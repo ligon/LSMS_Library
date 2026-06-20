@@ -349,6 +349,13 @@ estimation power (sparse PLs that fail `cfe.regression.prepare_data`'s
 `min_obs=30` floor want a home) and for downstream interpretability.
 This is the role of the `Aggregate Label` column on `harmonize_food`.
 
+This section owns the **bucket design** (when to add, the β-spread test,
+carve-outs, the `Aggregate (short)` companion). For the **API contract** side —
+what `labels='Aggregate'` does when a country *lacks* the column
+(`LabelUnavailableError` / the Feature drop-and-mark degrade), which countries
+already curate it, and the cross-country comparability trap — see the
+**`add-feature/food-acquired/aggregate-labels` sub-skill**.
+
 ### When to add an `Aggregate Label` column
 
 When any of:
