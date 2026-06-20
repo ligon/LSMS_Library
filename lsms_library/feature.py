@@ -25,6 +25,7 @@ from importlib.resources import files
 from .yaml_utils import load_yaml
 from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
+from .errors import LabelUnavailableError
 
 
 def _load_global_columns() -> dict[str, dict[str, Any]]:
@@ -369,6 +370,11 @@ class Feature:
             if "m" not in canonical_levels:
                 canonical_levels = canonical_levels + ["m"]
 
+        # Countries dropped because they cannot honour a labels=X request (no
+        # curated column).  Accumulated and reported ONCE after the loop, with a
+        # df.attrs marker -- distinct from genuine per-country build failures.
+        labels_unavailable: list[str] = []
+
         for name in targets:
             try:
                 c = Country(name, trust_cache=effective_trust_cache)
@@ -406,6 +412,11 @@ class Feature:
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
                 frames.append(df)
+            except LabelUnavailableError:
+                # Country curates no such label column -> degrade, don't conflate
+                # with a build failure.  Reported once after the loop (Contract B).
+                labels_unavailable.append(name)
+                continue
             except Exception as e:  # broad catch intentional: surface per-country failures as warnings
                 # Cross-country aggregation must not crash on one country's
                 # implementation error; the warning carries the specific type.
@@ -413,8 +424,23 @@ class Feature:
                     f"Failed to load {self.table_name} for {name}: {type(e).__name__}: {e}"
                 )
 
+        def _mark_labels_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
+            """Contract B: one aggregated warning + a df.attrs marker for the
+            countries dropped because they curate no requested label column."""
+            if not labels_unavailable:
+                return result
+            warnings.warn(
+                f"{self.table_name}: labels={kwargs.get('labels')!r} unavailable "
+                f"for {len(labels_unavailable)} country(ies) {labels_unavailable} "
+                f"-- they curate no such food-label column and were dropped from "
+                f"the assembly (kept {n_kept}). Add the column or pass a country "
+                f"subset to silence this."
+            )
+            result.attrs['labels_unavailable'] = list(labels_unavailable)
+            return result
+
         if not frames:
-            return pd.DataFrame()
+            return _mark_labels_unavailable(pd.DataFrame(), 0)
 
         # pandas cannot stack frames whose index DEPTH/NAMES differ into a named
         # MultiIndex -- it falls back to an unnamed object index, collapsing the
@@ -445,6 +471,7 @@ class Feature:
                 frames = kept
 
         result = pd.concat(frames)
+        n_kept = result.index.get_level_values("country").nunique()
 
         # GH #326: pd.concat can leave the (structurally-consistent) index
         # levels UNNAMED, forcing callers to index positionally instead of
@@ -474,4 +501,4 @@ class Feature:
                 f"unnamed object index; per-country index names differ: {shapes}"
             )
 
-        return result
+        return _mark_labels_unavailable(result, n_kept)

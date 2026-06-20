@@ -49,6 +49,7 @@ from .local_tools import (
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 from .currency import attach_currency, is_monetary_table
+from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 import importlib.util
 import hashlib
@@ -2053,18 +2054,27 @@ class Country:
         if table is None:
             table = cat_maps.get('harmonize_food')
         if table is None:
-            raise KeyError(
+            # Country never curated a food-label table -> it cannot honour the
+            # relabel.  LabelUnavailableError (a KeyError subclass) lets Feature
+            # degrade gracefully while direct callers still catch KeyError.
+            raise LabelUnavailableError(
                 f"No food label table ('food_items' or 'harmonize_food') "
                 f"on {self.name!r} for labels={labels!r}"
             )
         if 'Preferred Label' not in table.columns:
+            # Malformed table (has a food-label table but no key column) -> a
+            # genuine data defect, NOT a missing-curation case.  Plain KeyError
+            # so it surfaces loudly rather than being degraded-over by Feature.
             raise KeyError(
                 f"Food label table on {self.name!r} has no 'Preferred Label' column"
             )
         target = f"{labels} Label" if f"{labels} Label" in table.columns else labels
         if target not in table.columns:
             available = [c for c in table.columns if c != 'Preferred Label']
-            raise KeyError(
+            # Country curates a food-label table but not THIS label column
+            # (e.g. labels='Aggregate' against an EHCVM 'Original Label'-only
+            # table) -> missing curation, degradable by Feature.
+            raise LabelUnavailableError(
                 f"Column {target!r} not in food label table on {self.name!r}; "
                 f"available: {available}"
             )
