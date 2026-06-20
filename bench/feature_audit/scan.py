@@ -610,6 +610,63 @@ def declaring_countries(feature: str, country_filter: list[str] | None) -> list[
     return declared
 
 
+def _scan_one_feature(
+    feature: str, country_filter: list[str] | None, phases: set[str],
+    limit_countries: int | None, include_no_microdata: bool, build_timeout: int,
+) -> dict[str, Any]:
+    """Run one feature's full pipeline (Phase 1a/1b/2) and RETURN its records.
+
+    Module-level and data-returning (no shared file handle), so ``run`` can fan
+    features out across a ProcessPool -- ONE WORKER PER FEATURE.  That is the
+    parallelism axis that saturates a warm cache: per-country ``--jobs`` only
+    helps cold builds (Phase 1a), but warm scans are dominated by the SERIAL
+    cross-country assembly (Phase 1b), and there are ~a dozen features to run
+    concurrently.  Inner phases run ``jobs=1`` here to avoid nested pools.
+    """
+    t0 = time.perf_counter()
+    findings: list[Finding] = []
+    skips: list[tuple[str, str]] = []
+
+    def _result(n_countries: int) -> dict[str, Any]:
+        return {"feature": feature, "findings": findings, "skips": skips,
+                "n_countries": n_countries, "elapsed": time.perf_counter() - t0}
+
+    try:
+        countries = declaring_countries(feature, country_filter)
+    except ValueError as e:  # unknown feature name
+        skips.append((feature, str(e)))
+        return _result(0)
+    if limit_countries:
+        countries = countries[:limit_countries]
+    excluded = set() if include_no_microdata else NO_MICRODATA
+    dropped = [c for c in countries if c in excluded]
+    countries = [c for c in countries if c not in excluded]
+    for c in dropped:
+        skips.append((feature, f"{c}: known no-source-data country (CLAUDE.md)"))
+    if not countries:
+        skips.append((feature, "no declaring country in filter"))
+        return _result(0)
+
+    per_country_rows: dict[str, int] = {}
+    baseline = None
+    if "1" in phases:
+        f1a, per_country_rows = phase1a_country_sanity(
+            feature, countries, 1, build_timeout)
+        findings += f1a
+        f1b, baseline = phase1b_assembly(feature, countries, per_country_rows)
+        findings += f1b
+    if "2" in phases:
+        if baseline is None and feature not in _PROPERTY_FEATURES:
+            baseline, *_ = _build(lambda: ll.Feature(feature)(countries))
+        findings += phase2_kwargs(
+            feature, countries, baseline, per_country_rows, 1, build_timeout)
+    return _result(len(countries))
+
+
+def _scan_one_feature_star(args: tuple) -> dict[str, Any]:
+    return _scan_one_feature(*args)
+
+
 def run(features: list[str], country_filter: list[str] | None,
         phases: set[str], limit_countries: int | None,
         out_path: str, jobs: int = 1,
@@ -645,49 +702,44 @@ def run(features: list[str], country_filter: list[str] | None,
             fh.flush()
             n_skips += 1
 
-        for idx, feature in enumerate(features, 1):
+        def _handle(res: dict[str, Any]) -> None:
+            for feat, reason in res["skips"]:
+                skip(feat, reason)
+            emit(res["findings"])
+
+        if jobs > 1 and len(features) > 1:
+            # ONE WORKER PER FEATURE: fan the outer loop across a process pool.
+            # Per-country --jobs only speeds Phase 1a (cold builds); a warm scan
+            # is dominated by the SERIAL cross-country assembly (Phase 1b), so
+            # running features concurrently is what saturates the node.  Inner
+            # phases run jobs=1 (see _scan_one_feature) to avoid nested pools.
+            from multiprocessing import get_context
+            argv = [(f, country_filter, phases, limit_countries,
+                     include_no_microdata, build_timeout) for f in features]
+            pool = get_context("fork").Pool(processes=min(jobs, len(features)))
             try:
-                countries = declaring_countries(feature, country_filter)
-            except ValueError as e:  # unknown feature name
-                skip(feature, str(e))
-                continue
-            if limit_countries:
-                countries = countries[:limit_countries]
-            # Drop known no-microdata countries BEFORE any phase: Feature() (used
-            # by Phase 1b/2) has no skip list and would spin on them in the main
-            # process.  Logged per (feature, country) so coverage stays honest.
-            excluded = set() if include_no_microdata else NO_MICRODATA
-            dropped = [c for c in countries if c in excluded]
-            countries = [c for c in countries if c not in excluded]
-            for c in dropped:
-                skip(feature, f"{c}: known no-source-data country (CLAUDE.md)")
-            if not countries:
-                skip(feature, "no declaring country in filter")
-                continue
-
-            t0 = time.perf_counter()
-            print(f"[{idx}/{len(features)} {feature}] {len(countries)} countries"
-                  f"{f' (skipped {len(dropped)})' if dropped else ''}: "
-                  f"{', '.join(countries)}", file=sys.stderr, flush=True)
-
-            per_country_rows: dict[str, int] = {}
-            baseline = None
-            before = n_records
-            if "1" in phases:
-                f1a, per_country_rows = phase1a_country_sanity(
-                    feature, countries, jobs, build_timeout)
-                emit(f1a)
-                f1b, baseline = phase1b_assembly(feature, countries, per_country_rows)
-                emit(f1b)
-
-            if "2" in phases:
-                if baseline is None and feature not in _PROPERTY_FEATURES:
-                    baseline, *_ = _build(lambda: ll.Feature(feature)(countries))
-                emit(phase2_kwargs(feature, countries, baseline, per_country_rows,
-                                   jobs, build_timeout))
-
-            print(f"    done in {time.perf_counter() - t0:.0f}s  "
-                  f"(+{n_records - before} records)", file=sys.stderr, flush=True)
+                for i, res in enumerate(
+                        pool.imap_unordered(_scan_one_feature_star, argv), 1):
+                    _handle(res)
+                    print(f"[{i}/{len(features)} {res['feature']}] "
+                          f"{res['n_countries']} countries  {res['elapsed']:.0f}s  "
+                          f"(+{len(res['findings'])} records)",
+                          file=sys.stderr, flush=True)
+            finally:
+                pool.close()
+                pool.join()
+        else:
+            for idx, feature in enumerate(features, 1):
+                print(f"[{idx}/{len(features)} {feature}] building...",
+                      file=sys.stderr, flush=True)
+                res = _scan_one_feature(
+                    feature, country_filter, phases, limit_countries,
+                    include_no_microdata, build_timeout)
+                _handle(res)
+                print(f"    done in {res['elapsed']:.0f}s  "
+                      f"({res['n_countries']} countries, "
+                      f"+{len(res['findings'])} records)",
+                      file=sys.stderr, flush=True)
 
     print("\n=== feature-audit scan summary ===", file=sys.stderr)
     print(f"features: {len(features)}  records: {n_records}  skips: {n_skips}",
