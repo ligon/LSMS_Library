@@ -111,7 +111,19 @@ for _, row in panel_21.iterrows():
 # that 244009 -> 244010 (collision with the row that was originally
 # 244009). We skip the entry whose prev_i is itself another HH's
 # cur_i in the same candidate set.
-cur_set = {cur for cur, _ in candidates}
+#
+# GH #536: the "occupied" set must be EVERY 2021-22 household id, not just the
+# panel-linked candidates.  A moved household that renames onto a slot held by a
+# NON-panel 2021-22 household (PanelHH != 'Oui') still collides under id_walk's
+# single-pass rename -- 8 such rename-onto-occupied cases (e.g. 309009 -> 309010
+# where 309010 is a fresh, non-panel 2021-22 household).  The old panel-only
+# cur_set could not see them, so groupby().first() silently dropped one of each
+# colliding pair from sample / plot_features.  Build cur_set from the full cover.
+cur_set = set()
+for _, _r in cover_21[['grappe', 'menage']].dropna().drop_duplicates().iterrows():
+    _cv = _canonical_i(_r['grappe'], _r['menage'])
+    if _cv is not None:
+        cur_set.add(_cv)
 ehcvm_21_to_18: dict[str, str] = {}
 skipped_chains = 0
 for cur, prev in candidates:
