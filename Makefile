@@ -66,21 +66,25 @@ build: setup
 	$(POETRY) build
 
 # ── Release ───────────────────────────────────────────────
-# Usage: make release v=0.6.0
+# Usage: make release v=0.8.0
 #   1. Validates the tag doesn't already exist
 #   2. Runs the test suite in parallel (see PYTEST_ARGS above)
 #   3. Creates an annotated git tag (vX.Y.Z)
-#   4. Builds the distribution
+#   4. Builds the distribution locally as a SANITY check
 #
-# The version is derived from the tag by poetry-dynamic-versioning,
-# so no files need editing.
+# Publishing to PyPI is NOT done here — it is automated in CI
+# (.github/workflows/publish.yml) via Trusted Publishing when a GitHub
+# Release is published.  The version is derived from the tag by
+# poetry-dynamic-versioning, so no files need editing.  See the
+# `release` skill (.claude/skills/release/SKILL.md) for the full flow,
+# the release-event gotcha, and the workflow_dispatch fallback.
 #
 # For a long release test run, prefer a compute node over the login
 # node --- the test suite triggers cold country builds that can
 # saturate a shared login node for 45+ minutes.
 release:
 ifndef v
-	$(error Usage: make release v=0.6.0)
+	$(error Usage: make release v=0.8.0)
 endif
 	@if git rev-parse "v$(v)" >/dev/null 2>&1; then \
 		echo "Error: tag v$(v) already exists"; exit 1; \
@@ -89,8 +93,12 @@ endif
 	git tag -a "v$(v)" -m "Release $(v)"
 	$(POETRY) build
 	@echo ""
-	@echo "Tagged v$(v) and built dist/. When ready:"
+	@echo "Tagged v$(v) and built dist/ (local sanity build)."
+	@echo "To publish to PyPI (CI does the upload — no local twine):"
 	@echo "  git push origin v$(v)"
+	@echo "  gh release create v$(v) --title v$(v) --notes-file docs/releases/v$(v).md"
+	@echo "  # if the release event doesn't fire (see release skill):"
+	@echo "  gh workflow run publish.yml --ref master -f tag=v$(v)"
 
 # Delegate country-specific targets to the inner Makefile.
 # Usage: make country-test country=Uganda
