@@ -57,3 +57,19 @@ Level rationale:
 | 14.0           | Unknown                  |
 | 15.0           | None                     |
 | 17.0           | Unknown                  |
+
+* Housing (Roof) -- canonical harmonization (GH #170)
+
+Guyana housing has no Floor column; Roof only.
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Sheet Metal        | Iron Sheets     |
+| Concrete           | Concrete        |
+| Shingle (Wood)     | Wood            |
+| Shingle (Asphalt)  | Other           |
+| Shingle (Other)    | Other           |
+| Makeshift          | Other           |
+| Not Stated         | Other           |
+| Other              | Other           |
