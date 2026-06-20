@@ -15,6 +15,30 @@ is derived from the **git tag** by poetry-dynamic-versioning (the workflow
 checks out the tag, `fetch-depth: 0`), so there is no manual version bump and a
 guard fails the build if it resolves to `0.0.0`.
 
+### Before cutting: merge `development` → `master` and auto-close resolved issues
+
+Releases tag `master` (the default branch); routine PRs land on `development`.
+So **before** `make release`, open a **`development` → `master` merge PR** and
+put closing keywords for every issue resolved since the last release in its body:
+
+```
+Closes #498, #499, #500, #501, #502, #530, #551
+```
+
+This is the *only* point those issues auto-close: GitHub fires closing keywords
+only when they reach the default branch, and only via `Closes`/`Fixes`/`Resolves
+#N` (keyword + space) — **not** the `fix(#N):` conventional-commit scope style
+the fix commits use. Omit this and the resolved issues stay open after the merge
+(exactly what happened up to v0.8.0 — a batch had to be closed by hand). Build a
+candidate list, then **verify each is genuinely resolved** (not an umbrella issue
+a PR merely touched) before listing it:
+
+```sh
+# open issues whose fix PR branch (fix/<n>-… / feat/<n>-…) merged since the last tag
+gh pr list --state merged --limit 400 --json number,headRefName \
+  -q '.[].headRefName' | grep -oE '(fix|feat)/[0-9]+' | grep -oE '[0-9]+' | sort -un
+```
+
 Cut a release:
 
 ```sh
@@ -180,6 +204,8 @@ on other user-site packages.  Prefer the venv-local install above.
 ## Manual release sequence (fallback only — prefer the CI path above)
 
 ```sh
+# 0. First merge development -> master + close resolved issues (see "Before cutting" above)
+
 # 1. Make sure you're on a tagged commit
 git tag v0.8.0
 PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry build

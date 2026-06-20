@@ -685,3 +685,26 @@ Capturing the exact commands you ran (and any gotchas) in your pull request keep
 Note: the ~make test~ target expects the relevant Parquet/Stata assets to be
 available through DVC. Ensure you've authenticated and pulled/streamed the
 required files before relying on the smoke test.
+
+** Referencing issues from a pull request
+
+The repository's default branch is ~master~, but routine pull requests
+target ~development~.  GitHub only auto-closes an issue when a closing
+keyword reaches the *default* branch -- so a ~Closes #123~ in a PR that
+merges into ~development~ does **not** close the issue.  Two consequences
+worth knowing:
+
+- The conventional-commit scope style ~fix(#123):~ that we use in commit
+  subjects is *not* a GitHub closing keyword.  GitHub recognises only
+  ~Closes #123~ / ~Fixes #123~ / ~Resolves #123~ (keyword + space + ~#N~);
+  in ~fix(#123):~ the ~(~ breaks the pattern.  So fix commits never
+  auto-close their issues even once they reach ~master~.
+- Because fix PRs land on ~development~ (not the default branch), they
+  accumulate without closing their issues.  The issues close when
+  ~development~ is merged into ~master~ at release time -- *only if* the
+  closing keywords are in that merge PR's body.
+
+So: in a fix PR, reference the issue for traceability (~Addresses #123~),
+but list the closing keywords on the ~development -> master~ release-merge
+PR instead (~Closes #123, #124, ...~).  Merging that to ~master~ closes
+them all at once.  See the =release= skill for the release-merge step.
