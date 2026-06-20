@@ -1,0 +1,74 @@
+name: publish
+
+# Build a wheel + sdist and publish to PyPI when a GitHub Release is PUBLISHED.
+# Draft releases do NOT fire this (the `published` type only) -- so a release can
+# be staged as a draft and shipped by publishing it. The version is derived from
+# the release's git tag by poetry-dynamic-versioning, so there is no manual
+# version bump and no risk of the mis-versioned-wheel failure mode (see
+# .claude/skills/release/SKILL.md). Running in CI also sidesteps the local
+# keyring hang documented there -- Trusted Publishing (OIDC) stores no token.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # poetry-dynamic-versioning reads git tags to derive the version; the
+          # default shallow clone has none, which silently yields 0.0.0. Full
+          # history + tags is REQUIRED.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install poetry + dynamic-versioning plugin
+        # The [tool.poetry.requires-plugins] declaration is NOT enough in Poetry
+        # 2.x; the plugin must be actually installed or `poetry build` produces a
+        # 0.0.0 wheel. (release skill, "must be installed as a Poetry plugin".)
+        run: |
+          pip install poetry
+          poetry self add "poetry-dynamic-versioning[plugin]>=1.0.0,<2.0.0"
+
+      - name: Resolve & sanity-check version
+        run: |
+          VERSION=$(poetry version -s)
+          echo "Building $VERSION (release tag: ${GITHUB_REF_NAME})"
+          if [ "$VERSION" = "0.0.0" ]; then
+            echo "::error::Dynamic version resolved to 0.0.0 -- plugin inactive or tags not fetched (need fetch-depth: 0)."
+            exit 1
+          fi
+
+      - name: Build sdist + wheel
+        run: poetry build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    # Trusted Publishing (OIDC) -- no stored PyPI token. One-time setup on PyPI:
+    # add this repo (owner=ligon, repo=LSMS_Library, workflow=publish.yml) as a
+    # Trusted Publisher for the LSMS_Library project at
+    # https://pypi.org/manage/project/LSMS_Library/settings/publishing/
+    # (leave the "environment" field blank to match this workflow as written).
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
