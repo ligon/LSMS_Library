@@ -25,6 +25,15 @@ Index Info:
     individual_education: (t, v, i, pid)
     food_prices: (t, v, i, j, u, s)
     food_quantities: (t, v, i, j, u, s)
+    # GH #496: register so Feature() assembles a named MultiIndex instead of
+    # collapsing to a single object-tuple Index.  livestock is homogeneous
+    # across countries; people_last7days is (t,v,i,pid) for all but Uganda
+    # (reduced to (t,v,i) -- handled as a reduced-index country).  The plot-
+    # level ag features (plot_labor/crop_production/plot_inputs) are NOT here:
+    # their per-country index NAMES diverge (plot vs plot_id, crop vs j) and
+    # need harmonizing before registration -- tracked separately.
+    livestock: (t, i, animal)
+    people_last7days: (t, v, i, pid)
 
 # Cluster-id (v) join policy.  _finalize_result() joins v from sample() onto
 # household-level (i, t) tables that lack it.  A table is SKIPPED when its
