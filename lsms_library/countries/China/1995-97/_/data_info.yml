@@ -84,12 +84,15 @@ plot_features:
                 2: false
 
 individual_education:
-    # Education detail S01B.DTA; attainment code s01b10 (grade/level 1-12).
-    # pid maps from s01bid (person order); join to roster pid verified at build.
+    # CLSS 1995-97 has NO categorical attainment variable; education exists only
+    # as continuous years-of-schooling (S02.DTA s0201).  The prior wiring to
+    # S01B s01b10 was the MOTHER'S OCCUPATION code (#495).  Extract the raw years
+    # here; the china.py `individual_education` df_edit hook (auto-wired by table
+    # name) bins them to the canonical ordinal vocabulary.  S02 has clean hid/pid.
     file:
-        - ../Data/S01B.DTA
+        - ../Data/S02.DTA
     idxvars:
         i: hid
-        pid: s01bid
+        pid: pid
     myvars:
-        Educational Attainment: s01b10
+        Educational Attainment: s0201
