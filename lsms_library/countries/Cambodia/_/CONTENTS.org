@@ -51,50 +51,44 @@ CLOSED: [2023-07-24 Mon]
 Reads =2019-20/_/household_characteristics.parquet= and writes to
 =var/household_characteristics.parquet=.
 
-** DONE food_acquired.py
-CLOSED: [2023-08-04 Fri]
-Concatenates wave-level =food_acquired.parquet=, joins with
-=other_features= for market (=m=) index, and writes to
-=var/food_acquired.parquet=.
+** DONE food_acquired.py (canonical 2026-06-20, #108)
+Wave script =2019-20/_/food_acquired.py= emits canonical =(t, i, j, u, s)=
+with =[Quantity, Expenditure]= from =hh_sec_5.dta=: =i=HHID=, =j= harmonized
+via =food_items.org=, =u= the native unit, =s in {purchased, produced}=.
+hh_sec_5 reports ONE total quantity but splits VALUE (=s05q05= purchased /
+=s05q06= obtained-otherwise), so the quantity is apportioned by value share
+(#108 decision 2026-06-20); =s=produced= lumps own-production + in-kind.
+Country-level =_/food_acquired.py= concatenates the wave parquet(s) to
+=var/food_acquired.parquet=; registered in =data_scheme.yml= with
+=materialize: make=.  Price is api-derived.
 
-** DONE food_prices_quantities_and_expenditures.py
-Derives =food_expenditures=, =food_prices=, and =food_quantities=
-parquets from =var/food_acquired.parquet=.
-
-Note: writes CSV files to =~/Downloads/=, which is a side effect that
-should be removed.
+** DONE food_prices / food_quantities / food_expenditures (auto-derived)
+Derived at API time by =_FOOD_DERIVED= from =food_acquired= -- no per-country
+script.  The legacy =food_prices_quantities_and_expenditures.py= (which also
+wrote stray CSVs to =~/Downloads/=) was RETIRED (#108/#218).
 
 ** DONE food_items.org (2026-06-08; FCT column scaffolded)
 Harmonizes the 64 food codes from =hh_sec_5.dta= (variable
 =food_consumption_roster_1__id=) into preferred labels.  Columns:
 =Preferred Label | 2019-20 | Code | FCT ID=.  =2019-20/_/food_acquired.py=
-keys on the numeric =Code= (1--64) to map =i= to Preferred Labels
+keys on the numeric =Code= (1--64) to map =j= to Preferred Labels
 (verified 64/64 coverage).  The =FCT ID= column is a *scaffold* (blank):
 no freely-downloadable, machine-readable Cambodia FCT was obtained.
 Candidate FCT = SMILING-project Cambodia table (ASEANFOODS-based); see
 the org file's "Food Conversion Table" section for the source URL and
 remaining steps.
 
-** TODO nutrition.py
-Not yet implemented.  Requires:
-- A Food Conversion Table (FCT) mapping Cambodian food items to
-  nutritional content (calories, protein, fat, etc.).
-- The FAO Food Composition Tables for Southeast Asia or the SMILING
-  project database may be useful starting points.
-- =food_items.org= must be completed first to establish canonical item
-  names.
+** TODO nutrition.py -- tracked in #560 (FCT data-gap, split from #108)
+Blocked on obtaining a machine-readable Food Conversion Table (SMILING /
+ASEANFOODS); see #560.  The =food_items.org= harmonization + the =FCT ID=
+scaffold are ready; once the FCT CSV is in hand, populate =FCT ID= and add
+=nutrition.py=.  Deliberately split out so it does not block #108.
 
-** TODO food_prices_and_expenditures.py
-The existing =food_prices_quantities_and_expenditures.py= covers this
-functionality.  The TODO from the original CONTENTS.org may refer to a
-differently-structured version, or is redundant with the existing file.
-Clarify whether additional work is needed beyond what
-=food_prices_quantities_and_expenditures.py= already provides.
-
-** TODO data_scheme.yml
-Needed to integrate Cambodia into the =Country()= API.  Should declare
-at minimum =other_features=, =household_characteristics=, and
-=food_acquired= with =materialize: make=.
+** DONE data_scheme.yml
+Cambodia is integrated into the =Country()= API: =sample=, =cluster_features=,
+=household_roster=, =individual_education=, =plot_features=, =housing=,
+=interview_date=, and =food_acquired= (=materialize: make=) are declared;
+=household_characteristics= and the derived food tables auto-surface.
 
 ** TODO Migrate anti-patterns
 All wave-level scripts use =dvc.api.open()= and
