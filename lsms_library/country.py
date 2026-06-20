@@ -2594,6 +2594,24 @@ class Country:
 
                 if use_legacy:
                     wave_result = run_make_target(method_name, wave=w)
+                    # GH #535: run_make_target reads the whole shared folder's
+                    # script output, so for a country whose ``waves`` splits one
+                    # folder into several quarter-waves (Nigeria PP/PH share one
+                    # folder, e.g. 2010Q3 + 2011Q1 -> 2010-11) every quarter
+                    # re-injects the same script-tagged rows -- an exact doubling
+                    # at concat that surfaces as a false-positive GH #323
+                    # "duplicate tuple(s)" warning (plus a wasted 2x build).
+                    # Mirror grab_data's per-wave t-filter (~country.py:1092):
+                    # keep only the rows whose ``t`` matches the requested wave
+                    # ``w``.  No-op for single-t-per-folder tables and for
+                    # Tanzania's multi-round folder (``t == wave`` holds there);
+                    # ``w`` is never None on this in-loop path.
+                    if (isinstance(wave_result, pd.DataFrame)
+                            and not wave_result.empty
+                            and 't' in (wave_result.index.names or [])):
+                        wave_result = wave_result[
+                            wave_result.index.get_level_values('t') == w
+                        ]
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (
