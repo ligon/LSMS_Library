@@ -1,12 +1,66 @@
 ---
 name: release
-description: Use this skill when cutting a release (poetry build + wheel upload) of the LSMS Library. Covers poetry-dynamic-versioning plugin install, the Linux keyring hang on headless hosts, broken-system-poetry workarounds, and Savio compute-node outbound-network status.
+description: Use this skill when cutting a release of the LSMS Library. The primary path is automated — publish a GitHub Release and CI builds + uploads to PyPI via Trusted Publishing. Covers that flow and its release-event gotcha + workflow_dispatch fallback, plus the manual `poetry build` fallback (dynamic-versioning plugin, Linux keyring hang, broken-system-poetry, Savio outbound-network).
 ---
 
-# Release Tooling Gotchas
+# Releasing `lsms_library`
 
-Collected hazards from actually shipping wheels of `lsms_library`.
-Read this before you run `poetry build`.
+## Primary path: automated publish on GitHub Release (CI)
+
+As of v0.8.0 the canonical release path is **CI-driven** — you do **not**
+`poetry build` + upload by hand. `.github/workflows/publish.yml` builds the
+sdist+wheel and uploads to PyPI via **Trusted Publishing (OIDC)** — no stored
+token, and it runs in CI so the keyring hang below never applies. The version
+is derived from the **git tag** by poetry-dynamic-versioning (the workflow
+checks out the tag, `fetch-depth: 0`), so there is no manual version bump and a
+guard fails the build if it resolves to `0.0.0`.
+
+Cut a release:
+
+```sh
+make release v=0.8.0           # runs tests, creates annotated tag v0.8.0 (local)
+git push origin v0.8.0         # push the tag
+gh release create v0.8.0 --title v0.8.0 --notes-file docs/releases/v0.8.0.md
+```
+
+Publishing the GitHub Release *should* fire the workflow (`on: release:
+published`). **Then verify it actually ran** — `pypi.org` shows the new version
+and `gh run list --workflow=publish.yml` shows a `release` run.
+
+### Gotcha: the `release` event sometimes doesn't fire
+
+GitHub silently suppresses the `release: published` trigger in some cases —
+notably a release **created/published via a token** (the `gh` CLI), an **old or
+recreated draft**, or a tag that predates the workflow. Symptom: the release is
+published but `gh api .../actions/workflows/publish.yml/runs` shows
+`total_count: 0`. Publishing via the **web-UI "Publish release" button** (your
+own user identity) is the most reliable way to fire it.
+
+If it doesn't fire, use the **`workflow_dispatch` fallback** — always reliable,
+and the way v0.7.4 was shipped:
+
+```sh
+gh workflow run publish.yml --ref master -f tag=v0.8.0
+gh run watch $(gh run list --workflow=publish.yml -L1 --json databaseId -q '.[0].databaseId')
+```
+
+Both triggers build from the **tag** (`github.event.release.tag_name ||
+inputs.tag`), so the dispatch produces an identically-versioned artifact.
+
+### One-time PyPI setup (already done for LSMS_Library)
+
+PyPI Trusted Publishing is configured for this project: repo `ligon/LSMS_Library`,
+workflow `publish.yml`, environment blank
+(`pypi.org/manage/project/LSMS_Library/settings/publishing/`). A *new* project
+or a fork needs this registered before the first automated publish, or the
+upload step fails auth (the build step still succeeds).
+
+---
+
+# Manual / local-build fallback (CI down, or a local sanity build)
+
+Collected hazards from actually shipping wheels of `lsms_library` by hand.
+Read this before you run `poetry build` locally.
 
 ## `poetry-dynamic-versioning` must be installed as a Poetry plugin
 
@@ -123,15 +177,15 @@ python3 -m pip install --user --upgrade packaging
 That fixes the system poetry in place but may have flow-on effects
 on other user-site packages.  Prefer the venv-local install above.
 
-## Typical release sequence
+## Manual release sequence (fallback only — prefer the CI path above)
 
 ```sh
 # 1. Make sure you're on a tagged commit
-git tag v0.7.0
+git tag v0.8.0
 PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry build
 
 # 2. Verify the wheel filename carries the right version
-ls dist/        # should show lsms_library-0.7.0-*.whl
+ls dist/        # should show lsms_library-0.8.0-*.whl
 
 # 3. Upload (from a machine that can reach PyPI)
 poetry publish
