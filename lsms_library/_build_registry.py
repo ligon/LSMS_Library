@@ -146,7 +146,12 @@ def _unwrap(fn):
         return fn
 
 
+@functools.lru_cache(maxsize=None)
 def _source(fn) -> str:
+    # Memoised per function object: source is fixed per process, and the
+    # ALL-scoped orchestrators (_aggregate_wave_data/grab_data/df_data_grabber/
+    # _normalize_dataframe_index) sit in EVERY table's closure -- without this
+    # they are re-read+parsed per table (~300 ms each on the read gate).
     return textwrap.dedent(inspect.getsource(fn))  # dedent: methods are class-indented
 
 
@@ -163,13 +168,27 @@ def _strip_docstrings(tree):
     return tree
 
 
+@functools.lru_cache(maxsize=None)
 def _norm(fn) -> str:
     # ast.dump drops comments + normalises whitespace; we also strip docstrings,
     # so neither a comment nor a docstring edit invalidates -- only logic does.
+    # Memoised per function (cross-table sharing of the shared-orchestrator parse).
     try:
         return ast.dump(_strip_docstrings(ast.parse(_source(fn))))
     except (OSError, SyntaxError, TypeError):
         return f"<unsourced {fn.__module__}.{fn.__qualname__}>"
+
+
+def clear_caches() -> None:
+    """Clear every memoised cache (source, norm, module-classes, both
+    fingerprints).  Production never needs this (source is fixed per process);
+    tests that simulate a source edit by monkeypatching ``inspect.getsource``
+    MUST call it so the stale per-function ``_source``/``_norm`` are re-read."""
+    _source.cache_clear()
+    _norm.cache_clear()
+    _module_classes.cache_clear()
+    build_transforms_fingerprint.cache_clear()
+    framework_imports_fingerprint.cache_clear()
 
 
 def _import_map(fn) -> dict:

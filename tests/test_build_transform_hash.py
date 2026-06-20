@@ -118,9 +118,9 @@ def test_self_method_build_calls_are_versioned():
 
 
 def test_fingerprint_is_deterministic():
-    R.build_transforms_fingerprint.cache_clear()
+    R.clear_caches()
     a = R.build_transforms_fingerprint("food_acquired")
-    R.build_transforms_fingerprint.cache_clear()
+    R.clear_caches()
     b = R.build_transforms_fingerprint("food_acquired")
     assert a == b
 
@@ -253,8 +253,7 @@ def test_dynamically_dispatched_framework_helpers_are_versioned(monkeypatch, cou
     real = inspect.getsource
     monkeypatch.setattr(inspect, "getsource",
                         lambda o: real(o) + "\n_redteam_probe = 1\n" if o is target else real(o))
-    R.framework_imports_fingerprint.cache_clear()
-    R.build_transforms_fingerprint.cache_clear()
+    R.clear_caches()  # _source/_norm are memoised -> must clear to see the getsource edit
     after = c._table_cache_hash(table, c.waves)
     assert base != after, \
         f"editing framework helper {helper} did NOT invalidate {country}.{table} (#522 reopened)"
