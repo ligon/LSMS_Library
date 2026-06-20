@@ -1778,18 +1778,37 @@ def update_id(d: dict[str, str], id_splits: dict[str, int]) -> tuple[dict[str, s
         else:
             D_inv[v].append(k)
 
+    # GH #504: a minted suffix ``k_N`` must never equal an id a real household
+    # already holds -- a target value carried forward into this wave
+    # (``d.values()``) or one already emitted in this call.  The old code minted
+    # ``k_N`` from a per-base counter that could re-use a *live* suffix (a
+    # ``previous_i`` carried forward as ``k_N``), silently collapsing two
+    # distinct lineages onto one canonical id (60 such collisions in Malawi
+    # 2019-20; they propagate to anthropometry/sample/plot_features via the
+    # groupby().first() collapse).  Guard the mint by bumping past any clash.
+    # Single-source and ``it == 0`` passes are unchanged, so non-colliding
+    # households keep their original ids (byte-stable for healthy panels).
+    live = set(d.values())
+    emitted = set()
+
     updated_id = {}
     for k, v in D_inv.items():
-        if len(v)==1: 
+        if len(v)==1:
             updated_id[v[0]] = k
             id_splits[k] = 0
+            emitted.add(k)
         else:
             for it,v_element in enumerate(v):
-                split = id_splits.get(k, 0) + it
                 if it == 0:
-                    updated_id[v_element] = k
+                    cand = k
                 else:
-                    updated_id[v_element] = '%s_%d' % (k,split)
+                    split = id_splits.get(k, 0) + it
+                    cand = '%s_%d' % (k, split)
+                    while cand in live or cand in emitted:
+                        split += 1
+                        cand = '%s_%d' % (k, split)
+                updated_id[v_element] = cand
+                emitted.add(cand)
             id_splits[k] = id_splits.get(k, 0)+len(v)-1
 
     return updated_id, id_splits
