@@ -1,0 +1,342 @@
+#+TITLE: Versioning Build-Path Transform Code in the L2 Cache Hash — Step 2 Design
+#+filetags: skunkworks cache lsms_library design
+#+DATE: <2026-06-19 Fri>
+#+AUTHOR: Ethan Ligon + Sue (Claude Opus 4.8)
+
+* Purpose
+
+Close the last gap in the v0.8.0 content-hash cache layer: build-path
+*transform code* is not versioned, so editing it can leave a hash-valid
+but stale L2 parquet (the GH #522 blind spot).  This is the *step 2*
+follow-up to PR #534 (which made the build/read boundary structural by
+moving the framework build-path transforms into =build_transforms.py=).
+
+This document is a design, not an execution log.  The implementation is
+deferred to a session that can start from the [[#implementation-checklist][checklist]] below.
+
+#+begin_quote
+Rev 3 (post-#539 review round 2).  Rev 2 established that the hashable
+unit is a tagged function's *transitive closure*, not its own source.
+Rev 3 closes the load-bearing follow-on: *name resolution* is the hard
+part — the =getattr(own_module, name)= walk silently drops the
+function-level-import idiom (=from .feature import _ADDITIVE_MEASURE_COLUMNS=
+inside =_normalize_dataframe_index=), which is exactly how #514's
+build-relevant constant is reached.  Also folds in deterministic
+serialization of callable-valued constants, the =dedent= fix, and the
+corrected direct-tagging of the =build_transforms.py= functions.
+
+Rev 4 (post-#539 final remarks).  =apply_derived= resolves to *no* =tables=
+— scoping it to =['sample']= would be *under*-invalidation, not mere caution.
+The serialiser becomes an explicit type-dispatch with an else-*reject*, and a
+second red-test asserts no =0x= identity address leaks into any fingerprint
+part: paired with the resolve-to-None guard, two cheap invariants for the two
+genuinely hard sub-problems (resolution + serialization).
+#+end_quote
+
+* Background: what the hash covers today (v0.8.0)
+
+The L2 cache embeds a content hash in each parquet's pyarrow schema
+metadata (=lsms_cache_hash=).  =Wave._input_hash= and
+=Country._table_cache_hash= compose it from: =LSMS_CACHE_SCHEMA=; the wave
+=data_info.yml= and country =data_scheme.yml=; the wave/country modules and
+=mapping.py=; the country concatenator and script-path wave scripts; the
+=Makefile= and build-time =*.org= inputs; and the DVC sidecar md5 of each
+declared source (=.dta= never hashed).
+
+The deliberate exclusions are *read-path* transforms (kinship, spellings,
+categorical maps, =_join_v_from_sample=): they re-run on every read and
+never touch the cached parquet, so they must NOT invalidate it.
+
+* The gap
+
+The hash versions build-path /inputs/ (config) and /per-country scripts/,
+but not the *framework transform code* those scripts import and call.  Edit
+the body of a shared framework build-path function and nothing in the hash
+changes — the warm parquet stays valid and is served stale (#522).
+
+PR #534 isolated the framework build-path transforms into
+=build_transforms.py=.  The #534 review then established that the build-path
+surface is *not confined to one module*: it also lives in =country.py=.
+
+** Evidence: build-path code in country.py
+
+=_normalize_dataframe_index= (=country.py=) has four call sites; three are
+build-time, pre-=to_parquet= (=:2610= in =load_from_waves=, =:2824= in stage
+loading, =:2878= in the cache-load path), one is read-time (=:2056= in
+=_finalize_result=, post-write, a no-op on already-unique cached data).  Its
+consequential work — the duplicate-collapse — is now (as of *#533, merged
+2026-06-19 19:59*) an additive sum: it reads =_ADDITIVE_MEASURE_COLUMNS= via
+a *function-level* =from .feature import _ADDITIVE_MEASURE_COLUMNS=
+(=country.py:4067=), sums the additive columns (=:4068-4072=), and falls back
+to =.first()= (=:4076=).  So a *read-path* module's constant is now
+*build-relevant*, reached through the cycle-dodge import idiom — which is the
+crux of [[#resolution][name resolution]] below.
+
+=Wave.grab_data= is the same class of straddler (reads its own L2-wave
+parquet; on a miss, extracts + =apply_derived= + writes), and it imports its
+build callee the same way: function-level =from .transformations import
+apply_derived= (=country.py:994=).
+
+** Why module-boundary hashing is insufficient
+
+"One module = the hashable build unit" holds for =transformations.py=
+(read-path) and =build_transforms.py= (build-path) but breaks for
+=country.py=, where build and read code share the =Country= / =Wave=
+classes.  Hashing all of =country.py= invalidates every parquet on every
+read-path edit — defeating the warm cache.  We need a hash that selects
+*specific functions across modules*: the closure.
+
+* The closure is the hashable unit (rev-2)
+
+The hashable boundary is a tagged function's *transitive build-relevant
+closure*: the function, plus the =lsms_library=-owned callables it reaches,
+plus the module-level constants it reads.  A naive "hash each tagged
+function's own =getsource=" misses the closure — change =_declared_index_levels=
+(which =_normalize_dataframe_index= calls) and the collapse keys change while
+=getsource(_normalize_dataframe_index)= does not → stale cache.
+
+* Name resolution is the hard part (rev-3 load-bearing finding)
+:PROPERTIES:
+:CUSTOM_ID: resolution
+:END:
+
+Computing the closure means mapping each =co_names= string to the object it
+denotes.  The obvious resolver — =getattr(import_module(fn.__module__), name)=
+— only catches *own-module globals*.  It silently drops:
+
+- *function-level imports* (the =feature=↔=country= cycle-dodge idiom);
+- re-exports and conditional / =TYPE_CHECKING= imports.
+
+Verified against =development @ 2c561bae= by compiling
+=_normalize_dataframe_index= in isolation (no package import):
+
+#+begin_example
+'_ADDITIVE_MEASURE_COLUMNS' in co_names     -> True    # via IMPORT_FROM
+'_ADDITIVE_MEASURE_COLUMNS' in co_varnames  -> True    # it's a LOCAL (func-level import)
+module-level binding in country.py          -> none    # getattr(country, name) -> None
+from .feature import _ADDITIVE_MEASURE_COLUMNS  @ country.py:4067
+#+end_example
+
+So the rev-2 walk drops =_ADDITIVE_MEASURE_COLUMNS= — the very symbol the
+closure exists to catch.  The idiom is *pervasive*: =apply_derived= is
+imported the same way in =grab_data= (=country.py:994=), so it is dropped
+too — which is why the =build_transforms.py= functions must be *tagged
+directly*, not merely reached through =grab_data='s closure.
+
+** Three complementary layers
+
+1. *Resolver handles function-level imports.*  When =getattr(own_module, name)=
+   is =None=, scan the tagged function's AST for =ImportFrom= nodes and resolve
+   the name through the named (relative) module.  Closes the gap with no source
+   churn.  (See =_resolve= in the snippet.)
+2. *Leaf-module hygiene (recommended).*  Relocate shared build constants
+   (=_ADDITIVE_MEASURE_COLUMNS= and kin) into a leaf module imported at
+   *module level* by both =country= and =feature=, and convert =grab_data='s
+   =apply_derived= import to a module-level =from .build_transforms import
+   apply_derived= (safe — =build_transforms= imports nothing back).  This
+   removes #514's cycle dodge *and* makes =getattr(own_module, name)= sound, so
+   layer 1 becomes a backstop rather than the primary path.
+3. *Drift guard (essential backstop).*  A test that walks each tagged
+   function's AST and *fails* on any function-level =ImportFrom= whose target
+   is not resolved by the closure (and is not allowlisted as build-irrelevant).
+   Converts "a future edit re-introduced a hidden build dependency" from a
+   silent stale-cache bug into a red test.  (Targets =ImportFrom= specifically;
+   a blanket "fail on =co_names= → =None=" is too noisy — builtins =str=/=len=
+   and attribute names =groupby=/=first= all resolve to =None= benignly.)
+
+Ligon's stated preference is layers 2 + 3 (ship simple, no smarter resolver);
+the more general layer 1 needs no relocation.  Recommendation: implement
+*1 + 3* as the correctness core (works against the code as-is), and do *2* as
+follow-up hygiene that also kills the circular-import dodge.
+
+* Proposed design: =@build_transform= registry + closure hash
+
+#+begin_src python
+# lsms_library/_build_registry.py  -- a leaf module; imports nothing from the package.
+import ast, hashlib, importlib, inspect, textwrap
+
+_BUILD_TRANSFORMS = {}  # qualname -> (callable, tables)
+
+def build_transform(*, tables=None):
+    """Mark fn as a build-path entry point (output baked into the cached
+    parquet).  ``tables`` scopes which table hashes fold it in; None => every
+    table.  Returns fn UNCHANGED (no wrapper) — a tag, not a transform."""
+    def deco(fn):
+        _BUILD_TRANSFORMS[f"{fn.__module__}.{fn.__qualname__}"] = (fn, tuple(tables or ()))
+        return fn
+    return deco
+
+def _is_ours(o):
+    return (getattr(o, "__module__", "") or "").startswith("lsms_library")
+
+def _norm(fn):
+    return ast.dump(ast.parse(textwrap.dedent(inspect.getsource(fn))))  # dedent: methods are indented
+
+def _resolve(fn, name):
+    mod = importlib.import_module(fn.__module__)
+    obj = getattr(mod, name, None)
+    if obj is not None:
+        return obj
+    try:                                            # layer 1: function-level imports
+        tree = ast.parse(textwrap.dedent(inspect.getsource(fn)))
+    except (OSError, SyntaxError):
+        return None
+    parent = fn.__module__.rsplit(".", 1)[0]
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                if (alias.asname or alias.name) == name:
+                    tgt = importlib.import_module("." * node.level + (node.module or ""), package=parent)
+                    return getattr(tgt, alias.name, None)
+    return None
+
+def _ser(obj, seen, parts):                          # deterministic type-dispatch; no identity leaks
+    if isinstance(obj, (str, int, float, bool, type(None))):
+        return repr(obj)                             # primitive: stable repr
+    if callable(obj) and _is_ours(obj):
+        parts += _closure_parts(obj, seen)           # callable: qualname + hash its source
+        return f"<fn {obj.__module__}.{obj.__qualname__}>"   # qualname, NOT repr (no 0x address)
+    if isinstance(obj, dict):
+        return "{" + ",".join(f"{k!r}:{_ser(v, seen, parts)}"
+                              for k, v in sorted(obj.items(), key=lambda kv: repr(kv[0]))) + "}"
+    if isinstance(obj, (list, tuple, set, frozenset)):
+        xs = obj if isinstance(obj, (list, tuple)) else sorted(obj, key=repr)
+        return type(obj).__name__ + "[" + ",".join(_ser(v, seen, parts) for v in xs) + "]"
+    raise TypeError(                                 # else: REJECT, don't leak a default 0x repr
+        f"build constant of un-serialisable type {type(obj).__name__!r}; "
+        f"add a case to _ser rather than fall back to identity repr")
+
+def _closure_parts(fn, seen):
+    qn = f"{fn.__module__}.{fn.__qualname__}"
+    if qn in seen:
+        return []
+    seen.add(qn)
+    parts = [qn + "=" + _norm(fn)]
+    for name in fn.__code__.co_names:
+        obj = _resolve(fn, name)
+        if obj is None:
+            continue
+        if callable(obj) and _is_ours(obj):
+            parts += _closure_parts(obj, seen)
+        elif isinstance(obj, (dict, list, tuple, set, frozenset, str, int, float, bool)):
+            parts.append(f"{fn.__module__}.{name}=" + _ser(obj, seen, parts))
+    return parts
+
+def build_transforms_fingerprint(table=None):
+    seen, parts = set(), []
+    for qn, (fn, tables) in sorted(_BUILD_TRANSFORMS.items()):
+        if table is not None and tables and table not in tables:
+            continue                                 # per-table precision
+        parts += _closure_parts(fn, seen)
+    return hashlib.sha256("\x1f".join(sorted(set(parts))).encode()).hexdigest()
+#+end_src
+
+Fold =build_transforms_fingerprint(method_name)= into =Country._table_cache_hash=
+and =Wave._input_hash= as one term, inside their existing
+=try/except -> None= guard so a fingerprint failure degrades to "unverifiable
+-> read-if-present" rather than breaking reads.  Demote =LSMS_CACHE_SCHEMA= to
+a backstop (keep it; it stops being the *only* thing between a build-code edit
+and stale data).
+
+** Tagging (direct — corrects rev-2's "rely on grab_data's closure")
+
+- =build_transforms.py=: =food_acquired_to_canonical=,
+  =_finalize_canonical_food_acquired= → =tables=['food_acquired']=;
+  =apply_derived=, =fill_v_with_coord_bin= → *no* =tables=.  This is
+  *under*-invalidation avoidance, not mere caution: scoping them to =['sample']=
+  (the only current =derived:= consumer, Uganda 2009-10) would silently leave a
+  future non-=sample= =derived:= table's code-dependency on =apply_derived=
+  uncovered — only =sample= would fold in =apply_derived='s source.  No-=tables=
+  (honest over-invalidation; these are edited rarely) is the safe call.  They
+  are tagged *directly* because =grab_data='s function-level import would
+  otherwise drop them from its closure.
+- =country.py=: =_normalize_dataframe_index=, =Wave.grab_data= → no =tables=
+  (every build).
+
+* Per-table precision is in the first cut
+
+=tables=['food_acquired']= rides the decorator — no call-graph analysis.  It
+matters for the food-specific transforms: without it, editing
+=food_acquired_to_canonical= would rebuild all 40 countries' =household_roster=.
+The =country.py= tags carry no =tables= (every build), so they land in every
+table's fingerprint regardless.
+
+A precise middle ground for =apply_derived= (deferred): compute its =tables= at
+hash time from "does this table's =data_info.yml= declare a =derived:= block?"
+— covering every =derived:= table and over-invalidating none, at the cost of
+the fingerprint reading config that is already loaded.  No-=tables= is a fine
+first cut; this is the upgrade if the over-invalidation ever bites.
+
+* Alternatives considered (and rejected)
+
+- *Hash each tagged function's own source only* (rev-1 implicit).  Misses the
+  transitive closure (=_declared_index_levels=) — reopens #522.
+- *=getattr(own_module, name)= resolution only* (rev-2).  Misses function-level
+  imports (=_ADDITIVE_MEASURE_COLUMNS=, =apply_derived=) — the rev-3 finding.
+- *Relocate =_normalize_dataframe_index= into =build_transforms.py=.*  Entangled
+  with =_aggregate_wave_data= and dual-call; tagging is far less risky.
+- *Hash all of =country.py= / =transformations.py=.*  Invalidates every parquet
+  on every read-path edit; defeats the warm cache.
+
+* Risks / open questions
+
+- =inspect.getsource= needs =.py= on disk (true for in-tree =.venv= and a normal
+  wheel); =LSMS_CACHE_SCHEMA= remains the fallback if absent.
+- =ast.dump= still carries docstring nodes, so a docstring edit invalidates —
+  strip module/function docstrings before dump if judged too eager.
+- =_resolve='s AST scan handles =ImportFrom=; bare =import x.y= and string-keyed
+  =getattr= are still invisible — the drift guard (layer 3) is the backstop.
+- Constant serialisation must be stable; =_ser= is an explicit type-dispatch
+  (primitive→repr, callable→qualname+source-hash, container→recurse, *else
+  raise*) so an unhandled type fails loudly rather than leaking a default =0x=
+  identity =repr= (the =_DERIVED_TRANSFORMERS= case).  A red-test asserts no
+  =0x[0-9a-f]+= appears in any fingerprint part — catching the whole
+  identity-leak class, parallel to the resolve-to-None guard.
+- Decorating =Wave.grab_data= must return the function unchanged (no wrapper).
+- =inspect.getsource= of a decorated function includes the
+  =@build_transform(...)= line — desirable, since editing =tables= then
+  correctly invalidates; =textwrap.dedent= (already applied) handles the
+  class-indentation of methods.
+- =grab_data= over-invalidates (a plumbing-only edit triggers a rebuild) and is
+  a known blunt instrument; isolating its extraction core is a later refinement.
+
+* Implementation checklist
+:PROPERTIES:
+:CUSTOM_ID: implementation-checklist
+:END:
+
+1. Add =lsms_library/_build_registry.py= (=build_transform=, =_resolve=, =_ser=,
+   =_closure_parts=, =build_transforms_fingerprint=).
+2. Tag entry points (run =gitnexus_impact= on each first): the 4 in
+   =build_transforms.py= (food funcs =tables=['food_acquired']=; =apply_derived=
+   / =fill_v_with_coord_bin= *no* =tables=); =_normalize_dataframe_index= and
+   =Wave.grab_data= in =country.py= (no =tables=).
+3. Fold =build_transforms_fingerprint(method_name)= into
+   =Country._table_cache_hash= and =Wave._input_hash= (inside the existing
+   =try/except=); update docstrings.
+4. (Layer 2 hygiene) relocate =_ADDITIVE_MEASURE_COLUMNS= to a leaf module,
+   module-level imported by =country= + =feature=; convert =grab_data='s
+   =apply_derived= import to module level.  Confirms the cycle is gone.
+5. Demote =LSMS_CACHE_SCHEMA= to a backstop in =local_tools=.
+6. Add the two red-tests for the hard sub-problems: (a) tagged-entry-point set
+   equals a checked-in set; (b) *resolution* — walk each tagged function's
+   =ImportFrom= nodes and fail on any unresolved-and-not-allowlisted build
+   dependency; (c) *serialization* — assert no =0x[0-9a-f]+= appears in any
+   fingerprint part (no identity-repr leak).
+7. Verify: changing =_ADDITIVE_MEASURE_COLUMNS= (add a table) or
+   =_declared_index_levels= auto-rebuilds a warm Mali =food_acquired= read (no
+   =LSMS_NO_CACHE=); a kinship-label edit does NOT invalidate; editing
+   =food_acquired_to_canonical= invalidates only =food_acquired=, not
+   =household_roster=; the fingerprint is byte-stable across two processes.
+8. Update CLAUDE.md's cache section to describe the build-transform fingerprint.
+
+* References
+
+- PR #534 — step 1 (build/read split: =build_transforms.py=).
+- PR #531 — the cache-aware verification discussion that started this.
+- PR #533 / GH #514 — merged 2026-06-19 19:59; wired additive-sum +
+  =_ADDITIVE_MEASURE_COLUMNS= into =_normalize_dataframe_index= via a
+  function-level import — the live proof of the resolution gap.
+- GH #522 — the framework-transform-code cache blind spot.
+- GH #537 — =validate_acquisition_source= dormancy (surfaced alongside #534).
+- =SkunkWorks/dvc_object_management.org= — the v0.7.0/v0.8.0 cache design lineage.
