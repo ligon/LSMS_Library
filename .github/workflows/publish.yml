@@ -1,15 +1,24 @@
 name: publish
 
-# Build a wheel + sdist and publish to PyPI when a GitHub Release is PUBLISHED.
-# Draft releases do NOT fire this (the `published` type only) -- so a release can
-# be staged as a draft and shipped by publishing it. The version is derived from
-# the release's git tag by poetry-dynamic-versioning, so there is no manual
-# version bump and no risk of the mis-versioned-wheel failure mode (see
-# .claude/skills/release/SKILL.md). Running in CI also sidesteps the local
-# keyring hang documented there -- Trusted Publishing (OIDC) stores no token.
+# Build a wheel + sdist and publish to PyPI, either:
+#   * automatically when a GitHub Release is PUBLISHED, or
+#   * manually via workflow_dispatch with a `tag` input (re-publish / recover
+#     when the release event doesn't fire -- e.g. an old or recreated draft, or
+#     a release created by a token whose trigger GitHub suppresses).
+# Either way the version is derived from the git TAG by poetry-dynamic-versioning
+# (the checkout below targets the tag), so there is no manual version bump and no
+# risk of the mis-versioned-wheel failure mode (see .claude/skills/release/
+# SKILL.md). Running in CI also sidesteps the local keyring hang documented there
+# -- Trusted Publishing (OIDC) stores no token.
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing git tag to build & publish (e.g. v0.7.4)."
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -20,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Build from the TAG, whichever trigger fired: the release's tag for a
+          # release event, or the workflow_dispatch `tag` input for a manual run.
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
           # poetry-dynamic-versioning reads git tags to derive the version; the
           # default shallow clone has none, which silently yields 0.0.0. Full
           # history + tags is REQUIRED.
@@ -40,7 +52,7 @@ jobs:
       - name: Resolve & sanity-check version
         run: |
           VERSION=$(poetry version -s)
-          echo "Building $VERSION (release tag: ${GITHUB_REF_NAME})"
+          echo "Building $VERSION from $(git describe --tags --always)"
           if [ "$VERSION" = "0.0.0" ]; then
             echo "::error::Dynamic version resolved to 0.0.0 -- plugin inactive or tags not fetched (need fetch-depth: 0)."
             exit 1
