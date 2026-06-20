@@ -18,7 +18,7 @@ Index Info:
     household_characteristics: (t, v, i, m)
     plot_features: (t, v, i, plot_id)
     food_acquired: (t, v, i, j, u, s)
-    interview_date: (t, v, i)
+    interview_date: (t, v, i, visit)
     shocks: (t, i, Shock)
     panel_ids: (t, i)
     assets: (t, i, j)
@@ -34,6 +34,16 @@ Index Info:
     # need harmonizing before registration -- tracked separately.
     livestock: (t, i, animal)
     people_last7days: (t, v, i, pid)
+
+  # Features whose reduced-index countries get their MISSING canonical levels
+  # FABRICATED as NaN (so all countries share the full canonical shape and are
+  # KEPT) instead of being modal-excluded.  Use only where the reduced shape is
+  # legitimate variation, not an incompatible table.
+  # interview_date (#506): EHCVM countries are genuinely per-visit (t,v,i,visit);
+  # single-visit countries get visit=NaN so Feature() keeps the per-visit dates
+  # instead of dropping `visit` and first()-collapsing one date per household.
+  fabricate_missing_levels:
+    - interview_date
 
 # Cluster-id (v) join policy.  _finalize_result() joins v from sample() onto
 # household-level (i, t) tables that lack it.  A table is SKIPPED when its
