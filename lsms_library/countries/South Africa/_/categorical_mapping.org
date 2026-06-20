@@ -1,0 +1,45 @@
+#+title: Categorical mappings for South Africa
+
+* Housing (Roof / Floor) -- canonical harmonization (GH #170)
+
+Maps the SALDRU 1993 IHS roof/floor material values onto the canonical
+housing vocabulary (=lsms_library/categorical_mapping/canonical_housing_labels.org=).
+Auto-applied by column name via =_apply_categorical_mappings=.
+
+#+name: Roof
+| Alternate Spelling        | Preferred Label  |
+|---------------------------+------------------|
+| Corrugated Iron           | Iron Sheets      |
+| Asbestos                  | Asbestos         |
+| Tile                      | Clay Tiles       |
+| Thatching                 | Thatch           |
+| Cement Block              | Concrete         |
+| Wood                      | Wood             |
+| Mud                       | Mud              |
+| Wattle and Daub           | Mud              |
+| Mixture of Mud and Cement | Mud              |
+| Plastic                   | Plastic Sheeting |
+| Bricks                    | Other            |
+| Cardboard                 | Other            |
+| Pre-fab                   | Other            |
+| Other                     | Other            |
+
+#+name: Floor
+| Alternate Spelling        | Preferred Label |
+|---------------------------+-----------------|
+| Mixture of Mud and Cement | Earth           |
+| Mud                       | Earth           |
+| Wattle and Daub           | Earth           |
+| Tile                      | Tiles           |
+| Carpet                    | Carpet          |
+| Linoleum                  | Vinyl/Linoleum  |
+| Cement Block              | Concrete        |
+| Bricks                    | Bricks          |
+| Wood                      | Wood            |
+| Asbestos                  | Other           |
+| Cardboard                 | Other           |
+| Corrugated Iron           | Other           |
+| Plastic                   | Other           |
+| Pre-fab                   | Other           |
+| Thatching                 | Other           |
+| Other                     | Other           |

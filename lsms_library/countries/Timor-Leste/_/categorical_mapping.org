@@ -1,0 +1,44 @@
+#+title: Categorical mappings for Timor-Leste
+
+* Housing (Roof / Floor) -- canonical harmonization (GH #170)
+
+Maps the Timor-Leste roof/floor values onto the canonical housing
+vocabulary (=lsms_library/categorical_mapping/canonical_housing_labels.org=).
+Both case variants of each value are listed so the exact-match mapping
+also collapses the case-variance.  Auto-applied by column name.
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Metal sheets/zinc  | Iron Sheets     |
+| metal sheets/zinc  | Iron Sheets     |
+| Sugar palm fibre   | Thatch          |
+| sugar palm fibre   | Thatch          |
+| Leaves             | Thatch          |
+| leaves             | Thatch          |
+| Tile               | Clay Tiles      |
+| tile               | Clay Tiles      |
+| Concrete           | Concrete        |
+| concrete           | Concrete        |
+| Wood               | Wood            |
+| wood               | Wood            |
+| Other              | Other           |
+| other              | Other           |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Earth/clay         | Earth           |
+| earth/clay         | Earth           |
+| Concrete/brick     | Concrete        |
+| concrete/brick     | Concrete        |
+| floor tile         | Tiles           |
+| Floor tille/cement | Tiles           |
+| Marble/ceramic     | Tiles           |
+| marble/ceramic     | Tiles           |
+| Bamboo             | Wood            |
+| bamboo             | Wood            |
+| Wood               | Wood            |
+| wood               | Wood            |
+| Other              | Other           |
+| other              | Other           |

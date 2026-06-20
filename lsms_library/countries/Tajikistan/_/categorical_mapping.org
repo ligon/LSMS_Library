@@ -47,3 +47,30 @@ Notes on the non-obvious levels:
 | candidate of science                | Doctorate                |
 | doctor of science                   | Doctorate                |
 | other                               | Unknown                  |
+
+* Housing (Roof / Floor) -- canonical harmonization (GH #170)
+
+#+name: Roof
+| Alternate Spelling     | Preferred Label |
+|------------------------+-----------------|
+| slate                  | Slate           |
+| metal sheeting         | Iron Sheets     |
+| metal sheets           | Iron Sheets     |
+| plastic on metal       | Iron Sheets     |
+| bitumised concrete slab | Concrete       |
+| mud                    | Mud             |
+| thatch                 | Thatch          |
+| tiles                  | Clay Tiles      |
+| other                  | Other           |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| painted wood       | Wood            |
+| parquet            | Wood            |
+| clay/eatern floor  | Earth           |
+| clay/earthen floor | Earth           |
+| linoleum           | Vinyl/Linoleum  |
+| concrete           | Concrete        |
+| alabaster surface  | Concrete        |
+| other              | Other           |

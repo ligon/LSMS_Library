@@ -34,3 +34,33 @@ BacII / Baccalaureate II higher-education-entrance certificate).
 | Doctorate degree (PhD)                                  | Doctorate                    |
 | DonÂ´t know                                             | Unknown                      |
 | Other (Specify)                                         | Unknown                      |
+
+* Housing (Roof / Floor) -- canonical harmonization (GH #170)
+
+Note: the =Other (Specify)= rows below are scoped to the Roof/Floor tables
+(housing); the education =Other (Specify) -> Unknown= row above is unaffected
+(each table is keyed independently).
+
+#+name: Roof
+| Alternate Spelling                                                                    | Preferred Label |
+|---------------------------------------------------------------------------------------+-----------------|
+| Galvanized iron or aluminium or other metal sheets                                    | Iron Sheets     |
+| Tiles                                                                                 | Clay Tiles      |
+| Fibrous cement                                                                        | Asbestos        |
+| Concrete                                                                              | Concrete        |
+| Thatch/leaves/grass                                                                   | Thatch          |
+| Mixed but predominantly made of galvanized iron/aluminium, tiles or fibrous cement    | Other           |
+| Other (Specify)                                                                       | Other           |
+
+#+name: Floor
+| Alternate Spelling      | Preferred Label |
+|-------------------------+-----------------|
+| Wooden planks           | Wood            |
+| Parquet, polished wood  | Wood            |
+| Bamboo strips           | Wood            |
+| Ceramic tiles           | Tiles           |
+| Cement/Brick/Stone      | Cement          |
+| Earth, clay             | Earth           |
+| Polished stone, marble  | Stone           |
+| Vinyl                   | Vinyl/Linoleum  |
+| Other (Specify)         | Other           |
