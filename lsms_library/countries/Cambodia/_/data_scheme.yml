@@ -55,3 +55,14 @@ Data Scheme:
     index: (t, i)
     Int_t: datetime
     materialize: make
+
+  food_acquired:
+    # Built by 2019-20/_/food_acquired.py -> canonical (t, i, j, u, s) with
+    # [Quantity, Expenditure]; s in {purchased, produced} via value-share split
+    # of the single reported quantity (hh_sec_5; see the wave script). Price is
+    # api-derived. food_prices / food_quantities / food_expenditures are
+    # auto-derived at runtime (_FOOD_DERIVED) -- do NOT register them here.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    materialize: make
