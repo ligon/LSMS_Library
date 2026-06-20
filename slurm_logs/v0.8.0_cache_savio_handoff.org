@@ -1,0 +1,131 @@
+#+TITLE: v0.8.0 Cache — Savio Feature-Scan Handoff
+#+filetags: handoff cache v0.8.0 savio
+#+DATE: <2026-06-20 Sat>
+#+AUTHOR: Sue (Claude Opus 4.8)
+
+* Why you're reading this
+
+You're running a full ~Feature()~ scan on Savio to exercise the v0.8.0
+content-hash cache before we tag the release.  This note is so that *if* a
+cache discrepancy surfaces, you diagnose it against the design we just shipped
+instead of rediscovering it.  The cache is the *headline* of v0.8.0, so a
+correctness regression here is the one thing that should block the tag.
+
+Release state: ~development~ @ a green CI (run for HEAD ~8a6d590f~ = success).
+Step-2 build-transform versioning landed in #543 (8-round red-teamed), built on
+#534/#539.  Design: =SkunkWorks/build_transform_cache_hash.org=; cache overview:
+=docs/guide/caching.md= and the "Cache Behavior" + "Pandas/Two Build Paths"
+sections of =CLAUDE.md=.
+
+* The ONE diagnostic question for any finding: does it reproduce COLD?
+
+This is the whole game (it's the #531 guidance).  Match the symptom to where it
+lives BEFORE calling anything a cache bug:
+
+- *Assembly-time / post-read* (index collapse, unnamed level, 100%-NaN ~v~,
+  kinship/spelling, ~groupby().first()~ dup-collapse) -- these re-run on EVERY
+  ~Feature()~/~Country()~ call on top of the parquet.  They reproduce *warm* and
+  *cold* identically.  **Not a cache bug.**  Fix the transform.
+- *Stale parquet* -- only shows *warm*; vanishes on a *cold* build.  THIS is the
+  cache-correctness class v0.8.0 is supposed to prevent.  If you find one, it's a
+  real v0.8.0 defect and a tag-blocker.
+
+So for any scan finding: re-run it cold and compare.
+#+begin_src bash
+# cold, authoritative — neutral CWD (the .pth pins lsms_library to main; see below)
+LSMS_NO_CACHE=1 python /abs/path/bench/feature_audit/scan.py --features <f> --countries <C> --out /tmp/cold.jsonl
+# or physically clear one country and let it rebuild:
+lsms-library cache clear --country <C>
+#+end_src
+- warm == cold  -> assembly bug, not cache.  Triage the transform.
+- warm != cold  -> **stale cache = v0.8.0 defect.**  Capture both parquets +
+  the country/wave/table and ping back.
+
+* Savio traps that masquerade as cache bugs (rule these out first)
+
+1. *The =.pth= pin* (=CLAUDE.md= scrum-master addendum #3).
+   =.venv/lib/python3.11/site-packages/lsms_library.pth= hardcodes the MAIN
+   checkout.  ~PYTHONPATH~ alone does NOT redirect ~import lsms_library~ to a
+   worktree -- so a worktree edit you *think* you're testing may be running
+   main's code.  For *config* edits set
+   ~LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries~; for *library-code*
+   edits run with ~cwd=worktree~ or a worktree venv.  A "cache didn't
+   invalidate" report is often really "the edit never loaded."
+2. *Stale node-local venv* (=CLAUDE.md= scrum-master addendum #4).  ~.venv~ is a
+   symlink to ~/local/jobNNN/venv~ and goes stale when you land on a different
+   node.  Use the README's adopt-or-build recipe; do NOT grab
+   ~.venv.lustre/bin/python~ (every import round-trips through Lustre).
+3. *Shared cache across agents.*  Subagents share
+   ~~/.local/share/lsms_library/~.  Concurrent builds of *different* countries
+   are fine, but if you're A/B-testing a fix don't let a sibling agent warm the
+   same country's parquet underneath you.
+4. *Do NOT ~dvc pull~ in parallel.*  Use ~get_dataframe()~ (lock-free direct-S3).
+   The DVC CLI takes the global lock and fails under concurrency (=CLAUDE.md=).
+
+* What the v0.8.0 hash DOES and does NOT cover (so you know what's expected)
+
+Covered -> editing it auto-invalidates the affected table:
+- survey config (=data_info.yml=/=data_scheme.yml=/=Makefile=/=.org=), the
+  wave+country modules, ~_/{table}.py~ scripts, the DVC sidecar md5 of sources;
+- *every build-input file* in a country/wave ~_/~ dir -- =.py= helper bodies
+  (e.g. =_age_helpers.py=) AND =.csv=/=.json=/=.txt= conversion tables
+  (e.g. Malawi =ihs3_conversions.csv=);
+- framework build-path transform CODE, via the closure of these 8 tagged
+  entry points (=lsms_library/_build_registry.py=):
+  ~food_acquired_to_canonical~, ~_finalize_canonical_food_acquired~,
+  ~apply_derived~, ~fill_v_with_coord_bin~, ~_normalize_dataframe_index~,
+  ~Wave.grab_data~, ~Country._aggregate_wave_data~, ~df_data_grabber~ -- plus
+  the ~lsms_library~ helpers those reach.
+
+NOT covered (these are *expected* misses, NOT new bugs -- don't file them):
+- *Read-path* transforms (~_finalize_result~, kinship, spellings,
+  ~_join_v_from_sample~) -- excluded on purpose; they re-apply on every read, so
+  an edit surfaces regardless of cache.  (If one of THESE looks wrong, it's an
+  assembly bug, reproduces cold, fix the transform.)
+- *Purely string-keyed dynamic dispatch* into framework code
+  (~getattr(mod, runtime_string)()~ / ~import_module(runtime_string)~) -- not
+  statically resolvable.  Backstopped by a manual ~LSMS_CACHE_SCHEMA~ bump.
+  Documented in =_build_registry.py=.  If a country build uses runtime-string
+  dispatch into framework code and a stale-cache shows, that's the known
+  residual, not a regression.
+
+* Belt-and-suspenders already in place (you may SEE these fire -- that's good)
+
+- ~Country._assert_built_required_columns~ -- script-path tables only; raises an
+  actionable error if a build is missing a required declared column (the
+  stale-wave-parquet symptom) instead of returning wrong data silently.
+- ~Country._evict_hashless_wave_caches~ -- evicts script-path L2-wave parquets
+  before every rebuild descent (GH #479), so a source-script fix actually
+  re-runs.
+- =bench/feature_audit/scan.py= itself is the regression net.  A discrepancy
+  scan catches that CI didn't usually means *warm-cache shadowing*; confirm with
+  a cold run or ~pytest --rebuild-caches~.
+
+* Performance expectations (so you can flag a real regression)
+
+- ~build_transforms_fingerprint~ runs on the read gate; ~_source~/~_norm~ are
+  memoised, so warm fingerprint recompute is ~ms (one-time per-process warmup of
+  the shared-orchestrator parse ~200-400ms, then ~8ms).  The v0.7.0 warm fast
+  path is preserved.
+- If you see warm reads paying *hundreds of ms per table repeatedly* (not just
+  once per process), that's a memoisation regression -- capture a profile
+  (=.claude/skills/profiling/SKILL.md=) and flag it.
+
+* If you find a real stale-cache (warm != cold)
+
+Capture and report:
+1. country / wave / table / feature + the exact ~Feature()~ or ~Country()~ call;
+2. ~git rev-parse HEAD~ of the checkout actually loaded (mind the =.pth=);
+3. both parquets (warm + post-~cache clear~ cold) or their differing values;
+4. whether it's YAML-path or script-path (=materialize: make= in
+   =data_scheme.yml=);
+5. which build input you suspect (so we can check it's in the hash closure).
+
+Then it's a tag-blocker -- ping back and I'll triage it against the
+implementation while it's fresh.
+
+* TL;DR
+- Cold-vs-warm is the only test that matters.  Warm==cold -> not a cache bug.
+- Rule out the =.pth= pin / stale venv first.
+- Read-path + string-keyed-dispatch misses are EXPECTED (not regressions).
+- A genuine warm!=cold stale parquet blocks the v0.8.0 tag -- capture and escalate.
