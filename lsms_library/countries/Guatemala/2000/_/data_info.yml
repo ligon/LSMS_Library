@@ -29,6 +29,13 @@ cluster_features:
             - mapping:
                 urbana: Urban
                 rural: Rural
+        # `region` is the 8 Guatemalan geographic regions (string-labelled:
+        # central / metropolitana / norte / nororiente / noroccidente /
+        # suroriente / suroccidente / peten).  It is already the cluster index
+        # (v) but was never surfaced as a column, so market='Region' raised
+        # KeyError.  Expose it so demand estimation by region works (GH #530,
+        # same class as Azerbaijan).
+        Region: region
 
 household_roster:
     file: ECV09P05.DTA
