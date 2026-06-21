@@ -88,6 +88,46 @@ Distinguish two cases:
    cross-country interface is the derived tables, which have already aggregated
    it.  Reference: GhanaLSS, `slurm_logs/DESIGN_ghanalss_food_acquired_2026-06-15.org` (decision D1).
 
+### Recall fidelity: record the *actual recalled acquisition*, never a "typical" period
+
+`food_acquired` records **what the household actually acquired during the
+survey's recall window** — nothing more.  Do **NOT** impute, annualize, or
+rescale quantities/expenditures to a "typical month", an average month, or a
+full year, **even when the survey offers a usual-/typical-period variable**.
+The canonical table must not bake in an assumption that the recalled window is
+representative of the rest of the year; that is an analyst's modelling choice,
+made downstream, not a property of the harmonized data.
+
+When a questionnaire records *both* an actual-recall figure and a usual/typical
+figure, **use the actual recall** and leave the rest in the source:
+
+- **Guatemala ENCOVI 2000** records, per (household, item): a usual monthly
+  spend (`p12a05` "gasto al mes") + months-per-year bought (`p12a04` "meses
+  compro") **and** the actual last-15-days purchase (`p12a06a` quantity /
+  `p12a06d` expense; obtained side `p12a10a`).  Canonical `food_acquired` uses
+  the **actual 15-day** variables; `p12a05`/`p12a09a` (usual month) and
+  `p12a04`/`p12a08` (months-acquired) are deliberately **unused** and documented
+  as such in `CONTENTS.org`.
+
+Corollaries:
+
+- **A "missing" row is information, not loss.**  A household that buys an item
+  regularly but not within the recall window correctly emits **no row** for it.
+  Do not back-fill from a usual-period variable to "recover" it — that would
+  fabricate an acquisition the recall did not record.  (This is why an
+  apparent "N% of expenditure dropped vs the monthly total" is *not* a defect
+  when the monthly total is the typical-period estimate.)
+- **Reconcile against the actual-recall source total**, not the usual-period
+  one (Guatemala: against `Σ p12a06d`, not `Σ p12a05`).
+- **Keep one recall window across sources.**  If purchased is last-15-days, the
+  produced/in-kind side must also be last-15-days (Guatemala: `p12a10a`, not the
+  monthly `p12a09a`) — mixing a 15-day purchase with a monthly own-production
+  figure in one `Quantity` column is incommensurable.
+- **Document the available-but-unused period variables** in the country's
+  `CONTENTS.org` so the choice is discoverable and reversible.
+
+Reference: PR #578 (Guatemala) and the maintainer decision recorded there.
+
 ## The unit conversion pipeline
 
 ### Step 1: Harmonize food item names
