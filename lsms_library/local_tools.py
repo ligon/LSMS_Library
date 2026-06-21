@@ -1256,35 +1256,6 @@ def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id
 
 
 
-def add_markets_from_other_features(country: str, df: pd.DataFrame, additional_other_features: bool = False) -> pd.DataFrame:
-    of = pd.read_parquet(f"../{country}/var/other_features.parquet", engine='pyarrow')
-
-    df_idx = df.index.names
-
-    try:
-        df = df.droplevel('m')
-    except KeyError:
-        pass
-
-    colname = df.columns.names
-
-    if additional_other_features:
-        if 'm' in of.index.names:
-            df = df.join(of.reset_index('m'), on=['j','t'])
-        else:
-            df = df.join(of, on=['j','t'])
-    else:
-        if 'm' in of.index.names:
-            df = df.join(of.reset_index('m')['m'], on=['j','t'])
-        else:
-            df = df.join(of['m'], on=['j','t'])
-
-
-    df = df.reset_index().set_index(df_idx)
-    df.columns.names = colname
-
-    return df
-
 def df_from_orgfile(orgfn: str | Path, name: str | None = None, set_columns: bool = True, to_numeric: bool = True, encoding: str | None = None) -> pd.DataFrame:
     """Extract the org table with name from the orgmode file named orgfn; return a pd.DataFrame.
 

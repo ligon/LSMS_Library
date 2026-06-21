@@ -7,8 +7,9 @@ This will build all the files associated with =COUNTRY=, where =COUNTRY= is a st
 make build country=$(COUNTRY)   # E.g., make build country=Malawi
 #+end_src
 
-** Test files
-This will test the structure and correctness of files that have been built:
+** Test (per-country feature-audit scan)
+This runs the cross-feature sanity scan for =COUNTRY= through the Country API
+(=bench/feature_audit/scan.py=), reporting per-feature pass/warn/fail:
 #+begin_src sh
 make test country=$(COUNTRY)   # E.g., make test country=Malawi
 #+end_src
