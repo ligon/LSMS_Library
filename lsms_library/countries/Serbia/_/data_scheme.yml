@@ -33,6 +33,19 @@ Data Scheme:
     Age: float
     Value: float
 
+  food_acquired:
+    # Built by 2007/_/food_acquired.py -> canonical (t, i, j, u, s) with
+    # [Quantity, Expenditure, Price]. Source is the 7-day consumption diary
+    # (m5_1_diary). s is read from the per-entry `izvor` flag:
+    # 1=purchased, 2=produced, 3=inkind, NaN (meals away)=purchased. Price is
+    # an informational median daily unit value. food_prices / food_quantities /
+    # food_expenditures auto-derive at runtime (_FOOD_DERIVED) -- do NOT
+    # register them here.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    materialize: make
+
   housing:
     index: (t, i)
     Water: str
