@@ -66,7 +66,7 @@
 | Alimento Infantil            | alimento infantil                                      | Alimento Infantil         |    1 |  19093 |
 | Sopa Enlatada                | sopa enlatada y en sobres                              | Sopa enlatada y en sobres |   61 |  20007 |
 | Pastas De Tomate             | pastas de tomate y salsas de tomate                    | Pasta y salsa de tomate   |   62 |  20071 |
-| Condimentos                  | condimentos (orégano, pimienta, ...)                   | ---                       |   64 |  22017 |
+| Condimentos                  | condimentos (orégano, pimienta, ...)                   | Condimentos               |   64 |  22017 |
 | Sal                          | sal                                                    | Sal                       |   65 |  22021 |
 | Sodas, Refrescos Y Jugos     | sodas, refrescos y jugos                               | Sodas y refrescos         |   66 |  17018 |
 | Helados                      | helados                                                | Helados                   |   67 |  18015 |

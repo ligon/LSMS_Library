@@ -1,0 +1,19 @@
+Country: Panama
+
+Data Scheme:
+  sample:
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+
+  food_acquired:
+    # Canonical long form (Phase 3 of GH #218).  v is omitted from the index
+    # here -- it is joined from sample() at API time by _join_v_from_sample.
+    # Built by the wave scripts ({wave}/_/food_acquired.py) which emit
+    # (t, i, j, u, s) parquets, concatenated by _/food_acquired.py.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    Price: float
+    materialize: make

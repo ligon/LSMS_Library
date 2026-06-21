@@ -1,0 +1,13 @@
+Wave: '1997'
+Country: Panama
+
+# Minimal sample table: maps each household to its primary sampling unit (upm),
+# so the framework can join `v` onto food_acquired at API time.  INFORM.DTA is
+# the 1997 household cover file (one row per household, `form`), and carries the
+# `upm` cluster id.  No household expansion weight is present in this wave.
+sample:
+    file: ../Data/INFORM.DTA
+    idxvars:
+        i: form
+    myvars:
+        v: upm   # formatted by panama.py's v() (format_id wrapper)

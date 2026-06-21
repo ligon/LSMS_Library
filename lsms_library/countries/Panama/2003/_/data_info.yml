@@ -1,0 +1,15 @@
+Wave: '2003'
+Country: Panama
+
+# Minimal sample table: maps each household to its primary sampling unit (upm).
+# The food file (E03GA10B.DTA) does NOT carry `upm`; the household cover file
+# E03BASE.DTA does (one row per household, keyed on `form`), along with the
+# expansion factor (`factor`).
+sample:
+    file: ../Data/E03BASE.DTA
+    idxvars:
+        i: form
+    myvars:
+        v: upm   # formatted by panama.py's v() (format_id wrapper)
+        weight: factor
+        panel_weight: factor
