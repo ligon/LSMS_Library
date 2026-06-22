@@ -1,59 +1,25 @@
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
-"""Calculate food prices for different items across rounds; allow
-different prices for different units.  
+#!/usr/bin/env python
+"""Concatenate wave-level food_acquired for GhanaSPS.
+
+Each wave script ({wave}/_/food_acquired.py) emits canonical (t, i, j, u, s)
+with [Quantity, Expenditure]; this just stacks the waves and writes the
+country-level parquet.  food_prices / food_quantities / food_expenditures are
+derived at API time by _FOOD_DERIVED -- there is no per-country derivation
+script (the retired food_prices_quantities_and_expenditures.py).
+
+GhanaSPS has no `sample` table (cluster identity unavailable), so `v` is not
+joined: the canonical index here is (t, i, j, u, s) without v.  This is an
+accepted data gap; a sample/v follow-up will fold GhanaSPS into the default
+Feature() assembly later.
 """
-
 import pandas as pd
-import numpy as np
-from ghana_panel import change_id, Waves, harmonized_food_labels
-import sys
-sys.path.append('../../_/')
-from lsms_library.local_tools import df_from_orgfile
 
-def fix_food_labels():
-    D = {}
-    for w in Waves.keys():
-        D.update(harmonized_food_labels(fn='./food_items.org',key=w))
+from lsms_library.local_tools import to_parquet, get_dataframe
 
-    return D
+X = []
+for t in ['2009-10', '2013-14', '2017-18']:
+    X.append(get_dataframe('../%s/_/food_acquired.parquet' % t))
 
-def id_walk(df,wave,waves):
+x = pd.concat(X, axis=0)
 
-    use_waves = list(waves.keys())
-    T = use_waves.index(wave)
-    for t in use_waves[T::-1]:
-        if len(waves[t]):
-            df = change_id(df,'../%s/Data/%s' % (t,waves[t][0]),*waves[t][1:])
-        else:
-            df = change_id(df)
-
-    return df
-
-#harmonize unit labels 
-units = df_from_orgfile('./units.org',name='harmonizedunit',encoding='ISO-8859-1')
-unitsd = units.set_index('Preferred Label').squeeze().to_dict('dict')
-for k in unitsd.keys():
-    unitsd[k] = {v: k for k, v in unitsd[k].items()}
-
-p = []
-for t in Waves.keys():
-    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
-    print(t)
-    df = df.replace({'unit': unitsd[t]})
-    # There may be occasional repeated reports of purchases of same food
-    df = df.drop(columns = 'price')
-    df0 = df.groupby(['j','t','i','unit']).sum()
-    df0['purchased_value'] = df0['purchased_value'].replace(0, np.nan)
-    df0['price'] = df0['purchased_value']/df0['purchased_quantity']
-    #df = df.reset_index().set_index(['j','t','i','units','units_purchased'])
-    df1 = id_walk(df0,t,Waves)
-    p.append(df1)
-
-p = pd.concat(p)
-
-p = p.reset_index().set_index(['j', 't', 'i', 'unit'])
-
-p = p.rename(index=fix_food_labels(),level='i')
-
-to_parquet(p, '../var/food_acquired.parquet')
+to_parquet(x, '../var/food_acquired.parquet')
