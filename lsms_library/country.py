@@ -3397,7 +3397,8 @@ class Country:
 
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
-                       units=None, volume_as_mass=True, currency=None, numeraire=None):
+                       units=None, volume_as_mass=True, currency=None, numeraire=None,
+                       basis=None):
                 if age_cuts is not None and name not in self._ROSTER_DERIVED:
                     raise TypeError(
                         f"{name}() got an unexpected keyword argument 'age_cuts'; "
@@ -3409,6 +3410,20 @@ class Country:
                         f"{name}() got an unexpected keyword argument 'units'; "
                         "only 'food_prices' and 'food_quantities' accept units."
                     )
+                if basis is not None:
+                    if name != 'food_expenditures':
+                        raise TypeError(
+                            f"{name}() got an unexpected keyword argument 'basis'; "
+                            "only 'food_expenditures' accepts basis."
+                        )
+                    # Validate early: the derive path's broad except would
+                    # otherwise swallow the transform's ValueError and surface
+                    # a confusing "could not materialize" instead (#575).
+                    if basis not in {'purchased', 'total'}:
+                        raise ValueError(
+                            f"food_expenditures() basis= must be 'purchased' or "
+                            f"'total'; got {basis!r}"
+                        )
                 if (volume_as_mass is not True
                         and name not in {'food_prices', 'food_quantities'}):
                     raise TypeError(
@@ -3462,6 +3477,8 @@ class Country:
                         transform_kwargs['units'] = units
                     if name in {'food_prices', 'food_quantities'}:
                         transform_kwargs['volume_as_mass'] = volume_as_mass
+                    if name == 'food_expenditures' and basis is not None:
+                        transform_kwargs['basis'] = basis
                     derived = None
                     try:
                         fa = self._aggregate_wave_data(waves, 'food_acquired')
