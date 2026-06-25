@@ -632,24 +632,66 @@ def _apply_kg_conversion(df, factors):
     return v
 
 
-def food_expenditures_from_acquired(df):
+def food_expenditures_from_acquired(df, basis='purchased'):
     """Derive food expenditures from food_acquired.
 
-    Returns a DataFrame of total expenditure per household × item × period
-    × acquisition source (when ``s`` is present in the input index),
-    summed over units.
+    Returns a DataFrame of expenditure per household × item × period ×
+    acquisition source (when ``s`` is present in the input index), summed
+    over units.
 
-    Phase 4 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org
-    extends the group-by to preserve the ``s`` (acquisition-source) index
-    level.  Users who want the legacy collapsed view call
-    ``food_expenditures.groupby(level=['t','v','i','j']).sum()``
-    explicitly.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        food_acquired with an ``Expenditure`` column.
+    basis : {'purchased', 'total'}, default 'purchased'
+        Which acquisition sources contribute to ``Expenditure`` (GH #575):
+
+        - ``'purchased'`` (default): **cash outlay only** — keep rows with
+          ``s == 'purchased'``.  Own-production / in-kind / other sources
+          carry no cash expenditure, so they are excluded.  This is
+          *consistent across countries* regardless of whether the source
+          happened to record an imputed produced/in-kind value: some waves
+          (e.g. Serbia, GhanaSPS) populate ``Expenditure`` on produced/
+          in-kind rows, others (e.g. Guatemala, and every country built via
+          the stock ``food_acquired_to_canonical``) leave it NaN.  Filtering
+          to ``purchased`` removes that cross-country divergence.
+        - ``'total'``: **all recorded acquisition value** — sum
+          ``Expenditure`` across every ``s``.  Where the source recorded a
+          produced/in-kind value it is included; where it did not, ``'total'``
+          equals ``'purchased'`` for that country (no value is fabricated).
+          *Imputing* own-production value at purchase prices for purchased-
+          only-source countries is a tracked follow-up, NOT done here.
+
+    Notes
+    -----
+    Phase 4 of GH #169 preserves the ``s`` (acquisition-source) level in the
+    output.  Users who want the legacy collapsed view call
+    ``food_expenditures.groupby(level=['t','v','i','j']).sum()`` explicitly;
+    ``basis='purchased'`` then yields the purchased total, ``'total'`` the
+    sum across recorded sources.
+
+    When the input has no ``s`` level (pre-canonical waves) the two bases
+    coincide — there is no source split to filter on.
     """
+    valid_basis = {'purchased', 'total'}
+    if basis not in valid_basis:
+        raise ValueError(
+            f"food_expenditures basis= must be one of {sorted(valid_basis)}, "
+            f"got {basis!r}"
+        )
+
     df = _normalize_columns(df)
     if 'Expenditure' not in df.columns:
         raise ValueError("food_acquired must have an 'Expenditure' column")
 
     idx_names = list(df.index.names)
+
+    x = df[['Expenditure']].replace(0, np.nan).dropna()
+    if basis == 'purchased' and 's' in idx_names:
+        # Cash outlay only — drop non-purchased sources so the figure means
+        # the same thing across countries (#575).
+        x = x[x.index.get_level_values('s').astype(str) == 'purchased']
+
     # Preserve `s` in the output (Phase 4).  `u` is dropped — Expenditure
     # is currency-denominated, so summing across units is meaningful.
     # `v` is also omitted: with pandas's default ``dropna=True``, a
@@ -660,8 +702,6 @@ def food_expenditures_from_acquired(df):
     # asked, so dropping ``v`` here loses no information.  Closes #246
     # part (C-2) NaN-``v`` regression.
     group_by = [n for n in ['t', 'i', 'j', 's'] if n in idx_names]
-
-    x = df[['Expenditure']].replace(0, np.nan).dropna()
     x = x.groupby(group_by).sum()
     return x
 
