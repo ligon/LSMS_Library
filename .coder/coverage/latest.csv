@@ -65,8 +65,8 @@ Albania,subjective_well_being,2004,absent,absent,,source not declared for wave
 Albania,subjective_well_being,2005,sane,declared,3840,warn: index_levels_match_scheme
 Albania,subjective_well_being,2008,sane,declared,3599,warn: index_levels_match_scheme
 Albania,subjective_well_being,2012,sane,declared,6671,warn: index_levels_match_scheme
-Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
-Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
 Azerbaijan,cluster_features,1995,sane,declared,168,warn: has_household_index
 Azerbaijan,household_characteristics,1995,sane,declared,2016,all checks pass
 Azerbaijan,household_roster,1995,sane,declared,10012,warn: index_levels_match_scheme
@@ -167,6 +167,10 @@ Burkina_Faso,subjective_well_being,2018-19,sane,declared,6988,warn: index_levels
 Burkina_Faso,subjective_well_being,2021-22,sane,declared,3186,warn: index_levels_match_scheme
 Burkina_Faso,updated_ids,,sane,declared,2,2 entries
 Cambodia,cluster_features,2019-20,sane,declared,252,warn: has_household_index
+Cambodia,food_acquired,2019-20,sane,declared,38201,warn: index_levels_match_scheme
+Cambodia,food_expenditures,2019-20,sane,declared,38198,all checks pass
+Cambodia,food_prices,2019-20,sane,declared,35187,all checks pass
+Cambodia,food_quantities,2019-20,sane,declared,35190,all checks pass
 Cambodia,household_characteristics,2019-20,sane,declared,1512,all checks pass
 Cambodia,household_roster,2019-20,sane,declared,6351,warn: index_levels_match_scheme
 Cambodia,housing,2019-20,sane,declared,1512,warn: index_levels_match_scheme
@@ -177,7 +181,7 @@ Cambodia,sample,2019-20,sane,declared,1512,all checks pass
 China,cluster_features,1995-97,sane,declared,30,warn: has_household_index
 China,household_characteristics,1995-97,sane,declared,784,all checks pass
 China,household_roster,1995-97,sane,declared,2996,warn: index_levels_match_scheme
-China,individual_education,1995-97,sane,declared,1744,warn: index_levels_match_scheme
+China,individual_education,1995-97,sane,declared,2830,warn: index_levels_match_scheme
 China,plot_features,1995-97,sane,declared,3180,"warn: index_levels_match_scheme,no_constant_columns"
 China,sample,1995-97,sane,declared,787,all checks pass
 CotedIvoire,assets,1985-86,absent,absent,,source not declared for wave
@@ -185,11 +189,11 @@ CotedIvoire,assets,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,assets,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,assets,1988-89,absent,absent,,source not declared for wave
 CotedIvoire,assets,2018-19,sane,declared,66857,all checks pass
-CotedIvoire,cluster_features,1985-86,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-CotedIvoire,cluster_features,1986-87,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-CotedIvoire,cluster_features,1987-88,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-CotedIvoire,cluster_features,1988-89,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-CotedIvoire,cluster_features,2018-19,sane,declared,1084,warn: has_household_index
+CotedIvoire,cluster_features,1985-86,builds,declared,100,fail: declared_columns_present; warn: has_household_index
+CotedIvoire,cluster_features,1986-87,builds,declared,100,fail: declared_columns_present; warn: has_household_index
+CotedIvoire,cluster_features,1987-88,builds,declared,100,fail: declared_columns_present; warn: has_household_index
+CotedIvoire,cluster_features,1988-89,builds,declared,100,fail: declared_columns_present; warn: has_household_index
+CotedIvoire,cluster_features,2018-19,builds,declared,1084,fail: declared_columns_present; warn: has_household_index
 CotedIvoire,crop_production,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,crop_production,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,crop_production,1987-88,absent,absent,,source not declared for wave
@@ -274,7 +278,7 @@ CotedIvoire,sample,1985-86,sane,declared,1588,all checks pass
 CotedIvoire,sample,1986-87,sane,declared,1600,all checks pass
 CotedIvoire,sample,1987-88,sane,declared,1600,all checks pass
 CotedIvoire,sample,1988-89,sane,declared,1600,all checks pass
-CotedIvoire,sample,2018-19,sane,declared,12992,all checks pass
+CotedIvoire,sample,2018-19,builds,declared,12992,fail: no_all_null_columns; warn: no_constant_columns
 CotedIvoire,shocks,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,shocks,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,shocks,1987-88,absent,absent,,source not declared for wave
@@ -638,8 +642,24 @@ GhanaLSS,sample,2005-06,builds,declared,8687,fail: no_all_null_columns; warn: no
 GhanaLSS,sample,2012-13,sane,declared,16772,all checks pass
 GhanaLSS,sample,2016-17,sane,declared,14009,all checks pass
 GhanaLSS,updated_ids,,sane,declared,7,7 entries
+GhanaSPS,food_acquired,2009-10,sane,declared,119847,all checks pass
+GhanaSPS,food_acquired,2013-14,sane,declared,139339,all checks pass
+GhanaSPS,food_acquired,2017-18,sane,declared,148743,all checks pass
+GhanaSPS,food_expenditures,2009-10,sane,declared,119169,all checks pass
+GhanaSPS,food_expenditures,2013-14,sane,declared,133163,all checks pass
+GhanaSPS,food_expenditures,2017-18,sane,declared,145872,all checks pass
+GhanaSPS,food_prices,2009-10,sane,declared,113722,all checks pass
+GhanaSPS,food_prices,2013-14,sane,declared,135620,all checks pass
+GhanaSPS,food_prices,2017-18,sane,declared,138098,all checks pass
+GhanaSPS,food_quantities,2009-10,sane,declared,114278,all checks pass
+GhanaSPS,food_quantities,2013-14,sane,declared,136872,all checks pass
+GhanaSPS,food_quantities,2017-18,sane,declared,138799,all checks pass
 Guatemala,assets,2000,sane,declared,37995,all checks pass
 Guatemala,cluster_features,2000,sane,declared,8,"warn: has_household_index,reasonable_size"
+Guatemala,food_acquired,2000,sane,declared,215982,warn: index_levels_match_scheme
+Guatemala,food_expenditures,2000,sane,declared,191790,all checks pass
+Guatemala,food_prices,2000,sane,declared,191790,all checks pass
+Guatemala,food_quantities,2000,sane,declared,215982,all checks pass
 Guatemala,household_characteristics,2000,sane,declared,7276,all checks pass
 Guatemala,household_roster,2000,sane,declared,37771,warn: index_levels_match_scheme
 Guatemala,individual_education,2000,sane,declared,20678,warn: index_levels_match_scheme
@@ -950,9 +970,9 @@ Mali,subjective_well_being,2017-18,absent,absent,,source not declared for wave
 Mali,subjective_well_being,2018-19,sane,declared,6584,warn: index_levels_match_scheme
 Mali,subjective_well_being,2021-22,sane,declared,6105,warn: index_levels_match_scheme
 Mali,updated_ids,,sane,declared,4,4 entries
-Nepal,assets,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,assets,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,assets,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
 Nepal,cluster_features,1995-96,absent,absent,,source not declared for wave
 Nepal,cluster_features,2003-04,absent,absent,,source not declared for wave
 Nepal,cluster_features,2010-11,absent,absent,,source not declared for wave
@@ -980,9 +1000,9 @@ Nepal,individual_education,2010-11,absent,absent,,source not declared for wave
 Nepal,interview_date,1995-96,absent,absent,,source not declared for wave
 Nepal,interview_date,2003-04,absent,absent,,source not declared for wave
 Nepal,interview_date,2010-11,absent,absent,,source not declared for wave
-Nepal,sample,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,sample,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,sample,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
 Niger,assets,2011-12,sane,declared,19506,warn: low_duplicate_rate
 Niger,assets,2014-15,sane,declared,17070,warn: low_duplicate_rate
 Niger,assets,2018-19,sane,declared,26566,all checks pass
@@ -1355,6 +1375,10 @@ Senegal,subjective_well_being,2021-22,sane,declared,7035,warn: index_levels_matc
 Senegal,updated_ids,,sane,declared,2,2 entries
 Serbia,assets,2007,sane,declared,48060,all checks pass
 Serbia,cluster_features,2007,sane,declared,328,warn: has_household_index
+Serbia,food_acquired,2007,sane,declared,200046,warn: index_levels_match_scheme
+Serbia,food_expenditures,2007,sane,declared,200046,all checks pass
+Serbia,food_prices,2007,sane,declared,196279,all checks pass
+Serbia,food_quantities,2007,sane,declared,196279,all checks pass
 Serbia,household_characteristics,2007,sane,declared,5557,all checks pass
 Serbia,household_roster,2007,sane,declared,17375,warn: index_levels_match_scheme
 Serbia,housing,2007,sane,declared,2744,warn: index_levels_match_scheme
