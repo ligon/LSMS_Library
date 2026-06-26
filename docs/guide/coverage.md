@@ -42,9 +42,7 @@ make matrix-coverage     # coverage layer only — no builds, no data access
 ```
 
 `make matrix` writes the committed journal `.coder/coverage/latest.csv` and a
-self-contained HTML readout under `bench/results/<date>/matrix.html`. Refreshing
-the snapshot and committing it is all that's needed for this page to update —
-the docs build re-renders from the CSV (no data access required).
+self-contained HTML readout under `bench/results/<date>/matrix.html`.
 
 !!! note "Authoritative runs use a clean cache"
     Readiness is graded by building each feature. A **warm cache** reflects
@@ -53,6 +51,32 @@ the docs build re-renders from the CSV (no data access required).
     "ready from source" snapshot, build each country from a cleared cache
     (`lsms-library cache clear --country <C>` first). The committed snapshot is
     produced this way.
+
+### Publishing a refreshed snapshot
+
+The page on this site is rendered from the committed `latest.csv` at docs-build
+time, and **the docs site only deploys on a push to `master`**. So the full loop
+to refresh what readers see is:
+
+1. **Rebuild authoritatively** — clear caches, then build. For the whole cube,
+   the per-country clean-cache builds parallelise well (one country per job);
+   for a spot refresh, scope with `C=`:
+   ```bash
+   lsms-library cache clear --country Uganda   # repeat per country, or clear all
+   make matrix C="Uganda"                       # omit C= for the full cube
+   ```
+2. **Commit the journal** (it is tracked despite the global `*.csv` ignore):
+   ```bash
+   git add .coder/coverage/latest.csv
+   git commit -m "data(coverage): refresh matrix snapshot"
+   ```
+3. **Land it on `master`** via the normal `development → master` flow. That push
+   triggers `mkdocs build` + deploy (`ci.yml` `docs` job, gated to `master`), and
+   the page re-renders from the new CSV — no data access needed in CI.
+
+A scheduled/nightly refresh (a cron that runs step 1 and commits step 2) is a
+natural future enhancement, but is **not wired yet** — today the snapshot changes
+only when someone runs the loop above.
 
 ## Reading it from Python
 
