@@ -141,3 +141,36 @@ CLI + HTML renderer importing that module. Module named `coverage_matrix` (not
 - Cleared by review: per-wave slice keeps the `t` level (int `t` safe via
   `str()`); no module/function shadowing post-rename; renderer handles empty
   matrix + NA `n_rows`; pandas-3 clean.
+
+### Full-cube run (authoritative, Savio array job 35193615)
+- 34 countries built in parallel, each from a **cleared cache** (per-country
+  `lsms-library cache clear` then cold build) -> authoritative source-truth.
+  1825 cells: sane=1186, absent=456, builds=136, dropped=39, broken=8.
+- broken=8 = Armenia(2)+Nepal(6) = the documented no-microdata countries
+  (CLAUDE.md "Countries Without Microdata") -> correct, not new bugs.
+- dropped=39 = the worklist (Nigeria multi-round ×22, EHCVM
+  household_characteristics, CotedIvoire, GhanaLSS). Triage is follow-up;
+  some are the known multi-round wave-label↔`t` false-positive (§6 / review #3).
+- Snapshot committed to `.coder/coverage/latest.csv` (lights up the docs grid).
+
+### Determinism finding (important; from the warm-cache check)
+- A **warm cache is non-authoritative**: Uganda `earnings` graded `sane` cold but
+  `broken` warm (GH #479 stale script-path wave parquet: declared col `Earnings`
+  vs built `earnings`). The matrix faithfully reports build state; the
+  non-determinism is a library-cache property. -> Authoritative runs clear the
+  cache first (now the cube's method; documented in `docs/guide/coverage.md`).
+  This is a *found bug* surfaced by the tool (out of scope to fix per charter).
+
+### Slurm/venv gotcha (for future cube runs)
+- `bin/savio_venv.sh mount` (squashfuse) RACES when many array tasks share a
+  node -> broken mounts (`ModuleNotFoundError: yaml`, exit 127). Use a per-task
+  node-local tar-pipe from `.venv.lustre` instead (see
+  `slurm_logs/2026-06-25_coverage_matrix/cube/build_shard.sbatch`). Single jobs
+  (validation/aggregate) are fine with the squashfs mount.
+
+### Docs integration (commit 9225a029)
+- `docs/guide/coverage.md` + stdlib-only mkdocs hook `docs_hooks/coverage_matrix.py`
+  render the snapshot CSV into the site at build time. Decoupled from data
+  access (docs CI installs only mkdocs-material+mkdocstrings): a refreshed CSV
+  commit -> docs redeploy re-renders. Reuse boundary: the hook duplicates ~4
+  presentation dicts because the package is not importable in the docs env.
