@@ -25,7 +25,7 @@ PYTEST_WORKERS ?= $(or $(SLURM_CPUS_ON_NODE),$(shell nproc 2>/dev/null || echo 1
 PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 
 .PHONY: setup test test-full retest test-ff build release clean help \
-        profile profile-cold profile-cprofile
+        profile profile-cold profile-cprofile matrix matrix-coverage
 
 # Use a stamp file in .make/ rather than .venv/pyvenv.cfg --- Poetry's
 # default ``virtualenvs.in-project = false`` puts the venv under
@@ -143,6 +143,20 @@ profile-cprofile: setup
 	$(POETRY) run python bench/build_feature.py $(country) $(feature) \
 	    --profile cprofile --json $(PROFILE_JSON)
 
+# ---------------------------------------------------------------------------
+# Coverage matrix --- country x feature x wave readiness readout.
+# Writes a git-tracked snapshot (.coder/coverage/latest.csv) + a self-contained
+# HTML readout (bench/results/<date>/matrix.html).  Scope with C=/F=, e.g.
+#   make matrix C="Uganda Malawi"          # readiness for two countries
+#   make matrix-coverage                   # coverage only, no builds, no auth
+matrix: setup
+	$(POETRY) run python bench/matrix.py \
+	    $(if $(C),--countries $(C)) $(if $(F),--features $(F))
+
+matrix-coverage: setup
+	$(POETRY) run python bench/matrix.py --no-readiness \
+	    $(if $(C),--countries $(C)) $(if $(F),--features $(F))
+
 clean:
 	rm -rf dist/ build/ *.egg-info
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
@@ -167,6 +181,12 @@ help:
 	@echo "  make country-build country=Uganda"
 	@echo ""
 	@echo "Or work directly:  make -C lsms_library help"
+	@echo ""
+	@echo "Coverage matrix (country x feature x wave readiness):"
+	@echo "  make matrix                       # full cube (heavy first run; cache-cheap after)"
+	@echo "  make matrix C=\"Uganda Malawi\"      # scope to countries (C=) / features (F=)"
+	@echo "  make matrix-coverage              # coverage layer only (no builds, no auth)"
+	@echo "  Outputs: .coder/coverage/latest.csv (committed) + bench/results/<date>/matrix.html"
 	@echo ""
 	@echo "Profiling (requires: poetry install --with profile):"
 	@echo "  make profile          country=Niger feature=household_roster"
