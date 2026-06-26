@@ -41,6 +41,9 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
 
+hooks:
+  - docs_hooks/coverage_matrix.py
+
 plugins:
   - search
   - mkdocstrings:
@@ -66,8 +69,10 @@ nav:
       - Feature: guide/feature.md
       - Caching: guide/caching.md
       - Panel Data: guide/panel-data.md
+      - Coverage Matrix: guide/coverage.md
   - API Reference:
       - Country: api/country.md
       - Wave: api/wave.md
       - Feature: api/feature.md
+      - Coverage: api/coverage.md
   - Contributing: contributing.md
