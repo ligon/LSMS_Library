@@ -1,0 +1,1826 @@
+country,feature,wave,tier,coverage,n_rows,detail
+Albania,assets,2002,sane,declared,20448,all checks pass
+Albania,assets,2003,absent,absent,,source not declared for wave
+Albania,assets,2004,absent,absent,,source not declared for wave
+Albania,assets,2005,absent,absent,,source not declared for wave
+Albania,assets,2008,absent,absent,,source not declared for wave
+Albania,assets,2012,absent,absent,,source not declared for wave
+Albania,cluster_features,2002,sane,declared,450,warn: has_household_index
+Albania,cluster_features,2003,builds,declared,449,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Albania,cluster_features,2004,builds,declared,450,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Albania,cluster_features,2005,sane,declared,480,warn: has_household_index
+Albania,cluster_features,2008,absent,absent,,source not declared for wave
+Albania,cluster_features,2012,absent,absent,,source not declared for wave
+Albania,household_characteristics,2002,sane,declared,3599,all checks pass
+Albania,household_characteristics,2003,sane,declared,1780,all checks pass
+Albania,household_characteristics,2004,sane,declared,1797,all checks pass
+Albania,household_characteristics,2005,sane,declared,3840,all checks pass
+Albania,household_characteristics,2008,sane,declared,3599,all checks pass
+Albania,household_characteristics,2012,sane,declared,6669,all checks pass
+Albania,household_roster,2002,sane,declared,16521,warn: index_levels_match_scheme
+Albania,household_roster,2003,sane,declared,8679,warn: index_levels_match_scheme
+Albania,household_roster,2004,sane,declared,8025,warn: index_levels_match_scheme
+Albania,household_roster,2005,sane,declared,17302,warn: index_levels_match_scheme
+Albania,household_roster,2008,sane,declared,14869,warn: index_levels_match_scheme
+Albania,household_roster,2012,sane,declared,25335,warn: index_levels_match_scheme
+Albania,housing,2002,absent,absent,,source not declared for wave
+Albania,housing,2003,absent,absent,,source not declared for wave
+Albania,housing,2004,absent,absent,,source not declared for wave
+Albania,housing,2005,sane,declared,3840,warn: index_levels_match_scheme
+Albania,housing,2008,sane,declared,3599,warn: index_levels_match_scheme
+Albania,housing,2012,sane,declared,6671,warn: index_levels_match_scheme
+Albania,individual_education,2002,absent,absent,,source not declared for wave
+Albania,individual_education,2003,absent,absent,,source not declared for wave
+Albania,individual_education,2004,absent,absent,,source not declared for wave
+Albania,individual_education,2005,sane,declared,14291,warn: index_levels_match_scheme
+Albania,individual_education,2008,sane,declared,12655,warn: index_levels_match_scheme
+Albania,individual_education,2012,sane,declared,22808,warn: index_levels_match_scheme
+Albania,interview_date,2002,sane,declared,3599,warn: index_levels_match_scheme
+Albania,interview_date,2003,absent,absent,,source not declared for wave
+Albania,interview_date,2004,sane,declared,1797,warn: index_levels_match_scheme
+Albania,interview_date,2005,sane,declared,3840,warn: index_levels_match_scheme
+Albania,interview_date,2008,absent,absent,,source not declared for wave
+Albania,interview_date,2012,absent,absent,,source not declared for wave
+Albania,plot_features,2002,sane,declared,6082,"warn: index_levels_match_scheme,no_constant_columns"
+Albania,plot_features,2003,absent,absent,,source not declared for wave
+Albania,plot_features,2004,absent,absent,,source not declared for wave
+Albania,plot_features,2005,sane,declared,5456,"warn: index_levels_match_scheme,no_constant_columns"
+Albania,plot_features,2008,builds,declared,3977,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Albania,plot_features,2012,builds,declared,4661,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Albania,sample,2002,sane,declared,3599,all checks pass
+Albania,sample,2003,builds,declared,1764,fail: no_all_null_columns; warn: no_constant_columns
+Albania,sample,2004,builds,declared,1884,fail: no_all_null_columns; warn: no_constant_columns
+Albania,sample,2005,sane,declared,3840,all checks pass
+Albania,sample,2008,sane,declared,3599,all checks pass
+Albania,sample,2012,sane,declared,6671,all checks pass
+Albania,shocks,2002,absent,absent,,source not declared for wave
+Albania,shocks,2003,absent,absent,,source not declared for wave
+Albania,shocks,2004,absent,absent,,source not declared for wave
+Albania,shocks,2005,absent,absent,,source not declared for wave
+Albania,shocks,2008,absent,absent,,source not declared for wave
+Albania,shocks,2012,sane,declared,1532,all checks pass
+Albania,subjective_well_being,2002,sane,declared,3599,warn: index_levels_match_scheme
+Albania,subjective_well_being,2003,sane,declared,1780,warn: index_levels_match_scheme
+Albania,subjective_well_being,2004,absent,absent,,source not declared for wave
+Albania,subjective_well_being,2005,sane,declared,3840,warn: index_levels_match_scheme
+Albania,subjective_well_being,2008,sane,declared,3599,warn: index_levels_match_scheme
+Albania,subjective_well_being,2012,sane,declared,6671,warn: index_levels_match_scheme
+Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Azerbaijan,cluster_features,1995,sane,declared,168,warn: has_household_index
+Azerbaijan,household_characteristics,1995,sane,declared,2016,all checks pass
+Azerbaijan,household_roster,1995,sane,declared,10012,warn: index_levels_match_scheme
+Azerbaijan,housing,1995,sane,declared,2016,warn: index_levels_match_scheme
+Azerbaijan,individual_education,1995,sane,declared,9005,warn: index_levels_match_scheme
+Azerbaijan,interview_date,1995,sane,declared,2015,warn: index_levels_match_scheme
+Azerbaijan,sample,1995,sane,declared,2016,all checks pass
+Benin,assets,2018-19,sane,declared,38191,all checks pass
+Benin,cluster_features,2018-19,sane,declared,670,warn: has_household_index
+Benin,crop_production,2018-19,sane,declared,9056,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+Benin,food_acquired,2018-19,sane,declared,189236,all checks pass
+Benin,food_expenditures,2018-19,sane,declared,150779,all checks pass
+Benin,food_prices,2018-19,sane,declared,149063,all checks pass
+Benin,food_quantities,2018-19,sane,declared,186362,all checks pass
+Benin,food_security,2018-19,sane,declared,8011,warn: index_levels_match_scheme
+Benin,household_characteristics,2018-19,sane,declared,7991,all checks pass
+Benin,household_roster,2018-19,sane,declared,42343,warn: index_levels_match_scheme
+Benin,housing,2018-19,sane,declared,8012,warn: index_levels_match_scheme
+Benin,individual_education,2018-19,sane,declared,42343,warn: index_levels_match_scheme
+Benin,interview_date,2018-19,sane,declared,24035,warn: index_levels_match_scheme
+Benin,livestock,2018-19,sane,declared,7334,all checks pass
+Benin,people_last7days,2018-19,sane,declared,35042,"warn: index_levels_match_scheme,no_constant_columns"
+Benin,plot_features,2018-19,sane,declared,7588,"warn: index_levels_match_scheme,no_constant_columns"
+Benin,plot_inputs,2018-19,sane,declared,10534,warn: index_levels_match_scheme
+Benin,plot_labor,2018-19,sane,declared,10738,warn: index_levels_match_scheme
+Benin,sample,2018-19,sane,declared,8012,all checks pass
+Benin,shocks,2018-19,sane,declared,12305,all checks pass
+Benin,subjective_well_being,2018-19,sane,declared,7953,warn: index_levels_match_scheme
+Burkina_Faso,assets,2014,sane,declared,50461,all checks pass
+Burkina_Faso,assets,2018-19,sane,declared,42215,all checks pass
+Burkina_Faso,assets,2021-22,sane,declared,20275,all checks pass
+Burkina_Faso,cluster_features,2014,sane,declared,900,warn: has_household_index
+Burkina_Faso,cluster_features,2018-19,sane,declared,585,warn: has_household_index
+Burkina_Faso,cluster_features,2021-22,sane,declared,550,warn: has_household_index
+Burkina_Faso,crop_production,2014,absent,absent,,source not declared for wave
+Burkina_Faso,crop_production,2018-19,sane,declared,15587,"warn: index_levels_match_scheme,no_constant_columns"
+Burkina_Faso,crop_production,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,food_acquired,2014,sane,declared,97361,all checks pass
+Burkina_Faso,food_acquired,2018-19,sane,declared,137934,all checks pass
+Burkina_Faso,food_acquired,2021-22,sane,declared,69208,all checks pass
+Burkina_Faso,food_coping,2014,sane,declared,51099,warn: index_levels_match_scheme
+Burkina_Faso,food_coping,2018-19,absent,absent,,source not declared for wave
+Burkina_Faso,food_coping,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,food_expenditures,2014,sane,declared,96793,all checks pass
+Burkina_Faso,food_expenditures,2018-19,sane,declared,97802,all checks pass
+Burkina_Faso,food_expenditures,2021-22,sane,declared,50109,all checks pass
+Burkina_Faso,food_prices,2014,sane,declared,96582,all checks pass
+Burkina_Faso,food_prices,2018-19,sane,declared,97385,all checks pass
+Burkina_Faso,food_prices,2021-22,sane,declared,50000,all checks pass
+Burkina_Faso,food_quantities,2014,sane,declared,97062,all checks pass
+Burkina_Faso,food_quantities,2018-19,sane,declared,137452,all checks pass
+Burkina_Faso,food_quantities,2021-22,sane,declared,69017,all checks pass
+Burkina_Faso,food_security,2014,absent,absent,,source not declared for wave
+Burkina_Faso,food_security,2018-19,sane,declared,7009,warn: index_levels_match_scheme
+Burkina_Faso,food_security,2021-22,sane,declared,3224,warn: index_levels_match_scheme
+Burkina_Faso,household_characteristics,2014,dropped,declared,,declared for wave but absent from built t-index
+Burkina_Faso,household_characteristics,2018-19,sane,declared,7004,all checks pass
+Burkina_Faso,household_characteristics,2021-22,sane,declared,3226,all checks pass
+Burkina_Faso,household_roster,2014,sane,declared,78543,warn: index_levels_match_scheme
+Burkina_Faso,household_roster,2018-19,sane,declared,45612,warn: index_levels_match_scheme
+Burkina_Faso,household_roster,2021-22,sane,declared,22362,warn: index_levels_match_scheme
+Burkina_Faso,housing,2014,sane,declared,10799,warn: index_levels_match_scheme
+Burkina_Faso,housing,2018-19,sane,declared,7010,warn: index_levels_match_scheme
+Burkina_Faso,housing,2021-22,sane,declared,3227,warn: index_levels_match_scheme
+Burkina_Faso,individual_education,2014,sane,declared,64477,warn: index_levels_match_scheme
+Burkina_Faso,individual_education,2018-19,sane,declared,45612,warn: index_levels_match_scheme
+Burkina_Faso,individual_education,2021-22,sane,declared,22362,warn: index_levels_match_scheme
+Burkina_Faso,interview_date,2014,absent,absent,,source not declared for wave
+Burkina_Faso,interview_date,2018-19,sane,declared,21028,warn: index_levels_match_scheme
+Burkina_Faso,interview_date,2021-22,sane,declared,9681,warn: index_levels_match_scheme
+Burkina_Faso,livestock,2014,absent,absent,,source not declared for wave
+Burkina_Faso,livestock,2018-19,sane,declared,13961,all checks pass
+Burkina_Faso,livestock,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,months_food_inadequate,2014,sane,declared,10220,warn: index_levels_match_scheme
+Burkina_Faso,months_food_inadequate,2018-19,absent,absent,,source not declared for wave
+Burkina_Faso,months_food_inadequate,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,panel_ids,,sane,declared,3132,3132 entries
+Burkina_Faso,people_last7days,2014,absent,absent,,source not declared for wave
+Burkina_Faso,people_last7days,2018-19,sane,declared,45332,"warn: index_levels_match_scheme,no_constant_columns"
+Burkina_Faso,people_last7days,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,plot_features,2014,absent,absent,,source not declared for wave
+Burkina_Faso,plot_features,2018-19,sane,declared,12434,"warn: index_levels_match_scheme,no_constant_columns"
+Burkina_Faso,plot_features,2021-22,sane,declared,7350,"warn: index_levels_match_scheme,no_constant_columns"
+Burkina_Faso,plot_inputs,2014,absent,absent,,source not declared for wave
+Burkina_Faso,plot_inputs,2018-19,sane,declared,22694,warn: index_levels_match_scheme
+Burkina_Faso,plot_inputs,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,plot_labor,2014,absent,absent,,source not declared for wave
+Burkina_Faso,plot_labor,2018-19,sane,declared,16987,warn: index_levels_match_scheme
+Burkina_Faso,plot_labor,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,sample,2014,sane,declared,10411,all checks pass
+Burkina_Faso,sample,2018-19,builds,declared,7010,fail: no_all_null_columns; warn: no_constant_columns
+Burkina_Faso,sample,2021-22,builds,declared,3227,fail: no_all_null_columns; warn: no_constant_columns
+Burkina_Faso,shocks,2014,sane,declared,11596,all checks pass
+Burkina_Faso,shocks,2018-19,builds,declared,8766,fail: no_all_null_columns; warn: no_constant_columns
+Burkina_Faso,shocks,2021-22,sane,declared,4475,all checks pass
+Burkina_Faso,subjective_well_being,2014,absent,absent,,source not declared for wave
+Burkina_Faso,subjective_well_being,2018-19,sane,declared,6988,warn: index_levels_match_scheme
+Burkina_Faso,subjective_well_being,2021-22,sane,declared,3186,warn: index_levels_match_scheme
+Burkina_Faso,updated_ids,,sane,declared,2,2 entries
+Cambodia,cluster_features,2019-20,sane,declared,252,warn: has_household_index
+Cambodia,household_characteristics,2019-20,sane,declared,1512,all checks pass
+Cambodia,household_roster,2019-20,sane,declared,6351,warn: index_levels_match_scheme
+Cambodia,housing,2019-20,sane,declared,1512,warn: index_levels_match_scheme
+Cambodia,individual_education,2019-20,sane,declared,1973,warn: index_levels_match_scheme
+Cambodia,interview_date,2019-20,sane,declared,1512,warn: index_levels_match_scheme
+Cambodia,plot_features,2019-20,sane,declared,2951,warn: index_levels_match_scheme
+Cambodia,sample,2019-20,sane,declared,1512,all checks pass
+China,cluster_features,1995-97,sane,declared,30,warn: has_household_index
+China,household_characteristics,1995-97,sane,declared,784,all checks pass
+China,household_roster,1995-97,sane,declared,2996,warn: index_levels_match_scheme
+China,individual_education,1995-97,sane,declared,1744,warn: index_levels_match_scheme
+China,plot_features,1995-97,sane,declared,3180,"warn: index_levels_match_scheme,no_constant_columns"
+China,sample,1995-97,sane,declared,787,all checks pass
+CotedIvoire,assets,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,assets,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,assets,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,assets,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,assets,2018-19,sane,declared,66857,all checks pass
+CotedIvoire,cluster_features,1985-86,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,1986-87,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,1987-88,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,1988-89,builds,declared,100,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,2018-19,sane,declared,1084,warn: has_household_index
+CotedIvoire,crop_production,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,crop_production,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,crop_production,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,crop_production,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,crop_production,2018-19,sane,declared,22216,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+CotedIvoire,food_acquired,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,food_acquired,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,food_acquired,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,food_acquired,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,food_acquired,2018-19,sane,declared,296241,all checks pass
+CotedIvoire,food_expenditures,1985-86,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,food_expenditures,1986-87,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,food_expenditures,1987-88,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,food_expenditures,1988-89,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,food_expenditures,2018-19,sane,declared,215620,all checks pass
+CotedIvoire,food_prices,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,food_prices,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,food_prices,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,food_prices,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,food_prices,2018-19,sane,declared,213872,all checks pass
+CotedIvoire,food_quantities,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,food_quantities,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,food_quantities,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,food_quantities,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,food_quantities,2018-19,sane,declared,294493,all checks pass
+CotedIvoire,food_security,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,food_security,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,food_security,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,food_security,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,food_security,2018-19,sane,declared,12960,warn: index_levels_match_scheme
+CotedIvoire,household_characteristics,1985-86,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,household_characteristics,1986-87,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,household_characteristics,1987-88,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,household_characteristics,1988-89,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,household_characteristics,2018-19,sane,declared,12979,all checks pass
+CotedIvoire,household_roster,1985-86,builds,declared,14398,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,1986-87,builds,declared,13867,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,1987-88,builds,declared,11847,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,1988-89,builds,declared,10560,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,2018-19,sane,declared,61116,warn: index_levels_match_scheme
+CotedIvoire,housing,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,housing,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,housing,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,housing,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,housing,2018-19,sane,declared,12992,warn: index_levels_match_scheme
+CotedIvoire,individual_education,1985-86,sane,declared,4954,warn: index_levels_match_scheme
+CotedIvoire,individual_education,1986-87,sane,declared,5069,warn: index_levels_match_scheme
+CotedIvoire,individual_education,1987-88,sane,declared,4591,warn: index_levels_match_scheme
+CotedIvoire,individual_education,1988-89,sane,declared,3947,warn: index_levels_match_scheme
+CotedIvoire,individual_education,2018-19,sane,declared,61116,warn: index_levels_match_scheme
+CotedIvoire,interview_date,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,interview_date,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,interview_date,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,interview_date,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,interview_date,2018-19,sane,declared,38973,warn: index_levels_match_scheme
+CotedIvoire,livestock,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,livestock,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,livestock,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,livestock,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,livestock,2018-19,sane,declared,4711,all checks pass
+CotedIvoire,people_last7days,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,people_last7days,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,people_last7days,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,people_last7days,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,people_last7days,2018-19,sane,declared,60617,"warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,plot_features,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,plot_features,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,plot_features,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,plot_features,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,plot_features,2018-19,sane,declared,14417,"warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,plot_inputs,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,plot_inputs,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,plot_inputs,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,plot_inputs,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,plot_inputs,2018-19,sane,declared,11250,warn: index_levels_match_scheme
+CotedIvoire,plot_labor,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,plot_labor,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,plot_labor,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,plot_labor,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,plot_labor,2018-19,sane,declared,22264,warn: index_levels_match_scheme
+CotedIvoire,sample,1985-86,sane,declared,1588,all checks pass
+CotedIvoire,sample,1986-87,sane,declared,1600,all checks pass
+CotedIvoire,sample,1987-88,sane,declared,1600,all checks pass
+CotedIvoire,sample,1988-89,sane,declared,1600,all checks pass
+CotedIvoire,sample,2018-19,sane,declared,12992,all checks pass
+CotedIvoire,shocks,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,shocks,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,shocks,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,shocks,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,shocks,2018-19,sane,declared,13778,all checks pass
+CotedIvoire,subjective_well_being,1985-86,absent,absent,,source not declared for wave
+CotedIvoire,subjective_well_being,1986-87,absent,absent,,source not declared for wave
+CotedIvoire,subjective_well_being,1987-88,absent,absent,,source not declared for wave
+CotedIvoire,subjective_well_being,1988-89,absent,absent,,source not declared for wave
+CotedIvoire,subjective_well_being,2018-19,sane,declared,12912,warn: index_levels_match_scheme
+Ethiopia,anthropometry,2011-12,sane,declared,2493,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,anthropometry,2013-14,sane,declared,4175,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,anthropometry,2015-16,sane,declared,5355,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,anthropometry,2018-19,sane,declared,3081,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,anthropometry,2021-22,sane,declared,3660,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,assets,2011-12,sane,declared,138912,all checks pass
+Ethiopia,assets,2013-14,sane,declared,184170,all checks pass
+Ethiopia,assets,2015-16,sane,declared,173390,all checks pass
+Ethiopia,assets,2018-19,sane,declared,37855,all checks pass
+Ethiopia,assets,2021-22,sane,declared,33560,all checks pass
+Ethiopia,cluster_features,2011-12,builds,declared,333,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Ethiopia,cluster_features,2013-14,sane,declared,434,warn: has_household_index
+Ethiopia,cluster_features,2015-16,sane,declared,432,warn: has_household_index
+Ethiopia,cluster_features,2018-19,builds,declared,535,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Ethiopia,cluster_features,2021-22,builds,declared,435,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Ethiopia,community_prices,2011-12,sane,declared,4340,warn: has_household_index
+Ethiopia,community_prices,2013-14,sane,declared,5370,warn: has_household_index
+Ethiopia,community_prices,2015-16,sane,declared,9226,warn: has_household_index
+Ethiopia,community_prices,2018-19,sane,declared,13994,warn: has_household_index
+Ethiopia,community_prices,2021-22,sane,declared,12327,warn: has_household_index
+Ethiopia,crop_production,2011-12,sane,declared,7744,warn: index_levels_match_scheme
+Ethiopia,crop_production,2013-14,sane,declared,26159,warn: index_levels_match_scheme
+Ethiopia,crop_production,2015-16,sane,declared,25920,warn: index_levels_match_scheme
+Ethiopia,crop_production,2018-19,sane,declared,14092,warn: index_levels_match_scheme
+Ethiopia,crop_production,2021-22,sane,declared,11604,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2011-12,sane,declared,31084,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2013-14,sane,declared,44337,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2015-16,sane,declared,67161,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2018-19,sane,declared,98800,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2021-22,sane,declared,84538,warn: index_levels_match_scheme
+Ethiopia,food_coping,2011-12,sane,declared,29523,warn: index_levels_match_scheme
+Ethiopia,food_coping,2013-14,sane,declared,41926,warn: index_levels_match_scheme
+Ethiopia,food_coping,2015-16,sane,declared,39631,warn: index_levels_match_scheme
+Ethiopia,food_coping,2018-19,absent,absent,,source not declared for wave
+Ethiopia,food_coping,2021-22,absent,absent,,source not declared for wave
+Ethiopia,food_expenditures,2011-12,sane,declared,19166,all checks pass
+Ethiopia,food_expenditures,2013-14,sane,declared,32484,all checks pass
+Ethiopia,food_expenditures,2015-16,sane,declared,52852,all checks pass
+Ethiopia,food_expenditures,2018-19,sane,declared,84871,all checks pass
+Ethiopia,food_expenditures,2021-22,sane,declared,74718,all checks pass
+Ethiopia,food_prices,2011-12,sane,declared,18905,all checks pass
+Ethiopia,food_prices,2013-14,sane,declared,32298,all checks pass
+Ethiopia,food_prices,2015-16,sane,declared,52843,all checks pass
+Ethiopia,food_prices,2018-19,sane,declared,84871,all checks pass
+Ethiopia,food_prices,2021-22,sane,declared,74718,all checks pass
+Ethiopia,food_quantities,2011-12,sane,declared,30812,all checks pass
+Ethiopia,food_quantities,2013-14,sane,declared,44127,all checks pass
+Ethiopia,food_quantities,2015-16,sane,declared,67158,all checks pass
+Ethiopia,food_quantities,2018-19,sane,declared,98800,all checks pass
+Ethiopia,food_quantities,2021-22,sane,declared,84538,all checks pass
+Ethiopia,food_security,2011-12,absent,absent,,source not declared for wave
+Ethiopia,food_security,2013-14,absent,absent,,source not declared for wave
+Ethiopia,food_security,2015-16,absent,absent,,source not declared for wave
+Ethiopia,food_security,2018-19,absent,absent,,source not declared for wave
+Ethiopia,food_security,2021-22,sane,declared,4958,warn: index_levels_match_scheme
+Ethiopia,household_characteristics,2011-12,sane,declared,3629,all checks pass
+Ethiopia,household_characteristics,2013-14,sane,declared,5232,all checks pass
+Ethiopia,household_characteristics,2015-16,sane,declared,4953,all checks pass
+Ethiopia,household_characteristics,2018-19,dropped,declared,,declared for wave but absent from built t-index
+Ethiopia,household_characteristics,2021-22,dropped,declared,,declared for wave but absent from built t-index
+Ethiopia,household_roster,2011-12,builds,declared,18771,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2013-14,builds,declared,25968,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2015-16,builds,declared,26760,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2018-19,builds,declared,29503,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2021-22,builds,declared,25374,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,housing,2011-12,sane,declared,3912,warn: index_levels_match_scheme
+Ethiopia,housing,2013-14,sane,declared,5261,warn: index_levels_match_scheme
+Ethiopia,housing,2015-16,sane,declared,4954,warn: index_levels_match_scheme
+Ethiopia,housing,2018-19,sane,declared,6770,warn: index_levels_match_scheme
+Ethiopia,housing,2021-22,sane,declared,4958,warn: index_levels_match_scheme
+Ethiopia,individual_education,2011-12,sane,declared,8008,warn: index_levels_match_scheme
+Ethiopia,individual_education,2013-14,sane,declared,8505,warn: index_levels_match_scheme
+Ethiopia,individual_education,2015-16,sane,declared,12633,"warn: index_levels_match_scheme,no_null_index_levels"
+Ethiopia,individual_education,2018-19,sane,declared,16027,warn: index_levels_match_scheme
+Ethiopia,individual_education,2021-22,sane,declared,13886,warn: index_levels_match_scheme
+Ethiopia,interview_date,2011-12,absent,absent,,source not declared for wave
+Ethiopia,interview_date,2013-14,absent,absent,,source not declared for wave
+Ethiopia,interview_date,2015-16,absent,absent,,source not declared for wave
+Ethiopia,interview_date,2018-19,sane,declared,6762,warn: index_levels_match_scheme
+Ethiopia,interview_date,2021-22,sane,declared,1474,warn: index_levels_match_scheme
+Ethiopia,livestock,2011-12,sane,declared,7566,all checks pass
+Ethiopia,livestock,2013-14,sane,declared,8601,all checks pass
+Ethiopia,livestock,2015-16,sane,declared,9239,all checks pass
+Ethiopia,livestock,2018-19,sane,declared,6866,all checks pass
+Ethiopia,livestock,2021-22,sane,declared,4907,all checks pass
+Ethiopia,nutrition,2011-12,absent,absent,,source not declared for wave
+Ethiopia,nutrition,2013-14,absent,absent,,source not declared for wave
+Ethiopia,nutrition,2015-16,absent,absent,,source not declared for wave
+Ethiopia,nutrition,2018-19,absent,absent,,source not declared for wave
+Ethiopia,nutrition,2021-22,absent,absent,,source not declared for wave
+Ethiopia,panel_ids,,sane,declared,4954,4954 entries
+Ethiopia,people_last7days,2011-12,sane,declared,18864,warn: index_levels_match_scheme
+Ethiopia,people_last7days,2013-14,sane,declared,23785,warn: index_levels_match_scheme
+Ethiopia,people_last7days,2015-16,sane,declared,23393,warn: index_levels_match_scheme
+Ethiopia,people_last7days,2018-19,sane,declared,29503,warn: index_levels_match_scheme
+Ethiopia,people_last7days,2021-22,sane,declared,22688,warn: index_levels_match_scheme
+Ethiopia,plot_features,2011-12,builds,declared,32025,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_features,2013-14,sane,declared,33147,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_features,2015-16,sane,declared,33305,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_features,2018-19,sane,declared,19339,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_features,2021-22,sane,declared,14878,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_inputs,2011-12,sane,declared,45149,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_inputs,2013-14,sane,declared,47416,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_inputs,2015-16,sane,declared,47426,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_inputs,2018-19,sane,declared,23271,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_inputs,2021-22,sane,declared,17638,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_labor,2011-12,sane,declared,62672,warn: index_levels_match_scheme
+Ethiopia,plot_labor,2013-14,sane,declared,68494,warn: index_levels_match_scheme
+Ethiopia,plot_labor,2015-16,sane,declared,70312,warn: index_levels_match_scheme
+Ethiopia,plot_labor,2018-19,sane,declared,39984,warn: index_levels_match_scheme
+Ethiopia,plot_labor,2021-22,sane,declared,31463,warn: index_levels_match_scheme
+Ethiopia,sample,2011-12,sane,declared,3969,all checks pass
+Ethiopia,sample,2013-14,sane,declared,5262,all checks pass
+Ethiopia,sample,2015-16,sane,declared,4954,all checks pass
+Ethiopia,sample,2018-19,sane,declared,6770,all checks pass
+Ethiopia,sample,2021-22,sane,declared,4959,all checks pass
+Ethiopia,shocks,2011-12,sane,declared,3552,all checks pass
+Ethiopia,shocks,2013-14,sane,declared,3127,all checks pass
+Ethiopia,shocks,2015-16,sane,declared,5540,all checks pass
+Ethiopia,shocks,2018-19,sane,declared,3736,all checks pass
+Ethiopia,shocks,2021-22,sane,declared,5823,all checks pass
+Ethiopia,updated_ids,,sane,declared,2,2 entries
+EthiopiaRHS,anthropometry,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,anthropometry,1994a,sane,declared,8621,warn: index_levels_match_scheme
+EthiopiaRHS,anthropometry,1994b,sane,declared,9057,warn: index_levels_match_scheme
+EthiopiaRHS,anthropometry,1995,sane,declared,9346,warn: index_levels_match_scheme
+EthiopiaRHS,anthropometry,1997,sane,declared,9409,warn: index_levels_match_scheme
+EthiopiaRHS,anthropometry,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,anthropometry,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,anthropometry,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,assets,1989,sane,declared,488,all checks pass
+EthiopiaRHS,assets,1994a,absent,absent,,source not declared for wave
+EthiopiaRHS,assets,1994b,absent,absent,,source not declared for wave
+EthiopiaRHS,assets,1995,absent,absent,,source not declared for wave
+EthiopiaRHS,assets,1997,absent,absent,,source not declared for wave
+EthiopiaRHS,assets,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,assets,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,assets,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,cluster_features,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,cluster_features,1994a,sane,declared,18,"warn: has_household_index,no_constant_columns"
+EthiopiaRHS,cluster_features,1994b,sane,declared,18,"warn: has_household_index,no_constant_columns"
+EthiopiaRHS,cluster_features,1995,sane,declared,18,"warn: has_household_index,no_constant_columns"
+EthiopiaRHS,cluster_features,1997,sane,declared,18,"warn: has_household_index,no_constant_columns"
+EthiopiaRHS,cluster_features,1999,sane,declared,18,"warn: has_household_index,no_constant_columns"
+EthiopiaRHS,cluster_features,2004,sane,declared,18,"warn: has_household_index,no_constant_columns"
+EthiopiaRHS,cluster_features,2009,sane,declared,18,"warn: has_household_index,no_constant_columns"
+EthiopiaRHS,community_prices,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,community_prices,1994a,absent,absent,,source not declared for wave
+EthiopiaRHS,community_prices,1994b,absent,absent,,source not declared for wave
+EthiopiaRHS,community_prices,1995,absent,absent,,source not declared for wave
+EthiopiaRHS,community_prices,1997,absent,absent,,source not declared for wave
+EthiopiaRHS,community_prices,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,community_prices,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,community_prices,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,consumption,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,consumption,1994a,absent,absent,,source not declared for wave
+EthiopiaRHS,consumption,1994b,absent,absent,,source not declared for wave
+EthiopiaRHS,consumption,1995,absent,absent,,source not declared for wave
+EthiopiaRHS,consumption,1997,absent,absent,,source not declared for wave
+EthiopiaRHS,consumption,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,consumption,2004,sane,declared,1368,warn: index_levels_match_scheme
+EthiopiaRHS,consumption,2009,sane,declared,1357,warn: index_levels_match_scheme
+EthiopiaRHS,crop_production,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,crop_production,1994a,sane,declared,3404,warn: index_levels_match_scheme
+EthiopiaRHS,crop_production,1994b,builds,declared,1967,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+EthiopiaRHS,crop_production,1995,sane,declared,3350,warn: index_levels_match_scheme
+EthiopiaRHS,crop_production,1997,sane,declared,3021,warn: index_levels_match_scheme
+EthiopiaRHS,crop_production,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,crop_production,2004,sane,declared,2998,warn: index_levels_match_scheme
+EthiopiaRHS,crop_production,2009,sane,declared,2783,"warn: index_levels_match_scheme,no_null_index_levels"
+EthiopiaRHS,food_acquired,1989,sane,declared,2068,"warn: index_levels_match_scheme,no_null_index_levels"
+EthiopiaRHS,food_acquired,1994a,sane,declared,12971,warn: index_levels_match_scheme
+EthiopiaRHS,food_acquired,1994b,sane,declared,13333,warn: index_levels_match_scheme
+EthiopiaRHS,food_acquired,1995,sane,declared,11956,warn: index_levels_match_scheme
+EthiopiaRHS,food_acquired,1997,sane,declared,14365,warn: index_levels_match_scheme
+EthiopiaRHS,food_acquired,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,food_acquired,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,food_acquired,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,food_expenditures,1989,sane,declared,2014,warn: no_null_index_levels
+EthiopiaRHS,food_expenditures,1994a,sane,declared,9258,all checks pass
+EthiopiaRHS,food_expenditures,1994b,sane,declared,8582,all checks pass
+EthiopiaRHS,food_expenditures,1995,sane,declared,8270,all checks pass
+EthiopiaRHS,food_expenditures,1997,sane,declared,9537,all checks pass
+EthiopiaRHS,food_expenditures,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,food_expenditures,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,food_expenditures,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,food_prices,1989,dropped,declared,,declared for wave but absent from built t-index
+EthiopiaRHS,food_prices,1994a,sane,declared,9353,all checks pass
+EthiopiaRHS,food_prices,1994b,sane,declared,8591,all checks pass
+EthiopiaRHS,food_prices,1995,sane,declared,8283,all checks pass
+EthiopiaRHS,food_prices,1997,sane,declared,9552,all checks pass
+EthiopiaRHS,food_prices,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,food_prices,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,food_prices,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,food_quantities,1989,sane,declared,2060,warn: no_null_index_levels
+EthiopiaRHS,food_quantities,1994a,sane,declared,12842,all checks pass
+EthiopiaRHS,food_quantities,1994b,sane,declared,13279,all checks pass
+EthiopiaRHS,food_quantities,1995,sane,declared,11921,all checks pass
+EthiopiaRHS,food_quantities,1997,sane,declared,14327,all checks pass
+EthiopiaRHS,food_quantities,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,food_quantities,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,food_quantities,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,1994a,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,1994b,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,1995,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,1997,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,hhsize,2009,sane,declared,1358,warn: index_levels_match_scheme
+EthiopiaRHS,household_characteristics,1989,sane,declared,338,all checks pass
+EthiopiaRHS,household_characteristics,1994a,sane,declared,1477,all checks pass
+EthiopiaRHS,household_characteristics,1994b,sane,declared,1476,all checks pass
+EthiopiaRHS,household_characteristics,1995,sane,declared,1477,all checks pass
+EthiopiaRHS,household_characteristics,1997,sane,declared,1475,all checks pass
+EthiopiaRHS,household_characteristics,1999,sane,declared,1475,all checks pass
+EthiopiaRHS,household_characteristics,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,household_characteristics,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,household_roster,1989,sane,declared,2302,warn: index_levels_match_scheme
+EthiopiaRHS,household_roster,1994a,sane,declared,8863,warn: index_levels_match_scheme
+EthiopiaRHS,household_roster,1994b,sane,declared,9317,warn: index_levels_match_scheme
+EthiopiaRHS,household_roster,1995,sane,declared,9516,warn: index_levels_match_scheme
+EthiopiaRHS,household_roster,1997,sane,declared,10788,warn: index_levels_match_scheme
+EthiopiaRHS,household_roster,1999,sane,declared,10788,warn: index_levels_match_scheme
+EthiopiaRHS,household_roster,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,household_roster,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,income,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,income,1994a,absent,absent,,source not declared for wave
+EthiopiaRHS,income,1994b,absent,absent,,source not declared for wave
+EthiopiaRHS,income,1995,absent,absent,,source not declared for wave
+EthiopiaRHS,income,1997,absent,absent,,source not declared for wave
+EthiopiaRHS,income,1999,sane,declared,252,all checks pass
+EthiopiaRHS,income,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,income,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,livestock,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,livestock,1994a,absent,absent,,source not declared for wave
+EthiopiaRHS,livestock,1994b,absent,absent,,source not declared for wave
+EthiopiaRHS,livestock,1995,absent,absent,,source not declared for wave
+EthiopiaRHS,livestock,1997,absent,absent,,source not declared for wave
+EthiopiaRHS,livestock,1999,sane,declared,541,all checks pass
+EthiopiaRHS,livestock,2004,sane,declared,1355,all checks pass
+EthiopiaRHS,livestock,2009,sane,declared,1577,all checks pass
+EthiopiaRHS,panel_ids,,sane,declared,4708,4708 entries
+EthiopiaRHS,plot_features,1989,absent,absent,,source not declared for wave
+EthiopiaRHS,plot_features,1994a,sane,declared,5299,warn: index_levels_match_scheme
+EthiopiaRHS,plot_features,1994b,absent,absent,,source not declared for wave
+EthiopiaRHS,plot_features,1995,absent,absent,,source not declared for wave
+EthiopiaRHS,plot_features,1997,absent,absent,,source not declared for wave
+EthiopiaRHS,plot_features,1999,absent,absent,,source not declared for wave
+EthiopiaRHS,plot_features,2004,absent,absent,,source not declared for wave
+EthiopiaRHS,plot_features,2009,absent,absent,,source not declared for wave
+EthiopiaRHS,sample,1989,sane,declared,338,warn: no_constant_columns
+EthiopiaRHS,sample,1994a,sane,declared,1480,warn: no_constant_columns
+EthiopiaRHS,sample,1994b,sane,declared,1480,warn: no_constant_columns
+EthiopiaRHS,sample,1995,sane,declared,1480,warn: no_constant_columns
+EthiopiaRHS,sample,1997,sane,declared,1475,warn: no_constant_columns
+EthiopiaRHS,sample,1999,sane,declared,1475,warn: no_constant_columns
+EthiopiaRHS,sample,2004,sane,declared,1368,warn: no_constant_columns
+EthiopiaRHS,sample,2009,sane,declared,1357,warn: no_constant_columns
+EthiopiaRHS,updated_ids,,absent,absent,,empty / no entries
+GhanaLSS,cluster_features,1987-88,dropped,declared,,declared for wave but absent from built t-index
+GhanaLSS,cluster_features,1988-89,dropped,declared,,declared for wave but absent from built t-index
+GhanaLSS,cluster_features,1991-92,builds,declared,365,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+GhanaLSS,cluster_features,1998-99,dropped,declared,,declared for wave but absent from built t-index
+GhanaLSS,cluster_features,2005-06,builds,declared,580,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+GhanaLSS,cluster_features,2012-13,sane,declared,1200,warn: has_household_index
+GhanaLSS,cluster_features,2016-17,builds,declared,1000,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+GhanaLSS,food_acquired,1987-88,builds,declared,71605,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,1988-89,builds,declared,72614,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,1991-92,sane,declared,623600,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,1998-99,sane,declared,542105,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,2005-06,sane,declared,1115420,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,2012-13,sane,declared,1709094,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,2016-17,sane,declared,1124871,warn: index_levels_match_scheme
+GhanaLSS,food_expenditures,1987-88,sane,declared,71605,all checks pass
+GhanaLSS,food_expenditures,1988-89,sane,declared,72614,all checks pass
+GhanaLSS,food_expenditures,1991-92,sane,declared,95672,all checks pass
+GhanaLSS,food_expenditures,1998-99,sane,declared,134627,all checks pass
+GhanaLSS,food_expenditures,2005-06,sane,declared,230823,all checks pass
+GhanaLSS,food_expenditures,2012-13,sane,declared,461602,all checks pass
+GhanaLSS,food_expenditures,2016-17,sane,declared,373678,all checks pass
+GhanaLSS,food_prices,1987-88,sane,declared,71605,all checks pass
+GhanaLSS,food_prices,1988-89,sane,declared,72614,all checks pass
+GhanaLSS,food_prices,1991-92,sane,declared,95672,all checks pass
+GhanaLSS,food_prices,1998-99,sane,declared,134627,all checks pass
+GhanaLSS,food_prices,2005-06,sane,declared,230823,all checks pass
+GhanaLSS,food_prices,2012-13,sane,declared,461602,all checks pass
+GhanaLSS,food_prices,2016-17,sane,declared,438773,all checks pass
+GhanaLSS,food_quantities,1987-88,sane,declared,71605,all checks pass
+GhanaLSS,food_quantities,1988-89,sane,declared,72614,all checks pass
+GhanaLSS,food_quantities,1991-92,sane,declared,114141,all checks pass
+GhanaLSS,food_quantities,1998-99,sane,declared,161176,all checks pass
+GhanaLSS,food_quantities,2005-06,sane,declared,259227,all checks pass
+GhanaLSS,food_quantities,2012-13,sane,declared,511720,all checks pass
+GhanaLSS,food_quantities,2016-17,sane,declared,420529,all checks pass
+GhanaLSS,food_security,1987-88,absent,absent,,source not declared for wave
+GhanaLSS,food_security,1988-89,absent,absent,,source not declared for wave
+GhanaLSS,food_security,1991-92,absent,absent,,source not declared for wave
+GhanaLSS,food_security,1998-99,absent,absent,,source not declared for wave
+GhanaLSS,food_security,2005-06,absent,absent,,source not declared for wave
+GhanaLSS,food_security,2012-13,absent,absent,,source not declared for wave
+GhanaLSS,food_security,2016-17,sane,declared,13892,warn: index_levels_match_scheme
+GhanaLSS,household_characteristics,1987-88,sane,declared,3136,all checks pass
+GhanaLSS,household_characteristics,1988-89,sane,declared,3190,all checks pass
+GhanaLSS,household_characteristics,1991-92,sane,declared,4543,all checks pass
+GhanaLSS,household_characteristics,1998-99,sane,declared,5996,all checks pass
+GhanaLSS,household_characteristics,2005-06,sane,declared,8687,all checks pass
+GhanaLSS,household_characteristics,2012-13,sane,declared,16769,all checks pass
+GhanaLSS,household_characteristics,2016-17,sane,declared,13990,all checks pass
+GhanaLSS,household_roster,1987-88,builds,declared,15492,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,1988-89,builds,declared,14914,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,1991-92,sane,declared,20403,warn: index_levels_match_scheme
+GhanaLSS,household_roster,1998-99,builds,declared,26411,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,2005-06,sane,declared,37128,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,2012-13,sane,declared,72372,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,2016-17,sane,declared,59864,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,housing,1987-88,absent,absent,,source not declared for wave
+GhanaLSS,housing,1988-89,absent,absent,,source not declared for wave
+GhanaLSS,housing,1991-92,sane,declared,4528,warn: index_levels_match_scheme
+GhanaLSS,housing,1998-99,sane,declared,5998,warn: index_levels_match_scheme
+GhanaLSS,housing,2005-06,sane,declared,8687,warn: index_levels_match_scheme
+GhanaLSS,housing,2012-13,sane,declared,16772,warn: index_levels_match_scheme
+GhanaLSS,housing,2016-17,sane,declared,14009,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1987-88,sane,declared,7543,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1988-89,sane,declared,8939,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1991-92,sane,declared,10778,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1998-99,sane,declared,16582,warn: index_levels_match_scheme
+GhanaLSS,individual_education,2005-06,sane,declared,23380,warn: index_levels_match_scheme
+GhanaLSS,individual_education,2012-13,sane,declared,50559,warn: index_levels_match_scheme
+GhanaLSS,individual_education,2016-17,sane,declared,42140,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1987-88,sane,declared,3147,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1988-89,sane,declared,3192,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1991-92,sane,declared,4549,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1998-99,sane,declared,5998,warn: index_levels_match_scheme
+GhanaLSS,interview_date,2005-06,sane,declared,8687,warn: index_levels_match_scheme
+GhanaLSS,interview_date,2012-13,sane,declared,16757,warn: index_levels_match_scheme
+GhanaLSS,interview_date,2016-17,sane,declared,14008,warn: index_levels_match_scheme
+GhanaLSS,panel_ids,,sane,declared,714,714 entries
+GhanaLSS,plot_features,1987-88,absent,absent,,source not declared for wave
+GhanaLSS,plot_features,1988-89,absent,absent,,source not declared for wave
+GhanaLSS,plot_features,1991-92,builds,declared,5213,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,plot_features,1998-99,builds,declared,10569,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,plot_features,2005-06,absent,absent,,source not declared for wave
+GhanaLSS,plot_features,2012-13,sane,declared,21360,warn: index_levels_match_scheme
+GhanaLSS,plot_features,2016-17,sane,declared,11207,warn: index_levels_match_scheme
+GhanaLSS,sample,1987-88,builds,declared,3147,fail: no_all_null_columns; warn: no_constant_columns
+GhanaLSS,sample,1988-89,builds,declared,3192,fail: no_all_null_columns; warn: no_constant_columns
+GhanaLSS,sample,1991-92,builds,declared,4523,fail: no_all_null_columns; warn: no_constant_columns
+GhanaLSS,sample,1998-99,builds,declared,5998,fail: no_all_null_columns; warn: no_constant_columns
+GhanaLSS,sample,2005-06,builds,declared,8687,fail: no_all_null_columns; warn: no_constant_columns
+GhanaLSS,sample,2012-13,sane,declared,16772,all checks pass
+GhanaLSS,sample,2016-17,sane,declared,14009,all checks pass
+GhanaLSS,updated_ids,,sane,declared,7,7 entries
+Guatemala,assets,2000,sane,declared,37995,all checks pass
+Guatemala,cluster_features,2000,sane,declared,8,"warn: has_household_index,reasonable_size"
+Guatemala,household_characteristics,2000,sane,declared,7276,all checks pass
+Guatemala,household_roster,2000,sane,declared,37771,warn: index_levels_match_scheme
+Guatemala,individual_education,2000,sane,declared,20678,warn: index_levels_match_scheme
+Guatemala,sample,2000,sane,declared,7276,all checks pass
+Guatemala,shocks,2000,sane,declared,11752,warn: no_constant_columns
+Guinea-Bissau,assets,2018-19,sane,declared,30125,all checks pass
+Guinea-Bissau,cluster_features,2018-19,sane,declared,450,warn: has_household_index
+Guinea-Bissau,crop_production,2018-19,sane,declared,10579,"warn: index_levels_match_scheme,no_constant_columns"
+Guinea-Bissau,food_acquired,2018-19,sane,declared,127219,all checks pass
+Guinea-Bissau,food_expenditures,2018-19,sane,declared,90795,all checks pass
+Guinea-Bissau,food_prices,2018-19,sane,declared,89773,all checks pass
+Guinea-Bissau,food_quantities,2018-19,sane,declared,126197,all checks pass
+Guinea-Bissau,food_security,2018-19,sane,declared,5350,warn: index_levels_match_scheme
+Guinea-Bissau,household_characteristics,2018-19,sane,declared,5348,all checks pass
+Guinea-Bissau,household_roster,2018-19,sane,declared,42839,warn: index_levels_match_scheme
+Guinea-Bissau,housing,2018-19,sane,declared,5351,warn: index_levels_match_scheme
+Guinea-Bissau,individual_education,2018-19,sane,declared,42839,warn: index_levels_match_scheme
+Guinea-Bissau,interview_date,2018-19,sane,declared,16053,warn: index_levels_match_scheme
+Guinea-Bissau,livestock,2018-19,sane,declared,7989,all checks pass
+Guinea-Bissau,people_last7days,2018-19,sane,declared,42569,"warn: index_levels_match_scheme,no_constant_columns"
+Guinea-Bissau,plot_features,2018-19,sane,declared,9873,"warn: index_levels_match_scheme,no_constant_columns"
+Guinea-Bissau,plot_inputs,2018-19,sane,declared,5534,warn: index_levels_match_scheme
+Guinea-Bissau,plot_labor,2018-19,sane,declared,15516,warn: index_levels_match_scheme
+Guinea-Bissau,sample,2018-19,sane,declared,5351,all checks pass
+Guinea-Bissau,shocks,2018-19,sane,declared,9487,warn: no_constant_columns
+Guinea-Bissau,subjective_well_being,2018-19,sane,declared,5334,warn: index_levels_match_scheme
+Guyana,assets,1992,absent,absent,,source not declared for wave
+Guyana,cluster_features,1992,sane,declared,130,warn: has_household_index
+Guyana,household_characteristics,1992,sane,declared,1495,all checks pass
+Guyana,household_roster,1992,sane,declared,6939,warn: index_levels_match_scheme
+Guyana,housing,1992,sane,declared,1508,warn: index_levels_match_scheme
+Guyana,individual_education,1992,sane,declared,4137,warn: index_levels_match_scheme
+Guyana,interview_date,1992,sane,declared,1502,warn: index_levels_match_scheme
+Guyana,sample,1992,sane,declared,1502,all checks pass
+India,assets,1997-98,sane,declared,4371,all checks pass
+India,cluster_features,1997-98,sane,declared,120,warn: has_household_index
+India,employment,1997-98,sane,declared,2593,warn: index_levels_match_scheme
+India,household_characteristics,1997-98,sane,declared,2252,all checks pass
+India,household_roster,1997-98,sane,declared,14493,warn: index_levels_match_scheme
+India,housing,1997-98,sane,declared,2251,warn: index_levels_match_scheme
+India,individual_education,1997-98,sane,declared,14493,warn: index_levels_match_scheme
+India,interview_date,1997-98,sane,declared,2249,warn: index_levels_match_scheme
+India,months_food_inadequate,1997-98,sane,declared,2251,warn: index_levels_match_scheme
+India,sample,1997-98,sane,declared,2251,all checks pass
+Iraq,assets,2006-07,builds,declared,212047,fail: no_all_null_columns; warn: no_constant_columns
+Iraq,assets,2012,sane,declared,576680,all checks pass
+Iraq,cluster_features,2006-07,sane,declared,2961,warn: has_household_index
+Iraq,cluster_features,2012,sane,declared,2828,warn: has_household_index
+Iraq,household_characteristics,2006-07,sane,declared,2146,all checks pass
+Iraq,household_characteristics,2012,sane,declared,25145,all checks pass
+Iraq,household_roster,2006-07,sane,declared,127189,warn: index_levels_match_scheme
+Iraq,household_roster,2012,sane,declared,176042,"warn: index_levels_match_scheme,no_constant_columns"
+Iraq,housing,2006-07,sane,declared,17822,warn: index_levels_match_scheme
+Iraq,housing,2012,sane,declared,25146,warn: index_levels_match_scheme
+Iraq,individual_education,2006-07,sane,declared,52441,warn: index_levels_match_scheme
+Iraq,individual_education,2012,sane,declared,68606,warn: index_levels_match_scheme
+Iraq,interview_date,2006-07,sane,declared,17822,warn: index_levels_match_scheme
+Iraq,interview_date,2012,sane,declared,25146,warn: index_levels_match_scheme
+Iraq,life_satisfaction,2006-07,absent,absent,,source not declared for wave
+Iraq,life_satisfaction,2012,sane,declared,268336,warn: index_levels_match_scheme
+Iraq,sample,2006-07,sane,declared,17822,all checks pass
+Iraq,sample,2012,sane,declared,25146,all checks pass
+Iraq,shocks,2006-07,absent,absent,,source not declared for wave
+Iraq,shocks,2012,sane,declared,8812,all checks pass
+Kazakhstan,assets,1996,sane,declared,11016,all checks pass
+Kazakhstan,cluster_features,1996,sane,declared,135,warn: has_household_index
+Kazakhstan,household_characteristics,1996,sane,declared,1992,all checks pass
+Kazakhstan,household_roster,1996,sane,declared,7220,warn: index_levels_match_scheme
+Kazakhstan,housing,1996,sane,declared,1996,warn: index_levels_match_scheme
+Kazakhstan,individual_education,1996,sane,declared,3190,warn: index_levels_match_scheme
+Kazakhstan,sample,1996,sane,declared,1996,all checks pass
+Kazakhstan,subjective_well_being,1996,sane,declared,1983,warn: index_levels_match_scheme
+Kosovo,assets,2000,sane,declared,23544,all checks pass
+Kosovo,cluster_features,2000,sane,declared,360,warn: has_household_index
+Kosovo,household_characteristics,2000,sane,declared,2880,all checks pass
+Kosovo,household_roster,2000,sane,declared,17917,warn: index_levels_match_scheme
+Kosovo,housing,2000,sane,declared,2865,warn: index_levels_match_scheme
+Kosovo,individual_education,2000,sane,declared,14233,warn: index_levels_match_scheme
+Kosovo,interview_date,2000,sane,declared,2880,warn: index_levels_match_scheme
+Kosovo,plot_features,2000,sane,declared,6469,"warn: index_levels_match_scheme,no_constant_columns"
+Kosovo,sample,2000,sane,declared,2880,all checks pass
+Liberia,assets,2018-19,sane,declared,16357,all checks pass
+Liberia,cluster_features,2018-19,sane,declared,32,warn: has_household_index
+Liberia,household_characteristics,2018-19,sane,declared,2878,all checks pass
+Liberia,household_roster,2018-19,sane,declared,12263,warn: index_levels_match_scheme
+Liberia,individual_education,2018-19,sane,declared,2904,warn: index_levels_match_scheme
+Liberia,interview_date,2018-19,sane,declared,2787,warn: index_levels_match_scheme
+Liberia,months_food_inadequate,2018-19,sane,declared,2974,warn: index_levels_match_scheme
+Liberia,plot_features,2018-19,sane,declared,2064,warn: index_levels_match_scheme
+Liberia,sample,2018-19,sane,declared,2986,all checks pass
+Liberia,shocks,2018-19,sane,declared,1358,all checks pass
+Malawi,anthropometry,2004-05,absent,absent,,source not declared for wave
+Malawi,anthropometry,2010-11,sane,declared,7788,warn: index_levels_match_scheme
+Malawi,anthropometry,2013-14,sane,declared,2534,warn: index_levels_match_scheme
+Malawi,anthropometry,2016-17,sane,declared,8712,warn: index_levels_match_scheme
+Malawi,anthropometry,2019-20,sane,declared,12004,warn: index_levels_match_scheme
+Malawi,assets,2004-05,builds,declared,214285,fail: no_all_null_columns; warn: no_constant_columns
+Malawi,assets,2010-11,sane,declared,43473,all checks pass
+Malawi,assets,2013-14,builds,declared,17622,fail: no_all_null_columns; warn: no_constant_columns
+Malawi,assets,2016-17,sane,declared,42447,all checks pass
+Malawi,assets,2019-20,sane,declared,38470,all checks pass
+Malawi,cluster_features,2004-05,builds,declared,110,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Malawi,cluster_features,2010-11,sane,declared,768,warn: has_household_index
+Malawi,cluster_features,2013-14,sane,declared,204,warn: has_household_index
+Malawi,cluster_features,2016-17,builds,declared,880,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Malawi,cluster_features,2019-20,sane,declared,819,warn: has_household_index
+Malawi,community_prices,2004-05,absent,absent,,source not declared for wave
+Malawi,community_prices,2010-11,sane,declared,39166,"warn: no_null_index_levels,has_household_index"
+Malawi,community_prices,2013-14,sane,declared,6511,"warn: no_null_index_levels,has_household_index"
+Malawi,community_prices,2016-17,absent,absent,,source not declared for wave
+Malawi,community_prices,2019-20,sane,declared,36958,"warn: no_null_index_levels,has_household_index"
+Malawi,crop_production,2004-05,absent,absent,,source not declared for wave
+Malawi,crop_production,2010-11,sane,declared,33349,warn: index_levels_match_scheme
+Malawi,crop_production,2013-14,sane,declared,12602,warn: index_levels_match_scheme
+Malawi,crop_production,2016-17,sane,declared,36003,warn: index_levels_match_scheme
+Malawi,crop_production,2019-20,sane,declared,49425,warn: index_levels_match_scheme
+Malawi,food_acquired,2004-05,sane,declared,176193,warn: index_levels_match_scheme
+Malawi,food_acquired,2010-11,sane,declared,198354,warn: index_levels_match_scheme
+Malawi,food_acquired,2013-14,sane,declared,81680,warn: index_levels_match_scheme
+Malawi,food_acquired,2016-17,sane,declared,245459,warn: index_levels_match_scheme
+Malawi,food_acquired,2019-20,sane,declared,269845,warn: index_levels_match_scheme
+Malawi,food_coping,2004-05,absent,absent,,source not declared for wave
+Malawi,food_coping,2010-11,sane,declared,61355,warn: index_levels_match_scheme
+Malawi,food_coping,2013-14,sane,declared,19994,warn: index_levels_match_scheme
+Malawi,food_coping,2016-17,sane,declared,62232,warn: index_levels_match_scheme
+Malawi,food_coping,2019-20,sane,declared,57157,warn: index_levels_match_scheme
+Malawi,food_expenditures,2004-05,sane,declared,108094,all checks pass
+Malawi,food_expenditures,2010-11,sane,declared,137065,all checks pass
+Malawi,food_expenditures,2013-14,sane,declared,59264,all checks pass
+Malawi,food_expenditures,2016-17,sane,declared,179045,all checks pass
+Malawi,food_expenditures,2019-20,sane,declared,198512,all checks pass
+Malawi,food_prices,2004-05,sane,declared,108057,all checks pass
+Malawi,food_prices,2010-11,sane,declared,137003,all checks pass
+Malawi,food_prices,2013-14,sane,declared,59263,all checks pass
+Malawi,food_prices,2016-17,sane,declared,178755,all checks pass
+Malawi,food_prices,2019-20,sane,declared,198535,all checks pass
+Malawi,food_quantities,2004-05,sane,declared,176146,all checks pass
+Malawi,food_quantities,2010-11,sane,declared,198241,all checks pass
+Malawi,food_quantities,2013-14,sane,declared,81675,all checks pass
+Malawi,food_quantities,2016-17,sane,declared,245146,all checks pass
+Malawi,food_quantities,2019-20,sane,declared,269820,all checks pass
+Malawi,food_security,2004-05,absent,absent,,source not declared for wave
+Malawi,food_security,2010-11,absent,absent,,source not declared for wave
+Malawi,food_security,2013-14,sane,declared,4000,warn: index_levels_match_scheme
+Malawi,food_security,2016-17,builds,declared,12446,fail: no_null_index_levels; warn: index_levels_match_scheme
+Malawi,food_security,2019-20,sane,declared,11432,warn: index_levels_match_scheme
+Malawi,household_characteristics,2004-05,sane,declared,11276,all checks pass
+Malawi,household_characteristics,2010-11,sane,declared,12262,all checks pass
+Malawi,household_characteristics,2013-14,sane,declared,3997,all checks pass
+Malawi,household_characteristics,2016-17,sane,declared,14783,all checks pass
+Malawi,household_characteristics,2019-20,sane,declared,14600,all checks pass
+Malawi,household_roster,2004-05,sane,declared,52707,warn: index_levels_match_scheme
+Malawi,household_roster,2010-11,sane,declared,56409,warn: index_levels_match_scheme
+Malawi,household_roster,2013-14,sane,declared,20220,warn: index_levels_match_scheme
+Malawi,household_roster,2016-17,sane,declared,66151,warn: index_levels_match_scheme
+Malawi,household_roster,2019-20,sane,declared,65125,warn: index_levels_match_scheme
+Malawi,housing,2004-05,sane,declared,11280,warn: index_levels_match_scheme
+Malawi,housing,2010-11,sane,declared,12271,warn: index_levels_match_scheme
+Malawi,housing,2013-14,sane,declared,4000,warn: index_levels_match_scheme
+Malawi,housing,2016-17,sane,declared,14955,warn: index_levels_match_scheme
+Malawi,housing,2019-20,sane,declared,14612,warn: index_levels_match_scheme
+Malawi,individual_education,2004-05,sane,declared,32607,warn: index_levels_match_scheme
+Malawi,individual_education,2010-11,sane,declared,38528,warn: index_levels_match_scheme
+Malawi,individual_education,2013-14,sane,declared,14778,warn: index_levels_match_scheme
+Malawi,individual_education,2016-17,sane,declared,49435,warn: index_levels_match_scheme
+Malawi,individual_education,2019-20,sane,declared,49319,warn: index_levels_match_scheme
+Malawi,interview_date,2004-05,sane,declared,11280,warn: index_levels_match_scheme
+Malawi,interview_date,2010-11,sane,declared,15518,warn: index_levels_match_scheme
+Malawi,interview_date,2013-14,sane,declared,7967,warn: index_levels_match_scheme
+Malawi,interview_date,2016-17,sane,declared,17269,warn: index_levels_match_scheme
+Malawi,interview_date,2019-20,sane,declared,17450,warn: index_levels_match_scheme
+Malawi,livestock,2004-05,absent,absent,,source not declared for wave
+Malawi,livestock,2010-11,sane,declared,11329,all checks pass
+Malawi,livestock,2013-14,sane,declared,4099,all checks pass
+Malawi,livestock,2016-17,sane,declared,11445,all checks pass
+Malawi,livestock,2019-20,sane,declared,12253,all checks pass
+Malawi,months_food_inadequate,2004-05,absent,absent,,source not declared for wave
+Malawi,months_food_inadequate,2010-11,sane,declared,12271,warn: index_levels_match_scheme
+Malawi,months_food_inadequate,2013-14,sane,declared,4000,warn: index_levels_match_scheme
+Malawi,months_food_inadequate,2016-17,sane,declared,12447,warn: index_levels_match_scheme
+Malawi,months_food_inadequate,2019-20,sane,declared,11434,warn: index_levels_match_scheme
+Malawi,people_last7days,2004-05,absent,absent,,source not declared for wave
+Malawi,people_last7days,2010-11,sane,declared,56218,warn: index_levels_match_scheme
+Malawi,people_last7days,2013-14,sane,declared,20219,warn: index_levels_match_scheme
+Malawi,people_last7days,2016-17,sane,declared,66151,warn: index_levels_match_scheme
+Malawi,people_last7days,2019-20,sane,declared,65125,warn: index_levels_match_scheme
+Malawi,plot_features,2004-05,absent,absent,,source not declared for wave
+Malawi,plot_features,2010-11,sane,declared,18990,"warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_features,2013-14,sane,declared,6331,"warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_features,2016-17,builds,declared,19759,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_features,2019-20,builds,declared,23259,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_inputs,2004-05,absent,absent,,source not declared for wave
+Malawi,plot_inputs,2010-11,builds,declared,46627,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+Malawi,plot_inputs,2013-14,builds,declared,16188,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+Malawi,plot_inputs,2016-17,sane,declared,52494,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+Malawi,plot_inputs,2019-20,sane,declared,64875,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+Malawi,plot_labor,2004-05,absent,absent,,source not declared for wave
+Malawi,plot_labor,2010-11,sane,declared,21016,warn: index_levels_match_scheme
+Malawi,plot_labor,2013-14,sane,declared,9197,warn: index_levels_match_scheme
+Malawi,plot_labor,2016-17,sane,declared,22627,warn: index_levels_match_scheme
+Malawi,plot_labor,2019-20,sane,declared,27157,warn: index_levels_match_scheme
+Malawi,sample,2004-05,sane,declared,11280,all checks pass
+Malawi,sample,2010-11,sane,declared,12271,all checks pass
+Malawi,sample,2013-14,sane,declared,4000,all checks pass
+Malawi,sample,2016-17,sane,declared,14955,all checks pass
+Malawi,sample,2019-20,sane,declared,14612,all checks pass
+Malawi,shocks,2004-05,builds,declared,28389,fail: no_all_null_columns; warn: no_constant_columns
+Malawi,shocks,2010-11,sane,declared,17422,all checks pass
+Malawi,shocks,2013-14,sane,declared,9952,all checks pass
+Malawi,shocks,2016-17,sane,declared,27904,all checks pass
+Malawi,shocks,2019-20,sane,declared,21024,all checks pass
+Malawi,subjective_well_being,2004-05,absent,absent,,source not declared for wave
+Malawi,subjective_well_being,2010-11,sane,declared,12270,warn: index_levels_match_scheme
+Malawi,subjective_well_being,2013-14,absent,absent,,source not declared for wave
+Malawi,subjective_well_being,2016-17,builds,declared,12445,fail: no_null_index_levels; warn: index_levels_match_scheme
+Malawi,subjective_well_being,2019-20,sane,declared,11432,warn: index_levels_match_scheme
+Mali,assets,2014-15,absent,absent,,source not declared for wave
+Mali,assets,2017-18,absent,absent,,source not declared for wave
+Mali,assets,2018-19,sane,declared,37691,all checks pass
+Mali,assets,2021-22,sane,declared,37899,all checks pass
+Mali,cluster_features,2014-15,sane,declared,989,warn: has_household_index
+Mali,cluster_features,2017-18,sane,declared,953,warn: has_household_index
+Mali,cluster_features,2018-19,sane,declared,551,warn: has_household_index
+Mali,cluster_features,2021-22,sane,declared,513,warn: has_household_index
+Mali,community_prices,2014-15,sane,declared,23646,warn: has_household_index
+Mali,community_prices,2017-18,absent,absent,,source not declared for wave
+Mali,community_prices,2018-19,absent,absent,,source not declared for wave
+Mali,community_prices,2021-22,absent,absent,,source not declared for wave
+Mali,crop_production,2014-15,sane,declared,10341,warn: index_levels_match_scheme
+Mali,crop_production,2017-18,builds,declared,24719,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Mali,crop_production,2018-19,absent,absent,,source not declared for wave
+Mali,crop_production,2021-22,absent,absent,,source not declared for wave
+Mali,food_acquired,2014-15,sane,declared,122085,all checks pass
+Mali,food_acquired,2017-18,absent,absent,,source not declared for wave
+Mali,food_acquired,2018-19,sane,declared,161564,all checks pass
+Mali,food_acquired,2021-22,sane,declared,146622,all checks pass
+Mali,food_coping,2014-15,sane,declared,18261,warn: index_levels_match_scheme
+Mali,food_coping,2017-18,absent,absent,,source not declared for wave
+Mali,food_coping,2018-19,absent,absent,,source not declared for wave
+Mali,food_coping,2021-22,absent,absent,,source not declared for wave
+Mali,food_expenditures,2014-15,sane,declared,90925,all checks pass
+Mali,food_expenditures,2017-18,absent,absent,,source not declared for wave
+Mali,food_expenditures,2018-19,sane,declared,126586,all checks pass
+Mali,food_expenditures,2021-22,sane,declared,115808,all checks pass
+Mali,food_prices,2014-15,sane,declared,99954,all checks pass
+Mali,food_prices,2017-18,absent,absent,,source not declared for wave
+Mali,food_prices,2018-19,sane,declared,125873,all checks pass
+Mali,food_prices,2021-22,sane,declared,116367,all checks pass
+Mali,food_quantities,2014-15,sane,declared,108711,all checks pass
+Mali,food_quantities,2017-18,absent,absent,,source not declared for wave
+Mali,food_quantities,2018-19,sane,declared,160851,all checks pass
+Mali,food_quantities,2021-22,sane,declared,144855,all checks pass
+Mali,food_security,2014-15,absent,absent,,source not declared for wave
+Mali,food_security,2017-18,absent,absent,,source not declared for wave
+Mali,food_security,2018-19,sane,declared,6596,warn: index_levels_match_scheme
+Mali,food_security,2021-22,sane,declared,6137,warn: index_levels_match_scheme
+Mali,household_characteristics,2014-15,sane,declared,3779,all checks pass
+Mali,household_characteristics,2017-18,sane,declared,8386,all checks pass
+Mali,household_characteristics,2018-19,sane,declared,6476,warn: no_constant_columns
+Mali,household_characteristics,2021-22,dropped,declared,,declared for wave but absent from built t-index
+Mali,household_roster,2014-15,sane,declared,5149,warn: index_levels_match_scheme
+Mali,household_roster,2017-18,sane,declared,94071,warn: index_levels_match_scheme
+Mali,household_roster,2018-19,sane,declared,46014,"warn: index_levels_match_scheme,no_constant_columns"
+Mali,household_roster,2021-22,builds,declared,43472,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Mali,housing,2014-15,sane,declared,3804,warn: index_levels_match_scheme
+Mali,housing,2017-18,sane,declared,8390,warn: index_levels_match_scheme
+Mali,housing,2018-19,sane,declared,6602,warn: index_levels_match_scheme
+Mali,housing,2021-22,sane,declared,6143,warn: index_levels_match_scheme
+Mali,individual_education,2014-15,sane,declared,2093,warn: index_levels_match_scheme
+Mali,individual_education,2017-18,sane,declared,23825,warn: index_levels_match_scheme
+Mali,individual_education,2018-19,sane,declared,46014,warn: index_levels_match_scheme
+Mali,individual_education,2021-22,sane,declared,43472,warn: index_levels_match_scheme
+Mali,interview_date,2014-15,sane,declared,3804,all checks pass
+Mali,interview_date,2017-18,sane,declared,8390,all checks pass
+Mali,interview_date,2018-19,sane,declared,6602,all checks pass
+Mali,interview_date,2021-22,sane,declared,6143,all checks pass
+Mali,livestock,2014-15,sane,declared,9939,all checks pass
+Mali,livestock,2017-18,sane,declared,30757,all checks pass
+Mali,livestock,2018-19,absent,absent,,source not declared for wave
+Mali,livestock,2021-22,absent,absent,,source not declared for wave
+Mali,panel_ids,,sane,declared,5011,5011 entries
+Mali,people_last7days,2014-15,sane,declared,37175,warn: index_levels_match_scheme
+Mali,people_last7days,2017-18,sane,declared,94071,warn: index_levels_match_scheme
+Mali,people_last7days,2018-19,absent,absent,,source not declared for wave
+Mali,people_last7days,2021-22,absent,absent,,source not declared for wave
+Mali,plot_features,2014-15,absent,absent,,source not declared for wave
+Mali,plot_features,2017-18,absent,absent,,source not declared for wave
+Mali,plot_features,2018-19,sane,declared,7323,"warn: index_levels_match_scheme,no_constant_columns"
+Mali,plot_features,2021-22,sane,declared,6638,"warn: index_levels_match_scheme,no_constant_columns"
+Mali,plot_inputs,2014-15,sane,declared,33008,"warn: index_levels_match_scheme,no_null_index_levels"
+Mali,plot_inputs,2017-18,sane,declared,80727,"warn: index_levels_match_scheme,no_null_index_levels"
+Mali,plot_inputs,2018-19,absent,absent,,source not declared for wave
+Mali,plot_inputs,2021-22,absent,absent,,source not declared for wave
+Mali,plot_labor,2014-15,sane,declared,14843,warn: index_levels_match_scheme
+Mali,plot_labor,2017-18,sane,declared,37214,warn: index_levels_match_scheme
+Mali,plot_labor,2018-19,absent,absent,,source not declared for wave
+Mali,plot_labor,2021-22,absent,absent,,source not declared for wave
+Mali,sample,2014-15,builds,declared,3804,fail: no_all_null_columns; warn: no_constant_columns
+Mali,sample,2017-18,sane,declared,8390,all checks pass
+Mali,sample,2018-19,builds,declared,6602,fail: no_all_null_columns; warn: no_constant_columns
+Mali,sample,2021-22,builds,declared,6143,fail: no_all_null_columns; warn: no_constant_columns
+Mali,shocks,2014-15,sane,declared,5837,all checks pass
+Mali,shocks,2017-18,sane,declared,6216,all checks pass
+Mali,shocks,2018-19,sane,declared,9837,warn: no_constant_columns
+Mali,shocks,2021-22,sane,declared,4884,all checks pass
+Mali,subjective_well_being,2014-15,absent,absent,,source not declared for wave
+Mali,subjective_well_being,2017-18,absent,absent,,source not declared for wave
+Mali,subjective_well_being,2018-19,sane,declared,6584,warn: index_levels_match_scheme
+Mali,subjective_well_being,2021-22,sane,declared,6105,warn: index_levels_match_scheme
+Mali,updated_ids,,sane,declared,4,4 entries
+Nepal,assets,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,cluster_features,1995-96,absent,absent,,source not declared for wave
+Nepal,cluster_features,2003-04,absent,absent,,source not declared for wave
+Nepal,cluster_features,2010-11,absent,absent,,source not declared for wave
+Nepal,food_acquired,1995-96,absent,absent,,source not declared for wave
+Nepal,food_acquired,2003-04,absent,absent,,source not declared for wave
+Nepal,food_acquired,2010-11,absent,absent,,source not declared for wave
+Nepal,food_expenditures,1995-96,absent,absent,,source not declared for wave
+Nepal,food_expenditures,2003-04,absent,absent,,source not declared for wave
+Nepal,food_expenditures,2010-11,absent,absent,,source not declared for wave
+Nepal,food_prices,1995-96,absent,absent,,source not declared for wave
+Nepal,food_prices,2003-04,absent,absent,,source not declared for wave
+Nepal,food_prices,2010-11,absent,absent,,source not declared for wave
+Nepal,food_quantities,1995-96,absent,absent,,source not declared for wave
+Nepal,food_quantities,2003-04,absent,absent,,source not declared for wave
+Nepal,food_quantities,2010-11,absent,absent,,source not declared for wave
+Nepal,household_characteristics,1995-96,absent,absent,,source not declared for wave
+Nepal,household_characteristics,2003-04,absent,absent,,source not declared for wave
+Nepal,household_characteristics,2010-11,absent,absent,,source not declared for wave
+Nepal,household_roster,1995-96,absent,absent,,source not declared for wave
+Nepal,household_roster,2003-04,absent,absent,,source not declared for wave
+Nepal,household_roster,2010-11,absent,absent,,source not declared for wave
+Nepal,individual_education,1995-96,absent,absent,,source not declared for wave
+Nepal,individual_education,2003-04,absent,absent,,source not declared for wave
+Nepal,individual_education,2010-11,absent,absent,,source not declared for wave
+Nepal,interview_date,1995-96,absent,absent,,source not declared for wave
+Nepal,interview_date,2003-04,absent,absent,,source not declared for wave
+Nepal,interview_date,2010-11,absent,absent,,source not declared for wave
+Nepal,sample,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Niger,assets,2011-12,sane,declared,19506,warn: low_duplicate_rate
+Niger,assets,2014-15,sane,declared,17070,warn: low_duplicate_rate
+Niger,assets,2018-19,sane,declared,26566,all checks pass
+Niger,assets,2021-22,sane,declared,31139,all checks pass
+Niger,cluster_features,2011-12,builds,declared,270,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Niger,cluster_features,2014-15,builds,declared,270,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Niger,cluster_features,2018-19,sane,declared,504,warn: has_household_index
+Niger,cluster_features,2021-22,sane,declared,555,warn: has_household_index
+Niger,community_prices,2011-12,sane,declared,8923,warn: has_household_index
+Niger,community_prices,2014-15,sane,declared,6500,warn: has_household_index
+Niger,community_prices,2018-19,absent,absent,,source not declared for wave
+Niger,community_prices,2021-22,absent,absent,,source not declared for wave
+Niger,crop_production,2011-12,builds,declared,8813,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,crop_production,2014-15,builds,declared,8403,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,crop_production,2018-19,builds,declared,13717,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,crop_production,2021-22,builds,declared,10963,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,food_acquired,2011-12,absent,absent,,source not declared for wave
+Niger,food_acquired,2014-15,absent,absent,,source not declared for wave
+Niger,food_acquired,2018-19,sane,declared,107939,all checks pass
+Niger,food_acquired,2021-22,sane,declared,131092,all checks pass
+Niger,food_expenditures,2011-12,absent,absent,,source not declared for wave
+Niger,food_expenditures,2014-15,absent,absent,,source not declared for wave
+Niger,food_expenditures,2018-19,sane,declared,86199,all checks pass
+Niger,food_expenditures,2021-22,sane,declared,112932,all checks pass
+Niger,food_prices,2011-12,absent,absent,,source not declared for wave
+Niger,food_prices,2014-15,absent,absent,,source not declared for wave
+Niger,food_prices,2018-19,sane,declared,85741,all checks pass
+Niger,food_prices,2021-22,sane,declared,112629,all checks pass
+Niger,food_quantities,2011-12,absent,absent,,source not declared for wave
+Niger,food_quantities,2014-15,absent,absent,,source not declared for wave
+Niger,food_quantities,2018-19,sane,declared,107481,all checks pass
+Niger,food_quantities,2021-22,sane,declared,130784,all checks pass
+Niger,food_security,2011-12,absent,absent,,source not declared for wave
+Niger,food_security,2014-15,sane,declared,3557,warn: index_levels_match_scheme
+Niger,food_security,2018-19,sane,declared,6021,warn: index_levels_match_scheme
+Niger,food_security,2021-22,sane,declared,6619,warn: index_levels_match_scheme
+Niger,household_characteristics,2011-12,sane,declared,3961,all checks pass
+Niger,household_characteristics,2014-15,sane,declared,3558,all checks pass
+Niger,household_characteristics,2018-19,sane,declared,6024,all checks pass
+Niger,household_characteristics,2021-22,sane,declared,6564,all checks pass
+Niger,household_roster,2011-12,sane,declared,25125,warn: index_levels_match_scheme
+Niger,household_roster,2014-15,sane,declared,22506,warn: index_levels_match_scheme
+Niger,household_roster,2018-19,sane,declared,35406,warn: index_levels_match_scheme
+Niger,household_roster,2021-22,sane,declared,38754,warn: index_levels_match_scheme
+Niger,housing,2011-12,sane,declared,3968,warn: index_levels_match_scheme
+Niger,housing,2014-15,sane,declared,3558,warn: index_levels_match_scheme
+Niger,housing,2018-19,sane,declared,6024,warn: index_levels_match_scheme
+Niger,housing,2021-22,sane,declared,6622,warn: index_levels_match_scheme
+Niger,individual_education,2011-12,sane,declared,3452,warn: index_levels_match_scheme
+Niger,individual_education,2014-15,sane,declared,2821,warn: index_levels_match_scheme
+Niger,individual_education,2018-19,sane,declared,35406,warn: index_levels_match_scheme
+Niger,individual_education,2021-22,sane,declared,38753,warn: index_levels_match_scheme
+Niger,interview_date,2011-12,absent,absent,,source not declared for wave
+Niger,interview_date,2014-15,absent,absent,,source not declared for wave
+Niger,interview_date,2018-19,sane,declared,18067,warn: index_levels_match_scheme
+Niger,interview_date,2021-22,sane,declared,19831,warn: index_levels_match_scheme
+Niger,livestock,2011-12,sane,declared,6614,all checks pass
+Niger,livestock,2014-15,sane,declared,4998,all checks pass
+Niger,livestock,2018-19,sane,declared,9764,all checks pass
+Niger,livestock,2021-22,sane,declared,8834,all checks pass
+Niger,panel_ids,,sane,declared,7840,7840 entries
+Niger,people_last7days,2011-12,sane,declared,25125,warn: index_levels_match_scheme
+Niger,people_last7days,2014-15,sane,declared,26369,warn: index_levels_match_scheme
+Niger,people_last7days,2018-19,builds,declared,35148,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,people_last7days,2021-22,builds,declared,38442,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,plot_features,2011-12,absent,absent,,source not declared for wave
+Niger,plot_features,2014-15,absent,absent,,source not declared for wave
+Niger,plot_features,2018-19,sane,declared,6684,"warn: index_levels_match_scheme,no_constant_columns"
+Niger,plot_features,2021-22,sane,declared,5729,"warn: index_levels_match_scheme,no_constant_columns"
+Niger,plot_inputs,2011-12,sane,declared,8465,warn: index_levels_match_scheme
+Niger,plot_inputs,2014-15,sane,declared,8071,warn: index_levels_match_scheme
+Niger,plot_inputs,2018-19,sane,declared,13395,warn: index_levels_match_scheme
+Niger,plot_inputs,2021-22,sane,declared,12433,warn: index_levels_match_scheme
+Niger,plot_labor,2011-12,sane,declared,19643,warn: index_levels_match_scheme
+Niger,plot_labor,2014-15,sane,declared,15803,warn: index_levels_match_scheme
+Niger,plot_labor,2018-19,sane,declared,9457,warn: index_levels_match_scheme
+Niger,plot_labor,2021-22,sane,declared,8006,warn: index_levels_match_scheme
+Niger,sample,2011-12,sane,declared,3968,all checks pass
+Niger,sample,2014-15,builds,declared,3558,fail: no_all_null_columns; warn: no_constant_columns
+Niger,sample,2018-19,builds,declared,6024,fail: no_all_null_columns; warn: no_constant_columns
+Niger,sample,2021-22,builds,declared,6622,fail: no_all_null_columns; warn: no_constant_columns
+Niger,shocks,2011-12,sane,declared,4298,all checks pass
+Niger,shocks,2014-15,sane,declared,3771,all checks pass
+Niger,shocks,2018-19,builds,declared,6551,fail: no_all_null_columns; warn: no_constant_columns
+Niger,shocks,2021-22,sane,declared,2876,all checks pass
+Niger,subjective_well_being,2011-12,absent,absent,,source not declared for wave
+Niger,subjective_well_being,2014-15,absent,absent,,source not declared for wave
+Niger,subjective_well_being,2018-19,sane,declared,5998,warn: index_levels_match_scheme
+Niger,subjective_well_being,2021-22,sane,declared,6545,warn: index_levels_match_scheme
+Niger,updated_ids,,sane,declared,4,4 entries
+Nigeria,anthropometry,2010Q3,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2011Q1,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2012Q3,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2013Q1,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2015Q3,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2016Q1,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2018Q3,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2019Q1,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2023Q3,absent,absent,,source not declared for wave
+Nigeria,anthropometry,2024Q1,absent,absent,,source not declared for wave
+Nigeria,assets,2010Q3,builds,declared,38947,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,assets,2011Q1,builds,declared,38947,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,assets,2012Q3,sane,declared,161125,all checks pass
+Nigeria,assets,2013Q1,sane,declared,161125,all checks pass
+Nigeria,assets,2015Q3,sane,declared,188229,all checks pass
+Nigeria,assets,2016Q1,sane,declared,188229,all checks pass
+Nigeria,assets,2018Q3,sane,declared,44358,all checks pass
+Nigeria,assets,2019Q1,sane,declared,44358,all checks pass
+Nigeria,assets,2023Q3,absent,absent,,source not declared for wave
+Nigeria,assets,2024Q1,absent,absent,,source not declared for wave
+Nigeria,cluster_features,2010Q3,builds,declared,411,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Nigeria,cluster_features,2011Q1,builds,declared,411,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Nigeria,cluster_features,2012Q3,sane,declared,410,warn: has_household_index
+Nigeria,cluster_features,2013Q1,sane,declared,410,warn: has_household_index
+Nigeria,cluster_features,2015Q3,builds,declared,402,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Nigeria,cluster_features,2016Q1,builds,declared,402,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Nigeria,cluster_features,2018Q3,builds,declared,405,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Nigeria,cluster_features,2019Q1,builds,declared,405,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Nigeria,cluster_features,2023Q3,absent,absent,,source not declared for wave
+Nigeria,cluster_features,2024Q1,absent,absent,,source not declared for wave
+Nigeria,community_prices,2010Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,community_prices,2011Q1,sane,declared,24074,warn: has_household_index
+Nigeria,community_prices,2012Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,community_prices,2013Q1,sane,declared,23943,warn: has_household_index
+Nigeria,community_prices,2015Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,community_prices,2016Q1,sane,declared,31412,warn: has_household_index
+Nigeria,community_prices,2018Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,community_prices,2019Q1,sane,declared,23237,warn: has_household_index
+Nigeria,community_prices,2023Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,community_prices,2024Q1,sane,declared,21873,warn: has_household_index
+Nigeria,crop_production,2010Q3,absent,absent,,source not declared for wave
+Nigeria,crop_production,2011Q1,absent,absent,,source not declared for wave
+Nigeria,crop_production,2012Q3,absent,absent,,source not declared for wave
+Nigeria,crop_production,2013Q1,absent,absent,,source not declared for wave
+Nigeria,crop_production,2015Q3,absent,absent,,source not declared for wave
+Nigeria,crop_production,2016Q1,absent,absent,,source not declared for wave
+Nigeria,crop_production,2018Q3,absent,absent,,source not declared for wave
+Nigeria,crop_production,2019Q1,absent,absent,,source not declared for wave
+Nigeria,crop_production,2023Q3,absent,absent,,source not declared for wave
+Nigeria,crop_production,2024Q1,absent,absent,,source not declared for wave
+Nigeria,food_acquired,2010Q3,builds,declared,73237,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2011Q1,builds,declared,71246,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2012Q3,builds,declared,121750,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2013Q1,builds,declared,134097,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2015Q3,builds,declared,147516,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2016Q1,builds,declared,137856,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2018Q3,sane,declared,158470,warn: index_levels_match_scheme
+Nigeria,food_acquired,2019Q1,sane,declared,161484,warn: index_levels_match_scheme
+Nigeria,food_acquired,2023Q3,absent,absent,,source not declared for wave
+Nigeria,food_acquired,2024Q1,absent,absent,,source not declared for wave
+Nigeria,food_coping,2010Q3,sane,declared,43204,warn: index_levels_match_scheme
+Nigeria,food_coping,2011Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,food_coping,2012Q3,sane,declared,41353,warn: index_levels_match_scheme
+Nigeria,food_coping,2013Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,food_coping,2015Q3,sane,declared,41282,warn: index_levels_match_scheme
+Nigeria,food_coping,2016Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,food_coping,2018Q3,absent,absent,,source not declared for wave
+Nigeria,food_coping,2019Q1,absent,absent,,source not declared for wave
+Nigeria,food_coping,2023Q3,absent,absent,,source not declared for wave
+Nigeria,food_coping,2024Q1,absent,absent,,source not declared for wave
+Nigeria,food_expenditures,2010Q3,sane,declared,62099,all checks pass
+Nigeria,food_expenditures,2011Q1,sane,declared,59775,all checks pass
+Nigeria,food_expenditures,2012Q3,sane,declared,52758,all checks pass
+Nigeria,food_expenditures,2013Q1,sane,declared,56937,all checks pass
+Nigeria,food_expenditures,2015Q3,sane,declared,62476,all checks pass
+Nigeria,food_expenditures,2016Q1,sane,declared,57132,all checks pass
+Nigeria,food_expenditures,2018Q3,sane,declared,64376,all checks pass
+Nigeria,food_expenditures,2019Q1,sane,declared,66732,all checks pass
+Nigeria,food_expenditures,2023Q3,absent,absent,,source not declared for wave
+Nigeria,food_expenditures,2024Q1,absent,absent,,source not declared for wave
+Nigeria,food_prices,2010Q3,sane,declared,61967,all checks pass
+Nigeria,food_prices,2011Q1,sane,declared,59619,all checks pass
+Nigeria,food_prices,2012Q3,sane,declared,675,all checks pass
+Nigeria,food_prices,2013Q1,sane,declared,161,all checks pass
+Nigeria,food_prices,2015Q3,sane,declared,509,all checks pass
+Nigeria,food_prices,2016Q1,sane,declared,426,all checks pass
+Nigeria,food_prices,2018Q3,sane,declared,1106,all checks pass
+Nigeria,food_prices,2019Q1,sane,declared,1044,all checks pass
+Nigeria,food_prices,2023Q3,absent,absent,,source not declared for wave
+Nigeria,food_prices,2024Q1,absent,absent,,source not declared for wave
+Nigeria,food_quantities,2010Q3,sane,declared,73102,all checks pass
+Nigeria,food_quantities,2011Q1,sane,declared,71068,all checks pass
+Nigeria,food_quantities,2012Q3,sane,declared,69607,all checks pass
+Nigeria,food_quantities,2013Q1,sane,declared,76863,all checks pass
+Nigeria,food_quantities,2015Q3,sane,declared,85547,all checks pass
+Nigeria,food_quantities,2016Q1,sane,declared,81150,all checks pass
+Nigeria,food_quantities,2018Q3,sane,declared,95200,all checks pass
+Nigeria,food_quantities,2019Q1,sane,declared,95794,all checks pass
+Nigeria,food_quantities,2023Q3,absent,absent,,source not declared for wave
+Nigeria,food_quantities,2024Q1,absent,absent,,source not declared for wave
+Nigeria,household_characteristics,2010Q3,sane,declared,4995,all checks pass
+Nigeria,household_characteristics,2011Q1,sane,declared,4915,all checks pass
+Nigeria,household_characteristics,2012Q3,sane,declared,4685,all checks pass
+Nigeria,household_characteristics,2013Q1,sane,declared,4768,all checks pass
+Nigeria,household_characteristics,2015Q3,sane,declared,4611,all checks pass
+Nigeria,household_characteristics,2016Q1,sane,declared,4582,all checks pass
+Nigeria,household_characteristics,2018Q3,sane,declared,5051,all checks pass
+Nigeria,household_characteristics,2019Q1,sane,declared,4980,all checks pass
+Nigeria,household_characteristics,2023Q3,sane,declared,4771,all checks pass
+Nigeria,household_characteristics,2024Q1,sane,declared,4716,all checks pass
+Nigeria,household_roster,2010Q3,builds,declared,27588,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2011Q1,builds,declared,28281,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2012Q3,sane,declared,29314,warn: index_levels_match_scheme
+Nigeria,household_roster,2013Q1,sane,declared,30234,warn: index_levels_match_scheme
+Nigeria,household_roster,2015Q3,builds,declared,32139,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2016Q1,builds,declared,32827,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2018Q3,builds,declared,27607,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2019Q1,builds,declared,26557,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2023Q3,builds,declared,27421,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2024Q1,builds,declared,25662,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,housing,2010Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,housing,2011Q1,sane,declared,4899,warn: index_levels_match_scheme
+Nigeria,housing,2012Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,housing,2013Q1,sane,declared,4756,warn: index_levels_match_scheme
+Nigeria,housing,2015Q3,sane,declared,4589,warn: index_levels_match_scheme
+Nigeria,housing,2016Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,housing,2018Q3,sane,declared,5047,warn: index_levels_match_scheme
+Nigeria,housing,2019Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,housing,2023Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,housing,2024Q1,sane,declared,4715,warn: index_levels_match_scheme
+Nigeria,individual_education,2010Q3,sane,declared,643,warn: index_levels_match_scheme
+Nigeria,individual_education,2011Q1,sane,declared,643,warn: index_levels_match_scheme
+Nigeria,individual_education,2012Q3,sane,declared,313,warn: index_levels_match_scheme
+Nigeria,individual_education,2013Q1,sane,declared,313,warn: index_levels_match_scheme
+Nigeria,individual_education,2015Q3,sane,declared,17687,warn: index_levels_match_scheme
+Nigeria,individual_education,2016Q1,sane,declared,17687,warn: index_levels_match_scheme
+Nigeria,individual_education,2018Q3,sane,declared,19271,warn: index_levels_match_scheme
+Nigeria,individual_education,2019Q1,sane,declared,19271,warn: index_levels_match_scheme
+Nigeria,individual_education,2023Q3,sane,declared,19053,warn: index_levels_match_scheme
+Nigeria,individual_education,2024Q1,sane,declared,19053,warn: index_levels_match_scheme
+Nigeria,interview_date,2010Q3,sane,declared,4953,warn: index_levels_match_scheme
+Nigeria,interview_date,2011Q1,sane,declared,4915,warn: index_levels_match_scheme
+Nigeria,interview_date,2012Q3,sane,declared,4809,warn: index_levels_match_scheme
+Nigeria,interview_date,2013Q1,sane,declared,4769,warn: index_levels_match_scheme
+Nigeria,interview_date,2015Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,interview_date,2016Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,interview_date,2018Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,interview_date,2019Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,interview_date,2023Q3,absent,absent,,source not declared for wave
+Nigeria,interview_date,2024Q1,absent,absent,,source not declared for wave
+Nigeria,livestock,2010Q3,absent,absent,,source not declared for wave
+Nigeria,livestock,2011Q1,absent,absent,,source not declared for wave
+Nigeria,livestock,2012Q3,absent,absent,,source not declared for wave
+Nigeria,livestock,2013Q1,absent,absent,,source not declared for wave
+Nigeria,livestock,2015Q3,absent,absent,,source not declared for wave
+Nigeria,livestock,2016Q1,absent,absent,,source not declared for wave
+Nigeria,livestock,2018Q3,absent,absent,,source not declared for wave
+Nigeria,livestock,2019Q1,absent,absent,,source not declared for wave
+Nigeria,livestock,2023Q3,absent,absent,,source not declared for wave
+Nigeria,livestock,2024Q1,absent,absent,,source not declared for wave
+Nigeria,nonfood_expenditures,2010Q3,builds,declared,4965,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2011Q1,builds,declared,4811,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2012Q3,builds,declared,4581,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2013Q1,builds,declared,4729,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2015Q3,builds,declared,4579,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2016Q1,builds,declared,4564,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2018Q3,builds,declared,5047,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2019Q1,builds,declared,4979,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2023Q3,absent,absent,,source not declared for wave
+Nigeria,nonfood_expenditures,2024Q1,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2010Q3,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2011Q1,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2012Q3,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2013Q1,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2015Q3,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2016Q1,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2018Q3,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2019Q1,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2023Q3,absent,absent,,source not declared for wave
+Nigeria,people_last7days,2024Q1,absent,absent,,source not declared for wave
+Nigeria,plot_features,2010Q3,builds,declared,6029,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2011Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,plot_features,2012Q3,builds,declared,5888,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2013Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,plot_features,2015Q3,builds,declared,5824,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2016Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,plot_features,2018Q3,builds,declared,11072,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2019Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,plot_features,2023Q3,builds,declared,9232,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2024Q1,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,plot_inputs,2010Q3,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2011Q1,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2012Q3,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2013Q1,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2015Q3,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2016Q1,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2018Q3,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2019Q1,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2023Q3,absent,absent,,source not declared for wave
+Nigeria,plot_inputs,2024Q1,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2010Q3,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2011Q1,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2012Q3,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2013Q1,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2015Q3,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2016Q1,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2018Q3,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2019Q1,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2023Q3,absent,absent,,source not declared for wave
+Nigeria,plot_labor,2024Q1,absent,absent,,source not declared for wave
+Nigeria,sample,2010Q3,sane,declared,5000,all checks pass
+Nigeria,sample,2011Q1,sane,declared,5000,all checks pass
+Nigeria,sample,2012Q3,sane,declared,4859,all checks pass
+Nigeria,sample,2013Q1,sane,declared,4859,all checks pass
+Nigeria,sample,2015Q3,sane,declared,4696,all checks pass
+Nigeria,sample,2016Q1,sane,declared,4696,all checks pass
+Nigeria,sample,2018Q3,sane,declared,5263,all checks pass
+Nigeria,sample,2019Q1,sane,declared,5263,all checks pass
+Nigeria,sample,2023Q3,sane,declared,5067,all checks pass
+Nigeria,sample,2024Q1,sane,declared,5067,all checks pass
+Nigeria,shocks,2010Q3,sane,declared,2200,all checks pass
+Nigeria,shocks,2011Q1,sane,declared,2200,all checks pass
+Nigeria,shocks,2012Q3,sane,declared,2882,all checks pass
+Nigeria,shocks,2013Q1,sane,declared,2882,all checks pass
+Nigeria,shocks,2015Q3,sane,declared,2323,all checks pass
+Nigeria,shocks,2016Q1,sane,declared,2323,all checks pass
+Nigeria,shocks,2018Q3,sane,declared,3870,all checks pass
+Nigeria,shocks,2019Q1,sane,declared,3870,all checks pass
+Nigeria,shocks,2023Q3,absent,absent,,source not declared for wave
+Nigeria,shocks,2024Q1,absent,absent,,source not declared for wave
+Pakistan,cluster_features,1991,sane,declared,301,warn: has_household_index
+Pakistan,household_characteristics,1991,sane,declared,4794,all checks pass
+Pakistan,household_roster,1991,sane,declared,36079,warn: index_levels_match_scheme
+Pakistan,housing,1991,sane,declared,4789,warn: index_levels_match_scheme
+Pakistan,interview_date,1991,sane,declared,4956,warn: index_levels_match_scheme
+Pakistan,sample,1991,sane,declared,4967,all checks pass
+Senegal,assets,2018-19,sane,declared,54604,all checks pass
+Senegal,assets,2021-22,sane,declared,54057,all checks pass
+Senegal,cluster_features,2018-19,sane,declared,598,warn: has_household_index
+Senegal,cluster_features,2021-22,sane,declared,596,warn: has_household_index
+Senegal,crop_production,2018-19,sane,declared,8416,"warn: index_levels_match_scheme,no_constant_columns"
+Senegal,crop_production,2021-22,absent,absent,,source not declared for wave
+Senegal,food_acquired,2018-19,sane,declared,215266,all checks pass
+Senegal,food_acquired,2021-22,sane,declared,220447,all checks pass
+Senegal,food_expenditures,2018-19,sane,declared,190819,all checks pass
+Senegal,food_expenditures,2021-22,sane,declared,197387,all checks pass
+Senegal,food_prices,2018-19,sane,declared,190304,all checks pass
+Senegal,food_prices,2021-22,sane,declared,196968,all checks pass
+Senegal,food_quantities,2018-19,sane,declared,214745,all checks pass
+Senegal,food_quantities,2021-22,sane,declared,219644,all checks pass
+Senegal,food_security,2018-19,sane,declared,7156,warn: index_levels_match_scheme
+Senegal,food_security,2021-22,sane,declared,7109,warn: index_levels_match_scheme
+Senegal,household_characteristics,2018-19,sane,declared,7150,all checks pass
+Senegal,household_characteristics,2021-22,sane,declared,7114,all checks pass
+Senegal,household_roster,2018-19,sane,declared,66119,warn: index_levels_match_scheme
+Senegal,household_roster,2021-22,sane,declared,63531,warn: index_levels_match_scheme
+Senegal,housing,2018-19,sane,declared,7156,warn: index_levels_match_scheme
+Senegal,housing,2021-22,sane,declared,7120,warn: index_levels_match_scheme
+Senegal,individual_education,2018-19,sane,declared,66116,warn: index_levels_match_scheme
+Senegal,individual_education,2021-22,sane,declared,63530,warn: index_levels_match_scheme
+Senegal,interview_date,2018-19,sane,declared,21464,warn: index_levels_match_scheme
+Senegal,interview_date,2021-22,sane,declared,21360,warn: index_levels_match_scheme
+Senegal,livestock,2018-19,sane,declared,9404,all checks pass
+Senegal,livestock,2021-22,absent,absent,,source not declared for wave
+Senegal,panel_ids,,sane,declared,6127,6127 entries
+Senegal,people_last7days,2018-19,sane,declared,65723,"warn: index_levels_match_scheme,no_constant_columns"
+Senegal,people_last7days,2021-22,absent,absent,,source not declared for wave
+Senegal,plot_features,2018-19,sane,declared,7712,"warn: index_levels_match_scheme,no_constant_columns"
+Senegal,plot_features,2021-22,sane,declared,6112,"warn: index_levels_match_scheme,no_constant_columns"
+Senegal,plot_inputs,2018-19,sane,declared,9901,warn: index_levels_match_scheme
+Senegal,plot_inputs,2021-22,absent,absent,,source not declared for wave
+Senegal,plot_labor,2018-19,sane,declared,10447,warn: index_levels_match_scheme
+Senegal,plot_labor,2021-22,absent,absent,,source not declared for wave
+Senegal,sample,2018-19,sane,declared,7156,all checks pass
+Senegal,sample,2021-22,sane,declared,7120,all checks pass
+Senegal,shocks,2018-19,sane,declared,6131,warn: no_constant_columns
+Senegal,shocks,2021-22,sane,declared,4182,all checks pass
+Senegal,subjective_well_being,2018-19,sane,declared,7105,warn: index_levels_match_scheme
+Senegal,subjective_well_being,2021-22,sane,declared,7035,warn: index_levels_match_scheme
+Senegal,updated_ids,,sane,declared,2,2 entries
+Serbia,assets,2007,sane,declared,48060,all checks pass
+Serbia,cluster_features,2007,sane,declared,328,warn: has_household_index
+Serbia,household_characteristics,2007,sane,declared,5557,all checks pass
+Serbia,household_roster,2007,sane,declared,17375,warn: index_levels_match_scheme
+Serbia,housing,2007,sane,declared,2744,warn: index_levels_match_scheme
+Serbia,individual_education,2007,sane,declared,17375,warn: index_levels_match_scheme
+Serbia,interview_date,2007,sane,declared,5557,warn: index_levels_match_scheme
+Serbia,sample,2007,sane,declared,5557,all checks pass
+Serbia and Montenegro,cluster_features,2002,sane,declared,618,warn: has_household_index
+Serbia and Montenegro,cluster_features,2003,sane,declared,301,warn: has_household_index
+Serbia and Montenegro,household_characteristics,2002,sane,declared,6386,all checks pass
+Serbia and Montenegro,household_characteristics,2003,sane,declared,2548,all checks pass
+Serbia and Montenegro,household_roster,2002,sane,declared,19725,"warn: index_levels_match_scheme,no_constant_columns"
+Serbia and Montenegro,household_roster,2003,sane,declared,8027,"warn: index_levels_match_scheme,no_constant_columns"
+Serbia and Montenegro,life_satisfaction,2002,sane,declared,6273,warn: index_levels_match_scheme
+Serbia and Montenegro,life_satisfaction,2003,sane,declared,2521,warn: index_levels_match_scheme
+Serbia and Montenegro,sample,2002,builds,declared,6386,fail: no_all_null_columns; warn: no_constant_columns
+Serbia and Montenegro,sample,2003,sane,declared,2548,all checks pass
+South Africa,assets,1993,sane,declared,35187,all checks pass
+South Africa,cluster_features,1993,sane,declared,355,warn: has_household_index
+South Africa,household_characteristics,1993,sane,declared,8799,all checks pass
+South Africa,household_roster,1993,sane,declared,43687,warn: index_levels_match_scheme
+South Africa,housing,1993,sane,declared,8808,warn: index_levels_match_scheme
+South Africa,individual_education,1993,sane,declared,43455,warn: index_levels_match_scheme
+South Africa,interview_date,1993,sane,declared,8809,warn: index_levels_match_scheme
+South Africa,life_satisfaction,1993,sane,declared,8724,warn: index_levels_match_scheme
+South Africa,sample,1993,sane,declared,8809,all checks pass
+Tajikistan,cluster_features,1999,sane,declared,125,warn: has_household_index
+Tajikistan,cluster_features,2003,sane,declared,208,warn: has_household_index
+Tajikistan,cluster_features,2007,sane,declared,267,warn: has_household_index
+Tajikistan,cluster_features,2009,sane,declared,167,warn: has_household_index
+Tajikistan,food_security_hfias,1999,absent,absent,,source not declared for wave
+Tajikistan,food_security_hfias,2003,absent,absent,,source not declared for wave
+Tajikistan,food_security_hfias,2007,sane,declared,4644,warn: index_levels_match_scheme
+Tajikistan,food_security_hfias,2009,sane,declared,1503,warn: index_levels_match_scheme
+Tajikistan,household_characteristics,1999,sane,declared,1977,all checks pass
+Tajikistan,household_characteristics,2003,sane,declared,4159,all checks pass
+Tajikistan,household_characteristics,2007,sane,declared,4644,all checks pass
+Tajikistan,household_characteristics,2009,sane,declared,1503,all checks pass
+Tajikistan,household_roster,1999,sane,declared,14142,warn: index_levels_match_scheme
+Tajikistan,household_roster,2003,sane,declared,26141,warn: index_levels_match_scheme
+Tajikistan,household_roster,2007,sane,declared,28957,warn: index_levels_match_scheme
+Tajikistan,household_roster,2009,sane,declared,10069,warn: index_levels_match_scheme
+Tajikistan,housing,1999,builds,declared,1999,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Tajikistan,housing,2003,absent,absent,,source not declared for wave
+Tajikistan,housing,2007,sane,declared,4644,warn: index_levels_match_scheme
+Tajikistan,housing,2009,builds,declared,1503,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Tajikistan,individual_education,1999,sane,declared,6958,warn: index_levels_match_scheme
+Tajikistan,individual_education,2003,sane,declared,20300,warn: index_levels_match_scheme
+Tajikistan,individual_education,2007,sane,declared,23663,warn: index_levels_match_scheme
+Tajikistan,individual_education,2009,sane,declared,8376,warn: index_levels_match_scheme
+Tajikistan,interview_date,1999,sane,declared,2000,warn: index_levels_match_scheme
+Tajikistan,interview_date,2003,sane,declared,4160,warn: index_levels_match_scheme
+Tajikistan,interview_date,2007,sane,declared,4643,warn: index_levels_match_scheme
+Tajikistan,interview_date,2009,sane,declared,1503,warn: index_levels_match_scheme
+Tajikistan,life_satisfaction,1999,absent,absent,,source not declared for wave
+Tajikistan,life_satisfaction,2003,absent,absent,,source not declared for wave
+Tajikistan,life_satisfaction,2007,sane,declared,9251,warn: index_levels_match_scheme
+Tajikistan,life_satisfaction,2009,sane,declared,2984,warn: index_levels_match_scheme
+Tajikistan,plot_features,1999,absent,absent,,source not declared for wave
+Tajikistan,plot_features,2003,absent,absent,,source not declared for wave
+Tajikistan,plot_features,2007,sane,declared,3974,"warn: index_levels_match_scheme,no_constant_columns"
+Tajikistan,plot_features,2009,absent,absent,,source not declared for wave
+Tajikistan,sample,1999,builds,declared,2000,fail: no_all_null_columns; warn: no_constant_columns
+Tajikistan,sample,2003,builds,declared,4160,fail: no_all_null_columns; warn: no_constant_columns
+Tajikistan,sample,2007,sane,declared,4860,all checks pass
+Tajikistan,sample,2009,sane,declared,1503,all checks pass
+Tanzania,anthropometry,2008-09,builds,declared,14382,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Tanzania,anthropometry,2010-11,sane,declared,17059,warn: index_levels_match_scheme
+Tanzania,anthropometry,2012-13,sane,declared,19790,warn: index_levels_match_scheme
+Tanzania,anthropometry,2014-15,sane,declared,11699,warn: index_levels_match_scheme
+Tanzania,anthropometry,2019-20,sane,declared,3080,warn: index_levels_match_scheme
+Tanzania,anthropometry,2020-21,sane,declared,12664,warn: index_levels_match_scheme
+Tanzania,assets,2008-09,absent,absent,,source not declared for wave
+Tanzania,assets,2010-11,absent,absent,,source not declared for wave
+Tanzania,assets,2012-13,absent,absent,,source not declared for wave
+Tanzania,assets,2014-15,absent,absent,,source not declared for wave
+Tanzania,assets,2019-20,sane,declared,61725,all checks pass
+Tanzania,assets,2020-21,absent,absent,,source not declared for wave
+Tanzania,cluster_features,2008-09,sane,declared,409,"warn: has_household_index,no_constant_columns"
+Tanzania,cluster_features,2010-11,sane,declared,409,"warn: has_household_index,no_constant_columns"
+Tanzania,cluster_features,2012-13,sane,declared,409,warn: has_household_index
+Tanzania,cluster_features,2014-15,sane,declared,498,warn: has_household_index
+Tanzania,cluster_features,2019-20,sane,declared,247,warn: has_household_index
+Tanzania,cluster_features,2020-21,sane,declared,417,warn: has_household_index
+Tanzania,community_cluster_xwalk,2008-09,absent,absent,,source not declared for wave
+Tanzania,community_cluster_xwalk,2010-11,absent,absent,,source not declared for wave
+Tanzania,community_cluster_xwalk,2012-13,absent,absent,,source not declared for wave
+Tanzania,community_cluster_xwalk,2014-15,absent,absent,,source not declared for wave
+Tanzania,community_cluster_xwalk,2019-20,sane,declared,99,warn: has_household_index
+Tanzania,community_cluster_xwalk,2020-21,sane,declared,488,warn: has_household_index
+Tanzania,community_prices,2008-09,absent,absent,,source not declared for wave
+Tanzania,community_prices,2010-11,absent,absent,,source not declared for wave
+Tanzania,community_prices,2012-13,absent,absent,,source not declared for wave
+Tanzania,community_prices,2014-15,absent,absent,,source not declared for wave
+Tanzania,community_prices,2019-20,sane,declared,2769,warn: has_household_index
+Tanzania,community_prices,2020-21,sane,declared,13062,warn: has_household_index
+Tanzania,crop_production,2008-09,absent,absent,,source not declared for wave
+Tanzania,crop_production,2010-11,absent,absent,,source not declared for wave
+Tanzania,crop_production,2012-13,absent,absent,,source not declared for wave
+Tanzania,crop_production,2014-15,absent,absent,,source not declared for wave
+Tanzania,crop_production,2019-20,sane,declared,3001,"warn: index_levels_match_scheme,no_constant_columns"
+Tanzania,crop_production,2020-21,sane,declared,11125,"warn: index_levels_match_scheme,no_constant_columns"
+Tanzania,food_acquired,2008-09,sane,declared,44957,warn: index_levels_match_scheme
+Tanzania,food_acquired,2010-11,sane,declared,54773,warn: index_levels_match_scheme
+Tanzania,food_acquired,2012-13,sane,declared,67899,warn: index_levels_match_scheme
+Tanzania,food_acquired,2014-15,sane,declared,61984,warn: index_levels_match_scheme
+Tanzania,food_acquired,2019-20,sane,declared,16104,warn: index_levels_match_scheme
+Tanzania,food_acquired,2020-21,sane,declared,5896,warn: index_levels_match_scheme
+Tanzania,food_coping,2008-09,dropped,declared,,declared for wave but absent from built t-index
+Tanzania,food_coping,2010-11,sane,declared,31375,warn: index_levels_match_scheme
+Tanzania,food_coping,2012-13,sane,declared,40080,warn: index_levels_match_scheme
+Tanzania,food_coping,2014-15,sane,declared,34724,warn: index_levels_match_scheme
+Tanzania,food_coping,2019-20,sane,declared,9464,warn: index_levels_match_scheme
+Tanzania,food_coping,2020-21,sane,declared,37672,warn: index_levels_match_scheme
+Tanzania,food_expenditures,2008-09,sane,declared,34497,all checks pass
+Tanzania,food_expenditures,2010-11,sane,declared,42118,all checks pass
+Tanzania,food_expenditures,2012-13,sane,declared,52619,all checks pass
+Tanzania,food_expenditures,2014-15,sane,declared,49557,all checks pass
+Tanzania,food_expenditures,2019-20,sane,declared,12808,all checks pass
+Tanzania,food_expenditures,2020-21,sane,declared,4694,all checks pass
+Tanzania,food_prices,2008-09,sane,declared,34413,all checks pass
+Tanzania,food_prices,2010-11,sane,declared,42083,all checks pass
+Tanzania,food_prices,2012-13,sane,declared,52548,all checks pass
+Tanzania,food_prices,2014-15,sane,declared,49511,all checks pass
+Tanzania,food_prices,2019-20,sane,declared,12418,all checks pass
+Tanzania,food_prices,2020-21,sane,declared,4606,all checks pass
+Tanzania,food_quantities,2008-09,sane,declared,44873,all checks pass
+Tanzania,food_quantities,2010-11,sane,declared,54738,all checks pass
+Tanzania,food_quantities,2012-13,sane,declared,67828,all checks pass
+Tanzania,food_quantities,2014-15,sane,declared,61938,all checks pass
+Tanzania,food_quantities,2019-20,sane,declared,15714,all checks pass
+Tanzania,food_quantities,2020-21,sane,declared,5808,all checks pass
+Tanzania,household_characteristics,2008-09,sane,declared,3264,all checks pass
+Tanzania,household_characteristics,2010-11,sane,declared,3921,all checks pass
+Tanzania,household_characteristics,2012-13,sane,declared,5000,all checks pass
+Tanzania,household_characteristics,2014-15,sane,declared,4336,all checks pass
+Tanzania,household_characteristics,2019-20,sane,declared,1183,all checks pass
+Tanzania,household_characteristics,2020-21,sane,declared,4700,all checks pass
+Tanzania,household_roster,2008-09,sane,declared,16709,warn: index_levels_match_scheme
+Tanzania,household_roster,2010-11,sane,declared,20558,warn: index_levels_match_scheme
+Tanzania,household_roster,2012-13,sane,declared,25412,warn: index_levels_match_scheme
+Tanzania,household_roster,2014-15,sane,declared,21027,warn: index_levels_match_scheme
+Tanzania,household_roster,2019-20,sane,declared,5586,warn: index_levels_match_scheme
+Tanzania,household_roster,2020-21,sane,declared,23592,warn: index_levels_match_scheme
+Tanzania,housing,2008-09,sane,declared,3265,warn: index_levels_match_scheme
+Tanzania,housing,2010-11,sane,declared,3922,warn: index_levels_match_scheme
+Tanzania,housing,2012-13,sane,declared,5010,warn: index_levels_match_scheme
+Tanzania,housing,2014-15,sane,declared,4341,warn: index_levels_match_scheme
+Tanzania,housing,2019-20,sane,declared,1183,warn: index_levels_match_scheme
+Tanzania,housing,2020-21,sane,declared,4709,warn: index_levels_match_scheme
+Tanzania,individual_education,2008-09,sane,declared,5865,warn: index_levels_match_scheme
+Tanzania,individual_education,2010-11,sane,declared,7524,warn: index_levels_match_scheme
+Tanzania,individual_education,2012-13,sane,declared,10000,warn: index_levels_match_scheme
+Tanzania,individual_education,2014-15,sane,declared,8288,warn: index_levels_match_scheme
+Tanzania,individual_education,2019-20,sane,declared,2415,warn: index_levels_match_scheme
+Tanzania,individual_education,2020-21,sane,declared,9275,warn: index_levels_match_scheme
+Tanzania,interview_date,2008-09,sane,declared,3263,warn: index_levels_match_scheme
+Tanzania,interview_date,2010-11,sane,declared,3923,warn: index_levels_match_scheme
+Tanzania,interview_date,2012-13,sane,declared,5010,warn: index_levels_match_scheme
+Tanzania,interview_date,2014-15,sane,declared,4338,warn: index_levels_match_scheme
+Tanzania,interview_date,2019-20,sane,declared,1184,warn: index_levels_match_scheme
+Tanzania,interview_date,2020-21,sane,declared,4709,warn: index_levels_match_scheme
+Tanzania,life_satisfaction,2008-09,sane,declared,16783,warn: index_levels_match_scheme
+Tanzania,life_satisfaction,2010-11,sane,declared,27522,warn: index_levels_match_scheme
+Tanzania,life_satisfaction,2012-13,sane,declared,34587,warn: index_levels_match_scheme
+Tanzania,life_satisfaction,2014-15,sane,declared,30124,warn: index_levels_match_scheme
+Tanzania,life_satisfaction,2019-20,sane,declared,9351,warn: index_levels_match_scheme
+Tanzania,life_satisfaction,2020-21,sane,declared,33681,warn: index_levels_match_scheme
+Tanzania,livestock,2008-09,absent,absent,,source not declared for wave
+Tanzania,livestock,2010-11,absent,absent,,source not declared for wave
+Tanzania,livestock,2012-13,absent,absent,,source not declared for wave
+Tanzania,livestock,2014-15,absent,absent,,source not declared for wave
+Tanzania,livestock,2019-20,sane,declared,1212,all checks pass
+Tanzania,livestock,2020-21,sane,declared,5343,all checks pass
+Tanzania,panel_ids,,sane,declared,8129,8129 entries
+Tanzania,people_last7days,2008-09,absent,absent,,source not declared for wave
+Tanzania,people_last7days,2010-11,absent,absent,,source not declared for wave
+Tanzania,people_last7days,2012-13,absent,absent,,source not declared for wave
+Tanzania,people_last7days,2014-15,absent,absent,,source not declared for wave
+Tanzania,people_last7days,2019-20,sane,declared,5587,warn: index_levels_match_scheme
+Tanzania,people_last7days,2020-21,sane,declared,23592,warn: index_levels_match_scheme
+Tanzania,plot_features,2008-09,absent,absent,,source not declared for wave
+Tanzania,plot_features,2010-11,absent,absent,,source not declared for wave
+Tanzania,plot_features,2012-13,absent,absent,,source not declared for wave
+Tanzania,plot_features,2014-15,absent,absent,,source not declared for wave
+Tanzania,plot_features,2019-20,sane,declared,2305,"warn: index_levels_match_scheme,no_constant_columns"
+Tanzania,plot_features,2020-21,sane,declared,6560,"warn: index_levels_match_scheme,no_constant_columns"
+Tanzania,plot_inputs,2008-09,absent,absent,,source not declared for wave
+Tanzania,plot_inputs,2010-11,absent,absent,,source not declared for wave
+Tanzania,plot_inputs,2012-13,absent,absent,,source not declared for wave
+Tanzania,plot_inputs,2014-15,absent,absent,,source not declared for wave
+Tanzania,plot_inputs,2019-20,sane,declared,1774,"warn: index_levels_match_scheme,no_null_index_levels"
+Tanzania,plot_inputs,2020-21,sane,declared,7924,"warn: index_levels_match_scheme,no_null_index_levels"
+Tanzania,plot_labor,2008-09,absent,absent,,source not declared for wave
+Tanzania,plot_labor,2010-11,absent,absent,,source not declared for wave
+Tanzania,plot_labor,2012-13,absent,absent,,source not declared for wave
+Tanzania,plot_labor,2014-15,absent,absent,,source not declared for wave
+Tanzania,plot_labor,2019-20,sane,declared,1031,warn: index_levels_match_scheme
+Tanzania,plot_labor,2020-21,sane,declared,7596,warn: index_levels_match_scheme
+Tanzania,sample,2008-09,sane,declared,3265,all checks pass
+Tanzania,sample,2010-11,sane,declared,3924,all checks pass
+Tanzania,sample,2012-13,sane,declared,5010,all checks pass
+Tanzania,sample,2014-15,sane,declared,4341,all checks pass
+Tanzania,sample,2019-20,sane,declared,1184,all checks pass
+Tanzania,sample,2020-21,sane,declared,4709,all checks pass
+Tanzania,shocks,2008-09,builds,declared,14165,fail: no_all_null_columns; warn: no_constant_columns
+Tanzania,shocks,2010-11,builds,declared,15843,fail: no_all_null_columns; warn: no_constant_columns
+Tanzania,shocks,2012-13,sane,declared,16825,all checks pass
+Tanzania,shocks,2014-15,builds,declared,7699,fail: no_all_null_columns; warn: no_constant_columns
+Tanzania,shocks,2019-20,builds,declared,864,fail: no_all_null_columns; warn: no_constant_columns
+Tanzania,shocks,2020-21,builds,declared,5067,fail: no_all_null_columns; warn: no_constant_columns
+Tanzania,updated_ids,,sane,declared,5,5 entries
+Timor-Leste,cluster_features,2001,sane,declared,300,warn: has_household_index
+Timor-Leste,cluster_features,2007-08,sane,declared,300,warn: has_household_index
+Timor-Leste,household_characteristics,2001,sane,declared,1800,all checks pass
+Timor-Leste,household_characteristics,2007-08,sane,declared,4477,all checks pass
+Timor-Leste,household_roster,2001,sane,declared,9113,warn: index_levels_match_scheme
+Timor-Leste,household_roster,2007-08,sane,declared,25000,warn: index_levels_match_scheme
+Timor-Leste,housing,2001,sane,declared,1800,"warn: index_levels_match_scheme,no_constant_columns"
+Timor-Leste,housing,2007-08,sane,declared,4477,warn: index_levels_match_scheme
+Timor-Leste,interview_date,2001,sane,declared,1800,warn: index_levels_match_scheme
+Timor-Leste,interview_date,2007-08,sane,declared,4477,warn: index_levels_match_scheme
+Timor-Leste,life_satisfaction,2001,sane,declared,12429,warn: index_levels_match_scheme
+Timor-Leste,life_satisfaction,2007-08,sane,declared,26386,warn: index_levels_match_scheme
+Timor-Leste,months_food_inadequate,2001,sane,declared,1798,warn: index_levels_match_scheme
+Timor-Leste,months_food_inadequate,2007-08,sane,declared,3995,warn: index_levels_match_scheme
+Timor-Leste,plot_features,2001,absent,absent,,source not declared for wave
+Timor-Leste,plot_features,2007-08,sane,declared,6308,"warn: index_levels_match_scheme,no_constant_columns"
+Timor-Leste,sample,2001,sane,declared,1800,all checks pass
+Timor-Leste,sample,2007-08,sane,declared,4477,all checks pass
+Togo,assets,2018,sane,declared,31462,all checks pass
+Togo,cluster_features,2018,sane,declared,540,warn: has_household_index
+Togo,crop_production,2018,sane,declared,11563,"warn: index_levels_match_scheme,no_constant_columns"
+Togo,food_acquired,2018,sane,declared,112557,all checks pass
+Togo,food_expenditures,2018,sane,declared,74668,all checks pass
+Togo,food_prices,2018,sane,declared,75512,all checks pass
+Togo,food_quantities,2018,sane,declared,110082,all checks pass
+Togo,food_security,2018,sane,declared,6163,warn: index_levels_match_scheme
+Togo,household_characteristics,2018,sane,declared,6146,all checks pass
+Togo,household_roster,2018,sane,declared,27480,warn: index_levels_match_scheme
+Togo,housing,2018,sane,declared,6171,warn: index_levels_match_scheme
+Togo,individual_education,2018,sane,declared,27481,warn: index_levels_match_scheme
+Togo,interview_date,2018,sane,declared,18493,warn: index_levels_match_scheme
+Togo,livestock,2018,sane,declared,6181,all checks pass
+Togo,people_last7days,2018,sane,declared,25282,"warn: index_levels_match_scheme,no_constant_columns"
+Togo,plot_features,2018,sane,declared,9553,"warn: index_levels_match_scheme,no_constant_columns"
+Togo,plot_inputs,2018,sane,declared,13565,warn: index_levels_match_scheme
+Togo,plot_labor,2018,sane,declared,15052,warn: index_levels_match_scheme
+Togo,sample,2018,sane,declared,6171,all checks pass
+Togo,shocks,2018,sane,declared,7230,warn: no_constant_columns
+Togo,subjective_well_being,2018,sane,declared,6120,warn: index_levels_match_scheme
+Uganda,anthropometry,2005-06,absent,absent,,source not declared for wave
+Uganda,anthropometry,2009-10,sane,declared,2095,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2010-11,sane,declared,1688,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2011-12,sane,declared,1620,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2013-14,sane,declared,1750,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2015-16,sane,declared,1315,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2018-19,builds,declared,11222,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2019-20,builds,declared,9863,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,assets,2005-06,sane,declared,22994,warn: low_duplicate_rate
+Uganda,assets,2009-10,sane,declared,16306,all checks pass
+Uganda,assets,2010-11,sane,declared,14394,all checks pass
+Uganda,assets,2011-12,sane,declared,14846,all checks pass
+Uganda,assets,2013-14,sane,declared,14477,all checks pass
+Uganda,assets,2015-16,sane,declared,15073,all checks pass
+Uganda,assets,2018-19,sane,declared,9227,all checks pass
+Uganda,assets,2019-20,sane,declared,9491,all checks pass
+Uganda,cluster_features,2005-06,sane,declared,322,warn: has_household_index
+Uganda,cluster_features,2009-10,sane,declared,317,warn: has_household_index
+Uganda,cluster_features,2010-11,sane,declared,324,warn: has_household_index
+Uganda,cluster_features,2011-12,sane,declared,321,warn: has_household_index
+Uganda,cluster_features,2013-14,sane,declared,706,warn: has_household_index
+Uganda,cluster_features,2015-16,sane,declared,875,warn: has_household_index
+Uganda,cluster_features,2018-19,sane,declared,751,warn: has_household_index
+Uganda,cluster_features,2019-20,builds,declared,793,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Uganda,crop_production,2005-06,absent,absent,,source not declared for wave
+Uganda,crop_production,2009-10,builds,declared,24997,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,crop_production,2010-11,builds,declared,20442,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,crop_production,2011-12,sane,declared,19552,warn: index_levels_match_scheme
+Uganda,crop_production,2013-14,sane,declared,17053,warn: index_levels_match_scheme
+Uganda,crop_production,2015-16,sane,declared,18874,warn: index_levels_match_scheme
+Uganda,crop_production,2018-19,sane,declared,14194,warn: index_levels_match_scheme
+Uganda,crop_production,2019-20,sane,declared,15369,warn: index_levels_match_scheme
+Uganda,earnings,2005-06,sane,declared,1467,warn: index_levels_match_scheme
+Uganda,earnings,2009-10,sane,declared,2889,warn: index_levels_match_scheme
+Uganda,earnings,2010-11,sane,declared,2618,warn: index_levels_match_scheme
+Uganda,earnings,2011-12,sane,declared,2805,warn: index_levels_match_scheme
+Uganda,earnings,2013-14,sane,declared,3119,warn: index_levels_match_scheme
+Uganda,earnings,2015-16,sane,declared,3305,warn: index_levels_match_scheme
+Uganda,earnings,2018-19,sane,declared,3180,warn: index_levels_match_scheme
+Uganda,earnings,2019-20,sane,declared,3064,warn: index_levels_match_scheme
+Uganda,enterprise_income,2005-06,sane,declared,1351,warn: index_levels_match_scheme
+Uganda,enterprise_income,2009-10,sane,declared,2917,warn: index_levels_match_scheme
+Uganda,enterprise_income,2010-11,sane,declared,1619,warn: index_levels_match_scheme
+Uganda,enterprise_income,2011-12,sane,declared,1577,warn: index_levels_match_scheme
+Uganda,enterprise_income,2013-14,sane,declared,3119,warn: index_levels_match_scheme
+Uganda,enterprise_income,2015-16,sane,declared,1659,warn: index_levels_match_scheme
+Uganda,enterprise_income,2018-19,sane,declared,543,warn: index_levels_match_scheme
+Uganda,enterprise_income,2019-20,sane,declared,1150,warn: index_levels_match_scheme
+Uganda,fct,,sane,declared,15,"warn: has_time_index,has_household_index,no_constant_columns"
+Uganda,fct,2005-06,absent,absent,,source not declared for wave
+Uganda,fct,2009-10,absent,absent,,source not declared for wave
+Uganda,fct,2010-11,absent,absent,,source not declared for wave
+Uganda,fct,2011-12,absent,absent,,source not declared for wave
+Uganda,fct,2013-14,absent,absent,,source not declared for wave
+Uganda,fct,2015-16,absent,absent,,source not declared for wave
+Uganda,fct,2018-19,absent,absent,,source not declared for wave
+Uganda,fct,2019-20,absent,absent,,source not declared for wave
+Uganda,food_acquired,2005-06,sane,declared,40749,warn: index_levels_match_scheme
+Uganda,food_acquired,2009-10,sane,declared,38107,warn: index_levels_match_scheme
+Uganda,food_acquired,2010-11,sane,declared,35489,warn: index_levels_match_scheme
+Uganda,food_acquired,2011-12,sane,declared,38983,warn: index_levels_match_scheme
+Uganda,food_acquired,2013-14,sane,declared,50703,warn: index_levels_match_scheme
+Uganda,food_acquired,2015-16,sane,declared,50108,warn: index_levels_match_scheme
+Uganda,food_acquired,2018-19,sane,declared,53288,warn: index_levels_match_scheme
+Uganda,food_acquired,2019-20,sane,declared,48144,warn: index_levels_match_scheme
+Uganda,food_expenditures,2005-06,sane,declared,40747,all checks pass
+Uganda,food_expenditures,2009-10,sane,declared,38107,all checks pass
+Uganda,food_expenditures,2010-11,sane,declared,35489,all checks pass
+Uganda,food_expenditures,2011-12,sane,declared,38980,all checks pass
+Uganda,food_expenditures,2013-14,sane,declared,50657,all checks pass
+Uganda,food_expenditures,2015-16,sane,declared,50072,all checks pass
+Uganda,food_expenditures,2018-19,sane,declared,53288,all checks pass
+Uganda,food_expenditures,2019-20,sane,declared,48139,all checks pass
+Uganda,food_prices,2005-06,sane,declared,39494,all checks pass
+Uganda,food_prices,2009-10,sane,declared,37485,all checks pass
+Uganda,food_prices,2010-11,sane,declared,34681,all checks pass
+Uganda,food_prices,2011-12,sane,declared,38201,all checks pass
+Uganda,food_prices,2013-14,sane,declared,49906,all checks pass
+Uganda,food_prices,2015-16,sane,declared,49387,all checks pass
+Uganda,food_prices,2018-19,sane,declared,52499,all checks pass
+Uganda,food_prices,2019-20,sane,declared,47428,all checks pass
+Uganda,food_quantities,2005-06,sane,declared,39494,all checks pass
+Uganda,food_quantities,2009-10,sane,declared,37485,all checks pass
+Uganda,food_quantities,2010-11,sane,declared,34681,all checks pass
+Uganda,food_quantities,2011-12,sane,declared,38204,all checks pass
+Uganda,food_quantities,2013-14,sane,declared,49888,all checks pass
+Uganda,food_quantities,2015-16,sane,declared,49373,all checks pass
+Uganda,food_quantities,2018-19,sane,declared,52499,all checks pass
+Uganda,food_quantities,2019-20,sane,declared,47433,all checks pass
+Uganda,household_characteristics,2005-06,sane,declared,3122,all checks pass
+Uganda,household_characteristics,2009-10,sane,declared,2975,all checks pass
+Uganda,household_characteristics,2010-11,sane,declared,2685,all checks pass
+Uganda,household_characteristics,2011-12,sane,declared,2843,all checks pass
+Uganda,household_characteristics,2013-14,sane,declared,3117,all checks pass
+Uganda,household_characteristics,2015-16,sane,declared,3305,all checks pass
+Uganda,household_characteristics,2018-19,sane,declared,3241,all checks pass
+Uganda,household_characteristics,2019-20,sane,declared,3076,all checks pass
+Uganda,household_roster,2005-06,sane,declared,16759,warn: index_levels_match_scheme
+Uganda,household_roster,2009-10,sane,declared,18734,warn: index_levels_match_scheme
+Uganda,household_roster,2010-11,sane,declared,19180,warn: index_levels_match_scheme
+Uganda,household_roster,2011-12,sane,declared,21487,warn: index_levels_match_scheme
+Uganda,household_roster,2013-14,sane,declared,17396,warn: index_levels_match_scheme
+Uganda,household_roster,2015-16,sane,declared,16739,warn: index_levels_match_scheme
+Uganda,household_roster,2018-19,sane,declared,18355,warn: index_levels_match_scheme
+Uganda,household_roster,2019-20,sane,declared,16054,warn: index_levels_match_scheme
+Uganda,housing,2005-06,sane,declared,3122,warn: index_levels_match_scheme
+Uganda,housing,2009-10,sane,declared,2939,warn: index_levels_match_scheme
+Uganda,housing,2010-11,sane,declared,2638,warn: index_levels_match_scheme
+Uganda,housing,2011-12,sane,declared,2834,warn: index_levels_match_scheme
+Uganda,housing,2013-14,sane,declared,3119,warn: index_levels_match_scheme
+Uganda,housing,2015-16,builds,declared,3312,fail: no_null_index_levels; warn: index_levels_match_scheme
+Uganda,housing,2018-19,sane,declared,3180,warn: index_levels_match_scheme
+Uganda,housing,2019-20,sane,declared,3066,warn: index_levels_match_scheme
+Uganda,income,2005-06,absent,absent,,source not declared for wave
+Uganda,income,2009-10,absent,absent,,source not declared for wave
+Uganda,income,2010-11,absent,absent,,source not declared for wave
+Uganda,income,2011-12,absent,absent,,source not declared for wave
+Uganda,income,2013-14,absent,absent,,source not declared for wave
+Uganda,income,2015-16,absent,absent,,source not declared for wave
+Uganda,income,2018-19,absent,absent,,source not declared for wave
+Uganda,income,2019-20,absent,absent,,source not declared for wave
+Uganda,individual_education,2005-06,sane,declared,5454,warn: index_levels_match_scheme
+Uganda,individual_education,2009-10,sane,declared,5234,warn: index_levels_match_scheme
+Uganda,individual_education,2010-11,sane,declared,5054,warn: index_levels_match_scheme
+Uganda,individual_education,2011-12,sane,declared,5364,warn: index_levels_match_scheme
+Uganda,individual_education,2013-14,sane,declared,6213,warn: index_levels_match_scheme
+Uganda,individual_education,2015-16,sane,declared,6348,warn: index_levels_match_scheme
+Uganda,individual_education,2018-19,sane,declared,6477,warn: index_levels_match_scheme
+Uganda,individual_education,2019-20,sane,declared,6382,warn: index_levels_match_scheme
+Uganda,interview_date,2005-06,sane,declared,3119,all checks pass
+Uganda,interview_date,2009-10,sane,declared,2975,all checks pass
+Uganda,interview_date,2010-11,sane,declared,2646,all checks pass
+Uganda,interview_date,2011-12,sane,declared,2850,all checks pass
+Uganda,interview_date,2013-14,sane,declared,3119,all checks pass
+Uganda,interview_date,2015-16,sane,declared,3301,all checks pass
+Uganda,interview_date,2018-19,sane,declared,3176,all checks pass
+Uganda,interview_date,2019-20,sane,declared,3078,all checks pass
+Uganda,livestock,2005-06,absent,absent,,source not declared for wave
+Uganda,livestock,2009-10,sane,declared,4506,all checks pass
+Uganda,livestock,2010-11,sane,declared,3710,all checks pass
+Uganda,livestock,2011-12,sane,declared,3805,all checks pass
+Uganda,livestock,2013-14,sane,declared,3597,all checks pass
+Uganda,livestock,2015-16,sane,declared,3709,all checks pass
+Uganda,livestock,2018-19,sane,declared,3760,all checks pass
+Uganda,livestock,2019-20,sane,declared,3986,all checks pass
+Uganda,months_food_inadequate,2005-06,absent,absent,,source not declared for wave
+Uganda,months_food_inadequate,2009-10,sane,declared,2920,warn: index_levels_match_scheme
+Uganda,months_food_inadequate,2010-11,builds,declared,2631,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,months_food_inadequate,2011-12,sane,declared,2831,warn: index_levels_match_scheme
+Uganda,months_food_inadequate,2013-14,sane,declared,3113,warn: index_levels_match_scheme
+Uganda,months_food_inadequate,2015-16,sane,declared,3301,warn: index_levels_match_scheme
+Uganda,months_food_inadequate,2018-19,absent,absent,,source not declared for wave
+Uganda,months_food_inadequate,2019-20,absent,absent,,source not declared for wave
+Uganda,nonfood_expenditures,2005-06,builds,declared,3122,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,nonfood_expenditures,2009-10,builds,declared,2752,"fail: no_null_index_levels,no_all_null_columns; warn: no_constant_columns,no_float_stringified_index,ids_format_id_canonical"
+Uganda,nonfood_expenditures,2010-11,builds,declared,2639,"fail: no_null_index_levels,no_all_null_columns; warn: no_constant_columns,no_float_stringified_index,ids_format_id_canonical"
+Uganda,nonfood_expenditures,2011-12,builds,declared,2824,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,nonfood_expenditures,2013-14,builds,declared,3115,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,nonfood_expenditures,2015-16,builds,declared,3298,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,nonfood_expenditures,2018-19,builds,declared,3176,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,nonfood_expenditures,2019-20,builds,declared,3066,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,nutrition,2005-06,absent,absent,,source not declared for wave
+Uganda,nutrition,2009-10,absent,absent,,source not declared for wave
+Uganda,nutrition,2010-11,absent,absent,,source not declared for wave
+Uganda,nutrition,2011-12,absent,absent,,source not declared for wave
+Uganda,nutrition,2013-14,absent,absent,,source not declared for wave
+Uganda,nutrition,2015-16,absent,absent,,source not declared for wave
+Uganda,nutrition,2018-19,absent,absent,,source not declared for wave
+Uganda,nutrition,2019-20,absent,absent,,source not declared for wave
+Uganda,panel_ids,,sane,declared,9510,9510 entries
+Uganda,people_last7days,2005-06,sane,declared,3105,warn: index_levels_match_scheme
+Uganda,people_last7days,2009-10,sane,declared,2912,warn: index_levels_match_scheme
+Uganda,people_last7days,2010-11,absent,absent,,source not declared for wave
+Uganda,people_last7days,2011-12,absent,absent,,source not declared for wave
+Uganda,people_last7days,2013-14,sane,declared,3118,warn: index_levels_match_scheme
+Uganda,people_last7days,2015-16,absent,absent,,source not declared for wave
+Uganda,people_last7days,2018-19,sane,declared,3181,warn: index_levels_match_scheme
+Uganda,people_last7days,2019-20,sane,declared,3066,warn: index_levels_match_scheme
+Uganda,plot_features,2005-06,builds,declared,5463,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2009-10,sane,declared,5825,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2010-11,sane,declared,4520,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2011-12,builds,declared,4840,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2013-14,sane,declared,5436,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2015-16,sane,declared,5581,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2018-19,sane,declared,5811,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2019-20,builds,declared,5365,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_inputs,2005-06,absent,absent,,source not declared for wave
+Uganda,plot_inputs,2009-10,sane,declared,13763,warn: index_levels_match_scheme
+Uganda,plot_inputs,2010-11,sane,declared,13375,warn: index_levels_match_scheme
+Uganda,plot_inputs,2011-12,sane,declared,12196,warn: index_levels_match_scheme
+Uganda,plot_inputs,2013-14,sane,declared,11721,warn: index_levels_match_scheme
+Uganda,plot_inputs,2015-16,sane,declared,11889,warn: index_levels_match_scheme
+Uganda,plot_inputs,2018-19,sane,declared,10195,warn: index_levels_match_scheme
+Uganda,plot_inputs,2019-20,sane,declared,9880,warn: index_levels_match_scheme
+Uganda,plot_labor,2005-06,absent,absent,,source not declared for wave
+Uganda,plot_labor,2009-10,sane,declared,37107,warn: index_levels_match_scheme
+Uganda,plot_labor,2010-11,sane,declared,29956,warn: index_levels_match_scheme
+Uganda,plot_labor,2011-12,sane,declared,28255,warn: index_levels_match_scheme
+Uganda,plot_labor,2013-14,sane,declared,27794,warn: index_levels_match_scheme
+Uganda,plot_labor,2015-16,sane,declared,28431,warn: index_levels_match_scheme
+Uganda,plot_labor,2018-19,sane,declared,6072,warn: index_levels_match_scheme
+Uganda,plot_labor,2019-20,sane,declared,12262,warn: index_levels_match_scheme
+Uganda,sample,2005-06,sane,declared,3123,all checks pass
+Uganda,sample,2009-10,sane,declared,2975,all checks pass
+Uganda,sample,2010-11,sane,declared,2716,all checks pass
+Uganda,sample,2011-12,sane,declared,2850,all checks pass
+Uganda,sample,2013-14,sane,declared,3119,all checks pass
+Uganda,sample,2015-16,sane,declared,3305,all checks pass
+Uganda,sample,2018-19,sane,declared,3176,all checks pass
+Uganda,sample,2019-20,sane,declared,3098,all checks pass
+Uganda,shocks,2005-06,builds,declared,3644,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,shocks,2009-10,sane,declared,2667,all checks pass
+Uganda,shocks,2010-11,sane,declared,1541,all checks pass
+Uganda,shocks,2011-12,sane,declared,1288,all checks pass
+Uganda,shocks,2013-14,sane,declared,1572,all checks pass
+Uganda,shocks,2015-16,sane,declared,1021,all checks pass
+Uganda,shocks,2018-19,sane,declared,1472,all checks pass
+Uganda,shocks,2019-20,sane,declared,1252,all checks pass
+Uganda,updated_ids,,sane,declared,4,4 entries

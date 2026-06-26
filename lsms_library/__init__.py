@@ -125,6 +125,7 @@ from . import country
 from .country import Country, Wave
 from .feature import Feature
 from .catalog import countries, features
+from .coverage_matrix import coverage
 from .currency import currency_for
 from .conversion import convert
 from . import local_tools as tools
