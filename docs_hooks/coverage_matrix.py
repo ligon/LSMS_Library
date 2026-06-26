@@ -14,6 +14,8 @@ importable in the docs environment.
 from __future__ import annotations
 
 import csv
+import json
+from datetime import date
 from html import escape
 from pathlib import Path
 
@@ -109,20 +111,56 @@ def _render(rows: list[dict]) -> str:
     )
 
 
+def _status_banner(config) -> str:
+    """Freshness + expiry banner from refresh_status.json (auto-refresh chain).
+
+    Escalates note → warning → danger as expiry nears. Empty if no status file
+    (e.g. before the auto-refresh has ever run).
+    """
+    p = _snapshot_path(config).parent / "refresh_status.json"
+    if not p.exists():
+        return ""
+    try:
+        st = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return ""
+    last = st.get("last_refreshed", "?")
+    expires = st.get("expires") or ""
+    fresh = f"Last auto-refreshed **{escape(str(last))}**"
+    if not expires:
+        return f'!!! note "Coverage status"\n    {fresh}.\n\n'
+    try:
+        days = (date.fromisoformat(expires) - date.today()).days
+    except Exception:
+        return f'!!! note "Coverage status"\n    {fresh}.\n\n'
+    renew = (f"Renew with `sbatch --export=ALL,COV_EXPIRES=<future> "
+             f"bin/coverage_refresh.sbatch` or it stops.")
+    if days < 0:
+        kind, msg = "danger", f"Auto-refresh **expired {escape(expires)}** — snapshot is frozen. {renew}"
+    elif days <= 7:
+        kind, msg = "danger", f"Auto-refresh **expires {escape(expires)}** (~{days}d). {renew}"
+    elif days <= 30:
+        kind, msg = "warning", f"Auto-refresh expires {escape(expires)} (~{days}d). {renew}"
+    else:
+        kind, msg = "note", f"Auto-refresh active; renewal due by {escape(expires)} (~{days}d)."
+    return f'!!! {kind} "Coverage status"\n    {fresh}. {msg}\n\n'
+
+
 def _fragment(config) -> str:
+    banner = _status_banner(config)
     path = _snapshot_path(config)
     if not path.exists():
-        return ('!!! warning "Coverage snapshot not generated yet"\n'
+        return banner + ('!!! warning "Coverage snapshot not generated yet"\n'
                 "    No `.coder/coverage/latest.csv` found. Generate it with "
                 "`make matrix` (full readiness) or `make matrix-coverage` "
                 "(config-only), then rebuild the docs.\n")
     try:
         rows = _read_rows(path)
     except Exception as exc:  # never break --strict on a malformed snapshot
-        return f'!!! danger "Could not read coverage snapshot"\n    `{escape(str(exc))}`\n'
+        return banner + f'!!! danger "Could not read coverage snapshot"\n    `{escape(str(exc))}`\n'
     if not rows:
-        return '!!! note "Coverage snapshot is empty."\n'
-    return _render(rows)
+        return banner + '!!! note "Coverage snapshot is empty."\n'
+    return banner + _render(rows)
 
 
 def on_page_markdown(markdown: str, *, page, config, files=None, **kwargs):  # mkdocs hook

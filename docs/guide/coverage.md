@@ -74,9 +74,30 @@ to refresh what readers see is:
    triggers `mkdocs build` + deploy (`ci.yml` `docs` job, gated to `master`), and
    the page re-renders from the new CSV — no data access needed in CI.
 
-A scheduled/nightly refresh (a cron that runs step 1 and commits step 2) is a
-natural future enhancement, but is **not wired yet** — today the snapshot changes
-only when someone runs the loop above.
+### Automated refresh (opt-in, Savio)
+
+The loop above can run unattended via two self-resubmitting Slurm jobs in
+`bin/` — used because Savio disables both `scrontab` and user `crontab`, so the
+Slurm scheduler itself becomes the cron (each run `sbatch`s its own successor).
+They are **off until seeded**:
+
+```bash
+# weekly warm/incremental refresh + monthly authoritative (clean-cache) reseed,
+# each set to retire on COV_EXPIRES unless renewed:
+sbatch --export=ALL,COV_EXPIRES=2026-12-25 bin/coverage_refresh.sbatch
+sbatch --export=ALL,COV_EXPIRES=2026-12-25 bin/coverage_reseed.sbatch
+```
+
+Properties (see `bin/coverage_lib.sh`): builds in a **dedicated clone** (never
+your checkout); **change-gated** (skips the build unless `countries/**` or the
+matrix code changed); **connectivity-gated** (most-but-not-all nodes reach
+GitHub — a bad node is skipped, never breaks the chain); pushes to `development`.
+
+It **tells you before it retires**: ~21 days before `COV_EXPIRES` it opens a
+GitHub issue (which emails you), and this page shows a freshness/expiry banner
+that escalates as the date nears. Stop it anytime with
+`touch ~/.lsms_coverage_refresh.STOP`; renew by re-seeding with a later
+`COV_EXPIRES`. Check the schedule with `squeue -u $USER` (a pending future job).
 
 ## Reading it from Python
 
