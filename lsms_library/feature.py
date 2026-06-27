@@ -74,6 +74,24 @@ def _canonical_index_levels(table_name: str) -> list[str]:
     return [tok.strip() for tok in cleaned.split(",") if tok.strip()]
 
 
+def _fabricates_missing_levels(table_name: str) -> bool:
+    """Whether *table_name* opts into NaN-fabrication of missing canonical
+    levels (``Index Info: fabricate_missing_levels`` in data_info.yml).
+
+    When True, ``_harmonize_country_frame`` adds any missing canonical index
+    levels to a reduced-index country as a ``pd.NA`` level (so every country
+    shares the full canonical shape and is KEPT), instead of leaving it reduced
+    to be modal-excluded.  Use only where the reduced shape is legitimate
+    variation -- e.g. interview_date's single-visit countries vs per-visit
+    EHCVM ones (#506).
+    """
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    lst = data.get("Index Info", {}).get("fabricate_missing_levels", []) or []
+    return table_name in lst
+
+
 # Tables whose measure columns are ADDITIVE across a dropped recall/visit level.
 # When collapsing the duplicate index left after dropping that level, these must
 # be SUMMED (not reduced via first(), which undercounts the cross-country total).
@@ -105,7 +123,8 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str) -> pd.DataFrame
 
 
 def _harmonize_country_frame(
-    df: pd.DataFrame, canonical_levels: list[str], country: str, table_name: str
+    df: pd.DataFrame, canonical_levels: list[str], country: str, table_name: str,
+    fabricate_missing: bool = False,
 ) -> pd.DataFrame:
     """Coerce a single country's frame toward the canonical shape before concat.
 
@@ -115,7 +134,12 @@ def _harmonize_country_frame(
     for the WHOLE feature.  This drops all-NaN columns and removes index
     levels that are not part of the canonical index (only when every
     canonical level is present, so legitimately-reduced frames are left
-    alone).  It never fabricates missing levels.
+    alone).
+
+    By default it never fabricates missing levels.  When ``fabricate_missing``
+    (a per-feature opt-in, #506), any canonical level absent from this country's
+    index is added as a ``pd.NA`` level so reduced-index countries share the
+    full canonical shape and are KEPT (rather than modal-excluded in __call__).
     """
     if not isinstance(df, pd.DataFrame) or df.empty:
         return df
@@ -136,6 +160,17 @@ def _harmonize_country_frame(
     # there is at least one extra (keeps single-country reductions intact).
     if canonical_levels and isinstance(df.index, pd.MultiIndex):
         names = list(df.index.names)
+        # Opt-in (#506): fabricate any missing canonical level as a pd.NA index
+        # level so a legitimately-reduced country keeps the full canonical shape
+        # (and is KEPT, not modal-excluded).  E.g. interview_date single-visit
+        # countries gain visit=NaN to stack with per-visit EHCVM countries.
+        missing = [lvl for lvl in canonical_levels if lvl not in names]
+        if fabricate_missing and missing:
+            flat = df.reset_index()
+            for lvl in missing:
+                flat[lvl] = pd.NA
+            df = flat.set_index(names + missing)
+            names = list(df.index.names)
         have_all_canonical = all(lvl in names for lvl in canonical_levels)
         if have_all_canonical:
             # Put the canonical levels in canonical ORDER (then any extras).  Do
@@ -349,6 +384,7 @@ class Feature:
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
+        fabricate_missing = _fabricates_missing_levels(self.table_name)  # #506
 
         # numeraire supersedes currency; both are no-ops for non-monetary tables.
         # Either way the output carries a `currency` index level (relabelled to
@@ -407,7 +443,7 @@ class Feature:
                 # column / extra index level can't collapse the whole
                 # concatenated index to object tuples (GH #325).
                 df = _harmonize_country_frame(
-                    df, canonical_levels, name, self.table_name
+                    df, canonical_levels, name, self.table_name, fabricate_missing
                 )
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])

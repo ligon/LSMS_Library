@@ -1,0 +1,26 @@
+#+title: Categorical mappings for Pakistan
+
+* Housing (Roof / Floor) -- canonical harmonization (GH #170)
+
+Maps the Pakistan IHS 1991 roof/floor values onto the canonical housing
+vocabulary (=lsms_library/categorical_mapping/canonical_housing_labels.org=).
+Auto-applied by column name.
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Galvanized Iron    | Iron Sheets     |
+| Concrete/Cement    | Concrete        |
+| Wood/Planks        | Wood            |
+| Earth/Mud          | Mud             |
+| Straw/Thatch       | Thatch          |
+| Other              | Other           |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Earth              | Earth           |
+| Cement/Tile        | Cement          |
+| Stone/Brick        | Stone           |
+| Wood               | Wood            |
+| Other              | Other           |

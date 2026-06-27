@@ -121,17 +121,33 @@ linkage via the =Waves= dictionary.
 We have tried to make it possible to compare food expenditures not only across rounds within one of these surveys, but also across surveys.  The main tool needed for harmonization is a set of consistent food labels.  Those consistent labels are the "Aggregate Labels" found in https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/.
 
 
+* Status (2026-06-20, #109)
+The food harmonization that made GhanaLSS the least-complete country is DONE:
+=food_acquired= is canonical =(t, i, j, u, s)= and registered
+(=materialize: make=); =food_prices= / =food_quantities= / =food_expenditures=
+derive at runtime (=_FOOD_DERIVED=); =household_characteristics= /
+=household_roster= build; the legacy
+=food_prices_quantities_and_expenditures.py= is retired; =shocks= is ruled out
+(data-gap, #352).  The full GhanaLSS test sweep is green (41 passed).  The
+remaining work is split out: =community_prices= + inverse price->quantity
+imputation (#562), and the nutrition Food Conversion Table (#563).
+
 * Files in GhanaLSS/_/
-** TODO ghana_lss.py
-Contains code common to different GLSS rounds.
-** TODO food_items.org
-See discussion above for harmonization of food labels across rounds and surveys.  But we should provide code here to usefully extract that information.
-
-** TODO conversion_to_kgs.json
-
-** TODO other_features.py
-** TODO household_characteristics.py
-** TODO food_acquired.py
+** DONE ghana_lss.py
+Common code across GLSS rounds (=ghanalss.py=); handles the GLSS1--GLSS2 panel
+linkage via the =Waves= dictionary.
+** DONE food_items.org
+Food labels harmonized across all 7 waves (the "Aggregate Labels").
+** DONE conversion_to_kgs.json -- intentionally NOT used
+The canonicalization fills missing quantities via the inverse market-price
+ladder (=transformations.median_price_valuation=) in native units, which
+obviates a bespoke kg table (design D2/D4).  kg conversion stays a separate
+downstream concern.
+** DONE other_features.py
+Obsolete -- replaced by =cluster_features= (added at query time).
+** DONE household_characteristics.py
+Auto-derived at runtime from =household_roster= (=_ROSTER_DERIVED=); builds.
+** DONE food_acquired.py (canonical, #109)
 Data on expenditures is somewhat unusual, in two different ways.
 
 First, for waves before 2016--17, the survey instrument elicits the amount spent in purchasing different items, but does /not/ elicit quantities purchased.  (A separate price survey was conducted, and could presumably be used to obtain quantities.)  A separate module elicits quantities of home produced food consumed, as well as the hypothetical price at which home produced goods could be sold.
@@ -194,7 +210,10 @@ print(fa.describe())
 #+end_src
 
 
-** TODO food_prices_quantities_and_expenditures.py
+** DONE food_prices_quantities_and_expenditures.py -- RETIRED
+Removed (#109).  =food_prices= / =food_quantities= / =food_expenditures= are
+derived at API time from =food_acquired= by =_FOOD_DERIVED= -- no per-country
+script.
 Test...
 #+begin_src python :results output
 import pandas as pd
@@ -205,8 +224,12 @@ print(pd.read_parquet('../var/food_expenditures.parquet').describe())
 #+end_src
 
 
-*** TODO food_expenditures
-This parquet file built in a non-standard fashion, and is missing indices (t,m).  Code here acquires those indices from =household_characteristics=.
+*** DONE food_expenditures
+Now derived canonically by =_FOOD_DERIVED= -- index =(i, t, v, j, s)=.  The old
+non-standard build (missing =(t, m)=, indices borrowed from
+=household_characteristics=) is gone; =m= is added on demand via =market=.
+(The demand-estimation snippet below predates the canonical shape and references
+the old =purchased_value= column -- illustrative only.)
 #+begin_src python
 import pandas as pd
 import numpy as np
@@ -236,7 +259,9 @@ r.get_gamma_se()
 r.to_pickle('../var/cfe_demands.rgsn')
 #+end_src
 
-** TODO Food Conversion Table
+** DEFERRED Food Conversion Table -- tracked in #563
+West Africa FCT -> a =nutrition= feature; split out of #109 as a data-gap so it
+does not block the food harmonization (cf. Cambodia #560).  Sources:
 West Africa Food Conversion Table (Inputs into Ghana Food Expenditure Data):
 https://docs.google.com/spreadsheets/d/1Ar88nD6jQl4u8iCIsAIkLxOjHpfvi6ZBVJlwf91HOOQ/edit?usp=sharing
 Ghana Food Expenditure Data with Aggregate Labels and FTC Codes:
@@ -252,9 +277,13 @@ The only tangentially related content is in GLSS7 Section 13E (governance module
 Ghana's LSMS-ISA participation is through the GhanaSPS (Social Panel Survey), not the GLSS.  Shocks data for Ghana should be sought in GhanaSPS if available.
 
 * Files in GhanaLSS/<SOMEYEAR>/_/
-** TODO household_characteristics.py
-** TODO food_acquired.py
-** TODO other_features.py
+** DONE food_acquired.py
+Wave scripts emit canonical =(t, i, j, u, s, visit)=; the framework joins =v=
+and derives the food tables.
+** DONE household_characteristics.py
+Auto-derived from =household_roster= (=_ROSTER_DERIVED=).
+** DONE other_features.py
+Obsolete -- =cluster_features= at query time.
 
 * subjective_well_being — not available (2026-06-06)
 No GLSS wave (1987-88…2016-17) carries a subjective-well-being / life-evaluation /

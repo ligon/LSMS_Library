@@ -238,3 +238,33 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | U8                      | Postgraduate                 |
 | JSS1                    | Lower secondary              |
 | JSS3                    | Lower secondary complete     |
+
+* Housing (Roof / Floor) -- canonical harmonization (GH #170)
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Metal Sheet        | Iron Sheets     |
+| Slate/Asbestos     | Asbestos        |
+| Cement/Concrete    | Concrete        |
+| Roofing Tiles      | Clay Tiles      |
+| Thatch             | Thatch          |
+| Bamboo             | Wood            |
+| Mud/Earth          | Mud             |
+| Wood               | Wood            |
+| Other              | Other           |
+
+#+name: Floor
+| Alternate Spelling   | Preferred Label |
+|----------------------+-----------------|
+| Cement/Concrete      | Concrete        |
+| Earth/Mud            | Earth           |
+| Ceramic/Marble Tiles | Tiles           |
+| Vinyl Tiles          | Vinyl/Linoleum  |
+| Terrazzo             | Concrete        |
+| Burnt Bricks         | Bricks          |
+| Stone                | Stone           |
+| Stone/Brick          | Stone           |
+| Wood                 | Wood            |
+| Fibre-glass          | Other           |
+| Other                | Other           |

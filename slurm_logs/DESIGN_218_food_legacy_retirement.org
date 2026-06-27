@@ -1,0 +1,134 @@
+#+TITLE: #218 — Retire the legacy food pipeline / modernize the 4 unregistered countries (rev-2)
+#+filetags: design food_acquired 218 proposal
+#+DATE: <2026-06-20 Sat>
+#+AUTHOR: Sue (Claude Opus 4.8)
+
+* Rev-2 — what the adversarial review changed
+Rev-1 proposed retiring the legacy food pipeline behind an *equivalence gate*
+("reconcile modern vs the legacy =var/food_*.parquet= within tolerance").  An
+adversarial review (workflow =wuiofz6p0=, 11 confirmed findings) demolished that
+core on two independent grounds:
+
+1. *The legacy baseline is unbuildable.*  Every one of the 7 legacy
+   =food_prices_quantities_and_expenditures.py= scripts =KeyError('m')= when run:
+   they group/join on the =m= (market) level that came from the **retired
+   =other_features= infra**.  So =make= crashes; there is no live
+   =var/food_*.parquet= to reconcile against.  **The legacy pipeline is already
+   dead code, not a working baseline.**  (This is the real answer to "I thought
+   we had these working" — they broke when =other_features= was retired.)
+2. *Even if buildable, the gate is misconceived.*  Legacy =food_expenditures= =
+   purchased + produced + in-kind value (total acquisition value).  Modern
+   =food_expenditures_from_acquired= is **purchased-only** (the canonical builder
+   sets produced/in-kind =Expenditure= to NaN).  They measure different things;
+   an aggregate-Expenditure check is meaningless (GhanaSPS: own-production +
+   in-kind = 30.4% of food value, structurally absent from the modern figure).
+
+So #218 is reframed: **not "carefully retire working code", but "the legacy is
+dead code; build the modern replacement and remove the dead scripts."**  The
+acceptance bar is NOT equivalence-vs-legacy; it is canonical-shape + sanity +
+cross-country assembly + **source-traceable reconciliation against the raw
+=.dta=** (the legacy parquet is unusable as a baseline).
+
+* Ground truth (verified, rev-2)
+| Country       | food_acquired now | modern API food tables | legacy pqe script |
+|---------------+-------------------+------------------------+-------------------|
+| Burkina_Faso  | canonical+registered | served by _FOOD_DERIVED | KeyError('m') (dead) |
+| Senegal       | canonical+registered | served               | KeyError('m') (dead) |
+| Tanzania      | canonical+registered | served               | KeyError('m') (dead) |
+| GhanaSPS      | non-canonical, UNregistered, NO data_scheme.yml, NO sample | empty/raises | KeyError('m') (dead); food_quantities block commented out |
+| Guatemala     | non-canonical, UNregistered (has sample + scheme) | empty | KeyError('m') (dead) |
+| Panama        | non-canonical, UNregistered, NO data_scheme.yml, NO sample | empty | KeyError('m') (dead) |
+| Serbia        | non-canonical, UNregistered (has sample + scheme) | empty | KeyError('m') (dead) |
+
+- Modern =Country(X).food_{expenditures,prices,quantities}()= returns an empty
+  =(0,0)= frame for the 4 (a silent-empty bug; Phase 0).
+- harmony.py reads =var/food_expenditures.parquet= (primary),
+  =var/household_characteristics.parquet=, =var/food_prices.parquet=; its only
+  invocation is =lsms_library/Makefile= (=make test country=X=), documented in
+  =CONTRIBUTING.org= and =README.org=.  scan.py covers its cross-country sanity
+  (the "scan.py doesn't replicate harmony" attack was refuted).
+
+* Invariant (unchanged)
+**No country loses food data.**  But "verify equivalence vs legacy" is replaced
+by "verify the modern canonical build is correct against the SOURCE", since the
+legacy output cannot be produced.
+
+* Acceptance bar (replaces the equivalence gate)
+For a country to have its legacy script retired, its modern food path must pass:
+1. =Country(X).food_acquired()= is canonical =(t,v,i,j,u,s)= + =[Quantity,
+   Expenditure]= and =is_this_feature_sane= passes (bar the universal v-warn).
+2. =food_{expenditures,prices,quantities}()= populate (non-empty, canonical).
+3. =Feature(...)= assembles them with a named MultiIndex (scan.py).
+4. *Source-traceable reconciliation*: totals computed from the canonical
+   =food_acquired= (summing ALL acquisition sources, purchased+produced+inkind)
+   reconcile against the raw =.dta= module totals — NOT against the broken
+   legacy parquet.  Coverage counts (distinct i, j, (i,j) cells) match the
+   source within a documented delta.
+
+* Proposed solution (phased)
+
+** Phase 0 — fix the silent-empty derived (prerequisite)
+When =food_acquired= is unavailable, =food_{expenditures,prices,quantities}()=
+must raise (like =food_acquired= itself), not return an empty =(0,0)= frame that
+masks "no food data".  Fix at the offering/dispatch gate in =country.py= (the
+review noted the fix is at the *offering* gate, not the method body).
+
+** Phase 1 — retire harmony.py  (SEPARATE PR — proceeding now)
+Remove =lsms_library/harmony.py=, the =Makefile= harmony target, and the orphan
+=local_tools.add_markets_from_other_features=.  Update the documented
+=make test country=X= consumer: repoint =CONTRIBUTING.org= / =README.org= / the
+=Makefile= help+test target to a Country-API sanity (scan.py country subset), or
+remove the target + its doc references.  Independent of Phases 2/3.
+
+** Phase 2 — the 3 shadowed countries (BF / Senegal / Tanzania)
+Their legacy script is dead (KeyError m) AND their modern food tables are served
+by =_FOOD_DERIVED=.  So: (a) one-line repro that the legacy script no longer
+builds (establishing no live output); (b) confirm modern =food_*()= sane;
+(c) remove the dead legacy script + its Makefile rule + CONTENTS.org refs.
+No equivalence step (impossible); the bar is "modern is sane + nothing reads the
+dead legacy output".
+
+** Phase 3 — modernize the 4 (one focused issue each), sequenced by readiness
+- *Smaller (have sample + data_scheme.yml):* **Guatemala**, **Serbia**.
+  Guatemala's =v= is the region (degenerate cluster — refuted as a blocker), so
+  the v-join is fine.  Canonicalize wave food_acquired -> register -> bar above
+  -> retire legacy.
+- *Larger (NO data_scheme.yml AND NO sample table):* **GhanaSPS**, **Panama**.
+  Need a from-scratch =data_scheme.yml= + a =sample= table (cluster identity:
+  Panama from =upm=; GhanaSPS source TBD) BEFORE food_acquired can be registered
+  and v-joined.
+- *GhanaSPS custom melt:* GhanaSPS reports THREE explicit source values
+  (=purchased_value/produced_value/inkind_value=) + quantities — it does NOT fit
+  the stock =food_acquired_to_canonical= (which models purchased/produced only
+  and NaNs produced Expenditure).  GhanaSPS needs a custom melt that **carries
+  Expenditure on produced + in-kind rows** (s ∈ {purchased, produced, inkind}).
+- Each: canonicalize -> register -> acceptance bar -> retire legacy, as one PR.
+
+* Rollback
+Per-country, canonicalization + legacy-retirement are COUPLED (they share the
+=var/food_acquired.parquet= schema), so each Phase-3 country lands and reverts as
+ONE PR — not "restore the legacy script from git" (the corrected rollback).
+
+* Separate, library-wide question (NOT #218): food_expenditures = purchased-only
+The review showed modern =food_expenditures= (via =food_expenditures_from_acquired=)
+sums =Expenditure= over =s=, but the canonical builder NaNs produced/in-kind
+=Expenditure= — so =food_expenditures= is **purchased value only** for every
+country.  Own-production/in-kind VALUE is reconstructable (=food_quantities= ×
+=food_prices(units='unitprice')=) but is not in =food_expenditures= itself.  This
+may be correct-by-design (expenditure = cash outlay) or a gap (total acquisition
+value is a common analytic need).  **Filed as its own issue** — it affects all
+countries and must not ride on #218.
+
+* Scope / sequencing summary
+- Now (this session): Phase 1 (harmony retirement) as its own PR; file the 4
+  Phase-3 issues + the food_expenditures-semantics issue; rev-2 this doc.
+- Later: Phase 0 (silent-empty fix); Phase 2 (3 dead-script removals); Phase 3
+  (4 canonicalizations, sequenced Guatemala/Serbia then GhanaSPS/Panama).
+- #218 stays open as the umbrella; closes when all phases land.
+
+* References
+- Review: workflow =wuiofz6p0= (11 confirmed / 7 refuted).
+- #218, #108 (Cambodia canon precedent), #109 (GhanaLSS), #169 (canonical
+  food_acquired columns), CLAUDE.md ## Cache Behavior, transformations.py
+  =_FOOD_DERIVED= / =food_*_from_acquired=, build_transforms.py
+  =food_acquired_to_canonical=, bench/feature_audit/.

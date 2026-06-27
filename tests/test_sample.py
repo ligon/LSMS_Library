@@ -386,11 +386,18 @@ class TestUganda2009MarketFallback:
     def fe(self):
         """Uganda food_expenditures(market='Region'), or skip if the
         underlying microdata cannot be built in this environment
-        (e.g. CI without DVC S3 credentials)."""
+        (e.g. CI without DVC S3 credentials).
+
+        Uses ``basis='total'`` (#575): this test asserts the market-fallback
+        v-retention coverage (≥2929 HH), which is orthogonal to acquisition
+        source.  The purchased-only default (the new #575 default) legitimately
+        drops the 29 Uganda HH that consumed only own-production / in-kind food
+        (zero cash expenditure); ``basis='total'`` keeps the full HH set the
+        coverage invariant is about."""
         try:
             return (
                 ll.Country("Uganda")
-                .food_expenditures(market="Region")
+                .food_expenditures(market="Region", basis="total")
                 .squeeze()
             )
         except Exception as exc:  # broad catch intentional: skip on any build failure

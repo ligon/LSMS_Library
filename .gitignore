@@ -89,3 +89,12 @@ lsms_library/countries/*/var/*
 
 # Feature-audit run artifacts (results.jsonl / scan.log / memos)
 bench/feature_audit/results/
+
+# Coverage-matrix HTML readout (ephemeral artifact; the committed journal is
+# .coder/coverage/latest.csv).  bench/build_feature.py profiling output too.
+bench/results/
+
+# ...but the coverage-matrix journal + blessing list ARE tracked (override the
+# global *.csv ignore above; .coder/ itself is not ignored so this works).
+!.coder/coverage/latest.csv
+!.coder/coverage/blessed.csv

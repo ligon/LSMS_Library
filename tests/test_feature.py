@@ -72,3 +72,50 @@ def test_column_table_has_countries(table):
     """Every table with canonical columns should be declared by ≥1 country."""
     countries = _discover_countries_for_table(table)
     assert len(countries) > 0, f"No countries declare '{table}' in data_scheme.yml"
+
+
+# ---------------------------------------------------------------------------
+# _harmonize_country_frame: missing-level fabrication opt-in (GH #506)
+# ---------------------------------------------------------------------------
+
+import pandas as pd
+from lsms_library.feature import _harmonize_country_frame, _fabricates_missing_levels
+
+
+def _reduced_frame():
+    """A reduced (t,v,i) frame vs a canonical (t,v,i,visit) target."""
+    idx = pd.MultiIndex.from_tuples([('2020', 'c1', 'h1'), ('2020', 'c1', 'h2')],
+                                    names=['t', 'v', 'i'])
+    return pd.DataFrame({'Int_t': ['2020-01-01', '2020-02-01']}, index=idx)
+
+
+class TestFabricateMissingLevels:
+    def test_optout_leaves_reduced_frame_untouched(self):
+        """Default (no opt-in): a missing canonical level is NOT fabricated."""
+        df = _harmonize_country_frame(_reduced_frame(), ['t', 'v', 'i', 'visit'],
+                                      'X', 'sometable', fabricate_missing=False)
+        assert list(df.index.names) == ['t', 'v', 'i']
+
+    def test_optin_fabricates_missing_level_as_na(self):
+        """Opt-in (#506): the missing 'visit' level is added as a pd.NA level,
+        in canonical order, so the frame shares the full canonical shape."""
+        df = _harmonize_country_frame(_reduced_frame(), ['t', 'v', 'i', 'visit'],
+                                      'X', 'interview_date', fabricate_missing=True)
+        assert list(df.index.names) == ['t', 'v', 'i', 'visit']
+        assert df.index.get_level_values('visit').isna().all()
+        assert len(df) == 2  # no rows lost
+
+    def test_optin_preserves_existing_level(self):
+        """A frame that already has the per-visit level is left intact (ordered)."""
+        idx = pd.MultiIndex.from_tuples([('2020', 'c1', 'h1', '1'), ('2020', 'c1', 'h1', '2')],
+                                        names=['t', 'v', 'i', 'visit'])
+        full = pd.DataFrame({'Int_t': ['a', 'b']}, index=idx)
+        df = _harmonize_country_frame(full, ['t', 'v', 'i', 'visit'],
+                                      'Y', 'interview_date', fabricate_missing=True)
+        assert list(df.index.names) == ['t', 'v', 'i', 'visit']
+        assert df.index.get_level_values('visit').tolist() == ['1', '2']
+
+    def test_interview_date_opts_in(self):
+        """interview_date is registered for fabrication; a non-listed table is not."""
+        assert _fabricates_missing_levels('interview_date') is True
+        assert _fabricates_missing_levels('assets') is False

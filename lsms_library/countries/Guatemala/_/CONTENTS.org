@@ -266,6 +266,68 @@ print(fa.final.describe())
 : 75%       30.000000         12.600001
 : max      600.000000        800.000000
 
+* food_acquired — Capitulo 12 recall structure (2026-06-21)
+
+The ENCOVI 2000 Capitulo 12 food instrument (=ECV13G12.DTA=) records, per
+(household =hogar=, food =item=), TWO acquisition channels — *purchased* and
+*obtained* (own production / gift / in-kind / barter / etc.) — and for each
+channel it asks BOTH a "usual/typical" recall AND an "actual last-15-days"
+recall.  The variables and their recall periods are:
+
+** Purchased channel
+- =p12a03=  — buy flag (compró este producto: sí/no).
+- =p12a04=  — "meses compro": number of months per year the item is bought
+  (a frequency, NOT a quantity).
+- =p12a05=  — "gasto al mes": USUAL/typical monthly spend (estimate).
+- =p12a06a= — "cantidad compro": quantity bought in the LAST 15 DAYS (actual).
+- =p12a06b= — reported purchase unit (libra, unidad, bolsa, …).
+- =p12a06c= — "equivalencia": multiplier converting the reported purchase unit
+  =p12a06b= into the per-item reference unit =umr=.
+- =p12a06d= — "gasto ult 15 dias": ACTUAL spend over the last 15 days.
+
+** Obtained channel
+- =p12a07=  — obtained flag (obtuvo este producto: sí/no).
+- =p12a08=  — "meses obtuvo": months per year obtained (frequency, NOT qty).
+- =p12a09a= — "cantidad obtuvo al mes": USUAL/typical monthly quantity obtained.
+- =p12a09b= — reported obtained unit code (monthly recall).
+- =p12a10a= — "cantidad obtuvo ult 15 dias": ACTUAL quantity obtained in the
+  last 15 days.
+- =p12a10b= — reported obtained unit code (15-day recall).
+- =p12a11a..f= — source breakdown si/no flags for the obtained quantity:
+  (a) own production, (b) gift, (c) in-kind pay, (d) business, (e) barter,
+  (f) other.
+
+** Shared
+- =umr=   — per-item standard reference unit.
+- =cnlib= — "factor de conversion a libras": converts =umr= into pounds.
+
+** RECALL PERIODS DIFFER BY VARIABLE
+=p12a06a= / =p12a06d= / =p12a10a= are ACTUAL last-15-days recall; =p12a05= /
+=p12a09a= are USUAL-month estimates; =p12a04= / =p12a08= are months-per-year
+frequencies.  These are NOT interchangeable.
+
+** What the canonical food_acquired uses
+The canonical =food_acquired= (built by =2000/_/food_acquired.py=) records the
+ACTUAL last-15-days recall and DELIBERATELY does NOT use the usual-month
+(=p12a05= / =p12a09a=) or the months-acquired (=p12a04= / =p12a08=) variables,
+to avoid assuming the recalled 15-day window is representative of the rest of
+the year (maintainer decision, PR #578).  Specifically:
+- s='purchased':  Quantity(lbs) = =p12a06a= * =p12a06c= * =cnlib=;
+  Expenditure = =p12a06d=.  Kept only where =p12a06a= > 0.
+- s in {produced, inkind, other}:  Quantity(lbs) = =p12a10a= * =cnlib=;
+  Expenditure = NaN (the instrument records no value for obtained acquisition).
+  Kept only where =p12a10a= > 0.  s is split from the =p12a11*= flags:
+  own-production -> produced; gift + in-kind pay -> inkind;
+  business + barter + other (or no flag) -> other.
+- u = 'lbs'; i = =hogar= (household); j = =item= harmonized via
+  =food_items.org= '2000' column.
+
+There is NO obtained-side equivalence multiplier analogous to =p12a06c=: the
+obtained block carries only a unit CODE (=p12a09b= / =p12a10b=), and =p12a06c=
+is NaN on every obtained-only row.  In the raw data =p12a10b= equals the
+reference unit =umr= on 80.8% of obtained rows, so =cnlib= (umr->lbs) is applied
+directly with an implicit obtained equivalence of 1.
+
 * Known data issues
 
 ** interview_date — not available (2026-06-06)
