@@ -343,6 +343,7 @@ Currency:
   Niger: XOF
   Nigeria: NGN
   Pakistan: PKR
+  Panama: PAB                       # Balboa pegged 1:1 to USD; USD also circulates (dual currency)
   Senegal: XOF
   Serbia: RSD                       # 2007 wave (RSD since 2006)
   'Serbia and Montenegro':          # 2002, 2003 waves
