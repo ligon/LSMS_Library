@@ -226,6 +226,22 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
     pandas.DataFrame
         Household-level counts with one column per sex × age bucket and
         a ``log HSize`` column.
+
+    Notes
+    -----
+    **Residence filter.**  Non-resident members are dropped using whichever
+    residence-duration column the roster carries — ``MonthsSpent`` (months
+    present), ``MonthsAway`` (→ ``12 - value``) or ``WeeksAway``
+    (→ ``12 - weeks/(52/12)``); see ``CLAUDE.md`` §"MonthsSpent /
+    MonthsAway / WeeksAway".  ``df`` here is the *country-level* concat of
+    every wave, so those columns are unioned across waves: a column
+    supplied by one wave appears (all-NaN) on the others.  The resolution
+    is therefore a **per-row coalesce** across the three sources, and a
+    wave with no usable residence datum at all falls back to counting every
+    roster member — the documented behaviour for a country with no
+    residence column, applied per-wave.  Without those two rules an entire
+    wave's ``household_characteristics`` silently vanishes while its
+    ``household_roster`` is fully populated.
     """
     roster_df = df.copy()
     roster_df.columns = roster_df.columns.str.lower()
@@ -248,20 +264,83 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
     # Uganda uses MonthsSpent (months present, 0-12).  East African
     # surveys (Ethiopia, Tanzania, Malawi) use MonthsAway (months
     # absent, 0-12); convert to months-present for a uniform filter.
+    # Ethiopia W4-W5 and Cambodia use WeeksAway instead.
+    #
+    # The resolution is a per-ROW coalesce, not a per-column choice: this
+    # frame is the *country-level* concat of every wave, so a column
+    # contributed by one wave is unioned onto all the others.  Ethiopia
+    # carries BOTH MonthsAway (W1-W3) and WeeksAway (W4-W5), disjointly
+    # populated -- picking the first column *present* would resolve W4-W5
+    # to an all-NaN MonthsAway and delete both waves.  Priority order on
+    # the (rare) rows where more than one source is populated:
+    # MonthsSpent (asked directly) > MonthsAway > WeeksAway (coarser).
+    # Work positionally (numpy) rather than through pandas alignment: the
+    # roster index is a MultiIndex with duplicate entries in the wild.
+    def _numeric(col):
+        return pd.to_numeric(roster_df[col], errors='coerce').astype('float64').to_numpy()
+
     ms = None
+    _sources = []
     if 'monthsspent' in roster_df.columns:
-        ms = pd.to_numeric(roster_df['monthsspent'], errors='coerce')
-    elif 'monthsaway' in roster_df.columns:
-        ma = pd.to_numeric(roster_df['monthsaway'], errors='coerce')
-        ms = 12 - ma
-        ms = ms.clip(lower=0)  # guard against >12 outliers
-    elif 'weeksaway' in roster_df.columns:
-        wa = pd.to_numeric(roster_df['weeksaway'], errors='coerce')
-        ms = 12 - (wa / (52 / 12))
-        ms = ms.clip(lower=0)
+        _sources.append(_numeric('monthsspent'))
+    if 'monthsaway' in roster_df.columns:
+        # months present = 12 - months away; clip guards >12 outliers
+        _sources.append(np.clip(12 - _numeric('monthsaway'), 0, None))
+    if 'weeksaway' in roster_df.columns:
+        _sources.append(np.clip(12 - (_numeric('weeksaway') / (52 / 12)), 0, None))
+    if _sources:
+        ms = _sources[0]
+        for _alt in _sources[1:]:
+            ms = np.where(np.isnan(ms), _alt, ms)
     if ms is not None:
-        age = pd.to_numeric(roster_df['age'], errors='coerce')
-        keep = ms.notna() & ((ms > 0) | (age < 1))
+        age = _numeric('age')
+        with np.errstate(invalid='ignore'):
+            keep = ~np.isnan(ms) & ((ms > 0) | (age < 1))
+        # A wave can end up with a residence column that is entirely NaN
+        # *within that wave* -- either because the survey never asked the
+        # question (CotedIvoire 1985-89, Mali 2021-22: the column exists in
+        # this frame only because the country-level concat unioned it in
+        # from a later wave) or because the labels did not parse.  ``keep``
+        # is then all-False for the wave and household_characteristics
+        # silently returns NOTHING for it while household_roster is fully
+        # populated.  Guard per ``t``: a wave with no usable residence datum
+        # at all reverts to the documented pre-MonthsSpent behaviour --
+        # "countries without any residence column are unaffected -- the old
+        # count-everyone behavior continues" (CLAUDE.md) -- applied at wave
+        # granularity.  Waves that DO have residence data are filtered
+        # exactly as before, so the Uganda drift the filter was introduced
+        # to fix stays fixed.
+        has_ms = ~np.isnan(ms)
+        idx_names = roster_df.index.names or []
+        if 't' in idx_names:
+            t_vals = pd.Index(roster_df.index.get_level_values('t'))
+            wave_has_ms = (
+                pd.Series(has_ms)
+                .groupby(t_vals, dropna=False)
+                .transform('any')
+                .to_numpy()
+            )
+        else:
+            wave_has_ms = np.full(len(roster_df), bool(has_ms.any()))
+        if not wave_has_ms.all():
+            import warnings as _warnings
+            if 't' in idx_names:
+                _dead = sorted(
+                    {str(t) for t, ok in zip(t_vals, wave_has_ms) if not ok}
+                )
+            else:
+                _dead = ['<no-t>']
+            _warnings.warn(
+                f"household_characteristics: no usable residence duration "
+                f"(MonthsSpent / MonthsAway / WeeksAway) for wave(s) {_dead}; "
+                f"counting every roster member there instead of filtering to "
+                f"resident members.  The column is present in the country-level "
+                f"frame only because another wave supplies it.  Waves with "
+                f"residence data are filtered as usual.",
+                UserWarning,
+                stacklevel=3,
+            )
+        keep = keep | ~wave_has_ms
         roster_df = roster_df[keep]
     roster_df = roster_df.dropna(subset=['sex', 'age'])
     roster_df['age_interval'] = age_intervals(roster_df['age'], age_cuts)
