@@ -1,11 +1,26 @@
+# Household identity is the TRIPLE (ED, SN, HH) -- GH #503.
+#
+# COVERN.dta has 1807 rows: 1807 unique (ED, SN, HH) but only 1502 unique
+# (ED, HH).  The survey declares the triple itself -- COVERN.NEWID ==
+# ED*100000 + SN*100 + HH for all 1807 rows -- and an independent check agrees:
+# HHCHAR.hhsize equals the ROSTERN member count for 98.1% of households keyed on
+# the triple, but only 81.1% keyed on the pair.  Keying on (ED, HH) silently
+# merged ~305 real households into others (and grafted 294 people onto a
+# household that was not theirs).  Every table below keys on the triple; they
+# MUST move together, or the v-join would fail to match across tables.
+#
+# The cluster is (ED, SN), not ED -- see mapping.py:v().
 Country: Guyana
 Wave: 1992
 cluster_features:
+    # i is declared (and immediately collapsed away by Wave.cluster_features)
+    # only so the household-grain cover page is aggregated to (t, v) explicitly
+    # rather than tripping the GH#323 duplicate-index collapse downstream.
     file:
         - ../Data/COVERN.dta
     idxvars:
-        v: ED
-        i: HH
+        v: [ED, SN]
+        i: [ED, SN, HH]
     myvars:
         Region: RGN
         Rural:
@@ -15,14 +30,21 @@ cluster_features:
                 2: Rural
 
 sample:
+    # WEIGHT.dta is keyed on ED alone and carries one weight per ED; joining it
+    # on ED reproduces WEIGHTID.dta's authoritative per-household weight for
+    # 1795/1795 rows.  So the weight merge stays keyed on a plain `ED` helper
+    # column even though v is now (ED, SN) -- the helper is dropped below.
+    # (WEIGHTID.dta is not a usable substitute: only 1742/1795 of its triples
+    # are in COVERN, and it carries a duplicate triple.)
     dfs:
         - df_cover
         - df_weights
     df_cover:
         file: ../Data/COVERN.dta
         idxvars:
-            i: [ED, HH]
-            v: ED
+            i: [ED, SN, HH]
+            v: [ED, SN]
+            ED: ED
         myvars:
             strata: STNO
             Rural:
@@ -33,21 +55,26 @@ sample:
     df_weights:
         file: ../Data/WEIGHT.dta
         idxvars:
-            v: ED
+            ED: ED
         myvars:
             weight: WEIGHT
     merge_on:
-        - v
+        - ED
     final_index:
         - i
         - t
+    drop:
+        # merge-only helper; v (ED-SN) is the cluster the API exposes.
+        - ED
 
 household_roster:
+    # No `v` here: the framework joins it from sample() at API time
+    # (_join_v_from_sample), and it SKIPS when v is already present -- so a
+    # stale `v: ED` would survive and disagree with sample's (ED, SN).
     file:
         - ../Data/ROSTERN.dta
     idxvars:
-        v: ED
-        i: [ED, HH]
+        i: [ED, SN, HH]
         pid: PID
     myvars:
         Sex:
@@ -82,11 +109,13 @@ household_roster:
 
 individual_education:
     # Dedicated education module EDUCN.dta; HS = highest school (codes 1-17).
-    # i=[ED,HH], pid=PID match the roster (~0.3% spine orphans).
+    # i=[ED,SN,HH], pid=PID match the roster.  EDUCN carries the same ED/SN/HH
+    # triple as ROSTERN: 7691 rows, 7691 unique (ED,SN,HH,PID) -- but only 6824
+    # unique (ED,HH,PID), so the old pair key collided 867 person-rows.
     file:
         - ../Data/EDUCN.dta
     idxvars:
-        i: [ED, HH]
+        i: [ED, SN, HH]
         pid: PID
     myvars:
         Educational Attainment:
@@ -95,10 +124,16 @@ individual_education:
 
 housing:
     # Dwelling module HHCHAR.dta, block (16) HOUSING (questionnaire GUY02.pdf
-    # p.31).  HHCHAR keys the household on (ed_dvsn, smpl_hh); these equal the
-    # roster's (ED, HH) numerically, so i=[ed_dvsn, smpl_hh] hyphen-joins to the
-    # same "ED-HH" form the roster/sample use (~1.1% orphans vs sample, same
-    # (ED,HH) ambiguity the roster itself carries).  All dwelling columns are
+    # p.31).  HHCHAR keys the household on (ed_dvsn, ed_smpl, smpl_hh), which
+    # equals the roster's (ED, SN, HH) numerically -- so i=[ed_dvsn, ed_smpl,
+    # smpl_hh] hyphen-joins to the same "ED-SN-HH" form the roster/sample use.
+    # Verified: 1765/1819 HHCHAR triples are present in COVERN's (ED,SN,HH) set,
+    # and HHCHAR.hhsize equals the ROSTERN member count for 98.1% of households
+    # under the triple vs 81.1% under the old (ed_dvsn, smpl_hh) pair -- the pair
+    # is not the household (GH #503).  Do NOT use HHCHAR's `newid` column as the
+    # key: it is corrupt (240 of 1819 rows violate the ED*100000+SN*100+HH
+    # identity that COVERN satisfies exactly, and it collides -- 1616 distinct
+    # values for 1819 rows).  All dwelling columns are
     # bare integer codes with NO embedded value labels, so each carries an
     # explicit code->name mapping (0 = not recorded -> "Not Stated").
     #   Roof        <- bldg4  (16.1,4 material used for roof)
@@ -112,7 +147,7 @@ housing:
     file:
         - ../Data/HHCHAR.dta
     idxvars:
-        i: [ed_dvsn, smpl_hh]
+        i: [ed_dvsn, ed_smpl, smpl_hh]
     myvars:
         Roof:
             - bldg4

@@ -1,6 +1,145 @@
 #+TITLE: Guyana — country notes & known data issues
 
+* Household identity: the household is (ED, SN, HH)                    :GH503:
+
+The Guyana 1992 household key is the **triple** =(ED, SN, HH)= — enumeration
+district, sample number, household number.  =ED= alone, or =(ED, HH)=, is **not**
+a household.
+
+** The survey declares the key itself
+=COVERN.dta= carries an explicit =NEWID= column, and
+
+: NEWID == ED*100000 + SN*100 + HH
+
+holds for **all 1807** cover-page rows.  (Check it in =int64=: the raw columns
+are =int16= and the multiplication overflows.)  So the source itself says the
+household is the triple.
+
+| key            | distinct households in COVERN (1807 rows) |
+|----------------+-------------------------------------------|
+| =(ED, SN, HH)= |                                      1807 |
+| =(ED, HH)=     |                                      1502 |
+
+** What the old =(ED, HH)= key did (fixed 2026-07; GH #503)
+
+Until this fix every Guyana table keyed on =i = [ED, HH]=.  That collapsed 1807
+real households into 1502, and =_normalize_dataframe_index= silently resolved the
+collision with =groupby().first()=.  The damage was **not** "missing rows" — it
+was /wrong numbers that looked right/:
+
+- **562** real households were merged into a shared row; **305** vanished from
+  =sample()= entirely (1502 rows instead of 1807).
+- **101 surviving households were chimeras** — they held members of two
+  different real households — and **191 person-rows were grafted onto a
+  household that was not theirs**.  Mean household size was inflated 4.38 →
+  4.64.
+- =assets= **summed two households' durables together**: 225 asset households
+  were the arithmetic sum of two real households, yielding 220 =(i, j)= cells
+  whose =Value= appears nowhere in the source.
+- =interview_date= picked one of two households' dates arbitrarily for 305
+  households.
+- 888 person-rows were dropped from =household_roster=; 867 from
+  =individual_education=.
+
+Independent corroboration that the triple (not the pair) is the household:
+=HHCHAR.hhsize= equals the =ROSTERN= member count for **98.1%** of households
+keyed on =(ED, SN, HH)=, but only **81.1%** keyed on =(ED, HH)=.
+
+Household ids are now =ED-SN-HH= strings (e.g. ='1-37-1'=, formerly ='1-1'=).
+**Every Guyana number produced before this fix is suspect.**
+
+Regression net: =tests/test_guyana_household_identity.py=.
+
+* The sampling cluster is (ED, SN), not ED                             :GH503:
+
+=ED= is not a cluster.  Across the 130 EDs, =RGN= varies within **22** of them,
+=SECTOR= within **10**, =STNO= within **24**.  Since =Wave.cluster_features=
+collapses to =(t, v)= with =.first()= ("invariant within a cluster by
+construction of the LSMS-ISA sampling design"), =v: ED= handed **287 of 1807**
+households a Region that is not their own and **143** the wrong Rural — which
+then propagated into =m= / =market== aggregates.
+
+Under =v = (ED, SN)= there are **168** clusters; =SECTOR= varies within **0** of
+them and =RGN= within **3**.
+
+** Residual: 13 households still get a wrong Region
+=RGN= is inconsistent within 3 of the 168 =(ED, SN)= clusters, so the =.first()=
+collapse still mis-assigns =Region= for **13** households (down from 287).  This
+is a source inconsistency, not a key error; =cluster_features= is =(t, v)= by
+canonical declaration, so fixing it properly means promoting Region to a
+household-level column.  Not done.
+
+** Weights stay keyed on ED
+=WEIGHT.dta= is =(ED, WEIGHT)= with exactly one weight per ED, and joining it on
+=ED= reproduces =WEIGHTID.dta='s authoritative per-household weight for
+**1795/1795** rows.  So the =sample= weight sub-df keeps merging on a plain =ED=
+helper column (dropped before the final index) even though =v= is now
+=(ED, SN)=.  =WEIGHTID.dta= is /not/ a usable substitute: only 1742 of its 1795
+triples are in COVERN, and it carries a duplicate triple.
+
+2 of the 130 COVERN EDs (23 households) are absent from =WEIGHT.dta= and have a
+NaN weight.  Pre-existing.
+
+* =newid= is CORRUPT in the second-questionnaire files (HHCHAR, DRBLS) :GH503:
+
+**Do not key =HHCHAR= or =DRBLS= on =newid=.**  Unlike =COVERN.NEWID=, the
+=newid= column in the second-questionnaire family is malformed:
+
+- Both files hold only **1616 distinct =newid= across ~1818 rows**.
+- **240 of 1819** =HHCHAR= rows violate the =ED*100000 + SN*100 + HH= identity
+  that =COVERN= satisfies exactly (the =HH= tail is mangled — e.g. ED 170 /
+  SN 87 has =smpl_hh= 1,3,5,7,9,11 but =newid= tails 0,4,4,8,8,12).
+- **317 =DRBLS= rows carry an ambiguous (duplicated) =newid=.**
+
+Consequently the old =assets.py= join (=DRBLS.newid ↔ COVERN.NEWID=) recovered
+only **1529 distinct households from 1730 rows** — it merged ~200 households
+into others /even after/ the triple fix would have been applied to it.
+
+** How =assets= recovers DRBLS's household: the HHCHAR positional crosswalk
+=DRBLS= has no =ED=/=SN=/=HH= columns — only the corrupt =newid= and =id_nmbr=
+(which is not a household key at all: 160 distinct values across 1818 rows).
+
+=HHCHAR= carries **both** the corrupt =newid= /and/ the clean
+=(ed_dvsn, ed_smpl, smpl_hh)= triple (== COVERN's =(ED, SN, HH)=).  After
+dropping HHCHAR's single duplicate-triple record, HHCHAR is **row-for-row
+parallel to DRBLS**: =newid= matches 1818/1818 /and/ =id_nmbr= matches 1818/1818.
+So DRBLS row /k/ is HHCHAR row /k/'s household.
+
+The crosswalk is validated where it can be: on the 1415 DRBLS rows whose =newid=
+is /unambiguous/, it agrees with the old newid join for **1415/1415 (100%)**.  It
+resolves the 317 rows the newid join cannot, and yields 1818 rows → **1818
+distinct households** (1:1, as a wide one-row-per-household table must be).
+
+=_/assets.py= **asserts** the row parity.  If a re-extract of either file breaks
+it, the build raises rather than silently misattributing durables.
+
+** No cross-household summation in =assets=
+Because DRBLS is wide and each row is exactly one household, =(t, i, j)= is
+unique by construction.  The old script collapsed duplicate =(t, i, j)= by
+SUMMING, justifying it as "several per-acquisition detail rows for the same
+(household, item)" — but that premise was itself an artifact of the conflation:
+those "detail rows" were /different households/ colliding on =ED-HH=.  The only
+legitimate within-household sum is blocks =31/31a/31b=, which share the item
+label "OTHER AUDIO-VISUAL"; =assets.py= now raises if any /other/ item produces a
+duplicate =(t, i, j)=.
+
 * Known data issues
+
+** housing — one irreducible key collision (1 of 1818 households)
+=HHCHAR= contains two records that both claim ED 123 / SN 722 / HH 6.  They are
+genuinely /different/ households (different sex of head, different income — 6847
+vs 20785 — different walls and room count), and their =newid= is identical too,
+so the collision cannot be resolved from the source.
+=_normalize_dataframe_index= collapses them with =.first()= and emits the GH#323
+=RuntimeWarning=.
+
+**That warning is left in place on purpose.**  It is now /true and useful/ — one
+genuine source defect — instead of drowning among the 311 spurious duplicates the
+old key produced.  Silencing it would destroy the only detector we have for this
+class of bug.
+
+=housing= also carries 54 households whose triple is not in =COVERN= (out of
+sample); they get a NaN =v=.
 
 ** shocks — not available (2026-06-06)
 Guyana 1992 (early-design GLSS) has no shocks-and-coping roster. A scan of

@@ -5,17 +5,23 @@ from lsms_library.local_tools import df_data_grabber, format_id, to_parquet
 
 # Guyana 1992 cover page (COVERN.dta) records the enumeration date as
 # day/month/year-of-enumeration (DDE/MDE/YDE).  The household key is the
-# composite (ED, HH); we hyphen-join ED+HH to match sample's "ED-HH" form
-# (e.g. "1-1").  v is the enumeration district ED.  YDE is stored 2-digit
-# (uniformly 93 -> 1993): enumeration ran Mar-Aug 1993 even though the
-# survey is nominally the 1992 round.
-idxvars = dict(ED='ED', HH='HH')
+# composite (ED, SN, HH) -- NOT (ED, HH), which conflates distinct households
+# (GH #503): COVERN's 1807 rows hold 1807 unique triples but only 1502 unique
+# pairs, and the survey's own NEWID == ED*100000 + SN*100 + HH for all 1807.
+# Under the old pair key this table silently picked ONE of two different
+# households' enumeration dates for 305 households (e.g. i='1-1' was both
+# 18-Jun-93 and 22-Mar-93).  We hyphen-join ED+SN+HH to match sample's
+# "ED-SN-HH" form (e.g. "1-37-1").  YDE is stored 2-digit (uniformly 93 ->
+# 1993): enumeration ran Mar-Aug 1993 even though the survey is nominally the
+# 1992 round.
+idxvars = dict(ED='ED', SN='SN', HH='HH')
 myvars = dict(day='DDE', month='MDE', year='YDE')
 
 df = df_data_grabber('../Data/COVERN.dta', idxvars, **myvars).reset_index()
 
-# Composite household id "ED-HH" and cluster id v=ED (format_id each part).
-df['i'] = df['ED'].map(format_id) + '-' + df['HH'].map(format_id)
+# Composite household id "ED-SN-HH" (format_id each part).
+df['i'] = (df['ED'].map(format_id) + '-' + df['SN'].map(format_id)
+           + '-' + df['HH'].map(format_id))
 df['t'] = '1992'
 
 # Expand 2-digit year of enumeration to 4-digit (e.g. 93 -> 1993).
