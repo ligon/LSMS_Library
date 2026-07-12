@@ -156,6 +156,23 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 **EHCVM note**: EHCVM 2018-19 countries lack a continuous months variable. The binary `s01q12` ("lived continuously 6+ months?") is mapped to 0/12. Guinea-Bissau may need Portuguese keys (`Sim`/`Não`) alongside `Oui`/`Non`. See CONTENTS.org files for per-country documentation.
 
+## Coverage Matrix (v0.9.0+)
+
+`make matrix` grades every `(country, feature, wave)` cell on a tier ladder — `absent` / `dropped` / `broken` / `builds` / `sane` / `blessed` — and commits a snapshot to `.coder/coverage/latest.csv`. `ll.coverage()` reads it back. See `docs/guide/coverage.md`.
+
+**`sane` is not `blessed`, and the difference matters.**
+
+- **`sane`** — the automated checks passed. *No human has necessarily looked at a single number.*
+- **`blessed`** — a human read the actual numbers for that cell and believes them. Recorded in the git-tracked `.coder/coverage/blessed.csv`.
+
+A feature can build cleanly, pass every sanity check, and still be quietly wrong — wired to the wrong source column, or carrying an unverified unit conversion. So **for anything feeding published analysis, `sane` is not enough.**
+
+> **The rule: if you used a cell in real analysis and looked at its numbers, bless it in the same PR.**
+> `country,feature,wave,blessed_by,date,note` (`wave` blank for country-level features). Blessings accrete; never bulk-seed them. An empty blessing file is honest — a file full of blessings nobody gave makes `blessed` a synonym for `sane` and destroys the tier.
+> Do **not** put `#` comments in `blessed.csv`: `load_blessed()` reads it without a `comment=` arg, so a comment line becomes a phantom blessed cell.
+
+**Do not trust a `sane` cell as proof an issue is fixed.** Know what the grader does *not* look at — it is a cold build (so it cannot see warm-cache-only divergences) and it does not check currency labels.
+
 ## Derived Tables
 
 `household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — `Country.data_scheme` auto-surfaces them when the source table (`food_acquired` or `household_roster`) is present. A `!derived` YAML tag was considered and rejected (2026-04-18): it would create a migration burden with no gain over the hardcoded dicts + auto-discovery.

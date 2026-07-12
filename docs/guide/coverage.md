@@ -29,6 +29,42 @@ re-implements the sanity checks.
 | `sane` | The wave slice is non-empty and passes every sanity check (warnings allowed). |
 | `blessed` | `sane` **and** listed in the git-tracked blessing file `.coder/coverage/blessed.csv`. |
 
+## Blessing a cell
+
+`sane` and `blessed` answer different questions:
+
+- **`sane`** — *the automated checks passed.* No human has necessarily looked at
+  a single number.
+- **`blessed`** — *a human read the actual numbers for this cell and believes
+  them.*
+
+For anything feeding published analysis, `sane` is not enough. A feature can
+build cleanly, pass every sanity check, and still be quietly wrong — wired to
+the wrong source column, or carrying a unit conversion nobody verified.
+
+**The rule: if you used a cell in real analysis and looked at its numbers, bless
+it in the same PR.**
+
+```csv
+country,feature,wave,blessed_by,date,note
+Uganda,food_expenditures,2019-20,ligon,2026-07-12,used in demand estimation; totals reconcile
+```
+
+`wave` is blank for country-level features. Only `country`, `feature`, and
+`wave` are read by the matrix — `blessed_by` / `date` / `note` are provenance
+for humans, and they are what make a blessing auditable rather than a bare
+assertion.
+
+Blessings accrete; they are never bulk-seeded. An empty blessing file is honest.
+A file full of blessings nobody actually gave is worse than no file at all,
+because it would make `blessed` a synonym for `sane` and destroy the only
+distinction the tier exists to draw.
+
+!!! warning "Do not put `#` comments in `blessed.csv`"
+    `load_blessed()` reads it with `pd.read_csv(..., keep_default_na=False)` and
+    no `comment=` argument, so a comment line is parsed as a **row** — a phantom
+    blessed cell. Header and data only.
+
 The grid cell shows a worst-first glyph tally over a country's waves
 (e.g. `⚠2 ✓5 –1` = 2 `builds`, 5 `sane`, 1 `absent`) and is coloured by the most
 actionable tier present.
