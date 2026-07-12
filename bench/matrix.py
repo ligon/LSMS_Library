@@ -50,6 +50,10 @@ TIER_COLOR = {
     "asked-not-distributed": "#c5b3e6",
     # Data downloaded, zero config -- work not yet STARTED.  Must read as work,
     # not as a quiet gap.
+    # WANTED but UNOBTAINABLE (the channel is broken).  Deliberately a live,
+    # visible colour: it must never read as "nothing to see here" -- that was
+    # exactly the mistake of grading Nepal `n/a`.
+    "blocked":               "#e8590c",
     "unconfigured":          "#fd7e14",
     "declared": "#cfe2ff",
     "dropped":  "#f5c2c7",
@@ -62,6 +66,7 @@ TIER_GLYPH = {
     "n/a": "·", "absent": "–", "declared": "?", "dropped": "✗!",
     "broken": "✗", "builds": "⚠", "sane": "✓", "blessed": "★",
     "not-asked": "∅", "asked-not-distributed": "⤓", "unconfigured": "⌀",
+    "blocked": "⛔",
 }
 
 

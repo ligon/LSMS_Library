@@ -18,9 +18,12 @@ Tier ladder (worst→best; each derived from existing machinery only):
 tier                   meaning
 =====================  ====================================================
 n/a                    no per-wave readiness applies: a country-level-only
-                       feature, a table with no ``t`` axis, or a country with
-                       no microdata in the repo at all (Armenia, Nepal — see
-                       :func:`countries_without_microdata`)
+                       feature, or a table with no ``t`` axis
+blocked                we WANT it, we KNOW where it is, and we CANNOT get it —
+                       the acquisition channel is broken (Nepal: NSO site down;
+                       Albania 1996).  A LIVE gap, not a settled one: visible,
+                       out of the work queue, and RE-PROBED on every refresh.
+                       See :func:`load_blocked`.
 not-asked              adjudicated: the instrument genuinely never asked.
                        Closed.  *Requires evidence* (:func:`load_verdicts`).
 asked-not-distributed  adjudicated: the instrument DID ask, but the shipped
@@ -65,8 +68,8 @@ import pandas as pd
 # Tier ladder
 # ---------------------------------------------------------------------------
 TIER_ORDER = [
-    "n/a", "not-asked", "asked-not-distributed", "unconfigured", "absent",
-    "declared", "dropped", "broken", "builds", "sane", "blessed",
+    "n/a", "not-asked", "asked-not-distributed", "blocked", "unconfigured",
+    "absent", "declared", "dropped", "broken", "builds", "sane", "blessed",
 ]
 # Worst → best, for rolling several wave tiers up into one grid cell. The most
 # actionable (a real defect) sorts first so problems surface in the summary.
@@ -74,9 +77,12 @@ TIER_ORDER = [
 # ``absent`` (= an *un-adjudicated* gap) sorts as actionable, because it is the
 # live queue.  ``not-asked`` and ``asked-not-distributed`` are *adjudicated* and
 # sort with ``n/a`` at the quiet end: they are settled, not pending.
+# `blocked` sorts BELOW the actionable defects (nobody can close it by trying
+# harder) but ABOVE the settled tiers -- it is a gap we still WANT, and it must
+# never read as "nothing to see here".  That is precisely the mistake `n/a` made.
 ROLLUP_PRIORITY = [
     "broken", "dropped", "builds", "unconfigured", "absent", "declared",
-    "sane", "blessed", "asked-not-distributed", "not-asked", "n/a",
+    "sane", "blessed", "blocked", "asked-not-distributed", "not-asked", "n/a",
 ]
 COLUMNS = ["country", "feature", "wave", "tier", "coverage", "n_rows", "detail"]
 
@@ -261,6 +267,71 @@ def unconfigured_countries(countries_root) -> dict[str, int]:
     return out
 
 
+def default_blocked_path() -> Path:
+    return _repo_root() / ".coder" / "coverage" / "blocked_sources.csv"
+
+
+def load_blocked(path: Path | None = None) -> dict[tuple[str, str], dict]:
+    """Sources we WANT, KNOW where to get, and CANNOT obtain — keyed ``(country, wave)``.
+
+    CSV header:
+    ``country,wave,catalog_id,blocker,probe,last_checked,unblock,recorded_by``
+
+    This is the state between ``missing-wave`` (obtainable — go run ``add-wave``)
+    and "does not exist".  The data exists, the provenance is known, and the
+    *acquisition channel* is broken:
+
+    - **Nepal** (3 waves) — NSO Nepal hosts the microdata, not the WB; the NSO
+      site is unreachable and no human contact has been reached.
+    - **Albania 1996** — directory and WB catalog entry (2311) both exist; zero
+      data files.
+
+    Why it is NOT any tier we already had
+    -------------------------------------
+    ``n/a`` says *"no readiness applies"* — it reads as *nothing to see here*,
+    and hides a gap we actively want.  (Nepal was graded ``n/a`` between
+    2026-07-12 and this commit.  That was wrong, and it was mine.)
+    ``not-asked`` / ``none`` are **terminal**; this is not.  ``todo`` would put
+    it in an RA's queue, where they would spend a day rediscovering that the NSO
+    site is down.
+
+    ``blocked`` is *visible* (it counts against us) but *not actionable by us* —
+    nobody closes it by trying harder.
+
+    The load-bearing part: ``probe`` + the recheck
+    ---------------------------------------------
+    A blocker is a **condition that changes**.  A broken website heals; a dead
+    contact gets replaced.  *"We hope we'll find it someday" is not a plan — a
+    scheduled recheck is.*  So every row carries a ``probe`` (the URL to retry)
+    and a ``last_checked``, and the existing ``bin/coverage_refresh.sbatch``
+    re-probes them and opens a GitHub issue when one comes back.  Without that,
+    this tier is just a nicer word for *forgotten*.
+
+    A row with no ``blocker`` or no ``probe`` is IGNORED (with a warning): an
+    un-probeable blocker cannot be rechecked, so it would silently become the
+    permanent close it is explicitly not.
+    """
+    path = path or default_blocked_path()
+    if not Path(path).exists():
+        return {}
+    df = pd.read_csv(path, dtype=str, keep_default_na=False)
+    out: dict[tuple[str, str], dict] = {}
+    for _, r in df.iterrows():
+        key = (r.get("country", ""), r.get("wave", ""))
+        if not (r.get("blocker", "") or "").strip():
+            warnings.warn(f"blocked_sources: ignoring {key} — no `blocker` recorded; "
+                          "an unexplained block is indistinguishable from neglect.",
+                          stacklevel=2)
+            continue
+        if not (r.get("probe", "") or "").strip():
+            warnings.warn(f"blocked_sources: ignoring {key} — no `probe` URL, so it can "
+                          "never be rechecked and would silently become permanent.",
+                          stacklevel=2)
+            continue
+        out[key] = dict(r)
+    return out
+
+
 @lru_cache(maxsize=1)
 def countries_without_microdata() -> dict[str, str]:
     """Countries whose config exists but whose source microdata is not in-repo.
@@ -364,7 +435,7 @@ def _safe_build(co, feature, env):
 
 def grade_feature(country_name, feature, waves, co, env, *,
                   avail_by_wave=None, blessed=frozenset(), verdicts=None,
-                  readiness=True) -> list[dict]:
+                  blocked=None, readiness=True) -> list[dict]:
     """Per-wave cells for one ``(country, feature)``.
 
     Builds the country-level table at most once (``readiness=True``) and grades
@@ -385,14 +456,36 @@ def grade_feature(country_name, feature, waves, co, env, *,
                 avail_by_wave[w] = set()
     covered: dict[str, bool] = {w: feature in avail_by_wave[w] for w in waves}
     verdicts = {} if verdicts is None else verdicts
+    blocked = {} if blocked is None else blocked
 
     def _absent(w):
         """The single place an un-declared cell is graded (see _absent_tier)."""
         return _absent_tier(country_name, feature, w, verdicts)
 
+    def _blocked_cell(w):
+        """`blocked` if this wave's SOURCE is unobtainable, else None.
+
+        Blockedness is a property of the *source*, not of a build -- we do not
+        need to try (and fail) to build Nepal to know that NSO's site is down.
+        So this is checked FIRST, and it applies to the cheap coverage-only layer
+        too.  (It did not, briefly, which meant `make matrix-coverage` reported
+        `blocked=0` while four sources were plainly blocked.)
+        """
+        blk = blocked.get((country_name, str(w)))
+        if not blk:
+            return None
+        return _cell(country_name, feature, w, "blocked", "declared",
+                     detail=f"blocked: {blk.get('blocker','')} "
+                            f"[probe {blk.get('probe','')}; "
+                            f"last checked {blk.get('last_checked','?')}]")
+
     if not readiness:
         out = []
         for w in waves:
+            blk = _blocked_cell(w)
+            if blk is not None:
+                out.append(blk)
+                continue
             if covered[w]:
                 out.append(_cell(country_name, feature, w, "declared", "declared",
                                  detail="coverage-only run"))
@@ -406,21 +499,35 @@ def grade_feature(country_name, feature, waves, co, env, *,
     if err is not None or df is None or len(df) == 0:
         why = err or "feature built empty"
         # A country with no microdata in the repo cannot build.  That is a data-
-        # availability fact, not a defect -- grade `n/a`, not `broken`, so the
-        # `broken` tier stays meaningful.  (See countries_without_microdata.)
+        # availability fact, not a defect -- so it is not `broken`.  But WHICH
+        # non-defect it is matters, and `blocked` OUTRANKS `n/a`:
+        #
+        #   blocked : we WANT this, we KNOW where it is, we CANNOT get it (the
+        #             acquisition channel is broken).  A live gap.  Re-probed.
+        #   n/a     : nothing to see here.
+        #
+        # Nepal was graded `n/a` (my error, 2026-07-12).  `n/a` says "don't look",
+        # which buried a gap we actively want -- the same lumping bug this module
+        # exists to prevent, committed by its author.  A blocked source must stay
+        # VISIBLE.
         no_data = countries_without_microdata().get(country_name)
-        fail_tier = "n/a" if no_data else "broken"
-        if no_data:
-            why = f"no microdata in repo: {no_data}"
         out = []
         for w in waves:
-            if covered[w]:
-                out.append(_cell(country_name, feature, w, fail_tier, "declared",
-                                 detail=why))
-            else:
+            if not covered[w]:
                 tier, detail = _absent(w)
                 out.append(_cell(country_name, feature, w, tier, "absent",
                                  detail=detail))
+                continue
+            blk = _blocked_cell(w)
+            if blk is not None:
+                out.append(blk)
+                continue
+            if no_data:
+                out.append(_cell(country_name, feature, w, "n/a", "declared",
+                                 detail=f"no microdata in repo: {no_data}"))
+                continue
+            out.append(_cell(country_name, feature, w, "broken", "declared",
+                             detail=why))
         return out
 
     names = list(df.index.names or [])
@@ -464,6 +571,10 @@ def grade_feature(country_name, feature, waves, co, env, *,
 
     cells = []
     for w in waves:
+        blk = _blocked_cell(w)
+        if blk is not None:
+            cells.append(blk)
+            continue
         if not covered[w]:
             tier, detail = _absent(w)
             cells.append(_cell(country_name, feature, w, tier, "absent",
@@ -489,7 +600,7 @@ def grade_feature(country_name, feature, waves, co, env, *,
 
 
 def grade_country_level(country_name, feature, co, env, *,
-                        blessed=frozenset(), verdicts=None,
+                        blessed=frozenset(), verdicts=None, blocked=None,
                         readiness=True) -> dict:
     """Grade a country-level-only feature (panel_ids / updated_ids): wave=None."""
     if not readiness:
@@ -500,6 +611,14 @@ def grade_country_level(country_name, feature, co, env, *,
             warnings.simplefilter("ignore")
             val = env["load_feature"](co, feature)
     except Exception as e:  # noqa: BLE001
+        # A blocked source cannot build, and that is not a defect.  Same rule as
+        # the per-wave path: `blocked` outranks `n/a`, because it is a gap we
+        # still WANT and must stay visible.
+        blk = (blocked or {}).get((country_name, ""))
+        if blk:
+            return _cell(country_name, feature, None, "blocked", "declared",
+                         detail=f"blocked: {blk.get('blocker','')} "
+                                f"[probe {blk.get('probe','')}]")
         no_data = countries_without_microdata().get(country_name)
         if no_data:
             return _cell(country_name, feature, None, "n/a", "declared",
@@ -522,7 +641,7 @@ def grade_country_level(country_name, feature, co, env, *,
 # Whole-matrix build
 # ---------------------------------------------------------------------------
 def build_matrix(countries=None, features=None, *, readiness=True,
-                 blessed=None, verdicts=None,
+                 blessed=None, verdicts=None, blocked=None,
                  log=lambda _m: None) -> pd.DataFrame:
     """Build the full (country × feature × wave) status table.
 
@@ -546,6 +665,8 @@ def build_matrix(countries=None, features=None, *, readiness=True,
         blessed = load_blessed()
     if verdicts is None:
         verdicts = load_verdicts()
+    if blocked is None:
+        blocked = load_blocked()
     if countries is None:
         countries = catalog.countries()
     feat_filter = set(features) if features else None
@@ -558,6 +679,15 @@ def build_matrix(countries=None, features=None, *, readiness=True,
     # paid-for data that simply did not appear.  Surface them as `unconfigured`:
     # visibly red, not absent from the report.  A denominator that omits the work
     # you have not started is not a denominator.
+    # A blocked source we want but do NOT model as a wave must still appear.
+    # `Albania/1996` is exactly this: the directory and its WB catalog entry
+    # (2311) exist, but it has no `_/` and no `Data/`, so `Country.waves` never
+    # enumerates it and every per-wave loop skips it silently.  The blocked list
+    # is AUTHORITATIVE about sources we want -- it does not defer to whether the
+    # model currently happens to know about them.  (Same invisibility bug as the
+    # `unconfigured` countries below, one level down.)
+    modelled: set[tuple[str, str]] = set()
+
     for c, nwaves in unconfigured_countries(countries_root).items():
         if countries is not None and c not in countries:
             continue
@@ -586,6 +716,8 @@ def build_matrix(countries=None, features=None, *, readiness=True,
                               detail=f"country load failed: {type(e).__name__}: {e}"))
             continue
 
+        modelled.update((c, str(w)) for w in waves)
+
         sel = [f for f in feats if (feat_filter is None or f in feat_filter)]
         log(f"  {c}: {len(waves)} waves × {len(sel)} features"
             + ("" if readiness else " (coverage only)"))
@@ -593,6 +725,7 @@ def build_matrix(countries=None, features=None, *, readiness=True,
             rows.extend(grade_feature(c, f, waves, co, env,
                                       avail_by_wave=avail_by_wave,
                                       blessed=blessed, verdicts=verdicts,
+                                      blocked=blocked,
                                       readiness=readiness))
 
         for clf in country_level_only:
@@ -601,7 +734,18 @@ def build_matrix(countries=None, features=None, *, readiness=True,
             if _has_country_level_feature(c, clf, countries_root):
                 rows.append(grade_country_level(c, clf, co, env,
                                                 blessed=blessed, verdicts=verdicts,
+                                      blocked=blocked,
                                       readiness=readiness))
+
+    for (bc, bw), blk in (blocked or {}).items():
+        if countries is not None and bc not in countries:
+            continue
+        if (bc, str(bw)) in modelled:
+            continue                       # already graded per-wave above
+        rows.append(_cell(bc, "<wave>", bw, "blocked", "declared",
+                          detail=f"blocked, and NOT MODELLED as a wave "
+                                 f"(no _/ config): {blk.get('blocker','')} "
+                                 f"[probe {blk.get('probe','')}]"))
 
     df = pd.DataFrame(rows, columns=COLUMNS)
     df["tier"] = pd.Categorical(df["tier"], categories=TIER_ORDER, ordered=True)
