@@ -213,13 +213,23 @@ class TestCountryRegressions:
         assert not any(v != v.strip() for v in strata)
 
     def test_ghanalss_1991_92_rural_code_map_says_urban(self):
-        """LATENT defect (not currently reaching sample() in a clean build -- the
-        'Semi-urban' values I first saw came from a STALE shared-cache parquet).
-        The `rural` code->label table in GhanaLSS/1991-92/_/categorical_mapping.org
-        asserted 1 = 'Semi-urban'.  That is provably wrong: loc2=1 nests EXACTLY
-        onto loc3 in {1,2} == loc5 in {1,2} == Accra (459) + Other Urban (1119) =
-        1578, i.e. it is the union of the two URBAN strata.  mapping.Rural() reads
-        that table, so the wrong label is one YAML edit away from going live."""
+        """LIVE class-1 defect.  The `rural` code->label table in
+        GhanaLSS/1991-92/_/categorical_mapping.org asserted 1 = 'Semi-urban'.
+        That is provably wrong: loc2=1 nests EXACTLY onto loc3 in {1,2} ==
+        loc5 in {1,2} == Accra (459) + Other Urban (1119) = 1578, i.e. it is
+        the union of the two URBAN strata.  GLSS4 declares 1|Urban for the same
+        loc2 (1998-99/_/categorical_mapping.org:19-22).  mapping.Rural() reads
+        that table, so pre-fix `sample()` shipped 'Semi-urban' to users for
+        1,578 households (and 100 clusters in `cluster_features()`).
+
+        NOTE, because an earlier draft of this docstring said the opposite and
+        was wrong: this is NOT latent.  A clean, from-source build of pristine
+        `development` in an isolated LSMS_DATA_DIR does ship 'Semi-urban'.  Do
+        not re-downgrade it to a doc-only fix.  (The original mis-grading came
+        from a verification run whose LSMS_COUNTRIES_ROOT override was silently
+        ignored -- GhanaLSS/1991-92/_/mapping.py:8 hardcodes
+        files('lsms_library')/'countries', bypassing the override.  That is a
+        separate CLAUDE.md anti-pattern worth its own issue.)"""
         import importlib.util
         import sys
 
