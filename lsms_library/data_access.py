@@ -214,10 +214,18 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     # Serbia and Montenegro was a distinct ISO entity (SCG); its two LSMS
     # rounds are catalog ids 80 and 81, matching our 2002/ and 2003/ dirs.
     "Serbia and Montenegro": CountryCatalog("SCG"),
-    # ZAF: the General Household Survey (GHS, 2002-2025) is published under
-    # ``datafirst`` (UCT's DataFirst archive), not ``lsms`` -- 21 waves invisible
-    # to a lsms-only search (GH #597).  ``lsms`` carries only the 1993 Integrated
-    # Household Survey, which we hold as ``1993/``.
+    # ZAF: three series live in ``datafirst`` (UCT's DataFirst archive), not
+    # ``lsms`` -- 28 waves invisible to a lsms-only search (GH #597).  ``lsms``
+    # carries only the 1993 Integrated Household Survey, which we hold as
+    # ``1993/``.  Each series is acquired for a STATED reason, and they are not
+    # interchangeable -- see ``capability.py``:
+    #
+    #   GHS (21 waves, 2002-2025)  roster, housing, education, employment.
+    #                              Does NOT carry a consumption module, so it
+    #                              cannot populate ``food_acquired``.
+    #   IES (5 waves)              income + expenditure + acquisition diary.
+    #   LCS (2 waves)              living conditions + expenditure diary.
+    #                              IES and LCS are what feed the demand path.
     #
     # The series pin matters more here than anywhere else: ``datafirst`` returns
     # 320 ZAF rows -- quarterly labour force surveys, censuses, victim-of-crime
@@ -225,7 +233,7 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     # surveys.  Widening the repository without pinning the series would report
     # ~357 "missing waves" for South Africa, which is not a denominator anyone
     # could use.
-    "South Africa": CountryCatalog("ZAF", idno_pattern=r"_(IHS|GHS)_",
+    "South Africa": CountryCatalog("ZAF", idno_pattern=r"_(IHS|GHS|IES|LCS)_",
                                    repositories=("lsms", "datafirst")),
     "Tajikistan": CountryCatalog("TJK"),
     # TZA is shared: the National Panel Survey vs the Kagera Health and

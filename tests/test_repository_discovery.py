@@ -253,12 +253,14 @@ class TestWideningDoesNotAdmitNoise:
         assert "7860" not in found, "global Findex is not an Armenian wave"
 
     def test_south_africa_rejects_the_datafirst_archive(self, catalog):
+        """DataFirst holds 320 ZAF rows.  Three series are ours; the rest are
+        not, and the pin is the only thing standing between them and the
+        census."""
         found = {e["id"] for e in discover_waves("South Africa")}
-        assert "8296" not in found, "Quarterly Labour Force Survey is not a GHS"
-        assert "8219" not in found, (
-            "the Income and Expenditure Survey is a plausible acquisition, but "
-            "it has not been ruled in remit; it must not enter the census by "
-            "accident")
+        assert "8296" not in found, "Quarterly Labour Force Survey is not ours"
+        # ... while the three ruled-in series ARE admitted:
+        assert {"2773", "8309"} <= found, "GHS"
+        assert "8219" in found, "IES -- ruled in remit: it feeds the demand path"
 
     def test_a_study_we_hold_under_another_id_is_not_reported_missing(
             self, catalog):
