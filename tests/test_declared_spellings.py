@@ -18,6 +18,9 @@ These tests pin:
   3. the per-country data fixes, each of which is a distinct root cause.
 """
 
+import os
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -163,7 +166,42 @@ class TestSampleIsDeclared:
 # 3. Per-country regressions (each a distinct root cause)
 # ---------------------------------------------------------------------------
 
+def _aws_creds_available() -> bool:
+    """True iff DVC could perform an S3 pull right now.
+
+    The per-country regressions below BUILD REAL COUNTRY DATA, which goes
+    through DVC -> S3.  Without credentials they fail with
+    ``NoCredentialsError`` regardless of whether the test logic is correct.
+
+    The CI ``unit-tests`` job intentionally sets ``LSMS_SKIP_AUTH=1`` to keep PR
+    validation fast and data-free; only ``data-tests`` carries the S3 secrets.
+    So these must silent-skip there, exactly as the equivalent guard in
+    ``tests/test_canonical_shape_via_cache_miss.py`` does.
+
+    (Mirrors that helper deliberately rather than importing across test modules.
+    The duplication is the pre-existing house pattern; centralising it into
+    ``conftest.py`` is worth doing, but not in a CI-red hotfix.)
+    """
+    if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
+        return True
+    creds_file = (
+        Path(__file__).parent.parent
+        / "lsms_library" / "countries" / ".dvc" / "s3_creds"
+    )
+    if creds_file.exists():
+        try:
+            return "aws_access_key_id" in creds_file.read_text()
+        except OSError:
+            return False
+    return False
+
+
 @pytest.mark.slow
+@pytest.mark.skipif(
+    not _aws_creds_available(),
+    reason="per-country regressions build real data (DVC -> S3); no credentials "
+           "in the `unit-tests` CI job (LSMS_SKIP_AUTH=1). They run in `data-tests`.",
+)
 class TestCountryRegressions:
     def test_uganda_2005_06_rural_is_canonical(self):
         """Root cause: YAML key TYPE mismatch.  Raw `urban` is object-dtype but
