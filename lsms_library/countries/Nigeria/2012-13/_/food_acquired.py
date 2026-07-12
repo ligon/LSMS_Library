@@ -1,112 +1,54 @@
 #!/usr/bin/env python
-"""Extract raw food acquisition data for Nigeria 2012-13.
+"""Extract raw food acquisition data for Nigeria 2012-13 (GHS-Panel W2).
 
 Source files:
   - sect10b_harvestw2.csv  (post-harvest, 2013Q1)
   - sect7b_plantingw2.csv  (post-planting, 2012Q3)
+
+W2 questionnaire (RENUMBERED vs W1 -- GH #591):
+  q2a/q2b  total quantity consumed (7 days) + unit
+  q3a/q3b  QUANTITY PURCHASED + unit                 <- q4 pays for this
+  q4       amount spent on [ITEM] (Naira)
+  q5a/q5b  consumption that came from PURCHASES + unit
+  q6a/q6b  consumption that came from OWN PRODUCTION + unit
+  q7a/q7b  consumption that came from GIFTS + unit
+Identity q5a + q6a + q7a == q2a holds in 99.9% (PH) / 99.2% (PP) of rows.
+
+Until GH #591 this script mapped q5a -> `Produced`, i.e. it labelled the
+PURCHASED quantity as own production, leaving the purchased row with
+(q2a - q5a) = q6a + q7a ~ 0 while the expenditure rode on it.  That made
+Price = Expenditure / 0 = inf for ~40% of rows, which
+food_prices_from_acquired silently dropped: 2013Q1 kept 161 price rows out
+of a 134k-row food_acquired.
 """
 import sys
-import numpy as np
+
 import pandas as pd
 
-sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet, get_categorical_mapping, get_dataframe
-from lsms_library.transformations import food_acquired_to_canonical
-
-_food_labels_raw = get_categorical_mapping(tablename='harmonize_food',
-                                           idxvars='Code',
-                                           **{'Preferred Label': 'Preferred Label'})
-# Re-key harmonize_food on INT codes so the numeric item_cd (int64 in the
-# source CSV) resolves to its Preferred Label.  The Code column is
-# string-keyed, so a raw int j would otherwise never match and stay numeric
-# (GH #443).  Codes with a blank / '---' label legitimately stay raw.
-food_labels = {}
-for _k, _v in _food_labels_raw.items():
-    try:
-        _ik = int(_k)
-    except (TypeError, ValueError):
-        continue
-    if pd.isna(_v) or str(_v).strip() in ('', '---'):
-        continue
-    food_labels[_ik] = str(_v).strip()
-
-_unit_raw = get_categorical_mapping(tablename='u',
-                                     idxvars='Code',
-                                     **{'2012-13': '2012-13'})
-unitcodes = {k: v for k, v in _unit_raw.items() if isinstance(v, str)}
-
-zone_labels = {1: 'North central',
-               2: 'North east',
-               3: 'North west',
-               4: 'South east',
-               5: 'South south',
-               6: 'South west'}
-
-
-def extract_food(fn, varmap, t, food_labels):
-    """Read a food consumption file and produce a standardized DataFrame."""
-    df = get_dataframe(fn)
-
-    df = df.rename(columns=varmap)
-
-    df['j'] = df['j'].replace(food_labels)
-    df['u'] = df['u'].replace(unitcodes).fillna('None')
-    df['m'] = df['m'].replace(zone_labels)
-
-    df['t'] = t
-
-    keep = ['t', 'i', 'j', 'u', 'm',
-            'Quantity', 'Expenditure', 'Produced']
-    keep = [c for c in keep if c in df.columns]
-    df = df[keep]
-
-    value_cols = [c for c in ['Quantity', 'Expenditure', 'Produced'] if c in df.columns]
-    df = df.replace('', pd.NA)
-    df = df.dropna(subset=value_cols, how='all')
-
-    return df
-
+sys.path.append('../../_/')
+from lsms_library.local_tools import to_parquet
+from nigeria import food_acquired_for_wave
 
 # --- Harvest (2013Q1) ---
-harvest_vars = {
-    'hhid': 'i',
-    'item_cd': 'j',
-    's10bq2a': 'Quantity',
-    's10bq2b': 'u',
-    's10bq4': 'Expenditure',
-    's10bq5a': 'Produced',
-    'zone': 'm',
-}
-harvest = extract_food('../Data/sect10b_harvestw2.csv',
-                        harvest_vars, '2013Q1', food_labels)
+harvest = food_acquired_for_wave(
+    '../Data/sect10b_harvestw2.csv', '2013Q1',
+    sources={
+        'purchased': {'quantity': 's10bq3a', 'unit': 's10bq3b'},
+        'produced':  {'quantity': 's10bq6a', 'unit': 's10bq6b'},
+        'inkind':    {'quantity': 's10bq7a', 'unit': 's10bq7b'},
+    },
+    expenditure='s10bq4')
 
 # --- Planting (2012Q3) ---
-planting_vars = {
-    'hhid': 'i',
-    'item_cd': 'j',
-    's7bq2a': 'Quantity',
-    's7bq2b': 'u',
-    's7bq4': 'Expenditure',
-    's7bq5a': 'Produced',
-    'zone': 'm',
-}
-planting = extract_food('../Data/sect7b_plantingw2.csv',
-                         planting_vars, '2012Q3', food_labels)
+planting = food_acquired_for_wave(
+    '../Data/sect7b_plantingw2.csv', '2012Q3',
+    sources={
+        'purchased': {'quantity': 's7bq3a', 'unit': 's7bq3b'},
+        'produced':  {'quantity': 's7bq6a', 'unit': 's7bq6b'},
+        'inkind':    {'quantity': 's7bq7a', 'unit': 's7bq7b'},
+    },
+    expenditure='s7bq4')
 
-# --- Combine and index ---
-df = pd.concat([harvest, planting], ignore_index=True)
-
-df['i'] = df['i'].astype(int).astype(str)
-
-df = df.set_index(['t', 'i', 'j', 'u'])
-df = df.sort_index()
-
-# Canonical reshape (GH #169): drop `m` (lives in cluster_features) and
-# melt (Quantity, Produced, Expenditure) onto the `s` (acquisition source)
-# axis.  `v` is added at API time by _join_v_from_sample.
-if 'm' in df.columns:
-    df = df.drop(columns=['m'])
-df = food_acquired_to_canonical(df, drop_columns=())
-df = df.sort_index()
+df = pd.concat([harvest, planting]).sort_index()
 
 to_parquet(df, 'food_acquired.parquet')

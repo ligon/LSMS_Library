@@ -25,11 +25,28 @@ Data Scheme:
 
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
-    # source (purchased / produced).  Wave-level food_acquired.py
-    # reshapes wide-form (Quantity-total, Produced-subset, Expenditure)
-    # into long-form on s via food_acquired_to_canonical.  `m` (zone)
-    # dropped — lives in cluster_features.  See
+    # source.  `m` (zone) dropped — lives in cluster_features.  See
     # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    #
+    # GH #591: Nigeria emits THREE sources — purchased / produced / inkind
+    # (gifts) — built by nigeria.food_acquired_for_wave from each source's
+    # OWN reported quantity and OWN reported unit, not from a
+    # (total - produced) residual.  The GHS questionnaire was renumbered
+    # after wave 1 and the wave scripts had not followed: q5a was bound to
+    # `Produced` in every wave, but from W2 on q5a is the quantity consumed
+    # out of PURCHASES (own production moved to q6a, gifts to q7a).  The
+    # purchased row therefore held ~0 quantity while the expenditure rode
+    # on it → Price = E/0 = inf → silently dropped, leaving 161–1,106
+    # price rows per wave out of 120k–160k.
+    #
+    # Expenditure is carried on the s='purchased' row only, paired with the
+    # quantity the survey says it paid for: q3a (W1–W3) or q9a (W4).
+    # Reference-period caveat, W4 (2018Q3/2019Q1) ONLY: the purchase block
+    # (q9a/q9b/q9_cvn/q10) records the MOST RECENT purchase within 30 days,
+    # while produced/inkind are 7-day consumption.  Quantity summed across
+    # `s` is therefore not a 7-day consumption total for W4.  Imputing a
+    # 7-day purchased value (q5a × price) was rejected — it fabricates a
+    # number no respondent reported.  See Nigeria/_/CONTENTS.org.
     index: (t, i, j, u, s)
     Quantity: float
     Expenditure: float

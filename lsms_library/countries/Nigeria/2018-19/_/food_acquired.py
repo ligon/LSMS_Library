@@ -1,127 +1,73 @@
 #!/usr/bin/env python
-"""Extract raw food acquisition data for Nigeria 2018-19.
-
-Produces item-level food consumption, purchase, and production data
-before any unit conversion.  Downstream scripts derive food_expenditures,
-food_prices, and food_quantities from this table.
+"""Extract raw food acquisition data for Nigeria 2018-19 (GHS-Panel W4).
 
 Source files:
   - sect10b_harvestw4.csv  (post-harvest, 2019Q1)
   - sect7b_plantingw4.csv  (post-planting, 2018Q3)
+
+W4 questionnaire -- renumbered AGAIN (GH #591).  The per-source unit
+columns are gone (q5a/q6a/q7a are "of [QTY] consumed, how much came
+from ...", so all three are in the CONSUMPTION unit q2b), and the purchase
+question moved into its own block with its own unit and kg factor:
+  q2a/q2b/q2_cvn  total consumed (7 days) + unit + Kg/L factor
+  q5a             ... of which came from PURCHASES   (unit q2b)
+  q6a             ... of which came from OWN PRODUCTION (unit q2b)
+  q7a             ... of which came from GIFTS/OTHER (unit q2b)
+  q8              did the HH purchase any [ITEM] in the past 30 days?
+  q9a/q9b/q9_cvn  quantity of the MOST RECENT PURCHASE + unit + Kg/L factor
+  q10             amount spent on that purchase       <- pays for q9a
+
+Two defects fixed here:
+  1. q5a was mapped to `Produced`.  It is the quantity consumed out of
+     PURCHASES; own production is q6a.  (Same inversion as W2/W3.)
+  2. q10 (the value of the most recent purchase) was paired with the
+     residual (q2a - q5a).  It pays for q9a, in unit q9b -- which differs
+     from the consumption unit q2b in 13% (PH) / 10% (PP) of rows.
+
+The purchased row therefore carries the PURCHASE TRANSACTION (q9a, q9b,
+q9_cvn, q10): every stored number is survey-reported and
+Expenditure/Quantity is a real price.  Validated against the independent
+community_prices survey (median survey/community unit-value ratio 0.95 on
+matched (t, j, u) cells; 93% within 25%).  Note the reference-period
+asymmetry this leaves: the purchased row is a 30-day most-recent purchase
+while produced / in-kind are 7-day consumption.  Imputing a 7-day
+purchased value (q5a x price) was rejected -- it would fabricate a number
+no respondent reported.  See nigeria.food_acquired_for_wave.
 """
 import sys
-import numpy as np
+
 import pandas as pd
 
-sys.path.append('../../../_/')
-from lsms_library.local_tools import to_parquet, get_categorical_mapping, get_dataframe
-from lsms_library.transformations import food_acquired_to_canonical
-
-_food_labels_raw = get_categorical_mapping(tablename='harmonize_food',
-                                           idxvars='Code',
-                                           **{'Preferred Label': 'Preferred Label'})
-# Re-key harmonize_food on INT codes so the numeric item_cd (int64 in the
-# source CSV) resolves to its Preferred Label.  The Code column is
-# string-keyed, so a raw int j would otherwise never match and stay numeric
-# (GH #443).  Codes with a blank / '---' label legitimately stay raw.
-food_labels = {}
-for _k, _v in _food_labels_raw.items():
-    try:
-        _ik = int(_k)
-    except (TypeError, ValueError):
-        continue
-    if pd.isna(_v) or str(_v).strip() in ('', '---'):
-        continue
-    food_labels[_ik] = str(_v).strip()
-
-_unit_raw = get_categorical_mapping(tablename='u',
-                                     idxvars='Code',
-                                     **{'2018-19': '2018-19'})
-unitcodes = {k: v for k, v in _unit_raw.items() if isinstance(v, str)}
-
-zone_labels = {1: 'North central',
-               2: 'North east',
-               3: 'North west',
-               4: 'South east',
-               5: 'South south',
-               6: 'South west'}
-
-
-def extract_food(fn, varmap, t, food_labels):
-    """Read a food consumption file and produce a standardized DataFrame."""
-    df = get_dataframe(fn)
-
-    df = df.rename(columns=varmap)
-
-    # Apply food item labels from categorical_mapping.org
-    df['j'] = df['j'].replace(food_labels)
-
-    # Apply unit labels and zone labels
-    df['u'] = df['u'].replace(unitcodes).fillna('None')
-    df['m'] = df['m'].replace(zone_labels)
-
-    df['t'] = t
-
-    # Keep relevant columns
-    keep = ['t', 'i', 'j', 'u', 'm',
-            'Quantity', 'Expenditure', 'Produced', 'kg_factor']
-    # Only keep columns that exist (some may be absent in some waves)
-    keep = [c for c in keep if c in df.columns]
-    df = df[keep]
-
-    # Drop rows with no data at all
-    value_cols = [c for c in ['Quantity', 'Expenditure', 'Produced'] if c in df.columns]
-    df = df.replace('', pd.NA)
-    df = df.dropna(subset=value_cols, how='all')
-
-    return df
-
+sys.path.append('../../_/')
+from lsms_library.local_tools import to_parquet
+from nigeria import food_acquired_for_wave
 
 # --- Harvest (2019Q1) ---
-harvest_vars = {
-    'hhid': 'i',
-    'item_cd': 'j',
-    's10bq2a': 'Quantity',         # total quantity consumed past 7 days
-    's10bq2b': 'u',                # unit of consumption
-    's10bq10': 'Expenditure',      # total value purchased
-    's10bq5a': 'Produced',         # home produced quantity
-    's10bq2_cvn': 'kg_factor',     # exact Kg/L conversion factor (GH #378)
-    'zone': 'm',
-}
-harvest = extract_food('../Data/sect10b_harvestw4.csv',
-                        harvest_vars, '2019Q1', food_labels)
+harvest = food_acquired_for_wave(
+    '../Data/sect10b_harvestw4.csv', '2019Q1',
+    sources={
+        'purchased': {'quantity': 's10bq9a', 'unit': 's10bq9b',
+                      'kg_factor': 's10bq9_cvn'},
+        'produced':  {'quantity': 's10bq6a', 'unit': 's10bq2b',
+                      'kg_factor': 's10bq2_cvn'},
+        'inkind':    {'quantity': 's10bq7a', 'unit': 's10bq2b',
+                      'kg_factor': 's10bq2_cvn'},
+    },
+    expenditure='s10bq10')
 
 # --- Planting (2018Q3) ---
-planting_vars = {
-    'hhid': 'i',
-    'item_cd': 'j',
-    's7bq2a': 'Quantity',
-    's7bq2b': 'u',
-    's7bq10': 'Expenditure',
-    's7bq5a': 'Produced',
-    's7bq2_cvn': 'kg_factor',      # exact Kg/L conversion factor (GH #378)
-    'zone': 'm',
-}
-planting = extract_food('../Data/sect7b_plantingw4.csv',
-                         planting_vars, '2018Q3', food_labels)
+planting = food_acquired_for_wave(
+    '../Data/sect7b_plantingw4.csv', '2018Q3',
+    sources={
+        'purchased': {'quantity': 's7bq9a', 'unit': 's7bq9b',
+                      'kg_factor': 's7bq9_cvn'},
+        'produced':  {'quantity': 's7bq6a', 'unit': 's7bq2b',
+                      'kg_factor': 's7bq2_cvn'},
+        'inkind':    {'quantity': 's7bq7a', 'unit': 's7bq2b',
+                      'kg_factor': 's7bq2_cvn'},
+    },
+    expenditure='s7bq10')
 
-# --- Combine and index ---
-df = pd.concat([harvest, planting], ignore_index=True)
-
-# Convert ID to string for consistency with household_roster
-df['i'] = df['i'].astype(int).astype(str)
-
-df = df.set_index(['t', 'i', 'j', 'u'])
-
-# Sort and save
-df = df.sort_index()
-
-# Canonical reshape (GH #169): drop `m` (lives in cluster_features) and
-# melt (Quantity, Produced, Expenditure) onto the `s` (acquisition source)
-# axis.  `v` is added at API time by _join_v_from_sample.
-if 'm' in df.columns:
-    df = df.drop(columns=['m'])
-df = food_acquired_to_canonical(df, drop_columns=())
-df = df.sort_index()
+df = pd.concat([harvest, planting]).sort_index()
 
 to_parquet(df, 'food_acquired.parquet')

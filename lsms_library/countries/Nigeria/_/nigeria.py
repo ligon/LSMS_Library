@@ -1990,3 +1990,122 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     out['i'] = out['v']
     out = out.set_index(['t', 'v', 'i', 'j', 'u']).sort_index()
     return out[['Price']]
+
+
+# ---------------------------------------------------------------------
+# food_acquired (GH #591) -- acquisition-source split
+# ---------------------------------------------------------------------
+#
+# The GHS-Panel food module records 7-day consumption of each item and
+# decomposes it BY ACQUISITION SOURCE.  The questionnaire was RENUMBERED
+# after wave 1, and the wave scripts did not follow (GH #591) -- q5a was
+# bound to `Produced` in every wave, but from wave 2 on q5a is the
+# quantity consumed OUT OF PURCHASES, and own production moved to q6a.
+# The Stata variable labels are unambiguous:
+#
+#   W1 (2010-11)   q2a total consumed | q3a from purchases | q4 spend
+#                  | q5a own production | q6a gift
+#   W2 (2012-13)   q2a total consumed | q3a QUANTITY PURCHASED | q4 spend
+#   W3 (2015-16)   | q5a consumption from purchases | q6a own production
+#                  | q7a gift
+#   W4 (2018-19)   q2a total consumed (+q2_cvn kg factor)
+#                  | q5a from purchases | q6a own production | q7a gift
+#                  | q9a QUANTITY PURCHASED (+q9b unit, +q9_cvn kg factor)
+#                  | q10 spend on that purchase
+#
+# So: `Produced` is q5a in W1 but q6a in W2-W4, and the survey's own
+# purchase QUANTITY (the denominator the spend actually paid for) is q3a
+# in W1-W3 and q9a in W4 -- never the (total - produced) residual the old
+# scripts computed.  Gifts get their own canonical source (`inkind`).
+#
+# Every unit column (q2b/q3b/q5b/q6b/q7b/q9b) is coded in the SAME unit
+# code space (the `u` table in categorical_mapping.org), so each source
+# row carries the unit ITS quantity was reported in -- rather than
+# inheriting the consumption unit q2b, which differs from the W4 purchase
+# unit q9b in ~13% of rows.
+#
+# Reference-period caveat (W4 only): q9a/q10 describe the household's MOST
+# RECENT purchase within the last 30 days, while q6a/q7a are 7-day
+# consumption.  Pairing q10 with q9a is what makes the unit value a real
+# price (validated against the independent community_prices survey: median
+# ratio 0.95 on matched (t, j, u) cells, vs 1.05 and far noisier when q5a
+# is used as the denominator).  The alternative -- imputing a 7-day
+# purchased VALUE as q5a x price -- would fabricate a number no respondent
+# reported, so it is NOT done here.  Consumers aggregating quantity across
+# `s` for W4 should be aware the purchased row is a 30-day purchase, not a
+# 7-day consumption flow.
+
+def food_acquired_for_wave(fn, t, sources, expenditure,
+                           item='item_cd', hhid='hhid'):
+    """Canonical (t, i, j, u, s) food_acquired rows for one Nigeria round.
+
+    Parameters
+    ----------
+    fn : str
+        Path to the round's food module (``../Data/sect10b_harvestwN.csv``
+        or ``../Data/sect7b_plantingwN.csv``), read via ``get_dataframe``.
+    t : str
+        The round's period label (e.g. ``'2013Q1'``).
+    sources : dict
+        ``{s: {'quantity': var, 'unit': var, 'kg_factor': var|None}}`` for
+        each acquisition source ``s`` in ``purchased`` / ``produced`` /
+        ``inkind``.  ``kg_factor`` (optional) names a per-row survey-supplied
+        Kg/L conversion factor (W4's ``*_cvn``); when given, the row's exact
+        ``Quantity_kg`` is carried (GH #378).
+    expenditure : str
+        The variable holding the cash outlay.  Attached to the
+        ``s='purchased'`` row ONLY -- produced / in-kind rows carry no cash
+        expenditure (the framework's cross-country convention; see
+        ``food_expenditures_from_acquired`` basis='purchased', GH #575).
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed on ``(t, i, j, u, s)`` with columns ``Quantity``,
+        ``Expenditure`` (+ ``Quantity_kg`` where a kg factor was supplied).
+        ``v`` is intentionally absent -- joined from ``sample()`` at API
+        time.  Rows are kept where ``Quantity > 0`` OR ``Expenditure > 0``
+        and genuine duplicate keys are aggregated, via the shared
+        :func:`lsms_library.transformations._finalize_canonical_food_acquired`
+        tail (GH #251).
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.transformations import _finalize_canonical_food_acquired
+
+    df = get_dataframe(fn)
+
+    food_labels = harmonized_food_labels()
+
+    i = df[hhid].astype(int).astype(str)
+    j = df[item].replace(food_labels)
+    E = pd.to_numeric(df[expenditure], errors='coerce')
+
+    pieces = []
+    for s, spec in sources.items():
+        q = pd.to_numeric(df[spec['quantity']], errors='coerce')
+        # `u` is stored as the RAW unit code; the framework's automatic
+        # categorical mapping resolves it to the `u` table's Preferred
+        # Label at API time (do NOT pre-resolve here -- that is what every
+        # other Nigeria wave has always done and what the cached parquets
+        # hold).
+        u = df[spec['unit']]
+        piece = pd.DataFrame({
+            't': t,
+            'i': i.values,
+            'j': j.values,
+            'u': u.values,
+            's': s,
+            'Quantity': q.values,
+            'Expenditure': (E.values if s == 'purchased'
+                            else np.full(len(df), np.nan)),
+        })
+        kg_factor = spec.get('kg_factor')
+        if kg_factor is not None:
+            piece['Quantity_kg'] = (
+                q.values * pd.to_numeric(df[kg_factor], errors='coerce').values)
+        pieces.append(piece)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['u'] = out['u'].fillna('None')
+
+    return _finalize_canonical_food_acquired(out)

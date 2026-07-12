@@ -2,6 +2,75 @@
 * Food Conversion Table
 A food conversion table can be found at https://docs.google.com/spreadsheets/d/1whE_EW5x-jxrsKvYWfefdBppzp_TZhPP61bdEN-FEJ4/
 
+* food_acquired acquisition sources (GH #591)
+
+The GHS-Panel food module asks total 7-day consumption of each item and then
+decomposes it by *acquisition source*.  **The questionnaire was renumbered
+after wave 1** and the wave scripts did not follow.  The Stata variable
+labels (the =.dta= twins of the CSVs we build from) are unambiguous:
+
+| variable | W1 (2010-11)             | W2 / W3 (2012-13, 2015-16)      | W4 (2018-19)                        |
+|----------+--------------------------+---------------------------------+-------------------------------------|
+| q2a/q2b  | total consumed + unit    | total consumed + unit           | total consumed + unit (+q2_cvn kg)  |
+| q3a/q3b  | *from purchases* + unit  | *quantity purchased* + unit     | ---                                 |
+| q4       | amount spent             | amount spent                    | ---                                 |
+| q5a      | *own production*         | consumption from purchases      | consumption from purchases          |
+| q6a      | *gift*                   | *own production*                | *own production*                    |
+| q7a      | ---                      | *gift*                          | *gift / other*                      |
+| q8       | ---                      | ---                             | purchased in past 30 days? (y/n)    |
+| q9a/q9b  | ---                      | ---                             | *most recent purchase* + unit (+cvn)|
+| q10      | ---                      | ---                             | spent on that purchase              |
+
+Until #591 every wave mapped =q5a -> Produced=.  In W1 that is correct.  From
+W2 on, q5a is the quantity consumed *out of purchases*, so the build labelled
+purchases as own production and left the purchased row holding
+=(total - purchases) = q6a + q7a ~ 0= --- with the expenditure still riding on
+it.  =Price = Expenditure / 0 = inf=, and =food_prices_from_acquired= dropped
+those rows outright: **161--1,106 surviving price rows per wave against a
+120k--160k-row =food_acquired=**, and =food_quantities= reporting 87--94% of
+Nigerian food as own-produced (wave 1, never broken, says ~5%).
+
+Now each source row carries *its own reported quantity and its own reported
+unit* (all the =*b= unit columns share one code space), via
+=nigeria.food_acquired_for_wave=:
+
+- =s='purchased'= --- q3a/q3b (W1--W3) or q9a/q9b/q9_cvn (W4), with
+  =Expenditure= = q4 (W1--W3) or q10 (W4).  Quantity and Expenditure describe
+  the *same transaction*, which is what makes the unit value a price.
+- =s='produced'=  --- q5a (W1) or q6a (W2--W4).
+- =s='inkind'=    --- q6a (W1) or q7a (W2--W4).  Gifts were previously folded
+  into =purchased=.
+
+Validated against the *independent* =community_prices= survey (median
+survey/community unit-value ratio 0.95 on matched =(t, j, u)= cells in 2019Q1;
+93% within 25%).  =food_expenditures= is **unchanged, byte for byte** --- the
+expenditure always rode on the purchased row and still does.
+
+*** Reference-period caveat --- W4 (2018Q3 / 2019Q1) only
+
+W4 has no 7-day purchase-value question.  Its only monetary variable, q10, is
+the value of the household's *most recent purchase within the last 30 days*,
+and q9a is that purchase's quantity.  So for W4 the =purchased= row is a
+30-day purchase event while =produced= / =inkind= are 7-day consumption:
+**=Quantity= summed across =s= is not a 7-day consumption total for W4.**
+
+Pairing q10 with q9a is what makes the price right, and it keeps every stored
+number survey-reported.  The alternative --- imputing a 7-day purchased value
+as =q5a x price=, which is what the World Bank's own W4 consumption aggregate
+does --- was rejected here because it fabricates a number no respondent
+reported and would silently move =food_expenditures=.  Worth revisiting as its
+own issue.
+
+*** Stray unit codes in the per-source unit columns
+
+Carrying each source's own unit exposes three junk values the consumption unit
+=q2b= never had: codes *58* (W2 =q7b=), *65* (W3 =q3b=) and *103* (W3 =q5b=),
+one row each out of ~600k.  65 and 103 are *item* codes ("65. FRUITS: CANNED",
+"103. FISH-DRIED") that a keypunch put in a unit field; 58 has no label in any
+=.dta= label set.  They are left as raw codes rather than given an invented
+label --- the same treatment as the residual codes noted below.  (Sanity checks
+pass: =no_float_stringified_index= only inspects id levels.)
+
 * food_acquired unit codes (GH #223 Layer 2)
 
 The =s10bq2b= / =s7bq2b= unit variable is a numeric code.  The repo's

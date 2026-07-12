@@ -4,6 +4,7 @@
 A collection of mappings to transform dataframes.
 """
 import re
+import warnings
 
 import pandas as pd
 import numpy as np
@@ -29,6 +30,112 @@ from .build_transforms import (  # noqa: F401  (re-export for back-compat)
 # value constraints on index levels, so the enumeration lives here and is
 # enforced in code by :func:`validate_acquisition_source`.
 S_VALUES = ('purchased', 'produced', 'inkind', 'other')
+
+# Warn when this share of the rows that *should* have produced a price
+# instead get dropped as 0 / inf / NaN by ``food_prices_from_acquired``
+# (GH #591).  A price that cannot be computed is data loss; dropping the
+# row makes the loss invisible (the row does not come back as NaN -- it
+# ceases to exist), which is how Nigeria shipped six waves of
+# food_prices built on 0.5% of the data, all graded `sane`.
+#
+# Calibration (all 20 cached food_acquired parquets, 2026-07): the share of
+# expenditure-bearing rows lost at this step is 74% for Nigeria (pre-#591),
+# 7.9% for Cambodia (same Quantity==0-with-Expenditure>0 signature, tracked
+# separately), 0.2-1.9% for the EHCVM family / Serbia / Uganda / Tanzania /
+# GhanaSPS, and 0 elsewhere.  5% therefore fires on a genuine defect and
+# stays quiet on the ordinary long tail of unpriceable rows.
+PRICE_LOSS_WARN_THRESHOLD = 0.05
+
+
+class UnpriceableRowsWarning(UserWarning):
+    """Emitted when ``food_prices`` drops a large share of priceable rows.
+
+    Subclasses ``UserWarning`` so it can be filtered / promoted to an error
+    (``warnings.simplefilter('error', UnpriceableRowsWarning)``) independently
+    of the library's other warnings.
+    """
+
+
+def _as_float(s):
+    """Series -> float64 ndarray with NaN for missing (pd.NA-safe)."""
+    return pd.to_numeric(s, errors='coerce').to_numpy(dtype='float64',
+                                                      na_value=np.nan)
+
+
+def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
+    """Drop rows with a 0 / +-inf / NaN Price -- loudly (GH #591).
+
+    Splits the dropped rows by cause before discarding them, records the
+    tally on ``result.attrs['price_rows_dropped']``, and emits ONE
+    aggregated :class:`UnpriceableRowsWarning` per call (never one per row)
+    when the loss exceeds *threshold* of the rows that ought to have
+    produced a price.
+
+    Causes
+    ------
+    ``inf``
+        ``Price = Expenditure / 0``: the survey recorded money spent but a
+        zero (or zero-after-kg-conversion) quantity.  ALWAYS a data defect
+        -- either a 0-as-missing sentinel or, as in Nigeria, a quantity
+        variable bound to the wrong survey question.
+    ``nan``
+        Quantity missing, or a unit with no kg factor (the ``kg*`` modes).
+    ``zero``
+        Zero Expenditure (``*value``) or a zero reported Price (``*price``).
+
+    Parameters
+    ----------
+    v : DataFrame
+        Frame carrying the computed ``Price`` column.
+    units : str
+        The ``food_prices`` mode, for the message.
+    expected : boolean ndarray
+        Rows that OUGHT to have produced a price -- the denominator of the
+        loss fraction.  Supplied by the caller from the *inputs* (Expenditure
+        > 0 for the ``*value`` modes; a non-null REPORTED Price for the
+        ``*price`` modes), never from the computed Price, so a conversion
+        failure counts as a loss rather than silently shrinking the base.
+    """
+    price = _as_float(v['Price'])
+
+    is_inf = np.isinf(price)
+    is_nan = np.isnan(price)
+    is_zero = (price == 0)
+    dropped = is_inf | is_nan | is_zero
+
+    expected = np.asarray(expected, dtype=bool)
+    lost = int((dropped & expected).sum())
+    n_expected = int(expected.sum())
+    tally = {
+        'units': units,
+        'rows_in': int(len(v)),
+        'expected': n_expected,
+        'dropped_total': int(dropped.sum()),
+        'dropped_expected': lost,
+        'inf': int((is_inf & expected).sum()),
+        'nan': int((is_nan & expected).sum()),
+        'zero': int((is_zero & expected).sum()),
+        'lost_fraction': (lost / n_expected) if n_expected else 0.0,
+    }
+
+    if n_expected and lost / n_expected > threshold:
+        warnings.warn(
+            f"food_prices(units={units!r}): dropped {lost:,} of {n_expected:,} "
+            f"priceable rows ({lost / n_expected:.1%}) because Price was "
+            f"inf ({tally['inf']:,}), NaN ({tally['nan']:,}) or zero "
+            f"({tally['zero']:,}).  An inf Price means the survey recorded an "
+            f"Expenditure against a ZERO Quantity -- typically a 0-as-missing "
+            f"sentinel or a quantity variable mapped to the wrong survey "
+            f"question.  These rows are DROPPED, not returned as NaN, so the "
+            f"gap is otherwise invisible.  See GH #591.",
+            UnpriceableRowsWarning,
+            stacklevel=3,
+        )
+
+    out = v[~dropped][['Price']]
+    out.attrs = dict(v.attrs)
+    out.attrs['price_rows_dropped'] = tally
+    return out
 
 
 def validate_acquisition_source(df: pd.DataFrame) -> None:
@@ -686,6 +793,13 @@ def food_expenditures_from_acquired(df, basis='purchased'):
 
     idx_names = list(df.index.names)
 
+    # Drop zero / missing Expenditure.  Unlike the same-shaped drop in
+    # food_prices_from_acquired (GH #591), this one is NOT silent data loss
+    # and deliberately gets no warning: a zero expenditure contributes zero
+    # to every downstream sum, so dropping the row is a sparsity convention,
+    # not the destruction of a number the user needed.  (The price drop is
+    # different in kind: there the row carried a POSITIVE expenditure and
+    # the price was uncomputable, so the row's information dies with it.)
     x = df[['Expenditure']].replace(0, np.nan).dropna()
     if basis == 'purchased' and 's' in idx_names:
         # Cash outlay only — drop non-purchased sources so the figure means
@@ -930,7 +1044,19 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
             # No u index → can't convert; emit NaN
             v = df.assign(Price=np.nan)
 
-    v = v[['Price']].replace([0, np.inf, -np.inf], np.nan).dropna()
+    # Zero / infinite / NaN prices are dropped -- but NOT silently (GH #591).
+    # The denominator of the loss is taken from the INPUTS: the rows that
+    # ought to have produced a price.  ``.replace(...).dropna()`` used to do
+    # this in one wordless expression, which is how ~99% of Nigeria's price
+    # rows vanished without a trace.  NaN-and-keep was considered and
+    # rejected: it would change the shape of food_prices for every country
+    # (Uganda +6,456 rows, Serbia +3,767, Tanzania +714, GhanaSPS +883) and
+    # downstream demand code assumes a dense frame.
+    if units in ('kgvalue', 'unitvalue'):
+        expected = _as_float(df['Expenditure']) > 0
+    else:                                   # 'kgprice' / 'unitprice'
+        expected = ~np.isnan(_as_float(df['Price']))
+    v = _drop_unpriceable(v, units, expected)
 
     # Aggregate over any non-canonical recall level (e.g. GhanaLSS's
     # ``visit`` — ~12 repeated recall visits per month) at the country
@@ -946,7 +1072,12 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
     # arbitrary visit's price via ``groupby().first()`` (GH #517).
     group_by = [n for n in ['t', 'i', 'j', 'u', 's'] if n in v.index.names]
     if group_by:
+        tally = v.attrs.get('price_rows_dropped')
         v = v.groupby(group_by).median()
+        # groupby drops attrs (pandas 2.x/3.x) -- keep the drop tally so a
+        # caller can audit the loss without parsing the warning text.
+        if tally is not None:
+            v.attrs['price_rows_dropped'] = tally
     return v
 
 
