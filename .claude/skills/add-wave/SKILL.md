@@ -34,10 +34,20 @@ Returns a list of dicts annotated with:
 | key            | meaning                                                                 |
 |----------------|-------------------------------------------------------------------------|
 | `local`        | `bool` — `True` only when a wave dir *records* this catalog id.          |
-| `local_status` | `"yes"` / `"no"` / `"unknown"` — the honest tri-state (see below).       |
-| `local_waves`  | the wave directories backing this entry.                                 |
+| `local_status` | `"yes"` / `"covered"` / `"derived"` / `"unknown"` / `"no"` (see below).  |
+| `local_waves`  | the wave dirs that back, cover, or constitute this entry.                |
 
-Waves with `local_status == "no"` are on the WB but not yet in the repo.
+**Only `local_status == "no"` is an acquisition candidate**, and a `no` has to
+be *earned* — it is a confident claim that we neither hold this study nor
+anything containing it (GH #600):
+
+| status | meaning | `local` |
+|---|---|---|
+| `yes` | a wave dir records this catalog id | `True` |
+| `covered` | we don't hold its files, but a release we *do* hold subsumes its content — Tanzania's `2008-15/` holds the Uniform Panel Dataset (3814), whose `round` column carries NPS rounds 1–4 (76, 1050, 2252, 2862) | `False` |
+| `derived` | built *out of* entries we hold, **all** of them — Nigeria 5835 is the four GHS-Panel waves, harmonized | `False` |
+| `unknown` | we cannot say: a matching dir records no WB id, **or** the label is a logical wave inside a multi-round folder that no record accounts for | `False` |
+| `no` | not held, not covered, not derived: a real gap | `False` |
 
 **Matching is on the WB catalog id, not on the wave label.** Each wave dir
 records the catalog entry it came from in `Documentation/SOURCE.org`
@@ -47,11 +57,19 @@ share a year range (Nigeria's GHS-Panel W4 **3557** and Living Standards
 Survey **3827** both span 2018–2019), and one catalog entry can span two of
 our wave dirs (Uganda **1001** covers both `2005-06/` and `2009-10/`).
 
-`local_status == "unknown"` means a directory whose label matches exists but
-has **no recorded WB catalog id** — so we cannot say whether it holds this
-study or a different one with the same year range. Such rows carry
-`local=False`: an unverified claim is treated as not-held, because wrongly
-believing we hold a survey is the failure mode that hides missing data.
+**But the id is not a 1:1 key either.** `#+CATALOG_ID:` is a **list** — one dir
+can hold several entries (`Malawi/2016-17/` is `2936, 2939`: IHS4 in
+`Data/Cross_Sectional/`, the 2016 IHPS panel wave in `Data/Panel/`). Entries a
+held release *subsumes* go in `#+CATALOG_COVERS:` — **covered is not held**, and
+claiming otherwise is the same false claim pointed the other way. Relations
+*between catalog entries* (a study re-catalogued in a second repository; a
+derived re-release) live in `lsms_library/catalog_relations.yml`, each with its
+evidence.
+
+**When you add a wave, check whether its `Data/` holds more than one catalog
+entry** — a `Panel/` + `Cross_Sectional/` split is the tell. The WB datafile API
+settles it in one call: `/index.php/api/catalog/{id}/data_files?id_format=id`
+lists an entry's files; compare against the `.dta` you actually downloaded.
 
 To (re)stamp provenance across the tree:
 

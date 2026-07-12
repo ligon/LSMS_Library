@@ -483,3 +483,369 @@ class TestCountryCatalogRegistry:
     def test_unregistered_country_returns_empty(self, countries):
         from lsms_library.data_access import discover_waves
         assert discover_waves("Atlantis") == []
+
+
+# ---------------------------------------------------------------------------
+# GH #600 -- catalog_id is not a 1:1 key, in EITHER direction.
+#
+# The failure this section pins down is not a gap but a CONFIDENT FALSE CLAIM:
+# `local_status='no'` on studies we demonstrably hold.  Every relation asserted
+# below was checked against the WB datafile API
+# (`/api/catalog/{id}/data_files`) -- see `.coder/ledger/600-provenance-1to1.md`
+# for the file counts and the instrument's positive/negative controls.
+# ---------------------------------------------------------------------------
+
+# Malawi: ONE directory, TWO catalog entries.  Malawi/2016-17/Data/
+# Cross_Sectional/ is IHS4 (2936); Data/Panel/ is the 2016 wave of the IHPS
+# long-term panel (2939) -- 97 of its 98 files are in 2939's datafile list and
+# NONE in 2936's.
+MWI_ROWS = [
+    {"id": "1003", "idno": "MWI_2010_IHS-III_v01_M", "title": "IHS3",
+     "year_start": 2010, "year_end": 2011, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/1003"},
+    {"id": "2936", "idno": "MWI_2016_IHS-IV_v04_M", "title": "IHS4",
+     "year_start": 2016, "year_end": 2017, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/2936"},
+    {"id": "2939", "idno": "MWI_2010-2016_IHPS_v03_M", "title": "IHPS long panel",
+     "year_start": 2010, "year_end": 2016, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/2939"},
+]
+
+# Tanzania: ONE directory (2008-15/), whose held release (the Uniform Panel
+# Dataset, 3814) SUBSUMES four entries whose files we do not hold.
+TZA_ROWS = [
+    {"id": "76", "idno": "TZA_2008_NPS-R1_v03_M", "title": "NPS Round 1",
+     "year_start": 2008, "year_end": 2009, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/76"},
+    {"id": "1050", "idno": "TZA_2010_NPS-R2_v03_M", "title": "NPS Round 2",
+     "year_start": 2010, "year_end": 2011, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/1050"},
+    {"id": "2252", "idno": "TZA_2012_NPS-R3_v01_M", "title": "NPS Round 3",
+     "year_start": 2012, "year_end": 2013, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/2252"},
+    {"id": "2862", "idno": "TZA_2014_NPS-R4_v03_M", "title": "NPS Round 4",
+     "year_start": 2014, "year_end": 2015, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/2862"},
+    {"id": "3814", "idno": "TZA_2008-2014_NPS-UPD_v01_M", "title": "Uniform Panel Dataset",
+     "year_start": 2008, "year_end": 2015, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/3814"},
+    # An alternative version of Round 4 whose master (2862) we do NOT hold, and
+    # a different survey entirely.  Neither is covered by the UPD.
+    {"id": "3455", "idno": "TZA_2014_NPS-R4_v03_M_v03_A_EXT", "title": "NPS R4 extended",
+     "year_start": 2013, "year_end": 2016, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/3455"},
+    {"id": "2863", "idno": "TZA_2016_NPS-FTFISS_v01_M", "title": "Feed the Future ISS",
+     "year_start": 2016, "year_end": 2016, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/2863"},
+]
+
+# Nigeria: the WB re-releases the four GHS-Panel waves we hold as one
+# harmonized "Uniform Panel Dataset" (5835).  We hold every constituent.
+NGA_NUPD_ROWS = NGA_ROWS + [
+    {"id": "2734", "idno": "NGA_2015_GHSP-W3_v02_M", "title": "GHS Panel W3",
+     "year_start": 2015, "year_end": 2016, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/2734"},
+    {"id": "1952", "idno": "NGA_2012_GHSP-W2_v02_M", "title": "GHS Panel W2",
+     "year_start": 2012, "year_end": 2013, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/1952"},
+    {"id": "5835", "idno": "NGA_2010-2019_NUPD_v01_M", "title": "GHS Panel Uniform Panel Data",
+     "year_start": 2010, "year_end": 2019, "doi": "", "repository": "lsms",
+     "url": "https://microdata.worldbank.org/index.php/catalog/5835"},
+]
+
+
+def _wb(country, wave, catalog_id=None, catalog_ids=None, covers=None):
+    """A rendered worldbank SOURCE.org for a wave."""
+    return pv.render_source_org(pv.WaveProvenance(
+        country=country, wave=wave, source=pv.SOURCE_WORLDBANK,
+        catalog_id=catalog_id, catalog_ids=list(catalog_ids or []),
+        covers=list(covers or []),
+        url=("https://microdata.worldbank.org/index.php/catalog/"
+             f"{(catalog_ids or [catalog_id])[0]}")))
+
+
+class TestMultipleIdsPerWaveDir:
+    """One directory can hold the files of SEVERAL catalog entries."""
+
+    def test_repeated_catalog_id_lines_accumulate(self):
+        """They used to silently LAST-WIN: a dict comprehension over findall.
+
+        You could not record a second id even by hand, and nothing said so."""
+        prov = pv.parse_source_org(
+            "SOURCE\n\nhttps://x/catalog/2936\n\n"
+            "#+CATALOG_ID: 2936\n#+CATALOG_ID: 2939\n"
+            "#+PROVENANCE_SOURCE: worldbank\n", "Malawi", "2016-17")
+        assert prov.catalog_ids == ["2936", "2939"]
+
+    def test_comma_separated_catalog_id_list(self):
+        prov = pv.parse_source_org(
+            "SOURCE\n\nhttps://x/catalog/2936\n\n"
+            "#+CATALOG_ID: 2936, 2939\n#+PROVENANCE_SOURCE: worldbank\n",
+            "Malawi", "2016-17")
+        assert prov.catalog_ids == ["2936", "2939"]
+        # The scalar stays the PRIMARY entry -- every pre-#600 reader still works.
+        assert prov.catalog_id == "2936"
+        assert prov.is_worldbank
+
+    def test_single_id_still_parses_as_a_one_element_list(self):
+        """The 121 other shipped SOURCE.org files must be unaffected."""
+        prov = pv.parse_source_org(
+            "SOURCE\n\nhttps://x/catalog/3557\n\n#+CATALOG_ID: 3557\n"
+            "#+PROVENANCE_SOURCE: worldbank\n", "Nigeria", "2018-19")
+        assert prov.catalog_ids == ["3557"]
+        assert prov.catalog_id == "3557"
+
+    def test_render_then_parse_round_trips_a_multi_id_record(self):
+        text = _wb("Malawi", "2016-17", catalog_ids=["2936", "2939"])
+        assert "#+CATALOG_ID: 2936, 2939" in text
+        back = pv.parse_source_org(text, "Malawi", "2016-17")
+        assert back.catalog_ids == ["2936", "2939"]
+        # Idempotent: rendering the parsed record reproduces the file.
+        assert pv.render_source_org(back) == text
+
+    def test_local_catalog_ids_reports_every_id_a_dir_holds(self, countries):
+        from lsms_library.data_access import local_catalog_ids
+        _write_source(countries, "Malawi", "2016-17",
+                      _wb("Malawi", "2016-17", catalog_ids=["2936", "2939"]))
+        held = local_catalog_ids("Malawi")
+        assert held == {"2936": ["2016-17"], "2939": ["2016-17"]}
+
+    def test_ihps_panel_we_hold_is_not_reported_missing(self, countries,
+                                                       monkeypatch):
+        """THE regression (GH #600).  Malawi/2016-17/Data/Panel/ IS the 2016
+        wave of the IHPS long-term panel (2939): 97 of its 98 files appear in
+        2939's WB datafile list and none in IHS4's.  Recording only 2936 made
+        discovery report a study we hold as MISSING."""
+        from lsms_library.data_access import discover_waves
+        _mock_catalog(monkeypatch, MWI_ROWS)
+        _write_source(countries, "Malawi", "2010-11",
+                      _wb("Malawi", "2010-11", catalog_id="1003"))
+        _write_source(countries, "Malawi", "2016-17",
+                      _wb("Malawi", "2016-17", catalog_ids=["2936", "2939"]))
+
+        by_id = {e["id"]: e for e in discover_waves("Malawi")}
+        for cid in ("2936", "2939"):
+            assert by_id[cid]["local_status"] == "yes", cid
+            assert by_id[cid]["local"] is True, cid
+            assert by_id[cid]["local_waves"] == ["2016-17"], cid
+
+
+class TestCoveredIsNotHeldAndIsNotMissing:
+    """Tanzania/2008-15/ holds ONE entry (the UPD) that SUBSUMES four others."""
+
+    def test_covers_round_trips(self):
+        text = _wb("Tanzania", "2008-15", catalog_id="3814",
+                   covers=["76", "1050", "2252", "2862"])
+        assert "#+CATALOG_COVERS: 76, 1050, 2252, 2862" in text
+        back = pv.parse_source_org(text, "Tanzania", "2008-15")
+        assert back.catalog_ids == ["3814"]
+        assert back.covers == ["76", "1050", "2252", "2862"]
+        assert pv.render_source_org(back) == text
+
+    def test_the_four_nps_rounds_are_covered_not_missing(self, countries,
+                                                         monkeypatch):
+        """THE regression (GH #600).  We hold the Uniform Panel Dataset, whose
+        `round` column carries rounds 1-4 -- which is why Country('Tanzania')
+        exposes four waves out of one directory.  Discovery reported all four
+        individual NPS entries as `no`: the largest cluster of false 'missing
+        wave' rows in the census."""
+        from lsms_library.data_access import discover_waves
+        _mock_catalog(monkeypatch, TZA_ROWS)
+        _write_source(countries, "Tanzania", "2008-15",
+                      _wb("Tanzania", "2008-15", catalog_id="3814",
+                          covers=["76", "1050", "2252", "2862"]))
+
+        by_id = {e["id"]: e for e in discover_waves("Tanzania")}
+        assert by_id["3814"]["local_status"] == "yes"
+        for cid in ("76", "1050", "2252", "2862"):
+            assert by_id[cid]["local_status"] == "covered", cid
+            # Covered is not held: we do NOT have these entries' files.  The
+            # bool contract is unchanged for every existing caller.
+            assert by_id[cid]["local"] is False, cid
+            assert by_id[cid]["local_waves"] == ["2008-15"], cid
+
+    def test_covered_does_not_sweep_up_neighbouring_entries(self, countries,
+                                                            monkeypatch):
+        """`covered` must be earned per-entry, not inferred from the folder.
+
+        3455 is an alternative version of Round 4 whose master we do not hold;
+        2863 is a different survey (Feed the Future).  Both stay `no`."""
+        from lsms_library.data_access import discover_waves
+        _mock_catalog(monkeypatch, TZA_ROWS)
+        _write_source(countries, "Tanzania", "2008-15",
+                      _wb("Tanzania", "2008-15", catalog_id="3814",
+                          covers=["76", "1050", "2252", "2862"]))
+
+        by_id = {e["id"]: e for e in discover_waves("Tanzania")}
+        assert by_id["3455"]["local_status"] == "no"
+        assert by_id["2863"]["local_status"] == "no"
+
+
+class TestPartialRecordCannotMasqueradeAsKnowledge:
+    """A multi-round folder whose record does not account for a logical wave
+    must yield `unknown` -- never a confident `no`."""
+
+    def test_unrecorded_logical_wave_is_unknown_not_no(self, countries,
+                                                       monkeypatch):
+        """The structural backstop: with NO `covers` line at all, the four NPS
+        entries are still not called missing, because Tanzania exposes waves
+        with exactly those labels out of its multi-round folder.  Silence must
+        not masquerade as knowledge -- and neither must a partial record."""
+        from lsms_library import data_access as da
+        _mock_catalog(monkeypatch, TZA_ROWS)
+        # The folder records the UPD and nothing else -- the pre-#600 state.
+        _write_source(countries, "Tanzania", "2008-15",
+                      _wb("Tanzania", "2008-15", catalog_id="3814"))
+        # Tanzania's wave_folder_map backs four logical waves out of 2008-15/.
+        monkeypatch.setattr(da, "_logical_wave_labels",
+                            lambda c: {"2008-09", "2010-11", "2012-13",
+                                       "2014-15"})
+
+        by_id = {e["id"]: e for e in da.discover_waves("Tanzania")}
+        for cid in ("76", "1050", "2252", "2862"):
+            assert by_id[cid]["local_status"] == "unknown", cid
+            assert by_id[cid]["local"] is False, cid
+        # A different survey that shares no logical-wave label is still a
+        # confident `no`: the escape hatch must not become a blanket amnesty.
+        assert by_id["2863"]["local_status"] == "no"
+
+    def test_logical_wave_labels_finds_tanzanias_multiround_waves(self):
+        """Validate the instrument itself: the backstop reads the country's own
+        wave_folder_map, so it must actually SEE Tanzania's four folder-backed
+        waves.  A check that cannot find anything proves nothing."""
+        from lsms_library.data_access import _logical_wave_labels
+        assert _logical_wave_labels("Tanzania") == {
+            "2008-09", "2010-11", "2012-13", "2014-15"}
+        # A country with a dir per wave has no folder-backed logical waves.
+        assert _logical_wave_labels("Malawi") == set()
+
+
+class TestCatalogRelations:
+    """Facts about the CATALOG, which no wave dir of ours can state alone."""
+
+    def test_a_uniform_panel_built_from_waves_we_hold_is_not_a_gap(
+            self, countries, monkeypatch):
+        """Nigeria 5835 (`NGA_2010-2019_NUPD`) is the four GHS-Panel waves we
+        hold, harmonized -- not new fieldwork, not an acquisition target."""
+        from lsms_library.data_access import discover_waves
+        _mock_catalog(monkeypatch, NGA_NUPD_ROWS)
+        for wave, cid in (("2010-11", "1002"), ("2012-13", "1952"),
+                          ("2015-16", "2734"), ("2018-19", "3557")):
+            _write_source(countries, "Nigeria", wave,
+                          _wb("Nigeria", wave, catalog_id=cid))
+
+        by_id = {e["id"]: e for e in discover_waves("Nigeria")}
+        assert by_id["5835"]["local_status"] == "derived"
+        assert by_id["5835"]["local"] is False          # we hold no NUPD file
+        assert by_id["5835"]["local_waves"] == ["2010-11", "2012-13",
+                                                "2015-16", "2018-19"]
+        # The survey we genuinely do not hold is still a confident `no`.
+        assert by_id["3827"]["local_status"] == "no"
+
+    def test_derived_needs_EVERY_constituent_and_downgrades_on_its_own(
+            self, countries, monkeypatch):
+        """The completeness rule is what keeps `derived_from` honest.  Drop one
+        constituent wave and 5835 goes back to being reported missing, with
+        nobody having to remember to edit catalog_relations.yml."""
+        from lsms_library.data_access import discover_waves
+        _mock_catalog(monkeypatch, NGA_NUPD_ROWS)
+        for wave, cid in (("2010-11", "1002"), ("2012-13", "1952"),
+                          ("2018-19", "3557")):       # 2734 (W3) NOT held
+            _write_source(countries, "Nigeria", wave,
+                          _wb("Nigeria", wave, catalog_id=cid))
+
+        by_id = {e["id"]: e for e in discover_waves("Nigeria")}
+        assert by_id["5835"]["local_status"] == "no"
+
+    def test_same_study_under_two_repository_ids_reads_as_held(
+            self, countries, monkeypatch):
+        """South Africa 1993 is `lsms` 297 AND `datafirst` 902 -- identical
+        71-file lists, one survey.  A census that surfaces 902 must not call it
+        a missing wave.
+
+        Today two things keep 902 out of the census: the search is `lsms`-only,
+        and (with GH #597/PR #599) South Africa's `idno_pattern` pins the
+        IHS/GHS series.  Both are *incidental* guards -- widen either and the
+        duplicate reappears.  So the test admits the entry deliberately (a
+        pattern-free spec, i.e. a widening) and checks the guard that is
+        actually about identity: the same-study alias."""
+        from lsms_library.data_access import (CountryCatalog, _COUNTRY_CATALOG,
+                                              discover_waves)
+        monkeypatch.setitem(_COUNTRY_CATALOG, "South Africa",
+                            CountryCatalog("ZAF"))
+        _mock_catalog(monkeypatch, [
+            {"id": "297", "idno": "ZAF_1993_IHS_v01_M", "title": "IHS 1993",
+             "year_start": 1993, "year_end": 1993, "doi": "",
+             "repository": "lsms",
+             "url": "https://microdata.worldbank.org/index.php/catalog/297"},
+            {"id": "902", "idno": "ZAF_1993_PSLSD_v01_M", "title": "PSLSD 1993",
+             "year_start": 1993, "year_end": 1993, "doi": "",
+             "repository": "datafirst",
+             "url": "https://microdata.worldbank.org/index.php/catalog/902"},
+        ])
+        _write_source(countries, "South Africa", "1993",
+                      _wb("South Africa", "1993", catalog_id="297"))
+
+        by_id = {e["id"]: e for e in discover_waves("South Africa")}
+        assert by_id["297"]["local_status"] == "yes"
+        assert by_id["902"]["local_status"] == "yes"
+        assert by_id["902"]["local_waves"] == ["1993"]
+
+    def test_a_derived_subset_is_not_an_alias(self):
+        """Malawi `central` 3016 is a 4-file ML subset of IHS3 (1003), NOT a
+        co-equal re-catalogue.  Flattening a subset into an equivalence would
+        repeat the original sin: a real relation crushed onto a key that cannot
+        express it."""
+        from lsms_library.catalog_relations import (derived_from,
+                                                    same_study_aliases)
+        assert derived_from()["3016"] == ["1003"]
+        assert "3016" not in same_study_aliases()
+
+    def test_every_relation_carries_its_evidence(self):
+        """An unevidenced negative is unfalsifiable, and therefore permanent."""
+        from lsms_library import catalog_relations as cr
+        for cid in list(cr.derived_from()) + list(cr.same_study_aliases()):
+            assert cr.evidence_for(cid), f"{cid} has no recorded evidence"
+
+
+class TestBackfillDoesNotClobberHandRecordedFacts:
+
+    def test_restamp_preserves_extra_ids_covers_note_and_validation(self):
+        """`backfill_wave_provenance.py` rebuilds each record from the catalog.
+        The catalog cannot tell it that a dir holds a SECOND entry, or that a
+        release covers others -- so a naive re-stamp would silently delete
+        exactly the facts this issue exists to record."""
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+        import backfill_wave_provenance as bf
+
+        entry = {"id": "3814", "idno": "TZA_2008-2014_NPS-UPD_v01_M",
+                 "title": "UPD", "year_start": 2008, "year_end": 2015,
+                 "doi": "", "repository": "lsms",
+                 "url": "https://microdata.worldbank.org/index.php/catalog/3814"}
+        prov = bf._from_entry(
+            "Tanzania", "2008-15", entry, "source-url", "2026-07-12",
+            note="evidence here", validation=pv.VALIDATION_CONTENT,
+            also_ids=["9999"], covers=["76", "1050", "2252", "2862"])
+        assert prov.catalog_ids == ["3814", "9999"]
+        assert prov.covers == ["76", "1050", "2252", "2862"]
+        assert prov.note == "evidence here"
+        assert prov.validation == pv.VALIDATION_CONTENT
+
+
+class TestShippedRecordsSayWhatWeMeasured:
+    """The three directories whose provenance was structurally incomplete."""
+
+    def test_tanzania_2008_15_covers_the_four_nps_rounds(self):
+        from lsms_library.data_access import _COUNTRIES_DIR
+        prov = pv.read_provenance(_COUNTRIES_DIR, "Tanzania", "2008-15")
+        assert prov.catalog_ids == ["3814"]        # we hold the UPD, only
+        assert prov.covers == ["76", "1050", "2252", "2862"]
+
+    @pytest.mark.parametrize("wave,ids", [("2016-17", ["2936", "2939"]),
+                                          ("2019-20", ["3818", "3819"])])
+    def test_malawi_wave_dirs_hold_two_entries_each(self, wave, ids):
+        from lsms_library.data_access import _COUNTRIES_DIR
+        prov = pv.read_provenance(_COUNTRIES_DIR, "Malawi", wave)
+        assert prov.catalog_ids == ids
+        assert prov.covers == []                   # held, not covered

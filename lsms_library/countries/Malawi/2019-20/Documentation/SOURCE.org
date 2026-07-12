@@ -2,7 +2,7 @@ SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/3818
 
-#+CATALOG_ID: 3818
+#+CATALOG_ID: 3818, 3819
 #+CATALOG_IDNO: MWI_2019_IHS-V_v06_M
 #+CATALOG_TITLE: Fifth Integrated Household Survey 2019-2020
 #+CATALOG_YEARS: 2019-2020
@@ -11,4 +11,6 @@ https://microdata.worldbank.org/index.php/catalog/3818
 #+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3818
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
+#+PROVENANCE_VALIDATION: content-validated
 #+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: TWO catalog entries live in this one directory (GH #600). Data/Cross_Sectional/ is the Fifth Integrated Household Survey, id 3818 (103 of 108 of 3818's files). Data/Panel/ is the 2019 wave of the Integrated Household Panel Survey, id 3819 (MWI_2010-2019_IHPS_v06_M, "Long-Term Panel, 102 EAs"): 96 of its 97 files appear in 3819's WB datafile list and NONE in 3818's. The other CATALOG_* keys above describe the primary entry (3818). We hold 3819's 2019 wave; 3819 also re-releases the 2010/2013/2016 IHPS data, which we hold in their original release form (1003, 2248, 2939). Checked 2026-07-12 against the WB datafile API.

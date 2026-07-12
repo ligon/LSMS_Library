@@ -232,11 +232,21 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
                 today: str, note: str | None = None,
                 superseded: str | None = None,
                 notes: str | None = None,
-                validation: str | None = None) -> WaveProvenance:
+                validation: str | None = None,
+                also_ids: list[str] | None = None,
+                covers: list[str] | None = None) -> WaveProvenance:
+    # ``also_ids`` / ``covers`` are hand-recorded facts this script cannot
+    # rediscover from the catalog: the OTHER entries a directory holds, and the
+    # entries a held release subsumes (GH #600).  A re-stamp must carry them
+    # through -- rebuilding the record from the catalog alone would silently
+    # delete them, which is how a partial record gets created in the first place.
+    primary = str(entry["id"])
+    ids = [primary] + [i for i in (also_ids or []) if i != primary]
     return WaveProvenance(
         country=country, wave=wave,
         source=SOURCE_WORLDBANK,
-        catalog_id=str(entry["id"]),
+        catalog_ids=ids,
+        covers=list(covers or []),
         idno=entry.get("idno") or None,
         title=entry.get("title") or None,
         years=_years(entry),
@@ -286,7 +296,9 @@ def resolve(country: str, wave: str, root: Path,
             return _from_entry(country, wave, entry, "manual-override", today,
                                note=ov["note"], superseded=superseded,
                                notes=keep,
-                               validation=ov.get("validation")), "override"
+                               validation=ov.get("validation"),
+                               also_ids=existing.catalog_ids[1:],
+                               covers=existing.covers), "override"
 
     url = existing.url or ""
 
@@ -303,9 +315,18 @@ def resolve(country: str, wave: str, root: Path,
                       if existing.method in ("doi-lookup", "manual-override",
                                              "add-wave")
                       else "source-url")
+            # Everything the catalog cannot tell us -- the additional entries
+            # this dir holds, the entries the held release covers, the
+            # hand-written note, how strongly the id is corroborated -- is
+            # carried through verbatim.  A re-stamp records what the catalog
+            # says; it must not erase what a human established (GH #600).
             return _from_entry(country, wave, entry, method, today,
                                notes=keep,
-                               superseded=existing.superseded_url), method
+                               superseded=existing.superseded_url,
+                               note=existing.note,
+                               validation=existing.validation,
+                               also_ids=existing.catalog_ids[1:],
+                               covers=existing.covers), method
         # Recorded an id the catalog does not have for this country.  Do not
         # invent a replacement.
         return WaveProvenance(
