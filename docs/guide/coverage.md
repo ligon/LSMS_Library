@@ -28,6 +28,70 @@ re-implements the sanity checks.
 | `builds` | The wave slice is non-empty but fails a sanity check (`SanityReport.ok is False`). |
 | `sane` | The wave slice is non-empty and passes every sanity check (warnings allowed). |
 | `blessed` | `sane` **and** listed in the git-tracked blessing file `.coder/coverage/blessed.csv`. |
+| `not-asked` | Adjudicated: the survey instrument genuinely never asked. Closed. |
+| `asked-not-distributed` | Adjudicated: the instrument **did** ask, but the shipped extract does not carry the variables. An *acquisition* problem. |
+
+## Adjudicating an `absent` cell
+
+`absent` alone says only *"the feature is not declared for this wave."* That
+conflates states that could not be more different, and until they are separated
+the number can never reach zero:
+
+| verdict | meaning | closes the cell? | routes to |
+|---|---|---|---|
+| `todo` | the data **is** there; nobody wrote the config | no — stays `absent` | `add-feature` |
+| `asked-not-distributed` | asked, but the extract lacks it | **yes** | acquisition / `add-wave` |
+| `not-asked` | genuinely never asked | **yes** | closed forever |
+| `unsure` | a required check could not be run | no — stays `absent` | human / OCR |
+
+Verdicts live in the git-tracked `.coder/coverage/absent_verdicts.csv`:
+
+```csv
+country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date
+Albania,shocks,2005,todo,C1;C2,Data/migrationE_cl.dta m6e_q00 = 'Type of Shock Code' (10 types),sue,2026-07-12
+```
+
+### Evidence is not optional
+
+A **closing** verdict (`not-asked` / `asked-not-distributed`) is a *permanent,
+unsupervised write*: it removes a cell from the work queue with nobody
+reviewing it. So `load_verdicts()` **refuses** a closing verdict whose
+`evidence` field is empty, and warns.
+
+This is not defensive pedantry. It already went wrong:
+`Albania/_/data_scheme.yml` asserted *"earlier waves have no shocks module"* —
+and Albania 2005's `migrationE_cl.dta` carries `m6e_q00 = 'Type of Shock Code'`
+with ten shock types. The claim was false, nobody could catch it (nothing
+recorded *how* it was reached), and it silently suppressed work on ~5 cells.
+
+**An unevidenced negative is unfalsifiable, and therefore permanent whether or
+not it is true.**
+
+### The four checks
+
+A cell may be closed only when **all applicable** checks were run and all came
+back negative. Record which ran in `checks_run`. A check you *cannot* run makes
+the verdict `unsure` — silence is never evidence.
+
+1. **C1 — variable/value-label sweep.** Metadata-only reads across every source
+   file for the wave. Be extension-agnostic (LSMS ships Stata as `.tab`, SPSS as
+   `.sav`) and **search in the instrument's own language** (French, Spanish,
+   Portuguese). Distinguish *"no labels found"* from *"the files carry no labels
+   at all"* — the latter means the check did not run.
+2. **C2 — sibling-wave differential.** Necessary whenever the country has the
+   feature for another wave, but **never sufficient**: module vocabularies change
+   completely between waves (Iraq's 2007 `"Problem: theft"` shares no words with
+   2012's phrasing, yet both waves have the module).
+3. **C3 — Harmonized LSMS-ISA Ag cross-check.** `countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet`
+   (7 ISA countries). **Positive-only**: a non-null harmonized column proves the
+   concept was asked; a *null* one proves nothing — it means the WB harmonizers
+   didn't code it.
+4. **C4 — the questionnaire. Mandatory before any permanent close.**
+   *Absence in the shipped `.dta` is not absence in the instrument.* Every
+   data-side check can be defeated by a data-*distribution* gap, so no amount of
+   data-side evidence may close a cell as `not-asked` — only the questionnaire
+   can separate `not-asked` from `asked-not-distributed`, and those route to
+   completely different queues.
 
 ## Blessing a cell
 

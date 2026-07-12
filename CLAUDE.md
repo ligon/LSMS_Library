@@ -173,6 +173,23 @@ A feature can build cleanly, pass every sanity check, and still be quietly wrong
 
 **Do not trust a `sane` cell as proof an issue is fixed.** Know what the grader does *not* look at — it is a cold build (so it cannot see warm-cache-only divergences) and it does not check currency labels.
 
+### Adjudicating `absent` cells
+
+`absent` says only "not declared for this wave" — which conflates *"the survey never asked"* with *"nobody wrote the config yet"*. Verdicts go in the git-tracked `.coder/coverage/absent_verdicts.csv` (`country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date`):
+
+| verdict | meaning | closes the cell? |
+|---|---|---|
+| `todo` | data is there, config missing | no — stays `absent`, but now sized + sourced |
+| `asked-not-distributed` | instrument asked; the shipped extract lacks it | **yes** → acquisition queue |
+| `not-asked` | genuinely never asked | **yes** → closed forever |
+| `unsure` | a required check could not be run | no — stays in the queue, records why |
+
+> **A closing verdict REQUIRES evidence — `load_verdicts()` refuses one without it.** A closing verdict is a permanent, unsupervised write. An unevidenced negative is unfalsifiable, and therefore permanent whether or not it is true.
+>
+> This already went wrong: `Albania/_/data_scheme.yml` asserted *"earlier waves have no shocks module"*, but Albania 2005's `migrationE_cl.dta` carries `m6e_q00 = 'Type of Shock Code'` with ten shock types. False, uncatchable (nothing recorded *how* it was reached), and it suppressed ~5 cells of work. **Never write an unevidenced "no module here" claim, in a verdict file or in a YAML comment.**
+
+Before closing a cell, run the four checks (see `docs/guide/coverage.md`). The two that are most often skipped and most often wrong: **C2 (sibling-wave differential) is necessary but NEVER sufficient** — module vocabularies change completely between waves; and **C4 (the questionnaire) is mandatory**, because *absence in the shipped `.dta` is not absence in the instrument*. Only the questionnaire separates `not-asked` from `asked-not-distributed`.
+
 ## Derived Tables
 
 `household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — `Country.data_scheme` auto-surfaces them when the source table (`food_acquired` or `household_roster`) is present. A `!derived` YAML tag was considered and rejected (2026-04-18): it would create a migration burden with no gain over the hardcoded dicts + auto-discovery.
