@@ -118,6 +118,32 @@ per kg — a separate, pre-existing finding, logged in §6.)
   Nigeria tests instead of changing audit grading for every country.
 
 ---
+### Regression evidence (cross-country)
+
+Hashed every `(country, table)` cell for the 21 countries that build
+`food_acquired`, under **base `development` code** (a detached worktree at
+`2d3d5f71`, pre-fix cache) and under **this branch** (fixed cache), same
+`sha256` over index + values:
+
+```
+cells compared: 84   BYTE-IDENTICAL: 81   CHANGED: 3
+CHANGED:  Nigeria/food_acquired    1,005,656 -> 595,725
+          Nigeria/food_prices        125,507 -> 481,191
+          Nigeria/food_quantities    648,331 -> 594,463
+UNCHANGED: Nigeria/food_expenditures  + all 20 other countries, every table
+```
+
+The 20 untouched countries: Benin, Burkina_Faso, Cambodia, CotedIvoire,
+Ethiopia, EthiopiaRHS, GhanaLSS, GhanaSPS, Guatemala, Guinea-Bissau, Malawi,
+Mali, Nepal, Niger, Panama, Senegal, Serbia, Tanzania, Togo, Uganda.
+
+`bench/feature_audit/scan.py` on the fixed tree: one `fail`
+(`food_acquired | labels='Aggregate' | assembly_nonempty`), attributed to
+GhanaLSS by the scan's own adjacent record — *"labels='Aggregate' unavailable
+for 1 country(ies) ['GhanaLSS'] — they curate no such food-label column and were
+dropped from the assembly (kept 0)"*. No Nigeria file and no label code is
+touched by this branch; pre-existing.
+
 ### Phase 3 — verification
 
 - `nigeria.food_acquired_for_wave` — **OK (anchored on §2/§5)**: new Nigeria-local
