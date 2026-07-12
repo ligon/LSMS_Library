@@ -53,6 +53,8 @@ from lsms_library.provenance import (
     SOURCE_EXTERNAL,
     SOURCE_UNKNOWN,
     SOURCE_WORLDBANK,
+    VALIDATION_CATALOG_ONLY,
+    VALIDATION_CONTENT,
     WB_DOI_PREFIX,
     WaveProvenance,
     read_provenance,
@@ -67,8 +69,10 @@ from lsms_library.provenance import (
 # Keep this table tiny and justified; it is not a place to park guesses.
 
 _OVERRIDES: dict[tuple[str, str], dict] = {
+    # --- Correcting a wrongly-recorded id -----------------------------------
     ("Nigeria", "2018-19"): {
         "catalog_id": "3557",
+        "validation": VALIDATION_CONTENT,
         "note": (
             "Corrected from catalog 3827 (NGA_2018_LSS, 'Living Standards "
             "Survey 2018-2019').  The data files in this directory are "
@@ -79,6 +83,71 @@ _OVERRIDES: dict[tuple[str, str], dict] = {
             "GHS-Panel (W1=1002, W2=1952, W3=2734, W5=6410)."
         ),
     },
+
+    # --- Waves with no SOURCE.org, resolved from directory contents ---------
+    ("Niger", "2011-12"): {
+        "catalog_id": "2050",
+        "validation": VALIDATION_CONTENT,
+        "note": (
+            "No SOURCE.org was recorded.  Data/ contains a directory named "
+            "NER_2011_ECVMA_v01_M_Stata8 -- the World Bank idno itself -- "
+            "which matches catalog 2050 (NER_2011_ECVMA_v01_M, 'National "
+            "Survey on Household Living Conditions and Agriculture', "
+            "2011-2012).  Identified from the data, not from the year range."
+        ),
+    },
+    ("Senegal", "2021-22"): {
+        "catalog_id": "6278",
+        "validation": VALIDATION_CONTENT,
+        "note": (
+            "No SOURCE.org was recorded.  Data/ holds 58 ehcvm_*_sen2021 "
+            "files (ehcvm_conso_sen2021, ehcvm_individu_sen2021, ...), "
+            "matching catalog 6278 (SEN_2021_EHCVM-2_v01_M, 2021-2022), the "
+            "only SEN EHCVM-2 entry; 4297 is the 2018-19 wave."
+        ),
+    },
+    ("Nepal", "2003-04"): {
+        "catalog_id": "74",
+        # Deliberately weaker than the two above: there is no local data to
+        # corroborate the id against.  Recorded, but flagged as such.
+        "validation": VALIDATION_CATALOG_ONLY,
+        "note": (
+            "No SOURCE.org was recorded.  Matched to catalog 74 "
+            "(NPL_2003_LSS-II_v01_M, 'Living Standards Survey 2003-2004, "
+            "Second Round') on idno and year range.  NOT content-validated: "
+            "Nepal/2003-04/Data/ is EMPTY -- Nepal's microdata is hosted by "
+            "the Nepal NSO rather than the World Bank and is not in this "
+            "repository (see CLAUDE.md, 'Countries Without Microdata').  So "
+            "the provenance is known while the data is absent; these are two "
+            "different facts and are recorded as such."
+        ),
+    },
+
+    # --- Waves that are definitively NOT World Bank datasets ----------------
+    # Terminal state: 'none', not 'unknown'.  Leaving these unknown would mean
+    # someone re-searches them forever -- the same absent-vs-unknown black hole
+    # this work exists to close, one level down.
+    ("GhanaSPS", "2013-14"): {
+        "source": SOURCE_EXTERNAL,
+        "note": (
+            "Ghana Socioeconomic Panel Survey wave 2 (EGC-ISSER, Yale "
+            "University / ISSER).  Not a World Bank dataset: a GHA query "
+            "across the ENTIRE WB catalog (all collections, 152 entries) "
+            "returns exactly one GSPS study -- 2534, the 2009-2010 wave -- "
+            "and nothing later.  Directory contents (01a_consent.dta, "
+            "01b2_roster.dta, 00_comm_info.dta) are the EGC-ISSER instrument, "
+            "not a WB one.  CATALOG_ID is 'none', not 'unknown'."
+        ),
+    },
+    ("GhanaSPS", "2017-18"): {
+        "source": SOURCE_EXTERNAL,
+        "note": (
+            "Ghana Socioeconomic Panel Survey wave 3 (EGC-ISSER, Yale "
+            "University / ISSER).  Not a World Bank dataset -- see the "
+            "GhanaSPS/2013-14 note; the WB catalog holds only the 2009-2010 "
+            "GSPS wave (2534).  CATALOG_ID is 'none', not 'unknown'."
+        ),
+    },
 }
 
 
@@ -87,10 +156,21 @@ def _wave_dirs(root: Path, country: str) -> list[str]:
 
 
 def _declared_waves(country: str) -> set[str] | None:
-    """Waves the library itself recognises, or ``None`` if it cannot say."""
+    """Wave *directories* the library recognises, or ``None`` if it cannot say.
+
+    ``Country.waves`` is not always a list of directory names.  Nigeria's are
+    survey rounds (``2010Q3``, ``2011Q1``) and Tanzania's are logical waves
+    (``2008-09`` .. ``2014-15``); both map onto directories via
+    ``wave_folder_map``.  Provenance is recorded per *directory*, so fold the
+    folder names in too -- otherwise a real wave folder looks undeclared.
+    """
     try:
         import lsms_library as ll
-        return set(ll.Country(country).waves)
+        c = ll.Country(country)
+        declared = set(c.waves)                   # sets wave_folder_map as a side effect
+        folder_map = getattr(c, "wave_folder_map", None) or {}
+        declared |= {str(v) for v in folder_map.values()}
+        return declared
     except Exception as exc:                      # noqa: BLE001 - best effort
         print(f"  ! {country}: could not read Country.waves ({exc!r}); "
               "will only update wave dirs that already have a SOURCE.org")
@@ -151,7 +231,8 @@ def _years(entry: dict) -> str | None:
 def _from_entry(country: str, wave: str, entry: dict, method: str,
                 today: str, note: str | None = None,
                 superseded: str | None = None,
-                notes: str | None = None) -> WaveProvenance:
+                notes: str | None = None,
+                validation: str | None = None) -> WaveProvenance:
     return WaveProvenance(
         country=country, wave=wave,
         source=SOURCE_WORLDBANK,
@@ -163,6 +244,7 @@ def _from_entry(country: str, wave: str, entry: dict, method: str,
         doi=entry.get("doi") or None,
         url=entry.get("url"),
         method=method,
+        validation=validation,
         recorded=today,
         note=note,
         superseded_url=superseded,
@@ -178,9 +260,19 @@ def resolve(country: str, wave: str, root: Path,
     # Human-written prose in the original file is carried through verbatim.
     keep = existing.notes
 
-    # --- 4. Manual override (evidence beats the recorded URL) ---------------
+    # --- 4. Manual override (evidence beats the recorded URL / the silence) --
     ov = _OVERRIDES.get((country, wave))
     if ov:
+        # 4a. Definitively not a WB dataset -> terminal 'none', not 'unknown'.
+        if ov.get("source") == SOURCE_EXTERNAL:
+            return WaveProvenance(
+                country=country, wave=wave, source=SOURCE_EXTERNAL,
+                url=ov.get("url") or existing.url,
+                method="manual-override", recorded=today,
+                note=ov["note"], notes=keep,
+            ), "override"
+
+        # 4b. Resolve to a specific catalog id.
         entry = by_id.get(ov["catalog_id"])
         if entry:
             # Remember the URL we replaced -- but only the *original* one.  On
@@ -193,7 +285,8 @@ def resolve(country: str, wave: str, root: Path,
                           else None)
             return _from_entry(country, wave, entry, "manual-override", today,
                                note=ov["note"], superseded=superseded,
-                               notes=keep), "override"
+                               notes=keep,
+                               validation=ov.get("validation")), "override"
 
     url = existing.url or ""
 

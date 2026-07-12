@@ -1,12 +1,19 @@
 SOURCE
 
-(source URL not recorded)
+https://microdata.worldbank.org/index.php/catalog/2050
 
-#+CATALOG_ID: unknown
-#+PROVENANCE_SOURCE: unknown
-#+PROVENANCE_METHOD: unresolved
+#+CATALOG_ID: 2050
+#+CATALOG_IDNO: NER_2011_ECVMA_v01_M
+#+CATALOG_TITLE: National Survey on Household Living Conditions and Agriculture 2011
+#+CATALOG_YEARS: 2011-2012
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/bp16-s524
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2050
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: content-validated
 #+PROVENANCE_RECORDED: 2026-07-12
-#+PROVENANCE_NOTE: No source URL recorded for this wave; its World Bank catalog id is unknown.  Deliberately NOT inferred from the directory name -- year-range labels collide across distinct surveys.
+#+PROVENANCE_NOTE: No SOURCE.org was recorded.  Data/ contains a directory named NER_2011_ECVMA_v01_M_Stata8 -- the World Bank idno itself -- which matches catalog 2050 (NER_2011_ECVMA_v01_M, 'National Survey on Household Living Conditions and Agriculture', 2011-2012).  Identified from the data, not from the year range.
 
 * Notes (preserved from the original SOURCE.org)
 (source URL not recorded)
