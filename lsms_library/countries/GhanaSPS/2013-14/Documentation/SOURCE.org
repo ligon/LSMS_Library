@@ -1,0 +1,12 @@
+SOURCE
+
+(source URL not recorded)
+
+#+CATALOG_ID: unknown
+#+PROVENANCE_SOURCE: unknown
+#+PROVENANCE_METHOD: unresolved
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: No source URL recorded for this wave; its World Bank catalog id is unknown.  Deliberately NOT inferred from the directory name -- year-range labels collide across distinct surveys.
+
+* Notes (preserved from the original SOURCE.org)
+(source URL not recorded)

@@ -117,6 +117,8 @@ override.
 
 **Adding new waves**: `lsms_library.data_access.discover_waves()` / `add_wave()`; `push_to_cache_batch()` for batched `dvc add` + `dvc push`. See `CONTRIBUTING.org`.
 
+**Wave provenance (`lsms_library/provenance.py`).** Every wave dir records the WB catalog entry it came from in `Documentation/SOURCE.org`, as org keyword lines (`#+CATALOG_ID:`, `#+CATALOG_IDNO:`, `#+PROVENANCE_SOURCE:` ∈ {`worldbank`, `external`, `unknown`}, …) appended beneath the original free-text URL — which stays the file's first URL, so the legacy `_read_source_url()` reader is unaffected. Human-written prose in a pre-existing `SOURCE.org` is preserved verbatim under a `* Notes (preserved …)` heading; the writer is idempotent. `discover_waves()` matches on the **catalog id**, never on a wave label reconstructed from the entry's year range — labels collide across distinct surveys (Nigeria GHS-Panel W4 `3557` vs. Living Standards Survey `3827`, both 2018–2019) and one entry can span two wave dirs (Uganda `1001` → `2005-06/` + `2009-10/`). Where no id is recorded it falls back to the label heuristic but reports `local_status='unknown'` with `local=False` — silence must not masquerade as knowledge. Countries sharing an ISO code (GhanaLSS/GhanaSPS → GHA; Tanzania/Tanzania_Kegera → TZA) are disambiguated by an `idno_pattern` in `_COUNTRY_CATALOG`; non-WB countries (`EthiopiaRHS`, `KenyaLPS`) are explicitly `discoverable=False`. Re-stamp with `python scripts/backfill_wave_provenance.py`.
+
 **Three-tier credential model.** The WB Microdata API key is the sole real gate; the S3 bucket is a read cache over the authoritative WB NADA downloads.
 
 | User has                                                   | Gets                                                  |

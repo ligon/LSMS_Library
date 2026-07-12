@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/azv8-cf20]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/543
+
+#+CATALOG_ID: 543
+#+CATALOG_IDNO: PAK_1991_IHS_v01_M
+#+CATALOG_TITLE: Integrated Household Survey 1991
+#+CATALOG_YEARS: 1991-1991
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/azv8-cf20
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/543
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

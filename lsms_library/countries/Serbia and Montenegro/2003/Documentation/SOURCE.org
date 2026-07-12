@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/h5ve-n970]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/81
+
+#+CATALOG_ID: 81
+#+CATALOG_IDNO: SCG_2003_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2003 (General Population, Wave 2 Panel) and Roma Settlement Survey 2003
+#+CATALOG_YEARS: 2003-2003
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/h5ve-n970
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/81
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12
