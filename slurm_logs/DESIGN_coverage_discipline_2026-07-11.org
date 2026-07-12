@@ -212,14 +212,60 @@ The false negatives are the dangerous ones, because they are silent:
 - *GhanaLSS / GhanaSPS* both map to ISO =GHA=, so each sees the other's
   waves as its own missing waves.
 
-Root cause: *none of the 136 wave directories records the WB catalog id it
-came from.*  =add_wave()= writes a =SOURCE.org=; not one pre-existing wave
-has one (=find ... -name SOURCE.org= → 0).
+*** CORRECTION [2026-07-12] --- I got the root cause wrong, and the truth is worse
 
-*Fix (prerequisite for Defect 2).*  Stamp =catalog_id= per wave dir and
-match on the id, not on a reconstructed label.  Backfilling 136 waves is a
-bounded, mostly-mechanical job.  Until it is done, any "missing wave"
-column in the matrix is guesswork.
+I originally wrote here: /"none of the 136 wave directories records the WB
+catalog id it came from ... not one pre-existing wave has one
+(=find ... -name SOURCE.org= → 0)."/
+
+*That is false.*  *117 of the 136 waves had a =SOURCE.org= all along.*  My
+=find= used =-maxdepth 3=; the file lives at
+={Country}/{wave}/Documentation/SOURCE.org= --- depth *4*.  The command
+returned 0 because it could not see the files, not because they were absent.
+
+I ran one command, it returned zero, and I called it proof.  That is
+precisely the /unevidenced negative/ this document spends §D2 warning
+against, and I committed it to a design doc, a commit message, and a PR.
+The rule applies to me: *silence is not evidence, and a null result from an
+instrument you have not validated is a null result about the instrument.*
+
+*The real defect is worse than the one I described.*  The provenance is not
+merely missing --- in places it is *wrong*:
+
+- =Nigeria/2018-19/Documentation/SOURCE.org= records catalog *3827* --- the
+  /Nigeria Living Standards Survey/.  The directory actually holds
+  =aux_plantingw4= / =aux_harvestw4= --- *GHS-Panel W4 (3557)*, a different
+  survey.
+
+A backfill that /trusted/ =SOURCE.org= would therefore have *cemented* the
+error rather than fixed it.  Absent provenance is a gap; wrong provenance is
+a lie, and it is the harder failure.
+
+A third failure mode neither of us predicted: *one catalog entry can back two
+wave directories.*  WB 1001 (=UGA_2005-2009_UNPS=) renders as ="2005-10"=,
+matching no directory --- so it read as MISSING although we hold it across
+=2005-06/= and =2009-10/=.
+
+*Fix (prerequisite for Defect 2).*  Match on catalog id, and *validate rather
+than trust* the recorded id against the directory's actual contents.  Keep
+="none"= (definitively not a WB dataset) distinct from ="unknown"= (we do not
+know) --- collapsing them would re-create exactly the =absent=-black-hole
+mistake of Defect 1, one level down.
+
+*** =SOURCE.org= is load-bearing --- creating one PROMOTES a directory into a wave
+
+Found while implementing this (PR #595), and it is a trap worth its own note.
+=Country.waves= (=country.py:1452=) falls back to scanning for directories
+containing =Documentation/SOURCE.org=.  So *writing* a =SOURCE.org= does not
+merely annotate a wave --- it *creates* one.
+
+A first pass that stamped all 136 dirs broke
+=test_sample.py::test_covers_all_waves[Benin]=, because =Benin/2018-2019/= is
+a *stray duplicate* of =Benin/2018-19/= (identical =.dta=) and stamping it
+promoted the duplicate into a wave that =sample()= does not cover.  The full
+test suite caught it.
+
+Metadata that silently changes the shape of the data model is not metadata.
 
 ** Defect 4 --- eleven countries are invisible
 
