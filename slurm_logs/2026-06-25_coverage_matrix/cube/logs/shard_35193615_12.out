@@ -1,0 +1,40 @@
+=== task 12: country='Guinea-Bissau'  node=n0181.savio3  Thu Jun 25 18:45:10 PDT 2026 ===
+--- provisioning venv -> /local/job35193655/venv ---
+--- cache clear Guinea-Bissau ---
+Guinea-Bissau: removed
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/var/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guinea-Bissau/2018-19/_/subjective_well_being.parquet
+--- build Guinea-Bissau ---
+=== done 'Guinea-Bissau' rc=0  Thu Jun 25 18:47:21 PDT 2026 ===

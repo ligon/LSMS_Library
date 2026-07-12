@@ -846,6 +846,51 @@ Note there is *no =add-country= skill* --- =add-feature= covers the
 "create a =data_scheme.yml= if absent" case in a paragraph.  Ten
 bootstraps justify writing one.
 
+* The acquisition queue (added [2026-07-12])
+
+Phase 0 was meant to make the /denominator/ honest.  It did --- and the honest
+denominator is much larger than the matrix ever suggested, because the
+instrument could not see most of it.
+
+** What we cannot see is bigger than what we can
+
+=discover_waves()= defaults to =collection='lsms'=.  Entire WB series published
+under other repositories are *structurally invisible* --- not "not yet fetched",
+/unfindable/:
+
+| country       | we hold        | invisible to discovery                          |
+|---------------+----------------+-------------------------------------------------|
+| Armenia       | =1996/= (0 files) | *18 waves* ILCS 2001--2018 (=repo=central=)  |
+| South Africa  | =1993/=        | *10 waves* GHS 2015--2025 (=repo=datafirst=)    |
+
+*Both ruled in remit* (Ethan, 2026-07-12).  GH #597.
+
+This is the deepest form of the Defect-2 error.  I proposed fixing the
+self-congratulatory denominator by wiring =discover_waves= into the matrix ---
+but =discover_waves= /itself/ only looks in one collection.  We would have
+shipped a denominator that was *confidently wrong*: "no missing waves" for
+Armenia, while eighteen sit in the catalog.
+
+/The ruler was miscalibrated.  So was the ruler's own instrument./
+
+** The queue, as currently known
+
+| source                                              | waves |
+|-----------------------------------------------------+-------|
+| Armenia ILCS + South Africa GHS (GH #597)           |   ~28 |
+| Genuine missing WB waves (first census)             |    15 |
+| Orphan countries --- data downloaded, no config (Ph.5) |    35 |
+| *Blocked* --- wanted, known, unobtainable (Nepal, Albania 1996) |     4 |
+
+Roughly *43 waves to acquire* and *35 already-downloaded waves to configure*,
+on top of the 456 absent cells.  None of this is new work appearing --- it is
+work that was always there and could not be counted.  That is what an honest
+denominator costs, and it is the whole point of paying it.
+
+*The acquisition queue is separate from the config queue.*  Do not conflate
+=add-wave= (get the data) with =add-feature= (harmonize it).  And know the size
+of the gap /before/ committing to close it.
+
 * Decisions taken
 
 1. *Scope of the config-less countries* --- [2026-07-11] *in remit.*  They

@@ -1,0 +1,8 @@
+index: ['t', 'v', 'j', 'u'] shape: (23646, 2) unique: True
+u labels (all): ['Bidon', 'Boîte', 'Centilitre', 'Gramme', 'Kg', 'Litre', 'Paquet', 'Sac large', 'Sac moyen', 'Sac petit', 'Sachet', 'Tas', 'Unité', 'Verre']
+u count: 14
+u values NOT a u-table Preferred Label: []
+j values NOT a harmonize_food Preferred Label: []
+v intersect sample(): 728/754
+Price non-null: 23646 | Quantity non-null: 21387
+Price>0 all: True

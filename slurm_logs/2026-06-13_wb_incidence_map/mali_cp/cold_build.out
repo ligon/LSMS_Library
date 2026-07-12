@@ -1,0 +1,27 @@
+=== community_prices (cold framework build) ===
+shape: (23646, 2)
+index names: ['t', 'v', 'j', 'u']
+columns: ['Price', 'Quantity']
+unique index: True
+v count: 754 | j count: 37 | u count: 14
+t values: ['2014-15']
+                                           Price  Quantity
+t       v j                   u                           
+2014-15 1 Arachide            Kg           600.0       1.0
+          Concentré de tomate Boîte        125.0      <NA>
+          Cube alimentaire    Unité         30.0      <NA>
+          Farine de blé       Kg           500.0       1.0
+                              Sac moyen  25000.0      50.0
+          Haricots secs       Kg           400.0       1.0
+          Maïs                Kg           170.0       1.0
+                              Sac large  17000.0     100.0
+
+v intersect sample: 728/754 community-price clusters join sample()
+community_prices j count: 37 | of which also in food_acquired.j: 37
+sample shared j: ['Arachide', 'Beurre de karité', 'Blé', 'Boissons gazeuses', 'Concentré de tomate', 'Cube alimentaire', 'Farine de blé', 'Farine de maïs', 'Farine de mil', "Feuilles d'oseille", 'Feuilles de baobab', 'Fonio']
+community-only j (not in food_acquired): []
+Traceback (most recent call last):
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/2026-06-13_wb_incidence_map/mali_cp/cold_build.py", line 35, in <module>
+    san = diagnostics.is_this_feature_sane(c, 'community_prices')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: is_this_feature_sane() missing 1 required positional argument: 'feature'

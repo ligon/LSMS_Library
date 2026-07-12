@@ -1,0 +1,999 @@
+clearing the 8 touched countries (cold), then full suite (09:44:57)
+Ethiopia: removed
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2011-12/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2013-14/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2015-16/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2021-22/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2011-12/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2013-14/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2015-16/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2021-22/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2011-12/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2013-14/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2015-16/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Ethiopia/2021-22/_/sample.parquet
+Malawi: removed
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2004-05/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2010-11/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2013-14/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2016-17/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2019-20/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2013-14/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2016-17/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2019-20/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2010-11/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2013-14/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2016-17/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2019-20/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2004-05/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2010-11/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2013-14/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2016-17/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Malawi/2019-20/_/sample.parquet
+Niger: removed
+  /global/home/users/ligon/.local/share/lsms_library/Niger/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2011-12/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2014-15/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2021-22/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2021-22/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2011-12/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2014-15/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Niger/2021-22/_/sample.parquet
+Tanzania: removed
+  /global/home/users/ligon/.local/share/lsms_library/Tanzania/var/community_prices.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tanzania/2019-20/_/community_prices.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tanzania/2020-21/_/community_prices.parquet
+Mali: removed
+  /global/home/users/ligon/.local/share/lsms_library/Mali/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2014-15/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2017-18/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2021-22/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2021-22/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2014-15/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2017-18/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Mali/2021-22/_/sample.parquet
+Nigeria: removed
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2010-11/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2012-13/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2015-16/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2023-24/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2012Q3/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2013Q1/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2015Q3/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2016Q1/_/panel_ids.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2010-11/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2012-13/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2015-16/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2023-24/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2010Q3/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2011Q1/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2012Q3/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2013Q1/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2015Q3/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2016Q1/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2018Q3/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2019Q1/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2023Q3/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Nigeria/2024Q1/_/sample.parquet
+EthiopiaRHS: removed
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/consumption.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/sample.parquet
+....s.....
+########## PARALLEL FULL-COLD GATE 09:48:00 -n 16 --rebuild-caches ##########
+
+[--rebuild-caches] purged 194 cache files under /global/home/users/ligon/.local/share/lsms_library
+bringing up nodes...
+bringing up nodes...
+
+..s..................................................................... [  5%]
+........................................................................ [ 11%]
+...................................................s...s...............s [ 17%]
+sssss.ss................................................................ [ 22%]
+........................................................................ [ 28%]
+...............................s..s............................s........ [ 34%]
+.............s...x........x.......s..................................... [ 39%]
+...................F.......................x............................ [ 45%]
+...........s.s.....ss.sssssssss..................ss...s.ssx.....ss...... [ 51%]
+........................................................................ [ 56%]
+........................................................................ [ 62%]
+...............................s...s.................................... [ 68%]
+..........ssssss.sssss.s.....s.s........s.ss...s.....s........s.......ss [ 73%]
+sssss...s.....s.s.s...ss................................................ [ 79%]
+xx.........s.....x...s.F.ss.s.ss.s.ss.s.ssss.ssss.ssss.ssss.Fssss..sss.. [ 85%]
+Fsss.s.sss.s.s.......................................................... [ 90%]
+..s...x................Fx.F............................................. [ 96%]
+.............xX...........................                               [100%]
+=================================== FAILURES ===================================
+__________________ TestSample.test_covers_all_waves[Albania] ___________________
+[gw3] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+self = <LSMS_Library.tests.test_sample.TestSample object at 0x146d2b5be010>
+country_name = 'Albania'
+sample_df =               v      weight  panel_weight   strata  Rural
+i     t                                                  
+1-...13916     50.213916  Coastal  Rural
+83409 2012  834  117.063931    117.063931  Coastal  Rural
+
+[21357 rows x 5 columns]
+
+    def test_covers_all_waves(self, country_name, sample_df):
+        """sample() should cover all waves the country declares."""
+        c = ll.Country(country_name)
+        expected_waves = set(c.waves)
+        actual_waves = set(sample_df.index.get_level_values("t").unique())
+        missing = expected_waves - actual_waves
+>       assert not missing, (
+            f"{country_name} sample missing waves: {sorted(missing)}"
+        )
+E       AssertionError: Albania sample missing waves: ['1996']
+E       assert not {'1996'}
+
+tests/test_sample.py:149: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  lsms_library.country:country.py:489 no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/1996 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+_______ test_parquet_matches_baseline[2005-06/_/interview_date.parquet] ________
+[gw3] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+uganda_root = PosixPath('/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda')
+rel_path = '2005-06/_/interview_date.parquet'
+
+    @pytest.mark.parametrize("rel_path", _parquet_ids())
+    def test_parquet_matches_baseline(uganda_root, rel_path):
+        """Each parquet must exactly match its baseline fingerprint."""
+        baseline_entry = BASELINE[rel_path]
+    
+        if "error" in baseline_entry:
+            pytest.skip(f"Baseline recorded an error for {rel_path}: {baseline_entry['error']}")
+    
+        # Check both in-tree and data_root locations
+        parquet_path = uganda_root / rel_path
+        if not parquet_path.exists():
+            from lsms_library.paths import data_root
+            data_root.cache_clear()
+            alt_path = data_root("Uganda") / rel_path
+            if alt_path.exists():
+                parquet_path = alt_path
+        if not parquet_path.exists():
+            pytest.skip(f"Parquet not built: {rel_path}")
+    
+        df = pd.read_parquet(parquet_path, engine="pyarrow")
+        actual = _fingerprint(df)
+    
+        # Check shape
+        assert actual["shape"] == baseline_entry["shape"], (
+            f"{rel_path}: shape mismatch: {actual['shape']} != {baseline_entry['shape']}"
+        )
+    
+        # Check columns
+>       assert actual["columns"] == baseline_entry["columns"], (
+            f"{rel_path}: column mismatch:\n"
+            f"  actual:   {actual['columns']}\n"
+            f"  expected: {baseline_entry['columns']}"
+        )
+E       AssertionError: 2005-06/_/interview_date.parquet: column mismatch:
+E           actual:   ['Int_t']
+E           expected: ['date']
+E       assert ['Int_t'] == ['date']
+E         
+E         At index 0 diff: 'Int_t' != 'date'
+E         Use -v to get more diff
+
+tests/test_uganda_invariance.py:145: AssertionError
+_________ test_parquet_matches_baseline[var/cluster_features.parquet] __________
+[gw3] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+uganda_root = PosixPath('/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda')
+rel_path = 'var/cluster_features.parquet'
+
+    @pytest.mark.parametrize("rel_path", _parquet_ids())
+    def test_parquet_matches_baseline(uganda_root, rel_path):
+        """Each parquet must exactly match its baseline fingerprint."""
+        baseline_entry = BASELINE[rel_path]
+    
+        if "error" in baseline_entry:
+            pytest.skip(f"Baseline recorded an error for {rel_path}: {baseline_entry['error']}")
+    
+        # Check both in-tree and data_root locations
+        parquet_path = uganda_root / rel_path
+        if not parquet_path.exists():
+            from lsms_library.paths import data_root
+            data_root.cache_clear()
+            alt_path = data_root("Uganda") / rel_path
+            if alt_path.exists():
+                parquet_path = alt_path
+        if not parquet_path.exists():
+            pytest.skip(f"Parquet not built: {rel_path}")
+    
+        df = pd.read_parquet(parquet_path, engine="pyarrow")
+        actual = _fingerprint(df)
+    
+        # Check shape
+        assert actual["shape"] == baseline_entry["shape"], (
+            f"{rel_path}: shape mismatch: {actual['shape']} != {baseline_entry['shape']}"
+        )
+    
+        # Check columns
+        assert actual["columns"] == baseline_entry["columns"], (
+            f"{rel_path}: column mismatch:\n"
+            f"  actual:   {actual['columns']}\n"
+            f"  expected: {baseline_entry['columns']}"
+        )
+    
+        # Check index names
+        assert actual["index_names"] == baseline_entry["index_names"], (
+            f"{rel_path}: index names mismatch:\n"
+            f"  actual:   {actual['index_names']}\n"
+            f"  expected: {baseline_entry['index_names']}"
+        )
+    
+        # Check dtypes (after canonicalizing string-family equivalence —
+        # see _DTYPE_EQUIVALENCE above).
+>       assert _canonical_dtypes(actual["dtypes"]) == _canonical_dtypes(baseline_entry["dtypes"]), (
+            f"{rel_path}: dtype mismatch:\n"
+            f"  actual:   {actual['dtypes']}\n"
+            f"  expected: {baseline_entry['dtypes']}"
+        )
+E       AssertionError: var/cluster_features.parquet: dtype mismatch:
+E           actual:   {'District': 'str', 'Latitude': 'float64', 'Longitude': 'float64', 'Region': 'string', 'Rural': 'string'}
+E           expected: {'District': 'str', 'Latitude': 'float32', 'Longitude': 'float32', 'Region': 'string', 'Rural': 'string'}
+E       assert {'District': ...'string', ...} == {'District': ...'string', ...}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'Longitude': 'float64'} != {'Longitude': 'float32'}
+E         {'Latitude': 'float64'} != {'Latitude': 'float32'}
+E         Use -v to get more diff
+
+tests/test_uganda_invariance.py:160: AssertionError
+______________ test_parquet_matches_baseline[var/shocks.parquet] _______________
+[gw3] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+uganda_root = PosixPath('/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda')
+rel_path = 'var/shocks.parquet'
+
+    @pytest.mark.parametrize("rel_path", _parquet_ids())
+    def test_parquet_matches_baseline(uganda_root, rel_path):
+        """Each parquet must exactly match its baseline fingerprint."""
+        baseline_entry = BASELINE[rel_path]
+    
+        if "error" in baseline_entry:
+            pytest.skip(f"Baseline recorded an error for {rel_path}: {baseline_entry['error']}")
+    
+        # Check both in-tree and data_root locations
+        parquet_path = uganda_root / rel_path
+        if not parquet_path.exists():
+            from lsms_library.paths import data_root
+            data_root.cache_clear()
+            alt_path = data_root("Uganda") / rel_path
+            if alt_path.exists():
+                parquet_path = alt_path
+        if not parquet_path.exists():
+            pytest.skip(f"Parquet not built: {rel_path}")
+    
+        df = pd.read_parquet(parquet_path, engine="pyarrow")
+        actual = _fingerprint(df)
+    
+        # Check shape
+        assert actual["shape"] == baseline_entry["shape"], (
+            f"{rel_path}: shape mismatch: {actual['shape']} != {baseline_entry['shape']}"
+        )
+    
+        # Check columns
+        assert actual["columns"] == baseline_entry["columns"], (
+            f"{rel_path}: column mismatch:\n"
+            f"  actual:   {actual['columns']}\n"
+            f"  expected: {baseline_entry['columns']}"
+        )
+    
+        # Check index names
+        assert actual["index_names"] == baseline_entry["index_names"], (
+            f"{rel_path}: index names mismatch:\n"
+            f"  actual:   {actual['index_names']}\n"
+            f"  expected: {baseline_entry['index_names']}"
+        )
+    
+        # Check dtypes (after canonicalizing string-family equivalence —
+        # see _DTYPE_EQUIVALENCE above).
+>       assert _canonical_dtypes(actual["dtypes"]) == _canonical_dtypes(baseline_entry["dtypes"]), (
+            f"{rel_path}: dtype mismatch:\n"
+            f"  actual:   {actual['dtypes']}\n"
+            f"  expected: {baseline_entry['dtypes']}"
+        )
+E       AssertionError: var/shocks.parquet: dtype mismatch:
+E           actual:   {'AffectedAssets': 'string', 'AffectedConsumption': 'string', 'AffectedIncome': 'string', 'AffectedProduction': 'string', 'Duration': 'float64', 'HowCoped0': 'str', 'HowCoped1': 'str', 'HowCoped2': 'str', 'Onset': 'Float64', 'Year': 'Float64'}
+E           expected: {'AffectedAssets': 'boolean', 'AffectedConsumption': 'boolean', 'AffectedIncome': 'boolean', 'AffectedProduction': 'boolean', 'Duration': 'float64', 'HowCoped0': 'object', 'HowCoped1': 'object', 'HowCoped2': 'object', 'Onset': 'Int64', 'Year': 'Float64'}
+E       assert {'AffectedAss...'string', ...} == {'AffectedAss...boolean', ...}
+E         
+E         Omitting 5 identical items, use -vv to show
+E         Differing items:
+E         {'AffectedProduction': 'string'} != {'AffectedProduction': 'boolean'}
+E         {'AffectedConsumption': 'string'} != {'AffectedConsumption': 'boolean'}
+E         {'AffectedIncome': 'string'} != {'AffectedIncome': 'boolean'}
+E         {'AffectedAssets': 'string'} != {'AffectedAssets': 'boolean'}
+E         {'Onset': 'Float64'} != {'Onset': 'Int64'}
+E         Use -v to get more diff
+
+tests/test_uganda_invariance.py:160: AssertionError
+_________________ test_api_matches_replication[interview_date] _________________
+[gw15] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+spec = FeatureSpec(name='interview_date', kwargs={'market': 'Region'}, transform=None, atol=0.0, extra_keys=(), max_na_asym=0, max_outliers=0)
+
+    @pytest.mark.parametrize(
+        "spec",
+        FEATURE_SPECS,
+        ids=[spec.name for spec in FEATURE_SPECS],
+    )
+    def test_api_matches_replication(spec: FeatureSpec) -> None:
+        """API output must agree with the canonical replication parquet on common rows."""
+        # ``earnings`` and ``enterprise_income`` both fail vs the
+        # ``pin/use_parquet`` replication parquet but for reasons we
+        # consider basically harmless --- the library output is correct,
+        # the *replication's* schema is what wants updating:
+        #
+        # * ``earnings``: API column ``Earnings`` (1 column, (i,t,m) index)
+        #   vs replication ``level_1`` + ``earnings`` (lowercase plus a
+        #   stray reset-index artefact).  Replication should be regenerated
+        #   against the current API.
+        # * ``enterprise_income``: same conceptual divergence, plus a
+        #   fresh-clone failure path -- the wave-level scripts under
+        #   ``Uganda/{wave}/_/enterprise_income.py`` use the legacy
+        #   ``dvc.api.open(fn, mode='rb')`` pattern (CLAUDE.md anti-pattern)
+        #   which bypasses the framework's ``credentialpath`` override and
+        #   reads the in-tree ``.dvc/s3_creds`` rather than the auto-
+        #   unlocked user-config path.  On a clone without a populated
+        #   local DVC blob cache the open call raises
+        #   ``botocore.NoCredentialsError`` and the make subprocess exits
+        #   non-zero.  The proper fix is the ``get_dataframe()`` migration
+        #   scheduled for v0.7.2's configurable-cache work (see
+        #   ``SkunkWorks/configurable_data_cache.org``).
+        #
+        # Both are xfail rather than skip so we still notice if the
+        # divergence resolves (e.g., after replication regen).
+        _LEGACY_DVC_FEATURES = {"earnings", "enterprise_income"}
+        if spec.name in _LEGACY_DVC_FEATURES:
+            pytest.xfail(
+                f"{spec.name}: known divergence vs the pin/use_parquet "
+                f"replication parquet (or fresh-clone NoCredentialsError "
+                f"via legacy dvc.api.open()).  Library output is correct; "
+                f"replication should regenerate against the current API."
+            )
+    
+        # locality: deprecated API (DeprecationWarning, see docs/migration/
+        # locality.md); current implementation is a compatibility shim
+        # (`legacy_locality` in transformations.py) that joins sample() and
+        # cluster_features().  The replication parquet was generated from
+        # the original wave-level locality.py scripts (since deleted) and
+        # has bit-rotted in three orthogonal ways:
+        #   1. Uganda 2009-10: replication has empty-string Parish for
+        #      541 HHs; the current sample() carries `@<lat>,<lon>`
+        #      coordinate strings as the `v` (cluster) code for the same
+        #      HHs -> 541 string mismatches plus 25 NaN-asymmetry rows
+        #      (HHs whose API-side sample.v is genuinely NaN, where the
+        #      replication had coerced the missing value to '').
+        #   2. Float stringification: replication has e.g. '10120402.0'
+        #      where the API now has the canonical '10120402' (~3118
+        #      additional string diffs, all 2010-11/2011-12 numeric
+        #      cluster codes).
+        #   3. The single both-NaN HH (3b486c0be9... 2019-20) is a
+        #      split-off with no sample-row cluster (GH #197 family).
+        # All three disagreements are replication staleness, not library
+        # regressions.  Keeping as xfail (not skip) so we still notice if
+        # the divergence resolves after a replication regenerate.
+        if spec.name == "locality":
+            pytest.xfail(
+                "locality: deprecated API; replication parquet predates the "
+                "sample() + cluster_features() shim and the @-coord cluster "
+                "codes in 2009-10 / float-suffix cleanup.  Library output is "
+                "correct; replication should regenerate."
+            )
+    
+        # NOTE: ``income`` and ``fct`` were previously ``xfail``-marked
+        # here due to a DVC-lock concurrency issue under ``make -s -j12``.
+        # Resolved by replacing ``Repo.fetch`` (which acquired
+        # ``repo.lock`` and rebuilt ``Repo.index`` per call, ~93s + lock
+        # contention) with a direct fsspec ``get_file()`` call in
+        # ``_ensure_dvc_pulled`` (~1s, no lock).  See
+        # ``slurm_logs/HANDOFF_2026-05-07.org`` for the empirical
+        # investigation and ``lsms_library/local_tools.py`` for the bypass.
+        #
+        # ``food_acquired`` was *also* previously ``xfail``-marked under
+        # the same DVC-lock-race umbrella, but actually had a second,
+        # independent failure mode that the lock-race xfail was masking:
+        # the ``market`` column (computed at API time by
+        # ``_add_market_index`` joining ``Region`` from
+        # ``cluster_features``) shows ~92k rows of NaN-asymmetry vs the
+        # replication baseline.  Verified with ``LSMS_FORCE_DVCFS_OPEN=1``
+        # (forcing the legacy DVCFS.open code path) on 2026-05-07: same
+        # 92119-row asymmetry.  So this is a data-correctness issue
+        # downstream of DVC, not a fetch issue.
+        #
+        # Likely root cause: the replication baseline predates two recent
+        # schema changes to ``food_acquired`` -- (a) the addition of an
+        # ``s`` (source) index level (commits ``2048122f`` and
+        # ``b9df8fb4``, GH #169 Phases 1 + 4), and (b) revised unit
+        # handling (commits ``a5f8544f`` GH #224, ``2ccd9301`` GH #231
+        # ``volume_as_mass`` kwarg).  Both change row count or row
+        # structure relative to the baseline, producing rows in the API
+        # output that have no corresponding row in replication; on merge,
+        # such rows show NaN on the replication side for every column
+        # including ``market`` (since ``market`` is computed-then-merged).
+        # Resolving will likely require regenerating the replication
+        # baseline against current canonical schema -- tracked in the
+        # ``Replication parquet regeneration`` open item.
+        #
+        # Keeping ``xfail`` (not skip) so we still notice when the
+        # underlying ``market`` divergence is resolved.
+        if spec.name == "food_acquired":
+            pytest.xfail(
+                "food_acquired: pre-existing 'market' NaN-asymmetry vs "
+                "replication baseline (~92k rows).  Surfaces now that the "
+                "DVC-lock contention is fixed and the build completes.  "
+                "Likely caused by recent food_acquired schema changes "
+                "(s-axis, units) post-dating the baseline; needs replication "
+                "regeneration."
+            )
+    
+        # ``nutrition`` couples through ``fct`` and the auto-derived
+        # ``food_quantities`` table; the Phase-3 / Phase-4 s-axis canonical
+        # reshape (PRs c8d8f525, b9df8fb4) and the post-replication
+        # tightening of unit-code filters in 2018-19 / 2019-20 (dropping
+        # codes {800, 801, 802, 996-999}) both post-date the replication's
+        # ``nutrition.parquet``.  Empirical: 23,251 of 23,798 rows out of
+        # tolerance on column ``Energy`` with max |Delta| = 4.65 million
+        # (Slurm pre-flight 34085562, 2026-05-09 -- see HANDOFF.md).  This
+        # is the same kind of schema-evolution mismatch PR #254 bridged
+        # for ``food_expenditures`` / ``food_prices`` / ``food_quantities``;
+        # ``nutrition`` was out of scope for #254 because it couples
+        # through fct and may need a wider bridge.  Tracked for v0.7.3.
+        #
+        # Keeping xfail (not skip) so we notice when a future
+        # replication regen or bridge extension resolves the divergence.
+        if spec.name == "nutrition":
+            pytest.xfail(
+                "nutrition: 97.7% of rows out of tolerance on Energy "
+                "(max |Delta| = 4.65M).  Same shape as the pre-#254 "
+                "food_* drift; nutrition was out of scope for #254 due "
+                "to its fct coupling.  Library output is correct; "
+                "replication should regenerate or the bridge extended."
+            )
+    
+        repl = _load_replication(spec.name)
+    
+        try:
+            api = _call_api(spec.name, spec.kwargs)
+        except Exception as exc:  # broad catch intentional: any API failure is a test failure
+            pytest.fail(f"API call Country('Uganda').{spec.name}(**{spec.kwargs}) raised: "
+                        f"{type(exc).__name__}: {exc}")
+    
+        if spec.transform is not None:
+            api = spec.transform(api)
+    
+        merged, merge_key = _merge_on_common_index(api, repl, extra_keys=spec.extra_keys)
+    
+        assert len(merged) > 0, (
+            f"{spec.name}: no overlap between API and replication on {merge_key}; "
+            f"API shape={api.shape} index={list(api.index.names)}; "
+            f"repl shape={repl.shape} index={list(repl.index.names)}"
+        )
+    
+        suffixed_api = [c for c in merged.columns if c.endswith("_api")]
+        pairs = []
+        for c in suffixed_api:
+            base = c[:-4]
+            if f"{base}_repl" in merged.columns:
+                pairs.append(base)
+    
+>       assert pairs, (
+            f"{spec.name}: no shared data columns after merge; "
+            f"API cols after transform={list(api.columns)}; "
+            f"repl cols={list(repl.columns)}"
+        )
+E       AssertionError: interview_date: no shared data columns after merge; API cols after transform=['Int_t']; repl cols=['date']
+E       assert []
+
+tests/test_uganda_api_vs_replication.py:573: AssertionError
+----------------------------- Captured stderr call -----------------------------
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+__________________ test_clean_countries_have_no_u_code_leaks ___________________
+[gw14] linux -- Python 3.11.6 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+    def test_clean_countries_have_no_u_code_leaks():
+        import warnings
+    
+        import lsms_library as ll
+    
+        checked = 0
+        for c in _KNOWN_CLEAN:
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    fa = ll.Country(c, preload_panel_ids=False).food_acquired()
+            except Exception:
+                continue  # microdata not available in this environment
+            checked += 1
+            leaks = diagnostics.food_acquired_u_code_leaks(c, df=fa)
+>           assert not leaks, f"{c}: leaked u codes {leaks[:10]}"
+E           AssertionError: Mali: leaked u codes ['10 Kg', '25 Kg', '5 Kg']
+E           assert not ['10 Kg', '25 Kg', '5 Kg']
+
+tests/test_u_code_leak.py:104: AssertionError
+=============================== warnings summary ===============================
+tests/test_dvc_caching.py: 13 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1035: UserWarning: Country directory not found for 'TestCountry'
+    warnings.warn(f"Country directory not found for {country_name!r}")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Kazakhstan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Kazakhstan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 3 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py: 2 warnings
+tests/test_sample.py: 9 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['i', 't'] had 5228 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+tests/test_canonical_shape_via_cache_miss.py: 1 warning
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['i', 't'] had 2 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_sample.py: 27 warnings
+tests/test_age_dtype_consistency.py: 6 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a22
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 27 warnings
+tests/test_age_dtype_consistency.py: 6 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a23
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 18 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a37
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 18 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a40
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['i', 't'] had 60 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_sample.py: 16 warnings
+tests/test_canonical_shape_via_cache_miss.py: 2 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq13y
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 16 warnings
+tests/test_canonical_shape_via_cache_miss.py: 2 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq16y
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 16 warnings
+tests/test_canonical_shape_via_cache_miss.py: 2 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: tracked_obs
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 7 warnings
+tests/test_canonical_shape_via_cache_miss.py: 1 warning
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['i', 't'] had 792 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+  One or more strings in the dta file could not be decoded using utf-8, and
+  so the fallback encoding of latin-1 is being used.  This can happen when a file
+  has been incorrectly encoded by Stata or some other software. You should verify
+  the string values returned are correct.
+    values = reader.value_labels()
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['i', 't'] had 8 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s00_inte
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s00_supe
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py: 8 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s00_entr
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_has_v_column[Serbia]
+tests/test_sample.py::TestSample::test_v_mostly_populated[Serbia]
+tests/test_sample.py::TestSample::test_index_is_i_t[Serbia]
+tests/test_sample.py::TestSample::test_v_is_string_dtype[Serbia]
+tests/test_sample.py::TestSample::test_no_duplicate_index[Serbia]
+tests/test_sample.py::TestSample::test_weighted_population_stable_across_waves[Serbia]
+tests/test_sample.py::TestSample::test_cross_section_weight_positive_when_panel_null[Serbia]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Serbia]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Serbia]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['i', 't'] had 5805 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_locality_deprecation.py: 2 warnings
+tests/test_sample.py: 15 warnings
+tests/test_canonical_shape_via_cache_miss.py: 6 warnings
+tests/test_add_market_index_dedup.py: 3 warnings
+tests/test_uganda_tables.py: 1 warning
+tests/test_uganda_v_grain_invariants.py: 6 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_locality_deprecation.py: 2 warnings
+tests/test_sample.py: 15 warnings
+tests/test_canonical_shape_via_cache_miss.py: 6 warnings
+tests/test_add_market_index_dedup.py: 3 warnings
+tests/test_uganda_tables.py: 1 warning
+tests/test_uganda_v_grain_invariants.py: 6 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2010-11]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2015-16]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 3168 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2010-11]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2015-16]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2657 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2010-11]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2015-16]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2392 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2010-11]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2015-16]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2529 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2010-11]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2015-16]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2412 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2010-11]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2015-16]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2430 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2010-11]
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2015-16]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2425 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_sample.py: 9 warnings
+tests/test_age_dtype_consistency.py: 2 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['i', 't'] had 59 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Malawi]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Malawi]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 165 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Guyana_household_characteristics]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Guyana]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Guyana]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 888 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Guyana_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Azerbaijan_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Serbia_and_Montenegro_household_characteristics]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/diagnostics.py:808: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    ref_df = ref_method()
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Benin]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Benin]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Benin/2018-19/Data/s01_me_ben2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/demog89_1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/age_sex_r4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py: 7 warnings
+tests/test_age_dtype_consistency.py: 4 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/roster.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_v_is_string_dtype[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_v_mostly_populated[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_has_weight_column[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_has_v_column[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_covers_all_waves[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_no_duplicate_index[EthiopiaRHS]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[EthiopiaRHS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[EthiopiaRHS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/2004/Data/consumptionaggregates_123456.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_v_is_string_dtype[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_v_mostly_populated[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_has_weight_column[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_has_v_column[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_covers_all_waves[EthiopiaRHS]
+tests/test_sample.py::TestSample::test_no_duplicate_index[EthiopiaRHS]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[EthiopiaRHS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[EthiopiaRHS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/consumptionAggrgates_r7.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py: 32 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:854: UserWarning: Makefile not found in /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/_. Unable to generate required data.
+    warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Albania]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Albania]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1888: UserWarning: Unknown relationship labels (add to kinship.yml): ['Father / mother-in-law', 'Grandfather / Mother', 'brother/sister in-law', 'father/mother in-law']
+    df = _expand_kinship(df)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 32026 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Mali/2018-19/Data/s01_me_mli2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Mali/2021-22/Data/s01_me_mli2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 38 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Burkina_Faso]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Burkina_Faso]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Burkina_Faso/2018-19/Data/s01_me_bfa2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Burkina_Faso]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Burkina_Faso]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Burkina_Faso/2021-22/Data/s01_me_bfa2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[China]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[China]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 4 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:405: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[CotedIvoire]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[CotedIvoire]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 2 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[CotedIvoire]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[CotedIvoire]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file CotedIvoire/2018-19/Data/Menage/s01_me_CIV2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Ethiopia]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Ethiopia]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q06
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Niger]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Niger]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 210 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Niger]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Niger]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Niger/2018-19/Data/s01_me_ner2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Niger]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Niger]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Niger/2021-22/Data/s01_me_ner2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Senegal]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Senegal]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Senegal/2018-19/Data/s01_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[South Africa]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[South Africa]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1888: UserWarning: Unknown relationship labels (add to kinship.yml): ['-1']
+    df = _expand_kinship(df)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q2
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q4
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q7
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q10
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q11
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: isabel
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Togo]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Togo]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Togo/2018/Data1/s01_me_tgo2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaLSS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 10 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Guinea-Bissau]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Guinea-Bissau]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1009: UserWarning: Refusing workspace copy of DVC-tracked file Guinea-Bissau/2018-19/Data/s01_me_gnb2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Iraq]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Iraq]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 175725 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Iraq]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Iraq]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1859: UserWarning: Iraq: waves ['2012'] have 100% NaN v after _join_v_from_sample; these will be silently dropped from derived tables (household_characteristics, food_expenditures, food_prices, food_quantities) by the downstream groupby.  Check i-key compatibility between the roster source and the sample table -- compare wave-level data_info.yml's `idxvars.i` on each side.  See GH #256 for context and PRs #244 / #253 / #255 for the established fix pattern.
+    df = self._join_v_from_sample(df)
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'j'] had 1276 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'j'] had 1147 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i'] had 623483 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'j'] had 6523 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'i', 'j'] had 1049585 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1859: UserWarning: GhanaLSS: waves ['1991-92', '1998-99', '2005-06'] have 100% NaN v after _join_v_from_sample; these will be silently dropped from derived tables (household_characteristics, food_expenditures, food_prices, food_quantities) by the downstream groupby.  Check i-key compatibility between the roster source and the sample table -- compare wave-level data_info.yml's `idxvars.i` on each side.  See GH #256 for context and PRs #244 / #253 / #255 for the established fix pattern.
+    df = self._join_v_from_sample(df)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sample.py::TestSample::test_covers_all_waves[Albania] - Ass...
+FAILED tests/test_uganda_invariance.py::test_parquet_matches_baseline[2005-06/_/interview_date.parquet]
+FAILED tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/cluster_features.parquet]
+FAILED tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/shocks.parquet]
+FAILED tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date]
+FAILED tests/test_u_code_leak.py::test_clean_countries_have_no_u_code_leaks
+6 failed, 1134 passed, 115 skipped, 10 xfailed, 1 xpassed, 601 warnings in 530.51s (0:08:50)

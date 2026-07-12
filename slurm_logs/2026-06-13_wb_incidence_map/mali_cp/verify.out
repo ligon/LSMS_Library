@@ -1,0 +1,30 @@
+community_prices: (23646, 2) ['t', 'v', 'j', 'u']
+is_this_feature_sane.ok = True
+  (sane)
+food_acquired: OK shape=(430188, 2) index=['i', 't', 'v', 'j', 'u', 's']
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+crop_production: OK shape=(35060, 8) index=['i', 't', 'v', 'plot', 'crop']
+food_prices: OK shape=(342121, 1) index=['i', 't', 'v', 'j', 'u', 's']

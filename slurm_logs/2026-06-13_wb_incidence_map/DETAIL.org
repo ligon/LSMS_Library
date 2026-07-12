@@ -1,0 +1,242 @@
+#+TITLE: WB LSMS-ISA × LSMS_Library — per feature-area detail
+#+AUTHOR: wb-incidence-map synthesis agent
+#+DATE: 2026-06-13
+
+Per feature-area crosswalk. "Their variable group" lists the dominant
+constructs from =define_labels= (programs.do:562-764) and the per-country
+=.do=. "agg/item" is the dominant tag across the 7 overlap countries.
+".do source" points at the construct to consult. "Recommendation" obeys both
+cautions: aggregates/indices/ratios/median-valuations become
+=transformations= functions over item-level data; data-layer features are
+proposed at their natural grains (no wide mirror).
+
+* 1. Panel IDs
+- *Ours*: =panel_ids= (+ =updated_ids=), property-dicts on =Country=.
+- *Theirs*: =hh_id_obs/_merge=, =indiv_id_obs/_merge=, =plot_id_obs/_merge=,
+  =parcel_id_obs/_merge=, =manager_id_obs/_merge=, =respondent_id_obs/_merge=,
+  =ea_id_obs/_merge=, =wave=, =season= (UGA). Grain: per-entity.
+- *agg/item*: item (the =group()= relabels keys; for Mali/Niger the IDs are a
+  cross-section "group()" so tagged agg, but they are still keys, not sums).
+- *.do source*: =Append_{CC}.do= ID-frame section (e.g. =Append_ETH.do:30-49=,
+  =Append_NGA.do:25=, =Append_UGA.do:130-136=).
+- *Recommendation*: BOTH — no action. Our =panel_ids= already maps raw→panel.
+
+* 2. Sampling/geography
+- *Ours*: =sample= (i,t → v, weight, panel_weight, strata, Rural) +
+  =cluster_features= (geovars, distances, aez).
+- *Theirs*: =strataid=, =urban=, =admin_1..4 (+_name)=, =pw=,
+  =geocoords_id/lat_modified/lon_modified=, =dist_road/popcenter/market=,
+  =aez=, =elevation/twi/popdensity=. Grain: hh / ea.
+- *agg/item*: item (=soil_fertility_index= is the one agg, a PCA — minor).
+- *.do source*: =ETH_ESS1.do:111-178,1114-1175=; =NGA_GHS1.do:102-147,1172-1177=.
+- *Recommendation*: BOTH — no action. =soil_fertility_index= (if wanted) is a
+  =transformations= PCA over our soil-quality items, not a stored column.
+
+* 3. HH composition
+- *Ours*: =household_characteristics= (runtime-derived from =household_roster=).
+- *Theirs*: =hh_size= (item-ish), =hh_dependency_ratio= (dep/nondep ratio).
+- *agg/item*: agg (dependency ratio dominates).
+- *.do source*: =ETH_ESS1.do:957-961=; =MWI_IHPS1.do:965-976=; =TZA_NPS1.do:723-737=.
+- *Recommendation*: BOTH^a — no data-layer action. =hh_dependency_ratio= is a
+  transform over our roster; surface as a =household_characteristics= column
+  or a small transforms helper if a consumer asks.
+
+* 4. Individual roster
+- *Ours*: =household_roster= (Sex, Age, Generation, Distance, Affinity, …).
+- *Theirs*: =age=, =female=, =married=, =relationship_head=, =birth_month=,
+  =working_age=, =indiv_id=. Grain: individual.
+- *agg/item*: item.
+- *.do source*: =ETH_ESS1.do:1197-1213=; =MLI_EACI1.do:1400-1429=; =TZA_NPS1.do:977-999=.
+- *Recommendation*: BOTH — no action. Their =relationship_head= maps to our
+  Kroeber decomposition; =working_age= is a trivial transform over =Age=.
+
+* 5. Education
+- *Ours*: =individual_education=.
+- *Theirs*: =formal_education=, =primary_education/education= (individual);
+  =hh_formal_education=, =hh_primary_education= (HH max rollups);
+  =*_education_manager=, =*_education_respondent= (plot-actor extracts).
+- *agg/item*: mixed (individual binaries item; HH rollups agg).
+- *.do source*: =ETH_ESS1.do:1268-1277,934-939=; =MWI_IHPS1.do:1273-1282,948-951=.
+- *Recommendation*: BOTH — no data-layer action. The HH-max rollups and the
+  plot-manager/respondent education joins are =transformations= over
+  =individual_education= + =plot_features= manager keys, not stored columns.
+
+* 6. Anthropometry/nutrition
+- *Ours*: =nutrition= (Ethiopia; Uganda with FCT). Absent Mali/Malawi/Niger/
+  Nigeria/Tanzania.
+- *Theirs*: =weight=, =height= (item), =haz06/waz06/whz06/bmiz06= (z-score
+  index), =wasting= (whz06<-2). Present ETH/MWI/NGA/TZA/UGA; absent MLI/NER.
+  =HDDS= filed here too (dietary aggregate).
+- *agg/item*: item for weight/height; z-scores are derived indices (agg) but
+  per-individual.
+- *.do source*: =ETH_ESS1.do:1217-1235=; =MWI_IHPS1.do:1213-1231=;
+  =TZA_NPS1.do:1002-1024=; =NGA_GHS1.do:1296-1308=.
+- *Recommendation*: THEIRS-ONLY for Malawi/Nigeria/Tanzania → *build
+  =nutrition= as an item feature* at grain =(t,i,individual)= carrying raw
+  weight/height; z-scores (haz/whz/...) are a =transformations= fn (anthro
+  reference-pop lookup), NOT stored. See GAP_RANKING #2.
+
+* 7. Labor/time-use
+- *Ours*: Uganda only — =people_last7days=, =earnings=, =income=,
+  =enterprise_income=. None elsewhere.
+- *Theirs*: individual 7-day =farm_work/SOB_work/wage_work=,
+  =farm_hrs/SB_hrs/wage_hrs=, industry dummies =ind_ag.../ind_serv=,
+  =working_age= (item); plot =total_labor_days=, =total_family_labor_days=,
+  =total_hired_labor_days= (collapse-sum, agg); =hired_labor_value= (agg).
+- *agg/item*: mixed.
+- *.do source*: =ETH_ESS1.do:1242-1264 (individual)=, =787-799 (plot days)=;
+  =TZA_NPS1.do:1027-1062, 513-546=; =UGA_UNPS1.do:968-992, 467-509=.
+- *Recommendation*: THEIRS-ONLY for ETH/MLI/MWI/NER/NGA/TZA → *build
+  individual labor feature* =people_last7days= at =(t,i,individual)= (work
+  dummies, hours, industry); *plot labor* is a separate feature
+  =plot_labor (t,i,plot)= holding family/hired *days* (item rows, NOT the
+  pre-summed total). =total_labor_days= and =hired_labor_value= are
+  =transformations= over those. See GAP_RANKING #1.
+
+* 8. Plots/parcels
+- *Ours*: =plot_features=.
+- *Theirs*: =plot_area/plot_area_GPS/self_reported_area=, =irrigated=,
+  =fallow=, =erosion_protection=, =plot_owned/parcel_owned=,
+  =plot_certificate=, =intercropped=, =plot_slope/plot_dist_household=, soil
+  indices; HH-grain aggs =farm_size=, =nb_plots=, =nb_fallow_plots=,
+  =soil_fertility_index= (agg).
+- *agg/item*: mixed (plot attrs item; HH counts/farm_size agg).
+- *.do source*: =ETH_ESS1.do:451-492,877-919=; =MWI_IHPS1.do:606-632,886-939=;
+  =UGA_UNPS1.do:396-427,601-633=.
+- *Recommendation*: BOTH — verify =plot_features= carries the item attrs
+  (area, irrigated, fallow, owned, certificate, erosion). =farm_size=,
+  =nb_plots=, =nb_fallow_plots= are =transformations= (HH sums/counts over
+  =plot_features=), never stored. Possible OURS-PARTIAL — see GAP_RANKING #6.
+
+* 9. Crop production/harvest
+- *Ours*: NONE.
+- *Theirs*: =harvest_kg= (collapse-sum, plot-crop), =harvest_sold_kg=,
+  =share_kg_sold= (ratio), =yield_kg= (harvest/area ratio), =main_crop=,
+  =maincrop_valueshare=, =contains_crop_*/share_value_*= (crop-group dummies/
+  shares), =nb_seasonal_crop=, =planting_month/harvest_end_month= (item),
+  =intercropped=. Present all 7.
+- *agg/item*: agg (the harvest/yield/share constructs dominate).
+- *.do source*: =ETH_ESS1.do:256, 321-333=; =Append_ETH.do:241,296=;
+  =NGA_GHS1.do:191-292=; =TZA_NPS1.do:205-221=; =MLI_EACI1.do:296,540=.
+- *Recommendation*: THEIRS-ONLY^a all 7 → *build item feature*
+  =crop_production (t,i,plot,crop)= holding *reported harvest quantity per
+  crop+unit and reported sale quantity/value* (raw rows, not the plot-crop
+  sum). =harvest_kg= (unit→kg sum), =yield_kg=, =share_kg_sold=, =main_crop=,
+  crop-group shares are ALL =transformations= over that feature. Top gap —
+  GAP_RANKING #1 area.
+
+* 10. Ag inputs
+- *Ours*: NONE.
+- *Theirs*: =seed_kg= (collapse-sum), =seeds_amount_purchased_kg=,
+  =improved=, =inorganic_fertilizer/organic_fertilizer= (binaries),
+  =nitrogen_kg= (kg×N-content sum), =UREA_kg/DAP_kg/NPK_kg= (unit-conv),
+  =used_pesticides= (binary), =tractor=. Present all 7.
+- *agg/item*: mixed (binaries item; kg sums agg).
+- *.do source*: =ETH_ESS1.do:506-515,833-836,870-874=;
+  =MLI_EACI1.do:623,962-965,1039=; =NGA_GHS1.do:500-803=.
+- *Recommendation*: THEIRS-ONLY all 7 → *build item feature*
+  =plot_inputs (t,i,plot,input)= with one row per input applied (type,
+  reported quantity+unit, purchased flag, improved-seed flag). =seed_kg=,
+  =nitrogen_kg= (N-content factors), the =inorganic_fertilizer= any-flag are
+  =transformations= over those rows. GAP_RANKING #2 area.
+
+* 11. Ag valuations
+- *Ours*: =food_prices= (runtime-derived from =food_acquired=) — *valuation
+  logic only*, and only for *consumed food*, not plot production.
+- *Theirs*: =harvest_value_{LCU,USD}=, =yield_value_{LCU,USD}=,
+  =seed_value_{LCU,USD}=, =hired_labor_value_{LCU,USD}=,
+  =inorganic_fertilizer_value_{LCU,USD}=, =harvest_sold_value=. All
+  median-price imputed (price = sold_value/sold_kg, then median over
+  EA/admin cells with ≥10 obs), then USD via CPI deflator + Atlas FX.
+- *agg/item*: agg (median-price imputed valuation — the canonical aggregate).
+- *.do source*: valuation programs =programs.do:4-108 (crops)=,
+  =138-243 (seeds)=, =244-470 (wages)=, =471-561 (fert)=; deflator in each
+  =Append_{CC}.do:~440-520=.
+- *Recommendation*: BOTH^a in name only. *Never* store any =*_value_*= column.
+  Once Areas 9 & 10 item features exist, add a single =transformations= fn
+  =median_price_valuation()= that reproduces their EA/admin median-price
+  ladder over the item rows + a =deflate_to_usd()= helper. This is the
+  archetypal "aggregation lives in transformations" case. GAP_RANKING #7.
+
+* 12. Livestock
+- *Ours*: NONE (CLAUDE.md notes "livestock (bespoke today)").
+- *Theirs*: =livestock= — a *single binary* "engaged in livestock activities
+  y/n", collapse-max to HH. NO herd counts, NO TLU, NO valuation anywhere.
+- *agg/item*: item (ETH/MWI/NGA/UGA) vs agg (MLI/NER/TZA collapse-max). Their
+  construct is thin either way.
+- *.do source*: =ETH_ESS1.do:966-971=; =NGA_GHS1.do:992-998=;
+  =MWI_IHPS1.do:978-986=; =TZA_NPS1.do:739-747=.
+- *Recommendation*: THEIRS-ONLY all 7, but theirs is a *degenerate* binary.
+  Build =livestock (t,i,animal)= item feature from the raw livestock roster
+  (species, head counts, owned/sold) — RICHER than theirs. Their binary is
+  then =df.groupby(['t','i']).any()= in transforms. GAP_RANKING #4.
+
+* 13. Assets
+- *Ours*: =assets= (item-level ownership rows).
+- *Theirs*: =ag_asset_index=, =hh_asset_index= — PCA/factor scores only; the
+  underlying per-item ownership dummies are reshaped wide then *discarded*.
+- *agg/item*: agg (constructed indices).
+- *.do source*: =ETH_ESS1.do:1077-1102=; =MWI_IHPS1.do:1070-1096=;
+  =NGA_GHS1.do:1124-1162=; =TZA_NPS1.do:856-884=.
+- *Recommendation*: BOTH^a — we already hold the items they threw away. To
+  reach parity on the *index*, add a =transformations= fn =asset_index()=
+  (PCA factor over our =assets= ownership), NEVER store the score.
+
+* 14. Consumption/welfare
+- *Ours*: =food_acquired= (+ runtime =food_expenditures/quantities=),
+  =nonfood_expenditures= (Nigeria, Uganda).
+- *Theirs*: =totcons_{LCU,USD}= (per-capita consumption aggregate, taken from
+  a precomputed WB file), =cons_quint= (xtile), =HDDS=. No item-level food
+  acquisition on their side.
+- *agg/item*: agg (totcons/quintile/HDDS all aggregates).
+- *.do source*: =ETH_ESS1.do:980-984,973-977=; =MWI_IHPS2.do:1043-1054=;
+  =UGA_UNPS1.do:731-737=.
+- *Recommendation*: BOTH^a — we hold the items; =totcons=, =cons_quint=, =HDDS=
+  are optional =transformations= over our food/nonfood item data (or a
+  pass-through of the WB aggregate file). No data-layer gap; consider a
+  =consumption_aggregate()= transform for those who want totcons parity.
+
+* 15. Housing/utilities
+- *Ours*: =housing= (Roof, Floor, Walls, Water, Toilet — categorical schema).
+- *Theirs*: =hh_electricity_access= — the *only* housing var; no roof/floor/
+  water/toilet harmonised on their side.
+- *agg/item*: item.
+- *.do source*: =ETH_ESS1.do:946-950=; =MWI_IHPS1.do:957-962=;
+  =NGA_GHS1.do:965-970=; =UGA_UNPS1.do:684-691=.
+- *Recommendation*: BOTH — our coverage is strictly *richer*. Confirm =housing=
+  carries an electricity indicator (or derive =Electricity= from the same
+  housing module) to close the one var they have that we might not surface.
+
+* 16. Shocks
+- *Ours*: =shocks=.
+- *Theirs*: =hh_shock= (any negative shock 12mo, collapse-max), =crop_shock=,
+  =drought_shock/rain_shock/pests_shock/flood_shock= (per plot-crop binaries).
+- *agg/item*: mixed (=hh_shock= agg; crop-cause shocks item).
+- *.do source*: =ETH_ESS1.do:1069-1073=; =NGA_GHS1.do:1107-1114,222-241=;
+  =MWI_IHPS1.do:1055-1059,327-387=.
+- *Recommendation*: BOTH — verify =shocks= carries the per-shock-type rows
+  (drought/flood/pests). =hh_shock= any-flag is a transform. The
+  crop-attributed shocks (plot-crop grain) are better modelled as a column on
+  the Area-9 =crop_production= feature than duplicated into =shocks=.
+
+* 17. Subjective wellbeing
+- *Ours*: =subjective_well_being= (Mali, Malawi, Niger);
+  =life_satisfaction= (Tanzania, domain-satisfaction battery). None for
+  Ethiopia/Nigeria/Uganda.
+- *Theirs*: NONE anywhere (zero constructs across all 7 panels and
+  =define_labels=).
+- *agg/item*: n/a.
+- *.do source*: n/a (confirmed absent).
+- *Recommendation*: OURS-ONLY (MLI/MWI/NER/TZA) / NEITHER (ETH/NGA/UGA). No
+  parity action vs theirs; OURS-ONLY is a coverage win.
+
+* 18. Food security
+- *Ours*: =food_security= (FIES), =food_coping= (rCSI),
+  =months_food_inadequate=, =food_security_hfias= per country (varies).
+- *Theirs*: only =HDDS= (dietary-diversity aggregate) — present Niger, Uganda;
+  nothing for ETH/MLI/MWI/NGA/TZA. HDDS is NOT an experience scale.
+- *agg/item*: agg (HDDS is a rowtotal of 12 collapse-max group flags).
+- *.do source*: =NER_ECVMA1.do:1472-1486=; =UGA_UNPS1.do:1013-1039=.
+- *Recommendation*: OURS-ONLY (ETH/MLI/MWI/NGA/TZA) — coverage win, we carry
+  true experience scales. For Niger/Uganda BOTH^a: HDDS, if wanted, is a
+  =transformations= fn over item-level diet recall, NOT a stored feature.

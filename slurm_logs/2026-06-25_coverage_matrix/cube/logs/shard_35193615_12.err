@@ -1,0 +1,11 @@
+[matrix] building (full) ...
+  Guinea-Bissau: 1 waves × 21 features
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guinea-Bissau/2018-19/_/people_last7days.py:115: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s01_me_gnb2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  s01 = get_dataframe('../Data/s01_me_gnb2018.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guinea-Bissau/2018-19/_/plot_features.py:24: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_gnb2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_gnb2018.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guinea-Bissau/2018-19/_/plot_labor.py:139: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_gnb2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_gnb2018.dta', convert_categoricals=False)
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Guinea-Bissau.csv (21 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=0, declared=0, dropped=0, broken=0, builds=0, sane=21, blessed=0

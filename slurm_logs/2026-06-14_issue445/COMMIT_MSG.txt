@@ -1,0 +1,42 @@
+fix(#445): clear the pre-existing cold-gate failures (Uganda baselines, Albania waves)
+
+The 2026-06-14 full cold `pytest --rebuild-caches` gate surfaced 5 failures,
+none introduced by the parity loop.  Four are stale baselines tracking
+intentional, already-shipped schema evolution; one is a framework footgun.
+
+Albania `waves` (fixes test_sample[Albania] "missing 1996"):
+  `Country.waves` consults a `_/{country}.py` module's `waves` attribute BEFORE
+  the data_scheme `Waves:` list, then falls through to a directory glob when the
+  module defines none.  `albania.py` existed without a `waves` attr, so the glob
+  silently re-included `1996/` (Documentation/SOURCE.org present) despite
+  data_scheme documenting it as excluded (EWS, not LSMS).  Add the authoritative
+  `waves` list to `albania.py`.  (The broader property footgun -- data_scheme
+  `Waves:` ignored whenever a country module exists -- is left for a framework
+  follow-up; Albania is the only country currently affected.)
+
+Uganda invariance baseline (regenerate tests/fixtures/uganda_baseline.json):
+  Regenerated via the canonical tests/generate_baseline.py against a fresh cold
+  build, restricted to the original 53-key set (no test-surface expansion).
+  13 entries updated, all verified DETERMINISTIC across two independent cold
+  builds:
+    - interview_date (9): `date` -> `Int_t` (commit 4192eb06, closes #325).
+    - cluster_features: Lat/Lon float32 -> float64 + GPS now populated
+      (coords within Uganda's bounding box; #161 wiring).
+    - shocks (var + 2005-06): pandas-3.0 dtype migration (boolean -> string,
+      Int64 -> Float64; values preserved).
+    - nutrition: deterministic content drift from food-chain evolution
+      (masked in the gate by skip/ordering; reproducible hash).
+
+interview_date api-vs-replication (xfail):
+  Matches the existing food_acquired / nutrition pattern -- the replication
+  baseline predates #325 and still carries `date`, so the merge finds no shared
+  data column.  Library output is correct; replication should regenerate.
+
+NOT changed -- food_quantities api-vs-replication:
+  Passes deterministically both warm and cold in isolation; its gate failure is
+  the pre-existing #330 parallel-cold cache-race flake, not a stale baseline.
+  Left for #330 rather than masked with a (would-XPASS) xfail.
+
+Refs #445.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
