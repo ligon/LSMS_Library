@@ -34,7 +34,21 @@ The returned DataFrame prepends a `country` index level.
 - `scrum-master-hpc` (shared sucoder skill at `~/.sucoder/skills/scrum-master-hpc/SKILL.md`) — dispatching subagents, worktrees, DVC lock hygiene. Read this before using the Agent tool for multi-country work. Library-specific addenda:
   1. Subagents share the parquet cache at `~/.local/share/lsms_library/`, so concurrent agents building different countries don't conflict.
   2. The venv is at `{repo_root}/.venv/bin/python` (not in worktrees) — set `PYTHONPATH` to the worktree so development-branch code is picked up.
-  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path** — `PYTHONPATH` alone does NOT redirect imports of `lsms_library` to a worktree.  Worker agents that rebuild a feature to verify a YAML edit will silently run the main checkout's code.  For **config** edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), set **`LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries`** so the live package reads the worktree's config tree (GH #436); this is the clean fix and needs no fresh venv.  For **library-code** edits (`country.py`, `local_tools.py`, …) the `.pth` still pins to the main checkout, so either (a) verify via static diff only, or (b) have the agent install a fresh venv inside its worktree.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill for detection and mitigations.
+  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path**, so a worktree agent can silently verify against the *main checkout's* code.  **Always set `PYTHONPATH=<worktree>`** — it *does* beat the `.pth` (corrected 2026-07-12; this entry previously claimed the opposite, and the wrong claim sent people to a needless fresh-venv build).
+
+     **The actual trap is `python <script>.py`.**  Python sets `sys.path[0]` to the **script's own directory**, *not* cwd.  So `cd`-ing into the worktree does **not** protect a script run — cwd never enters `sys.path` at all, the `.pth`'s main-repo path wins, and you import the main checkout while believing you are testing the worktree.  Verified:
+
+     | invocation (cwd = worktree) | `PYTHONPATH` | imports |
+     |---|---|---|
+     | `python -c "import lsms_library"` | unset | worktree ✓ (cwd is `sys.path[0]`) |
+     | `python bench/scan.py` | unset | **main checkout ✗ — the trap** |
+     | `python bench/scan.py` | `=<worktree>` | worktree ✓ |
+
+     This has already cost a worker agent a full wasted audit run (PR #594).  Since the failure is *silent* and looks like success, **assert it** rather than assume it:
+     ```python
+     import lsms_library; assert 'worktrees' in lsms_library.__file__, lsms_library.__file__
+     ```
+     For **config**-only edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), `LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries` is the cleaner lever: the live package reads the worktree's config tree (GH #436) and library-code identity stops mattering.  A fresh in-worktree venv is **not** needed for either case.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill.
   4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's **adopt-or-build recipe** (adopt any importable `/local/job*/venv` already on the node → tar-pipe build only if none → reclaim the stale ones), which gives cross-job persistence without root.  Note: a stable `/local/$USER/<repo>` path is NOT creatable by us (`/local` is `root:root`); a genuinely persistent path needs an HPC-support ticket (README "Admin endgame").  **Opt-in fast path**: `bin/savio_venv.sh` packages the venv as a single squashfs image (`.venv.sqfs`, ~255 MB / one Lustre inode vs ~33k files) and mounts it per job via apptainer's `squashfuse_ll` (`mount`/`umount`/`update` subcommands) — kills the Lustre-MDS load and sidesteps the per-job reaper; see `docs/savio_venv.md` for the model + how to rebuild the image when deps change.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
 
 ## Repository Layout
@@ -155,6 +169,40 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 **Root cause context**: the replication pipeline (`lsms.tools.get_household_roster`) did `dropna(how='any')` on `[HHID, sex, age, months_spent]`, implicitly excluding departed members. The current API's runtime derivation previously counted everyone in the roster, producing a 1315-HH drift on Uganda `household_characteristics`. Adding MonthsSpent + the filter resolved this to ~220 residual outliers (age-bracket boundary shifts from `age_handler`'s DOB-derived fractional ages).
 
 **EHCVM note**: EHCVM 2018-19 countries lack a continuous months variable. The binary `s01q12` ("lived continuously 6+ months?") is mapped to 0/12. Guinea-Bissau may need Portuguese keys (`Sim`/`Não`) alongside `Oui`/`Non`. See CONTENTS.org files for per-country documentation.
+
+## Coverage Matrix (v0.9.0+)
+
+`make matrix` grades every `(country, feature, wave)` cell on a tier ladder — `absent` / `dropped` / `broken` / `builds` / `sane` / `blessed` — and commits a snapshot to `.coder/coverage/latest.csv`. `ll.coverage()` reads it back. See `docs/guide/coverage.md`.
+
+**`sane` is not `blessed`, and the difference matters.**
+
+- **`sane`** — the automated checks passed. *No human has necessarily looked at a single number.*
+- **`blessed`** — a human read the actual numbers for that cell and believes them. Recorded in the git-tracked `.coder/coverage/blessed.csv`.
+
+A feature can build cleanly, pass every sanity check, and still be quietly wrong — wired to the wrong source column, or carrying an unverified unit conversion. So **for anything feeding published analysis, `sane` is not enough.**
+
+> **The rule: if you used a cell in real analysis and looked at its numbers, bless it in the same PR.**
+> `country,feature,wave,blessed_by,date,note` (`wave` blank for country-level features). Blessings accrete; never bulk-seed them. An empty blessing file is honest — a file full of blessings nobody gave makes `blessed` a synonym for `sane` and destroys the tier.
+> Do **not** put `#` comments in `blessed.csv`: `load_blessed()` reads it without a `comment=` arg, so a comment line becomes a phantom blessed cell.
+
+**Do not trust a `sane` cell as proof an issue is fixed.** Know what the grader does *not* look at — it is a cold build (so it cannot see warm-cache-only divergences) and it does not check currency labels.
+
+### Adjudicating `absent` cells
+
+`absent` says only "not declared for this wave" — which conflates *"the survey never asked"* with *"nobody wrote the config yet"*. Verdicts go in the git-tracked `.coder/coverage/absent_verdicts.csv` (`country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date`):
+
+| verdict | meaning | closes the cell? |
+|---|---|---|
+| `todo` | data is there, config missing | no — stays `absent`, but now sized + sourced |
+| `asked-not-distributed` | instrument asked; the shipped extract lacks it | **yes** → acquisition queue |
+| `not-asked` | genuinely never asked | **yes** → closed forever |
+| `unsure` | a required check could not be run | no — stays in the queue, records why |
+
+> **A closing verdict REQUIRES evidence — `load_verdicts()` refuses one without it.** A closing verdict is a permanent, unsupervised write. An unevidenced negative is unfalsifiable, and therefore permanent whether or not it is true.
+>
+> This already went wrong: `Albania/_/data_scheme.yml` asserted *"earlier waves have no shocks module"*, but Albania 2005's `migrationE_cl.dta` carries `m6e_q00 = 'Type of Shock Code'` with ten shock types. False, uncatchable (nothing recorded *how* it was reached), and it suppressed ~5 cells of work. **Never write an unevidenced "no module here" claim, in a verdict file or in a YAML comment.**
+
+Before closing a cell, run the four checks (see `docs/guide/coverage.md`). The two that are most often skipped and most often wrong: **C2 (sibling-wave differential) is necessary but NEVER sufficient** — module vocabularies change completely between waves; and **C4 (the questionnaire) is mandatory**, because *absence in the shipped `.dta` is not absence in the instrument*. Only the questionnaire separates `not-asked` from `asked-not-distributed`.
 
 ## Derived Tables
 

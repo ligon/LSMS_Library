@@ -14,27 +14,49 @@ See `.coder/charter-coverage-matrix.md` and `.coder/ledger/coverage-matrix.md`.
 
 Tier ladder (worst→best; each derived from existing machinery only):
 
-==========  ===========================================================
-tier        meaning
-==========  ===========================================================
-n/a         no per-wave readiness applies (country-level-only feature, or
-            the built table has no ``t`` axis)
-absent      feature applies to the country but its source is not declared
-            for this wave (``feature`` ∉ ``Wave.data_scheme`` ∪ derived)
-declared    source present for the wave; readiness not assessed
-            (coverage-only run)
-dropped     source declared for the wave but the wave is missing / empty in
-            the built table (the silent-drop bug class, e.g. Iraq #532)
-broken      the country-level build raised, or the whole feature is empty
-builds      wave slice is non-empty but ``SanityReport.ok is False``
-sane        wave slice is non-empty and ``SanityReport.ok is True``
-blessed     ``sane`` and listed in the git-tracked blessing file
-==========  ===========================================================
+=====================  ====================================================
+tier                   meaning
+=====================  ====================================================
+n/a                    no per-wave readiness applies: a country-level-only
+                       feature, a table with no ``t`` axis, or a country with
+                       no microdata in the repo at all (Armenia, Nepal — see
+                       :func:`countries_without_microdata`)
+not-asked              adjudicated: the instrument genuinely never asked.
+                       Closed.  *Requires evidence* (:func:`load_verdicts`).
+asked-not-distributed  adjudicated: the instrument DID ask, but the shipped
+                       extract does not carry the variables.  An acquisition
+                       problem, not a config one.  *Requires evidence.*
+absent                 feature applies to the country but its source is not
+                       declared for this wave — and the gap is UN-ADJUDICATED
+                       (or adjudicated ``todo``/``unsure``, which stay open).
+                       This is the live queue.
+declared               source present for the wave; readiness not assessed
+                       (coverage-only run)
+dropped                source declared for the wave but the wave is missing /
+                       empty in the built table (the silent-drop bug class)
+broken                 the country-level build raised, or the feature is empty
+builds                 wave slice is non-empty but ``SanityReport.ok is False``
+sane                   wave slice is non-empty and ``SanityReport.ok is True``
+                       — i.e. the automated checks passed.  NOT a claim that
+                       any human has looked at a single number.
+blessed                ``sane`` **and** a human read the numbers and believed
+                       them (git-tracked ``blessed.csv``).  Required for any
+                       cell feeding published analysis.
+=====================  ====================================================
+
+Two rules the tiers exist to enforce, both learned the hard way:
+
+- *An unevidenced negative is unfalsifiable, and therefore permanent whether or
+  not it is true.*  So a closing verdict without evidence is refused outright.
+- *A regrade is not a fix.*  When a change alters how cells are GRADED rather
+  than what they CONTAIN, first inventory what the old grading was catching by
+  accident (see GH #591, #592).
 """
 from __future__ import annotations
 
 import os
 import warnings
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -43,14 +65,60 @@ import pandas as pd
 # Tier ladder
 # ---------------------------------------------------------------------------
 TIER_ORDER = [
-    "n/a", "absent", "declared", "dropped", "broken", "builds", "sane", "blessed",
+    "n/a", "not-asked", "asked-not-distributed", "unconfigured", "absent",
+    "declared", "dropped", "broken", "builds", "sane", "blessed",
 ]
 # Worst → best, for rolling several wave tiers up into one grid cell. The most
 # actionable (a real defect) sorts first so problems surface in the summary.
+#
+# ``absent`` (= an *un-adjudicated* gap) sorts as actionable, because it is the
+# live queue.  ``not-asked`` and ``asked-not-distributed`` are *adjudicated* and
+# sort with ``n/a`` at the quiet end: they are settled, not pending.
 ROLLUP_PRIORITY = [
-    "broken", "dropped", "builds", "declared", "sane", "blessed", "absent", "n/a",
+    "broken", "dropped", "builds", "unconfigured", "absent", "declared",
+    "sane", "blessed", "asked-not-distributed", "not-asked", "n/a",
 ]
 COLUMNS = ["country", "feature", "wave", "tier", "coverage", "n_rows", "detail"]
+
+# ---------------------------------------------------------------------------
+# Absent-cell verdicts (GH #593)
+# ---------------------------------------------------------------------------
+# ``absent`` means only "this feature is not declared for this wave".  It
+# conflates states that could not be more different, and until they are
+# separated the number can never reach zero:
+#
+#   todo                   the data IS there; nobody has written the config.
+#                          Real, actionable work.  Stays ``absent`` in the grid
+#                          (it is the live queue) but is now *sized and sourced*.
+#   asked-not-distributed  the instrument DID ask, but the shipped extract does
+#                          not carry the variables.  An ACQUISITION problem, not
+#                          a config one -- a different queue entirely.
+#   not-asked              the instrument genuinely never asked.  Closed forever.
+#   unsure                 a required check could not be run.  STAYS in the queue,
+#                          and records why.  Silence is never evidence.
+#
+# A 38-cell pilot (2026-07-11) returned 25 todo / 13 unsure / **0 not-asked** --
+# so ``absent`` is not hiding "the survey never asked", it is hiding a backlog.
+# ``not-asked`` may be near-empty; the mechanism earns its keep by making every
+# probe TERMINATE in a recorded, re-checkable verdict rather than evaporating.
+#
+# The evidence bar is non-negotiable, because a verdict here is a PERMANENT,
+# UNSUPERVISED write.  An unevidenced negative is unfalsifiable, and therefore
+# forever.  This is not hypothetical: ``Albania/_/data_scheme.yml`` asserted
+# "earlier waves have no shocks module" -- and Albania 2005's
+# ``migrationE_cl.dta`` carries ``m6e_q00 = 'Type of Shock Code'`` with ten shock
+# types.  The claim was wrong, nobody could catch it, and it suppressed work.
+#
+# See ``docs/guide/coverage.md`` and
+# ``slurm_logs/DESIGN_coverage_discipline_2026-07-11.org``.
+ADJUDICATED_TIERS = {"not-asked", "asked-not-distributed"}
+VERDICTS = {"todo", "asked-not-distributed", "not-asked", "unsure"}
+# Verdicts that CLOSE a cell (change its tier away from plain ``absent``).
+# ``todo`` and ``unsure`` deliberately do not: they are still open work.
+_VERDICT_TO_TIER = {
+    "not-asked": "not-asked",
+    "asked-not-distributed": "asked-not-distributed",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -76,6 +144,72 @@ def default_blessed_path() -> Path:
     return _repo_root() / ".coder" / "coverage" / "blessed.csv"
 
 
+def default_verdicts_path() -> Path:
+    return _repo_root() / ".coder" / "coverage" / "absent_verdicts.csv"
+
+
+def load_verdicts(path: Path | None = None) -> dict[tuple[str, str, str], dict]:
+    """Adjudications of ``absent`` cells, keyed ``(country, feature, wave)``.
+
+    CSV with header
+    ``country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date``
+    (``wave`` blank for country-level features).  Missing file → empty dict.
+
+    ``verdict`` must be one of :data:`VERDICTS`.  A row is IGNORED (with a
+    warning) when its verdict is unknown, or when it claims a closing verdict
+    (``not-asked`` / ``asked-not-distributed``) with an **empty ``evidence``**
+    field.
+
+    That last rule is the point of the whole mechanism.  A closing verdict is a
+    permanent, unsupervised write: it removes a cell from the work queue with
+    nobody reviewing it.  An unevidenced negative cannot be challenged, and is
+    therefore permanent whether or not it is true.  So we simply do not accept
+    one -- an evidence-free close is not a close, it is a red cell that lies.
+    """
+    path = path or default_verdicts_path()
+    if not Path(path).exists():
+        return {}
+    df = pd.read_csv(path, dtype=str, keep_default_na=False)
+    out: dict[tuple[str, str, str], dict] = {}
+    for _, r in df.iterrows():
+        key = (r.get("country", ""), r.get("feature", ""), r.get("wave", ""))
+        verdict = (r.get("verdict", "") or "").strip()
+        if verdict not in VERDICTS:
+            warnings.warn(
+                f"absent_verdicts: ignoring {key} -- unknown verdict "
+                f"{verdict!r} (expected one of {sorted(VERDICTS)})",
+                stacklevel=2,
+            )
+            continue
+        if verdict in _VERDICT_TO_TIER and not (r.get("evidence", "") or "").strip():
+            warnings.warn(
+                f"absent_verdicts: ignoring {key} -- verdict {verdict!r} closes "
+                "the cell permanently and so REQUIRES a non-empty `evidence` "
+                "field.  An unevidenced negative is unfalsifiable.",
+                stacklevel=2,
+            )
+            continue
+        out[key] = dict(r)
+    return out
+
+
+def _absent_tier(country, feature, wave, verdicts) -> tuple[str, str]:
+    """Grade a not-declared cell: ``(tier, detail)``.
+
+    The single place ``absent`` is decided.  Without an adjudication the cell is
+    plain ``absent`` -- an *open, un-triaged* gap.  With one it may be closed
+    (``not-asked`` / ``asked-not-distributed``); ``todo`` and ``unsure`` stay
+    ``absent`` because they are still work, but carry their evidence forward so
+    the next person does not re-derive it.
+    """
+    v = verdicts.get((country, feature, str(wave) if wave is not None else ""))
+    if not v:
+        return "absent", "source not declared for wave"
+    verdict = v.get("verdict", "")
+    detail = f"{verdict}: {v.get('evidence', '')}".strip().rstrip(":")
+    return _VERDICT_TO_TIER.get(verdict, "absent"), detail
+
+
 def load_blessed(path: Path | None = None) -> set[tuple[str, str, str]]:
     """Return the git-tracked set of blessed ``(country, feature, wave)`` cells.
 
@@ -90,6 +224,68 @@ def load_blessed(path: Path | None = None) -> set[tuple[str, str, str]]:
         (r.get("country", ""), r.get("feature", ""), r.get("wave", ""))
         for _, r in df.iterrows()
     }
+
+
+def unconfigured_countries(countries_root) -> dict[str, int]:
+    """Country dirs with downloaded microdata but **no** ``_/data_scheme.yml``.
+
+    Returns ``{country: n_waves_with_data}``.
+
+    :func:`catalog.countries` admits a directory only if it carries a
+    ``_/data_scheme.yml``, so these are invisible to ``Country()``, to
+    ``Feature()``, and — until now — to this matrix.  As of 2026-07-11 that hid
+    **ten in-remit countries and ~35 waves of already-downloaded microdata**
+    (Afghanistan, Bosnia-Herzegovina, Brazil, Bulgaria, Kyrgyz Republic,
+    Nicaragua, Panama, Peru, Rwanda, Tanzania_Kegera).
+
+    A denominator that omits the work you have not started is not a denominator,
+    so the matrix now reports them as ``unconfigured`` rather than not at all.
+
+    A directory counts only if at least one of its wave subdirs has a ``Data/``
+    (with or without files — DVC sidecars alone are enough, since the blobs are
+    fetched lazily).  That keeps stray non-country dirs out.
+    """
+    out: dict[str, int] = {}
+    try:
+        root = Path(countries_root())
+    except Exception:  # noqa: BLE001
+        return out
+    for p in sorted(root.iterdir()):
+        if not p.is_dir() or p.name.startswith((".", "_")):
+            continue
+        if (p / "_" / "data_scheme.yml").exists():
+            continue                                   # configured; not our problem
+        n = sum(1 for w in p.iterdir() if w.is_dir() and (w / "Data").is_dir())
+        if n:
+            out[p.name] = n
+    return out
+
+
+@lru_cache(maxsize=1)
+def countries_without_microdata() -> dict[str, str]:
+    """Countries whose config exists but whose source microdata is not in-repo.
+
+    Declared in the canonical ``lsms_library/data_info.yml`` (config, not code —
+    GH #436), mirroring the "Countries Without Microdata" table in CLAUDE.md.
+
+    Their features *cannot* build.  That is a fact about data availability, not
+    a defect, so the matrix grades their cells ``n/a`` rather than ``broken``.
+    Before this, **all 8 ``broken`` cells in the cube were these two countries**
+    (Armenia ×2, Nepal ×6) — which meant the most alarming tier in the ladder
+    contained nothing actionable, and a genuine build failure would have been
+    lost among them.
+
+    Returns ``{country: reason}``.
+    """
+    try:
+        from importlib.resources import files
+        from .yaml_utils import load_yaml
+        with open(files("lsms_library") / "data_info.yml", encoding="utf-8") as fh:
+            info = load_yaml(fh)
+        section = (info or {}).get("Countries Without Microdata", {}) or {}
+        return dict(section.get("countries", {}) or {})
+    except Exception:  # noqa: BLE001 — a missing/old data_info.yml must not break grading
+        return {}
 
 
 # ---------------------------------------------------------------------------
@@ -167,7 +363,8 @@ def _safe_build(co, feature, env):
 
 
 def grade_feature(country_name, feature, waves, co, env, *,
-                  avail_by_wave=None, blessed=frozenset(), readiness=True) -> list[dict]:
+                  avail_by_wave=None, blessed=frozenset(), verdicts=None,
+                  readiness=True) -> list[dict]:
     """Per-wave cells for one ``(country, feature)``.
 
     Builds the country-level table at most once (``readiness=True``) and grades
@@ -187,50 +384,90 @@ def grade_feature(country_name, feature, waves, co, env, *,
             except Exception:  # noqa: BLE001 — a broken wave declares nothing
                 avail_by_wave[w] = set()
     covered: dict[str, bool] = {w: feature in avail_by_wave[w] for w in waves}
+    verdicts = {} if verdicts is None else verdicts
+
+    def _absent(w):
+        """The single place an un-declared cell is graded (see _absent_tier)."""
+        return _absent_tier(country_name, feature, w, verdicts)
 
     if not readiness:
-        return [
-            _cell(country_name, feature, w,
-                  tier="declared" if covered[w] else "absent",
-                  coverage="declared" if covered[w] else "absent",
-                  detail="coverage-only run")
-            for w in waves
-        ]
+        out = []
+        for w in waves:
+            if covered[w]:
+                out.append(_cell(country_name, feature, w, "declared", "declared",
+                                 detail="coverage-only run"))
+            else:
+                tier, detail = _absent(w)
+                out.append(_cell(country_name, feature, w, tier, "absent",
+                                 detail=detail))
+        return out
 
     df, err = _safe_build(co, feature, env)
     if err is not None or df is None or len(df) == 0:
         why = err or "feature built empty"
-        return [
-            _cell(country_name, feature, w,
-                  tier="broken" if covered[w] else "absent",
-                  coverage="declared" if covered[w] else "absent",
-                  detail=why if covered[w] else "source not declared for wave")
-            for w in waves
-        ]
+        # A country with no microdata in the repo cannot build.  That is a data-
+        # availability fact, not a defect -- grade `n/a`, not `broken`, so the
+        # `broken` tier stays meaningful.  (See countries_without_microdata.)
+        no_data = countries_without_microdata().get(country_name)
+        fail_tier = "n/a" if no_data else "broken"
+        if no_data:
+            why = f"no microdata in repo: {no_data}"
+        out = []
+        for w in waves:
+            if covered[w]:
+                out.append(_cell(country_name, feature, w, fail_tier, "declared",
+                                 detail=why))
+            else:
+                tier, detail = _absent(w)
+                out.append(_cell(country_name, feature, w, tier, "absent",
+                                 detail=detail))
+        return out
 
     names = list(df.index.names or [])
     if "t" not in names:
         rep = env["is_this_feature_sane"](df, country_name, feature)
         base = tier_from_report(rep)
-        cells = [
-            _cell(country_name, feature, w,
-                  tier="n/a" if covered[w] else "absent",
-                  coverage="declared" if covered[w] else "absent",
-                  detail=(f"no per-wave (t) axis; country-level grade={base}"
-                          if covered[w] else "source not declared for wave"))
-            for w in waves
-        ]
+        cells = []
+        for w in waves:
+            if covered[w]:
+                cells.append(_cell(country_name, feature, w, "n/a", "declared",
+                                   detail=f"no per-wave (t) axis; "
+                                          f"country-level grade={base}"))
+            else:
+                tier, detail = _absent(w)
+                cells.append(_cell(country_name, feature, w, tier, "absent",
+                                   detail=detail))
         cells.append(_cell(country_name, feature, None, base, "declared",
                            n_rows=len(df), detail=_report_summary(rep)))
         return cells
 
     t_values = {str(v) for v in df.index.get_level_values("t").unique()}
     t_level = df.index.get_level_values("t").astype(str)
+
+    # Columns populated SOMEWHERE in the country frame.  Exempt these from the
+    # per-wave ``no_all_null_columns`` check: it is a *country-level* check, and
+    # a question simply not fielded in a given wave is legitimately all-null in
+    # that wave's slice.  Without this, such cells were graded ``builds`` (a
+    # defect) rather than ``sane`` -- 128 of the 138 ``builds`` cells in the
+    # 2026-06-26 snapshot were this artefact, and *zero* of the columns they
+    # flagged were all-null country-wide.
+    #
+    # A column that IS all-null across the whole country stays non-optional and
+    # still (correctly) fails -- we are relaxing the slice, not the country.
+    #
+    # NB: this deliberately hides *wave-level* column gaps from the sanity
+    # grade, because a sanity grade is the wrong instrument for them.  Two such
+    # gaps that this exposure was catching only by accident were inventoried as
+    # GH #591 (Nigeria food_prices) and GH #592 (18 waves with no GPS) BEFORE
+    # this change landed, so the regrade cannot bury them.
+    populated = {c for c in df.columns if df[c].notna().any()}
+
     cells = []
     for w in waves:
         if not covered[w]:
-            cells.append(_cell(country_name, feature, w, "absent", "absent",
-                               detail="source not declared for wave"))
+            tier, detail = _absent(w)
+            cells.append(_cell(country_name, feature, w, tier, "absent",
+                               detail=detail))
             continue
         if str(w) not in t_values:
             cells.append(_cell(country_name, feature, w, "dropped", "declared",
@@ -241,7 +478,8 @@ def grade_feature(country_name, feature, waves, co, env, *,
             cells.append(_cell(country_name, feature, w, "dropped", "declared",
                                detail="declared, present in t-index but 0 rows"))
             continue
-        rep = env["is_this_feature_sane"](sl, country_name, feature)
+        rep = env["is_this_feature_sane"](sl, country_name, feature,
+                                          extra_optional=populated)
         tier = tier_from_report(rep)
         if tier == "sane" and (country_name, feature, str(w)) in blessed:
             tier = "blessed"
@@ -251,7 +489,8 @@ def grade_feature(country_name, feature, waves, co, env, *,
 
 
 def grade_country_level(country_name, feature, co, env, *,
-                        blessed=frozenset(), readiness=True) -> dict:
+                        blessed=frozenset(), verdicts=None,
+                        readiness=True) -> dict:
     """Grade a country-level-only feature (panel_ids / updated_ids): wave=None."""
     if not readiness:
         return _cell(country_name, feature, None, "n/a", "n/a",
@@ -261,12 +500,19 @@ def grade_country_level(country_name, feature, co, env, *,
             warnings.simplefilter("ignore")
             val = env["load_feature"](co, feature)
     except Exception as e:  # noqa: BLE001
+        no_data = countries_without_microdata().get(country_name)
+        if no_data:
+            return _cell(country_name, feature, None, "n/a", "declared",
+                         detail=f"no microdata in repo: {no_data}")
         return _cell(country_name, feature, None, "broken", "declared",
                      detail=f"{type(e).__name__}: {e}")
     n = len(val) if hasattr(val, "__len__") else 0
     if n == 0:   # avoid `not val` — ambiguous if a future feature returns a frame
-        return _cell(country_name, feature, None, "absent", "absent",
-                     detail="empty / no entries")
+        tier, detail = _absent_tier(country_name, feature, None,
+                                    verdicts or {})
+        if detail == "source not declared for wave":   # un-adjudicated
+            detail = "empty / no entries"
+        return _cell(country_name, feature, None, tier, "absent", detail=detail)
     tier = "blessed" if (country_name, feature, "") in blessed else "sane"
     return _cell(country_name, feature, None, tier, "declared",
                  n_rows=n, detail=f"{n} entries")
@@ -276,7 +522,8 @@ def grade_country_level(country_name, feature, co, env, *,
 # Whole-matrix build
 # ---------------------------------------------------------------------------
 def build_matrix(countries=None, features=None, *, readiness=True,
-                 blessed=None, log=lambda _m: None) -> pd.DataFrame:
+                 blessed=None, verdicts=None,
+                 log=lambda _m: None) -> pd.DataFrame:
     """Build the full (country × feature × wave) status table.
 
     Parameters
@@ -297,11 +544,28 @@ def build_matrix(countries=None, features=None, *, readiness=True,
     countries_root = env["countries_root"]
     if blessed is None:
         blessed = load_blessed()
+    if verdicts is None:
+        verdicts = load_verdicts()
     if countries is None:
         countries = catalog.countries()
     feat_filter = set(features) if features else None
 
     rows: list[dict] = []
+
+    # Country dirs holding downloaded microdata but NO config are invisible to
+    # `catalog.countries()` (it requires `_/data_scheme.yml`), so the matrix has
+    # never reported them at all -- 10 in-remit countries and ~35 waves of
+    # paid-for data that simply did not appear.  Surface them as `unconfigured`:
+    # visibly red, not absent from the report.  A denominator that omits the work
+    # you have not started is not a denominator.
+    for c, nwaves in unconfigured_countries(countries_root).items():
+        if countries is not None and c not in countries:
+            continue
+        rows.append(_cell(c, "<country>", None, "unconfigured", "absent",
+                          n_rows=nwaves,
+                          detail=f"microdata present ({nwaves} waves) but no "
+                                 f"_/data_scheme.yml — country not configured"))
+
     for c in countries:
         try:
             co = Country(c, preload_panel_ids=False)
@@ -328,26 +592,64 @@ def build_matrix(countries=None, features=None, *, readiness=True,
         for f in sel:
             rows.extend(grade_feature(c, f, waves, co, env,
                                       avail_by_wave=avail_by_wave,
-                                      blessed=blessed, readiness=readiness))
+                                      blessed=blessed, verdicts=verdicts,
+                                      readiness=readiness))
 
         for clf in country_level_only:
             if feat_filter is not None and clf not in feat_filter:
                 continue
             if _has_country_level_feature(c, clf, countries_root):
                 rows.append(grade_country_level(c, clf, co, env,
-                                                blessed=blessed, readiness=readiness))
+                                                blessed=blessed, verdicts=verdicts,
+                                      readiness=readiness))
 
     df = pd.DataFrame(rows, columns=COLUMNS)
     df["tier"] = pd.Categorical(df["tier"], categories=TIER_ORDER, ordered=True)
     return df
 
 
-def save_snapshot(df: pd.DataFrame, path: Path | None = None) -> Path:
-    """Write the status table to the git-tracked snapshot CSV."""
+def save_snapshot(df: pd.DataFrame, path: Path | None = None, *,
+                  merge: bool = True) -> Path:
+    """Write the status table to the git-tracked snapshot CSV.
+
+    ``merge=True`` (default) **upserts** ``df``'s cells into the existing
+    snapshot on the ``(country, feature, wave)`` key, leaving every other cell
+    untouched.  ``merge=False`` replaces the file wholesale.
+
+    Why merge is the default
+    ------------------------
+    A *scoped* run (``make matrix C="Uganda"``) grades only some cells.  Writing
+    that result wholesale silently **destroys** every cell it did not grade --
+    and ``docs/guide/coverage.md`` documents exactly that as the "spot refresh"
+    procedure, immediately followed by ``git add .coder/coverage/latest.csv &&
+    git commit``.  Following the guide verbatim therefore committed a 67-cell
+    snapshot over the authoritative 1849-cell one.  (Observed 2026-07-12.)
+
+    A partial measurement must never be able to erase a complete one.  A full
+    sweep still rewrites everything it grades, so the authoritative run is
+    unaffected; it simply no longer depends on *not* being scoped.
+    """
     path = Path(path) if path is not None else default_snapshot_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     out = df.copy()
     out["tier"] = out["tier"].astype(str)
+
+    if merge and path.exists():
+        try:
+            prev = pd.read_csv(path, dtype=str, keep_default_na=False)
+        except Exception:  # noqa: BLE001 — an unreadable snapshot is simply replaced
+            prev = None
+        if prev is not None and not prev.empty:
+            key = ["country", "feature", "wave"]
+            fresh = out.copy()
+            for k in key:                      # align dtypes for the anti-join
+                fresh[k] = fresh[k].astype(str)
+            keep = prev.merge(fresh[key].drop_duplicates(), on=key,
+                              how="left", indicator=True)
+            keep = keep[keep["_merge"] == "left_only"].drop(columns="_merge")
+            out = pd.concat([keep, fresh], ignore_index=True)
+
+    out = out.reindex(columns=COLUMNS)
     out.sort_values(["country", "feature", "wave"]).to_csv(path, index=False)
     return path
 

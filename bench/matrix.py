@@ -39,7 +39,18 @@ RESULTS_DIR = REPO_ROOT / "bench" / "results"
 # Presentation only (the model is colour-agnostic).
 TIER_COLOR = {
     "n/a":      "#e9ecef",
+    # `absent` is the LIVE QUEUE (an un-adjudicated gap), so it must not read as
+    # quietly settled.  The adjudicated tiers below are the settled ones.
     "absent":   "#f1f3f5",
+    # Adjudicated-and-closed: dimmer than `absent`, because there is no work here.
+    "not-asked":             "#dee2e6",
+    # Adjudicated as an ACQUISITION problem (asked, but not in the shipped
+    # extract) -- a distinct colour, because it routes to a different queue
+    # entirely and should never be mistaken for either config work or a close.
+    "asked-not-distributed": "#c5b3e6",
+    # Data downloaded, zero config -- work not yet STARTED.  Must read as work,
+    # not as a quiet gap.
+    "unconfigured":          "#fd7e14",
     "declared": "#cfe2ff",
     "dropped":  "#f5c2c7",
     "broken":   "#dc3545",
@@ -50,6 +61,7 @@ TIER_COLOR = {
 TIER_GLYPH = {
     "n/a": "·", "absent": "–", "declared": "?", "dropped": "✗!",
     "broken": "✗", "builds": "⚠", "sane": "✓", "blessed": "★",
+    "not-asked": "∅", "asked-not-distributed": "⤓", "unconfigured": "⌀",
 }
 
 

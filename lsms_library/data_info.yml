@@ -357,3 +357,17 @@ Currency:
   Timor-Leste: USD                  # USD official since 2000
   Togo: XOF
   Uganda: UGX
+# Countries whose config exists but whose source microdata is NOT in this
+# repository.  Their features cannot build; that is a fact about data
+# availability, not a defect.  The coverage matrix grades their cells `n/a`
+# rather than `broken`, so a real build failure elsewhere is not lost in the
+# noise (before this, all 8 `broken` cells in the cube were these two).
+#
+# Keep this in sync with the "Countries Without Microdata" table in CLAUDE.md.
+Countries Without Microdata:
+  note: >-
+    Config present, source .dta absent.  See CLAUDE.md.  Adding the data is an
+    acquisition task; it is not a bug in the country's config.
+  countries:
+    Armenia: No data files downloaded; WB catalog / external hosting.
+    Nepal: NSO hosts the data, not the WB (https://microdata.nsonepal.gov.np/).

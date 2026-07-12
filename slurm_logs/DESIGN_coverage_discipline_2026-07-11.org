@@ -1,0 +1,873 @@
+#+TITLE: Filling the coverage matrix: a discipline and a workplan
+#+AUTHOR: Sue (Claude Opus 4.8)
+#+DATE: [2026-07-11 Sat]
+
+* Motivation
+
+We already /measure/ coverage.  =make matrix= grades every
+=(country, feature, wave)= cell on an eight-tier ladder and commits the
+result to =.coder/coverage/latest.csv=; =ll.coverage()= reads it back.
+That machinery landed in June (#584, #586, #590) and it works.
+
+What we do /not/ have is a discipline for closing the cells it reddens.
+The snapshot has 1849 cells:
+
+| tier    | cells | meaning                                     |
+|---------+-------+---------------------------------------------|
+| sane    |  1208 | builds, passes sanity                       |
+| absent  |   456 | "source not declared for this wave"         |
+| builds  |   138 | builds, /fails/ a sanity check              |
+| dropped |    39 | declared for the wave, missing from output  |
+| broken  |     8 | build raises, or the feature is empty       |
+| blessed |     0 | human-signed-off --- the tier is never used |
+
+This document argues that the matrix does not fill because of defects in
+the /instrument/, not any shortage of effort.  A census run on
+[2026-07-11 Sat] found *six*, and they bias in both directions at once:
+the matrix reports work that does not exist, and hides work that does.
+
+** The corrected ledger
+
+Once the six defects below are accounted for, the cube's real state is
+materially different from what it reports:
+
+| tier as reported | cells | what it actually is                                                       |
+|------------------+-------+---------------------------------------------------------------------------|
+| sane             |  1208 | genuine                                                                   |
+| builds           |   138 | *131 are a grading bug* (Defect 5); ~7 real, incl. 2 buried data gaps      |
+| broken           |     8 | *all 8 mis-tiered* --- Armenia/Nepal have no microdata at all (Defect 6)   |
+| dropped          |    39 | *genuine, and the most dangerous tier* --- silent data loss                |
+| absent           |   456 | *unknowable* --- conflates "never asked" with "not yet done" (Defect 1)    |
+| blessed          |     0 | the top tier has never once been used                                     |
+
+: really-clean  ~1339   (1208 + the 131 misgraded)
+: really-broken   ~46   (39 dropped + ~7 builds) + 24 data gaps hiding inside the regrade
+: genuinely unknown  456   <- and a 38-cell pilot says ~2/3 of these are REAL WORK
+
+*The 456 is not a pile of "the survey never asked."*  A pilot running the
+full evidence standard over 38 of them returned *25 TODO, 13 UNSURE, and
+zero NOT-ASKED* (§Defect 1).  The uncomfortable implication: the backlog is
+*larger* than the matrix's red suggests, not smaller.  Nothing here shrinks
+the work.  It makes it knowable, sized, and ordered --- which is the most an
+instrument can honestly do.
+
+*Cells whose reported tier is wrong or unactionable: 595 of 1849 --- 32% of
+the cube.*  And the cube's /denominator/ is itself wrong: it omits every
+wave the World Bank publishes that we have not downloaded (Defect 2), and
+eleven countries whose data we already hold (Defect 4).
+
+The matrix cannot drive a workplan until it can be trusted.  *Fix the
+ruler, then measure.*  That is Phase 0, and it is about a day's work.
+
+* Six defects in the measurement, before any workplan
+
+** Defect 1 --- =absent= is a black hole (the keystone)
+
+=absent= means "the feature is not declared for this wave."  That single
+tier conflates two states that could not be more different:
+
+- *NOT-ASKED* --- the survey instrument never asked the question.  There
+  is no work here.  There will never be work here.
+- *TODO* --- the data is sitting in =Data/=; nobody has written the
+  config.  This is real, actionable work.
+
+Nothing in the repo distinguishes them.  Two consequences, and the second
+is worse than the first.
+
+*The queue never converges.*  A genuinely not-asked cell stays red
+forever, so the number cannot reach zero, so nobody can tell progress
+from noise.  The queue is not a queue --- it is a mood.
+
+*And the probe's findings evaporate.*  Whoever investigates a cell learns
+something real --- "this wave's module is in =migrationE_cl.dta=, not
+=Data/=" or "this instrument genuinely dropped the question in 2005" ---
+and has *nowhere to put it*.  The knowledge dies in their head, and the
+next person pays the same cost to rediscover it.  Over 456 cells that is
+not inefficiency; it is a repository that cannot learn.
+
+The evidence that this has already happened, and produced a *false*
+conclusion now sitting in the codebase, is in "Exhibit A" below.  It is
+the reason the fix is an /evidence/ file, not merely a /verdict/ file.
+
+*Fix.*  Add a git-tracked adjudication file =.coder/coverage/absent_verdicts.csv=,
+keyed =(country, feature, wave)= with a *mandatory* =evidence= column, a
+=checks_run= column, and =adjudicated_by= / =date=.  It mirrors the
+existing =blessed.csv= mechanism --- same loader, same shape --- so it costs
+about fifteen lines in =coverage_matrix.py= (=absent= is emitted at five
+sites in =grade_feature=; factor a single =_absent_tier()= helper).
+
+The property this buys is the one that matters:
+
+#+begin_quote
+Every probe of an =absent= cell now *terminates* --- in config, or in a
+recorded verdict with evidence.  A probe that ends without one of those
+did not happen.
+#+end_quote
+
+*** What the pilot proved (and what it refuted)
+
+A 38-cell pilot (=shocks=, =assets=; 2026-07-11) ran the full evidence
+standard of §D2.  Its headline *refutes the premise this section was
+originally written on*:
+
+: 25 TODO   13 UNSURE   0 NOT-ASKED
+
+*The =absent= tier is not hiding a pile of "the survey never asked."  It
+is hiding a backlog.*  On this evidence NOT-ASKED may be close to an
+/empty category/, and =actionable_todo= will land near 456, not far below
+it.  The honest consequence is uncomfortable and should be stated plainly:
+*the gap is bigger than it looked, not smaller.*  The mechanism proposed
+here does not shrink the work.  It makes the work /knowable/, which is a
+different and lesser claim than the one I started with.
+
+But the pilot found a state I had missed, and it is not rare:
+
+*** The third state: ASKED-NOT-DISTRIBUTED
+
+- *Albania 2004 =assets=* --- the label sweep and the sibling differential
+  both come back negative, and *both are correct about the data*: the
+  variables genuinely are not in the shipped =.dta=.  But the
+  questionnaire (=alb04hhq2.pdf=) has =MODULE 2: DWELLING, UTILITIES AND
+  DURABLE GOODS=, itemising =105 Refrigerator 106 Freezer 107 Washing
+  machine=.  *The module was asked.  The extract does not carry it.*
+- *EthiopiaRHS R5--R7* --- the archive ships only aggregates; no raw
+  section files exist to search.
+
+This is neither TODO (there is nothing to configure) nor NOT-ASKED (the
+instrument asked).  It is a *data-acquisition* problem --- chase the
+extract --- and it belongs to a different queue and a different skill
+(=add-wave=), not to the config backlog.  Conflating it with either would
+be a third silent error.
+
+So the verdict is *four-way*, not binary:
+
+| verdict                 | meaning                                | terminates? | routes to      |
+|-------------------------+----------------------------------------+-------------+----------------|
+| =todo=                  | data present, config missing            | no          | =add-feature=  |
+| =asked-not-distributed= | instrument asked; extract lacks it      | *yes*       | acquisition    |
+| =not-asked=             | instrument genuinely never asked        | *yes*       | closed forever |
+| =unsure=                | a required check could not be run       | no          | human / OCR    |
+
+*** Exhibit A --- the failure is not hypothetical.  It already happened.
+
+=lsms_library/countries/Albania/_/data_scheme.yml:86= states:
+
+#+begin_quote
+"Occurrence-only shocks module (2012 wave only; *earlier waves have no
+shocks module*)."
+#+end_quote
+
+That claim is *false*.  Verified directly against the source:
+=Albania/2005/Data/migrationE_cl.dta= carries
+=m6e_q00 = 'Type of Shock Code'= with ten shock types (Dispossession of
+Land, Unexpected death of income earner, Job loss, Flood damage, Pyramid
+scheme, ...), plus a =m6e_q1989..q1999= year-occurrence grid.  Albania
+2008 carries the identical variable; 2003 and 2004 carry
+="faced any shocks in last 12 months"=.
+
+*An evidence-free NOT-ASKED claim already exists in this repo, it is
+wrong, and it has been quietly suppressing work on roughly five cells.*
+Nobody could catch it, because nothing recorded /how/ it was reached.
+
+This is the entire argument for the evidence column, made for me, by the
+codebase, before I proposed it.  The lesson is not "someone was careless"
+--- it is that *an unevidenced negative is unfalsifiable*, and therefore
+permanent.  Which is exactly what we are about to license 456 times.
+
+** Defect 2 --- the denominator is self-congratulatory
+
+=build_matrix= enumerates waves with =waves = list(co.waves)=
+(=coverage_matrix.py:308=), and =Country.waves= is derived from
+directories that exist /on disk/.  So a wave the World Bank publishes and
+we have never downloaded is not a red cell.  It is *no cell at all*.
+
+Two perverse incentives follow.  Downloading a new wave makes coverage
+look /worse/ (fresh =absent= cells appear).  Never downloading anything
+looks perfect.  A matrix that rewards not acquiring data is measuring
+the wrong thing.
+
+*Fix.*  We already have =data_access.discover_waves(country)=, which
+returns the WB catalog annotated with a =local= bool.  Feed it in and
+emit a =missing-wave= row for every upstream wave we lack.  The cube
+gains its honest denominator.  (Two configured countries --- =EthiopiaRHS=
+and =Serbia and Montenegro= --- are missing from =_COUNTRY_CODES= and so
+are blind to discovery; that is a two-line fix.)
+
+** Defect 3 --- no wave records its provenance (blocks the fix for Defect 2)
+
+=discover_waves()= decides whether we already hold a catalog entry by
+/string-matching/ a fabricated wave label (=_catalog_to_wave_label= vs
+=_local_waves=) against directory names.  It is wrong in both directions:
+of 41 flagged entries, *12 were false positives* and *at least 2 were
+false negatives*.
+
+The false negatives are the dangerous ones, because they are silent:
+
+- *Nigeria 2018-19* --- catalog id 3827 is the /Nigeria Living Standards
+  Survey/.  =Nigeria/2018-19/= actually holds GHS-Panel W4 (id 3557), a
+  *different survey*.  The label collides, so we believe we have the LSS.
+  We do not.
+- *Ethiopia 2013-14* --- id 2671 (Land & Soil Experimental Research) is
+  masked by ESS W2 (id 2247).
+- *GhanaLSS / GhanaSPS* both map to ISO =GHA=, so each sees the other's
+  waves as its own missing waves.
+
+*** CORRECTION [2026-07-12] --- I got the root cause wrong, and the truth is worse
+
+I originally wrote here: /"none of the 136 wave directories records the WB
+catalog id it came from ... not one pre-existing wave has one
+(=find ... -name SOURCE.org= → 0)."/
+
+*That is false.*  *117 of the 136 waves had a =SOURCE.org= all along.*  My
+=find= used =-maxdepth 3=; the file lives at
+={Country}/{wave}/Documentation/SOURCE.org= --- depth *4*.  The command
+returned 0 because it could not see the files, not because they were absent.
+
+I ran one command, it returned zero, and I called it proof.  That is
+precisely the /unevidenced negative/ this document spends §D2 warning
+against, and I committed it to a design doc, a commit message, and a PR.
+The rule applies to me: *silence is not evidence, and a null result from an
+instrument you have not validated is a null result about the instrument.*
+
+*The real defect is worse than the one I described.*  The provenance is not
+merely missing --- in places it is *wrong*:
+
+- =Nigeria/2018-19/Documentation/SOURCE.org= records catalog *3827* --- the
+  /Nigeria Living Standards Survey/.  The directory actually holds
+  =aux_plantingw4= / =aux_harvestw4= --- *GHS-Panel W4 (3557)*, a different
+  survey.
+
+A backfill that /trusted/ =SOURCE.org= would therefore have *cemented* the
+error rather than fixed it.  Absent provenance is a gap; wrong provenance is
+a lie, and it is the harder failure.
+
+A third failure mode neither of us predicted: *one catalog entry can back two
+wave directories.*  WB 1001 (=UGA_2005-2009_UNPS=) renders as ="2005-10"=,
+matching no directory --- so it read as MISSING although we hold it across
+=2005-06/= and =2009-10/=.
+
+*Fix (prerequisite for Defect 2).*  Match on catalog id, and *validate rather
+than trust* the recorded id against the directory's actual contents.  Keep
+="none"= (definitively not a WB dataset) distinct from ="unknown"= (we do not
+know) --- collapsing them would re-create exactly the =absent=-black-hole
+mistake of Defect 1, one level down.
+
+*** =SOURCE.org= is load-bearing --- creating one PROMOTES a directory into a wave
+
+Found while implementing this (PR #595), and it is a trap worth its own note.
+=Country.waves= (=country.py:1452=) falls back to scanning for directories
+containing =Documentation/SOURCE.org=.  So *writing* a =SOURCE.org= does not
+merely annotate a wave --- it *creates* one.
+
+A first pass that stamped all 136 dirs broke
+=test_sample.py::test_covers_all_waves[Benin]=, because =Benin/2018-2019/= is
+a *stray duplicate* of =Benin/2018-19/= (identical =.dta=) and stamping it
+promoted the duplicate into a wave that =sample()= does not cover.  The full
+test suite caught it.
+
+Metadata that silently changes the shape of the data model is not metadata.
+
+** Defect 4 --- eleven countries are invisible
+
+=catalog._country_dirs()= admits a directory only if it carries
+=_/data_scheme.yml=.  Eleven country directories hold *downloaded survey
+data and no config at all*:
+
+: Afghanistan(2 waves)  Bosnia-Herzegovina(5)  Brazil(1)  Bulgaria(5)
+: KenyaLPS(4)  Kyrgyz Republic(4)  Nicaragua(3)  Panama(3)  Peru(4)
+: Rwanda(2)  Tanzania_Kegera(2)
+
+Thirty-five waves of paid-for, downloaded microdata that the coverage
+matrix reports nothing about, because the matrix's own gate hides them.
+The matrix says 35 countries; the repo has 46.
+
+*Fix.*  Enumerate country /directories/, not configured countries, and
+emit an =unconfigured= country-level row for the config-less ones.  They
+should be visibly red, not absent from the report.
+
+** Defect 5 --- the wave-slice grader applies country-level checks
+
+The single biggest numerical error in the matrix.
+=coverage_matrix._wave_cells= (L244) grades a wave by slicing the country
+frame on =t= and calling =diagnostics.is_this_feature_sane= on the slice.
+But =_check_no_all_null_columns= (=diagnostics.py:280=) is a *country-level*
+check.  A question that simply was not fielded in a given wave is
+legitimately all-null /in that slice/ --- and gets graded =builds=.
+
+*Proof it is a grading bug and not a data bug:* of the 124 offending
+columns, *zero* are all-null country-wide.  Every one is populated in at
+least one other wave.
+
+*131 of the 138 =builds= cells are false.*  The matrix is crying wolf on
+7% of the entire cube.
+
+*Fix.*  When grading a slice, pass the country frame's populated-column
+set as =optional=.  Small.
+
+*** But sequence this correctly --- a regrade is not a fix
+
+Fixing the grader re-tiers 131 cells =builds= → =sane= in one commit.
+Two *genuine* data gaps are currently hiding inside that bucket and would
+be *silently buried* by it:
+
+- *Nigeria =food_acquired.Quantity_kg= is all-null in 6 of 8 waves.*  The
+  kg conversion is missing, so the /default/ =food_prices(units='kgvalue')=
+  --- =Expenditure / Quantity_kg= --- returns *NaN* for those waves.  A
+  live, user-facing data defect with no tracking issue.
+- *18 cells of missing GPS =Latitude=/=Longitude=* in =cluster_features=
+  (CotedIvoire, Nigeria, Ethiopia, Malawi, Niger, Uganda).
+
+*Extract both as their own issues BEFORE regrading.*  Otherwise the
+cleanup destroys the only evidence that they exist.  This is the general
+rule: /whenever a fix changes how cells are graded rather than what they
+contain, first inventory what the old grading was catching by accident./
+
+** Defect 6 --- =broken= is mis-tiered for the known-no-microdata countries
+
+All 8 =broken= cells are =PathMissingError= from *Armenia* (2) and *Nepal*
+(6) --- both of which CLAUDE.md already documents under /Countries Without
+Microdata/.  They are not broken; they have no data.  They need a
+known-no-data skip list and an =absent=/=n/a= tier, not a bug fix.
+
+(Secondary harness bug found alongside: all three Nepal waves report the
+/1995-96/ path --- the country-level build raised once and the single
+exception was fanned out to every wave, so per-wave detail in =broken=
+cells is not trustworthy.)
+
+** Aside --- a live data-integrity bug found while counting
+
+The ten wave-shaped directories at the =countries/= root (=2009-10/=,
+=2010-11/=, ...) are *not* misplaced data.  All 33 =.dta= in them are
+md5-identical to DVC-tracked sources under =Uganda/=, =Nigeria/=,
+=Tanzania/=.  They are output of a cwd bug: the country-level =_/= script
+idiom =../{wave}/Data/...= resolves against the /process cwd/ when a
+script runs from the country dir rather than =_/=, and
+=_resolve_data_path()= (=local_tools.py:719=) has no pattern for that
+form, so it passes the path through unrewritten.
+
+The litter is harmless; the /latent hazard/ is not.
+=_is_polluted_workspace_copy()= (=local_tools.py:679=) refuses an in-tree
+copy only when a *sister =.dvc= sidecar* exists.  These strays have none
+--- so =get_dataframe()= would accept them as legitimate local data and
+silently shadow the DVC blob with a stale copy.
+
+*This is a correctness bug, not a coverage bug.*  File it separately:
+teach =_resolve_data_path= to handle (or loudly reject) the
+=../{wave}/Data/...= form, and/or resolve country-script paths against
+=__file__= rather than cwd.  Cleaning the 47 MB is the easy half.
+
+** Why these come first
+
+Every one is a defect in the /instrument/, not the data.  Fixing them is
+cheap --- about a day in total --- and until they are fixed, every workplan
+built on this matrix is built on numbers that are 32% wrong and a
+denominator that cannot reach zero.  Fix the ruler, then measure.
+
+Note the *asymmetry of the errors*, which is what makes them insidious:
+
+- Defects 1, 5, 6 make the matrix *cry wolf* --- 595 cells whose tier is
+  wrong or unactionable.  The cost is wasted effort and, worse,
+  desensitisation: a dashboard that is a third noise stops being read.
+- Defects 2, 3, 4 make the matrix *flatter itself* --- upstream waves we
+  never downloaded and countries whose data we already hold simply do not
+  appear.  The cost is invisible work, and an incentive gradient that
+  /punishes acquiring data/ (a new wave only ever adds red cells).
+
+A measure that is simultaneously alarmist about what we have and silent
+about what we lack is worse than no measure, because it is trusted.
+
+* The discipline
+
+** D1. Every red cell terminates in a recorded state, or the probe did not happen
+
+| state                   | meaning                           | artifact                                     |
+|-------------------------+-----------------------------------+----------------------------------------------|
+| =sane=                  | config written, builds, passes     | the config + a green =make matrix=           |
+| =not-asked=             | instrument genuinely never asked   | =absent_verdicts.csv= row + *questionnaire*  |
+| =asked-not-distributed= | asked; the extract lacks it        | =absent_verdicts.csv= row → acquisition queue |
+| =unsure=                | a required check could not be run  | =absent_verdicts.csv= row + the named blocker |
+| =issue=                 | data is there, the build is wrong  | a GH issue → the =backlog-workflow= loop      |
+
+There is no "I looked at it once."  A probe that ends without one of these
+artifacts did not happen, and its cost will be paid again by the next
+person.  =unsure= is a first-class outcome, not a failure --- it keeps the
+cell in the queue and *records why*, which is the whole point.
+
+** D2. The evidence standard (no human sign-off, but a serious search)
+
+*Constraint (Ethan, 2026-07-11):* his eyes are /not/ required on every
+=not_asked= row --- bandwidth is finite --- but "a serious search should
+happen before this conclusion is reached."
+
+So the bar cannot be "an agent looked."  =not_asked= is a *permanent,
+unsupervised write*: it removes a cell from the queue forever, with nobody
+checking.  That makes it the single most dangerous write in this design,
+and it earns a hard, enumerated protocol.  The failure mode is specific
+and it is not exotic:
+
+#+begin_quote
+*A renamed variable is indistinguishable from an absent one.*
+=hh_s11q01= becomes =s11q1a= between waves; a naive label search finds
+nothing and concludes the survey stopped asking.  It did not.  We then
+close the cell permanently and lose the data forever, silently.
+#+end_quote
+
+Every check below exists to catch that.  A cell may be written to
+=not_asked.csv= only when *all applicable* checks are run and *all* come
+back negative; the row records *which ran*, in a =checks= column.  Any
+check that cannot be run downgrades the verdict to =UNSURE= --- which
+stays in the queue.  Silence is never evidence.
+
+*Each rule below was found by the pilot being wrong first.  They are not
+theory.*
+
+*** Check 1 --- variable-label sweep (always; necessary, never sufficient)
+No matching variable or value label in any source file for that wave.
+Metadata-only reads (=pyreadstat.read_dta(..., metadataonly=True)=), blob
+fetched by the lock-free direct-S3 bypass.  Three corrections the pilot
+paid for:
+
+1. *Be extension-agnostic.*  LSMS ships Stata binaries named =.tab=
+   (EthiopiaRHS) and SPSS =.sav= (Albania 2008/2012).  Try =read_dta= →
+   =read_sav= → text, regardless of suffix.  A suffix-driven reader
+   silently reads garbage.
+2. *Report label /availability/ separately from label /hits/.*
+   CotedIvoire's =.DCT= fixed-width files carry *no variable labels at
+   all* (names are opaque: =C01Q01=).  The first pass scored "0 hits
+   across 80 files" and read as a clean negative.  It was the probe having
+   nothing to read.  *Silence must be structurally distinguishable from
+   absence* --- if the corpus is unlabelled, the check did not run.
+3. *Multilingual, or it is not a search.*  Albania 2012's durables are
+   =Frigorifer=, =Lavatrice=; CotedIvoire/Mali shocks are =sinistre=,
+   =sécheresse=.  English-only missed Albania 2012 entirely.
+
+Also: *the wave's =Data/= dir is not the source universe.*  EthiopiaRHS
+wave dirs hold 4--6 files; its =_dataverse_archive/= holds 251.  Scoping
+the probe to =Data/= alone would have produced seven confident false
+negatives.
+
+*** Check 2 --- sibling differential (necessary for PARTIAL pairs; *not sufficient*)
+Take the working sibling wave's source variable and establish its
+/analogue/ is absent --- names do not survive renaming, so match on *item
+content* (the value-label lexicon of =j= / =Shock=), not variable names.
+
+*The pilot proved this check alone manufactures false NOT-ASKEDs.*  It
+returned "content absent" (0/23 lexicon hits) for *Iraq 2006-07* --- a wave
+carrying a full 11-shock + 24-coping module.  The 2007 labels
+(="Problem: theft"=) share no vocabulary with 2012's (="Loss of asset or
+livestock due to theft/accident/death"=).  Only the *filename*
+(=2007ihses18_risks.dta=) caught it.  A lexicon differential is necessary,
+never sufficient.
+
+Module renumbering is the norm, not the exception: Nigeria =sect5= (w4) →
+=sect10= (w5) for assets, =sect15a= → =sect12= for shocks; Iraq =risks=
+(2007) → =shocks= (2012), wide → long.
+
+*** Check 3 --- Harmonized LSMS-ISA Ag cross-check (mandatory where it applies)
+An *independent* oracle, and the one Ethan specifically asked for.  The
+WB Harmonised Panel is already in the repo as a 48 MB DVC blob at
+=countries/Harmonized_LSMS-ISA_Ag/lsms_ag.parquet= (281,803 x 223;
+materializes lock-free via =get_dataframe=).  It covers *Ethiopia,
+Malawi, Mali, Niger, Nigeria, Tanzania, Uganda* and carries harmonized ag
+variables --- =total_labor_days=, =seed_kg=, =inorganic_fertilizer_value=,
+=harvest_kg=, =plot_area=, ... --- keyed by =country= x =wave=.
+
+This is *decisive* for the ag features, which are *137 of the 456 absent
+cells (30%)*: =plot_features= (30), =livestock= (30), =crop_production=
+(27), =plot_inputs= (25), =plot_labor= (25).  If the WB extracted
+=total_labor_days= for Tanzania wave 3, then that wave *has* plot-labor
+data and any NOT-ASKED claim for it is simply false.
+
+And it is better than a veto.  The WB's per-wave *do-files*
+(=lsms-worldbank/LSMS-ISA-harmonised-dataset-on-agricultural-productivity-and-welfare=)
+name the *raw file and variable* behind each harmonized column.  So a
+positive hit does not merely reject NOT-ASKED --- it hands us the source
+file and variable name, i.e. most of the config.  Check 3 is both the
+strictest gate and the biggest accelerator on this list.
+
+*The oracle is /positive-only/.*  A non-null harmonized column proves the
+concept was asked.  *A null column proves nothing* --- it means the WB's
+harmonizers did not code it, not that the survey did not ask.  The pilot
+nailed this: Mali 2014-15 has =hh_asset_index= *0% non-null*, yet the
+durables roster is plainly there (=EACIACT_p1.dta:s08q01=, 25 items).  Had
+Check 3 been allowed to vote "no", it would have closed a live cell.
+
+*Check 3 may corroborate TODO.  It may never establish NOT-ASKED.*
+
+/Wave mapping (solved):/ no external map is needed --- the oracle's own
+=survey= column carries the label.  For Tanzania: =wave 1.0 → 'NPS 2008 -
+2009'=, =2.0 → 'NPS 2010 - 2011'=, ... Group by =(country, survey)=.
+
+/Coverage limit:/ 7 countries, and it *stops at GHS 2018-19* --- so it gives
+no help on Nigeria's 2023-24 rounds, which is exactly where Nigeria's
+absent ag cells live.  Check 1 found them anyway (=sect10_plantingw5.dta=,
+=sect12_harvestw5.dta=).
+
+/Housekeeping:/ this parquet is currently an *orphan* --- nothing in the
+codebase references it.  Wiring it into the probe finally gives it a job.
+
+*** Check 4 --- the questionnaire.  *Mandatory before any permanent close.*
+Originally listed last and optional.  *The pilot promoted it to the
+decisive check*, and it is the one that must never be skipped.
+
+*Albania 2004 =assets=*: Check 1 and Check 2 both returned negative, and
+both were *correct about the data* --- the variables really are absent from
+the shipped =.dta=.  Three independent data-side checks unanimously said
+NOT-ASKED.  The questionnaire said =MODULE 2: ... DURABLE GOODS=,
+=105 Refrigerator 106 Freezer 107 Washing machine=.  They were all wrong.
+
+#+begin_quote
+*Absence in the shipped =.dta= is not absence in the instrument.*
+Every data-side check can be defeated by a data-/distribution/ gap.  Only
+the questionnaire can separate NOT-ASKED from ASKED-NOT-DISTRIBUTED --- and
+those two route to completely different queues.
+#+end_quote
+
+So: *no data-side evidence, however unanimous, may close a cell as
+NOT-ASKED.*  Only the questionnaire can.  Where no questionnaire exists,
+or it is a pre-1995 =CCITTFaxDecode= scan with no text layer (CotedIvoire
+1985--89; needs OCR), the verdict is =unsure= and the cell *stays in the
+queue*.  The pilot's own control makes the point: Albania 2002's
+study-level DDI scores zero hits for "durable" even though 2002
+demonstrably /has/ =durables_cl.dta=.  Its silence carries no information.
+
+/Implementation note:/ =pdftotext=/=pypdf= are absent on Savio compute
+nodes.  The pilot's pure-python extractor (zlib-inflate the =FlateDecode=
+streams, pull =Tj=/=TJ= text ops) works on modern PDFs and is enough.
+
+*** What gets recorded
+: country, feature, wave, verdict, checks_run, evidence, adjudicated_by, date
+=evidence= must cite something a human can re-check in under a minute --- a
+questionnaire section number, or "no variable or value label matching
+{shock|choc|conmoción}/... across the 14 =.dta= in =Data/=; sibling wave
+2013-14 uses =hh_s16q01=, which has no analogue here."  Not "searched, not
+found."
+
+*** Why this is enough without Ethan's eyes
+The row is a PR.  It is diffable, it names the checks it ran, and its
+evidence is re-verifiable in a minute by anyone who doubts it.  A wrong
+=not_asked= is therefore *recoverable* --- which is the property that makes
+unsupervised writes acceptable.  What would /not/ be acceptable is an
+evidence-free row, because nothing about it can ever be challenged.
+
+** D3. Probe by =(country, feature)=, not by cell
+
+The 456 absent cells collapse to *151 =(country, feature)= pairs*, and
+they split unevenly:
+
+- *338 cells / 130 pairs are PARTIAL* --- the country /already has/ that
+  feature for at least one other wave.  The schema is settled, the source
+  structure is known, a working =data_info.yml= sits one directory over.
+  The only open question is whether /this/ wave's instrument asked.
+- *118 cells / 21 pairs are WHOLE* --- the feature is missing for every
+  wave.  A from-scratch build.
+
+*74% of the gap is the cheap kind.*  A single probe of one pair typically
+resolves 2--5 cells at once, because the answer ("the 2005 and 2008 waves
+dropped the assets module") is a property of the pair, not of the cell.
+Probing cell-by-cell is a factor-of-three waste.
+
+** D4. Reuse the existing execution loop; do not build a new one
+
+We already have the machinery to /fix/ a cell and prove it:
+
+- =.claude/skills/add-feature/= --- the authoring path, with sub-skills
+  for =shocks=, =assets=, =sample=, =food-acquired=, =housing=, =pp-ph=,
+  =panel-ids=.
+- =.claude/skills/add-wave/= --- the acquisition path (=discover_waves=,
+  =add_wave=, DVC push).
+- =bench/feature_audit/= --- the regression net.
+- =.claude/skills/backlog-workflow/= --- worktree-isolated fix → verify →
+  red-team → PR.
+
+The matrix's job is to be the *worklist generator* for that loop, not to
+grow a parallel one.  The only new machinery this document proposes is
+=not_asked.csv= and two enumeration fixes.
+
+** D5. =blessed= means a human looked  [ADOPTED 2026-07-12]
+
+=sane= and =blessed= answer different questions, and the gap between them
+is where quiet errors live:
+
+- *=sane=* --- the automated checks passed.  /No human has necessarily looked
+  at a single number./
+- *=blessed=* --- a human read the actual numbers for that cell and believes
+  them.
+
+A feature can build cleanly, pass every check, and still be wired to the
+wrong source column or carry an unverified unit conversion.  *For anything
+feeding published analysis, =sane= is not enough.*
+
+*The tier was already fully implemented* --- loader, promotion, colour, =★=
+glyph, docs.  Only the file was empty (21 bytes).  Adopting it cost *zero
+code*:
+
+1. Schema extended to =country,feature,wave,blessed_by,date,note=.
+   =load_blessed= reads via =r.get(...)=, so the provenance columns are
+   free --- and they are what make a blessing /auditable/ rather than a bare
+   assertion.  Verified: extra columns ignored, blank-=wave= country-level
+   key still works.
+2. *The rule* (=CLAUDE.md= + =docs/guide/coverage.md=): /if you used a cell
+   in real analysis and looked at its numbers, bless it in the same PR./
+
+*Seeded empty, deliberately* (Ethan, 2026-07-12).  Blessings /accrete/;
+they are never bulk-seeded.  An empty blessing file is honest.  Bulk-
+blessing the 1208 =sane= cells would make =blessed= a synonym for =sane=,
+destroy the only distinction the tier draws, and assert a human review
+that never happened.
+
+*Trap found while wiring it:* =load_blessed= calls =pd.read_csv(...,
+keep_default_na=False)= with *no* =comment== argument, so a ~#~-comment
+line in =blessed.csv= is parsed as a *row* --- a phantom blessed cell.
+Header and data only.  Documented in both places.
+
+*** Corollary: a =sane= cell is not proof an issue is fixed
+Know what the grader does /not/ look at.  It is a *cold* build, so it
+cannot see warm-cache-only divergences (issue #588); and it does not check
+currency labels (#589).  Both look clean in the matrix and are genuinely
+open.  This is the same discipline as D2: /an unevidenced negative is
+worthless, whoever --- or whatever --- produced it./
+
+* Workplan
+
+Ordered by leverage --- cells closed per unit of effort --- not by country.
+
+** Phase 0 --- Fix the ruler (~1 day, do this first, in this order)
+
+0. *Inventory before regrading* (Defect 5): file the Nigeria =Quantity_kg=
+   gap and the GPS Lat/Lon gap as issues /first/, or step 4 buries them.
+1. *Absent-verdict tiers* (Defect 1) --- =.coder/coverage/absent_verdicts.csv=
+   + loader, mirroring =blessed=; =absent= is emitted at five sites in
+   =grade_feature=, so factor a single =_absent_tier()= helper.  Four
+   verdicts, not two: =todo= / =asked-not-distributed= / =not-asked= /
+   =unsure=.  Teach the HTML readout and =ll.coverage()= the tiers.  Headline
+   number = =todo + unsure= (the live queue).
+2. *Wave provenance* (Defect 3) --- stamp the WB =catalog_id= into each wave
+   dir (=add_wave= already writes =SOURCE.org=; *0 of 136 existing waves has
+   one*); match =discover_waves.local= on the id, not a reconstructed label.
+   Add =_COUNTRY_CODES["Serbia and Montenegro"] = "SCG"=; disambiguate the
+   shared =GHA= code that makes GhanaLSS and GhanaSPS each see the other's
+   waves as missing.
+3. *Upstream wave axis* (Defect 2) --- fold =discover_waves()= into
+   =build_matrix= as =missing-wave= rows.  Only meaningful after step 2.
+4. *Fix the wave-slice grader* (Defect 5) --- pass the country frame's
+   populated-column set as =optional= when grading a slice.  Regrades 131.
+5. *Known-no-data skip list* (Defect 6) --- Armenia, Nepal → =n/a=, not =broken=.
+6. *Surface the 10 in-remit config-less countries* (Defect 4) as =unconfigured=.
+
+*Exit test:* no tier lies, and every number is one we can burn down.
+Concretely: =builds= drops from 138 to ~7; =broken= from 8 to 0; a
+=missing-wave= count appears; the 456 splits four ways; and the ten
+in-remit orphan countries show up red instead of not at all.
+
+7. *Correct the false claim in* =Albania/_/data_scheme.yml:86= (see Defect 1,
+   Exhibit A) --- and grep the other 34 countries' =_/= comments for
+   unevidenced "no X module" assertions.  If one is wrong, assume others are.
+
+** Phase 1 --- Adjudicate the 456 (the probe sweep)
+
+Run the four-check probe over every absent cell.  Read-only, embarrassingly
+parallel, and *the single highest-value item on this list*: it converts 456
+undifferentiated red cells into a costed, ordered, evidence-backed queue.
+
+*Cost (measured, not guessed).*  The 456 cells collapse to *78 distinct
+=(country, wave)= folders* --- metadata is read once per folder and shared
+across the ~5.8 absent features in it, so the folder, not the cell, is the
+unit.  Check 1 over all 78: *~3 min warm, ~12 min cold* (S3 required; the
+lock-free bypass worked, no lock contention).  Checks 2 and 4 are the real
+cost --- ~78 questionnaires, and a lexicon spec per =(country, feature)=.
+
+: total  12--20 agent-hours,  parallelizable ~8-way by country
+:        -> ~2--3 hours wall-clock
+
+*Expected yield (from the pilot, and it is not what I predicted).*
+Roughly *60--75% TODO, 20--30% UNSURE, and very few NOT-ASKED.*  Plan for
+the sweep to /confirm work/, not to retire it.  Its value is that the work
+becomes *sized and sourced* --- 25 of the pilot's 38 cells came back with
+the exact file and variable name attached, which is most of the config
+already written.
+
+*Exit:* every absent cell carries a verdict + evidence, or is =unsure= with
+a named blocker.  Nothing is left in the undifferentiated bucket.
+
+*Known blockers the sweep will surface (from the pilot's 13 UNSURE):*
+- *CotedIvoire 1985--89 (8 cells)* --- =.DAT=/=.DCT= fixed-width with zero
+  variable labels, and questionnaires that are =CCITTFaxDecode= *scans*
+  with no text layer.  No check can run.  Needs OCR + a section-number →
+  module map.  This is the hardest corner of the cube.
+- *EthiopiaRHS R5--R7 (3 cells)* --- archive ships aggregates only.  Is the
+  raw section data obtainable from IFPRI Dataverse, or aggregate-only
+  forever?  A question for a human, not an agent.
+- *Albania 2004 assets / 2002 shocks* --- chase the missing extract; locate
+  the 2002 household questionnaire.
+
+** Phase 2 --- Harvest the PARTIAL TODOs
+
+The =data_info.yml=-next-door cases.  Highest yield per hour in the repo.
+Dispatch through the existing =add-feature= + =backlog-workflow= loop,
+worktree-isolated, verified against the audit harness.
+
+*** Start with Nigeria's ag block --- 50 cells, one country
+
+The most concentrated gap in the cube.  Nigeria has ten PP/PH round
+directories (=2010Q3=, =2011Q1=, ... =2024Q1=) and:
+
+| feature         | absent | builds | dropped |
+|-----------------+--------+--------+---------|
+| crop_production |     10 |      0 |       0 |
+| livestock       |     10 |      0 |       0 |
+| plot_inputs     |     10 |      0 |       0 |
+| plot_labor      |     10 |      0 |       0 |
+| plot_features   |      0 |      5 |       5 |
+
+Why this is the right first target:
+
+- Nigeria is a core LSMS-ISA country; its GHS-Panel unquestionably /has/
+  ag modules.  The 40 =absent= cells are TODO, not NOT-ASKED, and the
+  Harmonized-Ag oracle (Check 3) proves it --- it carries Nigeria waves
+  1--4 with =harvest_kg=, =seed_kg=, =total_labor_days=.
+- The WB do-files *name the raw file and variable per wave*, so most of
+  the config is pre-derivable rather than reverse-engineered.
+- =plot_features= is already wired for all ten rounds, so the PP/PH
+  script pattern (=.claude/skills/add-feature/pp-ph/=) exists in-repo ---
+  the four missing features follow it.
+- Its =plot_features= being 5 =builds= + 5 =dropped= is very likely the
+  PP/PH distinct-=t= / duplicate-index bug that skill already documents.
+  Fix the root and the degraded half of the block closes with it.
+
+One country, one script pattern, ~50 cells.  Nothing else in the cube has
+that density.
+
+** Phase 3 --- The degraded cells, in severity order
+
+The census (2026-07-11) already clustered these.  Do them in *this* order
+--- it is not the order the tier ladder suggests.
+
+*** 3a. =roster_to_characteristics= deletes entire waves (8 cells, TOP SEVERITY)
+
+The one unambiguous silent-data-loss bug in the cube.
+=transformations.py:251-265= --- the residence filter added with
+=MonthsSpent= --- drops every row of a wave when the resolved months
+column is unusable, so =household_characteristics= returns *nothing* for
+that wave while the underlying roster is fully populated.  Three distinct
+defects in one 14-line block:
+
+1. *The =elif= chain picks the first column /present/, not /populated/.*
+   Ethiopia's country frame carries both =MonthsAway= (0 non-null in
+   2018-19 and 2021-22) and =WeeksAway= (28,634 / 20,504 non-null --- W4/W5
+   switched to weeks, exactly as CLAUDE.md documents).  =monthsaway= wins
+   the =elif=, =ms= is all-NaN, *both waves are deleted.*  Fix: coalesce
+   per row rather than per column.
+2. *No all-NaN guard.*  CotedIvoire 1985-89 and Mali 2021-22 have
+   =MonthsSpent= 0% non-null --- the column exists in the frame only because
+   the country-level concat unions it in from other waves.  =keep= is
+   all-False; *five waves deleted.*
+3. *Untranslated French labels.*  Burkina Faso 2014 =MonthsSpent= is
+   ='6 mois ou plus'= / ='moins de 6 mois'= (77,268 / 943 rows).
+   =errors='coerce'= → NaN → *wave deleted.*  A one-line YAML mapping, the
+   same =Oui=/=Non= → 12/0 pattern CLAUDE.md already prescribes for EHCVM.
+
+Defects 1 and 2 collapse into one guard: /if the resolved =ms= is entirely
+NaN within a =t= group, skip the filter for that group/ (reverting to the
+documented pre-=MonthsSpent= count-everyone behaviour).  *One function, 8
+cells, top severity.*  It is a post-read derived transform (=_ROSTER_DERIVED=),
+so per =backlog-workflow= it reproduces *warm* --- no cold rebuild needed.
+
+*** 3b. Extract the two genuine gaps hiding inside the =builds= bucket
+Nigeria =Quantity_kg= (6 cells; breaks the default =food_prices=) and the
+GPS Lat/Lon gap (18 cells).  File before regrading (see Defect 5).
+
+*** 3c. Fix the grader (Defect 5) --- regrades 131 cells
+
+*** 3d. Nigeria's PP/PH =dropped= bloc (22 cells) --- and correct issue #587
+#587 attributes these to a "multi-round wave-label ↔ =t= mismatch."  *That
+diagnosis is refuted.*  The built =t= values /are/ valid Nigeria wave
+labels --- they are simply the labels of the *opposite round*.  Each feature
+is being built for only one round of each PP/PH pair:
+=community_prices= is all Q1 and no Q3; =plot_features= is all Q3 and no
+Q1; =food_coping= all Q3.  These are not false positives; they are real
+half-missing features.  Re-diagnose before dispatching.
+
+*** 3e. The mis-tiered =broken= (8) and the CotedIvoire derived-feature over-declaration (4)
+Armenia/Nepal need a known-no-data skip list (Defect 6).  CotedIvoire's
+=food_expenditures= 1985-89 is =dropped= only because its /source/
+=food_acquired= is =absent= for those waves --- derived features should
+inherit their source's per-wave declaration in the coverage layer.
+
+*** Stale issues to close (the matrix says they are already done)
+=#571= (Guatemala =food_acquired=), =#572= (Serbia), =#574= (GhanaSPS) ---
+all =sane=, with their derived tables =sane= too.  =#573= (Panama) is
+genuinely still open.  Note =#588= and =#589= look clean in the matrix but
+are *not* stale: the matrix is a cold build and structurally cannot see
+#588's warm-cache-only divergence, nor #589's currency labels.  *A cell
+being =sane= is not proof an issue is fixed --- know what the grader does
+not look at.*
+
+*** Tracking
+*146 of the 185 degraded cells have no tracking issue at all.*  Only the 39
+=dropped= are tracked, by =#587= alone --- and #587's hypothesis for its
+largest bloc is wrong (3d).
+
+** Phase 4 --- The 21 WHOLE-feature pairs
+
+Real feature work through the =add-feature= sub-skills; schedule
+deliberately.
+
+** Phase 5 --- Bootstrap the ten in-remit orphan countries
+
+*Scope decision (Ethan, 2026-07-11): these are in remit.*  They are
+"kissing cousins" --- WB data carrying many of the LSMS modules.  Mostly
+/classic/ LSMS (the Deaton-era ENNIV / EMNV / ENV / PPV surveys) rather
+than LSMS-ISA, so their instrument profile differs; that difference is
+exactly what =not_asked.csv= is for, and needs no new mechanism.
+
+Ordered by cost-to-first-green (from the census):
+
+| # | country          | waves | survey            | why here                                                |
+|---+------------------+-------+-------------------+---------------------------------------------------------|
+| 1 | Panama           |     3 | ENV               | *cheapest win.*  Already has =panama.py=, =food_acquired.py=, =food_items.org=, =units.py=; only =data_scheme.yml= + wave =data_info.yml= missing |
+| 2 | Kyrgyz Republic  |     4 | PMS / LSMS        | textbook LSMS modules (expenditure, diet, anthropometry, community) |
+| 3 | Peru             |     4 | ENNIV             | =food_acquired= already scoped in a country =data_info.yml=; friction: 1990 is =.ssp=, and its =v=-in-index predates =_join_v_from_sample()= |
+| 4 | Bosnia-Herzegovina |   5 | BiH LSMS          | genuine 4-year panel; =2001-04/= is a panel-file dir → use the multi-round-waves pattern, not a naive wave |
+| 5 | Nicaragua        |     3 | EMNV              | 1993 / 1998-99 clean =.DTA=; 2001 is =.dat= + =.dct= (needs =infile=); 2005 has no microdata |
+| 6 | Tanzania_Kagera  |     2 | KHDS              | real long panel; dir name is a *typo* (=Kegera=).  Note the WB census found KHDS W1--W6 upstream (ids 359, 79, 2251) --- acquire and bootstrap together |
+| 7 | Brazil           |     1 | PPV               | clean one-off cross-section; cheap, low leverage |
+| 8 | Afghanistan      |     2 | ALCS              | partial bootstrap exists (=afghanistan.py=, =Makefile=) |
+| 9 | Rwanda           |     2 | EICV              | 2000-01 workable (=.sav=); 2005-06 is bare =.dat=, no dictionary |
+| 10 | Bulgaria        |     5 | Integrated HHS    | repeated cross-sections; sidecars mix raw with WB-*constructed* aggregates --- sorting raw from derived is the real cost |
+
+*Recommend dropping =KenyaLPS=* (5 dirs, 158 MB).  It is the Kenya Life
+Panel Survey --- a Miguel/Kremer /individual/ deworming-tracking study, not
+an LSMS household survey.  The canonical schema (=household_roster=,
+=food_acquired=, =sample=/=v=) does not map onto it.  Keeping it in the
+denominator just manufactures permanent red.
+
+Note there is *no =add-country= skill* --- =add-feature= covers the
+"create a =data_scheme.yml= if absent" case in a paragraph.  Ten
+bootstraps justify writing one.
+
+* Decisions taken
+
+1. *Scope of the config-less countries* --- [2026-07-11] *in remit.*  They
+   are WB "kissing cousins" carrying many LSMS modules.  See Phase 5.
+   /Open sub-question:/ is =KenyaLPS= the one exception?  It is an
+   individual tracking panel, not a household survey, and the canonical
+   schema does not map onto it.
+2. *Adjudication authority* --- [2026-07-11] *no human sign-off required*,
+   but only against the enumerated evidence standard of §D2, which the
+   pilot then hardened: Check 4 (the questionnaire) is *mandatory* before
+   any permanent close, because every data-side check can be defeated by a
+   data-/distribution/ gap (Albania 2004).  An agent may write a verdict;
+   it may not write an /unevidenced/ one.
+3. *=blessed=* --- [2026-07-12] *adopted, seeded empty, bless-on-first-use.*
+   Implemented; see §D5.
+
+* Open questions for Ethan
+
+1. *=KenyaLPS=* --- drop from the denominator?  (Recommend: yes.)
+2. *EthiopiaRHS R5--R7* --- is the raw section data obtainable from IFPRI
+   Dataverse, or is the archive aggregate-only forever?  Three cells hang
+   on this and no agent can answer it.
+3. *The =Harmonized_LSMS-ISA_Ag= parquet* is an orphan --- 48 MB, DVC-tracked,
+   referenced by nothing.  The probe (§D2 Check 3) gives it a job.  Keep it
+   where it is, or move it out of =countries/=?  It is not a country.
