@@ -48,6 +48,9 @@ TIER_COLOR = {
     # extract) -- a distinct colour, because it routes to a different queue
     # entirely and should never be mistaken for either config work or a close.
     "asked-not-distributed": "#c5b3e6",
+    # Data downloaded, zero config -- work not yet STARTED.  Must read as work,
+    # not as a quiet gap.
+    "unconfigured":          "#fd7e14",
     "declared": "#cfe2ff",
     "dropped":  "#f5c2c7",
     "broken":   "#dc3545",
@@ -58,7 +61,7 @@ TIER_COLOR = {
 TIER_GLYPH = {
     "n/a": "·", "absent": "–", "declared": "?", "dropped": "✗!",
     "broken": "✗", "builds": "⚠", "sane": "✓", "blessed": "★",
-    "not-asked": "∅", "asked-not-distributed": "⤓",
+    "not-asked": "∅", "asked-not-distributed": "⤓", "unconfigured": "⌀",
 }
 
 

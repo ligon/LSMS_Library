@@ -165,6 +165,14 @@ to refresh what readers see is:
    lsms-library cache clear --country Uganda   # repeat per country, or clear all
    make matrix C="Uganda"                       # omit C= for the full cube
    ```
+
+    !!! note "A scoped run upserts; it does not replace"
+        `save_snapshot()` **merges** on `(country, feature, wave)`, so
+        `make matrix C="Uganda"` updates Uganda's cells and leaves every other
+        country's alone. Before 2026-07-12 it replaced the file wholesale --
+        which meant that following this very procedure with `C=` committed a
+        67-cell snapshot over the authoritative 1849-cell one. A partial
+        measurement must never be able to erase a complete one.
 2. **Commit the journal** (it is tracked despite the global `*.csv` ignore):
    ```bash
    git add .coder/coverage/latest.csv

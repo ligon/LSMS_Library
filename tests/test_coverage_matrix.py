@@ -419,3 +419,109 @@ def test_absent_stays_absent_with_no_verdicts():
                               _env(_df_with_t({"w1": 3}), _ok_report()),
                               readiness=True)
     assert _tiers(cells)[("foo", "w2")] == "absent"
+
+
+# ---------------------------------------------------------------------------
+# `unconfigured` + known-no-microdata (Defects 4 and 6)
+# ---------------------------------------------------------------------------
+def test_unconfigured_countries_finds_data_without_config(tmp_path):
+    """A country dir with microdata but no _/data_scheme.yml must be REPORTED.
+
+    `catalog.countries()` requires a data_scheme.yml, so these were invisible to
+    the whole library -- 10 in-remit countries and ~35 waves of already-
+    downloaded data that the matrix simply never mentioned.  A denominator that
+    omits the work you have not started is not a denominator.
+    """
+    root = tmp_path / "countries"
+    # configured country -> NOT unconfigured
+    (root / "Uganda" / "_").mkdir(parents=True)
+    (root / "Uganda" / "_" / "data_scheme.yml").write_text("Country: Uganda\n")
+    (root / "Uganda" / "2019-20" / "Data").mkdir(parents=True)
+    # data, no config -> unconfigured
+    (root / "Peru" / "1994" / "Data").mkdir(parents=True)
+    (root / "Peru" / "1991" / "Data").mkdir(parents=True)
+    # no Data/ at all -> not a country dir; must be ignored
+    (root / "stray").mkdir()
+
+    got = cov.unconfigured_countries(lambda: root)
+    assert got == {"Peru": 2}
+
+
+def test_known_no_microdata_countries_are_na_not_broken():
+    """Armenia/Nepal have NO source data.  That is a fact, not a defect.
+
+    Before this, ALL 8 `broken` cells in the cube were these two countries --
+    so the most alarming tier in the ladder contained nothing actionable, and a
+    genuine build failure would have been lost among them.
+    """
+    known = cov.countries_without_microdata()
+    assert set(known) >= {"Armenia", "Nepal"}
+
+    co = _FakeCountry({"1996": ["household_roster"]})
+    env = _env(FileNotFoundError("PathMissingError: INDSECA.dta"), _ok_report())
+
+    cells = cov.grade_feature("Armenia", "household_roster", ["1996"], co, env,
+                              readiness=True)
+    cell = cells[0]
+    assert cell["tier"] == "n/a"                      # not `broken`
+    assert "no microdata in repo" in cell["detail"]
+
+    # ...but a country that SHOULD have data still reports `broken`.
+    cells = cov.grade_feature("Uganda", "household_roster", ["1996"], co, env,
+                              readiness=True)
+    assert cells[0]["tier"] == "broken"
+
+
+def test_new_tiers_are_registered_in_the_ladder():
+    for t in ("not-asked", "asked-not-distributed", "unconfigured"):
+        assert t in cov.TIER_ORDER, t
+        assert t in cov.ROLLUP_PRIORITY, t
+    # every tier the model can emit must be rankable by the rollup
+    assert set(cov.TIER_ORDER) == set(cov.ROLLUP_PRIORITY)
+
+
+def test_scoped_snapshot_MERGES_and_does_not_destroy_other_cells(tmp_path):
+    """A partial measurement must never erase a complete one.
+
+    `make matrix C="Uganda"` grades only Uganda.  Writing that wholesale wiped
+    every other country -- and docs/guide/coverage.md documented exactly that as
+    the "spot refresh" procedure, followed by `git add latest.csv && commit`.
+    Following the guide verbatim replaced the authoritative 1849-cell snapshot
+    with a 67-cell one.  (Observed 2026-07-12.)
+    """
+    snap = tmp_path / "latest.csv"
+    full = pd.DataFrame(
+        [{"country": "Uganda", "feature": "housing", "wave": "2019-20",
+          "tier": "builds", "coverage": "declared", "n_rows": "10", "detail": "old"},
+         {"country": "Malawi", "feature": "housing", "wave": "2016-17",
+          "tier": "sane", "coverage": "declared", "n_rows": "99", "detail": "keep me"}],
+        columns=cov.COLUMNS)
+    cov.save_snapshot(full, snap, merge=False)
+
+    # a SCOPED re-run: only Uganda was graded
+    scoped = pd.DataFrame(
+        [{"country": "Uganda", "feature": "housing", "wave": "2019-20",
+          "tier": "sane", "coverage": "declared", "n_rows": "10", "detail": "new"}],
+        columns=cov.COLUMNS)
+    cov.save_snapshot(scoped, snap)
+
+    got = pd.read_csv(snap, dtype=str, keep_default_na=False)
+    assert len(got) == 2, "the un-graded country was destroyed"
+    uga = got[got.country == "Uganda"].iloc[0]
+    mwi = got[got.country == "Malawi"].iloc[0]
+    assert uga["tier"] == "sane" and uga["detail"] == "new"    # upserted
+    assert mwi["tier"] == "sane" and mwi["detail"] == "keep me" # untouched
+
+
+def test_save_snapshot_merge_false_still_replaces(tmp_path):
+    snap = tmp_path / "latest.csv"
+    cov.save_snapshot(pd.DataFrame(
+        [{"country": "Malawi", "feature": "housing", "wave": "w", "tier": "sane",
+          "coverage": "declared", "n_rows": "1", "detail": ""}],
+        columns=cov.COLUMNS), snap, merge=False)
+    cov.save_snapshot(pd.DataFrame(
+        [{"country": "Uganda", "feature": "housing", "wave": "w", "tier": "sane",
+          "coverage": "declared", "n_rows": "1", "detail": ""}],
+        columns=cov.COLUMNS), snap, merge=False)
+    got = pd.read_csv(snap, dtype=str)
+    assert list(got.country) == ["Uganda"]
