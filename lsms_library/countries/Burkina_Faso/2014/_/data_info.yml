@@ -33,7 +33,19 @@ household_roster:
         Sex: B2
         Age: B4
         Relationship: B5
-        MonthsSpent: B3A
+        # B3A is a 6-month binary ("Depuis combien de temps [NOM] vit dans
+        # ce menage?"), not a months count: '6 mois ou plus' (77,268) /
+        # 'moins de 6 mois' (943) / NaN (332).  Same semantics as the EHCVM
+        # waves' s01q12/s01q13 (>=6 months y/n), so it is mapped to the same
+        # 12/0 canonical MonthsSpent -- see CLAUDE.md "EHCVM note" and e.g.
+        # Burkina_Faso/2018-19, Mali/2017-18.  Left untranslated, the French
+        # labels coerce to NaN in roster_to_characteristics() and the whole
+        # wave drops out of household_characteristics.
+        MonthsSpent:
+            - B3A
+            - mapping:
+                '6 mois ou plus': 12
+                'moins de 6 mois': 0
 
 individual_education:
     # 2014 EMC: highest formal-education level attained is B14 ("Quel est le
