@@ -1,0 +1,17 @@
+[matrix] building (full) ...
+  Ethiopia: 5 waves × 24 features
+/local/job35193627/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job35193627/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Ethiopia.csv (122 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=14, declared=0, dropped=2, broken=0, builds=9, sane=97, blessed=0

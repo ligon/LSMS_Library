@@ -1,0 +1,52 @@
+=== task 25: country='Senegal'  node=n0178.savio3  Thu Jun 25 18:48:54 PDT 2026 ===
+--- provisioning venv -> /local/job35193715/venv ---
+--- cache clear Senegal ---
+Senegal: removed
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/var/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2018-19/_/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Senegal/2021-22/_/subjective_well_being.parquet
+--- build Senegal ---
+=== done 'Senegal' rc=0  Thu Jun 25 18:53:27 PDT 2026 ===

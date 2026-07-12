@@ -1,0 +1,18 @@
+=== task 2: country='Azerbaijan'  node=n0190.savio3  Thu Jun 25 18:43:32 PDT 2026 ===
+--- provisioning venv -> /local/job35193620/venv ---
+--- cache clear Azerbaijan ---
+Azerbaijan: removed
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/1995/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/1995/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/1995/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/1995/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/1995/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Azerbaijan/1995/_/sample.parquet
+--- build Azerbaijan ---
+=== done 'Azerbaijan' rc=0  Thu Jun 25 18:45:02 PDT 2026 ===

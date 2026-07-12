@@ -1,0 +1,196 @@
+COUNTRY=EthiopiaRHS
+WAVES=['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
+FEATURES=['area_output', 'assets', 'cluster_features', 'consumption', 'food_acquired', 'food_expenditures', 'food_prices', 'food_quantities', 'hhsize', 'household_characteristics', 'household_roster', 'income', 'livestock', 'panel_ids', 'plot_features', 'sample']
+================================================================================
+
+### FEATURE: area_output
+  shape=(2649, 18) index=['i', 't', 'v'] waves=['2004', '2009']
+  report.ok=True
+  WARN-OK[index_levels_match_scheme]: Extra index levels not in scheme: ['v']; expected: ['t', 'i'], actual: ['i', 't', 'v']
+  PYWARNINGS (10):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2004/Data/area_output_04rev.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/erhs7_meher_area_output_cereals_2009.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/demog89_1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/age_sex_r4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/roster.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2004/Data/consumptionaggregates_123456.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/consumptionAggrgates_r7.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: assets
+  shape=(488, 4) index=['i', 't'] waves=['1989']
+  report.ok=True
+  PYWARNINGS (7):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/assetars.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/assetdeb.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/assetdin.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/assetgam.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/assethar.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/assetsid.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/assetwol.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: cluster_features
+  shape=(126, 3) index=['t', 'v'] waves=['1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
+  report.ok=True
+  WARN-BAD[has_household_index]: No 'i' level in index
+  WARN-BAD[no_constant_columns]: 1 constant column(s): ['Rural']
+  PYWARNINGS (7):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/age_sex_r4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/roster.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2004/Data/consumptionaggregates_123456.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/consumptionAggrgates_r7.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: consumption
+  shape=(2725, 6) index=['i', 't', 'v'] waves=['2004', '2009']
+  report.ok=True
+  WARN-OK[index_levels_match_scheme]: Extra index levels not in scheme: ['v']; expected: ['t', 'i'], actual: ['i', 't', 'v']
+  PYWARNINGS (2):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2004/Data/consumptionaggregates_123456.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/consumptionAggrgates_r7.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: food_acquired
+  shape=(54693, 2) index=['i', 't', 'v', 'j', 'u', 's'] waves=['1989', '1994a', '1994b', '1995', '1997']
+  report.ok=True
+  WARN-OK[index_levels_match_scheme]: Extra index levels not in scheme: ['v']; expected: ['t', 'i', 'j', 'u', 's'], actual: ['i', 't', 'v', 'j', 'u', 's']
+  PYWARNINGS (5):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/food89.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/food1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/food2.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/food3.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/food4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: food_expenditures
+  shape=(37661, 1) index=['i', 't', 'v', 'j', 's'] waves=['1989', '1994a', '1994b', '1995', '1997']
+  report.ok=True
+  PYWARNINGS (5):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/food89.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/food1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/food2.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/food3.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/food4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: food_prices
+  shape=(35779, 1) index=['i', 't', 'v', 'j', 'u', 's'] waves=['1994a', '1994b', '1995', '1997']
+  report.ok=True
+  PYWARNINGS (5):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/food89.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/food1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/food2.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/food3.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/food4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: food_quantities
+  shape=(54429, 1) index=['i', 't', 'v', 'j', 'u', 's'] waves=['1989', '1994a', '1994b', '1995', '1997']
+  report.ok=True
+  PYWARNINGS (5):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/food89.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/food1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/food2.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/food3.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/food4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: hhsize
+  shape=(1358, 2) index=['i', 't', 'v'] waves=['2009']
+  report.ok=True
+  WARN-OK[index_levels_match_scheme]: Extra index levels not in scheme: ['v']; expected: ['t', 'i'], actual: ['i', 't', 'v']
+  PYWARNINGS (1):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/hhsize_round7.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: household_characteristics
+  shape=(7718, 15) index=['t', 'v', 'i'] waves=['1989', '1994a', '1994b', '1995', '1997', '1999']
+  report.ok=True
+  PYWARNINGS (6):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/demog89_1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/age_sex_r4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/roster.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: household_roster
+  shape=(51574, 6) index=['i', 't', 'v', 'pid'] waves=['1989', '1994a', '1994b', '1995', '1997', '1999']
+  report.ok=True
+  WARN-OK[index_levels_match_scheme]: Extra index levels not in scheme: ['v']; expected: ['t', 'i', 'pid'], actual: ['i', 't', 'v', 'pid']
+  PYWARNINGS (6):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/demog89_1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/age_sex_r4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/roster.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: income
+  shape=(252, 5) index=['i', 't'] waves=['1999']
+  report.ok=True
+  PYWARNINGS (4):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/arsinc5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/debinc5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/dininc5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/sidinc5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: livestock
+  shape=(3473, 2) index=['i', 't'] waves=['1999', '2004', '2009']
+  report.ok=True
+  PYWARNINGS (9):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/arslvs5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/deblvs5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/dinklvs5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/gamlvs5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/harlvs5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/sidlvs5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/wollvs5.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2004/Data/livestockaggregates_123456.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/livestock_agg_round7.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+### FEATURE: panel_ids
+  PROPERTY feature -> type=dict, len=4708
+  SANITY RAISED: 'dict' object has no attribute 'index'
+
+### FEATURE: plot_features
+  shape=(5284, 5) index=['i', 't', 'v', 'plot_id'] waves=['1994a']
+  report.ok=True
+  WARN-OK[index_levels_match_scheme]: Extra index levels not in scheme: ['v']; expected: ['t', 'i', 'plot_id'], actual: ['i', 't', 'v', 'plot_id']
+  PYWARNINGS (2):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/land1all.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Canonical index over ['t', 'i', 'plot_id'] had 163 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+
+### FEATURE: sample
+  shape=(10453, 5) index=['i', 't'] waves=['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
+  report.ok=True
+  WARN-BAD[no_constant_columns]: 3 constant column(s): ['weight', 'panel_weight', 'Rural']
+  PYWARNINGS (8):
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1989/Data/demog89_1.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994a/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1994b/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1995/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1997/Data/age_sex_r4.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/roster.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2004/Data/consumptionaggregates_123456.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    - Refusing workspace copy of DVC-tracked file EthiopiaRHS/2009/Data/consumptionAggrgates_r7.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+
+================================================================================
+SUMMARY
+================================================================================
+  area_output                  OK             rows=2649 report_ok=True waves=['2004', '2009'] bad_warns=[]
+  assets                       OK             rows=488 report_ok=True waves=['1989'] bad_warns=[]
+  cluster_features             BAD-WARN       rows=126 report_ok=True waves=['1994a', '1994b', '1995', '1997', '1999', '2004', '2009'] bad_warns=['has_household_index', 'no_constant_columns']
+  consumption                  OK             rows=2725 report_ok=True waves=['2004', '2009'] bad_warns=[]
+  food_acquired                OK             rows=54693 report_ok=True waves=['1989', '1994a', '1994b', '1995', '1997'] bad_warns=[]
+  food_expenditures            OK             rows=37661 report_ok=True waves=['1989', '1994a', '1994b', '1995', '1997'] bad_warns=[]
+  food_prices                  OK             rows=35779 report_ok=True waves=['1994a', '1994b', '1995', '1997'] bad_warns=[]
+  food_quantities              OK             rows=54429 report_ok=True waves=['1989', '1994a', '1994b', '1995', '1997'] bad_warns=[]
+  hhsize                       OK             rows=1358 report_ok=True waves=['2009'] bad_warns=[]
+  household_characteristics    OK             rows=7718 report_ok=True waves=['1989', '1994a', '1994b', '1995', '1997', '1999'] bad_warns=[]
+  household_roster             OK             rows=51574 report_ok=True waves=['1989', '1994a', '1994b', '1995', '1997', '1999'] bad_warns=[]
+  income                       OK             rows=252 report_ok=True waves=['1999'] bad_warns=[]
+  livestock                    OK             rows=3473 report_ok=True waves=['1999', '2004', '2009'] bad_warns=[]
+  panel_ids                    SANITY-RAISED  rows=4708 report_ok=None waves=None bad_warns=[]
+  plot_features                OK             rows=5284 report_ok=True waves=['1994a'] bad_warns=[]
+  sample                       BAD-WARN       rows=10453 report_ok=True waves=['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009'] bad_warns=['no_constant_columns']
+
+OVERALL_FAIL=True

@@ -1,0 +1,5 @@
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/2018-19/_/./plot_features.py:19: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_sen2018.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/2021-22/_/./plot_features.py:19: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_sen2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_sen2021.dta', convert_categoricals=False)
+Senegal: 17 features audited

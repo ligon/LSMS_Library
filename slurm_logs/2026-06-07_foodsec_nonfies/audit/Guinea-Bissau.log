@@ -1,0 +1,3 @@
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guinea-Bissau/2018-19/_/plot_features.py:24: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_gnb2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_gnb2018.dta', convert_categoricals=False)
+Guinea-Bissau: 16 features audited
