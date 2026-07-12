@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/215m-9g90]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/77
+
+#+CATALOG_ID: 77
+#+CATALOG_IDNO: KSV_2000_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2000
+#+CATALOG_YEARS: 2000-2000
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/215m-9g90
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/77
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

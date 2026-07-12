@@ -1,1 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/79/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/79
+
+#+CATALOG_ID: 79
+#+CATALOG_IDNO: TZA_2004_KHDS_v01_M
+#+CATALOG_TITLE: Kagera Health and Development Survey 2004 (Wave 5 Panel)
+#+CATALOG_YEARS: 2004-2004
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/5ayf-re90
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/79
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

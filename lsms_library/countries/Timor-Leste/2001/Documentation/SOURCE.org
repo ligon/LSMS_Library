@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/3gq7-sk98]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/75
+
+#+CATALOG_ID: 75
+#+CATALOG_IDNO: TLS_2001_TLSS_v01_M
+#+CATALOG_TITLE: Living Standards Survey 2001
+#+CATALOG_YEARS: 2001-2001
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/3gq7-sk98
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/75
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

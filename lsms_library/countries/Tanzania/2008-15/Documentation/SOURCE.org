@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/3814
+
+#+CATALOG_ID: 3814
+#+CATALOG_IDNO: TZA_2008-2014_NPS-UPD_v01_M
+#+CATALOG_TITLE: National Panel Survey 2008-2015, Uniform Panel Dataset
+#+CATALOG_YEARS: 2008-2015
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/655c-x145
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3814
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

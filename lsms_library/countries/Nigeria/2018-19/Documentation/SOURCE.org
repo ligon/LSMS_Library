@@ -1,3 +1,16 @@
-SOURCE 
+SOURCE
 
-https://microdata.worldbank.org/index.php/catalog/3827
+https://microdata.worldbank.org/index.php/catalog/3557
+
+#+CATALOG_ID: 3557
+#+CATALOG_IDNO: NGA_2018_GHSP-W4_v03_M
+#+CATALOG_TITLE: General Household Survey, Panel 2018-2019, Wave 4
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/1hgw-dq47
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3557
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_SUPERSEDED_URL: https://microdata.worldbank.org/index.php/catalog/3827
+#+PROVENANCE_NOTE: Corrected from catalog 3827 (NGA_2018_LSS, 'Living Standards Survey 2018-2019').  The data files in this directory are sect*_plantingw4 / sect*_harvestw4 / nga_*_y4 -- i.e. General Household Survey Panel Wave 4 (NGA_2018_GHSP-W4, catalog 3557). Both studies span 2018-2019, so the previously recorded id was the wrong one of the two.  Every sibling Nigeria wave is also GHS-Panel (W1=1002, W2=1952, W3=2734, W5=6410).

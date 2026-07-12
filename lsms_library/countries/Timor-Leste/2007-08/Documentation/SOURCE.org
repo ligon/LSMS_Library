@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/x7qj-ne03]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/78
+
+#+CATALOG_ID: 78
+#+CATALOG_IDNO: TLS_2007_TLSLS_v01_M
+#+CATALOG_TITLE: Survey of Living Standards 2007 and Extension 2008
+#+CATALOG_YEARS: 2007-2008
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/x7qj-ne03
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/78
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/1494-v479]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/280
+
+#+CATALOG_ID: 280
+#+CATALOG_IDNO: KGZ_1993_KMPS_v01_M
+#+CATALOG_TITLE: Multipurpose Poverty Survey 1993
+#+CATALOG_YEARS: 1993-1993
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/1494-v479
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/280
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12
