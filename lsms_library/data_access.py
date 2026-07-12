@@ -54,6 +54,7 @@ import tempfile
 import time
 import urllib.error
 import zipfile
+from collections.abc import Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlparse
@@ -98,19 +99,52 @@ _COUNTRIES_DIR = countries_root()
 # catalog at all.  It is recorded explicitly -- rather than simply omitted --
 # so that "we deliberately do not discover this" is distinguishable from "we
 # forgot to add a country code".
+#
+# ``repositories`` (GH #597) lists the WB *collections* to search for a country,
+# defaulting to ``("lsms",)``.  The World Bank publishes whole household-survey
+# series outside the ``lsms`` collection -- Armenia's Integrated Living
+# Conditions Survey sits in ``central``, South Africa's General Household Survey
+# in ``datafirst`` -- and a search hard-coded to ``lsms`` cannot see them at all.
+# They were not "not yet fetched"; they were unfindable.
+#
+# The fix is deliberately *targeted*.  Dropping the collection filter entirely
+# inflates a country's result set 30-400x with material we do not want (Findex,
+# Afrobarometer, DHS, enterprise surveys, and -- in ``datafirst`` -- 320 rows of
+# South African election studies, school registers and media surveys).  That
+# trades a false-negative problem for a false-positive one, and the second is
+# worse: it buries the real gaps in noise.  A missing-wave list nobody trusts is
+# worse than no list.
+#
+# So widening a country to a second repository is paired with an
+# ``idno_pattern`` that pins the *survey series*.  The two levers compose:
+# ``repositories`` says where to look, ``idno_pattern`` says what counts.  Both
+# are config, not heuristics -- auditable beats clever.
+#
+# Widening without pinning the series would also resurface studies we already
+# hold under a *different* catalog id in another repository: ``central`` id 3016
+# (``MWI_2010_IHS-III_v01_M_v01_A_ML``) is the same Malawi IHS3 as ``lsms`` id
+# 1003 (``MWI_2010_IHS-III_v01_M``), which we hold as ``Malawi/2010-11/``, and
+# ``datafirst`` id 902 (``ZAF_1993_PSLSD``) is the same 1993 South African survey
+# as ``lsms`` id 297 (``ZAF_1993_IHS``), which we hold as ``South Africa/1993/``.
+# Naive widening reports both as missing waves.  They are not.
 
 
 class CountryCatalog:
     """How a country directory maps onto the WB Microdata Library catalog."""
 
-    __slots__ = ("code", "idno_pattern", "discoverable", "reason")
+    __slots__ = ("code", "idno_pattern", "discoverable", "reason",
+                 "repositories")
 
     def __init__(self, code: str | None, idno_pattern: str | None = None,
-                 discoverable: bool = True, reason: str | None = None):
+                 discoverable: bool = True, reason: str | None = None,
+                 repositories: Sequence[str] | None = None):
         self.code = code
         self.idno_pattern = idno_pattern
         self.discoverable = discoverable
         self.reason = reason
+        # Default: the LSMS collection alone, which is where all but a handful
+        # of our series live.
+        self.repositories: tuple[str, ...] = tuple(repositories or ("lsms",))
 
     def matches(self, entry: dict) -> bool:
         """True when a catalog *entry* belongs to this country directory."""
@@ -122,7 +156,16 @@ class CountryCatalog:
 _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     "Afghanistan": CountryCatalog("AFG"),
     "Albania": CountryCatalog("ALB"),
-    "Armenia": CountryCatalog("ARM"),
+    # ARM: the Integrated Living Conditions Survey (ILCS, 2001-2018) is an
+    # annual living-standards series published under ``central``, NOT ``lsms``
+    # -- 18 waves that a lsms-only search could not see (GH #597).  ``lsms``
+    # carries only the 1996 Household Budget Survey, which we hold as ``1996/``.
+    # The pattern admits both series and nothing else: ``central`` also returns
+    # Armenian Labour Force Surveys, a migration survey and a time-use survey,
+    # plus global Findex / Global Consumption Database rows tagged to every
+    # country.
+    "Armenia": CountryCatalog("ARM", idno_pattern=r"_(HBS|ILCS)_",
+                              repositories=("lsms", "central")),
     "Azerbaijan": CountryCatalog("AZE"),
     "Benin": CountryCatalog("BEN"),
     "Bosnia-Herzegovina": CountryCatalog("BIH"),
@@ -161,7 +204,19 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     # Serbia and Montenegro was a distinct ISO entity (SCG); its two LSMS
     # rounds are catalog ids 80 and 81, matching our 2002/ and 2003/ dirs.
     "Serbia and Montenegro": CountryCatalog("SCG"),
-    "South Africa": CountryCatalog("ZAF"),
+    # ZAF: the General Household Survey (GHS, 2002-2025) is published under
+    # ``datafirst`` (UCT's DataFirst archive), not ``lsms`` -- 21 waves invisible
+    # to a lsms-only search (GH #597).  ``lsms`` carries only the 1993 Integrated
+    # Household Survey, which we hold as ``1993/``.
+    #
+    # The series pin matters more here than anywhere else: ``datafirst`` returns
+    # 320 ZAF rows -- quarterly labour force surveys, censuses, victim-of-crime
+    # and domestic-tourism surveys, election studies, school registers, media
+    # surveys.  Widening the repository without pinning the series would report
+    # ~357 "missing waves" for South Africa, which is not a denominator anyone
+    # could use.
+    "South Africa": CountryCatalog("ZAF", idno_pattern=r"_(IHS|GHS)_",
+                                   repositories=("lsms", "datafirst")),
     "Tajikistan": CountryCatalog("TJK"),
     # TZA is shared: the National Panel Survey vs the Kagera Health and
     # Development Survey (a separate longitudinal study).
@@ -1293,6 +1348,33 @@ def _wb_catalog_search(country_code: str,
     return results
 
 
+def _wb_catalog_search_many(country_code: str,
+                            collections: Sequence[str],
+                            ) -> list[dict]:
+    """Search several WB collections and union the results.
+
+    Deduplicated on the catalog ``id``: a study can be listed in more than one
+    collection, and the same row must not be counted twice.  Order is preserved
+    (first collection wins), so the ``lsms`` view of a study -- which is the one
+    whose id our ``SOURCE.org`` files record -- takes precedence.
+
+    Note this dedups on the catalog **id**, which does *not* catch a study that
+    the WB has catalogued twice under two *different* ids in two repositories
+    (Malawi IHS3 is both ``lsms`` 1003 and ``central`` 3016).  Nothing in the
+    catalog metadata links those, so the defence against them is the per-country
+    ``idno_pattern`` -- see the note above :class:`CountryCatalog`.
+    """
+    seen: set[str] = set()
+    out: list[dict] = []
+    for coll in collections:
+        for row in _wb_catalog_search(country_code, coll):
+            if row["id"] in seen:
+                continue
+            seen.add(row["id"])
+            out.append(row)
+    return out
+
+
 def _local_waves(country: str) -> list[str]:
     """Return the list of wave directories that already exist locally."""
     country_dir = _COUNTRIES_DIR / country
@@ -1341,7 +1423,7 @@ def local_catalog_ids(country: str) -> dict[str, list[str]]:
 
 
 def discover_waves(country: str,
-                   collection: str = "lsms",
+                   collection: str | None = None,
                    ) -> list[dict]:
     """Find WB catalog entries for *country*, flagging which we already hold.
 
@@ -1378,12 +1460,20 @@ def discover_waves(country: str,
     ``local_waves``
         The wave directories backing this entry (empty unless ``local``).
 
+    Which WB *collections* are searched is per-country config: the
+    ``repositories`` field of :class:`CountryCatalog`, defaulting to
+    ``("lsms",)``.  Armenia adds ``central`` and South Africa adds ``datafirst``,
+    where their living-standards series are actually published (GH #597).  The
+    results are unioned and deduplicated on the catalog id.
+
     Parameters
     ----------
     country : str
         Country directory name, e.g. ``"Ethiopia"``.
-    collection : str
-        WB Microdata Library collection to search (default ``"lsms"``).
+    collection : str, optional
+        Search this single collection instead of the country's configured
+        ``repositories``.  Escape hatch for exploration; leave it ``None``
+        (the default) to get the configured behaviour.
 
     Returns
     -------
@@ -1402,7 +1492,8 @@ def discover_waves(country: str,
                     country, spec.reason or "not a World Bank dataset.")
         return []
 
-    entries = [e for e in _wb_catalog_search(spec.code, collection)
+    collections = (collection,) if collection else spec.repositories
+    entries = [e for e in _wb_catalog_search_many(spec.code, collections)
                if spec.matches(e)]
 
     held = local_catalog_ids(country)

@@ -64,6 +64,40 @@ Countries that are not WB datasets (`EthiopiaRHS`, `KenyaLPS`) are marked
 `discoverable=False` in `_COUNTRY_CATALOG` and return `[]` with an explanatory
 log — deliberately, rather than being silently absent.
 
+#### Which repositories get searched (GH #597)
+
+`discover_waves()` searches the collections listed in the country's
+`repositories` field, **default `("lsms",)`**. The World Bank publishes whole
+series outside `lsms` — Armenia's Integrated Living Conditions Survey (18
+waves) is in `central`, South Africa's General Household Survey (21 waves) is
+in `datafirst` — and a lsms-only search cannot see them *at all*.
+
+**Adding a new country requires a one-time broad sweep** to learn which
+repositories hold its series (`_wb_catalog_search(code, collection=None)`
+searches everything). Curate the answer into config; do not infer it at
+runtime.
+
+> **Widening a country to a second repository REQUIRES an `idno_pattern` that
+> pins the survey series.** Dropping the collection filter inflates results
+> 30–400× (Findex, DHS, Afrobarometer, enterprise surveys; `datafirst` alone
+> returns 320 South African rows — censuses, election studies, school
+> registers). Worse, it resurfaces studies we *already hold* under a different
+> catalog id in another repository: `central` 3016 (`MWI_2010_IHS-III_..._A_ML`)
+> is the same Malawi IHS3 as `lsms` 1003, and `datafirst` 902 (`ZAF_1993_PSLSD`)
+> is the same 1993 survey as `lsms` 297. Nothing in the catalog metadata links
+> those pairs, so id-matching cannot catch them — only the series pin can.
+> A missing-wave list nobody trusts is worse than no list.
+
+```python
+"Armenia":      CountryCatalog("ARM", idno_pattern=r"_(HBS|ILCS)_",
+                               repositories=("lsms", "central")),
+"South Africa": CountryCatalog("ZAF", idno_pattern=r"_(IHS|GHS)_",
+                               repositories=("lsms", "datafirst")),
+```
+
+Note `GET /api/collections` returns HTTP 400 — collection ids cannot be
+enumerated via the API. Read them off the `repositoryid` field of search rows.
+
 ### Step 2: Add the wave
 
 ```python
