@@ -19,6 +19,7 @@ Usage::
 from __future__ import annotations
 
 import collections.abc
+import re
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -1350,6 +1351,25 @@ def _check_ids_applied_consistently(country) -> Check:
         return Check("ids_applied_consistently", "fail", str(e))
 
 
+_SPLIT_SUFFIX_RE = re.compile(r"_\d+$")
+
+
+def _is_split_of(canon_ci: str, canon_pi: str) -> bool:
+    """Is ``canon_ci`` a split-off of household ``canon_pi``?
+
+    When several current-wave households claim the same previous-wave
+    household (a household that *split* between waves),
+    :func:`.local_tools.update_id` keeps the base id for the first and
+    mints ``base_1``, ``base_2``, … for the rest.  So ``'101332_1'`` is
+    the second household descended from ``'101332'`` — a chain entry
+    relating the two is correct, not inconsistent.
+    """
+    if not isinstance(canon_ci, str) or not isinstance(canon_pi, str):
+        return False
+    m = _SPLIT_SUFFIX_RE.search(canon_ci)
+    return bool(m) and canon_ci[: m.start()] == canon_pi
+
+
 def _check_panel_ids_targets_exist(country) -> Check:
     """Every ``panel_ids`` chain entry should reference households that
     actually exist in ``household_roster`` — after accounting for
@@ -1361,8 +1381,10 @@ def _check_panel_ids_targets_exist(country) -> Check:
     walks each chain endpoint through ``updated_ids`` to get its
     canonical form, then verifies the canonical ID appears in the
     respective wave's roster. It also cross-checks that both
-    endpoints of a chain entry resolve to the **same** canonical ID
-    (otherwise the entry is internally inconsistent).
+    endpoints of a chain entry resolve to the **same** canonical ID —
+    or, for a household that *split* between the two waves, that the
+    current one is a ``base_N`` split-off of the previous one (see
+    :func:`_is_split_of`); anything else is internally inconsistent.
 
     Would have caught the Niger '10010' → '101' bug from 2026-04:
     the panel_ids.py script constructed current IDs that did not
@@ -1398,9 +1420,17 @@ def _check_panel_ids_targets_exist(country) -> Check:
             canon_pi = ui.get(pw, {}).get(pi_, pi_)
 
             # Cross-check: a chain entry's two endpoints should resolve
-            # to the same canonical ID. If they don't, the chain is
-            # internally inconsistent.
-            if canon_ci != canon_pi:
+            # to the same canonical ID -- *or* the current one is a split
+            # of the previous one.  When a household splits, ``update_id``
+            # mints ``prev``, ``prev_1``, ``prev_2`` ... for the several
+            # current households claiming one previous id
+            # (``local_tools.update_id``), so ``canon_ci == f'{canon_pi}_N'``
+            # is the library's own convention, not an inconsistency.  Both
+            # endpoints are still required to exist (checked below).
+            # Without this, every split household false-fails: Malawi's
+            # IHPS reported 1410/5686 (25%) "inconsistent" entries that
+            # were nothing of the sort (GH #548).
+            if canon_ci != canon_pi and not _is_split_of(canon_ci, canon_pi):
                 inconsistent += 1
                 if len(sample_missing) < 3:
                     sample_missing.append(
