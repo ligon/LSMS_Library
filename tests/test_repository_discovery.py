@@ -90,9 +90,35 @@ ZAF_DATAFIRST = [
      "year_start": 1993, "year_end": 1993, "doi": "", "url": ""},
 ]
 
+LBR_LSMS = [
+    {"id": "3787", "idno": "LBR_2018_NHFS_v01_M", "repository": "lsms",
+     "title": "National Household Forest Survey 2018-2019",
+     "year_start": 2018, "year_end": 2019, "doi": "", "url": ""},
+]
+
+LBR_CENTRAL = [
+    {"id": "2563", "idno": "LBR_2014_HIES_v01_M", "repository": "central",
+     "title": "Household Income and Expenditure Survey 2014-2015",
+     "year_start": 2014, "year_end": 2015, "doi": "", "url": ""},
+    {"id": "2986", "idno": "LBR_2016_HIES_v01_M", "repository": "central",
+     "title": "Household Income and Expenditure Survey 2016",
+     "year_start": 2016, "year_end": 2017, "doi": "", "url": ""},
+    # `central` noise for LBR:
+    {"id": "8189", "idno": "LBR_2017_MTF_v01_M", "repository": "central",
+     "title": "Multi-Tier Framework for Measuring Energy Access 2017",
+     "year_start": 2017, "year_end": 2017, "doi": "", "url": ""},
+    {"id": "4529", "idno": "LBR_2017_PESBR_v01_M", "repository": "central",
+     "title": "Survey of Public Servants 2017",
+     "year_start": 2017, "year_end": 2017, "doi": "", "url": ""},
+    {"id": "888", "idno": "AFR_2008_AFB-MR4_v02_M", "repository": "central",
+     "title": "Afrobarometer Survey 2008",
+     "year_start": 2008, "year_end": 2008, "doi": "", "url": ""},
+]
+
 _BY_COLLECTION = {
     "ARM": {"lsms": ARM_LSMS, "central": ARM_CENTRAL},
     "ZAF": {"lsms": ZAF_LSMS, "datafirst": ZAF_DATAFIRST},
+    "LBR": {"lsms": LBR_LSMS, "central": LBR_CENTRAL},
 }
 
 
@@ -124,19 +150,23 @@ class TestRepositoryConfig:
         for name in ("Nigeria", "Uganda", "Malawi", "Ethiopia", "Tanzania"):
             assert _COUNTRY_CATALOG[name].repositories == ("lsms",), name
 
-    def test_armenia_and_south_africa_are_widened(self):
+    def test_widened_countries_are_widened(self):
         assert _COUNTRY_CATALOG["Armenia"].repositories == ("lsms", "central")
         assert _COUNTRY_CATALOG["South Africa"].repositories == (
             "lsms", "datafirst")
+        assert _COUNTRY_CATALOG["Liberia"].repositories == ("lsms", "central")
 
     def test_widened_countries_pin_their_series(self):
-        """Widening without a series pin is the false-positive failure mode."""
-        for name in ("Armenia", "South Africa"):
-            spec = _COUNTRY_CATALOG[name]
-            assert len(spec.repositories) > 1
-            assert spec.idno_pattern, (
-                f"{name} searches {spec.repositories} but pins no series; it "
-                "will report unrelated studies as missing waves.")
+        """Widening without a series pin is the false-positive failure mode.
+
+        This is the invariant that keeps the census trustworthy, so it is
+        asserted over *every* widened country -- including any added later.
+        """
+        for name, spec in _COUNTRY_CATALOG.items():
+            if len(spec.repositories) > 1:
+                assert spec.idno_pattern, (
+                    f"{name} searches {spec.repositories} but pins no series; "
+                    "it will report unrelated studies as missing waves.")
 
 
 # ---------------------------------------------------------------------------
@@ -155,6 +185,46 @@ class TestWidenedDiscoveryFindsTheHiddenSeries:
         found = {e["id"] for e in discover_waves("South Africa")}
         assert {"2773", "8309"} <= found          # the GHS, from `datafirst`
         assert "297" in found                     # the IHS we hold, from `lsms`
+
+    def test_liberia_hies_is_found(self, catalog):
+        """We hold a *forest* survey; the two HIES waves were invisible."""
+        found = {e["id"] for e in discover_waves("Liberia")}
+        assert {"2563", "2986"} <= found       # the HIES, from `central`
+        assert "3787" in found                 # the NHFS we hold, from `lsms`
+
+    def test_liberia_rejects_thematic_studies_in_central(self, catalog):
+        found = {e["id"] for e in discover_waves("Liberia")}
+        assert "8189" not in found, "energy-access framework is not a HIES wave"
+        assert "4529" not in found, "survey of public servants is not ours"
+        assert "888" not in found, "Afrobarometer is not ours"
+
+    def test_liberia_nhfs_is_matched_for_identity_not_remit(self, catalog,
+                                                            tmp_path):
+        """The NHFS is in the pattern because it is the catalog entry backing a
+        wave dir we HOLD -- discovery must be able to report it as held.
+
+        By the remit predicate a forest-resources survey is NOT in remit.  This
+        is where the two axes -- 'is this catalog row this country's?' and 'is
+        this survey in remit?' -- visibly diverge, and the divergence is
+        deliberate: `idno_pattern` answers the first question, not the second.
+        """
+        import lsms_library.provenance as pv
+        src = (tmp_path / "countries" / "Liberia" / "2018-19" / "Documentation")
+        src.mkdir(parents=True)
+        (src / "SOURCE.org").write_text(pv.render_source_org(
+            pv.WaveProvenance(country="Liberia", wave="2018-19",
+                              source=pv.SOURCE_WORLDBANK, catalog_id="3787",
+                              idno="LBR_2018_NHFS_v01_M",
+                              url="https://microdata.worldbank.org"
+                                  "/index.php/catalog/3787")))
+
+        by_id = {e["id"]: e for e in discover_waves("Liberia")}
+        # The forest survey: ours by identity, held, and NOT in remit.
+        assert by_id["3787"]["local"] is True
+        assert by_id["3787"]["local_waves"] == ["2018-19"]
+        # The HIES waves: in remit, and NOT held.
+        assert by_id["2563"]["local"] is False
+        assert by_id["2986"]["local"] is False
 
     def test_every_configured_repository_is_searched(self, catalog):
         discover_waves("Armenia")

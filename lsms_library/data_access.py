@@ -188,7 +188,17 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     "Kazakhstan": CountryCatalog("KAZ"),
     "Kosovo": CountryCatalog("XKX"),
     "Kyrgyz Republic": CountryCatalog("KGZ"),
-    "Liberia": CountryCatalog("LBR"),
+    # LBR: the Household Income and Expenditure Survey (2014-15, 2016) is in
+    # `central`, not `lsms` (GH #597).  `lsms` carries only the 2018-19 National
+    # Household *Forest* Survey, which is what we hold as `2018-19/`.
+    #
+    # NHFS is in the pattern for *identity*, not remit: it is the catalog entry
+    # backing a wave dir we hold, so discovery must be able to report it as held.
+    # By the remit predicate (see the #597 PR) a forest-resources survey is NOT
+    # in remit -- it is held-but-out-of-remit, the same class as KenyaLPS.  The
+    # two axes are distinct and this entry is where they visibly diverge.
+    "Liberia": CountryCatalog("LBR", idno_pattern=r"_(HIES|NHFS)_",
+                              repositories=("lsms", "central")),
     "Malawi": CountryCatalog("MWI"),
     "Mali": CountryCatalog("MLI"),
     "Nepal": CountryCatalog("NPL"),

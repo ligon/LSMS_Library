@@ -93,7 +93,14 @@ runtime.
                                repositories=("lsms", "central")),
 "South Africa": CountryCatalog("ZAF", idno_pattern=r"_(IHS|GHS)_",
                                repositories=("lsms", "datafirst")),
+"Liberia":      CountryCatalog("LBR", idno_pattern=r"_(HIES|NHFS)_",
+                               repositories=("lsms", "central")),
 ```
+
+`idno_pattern` answers **"is this catalog row this country's?"** (identity), NOT
+**"is this survey in remit?"**.  The two diverge: Liberia's NHFS is in the
+pattern because it is the catalog entry backing a wave dir we *hold*, but a
+forest-resources survey is not in remit.  Do not conflate them.
 
 Note `GET /api/collections` returns HTTP 400 — collection ids cannot be
 enumerated via the API. Read them off the `repositoryid` field of search rows.
