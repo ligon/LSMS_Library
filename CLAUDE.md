@@ -34,7 +34,21 @@ The returned DataFrame prepends a `country` index level.
 - `scrum-master-hpc` (shared sucoder skill at `~/.sucoder/skills/scrum-master-hpc/SKILL.md`) — dispatching subagents, worktrees, DVC lock hygiene. Read this before using the Agent tool for multi-country work. Library-specific addenda:
   1. Subagents share the parquet cache at `~/.local/share/lsms_library/`, so concurrent agents building different countries don't conflict.
   2. The venv is at `{repo_root}/.venv/bin/python` (not in worktrees) — set `PYTHONPATH` to the worktree so development-branch code is picked up.
-  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path** — `PYTHONPATH` alone does NOT redirect imports of `lsms_library` to a worktree.  Worker agents that rebuild a feature to verify a YAML edit will silently run the main checkout's code.  For **config** edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), set **`LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries`** so the live package reads the worktree's config tree (GH #436); this is the clean fix and needs no fresh venv.  For **library-code** edits (`country.py`, `local_tools.py`, …) the `.pth` still pins to the main checkout, so either (a) verify via static diff only, or (b) have the agent install a fresh venv inside its worktree.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill for detection and mitigations.
+  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path**, so a worktree agent can silently verify against the *main checkout's* code.  **Always set `PYTHONPATH=<worktree>`** — it *does* beat the `.pth` (corrected 2026-07-12; this entry previously claimed the opposite, and the wrong claim sent people to a needless fresh-venv build).
+
+     **The actual trap is `python <script>.py`.**  Python sets `sys.path[0]` to the **script's own directory**, *not* cwd.  So `cd`-ing into the worktree does **not** protect a script run — cwd never enters `sys.path` at all, the `.pth`'s main-repo path wins, and you import the main checkout while believing you are testing the worktree.  Verified:
+
+     | invocation (cwd = worktree) | `PYTHONPATH` | imports |
+     |---|---|---|
+     | `python -c "import lsms_library"` | unset | worktree ✓ (cwd is `sys.path[0]`) |
+     | `python bench/scan.py` | unset | **main checkout ✗ — the trap** |
+     | `python bench/scan.py` | `=<worktree>` | worktree ✓ |
+
+     This has already cost a worker agent a full wasted audit run (PR #594).  Since the failure is *silent* and looks like success, **assert it** rather than assume it:
+     ```python
+     import lsms_library; assert 'worktrees' in lsms_library.__file__, lsms_library.__file__
+     ```
+     For **config**-only edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), `LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries` is the cleaner lever: the live package reads the worktree's config tree (GH #436) and library-code identity stops mattering.  A fresh in-worktree venv is **not** needed for either case.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill.
   4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's **adopt-or-build recipe** (adopt any importable `/local/job*/venv` already on the node → tar-pipe build only if none → reclaim the stale ones), which gives cross-job persistence without root.  Note: a stable `/local/$USER/<repo>` path is NOT creatable by us (`/local` is `root:root`); a genuinely persistent path needs an HPC-support ticket (README "Admin endgame").  **Opt-in fast path**: `bin/savio_venv.sh` packages the venv as a single squashfs image (`.venv.sqfs`, ~255 MB / one Lustre inode vs ~33k files) and mounts it per job via apptainer's `squashfuse_ll` (`mount`/`umount`/`update` subcommands) — kills the Lustre-MDS load and sidesteps the per-job reaper; see `docs/savio_venv.md` for the model + how to rebuild the image when deps change.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
 
 ## Repository Layout
