@@ -82,11 +82,27 @@ exists in the library; `roster_to_characteristics` is the only site.
 
 ## §6 Open questions for the human
 
-- BF 2014 `B3A` is a **6-month binary**, not a months count (`6 mois ou plus`
-  77,268 / `moins de 6 mois` 943 / NaN 332). Mapping it to 12/0 matches the
-  EHCVM convention (and drops the 943 short-stay members), but it is coarser
-  than Uganda's true months count. Flagged, not decided — if the project would
-  rather keep short-stay members in BF 2014, change the mapping to `12 / 6`.
+- **RESOLVED (Ethan, 2026-07-12): BF 2014 `B3A` stays `12 / 0`.** The decision
+  is subtle enough that someone will try to "fix" it later, so it is recorded
+  both here and in a comment above the mapping in
+  `Burkina_Faso/2014/_/data_info.yml`:
+  - `B3A`'s *variable label* is a **duration** question ("durant combien de mois
+    [NOM] a vécu dans le ménage"), but the **released variable is collapsed to a
+    6-month binary**: `{1: '6 mois ou plus', 2: 'moins de 6 mois', 9: 'Valeur
+    manquante'}` — 77,268 / 943 / (332 NaN).
+  - So `'moins de 6 mois'` does **not** mean "lived zero months". Those 943
+    people (1.2%) *did* live in the household, for 1–5 months. Read literally,
+    mapping them to `0` is false.
+  - This is exactly where `B3A` **differs from the EHCVM precedent it borrows**:
+    `s01q12` ("lived continuously 6+ months? Oui/Non") is a **membership test**,
+    so `Non → 0` is faithful there; `B3A` is a **binned duration**.
+  - We keep `12/0` anyway because the `0` encodes **"not a de-facto household
+    member"** (the standard LSMS 6-month rule), not a claim about months lived —
+    and consistency with the EHCVM family wins. The 943 are dropped by the
+    filter, as the EHCVM `Non` members are.
+  - `12/6` was rejected partly because **6 is the one value the respondent
+    explicitly ruled out**. If we ever choose to keep these members, the honest
+    fill is **3** (the 1–5 month interval midpoint), not 6.
 - CotedIvoire 1985–89 and Mali 2021-22 now count **everyone** in the roster
   (no residence question in those waves). That is the documented behaviour for
   a country with no residence column, applied per-wave. It does mean those
