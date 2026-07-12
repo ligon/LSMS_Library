@@ -44,11 +44,12 @@ cluster_features:
     myvars:
         Region: region
         District: dist
-        Rural:
-            - reside
-            - mappings:
-                Rural: 1
-                Urban: 0
+        # Raw `reside` is already the canonical 'Rural'/'Urban' in this wave.
+        # The `mappings:` block that used to sit here turned those good labels
+        # into 1/0 (and note it was even spelled `mappings:` rather than the
+        # `mapping:` the grabber honours).  Pass the label through; the other
+        # Malawi waves now do the same.  GH #602.
+        Rural: reside
 
 household_roster:
     file: sec_b.dta

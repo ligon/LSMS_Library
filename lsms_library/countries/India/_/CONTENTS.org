@@ -1,5 +1,25 @@
 #+title: Contents
 
+* sample.Rural — NOT available (2026-07-12, #602)
+
+=sample= carries no =Rural= (urban/rural) column, deliberately.
+
+It previously did, derived from =stratum= via a float-keyed mapping
+(=1.0: Urban ... 4.0: Rural=).  Raw =stratum= is a *string* column, so that
+mapping never matched a single row and the raw stratum label leaked into
+=Rural= for **100% of households** (='UP-other'=, =' B-other'= (leading
+space), ='UP-qual'=, =' B-qual'=) — see GH #602.
+
+The deeper problem is that =stratum= is not an urban/rural variable at all: it
+is a *state x sampling-phase* stratum, perfectly collinear with =state=
+(crosstab: every =' B-*'= row is Bihar, every ='UP-*'= row is Uttar Pradesh).
+The UP & Bihar Survey of Living Conditions 1997-98 has no urban/rural variable
+in =HHLIST.DTA= or =PSULIST.DTA=.  =Rural= was therefore *removed* rather than
+re-mapped: asserting a classification the survey never recorded would replace a
+visibly wrong value with an invisibly wrong one.  =strata= now carries the true
+stratum labels (whitespace normalised: =UP-qual=, =UP-other=, =B-qual=,
+=B-other=).
+
 * assets — consumer durables (2026-06-08, #342)
 Source: =SECT07D.DTA= §7 Part D "Consumer durables owned".  The module is
 already stored long (one row per household-item) with =itemcode= and =v07d02=
