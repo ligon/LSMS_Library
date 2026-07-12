@@ -267,6 +267,26 @@ def unconfigured_countries(countries_root) -> dict[str, int]:
     return out
 
 
+# Kinds of blocker.  Absorbed from the June-2026 obtainability audit (GH #552),
+# which independently reached this axis; recording it as STRUCTURE rather than
+# prose, because the kinds route to completely different people:
+#
+#   nso-redirect  the WB catalogues it but redirects to a national statistics
+#                 office, and that office's channel is broken/unreachable.
+#                 (Nepal NSO; Jamaica STATIN; Ecuador INEC.)  -> chase a human.
+#   fee-gated     obtainable, for money and permission.  (Vietnam GSO: USD
+#                 200-2000 + GSO consent.)  -> a BUDGET decision, not an
+#                 engineering one.  Never queue this for an RA.
+#   unconfirmed   we believe it is blocked but have not proven it; it may in
+#                 fact be a plain obtainable TODO.  (Albania 1996.)
+#                 -> the honest state when you have not actually checked.
+#
+# "The site is down" and "it costs $2,000" are not the same blocker, and
+# flattening them is how a money question silently becomes an engineering
+# backlog item that nobody can ever close.
+BLOCKER_KINDS = {"nso-redirect", "fee-gated", "unconfirmed", "licensed", "other"}
+
+
 def default_blocked_path() -> Path:
     return _repo_root() / ".coder" / "coverage" / "blocked_sources.csv"
 
@@ -474,8 +494,9 @@ def grade_feature(country_name, feature, waves, co, env, *,
         blk = blocked.get((country_name, str(w)))
         if not blk:
             return None
+        kind = blk.get("blocker_kind", "") or "other"
         return _cell(country_name, feature, w, "blocked", "declared",
-                     detail=f"blocked: {blk.get('blocker','')} "
+                     detail=f"blocked[{kind}]: {blk.get('blocker','')} "
                             f"[probe {blk.get('probe','')}; "
                             f"last checked {blk.get('last_checked','?')}]")
 
