@@ -7,7 +7,11 @@ Data Scheme:
     weight: float
     panel_weight: float
     strata: str
-    Rural: str
+    # No Rural: this survey records no urban/rural variable.  It was previously
+    # derived from `stratum` (a state x sampling-phase stratum, collinear with
+    # `state`) via a float-keyed map against a string column, which never fired --
+    # so the raw stratum label leaked into Rural for 100% of households.  See
+    # GH #602 and ../_/CONTENTS.org.
 
   cluster_features:
     index: (t, v)

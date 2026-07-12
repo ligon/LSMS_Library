@@ -204,9 +204,13 @@ class TestCountryRegressions:
         rather than invented."""
         import lsms_library as ll
         s = ll.Country("India").sample()
-        if "Rural" in s.columns:
-            assert set(s["Rural"].dropna().unique()) <= {"Rural", "Urban", "Informal"}
-        assert not set(s["strata"].dropna().unique()) & {"UP-other", " B-other"}
+        # Rural is gone entirely -- the survey has no urban/rural variable.
+        assert "Rural" not in s.columns, sorted(s.columns)
+        # strata now carries the TRUE stratum labels, whitespace-normalised.
+        # ('UP-other' is a legitimate label; ' B-other' -- leading space -- is not.)
+        strata = set(s["strata"].dropna().unique())
+        assert strata == {"UP-qual", "UP-other", "B-qual", "B-other"}, strata
+        assert not any(v != v.strip() for v in strata)
 
     def test_ghanalss_1991_92_rural_code_map_says_urban(self):
         """LATENT defect (not currently reaching sample() in a clean build -- the
