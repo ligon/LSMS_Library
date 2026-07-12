@@ -27,25 +27,94 @@ from .build_transforms import (  # noqa: F401  (re-export for back-compat)
 # level.  See ``slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org``
 # and GH #169.  ``data_info.yml`` does not currently support enumerated
 # value constraints on index levels, so the enumeration lives here and is
-# enforced in code by :func:`validate_acquisition_source`.
+# enforced in code by :func:`validate_acquisition_source`, which runs on every
+# read from :meth:`Country._finalize_result`.
+#
+# This is the SINGLE definition of "canonical s".  A country build that needs
+# the list (e.g. to filter its raw source codes) must ``import S_VALUES`` --
+# never re-spell it locally.  EthiopiaRHS did exactly that and drifted to a
+# narrower 3-tuple that silently omitted 'other' (GH #537).
 S_VALUES = ('purchased', 'produced', 'inkind', 'other')
 
 
 def validate_acquisition_source(df: pd.DataFrame) -> None:
-    """Raise ``ValueError`` if ``s`` index level contains non-canonical values.
+    """Raise ``ValueError`` if the ``s`` index level is non-canonical.
 
     No-op when ``s`` is not in the index.  Called from
-    :meth:`Country._finalize_result` for tables that carry an ``s`` level
-    (currently just ``food_acquired`` and its derivatives).
+    :meth:`lsms_library.country.Country._finalize_result`, so it runs on the
+    frame the user actually receives, for every table carrying an ``s`` level
+    (``food_acquired`` and the three ``_FOOD_DERIVED`` tables built from it).
+
+    **What this is.**  A *post-condition regression guard*, not a bug detector.
+    It passes on 100% of current data: as of 2026-07-12, all 80 (country x food
+    table) frames -- 31.9M rows across the 20 countries with a ``food_acquired``
+    -- are already canonical, with zero NaN.  It finds nothing today, and that
+    is the expected steady state.  Do not read a green run as evidence that a
+    number is right; read it as evidence that nobody has *broken* ``s`` yet.
+
+    **Why it is worth its cost anyway.**  19 of those 20 countries set ``s`` as
+    a bare string literal in a build script (``purch['s'] = 'purchased'``).  A
+    single typo -- ``'Purchased'``, ``'purchase'``, ``'own-production'`` --
+    would mint a phantom category and silently split rows across the
+    ``(t, v, i, j, u, s)`` index, so ``food_expenditures`` would quietly drop or
+    double-count a source.  That is a silently-wrong-number class of bug, and it
+    is exactly what this guard turns into a loud crash.  A crash is a gift.
+
+    **NaN is a violation, deliberately.**  The original implementation called
+    ``.dropna()`` before comparing, which made it structurally blind to a NaN
+    ``s`` -- the *dominant* real-world non-conformity, since an unmapped source
+    code (EthiopiaRHS/1989 has 677 of them upstream) becomes NaN rather than a
+    bad string.  A row whose acquisition source is unknown does not belong on
+    the ``s`` axis: it must be mapped to a canonical value, mapped to ``other``,
+    or dropped at the wave level -- explicitly, by the country's build.
+
+    See ``slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org`` and GH
+    #169 (which introduced ``S_VALUES``) / GH #537 (which wired this in -- it
+    had zero call sites from birth despite a docstring claiming otherwise).
     """
-    if 's' not in (df.index.names or []):
+    names = list(df.index.names or [])
+    if 's' not in names:
         return
-    observed = set(df.index.get_level_values('s').dropna().unique())
-    invalid = observed - set(S_VALUES)
+
+    # This runs on EVERY read (_finalize_result), including Feature(), which
+    # assembles all 20 food countries in one call -- so the clean case has to be
+    # cheap.  The old form, get_level_values('s').unique(), is O(#rows) and cost
+    # 877 ms on GhanaLSS food_acquired (5.26M rows).  Instead:
+    #
+    #   * unique values come off the MultiIndex *levels*, already deduplicated
+    #     -> O(#unique), microseconds;
+    #   * NaN is read off the level *codes* (pandas encodes a missing entry as
+    #     code -1 and never stores NaN in `levels`) -> one vectorised int
+    #     compare.  This is also precisely why a levels-based scan -- and the
+    #     original `.dropna()` scan -- could not see a NaN `s` at all.
+    #
+    # `levels` can retain entries for rows filtered out upstream, so a bad value
+    # found there is only a *suspicion*; we pay the O(#rows) prune to confirm it
+    # and avoid a false positive.  That cost is only ever paid on the unhappy
+    # path.  Net: 877 ms -> ~10 ms on GhanaLSS when the data is clean.
+    pos = names.index('s')
+    allowed = set(S_VALUES)
+    if isinstance(df.index, pd.MultiIndex):
+        n_missing = int((np.asarray(df.index.codes[pos]) == -1).sum())
+        invalid = set(df.index.levels[pos]) - allowed
+        if invalid:  # suspicion only -- confirm against rows actually present
+            invalid = set(df.index.remove_unused_levels().levels[pos]) - allowed
+    else:
+        level = df.index.get_level_values('s')
+        n_missing = int(pd.isna(level).sum())
+        invalid = set(level.dropna().unique()) - allowed
+
+    problems = []
     if invalid:
+        problems.append(f"non-canonical value(s) {sorted(map(repr, invalid))}")
+    if n_missing:
+        problems.append(f"{n_missing} row(s) with a missing (NaN) value")
+    if problems:
         raise ValueError(
-            f"Non-canonical values in 's' index level: {sorted(invalid)}. "
-            f"Allowed values are {S_VALUES}.  See "
+            f"Invalid 's' (acquisition source) index level: {'; '.join(problems)}. "
+            f"Allowed values are {S_VALUES} and NaN is not permitted -- map the "
+            f"offending rows to a canonical source (or to 'other') in the wave's "
+            f"build, or drop them there explicitly.  See "
             f"slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org."
         )
 

@@ -49,6 +49,12 @@ from .local_tools import (
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 from .currency import attach_currency, is_monetary_table
+# Safe at module level: transformations imports only local_tools /
+# build_transforms / cfe, never country -- so there is no cycle -- and
+# lsms_library/__init__.py imports it anyway.  The other `transformations`
+# imports in this file are function-local for historical reasons; this one is
+# on the hot read path (_finalize_result), so it is hoisted.
+from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 import importlib.util
@@ -2215,6 +2221,18 @@ class Country:
             # non-null" form should use ``subset=`` themselves; this step is
             # the universal safety-net.
             df = df.dropna(how='all')
+
+            # Post-condition: the `s` (acquisition source) axis is canonical.
+            # Runs here -- after mappings/spellings/dropna -- so it validates the
+            # frame the caller actually receives, and so a country's
+            # categorical_mapping or `spellings` entry cannot smuggle a
+            # non-canonical source past it.  No-op for the tables without an `s`
+            # level, i.e. everything but food_acquired + _FOOD_DERIVED.
+            #
+            # This guard passes on all current data (GH #537); it exists to make
+            # a future regression loud rather than silently wrong, because `s` is
+            # a bare string literal in 19 of the 20 build scripts that set it.
+            validate_acquisition_source(df)
 
             # Attach the ISO 4217 currency label (last, so it rides through the
             # caller's _relabel_j / _add_market_index without being dropped).
