@@ -447,26 +447,19 @@ def test_unconfigured_countries_finds_data_without_config(tmp_path):
     assert got == {"Peru": 2}
 
 
-def test_known_no_microdata_countries_are_na_not_broken():
-    """Armenia/Nepal have NO source data.  That is a fact, not a defect.
+def test_a_build_failure_in_a_normal_country_is_still_broken():
+    """Superseded test.
 
-    Before this, ALL 8 `broken` cells in the cube were these two countries --
-    so the most alarming tier in the ladder contained nothing actionable, and a
-    genuine build failure would have been lost among them.
+    This used to assert Armenia/Nepal grade `n/a` via `countries_without_microdata`.
+    Both entries turned out to be MISCLASSIFIED (2026-07-12): Nepal is `blocked`
+    (data exists, NSO site down), and Armenia is not missing at all -- its 18 ILCS
+    waves sit under repositoryid='central', invisible to discover_waves(
+    collection='lsms').  The map is now empty; see test_countries_without_microdata_is_now_empty
+    and the `blocked` tests.  What survives is the invariant that a REAL build
+    failure still reports `broken`.
     """
-    known = cov.countries_without_microdata()
-    assert set(known) >= {"Armenia", "Nepal"}
-
     co = _FakeCountry({"1996": ["household_roster"]})
-    env = _env(FileNotFoundError("PathMissingError: INDSECA.dta"), _ok_report())
-
-    cells = cov.grade_feature("Armenia", "household_roster", ["1996"], co, env,
-                              readiness=True)
-    cell = cells[0]
-    assert cell["tier"] == "n/a"                      # not `broken`
-    assert "no microdata in repo" in cell["detail"]
-
-    # ...but a country that SHOULD have data still reports `broken`.
+    env = _env(RuntimeError("boom"), _ok_report())
     cells = cov.grade_feature("Uganda", "household_roster", ["1996"], co, env,
                               readiness=True)
     assert cells[0]["tier"] == "broken"
@@ -525,3 +518,96 @@ def test_save_snapshot_merge_false_still_replaces(tmp_path):
         columns=cov.COLUMNS), snap, merge=False)
     got = pd.read_csv(snap, dtype=str)
     assert list(got.country) == ["Uganda"]
+
+
+# ---------------------------------------------------------------------------
+# `blocked` — WANTED, KNOWN, UNOBTAINABLE (Nepal NSO down; Albania 1996)
+# ---------------------------------------------------------------------------
+def _blocked_file(tmp_path, rows):
+    p = tmp_path / "blocked_sources.csv"
+    hdr = ("country,wave,catalog_id,blocker,probe,last_checked,unblock,"
+           "recorded_by\n")
+    p.write_text(hdr + "".join(rows))
+    return p
+
+
+def test_blocked_beats_na_for_a_country_with_no_local_data(tmp_path):
+    """A blocked source must stay VISIBLE, not be buried under `n/a`.
+
+    Nepal was graded `n/a` (2026-07-12, my error).  `n/a` means "no readiness
+    applies" -- it reads as *nothing to see here*, and it hid a gap we actively
+    want: the data EXISTS, we KNOW its catalog id, and the NSO site is simply
+    down.  `blocked` says "we want this and cannot get it", which is the truth.
+    """
+    p = _blocked_file(tmp_path, [
+        "Nepal,2003-04,74,NSO site unreachable,https://microdata.nsonepal.gov.np/,"
+        "2026-07-12,a human at NSO,ligon\n"])
+    blocked = cov.load_blocked(p)
+    co = _FakeCountry({"2003-04": ["household_roster"]})
+    env = _env(FileNotFoundError("PathMissingError"), _ok_report())
+
+    cells = cov.grade_feature("Nepal", "household_roster", ["2003-04"], co, env,
+                              readiness=True, blocked=blocked)
+    cell = cells[0]
+    assert cell["tier"] == "blocked"                 # not `n/a`, not `broken`
+    assert "NSO site unreachable" in cell["detail"]
+    assert "probe" in cell["detail"]                 # carries the retry URL
+
+
+def test_blocked_row_without_a_probe_is_REFUSED(tmp_path):
+    """No probe -> it can never be rechecked -> it silently becomes permanent.
+
+    A blocker is a CONDITION THAT CHANGES.  "We hope we'll find it someday" is
+    not a plan; a scheduled recheck is.  A row with no probe is just a nicer
+    word for `forgotten`, so we refuse it.
+    """
+    p = _blocked_file(tmp_path, [
+        "Nepal,2003-04,74,NSO site unreachable,,2026-07-12,a human,ligon\n"])
+    with pytest.warns(UserWarning, match="never be rechecked"):
+        assert cov.load_blocked(p) == {}
+
+
+def test_blocked_row_without_a_blocker_is_REFUSED(tmp_path):
+    """An unexplained block is indistinguishable from neglect."""
+    p = _blocked_file(tmp_path, [
+        "Nepal,2003-04,74,,https://example.org,2026-07-12,a human,ligon\n"])
+    with pytest.warns(UserWarning, match="no `blocker`"):
+        assert cov.load_blocked(p) == {}
+
+
+def test_a_genuinely_broken_country_still_reports_broken(tmp_path):
+    """We relaxed the BLOCKED countries, not error reporting generally."""
+    co = _FakeCountry({"2019-20": ["household_roster"]})
+    env = _env(RuntimeError("boom"), _ok_report())
+    cells = cov.grade_feature("Uganda", "household_roster", ["2019-20"], co, env,
+                              readiness=True, blocked=cov.load_blocked(
+                                  tmp_path / "nope.csv"))
+    assert cells[0]["tier"] == "broken"
+
+
+def test_countries_without_microdata_is_now_empty():
+    """Both former entries were misclassified live gaps.
+
+    Nepal -> `blocked`.  Armenia -> not missing at all: its 18 ILCS waves sit
+    under repositoryid='central', invisible to discover_waves(collection='lsms').
+    """
+    assert cov.countries_without_microdata() == {}
+
+
+def test_blocked_source_appears_even_when_not_modelled_as_a_wave(tmp_path, monkeypatch):
+    """`Albania/1996` has a directory and a WB catalog entry -- and no `_/`.
+
+    So `Country.waves` never enumerates it and every per-wave loop skips it in
+    silence.  The blocked list is AUTHORITATIVE about sources we want; it does
+    not defer to whether the model happens to know about them.  Otherwise the
+    denominator quietly omits exactly the waves we most want and cannot get.
+    """
+    p = _blocked_file(tmp_path, [
+        "Albania,1996,2311,acquisition never completed,"
+        "https://microdata.worldbank.org/index.php/catalog/2311,2026-07-12,"
+        "confirm WB serves it,ligon\n"])
+    blocked = cov.load_blocked(p)
+    df = cov.build_matrix(["Albania"], readiness=False, blocked=blocked)
+    hit = df[(df["wave"].astype(str) == "1996") & (df["tier"] == "blocked")]
+    assert len(hit) == 1, "a blocked, un-modelled wave vanished from the matrix"
+    assert "NOT MODELLED as a wave" in hit.iloc[0]["detail"]

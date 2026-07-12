@@ -367,6 +367,24 @@ Countries Without Microdata:
   note: >-
     Config present, source .dta absent.  See CLAUDE.md.  Adding the data is an
     acquisition task; it is not a bug in the country's config.
-  countries:
-    Armenia: No data files downloaded; WB catalog / external hosting.
-    Nepal: NSO hosts the data, not the WB (https://microdata.nsonepal.gov.np/).
+  countries: {}
+  # EMPTIED 2026-07-12.  Both former entries were MISCLASSIFIED, and both in the
+  # same way: a live gap hidden behind a label that reads "nothing to see here".
+  #
+  #   Nepal   -> `blocked` (.coder/coverage/blocked_sources.csv).  The data
+  #              EXISTS and we WANT it; NSO Nepal hosts it and their site is
+  #              down.  Grading it n/a said "don't look".  It is now visible and
+  #              re-probed on every coverage refresh.
+  #
+  #   Armenia -> NOT missing at all.  `discover_waves()` defaults to
+  #              collection='lsms', but Armenia's 18 waves of Integrated Living
+  #              Conditions Survey (2001-2018, ids 2950-2964/2966/3591/3617) sit
+  #              under repositoryid='central' -- INVISIBLE to our discovery, not
+  #              absent from the world.  It is one of the largest actionable
+  #              acquisition gaps in the repo (GH #597), not a country "without
+  #              microdata".
+  #
+  # Leave this map EMPTY unless a country genuinely has no obtainable data
+  # anywhere.  If you are tempted to add one, ask which of `blocked` (channel
+  # broken) or a missing-wave TODO (we just have not fetched it) you actually
+  # mean -- historically it has always been one of those two.
