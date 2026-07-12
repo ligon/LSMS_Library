@@ -404,6 +404,65 @@ class TestSourceOrgIsLoadBearing:
         assert backfill._may_write("Benin", "2018-2019", root, None) is False
 
 
+class TestEveryDeclaredWaveIsResolved:
+    """The shipped tree records a terminal answer for every declared wave.
+
+    'unknown' is a legitimate *state* -- but it must not be a resting place.
+    Each of the five waves that started out unknown was resolved from evidence:
+    three to a catalog id (Niger/2011-12 from a Data/ directory literally named
+    NER_2011_ECVMA_v01_M_Stata8; Senegal/2021-22 from 58 ehcvm_*_sen2021 files;
+    Nepal/2003-04 on catalog metadata alone, flagged catalog-only because its
+    Data/ is empty), and two to 'none' (GhanaSPS 2013-14 / 2017-18 are
+    EGC-ISSER, and the entire WB catalog holds exactly one GSPS study).
+    """
+
+    def test_no_shipped_source_org_is_left_unknown(self):
+        """Every SOURCE.org we ship records a terminal answer.
+
+        Iterates the files themselves rather than ``Country.waves`` -- provenance
+        is recorded per *directory*, and ``Country.waves`` is not always a list
+        of directory names (Nigeria's are rounds like ``2010Q3``, Tanzania's are
+        logical waves; both map to folders via ``wave_folder_map``).
+        """
+        from lsms_library.paths import countries_root
+
+        root = countries_root()
+        unknown = []
+        for src in sorted(root.glob("*/*/Documentation/SOURCE.org")):
+            country, wave = src.parts[-4], src.parts[-3]
+            if not pv.read_provenance(root, country, wave).is_resolved:
+                unknown.append(f"{country}/{wave}")
+        assert not unknown, (
+            "SOURCE.org files with unresolved provenance: " + ", ".join(unknown))
+
+    @pytest.mark.parametrize("country,wave,catalog_id,validation", [
+        ("Nigeria", "2018-19", "3557", pv.VALIDATION_CONTENT),
+        ("Niger", "2011-12", "2050", pv.VALIDATION_CONTENT),
+        ("Senegal", "2021-22", "6278", pv.VALIDATION_CONTENT),
+        # Provenance known, data absent -- two different facts, kept distinct.
+        ("Nepal", "2003-04", "74", pv.VALIDATION_CATALOG_ONLY),
+    ])
+    def test_evidence_resolved_waves(self, country, wave, catalog_id, validation):
+        from lsms_library.paths import countries_root
+        prov = pv.read_provenance(countries_root(), country, wave)
+        assert prov.catalog_id == catalog_id
+        assert prov.is_worldbank
+        assert prov.validation == validation
+
+    @pytest.mark.parametrize("wave", ["2013-14", "2017-18"])
+    def test_ghana_sps_egc_isser_waves_are_none_not_unknown(self, wave):
+        """A terminal 'none' -- otherwise these get re-searched forever."""
+        from lsms_library.paths import countries_root
+        prov = pv.read_provenance(countries_root(), "GhanaSPS", wave)
+        assert prov.source == pv.SOURCE_EXTERNAL
+        assert prov.catalog_id is None
+        assert prov.is_resolved            # resolved, though not a WB study
+        text = pv.source_org_path(countries_root(), "GhanaSPS",
+                                  wave).read_text()
+        assert "#+CATALOG_ID: none" in text
+        assert "#+CATALOG_ID: unknown" not in text
+
+
 class TestCountryCatalogRegistry:
     def test_serbia_and_montenegro_has_a_code(self):
         """SCG returns catalog ids 80 and 81, matching our 2002/ and 2003/."""

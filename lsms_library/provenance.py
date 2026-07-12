@@ -83,6 +83,15 @@ SOURCE_UNKNOWN = "unknown"
 _ID_NONE = "none"
 _ID_UNKNOWN = "unknown"
 
+# PROVENANCE_VALIDATION values.  A catalog id can be right for two quite
+# different reasons, and the difference is worth recording rather than
+# flattening: an id corroborated by the wave's own data files is a much
+# stronger claim than one matched only on catalog metadata.  Nigeria/2018-19
+# is precisely why -- its recorded id matched the year range perfectly and was
+# still the wrong survey; only the filenames settled it.
+VALIDATION_CONTENT = "content-validated"   # the wave's data files corroborate the id
+VALIDATION_CATALOG_ONLY = "catalog-only"   # catalog metadata only; no local data to check
+
 _KEYWORD_RE = re.compile(r"^\s*#\+([A-Z_]+):\s*(.*?)\s*$", re.MULTILINE)
 _URL_RE = re.compile(r"https?://[^\s\]\)]+")
 _CATALOG_ID_RE = re.compile(r"/catalog/(\d+)")
@@ -131,6 +140,7 @@ class WaveProvenance:
     doi: str | None = None                # study DOI, when the catalog has one
     url: str | None = None                # the source URL as recorded
     method: str | None = None             # how the id was determined
+    validation: str | None = None         # how strongly the id is corroborated
     recorded: str | None = None           # ISO date we wrote the record
     note: str | None = None
     superseded_url: str | None = None     # prior URL, when we corrected one
@@ -203,8 +213,9 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
 
     known = {"CATALOG_ID", "CATALOG_IDNO", "CATALOG_TITLE", "CATALOG_YEARS",
              "CATALOG_REPOSITORY", "CATALOG_DOI", "CATALOG_URL",
-             "PROVENANCE_SOURCE", "PROVENANCE_METHOD", "PROVENANCE_RECORDED",
-             "PROVENANCE_NOTE", "PROVENANCE_SUPERSEDED_URL"}
+             "PROVENANCE_SOURCE", "PROVENANCE_METHOD", "PROVENANCE_VALIDATION",
+             "PROVENANCE_RECORDED", "PROVENANCE_NOTE",
+             "PROVENANCE_SUPERSEDED_URL"}
 
     return WaveProvenance(
         country=country,
@@ -218,6 +229,7 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
         doi=kw.get("CATALOG_DOI") or None,
         url=url,
         method=method,
+        validation=kw.get("PROVENANCE_VALIDATION") or None,
         recorded=kw.get("PROVENANCE_RECORDED") or None,
         note=kw.get("PROVENANCE_NOTE") or None,
         superseded_url=kw.get("PROVENANCE_SUPERSEDED_URL") or None,
@@ -255,6 +267,8 @@ def render_source_org(prov: WaveProvenance) -> str:
     lines.append(f"#+PROVENANCE_SOURCE: {prov.source}")
     if prov.method:
         lines.append(f"#+PROVENANCE_METHOD: {prov.method}")
+    if prov.validation:
+        lines.append(f"#+PROVENANCE_VALIDATION: {prov.validation}")
     recorded = prov.recorded or _dt.date.today().isoformat()
     lines.append(f"#+PROVENANCE_RECORDED: {recorded}")
     # A superseded URL equal to the current one carries no information and

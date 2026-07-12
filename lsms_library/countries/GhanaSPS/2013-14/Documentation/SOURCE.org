@@ -2,11 +2,11 @@ SOURCE
 
 (source URL not recorded)
 
-#+CATALOG_ID: unknown
-#+PROVENANCE_SOURCE: unknown
-#+PROVENANCE_METHOD: unresolved
+#+CATALOG_ID: none
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: manual-override
 #+PROVENANCE_RECORDED: 2026-07-12
-#+PROVENANCE_NOTE: No source URL recorded for this wave; its World Bank catalog id is unknown.  Deliberately NOT inferred from the directory name -- year-range labels collide across distinct surveys.
+#+PROVENANCE_NOTE: Ghana Socioeconomic Panel Survey wave 2 (EGC-ISSER, Yale University / ISSER).  Not a World Bank dataset: a GHA query across the ENTIRE WB catalog (all collections, 152 entries) returns exactly one GSPS study -- 2534, the 2009-2010 wave -- and nothing later.  Directory contents (01a_consent.dta, 01b2_roster.dta, 00_comm_info.dta) are the EGC-ISSER instrument, not a WB one.  CATALOG_ID is 'none', not 'unknown'.
 
 * Notes (preserved from the original SOURCE.org)
 (source URL not recorded)
