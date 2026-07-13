@@ -88,3 +88,22 @@ def test_assets_collapse_is_a_no_op_on_a_unique_index():
 def test_additive_policy_columns_are_tuples(table):
     """Guard the shape of the registry (a bare string would iterate per-char)."""
     assert isinstance(_ADDITIVE_MEASURE_COLUMNS[table], tuple)
+
+
+# --- GH #323: all-NA groups must be NA, not a fabricated 0.0 -------------------
+
+def test_all_na_group_sums_to_NA_not_zero():
+    """`sum()` defaults to min_count=0, so an all-NA group sums to 0.0 -- a hard
+    zero asserted where the survey recorded nothing.  It must be NA instead."""
+    import pandas as pd
+    from lsms_library.country import _sum_min_count_1
+    s = pd.Series([pd.NA, pd.NA], dtype='Float64')
+    assert pd.isna(_sum_min_count_1(s)), "all-NA group must sum to NA, not 0.0"
+    assert s.sum() == 0.0, "guard: bare .sum() is the fabrication we are avoiding"
+
+
+def test_partial_na_group_still_sums_the_observed_values():
+    import pandas as pd
+    from lsms_library.country import _sum_min_count_1
+    s = pd.Series([7000, pd.NA, 3000], dtype='Float64')
+    assert _sum_min_count_1(s) == 10000, "observed values must still be summed"
