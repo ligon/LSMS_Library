@@ -25,23 +25,41 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 cluster_features:
+    # `v` MUST be `ea_unique`, not `ea_code` (GH #323).  `ea_code` is an EA
+    # SERIAL NUMBER, unique only within (county, district, clan): it takes just
+    # 32 distinct values across 250 real enumeration areas.  Keying on it merged
+    # unrelated EAs from opposite ends of the country -- `ea_code` 12 alone held
+    # 621 households in 54 real EAs spanning ALL 14 counties, and the downstream
+    # `.first()` collapse stamped every one of them with county='bong'.
+    # `ea_unique` (250 values, 10-13 HH each) is the survey's real EA key: it is
+    # a string prefix of `hhid` for all 2,986 households, and Region / locality /
+    # county / district / clan are each constant within it (zero violations).
+    # The household->cluster reduction is done explicitly + guarded by the
+    # `cluster_features` hook in `mapping.py`; see the note there.
     file:
         - "../Data/Household/sect1_public.dta"
     idxvars:
         i: hhid
-        v: ea_code
+        v: ea_unique
     myvars:
         Region: region
         Rural: locality
         County: county_code
 
 sample:
+    # `v: ea_unique` must change in LOCKSTEP with cluster_features above:
+    # `_join_v_from_sample()` propagates this `v` to EVERY household-level
+    # Liberia table, so the two must agree character-for-character or the join
+    # silently yields NaN cluster attributes.  `v` here is a MYVAR, which does
+    # NOT get `format_id` automatically -- the `v()` function in `mapping.py`
+    # supplies it (`ea_unique` is float64; raw it would stringify to
+    # '302003132.0' and match nothing).
     file:
         - "../Data/Household/sect1_public.dta"
     idxvars:
         i: hhid
     myvars:
-        v: ea_code
+        v: ea_unique
         weight: hhweight
         Rural:
             - locality

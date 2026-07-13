@@ -8,6 +8,39 @@ questionnaire (`liberia_hh_forestry_qx_final.pdf`).
 
 * Known data issues
 
+** cluster identity: use =ea_unique=, NEVER =ea_code= (2026-07-12, GH #323)
+=sect1_public.dta= carries two EA-ish columns, and the obvious-looking one is
+wrong:
+- =ea_code= — an EA *serial number*, unique only within (county, district,
+  clan). Just **32** distinct values, and it is a **dirty mixed-type column**
+  (both ='132'= and =12.0= appear). It is merely the trailing field of
+  =ea_unique=.
+- =ea_unique= — the real EA key: **250** values, 10–13 households each, a string
+  prefix of =hhid= for all 2,986 households. Region / county / district / clan /
+  locality are each constant within it (zero violations).
+
+=v= was originally wired to =ea_code=, so 250 real enumeration areas were merged
+into 32 buckets. =ea_code= 12 alone held 621 households from 54 real EAs spanning
+**all 14 counties**, and the =.first()= collapse in =Wave.cluster_features()=
+stamped every one of them =county='bong'=. Silently WRONG, not merely missing.
+
+Both =cluster_features.idxvars.v= and =sample.myvars.v= must stay on =ea_unique=,
+**in lockstep** — =_join_v_from_sample()= pushes =sample='s =v= into every
+household-level Liberia table, so changing one alone desynchronises the join and
+yields all-NaN cluster attributes. Because =ea_unique= is float64 and =format_id=
+is *not* auto-applied to myvars, =sample= needs the =v()= function in
+=2018-19/_/mapping.py=; without it the two sides differ ='302003132.0'= vs
+='302003132'= and match nothing.
+
+Do **not** rebuild a composite key from (county, district, clan, ea_code): the
+mixed dtypes split 9 real EAs in two (258 groups for 250 EAs). Use =ea_unique=.
+
+The household→cluster reduction (2,986 rows → 250) is legitimate but is enforced
+explicitly by the guarded =cluster_features= hook in =2018-19/_/mapping.py=, which
+*asserts* attribute-constancy and raises. Note the =aggregation:= key in
+=data_scheme.yml= is currently **inert** (nothing reads it), so it could not be
+used for this.
+
 ** housing — not available (2026-06-06)
 The NHFS questionnaire's 21-section table of contents has **no dwelling/housing
 module**. The two plausibly-named sections are not dwelling characteristics:

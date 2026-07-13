@@ -2,6 +2,21 @@ Country: Liberia
 
 Data Scheme:
   cluster_features:
+    # GH #323.  `v` is `ea_unique` (250 real enumeration areas), NOT `ea_code`
+    # (32 EA serial numbers, unique only within county/district/clan).  See
+    # CONTENTS.org and 2018-19/_/data_info.yml.
+    #
+    # The source is one row per HOUSEHOLD (2,986) and this table is one row per
+    # CLUSTER (250), so a reduction is unavoidable.  It is performed by the
+    # GUARDED `cluster_features` hook in `2018-19/_/mapping.py`, which asserts
+    # Region/Rural/County are constant within (t, v) and RAISES if they are not
+    # -- so the reduction is a lossless projection over exact-duplicate rows,
+    # never an arbitrary `.first()` pick.
+    #
+    # It is deliberately NOT declared via an `aggregation:` block here: that key
+    # is inert (it sits in the `_skip` meta-key set in country.py and
+    # diagnostics.py -- nothing reads it), so declaring it would document the
+    # reduction while enforcing nothing.  Prose is not enforcement.
     index: (t, v)
     Region: str
     Rural: str
