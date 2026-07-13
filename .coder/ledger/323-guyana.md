@@ -84,9 +84,28 @@ one duplicate that legitimately remains.
   enumeration district cannot lie in two regions; ED 5 does.  Leaving `v: ED`
   would have left `cluster_features` inventing a Region for 537 households and a
   Rural for 274 via `first()` — the same silent-wrongness class as #323, which
-  the standard forbids leaving behind.  **This is isolated in its own commit and
-  can be reverted alone** if you disagree.  Everything else (the `i` fix) stands
-  independently.
+  the standard forbids leaving behind.
+
+  **Honest caveat: it is NOT in a separate commit.**  I said it would be and then
+  did not do it; it landed in `d3f2833b` alongside the `i` fix.  The two are
+  nevertheless *logically* independent — the `i` fix (and every row count except
+  `cluster_features`) does not depend on `v`.  To back the `v` change out while
+  keeping the `i` fix:
+
+  1. `1992/_/data_info.yml`, `cluster_features.idxvars` → `v: ED`
+     (keep the stray `i: HH` deleted — that part is not part of the v question).
+  2. `1992/_/data_info.yml`, `sample`: `df_cover.idxvars.v` → `ED`; delete
+     `ed_key: ED` from `df_cover` *and* `df_weights`; `merge_on` → `[v]`.
+     (`ed_key` exists ONLY because a composite `v` cannot key the WEIGHT merge.)
+  3. `1992/_/mapping.py`: delete `v()`; delete the `cluster_features()` hook; drop
+     the `ed_key` column-drop in `sample()` (harmless if left).
+  4. `tests/test_guyana_index_uniqueness.py`: `cluster_features` → 130 rows;
+     delete `test_cluster_is_the_segment_not_the_ed`.
+
+  Everything else — roster 7,827 / education 4,633 / housing 1,817 / sample 1,807
+  / interview_date 1,807 / assets 11,227 — is unaffected by that revert.  Note
+  the cost of reverting: `cluster_features` goes back to 130 rows in which the
+  Region of 537 households and the Rural of 274 are decided by row order.
 
 ---
 ### Phase 3 — verification
