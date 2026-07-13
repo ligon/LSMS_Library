@@ -11,3 +11,42 @@ Tracked in GitHub issue #352.
 
 (Note: housing, interview_date, individual_education, and cluster_features
 are implemented for Timor-Leste; plot_features is implementable 2007-08.)
+
+** cluster_features 2007-08 — declared de-duplication (GH #323, 2026-07-12)
+
+The 2007-08 wave builds =cluster_features= from =../Data/basicvars.dta=, which
+is the **household cover file**: 4477 rows, one per =hh_id=, but only 300
+distinct =cluster=s.  The declared =(t, v)= index therefore arrives with **4177
+duplicate tuples**, and each household simply carries a redundant copy of its
+cluster's attributes.
+
+The collapse to 300 clusters is *intended and lossless* — verified: =cluster= is
+a globally-unique superkey (adding =district=, =posto=, =suco=, =region= or
+=strata= to the group key splits nothing, 300 → 300), the payload is constant in
+**0/300** clusters, and =drop_duplicates()= and =groupby().first()= return
+identical 300-row frames.  **No household and no person is lost** — households
+live in =sample= (index =(i, t)=, 4477 rows), which is unaffected.
+
+The defect was that this correct collapse was performed **silently**, by the same
+=_normalize_dataframe_index= code path that vaporises 32,026 people from Mali's
+=household_roster=.  A correct collapse was indistinguishable from a catastrophic
+one.  It is now DECLARED in =_/data_scheme.yml=:
+
+: cluster_features:
+:   index: (t, v)
+:   aggregation:
+:     on_duplicate_index: unique
+
+=unique= is a *verified* de-duplication: every =(t, v)= group must carry a single
+distinct value of =Region= and =Rural=, or the build RAISES.  We deliberately do
+**not** declare =first= — which gives the right answer today only by luck, not by
+construction — because the invariant that makes this table meaningful ("the
+payload is constant within a cluster") was previously asserted only in a YAML
+comment, and prose is not enforcement.  The check costs nothing today (0/300
+conflicts) and exists so that a future wave in which =Region= genuinely varies
+within a cluster fails LOUDLY instead of silently picking one.
+
+The **2001** wave needs no declaration: it reads =WEIGHT.DTA=, which is already
+one row per cluster (=id4=), so its index is unique by construction.  That is the
+structurally honest pattern; 2007-08 reaches the same 300 rows only because the
+framework de-duplicates for it.

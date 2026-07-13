@@ -21,7 +21,25 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # GH #323.  The 2007-08 wave extracts this from basicvars.dta, the HOUSEHOLD
+    # cover file (4477 rows, one per hh_id, but only 300 distinct clusters), so
+    # the declared (t, v) index arrives with 4177 duplicate tuples.  The collapse
+    # to 300 is INTENDED and lossless -- each household merely carries a
+    # redundant copy of its cluster's attributes -- but it used to be performed
+    # SILENTLY by _normalize_dataframe_index's groupby().first(), i.e. by the
+    # same code path that vaporises 32,026 people from Mali's roster.  A correct
+    # collapse was indistinguishable from a catastrophic one.
+    #
+    # `on_duplicate_index: unique` DECLARES it and makes it machine-checked:
+    # every (t, v) group must carry a single distinct value of Region and Rural,
+    # or the build RAISES.  Verified 0/300 conflicts today, so this costs
+    # nothing now; it exists so that a future wave in which Region genuinely
+    # varies within a cluster fails LOUDLY instead of silently picking one.
+    # (The 2001 wave needs no declaration: it reads WEIGHT.DTA, which is already
+    # one row per cluster, so its index is unique by construction.)
     index: (t, v)
+    aggregation:
+      on_duplicate_index: unique
     Region: str
     Rural: str
 

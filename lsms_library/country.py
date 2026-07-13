@@ -4109,9 +4109,15 @@ def _normalize_dataframe_index(
     - Reorders index levels to match the declared order.
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
-    - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+    - Collapses duplicate entries, in priority order:
+
+      1. a DECLARED reducer -- ``aggregation: {on_duplicate_index: unique}`` in
+         the country's ``data_scheme.yml`` -- which verifies the payload is
+         constant within each index group and RAISES if it is not (GH #323);
+      2. SUM of the additive measure columns for tables in
+         ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``);
+      3. otherwise the first row per group (the historical default), with a
+         ``RuntimeWarning`` naming the dropped rows.
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4190,7 +4196,54 @@ def _normalize_dataframe_index(
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
+
+        # GH #323: a table may DECLARE how its duplicate index tuples reduce, via
+        #     aggregation:
+        #       on_duplicate_index: unique
+        # in the country's data_scheme.yml.  `unique` (alias `single`) is a
+        # *verified de-duplication*: the declared payload must be CONSTANT within
+        # each index group, so collapsing is provably lossless.  If any group is
+        # not constant the collapse would have to CHOOSE a value -- which .first()
+        # would do silently and wrongly -- so we RAISE instead.
+        #
+        # This exists because "the payload is constant within the group" is the
+        # invariant that makes such a table meaningful, and until now it was
+        # asserted only in YAML comments.  Prose is not enforcement.  Declaring
+        # the reducer converts a future silently-WRONG failure into a loud one.
+        #
+        # `on_duplicate_index` is a reserved key: it can never collide with an
+        # index level name, so it coexists with the (currently inert) {level:
+        # reducer} grain-collapse map described in
+        # SkunkWorks/grain_aggregation_policy.org.
+        policy = schema_entry.get("aggregation") if isinstance(schema_entry, dict) else None
+        reducer = policy.get("on_duplicate_index") if isinstance(policy, dict) else None
+
+        if reducer in ("unique", "single"):
+            # "at most one distinct OBSERVED value per group".  dropna=True is
+            # deliberate: a group of (NaN, 'East') is UNAMBIGUOUS, not
+            # conflicting -- there is only one observed value, and .first()
+            # skips NaN and returns exactly it.  Raising there would be a false
+            # alarm, and false alarms are how a check gets disabled.  A group
+            # that is entirely NaN stays NaN (missing stays missing).  Only 2+
+            # distinct *observed* values are a genuine conflict.
+            nun = df.groupby(level=present_levels, observed=True).nunique(dropna=True)
+            conflicting = [c for c in nun.columns if (nun[c] > 1).any()]
+            if conflicting:
+                n_bad = int((nun[conflicting] > 1).any(axis=1).sum())
+                example = nun.loc[(nun[conflicting] > 1).any(axis=1)].index[0]
+                raise ValueError(
+                    f"{table_name or 'table'}: aggregation 'on_duplicate_index: "
+                    f"{reducer}' requires the payload to be constant within each "
+                    f"{tuple(present_levels)} group, but {n_bad} group(s) carry "
+                    f"conflicting values in {conflicting} (e.g. {tuple(present_levels)}"
+                    f"={example!r}). Refusing to pick one silently — GH #323. "
+                    f"Either the index is missing a level, or this table needs a "
+                    f"different reducer."
+                )
+            # Verified constant: .first() IS the unique value.  Declared and
+            # checked, so no #323 warning.
+            df = df.groupby(level=present_levels, observed=True).first()
+        elif present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
