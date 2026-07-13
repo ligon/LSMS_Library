@@ -34,6 +34,32 @@ Data Scheme:
     index: (t, v)
     Region: str
     Rural: str
+    # All four waves read Region/Rural from the HOUSEHOLD cover file
+    # (1999 SHLDDTA, 2003 interview, 2007 r1m0, 2009 m0), so the extraction
+    # lands at household grain -- one row per household, `i` alongside `v`.
+    # The canonical grain of cluster_features is the CLUSTER, (t, v), so `i`
+    # is collapsed away.  The row multiplicity is exactly the two-stage
+    # sampling take (households sampled per PSU):
+    #
+    #   wave   HH rows   PSUs   collapsed   HH per PSU
+    #   1999      2000    125        1875      14-18
+    #   2003      4160    208        3952      exactly 20
+    #   2007      4644    267        4377      exactly 9..20
+    #   2009      1503    167        1336      exactly 9
+    #
+    # Region and Rural are PSU-level attributes REPLICATED across the
+    # households of a cluster, so the collapse is lossless: 0 of all 767
+    # cluster-waves carry more than one distinct (Region, Rural) -- verified on
+    # the raw numeric codes in the source .dta, so no code->label mapping
+    # collision can hide a conflict.
+    #
+    # `unique` (not `first`) is the reducer precisely BECAUSE it is a no-op
+    # today: it converts that fact from an unchecked assumption into an
+    # invariant re-verified on every build.  If a recode or a new wave ever
+    # puts a PSU across two oblasts, this RAISES instead of silently keeping
+    # whichever household happened to sort first (GH #323).
+    aggregation:
+      i: unique
 
   housing:
     # TLSS dwelling module.  1999 (SSEC2) and 2007 (r1m7a/b/c) field a full

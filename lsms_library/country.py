@@ -1184,6 +1184,47 @@ class Wave:
                     c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
                     for c in df.columns
                 }
+                # GH #323.  The comment above ASSERTS that the ``first``-reduced
+                # columns are cluster-invariant -- but nothing checked it, and an
+                # unchecked ``.first()`` over a household grain is exactly the
+                # silent-collapse bug (it is indistinguishable from merging
+                # distinct entities).  Prose is not enforcement, so check it.
+                #
+                # GPS is excluded: Latitude/Longitude are HH-level BY DESIGN and
+                # are averaged to a cluster centroid, so they are *expected* to
+                # vary within a cluster and must not be flagged.
+                #
+                # A country may declare the policy in data_scheme.yml:
+                #     cluster_features:
+                #       aggregation:
+                #         i: unique     # enforce losslessness; RAISE on conflict
+                # ``unique``/``constant`` turns the assumption into an invariant
+                # re-verified on every build.  ``first`` declares the discard
+                # deliberate.  Undeclared keeps the historical collapse (data
+                # byte-identical) but WARNS when the assertion is actually false,
+                # so the class surfaces instead of hiding.
+                reduced = [c for c in df.columns if c not in ('Latitude', 'Longitude')]
+                entry = self.country._materialization_entry('cluster_features')
+                reducer = _declared_reducer(entry, ['i'])
+                where = f"{self.name} cluster_features"
+                if reducer in ('unique', 'constant'):
+                    _assert_constant_within_groups(
+                        df, keep_levels, reduced, ['i'], where, reducer,
+                    )
+                elif reducer is None:
+                    offenders, bad_cols = _nonconstant_groups(df, keep_levels, reduced)
+                    if len(offenders):
+                        warnings.warn(
+                            f"{where}: collapsing household grain `i` to the "
+                            f"canonical (t, v) cluster index via .first(), but "
+                            f"{len(offenders)} cluster(s) carry conflicting values "
+                            f"in {bad_cols} -- one value is being kept and the "
+                            f"others silently DISCARDED (GH #323).  Declare "
+                            f"`aggregation: {{i: unique}}` once the conflict is "
+                            f"resolved, or add the finer level to the index.  "
+                            f"First offending cluster(s): {offenders[:5].tolist()}.",
+                            RuntimeWarning,
+                        )
                 df = df.groupby(level=keep_levels).agg(agg)
             else:
                 df = df.groupby(level=keep_levels).first()
@@ -3737,6 +3778,142 @@ def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
     return [str(level) for level in declared_levels]
 
 
+#: Reducers accepted by the ``aggregation:`` block in a country's
+#: ``data_scheme.yml``.  Deliberately small (GH #323):
+#:
+#: ``unique`` / ``constant``
+#:     Collapse a group ONLY when every retained column holds exactly one
+#:     distinct value; RAISE otherwise.  Use when the eliminated level is a
+#:     finer grain over which the retained columns are *replicated* (e.g.
+#:     Tajikistan's cluster_features, read from the household cover file: the
+#:     ~9-20 households sampled per PSU each repeat their PSU's Region/Rural).
+#:     The collapse is then provably lossless rather than a silent guess.
+#:
+#: ``first``
+#:     Keep the first row per group, DISCARDING the rest.  Lossy, but a
+#:     deliberate, declared choice (the #323 warning is suppressed) rather than
+#:     the silent fallback.
+#:
+#: ``sum`` is intentionally NOT offered here: the one table whose source
+#: legitimately repeats rows per index tuple (``food_acquired``) is summed via
+#: the vetted ``_ADDITIVE_MEASURE_COLUMNS`` allowlist, which names the columns
+#: that may be added.  A generic ``sum`` would happily add up region codes and
+#: sampling weights.
+_DECLARED_REDUCERS = ("unique", "constant", "first")
+
+
+def _declared_reducer(
+    schema_entry: dict[str, Any] | None,
+    eliminated_levels: list[str],
+) -> str | None:
+    """Return the reducer declared for an eliminated index level, if any.
+
+    The ``aggregation:`` block maps an index level to a reducer.  Only levels
+    actually being *collapsed away* here are consulted -- a reducer declared for
+    a level that survives in the canonical index (e.g. ``visit`` in Senegal's
+    ``interview_date``, index ``(t, i, visit)``) describes how a downstream
+    consumer should collapse it and is correctly a no-op for us.
+    """
+    if not schema_entry or not eliminated_levels:
+        return None
+
+    policy = schema_entry.get("aggregation")
+    if not isinstance(policy, dict):
+        return None
+
+    chosen = {
+        str(policy[lvl]).strip().lower()
+        for lvl in eliminated_levels
+        if lvl in policy and policy[lvl] is not None
+    }
+    if not chosen:
+        return None
+    if len(chosen) > 1:
+        raise ValueError(
+            f"Conflicting `aggregation:` reducers {sorted(chosen)} declared for "
+            f"index levels {eliminated_levels} being collapsed together; a single "
+            f"group cannot be reduced two ways.  Declare one reducer."
+        )
+
+    reducer = chosen.pop()
+    if reducer not in _DECLARED_REDUCERS:
+        raise ValueError(
+            f"Unknown `aggregation:` reducer {reducer!r} in data_scheme.yml; "
+            f"supported reducers are {list(_DECLARED_REDUCERS)}."
+        )
+    return reducer
+
+
+def _nonconstant_groups(
+    df: pd.DataFrame,
+    group_levels: list[str],
+    cols: list[str],
+) -> tuple[pd.Index, list[str]]:
+    """Groups where some column in ``cols`` carries >1 distinct value.
+
+    This is *the ambiguous set*: the rows for which a ``.first()`` collapse is a
+    GUESS rather than a lossless dedup.  Empty ambiguous set => ``.first()``
+    provably picks the only value there is.
+    """
+    cols = [c for c in cols if c in df.columns]
+    if not cols:
+        return df.index[:0], []
+    nun = df[cols].groupby(level=group_levels, observed=True).nunique(dropna=True)
+    bad_cols = [c for c in cols if (nun[c] > 1).any()]
+    if not bad_cols:
+        return nun.index[:0], []
+    return nun[(nun[bad_cols] > 1).any(axis=1)].index, bad_cols
+
+
+def _assert_constant_within_groups(
+    df: pd.DataFrame,
+    group_levels: list[str],
+    cols: list[str],
+    eliminated_levels: list[str],
+    where: str,
+    reducer: str = "unique",
+) -> None:
+    """Raise unless collapsing ``eliminated_levels`` is provably LOSSLESS.
+
+    A wrong-but-quiet answer (class-1) is strictly worse than a loud failure, so
+    when the declared invariant does not hold we refuse to guess (GH #323).
+    """
+    offenders, bad_cols = _nonconstant_groups(df, group_levels, cols)
+    if not len(offenders):
+        return
+    raise ValueError(
+        f"{where}: `aggregation: {{{eliminated_levels[0]}: {reducer}}}` in "
+        f"data_scheme.yml asserts that collapsing {eliminated_levels} leaves every "
+        f"column constant within {group_levels} -- but {len(offenders)} group(s) "
+        f"carry conflicting values in {bad_cols}.  Collapsing would silently keep "
+        f"whichever row sorted first.  First offending group(s): "
+        f"{offenders[:5].tolist()}.  Either the source grain is genuinely finer "
+        f"than the declared index (add the level to the index), or the declared "
+        f"reducer is wrong."
+    )
+
+
+def _apply_declared_reducer(
+    df: pd.DataFrame,
+    reducer: str,
+    present_levels: list[str],
+    eliminated_levels: list[str],
+    table_name: str | None,
+    wave: str | None,
+) -> pd.DataFrame:
+    """Collapse ``df`` to ``present_levels`` under a DECLARED aggregation policy.
+
+    ``unique``/``constant`` verifies the collapse is lossless and raises if it is
+    not -- turning a silent guess into an enforced invariant (GH #323).
+    """
+    if reducer in ("unique", "constant"):
+        where = f"{table_name or '<table>'}" + (f" (wave {wave})" if wave else "")
+        _assert_constant_within_groups(
+            df, present_levels, list(df.columns), eliminated_levels, where, reducer,
+        )
+    return df.groupby(level=present_levels, observed=True).first()
+
+
 _SCHEME_DTYPE_MAP = {
     'bool': pd.BooleanDtype(),
     'int': pd.Int64Dtype(),
@@ -4162,6 +4339,7 @@ def _normalize_dataframe_index(
 
     # Drop any unexpected index levels (but keep at least one, and only on MultiIndex)
     extra_levels = [lvl for lvl in df.index.names if lvl not in declared]
+    eliminated_levels: list[str] = []
     if (
         extra_levels
         and isinstance(df.index, pd.MultiIndex)
@@ -4169,6 +4347,10 @@ def _normalize_dataframe_index(
     ):
         try:
             df = df.droplevel(extra_levels)
+            # Remember which levels we removed: an `aggregation:` policy in
+            # data_scheme.yml names the ELIMINATED level (the grain being
+            # collapsed away), so we need this to look the policy up below.
+            eliminated_levels = [str(lvl) for lvl in extra_levels]
         except ValueError:
             pass  # Cannot drop levels; keep original index
 
@@ -4190,7 +4372,19 @@ def _normalize_dataframe_index(
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
+
+        # GH #323: an explicitly DECLARED aggregation policy beats every
+        # default below.  `aggregation:` in data_scheme.yml maps an ELIMINATED
+        # index level (the grain being collapsed away) to a reducer.  Until now
+        # the key was inert -- parsed only to be *excluded* from column parsing
+        # -- so a country could describe its intended collapse and still get the
+        # silent groupby().first() fallback.  Declaring it now ENFORCES it.
+        reducer = _declared_reducer(schema_entry, eliminated_levels)
+        if reducer is not None:
+            df = _apply_declared_reducer(
+                df, reducer, present_levels, eliminated_levels, table_name, wave,
+            )
+        elif present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
