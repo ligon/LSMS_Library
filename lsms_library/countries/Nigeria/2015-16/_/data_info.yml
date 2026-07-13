@@ -1,37 +1,62 @@
 Country: Nigeria
 Wave: 2015-16
 
+# `v` = composite cluster id (state/lga/ea) built from raw CODES; see the
+# GH #323 note in _/nigeria.py and the W1 data_info.yml for the full rationale.
 sample:
-    file: secta_plantingw3.dta
-    idxvars:
-        i: hhid
-    myvars:
-        v: ea
-        weight: wt_wave3
-        panel_weight: wt_w1_w2_w3
-        strata: zone
-        Rural:
-            - sector
-            - mapping:
-                1. URBAN: Urban
-                2. RURAL: Rural
-                1. Urban: Urban
-                2. Rural: Rural
-                rural: Rural
-                Rural: Rural
-                RURAL: Rural
-                urban: Urban
-                Urban: Urban
-                URBAN: Urban
-
-cluster_features:
     dfs:
+        - df_key
         - df_main
-        - df_geo
+    df_key:
+        file: secta_plantingw3.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
     df_main:
         file: secta_plantingw3.dta
         idxvars:
-            v: ea
+            i: hhid
+        myvars:
+            weight: wt_wave3
+            panel_weight: wt_w1_w2_w3
+            strata: zone
+            Rural:
+                - sector
+                - mapping:
+                    1. URBAN: Urban
+                    2. RURAL: Rural
+                    1. Urban: Urban
+                    2. Rural: Rural
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
+
+cluster_features:
+    dfs:
+        - df_key
+        - df_main
+        - df_geo
+    df_key:
+        file: secta_plantingw3.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
+    df_main:
+        file: secta_plantingw3.dta
+        idxvars:
+            i: hhid
         myvars:
             Region: zone
             District: state
@@ -48,17 +73,22 @@ cluster_features:
                     urban: Urban
                     Urban: Urban
                     URBAN: Urban
+    # Joined on `i` (household), not `v`.  This file's lat/lon columns are
+    # UPPERCASE; asking for the lowercase names made df_data_grabber raise
+    # KeyError, which the GH #515 handler swallows by dropping the sub-df --
+    # which is why W3 had no Latitude/Longitude at all.
     df_geo:
         file: NGA_HouseholdGeovars_Y3.dta
         idxvars:
-            v: ea
+            i: hhid
         myvars:
-            Latitude: lat_dd_mod
-            Longitude: lon_dd_mod
+            Latitude: LAT_DD_MOD
+            Longitude: LON_DD_MOD
     merge_on:
-        - v
+        - i
     final_index:
         - t
+        - i
         - v
 
 assets:
