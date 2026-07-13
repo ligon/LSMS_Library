@@ -35,4 +35,25 @@ df['month'] = df['month'].map(months_dict)
 df['int_t'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
 df=df.drop(columns=['year','month','day'])
 
+# GH #323 -- make the dedup DECLARED and VERIFIED, not a silent framework
+# groupby().first().
+#
+# upd4_hh_a.dta's true primary key is (UPHI, round) -- the panel-tracking LINE
+# (29,250 / 29,250 unique).  This script keys on (r_hhid, round), which is unique
+# on only 16,540 pairs, so the same household-round record arrives replicated
+# once per descendant line.  The framework was silently absorbing the 12,710
+# excess rows with groupby(['i','t']).first().
+#
+# That collapse is VALUE-PRESERVING here -- unlike cluster_features, the only
+# columns that vary within a duplicated (r_hhid, round) group are UPHI and
+# clusterid; the interview date is identical across every replicate (verified:
+# 0 groups with >1 distinct ha_18_1/2/3, and all 12,710 excess rows are exact
+# full-row duplicates).  So dedup, but ASSERT the invariant that makes it safe:
+# if a future wave ever breaks it, this fails LOUDLY instead of returning an
+# arbitrary date.
+assert df.groupby(level=['i', 't'])['int_t'].nunique(dropna=False).max() <= 1, \
+    'interview_date: int_t varies within (i, t) -- the dedup below would pick ' \
+    'an arbitrary date (GH #323)'
+df = df[~df.index.duplicated(keep='first')]
+
 to_parquet(df,'interview_date.parquet')

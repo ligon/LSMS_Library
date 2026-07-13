@@ -3,6 +3,11 @@ Wave: 2020-21
 
 cluster_features:
     file: hh_sec_a.dta
+    # `i` is deliberately retained even though cluster_features declares index
+    # (t, v): Region/District/Rural are HOUSEHOLD attributes (where the household
+    # was interviewed), and the table declares `aggregation: majority` in
+    # data_scheme.yml.  The household level IS THE BALLOT -- drop it and the
+    # majority vote has nothing to count.  See GH #323.
     idxvars:
         i: y5_hhid
         v: clusterid

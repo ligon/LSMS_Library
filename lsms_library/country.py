@@ -1171,15 +1171,31 @@ class Wave:
         # ``idxvars`` so the YAML can merge a household-level df_geo
         # for GPS.  The result then has HH grain (one row per
         # household) instead of the canonical ``(t, v)`` cluster
-        # grain documented in ``data_scheme.yml``.  Collapse with
-        # ``.first()`` for non-GPS columns (Region/Rural/District are
-        # invariant within a cluster by construction of the LSMS-ISA
-        # sampling design) and ``.mean()`` for Latitude/Longitude
-        # (HH-level GPS approximated as the cluster centroid).
-        # GH #161.
+        # grain documented in ``data_scheme.yml``.  GH #161.
+        #
+        # The historical reduction was ``.first()`` for non-GPS columns, on the
+        # stated premise that "Region/Rural/District are invariant within a
+        # cluster by construction of the LSMS-ISA sampling design".  THAT PREMISE
+        # IS FALSE FOR A TRACKED PANEL (GH #323): the geo columns come from the
+        # household cover page (where the household was INTERVIEWED), while ``v``
+        # is its ORIGINAL sampling EA, which the panel carries forward unchanged
+        # when it tracks a mover or a split-off.  In Tanzania's NPS, 1,058
+        # cluster-rounds hold conflicting geography and ``.first()`` MISLABELS
+        # 224 of them (a KILIMANJARO cluster returned as MOROGORO).
+        #
+        # So a country may now DECLARE the reduction (``aggregation:`` in
+        # data_scheme.yml) and get a reducer that is honest about ambiguity --
+        # ``majority`` takes a strict >50% vote and emits <NA> where there is no
+        # majority, rather than silently picking a row.  Countries that declare
+        # nothing keep the exact historical first()/mean() behaviour.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
-            if df.columns.size:
+            policy = _declared_aggregation(
+                self.country._materialization_entry('cluster_features')
+            )
+            if policy is not None and df.columns.size:
+                df = _reduce_declared(df, keep_levels, policy, 'cluster_features')
+            elif df.columns.size:
                 agg = {
                     c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
                     for c in df.columns
@@ -3737,6 +3753,134 @@ def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
     return [str(level) for level in declared_levels]
 
 
+#: Reducers a table may name in its ``aggregation:`` declaration (GH #323).
+_DECLARED_REDUCERS = ('majority', 'first', 'sum')
+
+
+def _declared_aggregation(schema_entry: dict[str, Any] | None) -> dict[str, str] | str | None:
+    """The ``aggregation:`` policy declared for a table, if any (GH #323).
+
+    A table whose *source* grain is finer than its *declared* index needs an
+    explicit reduction policy.  Declaring it in ``data_scheme.yml`` turns a
+    silent ``groupby().first()`` into an enforced, named contract::
+
+        cluster_features:
+          index: (t, v)
+          aggregation: majority       # every measure column, or...
+          # aggregation: {Region: majority, Rural: first}
+
+    Returns the scalar reducer name, a per-COLUMN mapping, or None.
+
+    **Legacy level-keyed entries are ignored.**  Nine countries (Malawi,
+    Senegal, Albania, Benin, ...) already carry a documentation-only
+    ``aggregation: {visit: first}`` on ``interview_date`` -- a note about which
+    INDEX LEVEL gets collapsed, explicitly marked "nothing reads this yet".
+    Those keys name a declared index level, not a column, so they are dropped
+    here; if nothing column-keyed remains the table has NO enforced policy and
+    keeps its existing behaviour (including the GH #323 warning).  Reading them
+    as column policies would silently hijack nine countries.
+    """
+    if not schema_entry:
+        return None
+    agg = schema_entry.get("aggregation")
+    if agg is None:
+        return None
+    if isinstance(agg, str):
+        if agg not in _DECLARED_REDUCERS:
+            raise ValueError(
+                f"Unknown aggregation reducer {agg!r}; "
+                f"expected one of {_DECLARED_REDUCERS}."
+            )
+        return agg
+    if isinstance(agg, dict):
+        levels = set(_declared_index_levels(schema_entry))
+        policy = {col: red for col, red in agg.items() if col not in levels}
+        if not policy:
+            return None            # purely the legacy level-keyed note
+        for col, red in policy.items():
+            if red not in _DECLARED_REDUCERS:
+                raise ValueError(
+                    f"Unknown aggregation reducer {red!r} for column {col!r}; "
+                    f"expected one of {_DECLARED_REDUCERS}."
+                )
+        return policy
+    raise ValueError(f"aggregation: must be a string or mapping, got {type(agg).__name__}")
+
+
+def _majority(s: pd.Series) -> Any:
+    """Strict-majority vote over *s*, or ``pd.NA`` when there is no majority.
+
+    The reducer for a household-grain source feeding a cluster-grain table
+    (GH #323).  Deliberately NOT ``mode()``:
+
+    * Blank / whitespace-only strings are NOT votes.  Tanzania's 2008-09 and
+      2010-11 rounds record ``District`` as ``''`` for every row; a plain mode
+      would elect ``''`` and ship an empty string as a district *name* -- a
+      silently-WRONG value (class-1).  Treating it as missing keeps the cell
+      honestly empty (class-2).
+    * A plurality is not enough: the winner must hold **more than half** of the
+      non-null votes.  Where no value does, the answer is genuinely ambiguous
+      and we return ``pd.NA`` rather than guess.  Dropping loudly beats
+      guessing quietly.
+    """
+    s = s.dropna()
+    if len(s) and (s.dtype == object or isinstance(s.dtype, pd.StringDtype)
+                   or isinstance(s.dtype, pd.CategoricalDtype)):
+        stripped = s.astype("string").str.strip()
+        s = s[stripped.notna() & stripped.ne("")]
+    if not len(s):
+        return pd.NA
+    counts = s.value_counts()
+    if counts.iloc[0] * 2 > len(s):     # strict majority of the non-null votes
+        return counts.index[0]
+    return pd.NA
+
+
+def _reduce_declared(
+    df: pd.DataFrame,
+    levels: list[str],
+    policy: dict[str, str] | str,
+    table_name: str | None,
+) -> pd.DataFrame:
+    """Collapse *df* to *levels* using the table's DECLARED aggregation policy.
+
+    Unlike the historical ``groupby().first()`` fallback this is not silent: the
+    policy is named in ``data_scheme.yml``, and the ``majority`` reducer reports
+    the tuples it could not resolve.
+    """
+    if isinstance(policy, str):
+        agg = {c: policy for c in df.columns}
+    else:
+        agg = {c: policy.get(c, "first") for c in df.columns}
+
+    funcs = {"majority": _majority, "first": "first", "sum": "sum"}
+    # dropna=True (the pandas default, and what the framework's other groupbys
+    # use): a NULL index key is not a group.  Tanzania 2020-21 has 545 households
+    # with a missing `clusterid`; they must not condense into a phantom
+    # "cluster" row keyed on <NA>.
+    grouped = df.groupby(level=levels, observed=True)
+    out = grouped.agg({c: funcs[r] for c, r in agg.items()})
+
+    # Report the cells the majority vote could not resolve.  These are the rows
+    # where validation was actually NEEDED -- not the ones already unanimous.
+    maj_cols = [c for c, r in agg.items() if r == "majority"]
+    if maj_cols:
+        had = grouped[maj_cols].count() > 0      # group had at least one vote
+        unresolved = out[maj_cols].isna() & had  # ...but no strict majority
+        n = int(unresolved.to_numpy().sum())
+        if n:
+            per_col = {c: int(unresolved[c].sum()) for c in maj_cols
+                       if int(unresolved[c].sum())}
+            warnings.warn(
+                f"{table_name or 'table'}: majority vote over {levels} left {n} "
+                f"cell(s) unresolved (no strict majority) and set them to <NA> "
+                f"rather than guess: {per_col}.  These index tuples carry "
+                f"genuinely conflicting source values (GH #323).",
+                RuntimeWarning,
+            )
+    return out
+
+
 _SCHEME_DTYPE_MAP = {
     'bool': pd.BooleanDtype(),
     'int': pd.Int64Dtype(),
@@ -4187,6 +4331,15 @@ def _normalize_dataframe_index(
         # re-derive any per-unit Price from the summed totals -- no data lost,
         # no warning.  Single source of truth for the additive column map lives
         # in feature.py (imported lazily to avoid an import cycle).
+        # GH #323: a table whose source grain is finer than its declared index
+        # may DECLARE its reduction (`aggregation:` in data_scheme.yml).  A
+        # declared policy is an enforced contract, so it replaces the silent
+        # .first() below -- and, unlike .first(), `majority` reports the tuples
+        # it could not resolve instead of picking one arbitrarily.
+        policy = _declared_aggregation(schema_entry)
+        if policy is not None:
+            return _reduce_declared(df, present_levels, policy, table_name)
+
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]

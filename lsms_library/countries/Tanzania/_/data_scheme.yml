@@ -10,7 +10,25 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # DECLARED REDUCTION (GH #323).  The source grain is the HOUSEHOLD cover
+    # page (upd4_hh_a / HH_SEC_A / hh_sec_a): Region/District/Rural record where
+    # the household was actually INTERVIEWED.  But `clusterid` is the household's
+    # ORIGINAL sampling EA, which the NPS panel carries forward unchanged when it
+    # TRACKS a mover or a split-off -- so the geo columns are HOUSEHOLD
+    # attributes, not cluster attributes, and they are NOT constant within a
+    # cluster (round 1, before anyone has moved: 0 conflicts; rounds 2-4: 229 /
+    # 337 / 63 conflicted clusters).
+    #
+    # Reducing household -> cluster with the framework's default .first() does
+    # not merely dedup, it MISLABELS: 224 cluster-rows across the six waves get
+    # a Region/District/Rural that disagrees with the majority of their own
+    # households (a KILIMANJARO cluster returned as MOROGORO).  `majority` takes
+    # a strict >50% vote of the cluster's households -- justified because tracked
+    # movers are a small minority inside their origin cluster (median modal share
+    # = 1.000).  Where no value holds a majority the cell is set to <NA> rather
+    # than guessed (Region 27, District 108, Rural 27 cells).
     index: (t, v)
+    aggregation: majority
     Region: str
     District: str
     Rural: str

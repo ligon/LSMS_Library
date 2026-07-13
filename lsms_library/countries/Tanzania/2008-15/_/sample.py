@@ -6,6 +6,7 @@ from the cover page file (upd4_hh_a.dta).
 """
 from lsms_library.local_tools import get_dataframe, format_id, to_parquet
 import pandas as pd
+import warnings
 
 round_match = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
 
@@ -50,8 +51,40 @@ sample['Rural'] = sample['Rural'].map(rural_map)
 
 sample = sample.set_index(['i', 't'])
 
-# Handle duplicates by keeping first occurrence
-if not sample.index.is_unique:
-    sample = sample.groupby(level=sample.index.names).first()
+# GH #323 -- the SAME (UPHI, round) replication that hit interview_date and
+# cluster_features.  upd4_hh_a.dta is keyed on the panel-tracking LINE (UPHI),
+# not the household, so each household-round arrives once per descendant line
+# (29,250 source rows -> 16,540 distinct (i, t)).  The old
+# `groupby(level=...).first()` hid that collapse BEFORE the parquet was written,
+# so it was invisible even to a wave-parquet audit.
+#
+# weight / strata / Rural / panel_weight are identical across the replicates
+# (verified: 0 (r_hhid, round) pairs with >1 distinct value), so deduping them
+# is value-preserving -- ASSERT that rather than trust it.
+_cols = ['weight', 'panel_weight', 'strata', 'Rural']
+_nun = sample.groupby(level=['i', 't'], observed=True)[_cols].nunique(dropna=False)
+assert (_nun.max() <= 1).all(), \
+    f'sample: {_cols} vary within (i, t); dedup would pick arbitrarily (GH #323)'
+
+# `v` is the EXCEPTION.  59 of the 16,540 (i, t) pairs carry more than one
+# clusterid: two panel lines with different ORIGIN EAs ended up in one physical
+# household, so the household's sampling cluster is genuinely ambiguous.  The old
+# .first() picked one at random -- and because _join_v_from_sample() joins this v
+# onto EVERY Tanzania household table, that arbitrary pick propagated library-
+# wide.  Emit <NA> instead: a loudly-missing cluster (class-2) beats a silently-
+# wrong one (class-1).  The left-join keeps the rows; only v goes null.
+_vn = sample.groupby(level=['i', 't'], observed=True)['v'].transform('nunique')
+_ambiguous = _vn > 1
+if _ambiguous.any():
+    n = int(sample.loc[_ambiguous].index.nunique())
+    warnings.warn(
+        f'sample: {n} (i, t) pair(s) map to >1 clusterid (a household holding '
+        f'two panel lines with different origin EAs); v set to <NA> rather than '
+        f'picking one arbitrarily (GH #323).',
+        RuntimeWarning,
+    )
+    sample.loc[_ambiguous, 'v'] = pd.NA
+
+sample = sample[~sample.index.duplicated(keep='first')]
 
 to_parquet(sample, 'sample.parquet')
