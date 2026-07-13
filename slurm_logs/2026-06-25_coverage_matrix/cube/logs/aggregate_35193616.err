@@ -1,0 +1,4 @@
+[aggregate] 34 shards -> 1825 cells, 34 countries
+[aggregate] snapshot -> .coder/coverage/latest.csv
+[aggregate] html     -> slurm_logs/2026-06-25_coverage_matrix/cube/matrix_full.html
+[aggregate] tiers: n/a=0, absent=456, declared=0, dropped=39, broken=8, builds=136, sane=1186, blessed=0

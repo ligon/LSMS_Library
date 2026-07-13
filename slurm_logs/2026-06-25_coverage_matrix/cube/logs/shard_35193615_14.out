@@ -1,0 +1,24 @@
+=== task 14: country='India'  node=n0185.savio3  Thu Jun 25 18:45:47 PDT 2026 ===
+--- provisioning venv -> /local/job35193668/venv ---
+--- cache clear India ---
+India: removed
+  /global/home/users/ligon/.local/share/lsms_library/India/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/employment.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/employment.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/India/1997-98/_/sample.parquet
+--- build India ---
+=== done 'India' rc=0  Thu Jun 25 18:46:28 PDT 2026 ===

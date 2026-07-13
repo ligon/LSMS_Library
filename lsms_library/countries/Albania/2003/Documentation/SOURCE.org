@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/bd62-r051]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/87
+
+#+CATALOG_ID: 87
+#+CATALOG_IDNO: ALB_2003_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2003 (Wave 2 Panel)
+#+CATALOG_YEARS: 2003-2003
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/bd62-r051
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/87
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

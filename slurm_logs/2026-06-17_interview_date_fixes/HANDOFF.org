@@ -1,0 +1,96 @@
+#+TITLE: Session handoff — interview_date bug fixes (#474, #475, #476)
+#+DATE: 2026-06-17
+#+AUTHOR: Sue (Claude Opus 4.8, scrum master)
+
+* Context
+Branch =feat/interview-date-visit-ehcvm= @ 717e32f4 (the visit-index work).
+Node n0078.savio3 (32 cores). Venv: squashfs image mounted via
+=bin/savio_venv.sh mount= -> /local/job35098382/venv_img (stale symlink to a
+dead job recovered at session start; 6 prunable worktrees pruned).
+
+Three GitHub bugs, all surfaced by the cross-country visit-date survey. Each
+dispatched to its own background worktree agent (all branched cleanly from
+717e32f4, verified via =git worktree list=).
+
+* The three fixes (one agent each, parallel)
+
+** #475 Kosovo — agent ab5f203a — worktree-agent-ab5f203aedce95c22
+Script-path table =Kosovo/2000/_/interview_date.py= wires =Int_t= from
+=s0i_dat0= (CSPro case open/close machine timestamp). Fix: wire from the
+questionnaire date =s0i_q22= (+ a/b/c components). Single-interview, no visit
+level. Config-only edit; verify by cold rebuild (cache clear Kosovo, then
+LSMS_COUNTRIES_ROOT -> worktree).
+
+** #474 Albania — agent ab4c8a37 — worktree-agent-ab4c8a371a7101af1
+YAML + module. 2002/2004/2005 =interview_date= wire =Int_t: [m0_date]= (a
+"last modification" stamp, not the interview date). Fix: wire the real
+interview-date question and carry both enumerator visits on a =visit= index,
+mirroring the Malawi pattern:
+- albania.py gets =albania_date_ymd(row)= (copy of malawi_date_ymd) +
+  =interview_date(df)= -> =melt_visit_intervals(df, start_base='int_t', out_start='Int_t')=
+- wave myvars: =int_t: [y,m,d, mapping: albania_date_ymd]= (+ =int_t_v2= where a
+  2nd visit exists). 2002 confirmed cols: m0_q08{d,m,y} v1 / m0_q08{d,m,y}2 v2.
+  2004/2005 cover-file cols discovered by the agent (labels).
+- data_scheme: index =(t,i)= -> =(t,i,visit)= + =aggregation: {visit: first}=.
+
+** #476 EHCVM — agent a888b3bf — worktree-agent-a888b3bfe03f035b0  [MOST URGENT]
+Regression introduced by THIS branch (717e32f4). The new =interview_date(df)=
+table hook collides with an =interview_date: s00q23a= myvar inside each EHCVM
+=household_roster='s =df_cover= sub-df: =map_formatting_function= auto-wraps the
+same-named myvar into the (col, func) form and applies the DataFrame hook
+per-cell -> AttributeError, masked as KeyError. Symptom: hard RuntimeError on
+cold-cache countries (Benin, Guinea-Bissau, Togo) and SILENT loss of whole
+EHCVM waves on others (Niger, Burkina_Faso, CotedIvoire) once the cache is
+rebuilt.
+Fix (config-only, issue option 1): drop the dead =interview_date= myvar by
+collapsing the =dfs: [df_main, df_cover]= merge back to a single-file
+extraction (promote df_main; delete df_cover/merge_on/final_index). Applied to
+all EHCVM countries incl. Mali (consistency / latent landmine). Verify by COLD
+rebuild of household_roster for all 8 countries: no exceptions, full wave sets
+restored, =interview_date= column gone from the roster.
+
+* Deferred to coordinator (NOT in any worker's scope)
+Framework-hardening from issue #476 (options 2 & 3). Kept out of the workers
+because they touch country.py / local_tools.py (framework heart) and the venv
+=.pth= pins =import lsms_library= to the MAIN checkout — editing it mid-flight
+would corrupt the workers' verification (worker/verifier exclusion). Do these
+AFTER the three config fixes merge:
+- *Option 3 (diagnosability, low-risk, recommended):* narrow
+  =df_data_grabber='s broad =except AttributeError= (local_tools.py ~1039) so a
+  genuine error inside a user formatting function is chained/surfaced, not
+  re-raised as a misleading =KeyError=.
+- *Option 2 (recurrence guard, needs design):* stop =map_formatting_function=
+  auto-wrapping a myvar as a per-cell formatter when the matched function is a
+  table-level df_edit hook (name == a data_scheme table name). No clean
+  registry exists today — distinguishing a df-edit hook from a column formatter
+  needs a deliberate convention. Recommend a short design note + follow-up
+  issue rather than rushing it into this branch.
+
+* RESOLUTION (2026-06-17, all landed on =feat/interview-date-visit-ehcvm=)
+- =35774b2d= #475 Kosovo — cherry-picked from worker; reviewed (corrected one
+  misleading comment about NaT coercion before merge).
+- =04e55c10= #474 Albania — cherry-picked; worker found two extra Albania-scoped
+  fixes (=converted_categoricals: False= for the 2002 mislabeled year column;
+  numeric-month date parser). Verified the YAML key is honoured at
+  country.py:846 (keys on key *presence*).
+- =373565f4= #476 EHCVM — *the config-collapse plan was WRONG and abandoned.*
+  The #476 worker correctly refused it and escalated: =interview_date= is NOT a
+  dead column — every EHCVM wave's =mapping.py::household_roster(df)= feeds it to
+  =age_handler= for DOB-derived Age, then drops it. Collapsing =df_cover= breaks
+  age computation everywhere; the worker's apparent "successes" were stale
+  L2-country parquets, not true rebuilds. Real fix = the framework guard
+  (issue option 2), done by the coordinator in the main checkout (safe: all
+  workers were at rest, .pth pins imports to main checkout so edits are what
+  runs): =map_formatting_function= no longer auto-binds a myvar to a function
+  that is a declared-table df_edit hook. Also narrowed =df_data_grabber='s
+  masking =except AttributeError= (issue option 3). Static audit: =interview_date=
+  is the ONLY myvar-name/table-name collision in the repo, so blast radius =
+  exactly this bug.
+
+  Validation (cold, LSMS_NO_CACHE=1): 8/8 EHCVM rosters build with full wave
+  sets + no interview_date leak; 8/8 interview_date tables build (7 melt/visit,
+  Mali plain); Malawi/Uganda/Ethiopia/Tanzania rosters + Malawi interview_date
+  melt unaffected; 207 schema tests pass.
+
+- Worktrees removed, agent branches deleted. Branch tip 373565f4.
+- NOT pushed / no PR yet — awaiting the human's call (branch was never on origin).

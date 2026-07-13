@@ -592,6 +592,8 @@ def is_this_feature_sane(
     df: pd.DataFrame,
     country: str,
     feature: str,
+    *,
+    extra_optional: set[str] | None = None,
 ) -> SanityReport:
     """Run all sanity checks on a feature DataFrame.
 
@@ -603,6 +605,21 @@ def is_this_feature_sane(
         Country name (e.g., ``'Uganda'``).
     feature : str
         Feature/table name (e.g., ``'food_acquired'``).
+    extra_optional : set[str], optional
+        Column names to exempt from ``no_all_null_columns``, *in addition* to
+        those declared ``optional`` in the country's scheme.
+
+        This exists for **grading a slice of a larger frame** — notably the
+        coverage matrix, which grades one wave at a time by slicing the
+        country-level table on ``t``.  ``no_all_null_columns`` is a
+        *country-level* check: a column that is legitimately not fielded in
+        one wave is all-null *within that wave's slice* and would be reported
+        as a failure, even though the country as a whole populates it.
+
+        Callers grading a slice should pass the set of columns that are
+        populated **somewhere in the parent frame**; a column that is all-null
+        across the whole country is then still (correctly) reported as a
+        failure.  Default ``None`` preserves the historical behaviour exactly.
 
     Returns
     -------
@@ -612,7 +629,9 @@ def is_this_feature_sane(
     """
     scheme = _load_scheme(country)
     report = SanityReport(country=country, feature=feature)
-    optional = scheme.get(feature, {}).get("optional", set())
+    optional = set(scheme.get(feature, {}).get("optional", set()))
+    if extra_optional:
+        optional |= set(extra_optional)
 
     report.checks.append(_check_not_empty(df))
     report.checks.append(_check_has_index(df))

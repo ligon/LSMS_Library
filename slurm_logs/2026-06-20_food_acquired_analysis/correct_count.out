@@ -1,0 +1,42 @@
+declared countries (16): ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'GhanaLSS', 'Guinea-Bissau', 'Malawi', 'Mali', 'Nepal', 'Niger', 'Nigeria', 'Senegal', 'Tanzania', 'Togo', 'Uganda']
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+
+=== per-country food_acquired build/sanity (cache warmed) ===
+{"country": "Benin", "built": true, "sane": true, "nrows": 189236, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Burkina_Faso", "built": true, "sane": true, "nrows": 304503, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "CotedIvoire", "built": true, "sane": true, "nrows": 296241, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Ethiopia", "built": true, "sane": true, "nrows": 325920, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "EthiopiaRHS", "built": true, "sane": true, "nrows": 54693, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "GhanaLSS", "built": true, "sane": true, "nrows": 5259309, "index": ["i", "t", "v", "j", "u", "s", "visit"], "has_s": true, "cols": ["Quantity", "Expenditure", "Price"], "err": null}
+{"country": "Guinea-Bissau", "built": true, "sane": true, "nrows": 127219, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Malawi", "built": true, "sane": true, "nrows": 971531, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure", "Quantity_kg"], "err": null}
+{"country": "Mali", "built": true, "sane": true, "nrows": 430271, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Nepal", "built": false, "sane": null, "nrows": null, "index": null, "has_s": null, "cols": null, "err": "RuntimeError: Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."}
+{"country": "Niger", "built": true, "sane": true, "nrows": 239031, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Nigeria", "built": true, "sane": true, "nrows": 1005656, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure", "Quantity_kg"], "err": null}
+{"country": "Senegal", "built": true, "sane": true, "nrows": 435713, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Tanzania", "built": true, "sane": true, "nrows": 251613, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Togo", "built": true, "sane": true, "nrows": 112557, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure"], "err": null}
+{"country": "Uganda", "built": true, "sane": true, "nrows": 355571, "index": ["i", "t", "v", "j", "u", "s"], "has_s": true, "cols": ["Quantity", "Expenditure", "Price"], "err": null}
+
+=== Feature('food_acquired')() assembly ===
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+assembled rows: 6793197
+countries PRESENT in Feature() (15): ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'GhanaLSS', 'Guinea-Bissau', 'Malawi', 'Mali', 'Niger', 'Nigeria', 'Senegal', 'Tanzania', 'Togo', 'Uganda']
+declared-but-ABSENT (1): ['Nepal']
+
+=== SUMMARY ===
+declared:                 16
+built without error:      15  ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'GhanaLSS', 'Guinea-Bissau', 'Malawi', 'Mali', 'Niger', 'Nigeria', 'Senegal', 'Tanzania', 'Togo', 'Uganda']
+sane (is_this_feature_sane.ok): 15  ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'GhanaLSS', 'Guinea-Bissau', 'Malawi', 'Mali', 'Niger', 'Nigeria', 'Senegal', 'Tanzania', 'Togo', 'Uganda']
+canonical (s-axis + [Quantity,Expenditure]): 11  ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'Guinea-Bissau', 'Mali', 'Niger', 'Senegal', 'Tanzania', 'Togo']
+present in Feature():      15  ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'GhanaLSS', 'Guinea-Bissau', 'Malawi', 'Mali', 'Niger', 'Nigeria', 'Senegal', 'Tanzania', 'Togo', 'Uganda']
+
+CORRECT (built & canonical & present): 11
+  ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'Guinea-Bissau', 'Mali', 'Niger', 'Senegal', 'Tanzania', 'Togo']

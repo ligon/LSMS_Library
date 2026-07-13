@@ -1,1 +1,14 @@
+SOURCE
+
 https://microdata.worldbank.org/index.php/catalog/82
+
+#+CATALOG_ID: 82
+#+CATALOG_IDNO: CIV_1988_EPAM_v01_M
+#+CATALOG_TITLE: Enquête Permanente Auprès des Ménages 1988-1989 (Wave 4 Panel)
+#+CATALOG_YEARS: 1988-1989
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/kdy4-zz15
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/82
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

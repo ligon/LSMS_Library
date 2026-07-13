@@ -1,0 +1,9 @@
+node: n0178.savio3
+--- HTTPS to github.com ---
+github HTTPS rc=200
+--- git ls-remote (read) ---
+0a78d8e64fbb8afa79b8af12fc07305fd41b6801	HEAD
+ls-remote OK
+--- gh token available? ---
+gh token present
+done

@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py", line 124, in <module>
+    from . import country
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 34, in <module>
+    import yaml
+ModuleNotFoundError: No module named 'yaml'
+savio_venv: venv mounted but import failed
+/var/spool/slurmd/job35193559/slurm_script: line 30: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory
+/var/spool/slurmd/job35193559/slurm_script: line 34: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory

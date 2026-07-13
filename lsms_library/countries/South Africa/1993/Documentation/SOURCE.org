@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/9567-t539]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/297
+
+#+CATALOG_ID: 297
+#+CATALOG_IDNO: ZAF_1993_IHS_v01_M
+#+CATALOG_TITLE: Integrated Household Survey 1993
+#+CATALOG_YEARS: 1993-1993
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/9567-t539
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/297
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

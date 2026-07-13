@@ -1,0 +1,19 @@
+=== task 13: country='Guyana'  node=n0178.savio3  Thu Jun 25 18:45:29 PDT 2026 ===
+--- provisioning venv -> /local/job35193662/venv ---
+--- cache clear Guyana ---
+Guyana: removed
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/1992/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/1992/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/1992/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/1992/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/1992/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guyana/1992/_/sample.parquet
+--- build Guyana ---
+=== done 'Guyana' rc=0  Thu Jun 25 18:46:08 PDT 2026 ===

@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/3823
+
+#+CATALOG_ID: 3823
+#+CATALOG_IDNO: ETH_2018_ESS_v04_M
+#+CATALOG_TITLE: Socioeconomic Survey 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/3gma-7g23
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3823
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

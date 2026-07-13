@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/61xp-7h14]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/68
+
+#+CATALOG_ID: 68
+#+CATALOG_IDNO: BIH_2004_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2004 (Wave 4 Panel)
+#+CATALOG_YEARS: 2004-2005
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/61xp-7h14
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/68
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

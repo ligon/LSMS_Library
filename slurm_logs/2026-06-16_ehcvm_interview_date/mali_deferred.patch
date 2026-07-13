@@ -1,0 +1,165 @@
+diff --git a/lsms_library/countries/Mali/2018-19/_/data_info.yml b/lsms_library/countries/Mali/2018-19/_/data_info.yml
+index 15e51494..36831817 100644
+--- a/lsms_library/countries/Mali/2018-19/_/data_info.yml
++++ b/lsms_library/countries/Mali/2018-19/_/data_info.yml
+@@ -325,11 +325,19 @@ housing:
+ interview_date:
+     file: s00_me_mli2018.dta
+     idxvars:
+-        v: grappe
+-        visit: vague
++        # No `visit: vague` here -- `vague` is the EHCVM sample-split round
++        # (carried by t), NOT the enumerator visit.  The ordinal `visit`
++        # level is built by mapping.interview_date's melt below.  `v`
++        # auto-joins from sample() at API time.
+         i:
+             - grappe
+             - menage
+     myvars:
+-        Int_t: s00q23a
++        # q23/q24/q25 a/b = visits 1/2/3 start/end (a=début, b=fin).
++        int_start:    s00q23a
++        int_end:      s00q23b
++        int_start_v2: s00q24a
++        int_end_v2:   s00q24b
++        int_start_v3: s00q25a
++        int_end_v3:   s00q25b
+ 
+diff --git a/lsms_library/countries/Mali/2018-19/_/mapping.py b/lsms_library/countries/Mali/2018-19/_/mapping.py
+index 67695e91..4103d82c 100644
+--- a/lsms_library/countries/Mali/2018-19/_/mapping.py
++++ b/lsms_library/countries/Mali/2018-19/_/mapping.py
+@@ -64,10 +64,23 @@ def Age(value):
+ 
+ def interview_date(value):
+     '''
+-    Column-level pass-through for interview_date.
+-    Overrides mali.py's df-level interview_date(df) which expects a DataFrame.
+-    The household_roster(df) function handles date parsing via age_handler.
++    Dual-role hook named ``interview_date``.
++
++    As a COLUMN formatter (the ``interview_date: s00q23a`` myvar inside
++    ``household_roster``) it receives a scalar and passes it through; the
++    ``household_roster(df)`` function then parses the date via age_handler.
++
++    As the TABLE-level ``df_edit`` hook for the top-level ``interview_date``
++    table it receives a DataFrame and melts the EHCVM per-visit start/end
++    timestamps onto a ``visit`` index.  q23/q24/q25 a/b = visit 1/2/3
++    start/end -> int_start/int_end[_v2/_v3]; delegates to
++    local_tools.melt_visit_intervals -> 'Interview start' / 'Interview end'.
++    Collapsing ``visit`` with ``first`` reproduces the legacy single-date
++    table.  (Shadows mali.py's country-level interview_date(df), so the melt
++    lives here.)
+     '''
++    if isinstance(value, pd.DataFrame):
++        return tools.melt_visit_intervals(value)
+     return value
+ 
+ 
+diff --git a/lsms_library/countries/Mali/2021-22/_/data_info.yml b/lsms_library/countries/Mali/2021-22/_/data_info.yml
+index ed2ff7c0..ad28e1d5 100644
+--- a/lsms_library/countries/Mali/2021-22/_/data_info.yml
++++ b/lsms_library/countries/Mali/2021-22/_/data_info.yml
+@@ -211,13 +211,21 @@ individual_education:
+ interview_date:
+     file: s00_me_mli2021.dta
+     idxvars:
+-        v: grappe
+-        visit: vague
+-        i: 
++        # No `visit: vague` here -- `vague` is the EHCVM sample-split round
++        # (carried by t), NOT the enumerator visit.  The ordinal `visit`
++        # level is built by mapping.interview_date's melt below.  `v`
++        # auto-joins from sample() at API time.
++        i:
+             - grappe
+             - menage
+     myvars:
+-        Int_t: s00q23a
++        # q23/q24/q25 a/b = visits 1/2/3 start/end (a=début, b=fin).
++        int_start:    s00q23a
++        int_end:      s00q23b
++        int_start_v2: s00q24a
++        int_end_v2:   s00q24b
++        int_start_v3: s00q25a
++        int_end_v3:   s00q25b
+     
+ 
+ housing:
+diff --git a/lsms_library/countries/Mali/2021-22/_/mapping.py b/lsms_library/countries/Mali/2021-22/_/mapping.py
+index 9c85ff08..cb85d72c 100755
+--- a/lsms_library/countries/Mali/2021-22/_/mapping.py
++++ b/lsms_library/countries/Mali/2021-22/_/mapping.py
+@@ -45,9 +45,23 @@ def pid(value):
+ 
+ def interview_date(value):
+     '''
+-    Pass through interview_date as a scalar.
+-    Overrides the country-level interview_date(df) which expects a DataFrame.
++    Dual-role hook named ``interview_date``.
++
++    As a COLUMN formatter (the ``interview_date: s00q23a`` myvar inside
++    ``household_roster``) it receives a scalar and passes it through; the
++    ``household_roster(df)`` function then parses the date via age_handler.
++
++    As the TABLE-level ``df_edit`` hook for the top-level ``interview_date``
++    table it receives a DataFrame and melts the EHCVM per-visit start/end
++    timestamps onto a ``visit`` index.  q23/q24/q25 a/b = visit 1/2/3
++    start/end -> int_start/int_end[_v2/_v3]; delegates to
++    local_tools.melt_visit_intervals -> 'Interview start' / 'Interview end'.
++    Collapsing ``visit`` with ``first`` reproduces the legacy single-date
++    table.  (Shadows mali.py's country-level interview_date(df), so the melt
++    lives here.)
+     '''
++    if isinstance(value, pd.DataFrame):
++        return tools.melt_visit_intervals(value)
+     return value
+ 
+ 
+diff --git a/lsms_library/countries/Mali/_/data_scheme.yml b/lsms_library/countries/Mali/_/data_scheme.yml
+index 383b2751..441a8417 100644
+--- a/lsms_library/countries/Mali/_/data_scheme.yml
++++ b/lsms_library/countries/Mali/_/data_scheme.yml
+@@ -66,14 +66,16 @@ Data Scheme:
+     index: (t, v, i, j, u, s)
+     Quantity: float
+     Expenditure: float
+-  # EHCVM visits each household across multiple vagues/passages, each with
+-  # its own date.  The canonical interview_date is one date per household
+-  # (t, v, i); _normalize_dataframe_index drops the undeclared `visit` level
+-  # and collapses the duplicate rows via groupby.first(), keeping the first
+-  # visit's date.  (GH #325)
++  # EHCVM visits each household up to 3 times (q23/q24/q25 a/b = visit 1/2/3
++  # start/end); interview_date preserves every per-visit start/end timestamp on
++  # an ordinal `visit` index.  Cluster `v` auto-joins from sample().  Collapsing
++  # `visit` with `first` reproduces the legacy single-date table.  (GH #325)
+   interview_date:
+-    index: (t, v, i)
+-    Int_t: datetime
++    index: (t, i, visit)
++    Interview start: datetime
++    Interview end: datetime
++    aggregation:
++      visit: first
+   panel_ids: !make
+   assets:
+     index: (t, i, j)
+diff --git a/lsms_library/countries/Mali/_/mali.py b/lsms_library/countries/Mali/_/mali.py
+index 8c7ea199..b695e5dd 100755
+--- a/lsms_library/countries/Mali/_/mali.py
++++ b/lsms_library/countries/Mali/_/mali.py
+@@ -54,8 +54,12 @@ def Int_t(value):
+     else:
+         return pd.to_datetime(value, errors='coerce').date()
+ def interview_date(df):
+-    df['Int_t'] = pd.to_datetime(df['Int_t'])
+-    return df
++    """Melt EHCVM per-visit interview start/end timestamps onto a `visit`
++    index. q23/q24/q25 a/b = visit 1/2/3 start/end -> int_start/int_end[_v2/_v3].
++    Delegates to local_tools.melt_visit_intervals -> 'Interview start' /
++    'Interview end'; collapsing `visit` with `first` reproduces the legacy
++    single-date table."""
++    return tools.melt_visit_intervals(df)
+ 
+ 
+ # ---------------------------------------------------------------------------
