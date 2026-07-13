@@ -1,0 +1,40 @@
+=== task 32: country='Togo'  node=n0180.savio3  Thu Jun 25 18:52:57 PDT 2026 ===
+--- provisioning venv -> /local/job35193792/venv ---
+--- cache clear Togo ---
+Togo: removed
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/var/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Togo/2018/_/subjective_well_being.parquet
+--- build Togo ---
+=== done 'Togo' rc=0  Thu Jun 25 18:54:45 PDT 2026 ===

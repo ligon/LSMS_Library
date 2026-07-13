@@ -60,6 +60,12 @@ from urllib.parse import urlparse
 
 from . import config
 from .paths import countries_root
+from .provenance import (
+    SOURCE_WORLDBANK,
+    WaveProvenance,
+    read_provenance,
+    write_provenance,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,23 +75,122 @@ logger = logging.getLogger(__name__)
 # ``countries_root.cache_clear()`` within the same process.
 _COUNTRIES_DIR = countries_root()
 
-# WB LSMS collection: ISO-3166 alpha-3 codes for countries we track.
-# Used by discover_waves() to query the WB Microdata Library catalog.
+# ---------------------------------------------------------------------------
+# Country -> WB catalog registry
+# ---------------------------------------------------------------------------
+#
+# An ISO alpha-3 code alone is not enough to identify "our" surveys, because
+# several of our country directories are *different survey series from the
+# same nation*:
+#
+#   GhanaLSS / GhanaSPS  -- both ISO GHA (Living Standards Survey vs.
+#                           Socioeconomic Panel Survey)
+#   Tanzania / Tanzania_Kegera
+#                        -- both ISO TZA (National Panel Survey vs. the
+#                           Kagera Health and Development Survey)
+#
+# Without a discriminator each of those directories sees the other's catalog
+# entries as *its own* missing waves.  ``idno_pattern`` is a regex matched
+# against the catalog entry's ``idno`` (e.g. ``GHA_1987_GLSS_v02_M``), which
+# encodes the survey series and is the WB's own stable study identifier.
+#
+# ``discoverable=False`` marks a country whose data does not come from the WB
+# catalog at all.  It is recorded explicitly -- rather than simply omitted --
+# so that "we deliberately do not discover this" is distinguishable from "we
+# forgot to add a country code".
+
+
+class CountryCatalog:
+    """How a country directory maps onto the WB Microdata Library catalog."""
+
+    __slots__ = ("code", "idno_pattern", "discoverable", "reason")
+
+    def __init__(self, code: str | None, idno_pattern: str | None = None,
+                 discoverable: bool = True, reason: str | None = None):
+        self.code = code
+        self.idno_pattern = idno_pattern
+        self.discoverable = discoverable
+        self.reason = reason
+
+    def matches(self, entry: dict) -> bool:
+        """True when a catalog *entry* belongs to this country directory."""
+        if not self.idno_pattern:
+            return True
+        return bool(re.search(self.idno_pattern, str(entry.get("idno", ""))))
+
+
+_COUNTRY_CATALOG: dict[str, CountryCatalog] = {
+    "Afghanistan": CountryCatalog("AFG"),
+    "Albania": CountryCatalog("ALB"),
+    "Armenia": CountryCatalog("ARM"),
+    "Azerbaijan": CountryCatalog("AZE"),
+    "Benin": CountryCatalog("BEN"),
+    "Bosnia-Herzegovina": CountryCatalog("BIH"),
+    "Brazil": CountryCatalog("BRA"),
+    "Bulgaria": CountryCatalog("BGR"),
+    "Burkina_Faso": CountryCatalog("BFA"),
+    "Cambodia": CountryCatalog("KHM"),
+    "China": CountryCatalog("CHN"),
+    "CotedIvoire": CountryCatalog("CIV"),
+    "Ethiopia": CountryCatalog("ETH"),
+    # GHA is shared: GLSS (Living Standards Survey) vs GSPS (Socioeconomic
+    # Panel Survey).  Without the idno filter each sees the other's waves.
+    "GhanaLSS": CountryCatalog("GHA", idno_pattern=r"_GLSS"),
+    "GhanaSPS": CountryCatalog("GHA", idno_pattern=r"_GSPS"),
+    "Guatemala": CountryCatalog("GTM"),
+    "Guinea-Bissau": CountryCatalog("GNB"),
+    "Guyana": CountryCatalog("GUY"),
+    "India": CountryCatalog("IND"),
+    "Iraq": CountryCatalog("IRQ"),
+    "Kazakhstan": CountryCatalog("KAZ"),
+    "Kosovo": CountryCatalog("XKX"),
+    "Kyrgyz Republic": CountryCatalog("KGZ"),
+    "Liberia": CountryCatalog("LBR"),
+    "Malawi": CountryCatalog("MWI"),
+    "Mali": CountryCatalog("MLI"),
+    "Nepal": CountryCatalog("NPL"),
+    "Nicaragua": CountryCatalog("NIC"),
+    "Niger": CountryCatalog("NER"),
+    "Nigeria": CountryCatalog("NGA"),
+    "Pakistan": CountryCatalog("PAK"),
+    "Panama": CountryCatalog("PAN"),
+    "Peru": CountryCatalog("PER"),
+    "Rwanda": CountryCatalog("RWA"),
+    "Senegal": CountryCatalog("SEN"),
+    "Serbia": CountryCatalog("SRB"),
+    # Serbia and Montenegro was a distinct ISO entity (SCG); its two LSMS
+    # rounds are catalog ids 80 and 81, matching our 2002/ and 2003/ dirs.
+    "Serbia and Montenegro": CountryCatalog("SCG"),
+    "South Africa": CountryCatalog("ZAF"),
+    "Tajikistan": CountryCatalog("TJK"),
+    # TZA is shared: the National Panel Survey vs the Kagera Health and
+    # Development Survey (a separate longitudinal study).
+    "Tanzania": CountryCatalog("TZA", idno_pattern=r"_NPS"),
+    "Tanzania_Kegera": CountryCatalog("TZA", idno_pattern=r"_KHDS"),
+    "Timor-Leste": CountryCatalog("TLS"),
+    "Togo": CountryCatalog("TGO"),
+    "Uganda": CountryCatalog("UGA"),
+
+    # --- Not World Bank datasets -------------------------------------------
+    "EthiopiaRHS": CountryCatalog(
+        None, discoverable=False,
+        reason="Ethiopian Rural Household Survey is an IFPRI/Addis Ababa "
+               "University study distributed via Harvard Dataverse "
+               "(doi:10.7910/DVN/T8G8IV), not the World Bank Microdata "
+               "Library.  There is nothing to discover in the WB catalog."),
+    "KenyaLPS": CountryCatalog(
+        None, discoverable=False,
+        reason="Kenya Life Panel Survey is not distributed via the World "
+               "Bank Microdata Library (a KEN/lsms catalog query returns no "
+               "entries)."),
+}
+
+# Backwards-compatible view: the plain {country: ISO code} mapping that this
+# module exposed before the registry above.  Countries that are not WB-sourced
+# are absent, exactly as they were before.
 _COUNTRY_CODES: dict[str, str] = {
-    "Afghanistan": "AFG", "Albania": "ALB", "Armenia": "ARM",
-    "Azerbaijan": "AZE", "Benin": "BEN", "Bosnia-Herzegovina": "BIH",
-    "Brazil": "BRA", "Bulgaria": "BGR", "Burkina_Faso": "BFA",
-    "Cambodia": "KHM", "China": "CHN", "CotedIvoire": "CIV",
-    "Ethiopia": "ETH", "GhanaLSS": "GHA", "GhanaSPS": "GHA",
-    "Guatemala": "GTM", "Guinea-Bissau": "GNB", "Guyana": "GUY",
-    "India": "IND", "Iraq": "IRQ", "Kazakhstan": "KAZ",
-    "Kosovo": "XKX", "Kyrgyz Republic": "KGZ", "Liberia": "LBR",
-    "Malawi": "MWI", "Mali": "MLI", "Nepal": "NPL",
-    "Nicaragua": "NIC", "Niger": "NER", "Nigeria": "NGA",
-    "Pakistan": "PAK", "Panama": "PAN", "Peru": "PER",
-    "Rwanda": "RWA", "Senegal": "SEN", "Serbia": "SRB",
-    "South Africa": "ZAF", "Tajikistan": "TJK", "Tanzania": "TZA",
-    "Timor-Leste": "TLS", "Togo": "TGO", "Uganda": "UGA",
+    name: spec.code for name, spec in _COUNTRY_CATALOG.items()
+    if spec.code is not None
 }
 
 
@@ -1116,12 +1221,20 @@ def populate_and_push(country: str, wave: str,
 # ---------------------------------------------------------------------------
 
 def _wb_catalog_search(country_code: str,
-                       collection: str = "lsms",
+                       collection: str | None = "lsms",
                        ) -> list[dict]:
     """Query the WB Microdata Library catalog for a country.
 
     Returns a list of dicts with keys: ``id``, ``idno``, ``title``,
-    ``year_start``, ``year_end``, ``url``.
+    ``year_start``, ``year_end``, ``url``, ``doi``, ``repository``.
+
+    ``collection=None`` searches every collection, which is what provenance
+    resolution needs: a wave we hold may sit outside the ``lsms`` collection.
+
+    The ``doi`` field is what lets us resolve the many ``SOURCE.org`` files
+    that record a ``https://doi.org/10.48529/…`` link instead of a
+    ``/catalog/{id}`` URL -- the DOI does not encode the numeric id, but the
+    catalog row carries both.
     """
     import json
     import urllib.request
@@ -1131,33 +1244,52 @@ def _wb_catalog_search(country_code: str,
         logger.error("No MICRODATA_API_KEY; cannot search WB catalog.")
         return []
 
-    url = ("https://microdata.worldbank.org/index.php/api/catalog/search"
-           f"?ps=100&collection={collection}&country={country_code}")
-    req = urllib.request.Request(url)
-    req.add_header("X-API-KEY", api_key)
-    req.add_header("Accept", "application/json")
+    base = "https://microdata.worldbank.org/index.php/api/catalog/search"
+    results: list[dict] = []
+    page = 1
+    page_size = 100
 
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read())
-    except (urllib.error.URLError, OSError, TimeoutError,
-            json.JSONDecodeError) as exc:
-        # network / HTTP / decode failure; programmer bugs propagate.
-        logger.error("WB catalog search failed: %s", exc)
-        return []
+    while True:
+        url = f"{base}?ps={page_size}&page={page}&country={country_code}"
+        if collection:
+            url += f"&collection={collection}"
+        req = urllib.request.Request(url)
+        req.add_header("X-API-KEY", api_key)
+        req.add_header("Accept", "application/json")
 
-    results = []
-    for row in data.get("result", {}).get("rows", []):
-        sid = str(row.get("id", ""))
-        results.append({
-            "id": sid,
-            "idno": row.get("idno", ""),
-            "title": row.get("title", ""),
-            "year_start": row.get("year_start", ""),
-            "year_end": row.get("year_end", ""),
-            "url": (f"https://microdata.worldbank.org"
-                    f"/index.php/catalog/{sid}"),
-        })
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read())
+        except (urllib.error.URLError, OSError, TimeoutError,
+                json.JSONDecodeError) as exc:
+            # network / HTTP / decode failure; programmer bugs propagate.
+            logger.error("WB catalog search failed: %s", exc)
+            return results
+
+        result = data.get("result", {})
+        rows = result.get("rows", []) or []
+        for row in rows:
+            sid = str(row.get("id", ""))
+            results.append({
+                "id": sid,
+                "idno": row.get("idno", ""),
+                "title": row.get("title", ""),
+                "year_start": row.get("year_start", ""),
+                "year_end": row.get("year_end", ""),
+                "doi": row.get("doi", "") or "",
+                "repository": row.get("repositoryid", "") or "",
+                "url": (f"https://microdata.worldbank.org"
+                        f"/index.php/catalog/{sid}"),
+            })
+
+        try:
+            found = int(result.get("found", 0))
+        except (TypeError, ValueError):
+            found = len(results)
+        if len(rows) < page_size or len(results) >= found:
+            break
+        page += 1
+
     return results
 
 
@@ -1184,14 +1316,67 @@ def _catalog_to_wave_label(entry: dict) -> str:
     return ys
 
 
+def wave_provenance(country: str, wave: str) -> WaveProvenance:
+    """Return the recorded provenance of one local wave directory.
+
+    A wave with no ``SOURCE.org`` yields a record whose ``source`` is
+    ``"unknown"`` -- never a guess.  See :mod:`lsms_library.provenance`.
+    """
+    return read_provenance(_COUNTRIES_DIR, country, wave)
+
+
+def local_catalog_ids(country: str) -> dict[str, list[str]]:
+    """Map each WB catalog id we hold locally -> the wave dirs holding it.
+
+    One catalog entry can legitimately back **several** wave directories: WB
+    id 1001 (``UGA_2005-2009_UNPS``) covers both ``Uganda/2005-06/`` and
+    ``Uganda/2009-10/``.  Hence a list, not a scalar.
+    """
+    held: dict[str, list[str]] = {}
+    for wave in _local_waves(country):
+        prov = read_provenance(_COUNTRIES_DIR, country, wave)
+        if prov.is_worldbank and prov.catalog_id:
+            held.setdefault(prov.catalog_id, []).append(wave)
+    return {k: sorted(v) for k, v in held.items()}
+
+
 def discover_waves(country: str,
                    collection: str = "lsms",
                    ) -> list[dict]:
-    """Find WB catalog entries for *country* that we don't have locally.
+    """Find WB catalog entries for *country*, flagging which we already hold.
 
-    Each returned dict has the WB catalog fields plus ``"wave"`` (our
-    directory-name convention) and ``"local"`` (bool, True if we
-    already have it).
+    Matching is done on the **WB catalog id** recorded in each wave's
+    ``Documentation/SOURCE.org`` (see :mod:`lsms_library.provenance`), not on
+    a wave label reconstructed from the entry's year range.  Label matching
+    was wrong in both directions:
+
+    * *False positive* -- ``Nigeria/2018-19/`` holds GHS-Panel Wave 4 (id
+      3557), but the Living Standards Survey (id 3827) also spans 2018-2019,
+      so it too rendered as the label ``"2018-19"`` and was reported as
+      already held.  It is not.
+    * *False negative* -- WB id 1001 (``UGA_2005-2009_UNPS``) renders as
+      ``"2005-10"``, which matches no directory, so it looked missing even
+      though we hold it, split across ``2005-06/`` and ``2009-10/``.
+
+    Each returned dict carries the WB catalog fields plus:
+
+    ``wave``
+        Our directory-name convention, derived from the entry's year range.
+        Retained for display and for the label fallback below.
+    ``local``
+        ``bool`` -- ``True`` only when a local wave directory *records* this
+        catalog id.  Unchanged in type and truthiness from previous releases,
+        so existing callers keep working.
+    ``local_status``
+        ``"yes"`` / ``"no"`` / ``"unknown"`` -- the honest tri-state.
+        ``"unknown"`` means a directory whose label matches this entry exists
+        but has no recorded WB catalog id, so we cannot say whether it holds
+        this study or a different one that happens to share a year range.
+        These rows have ``local=False``: an unverified claim is treated as
+        not-held, because wrongly believing we hold a survey is the failure
+        mode that hides missing data.
+    ``local_waves``
+        The wave directories backing this entry (empty unless ``local``).
 
     Parameters
     ----------
@@ -1203,22 +1388,50 @@ def discover_waves(country: str,
     Returns
     -------
     list[dict]
-        Catalog entries sorted by year, annotated with local status.
+        Catalog entries sorted by year, annotated with local status.  Empty
+        for countries whose data does not come from the WB catalog at all
+        (e.g. ``EthiopiaRHS``); those log an explanatory message.
     """
-    code = _COUNTRY_CODES.get(country)
-    if not code:
-        logger.error("No ISO country code for %r. Add it to "
-                     "_COUNTRY_CODES in data_access.py.", country)
+    spec = _COUNTRY_CATALOG.get(country)
+    if spec is None:
+        logger.error("No WB catalog mapping for %r. Add it to "
+                     "_COUNTRY_CATALOG in data_access.py.", country)
+        return []
+    if not spec.discoverable or not spec.code:
+        logger.info("%s is not discoverable via the WB catalog: %s",
+                    country, spec.reason or "not a World Bank dataset.")
         return []
 
-    entries = _wb_catalog_search(code, collection)
-    local = set(_local_waves(country))
+    entries = [e for e in _wb_catalog_search(spec.code, collection)
+               if spec.matches(e)]
+
+    held = local_catalog_ids(country)
+    # Wave dirs whose WB catalog id we do NOT know: either no SOURCE.org, or
+    # one that records a non-WB source.  These are the only dirs for which we
+    # fall back to the old label heuristic -- and we mark the result unknown.
+    unresolved = {
+        w for w in _local_waves(country)
+        if not read_provenance(_COUNTRIES_DIR, country, w).is_worldbank
+    }
 
     for e in entries:
         e["wave"] = _catalog_to_wave_label(e)
-        e["local"] = e["wave"] in local
+        if e["id"] in held:
+            e["local"] = True
+            e["local_status"] = "yes"
+            e["local_waves"] = held[e["id"]]
+        elif e["wave"] in unresolved:
+            # A directory with this label exists, but nothing records what it
+            # actually holds.  Do not claim either way.
+            e["local"] = False
+            e["local_status"] = "unknown"
+            e["local_waves"] = [e["wave"]]
+        else:
+            e["local"] = False
+            e["local_status"] = "no"
+            e["local_waves"] = []
 
-    return sorted(entries, key=lambda e: e.get("year_start", ""))
+    return sorted(entries, key=lambda e: str(e.get("year_start", "")))
 
 
 def _get_console(verbose: bool):
@@ -1305,15 +1518,19 @@ def add_wave(country: str, catalog_id: str,
         return []
     log(f"IDNO: [bold]{idno}[/bold]")
 
-    # --- Derive wave label --------------------------------------------------
+    # --- Look up the catalog entry (wave label + provenance metadata) --------
+    entry: dict | None = None
+    spec = _COUNTRY_CATALOG.get(country)
+    if spec is not None and spec.code:
+        with status("Looking up catalog entry ..."):
+            for e in _wb_catalog_search(spec.code, collection=None):
+                if str(e["id"]) == cat_id:
+                    entry = e
+                    break
+
     if wave is None:
-        with status("Looking up wave years ..."):
-            code = _COUNTRY_CODES.get(country)
-            if code:
-                for e in _wb_catalog_search(code):
-                    if str(e["id"]) == cat_id:
-                        wave = _catalog_to_wave_label(e)
-                        break
+        if entry is not None:
+            wave = _catalog_to_wave_label(entry)
         if not wave:
             logger.error("Cannot derive wave label; pass wave= explicitly.")
             return []
@@ -1352,9 +1569,28 @@ def add_wave(country: str, catalog_id: str,
     (wave_dir / "Documentation").mkdir(parents=True, exist_ok=True)
     (wave_dir / "_").mkdir(parents=True, exist_ok=True)
 
-    source_file = wave_dir / "Documentation" / "SOURCE.org"
-    if not source_file.exists():
-        source_file.write_text(f"SOURCE\n\n{catalog_url}\n")
+    # Record provenance: the WB catalog *id* this directory came from, so
+    # discover_waves() can match on identity instead of guessing from a
+    # year-derived label.  Always (re)written -- add_wave knows the id for a
+    # fact, and an existing bare-URL SOURCE.org carries strictly less
+    # information than the record we can write here.
+    years = None
+    if entry is not None:
+        ys, ye = entry.get("year_start"), entry.get("year_end")
+        years = f"{ys}-{ye}" if ys and ye else (str(ys) if ys else None)
+
+    write_provenance(_COUNTRIES_DIR, WaveProvenance(
+        country=country,
+        wave=wave,
+        source=SOURCE_WORLDBANK,
+        catalog_id=cat_id,
+        idno=idno,
+        title=(entry or {}).get("title") or None,
+        years=years,
+        repository=(entry or {}).get("repository") or None,
+        url=catalog_url,
+        method="add-wave",
+    ))
     log(f"Created {country}/{wave}/ directory structure")
 
     # --- Download -----------------------------------------------------------

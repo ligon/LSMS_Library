@@ -1,0 +1,122 @@
+#+TITLE: GH #436 — code/data/config separation (overnight autonomous loop)
+#+DATE: 2026-06-15
+#+AUTHOR: Sue (scrum master, Claude Opus 4.8)
+
+* Mandate
+Maintainer (going to sleep): "put this in a loop with some adversarial checks
+... everything will be working, tested, and excellent in the morning." Working
+GH #436 autonomously: implement -> full cold gate + adversarial red-team ->
+fix -> re-gate -> merge if it clears the bar.
+
+* Merge bar (framework-core => strict)
+0-failed full cold gate AND clean adversarial review AND green CI AND verified
+default-preserving. Shaky -> stays a PR for morning review, not auto-merged.
+
+* Item 1 — LSMS_COUNTRIES_ROOT config-tree override  [branch feat/436-countries-root-override]
+** What
+Make the country *config* tree relocatable like `data_dir` already makes the
+data tree, so a worktree / alternate config checkout is read by the installed
+(.pth-pinned) package -> worktree self-verify becomes first-class. Retires the
+`COUNTRIES_ROOT` constant.
+
+** Key finding (issue under-scoped it)
+The issue's 1-line sketch (override paths.COUNTRIES_ROOT) was necessary but NOT
+sufficient: that constant was only used by catalog/diagnostics. The load-bearing
+resolution -- `Country.file_path`, `Wave.file_path` -- and the data-access layer
+(`_COUNTRIES_DIR` in data_access/local_tools, ~35 sites) each resolved
+`countries/` independently via `files("lsms_library")` / `Path(__file__).parent`.
+Routed ALL of them (10 framework files + 2 utils) through one resolver
+`paths.countries_root()` (env LSMS_COUNTRIES_ROOT -> config.yml countries_dir ->
+package default). + `config.countries_dir()` mirrors `data_dir()`.
+
+** Adversarial review (3 parallel red-team agents)
+- *completeness*: caught 2 util bypasses (util/geo_audit.py,
+  util/generate_dvc_stages.py -- the latter reachable from `cli generate-stages`)
+  that the first pass mislabelled "retired/deferred". FIXED (routed through
+  countries_root()).
+- *behavior*: only semantic delta is symlink-collapse at Wave.file_path /
+  feature._discover (files() -> .resolve()); PROVEN inert downstream + consistent
+  with the other sites already `.resolve()`d. Default-preserving confirmed per
+  layer (empirically EQUAL strings).
+- *import-safety*: PASS. No cycle (config is stdlib-leaf; paths imports it
+  lazily). All modules import standalone, with/without override.
+
+** Gate sequence (the loop caught what grep/agents missed)
+- gate1: INTERNALERROR -- 7 TEST modules imported the retired COUNTRIES_ROOT.
+  (My first grep scoped to lsms_library/*.py; the adversarial agents checked
+  package imports, not test collection.) FIXED: migrated the 7 tests.
+- gate2: INTERNALERROR AGAIN -- root `conftest.py` imports COUNTRIES_ROOT inside
+  `_purge_*`, only triggered by --rebuild-caches (so --no-purge collect-only
+  didn't catch it). FIXED conftest.py.
+- LESSON: should have run `grep -rln COUNTRIES_ROOT --include=*.py .`
+  (whole repo) FIRST. A repo-wide grep now confirms ZERO `paths.COUNTRIES_ROOT`
+  importers remain. Verified the fix with `--rebuild-caches --collect-only`
+  (exercises the conftest purge path that failed): clean.
+- gate3 (slurm_logs/.../gate3.out): RUNNING on af18b147 [update on completion].
+
+** Verification done
+- default-preserving: countries_root() == package dir; Uganda.file_path unchanged.
+- override honored across config/paths/Country.file_path/_COUNTRIES_DIR (subprocess,
+  env-before-import = the worktree model).
+- new test tests/test_countries_root_override.py (4 cases, subprocess-isolated).
+
+** Commit
+- c07f5de2 on feat/436-countries-root-override (23 files: 10 framework + 2 utils
+  + 8 migrated tests + 1 new test). NOT pushed yet (waiting gate2).
+
+** Deferred (genuinely out of scope)
+- 4 GhanaLSS wave-level mapping.py `files()` self-locates (per-country config
+  scripts that re-anchor to the package by design -- separate question).
+- _COUNTRIES_DIR import-time snapshots: honor env-before-import (worktree model),
+  do NOT track mid-process override + cache_clear. Documented inline.
+
+* Item 2 — declarative per-feature behavior (no-v-join DONE; derived-tables DECLINED)
+** Resumed 2026-06-15 (Sue, Claude Opus 4.8, 1M ctx) — Item 1 confirmed landed
+- Item 1 CI confirmed GREEN: dev run 27526309440 @ 3101af12, unit-tests pass;
+  `data-tests` *skips* on development push (only master runs it), so the prior
+  session's local gate3 was indeed the equivalent validator.  The open question
+  from the interrupted session is now answered.
+** no_v_join => declarative  [branch feat/436-declarative-v-join, PR #455]
+*** What
+The hardcoded `_no_v_join` set in `country._finalize_result` moved into the
+canonical schema YAML (`lsms_library/data_info.yml`).  `_no_v_join_tables()`
+derives it from `Index Info > index_info` (tables whose canonical index omits v)
+UNION a new `Join v from sample > skip_extra` list.  Adding a v-free feature now
+needs no framework-code edit.  Version-skew safe: missing section / parse error
+falls back to `_NO_V_JOIN_FALLBACK` (the historical 8) — never silently
+re-enables the join.
+*** Default-preserving
+Shipped YAML reproduces the EXACT historical 8-table set (asserted in tests).
+Pure refactor of *where* the policy lives, not *what* it is.
+*** Adversarial review (3 parallel red-team agents, static)
+- completeness: found `.claude/skills/add-feature/SKILL.md:432` still telling
+  contributors to edit `_no_v_join` in country.py — the very edit #436 abolishes.
+  FIXED (retargeted to data_info.yml).  Also SkunkWorks/audits/assets.md.
+- behavior: PROVEN default-preserving (set byte-identical; whole-token v match,
+  no substring bug; lru_cache on package-static file is safe).
+- import-safety: PASS (clean import, def-order fine, YAML parses, happy path
+  genuinely taken not masked by except).
+- nits fixed: dead `framework_diagnosis.md` ref dropped; index parser hardened to
+  strip exactly one paren pair (mirrors feature._canonical_index_levels).
+*** Gate
+- Full suite: 1774 passed, 2 failed — both PRE-EXISTING GhanaLSS/food_acquired
+  (missing Quantity), confirmed identical on baseline development.  0 regressions.
+- New tests/test_no_v_join_declarative.py: 10 cases, all pass.
+*** Commits / status
+- ce59129c (impl) + 7947de7a (adversarial doc/parser fixes) on
+  feat/436-declarative-v-join.  Pushed; PR #455 -> development.  CI unit-tests
+  running.  HELD for maintainer review per request (NOT auto-merged — maintainer
+  is awake and steering, unlike the overnight Item-1 run).
+** Derived tables (_FOOD_DERIVED / _ROSTER_DERIVED) — DECLINED, by decision
+Maintainer chose to leave these as code.  Rationale: each derived table requires
+a transform function in transformations.py, so the class dict is correctly
+co-located with that code.  Consistent with the documented 2026-04-18 rejection
+of a `!derived` YAML tag (see CLAUDE.md "Derived Tables").  Not a gap.
+
+* Loop log
+- Item 1 implemented; adversarial x3 clean (2 completeness gaps fixed); gate1
+  caught test imports (fixed); gate2 running.  [Item 1 since merged: PR #452,
+  CI green.]
+- Item 2 (no_v_join): implemented; adversarial x3 (1 major doc gap + nits fixed);
+  full gate 0-regression; default-preserving proven.  PR #455 open, held for
+  review.  Derived-tables sub-item declined by maintainer decision.

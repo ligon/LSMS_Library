@@ -8,11 +8,20 @@ template.  One wave configured: =2018-19=.
 
 Source: https://doi.org/10.48529/rn3k-z374
 
-A second directory =Benin/2018-2019/= contains a =Data/=
-sub-directory only — appears to be a duplicate-wave staging area.
-The configured wave is =2018-19=; the =2018-2019= folder is not
-referenced by any extractor and may be safely ignored or removed
-by a future cleanup pass.
+A second directory =Benin/2018-2019/= used to sit alongside this
+wave — a =Data/=-only duplicate-wave staging area.  *It was removed
+on [2026-07-12]* after verifying that all 52 of its DVC sidecars were
+*md5-identical* to =2018-19/Data/='s, with no unique files in either
+direction.  The DVC blobs are content-addressed and shared, so
+deleting the duplicate sidecars orphaned nothing.
+
+It was not merely clutter.  =Country.waves= (=country.py:1452=) falls
+back to scanning for directories containing =Documentation/SOURCE.org=,
+so *writing* a =SOURCE.org= into a directory *promotes it into a wave*.
+A provenance-backfill pass that stamped every directory therefore turned
+this duplicate into a wave that =sample()= does not cover, breaking
+=test_sample.py::test_covers_all_waves[Benin]= (found in PR #595).
+Removing it closes that trapdoor.
 
 * Sampling Design
 

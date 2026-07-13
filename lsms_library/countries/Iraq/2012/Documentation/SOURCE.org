@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/xh5a-y392]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2334
+
+#+CATALOG_ID: 2334
+#+CATALOG_IDNO: IRQ_2012_IHSES_v02_M
+#+CATALOG_TITLE: Household Socio-Economic Survey 2012, Second Round
+#+CATALOG_YEARS: 2012-2013
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/xh5a-y392
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2334
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

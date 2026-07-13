@@ -1,0 +1,18 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/74
+
+#+CATALOG_ID: 74
+#+CATALOG_IDNO: NPL_2003_LSS-II_v01_M
+#+CATALOG_TITLE: Living Standards Survey 2003-2004, Second Round
+#+CATALOG_YEARS: 2003-2004
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/74
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: catalog-only
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: No SOURCE.org was recorded.  Matched to catalog 74 (NPL_2003_LSS-II_v01_M, 'Living Standards Survey 2003-2004, Second Round') on idno and year range.  NOT content-validated: Nepal/2003-04/Data/ is EMPTY -- Nepal's microdata is hosted by the Nepal NSO rather than the World Bank and is not in this repository (see CLAUDE.md, 'Countries Without Microdata').  So the provenance is known while the data is absent; these are two different facts and are recorded as such.
+
+* Notes (preserved from the original SOURCE.org)
+(source URL not recorded)

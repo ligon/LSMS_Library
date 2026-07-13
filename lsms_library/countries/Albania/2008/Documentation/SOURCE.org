@@ -1,1 +1,13 @@
-https://microdata.worldbank.org/index.php/catalog/1933/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/1933
+
+#+CATALOG_ID: 1933
+#+CATALOG_IDNO: ALB_2008_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2008
+#+CATALOG_YEARS: 2008-2008
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/1933
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

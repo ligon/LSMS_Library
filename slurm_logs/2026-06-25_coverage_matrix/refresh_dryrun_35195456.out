@@ -1,0 +1,35 @@
+=== cov-refresh: node=n0190.savio3 branch=feature/coverage-matrix retry=0 dryrun=1 Thu Jun 25 20:23:44 PDT 2026 ===
+  PY=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+  cloning file:///global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library -> /tmp/cov_dryrun
+--- warm build ---
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+{996.0, 997.0, 998.0, 999.0}
+Look up nutrients for Apples.
+Look up nutrients for Butter.
+Look up nutrients for Cheese.
+Look up nutrients for Chicken (broiler).
+Look up nutrients for Coffee.
+Look up nutrients for Coffee (other).
+Look up nutrients for Cornflakes.
+Look up nutrients for Cucumber.
+Look up nutrients for Donuts.
+Look up nutrients for Ginger (fresh).
+Look up nutrients for Ginger (powder).
+Look up nutrients for Ice Cream.
+Look up nutrients for Infant Formula.
+Look up nutrients for Jam/Marmalade.
+Look up nutrients for Margarine, Butter, etc.
+Look up nutrients for Salt.
+Look up nutrients for Sausages.
+Look up nutrients for Soybeans (fresh).
+Look up nutrients for Tea.
+Look up nutrients for Tea (green).
+Look up nutrients for Tea (leaves).
+Look up nutrients for Tea (other).
+Look up nutrients for Water.
+Look up nutrients for Yoghurt.
+{996.0, 997.0, 998.0, 999.0}
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+--- commit + push ---
+  pushing (dry-run) to origin/feature/coverage-matrix
+=== cov-refresh done Thu Jun 25 20:29:16 PDT 2026 ===

@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/3885
+
+#+CATALOG_ID: 3885
+#+CATALOG_IDNO: TZA_2019_NPS-SDD_v06_M
+#+CATALOG_TITLE: National Panel Survey 2019-2020 - Extended Panel with Sex Disaggregated Data
+#+CATALOG_YEARS: 2019-2020
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/0y7d-1v78
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3885
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

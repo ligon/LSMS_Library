@@ -1,0 +1,18 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/6278
+
+#+CATALOG_ID: 6278
+#+CATALOG_IDNO: SEN_2021_EHCVM-2_v01_M
+#+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages, 2021-20122
+#+CATALOG_YEARS: 2021-2022
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6278
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: No SOURCE.org was recorded.  Data/ holds 58 ehcvm_*_sen2021 files (ehcvm_conso_sen2021, ehcvm_individu_sen2021, ...), matching catalog 6278 (SEN_2021_EHCVM-2_v01_M, 2021-2022), the only SEN EHCVM-2 entry; 4297 is the 2018-19 wave.
+
+* Notes (preserved from the original SOURCE.org)
+(source URL not recorded)

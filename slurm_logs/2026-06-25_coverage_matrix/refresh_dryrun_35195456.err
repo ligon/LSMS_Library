@@ -1,0 +1,20 @@
+[matrix] building (full) ...
+  Uganda: 8 waves × 27 features
+/tmp/cov_dryrun/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:227: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+/tmp/cov_dryrun/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:227: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/fooddatacentral/fooddatacentral.py:87: UserWarning: Couldn't find fdc_id=746767.
+  warnings.warn("Couldn't find fdc_id=%s." % fdc_id)
+/tmp/cov_dryrun/lsms_library/countries/Uganda/_/fct_addition.py:21: UserWarning: Couldn't find FDC Code Cheese for food 746767.
+  warnings.warn("Couldn't find FDC Code %s for food %s." % (food,FDC))
+/tmp/cov_dryrun/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:227: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+/tmp/cov_dryrun/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:227: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+  Malawi: 5 waves × 25 features
+[matrix] snapshot -> /tmp/cov_dryrun/.coder/coverage/latest.csv (344 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=50, declared=0, dropped=0, broken=8, builds=30, sane=256, blessed=0
+To https://github.com/ligon/LSMS_Library.git
+   cf0ea836..9ce6ca05  feature/coverage-matrix -> feature/coverage-matrix

@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/4298
+
+#+CATALOG_ID: 4298
+#+CATALOG_IDNO: TGO_2018_EHCVM_v02_M
+#+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/ww9z-d865
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/4298
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

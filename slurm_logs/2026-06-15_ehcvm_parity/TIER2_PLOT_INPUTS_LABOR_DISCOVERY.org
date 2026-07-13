@@ -1,0 +1,64 @@
+#+TITLE: Tier-2 ERHS plot_inputs / plot_labor — discovery (GH #438)
+#+DATE: 2026-06-15
+#+AUTHOR: Sue
+
+Read-only discovery for the canonical plot_inputs / plot_labor parity features
+on EthiopiaRHS.  Scanned all 251 archive .tab files for input/labor signals and
+characterised the carriers.  CONCLUSION FIRST, evidence below.
+
+* Conclusion: NOT wireable at canonical (plot) grain
+Canonical schemas (Malawi) REQUIRE a plot dimension:
+- plot_inputs : (t, i, plot, input, crop, u) -- Quantity, Purchased, ...
+- plot_labor  : (t, i, plot, source)         -- PersonDays, Wage
+
+ERHS never links inputs or labor to a specific plot.  The input/labor data
+exists and is rich, but is recorded at HOUSEHOLD x (crop | activity | contract)
+grain.  So neither canonical feature can be built.  Recommend: document as
+blocked (module-grain mismatch), like anthropometry was dropped for EHCVM.
+
+* Where the data actually lives (raw r{R}p{P}s{S} questionnaire sections)
+The cleaned aggregates (area_output_*, prodv, xcly, land_*) carry NO input/labor
+detail.  The detail is in the raw per-round/part/section files, which DO have
+questionnaire column labels:
+
+** Labor (household x activity x source -- NOT plot)
+- =r1p2s2.tab= (R1): q22_* = "No. of times spent on HARVESTING/PLOUGHING/
+  WEEDING non-sharetenant land", own-HH vs other-HH members, arrangement.
+  Grain (q1c, q5) household x activity.  No plot.
+- =r3p2s3a3.tab= (R3): q23_2{a,b,c}* = days worked by HIRED labour for
+  Planting / Cultivation / Harvesting; q23_2*7/*8 = people/days in labour
+  sharing; q23_2*5 = crop paid.  Grain household x activity x source.  No plot.
+- =r1p1s8.tab= (R1): q18_* = INDIVIDUAL off-farm/wage labor (q18_2 HH member,
+  days worked cash/kind, Birr earned).  Grain (q1c, q5, member) -- this is
+  labor-SUPPLY / people_last7days territory, NOT plot_labor.
+
+** Inputs (household x crop, or adoption/contract -- NOT plot)
+- =r3p2s3a3.tab= (R3): q23_7{a,b,...} = UREA / DAP kg used for Crop #1..#6;
+  q23_6b = fertilizer kg purchased.  QUANTITATIVE, but grain household x CROP.
+  No plot.
+- =r2p2s7a.tab= (R2): q27_* = modern-input ADOPTION (used y/n, input type,
+  year first used, who influenced).  Attitudinal/historical, not quantities.
+- =r2p2s8ba.tab= (R2): q28_50/51* = sharecropping CONTRACT booleans ("do you
+  / does the owner supply plough/seed/fertiliser?").  Contract terms, not
+  applied quantities.  (The design doc's r2p2s8* "contract detail".)
+- =r3p2s6a3.tab= (R3): q26_9* = input-ACCESS constraints ("could not obtain
+  fertiliser/seed/labour on time").  Not quantities.
+
+* What IS possible (reduced, NON-canonical -- a separate design decision)
+- A HOUSEHOLD-level fertilizer feature (t, i[, crop]) from R3 q23_7* UREA/DAP
+  kg (+ maybe R2).  Real quantities, but household/crop grain, sparse rounds.
+- A HOUSEHOLD-level farm-labor feature (t, i, activity, source) -- hired vs
+  labour-sharing days by planting/cultivation/harvesting (r1p2s2, r3p2s3a3).
+- An INDIVIDUAL off-farm-labor / labor-supply feature (t, i, pid) from r1p1s8
+  (days worked, earnings) -- closer to people_last7days than plot_labor.
+None of these are the canonical plot_inputs / plot_labor; each would be a NEW
+bespoke ERHS feature with its own schema + multi-round section decoding.
+
+* Recommendation
+1. Mark plot_inputs + plot_labor BLOCKED for ERHS (plot-grain absent); file a
+   note/issue.  Do NOT force the canonical schema onto household-grain data.
+2. If the household-level fertilizer / farm-labor variants are wanted, treat as
+   a separate scoped feature (not parity plot_inputs/plot_labor) -- maintainer
+   call.
+3. community_prices remains the next clean Tier-2 candidate (commrev1-3 +
+   community_2004; confirm grain first).

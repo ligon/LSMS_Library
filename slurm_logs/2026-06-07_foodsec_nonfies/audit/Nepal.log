@@ -1,0 +1,55 @@
+DVC unavailable for assets: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.. Falling back to manual aggregation.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/cluster_features.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/cluster_features.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_expenditures.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_expenditures.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_expenditures.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_expenditures.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_prices.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_prices.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_prices.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_prices.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_quantities.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_quantities.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_quantities.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/food_quantities.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_roster.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_roster.parquet still missing after running fallbacks.
+make: *** No rule to make target 'household_characteristics.py', needed by '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_characteristics.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_characteristics.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_characteristics.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_characteristics.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_roster.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/household_roster.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/individual_education.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/individual_education.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nepal/var/interview_date.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/interview_date.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/interview_date.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Nepal/var/interview_date.parquet still missing after running fallbacks.
+DVC unavailable for sample: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.. Falling back to manual aggregation.
+Nepal: 11 features audited

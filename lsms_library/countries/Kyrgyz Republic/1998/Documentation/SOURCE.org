@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/twzy-7936]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/283
+
+#+CATALOG_ID: 283
+#+CATALOG_IDNO: KGZ_1998_KPMS_v01_M
+#+CATALOG_TITLE: Poverty Monitoring Survey 1998
+#+CATALOG_YEARS: 1998-1998
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/twzy-7936
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/283
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/1952
+
+#+CATALOG_ID: 1952
+#+CATALOG_IDNO: NGA_2012_GHSP-W2_v02_M
+#+CATALOG_TITLE: General Household Survey, Panel  2012-2013, Wave 2
+#+CATALOG_YEARS: 2012-2013
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/kxpy-aa72
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/1952
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

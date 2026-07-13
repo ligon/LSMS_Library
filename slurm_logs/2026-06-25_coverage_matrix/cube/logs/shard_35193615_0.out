@@ -1,0 +1,52 @@
+=== task 0: country='Albania'  node=n0178.savio3  Thu Jun 25 18:43:32 PDT 2026 ===
+--- provisioning venv -> /local/job35193618/venv ---
+--- cache clear Albania ---
+Albania: removed
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2002/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2002/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2003/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2004/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2002/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2003/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2004/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2008/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2012/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2008/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2012/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2008/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2012/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2002/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2004/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2002/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2008/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2012/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2002/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2003/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2004/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2008/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2012/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2012/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/var/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2002/_/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2003/_/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2005/_/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2008/_/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Albania/2012/_/subjective_well_being.parquet
+--- build Albania ---
+=== done 'Albania' rc=0  Thu Jun 25 18:46:08 PDT 2026 ===
