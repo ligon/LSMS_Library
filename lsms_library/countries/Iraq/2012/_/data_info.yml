@@ -151,8 +151,15 @@ shocks:
         HowCoped2: q2003_3
 
 cluster_features:
-    # Cover page; one row per cluster v=cluster. Region=governorate;
-    # Rural from q00_16. Constant within cluster (verified, 2828 clusters).
+    # Cover page: one row per HOUSEHOLD (25,146), projected onto the cluster
+    # v=cluster (2,828).  Region=governorate (constant within cluster: 0/2828
+    # violations).  Rural from q00_16 -- a PER-HOUSEHOLD question, NOT a design
+    # stratum (the 2012 `stratum` does not encode urbanicity: 114 of 118 strata
+    # are mixed), so within-cluster disagreement is possible.  It occurs in
+    # exactly ONE cluster: 964 (ERBIL, stratum 1508) is 7 URBAN / 2 RURAL.
+    # `aggregation: unique` (../../_/data_scheme.yml) DECLARES the collapse and
+    # ENFORCES constancy: cluster 964's Rural is <NA> + a loud warning, not the
+    # silent minority-RURAL that groupby().first() used to pick (GH #323).
     file:
         - "../Data/2012ihses00_cover_page.dta"
     idxvars:

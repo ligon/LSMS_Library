@@ -126,9 +126,13 @@ housing:
         Tenure: q0327
 
 cluster_features:
-    # Cover page; one row per cluster v=xcluster. Region=xgov (governorate);
-    # Rural derived from the xstrat label via mapping.py:Rural. Constant
-    # within cluster (verified, 2961 clusters).
+    # Cover page: one row per HOUSEHOLD (17,822), projected onto the cluster
+    # v=xcluster (2,961).  Region=xgov (governorate); Rural derived from the
+    # DESIGN STRATUM label via mapping.py:Rural ("... - urban"/"... - rural"),
+    # so it is constant within cluster by construction.  Verified: 0/2961
+    # clusters have a conflicting Region or Rural, i.e. the projection is
+    # exactly lossless.  The collapse is DECLARED and its constancy invariant
+    # ENFORCED by `aggregation: unique` in ../../_/data_scheme.yml (GH #323).
     file:
         - "../Data/2007ihses00_cover_page.dta"
     idxvars:

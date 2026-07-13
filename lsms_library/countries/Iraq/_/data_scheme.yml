@@ -10,7 +10,28 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # Both waves read the household-level COVER PAGE (the same file `sample`
+    # reads) and project it onto the cluster: 17,822 HH -> 2,961 clusters
+    # (2006-07) and 25,146 HH -> 2,828 clusters (2012).  The "extra"
+    # granularity being dropped is the household `i`, which a cluster-level
+    # table must not retain -- so this collapse is INTENDED and lossless, NOT
+    # the GH #323 data-loss class.  It was previously performed by an
+    # UNDECLARED groupby().first(); `aggregation: unique` declares it and
+    # ENFORCES the constancy invariant it relies on (any column not constant
+    # within a cluster -> <NA> + a loud warning, never a silent guess).
+    #
+    # Verified against source: Region is constant within cluster in both waves
+    # (0/2961 and 0/2828 violations).  Rural is constant in 2006-07 by
+    # construction (it is parsed from the DESIGN STRATUM label, xstrat --
+    # "... - urban"/"... - rural").  In 2012 Rural comes from q00_16, a
+    # PER-HOUSEHOLD question, so within-cluster disagreement is possible; it
+    # occurs in exactly ONE cluster (964, ERBIL: 7 URBAN / 2 RURAL), which the
+    # old .first() silently resolved to RURAL -- the 2-of-9 MINORITY, purely
+    # by source order.  The 2012 `stratum` does NOT encode urbanicity (114 of
+    # 118 strata are mixed), so no design variable can adjudicate cluster 964;
+    # its Rural is therefore <NA> (loudly missing) rather than a guess.
     index: (t, v)
+    aggregation: unique
     Region: str
     Rural: str
 

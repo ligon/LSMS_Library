@@ -3785,7 +3785,7 @@ def _coerce_to_boolean(series: pd.Series) -> pd.Series:
     # numeric (int/float) path
     return pd.to_numeric(series, errors='coerce').astype(pd.BooleanDtype())
 
-_SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
+_SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend', 'aggregation'})
 
 
 @lru_cache(maxsize=1)
@@ -4097,6 +4097,80 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
 
 
 @build_transform()
+def _collapse_declared_unique(
+    df: pd.DataFrame,
+    levels: list[str],
+    reducer: str,
+    table_name: str | None = None,
+) -> pd.DataFrame:
+    """Collapse a DECLARED non-unique index whose columns must be constant.
+
+    Implements the scalar ``aggregation: unique`` policy (GH #323).  Use it
+    when the source is legitimately finer-grained than the declared index --
+    the canonical case being a cluster-level table (``cluster_features``,
+    index ``(t, v)``) extracted from a household-level cover page, where the
+    "extra" granularity is the household ``i`` that a cluster-level table must
+    not retain.
+
+    The projection is lossless *provided* every declared column is constant
+    within the declared group.  This function does not assume that -- it
+    CHECKS it:
+
+    - constant within the group (ignoring NA) -> take the single value;
+    - NOT constant -> the value is unknowable from the source, so emit a
+      ``RuntimeWarning`` naming the offending index key and the conflicting
+      values, and set that **cell** to ``pd.NA``.
+
+    The check is per-COLUMN, not per-row: a group with one ambiguous column
+    keeps its other, unambiguous columns.  Setting the cell NA (class-2,
+    silently *missing*) is deliberately preferred to taking the first row's
+    value (class-1, silently *wrong*) -- source order is not evidence.
+
+    Unlike the cold-build-only ``groupby().first()`` warning, the ``pd.NA``
+    written here is DURABLE: it is baked into the cached parquet, so the fix
+    survives the cache that would otherwise hide it.
+    """
+    if reducer != 'unique':
+        raise ValueError(
+            f"{table_name or 'table'}: unknown aggregation reducer "
+            f"{reducer!r} in data_scheme.yml; expected 'unique'."
+        )
+
+    grouped = df.groupby(level=levels, observed=True)
+    out = grouped.first()
+    # nunique(dropna=True): a group of {'Urban', <NA>} is NOT a conflict --
+    # a missing value does not contradict an observed one.
+    counts = grouped.nunique(dropna=True)
+
+    for col in df.columns:
+        if col not in counts.columns:
+            continue
+        conflict = counts[col] > 1
+        n_conflict = int(conflict.sum())
+        if not n_conflict:
+            continue
+        # Report the offending keys with their competing values, so the
+        # conflict is actionable rather than merely counted.
+        examples = []
+        for key in conflict[conflict].index[:5]:
+            vals = df.xs(key, level=tuple(levels) if len(levels) > 1 else levels[0])[col]
+            examples.append(f"{key}: {vals.value_counts(dropna=True).to_dict()}")
+        warnings.warn(
+            f"{table_name or 'table'}: column {col!r} is not constant within "
+            f"the declared index {tuple(levels)} for {n_conflict} group(s), "
+            f"violating the `aggregation: unique` invariant.  Those cells are "
+            f"set to <NA> (the value is not determinable from the source; "
+            f"source order is not evidence).  Offending: "
+            f"{'; '.join(examples)}"
+            f"{' ...' if n_conflict > 5 else ''} (GH #323).",
+            RuntimeWarning,
+        )
+        out[col] = out[col].mask(conflict, pd.NA)
+
+    return out
+
+
+@build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
     schema_entry: dict[str, Any],
@@ -4109,9 +4183,16 @@ def _normalize_dataframe_index(
     - Reorders index levels to match the declared order.
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
-    - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+    - Collapses duplicate entries, by the first policy that applies:
+
+      1. a scalar ``aggregation:`` declared in ``data_scheme.yml``
+         (currently ``unique`` -- see :func:`_collapse_declared_unique`);
+      2. SUM of the additive measure columns for tables in
+         ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``);
+      3. otherwise the first row per group, with a ``RuntimeWarning`` --
+         the historical default, and an UNDECLARED collapse (GH #323): a
+         table whose source is legitimately finer than its declared index
+         should say so with an explicit ``aggregation:`` policy.
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4180,6 +4261,29 @@ def _normalize_dataframe_index(
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
+
+        # GH #323: a DECLARED projection.  A scalar `aggregation:` in
+        # data_scheme.yml states the reducer for a legitimately non-unique
+        # declared index.  `unique` is the constancy-checked projection: the
+        # source is FINER-grained than the declared index (e.g. a cluster-level
+        # table read off a household-level cover page), and every declared
+        # column is expected to be CONSTANT within the declared group -- so
+        # collapsing destroys no information.  That expectation is an
+        # INVARIANT, and this reducer ENFORCES it rather than trusting it:
+        # where a column is not constant, the value is genuinely unknowable, so
+        # the cell is set to <NA> and the conflict reported (class-2, loudly
+        # missing) instead of silently taking whichever row sorted first
+        # (class-1, silently wrong).
+        #
+        # NOTE the MAPPING form (`aggregation: {visit: first}`, the grain
+        # policy of SkunkWorks/grain_aggregation_policy.org) is a different
+        # contract and is NOT a duplicate-collapse reducer -- only a scalar is.
+        agg_decl = schema_entry.get('aggregation') if schema_entry else None
+        if isinstance(agg_decl, str):
+            return _collapse_declared_unique(
+                df, present_levels, agg_decl, table_name,
+            )
+
         # GH #514/#323: collapsing a non-unique canonical index with .first()
         # silently DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
