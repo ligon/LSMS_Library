@@ -136,16 +136,41 @@ _ADDITIVE_MEASURE_COLUMNS = {
 }
 
 
-def _collapse_duplicate_index(df: pd.DataFrame, table_name: str) -> pd.DataFrame:
+def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
+                              country: str | None = None) -> pd.DataFrame:
     """Collapse duplicate index tuples left after dropping an extra index level.
 
     For additive-measure tables (GH #501) sum the additive columns and re-derive
     any unit-``Price`` column from the summed totals (price is per-unit, NOT
     additive).  Otherwise keep the first row per group (the historical default).
+
+    GH #323: this is the SECOND of the two core ``.first()`` collapses named in
+    SkunkWorks/grain_aggregation_policy.org.  Like the one in
+    ``country._normalize_dataframe_index`` it is audited before it destroys
+    anything -- a Feature() assembly must not be a place where a country quietly
+    loses rows that ``Country(name).table()`` would have returned.
     """
+    # Lazy import: country.py imports _ADDITIVE_MEASURE_COLUMNS from here, so a
+    # module-level import back would cycle.
+    from .country import _audit_index_collapse, _record_grain_report
+
     additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
-    grouped = df.groupby(level=list(df.index.names), observed=True)
     present = [c for c in (additive or ()) if c in df.columns]
+
+    report = _audit_index_collapse(df, list(df.index.names))
+    if report is not None and present and not report.get("unauditable"):
+        # The additive SUM is lossless over the measure columns; only an outright
+        # NaN-key deletion is real loss on that path.  An UNAUDITABLE report is
+        # never silenced -- "we could not check" is not "it is fine".
+        report = (dict(report, destroyed=0, conflicting_groups=0)
+                  if report.get("nan_key_rows") else None)
+    if report is not None:
+        report.update(country=country, table=table_name, wave=None,
+                      site="Feature._harmonize_country_frame",
+                      additive=bool(present))
+        _record_grain_report(report)
+
+    grouped = df.groupby(level=list(df.index.names), observed=True)
     if not present:
         return grouped.first()
     agg = {c: ("sum" if c in present else "first") for c in df.columns}
@@ -230,7 +255,7 @@ def _harmonize_country_frame(
                 )
                 df = df.droplevel(extra)
                 if not df.index.is_unique:
-                    df = _collapse_duplicate_index(df, table_name)
+                    df = _collapse_duplicate_index(df, table_name, country)
 
     return df
 
