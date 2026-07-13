@@ -1177,8 +1177,31 @@ class Wave:
         # sampling design) and ``.mean()`` for Latitude/Longitude
         # (HH-level GPS approximated as the cluster centroid).
         # GH #161.
+        #
+        # GH #323: "invariant by construction" is PROSE, and prose is not
+        # enforcement -- the claim is false in several countries (a cluster
+        # code that is only unique *within a district* merges two real
+        # clusters here, and ``.first()`` then keeps one Region at random:
+        # silently WRONG).  A country that has VERIFIED the invariance
+        # declares it in ``data_scheme.yml``::
+        #
+        #     cluster_features:
+        #       index: (t, v)
+        #       aggregation: {i: dedup}
+        #
+        # and the contract is then CHECKED here on the pre-collapse (still
+        # household-grain) frame -- the only place it can be checked, since
+        # every cached parquet downstream is written post-collapse.  A country
+        # that has not declared it keeps the legacy behaviour untouched.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
+            country_entry = ((self.country.resources or {})
+                             .get('Data Scheme') or {}).get('cluster_features')
+            if _aggregation_policy(country_entry).get('i') == _DEDUP:
+                _assert_dedup_lossless(df, keep_levels, collapsing=['i'],
+                                       table_name='cluster_features',
+                                       country=self.country.name,
+                                       wave=self.year)
             if df.columns.size:
                 agg = {
                     c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
@@ -3720,6 +3743,100 @@ class Country:
 
 
 
+#: The one ENFORCED reducer of the declarative grain-aggregation policy
+#: (``aggregation: {<level>: <reducer>}`` in a country's ``data_scheme.yml``;
+#: see SkunkWorks/grain_aggregation_policy.org).  ``dedup`` states that
+#: collapsing the named index level is LOSSLESS -- the rows sharing a surviving
+#: index tuple are one entity recorded once per collapsed unit -- and it is
+#: VERIFIED at build time by :func:`_assert_dedup_lossless`.  The other reducers
+#: in the vocabulary (``first``, ``sum``) stay documentary hints for the
+#: forward-looking ``collapse()``; they assert nothing and are not enforced.
+_DEDUP = 'dedup'
+
+
+def _aggregation_policy(schema_entry: Any) -> dict[str, str]:
+    """The declared ``{level: reducer}`` grain-aggregation policy for a table.
+
+    Levels named here are the ones the table's canonical index does NOT keep;
+    the reducer says how they collapse.  Absent/malformed -> ``{}`` (no policy
+    declared, so no collapse may claim to be intentional).
+    """
+    if not isinstance(schema_entry, dict):
+        return {}
+    policy = schema_entry.get('aggregation')
+    if not isinstance(policy, dict):
+        return {}
+    return {str(k): str(v).strip().lower() for k, v in policy.items()}
+
+
+def _assert_dedup_lossless(df: pd.DataFrame,
+                           keep_levels: list[str],
+                           *,
+                           collapsing: Iterable[str],
+                           table_name: str | None = None,
+                           country: str | None = None,
+                           wave: str | None = None) -> None:
+    """Verify that a DECLARED ``dedup`` collapse really discards nothing.
+
+    ``aggregation: {<level>: dedup}`` is a CONTRACT: the rows sharing a
+    ``keep_levels`` tuple are the SAME entity, recorded once per collapsed unit
+    (Cambodia ``cluster_features``: one cluster's Region/Rural repeated on each
+    of its ~6 household records), so reducing them keeps every distinct value.
+
+    This function ENFORCES that contract instead of trusting it -- the whole
+    point of GH #323.  A retained column holding two different non-null values
+    inside one surviving group means the collapse is merging entities that are
+    NOT the same, and ``.first()`` would return one of them *at random*: the
+    class-1 failure (silently WRONG), which is strictly worse than a loud stop.
+    So: raise, naming the offending groups.  Loudly missing beats quietly wrong.
+
+    A null is not a conflict -- ``groupby().first()`` skips nulls, so a group
+    holding ``{NA, 'Urban'}`` collapses to ``'Urban'`` and loses nothing.  Only
+    a genuine disagreement between two *observed* values is a violation.
+    """
+    collapsing = [str(lvl) for lvl in collapsing]   # never consume a generator
+    if not isinstance(df, pd.DataFrame) or df.empty or not keep_levels:
+        return
+    where = '/'.join(x for x in (country, wave, table_name) if x) or 'table'
+    conflicts: dict[str, pd.Series] = {}
+    for col in df.columns:
+        s = df[col]
+        # Unordered categoricals break groupby(); compare their labels instead.
+        if isinstance(s.dtype, pd.CategoricalDtype) and not s.cat.ordered:
+            s = s.astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
+        try:
+            distinct = s.groupby(level=keep_levels, observed=True).nunique(dropna=True)
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError(
+                f"{where}: column {col!r} cannot be verified against the "
+                f"declared `aggregation: {{{', '.join(collapsing)}: dedup}}` "
+                f"contract ({exc}). A dedup collapse that cannot be proven "
+                f"lossless must not run (GH #323)."
+            ) from exc
+        offending = distinct[distinct > 1]
+        if len(offending):
+            conflicts[str(col)] = offending
+    if not conflicts:
+        return
+    detail = []
+    for col, offending in conflicts.items():
+        head = ', '.join(f'{k}: {int(n)} distinct values'
+                         for k, n in offending.head(5).items())
+        more = '' if len(offending) <= 5 else f' (+{len(offending) - 5} more)'
+        detail.append(f'  {col}: {len(offending)} group(s) disagree -- {head}{more}')
+    raise RuntimeError(
+        f"{where}: declared `aggregation: {{{', '.join(collapsing)}: dedup}}` "
+        f"is VIOLATED -- collapsing {list(collapsing)} onto "
+        f"{keep_levels} is NOT lossless:\n" + "\n".join(detail) + "\n"
+        f"Each listed group holds rows that disagree on a retained column, so "
+        f"the collapse would silently keep ONE value and discard the others "
+        f"(GH #323). Either the index is incomplete (the level being kept does "
+        f"not identify a unique entity -- e.g. a cluster code reused across "
+        f"districts), or the column is not a property of the surviving grain. "
+        f"Fix the index or drop the `dedup` declaration; do not guess."
+    )
+
+
 def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
     """Parse the declared index metadata from a data scheme entry."""
     if not schema_entry:
@@ -3785,7 +3902,10 @@ def _coerce_to_boolean(series: pd.Series) -> pd.Series:
     # numeric (int/float) path
     return pd.to_numeric(series, errors='coerce').astype(pd.BooleanDtype())
 
-_SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
+# Scheme meta-keys that are not columns.  ``aggregation`` is the grain-
+# aggregation policy block ({level: reducer}; see _aggregation_policy) and must
+# never be mistaken for a declared column dtype.
+_SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend', 'aggregation'})
 
 
 @lru_cache(maxsize=1)
@@ -4162,6 +4282,7 @@ def _normalize_dataframe_index(
 
     # Drop any unexpected index levels (but keep at least one, and only on MultiIndex)
     extra_levels = [lvl for lvl in df.index.names if lvl not in declared]
+    dropped_levels: list[str] = []
     if (
         extra_levels
         and isinstance(df.index, pd.MultiIndex)
@@ -4169,6 +4290,10 @@ def _normalize_dataframe_index(
     ):
         try:
             df = df.droplevel(extra_levels)
+            # Remember what was dropped: dropping a level is what MANUFACTURES
+            # the duplicates the collapse below then reduces, so it decides
+            # whether that collapse is a declared projection or silent loss.
+            dropped_levels = [str(lvl) for lvl in extra_levels]
         except ValueError:
             pass  # Cannot drop levels; keep original index
 
@@ -4190,7 +4315,27 @@ def _normalize_dataframe_index(
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
+        # GH #323: a collapse is legitimate only when it is DECLARED.  A table
+        # whose source grain is finer than its canonical index declares the
+        # projection in ``data_scheme.yml`` (``aggregation: {<level>: dedup}``,
+        # SkunkWorks/grain_aggregation_policy.org).  ``dedup`` says the dropped
+        # level carries no information -- the rows it separates are the same
+        # entity recorded once per unit -- so the collapse is LOSSLESS, and we
+        # PROVE it here rather than trusting the declaration.  The check must
+        # run at (cold) build time on the pre-collapse frame: every cached
+        # parquet from here on is written post-collapse and cannot re-derive it.
+        policy = _aggregation_policy(schema_entry)
+        declared_dedup = [lvl for lvl in dropped_levels
+                          if policy.get(lvl) == _DEDUP]
+        if dropped_levels and len(declared_dedup) == len(dropped_levels):
+            _assert_dedup_lossless(df, present_levels,
+                                   collapsing=declared_dedup,
+                                   table_name=table_name, wave=wave)
+            # Verified lossless: .first() has no choice to make (every group is
+            # constant on every retained column), so it discards nothing and
+            # needs no warning.
+            df = df.groupby(level=present_levels, observed=True).first()
+        elif present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):

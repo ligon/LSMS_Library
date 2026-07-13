@@ -174,6 +174,50 @@ footguns; they become lossless union+sentinel.
   reconciles =plot= with =activity= -- genuine schema divergence, stays
   documented-as-blocked.
 
+* The =dedup= reducer (IMPLEMENTED, GH #323)
+
+The =aggregation:= block above was, until now, read by nobody: every consumer
+(=diagnostics.py=, =country.py=, =tests/test_table_structure.py=) merely SKIPS
+the key.  Niger/Togo's =interview_date: {visit: first}= is documentation.
+Prose is not enforcement.
+
+One reducer is now consumed and ENFORCED -- =dedup=:
+
+#+BEGIN_SRC yaml
+cluster_features:
+  index: (t, v)          # canonical grain
+  aggregation:
+    i: dedup             # source is household-grain; the projection is LOSSLESS
+#+END_SRC
+
+=dedup= is the only reducer that states a CHECKABLE claim: "the rows this level
+separates are the same entity recorded once per unit, so collapsing it discards
+nothing."  =country._assert_dedup_lossless= proves it at COLD BUILD time, on the
+pre-collapse frame -- the only place the evidence exists, since every cached
+parquet downstream is written post-collapse -- and RAISES, naming the offending
+groups, when a retained column disagrees within a surviving index tuple.  That
+converts the class-1 failure (=.first()= silently keeps one of two values) into
+class-2 (a loud stop).  Nulls are not conflicts: =.first()= skips them.
+
+Enforced at BOTH core collapse sites: =Wave.cluster_features= (the hardcoded
+household->cluster =groupby().agg({'first','mean'})= of GH #161, whose comment
+merely ASSERTED invariance -- and it is false in ~10 countries) and
+=_normalize_dataframe_index='s generic level-drop collapse.
+
+=first= / =sum= remain documentary hints for the future =collapse()=; they
+assert nothing and do NOT suppress the #323 warning.
+
+First adopter: Cambodia =cluster_features= (1512 household rows -> 252 clusters;
+0/252 clusters disagree on Region or Rural).  NOT declared repo-wide: the same
+idiom's invariance is VIOLATED in Uganda, Tanzania, Pakistan, Serbia, Burkina
+Faso, Nigeria, Malawi, Ethiopia, Albania, CotedIvoire, Kazakhstan, Liberia and
+Guyana (e.g. Uganda 2019-20: 125/794 clusters disagree on =Rural=; Tanzania
+2019-20: 61/247 disagree on =Region=), which look like INCOMPLETE INDEXES (a
+cluster code unique only within a district).  Blanket-declaring =dedup= there
+would either break them or, worse, bless them; each needs its own diagnosis, and
+this mechanism is the tool that makes the answer a one-line declaration with a
+loud failure if it is a lie.
+
 * Implementation order
 
 1. [DONE, PR #471] =u= in the canonical index (a grouping key).

@@ -90,6 +90,38 @@ Cambodia is integrated into the =Country()= API: =sample=, =cluster_features=,
 =interview_date=, and =food_acquired= (=materialize: make=) are declared;
 =household_characteristics= and the derived food tables auto-surface.
 
+** DONE cluster_features: a DECLARED household -> cluster projection (GH #323)
+The source is the household cover page =hh_sec_1.dta= -- 1512 rows, one per
+household, 252 clusters (~6 households each; min 5, max 7).  =s01q02= (Region)
+and =s01q06b= (Rural) are CLUSTER attributes repeated on every household record
+of the cluster, so projecting to the canonical =(t, v)= grain drops =i= and with
+it 1260 of the 1512 rows.
+
+That projection was happening SILENTLY (=Wave.cluster_features='s
+=groupby().first()=).  It is now DECLARED in =data_scheme.yml=:
+
+: cluster_features:
+:   index: (t, v)
+:   aggregation:
+:     i: dedup
+
+and ENFORCED by the framework (=country._assert_dedup_lossless=), which verifies
+on the pre-collapse frame that every retained column is constant within
+=(t, v)= and RAISES otherwise -- so the collapse can never quietly keep one of
+two disagreeing values.  Measured on 2019-20:
+
+| check                                   | result  |
+|-----------------------------------------+---------|
+| clusters disagreeing on Region          |   0/252 |
+| clusters disagreeing on Rural           |   0/252 |
+| rows of information lost by the collapse|       0 |
+
+=v= (=s01q01=) is a province-prefixed EA id (12064 Phnom Penh, 16001 Ratanak
+Kiri, 7029 Kampot), hence globally unique -- no province/district level is
+missing from the index.  This wave records no household GPS; a cover page that
+DID carry per-household Latitude/Longitude could not declare =i: dedup= (those
+genuinely vary within a cluster and are averaged to a centroid instead).
+
 ** TODO Migrate anti-patterns
 All wave-level scripts use =dvc.api.open()= and
 =from ligonlibrary.dataframes import from_dta= instead of

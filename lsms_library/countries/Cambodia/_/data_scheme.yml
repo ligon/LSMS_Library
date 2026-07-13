@@ -10,7 +10,29 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # HOUSEHOLD-grain source, CLUSTER-grain table -- declared, not accidental
+    # (GH #323).  hh_sec_1.dta (the cover page) has one row per household:
+    # 1512 households in 252 clusters (~6 per cluster, min 5 / max 7), with the
+    # cluster's attributes (s01q02 -> Region, s01q06b -> Rural) repeated on
+    # every household record.  Projecting to the canonical (t, v) grain drops
+    # the `i` level and with it 1260 of the 1512 rows.
+    #
+    # `dedup` says that projection is LOSSLESS -- the 1260 rows are exact
+    # repetitions, not distinct observations -- and the framework ENFORCES it
+    # at build time (country._assert_dedup_lossless): every retained column
+    # must be constant within (t, v), else it raises rather than let .first()
+    # keep one value at random.  Verified on the pre-collapse frame:
+    #   clusters whose households disagree on Region: 0 / 252
+    #   clusters whose households disagree on Rural : 0 / 252
+    # (v is a province-prefixed EA id -- 12064 Phnom Penh, 16001 Ratanak Kiri --
+    # so it is globally unique and no province/district level is missing.)
+    #
+    # NB: this wave has no household GPS.  A country whose cover page carries
+    # per-household Latitude/Longitude must NOT declare `i: dedup` -- those
+    # genuinely vary within a cluster and are averaged to a centroid instead.
     index: (t, v)
+    aggregation:
+      i: dedup
     Region: str
     Rural: str
 
