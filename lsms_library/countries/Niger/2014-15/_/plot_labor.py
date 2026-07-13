@@ -25,8 +25,11 @@ from niger import (i as niger_i, _coerce_days, _coerce_wage,
 
 
 def _hh(df):
-    return df.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                                index=['GRAPPE', 'MENAGE'])),
+    # FULL ECVMA-II household key (GRAPPE, MENAGE, EXTENSION) -- GH #323.
+    # 59 (GRAPPE, MENAGE) pairs host two distinct households; dropping
+    # EXTENSION merged them and silently discarded one.
+    return df.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                                index=['GRAPPE', 'MENAGE', 'EXTENSION'])),
                     axis=1)
 
 

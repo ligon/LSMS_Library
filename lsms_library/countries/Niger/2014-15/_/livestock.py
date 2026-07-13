@@ -37,9 +37,11 @@ ecvma_map, _ = _species_maps()
 owned = srcn['AS4AQ05'] == 1
 srcn = srcn[owned.values]
 
-# i from (GRAPPE, MENAGE) only (EXTENSION omitted to match sample/roster).
-hh = srcn.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                            index=['GRAPPE', 'MENAGE'])), axis=1)
+# i from the FULL ECVMA-II household key (GRAPPE, MENAGE, EXTENSION), matching
+# sample/roster (GH #323).  EXTENSION is part of the key: 59 (GRAPPE, MENAGE)
+# pairs host two distinct households.
+hh = srcn.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                            index=['GRAPPE', 'MENAGE', 'EXTENSION'])), axis=1)
 
 df = pd.DataFrame({
     'i':            hh.values,

@@ -1,12 +1,28 @@
 Country: Niger
 Wave: 2014-15
 
+# HOUSEHOLD KEY (GH #323).  The ECVMA-II household identifier is the TRIPLE
+# (GRAPPE, MENAGE, EXTENSION) -- "EXTENSION du menage" -- not the pair
+# (GRAPPE, MENAGE).  EXTENSION is 0 for the original household and 1/2 for
+# households that split off from it; 59 (GRAPPE, MENAGE) pairs carry TWO
+# DISTINCT HOUSEHOLDS (cover-page EXTENSION counts: 0=3478, 1=77, 2=62).
+#
+# Declaring `i: [GRAPPE, MENAGE]` made the declared index non-unique, and
+# _normalize_dataframe_index then silently collapsed it with groupby().first(),
+# ERASING one real household per collision (59 in sample/housing/food_security,
+# 210 roster rows, 1180 shock rows, 2006 asset rows).  niger.i() has always
+# handled the 3-column form (its `if len(x) > 2` branch); it was simply never
+# reached because no caller passed EXTENSION.
+#
+# Adding EXTENSION drives duplicates to EXACTLY ZERO in every source file.
+# Do NOT drop it back to a pair.  tests/test_niger_extension.py enforces this.
 sample:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014welfare_T1c.dta
     idxvars:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
     myvars:
         v: GRAPPE
         weight: hhweight
@@ -32,6 +48,7 @@ household_roster:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         pid: MS01Q00
     myvars:
         Sex: MS01Q01
@@ -45,6 +62,7 @@ individual_education:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         pid: MS02Q00
     myvars:
         # GH #171: map raw attainment labels onto the canonical ordinal vocab
@@ -56,9 +74,15 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 cluster_features:
+    # Extracted from the household COVER PAGE (3617 rows / 270 clusters) but
+    # declared at (t, v).  mapping.cluster_features collapses to cluster grain
+    # explicitly, by within-cluster majority + a warning on conflict (GH #323).
+    # `i: MENAGE` used to sit here: a bare MENAGE is NOT a household id (the
+    # household key is (GRAPPE, MENAGE, EXTENSION)).  It was harmless only
+    # because the declared index is (t, v) and the level got dropped -- a trap
+    # for the next reader.  cluster_features has no household level; removed.
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta
     idxvars:
-        i: MENAGE
         v: GRAPPE
     myvars:
         Region: MS00Q10
@@ -81,6 +105,7 @@ shocks:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         Shock: MS10Q01
     myvars:
         AffectedIncome:
@@ -142,6 +167,7 @@ food_security:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
     myvars:
         Worried:
             - MS14Q01
@@ -190,6 +216,7 @@ assets:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         j: MS07Q01
     myvars:
         Quantity: MS07Q03
@@ -203,6 +230,7 @@ housing:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
     myvars:
         Roof:
             - MS06Q11

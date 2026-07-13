@@ -1,9 +1,25 @@
 # Formatting functions for Niger 2021-22
+import sys
+from pathlib import Path
+
+# mapping.py is imported by the framework from an ARBITRARY cwd (importlib
+# spec_from_file_location), so a relative '../../_/' does not resolve.  Anchor
+# on __file__ instead: {Country}/{wave}/_/mapping.py -> parents[2] == {Country}.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / '_'))
+
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as food_acquired
 from collections import defaultdict
+
+# cluster_features is extracted from the household cover page (6622 rows / 555
+# clusters) but declared at (t, v).  Collapse to cluster grain EXPLICITLY via
+# the within-cluster majority, warning on any conflict, rather than leaving it
+# to _normalize_dataframe_index's groupby().first() (GH #323).  Attributes are
+# constant within every cluster in this wave, so values are unchanged; the
+# de-duplication is now declared instead of accidental.
+from niger import cluster_features_to_cluster_grain as cluster_features  # noqa: F401,E402
 
 
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',

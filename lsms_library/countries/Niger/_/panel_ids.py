@@ -11,18 +11,37 @@ absent from the wave aggregation).
 **ECVMA linkage is implicit.** ECVMA-II (2014-15) re-uses the same
 ``(grappe, menage)`` numbering as ECVMA-I (2011-12) for re-visited
 households. The 2011-12 household ID is a scalar ``hid = grappe*100 +
-menage``. The 2014-15 household ID uses ``niger.i()``, and the
-2014-15 household roster declares ``idxvars: i: [GRAPPE, MENAGE]``
-(without EXTENSION), so the roster-level current ID is
-``format_id(grappe) + '0' + format_id(menage, zp=2)`` — e.g. ``'1001'``
-for ``(g=1, m=1)``. We link a 2014-15 household to its 2011-12
-counterpart when the reconstructed hid exists in 2011-12. Extension 2
-(split-off) cover rows collapse with their parent in the roster (they
-share the same ``(grappe, menage)``), so the linkage is effectively
-at the ``(grappe, menage)`` level.
+menage``. The 2014-15 household ID is built by ``niger.i()`` from the
+FULL ECVMA-II household key ``(GRAPPE, MENAGE, EXTENSION)`` (GH #323),
+giving ``format_id(grappe) + '0' + format_id(menage, zp=2) +
+str(extension)`` — e.g. ``'10010'`` for ``(g=1, m=1, ext=0)``.
 
-Empirical counts (2026-04): 3557 unique ``(GRAPPE, MENAGE)`` pairs in
-the 2014-15 cover, ~3534 of which have a matching 2011-12 hid.
+**Split-offs do NOT inherit the parent's panel link — and this is load
+bearing.** 59 ``(grappe, menage)`` pairs host TWO distinct 2014-15
+households (extension compositions: 57 x (0, 2), 2 x (1, 2)). All
+households at a given ``(grappe, menage)`` descend from the SAME
+2011-12 household ``hid = grappe*100 + menage``, so a naive linkage
+would map two distinct current IDs onto ONE canonical baseline ID.
+``updated_ids`` is an identity-REWRITE map consumed by ``id_walk()``:
+mapping two households to the same canonical ID MERGES them, silently
+destroying one — which is precisely the GH #323 collapse this wave's
+key fix removes, reintroduced one layer up. The rewrite map must
+therefore be INJECTIVE.
+
+So exactly one household per ``(grappe, menage)`` may inherit the
+baseline identity: the BASE household, i.e. the one with the lowest
+EXTENSION present (normally 0). Households with a higher EXTENSION are
+post-baseline split-offs — genuinely NEW households — and are left
+UNLINKED (new entrants) rather than merged into their parent. Leaving
+them unlinked is class-2 (silently missing from the panel); merging
+them would be class-1 (silently wrong), and class-2 is strictly safer.
+
+This is enforced, not merely described: ``_assert_injective()`` below
+raises if any two current IDs ever map to the same canonical ID.
+
+Empirical counts (2026-07, GH #323): 3617 households in the 2014-15
+cover across 3558 ``(GRAPPE, MENAGE)`` pairs; 3537 base households link
+to a 2011-12 hid; 59 split-offs are deliberately left unlinked.
 
 **EHCVM linkage is explicit.** The 2021-22 cover sheet
 ``s00_me_ner2021`` has ``s00q07f1`` (previous grappe) and
@@ -86,43 +105,85 @@ cover14 = get_dataframe(
     '../2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta'
 )
 
-ecvma_14_to_11: dict[str, str] = {}
-# Iterate over unique (GRAPPE, MENAGE) pairs. The 2014-15 roster
-# declares idxvars as [GRAPPE, MENAGE] only (extensions are collapsed
-# with their parent), so the linkage is at the (grappe, menage) level.
-uniq_gm = cover14[['GRAPPE', 'MENAGE']].dropna().drop_duplicates()
+def _assert_injective(mapping: dict[str, str], label: str) -> None:
+    """A rewrite map MUST be injective.
 
-# First pass: build the set of 2014-15 current IDs (post-niger.i).
-# We need this to detect transitive-chain collisions in the second pass.
+    ``updated_ids`` is consumed by ``id_walk()``, which REWRITES each
+    current household ID to its canonical (baseline) ID.  If two distinct
+    households share a canonical ID they become one household, and the
+    framework's duplicate-index collapse (_normalize_dataframe_index's
+    groupby().first()) then silently discards one of them -- the GH #323
+    failure mode.  This assertion is the enforcement: prose in a docstring
+    is not.
+    """
+    seen: dict[str, str] = {}
+    for cur, prev in mapping.items():
+        if prev in seen:
+            raise AssertionError(
+                f'{label}: NON-INJECTIVE panel rewrite -- {seen[prev]!r} and '
+                f'{cur!r} both map to canonical {prev!r}.  id_walk() would '
+                f'MERGE these two distinct households (GH #323).'
+            )
+        seen[prev] = cur
+
+
+# The full ECVMA-II household key is the TRIPLE (GRAPPE, MENAGE, EXTENSION);
+# 59 (GRAPPE, MENAGE) pairs host two distinct households.
+uniq_gme = (cover14[['GRAPPE', 'MENAGE', 'EXTENSION']]
+            .dropna().drop_duplicates())
+
+# The BASE household at each (grappe, menage) is the one with the lowest
+# EXTENSION present (normally 0).  Only it inherits the 2011-12 identity;
+# higher extensions are post-baseline split-offs -- new households, left
+# unlinked.  See the module docstring for why this is not optional.
+base_ext = uniq_gme.groupby(['GRAPPE', 'MENAGE'], observed=True)['EXTENSION'].transform('min')
+uniq_gme = uniq_gme.assign(is_base=uniq_gme['EXTENSION'] == base_ext)
+
+
+def _cur_id(g: int, m: int, e: int) -> str | None:
+    return niger_i(pd.Series([g, m, e], index=['GRAPPE', 'MENAGE', 'EXTENSION']))
+
+
+# First pass: every 2014-15 current ID (post-niger.i), used to detect
+# transitive-chain collisions in the second pass.
 cur_ids_14: set[str] = set()
-for _, row in uniq_gm.iterrows():
-    g, m = int(row['GRAPPE']), int(row['MENAGE'])
-    cur_i = niger_i(pd.Series([g, m], index=['GRAPPE', 'MENAGE']))
+for _, row in uniq_gme.iterrows():
+    cur_i = _cur_id(int(row['GRAPPE']), int(row['MENAGE']), int(row['EXTENSION']))
     if cur_i is not None:
         cur_ids_14.add(cur_i)
 
-# Second pass: build the linkage, skipping transitive-chain collisions.
-# niger.i(g, m) = format_id(g) + '0' + format_id(m, zp=2) and the
-# theoretical 2011-12 hid = g*100+m share a namespace: e.g.
-# (g=10, m=2) gives cur_i='10002' and prev_i='1002', and (g=1, m=2)
-# gives cur_i='1002'. If we add both linkages, updated_ids['2014-15']
-# would form a transitive chain '10002'->'1002'->'102' — and id_walk's
-# single-pass .replace() applied twice would collapse both households
-# into the single canonical '102', destroying one of them. We skip
-# any linkage whose prev_i also appears as another HH's cur_i.
-for _, row in uniq_gm.iterrows():
-    g, m = int(row['GRAPPE']), int(row['MENAGE'])
-    cur_i = niger_i(pd.Series([g, m], index=['GRAPPE', 'MENAGE']))
+# Second pass: build the linkage.
+# niger.i() and the theoretical 2011-12 hid = g*100+m share a digit
+# namespace, so a prev_i can coincide with some OTHER household's cur_i.
+# Adding both linkages would form a transitive chain (cur -> prev -> prev')
+# and id_walk's single-pass .replace() applied twice would collapse two
+# households into one.  Skip any linkage whose prev_i is also a cur_i.
+ecvma_14_to_11: dict[str, str] = {}
+n_splitoff_unlinked = 0
+n_chain_skipped = 0
+for _, row in uniq_gme.iterrows():
+    g, m, e = int(row['GRAPPE']), int(row['MENAGE']), int(row['EXTENSION'])
+    cur_i = _cur_id(g, m, e)
     if cur_i is None:
         continue
     prev_i = str(g * 100 + m)
     if prev_i not in hid11_set:
         continue
+    if not row['is_base']:
+        # Split-off household.  Its parent (the base household at this same
+        # (grappe, menage)) already claims prev_i; linking this one too would
+        # make the rewrite non-injective and MERGE the two.  It is a new
+        # household -- leave it unlinked.
+        n_splitoff_unlinked += 1
+        continue
     if prev_i in cur_ids_14:
-        # prev_i collides with another HH's cur_i — ambiguous. Leave
-        # this household unlinked rather than produce a phantom chain.
+        # prev_i collides with another HH's cur_i -- ambiguous. Leave this
+        # household unlinked rather than produce a phantom chain.
+        n_chain_skipped += 1
         continue
     ecvma_14_to_11[cur_i] = prev_i
+
+_assert_injective(ecvma_14_to_11, 'ECVMA 2014-15 -> 2011-12')
 
 
 # -----------------------------------------------------------------------
@@ -168,6 +229,8 @@ for _, row in panel21.iterrows():
     if prev_i in ehcvm_18_set:
         ehcvm_21_to_18[cur_i] = prev_i
 
+_assert_injective(ehcvm_21_to_18, 'EHCVM 2021-22 -> 2018-19')
+
 
 # -----------------------------------------------------------------------
 # Assemble outputs
@@ -204,4 +267,7 @@ with open('updated_ids.json', 'w') as f:
 
 
 print(f"ECVMA 2014-15 → 2011-12: {len(ecvma_14_to_11)} households linked")
+print(f"  split-off households left UNLINKED (new entrants, GH #323): "
+      f"{n_splitoff_unlinked}")
+print(f"  linkages skipped to avoid a transitive ID chain: {n_chain_skipped}")
 print(f"EHCVM 2021-22 → 2018-19: {len(ehcvm_21_to_18)} households linked")

@@ -117,9 +117,14 @@ food_acquired:
         Produced: s07bq04
 
 cluster_features:
+    # Extracted from the household COVER PAGE (6622 rows / 555 clusters) but
+    # declared at (t, v).  mapping.cluster_features collapses to cluster grain
+    # explicitly, by within-cluster majority + a warning on conflict (GH #323).
+    # `i: menage` used to sit here: a bare menage is NOT a household id.  It was
+    # harmless only because the declared index is (t, v) and the level got
+    # dropped.  cluster_features has no household level; removed.
     file: s00_me_ner2021.dta
     idxvars:
-        i: menage
         v: grappe
     myvars:
         Region: s00q01

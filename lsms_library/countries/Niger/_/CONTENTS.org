@@ -15,6 +15,35 @@ See CLAUDE.md "EHCVM countries" for the cross-country pattern.
 Pre-EHCVM waves (2011-12, 2014-15) follow their own conventions;
 see the wave-level =data_info.yml= files for index definitions.
 
+** The ECVMA-II (2014-15) household key is a TRIPLE (GH #323)
+
+The 2014-15 household identifier is =(GRAPPE, MENAGE, EXTENSION)=, NOT
+=(GRAPPE, MENAGE)=.  =EXTENSION= ("Extension du menage") is 0 for the
+original household and 1/2 for households that SPLIT OFF from it.
+Cover-page counts: 0=3478, 1=77, 2=62 (3617 households in 3558
+=(grappe, menage)= pairs).
+
+*59 pairs carry TWO DISTINCT HOUSEHOLDS.*  They are not repeated rows:
+at =GRAPPE=2, MENAGE=1= the =EXTENSION=0= household has 10.5 members and
+a 56-year-old female head, and the =EXTENSION=2= household has 2 members
+and a 29-year-old male head, with its own weight and expenditure.
+
+Declaring =i: [GRAPPE, MENAGE]= made the declared index non-unique, and
+the framework's =_normalize_dataframe_index= then collapsed it with
+=groupby().first()=, ERASING one real household per collision — 59 rows
+from sample/housing/food_security, 210 roster rows, 1180 shock rows,
+2006 asset rows, and truncated (not summed) harvests.  Six of the 59
+produced CHIMERA rosters that mixed members of two different households.
+
+Adding =EXTENSION= drives duplicates to EXACTLY ZERO in every 2014-15
+source file.  =niger.i()= has always handled the 3-column form; it was
+simply never reached.  *Do not drop it back to a pair* —
+=tests/test_niger_extension.py= enforces this.
+
+Split-off households do NOT inherit the parent's panel link: see the
+=panel_ids.py= docstring (=updated_ids= is an identity-rewrite map and
+must stay injective, else =id_walk= merges them back together).
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does

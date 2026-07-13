@@ -1,5 +1,21 @@
 # Formatting functions for Niger 2014-15 (ECVMA2)
+import sys
+from pathlib import Path
+
+# mapping.py is imported by the framework from an ARBITRARY cwd (importlib
+# spec_from_file_location), so a relative '../../_/' does not resolve.  Anchor
+# on __file__ instead: {Country}/{wave}/_/mapping.py -> parents[2] == {Country}.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / '_'))
+
 import pandas as pd
+
+# cluster_features is extracted from the household cover page (3617 rows / 270
+# clusters) but declared at (t, v).  This wave is the one where the accidental
+# groupby().first() collapse is actually WRONG: 2 clusters disagree on Region
+# and 4 on District (enumerator typos), and first() resolves them by ROW ORDER.
+# Collapse explicitly via the within-cluster majority, warning on each conflict
+# (GH #323).
+from niger import cluster_features_to_cluster_grain as cluster_features  # noqa: F401,E402
 
 
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',

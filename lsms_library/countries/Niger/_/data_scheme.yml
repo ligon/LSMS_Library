@@ -16,6 +16,21 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # GRAIN (GH #323).  Declared at (t, v) -- ONE row per cluster -- but every
+    # Niger wave extracts it from the household COVER PAGE, i.e. at household
+    # grain (3968 / 3617 / 6024 / 6622 rows against 270 / 270 / 504 / 555
+    # clusters).  The de-duplication to cluster grain is done EXPLICITLY by
+    # niger.cluster_features_to_cluster_grain (wired as the `cluster_features`
+    # df_edit hook in each wave's mapping.py), NOT left to
+    # _normalize_dataframe_index's groupby().first(), which picks by ROW ORDER.
+    #
+    # aggregation: within-cluster MODE (majority) of each attribute; an exact
+    # tie emits NA rather than a guess; every conflict raises a warning naming
+    # the cluster.  This matters: in 2014-15 four clusters disagree on
+    # Region/District (enumerator typos, e.g. v=201: 10 households say Niamey1,
+    # 1 says Mirriah), so a row-order pick could hand a whole cluster the typo.
+    aggregation:
+      v: mode
     index: (t, v)
     Region: str
     District: str
@@ -182,6 +197,30 @@ Data Scheme:
     # harvest_month is recorded only in 2014-15 (AS02EQ06A); intercropped
     # only in the EHCVM waves (s16cq07).  Both are present in >=1 wave so
     # they are carried (NaN in the waves that lack them).
+    #
+    # NON-UNIQUE SOURCE (GH #323).  2011-12 and 2021-22 report the same
+    # (i, plot, crop, u) on more than one source line, so the declared index is
+    # NOT a key of the raw data.  niger._resolve_crop_production_repeats makes
+    # it one, EXPLICITLY -- rather than leaving it to
+    # _normalize_dataframe_index's groupby().first(), which kept whichever line
+    # came first and silently discarded the rest (30 rows in 2011-12, 1010 in
+    # 2021-22):
+    #   * EXACT re-entries (same key, identical measures) -> collapse to one row.
+    #   * GENUINE conflicts (measures disagree) -> measures set to NA and WARNED;
+    #     _finalize_result's dropna(how='all') then removes the row, so these
+    #     harvests are DROPPED from the API -- deliberately and LOUDLY (19 keys
+    #     in 2011-12, 740 in 2021-22).  We do NOT pick a line (first() silently
+    #     discards a real number) and we do NOT sum (that would double-count the
+    #     exact re-entries and invent a harvest total the survey never reports).
+    #     Resolving these needs the questionnaire; until then class-2 (LOUDLY
+    #     MISSING) beats class-1 (silently WRONG).
+    # 2011-12's `as02eq0` ("numero d'ordre") does make the file unique, but it is
+    # a bare LINE COUNTER -- it identifies the repeats without explaining them,
+    # and the canonical index has no line level.  2021-22 has no line id at all
+    # (no column, and no combination, resolves it).
+    aggregation:
+      exact_duplicates: drop
+      conflicting_measures: na       # deliberately NOT first, NOT sum
     index: (t, i, plot, crop, u)
     Quantity: float
     Quantity_sold: float
@@ -224,6 +263,31 @@ Data Scheme:
     # is in the index because one (input, crop) can be reported in several
     # units; a missing unit is filled with the 'Manquant' u label for the
     # same non-null reason.
+    #
+    # SEED-SLOT COLLAPSE (GH #323).  The ECVMA input roster gives seed SEVEN
+    # questionnaire slots: raw AS02CQ02 codes 11..17 all carry the IDENTICAL
+    # Stata label 'Semences', which harmonize_input maps to the single input
+    # label 'Seed'.  The slot number is a form artifact, not a semantic
+    # dimension, and the canonical index has no slot level -- so a household
+    # that planted one crop's seed from several slots lands several rows on ONE
+    # index key.  The SOURCE IS UNIQUE on its true key ((hh, raw CODE, crop,
+    # unit) = 8179 of 8179 rows in 2014-15); the collision is MANUFACTURED by
+    # the many-to-one label.  Left to _normalize_dataframe_index it collapsed
+    # with groupby().first(), keeping one slot and discarding the rest (73 rows
+    # in 2011-12, 45 in 2014-15) -- reporting 5 Tiya of seed where the household
+    # reported 50.  niger._finish_plot_inputs therefore SUMS the additive
+    # quantities within the declared key (this is the same reduction
+    # _finish_livestock already applies to the ECVMA animal SUB-TYPE lines).
+    # It does not double-count: each slot is a distinct reported line.
+    #
+    # The `crop` level must also stay INJECTIVE: the four EHCVM residual seed
+    # slots used to share one 'Autre crop' label, so genuinely different residual
+    # seed types (other-cereal seed vs tuber cuttings) collided and one was
+    # dropped.  See harmonize_seed_crop in categorical_mapping.org.
+    aggregation:
+      Quantity: sum                  # additive across the 7 'Semences' slots
+      Quantity_purchased: sum        # additive
+      Purchased: any                 # a flag, not a quantity
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool

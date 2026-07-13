@@ -53,8 +53,11 @@ def _num(col):
     return pd.to_numeric(src[col], errors='coerce')
 
 
-i_val = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                              index=['GRAPPE', 'MENAGE'])),
+# Build i from the SAME full household key used for the merge above
+# (GRAPPE, MENAGE, EXTENSION) -- GH #323.  This script already knew the key
+# was a triple (it merges on `key`); it just dropped EXTENSION here, which
+# merged the 59 (GRAPPE, MENAGE) pairs that host two distinct households.
+i_val = src.apply(lambda r: niger_i(pd.Series([r[c] for c in key], index=key)),
                   axis=1)
 pid = src['MS01Q00'].apply(format_id)
 

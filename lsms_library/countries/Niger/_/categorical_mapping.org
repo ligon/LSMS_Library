@@ -997,15 +997,29 @@
 # crop is encoded in the seed-type label ('Semences de petit mil').  This
 # table resolves each EHCVM seed-type label to the crop's harmonize_food
 # `Preferred Label`, so seed rows carry the SAME `crop` value a consumed
-# food / grown crop would (the shared j axis).  The catch-all seed slots
-# ('Semences d'autres céréales', 'Autres semences', 'Plants/boutures de
-# tubercules') resolve to 'Autre crop' (no single crop named).  The bare
-# label '20' is the 2018-19 trailing seed slot whose value-label text was
-# not stored (it is 'Autres semences' = code 20 in the sibling 2021-22
-# wave), so it also maps to 'Autre crop'.  Non-seed input labels are absent
-# here (the wave script only consults this table for rows whose input
-# resolved to 'Seed').  The ECVMA waves do NOT use this table — they read
-# the crop from the roster's own crop column.
+# food / grown crop would (the shared j axis).
+#
+# THE RESIDUAL BUCKETS MUST STAY INJECTIVE (GH #323).  `crop` is an INDEX
+# LEVEL of plot_inputs (t, i, input, crop, u).  Until 2026-07 all four
+# catch-all seed slots resolved to the SINGLE label 'Autre crop', so two rows
+# reporting GENUINELY DIFFERENT residual seed types -- e.g. "Semences d'autres
+# céréales" (other cereal seed) and "Plants/boutures de tubercules" (tuber
+# cuttings, not a cereal at all) -- collided on the same index key, and
+# _normalize_dataframe_index silently discarded one of them with
+# groupby().first() (6 rows in 2018-19, 3 in 2021-22).  A many-to-one label on
+# an INDEX LEVEL manufactures key collisions the source does not have.  Each
+# residual slot therefore keeps its OWN label.  Do not re-merge them.
+#
+# The bare label '20' is the 2018-19 trailing seed slot whose value-label text
+# was not stored.  The sibling 2021-22 wave's code 20 is 'Autres semences',
+# but the EHCVM seed CODES shift between waves (precisely why this table is
+# keyed on the label string, not the code), so we do NOT assume the two are
+# the same category: it gets its own residual label rather than being merged
+# into one we merely guess it matches.
+#
+# Non-seed input labels are absent here (the wave script only consults this
+# table for rows whose input resolved to 'Seed').  The ECVMA waves do NOT use
+# this table — they read the crop from the roster's own crop column.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -1018,10 +1032,10 @@
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
-| Autres semences               | Autre crop          |
-| 20                            | Autre crop          |
+| Semences d'autres céréales    | Autre crop (céréales)     |
+| Plants/boutures de tubercules | Autre crop (tubercules)   |
+| Autres semences               | Autre crop (non spécifié) |
+| 20                            | Autre crop (non étiqueté) |
 
 * Livestock Species (livestock — the animal axis)
 

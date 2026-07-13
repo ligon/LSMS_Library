@@ -1,3 +1,5 @@
+import warnings
+
 import pandas as pd
 import numpy as np
 import json
@@ -44,6 +46,75 @@ def i(x):
                 return grappe + '0' + menage + extension
             return grappe + '0' + menage
     return str(int(x))
+
+
+def cluster_features_to_cluster_grain(df):
+    """Collapse a HOUSEHOLD-grain cluster_features frame to ONE ROW PER CLUSTER.
+
+    ``cluster_features`` is declared at ``(t, v)``, but every Niger wave extracts
+    it from the household COVER PAGE -- one row per household (3968 / 3617 / 6024
+    / 6622 rows against 270 / 270 / 504 / 555 clusters).  Left alone, the
+    framework's ``_normalize_dataframe_index`` collapses the non-unique ``(t, v)``
+    index with ``groupby().first()``, which keeps whichever row happens to come
+    FIRST -- row order, not the majority (GH #323).
+
+    In 2011-12 / 2018-19 / 2021-22 the cluster attributes are constant within
+    every ``v``, so that collapse produced the right answer -- but by luck, and
+    silently.  In 2014-15 they are NOT constant: 2 clusters disagree on Region
+    and 4 on District, each a lopsided majority against a single outlier --
+
+        v=201  Region: {Communauté urbaine de Niamey: 10, Zinder: 1}
+        v=201  District: {Niamey1: 10, Mirriah: 1}
+        v=7    District: {Arlit: 11, Tchirozérine: 1}
+        v=84   District: {Aguié: 12, Madarounfa: 1}
+        v=86   Region: {Maradi: 9, Tahoua: 1} / District: {Tessaoua: 9, Abalak: 1}
+
+    -- i.e. enumerator typos.  A row-order pick can hand an entire cluster the
+    typo'd region.
+
+    So we de-duplicate EXPLICITLY, here at extraction, instead of letting the
+    framework do it by accident:
+
+      * take the within-cluster MODE (majority) of each attribute;
+      * WARN, naming the cluster and the competing values, on every conflict;
+      * on an exact TIE, emit NA rather than guess -- class-2 (silently MISSING)
+        is strictly safer than class-1 (silently WRONG).
+
+    Returns a frame indexed by the cluster key with exactly one row per cluster,
+    so the framework's duplicate-collapse never fires for this table again.
+    """
+    flat = df.reset_index()
+    key = [c for c in ('t', 'v') if c in flat.columns]
+    if 'v' not in key:
+        # Nothing to collapse on; hand the frame back untouched.
+        return df
+    # 'i' (and any other household-grain level) is NOT part of the cluster key.
+    attrs = [c for c in flat.columns if c not in key and c != 'i']
+
+    def _reduce(col):
+        """Majority value; NA on an exact tie or when everything is missing."""
+        vc = col.dropna().value_counts()
+        if len(vc) == 0:
+            return pd.NA
+        if len(vc) > 1 and vc.iloc[0] == vc.iloc[1]:
+            return pd.NA           # exact tie -> refuse to guess
+        return vc.index[0]
+
+    # Report conflicts before reducing, naming names.
+    for kv, grp in flat.groupby(key, observed=True):
+        for a in attrs:
+            vc = grp[a].dropna().value_counts()
+            if len(vc) > 1:
+                tie = vc.iloc[0] == vc.iloc[1]
+                warnings.warn(
+                    f"Niger cluster_features: cluster {dict(zip(key, kv if isinstance(kv, tuple) else (kv,)))} "
+                    f"reports {len(vc)} distinct values for {a!r}: {dict(vc)}. "
+                    + ("EXACT TIE -- emitting NA rather than guessing."
+                       if tie else f"Taking the majority ({vc.index[0]!r}).")
+                )
+
+    out = flat.groupby(key, observed=True)[attrs].agg(_reduce)
+    return out
 
 
 def panel_ids(df):
@@ -475,7 +546,22 @@ def _finish_crop_production(df, t):
     df['intercropped'] = df['intercropped'].astype('boolean')
     df['t'] = t
     df['crop'] = df['crop'].astype('string')
-    df['u'] = df['u'].astype('string')
+    # A REPORTED harvest line may carry no unit (the household gave a quantity
+    # with no uml, or neither).  `u` is an INDEX level, and pandas groupby DROPS
+    # rows whose grouping key is NaN -- so every NaN-`u` row was silently
+    # annihilated by _normalize_dataframe_index's duplicate-collapse whenever
+    # that collapse fired at all: 3140 rows in 2011-12, 1079 in 2014-15, 960 in
+    # 2021-22 (GH #323).  That is why the issue's headline crop_production counts
+    # (3170 / 1125 / 1970) are so much larger than the duplicate-key counts
+    # (30 / 46 / 1010): the rest was NaN-key collateral.
+    #
+    # Making the index unique (see _resolve_crop_production_repeats) stops the
+    # collapse from firing, which incidentally saves these rows -- but relying on
+    # that is a landmine: re-introduce ONE duplicate anywhere and 3140 unrelated
+    # rows vanish again.  So fill the unit with the existing 'Manquant' (=missing)
+    # `u` Preferred Label, exactly as _finish_plot_inputs already does, and the
+    # NaN-key drop can never fire regardless of uniqueness.
+    df['u'] = df['u'].astype('string').fillna('Manquant')
     # Drop placeholder rows with no crop recorded (a parcel listed but no
     # crop grown / reported on the line).  These carry no harvest data
     # (crop, Quantity, unit all NA) and are not item-level harvest records.
@@ -483,7 +569,108 @@ def _finish_crop_production(df, t):
     keep = ['t', 'i', 'plot', 'crop', 'u', 'Quantity',
             'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
     df = df[[c for c in keep if c in df.columns]]
+
+    df = _resolve_crop_production_repeats(df, t)
+
     df = df.set_index(['t', 'i', 'plot', 'crop', 'u'])
+    return df
+
+
+# Measure columns of crop_production: the values we must NOT guess at.
+_CROP_MEASURES = ['Quantity', 'Quantity_sold', 'Value_sold',
+                  'harvest_month', 'intercropped']
+
+
+def _resolve_crop_production_repeats(df, t):
+    """Make (t, i, plot, crop, u) a KEY -- explicitly, and without guessing.
+
+    GH #323.  Two Niger waves report the SAME (household, plot, crop, unit)
+    on more than one source line, so the declared index is not unique and
+    _normalize_dataframe_index silently collapsed it with groupby().first()
+    -- keeping whichever line happened to come first and DISCARDING the rest
+    (30 rows in 2011-12, 1010 in 2021-22).
+
+    What the source actually gives us, checked line by line:
+
+      2011-12 (ecvmaas2e_p2).  A column `as02eq0` ("numero d'ordre") makes the
+        file unique -- but it is a bare LINE COUNTER, not a season, variety or
+        any other semantic dimension, and the canonical crop_production index
+        has no line level.  So it identifies the repeats without EXPLAINING
+        them.
+      2021-22 (s16c_me_ner2021).  NOTHING resolves it: no line id, and no
+        combination of `vague` / intercrop / any other column makes the natural
+        key unique (best single column gets 16317 of 16468 rows).
+
+    In BOTH waves the repeats are a MIX:
+      * exact re-entries -- every measure identical (hid 5509 NIEBE: 6.0 and
+        6.0; grappe 85/menage 11: every column equal), and
+      * genuine conflicts -- the measures DIFFER (hid 7011 niébé: 15 and 21;
+        grappe 107/menage 8: 75 and NaN).
+
+    So neither reducer is safe on the conflicts.  `first()` silently discards a
+    real number; `sum` silently DOUBLE-COUNTS the exact re-entries (and would
+    invent a harvest total the survey never reports).  Deciding which of 15 or
+    21 is the harvest -- or whether it is 36 -- needs the questionnaire, which
+    we do not have.
+
+    Therefore, per the class-2-beats-class-1 rule (silently MISSING is strictly
+    safer than silently WRONG):
+
+      1. EXACT re-entries collapse to one row.  Unambiguous: the same record was
+         entered twice, so dropping the copy loses nothing.
+      2. GENUINE conflicts collapse to one row whose MEASURES ARE SET TO NA, and
+         we WARN, naming the count.  The quantity is NOT determinable from the
+         source, so we refuse to name one.
+
+    NOTE what (2) actually costs, end to end: with every measure NA the row has
+    no non-index data left, so ``_finalize_result``'s universal
+    ``dropna(how='all')`` safety-net then removes it outright.  The conflicting
+    harvest is therefore DROPPED from the API -- deliberately, and LOUDLY (the
+    warning below), instead of being dropped silently by groupby().first() while
+    a number nobody can justify is served in its place.  That is the whole point:
+    class-2 (loudly MISSING) beats class-1 (silently WRONG).  Affected: 19 keys
+    in 2011-12, 740 in 2021-22.
+
+    The result is a unique index, no SILENT drops, and no invented totals.
+    """
+    idx = ['t', 'i', 'plot', 'crop', 'u']
+    if not df.duplicated(idx).any():
+        return df
+
+    # (1) exact re-entries: identical on the key AND on every measure.
+    measures = [c for c in _CROP_MEASURES if c in df.columns]
+    before = len(df)
+    df = df.drop_duplicates(subset=idx + measures, keep='first')
+    n_exact = before - len(df)
+
+    # (2) whatever still shares a key is a genuine CONFLICT.
+    conflict = df.duplicated(idx, keep=False)
+    n_conflict_rows = int(conflict.sum())
+    n_conflict_keys = int(df.loc[conflict, idx].drop_duplicates().shape[0]) if n_conflict_rows else 0
+    if n_conflict_rows:
+        # Keep one row per key, but refuse to guess its measures.
+        keep_one = df[conflict].drop_duplicates(subset=idx, keep='first').copy()
+        for c in measures:
+            keep_one[c] = pd.NA
+        df = pd.concat([df[~conflict], keep_one], ignore_index=True)
+        warnings.warn(
+            f"Niger crop_production {t}: {n_conflict_keys} (i, plot, crop, u) "
+            f"key(s) are reported on {n_conflict_rows} source lines whose "
+            f"measures DISAGREE, and the source carries nothing that resolves "
+            f"them (2011-12's `as02eq0` is a bare line counter; 2021-22 has no "
+            f"line id at all).  DROPPING these harvest records (measures set to "
+            f"NA, which _finalize_result's dropna(how='all') then removes) "
+            f"rather than picking one line (silently wrong) or summing them "
+            f"(double-counts the exact re-entries).  These {n_conflict_keys} "
+            f"harvests are MISSING from the API, deliberately and loudly.  "
+            f"Resolving them needs the questionnaire.  GH #323."
+        )
+    if n_exact:
+        warnings.warn(
+            f"Niger crop_production {t}: dropped {n_exact} EXACT duplicate "
+            f"source line(s) (same key, identical measures -- a re-entry). "
+            f"GH #323."
+        )
     return df
 
 
@@ -604,7 +791,62 @@ def _finish_plot_inputs(df, t):
     keep = ['t', 'i', 'input', 'crop', 'u',
             'Quantity', 'Purchased', 'Quantity_purchased']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
+
+    # SEED-SLOT COLLAPSE (GH #323).  Why the tail SUMS within
+    # (t, i, input, crop, u) -- exactly the _finish_livestock sub-type story.
+    #
+    # The ECVMA input roster gives seed SEVEN questionnaire slots: raw
+    # AS02CQ02 codes 11..17 all carry the IDENTICAL Stata value label
+    # 'Semences', which harmonize_input then maps to the single input label
+    # 'Seed'.  The slot number is a questionnaire artifact, not a semantic
+    # dimension (it is not a seed variety or a source -- it is just "the
+    # crop's row on the form"), and the canonical plot_inputs index has no
+    # slot level.  A household that planted one crop's seed from several
+    # slots therefore lands several rows on ONE index key:
+    #
+    #     GRAPPE=38 MENAGE=16: Semences/crop 1/unit 3 -> 5, 20 and 25 Tiya
+    #
+    # The source is UNIQUE on its true key -- (hh, raw CODE, crop, unit)
+    # gives 8179 of 8179 rows in 2014-15 -- so these are NOT source
+    # duplicates; the collision is MANUFACTURED by the many-to-one label.
+    # Left alone, _normalize_dataframe_index collapsed them with
+    # groupby().first(), keeping ONE slot and silently discarding the rest
+    # (45 rows in 2014-15, 73 in 2011-12) -- i.e. reporting 5 Tiya of seed
+    # where the household reported 50.
+    #
+    # Quantity / Quantity_purchased are ADDITIVE at this grain (same
+    # household, same input, same crop, same unit), so the information-
+    # preserving reduction is SUM, not first().  This does not double-count:
+    # each slot is a distinct reported line with its own quantity.
+    # `Purchased` is a flag, so it reduces with ANY (the household bought
+    # seed for this crop if it bought it in any slot).  After the sum the
+    # (t, i, input, crop, u) index is UNIQUE, so no row is lost to the
+    # framework's canonical-index de-dup collapse.
+    #
+    # This is a no-op for rows that already sit alone on their key -- which
+    # is every non-seed input row, and (post-2026-07 injective residual
+    # labels, see categorical_mapping.org) nearly every EHCVM seed row.
+    idx = ['t', 'i', 'input', 'crop', 'u']
+    if df.duplicated(idx).any():
+        n_extra = int(df.duplicated(idx).sum())
+        agg = {}
+        if 'Quantity' in df.columns:
+            agg['Quantity'] = 'sum'
+        if 'Quantity_purchased' in df.columns:
+            agg['Quantity_purchased'] = 'sum'
+        if 'Purchased' in df.columns:
+            agg['Purchased'] = 'any'
+        before = len(df)
+        df = df.groupby(idx, observed=True, dropna=False).agg(agg).reset_index()
+        warnings.warn(
+            f"Niger plot_inputs {t}: {n_extra} reported input line(s) shared an "
+            f"index key (t, i, input, crop, u) -- the questionnaire's seven "
+            f"'Semences' slots all harmonize to input='Seed'.  SUMMED the "
+            f"additive quantities ({before} -> {len(df)} rows) rather than "
+            f"letting the framework keep one and drop the others (GH #323)."
+        )
+
+    df = df.set_index(idx)
     return df
 
 

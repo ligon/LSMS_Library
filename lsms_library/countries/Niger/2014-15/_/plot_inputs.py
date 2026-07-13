@@ -11,9 +11,12 @@ layout as 2011-12 but UPPERCASE columns:
   AS02CQ08A quantity purchased (native purchased-unit, AS02CQ08B)
 
 Only the rows the household actually applied are reported inputs, so we
-keep AS02CQ03==1.  i is built from (GRAPPE, MENAGE) via niger.i (matching
-this wave's sample / roster / crop_production idxvars, which omit
-EXTENSION).  No plot column; grain is (t, i, input, crop, u).
+keep AS02CQ03==1.  i is built from the FULL ECVMA-II household key
+(GRAPPE, MENAGE, EXTENSION) via niger.i, matching this wave's sample /
+roster / crop_production idxvars (GH #323).  EXTENSION is NOT optional:
+59 (GRAPPE, MENAGE) pairs host two distinct households.
+
+No plot column; grain is (t, i, input, crop, u).
 """
 import sys
 
@@ -37,8 +40,8 @@ applied = srcn['AS02CQ03'] == 1
 src = src[applied.values]
 srcn = srcn[applied.values]
 
-hh = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                           index=['GRAPPE', 'MENAGE'])), axis=1)
+hh = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                           index=['GRAPPE', 'MENAGE', 'EXTENSION'])), axis=1)
 
 # purchased: AS02CQ07 1 = Oui -> True, 2 = Non -> False (9 Manquant -> NA)
 purchased = srcn['AS02CQ07'].map({1: True, 2: False})
