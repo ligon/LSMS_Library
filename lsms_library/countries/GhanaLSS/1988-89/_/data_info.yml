@@ -1,12 +1,43 @@
 Country: GhanaLSS
 Wave: 1988-89
 
-cluster_features:
-    file: Y01A.DAT
-    idxvars:
-        v: CLUST
-    myvars:
-        Region: REGION
+# cluster_features: DELIBERATELY NOT WIRED (GH #323).
+#
+# This wave has NO cluster-level region variable.  The block that used to live
+# here read `Region: REGION` from Y01A.DAT -- but Y01A.DAT is the PERSON-LEVEL
+# ROSTER (14,924 persons / 3,192 households / 170 clusters) and its REGION column
+# is the person's REGION OF BIRTH, not the cluster's region.  Four independent
+# strands establish this:
+#
+#   1. The same column of the same file is ALSO mapped, correctly, as the
+#      roster's `Birthplace: REGION` below -- and mapping.py's Region() and
+#      Birthplace() are literally the same function body over the same
+#      region_dict.
+#   2. The `region` code list in this wave's categorical_mapping.org runs 1..17
+#      and includes 11=Nigeria, 12=Ivory Coast, 13=Togo, 14=Burkina Faso,
+#      15=Mali, 16=Other Africa.  A Ghanaian enumeration area cannot be located
+#      "in Nigeria"; only a BIRTHPLACE can take those values.
+#   3. REGION varies WITHIN a household in 1,019 of 3,192 households, with up to
+#      6 distinct values in a single household.  No household straddles 6
+#      regions; its members can be BORN in 6.  (It varies within a CLUSTER in
+#      167 of 170 clusters.)
+#   4. Y01A.DCT's variable order -- MAR, SCOHAB, SID, REGION, NAT (nationality),
+#      LODGE, MON, MEMB -- is the classic birthplace->nationality questionnaire pair.
+#
+# Because the declared cluster_features index is (t, v), the framework collapsed
+# these 14,924 person-rows to 170 clusters via groupby().first(), which silently
+# took the birth-region of the FIRST-LISTED PERSON of the FIRST-LISTED HOUSEHOLD
+# and called it the cluster's region.
+#
+# There is no valid substitute: a sweep of all 93 .DAT files in this wave's Data/
+# found no cluster-invariant region-like column, and CLUST does not encode region.
+# Taking the cluster's MODAL birthplace would be a guess that fails precisely
+# where it matters (migrant-receiving clusters: Greater Accra, mining/cocoa
+# areas), so we DROP the column rather than fabricate one: silently MISSING
+# (class-2) is strictly safer than silently WRONG (class-1).
+#
+# Re-adding `Region: REGION` here would restore the defect.  Pinned by
+# `tests/test_ghanalss_cluster_features_gh323.py`.
 
 sample:
     file: Y00A.DAT
