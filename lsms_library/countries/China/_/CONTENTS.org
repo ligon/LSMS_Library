@@ -51,8 +51,96 @@ Counties 1--3 map to Province 7 (Hebei); counties 4--6 to Province 8
 ** sample
 ** cluster_features
 ** household_roster
+** individual_education
+** plot_features
 
 * Known data issues
+
+** GH #323 — declared indexes were being silently collapsed (fixed 2026-07-12)
+
+Three China tables handed a NON-UNIQUE declared index to
+=_normalize_dataframe_index=, which collapsed it with =groupby().first()=
+and dropped the surplus rows.  2979 rows in total.  Both root causes are
+now fixed AT THE SOURCE, so no collapse is reached; each fix additionally
+*asserts* its invariant (see =China/_/china.py=), because a comment in a
+CONTENTS.org is documentation, not enforcement.
+
+Note this was value-lossless for China: the API returns byte-identical
+frames before and after.  The fix removes the *mechanism*, not a wrong
+number — the collapse was correct only by luck, and =groupby().first()= is
+column-wise first-non-null, so it can splice two different people into one
+fabricated row.
+
+*** cluster_features — 2972 of 3002 rows — extraction bug
+
+=cluster_features= is a VILLAGE-level table (index =(t, v)=) but was
+extracted from =S01A2.DTA=, the PERSON-level household roster, with
+=idxvars: {i: hid, v: [hid]}=.  Every one of the 3002 people emitted a
+village row for 30 villages — a 100x redundant extraction.  The surplus was
+then collapsed away by =Wave.cluster_features='s un-warned
+=groupby().first()= (GH #161), which fires whenever =i= is in the index —
+so this one never even produced the #323 warning.
+
+It survived only because the sole column, =Region=, happens to be a
+deterministic function of the index.  Now extracted at household grain from
+=TOTEXP.DTA= (787 rows, the same file =sample= reads) with no =i= in
+idxvars, and reduced to one row per village by the =cluster_features= hook,
+which asserts =(t, v)= is unique — i.e. that =Region= really is
+single-valued within a village.
+
+*** Why NOT NPT0101.DTA (the community questionnaire)
+
+=NPT0101.DTA= is a genuine one-row-per-village file (31 rows) with real
+=prov=/=county=/=town=/=village= columns, and would be the principled
+source.  It is NOT usable: its village codes cannot be linked to the
+household-derived =v=, and the link is not recoverable.
+
+- *The two codings are different schemes.*  NPT0101 codes a village as a
+  4-digit prov-prefixed hierarchy (7111 = prov 7 / county 71 / town 711 /
+  village 7111) and *encodes a town*.  =hid='s town digit is *always 0*
+  (see PSU identification above) — the household file carries no town at
+  all.  There is no arithmetic bridge.
+- *No crosswalk exists in the data.*  No file in the wave carries both
+  =hid= and a geography column (verified across all 90+ =.DTA= files).
+- *It cannot be inferred.*  Sample size per village is fixed by design (the
+  "main village" of each county gets 50 households, the others 20) and is
+  uncorrelated with NPT0101's village population (=bi1a=, range 127–1034),
+  so there is no signal to align the two lists on.
+- *It is ambiguous regardless.*  County 83 has SIX villages in NPT0101 but
+  only five appear in the household data, so at least one NPT0101 village
+  has no sampled households — and nothing identifies which.
+
+Adopting NPT0101 would therefore require a positional GUESS at the village
+crosswalk.  We decline to guess.  =Region= is unaffected by any of this:
+province is constant within a county, so it does not depend on the
+village-level correspondence at all.
+
+*** household_roster (4 rows) + individual_education (3 rows) — genuine duplicates
+
+Exactly two households carry a repeated =pid=:
+
+- *hid 30132* — the entire 3-person household is recorded TWICE,
+  byte-identically, in =S01A2.DTA= (roster) *and* =S02.DTA= (education).
+  The same whole-household duplicate RECORD also produces its duplicate
+  plot rows in =S05B.DTA= (GH #513), so it is one source defect spanning
+  three modules.  Exact-duplicate removal is lossless: 3 roster rows + 3
+  education rows.
+- *hid 10108* — the daughter-in-law is filed both as =pid 4= and,
+  mis-keyed, as =pid 3=, colliding with the son (the real pid 3).  The
+  spurious row is byte-identical to the pid-4 row on all 14 non-pid
+  columns, and =S02.DTA= independently lists exactly four members (pid
+  1,2,3,4).  The household has 4 people; the mis-keyed copy is dropped as a
+  documented, narrowly-scoped source erratum.  1 row.
+
+The mis-keyed rule is deliberately NOT generalised to "drop within-household
+duplicate persons matching on all non-pid columns" — that would silently
+delete IDENTICAL TWINS.  It additionally requires a real =(i, pid)=
+collision (twins carry distinct pids, so they never match) and asserts the
+affected keys are exactly the ones documented above.  Any *other* residual
+collision RAISES rather than being absorbed: loudly missing beats quietly
+wrong.
+
+** Other known data issues
 
 ** interview_date — not available (2026-06-06)
 The China 1995-97 survey carries no household-level interview-date field.
