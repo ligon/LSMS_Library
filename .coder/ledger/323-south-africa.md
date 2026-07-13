@@ -105,6 +105,30 @@ in their declared index, so it is never collapsed. Confirmed empirically (Malawi
 pass in both are the backward-compat guards (undeclared collapse still warns; a
 policy naming a *declared* level stays inert).
 
+Regression subset (all green on the fix branch):
+
+| file | result |
+|---|---|
+| `test_declared_aggregation` | 7 passed |
+| `test_normalize_index_j_preserved` | 3 passed — the *other* guard on the very function changed |
+| `test_add_market_index_dedup` | 3 passed |
+| `test_schema_consistency` | **218 passed** |
+| `test_feature` | 20 passed |
+| `test_canonical_shape_via_cache_miss` | 5 passed |
+
+**GH #589** (`test_currency.py::test_feature_ghana_per_wave`) fails **identically**
+pre- and post-fix — same assertion, character for character:
+`AssertionError: assert ['GHC'] == {'GHC'}`. Compared apples-to-apples by stashing
+in *this* tree (`diff` reported a delta only on the wall-clock line: 220 s cold vs
+34 s warm). Pre-existing; not touched.
+
+**Caveat — full suite not obtained.** `pytest tests/` in one process is
+**OOM-killed** (exit 137) on this node; that is an environment limit, unrelated to
+this change. It was run file-by-file instead (above). The decisive regression
+evidence is the §5 static gate, which is stronger than a green suite: 399 of 400
+tables cannot reach the new branch at all, and when `reducers` is empty control
+falls through to the original `elif present_additive:` / `else:` bodies verbatim.
+
 ## §7 Environment note (worth propagating)
 
 CLAUDE.md says "`PYTHONPATH` alone does NOT redirect imports to a worktree." The
