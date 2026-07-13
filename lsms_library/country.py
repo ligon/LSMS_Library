@@ -1172,14 +1172,57 @@ class Wave:
         # for GPS.  The result then has HH grain (one row per
         # household) instead of the canonical ``(t, v)`` cluster
         # grain documented in ``data_scheme.yml``.  Collapse with
-        # ``.first()`` for non-GPS columns (Region/Rural/District are
-        # invariant within a cluster by construction of the LSMS-ISA
-        # sampling design) and ``.mean()`` for Latitude/Longitude
-        # (HH-level GPS approximated as the cluster centroid).
-        # GH #161.
+        # ``.first()`` for non-GPS columns and ``.mean()`` for
+        # Latitude/Longitude (HH-level GPS approximated as the cluster
+        # centroid).  GH #161.
+        #
+        # GH #323: this collapse used to justify itself with "Region/Rural/
+        # District are invariant within a cluster by construction of the
+        # LSMS-ISA sampling design".  That premise is FALSE for panel
+        # follow-ups, and when it fails ``.first()`` does not merely drop
+        # redundant rows -- it hands one household's value to the whole
+        # cluster.  Albania 2004 is the worked example: ``m0_distr`` is the
+        # household's CURRENT district while the PSU code is its ORIGINAL
+        # one, so a cluster containing a household that moved to Tirana was
+        # relabelled to whatever the first row happened to say (6 clusters
+        # got the wrong district; two administrative sentinel "PSUs" pooled
+        # 83 households across 23 districts into 2 fabricated clusters).
+        #
+        # Crucially this collapse happens BEFORE ``_normalize_dataframe_index``,
+        # so the #323 duplicate-collapse warning there NEVER fires for
+        # cluster_features -- in ANY country.  The reduction stays as-is (it is
+        # correct wherever the invariance really holds, and changing the reducer
+        # would move data in countries not under review), but it is no longer
+        # SILENT where it is actually destroying information: a non-constant
+        # column within a cluster is now surfaced.  Silently WRONG is the worst
+        # failure mode; being told is the minimum.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
             if df.columns.size:
+                counts, examples = {}, {}
+                for c in df.columns:
+                    if c in ('Latitude', 'Longitude'):
+                        continue  # mean() is a declared aggregation, not a loss
+                    s = df[c]
+                    if isinstance(s.dtype, pd.CategoricalDtype):
+                        s = s.astype(str).replace({'nan': pd.NA, 'None': pd.NA})
+                    nu = s.groupby(level=keep_levels, observed=True).nunique(dropna=True)
+                    bad = nu[nu > 1]
+                    if len(bad):
+                        counts[c] = int(len(bad))  # the TRUE count, never truncated
+                        examples[c] = sorted(map(str, bad.index.tolist()))[:5]
+                if counts:
+                    warnings.warn(
+                        f"{self.name} cluster_features: collapsing the household "
+                        f"level with .first() is DISCARDING information -- "
+                        f"{counts} cluster(s) carry more than one distinct value for "
+                        f"that column, so each such cluster is assigned whichever "
+                        f"value happened to come first (GH #323).  A cluster attribute "
+                        f"that varies within its own cluster is not a cluster "
+                        f"attribute: the wave needs an explicit reducer (see "
+                        f"Albania/_/albania.py:cluster_reduce).  Examples: {examples}",
+                        RuntimeWarning,
+                    )
                 agg = {
                     c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
                     for c in df.columns

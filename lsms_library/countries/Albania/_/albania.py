@@ -21,6 +21,8 @@ a WIDE household-level farm questionnaire with cryptic, undocumented column
 labels ("1 m8a_q03", ...) and no decodable per-plot area / plot identity, so
 they are intentionally NOT wired (see CONTENTS.org).
 """
+import warnings
+
 import pandas as pd
 import lsms_library.local_tools as tools
 
@@ -295,3 +297,76 @@ def plot_features_for_wave(t, src, colmap):
         out = out.set_index(['t', 'i', 'plot_id'])
 
     return out
+
+
+# ---------------------------------------------------------------------------
+# cluster_features: explicit, CHECKED reduction to cluster grain (GH #323)
+# ---------------------------------------------------------------------------
+
+# The 2004 panel follow-up reuses the ORIGINAL 2002 PSU code in m0_q01 for every
+# traced household, plus two ADMINISTRATIVE sentinels that are not clusters at
+# all.  Verified against 2002 (see CONTENTS.org / .coder/ledger/323-albania.md):
+# 0 of the 83 sentinel households key into 2002's (psu, hh), whereas 1713 of the
+# 1714 real ones do.
+ALBANIA_2004_SENTINEL_PSUS = (995, 999)
+
+
+def cluster_reduce(df, columns, v='v', wave=None):
+    """Reduce a household-/person-grain frame to CLUSTER grain, with a CHECK.
+
+    ``cluster_features`` is declared at cluster grain -- index ``(t, v)`` -- but
+    every Albania wave extracts it from a household cover page (2003: from the
+    *person* roster).  The extra household level then reaches
+    ``_normalize_dataframe_index``, which drops it and collapses the leftover
+    duplicate ``(t, v)`` tuples with ``groupby().first()``: a SILENT reduction
+    that discards 3,149 / 8,229 / 1,347 / 3,360 rows in 2002 / 2003 / 2004 /
+    2005 and, in 2004, silently picked a *mover household's* current district as
+    the cluster's district (GH #323).
+
+    This makes the reduction explicit and enforced, rather than implicit and
+    silent:
+
+    - a row whose cluster id ``v`` is null is DROPPED (you cannot key a cluster
+      row on a null cluster id) -- with a warning saying how many;
+    - a declared column must carry exactly ONE distinct non-NA value within a
+      cluster.  A cluster that violates this gets ``<NA>`` for the offending
+      column and a ``RuntimeWarning`` naming the clusters.  Emitting a value we
+      cannot justify would be silently WRONG (class-1); ``<NA>`` is merely
+      silently MISSING (class-2), which is strictly safer.
+
+    Returns a frame indexed by ``v`` with exactly ``columns``, one row per
+    cluster, and a provably unique index.
+    """
+    tag = f"Albania/{wave} cluster_features" if wave else "Albania cluster_features"
+    out = df.copy()
+
+    n0 = len(out)
+    out = out[out[v].notna()]
+    if len(out) < n0:
+        warnings.warn(
+            f"{tag}: dropped {n0 - len(out)} source row(s) with a null cluster "
+            f"id ({v}); a cluster row cannot be keyed on a null cluster id "
+            f"(GH #323).",
+            RuntimeWarning,
+        )
+
+    for col in columns:
+        # nunique(dropna=True): a cluster mixing a value with NA is fine (the
+        # value wins); a cluster mixing two VALUES is not.
+        bad = out.groupby(v, observed=True)[col].nunique(dropna=True)
+        bad = bad[bad > 1]
+        if len(bad):
+            warnings.warn(
+                f"{tag}: {len(bad)} cluster(s) carry more than one distinct "
+                f"{col!r}; emitting <NA> for them rather than silently picking "
+                f"one (GH #323).  Clusters: {sorted(bad.index.tolist())[:20]}",
+                RuntimeWarning,
+            )
+            out.loc[out[v].isin(bad.index), col] = pd.NA
+
+    # Every (v, col) is now single-valued, so `first` cannot discard information.
+    reduced = (out.groupby(v, observed=True)[list(columns)]
+                  .first()
+                  .rename_axis(index='v'))
+    assert reduced.index.is_unique, f"{tag}: cluster index not unique after reduce"
+    return reduced

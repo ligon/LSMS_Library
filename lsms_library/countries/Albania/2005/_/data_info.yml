@@ -13,14 +13,12 @@ individual_education:
             - m2b_q04
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
-cluster_features:
-    file: ../Data/identification_cl.dta
-    idxvars:
-        v: m0_q00
-        i: m0_q01
-    myvars:
-        Region: m0_stratum
-        Rural: m0_ur
+# cluster_features: NOT built here.  It is CLUSTER grain (index (t, v)) but the
+# only source in this wave is household/person grain, so a YAML extraction had to
+# declare an extra household idxvar -- which the framework then silently collapsed
+# with groupby().first() (GH #323).  It is now built by _/cluster_features.py
+# (materialize: make in ../../_/data_scheme.yml), which reduces to cluster grain
+# EXPLICITLY and CHECKS that each cluster carries one distinct value per column.
 
 household_roster:
     # i=[m0_q00,m0_q01] -> composite via mapping.py:i() ('m0_q00-m0_q01') to

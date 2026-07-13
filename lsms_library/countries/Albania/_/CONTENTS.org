@@ -40,3 +40,75 @@ This is the 2004 / ~interview_date~ / ~subjective_well_being~ idiom (composite ~
 no ~v~ declared) which matches sample at 0% orphans.
 
 Tracked in GitHub issue #340.
+
+* cluster_features: cluster grain, and why 2004 needed a semantic fix (GH #323)
+
+~cluster_features~ is CLUSTER grain -- index ~(t, v)~ -- but every Albania wave's
+only source is HOUSEHOLD grain (2003's is the PERSON roster).  The waves used to
+extract it via YAML while declaring an extra household ~idxvars~ entry that is not
+part of the declared index; the framework dropped that level and collapsed the
+leftover duplicate ~(t, v)~ tuples with ~groupby().first()~, SILENTLY discarding
+3,149 / 8,229 / 1,347 / 3,360 source rows in 2002 / 2003 / 2004 / 2005.
+
+It is now built by per-wave ~_/cluster_features.py~ scripts (~materialize: make~)
+which reduce to cluster grain via ~albania.cluster_reduce~.  That reducer REQUIRES
+exactly one distinct non-NA value per (cluster, column) and emits ~<NA>~ plus a
+~RuntimeWarning~ otherwise -- silently MISSING is strictly safer than silently
+WRONG.  Merely deleting the extra ~i:~ would NOT have been enough: the rows stay
+household-grain and would still be collapsed silently.
+
+Cluster counts: 2002 = 450, 2003 = **449**, 2004 = **448**, 2005 = 480.
+
+- 2003 is 449, not 450: 711 person rows carry a NULL PSU, and a cluster row cannot
+  be keyed on a null cluster id.  The old silent collapse emitted them as a
+  ~v = NaN~ cluster.
+- 2002 / 2003 / 2005 were value-preserving (0 clusters carry >1 distinct value), so
+  for those three this is a pure no-op refactor -- a silent collapse turned into a
+  checked one.
+
+** 2004 was silently WRONG, not merely redundant
+
+~m0_q01~ is the household's ORIGINAL 2002 PSU (1,713 of the 1,714 non-sentinel
+~(m0_q01, m0_q02)~ keys exist in 2002's ~(psu, hh)~), but ~m0_distr~ is the
+household's CURRENT district.  A household that MOVED keeps its original PSU code
+and acquires a new district, so ~.first()~ handed a mover's district to the whole
+cluster.  ~m0_orhh~ does NOT identify the movers (every conflicted household is
+flagged 'yes' = original), so the wave carries no internal signal that recovers a
+cluster's district.
+
+~Region~ is therefore anchored on the 2002 psu -> district map (verified
+single-valued for all 450 PSUs), translated into 2004's district NAMES via a
+code -> name map learned only from PSUs that are unanimous AND hold >= 2 households
+(36 codes -> 36 names, 0 ambiguous).  The ">= 2 households" guard is essential:
+49 of the 448 real PSUs hold a single household, and a lone mover makes its PSU
+look perfectly "unanimous".  PSU 223 is exactly that -- one household, reported
+ELBASAN, truly GRAMSH -- and NO within-2004 consistency check can see it.
+
+Majority vote was rejected: it fails outright on PSUs 43 / 44 / 47 / 52 / 53, each
+a 1-vs-1 KUKES/TIRANE tie that ~first()~ only "resolves" by source row order.  All
+five are 2002 district code 17 = KUKES.
+
+Region corrected on 6 clusters: 16 (DURRES -> SHKODER), 223 (ELBASAN -> GRAMSH),
+259 (FIER -> MALLAKASTER), 280 (TIRANE -> SKRAPAR), 297 (KOLONJE -> KORCE), 344
+(SARANDE -> TEPELENE).  The source district names are mojibake -- Korce appears as
+both ~KORCE~ and ~KOR\x80E~ (a mis-decoded C-cedilla) -- and are normalized.
+
+** The 995 / 999 sentinels are not clusters
+
+~m0_q01~ in {995, 999} are administrative codes: 995 = 39 split-off / new
+households (all ~m0_orhh~ = 'no'), 999 = 44 original households that moved or could
+not be traced (all 'yes').  NONE of the 83 keys into 2002's ~(psu, hh)~.  They used
+to be promoted into 2 fabricated cluster rows -- both labelled ~BERAT~, pooling 83
+households across 23 districts.  They are excluded from ~cluster_features~, and
+~2004/_/sample.py~ now emits ~v = <NA>~ for those households rather than citing
+995/999 as genuine cluster ids.  The households are KEPT (they are real, weighted
+households); only their unknown cluster id is dropped.
+
+** Region is NOT comparable across Albania's waves
+
+A pre-existing wart, unchanged here and worth knowing before pooling: 2002 Region
+is a district CODE (36 values), 2003 is STRATUM (16), 2004 is a district NAME (36),
+2005 is ~m0_stratum~ (4: Central / Coastal / Mountain / Tirana).  ~Rural~ is
+declared but only extractable for 2002 and 2005 -- the 2003 and 2004 sources carry
+no urban/rural column at all.  ~Feature('cluster_features')~ therefore stacks four
+different meanings of "Region" into one column.
