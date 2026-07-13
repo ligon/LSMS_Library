@@ -2,10 +2,19 @@ Country: Serbia and Montenegro
 Wave: 2003
 
 cluster_features:
+    # GH #323.  Sourced from the PERSON-level demography file (one row per
+    # (mesto, rbd, clan)); `stratum`/`tip` are cluster-constant attributes
+    # replicated onto every person record.  The `cluster_features(df)` hook in
+    # `_/serbia and montenegro.py` reduces this to one row per cluster and
+    # RAISES if the payload is not invariant within `v` -- so the declared
+    # (t, v) index is unique by construction and the framework never has to
+    # collapse it.  There is deliberately no `i`: a cluster table has no
+    # household dimension, and bare `rbd` is not a household key anyway (it is
+    # 1..11, the within-cluster household number; the real key is the
+    # composite [mesto, rbd] that household_roster/sample declare).
     file: "../Data/2003 1 demography.dta"
     idxvars:
         v: mesto
-        i: rbd
     myvars:
         Region: stratum
         Rural:
