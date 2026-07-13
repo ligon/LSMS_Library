@@ -134,7 +134,44 @@ Two API counts are *not* caused by #323 and are deliberately left alone:
 - education 3,190: `bw003_` is NaN for 4,033 persons (no post-secondary
   attainment recorded) — pre-existing NaN drop, not an index collapse.
 
-## 9. Residual / not done
+## 9. Regression: proof nothing else moved
+
+**Logical (covers all 40 countries).** The new reducer runs only when
+`_declared_aggregation()` returns a *scalar*. Across **all 419 tables in all 40
+countries**, exactly **4** resolve to a scalar policy — Kazakhstan's. Everywhere
+else the branch is unreachable and the original statements execute verbatim.
+`_SCHEME_SKIP_KEYS` has a single consumer (`_enforce_declared_dtypes`), guarded
+by `col not in df.columns`; no table has a column named `aggregation`, so adding
+the key is a strict no-op.
+
+**Empirical (cold, vs the TRUE base `d572d8a9`).** 26 tables chosen to cover
+every path the change can reach — 9 `cluster_features` (the `Wave` i-collapse),
+7 mapping-form `interview_date` (the legacy `aggregation:` shape), 6
+duplicate-index tables in *other* countries (live #323 cells), and Kazakhstan's 4:
+
+    tables compared : 26
+    IDENTICAL       : 25
+    CHANGED         : 1
+      Kazakhstan/cluster_features   135:e8c3361d8301d7b2 -> 135:f07a6a5dfb1eb4b6
+
+The single change is the intended one (same 135 rows; the cluster-126 `Rural`
+flip). Kazakhstan's `sample` / `household_roster` / `individual_education` hash
+**identically** — their collapse was already value-preserving, so only the
+*enforcement* changed, not the values. Other countries' #323 cells (Guyana,
+Kosovo, Malawi, Niger) are untouched: they belong to their own fix agents.
+
+Three instrument failures were caught and fixed before any result was trusted:
+`yaml.safe_load` choking on the `!make` tag (silently zeroed all of Mali); a
+`pgrep` that matched *other agents'* pytest; and a probe DataFrame built from
+Series with a mismatched index, which pandas reindex-aligned to almost all-NaN
+(this one briefly made the `unique` guard *look* vacuous — it is not).
+
+**Baseline drift.** The main checkout has advanced 7 commits past this branch's
+base (incl. `c8c25f68`, a spellings fix that changes data in 5 countries).
+Comparing against it manufactured spurious diffs, so BEFORE was rebuilt from a
+detached worktree at `d572d8a9`.
+
+## 10. Residual / not done
 
 **The default is still `first()` + warning.** The #323 umbrella calls for the
 default on an *undeclared* non-unique index to become a hard ERROR. Flipping it
