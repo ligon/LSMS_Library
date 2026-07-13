@@ -98,8 +98,41 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 # Motivating case (GH #501): GhanaLSS food_acquired carries a per-visit level
 # (~12 repeated visits over a month); CONTENTS.org states the visits are summed.
 # Keeping first() there silently kept only ~48% of total Quantity.
+#
+# This is the ONE reduction policy core keeps (see the NO-AGGREGATION-IN-CORE
+# contract in SkunkWorks/grain_aggregation_policy.org and D1 of
+# slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org).  It is legitimate only
+# where the sum is provably LOSSLESS for the named column.  It is read from BOTH
+# collapse sites: _collapse_duplicate_index below (Feature, cross-country) and
+# country._normalize_dataframe_index (Country, per-table) -- so a table listed
+# here is summed consistently on both access paths.  Do NOT add a column here to
+# paper over a broken identifier or a missing index level: duplicates on a
+# declared index usually mean the GRAIN IS WRONG, and a reducer would only put a
+# signature on the corpse (D1).  Add a column only when the sum reconstructs
+# exactly the quantity the coarser grain is DEFINED as.
+#
+# assets (GH #323): Nigeria W2's `sect5b_plantingw2` is a PER-UNIT ROSTER -- one
+# row per individual unit owned, enumerated by `item_seq` (1..15), each with its
+# own reported Value.  The canonical assets grain is (t, i, j), so those rows
+# arrive as duplicates and first() kept ONE UNIT and discarded the rest:
+# N576,299,043 true -> N429,001,558 kept -> N147,297,485 (25.6%) DESTROYED, in
+# EACH of t=2012Q3 and t=2013Q1.  Summing Value is exactly lossless: the value of
+# a household's holding of item j IS the sum over the units it owns (hh 10001
+# owns 4 beds worth 7000+3000+6000+5000 = 21,000).
+#   * `Quantity` must stay first(): it comes from the SEPARATE, already-clean
+#     sect5a grid (one row per (i, j)) and the wave's `dfs:` merge REPEATS it
+#     across the item_seq rows -- verified, 0 groups where it varies.  Summing it
+#     would multiply the unit count by itself (4 beds -> 16).
+#   * `Age` also stays first().  It is genuinely per-unit (it varies within 7,029
+#     groups), so NO reducer is lossless at (t, i, j) -- the four beds are 10, 6,
+#     10 and 6 years old and that fact cannot be carried by one row.  first()
+#     keeps unit #1's age.  Retaining the detail needs the `item_seq` level to
+#     survive, which it currently cannot: the extra idxvar is dropped by the
+#     `dfs:` merge in Wave.grab_data (#323 Site 4), and Nigeria's other waves
+#     have no item_seq column to declare.  Tracked as a residual, not fixed here.
 _ADDITIVE_MEASURE_COLUMNS = {
     "food_acquired": ("Quantity", "Expenditure"),
+    "assets": ("Value",),
 }
 
 
