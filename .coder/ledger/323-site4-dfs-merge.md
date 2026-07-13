@@ -140,7 +140,39 @@ Verified end-to-end: **this core + `fix/323-ethiopia`'s config = all 5 waves
 clean**, 0 cartesians, 0 required-column errors, and `merge_how: left` honoured
 (merged rows == left rows exactly, in all five).
 
-## §9 Open questions for the human
+## §9 The suite is green, and the green is NOT proof
+
+Full suite: **3 failed, 3546 passed, 128 skipped** — and the 3 are exactly the
+3 pre-existing failures (`test_currency::test_feature_ghana_per_wave`,
+`test_table_structure::*[CotedIvoire/cluster_features]` ×2). **Zero new
+failures.**
+
+That green does not mean what it appears to mean, and the reason is #323's own
+pathology. Verified by direct API call on a warm cache:
+
+```
+Country('Ethiopia').cluster_features()  -> RuntimeError
+Country('Nigeria').cluster_features()   -> RuntimeError
+Country('Niger').cluster_features()     -> RuntimeError
+```
+
+The suite does not see it, for two different reasons:
+
+- **Ethiopia, Niger** — `test_table_structure` enumerates `var/*.parquet` and
+  reads them with `pd.read_parquet`, by its own stated contract ("only test what
+  is already cached"). It **never rebuilds and never checks the cache hash**.
+  Both countries still carry a `cluster_features.parquet` written *yesterday by
+  the pre-change code* (mtime 2026-07-12 21:16). The test reads the old file and
+  passes.
+- **Nigeria** — has **no** cached `cluster_features.parquet` at all, so the cell
+  is simply absent from `_find_cached_parquets()` and drops out of the test
+  matrix silently. Not tested, not reported.
+
+This is the same sentence the design note opens with: *the bug hid behind the
+cache that the bug poisoned.* Here it is hiding my own change's blast radius.
+**Do not read the green tick as clearance for these three countries.**
+
+## §10 Open questions for the human
 - **Sequencing.** The required-column hard error makes `cluster_features()` raise
   for **Ethiopia, Nigeria and Niger** until their configs are fixed. All ten are
   true positives on real, pre-existing bugs, and the fixes are one-liners — but
