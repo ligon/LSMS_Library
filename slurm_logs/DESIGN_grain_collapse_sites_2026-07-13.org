@@ -208,10 +208,60 @@ are cheap.
 
 Uganda is the largest of the three and is two independent sites ---
 =people_last7days= carries two rows per household with different member counts
-(about half of each affected wave is destroyed), and =cluster_features= is a
-Site-2 case: households in a cluster disagree on Latitude/Longitude, and
-=first()= can keep an all-NaN row while discarding the row that has the real
-coordinates.
+(about half of each affected wave is destroyed), and =cluster_features=, where
+households in a cluster disagree on Latitude/Longitude.  Both of Uganda's
+figures above are *Site 1*, not Site 2 --- see the corrections below.
+
+* Corrections (2026-07-13, after implementation)
+
+Two claims above were measured and found WRONG.  They are left in place, struck
+here rather than silently rewritten, because how they were wrong is instructive.
+
+** =first()= does not keep a row.  It FABRICATES one.
+
+I wrote that =first()= "can keep an all-NaN row while discarding the row that has
+the real coordinates."  That is false, and so is the same claim in #614's own
+=_audit_index_collapse= docstring (the =Burkina_Faso/shocks= example).
+
+=groupby().first()= skips NA *per column* --- it takes the first NON-NULL value of
+each column INDEPENDENTLY.  So a conflicting cluster does not collapse to one of
+its member households.  It collapses to a *composite* row, assembled column by
+column from different households: a record that exists NOWHERE in the survey.
+Verified on pandas 3.0.2:
+
+#+begin_example
+  v  Region  Rural   Lat        two households:
+  c1  <NA>   Urban   <NA>         row 0: Region missing, Urban
+  c1  Kigoma <NA>    -5.2         row 1: Kigoma, Rural missing, has GPS
+
+  groupby('v').first()  ->  Region=Kigoma  Rural=Urban  Lat=-5.2
+                            ^^ from row 1  ^^ from row 0  ^^ from row 1
+#+end_example
+
+The bug is therefore worse than "rows are silently dropped."  It *manufactures a
+household* and hands it to the analyst as a cluster.  Any prose in the codebase
+describing the collapse as "keeping the first row" should be corrected on sight.
+
+** Uganda's =cluster_features= is Site 1, not Site 2.
+
+The 9,890 destroyed / 934 NaN-key figures in the table above are Site 1.  Seven of
+Uganda's waves carry =i= as a *column*, not an idxvar, so =drop(columns='i')=
+launders a household-grain frame into a duplicate-ridden =(t, v)= frame that Site
+1 then collapses --- #614 does see these.  Site 2 adds a *ninth, separate* finding
+(wave 2019-20, 947 further rows) that #614 alone cannot see.
+
+The discriminator, now established: *if =i= is in a wave's =cluster_features=
+=idxvars=, the collapse is Site 2 and #614 is blind to it; if =i= arrives as a
+column, it is Site 1.*  Nobody chose this; it is an accident of each country's
+YAML.
+
+** Site 2 is far bigger than this note first assumed.
+
+Measured across all 40 countries on the pre-collapse frame: *30 household-grain
+cells across 17 countries; 15 of them destroy rows --- 38,638 rows destroyed and
+13,704 deleted outright on a NaN key.*  None of it visible to #614.  The original
+six-branch list was not the population; *Malawi* (four waves, 18,675 rows) is the
+largest single offender and appeared on no branch at all.
 
 * The lesson worth keeping
 
