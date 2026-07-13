@@ -1172,26 +1172,50 @@ class Wave:
         # ``idxvars`` so the YAML can merge a household-level df_geo
         # for GPS.  The result then has HH grain (one row per
         # household) instead of the canonical ``(t, v)`` cluster
-        # grain documented in ``data_scheme.yml``.  Collapse with
-        # ``.first()`` for non-GPS columns (Region/Rural/District are
-        # invariant within a cluster by construction of the LSMS-ISA
-        # sampling design) and ``.mean()`` for Latitude/Longitude
-        # (HH-level GPS approximated as the cluster centroid).
-        # GH #161.
+        # grain documented in ``data_scheme.yml``, so it has to be
+        # projected back onto ``(t, v)``.  GH #161.
+        #
+        # GH #323 SITE 2.  That projection used to be justified by a
+        # PROSE comment -- "Region/Rural/District are invariant within
+        # a cluster by construction of the LSMS-ISA sampling design" --
+        # and prose is not enforcement.  The claim is FALSE wherever a
+        # cluster code is unique only *within* a district: two real
+        # clusters then merge, and ``.first()`` keeps one district's
+        # Region and silently discards the other's.  That is WRONG data,
+        # not merely lost data.  The invariant is now CHECKED rather than
+        # asserted -- see ``_collapse_to_cluster_grain``.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
-            if df.columns.size:
-                agg = {
-                    c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
-                    for c in df.columns
-                }
-                df = df.groupby(level=keep_levels).agg(agg)
-            else:
-                df = df.groupby(level=keep_levels).first()
+            df = _collapse_to_cluster_grain(
+                df, keep_levels,
+                country=getattr(self.country, 'name', None), wave=self.year,
+            )
         # ``i`` may also leak in as a *column* when df_geo's idxvars
         # include it (the merge step turns the duplicate into a column).
         # Drop it: cluster_features is keyed on ``(t, v)``, the
         # household identifier has no place in the result.  GH #161.
+        #
+        # GH #323: NOTE WHAT THIS LINE ACTUALLY DOES.  When ``i`` is a COLUMN the
+        # frame is still HOUSEHOLD grain -- it just doesn't look like it, because
+        # the index is already ``(t, v)`` with one duplicate tuple per household.
+        # Dropping ``i`` LAUNDERS that: an honest household-grain table becomes a
+        # cluster-grain table with unexplained duplicates, which
+        # ``_normalize_dataframe_index`` (Site 1) then collapses.  So this is
+        # Site 2's twin, and the ONLY reason it is not silent is that Site 1's
+        # audit happens to catch the wreckage downstream (Uganda's seven
+        # ``i``-as-column waves: 9,890 rows destroyed, 934 deleted on a NaN key --
+        # all of it reported by #614, none of it by the audit above).
+        #
+        # It is deliberately NOT rerouted through ``_collapse_to_cluster_grain``
+        # here, because it does not need to be: Site 1 reduces these frames with the
+        # same ``.first()`` and audits them with the same instrument, so the loss is
+        # reported either way.  (Before the GPS ``.mean()`` was retired this
+        # asymmetry also silently decided whether a country's cluster coordinates
+        # came out a CENTROID or ONE HOUSEHOLD'S FIX -- on nothing more principled
+        # than whether its YAML put ``i`` in ``idxvars`` or left it in a merge
+        # block.  That incoherence was one of the arguments that retired the
+        # ``.mean()``; with core no longer aggregating anywhere, both paths now
+        # agree.)
         if 'i' in df.columns:
             df = df.drop(columns='i')
         # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
@@ -4275,9 +4299,18 @@ def _format_grain_report(report: dict[str, Any]) -> str:
     wave = report.get("wave")
     where = f"{country}/{table}" + (f"/{wave}" if wave else "")
     levels = ", ".join(report.get("levels") or [])
+    site = report.get("site")
     duplicated = bool(report.get("dropped") or report.get("destroyed")
                       or report.get("unauditable"))
-    if duplicated:
+    # GH #323 Site 2: the household -> cluster projection.  Not a *declared*-index
+    # collapse -- the index is deliberately narrowed from (t, v, i) to (t, v) -- so
+    # say what actually happened rather than borrowing Site 1's sentence.
+    if site == 'Wave.cluster_features':
+        bits = [
+            f"{where}: cluster_features was projected from HOUSEHOLD grain onto the "
+            f"cluster grain ({levels}), and the households in a cluster DISAGREE."
+        ]
+    elif duplicated:
         bits = [f"{where}: declared index ({levels}) is NOT UNIQUE."]
     else:
         # missing-level-only report: the index is unique, but only because it was
@@ -4308,13 +4341,27 @@ def _format_grain_report(report: dict[str, Any]) -> str:
             f"Additionally {report['nan_key_rows']:,} row(s) carry NaN in a declared "
             f"index level and are DELETED OUTRIGHT by the collapse (groupby dropna)."
         )
-    bits.append(
-        "Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN "
-        "or an index LEVEL IS MISSING -- fix the index (source a real id, or declare "
-        "the level the survey actually varies over). Do NOT declare a reducer: the "
-        "core does not aggregate (SkunkWorks/grain_aggregation_policy.org). "
-        "Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323."
-    )
+    if site == 'Wave.cluster_features':
+        bits.append(
+            "cluster_features is reduced with groupby().first(), which skips NA "
+            "per column -- so a conflicting cluster does not even yield one of its "
+            "households' rows, it yields a COMPOSITE. The comment that used to "
+            "license this ('Region/Rural/District are invariant within a cluster by "
+            "construction of the LSMS-ISA sampling design') is false here: this "
+            "cluster id is NOT unique at the grain it is being used at. Fix the "
+            "cluster key (e.g. make v a composite of district+cluster code), do not "
+            "declare a reducer: the core does not aggregate "
+            "(SkunkWorks/grain_aggregation_policy.org). "
+            "Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161."
+        )
+    else:
+        bits.append(
+            "Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN "
+            "or an index LEVEL IS MISSING -- fix the index (source a real id, or declare "
+            "the level the survey actually varies over). Do NOT declare a reducer: the "
+            "core does not aggregate (SkunkWorks/grain_aggregation_policy.org). "
+            "Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323."
+        )
     return " ".join(bits)
 
 
@@ -4377,6 +4424,116 @@ def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
         # what a session lost, whether the loss happened during THIS process's cold
         # build or during some earlier one whose parquet we are now serving.
         _record_grain_report(report)
+
+
+# ---------------------------------------------------------------------------
+# GH #323 -- SITE 2: the household -> cluster projection in Wave.cluster_features.
+#
+# A SECOND, hardcoded grain collapse, entirely separate from the declared-index
+# one in `_normalize_dataframe_index` (Site 1).  Countries that declare
+# ``i: <HHID>`` in their `cluster_features` idxvars (17 of them, so the YAML can
+# merge a household-level GPS frame) hand `Wave.cluster_features` a
+# HOUSEHOLD-grain table, which is then reduced to the declared ``(t, v)`` cluster
+# grain -- BEFORE `_normalize_dataframe_index` ever sees it.  So Site 1's audit
+# cannot see this loss: by the time it runs, the rows are already gone.
+#
+# The reduction was justified by a comment, and by nothing else:
+#
+#     "Region/Rural/District are invariant within a cluster by construction of
+#      the LSMS-ISA sampling design."
+#
+# Prose is not enforcement.  The claim fails exactly where a cluster code is
+# unique only WITHIN a district (or a region, or an enumeration area): two
+# genuinely different clusters collide on one ``v``, and ``.first()`` then keeps
+# one of their Regions and throws the other away.  The output is not a lossy
+# summary of the input -- it is a WRONG ROW, attributing one cluster's district to
+# another's households.  Under Design B (SkunkWorks/grain_aggregation_policy.org:
+# NO AGGREGATION IN CORE) the answer is not to teach core a better reducer; it is
+# to CHECK the invariant the comment merely asserted, and be loud when it fails.
+# Same machinery as Site 1: `_audit_index_collapse` + `_record_grain_report`, so
+# the finding is stamped into the L2 parquet and replayed on every warm read.
+#
+# GPS: THE LAST EXCEPTION, AND IT IS GONE (Ethan, 2026-07-13).
+# `Latitude`/`Longitude` used to be reduced with `.mean()` -- a cluster centroid --
+# on the theory that household GPS is genuinely per-household and so varies within
+# a cluster by design, making it a false positive for the audit and a legitimate
+# thing for core to average.  The corpus says otherwise.  Measured across every cell
+# where the `.mean()` could fire:
+#
+#   Malawi 2010-11   768 clusters    0 averaged   <- no-op
+#   Malawi 2013-14   204 clusters  188 averaged
+#   Malawi 2016-17   881 clusters    0 averaged   <- no-op
+#   Malawi 2019-20   819 clusters    0 averaged   <- no-op
+#   Niger  2021-22   555 clusters    0 averaged   <- no-op
+#
+# In FOUR OF FIVE cells the `.mean()` is a provable no-op: the published GPS *is*
+# the cluster's (displaced) fix, stamped onto each household -- it was never
+# household GPS at all.  In the fifth it averages points a median of 148 km and up
+# to 783 km apart, which is not a centroid, it is a BROKEN CLUSTER KEY -- and that
+# same cell is already warning for Region (93), District (165) and Rural (131).
+# The averaging was not summarising a cluster; it was smearing two clusters
+# together and hiding the evidence.
+#
+# So GPS is now audited and reduced exactly like every other column, and core
+# performs NO aggregation here at all.  Measured cost of the flip: ZERO new warning
+# cells -- every cell whose count it raises was already warning, and both silent GPS
+# cells stay silent.  The NO-AGGREGATION-IN-CORE contract
+# (SkunkWorks/grain_aggregation_policy.org) now has no exception left in it.
+#
+# (An analyst who genuinely wants a cluster centroid computes one -- that is what
+# transformations.py is for.  A country whose survey really does record per-household
+# GPS has put a household-level column in a cluster-grain table; the fix is to move
+# the column, not to teach core to average.)
+# ---------------------------------------------------------------------------
+
+
+def _collapse_to_cluster_grain(
+    df: pd.DataFrame,
+    keep_levels: list[str],
+    country: str | None = None,
+    wave: str | None = None,
+) -> pd.DataFrame:
+    """Project household-grain ``cluster_features`` onto the ``(t, v)`` grain.
+
+    Audits the projection BEFORE performing it -- one line later the evidence is
+    gone, and the parquet that gets cached is written from the collapsed frame,
+    which is why no downstream instrument (Site 1's audit included) can see this
+    loss.  Every column is treated alike: audited for destruction, then reduced
+    with ``.first()``.  Core does not aggregate -- not even GPS (see above).
+
+    ``.first()`` here is worse than it looks, and worth naming: pandas'
+    ``groupby().first()`` skips NA *per column*, so where households in a cluster
+    disagree it does not even return one of the source rows -- it assembles a row
+    out of the first non-null value of each column INDEPENDENTLY.  The result can
+    be a household composite that exists nowhere in the survey.  Hence: audit.
+    """
+    if not keep_levels:
+        return df
+
+    dropped_levels = [lvl for lvl in df.index.names if lvl not in keep_levels]
+
+    # AUDIT BEFORE DESTROYING -- on a frame from which the levels being PROJECTED
+    # AWAY have already been removed.  That removal is load-bearing and is the one
+    # subtlety here: ``_audit_index_collapse`` compares WHOLE ROWS via
+    # ``reset_index()``, and ``i`` is DISTINCT BY CONSTRUCTION within a cluster.
+    # Leave it in and every cluster with two households looks "destructive" --
+    # ~100% false positives, and the 11 Uganda clusters that genuinely disagree on
+    # Region are buried in the noise.  (Not hypothetical: the first cut of this
+    # patch did exactly that, and reported 2,304 destroyed rows for Uganda 2019-20
+    # instead of 947.  It was caught only by the test asserting that a LOSSLESS
+    # projection stays silent.)
+    #
+    # What is left is the real question: do the households of one cluster disagree
+    # about the CLUSTER'S OWN attributes?  If they do, the cluster id is not a
+    # cluster id.
+    audit_frame = df.droplevel(dropped_levels) if dropped_levels else df
+    report = _audit_index_collapse(audit_frame, keep_levels)
+    if report is not None:
+        report.update(country=country, table='cluster_features', wave=wave,
+                      site='Wave.cluster_features')
+        _record_grain_report(report)
+
+    return df.groupby(level=keep_levels, observed=True).first()
 
 
 @build_transform()
