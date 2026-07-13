@@ -1179,7 +1179,28 @@ class Wave:
         # GH #161.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
-            if df.columns.size:
+            # A DECLARED aggregation policy wins over the defaults below.
+            # The `.mean()` default treats household GPS as a cloud of points
+            # around the cluster and takes the centroid; that is right only
+            # while the households really are in the same place.  Nigeria's
+            # panel keeps a moved household's ORIGINAL ea in the sampling
+            # frame while the geovariables record its CURRENT dwelling, so a
+            # handful of clusters contain households up to ~890 km apart --
+            # and their "centroid" is a coordinate in neither place, invented
+            # by the reducer.  A country can declare `aggregation: {Latitude:
+            # unique, ...}` in data_scheme.yml to get the invariance-checked
+            # collapse instead: constant -> keep, disagreement -> <NA>, loudly.
+            # Countries that declare nothing keep the historical behaviour.
+            policy = _aggregation_policy(
+                ((self.country.resources or {}).get('Data Scheme') or {})
+                .get('cluster_features'))
+            if policy:
+                df = df.droplevel('i')
+                if not df.index.is_unique:
+                    df = _apply_aggregation_policy(
+                        df, policy, keep_levels, 'cluster_features',
+                        int(df.index.duplicated().sum()))
+            elif df.columns.size:
                 agg = {
                     c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
                     for c in df.columns
@@ -4096,6 +4117,109 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+#: Reducers accepted in a ``data_scheme.yml`` ``aggregation:`` block.
+#: ``unique`` is the invariance-checked reducer: it asserts the column is
+#: CONSTANT within each index group and yields <NA> (loudly) when it is not,
+#: so an ambiguous group can never be silently resolved to one arbitrary row.
+_AGG_REDUCERS = frozenset({'sum', 'first', 'last', 'mean', 'min', 'max', 'unique'})
+
+
+def _aggregation_policy(schema_entry: dict[str, Any] | None) -> dict[str, str]:
+    """Parse a declared ``aggregation:`` block into a {column: reducer} map.
+
+    Keys naming an *index level* rather than a column (Albania declares
+    ``aggregation: {visit: first}`` to document how collapsing its ``visit``
+    level reproduces the legacy Visit-1-only table) are simply not columns of
+    the frame and fall out harmlessly in ``_apply_aggregation_policy``.
+    """
+    if not schema_entry:
+        return {}
+    block = schema_entry.get('aggregation')
+    if not isinstance(block, dict):
+        return {}
+    policy = {}
+    for col, reducer in block.items():
+        reducer = str(reducer).strip().lower()
+        if reducer not in _AGG_REDUCERS:
+            warnings.warn(
+                f"Unknown aggregation reducer {reducer!r} for column {col!r}; "
+                f"expected one of {sorted(_AGG_REDUCERS)}.  Ignoring.",
+                RuntimeWarning,
+            )
+            continue
+        policy[str(col)] = reducer
+    return policy
+
+
+def _apply_aggregation_policy(
+    df: pd.DataFrame,
+    policy: dict[str, str],
+    present_levels: list[str],
+    table_name: str | None,
+    n_dropped: int,
+) -> pd.DataFrame:
+    """Collapse a non-unique index using a DECLARED per-column reducer map.
+
+    Any column of *df* that the policy does not name falls back to ``first``
+    -- and says so.  An unnamed column is exactly the silent-discard case GH
+    #323 is about, so it must never pass quietly.
+    """
+    if not df.columns.size:
+        # No columns to reduce: pd.DataFrame({}) would drop the index on the
+        # floor and hand back an empty frame.  Just dedupe the index.
+        return df[~df.index.duplicated()]
+
+    unlisted = [c for c in df.columns if c not in policy]
+    if unlisted:
+        warnings.warn(
+            f"{table_name}: aggregation policy does not cover column(s) "
+            f"{unlisted}; collapsing them with 'first', which DISCARDS the "
+            f"non-first rows of each duplicate group ({n_dropped} row(s)).  "
+            f"Declare a reducer for them in data_scheme.yml (GH #323).",
+            RuntimeWarning,
+        )
+
+    def _unique_or_na(s: pd.Series):
+        """The group's single distinct non-NA value, else <NA> (never a guess)."""
+        vals = s.dropna().unique()
+        if len(vals) == 1:
+            return vals[0]
+        if len(vals) == 0:
+            return pd.NA
+        return pd.NA  # genuinely ambiguous -> refuse to pick; counted below
+
+    grouped = df.groupby(level=present_levels, observed=True)
+    out = {}
+    conflicts: dict[str, int] = {}
+    for col in df.columns:
+        reducer = policy.get(col, 'first')
+        if reducer == 'unique':
+            n_distinct = grouped[col].nunique(dropna=True)
+            conflicts[col] = int((n_distinct > 1).sum())
+            out[col] = grouped[col].apply(_unique_or_na)
+        elif reducer == 'sum':
+            # min_count=1 keeps an all-NaN group NaN instead of turning it
+            # into 0.0 -- "not reported" must not become "reported zero".
+            out[col] = grouped[col].sum(min_count=1)
+        else:
+            out[col] = getattr(grouped[col], reducer)()
+
+    result = pd.DataFrame(out)
+    result = result[[c for c in df.columns if c in result.columns]]
+
+    hot = {c: n for c, n in conflicts.items() if n}
+    if hot:
+        warnings.warn(
+            f"{table_name}: 'unique' aggregation found column(s) that are NOT "
+            f"constant within their index group -- "
+            f"{', '.join(f'{c}: {n} group(s)' for c, n in sorted(hot.items()))}. "
+            f"Those groups are set to <NA> rather than resolved to an "
+            f"arbitrary row's value (GH #323: missing beats wrong).",
+            RuntimeWarning,
+        )
+    return result
+
+
 @build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
@@ -4187,6 +4311,19 @@ def _normalize_dataframe_index(
         # re-derive any per-unit Price from the summed totals -- no data lost,
         # no warning.  Single source of truth for the additive column map lives
         # in feature.py (imported lazily to avoid an import cycle).
+        # A DECLARED per-column aggregation policy wins over everything else.
+        # ``aggregation:`` in the country's data_scheme.yml maps a column to a
+        # reducer; the collapse is then intentional and documented rather than
+        # a silent groupby().first().  Before GH #323 this key was *parsed and
+        # discarded* (it appears only in the `_skip` meta-key sets) -- i.e. a
+        # country could "declare" an aggregation and still get .first().  Prose
+        # is not enforcement; this makes the declaration real.
+        policy = _aggregation_policy(schema_entry)
+        if policy:
+            df = _apply_aggregation_policy(
+                df, policy, present_levels, table_name, n_dropped)
+            return df
+
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]

@@ -10,7 +10,34 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # Built from the HOUSEHOLD cover page (one row per household), so the
+    # frame must collapse household -> cluster.  With the composite `v`
+    # (state/lga/ea -- see the GH #323 note in _/nigeria.py) that collapse is
+    # genuine, intended aggregation: every column below is a property of the
+    # CLUSTER, so it is constant across the cluster's households.
+    #
+    # `unique` is therefore the honest reducer: it takes the group's single
+    # distinct value and yields <NA> -- loudly, with a warning naming the
+    # column and the group count -- when the households disagree.  It never
+    # resolves a disagreement to one arbitrary household's value, which is
+    # exactly what the old groupby().first() did (and, on the old bare-`ea`
+    # key, is how 890/5000 W1 households ended up with another EA's District).
+    #
+    # Region/District/Rural are constant by construction (state and lga are IN
+    # the key; zone and sector are functions of them).  Latitude/Longitude are
+    # constant within every cluster in W1 (0 of 500 groups disagree), but from
+    # W2 on the panel follows households that move while keeping their
+    # original EA in the sampling frame, so their CURRENT coordinates differ
+    # from their cluster's: 5 / 24 / 50 clusters in W2 / W3 / W4 span more than
+    # one coordinate (households up to ~890 km apart).  Those clusters get a
+    # <NA> coordinate, not one household's guess.
     index: (t, v)
+    aggregation:
+      Region: unique
+      District: unique
+      Rural: unique
+      Latitude: unique
+      Longitude: unique
     Region: str
     District: str
     Rural: str
@@ -75,7 +102,39 @@ Data Scheme:
     index: (t, i)
     previous_i: str
   assets:
+    # Wave 2 (t = 2012Q3 / 2013Q1) is the only wave whose asset module carries
+    # a PER-UNIT roster: sect5b_plantingw2 has one row per individual unit
+    # owned, enumerated by `item_seq` (1..15), each with its own age (s5q3) and
+    # its own resale value (s5q4).  A household owning 5 hoes gets 5 rows.
+    # (dup on (hhid,item_cd) = 14,493; dup on (hhid,item_cd,item_seq) = 0 --
+    # item_seq is precisely the level the canonical (t,i,j) grain drops.)
+    # W1/W3/W4 have no such roster and are already unique on (t,i,j).
+    #
+    # `item_seq` is NOT added to the index: the canonical assets grain in
+    # lsms_library/data_info.yml is (t, i, j), and a 4-level Nigeria would
+    # break Feature('assets') assembly against every 3-level country.  So the
+    # per-unit rows are collapsed -- but with a DECLARED per-column reducer,
+    # because the old groupby().first() kept unit #1 and silently discarded
+    # the rest: N147,297,485 of reported household asset value, 25.6% of the
+    # wave's total, in EACH of the two quarters the wave is tagged on.
+    #
+    #   Value    sum   additive across the units owned -> the household's
+    #                  total value of item j.  (min_count=1, so an all-NaN
+    #                  group stays NaN: "not owned" must not become 0.)
+    #   Quantity first the count comes from sect5a, which is a clean
+    #                  household x item grid (0 duplicates) and is repeated
+    #                  unchanged across the item_seq rows by the merge.
+    #                  Summing it would multiply it by the unit count.
+    #   Age      mean  the units genuinely differ in age (e.g. 5 hoes aged
+    #                  4/6/6/10/10); at a one-row-per-(i,j) grain the mean age
+    #                  of the units owned is the declared summary.  There is
+    #                  no single true value to keep, so `first` was not just
+    #                  lossy but arbitrary.
     index: (t, i, j)
+    aggregation:
+      Value: sum
+      Quantity: first
+      Age: mean
     Quantity: float
     Age: float
     Value: float
@@ -356,7 +415,8 @@ Data Scheme:
     # it across sectc8a / sectc8b; W5 under Post Harvest Wave 5/Community/).
     # There is NO household i, so _join_v_from_sample does NOT apply -- `v`
     # is declared in the index here and carried NATIVELY: it is the
-    # community questionnaire's EA id (v = format_id(ea)), the SAME keyspace
+    # community questionnaire's EA id (v = cluster_id(state, lga, ea) -- the
+    # COMPOSITE key; GH #323), the SAME keyspace
     # as sample().v, so community_prices.v joins households via their
     # cluster.  Country-level script (_/community_prices.py) maps each wave
     # -> materialize: make.

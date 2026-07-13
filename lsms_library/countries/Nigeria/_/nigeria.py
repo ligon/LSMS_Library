@@ -1,5 +1,6 @@
 
 import os
+import re
 import pandas as pd
 import numpy as np
 
@@ -31,6 +32,109 @@ wave_folder_map = {
     '2023Q3': '2023-24',
     '2024Q1': '2023-24',
 }
+
+
+# =====================================================================
+# Cluster identity `v`  (GH #323)
+# =====================================================================
+# `ea` ALONE IS NOT A CLUSTER ID.  In the GHS-Panel it is a serial number
+# unique only *within* an LGA, so the same `ea` value recurs in different
+# LGAs and states.  Wave 1 is the proof: the design is 500 EAs x 10
+# households = 5,000 households, but
+#
+#     nunique(ea)                = 411      <- 89 real EAs conflated away
+#     nunique(state, lga, ea)    = 500      <- the design, recovered
+#
+# and the household geovariables confirm it independently: lat/lon is
+# constant within all 500 (state, lga, ea) groups (0 groups span >1
+# coordinate) but VARIES inside 76 of the 411 bare `ea` codes.  Keying on
+# `ea` therefore MERGES DISTINCT CLUSTERS, and the household->cluster
+# collapse in cluster_features then stamps one arbitrary EA's
+# Region/District/Rural onto every household in the merged group:
+# 890/5000 households got the wrong District in W1 alone (17.8%), rising
+# to 1283/5263 (24.4%) by W4.  That is a class-1 SILENTLY-WRONG defect,
+# and it leaks everywhere, because sample() publishes the same broken key
+# and _join_v_from_sample() stamps it onto every household table.
+#
+# THE KEYSPACE IS BUILT FROM CODES, NOT LABELS.  The community
+# questionnaire (community_prices) must land in the SAME keyspace as the
+# household files so a cluster's prices join its households.  In W2 the
+# community file's state/lga carry no Stata value labels while the
+# household file's do, so a LABEL-built key gives 0% overlap between the
+# two sides; a CODE-built key gives 100%.  Hence every consumer of these
+# helpers reads its geography with convert_categoricals=False (the YAML
+# path does this with `converted_categoricals:` on the sub-df) and the
+# composite is assembled from the raw numeric codes.
+#
+# THE `Moved` SENTINEL.  From W2 on, a tracked household that left its
+# original EA is recorded with ea == 0 -- surfacing as the label 'Moved'
+# (W2), '0. Moved' (W3), or a bare 0 (W4).  It is a MISSING-VALUE
+# SENTINEL, not a cluster: pooling those households would weld unrelated
+# households from across the country into fake clusters like
+# (Lagos, ETI-OSA, 'Moved').  They have no sampling cluster, so each is
+# given its own singleton id.  A NaN `v` was rejected deliberately: the
+# downstream groupby() in roster_to_characteristics / the food-derivation
+# pipeline DROPS NaN keys, which would silently delete these households
+# (152 / 306 / 166 in W2 / W3 / W4) from every derived table -- trading
+# one silent-data-loss bug for another.  An explicit singleton keeps them
+# present, keeps their true Region/District/Rural, and can never merge
+# them with anyone else.
+_MOVED_EA_CODE = 0
+
+
+def _geo_code(x):
+    """Normalize one geographic component to its numeric CODE as a string.
+
+    Handles every rendering the GHS files use for the same underlying code:
+    a raw numeric (``1690`` / ``1690.0``), a Stata code-prefixed label
+    (``'102. ABA SOUTH'`` -> ``'102'``), and the bare ``'Moved'`` label,
+    which is code 0.  Returns ``None`` when the value is missing.
+    """
+    if pd.isna(x):
+        return None
+    s = str(x).strip()
+    if not s:
+        return None
+    m = re.match(r'^(\d+)\s*\.\s*\D', s)   # '102. ABA SOUTH' -> '102'
+    if m:
+        return m.group(1)
+    if re.fullmatch(r'-?\d+(\.0*)?', s):   # 1690 / '1690' / '1690.0'
+        return str(int(float(s)))
+    if s.lower().lstrip('0. ').startswith('moved'):
+        return str(_MOVED_EA_CODE)
+    return ' '.join(s.upper().split())     # last-resort: a bare label
+
+
+def cluster_id(state, lga, ea, hhid=None):
+    """The composite EA identity for one household.  See the note above.
+
+    Real EA        -> ``'{state}/{lga}/{ea}'`` (codes)
+    'Moved' (ea=0) -> ``'moved-{hhid}'``: no sampling cluster; a singleton
+                      that can never be pooled with another household.
+    """
+    ea_c = _geo_code(ea)
+    if ea_c is None:
+        return None
+    if ea_c == str(_MOVED_EA_CODE):
+        hh = format_id(hhid)
+        return f'moved-{hh}' if hh is not None else None
+    state_c, lga_c = _geo_code(state), _geo_code(lga)
+    if state_c is None or lga_c is None:
+        return None
+    return f'{state_c}/{lga_c}/{ea_c}'
+
+
+def v(row):
+    """`v` formatting function, auto-bound by df_data_grabber.
+
+    Declared in the wave YAML as ``v: [state, lga, ea, hhid]`` (idxvars for
+    cluster_features, myvars for sample), so BOTH tables -- and
+    community_prices, via cluster_id() -- share one keyspace by
+    construction.  They must: sample.v is what _join_v_from_sample() stamps
+    onto every household table, and community_prices.v has to join it.
+    """
+    return cluster_id(row.get('state'), row.get('lga'), row.get('ea'),
+                      row.get('hhid'))
 
 
 # ---------------------------------------------------------------------
@@ -1766,7 +1870,7 @@ def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
 # sectc8a / sectc8b; W5 lives under Post Harvest Wave 5/Community/).  This
 # is a CLUSTER-level table: there is no household i.  `v` is the native
 # community-questionnaire EA id (`ea`), which maps to the SAME keyspace as
-# sample().v (sample joins v = format_id(ea) too), so community_prices.v
+# sample().v (sample publishes the same composite cluster_id; GH #323), so community_prices.v
 # joins households via their cluster.  Item-level REPORTED prices only --
 # NOT an index, NOT a median/mean across clusters, NOT an HH-median
 # imputation (those are transformations over these rows).
@@ -1901,7 +2005,9 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
         Each dict describes one source price frame:
             df     raw DataFrame (convert_categoricals=False)
             dec    decoded-label DataFrame (for unit / item decode)
-            ea     EA id column name (-> v = format_id(ea))
+            ea     EA id column name (-> v = cluster_id(state, lga, ea))
+            state  state column name (default 'state')
+            lga    LGA column name   (default 'lga')
             item   item_cd column name
             price  reported-price column name
             unit   unit column name (W3-W5; None for W1/W2)
@@ -1925,7 +2031,19 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     for fr in frames:
         df = fr['df']
         dec = fr['dec']
-        v = df[fr['ea']].apply(format_id)
+        # v must land in the SAME keyspace as sample().v, or a cluster's prices
+        # join no households at all.  That means the COMPOSITE (state/lga/ea)
+        # id, not the bare `ea` serial (GH #323), and it means building it from
+        # raw CODES: `df` here is read with convert_categoricals=False, and the
+        # community questionnaire carries no value labels on state/lga anyway,
+        # so a label-built key would not match the household side (measured: 0%
+        # overlap in W2, 100% on codes).  A community record with no usable EA
+        # yields v = None and is dropped by the notna() filter below.
+        state_col = fr.get('state', 'state')
+        lga_col = fr.get('lga', 'lga')
+        v = df.apply(
+            lambda r: cluster_id(r.get(state_col), r.get(lga_col), r[fr['ea']]),
+            axis=1)
         code = pd.to_numeric(df[fr['item']], errors='coerce')
         price = pd.to_numeric(df[fr['price']], errors='coerce')
 
