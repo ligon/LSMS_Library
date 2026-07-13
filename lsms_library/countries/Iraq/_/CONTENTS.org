@@ -9,3 +9,32 @@ The only food-stress signal is a single bespoke food-difficulty item
 (=q2005=) embedded in the shocks module, which is already captured by
 the wired =shocks= feature.  =food_security_hfias=, =food_coping=, and
 =months_food_inadequate= are therefore not implementable for Iraq.
+
+* cluster_features: a household->cluster projection, and one <NA> (GH #323)
+
+=cluster_features= is declared =(t, v)= --- a CLUSTER-level table --- but both
+waves extract it from the household-level COVER PAGE (the same file =sample=
+reads).  It is therefore a projection: 17,822 households -> 2,961 clusters
+(2006-07) and 25,146 -> 2,828 (2012).  The granularity being dropped is the
+household =i=, which a cluster-level table must not retain, so *no data is
+lost* --- the correct tables really are 2,961 and 2,828 rows.
+
+The collapse used to be performed by an undeclared =groupby().first()=.  It is
+now DECLARED in =_/data_scheme.yml= as =aggregation: unique=, which also
+ENFORCES the invariant the projection depends on: every declared column must be
+constant within its cluster.  Where it isn't, the cell is set to =<NA>= and a
+warning names the offending cluster --- rather than silently keeping whichever
+row happened to sort first.
+
+*Known data defect --- 2012 cluster 964 (ERBIL, stratum 1508).*  =Rural= in
+2012 comes from =q00_16=, a PER-HOUSEHOLD question, not a design stratum, so
+households in one cluster can disagree.  Exactly one does: cluster 964 is 7
+URBAN / 2 RURAL.  The 2012 =stratum= does not encode urbanicity (114 of its 118
+strata are mixed on =q00_16=), so nothing in the source adjudicates it, and a
+majority vote would be a guess dressed as an answer.  Its =Rural= is therefore
+=<NA>=.  Consumers who need a value must decide the rule themselves.  (The old
+=.first()= silently returned RURAL here --- the 2-of-9 minority.)
+
+2006-07 is unaffected: its =Rural= is parsed from the DESIGN STRATUM label
+(=xstrat=, "... - urban"/"... - rural"), so it is constant within cluster by
+construction --- 0 of 2,961 conflicts.
