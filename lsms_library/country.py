@@ -4096,6 +4096,104 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+# Reducers a table may name in its ``aggregation: on_duplicate_index:`` block.
+# ``sum`` / ``any`` / ``all`` are NA-PRESERVING here (see
+# ``_reduce_duplicate_index``): an all-NA group stays NA rather than collapsing
+# to 0 / False, so "the question was never asked" never silently becomes a
+# confident zero.
+_DUPLICATE_INDEX_REDUCERS = frozenset(
+    {'sum', 'any', 'all', 'first', 'last', 'min', 'max', 'mean'}
+)
+
+
+def _duplicate_index_policy(schema_entry: Any) -> dict[str, str] | None:
+    """Return the DECLARED per-column reducer map for a non-unique declared index.
+
+    Declared in a country's ``data_scheme.yml`` as::
+
+        plot_inputs:
+          index: (t, i, input, crop, u)
+          aggregation:
+            on_duplicate_index:      # an INTENDED many-to-one label merge
+              Quantity: sum
+              Purchased: any
+              Quantity_purchased: sum
+
+    ``aggregation:`` may also carry LEVEL-keyed entries (e.g. ``visit: first``,
+    which 9 countries declare on ``interview_date``).  Those are hints for an
+    explicit downstream collapse and are deliberately NOT consumed here -- only
+    the ``on_duplicate_index`` sub-block is, so adding this consumer cannot
+    change the behaviour of any table that does not opt in.  GH #323.
+    """
+    if not isinstance(schema_entry, dict):
+        return None
+    agg = schema_entry.get('aggregation')
+    if not isinstance(agg, dict):
+        return None
+    policy = agg.get('on_duplicate_index')
+    if not isinstance(policy, dict) or not policy:
+        return None
+    return policy
+
+
+def _reduce_duplicate_index(
+    df: pd.DataFrame,
+    levels: list[str],
+    policy: dict[str, str],
+    table_name: str | None,
+) -> pd.DataFrame:
+    """Collapse a non-unique DECLARED index with the DECLARED per-column reducers.
+
+    Every data column must be named in the policy.  An uncovered column is a
+    hard error rather than a silent ``first()``: the point of declaring the
+    aggregation is that each measure's reducer is a decision someone made on
+    purpose, so a column added later is forced to make that decision instead of
+    quietly inheriting a destructive default (GH #323).
+    """
+    bad = {c: r for c, r in policy.items() if r not in _DUPLICATE_INDEX_REDUCERS}
+    if bad:
+        raise ValueError(
+            f"{table_name}: unknown reducer(s) {bad} in "
+            f"aggregation.on_duplicate_index; expected one of "
+            f"{sorted(_DUPLICATE_INDEX_REDUCERS)}."
+        )
+    uncovered = [c for c in df.columns if c not in policy]
+    if uncovered:
+        raise ValueError(
+            f"{table_name}: the declared index {levels} is non-unique and this "
+            f"table declares aggregation.on_duplicate_index, but column(s) "
+            f"{uncovered} have no reducer.  Give each one a reducer (one of "
+            f"{sorted(_DUPLICATE_INDEX_REDUCERS)}); refusing to fall back to "
+            f"groupby().first(), which silently discards data (GH #323)."
+        )
+
+    grouped = df.groupby(level=levels, observed=True)
+    if not df.columns.size:  # index-only table: nothing to reduce
+        return grouped.first()
+
+    by_reducer: dict[str, list[str]] = {}
+    for col in df.columns:
+        # A reducer named for a column this wave doesn't carry (an `optional:`
+        # column) is simply unused -- only the columns actually present are
+        # reduced.
+        by_reducer.setdefault(policy[col], []).append(col)
+
+    parts = []
+    for reducer, cols in by_reducer.items():
+        sub = grouped[cols]
+        if reducer == 'sum':
+            # min_count=1: an all-NA group stays NA instead of becoming 0.
+            parts.append(sub.sum(min_count=1))
+        elif reducer in ('any', 'all'):
+            out = sub.any() if reducer == 'any' else sub.all()
+            # any()/all() answer False/True for an all-NA group; restore NA.
+            parts.append(out.mask(sub.count() == 0, pd.NA))
+        else:
+            parts.append(getattr(sub, reducer)())
+
+    return pd.concat(parts, axis=1)[list(df.columns)]
+
+
 @build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
@@ -4109,9 +4207,15 @@ def _normalize_dataframe_index(
     - Reorders index levels to match the declared order.
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
-    - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+    - Collapses duplicate entries, in precedence order:
+
+      1. the table's DECLARED per-column reducers, if it has an
+         ``aggregation: on_duplicate_index:`` block in ``data_scheme.yml``
+         (GH #323) -- an intended many-to-one merge, reduced on purpose;
+      2. else SUM the additive measure columns for tables in
+         ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``);
+      3. else keep the first row per group -- the historical default, which
+         silently DISCARDS the dropped rows and therefore warns.
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4180,6 +4284,15 @@ def _normalize_dataframe_index(
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
+        # GH #323: a table may DECLARE how to reduce an INTENDED many-to-one
+        # merge, per column, via ``aggregation: on_duplicate_index:`` in its
+        # data_scheme.yml.  A declaration wins over the hardcoded additive map
+        # below and must cover EVERY column -- no silent first().  Tables that
+        # declare nothing fall through to the pre-existing behaviour unchanged.
+        policy = _duplicate_index_policy(schema_entry)
+        if policy:
+            return _reduce_duplicate_index(df, present_levels, policy, table_name)
+
         # GH #514/#323: collapsing a non-unique canonical index with .first()
         # silently DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across

@@ -2392,3 +2392,67 @@ def anthropometry_zscores(anthropometry, who_reference, *,
     if 'whz06' in out.columns:
         out['wasting'] = (out['whz06'] < -2).where(out['whz06'].notna())
     return out
+
+
+def collapse_to_cluster_grain(df):
+    """Reduce a HOUSEHOLD-grain ``cluster_features`` extraction to CLUSTER grain.
+
+    Many countries source ``cluster_features`` from the household cover file,
+    which carries one row per HOUSEHOLD.  The table is declared at ``(t, v)``,
+    so the framework used to collapse the ~12x row inflation with a silent
+    ``groupby().first()`` -- correct only by the ACCIDENT that the cluster
+    attributes happen to be constant within the cluster (GH #323).
+
+    This makes the grain correction explicit and, crucially, ENFORCES the
+    invariant the correctness rests on: every attribute must be single-valued
+    within a cluster.  If a future wave violates it (a grappe split across
+    urban/rural, a re-coded region), this RAISES and names the offending
+    clusters instead of silently picking one row's value.
+
+    Use it as a wave-module ``df_edit`` hook::
+
+        # countries/<C>/<wave>/_/mapping.py
+        from lsms_library.transformations import (
+            collapse_to_cluster_grain as cluster_features,
+        )
+
+    Args:
+        df: cluster_features as extracted, indexed by the declared cluster
+            levels (typically ``(t, v)``), one row per household.
+
+    Returns:
+        The same frame with exactly one row per cluster.
+
+    Raises:
+        ValueError: if any attribute takes more than one distinct value within
+            a cluster -- i.e. the data is genuinely household-grain and
+            collapsing it would DESTROY information.
+    """
+    if not isinstance(df, pd.DataFrame) or df.empty or df.index.is_unique:
+        return df
+
+    levels = [n for n in df.index.names if n is not None]
+    if not levels:
+        return df
+
+    grouped = df.groupby(level=levels, observed=True, dropna=False)
+    # dropna=False: a cluster mixing NaN with a value is a genuine conflict.
+    nunique = grouped.nunique(dropna=False)
+    conflicted = nunique[(nunique > 1).any(axis=1)]
+    if len(conflicted):
+        offenders = {
+            col: int((nunique[col] > 1).sum())
+            for col in nunique.columns
+            if (nunique[col] > 1).any()
+        }
+        sample = conflicted.index[:5].tolist()
+        raise ValueError(
+            f"cluster_features is declared at cluster grain {levels}, but "
+            f"{len(conflicted)} cluster(s) carry more than one distinct value: "
+            f"{offenders}.  Collapsing would silently discard the difference "
+            f"(GH #323).  Offending clusters e.g. {sample}.  Either the "
+            f"attribute is genuinely household-level (it does not belong in "
+            f"cluster_features), or the source needs cleaning."
+        )
+
+    return grouped.first()

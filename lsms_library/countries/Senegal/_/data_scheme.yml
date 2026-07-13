@@ -75,6 +75,25 @@ Data Scheme:
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
+    # DECLARED many-to-one merge (GH #323).  harmonize_food deliberately maps
+    # several 2021-22 Original Labels onto ONE Preferred Label, because the
+    # 2021-22 questionnaire SPLIT four items that 2018-19 recorded as one:
+    #   Café                             <- Café en poudre + Café soluble
+    #   Arachides décortiquées ou pilées <- Arachides décortiquées + ... pilées
+    #   Crabes, crevettes                <- Crabes + Crevettes fraiches
+    #   Lait frais                       <- Lait frais industriel + non industriel
+    # Re-merging them restores cross-wave comparability, so the merge is
+    # INTENDED -- but it makes the declared index non-unique for 218 rows in
+    # 2021-22 (0 in 2018-19, where the split never happened).  Rows can only
+    # collide when the native unit `u` is IDENTICAL (u is in the index), so
+    # Quantity and Expenditure are extensive and SUM is exact -- it neither
+    # double-counts (the colliding rows are DISTINCT source items) nor discards
+    # (which groupby().first() would: it would erase 44,870 of 96,455 CFA and
+    # 1,545 of 2,588 units across the 436 colliding rows).
+    aggregation:
+      on_duplicate_index:
+        Quantity: sum
+        Expenditure: sum
   assets:
     index: (t, i, j)
     Quantity: float
@@ -203,6 +222,26 @@ Data Scheme:
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # DECLARED many-to-one merge (GH #323), same mechanism as food_acquired.
+    # harmonize_input maps all 11 seed types -> 'Seed', and harmonize_seed_crop
+    # maps the three CATCH-ALL seed labels ('Autres semences', 'Plants/boutures
+    # de tubercules', "Semences d'autres céréales") -> the same 'Autre crop'.
+    # Crop-specific seeds stay distinct (their crop separates them); ONLY the
+    # catch-all bucket collides -- exactly 15 groups / 30 rows, all
+    # ('Seed', 'Autre crop').
+    # SUM is exact, not a guess: each colliding pair is two DISTINCT source
+    # items (verified against s16b_me_sen2018.dta -- 0 duplicate source records
+    # on (grappe, menage, s16bq01, s16bq03b)), reported in the SAME unit u.  The
+    # five equal-valued pairs (e.g. 2.0 + 2.0 kg) are coincidence, not a
+    # duplicated record, so summing does not double-count.
+    # groupby().first() was DESTROYING 819.5 of 1,478.5 units of seed (55%) and
+    # resolving the one conflicting Purchased flag (i=341003: Non + Oui) by row
+    # order; `any` makes it well-defined.
+    aggregation:
+      on_duplicate_index:
+        Quantity: sum
+        Purchased: any
+        Quantity_purchased: sum
     materialize: make
 
   plot_labor:

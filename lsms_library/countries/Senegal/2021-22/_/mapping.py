@@ -3,6 +3,13 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+# cluster_features is declared at (t, v) but s00_me_sen2021.dta is the HOUSEHOLD
+# cover file -- 7,120 household rows for 596 grappes.  This df_edit hook reduces
+# the extraction to true cluster grain and ENFORCES that Region / Rural /
+# Latitude / Longitude are single-valued within a grappe (they are: 0 of 596
+# grappes conflict), so the table's correctness no longer rests on a silent
+# groupby().first().  GH #323.
+from lsms_library.transformations import collapse_to_cluster_grain as cluster_features
 from collections import defaultdict
 
 def v(value):
