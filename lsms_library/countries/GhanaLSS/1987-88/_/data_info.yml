@@ -1,13 +1,36 @@
 Country: GhanaLSS
 Wave: 1987-88
 
-cluster_features:
-    file: Y01A.DAT
-    idxvars:
-        v: CLUST
-    myvars:
-        Region: REGION
-        Age: AGEY
+# cluster_features: DELIBERATELY NOT WIRED (GH #323).
+#
+# Identical defect to 1988-89 (see that wave's data_info.yml for the full
+# argument), and it was NOT in the originally-reported affected-cell list only
+# because this wave's cluster_features parquet had never been built -- fixing
+# 1988-89 alone would have closed the instance and left the class.
+#
+# The block that used to live here read `Region: REGION` and `Age: AGEY` from
+# Y01A.DAT, the PERSON-LEVEL ROSTER (15,492 persons / 3,136 households / 176
+# clusters):
+#
+#   * `Region: REGION` is the person's REGION OF BIRTH, not the cluster's region.
+#     REGION varies WITHIN a household in 1,033 of 3,136 households (up to 6
+#     distinct values in ONE household), and within a cluster in 174 of 176.  The
+#     wave's own `region` code list includes 11=Nigeria, 12=Ivory Coast,
+#     13=Togo, 14=Burkina Faso -- foreign countries a Ghanaian enumeration area
+#     cannot be located in.  mapping.py's Region() and Birthplace() are the same
+#     function body over the same region_dict, and REGION is mapped as the
+#     roster's `Birthplace` below.
+#   * `Age: AGEY` is a PERSON's age.  Collapsed to one row per cluster it made a
+#     cluster's "Age" the age of its first-listed person (range 17-80) -- a
+#     category error, meaningless as a cluster feature.
+#
+# No cluster-invariant region source exists in this wave (Y00A.DAT's LOC is a
+# plausible Rural indicator but varies within cluster in 3 of 170 clusters, so it
+# is NOT wired without verification).  Dropping is safer than guessing: silently
+# MISSING (class-2) beats silently WRONG (class-1).
+#
+# Enforced by `aggregation: {Region: invariant}` in `_/data_scheme.yml`:
+# re-adding either column here RAISES at build time.
 
 sample:
     file: Y00A.DAT

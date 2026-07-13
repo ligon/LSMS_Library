@@ -4196,8 +4196,38 @@ def _normalize_dataframe_index(
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
         else:
+            # GH #323: a DECLARED `aggregation:` policy in data_scheme.yml makes
+            # the collapse explicit instead of silent.  The `invariant` reducer
+            # says: "the source is FINER-grained than the declared index, but this
+            # column is CONSTANT within each index group, so collapsing is a
+            # verified DE-DUPLICATION -- not a merge of distinct entities."
+            # It is CHECKED, not asserted in prose: _assert_invariant_within_index
+            # RAISES if the column is ever non-constant within a group, which turns
+            # a silently-WRONG collapse (class-1) into a loud failure.
+            #
+            # Worked example -- GhanaLSS cluster_features: every wave points `file:`
+            # at a HOUSEHOLD-grain source and projects cluster-invariant columns
+            # (region/loc2), so 934,584 rows legitimately de-duplicate to 1,000
+            # clusters.  The SAME line of code, pointed at a person-level BIRTHPLACE
+            # column (GhanaLSS 1987-88/1988-89), instead fabricated a cluster's
+            # "Region" from the first-listed person -- this check would have caught it.
+            policy = (schema_entry or {}).get("aggregation") or {}
+            if not isinstance(policy, dict):
+                policy = {}
+            invariant_cols = [
+                col for col, reducer in policy.items()
+                if reducer == "invariant" and col in df.columns
+            ]
+            if invariant_cols:
+                _assert_invariant_within_index(
+                    df, invariant_cols, present_levels, table_name
+                )
+
             df = df.groupby(level=present_levels, observed=True).first()
-            if n_dropped:
+            # Only DECLARED columns are exempt from the warning; anything the
+            # policy does not cover is still a silent drop and must be surfaced.
+            undeclared = [c for c in df.columns if c not in invariant_cols]
+            if n_dropped and undeclared:
                 # No aggregation policy for this table -- surface the loss
                 # loudly rather than drop rows quietly (a table whose source
                 # legitimately has multiple rows per index tuple needs an
@@ -4205,8 +4235,59 @@ def _normalize_dataframe_index(
                 warnings.warn(
                     f"Canonical index over {present_levels} had {n_dropped} "
                     f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                    f"those rows (possible silent data loss — GH #323).",
+                    f"those rows (possible silent data loss — GH #323). "
+                    f"Columns without an aggregation policy: {undeclared}.",
                     RuntimeWarning,
                 )
 
     return df
+
+
+def _assert_invariant_within_index(
+    df: pd.DataFrame,
+    columns: list[str],
+    levels: list[str],
+    table_name: str | None = None,
+) -> None:
+    """Verify each column is constant within every declared-index group.
+
+    Backs the ``aggregation: {col: invariant}`` policy (GH #323).  A column
+    declared ``invariant`` is one the survey records at a FINER grain than the
+    declared index but whose value does not vary within an index group (e.g. a
+    cluster's region, recorded once per household).  Collapsing such a column
+    with ``.first()`` is a lossless de-duplication.
+
+    Raises ``ValueError`` naming the offending groups if the invariant does not
+    hold -- a non-constant column means ``.first()`` would silently pick one
+    value from several distinct ones (class-1: silently WRONG).
+    """
+    offenders: dict[str, pd.Series] = {}
+    for col in columns:
+        counts = df.groupby(level=levels, observed=True)[col].nunique(dropna=True)
+        bad = counts[counts > 1]
+        if len(bad):
+            offenders[col] = bad
+
+    if not offenders:
+        return
+
+    where = f" in {table_name!r}" if table_name else ""
+    lines = [
+        f"aggregation policy declares these column(s){where} INVARIANT within "
+        f"{levels}, but they are NOT constant within their index group -- "
+        f"collapsing would silently pick one value from several (GH #323):"
+    ]
+    for col, bad in offenders.items():
+        examples = ", ".join(
+            f"{lvl}={cnt} distinct values" for lvl, cnt in bad.head(3).items()
+        )
+        lines.append(
+            f"  {col!r}: non-constant in {len(bad)} of "
+            f"{df.groupby(level=levels, observed=True).ngroups} group(s); e.g. {examples}"
+        )
+    lines.append(
+        "Either the column is wired to the WRONG source variable (one recorded at "
+        "a finer grain -- e.g. a person-level attribute mapped as a cluster "
+        "attribute), or it needs a real reducer instead of `invariant`."
+    )
+    raise ValueError("\n".join(lines))

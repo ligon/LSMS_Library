@@ -19,9 +19,39 @@ Index Info:
 
 Data Scheme:
   cluster_features:
+    # GH #323 -- DECLARED de-duplication, not a silent collapse.
+    #
+    # Every wired wave points `file:` at a HOUSEHOLD-grain source (the poverty
+    # aggregates / cover page / Section-8H food module) and projects columns that
+    # describe the CLUSTER, not the household.  So the source carries one row per
+    # household (2016-17: one row per household x food item -- 934,584 rows for
+    # 1,000 clusters) while the declared index (t, v) is one row per cluster.
+    # Collapsing to (t, v) is therefore a DE-DUPLICATION of a cluster-invariant
+    # projection -- the right answer -- but before #323 it happened SILENTLY via
+    # groupby().first(), which is the same line of code that would happily
+    # fabricate a value if the column were NOT cluster-invariant.
+    #
+    # `invariant` makes that assumption CHECKED rather than assumed: the build
+    # RAISES if any of these columns ever varies within a (t, v) group.  Verified
+    # cluster-invariant in all five wired waves at the time of writing (max
+    # distinct value per cluster = 1; zero clusters with >1):
+    #   1991-92 POV_GH.DTA          4,523 HH ->   365 clusters
+    #   1998-99 SEC0A.DTA           5,998 HH ->   300 clusters
+    #   2005-06 aggregates/pov_gh5  8,687 HH ->   580 clusters
+    #   2012-13 PARTA/g6loc_edt    16,772 HH -> 1,200 clusters
+    #   2016-17 g7sec8h.dta       934,584 rows-> 1,000 clusters
+    #
+    # 1987-88 / 1988-89 are deliberately NOT wired: their only candidate source
+    # (Y01A.DAT REGION) is the person's REGION OF BIRTH, not the cluster's region
+    # -- see those waves' data_info.yml for the full argument.
     index: (t, v)
     Region: str
     Rural: str
+    Ecological_zone: str
+    aggregation:
+      Region: invariant
+      Rural: invariant
+      Ecological_zone: invariant
   household_roster:
     index: (t, i, pid)
     Sex: str
