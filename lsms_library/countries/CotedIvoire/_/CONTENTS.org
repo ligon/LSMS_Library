@@ -129,6 +129,70 @@ Wave-level =_/food_expenditures.py= scripts exist for 1985-86, 1986-87 using the
 files as CSV format via =dvc.api.open=. They are legacy scripts and use the retired
 =lsms.tools= package — do not extend them.
 
+** Known source defects (GH #323)
+
+*** cluster_features is projected from a HOUSEHOLD-grain source
+
+All five waves read =cluster_features= from a household-grain file
+(=WEIGHT{85..88}.DAT=; =Menage/s00_me_CIV2018.dta= — the same files =sample=
+reads per household) while the table's grain is one row per cluster =(t, v)=.
+=cotedivoire.cluster_features()= projects to cluster grain in the extraction.
+Every declared column is a cluster-CONSTANT attribute, so the projection loses
+nothing; before it existed, the framework silently collapsed 17,896 surplus
+household rows with =groupby().first()=.
+
+Where a cluster's households DISAGREE about a cluster attribute the projection
+takes the *strict majority* and warns (naming the cluster and the competing
+values); on a tie it emits =<NA>= rather than let source row order decide.
+One real conflict exists:
+
+- *grappe 648* (CAVALLY, 2018-19): 11 households coded =Rural=, 1 coded
+  =Urbain= (distinct raw labels, not a case variant). Resolves to =Rural=.
+
+*** CLUST 122 has corrupted person keys (1988-89)
+
+=SEC01A.DAT= repeats =(CLUST, NH, PID)= on 4 rows, all in cluster 122; the
+declared index is =(t, i, pid)=, so the framework silently deleted them.
+Handled in =1988-89/_/mapping.py= (wave-scoped on purpose — a country-wide dedup
+rule would hide the next occurrence), which WARNS on every collision:
+
+- =(122, 19, PID 2)= — same F, REL 10, age *46 vs 45*. One person, double-entered.
+  Collapsed deliberately; the discarded age is named in the warning.
+- =(122, 21, PID 10)= — =SEX=F= and =SEX=M=, both age 10, both Son/Daughter.
+  The sex disagrees, so these two rows cannot be one person's consistent record.
+  *Both reported records are kept*, re-keyed =10= / =10_2=.
+
+  *UNRESOLVED AMBIGUITY, stated plainly*: the source does not say whether this
+  household has two 10-year-olds who were given one PID (plausible — it is a
+  polygamous household with two spouses, and it already contains two same-age
+  different-sex children as separate pids: 11=F,8 and 12=M,8), or ONE child
+  whose sex was corrupted on one of two entries. =HHEXP88.DAT.HHSIZE8= is 13 for
+  this household (= the roster ROW count), but it is *not* independent evidence:
+  it is itself built by counting rows of this same defective file, so it counts
+  the duplicate either way. Keeping both records invents no *measurement* (every
+  Sex/Age/Relationship emitted is as reported; only the key label is synthetic),
+  whereas collapsing would assert a Sex with a coin-flip chance of being wrong
+  AND delete a reported person. If a maintainer prefers to drop the ambiguous
+  person loudly instead, that is a one-line change in
+  =_resolve_pid_collisions=.
+
+- =individual_education= duplicates pids 1 and 2 in the same household (122, 21);
+  those pairs agree on the emitted column and are collapsed as double-entries.
+
+Separately (pre-existing, NOT #323): =(CLUST 137, NH 6, PID 12)= is a *blank*
+roster line (Sex =<NA>=, Age ='.', Relationship =<NA>=) and is dropped by
+=_finalize_result=. So the 1988-89 roster is 10,563 reported records − 1
+double-entry − 1 blank = *10,561* at the API.
+
+*** harmonize_seed_crop must stay INJECTIVE
+
+=plot_inputs= indexes on =(t, i, input, crop, u)= and =harmonize_input= maps every
+seed label to the single input =Seed=, so two seed labels sharing a =crop=
+Preferred Label collide on one key and one is silently dropped. A four-label
+=Autre crop= catch-all was doing exactly that, discarding 9 reported rows. The
+buckets are now split; the guard is the uniqueness assertion at the end of
+=2018-19/_/plot_inputs.py= — see the note in =_/categorical_mapping.org=.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 wave) does NOT ask

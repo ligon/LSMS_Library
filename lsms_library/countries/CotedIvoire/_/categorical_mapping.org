@@ -176,6 +176,28 @@
 # (the s16b roster has no crop column).  Referenced from
 # 2018-19/_/plot_inputs.py via get_categorical_mapping(<table>,
 # 'Original Label', 'Preferred Label').
+#
+# harmonize_seed_crop MUST STAY INJECTIVE over the labels actually present
+# (GH #323).  `crop` is an INDEX level of plot_inputs (t, i, input, crop, u),
+# and harmonize_input maps every seed label to the single `input` value
+# 'Seed' -- so any two DISTINCT reported seed items that share a Preferred
+# Label collide on one index tuple and the framework's groupby().first()
+# silently DISCARDS one of them.  Until 2026-07-12 four labels shared a
+# single 'Autre crop' catch-all bucket; two of them actually occur in the
+# data ("Autres semences" 404 rows, "Semences d'autres céréales" 86 rows),
+# 11 households reported BOTH, and the 9 of those that also shared a unit
+# lost a row apiece.  e.g. grappe 744 / menage 12 reported "Autres semences"
+# 400 kg (own-production) AND "Semences d'autres céréales" 350 kg (market-
+# purchased); the 350 kg market row was silently dropped.  The two are now
+# split ('Autre crop' / 'Autre céréale'), which is also what the source
+# means -- one IS specifically "other cereals".  "Plants/boutures de
+# tubercules" (tuber cuttings) gets 'Autre tubercule' for the same reason;
+# it and the bare code '20' happen to have 0 rows today.
+#
+# This comment is NOT the enforcement: prose does not enforce.  The guard is
+# the uniqueness assertion on the declared index at the end of
+# 2018-19/_/plot_inputs.py, which fails the build loudly if any future label
+# re-introduces a collision.
 
 #+NAME: harmonize_input
 | Original Label                            | Preferred Label     |
@@ -233,8 +255,8 @@
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
+| Semences d'autres céréales    | Autre céréale       |
+| Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
 

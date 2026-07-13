@@ -121,4 +121,29 @@ df = pd.DataFrame({
 df = _finish_plot_inputs(df, '2018-19')
 
 assert len(df) > 0, 'plot_inputs 2018-19 produced no rows'
+
+# GH #323 -- ENFORCE the declared grain.  `crop` is an index level and
+# harmonize_input collapses every seed label onto the single input 'Seed', so a
+# NON-INJECTIVE harmonize_seed_crop makes two DISTINCT reported seed line-items
+# land on one index tuple, whereupon the framework's groupby().first() silently
+# discards one.  That is what happened until 2026-07-12: four labels shared an
+# 'Autre crop' catch-all, and 9 rows -- real reported quantities, e.g. 350 kg of
+# market-purchased "Semences d'autres céréales" in grappe 744 / menage 12 --
+# vanished with no warning.  The CROP_NA sentinel above shows the author knew
+# the framework drops rows on a duplicated index and guarded the NaN case; the
+# catch-all bucket has the identical effect and was missed.
+#
+# A comment is not a guard.  This assertion is: if any future label (or a
+# re-widened bucket) re-introduces a collision, the BUILD FAILS here, loudly,
+# instead of quietly shipping short.
+dups = df.index[df.index.duplicated()]
+assert dups.empty, (
+    f"plot_inputs 2018-19: {len(dups)} duplicate tuple(s) on the declared index "
+    f"(t, i, input, crop, u) -- e.g. {list(dups[:3])}.  Two distinct reported "
+    f"input line-items are colliding on one key; the framework would silently "
+    f"drop one via groupby().first().  Most likely a non-injective "
+    f"harmonize_seed_crop in _/categorical_mapping.org (see the note there). "
+    f"Split the offending Preferred Label rather than letting a row disappear."
+)
+
 to_parquet(df, 'plot_inputs.parquet')
