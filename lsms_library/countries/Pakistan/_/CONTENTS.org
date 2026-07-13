@@ -27,3 +27,72 @@ is an ISA/EHCVM-specific module.  Pakistan Integrated Household Survey (PIHS) 19
 this round by full variable-label inspection of the source =.dta= files:
 all 17 sections (=F01=–=F17=) are accounted for with no shocks chapter — the loan-purpose (§15) and migration-reason (§8) codes are not an events roster.  Not implementable from current data; revisit only if a coping roster
 is later identified.  Tracked in GitHub issue #352.
+
+
+* cluster_features — rewired to real geography (2026-07-12, GH #323)
+
+** What was wrong
+
+~cluster_features~ (declared index =(t, v)=, one row per sampling cluster) was
+extracted in =1991/_/data_info.yml= from **F00A.DTA, the household COVER SHEET**,
+with =idxvars: {v: clust, i: hid}=.  Two compounding defects:
+
+1. *Wrong granularity.*  The =i: hid= idxvar made the extractor emit one row per
+   HOUSEHOLD (4,957) into a cluster-level table (301 clusters).  The surplus =i=
+   level was then silently collapsed away — 4,656 rows discarded.  The collapse
+   happened in ~Wave.cluster_features()~ (=country.py= ~1168, GH #161), whose
+   ~groupby().first()~ emits **no warning at all**; the GH #323 warning in
+   ~_normalize_dataframe_index~ never fired, because by then the frame was
+   already 301 rows and unique.
+
+2. *Wrong columns (the serious part).*  =Region= was wired to =religion= (the
+   household's religion code — not geography; a crosstab against province shows
+   they are unrelated, religion being ~96% code-1 in all four provinces), and
+   =Language= to =langint= (the language OF THE INTERVIEW).  Neither is a cluster
+   attribute: religion varies within 75/301 clusters and langint within 141/301.
+   So ~.first()~ was not deduplicating identical rows — it elected one arbitrary
+   household as spokesperson for its entire cluster.  **252 households' religion
+   and 849 households' langint disagreed with the value assigned to their
+   cluster: 1,101 silently-wrong attributions.**  =Rural= was declared
+   =optional: true= and never populated at all.
+
+** What it is now
+
+Built by =1991/_/cluster_features.py= (=materialize: make=) from **REGIONS.DTA**
+(already the source for ~sample~):
+
+| column | source          | codes                                            |
+|--------+-----------------+--------------------------------------------------|
+| Region | =province=      | 1 Punjab, 2 Sind, 3 NWFP, 4 Balochistan          |
+| Rural  | =urbrural=      | 1 Urban, 2 Rural                                 |
+
+Value labels are taken from =Data/REGIONS.TXT=, the codebook shipped with the
+survey — they are *not* inferred from the distributions.  (Note it spells the
+province "Sind"; the modern spelling is "Sindh", and NWFP is now Khyber
+Pakhtunkhwa.)
+
+=province= and =urbrural= are **perfectly constant within cluster** (0 of 300
+clusters vary), so reducing them to one row per cluster is exact and lossless.
+The script *asserts* that invariant — and the =clust=-prefix ↔ =province=
+invariant — at build time, so the build fails loudly if either ever breaks.  The
+extraction is unique by construction on =(t, v)=, so no reducer runs at all.
+
+** The one cluster with no region data
+
+Cluster =2202029= (a single-household cluster) is entirely absent from
+REGIONS.DTA — the survey never recorded its region.  Its =Region=/=Rural= are
+left ~<NA>~ and the framework's hollow-row policy (~dropna(how='all')~ in
+~_finalize_result~) then omits it, so ~cluster_features()~ returns **300** of the
+301 clusters.  This is deliberate: the leading digit of =clust= does encode
+province (a zero-off-diagonal crosstab), but that rule can only be validated on
+the 300 clusters where province is *already known* and is untestable on the one
+cluster where it would actually be needed — so applying it there would be a
+guess.  Honestly missing beats silently wrong.  ~sample~ likewise carries
+=Rural = NaN= for the 204 households with no REGIONS.DTA row.
+
+** religion / langint
+
+These remain in F00A.DTA and are legitimate *household* attributes.  They are not
+surfaced anywhere today.  If wanted, they belong in a household-level =(t, i)=
+table, where all 4,957 rows survive intact — never in ~cluster_features~, where a
+modal reducer would invent a cluster attribute the survey never measured.
