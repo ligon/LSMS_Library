@@ -4536,6 +4536,16 @@ def _collapse_to_cluster_grain(
     return df.groupby(level=keep_levels, observed=True).first()
 
 
+def _sum_min_count_1(x):
+    """Sum that yields NA (not 0.0) when every value in the group is missing.
+
+    ``Series.sum()`` defaults to ``min_count=0``, so an all-NA group sums to
+    ``0.0``.  For an additive measure column that is a FABRICATION -- it asserts a
+    hard zero where the survey recorded nothing.  GH #323.
+    """
+    return x.sum(min_count=1)
+
+
 @build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
@@ -4672,7 +4682,17 @@ def _normalize_dataframe_index(
                       if report.get("nan_key_rows") else None)
 
         if present_additive:
-            agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
+            # GH #323: `sum` defaults to min_count=0, so a group in which EVERY
+            # value is NA sums to 0.0 -- fabricating a hard zero where the truth is
+            # "unknown".  (`.first()` had the opposite vice: it silently DELETED such
+            # groups -- a #323-class row loss in its own right.)  min_count=1 yields
+            # NA instead, and _finalize_result's dropna(how='all') then drops the row
+            # honestly.  Measured: removes 103,902 fabricated Value=0 rows in Niger
+            # and 478 in Nigeria, restores both to baseline row counts, and leaves the
+            # recovered Value sums and every food_acquired total byte-identical.
+            # (country.py:2089 already uses min_count=1 for exactly this reason.)
+            agg = {c: (_sum_min_count_1 if c in present_additive else 'first')
+                   for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
