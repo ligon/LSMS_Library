@@ -3737,6 +3737,51 @@ def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
     return [str(level) for level in declared_levels]
 
 
+#: Reducers a country may name in a data_scheme ``aggregation:`` block.
+#: Deliberately small: each must be meaningful for a *collapse* of duplicate
+#: index tuples, and none may invent a value that is not in the data.
+_ALLOWED_REDUCERS = frozenset({"sum", "first", "last", "min", "max", "mean", "median"})
+
+
+def _declared_aggregation(schema_entry: dict[str, Any] | None) -> dict[str, str]:
+    """Parse a data-scheme ``aggregation:`` block into a ``{key: reducer}`` map.
+
+    GH #323.  The block was introduced by ``SkunkWorks/grain_aggregation_policy.org``
+    and is declared by several countries, but until now **nothing read it** -- it
+    was documentary prose while the code unconditionally applied
+    ``groupby().first()``, silently discarding the dropped rows.  Prose is not
+    enforcement; this parser is what turns the declaration into enforcement.
+
+    Two key kinds share the block; the caller disambiguates them against the
+    frame's actual columns:
+
+    * **column-keyed** (``Quantity: sum``) -- the reducer for that measure
+      column when duplicate index tuples are collapsed.
+    * **level-keyed** (``visit: first`` -- Malawi ``interview_date``) -- the
+      documented meaning is "collapsing this extra index level takes the first
+      row", i.e. a row-wise reducer applied to every column.
+
+    An unknown reducer RAISES rather than being ignored: a typo'd policy that
+    silently degraded to ``first()`` would reintroduce exactly the silent data
+    loss this block exists to prevent.
+    """
+    if not schema_entry or not isinstance(schema_entry, dict):
+        return {}
+    block = schema_entry.get("aggregation")
+    if not isinstance(block, dict):
+        return {}
+    policy: dict[str, str] = {}
+    for key, reducer in block.items():
+        name = str(reducer).strip().lower()
+        if name not in _ALLOWED_REDUCERS:
+            raise ValueError(
+                f"data_scheme aggregation policy for {key!r} names unknown "
+                f"reducer {reducer!r}; allowed: {sorted(_ALLOWED_REDUCERS)}"
+            )
+        policy[str(key)] = name
+    return policy
+
+
 _SCHEME_DTYPE_MAP = {
     'bool': pd.BooleanDtype(),
     'int': pd.Int64Dtype(),
@@ -4181,32 +4226,70 @@ def _normalize_dataframe_index(
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
         # GH #514/#323: collapsing a non-unique canonical index with .first()
-        # silently DISCARDS the dropped rows.  For additive-measure tables
-        # (food_acquired, whose source legitimately records the same item across
-        # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
-        # re-derive any per-unit Price from the summed totals -- no data lost,
-        # no warning.  Single source of truth for the additive column map lives
-        # in feature.py (imported lazily to avoid an import cycle).
+        # silently DISCARDS the dropped rows.  Reducer precedence, most
+        # specific first:
+        #
+        #   1. the country's DECLARED `aggregation:` block in data_scheme.yml
+        #      (SkunkWorks/grain_aggregation_policy.org).  Until GH #323 this
+        #      block was documentary prose that nothing read -- countries
+        #      declared a policy and the code ignored it, applying .first()
+        #      anyway.  It is now honoured, which is the whole point: an
+        #      aggregation that is WANTED must be DECLARED, not silent.
+        #   2. the hardcoded additive-measure map (food_acquired -> sum), kept
+        #      as the back-compatible default for countries that have not yet
+        #      declared a policy (GH #501/#514).
+        #   3. `first` -- the historical default, which is never safe for rows
+        #      carrying quantities.  Reaching it with rows that actually DIFFER
+        #      is the #323 bug, so say so (and raise under LSMS_STRICT_INDEX).
+        #
+        # Single source of truth for the additive column map lives in feature.py
+        # (imported lazily to avoid an import cycle).
         from .feature import _ADDITIVE_MEASURE_COLUMNS
+
+        policy = _declared_aggregation(schema_entry)
+        # Level-keyed entries (e.g. `visit: first`) mean "collapsing this level
+        # takes that reducer for every column"; column-keyed entries win over it.
+        level_keyed = {k: v for k, v in policy.items() if k not in df.columns}
+        row_reducer = next(iter(level_keyed.values()), None) if level_keyed else None
+        declared_cols = {k: v for k, v in policy.items() if k in df.columns}
+
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
-            agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
-            df = df.groupby(level=present_levels, observed=True).agg(agg)
-            if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
+
+        agg: dict[str, str] = {}
+        for col in df.columns:
+            if col in declared_cols:
+                agg[col] = declared_cols[col]
+            elif row_reducer is not None:
+                agg[col] = row_reducer
+            elif col in present_additive:
+                agg[col] = 'sum'
+            else:
+                agg[col] = 'first'
+
+        # Did an explicit policy cover this collapse, or did we fall back to
+        # the unsafe `first` default for columns whose rows actually differ?
+        covered = bool(declared_cols) or row_reducer is not None or bool(present_additive)
+        df = df.groupby(level=present_levels, observed=True).agg(agg)
+        if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
+            # Price is per-unit, NOT additive: re-derive it from summed totals.
+            if agg.get('Expenditure') == 'sum' or agg.get('Quantity') == 'sum':
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
-        else:
-            df = df.groupby(level=present_levels, observed=True).first()
-            if n_dropped:
-                # No aggregation policy for this table -- surface the loss
-                # loudly rather than drop rows quietly (a table whose source
-                # legitimately has multiple rows per index tuple needs an
-                # explicit policy, like the additive sum above).
-                warnings.warn(
-                    f"Canonical index over {present_levels} had {n_dropped} "
-                    f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                    f"those rows (possible silent data loss — GH #323).",
-                    RuntimeWarning,
-                )
+
+        if n_dropped and not covered:
+            msg = (
+                f"{table_name or 'table'}: canonical index over {present_levels} "
+                f"had {n_dropped} duplicate tuple(s) collapsed via "
+                f"groupby().first(), DISCARDING those rows (silent data loss — "
+                f"GH #323). If the collapse is intended, declare it in the "
+                f"country's data_scheme.yml:\n"
+                f"    {table_name or '<table>'}:\n"
+                f"      aggregation:\n"
+                f"        <column>: sum   # or first/mean/...\n"
+                f"Set LSMS_STRICT_INDEX=1 to turn this into an error."
+            )
+            if os.environ.get('LSMS_STRICT_INDEX'):
+                raise ValueError(msg)
+            warnings.warn(msg, RuntimeWarning)
 
     return df

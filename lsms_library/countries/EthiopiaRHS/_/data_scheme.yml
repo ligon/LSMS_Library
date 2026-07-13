@@ -151,10 +151,35 @@ Data Scheme:
   # Mali-style clean YAML: extract wide per-source columns; the
   # `food_acquired` df_edit hook in _/ethiopiarhs.py melts them to
   # canonical long form on s. Price is API-derived (food_prices).
+  #
+  # GRAIN-AGGREGATION POLICY (GH #323).  The ERHS q36 food module is a
+  # ONE-ROW-PER-FOOD-ITEM roster: all 27 source columns were enumerated and
+  # there is NO line / transaction / occasion / visit identifier (q36_1a is a
+  # section flag, not a line number).  So (t,i,j,u,s) IS the maximal grain the
+  # instrument supports -- there is no finer axis to name, and none should be
+  # invented.  The roster nevertheless carries MULTIPLE LINES per (i,j): most
+  # differ in unit (u is in the index, so they do not collide), but 127 rows
+  # across 1994a-1997 are a second acquisition of the SAME item, in the SAME
+  # unit, from the SAME source, carrying DIFFERENT measurements (e.g. 1997 hh
+  # 10_93 produced Berbere 1.0 kg AND 30.0 kg).  Those are real quantities, so
+  # the collapse to the canonical grain must SUM them -- `first` would silently
+  # destroy ~50% of the Quantity/Expenditure mass in the affected cells.
+  #
+  # This is DECLARED rather than inherited from the hardcoded additive-measure
+  # map in feature.py precisely because an aggregation that is WANTED must be
+  # visible in config (GH #323: prose is not enforcement).
+  #
+  # NB the reducer is `sum`, which DOUBLE-COUNTS a row punched twice -- so the
+  # `food_acquired` hook in _/ethiopiarhs.py drops rows that are
+  # indistinguishable in the canonical grain BEFORE the framework sums.  The
+  # dedup and the sum are a matched pair; neither is correct without the other.
   food_acquired:
     index: (t, i, j, u, s)
     Quantity: float
     Expenditure: float
+    aggregation:
+      Quantity: sum
+      Expenditure: sum
 
   # plot_features (#278, under #167): LASTING plot/parcel characteristics
   # of the household's farmland.  One row per plot -- MULTIPLE PLOTS PER
