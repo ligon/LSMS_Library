@@ -113,6 +113,25 @@ different ways**, so one fix does not close it:
   not let it see through the duplicate.) **If the maintainer prefers class-2
   (drop the ambiguous person loudly) over preserving both records, this is the
   one line to change**, in `1988-89/_/mapping.py::_resolve_pid_collisions`.
+- **`grappe_gps_CIV2018.dta` IS NOT IN THE REPO — CotedIvoire silently loses
+  cluster GPS in any clean clone / CI / worktree.** (Pre-existing; found while
+  proving this PR broke nothing.) `2018-19/_/data_info.yml` declares a `df_geo`
+  sub-df reading `Menage/grappe_gps_CIV2018.dta` for `Latitude`/`Longitude`, but
+  that file is an **untracked local artifact** sitting in the maintainer's main
+  checkout (dated Apr 12) with **no `.dvc` sidecar and no git entry**. Anywhere
+  else it cannot be resolved, the GH #515 optional-sub-df fallback drops the
+  sub-df with a warning, and `cluster_features` comes back with only
+  `[Region, Rural]`. Consequence: `test_table_structure`'s
+  `test_declared_columns_present[CotedIvoire/cluster_features]` and
+  `test_feature_is_sane[CotedIvoire/cluster_features]` **fail on pristine
+  `development`** in any such environment (verified in a detached `development`
+  worktree: identical failure, `Missing: ['Latitude', 'Longitude']`). They pass
+  in the main checkout only because the untracked file happens to be on disk.
+  **Fix is a maintainer action needing S3 write creds**: `dvc add` + push the
+  file. With the file present, this PR's `cluster_features` carries Lat/Lon
+  through correctly (1,484 rows, 1,084 grappes, 967 with GPS, index unique) and
+  all 6 CotedIvoire/cluster_features structural tests pass — verified by copying
+  the file in.
 - **CotedIvoire `assets` returns 2,169 duplicate index tuples at the API**
   (pre-existing, unchanged by this PR — present identically before and after).
   It is NOT a #323 row-loss (no rows are dropped; the declared `(t, i, j)` index
@@ -139,3 +158,15 @@ different ways**, so one fix does not close it:
 - **No CONTRADICTION or REINVENTION found.** No library code changed; the diff is
   confined to `lsms_library/countries/CotedIvoire/` plus one new test file, so no
   other country's build can be affected.
+
+**Full suite** (worktree config, cold CotedIvoire cache): `3 failed, 3141 passed,
+152 skipped, 4 xfailed, 1 xpassed`. All 3 failures are pre-existing and were each
+reproduced on pristine `development` in the same environment:
+
+| failure | pre-existing? | why |
+|---|---|---|
+| `test_currency::test_feature_ghana_per_wave` | yes — GH #589 | known base failure; this diff touches no Ghana and no library code |
+| `test_table_structure::test_declared_columns_present[CotedIvoire/cluster_features]` | yes | `grappe_gps_CIV2018.dta` unresolvable (§6) — identical failure on a detached `development` worktree |
+| `test_table_structure::test_feature_is_sane[CotedIvoire/cluster_features]` | yes | same cause; both PASS with this fix once the file is present |
+
+New tests: **12 of 13 fail on pristine `development`, 13/13 pass after.**
