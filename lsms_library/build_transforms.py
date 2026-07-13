@@ -14,10 +14,16 @@ written parquet:
   - ``apply_derived`` (+ ``fill_v_with_coord_bin`` and the
     ``_DERIVED_TRANSFORMERS`` registry): the ``derived:`` block applied by
     ``Wave.grab_data`` during extraction.
+  - ``reduce_to_agreed`` / ``collapse_to_cluster_grain`` / ``add_visit_level``:
+    the EXPLICIT grain helpers (GH #323).  A country's ``mapping.py`` calls
+    them BY NAME; core never dispatches them.
 
 These names are re-exported from ``lsms_library.transformations`` for
 backward compatibility with the country scripts that import them from there.
 """
+import os
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -336,3 +342,239 @@ def apply_derived(df, derived_spec):
             )
         df = fn(df, target=output_col, **step)
     return df
+
+
+# ---------------------------------------------------------------------------
+# Explicit grain helpers (GH #323)
+#
+# POLICY.  ``SkunkWorks/grain_aggregation_policy.org`` puts the boundary at the
+# ACCESS PATH: ``country.py`` / ``feature.py`` / ``local_tools.py`` NEVER reduce
+# grain -- they return the maximal grain the instruments support.  Aggregation
+# is always EXPLICITLY invoked, by the analyst or by the country.  The helpers
+# below are the country's instrument: a wave's ``_/mapping.py`` imports one BY
+# NAME and hands it the frame.  That is the country aggregating, visibly, at
+# build time -- not core aggregating behind the caller's back.
+#
+# They are therefore NOT a declared-reducer mechanism.  There is no
+# ``aggregation:`` YAML key and no dispatch table; core cannot reach these
+# functions.  A country that wants a collapse writes the call.
+#
+# The contract every reducer here upholds: a reduction that would DESTROY an
+# observed value is not performed quietly.  It raises, or (when the caller has
+# explicitly accepted the loss) it NAs the conflicted cells and warns loudly.
+# A helper that quietly picks a winner would only relocate the #323 bug.
+#
+# CACHE NOTE.  These run at build time, so their output is baked into the L2
+# parquet and their CODE must be versioned by the content hash.  It is, via
+# ``_build_registry.framework_imports_fingerprint``: ``Wave._input_hash`` /
+# ``Country._table_cache_hash`` parse every ``_/ *.py`` build module (mapping.py
+# included), resolve its ``from lsms_library... import`` targets, and fold their
+# closures in -- so editing a reducer invalidates exactly the waves that call
+# it.  ``add_visit_level`` additionally carries a ``@build_transform`` tag (it is
+# food_acquired-scoped, like its sibling ``food_acquired_to_canonical``); the
+# generic reducers deliberately do NOT, because an all-tables tag would fold
+# them into EVERY table's fingerprint in every country -- invalidating the whole
+# library's cache for a helper most countries never call, with no correctness
+# gain over the import-closure fold above.
+# ---------------------------------------------------------------------------
+
+_GRAIN_STRICT_ENV = 'LSMS_GRAIN_STRICT'
+
+
+class GrainConflict(ValueError):
+    """Rows sharing an index tuple carry DIFFERENT values; collapsing them
+    would destroy an observed value.  A ``ValueError`` subclass, so a caller
+    that catches ``ValueError`` still catches this."""
+
+
+class GrainConflictWarning(UserWarning):
+    """A reducer was told to proceed through a conflict (``on_conflict='na'``)
+    and blanked the conflicted cells.  Loud by construction: the values it
+    dropped are real data (GH #323)."""
+
+
+def _grain_strict() -> bool:
+    return os.environ.get(_GRAIN_STRICT_ENV, '').strip().lower() not in ('', '0', 'false', 'no')
+
+
+def _conflict_message(conflicts: pd.DataFrame, levels: list, verb: str) -> str:
+    """Human-readable, actionable account of a grain conflict.
+
+    ``conflicts`` is a boolean frame (group x column): True where a group holds
+    more than one distinct value.  Names the columns, the counts and a handful
+    of offending group keys -- enough to go look at the source.
+    """
+    per_col = {c: int(conflicts[c].sum()) for c in conflicts.columns if conflicts[c].any()}
+    bad = conflicts.any(axis=1)
+    examples = [tuple(k) if isinstance(k, tuple) else (k,) for k in conflicts.index[bad][:5]]
+    return (
+        f"grain conflict on {levels}: {int(bad.sum())} of {len(conflicts)} group(s) "
+        f"carry more than one distinct value.  Conflicted groups per column: "
+        f"{per_col}.  Offending groups e.g. {examples}.  {verb}  "
+        f"Either the payload is genuinely finer-grained than the declared index "
+        f"(it does not belong in this table), the identifier is broken / a level "
+        f"is missing, or the source needs cleaning.  If the loss is understood and "
+        f"accepted, pass on_conflict='na' to blank exactly these cells (and say why "
+        f"at the call site).  GH #323; SkunkWorks/grain_aggregation_policy.org."
+    )
+
+
+def reduce_to_agreed(df: pd.DataFrame, *, on_conflict: str = 'raise',
+                     na_is_conflict: bool = False) -> pd.DataFrame:
+    """Collapse rows sharing an index tuple, keeping ONLY values they AGREE on.
+
+    The honest reducer for a table whose declared grain is COARSER than the
+    source it is extracted from -- e.g. ``cluster_features``, declared ``(t, v)``
+    but read off a household-level cover page, where each cluster's attributes
+    are meant to be redundant copies across its households.
+
+    Call it from the country's ``_/mapping.py`` instead of letting the frame
+    reach core's duplicate-index fallback (``groupby().first()``), which is
+    silent, takes the first NON-NULL value PER COLUMN (so where the "redundant"
+    copies disagree it can synthesise a row that exists in no source), and hides
+    the loss behind the cache it poisons (GH #323).
+
+    Contract
+    --------
+    * **Lossless or loud.**  A group whose rows agree collapses to that agreed
+      row.  A group whose rows DISAGREE is never resolved by picking a winner:
+      by default this RAISES :class:`GrainConflict`, naming the columns and the
+      offending groups.  With ``on_conflict='na'`` the conflicted cells are set
+      missing (loudly missing beats quietly wrong) and a
+      :class:`GrainConflictWarning` is emitted -- the caller has to have asked
+      for that, in writing, at the call site.  ``LSMS_GRAIN_STRICT=1`` in the
+      environment escalates ``'na'`` back to a raise.
+    * **NaN is absence, not contradiction** (default).  A group where one row
+      says ``Dakar`` and another says nothing keeps ``Dakar``: no observed value
+      is discarded, so the completion is lossless.  Pass ``na_is_conflict=True``
+      for the stricter reading (a missing report is itself a disagreement).
+    * **NaN index keys survive.**  The groupby uses ``dropna=False``, so a row
+      whose declared index level is NaN is not deleted here.  (What core does
+      with it downstream is core's business -- see #323 Site 3.)
+    * **A unique index is returned untouched** -- same rows, same order, same
+      dtypes.  Nothing to collapse.
+
+    Args:
+        df: the frame as extracted, indexed by the declared (possibly
+            non-unique) levels.
+        on_conflict: ``'raise'`` (default) or ``'na'``.
+        na_is_conflict: treat a NaN alongside an observed value as a
+            disagreement rather than as a missing report.
+
+    Returns:
+        One row per index tuple.
+
+    Raises:
+        GrainConflict: on disagreement, unless ``on_conflict='na'``.
+        ValueError: on an unknown ``on_conflict``, or a non-empty frame with no
+            named index levels (a caller who forgot to set the index would
+            otherwise get a silent no-op).
+    """
+    if on_conflict not in ('raise', 'na'):
+        raise ValueError(f"on_conflict must be 'raise' or 'na', not {on_conflict!r}")
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError(f"reduce_to_agreed expects a DataFrame, got {type(df).__name__}")
+    if df.empty:
+        return df                       # e.g. grab_data's "no data loaded" frame
+    levels = [n for n in df.index.names if n is not None]
+    if not levels:
+        raise ValueError(
+            "reduce_to_agreed needs the declared index set (df.index has no named "
+            "levels); set_index the declared levels before reducing."
+        )
+    if df.index.is_unique:
+        return df                       # nothing to collapse -- keep rows/order/dtypes
+
+    cols = list(df.columns)
+    grouped = df.groupby(level=levels, observed=True, dropna=False)
+    # GroupBy.first() == first NON-NULL per column, which IS the agreed value
+    # wherever nunique <= 1.  We never rely on it where nunique > 1.
+    reduced = grouped[cols].first()
+    nunique = grouped[cols].nunique(dropna=not na_is_conflict).reindex(
+        index=reduced.index, columns=cols)
+    conflicts = nunique > 1
+
+    if bool(conflicts.to_numpy().any()):
+        if on_conflict == 'raise' or _grain_strict():
+            raise GrainConflict(_conflict_message(
+                conflicts, levels,
+                "Collapsing would silently discard the difference." if on_conflict == 'raise'
+                else f"on_conflict='na' was requested but {_GRAIN_STRICT_ENV} is set.",
+            ))
+        warnings.warn(
+            _conflict_message(conflicts, levels,
+                              "on_conflict='na': blanking those cells rather than "
+                              "picking an arbitrary winner."),
+            GrainConflictWarning, stacklevel=2)
+        reduced = reduced.mask(conflicts)
+
+    return reduced
+
+
+def collapse_to_cluster_grain(df: pd.DataFrame, *, on_conflict: str = 'raise',
+                              na_is_conflict: bool = False) -> pd.DataFrame:
+    """Reduce a HOUSEHOLD-grain ``cluster_features`` extraction to CLUSTER grain.
+
+    The named, discoverable case of :func:`reduce_to_agreed` -- and by far the
+    commonest: many countries source ``cluster_features`` from the household
+    cover file (one row per HOUSEHOLD) while the table is declared at ``(t, v)``,
+    so the frame arrives ~12x inflated and core used to collapse it with a silent
+    ``groupby().first()``, correct only by the ACCIDENT that the attributes
+    happen to be constant within the cluster (GH #323).
+
+    This makes the correction explicit and ENFORCES the invariant its
+    correctness rests on -- every attribute single-valued within a cluster.  A
+    cluster code that is unique only WITHIN a district, a re-coded region, a
+    grappe straddling urban and rural: any of these now raises and names the
+    offending clusters instead of keeping one row's value at random.  ("Invariant
+    by construction of the sampling design" is prose; prose is not enforcement.)
+
+    Use it as a wave-module ``df_edit`` hook::
+
+        # countries/<C>/<wave>/_/mapping.py
+        from lsms_library.transformations import (
+            collapse_to_cluster_grain as cluster_features,
+        )
+
+    See :func:`reduce_to_agreed` for the full contract (including
+    ``on_conflict='na'`` and ``LSMS_GRAIN_STRICT``).  Policy:
+    ``SkunkWorks/grain_aggregation_policy.org``.
+    """
+    return reduce_to_agreed(df, on_conflict=on_conflict, na_is_conflict=na_is_conflict)
+
+
+@build_transform(tables=['food_acquired'])
+def add_visit_level(df: pd.DataFrame, visit: int = 1) -> pd.DataFrame:
+    """Append a constant ``visit`` (recall-occasion) level to a food_acquired frame.
+
+    For a country whose ``food_acquired`` index carries a ``visit`` level because
+    SOME wave repeats the consumption recall, but whose OTHER waves ask it
+    exactly once.  Those single-recall waves get ``visit = 1`` so every wave
+    shares one index shape and the country-level concat aligns.
+
+    Motivating case (GH #323): Burkina Faso's 2014 EMC wave is a CONTINUOUS
+    survey that revisits the same 10,800 households in four quarterly passages,
+    each with its own independent 7-day recall (``visit = 1..4``); its EHCVM
+    waves (2018-19, 2021-22) field the module once.  Without the level, the four
+    passages collide on one ``(t, v, i, j, u, s)`` tuple and the additive
+    reducer SUMS them into a single bogus "7-day" figure.
+
+    This ADDS a level -- it never reduces grain -- which is exactly the
+    union-of-levels direction the grain policy asks for: carry the finer
+    instrument's detail, let the analyst collapse it.
+
+    Note ``visit`` is NOT EHCVM's ``vague``, which is a sample split (which
+    households are surveyed when), not a repeated measure;
+    ``food_acquired_to_canonical`` drops that upstream, and reusing it as
+    ``visit`` would falsely imply a second recall.
+
+    Raises:
+        ValueError: if ``visit`` is already present (in the index or the
+            columns) -- silently stamping a second one would corrupt the index.
+    """
+    if 'visit' in (df.index.names or []) or 'visit' in df.columns:
+        raise ValueError(
+            "add_visit_level: 'visit' is already present on this frame; stamping "
+            "a constant over an existing recall-occasion level would corrupt it."
+        )
+    return df.assign(visit=visit).set_index('visit', append=True)

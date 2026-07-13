@@ -20,6 +20,19 @@ from .build_transforms import (  # noqa: F401  (re-export for back-compat)
     fill_v_with_coord_bin,
     apply_derived,
     _DERIVED_TRANSFORMERS,
+    # Explicit grain helpers (GH #323).  They live in build_transforms because
+    # a country's mapping.py calls them at BUILD time and their output is baked
+    # into the L2 parquet; they are re-exported here because that is where the
+    # country scripts import from, and because the grain policy
+    # (SkunkWorks/grain_aggregation_policy.org) names transformations.py as the
+    # home of caller-invoked aggregation.  Both modules are caller-invoked; only
+    # the ACCESS PATH (country.py / feature.py / local_tools.py) is forbidden to
+    # reduce grain, and none of these is reachable from it.
+    reduce_to_agreed,
+    collapse_to_cluster_grain,
+    add_visit_level,
+    GrainConflict,
+    GrainConflictWarning,
 )
 
 
