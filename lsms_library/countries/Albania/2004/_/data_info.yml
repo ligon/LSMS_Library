@@ -1,13 +1,12 @@
 Country: Albania
 Wave: 2004
 
-cluster_features:
-    file: ../Data/w3_hh_basic.dta
-    idxvars:
-        v: m0_q01
-        i: chid
-    myvars:
-        Region: m0_distr
+# cluster_features: NOT built here.  It is CLUSTER grain (index (t, v)) but the
+# only source in this wave is household/person grain, so a YAML extraction had to
+# declare an extra household idxvar -- which the framework then silently collapsed
+# with groupby().first() (GH #323).  It is now built by _/cluster_features.py
+# (materialize: make in ../../_/data_scheme.yml), which reduces to cluster grain
+# EXPLICITLY and CHECKS that each cluster carries one distinct value per column.
 
 household_roster:
     file: ../Data/w3_roster_all.dta
