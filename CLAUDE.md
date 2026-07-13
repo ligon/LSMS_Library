@@ -156,6 +156,21 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 **EHCVM note**: EHCVM 2018-19 countries lack a continuous months variable. The binary `s01q12` ("lived continuously 6+ months?") is mapped to 0/12. Guinea-Bissau may need Portuguese keys (`Sim`/`Não`) alongside `Oui`/`Non`. See CONTENTS.org files for per-country documentation.
 
+## Grain Collapse: the Core Never Aggregates Silently (GH #323)
+
+`_normalize_dataframe_index` (`country.py`) still collapses a non-unique **declared** index with `groupby().first()`, and `feature._collapse_duplicate_index` does the same after dropping an extra level. Both are now **audited before they destroy anything** (`country._audit_index_collapse`):
+
+- **Destructive collapse** (the duplicate rows *disagree*) → `GrainCollapseWarning`, naming country/table/wave and the exact rows destroyed. `LSMS_GRAIN_STRICT=1` turns it into a fatal `GrainCollapseError` — that's the CI/test ratchet. There is deliberately **no allowlist of known-bad cells**; a known-bad cell stays loud until it is fixed.
+- **Lossless de-dup** (the duplicate rows are *identical* — e.g. a cluster attribute repeated once per household) → silent. ~6.4M of the ~7.5M duplicated rows in the corpus are this; reporting them would bury the ~540k real losses in noise.
+- `_ADDITIVE_MEASURE_COLUMNS` (`food_acquired`) still SUMs and stays silent — it is lossless.
+- `grain_reports()` returns the reports filed in-process (for tests / the audit harness).
+
+**The signal survives the cache — this is the load-bearing part.** The L2-country parquet is written **post-collapse**, so on a warm read the index is already unique and any detector at the collapse site is *structurally unable to fire*. (That is why the original #323 warning, added in PR #411, never fired in normal operation: **the bug hid behind the cache the bug poisoned**, and every guard we had — the warning, `diagnostics._check_duplicate_index`, any scan of `var/` — sat downstream of the destruction.) The audit is therefore embedded in the parquet's schema metadata (`lsms_grain_audit`, alongside `lsms_cache_hash`) at write time and **replayed on every warm read**.
+
+**Duplicates on a declared index mean the IDENTIFIER IS BROKEN or a LEVEL IS MISSING — fix the index; do not declare a reducer.** Mali's `household_roster` declares `(t, i, pid)` but `pid` is a *household* id stamped on every member, so `first()` keeps one person per household and 32,026 people vanish; no reducer is correct there. The `aggregation:` key in `data_scheme.yml` is **dead config** and is deliberately NOT honoured by the core collapse (a test pins this) — see `SkunkWorks/grain_aggregation_policy.org` §3a ("NO AGGREGATION IN CORE").
+
+*Known open (§3b of that doc)*: `groupby()` defaults to `dropna=True`, so a row with NaN in a declared index level is **deleted outright** by the collapse — 14 cells / 485,231 rows (worst: Burkina Faso `food_acquired` 2014, 82.5% of rows). Currently **reported, not fixed**.
+
 ## Derived Tables
 
 `household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — `Country.data_scheme` auto-surfaces them when the source table (`food_acquired` or `household_roster`) is present. A `!derived` YAML tag was considered and rejected (2026-04-18): it would create a migration burden with no gain over the hardcoded dicts + auto-discovery.

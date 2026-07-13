@@ -44,6 +44,7 @@ from .local_tools import (
     read_parquet_cache_hash,
     cache_freshness,
     stamp_parquet_hash,
+    read_parquet_grain_audit,
     _collect_file_paths_from_block,
 )
 from .paths import data_root, countries_root
@@ -2112,7 +2113,8 @@ class Country:
 
         if isinstance(df, pd.DataFrame):
             df = self._augment_index_from_related_tables(df, scheme_entry, None)
-            df = _normalize_dataframe_index(df, scheme_entry, None, method_name)
+            df = _normalize_dataframe_index(df, scheme_entry, None, method_name,
+                                            country=self.name)
 
             # Join v from sample() for household-level tables that lack it.
             # Skip if v is already in the index OR already present as a
@@ -2712,7 +2714,8 @@ class Country:
                         scheme_entry,
                         w,
                     )
-                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name)
+                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name,
+                                                            country=self.name)
 
                 if wave_result is None and not wave_has_table:
                     continue
@@ -2814,6 +2817,13 @@ class Country:
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
 
+            # GH #323: start this table's grain ledger clean.  It is repopulated
+            # either by the cold build (the collapse audit) or by replaying the
+            # stamp on a warm read -- so `grain_reports()` describes THIS load, and
+            # a stale report from an earlier call in the same process can never be
+            # re-stamped into a parquet it does not belong to.
+            _GRAIN_LEDGER.pop((self.name, method_name), None)
+
             # v0.7.0/v0.8.0: best-effort cache read.  If a parquet exists
             # at cache_path AND is not stale, read it and return without
             # consulting DVC, the stage layer, or the wave loaders.
@@ -2862,6 +2872,16 @@ class Country:
                     try:
                         cached_df = get_dataframe(cache_path)
                         cached_df = map_index(cached_df)
+                        # GH #323: this parquet was written POST-collapse, so its
+                        # index is unique and _normalize_dataframe_index below can
+                        # never re-detect the loss.  Replay what the cold build that
+                        # produced it recorded -- otherwise the warning is a
+                        # cold-build-only event and the loss is invisible on every
+                        # warm read, which is exactly how #323 survived its first fix.
+                        _replay_grain_audit(
+                            read_parquet_grain_audit(cache_path),
+                            self.name, method_name,
+                        )
                         if freshness == "legacy" and cache_expected_hash is not None:
                             # Trust-once-then-stamp: parquet predates
                             # hashing; assume it matches current sources
@@ -2899,7 +2919,8 @@ class Country:
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             to_parquet(df, cache_path,
-                                       cache_hash=self._table_cache_hash(method_name, waves))
+                                       cache_hash=self._table_cache_hash(method_name, waves),
+                                       grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return df
 
@@ -2926,7 +2947,8 @@ class Country:
                                     scheme_entry,
                                     stage.wave,
                                 )
-                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name)
+                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name,
+                                                                    country=self.name)
                                 stage_results[stage.wave or "ALL"] = df_wave
                         return stage_results
 
@@ -2943,7 +2965,8 @@ class Country:
                         combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
                         to_parquet(combined_df, cache_path,
-                                   cache_hash=self._table_cache_hash(method_name, waves))
+                                   cache_hash=self._table_cache_hash(method_name, waves),
+                                   grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return combined_df
 
@@ -2974,6 +2997,17 @@ class Country:
                             logger.debug(f"Reading {method_name} from cache {cache_path}")
                             cached_df = get_dataframe(cache_path)
                             cached_df = map_index(cached_df)
+                            # GH #323: the OTHER warm-read path.  Same argument as at
+                            # the v0.8.0 fast-path read above -- this parquet is
+                            # post-collapse, so nothing downstream can re-detect the
+                            # loss; replay what the cold build stamped.  (Largely dead
+                            # since the DVC stage layer was retired in v0.7.0, but a
+                            # silent warm read is exactly the hole being closed, so it
+                            # does not get to stay open on a technicality.)
+                            _replay_grain_audit(
+                                read_parquet_grain_audit(cache_path),
+                                self.name, method_name,
+                            )
                             wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
                             cached_df = self._augment_index_from_related_tables(
                                 cached_df,
@@ -2985,6 +3019,7 @@ class Country:
                                 scheme_entry,
                                 wave_hint,
                                 method_name,
+                                country=self.name,
                             )
                             return cached_df
                         except (FileNotFoundError, PathMissingError):
@@ -4096,12 +4131,261 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+# ---------------------------------------------------------------------------
+# GH #323 -- the grain-collapse audit.
+#
+# THE CLASS OF BUG.  `_normalize_dataframe_index` reduces a non-unique DECLARED
+# index with `groupby(...).first()`.  Where the duplicate rows DISAGREE, the rows
+# it drops are real data (distinct people, distinct shocks) and they vanished with
+# no signal.  #323 was closed once on a warning that could not fire (below); #500,
+# #501 and #514 were each closed on a single INSTANCE while the class survived.
+#
+# WHY THE OLD WARNING COULD NOT FIRE.  It was gated on `not df.index.is_unique`,
+# and the L2-country parquet is WRITTEN POST-COLLAPSE -- so on every warm read the
+# index is already unique and the gate is False.  The bug hid behind the cache that
+# the bug poisoned.  Two fixes follow from that, and both matter:
+#   (1) audit BEFORE the collapse, while the evidence still exists;
+#   (2) PERSIST the finding into the parquet and re-emit it on the warm read
+#       (`local_tools._GRAIN_AUDIT_KEY`), so the signal outlives the destruction.
+#
+# WHY NOT "just declare an aggregation policy".  Because duplicates on a declared
+# index almost never mean "reduce me" -- they mean the IDENTIFIER IS BROKEN or a
+# LEVEL IS MISSING.  Mali's `household_roster` declares `(t, i, pid)`, but `pid` is
+# a *household* id stamped onto every member (5,149 distinct values across 37,175
+# rows), so `first()` keeps ONE PERSON PER HOUSEHOLD and 32,026 people disappear.
+# No reducer is correct there: `first` keeps one person, `sum` is meaningless on
+# `Sex`.  Declaring `aggregation: {pid: first}` would only put a signature on the
+# corpse.  So the core does NOT aggregate -- consistent with the NO-AGGREGATION-IN-
+# CORE contract in SkunkWorks/grain_aggregation_policy.org -- it reports, and (in
+# strict mode) refuses.  The one genuine reduction policy we have,
+# `_ADDITIVE_MEASURE_COLUMNS` (food_acquired), stays and is lossless.
+# ---------------------------------------------------------------------------
+
+class GrainCollapseError(RuntimeError):
+    """A declared index was non-unique and collapsing it would destroy rows.
+
+    Raised instead of the default warning when ``LSMS_GRAIN_STRICT`` is set.
+    """
+
+
+class GrainCollapseWarning(RuntimeWarning):
+    """A declared index was non-unique; collapsing it destroyed rows (GH #323).
+
+    Its own class (rather than a bare ``RuntimeWarning``) so callers and CI can
+    target it precisely: ``warnings.simplefilter("error", GrainCollapseWarning)``.
+    """
+
+
+def _grain_strict() -> bool:
+    """Whether a destructive grain collapse should RAISE rather than warn.
+
+    Default is warn: making it fatal out of the box breaks ~30 countries at once
+    and gets reverted, and a revert is how the class survives.  Strict mode is
+    what lets tests and CI ratchet the census down to zero without a
+    known-bad allowlist (an allowlist is the same disease with a registry).
+    """
+    return os.environ.get("LSMS_GRAIN_STRICT", "").lower() in {"1", "true", "yes"}
+
+
+def _audit_index_collapse(
+    df: pd.DataFrame, levels: list[str],
+) -> dict[str, Any] | None:
+    """Measure what collapsing *df* onto *levels* would destroy.
+
+    Returns ``None`` when the collapse is provably lossless, else a report dict.
+
+    THE DISTINCTION THAT MAKES THIS SIGNAL READABLE.  Across the 40 countries,
+    ~7.5M rows sit on a duplicated declared index -- but 6.46M of them are EXACT
+    duplicates of a row that survives (a cluster attribute repeated once per
+    household in the cluster, say).  Collapsing those loses nothing.  Only ~542k
+    rows sit in groups whose rows actually DISAGREE, and those are the real data
+    loss.  Warning on the raw duplicate count would bury the 542k under 6.5M false
+    alarms -- and a warning nobody reads is exactly how this bug survived.  So:
+
+    - a duplicate group whose rows are all mutually identical -> lossless dedup,
+      not reported;
+    - a group containing any two rows that differ -> DESTRUCTIVE; every row it
+      drops is counted, including a row that happens to duplicate another inside
+      that group (two identical roster rows are still two distinct PEOPLE, and a
+      household's size is wrong if you drop one).
+
+    Missing values count as values: two rows that differ only in *whether* a field
+    is recorded are different rows.  That is deliberately conservative -- it
+    over-reports rather than under-reports, and it is what catches
+    ``Burkina_Faso/shocks``, where ``first()`` keeps an all-``<NA>`` row and throws
+    away the row that has the real answers.
+
+    ``nan_key_rows`` is a SEPARATE loss riding along in the same operation:
+    ``groupby()`` defaults to ``dropna=True``, so a row with NaN in a declared
+    index level is DELETED OUTRIGHT by the collapse, not merely merged into it.
+    """
+    if not levels:
+        return None
+    try:
+        n_nan_key_rows = int(df.index.to_frame().isna().any(axis=1).sum())
+    except (TypeError, ValueError):
+        n_nan_key_rows = 0
+
+    # If the audit itself cannot run we must NOT return None -- None means
+    # "provably lossless", and an instrument that fails silently and reports
+    # clean is the exact disease this whole change exists to cure.  Say so
+    # instead, loudly, and let the caller decide (strict mode makes it fatal).
+    #
+    # Cost note: the stringify below is O(rows) and is the expensive part
+    # (~3 s on the largest cell, Mali/cluster_features/2021-22 at 4.7M rows).
+    # It runs ONLY when the index is already known to be non-unique, and ONLY on
+    # the cold build path -- a warm read pays ~1 ms to read the stamp instead.
+    try:
+        # Stringify to make every column hashable (categoricals, lists, pd.NA)
+        # and to make NA compare equal to NA rather than to nothing.
+        flat = df.reset_index().astype(str)
+        size = flat.groupby(levels, dropna=False, observed=True).size()
+        distinct = (flat.drop_duplicates()
+                        .groupby(levels, dropna=False, observed=True).size())
+    except (TypeError, ValueError, KeyError) as exc:
+        return {
+            "levels": list(levels),
+            "rows": int(len(df)),
+            "dropped": int(df.index.duplicated().sum()),
+            "destroyed": 0,
+            "conflicting_groups": 0,
+            "nan_key_rows": n_nan_key_rows,
+            "unauditable": f"{type(exc).__name__}: {exc}",
+        }
+
+    n_dropped = int(size.sum() - len(size))
+    conflicting = distinct.index[distinct > 1]
+    n_destroyed = int((size.loc[conflicting] - 1).sum()) if len(conflicting) else 0
+
+    if not n_destroyed and not n_nan_key_rows:
+        return None  # provably lossless: nothing to report
+    return {
+        "levels": list(levels),
+        "rows": int(len(df)),
+        "dropped": n_dropped,
+        "destroyed": n_destroyed,
+        "conflicting_groups": int(len(conflicting)),
+        "nan_key_rows": n_nan_key_rows,
+    }
+
+
+def _format_grain_report(report: dict[str, Any]) -> str:
+    country = report.get("country") or "?"
+    table = report.get("table") or "?"
+    wave = report.get("wave")
+    where = f"{country}/{table}" + (f"/{wave}" if wave else "")
+    levels = ", ".join(report.get("levels") or [])
+    duplicated = bool(report.get("dropped") or report.get("destroyed")
+                      or report.get("unauditable"))
+    if duplicated:
+        bits = [f"{where}: declared index ({levels}) is NOT UNIQUE."]
+    else:
+        # missing-level-only report: the index is unique, but only because it was
+        # silently narrowed.
+        bits = [f"{where}: declared index was SILENTLY NARROWED to ({levels})."]
+    if report.get("unauditable"):
+        bits.append(
+            f"The collapse COULD NOT BE AUDITED ({report['unauditable']}), so it is "
+            f"NOT known to be safe: {report.get('dropped', 0):,} row(s) were dropped "
+            f"by groupby().first() and may carry data. Treat as data loss until shown "
+            f"otherwise."
+        )
+    if report.get("destroyed"):
+        bits.append(
+            f"Collapsing it with groupby().first() DESTROYED {report['destroyed']:,} "
+            f"of {report['rows']:,} rows whose values DISAGREE "
+            f"({report['conflicting_groups']:,} conflicting index tuples). "
+            f"These rows are gone from the returned data."
+        )
+    if report.get("missing_levels"):
+        bits.append(
+            f"Declared index level(s) {report['missing_levels']} are ABSENT from the "
+            f"data, so the index was silently narrowed -- that is very likely what "
+            f"manufactured these duplicates."
+        )
+    if report.get("nan_key_rows"):
+        bits.append(
+            f"Additionally {report['nan_key_rows']:,} row(s) carry NaN in a declared "
+            f"index level and are DELETED OUTRIGHT by the collapse (groupby dropna)."
+        )
+    bits.append(
+        "Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN "
+        "or an index LEVEL IS MISSING -- fix the index (source a real id, or declare "
+        "the level the survey actually varies over). Do NOT declare a reducer: the "
+        "core does not aggregate (SkunkWorks/grain_aggregation_policy.org). "
+        "Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323."
+    )
+    return " ".join(bits)
+
+
+# Reports produced during a build, keyed by (country, table).  The collapse
+# happens deep in a per-wave call but must be stamped into the L2-country parquet
+# written much later by a different function, and pandas drops ``df.attrs`` across
+# merge/set_index/groupby (see CLAUDE.md) -- so routing the report through attrs
+# would silently lose it, which is the very failure mode being fixed here.
+_GRAIN_LEDGER: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+
+def _record_grain_report(report: dict[str, Any]) -> None:
+    """Emit a grain-collapse report and file it for the cache writer."""
+    key = (report.get("country") or "?", report.get("table") or "?")
+    existing = _GRAIN_LEDGER.setdefault(key, [])
+    if report not in existing:
+        existing.append(report)
+    _emit_grain_report(report)
+
+
+def _emit_grain_report(report: dict[str, Any]) -> None:
+    """Raise (strict) or warn (default).  The single choke point for the signal."""
+    msg = _format_grain_report(report)
+    if _grain_strict():
+        raise GrainCollapseError(msg)
+    warnings.warn(msg, GrainCollapseWarning, stacklevel=2)
+
+
+def grain_reports(country: str | None = None, table: str | None = None) -> list[dict]:
+    """Grain-collapse reports filed during this process (GH #323).
+
+    Public read-only accessor, for tests / the audit harness / a user who wants to
+    assert their analysis lost nothing.
+    """
+    out: list[dict[str, Any]] = []
+    for (c, t), reports in _GRAIN_LEDGER.items():
+        if country is not None and c != country:
+            continue
+        if table is not None and t != table:
+            continue
+        out.extend(reports)
+    return out
+
+
+def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
+    """Re-emit reports stamped into an L2 parquet by the cold build (GH #323).
+
+    THIS IS THE LINE THAT MAKES THE FIX REAL.  Without it every warning is a
+    cold-build-only event, and since practically all reads are warm, the loss goes
+    back to being invisible the moment the cache is populated -- which is precisely
+    how #323 survived its first fix.
+    """
+    if not isinstance(reports, list):
+        return
+    for report in reports:
+        if not isinstance(report, dict):
+            continue
+        report = {**report, "country": country, "table": table, "from_cache": True}
+        # _record_ (not just _emit_): grain_reports() must be a reliable account of
+        # what a session lost, whether the loss happened during THIS process's cold
+        # build or during some earlier one whose parquet we are now serving.
+        _record_grain_report(report)
+
+
 @build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
     schema_entry: dict[str, Any],
     wave: str | None,
     table_name: str | None = None,
+    country: str | None = None,
 ) -> pd.DataFrame:
     """
     Reorder and reduce a dataframe's MultiIndex to match the declared schema.
@@ -4112,6 +4396,10 @@ def _normalize_dataframe_index(
     - Collapses duplicate entries: SUMs the additive measure columns for
       tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
       first row per group (the historical default).
+    - GH #323: AUDITS that collapse first, while the pre-collapse frame still
+      exists, and reports any destroyed rows loudly (or fatally, under
+      ``LSMS_GRAIN_STRICT``).  ``country`` is carried only so the report can name
+      the cell; it does not affect the transformation.
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4140,6 +4428,7 @@ def _normalize_dataframe_index(
 
     # Add synthetic levels when declared but missing (e.g., 't' for wave outputs)
     missing_levels = [lvl for lvl in declared if lvl not in current_names]
+    absent_levels: list[str] = []
     if missing_levels:
         df = df.reset_index()
         for level in missing_levels:
@@ -4147,9 +4436,29 @@ def _normalize_dataframe_index(
                 df[level] = wave
         # Only set_index with declared levels that actually exist in the DataFrame
         available = [lvl for lvl in declared if lvl in df.columns]
+        # GH #323: a declared level that is NEITHER an index level NOR a column is
+        # silently dropped here -- the index is narrowed behind the caller's back,
+        # which MANUFACTURES the duplicate tuples that the collapse below then
+        # destroys.  Two chained silent failures.  Record it so the collapse report
+        # can name it as the root cause (and so it is loud even when, by luck, the
+        # narrowed index stays unique).  Measured occurrences today: zero.
+        absent_levels = [lvl for lvl in declared if lvl not in df.columns]
         if available:
             df = df.set_index(available)
         current_names = list(df.index.names)
+
+    # Report the narrowing even when the narrowed index happens to stay UNIQUE --
+    # a silently narrowed index is a defect regardless of whether it also
+    # manufactured duplicates this time.  (When it DID manufacture them, the
+    # collapse report below names these levels as the likely root cause.)
+    if absent_levels and df.index.is_unique:
+        _record_grain_report({
+            "levels": [lvl for lvl in declared if lvl in df.index.names],
+            "rows": int(len(df)), "dropped": 0, "destroyed": 0,
+            "conflicting_groups": 0, "nan_key_rows": 0,
+            "missing_levels": absent_levels,
+            "country": country, "table": table_name, "wave": wave,
+        })
 
     # Reorder levels to match declaration
     present_declared = [lvl for lvl in declared if lvl in current_names]
@@ -4175,7 +4484,6 @@ def _normalize_dataframe_index(
     # Aggregate duplicates if any remain
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
-        n_dropped = int(df.index.duplicated().sum())
         # Convert unordered categoricals to strings so the groupby below works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
@@ -4184,12 +4492,28 @@ def _normalize_dataframe_index(
         # silently DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
         # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
-        # re-derive any per-unit Price from the summed totals -- no data lost,
-        # no warning.  Single source of truth for the additive column map lives
-        # in feature.py (imported lazily to avoid an import cycle).
+        # re-derive any per-unit Price from the summed totals -- no data lost.
+        # Single source of truth for the additive column map lives in feature.py
+        # (imported lazily to avoid an import cycle).
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
+
+        # GH #323: AUDIT BEFORE DESTROYING.  This is the only moment at which the
+        # evidence exists -- one line further down the dropped rows are gone, and
+        # the parquet we cache is written from the collapsed frame, which is why
+        # every previous instrument (the old warning, diagnostics'
+        # _check_duplicate_index, any scan of var/) reported "clean".
+        report = _audit_index_collapse(df, present_levels)
+        if report is not None and present_additive and not report.get("unauditable"):
+            # The additive SUM is lossless over the measure columns, so a
+            # disagreement among them is expected and is NOT destruction.  Only a
+            # NaN-key deletion (groupby drops those rows outright) is real loss here.
+            # An UNAUDITABLE report is never silenced here -- "we could not check"
+            # must not be downgraded to "it is fine".
+            report = (dict(report, destroyed=0, conflicting_groups=0)
+                      if report.get("nan_key_rows") else None)
+
         if present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
@@ -4197,16 +4521,11 @@ def _normalize_dataframe_index(
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
         else:
             df = df.groupby(level=present_levels, observed=True).first()
-            if n_dropped:
-                # No aggregation policy for this table -- surface the loss
-                # loudly rather than drop rows quietly (a table whose source
-                # legitimately has multiple rows per index tuple needs an
-                # explicit policy, like the additive sum above).
-                warnings.warn(
-                    f"Canonical index over {present_levels} had {n_dropped} "
-                    f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                    f"those rows (possible silent data loss — GH #323).",
-                    RuntimeWarning,
-                )
+
+        if report is not None:
+            report.update(country=country, table=table_name, wave=wave,
+                          missing_levels=absent_levels or None,
+                          additive=bool(present_additive))
+            _record_grain_report(report)
 
     return df
