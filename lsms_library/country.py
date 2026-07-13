@@ -1207,13 +1207,15 @@ class Wave:
         # all of it reported by #614, none of it by the audit above).
         #
         # It is deliberately NOT rerouted through ``_collapse_to_cluster_grain``
-        # here: that would change the returned data (GPS would start being averaged
-        # for these countries instead of ``.first()``-ed at Site 1), and a bug fix
-        # is not the place to do it.  But it is worth seeing plainly that whether a
-        # country's cluster coordinates are a CENTROID or ONE HOUSEHOLD'S FIX is
-        # decided by nothing more principled than whether its YAML happened to put
-        # ``i`` in ``idxvars`` or leave it in a merge block.  That inconsistency is
-        # the strongest argument for retiring the ``.mean()`` altogether.
+        # here, because it does not need to be: Site 1 reduces these frames with the
+        # same ``.first()`` and audits them with the same instrument, so the loss is
+        # reported either way.  (Before the GPS ``.mean()`` was retired this
+        # asymmetry also silently decided whether a country's cluster coordinates
+        # came out a CENTROID or ONE HOUSEHOLD'S FIX -- on nothing more principled
+        # than whether its YAML put ``i`` in ``idxvars`` or left it in a merge
+        # block.  That incoherence was one of the arguments that retired the
+        # ``.mean()``; with core no longer aggregating anywhere, both paths now
+        # agree.)
         if 'i' in df.columns:
             df = df.drop(columns='i')
         # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
@@ -4339,13 +4341,6 @@ def _format_grain_report(report: dict[str, Any]) -> str:
             f"Additionally {report['nan_key_rows']:,} row(s) carry NaN in a declared "
             f"index level and are DELETED OUTRIGHT by the collapse (groupby dropna)."
         )
-    if report.get("gps_averaged_groups"):
-        bits.append(
-            f"(Separately, {report['gps_averaged_groups']:,} cluster(s) covering "
-            f"{report.get('gps_averaged_rows', 0):,} household(s) have non-constant "
-            f"{report.get('gps_columns')}; these are AVERAGED to a centroid, not "
-            f"dropped, and are excluded from the destruction count above.)"
-        )
     if site == 'Wave.cluster_features':
         bits.append(
             "cluster_features is reduced with groupby().first(), which skips NA "
@@ -4458,52 +4453,38 @@ def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
 # Same machinery as Site 1: `_audit_index_collapse` + `_record_grain_report`, so
 # the finding is stamped into the L2 parquet and replayed on every warm read.
 #
-# THE GPS EXCEPTION (the one open question -- see the ledger, .coder/ledger/323-site2.md).
-# `Latitude`/`Longitude` are genuinely household-level: every household in a
-# cluster has its own fix, so they are NEVER constant within a cluster and auditing
-# them the way we audit Region would mark essentially every cluster in every
-# GPS country as "destructive" -- ~100% false-positive rate, which is how a warning
-# becomes noise and how #323 survived in the first place.  They are therefore
-# EXCLUDED from the destruction audit and, for now, still averaged (the historical
-# `.mean()`, i.e. the cluster centroid).  That `.mean()` is an aggregation in core
-# and is the last one left at this site; it is GRANDFATHERED, not endorsed.  It is
-# measured rather than assumed: whenever a report is filed for this cell it carries
-# `gps_averaged_groups` / `gps_averaged_rows`, and `_gps_averaging_stats` below can
-# be called directly to census it.  To make it loud instead, drop the
-# `_CLUSTER_GPS_COLUMNS` exclusion from the audit call -- one line.
+# GPS: THE LAST EXCEPTION, AND IT IS GONE (Ethan, 2026-07-13).
+# `Latitude`/`Longitude` used to be reduced with `.mean()` -- a cluster centroid --
+# on the theory that household GPS is genuinely per-household and so varies within
+# a cluster by design, making it a false positive for the audit and a legitimate
+# thing for core to average.  The corpus says otherwise.  Measured across every cell
+# where the `.mean()` could fire:
+#
+#   Malawi 2010-11   768 clusters    0 averaged   <- no-op
+#   Malawi 2013-14   204 clusters  188 averaged
+#   Malawi 2016-17   881 clusters    0 averaged   <- no-op
+#   Malawi 2019-20   819 clusters    0 averaged   <- no-op
+#   Niger  2021-22   555 clusters    0 averaged   <- no-op
+#
+# In FOUR OF FIVE cells the `.mean()` is a provable no-op: the published GPS *is*
+# the cluster's (displaced) fix, stamped onto each household -- it was never
+# household GPS at all.  In the fifth it averages points a median of 148 km and up
+# to 783 km apart, which is not a centroid, it is a BROKEN CLUSTER KEY -- and that
+# same cell is already warning for Region (93), District (165) and Rural (131).
+# The averaging was not summarising a cluster; it was smearing two clusters
+# together and hiding the evidence.
+#
+# So GPS is now audited and reduced exactly like every other column, and core
+# performs NO aggregation here at all.  Measured cost of the flip: ZERO new warning
+# cells -- every cell whose count it raises was already warning, and both silent GPS
+# cells stay silent.  The NO-AGGREGATION-IN-CORE contract
+# (SkunkWorks/grain_aggregation_policy.org) now has no exception left in it.
+#
+# (An analyst who genuinely wants a cluster centroid computes one -- that is what
+# transformations.py is for.  A country whose survey really does record per-household
+# GPS has put a household-level column in a cluster-grain table; the fix is to move
+# the column, not to teach core to average.)
 # ---------------------------------------------------------------------------
-
-#: Columns in `cluster_features` that are household-level GEODATA, not cluster
-#: attributes.  Excluded from the Site-2 destruction audit and reduced with
-#: `.mean()` (cluster centroid) rather than `.first()`.  See the block above.
-_CLUSTER_GPS_COLUMNS = ('Latitude', 'Longitude')
-
-
-def _gps_averaging_stats(
-    df: pd.DataFrame, keep_levels: list[str], gps_cols: list[str],
-) -> dict[str, Any] | None:
-    """Census the one aggregation core still performs (GH #323, Site 2).
-
-    Returns ``None`` when the ``.mean()`` over *gps_cols* is a no-op (every
-    cluster's households report the same fix, or none do), else counts the
-    clusters and rows where it genuinely averages.  This is what turns
-    "grandfathered" into "grandfathered, and here is exactly what it costs".
-    """
-    if not gps_cols or not keep_levels:
-        return None
-    try:
-        sub = df[gps_cols].apply(pd.to_numeric, errors='coerce')
-        grouped = sub.groupby(level=keep_levels, observed=True)
-        varying = (grouped.nunique(dropna=True) > 1).any(axis=1)
-        n_groups = int(varying.sum())
-        if not n_groups:
-            return None
-        n_rows = int(grouped.size()[varying].sum())
-    except (TypeError, ValueError, KeyError):
-        return None
-    return {"gps_columns": list(gps_cols),
-            "gps_averaged_groups": n_groups,
-            "gps_averaged_rows": n_rows}
 
 
 def _collapse_to_cluster_grain(
@@ -4517,9 +4498,8 @@ def _collapse_to_cluster_grain(
     Audits the projection BEFORE performing it -- one line later the evidence is
     gone, and the parquet that gets cached is written from the collapsed frame,
     which is why no downstream instrument (Site 1's audit included) can see this
-    loss.  Attribute columns are reduced with ``.first()`` and audited for
-    destruction; ``Latitude``/``Longitude`` are averaged and merely counted (see
-    the block above).
+    loss.  Every column is treated alike: audited for destruction, then reduced
+    with ``.first()``.  Core does not aggregate -- not even GPS (see above).
 
     ``.first()`` here is worse than it looks, and worth naming: pandas'
     ``groupby().first()`` skips NA *per column*, so where households in a cluster
@@ -4530,40 +4510,29 @@ def _collapse_to_cluster_grain(
     if not keep_levels:
         return df
 
-    gps = [c for c in df.columns if c in _CLUSTER_GPS_COLUMNS]
-    attrs = [c for c in df.columns if c not in _CLUSTER_GPS_COLUMNS]
     dropped_levels = [lvl for lvl in df.index.names if lvl not in keep_levels]
 
     # AUDIT BEFORE DESTROYING -- on a frame from which the levels being PROJECTED
-    # AWAY have already been removed.  Two exclusions, both load-bearing, and both
-    # of which make the difference between a signal and a noise generator:
-    #
-    #   * ``i`` (and any other dropped level) must go, because
-    #     ``_audit_index_collapse`` compares whole rows via ``reset_index()`` -- and
-    #     ``i`` is DISTINCT BY CONSTRUCTION within a cluster.  Leave it in and every
-    #     cluster with two households is "destructive": ~100% false positives, and
-    #     the 11 Uganda clusters that genuinely disagree on Region are buried.
-    #     (This is not hypothetical: the first cut of this patch did exactly that,
-    #     and reported 2,304 destroyed rows for Uganda 2019-20 instead of 175.)
-    #   * household GPS varies within a cluster BY DESIGN -- see the block above.
+    # AWAY have already been removed.  That removal is load-bearing and is the one
+    # subtlety here: ``_audit_index_collapse`` compares WHOLE ROWS via
+    # ``reset_index()``, and ``i`` is DISTINCT BY CONSTRUCTION within a cluster.
+    # Leave it in and every cluster with two households looks "destructive" --
+    # ~100% false positives, and the 11 Uganda clusters that genuinely disagree on
+    # Region are buried in the noise.  (Not hypothetical: the first cut of this
+    # patch did exactly that, and reported 2,304 destroyed rows for Uganda 2019-20
+    # instead of 947.  It was caught only by the test asserting that a LOSSLESS
+    # projection stays silent.)
     #
     # What is left is the real question: do the households of one cluster disagree
     # about the CLUSTER'S OWN attributes?  If they do, the cluster id is not a
     # cluster id.
-    report = _audit_index_collapse(df[attrs].droplevel(dropped_levels)
-                                   if dropped_levels else df[attrs],
-                                   keep_levels)
+    audit_frame = df.droplevel(dropped_levels) if dropped_levels else df
+    report = _audit_index_collapse(audit_frame, keep_levels)
     if report is not None:
-        report.update(
-            country=country, table='cluster_features', wave=wave,
-            site='Wave.cluster_features',
-            **(_gps_averaging_stats(df, keep_levels, gps) or {}),
-        )
+        report.update(country=country, table='cluster_features', wave=wave,
+                      site='Wave.cluster_features')
         _record_grain_report(report)
 
-    if df.columns.size:
-        agg = {c: ('mean' if c in gps else 'first') for c in df.columns}
-        return df.groupby(level=keep_levels, observed=True).agg(agg)
     return df.groupby(level=keep_levels, observed=True).first()
 
 

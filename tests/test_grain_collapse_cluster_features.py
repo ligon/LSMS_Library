@@ -27,10 +27,13 @@ Three properties, each of which FAILS on pre-fix code:
     is what the L2-country writer stamps into the parquet -- so it survives the
     cache, exactly as at Site 1.
 
-Plus one that PINS A DECISION rather than a behaviour: the ``.mean()`` on
-Latitude/Longitude is an aggregation in core, and it is GRANDFATHERED.  If someone
-later makes it loud, or rips it out, these tests must be edited to say so -- it
-does not get to change by accident.
+Plus a group that pins the GPS decision (Ethan, 2026-07-13): the ``.mean()`` that
+used to average Latitude/Longitude into a cluster centroid is **gone**.  It was the
+last aggregation core performed at this site, and the corpus showed it earned its
+keep nowhere -- a provable no-op in 4 of the 5 cells where it could fire, and in the
+5th it was averaging points up to 783 km apart, i.e. smearing a broken cluster key
+rather than summarising a cluster.  GPS is now audited and reduced exactly like
+every other column, and NO-AGGREGATION-IN-CORE has no exception left in it.
 """
 from __future__ import annotations
 
@@ -45,10 +48,8 @@ from lsms_library.country import (
     GrainCollapseError,
     GrainCollapseWarning,
     Wave,
-    _CLUSTER_GPS_COLUMNS,
     _GRAIN_LEDGER,
     _collapse_to_cluster_grain,
-    _gps_averaging_stats,
     _replay_grain_audit,
     grain_reports,
 )
@@ -265,18 +266,22 @@ def test_site2_report_is_stamped_into_the_parquet_and_replayed(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# 5. the GPS `.mean()` -- a DECISION, pinned
+# 5. GPS: core does not average it either.  DECIDED, and pinned.
 # --------------------------------------------------------------------------
 #
-# Latitude/Longitude are genuinely household-level: every household has its own
-# fix, so they are NEVER constant within a cluster.  Auditing them the way Region is
-# audited would mark ~every cluster in ~every GPS country destructive -- a ~100%
-# false-positive rate, and a warning nobody reads is how #323 survived its first
-# fix.  So they are excluded from the destruction audit and still averaged.
+# Latitude/Longitude used to be reduced with `.mean()` -- a cluster centroid -- on
+# the theory that household GPS is genuinely per-household, therefore varies within
+# a cluster by design, therefore is a false positive for the audit and a legitimate
+# thing for core to average.  The corpus refuted every step of that.  In 4 of the 5
+# cells where the `.mean()` could fire it is a provable NO-OP (the published GPS *is*
+# the cluster's displaced fix, stamped on each household -- never household GPS at
+# all).  In the 5th it averages points a median of 148 km and up to 783 km apart:
+# not a centroid, a broken cluster key -- and that cell already warns for Region,
+# District and Rural.
 #
-# That `.mean()` is the last aggregation core performs at this site.  It is
-# GRANDFATHERED, not endorsed.  These tests pin the decision so that changing it is
-# a deliberate act with a diff, not a drift.
+# Decision (Ethan, 2026-07-13): make it loud.  Core aggregates NOTHING here.
+# Measured cost: zero new warning cells.  These tests pin that, so it cannot drift
+# back to averaging without a deliberate diff.
 
 def _with_gps() -> pd.DataFrame:
     return _hh_grain(
@@ -286,65 +291,67 @@ def _with_gps() -> pd.DataFrame:
     )
 
 
-def test_gps_is_averaged_to_a_centroid_not_first():
+def test_gps_is_not_averaged__core_does_not_aggregate():
+    """The flip.  Was `.mean()` (2.0 / 31.0); is now `.first()`, like every other
+    column.  A cluster coordinate is now A HOUSEHOLD'S REPORTED FIX, not a synthetic
+    centroid that core invented behind the caller's back.
+    """
     out = Wave.cluster_features(_fake_wave(_with_gps()))
-    assert out.loc[("2020", "v1"), "Latitude"] == 2.0   # mean, not first (1.0)
-    assert out.loc[("2020", "v1"), "Longitude"] == 31.0
+    assert out.loc[("2020", "v1"), "Latitude"] == 1.0    # first, NOT mean (2.0)
+    assert out.loc[("2020", "v1"), "Longitude"] == 30.0  # first, NOT mean (31.0)
 
 
-def test_gps_variation_alone_does_not_warn__GRANDFATHERED():
-    """DECISION, not an accident.  Household GPS varies within a cluster by design;
-    warning on it would drown the Region/District finding that this whole site
-    exists to surface.  If this behaviour is ever changed (option (b): make it
-    loud), THIS TEST is the thing to edit, and the edit is the record of the choice.
+def test_gps_variation_now_warns():
+    """The inverted assertion.  Households in a cluster reporting different fixes is
+    a real disagreement about a cluster-grain fact, and `.first()` silently picks
+    one.  It is reported like any other destruction -- no exception, no grandfather.
     """
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         Wave.cluster_features(_fake_wave(_with_gps()))
-    assert not [w for w in caught if issubclass(w.category, GrainCollapseWarning)]
-    assert not grain_reports(country="Testland", table="cluster_features")
 
-
-def test_gps_averaging_is_counted_whenever_a_report_is_filed():
-    """Grandfathered, but not unmeasured: any report for this cell carries the census.
-    This is the ``audited`` half of "grandfather it, documented and audited".
-    """
-    df = pd.concat([_with_gps(),
-                    _hh_grain([("2020", "v1", "h3", "South", 5.0, 34.0)],
-                              ["Region", "Latitude", "Longitude"])])
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        Wave.cluster_features(_fake_wave(df))
-
+    grain = [w for w in caught if issubclass(w.category, GrainCollapseWarning)]
+    assert len(grain) == 1, "differing household GPS must now warn"
     (report,) = grain_reports(country="Testland", table="cluster_features")
-    assert report["destroyed"] == 2, "counted on the ATTRIBUTE columns only"
-    assert report["gps_averaged_groups"] == 1
-    assert report["gps_averaged_rows"] == 3
-    assert report["gps_columns"] == ["Latitude", "Longitude"]
+    assert report["destroyed"] == 1
+    assert report["site"] == "Wave.cluster_features"
 
 
-def test_gps_columns_are_excluded_from_the_destruction_count():
-    """The false-positive that would have made this whole audit unreadable."""
+def test_constant_gps_within_a_cluster_stays_silent():
+    """The other half, and the reason the flip was free: where the survey stamps the
+    cluster's own fix onto each household -- 4 of the 5 real cells -- the projection
+    is lossless and stays SILENT.  This is why making GPS loud added zero new
+    warning cells to the corpus.
+    """
     df = _hh_grain(
         [("2020", "v1", "h1", "North", 1.0, 30.0),
-         ("2020", "v1", "h2", "North", 9.0, 39.0)],   # same Region, different fix
+         ("2020", "v1", "h2", "North", 1.0, 30.0)],
         ["Region", "Latitude", "Longitude"],
     )
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        Wave.cluster_features(_fake_wave(df))
-    assert not [w for w in caught if issubclass(w.category, GrainCollapseWarning)], (
-        "differing household GPS is not destruction -- it is what the centroid is FOR"
-    )
+        out = Wave.cluster_features(_fake_wave(df))
+
+    assert not [w for w in caught if issubclass(w.category, GrainCollapseWarning)]
+    assert out.loc[("2020", "v1"), "Latitude"] == 1.0
 
 
-def test_gps_stats_are_none_when_the_mean_is_a_no_op():
+def test_no_column_is_special_cased_any_more():
+    """The contract, stated as a test: `_collapse_to_cluster_grain` has no notion of
+    a GPS column.  Latitude and a made-up column named Altitude get identical
+    treatment -- audited, then `.first()`.  If someone reintroduces a per-column
+    reducer, this fails.
+    """
     df = _hh_grain(
-        [("2020", "v1", "h1", 1.0, 30.0),
-         ("2020", "v1", "h2", 1.0, 30.0)],
-        ["Latitude", "Longitude"],
+        [("2020", "v1", "h1", 1.0, 100.0),
+         ("2020", "v1", "h2", 3.0, 300.0)],
+        ["Latitude", "Altitude"],
     )
-    assert _gps_averaging_stats(df, ["t", "v"], list(_CLUSTER_GPS_COLUMNS)) is None
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        out = Wave.cluster_features(_fake_wave(df))
+    assert out.loc[("2020", "v1"), "Latitude"] == 1.0
+    assert out.loc[("2020", "v1"), "Altitude"] == 100.0
 
 
 # --------------------------------------------------------------------------

@@ -1364,7 +1364,15 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
 # ``Wave.cluster_features`` was still unaudited, so its stamp is silent about a
 # loss that had already happened by the time Site 1 ran.  Bump so those parquets
 # rebuild once and carry an honest stamp.
-LSMS_CACHE_SCHEMA = 3
+#
+# Bumped 3 -> 4 (GH #323, SITE 2, GPS): retiring the ``.mean()`` on
+# Latitude/Longitude CHANGES RETURNED DATA -- a schema-3 ``cluster_features``
+# parquet holds cluster *centroids* that core synthesised, where the current code
+# returns a household's reported fix (Malawi 2013-14: 188 clusters).  It also
+# carries an audit stamped before GPS was audited, so it under-reports.  Not a
+# cosmetic bump: without it, a warm cache serves values this version would never
+# compute.
+LSMS_CACHE_SCHEMA = 4
 
 # Schema-metadata key under which the content hash is embedded.  Embedding
 # (rather than a ``{parquet}.hash`` sidecar) means the hash rotates
