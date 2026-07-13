@@ -745,6 +745,15 @@ class Wave:
 
         def map_formatting_function(var_name, value, format_id_function = False):
             """Applies formatting functions if available, otherwise uses defaults."""
+            if isinstance(value, dict) and set(value) == {'const'}:
+                # {varname: {const: value}} -- a literal, not a source column.
+                # Hand it to df_data_grabber's grabber untouched (it builds a
+                # constant Series).  No formatter, and in particular no
+                # format_id: the value is already exactly what we want.  Used to
+                # inject a fact about the FILE (e.g. which survey `passage` a
+                # per-visit file is) when the source carries it in the filename
+                # and in no column.  See GH #323 / Mali 2014-15 interview_date.
+                return value
             if isinstance(value, list) and isinstance(value[-1], dict):
                 # Accept both 'mapping' and 'mappings' (Mali uses the plural form)
                 if value[-1].get('mapping') or value[-1].get('mappings'):

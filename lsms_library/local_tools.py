@@ -1043,6 +1043,15 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
     """
 
     def grabber(df,v):
+        if isinstance(v, dict) and set(v) == {'const'}:
+            # Literal: {newvarname: {const: value}}.  The value is a fact about
+            # the FILE, not a column in it -- e.g. Mali 2014-15's interview_date
+            # reads EACICONTROLE_p1.dta / _p2.dta, where the survey `passage`
+            # (visit number) is encoded in the FILENAME and appears in no
+            # column.  Declared per-file via the `file:` override list, this
+            # injects the visit number as ground truth instead of inferring it
+            # from row order or by ranking dates (GH #323).
+            return pd.Series(v['const'], index=df.index)
         if isinstance(v,str): # Simple
             if v in df.columns:
                 return df[v]

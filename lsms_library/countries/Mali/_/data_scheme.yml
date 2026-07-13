@@ -66,13 +66,23 @@ Data Scheme:
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
-  # EHCVM visits each household across multiple vagues/passages, each with
-  # its own date.  The canonical interview_date is one date per household
-  # (t, v, i); _normalize_dataframe_index drops the undeclared `visit` level
-  # and collapses the duplicate rows via groupby.first(), keeping the first
-  # visit's date.  (GH #325)
+  # One row per household VISIT.  The canonical index (lsms_library/
+  # data_info.yml) is (t, v, i, visit) -- GH #506 established that the
+  # per-visit date is the thing to keep -- and the EHCVM peers (Niger, Benin,
+  # Togo, CotedIvoire) all declare `visit` too.
+  #
+  # GH #323: this used to declare (t, v, i), which made `visit` an UNDECLARED
+  # level.  _normalize_dataframe_index dropped it and collapsed the duplicates
+  # with groupby().first(), silently discarding one date per household:
+  # 3,804 rows in 2014-15 and 8,390 in 2017-18.  The old comment here justified
+  # that with "vague is a sample split, not a repeated measure" (GH #325).
+  # That premise is TRUE for the EHCVM waves (2018-19, 2021-22 -- each grappe is
+  # visited in exactly one vague, so (t, v, i) is already unique and adding
+  # `visit` changes nothing) and provably FALSE for the EACI waves (2014-15,
+  # 2017-18): passages 1 and 2 each cover ALL 3,804 households, a median 124
+  # days apart.  Those are two real interviews, not two samples.
   interview_date:
-    index: (t, v, i)
+    index: (t, v, i, visit)
     Int_t: datetime
   panel_ids: !make
   assets:

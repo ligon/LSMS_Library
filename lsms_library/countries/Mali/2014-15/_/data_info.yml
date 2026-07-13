@@ -61,13 +61,28 @@ household_roster:
     file: EACIIND_p1.dta
     idxvars:
         v: grappe
-        i: 
+        i:
             - grappe
             - menage
+        # GH #323: pid MUST be s01q00 ("Numero d'ordre" -- the person's own
+        # roster line), NOT s01q ("Code du répondant" -- the line number of
+        # whoever ANSWERED section 1 on the household's behalf).  s01q is a
+        # household-level attribute: 28,054 of 37,175 rows carry s01q == 1
+        # (the head answered), so it maps ~9.77 people/HH onto ~1.35 keys.
+        # Source cardinality on EACIIND_p1.dta (37,175 rows, one per PERSON):
+        #     uniq (grappe, menage, s01q)   =  5,149  <- keyed by WHO ANSWERED;
+        #                                       the framework then collapsed the
+        #                                       other 32,026 people away with
+        #                                       groupby().first(), labelling the
+        #                                       survivors with the wrong key.
+        #     uniq (grappe, menage, s01q00) = 37,175  <- exactly unique.
+        # This also puts household_roster.pid back in the same keyspace as
+        # _/people_last7days.py, which already keys on s01q00 and asserts
+        # uniqueness.
         pid:
             - grappe
-            - menage 
-            - s01q
+            - menage
+            - s01q00
     myvars:
         Sex: s01q01
         Age: s01q04a
@@ -112,14 +127,37 @@ food_acquired:
         - EACIALI_p2.dta
 
 interview_date:
+    # GH #323: the two EACI `passage`s are a REPEATED MEASURE, not a sample
+    # split.  EACICONTROLE_p1 and _p2 each cover all 3,804 households (p1-only:
+    # 0, p2-only: 0, both: 3,804), and the two visits are a median 124 days
+    # apart -- a post-planting and a post-harvest interview.  So each household
+    # has TWO genuine interview dates.  Without `visit` on the index the two
+    # files concatenated to 7,608 rows keyed on (v, i), and the framework
+    # collapsed the 3,804 duplicates with groupby().first(), silently throwing
+    # away the second date.  `visit` is carried and DECLARED (see
+    # _/data_scheme.yml), matching the canonical (t, v, i, visit) index and the
+    # EHCVM peers (Niger / Benin / Togo / CotedIvoire all keep `visit`).
+    #
+    # Unlike 2017-18 (eaci17_s00p1/p2, which carry a real `passage` column),
+    # EACICONTROLE_p1/_p2 have IDENTICAL column sets and NO passage column --
+    # the visit number is encoded only in the FILENAME.  So each file injects
+    # it as a literal (`{const: ...}`), which is ground truth.  It is NOT
+    # inferred from row order, and NOT inferred by ranking Int_t within the
+    # household: that rank would mislabel the 66 households whose passage-2
+    # interview is dated BEFORE their passage-1 interview (gaps run -10..+203
+    # days).
     file:
-        - EACICONTROLE_p1.dta
-        - EACICONTROLE_p2.dta
+        - EACICONTROLE_p1.dta:
+            visit: {const: '1'}
+        - EACICONTROLE_p2.dta:
+            visit: {const: '2'}
     idxvars:
         v: grappe
         i:
             - grappe
             - menage
+        # Default; every file in the `file:` list above overrides it.
+        visit: {const: '1'}
     myvars:
         Int_t:
             - s00q22y
@@ -178,10 +216,14 @@ individual_education:
         i:
             - grappe
             - menage
+        # GH #323: same person-id bug as household_roster above (same source
+        # file, same pid block).  s01q00 = "Numero d'ordre" (the person);
+        # s01q = "Code du répondant" (who answered).  See the household_roster
+        # comment for the cardinality evidence.
         pid:
             - grappe
             - menage
-            - s01q
+            - s01q00
     myvars:
         # GH #171: s02q23 = "Niveau d'instruction le plus élevé atteint" (value-
         # labelled French grade-years).  Was mis-wired to s01q06 = father's roster

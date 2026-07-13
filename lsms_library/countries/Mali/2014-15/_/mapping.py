@@ -63,9 +63,42 @@ def food_acquired(df):
     an Expenditure (value); produced / in-kind are quantity-only (NaN
     Expenditure), matching the EHCVM canonical contract.
 
-    ``visit`` (passage) is dropped: as with the EHCVM ``vague`` it is a
-    sample split, not a repeated measure, so it must not enter the
-    canonical index.
+    ``visit`` (passage) is dropped because the canonical food_acquired index
+    (lsms_library/data_info.yml) is ``(t, v, i, j, u, s)`` -- it has no
+    ``visit`` level -- so the two passages are AGGREGATED into the wave total.
+
+    GH #323 -- correcting the rationale that used to sit here.  This docstring
+    previously claimed passage "is a sample split, not a repeated measure, so it
+    must not enter the canonical index".  That is FALSE for the EACI waves and
+    the claim is worth killing explicitly, because it is the same false premise
+    that made ``interview_date`` throw away one date per household:
+
+        EACIALI_p1: 479,304 rows, passage=1, 3,804 households
+        EACIALI_p2: 479,304 rows, passage=2, 3,804 households
+        households in p1 only: 0 | p2 only: 0 | in BOTH: 3,804  (100% overlap)
+
+    The two passages are a genuine REPEATED MEASURE: the same households
+    revisited a median 124 days apart (post-planting and post-harvest), each
+    visit carrying its own 7-day consumption recall ("au cours des 7 derniers
+    jours").
+
+    Dropping `visit` is nevertheless SAFE here -- and, unlike interview_date,
+    it loses nothing -- because food_acquired is an additive-measure table
+    (``_ADDITIVE_MEASURE_COLUMNS`` in feature.py, GH #501):
+    ``_normalize_dataframe_index`` SUMS Quantity and Expenditure over the
+    resulting duplicate (t, v, i, j, u, s) tuples and re-derives Price from the
+    summed totals.  It does NOT ``first()`` them.  So the wave figure is the
+    total acquired across the survey's two recall weeks, and summing does not
+    double-count: the two 7-day windows are disjoint for 3,738 of 3,804
+    households (the remaining 66 have visits <=7 days apart -- a source-data
+    fieldwork artefact, some with negative gaps -- where the windows may
+    overlap; that is a pre-existing wrinkle in the .dta, not an artefact of this
+    reshape).
+
+    NOTE the consequence for cross-wave comparison: 2014-15 (and 2017-18) are
+    two-recall-week totals, while the EHCVM waves (2018-19, 2021-22) are single
+    7-day recalls.  Consumers comparing levels ACROSS waves must account for
+    that; it is a property of the instrument, not of this code.
     '''
     work = df.reset_index()
     if 'visit' in work.columns:
@@ -118,7 +151,20 @@ def Int_t(value):
     return pd.to_datetime(date, format='%Y-%m-%d', errors='coerce').date()
 
 def interview_date(df):
-    df['visit'] = df.groupby(level='i')['Int_t'].rank(method='first').astype(int).astype(str)
-    df = df.set_index('visit', append=True)
+    """Parse the interview date.
+
+    GH #323: ``visit`` now comes from the source ``passage`` column (declared in
+    ``_/data_info.yml`` idxvars), NOT from ranking ``Int_t`` within household as
+    this hook used to do::
+
+        df['visit'] = df.groupby(level='i')['Int_t'].rank(method='first')...
+
+    That rank was a positional GUESS at the visit number, and it is provably
+    wrong for the 66 households whose passage-2 interview is dated BEFORE their
+    passage-1 interview (the inter-visit gap runs from -10 to +203 days): the
+    rank would label their passage 2 as visit "1".  ``passage`` is ground truth
+    and needs no inference.  (It also ranked a level the declared index then
+    dropped, so the whole synthesis was discarded downstream anyway.)
+    """
     df['Int_t'] = pd.to_datetime(df['Int_t'])
     return df
