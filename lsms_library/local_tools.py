@@ -1357,7 +1357,14 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
 # on a warm cache the audit would never run and the fix would be invisible on
 # exactly the machines where the bug is already baked in.  Bumping the schema
 # makes those parquets stale, forcing one rebuild that audits and stamps them.
-LSMS_CACHE_SCHEMA = 2
+#
+# Bumped 2 -> 3 (GH #323, SITE 2): the same argument, one site along.  A
+# schema-2 ``cluster_features`` parquet was stamped by a build that audited only
+# the DECLARED-index collapse; the household -> cluster projection in
+# ``Wave.cluster_features`` was still unaudited, so its stamp is silent about a
+# loss that had already happened by the time Site 1 ran.  Bump so those parquets
+# rebuild once and carry an honest stamp.
+LSMS_CACHE_SCHEMA = 3
 
 # Schema-metadata key under which the content hash is embedded.  Embedding
 # (rather than a ``{parquet}.hash`` sidecar) means the hash rotates
