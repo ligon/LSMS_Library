@@ -1,5 +1,62 @@
 #+title: Contents
 
+* housing — a roster over dwelling STRUCTURES (GH #323)
+
+=DWELLING.dta= section 3a is *not* a household-level table.  The questionnaire
+(=2000/Documentation/hheng.pdf= p.82) tells the enumerator to "LIST ALL STRUCTURES
+BEFORE ASKING Q.2-6" and then asks, for each of 8 structure types (Tent,
+Prefab/container, Damaged house, Damaged apartment, Intact house, Intact
+apartment, Barracks, Others):
+
+: s3a_q01  "Does your household use [STRUCTURE]?"   YES..1  NO...2
+
+so the source carries 7,047 rows over 2,865 households and its true key is
+=(hhid, s3a_q0a)=.  (Use =s3a_q0a=, the full-text type — =s3a_q00= is the 8-char
+truncated Stata label and collides "Damaged house"/"Damaged apartment".)
+=s3a_q01= is a pure screener: all 4,168 'No' rows have =q02..q06= entirely NaN.
+
+Because =housing= is declared =(t, i)=, the roster used to reach the canonical
+index with 4,182 duplicate tuples and was collapsed by =groupby().first()=.
+=GroupBy.first()= is *skipna per column*, so it did not pick a row — it fabricated
+one: =Type= came from roster row 0 (usually a structure the household had said
+"No" to) while =Rooms=/=Tenure= came from the first non-null, i.e. the occupied
+structure.  *524 of the 2,850 single-occupancy households (18.4%) were published
+with a dwelling type they had explicitly denied.*  Separately, =Electricity= was
+mapped to =s3a_q01= — the occupancy screener — so every published value was
+meaningless.
+
+=2000/_/housing.py= now filters to the occupied structures, reduces the 13
+genuinely multi-structure households under a declared policy (=Rooms= = SUM of the
+per-structure =s3a_q04=; =Type=/=Walls=/=Tenure= from the primary structure = the
+*unique* argmax of =s3a_q02=, the area the household uses), and asserts the
+=(t, i)= index is unique before writing.  For the 3 households whose argmax *ties*
+(202, 11501, 12401) the primary structure is genuinely undetermined, so
+=Type=/=Walls=/=Tenure= are left =<NA>= rather than resolved by row order; =Rooms=
+(tie-independent) and the amenities columns survive.  The 2 households with no
+occupied structure at all (16307, 23801) are dropped with a warning.
+
+*Walls, Water, Toilet and Electricity do exist* — an earlier comment in
+=data_scheme.yml= claiming "DWELLING.dta has no Roof/Floor/Walls/Water/Toilet
+module" was false, and is why the electricity variable went unfound.  =Walls= is
+=s3a_q03= (per structure); =Electricity=/=Water=/=Toilet= are =s3b_q07= /
+=s3b_q01= / =s3b_q05= in the adjacent household-level =AMENITIES.dta=.  Roof and
+Floor genuinely are not collected.
+
+The full per-structure roster (the ~15 structure-rows of the multi-structure
+households) is not exposed as a feature; if it is ever wanted, it belongs in its
+own table indexed =(t, i, structure)=.
+
+* cluster_features — a declared, enforced household→cluster reduction (GH #323)
+
+=ID.dta= is household-level (2,880 rows, unique on =hhid=); =cluster_features= is
+=(t, v)=.  Kosovo 2000 is 360 PSUs x exactly 8 households, so the build must reduce
+2,880 → 360.  That reduction is *correct* — Region (=s0i_q07=, municipality) and
+Rural (=s0i_q09=) are constant within every PSU — but it used to happen silently,
+via a =groupby().first()= on a level that leaked in from an =i: hhid= entry in the
+wave =idxvars=, and *nothing enforced the homogeneity that makes it safe*.
+=2000/_/cluster_features.py= now performs the reduction explicitly and *raises* if
+Region/Rural are ever not constant within a cluster.  Same 360 rows, same values.
+
 * shocks — not available (2026-06-07, verified)
 
 =shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)

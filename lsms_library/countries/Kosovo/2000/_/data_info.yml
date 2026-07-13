@@ -1,18 +1,12 @@
 Country: Kosovo
 Wave: 2000
 
-cluster_features:
-    file: "../Data/ID.dta"
-    idxvars:
-        v: psu
-        i: hhid
-    myvars:
-        Region: s0i_q07
-        Rural:
-            - s0i_q09
-            - mapping:
-                Rural: Rural
-                Urban: Urban
+# cluster_features is built by _/cluster_features.py (materialize: make).
+# ID.dta is household-level (2,880 rows); cluster_features is (t, v).  The
+# reduction to 360 clusters is intended, but it must VERIFY that Region/Rural
+# are constant within a PSU rather than let groupby().first() pick a value by
+# row order.  Declaring `i: hhid` here handed a household-grain frame to a
+# cluster-grain index and 2,520 rows were collapsed silently.  GH #323.
 
 household_roster:
     file:
@@ -106,29 +100,19 @@ assets:
         Age: s10e_02
         Value: s10e_4a
 
-housing:
-    # DWELLING.dta has no Roof/Floor/Walls/Water/Toilet items in this
-    # survey; only dwelling type, electricity, rooms, and tenure exist.
-    # s3a_q0a is the full-text dwelling type (s3a_q00 is the 8-char
-    # truncated Stata label); s3a_q06 only exists truncated, so its
-    # labels are spelled out via mapping.
-    file: "../Data/DWELLING.dta"
-    idxvars:
-        i: hhid
-    myvars:
-        Type: s3a_q0a
-        Electricity: s3a_q01
-        Rooms: s3a_q04
-        Tenure:
-            - s3a_q06
-            - mapping:
-                Built pe: Built personally
-                Purchase: Purchased
-                Inherite: Inherited
-                Borrowed: Borrowed
-                Occupied: Occupied
-                From emp: From employer
-                Assigned: Assigned
-                Donated: Donated
-                Swapped: Swapped
-                Others: Others
+# housing is built by _/housing.py (materialize: make).
+#
+# DWELLING.dta section 3a is a ROSTER OVER DWELLING STRUCTURES -- the
+# enumerator lists all 8 structure types and asks s3a_q01 "Does your household
+# use [STRUCTURE]?" for each -- so it has 7,047 rows over 2,865 households and
+# CANNOT be extracted on the YAML path against a (t, i) index: it was being
+# collapsed by groupby().first(), which (being skipna per column) fabricated a
+# chimeric record and gave 524 households a dwelling type they had said No to.
+# The roster must be filtered to the occupied structures and the genuinely
+# multi-structure households reduced under a declared policy.  GH #323.
+#
+# NOTE: the comment that used to live here -- "DWELLING.dta has no
+# Roof/Floor/Walls/Water/Toilet module" -- was FALSE, and it is why nobody
+# noticed that `Electricity` had been wired to the occupancy screener.
+# Walls IS in DWELLING (s3a_q03, per structure), and Water/Toilet/Electricity
+# are all in the adjacent AMENITIES.dta (s3b_q01 / s3b_q05 / s3b_q07).

@@ -2,9 +2,22 @@ Country: Kosovo
 
 Data Scheme:
   cluster_features:
+    # ID.dta is household-level (2,880 rows, unique on hhid); this table is
+    # cluster-level.  Kosovo 2000 is 360 PSUs x 8 households, so the build
+    # necessarily reduces 2,880 -> 360: an INTENDED aggregation, declared
+    # below and ENFORCED in 2000/_/cluster_features.py.  GH #323.
     index: (t, v)
     Region: str
     Rural: str
+    materialize: make
+    aggregation:
+      # Reducer over the households of a cluster.  `unique` = the value must be
+      # constant within the group; the build RAISES if it is not, rather than
+      # letting groupby().first() publish whichever row happened to sort first.
+      # (Nothing in the library reads `aggregation:` today -- it is a declared
+      # policy, so the enforcement lives in the build script.  See below.)
+      Region: unique
+      Rural: unique
 
   interview_date:
     index: (t, i)
@@ -58,10 +71,39 @@ Data Scheme:
     materialize: make
 
   housing:
-    # Kosovo 2000 DWELLING.dta has no Roof/Floor/Walls/Water/Toilet
-    # module; only the dwelling-characteristic subset below exists.
+    # DWELLING.dta section 3a is a ROSTER OVER DWELLING STRUCTURES (8 types per
+    # household; s3a_q01 "Does your household use [STRUCTURE]?" is an occupancy
+    # SCREENER, and the 4,168 'No' rows carry no detail at all).  Built by a
+    # script: the roster is filtered to the occupied structures and the 13
+    # genuinely multi-structure households are reduced under the policy declared
+    # below.  On the YAML path this reached the (t, i) index with 4,182 duplicate
+    # tuples and was groupby().first()-ed into a chimera.  GH #323.
+    #
+    # Walls comes from DWELLING (s3a_q03, per structure); Electricity, Water and
+    # Toilet come from the adjacent household-level AMENITIES.dta (s3b_q07 /
+    # s3b_q01 / s3b_q05).  Electricity was previously wired to s3a_q01 -- the
+    # occupancy screener -- and every published value was meaningless.
     index: (t, i)
     Type: str
-    Electricity: str
+    Walls: str
     Rooms: float
     Tenure: str
+    Electricity: str
+    Water: str
+    Toilet: str
+    materialize: make
+    aggregation:
+      # Reducer over the OCCUPIED structures of a household.  ENFORCED in
+      # 2000/_/housing.py (nothing in the library reads `aggregation:` today).
+      #
+      # Rooms: SUM -- s3a_q04 is "rooms in [STRUCTURE]", a per-structure count,
+      #   so a household occupying two structures has the rooms of both.
+      #   `first` is provably the wrong reducer here.
+      # Type/Walls/Tenure: PRIMARY structure = the unique argmax of s3a_q02
+      #   ("how large is the part of the [STRUCTURE] your household uses").
+      #   Where that argmax TIES the primary structure is undetermined and the
+      #   value is left <NA> -- never broken by row order.
+      Rooms: sum
+      Type: primary_structure
+      Walls: primary_structure
+      Tenure: primary_structure
