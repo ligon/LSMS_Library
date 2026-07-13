@@ -99,3 +99,42 @@ non-uniqueness.
   path only — and the whole 2021-22 wave silently vanished from `interview_date` while the
   COLD path looked perfect. Reducers are now resolved case-insensitively and warm/cold
   parity is asserted. This is the §4 warm/cold invariant catching a live regression.
+
+---
+### Phase 4 — cross-country blast radius of the framework guards (MERGE-ORDER DEPENDENCY)
+
+The two framework guards were swept across **every `dfs:` block in the repo — 76
+(country, wave, table) cells**. Ethiopia builds clean. **5 cells in 4 OTHER countries
+now RAISE.** All five were independently confirmed to be serving corrupt data on
+pristine `development` *today* — the guards refuse corruption, they do not invent
+failures:
+
+| country | wave | table | pristine `development` behaviour (verified) |
+|---|---|---|---|
+| Mali | 2021-22 | cluster_features | **4,718,148 rows** (4,717,635 dup) for a ~513-EA table — cartesian |
+| Malawi | 2010-11 | cluster_features | 196,083 rows (183,812 dup) — cartesian |
+| Malawi | 2019-20 | cluster_features | 185,842 rows (171,230 dup) — cartesian |
+| Guinea-Bissau | 2018-19 | cluster_features | 5,410 rows (4,960 dup) — cartesian |
+| Niger | 2011-12 | cluster_features | Latitude/Longitude **entirely absent** (geo sub-df's columns misnamed) |
+
+These are the SAME CLASS as Ethiopia's, in countries that have their own #323 fix
+agents in flight. **This branch should land with (or after) the Malawi / Mali / Niger /
+Guinea-Bissau #323 fixes**, or their `cluster_features` will fail loudly instead of
+silently returning cartesian garbage.
+
+Two guard iterations were rejected along the way, both caught by the sweep:
+1. **Row-count ceiling** (`len(result) > len(left)+len(right)`) — sound but NOT
+   complete: a small explosion hides under it (2x2 + 1x1 = 5 rows from two 3-row
+   frames). It missed Guinea-Bissau. Replaced with the exact test (a key duplicated
+   in BOTH frames), which is sound *and* complete.
+2. **Required-column guard firing at the failure site** — over-fired on CotedIvoire
+   `sample` (a sibling sub-df supplies `weight`) and on any environment where a data
+   file is merely unavailable. Now judged POST-merge (so a sibling supplier counts)
+   and only for `KeyError` (the file loaded but lacks the column = a CONFIG bug a
+   developer can fix). A missing FILE still degrades with a warning, per GH #515.
+
+### Phase 5 — known-remaining, NOT introduced here
+- `individual_education` has a **pre-existing warm/cold cache divergence** on
+  `development`: cold 59,092 vs warm 58,859 rows (**233-row gap**). On this branch the
+  gap *shrinks* to 42 (63,181 vs 63,139). Same dtype-round-trip family as the
+  `interview_date` bug fixed here. Worth its own issue; out of scope for #323-Ethiopia.
