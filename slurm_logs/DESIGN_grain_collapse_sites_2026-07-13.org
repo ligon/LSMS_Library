@@ -1,0 +1,224 @@
+#+TITLE: The grain collapse has four sites, not one
+#+AUTHOR: Sue (Claude Opus 4.8)
+#+DATE: [2026-07-13 Mon]
+#+SUBTITLE: Consolidating GH #323. Records Ethan's decisions of 2026-07-13; supersedes the per-country core patches.
+
+* Why this note exists
+
+The #323 sweep fanned out one agent per country.  Each agent, in an isolated
+worktree, met the same root cause --- and each one fixed it.  The result is *17
+mutually distinct patches to =lsms_library/country.py=*, ranging from 10 to 340
+added lines, spread across 16 country branches plus =fix/323-framework=.
+
+That is not 17 bugs.  It is one bug, found 17 times, at four different places in
+the file, and answered with two incompatible designs.  This note names the four
+sites, records which design won, and states what happens to the country branches
+as a result.  Nothing else in the sweep should move until this is settled,
+because every one of those 17 patches conflicts with the others.
+
+The country-level *diagnosis* in those branches is good and is being kept.  It is
+only the core code that is redundant.
+
+* The root cause, in one sentence
+
+Core reduces grain with =.first()= and never checks that the reduction loses
+nothing.
+
+Everything below is that sentence, at a different line number.
+
+* The four sites
+
+** Site 1 --- =_normalize_dataframe_index= (~L4190): the generic collapse
+
+The declared-index collapse.  A non-unique DECLARED index is reduced with
+=groupby(...).first()=; where the duplicate rows DISAGREE, the dropped rows are
+real data and they vanish with no signal.
+
+This site attracted two rival designs.
+
+- Design A, "declare a reducer" :: Twelve branches (Cambodia, EthiopiaRHS,
+  GhanaLSS, Guinea-Bissau, Iraq, Kazakhstan, Nigeria, Senegal, South Africa,
+  Tajikistan, Tanzania, Timor-Leste).  Teach core to read an =aggregation:= key
+  from =data_scheme.yml=, verify the payload is constant within each index group,
+  else reduce with a named reducer.  All twelve wrote the same three helpers under
+  twelve different names (=_declared_aggregation= / =_aggregation_policy= /
+  =_duplicate_index_policy= / =_declared_reducer= / =_declared_reducers=, paired
+  with =_assert_constant_within_groups= / =_assert_dedup_lossless= /
+  =_assert_invariant_within_index=).  One feature, implemented twelve times.
+
+- Design B, "core never aggregates" :: =fix/323-framework= (PR #614), alone.
+  Audit BEFORE the collapse while the evidence still exists; warn on destruction
+  (fatal under =LSMS_GRAIN_STRICT=1=); and --- the load-bearing part --- persist
+  the finding into the parquet and re-emit it on the warm read, so the signal
+  outlives the destruction.
+
+*** Why the old warning could not fire
+
+Worth recording, because it is the reason #323 was closed once already and stayed
+broken.  The old guard was =not df.index.is_unique=.  The L2-country parquet is
+written POST-collapse, so on every warm read the index is already unique and the
+guard is =False=.  The bug hid behind the cache that the bug poisoned.  Any fix
+that only warns at cold-build time is not a fix.
+
+** Site 2 --- =Wave.cluster_features= (~L1177, GH #161): a second, hardcoded collapse
+
+A separate household-to-cluster collapse, =.first()= for attributes and =.mean()=
+for GPS, justified by a comment claiming:
+
+#+begin_quote
+Region/Rural/District are invariant within a cluster by construction of the
+LSMS-ISA sampling design.
+#+end_quote
+
+The claim is false.  As the Cambodia branch puts it: /"invariant by construction"
+is PROSE, and prose is not enforcement/.  A cluster code that is unique only
+*within a district* merges two real clusters here, and =.first()= then keeps one
+Region at random --- silently WRONG, not merely silently lossy.
+
+Touched by Albania, Cambodia, Kazakhstan, Nigeria, Tajikistan, Tanzania.  *PR #614
+does not touch this site at all* (zero hunks in the range).  This is the sharpest
+finding in the sweep and it is currently unowned.
+
+** Site 3 --- NaN-key annihilation
+
+=groupby()= defaults to =dropna=True=, so a row carrying NaN in a declared index
+level is DELETED OUTRIGHT by the collapse --- not merged into it, deleted.  This
+is a distinct loss riding along inside the same operation.
+
+- Burkina Faso :: fixes it --- =dropna=False=, rows RETAINED.
+- PR #614 :: reports it (=nan_key_rows=) but still deletes.
+
+These disagree on returned data, so this needed a decision rather than a merge.
+Measured: Uganda =cluster_features= loses *934 rows* this way across seven waves.
+
+** Site 4 --- the =dfs:= merge in =Wave.grab_data= (~L1014)
+
+An outer merge with no cardinality guard MANUFACTURES the duplicates that every
+site above then collapses.  Upstream of the whole problem.  Owned only by the
+Ethiopia branch (=_merge_subframes=, =_required_scheme_columns=).
+
+** Not a core bug at all
+
+Mali's ten lines are a =({const: value})= YAML primitive: inject a literal into
+=idxvars= when the fact lives in the *filename* and in no column (which survey
+=passage= a per-visit file is).  A legitimate small feature that got swept up in
+a bug hunt.  It belongs on its own PR and is not part of #323.
+
+* Scale of the thing
+
+From #614's measurement across all 40 countries:
+
+- ~7.5M rows sit on a duplicated declared index;
+- 6.46M of those are EXACT duplicates of a row that survives --- collapsing them
+  loses nothing;
+- only ~542k rows sit in groups whose rows actually DISAGREE.  That is the real
+  loss.
+
+This ratio is why Design B reports only on *destruction* and stays silent on a
+provably lossless collapse.  Warning on the raw duplicate count would bury the
+542k under 6.5M false alarms, and a warning nobody reads is how this bug survived
+in the first place.
+
+* Decisions (Ethan, 2026-07-13)
+
+** D1: Site 1 takes Design B.  Core does not aggregate.
+
+Rationale is Mali.  =household_roster= declares =(t, i, pid)=, but =pid= is a
+*household* id stamped onto every member --- 5,149 distinct values across 37,175
+rows.  =first()= keeps ONE PERSON PER HOUSEHOLD and 32,026 people disappear.  No
+reducer is correct there: =first= keeps one person, =sum= is meaningless on
+=Sex=.  Declaring =aggregation: {pid: first}= would only put a signature on the
+corpse.  Duplicates on a declared index almost never mean "reduce me" --- they
+mean the IDENTIFIER IS BROKEN or a LEVEL IS MISSING.
+
+This upholds the NO-AGGREGATION-IN-CORE contract already in force in
+=SkunkWorks/grain_aggregation_policy.org=.
+
+*Consequence.* The twelve Design-A core patches are dropped.  So are the
+=aggregation:= YAML keys added by fourteen branches: the key remains in core's
+=_skip= set, so it is dead config, and it now also contradicts the policy it was
+meant to serve.
+
+*What the Design-A countries actually wanted, they still get --- for free.*
+Cambodia, Tajikistan and GhanaLSS were not asking core to aggregate.  They were
+asking to say /"this household-to-cluster projection is lossless, and I checked."/
+Under Design B a provably lossless collapse is ALREADY SILENT.  They need no YAML
+and no country core code --- *provided the audit also runs at Site 2*, which is
+where their collapse actually happens.  That is now the main argument for owning
+Site 2 promptly.
+
+** D2: Site 3 deletes and reports.  It does not retain.
+
+#614's behaviour stands; Burkina Faso's =dropna=False= retain is rejected.
+Retaining would change returned data for every country in the library, which is a
+semantic change that does not belong inside a bug fix.
+
+The obligation this creates: the deletion must be LOUD.  =nan_key_rows= is already
+in the report and must stay there.  Uganda's 934 rows are allowed to be deleted;
+they are not allowed to be deleted *quietly*.
+
+** D3: Sites 2 and 4 get their own PRs.  They are not folded into #614.
+
+#614 stays scoped to Site 1 + Site 3 and can merge on its own merits.
+
+* Consequent plan
+
+** Core PRs
+
+- PR #614 :: Sites 1 and 3, Design B.  Already filed against =development=.
+  Requires no change under D1/D2 --- it already implements both.  *Merges first.*
+- PR (new) :: Site 2.  Extend the audit to =Wave.cluster_features=; delete the
+  false "invariant by construction" prose and enforce the invariant instead.
+  Salvage from Albania / Cambodia / Kazakhstan / Nigeria / Tajikistan / Tanzania.
+- PR (new) :: Site 4.  Cardinality guard on the =dfs:= outer merge.  Salvage from
+  Ethiopia.
+- PR (new, small) :: Mali's =({const: value})= idxvars primitive.  Not #323.
+
+** Country branches
+
+All 29 branches carrying work are stripped to *config and script changes only*
+--- no =lsms_library/*.py= --- and rebased onto #614.  Their country-level
+diagnosis is the value and it survives intact: Pakistan's cover-sheet
+misattribution, Guatemala's real ENCOVI PSU, Liberia's =ea_unique= rekey,
+Serbia's =(opstina, popkrug)= composite key, and the rest.
+
+Three open PRs carry a Design-A core patch and must be stripped before they can
+merge: *#609* (GhanaLSS, +84 lines of core), *#610* (Tajikistan, +196), *#613*
+(Cambodia, +148).  Three are already clean and config-only: *#608* (Guatemala),
+*#611* (India), *#612* (Pakistan).
+
+** Still owed a fix
+
+Benin, Togo and Uganda have no commits --- their agents died before committing,
+and all three DO have defects (measured 2026-07-13 against the pre-collapse
+frame, =LSMS_NO_CACHE=1=):
+
+| Country | Table              | Destroyed | NaN-key |
+|---------+--------------------+-----------+---------|
+| Benin   | plot_inputs        |        68 |       0 |
+| Togo    | plot_inputs        |       156 |       0 |
+| Uganda  | people_last7days   |     6,185 |       0 |
+| Uganda  | cluster_features   |     9,890 |     934 |
+
+Benin and Togo are the same bug and it is already solved: =harmonize_input= maps
+every seed label to =input='Seed'= and =harmonize_seed_crop= is non-injective
+(unmapped labels fall into the =Autre crop= catch-all), so two distinct
+line-items collide.  =fix/323-cotedivoire= already fixed exactly this; the two
+are cheap.
+
+Uganda is the largest of the three and is two independent sites ---
+=people_last7days= carries two rows per household with different member counts
+(about half of each affected wave is destroyed), and =cluster_features= is a
+Site-2 case: households in a cluster disagree on Latitude/Longitude, and
+=first()= can keep an all-NaN row while discarding the row that has the real
+coordinates.
+
+* The lesson worth keeping
+
+The fan-out gave every agent the same root cause and no way to see each other.
+Sixteen of them fixed it.  A sweep that touches a shared core file needs the core
+fix *landed first, centrally*, and the per-item agents restricted to config ---
+or it needs an explicit instruction that the core is off-limits and a finding
+there is to be REPORTED, not patched.
+
+See =~/.sucoder/skills/scrum-master-hpc/SKILL.md=; this belongs in it.
