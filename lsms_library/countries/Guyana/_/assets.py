@@ -16,13 +16,21 @@ Because ``get_dataframe`` does not surface variable labels, and because
 captured below verbatim from the column labels (the ``"NO. OWNED - "`` prefix
 stripped).  Blocks 31/31a/31b all share the label ``"OTHER AUDIO-VISUAL"``.
 
-i reconciliation: ``sample()`` keys households on ``i = "ED-HH"`` (from
-COVERN.dta).  DRBLS has no separate ED/HH columns, only ``newid``
-(= ED*100000 + ED_SMPL*100 + SMPL_H), whose tail does NOT encode HH.  We
-therefore join DRBLS.newid <-> COVERN.NEWID to recover (ED, HH) and build the
-same ``i`` as the sample table.  Verified 0 orphan households vs.
-``Country('Guyana').sample()``; ~5% of DRBLS rows have a newid absent from
+i reconciliation: ``sample()`` keys households on ``i = "ED-SN-HH"`` (from
+COVERN.dta), where SN is the ED sample-segment serial.  DRBLS has no separate
+ED/SN/HH columns, only ``newid`` (= ED*100000 + SN*100 + HH).  We therefore join
+DRBLS.newid <-> COVERN.NEWID to recover (ED, SN, HH) and build the same ``i`` as
+the sample table.  COVERN.NEWID is exactly that formula for 1807/1807 rows and
+is unique, so the join is safe.  ~5% of DRBLS rows have a newid absent from
 COVERN (genuinely out-of-sample) and are dropped.
+
+GH #323: this script previously recovered only (ED, HH) and discarded SN --
+even though the docstring above already spelled out that newid encodes ED_SMPL.
+Because 248 (ED,HH) buckets fuse 542 distinct real households, the per-item
+``groupby(['t','i','j']).sum()`` below was SUMMING TWO DIFFERENT HOUSEHOLDS'
+durables into one row: not merely lossy, but inventing holdings that no
+household reported.  Carrying SN through makes that sum aggregate strictly
+WITHIN a real household, which is what it was always meant to do.
 
 DRBLS lists multiple per-acquisition detail rows for the same (household,
 item).  Because the canonical (t, i, j) index must be unique, these are
@@ -70,10 +78,10 @@ def main():
     drb = get_dataframe(f'../{WAVE}/Data/DRBLS.dta')
     cov = get_dataframe(f'../{WAVE}/Data/COVERN.dta')
 
-    # Recover (ED, HH) for each DRBLS row by joining newid <-> COVERN.NEWID.
+    # Recover (ED, SN, HH) for each DRBLS row by joining newid <-> COVERN.NEWID.
     cov = cov.dropna(subset=['NEWID']).copy()
     cov['NEWID'] = cov['NEWID'].astype('int64')
-    id_map = cov.drop_duplicates('NEWID').set_index('NEWID')[['ED', 'HH']]
+    id_map = cov.drop_duplicates('NEWID').set_index('NEWID')[['ED', 'SN', 'HH']]
 
     drb = drb.dropna(subset=['newid']).copy()
     drb['newid'] = drb['newid'].astype('int64')
@@ -85,8 +93,8 @@ def main():
     print(f"Guyana 1992 assets: {n_drop}/{n_total} DRBLS rows dropped "
           f"(newid absent from COVERN).", file=sys.stderr)
 
-    drb['i'] = [f"{format_id(ed)}-{format_id(hh)}"
-                for ed, hh in zip(drb['ED'], drb['HH'])]
+    drb['i'] = [f"{format_id(ed)}-{format_id(sn)}-{format_id(hh)}"
+                for ed, sn, hh in zip(drb['ED'], drb['SN'], drb['HH'])]
 
     # WIDE -> LONG: one record per (household, item block).
     frames = []
@@ -110,7 +118,7 @@ def main():
     long['t'] = WAVE
 
     # DRBLS records SEVERAL detail rows for the same (household, item): e.g.
-    # household 1-1 lists five "BEDS" purchases made in different years at
+    # household 5-194-1 lists five "BEDS" purchases made in different years at
     # different prices.  The canonical assets index is (t, i, j) and the
     # framework REQUIRES it to be unique — ``_normalize_dataframe_index``
     # collapses any remaining duplicates with ``groupby().first()``, which
@@ -121,8 +129,13 @@ def main():
     # holding, NOT a cross-item household aggregate — the per-item granularity
     # the assets schema asks for is preserved; only the redundant
     # per-acquisition split (which the framework cannot represent in a unique
-    # index anyway) is summed.  Determinstic, and loses no quantity/value
+    # index anyway) is summed.  Deterministic, and loses no quantity/value
     # vs. the framework's arbitrary first().
+    #
+    # NB (GH #323): summing is only correct because ``i`` now carries SN and so
+    # names ONE real household.  Under the old (ED, HH) id this same sum silently
+    # pooled the durables of up to several distinct households — the reason a
+    # "we sum, so nothing is lost" comment is not by itself a safety argument.
     long = (long.groupby(['t', 'i', 'j'], as_index=True, observed=True)[['Quantity', 'Value']]
                 .sum(min_count=1)
                 .sort_index())
