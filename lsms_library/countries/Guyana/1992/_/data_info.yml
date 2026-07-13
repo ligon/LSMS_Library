@@ -1,11 +1,29 @@
 Country: Guyana
 Wave: 1992
+# HOUSEHOLD AND CLUSTER IDENTITY (GH #323).
+#
+# The survey keys a household on the THREE-level (ED, SN, HH), where SN is the
+# ED sample-segment serial (spelled `ed_smpl` in HHCHAR/WEIGHTID, `SN` in
+# COVERN/ROSTERN/EDUCN).  ED numbers are REUSED across segments, so (ED, HH)
+# alone MERGES DISTINCT REAL HOUSEHOLDS: 248 (ED,HH) buckets conflate 542 real
+# households holding 2,381 of 7,827 people (30.4%).  The survey's own household
+# id proves the key: COVERN.NEWID == ED*100000 + SN*100 + HH for 1807/1807 rows,
+# all unique.  i is therefore the hyphen-joined "ED-SN-HH".
+#
+# CLUSTER: the sampling segment is (ED, SN), NOT ED.  An ED number appears in
+# more than one region -- e.g. ED 5 / SN 194 is Region 4, urban (12 hh) while
+# ED 5 / SN 702 is Region 10, RURAL (12 hh): two different enumeration
+# districts that share the number 5.  Keying v on ED alone therefore forces an
+# arbitrary Region for 537 households and an arbitrary Rural for 274.  Keyed on
+# (ED, SN): 168 segments, each a fixed take of <=12 households, SECTOR (Rural)
+# 100% homogeneous (0 of 168 ambiguous) and RGN ambiguous in only 3 segments
+# (35 hh), each a single stray household mis-coded to a neighbouring region.
+# The WEIGHT lookup is unaffected -- see the sample block below.
 cluster_features:
     file:
         - ../Data/COVERN.dta
     idxvars:
-        v: ED
-        i: HH
+        v: [ED, SN]
     myvars:
         Region: RGN
         Rural:
@@ -15,14 +33,29 @@ cluster_features:
                 2: Rural
 
 sample:
+    # WEIGHT.dta is a LOOKUP (the 616-ED national frame), not a spine.  The
+    # framework merges sub-dfs with how='outer', so merging on `v` used to admit
+    # the 488 frame-only EDs as phantom rows with i = NaN (1807 + 488 = 2295
+    # rows, of which 793 were then silently dropped by the duplicate collapse).
+    # We merge on the RAW ED (`ed_key`, a helper carried by both sub-dfs, dropped
+    # by the sample() hook in mapping.py) and the hook then drops every i-less
+    # row, restoring 1807 real households.
+    #
+    # The weight is keyed on ED alone in the SOURCE (WEIGHTID.dta assigns one
+    # weight per ED; 0 of 126 EDs vary across their segments), so looking it up
+    # on ED while identifying the cluster as (ED, SN) is faithful to the survey:
+    # joining WEIGHT.dta on ED reproduces WEIGHTID's household weights 1795/1795
+    # with 100% value agreement.  EDs 408 and 482 (23 households) have no row in
+    # WEIGHT.dta at all; their weight stays NaN -- loudly missing, never imputed.
     dfs:
         - df_cover
         - df_weights
     df_cover:
         file: ../Data/COVERN.dta
         idxvars:
-            i: [ED, HH]
-            v: ED
+            i: [ED, SN, HH]
+            v: [ED, SN]
+            ed_key: ED
         myvars:
             strata: STNO
             Rural:
@@ -33,21 +66,25 @@ sample:
     df_weights:
         file: ../Data/WEIGHT.dta
         idxvars:
-            v: ED
+            ed_key: ED
         myvars:
             weight: WEIGHT
     merge_on:
-        - v
+        - ed_key
     final_index:
         - i
         - t
 
 household_roster:
+    # i=[ED,SN,HH]: dropping SN made (ED,HH,PID) non-unique for 888 of 7,827
+    # rows, which the framework then collapsed with groupby().first() -- keeping
+    # one household's members and discarding the other's (GH #323).  With SN the
+    # key is exactly unique (0 duplicates).  v is joined from sample() at API
+    # time; it is not declared here.
     file:
         - ../Data/ROSTERN.dta
     idxvars:
-        v: ED
-        i: [ED, HH]
+        i: [ED, SN, HH]
         pid: PID
     myvars:
         Sex:
@@ -82,11 +119,13 @@ household_roster:
 
 individual_education:
     # Dedicated education module EDUCN.dta; HS = highest school (codes 1-17).
-    # i=[ED,HH], pid=PID match the roster (~0.3% spine orphans).
+    # i=[ED,SN,HH], pid=PID match the roster.  Without SN, 867 of 7,691 rows
+    # collided on (ED,HH,PID) and were silently dropped (GH #323); with SN the
+    # key is exactly unique (0 duplicates, 0 spine orphans vs COVERN).
     file:
         - ../Data/EDUCN.dta
     idxvars:
-        i: [ED, HH]
+        i: [ED, SN, HH]
         pid: PID
     myvars:
         Educational Attainment:
@@ -95,10 +134,22 @@ individual_education:
 
 housing:
     # Dwelling module HHCHAR.dta, block (16) HOUSING (questionnaire GUY02.pdf
-    # p.31).  HHCHAR keys the household on (ed_dvsn, smpl_hh); these equal the
-    # roster's (ED, HH) numerically, so i=[ed_dvsn, smpl_hh] hyphen-joins to the
-    # same "ED-HH" form the roster/sample use (~1.1% orphans vs sample, same
-    # (ED,HH) ambiguity the roster itself carries).  All dwelling columns are
+    # p.31).  HHCHAR keys the household on the THREE-level
+    # (ed_dvsn, ed_smpl, smpl_hh), which equals the roster's (ED, SN, HH)
+    # numerically -- so i=[ed_dvsn, ed_smpl, smpl_hh] hyphen-joins to the same
+    # "ED-SN-HH" form.  The previous 2-level i=[ed_dvsn, smpl_hh] was NOT merely
+    # ambiguous, it was WRONG: 311 of 1,819 rows collided and were silently
+    # collapsed with groupby().first(), fusing distinct households (GH #323).
+    #
+    # Do NOT key this table on HHCHAR.newid: that column is corrupt (319
+    # duplicate values, and it disagrees with the ED*100000+ed_smpl*100+smpl_hh
+    # formula in 240 of 1,819 rows).  Where the two disagree the TRIPLE is the
+    # trustworthy one -- it matches a real COVERN household in 235 of those 240
+    # rows, versus 201 for newid (1,765 vs 1,731 overall).  (COVERN.NEWID, a
+    # different column in a different file, IS clean and is used by _/assets.py.)
+    #
+    # Exactly one duplicate survives the 3-level key and is handled EXPLICITLY
+    # by the housing() hook in mapping.py -- see there.  All dwelling columns are
     # bare integer codes with NO embedded value labels, so each carries an
     # explicit code->name mapping (0 = not recorded -> "Not Stated").
     #   Roof        <- bldg4  (16.1,4 material used for roof)
@@ -112,7 +163,7 @@ housing:
     file:
         - ../Data/HHCHAR.dta
     idxvars:
-        i: [ed_dvsn, smpl_hh]
+        i: [ed_dvsn, ed_smpl, smpl_hh]
     myvars:
         Roof:
             - bldg4
