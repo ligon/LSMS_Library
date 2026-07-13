@@ -27,6 +27,7 @@ from pathlib import Path
 import pytest
 
 import lsms_library as ll
+from lsms_library.local_tools import data_root
 
 
 def _aws_creds_available() -> bool:
@@ -71,10 +72,12 @@ def guyana():
 def test_declared_index_is_unique(guyana, table):
     """No table may ship a duplicated canonical index.
 
-    A duplicate here is silently collapsed by ``groupby().first()`` at
-    normalize time -- the GH #323 data loss.  Guarding the *index* (rather than
-    only the row count) keeps this test meaningful if the source is ever
-    re-extracted.
+    NOTE: this is NOT the primary #323 guard and it does NOT fail on the pre-fix
+    config -- ``_normalize_dataframe_index`` collapses duplicates before we ever
+    see the frame, so the returned index is unique precisely BECAUSE rows were
+    silently discarded.  The real #323 guards are the row counts below (which do
+    fail pre-fix).  This one catches duplicates re-introduced AFTER normalize --
+    e.g. the id_walk/`attrs` double-application that bit Burkina Faso.
     """
     df = getattr(guyana, table)()
     dupes = df.index.duplicated()
@@ -95,17 +98,54 @@ def test_row_counts_recovered(guyana, table):
     )
 
 
-def test_no_silent_collapse_warning(guyana):
-    """The framework's own GH #323 warning must not fire for any Guyana table."""
+def _clear_guyana_caches(tables) -> None:
+    """Physically drop L2-country (`var/`) and L2-wave parquets for Guyana.
+
+    REQUIRED for the collapse-warning test below.  The framework's GH #323
+    warning fires only on a COLD build: in warm operation the collapse is
+    already baked into the cache, so the warning never fires again and a
+    warm-cache assertion passes VACUOUSLY.  The bug hides behind the cache the
+    bug poisoned -- which is how #323 stayed hidden in the first place.
+    """
+    root = data_root() / "Guyana"
+    if not root.exists():
+        return
+    for table in tables:
+        l1 = root / "var" / f"{table}.parquet"
+        if l1.exists():
+            l1.unlink()
+        for wave_dir in root.iterdir():
+            if not wave_dir.is_dir() or wave_dir.name == "var":
+                continue
+            l2 = wave_dir / "_" / f"{table}.parquet"
+            if l2.exists():
+                l2.unlink()
+
+
+def test_no_silent_collapse_warning_on_cold_build(monkeypatch):
+    """The framework's GH #323 collapse warning must not fire for any Guyana table.
+
+    Built COLD (caches cleared + LSMS_NO_CACHE) so the collapse path actually
+    runs.  Without the cold build this assertion is vacuous: it passes on the
+    pre-fix config too, because the warm cache already contains the collapsed
+    rows and no rebuild -- hence no warning -- ever happens.
+    """
+    monkeypatch.setenv("LSMS_NO_CACHE", "1")
+    tables = sorted(EXPECTED_ROWS)
+    _clear_guyana_caches(tables)
+
+    country = ll.Country("Guyana")
     offenders = []
-    for table in sorted(EXPECTED_ROWS):
+    for table in tables:
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
-            getattr(guyana, table)()
+            getattr(country, table)()
         for w in caught:
             if "duplicate tuple" in str(w.message):
                 offenders.append(f"{table}: {w.message}")
-    assert not offenders, "Silent index collapse still happening:\n" + "\n".join(offenders)
+    assert not offenders, (
+        "Declared index still being collapsed with groupby().first() "
+        "(GH #323):\n" + "\n".join(offenders))
 
 
 def test_household_id_carries_the_segment(guyana):

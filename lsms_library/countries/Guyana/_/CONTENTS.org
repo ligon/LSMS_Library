@@ -1,5 +1,105 @@
 #+TITLE: Guyana — country notes & known data issues
 
+* Household and cluster identity (READ FIRST)
+
+The household key is the *three-level* =(ED, SN, HH)= and the sampling cluster is
+the *two-level* =(ED, SN)=.  =SN= is the ED sample-segment serial — spelled
+=ed_smpl= in =HHCHAR.dta= / =WEIGHTID.dta=, and =SN= in
+=COVERN/ROSTERN/EDUCN=.  So =i = "ED-SN-HH"= (e.g. ="5-194-2"=) and
+=v = "ED-SN"= (e.g. ="5-194"=).
+
+*ED numbers are reused across segments.*  They are NOT unique on their own:
+
+| ED | SN  | Region | Sector | households |
+|----+-----+--------+--------+------------|
+|  5 | 194 |      4 | urban  |         12 |
+|  5 | 702 |     10 | rural  |         12 |
+
+Those are two different enumeration districts that happen to share the number 5.
+
+Until GH #323 the config declared =i: [ED, HH]= and =v: ED=.  Both are wrong,
+and both were *silently* wrong: the framework's =_normalize_dataframe_index=
+collapses a non-unique declared index with =groupby().first()=, so 248 =(ED,HH)=
+buckets fused 542 distinct real households holding 2,381 of 7,827 people (30.4%),
+and one household's members were kept while another's were thrown away.  The
+survey's own id proves the key: =COVERN.NEWID == ED*100000 + SN*100 + HH= for
+1807/1807 rows, all unique.
+
+Row counts before → after the fix:
+
+| table                | before |  after |
+|----------------------+--------+--------|
+| household_roster     |  6,939 |  7,827 |
+| individual_education |  4,137 |  4,633 |
+| housing              |  1,508 |  1,817 |
+| sample               |  1,502 |  1,807 |
+| interview_date       |  1,502 |  1,807 |
+| assets               | 10,345 | 11,227 |
+| cluster_features     |    130 |    168 |
+
+Enforced by =tests/test_guyana_index_uniqueness.py= (pinned row counts, the ED-5
+de-fusion, and a *cold-build* no-collapse-warning check).  A warm-cache check
+would pass vacuously — the collapse is baked into the cache, so the warning
+never fires twice.  Prose here is documentation; the test is the enforcement.
+
+* Declared aggregation / drop policies
+
+These are the places where a duplicate is resolved by an *explicit, declared*
+rule instead of the framework's silent =first()=.  All live in
+=1992/_/mapping.py= as =df_edit= hooks.
+
+** housing — one household DROPPED (class-2: loudly missing)
+Exactly one duplicate survives the correct 3-level key:
+=(ed_dvsn=123, ed_smpl=722, smpl_hh=6)= — a duplicated record in the *source*
+(=WEIGHTID.dta= carries it too), whose two rows share =newid= (12372206) and
+=hhsize= (3) but disagree on ~35 columns including =totexp= (6,345 vs 25,843) and
+wall material (=bldg3= 1=Wood vs 3=Wood & Concrete).  There is no principled way
+to choose, so *both rows are dropped* with a warning naming the household.  It is
+therefore absent from =housing= but present in roster/education/sample.
+Dropping loudly beats guessing quietly.
+
+** cluster_features — MODE, not first (ties → NA)
+=COVERN= is household-level (1,807 rows); =cluster_features= is declared at
+=(t, v)=, so it must be reduced to one row per segment.  The declared reducer is
+the *majority (mode)*.  With =v = (ED, SN)= the segment is 100% homogeneous in
+=Rural= (0 of 168 ambiguous); =Region= is ambiguous in only 3 of 168 segments
+(35 households), and in each the split is a lone stray household against the rest
+(1-vs-10, 1-vs-11, 1-vs-11, all within one stratum and one sector) — a coding
+error, not a real split.  =first()= would have let row order decide.  A genuine
+tie has no majority and is set to =NA=, never guessed.
+
+** sample — weight is a LOOKUP, not a spine
+=WEIGHT.dta= is the 616-ED *national sampling frame*.  The framework merges
+sub-dfs with =how='outer'=, so the 488 frame EDs that were never surveyed used to
+arrive as phantom rows with =i = NaN= (1807 + 488 = 2295 rows).  The merge is now
+keyed on a raw-ED helper column and the hook drops every i-less row.
+
+EDs *408* and *482* (23 households) have no row in =WEIGHT.dta= at all; their
+=weight= stays =NaN= — loudly missing, never imputed.
+
+The weight is keyed on ED *in the source*: =WEIGHTID.dta= assigns one weight per
+ED and 0 of its 126 EDs vary across their segments.  So looking the weight up on
+ED while identifying the *cluster* as =(ED, SN)= is faithful to the survey —
+joining =WEIGHT.dta= on ED reproduces =WEIGHTID='s household weights 1795/1795
+with 100% value agreement.
+
+* Traps
+
+- *=HHCHAR.newid= is corrupt.*  Do NOT key =housing= on it: 319 duplicate values,
+  and it disagrees with its own =(ed_dvsn, ed_smpl, smpl_hh)= triple in 240 of
+  1,819 rows.  Where the two disagree the *triple* is the trustworthy one — it
+  matches a real =COVERN= household in 235 of those 240 rows, versus 201 for
+  =newid= (1,765 vs 1,731 overall).  (=COVERN.NEWID=, a different column in a
+  different file, IS clean and unique, and =_/assets.py= does use it.)
+- *=assets= sums.*  =_/assets.py= collapses per-acquisition detail rows with
+  =groupby(['t','i','j']).sum()=.  That is only safe because =i= now names ONE
+  real household; under the old =(ED, HH)= id the same sum silently pooled the
+  durables of *two different households*, inventing holdings nobody reported.
+  "We sum, so nothing is lost" is not by itself a safety argument.
+- =EDUCN.dta= has 7,691 rows but =HS= (highest school) is NaN for 3,058 of them;
+  those rows carry no education value and do not survive into
+  =individual_education= (hence 4,633, not 7,691).  This is unrelated to #323.
+
 * Known data issues
 
 ** shocks — not available (2026-06-06)
