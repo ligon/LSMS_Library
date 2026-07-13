@@ -1,6 +1,27 @@
 Country: Kazakhstan
 Data Scheme:
+  # GH #323 -- DECLARED aggregation policies.
+  #
+  # KZ96SMP_PUF.dta, KZ96REL.dta and KZ96EDU_PUF.dta are all PERSON-level
+  # (7,224 rows each, one per individual).  `sample` and `cluster_features` are
+  # coarser than their source, so the person dimension must be projected away.
+  # That collapse used to happen silently via groupby().first(); it is now an
+  # explicit contract that the framework ENFORCES.  See _/CONTENTS.org.
+  #
+  # KLSS 1996 design: 1,996 households / 7,224 individuals / 135 clusters.
+
   cluster_features:
+    # Cluster grain (t, v) projected from person rows.  `unique` would RAISE:
+    # the source codes cluster attributes redundantly on each household and is
+    # internally inconsistent for exactly 2 of 135 clusters --
+    #   loc_nr=126: 50 households 'urban', 1 (rn=1264) 'rural'
+    #   loc_nr=5  :  9 households 'Akmolins', 1 (rn=43) 'Aktobink'
+    # `first()` returned the MINORITY value 'Rural' for cluster 126 -- silently
+    # wrong.  `mode` takes the majority (-> 'Urban') and WARNS naming both
+    # clusters, so the source inconsistency is visible instead of hidden.  We
+    # deliberately do NOT hand-patch rn=1264/rn=43 in a mapping layer: that
+    # would overwrite source values on an inference and bake a guess in as fact.
+    aggregation: mode
     index: (t, v)
     Region: str
     Rural: str
@@ -15,6 +36,13 @@ Data Scheme:
     materialize: make
 
   household_roster:
+    # Household rn=805 is duplicated in the master person register: personnr
+    # 2, 3 and 4 each appear TWICE, and the paired rows are identical in all 30
+    # non-serial columns (same sex, same age, same dob to the day).  They are
+    # copies, not people.  `dedupe` drops the exact duplicates and RAISES if any
+    # (i, pid) collision survives -- so a FUTURE non-identical collision becomes
+    # a loud error instead of a silent first()-wins.  7,224 -> 7,221 persons.
+    aggregation: dedupe
     index: (t, i, pid)
     Sex: str
     Age: int
@@ -24,6 +52,9 @@ Data Scheme:
     Affinity: str
 
   individual_education:
+    # Same rn=805 duplication, propagated into the education register (identical
+    # across all 26 columns).  See household_roster above.
+    aggregation: dedupe
     index: (t, i, pid)
     Educational Attainment: str
 
@@ -42,6 +73,11 @@ Data Scheme:
     materialize: make
 
   sample:
+    # Household grain (i, t) projected from person rows (7,224 -> 1,996).  The
+    # projection is value-preserving: 0 of 1,996 households carry a non-constant
+    # v / Region / Rural.  `unique` verifies that on every build and RAISES the
+    # day it stops being true, instead of silently taking an arbitrary row.
+    aggregation: unique
     index: (i, t)
     v: str
     weight:

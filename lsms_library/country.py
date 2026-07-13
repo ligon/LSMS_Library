@@ -1177,9 +1177,28 @@ class Wave:
         # sampling design) and ``.mean()`` for Latitude/Longitude
         # (HH-level GPS approximated as the cluster centroid).
         # GH #161.
+        # GH #323: the `.first()` below rests on the claim that Region/Rural are
+        # "invariant within a cluster by construction".  That is PROSE, not
+        # enforcement, and it is false in at least one real survey (Kazakhstan
+        # 1996 cluster 126 codes 50 households urban and 1 rural, and `.first()`
+        # silently returned the minority value).  A country can now DECLARE the
+        # collapse via `aggregation:` in data_scheme.yml, which enforces the
+        # invariant (`unique`), asserts the rows are identical (`dedupe`), or
+        # states a majority rule and warns (`mode`).  Undeclared tables keep the
+        # historical behaviour exactly.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
-            if df.columns.size:
+            gps = {c: 'mean' for c in ('Latitude', 'Longitude') if c in df.columns}
+            policy = _declared_aggregation(
+                self.country._materialization_entry('cluster_features')
+            )
+            if policy and df.columns.size:
+                df = _collapse_with_policy(
+                    df, keep_levels, policy, 'cluster_features',
+                    context=f"cluster_features [{self.year}]",
+                    col_overrides=gps,
+                )
+            elif df.columns.size:
                 agg = {
                     c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
                     for c in df.columns
@@ -3785,7 +3804,188 @@ def _coerce_to_boolean(series: pd.Series) -> pd.Series:
     # numeric (int/float) path
     return pd.to_numeric(series, errors='coerce').astype(pd.BooleanDtype())
 
-_SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend'})
+_SCHEME_SKIP_KEYS = frozenset({'index', 'materialize', 'backend', 'aggregation'})
+
+
+# ---------------------------------------------------------------------------
+# Declared aggregation policy (GH #323)
+# ---------------------------------------------------------------------------
+#
+# When a table's source is finer-grained than its declared index (e.g. a
+# person-level file feeding a household-level `sample`), the extra rows have to
+# be collapsed.  Historically that collapse was an *undeclared* ``groupby()
+# .first()`` -- which silently discards rows, and silently picks an arbitrary
+# value when the group disagrees.  ``aggregation:`` in ``data_scheme.yml`` makes
+# the collapse an explicit, enforced contract instead:
+#
+#   unique  -- the projection must be value-preserving: every column must carry
+#              exactly one distinct non-null value per group.  RAISES if not.
+#              Use when the source rows are redundant copies of a coarser
+#              entity (person rows carrying their household's attributes).
+#   dedupe  -- the colliding rows must be *identical*: drop exact duplicates,
+#              then RAISE if any index tuple still collides.  Use for known
+#              duplicate records in a source register.
+#   mode    -- take the majority value per group, and WARN naming the groups
+#              that disagreed.  Use when the source codes a coarse entity's
+#              attribute redundantly on each fine row and is known to be
+#              internally inconsistent for a few of them.
+#   first   -- the legacy behaviour, opted into explicitly (lossy by design).
+#   sum     -- add the additive measure columns (see _ADDITIVE_MEASURE_COLUMNS).
+#
+# `unique` and `dedupe` are the safe ones: they convert a silently-WRONG result
+# (class-1) into a loud failure (class-2).  `mode` is a *stated* majority rule
+# rather than an accident of row order, and it is never silent.
+_AGGREGATION_POLICIES = frozenset({'unique', 'dedupe', 'mode', 'first', 'sum'})
+
+
+def _declared_aggregation(scheme_entry: dict[str, Any] | None) -> str | None:
+    """Return the scalar ``aggregation:`` policy declared for a table, or None.
+
+    ``aggregation:`` already carried a *different*, mapping-shaped meaning before
+    GH #323: a forward-looking per-level grain policy (``aggregation: {visit:
+    first}`` on ``interview_date`` in Albania, Malawi, Senegal and six other
+    countries) that nothing currently reads.  We keep both shapes:
+
+    * **mapping**  -- the legacy per-level grain policy.  Not a duplicate-collapse
+      policy, so return None and leave those tables on the historical path.
+    * **scalar**   -- the GH #323 duplicate-collapse policy (this function's job).
+
+    Raises on an unrecognised scalar: a typo in ``data_scheme.yml`` must fail
+    loudly rather than silently fall back to the lossy legacy default.
+    """
+    if not isinstance(scheme_entry, dict):
+        return None
+    policy = scheme_entry.get('aggregation')
+    if policy is None:
+        return None
+    if isinstance(policy, dict):
+        # Legacy per-level grain policy (e.g. {visit: first}); not GH #323's.
+        return None
+    policy = str(policy).strip().lower()
+    if policy not in _AGGREGATION_POLICIES:
+        raise ValueError(
+            f"Unknown aggregation policy {policy!r} in data_scheme.yml; "
+            f"expected one of {sorted(_AGGREGATION_POLICIES)}."
+        )
+    return policy
+
+
+def _mode_or_na(series: pd.Series) -> Any:
+    """Majority value of *series*, ignoring nulls; pd.NA when all-null.
+
+    ``Series.mode()`` sorts, so ties break deterministically.
+    """
+    modes = series.mode(dropna=True)
+    return modes.iloc[0] if len(modes) else pd.NA
+
+
+def _collapse_with_policy(
+    df: pd.DataFrame,
+    levels: list[str],
+    policy: str,
+    table_name: str | None = None,
+    context: str = "",
+    col_overrides: dict[str, str] | None = None,
+) -> pd.DataFrame:
+    """Collapse *df* onto *levels* under an explicitly declared *policy*.
+
+    ``col_overrides`` maps a column name to a pandas agg func that wins over the
+    policy (used to keep cluster GPS as a centroid ``mean``).
+    """
+    col_overrides = col_overrides or {}
+    label = f"{context or table_name or 'table'}"
+
+    # Unordered categoricals blow up groupby()/mode(); normalise to strings the
+    # same way _normalize_dataframe_index does before its own collapse.
+    for col in df.columns:
+        if hasattr(df[col], 'cat') and not df[col].cat.ordered:
+            df = df.assign(**{col: df[col].astype(str).replace(
+                {'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})})
+
+    if policy == 'dedupe':
+        # Exact-duplicate rows are redundant records; anything else colliding on
+        # the declared index is a genuine conflict we must not resolve by guess.
+        flat = df.reset_index()
+        before = len(flat)
+        flat = flat.drop_duplicates()
+        residual = flat.duplicated(subset=levels)
+        if residual.any():
+            examples = flat.loc[residual, levels].head(5).to_dict('records')
+            raise ValueError(
+                f"{label}: aggregation 'dedupe' found {int(residual.sum())} index "
+                f"tuple(s) over {levels} whose rows are NOT identical, so they "
+                f"cannot be safely deduplicated. Examples: {examples}. Resolve "
+                f"the conflict in the source/config, or declare a different "
+                f"aggregation policy (GH #323)."
+            )
+        out = flat.set_index(levels)
+        logger.debug("%s: dedupe dropped %d exact-duplicate row(s)",
+                     label, before - len(flat))
+        return out
+
+    grouped = df.groupby(level=levels, observed=True)
+
+    if policy == 'unique':
+        # Verify-then-collapse: the projection must throw away no information.
+        conflicts: dict[str, list[Any]] = {}
+        for col in df.columns:
+            if col in col_overrides:
+                continue
+            n = grouped[col].nunique(dropna=True)
+            bad = n[n > 1]
+            if len(bad):
+                conflicts[col] = list(bad.index[:5])
+        if conflicts:
+            raise ValueError(
+                f"{label}: aggregation 'unique' requires one distinct value per "
+                f"group over {levels}, but these column(s) disagree within a "
+                f"group: { {c: v for c, v in conflicts.items()} }. The declared "
+                f"collapse is NOT value-preserving; fix the source or declare "
+                f"'mode'/'first' explicitly (GH #323)."
+            )
+        agg = {c: col_overrides.get(c, 'first') for c in df.columns}
+        return grouped.agg(agg) if df.columns.size else grouped.first()
+
+    if policy == 'mode':
+        # Majority rule -- stated, not accidental -- and never silent.
+        disagreed: dict[str, list[Any]] = {}
+        for col in df.columns:
+            if col in col_overrides:
+                continue
+            n = grouped[col].nunique(dropna=True)
+            bad = n[n > 1]
+            if len(bad):
+                disagreed[col] = list(bad.index)
+        agg = {c: col_overrides.get(c, _mode_or_na) for c in df.columns}
+        out = grouped.agg(agg) if df.columns.size else grouped.first()
+        if disagreed:
+            warnings.warn(
+                f"{label}: aggregation 'mode' resolved column(s) whose values "
+                f"disagree within a group over {levels}: "
+                f"{ {c: v for c, v in disagreed.items()} }. The majority value "
+                f"was taken; the source is internally inconsistent for these "
+                f"group(s) and should be audited (GH #323).",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+        return out
+
+    if policy == 'sum':
+        from .feature import _ADDITIVE_MEASURE_COLUMNS
+        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) or ()
+        present = [c for c in additive if c in df.columns]
+        agg = {
+            c: col_overrides.get(c, 'sum' if c in present else 'first')
+            for c in df.columns
+        }
+        out = grouped.agg(agg)
+        if 'Price' in out.columns and {'Expenditure', 'Quantity'} <= set(out.columns):
+            out['Price'] = out['Expenditure'] / out['Quantity'].where(out['Quantity'] != 0)
+        return out
+
+    # policy == 'first': legacy, explicitly opted into.
+    agg = {c: col_overrides.get(c, 'first') for c in df.columns}
+    return grouped.agg(agg) if df.columns.size else grouped.first()
 
 
 @lru_cache(maxsize=1)
@@ -4180,6 +4380,19 @@ def _normalize_dataframe_index(
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
+        # GH #323: an explicitly DECLARED aggregation policy wins over every
+        # heuristic below.  `unique`/`dedupe` turn a silently-wrong collapse
+        # into a loud failure; `mode` states a majority rule and warns.  When
+        # nothing is declared we fall through to the historical behaviour, so
+        # undeclared tables stay byte-identical to before.
+        policy = _declared_aggregation(schema_entry)
+        if policy:
+            return _collapse_with_policy(
+                df, present_levels, policy, table_name,
+                context=f"{table_name or 'table'}"
+                        + (f" [{wave}]" if wave is not None else ""),
+            )
+
         # GH #514/#323: collapsing a non-unique canonical index with .first()
         # silently DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
