@@ -124,14 +124,22 @@ cluster_features:
             # lookups for this wave.
             District: hh_a01
     df_geo:
+        # Keyed on case_id (HOUSEHOLD grain: 12,271 rows, one per household),
+        # NOT on ea_id.  Merging it on `v` was a cartesian product within each
+        # EA -- sum(n_hh_per_ea^2) = 196,083 rows against 12,271 real
+        # households, a ~16x row fabrication (GH #323).  It did not corrupt
+        # values (lat_modified is constant within every one of the 768 EAs, so
+        # the later .first() happened to land on the right number), but it
+        # fabricated 183,812 fully-duplicated rows and hid the grain mismatch.
+        # Merge on `i`, the key both files actually share.
         file: Full_Sample/Geovariables/HH_level/householdgeovariables.dta
         idxvars:
-            v: ea_id
+            i: case_id
         myvars:
             Latitude: lat_modified
             Longitude: lon_modified
     merge_on:
-        - v
+        - i
     final_index:
         - t
         - v

@@ -40,3 +40,4 @@ def fies_score(row):
     if all(pd.isna(v) for v in vals):
         return pd.NA
     return int(sum(1 for v in vals if v is True))
+

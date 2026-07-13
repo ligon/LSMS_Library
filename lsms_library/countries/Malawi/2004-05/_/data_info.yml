@@ -6,7 +6,19 @@ sample:
     idxvars:
         i: case_id
     myvars:
-        v: ea
+        # `psu`, NOT `ea` (GH #323).  In sec_a.dta `ea` is a 1-3 digit EA
+        # sequence *within a Traditional Authority*, so it takes only 110
+        # distinct values and is NOT a cluster key: 79 of those 110 buckets
+        # span more than one district and 66 span more than one REGION,
+        # leaving 9,940 of 11,280 households (88%) in a bucket that straddles
+        # regions.  `psu` is the real IHS2 cluster: 564 distinct, exactly 20
+        # households each, equal to case_id[:8] for every row, and each psu
+        # resolves to exactly one region/district/reside.
+        # `sample` is the single source of truth for `v` (_join_v_from_sample
+        # puts it on every household-level table), so the broken key was
+        # propagating a wrong cluster -- and a wrong Region/District -- into
+        # every Malawi 2004-05 table.
+        v: psu
         weight: hhwght
         panel_weight: hhwght
         strata:
@@ -40,7 +52,14 @@ cluster_features:
     file: sec_a.dta
     idxvars:
         i: case_id
-        v: ea
+        # `psu`, NOT `ea` -- see the note on sample.v above (GH #323).  With
+        # `v: ea` this table reported 110 "clusters" where 564 exist, and the
+        # framework's groupby(['t','v']).first() then handed each of those 110
+        # buckets ONE arbitrary household's Region/District -- wrong for the
+        # 66 buckets that span >1 region.  Keyed on psu, Region/District/Rural
+        # are constant within every one of the 564 clusters, so the collapse
+        # to the declared (t, v) grain is lossless.
+        v: psu
     myvars:
         Region: region
         District: dist
@@ -105,25 +124,46 @@ housing:
 
 shocks:
     file: sec_ab.dta
+    # CODE-BASED extraction (GH #323).  sec_ab.dta's ab02 is a labelled Stata
+    # variable whose value labels are NOT unique: codes 117 and 118 -- the
+    # questionnaire's two separate "Other (specify)" roster slots, each with
+    # its own ab02oth free-text -- BOTH carry the label "Other".  Reading the
+    # labels merges them, so (t, i, Shock) went non-unique for 11,077 rows and
+    # _normalize_dataframe_index silently dropped them via groupby().first().
+    # 10,831 of those 11,077 were pure artefact: the level that distinguishes
+    # them is in the file and was being thrown away.  Read the raw codes and
+    # map them to labels ourselves (shock_label in mapping.py), keeping 117 and
+    # 118 distinct.  Because the whole file is now read unconverted, ab04 and
+    # ab07a/b/c are raw codes too and are mapped from codes below.
+    converted_categoricals: False
     idxvars:
         i: case_id
-        Shock: ab02
+        Shock:
+            - ab02
+            - mapping: shock_label
     myvars:
+        # ab04: 1 = Income loss, 2 = Asset loss, 3 = Loss of both.
         AffectedIncome:
             - ab04
             - mapping:
-                Income loss: True
-                Asset loss: False
-                Loss of both: True
+                1: True
+                2: False
+                3: True
         AffectedAssets:
             - ab04
             - mapping:
-                Income loss: False
-                Asset loss: True
-                Loss of both: True
-        HowCoped0: ab07a
-        HowCoped1: ab07b
-        HowCoped2: ab07c
+                1: False
+                2: True
+                3: True
+        HowCoped0:
+            - ab07a
+            - mapping: coping_label
+        HowCoped1:
+            - ab07b
+            - mapping: coping_label
+        HowCoped2:
+            - ab07c
+            - mapping: coping_label
 
 assets:
     file: sec_m1.dta

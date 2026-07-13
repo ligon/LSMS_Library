@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 import re
 import sys
+import warnings
 sys.path.append('../../../_/')
 from lsms_library.local_tools import conversion_table_matching_global, format_id, melt_visit_intervals
 
@@ -2407,3 +2408,144 @@ def assemble_community_prices(t, pieces):
         f"Non-unique (t,v,j,u) in community_prices {t}"
     assert len(out) > 0, f"community_prices {t} produced no rows"
     return out
+
+
+# --- cluster geography from the EA code (GH #323) --------------------------
+# The IHPS PANEL tracks movers.  In 2013-14, and in the Panel half of 2016-17
+# and 2019-20, `ea_id` is the household's BASELINE enumeration area but
+# `region` / `district` / `reside` describe where the household was FOUND at
+# interview.  For a household that moved, those are not attributes of the EA
+# it left -- they are attributes of the household.  Handing them to
+# cluster_features, whose declared index is (t, v), means the framework's
+# groupby(['t','v']).first() publishes ONE arbitrary household's location as
+# the whole cluster's: `region` disagrees within ea_id in 93 of 204 EAs in
+# 2013-14 and 66 of 102 panel EAs in 2019-20; `district` in 165 and 98.
+#
+# The Malawi EA code carries the geography itself and is therefore immune to
+# moves: digit 1 is the region, the first three digits are the district.  Both
+# are verified unique in every Malawi file with a sound cluster key -- 2016-17
+# CS (779 EAs), 2019-20 CS (717), 2010-11 (768), 2004-05 keyed on psu (564) --
+# and against 2013-14's own non-movers.
+#
+# The map below is the MODERN (IHS3/IHPS/IHS4/IHS5) district coding, read off
+# the 2019-20 cross-section.  NOTE it does NOT apply to 2004-05 (IHS2), whose
+# codes combine districts that the later frames separate (its 105 is
+# "Mzimba/Mzuzu City", where the modern 105 is Mzimba and 107 Mzuzu City) --
+# 2004-05 keeps its own `region`/`dist` columns, which are sound once `v` is
+# keyed on psu.  Cross-wave spelling drift ("Blanytyre", "Zomba" vs "Zomba
+# Non-City") is normalised downstream by the `district` / `region` tables in
+# categorical_mapping.org.  tests/test_malawi_gh323.py re-derives this map from
+# the source files and asserts it still agrees, so it cannot silently drift.
+_EA3_DISTRICT = {
+    '101': 'Chitipa',       '102': 'Karonga',       '103': 'Nkhatabay',
+    '104': 'Rumphi',        '105': 'Mzimba',        '106': 'Likoma',
+    '107': 'Mzuzu City',    '201': 'Kasungu',       '202': 'Nkhotakota',
+    '203': 'Ntchisi',       '204': 'Dowa',          '205': 'Salima',
+    '206': 'Lilongwe',      '207': 'Mchinji',       '208': 'Dedza',
+    '209': 'Ntcheu',        '210': 'Lilongwe City', '301': 'Mangochi',
+    '302': 'Machinga',      '303': 'Zomba Non-City','304': 'Chiradzulu',
+    '305': 'Blantyre',      '306': 'Mwanza',        '307': 'Thyolo',
+    '308': 'Mulanje',       '309': 'Phalombe',      '310': 'Chikwawa',
+    '311': 'Nsanje',        '312': 'Balaka',        '313': 'Neno',
+    '314': 'Zomba City',    '315': 'Blantyre City',
+}
+
+_EA1_REGION = {'1': 'North', '2': 'Central', '3': 'Southern'}
+
+
+def _ea_code(value):
+    """The raw ea_id as a string, or None when absent."""
+    x = value.iloc[0] if hasattr(value, 'iloc') else value
+    if pd.isna(x):
+        return None
+    return str(x)
+
+
+def ea_region(value):
+    """Baseline region of the EA, decoded from ea_id[:1]. Mover-immune."""
+    ea = _ea_code(value)
+    if ea is None:
+        return pd.NA
+    # An unknown prefix becomes NA rather than a guess: a cluster we cannot
+    # place must be visibly unplaced, never quietly misplaced.
+    return _EA1_REGION.get(ea[:1], pd.NA)
+
+
+def ea_district(value):
+    """Baseline district of the EA, decoded from ea_id[:3]. Mover-immune."""
+    ea = _ea_code(value)
+    if ea is None:
+        return pd.NA
+    return _EA3_DISTRICT.get(ea[:3], pd.NA)
+
+
+def baseline_unknown(value):
+    """Rural status of a PANEL cluster: not determinable from the source.
+
+    The IHPS panel files (2016-17, 2019-20) carry `reside` for the household's
+    CURRENT location and, unlike 2013-14, no `baseline_rural` flag -- so for a
+    baseline EA whose members have moved there is nothing in the file that says
+    whether that EA was urban or rural (`reside` disagrees within ea_id in 75 of
+    102 panel EAs in 2016-17 and 86 of 102 in 2019-20).  Emit NA rather than let
+    .first() publish an arbitrary mover's answer as the cluster's: silently
+    MISSING is recoverable, silently WRONG is not.  Household-level rural status
+    is unaffected and remains available, correctly, from sample().
+    """
+    return pd.NA
+
+
+def cluster_features(df):
+    """df_edit hook for cluster_features -- make the (t, v) collapse LOSSLESS.
+
+    cluster_features is EXTRACTED at household grain (t, v, i) but DECLARED at
+    (t, v), so the framework reduces it with groupby(['t','v']).first().  That
+    reduction is only safe if each attribute is CONSTANT within its cluster.
+    Where it is not, .first() silently publishes ONE ARBITRARY household's value
+    as the whole cluster's -- which is the GH #323 harm, and it is invisible
+    because the collapse is baked into the cache before anyone can see it.
+
+    The upstream config fixes make every attribute constant within v in every
+    Malawi wave but one: 7 of 2016-17's 779 cross-sectional EAs carry two
+    different modified coordinates in householdgeovariablesihs4.dta, up to 107km
+    apart, and nothing in the source says which is the EA's.  Rather than let
+    .first() pick, this hook blanks any attribute that disagrees inside its own
+    cluster and says so.  Absent-and-loud beats present-and-wrong: a NaN can be
+    detected and repaired downstream, a plausible-but-wrong coordinate cannot.
+
+    This is a GUARD, not a cleanup: with the config correct it fires on those 7
+    EAs and nothing else, and if a future edit reintroduces a broken cluster key
+    it converts what would be silently-wrong data into loudly-missing data.
+    """
+    if not isinstance(df, pd.DataFrame) or df.empty:
+        return df
+
+    flat = df.reset_index()
+    if 'v' not in flat.columns:
+        return df
+
+    keys = [k for k in ('t', 'v') if k in flat.columns]
+    payload = [c for c in flat.columns if c not in ('t', 'v', 'i')]
+    if not payload:
+        return df
+
+    g = flat.groupby(keys, dropna=False)
+    for col in payload:
+        # >1 distinct NON-NULL value inside one cluster == the source disagrees
+        # with itself about a cluster-level attribute.
+        inconsistent = g[col].transform('nunique') > 1
+        n_bad = int(inconsistent.sum())
+        if n_bad:
+            n_clusters = int(flat.loc[inconsistent, keys].drop_duplicates().shape[0])
+            warnings.warn(
+                f"Malawi cluster_features: `{col}` takes more than one value "
+                f"inside {n_clusters} cluster(s) ({n_bad} household rows).  The "
+                f"source does not determine a cluster-level value, so it is set "
+                f"to NA rather than collapsed to an arbitrary household's "
+                f"(GH #323).",
+                RuntimeWarning,
+            )
+            # blank the WHOLE cluster: groupby().first() skips NaN, so leaving
+            # any one row non-null would just re-elect an arbitrary winner.
+            flat.loc[inconsistent, col] = pd.NA
+
+    return flat.set_index(list(df.index.names))

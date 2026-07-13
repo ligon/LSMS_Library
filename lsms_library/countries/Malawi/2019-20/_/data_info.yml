@@ -54,14 +54,38 @@ cluster_features:
             - Cross_Sectional/hh_mod_a_filt.dta
             - Panel/hh_mod_a_filt_19.dta:
                 i: y4_hhid
+                # The Panel half is the IHPS and it TRACKS MOVERS: `reside` is
+                # where the household was FOUND, not what its BASELINE EA is,
+                # and it disagrees within ea_id in 86 of the 102 panel EAs.
+                # This wave's panel file carries no baseline_rural flag, so the
+                # EA's urban/rural status is not recoverable here -- emit NA
+                # rather than let groupby().first() publish one arbitrary
+                # mover's answer as the cluster's.  Household-level rural status
+                # is unaffected: sample() still carries it, correctly.  GH #323.
+                Rural:
+                    - reside
+                    - mapping: baseline_unknown
         idxvars:
             i:
                 - case_id
                 - function: cs_i
             v: ea_id
         myvars:
-            Region: region
-            District: district
+            # Decoded from the EA CODE, not read from `region`/`district` --
+            # those are the household's location at interview, and the
+            # mover-tracking Panel half disagrees within ea_id in 66 EAs
+            # (region) and 98 (district), so the (t, v) collapse was handing
+            # each such EA an arbitrary household's district.  ea_id[:1]/[:3]
+            # encode the baseline geography and are mover-immune (see
+            # ea_region/ea_district in ../../_/malawi.py).  A no-op on the clean
+            # cross-section (prefix->region/district is already 1:1 across all
+            # 717 CS EAs); only the panel is corrected.  GH #323.
+            Region:
+                - ea_id
+                - mapping: ea_region
+            District:
+                - ea_id
+                - mapping: ea_district
             Rural:
                 - reside
                 - mapping:
@@ -70,14 +94,32 @@ cluster_features:
                     RURAL: 1
                     URBAN: 0
     df_geo:
+        # Keyed on case_id (HOUSEHOLD grain: 11,434 rows), NOT ea_id -- ea_id
+        # is non-unique in this file.  Merging on `v` was a cartesian product
+        # within each EA: 182,664 (cross-section) + 3,178 (panel) = 185,842
+        # rows against 11,434 real households (GH #323).  Value-neutral
+        # (ea_lat_mod is an EA-level constant, as the name says) but a ~16x
+        # fabrication.  Merge on `i`.
+        #
+        # NB: `i` here is the RAW case_id, deliberately un-prefixed.  df_main
+        # above spells its mapping `function: cs_i`, and `function:` is NOT a
+        # key country.py understands (only `mapping:`/`mappings:` are), so that
+        # cs_i never fires and 2019-20's cross-sectional households keep their
+        # bare case_id -- which every 2019-20 script also assumes and documents
+        # (see anthropometry.py / people_last7days.py: "the roster has 0 cs-19-
+        # rows").  The wave is internally consistent, so df_geo must key on the
+        # bare case_id too; adding `mapping: cs_i` HERE would prefix one side of
+        # the merge only and silently match nothing.  The dead `function:` spec
+        # is left alone -- rewiring 2019-20's whole id keyspace is a separate
+        # change from #323, and doing it here would be an unrelated regression.
         file: Cross_Sectional/householdgeovariables_ihs5.dta
         idxvars:
-            v: ea_id
+            i: case_id
         myvars:
             Latitude: ea_lat_mod
             Longitude: ea_lon_mod
     merge_on:
-        - v
+        - i
     final_index:
         - t
         - v

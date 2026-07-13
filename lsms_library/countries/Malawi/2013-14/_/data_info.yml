@@ -47,32 +47,50 @@ interview_date:
             - mapping: malawi_date_ymd
 
 cluster_features:
-    dfs:
-        - df_main
-        - df_geo
-    df_main:
-        file: HH_MOD_A_FILT_13.dta
-        idxvars:
-            i: y2_hhid
-            v: ea_id
-        myvars:
-            Region: region
-            District: district
-            Rural:
-                - reside
-                - mapping:
-                    rural: 0
-                    urban: 1
-    df_geo:
-        # 2013-14 IHPS publishes lat/lon per HOUSEHOLD (jittered per HH),
-        # not per cluster — the file is keyed on y2_hhid, not ea_id.
-        # Merge df_geo onto df_main on i rather than v.
-        file: HouseholdGeovariables_IHPS_13.dta
-        idxvars:
-            i: y2_hhid
-        myvars:
-            Latitude: LAT_DD_MOD
-            Longitude: LON_DD_MOD
+    # 2013-14 is the IHPS PANEL, and it TRACKS MOVERS.  `ea_id` is the
+    # household's BASELINE (IHS3 2010-11) enumeration area, but `region`,
+    # `district` and `reside` describe where the household was found in 2013 --
+    # which, for a household that moved, is not where its baseline EA is.  So
+    # these are HOUSEHOLD attributes wearing a CLUSTER attribute's name, and
+    # collapsing them to the declared (t, v) grain with groupby().first() hands
+    # each EA one arbitrary household's location: `region` disagrees within
+    # ea_id in 93 of 204 EAs, `district` in 165, `reside` in 131 (GH #323).
+    #
+    # Evidence that this is exactly the mover effect and not a broken key:
+    # every single household whose region/district/reside differs from its EA's
+    # modal value has dist_to_IHS3location > 0 (177/177, 519/519, 300/300), and
+    # restricting to non-movers makes ea_id perfectly consistent (0 of 161 EAs
+    # vary on any of the three).
+    #
+    # Fix: take the cluster's geography from the EA CODE, which encodes it.
+    # ea_id[:1] is the region and ea_id[:3] the district -- verified unique in
+    # EVERY Malawi wave that has a sound cluster key (2004-05 psu: 564 EAs;
+    # 2016-17: 779; 2019-20: 717) and against this wave's own non-movers.
+    # Rural comes from `baseline_rural`, the BASELINE urban/rural flag, which
+    # (unlike `reside`) is already constant within all 204 EAs.
+    file: HH_MOD_A_FILT_13.dta
+    idxvars:
+        i: y2_hhid
+        v: ea_id
+    myvars:
+        Region:
+            - ea_id
+            - mapping: ea_region
+        District:
+            - ea_id
+            - mapping: ea_district
+        Rural: baseline_rural
+    # Latitude/Longitude are DELIBERATELY NOT DECLARED for this wave.
+    # HouseholdGeovariables_IHPS_13.dta is keyed on y2_hhid and gives the
+    # household's 2013 position, so for a mover it is the coordinate of
+    # wherever they moved TO -- up to 699 km from the baseline EA.  lat/lon
+    # therefore disagree within ea_id in 188 of 204 EAs, and .first() would
+    # publish one arbitrary household's position as the cluster's.  The
+    # source does not carry a cluster-level coordinate for this wave and the
+    # YAML path cannot filter to non-movers, so we emit NOTHING rather than a
+    # number that can be a district away: absent-and-obvious beats present-
+    # and-wrong.  (For the same reason the old `dfs:`/`merge_on:` block is
+    # gone -- there is now a single source file.)
     merge_on:
         - i
     final_index:

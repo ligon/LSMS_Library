@@ -54,14 +54,39 @@ cluster_features:
             - Cross_Sectional/hh_mod_a_filt.dta
             - Panel/hh_mod_a_filt_16.dta:
                 i: y3_hhid
+                # The Panel half is the IHPS and it TRACKS MOVERS: `reside` is
+                # where the household was FOUND, not what its BASELINE EA is,
+                # and it disagrees within ea_id in 75 of the 102 panel EAs.
+                # This wave's panel file carries no baseline_rural flag (only
+                # dist_to_IHS3location), so the EA's urban/rural status is not
+                # recoverable here -- emit NA rather than let groupby().first()
+                # publish one arbitrary mover's answer as the cluster's.
+                # Household-level rural status is unaffected: sample() still
+                # carries it, per household, correctly.  GH #323.
+                Rural:
+                    - reside
+                    - mapping: baseline_unknown
         idxvars:
             i:
                 - case_id
                 - mapping: cs_i
             v: ea_id
         myvars:
-            Region: region
-            District: district
+            # Region/District are decoded from the EA CODE, not read from the
+            # `region`/`district` columns.  Those columns are the household's
+            # location at interview; for the mover-tracking Panel half they are
+            # not the baseline EA's location, so collapsing them to the declared
+            # (t, v) grain assigned an arbitrary household's district to the EA.
+            # ea_id[:1]/[:3] encode region/district and are mover-immune (see
+            # ea_region/ea_district in ../../_/malawi.py).  On the clean
+            # cross-section this is a no-op -- prefix->region/district is already
+            # 1:1 across all 779 CS EAs -- so only the panel is corrected.
+            Region:
+                - ea_id
+                - mapping: ea_region
+            District:
+                - ea_id
+                - mapping: ea_district
             Rural:
                 - reside
                 - mapping:
@@ -73,9 +98,20 @@ cluster_features:
         # 2016-17 IHS4 publishes lat/lon per HOUSEHOLD (cross-sectional file
         # is keyed on case_id, not ea_id).  Panel HHs (~2.5k) lack a geo
         # file in this wave and end up with NaN lat/lon -- acceptable.
+        #
+        # `mapping: cs_i` is REQUIRED here (GH #323).  df_main rewrites the
+        # cross-sectional case_id to 'cs-17-'+format_id(case_id); df_geo used
+        # to key on the RAW case_id, so the merge on `i` matched NOTHING:
+        # Latitude was non-null for 0 of the 14,955 v-present rows (100% of
+        # this wave's geovariables were being dropped) and the 12,447
+        # unmatched geo rows came through as phantom NaN-`i`/NaN-`v` rows that
+        # all collapsed into a single bogus (t, v=NaN) cluster (GH #606).
+        # Both sides of the merge must live in the same keyspace.
         file: Cross_Sectional/householdgeovariablesihs4.dta
         idxvars:
-            i: case_id
+            i:
+                - case_id
+                - mapping: cs_i
         myvars:
             Latitude: lat_modified
             Longitude: lon_modified
