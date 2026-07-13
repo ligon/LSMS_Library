@@ -159,6 +159,54 @@ sample:
         - t
 ```
 
+Note `merge_on: i` — the **household** key, unique in both sub-frames. That is
+what makes this merge a join.
+
+### The `dfs:` merge contract (GH #323 site 4)
+
+**`merge_on` must be unique in at least one sub-frame.** If both sub-frames are
+finer-grained than the merge key, the merge is many-to-many and pandas emits a
+*cartesian product within each key group* — it MANUFACTURES rows that exist in
+no survey. The classic error is joining two **household**-grain frames on the
+**cluster** key `v`: Ethiopia's `cluster_features` did exactly this and produced
+65,508 rows in 2013-14 and 57,786 in 2015-16 from tables that have 433 and 432
+clusters. The downstream `groupby().first()` collapse then tidied it away, so
+the table looked perfectly clean.
+
+`Wave._merge_subframes` now checks this exactly (a key value duplicated in
+*both* sub-frames is the definition of the cartesian) and warns with the phantom
+row count; `LSMS_GRAIN_STRICT=1` makes it fatal. **Fix it by making the merge
+correct — re-key to `i`, or reduce a sub-frame to the merge-key grain in a wave
+script.** Never by aggregating the explosion away afterwards: core does not
+aggregate (`SkunkWorks/grain_aggregation_policy.org`), and a reducer applied to
+a cartesian only puts a signature on the corpse.
+
+#### `merge_how:` (optional, default `outer`)
+
+```yaml
+    merge_on:
+        - i
+    merge_how: left      # default is `outer`
+```
+
+Declare `merge_how: left` when the **primary** sub-df (`dfs[0]`) is authoritative
+for which rows exist and the others are strict enrichments. A geovariable file
+that carries households the cover page does not is the usual case: under `outer`
+those orphans arrive with a null value in every index level the cover owned, and
+then collapse together into one phantom null-keyed row.
+
+#### A dropped sub-df that owned a required column is now a hard error
+
+The GH #515 fallback drops a secondary sub-df that fails to load and proceeds
+with a warning. That is right for a file that is *unavailable* (nothing you can
+edit fixes it). It is **wrong** for a file that loaded fine but does not carry
+the column your YAML names — a typo, a casing mismatch (`lat_dd_mod` vs
+`LAT_DD_MOD`), a renamed variable. Ethiopia lost `Latitude`/`Longitude` from
+three of five waves exactly that way, behind a warning nobody read. If such a
+drop leaves a column declared **required** in `data_scheme.yml` entirely absent,
+`grab_data` now raises. Fix the column name, or mark the column
+`optional: true` if the wave genuinely does not have it.
+
 ### Multi-round files (Tanzania 2008-15 pattern)
 
 When a single `.dta` file contains multiple survey rounds with a `round` column, the YAML path cannot handle it --- use a Python script. The script reads the file, maps round numbers to wave labels, and splits panel vs refresh households for `panel_weight`:
