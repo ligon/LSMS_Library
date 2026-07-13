@@ -93,13 +93,52 @@ employment:
   # household number, which did not match sample()'s i:hhcode and broke the
   # v-join (sibling of the household_roster defect fixed in GH #324).  v is
   # NOT declared here -- the framework joins it from sample().
+  #
+  # SECT02AD is ACTIVITY-level, NOT person-level: one row = one JOB.  A person
+  # holds 1-14 activities (`actcode`, a sequential per-person slot A..T), each
+  # with its OWN wage.  The (hhcode, idcode, actcode) 3-key is EXACTLY unique
+  # (16,089 rows / 16,089 distinct triples, zero nulls); (hhcode, idcode) alone
+  # is NOT (6,194 duplicate person tuples).
+  #
+  # `act` is therefore a REQUIRED index level, not an optional refinement.
+  # Without it the framework's _normalize_dataframe_index collapsed the table
+  # with groupby().first() -- which is SKIPNA, so it filled each column
+  # independently from that column's first non-null value and MANUFACTURED rows
+  # present in no source record (GH #323).  Measured damage:
+  #   * 62.0% of wage observations destroyed (5,627 -> 2,136 non-null)
+  #   * 39.8% of reported cash silently lost (92,116 -> 55,498)
+  #   * 107 persons got Cash_per_day and Rural from two DIFFERENT activity rows
+  #   * e.g. hhcode=1011 idcode=1: A=(15.0, NaN), B..F=(0.0, 'Rural')
+  #     -> collapsed to the fabricated pair (15.0, 'Rural'), in NO source row.
+  #
+  # Do NOT "simplify" this back to a person-level index, and do NOT paper over
+  # it with an `aggregation:`.  `first` is provably wrong (above); `sum` is also
+  # wrong because v02b02 is a per-day wage RATE and rates do not add without
+  # days-worked weights (v02a02a..l / v02a03).  Any person-level collapse
+  # (primary activity? days-weighted mean?) is a real economic decision that
+  # belongs to the CONSUMER, downstream of a faithful activity-level table --
+  # not to a silent groupby inside the framework.  Consumers wanting the old
+  # shape ask for it explicitly, e.g. df.xs('A', level='act') for the primary
+  # activity.  The guard is the widened index itself; this comment is only its
+  # rationale (prose is not enforcement).
   file:
       - ../Data/SECT02AD.DTA
   idxvars:
       i: hhcode
       pid: idcode
+      act: actcode
   myvars:
       Cash_per_day: v02b02
+      # NOTE (separate defect, not the GH #323 root cause): v02a05b is the
+      # per-ACTIVITY WORKPLACE location (14,998/16,089 NaN; 728 'Urban' / 363
+      # 'Rural'), NOT a household residence flag -- while India's `sample`
+      # deliberately carries NO Rural (GH #602: "India simply has no Rural
+      # indicator").  The silent collapse was laundering this sparse per-job
+      # field into a column that reads as the very household Rural indicator
+      # #602 removed.  Widening the index de-fangs it (it is now honestly
+      # per-activity rather than a fabricated person-level value), but the NAME
+      # still misleads and should become `Workplace_Rural` (or be dropped).
+      # Left in place here to keep this commit scoped to GH #323.
       Rural: v02a05b
         
 

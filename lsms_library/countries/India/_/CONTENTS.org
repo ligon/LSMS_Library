@@ -20,6 +20,45 @@ visibly wrong value with an invisibly wrong one.  =strata= now carries the true
 stratum labels (whitespace normalised: =UP-qual=, =UP-other=, =B-qual=,
 =B-other=).
 
+* employment — ACTIVITY-level, index =(t, i, pid, act)= (2026-07-12, #323)
+Source: =SECT02AD.DTA= §2 Parts A–D.  *One row = one JOB, not one person.*  A
+person holds 1–14 activities; =actcode= is the sequential per-person slot
+(A..T), and each activity carries its OWN wage (=v02b02=, a per-day cash wage
+RATE) and its own sub-section descriptors (=v02bactd= etc.: "AG WORK",
+"PLOUGHING", "CASUAL LABOUR", "TEACHER").  The =(hhcode, idcode, actcode)=
+3-key is EXACTLY unique — 16,089 rows / 16,089 distinct triples, zero nulls;
+=(hhcode, idcode)= alone is NOT (6,194 duplicate person tuples).
+
+=act= is therefore a *required* index level.  Until #323 it was omitted, and
+=_normalize_dataframe_index= collapsed the non-unique index with a *skipna*
+=groupby().first()= — which fills each column independently from that column's
+first non-null value, so it did not merely drop rows, it *manufactured* rows
+present in no source record.  Measured damage: 62.0% of wage observations
+destroyed (5,627 → 2,136 non-null), 39.8% of reported cash lost (92,116 →
+55,498), and 107 persons given a =Cash_per_day= and a =Rural= taken from two
+DIFFERENT activity rows (e.g. hhcode=1011 idcode=1 → the fabricated pair
+(15.0, 'Rural'), which appears in no source row).
+
+Do NOT narrow the index back to =(t, i, pid)=, and do NOT paper over it with an
+=aggregation:=.  =first= is provably wrong (above); =sum= is also wrong, because
+a per-day wage RATE does not add without days-worked weights (=v02a02a..l= /
+=v02a03=).  Collapsing to person level is a real economic decision (primary
+activity?  days-weighted mean?) that belongs to the CONSUMER, downstream of a
+faithful activity-level table — e.g. =df.xs('A', level='act')= for the primary
+activity.  The widened index is the guard; this note is only its rationale.
+
+The API returns *6,158* rows, not 16,089: =country.py='s universal
+=dropna(how='all')= safety-net drops the 9,931 activity rows carrying neither a
+wage nor a workplace.  Every wage row survives it (5,627 of 6,158).
+
+CAVEAT — =Rural= is misnamed: =v02a05b= is the per-ACTIVITY *workplace*
+location (14,998/16,089 NaN; 728 Urban / 363 Rural), *not* a household
+residence flag.  India's =sample= deliberately carries no =Rural= at all (#602:
+"India simply has no Rural indicator").  Widening the index de-fangs the column
+(it is now honestly per-activity rather than a fabricated person-level value),
+but the name still misleads and should become =Workplace_Rural= (or be
+dropped).  Tracked separately; left alone to keep #323 scoped.
+
 * assets — consumer durables (2026-06-08, #342)
 Source: =SECT07D.DTA= §7 Part D "Consumer durables owned".  The module is
 already stored long (one row per household-item) with =itemcode= and =v07d02=
