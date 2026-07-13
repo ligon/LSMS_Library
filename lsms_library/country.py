@@ -4096,6 +4096,156 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+class DuplicateIndexError(ValueError):
+    """A declared canonical index has duplicate tuples with CONFLICTING payloads.
+
+    Raised by :func:`_resolve_duplicate_index` instead of silently collapsing
+    them (GH #323).  Set ``LSMS_INDEX_COLLAPSE=warn`` to restore the legacy
+    lossy ``groupby().first()`` behaviour for triage.
+    """
+
+
+# GH #323.  Policy for a declared index that STILL has duplicate tuples after
+# byte-identical rows have been removed -- i.e. rows that genuinely disagree on
+# their payload, so any collapse destroys information.
+#   'error' (default) -- refuse to serve; raise DuplicateIndexError.
+#   'warn'            -- legacy: warn, then groupby().first() (LOSSY).
+_COLLAPSE_POLICY_ENV = "LSMS_INDEX_COLLAPSE"
+
+
+def _duplicate_index_policy() -> str:
+    return (os.environ.get(_COLLAPSE_POLICY_ENV) or "error").strip().lower()
+
+
+def _resolve_duplicate_index(
+    df: pd.DataFrame,
+    present_levels: list[str],
+    wave: str | None = None,
+    table_name: str | None = None,
+) -> pd.DataFrame:
+    """Reconcile a non-unique declared index WITHOUT silently losing rows (GH #323).
+
+    The historical behaviour -- ``groupby(level=...).first()`` -- silently
+    discarded every row after the first in each duplicated group.  Measured
+    across the cached wave parquets that was 7,244,929 rows, of which 6,783,753
+    were byte-identical redundant repeats (harmless) and 461,176 carried
+    genuinely CONFLICTING payloads (real, silent data destruction -- e.g. 30,800
+    distinct people in Mali's 2014-15 roster).
+
+    Three paths, in order:
+
+    1. ADDITIVE tables (``food_acquired``): an explicit, declared reducer --
+       SUM the additive measures, re-derive ``Price`` from the summed totals.
+       These rows are real repeated transactions, so they are deliberately NOT
+       de-duplicated first (two byte-identical transactions are two purchases;
+       dropping one would silently HALVE the household's quantity).
+
+    2. DE-DUPLICATE (lossless): drop rows that repeat another on the key AND
+       every payload column.  Such a row is a redundant repeat, not a distinct
+       entity -- typically a coarse attribute (a cluster's Region/Rural)
+       projected onto a finer-grained source file, or a duplicated record in the
+       released ``.dta``.  This is provably output-identical to the legacy
+       collapse for these rows, because ``groupby().first()`` ignores row
+       multiplicity.  Guinea-Bissau's ``cluster_features`` is entirely this case
+       (5,410 -> 450, zero conflicts).
+
+    3. VERIFY (loud): anything still duplicated disagrees on its payload.
+       Collapsing it would be silent data loss, so by default we RAISE.  The
+       repo's own grain contract (``SkunkWorks/grain_aggregation_policy.org``)
+       requires that the access path -- this function included -- never reduce
+       grain.
+    """
+    from .feature import _ADDITIVE_MEASURE_COLUMNS
+    additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
+    present_additive = [c for c in (additive or ()) if c in df.columns]
+
+    # set_index / reset_index drop .attrs in pandas 2.x (the id_converted flag).
+    attrs = dict(df.attrs)
+
+    # --- 1. ADDITIVE: declared reducer, no dedup (see docstring) -------------
+    if present_additive:
+        agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
+        out = df.groupby(level=present_levels, observed=True).agg(agg)
+        if 'Price' in out.columns and {'Expenditure', 'Quantity'} <= set(out.columns):
+            out['Price'] = out['Expenditure'] / out['Quantity'].where(out['Quantity'] != 0)
+        out.attrs = attrs
+        return out
+
+    # --- 1b. Rows whose KEY contains NaN -------------------------------------
+    # groupby(..., dropna=True) -- the legacy collapse -- silently dropped every
+    # group with a NaN in the key, so such rows never reached the caller.  Drop
+    # them here too, so this fix is a STRICT no-op for non-conflicting tables
+    # rather than quietly resurrecting a NaN-keyed row (which would also inject
+    # NaN into the index and break the downstream id_walk / v-join).
+    #
+    # These rows ARE a silent-loss class of their own (e.g. GhanaLSS 2016-17
+    # food_security has 110 rows with a NaN household id; CotedIvoire 1988-89
+    # individual_education likewise) -- but that is a DIFFERENT defect from
+    # #323's duplicate-collapse, and fixing it here would change two countries'
+    # output under cover of an unrelated ticket.  Left deliberately untouched
+    # and reported separately.
+    key_na = df.index.to_frame(index=False).isna().any(axis=1).to_numpy()
+    if key_na.any():
+        df = df.loc[~key_na]
+        df.attrs = attrs
+        if df.index.is_unique:
+            return df
+
+    # --- 2. DE-DUPLICATE byte-identical rows (lossless) ----------------------
+    # NB DataFrame.drop_duplicates() ignores the INDEX, so flatten first.
+    try:
+        flat = pd.concat(
+            [df.index.to_frame(index=False), df.reset_index(drop=True)], axis=1)
+        exact = flat.duplicated().to_numpy()
+    except TypeError:
+        exact = np.zeros(len(df), dtype=bool)   # unhashable payload -> cannot dedup
+
+    if exact.any():
+        df = df.loc[~exact]
+        df.attrs = attrs
+
+    if df.index.is_unique:
+        return df       # every duplicate was a redundant repeat -- nothing lost
+
+    # --- 3. VERIFY: what survives disagrees on its payload -> REAL loss ------
+    n_conflict = int(df.index.duplicated().sum())
+    dup_keys = df.index[df.index.duplicated()].unique()
+    try:
+        sub = df.loc[df.index.duplicated(keep=False)]
+        varying = [c for c in sub.columns
+                   if sub.groupby(level=present_levels, observed=True)[c]
+                        .nunique(dropna=False).max() > 1]
+    except Exception:                       # diagnostic only -- never mask the error
+        varying = []
+
+    where = table_name or 'table'
+    if wave:
+        where += f" (wave {wave})"
+    msg = (
+        f"[GH #323] {where}: declared index {tuple(present_levels)} is NOT unique. "
+        f"{n_conflict} row(s) across {len(dup_keys)} key(s) are still duplicated "
+        f"AFTER byte-identical rows were removed, so they carry CONFLICTING "
+        f"payloads and are DISTINCT observations"
+        + (f" (disagreeing column(s): {varying})" if varying else "")
+        + f". Collapsing them with groupby().first() would silently discard "
+        f"{n_conflict} row(s). Refusing to serve corrupt data.\n"
+        f"  example key(s): {list(dup_keys[:3])}\n"
+        f"  Fix the GRAIN, not the symptom: declare the missing index level(s) in "
+        f"the country's _/data_scheme.yml so the distinct observations are keyed "
+        f"apart, or reconcile the duplicates at the wave level.\n"
+        f"  To restore the legacy (LOSSY) collapse for triage only, set "
+        f"{_COLLAPSE_POLICY_ENV}=warn."
+    )
+
+    if _duplicate_index_policy() == "warn":
+        warnings.warn(msg, RuntimeWarning)
+        out = df.groupby(level=present_levels, observed=True).first()
+        out.attrs = attrs
+        return out
+
+    raise DuplicateIndexError(msg)
+
+
 @build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
@@ -4109,9 +4259,10 @@ def _normalize_dataframe_index(
     - Reorders index levels to match the declared order.
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
-    - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+    - Reconciles duplicate index tuples via :func:`_resolve_duplicate_index`:
+      SUM for additive-measure tables, else drop byte-identical repeats
+      (lossless) and RAISE on any residual conflicting-payload duplicate
+      rather than silently dropping them (GH #323).
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4172,41 +4323,13 @@ def _normalize_dataframe_index(
         except ValueError:
             pass  # Cannot drop levels; keep original index
 
-    # Aggregate duplicates if any remain
+    # Reconcile duplicates if any remain.  GH #323: see _resolve_duplicate_index.
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
-        n_dropped = int(df.index.duplicated().sum())
-        # Convert unordered categoricals to strings so the groupby below works
+        # Convert unordered categoricals to strings so the groupby/dedup below work
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
-        # GH #514/#323: collapsing a non-unique canonical index with .first()
-        # silently DISCARDS the dropped rows.  For additive-measure tables
-        # (food_acquired, whose source legitimately records the same item across
-        # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
-        # re-derive any per-unit Price from the summed totals -- no data lost,
-        # no warning.  Single source of truth for the additive column map lives
-        # in feature.py (imported lazily to avoid an import cycle).
-        from .feature import _ADDITIVE_MEASURE_COLUMNS
-        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
-        present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
-            agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
-            df = df.groupby(level=present_levels, observed=True).agg(agg)
-            if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
-                df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
-        else:
-            df = df.groupby(level=present_levels, observed=True).first()
-            if n_dropped:
-                # No aggregation policy for this table -- surface the loss
-                # loudly rather than drop rows quietly (a table whose source
-                # legitimately has multiple rows per index tuple needs an
-                # explicit policy, like the additive sum above).
-                warnings.warn(
-                    f"Canonical index over {present_levels} had {n_dropped} "
-                    f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                    f"those rows (possible silent data loss — GH #323).",
-                    RuntimeWarning,
-                )
+        df = _resolve_duplicate_index(df, present_levels, wave, table_name)
 
     return df

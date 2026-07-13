@@ -48,10 +48,22 @@ cluster_features:
             Region: s00q01
             Rural:
                 - s00q04
+                # Guinea-Bissau is LUSOPHONE: the raw s00q04 labels are
+                # 'Rural' / 'Urbano'.  The French 'Urbain' keys here were
+                # copied from a francophone EHCVM sibling and never matched
+                # anything, so 'Urbano' leaked through UNMAPPED -- 169 of the
+                # 450 clusters carried the off-schema value 'Urbano' where
+                # lsms_library/data_info.yml declares the canonical domain to
+                # be {Rural, Urban}.  (The `sample` block above already maps
+                # Urbano correctly; only this block was missed.)  The French
+                # keys are kept as harmless no-ops.
                 - mapping:
                     Rural: Rural
                     rural: Rural
                     RURAL: Rural
+                    Urbano: Urban
+                    urbano: Urban
+                    URBANO: Urban
                     Urbain: Urban
                     urbain: Urban
                     URBAIN: Urban
