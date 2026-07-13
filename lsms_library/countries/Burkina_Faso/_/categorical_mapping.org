@@ -356,6 +356,7 @@
 | Tine                      | Tine            |
 | Unite                     | Unité           |
 | Unité                     | Unité           |
+| Value                     | Value           |
 | Verre                     | Verre           |
 | Yorouba                   | Yorouba         |
 | autre unité               | Autre           |
@@ -527,25 +528,45 @@
 
 # harmonize_seed_crop — EHCVM-only.  The s16b roster has NO crop column;
 # the crop is encoded in the seed-type label.  Resolves each seed label to
-# the crop's harmonize_food Preferred Label.  Catch-all seed slots ->
-# 'Autre crop'.  '21' is Burkina's trailing 'Autres semences' slot.
+# the crop's harmonize_food Preferred Label.
+#
+# GH #323 — THE CATCH-ALL SLOTS MUST STAY DISTINCT.  These four labels used to
+# ALL map to a single 'Autre crop' cell.  The raw source has ZERO duplicates on
+# (grappe, menage, s16bq01, s16bq03b), so that many-to-one collapse MANUFACTURED
+# 183 duplicate (t, i, input, crop, u) rows across 170 groups — and because
+# plot_inputs was not an additive-measure table, groupby().first() then threw
+# away 2,778.98 kg of seed (149 of the 170 groups carried DIFFERENT quantities;
+# e.g. household (18,78) reported 'Autres semences' 1.0 kg AND code-21 2.0 kg).
+# They are genuinely different seed types — 'other cereal seed' is not 'tuber
+# cuttings' — so they get distinct labels and the collision disappears at
+# source rather than being papered over by a sum.
+#
+# Code '21' is a BARE, UNLABELED Stata code (602 rows).  It is NOT the same slot
+# as 'Autres semences', which carries its own text label in the very same
+# variable (883 rows) — a Stata value label applies to every row of its code, so
+# a code appearing bare has no label defined at all.  What crop it denotes is
+# therefore NOT determinable from the data, and this table previously ASSERTED
+# it was the 'Autres semences' slot.  It is labelled honestly as unidentified
+# instead: the rows are kept and countable (class-2, loudly missing) rather than
+# silently merged into a category they may not belong to (class-1).  Code '20'
+# does not occur in the 2018-19 data at all but is mapped for the same reason.
 
 #+NAME: harmonize_seed_crop
-| Original Label                | Preferred Label     |
-|-------------------------------+---------------------|
-| Semences de petit mil         | Mil                 |
-| Semences de sorgho            | Sorgho              |
-| Semences de maïs              | Maïs en grain       |
-| Semences de riz               | Riz Paddy           |
-| Semences de coton             | Coton               |
-| Semences de sésame            | Sésame              |
-| Semences de césame            | Sésame              |
-| Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
-| Autres semences               | Autre crop          |
-| 20                            | Autre crop          |
-| 21                            | Autre crop          |
+| Original Label                | Preferred Label                 |
+|-------------------------------+---------------------------------|
+| Semences de petit mil         | Mil                             |
+| Semences de sorgho            | Sorgho                          |
+| Semences de maïs              | Maïs en grain                   |
+| Semences de riz               | Riz Paddy                       |
+| Semences de coton             | Coton                           |
+| Semences de sésame            | Sésame                          |
+| Semences de césame            | Sésame                          |
+| Semences de haricots/niébé    | Niébé/Haricots secs             |
+| Semences d'autres céréales    | Autre céréale                   |
+| Plants/boutures de tubercules | Tubercule (plants/boutures)     |
+| Autres semences               | Autre semence                   |
+| 20                            | Semence non identifiée (code 20) |
+| 21                            | Semence non identifiée (code 21) |
 
 # harmonize_species_ehcvm — s17q02 livestock species CODE (1-11) ->
 # canonical species Preferred Label.  Code-keyed (load s17 with

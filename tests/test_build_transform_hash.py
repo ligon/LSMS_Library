@@ -29,6 +29,18 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.build_transforms._finalize_canonical_food_acquired",
     "lsms_library.build_transforms.fill_v_with_coord_bin",
     "lsms_library.build_transforms.apply_derived",
+    # GH #323 (conscious additions -- both are build-path, i.e. their output is
+    # baked into the L2 parquet, so they must version the cache):
+    #   add_visit_level   -- stamps the constant `visit` recall level on the
+    #                        single-recall waves of a country whose OTHER wave
+    #                        repeats the food-consumption recall (Burkina 2014's
+    #                        four quarterly EMC passages).
+    #   reduce_to_agreed  -- agree-or-NA collapse for a table whose declared
+    #                        grain is coarser than its source (cluster_features
+    #                        off a household-level cover page); replaces a silent
+    #                        groupby().first() that picked an arbitrary winner.
+    "lsms_library.build_transforms.add_visit_level",
+    "lsms_library.build_transforms.reduce_to_agreed",
     "lsms_library.country._normalize_dataframe_index",
     "lsms_library.country.Wave.grab_data",
     "lsms_library.country.Country._aggregate_wave_data",

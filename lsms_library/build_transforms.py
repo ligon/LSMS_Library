@@ -24,6 +24,59 @@ import pandas as pd
 from ._build_registry import build_transform
 
 
+def _agree_or_na(s: pd.Series):
+    """The single agreed value in *s*, or NA when its values disagree."""
+    u = s.dropna().unique()
+    return u[0] if len(u) == 1 else pd.NA
+
+
+@build_transform()
+def reduce_to_agreed(df: pd.DataFrame) -> pd.DataFrame:
+    """Collapse rows sharing an index tuple, keeping only values they AGREE on.
+
+    The honest reducer for a table whose declared grain is COARSER than its
+    source -- e.g. ``cluster_features`` (declared ``(t, v)``) extracted from a
+    household-level cover page, where each cluster's attributes are supposed to
+    be redundant copies across its households.
+
+    Use this instead of leaving the collapse to the framework's duplicate-index
+    fallback (``groupby().first()``), which (a) is silent and (b) takes the
+    first NON-NULL value PER COLUMN rather than the first row -- so where the
+    "redundant" copies actually disagree it invents a record that exists in no
+    source row.  Here a disagreement becomes NA: loudly missing (class-2) beats
+    quietly wrong (class-1).  GH #323.
+    """
+    levels = [n for n in df.index.names if n is not None]
+    if not levels:
+        return df
+    return (df.groupby(level=levels, observed=True, dropna=False)[list(df.columns)]
+              .agg(_agree_or_na))
+
+
+@build_transform(tables=['food_acquired'])
+def add_visit_level(df: pd.DataFrame, visit: int = 1) -> pd.DataFrame:
+    """Append a constant ``visit`` (recall-occasion) level to a food_acquired frame.
+
+    For countries whose ``food_acquired`` index carries a ``visit`` level
+    because SOME wave repeats the consumption recall, but whose OTHER waves
+    ask it exactly once.  Those single-recall waves get ``visit = 1`` so every
+    wave shares one index shape and the country-level concat aligns.
+
+    Motivating case (GH #323): Burkina Faso's 2014 EMC wave is a CONTINUOUS
+    survey that revisits the same 10,800 households in four quarterly
+    passages, each with its own independent 7-day recall (``visit = 1..4``);
+    its EHCVM waves (2018-19, 2021-22) field the module once.  Without the
+    level, the four passages collide on one ``(t, v, i, j, u, s)`` tuple and
+    the additive reducer SUMS them into a single bogus "7-day" figure.
+
+    Note this is NOT the same thing as EHCVM's ``vague``, which is a sample
+    split (which households are surveyed when) rather than a repeated measure;
+    ``food_acquired_to_canonical`` drops that upstream, and reusing it as
+    ``visit`` would falsely imply a second recall.
+    """
+    return df.assign(visit=visit).set_index('visit', append=True)
+
+
 @build_transform(tables=['food_acquired'])
 def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.DataFrame:
     """Reshape wide-form ``food_acquired`` into canonical long-form on ``s``.

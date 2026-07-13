@@ -2,7 +2,40 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+from lsms_library.transformations import (food_acquired_to_canonical,
+                                          add_visit_level, reduce_to_agreed)
+
+
+def cluster_features(df):
+    '''Collapse the household-level cover page to ONE row per cluster.
+
+    GH #323.  ``cluster_features`` is declared at cluster grain ``(t, v)`` but
+    the EHCVM source (``s00_me``) is one row per HOUSEHOLD, so the frame that
+    arrives here is household-level and the declared index is non-unique.  The
+    framework used to collapse it silently via ``groupby().first()``.
+
+    The collapse is correct in INTENT -- Region / District / Rural really are
+    redundant copies within a grappe here (verified: NONE of the three varies
+    within a cluster in this wave, unlike 2014, where province straddles 94 of
+    900 clusters) -- but it must be DECLARED rather than left to a silent
+    framework fallback.  ``reduce_to_agreed`` makes it explicit and would
+    surface any future disagreement as NA instead of an arbitrary winner.
+    '''
+    return reduce_to_agreed(df)
+
+
+def food_acquired(df):
+    '''Canonical reshape, plus the single-recall ``visit`` level (GH #323).
+
+    ``vague`` is still dropped: in EHCVM it is a SAMPLE SPLIT (each household
+    is visited in exactly one vague), not a repeated measure.  But Burkina's
+    ``food_acquired`` index now carries a ``visit`` (recall-occasion) level,
+    because the 2014 EMC wave revisits every household in FOUR quarterly
+    passages, each with its own 7-day recall.  EHCVM asks the consumption
+    module ONCE per household, so ``visit = 1``.
+    '''
+    return add_visit_level(food_acquired_to_canonical(df), visit=1)
+
 
 FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
               'AteLess', 'RanOut', 'Hungry', 'WholeDay']

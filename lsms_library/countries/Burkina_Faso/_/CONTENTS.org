@@ -14,12 +14,70 @@ Makefile works for current files in the folder.
 ** DONE other_features.py
 ** DONE household_characteristics.py
 ** DONE food_acquired
-Converted from Python scripts to YAML =data_info.yml= entries for all three waves (2014, 2018-19, 2021-22).
+The EHCVM waves (2018-19, 2021-22) are YAML =data_info.yml= entries.  The 2014
+wave is built by the SCRIPT path (=2014/_/food_acquired.py=) -- see below.
 
-*** 2014 wave (EMC)
-The 2014 survey has 4 passages (=emc2014_p{1..4}_conso7jours_*.dta=).  Only passage 1 records food quantities (=qachat=), units (=uachat=), and auto-consumption quantities (=qautocons=).  Passages 2--4 record only monetary values: purchase expenditure (=achat=), auto-consumption value (=autocons=), and gifts (=cadeau=).  All 4 passages are included; =Quantity=, =Produced=, and =u= are NaN for passages 2--4.
+Index: =(t, v, i, j, u, s, visit)=.  =visit= is the RECALL OCCASION (same shape
+as GhanaLSS).
 
-Variable names differ from EHCVM waves: cluster is =zd= (not =grappe=), food item is =product= (not =s07bq01=), etc.
+*** 2014 wave (EMC) -- FOUR QUARTERLY PASSAGES (GH #323)
+The EMC 2014 is a CONTINUOUS survey: the same 10,800 households are revisited in
+four quarterly passages (=emc2014_p{1..4}_conso7jours_*.dta=), each carrying its
+own INDEPENDENT SEVEN-DAY consumption recall.  Every household in p2/p3/p4 is a
+revisit of a p1 household (|p1| = 10,800 = the union of all four).  They are
+therefore FOUR OBSERVATIONS, not one, and are emitted as =visit= = 1..4.
+
+This used to be wrong in two compounding ways, and the second one is why the
+first stayed hidden:
+
+1. The four files were listed under a single =file:= key in =data_info.yml= with
+   no index level distinguishing them and =t='2014'= for all four.  All four
+   quarters collapsed onto the same =(t,v,i,j,u,s)= tuple and -- because
+   =food_acquired= is an additive-measure table -- were SUMMED.  Four separate
+   7-day recalls added together and labelled as a single 7-day observation.
+2. Only passage 1 records quantities and units (=qachat= / =uachat=, and the
+   parallel =qautocons= / =uautocons= and =qcadeau= / =ucadeau=).  Passages 2--4
+   have NO quantity or unit columns at all.  Those rows entered with =u=NaN=,
+   and the framework's duplicate-collapse =groupby()= -- which inherits pandas'
+   =dropna=True= default -- then DELETED every NaN-keyed group outright:
+   460,438 rows and 261,824,419 CFA, 76.5% of the wave's expenditure.  The kill
+   was gated on the index being non-unique, i.e. on defect (1).
+
+Each source row carries THREE PARALLEL (quantity, unit, value) triples.  They are
+independent acquisition acts, NOT a total-and-a-subset -- only 286 p1 rows have
+both =qachat= and =qautocons= non-null, and 49 of those have =qautocons > qachat=:
+
+| source        | quantity    | unit        | value      | canonical =s= |
+|---------------+-------------+-------------+------------+---------------|
+| purchases     | =qachat=    | =uachat=    | =achat=    | purchased     |
+| own produce   | =qautocons= | =uautocons= | =autocons= | produced      |
+| gifts/in-kind | =qcadeau=   | =ucadeau=   | =cadeau=   | inkind        |
+
+The old YAML mapped =Quantity: qachat= / =Produced: qautocons= and let
+=food_acquired_to_canonical= compute =purchased = Quantity - Produced=, which is
+a category error; it also tagged the produced quantity with =uachat= (the
+PURCHASE unit, usually NaN), which is what made those rows NaN-keyed.  The
+=cadeau= (in-kind) stream -- 9,723,324 CFA -- was never read at all.
+
+Rows with a real quantity AND unit keep them.  Rows with only money (all of
+p2/p3/p4, plus the 44,048 p1 rows that report =achat= with a NaN =uachat=) are
+emitted with the LCU convention already used by GhanaLSS: =u='Value'=,
+=Quantity = Expenditure=.  =conson= is an Oui/Non consumption flag, not a value,
+and =mtt_dep= does not reconcile to =achat+autocons+cadeau=; neither is used.
+
+Reconciliation (asserted in the build script): Expenditure summed over
+=s='purchased'= == 93,383,167 + 82,473,394 + 93,328,730 + 72,925,224 ==
+*342,110,515 CFA*, the exact sum of =achat= across the four source files.
+
+*CAVEAT for consumers.*  The derived tables collapse =visit= (=food_expenditures=
+and =food_quantities= SUM it; =food_prices= takes the median).  So 2014's derived
+expenditure is a total over FOUR NON-CONTIGUOUS RECALL WEEKS -- *not* a 7-day
+figure, and *not* directly comparable to the EHCVM waves' single-week totals.
+Work from =food_acquired= (which keeps the passages apart on =visit=) if you need
+a per-quarter or per-week basis.
+
+Variable names differ from EHCVM waves: cluster is =zd= (not =grappe=), food item
+is =product= (not =s07bq01=), etc.
 
 *** 2018-19 and 2021-22 waves (EHCVM)
 Standard EHCVM format, nearly identical to Mali.  Variable names: =s07bq01= (food item), =s07bq03a= (quantity), =s07bq03b= (unit), =s07bq08= (expenditure), =s07bq04= (produced), =vague= (visit/passage).
@@ -92,3 +150,78 @@ uses a different instrument and is out of scope.
 - Placeholder rows (no field/parcel number) for non-farming households
   are dropped.  Latitude / Longitude deferred (no decimal-degree parcel
   GPS in EHCVM s16a).
+
+* Duplicate-index defects fixed under GH #323
+
+Four separate defects, all of which reached the API as a silent
+=groupby().first()= collapse in =_normalize_dataframe_index=.  Three were
+country-level; one (=food_acquired=) is documented in full above.
+
+** cluster_features (all 3 waves) -- an INTENDED collapse, made explicit
+=cluster_features= is declared at cluster grain =(t, v)=, but all three waves
+extract it from the HOUSEHOLD cover page (2014 =emc2014_p1_logement=; EHCVM
+=s00_me=) -- one row per household.  The declared index was therefore non-unique
+(10,800 -> 900 clusters in 2014; 7,010 -> 585 in 2018-19; 3,227 -> 550 in
+2021-22) and the framework silently collapsed it with =first()=.
+
+The collapse is correct in INTENT -- the cluster attributes are meant to be
+redundant copies -- but it is now DECLARED, via a =cluster_features()=
+post-processor in each wave's =mapping.py= that calls
+=lsms_library.transformations.reduce_to_agreed=.  That reducer keeps a value only
+where the rows AGREE, and returns NA where they do not, instead of picking an
+arbitrary winner.
+
+This matters for 2014.  =Region= and =Rural= are constant within =zd= for all
+900 clusters, but =District= (province) is NOT: it varies within =zd= for *94 of
+900 clusters (10.4%)*.  E.g. =zd=9= holds 7 households in province BALE and 5 in
+TUY -- both inside the Boucle du Mouhoun region (region and rural status never
+disagree, so =v = zd= remains a sound cluster id; only the province straddles).
+=first()= picked one of the two arbitrarily.  District is now NA for exactly
+those 94 clusters: the ambiguity is visible and countable rather than resolved by
+a coin flip.  The EHCVM waves are wholly benign (nothing varies within a grappe).
+
+** shocks (2014) -- two genuinely duplicated households
+Exactly two households -- =(zd=47, menage=5)= and =(zd=556, menage=13)= -- have
+their entire 19-row shock roster entered TWICE in =emc2014_p3_chocs= (38 rows
+each against the modal 19; the other 10,219 households are clean).  That made the
+declared =(t, i, Shock)= index non-unique, which handed the table to
+=groupby().first()= AND -- because the NaN-key deletion is gated on non-uniqueness
+-- silently deleted this wave's *9 NaN-key shock rows*.
+
+The wave now dedups explicitly: 37 of the 38 duplicate rows are byte-identical
+re-entries (dropped outright, nothing lost); the 38th pair is one ALL-NULL row
+plus one populated row, reduced by agree-or-NA to the populated one.  Result:
+194,246 -> 194,208 rows, 0 duplicates, and the 9 NaN-key rows RETAINED (they were
+194,199 rows with 0 NaN-key rows before).
+
+NOTE, because it is easy to talk yourself into it: in the RAW file that pair
+disagrees on =CS1= (one entry says the household did not suffer the drought, the
+other says it did).  That is *not* representable in this table -- =CS1= is not
+part of the schema, whose columns are the =CS3*=/=CS4*= impact and coping fields
+-- so the not-suffered entry is ALL-NULL after extraction and contributes nothing
+to any column.  =first()= and agree-or-NA return the same (populated) row.  The
+output was never a chimera; no such fix is claimed.
+
+** plot_inputs (2018-19) -- a MANUFACTURED collision with the wrong reducer
+The raw =s16b= source has ZERO duplicates on =(grappe, menage, s16bq01,
+s16bq03b)=.  The 183 duplicate rows were created by =harmonize_seed_crop=, which
+mapped four DISTINCT source seed types -- =Autres semences=, =Plants/boutures de
+tubercules=, =Semences d'autres céréales=, and the bare code =21= -- onto a single
+=crop='Autre crop'= cell.  =plot_inputs= was not an additive-measure table, so
+=first()= then discarded *2,778.98 kg of seed* across 170 groups (149 of which
+carried DIFFERENT quantities).
+
+Fixed at both ends: the four catch-all slots now get DISTINCT crop labels (they
+are genuinely different seed types -- "other cereal seed" is not "tuber
+cuttings"), so the collision disappears at source; and =plot_inputs= is registered
+in =_ADDITIVE_MEASURE_COLUMNS= so that any REMAINING legitimate collision (e.g.
+=Semences de sésame= and the variant spelling =Semences de césame=, which both
+correctly map to =Sésame=) is SUMMED rather than first()'d.
+
+Code =21= is a BARE, UNLABELED Stata code (602 rows).  It is NOT the same slot as
+=Autres semences=, which carries its own text label in the very same variable (883
+rows) -- a Stata value label applies to every row of its code, so a code appearing
+bare has no label defined at all.  What crop it denotes is not determinable from
+the data, and =categorical_mapping.org= previously ASSERTED it was the "Autres
+semences" slot.  It is now labelled honestly as unidentified: the rows are kept
+and countable rather than silently merged into a category they may not belong to.

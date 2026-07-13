@@ -100,6 +100,14 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 # Keeping first() there silently kept only ~48% of total Quantity.
 _ADDITIVE_MEASURE_COLUMNS = {
     "food_acquired": ("Quantity", "Expenditure"),
+    # GH #323: plot_inputs records one row per REPORTED input application, so
+    # two source rows can legitimately land on one (t, i, input, crop, u) —
+    # e.g. Burkina's harmonize_seed_crop maps both 'Semences de sésame' and the
+    # variant spelling 'Semences de césame' to the crop 'Sésame'.  Quantity is
+    # additive; first() silently discarded the other rows (2,778.98 kg of seed
+    # on Burkina 2018-19 alone, across 170 groups).  Summing is the correct
+    # reducer.  `Purchased` is a bool and stays on first().
+    "plot_inputs": ("Quantity", "Quantity_purchased"),
 }
 
 

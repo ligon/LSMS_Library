@@ -165,22 +165,17 @@ housing:
                 Moquette: Carpet
                 'Autre à préciser': Other
 
-food_acquired:
-    idxvars:
-        v: zd
-        i:
-            - zd
-            - menage
-        j:
-            - product
-            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
-        u: uachat
-    myvars:
-        Quantity: qachat
-        Expenditure: achat
-        Produced: qautocons
-    file:
-        - emc2014_p1_conso7jours_16032015.dta
-        - emc2014_p2_conso7jours_16032015.dta
-        - emc2014_p3_conso7jours_16032015.dta
-        - emc2014_p4_conso7jours_16032015.dta
+# food_acquired is built by the SCRIPT path (2014/_/food_acquired.py), NOT here.
+#
+# GH #323.  The four `emc2014_p{1..4}_conso7jours` files are the four quarterly
+# PASSAGES of the EMC 2014 continuous survey over the SAME 10,800 households --
+# four independent 7-day recalls, not one.  Listing them under a single `file:`
+# key (as this block used to) gives every passage the same `t` and no index
+# level to tell them apart, so all four collapse onto one (t,v,i,j,u,s) tuple
+# and get SUMMED.  A YAML `file:` list cannot express a per-file index level;
+# the script emits the `visit` (passage) level instead.
+#
+# The old block also mapped `u: uachat` / `Quantity: qachat` / `Produced:
+# qautocons` -- columns that exist ONLY in passage 1.  p2/p3/p4 rows entered
+# with u=NaN and were then DELETED outright by the duplicate-collapse groupby's
+# dropna=True default (460,438 rows / 261.8M CFA).  See the script's docstring.

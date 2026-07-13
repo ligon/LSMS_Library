@@ -53,23 +53,29 @@ Data Scheme:
 
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
-    # source (purchased / produced / inkind / other).  EHCVM 2018-19
-    # and 2021-22 wave mapping.py files import
-    # food_acquired_to_canonical as food_acquired to reshape the
-    # wide-form (Quantity-total, Produced-subset, Expenditure) into
-    # long-form on s.  `visit` (vague) is dropped: in EHCVM it's a
+    # source (purchased / produced / inkind).  EHCVM 2018-19 and 2021-22
+    # wave mapping.py files call food_acquired_to_canonical to reshape the
+    # wide form into long form on s.  EHCVM's `vague` is dropped: it is a
     # sample split, not a repeated measure.
     #
-    # The 2014 wave (which the country module emits as t='2013_Q4' via
-    # the country-level food_acquired.py script) is Phase-2-incomplete:
-    # it follows the legacy script-path build that bypasses mapping.py
-    # post-processors, so the helper isn't invoked.  Pending a Phase 3
-    # rewrite of Burkina_Faso/2014/_/food_acquired.py (or the country-
-    # level food_acquired.py) to emit canonical shape, t='2013_Q4'
-    # continues to emit a legacy non-canonical shape.  Country
-    # ('Burkina_Faso').food_acquired() runtime output mixes shapes
-    # across waves until that lands.
-    index: (t, v, i, j, u, s)
+    # `visit` = RECALL OCCASION (GH #323).  The 2014 EMC wave is a
+    # CONTINUOUS survey: the same 10,800 households are revisited in FOUR
+    # quarterly passages, each with its own independent SEVEN-DAY recall,
+    # so visit = 1..4 there.  Without this level all four passages land on
+    # the same (t,v,i,j,u,s) tuple and the framework's additive reducer
+    # SUMS them -- four separate 7-day recalls added together and labelled
+    # as one (items seen in all four quarters inflated 4x).  The EHCVM
+    # waves ask the consumption module once, so visit = 1.  Same shape and
+    # same rationale as GhanaLSS, which also carries a `visit` level.
+    #
+    # CAVEAT for consumers: because `visit` is collapsed by the derived
+    # food tables (food_expenditures / food_quantities SUM it, food_prices
+    # takes the median -- see transformations.py), 2014's derived
+    # expenditure is a total over FOUR non-contiguous recall weeks, NOT a
+    # 7-day figure, and is therefore NOT directly comparable to the EHCVM
+    # waves' single-week totals.  Work from food_acquired (which keeps the
+    # passages apart) if you need a per-quarter or per-week basis.
+    index: (t, v, i, j, u, s, visit)
     Quantity: float
     Expenditure: float
   assets:

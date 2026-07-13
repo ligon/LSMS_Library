@@ -16,6 +16,8 @@ from .local_tools import format_id
 # scripts that do `from lsms_library.transformations import ...` keep working.
 from .build_transforms import (  # noqa: F401  (re-export for back-compat)
     food_acquired_to_canonical,
+    add_visit_level,
+    reduce_to_agreed,
     _finalize_canonical_food_acquired,
     fill_v_with_coord_bin,
     apply_derived,

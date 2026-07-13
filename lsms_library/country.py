@@ -4176,6 +4176,28 @@ def _normalize_dataframe_index(
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
         n_dropped = int(df.index.duplicated().sum())
+        # GH #323 (reopened): pandas' groupby defaults to ``dropna=True``, which
+        # DELETES every group whose key contains NaN on ANY level -- not just the
+        # duplicate rows, the whole group.  That kill is invisible to the
+        # duplicate accounting below (``index.duplicated()`` counts repeats, not
+        # NaN keys), so it never reached the warning.  It is also *gated* on this
+        # ``is_unique`` branch: a table only loses its NaN-key rows once some
+        # OTHER defect (a missing index level) makes the index non-unique, which
+        # is why it stayed hidden.  Burkina Faso 2014 food_acquired lost 460,438
+        # rows / 261.8M CFA this way -- the four quarterly passages collided on a
+        # passage-less index, and every row whose unit ``u`` was NaN (p2/p3/p4
+        # record no unit at all) was then annihilated outright.
+        #
+        # ``dropna=False`` keeps NaN-key groups.  A NaN key is a legitimate
+        # observation with an unknown level value (class-2, honestly missing);
+        # deleting it silently is class-1.  Countries that currently rely on the
+        # kill will now RETAIN those rows -- that is the point.
+        n_nan_key = 0
+        if present_levels:
+            nan_key_mask = pd.DataFrame(
+                {lvl: pd.isna(df.index.get_level_values(lvl)) for lvl in present_levels}
+            ).any(axis=1)
+            n_nan_key = int(nan_key_mask.sum())
         # Convert unordered categoricals to strings so the groupby below works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
@@ -4192,21 +4214,43 @@ def _normalize_dataframe_index(
         present_additive = [c for c in (additive or ()) if c in df.columns]
         if present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
-            df = df.groupby(level=present_levels, observed=True).agg(agg)
+            df = df.groupby(level=present_levels, observed=True, dropna=False).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
         else:
-            df = df.groupby(level=present_levels, observed=True).first()
+            df = df.groupby(level=present_levels, observed=True, dropna=False).first()
             if n_dropped:
                 # No aggregation policy for this table -- surface the loss
                 # loudly rather than drop rows quietly (a table whose source
                 # legitimately has multiple rows per index tuple needs an
                 # explicit policy, like the additive sum above).
+                #
+                # NB: groupby().first() is per-column FIRST-NON-NULL, not the
+                # first row.  When the duplicate rows carry DIFFERENT non-null
+                # values in different columns it therefore synthesizes a record
+                # that exists in NO source row.  (It is safe in the common case
+                # where the duplicates are byte-identical re-entries, or where
+                # all but one row is entirely null.)  A country whose source
+                # legitimately carries duplicate index tuples should dedup
+                # explicitly at the wave build -- see
+                # transformations.reduce_to_agreed, which keeps a value only
+                # where the rows agree and returns NA where they conflict --
+                # rather than rely on this reducer.
                 warnings.warn(
                     f"Canonical index over {present_levels} had {n_dropped} "
                     f"duplicate tuple(s); collapsed via groupby().first(), dropping "
                     f"those rows (possible silent data loss — GH #323).",
                     RuntimeWarning,
                 )
+        if n_nan_key:
+            # Loud, separate accounting: these rows were previously DELETED.
+            warnings.warn(
+                f"Canonical index over {present_levels} had {n_nan_key} row(s) "
+                f"with a NaN index key; these are now RETAINED (groupby "
+                f"dropna=False).  Before GH #323 they were silently deleted.  "
+                f"A NaN index level usually means a declared level is missing "
+                f"from the source — check the wave build.",
+                RuntimeWarning,
+            )
 
     return df
