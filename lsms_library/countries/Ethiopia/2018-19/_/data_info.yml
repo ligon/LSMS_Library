@@ -1,6 +1,14 @@
 Country: Ethiopia
 Wave: 2018-19
 
+# cluster_features (GH #323).  Both sources are HOUSEHOLD-grain, so they are
+# merged on household_id (1:1) and reduced to the EA grain by the declared
+# `aggregation:` policy in ../../_/data_scheme.yml -- NOT merged on the cluster
+# key v, which made the join many-to-many and produced a cartesian product
+# (latent: the geo sub-df never loaded, so it never fired).
+# The geo file spells its coordinates lat_mod / lon_mod (no '_dd_') in this
+# wave; asking for lat_dd_mod raised a KeyError that the optional sub-df
+# fallback swallowed, silently dropping Latitude/Longitude entirely.
 cluster_features:
     dfs:
         - df_main
@@ -9,6 +17,7 @@ cluster_features:
         file: sect_cover_hh_w4.dta
         idxvars:
             v: ea_id
+            i: household_id
         myvars:
             Region: saq01
             District: saq02
@@ -24,15 +33,23 @@ cluster_features:
     df_geo:
         file: ETH_HouseholdGeovariables_Y4.dta
         idxvars:
-            v: ea_id
+            i: household_id
         myvars:
-            Latitude: lat_dd_mod
-            Longitude: lon_dd_mod
+            Latitude: lat_mod
+            Longitude: lon_mod
     merge_on:
-        - v
+        - i
+    # The cover page defines the surveyed household/EA roster; the geo file is
+    # a strict enrichment (and carries households the cover does not).  A left
+    # merge keeps the cover authoritative instead of letting orphan geo rows
+    # arrive with a null v and collapse into a phantom cluster.
+    merge_how: left
     final_index:
         - t
         - v
+    # i was only the merge key; cluster_features is an EA-grain table.
+    drop:
+        - i
 
 household_roster:
     file: sect1_hh_w4.dta

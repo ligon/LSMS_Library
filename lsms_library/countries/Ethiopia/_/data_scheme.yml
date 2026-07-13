@@ -10,12 +10,42 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # GRAIN NOTE (GH #323).  Both ESS sources are HOUSEHOLD-grain: the survey
+    # cover page (Region/District/Rural) and the geovariable file
+    # (Latitude/Longitude).  The table's grain is the EA/cluster, so the
+    # household -> EA reduction is real and must be DECLARED, not left to
+    # _normalize_dataframe_index's silent groupby().first().
+    #
+    # Before this was declared, the wave YAML merged the two household-grain
+    # frames on the CLUSTER key v with how='outer' -- a many-to-many join that
+    # manufactured a cartesian product within each EA (W2: 5,262 x 5,287
+    # households over 433 EAs -> 65,508 rows for a 433-row table; W3 -> 57,786).
+    # first() then hid the explosion.  The merge is now on household_id, so it
+    # is 1:1, and the EA reduction happens here, explicitly.
     index: (t, v)
     Region: str
     District: str
     Rural: str
     Latitude: float
     Longitude: float
+    aggregation:
+      # Region/District/Rural are administrative attributes of the EA itself.
+      # VERIFIED EA-constant in all five waves -- 0 EAs carry more than one
+      # distinct value (333/433/432/535/435 EAs checked) -- so `first` is
+      # provably lossless here, not a guess.
+      Region: first
+      District: first
+      Rural: first
+      # Latitude/Longitude are the household's OWN (jittered) GPS fix, and are
+      # NOT EA-constant: 38/433 EAs (W2), 72/432 (W3) and 72/435 (W5) carry
+      # more than one distinct household coordinate.  `first` would publish an
+      # arbitrary household's location as the cluster's.  The median is the
+      # EA's central coordinate, is robust to the WB's positional jitter and to
+      # a stray outlier, and -- unlike a mean -- is insensitive to a single
+      # mis-keyed fix.  NaN household coordinates are skipped, so an EA keeps a
+      # location as long as any of its households reported one.
+      Latitude: median
+      Longitude: median
 
   shocks:
     index: (t, i, Shock)
@@ -55,8 +85,36 @@ Data Scheme:
     Floor: str
 
   interview_date:
+    # GRAIN NOTE (GH #323).  W4's source is the household cover
+    # (sect_cover_hh_w4.dta) and is already household-grain.  W5 has NO usable
+    # household-level date: sect_cover_hh_w5.dta's only timestamp column
+    # (saq19__Timestamp) is redacted to '**CONFIDENTIAL**' for every one of its
+    # 4,959 rows.  The sole W5 date source is the POST-HARVEST cover
+    # (sect_cover_ph_w5.dta), whose grain is the agricultural HOLDER, not the
+    # household: 1,596 holder rows over 1,581 households, of which 15 have two
+    # holders interviewed on DIFFERENT days (e.g. HH 030610088800708125 on
+    # 2022-04-13 and 2022-04-18).
+    #
+    # COVERAGE CAVEAT: W5 interview_date therefore covers only 1,581 of the
+    # 4,959 W5 households (31.9%) -- the agricultural sub-sample.  The other
+    # 3,378 households are ABSENT from the table rather than carrying a guessed
+    # date: class-2 (silently missing) is strictly safer than class-1 (silently
+    # wrong), and there is no household-level date to recover.
     index: (t, i)
     Int_t: datetime
+    aggregation:
+      # A household with two holders was contacted across two visits; the
+      # household's interview date is the date it was FIRST contacted.  `min`
+      # states that; `first` would return whichever holder the file happened to
+      # list first, which is arbitrary.  The '##N/A##' sentinel (112 holder
+      # rows) is coerced to NaT upstream in 2021-22/_/mapping.py, and min()
+      # skips NaT -- so a household keeps a date if either holder reported one,
+      # and stays NaT only if neither did.
+      #
+      # Declared under the canonical name Int_t.  The reducer is resolved
+      # case-insensitively, so it also matches the wave-level frame, which
+      # still carries the raw myvars spelling `int_t`.
+      Int_t: min
 
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s ∈ {purchased, produced}.

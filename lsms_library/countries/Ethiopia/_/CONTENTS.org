@@ -600,3 +600,103 @@ subjective-well-being / Cantril-ladder / life-satisfaction module. A variable-na
 scan of all 63-75 household section files per wave returned zero matches
 (ladder/well-being/satisfaction/step/life). Resolves the #331 "unknown" → absent.
 (Food-security IS present — see #332.) Tracked in #331.
+
+* GH #323 — grain / index-collapse fixes (2026-07)
+
+Five tables were landing a NON-UNIQUE canonical index, which the framework
+silently collapsed with =groupby().first()=, discarding the dropped rows.  In
+four of the five the non-uniqueness was MANUFACTURED by the extraction, not a
+real finer grain.
+
+** cluster_features (all 5 waves)
+Both sources are HOUSEHOLD-grain (the survey cover page, and the geovariable
+file), but the YAML merged them on the CLUSTER key =v= with =how: outer= — a
+many-to-many join that produced a cartesian product WITHIN each EA (W2: 5,262 ×
+5,287 households over 433 EAs → 65,508 rows for a 433-row table; W3 → 57,786).
+They are now merged on =household_id= (1:1) and reduced to the EA grain by an
+explicit =aggregation:= policy in =_/data_scheme.yml=.
+
+The geo sub-df ALSO failed to load in three waves, and the GH #515 optional-
+sub-df fallback swallowed the =KeyError=, so =Latitude=/=Longitude= were
+100% ABSENT from those waves with only a warning:
+- 2011-12 → the file spells them =LAT_DD_MOD= / =LON_DD_MOD= (UPPERCASE)
+- 2018-19 → =lat_mod= / =lon_mod= (no =_dd_=)
+- 2021-22 → the geo file has NO =ea_id= column at all; it is keyed
+  =household_id=, so the cover must supply =v=.
+
+Reducers (declared, not silent): Region/District/Rural use =first=, which is
+provably LOSSLESS — they are EA-constant in every wave (0 EAs carry more than
+one distinct value, across 333/433/432/535/435 EAs).  Latitude/Longitude use
+=median=: the household GPS fixes are jittered and are NOT EA-constant (38/433
+EAs in W2, 72/432 in W3, 72/435 in W5), so =first= would publish an arbitrary
+household's location as the cluster's.
+
+** individual_education (2013-14, 2015-16)
+Indexed on the W1-BASELINE ids (=household_id= / =individual_id=) while
+=household_roster= and =shocks= for the same waves correctly used the
+wave-native =household_id2= / =individual_id2=.  Consequences:
+- W2: 5,248 rows — the urban REFRESHMENT sample, which has no W1 antecedent —
+  carry a BLANK household_id AND a blank individual_id, so all of them
+  collapsed into ONE phantom tuple ('2013-14', '', '') and 5,247 real people
+  vanished.
+- W3: SPLIT-OFF households share their parent's W1 household_id, so 8 rows
+  merged two REAL, DISTINCT people (individual 0105010010503101 is recorded
+  with '10th Grade Complete' in one household and '9th Grade Complete' in the
+  other).
+Now indexed on household_id2/individual_id2: 23,785/23,785 and 23,393/23,393
+UNIQUE.  This also makes =pid= JOINABLE to household_roster, which it was not
+before.  =id_walk= + =panel_ids= still map back to the W1 baseline, so panel
+linkage is preserved.
+
+** interview_date (2021-22)  ⚠ COVERAGE CAVEAT
+W5 has NO usable household-level date: =sect_cover_hh_w5.dta='s only timestamp
+(=saq19__Timestamp=) is redacted to '**CONFIDENTIAL**' in all 4,959 rows.  The
+only date source is the POST-HARVEST cover =sect_cover_ph_w5.dta=, whose grain
+is the agricultural HOLDER: 1,596 holder rows over 1,581 households, 15 of
+which have two holders interviewed on DIFFERENT days.
+
+*** W5 interview_date therefore covers only 1,581 of the 4,959 W5 households
+    (31.9%) — the agricultural sub-sample.  The other 3,378 are ABSENT from the
+    table rather than carrying a guessed date.
+The declared reducer is =min= ("the date the household was first contacted"),
+not =first= (which would return whichever holder the file happened to list
+first).  The '##N/A##' sentinel (112 holder rows) is coerced to NaT in
+=2021-22/_/mapping.py=.  W4 gets the same datetime coercion
+(=2018-19/_/mapping.py=): without it the concatenated column became an OBJECT
+column, the country parquet stored it as text, and on the next CACHED read
+pandas inferred one datetime format and silently dropped the entire 2021-22
+wave.
+
+** crop_production (all 5 waves)
+Three separate collisions on (t, i, plot_id, j, u), all now resolved in
+=_/ethiopia.py= (=crop_production_for_wave=) so the wave parquet is ALREADY
+unique — the collapse is a stated policy of the build, not a side effect of
+index normalization:
+1. W2's =sect9_ph_w2.dta= contains 605 EXACT, byte-identical duplicate records.
+   Dropped explicitly (=drop_duplicates=) BEFORE any summing, or they would
+   double the reported harvest.
+2. =harmonize_crop= is MANY-TO-ONE (codes 52, 56, 69 → "Leafy Greens";
+   90, 99 → "Other Land Use"), so two DIFFERENT crops on one field in the same
+   unit land on one row (2 rows in W1, 4 in W3).  Their harvests are SUMMED.
+3. W4/W5 §9 record SEVERAL crop ENTRIES per (holder, parcel, field, crop_code),
+   distinguished only by the within-field serial =crop_id=, each with its own
+   quantity (W5 holder 03051208880020608101 parcel 1 field 1 reports Teff as
+   8 + 3 + 2 Chinet Medium).  SUMMED to 13; =first()= kept 8 and destroyed 5.
+The sum is done in TWO stages, because §11 sells at the (holder, crop) grain
+and one sale record is broadcast onto every §9 harvest row sharing that
+(holder, crop_code): summing =Value_sold= / =Quantity_sold= across those rows
+would DOUBLE-COUNT the same sale.  Stage 1 (pre-sales) merges the same-code
+entries; stage 2 (post-sales) merges the label collapse.  Non-additive
+attributes (harvest_month, intercropped, …) use a unique-or-NA reducer: where
+the collapsing rows disagree we return NA rather than guess.
+Verified: total reported §9 harvest quantity is CONSERVED at ratio 1.000 in
+every wave — nothing lost, nothing double-counted.
+
+** panel_ids (2013-14)
+The wave-level =panel_ids:= block pointed at =sect_cover_ls_w2.dta= — the
+LIVESTOCK-section cover, whose grain is the agricultural HOLDER (3,812 rows /
+3,670 households) and which covers only 3,670 of the wave's 5,262 households.
+It was a vestigial, wrong-source duplicate: =data_scheme.yml= already declares
+=panel_ids= as =materialize: make=, and the country-level =_/panel_ids.py=
+reads the correct household-grain =sect_cover_hh_w2.dta= (5,262 rows, unique).
+Deleted.

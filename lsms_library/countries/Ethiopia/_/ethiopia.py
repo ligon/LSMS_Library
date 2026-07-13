@@ -947,6 +947,54 @@ def _greg_month(series):
     return n.map(_ETH_MONTH_TO_GREG).astype('Int64')
 
 
+def _unique_or_na(s):
+    """The common non-null value, or NA when the rows disagree.
+
+    The honest reducer for a NON-additive attribute (harvest_month,
+    intercropped, ...) when several source rows collapse onto one canonical
+    row.  If every row that reported the attribute agrees, that value is the
+    row's value.  If they disagree we do NOT pick one -- we return NA, because
+    we genuinely do not know which is right.  Class-2 (honestly missing) beats
+    class-1 (silently wrong); a silent first() would publish an arbitrary one
+    of the disagreeing values as fact (GH #323).
+    """
+    v = s.dropna().unique()
+    if len(v) == 1:
+        return v[0]
+    return pd.NA
+
+
+def _collapse_crop_rows(out, keys, sum_cols):
+    """Collapse ``out`` to one row per ``keys`` with an EXPLICIT policy.
+
+    ``sum_cols`` are ADDITIVE reported measures (harvest quantity, quantity
+    sold, value sold): several source rows describing the same canonical
+    (plot, crop, unit) are parts of one total, so they are SUMMED -- summing
+    keeps every reported unit of harvest, whereas the framework's default
+    groupby().first() would silently discard all but one (ESS W5 holder
+    03051208880020608101 reports Teff on one field as 8 + 3 + 2 Chinet Medium;
+    first() keeps 8 and destroys 5).  ``min_count=1`` keeps an all-NaN group
+    NaN instead of turning it into a spurious 0.
+
+    Every other column is reduced with :func:`_unique_or_na`.
+    """
+    if not out.duplicated(subset=keys).any():
+        return out
+    dtypes = out.dtypes.to_dict()
+    others = [c for c in out.columns if c not in keys and c not in sum_cols]
+    agg = {c: (lambda s: s.sum(min_count=1)) for c in sum_cols}
+    agg.update({c: _unique_or_na for c in others})
+    res = (out.groupby(keys, as_index=False, observed=True, dropna=False)
+              .agg(agg))
+    for col, dt in dtypes.items():          # groupby+agg loses nullable dtypes
+        if col in res.columns:
+            try:
+                res[col] = res[col].astype(dt)
+            except (TypeError, ValueError):
+                pass
+    return res
+
+
 def crop_production_for_wave(t, harvest, planting, sale, colmap,
                              intercrop=None, unit_labels=None,
                              sale_unit_labels=None):
@@ -996,6 +1044,30 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     crop_map = _eth_crop_label_map()
 
     h = harvest.copy()
+
+    # GH #323 (a): EXACT full-row duplicate RECORDS in the raw §9 file.
+    # W2's sect9_ph_w2.dta carries 605 byte-identical duplicate rows (e.g.
+    # holder 0102040170201801, parcel 3, field 1, crop_code 6, qty 3.0, unit 11
+    # appears twice) -- a data-entry artifact, not two harvests.  Dropping them
+    # here, explicitly and up front, is a DECLARED dedup of identical records;
+    # it must happen BEFORE any summing below, or the duplicate would be added
+    # to itself and double the reported harvest.  drop_duplicates() removes
+    # only rows identical in EVERY column, so nothing distinguishable is lost.
+    n_exact = int(h.duplicated().sum())
+    if n_exact:
+        h = h.drop_duplicates()
+        assert not h.duplicated().any()
+        # ``unit_labels`` is the SAME §9 file's unit column, loaded separately
+        # with convert_categoricals=True and aligned to `harvest` row-for-row.
+        # Re-align it to the surviving rows or it silently desynchronises and
+        # every unit label shifts (pandas raises on the length mismatch, which
+        # is how this was caught).
+        if unit_labels is not None:
+            unit_labels = unit_labels.loc[h.index]
+        print('crop_production %s: dropped %d EXACT full-row duplicate §9 '
+              'record(s) (byte-identical; declared dedup, GH #323)'
+              % (t, n_exact))
+
     # plot_id identical to plot_features.
     plot_id = (h[c['holder_id']].apply(format_id).astype(str) + '_'
                + h[c['parcel_id']].apply(format_id).astype(str) + '_'
@@ -1069,6 +1141,24 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     else:
         out['planting_month'] = pd.Series(pd.NA, index=out.index, dtype='Int64')
 
+    # GH #323 (c) -- COLLAPSE STAGE 1, before the sales join.
+    # W4/W5 §9 records SEVERAL crop ENTRIES per (holder, parcel, field,
+    # crop_code), distinguished only by the within-field entry serial
+    # `crop_id`, each with its OWN reported quantity (W5 holder
+    # 03051208880020608101 parcel 1 field 1 Teff: 8, 3 and 2 Chinet Medium;
+    # 13 such extra rows in W4, 32 in W5).  They are parts of ONE field's
+    # harvest of that crop, so the reported quantities are SUMMED (8+3+2 = 13).
+    # first() would have kept 8 and silently destroyed 5 units.
+    #
+    # This MUST happen BEFORE the sales merge.  §11 sells at the
+    # (holder, crop) grain, so a single sale record is broadcast onto every
+    # harvest row sharing that (holder, crop_code) -- summing Value_sold /
+    # Quantity_sold afterwards would count the SAME sale two or three times.
+    # Collapsing first leaves exactly one row per (holder, crop_code, plot,
+    # unit) for the sale to attach to.
+    out = _collapse_crop_rows(
+        out, ['t', 'i', 'plot_id', '_holder', '_code', 'j', 'u'], ['Quantity'])
+
     # Sales: §11 is (household, holder, crop) grain.  Attach reported
     # sold-qty / sold-value ONLY where (holder, crop) maps to exactly one
     # plot-crop harvest row (see SALES GRAIN CAVEAT above).
@@ -1137,7 +1227,30 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     out = out[~(empty_u & out['Quantity'].isna()
                 & out['Quantity_sold'].isna())]
     out['u'] = out['u'].fillna('Other (Specify)')
+
+    # GH #323 (b) -- COLLAPSE STAGE 2, to the declared canonical grain.
+    # harmonize_crop is MANY-TO-ONE: raw crop codes 52, 56 and 69 all carry the
+    # Preferred Label "Leafy Greens" (and 90, 99 -> "Other Land Use").  Two
+    # DIFFERENT crops grown on the same field and reported in the same unit
+    # therefore land on the same (plot_id, j, u) row (2 rows in W1, 4 in W3).
+    # Their harvests are SUMMED -- the field's total leafy-greens harvest --
+    # rather than first()'d, which would silently discard an entire crop's
+    # output.  Each surviving row here carries a DISTINCT _code (stage 1
+    # already merged the same-code entries), so its §11 sale figures are
+    # distinct records and summing them cannot double-count.
+    #
+    # Doing this in the script means the wave parquet is ALREADY unique on the
+    # declared index: the collapse is a stated policy of this build, not a side
+    # effect of _normalize_dataframe_index quietly mopping up afterwards.
+    out = _collapse_crop_rows(
+        out, ['t', 'i', 'plot_id', 'j', 'u'],
+        ['Quantity', 'Quantity_sold', 'Value_sold'])
+
     out = out.set_index(['t', 'i', 'plot_id', 'j', 'u'])
+    assert out.index.is_unique, (
+        'crop_production %s: index (t,i,plot_id,j,u) still not unique after '
+        'the declared collapse -- %d duplicate tuple(s)'
+        % (t, int(out.index.duplicated().sum())))
     # Stable column order.
     out = out[['Quantity', 'Quantity_sold', 'Value_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial']]

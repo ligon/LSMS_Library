@@ -8,6 +8,8 @@ FIES item columns have been mapped to True/False/NaN, and it:
   1. coerces the 8 items to pandas nullable ``boolean`` dtype, and
   2. adds ``FIES_score`` = count of True across the 8 items (NaN only
      when all 8 items are NaN).
+
+``interview_date`` is the same kind of by-name df_edit hook (GH #323).
 """
 
 import pandas as pd
@@ -34,4 +36,25 @@ def food_security(df):
     score = score.where(~all_na, other=pd.NA)
     df["FIES_score"] = score.astype("Int64")
 
+    return df
+
+
+def interview_date(df):
+    """Coerce the W5 §PH-cover InterviewDate to a real datetime (GH #323).
+
+    The source column is a STRING with an explicit '##N/A##' sentinel in 112
+    of its 1,596 holder rows.  Left as-is, the sentinel is a truthy string:
+    it survives into the table as a bogus "date", and it makes the column's
+    dtype object, so the declared ``min`` reducer in data_scheme.yml would
+    compare strings rather than timestamps -- and '##N/A##' sorts BEFORE any
+    ISO date, so min() would return the sentinel for every affected household.
+
+    ``errors='coerce'`` maps the sentinel (and any other unparseable value) to
+    NaT, which min() then skips.  A household keeps a date if either of its
+    holders reported one, and stays NaT only if neither did -- class-2
+    (honestly missing) rather than class-1 (silently wrong).
+    """
+    df = df.copy()
+    if 'int_t' in df.columns:
+        df['int_t'] = pd.to_datetime(df['int_t'], errors='coerce')
     return df

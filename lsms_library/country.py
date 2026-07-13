@@ -874,6 +874,88 @@ class Wave:
     def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
 
+    def _required_scheme_columns(self, request: str) -> set[str]:
+        """Columns the country's data_scheme declares REQUIRED for ``request``.
+
+        Mirrors ``Country._assert_built_required_columns`` / diagnostics:
+        every scheme-entry key that is not structural metadata and is not
+        marked ``optional: true``.
+        """
+        resources = self.country.resources
+        scheme_map = (resources or {}).get('Data Scheme') or {}
+        entry = scheme_map.get(request)
+        if not isinstance(entry, dict):
+            return set()
+        _skip = {"index", "materialize", "backend", "aggregation"}
+        return {
+            k for k, v in entry.items()
+            if isinstance(k, str) and k not in _skip
+            and not (isinstance(v, dict) and v.get("optional"))
+        }
+
+    def _merge_subframes(self, left: pd.DataFrame, right: pd.DataFrame,
+                         merge_on: list[str], request: str,
+                         lname: str, rname: str,
+                         how: str = 'outer') -> pd.DataFrame:
+        """Outer-merge two ``dfs:`` sub-frames, refusing a cartesian product.
+
+        GH #323 (the CLASS).  ``dfs:`` merges join sub-frames on the declared
+        ``merge_on`` keys.  When BOTH sub-frames are finer-grained than
+        ``merge_on`` -- e.g. two HOUSEHOLD-grain frames merged on the CLUSTER
+        key ``v`` -- the merge is many-to-many and yields a cartesian product
+        *within each key group*.  ``_normalize_dataframe_index`` then quietly
+        mopped the explosion up with ``groupby().first()``, so the table looked
+        fine while 99% of its rows were phantoms.  Ethiopia cluster_features
+        W2/W3 alone manufactured 122,428 such rows (5,262 x 5,287 households
+        over 433 EAs -> 65,508 rows from a 433-row table).
+
+        The guard is EXACT -- both sound and complete -- not a heuristic on row
+        counts.  A merge is many-to-many precisely when some key value is
+        duplicated in BOTH frames: that key alone then contributes n x m rows.
+        So we intersect the set of keys duplicated in ``left`` with the set
+        duplicated in ``right``; a non-empty intersection *is* the cartesian,
+        and an empty one proves the merge is 1:1 / 1:m / m:1 (every row of the
+        finer side matches at most one row of the other).
+
+        A row-count ceiling (``len(result) <= len(left) + len(right)``) was
+        tried first and rejected: it is sound but NOT complete -- a small
+        explosion hides under it (2x2 + 1x1 = 5 rows from two 3-row frames
+        never exceeds the 6-row ceiling), so it would wave through exactly the
+        cartesians that are hardest to notice by eye.
+
+        ``how`` defaults to ``'outer'`` (the historical behaviour, unchanged
+        for every existing ``dfs:`` block).  A wave may declare ``merge_how:
+        left`` in its data_info.yml when the PRIMARY sub-df is authoritative
+        for which rows exist -- e.g. Ethiopia cluster_features, where the
+        survey cover page defines the household/EA roster and the geovariable
+        file is a strict enrichment that also carries households the cover
+        does not (25 in W2, 34 in W4).  Under ``outer`` those orphans arrive
+        with a null ``v`` and collapse into a phantom cluster.
+        """
+        keys = [k for k in merge_on if k in left.columns and k in right.columns]
+        if keys:
+            ldup = left.loc[left.duplicated(subset=keys, keep=False), keys]
+            rdup = right.loc[right.duplicated(subset=keys, keep=False), keys]
+            if len(ldup) and len(rdup):
+                lset = set(map(tuple, ldup.astype(str).itertuples(index=False)))
+                rset = set(map(tuple, rdup.astype(str).itertuples(index=False)))
+                both = lset & rset
+                if both:
+                    example = sorted(both)[0]
+                    raise ValueError(
+                        f"{self.name}/{request}: merging sub-frames '{lname}' "
+                        f"({len(left)} rows) and '{rname}' ({len(right)} rows) "
+                        f"on {merge_on} is a many-to-many CARTESIAN PRODUCT, not "
+                        f"a join: {len(both)} key value(s) are duplicated in BOTH "
+                        f"sub-frames (e.g. {keys} = {example}), so each one "
+                        f"contributes n x m phantom rows. Both sub-frames are "
+                        f"finer-grained than the merge key. Merge on a key that is "
+                        f"unique in at least one sub-frame (e.g. household_id "
+                        f"rather than the cluster id v), or reduce a sub-frame to "
+                        f"the merge-key grain before merging (GH #323)."
+                    )
+        return pd.merge(left, right, on=merge_on, how=how)
+
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
@@ -987,6 +1069,7 @@ class Wave:
             # Vertical Merge dfs
             if data_info.get('dfs'):
                 merge_dfs = []
+                dropped_subdfs: list[tuple[str, Any, Exception]] = []
                 merge_on =list(set('t').union(data_info.get('merge_on')))#a list
                 df_edit_function = self.formatting_functions.get(request)
                 idxvars_list = list(dict.fromkeys(data_info.get('final_index')))
@@ -1014,7 +1097,46 @@ class Wave:
                         # drop the optional sub-df rather than abort the whole
                         # cluster_features table and lose the Region/District
                         # that the primary df_main provides.  GH #515.
+                        #
+                        # BUT: dropping a sub-df silently deletes every column
+                        # it was the sole supplier of.  When those columns are
+                        # declared REQUIRED (non-``optional``) in the country's
+                        # data_scheme, "proceed without it" means serving the
+                        # table with a required column 100% ABSENT -- a class-1
+                        # (silently WRONG) outcome a warning does not prevent.
+                        # Ethiopia cluster_features hit exactly this in 3 of 5
+                        # waves: the YAML asked for columns the geo file does
+                        # not carry (``LAT_DD_MOD`` not ``lat_dd_mod`` in W1;
+                        # ``lat_mod`` in W4; no ``ea_id`` at all in W5), the
+                        # KeyError was swallowed here, and Latitude/Longitude
+                        # vanished from the table behind a warning.  Prose is
+                        # not enforcement: if the dropped sub-df was the only
+                        # source of a required declared column, fail loudly
+                        # (GH #323).
                         sub_file = sub_data_info.get('file', i)
+                        # Record it.  Two very different things land here, and
+                        # only one of them is a bug we can make the author fix:
+                        #
+                        #   KeyError  -- the file LOADED but does not carry the
+                        #     column the YAML asked for.  That is a CONFIG bug
+                        #     (a typo / wrong casing / renamed variable), it is
+                        #     100% reproducible, and a developer can fix it by
+                        #     editing data_info.yml.  If it costs a REQUIRED
+                        #     column, fail loudly (see the post-merge check).
+                        #
+                        #   FileNotFoundError / PathMissingError / DvcException
+                        #     -- the file is not AVAILABLE in this environment.
+                        #     No config edit fixes that; it is exactly what the
+                        #     GH #515 optional-sub-df fallback exists to absorb,
+                        #     and hard-failing here would break every legitimate
+                        #     partial-data checkout.  Stay soft.
+                        #
+                        # Only the config-bug kind can escalate to an error;
+                        # whether it ACTUALLY costs a required column is judged
+                        # after the merge, since a sibling sub-df may supply the
+                        # same column.
+                        dropped_subdfs.append((i, sub_file, exc,
+                                               isinstance(exc, KeyError)))
                         warnings.warn(
                             f"{self.name}/{request}: could not load "
                             f"sub-df '{i}' (file: {sub_file}); "
@@ -1029,11 +1151,54 @@ class Wave:
                     available_idx = [c for c in idxvars_list if c in df.columns]
                     df = df.set_index(available_idx)
                 else:
-                    df = pd.merge(merge_dfs[0], merge_dfs[1], on=merge_on, how='outer')
+                    merge_how = data_info.get('merge_how', 'outer')
+                    df = self._merge_subframes(
+                        merge_dfs[0], merge_dfs[1], merge_on, request,
+                        dfs_list[0], dfs_list[1], how=merge_how)
                     if len(merge_dfs) > 2:
                         for i in range(2, len(merge_dfs)):
-                            df = pd.merge(df, merge_dfs[i], on=merge_on, how='outer')
+                            df = self._merge_subframes(
+                                df, merge_dfs[i], merge_on, request,
+                                '+'.join(dfs_list[:i]), dfs_list[i],
+                                how=merge_how)
                     df = df.set_index(idxvars_list)
+
+                # GH #323/#515.  A dropped optional sub-df silently deletes
+                # every column it was the SOLE supplier of.  Warning about it
+                # is not enough: Ethiopia cluster_features asked its geo file
+                # for columns it does not carry (LAT_DD_MOD not lat_dd_mod in
+                # W1; lat_mod in W4; no ea_id at all in W5), the KeyError was
+                # swallowed, and Latitude/Longitude -- REQUIRED in the
+                # data_scheme -- vanished from three of five waves behind a
+                # warning nobody read.  Prose is not enforcement.
+                #
+                # Judged HERE, after the merge, not at the failure site: a
+                # sibling sub-df may supply the same column, in which case
+                # dropping this one costs nothing.  So we fire only on columns
+                # genuinely ABSENT from the assembled frame, and only when the
+                # loss is traceable to a CONFIG bug (a column the file doesn't
+                # have) rather than a file that isn't available here.
+                config_bugs = [d for d in dropped_subdfs if d[3]]
+                if config_bugs and isinstance(df, pd.DataFrame):
+                    have = set(map(str, df.columns)) | {
+                        str(n) for n in df.index.names if n is not None}
+                    missing = sorted(self._required_scheme_columns(request) - have)
+                    if missing:
+                        names = ', '.join(
+                            f"'{n}' (file: {f})" for n, f, _, _ in config_bugs)
+                        first_exc = config_bugs[0][2]
+                        raise RuntimeError(
+                            f"{self.name}/{request}: sub-df(s) {names} loaded but "
+                            f"do NOT carry the column(s) the YAML asks for, leaving "
+                            f"required declared column(s) {missing} ENTIRELY ABSENT "
+                            f"from '{request}'. Serving the table without them would "
+                            f"be silently wrong. Fix the source column names in this "
+                            f"wave's data_info.yml, or mark the column(s) "
+                            f"`optional: true` in data_scheme.yml if they are "
+                            f"genuinely unavailable for this wave (GH #323/#515). "
+                            f"First error: {first_exc!r}"
+                        ) from first_exc
+
                 # Apply any `derived:` transformers declared in the YAML.  These
                 # run on the merged-and-indexed frame, before the per-request
                 # Python hook, so they see the full multi-source result and
@@ -4188,9 +4353,49 @@ def _normalize_dataframe_index(
         # no warning.  Single source of truth for the additive column map lives
         # in feature.py (imported lazily to avoid an import cycle).
         from .feature import _ADDITIVE_MEASURE_COLUMNS
+
+        # GH #323: a table whose source grain is legitimately FINER than its
+        # declared index may declare an explicit reducer per column, in
+        # data_scheme.yml:
+        #
+        #     cluster_features:
+        #       index: (t, v)
+        #       ...
+        #       aggregation:
+        #         Region: first        # verified EA-constant -> lossless
+        #         Latitude: median     # household GPS -> EA centre
+        #
+        # This is the "declare it, don't leave it silent" path: the collapse
+        # is a stated policy, so it does not warn.  Every non-index column
+        # must be given a reducer -- an unlisted column would otherwise fall
+        # back to a silent first(), which is the very bug this closes -- so a
+        # partial spec is a hard config error, not a default.
+        agg_spec = (schema_entry.get('aggregation')
+                    if isinstance(schema_entry, dict) else None)
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
+        if isinstance(agg_spec, dict) and agg_spec:
+            # Resolve reducers case-insensitively.  The SAME table reaches this
+            # function under two spellings of the same column: the wave-level
+            # frame carries the raw myvars name (``int_t``) while the cached /
+            # canonical country frame carries the declared name (``Int_t``).
+            # Matching case-sensitively would find no reducer for one of them
+            # and raise below -- which is how this first went wrong: the warm
+            # (cached) path blew up where the cold path was fine, and the whole
+            # 2021-22 wave silently vanished from interview_date.
+            lookup = {str(k).lower(): v for k, v in agg_spec.items()}
+            unspecified = [c for c in df.columns if str(c).lower() not in lookup]
+            if unspecified:
+                raise ValueError(
+                    f"{table_name or 'table'}: data_scheme declares an "
+                    f"`aggregation:` policy but gives no reducer for column(s) "
+                    f"{unspecified}. Collapsing them would fall back to a "
+                    f"silent first() (GH #323). Add an explicit reducer for "
+                    f"each, or remove the `aggregation:` block."
+                )
+            df = df.groupby(level=present_levels, observed=True).agg(
+                {c: lookup[str(c).lower()] for c in df.columns})
+        elif present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):

@@ -1,6 +1,13 @@
 Country: Ethiopia
 Wave: 2013-14
 
+# cluster_features (GH #323).  Both sources are HOUSEHOLD-grain, so they are
+# merged on household_id2 (1:1) and reduced to the EA grain by the declared
+# `aggregation:` policy in ../../_/data_scheme.yml -- NOT merged on the cluster
+# key v, which made the join many-to-many and produced a cartesian product
+# (5,262 x 5,287 households over 433 EAs -> 65,508 rows).
+# The geo file carries both household_id and household_id2; household_id2 is
+# the W2-native key (matching v = ea_id2 and the roster/shocks i).
 cluster_features:
     dfs:
         - df_main
@@ -9,6 +16,7 @@ cluster_features:
         file: sect_cover_hh_w2.dta
         idxvars:
             v: ea_id2
+            i: household_id2
         myvars:
             Region: saq01
             District: saq02
@@ -31,23 +39,35 @@ cluster_features:
     df_geo:
         file: Pub_ETH_HouseholdGeovars_Y2.dta
         idxvars:
-            v: ea_id2
+            i: household_id2
         myvars:
             Latitude: lat_dd_mod
             Longitude: lon_dd_mod
     merge_on:
-        - v
+        - i
+    # The cover page defines the surveyed household/EA roster; the geo file is
+    # a strict enrichment (and carries households the cover does not).  A left
+    # merge keeps the cover authoritative instead of letting orphan geo rows
+    # arrive with a null v and collapse into a phantom cluster.
+    merge_how: left
     final_index:
         - t
         - v
+    # i was only the merge key; cluster_features is an EA-grain table.
+    drop:
+        - i
 
-panel_ids:
-    file:
-        - ../Data/sect_cover_ls_w2.dta
-    idxvars:
-        i: household_id2
-    myvars:
-        previous_i: household_id
+# panel_ids is built by the country-level _/panel_ids.py (declared
+# `materialize: make` in ../../_/data_scheme.yml), which reads the correct
+# household-grain cover sect_cover_hh_w2.dta (5,262 rows, unique).
+#
+# The wave-level block that used to sit here was a vestigial, WRONG-SOURCE
+# duplicate: it pointed at ../Data/sect_cover_ls_w2.dta -- the LIVESTOCK
+# section cover, whose grain is the agricultural HOLDER, not the household
+# (3,812 rows / 3,670 households; 142 households have 2-3 holders).  It
+# therefore presented a non-unique (t, i) index that groupby().first()
+# silently collapsed, and it covered only 3,670 of the wave's 5,262
+# households.  Deleted -- GH #323.
 
 household_roster:
     file: sect1_hh_w2.dta
@@ -75,10 +95,26 @@ household_roster:
         MonthsAway: hh_s1q05
 
 individual_education:
+    # GH #323.  These MUST be the wave-native ids (household_id2 /
+    # individual_id2), the same ids household_roster and shocks use for this
+    # wave -- NOT the W1-baseline household_id / individual_id.
+    #
+    # Under the baseline ids, 5,248 of the 23,785 rows -- the W2 urban
+    # refreshment sample, which has NO W1 antecedent -- carry a BLANK
+    # household_id AND a BLANK individual_id, so they all collapsed into a
+    # single phantom index tuple ('2013-14', '', ''), silently deleting
+    # 5,247 real people from the table.
+    #
+    # household_id2/individual_id2 is 23,785/23,785 UNIQUE.  id_walk + the existing
+    # panel_ids chain still map household_id2 back to the W1 baseline, so
+    # cross-wave panel linkage is preserved (this is exactly what the roster
+    # already relies on).  It also makes pid JOINABLE to household_roster,
+    # which it was not before (roster pid = individual_id2, education pid was
+    # individual_id).
     file: sect2_hh_w2.dta
     idxvars:
-        i: household_id
-        pid: individual_id
+        i: household_id2
+        pid: individual_id2
     myvars:
         # Highest grade completed (free-text survey labels).
         Educational Attainment:
