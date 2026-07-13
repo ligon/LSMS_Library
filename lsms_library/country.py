@@ -4162,6 +4162,7 @@ def _normalize_dataframe_index(
 
     # Drop any unexpected index levels (but keep at least one, and only on MultiIndex)
     extra_levels = [lvl for lvl in df.index.names if lvl not in declared]
+    dropped_levels: list[str] = []
     if (
         extra_levels
         and isinstance(df.index, pd.MultiIndex)
@@ -4169,6 +4170,7 @@ def _normalize_dataframe_index(
     ):
         try:
             df = df.droplevel(extra_levels)
+            dropped_levels = list(extra_levels)
         except ValueError:
             pass  # Cannot drop levels; keep original index
 
@@ -4190,7 +4192,37 @@ def _normalize_dataframe_index(
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
+
+        # GH #323: an explicitly DECLARED reduction. `aggregation:` in the
+        # country's data_scheme.yml maps an index level that the source frame
+        # carries but the canonical index does NOT declare -- i.e. a level that
+        # is collapsed away here -- to the reducer used to collapse it.  This
+        # turns a silent, accidental groupby().first() into a stated policy that
+        # the framework enforces.  Reducers:
+        #   unique : ASSERT-CONSTANT.  Every column must hold exactly one
+        #            distinct non-null value per group; raise if not.  Use when
+        #            the extra level is a pure repetition of a coarser entity's
+        #            attributes (e.g. South Africa `cluster_features`, whose
+        #            source STRATA2.dta is household-level: each cluster's
+        #            Region/Rural repeat once per household).  `first` would
+        #            return the right answer only by accident of clean data;
+        #            `unique` converts that latent silently-WRONG (class-1) risk
+        #            into a loud failure (class-2), which is strictly safer.
+        #   first  : take the first row per group -- the historical default, but
+        #            stated deliberately rather than fallen into.
+        reducers = _declared_reducers(schema_entry, dropped_levels, table_name)
+
+        if reducers and not present_additive:
+            reducer = reducers[0]
+            grouped = df.groupby(level=present_levels, observed=True)
+            if reducer == 'unique':
+                _assert_constant_within_groups(
+                    df, grouped, present_levels, dropped_levels, table_name,
+                )
+            df = grouped.first()
+            # Declared + enforced: no warning.  The rows removed are, by the
+            # assertion above (for `unique`), exact redundant repetitions.
+        elif present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
@@ -4210,3 +4242,77 @@ def _normalize_dataframe_index(
                 )
 
     return df
+
+
+_VALID_REDUCERS = ('unique', 'first')
+
+
+def _declared_reducers(
+    schema_entry: dict[str, Any],
+    dropped_levels: list[str],
+    table_name: str | None,
+) -> list[str]:
+    """
+    Resolve the ``aggregation:`` policy for the levels being collapsed away.
+
+    ``aggregation`` maps an index level name to a reducer (see
+    ``_normalize_dataframe_index``).  Only levels actually dropped from the
+    declared index are consulted, so a policy naming a level that the canonical
+    index *does* declare (and which therefore never collapses) stays inert --
+    that is the case for the ``visit: first`` blocks on ``interview_date`` in
+    Malawi, Albania, Senegal, Togo, Niger, Benin, CotedIvoire, Burkina Faso and
+    Guinea-Bissau, whose index declares ``visit``.
+    """
+    policy = schema_entry.get('aggregation') if isinstance(schema_entry, dict) else None
+    if not isinstance(policy, dict) or not dropped_levels:
+        return []
+    reducers = [policy[lvl] for lvl in dropped_levels if lvl in policy]
+    bad = [r for r in reducers if r not in _VALID_REDUCERS]
+    if bad:
+        raise ValueError(
+            f"{table_name or 'table'}: unknown aggregation reducer(s) {bad}; "
+            f"expected one of {list(_VALID_REDUCERS)}."
+        )
+    if len(set(reducers)) > 1:
+        raise ValueError(
+            f"{table_name or 'table'}: conflicting aggregation reducers "
+            f"{sorted(set(reducers))} declared for collapsed levels "
+            f"{dropped_levels}; declare a single reducer."
+        )
+    return reducers
+
+
+def _assert_constant_within_groups(
+    df: pd.DataFrame,
+    grouped,
+    present_levels: list[str],
+    dropped_levels: list[str],
+    table_name: str | None,
+) -> None:
+    """
+    Enforce the ``unique`` reducer: every column must be constant within group.
+
+    Raises ``ValueError`` naming the offending groups/columns.  Failing loudly
+    here is the point (GH #323): it is the difference between a reduction that
+    is provably lossless and one that merely *happens* to be lossless on today's
+    data.
+    """
+    if df.empty or not len(df.columns):
+        return
+    nuniq = grouped.nunique(dropna=True)
+    violating = (nuniq > 1).any(axis=1)
+    if not bool(violating.any()):
+        return
+    bad = nuniq[violating]
+    bad_cols = [c for c in bad.columns if bool((bad[c] > 1).any())]
+    sample = bad.head(5).to_string()
+    raise ValueError(
+        f"{table_name or 'table'}: aggregation policy declares reducer 'unique' "
+        f"for collapsed level(s) {dropped_levels}, which asserts every column is "
+        f"constant within each {present_levels} group -- but "
+        f"{int(violating.sum())} group(s) vary on column(s) {bad_cols}. "
+        f"Collapsing would silently pick one value and discard the others "
+        f"(GH #323). Either the level belongs in the canonical index, or the "
+        f"reducer is wrong. Offending groups (first 5, distinct-value counts):\n"
+        f"{sample}"
+    )

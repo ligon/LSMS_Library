@@ -19,6 +19,15 @@ sample:
                 3: Informal
 
 cluster_features:
+    # STRATA2.dta is HOUSEHOLD-level (8809 rows, hhid unique) but this table is
+    # CLUSTER-level (index (t, v), 355 clusters), so the read is inherently
+    # many-to-one.  `i: hhid` is deliberately RETAINED below: it names the level
+    # that gets collapsed away, which is what lets _/data_scheme.yml declare
+    # `aggregation: {i: unique}` (assert-constant) and have the framework ENFORCE
+    # the reduction rather than fall into a silent groupby().first() (GH #323).
+    # Do NOT remove `i: hhid` as "spurious" -- dropping it does NOT remove the
+    # many-to-one (you still get 8809 rows indexed by v); it only makes the
+    # reduction anonymous and un-checkable, re-arming the silent collapse.
     file:
         - ../Data/STRATA2.dta
     idxvars:

@@ -10,9 +10,29 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # DECLARED REDUCTION (GH #323).  The 1993 source, Data/STRATA2.dta, is a
+    # HOUSEHOLD-level stratification file: 8809 rows, `hhid` unique, carrying
+    # 355 distinct `clustnum`.  cluster_features is by contract a CLUSTER-level
+    # table -- Region and Rural are both cluster attributes -- so reading it out
+    # of a household file is inherently many-to-one (mean 24.8 households per
+    # cluster, range 3-120).  1993/_/data_info.yml therefore keeps `i: hhid` in
+    # idxvars to NAME the level that is collapsed away, and the policy below
+    # states how.
+    #
+    # Reducer `unique` = ASSERT-CONSTANT: Region/Rural must hold exactly one
+    # distinct value per (t, v), else the build RAISES.  Verified on the raw
+    # source: across all 355 clusters, `newprov` and `type` each have
+    # nunique == 1 -- 0/355 vary -- so groupby().first() is byte-identical to a
+    # full drop_duplicates (355 rows, .equals() == True) and the collapse is
+    # LOSSLESS.  `first` would give the right answer here only by accident of
+    # the data being clean; `unique` makes that accident a checked invariant, so
+    # a future wave (or a source revision) in which a cluster's attributes DO
+    # vary fails loudly instead of silently discarding one of them.
     index: (t, v)
     Region: str
     Rural: str
+    aggregation:
+      i: unique
 
   household_roster:
     index: (t, i, pid)
