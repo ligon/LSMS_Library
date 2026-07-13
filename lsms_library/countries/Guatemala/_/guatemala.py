@@ -1,9 +1,133 @@
 #!/usr/bin/env python
 
+import warnings
+
 import pandas as pd
 import pyreadstat
 import numpy as np
 import json
+
+
+# ---------------------------------------------------------------------------
+# Cluster identity (GH #323)
+#
+# ENCOVI 2000's primary sampling unit.  The survey DID release a PSU: the
+# household-level file CONSUMO5.DTA carries `upm` ("Unidad Primaria de
+# Muestreo") alongside the full geographic hierarchy depto/mupio/sector/
+# segmento.  Both CLAUDE.md's "Guatemala | No PSU/cluster variable in data" and
+# the old `v: region` wiring predate finding it -- the ECV*/HOGARES/PERSONAS
+# files carry only region+area, so the PSU was never looked for in the one
+# household-level file that actually has it.
+#
+# **Do NOT use the raw `upm` column.**  Stata stored it as a `float` (IEEE
+# single precision) and every value lies in ~1.0e8-2.2e9, far above float32's
+# exact-integer limit of 2**24 = 16,777,216.  The float32 ULP at those
+# magnitudes is 8-256, which destroys the low-order digits encoding `segmento`:
+# the 1,065 real PSUs collapse into only 847 distinct stored `upm` values, and
+# 201 of those values conflate two or more genuinely different PSUs (2,128
+# households).  Reading `upm` back therefore silently MERGES clusters -- a
+# smaller instance of the very bug this fix exists to remove.
+#
+# The faithful, uncorrupted reconstruction is the geographic composite built by
+# v() below.  Its components are small integers (mupio<=35, sector<=119,
+# segmento<=49) that float32 represents exactly.  Verified against the
+# 7,276-household frame:
+#   * 1,065 clusters; strictly refines the corrupt `upm` (no composite cell
+#     spans two upm values), so it is at least as fine and is clean.
+#   * 0 clusters contain both urban and rural households -> Rural is a genuine
+#     function of v, so cluster_features is well-posed.
+#   * 0 clusters span more than one region -> Region likewise.
+#   * the design weight `factor` is EXACTLY constant within every one of the
+#     1,065 clusters (0 with >1 distinct weight), as a two-stage design
+#     requires -- independent confirmation this is the true PSU.  The corrupt
+#     `upm` fails that test (17 of its 847 groups carry >1 weight).
+#   * median 6, max 16 households per cluster.
+# ---------------------------------------------------------------------------
+def v(value):
+    """Build the ENCOVI 2000 cluster (PSU) key from its geographic components.
+
+    Bound by the ``[depto, mupio, sector, segmento]`` list in data_info.yml
+    (df_data_grabber's "Trickier" form, as with Benin's composite ``i()``), so
+    ``value`` is the row's Series of those four columns.
+
+    ``depto`` is a Stata value-label (a department name, e.g. 'alta verapaz');
+    the others are small numeric codes, zero-padded here so keys sort sensibly
+    and cannot collide by digit-run ambiguity ('1-2-3' vs '12-3').
+    """
+    depto, mupio, sector, segmento = (value.iloc[k] for k in range(4))
+
+    # Missing any component => no identifiable cluster.  Return NA and let the
+    # row be handled explicitly downstream rather than silently bucketed into
+    # some wrong PSU.
+    if any(pd.isna(x) for x in (depto, mupio, sector, segmento)):
+        return pd.NA
+
+    return '{}-{:02d}-{:03d}-{:02d}'.format(
+        str(depto).strip(), int(mupio), int(sector), int(segmento))
+
+
+def cluster_features(df):
+    """Collapse the household-level extraction to exactly one row per PSU.
+
+    df_edit hook for ``cluster_features`` (GH #323).  The source file is
+    household-level (7,276 rows) but cluster_features' canonical index is
+    (t, v) -- one row per cluster.  The old wiring declared ``v: region`` (only
+    8 distinct values) *and* leaked ``i: hogar`` into idxvars, so the framework
+    received 7,276 rows on a declared (t, v) index and
+    ``_normalize_dataframe_index`` collapsed them with ``groupby().first()``.
+    Since every one of the 8 regions contains both urban and rural households,
+    that ``.first()`` was not a dedup but an ARBITRARY pick: it stamped 7
+    regions "Urban" and one "Rural" purely by row order, leaving 3,591 of 7,276
+    households (49.4%) in a cluster whose Rural flag contradicted their own.
+    That is silently-WRONG data, not merely missing.
+
+    With v = the true PSU, Rural and Region are genuine functions of v, so the
+    collapse is exact.  We do not *assume* that -- we ENFORCE it: if any
+    payload column ever varies within a cluster we raise, rather than silently
+    picking one value.  A comment is documentation; this is enforcement.
+    """
+    flat = df.reset_index()
+    if 'v' not in flat.columns:
+        raise ValueError(
+            "Guatemala cluster_features: no `v` level/column in the extracted "
+            f"frame (got {list(flat.columns)}).  Check idxvars in "
+            "2000/_/data_info.yml."
+        )
+
+    # Rows with no identifiable cluster cannot be placed.  Drop them LOUDLY:
+    # silently-missing beats silently-wrong, but neither should be silent.
+    unplaced = int(flat['v'].isna().sum())
+    if unplaced:
+        warnings.warn(
+            f"Guatemala cluster_features: dropping {unplaced} row(s) with no "
+            "identifiable PSU (missing depto/mupio/sector/segmento).",
+            RuntimeWarning,
+        )
+        flat = flat[flat['v'].notna()]
+
+    keys = [c for c in ('t', 'v') if c in flat.columns]
+    payload = [c for c in flat.columns if c not in keys and c != 'i']
+
+    # ENFORCE that every payload column is constant within a cluster, so the
+    # dedup below is provably lossless instead of an arbitrary pick.
+    if payload:
+        varying = (flat.groupby(keys, observed=True)[payload]
+                       .nunique(dropna=False)
+                       .max())
+        bad = [c for c in payload if int(varying.get(c, 0)) > 1]
+        if bad:
+            raise ValueError(
+                f"Guatemala cluster_features: column(s) {bad} are not constant "
+                "within a cluster (t, v).  Collapsing would silently discard "
+                "real variation (GH #323).  The PSU key or the column set is "
+                "wrong -- fix the wiring rather than letting groupby().first() "
+                "pick a value arbitrarily."
+            )
+
+    out = flat.drop_duplicates(subset=keys).set_index(keys)
+    return out.drop(columns=[c for c in ('i',) if c in out.columns])
+
+
 def _household_roster_from_df(df, sex, age, HHID, sex_converter=None, age_converter=None,
                                months_spent='months_spent', Age_ints=None):
     """Inline replacement for lsms.tools.get_household_roster(fn_type=None)."""

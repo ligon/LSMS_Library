@@ -241,7 +241,8 @@ Some countries have configs but no source `.dta` in the repository:
 | Nepal            | NSO hosts data, not WB            | https://microdata.nsonepal.gov.np/ (free registration)       |
 | Armenia          | No data files downloaded          | WB catalog, external hosting                                 |
 | Timor-Leste 2001 | No `_/` config for this wave      | WB catalog                                                   |
-| Guatemala        | No PSU/cluster variable in data   | ENCOVI 2000 design                                           |
+
+> **Guatemala was listed here as "No PSU/cluster variable in data" — that was wrong** (corrected 2026-07, GH #323). ENCOVI 2000 *does* identify its primary sampling unit; the PSU just lives in `CONSUMO5.DTA` (which carries `upm` plus the full `depto`/`mupio`/`sector`/`segmento` hierarchy and joins 1:1 on `hogar`), while the `ECV*`/`HOGARES`/`PERSONAS` files everyone checked carry only `region` + `area`. Guatemala's `v` is now the composite `depto-mupio-sector-segmento` (1,065 clusters). **Do not use the raw `upm` column**: Stata stored it as float32 and every value exceeds 2^24, so the digits encoding `segmento` are rounded away — 201 `upm` values silently conflate distinct PSUs. See `countries/Guatemala/_/guatemala.py`.
 
 ## Design / Skunkworks References
 
