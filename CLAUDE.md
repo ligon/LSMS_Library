@@ -89,6 +89,35 @@ There are two ways a table gets built at the wave level.
 
 **Rule of thumb**: column mappings from one source file per wave → YAML. Cross-file concatenation, per-row `t` assignment, or multi-wave source files → script with `materialize: make`.
 
+### A script is a complication. Go read about it before you edit.
+
+**`materialize: make` exists because someone decided YAML could not express this table.** That decision is a *survey idiosyncrasy*, and the script is the scar tissue. So the build path is a mechanical, always-current signal of where the complications are — you never have to guess:
+
+```sh
+grep -c 'materialize: make\|!make' lsms_library/countries/{C}/_/data_scheme.yml
+```
+
+**BEFORE editing any script-path table, read the country's `_/CONTENTS.org` and the script's own docstring. Then say what you found.** Not "I checked" — *what the idiosyncrasy is*. If you cannot name it, you have not looked.
+
+This is not optional politeness. Two examples from the GH #323 sweep, both of which would have shipped silent corruption:
+- **Nigeria** is post-planting/post-harvest: every wave dir holds *two* rounds needing *distinct* `t` values. A cluster-key rekey that isn't round-invariant silently moves households between clusters across rounds. (`.claude/skills/add-feature/pp-ph/SKILL.md` — "the single most common source of duplicate-index bugs in these countries.")
+- **Tanzania**'s `2008-15/` is *one folder, four rounds* via `wave_folder_map`. A fix reasoning about "a household's two panel lines" has a two-round assumption baked into a four-round folder.
+
+The signals corroborate each other — script count tracks documentation length, because the countries that needed scripts are the ones that needed explaining:
+
+| | script-path tables | `CONTENTS.org` |
+|---|---|---|
+| Nigeria | 22 | 256 lines |
+| Ethiopia | 19 | 602 |
+| Uganda | 18 | 257 |
+| Tanzania | 18 | 971 |
+| Malawi | 11 | 497 |
+| Iraq / Guyana / Kosovo | 1–2 | 9–13 |
+
+**Deliberately NOT centralized.** There is no master table of "weird things about country X", and there should not be — it would drift out of sync with the `CONTENTS.org` files and become a second source of truth that lies. The docs live next to the code so they stay honest. The cost of that choice is that **you have to go look**, which is what this section exists to make you do.
+
+*Known gap*: `Senegal/_/CONTENTS.org` is a stub (a TODO list, not idiosyncrasy docs) despite 7 script-path tables. Treat Senegal with extra care and write up what you learn.
+
 ## Data Access
 
 Microdata must be obtained from the [World Bank Microdata Library](https://microdata.worldbank.org/) under their terms of use. Contributors pushing write access need GPG/PGP keys.
