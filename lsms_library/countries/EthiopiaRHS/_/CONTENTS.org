@@ -260,6 +260,53 @@ files are the R6 slice.
   R6/R7 area_output PAs 21-23 (extra Debre-Birhan sub-sites not in the
   erhs_village_* Code tables -> NaN Region/Woreda/v).
 
+* food_acquired grain: repeat lines, double-punches (GH #323)
+
+The q36 food module is a ONE-ROW-PER-FOOD-ITEM roster.  All 27 source
+columns were enumerated: there is NO line / transaction / occasion /
+visit identifier (=q36_1a= is a section flag, 1.0/NaN/2.0, NOT a line
+number).  So =(t, i, j, u, s)= IS the maximal grain the instrument
+supports -- there is no finer axis to name, and none should be invented.
+
+The roster nevertheless carries MULTIPLE LINES per (household, item).
+Most differ in UNIT (=u= is in the index, so they do not collide and are
+preserved).  The rest split two ways, and the distinction is
+load-bearing:
+
+- 127 rows (1994a-1997) are a second acquisition of the SAME item, in
+  the SAME unit, from the SAME source, carrying DIFFERENT measurements
+  (1997 hh 10_93 produced Berbere 1.0 kg AND 30.0 kg).  These are REAL,
+  and core already handles them: =food_acquired= is in =feature.py='s
+  =_ADDITIVE_MEASURE_COLUMNS=, so the collapse to the canonical grain
+  SUMS Quantity and Expenditure.  (=first= would destroy ~50% of the
+  Quantity/Expenditure mass in the affected cells.)
+
+- 90 rows are byte-identical in the canonical grain AND in both measures
+  -- one measurement punched twice (food89.dta rows 865/866 are identical
+  in EVERY source column: hh 20120, foodcode 34, qty 2.0, unit 9, value
+  0.5).  Because the collapse SUMS, these are DOUBLE-COUNTED (the API
+  reported Fenugreek 4.0/1.0 for that household).
+  =ethiopiarhs.food_acquired= drops them via =_drop_double_punched()=
+  BEFORE the framework sums: 514.9 Quantity and 343.1 Birr of
+  overstatement removed.
+
+The dedup is what makes the sum correct.  The sum is unconditional (it is
+core's, not this country's, and it is right for the 127 real repeats);
+without the dedup, the 90 punch-duplicates are counted twice.
+
+JUDGMENT CALL: a household *could* genuinely acquire the same item, same
+unit, same source, same amount, same price, twice in a recall week; the
+instrument records no axis on which such rows differ, so the data cannot
+settle it.  We drop (conservative).  Being wrong understates by 90 rows
+(silently missing); summing overstates (silently wrong), and the latter
+is the worse failure.
+
+Also: the wide melt path now filters missing =j= (as the 1989 path always
+did).  11 NaN-j rows (1995) were previously deleted by accident --
+=groupby(level=...)= defaults to =dropna=True=, so a NaN index key
+silently vanishes during the collapse.  The item is unidentifiable, so
+the row is now dropped deliberately rather than by pandas' default.
+
 * Food security (non-FIES families, GH #332) --- not wired
 
 ERHS carries only bespoke, non-standardized food-stress items (IFPRI

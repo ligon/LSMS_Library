@@ -87,6 +87,48 @@ def i(value):
     return tools.format_id(value)
 
 
+#: Canonical grain of `food_acquired` (less `t`, which the framework prepends).
+_FOOD_GRAIN = ['i', 'j', 'u', 's']
+#: The measures that ride on that grain.
+_FOOD_MEASURES = ['Quantity', 'Expenditure']
+
+
+def _drop_double_punched(flat):
+    """Drop food rows that are INDISTINGUISHABLE in the canonical grain.
+
+    GH #323.  The ERHS q36 food module is a one-row-per-food-item roster with
+    NO line / transaction / occasion identifier -- all 27 source columns were
+    enumerated; q36_1a is a section flag, not a line number.  So two rows equal
+    on (i, j, u, s) AND on Quantity AND on Expenditure are not a second,
+    distinguishable acquisition: they are the SAME measurement recorded twice
+    (a data-entry double-punch -- e.g. food89.dta rows 865/866 are identical in
+    EVERY source column, incl. unrelated household-level fields).
+
+    This must happen BEFORE the framework collapses the canonical index, because
+    that collapse SUMS the additive measures: `food_acquired` is in feature.py's
+    `_ADDITIVE_MEASURE_COLUMNS`, so the sum is unconditional core behaviour (GH
+    #501/#514) -- not something this country opts into.  Left in, these rows are
+    silently DOUBLE-COUNTED: 1989 hh 20120 Fenugreek reports Quantity 4.0 / 1.0
+    Birr where the source recorded 2.0 / 0.5.  Across the five roster waves that
+    is 90 rows, 514.9 Quantity and 343.1 Birr of pure overstatement.
+
+    Rows that DIFFER in Quantity or Expenditure are NOT touched -- those are
+    real repeat measurements (a household that produced Berbere 1.0 kg and
+    30.0 kg) and core's `sum` correctly folds them together.
+
+    JUDGMENT CALL, stated plainly: a household *could* genuinely acquire the
+    same item, same unit, same source, same amount, at the same price, twice in
+    one recall week; the instrument cannot rule it out, because it records no
+    axis on which the two rows differ.  We take the conservative reading and
+    drop.  If that call is wrong we UNDERSTATE by these rows (class-2, silently
+    missing); summing them OVERSTATES (class-1, silently wrong) -- and for rows
+    that are identical on every recorded axis, asserting "two distinct events"
+    is the stronger, less defensible claim.
+    """
+    subset = [c for c in _FOOD_GRAIN + _FOOD_MEASURES if c in flat.columns]
+    return flat.drop_duplicates(subset=subset)
+
+
 def food_acquired(df):
     """Melt ERHS wide per-source food columns into canonical long form.
 
@@ -127,6 +169,7 @@ def food_acquired(df):
         # would need Codeunit1.SPS).
         if 'u' in flat.columns:
             flat['u'] = flat['u'].astype('string').str.strip()
+        flat = _drop_double_punched(flat)
         return flat.set_index(idx)
 
     w = df.reset_index()
@@ -160,6 +203,17 @@ def food_acquired(df):
     out['u'] = out['u'].astype('string').str.strip()
     out = out[out['i'].notna()]
     out = out[out['u'].notna() & (out['u'] != '')]
+    # Drop rows with no FOOD id.  `j` is an index level, so a NaN here cannot be
+    # placed on the item axis at all.  The 1989 path above already filters j;
+    # this path did not, leaking 11 NaN-j rows (1995) that pandas then deleted
+    # by accident -- groupby(level=...) defaults to dropna=True, so any row with
+    # a NaN index key silently VANISHES during the canonical-index collapse
+    # (GH #323, and it only bites when the index happens to be non-unique).
+    # Dropping them here makes an accident an intentional, symmetric decision:
+    # the item is unidentifiable, so the row is dropped LOUDLY rather than
+    # guessed at.  Output is unchanged; the honesty is the point.
+    out = out[out['j'].notna()]
+    out = _drop_double_punched(out)
     out = out.set_index(['i', 'j', 'u', 's'])
     return out
 
