@@ -10,32 +10,20 @@ Data Scheme:
     Rural: str
 
   cluster_features:
-    # Latitude / Longitude are `optional:` because the source they come from is
-    # NOT in the shipped distribution -- NOT because CotedIvoire lacks cluster
-    # GPS.  It has it: 2018-19/_/data_info.yml wires `df_geo` to
-    # Menage/grappe_gps_CIV2018.dta (1084 grappes; columns grappe,
-    # coordonnes_gps__Latitude, coordonnes_gps__Longitude), and that wiring is
-    # correct -- the column names match the file exactly.  The problem is that
-    # this one file was never `dvc add`ed: it carries no .dvc sidecar, whereas
-    # every EHCVM sibling (Senegal / Mali / Niger / Burkina_Faso / Benin / Togo
-    # / Guinea-Bissau) has grappe_gps_<iso>2018.dta.dvc.  So in any clean
-    # checkout the file is simply absent, the GH #515 optional-sub-df fallback
-    # in country.py swallows the resulting PathMissingError, and Lat/Lon drop
-    # out silently.
-    #
-    # REMEDY (needs a human with S3 write creds -- it publishes a new blob to
-    # the shared dataset): `dvc add` + `dvc push` the GPS file, then delete the
-    # two `optional:` markers below.  No other change is required; the columns
-    # will flow through the existing df_geo merge as soon as the file resolves.
+    # Latitude / Longitude come from the df_geo merge wired in
+    # 2018-19/_/data_info.yml -> Menage/grappe_gps_CIV2018.dta (1084 grappes;
+    # columns grappe, coordonnes_gps__Latitude, coordonnes_gps__Longitude).
+    # Until 2026-07-13 that one file carried NO .dvc sidecar -- unlike every
+    # EHCVM sibling -- so in a clean checkout it was simply absent, the GH #515
+    # optional-sub-df fallback swallowed the PathMissingError, and Lat/Lon
+    # dropped out silently.  It is now DVC-tracked, so they are REQUIRED again.
     index: (t, v)
     Region: str
     Rural: str
     Latitude:
       type: float
-      optional: true
     Longitude:
       type: float
-      optional: true
 
   household_roster:
     index: (t, i, pid)
