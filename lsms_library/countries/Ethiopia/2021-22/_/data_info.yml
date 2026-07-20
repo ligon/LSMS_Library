@@ -1,6 +1,22 @@
 Country: Ethiopia
 Wave: 2021-22
 
+# cluster_features (GH #323 site 4).  Both sources are HOUSEHOLD-grain, so
+# they are merged on household_id (1:1 -- unique and blank-free in BOTH frames:
+# 4,959 cover rows / 4,890 geo rows, 0 keys duplicated in both) and reduced to
+# the (t, v) EA grain by Wave.cluster_features' existing GH #161 collapse --
+# mean() for Latitude/Longitude (the cluster centroid), first() for
+# Region/District/Rural.  That is why `i` is in `final_index`: the collapse
+# only fires when `i` is an index level.
+#
+# The W5 geo file has NO ea_id column AT ALL -- it is keyed on household_id
+# only (52 columns, checked).  So the old `v: ea_id` idxvar on df_geo asked it
+# for a column it does not have; the KeyError was swallowed by the GH #515
+# optional-sub-df fallback and cluster_features was served with
+# Latitude/Longitude 100% absent.  The COORDINATES themselves were never
+# missing: lat_dd_mod / lon_dd_mod are present and non-null for 4,847 of the
+# 4,890 rows.  It was the KEY that was wrong, not the data -- so this is wired
+# up, NOT marked optional.  Joining on household_id lets the cover supply v.
 cluster_features:
     dfs:
         - df_main
@@ -9,6 +25,7 @@ cluster_features:
         file: sect_cover_hh_w5.dta
         idxvars:
             v: ea_id
+            i: household_id
         myvars:
             Region: saq01
             District: saq02
@@ -24,17 +41,24 @@ cluster_features:
                     urban: Urban
                     2. URBAN: Urban
     df_geo:
+        # Keyed on household_id ONLY -- this file carries no ea_id.
         file: eth_householdgeovariables_y5.dta
         idxvars:
-            v: ea_id
+            i: household_id
         myvars:
             Latitude: lat_dd_mod
             Longitude: lon_dd_mod
     merge_on:
-        - v
+        - i
+    # The cover page is authoritative for which households exist; the geo file
+    # is a strict enrichment and carries 35 households the cover does not.
+    # `left` keeps those orphans from arriving with a null v and collapsing
+    # into one phantom cluster.
+    merge_how: left
     final_index:
         - t
         - v
+        - i
 
 panel_ids:
     file:

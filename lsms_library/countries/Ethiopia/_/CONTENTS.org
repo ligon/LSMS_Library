@@ -454,6 +454,54 @@ We therefore DEFER Latitude/Longitude -- they are NOT emitted.  Note
 the GPS-*measured field area* (square metres; =pp_s3q05_a= W1-W3,
 =s3q08= W4-W5) is NOT redacted and is the primary Area source.
 
+This applies to =plot_features= ONLY.  The HOUSEHOLD geovariables
+files are a different release and DO carry usable (offset) coordinates
+-- see the next section.  Do not conflate the two.
+
+** Household geovariables: four spellings across five waves (GH #323)
+
+=cluster_features= gets its Latitude/Longitude from the per-wave
+household geovariables file.  The coordinates are the WB's standard
+*modified* (randomly offset) decimal degrees -- real and usable at the
+EA/cluster grain, and NOT redacted like the plot GPS above.
+
+The catch: the WB renamed the coordinate columns in almost every wave,
+and W5 dropped the EA key entirely.  All four variants are live:
+
+| Wave    | Geovariables file                     | Lat / Lon columns          | Keys present            |
+|---------+---------------------------------------+----------------------------+-------------------------|
+| 2011-12 | =Pub_ETH_HouseholdGeovariables_Y1=    | =LAT_DD_MOD= / =LON_DD_MOD= (UPPERCASE!) | household_id, ea_id     |
+| 2013-14 | =Pub_ETH_HouseholdGeovars_Y2=         | =lat_dd_mod= / =lon_dd_mod= | household_id(2), ea_id(2) |
+| 2015-16 | =ETH_HouseholdGeovars_y3=             | =lat_dd_mod= / =lon_dd_mod= | household_id2, ea_id2   |
+| 2018-19 | =ETH_HouseholdGeovariables_Y4=        | =lat_mod= / =lon_mod= (no =_dd_=!) | household_id, ea_id     |
+| 2021-22 | =eth_householdgeovariables_y5=        | =lat_dd_mod= / =lon_dd_mod= | household_id ONLY -- *no ea_id* |
+
+Every one of these files is HOUSEHOLD-grain, not EA-grain.  So
+=cluster_features= merges the cover page to the geo file on the
+HOUSEHOLD id (1:1; unique and blank-free in both frames in all five
+waves) and lets =Wave.cluster_features='s GH #161 collapse reduce to
+the =(t, v)= EA grain -- =mean()= for Latitude/Longitude (the cluster
+centroid), =first()= for Region/District/Rural.  This is why =i= is in
+each wave's =final_index=: that collapse only fires when =i= is an
+index level.
+
+Merging on the CLUSTER key =v= instead -- which is what the config used
+to do -- is a many-to-many join and produces a CARTESIAN PRODUCT
+(2013-14: 5,262 x 5,287 households over 433 EAs -> 65,508 rows, 60,221
+of them phantom; 2015-16: 57,786 rows, 52,832 phantom).  The downstream
+=groupby().first()= then tidied the evidence away, so the table
+reported clean.  Use =household_id2= for W2/W3, NOT =household_id=:
+the latter is the W1 baseline id and is BLANK for households new to the
+panel, so re-keying to it would trade an EA cartesian for a NULL-KEY
+cartesian.
+
+=merge_how: left= is declared in all five waves: the cover page is
+authoritative for which households exist, and the geo file carries
+households the cover does not (W2 25, W4 124, W5 35).  Under the
+default =outer= those orphans arrive with a null =v= and collapse into
+one phantom cluster -- W2 gained a spurious 434th EA
+(=030412088800105=) exactly this way.
+
 ** Area and the local-unit gap
 
 Area is GPS square-metres / 10000 -> hectares where present
