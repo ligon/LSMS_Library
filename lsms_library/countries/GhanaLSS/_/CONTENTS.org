@@ -80,7 +80,7 @@ without an explicit mapping file.
 |--------+--------------------+----------+----------------------------------|
 | GLSS1  | ---                | ---      | Not available                    |
 | GLSS2  | ---                | ---      | Not available                    |
-| GLSS3  | =POV_GH.DTA=      | =loc2=   | 1=Semi-urban, 2=Rural (numeric)  |
+| GLSS3  | =POV_GH.DTA=      | =loc2=   | 1=Urban, 2=Rural (numeric)       |
 | GLSS4  | =SEC0A.DTA=        | =loc2=   | 1=Urban, 2=Rural (numeric)       |
 | GLSS5  | ---                | ---      | Not in cover page; in =pov_gh5=  |
 | GLSS6  | =g6loc_edt.dta=    | =loc2=   | Rural, Urban (string)            |

@@ -68,6 +68,62 @@ _API_DERIVED_COLUMNS: dict[str, set[str]] = _load_api_derived()
 
 
 # ---------------------------------------------------------------------------
+# Declared value vocabularies (data_info.yml `spellings`)
+# ---------------------------------------------------------------------------
+
+def _load_declared_vocabularies() -> dict[str, dict[str, tuple[frozenset, dict]]]:
+    """Return ``{table: {column: (vocabulary, variant_map)}}`` from data_info.yml.
+
+    For every column carrying a ``spellings`` block, the *vocabulary* is the set
+    of canonical keys and the *variant_map* is the ``{variant: canonical}``
+    inverse used by ``country._enforce_canonical_spellings``.
+
+    This deliberately does **not** reuse ``country._load_canonical_spellings()``:
+    that function drops any column whose variant lists are all empty (its final
+    ``if variant_map:`` guard), which would silently exclude ``Affinity``,
+    ``Tenure`` and ``TenureSystem`` — columns that declare a canonical
+    vocabulary but no spelling variants.  The vocabulary is ``spellings.keys()``,
+    and it is a constraint whether or not any variants happen to be listed.
+
+    Keyed by **(table, column)**, never by column name alone: ``housing.Tenure``
+    is a legitimately different vocabulary (dwelling tenure) from
+    ``plot_features.Tenure`` (land tenure), and ``housing`` declares none.
+    """
+    from importlib.resources import files
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            info = _yaml.safe_load(f)
+    except (OSError, _yaml.YAMLError):
+        # Missing or malformed data_info.yml -> no declared vocabularies.
+        # Programmer bugs (TypeError, AttributeError) propagate.
+        return {}
+    result: dict[str, dict[str, tuple[frozenset, dict]]] = {}
+    for table, cols in (info or {}).get("Columns", {}).items():
+        if not isinstance(cols, dict):
+            continue
+        for col, meta in cols.items():
+            if not isinstance(meta, dict):
+                continue
+            spellings = meta.get("spellings")
+            if not isinstance(spellings, dict) or not spellings:
+                continue
+            variant_map = {
+                v: canonical
+                for canonical, variants in spellings.items()
+                for v in (variants or [])
+            }
+            result.setdefault(table, {})[col] = (
+                frozenset(spellings.keys()), variant_map,
+            )
+    return result
+
+
+_DECLARED_VOCABULARIES: dict[str, dict[str, tuple[frozenset, dict]]] = \
+    _load_declared_vocabularies()
+
+
+# ---------------------------------------------------------------------------
 # Report dataclass
 # ---------------------------------------------------------------------------
 
@@ -389,6 +445,63 @@ def _check_value_constraints(df: pd.DataFrame, scheme: dict, feature: str) -> Ch
                  f"{len(constrained)} constrained column(s) — all values valid")
 
 
+def _check_declared_spellings(df: pd.DataFrame, feature: str) -> Check:
+    """Fail if a column's values fall outside the vocabulary declared in data_info.yml.
+
+    ``_enforce_canonical_spellings`` *maps* known variants to their canonical
+    form but never *rejects* unknown ones, so a value the schema never declared
+    (Uganda's literal ``'0'`` for ``sample.Rural``; Malawi's ``'0.0'``/``'1.0'``
+    for ``cluster_features.Rural``) flows straight through to the user.  The
+    idiomatic filter ``df[df['Rural'] == 'Rural']`` then silently returns zero
+    rows.  This check closes that gap: a declared vocabulary is a constraint,
+    and violating it is a ``fail``.
+
+    Membership is tested **after** applying the variant map, exactly as
+    ``_enforce_canonical_spellings`` would, so the check is correct on both
+    pre-``_finalize_result`` cached parquets (which ``tests/test_table_structure``
+    reads directly, and which legitimately hold known variants such as Malawi's
+    ``rural``/``RURAL``) and post-finalize API frames.
+    """
+    vocabularies = _DECLARED_VOCABULARIES.get(feature, {})
+    if not vocabularies:
+        return Check("declared_spellings", "pass",
+                     "No declared vocabulary for this table (skipped)")
+
+    issues = []
+    checked = []
+    for col, (vocabulary, variant_map) in vocabularies.items():
+        if col in df.columns:
+            values = df[col]
+        elif col in (df.index.names or []):
+            values = pd.Series(df.index.get_level_values(col))
+        else:
+            continue  # column absent for this country — not a violation
+        checked.append(col)
+
+        # Mirror _enforce_canonical_spellings' normalization, then test membership.
+        if isinstance(values.dtype, pd.CategoricalDtype):
+            values = values.astype("string")
+        normalized = values.replace(variant_map).dropna()
+        offending = normalized[~normalized.isin(vocabulary)]
+        if offending.empty:
+            continue
+        counts = offending.value_counts()
+        shown = ", ".join(f"{v!r} ({n})" for v, n in counts.head(5).items())
+        more = f", +{len(counts) - 5} more" if len(counts) > 5 else ""
+        issues.append(
+            f"{col}: {len(offending)}/{len(normalized)} value(s) outside declared "
+            f"vocabulary {sorted(vocabulary)}: {shown}{more}"
+        )
+
+    if issues:
+        return Check("declared_spellings", "fail", "; ".join(issues))
+    if not checked:
+        return Check("declared_spellings", "pass",
+                     "No constrained columns present (skipped)")
+    return Check("declared_spellings", "pass",
+                 f"{len(checked)} column(s) match declared vocabulary: {sorted(checked)}")
+
+
 def _check_duplicate_index(df: pd.DataFrame) -> Check:
     """Flag high rates of duplicate index entries."""
     if not df.index.has_duplicates:
@@ -646,6 +759,7 @@ def is_this_feature_sane(
     report.checks.append(_check_declared_columns(df, scheme, feature))
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
     report.checks.append(_check_value_constraints(df, scheme, feature))
+    report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))
     report.checks.append(_check_float_stringified_index(df))
     report.checks.append(_check_ids_format_id_canonical(df))
@@ -872,6 +986,7 @@ def validate_feature(
     report.checks.append(_check_declared_columns(df, scheme, feature))
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
     report.checks.append(_check_value_constraints(df, scheme, feature))
+    report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))
 
     # --- New wave present? --------------------------------------------------

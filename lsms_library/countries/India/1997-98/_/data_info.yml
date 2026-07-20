@@ -10,20 +10,31 @@ sample:
         v: village
         weight: weight
         panel_weight: weight
+        # Raw `stratum` is a STRING column with exactly four values --
+        # 'UP-qual', 'UP-other', ' B-qual', ' B-other' (note the leading space
+        # on the Bihar pair).  It is a state x sampling-phase stratum and is
+        # perfectly collinear with `state` (UP vs Bihar); crosstab confirms
+        # every ' B-*' row is Bihar and every 'UP-*' row is Uttar Pradesh.
+        #
+        # It carries NO urban/rural information.  The float-keyed mapping that
+        # used to sit here (1.0: 'Urban Poor' ... 4.0: 'Rural Non-Poor', and a
+        # parallel one deriving `Rural`) never matched a single row -- the keys
+        # are floats, the data are strings -- so `Rural` reached the user as the
+        # raw stratum label ('UP-other', ' B-qual', ...) for 100% of households.
+        # See GH #602.
+        #
+        # `Rural` is therefore DELETED rather than re-mapped: there is no
+        # urban/rural variable in this survey to derive it from, and inventing
+        # one (e.g. asserting the survey is rural-only) would replace a visibly
+        # wrong value with an invisibly wrong one.  India simply has no Rural
+        # indicator.  Only the whitespace is normalised on `strata` below.
         strata:
             - stratum
             - mapping:
-                1.0: Urban Poor
-                2.0: Urban Non-Poor
-                3.0: Rural Poor
-                4.0: Rural Non-Poor
-        Rural:
-            - stratum
-            - mapping:
-                1.0: Urban
-                2.0: Urban
-                3.0: Rural
-                4.0: Rural
+                'UP-qual': UP-qual
+                'UP-other': UP-other
+                ' B-qual': B-qual
+                ' B-other': B-other
 
 cluster_features:
   file:

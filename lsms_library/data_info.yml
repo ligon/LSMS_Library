@@ -125,6 +125,33 @@ Columns:
         unrelated: []
         guest: []
         servant: []
+  sample:
+    # `sample` was historically absent from this section, which made
+    # _enforce_canonical_spellings a complete no-op on sample() -- it did not
+    # merely fail to reject unknown values, it never even mapped the *known*
+    # variants.  That is why Tajikistan shipped 9,020 rows of lowercase
+    # 'rural'/'urban' sitting next to canonical 'Rural'/'Urban'.  GH #602.
+    #
+    # Rural is deliberately NOT `required: true`: many countries' sample table
+    # carries only (v, weight, strata) and has no urban/rural indicator at all.
+    Rural:
+      type: str
+      spellings:
+        # Same vocabulary as cluster_features.Rural below -- one concept, one
+        # canonical spelling, wherever it appears.
+        # French (EHCVM) and Portuguese (Guinea-Bissau) labels are accepted
+        # variants of the same concept -- the survey language should not change
+        # the canonical value the user filters on.  GH #602.
+        Rural: [rural, RURAL, Rurale, rurale, RURALE, Rural (zone rurale)]
+        Urban: [urban, URBAN, Urbain, urbain, URBAIN, Urbano, urbano, URBANO]
+        # Third settlement stratum, used only by South Africa 1993 (PSLSD),
+        # whose sampling frame classifies areas as urban / rural / informal
+        # (squatter settlement).  It is deliberately NOT folded into Urban:
+        # the source's own `metro` variable groups these households with the
+        # non-metro areas (type=3 is entirely metro=3, whereas the urban
+        # stratum is entirely metro=1), so there is no evidence they are urban.
+        # Kept as a distinct, VISIBLE value rather than guessed away.  GH #602.
+        Informal: []
   cluster_features:
     Region:
       type: str
@@ -136,8 +163,19 @@ Columns:
         # Canonical values are 'Rural' / 'Urban' (capitalised).  Some
         # wave-level extractions emit lowercase; normalise here via the
         # standard spellings path.  GH #163.
-        Rural: [rural, RURAL]
-        Urban: [urban, URBAN]
+        # French (EHCVM) and Portuguese (Guinea-Bissau) labels are accepted
+        # variants of the same concept -- the survey language should not change
+        # the canonical value the user filters on.  GH #602.
+        Rural: [rural, RURAL, Rurale, rurale, RURALE, Rural (zone rurale)]
+        Urban: [urban, URBAN, Urbain, urbain, URBAIN, Urbano, urbano, URBANO]
+        # Third settlement stratum, used only by South Africa 1993 (PSLSD),
+        # whose sampling frame classifies areas as urban / rural / informal
+        # (squatter settlement).  It is deliberately NOT folded into Urban:
+        # the source's own `metro` variable groups these households with the
+        # non-metro areas (type=3 is entirely metro=3, whereas the urban
+        # stratum is entirely metro=1), so there is no evidence they are urban.
+        # Kept as a distinct, VISIBLE value rather than guessed away.  GH #602.
+        Informal: []
     District:
       type: str
     Latitude:

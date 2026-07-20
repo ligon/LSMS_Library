@@ -62,13 +62,16 @@ cluster_features:
         myvars:
             Region: region
             District: district
-            Rural:
-                - reside
-                - mapping:
-                    Rural: 0
-                    Urban: 1
-                    RURAL: 1
-                    URBAN: 0
+            # Raw `reside` is already a declared spelling of the canonical
+            # Rural/Urban vocabulary in every Malawi wave ('Rural'/'Urban',
+            # 'rural'/'urban', 'RURAL'/'URBAN' -- the case differs between the
+            # Cross_Sectional and Panel files).  Pass it through and let
+            # _enforce_canonical_spellings normalise it.  The `mapping:` blocks
+            # that used to sit here converted these good labels into 0/1 and
+            # got the DIRECTION WRONG: because the two source files disagree on
+            # case, 2016-17 and 2019-20 mapped rural households to BOTH codes,
+            # sign-flipping the indicator between waves.  GH #602.
+            Rural: reside
     df_geo:
         file: Cross_Sectional/householdgeovariables_ihs5.dta
         idxvars:
