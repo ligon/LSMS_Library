@@ -1351,33 +1351,13 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
 # for *post-read* transforms (Country._finalize_result, kinship expansion,
 # canonical spellings, automatic categorical mappings, _join_v_from_sample)
 # -- those re-run on every read and never touch the cached parquet.
-# Bumped 1 -> 2 (GH #323): the grain-collapse audit.  Every L2-country parquet
-# written before this bump was written POST-collapse by a build that could not
-# report what it had destroyed, and carries no ``lsms_grain_audit`` stamp -- so
-# on a warm cache the audit would never run and the fix would be invisible on
-# exactly the machines where the bug is already baked in.  Bumping the schema
-# makes those parquets stale, forcing one rebuild that audits and stamps them.
-LSMS_CACHE_SCHEMA = 2
+LSMS_CACHE_SCHEMA = 1
 
 # Schema-metadata key under which the content hash is embedded.  Embedding
 # (rather than a ``{parquet}.hash`` sidecar) means the hash rotates
 # atomically with the parquet via os.replace, can never desync from its
 # data, and is removed together with the parquet by ``cache clear``.
 _CACHE_HASH_KEY = b"lsms_cache_hash"
-
-# GH #323.  Schema-metadata key under which the grain-collapse audit is
-# embedded, alongside the content hash and by the same argument (rotates
-# atomically with the data; cannot desync; removed by ``cache clear``).
-#
-# WHY THIS EXISTS -- the mechanism that hid GH #323 for two closures:
-# ``_normalize_dataframe_index`` collapses a non-unique declared index and can
-# only detect that while it still holds the PRE-collapse frame.  The parquet it
-# then writes is POST-collapse, so on every subsequent (warm) read the index is
-# already unique, the ``not df.index.is_unique`` gate is False, and the warning
-# is *structurally unable to fire*.  The bug hid behind the cache that the bug
-# poisoned.  Persisting the audit here -- and re-emitting it on the warm read --
-# is what makes the signal outlive the destruction it describes.
-_GRAIN_AUDIT_KEY = b"lsms_grain_audit"
 
 # Extensions treated as survey source data when scanning script-path
 # tables for literal file references.
@@ -1503,39 +1483,6 @@ def read_parquet_cache_hash(path: str | Path) -> str | None:
     return raw
 
 
-def read_parquet_grain_audit(path: str | Path) -> list[dict] | None:
-    """Return the grain-collapse audit embedded in an L2 parquet (GH #323).
-
-    A list of report dicts (see ``country._audit_index_collapse``), or ``None``
-    when the parquet carries no stamp (written by a pre-#323 build, or by a
-    build in which nothing was collapsed).
-
-    Reads only the footer (``read_schema``), so cost is ~1 ms regardless of row
-    count -- safe on the L2 warm-read hot path, which is the whole point: this
-    is what lets a warm read re-emit a warning about a destruction that happened
-    during some *earlier* cold build.
-    """
-    try:
-        import pyarrow.parquet as pq
-        md = pq.read_schema(str(path)).metadata
-    except (OSError, ArrowInvalid):
-        return None
-    except Exception:
-        return None
-    if not md:
-        return None
-    raw = md.get(_GRAIN_AUDIT_KEY)
-    if raw is None:
-        return None
-    if isinstance(raw, (bytes, bytearray)):
-        raw = raw.decode()
-    try:
-        reports = json.loads(raw)
-    except (ValueError, TypeError):
-        return None
-    return reports if isinstance(reports, list) else None
-
-
 def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
     """Classify an L2 parquet against the expected content hash.
 
@@ -1591,7 +1538,7 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         return False
 
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None) -> pd.DataFrame:
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
@@ -1615,11 +1562,6 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         content hash for staleness detection (see :func:`cache_freshness`).
         ``None`` writes a plain parquet (e.g. wave-script outputs, which
         are stamped trust-once on first read instead).
-    grain_audit : list[dict] | None, default None
-        If given, embed this grain-collapse audit under ``lsms_grain_audit``
-        (GH #323) so a warm read can re-emit a warning about rows destroyed
-        during the cold build that produced this parquet.  See
-        :func:`read_parquet_grain_audit`.
     """
     if not absolute_path:
         fn = _resolve_data_path(fn)
@@ -1653,17 +1595,11 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit:
+    if cache_hash is not None:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
-        if cache_hash is not None:
-            md[_CACHE_HASH_KEY] = cache_hash.encode()
-        if grain_audit:
-            # GH #323: carry the collapse report with the data it describes,
-            # so the warm read can re-emit it (the pre-collapse frame that
-            # proved the loss is long gone by then).
-            md[_GRAIN_AUDIT_KEY] = json.dumps(grain_audit).encode()
+        md[_CACHE_HASH_KEY] = cache_hash.encode()
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, fn)
     else:

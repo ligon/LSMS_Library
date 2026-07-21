@@ -183,66 +183,10 @@ footguns; they become lossless union+sentinel.
    Malawi+ERHS =crop_production= =Feature= does not even reconcile today.
 3. Flip =_harmonize_country_frame= and =_normalize= from reduce-to-common
    to expand-to-union + sentinel-fill; retire both =.first()= collapses.
-   *[PARTIAL -- GH #323 framework fix.  See "3a" below.]*
 4. =transformations.collapse(df, grain=, policy=)= + the =data_info.yml=
    =aggregation:= block; expose as a =Feature= method / =grain= kwarg.
 5. =food_expenditures= becomes a =collapse= recipe; audit features for
    the now-loud "would have collapsed" cases.
-
-** 3a. What the #323 framework fix actually landed (and what it did NOT)
-
-*LANDED.*  Both =.first()= collapses are now AUDITED BEFORE THEY DESTROY
-ANYTHING, and a destructive collapse is LOUD (=GrainCollapseWarning=) or FATAL
-(=LSMS_GRAIN_STRICT=1= -> =GrainCollapseError=).  =country._audit_index_collapse=
-is the single instrument; =feature._collapse_duplicate_index= uses it too.
-
-*NOT LANDED: union + sentinel-fill.*  The collapses still HAPPEN; they are merely
-no longer silent.  Step 3 in its full form (return the maximal grain, never
-reduce) is still pending, as is step 4 (=transformations.collapse=, which does
-not exist -- =grep 'def collapse'= is still zero hits).
-
-*Why the audit had to come first, and why it changes step 3's shape.*  The
-measurement the audit makes possible says the union+sentinel framing does not fit
-most of the census.  Of 142 duplicate-index cells across 31 countries:
-
-- ~6.4M of the ~7.5M duplicated rows are EXACT duplicates of a surviving row --
-  a cluster attribute repeated once per household.  Collapsing them destroys
-  nothing.  A union+sentinel here would add a level to carry no information.
-- ~540k rows are the real loss, and almost none of them want a reducer.  They are
-  BROKEN IDENTIFIERS (Mali =household_roster= declares =(t, i, pid)= but =pid= is
-  a *household* id stamped on every member -- 5,149 distinct values over 37,175
-  rows, so =first()= keeps ONE PERSON PER HOUSEHOLD) or MISSING LEVELS
-  (Tanzania =interview_date= declares =(t, i)=; canonical is =(t, v, i, visit)=).
-  The fix for both is to FIX THE INDEX, not to reduce over it -- which is exactly
-  the precedent of the only landed step: *PR #471 fixed crop_production by ADDING
-  =u= to the index, not by aggregating over it.*
-
-So the contract holds and is now ENFORCED rather than merely stated: the core does
-not aggregate.  It reports, and under strict mode it refuses.
-
-*Corollary -- do NOT wire the =aggregation:= key into the core collapse.*  It
-remains dead config (zero consumers; =country.py:2387= / =diagnostics.py:174= both
-=_skip= it).  All 9 declarations are =interview_date: {visit: first}= on tables
-that ALREADY declare =visit=, so they have no duplicates and would never fire; and
-were the key honoured at the core collapse it would convert "preserve both visit
-dates" into "silently keep Visit 1" -- reintroducing the very loss
-=melt_visit_intervals= was built to end.  It is a legacy-reproduction shim
-(=senegal.py:262=), not a grain policy.  A regression test now pins this: an
-=aggregation:= block MUST NOT buy silence
-(=tests/test_grain_collapse.py::test_aggregation_key_is_not_honoured_as_a_core_reduction_policy=).
-You cannot declare your way out of a broken index.
-
-** 3b. A third silent loss found in the same 12 lines (open)
-
-=groupby(level=...)= defaults to =dropna=True=, so a row with NaN in a DECLARED
-index level is *DELETED OUTRIGHT* by the collapse, not merely merged into it.
-14 cells, *485,231 rows*; worst is =Burkina_Faso/food_acquired/2014= at 460,438 of
-557,822 rows (82.5%).  This fires on the additive branch too.
-
-The #323 fix REPORTS this (=nan_key_rows= in the audit) but deliberately does NOT
-change the behaviour: restoring those rows is a data change needing per-country
-validation, and shipping it inside the diff that is supposed to make data changes
-*visible* would make that diff unreviewable.  Needs its own issue.
 
 * Open questions
 
@@ -252,12 +196,7 @@ validation, and shipping it inside the diff that is supposed to make data change
 - Median over an even count: pin the convention for reproducibility.
 - =cache_hash=: the cached parquet is the maximal-grain union; =collapse=
   is a post-read transform, so the aggregation policy must NOT enter the
-  L2 content hash.  Confirm.  [Still holds -- the #323 audit is a *finding*
-  ABOUT the cached bytes, not a policy that changes them, so it rides in a
-  SEPARATE metadata key (=lsms_grain_audit=) and stays out of the hash.
-  =LSMS_CACHE_SCHEMA= was bumped 1 -> 2 once, to force the pre-audit parquets
-  -- written post-collapse by a build that could not report what it destroyed --
-  to rebuild and be stamped.]
+  L2 content hash.  Confirm.
 - Geographic hierarchy (=woreda > v > i=) for the =<broadcast>= sentinel:
   worth it, or keep community_prices' explicit broadcast indefinitely?
 
