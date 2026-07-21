@@ -969,3 +969,173 @@ Longitude are therefore NOT emitted.
   (+ =_plot_harmonized_codes=, =_map_plot_codes=).
 - =Tanzania/2019-20/_/plot_features.py=, =Tanzania/2020-21/_/plot_features.py= :: per-wave scripts.
 - =Tanzania/_/plot_features.py= :: country concatenator (concat + id_walk).
+
+* The cluster key of =cluster_features= (GH #323, Site 2)
+
+** The defect, and why it is a key defect
+
+Tanzania was the worst Site-2 offender in the library.  Measured cold on
+=development=, households *within the same cluster* disagreed about the
+cluster's own attributes in *2,104 of 7,167 cluster-attribute cells (29.4%)*
+--- 65.4% of them in 2012-13 --- and =groupby().first()= resolved that by
+serving one arbitrary household's answer as the cluster's.
+
+The cause is *not* an ambiguous cluster code.  Every wave read =Region= /
+=District= / =Rural= off the household *cover page*: the address where that
+household was *interviewed*.  The NPS is a *tracking* panel.  When a household
+moves, or a member splits off to form a new household, the survey follows it,
+records its *new* address, and carries its *original* sampling cluster =v=
+forward unchanged.  So the geo columns are HOUSEHOLD attributes; =v= is a
+CLUSTER attribute; and projecting the former onto the latter asks a household
+that has left the cluster to describe it.
+
+That the columns really are cluster attributes is settled by round 1.  In
+2008-09, before anyone has moved, *all 409 clusters agree on all three columns
+--- 0 contested cells*.  The disagreement appears only from round 2 on, and it
+tracks movement: 549 / 1,154 / 314 households in rounds 2 / 3 / 4 report a
+region that is not their own cluster's.
+
+** The identifier already carries the answer
+
+The NPS cluster id is not an opaque serial.  It is a *hierarchical geocode*
+whose leading fields are the cluster's region and district.  Validated against
+the 2008-09 frame --- the only pollution-free round:
+
+- every one of the *26 region codes* present maps to *exactly one* region name
+  (0 violations over 409 clusters);
+- the *district digit* of the geocode equals the separately reported district
+  code =ha_02_1= for *100.0%* of round-1 households.
+
+The field widths are a property of the *wave*, never of the string's length:
+
+| scheme | layout                  | waves                                        |
+|--------+-------------------------+----------------------------------------------|
+| =nps=  | =RR D WW EEE= (8)       | NPS rounds 1-3; the 2014-15 *extended* panel |
+| =nps=  | =RR DD WWW EE CCC= (12) | the 2014-15 *refresh* sample                 |
+| =sdd=  | =RR D WWW EEE= (9)      | NPS-SDD, 2019-20                             |
+| =y5=   | =RR-DD-WWW-EE-CCC=      | NPS Y5, 2020-21 (=y5_cluster=)               |
+
+Reading 2019-20's 8-character ='11014002'= under the 8-digit scheme yields
+IRINGA; under its own 9-digit scheme it is =01-1-014-002= = DODOMA.  Getting
+this wrong relabels a whole region silently, which is why
+=tanzania.cluster_region()= makes the caller name the scheme.
+
+** The fix
+
+*The cluster's geography is recorded from inside the cluster.*  Each wave now
+excludes the households that are no longer there, and leaves the frame at
+household grain so the projection onto =(t, v)= stays where the framework
+audits it (=Wave.cluster_features=).  Residency is decided against the
+cluster's own geocode, in tiers (region+district, then region, then --- if a
+cluster-wave has no resident at all --- unfiltered, so no cluster is ever
+dropped by tightening the test).  Tiers are evaluated per =(t, v)=, not per
+=v=: grouping on =v= alone silently lost 12 cluster-waves.
+
+Per wave:
+
+| wave    | =v=            | frame restriction                                    | Region / District           |
+|---------+----------------+------------------------------------------------------+-----------------------------|
+| 2008-15 | =clusterid=    | geocode residency (region + district code)           | =ha_01_1= / =ha_02_2=       |
+| 2019-20 | =clusterid=    | =sdd_cluster= present AND found at ORIGINAL location | =t0_region= / =t0_district= |
+| 2020-21 | *=y5_cluster=* | found at ORIGINAL location, or BOOSTER               | =hh_a01_1= / =hh_a02_1=     |
+
+Two waves needed more than a filter.
+
+*2019-20 was reading the mover question.*  =hh_a01_1= / =hh_a02_1= are asked
+ONLY of households found at a NEW location --- they are null for 89.9% of the
+households found at their ORIGINAL location, i.e. for exactly the ones that can
+describe the cluster.  The cluster's own location is =t0_region= /
+=t0_district=.  Separately, the 326 SPLIT-OFF rows (=sdd_cluster= blank) carry
+a =clusterid= they were never sampled in: under a single DODOMA code they
+collect households whose own strata are DAR ES SALAAM, DODOMA and ZANZIBAR.
+Pooling them manufactured *100 clusters that do not exist* (247 -> 147).
+
+*2020-21's key was simply wrong.*  =cluster_features= keyed on =clusterid=
+while =sample= has always keyed on =y5_cluster=, so *all 417 of its =(t, v)=
+pairs were unknown to =sample=* --- =_join_v_from_sample= matched nothing and
+every 2020-21 household got a =v= with no cluster_features row.  =clusterid= is
+also blank for all *545 booster households* (11.6%), which were therefore
+deleted outright on a NaN key, taking 68 clusters with them.  Keying on
+=y5_cluster= fixes both: 418 -> 515 clusters, 0 unknown to =sample=.
+
+** Measured effect (cold build, isolated =LSMS_DATA_DIR=, L2 rebuilt)
+
+Contested cluster-attribute cells (households in a cluster disagree),
+before -> after:
+
+| wave    | Region     | District     | Rural        | total          | clusters         |
+|---------+------------+--------------+--------------+----------------+------------------|
+| 2008-09 | 0 -> 0     | 0 -> 0       | 0 -> 0       | 0 -> 0         | 409 -> 409       |
+| 2010-11 | 152 -> 0   | 0 -> 0       | 177 -> 78    | 329 -> 78      | 409 -> 409       |
+| 2012-13 | 242 -> 0   | 314 -> 34    | 247 -> 113   | 803 -> 147     | 409 -> 409       |
+| 2014-15 | 52 -> 0    | 62 -> 17     | 46 -> 24     | 160 -> 41      | 498 -> 498       |
+| 2019-20 | 61 -> 1    | 99 -> 35     | 97 -> 36     | 257 -> 72      | 247 -> 147       |
+| 2020-21 | 199 -> 2   | 283 -> 32    | 75 -> 13     | 557 -> 47      | 418 -> 515       |
+| *total* | *706 -> 3* | *758 -> 118* | *642 -> 264* | *2,106 -> 385* | *2,389 -> 2,387* |
+
+*Region is essentially solved*: 706 contested clusters -> 3.
+
+Rows destroyed by the collapse, as reported by the framework's own Site-2
+audit: *10,982 -> 2,687* (2010-11 2,121 -> 605; 2012-13 3,960 -> 1,304;
+2014-15 864 -> 404; 2019-20 748 -> 197; 2020-21 3,289 -> 177), and the *545
+NaN-key deletions in 2020-21 -> 0*.
+
+** The residue, honestly
+
+385 cells still contested.  None of it is a key defect and none of it is forced
+to zero.
+
+*District (118).*  Overwhelmingly *two names for one place*.  Spelling and
+transliteration variants --- ='MBINGA (NYASA)'= / ='MBINGA(NYASA)'= /
+='MBINGA NYASA'= / ='NYASA'= / ='MBINGA'=; ='SONGEA VIJIJINI'= / ='SONGEA
+(V)'=; typos ='MUFINDI'= / ='MFINDI'=, ='IRINGA MJINI'= / ='IRINGA MJINI1'=.
+And genuine *district splits* that happened mid-panel: Chalinze out of
+Bagamoyo, Kibiti out of Rufiji, Ubungo out of Kinondoni.  These are
+label-harmonisation problems (a =harmonize_district= table would close most of
+them); they are not evidence that =v= is ambiguous.
+
+*Rural (264).*  EAs whose households are not all classified alike.  =urb_rur= /
+=sdd_rural= / =y5_rural= are recorded per HOUSEHOLD, and an EA on a town
+boundary genuinely contains both; modal share within a contested cluster is
+0.75-0.88.  This is real sub-cluster variation, not a merge of two clusters.
+
+*Region (3).*  Two 2020-21 clusters and one 2019-20 cluster sit across a
+post-2012 region boundary (SINGIDA/SIMIYU, GEITA/SHINYANGA, and a Pemba/Unguja
+pair).
+
+*Ids that contradict their own households (13).*  After the collapse, 13 of
+2,387 clusters carry a Region that is not the one their geocode encodes.  Four
+are 2014-15 SIMIYU clusters still wearing their pre-2012 SHINYANGA code --- the
+households are right and the id is stale, and the config lets the residents
+win.  Three are 2020-21 ids that are *malformed in the source*
+(='12-06-05-101-005'=, ='12-072-02-24-001'=, ='55-01-02-251-005'= carry the
+wrong field widths); one more carries region code =27=, which is not a Tanzania
+region code.  These are carried through as-is rather than repaired by guesswork.
+
+** Known, NOT fixed here
+
+- *2019-20 =sample.v= for the 326 split-off households.*  Those households are
+  still assigned the =clusterid= the file stamps on them, which is not a
+  sampling cluster --- and now that =cluster_features= no longer manufactures
+  rows for it, their =v= points at a cluster the table does not contain.
+  Blanking it would change =v= on every 2019-20 household table for 27.5% of
+  the wave; that is a semantic change that belongs in its own PR, not inside a
+  cluster-key fix.  Recorded rather than done.
+- *5 of 498 2014-15 clusters are unknown to =sample()=* (='17201000'=,
+  ='21408000'=, ='52104012'=, ='53119012'=, ='53206000'=).  They ARE present in
+  the wave-level =sample.parquet= (13 / 7 / 10 / 10 / 10 rows) and are lost
+  between there and =sample()= --- i.e. in =_finalize_result='s =id_walk=, on
+  the panel-id side.  Pre-existing on =development=; unchanged by this work.
+- =Rural= label harmonisation, and a =harmonize_district= table for the
+  district spellings above.
+
+** Files
+
+- =Tanzania/_/tanzania.py= :: =TZ_REGION_BY_CODE=, =cluster_region()=,
+  =cluster_district_code()=, =normalize_place()=, =keep_cluster_residents()=.
+- =Tanzania/2008-15/_/cluster_features.py= :: residency filter for rounds 1-4.
+- =Tanzania/2019-20/_/data_info.yml= + =_/mapping.py= :: =t0_*= geography,
+  frame-and-original-location restriction.
+- =Tanzania/2020-21/_/data_info.yml= + =_/mapping.py= :: =v= = =y5_cluster=,
+  original-or-booster restriction, place-name case normalisation.
+- =tests/test_gh323_tanzania_cluster_key.py= :: 28 tests.
