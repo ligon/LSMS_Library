@@ -144,7 +144,24 @@ override.
 
 **Always read files with `get_dataframe()` from `local_tools`.** It handles `.dta` / `.csv` / `.parquet` via a fallback chain: local file on disk → DVC filesystem (`DVCFileSystem`) → WB NADA download via `data_access.get_data_file()`. A script written as `get_dataframe('../Data/file.dta')` works whether the file is local, DVC-cached, or has never been downloaded.
 
-> **Never run `dvc pull` / `dvc fetch` from the CLI to materialize source data — especially in parallel (multiple agents, `make -j`, scatter-gather sweeps).** The DVC CLI takes the global `.dvc/tmp/lock` and rebuilds the repo index by walking ~7k `.dvc` sidecars (~93 s/call on Lustre); concurrent callers collide and fail with *"Unable to acquire lock"* (measured 91.7% failure at 12 concurrent — see `slurm_logs/dvc_lock_repro/`). `get_dataframe()` / `_ensure_dvc_pulled()` instead download the blob **directly from S3 (lock-free, ~0.1 s)** via the v0.7.3 bypass — so any number of readers can run concurrently. The *write* path (`push_to_cache` / `push_to_cache_batch`) still takes the lock; it retries on contention with backoff (`_run_dvc_with_lock_retry`). A coordinating fetch/write queue was considered and judged **unnecessary**: reads are already lock-free, and writes don't contend in practice — a single contributor's writes batch into one `dvc add`/`push`, and the rare concurrent-writer overlap is absorbed by the retry above. See `SkunkWorks/dvc_writer_distribution.org`.
+> ### Never invoke the `dvc` CLI yourself — for any operation
+>
+> Not `pull`, not `fetch`, not `add`, not `push`, not `checkout`, not `repro`. **The library owns both directions of DVC access, and the concurrency handling is built into each one.** Reach for the API below; if neither fits, stop and ask rather than shelling out to `dvc`.
+>
+> | You want to | Use | Concurrency behaviour |
+> |---|---|---|
+> | Read a tabular source (`.dta`/`.csv`/`.parquet`) | `get_dataframe()` (`local_tools`) | **Lock-free.** Any number of concurrent readers. |
+> | Get any other file on disk (PDF, Excel, codebook) | `data_access.get_data_file()` → returns a local `Path` | Same lock-free fetch, then DVCFS / WB fallback. |
+> | Publish new blobs | `push_to_cache()` / `push_to_cache_batch()` | Takes the lock, but **queues**: retries contention with exponential backoff + jitter. |
+> | Add a whole wave | `add_wave()` / `populate_and_push()` | Wraps the batched writer above. |
+>
+> **Why reads are safe.** `get_dataframe()` → `_ensure_dvc_pulled()` parses the `.dvc` sidecar for the md5 and pulls the blob **straight from S3 (~0.1 s)**, deliberately bypassing `Repo.fetch`. That bypass matters because `Repo.fetch` is `@locked`, and `lock_repo` calls `Repo._reset()` on entry *and* exit — dropping `Repo.index`, so the next access rebuilds it by walking ~7k `.dvc` sidecars (~93 s on Lustre, *regardless of blob size*; pyinstrument put ~78 s of that in `StorageMapping.__getitem__` alone). The bypass is **~850×** faster and never touches `.dvc/tmp/lock` at all. By contrast the CLI does take that global lock: measured **91.7% failure at 12 concurrent callers** (`slurm_logs/dvc_lock_repro/`).
+>
+> **Why writes are safe.** `_run_dvc_with_lock_retry()` retries *only* on lock-contention markers, with exponential backoff plus uniform jitter (no thundering herd). A genuine non-lock failure returns immediately, so real errors surface fast instead of hiding behind five rounds of backoff.
+>
+> A separate coordinating queue was considered and judged **unnecessary** precisely because of the two mechanisms above — reads never contend, and writes queue themselves. See `SkunkWorks/dvc_writer_distribution.org`.
+>
+> **Never `rm` a DVC lock file.** A lock that looks stale may belong to a live sibling process; deleting it corrupts that writer rather than unblocking you. If a write is genuinely stuck, let the backoff run, then investigate.
 
 **Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. Stale parquets from before this migration may still exist in-tree; they are harmless artifacts.
 
@@ -156,7 +173,8 @@ override.
 | `pd.read_stata('/absolute/path/...')`                    | Breaks on other machines, no DVC/WB fallback     |
 | `pyreadstat.read_dta(path)` directly                     | Same — bypasses all access layers                |
 | `from_dta('lsms_library/countries/...')` with abs path   | Non-portable; use relative `../Data/` paths      |
-| `dvc pull` / `dvc fetch` CLI to materialize data         | Takes the global `.dvc/tmp/lock`; serializes and fails under concurrency. Use `get_dataframe()` (lock-free direct-S3 bypass). |
+| **Any** `dvc` CLI invocation (`pull`, `fetch`, `add`, `push`, …)  | Takes the global `.dvc/tmp/lock`; serializes and fails under concurrency (91.7% failure at 12 concurrent). Read via `get_dataframe()` / `get_data_file()`; write via `push_to_cache_batch()`. |
+| `rm -f .dvc/tmp/*.lock` to "clear a stale lock"          | The lock may belong to a live sibling process; removing it corrupts that writer. Let the backoff in `_run_dvc_with_lock_retry` do its job. |
 
 **Adding new waves**: `lsms_library.data_access.discover_waves()` / `add_wave()`; `push_to_cache_batch()` for batched `dvc add` + `dvc push`. See `CONTRIBUTING.org`.
 
