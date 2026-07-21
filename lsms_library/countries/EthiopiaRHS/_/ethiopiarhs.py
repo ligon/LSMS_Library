@@ -440,5 +440,14 @@ def crop_production(df):
     for k in idx:
         out = out[out[k].notna() & (out[k].astype('string').str.strip() != '')]
     out = out.set_index(idx + ['j', 'u'])   # u is a grouping key, not a column
+    # GH #637 key-soundness review (2026-07-21).  KEY SOUND -- genuinely
+    # defensive; it has nothing to collapse.  The grain is unique BY
+    # CONSTRUCTION: the ERHS area_output_* files are WIDE one-row-per-household
+    # frames, and the melt above emits at most one row per (i, crop stub), with
+    # a constant u='Kg'.  So (t, i, j, u) can only collide if the wave's own
+    # (i,) index is non-unique.  Measured cold across all 6 waves that declare
+    # the table (1994a/1994b/1995/1997/2004/2009): 17,523 rows total --
+    # 3,404 / 1,967 / 3,350 / 3,021 / 2,998 / 2,783 -- with ZERO duplicate
+    # index tuples in every wave.  0 exact / 0 complementary / 0 conflicting.
     out = out.groupby(level=out.index.names).first()   # defensive de-dupe
     return out

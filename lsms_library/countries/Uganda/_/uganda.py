@@ -1083,6 +1083,46 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     # reported twice) by summing the reported quantities — this is NOT an
     # aggregation across distinct items, just de-duplication of repeated
     # identical source rows so the index is unique.
+    #
+    # GH #637 key-soundness review (2026-07-21).  KEY INCOMPLETE — the comment
+    # above is optimistic; the colliding rows are NOT "repeated identical
+    # source rows".  AGSEC5A/5B record MULTIPLE DISTINCT HARVEST RECORDS per
+    # plot-crop-season, and this key has no level for which record a row is:
+    #
+    #   2009-16: records are split by HARVEST CONDITION (a5aq6b / a5bq6b —
+    #     'Dry - grain', 'Fresh/raw harvested - in pods or shell/husks',
+    #     'Dry after additional drying - ...').  Measured on season A:
+    #       2009-10  257 colliding groups, condition differs in 222 (86%)
+    #       2010-11  328                                    277 (84%)
+    #       2011-12  363                                    339 (93%)
+    #       2013-14  254                                    223 (88%)
+    #       2015-16  397                                    370 (93%)
+    #     Adding the condition to the key drops 2011-12 from 363 colliding
+    #     groups to 24.  Example (2011-12, HH 1033000506, plot -1-6, Coffee,
+    #     Kilogram): 240 kg "Dry after additional drying" + 100 kg "Fresh/raw
+    #     harvested" are SUMMED to 340 kg — dry and fresh weight added
+    #     together — and harvest_month is then taken by `.first()`.
+    #
+    #   2019-20: records are split by INSTANCE (the _1 / _2 column groups,
+    #     s5aq06a_1/b_1/f_1 vs s5aq06a_2/b_2/f_2 — quantity, unit and month of
+    #     a first and a second harvest).  1,382 of 8,429 source rows report
+    #     both; 369 of those share a unit and so collide.  Probe: 370 colliding
+    #     groups, 211 conflicting on harvest_month.
+    #
+    #   2018-19 records no unit and no second instance -> no collisions.
+    #
+    # The conflict counts UNDERSTATE the merge: harvest_month is the only
+    # conflict-capable column here, and 2009-10 / 2010-11 have no month column
+    # at all, so their condition-merges are invisible to a conflict test while
+    # still summing fresh and dry quantities.
+    #
+    # NOT fixed here, deliberately.  The missing level means two different
+    # things in two questionnaire vintages (a condition vocabulary in 2009-16,
+    # an instance ordinal in 2019-20), so naming it is a GRAIN DECISION for a
+    # published table, not a bug fix — and per GH #323 D1 the answer is a new
+    # index level, never a reducer.  Tracked on GH #637 with the measurements
+    # above.  Do NOT paper over it with `.first(skipna=False)` or an
+    # `aggregation:` key; both are explicitly rejected.
     if not df.index.is_unique:
         num = df[['Quantity', 'Quantity_sold', 'Value_sold']].groupby(level=df.index.names).sum(min_count=1)
         firstcols = df[['harvest_month', 'intercropped']].groupby(level=df.index.names).first()
@@ -1289,11 +1329,31 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
 
     Returns
     -------
-    pd.DataFrame indexed by ``(t, i, plot, input)`` with columns
+    pd.DataFrame indexed by ``(t, i, plot, input, j, season)`` with columns
     ``Quantity`` (Float64), ``u`` (object, native unit label), ``Purchased``
-    (boolean), ``Quantity_purchased`` (Float64), ``Improved`` (boolean,
-    seed rows), and ``j`` (object crop label, seed rows where recorded).
-    Reported values only; missing-in-wave columns are NaN.
+    (boolean), ``Quantity_purchased`` (Float64) and ``Improved`` (boolean,
+    seed rows).  Reported values only; missing-in-wave columns are NaN.
+
+    ``season`` is part of the GRAIN (GH #637).  AGSEC3A and AGSEC3B are two
+    DISTINCT plot-season questionnaires and the same plot id appears in both,
+    so without it a fertilizer/pesticide applied in season A and again in
+    season B collapses onto ONE row -- summing quantities across seasons and
+    picking one native unit at random.  This is the identical argument the
+    sibling ``plot_labor`` builder already states for the SAME two files
+    ("collapsing the two seasons into one (plot, source) row would require
+    summing across seasons (a transformation)"), and ``crop_production``
+    likewise carries ``season``; ``plot_inputs`` was the only one of the
+    three that did not.  Measured on the pre-fix build: 230 of 242 colliding
+    index tuples in 2009-10 and 112 of 122 in 2013-14 were season-A/season-B
+    pairs, including 6 groups per wave where the two seasons reported the
+    SAME pesticide in DIFFERENT units (Kg vs Litre) -- i.e. kilograms were
+    being added to litres.
+
+    Seed rows come from AGSEC4A, the FIRST-season plot-crop roster, so they
+    carry ``season = 'A'``.  The second-season roster (AGSEC4B) is present in
+    the source but is not read, so no season-B seed rows are emitted -- a
+    pre-existing coverage gap that the ``season`` level now makes visible
+    instead of silently folding into the season-A rows.
     """
     input_map = _input_label_map()
     unit_map = _harvest_unit_map()        # seed unit reuses harvest scheme
@@ -1366,6 +1426,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
                 'i': hh.values,
                 'plot': plot_id.values,
                 'input': input_label.values,
+                'season': season,
                 'Quantity': qty.values,
                 'u': u.values,
                 'Purchased': purchased.values,
@@ -1423,6 +1484,9 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
             'i': hh.values,
             'plot': plot_id.values,
             'input': seed_label,
+            # AGSEC4A is the FIRST-season plot-crop roster (AGSEC4B, the
+            # second-season roster, is not read) -> every seed row is season A.
+            'season': 'A',
             'Quantity': qty.values,
             'u': u.values,
             'Purchased': purchased.values,
@@ -1458,12 +1522,20 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # level non-null so it is a valid index level.
     df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
 
-    df = df.set_index(['t', 'i', 'plot', 'input', 'j'])
-    # Collapse only EXACT-duplicate (t,i,plot,input,j) tuples — the same input
-    # identity reported twice for the same plot-crop (e.g. a fertilizer block
-    # appearing in both AGSEC3A passes, or a seed row repeated).  This is
-    # de-duplication of the index grain, NOT cross-item aggregation: Quantity
-    # / purchased quantity sum, flags/unit take first.
+    df = df.set_index(['t', 'i', 'plot', 'input', 'j', 'season'])
+    # Collapse only EXACT-duplicate (t,i,plot,input,j,season) tuples — the same
+    # input identity reported twice WITHIN one plot-season (e.g. a seed row
+    # repeated in AGSEC4A).  This is de-duplication of the index grain, NOT
+    # cross-item aggregation: Quantity / purchased quantity sum, flags/unit
+    # take first.
+    #
+    # GH #637 key-soundness review: `season` was added to the grain precisely
+    # so this collapse can no longer merge a season-A application with a
+    # season-B one.  Before it, ~95% of the collisions here were exactly that
+    # (2009-10: 230 of 242 index tuples appeared in BOTH seasons; 2013-14: 112
+    # of 122), and the `.first()` on `u` below resolved 6 groups per wave in
+    # which the two seasons reported the same pesticide in DIFFERENT units.
+    # What remains is same-season repetition, which is genuinely a duplicate.
     if not df.index.is_unique:
         num = df[['Quantity', 'Quantity_purchased']].groupby(level=df.index.names).sum(min_count=1)
         flags = df[['Purchased', 'Improved']].groupby(level=df.index.names).max()

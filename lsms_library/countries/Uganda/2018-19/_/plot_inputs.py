@@ -3,7 +3,7 @@
 
 Reads AGSEC3A (season 1) + AGSEC3B (season 2) plot-input modules (organic /
 inorganic fertilizer + pesticide blocks) and AGSEC4A (plot-crop roster, seed
-block) via get_dataframe, and emits a canonical (t,i,plot,input,j) parquet of
+block) via get_dataframe, and emits a canonical (t,i,plot,input,j,season) parquet of
 REPORTED input values.  See uganda.INPUT_COLMAPS for the per-wave column map.
 """
 import sys

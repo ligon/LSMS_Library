@@ -1061,6 +1061,35 @@ def _finish_people_last7days(df, t):
     keep = ['t', 'i', 'pid', 'farm_work', 'SOB_work', 'wage_work',
             'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']
     df = df[keep]
+    # GH #637 key-soundness review (2026-07-21).  KEY SOUND for 2011-12,
+    # 2018-19 and 2021-22 -- 25,125 / 35,406 / 44,320 rows, ZERO duplicates,
+    # this collapse is a no-op.
+    #
+    # KEY BROKEN for 2014-15, and NOT fixable here.  ECVMA2 identifies a
+    # household by (GRAPPE, MENAGE, EXTENSION); `niger.i` builds `i` from
+    # (GRAPPE, MENAGE) only.  ECVMA2_MS01P1.dta holds 3,617 distinct
+    # (GRAPPE, MENAGE, EXTENSION) households but only 3,558 distinct
+    # (GRAPPE, MENAGE) -- so 59 households have no `i` of their own, and their
+    # members' line numbers (MS01Q00 = 1, 2, 3, ...) collide with the other
+    # household's.  Measured: 420 rows in 210 colliding (t, i, pid) groups, and
+    # EXTENSION differs in 210 of 210 (100%).  These are DIFFERENT REAL PEOPLE:
+    #
+    #   GRAPPE 2, MENAGE 1, line 1 -> EXTENSION 0: age 56, industry 316
+    #                                 EXTENSION 2: age 29, industry 321
+    #   GRAPPE 2, MENAGE 1, line 2 -> EXTENSION 0: age 11
+    #                                 EXTENSION 2: age 22
+    #
+    # `.first()` merges each pair into one person who was never enumerated.
+    #
+    # The defect is NOT local to this table.  Dropping EXTENSION is a wave-wide
+    # convention: 2014-15's `sample`, `household_roster` (same source file,
+    # same 210 collisions), `individual_education`, `livestock`,
+    # `crop_production`, `plot_inputs` and `plot_labor` all key on
+    # (GRAPPE, MENAGE).  Re-keying only people_last7days would break its join
+    # to sample() / household_roster and the panel_ids chain -- a regression,
+    # not a fix.  The correct fix is to add EXTENSION to `i` across the whole
+    # 2014-15 wave (and to re-derive panel_ids), which is its own change with
+    # its own verification.  Tracked on GH #637; do not "fix" it here.
     df = (df.groupby(['t', 'i', 'pid'], dropna=False, as_index=False).first())
     df = df.set_index(['t', 'i', 'pid'])
     return df

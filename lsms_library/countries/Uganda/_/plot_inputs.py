@@ -1,8 +1,8 @@
 """Concatenate wave-level plot_inputs data for Uganda (GAP 2).
 
 Each wave's ``Uganda/<wave>/_/plot_inputs.py`` produces a parquet indexed
-``(t, i, plot, input, j)`` with the REPORTED input columns (Quantity, u,
-Purchased, Quantity_purchased, Improved).  This script concatenates them
+``(t, i, plot, input, j, season)`` with the REPORTED input columns (Quantity,
+u, Purchased, Quantity_purchased, Improved).  This script concatenates them
 across waves and applies cross-wave id_walk so the household index uses the
 panel canonical id scheme.
 

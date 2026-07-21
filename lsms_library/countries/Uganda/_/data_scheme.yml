@@ -176,13 +176,31 @@ Data Scheme:
     #            linkage).  In the index so per-crop seed rows on a
     #            multi-crop plot stay distinct (plot-crop seed grain) — ~38%
     #            of seeded plots carry >1 crop.
+    #   season — 'A' (first season) / 'B' (second season).  Carried in the
+    #            grain for exactly the reason plot_labor states for the SAME
+    #            two source files: AGSEC3A and AGSEC3B are distinct plot-SEASON
+    #            questionnaires and the same plot id appears in both, so
+    #            collapsing them into one (plot, input, j) row would mean
+    #            summing quantities across seasons (a transformation) and
+    #            picking one native unit at random.  Added by the GH #637
+    #            key-soundness review, which measured that ~95% of the
+    #            collisions on the old 5-level key were season-A/season-B
+    #            pairs (2009-10: 230 of 242 tuples present in BOTH seasons;
+    #            2013-14: 112 of 122), 6 of them per wave reporting the same
+    #            pesticide in DIFFERENT units (Kg vs Litre) — kilograms were
+    #            being summed with litres.  crop_production and plot_labor
+    #            already carried season; plot_inputs was the outlier.
+    #            Seed rows are season 'A': they come from AGSEC4A, the first-
+    #            season plot-crop roster.  AGSEC4B (second season) is not read,
+    #            so there are no season-B seed rows — a pre-existing coverage
+    #            gap that the level now makes visible rather than hiding.
     #
     # Columns are REPORTED values only — NO seed_kg / nitrogen_kg / any-use
     # flags / fertilizer totals (those are transformations).  Missing in a
     # wave -> NaN.  Improved is non-null only on seed rows (1=Improved seed
     # type, 0=Traditional).  Quantity is NaN on 2009-10/2010-11 seed rows
     # (those waves record no seed quantity, only purchased y/n + seed type).
-    index: (t, i, plot, input, j)
+    index: (t, i, plot, input, j, season)
     Quantity: float
     u: str
     Purchased: bool
