@@ -17,13 +17,60 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # The household -> cluster reduction here is INTENDED, not accidental: each
+    # wave's data_info.yml extracts one row per household (idxvars carry both
+    # `i` and `v`) and then declares `final_index: [t, v]`, deliberately
+    # collapsing to cluster grain (GH #161).  Until GH #323 that reduction ran
+    # through an undeclared `groupby().first()`, which picks whichever member
+    # household happened to sort first -- arbitrary, and silently wrong whenever
+    # the members disagree.  The policy below makes the reduction explicit and
+    # honest.  (`aggregation:` used to be documentation-only -- nothing read it.
+    # It is now enforced by _normalize_dataframe_index.)
+    #
+    #   Region / District / Rural -> `unique`
+    #     These are attributes OF THE CLUSTER, so when every member household
+    #     agrees, that shared value IS the cluster's.  When they DISAGREE the
+    #     source simply does not determine a cluster-level answer, and we emit
+    #     <NA> plus a warning rather than pick one (class-2 missing beats
+    #     class-1 wrong).  Two distinct causes of disagreement survive here:
+    #       - panel dispersal: `comm` (2005-06 .. 2011-12) is the 2005-06 EA of
+    #         origin -- an 8-digit structured code, verified 1:1 with District
+    #         in the frame year (0 collisions across 322 EAs).  A panel
+    #         household that MOVED still carries its origin EA, so its current
+    #         district differs from its EA's.  `mode` was considered and
+    #         REJECTED: validated against the 2005-06 frame it recovered the
+    #         right district for only 78% of the ambiguous groups -- and only
+    #         84% of the *unambiguous* control groups, because Uganda split its
+    #         districts between 2005 and 2011.  An estimator that misses 16% of
+    #         the cases whose answer is already known cannot be trusted on the
+    #         cases whose answer is not.  So: <NA>, loudly.
+    #       - genuine sub-cluster variation: `Rural` is an EA attribute, but v
+    #         is a PARISH in 2013-14/2015-16, and a parish contains both urban
+    #         and rural EAs.  Rural is therefore legitimately not a parish-level
+    #         attribute; <NA> says so.  (Per-household Rural remains exact in
+    #         `sample`, which is its proper home.)
+    #
+    #   Latitude / Longitude -> `median`
+    #     A cluster centroid is a well-defined summary of its members' points,
+    #     not a guess about an unknown label, so unlike the categoricals it can
+    #     be computed rather than NA'd.  `median` (not `mean`) is chosen for
+    #     robustness: it is a no-op on a clean cluster (the within-v GPS spread
+    #     is 0.0 km for the median cluster in every wave) and resists a single
+    #     far-flung mover, which would drag a mean across the country.
     index: (t,v)
+    aggregation:
+      Region: unique
+      Rural: unique
+      District: unique
+      Latitude: median
+      Longitude: median
     Region: str
     Rural: str
     District: str
     Latitude: float
     Longitude: float
-  
+
+
   household_roster:
     index: (t, i, pid)
     Sex: str

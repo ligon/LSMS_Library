@@ -34,9 +34,15 @@ individual_education:
 
 people_last7days:
     file: HH/gsec15a.dta
+    # GH #323 -- see the 2018-19 data_info.yml for the full rationale.  Same
+    # LONG-format gsec15a: two rows per hhid keyed by CEA01, which collided on
+    # the declared (i, t) index and were collapsed by groupby().first(),
+    # silently returning VISITOR counts for 1,486 of 3,078 households (48.3%)
+    # and ZERO people for 996 of them.  Restricting to the member rows matches
+    # the members-only semantics of every earlier wave and makes (i, t) unique.
+    where: "CEA01 == 'Household members'"
     idxvars:
         i: hhid
-        #member: CEA01
     myvars:
         Men : CEA01A
         Women : CEA01B
@@ -56,7 +62,14 @@ sample:
     idxvars:
         i: hhid
     myvars:
-        v: s1aq04a
+        # GH #323: composite DISTRICT/PARISH key built by the wave's mapping.v().
+        # s1aq04a (parish name) alone is not a cluster key -- 23 parish names
+        # recur across districts.  sample and cluster_features MUST declare the
+        # identical pair so _join_v_from_sample propagates a key that actually
+        # exists in cluster_features.
+        v:
+            - district
+            - s1aq04a
         weight: wgt  # only weight provided; wave 8 appears to be panel-only (no refreshment)
         panel_weight: wgt
         strata: subreg
@@ -67,7 +80,11 @@ cluster_features:
     file: HH/gsec1.dta
     idxvars:
         i: hhid
-        v: s1aq04a  # String for parish name.  Parish codes broken as in 2018-19.
+        # GH #323: same composite DISTRICT/PARISH key as `sample` above.
+        # (s1aq04a is the parish NAME; parish codes are broken as in 2018-19.)
+        v:
+            - district
+            - s1aq04a
     myvars:
         Region: region
         Rural: urban

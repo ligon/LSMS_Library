@@ -46,18 +46,44 @@ case, whitespace, and the =South-westrn= typo in 2011-12).
 The cluster identifier (=v= in the library's index convention) also
 changed:
 
-| Waves       | Variable      | Type    | Description            |
-|-------------+---------------+---------+------------------------|
-| 2005--2012  | =comm=        | numeric | Community/EA code      |
-| 2013-14     | =h1aq4a=      | numeric | Parish code (8 digits) |
-| 2015-16     | =parish_code= | numeric | Parish code            |
-| 2018-19     | =parish_name= | string  | Parish name            |
-| 2019-20     | =s1aq04a=     | string  | Parish name            |
+| Waves       | Variable                     | Type    | Description                  |
+|-------------+------------------------------+---------+------------------------------|
+| 2005--2012  | =comm=                       | numeric | Community/EA code            |
+| 2013-14     | =h1aq4a=                     | numeric | Parish code (8 digits)       |
+| 2015-16     | =parish_code=                | numeric | Parish code                  |
+| 2018-19     | =distirct_name= + =parish_name= | string  | =DISTRICT/PARISH= composite  |
+| 2019-20     | =district= + =s1aq04a=       | string  | =DISTRICT/PARISH= composite  |
 
 All are drawn from GSEC1 (the household cover page).  The shift
 from numeric EA codes to parish names occurred around 2015-16 as
 the sampling frame evolved from strict EA boundaries to parish-level
 clusters to accommodate split-off households.
+
+*** Why 2018-19 / 2019-20 =v= is a =DISTRICT/PARISH= composite (GH #323)
+
+Those two waves have no usable parish /code/ (=parish_code= carries only
+19 distinct values), so =v= was originally set to the free-text parish
+/name/.  **Parish names are not unique in Uganda.**  20 of them (2018-19)
+and 23 (2019-20) recur across districts; =CENTRAL= alone appears in TEN
+(HOIMA, KAGADI, KALUNGU, KIRYANDONGO, KYOTERA, MITOOMA, ...).  Keying on
+the bare name fused genuinely different parishes into a single "cluster",
+whose =Region= / =District= / GPS were then resolved by an undeclared
+=groupby().first()= — i.e. arbitrarily.
+
+Qualifying the name by its district makes =v= an actual cluster key:
+clusters spanning more than one district drop 20 → 0, and the p90
+within-cluster GPS spread falls 24.0 → 14.9 km.  Both =sample()= and
+=cluster_features()= build =v= from the same pair (see =mapping.v()= in
+each wave's =_/=), so the two cannot drift apart.
+
+Deliberately *not* keyed any finer.  Adding =subcounty_name= splits 10
+further groups, but every one of those splits is a spelling artefact of a
+single subcounty — =NYENGA= / =NYENGA DIVISION= (centroids 0.0 km apart),
+=LUBAGA= / =RUBAGA DIVISION= (5.3 km), ="KAGADI  TOWN COUNCIL"= /
+="KAGADI TOWN COUNCIL"= (a doubled space) — so it would fragment real
+parishes on data-entry noise.
+
+Note the source misspells "district" as =distirct_name= in 2018-19.
 
 *** Hybrid =v= in 2009-10 (movers and split-offs)
 
@@ -118,14 +144,24 @@ issue disappears by construction.
 
 *** HH-level =Region= on =sample()=
 
-Since =v= can be a synthetic =@lat,lon= label (§above) that has no
-entry in =cluster_features()=, consumers that needed =Region= used to
-pull it from =cluster_features()= and silently lose those households
-— the cluster-level table is keyed on real EA codes and cannot answer
-for synthetic ones.  =sample()= now exposes =Region= directly as a
+Since =v= can be a synthetic =@lat,lon= label (§above), consumers that
+needed =Region= used to pull it from =cluster_features()= and silently
+lose those households.  =sample()= exposes =Region= directly as a
 household-level column for every Uganda wave (it reads the same
 =region= field that =cluster_features()= does, with the same Kampala
 → Central fold in 2009-10 and 2010-11 where applicable).
+
+Note (GH #323): =cluster_features()= *does* now carry the synthetic
+=@lat,lon= clusters.  It previously did not — =sample()= built them via
+its =derived: coalesce_coord_bin= block but =cluster_features()= kept the
+raw blank =comm=, so all 565 out-of-frame households collapsed away and
+**339 =(t, v)= pairs present in =sample()= had no =cluster_features()=
+row at all**.  The 2009-10 =cluster_features= hook now invokes the *same*
+=fill_v_with_coord_bin= transformer, on the same coordinates with the same
+defaults, so the labels agree by construction; the orphan count is 0.  The
+24 households with neither a =comm= nor a GPS fix keep =v = <NA>= and are
+dropped — nothing can locate them, and a fabricated cluster would be worse
+than a missing one.
 
 Practical consequence: =Country('Uganda').sample()[['v','Region']]=
 is complete for every household; joining =Region= from =sample()=
@@ -238,7 +274,88 @@ concern from =u= label canonicalisation.  Its keys are the same
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+* =people_last7days= counts MEMBERS, not visitors
+
+The question ("how many people were present in the last 7 days?") is asked
+separately for household /members/ and for /visitors/.  Through 2013-14 the
+two live in parallel COLUMNS and the library maps =Men/Women/Boys/Girls= to
+the member block, ignoring the visitor block:
+
+| Wave    | File     | Member columns (used) | Visitor columns (ignored) |
+|---------+----------+-----------------------+---------------------------|
+| 2005-06 | GSEC14   | =h14q1--4=            | =h14q5--8=                |
+| 2009-10 | GSEC15A  | =h15a1--4=            | =h15a5--8=                |
+| 2013-14 | GSEC15   | =T6FQ01a--d=          | =T6FQ01e--h=              |
+
+From 2018-19 the questionnaire went LONG: the same distinction moved from a
+column suffix into a ROW category.  =GSEC15A= now has two rows per household
+keyed by =CEA01= ∈ {=Household members=, =Visitors=}, and =CEA01A--D= are the
+counts /for the selected category/.  The extraction was never updated, so both
+rows collided on the declared =(i, t)= index and =groupby().first()= kept
+whichever the file happened to list first — effectively a coin flip.  ~49% of
+households therefore carried VISITOR counts, and ~1,985 came back with ZERO
+people (GH #323).
+
+Fixed with a =where:= row filter in each wave's =data_info.yml=, selecting the
+member rows and thereby making =(i, t)= genuinely unique, so the collapse never
+fires.  Mean people/household: 2.86 → 4.60 (2018-19), 2.78 → 4.55 (2019-20).
+
+If you want "people fed" = members + visitors, that is a DIFFERENT table and
+should be declared as one; the five-wave precedent above is members-only.
+
+* =cluster_features= aggregation policy and its =<NA>= cells
+
+=cluster_features= is built by reducing HOUSEHOLD rows to cluster grain
+(=final_index: [t, v]=, GH #161).  That reduction is intended, but until GH #323
+it ran through an undeclared =groupby().first()=.  It is now declared in
+=_/data_scheme.yml= under =aggregation:= and enforced by the framework:
+
+- =Region= / =District= / =Rural= → =unique=: the value if every member
+  household agrees, else =<NA>= plus a warning.
+- =Latitude= / =Longitude= → =median=: a robust centroid (a no-op on clean
+  clusters, whose within-=v= spread is 0.0 km, and resistant to the occasional
+  wild geovar coordinate that would drag a =mean= across the country).
+
+**Consumers will now see =<NA>= where they previously saw a value.**  That is
+the point: the old value was an arbitrary pick among disagreeing households.
+Two legitimate causes of disagreement remain, and neither is a bug:
+
+1. /Panel dispersal/ — =comm= (2005-06 … 2011-12) is the *2005-06 EA of
+   origin*, so a household that MOVED still carries it while now living in
+   another district.  93 (2010-11) and 106 (2011-12) clusters are affected.
+   Their district is genuinely undetermined from this table alone.  (=mode= was
+   tried and rejected: validated against the 2005-06 frame it recovered the
+   right district for only 78% of the ambiguous groups — and just 84% of the
+   /unambiguous/ control groups, because Uganda split its districts between 2005
+   and 2011.)
+2. /Sub-cluster variation/ — =Rural= is an EA attribute, but =v= is a PARISH
+   from 2013-14 on, and a parish contains both urban and rural EAs.  So =Rural=
+   simply is not a parish-level attribute (70 / 65 / 122 / 122 clusters in
+   2013-14 / 2015-16 / 2018-19 / 2019-20).
+
+For a per-household answer, use =sample()=, which carries exact household-level
+=Rural= and =Region= for every household.
+
 * Known Issues
+** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
+:LOGBOOK:
+- Note taken on [2026-07-12 Sun] \\
+  2005-06 predates GPS, so its =df_geo= joins the *2009-10* geovar, which
+  contains 368 HHIDs absent from GSEC1.  The framework merges sub-dfs with
+  =how='outer'= (=country.py=, the =dfs:= branch), so those 368 become rows
+  with =v = NaN= and no survey data.  They are harmless *today* — =groupby=
+  drops NaN keys, so they never reach the API — but they are fabricated rows
+  and the =how='outer'= is library-wide.  Left alone deliberately: this is the
+  Uganda instance of GH #606, and changing the merge in =country.py= is a
+  40-country blast radius for zero Uganda-visible gain.  Fix it there, not here.
+:END:
+** TODO =cluster_features= 2019-20 has no GPS
+:LOGBOOK:
+- Note taken on [2026-07-12 Sun] \\
+  The 2019-20 =cluster_features= YAML declares no =df_geo=, so =Latitude= /
+  =Longitude= are =<NA>= for all 827 clusters.  Pre-existing; unrelated to
+  GH #323.  If a =unps_geovars_2019_20= file exists it should be wired in.
+:END:
 ** TODO Missing panel weight for 2019-20
 :LOGBOOK:
 - Note taken on [2026-04-09 Wed] \\

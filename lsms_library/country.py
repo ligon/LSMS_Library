@@ -797,32 +797,43 @@ class Wave:
         files = data_info.get('file')
         idxvars = data_info.get('idxvars')
         myvars = data_info.get('myvars')
+        # Optional row filter, applied by df_data_grabber to the RAW source
+        # frame (source column names, pre-rename).  Carried per-file so a
+        # multi-file table filters each source identically.  See
+        # local_tools._apply_where and GH #323.
+        where = data_info.get('where')
         final_mapping = dict()
         final_mapping['df_edit'] = formatting_functions.get(request)
         idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
         myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
         if isinstance(files, str):
-            final_mapping[files] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+            final_mapping[files] = {'idxvars': idxvars_updated, 'myvars': myvars_updated, 'where': where}
             return final_mapping
-        
+
         if isinstance(files, list):
             for i in files:
                 if isinstance(i, dict):
                     idxvars_override = idxvars_updated.copy()
                     myvars_override = myvars_updated.copy()
                     file_name, overrides = next(iter(i.items()))
+                    where_override = where
                     for key, val in overrides.items():
                         if key == 't':
                             idxvars_override[key] = (idxvars_updated[key][0], lambda x, val=val: val)
+                        elif key == 'where':
+                            # A per-file `where:` overrides the table-level one
+                            # (source files in a multi-file table can encode the
+                            # same row-category under different column names).
+                            where_override = val
                         elif key in idxvars:
                             idxvars_override[key] = map_formatting_function(key, val, format_id_function = True)
                         else:
                             myvars_override[key] = map_formatting_function(key, val)
-                    final_mapping[file_name] = {'idxvars': idxvars_override, 'myvars': myvars_override}
+                    final_mapping[file_name] = {'idxvars': idxvars_override, 'myvars': myvars_override, 'where': where_override}
                 else:
-                    final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
-                
+                    final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated, 'where': where}
+
             return final_mapping
         
     @property
@@ -956,7 +967,7 @@ class Wave:
                 last_error: Exception | None = None
                 for candidate in dict.fromkeys(candidates):
                     try:
-                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files)
+                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files, where=mappings.get('where'))
                         break
                     except (FileNotFoundError, PathMissingError) as error:
                         last_error = error
@@ -1171,15 +1182,30 @@ class Wave:
         # ``idxvars`` so the YAML can merge a household-level df_geo
         # for GPS.  The result then has HH grain (one row per
         # household) instead of the canonical ``(t, v)`` cluster
-        # grain documented in ``data_scheme.yml``.  Collapse with
-        # ``.first()`` for non-GPS columns (Region/Rural/District are
-        # invariant within a cluster by construction of the LSMS-ISA
-        # sampling design) and ``.mean()`` for Latitude/Longitude
-        # (HH-level GPS approximated as the cluster centroid).
-        # GH #161.
+        # grain documented in ``data_scheme.yml``.  GH #161.
+        #
+        # GH #323: when the country DECLARES an ``aggregation:`` policy for
+        # cluster_features, that policy is authoritative and the reduction
+        # belongs to ``_normalize_dataframe_index`` -- we only drop the
+        # household level here and let it apply the declared reducers.
+        # Collapsing locally would pre-empt the policy and silently win, which
+        # is precisely how this bug hid: the wave-level ``.first()`` below ran
+        # BEFORE the declared policy could, so a country could declare a policy
+        # and still get ``first()``.
+        #
+        # Without a declared policy the legacy behaviour is preserved verbatim
+        # (``first`` for the categoricals, ``mean`` for GPS) so undeclared
+        # countries are byte-identical.  Note the legacy comment claimed
+        # "Region/Rural/District are invariant within a cluster by construction
+        # of the LSMS-ISA sampling design" -- that is empirically FALSE (in
+        # Uganda, 122 clusters disagree on Rural in 2019-20 and 93 on District
+        # in 2010-11), which is why the honest fix is a declared policy rather
+        # than a comment asserting an invariant the data does not have.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
-            if df.columns.size:
+            if _declared_aggregation(self.country._materialization_entry('cluster_features')):
+                df = df.droplevel('i')
+            elif df.columns.size:
                 agg = {
                     c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
                     for c in df.columns
@@ -3737,6 +3763,63 @@ def _declared_index_levels(schema_entry: dict[str, Any] | None) -> list[str]:
     return [str(level) for level in declared_levels]
 
 
+def _reduce_unique(s: pd.Series) -> Any:
+    """Reducer: the single value the members agree on, else ``pd.NA``.
+
+    The honest reducer for an attribute that is a property OF THE GROUP (a
+    cluster's district, its region, its urban/rural status).  If every member
+    row reports the same value, that value IS the group's -- return it.  If the
+    members disagree, the data does not determine a group-level answer, so we
+    return ``pd.NA`` rather than pick one.
+
+    This is the class-2 (silently missing) choice over class-1 (silently
+    wrong).  ``first`` would return whichever row happened to sort first, which
+    is arbitrary and unfalsifiable; ``mode`` would return a majority guess.
+    ``_normalize_dataframe_index`` additionally WARNS with the per-column count
+    of groups it had to NA, so the ambiguity is visible rather than buried.
+    """
+    vals = s.dropna().unique()
+    return vals[0] if len(vals) == 1 else pd.NA
+
+
+# Reducers a table may name in its ``aggregation:`` block.  Anything else
+# raises, so a typo'd policy fails loudly instead of silently falling back.
+_REDUCERS: dict[str, Any] = {
+    'first': 'first',      # explicit opt-in to the historical arbitrary pick
+    'unique': _reduce_unique,
+    'median': 'median',
+    'mean': 'mean',
+    'sum': 'sum',
+    'min': 'min',
+    'max': 'max',
+}
+
+
+def _declared_aggregation(schema_entry: dict[str, Any] | None) -> dict[str, str]:
+    """Parse a table's ``aggregation:`` block -> ``{column: reducer-name}``.
+
+    The block declares how a table's COLUMNS are to be reduced when the
+    declared index is intentionally coarser than the extracted rows (e.g.
+    ``cluster_features``, whose ``final_index: [t, v]`` deliberately reduces
+    household rows to cluster grain -- GH #161).
+
+    Historically this block existed but nothing read it (Albania / Benin /
+    CotedIvoire / Burkina Faso all declare ``visit: first``), so a table's
+    "policy" was prose while the code silently ran ``groupby().first()``
+    regardless -- GH #323.  Reading it here makes the declaration load-bearing.
+
+    Keys naming an INDEX LEVEL rather than a column (the legacy ``visit:
+    first`` usage) simply do not match any column and are inert, so those
+    countries are unaffected.
+    """
+    if not schema_entry:
+        return {}
+    block = schema_entry.get("aggregation")
+    if not isinstance(block, dict):
+        return {}
+    return {str(k): str(v) for k, v in block.items()}
+
+
 _SCHEME_DTYPE_MAP = {
     'bool': pd.BooleanDtype(),
     'int': pd.Int64Dtype(),
@@ -4190,11 +4273,57 @@ def _normalize_dataframe_index(
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
+        policy = _declared_aggregation(schema_entry)
+        covered = [c for c in df.columns if c in policy]
+
         if present_additive:
             agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
+        elif covered:
+            # An explicit, DECLARED aggregation policy (GH #323).  The reduction
+            # is intended -- e.g. cluster_features' `final_index: [t, v]`, which
+            # deliberately reduces household rows to cluster grain (GH #161) --
+            # so no data-loss warning fires.  What DOES fire is the `unique`
+            # reducer's ambiguity report below: a declared policy still has to
+            # be honest about the cells it could not determine.
+            bad = {c: policy[c] for c in covered if policy[c] not in _REDUCERS}
+            if bad:
+                raise ValueError(
+                    f"{table_name}: aggregation: names unknown reducer(s) {bad}. "
+                    f"Known reducers: {sorted(_REDUCERS)}."
+                )
+            uncovered = [c for c in df.columns if c not in policy]
+            if uncovered:
+                warnings.warn(
+                    f"{table_name}: aggregation: declares a reducer for "
+                    f"{covered} but not for {uncovered}; those fall back to "
+                    f"first() and may silently discard rows (GH #323).",
+                    RuntimeWarning,
+                )
+            grouped = df.groupby(level=present_levels, observed=True)
+            agg = {c: _REDUCERS.get(policy.get(c, 'first'), 'first') for c in df.columns}
+            reduced = grouped.agg(agg)
+
+            # Loudness for `unique`: a group whose members disagree yields <NA>.
+            # Report how many, per column, so the ambiguity is VISIBLE.  Silence
+            # here would just be .first()'s silent-wrongness wearing a policy.
+            uniq_cols = [c for c in covered if policy[c] == 'unique']
+            if uniq_cols:
+                nun = grouped[uniq_cols].nunique(dropna=True)
+                ambiguous = {c: int((nun[c] > 1).sum()) for c in uniq_cols}
+                ambiguous = {c: n for c, n in ambiguous.items() if n}
+                if ambiguous:
+                    warnings.warn(
+                        f"{table_name}: 'unique' aggregation over {present_levels}: "
+                        f"member rows DISAGREED, so the value is <NA> for "
+                        f"{ambiguous} group(s) (of {len(reduced)}).  The source "
+                        f"does not determine a group-level value for these; "
+                        f"reporting <NA> rather than guessing (GH #323).",
+                        RuntimeWarning,
+                    )
+            df = reduced
         else:
             df = df.groupby(level=present_levels, observed=True).first()
             if n_dropped:

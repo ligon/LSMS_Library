@@ -35,9 +35,27 @@ individual_education:
 
 people_last7days:
     file: GSEC15A.dta
+    # GH #323.  From 2018-19 the questionnaire went LONG: GSEC15A carries TWO
+    # rows per hhid, discriminated by CEA01 ("Household member/visitor") in
+    # {'Household members', 'Visitors'}, and CEA01A-D are the counts "for
+    # selected category".  The declared index is (i, t), so without a filter
+    # BOTH rows collide on one tuple and _normalize_dataframe_index collapsed
+    # them with groupby().first() -- which, since file row-order is effectively
+    # a coin flip (1,636 of 3,242 households list Visitors first), silently
+    # returned the VISITOR counts for ~49% of households.  989 households came
+    # back with ZERO people.
+    #
+    # Members-only is not a judgement call: it is what the five earlier waves
+    # already do.  2005-06 (GSEC14 h14q1-4), 2009-10 (GSEC15A h15a1-4) and
+    # 2013-14 (GSEC15 T6FQ01a-d) all map Men/Women/Boys/Girls to the source's
+    # "hh members" block and leave the parallel "visitors" block (h14q5-8 /
+    # h15a5-8 / T6FQ01e-h) unused.  Those waves are duplicate-free precisely
+    # because the member/visitor split is in COLUMNS there; here it moved into
+    # ROWS.  The `where:` restores members-only and makes (i, t) genuinely
+    # unique, so the duplicate-collapse never fires at all.
+    where: "CEA01 == 'Household members'"
     idxvars:
         i: hhid
-       # member: CEA01
     myvars:
         Men : CEA01A
         Women : CEA01B
@@ -57,7 +75,15 @@ sample:
     idxvars:
         i: hhid
     myvars:
-        v: parish_name
+        # GH #323: v is the composite DISTRICT/PARISH key built by the wave's
+        # mapping.v().  parish_name ALONE is not a cluster key -- 20 parish
+        # names recur across districts ('CENTRAL' in ten of them).  sample and
+        # cluster_features MUST declare the identical pair or they desynchronise
+        # and _join_v_from_sample hands every other table a key that does not
+        # exist in cluster_features.  (parish_code is unusable: 19 values.)
+        v:
+            - distirct_name   # sic: the source misspells "district"
+            - parish_name
         weight: wgt  # cross-sectional weight
         panel_weight: hwgt_W7  # longitudinal weight (NaN for refreshment sample)
         strata: subreg
@@ -73,7 +99,10 @@ cluster_features:
         idxvars:
             i: hhid
             #v: parish_code  # BROKEN: Different codes than in previous years, and only 19 values!
-            v: parish_name
+            # GH #323: same composite DISTRICT/PARISH key as `sample` above.
+            v:
+                - distirct_name
+                - parish_name
         myvars:
             Region: region
             Rural: urban

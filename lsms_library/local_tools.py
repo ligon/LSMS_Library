@@ -1014,8 +1014,47 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
 
 #def regularize_string(s):
 
+def _apply_where(df: pd.DataFrame, expr: str, fn: str | Path = '') -> pd.DataFrame:
+    """Restrict a raw source frame to the rows matching ``expr`` (YAML ``where:``).
+
+    ``expr`` is a ``DataFrame.query`` expression over the SOURCE column names.
+    See ``df_data_grabber`` for the rationale (GH #323).
+
+    Every failure mode raises rather than degrading:
+
+    - a bad expression, or one naming a column the source lacks, raises
+      ``ValueError`` naming the file and the available columns -- a typo'd
+      filter must not silently pass every row through;
+    - a filter matching ZERO of a non-empty source raises -- an empty table is
+      the silent-data-loss outcome this primitive exists to prevent.  (A source
+      that is *itself* empty is passed through untouched; that is a
+      missing-data condition for callers upstream to judge, not a filter bug.)
+    """
+    if df.shape[0] == 0:
+        return df
+
+    before = len(df)
+    try:
+        out = df.query(expr)
+    except Exception as exc:
+        raise ValueError(
+            f"where: {expr!r} could not be evaluated against {fn} "
+            f"({type(exc).__name__}: {exc}).  Available source columns: "
+            f"{sorted(map(str, df.columns))}"
+        ) from exc
+
+    if len(out) == 0:
+        raise ValueError(
+            f"where: {expr!r} matched 0 of {before} rows in {fn} -- refusing to "
+            f"return an empty table.  Check the filter's spelling against the "
+            f"source's actual values."
+        )
+
+    return out
+
+
 @build_transform()  # build-path: extraction/formatting baked verbatim into the L2 parquet (#522)
-def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, **kwargs: Any) -> pd.DataFrame:
+def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, where: str | None = None, **kwargs: Any) -> pd.DataFrame:
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
 
@@ -1037,6 +1076,22 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
 
     Options convert_categoricals and encoding are passed to get_dataframe, and
     are documented there.
+
+    ``where`` is a row filter (the YAML ``where:`` key), a pandas
+    ``DataFrame.query`` expression evaluated against the RAW source frame --
+    i.e. over the *source* column names, before any column selection or
+    renaming.  It exists for LONG-format source files that carry several
+    row-categories per index tuple, where only one category belongs in the
+    table.  Filtering at the source keeps the declared index genuinely unique,
+    so ``_normalize_dataframe_index``'s duplicate-collapse never fires and no
+    row is silently discarded (GH #323).  Because the filter runs on the raw
+    frame, the discriminating column need not appear in ``idxvars``/``myvars``
+    and so never leaks into the output.
+
+    Failure is LOUD by design: an unparseable expression, a reference to a
+    column the source lacks, or a filter that matches ZERO rows all raise.  A
+    silently-empty table is exactly the class of failure this primitive exists
+    to prevent.
 
     Ethan Ligon                                                      March 2024
 
@@ -1086,6 +1141,9 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
         df = df_from_orgfile(fn,name=orgtbl,encoding=encoding)
         if df.shape[0]==0:
             raise KeyError(f'No table {orgtbl} in {fn}.')
+
+    if where is not None:
+        df = _apply_where(df, where, fn)
 
     out = {}
 
