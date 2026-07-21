@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/z7ee-4p39]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/408
+
+#+CATALOG_ID: 408
+#+CATALOG_IDNO: AZE_1995_SLC_v01_M
+#+CATALOG_TITLE: Survey of Living Conditions 1995
+#+CATALOG_YEARS: 1995-1995
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/z7ee-4p39
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/408
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

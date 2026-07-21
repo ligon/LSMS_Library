@@ -1,9 +1,16 @@
 SOURCE
 
-Ethiopian Rural Household Survey (ERHS) -- 1997 wave, Round 4 (1997).
-
-IFPRI Dataverse, doi:10.7910/DVN/T8G8IV (hdl:1902.1/15646)
 https://doi.org/10.7910/DVN/T8G8IV
 
+#+CATALOG_ID: none
+#+CATALOG_URL: https://doi.org/10.7910/DVN/T8G8IV
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: not-a-wb-dataset
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: Ethiopian Rural Household Survey is an IFPRI/Addis Ababa University study distributed via Harvard Dataverse (doi:10.7910/DVN/T8G8IV), not the World Bank Microdata Library.  There is nothing to discover in the WB catalog.
+
+* Notes (preserved from the original SOURCE.org)
+Ethiopian Rural Household Survey (ERHS) -- 1997 wave, Round 4 (1997).
+IFPRI Dataverse, doi:10.7910/DVN/T8G8IV (hdl:1902.1/15646)
 All ERHS rounds share one Dataverse deposit; see ../../_/CONTENTS.org
 for the round->file map.

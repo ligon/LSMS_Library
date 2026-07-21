@@ -1,6 +1,25 @@
 Country: Ethiopia
 Wave: 2013-14
 
+# cluster_features (GH #323 site 4).  Both sources are HOUSEHOLD-grain, so
+# they are merged on the household id (1:1) and reduced to the (t, v) EA grain
+# by Wave.cluster_features' existing GH #161 collapse -- mean() for
+# Latitude/Longitude (the cluster centroid), first() for Region/District/Rural.
+# That is why `i` is in `final_index`: the collapse only fires when `i` is an
+# index level.
+#
+# Merging on the CLUSTER key v instead made the join many-to-many and produced
+# a CARTESIAN PRODUCT: 5,262 cover households x 5,287 geo households over 433
+# EAs -> 65,508 rows, of which 60,221 were phantom.  The downstream
+# groupby().first() then tidied the evidence away, so the table reported clean.
+#
+# The key MUST be household_id2 (the W2 re-identified id), not household_id:
+# household_id is the W1 baseline id and is BLANK for households new to the
+# panel, so it is non-unique on the empty value -- re-keying to it would trade
+# an EA cartesian for a NULL-KEY cartesian (pd.merge matches nulls).  Verified:
+# household_id2 is unique and blank-free in BOTH frames (5,262 / 5,287 rows,
+# 0 keys duplicated in both).  This matches the wave's v (ea_id2) and the
+# i that sample/household_roster emit -- see _/CONTENTS.org.
 cluster_features:
     dfs:
         - df_main
@@ -9,6 +28,7 @@ cluster_features:
         file: sect_cover_hh_w2.dta
         idxvars:
             v: ea_id2
+            i: household_id2
         myvars:
             Region: saq01
             District: saq02
@@ -31,15 +51,21 @@ cluster_features:
     df_geo:
         file: Pub_ETH_HouseholdGeovars_Y2.dta
         idxvars:
-            v: ea_id2
+            i: household_id2
         myvars:
             Latitude: lat_dd_mod
             Longitude: lon_dd_mod
     merge_on:
-        - v
+        - i
+    # The cover page is authoritative for which households exist; the geo file
+    # is a strict enrichment and carries 25 households the cover does not (and
+    # a 434th EA the cover has never heard of).  `left` keeps those orphans
+    # from arriving with a null v and collapsing into one phantom cluster.
+    merge_how: left
     final_index:
         - t
         - v
+        - i
 
 panel_ids:
     file:

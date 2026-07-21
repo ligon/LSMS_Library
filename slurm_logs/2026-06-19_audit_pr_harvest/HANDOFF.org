@@ -1,0 +1,83 @@
+#+TITLE: Session Handoff — 2026-06-19 (audit-harness recovery + PR harvest)
+#+AUTHOR: Sue (Claude Opus 4.8, 1M context), scrum master
+
+* Summary
+Recovered the state left by the 2026-06-18 feature-audit-harness session
+(ended without housekeeping), then harvested its red-team draft fixes into
+PRs.  No work was lost; nothing was corrupted.
+
+* What the prior session left
+- Branch =feat/feature-audit-harness= (PR #521, already MERGED to
+  development; the local branch is stale — 10 commits behind dev).
+- Untracked =bench/feature_audit/backlog.workflow.js= (ran fine 2026-06-18,
+  produced =results/2026-06-18/backlog_report.md=, never committed).
+- 4 orphaned Workflow worktrees =.claude/worktrees/wf_9e904c1f-0cf-40..43=,
+  cut from a STALE base (=d981c918= = origin/master, not the branch tip),
+  each holding an uncommitted red-team candidate fix for a freshly-filed
+  issue.  The audit run (=audit.workflow.js=) had filed #511–#519 to GitHub.
+- Stale Savio venv symlink (=.venv -> /local/job35117117/venv_img=, dead job).
+
+* Actions taken
+- Recovered venv: =bash bin/savio_venv.sh mount= → =/local/job35127097/venv_img= (import OK).
+- Salvaged the 4 worktree diffs to
+  =bench/feature_audit/results/2026-06-18/draft_fixes/*.patch= (gitignored, on disk)
+  BEFORE removing the worktrees + their branches.
+- Re-applied each draft onto =origin/development=, VERIFIED with a
+  counterfactual (unfixed vs fixed), committed, pushed, opened a PR:
+  | PR   | issue | fix | verification |
+  |------+-------+-----+--------------|
+  | #525 | #516  | Albania kinship labels + SA rel_head int-key sentinel | warns 1→0 (Albania 90,731 rows; SA 43,687), counts unchanged |
+  | #526 | #515  | optional cluster_features geo sub-df KeyError → drop+warn | BF market=Region 22,362 → 145,011 rows (~122k recovered) |
+  | #527 | #517  | food_prices: collapse leaked =visit= recall via median | warn gone; Uganda/Malawi byte-stable; consistent w/ exp/qty derivations |
+  | #528 | #518  | derived hh_char market= KeyError no longer masked as Makefile error | Azerbaijan: RuntimeError → clean KeyError; happy path intact |
+  | #529 |  —    | commit backlog.workflow.js (skill #524 documented it; script was never committed) | meta/phases valid |
+  - All 5 PRs base on =development=.  #528 was re-targeted by hand (its
+    master base had drifted).
+
+* State at handoff
+- Checkout on =development= @ 49cb8050, clean tree.
+- Worktrees: only the main checkout (4 orphans removed).
+- venv mounted on n0050.savio3 (per-job; remounts via =bin/savio_venv.sh mount=).
+
+* Open / next
+- Review + merge PRs #525–#529 (human call).  Each closes its issue on
+  merge-to-master per the repo's dev→master flow.
+- Remaining filed audit issues NOT yet fixed: #513 (plot_features canonical
+  index), #514 (food_acquired canonical index), #519 (Iraq 2012
+  individual_education i:hh→questid — config one-liner, see backlog_report).
+- Backlog triage report (22 reconcile-close, 6 escalate) at
+  =bench/feature_audit/results/2026-06-18/backlog_report.md= — candidate
+  next sweep.
+- Cost: local builds only this session (no Slurm dispatch); negligible SU.
+
+* Phase 2 — tackling the remaining open audit issues (documented backlog-workflow)
+Ran the read-only diagnosis pass (workflow, 3 Explore agents) on #513/#514/#519,
+re-judged every classification, then fixed/escalated.  Cache discipline corrected
+mid-session (warm-first; cold/scoped-rebuild only for build-path + framework
+changes) and folded back into the skill.
+
+- =#532= fix(#519): Iraq 2012 individual_education i:hh→questid.  Config one-line;
+  verified WARM (config edit auto-invalidates only Iraq via v0.8.0 hash).
+  Recovered ~68k records (52,692→121,047 rows; 2012 wave was collapsing to ~9
+  hh ids and dropping from derived tables).
+- =#533= fix(#514): country.py _normalize_dataframe_index now SUMs additive cols
+  (food_acquired Quantity/Expenditure) instead of first() on duplicate canonical
+  tuples; non-additive tables keep first()+warning.  Threaded table_name through
+  4 call sites; lazy import of _ADDITIVE_MEASURE_COLUMNS from feature.py.
+  Verified (scoped rebuild): Mali +339.2M CFA / +913k qty recovered, warnings
+  3→0; Uganda byte-identical (no regression).  Build-path counterpart to #501/#507.
+- =#531= docs: cache-aware verification in the backlog-workflow skill (drop the
+  blanket cold-build; assembly/post-read defects repro warm).
+- =#530= filed: Azerbaijan cluster_features omits recoverable Region (PP.dta
+  zone/raion); =market='Region'= unavailable.  (#518's clean error exposed it.)
+- #513: deep-dived (don't auto-fix — 3+ structural issues).  Re-verified per
+  country: the filed "163" is EthiopiaRHS (not Malawi); Nigeria has a hidden
+  38,111-dup (t,i,plot_id) collapse (within-wave id_walk, NOT pp/ph — ruled out
+  by static read); a separate (i,t) no-plot_id class (Niger/Mali/Malawi/GhanaLSS).
+  Commented + re-scoped #513; split out =#535= (Nigeria) and =#536= ((i,t) class).
+
+** Still open (next session)
+- #513 (EthiopiaRHS/Malawi/China id_walk plot_id collision — design call),
+  #535 (Nigeria 38k id_walk dig), #536 ((i,t) no-plot_id class), #530 (Azerbaijan
+  Region wiring).  All diagnosed; none auto-fixable as a one-liner.
+- #511/#512 auto-close on the next development→master merge (#520).

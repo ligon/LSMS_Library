@@ -7,7 +7,17 @@ cluster_features:
         v: clust
     myvars:
         Region: region
-        Rural: loc2
+        # g7sec8h's `loc2` carries a TRAILING SPACE on the urban label
+        # ('Urban ', 439 clusters) -- it looks correct in a value_counts but
+        # compares false against 'Urban', so `df[df.Rural == 'Urban']` silently
+        # dropped every urban cluster in this wave.  (The `sample` block below
+        # reads a different, clean variable, `urbrur` from g7sec0, which is why
+        # sample was unaffected.)  GH #602.
+        Rural:
+            - loc2
+            - mapping:
+                'Urban ': Urban
+                'Rural ': Rural
 
 
 sample:

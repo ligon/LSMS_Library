@@ -66,14 +66,46 @@ cluster_features:
                     urbain: Urban
                     URBAIN: Urban
     df_geo:
-        file: NER_2011_ECVMA_v01_M_Stata8/NER_HouseholdGeovars_Y1.dta
+        # GH #323 site 4 -- THE COORDINATES WERE IN THE WRONG FILE.
+        #
+        # This used to point at NER_HouseholdGeovars_Y1.dta and ask it for
+        # lat_dd_mod / lon_dd_mod.  That file has 43 columns and NOT ONE of
+        # them is a coordinate: it ships only DERIVED raster covariates
+        # (dist_road, dist_market, af_bio_*, srtm, twi, sq1..sq7, EVI/NDVI
+        # series).  The KeyError was swallowed by the GH #515 optional-sub-df
+        # fallback, and cluster_features has been served with
+        # Latitude/Longitude 100% ABSENT ever since.
+        #
+        # The coordinates ship in a SIBLING file, NER_EA_Offsets.dta -- the
+        # WB's standard offset-EA-centroid release: 271 rows x (grappe,
+        # LAT_DD_MOD, LON_DD_MOD), 270 non-null grappes, coordinates inside
+        # Niger's bounding box (lat 11.88-18.75 N, lon 0.40-13.70 E).  It is
+        # already DVC-tracked alongside the rest of the wave.
+        #
+        # So this is NOT a "the survey never measured GPS" case and the
+        # columns are NOT marked `optional:` -- the data is real, available,
+        # and merely mis-addressed.  Wired up.
+        #
+        # Grain: EA_Offsets is one row per grappe (270 unique / 270), while
+        # df_main (ecvmamen_p1) is household-grain (3,968 rows over the same
+        # 270 grappes).  So the merge on the cluster key v is many-to-ONE --
+        # NOT a cartesian (0 keys duplicated in BOTH frames).  Every grappe in
+        # df_main is present in the offsets file and vice versa (0 orphans
+        # either way).  The coordinate is an EA-level constant, so the
+        # downstream collapse to the (t, v) cluster grain is exactly lossless.
+        file: NER_2011_ECVMA_v01_M_Stata8/NER_EA_Offsets.dta
         idxvars:
             v: grappe
         myvars:
-            Latitude: lat_dd_mod
-            Longitude: lon_dd_mod
+            Latitude: LAT_DD_MOD
+            Longitude: LON_DD_MOD
     merge_on:
         - v
+    # `left` is load-bearing: the offsets file has ONE trailing row with a
+    # null grappe (and null coordinates).  Under the default `outer` that row
+    # arrives as a phantom cluster with a null v; `left` drops it, since
+    # df_main is authoritative for which clusters exist.
+    merge_how: left
     final_index:
         - t
         - v

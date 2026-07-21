@@ -1,0 +1,71 @@
+#+TITLE: food_expenditures(basis=) — purchased vs total acquisition value (GH #575)
+#+filetags: design food_acquired food_expenditures 575
+#+DATE: <2026-06-25 Thu>
+#+AUTHOR: Sue (Claude Opus 4.8)
+
+* Problem
+=food_expenditures= had DIVERGED across countries.  =food_expenditures_from_acquired=
+summed =Expenditure= over whatever acquisition-source (=s=) rows carried a
+non-null value.  But the canonical builders disagree on whether produced/in-kind
+rows carry a value:
+- stock =food_acquired_to_canonical= (Burkina_Faso, Senegal, Tanzania, Guatemala,
+  ...) NaNs produced/in-kind =Expenditure= -> =food_expenditures= = purchased-only;
+- bespoke melts (Serbia, GhanaSPS, Uganda) populate produced/in-kind =Expenditure=
+  -> =food_expenditures= = total acquisition value.
+So =Feature('food_expenditures')= mixed two measures: Serbia/GhanaSPS showed
+systematically higher "expenditure" (own-production folded in) than the
+purchased-only countries.  Surfaced by the #218 adversarial review (=wuiofz6p0=).
+
+* Decision (user, 2026-06-25): a ``basis=`` kwarg, ``purchased`` the default
+Mirrors the Phase-4 =food_prices(units=)= / =food_quantities(units=)= precedent.
+
+- =food_expenditures(basis='purchased')= (DEFAULT): cash outlay only -- keep
+  rows with =s == 'purchased'=.  Consistent across ALL countries regardless of
+  whether the source recorded an imputed produced/in-kind value.  Removes the
+  divergence.
+- =food_expenditures(basis='total')=: sum recorded =Expenditure= across every
+  =s=.  Where the source recorded produced/in-kind value (Serbia, GhanaSPS,
+  Uganda) it is included; where it did not (Guatemala, stock-helper countries)
+  =total= equals =purchased= -- *no value is fabricated*.
+
+* Why purchased is the default
+"Expenditure" is a cash-outlay term of art.  A subsistence household that ate
+only its own produce has zero food *expenditure*; it correctly has no rows in
+the default view.  Analysts wanting consumption *value* (the usual CFE-demand
+input) pass =basis='total'= (and, once the follow-up lands, get imputed
+own-production value too).
+
+* Coverage consequence (documented, not a bug)
+Purchased-only default drops households whose food was entirely own-production.
+Measured: Uganda 2009-10 food_expenditures(market='Region') = 2900 HH at
+=basis='purchased'= vs 2929 at =basis='total'= (29 subsistence-only HH).  The
+=test_food_expenditures_retains_hybrid_v_HH= coverage invariant (which asserts
+the market-fallback v-retention, orthogonal to source) was updated to use
+=basis='total'= so it keeps measuring the full HH set it is about.
+
+* Implementation
+- =transformations.food_expenditures_from_acquired(df, basis='purchased')=:
+  validate basis; filter =s=='purchased'= for the default; group-by preserves
+  =s= (Phase 4).  No-=s= waves: bases coincide.
+- =country.py= generated method: new =basis=None= param; gate rejects =basis= on
+  non-=food_expenditures= tables AND validates the value EARLY (before the derive
+  path, whose broad =except= would otherwise swallow the ValueError and surface a
+  confusing "could not materialize").  Forwarded to the transform.
+- =Feature= forwards =basis= automatically (it is now in the method signature).
+- Tests: =tests/test_food_expenditures_basis.py= (6 synthetic-frame units);
+  =test_sample.py= coverage fixture switched to =basis='total'=.
+
+* Follow-up (NOT in this PR): impute own-production value for basis='total'
+For purchased-only-source countries, =basis='total'= currently == =purchased=
+(the source has no produced/in-kind value to sum).  A faithful "total
+acquisition value" should *impute* own-production / in-kind value at purchase
+unit prices (Deaton): produced value = produced Quantity x purchase unit-value
+for the same (t, j, u).  This is a modeling step (which price granularity --
+national (t,j,u) vs cluster/region -- and how to handle never-purchased items),
+deferred to its own issue.  Until then =basis='total'= is honestly "sum of
+recorded acquisition value", documented in the docstring.
+
+* References
+- GH #575, #218 (review =wuiofz6p0= that surfaced the divergence),
+  DESIGN_food_prices_units_kwarg_2026-05-06.org (the units= precedent),
+  transformations.py food_*_from_acquired, country.py _FOOD_DERIVED dispatch.

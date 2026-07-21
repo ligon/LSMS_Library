@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/frwh-7q04]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/73
+
+#+CATALOG_ID: 73
+#+CATALOG_IDNO: TJK_2009_TLSS_v01_M
+#+CATALOG_TITLE: Living Standards Survey 2009
+#+CATALOG_YEARS: 2009-2009
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/frwh-7q04
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/73
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

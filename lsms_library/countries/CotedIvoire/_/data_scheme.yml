@@ -10,11 +10,20 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # Latitude / Longitude come from the df_geo merge wired in
+    # 2018-19/_/data_info.yml -> Menage/grappe_gps_CIV2018.dta (1084 grappes;
+    # columns grappe, coordonnes_gps__Latitude, coordonnes_gps__Longitude).
+    # Until 2026-07-13 that one file carried NO .dvc sidecar -- unlike every
+    # EHCVM sibling -- so in a clean checkout it was simply absent, the GH #515
+    # optional-sub-df fallback swallowed the PathMissingError, and Lat/Lon
+    # dropped out silently.  It is now DVC-tracked, so they are REQUIRED again.
     index: (t, v)
     Region: str
     Rural: str
-    Latitude: float
-    Longitude: float
+    Latitude:
+      type: float
+    Longitude:
+      type: float
 
   household_roster:
     index: (t, i, pid)

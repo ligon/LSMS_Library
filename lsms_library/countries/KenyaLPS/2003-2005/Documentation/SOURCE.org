@@ -1,0 +1,12 @@
+SOURCE
+
+(source URL not recorded)
+
+#+CATALOG_ID: none
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: not-a-wb-dataset
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: Kenya Life Panel Survey is not distributed via the World Bank Microdata Library (a KEN/lsms catalog query returns no entries).
+
+* Notes (preserved from the original SOURCE.org)
+(source URL not recorded)

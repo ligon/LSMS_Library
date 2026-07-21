@@ -34,7 +34,21 @@ The returned DataFrame prepends a `country` index level.
 - `scrum-master-hpc` (shared sucoder skill at `~/.sucoder/skills/scrum-master-hpc/SKILL.md`) — dispatching subagents, worktrees, DVC lock hygiene. Read this before using the Agent tool for multi-country work. Library-specific addenda:
   1. Subagents share the parquet cache at `~/.local/share/lsms_library/`, so concurrent agents building different countries don't conflict.
   2. The venv is at `{repo_root}/.venv/bin/python` (not in worktrees) — set `PYTHONPATH` to the worktree so development-branch code is picked up.
-  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path** — `PYTHONPATH` alone does NOT redirect imports of `lsms_library` to a worktree.  Worker agents that rebuild a feature to verify a YAML edit will silently run the main checkout's code.  For **config** edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), set **`LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries`** so the live package reads the worktree's config tree (GH #436); this is the clean fix and needs no fresh venv.  For **library-code** edits (`country.py`, `local_tools.py`, …) the `.pth` still pins to the main checkout, so either (a) verify via static diff only, or (b) have the agent install a fresh venv inside its worktree.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill for detection and mitigations.
+  3. **`.venv/lib/python3.11/site-packages/lsms_library.pth` hardcodes the main-repo path**, so a worktree agent can silently verify against the *main checkout's* code.  **Always set `PYTHONPATH=<worktree>`** — it *does* beat the `.pth` (corrected 2026-07-12; this entry previously claimed the opposite, and the wrong claim sent people to a needless fresh-venv build).
+
+     **The actual trap is `python <script>.py`.**  Python sets `sys.path[0]` to the **script's own directory**, *not* cwd.  So `cd`-ing into the worktree does **not** protect a script run — cwd never enters `sys.path` at all, the `.pth`'s main-repo path wins, and you import the main checkout while believing you are testing the worktree.  Verified:
+
+     | invocation (cwd = worktree) | `PYTHONPATH` | imports |
+     |---|---|---|
+     | `python -c "import lsms_library"` | unset | worktree ✓ (cwd is `sys.path[0]`) |
+     | `python bench/scan.py` | unset | **main checkout ✗ — the trap** |
+     | `python bench/scan.py` | `=<worktree>` | worktree ✓ |
+
+     This has already cost a worker agent a full wasted audit run (PR #594).  Since the failure is *silent* and looks like success, **assert it** rather than assume it:
+     ```python
+     import lsms_library; assert 'worktrees' in lsms_library.__file__, lsms_library.__file__
+     ```
+     For **config**-only edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), `LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries` is the cleaner lever: the live package reads the worktree's config tree (GH #436) and library-code identity stops mattering.  A fresh in-worktree venv is **not** needed for either case.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill.
   4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's **adopt-or-build recipe** (adopt any importable `/local/job*/venv` already on the node → tar-pipe build only if none → reclaim the stale ones), which gives cross-job persistence without root.  Note: a stable `/local/$USER/<repo>` path is NOT creatable by us (`/local` is `root:root`); a genuinely persistent path needs an HPC-support ticket (README "Admin endgame").  **Opt-in fast path**: `bin/savio_venv.sh` packages the venv as a single squashfs image (`.venv.sqfs`, ~255 MB / one Lustre inode vs ~33k files) and mounts it per job via apptainer's `squashfuse_ll` (`mount`/`umount`/`update` subcommands) — kills the Lustre-MDS load and sidesteps the per-job reaper; see `docs/savio_venv.md` for the model + how to rebuild the image when deps change.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
 
 ## Repository Layout
@@ -74,6 +88,35 @@ There are two ways a table gets built at the wave level.
   - Elaborate unit conversions or cross-file joins (Nigeria / GhanaLSS `food_acquired`).
 
 **Rule of thumb**: column mappings from one source file per wave → YAML. Cross-file concatenation, per-row `t` assignment, or multi-wave source files → script with `materialize: make`.
+
+### A script is a complication. Go read about it before you edit.
+
+**`materialize: make` exists because someone decided YAML could not express this table.** That decision is a *survey idiosyncrasy*, and the script is the scar tissue. So the build path is a mechanical, always-current signal of where the complications are — you never have to guess:
+
+```sh
+grep -c 'materialize: make\|!make' lsms_library/countries/{C}/_/data_scheme.yml
+```
+
+**BEFORE editing any script-path table, read the country's `_/CONTENTS.org` and the script's own docstring. Then say what you found.** Not "I checked" — *what the idiosyncrasy is*. If you cannot name it, you have not looked.
+
+This is not optional politeness. Two examples from the GH #323 sweep, both of which would have shipped silent corruption:
+- **Nigeria** is post-planting/post-harvest: every wave dir holds *two* rounds needing *distinct* `t` values. A cluster-key rekey that isn't round-invariant silently moves households between clusters across rounds. (`.claude/skills/add-feature/pp-ph/SKILL.md` — "the single most common source of duplicate-index bugs in these countries.")
+- **Tanzania**'s `2008-15/` is *one folder, four rounds* via `wave_folder_map`. A fix reasoning about "a household's two panel lines" has a two-round assumption baked into a four-round folder.
+
+The signals corroborate each other — script count tracks documentation length, because the countries that needed scripts are the ones that needed explaining:
+
+| | script-path tables | `CONTENTS.org` |
+|---|---|---|
+| Nigeria | 22 | 256 lines |
+| Ethiopia | 19 | 602 |
+| Uganda | 18 | 257 |
+| Tanzania | 18 | 971 |
+| Malawi | 11 | 497 |
+| Iraq / Guyana / Kosovo | 1–2 | 9–13 |
+
+**Deliberately NOT centralized.** There is no master table of "weird things about country X", and there should not be — it would drift out of sync with the `CONTENTS.org` files and become a second source of truth that lies. The docs live next to the code so they stay honest. The cost of that choice is that **you have to go look**, which is what this section exists to make you do.
+
+*Known gap*: `Senegal/_/CONTENTS.org` is a stub (a TODO list, not idiosyncrasy docs) despite 7 script-path tables. Treat Senegal with extra care and write up what you learn.
 
 ## Data Access
 
@@ -117,6 +160,16 @@ override.
 
 **Adding new waves**: `lsms_library.data_access.discover_waves()` / `add_wave()`; `push_to_cache_batch()` for batched `dvc add` + `dvc push`. See `CONTRIBUTING.org`.
 
+**Wave provenance (`lsms_library/provenance.py`).** Every wave dir records the WB catalog entry it came from in `Documentation/SOURCE.org`, as org keyword lines (`#+CATALOG_ID:`, `#+CATALOG_IDNO:`, `#+PROVENANCE_SOURCE:` ∈ {`worldbank`, `external`, `unknown`}, …) appended beneath the original free-text URL — which stays the file's first URL, so the legacy `_read_source_url()` reader is unaffected. Human-written prose in a pre-existing `SOURCE.org` is preserved verbatim under a `* Notes (preserved …)` heading; the writer is idempotent. `discover_waves()` matches on the **catalog id**, never on a wave label reconstructed from the entry's year range — labels collide across distinct surveys (Nigeria GHS-Panel W4 `3557` vs. Living Standards Survey `3827`, both 2018–2019) and one entry can span two wave dirs (Uganda `1001` → `2005-06/` + `2009-10/`). Where no id is recorded it falls back to the label heuristic but reports `local_status='unknown'` with `local=False` — silence must not masquerade as knowledge. Countries sharing an ISO code (GhanaLSS/GhanaSPS → GHA; Tanzania/Tanzania_Kegera → TZA) are disambiguated by an `idno_pattern` in `_COUNTRY_CATALOG`; non-WB countries (`EthiopiaRHS`, `KenyaLPS`) are explicitly `discoverable=False`. `#+PROVENANCE_VALIDATION:` records *how strongly* an id is corroborated — `content-validated` (the wave's own data files confirm it, e.g. Niger 2011-12's `Data/NER_2011_ECVMA_v01_M_Stata8/`) vs. `catalog-only` (catalog metadata only; Nepal 2003-04 has no local data at all — provenance known, data absent, two different facts). All 123 shipped `SOURCE.org` are resolved: **0 unknown**. Re-stamp with `python scripts/backfill_wave_provenance.py`.
+
+**Which WB repositories discovery searches (`repositories`, GH #597).** `discover_waves()` searches the collections in a country's `repositories` field of `_COUNTRY_CATALOG`, **defaulting to `("lsms",)`**. Entire series live outside `lsms` and were *structurally unfindable*: Armenia's Integrated Living Conditions Survey (18 waves, 2001–2018) and Liberia's Household Income & Expenditure Survey (2 waves) are in `central`; South Africa's General Household Survey, Income & Expenditure Survey and Living Conditions Survey (28 waves) are in `datafirst`. **Widening a country to a second repository requires an `idno_pattern` pinning the survey series** — the two levers compose (`repositories` = where to look, `idno_pattern` = what counts). Dropping the collection filter instead inflates results 30–400× with Findex/DHS/Afrobarometer/enterprise noise, and resurfaces studies we *already hold under a different catalog id in another repository* (`central` 3016 = the same Malawi IHS3 as `lsms` 1003; `datafirst` 902 `ZAF_1993_PSLSD` = the same survey as `lsms` 297 `ZAF_1993_IHS`) — nothing in the catalog links those pairs, so only the series pin excludes them. Adding a new country needs a one-time broad sweep (`_wb_catalog_search(code, collection=None)`) curated into config. `GET /api/collections` returns HTTP 400; read collection ids off the `repositoryid` field of search rows.
+
+**Instrument capability (`lsms_library/capability.py`, GH #597).** What a survey series *measures* is recorded **when it is acquired**, not rediscovered by probing `absent` cells months later. A `SeriesCapability` names the features a series `provides` and `lacks`; each `lacks` entry pre-populates rows for `.coder/coverage/absent_verdicts.csv` via `proposed_absent_verdicts()`. Example: South Africa's GHS has no consumption module, so `South Africa/food_acquired/*` is explained from birth instead of being filed as a gap.
+
+> **A capability record may NOT close a cell on catalog metadata.** Each record carries a `validation` level — `catalog-only` → `data-validated` → `questionnaire-validated` — mirroring the `PROVENANCE_VALIDATION: content-validated | catalog-only` distinction. **Only `questionnaire-validated` (C4) emits a closing `not-asked`**; `catalog-only` and `data-validated` emit **`unsure`**, which leaves the cell in the work queue. A negative label sweep (C1) is exactly as consistent with `asked-not-distributed` as with `not-asked` — which is *why* C4 is mandatory. Closing a cell on a cataloguer's topic list would be the Albania mistake with better paperwork. `capability.audit()` asserts the invariant; `tests/test_capability.py` proves a `catalog-only` record cannot close a cell through the real `load_verdicts()`.
+
+Upgrading a series from `catalog-only` to `questionnaire-validated` (one RA, one PDF) is what converts its `unsure` rows into permanent `not-asked` — a bounded human step **per series**, not per cell.
+
 **Three-tier credential model.** The WB Microdata API key is the sole real gate; the S3 bucket is a read cache over the authoritative WB NADA downloads.
 
 | User has                                                   | Gets                                                  |
@@ -155,6 +208,62 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 **Root cause context**: the replication pipeline (`lsms.tools.get_household_roster`) did `dropna(how='any')` on `[HHID, sex, age, months_spent]`, implicitly excluding departed members. The current API's runtime derivation previously counted everyone in the roster, producing a 1315-HH drift on Uganda `household_characteristics`. Adding MonthsSpent + the filter resolved this to ~220 residual outliers (age-bracket boundary shifts from `age_handler`'s DOB-derived fractional ages).
 
 **EHCVM note**: EHCVM 2018-19 countries lack a continuous months variable. The binary `s01q12` ("lived continuously 6+ months?") is mapped to 0/12. Guinea-Bissau may need Portuguese keys (`Sim`/`Não`) alongside `Oui`/`Non`. See CONTENTS.org files for per-country documentation.
+
+## Grain Collapse: the Core Never Aggregates Silently (GH #323)
+
+`_normalize_dataframe_index` (`country.py`) still collapses a non-unique **declared** index with `groupby().first()`, and `feature._collapse_duplicate_index` does the same after dropping an extra level. Both are now **audited before they destroy anything** (`country._audit_index_collapse`):
+
+- **Destructive collapse** (the duplicate rows *disagree*) → `GrainCollapseWarning`, naming country/table/wave and the exact rows destroyed. `LSMS_GRAIN_STRICT=1` turns it into a fatal `GrainCollapseError` — that's the CI/test ratchet. There is deliberately **no allowlist of known-bad cells**; a known-bad cell stays loud until it is fixed.
+- **Lossless de-dup** (the duplicate rows are *identical* — e.g. a cluster attribute repeated once per household) → silent. ~6.4M of the ~7.5M duplicated rows in the corpus are this; reporting them would bury the ~540k real losses in noise.
+- `_ADDITIVE_MEASURE_COLUMNS` (`food_acquired`) still SUMs and stays silent — it is lossless.
+- `grain_reports()` returns the reports filed in-process (for tests / the audit harness).
+
+**The signal survives the cache — this is the load-bearing part.** The L2-country parquet is written **post-collapse**, so on a warm read the index is already unique and any detector at the collapse site is *structurally unable to fire*. (That is why the original #323 warning, added in PR #411, never fired in normal operation: **the bug hid behind the cache the bug poisoned**, and every guard we had — the warning, `diagnostics._check_duplicate_index`, any scan of `var/` — sat downstream of the destruction.) The audit is therefore embedded in the parquet's schema metadata (`lsms_grain_audit`, alongside `lsms_cache_hash`) at write time and **replayed on every warm read**.
+
+**Duplicates on a declared index mean the IDENTIFIER IS BROKEN or a LEVEL IS MISSING — fix the index; do not declare a reducer.** Mali's `household_roster` declares `(t, i, pid)` but `pid` is a *household* id stamped on every member, so `first()` keeps one person per household and 32,026 people vanish; no reducer is correct there. The `aggregation:` key in `data_scheme.yml` is **dead config** and is deliberately NOT honoured by the core collapse (a test pins this) — see `SkunkWorks/grain_aggregation_policy.org` §3a ("NO AGGREGATION IN CORE").
+
+*Known open (§3b of that doc)*: `groupby()` defaults to `dropna=True`, so a row with NaN in a declared index level is **deleted outright** by the collapse — 14 cells / 485,231 rows (worst: Burkina Faso `food_acquired` 2014, 82.5% of rows). Currently **reported, not fixed** (decision D2, 2026-07-13: delete-and-report; retaining would change returned data library-wide).
+
+**Site 2 — `Wave.cluster_features` (GH #161).** A *second, hardcoded* collapse, separate from the declared-index one. 17 countries declare `i: <HHID>` in `cluster_features` `idxvars` (so the YAML can merge a household-level GPS frame), which hands `Wave.cluster_features` a **household-grain** table; it projects that onto the `(t, v)` cluster grain **before `_normalize_dataframe_index` ever runs**, so Site 1's audit is structurally blind to it. It used to be licensed by a comment — *"Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design"* — and prose is not enforcement. The claim is **false**: measured across the corpus, **15 of 30 household-grain cells destroy rows (53,199 rows destroyed, 13,704 deleted on a NaN key)**. Kazakhstan 1996 cluster `v=126` holds 178 Urban households and 2 Rural, and `.first()` returns **`Rural`** for the whole cluster — silently *wrong*, not merely lossy. `_collapse_to_cluster_grain` now audits the projection with the *same* machinery (`_audit_index_collapse` → `GrainCollapseWarning`, stamped into the parquet, replayed on the warm read); a provably lossless projection stays silent (Cambodia 0/252, Tajikistan 0/767, South Africa 0/355).
+
+- **When auditing a collapse, `droplevel` the levels being projected away first.** `_audit_index_collapse` compares whole rows via `reset_index()`, so leaving `i` in makes every multi-household cluster look destructive — ~100% false positives.
+- `groupby().first()` **skips NA per column**, so a conflicting group collapses to a *composite* row assembled from the first non-null value of each column independently — a household that exists nowhere in the survey.
+- **Core aggregates nothing here — not even GPS** (decided 2026-07-13). `Latitude`/`Longitude` used to be reduced with `.mean()` (a cluster centroid); that was the last aggregation core performed anywhere, and the corpus showed it earned its keep nowhere. It is a **provable no-op in 4 of the 5 cells** where it could fire (the published GPS *is* the cluster's displaced fix, stamped on each household — it was never household GPS), and in the 5th (Malawi 2013-14) it averaged points a median of 148 km and up to **783 km** apart: a broken cluster key, not a centroid, in a cell that already warned for Region/District/Rural. GPS is now audited and `.first()`-ed like every other column. Cost of the flip, measured end-to-end: **zero new warning cells**. `SkunkWorks/grain_aggregation_policy.org` now has **no exception left in it**. An analyst who wants a centroid computes one (`transformations.py`); a country with genuine per-household GPS has put a household column in a cluster table and should move it.
+- `i` arriving as a **column** rather than an index level (Uganda's 7 other waves) is Site 2's twin: `drop(columns='i')` launders a household-grain frame into a `(t, v)` frame with unexplained duplicates. Site 1 reduces and audits those with the same `.first()`, so the loss is reported either way (9,890 destroyed + 934 NaN-key).
+*Known open (§3b of that doc)*: `groupby()` defaults to `dropna=True`, so a row with NaN in a declared index level is **deleted outright** by the collapse — 14 cells / 485,231 rows (worst: Burkina Faso `food_acquired` 2014, 82.5% of rows). Currently **reported, not fixed**.
+## Coverage Matrix (v0.9.0+)
+
+`make matrix` grades every `(country, feature, wave)` cell on a tier ladder — `absent` / `dropped` / `broken` / `builds` / `sane` / `blessed` — and commits a snapshot to `.coder/coverage/latest.csv`. `ll.coverage()` reads it back. See `docs/guide/coverage.md`.
+
+**`sane` is not `blessed`, and the difference matters.**
+
+- **`sane`** — the automated checks passed. *No human has necessarily looked at a single number.*
+- **`blessed`** — a human read the actual numbers for that cell and believes them. Recorded in the git-tracked `.coder/coverage/blessed.csv`.
+
+A feature can build cleanly, pass every sanity check, and still be quietly wrong — wired to the wrong source column, or carrying an unverified unit conversion. So **for anything feeding published analysis, `sane` is not enough.**
+
+> **The rule: if you used a cell in real analysis and looked at its numbers, bless it in the same PR.**
+> `country,feature,wave,blessed_by,date,note` (`wave` blank for country-level features). Blessings accrete; never bulk-seed them. An empty blessing file is honest — a file full of blessings nobody gave makes `blessed` a synonym for `sane` and destroys the tier.
+> Do **not** put `#` comments in `blessed.csv`: `load_blessed()` reads it without a `comment=` arg, so a comment line becomes a phantom blessed cell.
+
+**Do not trust a `sane` cell as proof an issue is fixed.** Know what the grader does *not* look at — it is a cold build (so it cannot see warm-cache-only divergences) and it does not check currency labels.
+
+### Adjudicating `absent` cells
+
+`absent` says only "not declared for this wave" — which conflates *"the survey never asked"* with *"nobody wrote the config yet"*. Verdicts go in the git-tracked `.coder/coverage/absent_verdicts.csv` (`country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date`):
+
+| verdict | meaning | closes the cell? |
+|---|---|---|
+| `todo` | data is there, config missing | no — stays `absent`, but now sized + sourced |
+| `asked-not-distributed` | instrument asked; the shipped extract lacks it | **yes** → acquisition queue |
+| `not-asked` | genuinely never asked | **yes** → closed forever |
+| `unsure` | a required check could not be run | no — stays in the queue, records why |
+
+> **A closing verdict REQUIRES evidence — `load_verdicts()` refuses one without it.** A closing verdict is a permanent, unsupervised write. An unevidenced negative is unfalsifiable, and therefore permanent whether or not it is true.
+>
+> This already went wrong: `Albania/_/data_scheme.yml` asserted *"earlier waves have no shocks module"*, but Albania 2005's `migrationE_cl.dta` carries `m6e_q00 = 'Type of Shock Code'` with ten shock types. False, uncatchable (nothing recorded *how* it was reached), and it suppressed ~5 cells of work. **Never write an unevidenced "no module here" claim, in a verdict file or in a YAML comment.**
+
+Before closing a cell, run the four checks (see `docs/guide/coverage.md`). The two that are most often skipped and most often wrong: **C2 (sibling-wave differential) is necessary but NEVER sufficient** — module vocabularies change completely between waves; and **C4 (the questionnaire) is mandatory**, because *absence in the shipped `.dta` is not absence in the instrument*. Only the questionnaire separates `not-asked` from `asked-not-distributed`.
 
 ## Derived Tables
 
@@ -239,9 +348,10 @@ Some countries have configs but no source `.dta` in the repository:
 | Country          | Reason                            | Source                                                       |
 |------------------|-----------------------------------|--------------------------------------------------------------|
 | Nepal            | NSO hosts data, not WB            | https://microdata.nsonepal.gov.np/ (free registration)       |
-| Armenia          | No data files downloaded          | WB catalog, external hosting                                 |
+| Armenia          | No data files downloaded — but 18 ILCS waves (2001–2018) ARE in the WB catalog, in the `central` repository. Acquisition backlog, not an absence (GH #597). | `discover_waves('Armenia')` |
 | Timor-Leste 2001 | No `_/` config for this wave      | WB catalog                                                   |
-| Guatemala        | No PSU/cluster variable in data   | ENCOVI 2000 design                                           |
+
+> **Guatemala was listed here as "No PSU/cluster variable in data" — that was wrong** (corrected 2026-07, GH #323). ENCOVI 2000 *does* identify its primary sampling unit; the PSU just lives in `CONSUMO5.DTA` (which carries `upm` plus the full `depto`/`mupio`/`sector`/`segmento` hierarchy and joins 1:1 on `hogar`), while the `ECV*`/`HOGARES`/`PERSONAS` files everyone checked carry only `region` + `area`. Guatemala's `v` is now the composite `depto-mupio-sector-segmento` (1,065 clusters). **Do not use the raw `upm` column**: Stata stored it as float32 and every value exceeds 2^24, so the digits encoding `segmento` are rounded away — 201 `upm` values silently conflate distinct PSUs. See `countries/Guatemala/_/guatemala.py`.
 
 ## Design / Skunkworks References
 

@@ -45,7 +45,7 @@ build:
 	+make -C ../$(country)/_
 
 test:
-	./harmony.py $(country)
+	$(PYTHON) ../bench/feature_audit/scan.py --countries $(country) --out /tmp/feature_audit_$(call slug,$(country)).jsonl
 
 materialize:
 	$(PYTHON) -m lsms_library.cli materialize \

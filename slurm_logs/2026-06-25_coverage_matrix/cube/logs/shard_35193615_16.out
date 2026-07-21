@@ -1,0 +1,20 @@
+=== task 16: country='Kazakhstan'  node=n0178.savio3  Thu Jun 25 18:46:11 PDT 2026 ===
+--- provisioning venv -> /local/job35193677/venv ---
+--- cache clear Kazakhstan ---
+Kazakhstan: removed
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/1996/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/1996/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/1996/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/1996/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/1996/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/1996/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/var/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kazakhstan/1996/_/subjective_well_being.parquet
+--- build Kazakhstan ---
+=== done 'Kazakhstan' rc=0  Thu Jun 25 18:46:51 PDT 2026 ===

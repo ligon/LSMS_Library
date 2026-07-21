@@ -20,6 +20,19 @@ from .build_transforms import (  # noqa: F401  (re-export for back-compat)
     fill_v_with_coord_bin,
     apply_derived,
     _DERIVED_TRANSFORMERS,
+    # Explicit grain helpers (GH #323).  They live in build_transforms because
+    # a country's mapping.py calls them at BUILD time and their output is baked
+    # into the L2 parquet; they are re-exported here because that is where the
+    # country scripts import from, and because the grain policy
+    # (SkunkWorks/grain_aggregation_policy.org) names transformations.py as the
+    # home of caller-invoked aggregation.  Both modules are caller-invoked; only
+    # the ACCESS PATH (country.py / feature.py / local_tools.py) is forbidden to
+    # reduce grain, and none of these is reachable from it.
+    reduce_to_agreed,
+    collapse_to_cluster_grain,
+    add_visit_level,
+    GrainConflict,
+    GrainConflictWarning,
 )
 
 
@@ -226,6 +239,22 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
     pandas.DataFrame
         Household-level counts with one column per sex × age bucket and
         a ``log HSize`` column.
+
+    Notes
+    -----
+    **Residence filter.**  Non-resident members are dropped using whichever
+    residence-duration column the roster carries — ``MonthsSpent`` (months
+    present), ``MonthsAway`` (→ ``12 - value``) or ``WeeksAway``
+    (→ ``12 - weeks/(52/12)``); see ``CLAUDE.md`` §"MonthsSpent /
+    MonthsAway / WeeksAway".  ``df`` here is the *country-level* concat of
+    every wave, so those columns are unioned across waves: a column
+    supplied by one wave appears (all-NaN) on the others.  The resolution
+    is therefore a **per-row coalesce** across the three sources, and a
+    wave with no usable residence datum at all falls back to counting every
+    roster member — the documented behaviour for a country with no
+    residence column, applied per-wave.  Without those two rules an entire
+    wave's ``household_characteristics`` silently vanishes while its
+    ``household_roster`` is fully populated.
     """
     roster_df = df.copy()
     roster_df.columns = roster_df.columns.str.lower()
@@ -248,20 +277,83 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
     # Uganda uses MonthsSpent (months present, 0-12).  East African
     # surveys (Ethiopia, Tanzania, Malawi) use MonthsAway (months
     # absent, 0-12); convert to months-present for a uniform filter.
+    # Ethiopia W4-W5 and Cambodia use WeeksAway instead.
+    #
+    # The resolution is a per-ROW coalesce, not a per-column choice: this
+    # frame is the *country-level* concat of every wave, so a column
+    # contributed by one wave is unioned onto all the others.  Ethiopia
+    # carries BOTH MonthsAway (W1-W3) and WeeksAway (W4-W5), disjointly
+    # populated -- picking the first column *present* would resolve W4-W5
+    # to an all-NaN MonthsAway and delete both waves.  Priority order on
+    # the (rare) rows where more than one source is populated:
+    # MonthsSpent (asked directly) > MonthsAway > WeeksAway (coarser).
+    # Work positionally (numpy) rather than through pandas alignment: the
+    # roster index is a MultiIndex with duplicate entries in the wild.
+    def _numeric(col):
+        return pd.to_numeric(roster_df[col], errors='coerce').astype('float64').to_numpy()
+
     ms = None
+    _sources = []
     if 'monthsspent' in roster_df.columns:
-        ms = pd.to_numeric(roster_df['monthsspent'], errors='coerce')
-    elif 'monthsaway' in roster_df.columns:
-        ma = pd.to_numeric(roster_df['monthsaway'], errors='coerce')
-        ms = 12 - ma
-        ms = ms.clip(lower=0)  # guard against >12 outliers
-    elif 'weeksaway' in roster_df.columns:
-        wa = pd.to_numeric(roster_df['weeksaway'], errors='coerce')
-        ms = 12 - (wa / (52 / 12))
-        ms = ms.clip(lower=0)
+        _sources.append(_numeric('monthsspent'))
+    if 'monthsaway' in roster_df.columns:
+        # months present = 12 - months away; clip guards >12 outliers
+        _sources.append(np.clip(12 - _numeric('monthsaway'), 0, None))
+    if 'weeksaway' in roster_df.columns:
+        _sources.append(np.clip(12 - (_numeric('weeksaway') / (52 / 12)), 0, None))
+    if _sources:
+        ms = _sources[0]
+        for _alt in _sources[1:]:
+            ms = np.where(np.isnan(ms), _alt, ms)
     if ms is not None:
-        age = pd.to_numeric(roster_df['age'], errors='coerce')
-        keep = ms.notna() & ((ms > 0) | (age < 1))
+        age = _numeric('age')
+        with np.errstate(invalid='ignore'):
+            keep = ~np.isnan(ms) & ((ms > 0) | (age < 1))
+        # A wave can end up with a residence column that is entirely NaN
+        # *within that wave* -- either because the survey never asked the
+        # question (CotedIvoire 1985-89, Mali 2021-22: the column exists in
+        # this frame only because the country-level concat unioned it in
+        # from a later wave) or because the labels did not parse.  ``keep``
+        # is then all-False for the wave and household_characteristics
+        # silently returns NOTHING for it while household_roster is fully
+        # populated.  Guard per ``t``: a wave with no usable residence datum
+        # at all reverts to the documented pre-MonthsSpent behaviour --
+        # "countries without any residence column are unaffected -- the old
+        # count-everyone behavior continues" (CLAUDE.md) -- applied at wave
+        # granularity.  Waves that DO have residence data are filtered
+        # exactly as before, so the Uganda drift the filter was introduced
+        # to fix stays fixed.
+        has_ms = ~np.isnan(ms)
+        idx_names = roster_df.index.names or []
+        if 't' in idx_names:
+            t_vals = pd.Index(roster_df.index.get_level_values('t'))
+            wave_has_ms = (
+                pd.Series(has_ms)
+                .groupby(t_vals, dropna=False)
+                .transform('any')
+                .to_numpy()
+            )
+        else:
+            wave_has_ms = np.full(len(roster_df), bool(has_ms.any()))
+        if not wave_has_ms.all():
+            import warnings as _warnings
+            if 't' in idx_names:
+                _dead = sorted(
+                    {str(t) for t, ok in zip(t_vals, wave_has_ms) if not ok}
+                )
+            else:
+                _dead = ['<no-t>']
+            _warnings.warn(
+                f"household_characteristics: no usable residence duration "
+                f"(MonthsSpent / MonthsAway / WeeksAway) for wave(s) {_dead}; "
+                f"counting every roster member there instead of filtering to "
+                f"resident members.  The column is present in the country-level "
+                f"frame only because another wave supplies it.  Waves with "
+                f"residence data are filtered as usual.",
+                UserWarning,
+                stacklevel=3,
+            )
+        keep = keep | ~wave_has_ms
         roster_df = roster_df[keep]
     roster_df = roster_df.dropna(subset=['sex', 'age'])
     roster_df['age_interval'] = age_intervals(roster_df['age'], age_cuts)
@@ -632,24 +724,66 @@ def _apply_kg_conversion(df, factors):
     return v
 
 
-def food_expenditures_from_acquired(df):
+def food_expenditures_from_acquired(df, basis='purchased'):
     """Derive food expenditures from food_acquired.
 
-    Returns a DataFrame of total expenditure per household × item × period
-    × acquisition source (when ``s`` is present in the input index),
-    summed over units.
+    Returns a DataFrame of expenditure per household × item × period ×
+    acquisition source (when ``s`` is present in the input index), summed
+    over units.
 
-    Phase 4 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org
-    extends the group-by to preserve the ``s`` (acquisition-source) index
-    level.  Users who want the legacy collapsed view call
-    ``food_expenditures.groupby(level=['t','v','i','j']).sum()``
-    explicitly.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        food_acquired with an ``Expenditure`` column.
+    basis : {'purchased', 'total'}, default 'purchased'
+        Which acquisition sources contribute to ``Expenditure`` (GH #575):
+
+        - ``'purchased'`` (default): **cash outlay only** — keep rows with
+          ``s == 'purchased'``.  Own-production / in-kind / other sources
+          carry no cash expenditure, so they are excluded.  This is
+          *consistent across countries* regardless of whether the source
+          happened to record an imputed produced/in-kind value: some waves
+          (e.g. Serbia, GhanaSPS) populate ``Expenditure`` on produced/
+          in-kind rows, others (e.g. Guatemala, and every country built via
+          the stock ``food_acquired_to_canonical``) leave it NaN.  Filtering
+          to ``purchased`` removes that cross-country divergence.
+        - ``'total'``: **all recorded acquisition value** — sum
+          ``Expenditure`` across every ``s``.  Where the source recorded a
+          produced/in-kind value it is included; where it did not, ``'total'``
+          equals ``'purchased'`` for that country (no value is fabricated).
+          *Imputing* own-production value at purchase prices for purchased-
+          only-source countries is a tracked follow-up, NOT done here.
+
+    Notes
+    -----
+    Phase 4 of GH #169 preserves the ``s`` (acquisition-source) level in the
+    output.  Users who want the legacy collapsed view call
+    ``food_expenditures.groupby(level=['t','v','i','j']).sum()`` explicitly;
+    ``basis='purchased'`` then yields the purchased total, ``'total'`` the
+    sum across recorded sources.
+
+    When the input has no ``s`` level (pre-canonical waves) the two bases
+    coincide — there is no source split to filter on.
     """
+    valid_basis = {'purchased', 'total'}
+    if basis not in valid_basis:
+        raise ValueError(
+            f"food_expenditures basis= must be one of {sorted(valid_basis)}, "
+            f"got {basis!r}"
+        )
+
     df = _normalize_columns(df)
     if 'Expenditure' not in df.columns:
         raise ValueError("food_acquired must have an 'Expenditure' column")
 
     idx_names = list(df.index.names)
+
+    x = df[['Expenditure']].replace(0, np.nan).dropna()
+    if basis == 'purchased' and 's' in idx_names:
+        # Cash outlay only — drop non-purchased sources so the figure means
+        # the same thing across countries (#575).
+        x = x[x.index.get_level_values('s').astype(str) == 'purchased']
+
     # Preserve `s` in the output (Phase 4).  `u` is dropped — Expenditure
     # is currency-denominated, so summing across units is meaningful.
     # `v` is also omitted: with pandas's default ``dropna=True``, a
@@ -660,8 +794,6 @@ def food_expenditures_from_acquired(df):
     # asked, so dropping ``v`` here loses no information.  Closes #246
     # part (C-2) NaN-``v`` regression.
     group_by = [n for n in ['t', 'i', 'j', 's'] if n in idx_names]
-
-    x = df[['Expenditure']].replace(0, np.nan).dropna()
     x = x.groupby(group_by).sum()
     return x
 

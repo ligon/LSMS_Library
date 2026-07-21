@@ -1,0 +1,13 @@
+[matrix] building (full) ...
+  Senegal: 2 waves × 21 features
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/2018-19/_/./people_last7days.py:112: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s01_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  s01 = get_dataframe('../Data/s01_me_sen2018.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/2018-19/_/./plot_features.py:19: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_sen2018.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/2021-22/_/./plot_features.py:19: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_sen2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_sen2021.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/2018-19/_/./plot_labor.py:131: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_sen2018.dta', convert_categoricals=False)
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Senegal.csv (44 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=5, declared=0, dropped=0, broken=0, builds=0, sane=39, blessed=0

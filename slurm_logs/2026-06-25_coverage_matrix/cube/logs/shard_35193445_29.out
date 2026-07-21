@@ -1,0 +1,3 @@
+=== task 29: country='Tajikistan'  node=n0179.savio3  Thu Jun 25 18:35:46 PDT 2026 ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193477/venv_img
+=== done 'Tajikistan' rc=127  Thu Jun 25 18:35:46 PDT 2026 ===

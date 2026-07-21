@@ -81,7 +81,8 @@ change is needed; the work is purely data curation.
 | Asbestos         | Uganda; possibly elsewhere.                                          |
 | Mud              | Includes ``Adobe`` (sun-dried mud brick).                            |
 | Mats             | Woven mats.  Togo: 1 obs.                                            |
-| Wood             | ``Wood, Planks`` / ``wood,planks``.                                  |
+| Wood             | ``Wood, Planks`` / ``wood,planks``.  Includes bamboo planks/strips.  |
+| Slate            | Slate / slate-tile roofing.  Tajikistan's dominant roof (#170).      |
 | Other            | ``Other (specify)``, ``OTHER(SPECIFY)``, etc.                        |
 
 * Canonical Floor Preferred Labels
@@ -94,9 +95,11 @@ change is needed; the work is purely data curation.
 | Cement            | Includes ``Smooth Cement``, ``Cement screed``.                       |
 | Concrete          | Aggregate + cement.  Distinct from ``Cement``.                       |
 | Tiles             | Includes ``Tile``, ``Mosaic or tiles``.                              |
-| Stone             | Stone floor.                                                         |
+| Stone             | Stone floor.  Includes polished stone / marble.                      |
 | Bricks            | Brick floor.                                                         |
-| Wood              | Wood plank / parquet.                                                |
+| Wood              | Wood plank / parquet.  Includes bamboo strips.                       |
+| Vinyl/Linoleum    | Resilient sheet/tile flooring (linoleum, vinyl, vinyl tiles) (#170). |
+| Carpet            | Carpeted floor.  South Africa: ~1.5k obs (#170).                     |
 | Other             | ``Other (specify)``, etc.                                            |
 
 * Per-country wiring

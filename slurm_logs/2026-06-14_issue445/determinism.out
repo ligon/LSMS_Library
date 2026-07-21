@@ -1,0 +1,71 @@
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:188: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:188: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 3168 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2657 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2392 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2529 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2412 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2430 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2425 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+[round1] {'cluster_features': 'fd9f5655ab2e', 'shocks': '53c53cb3645f', 'nutrition': 'fc85fc2e2046'}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:188: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:188: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 3168 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2657 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2392 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2529 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2412 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2430 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3464: RuntimeWarning: Canonical index over ['t', 'v'] had 2425 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+[round2] {'cluster_features': 'fd9f5655ab2e', 'shocks': '53c53cb3645f', 'nutrition': 'fc85fc2e2046'}
+
+=== determinism verdict ===
+  cluster_features     DETERMINISTIC
+  shocks               DETERMINISTIC
+  nutrition            DETERMINISTIC

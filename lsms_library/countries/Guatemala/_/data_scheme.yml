@@ -1,6 +1,27 @@
 Country: Guatemala
 
 Data Scheme:
+  food_acquired:
+    # ENCOVI 2000 Capitulo 12 food instrument, ACTUAL last-15-days recall.
+    # Canonical long shape built by 2000/_/food_acquired.py:
+    #   i = hogar (household); j = item (food, Preferred Label via
+    #       food_items.org '2000' column); u = 'lbs' (pounds); s in
+    #       {purchased, produced, inkind, other}.
+    # Purchased rows: Quantity = p12a06a*p12a06c*cnlib (15-day lbs),
+    #   Expenditure = p12a06d ("gasto ult 15 dias").
+    # Obtained rows: Quantity = p12a10a*cnlib (15-day lbs), Expenditure = NaN
+    #   (no obtained-value variable); s split via the p12a11* si/no flags.
+    # Deliberately uses the actual 15-day recall, NOT the usual-month
+    # (p12a05/p12a09a) or months-acquired (p12a04/p12a08) variables, to avoid
+    # assuming the recalled window is representative of the rest of the year.
+    # food_expenditures / food_prices / food_quantities auto-derive from this
+    # via the framework's _FOOD_DERIVED transforms (do NOT register them here).
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    Price: float
+    materialize: make
+
   sample:
     index: (i, t)
     v: str
@@ -10,10 +31,18 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # v is the ENCOVI 2000 primary sampling unit: the composite
+    # depto-mupio-sector-segmento from CONSUMO5.DTA, assembled by
+    # guatemala.v() -- 1,065 clusters, median 6 households each (GH #323).
+    # Both columns below are genuine functions of v (no cluster spans two
+    # regions; none contains both urban and rural households), so this table
+    # is exactly one row per cluster with nothing collapsed.
+    #
+    # Until #323 this declared `v: region` (8 values) while the wave frame was
+    # household-level (7,276 rows), so the framework silently collapsed 7,268
+    # rows with groupby().first() -- picking Rural arbitrarily by row order.
     index: (t, v)
-    Region:
-      type: str
-      optional: true  # ENCOVI 2000: region is used as the v-index itself; no separate Region column (CLAUDE.md: "No PSU/cluster variable in data")
+    Region: str
     Rural: str
 
   household_roster:

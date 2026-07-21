@@ -1,0 +1,22 @@
+Country: GhanaSPS
+
+Data Scheme:
+  food_acquired:
+    # Built by {wave}/_/food_acquired.py -> canonical (t, i, j, u, s) with
+    # [Quantity, Expenditure].  Bespoke 3-source melt: purchased / produced /
+    # received-gift (s in {purchased, produced, inkind}) each carry their own
+    # Quantity AND Expenditure (GhanaSPS records value on all three sources).
+    # The country-level _/food_acquired.py concatenates the waves.
+    #
+    # GhanaSPS has NO `sample` table (cluster identity unavailable: no cluster
+    # var in the food files, 2013-14 lacks EAs.dta, and EAs.dta is EA-level
+    # only).  So `v` is not joined and the index is (t, i, j, u, s) WITHOUT v.
+    # This is an accepted data gap; in the full Feature('food_acquired')()
+    # GhanaSPS is modal-excluded by design (it lacks v while others carry it).
+    #
+    # Price is api-derived; food_prices / food_quantities / food_expenditures
+    # auto-derive at runtime (_FOOD_DERIVED) -- do NOT register them here.
+    index: (t, i, j, u, s)
+    Quantity: float
+    Expenditure: float
+    materialize: make

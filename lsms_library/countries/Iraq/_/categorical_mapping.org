@@ -34,3 +34,34 @@
 | Doctorate degree                  | Doctorate                    |
 | Phd (doctorate)                   | Doctorate                    |
 | Other                             | Unknown                      |
+
+* Housing (Roof / Floor) -- canonical harmonization (GH #170)
+
+Both case variants of each value are listed so the exact-match mapping
+also collapses the case-variance.
+
+#+name: Roof
+| Alternate Spelling          | Preferred Label |
+|-----------------------------+-----------------|
+| Reinforced concrete casting | Concrete        |
+| reinforced concrete casting | Concrete        |
+| Iron bars                   | Concrete        |
+| iron bars                   | Concrete        |
+| Wood                        | Wood            |
+| wood                        | Wood            |
+| Others                      | Other           |
+| other                       | Other           |
+
+#+name: Floor
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Cement casting     | Cement          |
+| cement casting     | Cement          |
+| Tiles              | Tiles           |
+| tiles              | Tiles           |
+| Earth              | Earth           |
+| earth              | Earth           |
+| Brick              | Bricks          |
+| brick              | Bricks          |
+| Other              | Other           |
+| other              | Other           |

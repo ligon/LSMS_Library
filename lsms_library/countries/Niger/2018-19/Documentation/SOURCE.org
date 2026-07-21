@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/ggam-ax39]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/4296
+
+#+CATALOG_ID: 4296
+#+CATALOG_IDNO: NER_2018_EHCVM_v02_M
+#+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/ggam-ax39
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/4296
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

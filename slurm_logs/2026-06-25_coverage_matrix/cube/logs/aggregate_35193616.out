@@ -1,0 +1,6 @@
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193616/venv_img
+>> .venv -> /local/job35193616/venv_img  (verified import OK)
+=== shards present (34 of 34) ===
+=== missing countries (built no shard) ===
+
+=== aggregate done Thu Jun 25 19:03:22 PDT 2026 ===

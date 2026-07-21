@@ -1,0 +1,60 @@
+#+TITLE: GitHub backlog triage — 27 open issues
+#+DATE: 2026-06-15
+#+AUTHOR: Sue (coordinator) + 5 read-only audit agents (batches A-E)
+
+Read-only audit: each open issue assessed vs the current codebase + recent
+merged PRs.  Dispositions are recommendations; nothing was closed/edited.
+
+* CLOSE — resolved by merged work (recommend close, cite resolver)
+| # | title (short)                         | resolved by                    |
+|---+---------------------------------------+--------------------------------|
+| 453 | GhanaLSS food_acquired Quantity absent | PR #457 (just merged)         |
+| 384 | GhanaLSS 2016-17 empty units / exp cov | PR #457                       |
+| 180 | generalize harmonize_<m> hook (#168 f/u)| PR #227                       |
+| 113 | Tanzania community-price fallback      | PR #442 (investigated; join infeasible — wontfix-by-design) |
+| 277 | EthiopiaRHS wire assets/shocks/...     | PR #417/#414/#412             |
+| 436 | code/config separation + declarative   | PR #452 (Item 1) + #455 (Item 2); _FOOD_DERIVED deferred by design |
+
+* CLOSE-with-nuance (confirm)
+| # | title | nuance |
+|---+-------+--------|
+| 278 | EthiopiaRHS plot_features (under #167) | R1 landed (PR #425); R2-R4 deferred — close R1 + open a thin R2-R4 follow-up, or keep |
+| 426 | get_categorical_mapping {} on empty myvars | framework fix landed 48d89a9d (Apr 27); wave workarounds linger — closeable with a note |
+
+* DATA-LIMITED — rescope or document-limitation (maintainer call)
+| # | title | status |
+|---+-------+--------|
+| 108 | Cambodia missing nutrition/food_prices | food_prices wired; nutrition blocked by absent FCT; Cambodia lacks data_scheme.yml (architectural) |
+| 111 | Serbia broken build | food build fixed (2026-06-08); nutrition blocked by absent FCT |
+| 342 | assets gaps in 6 non-ISA surveys | India+Kazakhstan recovered (PR #422); Azerbaijan/Cambodia/GhanaLSS/Tajikistan data-limited (no counts/labels) |
+
+* KEEP — actionable, partial (priority)
+| # | pri | what's left |
+|---+-----+-------------|
+| 140 | hi  | GhanaSPS: add data_scheme.yml (+ wave data_info.yml) so features register — scripts exist, unregistered.  UNAMBIGUOUSLY actionable |
+| 109 | hi  | GhanaLSS: food_acquired done (#457); remaining: Phase-3 qty imputation, household_characteristics, conversion_to_kgs, other_features |
+| 161 | hi  | Uganda cluster_features: GPS wired; stray-i drop + 2019-20 Lat/Lon + v-grain still off |
+| 168 | hi  | harmonize_assets: Phase-1 table + hook done; Phase-2 (Uganda labels) + 12 countries pending |
+| 275 | hi  | EthiopiaRHS community prices: config wired; price1234_rev.tab not yet DVC'd to S3 |
+| 170 | med | housing Roof/Floor: 4 countries done; 9 remaining need per-country tables |
+| 171 | med | individual_education: no harmonize tables yet; Uganda 56% null (data vs extraction?) |
+
+* KEEP — valid, not started / forward-looking
+| # | pri | note |
+|---+-----+------|
+| 218 | lo  | retire per-country food_prices_quantities family (11 countries left; GhanaLSS done via #457) |
+| 263 | lo  | Uganda nutrition replication divergence (xfail; awaits replication regen) |
+| 226 | lo  | auto-aggregation for harmonize_food Aggregate Label (blocked on CFE tooling) |
+| 381 | lo  | cosmetic: spurious "No rule to make target food_acquired.parquet" for YAML/no-data countries |
+| 279 | lo  | bespoke label schemes without editing the package tree (relates to #436, distinct scope) |
+| 438 | med | extend WB-parity item stack to non-ISA (EHCVM tier-1 candidate); depends on #436 (landed) |
+| 439 | med | LSMS+ male/female intra-household disaggregation (new feature direction) |
+| 449 | lo  | pull WB geovariables for older Tanzania NPS W1-W3 |
+| 450 | lo  | expose LSMS-ISA harmonised geovariables/weather as a feature (hh-id bridge) |
+
+* Headline
+- ~6 clean closes (resolved by merged work), 2 close-with-nuance, 3 data-limited
+  (rescope), the rest keep.
+- Top actionable: #140 (GhanaSPS register — quick), #109 (GhanaLSS Phase 3 +
+  household_characteristics), #161 (Uganda cluster_features), #168 (assets harmonize).
+</content>

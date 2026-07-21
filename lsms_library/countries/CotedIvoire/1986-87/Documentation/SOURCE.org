@@ -1,1 +1,14 @@
+SOURCE
+
 https://microdata.worldbank.org/index.php/catalog/84
+
+#+CATALOG_ID: 84
+#+CATALOG_IDNO: CIV_1986_EPAM_v01_M
+#+CATALOG_TITLE: Enquête Permanente Auprès des Ménages 1986-1987 (Wave 2 Panel)
+#+CATALOG_YEARS: 1986-1987
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/qcr8-kp70
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/84
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,0 +1,58 @@
+=== task 9: country='EthiopiaRHS'  node=n0178.savio3  Thu Jun 25 18:43:34 PDT 2026 ===
+--- provisioning venv -> /local/job35193628/venv ---
+--- cache clear EthiopiaRHS ---
+EthiopiaRHS: removed
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/anthropometry.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994a/_/anthropometry.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994b/_/anthropometry.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1995/_/anthropometry.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1997/_/anthropometry.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1989/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994a/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994b/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1995/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1997/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1999/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/2004/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/2009/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/community_prices.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1989/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994a/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994b/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1995/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1997/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1989/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994a/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994b/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1995/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1997/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1999/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1999/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/2004/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/2009/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994a/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1989/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994a/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1994b/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1995/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1997/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/1999/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/2004/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/EthiopiaRHS/2009/_/sample.parquet
+--- build EthiopiaRHS ---
+  1994a: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1994b: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1995: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1997: dropped 1019/1577 rows (unmapped item code or non-positive price)
+  2004: dropped 12/624 rows (unmapped item code or non-positive price)
+  2009: dropped 67/709 rows (unmapped item code or non-positive price)
+community_prices: 2691 rows, 6 waves, 43 items
+=== done 'EthiopiaRHS' rc=0  Thu Jun 25 18:45:27 PDT 2026 ===

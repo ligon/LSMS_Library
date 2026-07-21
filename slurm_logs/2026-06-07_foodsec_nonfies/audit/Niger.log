@@ -1,0 +1,9 @@
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Niger/2011-12/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Niger/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Niger/2011-12/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Niger/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Niger/_/cluster_features.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Niger/2011-12/_/cluster_features.parquet still missing after running fallbacks.
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Niger/2021-22/_/plot_features.py:16: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_ner2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_ner2021.dta', convert_categoricals=False)
+Niger: 17 features audited

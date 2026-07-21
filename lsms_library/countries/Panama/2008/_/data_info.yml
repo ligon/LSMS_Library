@@ -1,0 +1,14 @@
+Wave: '2008'
+Country: Panama
+
+# Minimal sample table: maps each household to its primary sampling unit (upm).
+# 02hogar.dta is the 2008 household file (one row per household, keyed on
+# `hogar`) and carries both the `upm` cluster id and the expansion factor.
+sample:
+    file: ../Data/02hogar.dta
+    idxvars:
+        i: hogar
+    myvars:
+        v: upm   # formatted by panama.py's v() (format_id wrapper)
+        weight: factor
+        panel_weight: factor

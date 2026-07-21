@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/3409
+
+#+CATALOG_ID: 3409
+#+CATALOG_IDNO: MLI_2017_EAC-I_v03_M
+#+CATALOG_TITLE: Enquête Agricole de Conjoncture Intégrée aux Conditions de Vie des Ménages 2017
+#+CATALOG_YEARS: 2017-2018
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/0v50-h966
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3409
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

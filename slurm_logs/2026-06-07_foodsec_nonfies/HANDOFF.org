@@ -1,0 +1,114 @@
+#+TITLE: Session handoff — food-security non-FIES families (#332)
+#+DATE: 2026-06-07
+
+* Context
+Resumed an interrupted session (prior transcript 4fc0889d) building the three
+non-FIES food-security families on branch =feature/food-security-nonfies=:
+- =food_security_hfias= (HFIAS 9-item)
+- =food_coping= (rCSI / coping day-counts)
+- =months_food_inadequate= (months of inadequate provisioning)
+Design artifact: =slurm_logs/2026-06-06_assets_ineduc/IMPL_BRIEF_food_nonfies.md=.
+Stacked PR: base =feature/life-satisfaction= (#362) -> dev.
+
+* Environment
+- Node n0076.savio3, 32 cores. Venv was stale (job34958831); remounted via
+  =bin/savio_venv.sh mount= (.venv.sqfs). Import OK.
+- Budget fc_jevons at session start: 3,840 SUs used / 1,500,000 (0.26%).
+
+* Phase 1 — verify + commit the interrupted WIP  [DONE]
+Re-verified all 8 from a COLD cache (=lsms-library cache clear= + LSMS_NO_CACHE=1)
++ is_this_feature_sane (all report.ok True; only the expected
+index_levels_match_scheme WARN from framework-joined v). Committed per-country,
+pushed, opened *PR #365*.
+
+| Country     | Feature                  | Rows    | commit   |
+|-------------+--------------------------+---------+----------|
+| India       | months_food_inadequate   |   2,251 | a512d90b |
+| Liberia     | months_food_inadequate   |   2,974 | 666691f7 |
+| Timor-Leste | months_food_inadequate   |   5,793 | b2714948 |
+| Uganda      | months_food_inadequate   |  14,796 | a24075ad |
+| Tajikistan  | food_security_hfias      |   6,147 | 1a16fa96 |
+| Tanzania    | food_coping              | 153,315 | a42c29a4 |
+| Ethiopia    | food_coping              | 111,080 | 37fc9287 |
+| Nigeria     | food_coping              | 125,839 | 8f5dbd2a |
+
+Nigeria was the prior session's never-verified loose end (agent died before
+reporting); it builds clean now.
+
+* Phase 2 — broaden the sweep  [IN PROGRESS]
+Triage of the 34-country research JSON (research_swb_foodsec_2026-06-05.json)
+found these IMPLEMENT candidates not yet wired (microdata present):
+- *Malawi* — food_coping + months_food_inadequate (Module H; waves 2010-11,
+  2013-14, 2016-17, 2019-20; 2004-05 to confirm)
+- *Mali* — food_coping (EACI 2014-15 §17 s17q02a-e)
+- *Burkina_Faso* — food_coping + months_food_inadequate (2014 EMC P3:
+  SA2A-E coping, SA5A-L month flags)
+
+Dispatched 3 background builder agents (one per country) 2026-06-07, editing only
+their own country dir, self-verifying via cold-cache Country().<feat>() build.
+Awaiting reports -> review diffs -> commit per-country -> push to PR #365.
+
+* DOCUMENT-ABSENT (pending, separate docs commit)
+- Nepal (coping/months instrument exists but no microdata — NSO-hosted)
+- EthiopiaRHS (bespoke IFPRI meals/day), Iraq (bespoke q2005 food-difficulty)
+- Niger 2014-15 §"food security" is FIES verbatim (already wired), not separate
+- all-absent batch (consumption-only surveys): Albania, Armenia, Azerbaijan,
+  Cambodia, China, Guatemala, Guyana, Kazakhstan, Kosovo, Pakistan, Serbia,
+  Serbia and Montenegro, South Africa
+
+* Phase 2 — RESULT  [DONE]
+3 builder agents landed; each diff-reviewed + independently cold-cache
+re-verified before commit. Pushed to PR #365 (now 13 commits).
+| Country      | Feature(s)                            | Rows            | commit   |
+|--------------+---------------------------------------+-----------------+----------|
+| Burkina_Faso | food_coping + months_food_inadequate  | 51,099 + 10,220 | fcf5b150 |
+| Mali         | food_coping                           | 18,261          | 8fb0b7a3 |
+| Malawi       | food_coping + months_food_inadequate  | 200,738+40,152  | bcd4cdb7 |
+
+Cross-country catch: Mali + Malawi both label-verify rCSI order
+a=LessPreferred b=LimitPortion c=ReduceMeals d=RestrictAdults e=BorrowFood.
+Burkina's SA2A-E labels are 80-char-truncated (unverifiable); realigned to the
+peer order (=fix= aa6e2fe6) rather than the WFP-standard guess first committed.
+
+Absent docs (a7605d21): Nepal (instrument present, no microdata), EthiopiaRHS
+(bespoke), Iraq (q2005 already in shocks). Consumption-only batch left
+collectively-absent (noted in PR, not per-country).
+
+* Session close
+- Budget fc_jevons end: 3,840 SUs (delta ~0 — all work on the interactive node;
+  no Slurm jobs dispatched).
+- PR #365: 13 commits (8 Phase-1 + 4 Phase-2 + 1 docs), base feature/life-satisfaction.
+- Open follow-ups for next session:
+  - Full/targeted test run (test_schema_consistency, test_covers_all_waves) for
+    the 11 touched countries before merge — NOT yet run this session.
+  - Stacked-PR merge ordering: retarget #365 -> development after #359/#360/#362.
+  - Untracked EthiopiaRHS/{1989,1999,2004,2009}.txt OCR scratch: decide
+    gitignore vs move to slurm_logs (left in tree, uncommitted).
+
+* Merges — DONE (all into development)
+Landed the whole #331/#332 stack + the separate plot PR:
+| PR   | feature                         | merge commit |
+|------+---------------------------------+--------------|
+| #358 | plot_features (8 countries)     | c1527f1e     |
+| #359 | subjective_well_being (10)      | b2d278cc     |
+| #360 | food_security FIES (11)         | 4c630363     |
+| #362 | life_satisfaction (6)           | c9d24b0f     |
+| #365 | food-security non-FIES (11)     | 5a4d51ca     |
+
+Method: --merge (preserves per-country commits), bottom-up. Two gotchas hit:
+1. gh pr edit --base is broken by the Projects-classic GraphQL deprecation;
+   retarget #365 via `gh api -X PATCH .../pulls/365 -f base=development`.
+2. Merging #358 (plot) early put plot_features blocks into many countries'
+   data_scheme/data_info that the chain branches also appended to -> conflicts.
+   All were trivial both-append UNIONS (GhanaLSS data_info; Timor-Leste
+   data_scheme x2). Resolved by stripping conflict markers (keep both blocks);
+   smoke-tested merged tree (80 schema tests + feature builds green) before
+   landing #365. LESSON: merge the linear stack FIRST (shared SHAs => clean),
+   then the independent PR last.
+
+development tip 5a4d51ca. Remaining open PR #370 (Ethiopia food_acquired u,
+#223 Layer 2) is NOT ours.
+
+* Untracked scratch (NOT to commit)
+- EthiopiaRHS/{1989,1999,2004,2009}.txt — OCR questionnaire dumps (research)
+- slurm_logs/ artifacts

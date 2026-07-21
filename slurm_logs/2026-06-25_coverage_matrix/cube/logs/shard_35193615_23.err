@@ -1,0 +1,48 @@
+[matrix] building (full) ...
+  Nigeria: 10 waves × 23 features
+make: *** No rule to make target 'panel_ids.json'.  Stop.
+Makefile build failed for panel_ids: Command '['make', '-s', '-j20', 'panel_ids.json']' returned non-zero exit status 2.. Falling back to wave aggregation.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nigeria/var/crop_production.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/crop_production.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/crop_production.parquet'.  Stop.
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:936: DtypeWarning: Columns (0: s10bq2b_os, 1: s10bq3b_os, 2: s10bq5b_os, 3: s10bq6b_os, 4: s10bq7b_os) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:936: DtypeWarning: Columns (0: s7bq2b_os, 1: s7bq3b_os, 2: s7bq5b_os, 3: s7bq6b_os, 4: s7bq7b_os) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:936: DtypeWarning: Columns (0: s10bq2b_os, 1: s10bq9b_os) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq13y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq17y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq13y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq16y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: tracked_obs
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: interviewer_id
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: supervisor_id
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nigeria/var/livestock.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/livestock.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/livestock.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nigeria/var/people_last7days.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/people_last7days.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/people_last7days.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nigeria/var/plot_inputs.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/plot_inputs.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/plot_inputs.parquet'.  Stop.
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s11eq13
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s11eq26
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job35193705/venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s11eq34
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Nigeria/var/plot_labor.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/plot_labor.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/plot_labor.parquet'.  Stop.
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Nigeria.csv (230 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=82, declared=0, dropped=22, broken=0, builds=35, sane=91, blessed=0

@@ -15,6 +15,49 @@ See CLAUDE.md "EHCVM countries" for the cross-country pattern.
 Pre-EHCVM waves (2011-12, 2014-15) follow their own conventions;
 see the wave-level =data_info.yml= files for index definitions.
 
+* Cluster coordinates: the 2011-12 GPS is in =NER_EA_Offsets.dta= (GH #323)
+
+=cluster_features= Latitude/Longitude by wave:
+
+| Wave    | Source file                              | Lat / Lon columns                                  | Grain          |
+|---------+------------------------------------------+----------------------------------------------------+----------------|
+| 2011-12 | =NER_EA_Offsets.dta=                     | =LAT_DD_MOD= / =LON_DD_MOD=                        | grappe (EA)    |
+| 2014-15 | -- none shipped --                       | --                                                 | --             |
+| 2018-19 | =grappe_gps_ner2018.dta=                 | =coordonnes_gps__Latitude= / =__Longitude=         | grappe (EA)    |
+| 2021-22 | (see wave =data_info.yml=)               |                                                    | grappe (EA)    |
+
+THE TRAP, recorded because it cost real time and nearly cost a real
+column: the 2011-12 config used to point =df_geo= at
+=NER_HouseholdGeovars_Y1.dta= and ask it for =lat_dd_mod= /
+=lon_dd_mod=.  *That file has no coordinates at all.*  Its 43 columns
+are DERIVED raster covariates only -- =dist_road=, =dist_market=,
+=af_bio_*=, =srtm=, =twi=, =sq1..sq7=, the EVI/NDVI series.  There is
+no latitude and no longitude anywhere in it.  The resulting =KeyError=
+was swallowed by the GH #515 optional-sub-df fallback, so
+=cluster_features= was served with Latitude/Longitude 100% ABSENT for
+this wave, behind a warning nobody read.
+
+It is tempting to conclude "the survey has no GPS -- mark it
+=optional:=".  *That conclusion is wrong.*  The coordinates ship in a
+SIBLING file in the very same directory: =NER_EA_Offsets.dta=, the WB's
+standard offset-EA-centroid release -- 271 rows x (=grappe=,
+=LAT_DD_MOD=, =LON_DD_MOD=), 270 non-null grappes, coordinates inside
+Niger's bounding box (lat 11.88-18.75 N, lon 0.40-13.70 E), already
+DVC-tracked.  Every grappe in the household file is present in it and
+vice versa (0 orphans either way).  The file was DVC-tracked and
+available the whole time; only the config was pointing at the wrong
+one.  All 270 clusters now carry real coordinates.
+
+Because the offsets file is already at the EA grain, the merge on =v=
+is many-to-ONE (not a cartesian) and the collapse to =(t, v)= is
+exactly lossless -- the coordinate is an EA-level constant.
+=merge_how: left= is load-bearing: the offsets file has one trailing
+null-grappe row which =outer= would turn into a phantom cluster.
+
+2014-15 genuinely ships no geovariables/offsets file of any kind (the
+wave directory contains none), so its Latitude/Longitude are honestly
+absent -- not mis-addressed.  It is NOT wired, and that is correct.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does

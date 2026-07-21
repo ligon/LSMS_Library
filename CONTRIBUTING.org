@@ -678,7 +678,8 @@ Before opening a pull request:
    df = mw.waves['2019-20'].household_roster()
    print(df.head())
    #+end_src
-3. Run ~make test country=<Country>~ from ~lsms_library~ to exercise the harmonizer.
+3. Run ~make test country=<Country>~ from ~lsms_library~ to run the per-country
+   feature-audit sanity scan (~bench/feature_audit/scan.py~, via the Country API).
 
 Capturing the exact commands you ran (and any gotchas) in your pull request keeps future maintainers out of the tall grass.
 

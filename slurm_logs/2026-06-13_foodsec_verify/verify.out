@@ -1,0 +1,105 @@
+########## VERIFY START 22:51:13 ##########
+Touched countries: Benin Burkina_Faso CotedIvoire Ethiopia GhanaLSS Guinea-Bissau India Liberia Malawi Mali Niger Nigeria Senegal Tajikistan Tanzania Timor-Leste Togo Uganda
+########## CACHE CLEAR 22:51:14 ##########
+  /global/home/users/ligon/.local/share/lsms_library/Uganda/2011-12/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Uganda/2013-14/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Uganda/2015-16/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Uganda/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Uganda/2019-20/_/sample.parquet
+########## BUILD VERIFY 22:51:18 ##########
+=== 24 (country, feature) pairs discovered; workers=12 ===
+  target: Benin          food_security
+  target: Burkina_Faso   food_coping
+  target: Burkina_Faso   food_security
+  target: Burkina_Faso   months_food_inadequate
+  target: CotedIvoire    food_security
+  target: Ethiopia       food_coping
+  target: Ethiopia       food_security
+  target: GhanaLSS       food_security
+  target: Guinea-Bissau  food_security
+  target: India          months_food_inadequate
+  target: Liberia        months_food_inadequate
+  target: Malawi         food_coping
+  target: Malawi         food_security
+  target: Malawi         months_food_inadequate
+  target: Mali           food_coping
+  target: Mali           food_security
+  target: Niger          food_security
+  target: Nigeria        food_coping
+  target: Senegal        food_security
+  target: Tajikistan     food_security_hfias
+  target: Tanzania       food_coping
+  target: Timor-Leste    months_food_inadequate
+  target: Togo           food_security
+  target: Uganda         months_food_inadequate
+make: *** No rule to make target 'panel_ids.json'.  Stop.
+Makefile build failed for panel_ids: Command '['make', '-s', '-j16', 'panel_ids.json']' returned non-zero exit status 2.. Falling back to wave aggregation.
+RESULT [OK] {"country": "Guinea-Bissau", "feature": "food_security", "rows": 5350, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Benin", "feature": "food_security", "rows": 8011, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Burkina_Faso", "feature": "food_security", "rows": 10233, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "CotedIvoire", "feature": "food_security", "rows": 12960, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: v08a07d
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+RESULT [OK] {"country": "GhanaLSS", "feature": "food_security", "rows": 13892, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Liberia", "feature": "months_food_inadequate", "rows": 2974, "index": ["i", "t", "v"], "columns": ["MonthsInadequate", "AnyInadequate"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "India", "feature": "months_food_inadequate", "rows": 2251, "index": ["i", "t", "v"], "columns": ["MonthsInadequate", "AnyInadequate"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+make: *** No rule to make target 'panel_ids.json'.  Stop.
+Makefile build failed for panel_ids: Command '['make', '-s', '-j16', 'panel_ids.json']' returned non-zero exit status 2.. Falling back to wave aggregation.
+RESULT [OK] {"country": "Burkina_Faso", "feature": "months_food_inadequate", "rows": 10220, "index": ["i", "t", "v"], "columns": ["MonthsInadequate", "AnyInadequate"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Mali", "feature": "food_security", "rows": 12725, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Burkina_Faso", "feature": "food_coping", "rows": 51099, "index": ["i", "t", "v", "Strategy"], "columns": ["Days"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Niger", "feature": "food_security", "rows": 16197, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Senegal", "feature": "food_security", "rows": 14265, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Malawi", "feature": "food_security", "rows": 27878, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme", "no_null_index_levels"], "ok": true}
+RESULT [OK] {"country": "Togo", "feature": "food_security", "rows": 6163, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Mali", "feature": "food_coping", "rows": 18261, "index": ["i", "t", "v", "Strategy"], "columns": ["Days"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s13c14a
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s13c14b
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s13c14c
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+RESULT [OK] {"country": "Timor-Leste", "feature": "months_food_inadequate", "rows": 5793, "index": ["i", "t", "v"], "columns": ["MonthsInadequate", "AnyInadequate"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Tajikistan", "feature": "food_security_hfias", "rows": 6147, "index": ["i", "t", "v"], "columns": ["HFIAS1", "HFIAS2", "HFIAS3", "HFIAS4", "HFIAS5", "HFIAS6", "HFIAS7", "HFIAS8", "HFIAS9", "HFIAS_score", "HFIAS_category"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Malawi", "feature": "months_food_inadequate", "rows": 40152, "index": ["i", "t", "v"], "columns": ["MonthsInadequate", "AnyInadequate"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Malawi", "feature": "food_coping", "rows": 200738, "index": ["i", "t", "v", "Strategy"], "columns": ["Days"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Nigeria", "feature": "food_coping", "rows": 125839, "index": ["i", "t", "v", "Strategy"], "columns": ["Days"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Ethiopia", "feature": "food_security", "rows": 4958, "index": ["i", "t", "v"], "columns": ["Worried", "HealthyDiet", "FewFoods", "SkippedMeal", "AteLess", "RanOut", "Hungry", "WholeDay", "FIES_score"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Tanzania", "feature": "food_coping", "rows": 153315, "index": ["i", "t", "v", "Strategy"], "columns": ["Days"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Ethiopia", "feature": "food_coping", "rows": 111080, "index": ["i", "t", "v", "Strategy"], "columns": ["Days"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+RESULT [OK] {"country": "Uganda", "feature": "months_food_inadequate", "rows": 14796, "index": ["i", "t", "v"], "columns": ["MonthsInadequate", "AnyInadequate"], "failed": [], "warned": ["index_levels_match_scheme"], "ok": true}
+=== SUMMARY ===
+  [OK ] Burkina_Faso   food_coping              rows=51099 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Ethiopia       food_coping              rows=111080 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Malawi         food_coping              rows=200738 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Mali           food_coping              rows=18261 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Nigeria        food_coping              rows=125839 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Tanzania       food_coping              rows=153315 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Benin          food_security            rows=8011 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Burkina_Faso   food_security            rows=10233 fail=[] warn=['index_levels_match_scheme']
+  [OK ] CotedIvoire    food_security            rows=12960 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Ethiopia       food_security            rows=4958 fail=[] warn=['index_levels_match_scheme']
+  [OK ] GhanaLSS       food_security            rows=13892 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Guinea-Bissau  food_security            rows=5350 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Malawi         food_security            rows=27878 fail=[] warn=['index_levels_match_scheme', 'no_null_index_levels']
+  [OK ] Mali           food_security            rows=12725 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Niger          food_security            rows=16197 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Senegal        food_security            rows=14265 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Togo           food_security            rows=6163 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Tajikistan     food_security_hfias      rows=6147 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Burkina_Faso   months_food_inadequate   rows=10220 fail=[] warn=['index_levels_match_scheme']
+  [OK ] India          months_food_inadequate   rows=2251 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Liberia        months_food_inadequate   rows=2974 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Malawi         months_food_inadequate   rows=40152 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Timor-Leste    months_food_inadequate   rows=5793 fail=[] warn=['index_levels_match_scheme']
+  [OK ] Uganda         months_food_inadequate   rows=14796 fail=[] warn=['index_levels_match_scheme']
+=== 24/24 OK, 0 FAIL ===
+build verify exit=0
+########## PYTEST 22:51:59 ##########
+........................................................................ [ 32%]
+........................................................................ [ 64%]
+........................................................................ [ 97%]
+......                                                                   [100%]
+222 passed in 6.34s
+pytest exit=0
+########## VERIFY DONE 22:52:08 build_rc=0 pytest_rc=0 ##########

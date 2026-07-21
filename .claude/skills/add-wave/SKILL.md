@@ -29,7 +29,81 @@ from lsms_library.data_access import discover_waves
 discover_waves("Ethiopia")
 ```
 
-Returns a list of dicts annotated with `"local": True/False`. Waves marked `local=False` are on the WB but not yet in the repo.
+Returns a list of dicts annotated with:
+
+| key            | meaning                                                                 |
+|----------------|-------------------------------------------------------------------------|
+| `local`        | `bool` — `True` only when a wave dir *records* this catalog id.          |
+| `local_status` | `"yes"` / `"no"` / `"unknown"` — the honest tri-state (see below).       |
+| `local_waves`  | the wave directories backing this entry.                                 |
+
+Waves with `local_status == "no"` are on the WB but not yet in the repo.
+
+**Matching is on the WB catalog id, not on the wave label.** Each wave dir
+records the catalog entry it came from in `Documentation/SOURCE.org`
+(`#+CATALOG_ID:` — see `lsms_library/provenance.py`). Label matching used to
+be the mechanism and was wrong in both directions: two different surveys can
+share a year range (Nigeria's GHS-Panel W4 **3557** and Living Standards
+Survey **3827** both span 2018–2019), and one catalog entry can span two of
+our wave dirs (Uganda **1001** covers both `2005-06/` and `2009-10/`).
+
+`local_status == "unknown"` means a directory whose label matches exists but
+has **no recorded WB catalog id** — so we cannot say whether it holds this
+study or a different one with the same year range. Such rows carry
+`local=False`: an unverified claim is treated as not-held, because wrongly
+believing we hold a survey is the failure mode that hides missing data.
+
+To (re)stamp provenance across the tree:
+
+```sh
+python scripts/backfill_wave_provenance.py --dry-run   # report only
+python scripts/backfill_wave_provenance.py             # write SOURCE.org
+```
+
+Countries that are not WB datasets (`EthiopiaRHS`, `KenyaLPS`) are marked
+`discoverable=False` in `_COUNTRY_CATALOG` and return `[]` with an explanatory
+log — deliberately, rather than being silently absent.
+
+#### Which repositories get searched (GH #597)
+
+`discover_waves()` searches the collections listed in the country's
+`repositories` field, **default `("lsms",)`**. The World Bank publishes whole
+series outside `lsms` — Armenia's Integrated Living Conditions Survey (18
+waves) is in `central`, South Africa's General Household Survey (21 waves) is
+in `datafirst` — and a lsms-only search cannot see them *at all*.
+
+**Adding a new country requires a one-time broad sweep** to learn which
+repositories hold its series (`_wb_catalog_search(code, collection=None)`
+searches everything). Curate the answer into config; do not infer it at
+runtime.
+
+> **Widening a country to a second repository REQUIRES an `idno_pattern` that
+> pins the survey series.** Dropping the collection filter inflates results
+> 30–400× (Findex, DHS, Afrobarometer, enterprise surveys; `datafirst` alone
+> returns 320 South African rows — censuses, election studies, school
+> registers). Worse, it resurfaces studies we *already hold* under a different
+> catalog id in another repository: `central` 3016 (`MWI_2010_IHS-III_..._A_ML`)
+> is the same Malawi IHS3 as `lsms` 1003, and `datafirst` 902 (`ZAF_1993_PSLSD`)
+> is the same 1993 survey as `lsms` 297. Nothing in the catalog metadata links
+> those pairs, so id-matching cannot catch them — only the series pin can.
+> A missing-wave list nobody trusts is worse than no list.
+
+```python
+"Armenia":      CountryCatalog("ARM", idno_pattern=r"_(HBS|ILCS)_",
+                               repositories=("lsms", "central")),
+"South Africa": CountryCatalog("ZAF", idno_pattern=r"_(IHS|GHS)_",
+                               repositories=("lsms", "datafirst")),
+"Liberia":      CountryCatalog("LBR", idno_pattern=r"_(HIES|NHFS)_",
+                               repositories=("lsms", "central")),
+```
+
+`idno_pattern` answers **"is this catalog row this country's?"** (identity), NOT
+**"is this survey in remit?"**.  The two diverge: Liberia's NHFS is in the
+pattern because it is the catalog entry backing a wave dir we *hold*, but a
+forest-resources survey is not in remit.  Do not conflate them.
+
+Note `GET /api/collections` returns HTTP 400 — collection ids cannot be
+enumerated via the API. Read them off the `repositoryid` field of search rows.
 
 ### Step 2: Add the wave
 

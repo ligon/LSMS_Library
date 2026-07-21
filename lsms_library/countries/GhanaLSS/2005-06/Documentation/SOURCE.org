@@ -1,2 +1,10 @@
+SOURCE
+
 https://www2.statsghana.gov.gh/nada/index.php/catalog/5/get_microdata
-https://microdata.worldbank.org/index.php/catalog/1064
+
+#+CATALOG_ID: none
+#+CATALOG_URL: https://www2.statsghana.gov.gh/nada/index.php/catalog/5/get_microdata
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: external-source
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: Obtained from www2.statsghana.gov.gh, not the World Bank Microdata Library.

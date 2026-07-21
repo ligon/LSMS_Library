@@ -1,1 +1,13 @@
-https://microdata.worldbank.org/index.php/catalog/1970/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/1970
+
+#+CATALOG_ID: 1970
+#+CATALOG_IDNO: ALB_2012_LSMS_v01_M_v01_A_PUF
+#+CATALOG_TITLE: Living Standards Measurement Survey 2012
+#+CATALOG_YEARS: 2012-2012
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/1970
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

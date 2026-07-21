@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/tzem-9k74]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/65
+
+#+CATALOG_ID: 65
+#+CATALOG_IDNO: BIH_2001_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2001 (Wave 1 Panel)
+#+CATALOG_YEARS: 2001-2001
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/tzem-9k74
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/65
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

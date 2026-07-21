@@ -44,11 +44,13 @@ cluster_features:
     myvars:
         Region: region
         District: dist
-        Rural:
-            - reside
-            - mappings:
-                Rural: 1
-                Urban: 0
+        # Raw `reside` is already the canonical 'Rural'/'Urban' in this wave.
+        # The `mappings:` block that used to sit here DID fire (country.py's
+        # map_formatting_function honours both the `mapping:` and `mappings:`
+        # spellings) and destroyed those good labels into 1/0 -- which is why
+        # agreement with the correct sample.Rural was 0.0%.  Pass the label
+        # through; the other Malawi waves now do the same.  GH #602.
+        Rural: reside
 
 household_roster:
     file: sec_b.dta

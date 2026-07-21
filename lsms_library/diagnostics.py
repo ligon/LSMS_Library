@@ -19,6 +19,7 @@ Usage::
 from __future__ import annotations
 
 import collections.abc
+import re
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -64,6 +65,62 @@ def _load_api_derived() -> dict[str, set[str]]:
 
 
 _API_DERIVED_COLUMNS: dict[str, set[str]] = _load_api_derived()
+
+
+# ---------------------------------------------------------------------------
+# Declared value vocabularies (data_info.yml `spellings`)
+# ---------------------------------------------------------------------------
+
+def _load_declared_vocabularies() -> dict[str, dict[str, tuple[frozenset, dict]]]:
+    """Return ``{table: {column: (vocabulary, variant_map)}}`` from data_info.yml.
+
+    For every column carrying a ``spellings`` block, the *vocabulary* is the set
+    of canonical keys and the *variant_map* is the ``{variant: canonical}``
+    inverse used by ``country._enforce_canonical_spellings``.
+
+    This deliberately does **not** reuse ``country._load_canonical_spellings()``:
+    that function drops any column whose variant lists are all empty (its final
+    ``if variant_map:`` guard), which would silently exclude ``Affinity``,
+    ``Tenure`` and ``TenureSystem`` — columns that declare a canonical
+    vocabulary but no spelling variants.  The vocabulary is ``spellings.keys()``,
+    and it is a constraint whether or not any variants happen to be listed.
+
+    Keyed by **(table, column)**, never by column name alone: ``housing.Tenure``
+    is a legitimately different vocabulary (dwelling tenure) from
+    ``plot_features.Tenure`` (land tenure), and ``housing`` declares none.
+    """
+    from importlib.resources import files
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            info = _yaml.safe_load(f)
+    except (OSError, _yaml.YAMLError):
+        # Missing or malformed data_info.yml -> no declared vocabularies.
+        # Programmer bugs (TypeError, AttributeError) propagate.
+        return {}
+    result: dict[str, dict[str, tuple[frozenset, dict]]] = {}
+    for table, cols in (info or {}).get("Columns", {}).items():
+        if not isinstance(cols, dict):
+            continue
+        for col, meta in cols.items():
+            if not isinstance(meta, dict):
+                continue
+            spellings = meta.get("spellings")
+            if not isinstance(spellings, dict) or not spellings:
+                continue
+            variant_map = {
+                v: canonical
+                for canonical, variants in spellings.items()
+                for v in (variants or [])
+            }
+            result.setdefault(table, {})[col] = (
+                frozenset(spellings.keys()), variant_map,
+            )
+    return result
+
+
+_DECLARED_VOCABULARIES: dict[str, dict[str, tuple[frozenset, dict]]] = \
+    _load_declared_vocabularies()
 
 
 # ---------------------------------------------------------------------------
@@ -388,6 +445,63 @@ def _check_value_constraints(df: pd.DataFrame, scheme: dict, feature: str) -> Ch
                  f"{len(constrained)} constrained column(s) — all values valid")
 
 
+def _check_declared_spellings(df: pd.DataFrame, feature: str) -> Check:
+    """Fail if a column's values fall outside the vocabulary declared in data_info.yml.
+
+    ``_enforce_canonical_spellings`` *maps* known variants to their canonical
+    form but never *rejects* unknown ones, so a value the schema never declared
+    (Uganda's literal ``'0'`` for ``sample.Rural``; Malawi's ``'0.0'``/``'1.0'``
+    for ``cluster_features.Rural``) flows straight through to the user.  The
+    idiomatic filter ``df[df['Rural'] == 'Rural']`` then silently returns zero
+    rows.  This check closes that gap: a declared vocabulary is a constraint,
+    and violating it is a ``fail``.
+
+    Membership is tested **after** applying the variant map, exactly as
+    ``_enforce_canonical_spellings`` would, so the check is correct on both
+    pre-``_finalize_result`` cached parquets (which ``tests/test_table_structure``
+    reads directly, and which legitimately hold known variants such as Malawi's
+    ``rural``/``RURAL``) and post-finalize API frames.
+    """
+    vocabularies = _DECLARED_VOCABULARIES.get(feature, {})
+    if not vocabularies:
+        return Check("declared_spellings", "pass",
+                     "No declared vocabulary for this table (skipped)")
+
+    issues = []
+    checked = []
+    for col, (vocabulary, variant_map) in vocabularies.items():
+        if col in df.columns:
+            values = df[col]
+        elif col in (df.index.names or []):
+            values = pd.Series(df.index.get_level_values(col))
+        else:
+            continue  # column absent for this country — not a violation
+        checked.append(col)
+
+        # Mirror _enforce_canonical_spellings' normalization, then test membership.
+        if isinstance(values.dtype, pd.CategoricalDtype):
+            values = values.astype("string")
+        normalized = values.replace(variant_map).dropna()
+        offending = normalized[~normalized.isin(vocabulary)]
+        if offending.empty:
+            continue
+        counts = offending.value_counts()
+        shown = ", ".join(f"{v!r} ({n})" for v, n in counts.head(5).items())
+        more = f", +{len(counts) - 5} more" if len(counts) > 5 else ""
+        issues.append(
+            f"{col}: {len(offending)}/{len(normalized)} value(s) outside declared "
+            f"vocabulary {sorted(vocabulary)}: {shown}{more}"
+        )
+
+    if issues:
+        return Check("declared_spellings", "fail", "; ".join(issues))
+    if not checked:
+        return Check("declared_spellings", "pass",
+                     "No constrained columns present (skipped)")
+    return Check("declared_spellings", "pass",
+                 f"{len(checked)} column(s) match declared vocabulary: {sorted(checked)}")
+
+
 def _check_duplicate_index(df: pd.DataFrame) -> Check:
     """Flag high rates of duplicate index entries."""
     if not df.index.has_duplicates:
@@ -592,6 +706,8 @@ def is_this_feature_sane(
     df: pd.DataFrame,
     country: str,
     feature: str,
+    *,
+    extra_optional: set[str] | None = None,
 ) -> SanityReport:
     """Run all sanity checks on a feature DataFrame.
 
@@ -603,6 +719,21 @@ def is_this_feature_sane(
         Country name (e.g., ``'Uganda'``).
     feature : str
         Feature/table name (e.g., ``'food_acquired'``).
+    extra_optional : set[str], optional
+        Column names to exempt from ``no_all_null_columns``, *in addition* to
+        those declared ``optional`` in the country's scheme.
+
+        This exists for **grading a slice of a larger frame** — notably the
+        coverage matrix, which grades one wave at a time by slicing the
+        country-level table on ``t``.  ``no_all_null_columns`` is a
+        *country-level* check: a column that is legitimately not fielded in
+        one wave is all-null *within that wave's slice* and would be reported
+        as a failure, even though the country as a whole populates it.
+
+        Callers grading a slice should pass the set of columns that are
+        populated **somewhere in the parent frame**; a column that is all-null
+        across the whole country is then still (correctly) reported as a
+        failure.  Default ``None`` preserves the historical behaviour exactly.
 
     Returns
     -------
@@ -612,7 +743,9 @@ def is_this_feature_sane(
     """
     scheme = _load_scheme(country)
     report = SanityReport(country=country, feature=feature)
-    optional = scheme.get(feature, {}).get("optional", set())
+    optional = set(scheme.get(feature, {}).get("optional", set()))
+    if extra_optional:
+        optional |= set(extra_optional)
 
     report.checks.append(_check_not_empty(df))
     report.checks.append(_check_has_index(df))
@@ -626,6 +759,7 @@ def is_this_feature_sane(
     report.checks.append(_check_declared_columns(df, scheme, feature))
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
     report.checks.append(_check_value_constraints(df, scheme, feature))
+    report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))
     report.checks.append(_check_float_stringified_index(df))
     report.checks.append(_check_ids_format_id_canonical(df))
@@ -852,6 +986,7 @@ def validate_feature(
     report.checks.append(_check_declared_columns(df, scheme, feature))
     report.checks.append(_check_dtype_consistency(df, scheme, feature))
     report.checks.append(_check_value_constraints(df, scheme, feature))
+    report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))
 
     # --- New wave present? --------------------------------------------------
@@ -1350,6 +1485,25 @@ def _check_ids_applied_consistently(country) -> Check:
         return Check("ids_applied_consistently", "fail", str(e))
 
 
+_SPLIT_SUFFIX_RE = re.compile(r"_\d+$")
+
+
+def _is_split_of(canon_ci: str, canon_pi: str) -> bool:
+    """Is ``canon_ci`` a split-off of household ``canon_pi``?
+
+    When several current-wave households claim the same previous-wave
+    household (a household that *split* between waves),
+    :func:`.local_tools.update_id` keeps the base id for the first and
+    mints ``base_1``, ``base_2``, … for the rest.  So ``'101332_1'`` is
+    the second household descended from ``'101332'`` — a chain entry
+    relating the two is correct, not inconsistent.
+    """
+    if not isinstance(canon_ci, str) or not isinstance(canon_pi, str):
+        return False
+    m = _SPLIT_SUFFIX_RE.search(canon_ci)
+    return bool(m) and canon_ci[: m.start()] == canon_pi
+
+
 def _check_panel_ids_targets_exist(country) -> Check:
     """Every ``panel_ids`` chain entry should reference households that
     actually exist in ``household_roster`` — after accounting for
@@ -1361,8 +1515,10 @@ def _check_panel_ids_targets_exist(country) -> Check:
     walks each chain endpoint through ``updated_ids`` to get its
     canonical form, then verifies the canonical ID appears in the
     respective wave's roster. It also cross-checks that both
-    endpoints of a chain entry resolve to the **same** canonical ID
-    (otherwise the entry is internally inconsistent).
+    endpoints of a chain entry resolve to the **same** canonical ID —
+    or, for a household that *split* between the two waves, that the
+    current one is a ``base_N`` split-off of the previous one (see
+    :func:`_is_split_of`); anything else is internally inconsistent.
 
     Would have caught the Niger '10010' → '101' bug from 2026-04:
     the panel_ids.py script constructed current IDs that did not
@@ -1398,9 +1554,17 @@ def _check_panel_ids_targets_exist(country) -> Check:
             canon_pi = ui.get(pw, {}).get(pi_, pi_)
 
             # Cross-check: a chain entry's two endpoints should resolve
-            # to the same canonical ID. If they don't, the chain is
-            # internally inconsistent.
-            if canon_ci != canon_pi:
+            # to the same canonical ID -- *or* the current one is a split
+            # of the previous one.  When a household splits, ``update_id``
+            # mints ``prev``, ``prev_1``, ``prev_2`` ... for the several
+            # current households claiming one previous id
+            # (``local_tools.update_id``), so ``canon_ci == f'{canon_pi}_N'``
+            # is the library's own convention, not an inconsistency.  Both
+            # endpoints are still required to exist (checked below).
+            # Without this, every split household false-fails: Malawi's
+            # IHPS reported 1410/5686 (25%) "inconsistent" entries that
+            # were nothing of the sort (GH #548).
+            if canon_ci != canon_pi and not _is_split_of(canon_ci, canon_pi):
                 inconsistent += 1
                 if len(sample_missing) < 3:
                     sample_missing.append(

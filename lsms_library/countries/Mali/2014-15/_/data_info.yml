@@ -61,13 +61,36 @@ household_roster:
     file: EACIIND_p1.dta
     idxvars:
         v: grappe
-        i: 
+        i:
             - grappe
             - menage
+        # GH #323: `pid` MUST be s01q00, NOT s01q.  Verified against
+        # EACIIND_p1.dta variable labels:
+        #     s01q00 = "Numero d'ordre"    -- the person's own roster line
+        #     s01q   = "Code du répondant" -- the roster line of whoever
+        #                                     ANSWERED section 1 for the HH
+        # s01q is a HOUSEHOLD-level fact stamped onto every member row: it is
+        # constant within 3,335 of the 3,804 households, 28,054 of the 37,175
+        # rows carry s01q == 1 (the head answered), and every household's s01q
+        # value is itself one of that household's s01q00 line numbers -- i.e.
+        # s01q is a *reference into* the s01q00 numbering, not a member id.
+        #
+        # Source cardinality on EACIIND_p1.dta (37,175 rows, one per PERSON):
+        #     uniq (grappe, menage, s01q)   =  5,149   <- keyed by WHO ANSWERED
+        #     uniq (grappe, menage, s01q00) = 37,175   <- exactly unique
+        # As wired, the declared index (t, i, pid) was non-unique, and
+        # _normalize_dataframe_index collapsed it with groupby().first():
+        # ONE PERSON PER HOUSEHOLD survived (mean 1.35 members/HH) and 32,026
+        # people vanished silently.  s01q00 enumerates 1..n cleanly in all
+        # 3,804 households, giving mean 9.77 members/HH.
+        #
+        # This also puts household_roster.pid back in the same keyspace as
+        # _/people_last7days.py, which already keys on (grappe, menage, s01q00)
+        # and asserts uniqueness.
         pid:
             - grappe
-            - menage 
-            - s01q
+            - menage
+            - s01q00
     myvars:
         Sex: s01q01
         Age: s01q04a
@@ -178,10 +201,14 @@ individual_education:
         i:
             - grappe
             - menage
+        # GH #323: same person-id bug as household_roster above -- same source
+        # file, same pid block.  s01q00 = "Numero d'ordre" (the person's own
+        # roster line); s01q = "Code du répondant" (who answered).  See the
+        # household_roster comment for the cardinality evidence.
         pid:
             - grappe
             - menage
-            - s01q
+            - s01q00
     myvars:
         # GH #171: s02q23 = "Niveau d'instruction le plus élevé atteint" (value-
         # labelled French grade-years).  Was mis-wired to s01q06 = father's roster
