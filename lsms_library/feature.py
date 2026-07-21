@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import inspect
 import warnings
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -92,33 +93,126 @@ def _fabricates_missing_levels(table_name: str) -> bool:
     return table_name in lst
 
 
-# Tables whose measure columns are ADDITIVE across a dropped recall/visit level.
-# When collapsing the duplicate index left after dropping that level, these must
-# be SUMMED (not reduced via first(), which undercounts the cross-country total).
-# Motivating case (GH #501): GhanaLSS food_acquired carries a per-visit level
-# (~12 repeated visits over a month); CONTENTS.org states the visits are summed.
-# Keeping first() there silently kept only ~48% of total Quantity.
-_ADDITIVE_MEASURE_COLUMNS = {
-    "food_acquired": ("Quantity", "Expenditure"),
-}
+# --- Grain-aggregation policy (GH #323 / #501) -------------------------------
+#
+# The reducer used when collapsing a non-unique declared index is DECLARED, not
+# hardcoded: the canonical per-column policy lives in the `Aggregation:` section
+# of lsms_library/data_info.yml, and a country may override it in its
+# `_/data_scheme.yml` `aggregation:` block.  This module is the single resolver
+# for both collapse sites (here and Country._normalize_dataframe_index).
+#
+# Rationale: the historical `groupby().first()` silently DISCARDS the dropped
+# rows.  For an additive measure that destroys real quantity with no error --
+# GH #323.  Prose in a CONTENTS.org did not stop it; a declaration that the code
+# actually READS does.
+
+#: Reducers accepted in an `Aggregation:` / `aggregation:` block.  ``derive`` is
+#: special: the column is recomputed as Expenditure/Quantity AFTER the sum (a
+#: per-unit price is not additive and must never be summed).
+_VALID_REDUCERS = frozenset(
+    {"sum", "first", "last", "any", "all", "mean", "median", "min", "max", "derive"}
+)
+
+#: Reducers that actually REDUCE (vs. picking an arbitrary survivor).  A table is
+#: treated as having an active policy only if at least one such column is
+#: present in the frame -- otherwise we fall back to .first() + the loud warning.
+_REDUCING = _VALID_REDUCERS - {"first", "last", "derive"}
+
+
+def _validate_reducers(policy: dict[str, str], where: str) -> None:
+    """Reject an unknown reducer loudly -- a typo must not degrade to .first()."""
+    for col, reducer in policy.items():
+        if reducer not in _VALID_REDUCERS:
+            raise ValueError(
+                f"Unknown aggregation reducer {reducer!r} for column {col!r} in "
+                f"{where}. Valid reducers: {sorted(_VALID_REDUCERS)}."
+            )
+
+
+@lru_cache(maxsize=None)
+def _canonical_aggregation_cached(table_name: str) -> tuple[tuple[str, str], ...]:
+    """Parse the canonical policy once per table (data_info.yml is a static resource)."""
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    policy = dict(((data.get("Aggregation", {}) or {}).get(table_name, {}) or {}))
+    _validate_reducers(policy, f"data_info.yml Aggregation: {table_name}")
+    return tuple(policy.items())
+
+
+def _canonical_aggregation(table_name: str) -> dict[str, str]:
+    """Canonical per-column reducers for *table_name* (data_info.yml ``Aggregation:``)."""
+    if not table_name:
+        return {}
+    return dict(_canonical_aggregation_cached(table_name))
+
+
+def resolve_aggregation(
+    table_name: str | None,
+    schema_entry: dict[str, Any] | None = None,
+) -> dict[str, str]:
+    """Per-column reducers for *table_name*: canonical policy + country override.
+
+    The country's ``data_scheme.yml`` ``aggregation:`` block may override any
+    canonical entry.  Only keys naming a COLUMN participate; keys naming an
+    index LEVEL (e.g. interview_date's ``visit: first``, declared by ten
+    countries) are reserved for the future grain-collapse feature and are
+    ignored here -- see SkunkWorks/grain_aggregation_policy.org.
+    """
+    if not table_name:
+        return {}
+    policy = _canonical_aggregation(table_name)
+    if schema_entry:
+        override = schema_entry.get("aggregation") or {}
+        if isinstance(override, dict):
+            # Column keys are exactly the scheme entry's non-meta keys.
+            meta = {"index", "materialize", "backend", "aggregation"}
+            columns = {k for k in schema_entry if k not in meta}
+            col_override = {k: v for k, v in override.items() if k in columns}
+            _validate_reducers(col_override, f"data_scheme.yml {table_name}: aggregation")
+            policy.update(col_override)
+    return policy
+
+
+def collapse_with_policy(
+    df: pd.DataFrame,
+    levels: list[str],
+    table_name: str | None,
+    schema_entry: dict[str, Any] | None = None,
+) -> tuple[pd.DataFrame, bool]:
+    """Collapse a non-unique index over *levels* using the declared policy.
+
+    Returns ``(collapsed, policy_applied)``.  ``policy_applied`` is False when no
+    reducing column is present -- the caller then knows the frame was reduced by
+    the lossy ``.first()`` default and should warn (GH #323).
+    """
+    policy = resolve_aggregation(table_name, schema_entry)
+    grouped = df.groupby(level=levels, observed=True)
+
+    active = [c for c in df.columns if policy.get(c) in _REDUCING]
+    if not active:
+        return grouped.first(), False
+
+    derived = [c for c in df.columns if policy.get(c) == "derive"]
+    agg = {
+        c: ("first" if c in derived else policy.get(c, "first"))
+        for c in df.columns
+    }
+    out = grouped.agg(agg)
+    for col in derived:
+        if {"Expenditure", "Quantity"} <= set(out.columns):
+            out[col] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)
+    return out, True
 
 
 def _collapse_duplicate_index(df: pd.DataFrame, table_name: str) -> pd.DataFrame:
     """Collapse duplicate index tuples left after dropping an extra index level.
 
-    For additive-measure tables (GH #501) sum the additive columns and re-derive
-    any unit-``Price`` column from the summed totals (price is per-unit, NOT
-    additive).  Otherwise keep the first row per group (the historical default).
+    Reduces each column by the DECLARED policy (data_info.yml ``Aggregation:``):
+    additive measures are SUMMED and any unit-``Price`` re-derived from the summed
+    totals.  Falls back to first-row-per-group when no policy applies.
     """
-    additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
-    grouped = df.groupby(level=list(df.index.names), observed=True)
-    present = [c for c in (additive or ()) if c in df.columns]
-    if not present:
-        return grouped.first()
-    agg = {c: ("sum" if c in present else "first") for c in df.columns}
-    out = grouped.agg(agg)
-    if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
-        out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)
+    out, _ = collapse_with_policy(df, list(df.index.names), table_name)
     return out
 
 

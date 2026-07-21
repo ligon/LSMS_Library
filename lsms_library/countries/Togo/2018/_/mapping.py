@@ -63,6 +63,47 @@ def Age(value):
     return result
 
 
+def cluster_features(df):
+    '''Reduce the household-level EHCVM cover page to one row per CLUSTER.
+
+    ``cluster_features`` is declared ``(t, v)`` -- one row per grappe -- but its
+    df_main source ``s00_me_tgo2018.dta`` is the EHCVM *household* cover page:
+    6,171 rows = 6,171 households across 540 grappes.  Feeding it straight
+    through emitted 6,171 rows for a 540-row table, leaving 5,631 duplicate
+    ``(t, v)`` tuples for the framework to collapse with ``groupby().first()``.
+
+    That is an EXTRACTION bug, not an aggregation one, so it is fixed HERE
+    rather than by declaring a reducer: the table should never have had
+    duplicates.  It also fired a spurious GH #323 "possible silent data loss"
+    RuntimeWarning on every cold build -- noise that was camouflaging the REAL
+    #323 warning raised by ``plot_inputs`` on the same country.
+
+    The reduction is exactly VALUE-LOSSLESS, verified on the source: all 540
+    grappes carry exactly one distinct Region (s00q01) and one distinct Rural
+    (s00q04) value, and ``grappe_gps_tgo2018.dta`` is already one row per
+    grappe.  We do not take that on faith: if a column ever varies WITHIN a
+    grappe, the guard below raises instead of silently keeping an arbitrary row
+    (GH #323 -- a loud failure beats a quiet wrong answer).
+    '''
+    dup = df.index.duplicated(keep=False)
+    if dup.any():
+        levels = list(df.index.names)
+        varying = [
+            c for c in df.columns
+            if df[dup].groupby(level=levels, observed=True)[c]
+                      .nunique(dropna=False).gt(1).any()
+        ]
+        if varying:
+            raise ValueError(
+                f'Togo/2018 cluster_features: column(s) {varying} vary WITHIN a '
+                f'cluster, so collapsing the household cover page to one row per '
+                f'{levels} would silently discard real variation. Fix the '
+                f'extraction (or declare an aggregation policy) rather than '
+                f'dropping rows.'
+            )
+    return df[~df.index.duplicated(keep='first')]
+
+
 def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 

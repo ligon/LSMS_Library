@@ -4181,32 +4181,28 @@ def _normalize_dataframe_index(
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
         # GH #514/#323: collapsing a non-unique canonical index with .first()
-        # silently DISCARDS the dropped rows.  For additive-measure tables
-        # (food_acquired, whose source legitimately records the same item across
-        # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
-        # re-derive any per-unit Price from the summed totals -- no data lost,
-        # no warning.  Single source of truth for the additive column map lives
-        # in feature.py (imported lazily to avoid an import cycle).
-        from .feature import _ADDITIVE_MEASURE_COLUMNS
-        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
-        present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
-            agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
-            df = df.groupby(level=present_levels, observed=True).agg(agg)
-            if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
-                df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
-        else:
-            df = df.groupby(level=present_levels, observed=True).first()
-            if n_dropped:
-                # No aggregation policy for this table -- surface the loss
-                # loudly rather than drop rows quietly (a table whose source
-                # legitimately has multiple rows per index tuple needs an
-                # explicit policy, like the additive sum above).
-                warnings.warn(
-                    f"Canonical index over {present_levels} had {n_dropped} "
-                    f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                    f"those rows (possible silent data loss — GH #323).",
-                    RuntimeWarning,
-                )
+        # silently DISCARDS the dropped rows.  Which reducer to apply to each
+        # column is DECLARED, not hardcoded: the canonical policy lives in the
+        # `Aggregation:` section of lsms_library/data_info.yml and a country may
+        # override it in its data_scheme.yml `aggregation:` block.  When a policy
+        # applies, additive measures are SUMMED (and a per-unit Price re-derived
+        # from the summed totals) -- no data lost, no warning.  When none does, we
+        # keep the historical .first() but say so LOUDLY.  Resolver lives in
+        # feature.py (imported lazily to avoid an import cycle).
+        from .feature import collapse_with_policy
+        df, policy_applied = collapse_with_policy(
+            df, present_levels, table_name, schema_entry,
+        )
+        if not policy_applied and n_dropped:
+            # No aggregation policy for this table -- surface the loss
+            # loudly rather than drop rows quietly (a table whose source
+            # legitimately has multiple rows per index tuple needs an
+            # explicit policy, like the additive sum above).
+            warnings.warn(
+                f"Canonical index over {present_levels} had {n_dropped} "
+                f"duplicate tuple(s); collapsed via groupby().first(), dropping "
+                f"those rows (possible silent data loss — GH #323).",
+                RuntimeWarning,
+            )
 
     return df

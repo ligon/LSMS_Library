@@ -1351,7 +1351,15 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
 # for *post-read* transforms (Country._finalize_result, kinship expansion,
 # canonical spellings, automatic categorical mappings, _join_v_from_sample)
 # -- those re-run on every read and never touch the cached parquet.
-LSMS_CACHE_SCHEMA = 1
+#
+# 2 (GH #323): the grain-aggregation policy became declarative (data_info.yml
+#   `Aggregation:`), so a non-unique declared index now SUMS its additive
+#   measures instead of dropping rows via groupby().first().  That collapse runs
+#   PER WAVE, *before* the L2-country parquet is written (country.py
+#   ~_normalize_dataframe_index in the load_from_waves loop), so the old lossy
+#   result is baked into every warm cache -- the bug hides behind the cache the
+#   bug poisoned.  Bumping invalidates them so the fix actually reaches readers.
+LSMS_CACHE_SCHEMA = 2
 
 # Schema-metadata key under which the content hash is embedded.  Embedding
 # (rather than a ``{parquet}.hash`` sidecar) means the hash rotates

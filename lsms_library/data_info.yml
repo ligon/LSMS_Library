@@ -68,6 +68,81 @@ Join v from sample:
     - livestock
     - income
 
+# Grain-aggregation policy (GH #323/#501; SkunkWorks/grain_aggregation_policy.org).
+#
+# When the framework collapses a NON-UNIQUE declared index it must reduce each
+# column somehow.  The historical default -- groupby().first() -- silently
+# DISCARDS the dropped rows, which for an ADDITIVE measure (a quantity, an
+# expenditure) destroys real data with no error.  That is GH #323.
+#
+# This block is the single, declarative source of truth for the reducer, read by
+# BOTH collapse sites (Country._normalize_dataframe_index and
+# Feature._collapse_duplicate_index).  It replaces the former hardcoded
+# `_ADDITIVE_MEASURE_COLUMNS` dict in feature.py.
+#
+# Semantics:
+#   - keys are COLUMN names; the value is the reducer applied to that column.
+#   - reducers: sum | first | last | any | all | mean | median | min | max
+#     plus `derive` -- recompute as Expenditure/Quantity AFTER the sum (a
+#     per-unit price is NOT additive and must never be summed).
+#   - a column with no entry falls back to `first`.
+#   - a table with NO entry here (and no per-country override) collapses with
+#     .first() and emits the GH #323 RuntimeWarning -- loud, never silent.
+#
+# A country may OVERRIDE any of these in its `_/data_scheme.yml` `aggregation:`
+# block using the same COLUMN: reducer syntax.  (Keys naming an INDEX LEVEL --
+# e.g. interview_date's `visit: first` -- are reserved for the future grain-
+# collapse feature and are currently inert; see grain_aggregation_policy.org.)
+#
+# WHY these tables:  each is an item-level table whose declared index can
+# legitimately collide because a country's harmonization table is MANY-TO-ONE
+# (several raw survey items map onto one canonical item), so two source rows
+# land on one canonical (t, i, item, ...) tuple.  The rows are distinct real
+# acquisitions/applications/harvests; their quantities ADD.  Taking `first`
+# there is not a tie-break, it is data destruction.
+#   food_acquired   -- GhanaLSS per-visit recall (#501); EHCVM many-to-one
+#                      harmonize_food (e.g. Togo: Ademe+Gboma -> "Autres
+#                      legumes en feuilles").
+#   plot_inputs     -- EHCVM harmonize_input/harmonize_seed_crop send three
+#                      distinct residual seed types ("Autres semences",
+#                      "Plants/boutures de tubercules", "Semences d'autres
+#                      cereales") onto the SAME (Seed, Autre crop) pair.  The
+#                      raw source has ZERO duplicates; the collision is
+#                      manufactured by the taxonomy, and `first` was destroying
+#                      more Quantity than it kept (Togo: 11,045 of 21,771 units
+#                      on the colliding rows).  Affects every EHCVM country.
+#   crop_production -- same shape on (plot, crop, u): a many-to-one crop
+#                      harmonization collides two harvest lines for one plot.
+#   livestock /     -- no collisions observed today; the policy is declared so a
+#   plot_labor         future many-to-one mapping cannot silently start losing
+#                      head-counts or person-days.
+#
+# NOT listed (deliberately): `assets`.  Its columns are Quantity (additive) but
+# also Age / Value / Purchase Price, whose correct reduction across two rows for
+# the same (t, i, j) is genuinely ambiguous (mean? max? sum?).  Rather than GUESS
+# -- which would ship silently-WRONG numbers -- assets keeps .first() and the
+# loud GH #323 warning, and is pinned in tests/test_grain_aggregation.py's
+# known-offenders ratchet.  Silently-missing beats silently-wrong.
+Aggregation:
+  food_acquired:
+    Quantity: sum
+    Expenditure: sum
+    Price: derive             # per-unit price: re-derived, NEVER summed
+  plot_inputs:
+    Quantity: sum
+    Quantity_purchased: sum
+    Purchased: any            # bool: `first` on (True, False) loses the True
+  crop_production:
+    Quantity: sum
+    Quantity_sold: sum
+    Value_sold: sum
+  livestock:
+    HeadCount: sum
+    HeadAcquired: sum
+    HeadSold: sum
+  plot_labor:
+    PersonDays: sum
+
 # Canonical column definitions for cross-country tables.
 # 'required: true' means every country declaring this table must include
 # the column.  'spellings' is an inverse dictionary: each key is the

@@ -185,6 +185,24 @@ footguns; they become lossless union+sentinel.
    to expand-to-union + sentinel-fill; retire both =.first()= collapses.
 4. =transformations.collapse(df, grain=, policy=)= + the =data_info.yml=
    =aggregation:= block; expose as a =Feature= method / =grain= kwarg.
+   [PARTLY DONE, GH #323] The =data_info.yml= *=Aggregation:=* block is
+   BUILT and READ: it is now the single declarative source of truth for the
+   per-COLUMN reducer used by BOTH collapse sites
+   (=country._normalize_dataframe_index= and
+   =feature._collapse_duplicate_index=), resolved by
+   =feature.resolve_aggregation()= / =feature.collapse_with_policy()=, and
+   overridable per country in =data_scheme.yml='s =aggregation:= block.  It
+   REPLACED the hardcoded one-entry =_ADDITIVE_MEASURE_COLUMNS= dict.
+   Motivating loss: Togo =plot_inputs= destroyed 11,045 of 938,713 units of
+   Quantity because =harmonize_input= + =harmonize_seed_crop= map three
+   distinct EHCVM seed types onto one =(Seed, Autre crop)= pair and
+   =.first()= threw the collisions away.  Enforced by
+   =tests/test_grain_aggregation.py= (every additive table MUST declare a
+   reducer; the remaining =.first()= tables are a pinned ratchet).
+   STILL TODO in this step: =transformations.collapse(df, grain=, policy=)=
+   as a user-facing reducer, and the =Feature= =grain== kwarg.  Note the
+   =aggregation:= keys that name an index LEVEL (=visit: first=, declared by
+   ten countries) remain INERT -- they belong to that unbuilt half.
 5. =food_expenditures= becomes a =collapse= recipe; audit features for
    the now-loud "would have collapsed" cases.
 
