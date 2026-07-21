@@ -13,9 +13,24 @@ properties of what core returns.  The contract is NOT "core never reduces rows"
 -- Site 2's household->cluster projection legitimately reduces.  It is:
 
     P1  CONSERVATION    every row that leaves is accounted for.
-    P2  NO FABRICATION  every row that arrives was a row that was there.
+    P2  NO INVENTION    every cell holds an OBSERVED value, or NA.
     P3  ASYMMETRY       destructive collapse is loud; lossless collapse is silent.
     P4  ACCURACY        the number it reports is the number it destroyed.
+
+P2 is deliberately weaker than the "output rows are a subset of input rows" form
+this file was first written with.  That stronger version is WRONG here, and the
+mistake is worth recording because it is an attractive one: ``groupby().first()``
+skips NA per column, so complementary rows yield a combination that appears
+nowhere in the source -- which LOOKS like fabrication and is in fact the
+intended COMPLETION.  ``NaN`` is absence, not contradiction; ``reduce_to_agreed``
+returns the very same composite on purpose.  Chasing the stronger property leads
+straight to ``.first(skipna=False)``, which returns ``<NA>`` for values the
+survey actually recorded -- a regression dressed as a fix.
+
+The composite is wrong only when the rows describe DIFFERENT REAL ENTITIES, i.e.
+when the key is unique only within some coarser unit and two real clusters have
+been merged.  That is a broken IDENTIFIER, and D1 says fix the identifier.  It
+is not something a reducer can detect, which is why no property here tries to.
 
 P3's silent half matters as much as its loud half.  Of ~7.5M rows sitting on a
 duplicated declared index corpus-wide, 6.46M are exact duplicates of a surviving
@@ -116,31 +131,54 @@ def test_p2_lossless_collapse_returns_a_real_row():
     assert _rowset(out) <= _rowset(df)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        'LIVE DEFECT, GH #323. groupby().first() takes the first NON-NULL value '
-        'PER COLUMN, so a group whose rows are complementary yields a row that '
-        'never existed in the data: (a1, NA) + (NA, b2) -> (a1, b2). The '
-        'collapse is reported ("DESTROYED 1 of 2"), so it is not silent -- but '
-        'what core RETURNS is synthetic, which is worse than dropping a row. '
-        'Remove this xfail when core stops fabricating; strict=True makes it '
-        'fail the moment that happens, so the ratchet cannot be forgotten.'),
-)
-def test_p2_core_never_fabricates_a_row_that_was_not_in_the_input():
-    """Every returned row must have existed, verbatim, in the input.
+def test_p2_every_output_cell_is_an_observed_value_or_na():
+    """No cell may hold a value that was never observed in its group.
 
-    Selection may drop rows; it may not INVENT one. This is the property the
-    design note's own correction names -- "first() fabricates a row" -- and no
-    static check of any kind can see it.
+    This is the correct form of "no fabrication".  An earlier draft of this file
+    asserted the stronger `output rows subset of input rows`, and that was WRONG
+    -- see the completion test below for why.  This weaker property is the one
+    that actually encodes the contract, and it is still not free: it fails for
+    any reducer that computes a new value (a mean, a midpoint) rather than
+    selecting an observed one.
+    """
+    df = _frame([('2018', 'h1', 'a1', 'b1'),
+                 ('2018', 'h1', 'a2', 'b2')])
+    out, _ = _collapse(df)
+    for col in out.columns:
+        observed = set(df[col].dropna().astype(str))
+        for val in out[col]:
+            assert pd.isna(val) or str(val) in observed, (
+                f'{col}={val!r} was never observed in the input')
+
+
+def test_p2_complementary_missingness_is_COMPLETION_not_fabrication():
+    """(a1, <NA>) + (<NA>, b2) -> (a1, b2) is CORRECT, and must stay that way.
+
+    This pins a doctrine that is easy to "fix" into a regression.  ``NaN`` is
+    ABSENCE, not contradiction: if one row reports Region and the other reports
+    Rural, the cluster has both, and keeping both discards no observed value.
+    The repo's own reducer implements exactly this -- see
+    ``test_nan_is_absence_not_contradiction`` in
+    ``tests/test_gh323_explicit_reducers.py`` -- and ``reduce_to_agreed``
+    returns the SAME composite that ``groupby().first()`` does here.
+
+    So the composite is not the bug, and the tempting one-word "fix"
+    (``.first(skipna=False)``) is a REGRESSION: it would return ``<NA>`` for a
+    value the survey actually recorded.  Verified on pandas 3.0.2.
+
+    Where a composite IS wrong is when the rows describe DIFFERENT REAL
+    ENTITIES -- two clusters merged by a key that is unique only within a
+    district.  That is a broken identifier, and the fix is the identifier
+    (GH #323 D1), not the reducer.
     """
     df = _frame([('2018', 'h1', 'a1', pd.NA),
                  ('2018', 'h1', pd.NA, 'b2')])
     out, _ = _collapse(df)
-    fabricated = _rowset(out) - _rowset(df)
-    assert not fabricated, (
-        f'core returned {len(fabricated)} row(s) that were never in the input: '
-        f'{sorted(fabricated)}')
+    assert len(out) == 1
+    assert out['A'].iloc[0] == 'a1'
+    assert out['B'].iloc[0] == 'b2', (
+        'core dropped an observed value instead of completing from it -- has '
+        'someone set skipna=False?')
 
 
 # ---------------------------------------------------------------------------
