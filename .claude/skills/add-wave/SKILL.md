@@ -199,14 +199,9 @@ DVC layers config files: `config.local` overrides `config`. This keeps the reade
 
 ## Batched DVC Operations
 
-Always use batched `dvc add` + `dvc push` when adding multiple files. The `populate_and_push()` and `push_to_cache_batch()` functions do this automatically. On a cluster scratch filesystem, batched operations process 68 files in ~2.5 minutes vs ~90 minutes sequentially.
+Publish blobs with `push_to_cache_batch()` (or `populate_and_push()` / `add_wave()`, which wrap it). These batch the underlying `dvc add` + `dvc push` for you: on a cluster scratch filesystem, batched operations process 68 files in ~2.5 minutes vs ~90 minutes sequentially. They also route through `_run_dvc_with_lock_retry()`, so concurrent writers queue on the global lock with backoff + jitter instead of failing.
 
-If running DVC commands manually, follow CONTRIBUTING.org steps 8-9:
-```bash
-cd lsms_library/countries
-dvc add Ethiopia/2021-22/Data/*.dta
-dvc push
-```
+**Do not run `dvc add` / `dvc push` by hand**, and never `rm` a DVC lock file — see `CLAUDE.md` §"Data Access". Hand-rolled invocations take the global `.dvc/tmp/lock` with no retry, which is how a parallel sweep gets a wave half-pushed.
 
 ## Data Loading in Scripts
 

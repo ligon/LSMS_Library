@@ -119,7 +119,9 @@
    creds="$(python -c 'from lsms_library import config; print(config.s3_write_creds_path())')"
    export AWS_ACCESS_KEY_ID=$(awk -F' *= *' '/aws_access_key_id/{print $2}'     "$creds")
    export AWS_SECRET_ACCESS_KEY=$(awk -F' *= *' '/aws_secret_access_key/{print $2}' "$creds")
-   dvc push          # or call push_to_cache_batch() from Python
+   # then publish from Python -- push_to_cache_batch() batches the add/push
+   # and retries lock contention with backoff; prefer it over a bare `dvc push`
+   python -c 'from lsms_library.data_access import push_to_cache_batch; push_to_cache_batch(paths)'
    #+end_src
 
    If a writer key reports =InvalidAccessKeyId= /
@@ -174,34 +176,46 @@
 
    The editable install exposes =lsms_library= so the import hooks and
    authentication helpers work consistently inside the virtualenv.
-* Streaming dvc files
-   A =dvc pull= will download dvc files to your local repository.
-   But this is usually not the best way to proceed!  In particular, =dvc=
-   offers an api which permits one to "stream" or cache files, leaving
-   your storage local to the working repository free of big data
-   files.
+* Reading dvc-tracked files
+   *Use the library API; do not invoke the =dvc= CLI and do not use
+   =dvc.api= directly.*  Both are documented anti-patterns --- see
+   =CLAUDE.md= §"Data Access" for the full rule and the measurements
+   behind it.
 
-   To illustrate,
    #+begin_src python
-     import dvc.api
-     import pandas as pd
+     from lsms_library.local_tools import get_dataframe
 
-     with dvc.api.open('BigRemoteFile.dta',mode='rb') as dta:
-         df = pd.read_stata(dta)
+     df = get_dataframe('../Data/BigRemoteFile.dta')
    #+end_src
-   This will result in a =pandas.DataFrame= in RAM, but will use no
-   additional disk (except that, depending on what's being used as the
-   dvc store, the file may actually be stored in =.dvc/cache=; this
-   cache can be cleared with =dvc gc=).
 
-** Pulling dvc files
-   If you need the actual file instead of a "stream" you can instead
-   "pull" the dvc files, using
-   #+begin_src sh
-   dvc pull
-   #+end_src
-   and files should be added from the remote dvc data store to your
-   working repository.
+   =get_dataframe()= resolves through local disk → DVC → World Bank NADA,
+   and on a cache miss pulls the blob *directly from S3* without ever
+   taking the global =.dvc/tmp/lock=.  That makes it safe to run any
+   number of readers concurrently (=make -j=, several agents, a
+   scatter-gather sweep), which =dvc pull= is not: it serialises on that
+   lock and was measured failing 91.7% of the time at 12 concurrent
+   callers.
+
+   For a file you need on disk rather than in a DataFrame (a
+   questionnaire PDF, an Excel codebook), use
+   =data_access.get_data_file('{Country}/{wave}/Documentation/foo.pdf')=,
+   which returns a local =Path= by the same lock-free route.
+
+   To *publish* new blobs, use =push_to_cache_batch()= (or
+   =add_wave()= / =populate_and_push()=, which wrap it).  That path does
+   take the lock, but retries contention with exponential backoff and
+   jitter, so concurrent writers queue rather than fail.
+
+   #+begin_quote
+   Never =rm= a DVC lock file to "clear a stale lock" --- it may belong
+   to a live sibling process, and removing it corrupts that writer.
+   #+end_quote
+
+** Pulling dvc files manually (escape hatch)
+   Manual =dvc= commands remain available for one-off local
+   troubleshooting when nothing else is running.  They are *not* the
+   normal path and must never appear in scripts, skills, or agent
+   workflows.
 
    The DVC repository is rooted at =lsms_library/countries/= (not the
    project root), so run =dvc= commands from inside that directory or
