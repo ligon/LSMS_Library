@@ -826,6 +826,70 @@
 |  119 | Nomi Tin (1kg)                    |
 |  120 | Nomi Tin (500g)                   |
 
+# harvest_conditions: harvest CONDITION/STATE code -> Preferred Label for the
+# `condition` index level of crop_production (GH #323 / #637).  UNPS question
+# 6c, "in what condition/state was the crop harvested" -- asked jointly with
+# the quantity and unit, so the SAME plot-crop-season yields one record per
+# state and the states must not be summed together (dry weight + fresh weight
+# is not a quantity of anything).
+#
+# The integer scheme is a 2-D cross of a DRYNESS family (tens digit) with a
+# physical FORM (units digit):
+#
+#     1x  Green harvested          x0  state not applicable
+#     2x  Fresh / raw harvested    x1  with shell/cob and with stalk
+#     3x  Dry at harvest           x2  with shell/cob, without stalk
+#     4x  Dry after additional     x3  in the cob
+#         drying                   x4  in pods or shell/husks
+#                                  x5  grain
+#
+# The Preferred Labels below encode exactly that cross in snake_case, so a
+# sibling LSMS-ISA country with a coarser instrument can reuse the family
+# tokens (`fresh`, `dried`) and a finer one can extend the list.  The
+# canonical vocabulary is declared cross-country in
+# lsms_library/data_info.yml (Columns > crop_production > condition).
+#
+# Source Label is the VERBATIM Stata value label, for provenance; it is not
+# read at runtime (get_categorical_mapping selects Code + Preferred Label).
+# The label text drifts cosmetically across vintages -- 2009-16 uses an
+# en-dash, 2018-20 a hyphen, 2015-16 AGSEC5B is mojibaked, and code 99 is
+# "Others" in 2011-12 but "Not Applicable" in 2018-20 (recorded in the
+# Preferred Label as `other_condition`, the more conservative reading; only
+# 3 rows in the whole panel and none after 2011-12).  The CODES are
+# bit-identical in every wave that carries value labels (2011-12, 2013-14,
+# 2015-16, 2018-19, 2019-20), which is why one table serves all vintages.
+#
+# 2009-10 and 2010-11 carry NO value labels at all; their condition codes were
+# matched to this scheme by distribution (their modes are 20 / 45 / 24, the
+# same as the labelled waves).  ~1.0-1.5% of their rows carry codes outside
+# the 20 below (data-entry noise plus, plausibly, the unlabelled grid cells
+# 10/15/25/30/34 -- a HYPOTHESIS, deliberately NOT given labels here).  Those
+# rows get the `unknown_condition` sentinel from uganda._CONDITION_UNKNOWN
+# rather than an invented label.
+#+name: harvest_conditions
+| Code | Preferred Label                     | Source Label                                              |
+|------+-------------------------------------+-----------------------------------------------------------|
+|   11 | green_with_shell_and_stalk          | Green harvested - with shell/cob and with stalk           |
+|   12 | green_with_shell                    | Green harvested - with shell/cob without stalk            |
+|   13 | green_in_cob                        | Green harvested - in the cob                              |
+|   14 | green_in_pods                       | Green harvested - in the pods                             |
+|   20 | fresh                               | Fresh/raw harvested - state not applicable                |
+|   21 | fresh_with_shell_and_stalk          | Fresh/raw harvested - with shell/cob and with stalk       |
+|   22 | fresh_with_shell                    | Fresh/raw harvested - with shell/cob without stalk        |
+|   23 | fresh_in_cob                        | Fresh/raw harvested - in the cob                          |
+|   24 | fresh_in_pods                       | Fresh/raw harvested - in pods or shell/husks              |
+|   31 | dry_at_harvest_with_shell_and_stalk | Dry at harvest - with shell/cob and with stalk            |
+|   32 | dry_at_harvest_with_shell           | Dry at harvest - with shell/cob without stalk             |
+|   33 | dry_at_harvest_in_cob               | Dry at harvest - in the cob                               |
+|   35 | dry_at_harvest_grain                | Dry at harvest - grain                                    |
+|   40 | dried                               | Dry after additional drying - state not applicable        |
+|   41 | dried_with_shell_and_stalk          | Dry after additional drying - with shell and with stalk   |
+|   42 | dried_with_shell                    | Dry after additional drying - with shell and without stalk |
+|   43 | dried_in_cob                        | Dry after additional drying - in the cob                  |
+|   44 | dried_in_pods                       | Dry after additional drying - In pods or shell/husks      |
+|   45 | dried_grain                         | Dry - grain                                               |
+|   99 | other_condition                     | Others / Not Applicable                                   |
+
 # harmonize_input: agricultural-input identity Code -> Preferred Label for
 # the plot_inputs feature (GAP 2).  One row per REPORTED input applied to a
 # plot, ``input`` axis.  The UNPS plot-input module (AGSEC3A/3B) records four

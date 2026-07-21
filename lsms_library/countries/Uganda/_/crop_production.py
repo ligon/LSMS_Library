@@ -1,7 +1,7 @@
 """Concatenate wave-level crop_production data for Uganda (GAP 1).
 
 Each wave's ``Uganda/<wave>/_/crop_production.py`` produces a parquet
-indexed ``(t, i, plot, j, u, season)`` with the REPORTED harvest columns
+indexed ``(t, i, plot, j, u, condition, season)`` with the REPORTED harvest columns
 (Quantity, Quantity_sold, Value_sold, harvest_month, intercropped,
 perennial, planting_month).  This script concatenates them across waves
 and applies cross-wave id_walk so the household index uses the panel

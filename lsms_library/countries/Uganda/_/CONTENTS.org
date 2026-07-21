@@ -238,7 +238,212 @@ concern from =u= label canonicalisation.  Its keys are the same
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+* Harvest condition on =crop_production= (GH #323 / #637)
+
+** The defect
+
+The UNPS post-harvest module (AGSEC5A season A / AGSEC5B season B) asks
+question 6 as a single compound question: *how much did you harvest, in
+what unit, and in what condition/state*.  A household that took some of a
+crop off a plot fresh and the rest after drying it answers TWICE.  Both
+answers are separate source rows (2009-16) or separate parallel column
+slots (2018-20).
+
+=crop_production= was keyed =(t, i, plot, j, u, season)=, with no level
+for the condition, so those answers landed on the same index tuple and the
+de-duplication block at the end of =uganda.crop_production_for_wave= summed
+them.  Dry weight was added to fresh weight.  A measured example from
+2011-12:
+
+#+begin_example
+HH 1033000506  plot -1-6  Coffee  Kilogram (KG)
+   240 kg  "Dry after additional drying - in pods or shell/husks"  month 6
+   100 kg  "Fresh/raw harvested - in pods or shell/husks"          month 6
+   -> summed to 340 kg
+#+end_example
+
+340 is not a quantity of anything.  Across the panel this affected *3 654
+index groups*.
+
+The quietest instances were 2009-10 and 2010-11: those waves have no
+harvest-month column, so *every* one of their collisions looked like an
+exact duplicate of an identical record, while in fact fresh and dry
+weights were being added together.
+
+** Fix: =condition= is an index level
+
+The grain is now =(t, i, plot, j, u, condition, season)=.  Labels come
+from the =harvest_conditions= table in =_/categorical_mapping.org=, via
+=uganda._harvest_condition_map()=; the canonical cross-country vocabulary
+is declared in =lsms_library/data_info.yml= under
+=Columns > crop_production > condition=.
+
+*Quantities in different conditions are not commensurable.*  Do not sum
+across this level without a drying / shelling conversion.  =transformations.harvest_kg=
+groups by =(t, i, plot, j)= and therefore still sums across conditions —
+that is a *pre-existing* property of that transform, unchanged by this
+work, and it remains the caller's problem (its own docstring already warns
+that its unit coverage is a lower bound).
+
+** Which source column is the unit and which is the condition
+
+Decided by the VALUE-LABEL vocabulary, never by the variable label.  The
+unit column's labels decode to Kg / Sack (100 kgs) / Bunch (Big); the
+condition column's to Green / Fresh / Dry ....  Verified per wave against
+the Stata metadata on 2026-07-21:
+
+| wave    | file    | condition | unit      | note                                                    |
+|---------+---------+-----------+-----------+---------------------------------------------------------|
+| 2009-10 | AGSEC5A | a5aq6b    | a5aq6c    | no value labels at all; matched by code distribution     |
+| 2009-10 | AGSEC5B | a5bq6b    | a5bq6c    | ditto                                                    |
+| 2010-11 | AGSEC5A | a5aq6b    | a5aq6c    | ditto                                                    |
+| 2010-11 | AGSEC5B | a5bq6b    | a5bq6c    | ditto                                                    |
+| 2011-12 | AGSEC5A | a5aq6b    | a5aq6c    | variable + value labels agree                            |
+| 2011-12 | AGSEC5B | a5bq6b    | a5bq6c    | variable + value labels agree                            |
+| 2013-14 | AGSEC5A | a5aq6b    | a5aq6c    | *variable labels are swapped*; value labels are correct  |
+| 2013-14 | AGSEC5B | a5bq6b    | a5bq6c    | variable + value labels agree                            |
+| 2015-16 | AGSEC5A | a5aq6b    | a5aq6c    | variable + value labels agree                            |
+| 2015-16 | AGSEC5B | a5bq6b    | a5bq6c    | value labels mojibaked (=ï¿½= for the en-dash)           |
+| 2018-19 | AGSEC5A | a5aq6b    | (none)    | no unit column exists -> u='Unknown'                     |
+| 2018-19 | AGSEC5B | a5bq6c    | a5bq6b*   | *unit exists but is NOT wired; see Known Issues          |
+| 2019-20 | agsec5a | s5aq06c_1 | s5aq06b_1 | slot 1                                                   |
+| 2019-20 | agsec5a | s5aq06c_2 | s5aq06b_2 | slot 2                                                   |
+| 2019-20 | agsec5b | s5bq06c_1 | s5bq06b_1 | slot 1 (slot 2 not wired; see Known Issues)              |
+
+A comment previously in =uganda.py= claimed "the WB .do's A5aq6b/A5aq6c
+unit/condition rename is inverted for these actual UNPS files".  That is
+*true of exactly one file* — 2013-14 AGSEC5A, where =a5aq6b= is titled
+"Unit of quantity for the crop harvested" but carries the condition value
+labels, and =a5aq6c= is titled "Condition/state of the harvested crop" but
+carries the unit value labels.  Every other wave labels its variables
+correctly.  The wiring (=6c= = unit) was right in all cases; only the
+explanation was overstated.
+
+2018-19 AGSEC5A additionally carries an =a5aq6c= that holds the *same*
+20-code condition scheme, unlabelled, disagreeing with =a5aq6b= on 158 of
+7 144 rows.  The labelled column (=a5aq6b=) is used.
+
+** The two vintages encode the same vocabulary
+
+- *2009-16 (LONG)* — one column group per season; the condition is a VALUE
+  in =a5aq6b= / =a5bq6b=, with multiple source rows per plot-crop.
+- *2018-20 (WIDE)* — parallel =_1= / =_2= slots; the condition for each
+  slot is a value in that slot's own 6c column.  The slot number is *not*
+  an ordinal "first/second harvest": the 2019-20 Stata variable labels read
+  literally "6c. Condition/state of crop harvested (2018, full harvest,
+  condition1)" and "(… condition2)".
+
+They are the same vocabulary — in fact the same *integer codes*.  Every
+wave that carries value labels (2011-12, 2013-14, 2015-16, 2018-19,
+2019-20) uses the identical 20-code set; only the label TEXT drifts
+(en-dash vs hyphen, mojibake in 2015-16 AGSEC5B, and code 99 reading
+"Others" in 2011-12 but "Not Applicable" in 2018-20).  One
+=harvest_conditions= table therefore serves all vintages, and no
+harmonisation between them was needed or invented.
+
+Worked example, =agsec5a.dta= row index 3 (2019-20): same maize, same
+plot, same month; slot _1 = 80.0 Kilogram(KG) "Dry - grain", slot _2 = 2.0
+Plastic Basin(15 lts) "Fresh/raw harvested - in the cob".
+
+The scheme is a 2-D cross of a dryness family (tens digit: 1 green, 2
+fresh/raw, 3 dry at harvest, 4 dry after additional drying) with a
+physical form (units digit: 0 n/a, 1 with shell/cob and stalk, 2 with
+shell/cob without stalk, 3 in the cob, 4 in pods/shell/husks, 5 grain).
+The =Preferred Label= strings encode exactly that cross.
+
+*Hypothesis, deliberately not acted on*: the unlabelled 2009-10/2010-11
+codes 10, 15, 25, 30 and 34 fit the grid (=green n/a=, =green grain=,
+=fresh grain=, =dry-at-harvest n/a=, =dry-at-harvest in pods=) and account
+for roughly half of those waves' off-scheme rows.  No wave labels them, so
+they are NOT given Preferred Labels; they fall to =unknown_condition=.
+
+** Effect (cold rebuild, isolated data dir, 2026-07-21)
+
+| wave    | dup groups before | after | rows before | rows after | Quantity (unchanged) |
+|---------+-------------------+-------+-------------+------------+----------------------|
+| 2009-10 |               670 |   181 |       24997 |      25485 |        310,664,565.8 |
+| 2010-11 |               608 |    81 |       20442 |      20970 |            708,149.5 |
+| 2011-12 |               653 |    55 |       19552 |      20152 |          1,128,560.3 |
+| 2013-14 |               589 |    61 |       17053 |      17585 |          1,098,713.5 |
+| 2015-16 |               764 |    63 |       18874 |      19576 |          1,050,367.4 |
+| 2018-19 |                 0 |     0 |       14194 |      14194 |          1,180,031.7 |
+| 2019-20 |               370 |    18 |       15369 |      15721 |          1,175,600.8 |
+|---------+-------------------+-------+-------------+------------+----------------------|
+| total   |              3654 |   459 |      130481 |     133683 |        317,005,989.0 |
+
+Collisions fall 87.4%.  =Quantity=, =Quantity_sold= and =Value_sold= totals
+are *identical* per wave before and after — as they must be: summing is
+conservative, so a correct fix moves rows apart, it does not create or
+destroy mass.
+
+*Residual 459 groups.*  These are now all *commensurable*: same crop, same
+unit, same condition, so summing them is arithmetically valid, which is
+precisely what was not true before.  Breakdown: 50 groups' rows differ in
+=harvest_month= (two harvest events of the same crop in the same state);
+~320 differ only in =Quantity= (repeat entries within the module, or both
+2019-20 slots reporting the same condition); 49 are byte-identical rows
+(a genuinely duplicated source record — note the collapse SUMS these, so a
+repeated record still doubles; pre-existing behaviour, not addressed here);
+37 carry the =unknown_condition= sentinel in the key and so may still hide
+a real condition difference (28 of them in 2009-10).
+
+*=unknown_condition= incidence*: 7 994 of 133 683 rows (6.0%), concentrated
+in the two unlabelled waves — 2009-10 5 911, 2010-11 914, 2011-12 712,
+2013-14 409, 2015-16 26, 2018-19 9, 2019-20 13.  Most are rows where the
+condition column is simply null, not off-scheme codes (only ~500 rows in
+the whole panel carry a code outside the 20-code scheme).
+
+** Cross-country status
+
+=crop_production= is NOT registered in =lsms_library/data_info.yml=
+=Index Info > index_info=, by an explicit decision recorded there: the
+plot-level ag features' per-country index NAMES diverge (=plot= vs
+=plot_id=, =crop= vs =j=) and must be harmonised first.  Uganda was
+therefore *already* excluded from =Feature('crop_production')= before this
+change — its shape =['i','t','v','plot','j','u','season']= differs from the
+modal =['i','t','v','plot','crop','u']= — alongside Ethiopia, EthiopiaRHS,
+Mali, Nigeria and Tanzania.  Adding =condition= cannot and does not change
+the set of countries Feature keeps.
+
 * Known Issues
+** TODO 2018-19 AGSEC5B harvest unit is available but not wired
+
+=CROP_COLMAPS['2018-19']['B']= sets =unit: None=, so every 2018-19 season-B
+harvest row carries =u='Unknown'=.  But =a5bq6b= exists in that file,
+titled "6b. Unit", with the full 40-label =harvest_units= vocabulary and
+7 041 non-null values.  (Season A genuinely has no unit column; the
+long-standing note "2018-19's harvest side carries no unit label" is
+correct for 5A and wrong for 5B.)  Wiring it would move rows between =u=
+values, so it is a separate change with its own before/after.
+
+** TODO Second condition slot dropped for 2019-20 season B
+
+=agsec5b.dta= (2019-20) carries =s5bq06a_2= / =s5bq06b_2= / =s5bq06c_2=,
+labelled "(2019, condition2)", with 1 306 non-null conditions.
+=CROP_COLMAPS= reads only slot 1, so those harvest records are absent from
+=crop_production= entirely.  2018-19 AGSEC5B likewise has an =_2= slot, but
+there its variable label reads "during the second season of 2017" — i.e.
+it may be a SEASON slot rather than a condition slot, and needs the
+questionnaire before it is wired.  Adding either ADDS mass, so both are
+deliberately outside the #323 condition fix (which is verified against a
+"totals unchanged" invariant).
+
+** TODO Duplicate collapse silently drops rows with a null index key
+
+=crop_production_for_wave='s de-duplication uses
+=groupby(level=...)=, whose pandas default is =dropna=True=.  Any row with
+=pd.NA= in an index level therefore *vanishes*.  Measured: 431 rows /
+7 108 132 native units in 2009-10 and 43 rows / 962.5 in 2011-12, all with
+a null =plot= id (the =hhid-parcel-plot= concatenation propagates NA).
+Unrelated to and unchanged by the =condition= work; =condition= is
+sentinel-filled precisely so it does not add to this.
+
+** TODO 2009-10 harvest quantities carry an unstripped 99999 sentinel
+
+2009-10's =Quantity= sums to 3.18e8 native units, ~300x every other wave,
+because =99999= is used as a missing-value sentinel and never removed.
+Any analysis touching 2009-10 =crop_production= quantities must filter it.
+
 ** TODO Missing panel weight for 2019-20
 :LOGBOOK:
 - Note taken on [2026-04-09 Wed] \\

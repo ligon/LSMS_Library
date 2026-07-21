@@ -130,7 +130,7 @@ Data Scheme:
     # (season 1) + AGSEC5B (season 2) of the UNPS post-harvest
     # questionnaire, joined to AGSEC4A for the intercropped flag.
     #
-    # Grain (t, i, plot, j, u, season):
+    # Grain (t, i, plot, j, u, condition, season):
     #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id;
     #            its parcel component is the parcel plot_features keys on.
     #   j      — crop, on the shared 'harmonize_crop' Preferred Labels,
@@ -140,6 +140,20 @@ Data Scheme:
     #   u      — reported native harvest unit ('harvest_units' table);
     #            'Unknown' where a wave records no harvest unit label
     #            (e.g. 2018-19 harvest side).
+    #   condition — physical state of the crop when the Quantity was
+    #            measured ('harvest_conditions' table): green / fresh /
+    #            dry-at-harvest / dried, crossed with the form (on the
+    #            stalk, with shell, in the cob, in pods, as grain).  UNPS
+    #            asks quantity, unit AND condition together, so the same
+    #            plot-crop-season carries one record PER CONDITION; before
+    #            this level existed (GH #323/#637) those records collided
+    #            and their Quantity was summed — dry weight added to fresh
+    #            weight.  'unknown_condition' where the wave records no
+    #            condition code or an off-scheme one (~1% of 2009-10 and
+    #            2010-11 rows, which ship no value labels).
+    #            Quantities in different conditions are NOT commensurable;
+    #            do not sum across this level without a drying/shelling
+    #            conversion.
     #   season — 'A' (first season) / 'B' (second season).
     #
     # Columns are REPORTED values only — no harvest_kg / yield /
@@ -147,7 +161,7 @@ Data Scheme:
     # wave -> NaN.  2005-06 is excluded: its AGSEC5A is a crop-area
     # allocation matrix with no crop-level harvest quantities, and the
     # WB LSMS-ISA panel itself starts at wave 1 (2009-10).
-    index: (t, i, plot, j, u, season)
+    index: (t, i, plot, j, u, condition, season)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
