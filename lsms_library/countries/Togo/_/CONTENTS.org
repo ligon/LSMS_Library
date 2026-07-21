@@ -59,6 +59,60 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 Togo has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
 
+* Grain: two cells that leaned on the framework collapse (GH #323)
+
+Togo tripped =_normalize_dataframe_index='s =groupby().first()= in two
+structurally different places.  Both are closed in the CONFIG, per
+decision D1 of =slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org=:
+*the core does not aggregate*, so the answer to a duplicated declared
+index is to stop manufacturing the duplicate --- never to declare a
+reducer.  (=aggregation:= in =data_scheme.yml= is dead config; nothing
+reads it, and a test pins that it is not honoured.)
+
+** plot_inputs --- REAL loss, 165 reported line-items destroyed
+
+=plot_inputs= is keyed =(t, i, input, crop, u)=.  =harmonize_input=
+maps *every* seed label onto the single =input= value ='Seed'=, so
+=crop= is the only level left that can tell two seed line-items apart
+--- and =harmonize_seed_crop= was NON-INJECTIVE: four labels shared one
+='Autre crop'= catch-all, three of which actually occur in Togo's
+=s16b= roster (=Plants/boutures de tubercules= 780 rows, =Autres
+semences= 591, =Semences d'autres céréales= 370).  162 households
+reported two of them at once, and 165 rows vanished.
+
+The identifier was BROKEN, not a level MISSING: 0 of the 162 colliding
+groups repeat the same raw =s16bq01= label, i.e. every collision is
+between two *distinct reported items* pooled by a lossy crop map.  The
+buckets are now split (=Autre céréale= / =Autre tubercule= / =Autre
+crop=), which is also what the source means.  Do NOT "fix" this by
+adding =Purchased= to the index --- =Purchased= is a measured attribute
+of a line-item, not part of its identity.  See the long note above
+=harmonize_seed_crop= in =categorical_mapping.org=, the uniqueness
+assertion at the end of =2018/_/plot_inputs.py=, and
+=tests/test_gh323_benin_togo.py=.  Measured: API 13,565 -> 13,730.
+
+** cluster_features --- an EXTRACTION bug, value-lossless
+
+=cluster_features= is declared =(t, v)= --- 540 grappes --- but its
+=df_main= is the EHCVM *household* cover page
+=2018/Data1/s00_me_tgo2018.dta=: 6,171 households.  (=df_geo=,
+=grappe_gps_tgo2018.dta=, is already 540 rows, so every duplicate came
+from =df_main=.)  The wave frame therefore carried 6,171 rows for a
+540-row table and left 5,631 of them on a duplicated =(t, v)= tuple for
+the framework to reduce.
+
+*No rows of value were destroyed* --- measured, not assumed: all 540
+grappes carry exactly one distinct Region (=s00q01=) and one distinct
+Rural (=s00q04=), so the reduction was value-lossless and (post-PR
+#614) correctly silent.  It is still fixed, because "lossless" here was
+an accident nobody was checking: =.first()= on a cluster that stopped
+being constant returns a silently *wrong* Region --- the Kazakhstan
+1996 / CotedIvoire grappe-648 failure mode.  The
+=cluster_features(df)= hook in =2018/_/mapping.py= projects to cluster
+grain in the extraction and RAISES if any column ever varies within a
+grappe.  Wave frame 6,171 -> 540; API unchanged at 540 rows with
+identical values.
+
 * plot_features (GH #167)
 
 Lasting parcel-level characteristics from the EHCVM agriculture module

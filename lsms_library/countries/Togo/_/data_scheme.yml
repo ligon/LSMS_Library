@@ -9,6 +9,17 @@ Data Scheme:
     strata: str
     Rural: str
   cluster_features:
+    # GRAIN (GH #323).  df_main is the EHCVM *household* cover page
+    # (2018/Data1/s00_me_tgo2018.dta, 6,171 households / 540 grappes), so
+    # the raw extraction emitted 6,171 rows for this 540-row table and left
+    # 5,631 of them on a duplicated (t, v) tuple.  The projection to cluster
+    # grain now happens in the EXTRACTION -- the cluster_features(df) hook in
+    # 2018/_/mapping.py -- and it CHECKS that Region/Rural really are constant
+    # within a grappe (they are: 0/540 violations) instead of leaning on the
+    # framework's groupby().first(), which would return a silently WRONG
+    # Region the day that stopped holding.  Do NOT declare a reducer here;
+    # see _/CONTENTS.org "Grain: two cells that leaned on the framework
+    # collapse".
     index: (t, v)
     Region: str
     Rural: str
