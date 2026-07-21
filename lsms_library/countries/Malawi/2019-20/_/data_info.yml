@@ -73,6 +73,24 @@ cluster_features:
             # sign-flipping the indicator between waves.  GH #602.
             Rural: reside
     df_geo:
+        # GH #323 SITE 4 -- KNOWN CARTESIAN, DELIBERATELY NOT FIXED HERE.
+        # `householdgeovariables_ihs5.dta` is HOUSEHOLD grain (11,434 rows, one
+        # per case_id, across 717 EAs), and this block keys it on `ea_id` and
+        # merges on the CLUSTER key `v`: 14,612 households x 11,434 geo rows
+        # paired within `v` = 185,842 rows, 171,230 of them phantom, for a table
+        # that collapses to 819 clusters.
+        #
+        # It does NOT corrupt any value -- a cartesian repeats values rather
+        # than inventing them, and the contested-cell count is provably
+        # unchanged by it (measured: 250 before and after collapsing the merge
+        # to household grain).  The one-line fix is `idxvars: {i: [case_id,
+        # {function: cs_i}]}` + `merge_on: [i]`; the two files are exactly 1:1
+        # on case_id.  Left in place so PR #627's cardinality guard (core,
+        # Site 4) still has this cell as evidence; #627 owns the decision.
+        #
+        # Unrelated to the cardinality: the 102 IHPS Panel EAs share NO ea_id
+        # with the geo file, so those clusters have NaN coordinates either way
+        # -- IHS5 publishes no geovariables for the panel half.
         file: Cross_Sectional/householdgeovariables_ihs5.dta
         idxvars:
             v: ea_id
