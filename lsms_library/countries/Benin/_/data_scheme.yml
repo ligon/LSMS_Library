@@ -63,9 +63,27 @@ Data Scheme:
     # `visit` (vague) is dropped: in EHCVM 2018-19 it's a sample split
     # (each grappe surveyed in exactly one vague), not a repeated measure,
     # so households are uniquely keyed by (t, v, i, j, u, s) without it.
+    #
+    # AGGREGATION (GH #323).  1,382 rows collide on the declared index.  The
+    # raw source has NO duplicates (s07b_me_ben2018.dta: 187,672 rows, all
+    # unique on (grappe, menage, s07bq01)); the collisions are MANUFACTURED
+    # DOWNSTREAM by harmonize_food, which is deliberately many-to-one: 160
+    # Original Labels -> 146 Preferred Labels, 14 catch-all buckets taking 2
+    # originals each ('Autres poissons fumés' <- ['Chinchard fumé',
+    # 'Marquereau (salomon) fumé']).  Two DISTINCT items bucketed together are
+    # a genuine aggregation, so the reducer must SUM, not keep the first.
+    # Colliding rows necessarily share `u` (it is IN the index), so the summed
+    # quantities are commensurable BY CONSTRUCTION.  This restates, in config,
+    # the policy that was already in force via feature.py's hardcoded
+    # _ADDITIVE_MEASURE_COLUMNS -- behaviour is unchanged (verified: total
+    # Expenditure 87,287,927 before and after); it is now self-documenting
+    # rather than requiring the reader to find a Python dict.
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
+    aggregation:
+      Quantity: sum
+      Expenditure: sum
 
   assets:
     index: (t, i, j)
@@ -179,10 +197,36 @@ Data Scheme:
     # the framework's canonical NaN-key de-dup collapse).  `u` is in the index
     # and a missing unit is filled with 'Manquant' for the same non-null
     # reason.
+    #
+    # AGGREGATION (GH #323).  71 rows collide on the declared index and were
+    # being DISCARDED by the framework's default groupby().first(), losing
+    # 11,445.2 units of reported input quantity and flipping 4 households'
+    # Purchased flag True->False.  As with food_acquired the raw source has NO
+    # duplicates (s16b_me_ben2018.dta, s16bq02==1: 10,605 rows, all unique on
+    # (grappe, menage, s16bq01)); the collisions are manufactured downstream by
+    # harmonize_seed_crop, which maps 12 originals onto 8 preferred labels with
+    # 'Autre crop' <- ['20', 'Autres semences', 'Plants/boutures de tubercules',
+    # "Semences d'autres céréales"].  A household reporting BOTH 'Autres
+    # semences' (9 kg) and 'Plants/boutures de tubercules' (6 kg) lands both in
+    # (Seed, Autre crop, Kilogramme) -- an intended bucketing with the wrong
+    # reducer.  Colliding rows necessarily share `u` (it is IN the index), so
+    # summing is commensurable BY CONSTRUCTION.
+    #   Quantity / Quantity_purchased : sum  -- commensurable, additive.
+    #   Purchased                     : any  -- the household DID purchase the
+    #       bucket if it purchased any member of it; `first` silently answers
+    #       False for a household whose second row is the purchased one.
+    # NB `sum` here is min_count=1 (see _AGG_REDUCERS in country.py):
+    # Quantity_purchased is <NA> in 10,222 of 10,605 rows, and a plain pandas
+    # sum (min_count=0) would fabricate 10,151 spurious 0.0 "purchased nothing"
+    # readings out of missing data.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    aggregation:
+      Quantity: sum
+      Quantity_purchased: sum
+      Purchased: any
     materialize: make
 
   plot_labor:

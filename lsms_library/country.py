@@ -4096,6 +4096,112 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+# ---------------------------------------------------------------------------
+# Declarative per-column aggregation policy (GH #323)
+# ---------------------------------------------------------------------------
+#
+# When the declared canonical index of a table is non-unique, the duplicate
+# tuples MUST be reduced by an EXPLICITLY DECLARED policy.  The historical
+# default -- groupby().first() -- silently DISCARDS the dropped rows, and the
+# warning that flagged it is dead in warm operation by construction (the
+# collapse is baked into the L2 parquet, so the cold-build warning never fires
+# again: the bug hides behind the cache the bug poisoned).
+#
+# A table declares its policy in ``data_scheme.yml`` as a per-COLUMN reducer map:
+#
+#     plot_inputs:
+#       index: (t, i, input, crop, u)
+#       Quantity: float
+#       aggregation:
+#         Quantity: sum
+#         Quantity_purchased: sum
+#         Purchased: any
+#
+# EVERY reducer below MUST BE AN IDENTITY ON A SINGLETON GROUP.  The collapse
+# runs over ALL groups, and the overwhelming majority are singletons (10,470 of
+# 10,534 for Benin plot_inputs).  A reducer that maps a lone <NA> to 0.0 or to
+# False corrupts far MORE rows than the duplicate collapse it exists to fix:
+# pandas' default ``sum()`` (min_count=0) returns 0.0 for an all-NA group, which
+# on Benin plot_inputs would fabricate 10,151 spurious "purchased 0 units"
+# readings out of missing data -- a class-1 (silently WRONG) defect 143x larger
+# than the 71-row class-1 defect being fixed.  Hence ``sum`` pins min_count=1
+# and ``any``/``all`` re-mask all-NA groups back to <NA>.
+def _agg_sum(g):
+    # min_count=1: an all-NA group stays <NA> instead of collapsing to 0.
+    return g.sum(min_count=1)
+
+
+def _agg_any(g):
+    # g.any() maps an all-NA group to False; re-mask those back to <NA>.
+    return g.any().astype("boolean").where(g.count() > 0)
+
+
+def _agg_all(g):
+    return g.all().astype("boolean").where(g.count() > 0)
+
+
+_AGG_REDUCERS: dict[str, Any] = {
+    "sum": _agg_sum,
+    "any": _agg_any,
+    "all": _agg_all,
+    "first": lambda g: g.first(),
+    "last": lambda g: g.last(),
+    "min": lambda g: g.min(),
+    "max": lambda g: g.max(),
+    "mean": lambda g: g.mean(),
+    "median": lambda g: g.median(),
+}
+
+# Meta-keys in a data_scheme entry that are not column declarations.
+_SCHEME_META_KEYS = {"index", "materialize", "backend", "aggregation"}
+
+
+def _column_aggregation_policy(
+    schema_entry: dict[str, Any] | None,
+    columns: Iterable[str],
+    declared_levels: Iterable[str],
+    table_name: str | None = None,
+) -> dict[str, str]:
+    """Extract the per-COLUMN reducer map from a scheme entry's ``aggregation:``.
+
+    Keys naming a declared INDEX LEVEL (e.g. ``interview_date``'s
+    ``visit: first``) are grain-collapse hints, not column reducers, and are
+    ignored here.  A key naming neither a declared column nor a declared level
+    is a TYPO and raises -- silently ignoring it would reintroduce exactly the
+    silent-fallback-to-first() bug this machinery exists to kill.  Likewise an
+    unknown reducer name raises rather than degrading to ``first``.
+    """
+    block = (schema_entry or {}).get("aggregation") or {}
+    if not isinstance(block, dict):
+        return {}
+
+    declared_levels = set(declared_levels)
+    declared_columns = {
+        k for k in (schema_entry or {}) if k not in _SCHEME_META_KEYS
+    }
+    present = set(columns)
+    where = f"{table_name}: " if table_name else ""
+
+    policy: dict[str, str] = {}
+    for key, reducer in block.items():
+        if key in declared_levels:
+            continue  # grain hint (level collapse), not a column reducer
+        if key not in declared_columns:
+            raise ValueError(
+                f"{where}aggregation: '{key}' is neither a declared column nor a "
+                f"declared index level of this table. Known columns: "
+                f"{sorted(declared_columns)}; levels: {sorted(declared_levels)}."
+            )
+        if reducer not in _AGG_REDUCERS:
+            raise ValueError(
+                f"{where}aggregation: unknown reducer '{reducer}' for column "
+                f"'{key}'. Choose one of {sorted(_AGG_REDUCERS)}."
+            )
+        if key in present:  # a declared-but-absent column in this wave is fine
+            policy[key] = reducer
+    return policy
+
+
 @build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
@@ -4109,9 +4215,12 @@ def _normalize_dataframe_index(
     - Reorders index levels to match the declared order.
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
-    - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+    - Collapses duplicate entries under an EXPLICITLY DECLARED aggregation
+      policy (the scheme entry's per-column ``aggregation:`` block, else the
+      legacy ``_ADDITIVE_MEASURE_COLUMNS`` map).  With NO declared policy the
+      collapse falls back to ``groupby().first()``, which silently discards the
+      dropped rows -- that path now warns, and RAISES when
+      ``LSMS_STRICT_AGGREGATION`` is set (GH #323).
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4181,32 +4290,56 @@ def _normalize_dataframe_index(
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
         # GH #514/#323: collapsing a non-unique canonical index with .first()
-        # silently DISCARDS the dropped rows.  For additive-measure tables
-        # (food_acquired, whose source legitimately records the same item across
-        # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
-        # re-derive any per-unit Price from the summed totals -- no data lost,
-        # no warning.  Single source of truth for the additive column map lives
-        # in feature.py (imported lazily to avoid an import cycle).
-        from .feature import _ADDITIVE_MEASURE_COLUMNS
-        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
-        present_additive = [c for c in (additive or ()) if c in df.columns]
-        if present_additive:
-            agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
-            df = df.groupby(level=present_levels, observed=True).agg(agg)
-            if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
+        # silently DISCARDS the dropped rows.  Reduce under an EXPLICITLY
+        # DECLARED policy instead.  Precedence:
+        #   1. the scheme entry's per-column `aggregation:` block (declarative,
+        #      self-documenting, supports non-additive reducers like `any`);
+        #   2. the legacy `_ADDITIVE_MEASURE_COLUMNS` map in feature.py (sum the
+        #      additive columns; imported lazily to avoid an import cycle);
+        #   3. nothing -- fall back to first() and make the loss LOUD.
+        policy = _column_aggregation_policy(
+            schema_entry, df.columns, declared, table_name
+        )
+        if not policy:
+            from .feature import _ADDITIVE_MEASURE_COLUMNS
+            additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
+            policy = {c: 'sum' for c in (additive or ()) if c in df.columns}
+
+        if policy:
+            grouped = df.groupby(level=present_levels, observed=True)
+            # Columns with no declared reducer keep the historical `first`.
+            reduced = {
+                col: _AGG_REDUCERS[policy.get(col, 'first')](grouped[col])
+                for col in df.columns
+            }
+            df = pd.DataFrame(reduced, columns=df.columns)
+            # Price is PER-UNIT, not additive: once Quantity/Expenditure have
+            # been summed the reported first() Price is stale, so re-derive it
+            # from the summed totals (pre-existing semantics of the additive
+            # path, applied uniformly to any summing policy).
+            if ('sum' in policy.values() and 'Price' in df.columns
+                    and {'Expenditure', 'Quantity'} <= set(df.columns)):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
         else:
             df = df.groupby(level=present_levels, observed=True).first()
             if n_dropped:
-                # No aggregation policy for this table -- surface the loss
-                # loudly rather than drop rows quietly (a table whose source
-                # legitimately has multiple rows per index tuple needs an
-                # explicit policy, like the additive sum above).
-                warnings.warn(
-                    f"Canonical index over {present_levels} had {n_dropped} "
-                    f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                    f"those rows (possible silent data loss — GH #323).",
-                    RuntimeWarning,
+                # No aggregation policy for this table -- the dropped rows are
+                # GONE.  A table whose source legitimately has several rows per
+                # declared index tuple needs an explicit `aggregation:` block.
+                #
+                # This warning is dead in WARM operation by construction: the
+                # collapsed frame is what gets cached, so a second read finds a
+                # unique index and never reaches here.  The bug hides behind the
+                # cache the bug poisoned -- which is why strict mode exists.
+                msg = (
+                    f"{table_name or 'table'}: canonical index over {present_levels} "
+                    f"had {n_dropped} duplicate tuple(s); collapsed via "
+                    f"groupby().first(), DISCARDING those rows (silent data loss "
+                    f"— GH #323). Declare an `aggregation:` block for this table "
+                    f"in its data_scheme.yml."
                 )
+                if os.environ.get("LSMS_STRICT_AGGREGATION"):
+                    raise ValueError(msg)
+                warnings.warn(msg, RuntimeWarning)
 
     return df
