@@ -264,16 +264,21 @@ def test_core_does_not_import_or_call_the_country_facing_reducers():
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
         }
 
+        # Bind-site check, deliberately source-agnostic.  The reducers are
+        # DEFINED in `build_transforms` but RE-EXPORTED by `transformations`
+        # (which is how a country script imports them), so keying on the source
+        # module would let core evade this by importing from the re-export.
+        # Core has no legitimate reason to bind these names from anywhere.
         imported = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom):
-                if (node.module or '').split('.')[-1] == 'build_transforms':
-                    for alias in node.names:
-                        if alias.name in _COUNTRY_FACING_REDUCERS:
-                            imported.add(alias.asname or alias.name)
-                            offenders.append(
-                                f'{mod}: imports {alias.name} from build_transforms'
-                            )
+                for alias in node.names:
+                    if alias.name in _COUNTRY_FACING_REDUCERS:
+                        imported.add(alias.asname or alias.name)
+                        offenders.append(
+                            f'{mod}: imports {alias.name} '
+                            f'from {node.module or "."}'
+                        )
 
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
