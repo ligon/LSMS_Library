@@ -60,7 +60,19 @@ cluster_features:
                 - mapping: cs_i
             v: ea_id
         myvars:
-            Region: region
+            # GH #323 SITE 2.  Harmonize the region label AT EXTRACTION, not
+            # only at API time.  The Cross_Sectional file spells the southern
+            # region 'Southern' and the Panel file spells it 'South'; EA
+            # 30305580 is sampled in BOTH halves (a genuine shared EA, same
+            # district -- not a code collision), so the household->cluster
+            # projection saw two spellings of one region and recorded a
+            # conflict that does not exist.  The auto-discovery `region`
+            # table already collapses them at API time, so applying it here
+            # is output-neutral -- it just stops the collapse from seeing a
+            # spelling difference as a disagreement about the cluster.
+            Region:
+                - region
+                - mappings: ['region', 'Alternate Spelling', 'Preferred Label']
             District: district
             # Raw `reside` is already a declared spelling of the canonical
             # Rural/Urban vocabulary in every Malawi wave ('Rural'/'Urban',
@@ -78,7 +90,18 @@ cluster_features:
         # file in this wave and end up with NaN lat/lon -- acceptable.
         file: Cross_Sectional/householdgeovariablesihs4.dta
         idxvars:
-            i: case_id
+            # `i` MUST be built exactly as df_main builds it.  df_main runs
+            # case_id through cs_i ('cs-17-' + format_id) to keep the
+            # Cross_Sectional ids apart from the Panel's y3_hhid; this block
+            # declared the RAW case_id, so the merge key never matched and
+            # the `how='outer'` join produced 12,447 orphan geo rows next to
+            # 14,955 main rows with no coordinates.  Result: 0 of 880
+            # clusters had GPS.  The two files are exactly 1:1 on case_id
+            # (12,447 = 12,447, no rows on either side alone), so mirroring
+            # the transform makes the join exact.
+            i:
+                - case_id
+                - mapping: cs_i
         myvars:
             Latitude: lat_modified
             Longitude: lon_modified
