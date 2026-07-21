@@ -210,22 +210,116 @@ def test_add_visit_level_refuses_to_stamp_over_an_existing_visit():
 # The policy itself: core must not be able to reach these behind the caller
 # --------------------------------------------------------------------------
 
-def test_core_does_not_dispatch_the_reducers():
-    """D1: core does not aggregate.  These helpers are called BY NAME from
-    country scripts; the access path must not import, reference, or dispatch
-    them (and no ``aggregation:`` YAML key may drive them).  A grep, because
-    the thing being guarded is precisely that no such wiring exists.
-    """
+_COUNTRY_FACING_REDUCERS = (
+    'reduce_to_agreed', 'collapse_to_cluster_grain', 'add_visit_level',
+)
+_CORE_MODULES = ('country.py', 'feature.py', 'local_tools.py')
+
+
+def _core_sources():
     from pathlib import Path
     import lsms_library
-
     root = Path(lsms_library.__file__).parent
-    banned = ('reduce_to_agreed', 'collapse_to_cluster_grain', 'add_visit_level')
+    return [(mod, (root / mod).read_text()) for mod in _CORE_MODULES]
+
+
+def test_core_does_not_import_or_call_the_country_facing_reducers():
+    """D1: core must not reach the country-facing reducers behind the caller.
+
+    These helpers live in ``build_transforms`` and are invoked BY NAME from
+    country scripts.  The Design-A wiring this guards against is core
+    *importing* one and *calling* it -- so that is what is checked, via the
+    AST.
+
+    **This was a substring grep and the grep was wrong.**  It banned the three
+    names anywhere in the text of a core module, which cannot distinguish
+
+      - ``from .build_transforms import collapse_to_cluster_grain`` -- the
+        Design-A coupling, a real violation; from
+      - ``country.py``'s own private ``_collapse_to_cluster_grain`` -- the
+        sanctioned Site 2 fix (PR #617), which merely shares a suffix.
+
+    The grep flagged the second, so ``development`` went red the moment PR #618
+    (this file) and PR #617 were both merged: two sibling #323 PRs, each green
+    alone, contradicting each other only in combination.
+
+    **Know what this test does NOT prove.**  It is a *coupling* check, not an
+    aggregation check.  A static scan cannot tell whether core aggregates -- a
+    locally-defined helper with any name at all could reduce grain silently and
+    this test would pass.  That property is behavioural and is enforced in
+    ``tests/test_gh323_grain_contract.py`` (conservation, no-fabrication,
+    loud/silent asymmetry, report accuracy).  Keep both: this one pins the
+    wiring, that one pins the behaviour.
+    """
+    import ast
+
     offenders = []
-    for mod in ('country.py', 'feature.py', 'local_tools.py'):
-        src = (root / mod).read_text()
-        offenders += [f"{mod}:{name}" for name in banned if name in src]
+    for mod, src in _core_sources():
+        tree = ast.parse(src)
+
+        # Names bound locally by a `def` are this module's own helpers, not the
+        # country-facing reducers -- even if they collide by name.
+        local_defs = {
+            node.name for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+
+        # Bind-site check, deliberately source-agnostic.  The reducers are
+        # DEFINED in `build_transforms` but RE-EXPORTED by `transformations`
+        # (which is how a country script imports them), so keying on the source
+        # module would let core evade this by importing from the re-export.
+        # Core has no legitimate reason to bind these names from anywhere.
+        imported = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                for alias in node.names:
+                    if alias.name in _COUNTRY_FACING_REDUCERS:
+                        imported.add(alias.asname or alias.name)
+                        offenders.append(
+                            f'{mod}: imports {alias.name} '
+                            f'from {node.module or "."}'
+                        )
+
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            if isinstance(func, ast.Name):
+                if func.id in imported:
+                    offenders.append(f'{mod}: calls {func.id}()')
+            elif isinstance(func, ast.Attribute):
+                # e.g. build_transforms.collapse_to_cluster_grain(...)
+                if (func.attr in _COUNTRY_FACING_REDUCERS
+                        and func.attr not in local_defs):
+                    offenders.append(f'{mod}: calls .{func.attr}()')
+
     assert not offenders, (
-        f"the access path references an explicit reducer: {offenders} -- that is "
-        "core aggregating behind the caller's back (GH #323 D1)"
+        f"the access path reaches a country-facing reducer: {offenders} -- that "
+        "is core aggregating behind the caller's back (GH #323 D1)"
+    )
+
+
+def test_the_reducers_are_not_yaml_dispatchable():
+    """The other half of D1: no ``aggregation:`` key may drive a reducer.
+
+    ``reduce_to_agreed`` / ``collapse_to_cluster_grain`` must NOT be registered
+    as ``@build_transform``s, or a country's YAML could reach them through the
+    ``derived:`` dispatch and core would be aggregating on a config's say-so --
+    Design A through the back door.
+    """
+    from lsms_library import _build_registry
+
+    registered = set(getattr(_build_registry, '_REGISTRY', {}) or {})
+    if not registered:  # registry keyed differently; fall back to the tag
+        from lsms_library import build_transforms as bt
+        registered = {
+            name for name in dir(bt)
+            if getattr(getattr(bt, name, None), '_build_transform', False)
+        }
+
+    leaked = {'reduce_to_agreed', 'collapse_to_cluster_grain'} & registered
+    assert not leaked, (
+        f"{sorted(leaked)} is registered as a build transform, so a country's "
+        "`derived:` YAML can dispatch it -- that is core aggregating on config's "
+        "say-so (GH #323 D1)"
     )
