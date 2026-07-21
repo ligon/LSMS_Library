@@ -100,6 +100,27 @@ sample:
         - _lon
 
 cluster_features:
+    # GH #323.  2009-10 is a panel-refresh wave, so `comm` in GSEC1 is the
+    # *2005-06* EA -- the original sampling frame.  The 565 households that
+    # moved or split off fall outside that frame and carry a BLANK `comm`,
+    # which uganda.v() (= format_id) normalises to None.  The (t, v) collapse
+    # in _normalize_dataframe_index then DELETED every one of them outright
+    # (groupby(dropna=True)), so 565 households referenced a cluster that had
+    # no row in cluster_features at all.
+    #
+    # `sample` already solved exactly this, with the `derived:
+    # coalesce_coord_bin` block above: fall back to a synthetic `@lat,lon`
+    # cluster binned from the modified GPS.  Do the SAME here, with the same
+    # transformer, the same source coordinates and the same defaults
+    # (grid_degrees=0.05, prefix='@') -- which is what makes the labels
+    # identical to sample's by CONSTRUCTION rather than by coincidence.  The
+    # two must agree or _join_v_from_sample hands the rest of the library a
+    # key that matches nothing.
+    #
+    # `derived:` runs after set_index(final_index), so `v` has to be a myvar
+    # and final_index (t, i) for it to still be a COLUMN when the transformer
+    # sees it.  The country-level hook uganda.cluster_features() then projects
+    # onto the declared (t, v) grain.
     dfs:
         - df_main
         - df_geo
@@ -107,8 +128,8 @@ cluster_features:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
-            v: comm
         myvars:
+            v: comm
             Rural: urban
             District: h1aq1  # TODO: This is numeric codes; needs mapping to names.
             Region:
@@ -127,4 +148,9 @@ cluster_features:
         - i
     final_index:
         - t
-        - v
+        - i
+    derived:
+        v:
+            kind: coalesce_coord_bin
+            lat: Latitude
+            lon: Longitude

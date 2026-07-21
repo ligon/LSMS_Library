@@ -53,6 +53,178 @@ def v(x):
     return format_id(x)
 
 
+# ---------------------------------------------------------------------------
+# GH #323 -- country-level df_edit hooks.
+#
+# Both of the functions below are dispatched by the framework as the named
+# table's ``df_edit`` hook (``Wave.column_mapping`` ->
+# ``final_mapping['df_edit'] = formatting_functions.get(request)``), for EVERY
+# Uganda wave, because they live in the country module.  A wave that needs
+# something different defines a function of the same name in its own
+# ``_/mapping.py``, which wins.
+#
+# They exist because the framework's fallbacks are silent: a non-unique declared
+# index is reduced with ``groupby().first()``, which takes the first NON-NULL
+# value of each column INDEPENDENTLY and can therefore return a row that exists
+# in no source record.  Neither of these hooks aggregates.  They make the grain
+# EXPLICIT and then either prove the reduction lossless or say -- out loud --
+# exactly what it could not resolve.  See
+# SkunkWorks/grain_aggregation_policy.org and
+# slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org.
+# ---------------------------------------------------------------------------
+
+_P7_MEMBER_CATEGORY = 'Household members'
+
+
+def people_last7days(df):
+    """Keep the HOUSEHOLD-MEMBER rows of a long-form GSEC15A (GH #323).
+
+    The question ("how many people were present in the last 7 days?") is asked
+    separately for household MEMBERS and for VISITORS.  Through 2013-14 the two
+    live in parallel COLUMNS and the YAML maps ``Men/Women/Boys/Girls`` onto the
+    member block, leaving the visitor block unused:
+
+    ===========  =========  =====================  =======================
+    Wave         File       Member cols (used)     Visitor cols (ignored)
+    ===========  =========  =====================  =======================
+    2005-06      GSEC14     ``h14q1``--``h14q4``   ``h14q5``--``h14q8``
+    2009-10      GSEC15A    ``h15a1``--``h15a4``   ``h15a5``--``h15a8``
+    2013-14      GSEC15     ``T6FQ01a``--``d``     ``T6FQ01e``--``h``
+    ===========  =========  =====================  =======================
+
+    (Verified against the Stata variable labels: ``h14q1`` = "male adults hh
+    members", ``h14q5`` = "male adults visitors", and so on.)
+
+    From 2018-19 the questionnaire went LONG: the same distinction moved out of
+    the column suffix and into a ROW category.  ``GSEC15A`` now carries exactly
+    two rows per ``hhid``, discriminated by ``CEA01`` ("Household member/visitor")
+    in {'Household members', 'Visitors'}, with ``CEA01A``--``CEA01D`` holding the
+    counts *for the selected category*.  The extraction was never updated: the
+    declared index stayed ``(i, t)``, so both rows collided on one tuple and
+    ``_normalize_dataframe_index`` reduced them with ``groupby().first()`` --
+    keeping whichever row the file happened to list first, which is a coin flip.
+
+    The wave YAML now also extracts ``CEA01`` as the temporary myvar
+    ``_category``; this hook selects the member rows and drops it, after which
+    ``(i, t)`` is genuinely unique and the collapse never fires.
+
+    Members-only is not a judgement call -- it is what the three earlier waves
+    above already do.  If you want "people fed" = members + visitors, that is a
+    DIFFERENT table and should be declared as one.
+
+    On a wave whose member/visitor split is in COLUMNS there is no ``_category``
+    to filter on and this is a pass-through -- but the uniqueness of the declared
+    index is asserted either way, so a future long-form wave that forgets the
+    ``_category`` myvar fails loudly here instead of silently returning visitor
+    counts for half its households.
+    """
+    if '_category' in df.columns:
+        cat = df['_category'].astype(str).str.strip()
+        keep = cat == _P7_MEMBER_CATEGORY
+        if not keep.any():
+            raise ValueError(
+                f"people_last7days: no rows with _category == "
+                f"{_P7_MEMBER_CATEGORY!r}; observed categories are "
+                f"{sorted(cat.unique())}.  The source's member/visitor label "
+                f"changed -- fix the filter rather than letting the (i, t) "
+                f"collapse pick a row at random (GH #323)."
+            )
+        df = df[keep].drop(columns='_category')
+    if not df.index.is_unique:
+        n_dup = int(df.index.duplicated().sum())
+        raise ValueError(
+            f"people_last7days: {n_dup} duplicate rows on the declared index "
+            f"{list(df.index.names)}.  Uganda's post-2018 GSEC15A is LONG "
+            f"(one row per member/visitor category); declare CEA01 as the "
+            f"`_category` myvar so this hook can select the member rows.  "
+            f"Collapsing them with .first() returns VISITOR counts for about "
+            f"half the households (GH #323)."
+        )
+    return df
+
+
+def cluster_features(df):
+    """Project the household-grain cover page onto the ``(t, v)`` cluster grain.
+
+    Uganda builds ``cluster_features`` from GSEC1, the household COVER PAGE, so
+    the extraction is one row per HOUSEHOLD while the table is declared at
+    ``(t, v)`` -- roughly a 4-10x inflation.  The reduction is intended (GH #161);
+    what was not intended is that it was left UNDECLARED, so it fell through to
+    the framework's ``groupby().first()``.  That reducer skips NA per column, so
+    where the households of a cluster disagree it does not even return one of
+    their rows -- it assembles a composite out of the first non-null value of
+    each column independently, a "household" that appears nowhere in the survey.
+
+    This hook makes the projection explicit and hands it to ``reduce_to_agreed``
+    (``lsms_library.build_transforms``), whose contract is *lossless or loud*:
+
+    * a cluster whose households AGREE collapses to that agreed row -- silently,
+      because nothing is lost;
+    * a household that reports nothing where another reports a value is an
+      ABSENCE, not a contradiction, so the observed value survives (this is the
+      bulk of Uganda's apparent "destruction": 2005-06 loses 2,551 rows to the
+      Site-1 audit but has ZERO clusters whose households actually disagree on
+      Region/Rural/District -- they differ only in whether the geovar carried a
+      GPS fix);
+    * a cluster whose households genuinely DISAGREE gets ``<NA>`` in the
+      offending column plus a ``GrainConflictWarning`` naming it.
+
+    ``on_conflict='na'`` rather than the default ``'raise'``, deliberately, and
+    the reason is that Uganda's residual disagreements are properties of the
+    SURVEY, not defects we can configure away:
+
+    1. ``comm`` (2005-06 .. 2011-12) is the *2005-06 EA of origin*, which the
+       panel carries forward when it tracks a mover.  A household that moved
+       district still reports its origin EA, so its District/Region legitimately
+       differ from its EA-mates'.  93 clusters in 2010-11, 106 in 2011-12.
+    2. ``v`` is a PARISH from 2013-14 on, and a parish contains several
+       enumeration areas -- some urban, some rural, each with its own geovar
+       fix.  ``Rural`` and the GPS are therefore not parish attributes at all
+       (65-126 clusters per wave for Rural).
+
+    Neither can be resolved from this table, and picking a winner is the bug.
+    ``<NA>`` + a warning is the honest answer; per-household ``Rural`` / ``Region``
+    remain exact in ``sample()``, which is their proper home.
+
+    NOT reduced with an average.  Where the within-cluster GPS varies at all it
+    varies by a MEDIAN of 4.6-42.9 km and by up to 584 km (measured, all waves):
+    that is a broken cluster key, not a scatter of points around a centroid, and
+    averaging it would smear two places into one and hide the evidence -- the
+    same argument that retired core's ``.mean()`` on 2026-07-13.
+
+    Rows whose ``v`` is missing are dropped HERE, with a count, rather than
+    disappearing inside a ``groupby(dropna=True)`` further downstream (GH #323
+    Site 3: delete and report, decision D2).  A cluster with no identifier cannot
+    be addressed by any consumer.
+    """
+    from lsms_library.build_transforms import reduce_to_agreed
+
+    flat = df.reset_index()
+    # The household level has no place in a cluster-grain table, and leaving it
+    # in would make every multi-household cluster look like a conflict (`i` is
+    # distinct by construction).  Drop it whether it arrived as an index level
+    # or -- via the `dfs:` merge -- as a column.
+    flat = flat.drop(columns=[c for c in ('i', 'index') if c in flat.columns])
+    missing = [lvl for lvl in ('t', 'v') if lvl not in flat.columns]
+    if missing:
+        raise ValueError(
+            f"cluster_features: {missing} absent from the extracted frame "
+            f"(have {list(flat.columns)}).  The wave's data_info.yml must "
+            f"supply `v` either as an idxvar or as a myvar."
+        )
+    n_blank = int(flat['v'].isna().sum())
+    if n_blank:
+        warnings.warn(
+            f"Uganda/cluster_features: dropping {n_blank:,} household row(s) "
+            f"with no cluster id (`v` is missing).  They cannot be addressed by "
+            f"any consumer, and keeping them would put an unnamed cluster in a "
+            f"table keyed on the cluster.  GH #323 (Site 3).",
+            stacklevel=2,
+        )
+        flat = flat[flat['v'].notna()]
+    return reduce_to_agreed(flat.set_index(['t', 'v']), on_conflict='na')
+
+
 def _format_agsec_hhid(s, t):
     """Canonical household id for Uganda's AGSEC (agricultural) modules.
 
