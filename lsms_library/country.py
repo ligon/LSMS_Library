@@ -4673,13 +4673,35 @@ def _normalize_dataframe_index(
         # _check_duplicate_index, any scan of var/) reported "clean".
         report = _audit_index_collapse(df, present_levels)
         if report is not None and present_additive and not report.get("unauditable"):
-            # The additive SUM is lossless over the measure columns, so a
-            # disagreement among them is expected and is NOT destruction.  Only a
-            # NaN-key deletion (groupby drops those rows outright) is real loss here.
-            # An UNAUDITABLE report is never silenced here -- "we could not check"
-            # must not be downgraded to "it is fine".
-            report = (dict(report, destroyed=0, conflicting_groups=0)
-                      if report.get("nan_key_rows") else None)
+            # The additive SUM is lossless over the columns it RECONCILES -- the
+            # additive measures themselves, plus a per-unit ``Price`` re-derived
+            # below from the summed totals -- so a disagreement confined to those
+            # is expected and is NOT destruction.  A disagreement in any OTHER
+            # column still is, so RE-AUDIT on what the sum does not fix rather than
+            # silencing the whole report.
+            #
+            # GH #323: silencing wholesale was safe only while `food_acquired` was
+            # the sole entry, because every column it carries is reconciled.
+            # `assets` is not like that: `Age` is genuinely per-unit (Nigeria W2's
+            # per-unit roster disagrees on it within 7,029 groups per round) and NO
+            # reducer preserves it at (t, i, j).  Registering `assets` as additive
+            # under the old rule would have traded a recovered `Value` total for a
+            # SILENT `Age` destruction -- the #323 disease, reintroduced by its own
+            # fix.  Losslessness is per column, so the audit must be too.
+            reconciled = list(present_additive)
+            if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
+                reconciled.append('Price')
+            residual = _audit_index_collapse(
+                df.drop(columns=reconciled), present_levels)
+            if residual is None:
+                report = None            # provably lossless once reconciled
+            elif not residual.get("unauditable"):
+                # An UNAUDITABLE residual is never silenced -- "we could not check"
+                # must not be downgraded to "it is fine"; keep the full report.
+                report = dict(report,
+                              destroyed=residual["destroyed"],
+                              conflicting_groups=residual["conflicting_groups"],
+                              additive_reconciled=reconciled)
 
         if present_additive:
             # GH #323: `sum` defaults to min_count=0, so a group in which EVERY

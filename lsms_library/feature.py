@@ -152,18 +152,34 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     """
     # Lazy import: country.py imports _ADDITIVE_MEASURE_COLUMNS from here, so a
     # module-level import back would cycle.
-    from .country import _audit_index_collapse, _record_grain_report
+    from .country import (_audit_index_collapse, _record_grain_report,
+                          _sum_min_count_1)
 
     additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
     present = [c for c in (additive or ()) if c in df.columns]
 
     report = _audit_index_collapse(df, list(df.index.names))
     if report is not None and present and not report.get("unauditable"):
-        # The additive SUM is lossless over the measure columns; only an outright
-        # NaN-key deletion is real loss on that path.  An UNAUDITABLE report is
-        # never silenced -- "we could not check" is not "it is fine".
-        report = (dict(report, destroyed=0, conflicting_groups=0)
-                  if report.get("nan_key_rows") else None)
+        # The additive SUM is lossless over the columns it RECONCILES -- the
+        # measures themselves plus a ``Price`` re-derived from the summed totals --
+        # so re-audit on what it does NOT fix rather than silencing wholesale.
+        # `assets` carries a per-unit `Age` no reducer preserves at (t, i, j);
+        # silencing the whole report would trade a recovered `Value` for a silent
+        # `Age` destruction.  Kept identical to country._normalize_dataframe_index
+        # so the two access paths agree (GH #323).
+        reconciled = list(present)
+        if "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
+            reconciled.append("Price")
+        residual = _audit_index_collapse(df.drop(columns=reconciled),
+                                         list(df.index.names))
+        if residual is None:
+            report = None
+        elif not residual.get("unauditable"):
+            # An UNAUDITABLE residual is never silenced -- "we could not check" is
+            # not "it is fine".
+            report = dict(report, destroyed=residual["destroyed"],
+                          conflicting_groups=residual["conflicting_groups"],
+                          additive_reconciled=reconciled)
     if report is not None:
         report.update(country=country, table=table_name, wave=None,
                       site="Feature._harmonize_country_frame",
@@ -173,7 +189,10 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     grouped = df.groupby(level=list(df.index.names), observed=True)
     if not present:
         return grouped.first()
-    agg = {c: ("sum" if c in present else "first") for c in df.columns}
+    # `min_count=1`, not a bare `sum`: an all-NA group must stay NA rather than
+    # become a fabricated 0.0.  Same reducer as country._normalize_dataframe_index
+    # -- the two sites read one policy dict and must apply it identically (#323).
+    agg = {c: (_sum_min_count_1 if c in present else "first") for c in df.columns}
     out = grouped.agg(agg)
     if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
         out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)

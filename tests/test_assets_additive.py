@@ -105,3 +105,110 @@ def test_partial_na_group_still_sums_the_observed_values():
     from lsms_library.country import _sum_min_count_1
     s = pd.Series([7000, pd.NA, 3000], dtype='Float64')
     assert _sum_min_count_1(s) == 10000
+
+
+def test_feature_site_uses_the_same_min_count_reducer():
+    """The two collapse sites read ONE policy dict, so they must apply it
+    identically -- an all-NA group is NA on the Feature path too, not 0.0."""
+    idx = pd.MultiIndex.from_tuples(
+        [("2012Q3", "10001", "Bed")] * 2, names=["t", "i", "j"])
+    df = pd.DataFrame({"Value": pd.array([pd.NA, pd.NA], dtype="Float64"),
+                       "Age": [10.0, 10.0]}, index=idx)
+    out = _collapse_duplicate_index(df, "assets")
+    assert pd.isna(out["Value"].iloc[0]), (
+        "an all-NA group summed to a fabricated 0.0 on the Feature path")
+
+
+# --- GH #323: registering a table as additive must not go on to silence a
+# --- destruction the SUM does not actually reconcile ------------------------
+
+def _collapse_country(df, table_name):
+    """Run the Country-side collapse, returning (out, grain warnings)."""
+    import warnings as _w
+    from lsms_library.country import (_normalize_dataframe_index,
+                                      GrainCollapseWarning)
+    with _w.catch_warnings(record=True) as caught:
+        _w.simplefilter("always")
+        out = _normalize_dataframe_index(
+            df, {"index": "(t, i, j)"}, wave="2012Q3",
+            table_name=table_name, country="Testland")
+    return out, [x for x in caught
+                 if issubclass(x.category, GrainCollapseWarning)]
+
+
+@pytest.mark.parametrize("collapse", ["country", "feature"])
+def test_additive_does_not_silence_a_non_additive_destruction(collapse):
+    """The trap this policy entry could have walked into.
+
+    Wholesale silencing was safe only while `food_acquired` -- every column of
+    which the collapse reconciles -- was the sole entry.  `assets` carries a
+    per-unit `Age` that NO reducer preserves at (t, i, j).  Silencing the whole
+    report would have bought a recovered `Value` total with a SILENT `Age`
+    destruction: GH #323 reintroduced by its own fix.  Losslessness is per
+    column, so the audit is too.
+    """
+    df = _roster_frame()                      # Age disagrees: 10, 6, 10, 6
+    if collapse == "country":
+        out, grain = _collapse_country(df, "assets")
+    else:
+        import warnings as _w
+        from lsms_library.country import GrainCollapseWarning
+        with _w.catch_warnings(record=True) as caught:
+            _w.simplefilter("always")
+            out = _collapse_duplicate_index(df, "assets")
+        grain = [x for x in caught
+                 if issubclass(x.category, GrainCollapseWarning)]
+    assert out["Value"].iloc[0] == 21000.0, "the recovery must survive"
+    assert grain, "Age was destroyed and nobody said so"
+
+
+@pytest.mark.parametrize("collapse", ["country", "feature"])
+def test_a_disagreement_confined_to_the_additive_columns_stays_silent(collapse):
+    """P3's silent half.  If the SUM reconciles every disagreement, warning
+    would be pure noise -- that is the whole reason the additive path exists."""
+    idx = pd.MultiIndex.from_tuples(
+        [("2012Q3", "10001", "Bed")] * 3, names=["t", "i", "j"])
+    df = pd.DataFrame({"Quantity": [4.0, 4.0, 4.0],       # agrees
+                       "Age": [10.0, 10.0, 10.0],         # agrees
+                       "Value": [7000.0, 3000.0, 6000.0]},  # disagrees; summed
+                      index=idx)
+    if collapse == "country":
+        out, grain = _collapse_country(df, "assets")
+    else:
+        import warnings as _w
+        from lsms_library.country import GrainCollapseWarning
+        with _w.catch_warnings(record=True) as caught:
+            _w.simplefilter("always")
+            out = _collapse_duplicate_index(df, "assets")
+        grain = [x for x in caught
+                 if issubclass(x.category, GrainCollapseWarning)]
+    assert out["Value"].iloc[0] == 16000.0
+    assert not grain, (
+        "a disagreement the SUM fully reconciles warned; that noise is what "
+        "buries the real signal")
+
+
+@pytest.mark.parametrize("collapse", ["country", "feature"])
+def test_food_acquired_stays_silent_when_only_price_disagrees(collapse):
+    """`Price` is RE-DERIVED from the summed totals, so a disagreement in it is
+    reconciled too -- food_acquired must not start warning on the visit-level
+    collapse it was registered to fix (GH #501)."""
+    idx = pd.MultiIndex.from_tuples(
+        [("2018", "h1", "Rice")] * 2, names=["t", "i", "j"])
+    df = pd.DataFrame({"Quantity": [2.0, 3.0],
+                       "Expenditure": [10.0, 20.0],
+                       "Price": [5.0, 6.6667]}, index=idx)
+    if collapse == "country":
+        out, grain = _collapse_country(df, "food_acquired")
+    else:
+        import warnings as _w
+        from lsms_library.country import GrainCollapseWarning
+        with _w.catch_warnings(record=True) as caught:
+            _w.simplefilter("always")
+            out = _collapse_duplicate_index(df, "food_acquired")
+        grain = [x for x in caught
+                 if issubclass(x.category, GrainCollapseWarning)]
+    assert out["Quantity"].iloc[0] == 5.0
+    assert out["Expenditure"].iloc[0] == 30.0
+    assert out["Price"].iloc[0] == pytest.approx(6.0)   # 30 / 5, re-derived
+    assert not grain
