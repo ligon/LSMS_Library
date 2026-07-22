@@ -1,5 +1,87 @@
 #+title: Contents
 
+* Survey design --- read before touching ANY 2008-15 table
+:PROPERTIES:
+:CUSTOM_ID: uphi-backcasting
+:END:
+
+Tanzania's NPS handles split-off households differently from most ---
+possibly all --- other surveys in this library, and the difference is
+*not* confined to any one table.  It was first written up under
+[[https://github.com/ligon/LSMS_Library/issues/114][#114]] in the
+context of =food_acquired= (see [[#issue-114][that entry]]), which has
+made it easy to mistake for a food-specific quirk.  It is not.
+
+** Split-offs are back-cast into EARLIER waves
+
+In most panels a household that forms mid-panel simply appears from
+that wave onward.  In the NPS's UPD4 construction, when a child leaves
+and founds a new household, *new observations are created in the
+earlier waves too*: the ancestor household's record is carried back
+under the descendant's own panel identifier.
+
+Two identifiers coexist in the 2008-15 multi-round files, and their
+Stata labels say exactly what they are:
+
+| variable  | label                                          |
+|-----------+------------------------------------------------|
+| =UPHI=    | Uniform Panel Household Identifier at NPSY4    |
+| =r_hhid=  | NPS HHID: y1_hhid, y2_hhid, y3_hhid, y4_hhid   |
+
+So =UPHI= identifies the panel household *as constituted at Round 4*,
+propagated backwards; =r_hhid= is the round-specific household.  The
+relationship is many-to-many, and it is *deliberate*.
+
+Measured on =upd4_hh_r.dta= (2026-07-21):
+
+| round | rows    | distinct =UPHI= | distinct =r_hhid= |
+|-------+---------+-----------------+-------------------|
+|     1 |  20,039 |           5,594 |             2,956 |
+|     2 | 155,097 |           8,163 |             3,924 |
+|     3 | 189,962 |           9,998 |             5,010 |
+|     4 |  84,337 |           4,961 |             4,341 |
+
+In round 1, *1,526 =r_hhid= values carry more than one =UPHI=, up to
+11*.  One 2008-09 household appears once per descendant household it
+eventually produces.
+
+** Why this matters for every table, not just food
+
+Any 2008-15 table inherits a choice, whether or not its author made it
+consciously:
+
+- key on =UPHI= :: one row per (descendant household, round).  A
+  household-level fact is repeated once per descendant --- the row
+  count reflects the Round-4 panel, not the interviewed households.
+- key on =r_hhid= :: one row per (interviewed household, round).  The
+  descendant linkage is discarded.
+
+Neither is "the" right answer, and *neither produces a signal that the
+usual duplicate-index instruments can see*:
+
+- keyed on =UPHI=, the index is unique, so no collapse warning fires
+  --- absence of duplicates is *not* evidence the key is sound here;
+- keyed on =r_hhid=, the back-cast copies collapse, and because their
+  payloads are identical the collapse is value-lossless and therefore
+  silent too.
+
+What the tables do today (2026-07-21) is *not* consistent:
+
+| table            | key            | note                                             |
+|------------------+----------------+--------------------------------------------------|
+| =food_acquired=  | =r_hhid=       | de-duplicated; row counts 408,707 $\to$ 228,281  |
+| =shocks= (2008-15) | =UPHI=       | one row per descendant-household-round           |
+
+*This inconsistency is unresolved.*  It is a grain decision about
+published tables and belongs to the maintainer; see the discussion on
+[[https://github.com/ligon/LSMS_Library/pull/651][PR #651]].  Until it
+is settled, do not "fix" one table's key to match the other as a side
+effect of unrelated work --- and do not conclude from a zero duplicate
+count that a 2008-15 key is sound.
+
+Related: the Round-4 sub-panel split is a separate matter, documented
+at [[#panel-design][Panel design note]].
+
 * Issues
 ** WAITING Missing food quantities in 2019-20 and 2020-21 (#112)
 :LOGBOOK:
@@ -463,6 +545,18 @@ the community↔cluster link.
 
 
 ** WAITING Duplicate rows in food_acquired from r_hhid/UPHI matching in 2008-15 (#114)
+:PROPERTIES:
+:CUSTOM_ID: issue-114
+:END:
+
+#+begin_quote
+*Scope note (2026-07-21).*  The =r_hhid= / =UPHI= many-to-many analysed
+below is a *country-level* property of the NPS panel construction, not a
+=food_acquired= quirk.  It affects every 2008-15 table.  See
+[[#uphi-backcasting][Survey design]] at the top of this file; this entry
+records only how it surfaced in =food_acquired=.
+#+end_quote
+
 :LOGBOOK:
 - Note taken on [2026-04-01 Tue] \\
   Documented as GitHub issue #114.  Root cause analysis added below.
