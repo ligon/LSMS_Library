@@ -1,5 +1,22 @@
 """Guinea-Bissau cluster_features -- the GH #323 CONTROL case.
 
+SCOPE NOTE (2026-07-22, after adversarial review).  The `Urbano` -> `Urban`
+mapping added by this PR is an **extraction-level** fix, NOT an API-level one.
+By the time this branch was written, commit `c8c25f68` (GH #602/#605) had
+already added `Urbano, urbano, URBANO` to `Columns.cluster_features.Rural.
+spellings` in `lsms_library/data_info.yml`, and `_enforce_canonical_spellings`
+applies that at API time.  So `Country(...).cluster_features()` returns the
+canonical value on plain `development` WITHOUT this PR, and every API-level
+assertion below passes with or without the config change -- they pin the
+invariant, they do NOT discriminate the fix.
+
+What the config change does measurably achieve is that the **stored L2-wave
+parquet** carries canonical `Urban` (2,014 rows) instead of raw `Urbano`, so a
+consumer reading the parquet directly -- rather than through the Country API --
+sees the canonical domain.  `test_wave_parquet_stores_canonical_rural` below is
+the one test that actually discriminates; keep it that way.
+
+
 The 2018-19 wave parquet holds 5,410 rows on a declared (t, v) index that has
 only 450 distinct clusters, so the framework collapses 4,960 duplicate rows.
 Unlike Mali (32,026 real people vaporized) that collapse is provably LOSSLESS,
@@ -73,3 +90,34 @@ def test_the_169_urbano_clusters_are_now_urban(cf):
     counts = cf["Rural"].value_counts(dropna=False).to_dict()
     assert counts.get("Urban") == 169, counts
     assert counts.get("Rural") == 281, counts
+
+
+def test_wave_parquet_stores_canonical_rural():
+    """The STORED parquet must be canonical, not merely the API view.
+
+    This is the only assertion in this file that fails without the config
+    change: `_enforce_canonical_spellings` repairs the API at read time, so an
+    API-level test cannot tell whether the extraction was fixed or whether the
+    safety net caught it.  Reading the wave parquet bypasses that net.
+
+    Defence-in-depth matters here because the parquet is a published artifact:
+    `docs/guide/caching.md` documents L2-wave as a consumer-visible layer, and
+    CLAUDE.md notes cached parquets store PRE-transformation data, so anything
+    the net fixes is invisible in storage.
+    """
+    from lsms_library.local_tools import data_root
+
+    path = data_root() / "Guinea-Bissau" / "2018-19" / "_" / "cluster_features.parquet"
+    if not path.exists():
+        pytest.skip(f"wave parquet not materialized at {path}")
+
+    stored = pd.read_parquet(path)
+    assert "Rural" in stored.columns, stored.columns.tolist()
+    values = set(stored["Rural"].dropna().astype(str))
+
+    leaked = values - {"Rural", "Urban"}
+    assert not leaked, (
+        f"the STORED parquet carries non-canonical Rural values {sorted(leaked)} "
+        "-- the extraction mapping is missing, and the API-time spellings net "
+        "is hiding it from every other test in this file"
+    )
