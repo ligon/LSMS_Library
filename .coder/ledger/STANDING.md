@@ -63,8 +63,11 @@ The authoritative sources. Quote these; do not restate schema rules from memory.
 
 - **IO is sanctioned-only.** Read with `get_dataframe`, write with `to_parquet`.
   Never `pd.read_stata`, `pyreadstat`, raw `dvc.api.open`, or absolute paths.
-  Never `dvc pull`/`dvc fetch` from the CLI (global lock; fails under concurrency).
-  See `CLAUDE.md` §"Data Access" anti-pattern table.
+  **Never invoke the `dvc` CLI at all** — not `pull`/`fetch`, not `add`/`push`
+  (global lock; 91.7% failure at 12 concurrent). Reads go through
+  `get_dataframe` / `get_data_file` (lock-free direct-S3); writes through
+  `push_to_cache_batch` (lock + backoff-with-jitter retry). Never `rm` a DVC
+  lock file. See `CLAUDE.md` §"Data Access" anti-pattern table.
 - **Do NOT bake `v` into feature parquets**; write `(t, i, …)` and let the
   framework join. Do NOT add `v` to feature `data_scheme.yml` indexes except
   `cluster_features`.

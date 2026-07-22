@@ -1,33 +1,63 @@
 Country: Nigeria
 Wave: 2010-11
 
+# `v` is the COMPOSITE cluster id (state/lga/ea), not the bare `ea` serial --
+# see the GH #323 note in _/nigeria.py.  `df_key` re-reads the same file with
+# `converted_categoricals` set (which makes get_dataframe skip the Stata label
+# decode) so the key is built from raw numeric CODES: the community
+# questionnaire that community_prices reads has no value labels on state/lga,
+# so a label-built key would not join it.  `df_main` keeps the decoded labels
+# for the human-readable Region / District / Rural columns.
 sample:
-    file: Post Planting Wave 1/Household/secta_plantingw1.dta
-    idxvars:
-        i: hhid
-    myvars:
-        v: ea
-        weight: wt_wave1
-        panel_weight: wt_wave1
-        strata: zone
-        Rural:
-            - sector
-            - mapping:
-                rural: Rural
-                Rural: Rural
-                RURAL: Rural
-                urban: Urban
-                Urban: Urban
-                URBAN: Urban
-
-cluster_features:
     dfs:
+        - df_key
         - df_main
-        - df_geo
+    df_key:
+        file: Post Planting Wave 1/Household/secta_plantingw1.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
     df_main:
         file: Post Planting Wave 1/Household/secta_plantingw1.dta
         idxvars:
-            v: ea
+            i: hhid
+        myvars:
+            weight: wt_wave1
+            panel_weight: wt_wave1
+            strata: zone
+            Rural:
+                - sector
+                - mapping:
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
+
+cluster_features:
+    dfs:
+        - df_key
+        - df_main
+        - df_geo
+    df_key:
+        file: Post Planting Wave 1/Household/secta_plantingw1.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
+    df_main:
+        file: Post Planting Wave 1/Household/secta_plantingw1.dta
+        idxvars:
+            i: hhid
         myvars:
             Region: zone
             District: state
@@ -40,17 +70,26 @@ cluster_features:
                     urban: Urban
                     Urban: Urban
                     URBAN: Urban
+    # Geovariables are HOUSEHOLD-level, so they join on `i`.  Joining them on
+    # `v` (as this block used to) is a many-to-many merge between two
+    # household-level frames -- a cartesian product within each EA, which is
+    # what inflated W2's cluster_features to 62,538 rows.  This file's columns
+    # are lowercase; W2/W3's are uppercase.  Asking for the wrong casing makes
+    # df_data_grabber raise KeyError, which the GH #515 handler catches by
+    # DROPPING the sub-df -- which is why Latitude/Longitude were missing from
+    # 3 of the 4 waves.
     df_geo:
         file: nga_householdgeovariables_y1.csv
         idxvars:
-            v: ea
+            i: hhid
         myvars:
-            Latitude: LAT_DD_MOD
-            Longitude: LON_DD_MOD
+            Latitude: lat_dd_mod
+            Longitude: lon_dd_mod
     merge_on:
-        - v
+        - i
     final_index:
         - t
+        - i
         - v
 
 assets:

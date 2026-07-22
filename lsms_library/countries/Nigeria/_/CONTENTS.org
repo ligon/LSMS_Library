@@ -46,7 +46,49 @@ this rotating panel design.
 
 ** Cluster (PSU) identifier
 
-=ea= is consistent across all five waves.
+*=ea= ALONE IS NOT THE CLUSTER ID* (GH #323).  It is a serial number unique
+only /within/ an LGA, so the same =ea= value recurs in different LGAs and
+states.  Wave 1 is the proof --- the GHS-Panel design is 500 EAs x 10
+households = 5,000 households, but
+
+| key                          | distinct values |
+|------------------------------+-----------------|
+| =ea=                         |             411 |
+| =(state, lga, ea)=           |             500 |
+
+and the household geovariables confirm it independently: lat/lon is constant
+within all 500 =(state, lga, ea)= groups, but /varies/ inside 76 of the 411
+bare =ea= codes.  Keying on =ea= therefore merges distinct clusters; the
+household -> cluster collapse in =cluster_features= then hands one arbitrary
+EA's Region/District/Rural to every household in the merged group (890/5000
+households got the wrong District in W1; 1283/5263 by W4).
+
+=v= is therefore the *composite* id =state/lga/ea=, built from the raw numeric
+CODES by =nigeria.cluster_id()= and published identically by =sample=,
+=cluster_features= and =community_prices= (one keyspace --- see the note at the
+top of =_/nigeria.py=).  It is built from codes, not labels, because the
+community questionnaire carries no value labels on =state=/=lga=: a
+label-built key matches the household side 0% of the time in W2, a code-built
+one 100%.
+
+*The =Moved= sentinel.*  From W2 on, a tracked household that left its original
+EA is recorded with =ea == 0= --- surfacing as the label =Moved= (W2),
+=0. Moved= (W3), or a bare =0= (W4).  It is a missing-value sentinel, not a
+cluster: pooling it welds unrelated households from across the country into
+fake clusters like =(Lagos, ETI-OSA, Moved)=.  Such households have no sampling
+cluster and each gets its own singleton =v= (=moved-{hhid}=): 152 / 306 / 166 /
+393 households in W2 / W3 / W4 / W5.  They are deliberately NOT given a NaN
+=v=, which the downstream =groupby()= would silently drop from every derived
+table.
+
+Cluster counts after the fix (real clusters + moved singletons):
+
+| Wave    | real clusters | moved singletons |
+|---------+---------------+------------------|
+| 2010-11 |           500 |                0 |
+| 2012-13 |           495 |              152 |
+| 2015-16 |           486 |              306 |
+| 2018-19 |           519 |              166 |
 
 ** Strata
 

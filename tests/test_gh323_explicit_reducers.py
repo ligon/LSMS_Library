@@ -223,79 +223,105 @@ def _core_sources():
     return [(mod, (root / mod).read_text()) for mod in _CORE_MODULES]
 
 
-def test_core_does_not_import_or_call_the_country_facing_reducers():
-    """D1: core must not reach the country-facing reducers behind the caller.
+def test_core_never_reduces_grain_without_auditing_it():
+    """D1, stated as the property it actually is.
 
-    These helpers live in ``build_transforms`` and are invoked BY NAME from
-    country scripts.  The Design-A wiring this guards against is core
-    *importing* one and *calling* it -- so that is what is checked, via the
-    AST.
+    **The previous form of this test had its polarity inverted.**  It banned
+    ``reduce_to_agreed`` / ``collapse_to_cluster_grain`` / ``add_visit_level``
+    from core.  But those three helpers never CHOOSE: they raise on
+    disagreement, or blank the cell to ``<NA>`` and warn.  Core calling one of
+    them cannot violate D1.  Meanwhile the construct that DOES choose -- a bare
+    ``groupby(...).first()``, which silently keeps one of two disagreeing
+    observed values -- was not guarded at all.  The ban forbade the safe tools
+    and permitted the dangerous one.
 
-    **This was a substring grep and the grep was wrong.**  It banned the three
-    names anywhere in the text of a core module, which cannot distinguish
+    So guard the dangerous one.  A core function may reduce grain with a raw
+    pandas reducer only if it also AUDITS that reduction, in the same function,
+    while the pre-collapse frame still exists (one line later the evidence is
+    gone -- that is the whole lesson of GH #323).
 
-      - ``from .build_transforms import collapse_to_cluster_grain`` -- the
-        Design-A coupling, a real violation; from
-      - ``country.py``'s own private ``_collapse_to_cluster_grain`` -- the
-        sanctioned Site 2 fix (PR #617), which merely shares a suffix.
+    Note what this deliberately PERMITS: core calling a fail-loud helper.  If a
+    site is rewritten to use ``reduce_to_agreed``, the raw reducer disappears
+    and no audit is required, because nothing can be silently destroyed.  That
+    is the intended gradient -- use the safe helper and you are free; use the
+    raw primitive and you must show your work.
 
-    The grep flagged the second, so ``development`` went red the moment PR #618
-    (this file) and PR #617 were both merged: two sibling #323 PRs, each green
-    alone, contradicting each other only in combination.
+    Still not provable here: whether the audit is CORRECT, or whether the
+    reduction is semantically right.  Behaviour is pinned in
+    ``tests/test_gh323_grain_contract.py``.
+    """
+    import ast
 
-    **Know what this test does NOT prove.**  It is a *coupling* check, not an
-    aggregation check.  A static scan cannot tell whether core aggregates -- a
-    locally-defined helper with any name at all could reduce grain silently and
-    this test would pass.  That property is behavioural and is enforced in
-    ``tests/test_gh323_grain_contract.py`` (conservation, no-fabrication,
-    loud/silent asymmetry, report accuracy).  Keep both: this one pins the
-    wiring, that one pins the behaviour.
+    def _is_grain_reducer(node):
+        """A pandas call that drops rows by selecting within groups."""
+        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
+            return False
+        attr = node.func.attr
+        if attr in ('agg', 'aggregate') and node.args:
+            a = node.args[0]
+            return isinstance(a, ast.Constant) and a.value in ('first', 'last')
+        if attr not in ('first', 'last', 'nth'):
+            return False
+        # only when the receiver is a groupby/resample chain
+        chain, cur = [], node.func.value
+        while isinstance(cur, (ast.Call, ast.Attribute, ast.Subscript)):
+            if isinstance(cur, ast.Call) and isinstance(cur.func, ast.Attribute):
+                chain.append(cur.func.attr); cur = cur.func.value
+            elif isinstance(cur, ast.Attribute):
+                chain.append(cur.attr); cur = cur.value
+            elif isinstance(cur, ast.Subscript):
+                cur = cur.value
+        return any(c in ('groupby', 'resample') for c in chain)
+
+    offenders = []
+    for mod, src in _core_sources():
+        tree = ast.parse(src)
+        for fn in [n for n in ast.walk(tree)
+                   if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+            reducers = [n.lineno for n in ast.walk(fn) if _is_grain_reducer(n)]
+            if not reducers:
+                continue
+            audits = [n for n in ast.walk(fn)
+                      if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                      and 'audit' in n.func.id]
+            if not audits:
+                offenders.append(f'{mod}::{fn.name} reduces at line(s) {reducers} '
+                                 f'with no audit call in the same function')
+
+    assert not offenders, (
+        'unaudited grain reduction in the access path: ' + '; '.join(offenders) +
+        ' -- core may reduce only if it audits the reduction first, or uses a '
+        'fail-loud reducer instead (GH #323 D1)'
+    )
+
+
+def test_core_does_not_read_an_aggregation_key():
+    """The actual Design-A wiring: core dispatching a reducer named by config.
+
+    Twelve branches of the #323 sweep proposed teaching core to read an
+    ``aggregation:`` key from ``data_scheme.yml``.  D1 rejected it.  Core may
+    mention the string (it is in the ``_skip`` set of scheme keys, so the key is
+    ignored rather than silently treated as a column) -- but it must never
+    RETRIEVE it, because retrieving it is the first line of Design A.
     """
     import ast
 
     offenders = []
     for mod, src in _core_sources():
-        tree = ast.parse(src)
-
-        # Names bound locally by a `def` are this module's own helpers, not the
-        # country-facing reducers -- even if they collide by name.
-        local_defs = {
-            node.name for node in ast.walk(tree)
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-        }
-
-        # Bind-site check, deliberately source-agnostic.  The reducers are
-        # DEFINED in `build_transforms` but RE-EXPORTED by `transformations`
-        # (which is how a country script imports them), so keying on the source
-        # module would let core evade this by importing from the re-export.
-        # Core has no legitimate reason to bind these names from anywhere.
-        imported = set()
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom):
-                for alias in node.names:
-                    if alias.name in _COUNTRY_FACING_REDUCERS:
-                        imported.add(alias.asname or alias.name)
-                        offenders.append(
-                            f'{mod}: imports {alias.name} '
-                            f'from {node.module or "."}'
-                        )
-
-        for node in ast.walk(tree):
-            if not isinstance(node, ast.Call):
-                continue
-            func = node.func
-            if isinstance(func, ast.Name):
-                if func.id in imported:
-                    offenders.append(f'{mod}: calls {func.id}()')
-            elif isinstance(func, ast.Attribute):
-                # e.g. build_transforms.collapse_to_cluster_grain(...)
-                if (func.attr in _COUNTRY_FACING_REDUCERS
-                        and func.attr not in local_defs):
-                    offenders.append(f'{mod}: calls .{func.attr}()')
+        for node in ast.walk(ast.parse(src)):
+            if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                    and node.func.attr == 'get' and node.args
+                    and isinstance(node.args[0], ast.Constant)
+                    and node.args[0].value == 'aggregation'):
+                offenders.append(f'{mod}:{node.lineno} .get("aggregation")')
+            if (isinstance(node, ast.Subscript)
+                    and isinstance(node.slice, ast.Constant)
+                    and node.slice.value == 'aggregation'):
+                offenders.append(f'{mod}:{node.lineno} ["aggregation"]')
 
     assert not offenders, (
-        f"the access path reaches a country-facing reducer: {offenders} -- that "
-        "is core aggregating behind the caller's back (GH #323 D1)"
+        f'core retrieves an `aggregation:` config key: {offenders} -- that is '
+        'core aggregating on a config\'s say-so (GH #323 D1, Design A rejected)'
     )
 
 

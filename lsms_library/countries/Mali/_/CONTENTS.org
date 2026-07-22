@@ -46,6 +46,89 @@ fix should map the numeric codes to canonical labels via Mali's
 in each wave's =data_info.yml=); pending that, downstream
 consumers should treat Mali separately.
 
+* cluster_features (GH #323 site 4 / GH #627)
+
+** 2021-22 was the worst =dfs:= cartesian in the corpus — fixed
+
+Until this fix, =2021-22/_/data_info.yml= built =cluster_features= from a
+two-sub-frame =dfs:= merge:
+
+| sub-frame | file                     | rows    | grain                    |
+|-----------+--------------------------+---------+--------------------------|
+| df_main   | ehcvm_conso_mli2021.dta  | 393,480 | household × food item    |
+| df_geo    | s00_me_mli2021.dta       |   6,143 | household (cover page)   |
+
+merged =on: [v]= — the *cluster* key.  513 grappes, so each side repeated
+every key value (767 consumption line-items and 12 households per grappe).
+A join on a key duplicated on *both* sides is a cartesian product by
+construction: every line-item paired with every household of its grappe.
+
+: 393,480 × 6,143  ->  4,718,148 rows,  4,324,668 of them phantoms
+
+PR #627's 40-country census found 4,907,774 phantom rows in all;
+*this one cell was 88% of them.*
+
+Why nobody noticed: =_normalize_dataframe_index= collapses the declared
+=(t, v)= index with =groupby().first()=, which reduced 4.7M rows to 513 —
+and the L2-country parquet is written *after* that collapse.  The table
+looked clean at every point anyone ever looked.  The phantoms existed only
+in the wave-level frame, upstream of the collapse.  (See CLAUDE.md, "Grain
+Collapse": /the bug hid behind the cache the bug poisoned/.)
+
+** The merge was never needed
+
+=s00_me_mli2021.dta= carries the geography itself.  Verified against the
+data, not inferred:
+
+| canonical | cover page | consumption file | agreement          |
+|-----------+------------+------------------+--------------------|
+| Region    | =s00q01=   | =region=         | 513/513 grappes    |
+| Rural     | =s00q04=   | =milieu=         | 513/513 grappes    |
+| Latitude  | =GPS__Latitude=  | (absent)   | —                  |
+| Longitude | =GPS__Longitude= | (absent)   | —                  |
+
+Both are *constant within grappe* in both files, the two files cover the
+identical 6,143 =(grappe, menage)= households, and the label sets are the
+same 9 regions / 2 milieux.  So the block is now a *single-file
+extraction* from the cover page.  Per GH #323 decision D1 the cartesian is
+cured *at the merge*; no reducer, no =aggregation:= key — a reducer on a
+cartesian only signs the corpse.
+
+The result is bit-for-bit unchanged: all 3,006 country-level rows across
+all four waves, all four columns, identical before and after (=DataFrame.equals=
+=True=).  This fix removes 4,324,668 invented rows and alters no value.
+
+Prior art within this same file: =sample.df_cover= already reads =Rural=
+from =s00q04= of this very cover page, and the 2017-18 wave already reads
+=Region: s0q01= / =Rural: s0q04= from *its* cover page.
+
+Pinned by =tests/test_gh323_mali_cartesian.py= (wave-level row counts for
+all four waves — a country-level assertion cannot see this bug).
+
+** The other three waves are not cartesian
+
+Their =df_geo= is one row per grappe, so the merge is many-to-one:
+
+| wave    | df_main                        | df_geo                        | wave rows | grappes |
+|---------+--------------------------------+-------------------------------+-----------+---------|
+| 2014-15 | eaci2014_agregatconso (3,804)  | eaci_geovariables_2014 (989)  |     3,804 |     989 |
+| 2017-18 | eaci17_s00p1 (8,390)           | eaci_geovariables_2017 (953)  |     8,390 |     953 |
+| 2018-19 | ehcvm_conso_mli2018 (366,639)  | grappe_gps_mli2018 (549)      |   366,639 |     551 |
+| 2021-22 | s00_me_mli2021 (6,143)         | — (single file)               |     6,143 |     513 |
+
+*Deferred, not a defect*: 2018-19 still reads the whole 366,639-row
+consumption file to produce 551 cluster rows.  It is wasteful, not wrong —
+its geo file is grappe-grain so no rows are manufactured — and it cannot be
+collapsed to one file the way 2021-22 was, because the GPS genuinely lives
+in a separate =grappe_gps_mli2018.dta= there.  Slimming =df_main= to the
+cover page =s00_me_mli2018.dta= would be a pure-performance change; left
+alone so this PR alters no value anywhere.
+
+*Known cosmetic inconsistency (unchanged here)*: =cluster_features.Rural=
+ships the raw French =Urbain= while =sample.Rural= maps it to =Urban=.
+Pre-existing and visible in 2014-15 too; fixing it would change returned
+values, which this PR deliberately does not do.  Adjacent to GH #602.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does

@@ -465,8 +465,138 @@ District names vary slightly across waves (e.g., "Blanytyre" vs
 =strata= table in =categorical_mapping.org=.
 
 ** Cluster (PSU)
-- 2004-05: =ea= (numeric, 110 unique EAs)
+- 2004-05: =psu= (string, 564 unique EAs)  -- *was* =ea=; see below
 - 2010-11 onward: =ea_id= (string, 200--800 unique EAs per wave)
+
+Every wave's =v= is the same object in the same format: the *fully qualified
+8-digit Malawi enumeration-area code*, =region(1) + district(2) + TA(2) +
+EA(3)= -- e.g. =10101016= is EA 016 of TA 01 of district 01 (Chitipa) of
+region 1 (North).
+
+*** GH #323: 2004-05's cluster key was not a cluster key
+
+Until this was fixed, 2004-05 declared =v: ea=.  =ea= is *the EA's sequence
+number within its Traditional Authority*, so it takes only *110 distinct
+values for IHS2's 564 enumeration areas*.  Keyed on =ea=, roughly five
+unrelated EAs -- in different TAs, districts and regions -- merged into one
+=v=, and the household -> cluster projection in =Wave.cluster_features= then
+resolved the disagreement with =groupby().first()=: one arbitrary household's
+answer, served as the cluster's.
+
+What that destroyed, measured cold:
+
+| quantity                                            | =v: ea= | =v: psu= |
+|-----------------------------------------------------+---------+----------|
+| clusters                                            |     110 |      564 |
+| districts present in =cluster_features=             |      20 |       26 |
+| settlement strata present in =cluster_features=     | 1 (all =Rural=) |        2 |
+| contested cluster-attribute cells (of 330 / 1,692)  |     164 |    *0* |
+
+The urban stratum did not merely lose rows -- it disappeared.  All 110
+surviving clusters came out =Rural=, because =first()= happened to reach a
+rural household in every merged group.  Six of Malawi's 26 districts vanished
+from =cluster_features= entirely.  Both facts were invisible at the API: the
+table looked complete, it was just wrong.
+
+=psu= is the fully qualified code, already present in =sec_a.dta=: 564 values,
+*exactly 20 households each* (the IHS2 design), and *zero* households in a
+cluster disagreeing about their cluster's region, district or urban/rural
+status.  It is declared identically in =sample= and in =cluster_features=,
+because =_join_v_from_sample= joins the two through =v= and they cannot be
+allowed to drift.
+
+Note the *frame vintage*: 2004-05 shares only 3 codes with 2010-11.  IHS2 is
+drawn from the 1998 census frame and IHS3+ from the 2008 frame, so the code
+*format* is common across all five waves but the code *sets* are not.  A
+cross-wave join on =v= is meaningful from 2010-11 onward and not before.
+
+*** GH #323: what remains contested, and why it is NOT re-keyed
+
+After the fix, three waves still have clusters whose households disagree.  In
+every case the measurement says the identifier is *right* and the households
+have *moved* -- these are tracked panels, and re-keying on the current district
+would fracture real EAs, desynchronise =v= from =sample=, and sever the panel's
+link to its own baseline.
+
+| wave    | contested cells | of    | what they are                                |
+|---------+-----------------+-------+----------------------------------------------|
+| 2004-05 |           *0*   | 1,692 | --                                           |
+| 2010-11 |           *0*   | 3,840 | --                                           |
+| 2013-14 |             765 | 1,020 | IHPS tracked movers (see below)              |
+| 2016-17 |              75 | 4,400 | IHPS-2016 =reside= is current, not baseline  |
+| 2019-20 |             250 | 4,095 | IHPS tracked movers                          |
+
+**** 2013-14 (IHPS): the GPS is the proof
+=ea_id= here is the *IHS3 baseline EA* -- 204 of IHS3's 768, and =case_id= is
+literally =ea_id= + household number.  The survey tracks movers and split-off
+households wherever they go (4,000 interviewed households from 3,104 baseline
+households), and the file's =region= / =district= / =reside= / geovariables all
+describe the household's *current* location.
+
+188 of 204 EAs have households reporting different coordinates, which is
+exactly the broken-key signature.  It is not one.  Restrict to households that
+did *not* move (=dist_to_IHS3location= <= 1 km) and *every one of the 204 EAs
+collapses to exactly one coordinate* -- =LAT_DD_MOD= is the EA-level displaced
+fix of the household's current location, not per-household jitter.  All of the
+within-EA spread (median 145 km, max 775 km) is dispersal.
+
+Corroborating: 588 of 4,000 households report a district different from the one
+encoded in their own =ea_id=, and those 588 sit a *median 68 km* from their
+IHS3 location against *0.03 km* for the 3,412 that match.
+
+**** 2016-17 (IHS4 + IHPS4)
+The 75 remaining cells are all =Rural=, all in the panel half.  IHPS-2016
+records =district= / =region= at *baseline* (0 of 2,508 households sit outside
+their EA's modal district) but =reside= *currently* -- 277 households differ
+from their EA's modal =reside= and 246 of those are flagged =mover=.  So one
+file mixes baseline and current geography; that is the survey's inconsistency,
+not ours.
+
+EA =30305580= is sampled in *both* the Cross_Sectional and the Panel halves.
+That is a genuine shared EA (same district), not a code collision -- the two
+halves spelled its region =Southern= and =South=, which used to read as a
+disagreement.  The =region= table is now applied at extraction, so it does not.
+
+**** 2019-20 (IHS5 + IHPS5)
+All 250 cells are in the panel half.  Unlike 2016-17, IHPS-2019 records
+=district= / =region= *currently*: 747 of 3,178 households are outside their
+EA's modal district, and 652 of those are more than 1 km from their IHS3
+location.  The 102 panel EAs share no =ea_id= with the 717 cross-sectional
+ones, so there is no cross-half collision here at all.
+
+*** GH #323: 2016-17 had no GPS, and the reason was a merge key
+=cluster_features= builds =i= for the Cross_Sectional half by running =case_id=
+through =cs_i= (='cs-17-'= + =format_id=), to keep it apart from the Panel's
+=y3_hhid=.  The =df_geo= block declared the *raw* =case_id=, so its merge key
+never matched anything: the =how='outer'= join produced 12,447 orphan geo rows
+alongside 14,955 main rows with no coordinates, and *0 of 880 clusters had
+GPS*.  =df_geo= now builds =i= exactly as =df_main= does; the two files are
+1:1 on =case_id= (12,447 = 12,447), so the join is exact and *779 of 880*
+clusters carry coordinates.  The remaining 101 are the IHPS panel EAs, for
+which IHS4 publishes no geovariables file.
+
+Cost of that fix, stated plainly: 7 of the 779 EAs have households whose IHS4
+=lat_modified= differs within the EA (IHS4's displacement is *nearly* but not
+exactly EA-constant), so =Latitude= / =Longitude= now show 7 contested cells
+where before there were none -- because before there was no coordinate at all.
+
+*** Known, deliberately unfixed: two cartesian =df_geo= merges (Site 4, PR #627)
+2010-11 and 2019-20 key a *household-grain* geovariables file on =ea_id= and
+merge it on the *cluster* key =v=, so =pd.merge= pairs every household with
+every geo row sharing that =v=:
+
+| wave    | households | geo rows | merged rows | phantom |
+|---------+------------+----------+-------------+---------|
+| 2010-11 |     12,271 |   12,271 |     196,083 | 183,812 |
+| 2019-20 |     14,612 |   11,434 |     185,842 | 171,230 |
+
+A cartesian *repeats* values, it does not invent them, so it corrupts nothing
+and changes no contested-cell count -- verified by measuring both waves with
+the merge collapsed to household grain (=merge_on: [i]=, the two files are 1:1
+on =case_id=): 0 and 250 contested cells respectively, identical either way.
+It does cost roughly 16x the build time and memory.  The one-line config fix is
+noted in each wave's =data_info.yml= but *not applied here*, so that PR #627's
+cardinality guard keeps these cells as evidence.  #627 owns the decision.
 
 ** Weights
 | Wave    | Cross-section weight | Panel weight       | Source file                                |

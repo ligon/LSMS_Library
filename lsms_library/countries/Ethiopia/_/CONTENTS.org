@@ -480,10 +480,43 @@ Every one of these files is HOUSEHOLD-grain, not EA-grain.  So
 =cluster_features= merges the cover page to the geo file on the
 HOUSEHOLD id (1:1; unique and blank-free in both frames in all five
 waves) and lets =Wave.cluster_features='s GH #161 collapse reduce to
-the =(t, v)= EA grain -- =mean()= for Latitude/Longitude (the cluster
-centroid), =first()= for Region/District/Rural.  This is why =i= is in
-each wave's =final_index=: that collapse only fires when =i= is an
-index level.
+the =(t, v)= EA grain.  This is why =i= is in each wave's
+=final_index=: that collapse only fires when =i= is an index level.
+
+*Correction (2026-07-21).*  This paragraph used to say the collapse
+takes =mean()= for Latitude/Longitude ("the cluster centroid") and
+=first()= for Region/District/Rural.  That is NO LONGER TRUE: the GPS
+=.mean()= was retired when core stopped aggregating anywhere -- see
+=_collapse_to_cluster_grain= in =country.py= and
+=SkunkWorks/grain_aggregation_policy.org=.  EVERY column is now
+=.first()=-ed, and the projection is audited before it destroys
+anything.
+
+And do NOT assume the flip is a no-op for Ethiopia.  It is one in W1
+and W4 -- 0 of 333 and 0 of 516 EAs carry more than one distinct
+household coordinate, i.e. the published fix really is the EA's,
+stamped on each household.  It is NOT one in the other three:
+
+| Wave    | EAs | EAs with >1 distinct household coordinate |
+|---------+-----+-------------------------------------------|
+| 2011-12 | 333 |                                         0 |
+| 2013-14 | 433 |                                        38 |
+| 2015-16 | 432 |                                        72 |
+| 2018-19 | 516 |                                         0 |
+| 2021-22 | 432 |                                        72 |
+
+and the disagreements are not jitter: W2 EA =010103010100106= holds
+three fixes spanning 0.19 deg of latitude and 0.60 deg of longitude, and
+W5 EA =020103010100203= spans 1.79 deg of longitude -- roughly 200 km.
+Points that far apart are not one enumeration area, so this is most
+likely a *cluster key that is not unique nationally* (the Malawi
+2013-14 pattern), not a GPS artifact.  Under =.first()= such an EA
+publishes one of its two real locations; under the old =.mean()= it
+published a point in between, which was worse but louder.  Either way
+the =(t, v)= key is the thing that is wrong.  The site-2 audit reports
+it on every cold build -- e.g. "Ethiopia/cluster_features/2015-16 ...
+DESTROYED 732 of 4,954 rows whose values DISAGREE (72 conflicting index
+tuples)" -- and it is UNFIXED.  See GH #323 site 2.
 
 Merging on the CLUSTER key =v= instead -- which is what the config used
 to do -- is a many-to-many join and produces a CARTESIAN PRODUCT
@@ -648,3 +681,100 @@ subjective-well-being / Cantril-ladder / life-satisfaction module. A variable-na
 scan of all 63-75 household section files per wave returned zero matches
 (ladder/well-being/satisfaction/step/life). Resolves the #331 "unknown" → absent.
 (Food-security IS present — see #332.) Tracked in #331.
+
+* GH #323 — verification against PR #627's core, and one further defect (2026-07-21)
+
+** cluster_features is CLEAR under #627 — verified, not assumed
+
+PR #627 (site 4) turns the GH #515 swallowed =KeyError= into a hard
+error when a dropped =dfs:= sub-frame costs a REQUIRED declared column,
+and adds an exact cartesian guard on the merge.  Its body lists
+Ethiopia as an unfixed blocker with three raising cells.  *That table
+is stale.*  The fix landed as commit =3488b791= (PR #628) and is an
+ancestor of =development=.  Measured end to end against #627's core
+(=development= merged with =fix/323-site4-dfs-merge=), cold, with an
+isolated data root:
+
+| Wave    | pre-#628 config                     | current config | phantom rows cleared |
+|---------+-------------------------------------+----------------+----------------------|
+| 2011-12 | RuntimeError (=lat_dd_mod= missing) | 3,969 rows     |                    0 |
+| 2013-14 | 65,508 rows, CARTESIAN              | 5,262 rows     |               60,221 |
+| 2015-16 | 57,786 rows, CARTESIAN              | 4,954 rows     |               52,832 |
+| 2018-19 | RuntimeError (=lat_dd_mod= missing) | 6,770 rows     |                    0 |
+| 2021-22 | RuntimeError (no =ea_id=)           | 4,959 rows     |                    0 |
+
+=Country('Ethiopia').cluster_features()= returns *2,168 rows on a
+unique (t, v)*, 2,146 with Latitude.  ALL 25 declared Ethiopia tables
+build: 0 raised, 0 cartesian cells, 0 dropped sub-dfs.  #627's own 16
+tests pass against this config.  *The same re-key that cleared the
+three raising cells also cleared both cartesian cells* -- which is why
+#627's census, taken before #628 landed, could not see it.
+
+** individual_education (2013-14, 2015-16) — the identifier was the W1 baseline
+
+Found while verifying the above; UNRELATED to #627, and unfixed until
+now.  Both waves indexed education on =household_id= / =individual_id=
+while =household_roster= and =shocks= for the SAME waves correctly used
+the wave-native =household_id2= / =individual_id2=.
+
+  - *W2*: =household_id= / =individual_id= are BLANK for the urban
+    REFRESHMENT sample, which has no W1 antecedent -- 5,248 of
+    =sect2_hh_w2.dta='s 23,785 rows.  All of them land on the single
+    tuple =('2013-14', '', '')=.  The framework audit said so exactly:
+    "DESTROYED 5,247 of 23,785 rows whose values DISAGREE (1
+    conflicting index tuples) ... Additionally 5,248 row(s) carry NaN
+    in a declared index level and are DELETED OUTRIGHT".
+  - *W3*: SPLIT-OFF households inherit their parent's baseline id (W3
+    households =010501020100105031= and =010501088800105031= -- the
+    =8888= marks the split-off -- both carry baseline
+    =01050100105031=), so 16 rows in 8 pairs collided and =first()=
+    MERGED TWO REAL, DISTINCT PEOPLE.  They disagree: baseline
+    individual =0105010010503101= is "10th Grade Complete" in one
+    household and "9th Grade Complete" in the other.
+
+It also made education UNJOINABLE to the roster: *0* of the built
+=(i, pid)= pairs matched a =household_roster= row in W2 and W3, against
+100% in W1, W4 and W5 (which use the wave-native ids and were always
+fine).  In W3, 1,231 of the 4,283 education "households" existed
+nowhere in the roster at all.
+
+Fixed by correcting the IDENTIFIER, per the standing #323 rule -- never
+by declaring a reducer.  After: both wave frames are unique
+(23,785/23,785 and 23,393/23,393), the two GrainCollapseWarnings are
+gone, the roster join is 100% in all five waves, and the country table
+goes 59,092 -> 63,181 rows under identical conditions.  Panel linkage
+is unaffected: =id_walk= plus the existing =panel_ids= chain still map
+=household_id2= back to the W1 baseline, exactly as =household_roster=
+already relies on.
+
+** Caveat: this table's country-level row count is ORDER-DEPENDENT
+
+Not caused by the fix above, and not fixed by it.  =id_walk= is applied
+only once =panel_ids= has resolved, and whether it has depends on cache
+state and on what else the process built first:
+
+  - =Country('Ethiopia').individual_education()= -> 63,139 rows
+  - the same call after touching =c.panel_ids= -> 62,939 rows
+
+The 200-row delta lands on 2011-12 / 2015-16 / 2018-19 / 2021-22 and
+reproduces identically in the pre-fix config.  The proximate cause is
+the lazy =self.updated_ids= probe in =_aggregate_wave_data=, whose
+=except (FileNotFoundError, KeyError, ValueError): pass= records a
+failed first attempt as "attempted" and then skips =id_walk= for the
+rest of the process.  Do NOT assert on this table's country-level row
+count; assert at the wave level, which is upstream of the collapse and
+deterministic.  See =.coder/ledger/323-ethiopia-config.md= §6.
+
+** Still open: the 2013-14 wave-level panel_ids: block
+
+=2013-14/_/data_info.yml= still declares =panel_ids:= against
+=sect_cover_ls_w2.dta= -- the LIVESTOCK-section cover, whose grain is
+the agricultural HOLDER (3,812 rows / 3,670 households) and which
+covers only 3,670 of the wave's 5,262 households.  =data_scheme.yml=
+declares =panel_ids= as =materialize: make=, so the country-level
+=_/panel_ids.py= (which reads the household-grain
+=sect_cover_hh_w2.dta=, 5,262 rows, unique) is authoritative and the
+block appears to be vestigial.  Left in place: "appears to be unused"
+is not evidence, and deleting config on that basis is exactly the move
+the repo forbids.  Someone should confirm it is dead and then remove
+it.
