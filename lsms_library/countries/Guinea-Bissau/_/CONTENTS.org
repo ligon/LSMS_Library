@@ -92,3 +92,46 @@ NO Portuguese-language branch (e.g. SoilType code 1 =Arenoso= maps to
 
 Latitude / Longitude are deferred: EHCVM s16a has no decimal-degree
 parcel GPS (=s16aq47= is an area, not a coordinate), as in Uganda.
+
+* Cluster Features -- the many-to-one projection (GH #323)
+
+=cluster_features= is declared at CLUSTER grain, index =(t, v)=, and returns
+450 rows -- one per grappe.  Its two source files are both FINER than that
+grain, so the extraction is a deliberate many-to-one projection.  This is
+safe here, and the reason is worth recording, because nothing in the config
+states it and the collapse itself is silent (auditing the collapse is core's
+business -- GH #323 Sites 1/2 -- not this country's):
+
+- =df_main= reads =s00_me_gnb2018.dta=, the household COVER PAGE: 5,351
+  households, zero duplicate households, spanning 450 grappes (~11.9 hh per
+  cluster).  It declares only =v: grappe=, so every household emits a row
+  carrying ITS CLUSTER's attributes -- =Region= (=s00q01=) and =Rural=
+  (=s00q04=).  Both are PERFECTLY CONSTANT WITHIN GRAPPE at source (verified:
+  zero grappes carry more than one distinct value of either), so the 4,901
+  surplus rows are redundant repeats of a cluster attribute, NOT distinct
+  observations.
+
+- =df_geo= reads =grappe_gps_gnb2018.dta=: 450 rows but only 445 unique
+  grappes.  Five records are BYTE-IDENTICAL duplicates -- same grappe, vague,
+  Latitude, Longitude, Accuracy, Altitude AND Timestamp -- i.e. an export
+  artifact in the WB-released file, not two separate GPS readings.
+  =merge_on: v= fans those five grappes out x2, and they happen to contain 59
+  households, adding 59 rows.
+
+5,351 + 59 = 5,410 rows at the wave level, collapsing to the correct 450
+clusters.  Because every duplicate is byte-identical on its payload, the
+collapse discards NOTHING: =drop_duplicates(full row)= and
+=drop_duplicates(t, v)= both yield 450.
+
+Do NOT "fix" this by adding =i= to the =cluster_features= index.
+=cluster_features= is the table that OWNS =v= (see CLAUDE.md); giving it a
+household level would break =_add_market_index= and the =v=-join for the
+whole country.
+
+The invariant is pinned by =tests/test_guinea_bissau_cluster_features.py=.
+
+** Known gap: 11 clusters have no coordinates
+
+Latitude/Longitude are NaN for 11 of the 450 grappes -- the 5 grappes absent
+from =grappe_gps_gnb2018.dta= altogether, plus 6 that are present but null.
+A geo-coverage gap in the released file, independent of the projection above.
