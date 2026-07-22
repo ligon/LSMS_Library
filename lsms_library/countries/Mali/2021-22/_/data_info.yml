@@ -111,28 +111,45 @@ sample:
         - t
 
 cluster_features:
-    dfs:
-        - df_main
-        - df_geo
-    df_main:
-        file: ehcvm_conso_mli2021.dta
-        idxvars:
-            v: grappe
-        myvars:
-            Region: region
-            Rural: milieu
-    df_geo:
-        file: s00_me_mli2021.dta
-        idxvars:
-            v: grappe
-        myvars:
-            Latitude: GPS__Latitude
-            Longitude: GPS__Longitude
-    merge_on:
-        - v
-    final_index:
-        - t
-        - v
+    # GH #323 (site 4) / GH #627.  This block USED to be a two-sub-frame
+    # `dfs:` merge: Region/Rural from `ehcvm_conso_mli2021.dta` and the GPS
+    # fix from `s00_me_mli2021.dta`, joined on `v`.  That was a CARTESIAN
+    # PRODUCT, not a join, and by a wide margin the worst one in the corpus:
+    #
+    #   ehcvm_conso is the EHCVM consumption file at (household x food item)
+    #   grain -- 393,480 rows for 6,143 households in 513 grappes.  s00 is the
+    #   household COVER PAGE -- 6,143 rows, also finer than `v`.  Merging two
+    #   frames on `v` when BOTH repeat `v` pairs every consumption line-item
+    #   with every household in its grappe: 393,480 x 6,143 -> 4,718,148 rows,
+    #   of which 4,324,668 were phantoms that exist in no survey (88% of the
+    #   4,907,774 phantom rows PR #627's 40-country census found).
+    #   `_normalize_dataframe_index` then mopped it up with groupby().first(),
+    #   so the table looked clean at 513 rows while nearly 4.4M invented rows
+    #   passed through it.
+    #
+    # The merge was never needed.  s00_me_mli2021.dta carries the geography
+    # itself: s00q01 == `region` and s00q04 == `milieu`, verified per grappe
+    # against ehcvm_conso -- 513/513 grappes agree on BOTH, each is constant
+    # within its grappe, and the two files cover the identical 6,143
+    # (grappe, menage) households.  So this is a single-file extraction, the
+    # cartesian is cured at the merge (not laundered by a reducer afterwards),
+    # and the returned values are bit-for-bit what they were.
+    #
+    # Grain note: s00 is still household-grain (12 households per grappe), so
+    # the declared (t, v) index is collapsed by the framework exactly as
+    # before -- but now it de-duplicates 12 identical rows per grappe instead
+    # of ~9,200 (mean 9,197 = 767 line-items x 12 households).  Region/Rural
+    # are provably constant within grappe (checked);
+    # Latitude/Longitude are the survey's per-grappe displaced fix stamped on
+    # every household of the grappe.
+    file: s00_me_mli2021.dta
+    idxvars:
+        v: grappe
+    myvars:
+        Region: s00q01
+        Rural: s00q04
+        Latitude: GPS__Latitude
+        Longitude: GPS__Longitude
 
 
 household_roster:
