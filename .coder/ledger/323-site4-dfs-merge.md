@@ -416,3 +416,23 @@ each — #625's `v` re-key). **4,552,673 of 4,907,774 phantom rows gone, 92.8%;
 Only failures in the sweep: Nepal 1995-96 and 2003-04 `sample`,
 `PathMissingError` — no data in the repository, pre-existing and unrelated.
 **0 required-column raises anywhere in the library.**
+
+### §12.1 Full suite on the merged branch (2026-07-22)
+
+`pytest tests/ -q -p no:randomly`, warm cache, this branch's core asserted:
+
+```
+2 failed, 3935 passed, 142 skipped, 9 xfailed, 1 xpassed  (31m48s)
+```
+
+Both failures are
+`test_table_structure::{TestTableStructure::test_declared_columns_present,
+TestFeatureSanity::test_feature_is_sane}[CotedIvoire/cluster_features]`, and
+both reproduce on a clean `origin/development` worktree with **none** of this
+PR's code. **Zero new failures.** (§9's third historical failure,
+`test_currency::test_feature_ghana_per_wave`, no longer fails on either.)
+
+Per §9 this is necessary and not sufficient: the suite still cannot see a
+build-path guard, because `test_table_structure` never asks for a build. The
+evidence that matters for this PR is the 90-merge cold census in §12, not this
+line.
