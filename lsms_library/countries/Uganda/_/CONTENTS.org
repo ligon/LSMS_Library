@@ -238,7 +238,442 @@ concern from =u= label canonicalisation.  Its keys are the same
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+* Harvest condition on =crop_production= (GH #323 / #637)
+
+** The defect
+
+The UNPS post-harvest module (AGSEC5A season A / AGSEC5B season B) asks
+question 6 as a single compound question: *how much did you harvest, in
+what unit, and in what condition/state*.  A household that took some of a
+crop off a plot fresh and the rest after drying it answers TWICE.  Both
+answers are separate source rows (2009-16) or separate parallel column
+slots (2018-20).
+
+=crop_production= was keyed =(t, i, plot, j, u, season)=, with no level
+for the condition, so those answers landed on the same index tuple and the
+de-duplication block at the end of =uganda.crop_production_for_wave= summed
+them.  Dry weight was added to fresh weight.  A measured example from
+2011-12:
+
+#+begin_example
+HH 1033000506  plot -1-6  Coffee  Kilogram (KG)
+   240 kg  "Dry after additional drying - in pods or shell/husks"  month 6
+   100 kg  "Fresh/raw harvested - in pods or shell/husks"          month 6
+   -> summed to 340 kg
+#+end_example
+
+340 is not a quantity of anything.  Across the panel this affected *3 654
+index groups*.
+
+The quietest instances were 2009-10 and 2010-11: those waves have no
+harvest-month column, so *every* one of their collisions looked like an
+exact duplicate of an identical record, while in fact fresh and dry
+weights were being added together.
+
+** Fix: =condition= is an index level
+
+The grain is now =(t, i, plot, j, u, condition, season)=.  Labels come
+from the =harvest_conditions= table in =_/categorical_mapping.org=, via
+=uganda._harvest_condition_map()=; the canonical cross-country vocabulary
+is declared in =lsms_library/data_info.yml= under
+=Columns > crop_production > condition=.
+
+*Quantities in different conditions are not commensurable.*  Do not sum
+across this level without a drying / shelling conversion.  =transformations.harvest_kg=
+groups by =(t, i, plot, j)= and therefore still sums across conditions —
+that is a *pre-existing* property of that transform, unchanged by this
+work, and it remains the caller's problem (its own docstring already warns
+that its unit coverage is a lower bound).
+
+** Which source column is the unit and which is the condition
+
+Decided by the VALUE-LABEL vocabulary, never by the variable label.  The
+unit column's labels decode to Kg / Sack (100 kgs) / Bunch (Big); the
+condition column's to Green / Fresh / Dry ....  Verified per wave against
+the Stata metadata on 2026-07-21:
+
+| wave    | file    | condition | unit      | note                                                    |
+|---------+---------+-----------+-----------+---------------------------------------------------------|
+| 2009-10 | AGSEC5A | a5aq6b    | a5aq6c    | no value labels at all; matched by code distribution     |
+| 2009-10 | AGSEC5B | a5bq6b    | a5bq6c    | ditto                                                    |
+| 2010-11 | AGSEC5A | a5aq6b    | a5aq6c    | ditto                                                    |
+| 2010-11 | AGSEC5B | a5bq6b    | a5bq6c    | ditto                                                    |
+| 2011-12 | AGSEC5A | a5aq6b    | a5aq6c    | variable + value labels agree                            |
+| 2011-12 | AGSEC5B | a5bq6b    | a5bq6c    | variable + value labels agree                            |
+| 2013-14 | AGSEC5A | a5aq6b    | a5aq6c    | *variable labels are swapped*; value labels are correct  |
+| 2013-14 | AGSEC5B | a5bq6b    | a5bq6c    | variable + value labels agree                            |
+| 2015-16 | AGSEC5A | a5aq6b    | a5aq6c    | variable + value labels agree                            |
+| 2015-16 | AGSEC5B | a5bq6b    | a5bq6c    | value labels mojibaked (=ï¿½= for the en-dash)           |
+| 2018-19 | AGSEC5A | a5aq6b    | (none)    | no unit column exists -> u='Unknown'                     |
+| 2018-19 | AGSEC5B | a5bq6c    | a5bq6b*   | *unit exists but is NOT wired; see Known Issues          |
+| 2019-20 | agsec5a | s5aq06c_1 | s5aq06b_1 | slot 1                                                   |
+| 2019-20 | agsec5a | s5aq06c_2 | s5aq06b_2 | slot 2                                                   |
+| 2019-20 | agsec5b | s5bq06c_1 | s5bq06b_1 | slot 1 (slot 2 not wired; see Known Issues)              |
+
+A comment previously in =uganda.py= claimed "the WB .do's A5aq6b/A5aq6c
+unit/condition rename is inverted for these actual UNPS files".  That is
+*true of exactly one file* — 2013-14 AGSEC5A, where =a5aq6b= is titled
+"Unit of quantity for the crop harvested" but carries the condition value
+labels, and =a5aq6c= is titled "Condition/state of the harvested crop" but
+carries the unit value labels.  Every other wave labels its variables
+correctly.  The wiring (=6c= = unit) was right in all cases; only the
+explanation was overstated.
+
+2018-19 AGSEC5A additionally carries an =a5aq6c= that holds the *same*
+20-code condition scheme, unlabelled, disagreeing with =a5aq6b= on 158 of
+7 144 rows.  The labelled column (=a5aq6b=) is used.
+
+** The two vintages encode the same vocabulary
+
+- *2009-16 (LONG)* — one column group per season; the condition is a VALUE
+  in =a5aq6b= / =a5bq6b=, with multiple source rows per plot-crop.
+- *2018-20 (WIDE)* — parallel =_1= / =_2= slots; the condition for each
+  slot is a value in that slot's own 6c column.  The slot number is *not*
+  an ordinal "first/second harvest": the 2019-20 Stata variable labels read
+  literally "6c. Condition/state of crop harvested (2018, full harvest,
+  condition1)" and "(… condition2)".
+
+They are the same vocabulary — in fact the same *integer codes*, with one
+documented exception: 2011-12, 2018-19 and 2019-20 label all 20 codes;
+2013-14 and 2015-16 label the same 19 *without 99*, although 32 rows in
+each of those waves use code 99.  Only the label TEXT otherwise drifts
+(en-dash vs hyphen, mojibake in 2015-16 AGSEC5B, collapsed double spaces
+in 2018-19, and code 99 reading "Others" in 2011-12 but "Not Applicable"
+in 2018-20).  One =harvest_conditions= table therefore serves all
+vintages, and no harmonisation between them was needed or invented.
+
+*** Code 99 is merged across vintages — the true incidence
+
+Corrected 2026-07-21 after adversarial review of PR #649.  The
+=categorical_mapping.org= comment used to justify the merge by asserting
+that code 99 was "only 3 rows in the whole panel and none after 2011-12".
+That was false by roughly 100x.  Measured on a cold rebuild (isolated
+=LSMS_DATA_DIR=, only =dvc-cache= symlinked in; Uganda cache physically
+removed; =LSMS_COUNTRIES_ROOT= pinned to the branch worktree):
+
+| wave                        | 2009-10 | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2018-19 | 2019-20 | total |
+|-----------------------------+---------+---------+---------+---------+---------+---------+---------+-------|
+| raw source rows, code 99    |       2 |       0 |     160 |      32 |      32 |      32 |     123 |   381 |
+| built rows, =other_condition= |     1 |       0 |     120 |      32 |      32 |      32 |     123 |   340 |
+
+So *219 of the 340 built rows are after 2011-12* — precisely the case the
+old comment said did not exist.  (Raw exceeds built because the
+duplicate-collapse merges commensurable rows and the =j=-null filter drops
+some.)  Code 99 means three different things across the panel: "Others"
+in 2011-12, "Not Applicable" in 2018-19/2019-20, and *nothing labelled at
+all* in 2013-14/2015-16.
+
+The merge onto one =other_condition= value is nonetheless kept, for
+reasons that survive the corrected numbers:
+
+1. =t= is an index level, so a 2011-12 "Others" tuple and a 2019-20 "Not
+   Applicable" tuple can never coincide.  Nothing is summed, aggregated or
+   de-duplicated across the vintage boundary — verified, no wave-crossing
+   collision exists.  The merge is a *naming* choice and the vintage stays
+   recoverable by the reader from =t=.
+2. 99 is the scheme's own residual slot in every vintage: the code the
+   instrument uses when the dryness x form grid does not apply.
+   =other_condition= names the slot without asserting which residual
+   reading applies.
+3. Splitting would need a THIRD value for 2013-14/2015-16, where no wave
+   says what 99 means — i.e. inventing a label the source does not carry.
+
+A future PR wanting finer semantics should split into =other_condition=
+(2011-12) / =not_applicable_condition= (2018-20), leaving 2009-10 /
+2013-14 / 2015-16 on the sentinel.  That MOVES 340 rows between index
+values, so it needs its own before/after and is out of scope for a
+comment correction.
+
+*** =Source Label= is a normalized representative, not a verbatim quote
+
+Also corrected 2026-07-21.  Of the 216 (code, wave, season) value-label
+pairs across the five labelled waves, *60 match the org file's
+=Source Label= column literally and 156 do not*.  The column is the
+2018-20 wording with whitespace runs collapsed, except for four codes
+where the two vintages differ in WORDING rather than punctuation and the
+column keeps the longer 2009-16 phrasing:
+
+| code | 2018-20 raw label                        | =Source Label=                                             |
+|------+------------------------------------------+------------------------------------------------------------|
+|   24 | Fresh/raw harvested - in pods            | Fresh/raw harvested - in pods or shell/husks               |
+|   32 | Dry at harvest - with shell              | Dry at harvest - with shell/cob without stalk              |
+|   42 | Dry after additional drying - with shell | Dry after additional drying - with shell and without stalk |
+|   99 | Not Applicable                           | Others / Not Applicable                                    |
+
+Code 99's entry is not a quote of anything: no wave writes "Others / Not
+Applicable".  Separately, code *45*'s PREFERRED label is an inference:
+every labelled wave writes exactly "Dry - grain", and =dried_grain= (the
+4x additional-drying family) is deduced from grid position — 35 already
+occupies "Dry at harvest - grain".  That code covers 40 411 of 133 683
+rows (30%), so the inference is load-bearing and is now stated rather
+than implied.
+
+**** The house convention for per-wave label drift already exists, and this table does not follow it
+
+Noted 2026-07-21, while re-reading this file end to end.  *"Unit handling
+for =food_acquired="* above (a section that predates the =condition= work)
+records the established shape:
+
+#+begin_quote
+The =u= table also retains the per-wave variant columns (=2005-06=,
+=2009-10=, ..., =2019-20=) that document the raw label appearing in each
+wave's questionnaire.  These extra columns are unused at runtime but
+preserve the cross-wave provenance previously captured in the retired
+=_/unitlabels.py= file.
+#+end_quote
+
+So =categorical_mapping.org= holds *three different shapes* for the same
+job:
+
+| table                 | shape                                    | per-wave drift |
+|-----------------------+------------------------------------------+----------------|
+| =u=                   | Code, Preferred Label, one col PER WAVE  | representable  |
+| =harvest_units=       | Code, Preferred Label                    | not recorded   |
+| =harvest_conditions=  | Code, Preferred Label, =Source Label=    | *lossy*        |
+
+The single =Source Label= column is the **root cause of the defect
+corrected above**, not merely its location: one cell cannot hold two
+vintages' wordings, so codes 24 / 32 / 42 silently took the 2009-16 text
+and 99 became a hand-made composite.  The =u= table has no such problem —
+it carries each wave's raw string in its own column, typos and all
+(=Small cup wuth handle(Akendo)= is preserved verbatim in six waves).
+
+*Recommended follow-up*: give =harvest_conditions= the =u= table's shape —
+replace =Source Label= with one column per labelled wave (2011-12,
+2013-14, 2015-16, 2018-19, 2019-20; 2009-10 and 2010-11 stay blank, as
+they ship no value labels, exactly as the =u= table leaves blanks).  It is
+**runtime-inert** — =get_categorical_mapping= reads only =Code= +
+=Preferred Label= — and the measured per-wave strings needed to populate
+it are the 216 label pairs recorded above.  Not done here because the
+PR #649 review scoped this finding to a prose correction and a table
+reshape is the maintainer's call, not a side effect of one.
+
+Worked example, =agsec5a.dta= row index 3 (2019-20): same maize, same
+plot, same month; slot _1 = 80.0 Kilogram(KG) "Dry - grain", slot _2 = 2.0
+Plastic Basin(15 lts) "Fresh/raw harvested - in the cob".
+
+The scheme is a 2-D cross of a dryness family (tens digit: 1 green, 2
+fresh/raw, 3 dry at harvest, 4 dry after additional drying) with a
+physical form (units digit: 0 n/a, 1 with shell/cob and stalk, 2 with
+shell/cob without stalk, 3 in the cob, 4 in pods/shell/husks, 5 grain).
+The =Preferred Label= strings encode exactly that cross.
+
+*Hypothesis, deliberately not acted on*: the unlabelled 2009-10/2010-11
+codes 10, 15, 25, 30 and 34 fit the grid (=green n/a=, =green grain=,
+=fresh grain=, =dry-at-harvest n/a=, =dry-at-harvest in pods=) and account
+for roughly half of those waves' off-scheme rows.  No wave labels them, so
+they are NOT given Preferred Labels; they fall to =unknown_condition=.
+
+** Effect (cold rebuild, isolated data dir, 2026-07-21)
+
+| wave    | dup groups before | after | rows before | rows after | Quantity (unchanged) |
+|---------+-------------------+-------+-------------+------------+----------------------|
+| 2009-10 |               670 |   181 |       24997 |      25485 |        310,664,565.8 |
+| 2010-11 |               608 |    81 |       20442 |      20970 |            708,149.5 |
+| 2011-12 |               653 |    55 |       19552 |      20152 |          1,128,560.3 |
+| 2013-14 |               589 |    61 |       17053 |      17585 |          1,098,713.5 |
+| 2015-16 |               764 |    63 |       18874 |      19576 |          1,050,367.4 |
+| 2018-19 |                 0 |     0 |       14194 |      14194 |          1,180,031.7 |
+| 2019-20 |               370 |    18 |       15369 |      15721 |          1,175,600.8 |
+|---------+-------------------+-------+-------------+------------+----------------------|
+| total   |              3654 |   459 |      130481 |     133683 |        317,005,989.0 |
+
+Collisions fall 87.4%.  =Quantity=, =Quantity_sold= and =Value_sold= totals
+are *identical* per wave before and after — as they must be: summing is
+conservative, so a correct fix moves rows apart, it does not create or
+destroy mass.
+
+*Residual 459 groups.*  These are now all *commensurable*: same crop, same
+unit, same condition, so summing them is arithmetically valid, which is
+precisely what was not true before.  Breakdown: 50 groups' rows differ in
+=harvest_month= (two harvest events of the same crop in the same state);
+~320 differ only in =Quantity= (repeat entries within the module, or both
+2019-20 slots reporting the same condition); 49 are byte-identical rows
+(a genuinely duplicated source record — note the collapse SUMS these, so a
+repeated record still doubles; pre-existing behaviour, not addressed here);
+37 carry the =unknown_condition= sentinel in the key and so may still hide
+a real condition difference (28 of them in 2009-10).
+
+*=unknown_condition= incidence*: 7 994 of 133 683 rows (6.0%), concentrated
+in the two unlabelled waves — 2009-10 5 911 (23.2% of that wave), 2010-11
+914 (4.4%), 2011-12 712 (3.5%), 2013-14 409 (2.3%), 2015-16 26 (0.1%),
+2018-19 9 (0.1%), 2019-20 13 (0.1%).  Most are rows where the condition
+column is simply null, not off-scheme codes: only 492 rows in the whole
+panel carry a code outside the 20-code scheme (297 = 1.1% of 2009-10, 192
+= 0.9% of 2010-11, 3 in 2011-12, none later).  *Do not read the ~1%
+off-scheme rate as the sentinel rate* — =data_scheme.yml= conflated the
+two until 2026-07-21.
+
+By (wave, season), the sentinel share is 25.7 / 20.5% (2009-10 A/B), 7.1 /
+1.0% (2010-11), 3.6 / 3.4% (2011-12), 0.3 / 4.4% (2013-14), 0.2 / 0.03%
+(2015-16), 0.13 / 0.00% (2018-19), 0.12 / 0.04% (2019-20); distinct
+non-sentinel conditions per cell range 18–20.  Those two ranges are what
+=tests/test_uganda_crop_condition.py= turns into per-cell invariants (see
+"A mis-wired colmap must fail loudly" below).
+
+** A mis-wired colmap must fail loudly
+
+Added 2026-07-21 after the PR #649 review demonstrated the gap by mutation.
+=crop_production_for_wave= used to guard every colmap lookup with
+=if cond.get(k) and cond[k] in df5.columns=, silently falling back when the
+named column was absent.  Every one of those fallbacks is *invisible in the
+output*: a mis-typed =condition= sentinels a whole wave-season to
+=unknown_condition=, a mis-typed =qty= drops the slot entirely, a mis-typed
+=unit= sets =u='Unknown'= everywhere.  The reviewer typo'd
+=CROP_COLMAPS['2018-19']['A']='s condition column, cleared the cache, and
+*all 10 tests passed* while that cell went to =unknown_condition= on 7 153
+of 7 153 rows.
+
+Two changes close it.
+
+1. *A NAMED column that does not resolve now raises =CropColmapError=*
+   (=uganda._require=).  =None= remains the declared, auditable way to say
+   "this wave records no such column" — 2018-19 season A genuinely has no
+   harvest unit.  A NAME is a claim about the source file, and it is now
+   checked.  *Measured no-op*: across all 7 waves x 2 seasons x every slot,
+   exactly one named column failed to resolve (see the 2010-11 intercrop
+   flag under Known Issues, fixed to =None= in the same change), and a cold
+   rebuild before/after is byte-identical — 133 683 rows, Quantity
+   317 005 989.0, Quantity_sold 18 134 251.4, Value_sold 9 066 365 499.8,
+   =intercropped= non-null 75 625 on both sides.
+
+2. *Three tests in =tests/test_uganda_crop_condition.py=*, deliberately
+   complementary because they catch different mistakes:
+   - =test_crop_colmap_columns_resolve_in_source= — a NAMED column must
+     exist in the file it is read from.  Catches typos and dropped columns.
+     Reads raw Stata, so it is S3-credential-guarded and skips in the
+     data-free CI job.
+   - =test_sentinel_share_bounded_per_wave_season= — no (wave, season) may
+     exceed 40% =unknown_condition=.  Worst honest cell measured is 2009-10
+     season A at 25.7%; a collapsed cell is ~100%.
+   - =test_condition_varies_within_every_wave_season= — every (wave,
+     season) must decode at least 10 distinct non-sentinel conditions.
+     Measured minimum is 18.
+
+   Mutation-proved both ways.  Typo =a5aq6b= -> =a5aq6b_TYPO=: the build
+   now raises and the module goes *1 failed + 8 errors* (was 10 passed).
+   Point the condition at an existing-but-wrong integer column
+   (=s5aq06f_1=, the harvest month — a plausible 6f/6b fat-finger): the
+   build succeeds, the resolve test passes, the sentinel share is only
+   33.7% so the *ceiling test also passes*, and the variety test catches it
+   at 2 distinct conditions.  Neither invariant alone is sufficient, which
+   is why both are kept.
+
+   The panel-wide checks cannot do this work: =test_condition_values_are_-
+   canonical= passes because =unknown_condition= IS canonical, and
+   =test_condition_actually_separates_records=' >1000 threshold survives
+   the loss of any single cell.
+
+3. Relatedly, =test_fresh_and_dry_no_longer_collide= no longer carries
+   =if sel.empty: pytest.skip(...)=.  A skip-on-empty escape hatch on the
+   fix's single most important regression test would let an id remapping
+   disarm it rather than fail it.  The =crop_production= fixture likewise
+   now re-raises a build failure when S3 credentials ARE present (it still
+   skips without them), so a config bug turns the module red instead of
+   reporting eight quiet skips.
+
+** Cross-country status
+
+=crop_production= is NOT registered in =lsms_library/data_info.yml=
+=Index Info > index_info=, by an explicit decision recorded there: the
+plot-level ag features' per-country index NAMES diverge (=plot= vs
+=plot_id=, =crop= vs =j=) and must be harmonised first.  Uganda was
+therefore *already* excluded from =Feature('crop_production')= before this
+change — its shape =['i','t','v','plot','j','u','season']= differs from the
+modal =['i','t','v','plot','crop','u']= — alongside Ethiopia, EthiopiaRHS,
+Mali, Nigeria and Tanzania.  Adding =condition= cannot and does not change
+the set of countries Feature keeps.
+
 * Known Issues
+** TODO =crop_production.intercropped= is wired to the SEED-USE question
+
+Found 2026-07-21 while closing the "silent colmap" gap above, by reading
+the Stata variable labels of every column =CROP_COLMAPS[...]['intercrop']=
+names.  *Not* raised in the PR #649 review.
+
+=crop_production_for_wave= builds =intercropped= from
+=colmap['intercrop']['flag']=, recoding =2 -> True=.  In every wave that
+populates the column, that flag points at the *seed-use* question, whose
+value labels are {1: Yes, 2: No} — so =intercropped=True= currently means
+"did NOT use seed/seedlings for this crop":
+
+| wave    | wired flag | its variable label                            | its value labels |
+|---------+------------+-----------------------------------------------+------------------|
+| 2011-12 | =a4aq3=    | Did you use any seed or for this crop?        | 1 Yes, 2 No      |
+| 2013-14 | =a4aq16=   | A4AQ16: Did you use any seed or seedlings...  | 1 Yes, 2 No      |
+| 2015-16 | =a4aq16=   | A4aq16: did you use any seed or seedlings...  | 1 Yes, 2 No      |
+| 2018-19 | =s4aq16=   | 16. Did you use any seed/seedlings?           | 1 Yes, 2 No      |
+| 2019-20 | =s4aq16=   | 16. Did you use any seed/seedlings?           | 1 Yes, 2 No      |
+
+The actual cropping-system question is a different column in the same
+file, and it is present in *every* wave:
+
+| wave              | column            | variable label                              | value labels                    |
+|-------------------+-------------------+---------------------------------------------+---------------------------------|
+| 2009-10, 2010-11  | =a4aq7=           | Cropping system                             | 1 Pure Stand, 2 Inter cropped   |
+| 2011-12 … 2015-16 | =a4aq8=           | What type of crop stand was on the plot?    | 1 Pure Stand, 2 Mixed Stand     |
+| 2018-19, 2019-20  | =s4aq08=          | 8. What type of crop stand was on the plot? | 1 Pure Stand, 2 Mixed Stand     |
+
+The two are near-independent, so the current column is close to noise:
+=(wired == 2)= agrees with =(crop-stand == 2)= on 48.5% / 48.8% / 52.5% /
+51.8% / 52.5% of rows (2011-12 … 2019-20) — a coin flip.  The "yes"
+rates differ too (33–42% wired vs 50–58% true crop-stand).
+
+*Any analysis using =crop_production.intercropped= today is using the
+seed-purchase question.*  Rewiring MOVES data (and would newly populate
+2009-10 and 2010-11, which are 100% NaN today), so it is a separate change
+with its own before/after — not folded into a comment-and-tests PR.
+
+** DONE 2010-11 intercrop flag named a column that does not exist
+
+=CROP_COLMAPS['2010-11']['intercrop']['flag']= was ='a4aq3'=, but 2010-11
+AGSEC4A ships only =['HHID','prcid','pltid','cropID','a4aq7'..'a4aq14']= —
+there is no =a4aq3=.  The old =in df4a.columns= guard swallowed it, so
+=intercropped= was NaN on all 20 970 rows of that wave with nothing said.
+Set to =None= (a provable no-op: the build output is byte-identical), so
+the config now states what the build already did and the strict check
+above can be applied uniformly.  Note this wave DOES carry =a4aq7=
+"Cropping system" {1: Pure Stand, 2: Inter cropped}; wiring it belongs
+with the item above.
+
+** TODO 2018-19 AGSEC5B harvest unit is available but not wired
+
+=CROP_COLMAPS['2018-19']['B']= sets =unit: None=, so every 2018-19 season-B
+harvest row carries =u='Unknown'=.  But =a5bq6b= exists in that file,
+titled "6b. Unit", with the full 40-label =harvest_units= vocabulary and
+7 041 non-null values.  (Season A genuinely has no unit column; the
+long-standing note "2018-19's harvest side carries no unit label" is
+correct for 5A and wrong for 5B.)  Wiring it would move rows between =u=
+values, so it is a separate change with its own before/after.
+
+** TODO Second condition slot dropped for 2019-20 season B
+
+=agsec5b.dta= (2019-20) carries =s5bq06a_2= / =s5bq06b_2= / =s5bq06c_2=,
+labelled "(2019, condition2)", with 1 306 non-null conditions.
+=CROP_COLMAPS= reads only slot 1, so those harvest records are absent from
+=crop_production= entirely.  2018-19 AGSEC5B likewise has an =_2= slot, but
+there its variable label reads "during the second season of 2017" — i.e.
+it may be a SEASON slot rather than a condition slot, and needs the
+questionnaire before it is wired.  Adding either ADDS mass, so both are
+deliberately outside the #323 condition fix (which is verified against a
+"totals unchanged" invariant).
+
+** TODO Duplicate collapse silently drops rows with a null index key
+
+=crop_production_for_wave='s de-duplication uses
+=groupby(level=...)=, whose pandas default is =dropna=True=.  Any row with
+=pd.NA= in an index level therefore *vanishes*.  Measured: 431 rows /
+7 108 132 native units in 2009-10 and 43 rows / 962.5 in 2011-12, all with
+a null =plot= id (the =hhid-parcel-plot= concatenation propagates NA).
+Unrelated to and unchanged by the =condition= work; =condition= is
+sentinel-filled precisely so it does not add to this.
+
+** TODO 2009-10 harvest quantities carry an unstripped 99999 sentinel
+
+2009-10's =Quantity= sums to 3.18e8 native units, ~300x every other wave,
+because =99999= is used as a missing-value sentinel and never removed.
+Any analysis touching 2009-10 =crop_production= quantities must filter it.
+
 ** TODO Missing panel weight for 2019-20
 :LOGBOOK:
 - Note taken on [2026-04-09 Wed] \\
