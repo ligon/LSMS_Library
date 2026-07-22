@@ -132,6 +132,43 @@ derive at runtime (=_FOOD_DERIVED=); =household_characteristics= /
 remaining work is split out: =community_prices= + inverse price->quantity
 imputation (#562), and the nutrition Food Conversion Table (#563).
 
+* TODO cluster_features 1987-88 / 1988-89 --- absent, but NOT "never asked" (2026-07-21, GH #323)
+
+Both GLSS1/GLSS2 waves had =cluster_features= wired to =Y01A.DAT='s =REGION=,
+which is the person's *region of birth*, not the cluster's region (its code list
+runs to 11=Nigeria, 12=Ivory Coast, 13=Togo).  That wiring is deleted; see each
+wave's =_/data_info.yml= for the argument and the measurements.
+
+*The cells are now =absent=, and that must not be read as a closure.*  A
+cluster-grain region candidate exists and is merely unvalidated:
+
+- =1988-89/Data/HEALTH.DAT= and =DRUG.DAT= (community health-facility and
+  drug-availability modules) each carry a facility-level =REGION= plus
+  =CL1..CL5=, the clusters that facility serves.  =CL + 2000= is this wave's
+  =CLUST= (166/168 and 167/169 land in the roster's 170-cluster set; offsets 0
+  and +1000 land none).  Together they cover *168 of 170* clusters.  =REGION= is
+  0-indexed against the wave's 1-indexed =region= table; =REGION + 1= equals the
+  cluster's modal birth-region in 160 of 166.
+- =1988-89/Data/CLYR1YR2.DAT= bridges the two waves' clusters (85 linked pairs,
+  all resolving), carrying that region to *84 of 85* linked 1987-88 clusters ---
+  i.e. at most 48% of that wave's 176.
+- 1987-88 itself has no other candidate: a sweep of all 77 =.DAT= files finds
+  =REGION= in exactly one, the roster.
+
+Why it is *not* wired: 14 clusters carry a cross-facility disagreement, HEALTH
+and DRUG disagree on 11 of the 165 clusters they share, 2 clusters are
+uncovered, and the =CL + 2000= mapping is *inferred from value ranges, not
+documented* --- the =.DCT= files carry positions and names only, no variable
+labels.  Confirming it needs the questionnaire, and *the GLSS1/GLSS2
+questionnaires are scanned-image PDFs with no text layer* (the same blocker
+recorded for =housing= and =individual_education= below), so check C4 is
+currently unrunnable for these two waves.
+
+Related and unfixed: =get_categorical_mapping= returns ={}= for the =region=
+table in *both* GLSS1 and GLSS2, so =Birthplace= is all-NA in both.  Repairing
+that is what would have *armed* the fabrication above --- which is why the
+wiring was removed first.
+
 * Files in GhanaLSS/_/
 ** DONE ghana_lss.py
 Common code across GLSS rounds (=ghanalss.py=); handles the GLSS1--GLSS2 panel

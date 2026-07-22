@@ -83,9 +83,35 @@ food_security:
     # (binarized by the same-named formatting fn in mapping.py).
     file: g7sec9c.dta
     idxvars:
-        i:
-            - clust
-            - nh
+        # GH #323: key on `hid`, NOT on the [clust, nh] pair.
+        #
+        # g7sec9c.dta has 14,009 rows.  The first 13,899 are unique on
+        # (clust, nh); the last 110 (rows 13,899-14,008) have clust=NaN AND
+        # nh=NaN -- but a perfectly valid `hid` -- and every one of their eight
+        # FIES items is NaN.  Those are GLSS7 households that never answered
+        # Section 9C; the numeric clust/nh columns were simply left unpopulated
+        # where `hid` was.  It is a defect in the World Bank source file.
+        #
+        # Keyed on [clust, nh], all 110 collapsed onto a single (t, NaN) tuple,
+        # so they were dropped outright by the duplicate-collapse (groupby's
+        # dropna) -- 110 distinct households silently vanishing into one phantom.
+        #
+        # `hid` is complete and reconstructs the compound key exactly: on all
+        # 13,899 well-keyed rows, hid == f"{clust}/{nh:02d}" with 100.00%
+        # fidelity, which is byte-identical to the id the framework builds from
+        # [clust, nh] (e.g. '70001/01').  So keying on `hid` leaves those 13,899
+        # ids unchanged and additionally recovers the 110 as the distinct
+        # households they are (all 110 are present in sample(), and their 110
+        # ids are disjoint from the 13,899).
+        #
+        # Their answers stay all-NA -- the truthful representation of "did not
+        # answer Section 9C".  FIES_score() already returns pd.NA when all eight
+        # items are missing, so this does NOT fabricate a food-secure score of 0.
+        # (_finalize_result's dropna(how='all') then drops these all-NA rows from
+        # the API, exactly as it already does for 7 all-NA households that DID
+        # have clust/nh populated.  The fix removes the phantom at the source; it
+        # is not expected to move the API row count.)
+        i: hid
     myvars:
         Worried: s9cq1
         HealthyDiet: s9cq2
