@@ -1,0 +1,174 @@
+#+title: Handoff -- 2026-07-21/22 session
+#+author: Sue (Claude Opus 4.8)
+#+date: [2026-07-22 Wed]
+
+* TL;DR
+
+=development= is at *fb749f03*, CI *green*, *135 commits / 45 merges* ahead of
+=master=.  That is a release point, and the release should be cut from it.
+
+The session began as "tidy up an unclean repo" and became a GH #323 sweep,
+a data-integrity investigation, and the evidence base for GH #603.
+
+* The release point
+
+** Cut from =fb749f03=
+
+Verify it is still =origin/development='s head, then use the automated path in
+=.claude/skills/release/SKILL.md=: publish a GitHub Release; CI builds and
+uploads to PyPI via Trusted Publishing.
+
+** The release notes MUST say the cache rebuilds once
+
+Two changes each invalidate every cached parquet, and they are in this release
+*deliberately together* so users rebuild once rather than twice:
+
+- PR #655 bumps =LSMS_CACHE_SCHEMA= 4 -> 5;
+- PR #627 changes =grab_data='s =@build_transform= fingerprint.
+
+Waiting for #627 was the whole reason this was not cut earlier.
+
+** What it carries
+
+| PR          | what                                                                    |
+|-------------+-------------------------------------------------------------------------|
+| #655        | Guatemala *+8,849 rows (30%)* recovered; =to_parquet= stopped nulling    |
+|             | the literal strings ='None'/'nan'/'<NA>'= (='None'= is the canonical     |
+|             | "no education" label); =LSMS_CACHE_SCHEMA= 4->5                          |
+| #627        | *Site 4* -- the =dfs:= outer merge that MANUFACTURES the duplicates      |
+|             | every other #323 site then collapses                                    |
+| #629        | =assets= additive -- *N294,594,970* recovered                            |
+| #641 #653   | *4.68M phantom rows* cleared (Mali 4.32M, Malawi 355k, GB 59)           |
+| #623 #649   | GB parquet canonical; Uganda =crop_production= gains a =condition= level |
+| #656 #661   | two FALSE claims corrected in tracked config files                       |
+| #652        | Tanzania NPS back-casting recorded as a COUNTRY fact                     |
+| #654 #658   | 111 waves of verbatim population evidence + per-country universe records |
+| #625 …      | plus the earlier country fixes merged during the day                     |
+
+Also fixed, and *live on =master= today*: Uganda 2005-06 =sample().Rural=
+returning the literal ='0'= (so =df[df.Rural=='Rural']= returns ZERO rows),
+Mali's missing =Urbain/Urbano= spellings, and =CLAUDE.md='s inverted
+=.pth=/=PYTHONPATH= guidance.
+
+* Decisions waiting on Ethan
+
+1. *GH #603 -- the population record.*  Evidence is now in: #654 (111 waves,
+   378 verbatim quotes) and #658 (per-country =CONTENTS.org= sections; 32
+   countries with documented exclusions, 34 with oversamples/sub-populations).
+   Two findings bear on the design:
+   - *Exactly ONE wave declares an urban exclusion* (Ethiopia ESS1).  ISA
+     countries run *12.7--55% urban realised*, median ~33%; EthiopiaRHS is
+     *0.0% urban in all 8 waves*.  Realised urban share separates rural-only
+     surveys from ISA cleanly; the declared universe does not.
+   - Ethiopia *ESS4/ESPS-5 put ZERO of their urban households through the
+     agriculture questionnaire* while urban is 54% of the sample, whereas
+     ESS1--ESS3 did.  The library spans two module regimes under one feature
+     name with nothing recording the difference.  The "no agriculture in
+     cities" intuition is about *module conditionality*, not sample coverage.
+   - *#654's tag counts are not load-bearing* and should be corrected before
+     #603 leans on them: the ladder promotes WB NADA boilerplate (one sentence
+     is the population statement for 14 waves across 10 countries) above a
+     national statistical office's own BID.  Section 3's verbatim quotes ARE
+     sound.
+
+2. *PR #651 -- Tanzania =UPHI= vs =r_hhid=.*  Do NOT merge its =shocks= re-key
+   without deciding: it silently changes Tanzania's shock counts by 41%.  The
+   NPS back-casts split-offs into EARLIER waves, so one round-1 =r_hhid= can
+   carry up to 11 =UPHI= (see =Tanzania/_/CONTENTS.org= section
+   =#uphi-backcasting=, added by #652).  =food_acquired= already de-duplicates
+   to =r_hhid=; =shocks= keys on =UPHI=.  The two tables are inconsistent
+   either way; it is a grain decision about published tables.
+
+3. *Guinea-Bissau =df_geo= hook* (merged in #653) dispatches *by name off the
+   sub-frame key* -- real current behaviour, but undocumented with zero prior
+   art in the corpus.  Ranked declarative alternatives are in that PR's ledger.
+
+* Open work
+
+** Filed today
+
+| issue | what                                                                  |
+|-------+-----------------------------------------------------------------------|
+| #637  | =groupby().first()= inventory -- 49 sites, 38 fabrication-capable.     |
+|       | Reframed: the composite is usually CORRECT completion; it is wrong    |
+|       | only when rows are DIFFERENT REAL ENTITIES.  Tanzania/Malawi reviewed |
+| #645  | closed by #655                                                        |
+| #647  | Uganda 2019-20 part-harvest columns (=s5aq06*_11/_21=) silently       |
+|       | dropped -- needs the questionnaire to decide if that is correct       |
+| #650  | =Documentation/= should not be optional: 3 waves carry only a         |
+|       | provenance stub, and =add_wave()= never fetches the real documents    |
+| #659  | GhanaLSS =sample().Rural= NULL for 21,026 of 56,330 rows (4/7 waves)  |
+| #660  | Ethiopia: 120/40 households in the ag files but not the cover page    |
+
+** PRs still open
+
+- Four remediated FIX_FIRST PRs (#646 #634 #622 + #643) verified READY.
+- #632 carries one remaining false claim in a test docstring: it says a
+  Togo defect was LIVE; it was LATENT (proven by building round-1 code cold).
+- #612 #620 are red on CI for their own reasons.
+
+** Known unowned
+
+Nigeria 2012Q3/2013Q1 cartesian cells remain (~114k phantom rows).  NOTE:
+#653's report also lists Ethiopia 2013-14/2015-16 -- that is *stale*; commit
+=3488b791= cleared them, as #644 verified.
+
+* Method findings -- read this before dispatching agents
+
+These cost real time today.  Every one of them made a failure look like a
+success.
+
+1. *The cache hides the bug it caused.*  Hit five times.  =LSMS_NO_CACHE=1= is
+   NOT sufficient -- it is soft for script-path L2-wave parquets.  Cold means an
+   isolated =LSMS_DATA_DIR= with =dvc-cache= symlinked to the shared L1.
+
+2. *Which CONFIG tree you measured matters as much as the cache.*
+   =countries_root()= silently follows the main checkout's current branch.  Two
+   "bugs" reported today were =master='s config, not stale data.  Assert
+   =LSMS_COUNTRIES_ROOT= and =lsms_library.__file__=.
+
+3. *A negative control must actually REMOVE the change.*  =git stash= does
+   nothing to a change already committed on the branch -- it silently produces
+   "no difference".  Revert the file against =origin/development=.
+
+4. *A test that passes before AND after is not evidence.*  Repeatedly: 10 of 16
+   Malawi tests passed with the bug fully present; all 4 Guinea-Bissau tests
+   passed on plain =development=; #649's 10 tests all passed while a mutated
+   colmap bucketed 7,153/7,153 rows into =unknown_condition=.
+
+5. *Zero can mean UNMEASURED, not clean.*  An in-process monkeypatch cannot see
+   a =materialize: make= subprocess -- use =runpy=, or measure the source.  And
+   *a broken key produces ZERO duplicates* (Tanzania =shocks= keyed on the
+   panel-line index): verify the table's =i= values live in the household
+   universe, *per wave, never in aggregate*.
+
+6. *Never trust a PR body's status table.*  Three agents were dispatched to
+   redo already-merged work because PR bodies were accurate when written and
+   overtaken by merges.  Check =origin/development= for the fix first.
+
+7. *Put =countries/{C}/_/CONTENTS.org= in the agent's BRIEF.*  Two existing
+   rules already said to read it and neither bit, because an agent reads what
+   its brief tells it to.  Rule now in =CLAUDE.md=; require the agent to NAME
+   the idiosyncrasy it found.
+
+8. *The recurring defect class was never wrong code -- it was wrong CLAIMS.*
+   Of seven PRs held by adversarial review, none had incorrect code; all had a
+   false measurement, a non-discriminating test, a stale duplicate, or a
+   comment asserting cleanliness.  A false claim in a tracked file outlives the
+   PR that introduced it, and =data_info.yml= is worse than a doc because it is
+   the file the next editor opens.
+
+* Housekeeping
+
+- ~30 agent worktrees under =.claude/worktrees/= and 47 MB of stray =.dta= at
+  =lsms_library/countries/= root (bare =2009-10/=, =2018-19/=, =2023-24/= --
+  a script run from the wrong cwd).  Sweep once nothing is running, using the
+  morning's protocol: verify each worktree is clean *and* its HEAD is reachable
+  from a remote ref before removing.  Never a blanket =rm=.
+- =.coder/coverage/latest.csv= is stale for the three =individual_education=
+  cells #655 fixed; needs =make matrix=.
+- Rescue refs from the morning's cleanup are on origin under
+  =rescue/2026-07-21/*= (9 refs) plus patches in =~/lsms-rescue-2026-07-21/=.
+  Safe to delete once nobody wants them.
+- =master= diverged twice today via a =push= reflog entry I could not attribute.
+  If =git reflog show master= shows it again, chase it rather than resetting.
