@@ -130,15 +130,44 @@ Data Scheme:
     #     Nigeria the only country in the library with a non-canonical assets
     #     grain.  A half-fix that also breaks cross-country consistency.
     #
-    # The complete fix is therefore TWO edits, both outside this file and both
-    # with cross-country blast radius (they belong on their own PR):
-    #   1. lsms_library/data_info.yml : index_info assets -> (t, i, j, item_seq)
-    #   2. lsms_library/feature.py    : _ADDITIVE_MEASURE_COLUMNS['assets'] =
-    #                                   ('Value',)   [Quantity must stay first --
-    #                                   it comes from the clean sect5a hh x item
-    #                                   grid and is merely repeated across the
-    #                                   item_seq rows; summing it would multiply
-    #                                   it by the unit count.  Age wants mean.]
+    # CORRECTION (2026-07-22).  The two-edit prescription that stood here was
+    # RIGHT about the data and WRONG about the plumbing.  Both halves have since
+    # been tested rather than reasoned about; recording the result so the wrong
+    # fix is not attempted from this file.
+    #
+    #   1. lsms_library/data_info.yml : index_info assets -> (t,i,j,item_seq)
+    #      -- INERT FOR NIGERIA, and harmful elsewhere.  Verified by experiment
+    #      (PR #629, 2026-07-22): `item_seq` was declared in Nigeria 2012-13's
+    #      `idxvars` AND `final_index` and the wave rebuilt cold; the frame comes
+    #      back on index ['i','t','j'] regardless, with identical rows and Value.
+    #      The `dfs:` merge in Wave.grab_data drops the level BEFORE
+    #      `final_index` is applied -- this is GH #323 SITE 4 (see PR #627), not
+    #      Site 1.  Nigeria cannot emit `item_seq` at all today.
+    #      Consequence: making it canonical would leave edit 2 dead code AND
+    #      silently disable the GH #498 guard for all 25 assets countries, since
+    #      none of them would carry the level either.  Do not do this until
+    #      Site 4 lands.
+    #
+    #   2. lsms_library/feature.py : _ADDITIVE_MEASURE_COLUMNS['assets'] =
+    #      ('Value',)  -- CORRECT, and implemented in PR #629 (open).  Quantity
+    #      must stay `first`: it comes from the clean sect5a hh x item grid and
+    #      is merely repeated across the item_seq rows, so summing it would
+    #      multiply it by the unit count.
+    #
+    #      One trap found while implementing it, worth knowing before anyone
+    #      registers another table there: adding a table to that dict ALSO
+    #      SILENCES ITS GRAIN AUDIT wholesale.  That was harmless while
+    #      `food_acquired` was the only entry (the collapse reconciles every
+    #      column it carries), but `assets` carries `Age`, which no reducer
+    #      reconciles at (t,i,j) -- so the naive registration turned a loud
+    #      13,447-destroyed-rows-per-round report into SILENCE.  #629 re-audits
+    #      on the columns the sum does not reconcile instead.
+    #
+    #      "Age wants mean" (the previous text) is SUPERSEDED.  Two 2026-07-13
+    #      decisions rule it out: the grain contract's P2 -- every cell holds an
+    #      OBSERVED value or NA, and a mean is neither (tests/
+    #      test_gh323_grain_contract.py) -- and the retirement of core's last
+    #      aggregation at Site 2.  Age is reported, not averaged.
     #
     # Declaring a per-column reducer in THIS file was tried and REJECTED (GH
     # #323 D1: core does not aggregate on declaration -- duplicates on a declared
