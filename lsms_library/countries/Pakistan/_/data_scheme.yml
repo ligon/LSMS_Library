@@ -3,11 +3,19 @@ Country: Pakistan
 Data Scheme:
   cluster_features:
     index: (t, v)
+    # Region = province (Punjab/Sind/NWFP/Balochistan), Rural = Urban/Rural, both
+    # from REGIONS.DTA and both provably constant within cluster.  Built by
+    # 1991/_/cluster_features.py, which is unique-by-construction on (t, v) so the
+    # framework's groupby().first() fallback never fires.  GH #323.
+    #
+    # `Language` was REMOVED: it was wired to `langint` (the language OF THE
+    # INTERVIEW), a household attribute that varies within 141/301 clusters.  It is
+    # not a cluster feature, and a modal reducer would invent a cluster attribute
+    # the survey never measured.  `religion`/`langint` remain in F00A.DTA and could
+    # be surfaced as a household-level (t, i) table if wanted.
     Region: str
-    Rural:
-      type: str
-      optional: true
-    Language: str
+    Rural: str
+    materialize: make
 
   interview_date:
     index: (t, i)

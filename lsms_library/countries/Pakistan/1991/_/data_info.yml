@@ -1,14 +1,17 @@
 Country: Pakistan
 Wave: 1991
-cluster_features:
-    file:
-        - F00A.DTA
-    idxvars:
-        v: clust
-        i: hid
-    myvars:
-        Region: religion
-        Language: langint
+# cluster_features is built by _/cluster_features.py (materialize: make).
+#
+# It used to live here, extracted from F00A.DTA (the household COVER SHEET) with
+# `idxvars: {v: clust, i: hid}`.  The `i: hid` level made the extractor emit one
+# row per HOUSEHOLD (4,957) into a table whose declared index is (t, v) (301
+# clusters); _normalize_dataframe_index then dropped `i` and collapsed the table
+# with a silent groupby().first(), discarding 4,656 rows.  The columns were wrong
+# too -- `Region: religion` wired the household's religion code to a geography
+# column, and `Language: langint` was the language of the interview; neither is a
+# cluster attribute.  Real cluster-level geography comes from REGIONS.DTA.  A
+# household-grain source cannot be made unique-by-cluster in YAML, so this table
+# moved to the script path.  GH #323.
 
 sample:
     dfs:
