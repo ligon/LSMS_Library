@@ -1372,7 +1372,16 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
 # carries an audit stamped before GPS was audited, so it under-reports.  Not a
 # cosmetic bump: without it, a warm cache serves values this version would never
 # compute.
-LSMS_CACHE_SCHEMA = 4
+#
+# Bumped 4 -> 5 (GH #645): ``to_parquet`` no longer destroys the literal strings
+# 'None' / 'nan' / '<NA>'.  The loss happened IN THE ACT OF WRITING, so every
+# L2-wave and L2-country parquet on every existing machine already has the nulls
+# baked in -- and the per-table input hashes are unchanged, so without this bump
+# nothing rebuilds and the fix is invisible on exactly the machines where the
+# corruption is already present.  This CHANGES RETURNED DATA (Guatemala
+# individual_education 20,678 -> 29,527 rows), which is precisely why the
+# rebuild must be forced rather than offered.
+LSMS_CACHE_SCHEMA = 5
 
 # Schema-metadata key under which the content hash is embedded.  Embedding
 # (rather than a ``{parquet}.hash`` sidecar) means the hash rotates
@@ -1648,13 +1657,29 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             if str in [type(x) for x in cats]: # At least some categories are strings...
                 df[col] = df[col].cat.rename_categories(lambda x: str(x))
 
-    # Pyarrow can't deal with mixes of types in columns of type object. Just
-    # convert them all to str.
+    # Pyarrow can't deal with mixes of types in columns of type object -- a
+    # genuinely mixed object column still raises ArrowTypeError under
+    # pandas 3.0 / pyarrow 23 ("Expected bytes, got a 'float' object"), so
+    # this guard is still load-bearing.  Just convert them all to str.
+    #
+    # GH #645: capture the null mask BEFORE ``astype(str)``.  The previous
+    # implementation stringified first and then tried to recover the nulls
+    # with ``.replace({'nan': None, 'None': None, '<NA>': None})`` -- but
+    # once a genuine missing has become the three characters ``nan`` it is
+    # indistinguishable from a legitimate value that spells ``nan``, and the
+    # recovery therefore deleted real data.  ``None`` was the canonical
+    # library label for "no education" (see harmonize_education.org), so
+    # every such person was nulled on write and then removed outright by
+    # ``_finalize_result``'s ``dropna(how='all')`` -- 8,849 rows (30%) of
+    # Guatemala's individual_education, 5,328 of Tajikistan's, 242 of
+    # Ethiopia's.  Masking after the cast is information-preserving: only
+    # cells that were *actually* missing become null.
     idxnames = df.index.names
     all = df.reset_index()
     for column in all:
         if all[column].dtype=='O':
-            all[column] = all[column].astype(str).astype('string[pyarrow]').replace({'nan': None, 'None': None, '<NA>': None})
+            na = all[column].isna()
+            all[column] = all[column].astype(str).astype('string[pyarrow]').mask(na)
     if index:
         resolved_idxnames = []
         for i, name in enumerate(idxnames):

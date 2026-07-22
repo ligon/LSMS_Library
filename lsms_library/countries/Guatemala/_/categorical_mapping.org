@@ -40,7 +40,7 @@ refined outputs such as "Primary incomplete" pass through unchanged).
 #+name: harmonize_education
 | Original Label     | Preferred Label  |
 |--------------------+------------------|
-| ninguno            | None             |
+| ninguno            | No education     |
 | educacion adultos  | Informal         |
 | preparatoria       | Pre-primary      |
 | primaria           | Primary complete |

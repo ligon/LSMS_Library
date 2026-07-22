@@ -2240,7 +2240,25 @@ class Country:
             # scripts that need the stricter "drop unless any DATA column is
             # non-null" form should use ``subset=`` themselves; this step is
             # the universal safety-net.
+            #
+            # GH #645: say how many rows it took.  This step is where a *value*
+            # corruption upstream turns into a silent *deletion* -- a nulled
+            # `Educational Attainment` is a deleted person, because the table
+            # has exactly one column.  30% of Guatemala's individual_education
+            # vanished here and nothing said a word (the cell was still graded
+            # `sane`).  INFO, not a warning: legitimately-hollow rows are
+            # common and this must not cry wolf on every table.  Whether it
+            # should escalate above some rate is a judgement for the
+            # maintainer, deliberately not made here.
+            n_before = len(df)
             df = df.dropna(how='all')
+            if len(df) < n_before and n_before:
+                n_dropped = n_before - len(df)
+                logger.info(
+                    "%s/%s: dropna(how='all') removed %d of %d rows (%.1f%%) "
+                    "-- every dropped row had NO non-index data at all",
+                    self.name, method_name or "?", n_dropped, n_before,
+                    100.0 * n_dropped / n_before)
 
             # Attach the ISO 4217 currency label (last, so it rides through the
             # caller's _relabel_j / _add_market_index without being dropped).
