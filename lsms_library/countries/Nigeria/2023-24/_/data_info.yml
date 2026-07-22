@@ -7,36 +7,57 @@ Wave: 2023-24
 # The script handles the pp/ph concat and t-value assignment
 # (2023Q3 / 2024Q1) per the pp-ph skill.
 
+# `v` = composite cluster id (state/lga/ea) built from raw CODES; see the
+# GH #323 note in _/nigeria.py.  This wave has no cluster_features table, but
+# sample.v is what _join_v_from_sample() stamps onto every household table, so
+# the bare `ea` key is just as wrong here: it collapses the wave's 719 real
+# (state, lga, ea) clusters into 404 `ea` codes.  393 households carry the
+# ea == 0 'Moved' sentinel and become singletons.
 sample:
-    file: Post Planting Wave 5/Household/secta_plantingw5.dta
-    idxvars:
-        i: hhid
-    myvars:
-        v: ea
-        weight: wt_cross_wave5
-        panel_weight: wt_longpanel_wave5
-        strata:
-            - strata
-            - mapping:
-                1: North Central
-                2: North East
-                3: North West
-                4: South East
-                5: South South
-                6: South West
-        Rural:
-            - sector
-            - mapping:
-                1. URBAN: Urban
-                2. RURAL: Rural
-                1. Urban: Urban
-                2. Rural: Rural
-                rural: Rural
-                Rural: Rural
-                RURAL: Rural
-                urban: Urban
-                Urban: Urban
-                URBAN: Urban
+    dfs:
+        - df_key
+        - df_main
+    df_key:
+        file: Post Planting Wave 5/Household/secta_plantingw5.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
+    df_main:
+        file: Post Planting Wave 5/Household/secta_plantingw5.dta
+        idxvars:
+            i: hhid
+        myvars:
+            weight: wt_cross_wave5
+            panel_weight: wt_longpanel_wave5
+            strata:
+                - strata
+                - mapping:
+                    1: North Central
+                    2: North East
+                    3: North West
+                    4: South East
+                    5: South South
+                    6: South West
+            Rural:
+                - sector
+                - mapping:
+                    1. URBAN: Urban
+                    2. RURAL: Rural
+                    1. Urban: Urban
+                    2. Rural: Rural
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 individual_education:
     # GH #171: highest education level completed per household member.

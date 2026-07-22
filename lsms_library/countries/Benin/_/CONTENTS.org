@@ -39,6 +39,106 @@ food_quantities.)
 
 * Data Quality Notes
 
+** Grain: the three ways Benin's declared indexes go non-unique (GH #323)
+
+Three Benin tables hand the framework a non-unique declared index, and
+they are *three different things*.  Conflating them is how #323 stayed
+alive elsewhere, so they are separated here.  All figures are cold
+builds under =LSMS_NO_CACHE=1= into an isolated =LSMS_DATA_DIR=; never
+read them off =var/=, which is written *post*-collapse and therefore
+cannot show you the loss.
+
+| table            | dup rows | what it is                      | fixed by                        |
+|------------------+----------+---------------------------------+---------------------------------|
+| =plot_inputs=    |       71 | broken identifier — REAL LOSS   | injective =harmonize_seed_crop= |
+| =cluster_features= |    7,342 | wrong extraction grain — no loss | extraction hook + invariant     |
+| =food_acquired=  |    1,382 | intended bucketing — no loss    | nothing; core already SUMs      |
+
+*** =plot_inputs= — the identifier was broken (fixed 2026-07-13)
+
+=harmonize_input= maps every seed label onto the single =input= value
+=Seed=, so =crop= is the only index level left to tell two seed
+line-items apart — and =harmonize_seed_crop= was non-injective: four
+labels shared one =Autre crop= catch-all, three of which occur in
+Benin's =s16b=.  A household reporting both "Autres semences" (9 kg)
+and "Plants/boutures de tubercules" (6 kg) landed both on
+=(Seed, Autre crop, Kilogramme)= and =groupby().first()= discarded
+one.  71 rows destroyed, 11,445.25 units of reported input quantity,
+and 4 households' =Purchased= flag flipped True→False.
+
+Two accountings circulate for this number and both are right, so say
+which you mean.  *71* counts every non-first row on a duplicated index
+tuple, across 64 conflicting groups.  *68* is the conservative count
+used in the issue text: it drops the 3 pairs whose *measured* payload
+(=Quantity= / =Purchased= / =Quantity_purchased=) happens to be equal,
+where =first()= loses no measurement.  Those 3 are still real losses —
+the two rows name two *different* crops — which is why 71 is the figure
+used here.  Both accountings go to **0** after the fix.
+
+Tuber cuttings are not cereal seed, so *summing* them would have been
+as wrong as dropping one.  The catch-all is split instead (see the
+note above =harmonize_seed_crop= in =categorical_mapping.org=), and
+=2018-19/_/plot_inputs.py= now asserts its declared index is unique
+before writing.  API rows 10,534 → 10,605 = every reported line-item.
+Same defect, same fix, as sibling EHCVM CotedIvoire and Togo — the
+tables were copied verbatim from the Niger reference and inherited the
+bug with it.
+
+*** =cluster_features= — the extraction grain was wrong (fixed 2026-07-21)
+
+=df_main= reads Region/Rural from the *household*-level cover page
+=s00_me_ben2018.dta= while declaring only =v: grappe=, so each
+grappe's attributes are broadcast across its households: 8,012 rows on
+a 670-cluster grain, 7,342 of them duplicate =(t, v)= tuples.
+
+*No value was ever lost*: 0 of 670 grappes carry more than one
+distinct =s00q01= (Region) or =s00q04= (Rural), and
+=grappe_gps_ben2018.dta= is already grappe-level at 670/670.  The
+#323 audit is correctly silent, and it should stay silent.
+
+But that is a fact about the 2018-19 data, not about the extraction.
+=groupby().first()= skips NA *per column*, so a grappe that ever
+straddled two regions would not collapse to one of its households — it
+would collapse to a composite row assembled column-by-column from
+different households, a cluster that exists nowhere in the survey.  So
+=2018-19/_/mapping.py= now carries a =cluster_features(df)= hook that
+projects to cluster grain in the *extraction* and RAISES if any
+cluster straddles two values.  8,012 → 670 rows reach the framework;
+the API result is byte-identical.  This buys
+correctness-by-construction, not rows.
+
+*** =food_acquired= — the bucketing is intended, and core sums it
+
+1,382 rows collide, and here that is *correct*.  The raw source has no
+duplicates (=s07b_me_ben2018.dta=: 187,672 rows, unique on
+=(grappe, menage, s07bq01)=); =harmonize_food= is deliberately
+many-to-one (160 Original Labels → 146 Preferred Labels, 14 buckets
+taking 2 originals each).  Seven of the 14 merely pool an alternate or
+mis-encoded spelling of the same item ("Maïs" with "MaÃ¯s en grain");
+the five that actually collide in the data are the taxonomy's own
+residual categories — =Autres légumes en feuilles= (1,830 rows),
+=Autres poissons fumés= (712), =Riz importé non parfumé= (120),
+=Autre Riz local= (66), =Autres poissons frais= (36).
+
+=food_acquired= is in core's =_ADDITIVE_MEASURE_COLUMNS=, so these are
+SUMMED, not =first()=-ed, which is why the audit is silent.  Colliding
+rows necessarily share =u= *and* =s= (both are in the index), so the
+sums are commensurable by construction.  Verified: wave-frame and API
+totals agree exactly — Quantity 576,293.81, Expenditure 87,287,926.96
+— across the 190,618 → 189,236 row reduction.
+
+*** No =aggregation:= keys, deliberately
+
+An =aggregation: {visit: first}= block sat on =interview_date= until
+2026-07-21.  It was deleted: nothing reads the key (it appears in core
+only inside "skip these meta-keys" sets, and a test pins that the
+collapse does not honour it), the #323 consolidation decided the core
+never aggregates (D1, 2026-07-13), and =visit= is an index *level*
+anyway, so "reduce it with first" named no operation.  Do not add such
+a key back — declaring a reducer only puts a signature on the corpse.
+Where a declared index goes non-unique, the identifier is broken or a
+level is missing; fix that.
+
 ** shocks: at most 2 coping strategies per household in 2018-19
 
 The 2018-19 instrument's shock module captures up to 26 distinct
