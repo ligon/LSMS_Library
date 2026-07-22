@@ -48,6 +48,12 @@ anthro = anthro.dropna(subset=['pid'])
 
 out = anthro[['t', 'i', 'pid', 'Weight', 'Height', 'MUAC']].set_index(['t', 'i', 'pid'])
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# HH_SEC_V.dta is (sdd_hhid, sdd_indid)-unique: 5,587 rows, 5,587 groups, 0
+# duplicates, 0 null sdd_hhid; format_id is injective over the wave's
+# households (1,184 distinct -> 1,184).  The 2019-20 wave carries none of the
+# 2008-15 panel-line replication (that is a property of the upd4 panel files,
+# not of the NPS).  .first() is never called on a cold build.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 

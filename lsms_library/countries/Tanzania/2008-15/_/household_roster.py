@@ -32,7 +32,13 @@ roster['pid'] = roster['pid'].astype(float).astype(int).astype(str)
 
 roster = roster.set_index(['t', 'i', 'pid'])
 
-# Handle duplicates by keeping first occurrence
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# upd4_hh_b.dta is one of the INDIVIDUAL-level upd4 modules, keyed
+# (round, r_hhid, UPI) -- 83,706 rows, 83,706 groups, 0 duplicates, 0 null UPI.
+# (It carries no UPHI column, so it escapes the panel-line replication that
+# hits the household-level modules -- see housing.py.)  The pid formatting
+# (float -> Int64 -> str) is injective: 45,396 distinct UPI -> 45,396 distinct
+# pid.  Measured on a cold build, .first() is never reached.
 if not roster.index.is_unique:
     roster = roster.groupby(level=roster.index.names).first()
 
