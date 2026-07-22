@@ -966,11 +966,18 @@ class Wave:
 
         Severity is graduated because the guard is new and the configs are old:
         a cartesian WARNS by default (naming country, wave, table, keys and the
-        exact phantom-row count) and is FATAL under ``LSMS_GRAIN_STRICT=1``,
-        the same lever the site-1 audit uses.  Warning rather than raising
-        keeps every currently-building country building -- their behaviour is
-        bit-for-bit what it was -- while making the fabrication impossible to
-        miss.  Set ``LSMS_GRAIN_STRICT=1`` in CI once the census is clean.
+        exact phantom-row count) and is FATAL under ``LSMS_GRAIN_STRICT``, read
+        through the SAME ``_grain_strict()`` predicate site 1 and site 2 use
+        (merged with PR #614).  Reading the variable independently here was a
+        latent divergence: a bare ``os.environ.get`` is truthy for ``"0"`` and
+        ``"false"``, so ``LSMS_GRAIN_STRICT=0`` would have made site 4 fatal
+        while sites 1-2 stayed in warn mode.  One lever, one reader.  Warning
+        rather than raising keeps every currently-building country building --
+        their behaviour is bit-for-bit what it was -- while making the
+        fabrication impossible to miss.
+
+        Note the lever is SHARED, so flipping it on in CI is gated on the whole
+        of #323 being clean, not just this site's census.
         """
         keys = [k for k in merge_on if k in left.columns and k in right.columns]
         bad = self._cartesian_keys(left, right, keys)
@@ -994,7 +1001,7 @@ class Wave:
                 f"aggregation afterwards. (GH #323 site 4; set "
                 f"LSMS_GRAIN_STRICT=1 to make this fatal.)"
             )
-            if os.environ.get('LSMS_GRAIN_STRICT'):
+            if _grain_strict():
                 raise ValueError(msg)
             warnings.warn(msg)
         return pd.merge(left, right, on=merge_on, how=how)
@@ -1125,9 +1132,28 @@ class Wave:
                 # others are strict enrichments -- e.g. a cover page that
                 # defines the household roster joined to a geovariable file
                 # that also carries households the cover does not.  Under
-                # `outer` those orphans arrive with null values in every index
-                # level the cover owned, and then collapse together into one
-                # phantom null-keyed row.
+                # `outer` those orphans arrive with a null value in every index
+                # level the cover owned.
+                #
+                # What happens to them next, MEASURED rather than assumed
+                # (Ethiopia 2013-14, geo file has 25 households the cover page
+                # does not): the wave frame is 5,287 rows under `outer` vs
+                # 5,262 under `left`, and 25 of those rows carry a null `v`.
+                # The downstream cluster-grain collapse then DELETES them --
+                # `groupby` drops null keys -- so the delivered table is 433
+                # clusters with identical values (sum Latitude 4070.3702)
+                # EITHER WAY.  An earlier version of this comment said the
+                # orphans "collapse together into one phantom null-keyed row";
+                # they do not survive to the delivered table at all.
+                #
+                # So `merge_how: left` is not a data fix.  It is worth
+                # declaring because (a) it stops manufacturing null-keyed rows
+                # for site 1 to delete, and (b) it keeps the dtype the merge
+                # would otherwise widen (Ethiopia 2013-14 `District` stays
+                # int8 under `left`, becomes float64 under `outer`).  Its cost
+                # is a lost signal: under `outer` the site-1 grain report told
+                # you those 25 geo households had no cover page; `left` drops
+                # them silently.
                 merge_how = data_info.get('merge_how', 'outer')
                 df_edit_function = self.formatting_functions.get(request)
                 idxvars_list = list(dict.fromkeys(data_info.get('final_index')))
@@ -1212,32 +1238,6 @@ class Wave:
                                 how=merge_how)
                     df = df.set_index(idxvars_list)
 
-                # GH #323/#515: did a swallowed KeyError cost a REQUIRED column?
-                # Judged here, on the assembled frame, so a column a sibling
-                # sub-df also supplies does not fire a false alarm.  Only the
-                # config-bug drops (KeyError) can escalate; an unavailable file
-                # stays soft.  Prose is not enforcement.
-                if config_bugs and isinstance(df, pd.DataFrame):
-                    have = set(map(str, df.columns)) | {
-                        str(n) for n in df.index.names if n is not None}
-                    missing = sorted(
-                        set(self._required_scheme_columns(request)) - have)
-                    if missing:
-                        names = ', '.join(
-                            f"'{n}' (file: {f})" for n, f, _ in config_bugs)
-                        first_exc = config_bugs[0][2]
-                        raise RuntimeError(
-                            f"{self.name}/{request}: sub-df(s) {names} loaded but "
-                            f"do NOT carry the column(s) the YAML asks for, leaving "
-                            f"required declared column(s) {missing} ENTIRELY ABSENT "
-                            f"from '{request}'. Serving the table without them would "
-                            f"be silently wrong. Fix the source column names in this "
-                            f"wave's data_info.yml, or mark the column(s) "
-                            f"`optional: true` in the country's data_scheme.yml if "
-                            f"they are genuinely unavailable for this wave "
-                            f"(GH #323/#515). First error: {first_exc!r}"
-                        ) from first_exc
-
                 # Apply any `derived:` transformers declared in the YAML.  These
                 # run on the merged-and-indexed frame, before the per-request
                 # Python hook, so they see the full multi-source result and
@@ -1256,6 +1256,49 @@ class Wave:
                     df = df.drop(columns=[c for c in drop_cols if c in df.columns])
                 if df_edit_function:
                     df = df_edit_function(df)
+
+                # GH #323/#515: did a swallowed KeyError cost a REQUIRED column?
+                # Judged HERE -- after the merge, after `derived:`, after
+                # `drop:` and after the per-request Python hook -- so that
+                # "present" means the same thing it means to this guard's
+                # country-level twin, ``_assert_built_required_columns``, which
+                # deliberately runs post-``_finalize_result``.  Two guards that
+                # judge presence at different moments will eventually disagree,
+                # which is the same trap the shared ``_required_scheme_columns``
+                # was factored out to avoid.  Concretely, a required column
+                # supplied by a `derived:` transformer or by the wave's own
+                # ``df_edit`` hook must NOT be reported absent (review finding
+                # 4 on PR #627; latent when written, not latent forever).
+                #
+                # A column a SIBLING sub-df also supplies likewise does not fire
+                # a false alarm.  Only the config-bug drops (KeyError) can
+                # escalate; an unavailable file stays soft.  Prose is not
+                # enforcement.
+                if config_bugs and isinstance(df, pd.DataFrame):
+                    have = set(map(str, df.columns)) | {
+                        str(n) for n in df.index.names if n is not None}
+                    missing = sorted(
+                        set(self._required_scheme_columns(request)) - have)
+                    if missing:
+                        names = ', '.join(
+                            f"'{n}' (file: {f})" for n, f, _ in config_bugs)
+                        first_exc = config_bugs[0][2]
+                        raise RuntimeError(
+                            f"{self.name}/{request}: sub-df(s) {names} loaded but "
+                            f"do NOT carry the column(s) the YAML asks for, leaving "
+                            f"required declared column(s) {missing} ENTIRELY ABSENT "
+                            f"from '{request}'. Serving the table without them would "
+                            f"be silently wrong. Fix the source column names in this "
+                            f"wave's data_info.yml -- that is the fix in every case "
+                            f"seen so far (Ethiopia, Niger and Nigeria were all a "
+                            f"casing mismatch or a wrong key, with the data sitting "
+                            f"in the file or in a sibling file). Only if the column "
+                            f"is genuinely unavailable, mark it `optional: true` in "
+                            f"the country's data_scheme.yml -- but note that file is "
+                            f"COUNTRY-grain, so doing so disarms this check for the "
+                            f"column in EVERY wave of {self.country.name}, not just "
+                            f"this one (GH #323/#515). First error: {first_exc!r}"
+                        ) from first_exc
 
             else:
                 mapping_details = self.column_mapping(request, data_info)

@@ -112,6 +112,42 @@ def test_merge_subframes_fatal_under_grain_strict(monkeypatch):
             left, right, ["v"], "cluster_features", "df_main", "df_geo")
 
 
+@pytest.mark.parametrize("value", ["0", "false", "no", "", "off"])
+def test_grain_strict_is_read_through_the_one_shared_predicate(monkeypatch, value):
+    """One env lever, ONE reader.
+
+    ``LSMS_GRAIN_STRICT`` is shared with site 1 / site 2, which read it via
+    ``_grain_strict()`` (``.lower() in {"1", "true", "yes"}``, merged in PR
+    #614).  Site 4 originally read it with a bare ``os.environ.get`` truthiness
+    test, which is TRUE for ``"0"`` and ``"false"`` -- so ``LSMS_GRAIN_STRICT=0``
+    would have made this site fatal while the other two stayed in warn mode.
+
+    DISCRIMINATION: this test fails on the pre-review implementation
+    (``if os.environ.get('LSMS_GRAIN_STRICT'):``) for every parameter except
+    the empty string, and passes on ``if _grain_strict():``.
+    """
+    monkeypatch.setenv("LSMS_GRAIN_STRICT", value)
+    assert C._grain_strict() is False, "precondition: site 1 is NOT strict here"
+    left = pd.DataFrame({"v": ["c1", "c1"], "Region": ["N", "N"]})
+    right = pd.DataFrame({"v": ["c1", "c1"], "Lat": [1.0, 1.1]})
+    with pytest.warns(UserWarning, match="CARTESIAN PRODUCT"):
+        _wave_stub()._merge_subframes(
+            left, right, ["v"], "cluster_features", "df_main", "df_geo")
+
+
+@pytest.mark.parametrize("value", ["1", "true", "TRUE", "yes"])
+def test_grain_strict_true_spellings_are_fatal_at_site_4_too(monkeypatch, value):
+    """The other half of the same contract: every spelling site 1 treats as
+    strict must be fatal here as well."""
+    monkeypatch.setenv("LSMS_GRAIN_STRICT", value)
+    assert C._grain_strict() is True
+    left = pd.DataFrame({"v": ["c1", "c1"], "Region": ["N", "N"]})
+    right = pd.DataFrame({"v": ["c1", "c1"], "Lat": [1.0, 1.1]})
+    with pytest.raises(ValueError, match="CARTESIAN PRODUCT"):
+        _wave_stub()._merge_subframes(
+            left, right, ["v"], "cluster_features", "df_main", "df_geo")
+
+
 def test_merge_subframes_clean_merge_is_silent_and_unchanged():
     """The guard must not perturb a healthy merge -- byte-identical to the
     ``pd.merge`` it replaced."""
@@ -236,11 +272,14 @@ def testland(tmp_path, monkeypatch):
     data_root.cache_clear()
 
     def build(scheme: str = _SCHEME, data_info: str | None = None,
-              geo: pd.DataFrame | None = None, geo_file: str = "geo.csv"):
+              geo: pd.DataFrame | None = None, geo_file: str = "geo.csv",
+              wave_module: str | None = None):
         c = croot / "Testland"
         (c / "_").mkdir(parents=True, exist_ok=True)
         (c / "2020" / "_").mkdir(parents=True, exist_ok=True)
         (c / "2020" / "Data").mkdir(parents=True, exist_ok=True)
+        if wave_module is not None:
+            (c / "2020" / "_" / "mapping.py").write_text(wave_module)
         # 4 households in 2 clusters, on BOTH sides -> merging on `ea` is 2x2
         # cartesian within each cluster.
         pd.DataFrame({"hid": ["h1", "h2", "h3", "h4"],
@@ -306,6 +345,74 @@ def test_dropped_subdf_costing_only_an_optional_column_stays_soft(testland):
         df = wave.grab_data("cluster_features")
     assert "Latitude" not in df.columns
     assert "Region" in df.columns          # the primary sub-df still delivered
+
+
+_HOOK_SUPPLIES_LATITUDE = '''\
+def cluster_features(df):
+    """A per-request ``df_edit`` hook that SUPPLIES the required column.
+
+    Stands in for the real-world cases where a declared column is produced by
+    the wave module rather than read straight out of a sub-df.
+    """
+    df = df.copy()
+    df["Latitude"] = 1.5
+    return df
+'''
+
+
+def test_required_column_supplied_by_the_wave_hook_is_not_reported_absent(testland):
+    """WHEN "present" is judged has to match the country-level twin.
+
+    ``Country._assert_built_required_columns`` judges presence AFTER
+    ``_finalize_result``.  This guard originally judged it immediately after
+    ``set_index`` -- before ``derived:``, before ``drop:``, before the
+    per-request Python hook -- so a required column that the wave module
+    supplies would have been reported ENTIRELY ABSENT while the built table
+    carried it.  Review finding 4 on PR #627.
+
+    DISCRIMINATION: this test FAILS (RuntimeError: ... ['Latitude'] ENTIRELY
+    ABSENT) with the check in its original position, and passes with it moved
+    below the hook.
+    """
+    wave = testland(data_info=_data_info(geo_lat_col="LAT_NOT_HERE"),
+                    wave_module=_HOOK_SUPPLIES_LATITUDE)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        df = wave.grab_data("cluster_features")
+    assert "Latitude" in df.columns
+    assert (df["Latitude"] == 1.5).all()
+
+
+def test_the_hard_error_still_fires_when_nothing_supplies_the_column(testland):
+    """The companion to the test above: moving the check later must not turn it
+    off.  Same config, a hook that supplies something ELSE -- still fatal."""
+    hook = 'def cluster_features(df):\n    df = df.copy()\n    df["Other"] = 1\n    return df\n'
+    wave = testland(data_info=_data_info(geo_lat_col="LAT_NOT_HERE"),
+                    wave_module=hook)
+    with pytest.raises(RuntimeError, match=r"required declared column\(s\) \['Latitude'\]"):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            wave.grab_data("cluster_features")
+
+
+def test_hard_error_says_optional_true_is_country_wide(testland):
+    """The escape hatch the message recommends is COUNTRY-grain, and the
+    message must say so.
+
+    ``data_scheme.yml`` is one file per country, so ``optional: true`` disarms
+    the check for that column in EVERY wave -- there is no per-wave granularity
+    to match this per-wave check.  Review finding 2 on PR #627: the old message
+    said "if they are genuinely unavailable for this wave", which reads as if
+    the escape hatch were per-wave.
+    """
+    wave = testland(data_info=_data_info(geo_lat_col="LAT_NOT_HERE"))
+    with pytest.raises(RuntimeError) as exc:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            wave.grab_data("cluster_features")
+    msg = str(exc.value)
+    assert "COUNTRY-grain" in msg
+    assert "EVERY wave of Testland" in msg
 
 
 def test_missing_file_stays_soft_even_for_a_required_column(testland):
