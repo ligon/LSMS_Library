@@ -279,6 +279,35 @@ Columns:
   individual_education:
     Educational Attainment:
       type: str
+      note: |
+        Canonical ordinal vocabulary, low -> high, defined in
+        categorical_mapping/canonical_education_labels.org.  Country grade
+        detail collapses onto these levels; `Unknown` is the non-ordinal
+        sentinel for don't-know / refused / unmappable.
+      spellings:
+        # GH #645: level 0 was spelled `None` until the to_parquet null-coercion
+        # fix.  That spelling was indistinguishable from a missing value after
+        # `astype(str)` -- and from YAML/CSV nulls -- so it was silently nulled
+        # on every parquet write and the row then deleted by
+        # `_finalize_result`'s `dropna(how='all')`.  Renamed to `No education`
+        # throughout `harmonize_education`; `None` stays here as an accepted
+        # VARIANT so parquets written before the rename, and any country whose
+        # mapping table has not been updated, still resolve at API time.
+        No education: ['None', 'NONE', 'none']
+        Informal: []
+        Pre-primary: []
+        Primary incomplete: []
+        Primary complete: []
+        Lower secondary: []
+        Lower secondary complete: []
+        Upper secondary: []
+        Upper secondary complete: []
+        Vocational/Technical: []
+        Tertiary certificate/diploma: []
+        Bachelor: []
+        Postgraduate: []
+        Doctorate: []
+        Unknown: []
   panel_ids:
     previous_i:
       type: str

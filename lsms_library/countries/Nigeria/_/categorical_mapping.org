@@ -889,9 +889,9 @@ Level collapse (mirrors Uganda's grade collapse):
 #+name: harmonize_education
 | Original Label                                                     | Preferred Label              |
 |--------------------------------------------------------------------+------------------------------|
-| none                                                               | None                         |
-| NONE                                                               | None                         |
-| 0. NONE                                                            | None                         |
+| none                                                               | No education                 |
+| NONE                                                               | No education                 |
+| 0. NONE                                                            | No education                 |
 | n1                                                                 | Pre-primary                  |
 | n2                                                                 | Pre-primary                  |
 | N1                                                                 | Pre-primary                  |

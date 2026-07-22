@@ -17,7 +17,7 @@ alongside the label for quantitative analysis.
 
 | Order | Preferred Label             | Covers                                                                 |
 |-------+-----------------------------+------------------------------------------------------------------------|
-|     0 | None                        | Never attended; no formal schooling; "not educated"                    |
+|     0 | No education                | Never attended; no formal schooling; "not educated"                    |
 |     1 | Informal                    | Adult literacy; quranic / religious / integrated; non-graded informal  |
 |     2 | Pre-primary                 | Nursery; kindergarten; pre-school                                      |
 |     3 | Primary incomplete          | Some primary grades; primary cycle not finished                        |
@@ -54,6 +54,19 @@ alongside the label for quantitative analysis.
   ladder (P/M/S/A/T/PS/U, K=Koranic) was decoded from the GLSS questionnaires.  No
   numeric residue remains across the LSMS-ISA education tables.
 - *Never-schooled handling.* The universal `dropna(how='all')` drops rows whose
-  only column (`Educational Attainment`) is NaN, so never-schooled members are
-  currently dropped rather than represented as `None`.  Whether to surface them
-  as a `None` row is an open #171 design question.
+  only column (`Educational Attainment`) is NaN, so members for whom the survey
+  recorded *nothing at all* are dropped.  Members the survey positively records
+  as never-schooled are kept, as `No education`.  Whether to surface the
+  *silent* never-schooled as a row too is an open #171 design question.
+- *Level 0 was spelled `None` until GH #645, and that spelling destroyed data.*
+  `to_parquet` used to stringify object columns and then recover nulls by
+  matching the strings `'nan'` / `'None'` / `'<NA>'` — so the label was
+  indistinguishable from a missing value and was nulled on every parquet write,
+  after which `_finalize_result`'s `dropna(how='all')` deleted the row outright
+  (8,849 rows — 30% — of Guatemala's `individual_education`).  The write path is
+  fixed, but the label is renamed as well: a canonical value that collides with
+  the null literal under `str()`, YAML, CSV and parquet round-trips is a trap
+  that will keep re-arming itself.  `None` remains an accepted *variant*
+  spelling (`data_info.yml` → `Columns.individual_education.Educational
+  Attainment.spellings`), so historical data and any not-yet-updated country
+  still resolve to `No education` at API time.

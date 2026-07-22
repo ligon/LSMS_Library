@@ -22,7 +22,7 @@
 #+name: harmonize_education
 | Original Label | Preferred Label              |
 |----------------+------------------------------|
-| Illitera       | None                         |
+| Illitera       | No education                 |
 | Literate       | Informal                     |
 | < Primar       | Primary incomplete           |
 | Primary        | Primary complete             |

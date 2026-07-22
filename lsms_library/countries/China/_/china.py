@@ -56,7 +56,7 @@ def _years_to_education_level(y):
     if y == 99 or y < 0:
         return pd.NA                       # missing sentinel
     if y == 0:
-        return 'None'
+        return 'No education'
     if y <= 5:
         return 'Primary incomplete'
     if y == 6:
