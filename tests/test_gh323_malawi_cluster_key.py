@@ -199,38 +199,32 @@ def test_every_wave_uses_the_same_eight_digit_ea_keyspace(sample):
 # 3.  The df_geo merges: no cartesian product, and the key actually matches.
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("wave", ["2010-11", "2019-20"])
-def test_the_known_cartesian_geo_merges_are_documented_where_they_live(wave):
-    """2010-11 and 2019-20 merge a HOUSEHOLD-grain geo file on the CLUSTER key.
-
-    That pairs every household with every geo row sharing its `v`: 196,083 rows
-    from 12,271 (183,812 phantom) and 185,842 from 14,612 (171,230 phantom).
-    It is Site 4, it is owned centrally by PR #627's cardinality guard, and it
-    is deliberately NOT fixed here -- but it must not be silent either.  A
-    cartesian repeats values rather than inventing them, so it changes no
-    contested-cell count; see the paired test below, which is the load-bearing
-    claim.
-    """
-    cfg = _wave_config(wave)["cluster_features"]
-    assert cfg.get("merge_on") == ["v"], (
-        f"{wave}: if this now merges on `i` the cartesian has been fixed -- "
-        "update the note in data_info.yml and tell PR #627 it lost an example"
-    )
-    src = (countries_root() / "Malawi" / wave / "_" / "data_info.yml").read_text()
-    assert "SITE 4" in src and "CARTESIAN" in src, (
-        f"{wave}: the known cartesian df_geo merge must stay documented in "
-        "data_info.yml, next to the declaration that causes it"
-    )
+# A test used to sit here pinning 2010-11 and 2019-20 as KNOWN-cartesian and
+# deliberately unfixed, so PR #627's census would keep them as evidence.  Its
+# own failure message named the condition for retiring it -- "if this now merges
+# on `i` the cartesian has been fixed ... tell PR #627 it lost an example" -- and
+# that has now happened: both waves merge on `i`, 183,812 and 171,230 phantom
+# rows -> 0, values bit-for-bit unchanged.  What replaced it is the widened
+# parametrize below (the two waves join the third in requiring `df_geo` to build
+# `i` exactly as `df_main` does) plus the row-count assertions in
+# tests/test_gh323_malawi_gb_cartesian.py, which is where the cartesian itself
+# is measured.
 
 
-@pytest.mark.parametrize("wave", ["2016-17"])
+@pytest.mark.parametrize("wave", ["2010-11", "2016-17", "2019-20"])
 def test_geo_subframe_builds_i_exactly_as_the_main_frame_does(wave):
     """Both halves of IHS4/IHS5 live in one table, so `i` for the
     Cross_Sectional half is run through `cs_i` to keep it apart from the Panel's
     y{3,4}_hhid.  The geo block declared the RAW case_id, so its merge key never
     matched: 2016-17 ended up with GPS for 0 of its 880 clusters, plus 12,447
     orphan geo rows manufactured by the outer join.  The two blocks must build
-    `i` identically or they drift apart again."""
+    `i` identically or they drift apart again.
+
+    Widened to all three household-keyed waves when 2010-11 and 2019-20 stopped
+    merging on the cluster key (GH #627).  For those two the risk runs the other
+    way from 2016-17's: there the mismatch matched NOTHING, here a mismatch
+    would silently reintroduce the cartesian.  2010-11 declares a bare
+    `case_id` on both sides; 2019-20 runs it through `cs_i` on both."""
     cfg = _wave_config(wave)["cluster_features"]
     main_i = cfg["df_main"]["idxvars"].get("i")
     geo_i = cfg["df_geo"]["idxvars"].get("i")
