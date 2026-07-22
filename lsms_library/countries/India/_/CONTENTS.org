@@ -1,5 +1,257 @@
 #+title: Contents
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence for what the India survey CLAIMS to represent, kept deliberately
+separate from what the data look like.  One wave only (=1997-98=).  Cross-refs:
+the =sample.Rural= entry below in this file (#602) is the data-side counterpart
+of the "no rural/urban universe is claimed" finding recorded here; the two
+agree and neither should be read without the other.
+
+** 1997-98 — declared universe (verbatim)
+
+Survey: /India - Uttar Pradesh and Bihar Survey of Living Conditions 1997-1998/
+(catalog title; the questionnaire cover reads "SURVEY OF LIVING CONDITIONS /
+UTTAR PRADESH AND BIHAR").  Catalog IDNO =IND_1997_SLCUPB_v01_M=, WB Microdata
+catalog entry 276, DOI https://doi.org/10.48529/q6sh-b869.
+
+Source (held IN this repo, not catalog-only):
+=India/1997-98/Documentation/ddi-documentation-english_microdata-276.pdf=,
+printed page 3 (PDF page index 2), section "Sampling" > "Sampling Procedure",
+sub-heading "Sampling Universe:".  Byte-identical text also appears in the WB
+catalog record at
+=dataset.metadata.study_desc.method.data_collection.sampling_procedure=.
+Language: English (no translation needed).  Verified verbatim against the PDF
+2026-07-21.
+
+#+begin_quote
+Sampling Universe:
+
+The universe for the study comprised 4 statistical regions: 2 in Uttar Pradesh
+(Eastern and Southern), and 2 in Bihar (Northern and Central). Altogether,
+there were 55 districts in the area covered by the study: 24 districts in the 2
+statistical regions in Uttar Pradesh, and 31 districts in the 2 statistical
+regions covered in Bihar.
+#+end_quote
+
+Immediately preceding it, same page, sub-heading "Sampling Information:" — this
+is the frame from which the 4 regions were carved, quoted for context:
+
+#+begin_quote
+Uttar Pradesh and Bihar, the two states selected for the study, are divided
+into 8 statistical regions: 5 in Uttar Pradesh (Himalayan, Western, Central,
+Eastern, and Southern) and 3 in Bihar(Southern, Northern, and Central).
+#+end_quote
+
+[sic — ="Bihar(Southern"= is unspaced in the source.]
+
+*The universe statement is AREA-level, not unit-level.*  It names 4 statistical
+regions / 55 districts.  It never says "all private households in ...", never
+names an observation unit, and states no inclusion or exclusion rule for any
+kind of household or person.  Whatever this survey represents, the
+documentation says only /where/, never /who/.  This is subnational by
+construction: nothing here is a claim about India.
+
+** 1997-98 — exclusions
+
+*No exclusion statement exists.*  Recorded as a gap, not as "no exclusions".
+
+What was searched: the full DDI text (793,507 chars extracted with pdfminer)
+for =universe=, =target population=, =geographic coverage=, =sampling
+deviation=, =response rate=, =weighting=, =rural=, =urban=, =exclud*=,
+=omitt*=, ="not covered"=, =nomad=, =institution=; both questionnaire PDFs
+(=slc-hh97.pdf= household, =slc-cq97.pdf= village) front-matter — both are
+blank instruments, cover page plus contents, carrying no scope statement; and
+the WB NADA catalog record for =IND_1997_SLCUPB_v01_M=.  Nothing found.
+
+Structurally there is nowhere for such a statement to be: the DDI's *"Data
+Processing"* and *"Data Appraisal"* sections both read, verbatim, =No content
+available=, and the report carries no "Weighting", "Response Rate" or
+"Deviations from Sample Design" section at all.  The absence is an absence of
+documentation, not evidence of an unrestricted universe.
+
+The 8-regions-to-4 reduction quoted above is the only bound-by-remainder in the
+record: 3 of Uttar Pradesh's 5 regions (Himalayan, Western, Central) and 1 of
+Bihar's 3 (Southern) lie outside the study area.  That is a geographic
+carve-out and should be read as one, but note the document frames it as
+/selection/, never as /exclusion/.
+
+*** CAUTION — do not upgrade "rural" from inference to claim
+
+The WB catalog abstract opens "A two-part study of *rural poverty* was carried
+out in 1997-98 ...", and every PSU in the design is a "village".  These are
+strongly suggestive of a rural-only universe.  *No document in either source
+states a rural-only universe as such.*  The word =rural= does not appear
+anywhere in the front matter of the local DDI (pages 1-9: zero hits, checked).
+Do not record "rural households" as this survey's population; it is an
+inference from the study's title and its PSU vocabulary, not a claim by anyone.
+
+This is the documentation-side twin of the =sample.Rural= finding (#602, below
+in this file): the shipped data carry no urban/rural variable, and the
+documentation asserts no urban/rural universe.  Neither source supports a
+rural/urban classification, from either direction.
+
+** 1997-98 — sub-samples and oversample  [IMPORTANT for anyone pooling]
+
+*This wave contains a purposive, double-rate oversample of 30 previously-visited
+villages.*  It is not flagged anywhere in the library's tables; a naive
+unweighted pooling of India will overweight them ~2:1 at the household level.
+
+The design, verbatim, same DDI page 3, sub-heading "Sampling Strategy:":
+
+#+begin_quote
+The sampling strategy followed for the quantitative study basically involved
+dividing the sample population into four main strata:
+1) districts that were covered in the qualitative study in Bihar (i.e. 4 districts)
+2) districts that were covered in the qualitative study in Uttar Pradesh (i.e. 3 districts)
+3) remaining districts in the 2 selected regions of Bihar (i.e. 27 districts)
+4) remaining districts in the 2 selected regions of Uttar Pradesh (i.e. 21 districts)
+#+end_quote
+
+#+begin_quote
+All 12 villages in Stratum 1 that were covered in the qualitative study were
+included in the sample. Similarly, all 18 villages in Stratum 2 that were
+covered in the qualitative study were included in the sample. In each of these
+30 villages, 30 households each were picked at random for the survey.
+
+In stratums 3 and 4, 45 villages each were selected for the survey. A two-step
+procedure was used to select villages in these two strata: first, 9 districts
+were selected in each stratum using PPS. In each of the 9 districts, 5 villages
+were then selected at the second stage, again using PPS. In each of these 90
+villages altogether, 15 households each were selected for the survey.
+#+end_quote
+
+And on the qualitative phase those 30 villages come from (same page):
+
+#+begin_quote
+In the first phase of the project, qualitative field work was carried out in 30
+villages: 3 villages each from 4 districts in Bihar (Mungher, Jehanabad,
+Saharsa, and Vaishali), and 6 villages each from 3 districts in Uttar Pradesh
+(Banda, Allahabad, and Gorakhpur).
+#+end_quote
+
+What that amounts to:
+
+| stratum | area                        | villages | selection             | HH/village | households |
+|---------+-----------------------------+----------+-----------------------+------------+------------|
+|       1 | Bihar, qualitative-phase    |       12 | ALL, with certainty   |         30 |        360 |
+|       2 | UP, qualitative-phase       |       18 | ALL, with certainty   |         30 |        540 |
+|       3 | Bihar, remaining districts  |       45 | PPS two-stage         |         15 |        675 |
+|       4 | UP, remaining districts     |       45 | PPS two-stage         |         15 |        675 |
+|---------+-----------------------------+----------+-----------------------+------------+------------|
+|         | total                       |      120 |                       |            |       2250 |
+
+Two distinct things make strata 1-2 a sub-population rather than just a stratum:
+
+1. *They were taken with certainty and non-randomly.*  "All 12 villages ... were
+   included"; they are the villages the earlier qualitative phase happened to
+   visit, not a probability draw from anything.  They have no design-based
+   inclusion probability in the ordinary sense.
+2. *They were sampled at twice the household rate* (30 vs 15 per village).  They
+   are 25% of villages but 40% of households (900 / 2,250).
+
+They are also, by construction, villages that had *already been enumerated once*
+by the same project.  The documentation does not discuss whether that matters;
+recorded here as a fact of the design, not as a claim about its consequences.
+
+The strata survive into the library.  =sample.strata= carries =UP-qual=,
+=UP-other=, =B-qual=, =B-other= — the =-qual= labels are strata 2 and 1, the
+=-other= labels strata 4 and 3.  So the oversample IS separable: subset or
+weight on =strata=.  The DDI's own variable list documents this variable as
+=stratum=, "Stratum (1-4)", in both =HHLIST= and =PSULIST=.  This independently
+corroborates the #602 finding below that =stratum= is a state-x-sampling-phase
+stratum and never an urban/rural one.
+
+No other sub-population appears: no ethnic/minority booster, no poverty-targeted
+module subsample, no refresh vs extended sub-panel (this is a single
+cross-section, not a panel).
+
+** 1997-98 — universe vs. what the weights represent
+
+*The documentation never says what the weights raise to.*  The DDI variable list
+documents =weight= in both =HHLIST= ("The file contains household listing data
+including geographic area information and weighting coefficient") and =PSULIST=
+("... community listing information including geographic area and weighting
+coefficient"), with the variable label, verbatim, =Raising factor=.  There is no
+"Weighting" section in the DDI and no weighting text in the catalog record.
+
+So: a raising factor is shipped, its target population is nowhere stated, and
+the only universe statement in the record is an /area/ (4 regions, 55
+districts) rather than a /population/.  A user computing a weighted mean from
+this wave is estimating a quantity for a population that the documentation does
+not define.  That is the honest reading; do not repair it by assuming the
+weights raise to "all rural households in the 4 regions".
+
+** 1997-98 — where the statements live
+
+| statement                                   | source                        | in this repo? |
+|---------------------------------------------+-------------------------------+---------------|
+| Sampling Universe (4 regions / 55 districts)| DDI PDF p.3 = catalog         | YES           |
+| Sampling Information (8 regions)            | DDI PDF p.3                   | YES           |
+| Sampling Strategy (4 strata, oversample)    | DDI PDF p.3                   | YES           |
+| =weight= = "Raising factor"                 | DDI PDF p.11-12 variable list | YES           |
+| geographic coverage sentence                | WB catalog =geog_coverage=    | *catalog only* |
+| "study of rural poverty" abstract           | WB catalog =abstract=         | *catalog only* |
+
+The load-bearing universe statement is held locally, so it is not a moving
+target.  The two catalog-only items are NOT held in this repo and can change
+without notice; they are recorded here as quotations with that caveat attached,
+and neither is used above to establish the universe.
+
+Catalog-only text, verbatim, WB Microdata record =IND_1997_SLCUPB_v01_M=,
+=study_desc.study_info.geog_coverage=:
+
+#+begin_quote
+The survey covered south and eastern Uttar Pradesh and north and central Bihar.
+#+end_quote
+
+Same record, =study_desc.study_info.abstract= (opening; the "rural poverty"
+phrase flagged above):
+
+#+begin_quote
+A two-part study of rural poverty was carried out in 1997-98 in south and
+eastern Uttar Pradesh and north and central Bihar. This study utilized both
+qualitative methods - rapid rural appraisal (RRA) & participatory rural
+appraisal (PRA) methodologies, and semi-structured interviews - as well as
+quantitative methods drawing on data collected from household and community
+surveys modelled after the World Bank's Living Standards Measurement Study
+(LSMS) surveys.
+#+end_quote
+
+#+begin_quote
+The data being distributed are from the quantitative component of the study,
+field work for which was carried out between December 1997 and March 1998. Data
+were collected through household and village-level questionnaires in 120
+villages drawn from a sample of 25 districts in UP and Bihar states; a total of
+2,250 households were interviewed during the course of the survey (more details
+on distribution of the sample are provided in the sampling section of this
+note). Of the sample of 120 villages where the household and village surveys
+were conducted, 30 had been visited in the earlier qualitative component of the
+study, while the remaining 90 were drawn at random from the sample districts.
+#+end_quote
+
+The "25 districts" reconciles with the strategy above: 4 + 3 qualitative-phase
+districts plus 9 + 9 PPS-selected districts.  Minor documentation-internal
+discrepancy, noted so the next reader does not chase it: the abstract says
+"2,250 households", the DDI's file description gives =HHLIST= "Cases 2251".
+
+*No NADA boilerplate.*  This wave's universe text is survey-specific prose, not
+the WB NADA template sentence that recurs verbatim across 15 other waves in the
+corpus.  It attests an actual description of this study's design.
+
+** 1997-98 — what is NOT established
+
+- No unit-level universe (no "all private households", no household definition,
+  no residence rule).
+- No institutional / collective / nomadic / homeless exclusion clause, in either
+  direction.
+- No rural-only claim (see caution above).
+- No response rate, no sampling deviations, no non-response treatment.
+- No statement of the population the =Raising factor= raises to.
+
+Each of these is a gap in the record, established by the search documented
+above.  None should be filled by inspecting the =.dta= files.
+
 * sample.Rural — NOT available (2026-07-12, #602)
 
 =sample= carries no =Rural= (urban/rural) column, deliberately.

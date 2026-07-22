@@ -33,6 +33,337 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 Senegal has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence for what each Senegal wave *claims* to cover, kept deliberately
+separate from what the data look like.  Every statement below is quoted
+verbatim from a named document at a named location; anything not quoted is
+labelled as editorial.  Nothing here is inferred from the =.dta= files.
+
+Both Senegal waves are EHCVM (=Enquête Harmonisée sur les Conditions de Vie
+des Ménages=), the WAEMU/UEMOA harmonized series run by ANSD with the World
+Bank and the WAEMU Commission.  See also =Household Presence / MonthsSpent=
+above, which documents the EHCVM 6-month *membership* rule (=s01q12= /
+=s01q13=) -- that rule decides who counts as a member of a sampled household
+and is a different question from the survey's declared universe.
+
+** 2018-19 (EHCVM-1) -- universe stated, in local documentation
+
+*** Declared universe (verbatim)
+
+Source :: =lsms_library/countries/Senegal/2018-19/Documentation/ddi-documentation-english_microdata-4297.pdf=,
+PDF page 3, section =Coverage= > =UNIVERSE= (immediately below
+=GEOGRAPHIC COVERAGE / National coverage=).  Language: English.
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+The same page, =GEOGRAPHIC COVERAGE=, verbatim: "National coverage".
+
+The identical string is carried in the WB catalog DDI XML export for study
+4297 (=<universe><![CDATA[...]]></universe>=), so the local file and the
+catalog agree.  This wave's statement therefore lives *in the repository*,
+not only in catalog metadata.
+
+*** WARNING: this universe sentence is WB NADA boilerplate
+
+That exact sentence is the single most repeated string in the cross-country
+population corpus -- it appears verbatim in roughly fifteen waves, including
+every WAEMU/EHCVM country (Benin, Burkina Faso, Cote d'Ivoire, Guinea-Bissau,
+Mali, Niger, Senegal, Togo) *and* in Ethiopia 2018-19 / 2021-22 and Nigeria
+2015-16 / 2018-19 / 2023-24, which are not EHCVM at all.
+
+It attests *which World Bank metadata template was filled in*.  It is not
+independent evidence that ANSD made that specific claim about this specific
+survey.  Treat it as a template default unless corroborated by a
+Senegal-specific document -- and no Senegal-specific document corroborating
+it was found (the local Basic Information Document for 4297 has a =Sample=
+section but no universe or target-population statement; see the gap note
+below).
+
+*** Exclusions
+
+- Population exclusions :: the four institutional/collective categories in
+  the quoted sentence -- prisons, hospitals, military barracks, school
+  dormitories.  Note this list is *narrower* than several sibling EHCVM
+  countries' own national-language reports, which additionally exclude
+  diplomatic households and the homeless (e.g. Burkina Faso 2018-19).  No
+  Senegal document found extends the list; recorded as it stands.
+- Geographic exclusions :: *none stated, and one document states the
+  opposite.*  DDI PDF page 4, =Sampling= > =SAMPLING PROCEDURE=, first
+  sentence, verbatim: "The Senegal EHCVM 2018/19 sample covers all regions
+  with urban and rural areas surveyed in all regions."  The same sentence
+  appears in the local Basic Information Document, =Sample= section.  There
+  is no dropped region and no urban- or rural-only restriction.  (This is
+  worth stating explicitly: Guinea-Bissau's EHCVM *does* carry such a
+  restriction -- "apart from the autonomous sector of Bissau (SAB) where all
+  respondents are from urban areas" -- so its absence here is informative,
+  not merely unrecorded.)
+- Security carve-outs :: none stated for this wave.
+
+*** Sub-sample structure: the two =vagues= are halves of every EA
+
+This is the sub-sample fact a pooling analyst needs.  The wave is not a
+single fieldwork pass: each EA was *split in half*, and the halves were
+interviewed in two seasons.  DDI PDF page 4, =SAMPLING PROCEDURE=, verbatim
+(identical text in the local BID, =Sample=, and in WB catalog 4297):
+
+#+begin_quote
+The total survey sample size is 7156 households - 3941 from urban areas and
+3215 from rural areas. After that, the survey design randomly divided each
+enumeration area into two equal groups. The survey team interrogated the
+first group in wave 1 and the other in wave 2. Finally, for various reasons,
+including availability and quality monitoring, the final sample size
+comprises slightly more households (twenty) in round 2 than in round 1. In
+wave one, the survey teams interviewed 3568 households (1961 in urban areas
+and 1607 in rural areas. In wave two, the teams interviewed 3588 households
+(1980 in urban areas and 1608 in rural areas).
+#+end_quote
+
+(Quoted as printed, including the unclosed parenthesis after "1607 in rural
+areas".)
+
+Same PDF, page 2, =ABSTRACT=, verbatim: "The surveys took place in two waves
+with each wave covering half of the sample. The first wave was fielded
+between September 2018 and December 2018, while the second wave occurred
+between April 2019 and July 2019. The two-wave approach was chosen to
+account for seasonality of consumption."
+
+Consequences for anyone pooling this wave:
+
+- The =vague= split is *seasonal*, by design.  Any within-wave comparison
+  across =vague= is confounded with season, deliberately so.
+- Because each EA is split rather than each EA being assigned wholly to one
+  =vague=, the design intent differs from the library's operating
+  assumption for EHCVM countries.  =CLAUDE.md= records the convention that
+  "each =grappe= is visited in exactly one =vague=", hence =v: grappe= and
+  =i: [grappe, menage]= rather than composites including =vague=.  The
+  documentation above says the *households* within an EA were split between
+  =vagues=, i.e. an EA appears in both.  Flagged, not adjudicated -- this is
+  a discrepancy between a documented design statement and a library
+  configuration convention, and resolving it needs someone to look at the
+  Senegal identifiers directly.
+
+*** Stated representativeness (a different claim from the universe)
+
+DDI PDF page 2, =ABSTRACT=, verbatim: "The EHCVM is a nationally
+representative survey of 7,100 households, which are also representative of
+the geopolitical zones (at both the urban and rural level)."
+
+Note the sample-size figures do not agree across documents: "approximately
+7,100" (=SERIES INFORMATION=), "7,100" (=ABSTRACT=), "7156" (=SAMPLING
+PROCEDURE= and the BID), and "7 176" / "7,176" in the *2021-22* BID's
+retrospective description of the 2018/19 sample (French and English
+respectively).  Quoted as printed in each; not reconciled here.
+
+No weighting statement was found for this wave in any source (the WB catalog
+=weight= field is empty), so there is no document saying what the weights
+are constructed to represent, as distinct from the declared universe.
+
+** 2021-22 (EHCVM-2) -- NO universe statement exists; gap recorded
+
+*** The gap
+
+*No universe or target-population statement was found for this wave in any
+local or catalog source.*  This is recorded as a gap, not filled by
+inference.  Searched, with results:
+
+| Location searched                                            | Result                                            |
+|--------------------------------------------------------------+---------------------------------------------------|
+| =Senegal/2021-22/Documentation/=                             | contains only =SOURCE.org=; no DDI PDF, no report |
+| WB catalog 6278 JSON (=api/catalog/6278?id_format=id=)       | =study_info= has no =universe= key at all         |
+| WB catalog 6278 DDI XML export (=/metadata/export/6278/ddi=) | no =<universe>= element (0 matches)               |
+| WB catalog 6278 study-description web page                   | no Universe heading under Coverage                |
+| Basic Information Document, English (=download/100388=)      | no universe / target-population statement         |
+| Basic Information Document, French (=download/100389=)       | no =champ=, =population cible=, =ménages collectifs=, =caserne=, =prison=, =internat= |
+| Household questionnaires, waves 1 and 2 (=download/100386=, =/100387=) | no universe statement                    |
+
+The method is known-good: the same =<universe>= grep against the 4297 export
+*does* return the 2018-19 sentence, so the absence at 6278 is a real absence
+and not a failed lookup.  (Independently re-verified against the live catalog
+while drafting this section.)
+
+*Do not silently inherit the 2018-19 universe for 2021-22.*  It is a
+defensible inheritance -- the 2021-22 design explicitly builds on the
+2018/19 frame (quoted below) -- but no document says so, and writing it in
+as this wave's universe would manufacture a claim.  Left open for the
+maintainer.
+
+The closest statements that exist, quoted verbatim and *not* universe
+statements:
+
+- WB catalog 6278, =study_info.geog_coverage= :: "National coverage"
+- WB catalog 6278, =series_statement.series_info= :: "The Senegal EHCVM
+  2021/22 is the second edition of a nationally representative household
+  survey conducted within the West Africa Economic Monetary Union (WAEMU)
+  Household Survey harmonization Project (P153702) ... The survey covers all
+  regions and includes approximately 7,100 households."
+- WB catalog 6278, =study_info.abstract= :: "The EHCVM is a nationally
+  representative survey of 7,100 households, which are also representative
+  of the geopolitical zones (at both the urban and rural level)."
+
+Note that the statement lives *only in WB catalog metadata plus two
+downloadable BIDs* -- the repository holds no documentation file for this
+wave beyond =SOURCE.org=.  For this wave the record is therefore a moving
+target: if the World Bank re-issues the catalog entry, nothing in this
+repository preserves what it previously said.
+
+*** Exclusions: two enumeration areas were dropped, one for security
+
+This *is* documented, and it was not in the catalog metadata -- it is only in
+the Basic Information Document.
+
+Source :: Basic Information Document (French),
+=microdata.worldbank.org/index.php/catalog/6278/download/100389=, section
+"4. Échantillonnage / 4.1. Volet ménage et communautaire", under "Plan
+d'échantillonnage".  Verbatim (whitespace normalized from the justified-text
+PDF extraction; wording, punctuation and accents unaltered):
+
+#+begin_quote
+Deux DRs n’ont pas été couverts lors de cette deuxième édition : l’un -a été
+retiré- pour des raisons de sécurité et l’autre au motif de refus des
+populations. Pour ce dernier DR, seuls trois ménages sur douze ciblés ont
+été enquêtés en 2018/2019.
+#+end_quote
+
+Translation (not source text) :: "Two DRs [=districts de recensement=,
+enumeration areas] were not covered in this second edition: one was
+withdrawn for security reasons and the other because of refusal by the
+population. For the latter DR, only three of the twelve targeted households
+had been surveyed in 2018/2019."
+
+The hyphens around "-a été retiré-" are as extracted from the PDF and are
+reproduced rather than silently cleaned.
+
+*** WARNING: the English BID mistranslates the unit of that exclusion
+
+Source :: Basic Information Document (English),
+=catalog/6278/download/100388=, same section.  Verbatim:
+
+#+begin_quote
+Two administrative regions (DRs) were not covered in this second edition:
+one was excluded due to security reasons, and the other due to refusal from
+the population. For this latter DR, only three out of the twelve targeted
+households were surveyed in 2018/2019.
+#+end_quote
+
+"DR" is =district de recensement= -- an *enumeration area*, the primary
+sampling unit.  The French BID uses "DR" interchangeably with "grappe"
+("les grappes ou districts de recensement (unités primaires de sondage)"),
+and the twelve-households-per-DR figure is the per-EA target, which settles
+it.  The English BID's "administrative regions" is wrong.  A reader working
+from the English document would conclude that two of Senegal's fourteen
+*regions* were dropped in 2021-22.  They were not: two EAs were.  Flagged
+explicitly because the error is in an official document and is
+consequential.
+
+*** Sub-samples: panel households plus a top-up, and no fresh national draw
+
+Source :: BID French, 4.1, verbatim:
+
+#+begin_quote
+L’édition 2 est une enquête de panel par grappes et le plan d’échantillonnage
+s’appuie sur celui de l’enquête de 2018/2019.
+#+end_quote
+
+#+begin_quote
+La base de sondage de l’enquête de 2018/2019 est le Recensement général de la
+Population et de l’Habitat, de l’Agriculture et de l’Elevage (RGPHAE) de
+2013. En 2021/2022, il a été procédé à un dénombrement dans les mêmes
+grappes.
+#+end_quote
+
+#+begin_quote
+En 2021/2022, la stratégie a consisté à revisiter les mêmes grappes. Il
+s’agit, en priorité pour chaque grappe, d’enquêter les -12- ménages de
+2018/2019 s’ils sont retrouvés (après la phase de dénombrement). Par la
+suite, il est question de compléter l’échantillon à 12 ménages dans les
+grappes où moins de 12 ménages ont été retrouvés pendant la phase de
+dénombrement (soit parce qu’il y a eu moins de 12 ménages dans la base de
+données finale de 2018/2019, soit parce qu’une partie des ménages n’est pas
+retrouvée généralement pour déménagement).
+#+end_quote
+
+Translation of the third quotation (not source text) :: "In 2021/2022 the
+strategy consisted of revisiting the same clusters.  The priority for each
+cluster is to survey the 12 households from 2018/2019 if they are found
+again (after the enumeration phase).  Thereafter the aim is to complete the
+sample back to 12 households in clusters where fewer than 12 households were
+found during the enumeration phase (either because there were fewer than 12
+households in the final 2018/2019 database, or because some households were
+not found, generally through having moved)."
+
+The English BID states the same, verbatim: "The second edition is a cluster
+panel survey, and the sampling plan builds upon that of the 2018/2019
+survey."
+
+So *this library wave contains two distinct sub-populations in one table*:
+(a) 2018/19 panel households re-found in their original cluster, and (b)
+replacement households drawn to top each cluster back up to twelve.  The
+documents describe the mechanism but never report how many households fall
+in each group, and never state what population group (b) is meant to
+represent.
+
+Cross-reference, repository-internal :: =Senegal/_/panel_ids.py= (docstring)
+already records the corresponding split as observed in the source file --
+the 2021-22 cover sheet =s00_me_sen2021.dta= carries a =PanelHH= flag with
+values ="Menage Panel"= (6127 rows) and ="Nouveau Ménage"= (993 rows).  That
+is a *property of the data*, recorded there, and is noted here only because
+it is the empirical counterpart of the documented top-up mechanism.  It is
+not evidence about the declared universe, and the correspondence between the
+993 "Nouveau Ménage" and the documented top-up is not asserted by any
+document.
+
+Caveat for weight users :: no weighting statement exists in any source for
+this wave either (the WB catalog =weight= and =sampling_deviation= fields are
+both empty).  Meanwhile =Senegal/2021-22/_/data_info.yml= maps both =weight=
+and =panel_weight= to the same source column =poids=.  Given that the wave
+contains a replacement component, a longitudinal weight identical to the
+cross-sectional weight is a claim no document supports.  Recorded as an open
+caveat; not resolved here, and not a licence to change the config without
+evidence.
+
+*** Sample design (context, not universe)
+
+WB catalog 6278, =method.data_collection.sampling_procedure=, verbatim:
+"The sampling base for the 2018/2019 survey was the General Census of
+Population and Housing, Agriculture, and Livestock (RGPHAE) of 2013. In
+2021/2022, a enumeration was conducted in the same clusters. ... The total
+survey sample size is 7,120 households - 3,922 from urban areas and 3,198
+from rural areas. ... In wave one, the survey teams interviewed 3,537
+households (1,946 in urban areas and 1,591 in rural areas). In wave two, the
+teams interviewed 3,583 households (1,976 in urban areas and 1,607 in rural
+areas)."
+
+Stratification, BID French 4.1, verbatim: "L’échantillon de l’enquête de
+2018/2019 a été tiré selon un plan de sondage stratifié à deux degrés. La
+strate est la combinaison région/milieu de résidence."  (Translation, not
+source text: "The 2018/2019 survey sample was drawn under a two-stage
+stratified design.  The stratum is the region/area-of-residence
+combination.")
+
+The two-=vague= seasonal split is repeated in this wave.  BID French,
+section 2.1, verbatim: "Les volets « ménage » et « communautaire » de
+l’enquête sont organisés en deux vagues. Chaque vague a porté sur la moitié
+de l’échantillon des grappes et la moitié de l’échantillon des ménages."
+Note this sentence says *half the clusters and half the households* -- which
+reads differently from the 2018-19 DDI's "randomly divided each enumeration
+area into two equal groups".  Both are quoted as printed; the two
+descriptions are not obviously consistent and are not reconciled here.
+Fieldwork dates, same section: wave 1 from 06 November 2021 to 05 January
+2022, wave 2 from 22 April to 22 July 2022.  (The catalog abstract gives
+slightly different ranges -- "November 2021 and January 2022" and "April
+2022 and September 2022" -- another unreconciled discrepancy.)
+
+** Summary table
+
+| Wave    | Universe declared?       | Where it lives                      | Geographic exclusion        | Institutional exclusion                                   | Within-wave sub-samples                                     |
+|---------+--------------------------+-------------------------------------+-----------------------------+-----------------------------------------------------------+-------------------------------------------------------------|
+| 2018-19 | yes (but NADA template)  | local DDI PDF *and* WB catalog 4297 | none; "all regions" stated  | prisons, hospitals, military barracks, school dormitories | two seasonal =vagues=, EA split in half                     |
+| 2021-22 | *no -- gap*              | n/a (no doc in repo beyond SOURCE.org) | 2 EAs dropped: 1 security, 1 refusal | none stated for this wave                        | panel re-visits + top-up replacements; two seasonal =vagues= |
+
 * plot_features (GH #167)
 
 Lasting parcel-level characteristics from the EHCVM agriculture module

@@ -82,6 +82,489 @@ count that a 2008-15 key is sound.
 Related: the Round-4 sub-panel split is a separate matter, documented
 at [[#panel-design][Panel design note]].
 
+* Sampling universe, exclusions and sub-samples
+:PROPERTIES:
+:CUSTOM_ID: sampling-universe
+:END:
+
+What the NPS *declares* it is a sample of, quoted verbatim from the
+documentation, with the exclusions and the within-wave sub-samples.  This
+records the survey's *claim*; it is deliberately not inferred from the data.
+Evidence gathered 2026-07-21 (GH #601); every quote below was re-checked
+against its cited file.
+
+This section is *evidence only*.  It does not propose a schema --- how the
+library should represent any of it is GH #603.
+
+Cross-references, so nothing here is read in isolation:
+- the *Panel design note* ([[#panel-design]]) already describes the Extended /
+  Refresh sub-panel split and the 545-household urban booster.  Everything
+  below agrees with it; this section adds the verbatim documentary basis and
+  the universe statements, which that note does not carry.
+- =.claude/skills/tanzania-panel-design.md= --- the same split, from the ID
+  side.
+- *The cluster key of =cluster_features= (GH #323, Site 2)* --- the tracking
+  design (households are followed to new addresses, carrying their original
+  sampling cluster) is the operational face of the eligibility/tracking rules
+  quoted below.
+
+** Summary
+
+| library wave | universe statement?         | where it lives                          | sub-sample structure inside the wave        |
+|--------------+-----------------------------+-----------------------------------------+---------------------------------------------|
+| 2008-09      | yes (UPD record, catalog)   | *WB catalog only* (id 3814)             | initial national cohort                     |
+| 2010-11      | yes (UPD record, catalog)   | *WB catalog only* (id 3814)             | same cohort, tracked                        |
+| 2012-13      | yes (UPD record, catalog)   | *WB catalog only* (id 3814)             | same cohort, tracked                        |
+| 2014-15      | yes (UPD + own R4 record)   | *WB catalog only* (id 3814 / 2862)      | *two disjoint sub-panels: Extended + Refresh* |
+| 2019-20      | yes                         | *in repo*: =2019-20/Documentation/TZA_2019_NPS-SDD_v06_M.xml= | Extended Panel sub-cohort only |
+| 2020-21      | *none --- gap*              | field exists and is empty (id 5639)     | Refresh Panel + *545-HH urban booster*      |
+
+Four of the six library waves have a universe statement that exists *only in
+World Bank catalog metadata*, not in any file in this repository.  For those
+the record is a moving target: it can be edited upstream without anything in
+the repo changing.  Only 2019-20's is held locally.
+
+** The declared universe
+
+*** 2008-09, 2010-11, 2012-13, 2014-15 (the =2008-15/= UPD folder)
+
+All four library waves are built from one catalog record --- the *Uniform
+Panel Dataset*, =TZA_2008-2014_NPS-UPD_v01_M=, catalog id 3814 (see
+=2008-15/Documentation/SOURCE.org=).  That record carries a single universe
+statement, which is therefore the documented universe for all four:
+
+#+begin_quote
+The universe includes all households and individuals in Tanzania with the
+exception of those residing in military barracks or other institutions.
+#+end_quote
+
+- Citation :: WB Microdata catalog DDI 1.2.2 export for catalog id 3814,
+  element =codeBook/stdyDscr/stdyInfo/sumDscr/universe=
+  (https://microdata.worldbank.org/index.php/metadata/export/3814/ddi,
+  retrieved 2026-07-21).  Language: English.  *Not present in any file in
+  this repository.*
+
+Geographic coverage, same record, element =sumDscr/geogCover=, VERBATIM:
+
+#+begin_quote
+Designed for analysis of key indicators at four primary domains of inference,
+namely: Dar es Salaam, other urban, rural, Zanzibar.
+#+end_quote
+
+*Important caveat --- the four waves do not attest this sentence equally.*
+Each round also has its own catalog record, and they disagree:
+
+| round      | catalog id | its own =<universe>=                                        |
+|------------+------------+-------------------------------------------------------------|
+| R1 2008-09 |         76 | *empty* (=<universe/>=)                                     |
+| R2 2010-11 |       1050 | *empty* (=<universe/>=)                                     |
+| R3 2012-13 |       2252 | present, but *different text* --- quoted below              |
+| R4 2014-15 |       2862 | present, *byte-identical* to the UPD sentence above         |
+
+So the UPD sentence is independently corroborated for 2014-15 only.  For
+2008-09 and 2010-11 the per-round records say nothing about a universe at
+all; what they offer instead is coverage / design language, VERBATIM:
+
+- id 76, =sumDscr/geogCover= :: "The survey covered all regions and all
+  districts of Tanzania, both mainland and Zanzibar."
+- id 76, =sumDscr/sampProc= (opening) :: "In order to monitor progress toward
+  the MKUKUTA goals, it was vital that the NPS have a nationally-representative
+  sample design. As such, in 2008/09 the NPS interviewed 3,280 households
+  spanning all regions and all districts of Tanzania, both mainland and
+  Zanzibar."
+- id 1050, =sumDscr/geogCover= :: "National Coverage: Dar es Salaam, other
+  urban areas in Mainland, rural areas in Mainland, and Zanzibar"
+
+Those are *sample-design and coverage* claims, not universe declarations, and
+are recorded here as such.
+
+The 2012-13 record's universe field is *circular* --- it describes the sample,
+not the population it is drawn from.  Catalog id 2252,
+=sumDscr/universe=, VERBATIM:
+
+#+begin_quote
+The survey covers all individuals included in the households in the sample.
+
+The eligibility requirement for the NPS is defined as any household member
+aged 15 years and above, excluding live-in servants. Households with at least
+one eligible member where completely interviewed, including any subsequent
+non-eligible members present in the household. Any household or eligible
+members that had either moved or split away from a primary household were
+tracked and interviewed in their new location.
+#+end_quote
+
+(=where= for =were= is in the source; quoted as printed.)  Its =geogCover=
+reads, VERBATIM: "Representative at the national, urban/rural and major
+ago-ecological zones levels." (=ago-= for =agro-= is in the source.)  Note
+this is a *third* representativeness claim --- agro-ecological zones ---
+different again from the four domains of inference of the UPD and R4 records.
+
+*Local documentation in this repo says nothing about a universe.*  The
+strongest statement in =2008-15/Documentation/NPS_UPD_Basic_Information_Document.pdf=
+is a representativeness claim, p. 4, section "Background", VERBATIM:
+
+#+begin_quote
+The Tanzania National Panel Survey (NPS) is a series of nationally
+representative multi-topic household surveys that collect information on
+topics including agricultural production, non-farm income generating
+activities, consumption expenditures, and a wealth of other socio-economic
+characteristics.
+#+end_quote
+
+The string "universe" does not occur anywhere in that BID (checked over the
+whole document).  The other local file,
+=ddi-documentation-english_microdata-3814.pdf=, is a stub record with no
+Scope / Coverage / Universe section at all.
+
+*** 2019-20 (NPS-SDD)
+
+#+begin_quote
+The universe includes all households and individuals in Tanzania with the
+exception of those residing in military barracks or other institutions.
+#+end_quote
+
+- Citation :: =lsms_library/countries/Tanzania/2019-20/Documentation/TZA_2019_NPS-SDD_v06_M.xml=,
+  line 74, element =codeBook/stdyDscr/stdyInfo/sumDscr/universe=.  Language:
+  English.  *This is the one Tanzania wave whose universe statement is held in
+  this repository.*  It is byte-identical to the WB catalog DDI export for
+  catalog id 3885, so local and catalog agree.
+
+Geographic coverage, same file, element =sumDscr/geogCover=, VERBATIM:
+"Designed for analysis of key indicators at the national level."  Unit of
+analysis, =sumDscr/anlyUnit=, VERBATIM: "Households; Individuals;".
+
+Note the geogCover *narrows* relative to every other NPS round: national only,
+not the four domains of inference.  That is consistent with 2019-20 following
+only the Extended Panel cohort (below) --- but the declared *universe* is
+unchanged and national.  See "Universe vs. what the sample and weights
+represent".
+
+*** 2020-21 (NPS Wave 5) --- NO UNIVERSE STATEMENT FOUND
+
+*This is a recorded gap, not a claim about the survey.*  The authoritative
+field exists and is empty.  WB catalog DDI export for catalog id 5639
+contains, VERBATIM:
+
+: <universe><![CDATA[]]></universe>
+
+Searched, and the string "universe" is *absent* from all of:
+
+- =2020-21/Documentation/ddi-documentation-english_microdata-5639.pdf= (12 pp;
+  it has Scope / Coverage / Sampling sections and *no* Universe line);
+- =2020-21/Documentation/nps_wave_5_report.pdf= (125 pp);
+- =2020-21/Documentation/executive_summary_tanzania_printfile_02b.pdf= (8 pp).
+
+The four Wave-5 questionnaire PDFs were not read for a universe statement.
+
+The nearest available statements are *not* universe statements and must not be
+promoted to one:
+
+- =sumDscr/geogCover= (id 5639; same text at local PDF p. 3, "Coverage" >
+  GEOGRAPHIC COVERAGE), VERBATIM: "Designed for analysis of key indicators at
+  four primary domains of inference, namely:\nDar es Salaam,\nOther Urban,\nRural,\nZanzibar,"
+- =nps_wave_5_report.pdf=, report p. 1 (PDF p. 21), section 1.1 Introduction,
+  VERBATIM: "The National Panel Survey (NPS) is a nationally representative
+  household survey that collects information on the living standards of the
+  population, including their consumption expenditure, non-farm income
+  generating activities, agricultural production, and other socio-economic
+  characteristics."
+
+*Do not carry the 2014-15 universe sentence onto 2020-21.*  Wave 5 follows a
+different cohort (Refresh Panel) plus a booster sample, so its realised sample
+is not the same set of units, and no document states a universe for it.
+
+** Exclusions
+
+*** Universe-level exclusion (2008-09 -- 2019-20)
+
+The only universe-level exclusion the NPS states, VERBATIM (citations as
+above, catalog id 3814 / 2862 / 3885 and the local 2019-20 DDI):
+
+#+begin_quote
+... with the exception of those residing in military barracks or other
+institutions.
+#+end_quote
+
+*No geographic exclusion.*  Nothing in any NPS document excludes a region, a
+zone, or urban or rural areas.  Zanzibar is explicitly *in* --- it is both a
+sampling stratum and one of the four domains of inference.  There is no
+"for security reasons" carve-out anywhere in the corpus.  This makes Tanzania
+unlike the LSMS-ISA waves elsewhere in the library that drop a named region
+by design.
+
+*** Household-level eligibility restriction (2012-13, 2019-20, 2020-21)
+
+Distinct from the universe: a rule about which households *qualify to be
+interviewed*.  It is stated under sampling procedure (and, in 2012-13,
+inside the universe field itself).
+
+2019-20, =2019-20/Documentation/TZA_2019_NPS-SDD_v06_M.xml=,
+=codeBook/stdyDscr/method/dataColl/sampProc=; the same text is in the local
+BID =tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf=,
+p. 7, section "Sample Design", VERBATIM:
+
+#+begin_quote
+The eligibility requirement for inclusion in the NPS is defined as any
+household member aged 15 years and above, excluding live-in servants.
+Households with at least one eligible member were completely interviewed,
+including any non-eligible members present in the household. Any household or
+eligible members that had either moved or split away from a primary household
+were tracked and interviewed in their new location.
+#+end_quote
+
+2020-21, catalog id 5639 =sampProc= (same text at
+=ddi-documentation-english_microdata-5639.pdf=, p. 3, "Sampling" > SAMPLING
+PROCEDURE), VERBATIM:
+
+#+begin_quote
+The eligibility requirement for inclusion of a household in this round of the
+NPS and all others is defined as any household having at least one member aged
+15 years and above, excluding live-in servants. Households with at least one
+eligible member were completely interviewed, including any non-eligible
+members present in the household.
+#+end_quote
+
+Two consequences worth flagging for a consumer:
+
+1. A household composed entirely of members under 15 is *out of scope by the
+   eligibility rule*, even though the declared universe says "all households
+   and individuals in Tanzania".  The universe sentence and the eligibility
+   rule do not agree, and the documentation never reconciles them.
+2. *Live-in servants are excluded from eligibility but not from the
+   interview* --- non-eligible members present in an eligible household are
+   still enumerated.  So the roster contains people the eligibility rule
+   excludes.
+
+** Oversamples and sub-samples --- specialization lives INSIDE the waves
+
+Tanzania is a strong instance of the pattern: none of the six library waves is
+a "special" wave, but three of them contain distinct sub-populations that a
+consumer must not average over blindly.  The panel-design facts are already in
+[[#panel-design]]; what follows is the documentary basis.
+
+*** 2014-15: two disjoint sub-panels inside one library wave
+
+Catalog id 3814, =codeBook/stdyDscr/method/dataColl/sampProc=, VERBATIM:
+
+#+begin_quote
+To maintain the panel concept of the NPS, the sample design for NPS 2014/2015
+consisted of a combination of the original NPS sample and a new NPS sample. A
+nationally representative sub-sample was selected to continue as part of the
+“Extended Panel” while an entirely new sample, “Refresh Panel”, was selected
+to represent national and sub-national domains. Similar to the sample in NPS
+2008/2009, the sample design for the “Refresh Panel” allows analysis at four
+primary domains of inference, namely: Dar es Salaam, other urban areas on
+mainland Tanzania, rural mainland Tanzania, and Zanzibar. This new cohort in
+NPS 2014/2015 will be maintained and tracked in all future rounds between
+national censuses.
+#+end_quote
+
+The stated *reason* for the refresh, same element, opening, VERBATIM:
+
+#+begin_quote
+While the same sample of respondents was maintained over the first three
+rounds of the NPS, longitudinal surveys tend to suffer from bias introduced by
+households leaving the survey over time; i.e. attrition. Although the NPS
+maintains a highly successful recapture rate (roughly 96% retention at the
+household level), minimizing the escalation of this selection bias, a refresh
+of longitudinal cohorts was done for the NPS 2014/15 to ensure proper
+representativeness of estimates while maintaining a sufficient primary sample
+to maintain cohesion within panel analysis.
+#+end_quote
+
+So the single library wave =2014-15= is a *pooled* Extended + Refresh sample.
+The two sub-panels even carry different cluster-id layouts in the data --- see
+the scheme table in *The cluster key of =cluster_features== (=RR D WW EEE=,
+8 chars, for the extended panel; =RR DD WWW EE CCC=, 12 chars, for the
+refresh sample).  Documentation calls *both* nationally representative; it
+gives no share.  (The "~20% sub-sample" figure in [[#panel-design]] and in
+=.claude/skills/tanzania-panel-design.md= comes from the NPS 2020/21 BID,
+pp. 7-8, and is not restated in any statement quoted here; it is not
+contradicted either.)
+
+*** 2019-20: the Extended Panel sub-cohort only
+
+Sample design, =2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf=,
+p. 7, section "Sample Design" (identical text in the local DDI's =sampProc=),
+VERBATIM:
+
+#+begin_quote
+The sample design for the NPS-SDD 2019/20 targeted the sub-sample of
+households from the initial NPS cohort originating in 2008/09 and subsequently
+surveyed in all four consecutive rounds, considered the “Extended Panel”. This
+consisted of 989 households from the NPS 2014/15 sample to be tracked and
+interviewed in the NPS-SDD 2019/20.
+#+end_quote
+
+Same page, on the realised sample, VERBATIM: "Ultimately, the final sample
+size for NPS-SDD 2019/20 was 5,587 individuals in 1,184 households."  (The
+1,184 figure matches the household count used in the community-price
+diagnosis elsewhere in this file.)
+
+Also on that page, two smaller top-ups that are part of the wave's sample and
+are easy to miss, VERBATIM:
+
+#+begin_quote
+It is worth mentioning that the sample design included complete households
+that could not be interviewed in NPS 2014/15, excluding those households that
+had refused to be interviewed in NPS 2014/15. This constituted an additional 8
+households. Individuals meeting the eligibility requirement that were
+interviewed as part of the NPS 2012/13, but were not located and interviewed
+during the NPS 2014/15, were also included in this round if located.
+Additionally, individuals from NPS 2014/15 who moved into another This
+constituted an additional 158 individuals assigned to their last known
+associated household.
+#+end_quote
+
+(The truncated sentence "who moved into another This constituted" is in the
+source, in both the BID and the DDI; quoted as printed.)
+
+*** 2020-21: Refresh Panel plus an explicit URBAN OVERSAMPLE
+
+Catalog id 5639, =sampProc= (same text at
+=ddi-documentation-english_microdata-5639.pdf=, p. 3), VERBATIM:
+
+#+begin_quote
+The NPS is based on a stratified, multi-stage cluster sample design which
+recognizes four analytical strata: Dar es Salaam, Other Urban areas in
+Mainland, Rural areas in Mainland, and Zanzibar. The sample design for the NPS
+2020/21 targeted the sub-sample of households from the initial NPS 2014/15
+cohort considered the “Refresh Panel”. These specific households had never
+previously been a part of the NPS sample design. This sample consisted of
+3,352 households from 419 clusters in the NPS 2014/15 that were tracked and
+interviewed in the NPS 2020/21. An additional “Booster Sample” of 545
+households from major cities and urban areas (specifically, Mbeya, Arusha,
+Mwanza, Tanga, and Dodoma) was also interviewed to allow for improved
+estimates in urban centres.
+#+end_quote
+
+And on the composition of the realised sample, same element, VERBATIM:
+
+#+begin_quote
+Ultimately, the final sample size for NPS 2020/21 was 23,592 individuals in
+4,709 households. Of these, 4,164 households allow for panel analysis as they
+have been found and interviewed in both NPS 2014/15 and NPS 2020/21, while the
+remaining 545 (in the “Booster Sample”) will only have data available in the
+NPS 2020/21.
+#+end_quote
+
+*This is the one thing in Tanzania a pooling consumer is most likely to get
+wrong.*  545 of 4,709 households (11.6%) in 2020-21 are a *purpose-built urban
+oversample of five named cities*, drawn to improve urban estimates --- not a
+national draw.  Unweighted pooling of 2020-21 with any other wave over-weights
+Mbeya, Arusha, Mwanza, Tanga and Dodoma.  These are the same 545 households
+that =cluster_features= previously deleted on a NaN =clusterid= key (see the
+GH #323 section).
+
+*** Design oversampling in the stratification itself
+
+Present identically in the 2019-20 local DDI
+(=2019-20/Documentation/TZA_2019_NPS-SDD_v06_M.xml=) and in catalog id 5639,
+element =codeBook/stdyDscr/method/dataColl/weight=, VERBATIM:
+
+#+begin_quote
+The sampling of these clusters was stratified along two dimensions: (i) eight
+administrative zones (seven on Mainland Tanzania plus Zanzibar as an eighth
+zone), and (ii) rural versus urban clusters within each administrative zone.
+The combination of these two dimensions yields 16 strata. In rural areas a
+cluster is defined as an entire village. In urban areas, a cluster is defined
+as a census enumeration area. As a general rule, the probability of selection
+was higher for clusters within strata where existing data sources showed that
+the variance of key variables of interest for the NPS (e.g., household
+consumption and maize production) were likely to be very high – implying the
+need for more observations to produce reliable estimates.
+#+end_quote
+
+That last sentence is a *variance-driven oversample built into stage 1*, not
+just a design effect: some strata are deliberately over-represented in the raw
+counts.  Weights are required for any national statement.
+
+** Universe vs. what the sample and the weights represent
+
+The documents come apart on this, and the gap is widest in 2019-20.
+
+- The *declared universe* for 2019-20 is national and unrestricted (bar
+  institutions) --- see above.
+- The *realised sample* is a longitudinal sub-cohort: 989 targeted households
+  that had been interviewed in all four prior rounds, plus split-offs.
+- The *geographic-coverage* field for that same wave drops to "national level"
+  and no longer claims the four domains of inference.
+- The *weights* are panel weights, not fresh cross-sectional weights.
+  =TZA_2019_NPS-SDD_v06_M.xml=, element
+  =codeBook/stdyDscr/method/dataColl/weight=, VERBATIM: "The methodology
+  used to calculate the panel weights for the extended panel households in NPS
+  2019/20 was developed as part of the LSMS-ISA work program. Details on the
+  methodology can be found in the paper: Himelein, Kristen. 2013. “Weight
+  Calculations for Panel Surveys with Subsampling and Split-off Tracking.”
+  Statistics and Public Policy, vol (1), pp40-45"
+
+Same file, opening of the same element, VERBATIM: "In order to produce
+nationally representative statistics with the NPS data, it is necessary to
+apply weighting or expansion factors. The panel survey weights adjust for
+differences in the probability of selection into the NPS 2008/09 sample for
+observations in various strata, 2008/09 households splitting into multiple
+households in NPS 2010/11 and NPS 2012/13, splitting even further in NPS
+2014/15, and attrition between rounds of the survey."
+
+For 2020-21 the parallel sentence, catalog id 5639, element =weight=,
+VERBATIM: "A similar practice was used for panel survey weights in NPS
+2020/21, based on their probability of selection in the NPS 2014/15 (as the
+Refresh Sample)."
+
+So: the universe sentence is about *Tanzania*; the weights are about
+*probability of selection into a specific earlier cohort*, corrected for
+attrition and splits.  Do not read the universe sentence as a statement that
+the wave's raw rows are a fresh national draw.  The library's two weight
+columns (=weight= cross-sectional, =panel_weight= longitudinal) are the place
+this distinction shows up in practice.
+
+*No Tanzania document denies a well-defined universe* (unlike, e.g., China
+1995-97 or EthiopiaRHS elsewhere in the library).  The 2020-21 case is
+silence, not denial.
+
+** Not boilerplate
+
+The Tanzania universe sentence is *not* the World Bank NADA template text.
+The most-repeated sentence in the library-wide corpus --- "The survey covered
+all de jure households excluding prisons, hospitals, military barracks, and
+school dormitories.", which appears verbatim in 15 waves across the EHCVM
+countries, Ethiopia and Nigeria --- does not occur in any Tanzania document.
+Tanzania's sentence names the country, and its exclusion clause ("military
+barracks or other institutions") is worded differently from the template's
+four-item list.  It is therefore usable as an attestation about *this* survey,
+which the boilerplate is not.
+
+The one caveat is the one already made above: the sentence is attested by the
+UPD record and by the 2014-15 round record, and is *reused* for 2008-09,
+2010-11 and 2012-13 because those waves are built from the UPD file --- the
+per-round records for those years do not contain it.
+
+** What was searched, so the gaps are falsifiable
+
+- =2008-15/Documentation/= (complete): =NPS_UPD_Basic_Information_Document.pdf=
+  (32 pp, text-extracted; "universe" absent),
+  =ddi-documentation-english_microdata-3814.pdf= (9 pp, stub record with no
+  Scope/Coverage/Universe section), =nps_upq_questionnaire.pdf= (instrument,
+  not read for universe), =SOURCE.org=, =LICENSE.org=.  Then WB catalog id
+  3814, plus per-round ids 76 / 1050 / 2252 / 2862 for corroboration.
+- =2019-20/Documentation/= (complete): =TZA_2019_NPS-SDD_v06_M.xml= (HIT),
+  =tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf=
+  (85 pp; no literal "universe" statement --- its Sample Design section, p. 7,
+  is about the Extended-Panel sub-sample), four questionnaire PDFs (not read
+  for universe), =SOURCE.org=, =LICENSE.org=.  Cross-checked against WB
+  catalog id 3885: identical.
+- =2020-21/Documentation/= (complete): =ddi-documentation-english_microdata-5639.pdf=
+  (12 pp), =nps_wave_5_report.pdf= (125 pp),
+  =executive_summary_tanzania_printfile_02b.pdf= (8 pp) --- "universe" and
+  "target population" absent from all three; four questionnaire PDFs (not read
+  for universe), =SOURCE.org=, =LICENSE.org=.  Fallback WB catalog id 5639:
+  =<universe>= element present and *empty*.
+
+Not searched: the Kiswahili instruments and interviewer manuals listed in the
+catalog records but not held in this repository.  If a universe statement for
+2020-21 exists anywhere, the Wave-5 interviewer manual is the next place to
+look.
+
 * Issues
 ** WAITING Missing food quantities in 2019-20 and 2020-21 (#112)
 :LOGBOOK:

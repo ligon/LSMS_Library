@@ -23,6 +23,377 @@ need for =vague= in the index.  See CLAUDE.md "EHCVM countries"
 note for the wider pattern across Senegal, Niger, Burkina Faso,
 Benin, Togo, and Guinea-Bissau.
 
+* Sampling universe, exclusions and sub-samples
+
+# ASCII EXCEPTION (deliberate, per the orgmode skill's "leave a comment" rule):
+# every #+begin_quote block below is a VERBATIM transcription of survey
+# documentation.  Most of it is French and carries accented characters,
+# typographic apostrophes and the sources' own sic spellings.  It is NOT
+# normalised to ASCII, because normalising it would destroy the one property
+# this section exists to preserve.  All prose OUTSIDE the quote blocks is ASCII.
+
+Evidence gathered for GH #601 / #603.  This section records *what each wave's
+documentation says its sample represents*, verbatim.  It deliberately proposes
+no schema and resolves nothing: #603 is deciding how the library should
+represent this, and until it does, the honest thing to hold is the quotes.
+
+Three rules were followed, and they are why this is usable as evidence:
+
+- Quotes are verbatim, in the source language, with a file + page citation.
+  Translations are on separate, clearly labelled lines.
+- Gaps are recorded as gaps, naming exactly what was searched.  No gap is
+  filled by adjacency or by a sibling wave.
+- *Nothing here was inferred from the data.*  No =.dta= was opened.  A survey's
+  universe is a claim its documentation makes; it is not something to
+  reverse-engineer from the microdata.
+
+Read it alongside the =Sampling Design= section above, which covers the
+*index* convention (=v: grappe=, =i: (grappe, menage)=).  That section is about
+identifiers; this one is about what the sample stands for.  The two do not
+overlap and neither supersedes the other.
+
+*One correction to the Overview above.*  The Overview opens "Mali EHCVM
+(Enquête Harmonisée sur les Conditions de Vie des Ménages) [...] Four waves are
+configured", which reads as though all four waves are EHCVM.  They are not.
+Only *2018-19 and 2021-22* are EHCVM; *2014-15 and 2017-18 are EAC-I* (Enquête
+Agricole de Conjoncture Intégrée), a different survey with a different frame, a
+different second-stage design and -- in 2014-15 -- a different observation unit
+in rural areas.  The =plot_features= section further down already says this
+("the pre-EHCVM EACI waves (2014-15, 2017-18) use a different agriculture
+instrument"), and the =Household Presence= section suspects it ("The 2017-18
+wave may also predate the EHCVM template"); the documentation confirms it.  The
+Overview's opening line is the only place in this file that blurs the two, and
+it should be amended when someone next touches it.
+
+** Summary
+
+| Wave    | Survey                | Labelled UNIVERSE?          | Statement lives in      | Geographic exclusion             |
+|---------+-----------------------+-----------------------------+-------------------------+----------------------------------|
+| 2014-15 | EAC-I 2014            | no -- coverage stmt only    | WB catalog only (!)     | Kidal                            |
+| 2017-18 | EAC-I 2017            | no -- coverage stmt only    | local Documentation.pdf | Kidal; Menaka/Taoudenit not yet regions |
+| 2018-19 | EHCVM-1 2018/19       | yes (but NADA boilerplate)  | local Documentation.pdf | Kidal, Bamako, Taoudenit, Menaka -- varies by vague |
+| 2021-22 | EHCVM-2 2021/22       | *none found*                | --                      | (not stated; design inherited)   |
+
+Two facts about this table matter more than the quotes themselves:
+
+1. *Only 2018-19 has a field labelled UNIVERSE at all*, and that field's text is
+   World Bank NADA template boilerplate (see below).  The other three waves offer
+   coverage / representativeness statements, which say where the sample was drawn
+   and what it estimates -- not what set of units it stands for.
+2. *2014-15's statement is not in this repository.*  It exists only in a
+   catalog-hosted Basic Information Document.  The record for that wave is a
+   moving target held by a third party, not something the library carries.
+
+** 2014-15 -- EAC-I 2014 (Enquete Agricole de Conjoncture Integree 2014)
+
+*The statement exists ONLY in WB catalog metadata, not in any file this repo
+ships.*  The wave's local =Documentation/Documentation.pdf= (the NADA-generated
+DDI report) has no =Universe= field; its Coverage section reads only "GEOGRAPHIC
+COVERAGE / National".  The text below comes from the Basic Information Document
+attached to WB catalog entry 2583 (resource 47801,
+https://microdata.worldbank.org/catalog/2583/download/47801), Section 4
+"Sample", printed page 5 (PDF page 8), first two paragraphs:
+
+#+begin_quote
+The EAC-I 2014 has been designed to have national coverage, including both urban and rural areas in all the regions of the country except Kidal. The domains were defined as the entire country, district of Bamako, other urban areas, and rural areas; and in the rural areas: agricultural zones, agro-pastoral zones and pastoral zones. Taking this into account, 51 explicit sample strata were selected.
+
+The target population was drawn from households in all regions of Mali except Kidal which was not accessible for security reasons. Kidal also has very low population density.
+#+end_quote
+
+Source is English; no translation needed.  Fidelity: the PDF's justified
+multi-space runs were collapsed to single spaces and hard line-breaks removed.
+No word was added, removed or reordered.
+
+*** Exclusion: Kidal, for security reasons
+
+: "...all the regions of the country except Kidal."
+: "...all regions of Mali except Kidal which was not accessible for security reasons."
+
+This is a *by-design* geographic exclusion with a stated cause, and it is the
+single most important fact in this section: it holds across every Mali wave in
+the library in some form.  Anyone pooling Mali with other countries, or
+comparing Mali across time, is comparing a country-minus-Kidal.
+
+*** Sub-population: the observation unit is not the same in town and country
+
+The local =Documentation.pdf= carries no universe, but its Sampling Procedure
+section does define the *observation units*, and they differ by stratum.
+Verbatim (French; local
+=lsms_library/countries/Mali/2014-15/Documentation/Documentation.pdf=, Sampling
+Procedure, printed p.5; identical text on WB catalog page 2583):
+
+#+begin_quote
+L'EAC-I est une enquête par sondage. Elle se distingue d'un recensement en ce sens que tous les ménages/exploitations ne sont pas enquêtés. Elle s'effectue auprès d'un nombre restreint d'unités d'observations (exploitations agricoles en milieu rural, ménage en milieu urbain) sélectionnées parmi l'ensemble plus vaste de toutes les unités du domaine d'intérêt en question. Ce nombre restreint d'unités d'observations constitue l'échantillon. Il est déterminé de telle sorte qu'il soit un format réduit de la population étudiée.
+#+end_quote
+
+Translation (supplied here; NOT source text):
+
+#+begin_quote
+The EAC-I is a sample survey. It differs from a census in that not all households / holdings are surveyed. It is carried out on a restricted number of observation units (agricultural holdings in rural areas, households in urban areas) selected from the much larger set of all units in the domain of interest. This restricted number of observation units constitutes the sample. It is determined so as to be a reduced-scale version of the population studied.
+#+end_quote
+
+So *in rural Mali the EAC-I unit is the agricultural holding
+(=exploitation agricole=); in urban Mali it is the household.*  That is a
+unit-of-observation shift inside a single survey, and it is unusual enough that
+the cross-country sweep singled Mali out for it.  A consumer who reads
+=household_roster= or =food_acquired= for 2014-15 as "a household sample
+throughout" is reading past a documented distinction.
+
+*** Sample design (context, NOT a universe statement)
+
+Two-stage; 1,070 EAs selected PPS from the 2009 Census of Population; 3
+households per rural EA and 9 per urban EA; total planned sample 4,218.
+
+** 2017-18 -- EAC-I 2017
+
+Local documentation, and it corroborates (does not contradict) the existing
+note in the =Household Presence / MonthsSpent= section below that "the 2017-18
+wave may also predate the EHCVM template": it does.  2017-18 is EAC-I, a
+revisit of the 2014 EAs, not EHCVM.
+
+No labelled UNIVERSE exists for this wave in either the local documentation or
+the DDI XML (=<sumDscr><universe/>= for catalog 3409 is *empty*; only
+variable-level =<universe>= tags such as "Individus âgés de 4 ans et plus"
+exist).  The closest coverage statement, from
+=lsms_library/countries/Mali/2017-18/Documentation/Documentation.pdf=, section
+"Sampling" > "Sampling Procedure", printed page 4, first bullet:
+
+#+begin_quote
+• L'échantillon est représentatif au niveau national et couvre toutes les régions et zones (urbaines et rurales) à l'exception de Kidal.
+#+end_quote
+
+Translation (supplied here; NOT source text):
+
+#+begin_quote
+The sample is representative at the national level and covers all regions and zones (urban and rural) with the exception of Kidal.
+#+end_quote
+
+The English Basic Information Document (WB catalog 3409, resource 47785; NOT
+present in this repo), Section 4 "Sample", printed p.7 (PDF p.10), states the
+same thing at more length:
+
+#+begin_quote
+The EAC-I 2017 replicates the same sampling design as the first edition, visiting the same EAs. The sample is nationally representative and cover all regions and areas (urban and rural) except Kidal4. The domains were defined as the entire country, district of Bamako, other urban areas, and rural areas; and in the rural areas: agricultural zones, agro-pastoral zones and pastoral zones. Taking this into account, 51 explicit sample strata were selected.
+#+end_quote
+
+("cover" for "covers" is as printed.)
+
+*** Exclusions
+
+Kidal, as in 2014-15.  Plus a frame-vintage exclusion, from footnote 4 of the
+same BID, verbatim:
+
+#+begin_quote
+At the time of the sample selection, the new regions (Menaka and Taoudénit) were not officially announced. Thus, the sample does not take into consideration these new divisions.
+#+end_quote
+
+And an *unplanned* coverage loss, distinct from the by-design exclusion above --
+same BID, Section 4, verbatim:
+
+#+begin_quote
+The total estimated size of the sample for the survey was 9630. Because of security reasons in the country not all the enumeration areas were visited: 8711 households were interviewed in the first visit; whereas 8658 household were reached during the second visit. The final sample was refined on the base of quality data assessment. The final sample size comprises 8390 households.
+#+end_quote
+
+This is the documentation coming apart from itself in a way worth naming: the
+sample is *declared* nationally representative ex-Kidal, but the document
+concedes that unnamed EAs elsewhere were not visited for security reasons.  What
+the weights represent and what the fieldwork reached are not the same set, and
+the document does not say which EAs were lost.
+
+*** Sub-sample: the Lourd / Leger split INSIDE rural EAs
+
+This is the specialization-inside-a-wave case for Mali, and it is easy to miss.
+From the same BID, Section 4 (verbatim, second stage):
+
+#+begin_quote
+-  9 households were selected with equal probability in each of the urban EAs
+-  9 households were selected with equal probability in each of the rural EAs, then in rural areas:
+
+o  Households # 3, 6, and 9 are administered the version Lourd
+o  Households # 1, 2, 4, 5, 7, 8 are administered the version Léger
+#+end_quote
+
+So in rural areas *one third of sampled households got the long ("Lourd")
+questionnaire and two thirds the short ("Léger") one.*  Any table sourced from a
+Lourd-only module is a one-third rural subsample, not the wave.  Planned n =
+9,630; achieved 8,390.  (The 2014-15 instruments shipped in that wave's
+=Documentation/= are named =EACI2014_..._LOURD_...=, consistent with the 2014
+design's 3-per-rural-EA figure, but no statement was found declaring a 2014
+Lourd/Leger split, so none is asserted here.)
+
+** 2018-19 -- EHCVM-1 2018/19
+
+The only Mali wave with an explicit, labelled UNIVERSE.  From
+=lsms_library/countries/Mali/2018-19/Documentation/Documentation.pdf=, section
+"Coverage" > heading "UNIVERSE", printed page 3:
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals, military barracks, and school dormitories.
+#+end_quote
+
+It appears identically in three renderings of the *same* NADA metadata record:
+the local Documentation.pdf p.3; the WB catalog 4295 study-description page
+under "Universe"; and the DDI XML =<sumDscr><universe>= element.  Those are one
+source, not three.
+
+*** BOILERPLATE WARNING -- this sentence attests a template, not a claim about Mali
+
+That exact sentence is *World Bank NADA template text*.  The cross-country sweep
+found it verbatim in *15 waves* -- across Benin, Burkina Faso, Cote d'Ivoire,
+Guinea-Bissau, Mali, Niger, Senegal, Togo, and also Ethiopia 2018-19 / 2021-22
+and Nigeria 2015-16 / 2018-19 / 2023-24.  Its presence tells you which metadata
+template was used.  It does *not* independently attest that Mali's INSTAT made
+that claim about this survey.  Treat it as weaker evidence than its
+"UNIVERSE"-labelled prominence suggests.
+
+*** Exclusions
+
+Institutional/collective quarters, per the boilerplate: prisons, hospitals,
+military barracks, school dormitories.
+
+Geographic exclusions are *not* in the universe field.  They are in the SAMPLING
+PROCEDURE section of the same document (printed p.4), and they are statements
+about where data were *collected*, which is a different kind of claim:
+
+#+begin_quote
+The survey collected data in rural and urban areas in all regions in each of the two waves, except Kidal, Bamako, Toaudénit, and Menaka. More specifically, during the first wave, the survey did not collect data in rural Kidal. Moreover, due to Bamako's purely urban nature, no rural area data are available for this district. Likewise, concerning Taoudenit and Menaka, the survey did not collect data for those regions during the first wave. In addition, there is no urban data for Taoudenit in wave 2.
+#+end_quote
+
+Note two things, quoted as printed:
+
+- The document spells the region *both* "Toaudénit" and "Taoudenit", two
+  sentences apart.  Neither spelling was corrected here.
+- The exclusions are *vague-specific* (=vague= = round).  Rural Kidal missing in
+  vague 1; Taoudenit and Menaka absent in vague 1; no urban Taoudenit in vague 2.
+  Since the library's EHCVM convention collapses =vague= out of the index (each
+  =grappe= is visited in exactly one =vague= -- see =Sampling Design= above), *the
+  index carries no trace of which coverage regime a given household fell under.*
+  Anyone computing a national aggregate from this wave should know that the
+  geographic coverage is not constant across the households being pooled.
+
+Fidelity: pdfminer renders this PDF's "fi" ligature as a single glyph, so raw
+extraction shows "speciﬁcally" / "ﬁrst"; ordinary letters are used above,
+matching the byte-identical catalog rendering.  Whitespace normalized; no words
+changed.
+
+*** Supplementary sample inside the wave
+
+Sample design (context, NOT a universe statement): frame = 6th edition of the
+2017/18 EMOP, itself derived from the 2009 RGPH, 1,153 EAs; two-stage stratified
+without replacement; 500 EAs PPS, *plus 51 additional EAs added in vague 2 to
+cover Menaka and Taoudenit*; 12 households per EA; planned n = 6,603 (2,752
+urban / 3,851 rural).  Those 51 EAs are a top-up to reach regions vague 1 could
+not, i.e. a supplement inside the wave rather than a uniform draw.
+
+** 2021-22 -- EHCVM-2 2021/22 -- NO UNIVERSE STATEMENT FOUND
+
+*Recorded as a gap, deliberately.*  No universe / target-population statement
+exists in any Mali 2021-22 documentation examined.  This is positive evidence of
+absence, not a failure to look:
+
+- The DDI XML for WB catalog 6275 contains *no* =<universe>= element at all
+  inside =<sumDscr>= (2018-19's catalog 4295 does contain one).
+- The catalog study-description page's Coverage section has only "Geographic
+  Coverage / National coverage" and no Universe field.
+- =lsms_library/countries/Mali/2021-22/Documentation/ddi-documentation-english_microdata-6275.pdf=
+  -- read in full (15,827 characters).  Coverage section: GEOGRAPHIC COVERAGE /
+  National coverage.  No UNIVERSE heading.
+- =lsms_library/countries/Mali/2021-22/Documentation/mli_ehcvm2_information_de_base_eng.pdf=
+  (English BID) -- Section 4 "Sampling" / 4.1 "Household and Community Sampling",
+  PDF pp.10-11, read in full.  No universe statement.
+- The French BID (catalog 6275, resource 100367), Section 4 "Échantillonnage" /
+  4.1 "Volet ménage et communautaire" -- read in full.  No =population cible=, no
+  =champ de l'enquête=.
+- All of the above were additionally grepped for
+  =univers|popul|champ|couvre|couverture|exclu|cible|de jure|target population|barracks|prison|Kidal=.
+- Not opened: =mli_ehcvm2_qnr_men_excel_vague{1,2}.pdf= (questionnaires --
+  instruments, not universe statements).
+
+*** The inference that was available, and was declined
+
+2021-22 is a panel revisit of the 2018/19 clusters, so its documentation
+describes the 2018/19 design instead of declaring its own universe.  Local
+English BID, Section 4.1, verbatim:
+
+#+begin_quote
+The sampling frame for the 2018/2019 survey is based on the 2009 general population and housing census (RGPH). In 2021/2022, an enumeration was conducted in the same clusters.
+
+The survey is a panel cluster survey, and the sampling plan is based on that of the 2018/2019 survey. Therefore, it is appropriate to describe the 2018/2019 plan.
+
+In 2021/2022, the strategy is to revisit the same clusters. This involves either surveying the 12 households from 2018/2019 if they are found (after the enumeration phase), or surveying the found households and completing the sample to 12 in clusters where fewer households are found during the enumeration phase (either because there were fewer than 12 households in the final 2018/2019 database or because some households were not found).
+#+end_quote
+
+French BID, 4.1 "Base de sondage", verbatim:
+
+#+begin_quote
+La base de sondage de l'enquête de 2018/2019 est le recensement général de la population et de l'habitat (RGPH) de 2009. En 2021/2022, il a été procédé à un dénombrement dans les mêmes grappes.
+#+end_quote
+
+It would be *defensible* to inherit the 2018-19 universe sentence ("all de jure
+households excluding prisons, hospitals, military barracks, and school
+dormitories") for 2021-22 on the strength of that panel linkage.  *That is an
+inference, not a documented claim for this wave, and it is recorded here only as
+such.*  It is left for #603 to decide whether the library may inherit; it is not
+decided here.
+
+*** Sub-samples INSIDE the 2021-22 wave -- two of them, both documented
+
+1. *A regional booster.*  Local English BID, Section 4.1, note beneath Table 2,
+   verbatim:
+
+   #+begin_quote
+   Note: For the regions of Kidal and Timbuktu, an additional sample was added to include rural Kidal and Taoudeni in the survey. The relative error in Table 1 concerns the initial sample.
+   #+end_quote
+
+   French original, verbatim:
+
+   #+begin_quote
+   Nb :  Pour  la  région  de  Kidal  et  Tombouctou,  un  échantillon  supplémentaire  a  été  ajouté  pour  intégrer  Kidal  rural  et Taoudéni à l'enquête. L'erreur relative dans le tableau 1 concerne l'échantillon initiale.
+   #+end_quote
+
+   (Justified spacing as printed in the French; "l'échantillon initiale" is the
+   source's own agreement error, quoted as printed.)  So *the 2021-22 wave is not
+   a uniform draw*: rural Kidal -- excluded by design in every earlier Mali wave
+   in this library -- is present here via an added sample, and the BID says
+   explicitly that the published relative errors do *not* cover it.
+
+2. *Panel households and top-up households in one wave.*  Per the revisit
+   strategy quoted above, a 2021-22 cluster contains the 2018/19 households that
+   were found *plus* freshly enumerated replacements to bring the cluster back to
+   12.  Those two groups do not represent the same thing, and the library's
+   =(grappe, menage)= index does not distinguish them.
+
+Sample design (context, NOT a universe statement): planned n = 6,708 (3,528
+urban / 3,180 rural); achieved 2,732 urban and 3,411 rural.
+
+** What a consumer pooling Mali should carry away
+
+- *Kidal is out of 2014-15, 2017-18 and 2018-19 by design*, and is partially back
+  in for 2021-22 via an explicit booster.  "Mali" in this library is not a
+  constant territory across waves.
+- *The 2014-15 rural observation unit is the agricultural holding, not the
+  household.*  Documented, and unusual.
+- *2017-18 rural households split one-third Lourd / two-thirds Leger.*  A
+  Lourd-sourced table is a subsample of the wave.
+- *2018-19's geographic coverage differs between vague 1 and vague 2*, and the
+  library's index does not record which vague a household was in.
+- *2021-22 has no universe statement of its own*, and mixes panel and
+  replacement households.
+- *2018-19's UNIVERSE field is WB NADA boilerplate shared with 14 other waves.*
+  It is the only labelled universe Mali has, and it is the weakest kind of
+  evidence dressed as the strongest.
+
+** Provenance of this section
+
+Assembled 2026-07-21 from a per-country documentation sweep (GH #601), against
+the local =Documentation/= trees for all four waves and against WB catalog
+entries 2583, 3409, 4295 and 6275 (rendered study-description pages, JSON
+metadata exports, and DDI XML exports -- the XML matters, because it
+distinguishes a *missing* =<universe>= element from a *present but empty* one,
+and Mali has one of each).  Questionnaire PDFs were not treated as universe
+sources.  No =.dta= file was opened.  Full evidence record, including the search
+transcript for every gap: =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=.
+
 * Files configured
 
 (Per =data_scheme.yml=: sample, cluster_features, household_roster,

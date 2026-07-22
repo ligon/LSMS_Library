@@ -2,6 +2,524 @@
 
 Brief table of contents and todo list.
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence for GH #601 / #603.  This section records *what the survey
+documentation claims* about the population each ENV wave represents.  It
+is deliberately quote-first: every universe statement below is reproduced
+verbatim in Spanish, with a separate, clearly-marked English rendering.
+No claim here is inferred from the microdata, and nothing here proposes a
+schema.
+
+** Provenance warning: none of these statements is held in this repository
+
+All three Panama waves are in the "catalog-only" position.  Not one
+=Documentation/= directory in this repo contains a universe statement;
+what is checked in is questionnaires, =LICENSE.org=, and a =SOURCE.org=
+holding only the catalog id + DOI.  The universe text lives inside
+technical reports hosted on the World Bank Microdata catalog, which are
+*not mirrored here*.  The record is therefore a moving target: if the WB
+re-issues a study record, the text below is what was read on 2026-07-21
+and nothing in this repository would detect the change.
+
+| Wave | Catalog id | Document carrying the universe                   | Mirrored in repo? | Local =Documentation/= holds                                                                        |
+|------+------------+--------------------------------------------------+-------------------+-----------------------------------------------------------------------------------------------------|
+| 1997 |        598 | =pn97bif.pdf= (Documento de Información Básica)  | no                | =pn97hhq.pdf=, =pn97com.pdf=, =pn97ant.pdf=, =caratula.pdf=, =Formulario_Precios.pdf=, =LICENSE.org= |
+| 2003 |       2346 | =pan03bif.pdf= (Informe Técnico de la ENV 2003)  | no                | =ddi-documentation-english_microdata-2346.pdf=, =FormulariodeHogares_V2.pdf=, poverty-map report      |
+| 2008 |         70 | =muestra.pdf= (Diseño Muestral de la ENV, 2008)  | no                | =hogar_V2.pdf=, =comunidad.pdf=, =precios.pdf=, =LICENSE.org=                                        |
+
+Two further facts about where the statements sit:
+
+- *The 2003 catalog record has no Universe field at all.*  The
+  study-description page for id 2346 carries only =Geographic Coverage:
+  National= and =Sampling Procedure: Sample size is 8,000 households=.
+  The shipped DDI PDF (=ddi-documentation-english_microdata-2346.pdf=,
+  which *is* in this repo) likewise has no Overview/Universe section --
+  its page 3 sampling metadata is the single sentence "Sample size is
+  8,000 households", and pages 4 and 6 read "No content available".  So
+  for 2003 the universe exists *only* inside a catalog-hosted PDF.
+- *None of these is NADA boilerplate.*  All three universe statements are
+  Panamanian statistical-office prose (MIPPE 1997; MEF/Dirección de
+  Políticas Sociales 2003; Contraloría General / DEC 2008), not the WB
+  NADA template sentence that recurs across other countries in the
+  corpus.  For 1997 and 2008 the catalog Universe field is a verbatim
+  copy of the national document.
+
+** ENV-97 -- Encuesta de Niveles de Vida 1997
+
+*** Declared universe (verbatim, Spanish)
+
+Source: =pn97bif.pdf=, section 6 "DISEÑO DE LA MUESTRA", sub-section
+"A. Universo de Estudio", printed p. 8 / PDF p. 12.  (Also reproduced as
+the Coverage > Universe field of catalog 598.)
+
+#+begin_quote
+A.  Universo de Estudio
+
+Lo constituyen el conjunto de viviendas particulares existentes en el país
+según el Censo de 1990 (Cuadro No. 1), existen 525,236 viviendas particulares
+ocupadas, de las cuales 295,156 (56.2%) integran el área urbana y 230,080 (43.8%)
+pertenecen al área rural, de estas últimas 198,016 viviendas se ubican en el área rural
+no indígena, 25,141 en el área rural indígena y 6,923 en el área rural de difícil acceso.
+#+end_quote
+
+English rendering (*not* source text; supplied by the extractor):
+
+#+begin_quote
+A. Study universe.  It is constituted by the set of private dwellings existing
+in the country according to the 1990 Census (Table No. 1); there are 525,236
+occupied private dwellings, of which 295,156 (56.2%) make up the urban area and
+230,080 (43.8%) belong to the rural area; of the latter, 198,016 dwellings are
+located in the non-indigenous rural area, 25,141 in the indigenous rural area and
+6,923 in the hard-to-reach rural area.
+#+end_quote
+
+Note the benchmark: the universe is pinned to the *1990* Census even
+though fieldwork ran in 1997.
+
+*** Exclusions
+
+*No exclusion statement was found.*  The ENV-97 documentation makes the
+opposite, explicitly inclusive claim (=pn97bif.pdf=, section 1
+"INTRODUCCION", printed p. 1 / PDF p. 5):
+
+#+begin_quote
+La encuesta tiene cobertura nacional, regional, urbana y rural e incluye, por
+primera vez, las poblaciones indígenas, el área rural dispersa y alejada y las
+poblaciones de difícil acceso.
+#+end_quote
+
+English rendering: "The survey has national, regional, urban and rural
+coverage and includes, for the first time, the indigenous populations, the
+dispersed and remote rural area and the hard-to-reach populations."
+
+The catalog's Geographic Coverage field for id 598 reads, in full: "Se
+cubre la totalidad del territorio nacional."
+
+The only restriction is carried by the universe *unit* itself --
+=viviendas particulares= (private dwellings), which by Panamanian census
+convention would exclude collective and institutional dwellings.  *The
+documentation does not say so*, and it is not asserted here as a
+documented exclusion.
+
+*** Sub-populations and oversamples
+
+ENV-97 partitions the country into five study domains, of which two are
+explicitly special-interest sub-populations.  Verbatim
+(=pn97bif.pdf=, Cuadro No. 1 footnote (a), PDF p. 12):
+
+#+begin_quote
+(a) Los Dominios, como se verá más adelante, son los niveles para los que la
+muestra permite obtener resultados independientes o estimaciones separadas. Los
+Dominios son agrupaciones que incluyen las Regiones de Planificación - unión de
+varias provincias - (Metropolitana, Occidental y Central) y las áreas de interés
+para la ENV (área indígena y de difícil acceso), cuyos límites geográficos y
+físicos no coinciden con las Regiones de Recolección que se crearon en forma
+"ad-hoc" para el operativo de campo.
+#+end_quote
+
+English rendering: "The Domains, as will be seen below, are the levels for
+which the sample permits independent results or separate estimates.  The
+Domains are groupings that include the Planning Regions -- a union of
+several provinces -- (Metropolitana, Occidental and Central) and the areas
+of interest for the ENV (indigenous area and hard-to-reach area), whose
+geographic and physical boundaries do not coincide with the Collection
+Regions created ad hoc for fieldwork."
+
+The regional (province-grouping) domains therefore *exclude* the indigenous
+and hard-to-reach areas by construction -- the same footnote is stated
+directly on the frame table as "(b) No incluye Indígena, ni Difícil
+Acceso."  A user who wants "Región Central" from ENV-97 is getting the
+non-indigenous, non-hard-to-reach part of it.
+
+The "difícil acceso" domain is defined verbatim (=pn97bif.pdf=, PDF p. 12):
+
+#+begin_quote
+Difícil Acceso. Se incluyen aquí las comunidades rurales más alejadas y dispersas del
+país a las que se llega principalmente a pie, a caballo o en canoa, muchas veces sólo
+en determinadas épocas del año (verano).
+#+end_quote
+
+English rendering: "Hard access.  Included here are the country's most
+remote and dispersed rural communities, reached principally on foot, on
+horseback or by canoe, often only in certain seasons of the year (summer)."
+
+Sample design, for context (=pn97bif.pdf=, sections B-D):
+
+- Frame: 14,203 PSUs from 1990 Census cartography -- 10,850 urban and
+  3,353 rural, the latter split 2,508 non-indigenous / 396 indigenous /
+  449 hard-to-reach.
+- "El tamaño muestral estimado ascendió a 5,591 viviendas, se calculó una
+  tasa de respuesta total del 90% lo que permite obtener al final una
+  muestra efectiva de 5,000 viviendas" (printed p. 11).  Achieved: 4,945
+  households.
+- Cuadro No. 3 allocates the 5,591 dwellings / 495 PSUs across the five
+  domains.  The PDF text layer of this table is *column-garbled*; the
+  indigenous and hard-to-reach rows appear to read 40 PSUs / 440
+  dwellings and 20 PSUs / 120 dwellings respectively, but this has *not*
+  been confirmed against the rendered table and should not be quoted as
+  fact.
+
+Arithmetic (mine, from the verbatim figures above, *not* a documentation
+claim): the indigenous rural area is 25,141/525,236 = 4.8% of the universe
+and hard-to-reach 6,923/525,236 = 1.3%.  If the tentative Cuadro No. 3
+reading holds, both are sampled well above their population share -- i.e.
+an oversample -- and *anyone pooling ENV-97 unweighted will over-represent
+indigenous and remote-rural households*.
+
+** ENV-03 -- Encuesta de Niveles de Vida 2003
+
+*** Declared universe (verbatim, Spanish)
+
+Source: =pan03bif.pdf= -- title page reads "INFORME TÉCNICO DE LA ENCUESTA
+DE NIVELES DE VIDA DE 2003", MEF / Dirección de Políticas Sociales,
+Panamá, Agosto 2005 (the WB catalog lists this resource under the
+misspelled label "Informe Techico ...").  Section "B. LA MUESTRA" > "1. LA
+MUESTRA" > "a. Universo", printed p. 11 / PDF p. 14.
+
+#+begin_quote
+a.  Universo
+
+El Universo de estudio de esta muestra fueron las viviendas particulares de los Censos
+Nacionales de Población y Vivienda del año 2000. En el año de referencia había un total de
+790,813 viviendas particulares, de las cuales 681,803 estaban ocupadas al momento de los
+censos. De éstas, 653,211 estaban ubicadas en áreas no indígenas y 28,592 en áreas
+indígenas.
+#+end_quote
+
+English rendering (*not* source text):
+
+#+begin_quote
+a. Universe.  The study universe of this sample was the private dwellings of the
+National Population and Housing Censuses of the year 2000.  In the reference year
+there was a total of 790,813 private dwellings, of which 681,803 were occupied at
+the time of the censuses.  Of these, 653,211 were located in non-indigenous areas
+and 28,592 in indigenous areas.
+#+end_quote
+
+*** Exclusions
+
+**** Domain-level: the province domains exclude indigenous areas
+
+=pan03bif.pdf=, section "2. DISEÑO DE LA MUESTRA", printed p. 13 / PDF
+p. 16:
+
+#+begin_quote
+Es necesario destacar que el dominio provincia excluye de éstas, las áreas habitadas
+mayoritariamente por pueblos indígenas.  Por consiguiente, las estimaciones de este dominio se
+refieren a características de la población residente en áreas no indígenas de las provincias.  Por
+otra parte, el dominio área indígena está conformado por los territorios de las Comarcas Indígenas
+de Kuna Yala, Ngöbe Buglé y Emberá más áreas específicas habitadas mayoritariamente por
+población indígena, ubicadas en cinco provincias del país.  Este mismo criterio se aplicó en la
+ENV de 1997.
+#+end_quote
+
+English rendering: "It must be stressed that the province domain excludes
+from these the areas inhabited mainly by indigenous peoples.
+Consequently, the estimates for this domain refer to characteristics of
+the population resident in the non-indigenous areas of the provinces.  On
+the other hand, the indigenous-area domain is made up of the territories
+of the Indigenous Comarcas of Kuna Yala, Ngöbe Buglé and Emberá plus
+specific areas inhabited mainly by indigenous population, located in five
+provinces of the country.  This same criterion was applied in the ENV of
+1997."
+
+This is *the* thing to know before aggregating Panama by province: a
+province figure is a non-indigenous-areas-of-that-province figure, in both
+2003 and (per this sentence) 1997.
+
+**** Module-level: the prices questionnaire excludes the two largest urban districts
+
+=pan03bif.pdf=, printed p. 11 / PDF p. 14:
+
+#+begin_quote
+j.  Precios en establecimientos. Cotización de precios de un conjunto de artículos
+de consumo cotidiano: alimentos, bebidas y tabaco (48 artículos), y bienes de
+aseo personal y del hogar (20 artículos) en áreas urbanas (a excepción de la
+Ciudad de Panamá y el Distrito de San Miguelito) rurales e indígenas de todo el
+país.
+#+end_quote
+
+English rendering: "j. Prices in establishments.  Price quotations for a
+set of everyday consumption articles: food, drink and tobacco (48
+articles), and personal and household hygiene goods (20 articles) in urban
+(*with the exception of Panama City and the District of San Miguelito*),
+rural and indigenous areas of the whole country."
+
+Consequence for this library: any price table built from the ENV-03 prices
+instrument has *no urban price observations for Panama City or San
+Miguelito* -- the country's largest urban agglomeration.  This is a
+module-level hole, not a household-sample hole.
+
+**** Module-level: agriculture asked only in rural and indigenous areas
+
+Same page:
+
+#+begin_quote
+i.  Actividad Agropecuaria (sólo para las áreas rurales e indígenas). Actividades
+principales de producción agropecuaria, mercadeo, venta, proyectos de
+reforestación.
+#+end_quote
+
+English rendering: "i. Agricultural activity (*only for rural and
+indigenous areas*).  Main activities of agricultural production,
+marketing, sale, reforestation projects."
+
+**** Not found
+
+*No statement excluding any geographic region from the household sample
+itself was found* in =pan03bif.pdf= (searched for
+=universo|población objetivo|marco muestral|cobertura geográfica|excluy|difícil acceso|dominio=),
+nor in the catalog record, nor in the shipped DDI PDF.
+
+*** Sub-populations and oversamples
+
+ENV-03 declares 15 inference domains (=pan03bif.pdf=, printed pp. 12-13);
+domain 15 is "Área Indígena".  The footnote to the sample-allocation table
+(printed p. 13) states verbatim:
+
+#+begin_quote
+1/  La muestra en Área Indígena se diseñó para ser seleccionada entre las
+Comarcas Indígenas y también en áreas habitadas mayoritariamente por
+población indígena en algunas provincias, por lo que el tamaño de la muestra
+en provincias está contemplado para la selección entre las áreas no indígenas.
+#+end_quote
+
+English rendering: "1/ The sample in the Indigenous Area was designed to be
+selected among the Indigenous Comarcas and also in areas inhabited mainly
+by indigenous population in some provinces, so that the sample size in
+provinces is intended for selection among the non-indigenous areas."
+
+Designed allocation (same table): gran total *7,900 dwellings in 790 PSUs*;
+Área Indígena *550 dwellings in 55 PSUs*.
+
+Arithmetic (mine, not documentation): indigenous areas are
+28,592/681,803 = 4.2% of the occupied-dwelling universe but 550/7,900 =
+7.0% of the designed sample -- an oversample of roughly 1.7x.  *Pool
+unweighted and you over-represent the comarcas.*
+
+*** A number that does not reconcile
+
+The catalog Sampling Procedure field for id 2346 says "Sample size is
+8,000 households"; the technical report's own allocation table totals
+*7,900* designed dwellings.  Both are recorded here as read; neither is
+corrected.
+
+** ENV-08 -- Encuesta de Niveles de Vida 2008
+
+*** Declared universe (verbatim, Spanish)
+
+Source: =muestra.pdf= ("DISEÑO MUESTRAL DE LA ENCUESTA DE NIVELES DE VIDA,
+JULIO 2008", Contraloría General de la República / Dirección de
+Estadística y Censo), section "1. UNIVERSO DE ESTUDIO", PDF pp. 1-2.
+Reproduced verbatim as the Coverage > Universe field of catalog 70.
+
+#+begin_quote
+1. UNIVERSO DE ESTUDIO
+
+La encuesta de niveles de vida, consideró como universo de estudio a la
+población total residente en las viviendas particulares ocupadas del país, según el
+Censo de Población y Vivienda del 2000.
+
+El universo, de acuerdo al objetivo de la investigación, se dividió en un sub-universo
+no indígena y en otro indígena; este último constituido por las comarcas
+del país y por las áreas rurales indígenas fuera de las áreas comarcales, y que
+mantienen sus patrones socio culturales.
+
+Tal como se observa en el cuadro, el total de viviendas particulares en el país,
+según el Censo, ascendió a 790,858 unidades habitacionales particulares, de las
+cuales 496,971 se localizan en el área urbana (62.8%) y 293,887 pertenecen al
+área rural (37.2%).  Las viviendas ocupadas representan el 86.2% de las viviendas
+particulares totales.  El universo no indígena, por su parte, constituye un 95.8% y
+el indígena un 4.2% de las viviendas particulares totales del país.  (ver anexo 1,
+distribución del universo por provincia y área)
+#+end_quote
+
+English rendering (*not* source text):
+
+#+begin_quote
+1. Study universe.  The living standards survey took as its study universe the
+total population resident in the country's occupied private dwellings, according
+to the 2000 Population and Housing Census.
+
+The universe, in accordance with the objective of the research, was divided into a
+non-indigenous sub-universe and an indigenous one; the latter constituted by the
+country's comarcas and by the indigenous rural areas outside the comarca areas,
+which maintain their socio-cultural patterns.
+
+As can be seen in the table, the total of private dwellings in the country,
+according to the Census, came to 790,858 private housing units, of which 496,971
+are located in the urban area (62.8%) and 293,887 belong to the rural area
+(37.2%).  Occupied dwellings represent 86.2% of total private dwellings.  The
+non-indigenous universe, for its part, constitutes 95.8% and the indigenous 4.2%
+of the country's total private dwellings.  (see annex 1, distribution of the
+universe by province and area)
+#+end_quote
+
+Two textual notes.  (i) In =muestra.pdf= the third paragraph is separated
+from the second by the table "Viviendas Particulares y Viviendas Ocupadas
+en la República, según Tipo de Universo: Censo 2000", and begins "Tal como
+se observa en el cuadro, el total ..."; the catalog Universe field for id
+70 drops that lead-in and starts "El total de viviendas particulares ...".
+The fuller PDF text is quoted above.  (ii) Whitespace is normalised
+throughout (the PDF is justified and text extraction doubles spaces); no
+word, figure or punctuation mark was altered.
+
+*** Exclusions
+
+*No geographic exclusion from the household sample was found.*  The
+Geographic Coverage field of catalog 70 reads, in full:
+
+#+begin_quote
+National coverage.
+Domains: Urban/rural; Panama City; Rest of Panama District; San Miguelito; West
+Panama; East Panama; Colon; Cocle; Herrera; Los Santos; Veraguas; Bocas del Toro;
+Chiriqui; Darien; Indigenous Area
+#+end_quote
+
+The module-level restriction clauses of ENV-03 recur word for word in the
+catalog's Scope > Notes for ENV-08 (catalog 70) -- prices "en áreas
+urbanas (a excepción de la Ciudad de Panamá y el Distrito de San
+Miguelito) rurales e indígenas de todo el país", and community agriculture
+"(sólo para las áreas rurales e indígenas)".  (The surrounding sentences
+differ slightly from 2003 -- the ENV-08 agriculture note adds "crédito,
+principales problemas" -- but the restriction clauses themselves are
+identical.)  Treat these with the same caution as in 2003: *the ENV-08
+price data have no Panama City / San Miguelito urban quotes.*
+
+As in the earlier waves, the universe unit -- =viviendas particulares
+ocupadas= -- would conventionally exclude collective and institutional
+dwellings, but the documentation does not say so and no such exclusion is
+asserted here.
+
+*** Sub-populations and oversamples -- the explicit two-sub-universe split
+
+ENV-08 is the clearest case in this country: the universe statement itself
+declares a *partition into a non-indigenous and an indigenous
+sub-universe* ("se dividió en un sub-universo no indígena y en otro
+indígena"), the indigenous one being the comarcas plus indigenous rural
+areas outside them.  This is a design partition, not an exclusion -- both
+halves are in scope -- but they are separately allocated and separately
+estimable.  From the catalog's Sampling Procedure field (= =muestra.pdf=,
+"DOMINIO DE ESTUDIO"):
+
+#+begin_quote
+Teniendo como referencia, los estudios del año 1997 y el 2003; y con el propósito
+de hacer comparativo los resultados de la investigación, se determinó que los
+dominios de estudios, para los cuales se desean estimaciones confiables estarían
+representados en primera instancia a nivel de República por área urbana y rural;
+muestra no indígena por área y muestra indígena. Las ocho provincias del país,
+igualmente se constituyen en dominios de estudios.
+#+end_quote
+
+English rendering: "Taking as reference the studies of 1997 and 2003, and
+with the purpose of making the results of the research comparable, it was
+determined that the study domains for which reliable estimates are desired
+would be represented in the first instance at Republic level by urban and
+rural area; non-indigenous sample by area and indigenous sample.  The
+country's eight provinces likewise constitute study domains."
+
+Designed allocation (=muestra.pdf=, section 6 "TAMAÑO DE LA MUESTRA"):
+*8,000 dwellings in 800 PSUs*, split 4,165 urban / 3,835 rural.  Verbatim:
+"En la muestra no indígena, las viviendas particulares seleccionadas
+ascendieron a 7,450 unidades habitacionales y en la indígena a 550
+unidades." and "El total de la muestra a investigar permitió, según el
+criterio de diseño muestral, la selección de 800 unidades primarias de
+muestreo; de las cuales 745 pertenecen a la muestra no indígena y 55 a la
+muestra indígena."
+
+Arithmetic (mine, not documentation): the indigenous sub-universe is 4.2%
+of private dwellings (documented verbatim above) but 550/8,000 = 6.9% of
+the designed sample -- an oversample of roughly 1.6x, essentially the same
+design as 2003.
+
+*** Universe vs. what the weights represent
+
+The expansion factors are defined at PSU level, separately for urban and
+rural parts of *each province p*, as the inverse selection probability
+(catalog 70, Weighting field, = =muestra.pdf= "FACTORES DE EXPANSIÓN"):
+"El proceso de estimación de los resultados de la encuesta está basado en
+la aplicación de los factores de expansión, por unidad primaria de
+muestreo; derivados del inverso de la probabilidad de selección."  The
+documented denominators are 2000-Census private-dwelling counts.  So the
+weights expand to a *2000-Census dwelling universe*, eight years stale at
+fieldwork -- the same benchmark-lag pattern as ENV-97 (1990 Census, seven
+years stale).  No post-stratification to a 2008 population projection is
+documented.
+
+Achieved coverage (catalog 70, Response Rate field): "Al final del
+Operativo de Campo de la ENV-08 se alcanzaron visitar un total de 7,274
+viviendas, lográndose encontrar 6,977 ocupadas completas.  Se obtuvo
+información completa en 7,045 hogares donde se entrevistaron 26,162
+personas. Se realizaron 781 reuniones de la Comunidad y 618 encuestas de
+Precios."  Refusal 1.4%.
+
+** Cross-wave cautions
+
+1. *Unit of the universe shifts between waves.*  ENV-97 and ENV-03 define
+   the universe as the *dwellings* ("el conjunto de viviendas
+   particulares" / "fueron las viviendas particulares"); ENV-08 defines it
+   as the *resident population in* occupied private dwellings ("la
+   población total residente en las viviendas particulares ocupadas").
+   Same practical scope, different declared object -- worth knowing before
+   comparing declared universe sizes across waves.
+
+2. *Benchmark census differs.*  1997 -> 1990 Census; 2003 and 2008 -> 2000
+   Census.  Every wave's universe is defined against a census several
+   years older than the fieldwork.
+
+3. *A census total that does not reconcile between our own two sources.*
+   The 2003 technical report gives *790,813* total private dwellings from
+   Census 2000; the 2008 sample-design document gives *790,858* for the
+   same census (and 681,799 occupied, against 2003's 681,803).  Both are
+   quoted verbatim above; neither is corrected here.
+
+4. *Province means are non-indigenous province means* in 1997 and 2003 by
+   explicit documentation, and the 2008 domain list carries "Indigenous
+   Area" as a peer of the eight provinces.  Do not read a province figure
+   as covering the comarcas.
+
+5. *Indigenous areas are oversampled in all waves for which allocation is
+   documented* (2003, 2008: ~1.6-1.7x population share; 1997 likely, on a
+   tentative table reading).  Unweighted pooling of Panama over-represents
+   indigenous households.
+
+** Gaps and what was searched
+
+- *No universe statement exists in this repository for any Panama wave.*
+  For each wave the local =Documentation/= tree was enumerated and every
+  PDF fetched via =data_access.get_data_file()= and text-extracted:
+  - 1997: =SOURCE.org= (DOI only), =LICENSE.org=, =pn97hhq.pdf=,
+    =pn97com.pdf=, =pn97ant.pdf=, =caratula.pdf=, =Formulario_Precios.pdf=
+    -- all blank forms, none contains a universe statement.
+  - 2003: =SOURCE.org= (DOI only), =ddi-documentation-english_microdata-2346.pdf=
+    (read page by page; *no Overview/Universe section at all*),
+    =InformedelMapadePobrezadePanamaAno2003.pdf= (searched
+    =universo|población objetivo|cobertura|marco muestral|excluy|comarca=;
+    it describes small-area estimation, not the survey universe),
+    =FormulariodeHogares_V2.pdf=, plus =.dvc= sidecars for
+    =Equivalencia.pdf=, =PRECIOS.pdf=, =Comunidad.pdf=.
+  - 2008: =SOURCE.org= (DOI only), =LICENSE.org=, =hogar_V2.pdf=,
+    =comunidad.pdf=, =precios.pdf= -- all blank forms, none contains a
+    universe statement.
+- Catalog search then resolved ids 598 / 2346 / 70, enumerated
+  related-materials (23 / 20 / 23 resources), and text-searched
+  =pn97bif.pdf=, =pan03bif.pdf=, =muestra.pdf= (and =antecedentes.pdf=)
+  for =universo|población objetivo|marco muestral|cobertura|excluy|excepci|difícil acceso|colectiv|dominio=.
+- *Institutional / collective-dwelling treatment is undocumented in all
+  three waves.*  Each universe is stated over =viviendas particulares=
+  with no accompanying sentence about collective quarters, homeless
+  population, or non-household population.  Recorded here as a gap, not as
+  an exclusion.
+- *The per-domain sample allocation for ENV-97 (Cuadro No. 3) is
+  unverified* -- the PDF text layer is column-garbled and the extracted
+  row totals do not sum to the stated 495 PSUs / 5,591 dwellings.  Anyone
+  needing ENV-97 domain sample sizes should read the rendered table.
+- *ENV-97 has no documented sampling-frame weighting text at hand.*
+  Weighting was read only for ENV-08 (catalog 70); the corresponding
+  ENV-97 and ENV-03 weighting documentation was not examined for this
+  note.
+
 * Files in Panama/_/
 ** TODO panama.py
 Contains code common to different rounds

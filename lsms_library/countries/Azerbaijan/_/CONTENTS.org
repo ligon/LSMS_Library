@@ -26,6 +26,300 @@ HHOPEN.dta).  =cluster_features.Region= is therefore declared
 Cluster identifier =v= = =ppid= (primary-place ID, 92 distinct
 values).  Household identifier =i= = =(ppid, hid)=.
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 for GH #601.  Azerbaijan has exactly one wave
+(=1995=), and its declared universe is *high*-confidence but *catalog-only*:
+see "Where the statement lives" below.  This section records what the
+documentation *claims*; nothing here was inferred from the =.dta= files.
+
+This section extends =* Sampling Design= above (geographic coverage, PSU
+identification) and bears directly on =* Data Quality Notes > sample.weight has
+only 3 distinct values=, which it *contradicts* -- see "Universe vs. what the
+weights represent".  It also discharges the standing request in that note
+("The original questionnaires ... are DVC-tracked but not yet read into this
+note"): both questionnaires have now been read, and *neither contains a
+sampling plan or a universe statement*.  The only substantive line in them is
+the interviewer preamble quoted below.
+
+** 1995 -- the declared universe (verbatim)
+
+The World Bank DDI record for =AZE_1995_SLC_v01_M= (catalog id 408) has *no*
+=universe= element.  The universe statement lives inside
+=study_desc.method.data_collection.sampling_procedure=, section "Design", and
+is inseparable from the design, because the universe *is* a three-way union:
+
+#+begin_quote
+The methodology that was chosen reflects the purpose of the survey. To balance
+a desire for a large, representative sample with the expense of a detailed
+survey instrument, a sample size of 2,016 households was selected. Three
+separate populations were covered: households in Baku, households outside of
+Baku and households of Displaced Persons. Within each of those populations, the
+sample was chosen in such a manner that each household had an equal probability
+of being selected.
+#+end_quote
+
+-- WB Microdata catalog 408, DDI
+=study_desc.method.data_collection.sampling_procedure=, section "Design"
+(rendered at https://microdata.worldbank.org/index.php/catalog/408/study-description
+under "Sampling > Sampling Procedure").
+
+The only other universe-like fields in the DDI:
+
+| DDI field                    | verbatim value                            |
+|------------------------------+-------------------------------------------|
+| =study_info.geog_coverage=   | =National=                                |
+| =study_info.analysis_unit=   | =- Households / - Individuals / - Community= (three lines) |
+| =study_info.universe=        | *absent* (no such element in the record)   |
+
+The frame outside Baku, same source, section "Outside of Baku":
+
+#+begin_quote
+The country is divided into towns, villages of the town type, and villages.
+Every household is located in one of those three types of population points. A
+list prepared by the National Statistical Committee contains just over 4,250 of
+these population points.
+#+end_quote
+
+The single *local* coverage claim, from the household questionnaire preamble
+(=1995/Documentation/queshhe.pdf=, p. 1, above the =POPULATION POINT= header):
+
+#+begin_quote
+I represent the SORGU Social Studies Center.  We are conducting a survey on the
+conditions of people's lives in all regions of Azerbaijan for the World Bank.
+#+end_quote
+
+(The source uses a curly apostrophe in "people's"; otherwise verbatim,
+including the double space after "Center.")
+
+Two lines later the same preamble says "For that purpose 2000 addresses have
+been chosen at random as in a lottery."  That figure matches the February 1995
+Baku address list described in the catalog's "Baku" section, *not* the 2,016
+households of the three-frame design.  Recorded as printed; not reconciled.
+
+** "National" and the frame do not agree, in the source itself
+
+=geog_coverage= asserts =National=, but the sampling frame explicitly excises
+eleven occupied raions, taking the population-point list from "just over 4,250"
+to 3,453.  Both statements are in the same DDI record.  They are recorded here
+verbatim rather than reconciled; a reader who takes =National= at face value
+will be wrong about roughly 800 population points.
+
+** Exclusions
+
+*** Geographic: eleven occupied raions, by design
+
+#+begin_quote
+To choose the sample outside of Baku, Baku was excluded from this list as were
+all the population points located in raions of the country currently occupied
+(Agdam, Xankendi, Xodjali, Xodjvendi, Susha, Kubatli, Zangelan, Kelbadjar,
+Lachin, Fizuli and Djebrali). The remainder of the country included 3453
+population points.
+#+end_quote
+
+-- catalog 408, =sampling_procedure=, section "Outside of Baku".  (Baku's own
+exclusion from *this* list is not a coverage exclusion: Baku is the separate
+first frame.  The eleven raions are excluded outright.)
+
+*** Field-work non-coverage: two population points not visited
+
+#+begin_quote
+During field work, one population point, Xandar, was not accessible due to
+security concerns and its proximity to the occupied region. A second population
+point, Sofukent, was not accessible because of the weather. In both cases, it
+was not practicable to replace the population points with two other population
+points randomly selected from the national list. Instead, field teams were
+instructed to visit the nearest population point of approximately the same size
+to the chosen population point.
+#+end_quote
+
+-- catalog 408, =sampling_procedure=, section "Sampling as Implemented".  This
+is *substitution*, not random replacement: two sampled points are represented
+by their nearest neighbours of similar size.
+
+*** Frame-quality caveats that bear on coverage
+
+Baku (passport-office lists), same source, section "Baku":
+
+#+begin_quote
+There is one passport for each dwelling in that raion regardless of the number
+of separate household/family units occupied the dwelling. The passport lists
+are, in principle, continuously updated with information from the housing
+maintenance offices. However, dwellings that are used for business, unoccupied,
+abandoned or rented to foreigners may remain listed. Furthermore, it is not
+clear how new privately built housing units would be listed.
+#+end_quote
+
+Major urban areas outside Baku, section "Sampling as Implemented":
+
+#+begin_quote
+In the course of the field work, it was discovered that population lists are not
+maintained in major urban areas. In Kuba, Xachmas, Devichi, Qaxi, Sheki, Ali
+Bairamli, Gojai and Agdash, supervisors had to improvise. In some cases passport
+registration lists were used, as was done in Baku. In other cases electric users
+lists, gas office books and butter/meat coupon distribution lists were used in
+order to capture a sample that was as representative as possible.
+#+end_quote
+
+*** Population exclusions: no statement found
+
+*No* statement excluding institutional or collective households, nomadic
+households, the homeless, or non-citizens appears anywhere in the catalog
+metadata or in any local document (list of what was searched below).  That is a
+*recorded gap*, not an assertion that such populations were in scope.
+
+** Oversamples and sub-populations -- the thing to know before pooling
+
+Specialization here lives *inside* the single wave.  The 1995 SLC is three
+separately-drawn samples reported as one dataset, each self-weighted within
+itself and none of them proportional to its share of the population:
+
+#+begin_quote
+The Azerbaijan Survey of Living Conditions sample design included 408
+households in the eleven raions that make up the city of Baku, 1200 households
+in the population outside of Baku, and 408 households among the registered
+Internally Displaced Persons residing throughout the country. This results in
+an oversampling of the Internally Displaced Persons population and an
+undersampling of the urban population of Baku. In order to use all data to
+provide nationally representative estimates, weighting factors must be applied
+to the data to account for the difference between the population and sample
+distributions.
+#+end_quote
+
+-- catalog 408, =sampling_procedure=, section "Design".
+
+The three groups are identified by =ppid= ranges (which is the library's =v=;
+see =* Sampling Design > PSU identification=), per DDI
+=study_desc.method.data_collection.weight=:
+
+| sub-population | designed n | =ppid= range (verbatim from the DDI weight field) |
+|----------------+------------+---------------------------------------------------|
+| outside Baku   |       1200 | =PPID 100-199=                                    |
+| Baku           |        408 | =PPID 1-34=                                       |
+| IDPs           |        408 | =PPID 201-234=                                    |
+
+The designed total, 2,016, is the same household count already recorded in
+=* Data Quality Notes= for this wave.
+
+The IDP frame is the *registered* IDP population, located through the Ministry
+of Refugees, with a further stage of sampling inside each raion:
+
+#+begin_quote
+In each raion, the administrative offices for the Ministry of Refugees was
+consulted to locate the internally displaced persons. Each office should have a
+list of internally displaced persons by households. An additional level of
+sampling took place to choose three places and four interviews will be
+conducted in each place. These places were buildings, towns, or tent camps
+depending on how the households were listed.
+#+end_quote
+
+-- catalog 408, =sampling_procedure=, section "Internally Displaced
+Population".  Unregistered displaced persons are outside this frame by
+construction.
+
+*Consequence for consumers*: an unweighted mean over Azerbaijan 1995 is a mean
+over a sample that over-represents registered IDPs and under-represents Baku.
+Do not pool it with other countries as though it were a self-weighting national
+sample.
+
+** Universe vs. what the weights represent -- CONTRADICTS an existing note
+
+The documentation is explicit that the weight is a *three-group*
+post-stratification factor, not a household-level design weight:
+
+#+begin_quote
+The three samples of households: outside Baku (PPID 100-199), Baku (PPID 1-34),
+and IDPs (PPID 201-234) are self-weighted for those three groups of households.
+(PPID is the variable name for population point identification code.) However,
+the number of households selected from each group do not correspond to the
+percent of the three groups in the national population.
+
+To use all sample households to represent all households in Azerbaijan,
+weighting factors should be used. This weight is included as variable W in the
+PP data
+file.
+#+end_quote
+
+-- catalog 408, DDI =study_desc.method.data_collection.weight= (line break
+before "file." is as in the source).
+
+This *contradicts* the existing note in =* Data Quality Notes= below, which
+reads:
+
+#+begin_quote
+The =weight= column on the =sample= table has just 3 unique values
+(min 0.694, max 1.258) across all 2,016 households.  [...]  This is far too
+uniform to be a true survey weight; it is more likely a normalising / fallback
+weight.  Consumers expecting genuine sampling weights for inference
+should treat Azerbaijan as effectively unweighted.
+#+end_quote
+
+Three distinct weight values is *exactly* what the documented design predicts:
+one factor per sub-population, because each sub-population is self-weighted
+internally.  The weight is not a fallback; per the DDI it is the intended
+variable =W=, and it is the *only* thing that makes the pooled sample
+nationally representative.  Advising consumers to treat Azerbaijan as
+"effectively unweighted" therefore inverts the documentation's instruction
+("weighting factors must be applied to the data").
+
+Both readings are quoted above; neither has been deleted.  Resolving this needs
+a check that =sample.weight= is in fact =W= from the PP file and that its three
+values map to the three =ppid= ranges -- a data check, deliberately *not*
+performed for this evidence pass.  Until then, treat the existing
+"effectively unweighted" advice as *disputed by the survey documentation*.
+
+** Where the statement lives -- catalog only
+
+The universe, exclusions, sub-samples and weight description exist *only* in
+World Bank NADA catalog metadata for study 408.  *No file in this repository
+contains them.*  The repo holds a pointer, not the text:
+=1995/Documentation/SOURCE.org= records =#+CATALOG_ID: 408= /
+=#+CATALOG_IDNO: AZE_1995_SLC_v01_M= and the DOI
+(https://doi.org/10.48529/z7ee-4p39), and =_/CONTENTS.org= cites the DOI.
+
+This makes Azerbaijan one of the waves whose population record is a *moving
+target*: if the World Bank edits or re-versions the study description, the
+statements quoted above change under us, and nothing in the repository would
+show it.  The quotes here are as retrieved 2026-07-21 from
+https://microdata.worldbank.org/index.php/api/catalog/AZE_1995_SLC_v01_M .
+
+*Not boilerplate.*  The most-repeated universe sentence in the cross-country
+corpus is WB NADA template text (15 waves).  It does *not* appear here -- this
+DDI has no =universe= element at all, and the text quoted above is
+survey-specific prose naming Azerbaijani raions, the National Statistical
+Committee and the Ministry of Refugees.  What is quoted is a claim about *this*
+survey, not a template.
+
+** What was searched, and what was not found
+
+Local (=lsms_library/countries/Azerbaijan/1995/Documentation/=), all read in
+full or grepped for =sampl|universe|populat|coverage|represent|strat|design|weight=:
+
+| file            | what it is                                   | universe statement? |
+|-----------------+----------------------------------------------+---------------------|
+| =SOURCE.org=    | catalog pointer + DOI                        | no (pointer only)   |
+| =LICENSE.org=   | WB Public Use Files terms                    | no                  |
+| =abstracte.pdf= | "SUMMARY OF RESULTS", English                | no -- results only  |
+| =abstractr.pdf= | Russian translation of the same              | no                  |
+| =ppabse.pdf=    | Abstract of the Population Point Qs, English | no (community counts only) |
+| =ppabsr.pdf=    | Russian counterpart                          | no                  |
+| =queshhe.pdf=   | household questionnaire, English             | preamble line only (quoted above) |
+| =quespope.pdf=  | population point questionnaire, English      | no                  |
+
+No Basic Information Document, sampling report, or Poverty Assessment is
+present in the repo for this wave.  Catalog: study 408 resolved via the DOI and
+the catalog search API; the full DDI JSON was retrieved and grepped for
+=exclud|Karabakh|occupied|not covered|omitted|institution|univ|coverage|analysis_unit=.
+
+Not found anywhere, and therefore *not* claimed either way: any exclusion of
+institutional / collective / nomadic / homeless households or of non-citizens;
+any age or citizenship restriction; any =universe= element in the DDI.
+
+Related, from =* Sampling Design= above: the microdata carries no region /
+oblast / rayon variable, so the eleven-raion exclusion *cannot be verified or
+re-imposed from the delivered data* -- it is knowable only from this
+documentation.
+
 * Files configured
 
 ** sample

@@ -102,6 +102,601 @@ NaN for that wave.  The cluster-level =loc2= is available in
 | GLSS6 | =PARTA/g6loc_edt.dta= | =HID= | =clust= | =weight= | =region= | =loc2= |
 | GLSS7 | =g7sec0.dta=     | =[clust,nh]= | =clust= | =WTA_S= | =region= | =urbrur= |
 
+* Sampling universe, exclusions and sub-samples
+
+# ASCII EXCEPTION (deliberate): the blocks inside #+begin_quote below are
+# VERBATIM transcriptions of GSS survey documentation.  One of them carries a
+# non-ASCII character as printed: the en dash in the GLSS6 SADA sentence
+# ("respectively -an").  It is NOT normalised, because normalising it would
+# destroy the one property that makes the quote evidence.  Everything else in
+# this section, inside quotes and out, is ASCII.
+
+Evidence gathered for GH #601 (the population record) from a documentation
+sweep on 2026-07-21; see =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= on
+branch =docs/601-population-statements= for the cross-country context.  Every
+quote below was re-verified against its cited source file before being written
+here.
+
+Three rules govern this section, and they are what make it usable:
+
+- *Verbatim or nothing.*  Source typography is preserved as printed, including
+  the sic spellings (="Education :"=, ="Agriculture:holders"=, ="covers region ,
+  zones"=) and the missing spaces (="(PSUs).The universe"=).  Nothing was
+  silently corrected.
+- *Nothing is inferred from the data.*  No =.dta= file was opened.  What a
+  survey /claims/ its sample represents and what its microdata look like are
+  two different facts, and this section records only the first.
+- *Gaps are recorded as gaps*, with what was searched, so the claim is
+  falsifiable.
+
+/Transcription note, applying to every quote below./  These are PDF and =.docx=
+sources.  Where a PDF's justified line-wrapping produced runs of spaces or
+split a word across lines (=socio- economic=), the whitespace was rejoined; and
+superscript footnote markers were dropped.  Nothing else was changed: wording,
+punctuation, sic spellings, missing spaces and stray spaces are exactly as
+printed.  One source (GLSS1) required a font decode; that is declared at the
+point of use.
+
+This section is about what the *documentation declares*.  It is deliberately
+separate from, and complementary to, =Sampling Design= above (which describes
+the mechanics as implemented in the data) and =Panel Linkage (GLSS1 to GLSS2)=
+below (which is derived from =PANELC.DAT=, not from documentation).  Where the
+documentation and those sections come apart, see /Tensions with the existing
+text/ at the end -- flagged, quoted on both sides, and *not* resolved here.
+
+No schema is proposed.  GH #603 decides how the library represents any of this.
+
+** Summary
+
+| Wave    | Round | Declared unit of the universe   | Where the statement lives           | Explicit exclusion?     | Confidence |
+|---------+-------+---------------------------------+-------------------------------------+-------------------------+------------|
+| 1987-88 | GLSS1 | persons ("all household members") | local DDI overview PDF (in repo)  | none found              | high       |
+| 1988-89 | GLSS2 | persons (circular -- see below)  | local DDI PDF (in repo)             | none found              | high       |
+| 1991-92 | GLSS3 | persons, per module              | local DDI PDF (in repo)             | yes -- 1 EA, chiefs     | high       |
+| 1998-99 | GLSS4 | households (coverage claim only) | local DDI PDF (in repo)             | none found              | high       |
+| 2005-06 | GLSS5 | population in private households | local DDI PDF (in repo)             | yes -- institutional    | high       |
+| 2012-13 | GLSS6 | population in individual households | local main report (in repo)      | yes -- institutional    | high       |
+| 2016-17 | GLSS7 | persons in private households    | local interviewers' manual (in repo) | none found             | medium     |
+
+Two facts about this table are worth stating plainly.
+
+*Every GLSS universe statement is in a file this repository ships.*  None of
+the seven waves is in the position of the 41-of-111 waves elsewhere in the
+library whose only population statement lives in World Bank catalog metadata.
+That matters: the record here is something the library holds, not a moving
+target on someone else's server.  Note also that for four of the seven waves
+the *World Bank* catalog entry named in =SOURCE.org= (2313, 2314, 2315, 2331)
+carries *no* Universe field at all -- the statements come from the Ghana
+Statistical Service NADA DDI PDFs shipped in each wave's =Documentation/=.
+
+*None of these is World Bank NADA boilerplate.*  The single most-repeated
+sentence in the cross-country corpus ("The survey covered all de jure
+households excluding prisons, hospitals, military barracks, and school
+dormitories.", verbatim in 15 waves) appears in *no* GLSS round.  Every
+sentence quoted below is GSS's own text about this survey.
+
+** The declared universe, per wave
+
+*** 1987-88 (GLSS1)
+
+Source: =1987-88/Documentation/GLSS 1987-88 Report.pdf=, section "Scope &
+Coverage" -> "Universe", PDF page 10 (printed "- 2 -").  Despite the filename,
+this file is the GSS NADA DDI study-documentation overview for GLSS 1, not a
+substantive report.
+
+#+begin_quote
+Universe
+
+The survey covered all household members of all age and sex category who reside in Ghana.
+#+end_quote
+
+/Transcription caveat:/ this PDF's text layer is a CID-encoded subset font with
+no ToUnicode map, so naive extraction yields =(cid:NN)= garbage.  The glyph map
+was reconstructed from cribs and the page decoded; the decode was reproduced
+independently during verification, and the resulting sentence is
+character-for-character identical to the Universe field on the live GSS NADA
+catalog page for study id 7.
+
+Note the unit: *persons*, not households.  Most waves across the library state
+their universe in households; GLSS1 is one of the few that states it in
+individuals.  The unit is not stable within GhanaLSS's own series either --
+compare GLSS5 ("the population living within private households"), GLSS6 ("the
+population living within individual households") and GLSS4 ("nationally
+representative household survey").
+
+The joint LSMS Basic Information Document
+(=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf=,
+which covers both the 1987-88 and 1988-89 rounds) contains *no*
+universe/target-population statement.
+
+*** 1988-89 (GLSS2)
+
+Source: =1988-89/Documentation/ddi-documentation-english-4.pdf=, "Coverage"
+block -> UNIVERSE field, PDF page 6 (document ID =DDI-GHA-GSS-GLSS2-2008-v2.0=).
+
+#+begin_quote
+UNIVERSE
+
+The survey covered all household members in the nationally representative sample. Different sections of the instruments have individual universes.
+#+end_quote
+
+*This statement is circular and should not be leaned on.*  "all household
+members in the nationally representative sample" describes the *sample*, not
+the set of units the sample stands for.  It is one of the corpus's clearest
+examples of a universe field that does not define a universe.
+
+The second sentence is a pointer, not a specification: the per-section
+universes are *not* enumerated for GLSS2.  (They are enumerated for GLSS3 --
+see below -- so the GLSS3 list is the nearest thing to a substantive reading,
+but it is GLSS3's list and is not asserted here for GLSS2.)
+
+*** 1991-92 (GLSS3)
+
+Source: =1991-92/Documentation/ddi-documentation-english-12.pdf=, "Coverage"
+block -> UNIVERSE field, PDF pages 5-6.
+
+#+begin_quote
+UNIVERSE
+
+The survey is nationally representative. It has the following sub-universes:
+
+Household roster: all usual household members
+
+Education : usual household members 5 years and older
+
+Health: all usual household members
+
+Employment and time use: usual household members 7 years and older
+
+Migration: usual household members 15 years and older
+
+Housing: heads of households
+
+Agriculture:holders
+#+end_quote
+
+Source typography preserved as printed: ="Education :"= (space before the
+colon) and ="Agriculture:holders"= (no space after it).
+
+This is the most granular universe statement of any GLSS round, and one of the
+few in the entire cross-country corpus that declares *per-module* universes.
+Anyone computing a denominator from a GLSS3 module should use the module's own
+sub-universe, not the household roster.
+
+The GLSS3 main report (=1991-92/Documentation/pdf/G3report.pdf=) has no
+"universe" heading; its Appendix 1 is about design, and is quoted under
+/Sub-samples/ below.
+
+*** 1998-99 (GLSS4)
+
+Source: =1998-99/Documentation/ddi-documentation-english-14.pdf=, "Coverage"
+block -> UNIVERSE field, PDF page 6.
+
+#+begin_quote
+UNIVERSE
+
+The survey is nationally representative household survey that covers region , zones and urban/rural residence.
+#+end_quote
+
+Typography preserved as printed: ="covers region , zones"= (space before the
+comma).
+
+*This is a coverage claim, not a universe declaration.*  It names the domains
+of analysis; it does not name the set of units the sample represents.
+
+The main report (=GHA_1998_GLSS_Report_EN.pdf=, content-identical to
+=glss4_report.pdf=) opens its Appendix 1 "SAMPLE DESIGN FOR ROUND 4 OF THE
+GLSS" with "A nationally representative sample of households was selected in
+order to achieve the survey objectives." (printed page 114) -- again a coverage
+claim.  Section 1.1 of that report presents estimates for "the total number of
+persons in private households in Ghana", which *implies* a private-household
+universe; the documentation never states that as a universe definition, and an
+implication is not recorded here as a claim.
+
+*** 2005-06 (GLSS5)
+
+*This wave carries two distinct universe statements in one document, and they
+are not the same thing.*  Both are recorded.
+
+(1) The DDI UNIVERSE field -- =2005-06/Documentation/ddi-documentation-english-5.pdf=,
+"Coverage" block, PDF page 4 (document ID =DDI-GHA-GSS-GLSS-2005-v2.0=,
+version 2.0, November 2008):
+
+#+begin_quote
+UNIVERSE
+
+The survey covered all de jure household members (usual residents) who have not been away from their usual residents for more than 6 months. This excludes heads of households.
+#+end_quote
+
+(2) The target population proper -- same file, "Sampling" -> "Sampling
+Procedure" -> "Sampling Frame and Units", PDF page 5:
+
+#+begin_quote
+As in all probability sample surveys, it is important that each sampling unit in the surveyed population have a known, non-zero probability of selection. To achieve this, there has to be an appropriate list, or sampling frame of the primary sampling units (PSUs).The universe defined for the GLSS 5 survey is the population living within private households in Ghana.
+#+end_quote
+
+Typography preserved: ="(PSUs).The universe"= (no space after the period) is as
+printed.
+
+Reading: (2) is the population record -- "the population living within private
+households in Ghana".  (1) is a *respondent-eligibility rule* (a de jure
+residence test), not a target population.
+
+The trailing clause of (1), ="This excludes heads of households."=, is quoted
+verbatim and is *not* interpreted here.  Its intended meaning is unclear (heads
+are certainly enumerated in the data).  Do not act on it without going back to
+the questionnaire.
+
+*** 2012-13 (GLSS6)
+
+Source: =2012-13/Documentation/REPORTS/GLSS6_Main Report.pdf=, "APPENDIX 1:
+METHODOLOGY OF THE SURVEY", section 6.2 "Sampling Frame and Units", printed
+page 204.  No DDI PDF is shipped for this wave.
+
+#+begin_quote
+6.2 Sampling Frame and Units
+
+The GLSS6 is a household probability sample survey designed to cater for a variety of analyses at the various domains of interest. As in all probability sample surveys, it is important that each sampling unit in the target population has a known, non-zero probability of being included in the sample. To achieve this, an appropriate list, or sampling frame of the PSUs is required. The list of standardized census EAs - together with their respective population and household sizes - obtained from the 2010 Population and Housing Census (PHC) conducted by the Ghana Statistical Service was used as the sampling frame for the GLSS6.
+
+However, the unit of measurement was the population living within individual households.
+#+end_quote
+
+Whitespace normalised from the report's justified line-wrapping; wording
+unaltered.
+
+The GSS NADA catalog entry for this study (id 72, the URL in =SOURCE.org=) does
+carry a UNIVERSE field, but it is uselessly terse -- "The survey covered all
+household members".  The local report is far more informative and is what is
+quoted.
+
+*** 2016-17 (GLSS7)
+
+*Confidence: medium.*  Unlike every other GLSS round, GLSS7 has *no* DDI
+Universe field anywhere -- not in the shipped
+=2016-17/Documentation/ddi-documentation-english-97.pdf= (whose Sampling,
+Questionnaires, Data Processing and Data Appraisal sections all read "No
+content available"), and not on the live GSS NADA catalog page for study id 97.
+
+The best available statement is from the interviewers' manual,
+=2016-17/Documentation/GLSS7 Final Manual.docx=, Chapter 1, closing section
+"1.2 METHODOLOGY OF THE SURVEY" (immediately after Table 1 "Regional
+Distribution of EAs and Households" and immediately before "1.3 SURVEY
+PERIOD"; the =.docx= has no page numbering in its XML, hence the section
+locator):
+
+#+begin_quote
+Basic information on all persons living in private households would be solicited.  In addition, all persons 15 years and older would be eligible for the labour force survey.  For the child labour module, the survey would solicit information from persons between the ages of 5-14 years.
+#+end_quote
+
+And, as the first sentence of section "Background" in the same chapter:
+
+#+begin_quote
+The Ghana Living Standards Survey (GLSS) is a nationally representative household survey which provides reliable, disaggregated and internationally comparable welfare and living conditions statistics in Ghana.
+#+end_quote
+
+*Why this is weaker evidence than the other six waves.*  It is a fieldwork
+instrument, not a metadata declaration, and it is written in the
+future/conditional tense ("would be solicited") because it was drafted before
+fieldwork.  It is a genuine coverage statement in an official GSS document, but
+it is not a universe field.
+
+Like GLSS3, GLSS7 states *per-module* eligibility (15+ for the labour force
+module; 5-14 for child labour) -- use those denominators for those modules.
+
+*Concrete next step if #603 needs a hardened GLSS7 record:* acquire the GLSS7
+Main Report published by GSS.  Its methodology appendix is the analogue of
+GLSS6's section 6.2 quoted above.  It is *not* in this repository's
+=2016-17/Documentation/= and was not consulted.
+
+** Exclusions
+
+Exclusions matter as much as inclusions, and only three of the seven rounds
+state one.
+
+*** Institutional population -- GLSS5 and GLSS6, explicit
+
+GLSS5, =2005-06/Documentation/ddi-documentation-english-5.pdf=, "Sampling Frame
+and Units", PDF page 5 (the sentence immediately following universe statement
+(2) above):
+
+#+begin_quote
+The institutional population (such as schools, hospitals etc), which represents a very small percentage in the 2000 Population and Housing Census (PHC), is excluded from the frame for the GLSS 5 survey.
+#+end_quote
+
+GLSS6, =2012-13/Documentation/REPORTS/GLSS6_Main Report.pdf=, section 6.2,
+printed page 204 (immediately following the GLSS6 universe quote above):
+
+#+begin_quote
+The institutional population (those who were in schools, hospitals, etc.), which represents a very small percentage of the 2010 Population and Housing Census (PHC), was excluded from the frame.
+#+end_quote
+
+The GLSS6 report carries this through into its own published estimates: the
+note to Table 2.1 (printed page 5) reads, verbatim, ="Excludes institutional
+population."=
+
+*** One enumeration area dropped -- GLSS3, explicit
+
+=1991-92/Documentation/pdf/G3report.pdf=, Appendix 1 "SAMPLE DESIGN FOR ROUND 3
+OF THE GLSS", printed page 113:
+
+#+begin_quote
+The figure of 28 rural workloads with no workload, shown in Table 2, includes one EA which had to be excluded from the final sampling frame because the local chiefs refused to allow the listing exercise to be done.
+#+end_quote
+
+This is a single-EA field-access exclusion, not a design carve-out.  It is
+recorded because it is the only named geographic exclusion in the GLSS series.
+
+*** No exclusion statement found -- GLSS1, GLSS2, GLSS4, GLSS7
+
+For these four rounds, *no* exclusion statement was found.  What was searched,
+per the standing rule against unevidenced "nothing here" claims:
+
+| Wave    | Searched                                                                                                                                                                                                 |
+|---------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1987-88 | =Documentation/= (=SOURCE.org=; =GLSS 1987-88 Report.pdf= decoded in full; =technical document/GHA_1987_GLSS_Basicinfo_EN.pdf=; listings of =technical document/=, =reports/=, =questionnaire/=); GSS NADA id 7; WB catalog 2313 |
+| 1988-89 | =Documentation/= (=SOURCE.org=; =ddi-documentation-english-4.pdf=; =technical document/GHA_1988_GLSS_Basicinfo_EN.pdf=; =technical document/GHA_1988_GLSS_Samplingrecoomendations_EN.pdf=; listings of =technical document/=, =reports/=, =questionnaire/=); GSS NADA id 4; WB catalog 2314 |
+| 1998-99 | =Documentation/= (=SOURCE.org=; =ddi-documentation-english-14.pdf=; =GHA_1998_GLSS_Report_EN.pdf=; =glss4_report.pdf=; =GHA_1998_GLSS_Data_User_Guide_EN.pdf=; =GHA_1998_GLSS_Dataentry_EN.pdf=; =questionnaire/= listing); GSS NADA id 14; WB catalog 2331 |
+| 2016-17 | =Documentation/= (=SOURCE.org=; =ddi-documentation-english-97.pdf= in full; =GLSS7 Final Manual.docx= in full, incl. a targeted scan for institutional / collective / homeless / nomadic wording -- zero hits; listings of the module =.docx= files and =Supervisors' manual_GLSS7.doc=); GSS NADA id 97.  No GLSS7 entry located in the WB catalog. |
+
+For GLSS4 and GLSS7 the "private households" phrasing in the surrounding prose
+*implies* the usual institutional-population exclusion that GLSS5 and GLSS6
+state explicitly.  That inference is deliberately *not* recorded as a claim.
+
+GLSS4's Appendix 1 does record a frame-quality caveat rather than an exclusion,
+=1998-99/Documentation/GHA_1998_GLSS_Report_EN.pdf=:
+
+#+begin_quote
+For the purposes of this survey the list of the 1984 population census Enumeration Areas (EAs) with population and household information was used as the sampling frame. ... This frame, though quite old, was considered inadequate, it being the best available at the time.
+#+end_quote
+
+(The "considered inadequate" reading is as printed; it appears to be a
+typographic error for "adequate", but it is quoted, not corrected.)
+
+** Oversamples and sub-samples
+
+*This is the part a reader pooling GLSS rounds needs before averaging
+anything.*  In this country, as in most of the corpus, specialization lives
+*inside* a wave rather than as a whole wave.
+
+*** GLSS1 -> GLSS2: a rotating panel with a half-retained sub-sample
+
+The GLSS3 main report's Appendix 1 describes the GLSS1/GLSS2 design.
+=1991-92/Documentation/pdf/G3report.pdf=, "Sample design for GLSS1 and GLSS2",
+printed page 110:
+
+#+begin_quote
+The original idea was that a rotating panel design would be used, with half of the sample being retained each year for re-interview and the other half being replaced. This design would provide a representative sample of households each year, but it also had the advantage of continuity from one year to the next, enabling more precise estimates to be made of the changes occurring in the socio-economic situation of households. Half the workloads from GLSS1 were therefore retained for GLSS2, and attempts were made to re-interview the same households. The other half of the GLSS2 sample was taken from the 100 EAs in replicate 6 of the master sample.
+#+end_quote
+
+And the master-sample construction, same appendix, printed page 109:
+
+#+begin_quote
+The Ghana Statistical Service (GSS) had created a master sample of enumeration areas (EAs), which serves as the sampling frame used for selecting households for each annual round of the GLSS. To prepare this master sample, the 12,969 EAs from the 1984 Population Census were first placed in order, by region within each location (rural/semi-urban/urban), in turn within each ecological zone (coastal/forest/savannah). A total of 800 EAs were then systematically selected from this list with probability proportional to size (PPS), and these selected EAs were then assigned systematically to eight separate replicates of 100 EAs. Each replicate thus provides a representative PPS sample of EAs. For GLSS1 two replicates (1 and 5) were used.
+#+end_quote
+
+So *GLSS2 is documented as two sub-samples in one wave*: a retained panel half
+(re-interview attempts on GLSS1 workloads) and a fresh half drawn from
+replicate 6.  This is precisely the "specialization inside a wave" shape.
+It also *contradicts* the existing =Survey Program= text -- see /Tensions/
+below.
+
+Corroborating, from GLSS1's own DDI overview (=1987-88/Documentation/GLSS
+1987-88 Report.pdf=, "Sampling Procedure", printed "- 2 -"; decoded, see the
+transcription caveat above):
+
+#+begin_quote
+The resulting list is 3200 households and 800 replacement households in something less than 200 sampling areas (specifically 178 in 1987-88 and 170 in 1988-89). Each group of 16, 32 or 48 households within a sampling area is referred to as a cluster in the GLSS data sets and in this document.
+#+end_quote
+
+That is one design document describing both rounds' realised sampling areas --
+consistent with a single master sample worked across two years, not two
+independent draws.
+
+*** GLSS3: the design breaks with GLSS1/GLSS2
+
+Same appendix, printed page 110:
+
+#+begin_quote
+For GLSS3 it was initially expected that the same sample design would be followed, with replicate 6 being retained and replicate 1 being replaced by replicate 2. A listing exercise was therefore carried out for replicate 2 in July/August 1989. However, following discussions between the GSS and the World Bank, it was decided that GLSS3 would differ substantially from GLSS1 and GLSS2, by giving much fuller attention to household expenditure and consumption, and with less attention to some of the topics covered previously. In order to obtain high quality data on household consumption and expenditure it was also decided that a larger and more widespread sample was required.
+#+end_quote
+
+(The sentence ends there; a superscript footnote marker "15" follows
+="required"= in the source and has been dropped per the transcription note.)
+
+The rotation was therefore abandoned at GLSS3.  This is the documentary basis
+for "no cross-wave linkage exists for GLSS3 onward" in =Panel Linkage= below --
+and it is a stronger basis than the ID-availability argument recorded there.
+
+*** GLSS5: regional oversample by design (a minimum-per-region floor)
+
+=2005-06/Documentation/ddi-documentation-english-5.pdf=, "Sample size and
+allocation", PDF page 5:
+
+#+begin_quote
+It was decided to sample a total sample of 8000 households nationwide .
+
+To ensure adequate numbers of complete interviews that will allow for reliable estimates at the various domains of interest, the GLSS 5 sample was designed to ensure that at least 400 households were selected from each region.
+#+end_quote
+
+Typography preserved: ="nationwide ."= (space before the period).
+
+The minimum-per-region floor *is* the oversample mechanism: it forces
+disproportionately large samples in the small regions.  GSS says so directly --
+see /Universe vs. what the weights represent/ below.
+
+*** GLSS6: sample doubled to serve the SADA (northern savannah) domain
+
+=2012-13/Documentation/REPORTS/GLSS6_Main Report.pdf=, "APPENDIX 1:
+METHODOLOGY OF THE SURVEY", "What is new?", printed page 200:
+
+#+begin_quote
+To cater for the needs of the Savannah Accelerated Development Authority (SADA) areas and also provide nationally representative quarterly labour force statistics, the number of primary Sampling Units (PSUs) and households were increased from 580 and 8,700 to 1,200 and 18,000 respectively –an increase of about 107% over the GLSS5 figures (Tables A1 and A2).
+#+end_quote
+
+The en dash and the missing space in ="respectively –an"= are as printed.
+
+Note precisely what this does and does not say.  It says the *overall* sample
+was roughly doubled in order to support SADA-area and quarterly-labour-force
+analysis.  It does not, in this sentence, quantify a SADA-specific
+disproportionality.  The disproportionality is stated separately, and
+quantified, in the weighting section -- next.
+
+*** GLSS7: fielded jointly with an Agriculture Module
+
+=2016-17/Documentation/GLSS7 Final Manual.docx=, section 1.2 "METHODOLOGY OF
+THE SURVEY":
+
+#+begin_quote
+The seventh round of the GLSS, like the previous rounds, would provide national and regional level indicators.  The survey is proposed to study about 15,000 households in 1,000 Enumeration Areas (EAs), consisting of 561 (56.1%) rural EAs and 439 (43.9%) urban EAs. The regional distribution of Enumeration Areas to be covered for the combined GLSS-7 and Agriculture Module would be as in Table 1.
+#+end_quote
+
+And, from section "Background":
+
+#+begin_quote
+The previous rounds of GLSS have always had a specific focus. In the 5th Round for instance, the Non-Farm Household Enterprises Module was made the focus and additional sections covering Tourism and Migrants & Remittances were introduced. The GLSS6 focused on Labour Force and the GLSS7, this time round, has Agriculture module as its main focus.
+#+end_quote
+
+The documentation describes a *combined* GLSS-7 + Agriculture Module fielding.
+Whether the Agriculture Module was administered to the full sample or to a
+sub-sample is *not* stated in any document in this repository, and is not
+asserted here.
+
+** Universe vs. what the weights represent
+
+The GLSS documentation is unusually explicit that these are different things,
+and says so in two rounds.
+
+GLSS5, =2005-06/Documentation/ddi-documentation-english-5.pdf=, "Weighting",
+PDF page 6:
+
+#+begin_quote
+The GLSS 5 is not a self-weighting sample design because disproportionately larger samples from regions with smaller populations were drawn. Therefore each sample household did not have the same chance of selection into the sample. Hence, weights were computed to reflect the different probabilities of selection in order to obtain the true contribution of each selected EA in the sample based on the first and second stage probabilities of selection.
+
+The household weight variable is called WEIGHT which is attached to each section data
+
+A grossing up factor (637.89) was used for the agriculture sections instead of the weight variable.
+#+end_quote
+
+GLSS6, =2012-13/Documentation/REPORTS/GLSS6_Main Report.pdf=, "9. Computation
+of Weights", printed page 207:
+
+#+begin_quote
+The GLSS6 is not a self-weighting sample design because disproportionately larger samples from regions with smaller populations were drawn. Therefore, each sample household did not have the same chance of selection into the survey sample. Hence, weights were computed to reflect the different probabilities of selection in order to obtain the true contribution of each selected EA in the sample based on the first and second stage probabilities of selection.
+#+end_quote
+
+GLSS6 quantifies the resulting disproportionality, same appendix, printed page 206:
+
+#+begin_quote
+The overall raising factor for the survey is 368. This means that, on average, the GLSS6 conducted interviews with 1 in 368 of the population of all ages per cluster. However, interviewing rates ranged from as low as 1 in 97 in Upper West Region and 1 in 158 in Upper East Region to as high as 1 in 650 in the Greater Accra Region and 1 in 703 in Ashanti Region (Table A7).
+#+end_quote
+
+Consequences a user must not miss:
+
+- The universe is national in both rounds, but the *sample* is heavily tilted
+  toward the small northern regions -- by a factor of roughly 7 between Upper
+  West and Ashanti in GLSS6.  Unweighted GLSS5/GLSS6 statistics are *not*
+  national statistics.
+- *GLSS5's agriculture sections do not use =WEIGHT=.*  GSS states a flat
+  grossing-up factor of 637.89 for them instead.  Anyone weighting GLSS5
+  agriculture data with the household =weight= variable is using a weight GSS
+  did not intend for those sections.  This is not currently reflected anywhere
+  in =Sampling Design= above.
+- For GLSS1 and GLSS2 the documentation asserts the opposite regime.  From the
+  GLSS3 report, Appendix 1, printed page 109:
+
+  #+begin_quote
+  The total sample therefore consisted of 3200 households, and the sample design provided a self-weighting sample, since each household in Ghana had an equal probability of being selected.
+  #+end_quote
+
+  This corroborates the existing =Weights= subsection's "GLSS1 and GLSS2 are
+  self-weighting" with a documentary citation, which it previously lacked.
+
+** Tensions with the existing text in this file
+
+Flagged, both sides quoted, *not* resolved.
+
+*** 1. "no rotating panel or refreshment sample mechanism"
+
+The =Survey Program= section above says:
+
+#+begin_quote
+Each round is designed as an independent nationally representative cross-section; there is no rotating panel or refreshment sample mechanism.
+#+end_quote
+
+The GLSS3 main report says (printed page 110, quoted in full under
+/Sub-samples/ above):
+
+#+begin_quote
+The original idea was that a rotating panel design would be used, with half of the sample being retained each year for re-interview and the other half being replaced. ... Half the workloads from GLSS1 were therefore retained for GLSS2, and attempts were made to re-interview the same households. The other half of the GLSS2 sample was taken from the 100 EAs in replicate 6 of the master sample.
+#+end_quote
+
+These are in direct conflict *for the GLSS1/GLSS2 pair*.  The documentation
+describes exactly a rotating panel with a refreshment half.  The =Survey
+Program= claim appears defensible from GLSS3 onward (the rotation was abandoned
+at GLSS3 -- see the printed-page-110 quote under /Sub-samples/), but not for
+1987-88/1988-89.
+
+Note that the =Panel Linkage (GLSS1 to GLSS2)= section further down already
+records the panel as an empirical fact ("Despite being designed as independent
+cross-sections, a sub-sample of GLSS1 households was re-interviewed in GLSS2 ...
+714 panel households", derived from =PANELC.DAT=).  The new evidence is that
+this was *not* an accident of fieldwork: it was the stated design.  The
+"Despite being designed as..." framing in that section is contradicted by GSS's
+own documentation.
+
+*** 2. "GLSS2 | 2xxx | 200 EAs, fresh draw"
+
+The cluster-numbering table in =Sampling Design= says:
+
+#+begin_quote
+| GLSS1     | 1xxx             | 200 EAs from 1984 census frame    |
+| GLSS2     | 2xxx             | 200 EAs, fresh draw               |
+#+end_quote
+
+The documentation says GLSS1 used master-sample replicates 1 and 5 (2 x 100
+EAs), and that GLSS2 was *half* retained GLSS1 workloads plus *half* from
+replicate 6 (100 EAs).  "Fresh draw" is therefore accurate for at most half of
+GLSS2.
+
+*** 3. "200 EAs" for GLSS1 and GLSS2
+
+GLSS1's own DDI overview says the realised figure was "something less than 200
+sampling areas (specifically 178 in 1987-88 and 170 in 1988-89)".  The design
+target was 200; the realised counts were lower.  The table's "200 EAs" is the
+design figure, not the achieved one.
+
+*** 4. "GLSS3+ Region-based (10 administrative regions from GLSS3; possibly finer in later rounds)"
+
+The "possibly finer" hedge is now resolvable for GLSS6 from documentation.
+=2012-13/Documentation/REPORTS/GLSS6_Main Report.pdf=, section 6.3
+"Stratification", printed page 204:
+
+#+begin_quote
+To enhance the precision and reliability of the survey results, the EAs were first stratified into 10 main domains according to the ten administrative regions. Within each region, the EAs were further stratified into their rural and urban categories, bringing the total number of sub-strata to 20. Again, the three ecological zones, namely 1) Coastal, 2) Forest, and 3) Savannah (SADA) were taken into consideration.
+#+end_quote
+
+The analogous GLSS5 statement, =2005-06/Documentation/ddi-documentation-english-5.pdf=,
+"Stratification", PDF page 5:
+
+#+begin_quote
+In order to take advantage of possible gains in precision and reliability of the survey estimates from stratification, the EAs were first stratified into the ten administrative regions. Within each region, the EAs were further sub-divided according to their rural and urban areas of location. The EAs were also classified according to ecological zones and inclusion of Accra (GAMA) so that the survey results could be presented according to the three ecological zones, namely 1) Coastal, 2) Forest, and 3) Northern Savannah, and for Accra.
+#+end_quote
+
+This is an enrichment of the existing table rather than a contradiction, and is
+recorded so the hedge can be retired for GLSS5 and GLSS6 at least.
+
+** Open items
+
+- *GLSS7 has no universe field anywhere.*  Acquiring the GSS-published GLSS7
+  Main Report would replace a future-tense interviewers'-manual sentence with
+  a methodology appendix.  This is the single highest-value acquisition for
+  Ghana's population record.
+- *GLSS5's ="This excludes heads of households."="* is unexplained and should be
+  checked against the GLSS5 Part A questionnaire before anyone relies on the
+  DDI universe field.
+- *Whether GLSS7's Agriculture Module was a full-sample or sub-sample module*
+  is not documented in this repository.
+
 * Panel Linkage (GLSS1 to GLSS2)
 
 Despite being designed as independent cross-sections, a sub-sample

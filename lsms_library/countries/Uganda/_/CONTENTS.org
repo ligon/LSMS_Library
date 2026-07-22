@@ -207,6 +207,486 @@ For cross-sectional analysis within a single wave, use =weight=.
 For longitudinal/panel analysis across waves, use =panel_weight=
 (and restrict to households where it is non-null and positive).
 
+** Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 under GH #601.  Every quote below was
+re-verified against the cited PDF at the cited page.
+
+Transcription conventions, so a later reader can tell quote from edit: runs
+of whitespace introduced by PDF justification are collapsed to single spaces;
+the source's typographic double quotes (around "wave", "tracking", "core",
+"target tracking") are transcribed as ASCII straight quotes; the =fi=/=ff=
+ligatures in the 2015-16 DDI are transcribed as ordinary ASCII letters; an
+en-dash in the 2019-20 BID is transcribed as "-".  *No words were changed,
+added, or reordered*, and nothing is elided except where marked with =...=.
+
+*** There is no declared universe for any Uganda wave
+
+No document for any of the eight waves carries a DDI =Universe= or "target
+population" field.  Searched, per wave: every local Basic Information
+Document and DDI PDF under =countries/Uganda/{wave}/Documentation/=,
+converted in full with pdfminer and grepped for =universe=, =target
+population=, =coverage=, =scope=, =excluded=, =exclusion=, =nomadic=,
+=institutional=, =sampling frame=; plus the World Bank catalog
+study-description pages for ids 1001, 2166, 2059, 2663, 3460, 3795 and 3902.
+=universe= returns *zero hits* in all of them.
+
+What exists instead, in every wave, is a *coverage claim* plus
+sampling-procedure prose:
+
+- a DDI =Geographic Coverage= field reading =National= (2009-10, 2018-19) or
+  =National coverage= (2010-11) or =National Coverage.= (2015-16); and
+- one recurring sentence about a "nationally representative sample of
+  households".
+
+Two things follow, and both matter when pooling Uganda with other countries.
+
+1. *This is not the World Bank NADA boilerplate.*  The sentence that appears
+   verbatim in 15 waves of the #601 corpus -- "The survey covered all de jure
+   households excluding prisons, hospitals, military barracks, and school
+   dormitories." -- does *not* appear anywhere in Uganda's documentation.
+   Uganda's recurring sentence is UBOS/LSMS-ISA text specific to the UNPS.
+   So it attests a real survey-programme claim, not a metadata template.
+
+2. *But it is copy-forward within the UNPS series.*  The same "carried out
+   over a twelve-month period ... on a nationally representative sample of
+   households" sentence, and the same paragraph of sampling procedure around
+   it, is reprinted essentially unchanged from 2009-10 through 2019-20 --
+   and the 2010-11 BID says so outright: "Refer to the UNPS 2009/10 Basic
+   Information Document for detailed information on the UNPS survey design"
+   (=UNPS_2010-11_Basic-Info-2014.pdf=, sec. 1.2, PDF p. 3).  There are
+   therefore effectively *two* independent coverage statements here -- one
+   for the UNHS 2005/06 baseline and one for the UNPS series -- not eight.
+   Treating agreement across waves as corroboration would be double-counting.
+
+*Gap, recorded as a gap.*  No Uganda document found states an
+institutional-population exclusion (prisons, hospitals, barracks, school
+dormitories) or a nomadic / homeless / collective-quarters exclusion.  That
+is *not* evidence that no such exclusion applies -- it is evidence that the
+question is unanswered in the documents this repo holds.  See the search
+list at the head of this subsection for exactly what was looked at.
+
+*** Declared coverage, per wave
+
+| Wave    | Statement source                                     | Held in repo? | Locator                                   |
+|---------+------------------------------------------------------+---------------+-------------------------------------------|
+| 2005-06 | UNHS 2005/06 Interviewer Manual                      | yes           | ch. 1, "SURVEY DESIGN", PDF p. 4          |
+| 2009-10 | DDI, catalog 1001                                    | yes           | Series; Coverage > Geographic Coverage    |
+| 2010-11 | Basic Information Document (rev. 2014)               | yes           | sec. 1.2 Survey Design, PDF p. 3          |
+| 2011-12 | Basic Information Document (rev. July 2014)          | yes           | sec. 1.2 Survey Design, PDF p. 6          |
+| 2013-14 | Basic Information Document                           | yes           | sec. 1.2 Survey Design, PDF p. 6          |
+| 2015-16 | DDI, catalog 3460                                    | yes           | Coverage, PDF p. 3; Sampling, PDF p. 4    |
+| 2018-19 | *WB catalog page only* -- see warning below          | *no*          | catalog 3795 Series / Coverage / Sampling |
+| 2019-20 | Basic Information Document                           | yes           | sec. 1.2 Survey Design, PDF pp. 6-7       |
+
+**** 2005-06 -- the UNHS baseline
+
+=2005-06/Documentation/UNHS.2005-06.Interviewer.Manual.FINAL.pdf=, Chapter
+One, section "SURVEY DESIGN" (PDF p. 4; printed p. 2).  The =...= elides one
+sentence about EA maps.
+
+#+begin_quote
+The UNHS 2005/06 will use the 2002 Population and Housing Census list of
+Enumeration Areas (EAs) as its sampling frame. ... A sample of about 750
+Enumeration Areas (EAs) has been selected. The selected areas will be visited
+by UBOS field workers who will list all households living in the EAs. 10
+households will be selected randomly from each EA. The UNHS sample covers the
+entire country and was selected in such a way that it will generate estimates
+for the whole of Uganda, for urban and rural Uganda, and each of the four
+(statistical) regions: Central, Eastern, Northern and Western, and for a few
+selected districts.
+#+end_quote
+
+This is a coverage/precision claim, not a universe: it says what the sample
+will /produce estimates for/, and never says what population is in scope.
+
+**** 2009-10 -- UNPS Wave 1
+
+=2009-10/Documentation/ddi-documentation-english_microdata-1001.pdf=,
+"Series" (PDF p. 14) and "Geographic Coverage" (PDF p. 16, printed "- 6 -");
+the IDP sentence quoted below is on PDF p. 17.
+The =...= elides the intervening Abstract / Objectives / Scope blocks.
+
+#+begin_quote
+The 2005-2009/10 Uganda National Panel Survey (UNPS) is the first multi-topic
+panel household survey conducted in Uganda. The UNPS is carried out annually,
+over a twelve-month period on a nationally representative sample of
+households. ... Geographic Coverage National
+#+end_quote
+
+**** 2010-11 through 2019-20 -- the recurring UNPS sentence
+
+Verbatim from =2011-12/Documentation/unps_2011_12_bid_rev2014july.pdf=,
+sec. 1.2 (PDF p. 6); the 2013-14 BID (PDF p. 6), the 2015-16 DDI (Sampling
+Procedure, PDF p. 4), the 2019-20 BID (sec. 1.2, PDF p. 6) and the catalog
+3795 page carry the same sentence, with or without the parenthetical (a
+"wave") and
+with =annually= present in 2010-11/2011-12/2013-14 and dropped from 2015-16
+onward:
+
+#+begin_quote
+The UNPS is carried out annually, over a twelve-month period (a "wave") on a
+nationally representative sample of households, for the purpose of
+accommodating the seasonality associated with the composition of and
+expenditures on consumption.
+#+end_quote
+
+**** 2018-19 -- statement exists ONLY in catalog metadata
+
+=2018-19/Documentation/= contains *no* Basic Information Document and *no*
+DDI PDF -- only =SOURCE.org=, =LICENSE.org= and four questionnaires
+(=agriculture_qx.pdf=, =unps_community.pdf=, =unps_hhq.pdf=,
+=unps_woman.pdf=).  The only population statement for this wave lives on
+https://microdata.worldbank.org/index.php/catalog/3795/study-description
+(fetched 2026-07-21), under Series Information, Coverage and Sampling:
+
+#+begin_quote
+The 2018/19 Uganda National Panel Survey (UNPS) is the seventh multi-topic
+panel household survey conducted in Uganda and follows surveys carried out in
+2009/10, 2010/11, 2011/12, 2013/14 and 2015/16. The UNPS is carried out over
+a twelve-month period on a nationally representative sample of households.
+... Coverage Geographic Coverage National
+#+end_quote
+
+*Warning.*  For this wave the library holds no copy of the claim.  The World
+Bank can revise or re-version that page at any time, so the 2018-19 record is
+a moving target rather than something this repo can reproduce.  Acquiring the
+2018-19 BID/DDI would close it.
+
+*** Exclusions
+
+**** IDP camps -- the one geographic/population exclusion, and it reverses
+
+The UNHS 2005/06 baseline *included* the internally-displaced population, by
+adding a sampling stage for it (=UNHS.2005-06.Interviewer.Manual.FINAL.pdf=,
+"SURVEY DESIGN", PDF p. 4):
+
+#+begin_quote
+However, in some districts of Northern Uganda where large populations have
+been displaced by the LRA war and are living in Internally Displaced People
+(IDP) Camps, a three-stage sampling design will be adopted, with the
+selection of the IDP as the first stage unit, the respective 'blocks' within
+the camp as the second stage selection and the households within the blocks
+as the third stage units of selection.
+#+end_quote
+
+The UNPS, which subsamples the UNHS 2005/06 frame, then *drops* those extra
+EAs.  The wording drifts across waves; each is quoted as printed:
+
+| Wave    | Verbatim                                                                                                                          | Source                              |
+|---------+-----------------------------------------------------------------------------------------------------------------------------------+-------------------------------------|
+| 2009-10 | Since IDP camps are now mostly unoccupied, the extra EAs in IDP camps are not a part of the UNPS subsample.                        | DDI 1001, Sampling, PDF p. 17       |
+| 2010-11 | -- no exclusion statement; see gap note below                                                                                     | --                                  |
+| 2011-12 | Since IDP (internally displaced people) camps are now mostly unoccupied, the extra EAs in IDP camps are not a part of the UNPS subsample. | BID sec. 1.2, PDF p. 6       |
+| 2013-14 | Since IDP camps are now mostly unoccupied, the extra EAs in IDP camps are not a part of the UNPS subsample.                       | BID sec. 1.2, PDF p. 6              |
+| 2015-16 | Since most IDP (Internally Displaced People) camps in the Northern region are currently unoccupied, the EAs that constituted IDP camps were not part of the UNPS sample. | DDI 3460, Sampling, PDF p. 4 |
+| 2018-19 | (same sentence as 2015-16)                                                                                                        | catalog 3795, Sampling Procedure    |
+| 2019-20 | Since most IDP (Internally Displaced People) camps in the Northern region are currently unoccupied, the EAs that constituted IDP camps were not part of the UNPS sample. | BID sec. 1.2, PDF p. 7 |
+
+Read plainly: from 2009-10 onward the UNPS frame is the UNHS 2005/06 frame
+*minus* its IDP-camp EAs.  The documents justify this by the camps being
+"mostly unoccupied" -- they do not claim the formerly-displaced population is
+picked up elsewhere in the frame, and they do not quantify what was dropped.
+Anyone using UNPS Northern-region estimates for the post-conflict period
+should carry that carve-out explicitly.
+
+*Gap -- 2010-11.*  Neither =UNPS_2010-11_Basic-Info-2014.pdf= nor
+=ddi-documentation-english_microdata-2166.pdf= nor the catalog 2166 page
+contains any exclusion statement for this wave; =IDP= returns *zero hits* in
+all three.  The 2010-11 BID instead defers to the 2009/10 BID for design.  So
+the IDP exclusion is not restated for 2010-11 -- inherited, not asserted.
+
+**** 2019-20 -- households whose last interview was Wave 0 or Wave 1 are out
+
+=2019-20/Documentation/unps2019_20_bid.pdf=, sec. 4.1 "Tracking" (PDF
+pp. 32-33), describing the expanded Wave 8 target-tracking scope:
+
+#+begin_quote
+All households (original, movers or split-offs) that were interviewed during
+Wave 2 and/or Wave 3 and/or Wave 4 and still live in Uganda, regardless of
+location or distance from original household location. ... "Previous wave" is
+defined as the last time that household was interviewed - in this case Wave
+7(2018/19); in others wave 6(2017/18); and/or wave 5(2015/16); and/or wave
+4(2013/14); and/or wave 3 (2011/12); and/or, Wave 2 (2010/11). If they were
+last interviewed in Wave 0 or Wave 1, they were excluded from the survey at
+this time.
+#+end_quote
+
+Wave 0 is the UNHS 2005/06 baseline and Wave 1 the UNPS 2009/10.  This is a
+panel-following rule rather than a statement about the target population, but
+it *bounds who can appear in 2019-20*: a household last seen in 2005/06 or
+2009/10 is out of scope for Wave 8 by design, not by attrition.
+
+**** Persons excluded from tracking
+
+Same source, sec. 4.1 (PDF p. 32), describing the rule in force through
+Wave 7:
+
+#+begin_quote
+Split-offs could originate from both original and shifted households, though
+the only household members eligible for target tracking as split-offs were
+the household head and individuals related to them such as spouse, biological
+children, parents of the head or spouse, etc. (codes 1-7 of Section 2
+Question 4 in the household questionnaire). Servants, other relatives and
+non-relatives (codes 8-96) were not tracked.
+#+end_quote
+
+and, for Wave 8 (PDF p. 33):
+
+#+begin_quote
+In those households, the only individuals marked for tracking are the
+previous wave's household head, spouse, and children over age 15. Other
+household members were not tracked beyond their known location from the
+previous wave - they were only included in interviews if they still lived
+with one of these "core" members.
+#+end_quote
+
+Consequence for =household_roster= / =household_characteristics=: servants,
+non-relatives and distant relatives who leave a UNPS household cannot form an
+in-sample split-off household.  Relationship categories are therefore *not*
+followed symmetrically over the panel.
+
+*** Oversamples and sub-samples inside a wave
+
+Uganda's specialisation lives *inside* waves, not as whole waves.  The
+documented sub-samples, in descending order of how much they should change
+what a reader does with the data:
+
+**** 1. Ten districts oversampled by the UNHS 2005/06, deflated in the UNPS
+
+=2011-12= BID sec. 1.2 (PDF p. 6) and =2013-14= BID sec. 1.2 (PDF p. 6),
+identical wording:
+
+#+begin_quote
+Within each stratum, the UNPS EAs were selected from the UNHS 2005/06 EAs
+with equal probability, and with implicit stratification by urban/rural and
+district (in this order), except for the rural portions of the ten districts
+that were oversampled by the UNHS 2005/06. In these districts, the
+probabilities were deflated, to bring them back to the levels originally
+intended.
+#+end_quote
+
+Restated more vaguely from 2015-16 onward (=2015-16= DDI Sampling, PDF p. 4;
+=2019-20= BID sec. 1.2, PDF pp. 6-7): "However, the probabilities of selection for the
+rural portions of ten districts that had been oversampled by the UNHS 2005/06
+were adjusted accordingly."
+
+*Gap.*  *The ten districts are never named* in any document searched (all
+eight waves' BIDs/DDIs plus the 2005/06 interviewer manual, grepped for
+=oversampl=).  So the oversample is attested but not reconstructible from
+what the repo holds; it is absorbed into the weights and cannot be identified
+in the data from documentation alone.
+
+**** 2. The 20% "target tracking" sub-sample (waves 1-4)
+
+Two households per EA -- 20% of the sample -- were designated for tracking
+movers, and *only those* were followed outside their original EA.
+=2019-20= BID sec. 4.1 (PDF p. 32):
+
+#+begin_quote
+Prior to the UNPS 2009/10 field work, 20% of households (two per EA) were
+randomly selected for purposes of tracking individuals that had moved from
+original locations since UNHS 2005/06. These were the only households tracked
+even if they had moved beyond their original EA/parish, they maintained the
+"target tracking" status during Wave 2 (2010/11), Wave 3 (2011/12) & Wave 4
+(2013/14).
+#+end_quote
+
+Same fact in the =2011-12= and =2013-14= BIDs, sec. 1.2 (both PDF p. 6):
+"Prior to the start
+of the 2009/10 field work, 2 UNPS households were also randomly selected in
+each EA for the purposes of tracking baseline individuals that moved away
+from original locations since the UNHS 2005/06."
+
+And the asymmetry between movers and split-offs (=2019-20= BID sec. 4.1,
+PDF p. 32):
+
+#+begin_quote
+In prior waves, movers were tracked and interviewed if they moved somewhere
+else within Uganda, even if they were not selected as part of the target
+tracking sample. ... In prior waves, split-offs were only tracked and
+interviewed if they moved to somewhere else within Uganda and were previously
+selected as part of the target tracking sample.
+#+end_quote
+
+*This is the sharpest sub-population fact in the Uganda record.*  Through
+Wave 4 the two groups enter on different terms: a whole household that
+shifted was followed regardless, but a split-off was eligible for interview
+only if its origin household was one of the two per EA in the target-tracking
+sample -- i.e. split-offs enter through a 20% sub-frame.  The documents do
+not quantify the resulting under-representation, and this section does not
+either.  It bears directly on the 565 movers and split-offs documented above
+under "Hybrid =v= in 2009-10 (movers and split-offs)": those households are
+outside the 2005-06 sampling frame, and the split-offs among them (368 in
+2009-10) reached the sample through that sub-frame.  Do not read split-offs
+in waves 1-4 as a representative sample of new household formation.
+
+**** 3. The one-third rotating refresh (2013-14 onward)
+
+=2015-16= DDI, "SAMPLE REFRESH" (PDF p. 4):
+
+#+begin_quote
+Starting with the UNPS 2013/14 (Wave 4) fieldwork, one third of the initial
+UNPS sample was refreshed with the intention to balance the advantages and
+shortcomings of panel surveys. Each new household will be visited for three
+consecutive waves, while baseline households will have a longer history of
+five or six years, given the start time of the sample refresh. This same
+sample was used for the UNPS 2015/16 (Wave 5) Once a steady state is reached,
+each household will be visited for three consecutive years, and at any given
+time one third of the households will be new, one third will be visited for
+the second time, and one third for the third (and last) time. The total
+sample will never be too different from a representative cross-section of the
+country, yet two-thirds of it will be a panel with a background of a year or
+two.
+#+end_quote
+
+(Sentence-boundary punctuation after "(Wave 5)" is missing in the source;
+quoted as printed.)  New households were drawn from a *different frame*:
+"New households were identified using the updated sample frames developed by
+the UBOS in 2013 as part of the preparations for the 2014 Uganda Population
+and Housing Census." (same page).  The =2013-14= BID sec. 1.2 anticipates
+this with the 2012 census: "parts of the sample will start to be replaced by
+new households extracted from the updated sample frames developed by the UBOS
+as part of the 2012 Uganda Population and Housing Census."  The refresh
+therefore mixes two sampling frames within a wave.
+
+*TENSION with "** Rotating panel and refreshment sample" above.*  That
+section states, without qualification, "Beginning in 2013-14, one-third of
+the original sample is refreshed each wave."  The documentation does not say
+that for 2015-16.  It says the refresh happened at Wave 4 and that "This same
+sample was used for the UNPS 2015/16 (Wave 5)", and it puts the each-wave
+one-third rotation in the future conditional -- "Once a steady state is
+reached".  So *each wave* is the design intent; whether it was achieved
+between W4 and W5 is contradicted by the DDI's own next sentence.  Neither
+claim should be deleted; the existing text should be read as the design and
+this quote as what the DDI reports actually happened.
+
+*Bears on the open TODO "Missing panel weight for 2019-20".*  That LOGBOOK
+entry reads "Appears to be panel-only (no refreshment sample). Confirm with
+UBOS documentation."  The 2019-20 BID does *not* support "no refreshment
+sample" -- sec. 4.1 (PDF p. 33) treats the refresh as operative: "The one-third of the
+original sample households that have been rotated out as part of the panel
+refresh are no longer tracked or interviewed at all." and "The new one-third
+of the sample rotated in as part of the panel refresh is not tracked beyond
+their location indicated during the listing exercise in late 2013."  But that
+second sentence dates the listing to *late 2013*, i.e. the Wave 4 refresh, so
+this passage is plausibly carried forward from an earlier BID rather than
+describing Wave 8 fieldwork.  Recorded as evidence bearing on the TODO, *not*
+as resolving it -- the identical-=wgt= observation in the data is not
+explained by anything found in the documentation.
+
+**** 4. The agriculture sub-sample (all UNPS waves)
+
+The Agriculture Questionnaire is not administered to the whole wave.
+=2013-14= BID sec. 1.2 (PDF p. 7) and =2019-20= BID sec. 1.2 (PDF p. 7), in
+the instrument list:
+
+#+begin_quote
+Agriculture Questionnaire, (administered to the subset of UNPS households
+engaged in agricultural activities)
+#+end_quote
+
+Any table sourced from the agriculture instrument (=crop_production=,
+=plot_features=, =plot_inputs=, =plot_labor=, =livestock=) is therefore
+defined on a self-selected subset of the wave, not on the wave.  The
+household weights are not weights for that subset.
+
+**** 5. Further within-wave subsets
+
+- *Women 15-49.*  The Woman Questionnaire covers only women of reproductive
+  age: "asking females in the households within the reproductive age of 15-49
+  years" and "birth history of eligible women in the household (15-49 years)"
+  (=2013-14= BID, sections 2A and 2B, PDF pp. 15-16).
+- *Half of each EA at Visit 1 (2019-20).*  "for half the number of households
+  in the EA, only the household roster information (Section 2) of the
+  Household Questionnaire is collected during Visit 1. In such cases, the
+  rest of the Household Questionnaire was completed approximately six months
+  later during Visit 2" (=2019-20= BID sec. 2.1, PDF p. 8).  A within-wave
+  split in *when* a household's non-roster modules were observed.
+- *Salt/oil sample collection at preselected households (2019-20).*  "Samples
+  of salt (about 20-50 grams) were collected at preselected households. A
+  100g packet of replacement salt was given to households where salt was
+  collected. Samples of oil and edible fat (about 25 mL) were also collected
+  at all households where item is available." (=2019-20= BID, sec. 2.1,
+  "Section 15: Household Consumption Expenditure", PDF p. 14.)  The
+  preselection rule is not documented.
+
+*** Universe versus what the weights represent
+
+The 2013-14 BID is unusually candid that the UNPS is trying to be two things
+at once, and that the sample is a compromise between them
+(=2013-14/Documentation/Basic Information Document.pdf=, sec. 4 "UNPS 2013/14
+Panel Weights", PDF p. 16):
+
+#+begin_quote
+The UNPS has two broad analytic goals. The first is to track the same sample
+of people from 2005/06 to 2013/14 to see how their lives have changed. The
+first goal is met by revisiting the same cases in each wave. Two-thirds of
+the original panel households (3200 household) were followed up in 2013/14
+wave. The second is to provide a cross-sectional snapshot of the Ugandan
+household population. The second goal, however, necessitates the
+incorporation new households and individuals in each wave to account for the
+changing population. The UNPS addresses this conflict by allowing for the
+inclusion of a sub-sample of split-off households in the wave and refreshing
+a third of the sample.
+#+end_quote
+
+and, on which weight answers which question (same document, sec. 4, PDF
+p. 22):
+
+#+begin_quote
+For cross-sectional estimates of population dynamics based only on the UNPS
+2013.14 data, the data users must use the variable wgt_X as part of GSEC1.dta
+of the UNPS 2013/14 package for household weight. This variable includes
+sampling weights for original as well as split-off and refreshed households
+and is generated as a result of the procedures detailed above. ... The
+variable wgt part of GSEC1.dta of the UNPS 2013/14 package for panel
+households was computed only for the interviewed both in 2011/2012 and
+2013/14.
+#+end_quote
+
+This corroborates the =weight= / =panel_weight= guidance in "** Sampling
+Weights" above from the primary source: =wgt_X= represents the Ugandan
+household population cross-sectionally; =wgt= represents only the
+2011/12-and-2013/14 panel.  They are answers to different questions about
+different populations, and the 1145 NaN panel weights recorded in the weights
+table are that by construction, not missingness.
+
+Note also the 2015-16 DDI's own hedge, quoted in full above: "The total
+sample will never be too different from a representative cross-section of the
+country" -- a claim of approximate, not exact, cross-sectional
+representativeness, made about a design that had not yet reached its steady
+state.
+
+*Numeric discrepancy in the primary sources, recorded not resolved.*  The
+size of the UNPS panel is given as *3,123* households in the 2009-10 DDI, the
+2011-12 BID, the 2013-14 BID, the 2015-16 DDI and the 2019-20 BID -- and as
+*3,200* in the 2010-11 DDI ("Out of the 7,400 households interviewed during
+the UNHS 2005/06, 3,200 households were selected for the UNPS"; abstract:
+"The survey covered 3,200 households") and in the 2013-14 BID passage quoted
+just above ("Two-thirds of the original panel households (3200 household)").
+The "** Overview" section above uses 3,123, which is the majority reading;
+the 3,200 figure is flagged here so a reader who meets it in the source
+documents knows it is a documentation inconsistency, not a second sample.
+
+*** Summary of gaps
+
+| Gap                                                          | What was searched                                                                 |
+|--------------------------------------------------------------+-----------------------------------------------------------------------------------|
+| No =Universe= / target-population field, any wave            | all 8 waves' local BIDs + DDIs (full pdfminer conversion) + 7 WB catalog pages     |
+| No institutional / nomadic / homeless exclusion statement    | same corpus, grepped =excluded=, =exclusion=, =institutional=, =nomadic=           |
+| 2005-06 -- no exclusion statement at all                     | interviewer manual (full), household questionnaire, catalog 1001                   |
+| 2010-11 -- no exclusion statement; =IDP= 0 hits              | BID (full), DDI 2166 (first 40 pp.), catalog 2166                                  |
+| 2018-19 -- no BID and no DDI held locally; catalog-only      | =2018-19/Documentation/= (questionnaires only); catalog 3795 fetched 2026-07-21     |
+| The ten oversampled districts are never named                | all 8 waves, grepped =oversampl=                                                   |
+| 2019-20 salt/oil preselection rule undocumented              | 2019-20 BID (full)                                                                 |
+
+One further note for readers of the wave list: the 2019-20 BID's own history
+enumerates "UNPS 2009/10, UNPS 2010/11, UNPS 2011/12, UNPS 2013/14, UNPS
+2015/16, UNPS 2017/18, UNPS 2018/19 & UNPS 2019/20" -- eight rounds including
+a *2017/18* (Wave 6) that this library does not carry.  Uganda's wave list
+here is not the full UNPS series.
+
 * Unit handling for =food_acquired=
 
 The =u= (unit) index level on =food_acquired= is canonical at

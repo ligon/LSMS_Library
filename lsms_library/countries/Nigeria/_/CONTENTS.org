@@ -129,6 +129,490 @@ weights but not longitudinal panel weights.
 - Wave 5: =ghs_panel_wave_5_basic_information_document_v1.pdf=
   (in =2023-24/Documentation/=)
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence for GH #601 / #603.  This records *what the GHS-Panel documentation
+says the sample represents* -- verbatim, with citations.  It is deliberately
+separate from the mechanical description in [[*Sampling Design][Sampling Design]] above, which
+documents how the library BUILDS =sample= / =cluster_features= (=v=, strata,
+weight variable names, counts).  Nothing here is inferred from the =.dta=
+files; a universe is a claim the documentation makes, not something to be
+reverse-engineered from microdata.
+
+Transcription note (declared repairs, nothing silently corrected): quotes are
+taken from PDF text layers, so runs of whitespace are collapsed and words split
+by line-breaking are rejoined (e.g. the source prints "post- planting" across a
+line break).  Typographic quotation marks in the sources are transcribed as
+ASCII straight quotes.  Wording, spelling and punctuation are otherwise
+unaltered.
+
+** Where each wave's universe statement lives
+
+Only *one of five* Nigeria waves holds its universe statement in a file this
+repository ships.  For the other four the statement is World Bank catalog
+metadata -- a live web page, i.e. a moving target the library does not hold.
+
+| Wave    | GHS-Panel | Catalog | Universe statement                                     | In-repo? |
+|---------+-----------+---------+--------------------------------------------------------+----------|
+| 2010-11 | W1        |    1002 | *none* -- catalog page has no Universe field at all      | n/a      |
+| 2012-13 | W2        |    1952 | catalog Universe field only                            | no       |
+| 2015-16 | W3        |    2734 | catalog Universe field only (local DDI PDF has none)   | no       |
+| 2018-19 | W4        |    3557 | local DDI PDF, =ddi-documentation-english_microdata-3557.pdf=, p. 4 | *yes*  |
+| 2023-24 | W5        |    6410 | catalog Universe field only (local BID + report: none) | no       |
+
+Verified 2026-07-21 against the live catalog pages and against the local PDFs.
+
+** Boilerplate warning (W3, W4, W5)
+
+The universe sentence carried by waves 3, 4 and 5 --
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+-- is *World Bank NADA template text*, not a claim traceable to the Nigerian
+National Bureau of Statistics.  The identical sentence appears verbatim in 15
+waves across the library's corpus, including the eight WAEMU/EHCVM countries
+and Ethiopia 2018-19 / 2021-22 (see =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=,
+section 5.6).  Its presence attests which metadata template was used.  It does
+not independently attest that a statistical office made that claim about the
+GHS-Panel.
+
+It is, however, *corroborated for Nigeria* by an NBS-authored document -- see
+the W3 entry below, where the same exclusion is stated in the panel's own
+weighting appendix in the NBS's own words.  That corroboration is what makes
+the exclusion credible for this country; the boilerplate alone would not.
+
+** Wave by wave
+
+*** 2010-11 (GHS-Panel Wave 1, catalog 1002) -- NO universe statement
+
+No universe statement was found for this wave.  The nearest inclusion claim,
+verbatim from the Wave 1 Basic Information Document, section 1.3 "Coverage and
+Scope", printed p. 3:
+
+#+begin_quote
+The revised GHS with the panel component, while having an intensive focus on
+agriculture, is a national survey. The survey covered all the 36 states and the
+Federal Capital Territory (FCT), Abuja. Both urban and rural enumeration areas
+(EAs) were canvassed.
+#+end_quote
+
+That is a *coverage* claim, not a universe declaration: it says where the sample
+was drawn, not what set of units it stands for.  Recorded as such.
+
+Catalog 1002, "Geographic coverage", verbatim: "National, the survey covered all
+the 36 states and Federal Capital Territory (FCT)."  Catalog 1002, "Sampling
+procedure" > "Sample Framework", verbatim:
+
+#+begin_quote
+The sample frame includes all thirty-six (36) states of the federation and
+Federal Capital Territory (FCT), Abuja. Both urban and rural areas were covered
+and in all, 500 clusters/EAs were canvassed and 5,000 households were
+interviewed. These samples were proportionally selected in the states such that
+different states have different samples.
+#+end_quote
+
+Representativeness, verbatim from the same BID, section 3.0 "Sample Design",
+printed p. 11: "The sample is designed to be representative at the national
+level as well as at the zonal level. The sample size of the GHS-Panel (unlike
+the full GHS) is not adequate for state-level estimates."  *State-level
+estimates from this panel are not supported by its own design document.*
+
+- Exclusions :: NONE STATED for this wave.  The Wave 1 BID contains no
+  occurrence of "universe", "de jure" or an institutional-population exclusion
+  (full-text searched); catalog 1002 has no Universe field.  The institutional
+  exclusion quoted under 2015-16 below applies to the same NISH / 2006-census
+  frame and is very likely to hold here too -- but *no Wave 1 document says so*,
+  and the inference is explicitly not made.
+- Searched :: =2010-11/Documentation/= (=SOURCE.org=, =Access and disclaimer.org=,
+  =LICENSE.org=, and =.dvc= stubs for the household / agriculture / community
+  questionnaires -- questionnaires only, no BID or report is shipped in-repo);
+  catalog 1002 study-description and related-materials pages; the Wave 1 BID PDF
+  in full (catalog 1002 -> =download/48233=), searched for "universe",
+  "de jure", "target population", "institutional", "sample frame",
+  "represent".
+
+*** 2012-13 (GHS-Panel Wave 2, catalog 1952) -- catalog and BID disagree
+
+The catalog carries a universe far narrower than any other GHS-Panel wave's.
+Verbatim from catalog 1952, study description > Coverage:
+
+#+begin_quote
+Universe: Agricultural farming household members.
+#+end_quote
+
+Adjacent fields on the same page, verbatim: "Geographic coverage: National Zone
+State Sector"; "Analysis unit: Agricultural Households."
+
+*This is inconsistent with the wave's own Basic Information Document*, which
+describes a re-interview of ALL Wave 1 households, agricultural or not.
+Verbatim from the Wave 2 BID (=Basic Information Document, Nigeria General
+Household Survey-Panel 2012/13=, February 10, 2015), section 3.0 "Wave 2 Sample
+and Weights", printed p. 23:
+
+#+begin_quote
+The GHS-Panel sample is designed to be representative at the national level as
+well as at the zonal level. The sample size of the GHS-Panel is not adequate
+for state-level estimates. The complete sampling information for the GHS-Panel
+Wave is described in the Basic Information Document for GHS-Panel 2010/2011.
+The objective of the GHS-Panel Wave 2 was to re-interview all of the Wave 1
+households.
+#+end_quote
+
+And from the Wave 2 survey report (=General Household Survey Panel 2012/2013=,
+NBS / FMARD / World Bank, 2014), Executive Summary, "Survey Objectives and
+Design" (PDF p. 9; the page carries no printed number): "The GHS-Panel is a nationally
+representative survey of 5,000 households which are also representative at the
+zonal (urban and rural) levels. The households included in the GHS-Panel are a
+sub-sample of the GHS sample households."
+
+Both statements are recorded; *this file does not adjudicate between them*.  A
+user pooling Nigeria W2 with the other waves should know that the only field in
+the corpus literally labelled "universe" for this wave says
+"agricultural farming household members", while every substantive document for
+the same wave describes a general household panel.
+
+- Exclusions :: NONE STATED.  The Wave 2 BID contains no occurrence of
+  "universe", "de jure" or "institutional" (full-text searched); the catalog
+  entry states no exclusion.
+- Searched :: =2012-13/Documentation/= (=SOURCE.org=, =Access and
+  disclaimer.org=, =LICENSE.org=, =.dvc= stubs for the six PP/PH questionnaires
+  -- no BID or report shipped in-repo); catalog 1952 study-description and
+  related-materials; the Wave 2 BID PDF in full (catalog 1952 ->
+  =download/48250=); the Wave 2 survey report PDF (=download/48253=).
+
+*** 2015-16 (GHS-Panel Wave 3, catalog 2734) -- has a conflict-area OVERSAMPLE
+
+Universe, verbatim from catalog 2734, study description > Coverage > Universe
+(preceded on the same page by "Geographic coverage: National coverage"):
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+This is the NADA boilerplate (see above).  It is *not* in the DDI PDF this repo
+ships for the wave: =2015-16/Documentation/ddi-documentation-english_microdata-2734.pdf=
+has Sampling / Questionnaires / Data Collection / Data Processing / File
+Description sections but no Coverage > Universe block, and full-text search
+finds neither "universe" nor "de jure" in it.
+
+**** Exclusions -- corroborated in NBS's own words
+
+Verbatim from the Wave 3 BID, Appendix 5 "Sampling Details" (=Final Weighting
+Procedures for Nigeria Panel Survey by Wave and Visit=), section 2 "Summary of
+Sample Design for the 2010 GHS and Panel Survey", printed p. 55:
+
+#+begin_quote
+The institutional population living in prisons, hospitals, military barracks,
+school dormitories, etc. are excluded from the universe defined for the
+household surveys.
+#+end_quote
+
+The exclusion is a property of the NISH master frame (built on the 2006 Housing
+and Population Census enumeration areas), so it is structural to every GHS-Panel
+wave -- though only W3 states it in a Nigerian document.
+
+**** Oversample: 5 extra households per conflict-area EA
+
+*This is a within-wave sub-sample and the reader pooling Nigeria must know about
+it.*  Verbatim, same appendix, printed p. 54:
+
+#+begin_quote
+In Wave 3 a conflict module was added to the Panel Survey. The sample EAs in the
+Panel Survey that are located in areas classified as conflict areas were
+identified, and a supplemental sample of 5 households was selected in each of
+these EAs, after a new listing was conducted. The purpose of this expanded
+sample was to increase the number of sample households in the conflict areas in
+order to improve the precision of indicators related to the effects of the
+conflicts.
+#+end_quote
+
+Unweighted W3 statistics therefore *over-represent conflict-area households by
+design*.  The appendix states that weights covering the expanded sample are
+provided ("The weighting procedures for this full sample including the
+additional households in the conflict areas are also described in this
+report").  The library surfaces =wt_wave3= / =wt_w1_w2_w3= (see the Weight
+variables table above); no in-repo check has been done of which of the published
+weight variables corresponds to the conflict-supplemented sample, so *do not
+assume* the shipped =weight= column absorbs the supplement.
+
+**** Panel attrition, verbatim (design context, not universe)
+
+Catalog 2734, "Sampling procedure": "A multi-stage stratified sample design was
+used for the GHS and the Panel Survey. The GHS-Panel sample is fully integrated
+with the 2010 GHS Sample. ... Out of these 22,000 households, 5,000 households
+from 500 EAs were selected for the panel component and 4,916 households
+completed their interviews in the first wave. Given the panel nature of the
+survey, some households had moved from their location and were not able to be
+located by the time of the Wave 3 visit, resulting in a slightly smaller sample
+of 4,581 households for Wave 3."
+
+(The elided passage contains the source's own arithmetic slip -- it computes a
+GHS sample of "22,200 households" and then refers to "these 22,000 households"
+one sentence later.  Quoted as printed.)
+
+*** 2018-19 (GHS-Panel Wave 4, catalog 3557) -- the Borno rural exclusion
+
+Universe, verbatim from the *locally held* DDI PDF
+=2018-19/Documentation/ddi-documentation-english_microdata-3557.pdf=, "Coverage"
+section, p. 4 (immediately after "GEOGRAPHIC COVERAGE: National"):
+
+#+begin_quote
+UNIVERSE
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+(NADA boilerplate again; the same sentence is on catalog 3557's page.  This is
+the one Nigeria wave whose universe statement the repository actually holds.)
+
+**** Exclusion by design: rural Borno, and inaccessible urban EAs
+
+Verbatim, same PDF, "Sampling" > "Deviations from Sample Design", pp. 5-6:
+
+#+begin_quote
+While the combined sample generally maintains both national and Zonal
+representativeness of the original GHS-Panel sample, the security situation in
+the North East of Nigeria prevented full coverage of the Zone. Due to security
+concerns, rural areas of Borno state were fully excluded from the refresh sample
+and some inaccessible urban areas were also excluded. Security concerns also
+prevented interviewers from visiting some communities in other parts of the
+country where conflict events were occurring. Refresh EAs that could not be
+accessed were replaced with another randomly selected EA in the Zone so as not
+to compromise the sample size. As a result, the combined sample is
+representative of areas of Nigeria that were accessible during 2018/19. The
+sample will not reflect conditions in areas that were undergoing conflict during
+that period. This compromise was necessary to ensure the safety of interviewers.
+#+end_quote
+
+Note what this does: *the document withdraws the national universe it declared
+two pages earlier.*  The Universe field says "all de jure households"; the
+sampling section says the sample represents "areas of Nigeria that were
+accessible during 2018/19".  Rural Borno is excluded by design -- not
+non-response -- and inaccessible EAs were REPLACED, so the sample size gives no
+signal that anything is missing.  Any W4 estimate presented as national is
+national-conditional-on-accessibility.
+
+**** Sub-samples: "refresh" and "long panel" (a partial refresh, not a new wave)
+
+Verbatim, same PDF, "Sampling Procedure", p. 5:
+
+#+begin_quote
+The original GHS-Panel sample of 5,000 households across 500 enumeration areas
+(EAs) and was designed to be representative at the national level as well as at
+the zonal level. ... However, after a nearly a decade of visiting the same
+households, a partial refresh of the GHS-Panel sample was implemented in Wave 4.
+
+For the partial refresh of the sample, a new set of 360 EAs were randomly
+selected which consisted of 60 EAs per zone. The refresh EAs were selected from
+the same sampling frame as the original GHS-Panel sample in 2010 (the "master
+frame"). A listing of all households was conducted in the 360 EAs and 10
+households were randomly selected in each EA, resulting in a total refresh
+sample of approximated 3,600 households.
+
+In addition to these 3,600 refresh households, a subsample of the original 5,000
+GHS-Panel households from 2010 were selected to be included in the new sample.
+This "long panel" sample was designed to be nationally representative to enable
+continued longitudinal analysis for the sample going back to 2010. The long
+panel sample consisted of 159 EAs systematically selected across the 6
+geopolitical Zones. ... In all, interviewers attempted to interview 1,507
+households from the original panel sample.
+
+The combined sample of refresh and long panel EAs consisted of 519 EAs. The
+total number of households that were successfully interviewed in both visits was
+4,976.
+#+end_quote
+
+(Sic: "and was designed", "approximated 3,600", "after a nearly a decade" --
+quoted as printed.)
+
+So a single library wave =2018-19= contains *two differently-drawn samples*
+pooled into one table: a fresh 360-EA cross-sectional draw and a 159-EA
+longitudinal subsample of the 2010 panel.  Each is separately claimed to be
+nationally representative, and each has its own weight (below).  The
+=Coverage counts= table in [[*Sampling Design][Sampling Design]] above (=panel_weight= non-null for
+1425/5263 rows) is the data-side shadow of exactly this split.
+
+*** 2023-24 (GHS-Panel Wave 5, catalog 6410)
+
+Universe, verbatim from catalog 6410, study description > Coverage > Universe
+(with "Geographic coverage: National"):
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+Identical to W3 and W4; NADA boilerplate.  *It is not in any file this repo
+ships for the wave.*  Both locally held documents --
+=ghs_panel_wave_5_basic_information_document_v1.pdf= and
+=ghs_panel_wave_5_survey_report.pdf= -- were text-extracted in full and contain
+zero occurrences of "universe", "de jure", "institutional", "prison",
+"barrack", "dormitor", "36 states" or "nomad".
+
+**** Exclusion: eight EAs unvisited for conflict
+
+Verbatim from the local BID, "Wave 5 Sample and Weights", pp. 32-33:
+
+#+begin_quote
+Although 518 EAs were identified for the post-planting visit, conflict events
+prevented interviewers from visiting eight EAs in the North West zone of the
+country. Therefore, the final number of EAs visited both post-planting and
+post-harvest comprised 157 long panel EAs and 354 refresh EAs.
+#+end_quote
+
+The catalog's "Deviations from the Sample Design" carries the same sentence and
+*names the states* -- verbatim: "The EAs were located in the states of Zamfara,
+Katsina, Kebbi and Sokoto."  That geographic detail exists only in the catalog
+metadata, not in the in-repo BID.
+
+Unlike W4, no replacement of inaccessible EAs is described: 518 identified,
+511 visited.
+
+**** Sub-samples: long panel (1,590 -> 1,376) and refresh
+
+Verbatim, local BID, p. 32:
+
+#+begin_quote
+In addition to these 3,600 refresh households, a subsample of the original 5,000
+GHS-Panel households from 2010 were selected to be included in the new sample.
+This "long panel" sample of 1,590 households was designed to be nationally
+representative to enable continued longitudinal analysis for the sample going
+back to 2010. The long panel sample consisted of 159 EAs systematically selected
+across Nigeria's six geopolitical zones. The combined sample of refresh and long
+panel EAs in Wave 5 that were eligible for inclusion consisted of 518 EAs based
+on the EAs selected in Wave 4. The combined sample generally maintains both the
+national and zonal representativeness of the original GHS-Panel sample. Due to
+attrition, the number of households from the long panel interviewed in Wave 5
+was 1,376.
+#+end_quote
+
+Final composition, verbatim (BID p. 32): "The final sample consisted of 4,715
+households, of which 1,376 were from the long panel sample and 3,339 from the
+refresh sample."  Attrition since 2010 in the retained EAs is 13.5 percent, and
+the BID states it is "highly variable across zones and sectors" -- highest in
+rural South West (28.8 percent), lowest in rural North Central (5.3 percent),
+and higher among urban (17.8 percent) than rural (11.4 percent) households.
+
+**** The community data disclaim a community universe
+
+Footnote 1 of the local BID, p. 6, verbatim:
+
+#+begin_quote
+The Community Questionnaire does not collect information from communities in the
+sociological sense. The data cannot be used to represent communities in Nigeria.
+The data collected at the community level represent information that is common
+to the households selected for inclusion in the selected sample enumeration
+areas (EAs).
+#+end_quote
+
+*This bears directly on =community_prices=* (documented below), which is
+cluster-level, keyed on =v= = the EA.  Per the survey's own documentation, an EA
+is not a community and these rows do not represent Nigerian communities; they
+represent the sampled households' shared price environment.  A cross-EA average
+of =community_prices= is not an estimate for "communities in Nigeria".
+
+** Universe vs. what the weights represent
+
+Two places where the documents come apart, and one correction to this file.
+
+*** W5 ships THREE weights, and =wt_wave5= is not a "general wave weight"
+
+Verbatim, W5 BID, weighting subsection, p. 35:
+
+#+begin_quote
+1. Longitudinal weights to be applied to the long panel sample: used for
+analysis that seeks to track dynamics within long panel households across the 5
+waves of the GHS-Panel
+2. Longitudinal weights to be applied to the combined sample: used for analysis
+that seeks to track dynamics within all wave 5 households (long panel + refresh)
+between waves 4 and 5
+3. Cross-sectional weights to be applied to the combined sample: used for
+analysis that seeks to provide representative estimates of the current
+population of Nigerian households at the time of wave 5 (2023/24).
+#+end_quote
+
+And the variable names, verbatim (same section):
+
+#+begin_quote
+All three weights can be found in the cover page data files for both the
+post-planting (secta_plantingw5.dta) and post-harvest (secta_harvestw5.dta). The
+variable names in both data files are wt_wave5 for the longitudinal weights
+applied to the combined samples, wt_longpanel_wave5 for the long-panel
+longitudinal weights, and wt_cross_wave5 for the cross-sectional weights.
+#+end_quote
+
+*Correction to the [[*Sampling Design][Sampling Design]] table above*, which annotates the 2023-24 row
+"Also has =wt_wave5= (general wave weight)".  Per the BID just quoted,
+=wt_wave5= is the *longitudinal weight for the combined (long panel + refresh)
+sample, waves 4 to 5* -- not a general-purpose wave weight.  The library's
+=weight= = =wt_cross_wave5= and =panel_weight= = =wt_longpanel_wave5= mappings
+are correct as they stand; the third weight is simply not surfaced, and the
+one-line note should be amended rather than the mapping.
+
+Note also that only the *cross-sectional* weight is claimed to estimate "the
+current population of Nigerian households"; the two longitudinal weights
+represent a 2010 (or 2018) population followed forward.  =panel_weight= is not a
+current-population weight.
+
+*** Weights are pinned to the ORIGINAL EA, which is why =Moved= is a sentinel
+
+Verbatim, W3 BID, printed p. 22:
+
+#+begin_quote
+All households were assigned weights based upon the EA they resided in during
+the sample selection. Therefore, a tracked household that moved from EA "A" to
+EA "B" would still be considered a part of EA "A" for the purpose of survey
+weight determination.
+#+end_quote
+
+This is the documentary basis for the =Moved= sentinel handling described in
+[[*Cluster (PSU) identifier][Cluster (PSU) identifier]] above: a moved household's =ea = 0= carries no
+cluster information, and the survey itself does not treat the destination EA as
+its cluster.  The library's per-household singleton =v= (=moved-{hhid}=) keeps
+such households out of every real cluster while keeping them in the table, which
+is consistent with -- though not identical to -- the survey's own convention of
+attributing them to the origin EA.
+
+** Summary: exclusions and sub-samples
+
+| Wave    | Institutional excl. | Geographic / security exclusion              | Within-wave sub-samples                          |
+|---------+---------------------+----------------------------------------------+--------------------------------------------------|
+| 2010-11 | none stated         | none stated                                  | none                                             |
+| 2012-13 | none stated         | none stated                                  | none stated (re-interview of all W1 households)  |
+| 2015-16 | stated (BID app. 5) | none stated                                  | *conflict-area OVERSAMPLE*: +5 HH per conflict EA  |
+| 2018-19 | stated (boilerplate)| *rural Borno fully excluded*; inaccessible urban EAs excluded; unreachable EAs replaced | *refresh (360 EAs) + long panel (159 EAs)*         |
+| 2023-24 | stated (boilerplate)| 8 EAs unvisited (Zamfara, Katsina, Kebbi, Sokoto); not replaced | *refresh + long panel* (1,376 + 3,339 HH)          |
+
+Practical consequences for anyone pooling Nigeria:
+
+1. W3 is conflict-oversampled; W4 excludes rural Borno by design.  Unweighted
+   pooling across Nigeria waves therefore mixes different implicit populations,
+   and the direction of the bias *reverses* between W3 (conflict areas
+   over-represented) and W4 (conflict areas removed).
+2. From W4 on, one library wave holds two differently-drawn samples.  Which
+   weight is correct depends on the question, and =panel_weight= is NaN for the
+   refresh households by construction (see the Coverage counts table above).
+3. Four of five waves' universe statements live only on a World Bank web page.
+   If a statement matters to an analysis, capture it at the time of use; the
+   repository does not hold it.
+
+** Documentation gaps (recorded as gaps)
+
+- 2010-11 :: no universe statement in any document found; the BID and catalog
+  both lack one.  The institutional exclusion is *not* asserted for this wave.
+- 2012-13 :: no universe statement in any Nigerian document; the only
+  "universe" field in existence for the wave is the catalog's "Agricultural
+  farming household members.", which its own BID contradicts.
+- 2015-16, 2023-24 :: universe statement exists only as WB catalog metadata; the
+  DDI PDF / BID / survey report shipped in-repo contain none.
+- All waves :: no statement was found about nomadic, homeless or
+  diplomatic-household populations, in either direction.  This is silence, not a
+  finding.
+
 * plot_features (GH #167)
 
 Lasting plot characteristics from the post-planting Agriculture
