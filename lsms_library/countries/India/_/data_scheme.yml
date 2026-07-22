@@ -35,8 +35,20 @@ Data Scheme:
     Educational Attainment: str
 
   employment:
-    index: (t, i, pid)
+    # ACTIVITY-level (SECT02AD §2A-D): one row = one JOB, not one person.
+    # `act` is the per-person activity slot (A..T); a person holds 1-14
+    # activities and EACH carries its own wage, so `act` is part of the key.
+    # Dropping it made the index non-unique (6,194 dup person tuples) and the
+    # framework collapsed it with a skipna groupby().first(), destroying 62% of
+    # wage observations and fabricating cross-row values (GH #323).  Do NOT
+    # narrow this back to (t, i, pid) and do NOT add an `aggregation:` --
+    # Cash_per_day is a per-day RATE, so neither `first` nor `sum` is a valid
+    # reducer; collapsing to person level is the CONSUMER's decision (see the
+    # long note in 1997-98/_/data_info.yml).  The widened index is the guard.
+    index: (t, i, pid, act)
     Cash_per_day: float
+    # per-ACTIVITY workplace location, NOT the household Rural flag (which
+    # India does not have -- GH #602).  Misnamed; see data_info.yml.
     Rural: str
 
   housing:
