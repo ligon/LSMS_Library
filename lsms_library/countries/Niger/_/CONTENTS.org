@@ -51,12 +51,39 @@ one.  All 270 clusters now carry real coordinates.
 Because the offsets file is already at the EA grain, the merge on =v=
 is many-to-ONE (not a cartesian) and the collapse to =(t, v)= is
 exactly lossless -- the coordinate is an EA-level constant.
-=merge_how: left= is load-bearing: the offsets file has one trailing
-null-grappe row which =outer= would turn into a phantom cluster.
+=merge_how: left= is load-bearing, but for a narrower reason than the
+obvious one -- stated precisely because it was first written down
+wrong.  The offsets file has one trailing null-=grappe= row.  Under the
+default =outer= that row does NOT reach the built table: the collapse
+to =(t, v)= goes through =groupby=, which drops NaN-key rows, so the
+returned frame is identical either way (270 clusters, no null =v=) --
+measured both ways.  What =left= removes is the grain report the
+deletion generates (=nan_key_rows: 1=), i.e. a =GrainCollapseWarning=
+that is FATAL under =LSMS_GRAIN_STRICT=1=.  =merge_how= itself arrives
+with PR #627; on =development= today the key is inert.
 
 2014-15 genuinely ships no geovariables/offsets file of any kind (the
 wave directory contains none), so its Latitude/Longitude are honestly
 absent -- not mis-addressed.  It is NOT wired, and that is correct.
+
+* Grain conflicts still open under =LSMS_GRAIN_STRICT=1= (GH #614 / #637)
+
+Fixing the 2011-12 coordinates cleared the GH #323/#515 required-column
+raise for Niger.  It did NOT make Niger strict-clean, and nothing in
+this file should be read as saying it did.  Measured 2026-07-21, cold,
+on PR #627's core, over every =data_scheme= entry plus the
+runtime-derived tables: all 23 build in the default (warn) mode with
+zero cartesian warnings, but *10 of the 23 raise under
+=LSMS_GRAIN_STRICT=1=* -- =cluster_features=, =household_roster=,
+=individual_education=, =shocks=, =assets=, =housing=, =food_security=
+(all 2014-15), =crop_production= and =plot_inputs= (2011-12), and
+=household_characteristics= as a cascade from the roster.  All are
+Site-1 / Site-2 identifier problems in Niger's own extraction config
+and =_/= scripts, tracked under GH #614 / #637; none involves a =dfs:=
+merge or a coordinate.
+The largest single loss is =cluster_features/2014-15=, which projects a
+household-grain frame onto =(t, v)= and destroys 42 of 3,617 rows
+across 4 conflicting clusters.
 
 * Household Presence / MonthsSpent
 
