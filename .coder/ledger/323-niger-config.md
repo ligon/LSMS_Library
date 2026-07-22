@@ -20,6 +20,13 @@ an independent re-derivation that reached the same answer from the data, the
 cold verification that Niger is genuinely cleared, and the regression test that
 keeps the trap closed.
 
+**"Cleared" is scoped, and the scope matters.** It means exactly this: #627's
+required-column `RuntimeError` no longer fires for Niger. It does **not** mean
+Niger is clean under `LSMS_GRAIN_STRICT=1` — 10 of its 23 tables raise there,
+all of them pre-existing Site-1/Site-2 grain conflicts owned by GH #614 / #637.
+See the Phase 3 table below; do not cite this ledger as evidence that Niger
+needs no further grain work.
+
 ## §2 Existing machinery (this task's area)
 
 | symbol | path:line | what it does | tested? | reuse / extend / new |
@@ -62,8 +69,22 @@ keeps the trap closed.
   (`grep -n merge_how lsms_library/country.py` → nothing). So on `development`
   today the offsets file's one trailing null-key row still arrives through the
   default `outer` merge and is deleted by the Site-1 collapse (loudly, per D2);
-  under #627's core `merge_how: left` drops it at the merge. Both end at 270
-  clean clusters with no null `v` — verified on the built table.
+  under #627's core `merge_how: left` drops it at the merge.
+- **What `merge_how: left` buys is the grain report, not the table.** Measured
+  both ways (cold, isolated data root, #627's core, config identical but for
+  the one key): the built `cluster_features` is the *same* — 1599 rows, 2011-12
+  at 270 clusters, 0 duplicate `v`, 0 null `v` — because the collapse to
+  `(t, v)` goes through `groupby`, which drops NaN-key rows anyway. The
+  difference is that without `left` the collapse emits
+  `Niger/cluster_features/2011-12: ... 1 row(s) carry NaN in a declared index
+  level and are DELETED OUTRIGHT`, a `GrainCollapseWarning` — and a
+  `GrainCollapseError` under `LSMS_GRAIN_STRICT=1`. The PR's first draft
+  claimed the phantom cluster was visible "on the built table"; **it is not**,
+  and the two tests that were supposed to pin it did not discriminate. Fixed:
+  `test_2011_12_emits_no_nan_key_grain_warning` asserts the warning's absence
+  (the report is stamped into the cached parquet and re-emitted on read, so it
+  works warm or cold), and the two invariant tests now say in their docstrings
+  that they do not discriminate and which test does.
 - `data_scheme.yml` carries `!make` tags, so it must be read with
   `lsms_library.yaml_utils.load_yaml`, **not** `yaml.safe_load` (which raises
   `ConstructorError`). Cost one test iteration.
@@ -145,31 +166,86 @@ Coordinate columns by wave, for the record:
 2021-22     555       555        555     555
 ```
 
-**All 23 Niger tables** (every `data_scheme` entry plus the runtime-derived
-food/roster tables) build cold under `LSMS_GRAIN_STRICT=1` with **zero** raises
-and **zero** cartesian warnings. Row counts are identical between `development`'s
-config and the independently re-derived one, so the two agree numerically as well
-as textually.
+**Niger is NOT strict-clean, and an earlier draft of this ledger said it was.**
+That sentence — *"all 23 Niger tables build cold under `LSMS_GRAIN_STRICT=1`
+with zero raises"* — was **false**, and is corrected here because a git-tracked
+ledger that says "Niger needs no Site-1/Site-2 work" would suppress ten cells of
+real work (the failure mode `CLAUDE.md` records for the Albania "no shocks
+module" claim). Re-measured twice, cold, isolated data root, #627's core, every
+`data_scheme` entry plus the runtime-derived tables (23):
 
-**Test negative control.** With `2011-12/_/data_info.yml` reverted to its
-pre-`3488b791` state, 3 of the 4 config-level tests fail
-(`..._points_at_the_ea_offsets_file`, `..._uses_the_uppercase_offset_column_names`,
-`test_merge_how_is_left`). `test_geovariables_file_has_no_coordinates_at_all`
-passes either way, correctly — it asserts a fact about the *data*, not the config.
-All 9 pass on `HEAD`.
+| mode | result |
+|---|---|
+| default (non-strict) | **23 / 23 build**; 10 of them emit a `GrainCollapseWarning`; **0 cartesian warnings** |
+| `LSMS_GRAIN_STRICT=1` | **10 of 23 RAISE** |
 
-**Incidental, reported not fixed** (surfaced by #614's Site-1/Site-2 audit during
-the test run, present on `development` today, unrelated to the geo wiring):
-`Niger/cluster_features/2014-15` projects a household-grain frame onto `(t, v)`
-and **destroys 42 of 3,617 rows across 4 conflicting clusters**. That is the
-majority-vote work in `origin/fix/323-niger` item B — Site 1/2 territory,
-`Niger/_/niger.py`, deferred per §5.
+```
+cluster_features        GrainCollapseError  2014-15   (42 of 3,617 rows)
+household_roster        GrainCollapseError  2014-15   (210 of 26,579)
+individual_education    GrainCollapseError  2014-15   (58 of 26,579)
+shocks                  GrainCollapseError  2014-15   (80 of 72,340)
+assets                  GrainCollapseError  2014-15   (482 of 122,978)
+housing                 GrainCollapseError  2014-15   (23 of 3,617)
+food_security           GrainCollapseError  2014-15   (38 of 3,617)
+crop_production         GrainCollapseError  2011-12   (19 of 11,983)
+plot_inputs             GrainCollapseError  2011-12   (51 of 8,538)
+household_characteristics  RuntimeError     (cascade from household_roster)
+```
 
-- `tests/test_niger_cluster_features_geo.py` — new, 9 tests: OK (anchored on §4,
-  §5). Pins the file, the casing, `merge_how: left`, the one trailing null-key
-  row that makes `left` load-bearing, the geovariables file's *absence* of
-  coordinates (the negative control, made permanent), that Latitude/Longitude
-  stay **required** in `data_scheme.yml`, and the built table's coverage + grain.
+What was actually established, and all that was: **the #627 required-column
+`RuntimeError` no longer fires for Niger** — `cluster_features` acquires its
+2011-12 coordinates and no cell is served with a required column absent. The
+Site-1/Site-2 grain conflicts above are **pre-existing on `development`**,
+unrelated to the geo wiring (none of them is a `dfs:` merge or a coordinate
+column), and **remain open** — they are GH #614 / #637 territory, routing
+through `Niger/_/niger.py`. Row counts are identical between `development`'s
+config and the independently re-derived one, so the two agree numerically as
+well as textually.
+
+**Test negative control** (10 tests; each row a separate cold run in a wiped,
+isolated `LSMS_DATA_DIR`):
+
+| config | core | result |
+|---|---|---|
+| HEAD | `development` | 9 passed, 1 skipped (the `merge_how`-effect test: this core ignores the key) |
+| HEAD | #627 | **10 passed** — also under `LSMS_GRAIN_STRICT=1` |
+| `2011-12` reverted to `3488b791^` | `development` | **4 failed**, 5 passed, 1 skipped |
+| `2011-12` reverted to `3488b791^` | #627 | 3 failed, **4 errors** (the required-column raise reaching the fixture), 3 passed |
+| HEAD minus `merge_how: left` | #627 | **2 failed** (`test_merge_how_is_left`, `test_2011_12_emits_no_nan_key_grain_warning`), 8 passed |
+
+An earlier draft claimed "3 of the 4 config-level tests fail"; the true count on
+`development`'s core is 4, the fourth being the end-to-end
+`test_2011_12_clusters_all_have_coordinates`.
+`test_geovariables_file_has_no_coordinates_at_all` passes either way, correctly
+— it asserts a fact about the *data*, not the config; its docstring now says so.
+
+**The end-to-end tests used to disarm themselves.** The shipped fixture was
+`except Exception: pytest.skip(...)`, so the three tests that touch real numbers
+went green-by-skip on exactly the regression they exist to catch: measured, the
+old file under the reverted config on #627's core gave *3 failed, 3 passed, **3
+skipped***, and under `LSMS_GRAIN_STRICT=1` at HEAD gave *6 passed, **3
+skipped***. The fixture no longer catches anything — the missing-credentials net
+in `tests/conftest.py` (PR #648) handles the data-free CI job, and a
+`GrainCollapseError` / `RuntimeError` now fails the file. The module removes
+`LSMS_GRAIN_STRICT` for its own duration (documented in its docstring) and
+asserts the strict *condition* directly instead, so it neither skips nor trips
+over Niger 2014-15's unrelated pre-existing conflict.
+
+**Incidental, reported not fixed** — the head of the ten-table list above, and
+the one that most looks like this PR's business: `Niger/cluster_features/2014-15`
+projects a household-grain frame onto `(t, v)` and **destroys 42 of 3,617 rows
+across 4 conflicting clusters**. Present on `development` today, unrelated to
+the geo wiring. That is the majority-vote work in `origin/fix/323-niger` item B
+— Site 1/2 territory, `Niger/_/niger.py`, deferred per §5.
+
+- `tests/test_niger_cluster_features_geo.py` — new, 10 tests: OK (anchored on
+  §4, §5). Pins the file, the casing, `merge_how: left` **and its measurable
+  effect** (the absence of the 2011-12 nan-key grain warning), the trailing
+  null-key row that makes `left` load-bearing, the geovariables file's *absence*
+  of coordinates (the negative control, made permanent), that Latitude/Longitude
+  stay **required** in `data_scheme.yml`, and the built table's coverage +
+  grain. The two tests that pin invariants rather than the fix say so in their
+  docstrings and name the test that discriminates.
 - No config re-landed; `development`'s `3488b791` already carries it — OK (§5).
 - No `aggregation:` key — OK (§3, D1).
 - No file under `lsms_library/*.py`; `Niger/_/niger.py` untouched — OK (§1).
