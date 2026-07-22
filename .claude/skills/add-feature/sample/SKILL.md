@@ -175,9 +175,12 @@ the table looked perfectly clean.
 
 `Wave._merge_subframes` now checks this exactly (a key value duplicated in
 *both* sub-frames is the definition of the cartesian) and warns with the phantom
-row count; `LSMS_GRAIN_STRICT=1` makes it fatal. **Fix it by making the merge
-correct — re-key to `i`, or reduce a sub-frame to the merge-key grain in a wave
-script.** Never by aggregating the explosion away afterwards: core does not
+row count; `LSMS_GRAIN_STRICT` makes it fatal. That variable is read through the
+same `_grain_strict()` predicate as sites 1–2, so all three sites agree on what
+counts as "strict" (`1`/`true`/`yes`, case-insensitive) — and turning it on in
+CI is gated on the whole of #323, not just this site. **Fix it by making the
+merge correct — re-key to `i`, or reduce a sub-frame to the merge-key grain in a
+wave script.** Never by aggregating the explosion away afterwards: core does not
 aggregate (`SkunkWorks/grain_aggregation_policy.org`), and a reducer applied to
 a cartesian only puts a signature on the corpse.
 
@@ -192,8 +195,24 @@ a cartesian only puts a signature on the corpse.
 Declare `merge_how: left` when the **primary** sub-df (`dfs[0]`) is authoritative
 for which rows exist and the others are strict enrichments. A geovariable file
 that carries households the cover page does not is the usual case: under `outer`
-those orphans arrive with a null value in every index level the cover owned, and
-then collapse together into one phantom null-keyed row.
+those orphans arrive with a null value in every index level the cover owned.
+
+**Be accurate about what this buys you.** Measured on Ethiopia 2013-14 (geo file
+carries 25 households the cover page does not):
+
+| | wave rows | null-`v` rows | delivered clusters | ΣLatitude | `District` dtype |
+|---|---:|---:|---:|---:|---|
+| `outer` | 5,287 | 25 | 433 | 4070.3702 | float64 |
+| `left`  | 5,262 | 0  | 433 | 4070.3702 | int8 |
+
+The orphans do **not** "collapse into one phantom cluster" — the downstream
+cluster-grain collapse *deletes* them, because `groupby` drops null keys. The
+delivered values are identical. So `merge_how: left` is not a data fix; it is
+worth declaring because it stops manufacturing null-keyed rows for site 1 to
+delete, and because it stops the merge widening an integer column. It has a
+cost: under `outer` the site-1 grain report *told* you 25 geo households had no
+cover page. `left` drops them silently. If that signal matters for a wave, keep
+`outer` and let site 1 report it.
 
 #### A dropped sub-df that owned a required column is now a hard error
 
@@ -204,8 +223,24 @@ the column your YAML names — a typo, a casing mismatch (`lat_dd_mod` vs
 `LAT_DD_MOD`), a renamed variable. Ethiopia lost `Latitude`/`Longitude` from
 three of five waves exactly that way, behind a warning nobody read. If such a
 drop leaves a column declared **required** in `data_scheme.yml` entirely absent,
-`grab_data` now raises. Fix the column name, or mark the column
-`optional: true` if the wave genuinely does not have it.
+`grab_data` now raises. Presence is judged after `derived:`, `drop:` and the
+wave's `df_edit` hook, so a column the wave module supplies is not reported
+absent.
+
+**Fix the column name.** In all ten cells this guard caught, the data existed:
+Ethiopia and Nigeria were casing mismatches or a wrong key column, and Niger
+2011-12's coordinates were in a *sibling* file in the same directory
+(`NER_EA_Offsets.dta`, `LAT_DD_MOD`/`LON_DD_MOD`) while the file the YAML named
+had none.
+
+**Know what this guard is and is not.** It is *"a mis-named column in a `dfs:`
+sub-df is fatal"* — not *"a required column is never absent"*. It fires only
+when a sub-df was dropped, so a wave with no `dfs:` block can serve a declared
+column 100% absent and never trip it (Niger **2014-15** does: `Latitude` is
+declared `float`, 0 of 270 rows populated, no raise). And `optional: true` is a
+blunt escape hatch — `data_scheme.yml` is **country**-grain, so it disarms the
+column for *every* wave and every script-path build of that country while the
+check is per-wave. Use it only where the country genuinely never has the column.
 
 ### Multi-round files (Tanzania 2008-15 pattern)
 
