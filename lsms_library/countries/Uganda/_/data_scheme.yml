@@ -149,8 +149,14 @@ Data Scheme:
     #            this level existed (GH #323/#637) those records collided
     #            and their Quantity was summed — dry weight added to fresh
     #            weight.  'unknown_condition' where the wave records no
-    #            condition code or an off-scheme one (~1% of 2009-10 and
-    #            2010-11 rows, which ship no value labels).
+    #            condition code or an off-scheme one: 7 994 of 133 683 rows
+    #            = 6.0% panel-wide, and 23.2% in 2009-10 (then 4.4 / 3.5 /
+    #            2.3 / 0.1 / 0.1 / 0.1% for 2010-11 … 2019-20).  A NULL
+    #            condition column is the bulk of that; only ~490 rows in the
+    #            whole panel carry a code OUTSIDE the 20-code scheme (1.1%
+    #            of 2009-10, 0.9% of 2010-11 — the two waves that ship no
+    #            value labels).  Measured cold 2026-07-21; the per-wave
+    #            breakdown is in _/CONTENTS.org.
     #            Quantities in different conditions are NOT commensurable;
     #            do not sum across this level without a drying/shelling
     #            conversion.

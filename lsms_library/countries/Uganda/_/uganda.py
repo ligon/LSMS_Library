@@ -934,6 +934,36 @@ def _harvest_condition_map():
     return _harmonized_codes(_HARVEST_CONDITION_TABLE)
 
 
+class CropColmapError(KeyError):
+    """A ``CROP_COLMAPS`` entry names a source column that does not exist.
+
+    Raised rather than silently falling back, because every fallback in
+    ``crop_production_for_wave`` is *invisible in the output*: a mis-typed
+    condition column sentinels a whole wave-season to ``unknown_condition``,
+    a mis-typed quantity column drops the slot entirely, and a mis-typed unit
+    column sets ``u='Unknown'`` everywhere.  All three look exactly like
+    "this wave genuinely does not record that", which is a claim the config
+    is allowed to make — but only by writing ``None``, explicitly.
+    """
+
+
+def _require(df, name, where, why):
+    """Return ``df[name]``; raise ``CropColmapError`` if the column is absent.
+
+    ``name`` of ``None`` never reaches here — a ``None`` in the colmap is the
+    declared, auditable way to say "this wave has no such column".
+    """
+    if name not in df.columns:
+        near = [c for c in df.columns if str(c).lower().startswith(str(name)[:5].lower())]
+        raise CropColmapError(
+            f"CROP_COLMAPS[{where}] names {name!r} as the {why} column, but that "
+            f"column is not in the source file (columns starting similarly: "
+            f"{near or 'none'}).  Fix the colmap, or write None to declare "
+            f"explicitly that this wave records no {why}."
+        )
+    return df[name]
+
+
 def _to_int_code(series):
     """Coerce a (possibly categorical/float/str) code column to Int64."""
     if series is None:
@@ -982,6 +1012,17 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
             file_hhid, file_parcel, file_plot, flag, [perennial]
         describing how to read the intercropped flag from ``df4a``.
 
+    Raises
+    ------
+    CropColmapError
+        If the colmap NAMES a column that is not in the source file.  Every
+        fallback here is invisible in the output — a wrong condition column
+        sentinels a whole wave-season to ``unknown_condition``, a wrong
+        quantity column drops the slot — so a name that does not resolve is
+        a config bug, not a survey fact.  To state a survey fact ("this wave
+        records no unit"), write ``None``, which is checked and auditable.
+        See ``tests/test_uganda_crop_condition.py``.
+
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot, j, u, condition, season)`` with columns
@@ -1005,22 +1046,24 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
         pa4 = df4a[ic['parcel']].apply(format_id)
         pl4 = df4a[ic['plot']].apply(format_id)
         key3 = list(zip(hh4, pa4, pl4))
-        if ic.get('flag') and ic['flag'] in df4a.columns:
-            flagcode = _to_int_code(df4a[ic['flag']])
+        w4 = f"{t!r}]['intercrop'"
+        if ic.get('flag'):
+            flagcode = _to_int_code(_require(df4a, ic['flag'], w4, 'intercrop flag'))
             # 1 = mono/No, 2 = Yes  (recode mirrors WB: 2 -> True)
             for k, c in zip(key3, flagcode):
                 if pd.notna(c):
                     inter_lookup[k] = bool(int(c) == 2)
-        if ic.get('crop') and ic['crop'] in df4a.columns:
-            crop4 = _to_int_code(df4a[ic['crop']])
+        if ic.get('crop'):
+            crop4 = _to_int_code(_require(df4a, ic['crop'], w4, 'intercrop crop'))
             key4 = list(zip(hh4, pa4, pl4, crop4))
-            if ic.get('perennial') and ic['perennial'] in df4a.columns:
-                per = _to_int_code(df4a[ic['perennial']])
+            if ic.get('perennial'):
+                per = _to_int_code(_require(df4a, ic['perennial'], w4, 'perennial'))
                 for k, c in zip(key4, per):
                     if pd.notna(c):
                         perennial_lookup[k] = bool(int(c) == 2)
-            if ic.get('planting_month') and ic['planting_month'] in df4a.columns:
-                pm = _to_int_code(df4a[ic['planting_month']])
+            if ic.get('planting_month'):
+                pm = _to_int_code(_require(df4a, ic['planting_month'], w4,
+                                           'planting month'))
                 for k, m in zip(key4, pm):
                     if pd.notna(m) and 1 <= int(m) <= 12:
                         planting_lookup[k] = int(m)
@@ -1033,30 +1076,33 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
         if cm is None:
             continue
 
-        hh = _format_agsec_hhid(df5[cm['hhid']], t)
-        parcel = df5[cm['parcel']].apply(format_id)
-        plot = df5[cm['plot']].apply(format_id) if cm.get('plot') and cm['plot'] in df5.columns else pd.Series(['']*len(df5), index=df5.index)
+        w = f"{t!r}][{season!r}"
+        hh = _format_agsec_hhid(_require(df5, cm['hhid'], w, 'household id'), t)
+        parcel = _require(df5, cm['parcel'], w, 'parcel id').apply(format_id)
+        plot = (_require(df5, cm['plot'], w, 'plot id').apply(format_id)
+                if cm.get('plot') else pd.Series(['']*len(df5), index=df5.index))
         plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
-        crop_code = _to_int_code(df5[cm['crop']])
+        crop_code = _to_int_code(_require(df5, cm['crop'], w, 'crop code'))
         j = crop_code.map(lambda c: crop_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
 
-        for cond in cm['conditions']:
+        for n, cond in enumerate(cm['conditions']):
+            ws = f"{w}]['conditions'][{n}"
             qcol = cond.get('qty')
-            if not qcol or qcol not in df5.columns:
+            if not qcol:
                 continue
-            qty = pd.to_numeric(df5[qcol], errors='coerce')
+            qty = pd.to_numeric(_require(df5, qcol, ws, 'quantity'), errors='coerce')
 
             # reported native unit
-            if cond.get('unit') and cond['unit'] in df5.columns:
-                ucode = _to_int_code(df5[cond['unit']])
+            if cond.get('unit'):
+                ucode = _to_int_code(_require(df5, cond['unit'], ws, 'unit'))
                 u = ucode.map(lambda c: unit_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
             else:
                 u = pd.Series([pd.NA]*len(df5), index=df5.index, dtype='object')
 
             # reported harvest CONDITION (UNPS q6c).  Sentinel-filled here
             # rather than left NA -- see _CONDITION_UNKNOWN.
-            if cond.get('condition') and cond['condition'] in df5.columns:
-                ccode = _to_int_code(df5[cond['condition']])
+            if cond.get('condition'):
+                ccode = _to_int_code(_require(df5, cond['condition'], ws, 'condition'))
                 condition = ccode.map(
                     lambda c: condition_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
             else:
@@ -1064,11 +1110,15 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
             condition = condition.astype('object').where(
                 condition.notna(), _CONDITION_UNKNOWN)
 
-            qsold = pd.to_numeric(df5[cond['qty_sold']], errors='coerce') if cond.get('qty_sold') in df5.columns else pd.Series([pd.NA]*len(df5), index=df5.index)
-            vsold = pd.to_numeric(df5[cond['value_sold']], errors='coerce') if cond.get('value_sold') in df5.columns else pd.Series([pd.NA]*len(df5), index=df5.index)
+            qsold = (pd.to_numeric(_require(df5, cond['qty_sold'], ws, 'quantity sold'),
+                                   errors='coerce') if cond.get('qty_sold')
+                     else pd.Series([pd.NA]*len(df5), index=df5.index))
+            vsold = (pd.to_numeric(_require(df5, cond['value_sold'], ws, 'value sold'),
+                                   errors='coerce') if cond.get('value_sold')
+                     else pd.Series([pd.NA]*len(df5), index=df5.index))
 
-            if cond.get('month') and cond['month'] in df5.columns:
-                hm = _to_int_code(df5[cond['month']])
+            if cond.get('month'):
+                hm = _to_int_code(_require(df5, cond['month'], ws, 'harvest month'))
                 hm = hm.where((hm >= 1) & (hm <= 12), pd.NA)
             else:
                 hm = pd.Series([pd.NA]*len(df5), index=df5.index, dtype='Int64')
@@ -1173,6 +1223,21 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
 #                      below) — a separate defect, see CONTENTS.org.
 #   2019-20            WB names throughout: s5{a,b}q06b_{1,2} = unit,
 #                      s5{a,b}q06c_{1,2} = condition, one pair per slot.
+#
+# A NAMED column that is absent from the source now RAISES (`_require` ->
+# CropColmapError) instead of silently falling back.  Write `None` to declare
+# that a wave records no such column -- that is a survey fact and is auditable;
+# a name that does not resolve is a config bug and used to be invisible.
+#
+# KNOWN DEFECT, deliberately not fixed here: every `intercrop.flag` below
+# points at the SEED-USE question ("did you use any seed/seedlings?",
+# {1: Yes, 2: No}), not at the cropping-system question (`a4aq7` "Cropping
+# system" {1: Pure Stand, 2: Inter cropped} in 2009-10/2010-11, `a4aq8` /
+# `s4aq08` "What type of crop stand was on the plot?" {1: Pure Stand,
+# 2: Mixed Stand} from 2011-12 on).  So `intercropped` currently means "did
+# NOT use seed", and agrees with the true crop-stand answer on only 48-53%
+# of rows.  Rewiring MOVES data, so it needs its own before/after; see
+# CONTENTS.org "Known Issues".
 CROP_COLMAPS = {
     '2009-10': {
         'A': {'hhid': 'HHID', 'parcel': 'a5aq1', 'plot': 'a5aq3', 'crop': 'a5aq5',
@@ -1198,8 +1263,18 @@ CROP_COLMAPS = {
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
                               'month': None}]},
+        # `flag: None` is a MEASUREMENT, not a guess: 2010-11 AGSEC4A ships
+        # ['HHID','prcid','pltid','cropID','a4aq7'..'a4aq14'] and has no
+        # `a4aq3` at all, so the previous 'a4aq3' entry silently resolved to
+        # nothing and `intercropped` was NaN on all 20 970 rows of this wave.
+        # Writing None makes the config say what the build already did (a
+        # provable no-op) instead of naming a column that does not exist.
+        # NOTE the wave DOES carry a cropping-system question — a4aq7,
+        # "Cropping system", value-labelled {1: Pure Stand, 2: Inter cropped}.
+        # Wiring it would ADD data, so it is a separate change with its own
+        # before/after; see CONTENTS.org "Known Issues".
         'intercrop': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
-                      'flag': 'a4aq3', 'crop': 'cropID'},
+                      'flag': None, 'crop': 'cropID'},
     },
     '2011-12': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',

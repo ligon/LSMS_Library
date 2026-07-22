@@ -156,3 +156,97 @@ physically cleared Uganda cache: 10 passed.
   drops the level.
 - No `aggregation:` key added; no reducer; no edit under `lsms_library/*.py` except the
   config file `data_info.yml`.  `transformations.py` untouched.
+
+---
+
+## Phase 4 — post-review corrections (PR #649 adversarial review, 2026-07-21)
+
+Verdict was APPROVE-WITH-NOTES: the data path survived every attack, three
+comments were inaccurate, one test gap was real.  All measurements below were
+re-derived independently (isolated `LSMS_DATA_DIR` with only `dvc-cache`
+symlinked in, `LSMS_COUNTRIES_ROOT` pinned to the worktree and asserted,
+Uganda cache physically removed, no `dvc` CLI) — not copied from the review.
+
+### F1 (MEDIUM) — code 99's justification was false by ~100x
+
+Old claim: "only 3 rows in the whole panel and none after 2011-12".
+Measured: **381 raw source rows** carry code 99 with a reported measure and
+**340 built rows** carry `other_condition`; **219 of the 340 are after
+2011-12**.  Per wave (built): 1 / 0 / 120 / 32 / 32 / 32 / 123.
+
+Vintage semantics confirmed from Stata metadata: 99 = `Others` (2011-12),
+`Not Applicable` (2018-19, 2019-20), and **absent from the label set** in
+2013-14 / 2015-16 (both ship 19 codes, no 99) though 32 rows per wave use it.
+
+**Behaviour unchanged.**  The merge is kept and the *real* justification is
+now written down: `t` is an index level so no wave-crossing tuple exists and
+nothing is summed; 99 is the scheme's own residual slot in every vintage; and
+splitting would need a third value for 2013-14/2015-16 where no wave says
+what 99 means.  The alternative (split into `other_condition` /
+`not_applicable_condition`) is recorded as a follow-up that moves 340 rows
+and needs its own before/after.
+
+### F2 (LOW) — the sentinel rate, not the off-scheme rate
+
+`data_scheme.yml` said "~1%".  Measured sentinel share: **7 994 / 133 683 =
+6.0% panel-wide, 23.2% in 2009-10**.  "~1%" is right only for *off-scheme
+codes*: 297 = 1.1% of 2009-10, 192 = 0.9% of 2010-11, 492 panel-wide.
+`CONTENTS.org` already had the correct figures, so this was the summary
+drifting from the analysis; the summary now agrees.
+
+### F3 (LOW) — `Source Label` is not verbatim
+
+Of the 216 (code, wave, season) label pairs in the five labelled waves,
+**60 match the org column literally, 156 do not**.  It is the 2018-20 wording
+with whitespace collapsed, except **four codes — 24, 32, 42, 99** — which
+take the longer 2009-16 phrasing; 99's text ("Others / Not Applicable")
+appears in no wave at all.  Also documented: code 45's *Preferred* Label
+`dried_grain` is an inference from grid position (every wave writes only
+"Dry - grain"), covering 40 411 / 133 683 rows = 30%.
+
+### F4 (MEDIUM) — a mis-wired colmap must fail loudly
+
+Two independent guards, because they catch different mistakes.
+
+1. **`uganda._require` raises `CropColmapError`** when a colmap NAMES a column
+   the source lacks.  `None` stays the declared way to say "no such column".
+   Measured no-op: exactly one named column failed to resolve panel-wide
+   (2010-11's intercrop `flag: 'a4aq3'`, a column that does not exist in that
+   file — fixed to `None`, itself a no-op), and a cold rebuild is
+   byte-identical afterwards (133 683 rows; Quantity 317,005,989.0;
+   Quantity_sold 18,134,251.4; Value_sold 9,066,365,499.8; `intercropped`
+   non-null 75 625 on both sides; sorted frames `.equals()` True).
+2. **Three tests**, thresholds set from measurement:
+   `test_crop_colmap_columns_resolve_in_source` (S3-guarded),
+   `test_sentinel_share_bounded_per_wave_season` (ceiling 40%; worst honest
+   cell 25.7%), `test_condition_varies_within_every_wave_season` (floor 10
+   distinct; measured minimum 18).
+
+**Mutation proof** (Uganda cache physically cleared each run):
+
+| mutation | before | after |
+|---|---|---|
+| baseline | 10 passed | **13 passed** |
+| `condition: 'a5aq6b_TYPO'` (2018-19 A) | 10 passed | **1 failed, 4 passed, 8 errors** |
+| `condition: 's5aq06f_1'` (existing wrong column) | 10 passed | **1 failed, 12 passed** |
+
+The second mutation is the informative one: the build succeeds, the resolve
+test passes, and the sentinel share is only **33.7%** — *under* the 40%
+ceiling — so the variety test (2 distinct conditions vs a floor of 10) is what
+catches it.  Neither invariant alone suffices; both are kept.
+
+Also hardened: `test_fresh_and_dry_no_longer_collide`'s `skip`-on-empty is now
+an assert, and the `crop_production` fixture re-raises a build failure when S3
+credentials are present (still skips without them, so the data-free CI job is
+unaffected).
+
+### Found while doing F4, NOT raised by the review
+
+`crop_production.intercropped` is wired to the **seed-use question** in every
+wave that populates it (`a4aq3` / `a4aq16` / `s4aq16`, all labelled "did you
+use any seed/seedlings?", {1: Yes, 2: No}), not to the cropping-system
+question (`a4aq7` "Cropping system" {1: Pure Stand, 2: Inter cropped}, or
+`a4aq8` / `s4aq08` "What type of crop stand was on the plot?" {1: Pure Stand,
+2: Mixed Stand}).  Agreement between the wired flag and the true crop-stand
+question is 48.5–52.5% — a coin flip.  Rewiring moves data, so it is filed as
+a Known Issue in `Uganda/_/CONTENTS.org`, not fixed here.
