@@ -148,11 +148,14 @@ def test_mixed_type_object_column_is_still_stringified():
     load-bearing and must not be narrowed away.  Pinned so a future "this is
     obsolete under pandas 3" cleanup has to confront the evidence.
     """
+    import pyarrow.lib as _pa
+
     idx = pd.Index(list("abc"), name="i")
     mixed = pd.DataFrame({"c": pd.Series(["a", 3, None], dtype=object, index=idx)})
-    with pytest.raises(Exception):
-        pd.DataFrame({"c": mixed["c"]}).to_parquet(
-            tempfile.mktemp(suffix=".parquet"), engine="pyarrow", index=False)
+    with tempfile.TemporaryDirectory() as d:
+        with pytest.raises((_pa.ArrowTypeError, _pa.ArrowInvalid)):
+            pd.DataFrame({"c": mixed["c"].reset_index(drop=True)}).to_parquet(
+                os.path.join(d, "raw.parquet"), engine="pyarrow", index=False)
     back = _roundtrip(mixed)
     assert list(back["c"][:2]) == ["a", "3"]
     assert back["c"].isna().iloc[2]
