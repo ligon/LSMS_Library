@@ -183,17 +183,32 @@ Data Scheme:
     #            collapsing them into one (plot, input, j) row would mean
     #            summing quantities across seasons (a transformation) and
     #            picking one native unit at random.  Added by the GH #637
-    #            key-soundness review, which measured that ~95% of the
-    #            collisions on the old 5-level key were season-A/season-B
-    #            pairs (2009-10: 230 of 242 tuples present in BOTH seasons;
-    #            2013-14: 112 of 122), 6 of them per wave reporting the same
-    #            pesticide in DIFFERENT units (Kg vs Litre) — kilograms were
-    #            being summed with litres.  crop_production and plot_labor
+    #            key-soundness review, which measured (cold; re-derived
+    #            2026-07-21) that 1,196 of the 1,342 colliding tuples on the
+    #            old 5-level key — 89%, not the "~95%" first written here —
+    #            were season-A/season-B pairs (2009-10: 230 of 242 tuples
+    #            present in BOTH seasons; 2013-14: 112 of 112, i.e. all of
+    #            them).  In 33 of those groups the two seasons reported the
+    #            same input in DIFFERENT units (Kg vs Litre), so kilograms
+    #            were summed with litres: 5 / 6 / 0 / 5 / 4 / 3 / 10 over
+    #            2009-10 … 2019-20 — NOT "6 per wave", and none at all in
+    #            2011-12.  crop_production and plot_labor
     #            already carried season; plot_inputs was the outlier.
     #            Seed rows are season 'A': they come from AGSEC4A, the first-
     #            season plot-crop roster.  AGSEC4B (second season) is not read,
     #            so there are no season-B seed rows — a pre-existing coverage
     #            gap that the level now makes visible rather than hiding.
+    #
+    # This grain is still NOT complete, and saying so here is the point of the
+    # comment.  With `season` the builder returns 84,216 of the 84,489 rows it
+    # constructs; the other 273 are still discarded by its de-dup step — 135
+    # DELETED outright by `groupby(dropna=True)` because `plot` is NaN (130 in
+    # 2009-10, 5 in 2011-12), and 138 merged away by collapsing 135 duplicate
+    # groups.  Every one of those 135 groups is `input='Seed'`: two AGSEC4A
+    # plot-crop rows for the same (plot, crop), i.e. a missing "which AGSEC4A
+    # row" identifier — the same defect one level down.  8 of them (all
+    # 2011-12) sum two or three reported quantities.  Measured cold
+    # 2026-07-21; tracked on GH #637, deliberately not fixed in that PR.
     #
     # Columns are REPORTED values only — NO seed_kg / nitrogen_kg / any-use
     # flags / fertilizer totals (those are transformations).  Missing in a
