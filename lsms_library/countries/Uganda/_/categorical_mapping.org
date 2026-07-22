@@ -877,6 +877,16 @@
 # Applicable".  It is a composite, and it is the one place in this table
 # where reading the Source Label as a quotation would mislead.
 #
+# THE SINGLE `Source Label` COLUMN IS THE ROOT CAUSE, not just the place the
+# error sits: one cell cannot hold two vintages' wordings.  The `u` table
+# further up THIS FILE already solves exactly this, with one column PER WAVE
+# (2005-06 ... 2019-20) carrying that wave's raw string verbatim, typos
+# included -- see CONTENTS.org "Unit handling for food_acquired", which
+# predates this table and which `harvest_conditions` did not follow.  The
+# recommended fix is to adopt the `u` shape here (runtime-inert:
+# get_categorical_mapping reads only Code + Preferred Label); it is written
+# up under CONTENTS.org "The house convention for per-wave label drift".
+#
 # Code 45's PREFERRED Label is likewise an inference, not a reading.  Every
 # labelled wave writes exactly "Dry - grain"; `dried_grain` (i.e. dry AFTER
 # ADDITIONAL DRYING, the 4x family) is inferred from the code's position in

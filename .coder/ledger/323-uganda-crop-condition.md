@@ -250,3 +250,43 @@ question (`a4aq7` "Cropping system" {1: Pure Stand, 2: Inter cropped}, or
 2: Mixed Stand}).  Agreement between the wired flag and the true crop-stand
 question is 48.5–52.5% — a coin flip.  Rewiring moves data, so it is filed as
 a Known Issue in `Uganda/_/CONTENTS.org`, not fixed here.
+
+### Prior art missed on the first pass (coordinator correction, 2026-07-21)
+
+I applied F1–F3 without reading `Uganda/_/CONTENTS.org` end to end — only the
+sections PR #649 itself had added. Re-read in full afterwards. One piece of
+genuine, pre-existing prior art was missed, and it bears directly on F3.
+
+**§"Unit handling for `food_acquired`"** (pre-dates the `condition` work;
+untouched by `b28b5024`) records the house convention for cross-wave label
+drift: the `u` table carries **one column per wave** (`2005-06` … `2019-20`)
+holding that wave's raw questionnaire string, "unused at runtime but
+preserv[ing] the cross-wave provenance".
+
+`categorical_mapping.org` therefore holds three shapes for one job:
+
+| table | shape | per-wave drift |
+|---|---|---|
+| `u` | Code, Preferred Label, one col per wave | representable |
+| `harvest_units` | Code, Preferred Label | not recorded |
+| `harvest_conditions` | Code, Preferred Label, `Source Label` | **lossy** |
+
+This reframes F3. The single `Source Label` column is not merely *where* the
+"verbatim" claim went wrong — it is **why** it could: one cell cannot hold two
+vintages' wordings, so codes 24/32/42 silently took the 2009-16 text and 99
+became a hand-made composite. The `u` table has no such failure mode; it
+preserves each wave's string separately, typos and all (`Small cup wuth
+handle(Akendo)`).
+
+Recommended follow-up (documented, not done): give `harvest_conditions` the
+`u` table's shape. Runtime-inert — `get_categorical_mapping` reads only
+`Code` + `Preferred Label` — and the 216 measured label pairs above are
+exactly the data needed to populate it. Left to the maintainer because the
+review scoped F3 to a prose correction.
+
+No **contradiction** was found: nothing pre-existing in `CONTENTS.org` asserts
+anything about code 99's incidence, the sentinel rate, or the unlabelled
+2009-10/2010-11 codes, so none of the F1/F2/F3 numbers overwrote a recorded
+decision. Checked the LOGBOOK/status entries too — the only one is on
+"Missing panel weight for 2019-20" (weights, unrelated); no `WAITING` caveats
+anywhere in the file.

@@ -408,6 +408,46 @@ occupies "Dry at harvest - grain".  That code covers 40 411 of 133 683
 rows (30%), so the inference is load-bearing and is now stated rather
 than implied.
 
+**** The house convention for per-wave label drift already exists, and this table does not follow it
+
+Noted 2026-07-21, while re-reading this file end to end.  *"Unit handling
+for =food_acquired="* above (a section that predates the =condition= work)
+records the established shape:
+
+#+begin_quote
+The =u= table also retains the per-wave variant columns (=2005-06=,
+=2009-10=, ..., =2019-20=) that document the raw label appearing in each
+wave's questionnaire.  These extra columns are unused at runtime but
+preserve the cross-wave provenance previously captured in the retired
+=_/unitlabels.py= file.
+#+end_quote
+
+So =categorical_mapping.org= holds *three different shapes* for the same
+job:
+
+| table                 | shape                                    | per-wave drift |
+|-----------------------+------------------------------------------+----------------|
+| =u=                   | Code, Preferred Label, one col PER WAVE  | representable  |
+| =harvest_units=       | Code, Preferred Label                    | not recorded   |
+| =harvest_conditions=  | Code, Preferred Label, =Source Label=    | *lossy*        |
+
+The single =Source Label= column is the **root cause of the defect
+corrected above**, not merely its location: one cell cannot hold two
+vintages' wordings, so codes 24 / 32 / 42 silently took the 2009-16 text
+and 99 became a hand-made composite.  The =u= table has no such problem —
+it carries each wave's raw string in its own column, typos and all
+(=Small cup wuth handle(Akendo)= is preserved verbatim in six waves).
+
+*Recommended follow-up*: give =harvest_conditions= the =u= table's shape —
+replace =Source Label= with one column per labelled wave (2011-12,
+2013-14, 2015-16, 2018-19, 2019-20; 2009-10 and 2010-11 stay blank, as
+they ship no value labels, exactly as the =u= table leaves blanks).  It is
+**runtime-inert** — =get_categorical_mapping= reads only =Code= +
+=Preferred Label= — and the measured per-wave strings needed to populate
+it are the 216 label pairs recorded above.  Not done here because the
+PR #649 review scoped this finding to a prose correction and a table
+reshape is the maintainer's call, not a side effect of one.
+
 Worked example, =agsec5a.dta= row index 3 (2019-20): same maize, same
 plot, same month; slot _1 = 80.0 Kilogram(KG) "Dry - grain", slot _2 = 2.0
 Plastic Basin(15 lts) "Fresh/raw harvested - in the cob".
