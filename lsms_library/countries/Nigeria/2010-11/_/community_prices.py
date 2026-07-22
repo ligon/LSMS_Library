@@ -3,8 +3,8 @@
 
 Item-level reported community food prices at grain (t, v, j, u) from the
 post-harvest COMMUNITY questionnaire's food-price module (Section C8,
-sectc8_harvestw1.csv).  CLUSTER-level (no household i); v = format_id(ea)
-is the community EA id, the SAME keyspace as sample().v.  W1 uses the
+sectc8_harvestw1.csv).  CLUSTER-level (no household i); v = cluster_id(state, lga, ea) is the
+COMPOSITE community EA id (GH #323), the SAME keyspace as sample().v.  W1 uses the
 community questionnaire's OWN item-code scheme (mapped by name to canonical
 harmonize_food Preferred Labels) and carries no unit column (the unit is the
 per-item fixed questionnaire unit).  t = 2011Q1 (post-harvest quarter).

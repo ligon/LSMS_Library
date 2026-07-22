@@ -71,8 +71,10 @@ from the first source that has it:
    `slurm_logs/build_ehcvm_unit_codebook.py` if a new sibling is added.
 
 3. **The questionnaire / codebook.** Survey documentation (Excel `Unites`
-   sheets, IHPS "CODES FOR UNIT" PDF pages) lists the code→label map. Pull it
-   from `{Country}/{wave}/Documentation/` via DVC (`.venv/bin/dvc pull …`) and
+   sheets, IHPS "CODES FOR UNIT" PDF pages) lists the code→label map. Fetch it
+   with `data_access.get_data_file('{Country}/{wave}/Documentation/foo.pdf')`,
+   which returns a local `Path` (lock-free; **never** shell out to `dvc` — see
+   `CLAUDE.md` §"Data Access"), then
    read with `pdftotext` or `pd.read_excel`. **Watch the scheme:** the
    questionnaire's generic list may use *different numbering* than the data
    (EHCVM's `Unites` sheet is 1–57; the data codes are 100–700 — they do not

@@ -10,6 +10,27 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # Built from the HOUSEHOLD cover page (one row per household), so the frame
+    # arrives at household grain and Wave.cluster_features() collapses it to
+    # the (t, v) cluster grain.  What makes that collapse SOUND is the key:
+    # `v` is the composite cluster id (state/lga/ea -- see the GH #323 note in
+    # _/nigeria.py), not the bare `ea` serial.  `ea` is unique only WITHIN an
+    # LGA, so keying on it merged distinct clusters and the collapse then
+    # stamped one arbitrary EA's Region/District onto the other's households
+    # (890/5000 W1 households got the wrong District).  With the composite key,
+    # Region/District/Rural are constant within the group BY CONSTRUCTION
+    # (state and lga are IN the key; zone and sector are functions of them), so
+    # the collapse is provably lossless for them.
+    #
+    # Latitude/Longitude are the exception and are NOT invariant from W2 on:
+    # the panel follows households that move while keeping their ORIGINAL ea in
+    # the sampling frame, so a mover's current coordinates differ from its
+    # cluster's.  Core reduces these with .mean() (the cluster centroid).  That
+    # is the historical behaviour and it is retained here deliberately: core
+    # does not aggregate on declaration (GH #323 D1), and auditing this
+    # household->cluster collapse is Site 2, owned centrally rather than
+    # per-country.  Measured spread: 5 / 24 / 50 clusters in W2 / W3 / W4 span
+    # more than one coordinate.  W1 is clean (0 of 500 groups disagree).
     index: (t, v)
     Region: str
     District: str
@@ -75,6 +96,84 @@ Data Scheme:
     index: (t, i)
     previous_i: str
   assets:
+    # KNOWN OPEN DEFECT (GH #323, Site 1) -- NOT fixed here; recorded so it is
+    # not rediscovered.  Wave 2 (t = 2012Q3 / 2013Q1) is the only wave whose
+    # asset module carries a PER-UNIT roster: sect5b_plantingw2 has one row per
+    # individual unit owned, enumerated by `item_seq` (1..15), each with its own
+    # age (s5q3) and its own resale value (s5q4).  A household owning 5 hoes
+    # gets 5 rows.  (dup on (hhid,item_cd) = 14,493; dup on
+    # (hhid,item_cd,item_seq) = 0 -- item_seq is precisely the level the
+    # canonical (t,i,j) grain drops.)  W1/W3/W4 have no such roster and are
+    # already unique on (t,i,j).
+    #
+    # Core collapses the per-unit rows with groupby().first(), which keeps unit
+    # #1 and DISCARDS the rest.  MEASURED (2026-07-13, LSMS_NO_CACHE=1):
+    #
+    #   true total (sum s5q4 over ALL units) : N576,299,043
+    #   what first() keeps (unit #1 only)    : N429,001,558
+    #   DESTROYED                            : N147,297,485  = 25.6%
+    #
+    # and it is destroyed in EACH of the two quarters the wave is tagged on
+    # (2012Q3 and 2013Q1 both return the same truncated N429,001,558).
+    #
+    # `item_seq` is exactly the missing level -- but declaring it here does NOT
+    # close the bug, and that was verified rather than assumed:
+    #
+    #   * the canonical assets grain (lsms_library/data_info.yml, Index Info >
+    #     index_info) is (t, i, j).  Feature('assets') calls
+    #     _harmonize_country_frame, which DROPS any level a country adds beyond
+    #     the canonical set, then _collapse_duplicate_index reduces the
+    #     resulting duplicates with first() -- because 'assets' is not listed in
+    #     feature.py's _ADDITIVE_MEASURE_COLUMNS (only 'food_acquired' is).
+    #   * so a 4-level Nigeria would repair Country('Nigeria').assets() and
+    #     Feature('assets') would re-destroy the identical N147M, while leaving
+    #     Nigeria the only country in the library with a non-canonical assets
+    #     grain.  A half-fix that also breaks cross-country consistency.
+    #
+    # CORRECTION (2026-07-22).  The two-edit prescription that stood here was
+    # RIGHT about the data and WRONG about the plumbing.  Both halves have since
+    # been tested rather than reasoned about; recording the result so the wrong
+    # fix is not attempted from this file.
+    #
+    #   1. lsms_library/data_info.yml : index_info assets -> (t,i,j,item_seq)
+    #      -- INERT FOR NIGERIA, and harmful elsewhere.  Verified by experiment
+    #      (PR #629, 2026-07-22): `item_seq` was declared in Nigeria 2012-13's
+    #      `idxvars` AND `final_index` and the wave rebuilt cold; the frame comes
+    #      back on index ['i','t','j'] regardless, with identical rows and Value.
+    #      The `dfs:` merge in Wave.grab_data drops the level BEFORE
+    #      `final_index` is applied -- this is GH #323 SITE 4 (see PR #627), not
+    #      Site 1.  Nigeria cannot emit `item_seq` at all today.
+    #      Consequence: making it canonical would leave edit 2 dead code AND
+    #      silently disable the GH #498 guard for all 25 assets countries, since
+    #      none of them would carry the level either.  Do not do this until
+    #      Site 4 lands.
+    #
+    #   2. lsms_library/feature.py : _ADDITIVE_MEASURE_COLUMNS['assets'] =
+    #      ('Value',)  -- CORRECT, and implemented in PR #629 (open).  Quantity
+    #      must stay `first`: it comes from the clean sect5a hh x item grid and
+    #      is merely repeated across the item_seq rows, so summing it would
+    #      multiply it by the unit count.
+    #
+    #      One trap found while implementing it, worth knowing before anyone
+    #      registers another table there: adding a table to that dict ALSO
+    #      SILENCES ITS GRAIN AUDIT wholesale.  That was harmless while
+    #      `food_acquired` was the only entry (the collapse reconciles every
+    #      column it carries), but `assets` carries `Age`, which no reducer
+    #      reconciles at (t,i,j) -- so the naive registration turned a loud
+    #      13,447-destroyed-rows-per-round report into SILENCE.  #629 re-audits
+    #      on the columns the sum does not reconcile instead.
+    #
+    #      "Age wants mean" (the previous text) is SUPERSEDED.  Two 2026-07-13
+    #      decisions rule it out: the grain contract's P2 -- every cell holds an
+    #      OBSERVED value or NA, and a mean is neither (tests/
+    #      test_gh323_grain_contract.py) -- and the retirement of core's last
+    #      aggregation at Site 2.  Age is reported, not averaged.
+    #
+    # Declaring a per-column reducer in THIS file was tried and REJECTED (GH
+    # #323 D1: core does not aggregate on declaration -- duplicates on a declared
+    # index nearly always mean the identifier is broken or a level is missing,
+    # not "reduce me").  An `aggregation:` key here would be dead config: core
+    # never reads it.  So nothing in this file pretends to fix it.
     index: (t, i, j)
     Quantity: float
     Age: float
@@ -356,7 +455,8 @@ Data Scheme:
     # it across sectc8a / sectc8b; W5 under Post Harvest Wave 5/Community/).
     # There is NO household i, so _join_v_from_sample does NOT apply -- `v`
     # is declared in the index here and carried NATIVELY: it is the
-    # community questionnaire's EA id (v = format_id(ea)), the SAME keyspace
+    # community questionnaire's EA id (v = cluster_id(state, lga, ea) -- the
+    # COMPOSITE key; GH #323), the SAME keyspace
     # as sample().v, so community_prices.v joins households via their
     # cluster.  Country-level script (_/community_prices.py) maps each wave
     # -> materialize: make.

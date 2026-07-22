@@ -47,6 +47,247 @@ Counties 1--3 map to Province 7 (Hebei); counties 4--6 to Province 8
 - https://microdata.worldbank.org/index.php/catalog/study/CHN_1995_LSS_v01_M
 - BID: =Documentation/chnbinfo.pdf= (Section 3 "Sample")
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 for GH #601.  China has exactly one wave in
+this repo (=1995-97=), and its universe statement lives in a file the
+repo holds: =1995-97/Documentation/chnbinfo.pdf= (the Basic Information
+Document, dated February 2003).  Every quote below was re-checked
+character-for-character against that PDF's extracted text, and the two
+catalog quotes against a live pull of
+https://microdata.worldbank.org/index.php/api/catalog/CHN_1995_LSS_v01_M
+on 2026-07-21.  Curly quotes and apostrophes inside the quote blocks are
+reproduced as they appear in the source.
+
+This section *extends* "Sampling Design" above; it does not replace it.
+That section already quotes the first sentence of the BID's §3 and
+correctly records that no weights exist.  The mechanics of PSU coding
+(=hid= digits, =v = hid // 100=) stay there and are not repeated here.
+
+** 1995-97: the declared universe is an explicit DENIAL of a universe
+
+The BID's statement of population is negative -- it says, in the survey's
+own words, that there is no well-defined population the sample is drawn
+from:
+
+#+begin_quote
+The CLSS sample is not a rigorous random sample drawn from a well-defined
+population.  Instead it is only a rough approximation of the rural
+population in Hebei and Liaoning provinces in Northeastern China.
+#+end_quote
+
+Citation: /China Living Standards Survey (CLSS), 1995-1997, Basic
+Information Document/, §3 "Sample", p.10, first sentence of the section.
+File: =lsms_library/countries/China/1995-97/Documentation/chnbinfo.pdf=.
+Language: English; no translation required.  (The instruments themselves
+were fielded in Chinese -- BID §5 "Using the Data", p.12: "Since the questionnaires used to
+collect the data were in Chinese, it is also advisable to check the
+Chinese versions of the questionnaires" -- but the *documentation* quoted
+here is English.)
+
+The Overview gives the geographic and unit-of-observation framing:
+
+#+begin_quote
+China Living Standards Survey (CLSS) consists of one household survey and
+one community (village) survey, conducted in Hebei and Liaoning Provinces
+(northern and northeast China) in July 1995 and July 1997 respectively.
+Five villages from each three sample counties of each province were
+selected (six were selected in Liaoyang County of Liaoning Province
+because of administrative area change).  About 880 farm households were
+selected from total thirty-one sample villages for the household survey.
+The same thirty-one villages formed the samples of community survey.
+#+end_quote
+
+Citation: BID §1 "Overview", p.1.
+
+*** Universe vs. what the weights represent
+
+There is nothing to reconcile, because there is nothing to weight with:
+the documentation denies a well-defined universe, the county and village
+stages were purposive, and *no sampling weights exist in the data files*
+(already noted under "Sampling Design").  The =sample= table therefore
+carries =v= but no =weight= / =panel_weight= / =strata= / =Rural=.  The
+practical consequence for a pooling user: nothing in this country can be
+inflated to any population, not even to rural Hebei + Liaoning, and the
+BID says so itself.
+
+*** Where the statement lives, and why the catalog is not a second witness
+
+The statement is held locally, in a DVC-tracked file in this repo -- this
+is *not* one of the waves whose universe exists only as WB catalog
+metadata.
+
+The catalog does carry the same language, but it is not independent
+corroboration:
+
+- =study_desc/method/data_collection/sampling_procedure= is byte-for-byte
+  the BID §3 text (verified 2026-07-21).
+- =study_desc/study_info/geog_coverage= reads: "The China Living
+  Standards Survey (CLSS) was conducted only in Hebei and Liaoning
+  Provinces (northern and northeast China)."
+- The record has *no* =universe= field at all.  The =study_info= keys
+  present are exactly: =abstract=, =coll_dates=, =nation=,
+  =geog_coverage=, =data_kind=, =notes=.
+
+So: catalog and local documentation are one statement, not two.
+
+*Boilerplate check*: not applicable.  This is survey-specific prose
+written about CLSS, not the WB NADA template sentence that recurs
+verbatim across ~15 waves in the corpus.  Nothing here attests a template.
+
+** Exclusions
+
+*** Geographic / domain restriction (by design, purposive)
+
+#+begin_quote
+Because of this, three counties in Hebei and three counties in Liaoning
+were selected as “primary sampling units” because data had been collected
+from those six counties by the Japanese occupation government in the
+1930’s.  Within each of these six counties (xian) five villages (cun)
+were selected, for an overall total of 30 villages (in fact, an
+administrative change in one village led to 31 villages being selected).
+#+end_quote
+
+#+begin_quote
+These other villages were not drawn randomly but were selected so as to
+“represent” variation within the county.
+#+end_quote
+
+Citation: BID §3, p.10 (both).  The domain is thus *rural* Hebei and
+Liaoning only -- 2 of China's 31 province-level units -- and within those,
+six purposively chosen counties picked to match 1930s Japanese-occupation
+survey sites.  Urban areas are outside the described domain; the BID never
+frames this as an "exclusion", it simply never claims them.
+
+*** Household-membership rule
+
+#+begin_quote
+Household members were defined to include “all the people who normally
+live and eat their meals together in this dwelling.”  Those who were
+absent more than nine of the last twelve months were excluded, except for
+the head of household.
+#+end_quote
+
+Citation: BID §2.1, Section 1A, p.2.  (This is the roster-eligibility
+rule; the wave's =household_roster= carries =MonthsAway= from =s01a212=.)
+
+*** Non-resident children
+
+#+begin_quote
+Section 1C collects information for children of household members who are
+not living in home.  Children who have died are not included.
+#+end_quote
+
+Citation: BID §2.1, Section 1C, p.2.
+
+*** Module-level universes (not household-frame exclusions)
+
+Recorded so a user does not read a module's denominator as the sample's:
+
+| module               | stated universe                                                                 | citation           |
+|----------------------+---------------------------------------------------------------------------------+--------------------|
+| Schooling (§2)       | "in essence the data on schooling can be said to apply all persons 6 age and above." | BID §2.1, p.2      |
+| Employment (§3)      | "All individuals age thirteen and above were asked to respond to the employment activity questions in Section 3." | BID §2.1, p.3      |
+| Community §10 Forestry | "Section 10 on Forestry was not administered in the 1997 survey."               | BID §2.2, p.10     |
+
+*** Exclusion categories with NO statement found
+
+No institutional / collective-quarters exclusion, no nomadic or homeless
+exclusion, and no "for security reasons" carve-out is stated anywhere in
+=chnbinfo.pdf= or in the catalog record.  Recorded as NOT FOUND, not as
+"none applied".  What was searched: the full extracted text of
+=chnbinfo.pdf= (62,706 chars) for /universe/, /population/, /random
+sample/, /Sample/; the full text of =chnville.pdf= (44,646 chars, the 1997
+Village Survey Form -- a blank instrument, no target-population
+statement); and the complete DDI metadata for CHN_1995_LSS_v01_M.  See
+"Sources that could not be searched" below for the one gap.
+
+** Oversamples and sub-samples
+
+There is one, and it is unweightable.  Six of the thirty-one villages --
+the "main villages", i.e. the actual 1930s survey sites -- were sampled at
+2.5x the per-village household count of the other twenty-five:
+
+#+begin_quote
+In each county a “main village” was selected that was in fact a village
+that had been surveyed in the 1930s.  Because of the interest in these
+villages 50 households were selected from each of these six villages (one
+for each of the six counties).  In addition, four other villages were
+selected in each county. [...] Within each of these villages 20
+households were selected for interviews.  Thus the intended sample size
+was 780 households, 130 from each county.
+#+end_quote
+
+Citation: BID §3, p.10.
+
+Read plainly: ~38% of the intended household sample (6 x 50 = 300 of 780)
+comes from six historically-selected villages.  Because there are no
+weights, *a naive pooled mean over China 1995-97 over-represents the
+1930s-survey villages* relative to any notion of rural Hebei/Liaoning, and
+nothing in the shipped data lets a user undo it.  Anyone averaging across
+countries needs to know this before pooling.
+
+The only probabilistic stage is within-village:
+
+#+begin_quote
+Unlike county and village selection, the selection of households within
+each village was done according to standard sample selection procedures.
+In each village, a list of all households in the village was obtained from
+village leaders.
+#+end_quote
+
+Citation: BID §3, p.11.  (Systematic selection with a random start, from a
+village-leader-supplied household list.)
+
+No other sub-population design is documented: no urban booster, no
+refresh/extended sub-panel, no module subsample, no minority oversample.
+
+** Two instruments, two years, one library wave
+
+The wave label =1995-97= folds together two fieldwork rounds two years
+apart -- relevant to anyone treating =t= as a single point in time:
+
+- Household survey: "Data collection began in July 1995 and ended in
+  August 1995." (BID §4, p.11)
+- Community/village survey: "Although village level data were also
+  collected in the summer of 1995, analysis of those data revealed many
+  problems and all 31 villages were revisited in July and August of 1997
+  to collect village level data." (BID §4, p.11)
+
+So =cluster_features= for =t='1995-97'= describes village conditions
+measured in 1997 (with recall for 1995 and 1988: "Enumerators asked for
+information about two years – 1995 and 1988." -- BID §2.2, p.7), while
+=household_roster= and the household modules are 1995.
+
+** Unreconciled household counts
+
+Three different numbers are in play; none of them is being "corrected"
+here, because the source itself is inconsistent:
+
+| figure | source                                                        |
+|--------+---------------------------------------------------------------|
+|   ~880 | BID §1 Overview, p.1: "About 880 farm households were selected" |
+|    780 | BID §3, p.10: "the intended sample size was 780 households"     |
+|    785 | BID §3, p.11: "In fact, the number of households in the sample is 785, as opposed to 780." |
+
+The "Sampling Design" section above reports "~880 farm households (787 in
+final data)".  The 787 is a data-side count and is not in conflict with
+anything quoted here; the 880-vs-780/785 gap is *the BID contradicting
+itself*, and is left as such.
+
+Unit of observation is stated as "farm households" (BID Overview).  The
+BID nowhere says non-farm rural households were eligible, and nowhere says
+they were excluded.  Do not infer either.
+
+** Sources that could not be searched
+
+=1995-97/Documentation/CHI01.pdf= (the household questionnaire, 1.2 MB) is
+an image-only scan: text extraction yields 52 characters, all page-break
+marks.  No OCR was run.  A questionnaire cover page can in principle carry
+additional coverage or eligibility language; that possibility is
+*unverified*, not excluded.  Everything above comes from =chnbinfo.pdf=
+and the WB catalog record.
+
 * Features configured
 ** sample
 ** cluster_features

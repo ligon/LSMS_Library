@@ -61,6 +61,51 @@ def Age(value):
     return result
 
 
+def cluster_features(df):
+    '''Reduce the broadcast household-level cover page to CLUSTER grain (GH #323).
+
+    ``df_main`` extracts Region/Rural from ``s00_me_ben2018.dta``, which is
+    HOUSEHOLD-level (8,012 rows = 8,012 distinct (grappe, menage) pairs over
+    670 grappes), but declares only ``v: grappe`` as its index var.  Each
+    grappe's attributes are therefore broadcast across all its households,
+    handing the framework 8,012 rows on a (t, v) index with 7,342 duplicate
+    tuples -- which ``_normalize_dataframe_index`` (GH #323 Site 1) then
+    reduces with ``groupby().first()``.
+
+    That reduction is VALUE-LOSSLESS today, so no data has ever been lost here
+    and the framework's #323 audit is correctly silent about it: measured
+    against the raw source under ``LSMS_NO_CACHE=1``, 0 of the 670 grappes
+    carry more than one distinct ``s00q01`` (Region) or ``s00q04`` (Rural),
+    and ``grappe_gps_ben2018.dta`` is already grappe-level at 670/670.
+
+    But "lossless today" is a property of the 2018-19 data, not of the
+    extraction, and relying on it MASKS the defect class: if a grappe ever
+    straddled two regions, ``first()`` would silently pick one -- and, because
+    it skips NA per COLUMN, it would in general hand back a composite row
+    assembled from different households, a cluster that exists nowhere in the
+    survey.  So fix the grain at the source and ENFORCE the invariant rather
+    than describing it: assert every cluster carries exactly one distinct
+    value per attribute, and RAISE if that ever stops being true, instead of
+    quietly choosing a winner.
+
+    This changes no returned value (670 rows before and after); it makes the
+    670 correct BY CONSTRUCTION rather than by luck.
+    '''
+    levels = list(df.index.names)
+    spread = df.groupby(level=levels, observed=True).nunique(dropna=False)
+    straddling = spread[(spread > 1).any(axis=1)]
+    if len(straddling):
+        raise ValueError(
+            f'Benin cluster_features: {len(straddling)} cluster(s) carry more '
+            f'than one distinct value for a cluster attribute, so reducing the '
+            f'household-level cover page to cluster grain would have to GUESS. '
+            f'Offending clusters (nunique per column):\n{straddling.head(10)}'
+        )
+    # Exact-duplicate rows by construction (the assertion above proves it), so
+    # keeping one row per cluster discards only redundancy.
+    return df[~df.index.duplicated(keep='first')]
+
+
 def household_roster(df):
     '''
     Recover Age from date-of-birth components when s01q04a is null.

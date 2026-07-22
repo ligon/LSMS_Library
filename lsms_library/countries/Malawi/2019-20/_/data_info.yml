@@ -73,14 +73,49 @@ cluster_features:
             # sign-flipping the indicator between waves.  GH #602.
             Rural: reside
     df_geo:
+        # GH #323 SITE 4 / GH #627 -- CARTESIAN, CURED AT THE MERGE.
+        #
+        # This block USED to key `householdgeovariables_ihs5.dta` on
+        # `v: ea_id` and merge on the CLUSTER key `v`.  Both sub-frames are
+        # HOUSEHOLD grain -- df_main is 14,612 households (11,434 IHS5
+        # cross-section + 3,178 IHPS panel), df_geo 11,434, one row per
+        # case_id across 717 EAs -- so `pd.merge` paired every household with
+        # every geo row sharing its `v`: 185,842 rows, 171,230 of them PHANTOM.
+        # `_normalize_dataframe_index` then collapsed that to 819 clusters with
+        # groupby().first(), so nothing downstream ever saw it.
+        #
+        # The geo file carries `case_id`, so the honest key was there all
+        # along.  Verified cold against the two source files:
+        #   * the CROSS-SECTIONAL half is exactly 1:1 on case_id -- 11,434 =
+        #     11,434, zero rows on either side alone, no duplicates;
+        #   * ea_lat_mod / ea_lon_mod are CONSTANT within all 717 ea_id (0 EAs
+        #     with more than one distinct coordinate) -- the published GPS is
+        #     the EA's displaced fix stamped on each household;
+        #   * df_main.ea_id == df_geo.ea_id for all 11,434 shared households.
+        # So keying on `i` hands each household its own coordinate, which is
+        # the coordinate the `v`-merge was already giving it: 185,842 -> 14,612
+        # wave rows, 171,230 -> 0 phantom, every returned value unchanged.
+        #
+        # `i` MUST be built exactly as df_main builds it -- case_id through
+        # `cs_i` -- or the join silently matches nothing (the failure mode
+        # 2016-17 was in until GH #323: 0 of 880 clusters carried GPS).
+        # `v` is deliberately NOT declared here; df_main owns it.
+        #
+        # Unchanged by this fix: the 102 IHPS Panel EAs share NO ea_id and no
+        # id with the geo file (measured: 0 overlap on either), so the panel
+        # half's clusters carry NaN coordinates before and after -- IHS5
+        # publishes no geovariables for the panel.  Under `outer` they arrive
+        # from df_main alone, exactly as they did under the `v` merge.
         file: Cross_Sectional/householdgeovariables_ihs5.dta
         idxvars:
-            v: ea_id
+            i:
+                - case_id
+                - function: cs_i
         myvars:
             Latitude: ea_lat_mod
             Longitude: ea_lon_mod
     merge_on:
-        - v
+        - i
     final_index:
         - t
         - v
