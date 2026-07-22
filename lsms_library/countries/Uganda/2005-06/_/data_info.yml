@@ -55,11 +55,17 @@ sample:
         strata: stratum
         Rural:
             - urban
-            - # Raw `urban` column is string-typed: '0' means rural, 'urban'
-              # means urban.  String keys required (see CLAUDE.md: "YAML
-              # mapping keys must be string keys when the raw labels are
-              # strings").  GH #163 item 3.
-                '0': Rural
+            - # The raw `urban` column is object-dtype but MIXED-typed: rural
+              # households carry the python int 0 (2,263 rows), urban ones the
+              # str 'urban' (860).  The key must therefore be the INT 0 -- a
+              # '0' string key never matches, the value passes through
+              # untouched, and it reaches the user as the literal string '0',
+              # so `df[df.Rural == 'Rural']` returns ZERO rows.  That is exactly
+              # what GH #163 item 3's fix did; it sat silently broken for three
+              # months until GH #602.  The `Region` stanza below already uses an
+              # int key for the same reason.  Verify with:
+              #   get_dataframe('../Data/GSEC1.dta')['urban'].map(type).value_counts()
+                0: Rural
                 urban: Urban
         # HH-level Region — the same column cluster_features reads, exposed
         # here so consumers can get Region for every HH regardless of cluster

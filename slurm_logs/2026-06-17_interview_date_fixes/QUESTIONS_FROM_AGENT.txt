@@ -1,0 +1,34 @@
+
+=== 2026-06-17 agent-a888b... BLOCKER on #476 collapse ===
+The task premise is INCORRECT: interview_date is NOT a dead column in EHCVM
+household_roster. ALL 12 affected waves' _/mapping.py household_roster(df) hooks
+read x["interview_date"] and pass it into tools.age_handler(..., interview_date=...)
+to recover DOB-derived Age, THEN drop the column (df.drop('interview_date', axis=1)).
+So the cover-page join is load-bearing for the age computation; it just doesn't
+survive into the API output.
+
+Collapsing the df_cover/df_temp merge (as instructed) removes the source of
+interview_date and breaks EVERY wave with KeyError: 'interview_date' inside
+_age_from_row. Verified by forcing a true wave-level rebuild (Senegal 2018-19,
+Benin 2018-19, both KeyError). The STEP-3 "successes" for Senegal/Mali/Niger/
+Burkina_Faso/CotedIvoire were STALE L2-country var/household_roster.parquet being
+served (pre-edit aggregates); Benin/GnB/Togo had no stale var/ parquet so they
+failed hard.
+
+The REAL collision (issue #476) is real but orthogonal to "dead column":
+map_formatting_function auto-binds the country-module interview_date(df) TABLE hook
+to the roster's interview_date MYVAR per-cell. Mali already shields this with a
+wave-level interview_date(value) scalar override in _/mapping.py (both waves) ->
+that's why Mali was "masked"/working. The other 7 countries lack that shield.
+
+Possible correct fixes (ALL out of scope for this config-collapse task -> escalating):
+  (a) Add a wave-level interview_date(value) scalar pass-through to each of the 7
+      countries' _/mapping.py household_roster path (mirror Mali) -- keeps the
+      cover-page join, keeps age computation, dodges the collision. But this edits
+      mapping.py (a country module, arguably config but the task said leave hooks).
+  (b) Framework fix: don't auto-apply a df-edit hook named after a myvar when the
+      hook signature is df-level not cell-level (coordinator's framework-hardening).
+  (c) Rename the interview_date TABLE hook so it doesn't collide with the myvar.
+
+NOT collapsing. Reverting my 12 data_info.yml edits to base 717e32f4 and reporting.
+No commit made.

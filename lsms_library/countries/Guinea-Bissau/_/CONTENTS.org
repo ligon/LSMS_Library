@@ -13,6 +13,317 @@ each grappe is visited in exactly one =vague=, so household
 identifier is =(grappe, menage)= without a vague level.  See
 CLAUDE.md "EHCVM countries" for the cross-country pattern.
 
+** =grappe_gps_gnb2018.dta= ships five duplicated records (GH #323 site 4 / #627)
+
+The GPS file has *450 rows for 445 grappes*.  Five grappes -- 155325,
+155426, 199719, 199816 and 1771231 -- appear *twice*, as verbatim
+duplicate rows: same latitude, same longitude, same accuracy, same
+altitude, same GPS timestamp.  The companion community cover
+=s00a_co_gnb2018.dta= carries the identical 450/445 split, so the
+duplication happened once, on the community side of the export.
+
+That alone made =cluster_features= a *cartesian product*.  The other
+=dfs:= sub-frame is the household cover page =s00_me_gnb2018.dta= at
+~12 rows per grappe, so merging on =v= when =v= repeats on *both*
+sides paired 11-12 household rows against 2 GPS rows for each of those
+five: *5,351 -> 5,410 rows, 59 phantom* (PR #627's census).  Small, but
+the same disease as Malawi's 183,812.
+
+*Guinea-Bissau is not the Malawi shape and does not take the Malawi
+cure.*  There is no household id to re-key on -- the GPS file is
+genuinely at grappe grain and carries nothing finer than =grappe= +
+=vague=, and both copies of every duplicate agree on =vague=.  Nor is
+there Mali 2021-22's single-file cure: the cover page has *no GPS
+columns at all* (checked).  So this cell takes the other remedy #627's
+guard names -- *reduce the sub-frame to the merge-key grain before it
+is merged* -- via a =df_geo(df)= hook in =2018-19/_/mapping.py=.
+
+Two things about that hook are worth knowing before touching it:
+
+- It is dispatched *by name off the sub-frame key*.  =Wave.grab_data=
+  resolves a =dfs:= sub-frame's =df_edit= with
+  =column_mapping(<sub-frame name>, ...)=, so the function must be
+  called exactly =df_geo= and the sub-frame must stay keyed =df_geo=.
+  Renaming either silently drops the de-dup.  A test pins both.
+- It uses =drop_duplicates()= over *every* column, key and payload
+  alike.  That is de-duplication, not aggregation (#323 D1 forbids the
+  latter): a row is removed only when an identical row already exists,
+  so if a future export ever ships two GPS fixes for one grappe that
+  actually *differ*, both survive, the merge is cartesian again, and
+  #627's guard fires.  =groupby().first()= or =keep='first'= would
+  silently pick one and hide exactly that.
+
+After: 5,351 wave rows, *0 phantom*, and the returned 450-row
+=cluster_features= frame is bit-for-bit identical (=DataFrame.equals=
+True, index equal, dtypes equal).
+
+Separately, and *not* fixed: the cover page names 450 grappes but the
+GPS file only 445, so five grappes carry NaN coordinates.  Absent data,
+not manufactured data.  The two counts coincide only by arithmetic
+accident -- the five duplicated records are byte-identical, so they are
+*not* five mislabelled fixes that could be reassigned to the five
+grappes that lack one.
+
+* Sampling universe, exclusions and sub-samples
+
+Evidence for what the Guinea-Bissau survey *claims* to represent, quoted
+verbatim from its own documentation.  This is deliberately kept separate
+from what the data look like: nothing below is inferred from any =.dta=.
+
+Guinea-Bissau has exactly one wave directory in the library, =2018-19=,
+so this section is the complete record for the country.
+
+** 2018-19 -- the declared universe
+
+Source: =lsms_library/countries/Guinea-Bissau/2018-19/Documentation/ddi-documentation-english_microdata-4293.pdf=,
+p. 3, section "Coverage".  Survey: /Inquérito Harmonizado sobre as Condiçöes
+de vide dos Agreagados Familiares 2018-2019/ (EHCVM 2018/19); WB catalog id
+4293, IDNO =GNB_2018_EHCVM_v02_M=.  Verified against the local PDF on
+2026-07-21.
+
+#+begin_quote
+GEOGRAPHIC COVERAGE
+National coverage
+
+UNIVERSE
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+Language: the documentation quoted here is in English; no translation is
+needed.  (The survey's own title, quoted above, is Portuguese.  The
+non-ASCII characters in it are reproduced as printed in the catalog record,
+including the erroneous =ö= in "Condiçöes" and the misspelling
+"Agreagados".)
+
+That is the whole universe field.  It is thin: it names a unit (de jure
+households) and an institutional exclusion, and says nothing about age,
+nationality, region, or a sampling frame.  Everything else below is
+coverage or design text, *not* a universe declaration, and is labelled as
+such.
+
+Two representativeness claims from the same DDI, p. 1, verbatim -- framing,
+not universe:
+
+#+begin_quote
+SERIES INFORMATION
+The Guinea-Bissau EHCVM 2018/19 is the first edition of a nationally
+representative household survey conducted within the West Africa Economic
+Monetary Union (WAEMU) Household Survey harmonization Project (P153702) a
+joint program by the World Bank and the WAEMU Commision that aims at
+producing household survey data in member countries (Benin, Burkina Faso,
+Chad, Cote d'Ivoire, Guinea Bissau, Mali, Niger, Senegal and Togo). The
+survey covers all regions and includes approximately 5,000 households.
+#+end_quote
+
+#+begin_quote
+ABSTRACT
+[...] The EHCVM is a nationally representative survey of 5,000 households,
+which are also representative of the geopolitical zones (at both the urban
+and rural level).
+#+end_quote
+
+(The ligature glyphs =fi= / =ffi= in the PDF are transcribed as ordinary
+letters.  =[...]= marks elided abstract text, not a change of wording.)
+
+** 2018-19 -- exclusions
+
+*** Institutional populations, from the UNIVERSE field (DDI p. 3)
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+*** Geographic: SAB is urban-only by design (DDI p. 4, SAMPLING PROCEDURE)
+
+This is the one exclusion a pooled analysis is most likely to trip over,
+and it is *not* in the universe field.  Verbatim:
+
+#+begin_quote
+The Guinea-Bissau EHCVM 2018/19 sample covers all regions with urban and
+rural areas surveyed in all regions apart from the autonomous sector of
+Bissau (SAB) where all respondents are from urban areas.
+#+end_quote
+
+The same sentence appears in the World Bank Basic Information Document
+(catalog 4293, download id 52550), section "Sample", p. 10, differing only
+in the hyphen of the country name:
+
+#+begin_quote
+The Guinea Bissau EHCVM 2018/19 sample covers all regions with urban and
+rural areas surveyed in all regions apart from the autonomous sector of
+Bissau (SAB) where all respondents are from urban areas.
+#+end_quote
+
+Note the tension with the ABSTRACT's claim of representativity "of the
+geopolitical zones (at both the urban and rural level)": for SAB there is
+no rural component to be representative of.  Recorded, not adjudicated.
+
+*** No other exclusion is stated
+
+No "for security reasons" carve-out, no dropped region, no nomadic /
+homeless / diplomatic clause appears anywhere in the DDI.  Searched: the
+full text of the local DDI PDF (all pages, pdfminer extraction), grepped
+for =universe=, =excl=, =de jure=, =prison=, =barrack=, =dormitor=,
+=representative=, =institutio=, =security=, =nomad=, =homeless=,
+=diplomat=; plus the WB Basic Information Document (20 pp.), grepped for
+=universe=, =population=, =excl=, =sampl=, =frame=, =target=,
+=representative=.  Absence is recorded as "not stated", never as "does not
+exist" -- some sibling EHCVM countries carry an explicit French exclusion
+of collective households, diplomats and the homeless in their national
+report, and no such national report is shipped for Guinea-Bissau.
+
+** 2018-19 -- oversamples and sub-populations
+
+*No oversample, booster, refresh panel or special sub-population is
+declared anywhere in the documentation.*  There is no MOP/Roma-style
+minority sample, no urban booster, no module subsample, no extended-vs-
+refresh split.  The design as stated is a single two-stage national draw
+(DDI p. 4 / BID p. 10, verbatim):
+
+#+begin_quote
+Upon deciding on the sample size and repartition, the survey design team
+implemented a 2-stage sampling methodology. At the first stage, 450
+enumeration areas (EAs) were selected from the sample frame. In the second
+stage, 12 households were selected in each enumeration area randomly.
+#+end_quote
+
+What *does* live inside this single library wave is a **seasonal split**,
+which a reader pooling the country must know about before averaging
+anything.  The library's =2018-19= directory contains both of the survey's
+own internal waves (its /vagues/).  DDI p. 1, verbatim:
+
+#+begin_quote
+The surveys took place in two waves with each wave covering half of the
+sample. The first wave was fielded between September 2018 and December
+2018, while the second wave occurred between April 2019 and June 2019. The
+two-wave approach was chosen to account for seasonality of consumption.
+#+end_quote
+
+DDI p. 4 / BID p. 10, verbatim:
+
+#+begin_quote
+The total survey sample size is 5351 households - 1990 from urban areas and
+3361 from rural areas. After that, the survey design randomly divided each
+enumeration area into two equal groups. The survey team interrogated the
+first group in wave 1 and the other in wave 2. Finally, for various
+reasons, including availability and quality monitoring, the final sample
+size comprises slightly more households (twenty-three) in round 2 than in
+round 1. In wave one, the survey teams interviewed 2664 households (1015 in
+urban areas and 1649 in rural areas. In wave two, the teams interviewed
+2687 households (975 in urban areas and 1712 in rural areas).
+#+end_quote
+
+(The unbalanced parenthesis after "1649 in rural areas" is in the source;
+quoted as printed.  The dash in "5351 households -" is a hyphen in the DDI
+and an en dash in the BID.)
+
+These are two seasonal visits to halves of one cross-section, *not* two
+panel rounds.  Each half is a random split of every EA, so neither half is
+a distinct sub-population -- but the two halves are fielded in different
+seasons, which matters for anything consumption- or agriculture-related.
+
+| item                   | wave 1 (Sep-Dec 2018) | wave 2 (Apr-Jun 2019) | total |
+|------------------------+-----------------------+-----------------------+-------|
+| households interviewed |                  2664 |                  2687 |  5351 |
+| of which urban         |                  1015 |                   975 |  1990 |
+| of which rural         |                  1649 |                  1712 |  3361 |
+
+(Table transcribed from the DDI sentence quoted above; not computed from
+data.)
+
+** 2018-19 -- where the statement lives
+
+Good news for this country: the universe statement is held *in the repo*,
+not only in moving WB catalog metadata.  It is in the tracked, DVC-managed
+=2018-19/Documentation/ddi-documentation-english_microdata-4293.pdf=
+(sidecar =...pdf.dvc= is committed).  The corroborating Basic Information
+Document is *not* shipped locally and was read from the WB catalog
+(4293 / download 52550); treat that second citation as off-repo and
+therefore a moving target.
+
+** Boilerplate warning
+
+The UNIVERSE sentence above is *World Bank NADA template text, not a
+statement by Guinea-Bissau's INE about this survey.*  The identical
+sentence --
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+-- appears verbatim in 15 waves across the library's corpus, including
+countries outside the WAEMU/EHCVM family (Ethiopia 2018-19 and 2021-22;
+Nigeria 2015-16, 2018-19, 2023-24).  Its presence attests which metadata
+template was used.  It does *not* independently attest that a statistical
+office made that claim about this survey.  The Guinea-Bissau-specific
+coverage claim is the SAB sentence under "Exclusions", not this one.
+
+** Universe vs. what the weights represent -- not documented
+
+The DDI contains **no** =WEIGHTING=, =RESPONSE RATE=, or =DEVIATIONS FROM
+SAMPLE DESIGN= section (verified by grepping the full extracted text of the
+local PDF for those headings; zero hits).  The BID has no separate universe
+or target-population statement either; its "Sample" section reproduces the
+DDI's SAMPLING PROCEDURE text.  So for this country there is *no documented
+account of what the sample weights in =ehcvm_ponderations_gnb2018.dta=
+inflate to*, and no documented non-response adjustment.  Recorded as a gap,
+not filled by inference.
+
+** Open question -- one vague per grappe, or two?
+
+Flagging a possible conflict between this evidence and the existing
+"Sampling Design" section of this file, rather than silently overwriting
+either.
+
+Existing =_/CONTENTS.org=, "Sampling Design" (and the matching "EHCVM
+countries" note in =CLAUDE.md=):
+
+#+begin_quote
+Standard EHCVM convention: =grappe= is the cluster identifier (=v=); each
+grappe is visited in exactly one =vague=, so household identifier is
+=(grappe, menage)= without a vague level.
+#+end_quote
+
+The DDI, p. 4, quoted in full above, says instead:
+
+#+begin_quote
+[...] the survey design randomly divided each enumeration area into two
+equal groups. The survey team interrogated the first group in wave 1 and
+the other in wave 2.
+#+end_quote
+
+Read literally, the DDI has *every* EA appearing in *both* vagues (roughly
+6 households each), which is the opposite of "each grappe is visited in
+exactly one vague".  Contrast Burkina Faso, whose BID splits the EAs
+themselves between the waves ("A total of 585 EAs were selected (half (293)
+for the first wave and half (292) for the second wave)") -- i.e. the EHCVM
+family is not uniform on this point, so the repo's cross-country convention
+may not hold for Guinea-Bissau.
+
+Not resolved here, deliberately: this task is evidence-gathering about the
+declared universe, and settling it means crosstabbing =grappe= against
+=vague= in the delivered data.  Either the identifier convention is wrong
+for this country (in which case =(grappe, menage)= may not be unique), or
+the DDI sentence describes the intended design rather than the delivered
+frame.  Whoever picks this up should do that crosstab and record the answer
+in the "Sampling Design" section.  Do not treat the current convention as
+verified for Guinea-Bissau on the strength of this file.
+
+** Record hygiene
+
+One correction to the upstream evidence record, noted so it is not
+propagated: the extraction notes state that
+=2018-19/Documentation/SOURCE.org= "contains only the DOI link" with no
+=#+CATALOG_ID:= / =#+PROVENANCE_*= keywords.  That is not true of the
+tracked file, which carries the full provenance block (=#+CATALOG_ID: 4293=,
+=#+CATALOG_IDNO: GNB_2018_EHCVM_v02_M=, =#+PROVENANCE_SOURCE: worldbank=,
+=#+PROVENANCE_METHOD: doi-lookup=, =#+PROVENANCE_RECORDED: 2026-07-12=),
+committed in =6bd1f318=.  Nothing else in the record depended on that
+claim.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 wave) does NOT ask
@@ -92,3 +403,46 @@ NO Portuguese-language branch (e.g. SoilType code 1 =Arenoso= maps to
 
 Latitude / Longitude are deferred: EHCVM s16a has no decimal-degree
 parcel GPS (=s16aq47= is an area, not a coordinate), as in Uganda.
+
+* Cluster Features -- the many-to-one projection (GH #323)
+
+=cluster_features= is declared at CLUSTER grain, index =(t, v)=, and returns
+450 rows -- one per grappe.  Its two source files are both FINER than that
+grain, so the extraction is a deliberate many-to-one projection.  This is
+safe here, and the reason is worth recording, because nothing in the config
+states it and the collapse itself is silent (auditing the collapse is core's
+business -- GH #323 Sites 1/2 -- not this country's):
+
+- =df_main= reads =s00_me_gnb2018.dta=, the household COVER PAGE: 5,351
+  households, zero duplicate households, spanning 450 grappes (~11.9 hh per
+  cluster).  It declares only =v: grappe=, so every household emits a row
+  carrying ITS CLUSTER's attributes -- =Region= (=s00q01=) and =Rural=
+  (=s00q04=).  Both are PERFECTLY CONSTANT WITHIN GRAPPE at source (verified:
+  zero grappes carry more than one distinct value of either), so the 4,901
+  surplus rows are redundant repeats of a cluster attribute, NOT distinct
+  observations.
+
+- =df_geo= reads =grappe_gps_gnb2018.dta=: 450 rows but only 445 unique
+  grappes.  Five records are BYTE-IDENTICAL duplicates -- same grappe, vague,
+  Latitude, Longitude, Accuracy, Altitude AND Timestamp -- i.e. an export
+  artifact in the WB-released file, not two separate GPS readings.
+  =merge_on: v= fans those five grappes out x2, and they happen to contain 59
+  households, adding 59 rows.
+
+5,351 + 59 = 5,410 rows at the wave level, collapsing to the correct 450
+clusters.  Because every duplicate is byte-identical on its payload, the
+collapse discards NOTHING: =drop_duplicates(full row)= and
+=drop_duplicates(t, v)= both yield 450.
+
+Do NOT "fix" this by adding =i= to the =cluster_features= index.
+=cluster_features= is the table that OWNS =v= (see CLAUDE.md); giving it a
+household level would break =_add_market_index= and the =v=-join for the
+whole country.
+
+The invariant is pinned by =tests/test_guinea_bissau_cluster_features.py=.
+
+** Known gap: 11 clusters have no coordinates
+
+Latitude/Longitude are NaN for 11 of the 450 grappes -- the 5 grappes absent
+from =grappe_gps_gnb2018.dta= altogether, plus 6 that are present but null.
+A geo-coverage gap in the released file, independent of the projection above.

@@ -2,13 +2,31 @@ Country: Tanzania
 Wave: 2019-20
 
 cluster_features:
+    # GH #323.  Region/District come from `t0_region` / `t0_district` -- the
+    # location of the SDD FRAME household, i.e. of the cluster -- and NOT from
+    # `hh_a01_1` / `hh_a02_1`, which this instrument asks ONLY OF MOVERS ("where
+    # are you now?").  Reading the mover question was doubly wrong: it is null
+    # for 89.9% of the households found at their ORIGINAL location (the ones
+    # that actually describe the cluster) and non-null precisely for the ones
+    # that left.  257 of 741 cluster-attribute cells were contested by it.
+    #
+    # `_frame` carries `sdd_cluster` purely so the df_edit hook can tell a FRAME
+    # household from a SPLIT-OFF.  A split-off is a new household formed by
+    # departing members; the SDD file leaves its `sdd_cluster` and `t0_*` blank
+    # but still stamps it with a `clusterid`, and that clusterid is NOT its
+    # sampling cluster -- among the 326 split-off rows it collects households
+    # whose own strata span DAR ES SALAAM, DODOMA and ZANZIBAR under a single
+    # DODOMA cluster code.  A split-off is evidence about itself, not about a
+    # cluster.  Dropped by the hook.
     file: HH_SEC_A.dta
     idxvars:
         i: sdd_hhid
         v: clusterid
     myvars:
-        Region: hh_a01_1
-        District: hh_a02_1
+        Region: t0_region
+        District: t0_district
+        _frame: sdd_cluster
+        _status: hh_tracking_status
         Rural:
             - sdd_rural
             - mapping:

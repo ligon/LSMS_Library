@@ -3,8 +3,20 @@
 
 2019-20 keeps the WB column names (s5aq06b_1 = harvest unit, s5aq06c_1 =
 condition) and records two parallel harvest conditions (_1 / _2) per
-(plot, crop); both are emitted as separate reported rows.  Crop module
-lives under Data/Agric/.  See uganda.CROP_COLMAPS['2019-20'].
+(plot, crop); both are emitted as separate reported rows.  The _1/_2 slot
+number is NOT an ordinal "first/second harvest" -- the Stata variable
+labels read "(2018, full harvest, condition1/condition2)" and each slot
+carries its own 6c condition column drawing on the same 20-code scheme as
+the 2009-16 long-form waves.  That condition is now an index level
+(GH #323/#637).
+
+KNOWN GAP: season B's agsec5b.dta also carries a slot _2
+(s5bq06a_2 / s5bq06b_2 / s5bq06c_2, labelled "(2019, condition2)", 1 306
+non-null conditions) which CROP_COLMAPS does not read, so those harvest
+records are absent from the table entirely.  Adding them ADDS mass and so
+is deliberately left to a separate change; see Uganda/_/CONTENTS.org.
+
+Crop module lives under Data/Agric/.  See uganda.CROP_COLMAPS['2019-20'].
 """
 import sys
 sys.path.append('../../_/')

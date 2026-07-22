@@ -1,7 +1,19 @@
 import pandas as pd
 import numpy as np
 import json
-from lsms_library.local_tools import get_dataframe
+from lsms_library.local_tools import get_dataframe, format_id
+
+
+def v(upm):
+    """Format the sampling-unit id (upm) for the sample table's `v` column.
+
+    The framework resolves a formatting function whose name matches the
+    myvar (`v`) and applies it to the single source column declared in the
+    sample `data_info.yml` (``v: upm``).  `format_id` is NOT applied to
+    myvars automatically (only to idxvars), so without this the numeric upm
+    would stringify to e.g. '9.0' instead of '9' -- breaking the v-join key.
+    """
+    return format_id(upm)
 
 
 def _household_roster_from_df(df, sex, age, HHID, sex_converter=None, age_converter=None,

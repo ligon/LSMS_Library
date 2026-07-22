@@ -78,11 +78,16 @@ cluster_features:
             i: case_id
             v: ea_id
         myvars:
-            Rural:
-                - reside
-                - mapping:
-                    rural: 0
-                    urban: 1
+            # Raw `reside` is already a declared spelling of the canonical
+            # Rural/Urban vocabulary in every Malawi wave ('Rural'/'Urban',
+            # 'rural'/'urban', 'RURAL'/'URBAN' -- the case differs between the
+            # Cross_Sectional and Panel files).  Pass it through and let
+            # _enforce_canonical_spellings normalise it.  The `mapping:` blocks
+            # that used to sit here converted these good labels into 0/1 and
+            # got the DIRECTION WRONG: because the two source files disagree on
+            # case, 2016-17 and 2019-20 mapped rural households to BOTH codes,
+            # sign-flipping the indicator between waves.  GH #602.
+            Rural: reside
             Region:
                 - hh_a01
                 - mapping:
@@ -124,14 +129,40 @@ cluster_features:
             # lookups for this wave.
             District: hh_a01
     df_geo:
+        # GH #323 SITE 4 / GH #627 -- CARTESIAN, CURED AT THE MERGE.
+        #
+        # This block USED to key `householdgeovariables.dta` on `v: ea_id` and
+        # merge on the CLUSTER key `v`.  Both sub-frames are HOUSEHOLD grain
+        # (12,271 rows each, one per case_id, across 768 EAs), so `pd.merge`
+        # paired every household of df_main with every geo row sharing that
+        # `v`: 196,083 rows, 183,812 of them PHANTOM -- rows that exist in no
+        # survey.  `_normalize_dataframe_index` then mopped the wreck up with
+        # groupby().first() down to 768 clusters, so the table read clean at
+        # every point anyone ever looked.
+        #
+        # The geo file carries `case_id`, so the honest key was there all
+        # along.  Verified cold against the two source files:
+        #   * exactly 1:1 on case_id -- 12,271 = 12,271, zero rows on either
+        #     side alone, no duplicate case_id in either file;
+        #   * lat_modified / lon_modified are CONSTANT within all 768 ea_id
+        #     (0 EAs with more than one distinct coordinate) -- the published
+        #     GPS is the EA's displaced fix stamped on each household;
+        #   * df_main.ea_id == df_geo.ea_id for all 12,271 households.
+        # So keying on `i` hands each household its own coordinate, which is
+        # the coordinate the `v`-merge was already giving it: 196,083 -> 12,271
+        # wave rows, 183,812 -> 0 phantom, and every returned value unchanged.
+        #
+        # `v` is deliberately NOT declared here.  df_main owns it; declaring it
+        # on both sides of a merge keyed on `i` would only produce a v_x/v_y
+        # collision.
         file: Full_Sample/Geovariables/HH_level/householdgeovariables.dta
         idxvars:
-            v: ea_id
+            i: case_id
         myvars:
             Latitude: lat_modified
             Longitude: lon_modified
     merge_on:
-        - v
+        - i
     final_index:
         - t
         - v

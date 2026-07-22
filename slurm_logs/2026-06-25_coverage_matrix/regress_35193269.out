@@ -1,0 +1,60 @@
+=== prolog ===
+node: n0186.savio3  jobid: 35193269  started: Thu Jun 25 18:18:16 PDT 2026
+
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193269/venv_img
+>> .venv -> /local/job35193269/venv_img  (verified import OK)
+python 3.11.6 pandas 3.0.2
+
+=== warm-cache check (Uganda readiness x2) ===
+  run1 (cold-ish): 429s   run2 (warm): 36s
+  identical tier tables across runs: False
+  run2 tiers: {'sane': np.int64(157), 'absent': np.int64(35), 'builds': np.int64(19), 'broken': np.int64(8)}
+
+=== full pytest (warm cache) ===
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Guinea-Bissau]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1084: UserWarning: Refusing workspace copy of DVC-tracked file Guinea-Bissau/2018-19/Data/s01_me_gnb2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Kazakhstan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:4188: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 3 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q2
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q4
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q7
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q10
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s1q11
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: isabel
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Togo]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1084: UserWarning: Refusing workspace copy of DVC-tracked file Togo/2018/Data1/s01_me_tgo2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_currency.py::test_feature_ghana_per_wave - AssertionError: ...
+1 failed, 3394 passed, 154 skipped, 4 xfailed, 1 xpassed, 72 warnings in 539.98s (0:08:59)
+
+=== done Thu Jun 25 18:35:17 PDT 2026 ===

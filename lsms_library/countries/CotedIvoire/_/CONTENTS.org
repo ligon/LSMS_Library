@@ -129,6 +129,420 @@ Wave-level =_/food_expenditures.py= scripts exist for 1985-86, 1986-87 using the
 files as CSV format via =dvc.api.open=. They are legacy scripts and use the retired
 =lsms.tools= package — do not extend them.
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 for GH #601.  Everything below is quoted
+verbatim from the cited source; the section headers, the tables and any
+sentence not inside a quote are editorial.  Nothing here is inferred from
+the microdata -- what a survey *claims* to represent and what its =.dta=
+files happen to contain are kept strictly apart.
+
+** Where the statements live (read this first)
+
+*No universe or coverage statement exists in any file this repository
+ships for any Côte d'Ivoire wave.*  All five waves' statements are
+*World Bank catalog metadata only*.  That makes the record a moving
+target: the text can change under us without any change in this repo.
+
+| Wave    | Catalog | Universe field? | Statement lives in                    | Confidence |
+|---------+---------+-----------------+---------------------------------------+------------|
+| 1985-86 |      83 | *no*            | catalog metadata only                 | medium     |
+| 1986-87 |      84 | *no*            | catalog metadata only                 | medium     |
+| 1987-88 |      85 | *no*            | catalog metadata only                 | medium     |
+| 1988-89 |      82 | *no*            | catalog metadata only                 | medium     |
+| 2018-19 |    4292 | yes             | catalog metadata only (and see 3.2)   | high       |
+
+What is in the repo instead, per wave =Documentation/=:
+
+- 1985-89 :: questionnaire scans only (=cot15A_V2.pdf=, =cot15B.pdf=,
+  =cot17.pdf=, =cot24A_V2.pdf=, =cot24B.pdf=, =cot08.pdf=, =cot23_V2.pdf=,
+  =cot23B.pdf=, =cot25A_V2.pdf=, =cot25B.pdf=, =cot30A_V2.pdf=,
+  =cot30B.pdf=) plus =SOURCE.org= and =LICENSE.org=.  *All twelve PDFs are
+  image-only scans with no text layer*, and no OCR tool was available on
+  the extraction host, so they could not be searched textually.  They are
+  questionnaires, not reports; a universe statement would not normally
+  live in them.  No Basic Information Document is DVC-tracked here.
+- 2018-19 :: questionnaires and code nomenclatures only
+  (=CIV-EHCVM1-QNR-*=, =CIV-EHCVM1-NOMENCLATURE-*=).
+  =CIV-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf= was text-extracted and searched for
+  « population cible », « univers », « champ de l' », « couverture »: the
+  only COUVERTURE hits are the questionnaire's own cover block.  No report
+  and no BID is DVC-tracked here.
+
+The corroborating documents cited below are catalog-hosted, not local:
+
+- CILSS :: "Cote d'Ivoire Living Standards Survey (CLSS) 1985-88: Basic
+  information for users of the data" (World Bank / Institut National de la
+  Statistique, 1996-08-06), https://microdata.worldbank.org/catalog/83/download/15551
+- EHCVM :: Basic Information Document (INS, June 2021),
+  https://microdata.worldbank.org/catalog/4292/download/52543 -- its
+  "Sample" section (p. 10) gives sizes and the two-stage design and
+  contains *no* universe or target-population statement.
+
+Both are in the acquisition queue: adding them to =Documentation/= would
+move four of the five rows above from "catalog metadata only" to
+something the library actually holds.
+
+** 1. CILSS / EPAM waves 1985-86, 1986-87, 1987-88, 1988-89
+
+*** 1.1 What is declared
+
+The four catalog entries (83, 84, 85, 82) carry *byte-identical*
+=sampling_procedure= text -- re-verified 2026-07-21 by fetching all four
+=/api/catalog/{id}?id_format=id= records and comparing the strings.  They
+share the single 1985-88 Basic Information Document.  Treat the four
+waves as carrying one statement, not four.
+
+*None of the four has a =Universe= field.*  =study_info.universe= is
+=null= in all four API records.  What follows is the nearest
+universe-defining language the documentation offers, and it is a
+*coverage and representativeness claim, not a declaration of the
+population*.
+
+Coverage, verbatim, =study_info.geog_coverage=, catalog 83 (identical in
+84 and 85; catalog 82 differs only in dropping the full stop after
+"coverage"):
+
+#+begin_quote
+National coverage.
+Domains: Urban/rural; Regions (East Forest, West Forest,  East Savannah, West Savannah)
+#+end_quote
+
+Nearest thing to a universe, verbatim, opening sentence of
+=method.data_collection.sampling_procedure=, all four entries:
+
+#+begin_quote
+The principal objective of the sample selection process for the CILSS Household Survey was to obtain a nationally representative cross-section of African households, some of which could be interviewed in successive years as panel households.
+#+end_quote
+
+Unit of analysis, verbatim, =study_info.analysis_unit=, all four entries:
+
+#+begin_quote
+- Households
+- Individuals
+- Community
+#+end_quote
+
+Three things a reader must not skip:
+
+1. The word "African" is *in the source*, in both the catalog and the
+   1996 Basic Information Document (printed p. 22, section "III.  Sample
+   Design and Selection").  It is quoted here exactly as written.  *No
+   claim is made here as to whether it implies non-African residents of
+   Côte d'Ivoire were out of scope* -- the documentation does not say, and
+   guessing would be exactly the kind of unevidenced claim this file
+   exists to prevent.
+2. "Nationally representative cross-section" describes the *sample*, not
+   the population.  No document found names the population.
+3. The =Domains= field names *four* regions with the savannah split
+   East/West, but the same entry's own Sampling Procedure section
+   classifies clusters into *five*: "Regional classification was
+   constructed so that clusters in Abidjan would be classified as
+   Abidjan; clusters in other major cities in East Forest, West Forest and
+   Savana would be classified as \"Other Cities \"; and only rural clusters
+   would be included in the East Forest, West Forest and Savanna.  Thus,
+   the urban-rural classification is as follows: Urban - Abidjan and Other
+   Cities; Rural - East Forest, West Forest and Savanna."  The two
+   statements are in the same catalog record and disagree.  The five-way
+   classification is the one this repo's config follows (see
+   [[*Sampling Design][1985-89 Waves (CILSS EPAM) > Sampling Design]]).  Recorded, not adjudicated.
+
+*** 1.2 Exclusions
+
+*No exclusion is stated at the universe level* for any of the four waves.
+No region, no institutional population (prisons, barracks, hospitals,
+dormitories), no nomadic or homeless population, and no security carve-out
+is named anywhere in the four catalog records.  Searched: =universe=,
+=nomad=, =institution=, =foreign= over the full study-description text of
+all four entries.
+
+The only exclusion language found anywhere is a household-*membership*
+rule -- a different thing from a universe exclusion, and quoted here so
+the difference is visible.  Verbatim, catalog study description,
+"Survey instrument > Questionnaires", SECTION 1: HOUSEHOLD ROSTER,
+Part A (identical in all four entries):
+
+#+begin_quote
+This section lists all people w ho normally live and eat their meals together in the dwelling as well as those who spent the previous night in the household, but cannot otherwise be considered household members. To qualify as a household member, a person must have resided in the household for 3 months or more during the previous 12 months. Since the number of months the person was resident in the household is recorded, users of the data can choose a more restrictive definition if they wish. For example, one study used six months of residence, rather than three months, as the criterion for household membership. The household head, newborn babies and new spouses are considered household members even if they do not satisfy the months of residence criterion. CILSS always excludes servants and boarders from household membership because they are considered to be separate households.
+#+end_quote
+
+(The " w ho" and the doubled spaces are in the source; quoted as printed.)
+
+Note for consumers of =household_roster=: this file's REL code table maps
+code 11 to =Servant=, which sits oddly beside "CILSS always excludes
+servants and boarders from household membership".  The two are
+reconciled by the first sentence above -- the roster *lists* people who
+"cannot otherwise be considered household members" -- so a servant row can
+legitimately be present in the roster while being outside CILSS's own
+household-membership definition.  Anyone computing household size or
+per-capita quantities from this table should decide explicitly whether to
+keep those rows.  The library does not decide it for you.
+
+*** 1.3 Sub-samples and sub-populations inside each wave
+
+Three, and all three matter before pooling.
+
+**** (a) A one-woman-per-household fertility sub-sample
+
+Verbatim, =sampling_procedure=, section ">> Selection of the Respondent
+for the Section on Fertility":
+
+#+begin_quote
+The survey collected fertility information for one woman per household. The woman, aged 15 or older, was selected at random from among household members, so that each eligible woman in a household had the same probability of being selected.
+#+end_quote
+
+The fertility module's universe is therefore *not* the wave's universe: it
+is one randomly chosen woman aged 15+ per household, which is a
+size-biased sample of women (a woman in a household with four eligible
+women has a quarter the selection probability of a lone eligible woman).
+No fertility feature is currently wired for these waves, but if one is
+added it must not be pooled with household-level tables without
+reweighting.
+
+**** (b) A rotating half-panel, not a four-wave panel
+
+Verbatim, =sampling_procedure=:
+
+#+begin_quote
+A two-stage sampling procedure was used. In the first stage, 100 Primary Sampling Units (PSUs) were selected across the country from a list of all PSUs available in the sampling frame. At the second stage, a cluster of 16 households was selected within each PSU. This led to a sample size of 1600 households a year, in 100 cluster s of 16 households each. Half of the households were replaced each year while the other half (the panel households in 1986, 1987 and 1988) were interviewed a second time.
+#+end_quote
+
+*This CONTRADICTS a claim already in this file.*  The existing
+"1985-89 Waves (CILSS EPAM) > Sampling Design" section says:
+
+#+begin_quote
+Panels: these are longitudinal (same households followed across 4 waves)
+but household IDs may change -- no panel_ids implemented yet
+#+end_quote
+
+The documentation says each household was interviewed *at most twice*
+(half replaced each year, the retained half "interviewed a second time").
+It does not describe households followed across four waves.  The
+documented design is a rotating two-year panel.  This is flagged, not
+silently corrected: whoever implements =panel_ids= for these waves should
+resolve it against the data and the 1996 BID and then fix whichever
+statement is wrong.
+
+**** (c) The Block 1 / Block 2 frame break, which splits 1987-88 down the middle
+
+Verbatim, =sampling_procedure=:
+
+#+begin_quote
+It is important to note that there was a change in the sampling procedures (the sampling frame, PSU selection process and listing procedures), used to select half of the clusters/households interviewed in 1987 (the other half were panel households retained from 1986), and all of the clusters/households interviewed in 1988.
+#+end_quote
+
+#+begin_quote
+Households selected on the basis of the first set of sampling procedures will henceforth be referred to as Block 1 data while households based on the second set of sampling procedures will be referred to as Block 2 data.
+#+end_quote
+
+#+begin_quote
+The sampling frame for Block 2 data was established from a list of places from the results of the Census of inhabited sites (RSH) performed in preparation for the 1988 Population Census.
+#+end_quote
+
+The documentation speaks in survey years; this repo's wave labels span
+two.  Survey year 1985 = wave =1985-86=, 1986 = =1986-87=, 1987 =
+=1987-88=, 1988 = =1988-89= (the same mapping the =WEIGHT85..88= source
+files follow).  On that mapping, the library's =1987-88= wave is *one
+wave containing two differently drawn sub-samples*: Block 1 panel
+households retained from 1986, and Block 2 households drawn from an
+entirely new frame with a new within-PSU selection unit (the « îlot »
+rather than the PSU).  1985-86 and 1986-87 are Block 1 throughout;
+1988-89 is Block 2 throughout.  A reader pooling
+CotedIvoire across the CILSS years is pooling across a frame break that
+falls *inside* one of the waves.
+
+*** 1.4 Universe vs. what the weights represent
+
+The documentation is unusually candid that the realized sample does not
+cleanly represent the claimed universe, and that the weights only
+partially repair it.  All quotes verbatim from =sampling_procedure=.
+
+Selection bias toward large households (section ">> Bias in the Selection
+of Households within PSUs, Block 1 Data"):
+
+#+begin_quote
+Analysis of the four years of the CILSS data revealed that household size (unweighted), dropped by 24 percent between 1985 and 1988. Three possible explanations were considered: (1) area l demographic change; (2) non-sampling measurement errors were involved; or (3) some sort of sampling bias. Investigation ruled out the first two possibilities. The third possibility clearly was an issue because the sampling frame and listing procedures had indeed changed in midstream and this was likely to have had an effect.
+#+end_quote
+
+#+begin_quote
+One set of weights is provided to reconcile this bias (Household Size Weights).
+#+end_quote
+
+A correction that *cannot* be made at all (section ">> Problems Due to
+Inaccurate Estimates of PSU Population"):
+
+#+begin_quote
+However, it is not possible to calculate these weights either for Block 1 data (m' I is not available since only 64 households per cluster were listed); or for Block 2 data (m' i is not available since the enumeration area was the îlot and not the PSU).
+#+end_quote
+
+#+begin_quote
+[Note: Omission of this weight has two effects: (1) a bias in favor of PSUs whose population has grown relatively slowly (or diminished) since the census, and against those that have grown exceptionally fast; and (2) a bias in favor of PSUs whose current mean household size is relatively large (Chris Scott, personal communication).]
+#+end_quote
+
+Non-response was handled by *substitution*, not by weighting (section
+">> Non-Response and Replacement of Households"):
+
+#+begin_quote
+In order to maintain the size of the sample, the 1985 CILSS instituted a procedure by which households in the original sample that refused or were unavailable were replaced by one of the 48 remaining households in the same cluster, enumerated during the pre-survey. [...] During the first year of the survey, a total of 124 of the 1600 original sample households (7.8 percent) were not interviewed and were thus replaced by other households.
+#+end_quote
+
+#+begin_quote
+In the second and subsequent years, the effort to replace non-responding households with other like households was abandoned. Households were replaced by the first household on the list of those remaining from the pre-survey or listing operation.
+#+end_quote
+
+("[...]" marks an elision of two intervening sentences; the quoted
+fragments are consecutive text otherwise.)
+
+*Open question, not resolved here.*  This repo's config uses a single
+weight variable for these waves -- see
+[[*Sampling Design][1985-89 Waves (CILSS EPAM) > Sampling Design]],
+"Weight variable: ALLWAITN (normalized all-household weight)".  The
+documentation describes more than one weight set, including the
+"Household Size Weights" quoted above.  *No document consulted states
+which distributed variable corresponds to which documented weight set*,
+and no such correspondence is asserted here.  Anyone using CILSS weights
+for published estimates should establish it from the 1996 BID's variable
+documentation first.
+
+** 2. EHCVM 2018-19
+
+*** 2.1 The declared universe
+
+This is the one Côte d'Ivoire wave with a formally labelled =Universe=
+field.  Verbatim, catalog 4292, =study_desc.study_info.universe=
+(re-verified character-for-character against the API record 2026-07-21):
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals, military barracks, and school dormitories.
+#+end_quote
+
+Verbatim, =study_info.geog_coverage=:
+
+#+begin_quote
+National coverage
+#+end_quote
+
+Verbatim, opening sentence of =method.data_collection.sampling_procedure=:
+
+#+begin_quote
+The Cote d'Ivoire EHCVM 2018/19 sample covers all regions with urban and rural areas surveyed in all regions.
+#+end_quote
+
+The catalog metadata is in *English* although the instruments are in
+French.  *No French-language universe statement was found* in any
+accessible document -- so unlike Burkina Faso, Niger or Guinea-Bissau,
+there is no INS-authored « champ de l'enquête » text here to compare the
+English against.
+
+*** 2.2 BOILERPLATE WARNING -- do not over-read the universe sentence
+
+The sentence quoted in 2.1 is *World Bank NADA template text*.  The
+cross-country survey behind GH #601 found it appearing verbatim in *15
+waves*: Benin (x2), Burkina Faso 2018-19 and 2021-22, Côte d'Ivoire,
+Guinea-Bissau, Mali, Niger, Senegal, Togo -- and also Ethiopia 2018-19 and
+2021-22 and Nigeria 2015-16, 2018-19 and 2023-24, which are not EHCVM at
+all.
+
+Its presence tells you *which metadata template was used*.  It does not
+independently attest that the Institut National de la Statistique made
+that claim about this survey.  It should be recorded as what it is: the
+strongest statement available for this wave, and simultaneously the least
+survey-specific sentence in the corpus.
+
+*** 2.3 Exclusions
+
+Verbatim exclusion clause, from the =Universe= field:
+
+#+begin_quote
+excluding prisons, hospitals, military barracks, and school dormitories
+#+end_quote
+
+That is an institutional-population exclusion and nothing more.
+
+*No geographic or regional exclusion is stated*, and the Sampling
+Procedure states the opposite: "The Cote d'Ivoire EHCVM 2018/19 sample
+covers all regions with urban and rural areas surveyed in all regions."
+This is worth noting because sibling EHCVM waves *do* carry such
+carve-outs -- Guinea-Bissau's excludes rural coverage in the autonomous
+sector of Bissau, Benin's excludes rural coverage in Littoral -- and
+Côte d'Ivoire's does not.  Pooling EHCVM countries without checking this
+per-country sentence will silently mix different geographic universes.
+
+Note also what the boilerplate does *not* mention, and what neighbouring
+EHCVM countries' French-language documents do: diplomatic households and
+the homeless (Burkina Faso's own French report excludes « les ménages
+ayant un statut diplomatique et les sans domiciles fixes »).  Whether
+those are also out of scope for Côte d'Ivoire is *not documented in any
+source consulted*.  Recorded as a gap, not as an exclusion.
+
+*** 2.4 Sub-samples inside the wave
+
+The wave contains a *two-vague (two-round) split*, already described in
+[[*Sampling Design][2018-19 Wave (EHCVM) > Sampling Design]] and repeated
+here only for its universe implications.  Verbatim,
+=sampling_procedure=:
+
+#+begin_quote
+Upon deciding on the sample size and repartition, the survey design team implemented a 2-stage sampling methodology. At the first stage, 1084 enumeration areas (EAs) were selected from the sample frame. In the second stage, 12 households were selected in each enumeration area randomly.
+#+end_quote
+
+#+begin_quote
+The total survey sample size is 12992 households - 5275 from urban areas and 7717 from rural areas. After that, the survey design randomly divided each enumeration area into two equal groups. The survey team interrogated the first group in wave 1 and the other in wave 2. Finally, for various reasons, including availability and quality monitoring, the final sample size comprises slightly more households (twelve) in round 2 than in round 1. In wave one, the survey teams interviewed 6490 households (2744 in urban areas and 3746 in rural areas. In wave two, the teams interviewed 6502 households (2531 in urban areas and 3971 in rural areas).
+#+end_quote
+
+(Unbalanced parenthesis and the odd "(twelve)" gloss are in the source;
+quoted as printed.)
+
+The two vagues are *seasonal*, and each household is in exactly one of
+them.  They are a random split of each EA, so each vague is a probability
+sample of the same universe -- but they are *not* interchangeable for
+anything seasonal (food acquisition, agriculture, prices).  A user
+subsetting to one vague has a half-size national sample restricted to one
+season, not a national annual estimate.
+
+*No oversample, booster sample, or targeted sub-population* is documented
+for this wave: no urban booster, no poor-household oversample, no
+refugee/migrant module subsample.  Searched: the full catalog 4292 study
+description and the catalog-hosted BID.
+
+** 3. Gaps, recorded as gaps
+
+- 1985-86, 1986-87, 1987-88, 1988-89 :: *no universe statement exists.*
+  Not in the catalog (=study_info.universe= is =null= in all four API
+  records, checked 2026-07-21), not in the 1996 Basic Information
+  Document's sample-design chapter, and not searchable in the twelve
+  local questionnaire PDFs because they are image-only scans with no text
+  layer and no OCR tool was available.  The GH #601 survey tags all four
+  =national-claimed=: a coverage claim exists, a population statement does
+  not.  *If OCR becomes available, the twelve scans are the one unsearched
+  local source* -- though a universe statement would be unusual in a
+  questionnaire.
+- 2018-19 :: a universe statement exists but is template text (2.2), and
+  no French-language original was found to corroborate it.
+- All five waves :: nothing in this repository states a universe.  Pulling
+  the two catalog-hosted documents named at the top of this section into
+  =Documentation/= is the cheapest way to change that.
+
+** 4. Cross-references within this file
+
+- Region and urban/rural classification for 1985-89, and the ALLWAITN
+  weight variable: "1985-89 Waves (CILSS EPAM) > Sampling Design".  Its
+  five-region classification agrees with the documentation's Sampling
+  Procedure section and disagrees with the same catalog record's
+  =Domains= field (see 1.1, point 3).
+- The four-wave-panel claim in that same section is *contradicted* by the
+  documentation; see 1.3(b).
+- Vague split, weights and strata for 2018-19: "2018-19 Wave (EHCVM) >
+  Sampling Design".  Consistent with the catalog; see 2.4.
+- Residency/membership rules: "Household Presence / MonthsSpent".  The
+  CILSS three-month membership rule quoted in 1.2 is the 1985-89 analogue
+  of the EHCVM =s01q12= / =s01q13= binaries described there, and that
+  section's statement that the 1985-89 waves lack a continuous
+  months-present variable should be read against the documentation's claim
+  that "the number of months the person was resident in the household is
+  recorded" -- the questionnaire says it was collected; whether it reaches
+  the distributed extract is a separate, undetermined question.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 wave) does NOT ask

@@ -4,7 +4,7 @@
 Item-level reported community food prices at grain (t, v, j, u) from the
 post-harvest COMMUNITY questionnaire's food-price module (Section C8,
 Post Harvest Wave 5/Community/sectc8_harvestw5.dta).  CLUSTER-level (no
-household i); v = format_id(ea).  W5 item_cd is the consumption-module scheme
+household i); v = cluster_id(state, lga, ea).  W5 item_cd is the consumption-module scheme
 already in harmonize_food (resolved via Code); the per-row unit label is
 c8aq2_b, the reported price c8aq3.  t = 2024Q1 (post-harvest quarter).
 """

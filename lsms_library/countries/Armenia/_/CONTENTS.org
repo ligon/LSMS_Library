@@ -1,0 +1,293 @@
+#+title: Contents
+
+* Sampling universe, exclusions and sub-samples
+
+# ASCII EXCEPTION (deliberate, per the orgmode skill's "leave a comment" rule):
+# every #+begin_quote block below is a VERBATIM transcription of survey
+# documentation.  Curly apostrophes ('Urban Dwellers'), curly double quotes
+# ("organized"), and the source's own double spaces ("households  (i.e.",
+# "cities,  and", "of  selection") are reproduced as printed.  Do not normalise
+# them: the point of these blocks is that a later reader can diff them against
+# the PDF.  All prose outside the quote blocks is ASCII apart from the section
+# sign in citations (§3.1 etc.), which matches the assembled
+# slurm_logs/POPULATION_STATEMENTS_2026-07-21.org.
+
+Armenia ships exactly one wave, =1996= (the Armenian Household Budget Survey,
+AHBS 96 / HBS 1996), and ships no microdata -- =_/data_scheme.yml= carries
+=data_available: false=.  Everything below is documentation evidence.  No =.dta=
+file was opened, and none could have been: the universe of a survey is a claim
+its documentation makes, not something to reverse-engineer from data.
+
+Evidence gathered 2026-07-21 for GH #601; the cross-country assembly is
+=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= on branch
+=docs/601-population-statements=, where this wave is tagged
+=national-all-households=, confidence *high*.
+
+** Where the statement lives -- NOT in this repo
+
+| wave | statement source                          | in this checkout? | confidence |
+|------+-------------------------------------------+-------------------+------------|
+| 1996 | =ar96binf.pdf= (WB Basic Information Doc) | *no*              | high       |
+
+The statement quoted below comes from *"Basic Information Document -- Republic
+Of Armenia, Household Budget Survey -- 1996 (AHBS 1996)"*, Development Research
+Group, Poverty and Human Resources Division, The World Bank, December 1998,
+filename =ar96binf.pdf=.  That file is *not present in this repository*.  It was
+downloaded from World Bank Microdata catalog entry 2324
+(https://microdata.worldbank.org/index.php/catalog/2324/download/34650).
+
+=1996/Documentation/= holds only =SOURCE.org= (the catalog URL plus provenance
+keywords), a =.gitignore=, and four DVC-tracked PDFs: =arm01.pdf= (Household
+Questionnaire), =arm03.pdf= (Diary Questionnaire), =arm04.pdf= (Diary of Current
+Expenditures), and =ddi-documentation-english_microdata-2324.pdf=.  That last
+file is a 12.7 kB related-materials *listing* -- it names =ar96binf.pdf= as the
+Basic Information Document but contains no universe statement of its own.
+
+Consequence, stated plainly: *for Armenia the library holds no copy of the
+document that defines its sample's universe.*  The record is a moving target on
+a World Bank server rather than something this repository can vouch for.  If the
+catalog entry is revised or withdrawn, the citations below become unverifiable.
+
+*This is not NADA boilerplate.*  The single most-repeated "universe" sentence in
+the cross-country corpus is World Bank NADA template text (15 waves).  Armenia
+is not one of them -- for the opposite reason: the DDI XML export for study 2324
+has *no* =<universe>= element at all.  Its =<sumDscr>= records only
+=<geogCover>National</geogCover>=, =<nation abbr="ARM">Armenia</nation>=, and
+=<anlyUnit>- Households\n- Individuals</anlyUnit>=.  The statement below is the
+Bank's own authored BID prose, which is stronger evidence than a template field,
+but it is prose in a document the repo does not hold.
+
+** 1996 -- the declared universe
+
+=ar96binf.pdf=, Section 3 "Sample", §3.1 "Coverage", p. 9, first paragraph
+(language: English; no translation needed):
+
+#+begin_quote
+The AHBS 96 covered the whole territory of the ROA which had an estimated population at the time of the survey of 3.75 million people and 875,000 households.3 According to the SDS records, about 61% of the households were classified as ‘Urban Dwellers’. Approximately 253,000 households  (i.e. 28.9% of the total in the republic and 47.7% of the urban households) were registered in the capital, Yerevan.
+#+end_quote
+
+The superscript =3= is the footnote reference reproduced under "Exclusions"
+below.  =ROA= = Republic of Armenia; =SDS= = State Department of Statistics.
+
+Unit of analysis, =ar96binf.pdf= §1 "Introduction", p. 3:
+
+#+begin_quote
+The unit of study in the survey was the household, defined as a group of co-resident individuals with a common living budget.
+#+end_quote
+
+A *representativity claim*, which is a different kind of claim and is kept
+labelled as such -- =ar96binf.pdf= §1 "Introduction", p. 3 (the same sentences,
+with =(HBS) 1996= substituted for =(AHBS 96)=, open the catalog abstract for
+study 2324, so this is also the catalog-level statement):
+
+#+begin_quote
+The Armenian Household Budget Survey (AHBS 96) was designed to be a nationally representative survey capable of measuring the standard of living in the Republic of Armenia (ROA) through the collection of data on the family, demographic, socio-economic and financial status of households. The survey was conducted in November - December 1996, on the whole territory of the republic by the State Department of Statistics (SDS) of ROA with technical and financial assistance from the World Bank.
+#+end_quote
+
+"Nationally representative" and "on the whole territory of the republic"
+describe where the sample was drawn and what it estimates.  The §3.1 sentence is
+the closer thing to a named universe: all households of the Republic of Armenia,
+approximately 875,000, containing approximately 3.75 million people.
+
+** 1996 -- exclusions
+
+*** Territorial (stated)
+
+The only exclusion the documentation states is territorial, and it is stated in
+a footnote -- =ar96binf.pdf=, footnote 3 on p. 9, attached to the word
+"households." in the §3.1 paragraph quoted above:
+
+#+begin_quote
+3 This excludes the enclave of Nagorni Karabakh within Azerbaijan, which is Armenian in population but not part of the Armenian Republic, and the Azerbaijanian territories of Nakhichevan and Artsvashen.
+#+end_quote
+
+Spelling "Nagorni Karabakh" is the source's.  Three territories are named:
+Nagorno-Karabakh, Nakhichevan, and Artsvashen.  Read carefully, the footnote is
+less a carve-out from the frame than a clarification of what "the whole
+territory of the ROA" and the 875,000-household figure do *not* count -- these
+are territories outside the Republic's jurisdiction, not regions dropped for
+cost or security.
+
+*** Population-group exclusions: NO STATEMENT FOUND
+
+No statement about institutional, collective, homeless, nomadic, refugee or
+displaced populations was found anywhere in =ar96binf.pdf=, in =projcomp.pdf=,
+or in the catalog metadata for study 2324.
+
+*Silence is not inclusion.*  This entry is recorded as a gap, not as a finding
+that such populations were in scope.  What was searched, and how, is in the
+"Search record" subsection at the end.
+
+*** Frame coverage (bears on the above)
+
+=ar96binf.pdf= §3.2 "Sampling Frames", pp. 9-10.  The frames are household and
+dwelling lists, which is the mechanism by which any non-household population
+would fall out of scope, whether or not the document says so:
+
+#+begin_quote
+Accurate sampling frames for AHBS 96 were available at all levels down to the individual as lists are frequently updated in the Marzes, Zheks and Villages of the ROA5.
+#+end_quote
+
+#+begin_quote
+Current lists of households and dwellings were available covering the whole Republic of Armenia. Only in case ( iv ) above  - i.e. urban public housing at the Zhek level - was it possible to select apartments which could contain more than one household. This was most likely to occur in Yerevan.
+#+end_quote
+
+"Case (iv)" is one of five enumerated frames: "At the Zhek level for urban
+public housing in large towns, a list of rent-payers with addresses including
+that of privatized apartments."  A =Zhek= is a Housing Management Office, an
+administrative division of roughly 15,000-20,000 population.
+
+** 1996 -- domains, strata and sub-samples
+
+*** The diary sub-sample (the within-wave split that matters for pooling)
+
+AHBS 96 measured household expenditure by *two different instruments inside the
+same wave*.  =ar96binf.pdf= §3.7 "Sub-sampling for the diary participants",
+p. 13:
+
+#+begin_quote
+As mentioned earlier, AHBS 96 collected household expenditure in two ways: the recall method and the diary method. About 25% of the selected sample households had to participate in diary method to record their daily income and expenditure activities while the remaining 75% were interviewed using the traditional recall method. In selecting the 25% sub-sample households that had to be part of the diary method, a 1-in-4 systematic sample from among the selected households in each sampling area was adopted.
+#+end_quote
+
+Realised counts, =ar96binf.pdf= §3.8 "Sample implemented", p. 15:
+
+#+begin_quote
+Out of the 4,920 households who answered questionnaires, 1,260 were systematically selected using the procedure discussed above to fill in the ‘household income and expenditure diary’.
+#+end_quote
+
+This is a *probability sub-sample of the same universe* (1-in-4 systematic
+within each sampling area), not a separate population -- so it does not split
+the universe.  But it splits the *measurement*: a quarter of households have
+30-day diary expenditure and three quarters have 30-day recall expenditure, and
+the two are not the same instrument.  Anyone pooling Armenian expenditure with
+other countries, or averaging within this wave, needs to know that before
+averaging anything.  The repo's questionnaire PDFs match this split: =arm01.pdf=
+is the household (recall) questionnaire, =arm03.pdf= / =arm04.pdf= are the diary
+instruments.
+
+*** Domains of interest
+
+=ar96binf.pdf= §3.5 "Sample design", p. 11 (this text is also the catalog's
+=<sampProc>=):
+
+#+begin_quote
+The State Department of Statistics specified 3 domains of interest for this study. These are Yerevan (the capital of ROA), Other Urban areas and Rural areas.
+#+end_quote
+
+No oversample follows from these domains.  The document says so explicitly and
+gives the reason -- same section, immediately after:
+
+#+begin_quote
+Recent estimates of earthquake zones assigned almost equal populations to these domain zones of interest, and as a result there was no need for special targeting and no particular reason was implied for departing from a proportionate (or self-weighting) design.
+#+end_quote
+
+So: *no oversample, no booster, no targeted sub-population sample in this wave.*
+That is an affirmative statement in the source, not an inference from silence.
+
+*** Stratification, and one unexplained number
+
+=ar96binf.pdf= §3.3 "Stratification", p. 10:
+
+#+begin_quote
+In AHBS 96, thirty four (34) of the 37 rayons of the rural sector in ROA were stratified into 3 strata based on the rayons’  altitude as follows:
+#+end_quote
+
+(followed by a table: Low =<= 1300m / Medium 1300-1700m / High =>= 1700m, with
+10 / 13 / 11 rayons.)
+
+The document *does not say* what became of the remaining 3 rural rayons -- not
+whether they were separately handled, differently stratified, or omitted.  §3.8's
+implementation table reports selected households in all 11 Marzes, so there is
+no evidence of a dropped region; but the 34-of-37 discrepancy is unexplained in
+the source and is recorded here as unexplained rather than resolved.
+
+*** Realised sample
+
+=ar96binf.pdf= §3.8 "Sample implemented", p. 14:
+
+#+begin_quote
+Out of the 5,040 initially selected for the AHBS 96 survey, a total of 4,920 households were actually interviewed (i.e. 120 or 2.4% of the total sample either refused to answer or were not found).
+#+end_quote
+
+The same paragraph gives 20,088 individuals in those 4,920 households; the
+implementation table gives 1,980 rural-village households across 10 Marzes and
+3,060 city households (of which Yerevan 1,445).
+
+** 1996 -- universe vs. what the weights represent
+
+The design is self-weighting, so the two do not come apart here -- there are no
+design weights to reconcile against the universe.  =ar96binf.pdf= §3.5, p. 11:
+
+#+begin_quote
+A self-weighting sample was derived by selecting Primary Sampling Units (PSUs) with probability proportional to their size (where size is defined as the number of households) and then taking a constant number of households from each selected. The sample, therefore, was designed to be self-weighted and representative at the administrative regions (Marzes) level, for urban and rural areas, and within urban areas by the size of cities,  and in rural areas by elevation. The number of households to be selected in each PSU was 20, so 250 PSUs were required to make up 5000 households.
+#+end_quote
+
+Two cautions on that sentence, both worth carrying:
+
+1. The document asserts *both* that there were exactly 3 domains of interest
+   (§3.5, quoted above) *and* that the sample is "representative at the
+   administrative regions (Marzes) level".  Those are different and much
+   stronger claims -- 11 Marzes, several with only 60-200 sampled rural
+   households -- and the BID does not reconcile them.  Reported here as the
+   document's own unreconciled pair, quoted rather than adjudicated.
+2. "Self-weighted" is a claim about the *design*.  Nonresponse (120 households,
+   2.4%) and the case-(iv) multiple-households-per-apartment situation both
+   perturb it, and the BID describes no post-survey weight adjustment.
+
+Because =data_available: false=, Armenia currently has no =sample= table and
+hence no =weight= / =panel_weight= column in the library at all.  If microdata
+is ever added, a constant weight is the design-consistent default -- but check
+the delivered files for a weight variable before assuming it.
+
+** NOT an AHBS 96 exclusion -- the predecessor budget survey
+
+One passage in the corpus reads like an exclusion list and is not one.  It
+appears in =projcomp.pdf= ("Armenia Living Standards Survey 1996, Project
+Completion Report", Julia Magluchiants, Ministry of Statistics, State Register
+and Analysis, Republic of Armenia), Part III "Survey Assessment", §2 "Lessons
+Learnt", p. 18.  Its subject, stated in the preceding sentences, is the *old
+permanent family-budget-survey network* that AHBS 96 replaced:
+
+#+begin_quote
+For many years the statisticians were carrying out a survey on family budget for the purpose of studying the living conditions of the population.
+
+The survey was organized due to the methods of selection. The selection of the families was carried out in two stages, at first the enterprises were mentioned, then the workers were selected, families where the survey on budget was carried out. Approximately one thousand families were involved in the survey on budget. The method of  selection and the permanent net of the families have their problems.
+
+Firstly, during the selection, the following entities were not included in the main group: some ministries (Ministry of National Security, Ministry of Internal Affairs Ministry of Defense), private and co-operative enterprises, as well as families, which members are unemployed.
+
+Secondly, constant budget network could not be representational  as required, as being systematically observed by families, owing to keeping the regular track of incomes and expenditures,  they were gradually becoming more “organized”  and thus lost their representational character.
+#+end_quote
+
+Do not attribute those exclusions to AHBS 96.  They are a retrospective critique
+of the enterprise-based Soviet-era design, offered as the motivation for the
+1996 redesign; =ar96binf.pdf= §3 records no such exclusions for AHBS 96 itself.
+The passage is transcribed here precisely so that a future reader who finds it
+does not have to re-adjudicate it.  =projcomp.pdf= is likewise *not* in this
+repository (WB catalog 2324, download/34652).
+
+** Search record (what was looked at, so the gaps above are falsifiable)
+
+- Local :: =lsms_library/countries/Armenia/1996/Documentation/= -- =SOURCE.org=
+  (catalog URL + =#+CATALOG_ID: 2324=, =#+CATALOG_IDNO: ARM_1996_HBS_v01_M=),
+  =.gitignore=, and the four DVC-tracked PDFs listed above, materialised through
+  =lsms_library.data_access.get_data_file()= (never the =dvc= CLI).  No Basic
+  Information Document, statistical report or technical document is stored
+  locally.
+- Catalog fallback :: WB Microdata catalog study 2324 -- the rendered
+  study-description page, the full DDI XML export
+  (https://microdata.worldbank.org/index.php/metadata/export/2324/ddi), the
+  related-materials page, and then the two technical documents =ar96binf.pdf=
+  (download/34650) and =projcomp.pdf= (download/34652).
+- Grep terms over all extracted text ::
+  =universe=, =target population=, =population of interest=, =coverage=,
+  =frame=, =exclud=, =omit=, =institution=, =nomad=, =homeless=, =refuge=,
+  =whole territory=, =all households=.
+- DDI :: no =<universe>= element present (checked in the XML export, which
+  distinguishes a *missing* element from a *present but empty* one).
+- Extraction :: quotes pulled with =pdfminer.six=.  pdfminer inserts a blank
+  line at each PDF line break; those were removed to reconstitute running
+  paragraphs.  No other repair was applied -- in particular the source's double
+  spaces and curly quotes are preserved.  Quotes re-verified against the
+  extracted text on 2026-07-21 before being written here.
+- Not done :: no =.dta= was opened (there are none locally, and it would be the
+  wrong evidence in any case).

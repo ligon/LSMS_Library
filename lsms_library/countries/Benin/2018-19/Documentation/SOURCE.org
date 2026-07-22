@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/rn3k-z374]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/4291
+
+#+CATALOG_ID: 4291
+#+CATALOG_IDNO: BEN_2018_EHCVM_v02_M
+#+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/rn3k-z374
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/4291
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

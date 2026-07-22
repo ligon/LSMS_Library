@@ -1,0 +1,604 @@
+#+title: Contents
+
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 (GH #601).  Four wave directories: =1985/=,
+=1990/=, =1991/=, =1994/= -- the four rounds of the /Encuesta Nacional de
+Hogares sobre Medicion de Niveles de Vida/ (ENNIV).  (=_/data_info.yml= labels
+the first wave =1985-1986= while the directory is =1985/=; the survey ran twelve
+months from late 1985 into 1986.)
+
+Everything below is quoted from survey documentation.  *No statement here is
+derived from the microdata*, and none should be: this section records what each
+round /claims/ to represent, which is a different fact from what the distributed
+=.dta= files contain.
+
+Spanish quotations are reproduced exactly as printed, accents, typos and all
+(the rest of this file is ASCII per house convention; the quotes are not, because
+they cannot be).  Translations are always on a separate line and are supplied by
+the extracting agent -- they are *not* source text.
+
+Read the 1985 and 1990 entries before pooling ENNIV rounds.  Two of the four
+waves do *not* declare a national universe: 1985 subtracts three departments and
+1990 is Lima-only.  Stacking all four rounds into one "Peru" panel without
+saying so averages across three different declared populations.
+
+** Where these statements live -- catalog-only, all four waves
+
+*Every one of the four universe statements exists only in World Bank Microdata
+Library catalog metadata.  None of them is in any file this repository ships.*
+
+Each wave's =Documentation/= directory holds only =SOURCE.org= (a DOI link plus
+=#+CATALOG_*= keywords) and =LICENSE.org=, alongside DVC-tracked questionnaires
+and manuals.  Those local PDFs were searched (see "What was searched" below) and
+none carries a universe or target-population statement.  The universe sentences
+were read from the catalog Study Description pages:
+
+| wave | catalog id | IDNO                   | DOI                  |
+|------+------------+------------------------+----------------------|
+| 1985 |        597 | =PER_1985_ENNIV_v01_M= | =10.48529/dsz6-gh05= |
+| 1990 |        596 | =PER_1990_ENNIV_v01_M= | =10.48529/w7v4-sz09= |
+| 1991 |        618 | =PER_1991_ENNIV_v01_M= | =10.48529/n513-d685= |
+| 1994 |        617 | =PER_1994_ENNIV_v01_M= | =10.48529/ntxg-ed63= |
+
+The ids were confirmed by DOI match against each wave's own =SOURCE.org=.  The
+practical consequence: *the record is a moving target.*  A WB metadata revision
+changes what Peru's declared universe is, with no diff in this repo.  Peru is
+one of 41 waves across the corpus in that position.
+
+*Not boilerplate.*  These four statements are original Spanish text (INE /
+Instituto Cuanto), not the World Bank NADA template sentence that recurs
+verbatim in fifteen waves elsewhere in the corpus.  They attest a statistical
+office's claim about these surveys, and each of the four is worded differently
+from the other three.
+
+** 1985 -- national, minus three departments in emergency
+
+Confidence: high.  Source type: WB catalog only.
+
+Universe, verbatim (Spanish, source language), catalog 597, Study Description,
+"Coverage" > "Universe":
+
+#+begin_quote
+la población está definida como el conjunto de todas la viviendas particulares y
+sus ocupantes residentes o no de las áreas urbana y rural del país, con la
+excepción de tres departamentos.
+#+end_quote
+
+["todas la viviendas" is the source's own agreement error, quoted uncorrected.]
+
+Translation (agent-supplied, NOT source text): "the population is defined as the
+set of all private dwellings and their occupants, resident or not, of the urban
+and rural areas of the country, with the exception of three departments."
+
+*** Exclusion: Ayacucho, Apurimac, Huancavelica
+
+The universe sentence names an exclusion without naming the departments.  The
+"Geographic Coverage" field immediately above it does, verbatim:
+
+#+begin_quote
+Cobertura nacional con la exepción de tres departamentos que se encontraban en
+emergencia, a saber:
+Ayacucho
+Apurímac
+Huancavelica
+#+end_quote
+
+["exepción" is the source's spelling, quoted uncorrected.]
+
+Translation (agent-supplied): "National coverage with the exception of three
+departments that were under a state of emergency, namely: Ayacucho / Apurimac /
+Huancavelica."
+
+This is a *design-level* subtraction of three named departments for security
+reasons -- the emergency zones of the internal conflict -- not a fieldwork
+shortfall.  ENNIV 1985-86 does not claim to represent the population of
+Ayacucho, Apurimac or Huancavelica, and a national aggregate computed from this
+wave is a national-minus-three-departments aggregate.
+
+*Provenance caveat:* this exclusion is documented *only* in the WB catalog
+record.  The local report =PER14.pdf= ("Encuesta sobre Niveles de Vida y Sector
+Informal en el Peru -- Primeros Resultados", INE / Banco Mundial, Diciembre
+1986), whose "Metodologia de la Encuesta" section was read in full, does not
+mention it.
+
+*** Frame and sample (design detail, not a universe statement)
+
+Catalog 597, "Sampling Procedure", verbatim:
+
+#+begin_quote
+La muestra de viviendas seleccionadas fue extraida de la muestra de viviendas de
+la Encuesta Nacional de Nutricón y Salud (ENNSA)
+#+end_quote
+
+["Nutricón" as printed.]  The ENNIV 1985-86 frame is thus a sub-sample of the
+1984 ENNSA sample of 19,277 dwellings.  Sample size, verbatim: "El tamaño de la
+muestra seleccionada a nivel nacional fue de 5,024 viviendas.  La muestra del
+área urbana total fue de 2,688 viviendas (incluyendo Lima Metropolitana) y del
+área rural total de 2,336 viviendas."
+
+Note a numerical disagreement between the two sources, recorded and not
+reconciled: the local =PER14.pdf= p. 2 says the survey interviewed "una muestra
+aleatoria de 5,120 viviendas", the catalog says 5,024 were selected and 4,906
+yielded information.
+
+** 1990 -- Metropolitan Lima only
+
+Confidence: high.  Source type: WB catalog for the universe sentence; the scope
+is *corroborated locally* by the instrument (below).
+
+Universe, verbatim (Spanish), catalog 596, "Coverage" > "Universe":
+
+#+begin_quote
+Todas las viviendas particulares y sus ocupantes, de todos los distritos de Lima
+metropolitana (inclutyendo Callao)
+#+end_quote
+
+["inclutyendo" is the source's typo for "incluyendo", quoted uncorrected.]
+
+Translation (agent-supplied): "All private dwellings and their occupants, in all
+the districts of metropolitan Lima (including Callao)."
+
+*** Exclusion: the whole of Peru outside Metropolitan Lima
+
+"Geographic Coverage", verbatim:
+
+#+begin_quote
+La encuesta sólamente cubre el área metropolitana de Lima, la capital del Perú
+#+end_quote
+
+["sólamente" as printed -- the accent is the source's error.]
+
+Translation (agent-supplied): "The survey only covers the metropolitan area of
+Lima, the capital of Peru."
+
+*This wave is not a national survey.*  It is the most consequential single fact
+in this section for anyone pooling ENNIV rounds: 1985, 1991 and 1994 declare
+national (or near-national) universes; 1990 declares a single metropolitan area.
+A =Feature()= call that stacks Peru's four waves and takes a mean over =t= mixes
+a Lima-only population into a national series.
+
+*** Local corroboration of the scope (a scope label, not a universe statement)
+
+The cover sheet of =Peru/1990/Documentation/pe90hhq.pdf= (p. 1) reads, verbatim:
+
+#+begin_quote
+ENCUESTA DE HOGARES / SOBRE MEDICION DE NIVELES DE VIDA / JUNIO 1990 /
+IDENTIFICACION DE LA VIVIENDA SELECCIONADA / LIMA METROPOLITANA
+#+end_quote
+
+That is a scope label printed on the instrument, not a declared universe, and it
+is recorded as corroboration only -- the universe quote itself is the catalog's.
+
+*** Sub-sample: the urbano-marginal expansion
+
+ENNIV 1990 is not a fresh draw.  Catalog 596, "Sampling Procedure", verbatim
+(sample design, not universe):
+
+#+begin_quote
+Considerando que por la encuesta anterior ENNIV 1985-6 el tamaño de la muestra
+para el dominio Lima Metropolitana fue de 1280 viviendas (128 conglomerados), en
+esta oportunidad debido al crecimiento poblacional ocurrido en la ciudad de
+Lima.  En los 144 nuevas zonas se reistraron 169144 nuevas viviendas, lo que
+determinó un incremento de 260 viviendas, lo que adicionadas al tamaño de la
+muestra original dio un total de 1540 viviendas seleccionadas (154
+conglomerados).
+#+end_quote
+
+[Quoted as printed: the first sentence is a fragment, and "reistraron" is the
+source's typo.]
+
+So the 1990 Lima sample = the 1985-86 Lima panel (1,280 dwellings / 128
+clusters) *plus* a 260-dwelling expansion drawn in 144 newly-mapped zones.  The
+1991 catalog record characterises that expansion, verbatim: "la ampliación
+muestral trabajada para ENNIV 90 (ampliación realizada en zonas urbano -
+marginales de Lima)" [sic, spacing as printed] -- it was drawn in Lima's
+marginal peri-urban settlements.  This is the closest thing in the Peru series
+to a *booster sample of a sub-population*, and it lives inside a wave rather
+than being one.  Catalog 596 also records that the 1990 sample "no es
+autoponderada".
+
+** 1991 -- "Población nacional", but see the coverage list
+
+Confidence: *medium*.  Source type: WB catalog only.  Recorded with its internal
+tension intact, because the tension is the finding.
+
+Universe, verbatim (Spanish), catalog 618, "Coverage" > "Universe" -- the
+field's entire content is two words:
+
+#+begin_quote
+Población nacional
+#+end_quote
+
+Translation (agent-supplied): "National population."
+
+*** The tension: a national claim next to a nine-domain coverage list
+
+"Geographic Coverage", verbatim:
+
+#+begin_quote
+La Población de la ENNIV 1991, es el conjunto de viviendas particulares y sus
+ocupantes de las siguientes zonas geográficas:
+Norte
+Costa Urbana
+Sierra Urbana
+Sierra Rural
+Centro
+Sierra Urbana
+Sierra Rural
+Sur
+Costa Urbana
+Sierra Urbana
+Sierra Rural
+Lima Metropolitana
+#+end_quote
+
+Translation (agent-supplied): "The Population of ENNIV 1991 is the set of
+private dwellings and their occupants of the following geographic zones: [list
+as above]."
+
+The enumerated list names Costa Urbana, Sierra Urbana and Sierra Rural (within
+Norte / Centro / Sur) plus Lima Metropolitana.  *Selva and Costa Rural do not
+appear in it.*  The catalog's "Sampling Procedure" is consistent with a
+nine-domain design: "El tamaño de la muestra fue de 2,252 viviendas distribuídas
+en 9 dominios." ["distribuídas" as printed.]
+
+*This section does NOT assert that Selva and Costa Rural were excluded.*  It
+records two things that are both true of the source: the Universe field says
+"Población nacional", and the coverage list as printed does not name those two
+domains.  Resolving that requires the INE / Instituto Cuanto technical document
+for ENNIV 1991, which is *not present in this repository* and was not located.
+Anyone relying on this wave for a national figure should resolve it first.  (The
+GH #601 sweep lists Peru 1991 as one of six waves whose sources disagree with
+themselves; it declined to adjudicate, and so does this file.)
+
+*** Field-level non-coverage (fieldwork, not design)
+
+Recorded separately from the design exclusions above because it is a different
+kind of fact -- these are places the enumerators could not reach, not places the
+frame left out.  Catalog 618, "Sampling Procedure", verbatim:
+
+#+begin_quote
+La variación en el número de caseríos seleccionados se debió a las limitaciones
+encontradas en el campo, por ejemplo, cuando se habían fusionado dos caseríos o
+cuando uno pertenecía a otro distrito o cuando por desconfianza de pobladores o
+falta de seguridad (zona roja), todo el caserío rechazaba la encuesta.  Esto
+último sucedió en los distritos de Puquina (Moquegua) y July (Puno).
+#+end_quote
+
+#+begin_quote
+Por otro lado en el departamento de Cajamarca, en los distritos de Asunción,
+Llapa y San Pablo, no se pudo visitar los caseríos, según ellos por carecer de
+la documentación apropiada para respaldar esta labor, además la policía no se
+hacía responsable de la seguridad de las encuestadoras.
+#+end_quote
+
+#+begin_quote
+En la Sierra Centro Rural fue necesario reemplazar 2 segmentos ya que a causa
+del terrorismo no había la mínima seguridad para trabajar.  Los distritos de
+Huasahuasi y San Pedro de Cajas en Tarma, se cambiaron por los distritos de
+Chupaca y Acobamba, respectivamente, de similares características a los
+originalmente seleccionados.
+#+end_quote
+
+Translation, in brief (agent-supplied, NOT source text): whole hamlets refused
+the survey for lack of security in Puquina (Moquegua) and July (Puno); hamlets
+in Asuncion, Llapa and San Pablo (Cajamarca) could not be visited; and two
+segments in the Sierra Centro Rural were *replaced* because terrorism made
+fieldwork unsafe, Huasahuasi and San Pedro de Cajas (Tarma) being swapped for
+Chupaca and Acobamba.
+
+The last of these matters for a different reason than the others: those segments
+were substituted, not dropped, so the realised sample contains clusters the
+design did not select.
+
+*** Panel content
+
+Catalog 618, "Sampling Procedure", verbatim:
+
+#+begin_quote
+En Lima Metropolitana la muestra fue la misma encuestada en la ENNIV 85-86, más
+un 15% de viviendas seleccionadas de la ampliación muestral trabajada para ENNIV
+90 (ampliación realizada en zonas urbano - marginales de Lima).  De las 1,006
+viviendas programadas, se llegaron a trabajar 801 viviendas.
+#+end_quote
+
+[sic, spacing as printed.]  In the rest of the urban area, verbatim: "En el área
+urbana se seleccionaron 64 segmentos (en 46 distritos) de los 79 trabajados en
+la ENNIV 85-86, teniendo en cuenta los mismos parámetros que para el área
+rural."
+
+** 1994 -- national, all households
+
+Confidence: high.  Source type: WB catalog only.
+
+Universe, verbatim (Spanish), catalog 617, "Coverage" > "Universe":
+
+#+begin_quote
+El universo a cubrir es la totalidad de hof¡gares en el territorio nacional
+#+end_quote
+
+["hof¡gares" is a corruption of "hogares" in the source; quoted exactly as
+printed rather than repaired.]
+
+Translation (agent-supplied): "The universe to be covered is the totality of
+households in the national territory."
+
+"Geographic Coverage", verbatim:
+
+#+begin_quote
+El ámbito geográfico de la investigación abarcó a todo el territorio nacional:
+Costa, Sierra y Selva
+#+end_quote
+
+Translation (agent-supplied): "The geographic scope of the study covered the
+whole national territory: Coast, Highlands and Jungle."
+
+*** Exclusions
+
+*No exclusion statement was found for this wave* -- neither in the catalog record
+nor in any of the nine local PDFs listed below.  This is recorded as an absence
+of evidence, not as evidence of no exclusion.  Unlike 1985, the 1994 record
+carries no emergency-zone carve-out; unlike 1991, its coverage field names all
+three natural regions including Selva.
+
+*** Sub-sample: 1994 is partly a panel on 1991
+
+Catalog 617, "Sampling Procedure", verbatim -- and the *identical sentence*
+appears in the local =Peru/1994/Documentation/m-encues.pdf= (MANUAL DEL
+ENCUESTADOR), which makes this the one scope-relevant sentence in the Peru
+series that the repository actually holds:
+
+#+begin_quote
+La muestra ha considerado las viviendas seleccionadas de la ENNIV-1991 y
+siguiendo la misma metodología, se han seleccionado las unidades muestrales en
+las áreas no estudiadas en 1991, por lo que la muestra es autoponderada ,
+probabilística, polietápica e independiente en cada dominio de estudio.
+#+end_quote
+
+[sic: the stray space before the comma in "autoponderada ," is as printed in the
+catalog rendering.]
+
+Translation (agent-supplied): "The sample took the dwellings selected for
+ENNIV-1991 and, following the same methodology, sampling units were selected in
+the areas not studied in 1991; the sample is therefore self-weighting,
+probabilistic, multi-stage and independent in each study domain."
+
+ENNIV-94 is therefore the ENNIV-1991 dwellings plus a fresh draw in "las áreas
+no estudiadas en 1991".  That phrase is the clearest available evidence that
+ENNIV 1991 did *not* in fact cover the whole national territory -- but it does
+not say which areas, so it does not resolve the Selva / Costa Rural question
+raised in the 1991 entry above.
+
+Sample size (local =m-encues.pdf=, and catalog), verbatim: "La ENNIV 1994 será
+efectuada en 3,544 viviendas en todo el País.  La muestra incluye: 820 viviendas
+en Lima Metropolitana, 1380 viviendas en el área urbana y 1344 viviendas en el
+área rural."
+
+** Universe vs. what the weights represent
+
+Two places where the documents come apart on this, both worth knowing before
+weighting anything.
+
+*** 1985: national inference levels, non-national universe
+
+Catalog 597, "Sampling Procedure", verbatim:
+
+#+begin_quote
+La muestra es autoponderada para los niveles de inferencia.  Dichos niveles de
+inferencia para resultados agregados son: Total Naci onal, Nacional Urbano,
+Nacional Rural, Lima Metropolitana y Regiones Naturales (costa, sierra y selva).
+#+end_quote
+
+["Naci onal" spacing as printed.]
+
+The design therefore offers a "Total Nacional" estimate while the universe on
+the same catalog page excludes three departments.  "Total Nacional" here means
+the national total *of the declared universe* -- Peru minus Ayacucho, Apurimac
+and Huancavelica -- not of Peru.  The weights carry no trace of that
+qualification.
+
+Note also that the inference levels name the three natural regions "(costa,
+sierra y selva)", so Selva is a 1985 inference domain even though it is absent
+from the 1991 coverage list.
+
+*** 1991 vs. 1994: the domain list changes
+
+The 1991 coverage list enumerates nine domains and does not name Selva or Costa
+Rural.  The 1994 catalog's "Weighting" section prints expansion factors over
+*seven* domains that do include them.  Reproduced from catalog 617, "Sampling" >
+"Weighting" (the source prints this as a two-column plain-text block):
+
+| DOMINIO DE ESTUDIO | FACTOR DE PONDERACION |
+|--------------------+-----------------------|
+| Costa Urbana       |            1746.48800 |
+| Costa Rural        |             787.77916 |
+| Sierra Urbana      |            1533.91460 |
+| Sierra Rural       |            1271.75410 |
+| Selva Urbana       |             706.47395 |
+| Selva Rural        |             729.41666 |
+| Lima Metropolitana |            1563.63580 |
+
+Costa Rural, Selva Urbana and Selva Rural carry weights in 1994 and are absent
+from the 1991 coverage list.  Whether that is a real change of universe between
+the two rounds or a defect in the 1991 metadata is *not settled by the evidence
+in hand*.
+
+For 1991 the catalog says only, verbatim: "La metodología de la ENNIV, considera
+el uso de un peso o factor de expansión, para cada dominio de estudio, con la
+finalidad de poder agregar los resultados a nivel del ámbito total del estudio."
+-- note "el ámbito total del estudio", the total scope of the study, which is
+not the same phrase as the national population.
+
+** Sub-sample and panel structure, across waves
+
+The ENNIV rounds are chained, and the chain is not uniform:
+
+| wave | declared universe                  | relation to earlier rounds                                                              |
+|------+------------------------------------+-----------------------------------------------------------------------------------------|
+| 1985 | national, minus 3 departments      | frame is a sub-sample of the 1984 ENNSA sample                                          |
+| 1990 | Metropolitan Lima only             | 1985-86 Lima panel + 260-dwelling urbano-marginal expansion                             |
+| 1991 | "Población nacional" (see caveat)  | Lima = the 1985-86 sample + 15% of the 1990 expansion; urban = 64 of the 79 1985-86 segments |
+| 1994 | all households, national territory | ENNIV-1991 dwellings + fresh draw in areas not studied in 1991                          |
+
+Two consequences a reader pooling this country needs before averaging anything:
+
+1. The Lima households are the most heavily re-interviewed group in the series
+   and the least representative of Peru; the 1990 wave is *entirely* that group.
+2. Peru's documentation flags no sub-population oversample as such, but the 1990
+   urbano-marginal =ampliación= functions as one -- a booster in Lima's marginal
+   settlements that then propagates into the 1991 sample at a 15% rate.
+
+** What was searched, and what was not found
+
+Recorded so that the next reader knows the shape of the gap rather than
+inheriting a silent one.
+
+- 1985 :: =Documentation/= holds =SOURCE.org=, =LICENSE.org=, and three
+     DVC-tracked PDFs: =PER01_V2.pdf= (1985 household questionnaire, INE / World
+     Bank LSMS, 9 December 1985), =PER03.pdf= (community questionnaire, Sept
+     1986) and =PER14.pdf= ("Primeros Resultados", INE / Banco Mundial, Diciembre
+     1986; Prologo, Introduccion, "Metodologia de la Encuesta" pp. 2-4 and
+     Appendices A and B were read).  *All three are image-only scans with an
+     empty text layer* (67 / 41 / 72 pages); they were rendered to page images
+     and read visually, no OCR being available on the host.  None states a
+     universe, and none mentions the three-department exclusion.
+- 1990 :: =PER19.pdf= ("Informe del Procesamiento de la ENNIV - 1990", 14 pp.,
+     image-only scan, read visually) is a data-keying report -- no universe.
+     =pe90hhq.pdf= (household questionnaire, text extracted) was grepped for
+     /universo/, /población objetivo/, /ámbito/, /cobertura/, /marco muestral/;
+     no universe statement, only the LIMA METROPOLITANA cover label quoted above.
+- 1991 :: =PER22.pdf= (community questionnaire, World Bank Poverty and Human
+     Resources Division, 6 pp., image-only scan, read visually) -- no universe.
+     =pe91hhq.pdf= (household questionnaire, text extracted, same greps) -- no
+     universe.
+- 1994 :: nine DVC-tracked PDFs, all text-extracted and grepped for the same
+     terms plus /cobertura geográfica/ and /target population/: =m-encues.pdf=
+     (Manual del Encuestador), =programa.pdf= (Programa de la Encuesta --
+     Conceptos y Definiciones), =pe94hhq1.pdf= and =pe94hhq3.pdf= (household
+     questionnaires), =cenpob94.pdf= and =dicciona.pdf= (data dictionaries),
+     =COD_BENS.pdf= and =COD_PAIS.pdf= (code lists, image-only).  The only hits
+     concerned the sampling frame and the geographic /ámbito/ of fieldwork
+     supervision.  The 1994 local documentation is the richest of the four and
+     still states scope only through sample counts, never a universe.
+
+*Residual gap.*  The image-only scans (three in 1985, one in 1990, one in 1991)
+were read by eye at page-image resolution.  A coverage sentence buried in a
+cover page or a manual introduction could in principle have been missed.  Also
+absent from this repository, and the natural place to resolve the 1991 tension:
+the INE / Instituto Cuanto technical documents for ENNIV 1990 and 1991.
+
+** Who counts as a member (not a universe statement, but it bounds the count)
+
+Recorded separately because these are residence rules, not universe
+declarations.  They decide who inside a sampled dwelling enters the data, and
+they are *not* stable -- not across rounds and, in 1994, not even within one
+round's own documentation.
+
+*** 1994: the two shipped documents give two different residence thresholds
+
+Both quotes below were re-extracted and verified against the local PDFs on
+2026-07-21, not taken on trust.
+
+=Peru/1994/Documentation/programa.pdf=, section "4.4 Hogar", verbatim:
+
+#+begin_quote
+Es la persona o conjunto de personas, sean o no parientes, que residen
+habitualmente más de 7 meses en los últimos 12 meses en una misma vivienda
+particular, ocupándola total o parcialmente y que atienden en común sus
+necesidades vitales o básicas.
+#+end_quote
+
+Translation (agent-supplied): "It is the person or set of persons, related or
+not, who habitually reside more than 7 months of the last 12 months in the same
+private dwelling, occupying it wholly or partly, and who attend in common to
+their vital or basic needs."
+
+=Peru/1994/Documentation/m-encues.pdf= (MANUAL DEL ENCUESTADOR), section "6.4
+Residente Habitual", verbatim:
+
+#+begin_quote
+Se considera que una persona es residente habitual en una determinada vivienda
+si es que ésta le sirve como domicilio permanente (come y duerme) o si reside al
+menos 3 de los últimos 12 meses.  No se considera como residentes del hogar a
+las personas separadas de la unión, aunque pasen pensión de alimentación a algún
+miembro del hogar encuestado.
+#+end_quote
+
+Translation (agent-supplied): "A person is considered a habitual resident of a
+given dwelling if it serves as their permanent domicile (they eat and sleep
+there) or if they reside there at least 3 of the last 12 months.  Persons
+separated from the union are not considered residents of the household, even if
+they pay maintenance to some member of the surveyed household."
+
+*The Programa says more than 7 of the last 12 months; the enumerator's manual --
+the document the fieldworker actually held -- says at least 3.*  Both are
+shipped in this repository, in the same wave directory.  Nothing found in either
+document reconciles them, and this file does not attempt to.  Anyone deriving a
+residence filter for Peru 1994 (cf. the =MonthsSpent= / =MonthsAway= handling
+described in =CLAUDE.md=) is choosing between two documented rules, not applying
+one.
+
+*** 1994: two categories of person are excluded from membership by rule
+
+=m-encues.pdf=, section "6.5 Miembros del Hogar", verbatim:
+
+#+begin_quote
+Son todas aquellas personas que comen y duermen habitualmente en el hogar, por
+lo menos tres de los últimos 12 meses precedentes a la encuesta, excepto los
+pensionistas y trabajadores del hogar, que nunca se considera como miembros del
+hogar.
+#+end_quote
+
+#+begin_quote
+Se considera en cambio, siempre como miembro del hogar al jefe del hogar, aunque
+no cumpla con el requisito de haber residido habitualmente por lo menos tres
+meses, y a los infantes de los miembros del hogar, menores de 3 meses.
+#+end_quote
+
+Translation (agent-supplied): members are all those who habitually eat and sleep
+in the household for at least three of the 12 months preceding the survey,
+"except lodgers/boarders (=pensionistas=) and domestic workers, who are never
+considered members of the household"; conversely the household head is always a
+member even if the three-month rule is not met, as are members' infants under 3
+months.
+
+Lodgers and live-in domestic workers are therefore *outside the counted
+population by rule*, not by chance -- the same shape of exclusion as Tanzania
+NPS's "excluding live-in servants" elsewhere in the corpus.  =m-encues.pdf=
+elsewhere adds that habitual residents absent "por un período mayor de nueve
+meses" are likewise not members.
+
+*** The other rounds, for comparison
+
+- 1985, local =PER14.pdf= p. 2 :: recorded by the GH #601 sweep as verbatim "Un
+     \"hogar\" fue definido como un grupo de individuos que han dormido
+     usualmente en la misma vivienda y han compartido las comidas, por lo menos
+     durante 3 de los 12 meses anteriores a la entrevista."  (At least 3 of the
+     last 12 months.)  *This one could not be re-verified here*: =PER14.pdf= is
+     an image-only scan with an empty text layer, so it is carried on the
+     sweep's visual reading.
+- 1991, catalog 618 "Unit of Analysis", verbatim :: "Es el hogar integrado por
+     una o más personas, sean o no parientes, que residan habitualmente en una
+     misma vivienda y que atiendan en común sus necesidades vitales."  No month
+     threshold is given, and this is catalog text rather than a survey document.
+- 1994, =m-encues.pdf= section "6.3 Hogar" :: the sentence is the same as
+     =programa.pdf= §4.4 *minus* the month clause and ending "sus alimentos"
+     rather than "sus necesidades vitales o básicas".  It is quoted only in
+     paraphrase here because pdfminer returns that particular paragraph with its
+     line fragments interleaved out of order; the reconstruction is
+     unambiguous but is not a clean verbatim extraction, so it is not presented
+     as one.
+
+Note on transcription: the 1994 PDFs' text layer contains spurious spaces inside
+words ("deter minada", "per manente", "duer me", "for mado", "pension istas",
+"miembro s") and before some punctuation ("unión ,", "hogar .").  Those are
+artifacts of the PDF's text layer, not of the printed page, and have been closed
+up in the quotations above.  No other change was made to any quoted string, and
+every quote here was verified against the PDF on 2026-07-21.
+
+** Scope of this section
+
+Per GH #601 this records *evidence only*.  It proposes no schema, no
+=data_scheme.yml= key and no code; how the library should represent a wave's
+declared universe is being decided in GH #603.

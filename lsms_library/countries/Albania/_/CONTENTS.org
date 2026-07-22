@@ -1,5 +1,572 @@
 #+TITLE: Albania — country notes & known data issues
 
+* Sampling universe, exclusions and sub-samples
+  :PROPERTIES:
+  :Recorded: 2026-07-21
+  :Context: GH #601 (the population record); evidence only -- GH #603 decides
+            how the library REPRESENTS any of this.  Nothing here proposes a
+            schema, a YAML key, or a code change.
+  :END:
+
+What each Albania wave's own documentation says its sample represents, quoted
+verbatim.  Three rules govern every entry below:
+
+- Verbatim or nothing :: every quoted sentence is reproduced
+     character-for-character from the cited file, with runs of whitespace and
+     PDF line-wrap collapsed to single spaces.  Where a repair was needed it is
+     declared inline.  No paraphrase is offered as a quote.
+- Gaps are recorded as gaps :: a wave with no statement gets an explicit "not
+     found" entry naming what was searched, so the claim is falsifiable.  No
+     wave's universe is filled in from a sibling wave, from the country, or from
+     the "obvious" inference.
+- Nothing is inferred from the data :: no =.dta= was opened for this.  A survey's
+     universe is a claim its documentation makes; it is not something to be
+     reverse-engineered from the microdata.  Keeping "what the survey claims"
+     apart from "what the data look like" is the whole point.
+
+All page references below were re-verified against the PDFs in this repo on
+2026-07-21 (pdfminer text extraction, page-by-page).  Two locators in the
+upstream sweep record were off by one page and are corrected here; see the 2003
+and 2008 entries.
+
+** Summary
+
+| wave | strongest statement available            | universe stated? | geographic exclusion | sub-sample / oversample                | where it lives     |
+|------+------------------------------------------+------------------+----------------------+----------------------------------------+--------------------|
+| 1996 | coverage + representativeness (2 sources) | no ("Universe" field absent) | *yes -- Tirana dropped* | *yes -- PPS to social-assistance recipients* | repo DDI + BID (catalog) |
+| 2002 | "The universe under study consists of all the households in the Republic of Albania." | yes | none stated | none                                    | *BID only -- NOT in this repo* |
+| 2003 | panel representativeness claim            | no               | none stated          | *yes -- ~half of the 2002 LSMS households* | repo DDI (+ BID)   |
+| 2004 | panel representativeness claim            | no               | none stated          | *yes -- same 2002-derived panel*        | repo DDI (+ BID)   |
+| 2005 | same "universe under study" sentence as 2002 | yes (but see caveat) | none stated      | none -- a completely new sample         | repo DDI (+ BID)   |
+| 2008 | *none*                                    | no               | not stated           | not stated                              | *nowhere*          |
+| 2012 | PSU-selection sentence + catalog coverage tag | no           | none stated          | none stated                             | repo DDI           |
+
+Read the "universe stated?" column strictly.  For 1996, 2003, 2004 and 2012 the
+documentation makes *coverage* or *representativeness* claims, which are not the
+same thing as a declared target population; they are recorded as what they are.
+The word "universe" appears in exactly one of the seven repo-held DDI PDFs
+(2005), and in no Albania WB catalog record's DDI =universe= field -- that field
+does not exist for any of catalogs 2311, 86, 87, 88, 64, 1933 or 1970.
+
+*Boilerplate check*: none of the Albania statements is the World Bank NADA
+template sentence ("The survey covered all de jure households excluding prisons,
+hospitals, military barracks, and school dormitories") that recurs verbatim in 15
+waves elsewhere in the library.  Every Albania statement below is survey-specific
+text.
+
+** 1996 -- Employment and Welfare Survey (directory present; NOT a declared wave)
+
+Note first what =_/data_scheme.yml= already says, and do not contradict it:
+
+: # 1996 excluded: Employment and Welfare Survey (EWS), not LSMS.
+
+The evidence below *corroborates and strengthens* that exclusion rather than
+challenging it.  1996 is a different survey (Ministry of Labour and Social
+Affairs, fielded August-November 1996), with a different geographic coverage and
+a purposive design.
+
+*** Declared coverage (no formal universe statement exists)
+
+#+begin_quote
+"The data collected cover approximately 1,500 households in rural and urban
+areas, excluding Tirana.  Tirana was not included because it had been the focus
+of another household survey in 1994.  The sample was designed to maximize the
+inclusion of poor areas to increase the number of program participants."
+#+end_quote
+
+- Source :: =1996/Documentation/ddi-documentation-english_microdata-2311.pdf=,
+     PDF p.3, "Sampling" > "Sampling Procedure", first paragraph.  Identical
+     wording opens section 1 of the Basic Information Document =alb96bif.pdf=
+     ("Basic Documentation, Albania: Employment and Welfare Survey"), PDF p.4 /
+     printed p.1.
+- Catalog field :: =study_desc.study_info.geog_coverage= (catalog 2311) reads
+     "National (except Tirana)".
+
+*** Exclusion: Tirana, by design
+
+This is the strongest exclusion finding in Albania, and it is stated three times
+independently.
+
+#+begin_quote
+"The sampling frame includes all rural and the urban areas of Albania except
+Tirana (see Introduction)."
+#+end_quote
+
+- Source :: =alb96bif.pdf=, section 3.1 "General description and sample size",
+     printed p.2.
+
+#+begin_quote
+"In other words, when the data are weighted the results are representative of
+rural and urban Albania with the exception of Tirana which was excluded from the
+study."
+#+end_quote
+
+- Source :: =alb96bif.pdf=, section 3, PDF p.10 / printed p.7.
+
+*** Oversample: social-assistance (Ndihma Ekonomike) recipients
+
+The 1996 sample is *not* a simple probability sample of the non-Tirana national
+population.  It is a program-evaluation sample with a deliberate oversample:
+
+#+begin_quote
+"In the first stage, formal administrative units were selected with probability
+proportional to the number of individuals receiving economic assistance (NE).
+The administrative units are communes in rural areas and bashki in urban areas.
+The areas with more participants were over-sampled to have a larger pool of NE
+recipients.  The behavior of recipients can be compared to non-participants in
+the program because they were drawn randomly.  In the second stage, households
+were selected with equal probability as described below."
+#+end_quote
+
+- Source :: =alb96bif.pdf=, section 3.1, printed p.3.
+- Repair declared :: the PDF hyphenates "over-" / "sampled" across a line break.
+     It is transcribed as "over-sampled"; whether the printed hyphen is lexical
+     or typographic cannot be settled from the text layer.
+- Design detail (context, not universe) :: rural -- 50 of 314 communes selected
+     PPS to estimated recipients, then a target of 29 households per commune by
+     systematic random sampling from civil registry lists; urban -- 8 of 48
+     bashkies PPS to NE recipients, then 60 households per bashki from a fresh
+     physical listing.
+
+*** Where the statements live
+
+The DDI PDF is held in this repo.  The Basic Information Document =alb96bif.pdf=
+is *not* -- it was fetched from
+https://microdata.worldbank.org/index.php/catalog/2311/download/34511 for this
+sweep.  The two exclusion quotes and the whole oversample paragraph come from
+that non-repo document; only the first coverage quote is held locally.
+
+** 2002 -- LSMS (Wave 1 Panel)
+
+*** Declared universe
+
+#+begin_quote
+"The unit of analysis and the unit of observation is the household.  The universe
+under study consists of all the households in the Republic of Albania.  We have
+used the Housing Unit (defined as the space occupied by one household) as the
+sampling unit, instead of the household, because the HU is more permanent and
+easier to identify in the field."
+#+end_quote
+
+- Source :: =alb02bif.pdf= (LSMS 2002 Basic Information Document), "Annex 5 --
+     Sample implementation report" (memo from Ms. Blerina Zykaj), section 1
+     "Sampling frame", PDF p.63 / printed p.61.
+
+*** WHERE THIS LIVES -- flag
+
+*The universe sentence is not in this repository.*  It exists only in
+=alb02bif.pdf=, obtained from
+https://microdata.worldbank.org/index.php/catalog/86/download/11834 .  It is not
+in the repo-held DDI PDF, and it is not in the WB catalog's DDI =universe= field
+(catalog 86 has no such field).  Albania 2002's universe statement is therefore a
+*moving target held by a third party*, not something the library holds.
+
+The nearest thing the repo does hold is a representativeness claim:
+
+#+begin_quote
+"The survey is representative for Tirana, other urban and rural areas, as well as
+for Tirana and the three main agro-ecological/economic areas (Coastal, Central
+and Mountain)."
+#+end_quote
+
+- Source :: =2002/Documentation/ddi-documentation-english_microdata-86.pdf=,
+     PDF p.3, "Sampling" > "Sampling Procedure" > "Stratification".
+- Catalog field :: =geog_coverage= (catalog 86) reads "National coverage.
+     Domains: Tirana, other urban, rural; Agro-ecological areas (coastal,
+     central, mountain)".
+
+*** Exclusions
+
+No geographic or population-group exclusion is stated anywhere in the 2002
+documentation.  The only exclusions documented are definitional -- who counts as
+a household member:
+
+#+begin_quote
+"Household membership in this survey is defined as being away from the household
+for less than six months.  Deceased individuals, lodgers, hired workers and
+servants are never considered household members.  Guests who stay with the
+household for six months and over, infants of less than six months, new arrivals
+(such as newly weds) are considered household members.  The household head was
+counted as a household member if he or she had been away less than 12 months,
+rather than the 6 month limit for anyone else absent."
+#+end_quote
+
+- Source :: =2002/Documentation/ddi-documentation-english_microdata-86.pdf=,
+     PDF p.5, "Questionnaires" > "Overview".
+
+Two frame edits are documented and are *not* population exclusions: enumeration
+areas with zero population were removed from the frame, and housing units found
+invalid during the listing update were removed.  They are recorded here so that a
+later reader does not mistake them for a coverage carve-out.
+
+*** Sub-samples
+
+None within 2002.  But note the forward direction: 2002 is the *parent* of the
+2003 and 2004 panel waves (below), which are drawn from it rather than from the
+population.
+
+** 2003 -- LSMS (Wave 2 Panel) / Albania Panel Survey
+
+*** No universe statement; the strongest claim is about representativeness
+
+#+begin_quote
+"The sample selected from the LSMS for the panel was designed to provide a
+nationally representative sample of households and individuals within Albania
+(see Appendix B for full description of the sample design and selection
+procedure).  This differs from the LSMS where the sample was designed to be
+representative of each strata which broadly represented the main regions in
+Albania so that regional level statistics could be generated (Mountain, Central,
+Coastal, Tirana)."
+#+end_quote
+
+- Source :: =2003/Documentation/ddi-documentation-english_microdata-87.pdf=,
+     PDF p.3, "Sampling" > "Sampling Procedure" > "Panel design".  Identical
+     wording in the BID =alb03bid.pdf= (not held in this repo), PDF p.1.
+- No document in the 2003 set contains the word "universe".  Catalog 87's
+     =geog_coverage= reads "National"; catalog 87 has no abstract.
+
+*** THIS WAVE IS A SUB-SAMPLE OF 2002 -- read before pooling
+
+#+begin_quote
+"The Albanian panel survey sample was selected from households interviewed on the
+2002 LSMS conducted by INSTAT with support from the World Bank.  The sample size
+for the panel took approximately half the LSMS households and has re-interviewed
+these households annually in each of 2003 and 2004."
+#+end_quote
+
+- Source :: same PDF, PDF p.3, "Panel design".
+
+So 2003 is not drawn from a population at all.  Its effective universe is 2002's,
+propagated forward through the panel-following rules -- which is a different kind
+of object from a fresh national draw, and the documentation says nothing about
+how well the propagation held.  Sample size 2,155 households (DDI sampling
+section).
+
+*** Scope restrictions (individual level)
+
+#+begin_quote
+"- Sample members moving out of Albania are considered to be out of scope for
+that year of the survey (note that they remain potentially eligible for interview
+and it is possible they may return to a sample household at a future wave)
+- From Wave 2, only household members aged 15 years and over are eligible for
+interview.  As children turn 15, they become eligible for interview (This differs
+from the LSMS where the individual questionnaire collected some data on children
+under 15 from the mother or main carer)."
+#+end_quote
+
+- Source :: same PDF, PDF p.4, "Panel design" bulleted list.
+
+No geographic exclusion is stated for 2003.
+
+*** Universe vs. what the weights support
+
+The documentation is explicit that the panel's representativeness is *narrower
+than 2002's*, on the analytic-domain axis:
+
+#+begin_quote
+"The panel data can be used for analysis broken down by strata to assess any
+differences between areas but should not be used to produce cross-sectional
+estimates at the regional level."
+#+end_quote
+
+- Source :: same PDF, *PDF p.3* (the upstream sweep record cited p.4 for this
+     sentence; re-verified 2026-07-21, it is on p.3 alongside the panel-design
+     narrative).
+
+** 2004 -- LSMS (Wave 3 Panel) / Albania Panel Survey
+
+*** No universe statement; representativeness claim, with an explicit domain narrowing
+
+#+begin_quote
+"The sample of the second and third waves of the panel (APS) has been selected
+from the LSMS 2002 in order to be representative of Albanian households and
+individuals at national level.  The LSMS 2002 differs from the APS 2003 and 2004
+in that the former is designed to be representative at regional level (Mountain,
+Central, Coastal and Tirana) as well as for urban and rural domains, while the
+latter are for last domains only (urban and rural)"
+#+end_quote
+
+#+begin_quote
+"The panel component selected from the LSMS is designed to provide a nationally
+representative sample of households and individuals within Albania."
+#+end_quote
+
+- Source :: =2004/Documentation/ddi-documentation-english_microdata-88.pdf=,
+     PDF p.3, "Sampling" > "Sampling Procedure" (opening paragraph under "Panel
+     sample, with LSMS 2002 and 2004"; second quote from the same section under
+     "APS 2003-2004 sample design").  Identical wording in the BID
+     =BasicInformationDocument_2004.pdf= (not held in this repo), section III
+     "Sample Design".
+- No document in the 2004 set contains the word "universe".  Catalog 88's
+     =geog_coverage= reads "National coverage. Domains: Tirana, other
+     urban,rura" -- truncated in the catalog record, quoted as served.
+- Sample size :: 1,797 valid household observations, 7,476 individual
+     observations.
+
+The domain narrowing in the first quote is the sharpest universe-vs-weights point
+in the Albania series: *2002 and 2005 support regional (Coastal / Central /
+Mountain / Tirana) estimates; 2003 and 2004 support only urban/rural.*  Anyone
+computing a regional series across Albania waves needs to know this before
+averaging.
+
+*** Scope restrictions
+
+#+begin_quote
+"From wave 2, only individuals aged 15 years and over are considered valid
+members, hence eligible for the interview.  Individuals moved out of Albania are
+not accounted as valid for this survey year, though they are still eligible for
+future waves."
+#+end_quote
+
+- Source :: same PDF, PDF p.4, "Sampling" > "Sampling Procedure".
+
+#+begin_quote
+"Household membership is defined as being an actual resident or away from the
+household for less than six months (the exceptions being: the household head even
+though he might be away from the household for up to 11 months).  Deceased
+individuals, lodgers, hired workers and servants are never considered household
+members."
+#+end_quote
+
+- Source :: same PDF, PDF p.5, "Questionnaires" > "Overview".
+
+No geographic exclusion is stated for 2004.
+
+*** How a household can enter the panel
+
+#+begin_quote
+"The sample is designed to focus on individuals, who have been also traced when
+moving from the original household to a new one.  This possibility represents the
+only way a household can enter the panel sample if it has not been already
+interviewed in the wave 1 (or in wave 2 for the APS 2004)."
+#+end_quote
+
+- Source :: same PDF, "Sampling" > "Sampling Procedure".
+
+** 2005 -- LSMS
+
+*** Declared universe
+
+#+begin_quote
+"The unit of analysis and the unit of observation is the household.  The universe
+under study consists of all the households in the Republic of Albania.  We have
+used the Housing Unit (defined as the space occupied by one household) as the
+sampling unit, instead of the household, because the HU is more permanent and
+easier to identify in the field."
+#+end_quote
+
+- Source :: =2005/Documentation/ddi-documentation-english_microdata-64.pdf=,
+     PDF p.3, "Sampling" > "Sampling Procedure" > subsection "1. Sampling frame",
+     final paragraph immediately before "2. Sample Size".  This is the *only*
+     repo-held Albania DDI in which the word "universe" appears at all.
+- Catalog field :: =geog_coverage= (catalog 64) reads "National coverage.
+     Domains: Tirana, other urban, rural; Agro-ecological areas (coastal,
+     central, mountain)".
+
+*** PROVENANCE CAVEAT -- this sentence is inherited 2002 text
+
+Easy to over-read, so record it plainly.  The paragraph is *verbatim identical*
+to the 2002 text (=alb02bif.pdf= Annex 5), and in the 2005 BID =alb05bid.pdf= it
+sits inside "Annex 5.1 Sample implementation report" -- a memo whose surrounding
+sentences describe the *2002* fieldwork ("In the LSMS the sample size is 450 EA
+and in each EA 8 households were selected.  So the total sample size of the LSMS
+is 3600 households.").  Verified 2026-07-21 by diffing the two annexes.
+
+It is nonetheless what the 2005 DDI's own Sampling Procedure section says, and
+what the WB catalog serves as catalog 64's =sampling_procedure=.  So: the claim
+is genuinely made *for* the 2005 wave, but it is carried-forward text, not a
+freshly written 2005 universe declaration.  Both facts, not one.
+
+*** Not a panel wave
+
+The 2005 sample is a fresh draw, not a continuation of the 2002 PSUs:
+
+#+begin_quote
+"These problems related to the two different working hypotheses concerning the
+new sample were deeply discussed with the LSMS staff during the visit to Albania's
+National Statistical Institute (INSTAT) the last January (24-27 January 2005).
+Finally, it was decided to carry out a new survey (hypothesis (ii))."
+#+end_quote
+
+- Source :: =alb05bid.pdf= (not held in this repo; fetched from
+     https://microdata.worldbank.org/index.php/catalog/64/download/11412 ),
+     section 2 "The hypotheses for the 2005 LSMS sample", printed p.8.
+     Hypothesis (ii) is "Select a new sample of PSUs and SSUs using a design
+     analogous to the one used in 2002"; hypothesis (i), rejected, would have
+     reused the 450 PSUs of 2002 and joined the panel households to the new
+     sample.
+
+So there is *no* 2005 panel sub-sample and no pooled cross-section-plus-panel
+structure inside this wave.  (The 2005 questionnaire's cover page does carry
+"Additional household information for panel tracking" -- that is tracking
+information collected for *future* waves, not a panel component of 2005.)
+
+*** Exclusions
+
+No geographic, regional, or population-group exclusion is stated anywhere in the
+2005 documentation.  The only documented frame edits are:
+
+#+begin_quote
+"In order to obtain EAs with the minimum of 50 and the maximum of 120 occupied
+housing units, the EAs with zero population have been taken off the sampling
+frame."
+#+end_quote
+
+#+begin_quote
+"During of the listing update process, HUs identified as invalid were taken off
+the frame."
+#+end_quote
+
+- Source :: same PDF, PDF pp.2-3.  Frame edits, not stated population
+     exclusions; recorded so they are not later mistaken for one.
+
+** 2008 -- NO STATEMENT FOUND
+
+*This is a documented gap, not an unsearched cell.*  Nothing about the 2008
+universe, coverage, or exclusions is recorded anywhere that could be found.
+
+The repo-held DDI PDF's sampling section reads, in full:
+
+#+begin_quote
+"Sampling
+
+No content available"
+#+end_quote
+
+- Source :: =2008/Documentation/ddi-documentation-english_microdata-1933 (1).pdf=,
+     *PDF p.3* (the upstream sweep record cited p.2; re-verified 2026-07-21 --
+     the heading and its "No content available" body are on p.3).  The
+     "Questionnaires", "Data Processing" and "Data Appraisal" sections read "No
+     content available" as well; the whole PDF extracts to about 2,800
+     characters.
+
+The only population-scope claims that exist at all are catalog metadata tags --
+=geog_coverage= = "National" and =analysis_unit= = "- individuals, - households, -
+communities" (catalog 1933).  Neither is a universe statement.
+
+*** What was searched
+
+1. =2008/Documentation/= in this repo -- =SOURCE.org= (catalog 1933), the DDI PDF
+   (fully text-extracted), =LICENSE.org=; the three =.xls= files are the
+   household and community questionnaires.
+2. WB catalog 1933 =/metadata/export/1933/json= -- full DDI metadata, grepped for
+   "universe" (ABSENT).  =study_desc.method= contains *only*
+   ={'data_collection': {'coll_mode': 'Face-to-face [f2f]'}}= -- there is no
+   =sampling_procedure= field at all.
+3. Catalog 1933 related materials, all 8 items enumerated.  The only prose
+   document is "Living Standard Measurement Survey 2008.pdf" (= "Albania Trends
+   in Poverty: 2002-2005-2008"), downloaded and text-searched for
+   "universe|target population|excluding|excluded|represent|sample|cover|nation"
+   -- it is a results report with no sampling or universe section.  The rest are
+   questionnaires, a price-range spreadsheet, a prefecture code list, and the
+   generic "Guide to LSMS" handbook.
+4. No Basic Information Document exists for 2008 in the catalog, unlike 1996,
+   2002, 2003, 2004 and 2005, all of which have one.
+
+*** Do not fill this gap by adjacency
+
+The 2008 abstract says only "In 2008, 3,600 households participated in the
+survey" -- the same 3,600 target as 2002 and 2005, and different from 2012's
+6,671.  That is a sample-size coincidence and is *not* evidence about the 2008
+universe.  Do not inherit 2005's or 2012's statement for it.  If a statement is
+needed, the acquisition route is INSTAT Albania directly (instat.gov.al), not the
+WB catalog.
+
+** 2012 -- NO UNIVERSE STATEMENT FOUND (design and coverage text only)
+
+No sentence declaring a universe or target population exists for 2012.  What the
+documentation does say is sample-design text and a catalog coverage tag, recorded
+here as exactly that and *not* laundered into a universe claim.
+
+#+begin_quote
+"In the first round, 834 Primary Selection Units (PSUs) have been chosen randomly
+to represent the whole territory of the country."
+#+end_quote
+
+- Source :: =2012/Documentation/ddi-documentation-english_microdata-1970.pdf=,
+     PDF p.4, "Sampling" > "Sampling Procedure".  This is a statement about PSU
+     selection, not a declared population.
+- Extraction repair declared :: pdfminer renders the PDF's "fi" ligature, so the
+     raw text layer reads "In the first round" with a ligature glyph.  The
+     spelling above is the form the WB catalog JSON serves for the same sentence.
+
+#+begin_quote
+"GEOGRAPHIC COVERAGE
+
+National"
+#+end_quote
+
+#+begin_quote
+"UNITS OF ANALYSIS
+
+- Households
+
+- Individuals"
+#+end_quote
+
+- Source :: same PDF, PDF p.2, "Overview" > "Coverage" / "UNITS OF ANALYSIS".
+     This is the only Albania DDI that ships the study-level Overview /
+     Identification / Scope / Coverage block -- and even it has no Universe
+     field.
+
+*** Domain expansion (bears on what the weights support)
+
+#+begin_quote
+"However, the geographic domains of analysis have been expanded to include the 12
+individual prefectures of Albania, by urban and rural strata, compared to four
+geographic regions (Central, Coastal, Mountain and Tirana) by urban and rural
+strata defined previously as domains for the survey."
+#+end_quote
+
+- Source :: same PDF, PDF p.4, "Sampling" > "Sampling Procedure".
+- Consequence stated in the same paragraph :: "This required a considerable
+     increase in the sample size from 3,600 to 6,671 households".
+
+So 2012 supports *finer* analytic domains (24 strata = 12 prefectures x
+urban/rural) than any earlier wave.  Design detail, for context only: frame =
+Population and Housing Census of October 2011; 834 PSUs x 8 households, plus 4
+substitute households per PSU, to 6,671 completed.
+
+*** Exclusions
+
+None found.  No geographic, regional, or population-group exclusion is stated for
+2012.
+
+*** What was searched
+
+=2012/Documentation/= in this repo (=SOURCE.org=, the DDI PDF fully
+text-extracted, =LICENSE.org=; the =.xls=/=.xlsx= files are questionnaires and
+the food diary); WB catalog 1970 =/metadata/export/1970/json= grepped for
+"universe" (ABSENT); all 5 related-materials items, including
+"living_standard_measurement_survey__2012__preliminary_results_.pdf" (= "Albania
+Trends in Poverty: 2002-2005-2008-2012"), which is a results report with no
+sampling or universe section.  No Basic Information Document exists for 2012.
+
+** What this means before pooling Albania waves
+
+Stated as consequences of the evidence above, not as a design proposal:
+
+- 1996 is a different survey with a different geography and a purposive,
+  recipient-weighted design.  =_/data_scheme.yml= already leaves it out of
+  =Waves:=; the Tirana exclusion and the NE-recipient oversample are two further,
+  independent reasons that decision is right.
+- 2003 and 2004 are not independent national draws.  They are roughly half of the
+  2002 LSMS households, re-interviewed, with emigrants out of scope and only
+  people aged 15+ eligible for individual interview from Wave 2 on.  Treating
+  them as four independent cross-sections is not what the documentation supports.
+- The analytic domain changes three times across the series: regional
+  (2002, 2005) -> urban/rural only (2003, 2004) -> prefecture x urban/rural
+  (2012).  A regional time series across all six declared waves is not supported
+  by the 2003/2004 documentation, which says so in as many words.
+- 2008 carries no statement of any kind.  Any claim about what Albania 2008
+  represents is currently unsourced.
+- Albania 2002's universe sentence is not in this repository and not in the WB
+  catalog's structured metadata.  It exists in one PDF on the World Bank's
+  download endpoint.  If that matters for reproducibility, the fix is to acquire
+  =alb02bif.pdf= (and =alb03bid.pdf=, =BasicInformationDocument_2004.pdf=,
+  =alb05bid.pdf=, =alb96bif.pdf=) into the corresponding =Documentation/=
+  directories -- an acquisition question, not a schema question.
+
 * Known issues
 
 ** household_roster 2002 & 2005 collapsed to the within-cluster id (RESOLVED)

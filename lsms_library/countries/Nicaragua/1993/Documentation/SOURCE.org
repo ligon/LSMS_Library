@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/tj77-3f05]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2349
+
+#+CATALOG_ID: 2349
+#+CATALOG_IDNO: NIC_1993_EMNV_v01_M
+#+CATALOG_TITLE: Encuesta Nacional de Hogares sobre Medición de Niveles de Vida 1993
+#+CATALOG_YEARS: 1993-1993
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/tj77-3f05
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2349
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

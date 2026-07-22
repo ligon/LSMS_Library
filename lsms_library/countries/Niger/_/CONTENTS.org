@@ -15,6 +15,367 @@ See CLAUDE.md "EHCVM countries" for the cross-country pattern.
 Pre-EHCVM waves (2011-12, 2014-15) follow their own conventions;
 see the wave-level =data_info.yml= files for index definitions.
 
+* Sampling universe, exclusions and sub-samples
+
+What each Niger wave's *own documentation* says its sample represents.  This
+records claims, not data: no =.dta= file was opened for it, and nothing here is
+reverse-engineered from the microdata.  Where a wave has no statement, that is
+recorded as a gap together with what was searched.
+
+Read this alongside =Sampling Design= above, which is about *identifiers*
+(=grappe= / =menage= / =vague=); this section is about *what population the
+sample claims to stand for*.  Evidence gathered 2026-07-21 for GH #601; the
+full cross-country sweep, with the search record for every wave, is
+=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= (GH #603 will decide how the
+library represents any of this -- nothing here proposes a schema).
+
+# ASCII EXCEPTION: the #+begin_quote blocks below are verbatim transcriptions of
+# survey documentation and keep their original accents, ligature-repaired
+# spellings and sic errors.  Prose outside the quote blocks is ASCII.
+
+| Wave    | Declared universe                       | Where the statement lives                          | Confidence |
+|---------+-----------------------------------------+----------------------------------------------------+------------|
+| 2011-12 | "target population" sentence; no =UNIVERSE= field | in-repo DDI PDF + Basic Information Document | high       |
+| 2014-15 | stated only by reference to the 2011 design       | in-repo DDI PDF                              | high       |
+| 2018-19 | explicit DDI =UNIVERSE= field (NADA boilerplate)  | in-repo DDI PDF; matches WB catalog          | high       |
+| 2021-22 | *none found*                                      | nothing local beyond =SOURCE.org=            | gap        |
+
+** 2011-12 -- ECVM/A 2011 (WB catalog 2050)
+
+There is *no DDI =UNIVERSE= field* for this wave, in the shipped DDI report or
+in the catalog DDI/XML export for id 2050.  The nearest thing to a universe
+statement is the "target population" sentence inside the Sampling Procedure,
+quoted here in full with the paragraph that precedes it.
+
+Source: =lsms_library/countries/Niger/2011-12/Documentation/ddi-documentation-english_microdata-2050.pdf=,
+section "Sampling" > "Sampling Procedure", PDF p. 3.  The identical passage is
+in =ECVMA_Information_de_Base_V9_eng.pdf=, section "3. SAMPLING", printed
+pp. 3-4 (PDF pp. 6-7).  Both files are DVC-tracked in this repo.  Language:
+English -- the shipped Basic Information Document is explicitly the =_eng=
+translation; no French original ships in this wave's =Documentation/=.
+
+#+begin_quote
+The ECVM/A 2011 has been designed to have national coverage, including both urban and rural areas in all the regions of the country. The domains are defined as the entire country, the city of Niamey; and other urban areas, rural areas, and in the rural areas, agricultural zones, agro-pastoral zones and pastoral zones. Taking this into account, 26 explicit sampling strata were selected: Niamey, and urban, agriculture, agro-pastoral and pastoral zones of the seven regions other than Niamey.
+
+The target population is drawn from households in all 8 regions of the country with the exception of certain strata found in Arlit (Agadez Region) because of difficulties in going there, the very low population density, and collective housing. The portion of the population excluded from the sample represents less than 0.4% of the total population of Niger. Of a total of 36,000 people not included in the sample design, about 29,000 live in Arlit and 7,000 in collective housing.
+#+end_quote
+
+*Exclusions* (same passage, quoted again on its own because this is the part
+that makes "national coverage" not mean what it appears to mean):
+
+#+begin_quote
+with the exception of certain strata found in Arlit (Agadez Region) because of difficulties in going there, the very low population density, and collective housing. The portion of the population excluded from the sample represents less than 0.4% of the total population of Niger. Of a total of 36,000 people not included in the sample design, about 29,000 live in Arlit and 7,000 in collective housing.
+#+end_quote
+
+Two distinct exclusions, both stated at the *sampling-frame* level -- i.e. by
+design, not as fieldwork non-response:
+
+- geographic :: certain strata in Arlit, Agadez Region (~29,000 people).
+- population :: collective housing (~7,000 people).
+
+The documented size of the excluded population is under 0.4% of Niger; that is
+the survey's own figure, quoted, not a check of ours.
+
+** 2014-15 -- ECVM/A 2014, Wave 2 Panel Data (WB catalog 2676)
+
+This wave has no separately stated universe and no =UNIVERSE= field.  Its
+documentation states the universe *by reference to the 2011 design*, and its
+own "GEOGRAPHIC COVERAGE" field says only that it is a panel of the 2011
+survey.
+
+Source: =lsms_library/countries/Niger/2014-15/Documentation/ddi-documentation-english_microdata-2676.pdf=,
+"Sampling" > "Sampling Procedure" > subsection "2011 Survey", PDF p. 6; the
+GEOGRAPHIC COVERAGE sentence is under "Coverage", PDF p. 4.  Language: English.
+
+#+begin_quote
+The ECVM/A 2011 was been designed to have national coverage, including both urban and rural areas in all the regions of the country. The domains are defined as the entire country, the city of Niamey; and other urban areas, rural areas, and in the rural areas, agricultural zones, agro-pastoral zones and pastoral zones. Taking this into account, 26 explicit sampling strata were selected: Niamey, and urban, agriculture, agro-pastoral and pastoral zones of the seven regions other than Niamey.
+
+The target population was drawn from households in all 8 regions of the country with the exception of certain strata found in Arlit (Agadez Region) because of difficulties in going there, the very low population density, and collective housing. The portion of the population excluded from the sample represents less than 0.4% of the total population of Niger. Of a total of 36,000 people not included in the sample design, about 29,000 live in Arlit and 7,000 in collective housing.
+#+end_quote
+
+GEOGRAPHIC COVERAGE (PDF p. 4), verbatim:
+
+#+begin_quote
+The ECVM/A 2014 is a panel survey with the ECVM/A 2011. The ECVM/A 2011 was designed to have national coverage, including both urban and rural areas in all the regions of the country. The domains are defined as the entire country, the city of Niamey; and other urban areas, rural areas, and in the rural areas, agricultural zones, agro-pastoral zones and pastoral zones.
+#+end_quote
+
+Transcription notes: "was been designed" is *sic* in the source.  The PDF's
+=fi= / =ffi= ligature glyphs are rendered as ordinary letters above; the
+document reads "defined" / "difficulties".
+
+*Exclusions.*  The 2011 frame exclusions (Arlit strata, collective housing) are
+restated verbatim and so carry into this wave.  On top of them, a
+panel-specific tracking rule bounds who could enter the 2014 sample at all
+(same section, subsection "2014 Survey"):
+
+#+begin_quote
+In the ECVM/A 2014, all households that had been interviewed in 2011 were tracked. Households that did not move were interviewed in their existing location. Households that had moved to other locations in Niger were followed and interviewed in their new locations if they could be found in the new location. Households that moved outside of Niger were not followed.
+#+end_quote
+
+International out-migrants are therefore out of scope by design.  Within-Niger
+movers are in scope *conditional on being found*, which is a coverage bound the
+documentation does not quantify.
+
+** 2018-19 -- EHCVM 2018/19 (WB catalog 4296; DOI 10.48529/ggam-ax39)
+
+The only Niger wave with an explicit DDI =UNIVERSE= field.  Source:
+=lsms_library/countries/Niger/2018-19/Documentation/ddi-documentation-english_microdata-4296.pdf=,
+section "Coverage", PDF p. 3.  Language: English.  Verbatim:
+
+#+begin_quote
+GEOGRAPHIC COVERAGE
+National coverage
+
+UNIVERSE
+The survey covered all de jure households excluding prisons, hospitals, military barracks, and school dormitories.
+#+end_quote
+
+The same sentence is in the WB catalog DDI/XML export for id 4296
+(=<universe><![CDATA[...]]></universe>), so local and catalog agree.
+
+*BOILERPLATE WARNING.*  That =UNIVERSE= sentence is *World Bank NADA template
+text*, not a claim written for this survey.  The cross-country sweep found it
+verbatim in *15 waves* -- across Benin, Burkina Faso, Cote d'Ivoire,
+Guinea-Bissau, Mali, Niger, Senegal and Togo (where a shared WAEMU/EHCVM
+template is expected) but also Ethiopia 2018-19 / 2021-22 and Nigeria 2015-16 /
+2018-19 / 2023-24.  Its presence attests *which metadata template was used*.
+It does not independently attest that Niger's Institut National de la
+Statistique made that claim about this survey.  Treat it as weaker evidence
+than the 2011-12 / 2014-15 target-population text, which is survey-specific.
+
+*Exclusions.*  Institutional populations only:
+
+#+begin_quote
+excluding prisons, hospitals, military barracks, and school dormitories
+#+end_quote
+
+No geographic exclusion is stated for this wave in any source consulted (the
+in-repo DDI PDF, the catalog record, the catalog DDI/XML).  *Do not read the
+ECVMA-era Arlit exclusion forward into it* -- and equally, no document consulted
+says the Arlit exclusion was lifted.  The honest statement is that this wave's
+documentation is silent on Arlit.
+
+*Within-wave structure (matters before pooling).*  The single library wave
+directory =2018-19/= holds *both* seasonal visits of the survey, each covering
+half of every EA.  Verbatim, same PDF, "Sampling" > "SAMPLING PROCEDURE",
+PDF p. 4:
+
+#+begin_quote
+Upon deciding on the sample size and repartition, the survey design team implemented a 2-stage sampling methodology. At the first stage, 504 enumeration areas (EAs) were selected from the sample frame. In the second stage, 12 households were selected in each enumeration area randomly.
+
+The total survey sample size is 6024 households - 1577 from urban areas and 4447 from rural areas. After that, the survey design randomly divided each enumeration area into two equal groups. The survey team interrogated the first group in wave 1 and the other in wave 2. Finally, for various reasons, including availability and quality monitoring, the final sample size comprises slightly more households (fifty-eight) in round 2 than in round 1. In wave one, the survey teams interviewed 2983 households (715 in urban areas and 2268 in rural areas. In wave two, the teams interviewed 3041 households (862 in urban areas and 2179 in rural areas).
+#+end_quote
+
+Sic: the unclosed parenthesis in "(715 in urban areas and 2268 in rural areas."
+is in the source.  Data collection dates, same PDF: first visit 2018-10 to
+2018-12, second visit 2019-04 to 2019-07.  These two =vague= are *seasonal
+halves of one cross-section*, not two panel rounds -- see =Sampling Design=
+above for why =v= is =grappe= alone and not =(vague, grappe)=.
+
+** 2021-22 -- EHCVM 2021/22 (WB catalog 6276; NER_2021_EHCVM-2_v01_M) -- GAP
+
+*No universe or target-population statement was found for this wave, anywhere.*
+Recorded as a gap rather than filled by adjacency.
+
+What was searched (2026-07-21): =lsms_library/countries/Niger/2021-22/Documentation/=,
+which contains *only* =SOURCE.org= -- no PDFs, no DVC-tracked documentation of
+any kind; then WB catalog 6276: the study-description page, the full DDI/XML
+metadata export (the string "universe" does not occur anywhere in the 1.8 MB
+XML), the related-materials listing (2 household questionnaires + Basic
+Information Document in English and French), and both Basic Information
+Documents, grepped for =universe|univers|population cible|target
+population|base de sondage|champ|couvre|excluant|exclu|represent|coverage|frame=.
+
+*Where the (non-)statement lives.*  Nothing for this wave exists in this repo
+beyond the catalog URL in =SOURCE.org=.  Everything below is WB catalog
+metadata, i.e. a moving target that the library does not hold a copy of.
+
+The strongest available claims, verbatim from the catalog study description at
+https://microdata.worldbank.org/index.php/catalog/6276 -- *these are coverage
+and representativeness claims, NOT universe declarations, and must not be
+laundered into one*:
+
+#+begin_quote
+[Coverage > Geographic Coverage:] National coverage
+
+[Series Information:] The Niger EHCVM 2021/22 is the second edition of a nationally representative household survey conducted within the West Africa Economic Monetary Union (WAEMU) Household Survey harmonization Project (P153702) a joint program by the World Bank and the WAEMU Commision that aims at producing household survey data in member countries (Benin, Burkina Faso, Chad, Cote d'Ivoire, Guinea Bissau, Mali, Niger, Senegal and Togo). The survey covers all regions and includes approximately 6,000 households.
+
+[Abstract:] The EHCVM is a nationally representative survey of 6,000 households, which are also representative of the geopolitical zones (at both the urban and rural level).
+#+end_quote
+
+Sic: "Commision".  "Covers all regions" describes where the sample was drawn;
+it does not name the set of units the sample stands for.
+
+*Exclusions: none stated.*  No institutional-population exclusion, no dropped
+region, no security carve-out appears in the catalog metadata, the DDI/XML, or
+either language version of the Basic Information Document.  That is an absence
+of a statement -- it is not evidence that nothing was excluded.
+
+*The 2021-22 Basic Information Document is a visibly incomplete template.*  Its
+French version's sampling-frame paragraph reads, verbatim, with the placeholder
+unfilled:
+
+#+begin_quote
+Base de sondage -- La base de sondage de l'enquête de 2018/19 était le recensement général de la population et de l'habitat (RGPH) de [PRECISER L'ANNÉE]. En 2021/22, il a été procédé à un dénombrement dans les mêmes grappes.
+#+end_quote
+
+Translation (ours, not source text): "Sampling frame -- The sampling frame of
+the 2018/19 survey was the general population and housing census (RGPH) of
+[SPECIFY THE YEAR].  In 2021/22, an enumeration was carried out in the same
+clusters."
+
+The English version carries the matching unfilled placeholders, e.g. "For a
+sample size of [xxxxx households], the precision was [...] at the national
+level and varied from [...] to [...] for the regions." and "the general
+population and housing census (RGPH) of [SPECIFY THE YEAR]".  A document with
+unfilled template slots in its sampling chapter is weak evidence about anything
+in that chapter.
+
+*The inference that was available and was declined.*  2021-22 is a cluster
+panel on the 2018/19 frame, so inheriting the 2018-19 universe sentence ("all
+de jure households excluding prisons, hospitals, military barracks, and school
+dormitories") would be defensible.  *No document says so*, so it is not
+recorded here as this wave's universe.  The same inference was available and
+declined for Mali 2021-22 and Senegal 2021-22; Burkina Faso 2021-22 is the
+sibling that *does* carry the sentence explicitly.
+
+** Oversamples and sub-populations
+
+*No oversample, booster sample, or special sub-population sample is documented
+for any Niger wave* in the sources listed above.  Niger has nothing of the
+Serbia/Montenegro MOP-Roma or Azerbaijan three-sub-population shape.
+
+Four structural facts do have to be known before pooling, none of which is an
+oversample:
+
+1. *Stratification is not oversampling, and nothing says which it is.*  The
+   2011-12 / 2014-15 design uses 26 explicit strata built from Niamey, other
+   urban, agricultural, agro-pastoral and pastoral zones.  Pastoral and
+   agro-pastoral zones are named strata; *no source consulted states whether
+   the allocation across them was proportionate or disproportionate*, and that
+   was not checked against the data.  Recorded as unknown.
+2. *2014-15 is a whole-wave panel*, not a fresh draw: it re-interviews the 2011
+   households under the tracking rule quoted above.  Split-offs are carried
+   (the wave's household key is =GRAPPE + MENAGE + EXTENSION=, with
+   =EXTENSION= 0 = non-mover, 1 = whole household moved, 2 = split-off
+   individual in a new household).
+3. *2018-19 and 2021-22 each pack two seasonal visits into one library wave.*
+   For 2018-19 this is quoted verbatim above (each EA split in half, visited
+   Oct-Dec 2018 and Apr-Jul 2019).
+4. *2021-22 mixes panel households with replacements inside a single wave.*
+   The sweep records, from BID section 4 and the catalog Sampling Procedure --
+   *as summary, not as a verbatim quote, so treat it as secondary* -- that the
+   same clusters are revisited, the 2018/19 households re-interviewed where
+   found, and the cluster topped back up to 12 households where fewer are
+   found; final sample 6,622 households (2,511 urban, 4,111 rural), visit 1 =
+   3,303 HH (17 Nov 2021 - 13 Feb 2022), visit 2 = 3,319 HH (3 Jun - 31 Aug
+   2022).  So a 2021-22 row is either a panel household or a top-up
+   replacement, and the documentation gives no flag distinguishing the two.
+
+** Universe versus what the weights represent
+
+*Gap.*  None of the sources listed in this section states what the survey
+weights are calibrated to represent, for any of the four waves.  This was not
+separately hunted beyond the documents named above, and no claim is made in
+either direction.  See =Sampling Design= above and the =sample= table for the
+two weight columns the library carries (=weight=, =panel_weight=); their
+meaning here rests on the library's cross-country convention, not on a Niger
+document anyone has quoted.
+
+** Membership rule (adjacent evidence, deliberately not claimed as Niger's universe)
+
+The =Household Presence / MonthsSpent= section below records that the EHCVM
+instrument establishes household membership through two binary six-month
+filters (=s01q12=, =s01q13=) rather than a continuous months-present variable.
+That is the *operational* membership rule standing behind the phrase "de jure
+households".
+
+The WAEMU-common EHCVM-2 enumerator manual states that rule and one further
+scope exclusion explicitly.  *That manual is shipped in Burkina Faso's wave
+directory, not Niger's* --
+=lsms_library/countries/Burkina_Faso/2021-22/Documentation/manuelagent_ehcvm2_version_v2.pdf=,
+printed p. 4 (PDF p. 7).  It is regional instrument boilerplate (its worked
+examples name Dosso and Niamey, i.e. Niger), which is exactly why it is
+recorded here as *adjacent evidence* and not as a Niger universe statement:
+
+#+begin_quote
+Attention : le personnel diplomatique ne fait pas partie du champ de l'enquête. En effet la résidence d'un diplomate est considérée comme extraterritorial, c'est-à-dire que juridiquement hors du pays concerné. Cependant les autres personnes travaillant dans ces organisations font partie du champ de l'enquête, tout comme les étrangers n'ayant pas de statut de personnel diplomatique.
+#+end_quote
+
+Translation (ours, not source text): "Note: diplomatic personnel are not part
+of the scope of the survey.  A diplomat's residence is considered
+extraterritorial, that is, legally outside the country concerned.  However,
+other people working in these organisations are part of the survey's scope, as
+are foreigners without diplomatic-personnel status."
+
+#+begin_quote
+Membre du ménage. Un membre du ménage est une personne résidant habituellement dans le ménage. Un individu réside habituellement dans le ménage dans deux situations : (i) il vit dans ce ménage depuis au moins 6 mois ; (ii) Il est arrivé dans le ménage depuis moins de 6 mois, mais avec l'intention d'y rester au moins 6 mois.
+#+end_quote
+
+Translation (ours, not source text): "Household member.  A household member is
+a person usually resident in the household.  An individual is usually resident
+in the household in two situations: (i) they have lived in this household for
+at least 6 months; (ii) they arrived in the household less than 6 months ago,
+but with the intention of staying at least 6 months."
+
+** Pooling caution
+
+The declared universe *changes across this country's own series*, so pooling
+all four Niger waves pools more than one declared population:
+
+- 2011-12 and 2014-15 :: national minus certain Arlit (Agadez) strata, minus
+  collective housing -- a documented, quantified geographic-plus-population
+  subtraction.
+- 2018-19 :: "all de jure households" minus institutional populations, with no
+  geographic subtraction stated -- and the statement is NADA boilerplate.
+- 2021-22 :: no declared universe at all.
+
+Nothing in the documentation reconciles these, and nothing here reconciles them
+either.
+
+* Cluster coordinates: the 2011-12 GPS is in =NER_EA_Offsets.dta= (GH #323)
+
+=cluster_features= Latitude/Longitude by wave:
+
+| Wave    | Source file                              | Lat / Lon columns                                  | Grain          |
+|---------+------------------------------------------+----------------------------------------------------+----------------|
+| 2011-12 | =NER_EA_Offsets.dta=                     | =LAT_DD_MOD= / =LON_DD_MOD=                        | grappe (EA)    |
+| 2014-15 | -- none shipped --                       | --                                                 | --             |
+| 2018-19 | =grappe_gps_ner2018.dta=                 | =coordonnes_gps__Latitude= / =__Longitude=         | grappe (EA)    |
+| 2021-22 | (see wave =data_info.yml=)               |                                                    | grappe (EA)    |
+
+THE TRAP, recorded because it cost real time and nearly cost a real
+column: the 2011-12 config used to point =df_geo= at
+=NER_HouseholdGeovars_Y1.dta= and ask it for =lat_dd_mod= /
+=lon_dd_mod=.  *That file has no coordinates at all.*  Its 43 columns
+are DERIVED raster covariates only -- =dist_road=, =dist_market=,
+=af_bio_*=, =srtm=, =twi=, =sq1..sq7=, the EVI/NDVI series.  There is
+no latitude and no longitude anywhere in it.  The resulting =KeyError=
+was swallowed by the GH #515 optional-sub-df fallback, so
+=cluster_features= was served with Latitude/Longitude 100% ABSENT for
+this wave, behind a warning nobody read.
+
+It is tempting to conclude "the survey has no GPS -- mark it
+=optional:=".  *That conclusion is wrong.*  The coordinates ship in a
+SIBLING file in the very same directory: =NER_EA_Offsets.dta=, the WB's
+standard offset-EA-centroid release -- 271 rows x (=grappe=,
+=LAT_DD_MOD=, =LON_DD_MOD=), 270 non-null grappes, coordinates inside
+Niger's bounding box (lat 11.88-18.75 N, lon 0.40-13.70 E), already
+DVC-tracked.  Every grappe in the household file is present in it and
+vice versa (0 orphans either way).  The file was DVC-tracked and
+available the whole time; only the config was pointing at the wrong
+one.  All 270 clusters now carry real coordinates.
+
+Because the offsets file is already at the EA grain, the merge on =v=
+is many-to-ONE (not a cartesian) and the collapse to =(t, v)= is
+exactly lossless -- the coordinate is an EA-level constant.
+=merge_how: left= is load-bearing: the offsets file has one trailing
+null-grappe row which =outer= would turn into a phantom cluster.
+
+2014-15 genuinely ships no geovariables/offsets file of any kind (the
+wave directory contains none), so its Latitude/Longitude are honestly
+absent -- not mis-addressed.  It is NOT wired, and that is correct.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does

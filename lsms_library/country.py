@@ -44,6 +44,7 @@ from .local_tools import (
     read_parquet_cache_hash,
     cache_freshness,
     stamp_parquet_hash,
+    read_parquet_grain_audit,
     _collect_file_paths_from_block,
 )
 from .paths import data_root, countries_root
@@ -466,6 +467,32 @@ def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, A
     return parsed
 
 
+# Keys of a ``data_scheme.yml`` entry that name something OTHER than a column.
+# ``aggregation`` is a historical reservation that core never honoured and,
+# under the GH #323 no-aggregation-in-core policy, never will; it stays here
+# only so an old config carrying one is not mistaken for a required column.
+_SCHEME_NON_COLUMN_KEYS = frozenset({"index", "materialize", "backend",
+                                     "aggregation"})
+
+
+def _required_scheme_columns(scheme_entry: Any) -> list[str]:
+    """Columns a ``data_scheme.yml`` entry declares REQUIRED.
+
+    Every entry key that is not structural metadata and is not marked
+    ``optional: true``.  Single source of truth for the required-vs-optional
+    reading of a scheme entry, shared by ``Wave.grab_data``'s dropped-sub-df
+    check and ``Country._assert_built_required_columns`` -- two guards that
+    must agree on what "required" means or one of them lies.
+    """
+    if not isinstance(scheme_entry, dict):
+        return []
+    return [
+        k for k, v in scheme_entry.items()
+        if isinstance(k, str) and k not in _SCHEME_NON_COLUMN_KEYS
+        and not (isinstance(v, dict) and v.get("optional"))
+    ]
+
+
 class Wave:
     """A single survey wave within a country.
 
@@ -874,6 +901,111 @@ class Wave:
     def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
 
+    def _required_scheme_columns(self, request: str) -> list[str]:
+        """Columns the country's ``data_scheme`` declares REQUIRED for *request*."""
+        scheme_map = (self.country.resources or {}).get('Data Scheme') or {}
+        return _required_scheme_columns(scheme_map.get(request))
+
+    def _cartesian_keys(self, left: pd.DataFrame, right: pd.DataFrame,
+                        keys: list[str]) -> pd.DataFrame | None:
+        """The key values on which merging ``left`` and ``right`` is CARTESIAN.
+
+        Returns a frame indexed by the offending key value(s) with columns
+        ``n`` (rows in ``left``) and ``m`` (rows in ``right``), or ``None``
+        when the merge is safe.
+
+        The test is EXACT -- sound *and* complete -- not a heuristic.  A join
+        on ``keys`` is many-to-many precisely when some key value is duplicated
+        in BOTH frames: that value alone then contributes ``n x m`` output rows
+        where an honest join would contribute at most ``max(n, m)``.  So we
+        intersect the key values duplicated in ``left`` with those duplicated
+        in ``right``; a non-empty intersection *is* the cartesian, and an empty
+        one proves the merge is 1:1 / 1:m / m:1 (every row of the finer side
+        matches at most one row of the coarser).
+
+        A row-count ceiling (``len(result) <= len(left) + len(right)``) was
+        tried first and rejected: sound but NOT complete.  A small explosion
+        hides under it -- two 3-row frames sharing one 2x2 key and one 1x1 key
+        yield 5 rows, never exceeding the 6-row ceiling -- so it would wave
+        through exactly the cartesians hardest to catch by eye.
+
+        ``dropna=False`` is deliberate.  ``pd.merge`` MATCHES null keys to each
+        other, so a null key value duplicated on both sides is a cartesian like
+        any other -- and a common one, since a failed upstream extraction lands
+        every one of its rows on the same null key.
+        """
+        if not keys:
+            return None
+        n = left.groupby(keys, dropna=False, observed=True).size().rename('n')
+        m = right.groupby(keys, dropna=False, observed=True).size().rename('m')
+        both = pd.concat([n, m], axis=1, join='inner')
+        both = both[(both['n'] > 1) & (both['m'] > 1)]
+        return both if len(both) else None
+
+    def _merge_subframes(self, left: pd.DataFrame, right: pd.DataFrame,
+                         merge_on: list[str], request: str,
+                         lname: str, rname: str,
+                         how: str = 'outer') -> pd.DataFrame:
+        """Merge two ``dfs:`` sub-frames, refusing to MANUFACTURE rows.
+
+        GH #323, site 4 -- the upstream one.  A ``dfs:`` block joins its
+        sub-frames on the declared ``merge_on`` keys with an outer merge.  When
+        BOTH sub-frames are finer-grained than ``merge_on`` -- e.g. two
+        HOUSEHOLD-grain frames joined on the CLUSTER key ``v`` -- the merge is
+        many-to-many and yields a cartesian product *within each key group*.
+        ``_normalize_dataframe_index`` then quietly mopped the explosion up
+        with ``groupby().first()``, so the table looked clean while most of its
+        rows were phantoms.  This site does not lose data; it INVENTS it, and
+        every other #323 site is downstream janitor to the mess.
+
+        The remedy is to make the merge correct -- join on a key that is unique
+        in at least one sub-frame (``i`` rather than ``v``), or reduce a
+        sub-frame to the merge-key grain in its own wave script.  Core does not
+        aggregate the explosion away after the fact: a reducer applied to a
+        cartesian only puts a signature on the corpse.
+
+        Severity is graduated because the guard is new and the configs are old:
+        a cartesian WARNS by default (naming country, wave, table, keys and the
+        exact phantom-row count) and is FATAL under ``LSMS_GRAIN_STRICT``, read
+        through the SAME ``_grain_strict()`` predicate site 1 and site 2 use
+        (merged with PR #614).  Reading the variable independently here was a
+        latent divergence: a bare ``os.environ.get`` is truthy for ``"0"`` and
+        ``"false"``, so ``LSMS_GRAIN_STRICT=0`` would have made site 4 fatal
+        while sites 1-2 stayed in warn mode.  One lever, one reader.  Warning
+        rather than raising keeps every currently-building country building --
+        their behaviour is bit-for-bit what it was -- while making the
+        fabrication impossible to miss.
+
+        Note the lever is SHARED, so flipping it on in CI is gated on the whole
+        of #323 being clean, not just this site's census.
+        """
+        keys = [k for k in merge_on if k in left.columns and k in right.columns]
+        bad = self._cartesian_keys(left, right, keys)
+        if bad is not None:
+            # Phantom rows: what the cartesian emits (n*m) beyond what an
+            # honest 1:m / m:1 join would have emitted (max(n, m)).
+            phantom = int((bad['n'] * bad['m'] - bad[['n', 'm']].max(axis=1)).sum())
+            example = bad.index[0]
+            msg = (
+                f"{self.name}/{request}: the `dfs:` merge of "
+                f"'{lname}' ({len(left)} rows) with '{rname}' ({len(right)} rows) "
+                f"on {keys} is a many-to-many CARTESIAN PRODUCT, not a join. "
+                f"{len(bad)} key value(s) are duplicated in BOTH sub-frames "
+                f"(e.g. {keys} = {example!r}, {bad['n'].iloc[0]} x "
+                f"{bad['m'].iloc[0]} rows), MANUFACTURING {phantom} phantom rows "
+                f"that exist in no survey. Both sub-frames are finer-grained than "
+                f"the merge key. Fix by merging on a key that is unique in at "
+                f"least one sub-frame (e.g. the household id `i` rather than the "
+                f"cluster id `v`), or by reducing a sub-frame to the merge-key "
+                f"grain before it is merged. Do NOT paper over it with an "
+                f"aggregation afterwards. (GH #323 site 4; set "
+                f"LSMS_GRAIN_STRICT=1 to make this fatal.)"
+            )
+            if _grain_strict():
+                raise ValueError(msg)
+            warnings.warn(msg)
+        return pd.merge(left, right, on=merge_on, how=how)
+
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
@@ -987,7 +1119,42 @@ class Wave:
             # Vertical Merge dfs
             if data_info.get('dfs'):
                 merge_dfs = []
+                merged_names: list[str] = []
+                # A dropped sub-df takes every column it was the sole supplier
+                # of with it.  Record the drops so the post-merge check below
+                # can tell whether that cost a REQUIRED declared column.
+                config_bugs: list[tuple[str, Any, Exception]] = []
                 merge_on =list(set('t').union(data_info.get('merge_on')))#a list
+                # `merge_how:` (GH #323) picks the join type for this block.
+                # Defaults to the historical 'outer', so every existing `dfs:`
+                # block is unchanged.  Declare `merge_how: left` where the
+                # PRIMARY sub-df is authoritative for which rows exist and the
+                # others are strict enrichments -- e.g. a cover page that
+                # defines the household roster joined to a geovariable file
+                # that also carries households the cover does not.  Under
+                # `outer` those orphans arrive with a null value in every index
+                # level the cover owned.
+                #
+                # What happens to them next, MEASURED rather than assumed
+                # (Ethiopia 2013-14, geo file has 25 households the cover page
+                # does not): the wave frame is 5,287 rows under `outer` vs
+                # 5,262 under `left`, and 25 of those rows carry a null `v`.
+                # The downstream cluster-grain collapse then DELETES them --
+                # `groupby` drops null keys -- so the delivered table is 433
+                # clusters with identical values (sum Latitude 4070.3702)
+                # EITHER WAY.  An earlier version of this comment said the
+                # orphans "collapse together into one phantom null-keyed row";
+                # they do not survive to the delivered table at all.
+                #
+                # So `merge_how: left` is not a data fix.  It is worth
+                # declaring because (a) it stops manufacturing null-keyed rows
+                # for site 1 to delete, and (b) it keeps the dtype the merge
+                # would otherwise widen (Ethiopia 2013-14 `District` stays
+                # int8 under `left`, becomes float64 under `outer`).  Its cost
+                # is a lost signal: under `outer` the site-1 grain report told
+                # you those 25 geo households had no cover page; `left` drops
+                # them silently.
+                merge_how = data_info.get('merge_how', 'outer')
                 df_edit_function = self.formatting_functions.get(request)
                 idxvars_list = list(dict.fromkeys(data_info.get('final_index')))
                 dfs_list = data_info.get('dfs')
@@ -997,6 +1164,7 @@ class Wave:
                     try:
                         sub_df = get_data(sub_data_info, sub_mapping_details)
                         merge_dfs.append(sub_df.reset_index())
+                        merged_names.append(i)
                     except (FileNotFoundError, PathMissingError, DvcException,
                             KeyError) as exc:
                         if idx == 0:
@@ -1014,7 +1182,37 @@ class Wave:
                         # drop the optional sub-df rather than abort the whole
                         # cluster_features table and lose the Region/District
                         # that the primary df_main provides.  GH #515.
+                        #
+                        # BUT (GH #323): "proceed without it" quietly serves the
+                        # table with every column that sub-df alone supplied
+                        # 100% ABSENT.  Where such a column is declared REQUIRED
+                        # in data_scheme.yml that is silently WRONG, not merely
+                        # silently incomplete, and a warning does not prevent it.
+                        # Two very different things land in this handler and only
+                        # one of them is a bug an author can fix:
+                        #
+                        #   KeyError -- the file LOADED but does not carry the
+                        #     column the YAML asked for.  A CONFIG bug (typo,
+                        #     wrong casing, renamed variable); 100% reproducible;
+                        #     fixed by editing data_info.yml.  Ethiopia's
+                        #     cluster_features asked for `lat_dd_mod` where the
+                        #     file has `LAT_DD_MOD`, the KeyError was swallowed
+                        #     here, and Latitude/Longitude vanished behind a
+                        #     warning nobody read.  This kind may escalate.
+                        #
+                        #   FileNotFoundError / PathMissingError / DvcException
+                        #     -- the file is not AVAILABLE in this environment.
+                        #     No config edit fixes that; absorbing it is exactly
+                        #     why the GH #515 fallback exists, and hard-failing
+                        #     would break every legitimate partial-data checkout.
+                        #     Stay soft.
+                        #
+                        # Whether a config bug ACTUALLY costs a required column
+                        # is judged after the merge -- a sibling sub-df may
+                        # supply the same column, in which case the drop is free.
                         sub_file = sub_data_info.get('file', i)
+                        if isinstance(exc, KeyError):
+                            config_bugs.append((i, sub_file, exc))
                         warnings.warn(
                             f"{self.name}/{request}: could not load "
                             f"sub-df '{i}' (file: {sub_file}); "
@@ -1029,11 +1227,17 @@ class Wave:
                     available_idx = [c for c in idxvars_list if c in df.columns]
                     df = df.set_index(available_idx)
                 else:
-                    df = pd.merge(merge_dfs[0], merge_dfs[1], on=merge_on, how='outer')
+                    df = self._merge_subframes(
+                        merge_dfs[0], merge_dfs[1], merge_on, request,
+                        merged_names[0], merged_names[1], how=merge_how)
                     if len(merge_dfs) > 2:
                         for i in range(2, len(merge_dfs)):
-                            df = pd.merge(df, merge_dfs[i], on=merge_on, how='outer')
+                            df = self._merge_subframes(
+                                df, merge_dfs[i], merge_on, request,
+                                '+'.join(merged_names[:i]), merged_names[i],
+                                how=merge_how)
                     df = df.set_index(idxvars_list)
+
                 # Apply any `derived:` transformers declared in the YAML.  These
                 # run on the merged-and-indexed frame, before the per-request
                 # Python hook, so they see the full multi-source result and
@@ -1052,6 +1256,49 @@ class Wave:
                     df = df.drop(columns=[c for c in drop_cols if c in df.columns])
                 if df_edit_function:
                     df = df_edit_function(df)
+
+                # GH #323/#515: did a swallowed KeyError cost a REQUIRED column?
+                # Judged HERE -- after the merge, after `derived:`, after
+                # `drop:` and after the per-request Python hook -- so that
+                # "present" means the same thing it means to this guard's
+                # country-level twin, ``_assert_built_required_columns``, which
+                # deliberately runs post-``_finalize_result``.  Two guards that
+                # judge presence at different moments will eventually disagree,
+                # which is the same trap the shared ``_required_scheme_columns``
+                # was factored out to avoid.  Concretely, a required column
+                # supplied by a `derived:` transformer or by the wave's own
+                # ``df_edit`` hook must NOT be reported absent (review finding
+                # 4 on PR #627; latent when written, not latent forever).
+                #
+                # A column a SIBLING sub-df also supplies likewise does not fire
+                # a false alarm.  Only the config-bug drops (KeyError) can
+                # escalate; an unavailable file stays soft.  Prose is not
+                # enforcement.
+                if config_bugs and isinstance(df, pd.DataFrame):
+                    have = set(map(str, df.columns)) | {
+                        str(n) for n in df.index.names if n is not None}
+                    missing = sorted(
+                        set(self._required_scheme_columns(request)) - have)
+                    if missing:
+                        names = ', '.join(
+                            f"'{n}' (file: {f})" for n, f, _ in config_bugs)
+                        first_exc = config_bugs[0][2]
+                        raise RuntimeError(
+                            f"{self.name}/{request}: sub-df(s) {names} loaded but "
+                            f"do NOT carry the column(s) the YAML asks for, leaving "
+                            f"required declared column(s) {missing} ENTIRELY ABSENT "
+                            f"from '{request}'. Serving the table without them would "
+                            f"be silently wrong. Fix the source column names in this "
+                            f"wave's data_info.yml -- that is the fix in every case "
+                            f"seen so far (Ethiopia, Niger and Nigeria were all a "
+                            f"casing mismatch or a wrong key, with the data sitting "
+                            f"in the file or in a sibling file). Only if the column "
+                            f"is genuinely unavailable, mark it `optional: true` in "
+                            f"the country's data_scheme.yml -- but note that file is "
+                            f"COUNTRY-grain, so doing so disarms this check for the "
+                            f"column in EVERY wave of {self.country.name}, not just "
+                            f"this one (GH #323/#515). First error: {first_exc!r}"
+                        ) from first_exc
 
             else:
                 mapping_details = self.column_mapping(request, data_info)
@@ -1171,26 +1418,50 @@ class Wave:
         # ``idxvars`` so the YAML can merge a household-level df_geo
         # for GPS.  The result then has HH grain (one row per
         # household) instead of the canonical ``(t, v)`` cluster
-        # grain documented in ``data_scheme.yml``.  Collapse with
-        # ``.first()`` for non-GPS columns (Region/Rural/District are
-        # invariant within a cluster by construction of the LSMS-ISA
-        # sampling design) and ``.mean()`` for Latitude/Longitude
-        # (HH-level GPS approximated as the cluster centroid).
-        # GH #161.
+        # grain documented in ``data_scheme.yml``, so it has to be
+        # projected back onto ``(t, v)``.  GH #161.
+        #
+        # GH #323 SITE 2.  That projection used to be justified by a
+        # PROSE comment -- "Region/Rural/District are invariant within
+        # a cluster by construction of the LSMS-ISA sampling design" --
+        # and prose is not enforcement.  The claim is FALSE wherever a
+        # cluster code is unique only *within* a district: two real
+        # clusters then merge, and ``.first()`` keeps one district's
+        # Region and silently discards the other's.  That is WRONG data,
+        # not merely lost data.  The invariant is now CHECKED rather than
+        # asserted -- see ``_collapse_to_cluster_grain``.
         if 'i' in df.index.names:
             keep_levels = [lvl for lvl in df.index.names if lvl != 'i']
-            if df.columns.size:
-                agg = {
-                    c: ('mean' if c in ('Latitude', 'Longitude') else 'first')
-                    for c in df.columns
-                }
-                df = df.groupby(level=keep_levels).agg(agg)
-            else:
-                df = df.groupby(level=keep_levels).first()
+            df = _collapse_to_cluster_grain(
+                df, keep_levels,
+                country=getattr(self.country, 'name', None), wave=self.year,
+            )
         # ``i`` may also leak in as a *column* when df_geo's idxvars
         # include it (the merge step turns the duplicate into a column).
         # Drop it: cluster_features is keyed on ``(t, v)``, the
         # household identifier has no place in the result.  GH #161.
+        #
+        # GH #323: NOTE WHAT THIS LINE ACTUALLY DOES.  When ``i`` is a COLUMN the
+        # frame is still HOUSEHOLD grain -- it just doesn't look like it, because
+        # the index is already ``(t, v)`` with one duplicate tuple per household.
+        # Dropping ``i`` LAUNDERS that: an honest household-grain table becomes a
+        # cluster-grain table with unexplained duplicates, which
+        # ``_normalize_dataframe_index`` (Site 1) then collapses.  So this is
+        # Site 2's twin, and the ONLY reason it is not silent is that Site 1's
+        # audit happens to catch the wreckage downstream (Uganda's seven
+        # ``i``-as-column waves: 9,890 rows destroyed, 934 deleted on a NaN key --
+        # all of it reported by #614, none of it by the audit above).
+        #
+        # It is deliberately NOT rerouted through ``_collapse_to_cluster_grain``
+        # here, because it does not need to be: Site 1 reduces these frames with the
+        # same ``.first()`` and audits them with the same instrument, so the loss is
+        # reported either way.  (Before the GPS ``.mean()`` was retired this
+        # asymmetry also silently decided whether a country's cluster coordinates
+        # came out a CENTROID or ONE HOUSEHOLD'S FIX -- on nothing more principled
+        # than whether its YAML put ``i`` in ``idxvars`` or left it in a merge
+        # block.  That incoherence was one of the arguments that retired the
+        # ``.mean()``; with core no longer aggregating anywhere, both paths now
+        # agree.)
         if 'i' in df.columns:
             df = df.drop(columns='i')
         # if cluster_feature data is from old other_features.parquet file, region is called 'm' so we need to rename it
@@ -2112,7 +2383,8 @@ class Country:
 
         if isinstance(df, pd.DataFrame):
             df = self._augment_index_from_related_tables(df, scheme_entry, None)
-            df = _normalize_dataframe_index(df, scheme_entry, None, method_name)
+            df = _normalize_dataframe_index(df, scheme_entry, None, method_name,
+                                            country=self.name)
 
             # Join v from sample() for household-level tables that lack it.
             # Skip if v is already in the index OR already present as a
@@ -2214,7 +2486,25 @@ class Country:
             # scripts that need the stricter "drop unless any DATA column is
             # non-null" form should use ``subset=`` themselves; this step is
             # the universal safety-net.
+            #
+            # GH #645: say how many rows it took.  This step is where a *value*
+            # corruption upstream turns into a silent *deletion* -- a nulled
+            # `Educational Attainment` is a deleted person, because the table
+            # has exactly one column.  30% of Guatemala's individual_education
+            # vanished here and nothing said a word (the cell was still graded
+            # `sane`).  INFO, not a warning: legitimately-hollow rows are
+            # common and this must not cry wolf on every table.  Whether it
+            # should escalate above some rate is a judgement for the
+            # maintainer, deliberately not made here.
+            n_before = len(df)
             df = df.dropna(how='all')
+            if len(df) < n_before and n_before:
+                n_dropped = n_before - len(df)
+                logger.info(
+                    "%s/%s: dropna(how='all') removed %d of %d rows (%.1f%%) "
+                    "-- every dropped row had NO non-index data at all",
+                    self.name, method_name or "?", n_dropped, n_before,
+                    100.0 * n_dropped / n_before)
 
             # Attach the ISO 4217 currency label (last, so it rides through the
             # caller's _relabel_j / _add_market_index without being dropped).
@@ -2384,12 +2674,7 @@ class Country:
             return
         # Parse declared (non-optional) columns exactly as diagnostics /
         # test_declared_columns_present do (skip index/materialize/etc. keys).
-        _skip = {"index", "materialize", "backend", "aggregation"}
-        required = [
-            k for k, v in scheme_entry.items()
-            if isinstance(k, str) and k not in _skip
-            and not (isinstance(v, dict) and v.get("optional"))
-        ]
+        required = _required_scheme_columns(scheme_entry)
         present = set(map(str, df.columns)) | set(
             n for n in df.index.names if n is not None
         )
@@ -2712,7 +2997,8 @@ class Country:
                         scheme_entry,
                         w,
                     )
-                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name)
+                    wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name,
+                                                            country=self.name)
 
                 if wave_result is None and not wave_has_table:
                     continue
@@ -2814,6 +3100,13 @@ class Country:
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
 
+            # GH #323: start this table's grain ledger clean.  It is repopulated
+            # either by the cold build (the collapse audit) or by replaying the
+            # stamp on a warm read -- so `grain_reports()` describes THIS load, and
+            # a stale report from an earlier call in the same process can never be
+            # re-stamped into a parquet it does not belong to.
+            _GRAIN_LEDGER.pop((self.name, method_name), None)
+
             # v0.7.0/v0.8.0: best-effort cache read.  If a parquet exists
             # at cache_path AND is not stale, read it and return without
             # consulting DVC, the stage layer, or the wave loaders.
@@ -2862,6 +3155,16 @@ class Country:
                     try:
                         cached_df = get_dataframe(cache_path)
                         cached_df = map_index(cached_df)
+                        # GH #323: this parquet was written POST-collapse, so its
+                        # index is unique and _normalize_dataframe_index below can
+                        # never re-detect the loss.  Replay what the cold build that
+                        # produced it recorded -- otherwise the warning is a
+                        # cold-build-only event and the loss is invisible on every
+                        # warm read, which is exactly how #323 survived its first fix.
+                        _replay_grain_audit(
+                            read_parquet_grain_audit(cache_path),
+                            self.name, method_name,
+                        )
                         if freshness == "legacy" and cache_expected_hash is not None:
                             # Trust-once-then-stamp: parquet predates
                             # hashing; assume it matches current sources
@@ -2899,7 +3202,8 @@ class Country:
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             to_parquet(df, cache_path,
-                                       cache_hash=self._table_cache_hash(method_name, waves))
+                                       cache_hash=self._table_cache_hash(method_name, waves),
+                                       grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return df
 
@@ -2926,7 +3230,8 @@ class Country:
                                     scheme_entry,
                                     stage.wave,
                                 )
-                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name)
+                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name,
+                                                                    country=self.name)
                                 stage_results[stage.wave or "ALL"] = df_wave
                         return stage_results
 
@@ -2943,7 +3248,8 @@ class Country:
                         combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
                         to_parquet(combined_df, cache_path,
-                                   cache_hash=self._table_cache_hash(method_name, waves))
+                                   cache_hash=self._table_cache_hash(method_name, waves),
+                                   grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
                         return combined_df
 
@@ -2974,6 +3280,17 @@ class Country:
                             logger.debug(f"Reading {method_name} from cache {cache_path}")
                             cached_df = get_dataframe(cache_path)
                             cached_df = map_index(cached_df)
+                            # GH #323: the OTHER warm-read path.  Same argument as at
+                            # the v0.8.0 fast-path read above -- this parquet is
+                            # post-collapse, so nothing downstream can re-detect the
+                            # loss; replay what the cold build stamped.  (Largely dead
+                            # since the DVC stage layer was retired in v0.7.0, but a
+                            # silent warm read is exactly the hole being closed, so it
+                            # does not get to stay open on a technicality.)
+                            _replay_grain_audit(
+                                read_parquet_grain_audit(cache_path),
+                                self.name, method_name,
+                            )
                             wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
                             cached_df = self._augment_index_from_related_tables(
                                 cached_df,
@@ -2985,6 +3302,7 @@ class Country:
                                 scheme_entry,
                                 wave_hint,
                                 method_name,
+                                country=self.name,
                             )
                             return cached_df
                         except (FileNotFoundError, PathMissingError):
@@ -4096,12 +4414,404 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
             pass  # best-effort; don't break loading
 
 
+# ---------------------------------------------------------------------------
+# GH #323 -- the grain-collapse audit.
+#
+# THE CLASS OF BUG.  `_normalize_dataframe_index` reduces a non-unique DECLARED
+# index with `groupby(...).first()`.  Where the duplicate rows DISAGREE, the rows
+# it drops are real data (distinct people, distinct shocks) and they vanished with
+# no signal.  #323 was closed once on a warning that could not fire (below); #500,
+# #501 and #514 were each closed on a single INSTANCE while the class survived.
+#
+# WHY THE OLD WARNING COULD NOT FIRE.  It was gated on `not df.index.is_unique`,
+# and the L2-country parquet is WRITTEN POST-COLLAPSE -- so on every warm read the
+# index is already unique and the gate is False.  The bug hid behind the cache that
+# the bug poisoned.  Two fixes follow from that, and both matter:
+#   (1) audit BEFORE the collapse, while the evidence still exists;
+#   (2) PERSIST the finding into the parquet and re-emit it on the warm read
+#       (`local_tools._GRAIN_AUDIT_KEY`), so the signal outlives the destruction.
+#
+# WHY NOT "just declare an aggregation policy".  Because duplicates on a declared
+# index almost never mean "reduce me" -- they mean the IDENTIFIER IS BROKEN or a
+# LEVEL IS MISSING.  Mali's `household_roster` declares `(t, i, pid)`, but `pid` is
+# a *household* id stamped onto every member (5,149 distinct values across 37,175
+# rows), so `first()` keeps ONE PERSON PER HOUSEHOLD and 32,026 people disappear.
+# No reducer is correct there: `first` keeps one person, `sum` is meaningless on
+# `Sex`.  Declaring `aggregation: {pid: first}` would only put a signature on the
+# corpse.  So the core does NOT aggregate -- consistent with the NO-AGGREGATION-IN-
+# CORE contract in SkunkWorks/grain_aggregation_policy.org -- it reports, and (in
+# strict mode) refuses.  The one genuine reduction policy we have,
+# `_ADDITIVE_MEASURE_COLUMNS` (food_acquired), stays and is lossless.
+# ---------------------------------------------------------------------------
+
+class GrainCollapseError(RuntimeError):
+    """A declared index was non-unique and collapsing it would destroy rows.
+
+    Raised instead of the default warning when ``LSMS_GRAIN_STRICT`` is set.
+    """
+
+
+class GrainCollapseWarning(RuntimeWarning):
+    """A declared index was non-unique; collapsing it destroyed rows (GH #323).
+
+    Its own class (rather than a bare ``RuntimeWarning``) so callers and CI can
+    target it precisely: ``warnings.simplefilter("error", GrainCollapseWarning)``.
+    """
+
+
+def _grain_strict() -> bool:
+    """Whether a destructive grain collapse should RAISE rather than warn.
+
+    Default is warn: making it fatal out of the box breaks ~30 countries at once
+    and gets reverted, and a revert is how the class survives.  Strict mode is
+    what lets tests and CI ratchet the census down to zero without a
+    known-bad allowlist (an allowlist is the same disease with a registry).
+    """
+    return os.environ.get("LSMS_GRAIN_STRICT", "").lower() in {"1", "true", "yes"}
+
+
+def _audit_index_collapse(
+    df: pd.DataFrame, levels: list[str],
+) -> dict[str, Any] | None:
+    """Measure what collapsing *df* onto *levels* would destroy.
+
+    Returns ``None`` when the collapse is provably lossless, else a report dict.
+
+    THE DISTINCTION THAT MAKES THIS SIGNAL READABLE.  Across the 40 countries,
+    ~7.5M rows sit on a duplicated declared index -- but 6.46M of them are EXACT
+    duplicates of a row that survives (a cluster attribute repeated once per
+    household in the cluster, say).  Collapsing those loses nothing.  Only ~542k
+    rows sit in groups whose rows actually DISAGREE, and those are the real data
+    loss.  Warning on the raw duplicate count would bury the 542k under 6.5M false
+    alarms -- and a warning nobody reads is exactly how this bug survived.  So:
+
+    - a duplicate group whose rows are all mutually identical -> lossless dedup,
+      not reported;
+    - a group containing any two rows that differ -> DESTRUCTIVE; every row it
+      drops is counted, including a row that happens to duplicate another inside
+      that group (two identical roster rows are still two distinct PEOPLE, and a
+      household's size is wrong if you drop one).
+
+    Missing values count as values: two rows that differ only in *whether* a field
+    is recorded are different rows.  That is deliberately conservative -- it
+    over-reports rather than under-reports, and it is what catches
+    ``Burkina_Faso/shocks``, where ``first()`` keeps an all-``<NA>`` row and throws
+    away the row that has the real answers.
+
+    ``nan_key_rows`` is a SEPARATE loss riding along in the same operation:
+    ``groupby()`` defaults to ``dropna=True``, so a row with NaN in a declared
+    index level is DELETED OUTRIGHT by the collapse, not merely merged into it.
+    """
+    if not levels:
+        return None
+    try:
+        n_nan_key_rows = int(df.index.to_frame().isna().any(axis=1).sum())
+    except (TypeError, ValueError):
+        n_nan_key_rows = 0
+
+    # If the audit itself cannot run we must NOT return None -- None means
+    # "provably lossless", and an instrument that fails silently and reports
+    # clean is the exact disease this whole change exists to cure.  Say so
+    # instead, loudly, and let the caller decide (strict mode makes it fatal).
+    #
+    # Cost note: the stringify below is O(rows) and is the expensive part
+    # (~3 s on the largest cell, Mali/cluster_features/2021-22 at 4.7M rows).
+    # It runs ONLY when the index is already known to be non-unique, and ONLY on
+    # the cold build path -- a warm read pays ~1 ms to read the stamp instead.
+    try:
+        # Stringify to make every column hashable (categoricals, lists, pd.NA)
+        # and to make NA compare equal to NA rather than to nothing.
+        flat = df.reset_index().astype(str)
+        size = flat.groupby(levels, dropna=False, observed=True).size()
+        distinct = (flat.drop_duplicates()
+                        .groupby(levels, dropna=False, observed=True).size())
+    except (TypeError, ValueError, KeyError) as exc:
+        return {
+            "levels": list(levels),
+            "rows": int(len(df)),
+            "dropped": int(df.index.duplicated().sum()),
+            "destroyed": 0,
+            "conflicting_groups": 0,
+            "nan_key_rows": n_nan_key_rows,
+            "unauditable": f"{type(exc).__name__}: {exc}",
+        }
+
+    n_dropped = int(size.sum() - len(size))
+    conflicting = distinct.index[distinct > 1]
+    n_destroyed = int((size.loc[conflicting] - 1).sum()) if len(conflicting) else 0
+
+    if not n_destroyed and not n_nan_key_rows:
+        return None  # provably lossless: nothing to report
+    return {
+        "levels": list(levels),
+        "rows": int(len(df)),
+        "dropped": n_dropped,
+        "destroyed": n_destroyed,
+        "conflicting_groups": int(len(conflicting)),
+        "nan_key_rows": n_nan_key_rows,
+    }
+
+
+def _format_grain_report(report: dict[str, Any]) -> str:
+    country = report.get("country") or "?"
+    table = report.get("table") or "?"
+    wave = report.get("wave")
+    where = f"{country}/{table}" + (f"/{wave}" if wave else "")
+    levels = ", ".join(report.get("levels") or [])
+    site = report.get("site")
+    duplicated = bool(report.get("dropped") or report.get("destroyed")
+                      or report.get("unauditable"))
+    # GH #323 Site 2: the household -> cluster projection.  Not a *declared*-index
+    # collapse -- the index is deliberately narrowed from (t, v, i) to (t, v) -- so
+    # say what actually happened rather than borrowing Site 1's sentence.
+    if site == 'Wave.cluster_features':
+        bits = [
+            f"{where}: cluster_features was projected from HOUSEHOLD grain onto the "
+            f"cluster grain ({levels}), and the households in a cluster DISAGREE."
+        ]
+    elif duplicated:
+        bits = [f"{where}: declared index ({levels}) is NOT UNIQUE."]
+    else:
+        # missing-level-only report: the index is unique, but only because it was
+        # silently narrowed.
+        bits = [f"{where}: declared index was SILENTLY NARROWED to ({levels})."]
+    if report.get("unauditable"):
+        bits.append(
+            f"The collapse COULD NOT BE AUDITED ({report['unauditable']}), so it is "
+            f"NOT known to be safe: {report.get('dropped', 0):,} row(s) were dropped "
+            f"by groupby().first() and may carry data. Treat as data loss until shown "
+            f"otherwise."
+        )
+    if report.get("destroyed"):
+        bits.append(
+            f"Collapsing it with groupby().first() DESTROYED {report['destroyed']:,} "
+            f"of {report['rows']:,} rows whose values DISAGREE "
+            f"({report['conflicting_groups']:,} conflicting index tuples). "
+            f"These rows are gone from the returned data."
+        )
+    if report.get("missing_levels"):
+        bits.append(
+            f"Declared index level(s) {report['missing_levels']} are ABSENT from the "
+            f"data, so the index was silently narrowed -- that is very likely what "
+            f"manufactured these duplicates."
+        )
+    if report.get("nan_key_rows"):
+        bits.append(
+            f"Additionally {report['nan_key_rows']:,} row(s) carry NaN in a declared "
+            f"index level and are DELETED OUTRIGHT by the collapse (groupby dropna)."
+        )
+    if site == 'Wave.cluster_features':
+        bits.append(
+            "cluster_features is reduced with groupby().first(), which skips NA "
+            "per column -- so a conflicting cluster does not even yield one of its "
+            "households' rows, it yields a COMPOSITE. The comment that used to "
+            "license this ('Region/Rural/District are invariant within a cluster by "
+            "construction of the LSMS-ISA sampling design') is false here: this "
+            "cluster id is NOT unique at the grain it is being used at. Fix the "
+            "cluster key (e.g. make v a composite of district+cluster code), do not "
+            "declare a reducer: the core does not aggregate "
+            "(SkunkWorks/grain_aggregation_policy.org). "
+            "Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161."
+        )
+    else:
+        bits.append(
+            "Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN "
+            "or an index LEVEL IS MISSING -- fix the index (source a real id, or declare "
+            "the level the survey actually varies over). Do NOT declare a reducer: the "
+            "core does not aggregate (SkunkWorks/grain_aggregation_policy.org). "
+            "Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323."
+        )
+    return " ".join(bits)
+
+
+# Reports produced during a build, keyed by (country, table).  The collapse
+# happens deep in a per-wave call but must be stamped into the L2-country parquet
+# written much later by a different function, and pandas drops ``df.attrs`` across
+# merge/set_index/groupby (see CLAUDE.md) -- so routing the report through attrs
+# would silently lose it, which is the very failure mode being fixed here.
+_GRAIN_LEDGER: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+
+def _record_grain_report(report: dict[str, Any]) -> None:
+    """Emit a grain-collapse report and file it for the cache writer."""
+    key = (report.get("country") or "?", report.get("table") or "?")
+    existing = _GRAIN_LEDGER.setdefault(key, [])
+    if report not in existing:
+        existing.append(report)
+    _emit_grain_report(report)
+
+
+def _emit_grain_report(report: dict[str, Any]) -> None:
+    """Raise (strict) or warn (default).  The single choke point for the signal."""
+    msg = _format_grain_report(report)
+    if _grain_strict():
+        raise GrainCollapseError(msg)
+    warnings.warn(msg, GrainCollapseWarning, stacklevel=2)
+
+
+def grain_reports(country: str | None = None, table: str | None = None) -> list[dict]:
+    """Grain-collapse reports filed during this process (GH #323).
+
+    Public read-only accessor, for tests / the audit harness / a user who wants to
+    assert their analysis lost nothing.
+    """
+    out: list[dict[str, Any]] = []
+    for (c, t), reports in _GRAIN_LEDGER.items():
+        if country is not None and c != country:
+            continue
+        if table is not None and t != table:
+            continue
+        out.extend(reports)
+    return out
+
+
+def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
+    """Re-emit reports stamped into an L2 parquet by the cold build (GH #323).
+
+    THIS IS THE LINE THAT MAKES THE FIX REAL.  Without it every warning is a
+    cold-build-only event, and since practically all reads are warm, the loss goes
+    back to being invisible the moment the cache is populated -- which is precisely
+    how #323 survived its first fix.
+    """
+    if not isinstance(reports, list):
+        return
+    for report in reports:
+        if not isinstance(report, dict):
+            continue
+        report = {**report, "country": country, "table": table, "from_cache": True}
+        # _record_ (not just _emit_): grain_reports() must be a reliable account of
+        # what a session lost, whether the loss happened during THIS process's cold
+        # build or during some earlier one whose parquet we are now serving.
+        _record_grain_report(report)
+
+
+# ---------------------------------------------------------------------------
+# GH #323 -- SITE 2: the household -> cluster projection in Wave.cluster_features.
+#
+# A SECOND, hardcoded grain collapse, entirely separate from the declared-index
+# one in `_normalize_dataframe_index` (Site 1).  Countries that declare
+# ``i: <HHID>`` in their `cluster_features` idxvars (17 of them, so the YAML can
+# merge a household-level GPS frame) hand `Wave.cluster_features` a
+# HOUSEHOLD-grain table, which is then reduced to the declared ``(t, v)`` cluster
+# grain -- BEFORE `_normalize_dataframe_index` ever sees it.  So Site 1's audit
+# cannot see this loss: by the time it runs, the rows are already gone.
+#
+# The reduction was justified by a comment, and by nothing else:
+#
+#     "Region/Rural/District are invariant within a cluster by construction of
+#      the LSMS-ISA sampling design."
+#
+# Prose is not enforcement.  The claim fails exactly where a cluster code is
+# unique only WITHIN a district (or a region, or an enumeration area): two
+# genuinely different clusters collide on one ``v``, and ``.first()`` then keeps
+# one of their Regions and throws the other away.  The output is not a lossy
+# summary of the input -- it is a WRONG ROW, attributing one cluster's district to
+# another's households.  Under Design B (SkunkWorks/grain_aggregation_policy.org:
+# NO AGGREGATION IN CORE) the answer is not to teach core a better reducer; it is
+# to CHECK the invariant the comment merely asserted, and be loud when it fails.
+# Same machinery as Site 1: `_audit_index_collapse` + `_record_grain_report`, so
+# the finding is stamped into the L2 parquet and replayed on every warm read.
+#
+# GPS: THE LAST EXCEPTION, AND IT IS GONE (Ethan, 2026-07-13).
+# `Latitude`/`Longitude` used to be reduced with `.mean()` -- a cluster centroid --
+# on the theory that household GPS is genuinely per-household and so varies within
+# a cluster by design, making it a false positive for the audit and a legitimate
+# thing for core to average.  The corpus says otherwise.  Measured across every cell
+# where the `.mean()` could fire:
+#
+#   Malawi 2010-11   768 clusters    0 averaged   <- no-op
+#   Malawi 2013-14   204 clusters  188 averaged
+#   Malawi 2016-17   881 clusters    0 averaged   <- no-op
+#   Malawi 2019-20   819 clusters    0 averaged   <- no-op
+#   Niger  2021-22   555 clusters    0 averaged   <- no-op
+#
+# In FOUR OF FIVE cells the `.mean()` is a provable no-op: the published GPS *is*
+# the cluster's (displaced) fix, stamped onto each household -- it was never
+# household GPS at all.  In the fifth it averages points a median of 148 km and up
+# to 783 km apart, which is not a centroid, it is a BROKEN CLUSTER KEY -- and that
+# same cell is already warning for Region (93), District (165) and Rural (131).
+# The averaging was not summarising a cluster; it was smearing two clusters
+# together and hiding the evidence.
+#
+# So GPS is now audited and reduced exactly like every other column, and core
+# performs NO aggregation here at all.  Measured cost of the flip: ZERO new warning
+# cells -- every cell whose count it raises was already warning, and both silent GPS
+# cells stay silent.  The NO-AGGREGATION-IN-CORE contract
+# (SkunkWorks/grain_aggregation_policy.org) now has no exception left in it.
+#
+# (An analyst who genuinely wants a cluster centroid computes one -- that is what
+# transformations.py is for.  A country whose survey really does record per-household
+# GPS has put a household-level column in a cluster-grain table; the fix is to move
+# the column, not to teach core to average.)
+# ---------------------------------------------------------------------------
+
+
+def _collapse_to_cluster_grain(
+    df: pd.DataFrame,
+    keep_levels: list[str],
+    country: str | None = None,
+    wave: str | None = None,
+) -> pd.DataFrame:
+    """Project household-grain ``cluster_features`` onto the ``(t, v)`` grain.
+
+    Audits the projection BEFORE performing it -- one line later the evidence is
+    gone, and the parquet that gets cached is written from the collapsed frame,
+    which is why no downstream instrument (Site 1's audit included) can see this
+    loss.  Every column is treated alike: audited for destruction, then reduced
+    with ``.first()``.  Core does not aggregate -- not even GPS (see above).
+
+    ``.first()`` here is worse than it looks, and worth naming: pandas'
+    ``groupby().first()`` skips NA *per column*, so where households in a cluster
+    disagree it does not even return one of the source rows -- it assembles a row
+    out of the first non-null value of each column INDEPENDENTLY.  The result can
+    be a household composite that exists nowhere in the survey.  Hence: audit.
+    """
+    if not keep_levels:
+        return df
+
+    dropped_levels = [lvl for lvl in df.index.names if lvl not in keep_levels]
+
+    # AUDIT BEFORE DESTROYING -- on a frame from which the levels being PROJECTED
+    # AWAY have already been removed.  That removal is load-bearing and is the one
+    # subtlety here: ``_audit_index_collapse`` compares WHOLE ROWS via
+    # ``reset_index()``, and ``i`` is DISTINCT BY CONSTRUCTION within a cluster.
+    # Leave it in and every cluster with two households looks "destructive" --
+    # ~100% false positives, and the 11 Uganda clusters that genuinely disagree on
+    # Region are buried in the noise.  (Not hypothetical: the first cut of this
+    # patch did exactly that, and reported 2,304 destroyed rows for Uganda 2019-20
+    # instead of 947.  It was caught only by the test asserting that a LOSSLESS
+    # projection stays silent.)
+    #
+    # What is left is the real question: do the households of one cluster disagree
+    # about the CLUSTER'S OWN attributes?  If they do, the cluster id is not a
+    # cluster id.
+    audit_frame = df.droplevel(dropped_levels) if dropped_levels else df
+    report = _audit_index_collapse(audit_frame, keep_levels)
+    if report is not None:
+        report.update(country=country, table='cluster_features', wave=wave,
+                      site='Wave.cluster_features')
+        _record_grain_report(report)
+
+    return df.groupby(level=keep_levels, observed=True).first()
+
+
+def _sum_min_count_1(x):
+    """Sum that yields NA (not 0.0) when every value in the group is missing.
+
+    ``Series.sum()`` defaults to ``min_count=0``, so an all-NA group sums to
+    ``0.0``.  For an additive measure column that is a FABRICATION -- it asserts a
+    hard zero where the survey recorded nothing.  GH #323.
+    """
+    return x.sum(min_count=1)
+
+
 @build_transform()
 def _normalize_dataframe_index(
     df: pd.DataFrame,
     schema_entry: dict[str, Any],
     wave: str | None,
     table_name: str | None = None,
+    country: str | None = None,
 ) -> pd.DataFrame:
     """
     Reorder and reduce a dataframe's MultiIndex to match the declared schema.
@@ -4112,6 +4822,10 @@ def _normalize_dataframe_index(
     - Collapses duplicate entries: SUMs the additive measure columns for
       tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
       first row per group (the historical default).
+    - GH #323: AUDITS that collapse first, while the pre-collapse frame still
+      exists, and reports any destroyed rows loudly (or fatally, under
+      ``LSMS_GRAIN_STRICT``).  ``country`` is carried only so the report can name
+      the cell; it does not affect the transformation.
     """
 
     if not isinstance(df, pd.DataFrame):
@@ -4140,6 +4854,7 @@ def _normalize_dataframe_index(
 
     # Add synthetic levels when declared but missing (e.g., 't' for wave outputs)
     missing_levels = [lvl for lvl in declared if lvl not in current_names]
+    absent_levels: list[str] = []
     if missing_levels:
         df = df.reset_index()
         for level in missing_levels:
@@ -4147,9 +4862,29 @@ def _normalize_dataframe_index(
                 df[level] = wave
         # Only set_index with declared levels that actually exist in the DataFrame
         available = [lvl for lvl in declared if lvl in df.columns]
+        # GH #323: a declared level that is NEITHER an index level NOR a column is
+        # silently dropped here -- the index is narrowed behind the caller's back,
+        # which MANUFACTURES the duplicate tuples that the collapse below then
+        # destroys.  Two chained silent failures.  Record it so the collapse report
+        # can name it as the root cause (and so it is loud even when, by luck, the
+        # narrowed index stays unique).  Measured occurrences today: zero.
+        absent_levels = [lvl for lvl in declared if lvl not in df.columns]
         if available:
             df = df.set_index(available)
         current_names = list(df.index.names)
+
+    # Report the narrowing even when the narrowed index happens to stay UNIQUE --
+    # a silently narrowed index is a defect regardless of whether it also
+    # manufactured duplicates this time.  (When it DID manufacture them, the
+    # collapse report below names these levels as the likely root cause.)
+    if absent_levels and df.index.is_unique:
+        _record_grain_report({
+            "levels": [lvl for lvl in declared if lvl in df.index.names],
+            "rows": int(len(df)), "dropped": 0, "destroyed": 0,
+            "conflicting_groups": 0, "nan_key_rows": 0,
+            "missing_levels": absent_levels,
+            "country": country, "table": table_name, "wave": wave,
+        })
 
     # Reorder levels to match declaration
     present_declared = [lvl for lvl in declared if lvl in current_names]
@@ -4175,7 +4910,6 @@ def _normalize_dataframe_index(
     # Aggregate duplicates if any remain
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
-        n_dropped = int(df.index.duplicated().sum())
         # Convert unordered categoricals to strings so the groupby below works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
@@ -4184,29 +4918,72 @@ def _normalize_dataframe_index(
         # silently DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
         # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
-        # re-derive any per-unit Price from the summed totals -- no data lost,
-        # no warning.  Single source of truth for the additive column map lives
-        # in feature.py (imported lazily to avoid an import cycle).
+        # re-derive any per-unit Price from the summed totals -- no data lost.
+        # Single source of truth for the additive column map lives in feature.py
+        # (imported lazily to avoid an import cycle).
         from .feature import _ADDITIVE_MEASURE_COLUMNS
         additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
         present_additive = [c for c in (additive or ()) if c in df.columns]
+
+        # GH #323: AUDIT BEFORE DESTROYING.  This is the only moment at which the
+        # evidence exists -- one line further down the dropped rows are gone, and
+        # the parquet we cache is written from the collapsed frame, which is why
+        # every previous instrument (the old warning, diagnostics'
+        # _check_duplicate_index, any scan of var/) reported "clean".
+        report = _audit_index_collapse(df, present_levels)
+        if report is not None and present_additive and not report.get("unauditable"):
+            # The additive SUM is lossless over the columns it RECONCILES -- the
+            # additive measures themselves, plus a per-unit ``Price`` re-derived
+            # below from the summed totals -- so a disagreement confined to those
+            # is expected and is NOT destruction.  A disagreement in any OTHER
+            # column still is, so RE-AUDIT on what the sum does not fix rather than
+            # silencing the whole report.
+            #
+            # GH #323: silencing wholesale was safe only while `food_acquired` was
+            # the sole entry, because every column it carries is reconciled.
+            # `assets` is not like that: `Age` is genuinely per-unit (Nigeria W2's
+            # per-unit roster disagrees on it within 7,029 groups per round) and NO
+            # reducer preserves it at (t, i, j).  Registering `assets` as additive
+            # under the old rule would have traded a recovered `Value` total for a
+            # SILENT `Age` destruction -- the #323 disease, reintroduced by its own
+            # fix.  Losslessness is per column, so the audit must be too.
+            reconciled = list(present_additive)
+            if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
+                reconciled.append('Price')
+            residual = _audit_index_collapse(
+                df.drop(columns=reconciled), present_levels)
+            if residual is None:
+                report = None            # provably lossless once reconciled
+            elif not residual.get("unauditable"):
+                # An UNAUDITABLE residual is never silenced -- "we could not check"
+                # must not be downgraded to "it is fine"; keep the full report.
+                report = dict(report,
+                              destroyed=residual["destroyed"],
+                              conflicting_groups=residual["conflicting_groups"],
+                              additive_reconciled=reconciled)
+
         if present_additive:
-            agg = {c: ('sum' if c in present_additive else 'first') for c in df.columns}
+            # GH #323: `sum` defaults to min_count=0, so a group in which EVERY
+            # value is NA sums to 0.0 -- fabricating a hard zero where the truth is
+            # "unknown".  (`.first()` had the opposite vice: it silently DELETED such
+            # groups -- a #323-class row loss in its own right.)  min_count=1 yields
+            # NA instead, and _finalize_result's dropna(how='all') then drops the row
+            # honestly.  Measured: removes 103,902 fabricated Value=0 rows in Niger
+            # and 478 in Nigeria, restores both to baseline row counts, and leaves the
+            # recovered Value sums and every food_acquired total byte-identical.
+            # (country.py:2089 already uses min_count=1 for exactly this reason.)
+            agg = {c: (_sum_min_count_1 if c in present_additive else 'first')
+                   for c in df.columns}
             df = df.groupby(level=present_levels, observed=True).agg(agg)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
         else:
             df = df.groupby(level=present_levels, observed=True).first()
-            if n_dropped:
-                # No aggregation policy for this table -- surface the loss
-                # loudly rather than drop rows quietly (a table whose source
-                # legitimately has multiple rows per index tuple needs an
-                # explicit policy, like the additive sum above).
-                warnings.warn(
-                    f"Canonical index over {present_levels} had {n_dropped} "
-                    f"duplicate tuple(s); collapsed via groupby().first(), dropping "
-                    f"those rows (possible silent data loss — GH #323).",
-                    RuntimeWarning,
-                )
+
+        if report is not None:
+            report.update(country=country, table=table_name, wave=wave,
+                          missing_levels=absent_levels or None,
+                          additive=bool(present_additive))
+            _record_grain_report(report)
 
     return df

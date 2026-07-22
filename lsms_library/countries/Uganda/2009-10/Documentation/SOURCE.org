@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/1001
+
+#+CATALOG_ID: 1001
+#+CATALOG_IDNO: UGA_2005-2009_UNPS_v03_M
+#+CATALOG_TITLE: National Panel Survey 2005-2009
+#+CATALOG_YEARS: 2005-2010
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/9vep-e461
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/1001
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

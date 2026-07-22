@@ -260,6 +260,435 @@ files are the R6 slice.
   R6/R7 area_output PAs 21-23 (extra Debre-Birhan sub-sites not in the
   erhs_village_* Code tables -> NaN Region/Woreda/v).
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered for GH #601 (population statements).  This section records
+what the ERHS documentation *claims* about the population its samples
+represent.  It is deliberately kept apart from what the data look like: no
+statement below is inferred from a =.dta=.  Nothing here proposes a schema --
+representation is GH #603's question, not this section's.
+
+** Where the statement lives
+
+All eight waves' universe evidence comes from ONE document, held in this
+repository:
+
+- Title :: "The Ethiopian Rural Household Surveys 1989-2009: Introduction",
+     Stefan Dercon and John Hoddinott, July 20, 2011.
+- Path :: =<wave>/Documentation/Overview and Acknowledgements and Data Description.pdf=
+- Note :: the file is byte-identical in all eight wave =Documentation/=
+     directories (md5 =bd61f8994668f4fb143daae09ad6d34b=, verified), and it
+     covers rounds 1989-2009 as a single narrative.
+
+Two consequences worth stating plainly:
+
+1. *This is local documentation, not catalog metadata.*  ERHS is not a World
+   Bank survey (=discoverable=False= in =_COUNTRY_CATALOG=; provenance is the
+   IFPRI Dataverse DOI =10.7910/DVN/T8G8IV=, see "Data Source" above).  There
+   is therefore no WB NADA record to fall back on -- and, correspondingly,
+   *none of the WB NADA boilerplate.*  In particular the corpus-wide template
+   sentence "The survey covered all de jure households excluding prisons,
+   hospitals, military barracks, and school dormitories" (verbatim in 15 waves
+   elsewhere in the library) does NOT appear here.  What is quoted below is an
+   authored statement by the survey's own principal investigators.
+2. *The universe is stated once, for the series, not once per round.*  Only
+   1989 and 1999 have any round-specific coverage language.  For 1994b, 1995,
+   1997, 2004 and 2009 the statement below is inherited, not restated -- see
+   "Gaps" at the end of this section.
+
+All quotes are verbatim from the PDF text layer, with typographic apostrophes
+normalized to ASCII =\'= per the repo's ASCII convention; no other change.
+
+** The declared universe (1994 onward: rounds R1-R7)
+
+Section 3 "Overview of the surveys", printed p. 8, the paragraph immediately
+preceding Table 1:
+
+#+begin_quote
+To be clear, these data are not nationally representative. However, they can be
+considered broadly representative of households in non-pastoralist farming
+systems as of 1994. With only 15 communities, but relatively large samples
+within each village, the interpretation of the results in terms of rural
+Ethiopia as a whole has to be done with care.
+#+end_quote
+
+This is one of only three waves-worth of documentation in the whole library
+that *denies* a well-defined national universe outright (the others being China
+1995-97 and Albania 1996).  It is not a hedge appended to a national claim; it
+is the claim.  *Anyone pooling EthiopiaRHS with nationally representative LSMS
+waves is pooling across that denial*, and the documentation says so before it
+says anything else about representativeness.
+
+The positive claim it does make -- "broadly representative of households in
+non-pastoralist farming systems as of 1994" -- is (a) a *farming-system*
+universe, not an administrative or national one, and (b) explicitly anchored to
+*1994*, i.e. it is not restated for the later rounds.
+
+Frame construction, same document, Section 1 (p. 2) and Section 3 (pp. 6-7):
+
+#+begin_quote
+In 1994, the survey was expanded to cover 15 villages across the country.1 An
+additional round was conducted in late 1994, with further rounds in 1995, 1997,
+1999, 2004 and 2009. In addition, nine new villages were selected giving a
+sample of 1477 households. The nine additional communities were selected to
+account for the diversity in the farming systems in the country, including the
+grain-plough areas of the Northern and Central highlands, the enset-growing
+areas and the sorghum-hoe areas.
+#+end_quote
+
+Footnote 1 (p. 2) fixes the unit that "village" denotes throughout:
+
+#+begin_quote
+In Ethiopia, the smallest unit of aggregation is the Peasant Association, an
+administrative unit of one or a small number of villages. In this
+documentation, we use "Peasant Association" and "village" interchangeably.
+#+end_quote
+
+Sampling within the frame, Section 3, p. 7:
+
+#+begin_quote
+A list of all households was constructed with the help of the local Peasant
+Association (PA) officials. ... In virtually all villages, therefore, there were
+good lists of the households in the village which could be used as a sampling
+frame.
+#+end_quote
+
+#+begin_quote
+Within each village, random sampling was used, stratified by female headed and
+non-female headed households, including (as explained above) an attempt to
+re-randomize the 1989 study villages, via extra sampling from new entrants,
+splits and newly formed households.
+#+end_quote
+
+And the document's own scale caveat on the village frame (Section 3, p. 7):
+
+#+begin_quote
+While in the context of sampling theory, one could argue that the sampling
+frame to select the villages was strictly stratified in the main agro-ecological
+zones and sub-zones, and one to three villages per strata was selected, it
+should be remembered that we have sampled only 15 of the thousands of villages
+in rural Ethiopia.
+#+end_quote
+
+** The declared universe (1989: the pre-expansion IFPRI round)
+
+1989 is a *different frame* with a *different purpose*, and the document says so
+directly.  Section 3, printed p. 6, first paragraph (the same sentences appear
+in Section 1, p. 2):
+
+#+begin_quote
+In 1989, IFPRI conducted a survey in seven Peasant Associations located in the
+regions Amhara, Oromiya and the Southern Ethiopian People's Association (now
+called SNNPR), see Webb, von Braun and Yohannes (1992). Civil conflict prevented
+survey work from being undertaken in Tigray. Under extremely difficult field
+conditions, household data were collected in order to study the response of
+households to food crises. The study collected consumption, asset and income
+data on about 450 households. Households were randomly selected within each
+Peasant Association, while the Peasant Associations selected were mainly areas
+that had suffered from the 1984-1985 famine and other droughts that followed
+between 1987 and 1989. At least four of the areas are considered particularly
+vulnerable, while two (Debre Berhan and Adele Keke) may be less vulnerable but
+still suffered from the famine (See also Dercon and Krishnan 1995).
+#+end_quote
+
+The 1989 village selection is therefore *purposive and famine-targeted*
+("mainly areas that had suffered from the 1984-1985 famine"), with random
+selection only *within* the chosen Peasant Associations.  1989 is NOT covered by
+the 1994 self-weighting-by-farming-system design (see below), and the document
+states its frame deviates from population shares -- Section 3, p. 8:
+
+#+begin_quote
+For the 1989 sample, however, the sampling proportions deviate from the
+population shares due to the absence of Northern Highland villages that were
+inaccessible because of war activity.
+#+end_quote
+
+** Exclusions
+
+These are what a reader pooling this country most needs before averaging
+anything.
+
+| Wave       | Exclusion                                                    | Basis stated in the document           |
+|------------+--------------------------------------------------------------+----------------------------------------|
+| 1989       | Tigray region entirely                                       | civil conflict / war activity          |
+| 1989       | Northern Highland villages                                   | inaccessible because of war activity   |
+| 1994a-2009 | pastoralist farming systems (~10% of the rural population)   | universe is non-pastoralist systems    |
+| 1994a-2009 | one 1989 village, semi-pastoralist, Southern Ethiopia        | violent conflict in the area           |
+| 2004       | the three villages added in 1999 (Oda Dawata, Bako Tibe, Somodo) | insufficient funding              |
+| all        | urban Ethiopia (in fact; see the caveat below)               | *not stated as a universe exclusion*   |
+
+Verbatim, in order.
+
+Security / conflict, 1989 (Section 3, p. 6; also Section 1, p. 2):
+
+#+begin_quote
+Civil conflict prevented survey work from being undertaken in Tigray.
+#+end_quote
+
+Security / conflict, at the 1994 restart (Section 3, pp. 6-7):
+
+#+begin_quote
+In 1994, CSAE and Economics/AAU started a panel survey incorporating six of the
+seven villages earlier surveyed in 1989 by IFPRI. (The remaining village in a
+semi-pastoralist area in Southern Ethiopia could not be revisited again because
+of violent conflict in the area).
+#+end_quote
+
+Population exclusion -- pastoralists.  The universe sentence excludes them by
+construction ("non-pastoralist farming systems"), and the footnote to Table 1
+(p. 8) sizes what that leaves out:
+
+#+begin_quote
+percentage of rural sedentary population;  pastoralist   population is about 10
+percent of total rural pop.
+#+end_quote
+
+That is: the population shares against which the sample is benchmarked in
+Table 1 are shares of the *rural sedentary* population, and the pastoralist
+population -- about a tenth of rural Ethiopia -- is outside the declared
+universe altogether.
+
+Funding exclusion, 2004 (Section 2 viii "The number of villages (2)", p. 6):
+
+#+begin_quote
+There was not sufficient funding to re-survey these villages in 2004.
+#+end_quote
+
+*Urban -- a deliberate non-claim.*  Every ERHS village is rural and the survey
+is titled "Rural Household Survey", but the documentation never states an
+urban exclusion as a universe statement; the closest it comes is calling the
+data "broadly representative of households in non-pastoralist farming systems".
+That distinction is preserved here on purpose: what the survey covers in fact
+and what it declares are two different facts, and the library's =sample=
+table already sets =Rural = 'Rural'= for every ERHS household as a *survey
+property* (see the Status notes above), which is an in-repo assertion, not a
+quotation.
+
+** Oversamples and sub-populations
+
+Specialization in ERHS lives *inside* the series rather than as a whole wave,
+which is the pattern the #601 sweep found across the library.  Four items, all
+documented:
+
+1. *Stratified oversampling of female-headed households, within every village*
+   (Section 3, p. 7).  This is a design stratum, not an incidental split:
+
+   #+begin_quote
+   Similarly, we made sure that an exact proportion of female headed households
+   were included via stratification.
+   #+end_quote
+
+2. *Stratified inclusion of landless households, within every village*
+   (Section 3, p. 7):
+
+   #+begin_quote
+   It had been suggested that in some areas landlessness is increasing, since
+   with the absence of redistribution and a ban on land sales and rental against
+   fixed payment no legal mechanisms exist for young households to acquire land
+   in land constrained areas. To make sure that these households were properly
+   represented we stratified the sample within each village to ensure a
+   representative number of landless households to be included. In practice, in
+   most areas this resulted only in a very small number of landless households to
+   be included.
+   #+end_quote
+
+3. *1999 (R5) carries three extra villages that no other round has*, added for a
+   round-specific purpose and dropped afterwards (Section 2 viii, p. 6):
+
+   #+begin_quote
+   In 1999, three additional villages - Oda Dawata, Bako Tibe and Somodo were
+   surveyed. The principal focus of the 1999 survey round was agricultural
+   productivity interest and it was felt that adding villages in higher
+   productivity villages would be informative. There was not sufficient funding
+   to re-survey these villages in 2004.
+   #+end_quote
+
+   The document gives the *rationale* for the extension but does NOT restate a
+   revised universe for the enlarged 1999 sample.  So 1999's recorded universe
+   is the series statement PLUS this documented, high-productivity, purposively
+   added three-village extension -- an extension that is, on the document's own
+   account, selected for being *unrepresentative* of the panel villages.  A
+   1999-vs-other-round comparison that does not hold the village set fixed is
+   comparing different frames.
+
+4. *The 1994 round is partly a panel continuation and partly a fresh draw*, and
+   the two halves have different histories: six villages carried over from the
+   purposive 1989 famine-vulnerability frame (with a re-randomization attempt),
+   plus nine newly selected villages.  Section 3, pp. 6-7:
+
+   #+begin_quote
+   In these villages, an attempt was made to re-randomize the sample by including
+   an exact proportion of newly formed or arrived households in the sample, as
+   well by replacing the lost households by households which were considered by
+   village elders and officials as broadly similar to in demographic and wealth
+   terms as the households which could not be traced.
+   #+end_quote
+
+   Tracing rule (Section 3, p. 6):
+
+   #+begin_quote
+   the tracing rule was based on the definition of a panel household, a household
+   that had still members of the 1989 household living in the village.
+   #+end_quote
+
+** Universe vs. what the weights represent
+
+The documentation and the library's =sample= table come apart here, and the gap
+is worth naming explicitly rather than leaving to be rediscovered.
+
+What the document claims (Section 3; the sentence straddles the printed p. 7 /
+p. 8 break) is a design property, not a set of expansion factors:
+
+#+begin_quote
+Sampling size in each village was governed by an attempt to obtain a
+self-weighting sample, when considered in terms of farming system: each person
+(approximately) represents the same number of persons from the main farming
+systems. The advantage is that pooling of the data is simplified, although
+alternative procedures could easily have been implemented.
+#+end_quote
+
+And it states plainly that the ingredients for weighting are missing
+(Section 3, p. 7):
+
+#+begin_quote
+The information available for ex-ante or ex-post weighing of the sample when
+pooled is limited. The available population figures for Ethiopia at the time of
+the survey were based on a questionable census of 1984, while linking farming
+systems to population figures turned out not to be straightforward.
+#+end_quote
+
+This *corroborates* -- it does not contradict -- the decision recorded in the
+Status section above, that =weight= / =panel_weight= are set to a uniform 1.0
+and are "Explicitly NOT expansion factors".  The documentary basis for that
+choice is the two quotes here; cross-reference rather than duplicate.  Note the
+scope, though: self-weighting is claimed *in terms of farming system*, and
+*for the 1994 frame only*.  It is not claimed for 1989, whose sampling
+proportions the document says deviate from population shares (quoted above).
+
+The library's =sample()= covers 1989 on the same uniform-1.0 basis as the
+1994+ waves; the documentation gives no warrant for treating the 1989 draw as
+self-weighting, so a pooled 1989 + 1994-onward computation is mixing a
+purposive famine-targeted frame with a self-weighted-by-farming-system one.
+
+** Gaps -- recorded as gaps
+
+Recorded per the repo's standing rule against unevidenced claims.  "No
+statement found" below means *searched and not present*, not *does not exist*.
+
+- 1994b (R2), 1995 (R3), 1997 (R4), 2004 (R6) :: no round-specific universe
+     statement exists in any file in this repo.  These waves inherit the single
+     series statement quoted above.  Searched, per wave: the full
+     =<wave>/Documentation/= listing; =Overview and Acknowledgements and Data
+     Description.pdf= (identical copy, extracted in full and grepped for
+     represent / sampl / universe / population / random / stratif); the wave's
+     =ERHS_hhquestionnaire_<wave>.pdf= front matter; =Table of Contents.pdf=;
+     =Documentation/SOURCE.org=; this file.  The document treats the later
+     rounds as revisits, and what it says changes across rounds is *attrition*,
+     not universe (Section 2 ix, p. 6: "Just under 8 per cent of the sample was
+     lost between 1994 and 1999, and a further 5.2 percent were lost from 1999
+     and 2004.").
+- 2009 (R7) :: *medium confidence, and the reason matters.*  The document is
+     dated July 20, 2011, its title spans 1989-2009, and Section 1 (p. 2) lists
+     2009 among the rounds -- so the series universe statement is documented as
+     covering R7.  But the body of the document predates the 2009 release; at
+     Section 2 v "Other survey rounds" (p. 5) it says only:
+
+     #+begin_quote
+     Data have also been collected in 2009. This data will be made available in
+     the future.
+     #+end_quote
+
+     There is *no* 2009-specific description of coverage, village count, or
+     exclusions anywhere in this repository.  Whether the 15-village frame was
+     re-surveyed in full in 2009 is *not stated in any document we hold*.  The
+     nearest thing to a 2009 coverage statement is =Table of Contents.pdf=,
+     which records "19 files in Excel format with data on the 15 communities
+     surveyed in Round 7 (2009) of the survey" -- a file-inventory line about the
+     community module, not a household universe.  Searched: full
+     =2009/Documentation/= listing; the overview PDF extracted in full (3421
+     lines) and grepped, including for "2009"; =ERHS_hhquestionnaire_2009.pdf=
+     front matter (cover + interview log); =Table of Contents.pdf=;
+     =Documentation/SOURCE.org=; =EthiopiaRHS/2009.txt=; this file.
+- 1989 questionnaire :: =ERHS_hhquestionnaire_1989.pdf= yields no extractable
+     text (scanned image), so it could not be searched for a universe or
+     eligibility statement.  Recorded so a future reader with OCR knows this
+     stone is unturned.
+- Module-level sub-universes :: not documented.  The overview notes only that
+     "The data collection was a complicated process, using different
+     questionnaires - which contained common parts - for the different Peasant
+     Associations" (Section 4, p. 12), which is an instrument-variation
+     statement, not a per-module universe.  Whether particular modules were
+     administered to sub-samples is unrecorded either way.
+- Community-level unit :: the 2004 community instrument does define its own
+     unit -- "For this questionnaire, the community is defined as the peasant
+     association (PA), but we want to know information about locally well-defined
+     neighborhoods as well" (=ERHS_Community Questionnaire 2004.pdf=,
+     "Instructions to enumerators", p. 1) -- but this is the community module's
+     observation unit, not the household universe.
+
+** Two numeric discrepancies noticed while checking (not resolved here)
+
+Flagged, not fixed; both are in the source or in this file's own earlier prose,
+and neither is settled by the evidence gathered for #601.
+
+1. *Household count.*  The documentation says the 1994 expansion gives "a sample
+   of 1477 households" (Section 1, p. 2, and Section 3, p. 7 -- 1477 in both
+   places).  The "Survey Program" section above says "~1,494 households".  The
+   documentation's figure is 1477; where 1,494 came from is not recorded.
+2. *1989 village count.*  The document is internally inconsistent: Section 1
+   (p. 2) says "a team visited 6 farming villages in Central and Southern
+   Ethiopia" and then, two sentences later, "IFPRI conducted a survey in seven
+   Peasant Associations".  The "6--7 villages" phrasing in the "Survey Program"
+   section above faithfully tracks that inconsistency; it is the document's, not
+   ours.
+
+* food_acquired grain: repeat lines, double-punches (GH #323)
+
+The q36 food module is a ONE-ROW-PER-FOOD-ITEM roster.  All 27 source
+columns were enumerated: there is NO line / transaction / occasion /
+visit identifier (=q36_1a= is a section flag, 1.0/NaN/2.0, NOT a line
+number).  So =(t, i, j, u, s)= IS the maximal grain the instrument
+supports -- there is no finer axis to name, and none should be invented.
+
+The roster nevertheless carries MULTIPLE LINES per (household, item).
+Most differ in UNIT (=u= is in the index, so they do not collide and are
+preserved).  The rest split two ways, and the distinction is
+load-bearing:
+
+- 127 rows (1994a-1997) are a second acquisition of the SAME item, in
+  the SAME unit, from the SAME source, carrying DIFFERENT measurements
+  (1997 hh 10_93 produced Berbere 1.0 kg AND 30.0 kg).  These are REAL,
+  and core already handles them: =food_acquired= is in =feature.py='s
+  =_ADDITIVE_MEASURE_COLUMNS=, so the collapse to the canonical grain
+  SUMS Quantity and Expenditure.  (=first= would destroy ~50% of the
+  Quantity/Expenditure mass in the affected cells.)
+
+- 90 rows are byte-identical in the canonical grain AND in both measures
+  -- one measurement punched twice (food89.dta rows 865/866 are identical
+  in EVERY source column: hh 20120, foodcode 34, qty 2.0, unit 9, value
+  0.5).  Because the collapse SUMS, these are DOUBLE-COUNTED (the API
+  reported Fenugreek 4.0/1.0 for that household).
+  =ethiopiarhs.food_acquired= drops them via =_drop_double_punched()=
+  BEFORE the framework sums: 514.9 Quantity and 343.1 Birr of
+  overstatement removed.
+
+The dedup is what makes the sum correct.  The sum is unconditional (it is
+core's, not this country's, and it is right for the 127 real repeats);
+without the dedup, the 90 punch-duplicates are counted twice.
+
+JUDGMENT CALL: a household *could* genuinely acquire the same item, same
+unit, same source, same amount, same price, twice in a recall week; the
+instrument records no axis on which such rows differ, so the data cannot
+settle it.  We drop (conservative).  Being wrong understates by 90 rows
+(silently missing); summing overstates (silently wrong), and the latter
+is the worse failure.
+
+Also: the wide melt path now filters missing =j= (as the 1989 path always
+did).  11 NaN-j rows (1995) were previously deleted by accident --
+=groupby(level=...)= defaults to =dropna=True=, so a NaN index key
+silently vanishes during the collapse.  The item is unidentifiable, so
+the row is now dropped deliberately rather than by pandas' default.
+
 * Food security (non-FIES families, GH #332) --- not wired
 
 ERHS carries only bespoke, non-standardized food-stress items (IFPRI

@@ -13,6 +13,198 @@ each grappe is visited in exactly one =vague=, so household
 identifier is =(grappe, menage)= without a vague level.  See
 CLAUDE.md "EHCVM countries" for the cross-country pattern.
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence for what the Togo wave *claims* to represent, kept deliberately
+separate from what the data look like.  Nothing here is inferred from any
+=.dta=; every claim is a quotation with a citation.  Companion to
+"Sampling Design" above (which records the =grappe=/=vague= identifier
+convention) and to "Household Presence / MonthsSpent" below (which
+records the 6-month residency filters =s01q12= / =s01q13= that operationalise
+"de jure" membership at the person level).
+
+Design representation is out of scope here --- GH #603 is deciding how the
+library should *encode* this.  This section is evidence only.
+
+** 2018 (EHCVM 2018/19)
+
+*** Declared universe (verbatim)
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals,
+military barracks, and school dormitories.
+#+end_quote
+
+Source: World Bank Microdata Library catalog entry *4298*
+(=TGO_2018_EHCVM_v02_M=; the id recorded in
+=2018/Documentation/SOURCE.org= as =#+CATALOG_ID: 4298=), DDI field
+=study_desc.study_info.universe=; rendered on the study-description page
+under Coverage > Universe.  Language: English (the source text is in
+English --- no translation needed; the local questionnaires are in French).
+
+Verified 2026-07-21 by re-fetching
+https://microdata.worldbank.org/metadata/export/4298/json --- byte-identical
+to the quote above.  The same record gives:
+
+| DDI field                       | value (verbatim)                     |
+|---------------------------------+--------------------------------------|
+| =study_info.geog_coverage=      | =National coverage=                  |
+| =study_info.analysis_unit=      | =- Household  - Individual  - Community= |
+| =method...sampling_deviation=   | (absent)                             |
+| =method...weight=               | (absent)                             |
+| =method.analysis_info.response_rate= | (absent)                        |
+
+*** WARNING: this universe sentence is NADA boilerplate, not a Togolese claim
+
+The sentence quoted above is *World Bank NADA template text*.  It appears
+verbatim in 15 waves across the corpus --- all eight WAEMU/EHCVM countries
+(Benin, Burkina Faso x2, Cote d'Ivoire, Guinea-Bissau, Mali, Niger, Senegal,
+Togo) and also Ethiopia 2018-19 / 2021-22 and Nigeria 2015-16 / 2018-19 /
+2023-24, which are not EHCVM at all.  Its presence attests *which metadata
+template was used*; it does **not** independently attest that INSEED made
+that claim about this survey.  Do not treat it as a statistical office's
+statement about Togo.
+
+Corroborating this reading: the Togo Basic Information Document (INSEED /
+World Bank, June 2021; catalog download id 52590) contains **no** universe
+statement and **no** exclusion clause at all --- greps for =universe=,
+=exclud=, =prison=, =barrack=, =nomad=, =homeless=, =institution= over the
+full 20-page text return only an unrelated hit ("access to financial
+institutions", Section 6).  The exclusion of collective/institutional
+dwellings is asserted *only* by the catalog template.
+
+*** WHERE THE STATEMENT LIVES: catalog only, nothing local
+
+There is **no universe or target-population statement in any file this
+repository holds** for this wave.  =2018/Documentation/= contains only
+=SOURCE.org= (URL + provenance keywords), =LICENSE.org= (access policy and
+citation), and five DVC-tracked questionnaire spreadsheets
+(=tgo_ehcvm1_qnr_household_excel_vague{1,2}.xls=,
+=tgo_ehcvm1_qnr_community_excel_vague{1,2}.xls=,
+=EHCVM_UEMOA_MEN_TOGO_V2.xls=).  No report, no BID, no abstract PDF is
+shipped locally.  =_/CONTENTS.org= and =2018/_/notes.org= were grepped for
+=univers|populati|menage|couvert|echantill|exclu= --- only incidental hits
+on food/nonfood item labels and id-structure notes.
+
+Consequence: for Togo the population record is a *moving target held on the
+World Bank's servers*, not something the library holds.  If catalog 4298 is
+revised, this section becomes stale silently.  (Togo is one of 41 of 111
+waves in this position.)
+
+*** Geographic coverage and the Lome Commune sentence (quoted, NOT corrected)
+
+Catalog 4298, Sampling > Sampling Procedure, opening sentence --- identical
+text in the Basic Information Document, section "Sample", *PDF page 10*,
+first sentence (both verified 2026-07-21):
+
+#+begin_quote
+The Togo EHCVM 2018/19 sample covers all regions with urban and rural areas
+surveyed in all regions except Lome Commune where all respondents are from
+rural areas.
+#+end_quote
+
+*Read that twice.*  It is quoted exactly as printed in both sources.  It is
+internally implausible --- Lome Commune is the wholly urban capital district
+--- and reads like an urban/rural transposition in the source document
+(compare Guinea-Bissau's structurally identical sentence, which says the
+autonomous sector of Bissau is the one where "all respondents are from
+*urban* areas").  It is reproduced here uncorrected on purpose.  **Do not
+silently "fix" it**, and do not treat the corrected reading as documented:
+what is documented is the sentence above.
+
+Practical import either way: *Lome Commune is a single-milieu stratum*.
+Whichever milieu the source meant, one of urban/rural is absent from Lome
+Commune by design, so a rural/urban contrast computed within Lome Commune is
+not estimable, and pooled urban/rural comparisons carry a design asymmetry
+there.
+
+*** Exclusions --- summary
+
+| kind                | what is excluded                                        | evidence                                        |
+|---------------------+---------------------------------------------------------+-------------------------------------------------|
+| Population/institutional | prisons, hospitals, military barracks, school dormitories | catalog 4298 Universe field --- *NADA boilerplate*; absent from the BID |
+| Geographic (region) | none --- "National coverage"; all regions surveyed      | catalog 4298 Geographic Coverage + Sampling Procedure |
+| Geographic (milieu) | one milieu absent in Lome Commune (source says rural-only; see caveat above) | catalog 4298 Sampling Procedure; BID p.10       |
+| Security carve-out  | none stated                                             | no =sampling_deviation= field in the DDI record |
+| Nomadic / homeless / diplomatic | *not mentioned either way*                  | --- (a gap, not a "no")                          |
+
+Note what is *not* in the record: unlike sibling EHCVM documentation
+elsewhere (e.g. the French EHCVM instruments quoted under Burkina Faso,
+which exclude =les sans domiciles fixes= and =les menages ayant un statut
+diplomatique=), nothing in Togo's catalog entry or BID says anything about
+homeless, nomadic, or diplomatic households.  That is silence, not a
+documented inclusion.
+
+*** Oversamples and sub-populations: NONE FOUND
+
+No booster, no ethnic or programme sub-sample, no refresh/extended split, no
+module subsample, and no cross-section-plus-panel combination is documented
+for this wave.  The design as stated is a plain stratified two-stage draw.
+
+The one structure that could be mistaken for a sub-sample is the *two-wave
+seasonal split*, which is a fielding split of one sample, not two
+populations.  BID p.4, "Survey Characteristics" (verified verbatim):
+
+#+begin_quote
+The surveys took place in two waves with each wave covering half of the
+sample. The first wave was fielded between September 2018 and December 2018,
+while the second wave occurred between April 2019 and June 2019. The
+two-wave approach was chosen to account for seasonality of consumption.
+#+end_quote
+
+The library folds both fielding waves into the single wave directory =2018=
+(=t = "2018"=), so the seasonal half-samples are pooled by default.  Anyone
+computing consumption levels should know they are averaging a
+Sept--Dec 2018 half and an Apr--Jun 2019 half.
+
+Sample-design magnitudes --- *context, not universe* (catalog 4298 Sampling
+Procedure; identical in BID p.10): two-stage design; 540 EAs at stage 1;
+12 households per EA at stage 2; total 6,171 households (2,270 urban,
+3,901 rural); each EA split into two equal halves, one per fielding wave;
+wave 1 = 2,931 households (1,034 urban, 1,897 rural), wave 2 = 3,240
+households (1,236 urban, 2,004 rural).
+
+*** Universe vs. what the weights represent
+
+*Unresolvable from the record.*  The DDI entry for 4298 carries **no**
+=weight=, no =sampling_deviation= and no =response_rate= field, and the BID
+says nothing about what the weights are constructed to represent.  So for
+Togo the two cannot be compared: only the (boilerplate) universe is on
+record.  Do not assume the weights represent the boilerplate universe ---
+nothing states it.
+
+*** Programme context (why the sibling countries look identical)
+
+BID, Introduction, p.3, verbatim:
+
+#+begin_quote
+The EHCVM 2018/19 is the first edition of a nationally representative
+household survey conducted within the Programme d'Harmonisation et de
+Modernisation des enquetes sur les Conditions de Vie des Menages (PHMECV
+program), a joint program by the World Bank and the WAEMU Commision. The
+main aim of the program is to strengthen the capacity of its member
+countries (Benin, Burkina Faso, Cote d'Ivoire, Guinee Bissau, Mali, Niger,
+Senegal, and Togo) to conduct living conditions surveys that meet
+harmonized, regional standards and to make the collected micro-data publicly
+accessible.
+#+end_quote
+
+(Transcription notes: accents dropped and curly apostrophes replaced for
+ASCII; a footnote marker after "PHMECV program" is dropped and the
+parenthesis closed --- the PDF prints "(PHMECV program2" with an unclosed
+paren.  "Commision" is the source's own spelling.  Wording otherwise
+unaltered.)  A
+near-identical universe sentence should therefore be expected for the other
+seven EHCVM countries --- and *is* found there, which is exactly why it
+cannot be read as a Togo-specific claim.
+
+*** Gap: the =_forEthan= extracts have no documented universe
+
+=2018/Data/= additionally contains non-EHCVM extracts
+(=Togo_survey2018_*_forEthan.dta= / =.csv=) shipped with no documentation of
+their own.  No universe statement is available for those files, and none was
+inferred from their contents.  Recorded as a gap.
+
 * food_acquired units (Benin<->Togo codebook link)
 
 Togo's =s07bq03b= unit variable stores bare numeric codes (100-662): its

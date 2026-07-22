@@ -1,1 +1,14 @@
+SOURCE
+
 https://microdata.worldbank.org/index.php/catalog/2251
+
+#+CATALOG_ID: 2251
+#+CATALOG_IDNO: TZA_2010_KHDS_v01_M
+#+CATALOG_TITLE: Kagera Health and Development Survey 2010, Wave 6
+#+CATALOG_YEARS: 2010-2010
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/x11b-sx16
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2251
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

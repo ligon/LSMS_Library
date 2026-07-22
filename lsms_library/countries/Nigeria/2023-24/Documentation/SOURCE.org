@@ -1,1 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/6410/
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/6410
+
+#+CATALOG_ID: 6410
+#+CATALOG_IDNO: NGA_2023_GHSP-W5_v01_M
+#+CATALOG_TITLE: General Household Survey, Panel 2023-2024
+#+CATALOG_YEARS: 2023-2024
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/zd5s-tj25
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6410
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

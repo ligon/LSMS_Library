@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/39ay-kr43]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/72
+
+#+CATALOG_ID: 72
+#+CATALOG_IDNO: TJK_2007_TLSS_v01_M
+#+CATALOG_TITLE: Living Standards Survey 2007
+#+CATALOG_YEARS: 2007-2007
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/39ay-kr43
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/72
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

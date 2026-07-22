@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/96jx-pv42]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/587
+
+#+CATALOG_ID: 587
+#+CATALOG_IDNO: NIC_1998_EMNV_v01_M
+#+CATALOG_TITLE: Encuesta Nacional de Hogares sobre Medición de Niveles de Vida 1998-1999 (Panel)
+#+CATALOG_YEARS: 1998-1999
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/96jx-pv42
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/587
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/w7v4-sz09]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/596
+
+#+CATALOG_ID: 596
+#+CATALOG_IDNO: PER_1990_ENNIV_v01_M
+#+CATALOG_TITLE: Encuesta Nacional de Hogares sobre Medición de Niveles de Vida 1990
+#+CATALOG_YEARS: 1990-1990
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/w7v4-sz09
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/596
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

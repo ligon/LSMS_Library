@@ -215,15 +215,23 @@ def test_feature_ghana_per_wave():
     if g.empty or CURRENCY_LEVEL not in g.index.names:
         pytest.skip("GhanaLSS food_expenditures unavailable")
     flat = g.reset_index()
-    by_wave = flat.groupby("t")[CURRENCY_LEVEL].agg(
-        lambda s: set(s.dropna().unique())
-    )
-    if "2005-06" in by_wave.index:
-        assert by_wave.loc["2005-06"] == {"GHC"}
-    post = [w for w in ("2012-13", "2016-17") if w in by_wave.index]
+    # Build the per-wave code sets directly rather than via groupby().agg():
+    # a reducer returning a ``set`` is a list-like, which pandas unwraps back
+    # into a Series element (``{'GHC'}`` -> ``['GHC']``), so the assertions
+    # below would compare a list against a set and fail on type alone.  A plain
+    # dict comprehension keeps the values honest ``set`` objects.
+    by_wave = {
+        wave: set(grp[CURRENCY_LEVEL].dropna().unique())
+        for wave, grp in flat.groupby("t")
+    }
+    # Set equality (not membership) is the point: a wave carrying *two* codes,
+    # or the wrong one, or none, must still fail.
+    if "2005-06" in by_wave:
+        assert by_wave["2005-06"] == {"GHC"}
+    post = [w for w in ("2012-13", "2016-17") if w in by_wave]
     for w in post:
-        assert by_wave.loc[w] == {"GHS"}
-    assert post or "2005-06" in by_wave.index, "no GhanaLSS waves materialized"
+        assert by_wave[w] == {"GHS"}
+    assert post or "2005-06" in by_wave, "no GhanaLSS waves materialized"
 
 
 def test_feature_non_monetary_unaffected():

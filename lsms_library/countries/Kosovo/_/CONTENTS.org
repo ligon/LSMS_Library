@@ -1,5 +1,254 @@
 #+title: Contents
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 for GH #601.  Kosovo has a single wave in this
+repository (=Country('Kosovo').waves == ['2000']=), so everything below is
+about that wave.  Nothing here is inferred from the =.dta= files; every claim
+is either a quotation from a named document at a named page, or is explicitly
+labelled as an observation.
+
+** 2000 -- the declared universe (verbatim)
+
+#+begin_quote
+The  unit  of  analysis  and  the  unit  of  observation  is  the  household.    The  universe  under  study
+consists of all the households in Kosovo, except those inhabited by members of the international
+community.
+#+end_quote
+
+Source: /Kosovo Living Standards Measurement Survey 2000: Basic Information/
+(Basic Information Document; Poverty and Human Resources Development Research
+Group, The World Bank, October 2001), Appendix F, "RECOMMENDATIONS AND
+IMPLEMENTATION OF THE SAMPLE DESIGN FOR THE KOSOVO LSMS SURVEY, 2000", opening
+paragraph -- printed p. 43 (PDF p. 46).  English original; no translation
+needed.  The doubled inter-word spacing is the source PDF's own text layer and
+is reproduced as extracted.
+
+This is a **national, all-household** universe: both urban and rural areas are
+in scope by design (see the domains below).  It is *not* NADA template
+boilerplate -- it is a statistician's sample-design appendix written for this
+survey.  Compare the WB NADA template sentence that recurs verbatim across
+~15 waves elsewhere in the corpus; nothing of that shape appears here.
+
+** 2000 -- exclusions
+
+*** Universe-level (the only one the documentation states)
+
+Households "inhabited by members of the international community" -- see the
+quotation above.  In 2000 Kosovo this is a materially large group (UNMIK,
+KFOR, NGO and contractor staff), not a nominal carve-out.
+
+*** Frame / eligibility-level (narrower than the universe, stated separately)
+
+The dwelling-unit listing kept only permanently-occupied units.  Same document,
+Appendix F, printed p. 54 (PDF p. 57), section on listing dwelling units.  The
+enumerator recorded one of six occupancy statuses:
+
+#+begin_quote
+1.  Occupied permanently.
+2.  Under construction (occupied)
+3.  Under construction (not occupied).
+4.  Vacant.
+5.  Seasonally occupied
+6.  Demolished or being demolished.
+#+end_quote
+
+#+begin_quote
+Afterwards, in the office, a determination of the "valid" dwelling units will be carried out, that is,
+those units that are occupied permanently (the first and fourth categories mentioned above) and
+these are the only ones that will be used during the selection process.
+#+end_quote
+
+Note as printed: the text says "the first and fourth categories" while category
+4 in its own list is "Vacant".  That is what the document says; it is quoted
+here unaltered rather than silently repaired.  The operative rule stated in the
+main body of the same appendix is narrower and consistent -- printed p. 45
+(PDF p. 48): units "that are occupied permanently, since these are the valid
+ones under the coverage requirements."  Either way, seasonally-occupied
+dwellings are outside the selection frame.
+
+*** Not exclusions -- recorded here so nobody later mistakes them for exclusions
+
+- *Rural frame coverage.*  "A  Housing  Damage  Assessment  Survey  (HDAS)  was
+  conducted  in  February  1999  and updated  in  June  1999  by  the
+  International  Management  Group  (IMG)  and  the  United  Nations High
+  Commissioner for Refugees (UNHCR) in the rural areas.  The survey covered 95
+  percent of the Albanian rural areas and provided the basis for the rural
+  sampling frame, after updating." (BID, printed p. 5, PDF p. 8; also
+  verbatim in the WB catalog =method/data_collection/sampling_procedure=.)
+  That is a *frame-coverage limitation*, not a declared universe exclusion.
+- *A security incident in the field.*  "Some zones in North Mirovica were
+  deemed too dangerous to be listed  systematically  and  the  names  were
+  taken  from  a  dweller. ... As  a  result,  the team was pulled out of the
+  field and alternative EAs had to be selected." (BID, printed p. 11, PDF
+  p. 14.)  This is fieldwork, and the EAs were *replaced*, not dropped.  There
+  is no "for security reasons" carve-out from the stated universe.
+- *Non-response replacement.*  "Households  from  the  original  sample
+  selection  which  could  not  be  interviewed  were replaced  by  reserve
+  households  to  reach  the  final  sample  size." (BID, printed p. 7, PDF
+  p. 10.)  Non-response rates were 11.8% (rural Albanian), 20.8% (urban
+  Albanian), 14.2% (rural Serb) and 39.2% (urban Serb).  Relevant to what the
+  weights mean; not an exclusion.
+
+** 2000 -- domains, sub-populations and disproportionate allocation
+
+The specialization in this wave lives *inside* the wave, as an explicit ethnic
+stratum with its own sampling frame.  Anyone pooling Kosovo with other
+countries, or computing an unweighted Kosovo mean, needs to know this.
+
+Design statement, BID printed p. 6 (PDF p. 9), also verbatim in the WB catalog
+=method/data_collection/sampling_procedure=:
+
+#+begin_quote
+The  sample  was  preset  at  2,880  households  in  order  to  allow  analyses  in  the  following
+breakdowns:  (a) Kosovo as a whole; (b) by area of responsibility, (c) by urban/rural locations.
+In addition, the survey data can be used to derive separate estimates for the Serbian minority.
+#+end_quote
+
+Catalog =study_info/geog_coverage= (WB DDI, idno =KSV_2000_LSMS_v01_M=):
+
+#+begin_quote
+Kosovo.
+Domains: Urban/rural; Area of Responsibility (American, British, French, German, Italian); Serbian minority
+#+end_quote
+
+Allocation, BID Table 1 (printed p. 6, PDF p. 9) and the sentence following it
+(printed p. 7, PDF p. 10):
+
+#+begin_quote
+The final sample size was 1,200 rural and urban Albanian households and 240 rural and
+urban Serb households, for a total sample size of 2,880 households.
+#+end_quote
+
+| Location | Ethnicity           | Areas of Responsibility                       | HH per domain |
+|----------+---------------------+-----------------------------------------------+---------------|
+| Rural    | Serb                | not applicable (one domain)                   | 240           |
+| Rural    | Albanian and others | American, British, French, German, Italian    | 240 each      |
+| Urban    | Serb                | not applicable (one domain)                   | 240           |
+| Urban    | Albanian and others | American, British, French, German, Italian    | 240 each      |
+
+(Table transcribed from BID Table 1, "Domains for the Sample And Number of
+Respondent Households".  12 domains x 240 = 2,880.  The prose sentence quoted
+above reads oddly against the table -- 1,200 is the per-location Albanian
+total, not the Albanian total -- and is quoted as printed.)
+
+The Serb sample had a *separate frame*, built by a separate enumeration
+operation (BID, printed p. 10, PDF p. 13):
+
+#+begin_quote
+Enumeration of the Serbs as a separate frame required counting households in all Serbian
+villages and urban zones.  The  rural Serb population in Kosovo numbers about 80,000, of which
+20,000  live  in  the  Northern  part  of  Kosovo  (3  municipalities)  and  the  rest  is  scattered  in  the
+"enclaves" of Southern and Central Kosovo and in the southern municipality of Strepce (Evans,
+2000).  Of the 30 selected villages, 8 are in Northern Kosovo.  Twenty-four of the urban EAs are
+also located there, because of the larger urban areas of Mitrovica and Zvecan.
+#+end_quote
+
+And, because the HDAS frame covered only Albanian rural areas (BID, printed
+p. 5, PDF p. 8):
+
+#+begin_quote
+Since the HDAS did not cover Serbian villages, a quick counting4 of housing units was
+performed in these villages, following a procedure similar to the one in the urban areas.
+#+end_quote
+
+*Observation (not a quotation):* equal allocation of 240 households to each of
+twelve domains, one of which is a minority numbering on the order of 80,000
+rural persons, is allocation disproportionate to population share -- i.e. the
+Serb stratum is an oversample in the ordinary sense.  The documentation
+nowhere uses the words "oversample" or "booster"; what it does say is quoted
+above, and the correction is carried by =WEIGHT=.  This is why the
+=2000/Data/= directory carries parallel =R_*= / =U_*= / =Serb_*= community
+files.
+
+** 2000 -- universe vs. what the weights represent
+
+These come apart, and the difference is not hypothetical.  The design claims
+twelve analysable domains (above); the weights section claims validity at two
+levels only.  BID, printed p. 10 (PDF p. 13):
+
+#+begin_quote
+Weights (expansion factors) have been calculated that should be used in analyses of the
+data in order to have estimates that are valid at the national and  urban/rural levels.  The weight
+variable, WEIGHT, is found in data set ID.
+#+end_quote
+
+So: the *universe* is all Kosovo households bar the international community;
+the *weights* are attested by the documentation only for national and
+urban/rural estimates.  Estimates by Area of Responsibility, or separate
+estimates for the Serbian minority, are stated as design intentions in the
+sampling section but are not covered by the weights sentence.  Do not read
+the weights sentence as licensing AR-level or Serb-minority-level inference
+without going back to the design.  (Kosovo's =sample= table exposes =weight=;
+there is no panel dimension -- single wave, no =panel_weight=.)
+
+** 2000 -- the community questionnaire has NO universe
+
+The documentation explicitly *denies* a well-defined universe for the community
+instrument.  BID, printed p. 4 (PDF p. 7); also verbatim in the WB catalog
+=method/data_collection/coll_situation=:
+
+#+begin_quote
+The data from community questionnaire are not a representative sample of communities
+in  Kosovo.    These  data  are  intended  to  provide  information  on  the  context  in  which  the
+households are located for the analyses of the household data.
+#+end_quote
+
+This bears directly on Kosovo's =cluster_features= table (declared in
+=_/data_scheme.yml= with index =(t, v)= and columns =Region=, =Rural=), which
+is built from the community files.  Community-level aggregates from Kosovo 2000
+are contextual covariates for the household data; they are *not* estimates for
+the population of Kosovo communities, and must not be averaged as if they were.
+
+** 2000 -- where the statement lives  (flag: NOT in this repository)
+
+| Fact                                              | Status                                                            |
+|---------------------------------------------------+-------------------------------------------------------------------|
+| Universe statement in a file under =Kosovo/2000/=  | *No.*  Documentation/ holds only comeng.pdf, hheng.pdf, hhalb.pdf |
+| Universe field in the WB DDI / catalog record      | *No.*  Zero occurrences of "universe" in the exported DDI JSON    |
+| Universe statement anywhere reachable              | Yes -- BID PDF, a *related material* of catalog study 77          |
+
+The three PDFs the repository does ship are bare questionnaire instruments.
+Text-searched all three (pdfminer): "universe" 0 hits in each; "sampling frame"
+0 hits in each; "population" appears twice in comeng.pdf, both inside question
+text about local economic conditions, and 0 times in either household
+questionnaire.  There is no target-population or sample-design statement in any
+file this repository holds.
+
+The BID was obtained from
+https://microdata.worldbank.org/index.php/catalog/77/download/11570 (reachable
+via catalog study 77 -> Related Materials, titled "Kosovo Living Standards
+Measurement Survey 2000: Basic Information").  It is *not* DVC-tracked here.
+That makes Kosovo's universe record a moving target: it depends on a World Bank
+URL, not on anything the library holds.  Consider acquiring the BID into
+=Kosovo/2000/Documentation/=.
+
+The catalog record's own metadata (=study_info=: abstract, coll_dates, nation,
+geog_coverage, analysis_unit, data_kind, notes; =method=: sampling_procedure,
+coll_mode, research_instrument, coll_situation, method_notes) has no universe
+field at all; =analysis_unit= is "- Households / - Individuals / - Community".
+The sampling_procedure text reproduces the BID's sample-design section verbatim,
+which is what corroborates the BID as the catalog's own account.
+
+** Verification notes (2026-07-21)
+
+- Every quotation above was re-extracted from the BID PDF and matched
+  character-for-character; the page locators were independently re-derived from
+  the PDF's printed page numbers.
+- *Correction to the gathered evidence record:* the "valid dwelling units"
+  quotation was recorded at printed p. 51 / PDF p. 54.  It is at printed p. 54
+  / PDF p. 57 -- three pages later.  The related but distinct sentence quoted
+  above ("...since these are the valid ones under the coverage requirements")
+  is at printed p. 45 / PDF p. 48.  Both corrected here.
+- *Second correction:* the evidence record noted that
+  =2000/Documentation/SOURCE.org= lacked the =#+CATALOG_ID:= / =#+CATALOG_IDNO:=
+  provenance keywords.  It has them (backfilled 2026-07-12, =PROVENANCE_METHOD:
+  doi-lookup=, =CATALOG_ID: 77=, =CATALOG_IDNO: KSV_2000_LSMS_v01_M=).  No
+  action needed.
+- No =.dta= file was opened in preparing this section, by design: what the
+  survey *claims* to cover and what the data happen to look like are kept apart
+  deliberately.
+
 * shocks — not available (2026-06-07, verified)
 
 =shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)

@@ -1,29 +1,39 @@
-from lsms_library.local_tools import get_dataframe
-"""Calculate food prices for different items across rounds; allow
-different prices for different units.
+#!/usr/bin/env python
+"""Concatenate Panama wave-level food_acquired parquets into the country table.
+
+Each wave script (``Panama/<wave>/_/food_acquired.py``) emits the canonical
+long form with index ``(t, i, j, u, s)`` and columns
+``[Quantity, Expenditure, Price]`` (Phase 3 of GH #218).  ``i`` is the
+household, ``j`` the harmonized food item, ``u`` the native unit, and ``s``
+the acquisition source (``{purchased, produced, inkind, other}``).  ``v`` is
+NOT baked in -- it is joined from ``sample()`` at API time.
+
+The three Panama waves (1997, 2003, 2008) are independent cross-sections (no
+cross-wave household panel linkage), so this is a plain concatenation.
+
+``food_expenditures``/``food_prices``/``food_quantities`` are no longer built
+here -- they are auto-derived at runtime by the framework's ``_FOOD_DERIVED``
+from this canonical ``food_acquired``.
 """
 import sys
+
 sys.path.append('../../_')
-from lsms_library.local_tools import to_parquet
+
 import pandas as pd
-import numpy as np
 
-fa = []
-for t in ['1997', '2003', '2008']:
-    df = get_dataframe('../'+t+'/_/food_acquired.parquet').squeeze()
-    df['t'] = t
-    df = df.reset_index()
-    df['j'] = t + df['j'].map(str)
-    df['unitcode (bought)'] = df['unitcode (bought)'].astype(str)
+from lsms_library.local_tools import get_dataframe, to_parquet
 
-    df = df.set_index(['j', 't', 'i', 'unitcode (bought)'])
-    df.index = df.index.rename({'unitcode (bought)': 'u'})
-    df.columns.name = 'k'
-    #df = id_walk(df,t,Waves)
-    fa.append(df)
+WAVES = ['1997', '2003', '2008']
 
-fa = pd.concat(fa)
+dfs = []
+for t in WAVES:
+    df = get_dataframe('../' + t + '/_/food_acquired.parquet')
+    if 't' not in df.index.names:
+        df = df.reset_index()
+        df['t'] = t
+        df = df.set_index(['t', 'i', 'j', 'u', 's'])
+    dfs.append(df)
 
-fa = fa.replace(0,np.nan)
-fa = fa.groupby(['j','t','i','u']).sum()
-to_parquet(fa,'../var/food_acquired.parquet')
+fa = pd.concat(dfs)
+
+to_parquet(fa, '../var/food_acquired.parquet')

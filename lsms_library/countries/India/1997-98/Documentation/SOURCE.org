@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/q6sh-b869]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/276
+
+#+CATALOG_ID: 276
+#+CATALOG_IDNO: IND_1997_SLCUPB_v01_M
+#+CATALOG_TITLE: Uttar Pradesh and Bihar Survey of Living Conditions 1997-1998
+#+CATALOG_YEARS: 1997-1998
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/q6sh-b869
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/276
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

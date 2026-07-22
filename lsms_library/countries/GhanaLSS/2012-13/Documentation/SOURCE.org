@@ -1,1 +1,10 @@
+SOURCE
+
 https://microdata.statsghana.gov.gh/index.php/catalog/72/study-description
+
+#+CATALOG_ID: none
+#+CATALOG_URL: https://microdata.statsghana.gov.gh/index.php/catalog/72/study-description
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: external-source
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: Obtained from microdata.statsghana.gov.gh, not the World Bank Microdata Library.

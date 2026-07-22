@@ -151,6 +151,27 @@ Data Scheme:
   # Mali-style clean YAML: extract wide per-source columns; the
   # `food_acquired` df_edit hook in _/ethiopiarhs.py melts them to
   # canonical long form on s. Price is API-derived (food_prices).
+  #
+  # GRAIN (GH #323).  The ERHS q36 food module is a ONE-ROW-PER-FOOD-ITEM
+  # roster: all 27 source columns were enumerated and there is NO line /
+  # transaction / occasion / visit identifier (q36_1a is a section flag, not a
+  # line number).  So (t,i,j,u,s) IS the maximal grain the instrument supports
+  # -- there is no finer axis to name, and none should be invented.
+  #
+  # The roster nevertheless carries MULTIPLE LINES per (i,j).  Most differ in
+  # UNIT (u is in the index, so they do not collide).  Of the rest, 127 rows
+  # across 1994a-1997 are a second acquisition of the SAME item, in the SAME
+  # unit, from the SAME source, carrying DIFFERENT measurements (e.g. 1997 hh
+  # 10_93 produced Berbere 1.0 kg AND 30.0 kg).  Those are real quantities, and
+  # core ALREADY sums them: `food_acquired` is in feature.py's
+  # `_ADDITIVE_MEASURE_COLUMNS`, so the collapse to the canonical grain SUMs
+  # Quantity and Expenditure.  Nothing needs declaring here.
+  #
+  # But `sum` DOUBLE-COUNTS a row punched twice.  So the `food_acquired` hook in
+  # _/ethiopiarhs.py drops rows that are indistinguishable in the canonical
+  # grain (`_drop_double_punched`) BEFORE the framework sums: 90 rows, 514.9
+  # Quantity and 343.1 Birr of pure overstatement.  The dedup is what makes the
+  # (already unconditional) sum correct.
   food_acquired:
     index: (t, i, j, u, s)
     Quantity: float
