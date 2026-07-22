@@ -3,8 +3,10 @@ Wave: 1987-88
 
 # cluster_features: DELIBERATELY NOT WIRED (GH #323).
 #
-# Identical defect to 1988-89 (see that wave's data_info.yml for the full
-# argument), and it was NOT in the originally-reported affected-cell list only
+# Same wrong SOURCE COLUMN as 1988-89 (see that wave's data_info.yml for the
+# full birthplace-vs-location argument), though the mechanism by which it went
+# wrong differs -- see the AGEY bullet below.  It was NOT in the
+# originally-reported affected-cell list only
 # because this wave's cluster_features parquet had never been built -- fixing
 # 1988-89 alone would have closed the instance and left the class.
 #
@@ -20,14 +22,45 @@ Wave: 1987-88
 #     cannot be located in.  mapping.py's Region() and Birthplace() are the same
 #     function body over the same region_dict, and REGION is mapped as the
 #     roster's `Birthplace` below.
-#   * `Age: AGEY` is a PERSON's age.  Collapsed to one row per cluster it made a
-#     cluster's "Age" the age of its first-listed person (range 17-80) -- a
-#     category error, meaningless as a cluster feature.
+#   * `Age: AGEY` is a PERSON's age, and it did NOT become a cluster "Age".
+#     (An earlier draft of this comment said it did; that was wrong, corrected
+#     2026-07-21 after adversarial review.)  What AGEY actually fed is the
+#     table-level `cluster_features(df)` hook in this wave's mapping.py, which
+#     `country.py` dispatches as the table's `df_edit`.  The hook filters
+#     `Age<12` and returns the MODAL BIRTHPLACE of a cluster's under-12s as
+#     `Region`, plus an all-NA `Rural`; it never emits an `Age` column.
+#     Measured cold on the pre-fix config tree,
+#     `Country('GhanaLSS')['1987-88'].grab_data('cluster_features')` is
+#     (0 rows, 2 cols) `['Region', 'Rural']` -- zero rows because
+#     `get_categorical_mapping` returns `{}` for this wave, so `Region` is
+#     all-NA and the hook's `groupby(['t','v','Region'])` drops every row.
+#     So the real defect here is "modal birthplace of under-12s", which is the
+#     very guess the 1988-89 comment says it refuses to make -- and it is armed
+#     behind the empty-`region_dict` bug: repair `region_dict` and it goes live.
 #
-# No cluster-invariant region source exists in this wave (Y00A.DAT's LOC is a
-# plausible Rural indicator but varies within cluster in 3 of 170 clusters, so it
-# is NOT wired without verification).  Dropping is safer than guessing: silently
-# MISSING (class-2) beats silently WRONG (class-1).
+# On a substitute region source: this is a `todo`, NOT a closure.
+#   - Directly in this wave: a sweep of all 77 .DAT files in this wave's Data/
+#     finds `REGION` in exactly one file -- Y01A.DAT, the roster column above.
+#     COMM.DAT (the community questionnaire, 137 rows) has no region column.
+#   - Indirectly, a candidate DOES exist and is unvalidated: 1988-89's
+#     HEALTH.DAT / DRUG.DAT carry a facility-level `REGION` keyed to the
+#     clusters each facility serves (see 1988-89/_/data_info.yml), and
+#     1988-89/Data/CLYR1YR2.DAT bridges year-1 to year-2 clusters.  Measured:
+#     85 linked (CLYR1, CLYR2) pairs, all 85 CLYR1 values in this wave's 176
+#     clusters and all 85 CLYR2 values in 1988-89's 170; 84 of the 85 reach a
+#     HEALTH/DRUG region, and that bridged region equals the 1987-88 cluster's
+#     modal birth-region in 77 of 84.  But it covers at most 85 of 176 clusters
+#     (48%) and inherits every ambiguity of the 1988-89 candidate, so it is NOT
+#     wired.  The cell is absent because nobody has validated this, not because
+#     the survey lacks the data.
+#   - Y00A.DAT's LOC is NOT a usable Rural indicator: it is 1 for 3,142 of the
+#     3,147 households and 2 for 5, varying within cluster in 5 of 176 clusters
+#     (the "3 of 170" in an earlier draft of this comment was 1988-89's figure,
+#     not this wave's).  Y00A.DCT carries no variable labels, so its meaning is
+#     unverified.  Not wired.
+#
+# Dropping is safer than guessing: silently MISSING (class-2) beats silently
+# WRONG (class-1).
 #
 # Re-adding either column here would restore the defect.  Pinned by
 # `tests/test_ghanalss_cluster_features_gh323.py`.

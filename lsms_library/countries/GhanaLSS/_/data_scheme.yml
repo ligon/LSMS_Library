@@ -36,12 +36,20 @@ Data Scheme:
     #   2012-13 PARTA/g6loc_edt    16,772 HH -> 1,200 clusters
     #   2016-17 g7sec8h.dta       934,584 rows-> 1,000 clusters
     #
-    # 1987-88 / 1988-89 are deliberately NOT wired: their only candidate source
+    # 1987-88 / 1988-89 are deliberately NOT wired: the source they WERE wired to
     # (Y01A.DAT REGION) is the person's REGION OF BIRTH, not the cluster's region
     # -- see those waves' data_info.yml for the full argument.  That is the fix
     # here: a column that is NOT cluster-invariant must not be projected onto the
     # cluster at all.  (Auditing the collapse itself is core's business, not this
     # country's -- see GH #323 Sites 1/2.)
+    #
+    # This is a `todo`, NOT a closure.  A cluster-grain region candidate DOES
+    # exist for 1988-89 -- HEALTH.DAT / DRUG.DAT carry a facility `REGION` keyed
+    # to the clusters served (CL1..CL5, CL + 2000 == CLUST), covering 168 of 170
+    # clusters -- and reaches 84 of 1987-88's 85 bridged clusters via
+    # CLYR1YR2.DAT.  It is unvalidated (14 ambiguous clusters, 2 uncovered, the
+    # +2000 mapping inferred not documented) and therefore unwired.  Do NOT read
+    # these two absent cells as "the survey never asked".
     index: (t, v)
     Region: str
     Rural: str

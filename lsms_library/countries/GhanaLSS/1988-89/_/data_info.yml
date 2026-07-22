@@ -3,11 +3,10 @@ Wave: 1988-89
 
 # cluster_features: DELIBERATELY NOT WIRED (GH #323).
 #
-# This wave has NO cluster-level region variable.  The block that used to live
-# here read `Region: REGION` from Y01A.DAT -- but Y01A.DAT is the PERSON-LEVEL
-# ROSTER (14,924 persons / 3,192 households / 170 clusters) and its REGION column
-# is the person's REGION OF BIRTH, not the cluster's region.  Four independent
-# strands establish this:
+# The block that used to live here read `Region: REGION` from Y01A.DAT -- but
+# Y01A.DAT is the PERSON-LEVEL ROSTER (14,924 persons / 3,192 households / 170
+# clusters) and its REGION column is the person's REGION OF BIRTH, not the
+# cluster's region.  Five independent strands establish this:
 #
 #   1. The same column of the same file is ALSO mapped, correctly, as the
 #      roster's `Birthplace: REGION` below -- and mapping.py's Region() and
@@ -17,11 +16,19 @@ Wave: 1988-89
 #      and includes 11=Nigeria, 12=Ivory Coast, 13=Togo, 14=Burkina Faso,
 #      15=Mali, 16=Other Africa.  A Ghanaian enumeration area cannot be located
 #      "in Nigeria"; only a BIRTHPLACE can take those values.
-#   3. REGION varies WITHIN a household in 1,019 of 3,192 households, with up to
+#   3. The "but an EA could be abroad if the survey follows movers" objection is
+#      answered by the data, not by assertion.  Code 11 is populated -- 236
+#      persons -- but they are spread across 87 of the 170 clusters, and no
+#      cluster is more than 17.5% foreign-coded (>=11); ZERO clusters are 100%.
+#      If REGION were the EA's location, an EA coded 11 would have ALL of its
+#      residents coded 11.  (GLSS also never followed movers: every round is an
+#      independent nationally representative cross-section of EAs drawn from the
+#      Ghanaian census frame -- ../../_/CONTENTS.org, "Survey Program".)
+#   4. REGION varies WITHIN a household in 1,019 of 3,192 households, with up to
 #      6 distinct values in a single household.  No household straddles 6
 #      regions; its members can be BORN in 6.  (It varies within a CLUSTER in
 #      167 of 170 clusters.)
-#   4. Y01A.DCT's variable order -- MAR, SCOHAB, SID, REGION, NAT (nationality),
+#   5. Y01A.DCT's variable order -- MAR, SCOHAB, SID, REGION, NAT (nationality),
 #      LODGE, MON, MEMB -- is the classic birthplace->nationality questionnaire pair.
 #
 # Because the declared cluster_features index is (t, v), the framework collapsed
@@ -29,12 +36,49 @@ Wave: 1988-89
 # took the birth-region of the FIRST-LISTED PERSON of the FIRST-LISTED HOUSEHOLD
 # and called it the cluster's region.
 #
-# There is no valid substitute: a sweep of all 93 .DAT files in this wave's Data/
-# found no cluster-invariant region-like column, and CLUST does not encode region.
-# Taking the cluster's MODAL birthplace would be a guess that fails precisely
-# where it matters (migrant-receiving clusters: Greater Accra, mining/cocoa
-# areas), so we DROP the column rather than fabricate one: silently MISSING
-# (class-2) is strictly safer than silently WRONG (class-1).
+# Today that fabrication is ARMED BUT NOT FIRING: `get_categorical_mapping`
+# returns `{}` for this wave (a separate, unfixed defect that also breaks the
+# roster's `Birthplace`), so `Region` comes out 100% NA -- on the pre-fix config
+# tree the wave builds 14,924 rows with a `Region` column whose non-null count is
+# ZERO.  Repair `region_dict` -- a plausible future fix, since it is needed for
+# `Birthplace` -- and the fabricated cluster region goes live.  Deleting the
+# block costs nothing today and defuses that.
+#
+# On a substitute region source: this is a `todo`, NOT a closure.
+#
+# An earlier draft of this comment claimed "a sweep of all 93 .DAT files in this
+# wave's Data/ found no cluster-invariant region-like column".  That is FALSE and
+# is corrected here (2026-07-21, after adversarial review).  Redoing the sweep:
+# `REGION` appears in THREE of the 93 files -- Y01A.DAT (the roster column above)
+# and, at cluster grain, HEALTH.DAT and DRUG.DAT, the community health-facility
+# and drug-availability modules.  Both carry a facility-level `REGION` plus
+# `CL1..CL5`, the clusters each facility serves.  Measured:
+#
+#   - CL + 2000 is this wave's CLUST: 166 of 168 HEALTH codes and 167 of 169 DRUG
+#     codes land in the roster's 170-cluster set (offsets 0 and +1000 land 0).
+#   - Together HEALTH + DRUG cover 168 of the 170 clusters; 14 clusters carry a
+#     cross-facility disagreement, and where HEALTH and DRUG both speak they
+#     agree on 154 of the 165 clusters they share.
+#   - HEALTH/DRUG `REGION` runs 0..9 against the roster's 1..11, i.e. it is
+#     0-indexed against this wave's 1-indexed `region` code table.  REGION+1
+#     equals the cluster's modal birth-region in 160 of 166, and on average 79%
+#     (median 86%) of a cluster's residents were BORN in its HEALTH region --
+#     which is itself the cleanest confirmation of the argument above: the ~20%
+#     gap IS migration, which is exactly why birthplace cannot stand in for
+#     location.
+#
+# It is NOT wired because it is not validated, and validating it is real work:
+# the 14 ambiguous clusters and the 2 uncovered ones are genuine, the CL+2000
+# mapping is inferred from value ranges rather than documented (the .DCT files
+# carry positions and names only, no variable labels), and the GLSS1/GLSS2
+# questionnaires are scanned-image PDFs with no text layer (see
+# ../../_/CONTENTS.org), so the instrument cannot be consulted to confirm it.
+# Absence here means "nobody has done that work", NOT "the survey lacks it".
+#
+# Taking the cluster's MODAL birthplace would still be a guess that fails
+# precisely where it matters (migrant-receiving clusters: Greater Accra,
+# mining/cocoa areas), so we DROP the column rather than fabricate one:
+# silently MISSING (class-2) is strictly safer than silently WRONG (class-1).
 #
 # Re-adding `Region: REGION` here would restore the defect.  Pinned by
 # `tests/test_ghanalss_cluster_features_gh323.py`.

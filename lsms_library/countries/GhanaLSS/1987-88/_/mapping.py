@@ -60,8 +60,19 @@ def cluster_features(df):
 
     '''
     Formatting dataframe for cluster features
-    
+
     infers the region for each cluster via where most young kids have their birthplace as (less likely to move?)
+
+    GH #323 -- DEAD CODE, AND A LANDMINE.  ``country.py`` dispatches this as the
+    ``df_edit`` for the ``cluster_features`` table, but this wave no longer
+    declares ``cluster_features`` (see ``data_info.yml``), so nothing calls it.
+    Do NOT re-add that block: the "modal birthplace of a cluster's under-12s"
+    heuristic below is a GUESS at the cluster's location, and it fails exactly
+    where it matters (migrant-receiving clusters -- Greater Accra, mining/cocoa
+    areas).  It is also silent about failing: ``region_dict`` is currently ``{}``
+    for this wave, so ``Region`` is all-NA, the ``groupby(['t','v','Region'])``
+    below drops every row, and the table builds as (0 rows, 2 cols).  Repair
+    ``region_dict`` and this starts emitting fabricated cluster regions.
     '''
 
     youngsters = df.query("Age<12")

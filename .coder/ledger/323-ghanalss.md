@@ -20,8 +20,12 @@ enables — which is why one uniform fix would have been wrong:
   household-grain; the projected columns are cluster-invariant. The collapse is
   a correct de-duplication, arrived at silently.
 * **(B) silently WRONG** — `cluster_features`, 1987-88 + 1988-89. `Region` is
-  wired to a person-level **region of birth**. `.first()` fabricates a cluster's
-  region from its first-listed person.
+  wired to a person-level **region of birth**. In 1988-89 `.first()` fabricates a
+  cluster's region from its first-listed person. In 1987-88 the wave's own
+  `df_edit` hook fabricates it from the modal birthplace of the cluster's
+  under-12s instead — same wrong column, different fabrication. (Corrected
+  2026-07-21; this line previously attributed `.first()` to both waves. See
+  "Corrections after adversarial review", C2.)
 * **(C) phantom NaN keys** — `food_security`, 2016-17. 110 households with
   NaN `clust`/`nh` collapse onto one NaN tuple and are dropped.
 
@@ -173,7 +177,8 @@ The value is **correctness**: a fabricated cluster `Region` deleted, a silent
    collapse onto one id. My `invariant` reducer cannot apply (weight/strata
    genuinely differ between two different households), and choosing the "true"
    match is a guess I refuse to make. **Reported, not guessed.**
-2. **`get_categorical_mapping` returns `{}` for GhanaLSS 1988-89** — both
+2. **`get_categorical_mapping` returns `{}` for GhanaLSS 1988-89 *and* 1987-88**
+   (1987-88 added 2026-07-21 — measured, `len(region_dict) == 0` in both) — both
    `region_dict` and `relationship_dict` are empty, so `Birthplace` *and*
    `Relationship` are all-NA for that wave. Separate defect; **not fixed here on
    purpose** — fixing it would *arm* the (B) fabrication, which is precisely why
@@ -213,7 +218,13 @@ API numbers, so both had to be verified at the **wave** level. Cold build
   `Region` column — that column is Y01A.DAT's `REGION`, the person's region of
   **BIRTH** (its code list runs to 11=Nigeria, 12=Ivory Coast, 13=Togo; a Ghanaian
   EA cannot be in Nigeria). This branch builds **0 rows, no columns** — deliberately
-  unwired. `1987-88` likewise.
+  unwired. Two precisions added 2026-07-21 after adversarial review: (a) those
+  14,924 `Region` values are **all NA** (`notna() == 0`) because `region_dict` is
+  `{}` — the fabrication is armed, not firing; (b) **`1987-88` is NOT "likewise"**.
+  Development already builds **0 rows** for 1987-88 — `(0, 2)`, columns
+  `['Region', 'Rural']` — because that wave routes through `mapping.py`'s
+  `cluster_features(df)` `df_edit` hook, whose `groupby(['t','v','Region'])` drops
+  every row when `Region` is all-NA. Only 1988-89 has the 14,924→0 delta.
 * `2016-17` `food_security` at wave level: development yields **13,899 distinct `i`
   + 110 NaN-keyed rows** (the 110 collapse onto one phantom `(t, NaN)` tuple and are
   deleted by groupby's dropna). This branch yields **14,009 distinct `i`, 0 NaN** —
@@ -222,3 +233,107 @@ API numbers, so both had to be verified at the **wave** level. Cold build
   `_finalize_result`'s `dropna(how='all')` — exactly as the original branch predicted.
   **The fix removes the phantom at the source; it is not expected to move the API
   row count.**
+
+---
+
+## Corrections after adversarial review (2026-07-21)
+
+The review reproduced every *data* number in this PR exactly and did not move the
+code. What it broke were three **claims**. All three are corrected here and in the
+tracked YAML comments; the corrections are comment-only.
+
+### C1 (was HIGH) — "no cluster-invariant region source exists" was FALSE
+
+`1988-89/_/data_info.yml` asserted, as permanent justification for the drop, that
+*"a sweep of all 93 .DAT files in this wave's Data/ found no cluster-invariant
+region-like column"*. That is the Albania-precedent anti-pattern CLAUDE.md bans by
+name, and worse than unevidenced — it is contradicted. Re-ran the sweep myself:
+`REGION` appears in **three** of the 93 files, not one.
+
+| measurement | value |
+|---|---|
+| files in 1988-89 `Data/` with a `REGION` column | `Y01A.DAT` (roster), **`HEALTH.DAT`**, **`DRUG.DAT`** |
+| `HEALTH.DAT` / `DRUG.DAT` shape | (231, 404) / (169, 191); both carry `REGION` + `CL1..CL5` |
+| offset that resolves `CL*` to `CLUST` | **`+2000`** — 166/168 (HEALTH), 167/169 (DRUG) land in the roster's 170-cluster set; offsets `0` and `+1000` land **0** |
+| clusters covered by HEALTH ∪ DRUG | **168 of 170** |
+| clusters with a cross-facility disagreement | **14** |
+| HEALTH vs DRUG agreement on shared clusters | **154 of 165** |
+| `REGION` range | HEALTH/DRUG **0..9**; roster **1..11** → 0-indexed against the wave's 1-indexed `region` table |
+| `REGION + 1` == cluster's modal birth-region | **160 of 166** |
+| mean / median share of a cluster's residents BORN in its HEALTH region | **0.793 / 0.855** |
+
+That last row is the cleanest confirmation of the PR's own thesis: the ~20% gap
+between "born here" and "lives here" *is* migration, which is exactly why
+birthplace cannot stand in for location. But the categorical negative had to go.
+The comment now says what is true: **a candidate exists, unvalidated, not wired —
+a `todo`, not a closure.** Not wiring it is still right: 14 ambiguous clusters, 2
+uncovered, and the `CL + 2000` mapping is inferred from value ranges, not
+documented. The `.DCT` files carry positions and names only (verified: no variable
+labels), and per `GhanaLSS/_/CONTENTS.org` the **GLSS1/GLSS2 questionnaires are
+scanned-image PDFs with no text layer** — so check C4 (the instrument) is
+*unrunnable* for these two waves. That is precisely why a closing verdict here
+would have been unfalsifiable.
+
+1987-88's weaker version was corrected too. Directly, the review's charge does
+*not* stick there: a sweep of all **77** `.DAT` files in that wave (not 93 — that
+is 1988-89's count) finds `REGION` in exactly one file, the roster. Indirectly it
+does: `1988-89/Data/CLYR1YR2.DAT` bridges the two waves' clusters — **85** linked
+`(CLYR1, CLYR2)` pairs, all 85 `CLYR1` values in 1987-88's 176 clusters and all 85
+`CLYR2` values in 1988-89's 170; **84 of the 85** reach a HEALTH/DRUG region, and
+that bridged region equals the 1987-88 cluster's modal birth-region in 77 of 84.
+Partial (85 of 176 clusters = 48%) and inheriting every ambiguity above, so also a
+`todo`.
+
+### C2 (was MEDIUM) — the `Age: AGEY` characterization was FALSE
+
+The 1987-88 comment said `AGEY` *"made a cluster's 'Age' the age of its
+first-listed person (range 17-80)"*. That never happened. `1987-88/_/mapping.py`
+defines a **table-level `cluster_features(df)` hook**, dispatched by `country.py`
+as the table's `df_edit`; `AGEY` is its **filter input** (`df.query("Age<12")`) and
+the frame it returns has columns `['Region', 'Rural']` — no `Age`, ever. Verified
+cold on the pre-fix config tree: `Country('GhanaLSS')['1987-88']
+.grab_data('cluster_features')` → **`(0, 2)`, `['Region','Rural']`**.
+
+The real 1987-88 defect is therefore **modal birthplace of a cluster's under-12s**
+— the very guess the 1988-89 comment says it refuses to make. It deserved naming,
+and it is a better argument for the drop than the one that was given. The hook
+survives this PR as dead code (nothing declares the table any more), so a landmine
+note now sits on its docstring: re-adding the block re-arms it.
+
+Root cause of the zero rows, in both waves: `get_categorical_mapping` returns `{}`
+for **1987-88 as well as 1988-89** (measured; §8 item 2 previously named only
+1988-89). `Region` is all-NA, and the hook's `groupby(['t','v','Region'])` drops
+every row.
+
+### C3 (was LOW ×2) — wrong wave's numbers
+
+* *"development builds 14,924 rows … `1987-88` likewise"* — no. Development
+  already builds **0** rows for 1987-88 (C2). Only 1988-89 has the delta. Fixed
+  above and in the PR body.
+* *"Y00A.DAT's LOC … varies within cluster in 3 of 170 clusters"* in the
+  **1987-88** comment — 3/170 is **1988-89's** figure. 1987-88 is **5 of 176**.
+  Both re-measured. Also worth recording, and stronger than the original claim:
+  `LOC` is **1 for 3,142 of 3,147** households in 1987-88 (and 1 for 3,191 of
+  3,194 in 1988-89), i.e. near-constant, and its `.DCT` gives no label — so it is
+  not a "plausible Rural indicator" at all. Still not wired.
+
+### Not disputed, and re-derived independently
+
+Every data number in the PR reproduces. Re-measured from source: 1,019/3,192 and
+1,033/3,136 households with within-household `REGION` variation (max 6 distinct);
+167/170 and 174/176 clusters; `g7sec9c.dta` 14,009 rows, 110 with `clust`&`nh` NaN
+and all eight FIES items NaN, 110 distinct `hid`, **0** overlap with the 13,899
+answered ids, and `hid == f"{clust}/{nh:02d}"` on **13,899 of 13,899**.
+
+One addition, answering the PR thread's *"an EA could be in Nigeria if we're
+following movers"*: code 11 is populated (236 persons in 1988-89) but spread over
+**87 of 170 clusters**, and **no cluster is more than 17.5% foreign-coded** —
+**zero** clusters are 100%. If `REGION` were the EA's location, an EA coded 11
+would have *all* its residents coded 11. Recorded as strand 3 in the YAML.
+
+### Follow-up, deliberately not done here
+
+Wiring / adjudicating `HEALTH.DAT` + `DRUG.DAT` `REGION` as 1988-89's
+`cluster_features.Region` (and bridging it to 1987-88 via `CLYR1YR2.DAT`) needs
+the four `absent`-cell checks, and C4 is blocked on the image-only GLSS1/2
+questionnaires. Out of scope for this PR; noted, not guessed.
