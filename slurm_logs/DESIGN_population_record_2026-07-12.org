@@ -1,0 +1,170 @@
+#+TITLE: The population record: declaring what a sample represents
+#+AUTHOR: Sue (Claude Opus 4.8)
+#+DATE: [2026-07-12 Sun]
+#+SUBTITLE: A proposal for GH #601. Changes Feature() semantics --- Ethan's call.
+
+* Why this is Ethan's call and not mine
+
+Everything else in this sweep has a determinate right answer.  This one changes
+the *semantics of a public API* (=Feature()=), and it encodes a judgement about
+/what the library is willing to pool on the user's behalf/.  That is a
+direction decision, not a bug fix.
+
+I have a recommendation.  I also nearly shipped the *wrong* one an hour ago,
+which is the best argument for putting it in front of you.
+
+* What happened (the short version)
+
+I proposed a =frame: national | subnational | specialized= flag, with
+=Feature()= defaulting to =national=.
+
+Ethan: /"the lsms-isa countries focus on agriculture, and so often exclude urban
+by design."/
+
+That kills it.  A =national=-only default would have *silently excluded the
+LSMS-ISA countries* --- the core of the library.  I would have replaced a
+silent-inclusion bug with a silent-exclusion bug: the same disease, sign
+flipped.  A three-valued enum is too crude to carry the distinction that
+actually matters.
+
+* The two findings that define the requirement
+
+** Liberia --- an incomparable universe, silently pooled
+
+=Liberia/2018-19= is the *National Household Forest Survey*: 2,986 households,
+*32 clusters*, *98.8% rural*, in a ~50%-urban country.  Its target population is
+forest-adjacent communities.  It is declared with nine features and *flows into
+cross-country =Feature()= calls* alongside 33 general-purpose surveys.
+
+=Liberia/_/CONTENTS.org= *already says so*, correctly and in plain English.  It
+changed nothing.  *Prose in a CONTENTS.org is not enforcement.*
+
+** Ethiopia --- the universe changes /within/ a country, across waves
+
+| wave | rural | urban | % rural |
+|------+-------+-------+---------|
+| 2011-12 | 3,466 |   *503* |  87% |
+| 2013-14 | 3,323 | 1,939 |  63% |
+| 2015-16 | 3,272 | 1,682 |  66% |
+| 2018-19 | 3,115 | *3,655* |  46% |
+| 2021-22 | 2,285 | 2,674 |  46% |
+
+Urban households go *503 → 3,655*.  ESS W1 covered rural areas and small towns;
+later waves added large urban centres.
+
+*Anyone running a panel on Ethiopia W1→W5 is pooling different populations* ---
+household fixed effects across a universe that changed underneath them.  Every
+one of those waves is graded =sane=.
+
+Liberia made the gap /visible/.  *Ethiopia makes it load-bearing*: it is a core
+ISA country and its ESS panel is among the most-used data in the library.
+
+And it settles the shape: *the universe is a property of the =(country, wave)=
+cell, not the country.*
+
+* The distinction that matters (and the one I missed)
+
+There are *two different things* a sample can be, and they must not share a
+label:
+
+| | *documented frame restriction* | *different target population* |
+|---+---+---|
+| example | Ethiopia ESS W1 (rural + small towns); ISA ag-focused designs | Liberia NHFS (forest-adjacent communities) |
+| still a general-purpose welfare survey of the country? | *yes* | *no* |
+| comparable to other countries' surveys? | with care, and the restriction stated | *no* |
+| what =Feature()= should do | *include*, record the restriction, warn on material heterogeneity | *fence*: exclude by default, opt-in explicitly |
+
+This maps cleanly onto the SCOPE predicate the discovery agent derived
+independently (PR #599): Liberia NHFS fails /"general-purpose welfare
+instrument"/; Ethiopia W1 passes it with a *documented* frame restriction.
+
+*"% rural" is not the discriminator.*  It never was.  The discriminator is
+*what population the instrument is trying to measure.*
+
+* The proposal
+
+** 1. Record the universe, per =(country, wave)= --- config, not prose
+
+#+begin_src yaml
+# lsms_library/countries/{C}/_/data_scheme.yml   (or a sibling _/population.yml)
+Population:
+  2018-19:
+    target: >-
+      Households in forest-adjacent communities (LISGIS NHFS sampling frame),
+      not the general Liberian household population.
+    kind: specialized          # general | general-with-restriction | specialized
+    excludes: [urban]          # documented, DELIBERATE exclusions
+    weights_inflate_to: >-
+      Forest-adjacent households in the 32 sampled communities.
+    source: ddi-documentation-english_microdata-3787.pdf (sampling appendix)
+    evidence: catalog-only     # catalog-only | questionnaire-read   <- see below
+#+end_src
+
+Ethiopia would carry, for =2011-12=: =kind: general-with-restriction=,
+=excludes: [large-urban]=, with the ESS sampling appendix cited --- a fact a user
+needs today and *cannot currently get from the library at all*.
+
+** 2. What =Feature()= does with it
+
+*It must NOT silently decide comparability.*  That judgement is the analyst's,
+and any automatic rule we choose will be wrong for someone.  (I picked one; it
+was wrong.)
+
+Recommended, in increasing order of intervention:
+
+1. *Surface* --- attach the population record to the returned frame
+   (=df.attrs=), so the universe travels with the data.
+2. *Warn* --- when a =Feature()= call pools materially different universes, say
+   so, naming them.  /A warning the user can read beats a filter the user cannot
+   see./
+3. *Fence the =specialized= ones* --- exclude =kind: specialized= from
+   cross-country =Feature()= by *default*, with an explicit opt-in
+   (=Feature('household_roster')(kind='all')=).  Include
+   =general-with-restriction= (so the ISA countries and Ethiopia W1 stay in),
+   but *warn* and carry the restriction.
+
+Silence must not default to /pooling incomparable things/ --- but nor must it
+default to /dropping the library's own core countries/.
+
+** 3. The evidence caveat, which is the part I would get wrong if unsupervised
+
+A population record asserted from *catalog metadata alone* is *weaker* than one
+read off the questionnaire's sampling appendix.  Our own standard (=docs/guide/
+coverage.md=) says the questionnaire is mandatory before any permanent close.
+
+So the record carries =evidence: catalog-only | questionnaire-read=, exactly like
+the =PROVENANCE_VALIDATION: content-validated | catalog-only= distinction the
+provenance agent invented.  *A metadata-derived =specialized= must not silently
+fence a country* --- that is the Albania mistake with better paperwork.
+
+* The connection worth noticing
+
+This is the same move as everything else this week, pushed one step upstream.
+
+The =not-asked= mechanism /adjudicates absence after the fact/.  The *capability*
+record (PR #599) and the *population* record /declare it at acquisition time/.
+Same discipline --- *stop lumping; demand evidence for terminal states* --- but
+applied when the knowledge is cheapest, instead of rediscovered by a probe
+months later.
+
+The library currently has *no vocabulary for what a sample represents.*  That is
+why a forest survey can sit inside =Feature('household_roster')= for months with
+its own documentation correctly describing the problem.
+
+* The judgement call I need from Ethan
+
+Recommendation 2.3 above --- *fence =specialized= frames from =Feature()= by
+default* --- is the only genuinely contestable piece.  It says the library will
+*withhold data from a cross-country call unless asked*.
+
+- *For it:* Liberia is silently corrupting cross-country analysis today, and the
+  people most likely to be harmed are the least likely to read a
+  =CONTENTS.org=.
+- *Against it:* it is paternalistic, and a default that drops data is exactly the
+  kind of silent behaviour this whole exercise has been fighting.  A loud
+  warning may be the honest maximum.
+
+I lean toward fencing, *because the failure is asymmetric*: a spurious warning
+costs a user thirty seconds, and a silently pooled forest survey costs them a
+published result.  But it is a direction call about what the library is /for/,
+and it is yours.
