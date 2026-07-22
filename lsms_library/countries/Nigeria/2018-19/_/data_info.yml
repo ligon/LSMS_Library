@@ -1,37 +1,62 @@
 Country: Nigeria
 Wave: 2018-19
 
+# `v` = composite cluster id (state/lga/ea) built from raw CODES; see the
+# GH #323 note in _/nigeria.py and the W1 data_info.yml for the full rationale.
 sample:
-    file: secta_plantingw4.dta
-    idxvars:
-        i: hhid
-    myvars:
-        v: ea
-        weight: wt_wave4
-        panel_weight: wt_longpanel
-        strata: strata
-        Rural:
-            - sector
-            - mapping:
-                1. URBAN: Urban
-                2. RURAL: Rural
-                1. Urban: Urban
-                2. Rural: Rural
-                rural: Rural
-                Rural: Rural
-                RURAL: Rural
-                urban: Urban
-                Urban: Urban
-                URBAN: Urban
-
-cluster_features:
     dfs:
+        - df_key
         - df_main
-        - df_geo
+    df_key:
+        file: secta_plantingw4.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
     df_main:
         file: secta_plantingw4.dta
         idxvars:
-            v: ea
+            i: hhid
+        myvars:
+            weight: wt_wave4
+            panel_weight: wt_longpanel
+            strata: strata
+            Rural:
+                - sector
+                - mapping:
+                    1. URBAN: Urban
+                    2. RURAL: Rural
+                    1. Urban: Urban
+                    2. Rural: Rural
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
+
+cluster_features:
+    dfs:
+        - df_key
+        - df_main
+        - df_geo
+    df_key:
+        file: secta_plantingw4.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
+    df_main:
+        file: secta_plantingw4.dta
+        idxvars:
+            i: hhid
         myvars:
             Region: zone
             District: state
@@ -48,17 +73,22 @@ cluster_features:
                     urban: Urban
                     Urban: Urban
                     URBAN: Urban
+    # This wave's geovariables file has NO `ea` column at all (hhid, lat, lon
+    # only), so the old `merge_on: [v]` could not join it and W4 silently lost
+    # Latitude/Longitude.  Joining on `i` (household) is both correct and the
+    # only thing that works here.
     df_geo:
         file: nga_householdgeovars_y4.dta
         idxvars:
-            v: ea
+            i: hhid
         myvars:
             Latitude: lat_dd_mod
             Longitude: lon_dd_mod
     merge_on:
-        - v
+        - i
     final_index:
         - t
+        - i
         - v
 
 assets:

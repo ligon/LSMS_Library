@@ -101,11 +101,35 @@ household_roster:
         Relationship: hh_s1q02
         MonthsAway: hh_s1q05
 
+# individual_education (GH #323).  The ids MUST be the W3-native
+# household_id2 / individual_id2 -- the same pair household_roster and shocks
+# already use for this wave -- NOT the W1-baseline household_id /
+# individual_id.
+#
+# household_id is the W1 BASELINE identity, and a household that SPLIT OFF
+# between waves inherits its parent's baseline id: W3 households
+# 010501020100105031 and 010501088800105031 (the `8888` marks the split-off)
+# both carry baseline household_id 01050100105031.  So (household_id,
+# individual_id) is 23,385 unique of 23,393 rows -- 16 rows in 8 colliding
+# pairs -- and the framework's groupby().first() collapse then MERGES TWO REAL,
+# DISTINCT PEOPLE.  They disagree: baseline individual 0105010010503101 is
+# '10th Grade Complete' in one household and '9th Grade Complete' in the other;
+# ...3105 is '3rd Grade Complete' vs '7th Grade Complete'.  first() publishes
+# one and destroys the other.  (household_id2, individual_id2) is 23,393 of
+# 23,393 unique.
+#
+# It was also breaking the join to household_roster, whose pid for this wave
+# IS individual_id2: BEFORE this change, 0 of the 12,633 built (i, pid) pairs
+# for t=2015-16 matched a roster row (and 1,231 of the 4,283 education
+# "households" existed nowhere in the roster), while W1/W4/W5 -- which use the
+# wave-native ids -- matched 100%.  Panel linkage is unaffected: id_walk plus
+# the existing panel_ids chain still maps household_id2 back to the W1
+# baseline, exactly as household_roster already relies on.
 individual_education:
     file: sect2_hh_w3.dta
     idxvars:
-        i: household_id
-        pid: individual_id
+        i: household_id2
+        pid: individual_id2
     myvars:
         # Highest grade completed (free-text survey labels).
         Educational Attainment:
