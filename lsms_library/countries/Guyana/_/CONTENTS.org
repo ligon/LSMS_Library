@@ -1,5 +1,428 @@
 #+TITLE: Guyana — country notes & known data issues
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 under GH #601.  Guyana has a single wave in this
+library, =1992/=.  This section records what the *documentation claims* the
+sample represents.  It deliberately does not look at the microdata: what the
+survey claims and what the data look like are two different facts, and keeping
+them apart is the point.  Nothing here proposes a schema — GH #603 owns that.
+
+** Where the statement lives: NOT in this repository
+
+*The universe evidence for Guyana 1992 is catalog-only.*  Every quotation below
+comes from =gy92info.pdf=, the Basic Information Document ("Guyana Living
+Standards Measurements Survey (GLSMS) 1992-1993: Basic Information
+Documentation", Country Operations Division II, Department III, Latin America
+and the Caribbean Region, The World Bank, July 15, 1996), hosted by the World
+Bank Microdata catalog at
+
+: https://microdata.worldbank.org/catalog/2319/download/34615
+
+That file is *not* in =lsms_library/countries/Guyana/1992/Documentation/=.  The
+documentation this repo does ship carries no universe statement:
+
+- =ddi-documentation-english_microdata-2319.pdf= (the shipped DDI) has *no*
+  Overview, Scope, Coverage or Universe section at all.  Its entire =Sampling
+  Procedure= field reads: "The LSMS survey was administered in conjunction with
+  the third subround of the HIES.  This required an additional visit by
+  interviewers to each of the approximately 1,800 households selected in this
+  round. ..." — sample-design text, not a universe.  Verified 2026-07-21 by
+  extracting all 11 pages; the strings =Universe=, =universe= and =Coverage= do
+  not occur in the file.
+- =SOURCE.org=, =LICENSE.org= — no universe statement.
+- =GUY01.pdf=, =GUY02.pdf=, =GUY03.pdf=, =GUY09.pdf= — image-only scans (text
+  layers of 12, 42, 2 and 16 characters respectively).  See the gap note below.
+
+So the record for this country is a *moving target held by the World Bank*, not
+something the library holds.  Guyana is one of 41 of 111 waves in that position
+(see =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=, §5.1).
+
+The WB catalog study page for entry 2319 has *no* =Universe= field.  Its
+Coverage section states only:
+
+#+begin_quote
+Geographic coverage: National
+#+end_quote
+
+That is a coverage claim, not a declaration of the population.  It should not be
+laundered into one.
+
+** 1992 — the declared universe, verbatim
+
+No document that could be read contains a field or a sentence labelled
+"universe" or "target population".  The closest thing to an explicit universe
+claim is the opening of the sample-design section, and the operational
+definition of the frame that follows it.
+
+Citation: =gy92info.pdf=, Section III "Sample", paragraphs 28-30, printed p. 7
+(PDF p. 11).
+
+#+begin_quote
+28.  The objectives of the HIES and the LSMS called for a national sample
+representative of rural and urban populations at all income levels.  Based on
+the experiences of Labor Force Survey and the Survey of Living Conditions in
+Jamaica, it was decided to draw a one-percent sample of households.  The design
+called for a two-stage stratified sample.  For the first stage sample,
+Enumeration Districts (geographical areas designated during the 1991 population
+census) were selected from 16 geographical regions.  In the second, households,
+the units of inquiry, were selected from a listing of all households in the
+selected Enumeration Districts.
+#+end_quote
+
+#+begin_quote
+29.  The First Stage Sample.  Guyana is divided into 10 Administrative Regions
+(Annex F contains a map displaying their borders).  For the 1991 population
+census, each Administrative Region was divided into Enumeration Districts (EDs)
+of about 100 households each.  There were 2,610 EDs in the country, of which 616
+were selected to the sample for the HIES.
+#+end_quote
+
+#+begin_quote
+30.  The urban sampling frame contained the EDs comprised of the Georgetown
+metropolitan area (central and suburban areas), which accounts for 21 percent of
+the total population, and the EDs comprised of the other urban areas which
+include New Amsterdam, Linden, Anna Regina, and Corriverton, accounting for 11.2
+percent of the population.  The Rural sampling frame was defined as the EDs in
+all ten Administrative Regions not defined as urban.
+#+end_quote
+
+Language of the source: English.  No translation needed.
+
+*Reading (editorial, not a quote).*  Taken together these say: a national,
+urban + rural, private-household frame, built from the 2,610 Enumeration
+Districts of the 1991 population census and covering all ten Administrative
+Regions.  This is *not* an LSMS-ISA-style rural-only or region-restricted
+design.  But note that no sentence names the population — the wave is tagged
+=national-claimed=, not =national-all-households=, in the #601 survey precisely
+because "a national sample representative of rural and urban populations" is a
+*representativeness* claim about a sample, not a statement of who is in scope.
+
+*Internal inconsistency in the source (flagged, not resolved).*  ¶28 says EDs
+"were selected from 16 geographical regions"; ¶29 says Guyana has 10
+Administrative Regions.  Table 1 of the same document lists 10 rural strata plus
+6 urban strata = 16, so "16 geographical regions" in ¶28 appears to mean strata.
+That reconciliation is *my* reading; the document does not state it.
+
+** 1992 — exclusions
+
+This is the part a pooler needs.  The finding is mostly negative, and the
+negative finding is itself evidence:
+
+*No document that could be read declares a categorical exclusion* — of
+institutional population, of collective or nomadic households, of the homeless,
+or of any Administrative Region — from the frame.  Per the repo's standing rule
+against unevidenced "no module here" claims, that sentence is scoped to what was
+actually read: the BID, the shipped DDI, and the catalog study page.  Two field
+manuals could not be read (see the gap note).
+
+What the documentation *does* record are field outcomes and access constraints,
+which are a different kind of fact:
+
+*** Seasonal inaccessibility of the interior regions (design accommodation, not exclusion)
+
+=gy92info.pdf= ¶32, printed p. 7 (PDF p. 11):
+
+#+begin_quote
+32.  Table 1 presents the allocation of selected EDs.  Note that the number of
+EDs selected in each stratum is a multiple of 8.  This was to ensure that each of
+the strata would be represented by at least two EDs in each of the four calendar
+rounds.  This sub-round restriction was not applied to interior regions 1, 7, 8,
+and 9 which are not accessible during certain periods of the year.  In these
+regions, the total sample allocated was programmed to be surveyed during the
+part of the year when they were accessible.
+#+end_quote
+
+Regions 1, 7, 8 and 9 stay *in* the frame; what is dropped is their even spread
+across the four calendar rounds.  This matters for this library specifically,
+because the wave shipped here *is one of those four rounds* (see below): a
+seasonal restriction applied to whole regions interacts with a design that
+retains only the third round.
+
+*** EDs actually lost in the field
+
+=gy92info.pdf= ¶42, printed p. 10 (PDF p. 14):
+
+#+begin_quote
+42.  Of the entire sample, only two EDS had to be substituted due to
+inaccessibility, and three became casualties.  Karisparu (ED no. 364) could not
+be surveyed because the air strip was closed, making the ED inaccessible.  A
+second ED in Region 4 was found to have only institutional population (the
+Georgetown Jail) and was not included.  The third ED not included was in Region
+10 due to unsatisfactory completion of the survey by the Enumerator and his
+subsequent resignation.  There was a substantial time lag, making revisits
+impossible.
+#+end_quote
+
+*Do not over-read the jail.*  The Georgetown Jail ED was dropped as a
+single-ED field outcome.  Nothing in the document states a *frame rule*
+excluding institutional population.  Those are different claims and only the
+first is evidenced.
+
+(=EDS= is the source's own capitalisation here and in ¶39; left as extracted.)
+
+*** Non-response is substituted, not excluded
+
+=gy92info.pdf= ¶37, printed p. 8-9 (PDF p. 12-13):
+
+#+begin_quote
+37.  From each of the rearranged sample frames, twelve (12) households were
+selected circular systematically with a random start and with substitution.  If
+a sample household could not be surveyed due to the temporary absence from the
+ED, refusal to give information or for other reasons, it was substituted by the
+household with the next sample serial number of the same column of the listing
+schedule so that the substitute household had the same economic characteristics
+as the original one.  The substitute for the last household of a column would,
+however, be the first household of the same column.  If a household had been
+already selected for survey, it would not be taken as a substitute.  If there was
+no proper substitute household in the same column, the first household in the
+next column was to be taken.
+#+end_quote
+
+Scale of the substitution, ¶41 (printed p. 10, PDF p. 14): "Of the total 7,254
+households surveyed in HIES, 1,196 were substituted households, and a very small
+proportion, 0.5 percent (37 households) were casualty households, e.g., no
+interview was conducted even with a substitute household."  So roughly one
+household in six in the HIES is a substitute drawn to match the original's
+economic characteristics.  This is a *realised-sample* property, not a universe
+property, but it bears on any analysis that treats non-response as ignorable.
+
+** 1992 — sub-samples and sub-populations (read this before pooling)
+
+The specialization in Guyana lives *inside* the wave, in three distinct ways.
+
+*** 1. The whole library wave is a one-quarter subround of a larger survey
+
+=gy92info.pdf= ¶38, "Sample Design of the LSMS", printed p. 9 (PDF p. 13):
+
+#+begin_quote
+38.  The LSMS was implemented in conjunction with the HIES and drew data from
+the third round of the four-round HIES 7,000 household sample.  Because each
+round represented a national sample, it was possible to administer the LSMS in
+one round only, covering 1,795 households in 154 EDs.
+#+end_quote
+
+The full HIES is 7,392 households in 616 EDs across four calendar rounds; what
+this library holds is the *third round only* — ~1,795 households in 154 EDs.  The
+BID's warrant for calling that national is the assertion "each round represented
+a national sample."
+
+The document itself immediately qualifies that warrant, ¶55, printed p. 13
+(PDF p. 17):
+
+#+begin_quote
+55.  It should be noted that because the full HIES contained a larger sample of
+7,200 households, some differences may occur in comparing results from the full
+HIES sample and analysis of the smaller (1,800 households) linked HIES-LSMS
+sample (e.g., slight differences in consumption patterns, and regional
+distribution).  For example, average household size for the HIES four sub-rounds
+was 4.3 compared with 4.4 for the third HIES-LSMS sub-round only.  The proportion
+of household expenditures on food was 54.0 percent for the HIES survey compared
+with 55.2 percent for the HIES-LSMS sample.
+#+end_quote
+
+So the survey's own documentation says the LSMS subsample's *regional
+distribution* differs from the full HIES — while ¶32 says four of ten regions
+were surveyed only in whichever part of the year they were accessible.  Anyone
+pooling Guyana with a full-year survey should know that the wave is a single
+quarter, and that the documentation does not claim the quarter is
+distributionally identical to the year.
+
+*** 2. Disproportionate allocation by stratum (the closest thing to an oversample)
+
+=gy92info.pdf= ¶31, printed p. 7 (PDF p. 11):
+
+#+begin_quote
+31.  The 616 EDs to be sampled were allocated to different strata taking into
+consideration the relative size of the rural and urban population.  Within the
+rural sector, the sample size was reallocated to ten strata in proportion to the
+rural population with a minimum of eight EDs for each stratum.  In the urban
+sector also, the sample size was reallocated into six strata in proportion to
+the urban population.  For the bigger and comparatively more populated interior
+regions (regions 1, 7, and 9) an allocation of 16 EDs was made so as to net about
+200 households in these regions.  Within each rural and urban stratum, the
+allocated number of EDs was selected in circular systematical manner with
+probability proportional to population as available from preliminary estimates
+from the 1991 census.  For some EDs the estimates were not yet available from the
+1991 census, so the results from the 1980 census were used.
+#+end_quote
+
+There is no *named* "booster" or "oversample" in this survey.  What there is: a
+floor of eight EDs per rural stratum and a deliberate 16-ED allocation to
+interior regions 1, 7 and 9 "so as to net about 200 households" — i.e. allocation
+departs from proportionality in the sparse interior.  Allocation from Table 1
+(=gy92info.pdf=, printed p. 7):
+
+| frame | stratum                | sample EDs |
+|-------+------------------------+------------|
+| Rural | Administrative Region 1|         16 |
+| Rural | Region 2               |         32 |
+| Rural | Region 3               |         72 |
+| Rural | Region 4               |        112 |
+| Rural | Region 5               |         40 |
+| Rural | Region 6               |         72 |
+| Rural | Region 7               |         16 |
+| Rural | Region 8               |          8 |
+| Rural | Region 9               |         16 |
+| Rural | Region 10              |          8 |
+| Rural | subtotal               |        392 |
+| Urban | Georgetown             |         48 |
+| Urban | Suburbs of Georgetown  |        104 |
+| Urban | New Amsterdam          |         16 |
+| Urban | Corriverton - Rosehall |         16 |
+| Urban | Linden                 |         32 |
+| Urban | Anna Regina            |          8 |
+| Urban | subtotal               |        224 |
+| TOTAL |                        |        616 |
+
+*Region *names* are deliberately omitted from the table.*  Table 1 prints a
+geographical description beside each region number, but the PDF's text layer
+yields only nine names for the ten numbered rural rows (Barima - Waini, Pomeroon
+- Supernaam, Essequibo Island - West Demerara, Mahaica - Berbice, East Berbice -
+Corentyne, Cuyuni - Mazaruni, Potaro - Simpauni, Upper Takutu - Upper Essequibo,
+Upper Demereara - Berbice) — one name, evidently Region 4's, is dropped, which
+shifts every pairing after it by one.  Rather than propagate a wrong
+number-to-name mapping, only the numbers and counts are transcribed here; read
+the names off Table 1 itself (printed p. 7).  The *counts* are as printed.
+
+Note also that 224/616 = 36 percent of sample EDs are urban, against the ~32
+percent urban population share implied by ¶30 (21 + 11.2).
+
+*** 3. Two within-household sub-samples in the LSMS instrument
+
+Both are documented and both are narrower than the household sample:
+
+- *Fertility module — one randomly selected woman per household.*
+  =gy92info.pdf= ¶23: "This section collected information about the pregnancy,
+  birthing, and contraceptive practices of women in the household between the
+  ages 13 and 49.  Only one member of the household was interviewed for this
+  section.  The interviewer consulted a previously prepared list of randomly
+  ordered ID numbers and selected the first one corresponding to an eligible
+  member of the household being interviewed. ..."
+- *Anthropometry module — households with a child under five, third visit.*
+  =gy92info.pdf= ¶24: "During the initial LSMS interview, the interviewer
+  indicated whether any children under the age of five years were present.  For
+  households with such children, a return visit by a team of nursing students,
+  was made to collect data on the children."
+
+  And its geographic limitation, ¶50, printed p. 12 (PDF p. 16): "No follow-up
+  visits subsequent to the administration of the anthropometric module were
+  attempted in interior regions due to prohibitive logistics and transportation
+  costs."
+
+So the anthropometric sub-sample is *not* uniformly followed up across the
+country: the interior regions get no post-anthropometry follow-up visit.
+
+** Universe vs. what the weights represent
+
+The documentation supplies expansion factors, and is explicit that they were
+adjusted where the frame and the field disagreed.  =gy92info.pdf= ¶43, printed
+p. 10 (PDF p. 14):
+
+#+begin_quote
+43.  Another constraint was the difficulty in physically identifying the EDS in
+the field using the census maps.  These maps had been prepared in the seventies
+and over the years, many changes had taken place.  In some areas, there was
+non-comparability between the Census population figure and the numbers of
+persons listed by the survey enumerators.  This was addressed by modifying the
+expansion factors to be used to estimate the values of different characteristics
+in cases where the difference between the ED population as estimated from the
+census and as revealed in the listing differed by more than 20 percent.  The
+expansion factors are included with the data files.
+#+end_quote
+
+Its footnote 3, on the same page:
+
+#+begin_quote
+3.  The expansion factors are missing for ED numbers 408 and 482.
+#+end_quote
+
+Two points for anyone weighting Guyana:
+
+1. The expansion factors ship in a separate file (=WEIGHT=, described in the
+   BID's Table 2 as "Contains ED number and expansion factor"), and are keyed at
+   *ED* level, not household level.
+2. They are *missing for two EDs*, and they were built for the HIES.  The BID
+   nowhere states that they were re-scaled for the third-round LSMS subsample —
+   and ¶55 says the LSMS subsample's regional distribution differs from the
+   HIES.  Whether the shipped factors weight the LSMS subsample to the national
+   population is *not established by the documentation*.  Treat that as an open
+   question, not as a defect claim.
+
+** Gaps: what was searched and not found
+
+Recorded as gaps per the repo's standing rule.  A silent gap is
+indistinguishable from an unevidenced negative.
+
+| searched                                             | result                                                    |
+|------------------------------------------------------+-----------------------------------------------------------|
+| =Guyana/1992/Documentation/SOURCE.org=               | provenance keywords only; no universe                     |
+| =Guyana/1992/Documentation/LICENSE.org=              | WB PUF terms only; no universe                            |
+| =ddi-documentation-english_microdata-2319.pdf=       | all 11 pp. extracted; no Overview/Scope/Coverage/Universe |
+| =GUY01.pdf= (GLSMS household questionnaire)          | *image-only scan, 12-char text layer — UNREAD*            |
+| =GUY02.pdf= (HIES household schedule)                | *image-only scan, 42-char text layer — UNREAD*            |
+| =GUY03.pdf= (HIES availability of facilities)        | *image-only scan, 2-char text layer — UNREAD*             |
+| =GUY09.pdf= (means tables)                           | *image-only scan, 16-char text layer — UNREAD*            |
+| =GUY04.pdf= (HIES Field Supervisor's Manual)         | catalog-hosted; *image-only scan, 20-char — UNREAD*       |
+| =GUY05.pdf= (HIES Instruction Manual for Field Staff)| catalog-hosted; *image-only scan, 136-char — UNREAD*      |
+| WB catalog study 2319 study-description page         | Abstract, Scope, Coverage, Sampling; *no Universe field*  |
+| WB catalog related-materials page                    | 10 documents enumerated; =gy92info.pdf= is the source     |
+
+No OCR tool (tesseract) was available on the host, so the six image-only PDFs
+could not be read.  =GUY04.pdf= and =GUY05.pdf= in particular are the manuals the
+BID itself points at for the household definition and the selection procedure
+(¶33: "The selection process is described in detail in the 'Field Supervisor's
+Manual'"; ¶53: "the GBS 'Instruction Manual for Field Staff' contains a very
+detailed explanation of each instrument item").  Either could carry a
+household-definition or coverage rule that this record therefore does not cover.
+*If someone runs OCR over GUY04/GUY05, revisit this section.*
+
+Household counts in the BID are mutually inconsistent and are *not* reconciled
+here: ¶33 "7,392 households was drawn"; ¶38 "four-round HIES 7,000 household
+sample" and "covering 1,795 households"; ¶41 "total 7,254 households surveyed in
+HIES"; ¶55 "a larger sample of 7,200 households" and "(1,800 households)";
+catalog and ¶33 "approximately 1,800 households".  They are quoted as printed.
+
+** Text-fidelity caveat on the quotations above
+
+=gy92info.pdf= is a 1996 print-to-PDF whose text layer inserts spurious spaces
+inside words, especially at justified line ends — the raw extraction contains
+e.g. =Househ old=, =implement ed=, =ED s comprised=, =1,79 5=, =was no t
+applied=, =Corrivert on=, =institutional populati on=, =and hi s subsequent=.
+In every quotation above I have (a) rejoined those split words, (b) collapsed
+runs of whitespace, and (c) removed marginal paragraph numbers that the
+extractor interleaves mid-sentence.  *No word was changed, added, dropped,
+reordered or translated.*  One deliberate non-repair: the source's =EDS= (¶42,
+¶39) is left as extracted rather than normalised to =EDs=.
+
+Reproduce with:
+
+#+begin_src python
+from pdfminer.high_level import extract_text
+from pdfminer.layout import LAParams
+extract_text('gy92info.pdf', page_numbers=list(range(9, 18)),
+             laparams=LAParams(word_margin=0.2, char_margin=3.0,
+                               line_margin=0.5, boxes_flow=0.5))
+#+end_src
+
+All quotations in this section were re-extracted from a freshly downloaded copy
+of =gy92info.pdf= on 2026-07-21 and match.
+
+** Notes for maintainers
+
+- This section does not contradict anything in this file.  The only pre-existing
+  note is the =shocks= availability finding under "Known data issues", which is
+  about module coverage, not sampling; the two do not interact.
+- Correction to the #601 evidence record: it states that this wave's
+  =SOURCE.org= "contains ONLY the bare DOI link ... no =#+CATALOG_ID= /
+  =#+PROVENANCE_*= keywords."  As of the 2026-07-12 provenance backfill that is
+  no longer true — =SOURCE.org= now carries =#+CATALOG_ID: 2319=,
+  =#+CATALOG_IDNO: GUY_1992_LSMS_v01_M=, =#+PROVENANCE_SOURCE: worldbank= and
+  =#+PROVENANCE_METHOD: doi-lookup=.  The catalog id the record inferred from a
+  filename is therefore independently confirmed.
+- Nothing in this section was derived from the =.dta= files.  Every claim is the
+  documentation's claim.
+
 * Known data issues
 
 ** shocks — not available (2026-06-06)

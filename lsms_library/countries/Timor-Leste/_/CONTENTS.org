@@ -1,5 +1,276 @@
 #+TITLE: Timor-Leste — country notes & known data issues
 
+* Sampling universe, exclusions and sub-samples
+
+What each Timor-Leste wave *claims* to represent, quoted from its own
+documentation.  This records only what the documents say; nothing here is
+inferred from the =.dta= files.  Evidence gathered 2026-07-21 (GH #601);
+quotes re-verified against the cited PDFs and against the World Bank catalog
+DDI export before being written here.
+
+| Wave    | Universe statement?    | Where the statement lives                | Stated exclusions       | Sub-samples inside the wave        |
+|---------+------------------------+------------------------------------------+-------------------------+------------------------------------|
+| 2001    | *none found*           | -- (nearest text is catalog-only)        | *none found*            | none                               |
+| 2007-08 | yes, explicit          | local =Documentation/= (and catalog)     | institutional households| 2008 Extension; unreleased panel   |
+
+Neither catalog record has a DDI =universe= element at all.  Checked directly:
+=study_desc.study_info= for =TLS_2001_TLSS_v01_M= has keys =[abstract,
+coll_dates, nation, geog_coverage, data_kind, notes]= and for
+=TLS_2007_TLSLS_v01_M= the same plus =analysis_unit=.  There is no =universe=
+key on either.  So for 2007-08 the *only* explicit universe statement anywhere
+is in a locally held document, and for 2001 there is none anywhere.
+
+Neither wave uses the World Bank NADA boilerplate sentence ("The survey covered
+all de jure households excluding prisons, hospitals, military barracks, and
+school dormitories", which recurs verbatim in 15 waves elsewhere in the
+corpus).  The 2007-08 exclusion text below is the Timorese statistical office's
+own prose, not template text.
+
+** 2001 (TLSS) -- no universe statement found
+
+*** The gap, stated as a gap
+
+No explicit universe / target-population statement exists for this wave, in the
+locally held documentation or in the World Bank catalog metadata.  The string
+=Universe= (any case) does not occur in the local DDI report at all, and there
+is no Universe heading on the catalog page.
+
+Searched (so that a later reader can falsify this):
+
+- =2001/Documentation/ddi-documentation-english_microdata-75.pdf= -- full text
+  (296k chars, pdfminer), grepped for =universe|target population|coverage|
+  geographic coverage|scope|represent|nationally representative|national
+  coverage|Domains:=.
+- =2001/Documentation/ETPA-Vol2-Final-web.pdf= (Poverty Assessment Vol. II,
+  Technical Report) -- full text (509k chars), grepped for =universe|
+  institutional|private household|not covered by the survey|target population|
+  household is defined|definition of a household|usually live together|common
+  kitchen|common food|excluded from the survey=.
+- =2001/Documentation/timorlestehhqeng_V2.pdf= (household questionnaire) --
+  full text, grepped for =universe|household member|eligible|definition|
+  resident|usual=.
+- =2001/Documentation/SOURCE.org=, =LICENSE.org=, and this file.
+- Remote: WB Microdata catalog study 75 -- study-description page,
+  related-materials page, and the DDI JSON at
+  =https://microdata.worldbank.org/index.php/api/catalog/TLS_2001_TLSS_v01_M=.
+
+*** Nearest documented coverage statements (not universe statements)
+
+These are the closest things the documentation offers.  They are coverage and
+sample-design claims, and they are recorded here *as* such -- none of them says
+which households were eligible to be sampled.
+
+Catalog only.  WB catalog study 75, Coverage > Geographic Coverage (DDI field
+=study_info.geog_coverage=):
+
+#+begin_quote
+National coverage.
+Domains: Urban/rural; Agro-ecological zones (Highlands, Lowlands, Western Region, Eastern Region, Central Region)
+#+end_quote
+
+Catalog only.  WB catalog study 75, Abstract (=study_info.abstract=):
+
+#+begin_quote
+A second element was the Timor-Leste Living Standards Measurement Survey (TLSS). This is a household survey with a nationally representative sample of 1,800 families from 100 sucos.
+#+end_quote
+
+*Both of the above exist only in World Bank catalog metadata -- neither appears
+in any file held in this repository.*  The locally held DDI PDF is a partial
+export: it carries Sampling / Questionnaires / Data Collection / Data
+Processing / variable lists, but not the Study Description "Coverage" block.
+So "National coverage." for 2001 is a moving target hosted by the WB, not
+something the library holds.
+
+Local.  =2001/Documentation/ETPA-Vol2-Final-web.pdf=, Ch. 1 "Survey Design and
+Welfare Measurement", para. 1.2, printed p. 1 (PDF p. 15); the same text is
+verbatim in =ddi-documentation-english_microdata-75.pdf= p. 2, "Sampling >
+Sampling Procedure > SAMPLE SIZE AND ANALYTIC DOMAINS":
+
+#+begin_quote
+A survey relies on identifying a subgroup of a population that is representative both for the underlying population and for specific analytical domains of interest. The main objective of the TLSS is to derive a poverty profile for the country and salient population groups. The fundamental analytic domains identified are the Major Urban Centers (Dili and Baucau), the Other Urban Centers and the Rural Areas. ... The survey has a sample size of 1,800 households, or about one percent of the total number of households in Timor-Leste.
+#+end_quote
+
+Local.  =ddi-documentation-english_microdata-75.pdf= pp. 2-3, "SAMPLING
+STRATEGY" -- bears on what the weights mean:
+
+#+begin_quote
+This implies that the sample is approximately selfweighted within the stratum: all households in the stratum had the same chance of being visited by the survey.
+#+end_quote
+
+*** Exclusions -- none found
+
+No statement of an excluded population (institutional or collective households,
+nomadic or homeless populations, a dropped district, a security carve-out)
+appears in the local 2001 documentation or in the catalog metadata.
+
+Two nearby rules were found and are recorded because they are easy to mistake
+for universe exclusions.  They are not: the first is a *frame/listing*
+definition and the second is a *household-membership* rule.
+
+Frame concept, =ddi-documentation-english_microdata-75.pdf= pp. 3-4, "Sampling
+Procedure > HOUSEHOLD LISTING":
+
+#+begin_quote
+The improvements introduced to the PLD consisted in clarifying the concept of a household "currently living in the aldeia", both by intensive training and supervision of the enumerators and by making its meaning explicit in the form's wording (it means that the household members are regularly eating and sleeping in the aldeia at the time of the operation).
+#+end_quote
+
+Membership rule, =timorlestehhqeng_V2.pdf=, Section 1 Part A, interviewer
+instructions to QUESTION 23:
+
+#+begin_quote
+DECEASED INDIVIDUALS ARE NEVER CLASSIFIED AS HOUSEHOLD MEMBERS.
+LODGERS ARE NOT CLASSIFIED AS HOUSEHOLD MEMBERS.
+#+end_quote
+
+*** Sub-samples
+
+None within the wave.  The 2001 design is a single stratified sample; the
+strata were Major Urban Centers (450 households: 378 Dili, 72 Baucau), Other
+Urban Centers (252) and Rural Areas (1,098), with a 3-stage PPS/PPS/EP
+selection outside Urban Dili and 2-stage in Urban Dili
+(=ddi-...-75.pdf=, "SAMPLE SIZE AND ANALYTIC DOMAINS" and "SAMPLING STRATEGY").
+That is sample design, not a universe.
+
+Note for anyone pooling across waves: half of this 2001 sample was selected for
+re-interview in 2007, but that panel component was *not released* -- see the
+2007-08 entry below.
+
+** 2007-08 (TLSLS-2, and the 2008 Extension TLSLS2-X)
+
+*** Declared universe (verbatim, local document)
+
+=2007-08/Documentation/TLSLS07_Final_Statistical_Abstract.pdf= (National
+Directorate of Statistics / Ministry of Finance, July 2008), Section "1.
+Demographics -- Concepts and definitions", printed p. 15 (PDF p. 27):
+
+#+begin_quote
+The TLSLS captures the population living in private households. A household is a group of persons (or a single person) who usually live together and have a common arrangement for food, such as using a common kitchen or a common food budget.  The persons may be related to each other or may be non-relatives, including servants or other employees, staying with the employer. Students and employees residing in and having a common food arrangement with the household are considered members of the household if they have been in the household for the last year and absent for no more than one month.   If absent for longer than nine months, only infants less than three months old, newly weds or a bride who has joined her husband's family are considered household members.
+#+end_quote
+
+Supporting, catalog only.  WB catalog study 78, Coverage > Geographic Coverage
+and Scope > Unit of Analysis:
+
+#+begin_quote
+National coverage.
+Domains: Urban/rural; Regional
+#+end_quote
+
+#+begin_quote
+- Household
+- Individual
+#+end_quote
+
+*** Exclusions (verbatim)
+
+Same document, same section, immediately following the universe paragraph:
+
+#+begin_quote
+However, this does not include boarders/lodgers or boarding houses operated by the household.  Boarding houses with more than five persons are considered to be institutional households.  Institutional households are not covered by the survey.  They are defined as a group of five or more unrelated persons living together, for example, those living in boarding houses, military barracks, prisons, or student dormitories.
+#+end_quote
+
+That is a genuine universe exclusion (institutional / collective quarters).  No
+geographic exclusion and no security carve-out is stated for this wave.  Note
+that the boarder/lodger clause in the same paragraph is a *membership* rule,
+not a universe exclusion -- the document runs the two together in one
+paragraph, and a reader should not.
+
+*** Two design components, only one released
+
+=2007-08/Documentation/ddi-documentation-english_microdata-78.pdf= p. 2,
+"Sampling > Sampling Procedure > SAMPLE DESIGN FOR THE 2007-2008 SURVEY"
+(identical text on the catalog page):
+
+#+begin_quote
+The TLSLS sample was designed to have two components: (i) a cross-sectional component of 4,500 households selected with the intention of representing the current population of Timor-Leste, and (ii) a panel component of 900 households, where half of the 2001 TLSS sample of 1800 households are randomly selected and re-interviewed, with the purpose to evaluating changes in the living conditions for the same set of households between the two surveys.
+#+end_quote
+
+Immediately following, same section:
+
+#+begin_quote
+However, this panel component is not being released at this time, so it will be neither covered in the rest of the documentation nor included in the data files.
+#+end_quote
+
+*This is the single most important sentence in this section for a user of the
+library.*  The 2001-2007 panel exists by design but is *not* in the shipped
+extract, so a household appearing in both library waves is not thereby a panel
+observation.  (Consistently, neither wave's =sample= declares =panel_weight= in
+=_/data_info.yml=.)
+
+Realized cross-section, same PDF p. 3:
+
+#+begin_quote
+In fact, the cross-sectional sample only consists of only 269 (rather than 300) different EAs. This necessitated selecting a multiple of 15 households (rather than just 15 households) in the EAs that were selected more than once. The final cross-sectional sample consists of 4,477 households.
+#+end_quote
+
+*** Sub-samples inside the wave
+
+The wave directory covers two instruments.  Anyone pooling should know this
+before averaging.
+
+1. *2008 Extension (TLSLS2-X)* -- a sub-sample of the TLSLS2 sample, not a
+   fresh draw.  =ddi-...-78.pdf=, "Sampling Procedure > 2008 EXTENSION SURVEY":
+
+   #+begin_quote
+   Sampling for the TLSLS2 - Extension survey was a sub-sample of the original TLSLS2 sample. The TLSLS2 field work was divided into 52 "weeks", with each week being a random subset of the total sample. The sub-sample was chosen by randomly selecting 19 weeks from the original field work schedule. Each week contained seven Primary Sampling Units (PSUs) for a total of 133 PSUs. In each PSU the teams were to interview 12 of the original 15 households, with the remaining three to serve as replacements. The total nominal sample size was thus 1596.
+   #+end_quote
+
+   There is no separate universe statement for the extension; its universe is
+   the TLSLS2 households it re-visits.
+
+2. *A quality-driven repeat in two districts* -- effectively an oversample of
+   Manatuto and Oecussi.  Same section, immediately following:
+
+   #+begin_quote
+   Additional interviews: Following the collection and initial analysis of the data, it was determined that data from one district, Manatuto, and partially from another district, Oecussi, were of insufficient quality in certain modules. Therefore it was decided to repeat the survey in another 25 PSUs of these two districts - six in Manatuto, and 19 in Oecussi. The additional PSUs chosen were randomly selected within the two districts from the remaining non-panel PSUs in the original TLSLS2 sample.
+   #+end_quote
+
+3. *A fieldwork-driven substitution* that changes which households the released
+   sample contains.  =ddi-...-78.pdf=, "Data Collection > DATA COLLECTION NOTES
+   > 2007-2008 SURVEY FIELDWORK":
+
+   #+begin_quote
+   In order to maintain a sample for a continuous period of a year, the final TLSLS sample thus excludes the 351 households interviewed in 2006 and instead includes the 358 revisited or replaced households.
+   #+end_quote
+
+*** Universe vs. what the weights represent
+
+The universe is "the population living in private households"; the weights are
+benchmarked to a projected population total, and the representativeness claim
+is made at ten domains rather than nationally alone.
+
+Representativeness, =ddi-...-78.pdf= p. 3:
+
+#+begin_quote
+The sample can be considered representative at national level as well as at the level of the ten domains represented by the rural and urban areas of the five regions.
+#+end_quote
+
+The ten domains are urban/rural within five regions: R1 Baucau, Lautem,
+Viqueque; R2 Ainaro, Manufahi, Manatuto; R3 Aileu, Dili, Ermera; R4 Bobonaro,
+Cova Lima, Liquica; R5 Oecussi (same section, enumerated verbatim there).
+
+Weight benchmark, same PDF, "Weighting > SELECTION PROBABILITIES AND RAISING
+FACTORS FR THE 2007-2008 SURVEY" (heading typo as printed):
+
+#+begin_quote
+The household weights are further adjusted such that the population totals as estimated from the full sample match the demographic projections for mid-2007 for each stratum. This corresponds to a mid-2007 total population for Timor-Leste of 1,047, 632 persons.
+#+end_quote
+
+("1,047, 632" is as printed.)  So weighted 2007-08 totals reproduce a 2007
+demographic *projection* based on the 2004 Census, not an independent count.
+
+** Notes on quoting and provenance
+
+- Quotes above have end-of-line hyphenation rejoined and hard line breaks
+  normalized to spaces; typographic quotes and diacritics are rendered in ASCII
+  per the repository's Org conventions.  No other alteration.
+- No =.dta= file was opened in preparing this section.  Nothing here is an
+  inference from the data about what the survey covers.
+- Wave provenance: both =SOURCE.org= files carry the catalog id
+  (=#+CATALOG_ID: 75= and =78=) and DOI, and the catalog records were fetched
+  and checked against them.
+- This section does not propose any schema for representing the above; how the
+  library should *record* a universe is being decided in GH #603.
+
 * Known data issues
 
 ** shocks — not available (2026-06-06)

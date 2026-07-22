@@ -760,6 +760,617 @@ The =reside= column appears in all cover page files but with varying
 case: "Rural"/"Urban", "rural"/"urban", "RURAL"/"URBAN". Harmonized to
 "Rural"/"Urban" via the =Rural= table in =categorical_mapping.org=.
 
+** Sampling universe, exclusions and sub-samples
+
+Evidence gathered for GH #601 (population statements).  This section records
+what the survey documentation *claims* the sample represents, verbatim, with
+citations.  It deliberately says nothing about how the library should represent
+any of it -- that is GH #603's decision.
+
+All quotes below were re-extracted from the cited PDFs (pdfminer) and from the
+World Bank DDI XML exports on 2026-07-21 and match character-for-character
+apart from whitespace: the justified PDFs emit runs of spaces inside sentences,
+which have been collapsed to single spaces.  No words were added, removed or
+reordered.  En dashes and =•= bullets inside quotes are as printed in the
+source, so the ASCII-source house preference yields to the verbatim rule here.
+
+*** At a glance
+
+| Wave    | Survey(s) in this library wave      | Catalog | Universe statement lives    | Likoma      | Institutional pop. |
+|---------+-------------------------------------+---------+-----------------------------+-------------+--------------------|
+| 2004-05 | IHS2 cross-section                  | 2307    | local PDF only (no field)   | EXCLUDED    | not stated         |
+| 2010-11 | IHS3 cross-section                  | 1003    | local PDF + catalog         | EXCLUDED    | excluded           |
+| 2013-14 | IHPS 2013 panel                     | 2248    | *catalog only*              | EXCLUDED    | excluded           |
+| 2016-17 | IHS4 cross-section + IHPS 2016      | 2936 + 2939 | local PDFs + catalog    | IHS4: in; IHPS: out | excluded   |
+| 2019-20 | IHS5 cross-section + IHPS 2019      | 3818 + 3819 | local PDF (IHS5); catalog (IHPS) | IHS5: in; IHPS text says out | excluded |
+
+Two structural facts a reader must have before pooling Malawi:
+
+1. *Likoma district moves in and out of the frame.*  IHS2 and IHS3 exclude it by
+   design; IHS4 is the first round to include it; IHS5 includes it but does not
+   treat it as a domain of analysis.  The IHPS panel universe text continues to
+   exclude it throughout.
+2. *2016-17 and 2019-20 are each one library wave carrying two different
+   declared universes* -- a national cross-section and a tracking-defined panel.
+   See "Two universes in one wave" below.
+
+*** 2004-05 (IHS2, catalog 2307)
+
+**** Declared universe -- and a caveat about its strength
+
+There is *no field or heading labelled "Universe"* anywhere in this wave's
+documentation, and the World Bank DDI XML for study 2307 has *no =<universe>=
+element at all* (verified 2026-07-21: =grep= over the fetched DDI returns zero
+matches).  The nearest statement is embedded in the Sampling Procedure
+narrative:
+
+#+begin_quote
+The sample for IHS-2 was drawn using a two-stage stratified sampling procedure
+from a sample frame using the 1998 Population Census Enumeration Areas (EAs).
+The population covered by the IHS-2 was all individuals living in selected
+households. The sample frame includes all three regions of Malawi: north, centre
+and south.
+#+end_quote
+
+Source :: =2004-05/Documentation/ddi-documentation-english_microdata-2307.pdf=,
+PDF p. 3, "Sampling" -> "Sampling Procedure".  Identical text is in the catalog
+DDI's =<sampProc>= element.
+
+*This statement is circular* and should not be treated as a universe.  "all
+individuals living in selected households" describes the *sample*, not the
+population the sample stands for.  Malawi IHS2 is one of the corpus's named
+examples of circular documentation (alongside GhanaLSS 1988-89).  Note also that
+the unit named here is *individuals*, not households.
+
+**** Exclusions
+
+#+begin_quote
+Each of the twenty-seven districts was considered as a separate sub-stratum of
+the main rural stratum (for IHS-2, Likoma District was excluded because of
+difficulty in travel to the island, so only twenty-six administrative districts
+were considered). Thus the total number of strata in the survey was thirty:
+twenty-six districts and four urban centers.
+#+end_quote
+
+Source :: same PDF, p. 3.
+
+- *Geographic* :: Likoma District excluded, on stated travel/logistics grounds.
+  This is the one hard, design-level exclusion documented for IHS2.
+- *Population* :: NO institutional-population exclusion is stated for IHS2.
+  IHS3 onward state one; IHS2's documentation is silent.  Recorded as silence,
+  not as evidence of inclusion.
+
+**** Sub-samples
+
+None.  IHS2 is a single cross-section, and it is *not* a panel baseline:
+
+#+begin_quote
+The IHPS sample does NOT have any links to the IHS2 sample. The IHS3 serves as a
+baseline ONLY for the panel subsample.
+#+end_quote
+
+Source :: =2016-17/Documentation/ihps_2016_bid_updated_final.pdf=, p. 4,
+footnote 1.
+
+The library's 2004-05 config reads the flat =2004-05/Data/= directory; there is
+no panel half to mix in.
+
+*** 2010-11 (IHS3, catalog 1003)
+
+**** Declared universe
+
+#+begin_quote
+The sampling frame for the IHS-3 is based on the listing information and
+cartography from the 2008 Malawi Population and Housing Census. The target
+universe for the IHS-3 includes individual households and persons living in
+those households within all the districts of Malawi except for Likoma. Also
+excluded from this survey is the population living in institutions, such as
+hospitals, prisons and military barracks.
+#+end_quote
+
+Source :: =2010-11/Documentation/IHS3_Report.pdf=, Chapter 1, s. "1.2 Sample
+design and coverage", PDF p. 19 (printed p. 2).  Verified 2026-07-21.
+
+This is a genuine target-universe statement (it uses the words "target
+universe"), and its unit is *both* households and persons.
+
+**** Exclusions
+
+Two mutually consistent layers.
+
+(a) Frame-level, with the reason given:
+
+#+begin_quote
+It was decided to exclude the island district of Likoma from the IHS3 sampling
+frame, since it only represents about 0.1% of the population of Malawi, and the
+corresponding cost of enumeration would be relatively high. The sampling frame
+further excludes the population living in institutions, such as hospitals,
+prisons and military barracks. Hence, the IHS3 strata are composed of 31
+districts in Malawi.
+#+end_quote
+
+Source :: =2010-11/Documentation/ddi-documentation-english_microdata-1003.pdf=,
+PDF p. 3, "Sampling" -> "Sampling Procedure".
+
+(b) Household-level ineligibility rules.  These are *NOT in either local PDF* --
+they exist only in the World Bank catalog DDI's =<universe>= element for study
+1003 (verified by fetching https://microdata.worldbank.org/index.php/metadata/export/1003/ddi
+on 2026-07-21):
+
+#+begin_quote
+Members of the following households are not eligible for inclusion in the
+survey:
+• All people who live outside the selected EAs, whether in urban or rural areas.
+• All residents of dwellings other than private dwellings, such as prisons,
+hospitals and army barracks.
+• Members of the Malawian armed forces who reside within a military base. (If
+such individuals reside in private dwellings off the base, however, they should
+be included among the households eligible for random selection for the survey.)
+• Non-Malawian diplomats, diplomatic staff, and members of their households.
+(However, note that non-Malawian residents who are not diplomats or diplomatic
+staff and are resident in private dwellings are eligible for inclusion in the
+survey. The survey is not restricted to Malawian citizens alone.)
+• Non-Malawian tourists and others on vacation in Malawi.
+#+end_quote
+
+Two things worth pulling out: the survey explicitly is *not* restricted to
+Malawian citizens; and this list is a set of *ineligibility* rules, so read as a
+universe field it defines the population only by negation.
+
+**** Representativeness (what the weights claim)
+
+#+begin_quote
+As noted above, the IHS3 data are representative at the national, urban/rural,
+regional and district-level.
+#+end_quote
+
+Source :: =ddi-documentation-english_microdata-1003.pdf=, PDF p. 3, "Weighting".
+The weight variable named there is =hhwght=; this wave's cover page in this repo
+carries =hh_wgt= (see the *Weights* table above).
+
+**** Sub-samples: the 204-EA panel baseline is drawn INSIDE this wave
+
+#+begin_quote
+A sub-sample of IHS3 sample enumeration areas (EAs) (i.e. 204 EAs out of 768
+EAs) was selected prior to the start of the IHS3 field work with the intention
+to (i) visit a total of 3,246 households in these EAs twice to reduce recall
+associated with different aspects of agricultural data collection and (ii) to
+track and resurvey these households in 2013 [...]
+#+end_quote
+
+Source :: =2016-17/Documentation/ihps_2016_bid_updated_final.pdf=, p. 4.
+
+This is the canonical "specialization lives inside a wave" case for Malawi: the
+IHPS baseline is a purposively-timed sub-sample of the IHS3 cross-section,
+*selected before fieldwork*, whose households were visited twice.  Its own
+representativeness is stated separately (see 2013-14 below) and is coarser than
+IHS3's.
+
+*Library note*: =2010-11/Data/= contains both =Full_Sample/= and =Panel/=, but
+the 2010-11 config reads only =Full_Sample/= (32 references vs. 0).  So this
+library wave carries the IHS3 cross-section alone -- unlike 2016-17 and 2019-20.
+
+*** 2013-14 (IHPS 2013, catalog 2248)
+
+**** Declared universe -- lives ONLY in World Bank catalog metadata
+
+The universe statement for this wave is *not present in any file in this
+repository under this wave*.  The local DDI report PDF
+(=2013-14/Documentation/ddi-documentation-english_microdata-2248.pdf=, 1,889 pp.)
+contains neither the word "universe" nor the phrase "neither servants"; it has
+only a Sampling Procedure narrative.  The statement is the catalog DDI's
+=<universe>= element, fetched and verified verbatim on 2026-07-21 from
+https://microdata.worldbank.org/index.php/metadata/export/2248/ddi:
+
+#+begin_quote
+The IHPS attempted to track all baseline households (from the IHS3) as well as
+individuals that moved away from the baseline dwellings between 2010 and 2013 as
+long as they were neither servants nor guests at the time of the IHS3; were
+projected to be at least 12 years of age and were known to be residing in
+mainland Malawi but excluding those in Likoma Island and in institutions,
+including prisons, police compounds, and army barracks.
+#+end_quote
+
+Because this lives only in the catalog, *the record is a moving target*: it can
+be revised upstream without anything in this repo changing.
+
+Near-identical wording *is* held locally, but filed under other waves:
+
+#+begin_quote
+The IHPS 2013 attempted to track all baseline households as well as individuals
+that moved away from the baseline dwellings between 2010 and 2013 as long as
+they were neither servants nor guests at the time of the IHS3; were projected to
+be at least 12 years of age and were known to be residing in mainland Malawi but
+excluding those in Likoma Island2 and in institutions, including prisons, police
+compounds, and army barracks.
+#+end_quote
+
+Sources :: =2016-17/Documentation/ihps_2016_bid_updated_final.pdf=, s. "1.20
+INTEGRATED HOUSEHOLD PANEL SURVEY (IHPS)", p. 5; and
+=2019-20/Documentation/the_integrated_household_panel_survey_2010_2019_report.pdf=,
+s. "1.1 Integrated Household Panel Survey", PDF p. 20 (printed p. 2).  ("Likoma
+Island2" is the footnote marker, as printed.)  Both verified 2026-07-21.
+
+*This is a TRACKING universe, not a fresh-draw universe.*  The target population
+is defined relative to the IHS3 2010 baseline sub-sample, not to Malawi.
+
+**** Exclusions
+
+- *Geographic* :: Likoma Island, and anything outside mainland Malawi.  The
+  reason is given in a footnote:
+
+  #+begin_quote
+  The exclusion of the Likoma Island is rooted in the traditional exclusion of
+  the district for IHS purposes, largely due to logistical considerations.
+  #+end_quote
+
+  Source :: =2016-17/Documentation/ihps_2016_bid_updated_final.pdf=, p. 5, fn. 2.
+
+- *Population* :: institutions -- prisons, police compounds, army barracks.
+  (Note "police compounds" appears in the IHPS wording but not in the IHS
+  cross-section wording.)
+- *Age rule* :: split-off individuals were tracked only if "projected to be at
+  least 12 years of age".  Under-12 movers are outside the tracking universe.
+- *Status rule* :: individuals who were "servants" or "guests" at baseline are
+  outside the tracking universe.
+
+The age and status rules are easy to miss and are a genuine part of the declared
+universe, not an operational detail.
+
+**** Representativeness (coarser than IHS3's, and stated at baseline)
+
+#+begin_quote
+At baseline, the IHPS sample was selected to be representative at the national-,
+regional-, urban/rural levels and for each of the following 6 strata: (i)
+Northern Region – Rural, (ii) Northern Region – Urban, (iii) Central Region –
+Rural, (iv) Central Region – Urban, (v) Southern Region – Rural, and (vi)
+Southern Region – Urban.
+#+end_quote
+
+Source ::
+=2019-20/Documentation/the_integrated_household_panel_survey_2010_2019_report.pdf=,
+p. 20 (verified); the same sentence, phrased "the IHPS sample (known as the IHPS
+2010) had been selected, out of the overall IHS3 sample as described above, to be
+representative at ...", is at =ihps_2016_bid_updated_final.pdf= p. 5.
+
+Note the claim is about the *baseline*.  It is not a claim about the 2013
+interviewed sample after tracking and split-off accretion.
+
+**** Sample composition (design detail, not universe)
+
+#+begin_quote
+Once a split-off individual was located, the new household that he/she
+formed/joined since 2010 was also brought into the IHPS sample. In view of the
+tracking rules, the final IHPS 2013 sample, therefore, included a total of 4,000
+households that could be traced back to 3,104 baseline households
+#+end_quote
+
+Source :: =ihps_2016_bid_updated_final.pdf=, p. 5.
+
+The 4,000-vs-3,104 gap is households *created by the tracking rule*.  A user
+weighting this wave should use =panelweight= and should not read the 4,000 as
+4,000 independent draws.  This is also the mechanism behind the 765 contested
+cluster-attribute cells documented under *GH #323: 2013-14 (IHPS): the GPS is
+the proof* above -- movers, not a broken key.
+
+*** 2016-17 (IHS4, catalog 2936 + IHPS 2016, catalog 2939)
+
+**** Two universes in one library wave
+
+The library's 2016-17 config reads *both* =../Data/Cross_Sectional/= (IHS4, 55
+references) and =../Data/Panel/= (IHPS 2016, 25 references).  Rows in this wave
+therefore come from two different declared target populations, with different
+geographic frames (Likoma in vs. out) and different analysis domains.  Anyone
+averaging over this wave is averaging over both.
+
+**** [A] IHS4 cross-section -- declared universe
+
+The DDI's "Universe" field contains only the ineligibility list:
+
+#+begin_quote
+Members of the following households are not eligible for inclusion in the
+survey:
+• All people who live outside the selected EAs, whether in urban or rural areas.
+• All residents of dwellings other than private dwellings, such as prisons,
+hospitals and army barracks.
+• Members of the Malawian armed forces who reside within a military base. (If
+such individuals reside in private dwellings off the base, however, they should
+be included among the households eligible for random selection for the survey.)
+• Non-Malawian diplomats, diplomatic staff, and members of their households.
+(However, note that non-Malawian residents who are not diplomats or diplomatic
+staff and are resident in private dwellings are eligible for inclusion in the
+survey. The survey is not restricted to Malawian citizens alone.)
+• Non-Malawian tourists and others on vacation in Malawi.
+#+end_quote
+
+Source :: =2016-17/Documentation/ddi-documentation-english_microdata-2936.pdf=,
+PDF p. 12, heading "Universe" (immediately under "Geographic Coverage:
+National").  Verified 2026-07-21; byte-equal to the catalog DDI =<universe>=.
+
+**** [A] IHS4 -- Likoma enters the frame
+
+#+begin_quote
+This is the first round of the survey to include the island district of Likoma
+in the sampling frame. The sampling frame further excludes the population living
+in institutions, such as hospitals, prisons and military barracks. Hence, the
+IHS4 strata are composed of 32 districts in Malawi.
+#+end_quote
+
+Source :: World Bank catalog DDI for study 2936, =<sampProc>= (fetched and
+verified 2026-07-21).  The same paragraph is in the local DDI PDF's Sampling
+Procedure section.
+
+This is a *real break* from 2004-05 and 2010-11: 32 districts, not 26 or 31.
+
+**** [B] IHPS 2016 panel -- declared universe
+
+#+begin_quote
+The IHPS 2016 attempted to track all IHPS 2013 households stemming from 102 of
+the original 204 baseline panel enumeration areas as well as individuals that
+moved away from the 2013 dwellings between 2013 and 2016 as long as they were
+neither servants nor guests at the time of the IHPS 2013; were projected to be
+at least 12 years of age and were known to be residing in mainland Malawi but
+excluding those in Likoma Island and in institutions, including prisons, police
+compounds, and army barracks.
+#+end_quote
+
+Source ::
+=2016-17/Documentation/Panel/ddi-documentation-english_microdata-2939.pdf=,
+PDF p. 5, heading "Coverage" -> "UNIVERSE".  Verified 2026-07-21.
+
+Same tracking / 12+ / servant-or-guest / Likoma / institution rules as 2013-14,
+now narrowed to *102 of the 204* baseline EAs.
+
+**** [B] IHPS 2016 -- the sample is halved, and the domains change
+
+#+begin_quote
+Given the increasing numbers of households to be tracked, as well as
+budget/resource constraints, starting in 2016, the IHPS target household sample was
+adjusted as the households that have been associated with 102 out of 204
+baseline EAs. Although the IHPS 2016 cannot be tabulated by region, the
+stratification of the IHPS 2010 sample by region, urban and rural strata was
+still maintained with a proportional allocation of the sample across the
+regions, based on the distribution of the sampling frame from the 2008 Malawi
+Census. [...] Thus, starting in 2016, the IHPS domains of analysis will be
+limited to the national, urban and rural areas.
+#+end_quote
+
+Source :: =2016-17/Documentation/ihps_2016_bid_updated_final.pdf=, p. 5.
+Verified 2026-07-21.  (The bracketed elision drops two sentences about Table 1.1
+and urban sample size.)
+
+This is the clearest *universe-vs-weights* divergence in the Malawi series: the
+strata still carry region, but the documentation says the survey no longer
+supports regional tabulation.  Region is present in the data and is *not* an
+analysis domain from 2016 onward.
+
+The two halves' claims side by side:
+
+#+begin_quote
+The IHS4 cross-section collected information from a sample of 12,480 households
+statistically designed to be representative at both national, district, urban
+and rural levels while the IHPS 2016 collected information from a sample of all
+households and split-off individuals stemming from 102 out of the 204 original
+baseline EAs representative at the national and urban/rural levels.
+#+end_quote
+
+Source :: =ihps_2016_bid_updated_final.pdf=, p. 4.  Verified 2026-07-21.
+
+**** Overlap warning
+
+EA =30305580= is sampled in *both* the Cross_Sectional and the Panel halves of
+this wave -- a genuine shared EA, not a code collision.  See *GH #323: 2016-17
+(IHS4 + IHPS4)* above for the measurement.  Relevant here because it means the
+two universes are not merely adjacent in this wave, they touch.
+
+**** Where these statements live
+
+Both universes are held *locally* (the two DDI PDFs plus the IHPS BID), so this
+wave is not catalog-dependent.  But note that
+=2016-17/Documentation/SOURCE.org= records catalog id *2936 only*; the IHPS 2016
+entry (2939), whose DDI PDF sits in =Documentation/Panel/=, is not recorded in
+any SOURCE.org in this repo.
+
+*** 2019-20 (IHS5, catalog 3818 + IHPS 2019, catalog 3819)
+
+**** Two universes in one library wave (again)
+
+The 2019-20 config reads both =../Data/Cross_Sectional/= (IHS5, 53 references)
+and =../Data/Panel/= (IHPS 2019, 26 references).
+
+**** [A] IHS5 cross-section -- declared universe
+
+#+begin_quote
+The sampling frame for the IHS5 is based on the cartography and data from the
+2018 Malawi Census of Population. This will provide a very updated frame for the
+first sampling stage compared to the IHS-4, which was based on the 2008 Census.
+The target universe for the IHS5 includes the individual households and persons
+living in these households within all the districts of Malawi, including the
+small island district of Likoma, which had also been included in IHS-4, but not
+in the previous surveys. The sampling frame excludes the population living in
+institutions, such as school dormitories, hospitals, prisons and military
+barracks.
+#+end_quote
+
+Source ::
+=2019-20/Documentation/fifth_integrated_household_survey_ihs5_2019_2020_basic_information_document.pdf=,
+s. "2.0 SURVEY DESIGN" -> "2.1 Sampling Frame and Sampling Units for the Malawi
+IHS5", printed p. 7.  Verified 2026-07-21.
+
+Note *school dormitories* are added to the institutional exclusion list here;
+IHS3 and IHS4 name only hospitals, prisons and military barracks.
+
+**** [A] IHS5 -- Likoma is in the frame but is NOT a domain of analysis
+
+#+begin_quote
+Because of the small size of Likoma, for stratification purposes it was combined
+with the district of Nkhata Bay. Although it will be represented in the
+national-level survey results, Likoma will not be considered a domain of
+analysis for the IHS5.
+#+end_quote
+
+Source :: same BID, p. 7.  Verified 2026-07-21.
+
+So Likoma's status is *three-valued* across the series: excluded from the frame
+(IHS2, IHS3), in the frame and a district (IHS4), in the frame but folded into
+Nkhata Bay for stratification and not a domain (IHS5).
+
+**** [A] IHS5 -- realised coverage fell short of the universe (COVID-19)
+
+This is *not* a design exclusion, and must not be recorded as one.  The universe
+did not change; fieldwork stopped.
+
+#+begin_quote
+Due to the COVID-19 pandemic, the data collection for IHS5 was suspended around
+10 April 2020 before the end of the fourth quarter. For this reason, it was
+necessary to adjust the basic design weights described above to account for
+sample EAs that were not enumerated because the data collection was suspended.
+#+end_quote
+
+#+begin_quote
+[...] in the case of the 51 sample EAs in the fourth quarter that were not
+enumerated, the weights were calculated as 0 since there were no households
+interviewed. These missing EAs were represented by the weight adjustment for the
+enumerated EAs in the stratum and quarter [...]
+#+end_quote
+
+Source :: same BID, pp. 41-42.
+
+#+begin_quote
+12, 288 households from 768 Enumeration Areas were selected. Due to COVID-19, 51
+Enumeration Areas were unable to be visited at the end of the 12-month fieldwork
+period. Due to this, the final response rate was 93 percent.
+#+end_quote
+
+Source :: World Bank catalog DDI for study 3818, =<respRate>= (fetched and
+verified 2026-07-21; the stray space in "12, 288" is as published).
+
+*Universe vs. weights*: the declared universe is the full 32-district
+population; the weights make the enumerated EAs stand in for the 51 unenumerated
+ones within stratum and quarter.  Since IHS5 deliberately enumerates a
+nationally representative subsample each quarter to capture seasonality, the
+loss is concentrated in the final quarter and the reweighting is a within-
+stratum-and-quarter adjustment, not a national one.  Anyone using IHS5 for
+seasonal analysis should read the BID before trusting Q4.
+
+**** [B] IHPS 2019 panel -- declared universe (catalog only, and internally odd)
+
+#+begin_quote
+The IHPS 2016 and 2019 attempted to track all IHPS 2013 households stemming from
+102 of the original 204 baseline panel enumeration areas as well as individuals
+that moved away from the 2013 dwellings between 2013 and 2016 as long as they
+were neither servants nor guests at the time of the IHPS 2013; were projected to
+be at least 12 years of age and were known to be residing in mainland Malawi but
+excluding those in Likoma Island and in institutions, including prisons, police
+compounds, and army barracks.
+#+end_quote
+
+Source :: World Bank catalog DDI for study 3819, =<universe>= (fetched and
+verified verbatim 2026-07-21 from
+https://microdata.worldbank.org/index.php/metadata/export/3819/ddi).  *Not
+present in any local file*, and catalog id 3819 is *not recorded in
+=2019-20/Documentation/SOURCE.org=*, which lists only 3818.
+
+Read it carefully: it says "2016 and 2019 attempted to track ... individuals
+that moved away from the 2013 dwellings between 2013 and 2016".  The 2016
+wording was extended in place rather than rewritten, so as published the field
+does not describe the 2016-2019 tracking operation at all.  The local report
+does:
+
+#+begin_quote
+The IHPS4 (2019), attempted to track households and individuals that moved away
+from the dwellings they were living during IHPS 2016. The areas of analysis were
+limited to the national, urban and rural areas since the number of EAs was
+halved during IHPS3 (2016).
+#+end_quote
+
+Source ::
+=2019-20/Documentation/the_integrated_household_panel_survey_2010_2019_report.pdf=,
+p. 20.  Verified 2026-07-21.
+
+**** [B] IHPS 2019 -- Likoma: the two sources disagree
+
+The catalog =<universe>= excludes Likoma Island.  The local 2019 panel report,
+at the same point in the same sentence, carries footnote 2 reading:
+
+#+begin_quote
+Likoma is included in the list of the districts.
+#+end_quote
+
+Source :: same report, p. 20, fn. 2.  (Compare the 2016 BID's footnote 2 at the
+identical position, which says the opposite: "The exclusion of the Likoma Island
+is rooted in the traditional exclusion of the district for IHS purposes".)  Both
+are recorded; neither is adjudicated here.  Since the IHPS frame is the 2010
+IHS3 baseline EAs, which excluded Likoma, no IHPS household can be from Likoma
+by construction regardless of which footnote is right -- but the *statements*
+differ and a reader should know.
+
+**** [B] IHPS 2019 -- composition
+
+#+begin_quote
+The survey collected data from 102 Enumeration with number of households
+increasing from 2,508 in 2016 to 3,178 in 2019 which could be traced back to
+2,370 households.
+#+end_quote
+
+Source :: same report, PDF p. 20 (sentence as printed, including "102
+Enumeration").  Verified 2026-07-21.
+
+*** Cross-wave: what to check before pooling
+
+- *Frame vintage changes twice.*  1998 census EAs (IHS2), 2008 census EAs
+  (IHS3/IHS4 and the IHPS baseline), 2018 census EAs (IHS5).  This is already
+  documented above under *GH #323* for the =v= codes: 2004-05 shares only 3
+  codes with 2010-11.  A cross-wave join on =v= is meaningful from 2010-11
+  onward and not before, and the *universe* changes with the frame too.
+- *Likoma*: out / out / out / in / in-but-not-a-domain (IHS2, IHS3, IHPS, IHS4,
+  IHS5).  Any district-level Malawi panel must decide what to do about this.
+- *Institutional exclusion* is stated from IHS3 onward and is silent for IHS2.
+  IHS5 adds school dormitories.
+- *The IHPS half of 2016-17 and 2019-20 is not nationally-by-region
+  representative* from 2016 onward, by the survey's own statement, even though
+  region is present in the data.
+- *The 12+ and servant/guest tracking rules* mean the IHPS "universe" is not a
+  population of Malawi at all -- it is a population defined by who was in the
+  2010 (later 2013) baseline and who was old enough and not a servant or guest.
+
+*** Boilerplate check
+
+Malawi's universe text is *not* the World Bank NADA template sentence ("The
+survey covered all de jure households excluding prisons, hospitals, military
+barracks, and school dormitories") that appears verbatim in 15 waves elsewhere
+in the corpus.  Malawi's statements are survey-specific.
+
+However, one block *is* reused verbatim within Malawi: the five-bullet
+ineligibility list is character-identical across the =<universe>= elements of
+catalog 1003 (IHS3), 2936 (IHS4) and 3818 (IHS5).  It is an IHS-series-standard
+metadata block, not three independent claims.  Treat it as attesting one
+editorial decision by the series' documenters, and note that as a "universe" it
+is purely negative: it lists who is ineligible and never states who is in.
+
+*** Corrections to the upstream evidence record (verified 2026-07-21)
+
+Three claims in the GH #601 per-wave record for Malawi did not survive
+re-checking against the cited sources.  Recorded here so they are not
+propagated.
+
+1. *"the WB catalog record for IHS5 (3818) has an EMPTY =<universe>= element"*
+   -- FALSE as fetched on 2026-07-21.  Study 3818's =<universe>= contains the
+   same five-bullet ineligibility list as 1003 and 2936 (delivered in a CDATA
+   section, which may be what defeated the earlier parse).  The substantive
+   point the record was making still stands and is stated above: IHS5's positive
+   target-universe sentence comes from the local Basic Information Document, not
+   from the catalog, and the catalog carries only the negative list.
+2. *"SOURCE.org for [2016-17] lists catalog 2936 AND 2248"* -- FALSE.
+   =2016-17/Documentation/SOURCE.org= lists 2936 only.  No SOURCE.org in this
+   repo records 2939 (IHPS 2016) or 3819 (IHPS 2019), which is the real gap.
+3. *"2016-17 ... Cross_Sectional (16 references) / Panel (17 references)"* and
+   *"2019-20 ... (21 / 18)"* -- the reference counts differ from a fresh =grep=
+   over =<wave>/_/= (2016-17: 55 / 25; 2019-20: 53 / 26; 2010-11: =Full_Sample=
+   32 / =Panel= 0).  The counts are incidental; the load-bearing conclusion --
+   2016-17 and 2019-20 read both halves, 2010-11 reads only =Full_Sample/= --
+   is confirmed.
+
 * Files in Malawi/<SOMEYEAR>/_/
 ** RETIRED household_characteristics.py
 Now derived at API time via =transformations.roster_to_characteristics=
