@@ -129,7 +129,35 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 #     keeps unit #1's age.  Retaining the detail needs the `item_seq` level to
 #     survive, which it currently cannot: the extra idxvar is dropped by the
 #     `dfs:` merge in Wave.grab_data (#323 Site 4), and Nigeria's other waves
-#     have no item_seq column to declare.  Tracked as a residual, not fixed here.
+#     have no item_seq column to declare.  Tracked as a residual, not fixed here;
+#     the Age loss is now REPORTED rather than silenced (see the residual re-audit
+#     in _collapse_duplicate_index and country._normalize_dataframe_index).
+#
+# WHERE THIS DEPARTS FROM THE RECORDED PRESCRIPTION, AND WHY.
+# `Nigeria/_/data_scheme.yml` on the (unmerged) #625 branch carries a "KNOWN OPEN
+# DEFECT" note that diagnoses all of the above correctly and then prescribes TWO
+# edits: (1) `data_info.yml : index_info assets -> (t, i, j, item_seq)` and
+# (2) this dict entry, with "Age wants mean".  Only (2) is done here.  Both
+# departures were checked, not assumed:
+#
+#   * (1) IS INERT TODAY.  Declaring `item_seq` in Nigeria 2012-13's `assets`
+#     idxvars AND in its `final_index` was measured cold (2026-07-21): the frame
+#     comes back with index ['i','t','j'] regardless -- identical rows and
+#     identical Value -- because the `dfs:` merge drops the extra idxvar before
+#     `final_index` is applied (#323 Site 4).  Nigeria cannot EMIT `item_seq` at
+#     all, so promoting it to canonical would make `item_seq` a level no country
+#     supplies: `have_all_canonical` would go False for all 25 assets countries,
+#     silently disabling the canonical level-reordering guard (GH #498), and
+#     _collapse_duplicate_index would never fire -- making entry (2) dead code.
+#     The note's own reasoning ("item_seq is exactly the missing level") is right
+#     about the DATA and wrong about the PLUMBING.  Site 4 has to be fixed first.
+#   * "Age wants mean" is superseded by two decisions taken after that note was
+#     written (both 2026-07-13): the grain contract's P2 -- every output cell
+#     holds an OBSERVED value or NA, which a mean violates by construction
+#     (tests/test_gh323_grain_contract.py) -- and the retirement of the last
+#     aggregation in core, the cluster-GPS `.mean()` at Site 2, after which
+#     SkunkWorks/grain_aggregation_policy.org "has no exception left in it".
+#     A mean Age would reintroduce exactly the exception just retired.
 _ADDITIVE_MEASURE_COLUMNS = {
     "food_acquired": ("Quantity", "Expenditure"),
     "assets": ("Value",),
