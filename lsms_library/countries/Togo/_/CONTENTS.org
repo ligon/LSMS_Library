@@ -98,8 +98,9 @@ assertion at the end of =2018/_/plot_inputs.py=, and
 =2018/Data1/s00_me_tgo2018.dta=: 6,171 households.  (=df_geo=,
 =grappe_gps_tgo2018.dta=, is already 540 rows, so every duplicate came
 from =df_main=.)  The wave frame therefore carried 6,171 rows for a
-540-row table and left 5,631 of them on a duplicated =(t, v)= tuple for
-the framework to reduce.
+540-row table --- *all* of them on a duplicated =(t, v)= tuple (no
+grappe holds fewer than 3 households), 5,631 of them EXCESS --- for the
+framework to reduce.
 
 *No rows of value were destroyed* --- measured, not assumed: all 540
 grappes carry exactly one distinct Region (=s00q01=) and one distinct
@@ -107,11 +108,30 @@ Rural (=s00q04=), so the reduction was value-lossless and (post-PR
 #614) correctly silent.  It is still fixed, because "lossless" here was
 an accident nobody was checking: =.first()= on a cluster that stopped
 being constant returns a silently *wrong* Region --- the Kazakhstan
-1996 / CotedIvoire grappe-648 failure mode.  The
-=cluster_features(df)= hook in =2018/_/mapping.py= projects to cluster
-grain in the extraction and RAISES if any column ever varies within a
-grappe.  Wave frame 6,171 -> 540; API unchanged at 540 rows with
-identical values.
+1996 / CotedIvoire grappe-648 failure mode.
+
+=2018/_/mapping.py= therefore alias-imports the *shipped* reducer as
+its =cluster_features= df_edit hook ---
+
+: from lsms_library.transformations import (
+:     collapse_to_cluster_grain as cluster_features,
+: )
+
+--- exactly as that helper's docstring prescribes.  It projects to
+cluster grain in the extraction and raises =GrainConflict= (naming the
+offending grappes) if any column ever varies within one.  Wave frame
+6,171 -> 540; API unchanged at 540 rows with identical values;
+=assert_frame_equal= passes against the pre-fix API frame.
+
+*Do not re-implement it here.*  The first draft of this fix hand-rolled
+a 40-line copy, whose =nunique(dropna=False)= guard read =NaN= as a
+CONTRADICTION rather than as absence --- against repo doctrine
+(=tests/test_gh323_grain_contract.py=).  It does *not* fire on today's
+data (the 5 GPS-less grappes are wholly GPS-less, so their
+=nunique(dropna=False)= is still 1), so the defect was LATENT: the
+first partially-fixed grappe, or one blank Region, and a correct
+completion becomes a dead build.  See =.coder/ledger/323-togo.md=
+section 7.
 
 * plot_features (GH #167)
 

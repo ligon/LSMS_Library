@@ -4,6 +4,64 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as food_acquired
 
+# ---------------------------------------------------------------------------
+# cluster_features -- reduce the household-level EHCVM cover page to CLUSTER
+# grain (GH #323).
+#
+# `cluster_features` is declared `(t, v)` -- one row per grappe -- but its
+# `df_main` source `../Data1/s00_me_tgo2018.dta` is the EHCVM *household* cover
+# page: 6,171 rows = 6,171 households across 540 grappes.  (`df_geo`,
+# `grappe_gps_tgo2018.dta`, is already exactly one row per grappe -- 540 -- so
+# every duplicate comes from `df_main`.)  Feeding that straight through emitted
+# 6,171 rows for a 540-row table.  All 6,171 sat on a duplicated `(t, v)`
+# tuple (no grappe holds fewer than 3 households), of which 5,631 were EXCESS
+# -- rows repeating a `(t, v)` already seen -- for the framework to reduce with
+# `groupby().first()`.
+#
+# That is an EXTRACTION bug, not an aggregation one, so it is fixed HERE rather
+# than by declaring a reducer (decision D1 of
+# `slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org`: the core does not
+# aggregate, and the answer to a manufactured duplicate is to stop
+# manufacturing it).  The table should never have had duplicates at all.
+#
+# NO ROWS ARE DESTROYED BY THIS -- measured, not assumed.  All 540 grappes
+# carry exactly one distinct Region (`s00q01`) and one distinct Rural
+# (`s00q04`) value, so the framework's collapse was VALUE-lossless and (post-PR
+# #614) correctly silent about it.  What this hook buys is therefore not
+# recovered rows but three other things:
+#
+#   1. the `(t, v)` grain is correct BY CONSTRUCTION instead of by accident of
+#      a downstream reduction the policy says not to lean on;
+#   2. the cluster-constancy of Region/Rural is CHECKED on every build rather
+#      than assumed -- `.first()` on a cluster that ever stopped being constant
+#      would return a silently WRONG Region (that is exactly the Kazakhstan
+#      1996 / CotedIvoire grappe 648 failure), and `reduce_to_agreed` RAISES
+#      `GrainConflict` instead, naming the offending grappes;
+#   3. the L2-wave parquet stops carrying 6,171 rows for a 540-row table.
+#
+# This is the SHIPPED helper (`lsms_library/build_transforms.py`, PR #618),
+# used exactly as its docstring prescribes -- not a private copy.  Its NaN
+# reading is the repo's: a grappe where one household reports `Maritime` and
+# another reports nothing keeps `Maritime` (completion, not contradiction --
+# `tests/test_gh323_grain_contract.py::test_p2_complementary_missingness_is_
+# COMPLETION_not_fabrication`).  Only an actual disagreement raises.  An
+# earlier draft of this file hand-rolled the reduction with
+# `nunique(dropna=False)`, i.e. NaN-as-contradiction.  That does NOT fire on
+# today's Togo data (the 5 GPS-less grappes are wholly GPS-less, so their
+# `nunique(dropna=False)` is still 1) -- it is LATENT: the first partial GPS
+# fix, or one blank Region, would have converted a correct completion into a
+# dead build.  See `.coder/ledger/323-togo.md` §7.
+#
+# Compare `CotedIvoire/_/cotedivoire.py::cluster_features` (`fc3be203`), which
+# projects the same EHCVM cover page for the same reason; it predates this
+# helper and resolves conflicts by strict majority because grappe 648 genuinely
+# disagrees.  Togo has no disagreeing grappe, so the default `on_conflict=
+# 'raise'` costs nothing today and is the stronger contract tomorrow.
+# ---------------------------------------------------------------------------
+from lsms_library.transformations import (
+    collapse_to_cluster_grain as cluster_features,
+)
+
 COPING_LABELS = {
     1: "Utilisation de son épargne",
     2: "Aide de parents ou d'amis",
@@ -61,61 +119,6 @@ def Age(value):
     result = list(value)
     result[2] = month_map.get(value.iloc[2])
     return result
-
-
-def cluster_features(df):
-    '''Reduce the household-level EHCVM cover page to one row per CLUSTER.
-
-    ``cluster_features`` is declared ``(t, v)`` -- one row per grappe -- but
-    its ``df_main`` source ``../Data1/s00_me_tgo2018.dta`` is the EHCVM
-    *household* cover page: 6,171 rows = 6,171 households across 540
-    grappes.  (``df_geo``, ``grappe_gps_tgo2018.dta``, is already exactly one
-    row per grappe -- 540 -- so every duplicate comes from ``df_main``.)
-    Feeding that straight through emitted 6,171 rows for a 540-row table,
-    leaving 5,631 rows on a duplicated ``(t, v)`` tuple for the framework to
-    reduce with ``groupby().first()``.
-
-    That is an EXTRACTION bug, not an aggregation one, so it is fixed HERE
-    rather than by declaring a reducer (GH #323, decision D1 of
-    ``slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org``: the core does
-    not aggregate, and the answer to a manufactured duplicate is to stop
-    manufacturing it).  The table should never have had duplicates at all.
-
-    NO ROWS ARE DESTROYED BY THIS -- measured, not assumed.  All 540 grappes
-    carry exactly one distinct Region (``s00q01``) and one distinct Rural
-    (``s00q04``) value, so the framework's collapse was VALUE-lossless and
-    (post-PR #614) correctly silent about it.  What this hook buys is
-    therefore not recovered rows but three other things:
-
-      1. the ``(t, v)`` grain is correct BY CONSTRUCTION instead of by
-         accident of a downstream reduction the policy says not to lean on;
-      2. the cluster-constancy of Region/Rural is CHECKED on every build
-         rather than assumed -- ``.first()`` on a cluster that ever stopped
-         being constant would return a silently WRONG Region (that is exactly
-         the Kazakhstan 1996 / CotedIvoire grappe 648 failure), and the guard
-         below RAISES instead;
-      3. the L2-wave parquet stops carrying 6,171 rows for a 540-row table.
-
-    Compare ``fix/323-cotedivoire`` (``cotedivoire.cluster_features``), which
-    projects the same EHCVM cover page to cluster grain for the same reason.
-    '''
-    dup = df.index.duplicated(keep=False)
-    if dup.any():
-        levels = list(df.index.names)
-        varying = [
-            c for c in df.columns
-            if df[dup].groupby(level=levels, observed=True)[c]
-                      .nunique(dropna=False).gt(1).any()
-        ]
-        if varying:
-            raise ValueError(
-                f'Togo/2018 cluster_features: column(s) {varying} vary WITHIN '
-                f'a cluster, so collapsing the household cover page to one row '
-                f'per {levels} would silently discard real variation (GH #323). '
-                f'Fix the extraction -- do NOT reduce; a loud failure beats a '
-                f'quiet wrong answer.'
-            )
-    return df[~df.index.duplicated(keep='first')]
 
 
 def shocks(df):

@@ -32,9 +32,15 @@ second: `cluster_features`.**
 | `Wave.grab_data('cluster_features')` **pre-fix** | **6,171** | 540 |
 | `Country('Togo').cluster_features()` | 540 | 540 |
 
-So the wave frame carried **5,631 rows on a duplicated `(t, v)` tuple** for the
-framework to reduce. Every one of those duplicates came from `df_main`; `df_geo`
-is already at cluster grain.
+So the wave frame carried **5,631 EXCESS rows** for the framework to reduce.
+(Precisely: `index.duplicated(keep=False).sum()` is **6,171** — every row shares
+its `(t, v)` with at least one other, since the smallest grappe holds 3
+households and the largest 12 — and `duplicated(keep='first').sum()` is
+**5,631**. The PR body's original "5,631 rows on a duplicated tuple" was the
+second number under the first number's name; corrected 2026-07-22.)
+
+Every one of those duplicates came from `df_main`; `df_geo` is already at
+cluster grain.
 
 **This destroys no VALUE.** All 540 grappes carry exactly one distinct Region
 (`s00q01`) and one distinct Rural (`s00q04`) — 0/540 violations, measured from
@@ -56,17 +62,23 @@ the source, not assumed. So `.first()` landed on the right answer, and post-PR
 | `_audit_index_collapse` | `lsms_library/country.py` | audits BEFORE the collapse; warns only on *destruction*; stamps the finding into the parquet and replays it on warm reads | PR #614 | **untouched** — and it is *why* nothing warns here |
 | `_collapse_to_cluster_grain` | `lsms_library/country.py` | Site 2: projects a household-grain `cluster_features` onto `(t, v)`, audited | PR (Site 2) | **not reached** — fires only when `i` is in `df.index.names`; Togo's YAML declares `v: grappe` only |
 | `Wave.column_mapping` → `final_mapping['df_edit']` | `lsms_library/country.py:802`, applied at `:1054` for the `dfs:` path | binds a `mapping.py` / `{country}.py` function whose **name matches the table** as a whole-frame post-extraction hook | — | **reuse** — this is the extension point |
-| `cotedivoire.cluster_features` | `CotedIvoire/_/cotedivoire.py` (`fc3be203`) | same EHCVM cover-page defect; projects to cluster grain **in the extraction** | `tests/test_gh323_cotedivoire.py` | **the pattern followed here** |
-| `Togo/2018/_/mapping.py` | wave module | already hosts `shocks`, `food_security`, `household_roster` df_edit hooks | — | **extend** — add `cluster_features` |
+| `reduce_to_agreed` | `lsms_library/build_transforms.py:422` (re-exported from `lsms_library.transformations`) | **the shipped country-facing reducer** — collapses rows sharing an index tuple, keeping only values they AGREE on; raises `GrainConflict` (naming the offending groups) otherwise; NaN is ABSENCE by default | `tests/test_gh323_explicit_reducers.py`, `tests/test_gh323_grain_contract.py` | **reuse** |
+| `collapse_to_cluster_grain` | `lsms_library/build_transforms.py:514` | the named `cluster_features` case of the above; **its docstring prescribes this exact call site** (`from lsms_library.transformations import collapse_to_cluster_grain as cluster_features`) | `…::test_collapse_to_cluster_grain_works_as_a_bare_df_edit_hook` | **reuse — aliased directly; NOT re-implemented** |
+| `cotedivoire.cluster_features` | `CotedIvoire/_/cotedivoire.py` (`fc3be203`) | same EHCVM cover-page defect; projects to cluster grain **in the extraction** | `tests/test_gh323_cotedivoire.py` | **the diagnosis followed here** — but it *predates* the helper above and hand-rolls its own resolution; do not copy its code |
+| `Togo/2018/_/mapping.py` | wave module | already hosts `shocks`, `food_security`, `household_roster` df_edit hooks, and already alias-imports `food_acquired_to_canonical as food_acquired` | — | **extend** — alias-import `collapse_to_cluster_grain as cluster_features` |
 
-**Prior art is decisive.** CotedIvoire 2018-19 is EHCVM and has the *identical*
-cell reading the *identical* file (`Menage/s00_me_CIV2018.dta`, 12,992 households
-into a 1,084-cluster table). Its fix projects in the extraction and resolves
-conflicts loudly. Togo's is the same fix, one wave smaller and one degree
-simpler: CIV needed strict-majority conflict resolution because grappe 648
-genuinely disagreed; **Togo has no disagreeing grappe**, so it raises instead of
-resolving. Raising is the stronger contract and is available precisely because
-the data supports it.
+**Prior art is decisive, in two layers.** *Diagnostically*: CotedIvoire 2018-19
+is EHCVM and has the *identical* cell reading the *identical* file
+(`Menage/s00_me_CIV2018.dta`, 12,992 households into a 1,084-cluster table). Its
+fix projects in the extraction and resolves conflicts loudly. Togo's is the same
+diagnosis, one wave smaller and one degree simpler: CIV needed strict-majority
+conflict resolution because grappe 648 genuinely disagreed; **Togo has no
+disagreeing grappe**, so the default `on_conflict='raise'` costs nothing and is
+the stronger contract. *Mechanically*: the CIV fix was **generalised into a
+public helper after CIV landed** — `collapse_to_cluster_grain` (PR #618,
+`48f4d08f`), merged on `development` before this branch was cut — so the correct
+move is to alias that helper, not to re-derive CIV's projection. See §7: the
+first draft of this PR got the diagnosis right and this half wrong.
 
 ## §3 Definitions & conventions in force
 
@@ -90,10 +102,19 @@ the data supports it.
 
 ## §4 Invariants & assumptions
 
-- **Region and Rural are constant within a grappe.** Measured: 0/540 violations.
-  This is the invariant `.first()` was silently *assuming*; the hook **checks**
-  it on every build and `raise`s if it ever fails. Pinned by
+- **Region and Rural are constant within a grappe.** Measured: 0/540 violations
+  (and 0/540 for `Latitude`/`Longitude` too). This is the invariant `.first()`
+  was silently *assuming*; `collapse_to_cluster_grain` **checks** it on every
+  build and raises `GrainConflict` if it ever fails. Pinned by
   `test_region_and_rural_are_constant_within_a_grappe`.
+- **NaN is ABSENCE, not contradiction.** A grappe where one household reports
+  `Maritime` and another reports nothing collapses to `Maritime`: no observed
+  value is discarded, so the completion is lossless. This is repo doctrine
+  (`tests/test_gh323_grain_contract.py::test_p2_complementary_missingness_is_
+  COMPLETION_not_fabrication`, `tests/test_gh323_explicit_reducers.py::
+  test_nan_is_absence_not_contradiction`) and it is the default
+  (`na_is_conflict=False`) of the shipped reducer. It is **not** what the first
+  draft of this file implemented — see §7.
 - **"Lossless" is not the same as "safe".** The reason to fix a value-lossless
   collapse is that `.first()` on a cluster that stopped being constant returns a
   silently **wrong** Region — not a missing one. That is the Kazakhstan 1996
@@ -119,8 +140,8 @@ the data supports it.
 | quantity | decision | reason |
 |----------|----------|--------|
 | the collapse itself | **reuse, untouched** | owned centrally; a per-country core patch is the exact failure the consolidation doc exists to stop (17 rival patches to one file) |
-| the projection | **new, but on the CIV pattern** — a `cluster_features(df)` df_edit hook | CIV's `cotedivoire.cluster_features` is the same fix for the same file; Togo's lives in the *wave* module because Togo has one wave and the defect is wave-scoped |
-| conflict handling | **RAISE** (CIV resolves by strict majority) | Togo has 0 conflicting grappes, so raising costs nothing today and is a stronger contract tomorrow. Majority-resolution would be inventing a policy for a case that does not exist. |
+| the projection | **reuse the shipped helper**, alias-imported as the `cluster_features` df_edit hook in the *wave* module (Togo has one wave and the defect is wave-scoped) | `collapse_to_cluster_grain` (PR #618) exists precisely for this cell and its docstring names this call site. **Corrected in round 2**: this row originally read "new, but on the CIV pattern" and a 40-line copy was written. See §7. |
+| conflict handling | **RAISE** — the reducer's default `on_conflict='raise'` (CIV resolves by strict majority) | Togo has 0 conflicting grappes, so raising costs nothing today and is a stronger contract tomorrow. Majority-resolution would be inventing a policy for a case that does not exist. |
 | declaring `aggregation:` for `cluster_features` | **rejected** | dead config; contradicts D1 (§3) |
 | adding `i` to the `cluster_features` index | **rejected** | `cluster_features` is a `(t, v)` table by definition; adding `i` would make it `sample()` with extra steps |
 | `LSMS_CACHE_SCHEMA` bump | **rejected** | the v0.8.0 content hash already covers `mapping.py` (§3); a manual lever is for library-wide pre-write changes, which this is not |
@@ -143,18 +164,19 @@ the data supports it.
 ---
 ### Phase 3 — verification
 
-- `cluster_features(df)` hook (`Togo/2018/_/mapping.py`) — **OK (anchored on §2, §5)**: reuses the framework's existing table-name df_edit dispatch (`country.py:802`/`:1054`); no new machinery. Follows CIV's extraction-side projection rather than re-deriving one.
-- **raises rather than reduces** — **OK (§4)**: negative-tested with a synthetic conflicting frame; `ValueError` names the offending columns.
+- `cluster_features` hook (`Togo/2018/_/mapping.py`) — **OK (anchored on §2, §5)**: a one-line alias of `lsms_library.transformations.collapse_to_cluster_grain`, dispatched by the framework's existing table-name `df_edit` mechanism (`country.py:802`/`:1054`); no new machinery, no private copy.
+- **raises rather than reduces** — **OK (§4)**: negative-tested with a synthetic conflicting frame; `GrainConflict` names the offending groups *and* the per-column conflict counts.
 - **no `aggregation:` key, no reducer, no index level added** — **OK (§3)**: D1 honoured.
 - **no `lsms_library/*.py` touched** — **OK (§4)**: `git diff --stat` confirms the change is confined to `lsms_library/countries/Togo/**`, `.coder/ledger/`, and one new test.
-- **REINVENTION check** — the two things this task could have reinvented were (a) CIV's cluster-grain projection and (b) the rejected Design-A reducer. (a) was found first and followed; (b) was found in the rescued draft and *discarded*, which is the more useful half of this ledger.
+- **REINVENTION check** — **this is where round 1 failed, and it is recorded rather than quietly patched.** The round-1 ledger asserted the only two reinvention candidates were (a) CIV's cluster-grain projection and (b) the rejected Design-A reducer, and concluded the check was clean. It **missed (c)**: `collapse_to_cluster_grain` / `reduce_to_agreed`, merged on `development` in PR #618 *after* CIV, in the same sweep this PR belongs to. Round 1 therefore hand-rolled a 40-line copy of a shipped, tested helper whose docstring names this exact call site. Round 2 replaces it with the alias. Search-tier lesson: the round-1 search was a `git log`/`git show` walk over *sibling country fixes*; it never grepped `lsms_library/` for the shipped helper. **A prior-art search that only looks at peer call sites cannot find a helper that was extracted from them.**
 
 **Result (2026-07-21, `LSMS_NO_CACHE=1`, `LSMS_COUNTRIES_ROOT` pinned to the worktree):**
 
 | observable | before | after |
 |---|---|---|
 | `Wave.grab_data('cluster_features')` rows | 6,171 | **540** |
-| rows on a duplicated `(t, v)` tuple | 5,631 | **0** |
+| EXCESS rows (`duplicated(keep='first')`) | 5,631 | **0** |
+| rows sharing a `(t, v)` (`keep=False`) | 6,171 | **0** |
 | clusters whose duplicate rows disagree | 0 | 0 (n/a) |
 | `Country('Togo').cluster_features()` rows | 540 | 540 |
 | API frame values | — | **identical** (`assert_frame_equal` passes) |
@@ -162,7 +184,16 @@ the data supports it.
 
 Rows of value: **none lost, none recovered** — by design. What changed is that
 the grain is now correct by construction and the invariant is enforced instead of
-assumed. Tests: 2 of 4 new tests FAIL on pristine `development`, all 4 pass after.
+assumed. Tests (round 2, six tests): **4 of 6 FAIL on pristine `development`**
+(`…wave_frame_is_already_at_cluster_grain`, `…hook_is_the_shipped_reducer_not_a_
+private_copy`, `…projection_hook_raises_rather_than_picking_a_row`,
+`…nan_is_absence_not_contradiction`); all 6 pass after. The other two
+(`…api_still_returns_every_cluster`, `…region_and_rural_are_constant_within_a_
+grappe`) pass **both** with and without the change by design — they pin an
+invariant and a source fact, not the fix — and each says so in its own
+docstring. Against the *round-1* (hand-rolled) tree, 3 of the 6 fail: the two
+that pin the alias and its NaN reading, plus the retargeted `GrainConflict`
+assertion.
 
 **`plot_inputs`, for the record** (landed in `36170a57`, re-verified here against
 the raw `s16b` roster with the counterfactual pre-fix map):
@@ -177,3 +208,91 @@ the raw `s16b` roster with the counterfactual pre-fix map):
 The issue text's "156" is the same defect counted more conservatively (excluding
 the 9 groups whose duplicate rows carry identical values). Both accountings go
 to 0.
+
+---
+## §7 Round 2 — what the adversarial review found, and what I re-derived
+
+PR #632 was reviewed and returned **FIX_FIRST**. The review confirmed every
+headline number and confirmed the diagnosis; what it broke was the *reuse*
+claim. Everything below was re-measured independently before being written down
+(isolated `LSMS_DATA_DIR`, `dvc-cache` symlinked to the shared blob store,
+`LSMS_COUNTRIES_ROOT` + `PYTHONPATH` pinned to the worktree with an in-process
+`assert 'wt632' in lsms_library.__file__`; negative control by reverting
+`mapping.py` to `origin/development`, **not** by stashing).
+
+### Accepted — Finding 1: the hook re-implemented merged machinery
+
+`collapse_to_cluster_grain` (`lsms_library/build_transforms.py:514`, PR #618,
+`48f4d08f`, re-exported from `lsms_library.transformations`) is the shipped
+helper for exactly this defect, and its docstring shows this exact call site.
+Round 1 hand-rolled a 40-line equivalent. Swapped for the one-line alias and
+rebuilt cold: the wave frame **and** the API frame are `assert_frame_equal`-
+identical (540 rows, same values, same order, same dtypes) to the hand-rolled
+build. The copy bought nothing and could only diverge. Fixed; §2/§5 corrected
+above rather than silently rewritten.
+
+### Accepted — Finding 2: the copy read `NaN` as contradiction
+
+The copy's guard was `nunique(dropna=False).gt(1)`, i.e. `na_is_conflict=True`
+hard-coded with no opt-out. Re-derived on a two-row frame
+(`Region=['Maritime', NaN]`, `Latitude=[NaN, 6.1]` in one grappe):
+
+| | result |
+|---|---|
+| round-1 hand-rolled hook | `ValueError: column(s) ['Region', 'Latitude'] vary WITHIN a cluster` — **build dies** |
+| `collapse_to_cluster_grain` (shipped) | `{'Region': 'Maritime', 'Latitude': 6.1}` |
+
+That contradicts §4's NaN doctrine, and it accused `Latitude` — a column that is
+pure absence. **Latent, not live**: `s00q01`/`s00q04` are 0% null and the GPS
+NaNs are constant within grappe (5 grappes, 56 household rows in the
+pre-projection frame). But Togo's own geo source is the shape that would trip
+it. Subsumed by the Finding-1 fix; now pinned by
+`test_nan_is_absence_not_contradiction`, which fails against the round-1 tree.
+
+### Accepted — Finding 3: weaker diagnostics
+
+The copy raised a bare `ValueError` naming only the columns. `reduce_to_agreed`
+raises `GrainConflict` (a `ValueError` subclass, so `except ValueError` callers
+are unaffected) naming the offending **groups** and per-column counts, and
+carries the `on_conflict='na'` escape hatch and `LSMS_GRAIN_STRICT` interaction.
+Subsumed. `test_projection_hook_raises_rather_than_picking_a_row` retargeted
+from `match='vary WITHIN a cluster'` to `GrainConflict` / `match='grain
+conflict'`.
+
+### Also fixed, not raised by the review
+
+- **The tests' fixtures swallowed every exception into `pytest.skip`.** A broken
+  build would have produced a green run — the end-to-end tests were vacuous
+  exactly when they mattered. Removed; the module now carries `requires_s3` from
+  `tests/conftest.py`, and `conftest`'s `pytest_runtest_makereport` hook converts
+  a missing-credentials failure (and only that) into a skip.
+- **"5,631 rows on a duplicated `(t, v)` tuple" was the wrong name for a right
+  number.** `duplicated(keep=False).sum()` is **6,171** (no grappe holds fewer
+  than 3 households, so every row shares its tuple); **5,631** is
+  `duplicated(keep='first').sum()`, the EXCESS. Corrected in §1, the results
+  table, `CONTENTS.org`, `data_scheme.yml` and `mapping.py`.
+- **Two of the four round-1 tests passed with and without the fix** and the PR
+  said so only in its body. Each now says so in its own docstring, naming the
+  tests that *do* discriminate.
+
+### Disputed — nothing
+
+No finding was over-claimed. Two review remarks are worth keeping as
+non-findings: the `household_roster` row-order difference the reviewer chased
+was correctly attributed to its own harness, not to this PR; and the
+"zero duplicates by splitting real entities" failure mode is genuinely ruled out
+here — re-derived independently: households per grappe run 3–12 with **394 of
+540 grappes at exactly 12** (the EHCVM design cell), `grappe` is nationally
+unique (`drop_duplicates(['s00q01','grappe'])` = 540 = `nunique(grappe)`), and
+`(grappe, menage)` has 0 duplicates.
+
+### Still deferred (unchanged)
+
+`Togo/_/data_scheme.yml`'s `interview_date` still carries a dead
+`aggregation: {visit: first}` key from `717e32f4`; removing it is a six-country
+change and stays out of scope. Separately noted for someone else:
+`tests/conftest.py`'s docstring advises `from conftest import
+aws_creds_available`, which **raises `ImportError`** — `tests/` is a package and
+a project-level `conftest.py` shadows the name. The working import is
+`from tests.conftest import ...`, which this module uses; the docstring is not
+edited here.
