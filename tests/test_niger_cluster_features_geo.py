@@ -46,13 +46,16 @@ strict-mode condition is asserted directly, by asserting the ABSENCE of the
 Site 1, owned by GH #637), which has nothing to do with the geo wiring.
 
 Data-dependent tests do NOT swallow exceptions.  The data-free CI job is
-handled by the missing-credentials net in ``tests/conftest.py`` -- which
-converts a ``NoCredentialsError`` (in a test OR in fixture setup) into a skip,
-and *only* that.  Anything else -- a ``GrainCollapseError``, a ``RuntimeError``
-from a failed build -- must turn this file red, not green-by-skip.
+handled by ``requires_s3`` plus the missing-credentials net in
+``tests/conftest.py`` -- which converts a ``NoCredentialsError`` (in a test OR
+in fixture setup) into a skip, and *only* that.  Anything else -- a
+``GrainCollapseError``, a ``RuntimeError`` from a failed build -- must turn
+this file red, not green-by-skip.
 """
+import importlib.util
 import inspect
 import os
+import pathlib
 import warnings
 
 import pytest
@@ -61,6 +64,28 @@ import yaml
 import lsms_library as ll
 from lsms_library.paths import countries_root
 from lsms_library.yaml_utils import load_yaml
+
+
+def _tests_conftest():
+    """``tests/conftest.py``, loaded by path.
+
+    NOT ``from conftest import requires_s3``: the repo has a **root-level**
+    ``conftest.py`` too, and it is the one that wins on ``sys.path``, so the
+    plain import raises ``ImportError``.  Loading by path keeps the single
+    source of truth for the credentials question (PR #648) instead of growing
+    yet another private ``_aws_creds_available`` copy -- which is the exact
+    duplication that file was created to end.  Re-executing it is harmless:
+    it defines two functions and a hook, and only pytest's own copy of the
+    module is registered as a plugin.
+    """
+    path = pathlib.Path(__file__).with_name("conftest.py")
+    spec = importlib.util.spec_from_file_location("lsms_tests_conftest", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+requires_s3 = _tests_conftest().requires_s3
 
 WAVE = "2011-12"
 SUBDIR = "NER_2011_ECVMA_v01_M_Stata8"
@@ -175,6 +200,7 @@ def test_latlon_stay_required_in_the_country_scheme(niger_root):
 # Data: the evidence the wiring rests on (the negative control, pinned)
 # --------------------------------------------------------------------------
 
+@requires_s3
 def test_offsets_file_carries_cluster_grain_coordinates(niger_root):
     df = _read(niger_root / WAVE / "Data" / OFFSETS)
     assert {"grappe", "LAT_DD_MOD", "LON_DD_MOD"} <= set(df.columns)
@@ -189,6 +215,7 @@ def test_offsets_file_carries_cluster_grain_coordinates(niger_root):
     assert keyed["LON_DD_MOD"].between(0.0, 16.5).all()
 
 
+@requires_s3
 def test_geovariables_file_has_no_coordinates_at_all(niger_root):
     """The negative control: why ``df_geo`` may not point here.
 
@@ -209,11 +236,9 @@ def test_geovariables_file_has_no_coordinates_at_all(niger_root):
 # --------------------------------------------------------------------------
 # End to end
 #
-# No `except Exception: skip` here.  A build that raises must fail this file;
-# tests/conftest.py's missing-credentials net is what handles the data-free CI
-# job, and nothing else is tolerated.  (That helper is not imported directly:
-# the repo has a root-level conftest.py, so `from conftest import ...` resolves
-# to the wrong module -- the net is a hook, and applies without an import.)
+# No `except Exception: skip` here.  `requires_s3` plus tests/conftest.py's
+# missing-credentials net handle the data-free CI job; nothing else is
+# tolerated.  A build that raises must fail this file.
 # --------------------------------------------------------------------------
 
 @pytest.fixture(scope="module")
@@ -235,6 +260,7 @@ def clusters(niger_build):
     return niger_build[0]
 
 
+@requires_s3
 def test_2011_12_clusters_all_have_coordinates(clusters):
     w = clusters[clusters["t"].astype(str) == WAVE]
     assert len(w) > 0
@@ -244,6 +270,7 @@ def test_2011_12_clusters_all_have_coordinates(clusters):
     assert w["Longitude"].between(0.0, 16.5).all()
 
 
+@requires_s3
 def test_2011_12_is_at_cluster_grain(clusters):
     """Invariant, not discrimination.
 
@@ -257,6 +284,7 @@ def test_2011_12_is_at_cluster_grain(clusters):
     assert not w["v"].duplicated().any()
 
 
+@requires_s3
 def test_no_phantom_null_key_cluster(clusters):
     """Invariant, not discrimination -- same caveat as the test above.
 
@@ -268,6 +296,7 @@ def test_no_phantom_null_key_cluster(clusters):
     assert "nan" not in set(w["v"].astype(str))
 
 
+@requires_s3
 @pytest.mark.skipif(
     not _core_reads_merge_how(),
     reason="this core hardcodes how='outer' on the dfs: merge (merge_how "
