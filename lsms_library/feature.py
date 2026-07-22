@@ -98,8 +98,69 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 # Motivating case (GH #501): GhanaLSS food_acquired carries a per-visit level
 # (~12 repeated visits over a month); CONTENTS.org states the visits are summed.
 # Keeping first() there silently kept only ~48% of total Quantity.
+#
+# This is the ONE reduction policy core keeps (see the NO-AGGREGATION-IN-CORE
+# contract in SkunkWorks/grain_aggregation_policy.org and D1 of
+# slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org).  It is legitimate only
+# where the sum is provably LOSSLESS for the named column.  It is read from BOTH
+# collapse sites: _collapse_duplicate_index below (Feature, cross-country) and
+# country._normalize_dataframe_index (Country, per-table) -- so a table listed
+# here is summed consistently on both access paths.  Do NOT add a column here to
+# paper over a broken identifier or a missing index level: duplicates on a
+# declared index usually mean the GRAIN IS WRONG, and a reducer would only put a
+# signature on the corpse (D1).  Add a column only when the sum reconstructs
+# exactly the quantity the coarser grain is DEFINED as.
+#
+# assets (GH #323): Nigeria W2's `sect5b_plantingw2` is a PER-UNIT ROSTER -- one
+# row per individual unit owned, enumerated by `item_seq` (1..15), each with its
+# own reported Value.  The canonical assets grain is (t, i, j), so those rows
+# arrive as duplicates and first() kept ONE UNIT and discarded the rest:
+# N576,299,043 true -> N429,001,558 kept -> N147,297,485 (25.6%) DESTROYED, in
+# EACH of t=2012Q3 and t=2013Q1.  Summing Value is exactly lossless: the value of
+# a household's holding of item j IS the sum over the units it owns (hh 10001
+# owns 4 beds worth 7000+3000+6000+5000 = 21,000).
+#   * `Quantity` must stay first(): it comes from the SEPARATE, already-clean
+#     sect5a grid (one row per (i, j)) and the wave's `dfs:` merge REPEATS it
+#     across the item_seq rows -- verified, 0 groups where it varies.  Summing it
+#     would multiply the unit count by itself (4 beds -> 16).
+#   * `Age` also stays first().  It is genuinely per-unit (it varies within 7,029
+#     groups), so NO reducer is lossless at (t, i, j) -- the four beds are 10, 6,
+#     10 and 6 years old and that fact cannot be carried by one row.  first()
+#     keeps unit #1's age.  Retaining the detail needs the `item_seq` level to
+#     survive, which it currently cannot: the extra idxvar is dropped by the
+#     `dfs:` merge in Wave.grab_data (#323 Site 4), and Nigeria's other waves
+#     have no item_seq column to declare.  Tracked as a residual, not fixed here;
+#     the Age loss is now REPORTED rather than silenced (see the residual re-audit
+#     in _collapse_duplicate_index and country._normalize_dataframe_index).
+#
+# WHERE THIS DEPARTS FROM THE RECORDED PRESCRIPTION, AND WHY.
+# `Nigeria/_/data_scheme.yml` on the (unmerged) #625 branch carries a "KNOWN OPEN
+# DEFECT" note that diagnoses all of the above correctly and then prescribes TWO
+# edits: (1) `data_info.yml : index_info assets -> (t, i, j, item_seq)` and
+# (2) this dict entry, with "Age wants mean".  Only (2) is done here.  Both
+# departures were checked, not assumed:
+#
+#   * (1) IS INERT TODAY.  Declaring `item_seq` in Nigeria 2012-13's `assets`
+#     idxvars AND in its `final_index` was measured cold (2026-07-21): the frame
+#     comes back with index ['i','t','j'] regardless -- identical rows and
+#     identical Value -- because the `dfs:` merge drops the extra idxvar before
+#     `final_index` is applied (#323 Site 4).  Nigeria cannot EMIT `item_seq` at
+#     all, so promoting it to canonical would make `item_seq` a level no country
+#     supplies: `have_all_canonical` would go False for all 25 assets countries,
+#     silently disabling the canonical level-reordering guard (GH #498), and
+#     _collapse_duplicate_index would never fire -- making entry (2) dead code.
+#     The note's own reasoning ("item_seq is exactly the missing level") is right
+#     about the DATA and wrong about the PLUMBING.  Site 4 has to be fixed first.
+#   * "Age wants mean" is superseded by two decisions taken after that note was
+#     written (both 2026-07-13): the grain contract's P2 -- every output cell
+#     holds an OBSERVED value or NA, which a mean violates by construction
+#     (tests/test_gh323_grain_contract.py) -- and the retirement of the last
+#     aggregation in core, the cluster-GPS `.mean()` at Site 2, after which
+#     SkunkWorks/grain_aggregation_policy.org "has no exception left in it".
+#     A mean Age would reintroduce exactly the exception just retired.
 _ADDITIVE_MEASURE_COLUMNS = {
     "food_acquired": ("Quantity", "Expenditure"),
+    "assets": ("Value",),
 }
 
 
@@ -119,18 +180,34 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     """
     # Lazy import: country.py imports _ADDITIVE_MEASURE_COLUMNS from here, so a
     # module-level import back would cycle.
-    from .country import _audit_index_collapse, _record_grain_report
+    from .country import (_audit_index_collapse, _record_grain_report,
+                          _sum_min_count_1)
 
     additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
     present = [c for c in (additive or ()) if c in df.columns]
 
     report = _audit_index_collapse(df, list(df.index.names))
     if report is not None and present and not report.get("unauditable"):
-        # The additive SUM is lossless over the measure columns; only an outright
-        # NaN-key deletion is real loss on that path.  An UNAUDITABLE report is
-        # never silenced -- "we could not check" is not "it is fine".
-        report = (dict(report, destroyed=0, conflicting_groups=0)
-                  if report.get("nan_key_rows") else None)
+        # The additive SUM is lossless over the columns it RECONCILES -- the
+        # measures themselves plus a ``Price`` re-derived from the summed totals --
+        # so re-audit on what it does NOT fix rather than silencing wholesale.
+        # `assets` carries a per-unit `Age` no reducer preserves at (t, i, j);
+        # silencing the whole report would trade a recovered `Value` for a silent
+        # `Age` destruction.  Kept identical to country._normalize_dataframe_index
+        # so the two access paths agree (GH #323).
+        reconciled = list(present)
+        if "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
+            reconciled.append("Price")
+        residual = _audit_index_collapse(df.drop(columns=reconciled),
+                                         list(df.index.names))
+        if residual is None:
+            report = None
+        elif not residual.get("unauditable"):
+            # An UNAUDITABLE residual is never silenced -- "we could not check" is
+            # not "it is fine".
+            report = dict(report, destroyed=residual["destroyed"],
+                          conflicting_groups=residual["conflicting_groups"],
+                          additive_reconciled=reconciled)
     if report is not None:
         report.update(country=country, table=table_name, wave=None,
                       site="Feature._harmonize_country_frame",
@@ -140,7 +217,10 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     grouped = df.groupby(level=list(df.index.names), observed=True)
     if not present:
         return grouped.first()
-    agg = {c: ("sum" if c in present else "first") for c in df.columns}
+    # `min_count=1`, not a bare `sum`: an all-NA group must stay NA rather than
+    # become a fabricated 0.0.  Same reducer as country._normalize_dataframe_index
+    # -- the two sites read one policy dict and must apply it identically (#323).
+    agg = {c: (_sum_min_count_1 if c in present else "first") for c in df.columns}
     out = grouped.agg(agg)
     if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
         out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)
