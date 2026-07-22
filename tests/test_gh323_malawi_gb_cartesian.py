@@ -31,16 +31,25 @@ therefore passes with the bug fully present — so these tests count rows in the
 WAVE-level frame, upstream of the collapse, and assert the source invariants
 that license the re-key rather than merely asserting them in a comment.
 """
+import importlib.util as _iu
+from pathlib import Path as _Path
+
 import pandas as pd
 import pytest
 import yaml
 
-try:
-    # `tests/` is a package and the repo ROOT also has a conftest.py, so a bare
-    # `from conftest import ...` resolves to the wrong one.
-    from tests.conftest import requires_s3
-except ImportError:                                             # pragma: no cover
-    from conftest import requires_s3
+# `requires_s3` lives in tests/conftest.py, and importing it is fiddlier than it
+# looks: the repo ROOT also has a conftest.py, so a bare `from conftest import`
+# picks up the wrong one, while `from tests.conftest import` resolves as
+# `tests.tests.conftest` when pytest imports this module as part of the `tests`
+# package (which is what CI does -- it failed there and passed locally).  Load
+# the sibling file by PATH, which is the same in every import mode.
+_conftest = _iu.module_from_spec(
+    _iu.spec_from_file_location(
+        'lsms_tests_conftest', _Path(__file__).with_name('conftest.py')))
+_conftest.__loader__.exec_module(_conftest)
+requires_s3 = _conftest.requires_s3
+
 from lsms_library.country import Country
 from lsms_library.local_tools import get_dataframe, format_id
 from lsms_library.paths import countries_root

@@ -49,15 +49,22 @@ or `format_id` change that breaks a key is caught rather than silently
   side, so both are in the raw `case_id` namespace and `i` joins exactly.  The
   test below keeps it that way.
 """
+import importlib.util as _iu
+from pathlib import Path as _Path
+
 import pandas as pd
 import pytest
 
-try:
-    # `tests/` is a package and the repo ROOT also has a conftest.py, so a bare
-    # `from conftest import ...` resolves to the wrong one.
-    from tests.conftest import requires_s3
-except ImportError:                                             # pragma: no cover
-    from conftest import requires_s3
+# See tests/test_gh323_malawi_gb_cartesian.py for why this is loaded by path
+# rather than imported: the root conftest.py shadows a bare `from conftest`,
+# and `from tests.conftest` resolves as `tests.tests.conftest` under CI's
+# package import mode.
+_conftest = _iu.module_from_spec(
+    _iu.spec_from_file_location(
+        'lsms_tests_conftest', _Path(__file__).with_name('conftest.py')))
+_conftest.__loader__.exec_module(_conftest)
+requires_s3 = _conftest.requires_s3
+
 from lsms_library.country import Country
 from lsms_library.local_tools import get_dataframe, format_id
 from lsms_library.paths import countries_root
