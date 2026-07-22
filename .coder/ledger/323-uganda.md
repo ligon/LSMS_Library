@@ -85,7 +85,7 @@ aggregate* — puts every file under `lsms_library/*.py` off limits, and makes
 | cluster-attribute reducer | `reduce_to_agreed` default: agree → value, disagree → `<NA>` + warn | `first` is arbitrary (class-1 wrong). `mode` was tried on the rescue branch and **rejected on evidence** — see §6.3. |
 | GPS reducer | **none** — `<NA>` on disagreement | the rescue argued `median`. Measured: where within-cluster GPS varies it varies by a MEDIAN of 4.6–42.9 km and up to 584 km. That is a broken key, not a scatter about a centroid — the identical argument that retired core's `.mean()` on 2026-07-13. Averaging would smear two places together and hide the evidence. |
 | 2009-10 synthetic cluster | **reuse** `fill_v_with_coord_bin`, reached through the *existing* `derived:` YAML block | `sample` already builds exactly this label; a second implementation would drift, and the two `v`s **must** agree. Declarative beats a hand-written hook. |
-| cluster key 2018-19 / 19-20 | `(district, parish)` composite | eliminates all 20 / 23 multi-district groups; **not** finer — see §6.4 |
+| cluster key 2018-19 / 19-20 | `(district, parish)` composite, plus a 3-entry `_V_ALIASES` table in 2019-20 | eliminates all 20 / 23 multi-district groups **and** the 3 over-split parishes that metric cannot see; **not** finer — see §6.4 |
 
 ## §6 Decisions that went against the rescue snapshot (with the evidence)
 
@@ -118,6 +118,32 @@ aggregate* — puts every file under `lsms_library/*.py` off limits, and makes
    (5.3 km), `'KAGADI  TOWN COUNCIL'` / `'KAGADI TOWN COUNCIL'` (a doubled
    space). Keying finer would fragment real parishes on data-entry noise.
 
+   **4a. …and the district component had to be held to the same standard**
+   (added after the adversarial review of PR #634, which found this). The
+   evidence originally offered for the composite — *"clusters spanning more
+   than one district: 20 → 0, 23 → 0"* — is **zero by construction** under a
+   key containing the district. It verifies that the key was applied; it
+   cannot see over-splitting. The audit that can: group GSEC1 by its own
+   `(county, subcounty, parish)` triple and count distinct `v`. 2018-19: **0**.
+   2019-20: **3** —
+
+   | county | subcounty | parish | district as coded (hh) | why one place |
+   |---|---|---|---|---|
+   | BUSIKI | NAMUTUMBA | NAWANSAGWA | `NAMTUMBA` (1) / `NAMUTUMBA` (10) | misspelling; `NAMTUMBA` occurs once in 3,098 hh |
+   | KASSANDA | KITUMBI | KIJUNA | `MUBENDE` (1) / `KASSANDA` (9) | Kassanda carved out of Mubende, 2019 |
+   | OMORO | BOBI | PALWO | `GULU` (2) / `OMORO` (8) | Omoro carved out of Gulu, 2016 |
+
+   All three also agree on `region`. Fixed by `_V_ALIASES` in
+   `2019-20/_/mapping.py`, keyed on the `(district, parish)` **pair** because
+   Mubende and Gulu are still real, populated districts here (29 / 37 hh), so
+   a bare district rename would be wrong. `District` is declared row-valued in
+   that wave's `cluster_features` and resolved through the same table —
+   otherwise `reduce_to_agreed` would blank it for exactly the three clusters
+   just merged. 827 → **824** clusters in 2019-20. Two further one-household
+   district misspellings (`PALISA`, `RUKINGIRI`) are deliberately left alone:
+   the correct spelling holds no household in the affected parish, so they
+   split nothing.
+
 5. **`comm` was NOT re-keyed** (carried over from the rescue diagnosis).
    `comm` is a structured code with zero district collisions in its frame year,
    and its multi-district groups show a *dispersal* signature, whereas
@@ -144,31 +170,53 @@ aggregate* — puts every file under `lsms_library/*.py` off limits, and makes
 4.60 / 4.55 and the zero-people households are 3 / 4.)
 
 `cluster_features` — 10,837 destroyed → **0**; 935 NaN-key deletions → 394,
-all of them now announced; 4,409 → 4,808 clusters. Per-wave table in
+all of them now announced; 4,409 → **4,805** clusters (4,809 rows in
+`var/cluster_features.parquet`; the framework's post-read `dropna(how='all')`
+removes the four all-blank 2010-11 clusters). Per-wave table in
 `Uganda/_/CONTENTS.org`.
 
 What replaces the destruction is a `GrainConflictWarning` per wave naming the
 cells that could not be determined — 0 `Region`/`District` conflicts remain in
-2018-19 / 2019-20 (the composite key fixed those), and what is left is panel
-dispersal (`comm` waves) and genuine sub-parish variation in `Rural` / GPS.
+2018-19 / 2019-20 (the composite key plus §6.4a's aliases fixed those), and
+what is left is panel dispersal (`comm` waves) and genuine sub-parish variation
+in `Rural` / GPS. Consumer-visible `<NA>` is concentrated in the two `comm`
+panel waves and is not a handful of cells: `District` is `<NA>` for **27.8%**
+of 2010-11 and **33.0%** of 2011-12 clusters, `Latitude`/`Longitude` for
+**41.2%** / **49.8%**. Recorded in `CONTENTS.org` too.
 
 ## §8 Verification
 
 - `sample.v` ≡ `cluster_features.v` for every wave: 0 `cluster_features`
   `(t, v)` pairs unknown to `sample`; 0 orphaned `sample` clusters except 4 in
   2010-11 whose every attribute conflicts (documented).
-- `tests/test_uganda_323_grain.py` — 24 tests, all config-level; exercises no
-  core aggregation.
-- `tests/test_uganda_v_grain_invariants.py`, `test_uganda_tables.py`,
-  `test_uganda_api_vs_replication.py`, `test_uganda_invariance.py` pass.
-- `tests/fixtures/uganda_baseline.json` refreshed for exactly two entries
-  (`var/cluster_features.parquet`, `var/sample.parquet`); a surgical update
-  that would have reported — and refused — any unrelated drift.
-- Pre-existing failure, NOT caused by this branch and NOT fixed by it (core is
-  out of scope): `tests/test_gh323_explicit_reducers.py::
-  test_core_does_not_dispatch_the_reducers` fails on pristine
-  `origin/development` because PR #617's private `country._collapse_to_cluster_grain`
-  contains PR #618's banned substring `collapse_to_cluster_grain`.
+- `tests/test_uganda_323_grain.py` — **27** tests, all config-level; exercises
+  no core aggregation. Nothing in it converts a build failure into a skip; the
+  only skip is `tests/conftest.py`'s credentials guard, attached to the `uga`
+  fixture so the two data-free tests still run in the CI `unit-tests` job.
+- Negative control for the §6.4a fix: emptying `_V_ALIASES` (an in-place edit,
+  not a `git stash` — the change is committed on the branch) fails
+  `test_v_does_not_over_split_one_real_parish[2019-20]` and
+  `test_the_2019_20_alias_table_is_the_thing_being_tested`, while the
+  `[2018-19]` parametrisation passes either way — stated as such in its
+  docstring.
+- `tests/test_uganda_v_grain_invariants.py`, `test_uganda_invariance.py` pass;
+  the 323 guard suite (`test_gh323_explicit_reducers`,
+  `test_gh323_grain_contract`, `test_grain_collapse*`,
+  `test_uganda_v_grain_invariants`) is **76 passed**.
+- `tests/fixtures/uganda_baseline.json` refreshed for exactly **three** entries
+  (`var/cluster_features.parquet` — shape 4,809; `var/sample.parquet`;
+  `var/people_last7days.parquet`); a surgical update that would have reported —
+  and refused — any unrelated drift. Only two of the 53 baseline entries carry
+  `v` at all (`cluster_features`, `sample`); the cached parquets are written
+  before `_join_v_from_sample`, so the re-keying cannot touch the other 51.
+- **Corrected 2026-07-21**: an earlier revision of this file claimed
+  `tests/test_gh323_explicit_reducers.py::test_core_does_not_dispatch_the_reducers`
+  was a pre-existing failure on pristine `origin/development`. It is not.
+  Re-run here: **22 passed** at both `45aee170` (this branch's base) and
+  `4c236d11` (current `development`) — PRs #635/#640 replaced the substring
+  guard with an AST one. The claim, and the matching paragraph in the PR body,
+  are withdrawn. (It also said "exactly two entries" of the baseline fixture
+  were refreshed; three were.)
 
 ## §9 Deferred (needs core, or another PR)
 
@@ -180,5 +228,12 @@ dispersal (`comm` waves) and genuine sub-parish variation in `Rural` / GPS.
   `({const: value})`.
 - GH #606: the `how='outer'` sub-df merge that manufactures 2005-06's 368
   phantom rows (Site 4).
-- 2019-20 has no `df_geo`, so its 827 clusters have no coordinates at all.
+- 2019-20 has no `df_geo`, so its 824 clusters have no coordinates at all.
   Pre-existing and unrelated to #323.
+- **Parish-name collisions *within* a district.** 32 of 2019-20's 824 clusters
+  span more than one county/subcounty spelling; almost all are the data-entry
+  artefacts §6.4 declines to key on, but at least one (`KAKUMIRO/KIKWAYA` —
+  8 hh in BUGANGAIZI/KIKWAYA, 1 in BUYANJA/KAKINDO) is a genuine second parish
+  of the same name inside one district. Not fixed here (the composite key does
+  not make it worse) and **not quantified for the other waves**; noting it so
+  the silence is not mistaken for a clean bill.

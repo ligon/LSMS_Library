@@ -50,6 +50,19 @@ def v(value):
     district makes ``v`` an actual key: 751 -> 781 clusters, and clusters
     spanning more than one district go 20 -> 0.
 
+    That last number is **zero by construction** under a key that contains the
+    district, so it is not by itself evidence -- it cannot see the opposite
+    error, OVER-SPLITTING one real parish because its households disagree about
+    their district.  The audit that can see it is: group GSEC1 by its own
+    ``(county_name, subcounty_name, parish_name)`` triple and count distinct
+    composite keys.  Run on this wave: **0** triples split across more than one
+    ``v`` -- all 20 of the splits here are genuinely distinct parishes.  (The
+    2019-20 file of the same name is NOT clean on this audit and carries a
+    three-entry alias table; ``tests/test_uganda_323_grain.py`` asserts the
+    invariant for both waves.)  This wave does carry one district misspelling,
+    ``PALISA`` for ``PALLISA``, in one household -- but the correctly-spelled
+    district holds no household in that parish, so it splits nothing.
+
     Both ``sample`` and ``cluster_features`` declare ``v`` as the same
     ``[distirct_name, parish_name]`` pair (note the source's misspelling of
     "district"), so the two cannot drift -- ``_join_v_from_sample`` propagates

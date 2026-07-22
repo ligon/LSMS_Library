@@ -180,7 +180,8 @@ def cluster_features(df):
     2. ``v`` is a PARISH from 2013-14 on, and a parish contains several
        enumeration areas -- some urban, some rural, each with its own geovar
        fix.  ``Rural`` and the GPS are therefore not parish attributes at all
-       (65-126 clusters per wave for Rural).
+       (70 / 65 / 122 / 122 clusters conflict on Rural in 2013-14 / 2015-16 /
+       2018-19 / 2019-20).
 
     Neither can be resolved from this table, and picking a winner is the bug.
     ``<NA>`` + a warning is the honest answer; per-household ``Rural`` / ``Region``

@@ -32,7 +32,17 @@ that exists in no source record -- is not.  Three real defects rode on it:
   DELETED outright by ``groupby(dropna=True)``, so 339 ``(t, v)`` pairs that
   ``sample()`` knew about had no ``cluster_features`` row at all;
 * the projection itself was never declared, so nothing checked it.
+
+**A note on skipping.**  Nothing in this module converts a build failure into a
+skip.  An earlier draft wrapped every fixture in ``except Exception:
+pytest.skip(...)``, which would have made the whole end-to-end half of this file
+VACUOUS the moment the Uganda build broke -- the exact silence it is here to
+prevent.  The only sanctioned skip is ``tests/conftest.py``'s
+``aws_creds_available()`` guard on the ``uga`` fixture (plus that file's narrow
+hook, which converts a *missing-credentials* failure and nothing else), so the
+data-free CI ``unit-tests`` job skips while a genuine regression is red.
 """
+import importlib.util
 import os
 import warnings
 
@@ -41,20 +51,54 @@ import pytest
 
 import lsms_library as ll
 
+# NB `from conftest import ...` -- which tests/conftest.py's own docstring
+# suggests -- resolves to the ROOT conftest.py, which does not define this.
+# `tests/` is a package (it has an __init__.py), so import it by package path.
+from tests.conftest import aws_creds_available
+
 COUNT_COLS = ['Men', 'Women', 'Boys', 'Girls']
 LONG_WAVES = ['2018-19', '2019-20']
 
+#: GSEC1 cover-page columns for the two long-form waves: the source file, the
+#: ``(district, parish)`` pair ``v`` is built from, and the survey's own
+#: administrative triple that says whether two ``v``\ s are really one place.
+GSEC1 = {
+    '2018-19': {
+        'file': 'Data/GSEC1.dta',
+        'pair': ['distirct_name', 'parish_name'],   # sic: source misspelling
+        'triple': ['county_name', 'subcounty_name', 'parish_name'],
+    },
+    '2019-20': {
+        'file': 'Data/HH/gsec1.dta',
+        'pair': ['district', 's1aq04a'],
+        'triple': ['s1aq02a', 's1aq03a', 's1aq04a'],
+    },
+}
 
-def _uganda_or_skip():
-    try:
-        return ll.Country('Uganda')
-    except Exception as exc:  # pragma: no cover - environment-dependent
-        pytest.skip(f"Uganda not available: {exc!r}")
+
+def _wave_mapping(wave):
+    """The wave's ``_/mapping.py``, loaded as a module."""
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Uganda' / wave / '_' / 'mapping.py'
+    spec = importlib.util.spec_from_file_location(f'_uganda_{wave}_mapping', path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 @pytest.fixture(scope='module')
 def uga():
-    return _uganda_or_skip()
+    """The country handle.
+
+    Skips ONLY when S3 credentials are absent (the data-free CI job), never on
+    a build error -- see the module docstring.  Attached to the fixture rather
+    than to the classes so the two data-free tests in this file (the hook
+    contract, and the missing-``_category`` guard) still run there.
+    """
+    if not aws_creds_available():
+        pytest.skip("needs S3 credentials to build Uganda; the unit-tests job "
+                    "is deliberately data-free (see tests/conftest.py)")
+    return ll.Country('Uganda')
 
 
 @pytest.fixture(scope='module')
@@ -69,14 +113,11 @@ def built(uga):
     """
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter('always')
-        try:
-            out = {
-                'people_last7days': uga.people_last7days(),
-                'cluster_features': uga.cluster_features(),
-                'sample': uga.sample(),
-            }
-        except Exception as exc:  # pragma: no cover
-            pytest.skip(f"Uganda tables unavailable: {exc!r}")
+        out = {
+            'people_last7days': uga.people_last7days(),
+            'cluster_features': uga.cluster_features(),
+            'sample': uga.sample(),
+        }
         out['warnings'] = [str(w.message) for w in caught]
     return out
 
@@ -195,6 +236,65 @@ class TestClusterFeatures:
             f"{wave}: {len(offenders)} v-group(s) span >1 district among their "
             f"member households, so `v` is not a cluster key: "
             f"{list(offenders.index[:5])}")
+
+    @pytest.mark.parametrize('wave', LONG_WAVES)
+    def test_v_does_not_over_split_one_real_parish(self, uga, wave):
+        """The converse of ``test_v_is_an_actual_cluster_key`` -- and the one
+        that actually has teeth.
+
+        "Clusters spanning more than one district: 20 -> 0, 23 -> 0" was the
+        only evidence originally offered for the DISTRICT/PARISH key, and it is
+        **zero by construction** under a key that contains the district.  It
+        cannot see OVER-SPLITTING: one real parish torn into two clusters
+        because a household or two coded the wrong district.
+
+        The survey's own ``(county, subcounty, parish)`` triple is an
+        independent witness, so: no triple may map to more than one ``v``.
+        2019-20 violated this three times -- ``NAMTUMBA``/``NAMUTUMBA`` (a
+        misspelling), and the ``MUBENDE``->``KASSANDA`` (2019) and
+        ``GULU``->``OMORO`` (2016) district carve-outs, where a straggler
+        household still codes the parent -- putting four households in a 1-2
+        household phantom cluster instead of the 10-11 household cluster they
+        belong to.  ``mapping._V_ALIASES`` resolves them.  2018-19 is clean and
+        always was, so for that wave this test pins an invariant rather than a
+        fix.
+        """
+        from lsms_library.local_tools import get_dataframe
+        spec = GSEC1[wave]
+        df = get_dataframe(uga[wave].file_path / spec['file'])
+        for c in set(spec['pair']) | set(spec['triple']):
+            df[c] = df[c].astype(str).str.strip().str.upper()
+        mapping = _wave_mapping(wave)
+        df['_v'] = df[spec['pair']].apply(mapping.v, axis=1)
+        df = df[df['_v'].notna()]
+        grouped = df.groupby(spec['triple'])['_v'].unique()
+        offenders = grouped[grouped.map(len) > 1]
+        detail = {k: sorted(vs) for k, vs in offenders.head(5).items()}
+        assert offenders.empty, (
+            f"{wave}: {len(offenders)} (county, subcounty, parish) triple(s) "
+            f"are split across more than one v, so the district component is "
+            f"fragmenting real parishes: {detail}")
+
+    def test_the_2019_20_alias_table_is_the_thing_being_tested(self):
+        """A data-free companion to the audit above, so the fix is pinned even
+        in the credential-free CI job: the three aliased ``(district, parish)``
+        pairs must collapse onto their canonical partner's key."""
+        mapping = _wave_mapping('2019-20')
+        for coded, canonical, parish in [('NAMTUMBA', 'NAMUTUMBA', 'NAWANSAGWA'),
+                                         ('MUBENDE', 'KASSANDA', 'KIJUNA'),
+                                         ('GULU', 'OMORO', 'PALWO')]:
+            got = mapping.v(pd.Series([coded, parish]))
+            want = mapping.v(pd.Series([canonical, parish]))
+            assert got == want == f'{canonical}/{parish}', (
+                f"{coded}/{parish} -> {got!r}, but it is the same place as "
+                f"{canonical}/{parish} -> {want!r}")
+            assert mapping.District(pd.Series([coded, parish])) == canonical, (
+                "District must be resolved through the same alias table, or "
+                "reduce_to_agreed blanks it for the merged cluster")
+        # ... and an unaliased pair must pass through untouched, so the table
+        # is not quietly rewriting the rest of the wave.
+        assert mapping.v(pd.Series(['MUBENDE', 'KIGANDA'])) == 'MUBENDE/KIGANDA'
+        assert mapping.District(pd.Series(['GULU', 'LAROO'])) == 'GULU'
 
     @pytest.mark.parametrize('wave', LONG_WAVES)
     def test_v_is_the_district_parish_composite(self, built, wave):

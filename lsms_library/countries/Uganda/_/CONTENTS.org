@@ -66,25 +66,67 @@ only 19 distinct values for 751 parishes, and the YAML has flagged it
 BROKEN for a while — so =v= was set to the free-text parish /name/.
 
 *Parish names are not unique in Uganda.*  20 of 2018-19's 751 names and
-23 of 2019-20's 794 recur across districts; =CENTRAL= alone appears in
-TEN (HOIMA, KAGADI, KALUNGU, KIRYANDONGO, KYOTERA, MITOOMA, …).  Keying
-on the bare name fused genuinely different parishes into a single
-"cluster", whose =Region= / =District= / GPS were then resolved by an
-undeclared =groupby().first()= — i.e. arbitrarily.
+23 of 2019-20's 793 recur across districts /as coded/; =CENTRAL= alone
+appears in TEN (HOIMA, KAGADI, KALUNGU, KIRYANDONGO, KYOTERA, MITOOMA,
+…).  Keying on the bare name fused genuinely different parishes into a
+single "cluster", whose =Region= / =District= / GPS were then resolved
+by an undeclared =groupby().first()= — i.e. arbitrarily.
 
 Qualifying the name by its district makes =v= an actual cluster key:
-751 → 781 clusters (2018-19) and 794 → 828 (2019-20), and clusters
-spanning more than one district drop 20 → 0 and 23 → 0.  Both =sample()=
+751 → 781 clusters (2018-19) and 793 → 824 (2019-20).  Both =sample()=
 and =cluster_features()= build =v= from the same pair via =mapping.v()=
 in each wave's =_/=, so the two cannot drift apart —
 =_join_v_from_sample= hands one key to every other Uganda table.
+
+**Read this before quoting "clusters spanning more than one district:
+20 → 0 and 23 → 0".**  That number is *zero by construction* under a key
+that contains the district.  It is a check that the key was applied, not
+evidence that the key is right, and it structurally cannot see the
+opposite error — *over-splitting*, where one real parish becomes two
+clusters because a household coded the wrong district.  The audit that
+can see it uses the survey's own administrative path as an independent
+witness: group GSEC1 by =(county, subcounty, parish)= and count distinct
+=v=.  Results:
+
+- *2018-19: 0* — all 20 of its splits are genuinely distinct parishes.
+- *2019-20: 3*, now resolved by a three-entry =_V_ALIASES= table in
+  =2019-20/_/mapping.py=:
+
+  | county   | subcounty | parish     | district as coded    | hh    |
+  |----------+-----------+------------+----------------------+-------|
+  | BUSIKI   | NAMUTUMBA | NAWANSAGWA | NAMTUMBA / NAMUTUMBA | 1/10  |
+  | KASSANDA | KITUMBI   | KIJUNA     | MUBENDE / KASSANDA   | 1/9   |
+  | OMORO    | BOBI      | PALWO      | GULU / OMORO         | 2/8   |
+
+  =NAMTUMBA= is a misspelling (one household in the whole wave).
+  Kassanda District was carved out of Mubende in 2019 and Omoro out of
+  Gulu in 2016, and a straggler household still codes the /parent/.  In
+  all three the two groups agree on =region= as well, so this is one
+  place recorded two ways.  Four households would otherwise sit in a 1–2
+  household phantom cluster instead of the 10–11 household cluster they
+  belong to: 827 → *824* clusters.  The alias is keyed on the
+  =(district, parish)= /pair/ — Mubende and Gulu are still real,
+  populated districts here (29 and 37 households), so a bare district
+  rename would be wrong.  =District= is declared row-valued in that
+  wave's =cluster_features= and resolved through the same table, so the
+  merge does not trade three over-splits for three =<NA>= districts.
+
+  Two further district misspellings in 2019-20 (=PALISA= for =PALLISA=,
+  =RUKINGIRI= for =RUKUNGIRI=) and one in 2018-19 (=PALISA=) are
+  deliberately *not* aliased: the correctly-spelled district holds no
+  household in the affected parish, so they split nothing.  Cosmetic
+  label warts, not grain defects.
 
 Deliberately *not* keyed any finer.  Adding =subcounty_name= splits 10
 further groups (2018-19) and 25 (2019-20), but the ones examined are
 spelling artefacts of a single subcounty — =NYENGA= / =NYENGA DIVISION=
 (centroids 0.0 km apart), =LUBAGA= / =RUBAGA DIVISION= (5.3 km),
 ="KAGADI  TOWN COUNCIL"= / ="KAGADI TOWN COUNCIL"= (a doubled space) —
-so it would fragment real parishes on data-entry noise.
+so it would fragment real parishes on data-entry noise.  (32 of
+2019-20's 824 clusters still span more than one county/subcounty
+/spelling/ for this reason.  One of them, =KAKUMIRO/KIKWAYA=, looks like
+a genuine within-district parish-name collision rather than a spelling
+artefact; it is untouched here and unquantified across the other waves.)
 
 Note the source misspells "district" as =distirct_name= in 2018-19.
 
@@ -350,10 +392,18 @@ loud/:
 - households that genuinely DISAGREE get =<NA>= in the offending column
   plus a =GrainConflictWarning= naming the clusters.
 
-*Consumers will now see =<NA>= where they previously saw a value.*  That
-is the point: the old value was an arbitrary pick, or a composite, among
-disagreeing households.  Two causes of disagreement remain, and neither
-is a bug we can configure away:
+*Consumers will now see =<NA>= where they previously saw a value*, and in
+the two =comm= panel waves it is a third of a column, not a handful of
+cells.  Measured on the returned table:
+
+| Wave    | =District= | =Region= | =Rural= | =Latitude= / =Longitude= |
+|---------+------------+----------+---------+--------------------------|
+| 2010-11 | 27.8%      | 5.0%     | 4.4%    | 41.2%                    |
+| 2011-12 | 33.0%      | 7.8%     | 0.0%    | 49.8%                    |
+
+That is the point: the old value was an arbitrary pick, or a composite,
+among disagreeing households.  Two causes of disagreement remain, and
+neither is a bug we can configure away:
 
 1. /Panel dispersal/ — =comm= (2005-06 … 2011-12) is the *2005-06 EA of
    origin*, which the panel carries forward when it tracks a mover.  A
@@ -363,7 +413,8 @@ is a bug we can configure away:
 2. /Sub-cluster variation/ — =v= is a PARISH from 2013-14 on, and a
    parish contains several enumeration areas, some urban and some rural,
    each with its own geovar fix.  =Rural= and the GPS are therefore not
-   parish attributes at all: 65--126 clusters per wave for =Rural=.
+   parish attributes at all: 65 / 122 / 122 clusters conflict on =Rural=
+   in 2015-16 / 2018-19 / 2019-20 (70 in 2013-14).
 
 For a per-household answer use =sample()=, which carries exact
 household-level =Rural= and =Region= for every household.
@@ -394,8 +445,13 @@ Measured effect of the whole change (cold build, =LSMS_NO_CACHE=1=):
 | 2013-14 | 1,012 → 0   | 1 → 1 (loud)      | 706 → 706     |
 | 2015-16 | 1,014 → 0   | 0                 | 875 → 875     |
 | 2018-19 | 1,452 → 0   | 0                 | 751 → 781     |
-| 2019-20 |   947 → 0   | 1 → 1 (loud)      | 793 → 827     |
-| *Total* | *10,837 → 0* | *935 → 394*      | *4,409 → 4,808* |
+| 2019-20 |   947 → 0   | 1 → 1 (loud)      | 793 → 824     |
+| *Total* | *10,837 → 0* | *935 → 394*      | *4,409 → 4,805* |
+
+(=cluster_features()= returns 4,805 rows; the on-disk
+=var/cluster_features.parquet= has 4,809, the difference being the four
+2010-11 clusters below, which the framework's post-read
+=dropna(how='all')= removes.)
 
 The 368 (2005-06) and the surviving NaN-key rows are still DELETED — that
 is decision D2 of =slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org=
@@ -421,7 +477,7 @@ why.
 :LOGBOOK:
 - Note taken on [2026-07-21 Tue] \\
   The 2019-20 =cluster_features= YAML declares no =df_geo=, so
-  =Latitude= / =Longitude= are =<NA>= for all 827 clusters.
+  =Latitude= / =Longitude= are =<NA>= for all 824 clusters.
   Pre-existing; unrelated to GH #323.  If a =unps_geovars_2019_20= file
   exists it should be wired in.
 :END:

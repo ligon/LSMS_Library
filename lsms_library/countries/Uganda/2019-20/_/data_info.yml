@@ -63,8 +63,11 @@ sample:
     myvars:
         # GH #323: composite DISTRICT/PARISH key built by this wave's
         # mapping.v().  s1aq04a (the parish NAME) alone is not a cluster key --
-        # 23 parish names recur across districts.  `sample` and
-        # `cluster_features` MUST declare the identical pair so
+        # 23 parish names recur across districts.  The reverse error (one real
+        # parish split across two districts as coded) is handled by the three
+        # `_V_ALIASES` entries in mapping.py; the "spans >1 district" metric
+        # cannot see it, so read that comment before trusting this key.
+        # `sample` and `cluster_features` MUST declare the identical pair so
         # _join_v_from_sample propagates a key that exists in both.
         v:
             - district
@@ -88,4 +91,11 @@ cluster_features:
     myvars:
         Region: region
         Rural: urban
-        District: district
+        # GH #323: row-valued so mapping.District() can resolve the same three
+        # `_V_ALIASES` entries that mapping.v() does.  If District were left as
+        # the bare `district` column, the three aliased clusters would contain
+        # households whose raw district strings disagree and reduce_to_agreed
+        # would blank District for all three.
+        District:
+            - district
+            - s1aq04a
