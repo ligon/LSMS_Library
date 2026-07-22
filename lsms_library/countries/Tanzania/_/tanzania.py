@@ -1681,7 +1681,12 @@ def people_last7days_for_wave(t, sec, colmap):
     out['working_age'] = out['working_age'].astype('boolean')
     out['t'] = t
     out = out.set_index(['t', 'i', 'pid'])
-    # Drop rows whose every activity field is null (no labor screen answered).
+    # GH #637 key-soundness review -- key SOUND, collapse is dead code.  Both
+    # callers' HH_SEC_E1 is (hhid, pid)-unique -- 2019-20 (sdd_hhid,
+    # sdd_indid): 5,587 rows / 5,587 groups / 0 duplicates; 2020-21 (y5_hhid,
+    # indidy5): 23,592 / 23,592 / 0 -- and format_id is injective over each
+    # wave's households (1,184 -> 1,184; 4,709 -> 4,709), so .first() is never
+    # reached on a cold build of either wave.
     if not out.index.is_unique:
         out = out.groupby(level=['t', 'i', 'pid']).first()
     out = out[PEOPLE_LAST7DAYS_COLUMNS]
@@ -1812,12 +1817,29 @@ def community_prices_for_wave(t, idf, colmap):
     # ~10% of (t, v, j, u) tuples carry >1 source item code that the shared
     # label deliberately MERGES (e.g. MILLET (GRAIN) + SORGHUM (GRAIN) -> the
     # one harmonize_food label "Millet & Sorghum (grain)", exactly as
-    # food_acquired lumps them).  Within a single cluster and unit, combine the
-    # colliding reported unit prices by their MEAN -- a within-cluster,
-    # within-label combination forced by label unification, NOT the forbidden
-    # cross-cluster median.
-    # keep-first: a genuine REPORTED price per cell (consistent with the sibling
-    # community_prices features), not a computed mean over the label-lumped rows.
+    # food_acquired lumps them).  Keep-first: a genuine REPORTED price per cell
+    # (consistent with the sibling community_prices features), not a computed
+    # mean over the label-lumped rows.  [The paragraph that used to stand here
+    # said the collision was resolved by the MEAN; the code has always taken
+    # the first.  Corrected under GH #637 -- doc only, no behaviour change.]
+    #
+    # GH #637 key-soundness review.  (t, v, j, u) IS the declared grain of this
+    # feature, and the collisions are EXACTLY the intended label lump, checked
+    # rather than assumed: of 261 colliding groups in 2019-20 and 1,281 in
+    # 2020-21, 261 / 1,281 span more than one SOURCE ITEM CODE and ZERO repeat
+    # a code.  So the survey never prices the same item twice in a cluster, and
+    # no additional index level is available that would not break the shared
+    # `j` vocabulary this feature exists to join on.
+    #
+    # What the collapse DOES do is resolve genuine disagreement arbitrarily:
+    # 243 of the 261 (2019-20) and 1,149 of the 1,281 (2020-21) groups hold
+    # more than one distinct observed price, e.g. cluster 01-06-47-85 in
+    # 2020-21 reports "Millet & Sorghum (grain)" per Kg at both 2,000 and
+    # 16,000 TSh -- .first() keeps 2,000 and the other observation disappears.
+    # That is the GH #323 "arbitrary resolution of two OBSERVED values"
+    # discussion, explicitly NOT the GH #637 completion question, and per #323
+    # D1 the answer may not be a reducer.  Left for a maintainer decision;
+    # recorded here rather than half-fixed.
     out = (out.groupby(['t', 'v', 'j', 'u'], as_index=False, dropna=False)
               [['Price']].first())
 

@@ -45,6 +45,10 @@ edu['Educational Attainment'] = harmonize_education_labels(edu['Educational Atta
 
 edu = edu.set_index(['t', 'i', 'pid'])
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# HH_SEC_C.dta is (sdd_hhid, sdd_indid)-unique: 5,587 rows, 5,587 groups, 0
+# duplicates, 0 null ids; format_id injective over the wave's 1,184
+# households.  .first() is never called on a cold build.
 if not edu.index.is_unique:
     edu = edu.groupby(level=edu.index.names).first()
 

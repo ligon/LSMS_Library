@@ -42,6 +42,10 @@ anthro = anthro.dropna(subset=['pid'])
 
 out = anthro[['t', 'i', 'pid', 'Weight', 'Height', 'MUAC']].set_index(['t', 'i', 'pid'])
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# hh_sec_v.dta is (y5_hhid, indidy5)-unique: 23,592 rows, 23,592 groups, 0
+# duplicates, 0 null y5_hhid; format_id injective over the wave's 4,709
+# households.  .first() is never called on a cold build.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 
