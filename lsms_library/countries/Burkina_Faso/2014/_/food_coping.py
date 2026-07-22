@@ -79,6 +79,15 @@ long = long.dropna(subset=['Days'])
 long['t'] = '2014'
 out = long[['t', 'i', 'Strategy', 'Days']].set_index(['t', 'i', 'Strategy'])
 
+# GH #637 key-soundness review (2026-07-21).  KEY SOUND -- this guard never
+# fires.  `i` concatenates an UNPADDED zd with a 3-padded menage, which would be
+# ambiguous if menage could reach 1000 (zd=1,menage=1001 and zd=11,menage=001
+# both give '11001').  Measured on emc2014_p3_securitealimentaire_27022015.dta:
+# menage ranges 1..17 over 900 zd, giving 10,230 source rows -> 10,230 distinct
+# (zd, menage) pairs -> 10,230 distinct `i`, with ZERO i values mapping to more
+# than one (zd, menage).  The melted frame is 51,099 rows on 51,099 distinct
+# (t, i, Strategy) tuples: 0 duplicates, so 0 exact / 0 complementary /
+# 0 conflicting groups.  Kept as a guard, not because it does anything today.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 
