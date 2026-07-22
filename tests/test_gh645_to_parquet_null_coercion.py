@@ -58,6 +58,7 @@ so no A/B comparison could see it, and the coverage matrix graded it ``sane``.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import re
@@ -71,10 +72,17 @@ import pandas as pd
 import pytest
 import yaml
 
-try:                                  # `tests` is a package, so the bare name
-    from tests.conftest import requires_s3   # `conftest` resolves to the ROOT
-except ImportError:                   # conftest.py, which has no requires_s3.
-    from conftest import requires_s3
+# `requires_s3` lives in tests/conftest.py (#648) but CANNOT be imported by
+# name: the repo root is ahead of tests/ on sys.path, so a bare
+# `import conftest` picks up the ROOT conftest.py (which has no requires_s3),
+# while `import tests.conftest` fails as `tests.tests` under the CI rootdir.
+# Both were observed failing on this PR's first CI run.  Load it by PATH, which
+# is import-mode agnostic and keeps #648's single source of truth.
+_conftest_spec = importlib.util.spec_from_file_location(
+    "_lsms_tests_conftest", Path(__file__).resolve().parent / "conftest.py")
+_conftest = importlib.util.module_from_spec(_conftest_spec)
+_conftest_spec.loader.exec_module(_conftest)
+requires_s3 = _conftest.requires_s3
 
 import lsms_library.local_tools as lt
 from lsms_library.local_tools import get_dataframe, to_parquet
