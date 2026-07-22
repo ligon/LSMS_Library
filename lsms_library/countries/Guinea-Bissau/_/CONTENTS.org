@@ -13,6 +13,57 @@ each grappe is visited in exactly one =vague=, so household
 identifier is =(grappe, menage)= without a vague level.  See
 CLAUDE.md "EHCVM countries" for the cross-country pattern.
 
+** =grappe_gps_gnb2018.dta= ships five duplicated records (GH #323 site 4 / #627)
+
+The GPS file has *450 rows for 445 grappes*.  Five grappes -- 155325,
+155426, 199719, 199816 and 1771231 -- appear *twice*, as verbatim
+duplicate rows: same latitude, same longitude, same accuracy, same
+altitude, same GPS timestamp.  The companion community cover
+=s00a_co_gnb2018.dta= carries the identical 450/445 split, so the
+duplication happened once, on the community side of the export.
+
+That alone made =cluster_features= a *cartesian product*.  The other
+=dfs:= sub-frame is the household cover page =s00_me_gnb2018.dta= at
+~12 rows per grappe, so merging on =v= when =v= repeats on *both*
+sides paired 11-12 household rows against 2 GPS rows for each of those
+five: *5,351 -> 5,410 rows, 59 phantom* (PR #627's census).  Small, but
+the same disease as Malawi's 183,812.
+
+*Guinea-Bissau is not the Malawi shape and does not take the Malawi
+cure.*  There is no household id to re-key on -- the GPS file is
+genuinely at grappe grain and carries nothing finer than =grappe= +
+=vague=, and both copies of every duplicate agree on =vague=.  Nor is
+there Mali 2021-22's single-file cure: the cover page has *no GPS
+columns at all* (checked).  So this cell takes the other remedy #627's
+guard names -- *reduce the sub-frame to the merge-key grain before it
+is merged* -- via a =df_geo(df)= hook in =2018-19/_/mapping.py=.
+
+Two things about that hook are worth knowing before touching it:
+
+- It is dispatched *by name off the sub-frame key*.  =Wave.grab_data=
+  resolves a =dfs:= sub-frame's =df_edit= with
+  =column_mapping(<sub-frame name>, ...)=, so the function must be
+  called exactly =df_geo= and the sub-frame must stay keyed =df_geo=.
+  Renaming either silently drops the de-dup.  A test pins both.
+- It uses =drop_duplicates()= over *every* column, key and payload
+  alike.  That is de-duplication, not aggregation (#323 D1 forbids the
+  latter): a row is removed only when an identical row already exists,
+  so if a future export ever ships two GPS fixes for one grappe that
+  actually *differ*, both survive, the merge is cartesian again, and
+  #627's guard fires.  =groupby().first()= or =keep='first'= would
+  silently pick one and hide exactly that.
+
+After: 5,351 wave rows, *0 phantom*, and the returned 450-row
+=cluster_features= frame is bit-for-bit identical (=DataFrame.equals=
+True, index equal, dtypes equal).
+
+Separately, and *not* fixed: the cover page names 450 grappes but the
+GPS file only 445, so five grappes carry NaN coordinates.  Absent data,
+not manufactured data.  The two counts coincide only by arithmetic
+accident -- the five duplicated records are byte-identical, so they are
+*not* five mislabelled fixes that could be reassigned to the five
+grappes that lack one.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 wave) does NOT ask

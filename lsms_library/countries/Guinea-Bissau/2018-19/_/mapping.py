@@ -5,6 +5,61 @@ import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as _food_acquired_canonical
 
 
+def df_geo(df):
+    """``cluster_features.df_geo`` sub-frame hook — GH #323 site 4 / GH #627.
+
+    **This is a SUB-FRAME hook, not a table hook.**  ``Wave.grab_data``
+    resolves a ``dfs:`` sub-frame's ``df_edit`` by calling
+    ``column_mapping(<sub-frame name>, ...)``, so a module-level function
+    named exactly after the sub-frame key (``df_geo``) runs on that
+    sub-frame **after extraction and before the merge**.  That "before the
+    merge" is the whole point; see below.
+
+    ``grappe_gps_gnb2018.dta`` ships **450 rows for 445 grappes**: five
+    grappes (155325, 155426, 199719, 199816, 1771231) appear TWICE, as
+    VERBATIM duplicate records — same latitude, same longitude, same
+    accuracy, same altitude, same GPS timestamp.  The companion community
+    cover ``s00a_co_gnb2018.dta`` carries the identical 450/445 split, so
+    the duplication happened once, on the community side of the export.
+
+    That alone made the ``cluster_features`` merge a CARTESIAN PRODUCT.
+    The other sub-frame (``s00_me_gnb2018.dta``, the household cover page)
+    is HOUSEHOLD grain — ~12 rows per grappe — so for those five grappes
+    the merge on ``v`` paired 11-12 household rows with 2 GPS rows and
+    emitted 22-24 where an honest join emits 11-12: **5,351 -> 5,410 rows,
+    59 of them phantom** (PR #627's 40-country census).
+
+    The cure is the second remedy the #627 guard itself names — *"reduce a
+    sub-frame to the merge-key grain BEFORE it is merged"*.  It is
+    deliberately NOT the first one (*"merge on a key unique in at least one
+    sub-frame"*): Guinea-Bissau has no such key.  The GPS file is at grappe
+    grain and carries nothing finer (only ``grappe`` and ``vague``, and both
+    copies of every duplicate agree on ``vague``), while the cover page is
+    at household grain, so ``v`` is non-unique on *both* sides and no
+    declarable key separates the two copies.
+
+    ``drop_duplicates()`` over EVERY column — key and payload alike — is
+    used on purpose, and it is de-duplication, not aggregation (#323 D1
+    forbids the latter).  It removes a row only when an identical row
+    already exists, so it cannot choose between disagreeing records: if a
+    future export ever ships two GPS fixes for one grappe that actually
+    DIFFER, both survive, the merge is cartesian again, and #627's guard
+    fires.  A ``groupby().first()`` or ``keep='first'`` would silently pick
+    one and hide exactly that.
+
+    Unrelated to the cardinality and NOT fixed here: the household cover
+    page names 450 grappes but the GPS file only 445, so five grappes carry
+    NaN coordinates.  Missing data, not manufactured data — and note the
+    two counts coincide only by arithmetic accident: the five duplicated
+    records are byte-identical, so they are not five mislabelled fixes that
+    could be reassigned to the five grappes that lack one.
+    """
+    names = list(df.index.names)
+    flat = df.reset_index()
+    deduped = flat.drop_duplicates()
+    return deduped.set_index(names)
+
+
 # Lossy-substitution prefixes the source data carries for two specific
 # Portuguese words.  Upstream of pyreadstat, the export pipeline
 # replaced the second byte of certain UTF-8 codepoints with literal
