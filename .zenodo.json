@@ -1,0 +1,25 @@
+{
+  "upload_type": "software",
+  "title": "LSMS_Library: a uniform interface to Living Standards Measurement Study household surveys",
+  "creators": [
+    {
+      "name": "Ligon, Ethan",
+      "affiliation": "University of California, Berkeley",
+      "orcid": "0000-0003-4928-0616"
+    }
+  ],
+  "description": "<p>A Python library providing a uniform interface to Living Standards Measurement Study (LSMS) household surveys from multiple countries and years, without the data loss typical of traditional harmonization approaches.</p><p>LSMS datasets are invaluable for studying poverty, consumption, and household welfare across developing countries, but each country's survey uses different variable names and encodings, food classification systems, questionnaire structures, and file formats. Researchers typically spend weeks learning each new dataset's idiosyncrasies, or fall back on pre-harmonized datasets that sacrifice detail. Rather than harmonizing the data itself, which discards information, this library provides an abstraction layer that harmonizes the <em>way the data are accessed</em>, so that cross-country and longitudinal analyses become tractable.</p>",
+  "license": "cc-by-4.0",
+  "access_right": "open",
+  "keywords": [
+    "Living Standards Measurement Study",
+    "LSMS",
+    "household surveys",
+    "development economics",
+    "poverty",
+    "consumption",
+    "food expenditure",
+    "data harmonization",
+    "Python"
+  ]
+}

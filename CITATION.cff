@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "LSMS_Library: a uniform interface to Living Standards Measurement Study household surveys"
+abstract: >-
+  A Python library providing a uniform interface to Living Standards Measurement
+  Study (LSMS) household surveys from multiple countries and years, without the
+  data loss typical of traditional harmonization approaches.  Each country's
+  survey uses different variable names and encodings, food classification
+  systems, questionnaire structures, and file formats.  Rather than harmonizing
+  the data itself, which discards information, this library provides an
+  abstraction layer that harmonizes the way the data are accessed, so that
+  cross-country and longitudinal analyses become tractable.
+authors:
+  - family-names: Ligon
+    given-names: Ethan
+    email: ligon@berkeley.edu
+    affiliation: "University of California, Berkeley"
+    orcid: "https://orcid.org/0000-0003-4928-0616"
+repository-code: "https://github.com/ligon/LSMS_Library"
+url: "https://github.com/ligon/LSMS_Library"
+license: CC-BY-4.0
+doi: 10.5281/zenodo.17258079
+keywords:
+  - Living Standards Measurement Study
+  - LSMS
+  - household surveys
+  - development economics
+  - poverty
+  - consumption
+  - food expenditure
+  - data harmonization
