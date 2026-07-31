@@ -160,6 +160,33 @@ Wave-specific notes (validated against the recon refuter pass,
   =cs_i= mapping the roster uses); the wave script applies the same
   prefix so XS plots are not ~100% orphaned.  All other halves emit the
   raw wave hhid and rely on framework id_walk / =panel_ids= chaining.
+- *2016-17 YAML-path tables must spell it =- mapping: cs_i=, NOT
+  =- function: cs_i=.*  This wave's working example is =sample= (see its
+  =idxvars.i=).  The 2019-20 wave uses =- function: cs_i= for the same job,
+  so copying that wave's block into this one *fails silently* --- the key is
+  ignored, the raw =case_id= is emitted, and the table lands in the wrong
+  namespace with no error.  Verified 2026-07-31: the =function:= spelling
+  left all four tables below at 0% overlap; =mapping:= took them to 100%.
+- *Four tables were in that wrong namespace until 2026-07-31*:
+  =food_security=, =subjective_well_being=, =shocks=, =assets= --- all four
+  read =Cross_Sectional/*= and declared a bare =i: case_id=.  Measured
+  against =household_roster= for 2016-17, each had *zero* id overlap
+  (12,446 / 12,445 / 12,426 / 11,272 rows respectively, 48,589 in total);
+  stripping =cs-17-= from the roster ids matched 100% of each, which is what
+  identified the defect.  This is the same failure the 2019-20 geo block
+  warns about, and that =cluster_features= was in for this wave until
+  GH #323 --- these four were missed by that sweep.
+  *The symptom is silence*: an empty join reads as "this wave has no such
+  data", not as an error.  When adding a YAML-path table to this wave,
+  assert overlap with =household_roster= before believing a low match rate
+  is survey coverage.
+- *FIES (=food_security=) is cross-sectional-only in 2016-17.*
+  =Panel/hh_mod_t_16.dta= stops at =hh_t12=; the FIES battery is
+  =hh_t13..hh_t20=, present only in =Cross_Sectional/hh_mod_t.dta=.  So the
+  2,508 panel households carry no FIES.  That is absence *in the shipped
+  extract* --- it is NOT established that those households were never asked;
+  separating =not-asked= from =asked-not-distributed= needs the IHS4/IHPS4
+  questionnaire (C4).  Do not write a closing verdict without it.
 
 * livestock (GAP 4)
 
