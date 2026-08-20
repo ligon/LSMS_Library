@@ -150,7 +150,10 @@ data gap
   =2009-10/_/food_acquired.py= reads -- carries =id3= with variable label
   "EA NO.", alongside =id1= "Region", =id2= "District", =id4= "HH ID".  So does
   every other wave-1 =.dta= except =S3AII/S3AIII= (which carry =id1=, =id2=,
-  =hhno=).
+  =hhno=).  *Values read, not just the column name* (this is exactly the trap
+  that 2013-14 sets, see I5): =S11A.id3= is non-null in 425,255 of 425,255
+  rows, 334 distinct values, 334 distinct =(id1,id2,id3)= tuples, across 5,003
+  households.
 - "EAs.dta is EA-level only": true of =EAs.dta= (2 columns, =id1= + =id3=), but
   irrelevant, because =key_hhld_info.dta= is the household-level cluster file:
   =hhno= + =id1= (Region) + =id2= (District) + =id3= (EA NO.) + =urbrur= +

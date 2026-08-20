@@ -358,3 +358,107 @@ warning text carries the cleanup command if wanted.
   open by whoever wrote them, and they bear on the sampling text -- most
   sharply, "no rotating panel or refreshment sample mechanism" is contradicted
   by GSS's own GLSS3 report for the GLSS1/GLSS2 pair.
+
+* Addendum: GLSS4 region codes were WRONG, and this session's own fix activated it
+
+Found while reading the GLSS4 questionnaire for the relationship codes, and
+verified by reading the PDF directly rather than accepting the report.
+
+=1998-99/_/categorical_mapping.org='s =region= table had codes *9 and 10
+swapped*, and no code 11 at all.  The GLSS4 Household Questionnaire, PDF page
+7, Section 1 column 10 ("In what region/country was (NAME) born?") reads:
+
+: ... Northern ......8 | Upper West ....9 | Upper East ...10 | Foreign [11]
+
+The repo table agreed with the questionnaire on codes 1--8 -- *including*
+GLSS4's non-standard 4=Eastern, 5=Volta -- but reversed the two northern
+regions, evidently by borrowing the country-level table's ordering.  GLSS3
+(1991-92) has the same northern reversal and is already documented; GLSS4 was
+not.
+
+*This was latent while the decode was dead, and commit =18b6ca51= activated
+it*: 2,056 people went from honest NA to wrongly-labelled Upper East <->
+Upper West, and 260 foreign-born stayed NA because code 11 was missing.  Live
+for about forty minutes.  Fixed in =f5e6b66c=.
+
+Three independent lines agree on the corrected ordering:
+
+1. the questionnaire (primary source, read directly);
+2. cover-page counts -- 120 households under code 9 against 260 under code 10;
+3. the 2000 census -- Upper East ~920k, Upper West ~576k, so the larger is
+   code 10.
+
+Birthplace null fraction: 0.0098 -> *0.0*.
+
+*The lesson is not "check the region table".*  It is that reviving a dead
+decode does not restore data -- it starts *trusting* a mapping table that
+nobody has had reason to validate, possibly for years, because while the decode
+was dead the table's contents could not be observed.  Any fix of this shape
+should re-verify the table against a primary source, not just make it non-empty.
+
+** GLSS4 relationship codes: found, and the earlier caution was justified
+
+The GLSS4 questionnaire (p.7 col.3), independently corroborated by the Data
+User Guide (PDF pp.31--32: "File SEC1.SSD - SECTION 1:HOUSEHOLD ROSTER",
+variable =REL=, "Records: 26,411" -- the exact row count of =SEC1.DTA=):
+
+| Code | Questionnaire wording                      | Canonical label    |
+|------+--------------------------------------------+--------------------|
+|    1 | Head                                       | Head               |
+|    2 | Wife/husband                               | Wife/husband       |
+|    3 | Son/daughter                               | Son/daughter       |
+|    4 | Grandchild                                 | Grandchild         |
+|    5 | Father/mother                              | Father/mother      |
+|    6 | Relative of head or head's spouse          | Other relative     |
+|    7 | Servant and his/her relative               | Servant            |
+|    8 | Tenant and his/her relative                | Tenant             |
+|    9 | Other not related to head or head's spouse | Others not related |
+
+Had this fallen through to the GLSS1 14-code table, *1,996 rows (7.6%)* would
+have been mis-labelled -- code 6 (1,766 people, "Relative of head") would have
+become "Sibling", code 7 (53, "Servant") "Niece/nephew".  Leaving the column
+null pending the questionnaire was the right call.
+
+** Final state: household_roster is complete in all seven waves
+
+| t       | Sex | Age    | Birthplace | Relationship | MonthsAway | Generation | Distance | Affinity |
+|---------+-----+--------+------------+--------------+------------+------------+----------+----------|
+| 1987-88 | 0.0 | 0.0001 |     0.0000 |          0.0 |     0.0000 |        0.0 |      0.0 |      0.0 |
+| 1988-89 | 0.0 | 0.0000 |     0.0004 |          0.0 |     0.0000 |        0.0 |      0.0 |      0.0 |
+| 1991-92 | 0.0 | 0.0000 |     0.0012 |          0.0 |     0.5061 |        0.0 |      0.0 |      0.0 |
+| 1998-99 | 0.0 | 0.0000 |     0.0000 |          0.0 |     0.0000 |        0.0 |      0.0 |      0.0 |
+| 2005-06 | 0.0 | 0.0000 |     0.0001 |          0.0 |     0.0000 |        0.0 |      0.0 |      0.0 |
+| 2012-13 | 0.0 | 0.0000 |     0.0004 |          0.0 |     0.0000 |        0.0 |      0.0 |      0.0 |
+| 2016-17 | 0.0 | 0.0000 |     0.0001 |          0.0 |     0.0000 |        0.0 |      0.0 |      0.0 |
+
+(null fraction; =Generation=/=Distance=/=Affinity= were *1.0* in three waves
+this morning.)  Zero kinship warnings.
+
+One pre-existing gap this did NOT touch and which is worth someone's attention:
+*1991-92 =MonthsAway= is 50.6% null.*  Unrelated to these fixes.
+
+* Test status
+
+Full suite at =f5e6b66c=: *2,402 passed, 77 skipped, 4 xfailed, 1 xpassed,
+1 failed*.
+
+The single failure is
+=test_table_structure.py::...[CotedIvoire/cluster_features]= -- "declared
+column 'Latitude' not found".  *Not caused by this work*, and confirmed by
+running it against =master= (=ad4b9c1f=) in an isolated worktree, with the
+import asserted to come from the worktree rather than the =.pth=-pinned main
+checkout.
+
+It is also *not a code defect*: it is a *stale-cache artefact of this
+workstation*.  The test reads a cached parquet.  Ours dates from 2026-07-21 and
+has columns =['Region','Rural']=; a cold rebuild of the same table yields
+=['Region','Rural','Latitude','Longitude']= (Latitude 34.8% null).
+
+*That gap is worth a look on its own*: the cached parquet carries a
+content-hash that grades it *fresh*, yet its content is degraded.  The likely
+path is the GH #515 optional-sub-df fallback -- if the geo file could not be
+fetched at build time, the sub-df is dropped with a warning and the parquet is
+written *without* Latitude but *with* a valid hash.  A degraded build then
+caches as though it were a good one, and no amount of hash checking will
+re-derive it.  Filed here as an observation, not chased (CotedIvoire is out of
+scope for this audit).
