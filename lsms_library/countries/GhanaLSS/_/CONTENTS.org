@@ -924,3 +924,105 @@ Still NOT wired (genuine blockers, not feature gaps to close cheaply):
   GLSS3 =.dta= files carry NO embedded value labels, and the correct file is
   not identifiable from the cached set, so it is left unwired rather than
   guessed.
+
+* Categorical decodes: three traps this country has now sprung three times (2026-08-19)
+
+Read this before touching any =mapping.py= or any =Code | Label= table here.
+
+** Trap 1: a bare =get_categorical_mapping= returns an EMPTY dict, silently
+
+=local_tools.get_categorical_mapping(tablename=X)= called *without* a
+value-column keyword returns =\{\}=.  It passes =idxvars='Code'= and no myvars,
+so =df_data_grabber= drops the Label column and the =.squeeze()= yields
+nothing.  Nothing raises.  Every lookup then misses, returns =pd.NA=, and the
+column ships 100% null while the build reports success.
+
+This has bitten GhanaLSS *three separate times*:
+
+| GH        | what died                                       | fixed for      |
+|-----------+-------------------------------------------------+----------------|
+| #372/#377 | =region_dict= -- Region/Birthplace all NA       | 1991-92 only   |
+| #348      | the 1991-92 =units= decode                      | 1991-92        |
+| (2026-08) | region/rural/relationship in the other 3 waves  | all            |
+
+The first two fixes were applied to *one wave each*, so 1987-88, 1988-89 and
+1998-99 kept calling the bare form.  Consequence, measured on a cold cache
+before the 2026-08-19 fix:
+
+- =cluster_features= graded *dropped* in all three waves.  1987-88 returned
+  *zero rows* (its region inference groups by an all-NA key, and =groupby=
+  drops it); the other two returned frames whose every declared column was null.
+- =household_roster= shipped =Birthplace=, =Relationship=, =Generation=,
+  =Distance= and =Affinity= 100% NULL in those three waves -- *56,817 people*
+  with no kinship data.  The last three are *required* columns in
+  =lsms_library/data_info.yml=.
+- =sample= shipped =strata= and =Rural= 100% null for 1998-99.
+
+*Use =local_tools.code_label_map= instead.*  It passes the value column and
+keys the result by *both* the string and the int form of each numeric code --
+because the second half of this trap is key types: =df_data_grabber=
+stringifies the Code index via =format_id= (so keys are ='1'=), while wave
+mapping functions variously look up with =int(value)= or =str(value)=.  Both
+historical bugs were partly key-type mismatches.
+
+** Trap 2: GLSS4's relationship scheme is NOT GLSS1's
+
+The country-level =relationship= table in =_/categorical_mapping.org= has
+*fourteen* codes and cites *GLSS1*'s data dictionary
+(=catalog/2313/data-dictionary/F184?file_name=y01a=).  It is correct for
+GLSS1 and GLSS2 -- verified against the raw data, where =REL= takes codes 1--14
+and code 1 occurs 3,136 / 3,192 times = each wave's household count.
+
+*It is not correct for GLSS4.*  1998-99's =rel= (=SEC1.DTA=, variable label
+"Relationship to HH head") takes only *nine* codes, 1--9, with code 1 occurring
+5,998 times = the household count.  =SEC1.DTA= carries *no* embedded Stata
+value labels (=value_labels() == []=), so the GLSS4 list has to come off the
+questionnaire.
+
+1998-99 =Relationship= is therefore *deliberately left unmapped* rather than
+decoded through a table that would silently mis-label it.  A null column is
+honest; a wrong kinship label propagates into
+=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  If you
+add the GLSS4 list, add it as a *wave-level* table in
+=1998-99/_/categorical_mapping.org= and search the wave dir *first*, so it
+cannot fall through to the GLSS1 table.  (The same wave-first discipline is why
+1991-92 keeps its own =region= table: GLSS3 orders the two northern regions
+9=Upper West, 10=Upper East, the reverse of the country-level table.)
+
+** Trap 3: GLSS1/GLSS2 "cluster region" is INFERRED, not measured
+
+GLSS1 and GLSS2 have *no cluster-location variable at all*.  Both waves read
+=cluster_features.Region= and =household_roster.Birthplace= from the *same*
+source column, =Y01A.DAT:REGION= -- which is the *person's region of birth*,
+not where the cluster is.
+
+=mapping.py::cluster_features= in both waves therefore *infers* the cluster's
+region as the modal birth region among household members under 12 (young
+children being least likely to have migrated).  =Age= is pulled into
+=cluster_features= =myvars= purely so that filter can run; it is dropped before
+the frame is returned.
+
+*This is an approximation, and any analysis keyed on GLSS1/GLSS2 cluster region
+inherits it.*  It loses no clusters (checked: 176 of 176 clusters in 1987-88
+have at least one under-12 with a valid birth region), but it is a guess about
+geography derived from a migration-sensitive question.
+
+1988-89 had no such function until 2026-08-19.  Once its decode was revived,
+the framework collapsed the person-grain frame with =groupby().first()=,
+taking an *arbitrary* person's birth region for the whole cluster --
+=GrainCollapseWarning= reported 14,559 of 14,924 rows destroyed across 167
+conflicting clusters, i.e. 167 of 170 clusters held members born in more than
+one region.
+
+** Cluster counts, and a vocabulary trap in the documentation
+
+Post-fix cluster counts are exactly the distinct =CLUST= values in the source:
+*176* (1987-88) and *170* (1988-89).
+
+Do *not* read these as an exact match to the DDI's realised figures of 178 and
+170 "sampling areas".  The same DDI sentence defines the terms apart: "Each
+group of 16, 32 or 48 households within a sampling area is referred to as a
+cluster in the GLSS data sets".  A sampling area may hold more than one
+cluster.  Observed households per cluster (1987-88: min 10, median 16, max 48;
+1988-89: min 14, median 16, max 47) match that design.  Treat the agreement as
+corroboration, not identity.
