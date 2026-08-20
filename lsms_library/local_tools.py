@@ -1168,6 +1168,61 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     raise exc
 
 
+def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
+                   idxvars: str = 'Code', fn: str = 'categorical_mapping.org',
+                   dual_keys: bool = True) -> dict[Any, Any]:
+    """Read a ``Code -> Label`` org table into a lookup dict.
+
+    Prefer this over a bare ``get_categorical_mapping(tablename=...)``.
+
+    **Why this exists.**  ``get_categorical_mapping`` passes ``idxvars='Code'``
+    and, unless the caller supplies a value column as a keyword, no myvars --
+    so ``df_data_grabber`` drops the Label column and the squeeze returns an
+    *empty dict*.  Every lookup against it then misses and silently yields
+    ``pd.NA``.  Nothing raises; the column simply comes out 100% null.
+
+    That failure mode has bitten GhanaLSS three separate times:
+
+      - GH #372 / #377 -- ``region_dict`` empty, every Region/Birthplace NA.
+      - GH #348 -- the 1991-92 ``units`` decode, same root cause.
+      - 1987-88 / 1988-89 / 1998-99 -- ``region``/``rural``/``relationship``
+        all resolved to ``{}``, leaving ``cluster_features`` dead in three
+        waves and the kinship columns of ``household_roster`` 100% null.
+
+    **Key types.**  ``df_data_grabber`` stringifies the Code index via
+    ``format_id``, so the natural keys are strings (``'1'``), while callers
+    variously look up with ``int(value)`` or ``str(value)``.  Both historical
+    bugs were partly key-type mismatches.  With ``dual_keys=True`` (the
+    default) the result is keyed by *both* the string and the integer form of
+    each numeric code, so a caller cannot get this wrong.  Non-numeric codes
+    (e.g. a table's ``.`` -> ``None`` row) are kept under their string key.
+
+    Returns ``{}`` if no file in *dirs* carries the table -- callers that need
+    to distinguish "absent" from "empty" should check the directories first.
+    """
+    for d in dirs:
+        if not d.endswith('/'):
+            d += '/'
+        try:
+            df = df_data_grabber(d + fn, idxvars, orgtbl=tablename,
+                                 **{value: value})
+        except (FileNotFoundError, KeyError, ValueError):
+            continue
+        out: dict[Any, Any] = {}
+        for k, v in df[value].to_dict().items():
+            if pd.isna(v):
+                continue
+            key = str(k).strip()
+            out[key] = v
+            if dual_keys:
+                try:
+                    out[int(key)] = v
+                except (TypeError, ValueError):
+                    pass
+        return out
+    return {}
+
+
 def harmonized_unit_labels(fn: str = '../../_/unitlabels.csv', key: str = 'Code', value: str = 'Preferred Label') -> dict[Any, str]:
     unitlabels = pd.read_csv(fn)
     unitlabels.columns = [s.strip() for s in unitlabels.columns]
