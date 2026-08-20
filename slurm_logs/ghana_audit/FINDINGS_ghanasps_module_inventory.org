@@ -108,7 +108,7 @@ Conversion Table are the mechanism for comparing GhanaSPS to GhanaLSS.
 =notes.org= additionally carries a hand-built =other_items.json= harmonization
 for *non-food* expenditure labels across the three rounds (33 items,
 "Preferred Label" column) -- machinery that already exists for a
-=nonfood_expenditures= feature nobody has declared (see section 4, R4).
+=nonfood_expenditures= feature nobody has declared (see F13 and rank 7).
 
 ** I7. =notes.org= references parquets that no longer have producers
 =notes.org= reads =../{wave}/_/food_expenditures.parquet=,
@@ -412,12 +412,13 @@ children -- the wave-1 instrument heading is literally "Part B: ANTHROPOMETRY
 
 | wave    | file                       | rows   | measured | variables                                                          |
 |---------+----------------------------+--------+----------+--------------------------------------------------------------------|
-| 2009-10 | =S6B.dta=                  | 18,757 | n/a*     | =s6b_4= Height cm, =s6b_5= Weight kg, =s6b_6= Hip, =s6b_7= Waist, =s6b_8= Arm circ. (+ =s6b_1= measured?, =s6b_3= standing/lying) |
+| 2009-10 | =S6B.dta=                  | 18,757 | 17,398   | =s6b_4= Height cm, =s6b_5= Weight kg, =s6b_6= Hip, =s6b_7= Waist, =s6b_8= Arm circ. (+ =s6b_1= measured?, =s6b_3= standing/lying) |
 | 2013-14 | =06b_anthropometry.dta=    | 16,354 | 14,898   | =height=, =weight_=, =hipsize=, =waistsize=, =armcircumference=     |
 | 2017-18 | =01evii_anthropometry.dta= | 19,006 | 17,555   | =height=, =weight=, =hipsize=, =waistsize=, =armcircumference=      |
 
-(* 2009-10 non-null counts not tabulated; the file is the same 15-column shape
-and the questionnaire is identical B1-B8.)
+(2009-10 verified: =s6b_4= height n=17,398 median 154 cm; =s6b_5= weight
+n=17,360 median 50 kg; =s6b_8= arm circumference n=17,407 median 24 cm; 4,996
+of 5,009 households represented.)
 
 Measured 2013-14: median height 155 cm, median weight 52 kg, median MUAC 21 cm;
 ages of measured persons 0 to 106 (median 22).  2017-18 medians 155 / 53 / 24.
@@ -538,7 +539,9 @@ All three waves carry a full LSMS-ISA-style agriculture section, plot-long:
 - Area: =2009-10/S4AII.dta= has =s4aii_a10= "Size of plot" + =s4aii_a11= unit
   *and a pre-converted =area_ha= "Land size in hectares"* -- the canonical unit
   the schema wants, already computed.  2017-18 has =plotsizeacres= +
-  =plotsizeunit=; 2013-14 has =plotsizeunit= (+ size in the same table).
+  =plotsizeunit=; 2013-14 has =totalsize= "Total Size" + =plotsizeunit= "Unit"
+  in =04h_agsection.dta= (no pre-converted hectare column in either later
+  wave).
 - Tenure: =S4AI.dta= (=s4ai_a2= year first used/owned, =s4ai_a3= fallow rights)
   and =04i_landtenure.dta= (103 / 139 columns) in the later waves.
 - Soil / irrigation: =2009-10/S4AIII.dta= (=s4aiii_a21= depth, =s4aiii_a23=
@@ -553,6 +556,10 @@ All three waves carry a full LSMS-ISA-style agriculture section, plot-long:
   =S4BII= (=s4bii_b75i= quantity stored) / =04n_harvest(questions)=,
   =04o_cropsalesstores*=.  =04nn_gatheringquestions= adds wild-gathered produce
   in waves 2-3.
+- The only non-=.dta= source in the whole country is
+  =2009-10/Data/Consumption Aggregates_STATA8.zip= (a zip of the wave-1
+  consumption aggregate); *no wave ships a community-level data file of any
+  format*.
 - 2017-18 additionally ships =Data/Crop_encrypted/= (=cropprice_W3.dta.bc=,
   =croppriceother_W3.dta.bc=, =unitcon_W3nonpii.dta.bc=, =FolderKey.bch=) --
   *encrypted*, not readable here.  Those filenames say crop prices and unit

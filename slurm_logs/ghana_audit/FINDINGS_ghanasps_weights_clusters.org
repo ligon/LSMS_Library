@@ -751,3 +751,52 @@ Working files (scratchpad, not in the repository):
 =files_meta.csv= (313 files with row/column counts), =fetch_failures.csv=
 (1 row, the recovered encoding failure).  Regenerate with the inventory
 script described in the Method note at the top.
+
+* CORRECTION by the dispatcher (Sue), verified 2026-08-19
+
+Three claims above were spot-checked directly.  Two hold exactly; *one is
+wrong and would have injected phantom clusters.*
+
+** Verified: the =data_scheme.yml= comment is false
+
+=GhanaSPS/_/data_scheme.yml= asserts "no cluster var in the food files".
+=2009-10/Data/S11A.dta= -- *the wave-1 food source itself* -- carries =id1=,
+=id2=, =id3=, =id4= and =hhno=, and =id3= takes exactly *334* distinct values,
+matching the documented 334 EAs.  Confirmed by direct read.
+
+** Verified: =ppweight3= is a per-person expansion weight
+
+=ppweight3= = =hhweight3= x household size for all 5,009 households (max
+absolute deviation 0.00195 on values of order 1,400, i.e. float32 rounding),
+using =S1D.dta='s 18,889 members.  Sums: =hhweight3= 7.109e6 households,
+=ppweight3= 2.419e7 persons -- the latter consistent with Ghana's 2010 census
+population.  GH #140 open question 6 is settled: per-person expansion weight,
+*not* a panel weight.
+
+** WRONG: the cluster key is =FPrimary[-6:-3]=, NOT =FPrimary[3:6]=
+
+The finding above states that =FPrimary[3:6]= yields "exactly 334 EAs in every
+wave".  *It does not.*  =FPrimary= is not fixed-width in 2017-18: 37 rows carry
+*10-character* ids (e.g. =1008308001=, =1009320001=, =1109320001=) because the
+leading split counter runs to two digits.  A *left*-anchored positional slice
+shifts by one on those rows.
+
+Measured against the wave-1 EA set (=key_hhld_info.id3=, zero-padded to 3):
+
+| wave    | id lengths        | =[:6]= (#140) | =[3:6]= (left) | =[-6:-3]= (right) |
+|---------+-------------------+---------------+----------------+-------------------|
+| 2013-14 | 9 (all 434,162)   |           583 |            334 |               334 |
+| 2017-18 | 9 (147,442), 10 (37) |        893 |        *336*   |               334 |
+
+Not in the wave-1 EA set: =[3:6]= introduces *2 EAs that do not exist in wave
+1*; =[-6:-3]= introduces *zero* in either wave.
+
+*The correct rule is right-anchored*: the household id ends in =EEE|HHH=, so
+the EA is =FPrimary.str[-6:-3]= (equivalently, zero-pad to a fixed width first,
+then slice).  Both rules agree on 2013-14, which is why a check on that wave
+alone would have passed.
+
+GH #140's own hypothesis (=FPrimary[:6]=) is wrong by a wide margin -- 583 and
+893 prefixes against 334 real EAs -- and should be recorded as refuted.
+
+*Do not implement the =sample= feature from the left-anchored rule.*
