@@ -462,3 +462,43 @@ written *without* Latitude but *with* a valid hash.  A degraded build then
 caches as though it were a good one, and no amount of hash checking will
 re-derive it.  Filed here as an observation, not chased (CotedIvoire is out of
 scope for this audit).
+
+* A near-miss worth recording: GhanaSPS food_expenditures is NOT down 20%
+
+While checking the GhanaSPS =sample= work, =food_expenditures= appeared to have
+lost ~20% of its rows against the committed June snapshot:
+
+| wave    | June snapshot | cold build today |
+|---------+---------------+------------------|
+| 2009-10 |       119,169 |           96,513 |
+| 2013-14 |       133,163 |          104,543 |
+| 2017-18 |       145,872 |          117,347 |
+
+=food_acquired=, =food_prices= and =food_quantities= were byte-identical
+across the same comparison, which made it look like a targeted regression in
+the derivation.  It is not.  *It is GH #575, working as designed.*
+
+=transformations.food_expenditures_from_acquired= defaults to
+=basis='purchased'= -- cash outlay only -- and its docstring names *GhanaSPS
+specifically* as one of the countries that populate =Expenditure= on
+produced/in-kind rows, which is exactly the cross-country divergence #575
+exists to remove.  GhanaSPS usable-expenditure rows split
+purchased 321,999 / produced 53,894 / inkind 25,933.
+
+Verified exactly: distinct =(i,t,j,s)= among usable rows *restricted to
+=s == 'purchased'=* is 96,513 / 104,543 / 117,347 -- identical to the delivered
+=food_expenditures=, whose only =s= level is =purchased=.  And the *June*
+figures equal the distinct-group count across *all* sources.  So the June
+snapshot records *pre-#575 semantics*, and the difference is the deliberate
+change, not lost data.
+
+*Two lessons.*
+
+1. This is a third way the stale committed snapshot misleads -- not just tier
+   inflation and grader artefacts, but *row counts computed under superseded
+   semantics*.  A row-count diff against it is not evidence of a regression.
+2. The check that settled it was reconstructing the expected number from first
+   principles (group the source rows the way the derivation says it groups
+   them) rather than reasoning about which commit might be responsible.  The
+   commit-archaeology route had already produced a plausible and wrong
+   candidate.
