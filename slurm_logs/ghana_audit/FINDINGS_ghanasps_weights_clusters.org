@@ -1,0 +1,725 @@
+#+title: GhanaSPS: sampling weights, cluster identity and cross-wave household linkage
+#+date: <2026-08-19>
+#+author: audit agent (read-only investigation, branch audit/ghana-correctness)
+
+Scope: settle, with evidence, (1) which files carry a household sampling
+weight, (2) whether any cluster / EA identifier exists, (3) whether waves can
+be linked, and (4) what the documentation says, for each of the three
+GhanaSPS waves.  Nothing under =lsms_library/= was modified.
+
+Method: every =.dta= named by a =.dvc= sidecar under
+=lsms_library/countries/GhanaSPS/{wave}/Data/= was fetched with
+=lsms_library.data_access.get_data_file()= and its metadata read with
+=pyreadstat.read_dta(..., metadataonly=True)=, producing an inventory of
+10,704 (file, variable, variable-label) triples.  Data were read with
+=lsms_library.local_tools.get_dataframe()=.  The =dvc= CLI was never invoked.
+
+** Coverage of the sweep, and the one recovery
+
+| Wave    | .dta sidecars | metadata read | non-.dta sidecars skipped        |
+|---------+---------------+---------------+----------------------------------|
+| 2009-10 |           124 |           124 | 1 (=Consumption Aggregates_STATA8.zip=) |
+| 2013-14 |            89 |            89 | 0                                |
+| 2017-18 |           100 |           100 | 4 (=Crop_encrypted/*.bc=, =FolderKey.bch=) |
+
+313 of 313 =.dta= files were read.  =2013-14/Data/01fi_generaleducation.dta=
+raised =UnicodeDecodeError= under =pyreadstat= (a latin-1 byte, =Other \x96
+specify=); its 74 variable labels were recovered with
+=pandas.io.stata.StataReader.variable_labels()= and contain no weight
+variable.  *There were no availability failures.*  Every file with a sidecar
+was fetched successfully.  The four =Crop_encrypted/= files are encrypted by
+design (=.bc= / =.bch=) and were not opened; they are crop-price / unit-
+conversion files, not household key files.
+
+* 1. Idiosyncrasies found in the GhanaSPS documentation
+
+Read in full: =_/CONTENTS.org= (377 lines), =_/notes.org= (406 lines),
+=_/README.org= (32 lines).  Named idiosyncrasies:
+
+1. *=_/README.org= is not about GhanaSPS at all.*  It is a variable table for
+   GLSS food-expenditure sections for survey years 1988, 1989, 1991 and 1998
+   (=SEC9B=, =S9B=, =y12a=, =fdexpcd=, =s9bq1=...).  Those are GhanaLSS
+   rounds.  =PLAN_ghanasps_cleanup.org= already flagged it ("Stale (GhanaLSS
+   content)"); it is still stale.  Do not treat it as GhanaSPS documentation.
+
+2. *=_/notes.org= is a food-label harmonization worksheet*, not survey-design
+   notes.  Its six headings are food/expenditure label crosswalks across the
+   three rounds plus a demand-system estimation block.  It contains no
+   statement about weights, clusters, EAs or =FPrimary=.  (Its only apparent
+   "cluster" hits are substring artefacts in food names.)
+
+3. *GSPS is a panel, not three national cross-sections.*  =CONTENTS.org=
+   "Sampling universe" opens with this warning: only wave 1 has a documented
+   probability sample; waves 2 and 3 are follow-ups plus split-offs, and no
+   document states a universe for them.  This governs everything below: a
+   =sample= feature for waves 2/3 cannot mean what it means for wave 1.
+
+4. *Wave 1 design, quoted in =CONTENTS.org= from
+   =Basic_Information_Dec_2015.pdf= s.3, printed p.8*: "5010 households from
+   334 Enumeration Areas (EAs) were sampled.  Fifteen households were selected
+   from each of the EAs."  Upper East (16 EAs) and Upper West (12 EAs) were
+   deliberately oversampled, so *the design is not self-weighting*.
+   5010 sampled vs 5009 interviewed is reconciled in the same document (s.5,
+   printed p.11): one household was dropped for data incompleteness.
+
+5. *"'2013-14' has no regions or urban/rural data."*  =CONTENTS.org=, under
+   "Files in GhanaSPS/_/ > other_features.py", quoting the wave-2 Data Map.
+   *This audit confirms it, and finds the trap that makes it easy to get
+   wrong* -- see s.3.2: =2013-14/Data/01ea_employmentscreener.dta= declares
+   =regioncode=, =regionname=, =districtname= and =communitycode=, and all
+   four are 100% empty strings in all 13,643 rows.  A variable-name grep says
+   "region exists"; the data say it does not.
+
+6. *Wave-label discrepancy for wave 3.*  =CONTENTS.org= records that the
+   directory is =2017-18= while the instrument's cover page says "WAVE 3
+   (2018-2019)" and the IHSN entry is titled 2018-2019.  Affects citation only.
+
+7. *Waves 2 and 3 are not in the World Bank catalog at all* (=CONTENTS.org=);
+   only wave 1 is (catalog 2534).  So there is no WB DDI for waves 2/3, which
+   is why no "Weighting" section exists for them (s.5).
+
+8. *Pre-release data caveat* (GH #140, not =CONTENTS.org=): some GhanaSPS data
+   on disk is a pre-release version.  Not re-verified here.  Every negative
+   finding below is a statement about *the extract this repository holds*.
+
+** Findings that contradict a claim in force
+
+*** Contradiction 1: =_/data_scheme.yml= on cluster identity (2009-10)
+
+=lsms_library/countries/GhanaSPS/_/data_scheme.yml=, verbatim:
+
+#+begin_quote
+GhanaSPS has NO `sample` table (cluster identity unavailable: no cluster
+var in the food files, 2013-14 lacks EAs.dta, and EAs.dta is EA-level
+only).  So `v` is not joined and the index is (t, i, j, u, s) WITHOUT v.
+#+end_quote
+
+Three sub-claims, evaluated:
+
+- "*no cluster var in the food files*" -- *false for 2009-10.*  The wave-1
+  food source =2009-10/Data/S11A.dta=, the file
+  =2009-10/_/food_acquired.py= actually reads, carries =id1= (Region), =id2=
+  (District), *=id3= (EA NO.)* and =id4= (HH ID) alongside =hhno=.  118 of
+  the 124 wave-1 =.dta= files carry =id3=.
+- "*2013-14 lacks EAs.dta*" -- true, but irrelevant: the EA is encoded in
+  =FPrimary= itself (s.3.2), and =EAs.dta= is not the household-to-EA link
+  even in wave 1.
+- "*EAs.dta is EA-level only*" -- true (334 rows, columns =id1=, =id3=), and
+  the wave-2 Data Map says exactly why that does not matter.  From
+  =2013-14/Documentation/Data Map.xlsx=, sheet "Datasets Not Used", verbatim:
+
+  #+begin_quote
+  EAs | W1 | Contains only two variables, EA's and regions, and this data is
+  already replicated (albeit at the hh level) in key_hhld_info)--unless we
+  want to check for consistency?
+  #+end_quote
+
+  That is precisely right: =2009-10/Data/key_hhld_info.dta= is one row per
+  household (5,009 rows) and carries =id3= for every one of them.
+
+  (Consistency check, since the Data Map asked: =EAs.dta= and
+  =key_hhld_info.dta= disagree on the region of *1 of 334 EAs*.  =EAs.dta=
+  puts EA 296 in region 5 (Eastern); all 15 households with =id3=296= in
+  =key_hhld_info.dta= are region 8 (Northern), district 109.  Treat
+  =key_hhld_info.dta= as authoritative.)
+
+*Verdict: the data_scheme.yml comment is wrong as a statement about 2009-10,
+and its wave-2/3 reasoning is superseded by s.3.2 below.*
+
+*** Contradiction 2: GH #140 open question 2, "is FPrimary[:6] the canonical cluster ID?"
+
+*No.*  =FPrimary[:6]= is right for panel households and wrong for split-offs.
+The correct cluster key is =FPrimary[3:6]= (equivalently =FPrimary[1:6]=,
+which prefixes the region).  Evidence in s.3.2.  The 583-prefix figure in
+=slurm_logs/PLAN_ghanasps_cleanup.org= is reproduced here exactly and
+explained: 334 real EAs + 249 spurious singleton prefixes manufactured by
+the leading split-off digit.
+
+* 2. Wave 2009-10
+
+** 2.1 Weights
+
+Every variable whose *name or label* matches
+=weight|wgt|wt|sampl|expans|pond|inflat|raising|probab= was extracted from the
+10,704-row inventory.  Wave-1 hits:
+
+| File              | Variable    | Variable label               | Grain           |
+|-------------------+-------------+------------------------------+-----------------|
+| =key_hhld_info.dta= | =hhweight3= | "Household weight - revised3" | household (5009) |
+| =key_hhld_info.dta= | =ppweight3= | "Population weight - revised3" | household (5009) |
+| =S10AI.dta=       | =hhweight2= | "Household weight - revised"  | person           |
+| =S5D3.dta=        | =hhweight=  | "Household weight"            | enterprise       |
+| =S6B.dta=         | =s6b_5=     | "B5 Weight (kilograms)"       | body weight -- NOT a sampling weight |
+| =S7A.dta=         | =s7a_27=    | "Q27 What was the weight of the child at birth-in kg" | body weight -- NOT a sampling weight |
+
+Summary statistics (=key_hhld_info.dta=, n = 5,009 households, 0 NaN):
+
+| Variable    |    n | min     | mean    | median  | max     | sum           |
+|-------------+------+---------+---------+---------+---------+---------------|
+| =hhweight3= | 5009 | 214.981 | 1419.20 | 1205.32 | 4751.10 |  7,108,790.10 |
+| =ppweight3= | 5009 | 220.239 | 4829.02 | 3772.92 | 41505.3 | 24,188,566.86 |
+
+*Both are expansion weights, not normalized weights* (mean is ~1400 and ~4800,
+not ~1).  =sum(ppweight3) = 24.19 million= is close to Ghana's 2010 Population
+and Housing Census count of ~24.66 million persons (an *approximate external
+comparator*, not a repository fact), i.e. about 1.9 per cent low.
+
+*Caveat worth recording*: =sum(hhweight3) = 7.11 million households= is well
+above the ~5.47 million households of the 2010 census (again an approximate
+external comparator).  The implied national mean household size is
+24.19/7.11 = 3.40 persons, against ~4.4 in the census.  The weights look
+calibrated on *persons*, and =hhweight3= should not be relied on as a
+household-count expansion factor without further checking.
+
+*=hhweight3= is a cluster-level design weight.*  It takes exactly one distinct
+value within each of the 334 EAs (=nunique= per =id3= is 1.0 for all 334) --
+consistent with a two-stage design where all 15 households in an EA share the
+same inclusion probability.
+
+*** Superseded revisions
+
+- =hhweight2= ("Household weight - revised") appears only in =S10AI.dta=, a
+  person-level module covering 4,998 households; 4,996 have a value.  Range
+  246.5 to 4686.1, sum 6,986,607.  Correlation with =hhweight3= is 0.867 and
+  *no household has an equal value* -- it is a genuinely different, earlier
+  revision.
+- =hhweight= ("Household weight") appears only in =S5D3.dta= (trade
+  inventory), 1,804 households, sum 1,563,434, max 43,019.  Also unequal to
+  =hhweight3= everywhere.
+
+*Use =hhweight3=.*  It is the only complete, one-row-per-household weight, it
+is the "revised3" generation, and it is the one the wave-2 panel documentation
+names (s.5.2).
+
+*** GH #140 open question 6, SETTLED: =ppweight3= is a per-person expansion weight, not a panel weight
+
+Test: count roster members per household from =2009-10/Data/S1D.dta= (18,889
+rows, exactly the 18,889 household members stated in
+=Baseline_Descriptive_Report.pdf= s.2.1), join to =key_hhld_info.dta= on
+=hhno= (0 unmatched), and compare =ppweight3/hhweight3= to household size.
+
+- =ppweight3 / hhweight3 == household size= for *5,009 of 5,009 households*
+  (=np.isclose= at =rtol=1e-6=; maximum absolute deviation 9.55e-07, i.e.
+  float32 storage rounding).
+- =sum(hhweight3 * hhsize) = 24,188,566.87= vs =sum(ppweight3) =
+  24,188,566.86=.
+- Mean household size 3.771; the ratio's mean is 3.771 with min 1 and max 20,
+  exactly the roster's household-size distribution.
+
+*=ppweight3= is arithmetically identical to =hhweight3= x household size.*  It
+is therefore a per-person expansion weight and carries no longitudinal
+information whatsoever.  It must NOT be mapped to =panel_weight=.
+
+*No panel weight exists in wave 1* -- which is expected, since wave 1 is the
+baseline.
+
+** 2.2 Cluster / PSU identity
+
+*Fully available, at household grain, in 118 of 124 files.*
+
+=key_hhld_info.dta= (5,009 rows, one per household) columns:
+=id1= (Region, labelled 1..10 Western/Central/Greater Accra/Volta/Eastern/
+Ashanti/Brong Ahafo/Northern/Upper East/Upper West), =id2= (District),
+=id3= ("EA NO."), =id4= ("HH ID"), =hhno=, =urbrur= (labelled 1 Urban / 2
+Rural), =loc7= (labelled 1 Accra(GAMA) .. 7 Rural Savannah), =hhweight3=,
+=ppweight3=.
+
+| Quantity                              | Value                    |
+|---------------------------------------+--------------------------|
+| distinct =id3= (EAs)                  | *334* (documented: 334)  |
+| households per EA                     | mean 15.00, min 14, max 15, sd 0.055 |
+| distinct =id1=                        | 10                       |
+| distinct =id2=                        | 115                      |
+| distinct (=id1=,=id2=,=id3=)          | 335 (see note)           |
+| =urbrur=                              | 2,010 Urban / 2,999 Rural |
+
+=id3= is a *global* EA number (1..334), not nested within region.  One
+anomaly: =id3=183= appears under two districts of region 6 (=id2=1= with 12
+households, =id2=94= with 3).  So (=id1=,=id2=,=id3=) gives 335 groups while
+=id3= gives 334.  Use =id3= alone as =v=; the extra district split is a
+district-coding artefact, not a second cluster.  This is likely the same thing
+the wave-2 Data Map means by "at least a few communities span two Eas".
+
+*** The =hhno= digit scheme (this is the key to waves 2 and 3)
+
+=hhno= is a 9-digit integer for all 5,009 households.  Decomposition, verified
+against the id columns:
+
+: hhno  =  S . RR . EEE . HHH
+:          1   2    3     3     digits
+:          |   |    |     +-- id4  (household within EA)   match rate 1.000
+:          |   |    +-------- id3  (EA number, 001..334)   match rate 1.000
+:          |   +------------- region (01..10)
+:          +----------------- split/generation counter; always '1' in wave 1
+
+So =hhno[3:6] == id3= exactly, and =hhno[:6]= partitions the 5,009 households
+into *334 groups of ~15* -- the EA partition.
+
+** 2.3 Documentation
+
+=2009-10/Documentation/Basic_Information_Dec_2015.pdf=, PDF page 10 (printed
+p.9), section 3 "Sampling and Survey Design", verbatim (extracted with
+=pdfminer=):
+
+#+begin_quote
+Since the design is not self-weighting, household sample weights have been
+computed and applied for the estimation of the survey results.  This was to
+facilitate estimation of the true contribution of each selected cluster in the
+sample.
+#+end_quote
+
+The same sentence appears in
+=2009-10/Documentation/ddi-documentation-english_microdata-2534.pdf=, PDF page
+3, under an explicit heading *"Weighting"*.
+
+Neither document names =hhweight3= or =ppweight3=.  The naming is established
+by the wave-2 panel documentation instead (s.5.2).
+
+* 3. Wave 2013-14
+
+** 3.1 Weights: NONE, and the documentation says so
+
+*No sampling weight exists in any of the 89 =.dta= files.*  The only
+weight-labelled variables in the whole wave are:
+
+| File                    | Variable        | Variable label                            | Verdict |
+|-------------------------+-----------------+-------------------------------------------+---------|
+| =06b_anthropometry.dta= | =weight_=       | "6b05 - Weight"                           | body weight, kg |
+| =07a_fertility.dta=     | =weightatbirth= | "s07a_27 - Weight of child at birth"      | body weight, kg |
+
+This is a *complete* sweep of 89 of 89 files and all their variable names and
+labels, with the encoding-failed file recovered separately.  It is not an
+"I could not download it" result.
+
+*** The documentary evidence that no wave-2 weight was ever computed
+
+=2013-14/Documentation/Variable Lists/key_hhinfo_panel.xlsx=, sheet
+=key_hhinfo_panel=.  This is the survey team's own panel-variable construction
+map: for each panel variable it names the wave-2 source variable+dataset and
+the wave-1 source variable+dataset.  Rows 17 and 18, transcribed verbatim
+(columns: Panel Variable | Panel Label | W2 Variable | W2 Question | W2
+Dataset | W1 Variable | W1 Question | W1 Dataset | Wave(s)):
+
+: hhweight | Household Weight   | (blank) | (blank) | (blank) | hhweight3 | hhweight3 | key_hhld_info | W1
+: ppweight | Population Weight  | (blank) | (blank) | (blank) | ppweight3 | ppweight3 | key_hhld_info | W1
+
+The =Wave(s)= cell reads *"W1"*, and all three W2 cells are empty.  The same
+file's Labels twin (=Variable Labels/key_hhinfo_panel_labels.xlsx=, sheet
+=Sheet1=) lists =hhweight= / =ppweight= with labels "Household Weight" /
+"Population Weight" and no wave-2 provenance.
+
+This is stronger than "we did not find a weight": the people who built the
+GSPS panel file wrote down, variable by variable, that the household and
+population weights are wave-1-only.  It also *confirms the wave-1 variable
+names* =hhweight3= / =ppweight3= in =key_hhld_info=.
+
+Nothing in =Data Map.xlsx=, =ISSER_Yale_Part A_WAVE II.docx=,
+=ISSER_Yale_Part B_WAVE II.docx= or =ISSER_Yale_Community Survey_WAVE II.docx=
+mentions sampling weights (each was unzipped and its =word/document.xml=
+stripped of tags and searched for =weight|sampl|enumeration area|EA|cluster|
+representative|expansion factor=; the only "weight" hits are the anthropometry
+and birth-weight questionnaire items, and the crop-unit question "Weight in
+kilograms of crop in one of this unit").  The wave ships no Basic Information
+Document and no DDI, so there is no "Weighting" section to consult.
+
+*Distinguish carefully*: the documentation *positively records* that the panel
+weights are W1-only.  It does *not* contain a sentence saying "no wave-2
+weights were computed".  What we have is (a) an exhaustive negative over the
+shipped microdata and (b) an affirmative construction map that assigns the
+weights to W1 only.
+
+** 3.2 Cluster identity: FULLY RECOVERABLE, and =FPrimary[:6]= is the wrong key
+
+=01a_consent.dta= is the household roster of the wave: 4,774 rows, 4,774
+distinct =FPrimary=, all 9 characters.
+
+*** Prefix census (the raw numbers, reproducing the PLAN's 583)
+
+| prefix       | n distinct | hh/prefix min | median | mean | max |
+|--------------+------------+---------------+--------+------+-----|
+| =FPrimary[:2]= |         10 |             1 |   13.0 | 477.4 | 4189 |
+| =FPrimary[:3]= |         40 |             1 |   12.0 | 119.4 |  770 |
+| =FPrimary[:4]= |         52 |             1 |   10.5 |  91.8 |  507 |
+| =FPrimary[:5]= |        127 |             1 |    8.0 |  37.6 |  149 |
+| *=FPrimary[:6]=* |    *583* |             1 |   11.0 |   8.2 |   15 |
+| =FPrimary[:7]= |        649 |             1 |    8.0 |   7.4 |   15 |
+
+583 is *not* 334, and the size distribution is bimodal: 150 prefixes hold
+exactly 1 household and 60 hold 2, while 96 hold exactly 15 and 73 hold 14.
+That bimodality is the whole story.
+
+*** Decomposition: panel households vs. split-offs
+
+Split the 4,774 by whether =FPrimary= exactly equals a 2009-10 =hhno=:
+
+| Group                        |    n | first char of =FPrimary= | distinct =[:6]= | hh/=[:6]= |
+|------------------------------+------+--------------------------+-----------------+-----------|
+| matches a W1 =hhno= (panel)  | 4366 | '1' (all)                | *334*           | 5..15, mean 13.07 |
+| no W1 match (split-off)      |  408 | '2' (327), '3' (62), '4' (14), '5' (4), '6' (1) | 249 | 1..8, mean 1.64 |
+
+- The panel group's 334 prefixes are *exactly* the wave-1 EA prefix set
+  (=set(panel[:6]) == set(W1 hhno[:6])=, verified).
+- *None* of the split-off group's 249 prefixes is a wave-1 EA prefix, and none
+  coincides with any panel household's prefix in this wave (0 of 408).
+
+So =FPrimary[:6]= scatters the 408 split-off households into 249 fictitious
+one- and two-household "clusters" that no household of the origin EA belongs
+to.  As a =v=, it would be silently wrong for 8.5 per cent of the wave.
+
+*** The rule that recovers the true EA (exhaustively verified)
+
+Replace the leading digit of =FPrimary= with ='1'=:
+
+- *408 of 408* split-off ids then land exactly on a wave-1 =hhno=.  Zero
+  misses.
+
+That is, =FPrimary= follows the *same* S/RR/EEE/HHH scheme as wave-1
+=hhno=, where the leading digit =S= is a split/generation counter (1 = the
+original wave-1 household, 2..6 = households split off from it) and the
+remaining 8 digits are the *origin* household's region, EA and household
+number.  Three ids illustrate it directly: =408294015=, =508294015= and
+=608294015= all descend from wave-1 household =108294015=.
+
+Applying it to all 4,774 households:
+
+| Implied EA (=FPrimary[3:6]=)      | value                |
+|-----------------------------------+----------------------|
+| distinct EAs                      | *334*                |
+| all are wave-1 EAs?               | *yes*                |
+| wave-1 EAs with 0 wave-2 households | *0*                |
+| households per EA                 | min 6, median 14, mean 14.29, max 27 |
+
+*Conclusion: cluster identity for 2013-14 is fully available.  Use
+=FPrimary[3:6]= (or =FPrimary[1:6]= to carry the region), never
+=FPrimary[:6]=.*
+
+Consistency with the published sample account: =CONTENTS.org= quotes the IHSN
+abstract, "5484 households were selected ... comprising of 5009 households
+from the baseline survey and 475 households from split of households created
+of which 4774 households were successfully interviewed."  Our decomposition
+gives 4,366 originals + 408 split-offs = 4,774.  Consistent.
+
+*** What is NOT available in 2013-14, and the grep trap
+
+- No region, district, urban/rural or community variable carries data.
+- =01ea_employmentscreener.dta= *declares* =regioncode=, =regionname=,
+  =districtname= and =communitycode=.  All four are the *empty string* in all
+  13,643 rows (=nunique = 1=, the value =''=).  A name-only grep reports these
+  as present.  They are not.
+- The region *is* recoverable from =FPrimary[1:3]=, but that is the *origin*
+  (wave-1) region, not necessarily current residence.
+
+*** A wave-2 geodata file exists upstream and is NOT in this repository
+
+=key_hhinfo_panel.xlsx= names a wave-2 dataset =w2_hh_geodata_w3preloads= as
+the W2 source for:
+
+: eacode_w2    | Enumeration Area (Wave 2) | W2 variable "eacode"     | dataset w2_hh_geodata_w3preloads
+: comm_code_w2 | Community Code (Wave 2)   | W2 variable "comm_code_w2" | dataset w2_hh_geodata_w3preloads
+: d_code_w2    | District Code (Wave 2)    | W2 variable "d_code_w2"  | dataset w2_hh_geodata_w3preloads
+: district_w2  | District (Wave 2)         | W2 variable "district_w2" | dataset w2_hh_geodata_w3preloads
+: region       | Region (Wave 1)           | W2 variable "regioncode" | dataset w2_hh_geodata_w3preloads
+
+There is no file of that name in =2013-14/Data/= (89 sidecars, all
+enumerated).  *This is an acquisition target, not an absence.*  It would give
+wave-2 *current-residence* geography, which the id-derived EA cannot.
+
+Also from =Data Map.xlsx=, sheet "Datasets", row for =key_hhinfo_panel=,
+column "Issues", verbatim (this is the passage CONTENTS.org paraphrases):
+
+#+begin_quote
+District codes need to be checked; may be good to harmonize across waves; may
+be good to integrate numerical codes and string names into numerical labeled
+variables; at least a few communities span two Eas--does that make sense?
+Rural/urban codes are missing from Wave 2; within Wave 1, there is some rural
+vs. urban inconsistency between public World Bank data and private PII data;
+there is some admin data from W1 that I haven't found in W2 that we may want
+to consider either removing from the dataset or pursuing in W2
+#+end_quote
+
+* 4. Wave 2017-18
+
+** 4.1 Weights: NONE
+
+*No sampling weight exists in any of the 100 =.dta= files.*  Only:
+
+| File                       | Variable        | Variable label                       | Verdict |
+|----------------------------+-----------------+--------------------------------------+---------|
+| =01evii_anthropometry.dta= | =weight=        | "6b05 - Weight"                      | body weight, kg |
+| =07a_fertility.dta=        | =weightatbirth= | "s07a_27 - Weight of child at birth" | body weight, kg |
+
+=00_hh_info.dta=, the wave's household key file, has exactly 12 columns and
+none of them is a weight: =FPrimary=, =round=, =remnant=,
+=FPrimary_original=, =hhmid_original=, =moved=, =last_wave=, =r_code=,
+=region=, =d_code=, =district=, =comm_code=.
+
+** 4.2 Cluster identity: RECOVERABLE from the id, plus a real current-residence geography
+
+=00_hh_info.dta=: 5,669 rows, 5,669 distinct =FPrimary=.
+
+*** Id structure
+
+| Fact                                          | Value |
+|-----------------------------------------------+-------|
+| =FPrimary= length                             | 9 for 5,666 rows; *10 for 3 rows* |
+| leading digit                                 | '1' 4415, '2' 869, '3' 248, '4' 82, '5' 32, '6' 12, '7' 6, '8' 3, '9' 2 |
+| lead-digit-to-'1' hits a wave-1 =hhno=        | *5,666 of 5,669* |
+| =FPrimary[3:6]= distinct (9-char ids only)    | *334*, all wave-1 EAs |
+| wave-1 EAs with 0 wave-3 households           | *0* |
+| households per EA                             | min 7, median 17, mean 16.96, max 37 |
+
+The three 10-character ids are transcription defects, and they are
+self-diagnosing because =FPrimary_original= holds the correct 9-digit form:
+
+| FPrimary     | round | FPrimary_original | region            |
+|--------------+-------+-------------------+-------------------|
+| =1009320001= |     2 | =109320001=       | Upper East Region |
+| =1109320001= |     2 | =109320001=       | Upper East Region |
+| =1008308001= |     2 | =108308001=       | Northern Region   |
+
+An extra digit has been inserted after the leading digit.  They are the only
+source of the two spurious "EA" codes =830= and =932= (=FPrimary[3:6]= over
+the raw column gives 336 values; over the well-formed ids, exactly 334).
+
+*** =FPrimary_original= independently confirms the split-off rule
+
+=FPrimary_original= ("Original HH ID if a split off") is populated for 920 of
+5,669 rows (683 distinct), blank for 4,749.
+
+- 894 of the 920 match a wave-1 =hhno=; 780 match a wave-2 =FPrimary=.
+- *917 of 920 equal =FPrimary= with only the leading digit changed* -- the 3
+  exceptions are exactly the 3 malformed 10-character ids above.
+- It is populated for =round=2= (862 rows) and =round=0= (58 rows), i.e. it
+  records splits created in *this* wave.  Households that split off in wave 2
+  and were re-interviewed in wave 3 carry a '2'-leading =FPrimary= with a
+  *blank* =FPrimary_original=.
+
+So =FPrimary_original= is a partial, wave-3-only record of a rule that the id
+scheme encodes universally.  The lead-digit rule is the general one; use
+=FPrimary_original= as corroboration, not as the primary link.
+
+*** Current-residence geography exists in wave 3 (unlike wave 2)
+
+=00_hh_info.dta= carries populated =r_code= / =region= (10 regions, all named)
+and =d_code= / =district= (real district names).
+
+*Important: this is CURRENT residence, not the sampling cluster.*  The region
+embedded in =FPrimary[1:3]= disagrees with =r_code= for *446 of 5,669
+households (7.9 per cent)* -- those are the households that moved between
+waves.  For a =sample= feature, =v= must come from the id (the sampling
+cluster the household was drawn in); =region= / =district= from
+=00_hh_info.dta= describe where it now lives.  They are different facts and
+must not be conflated.
+
+*=comm_code= is not usable as a cluster key*: 704 distinct values, 828 of
+5,669 households coded =-666= (the wave's missing sentinel), and
+(=r_code=,=d_code=,=comm_code=) gives 889 groups -- neither 334 nor a clean
+nesting.
+
+=00_comm_info.dta= and =rural-urban.dta= are *identical in content* (=DataFrame.equals= is True; 528
+rows, same 5 columns =regioncode=, =regionname=, =districtcode=,
+=communitycode=, =communitytype=), community-grain, with =communitytype= in
+{1, 2} (246/282) and 12 rows carrying =communitycode = -666=.  Joining them
+to households on (=regioncode=, =districtcode=, =communitycode=) covers only
+3,953 of 5,669 households (70 per cent); dropping district raises it to 4,636
+(82 per cent).  Usable as a *partial* urban/rural indicator with a documented
+caveat; not a cluster key.
+
+** 4.3 Documentation
+
+The wave's entire =Documentation/= tree is one file,
+=Questionnaire/HH_Questionnaire_23_10.docx=.  Its =word/document.xml= was
+searched for =weight|sampl|enumeration area|EA|cluster|representative|
+expansion factor=: no sampling-weight or sample-design text of any kind.  The
+only "weight" hits are the anthropometry consent paragraph and the birth-
+weight question.
+
+One instrument fact worth recording, from the social-network module, verbatim:
+
+#+begin_quote
+Other households in the Enumeration area in order 1 2 3 4 5 6 7 8 9 10 11 12
+13 14 ... Q 1a. Do you recognize this household whose members are listed?
+#+end_quote
+
+The enumeration area of *14 other households* (i.e. the wave-1 EA of 15) was
+still the operative field unit in wave 3, and the instrument enumerates it.
+That is independent instrument-level corroboration that EA membership was
+known to the fieldwork team in 2017-18, whatever the shipped extract carries.
+
+*No document in this wave addresses sampling weights at all.*  This is "no
+document addresses it", not "the document says no weights were computed".
+
+* 5. Cross-wave household linkage
+
+** 5.1 Identifier per wave
+
+| Wave    | Household id variable | Type        | Where                                 | Format |
+|---------+-----------------------+-------------+---------------------------------------+--------|
+| 2009-10 | =hhno=                | int32       | 123 of 124 files (all but =EAs.dta=)  | 9 digits, S/RR/EEE/HHH |
+| 2013-14 | =FPrimary=            | string      | 89 of 89 files                        | 9 chars, same scheme |
+| 2017-18 | =FPrimary=            | string      | 98 of 100 (the 2 without are the community-grain files) | 9 chars (3 malformed 10-char), same scheme |
+
+Normalization used for all comparisons: =astype(str)= on each; wave-1 =hhno=
+is a 9-digit int with no leading zero (the leading digit is always 1), so
+=str()= is already zero-pad-free and length-9 for all 5,009 rows.  No padding
+was needed or applied.
+
+** 5.2 Overlap counts
+
+Exact id equality:
+
+| Pair                    | overlap |
+|-------------------------+---------|
+| W1 & W2                 |   4,366 |
+| W2 & W3                 |   4,353 |
+| W1 & W3                 |   4,412 |
+| W1 & W2 & W3            |   4,016 |
+
+Ancestry (lead digit mapped to '1', so split-offs are attributed to their
+origin household):
+
+| Statement                                             | count |
+|-------------------------------------------------------+-------|
+| W1 households (baseline)                              | 5,009 |
+| W1 households with a descendant (incl. self) in W2    | 4,366 (87.2%) |
+| W1 households with a descendant (incl. self) in W3    | 4,425 (88.3%) |
+| W1 households with a descendant in both W2 and W3     | 4,029 |
+| W1 households with a descendant in *neither*          |   247 (4.9%) |
+| W2 households traceable to a W1 household             | 4,774 of 4,774 (100%) |
+| W3 households traceable to a W1 household             | 5,666 of 5,669 (99.95%; the 3 malformed ids trace via =FPrimary_original=) |
+
+*Every household in every wave of GhanaSPS is traceable to a wave-1 baseline
+household.*  =panel_ids= is straightforward: the map is
+=FPrimary -> '1' + FPrimary[1:]=, with a three-row correction from
+=FPrimary_original=.  GH #140's "2013-14 linkage less clear" is resolved:
+it is not less clear, it is exact.
+
+** 5.3 Wave-3 panel bookkeeping columns
+
+=00_hh_info.dta= carries =round= (0: 4,633; 1: 174; 2: 862), =last_wave= (2:
+4,353; 1: 396; NaN: 920), =remnant= (0: 5,564; 2: 58; 1: 47) and =moved=.
+=round=2= identifies the 862 households created in wave 3 (none of them
+matches a W1 or W2 id, as expected).  These are useful for constructing an
+honest =panel_weight= discussion but none of them is a weight.
+
+* 6. Summary table
+
+| Question                        | 2009-10                                 | 2013-14                                | 2017-18                                 |
+|---------------------------------+-----------------------------------------+----------------------------------------+-----------------------------------------|
+| Household weight in data?       | *YES* =hhweight3= (=key_hhld_info.dta=) | *NO*                                   | *NO*                                    |
+| Weight type                     | expansion (sum 7.11M HH)                | --                                     | --                                      |
+| Person weight                   | =ppweight3= = =hhweight3= x hhsize, exactly | --                                 | --                                      |
+| Panel weight anywhere?          | NO                                      | NO                                     | NO                                      |
+| Superseded weight revisions     | =hhweight2= (S10AI), =hhweight= (S5D3)  | --                                     | --                                      |
+| Cluster/EA identifier           | *=id3=* ("EA NO."), 334 EAs, ~15 HH each | *=FPrimary[3:6]=*, 334 EAs            | *=FPrimary[3:6]=*, 334 EAs              |
+| Is =FPrimary[:6]= the cluster?  | (=hhno[:6]= yes, 334)                   | *NO* -- 583 prefixes, 249 spurious     | *NO* -- same defect                     |
+| Household id                    | =hhno=                                  | =FPrimary=                             | =FPrimary= (3 malformed)                |
+| Households                      | 5,009                                   | 4,774                                  | 5,669                                   |
+| Region available                | =id1= (10, labelled)                    | *NO* (declared but 100% empty)         | =region=/=r_code= (current residence)   |
+| Urban/rural                     | =urbrur= (2,010 U / 2,999 R), =loc7=    | *NO*                                   | partial, 70-82% via =00_comm_info.dta=  |
+| Traceable to W1                 | (is W1)                                 | 4,774/4,774                            | 5,666/5,669 (+3 via =FPrimary_original=) |
+| Documentation on weights        | affirms weights computed (BID p.9, DDI "Weighting") | panel map assigns weights to W1 ONLY | silent                        |
+
+* 7. What this means for a =sample= feature
+
+The blanket claim in =_/data_scheme.yml= -- "GhanaSPS has NO =sample= table
+(cluster identity unavailable)" -- is not supportable.  Cluster identity is
+available in *all three waves*.  What is missing is *weights in waves 2 and
+3*, which is a different, narrower problem.
+
+** 2009-10: IMPLEMENTABLE NOW, no caveat
+
+Everything a =sample= row needs is in one household-grain file,
+=2009-10/Data/key_hhld_info.dta= (5,009 rows, 0 NaN in any of these):
+
+- =i= <- =hhno= (=format_id=)
+- =v= <- =id3= (334 EAs; do NOT use (=id1=,=id2=,=id3=), which gives 335
+  because of the EA-183 district split)
+- =weight= <- =hhweight3=
+- =panel_weight= <- =hhweight3= (baseline wave; no refreshment component yet).
+  *Do NOT use =ppweight3=* -- proven above to be =hhweight3= x household size.
+- =Rural= <- =urbrur= (labelled 1 Urban / 2 Rural)
+- =strata= <- =id1= (region; the design is stratified by region, per the BID)
+
+Note for whoever writes it: the =hhweight3= household total (7.11M) is ~30 per
+cent above the 2010 census household count while the person total is within
+2 per cent.  Record that in the wave's docs; do not silently rescale.
+
+** 2013-14: IMPLEMENTABLE WITH A DOCUMENTED CAVEAT (cluster only, no weight)
+
+- =i= <- =FPrimary= (=01a_consent.dta=, 4,774 rows)
+- =v= <- =FPrimary[3:6]= -- *334 EAs, every one a wave-1 EA, none lost.*
+  Equivalently =('1' + FPrimary[1:])[:6]=.  *Never =FPrimary[:6]=.*
+- =weight= <- *unavailable.*  Exhaustive sweep of 89 of 89 =.dta= files finds
+  none, and =key_hhinfo_panel.xlsx= assigns =hhweight= / =ppweight= to "W1"
+  with all wave-2 cells blank.
+- =panel_weight= <- unavailable.
+- =Rural=, =strata= <- unavailable (region derivable from =FPrimary[1:3]=, but
+  it is the *origin* region, which for a mover is not where they live).
+
+*Caveat to write into the config*: =v= is the *wave-1 sampling EA*, i.e. the
+cluster the household (or its parent household) was originally drawn in.  For
+the 408 split-off households and any mover, it is a lineage cluster, not a
+geographic one.  That is the right thing for design-based variance estimation
+and the wrong thing for "which market is this household near".
+
+*Acquisition target*: =w2_hh_geodata_w3preloads= (named by
+=key_hhinfo_panel.xlsx=, absent from =2013-14/Data/=) carries wave-2
+=eacode=, =comm_code_w2=, =d_code_w2=, =district_w2=.  Getting it would give
+wave 2 a current-residence geography.  It would *not* give it a weight.
+
+** 2017-18: IMPLEMENTABLE WITH A DOCUMENTED CAVEAT (cluster only, no weight)
+
+- =i= <- =FPrimary= (=00_hh_info.dta=, 5,669 rows).  Repair the 3 malformed
+  10-character ids from =FPrimary_original= first, or they will produce two
+  phantom EAs (=830=, =932=).
+- =v= <- =FPrimary[3:6]= -- *334 EAs, all wave-1 EAs, none lost.*
+- =weight= / =panel_weight= <- *unavailable* (100 of 100 files swept).
+- =Rural= <- partial: join =00_comm_info.dta= (= =rural-urban.dta=) on
+  (=regioncode=, =communitycode=) for 82 per cent coverage, or on the full
+  triple for 70 per cent.  Document the coverage; do not impute.
+- =strata= <- =r_code= is available but is *current* region, not the
+  stratification variable.  If a stratum is wanted, derive it from
+  =FPrimary[1:3]= (origin region) and say so.
+
+Same lineage-vs-geography caveat as wave 2, and it bites harder here: 446 of
+5,669 households (7.9 per cent) have an =r_code= that disagrees with their
+id-embedded origin region.
+
+** What is genuinely blocked
+
+*Weights for 2013-14 and 2017-18.*  Not blocked by this environment, and not
+blocked by anything a config edit can fix:
+
+1. The microdata do not contain them (313 of 313 files read; the sweep is
+   complete, with zero availability failures).
+2. The panel construction map records the weights as wave-1-only.
+3. Waves 2 and 3 are not in the WB catalog, so there is no DDI "Weighting"
+   section and no producer-published weight to go fetch.
+
+Whether ISSER/Yale ever computed wave-2/3 weights is a question for the data
+producer, not for the repository.  The honest configuration is: wave 1 gets a
+=sample= table with weights; waves 2 and 3 get a =sample= table with =v= and a
+=weight= column of NaN, and a comment that says *why*, citing
+=key_hhinfo_panel.xlsx=.
+
+Given =CONTENTS.org='s standing warning that no universe statement exists for
+waves 2 and 3, a NaN weight there is not merely an inconvenience -- it is
+arguably correct.  A weight without a universe is a number without a meaning.
+
+* 8. Answers to the GH #140 open questions this audit was asked to settle
+
+| # | Question                                                  | Answer |
+|---+-----------------------------------------------------------+--------|
+| 1 | Weights for 2013-14 / 2017-18: in BID PDFs, or not published? | Not in the microdata (complete sweep), no BID exists for either wave, and =key_hhinfo_panel.xlsx= assigns the weights to W1 only.  Treat as not published. |
+| 2 | Is =FPrimary[:6]= the canonical cluster ID for 2013-14?   | *No.*  =FPrimary[3:6]= is (334 EAs, exact match to wave 1).  =[:6]= manufactures 249 spurious clusters from the split-off leading digit. |
+| 3 | Panel structure: what fraction re-interviewed?            | W1->W2 87.2%, W1->W3 88.3%, both 80.4%; 4.9% of W1 households have no descendant in either later wave. |
+| 6 | Is =ppweight3= per-person or a panel weight?              | *Per-person expansion weight.*  =ppweight3 == hhweight3 * hhsize= for 5,009 of 5,009 households (max deviation 9.6e-07). |
+
+* 9. Artefacts
+
+Working files (scratchpad, not in the repository):
+=varinventory.csv= (10,704 rows: wave, file, variable, label),
+=files_meta.csv= (313 files with row/column counts), =fetch_failures.csv=
+(1 row, the recovered encoding failure).  Regenerate with the inventory
+script described in the Method note at the top.

@@ -1,0 +1,360 @@
+#+title: GhanaLSS correctness audit -- 2026-08-19
+#+author: Sue (Claude Opus 5)
+#+date: [2026-08-19 Wed]
+
+* Scope
+
+Correctness and completeness sweep of =GhanaLSS= (7 waves, GLSS1--GLSS7),
+requested alongside =GhanaSPS=.  This file records the GhanaLSS *correctness*
+findings.  Companion files in this directory:
+
+- =FINDINGS_ghanasps_weights_clusters.org=
+- =FINDINGS_ghanasps_module_inventory.org=
+- =FINDINGS_ghanasps_provenance.org=
+- =FINDINGS_glss4_relationship_codes.org=
+
+* Finding 0: the coverage baseline was stale, and it mattered
+
+=.coder/coverage/latest.csv= is dated *2026-06-26*.  The grader fix =8dcd2bcb=
+("Phase 0 -- fix the ruler") landed *2026-07-12*, i.e. *after* that snapshot,
+and its own commit message records that 128 of the 138 =builds= cells in the
+2026-06-26 snapshot were a *grading artefact* rather than a defect: the
+per-wave =no_all_null_columns= check was firing on columns that are legitimately
+absent in one wave's slice but populated country-wide.
+
+Reading the committed snapshot therefore gave a materially wrong picture of
+GhanaLSS.  A genuinely cold rebuild (fresh =LSMS_DATA_DIR= on node-local disk,
+with the L1 DVC blob cache symlinked in so no blob is re-fetched) gives:
+
+| tier    | committed snapshot (2026-06-26) | cold rebuild (2026-08-19, pre-fix) |
+|---------+---------------------------------+------------------------------------|
+| sane    |                              64 |                                 79 |
+| builds  |                              15 |                                  0 |
+| dropped |                               3 |                                  3 |
+| absent  |                              11 |                                 11 |
+
+*All 15 =builds= cells were the artefact.  All 3 =dropped= cells are real* and
+reproduce cold.  Chasing the 15 would have been wasted effort; the 3 were the
+signal.
+
+Cold snapshots are written to =ghana_cold_matrix.csv= (pre-fix) and
+=ghana_cold_matrix_postfix.csv= (post-fix) in this directory.  The committed
+34-country snapshot was deliberately *not* overwritten.
+
+** Recommendation
+
+Refresh =.coder/coverage/latest.csv=.  =refresh_status.json= claims a 30-day
+interval and an expiry of 2026-12-26, but the snapshot is ~8 weeks old and
+predates a grader change that altered how ~93% of the non-sane cells are
+classified.  Until it is refreshed, the committed matrix systematically
+over-reports defects.
+
+* Finding 1: a silent, empty categorical decode killed 3 waves (FIXED)
+
+** The mechanism
+
+=local_tools.get_categorical_mapping(tablename=X)= called *without* a
+value-column keyword returns an *empty dict*.  It passes =idxvars='Code'= and
+no myvars, so =df_data_grabber= drops the Label column and the subsequent
+=.squeeze()= yields nothing.
+
+Nothing raises.  Every lookup against the empty dict simply misses and returns
+=pd.NA=, so the affected column comes out 100% null and the build reports
+success.  This is the repo's own documented failure mode -- see the docstring
+of =GhanaLSS/1991-92/_/mapping.py::_code_label_map=, written when the same bug
+was fixed for that one wave.
+
+** Blast radius, established by AST sweep, not grep
+
+A line-based grep is *misleading* here, because most call sites are multi-line
+and pass their value column on a continuation line.  Parsing every
+=lsms_library/countries/**/*.py= with =ast= and inspecting the actual keyword
+set of each =get_categorical_mapping= call gives:
+
+| call sites                                             | count |
+|--------------------------------------------------------+-------|
+| total                                                  |    77 |
+| pass a value column explicitly                         |     1 |
+| pass one via the ~**{value: value}~ idiom              |    69 |
+| *pass none -- return ~{}~ by construction*             | *7*   |
+
+All 7 broken sites are GhanaLSS, in exactly three waves:
+
+| file                          | lines      |
+|-------------------------------+------------|
+| =1987-88/_/mapping.py=        | 9, 41      |
+| =1988-89/_/mapping.py=        | 9, 44      |
+| =1998-99/_/mapping.py=        | 9, 10, 42  |
+
+Those are *exactly* the three waves whose =cluster_features= graded =dropped=.
+
+** Measured damage, before the fix, on a cold cache
+
+| wave    | =cluster_features=                     | =household_roster= columns 100% null              |
+|---------+----------------------------------------+---------------------------------------------------|
+| 1987-88 | *0 rows*                               | Birthplace, Relationship, Generation, Distance, Affinity |
+| 1988-89 | 14,924 rows, sole column 100% null     | same                                              |
+| 1998-99 | 5,998 rows, both columns 100% null     | same                                              |
+
+1987-88 returns *zero* rows because its =mapping.py::cluster_features= infers
+the cluster's region from members' birth region and then groups by it --
+=groupby()= drops the all-NA key, so every row disappears.
+
+That is *56,817 people* (15,492 + 14,914 + 26,411) carrying no kinship data at
+all.  =Generation=, =Distance= and =Affinity= are *required* columns for
+=household_roster= in =lsms_library/data_info.yml=.
+
+The underlying source data was fine throughout.  =SEC0A.DTA= carries =region=
+(codes 1--10, 0 nulls) and =loc2= (1/2, 0 nulls) under exactly those names; the
+=region= / =rural= / =relationship= org tables all exist and are correct.  Only
+the decode was dead.
+
+** The fix (commit =18b6ca51=)
+
+Added =local_tools.code_label_map= -- a *new* helper, so it cannot change the
+behaviour of any existing caller -- which passes the value column and keys the
+result by *both* the string and the integer form of each numeric code.  The
+dual keying matters: =df_data_grabber= stringifies the Code index via
+=format_id=, while wave mapping functions variously look up with =int(value)=
+or =str(value)=, and both historical bugs (#348, #377) were partly key-type
+mismatches.  Then pointed the three waves at it.
+
+** Verification: the fix recovers every cluster in the source
+
+| wave    | clusters before | clusters after | distinct =CLUST= in =Y01A.DAT= |
+|---------+-----------------+----------------+--------------------------------|
+| 1987-88 | 0               |            176 |                            176 |
+| 1988-89 | 0 usable        |            170 |                            170 |
+
+*The fix loses nothing.*  Checked directly: the number of clusters holding at
+least one under-12 with a valid =REGION= is 176 of 176 in 1987-88, so the
+modal-birth-region heuristic drops *zero* clusters.
+
+*** A correction to an earlier draft of this file
+
+An earlier draft claimed 1988-89 "lands exactly on the documented figure" of
+170 and that 1987-88 was "2 short".  That over-claimed, and the reason is worth
+recording because it is a vocabulary trap in this survey.
+
+GLSS1's DDI overview says the realised sample was "something less than 200
+sampling areas (specifically 178 in 1987-88 and 170 in 1988-89)".  But the
+*same sentence* continues:
+
+#+begin_quote
+Each group of 16, 32 or 48 households within a sampling area is referred to as
+a cluster in the GLSS data sets and in this document.
+#+end_quote
+
+So in GLSS terminology a *sampling area* is not a *cluster* -- a sampling area
+may contain more than one cluster.  The observed households-per-cluster
+distribution matches the quoted design (1987-88: min 10, median 16, max 48;
+1988-89: min 14, median 16, max 47), i.e. mostly one "group of 16" per cluster.
+
+The right statement is therefore: the recovered cluster counts (176, 170) are
+*corroborated by, but not identical to*, GSS's realised sampling-area figures
+(178, 170).  They are exactly the counts present in the source file.  Do not
+cite 170 as an exact documentary match.
+
+* Finding 2: 1988-89 was collapsing an arbitrary person's birthplace (FIXED)
+
+Surfaced *by* the fix above, and only visible once the decode worked.
+
+GLSS1 and GLSS2 have *no cluster-location variable*.  Both waves read
+=cluster_features.Region= and =household_roster.Birthplace= from the *same*
+source column, =Y01A.DAT:REGION= -- which is the *person's region of birth*,
+not where the cluster is.  1987-88 handles this with an explicit heuristic in
+=mapping.py::cluster_features=: infer the cluster's region as the modal birth
+region among members under 12 (least likely to have migrated).
+
+*1988-89 had no such function.*  Once its decode was revived, the framework
+collapsed the person-grain frame with =groupby().first()= -- taking an
+arbitrary person's birth region as the whole cluster's region.  The grain audit
+caught it:
+
+#+begin_quote
+GhanaLSS/cluster_features/1988-89: declared index (t, v) is NOT UNIQUE.
+Collapsing it with groupby().first() DESTROYED 14,559 of 14,924 rows whose
+values DISAGREE (167 conflicting index tuples).
+#+end_quote
+
+167 of 170 clusters held members born in more than one region, so =.first()=
+was very nearly always picking arbitrarily.
+
+Ported the 1987-88 heuristic to 1988-89 (and added =Age: AGEY= to its
+=cluster_features= myvars, which is why 1987-88's config pulls =Age= at all --
+the heuristic filters on it, then drops it).  Result: 170 clusters, zero grain
+warnings.
+
+** =sample= was fixed by the same change
+
+=sample= reads =strata= and =Rural= from the same revived dicts.  Post-fix, on
+a cold cache:
+
+| wave    | v   | strata | Rural | weight | panel_weight |
+|---------+-----+--------+-------+--------+--------------|
+| 1987-88 | 0.0 |    1.0 |   1.0 |    1.0 |          1.0 |
+| 1988-89 | 0.0 |    1.0 |   1.0 |    1.0 |          1.0 |
+| 1991-92 | 0.0 |    0.0 |   0.0 |    1.0 |          1.0 |
+| 1998-99 | 0.0 |   *0.0* | *0.0* |    1.0 |          1.0 |
+| 2005-06 | 0.0 |    0.0 |   1.0 |    0.0 |          0.0 |
+| 2012-13 | 0.0 |    0.0 |   0.0 |    0.0 |          0.0 |
+| 2016-17 | 0.0 |    0.0 |   0.0 |    0.0 |          0.0 |
+
+(null fraction; 1998-99 strata and Rural were *1.0* before the fix)
+
+1998-99 now yields sensible values -- strata Ashanti 1060 / Greater Accra 859 /
+Volta 820 ..., Rural 3799 / Urban 2199, matching the raw =region= and =loc2=
+counts exactly.  *Every remaining null in this table is documented by design*
+in =CONTENTS.org=: weights exist only for GLSS5--GLSS7 (earlier rounds are
+self-weighting or carry a different weight type, deliberately excluded);
+GLSS1/GLSS2 field no urban/rural and no region strata; GLSS5's cover page
+carries no urban/rural variable.
+
+** Caveat that should not be lost
+
+*The heuristic is an approximation, not a measured value*, in both waves.  It
+now says so in its docstring.  A GLSS1/GLSS2 "cluster region" is inferred from
+where the cluster's young children were born, and any analysis keyed on it
+inherits that assumption.  This is a candidate for a =CONTENTS.org=
+idiosyncrasy entry.
+
+* Finding 3: GLSS4 relationship codes -- deliberately NOT fixed
+
+The obvious "finish the job" move would have been to decode 1998-99's
+=Relationship= through the same country-level table.  *That would have silently
+corrupted the data.*
+
+- GLSS4's =rel= (=SEC1.DTA=, variable label "Relationship to HH head") takes
+  *nine* codes, 1--9.  Code 1 occurs exactly 5,998 times = the household count,
+  so 1 = Head.
+- The country-level =relationship= table has *fourteen* codes and explicitly
+  cites *GLSS1*'s data dictionary (=catalog/2313/data-dictionary/F184?file_name=y01a=).
+- GLSS1 and GLSS2 raw data *do* use codes 1--14 (verified: code 1 occurs 3,136
+  and 3,192 times respectively = their household counts).  So the country table
+  is right for them and almost certainly *wrong* for GLSS4.
+- =SEC1.DTA= carries *no* embedded Stata value labels (=value_labels() == []=),
+  so the GLSS4 list has to come off the questionnaire.
+
+1998-99 =Relationship= is therefore left explicitly unmapped, with the reasoning
+and the one-line re-enable recorded in the code.  A null column is honest; a
+mis-labelled kinship column propagates into =Generation=/=Distance=/=Affinity=
+and is not recoverable downstream.
+
+Status: a dedicated agent is reading the GLSS4 questionnaire and data-entry
+manual.  See =FINDINGS_glss4_relationship_codes.org=.
+
+* Result: post-fix cold matrix
+
+Both matrices are cold rebuilds at the same HEAD, differing only by the fix.
+
+| tier    | cold pre-fix | cold post-fix |
+|---------+--------------+---------------|
+| sane    |           91 |           *94* |
+| dropped |            3 |            *0* |
+| builds  |            0 |             0 |
+| broken  |            0 |             0 |
+| absent  |           11 |            11 |
+
+Exactly three cells changed, and they are exactly the three targeted:
+
+| cell                                  | before  | after | rows |
+|---------------------------------------+---------+-------+------|
+| =cluster_features/1987-88=            | dropped | sane  |  176 |
+| =cluster_features/1988-89=            | dropped | sane  |  170 |
+| =cluster_features/1998-99=            | dropped | sane  |  300 |
+
+Zero collateral tier changes.  Test sweep (=-k "ghana or currency or schema or
+kinship"=): *359 passed, 1 skipped, 1 xpassed, 0 failed*.
+
+** The matrix could not see the biggest part of this defect
+
+Worth stating on its own, because it bears on how much the coverage matrix can
+be trusted as a defect detector.
+
+*The 56,817 people missing all kinship data never showed up as a non-=sane=
+cell.*  =household_roster= graded =sane= in all three affected waves both
+before and after the fix.  The reason is the wave-slice exemption added by
+=8dcd2bcb=: the per-wave =no_all_null_columns= check exempts any column that is
+populated *somewhere* in the country, and =Relationship= /
+=Generation= / =Distance= / =Affinity= are populated in the other four waves.
+
+That exemption is *correct* -- it removed 128 false positives repo-wide, and
+=coverage_matrix.py:576-586= says plainly that it "deliberately hides
+wave-level column gaps from the sanity grade, because a sanity grade is the
+wrong instrument for them."  But the consequence is worth internalising:
+
+#+begin_quote
+A =sane= cell does not mean the wave's columns are populated.  It means no
+column is dead *country-wide*.  A required column can be 100% null in three of
+seven waves and every cell still grades =sane=.
+#+end_quote
+
+The three =dropped= =cluster_features= cells were the only visible symptom of a
+defect whose larger half was invisible.  Chasing that one thread is what
+surfaced the rest.  There is no per-wave column-completeness readout in the
+library today; GH #591 and #592 are inventories of two such gaps that were
+caught by accident before the exemption landed.
+
+* Finding 4: GH #589 no longer reproduces
+
+=tests/test_currency.py::test_feature_ghana_per_wave= was the *only* failure in
+the 2026-06-26 full-suite run.  It passes today, both on the inherited warm
+cache and against a data root whose GhanaLSS parquets were *rebuilt from source
+in this session at current HEAD*.
+
+So the failure is real-but-fixed somewhere in the ~2 months of merges between
+that run and today, not a flake and not something this session's changes
+introduced.  *Closing is Ethan's call* -- the honest statement for the issue is
+"does not reproduce at =983913f5=, warm and cold-rebuilt", not "fixed by X",
+since the fixing commit was not identified.
+
+* Follow-up worth proposing (NOT done here)
+
+After this fix, *zero* bare =get_categorical_mapping(tablename=...)= callers
+remain in the repo -- the AST sweep now finds 70 correct call sites and none
+broken.  But the footgun itself is unchanged: the next person to call the bare
+form still gets =\{\}= silently.
+
+This is the *third* recurrence of the same failure in this one country, and the
+repo's stated ethos is that a known-bad stays loud.  A small change --
+=get_categorical_mapping= warns (or raises) when it is about to return an empty
+mapping *because no value column was requested* -- would convert a silent
+100%-null column into a loud error at the call site.
+
+Deliberately *not* folded into this session's commits: it is a behaviour change
+to a library function with 70 call sites across 15 countries, so it wants its
+own PR, its own test, and a decision on warn-vs-raise.
+
+* Finding 5 (hygiene, not a repo defect)
+
+The cold build emitted, for all three GhanaSPS waves:
+
+#+begin_quote
+UserWarning: Refusing workspace copy of DVC-tracked file ../Data/S11A.dta
+(sister .dvc sidecar exists).
+#+end_quote
+
+373 DVC-tracked =.dta= files exist as local working copies inside
+=lsms_library/countries/=.  They are *not* git-tracked -- this is local
+workspace state, not something shipped.  The library correctly refuses them and
+falls through to the blob cache, so nothing is wrong with the data.  Left alone
+deliberately: deleting them is destructive and is the human's call.  The
+warning text carries the cleanup command if wanted.
+
+* What is NOT covered here
+
+- No cells were *blessed*.  Blessing requires a human to have read the actual
+  numbers; that is not something this audit can do on someone's behalf.
+  GhanaLSS currently has *zero* blessed cells.
+- No =absent_verdicts.csv= rows were filed.  Ghana has *zero*, despite
+  =CONTENTS.org= carrying real evidence for several closures (GLSS shocks
+  across all 7 waves; =subjective_well_being= per GH #331).  Filing them is
+  cheap and is recommended -- but note the C4 rule: =not-asked= requires
+  questionnaire-validated evidence, and =CONTENTS.org= records that the
+  GLSS1/GLSS2 questionnaires are scanned-image PDFs with *no text layer*.  Some
+  of those cells can only honestly be =unsure=.
+- The four *unresolved tensions* already documented at
+  =GhanaLSS/_/CONTENTS.org:614-687= are untouched.  They were deliberately left
+  open by whoever wrote them, and they bear on the sampling text -- most
+  sharply, "no rotating panel or refreshment sample mechanism" is contradicted
+  by GSS's own GLSS3 report for the GLSS1/GLSS2 pair.
