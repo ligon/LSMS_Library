@@ -44,25 +44,16 @@ def Birthplace(value):
         return pd.NA
     return region_dict.get(int(value), pd.NA)
 
-# GLSS4's `rel` (SEC1.DTA, label "Relationship to HH head") uses a NINE-code
-# scheme (observed codes 1..9; code 1 occurs exactly 5998 times = the household
-# count, so 1=Head).  The country-level `relationship` table in
-# ../../_/categorical_mapping.org is the GLSS1 FOURTEEN-code scheme -- it cites
-# the GLSS1 data dictionary (catalog 2313, y01a) and GLSS1/GLSS2 raw data do
-# use codes 1..14.  Decoding GLSS4 through it would silently MIS-LABEL kinship,
-# which is worse than leaving it null, so this stays unmapped until the GLSS4
-# code list is read off the questionnaire and added as a WAVE-level
-# `relationship` table in 1998-99/_/categorical_mapping.org.
-# SEC1.DTA carries no embedded Stata value labels (value_labels() == []).
-# Once that table exists, this becomes:
-#     relationship_dict = tools.code_label_map('relationship', [f'{path}/_'])
-# with the wave dir FIRST so it cannot fall through to the GLSS1 table.
-_relationship_dict = {}
+# GLSS4's `rel` (SEC1.DTA) uses a NINE-code scheme, NOT the country-level
+# GLSS1 FOURTEEN-code table.  Decoded from the GLSS4 Household Questionnaire
+# p.7 col.3 via the wave-level `relationship` table; see the note there.
+# Wave dir FIRST, so this can never fall through to the country-level GLSS1
+# 14-code table.  See the long note on 1998-99/_/categorical_mapping.org.
+_relationship_dict = tools.code_label_map('relationship', [f'{path}/_'])
 
 def Relationship(value):
     '''
-    Formatting relationship variable.  Deliberately unmapped -- see the note
-    above on the GLSS4 9-code vs GLSS1 14-code mismatch.
+    Formatting relationship variable (GLSS4 9-code scheme).
     '''
     return _relationship_dict.get(value, pd.NA)
 
