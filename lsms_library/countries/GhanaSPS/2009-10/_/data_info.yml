@@ -1,0 +1,33 @@
+sample:
+    # key_hhld_info.dta is the wave-1 household key: exactly 5,009 rows, one
+    # per household, carrying the EA (id3), the locality stratum (loc7),
+    # urban/rural (urbrur) and the revised weights.
+    #
+    # `hhweight3` / `ppweight3` are the THIRD revision and supersede
+    # `hhweight2` (S10AI.dta) and `hhweight` (S5D3.dta), which differ from it
+    # for every household.  Both are EXPANSION weights: hhweight3 sums to
+    # 7.11M households and ppweight3 to 24.19M persons (~ Ghana's 2010 census
+    # population).  ppweight3 == hhweight3 * household size for all 5,009
+    # households (verified against S1D.dta's 18,889 members, max deviation
+    # 9.6e-07), so it is a per-person weight, NOT a panel weight -- this
+    # settles GH #140 open question 6.
+    #
+    # No panel weight exists in ANY GhanaSPS wave.  Wave 1 is the baseline
+    # (pre-refreshment), so panel_weight carries the same value as weight, per
+    # the convention in CLAUDE.md; waves 2 and 3 have neither.
+    # KNOWN SOURCE DISCREPANCY: key_hhld_info.dta is NOT a superset of the
+    # households in the food module.  At source level (both files use 9-digit
+    # hhno), S11A.dta carries 29 hhno values absent from key_hhld_info.dta, and
+    # key_hhld_info.dta carries 35 absent from S11A.dta.  Consequence: 690 of
+    # 407,929 food_acquired rows (0.17%, 29 households) get a NULL `v` from the
+    # sample join.  This is a property of the shipped extract, not of this
+    # config -- do not "fix" it by loosening the join.
+    file: key_hhld_info.dta
+    idxvars:
+        i: hhno
+    myvars:
+        v: id3
+        weight: hhweight3
+        panel_weight: hhweight3
+        strata: loc7
+        Rural: urbrur

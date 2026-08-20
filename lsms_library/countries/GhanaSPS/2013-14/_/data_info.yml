@@ -1,0 +1,20 @@
+sample:
+    # 01a_consent.dta is the wave-2 household-level file: 4,774 rows, 4,774
+    # distinct FPrimary -- exactly one row per interviewed household.
+    #
+    # NO WEIGHT EXISTS for this wave, and that is a producer-side fact, not a
+    # gap in our extract.  All 89 shipped .dta files were swept: the only
+    # "weight" variables are anthropometric body weight.  Positive documentary
+    # evidence: Documentation/Variable Lists/key_hhinfo_panel.xlsx rows 17-18
+    # assign hhweight/ppweight to WAVE 1 ONLY, with every wave-2 cell blank.
+    #
+    # No Rural and no strata either: this wave ships no geography.  CONTENTS.org
+    # records the same ("'2013-14' has no regions or urban/rural data"), and
+    # 01ea_employmentscreener.dta DECLARES regioncode/eacode/communitycode but
+    # populates 0 of 13,643 rows.  The acquisition target that would fix this is
+    # `w2_hh_geodata_w3preloads`, named in that xlsx and absent from Data/.
+    file: 01a_consent.dta
+    idxvars:
+        i: FPrimary
+    myvars:
+        v: FPrimary

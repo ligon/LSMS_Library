@@ -1,0 +1,18 @@
+sample:
+    # 00_hh_info.dta is the wave-3 household-level file: 5,669 rows, 5,669
+    # distinct FPrimary -- one row per household -- and it carries `region`.
+    #
+    # NO WEIGHT EXISTS for this wave either (all 100 shipped .dta files swept;
+    # only anthropometric body weight).  Wave-3 documentation is silent on
+    # weighting -- the wave ships a questionnaire and nothing else.
+    #
+    # Rural is NOT wired.  The only urban/rural source is rural-urban.dta, a
+    # 528-row COMMUNITY lookup keyed by communitycode (with -666 sentinels)
+    # that would have to be joined via 00_hh_info.comm_code, and it covers only
+    # ~70.5% of households.  Left out rather than shipped partial and unexplained.
+    file: 00_hh_info.dta
+    idxvars:
+        i: FPrimary
+    myvars:
+        v: FPrimary
+        strata: region

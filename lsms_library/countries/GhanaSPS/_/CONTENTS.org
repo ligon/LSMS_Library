@@ -375,3 +375,75 @@ written into any config file for this country.
 ** TODO household_characteristics.py
 ** TODO food_acquired.py
 ** TODO other_features.py
+
+* Cluster identity IS available -- and three ways to get it wrong (2026-08-19)
+
+For years this country carried the claim, in =_/data_scheme.yml=, that
+"cluster identity [is] unavailable: no cluster var in the food files, 2013-14
+lacks EAs.dta, and EAs.dta is EA-level only".  *That was false*, and a `sample`
+feature is now wired for all three waves.  =2009-10/Data/S11A.dta= -- the
+wave-1 food source named in that very sentence -- carries =id1=..=id4=, with
+=id3= populated in all 425,255 rows and taking exactly *334* distinct values,
+the documented EA count.
+
+Each wave's =_/data_info.yml= carries the details.  The three traps:
+
+** 1. Wave 1: use =id3= ALONE, never a composite with =id1=/=id2=
+
+=id3= runs 1..342 with 334 distinct values, i.e. it is a *globally unique* EA
+number, not an EA-within-district counter.  Households per EA: 14--15, median
+15, matching the documented "Fifteen households were selected from each of the
+EAs."
+
+Building =(id1, id2, id3)= yields *335* groups, not 334: *EA 183 spans two
+district codes* (12 households under =id2=1=, 3 under =id2=94=), so the
+composite splits one real EA in two.  =(id1, id3)= gives 334, but adds nothing
+over =id3=.  =hhweight3= is constant within =id3=, as a cluster design weight
+should be -- a useful check that the key is right.
+
+** 2. Waves 2/3: slice the household id from the RIGHT, never the left
+
+Household ids are =S | RR | EEE | HHH= -- split counter, region, EA, household
+-- so the EA is the three characters *ending three from the right*.
+
+The id is *not fixed width*.  In 2017-18 the leading split counter runs to two
+digits, so 37 rows are 10 characters long.  A left-anchored =FPrimary[3:6]=
+shifts by one on exactly those rows and yields *336* EAs, two of which do not
+exist in wave 1.  =FPrimary[-6:-3]= yields exactly *334* in both waves, all of
+them wave-1 EAs.
+
+Both rules agree on 2013-14, so *a check on that wave alone passes* and the
+error only appears in wave 3.
+
+GH #140's own hypothesis, =FPrimary[:6]=, is wrong by a wide margin: 583
+prefixes in 2013-14 and 893 in 2017-18, against 334 real EAs.  Treat it as
+refuted.
+
+** 3. Weights exist for wave 1 ONLY, and that is producer-side
+
+=hhweight3= / =ppweight3= in =2009-10/Data/key_hhld_info.dta= are the THIRD
+revision, superseding =hhweight2= (=S10AI.dta=) and =hhweight= (=S5D3.dta=),
+which differ from it for every household.  Both are *expansion* weights:
+=hhweight3= sums to 7.11M households, =ppweight3= to 24.19M persons (~ Ghana's
+2010 census population).
+
+=ppweight3= = =hhweight3= x household size for all 5,009 households (verified
+against =S1D.dta='s 18,889 members; max deviation 9.6e-07, i.e. float32
+rounding).  It is a *per-person expansion weight*, not a panel weight.  This
+settles GH #140 open question 6.
+
+*No panel weight exists in any wave*, and waves 2 and 3 have no sampling weight
+at all -- all 189 of their =.dta= files were swept and the only "weight"
+variables are anthropometric body weight.  This is *positive* evidence, not an
+absence of searching: =2013-14/Documentation/Variable Lists/key_hhinfo_panel.xlsx=
+rows 17--18 assign =hhweight=/=ppweight= to wave 1 only, with every wave-2 cell
+blank.  No config change can close that gap.
+
+** A source discrepancy the sample join exposes
+
+=key_hhld_info.dta= is *not* a superset of the households in the food module.
+At source level (both files use 9-digit =hhno=), =S11A.dta= carries 29 =hhno=
+absent from =key_hhld_info.dta=, and =key_hhld_info.dta= carries 35 absent from
+=S11A.dta=.  So 690 of 407,929 =food_acquired= rows (0.17%, 29 households) take
+a NULL =v=.  That is a property of the shipped extract.  Do not loosen the join
+to hide it.
