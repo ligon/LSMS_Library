@@ -447,3 +447,99 @@ absent from =key_hhld_info.dta=, and =key_hhld_info.dta= carries 35 absent from
 =S11A.dta=.  So 690 of 407,929 =food_acquired= rows (0.17%, 29 households) take
 a NULL =v=.  That is a property of the shipped extract.  Do not loosen the join
 to hide it.
+
+* Wave 3 (2017-18) is a MIXED-VINTAGE directory (2026-08-19)
+
+=2017-18/Data/= now holds files from two sources under two different sets of
+terms.  =2017-18/Documentation/LICENSE.org= is the authority; this section is
+the file-by-file picture, measured rather than asserted.
+
+** What was added
+
+Ten modules were *entirely absent* from this repository and were acquired from
+Harvard Dataverse (=doi:10.7910/DVN/E5QP0F= v1.2, *CC0 1.0*), in their original
+Stata-14 form:
+
+| file                              | shape        |
+|-----------------------------------+--------------|
+| =01giv_education_beliefs_pre=     | 4,807 x 1240 |
+| =09b_education_beliefs_post=      | 4,807 x 951  |
+| =10avii_financial_health=         | 5,669 x 190  |
+| =07c_ids_module=                  | 2,805 x 101  |
+| =07c_ids_roster=                  | 19,006 x 15  |
+| =03bvi_mobile_money_awareness=    | 19,008 x 43  |
+| =03bvi_mobile_money_accounts=     | 5,272 x 67   |
+| =03bvi_mobile_money_agents=       | 52 x 8       |
+| =open_ended=                      | 5,669 x 11   |
+| =commtype=                        | 5,669 x 2    |
+
+Nothing was overwritten; all ten are additions.
+
+** What our pre-existing files are, relative to the published release
+
+Compared file-by-file against Dataverse v1.2 on 2026-08-19 (md5 of our DVC
+blob vs the md5 of the Dataverse original):
+
+| relation to the public release                       | files |
+|------------------------------------------------------+-------|
+| content-identical                                    |    66 |
+| ours carries EXTRA variables                         |    30 |
+| ours carries FEWER variables                         |   *0* |
+| public-only (now acquired, above)                    |    10 |
+| ours-only (no public counterpart)                    |     3 |
+
+*Beware a measurement trap here.*  Only *8* of the 66 content-identical files
+are *byte*-identical.  The other 58 have the *same byte size* but a different
+md5: they are Stata re-saves differing only in header metadata.  Verified by
+loading three of them and comparing frames -- same shape, same columns,
+=DataFrame.equals()= True.  A byte-level comparison alone reports "88 files
+differ" and badly overstates the divergence.
+
+** What the public release strips, and why it matters
+
+For all 30 files where we carry more, *row counts are identical* -- the
+difference is columns only, always =+N -0=.  The stripped variables fall into
+three consistent groups:
+
+1. *Free-text responses* -- every =...other= variable (=joinedwhyother=,
+   =fatherworkother=, =borrowpurposeother=, =whatmediaother=, ...).
+2. *Sub-district geography* -- =d_code=, =district=, =comm_code=, and the
+   =*_community= / =*_comm= family (=whereborn_community=,
+   =plotlocation_comm=, =schoolcommunity=, =relativewhere_community=, ...).
+3. *Consent and admin flags* -- =consented= (6 files), =main_consent=,
+   =audio_consent=, =read=, =consent=, =checkpoint1..3=, =index=.
+
+That is a *disclosure-control edit*, not a data revision.  Our copies are
+pre-anonymization relative to what the producers published.  Treat that as a
+redistribution question, not merely a provenance one.
+
+** A correction worth keeping
+
+It is tempting to argue that the extra geography is what makes the =sample=
+feature possible.  *It is not.*  Checked directly: the public
+=00_hh_info.dta= retains both =FPrimary= and =region=, which is exactly what
+=2017-18/_/data_info.yml= uses (=v= from =FPrimary[-6:-3]=, =strata= from
+=region=).  What the public release removes is the *finer* geography --
+=d_code=, =district=, =comm_code= -- which a future district- or
+community-level feature would want, but the current =sample= does not.
+
+** Renames, and a duplicate, to know about
+
+- Our =public_services.dta= *is* the public =10aix_public_services.dta=:
+  same shape (5,669 x 22), same columns, =DataFrame.equals()= True.  It is a
+  rename, not a missing file -- so the gap was *10* modules, not 11.
+- Our =00_comm_info.dta= and =rural-urban.dta= are *identical to each other*
+  (both 528 x 5, =regioncode/regionname/districtcode/communitycode/communitytype=):
+  the same community lookup held twice under two names.
+- Neither is community *survey* data.  The community instrument (wave 2 ships
+  Sections 7A/7B/7C "Shocks and Conflicts") has *no microdata in any wave* --
+  these are lookup tables, and the distinction matters for the shocks verdict.
+
+** DVC remote layout: this repo now uses BOTH
+
+The S3 remote carries legacy objects at =LSMS/{md5[:2]}/{md5[2:]}= (DVC 2.x)
+and newly-pushed ones at =LSMS/files/md5/{md5[:2]}/{md5[2:]}= (DVC 3.x).  The
+ten files above went to the *latter*.  =local_tools= already probes both
+(see the =_ensure_dvc_pulled= candidate lists), and a cold read round-trip was
+verified for one of the new blobs.  Probing only the legacy path makes a
+correctly-pushed blob look missing.
