@@ -1,0 +1,733 @@
+#+TITLE: GhanaSPS module inventory -- what the shipped microdata actually contains
+#+DATE: 2026-08-19
+#+AUTHOR: audit/ghana-correctness (read-only investigation)
+
+* 0. Scope, method, and what "absent" means here
+
+READ-ONLY investigation.  Nothing under =lsms_library/= was edited.  The only
+write is this file.
+
+Method:
+1. Enumerated every =*.dta.dvc= sidecar under
+   =lsms_library/countries/GhanaSPS/{2009-10,2013-14,2017-18}/Data/= (124 + 89 +
+   100 = 313 files).
+2. Warmed each blob with =lsms_library.local_tools._ensure_dvc_pulled= (no =dvc=
+   CLI was invoked at any point) and read Stata *metadata only* with
+   =pyreadstat.read_dta(..., metadataonly=True)=, yielding 10,778
+   (file, variable, variable-label) triples.  313/313 files read successfully;
+   one (=2013-14/01fi_generaleducation.dta=) needed =encoding='latin1'=.  There
+   are *no =unknown= cells in this report* -- every file was inspected.
+3. Read actual values via =get_dataframe()= for every claim that turns on
+   coverage or on a column being populated rather than merely declared.
+4. Extracted full text of six instruments: wave-1
+   =Household_questionnaire_Part_A.pdf= / =Part_B.pdf= /
+   =Interviewers_Manual_household_survey.pdf= / the DDI report
+   =ddi-documentation-english_microdata-2534.pdf=; wave-2
+   =ISSER_Yale_Part A_WAVE II.docx= / =Part B_WAVE II.docx= / =Community
+   Survey_WAVE II.docx=; wave-3 =HH_Questionnaire_23_10.docx=.
+
+Verdict vocabulary used below, kept strictly separate per the repository rule
+that *absence from the shipped =.dta= is not absence from the instrument*:
+
+- =present(file)= :: a shipped data file carries the module.
+- =absent-from-extract= :: no shipped =.dta= carries it; the instrument
+  question is answered separately.
+- =asked-not-distributed= :: the instrument asks it AND a document says the
+  data exist elsewhere; quoted evidence given.
+- =not-asked= :: the module does not appear in any household instrument I read;
+  the search terms are listed so the claim is falsifiable.
+- =unknown= :: could not fetch.  *No cell in this report is =unknown=.*
+
+** Environment note (not a finding, but record it)
+
+During this session 313 =.dta= files appeared in the workspace under
+=GhanaSPS/*/Data/= (all mtime 2026-08-19 17:16, ~813 MB, git-ignored).  A
+sibling agent was concurrently active in the same checkout, so I did *not*
+delete them.  They are harmless: =get_dataframe()= refuses a workspace copy
+that has a sister =.dvc= sidecar and falls through to the DVC cache, and I
+verified two of them byte-for-byte against their sidecar md5
+(=EAs.dta= = 051292a4..., =01b2_roster.dta= = a8cf7084...), so every read in
+this report is of canonical content.  Cleanup command is in the library's own
+warning text.
+
+* 1. Idiosyncrasies found in =GhanaSPS/_/CONTENTS.org= (and =notes.org=, =README.org=)
+
+Named, not merely acknowledged.
+
+** I1. GSPS is a panel, not three cross-sections -- only wave 1 has a documented probability sample
+CONTENTS.org: "GSPS is a *panel*, not three independent national
+cross-sections.  Only wave 1 has a documented probability sample of Ghana.
+Waves 2 and 3 are follow-ups of that sample plus households split off from it,
+and *no document in the corpus states a universe for them*."  Wave-2 frame =
+5009 wave-1 HH + 475 split-offs = 5484 selected, 4774 interviewed.
+*Corroborated by the microdata*: 2017-18 =00_hh_info.dta= carries =remnant=
+("Whether HH is a remnant (head split off)"), =FPrimary_original=,
+=hhmid_original=, =last_wave= and =round=; 920 of 5,669 wave-3 households have
+no =last_wave= (i.e. are new), and 682 distinct =FPrimary_original= values link
+split-offs back to parent households.
+
+** I2. Waves 2 and 3 are not in the World Bank catalog at all
+Only wave 1 (WB study 2534) is; waves 2/3 exist only as IHSN/ISSER entries
+10354 / 10355.  Consequence for this audit: the wave-2 and wave-3
+=Documentation/= trees are thin (wave 3 ships exactly one document), so
+questionnaire-grade (C4) evidence is unevenly available across waves.
+
+** I3. The design is NOT self-weighting, and the oversample is regional
+"Since the design is not self-weighting, household sample weights have been
+computed and applied" (Basic_Information_Dec_2015.pdf, printed p. 9).  Upper
+East (16 EAs) and Upper West (12 EAs) deliberately over-sampled vs. Ashanti
+(60).  *Corroborated by the microdata*: =2009-10/key_hhld_info.dta= region
+counts are Ashanti 900 households (= 60 EAs x 15), Upper East 240 (= 16 EAs),
+Upper West 180 (= 12 EAs) -- exactly the documented Table 1 allocation.  So an
+unweighted GhanaSPS mean is not a national mean, and =hhweight3= exists to fix
+that (see F1).
+
+** I4. The 6-month household-membership rule
+"A person qualifies as a member of a household if he/she in the last 6 months
+regularly participated in this living arrangement with the household."
+CONTENTS.org cites this from the wave-1 Basic Information Document only.
+*New corroboration from this audit*: the rule is restated verbatim in the
+wave-3 instrument, =2017-18/Documentation/Questionnaire/HH_Questionnaire_23_10.docx=
+(extracted text line 446).  So it is a standing survey definition, not a
+wave-1-only statement.  This matters for roster-derived counts (see F2).
+
+** I5. "'2013-14' has no regions or urban/rural data"
+CONTENTS.org, under "Files in GhanaSPS/_/ > other_features.py", quoting the
+data map: "'2013-14' has no regions or urban/rural data ... So 2009-10 (Wave 1)
+has information but 2013-14 (Wave 2) does not.  For now, all of 2013-14 has
+Ghana set as its region."  *CONFIRMED, with a sharpening* -- see the conflict
+section 2 below.  The wave-2 extract does contain a file with geography
+*columns* (=01ea_employmentscreener.dta=: =regioncode=, =regionname=, =eacode=,
+=eaname=, =districtname=, =communitycode=) but *all six are blank in all 13,643
+rows*.  Declared, never populated.  So CONTENTS.org is right and the
+temptation to "just read the geo columns" is a trap.
+
+** I6. Food-label harmonization is the whole point of the country's =_/= directory
+=food_items.org= 's "Preferred Label" column and the West Africa Food
+Conversion Table are the mechanism for comparing GhanaSPS to GhanaLSS.
+=notes.org= additionally carries a hand-built =other_items.json= harmonization
+for *non-food* expenditure labels across the three rounds (33 items,
+"Preferred Label" column) -- machinery that already exists for a
+=nonfood_expenditures= feature nobody has declared (see section 4, R4).
+
+** I7. =notes.org= references parquets that no longer have producers
+=notes.org= reads =../{wave}/_/food_expenditures.parquet=,
+=other_expenditures.parquet= and =household_demographics.parquet=.  Only
+=other_expenditures.py= survives in the wave =_/= dirs; the demographics
+producer was deleted in commit =75143978= ("Remove 105 legacy other_features.py
+and household_characteristics.py scripts").  The deleted scripts are the
+cheapest available evidence of which source files a human already validated,
+and I used them (=git show 75143978^:...=):
+- 2009-10 roster: =../Data/S1D.dta=, HHID ==hhno=, age ==s1d_4i=, sex ==s1d_1=.
+- 2013-14 and 2017-18 roster: =../Data/01b2_roster.dta=, HHID ==FPrimary=,
+  age ==ageyears=, sex ==gender=.
+- 2009-10 geography: =../Data/key_hhld_info.dta=, ==hhno=, ==id1= (region),
+  ==urbrur=.
+- 2017-18 geography: =../Data/00_hh_info.dta=, ==FPrimary=, ==region=.
+
+** I8. =_/ghanasps.py= already encodes the wave-3 panel link
+=Waves = {'2009-10':(), '2013-14':(), '2017-18':('00_hh_info.dta', 'FPrimary',
+'FPrimary_original')}=.  The split-off remap is already wired for the
+=food_acquired= path; a =panel_ids= feature would be re-using, not inventing.
+
+* 2. CONFLICT: =data_scheme.yml= says cluster identity is unavailable.  It is available in two of three waves.
+
+** The claim in force
+=lsms_library/countries/GhanaSPS/_/data_scheme.yml=, comment on =food_acquired=
+(also repeated in =_/food_acquired.py= 's docstring):
+
+#+begin_quote
+GhanaSPS has NO `sample` table (cluster identity unavailable: no cluster var in
+the food files, 2013-14 lacks EAs.dta, and EAs.dta is EA-level only).  So `v`
+is not joined and the index is (t, i, j, u, s) WITHOUT v.  This is an accepted
+data gap
+#+end_quote
+
+** What the data show
+
+*** 2009-10 -- the claim is FALSE on all three of its sub-clauses
+- "no cluster var in the food files": =2009-10/S11A.dta= -- the very file
+  =2009-10/_/food_acquired.py= reads -- carries =id3= with variable label
+  "EA NO.", alongside =id1= "Region", =id2= "District", =id4= "HH ID".  So does
+  every other wave-1 =.dta= except =S3AII/S3AIII= (which carry =id1=, =id2=,
+  =hhno=).
+- "EAs.dta is EA-level only": true of =EAs.dta= (2 columns, =id1= + =id3=), but
+  irrelevant, because =key_hhld_info.dta= is the household-level cluster file:
+  =hhno= + =id1= (Region) + =id2= (District) + =id3= (EA NO.) + =urbrur= +
+  =loc7= + =hhweight3= + =ppweight3=, 5,009 rows, one per household.
+- Verified: 334 distinct =id3= values (exactly the documented 334 EAs), 10
+  regions, 335 distinct =(id1,id2,id3)= tuples -- i.e. one EA number is reused
+  across two districts, so =v= must be the *composite*, not raw =id3=.
+  =urbrur= = {Rural: 2999, Urban: 2010}; =hhweight3= populated for all 5,009
+  (mean 1419.2).  Value labels decode cleanly ( ={1: Urban, 2: Rural}= ).
+
+*** 2013-14 -- the claim is TRUE
+No shipped wave-2 file carries a populated cluster, region, district or
+urban/rural variable.  The only candidate,
+=2013-14/01ea_employmentscreener.dta=, declares =regioncode=, =regionname=,
+=eacode=, =eaname=, =districtname=, =communitycode= and populates *none* of
+them (0 non-blank of 13,643 rows for each).  This matches I5 exactly.
+
+*** 2017-18 -- the claim is FALSE, but coverage is partial
+=2017-18/00_hh_info.dta= carries =r_code= (10 regions), =d_code= (199
+districts), =comm_code= (704 distinct values) plus text =region= / =district=,
+for all 5,669 households.  =rural-urban.dta= and =00_comm_info.dta= map
+=(regioncode, districtcode, communitycode) -> communitytype=, value-labelled
+={1: Urban, 2: Rural}=, over 528 communities (246 Urban / 282 Rural).
+Measured: 828 of 5,669 households carry the missing sentinel
+=comm_code = -666=, and a left join of =00_hh_info= onto =rural-urban.dta= on
+=(r_code, d_code, comm_code)= matches *3,995 of 5,669* (70.5%).  Note the two
+files are not identical despite having the same five columns
+( =rural-urban.equals(comm_info)= is False ), which needs a look before either
+is used as the authority.
+
+** Consequence
+The sentence "GhanaSPS has NO =sample= table (cluster identity unavailable)"
+is, as written, wrong for 2 of 3 waves.  The *conclusion* (do not join =v= to
+=food_acquired= today) is still defensible while no =sample= table exists --
+but the stated reason is not the real one, and it is currently suppressing a
+=sample= + =cluster_features= build that wave 1 fully supports and wave 3
+supports for ~70% of households.  This is exactly the "unevidenced 'no module
+here' claim in a YAML comment" the repository forbids.  *Recommend the comment
+be corrected in whichever PR next touches this file* (out of scope here --
+read-only).
+
+* 3. Master table
+
+Rows are the library's canonical feature vocabulary (the 25 names that appear
+in at least one country's =_/data_scheme.yml=, plus the two features issue #140
+flags).  Cells name the shipped file(s); ~absent-x~ = absent-from-extract,
+~not-asked~ = searched the instrument and it is not there, ~a-n-d~ =
+asked-not-distributed (evidence quoted in section 5).
+
+Only =food_acquired= is currently *declared* in
+=GhanaSPS/_/data_scheme.yml=; every "present" cell below is therefore an
+undeclared, buildable table.
+
+| feature                | 2009-10                          | 2013-14                              | 2017-18                                 |
+|------------------------+----------------------------------+--------------------------------------+-----------------------------------------|
+| food_acquired (DECLARED) | S11A.dta                       | 11a_foodcomsumption_prod_purch.dta   | 11a_foodconsumption_prod_purch.dta (+ _give) |
+| household_roster       | S1D.dta                          | 01b2_roster + 01d_background         | 01b2_roster + 01b2_newroster + 01d_background |
+| individual_education   | S1FI, S1FII, S1FIII              | 01fi_generaleducation, 01fii, 01fiii | 01gi_generaleducation, 01gii, 01giii    |
+| housing                | S12AI.dta, S12AII.dta            | 12a_housing*(3), 12b_housing2        | 12a_housing*(3), 12b_housing2           |
+| assets                 | S3AII (tools), S3AIII (durables) | 03aii_tool*, 03aiii_durablegood*     | 03aii_tool*, 03aiii_durablegood* (+_osp) |
+| livestock              | S3AI.dta                         | 03ai_animalquestions.dta             | 03ai_animalquestions.dta (+_osp)        |
+| anthropometry          | S6B.dta                          | 06b_anthropometry.dta                | 01evii_anthropometry.dta                |
+| subjective_well_being  | S10AII (ladder), S10AI (K10)     | 10aii_subjectivesocialwelfare, 10ai  | 10aii_subjectivesocialwelfare, 10ai     |
+| life_satisfaction      | SEC0.dta (s1_0)                  | 01a_consent.dta (happy)              | 01a_consent.dta (happy)                 |
+| plot_features          | S4AI--S4AIV (plot_no)            | 04h_agsection, 04i_landtenure        | 04_plotroster, 04h_agsection, 04i_landtenure |
+| plot_inputs            | S4AVI1/2, S4AVII, S4AVIII1/2     | 04k_seed*, 04l_chem*, 04l_inputs, 04j | 04k_seed*, 04l_chem*, 04l_inputs, 04j   |
+| plot_labor             | S4AIX1--S4AIX8                   | 04m_aglabour, 04m_aglabourquestions  | 04m_aglabourquestions                   |
+| crop_production        | S4AV1/2, S4BI, S4BII             | 04n_harvest(+questions), 04o_*       | 04n_harvestquestions, 04o_*             |
+| nonfood_expenditures   | S11B, S11C, S11D                 | 11b_clothing*, 11c_otheritems, 11d_fuel* | 11b_clothing*, 11c_otheritems, 11d_fuel* |
+| income                 | S1EI/S1EII, S5A--S5F, S3BIV      | 01ei_employmentmain, 05ai_basicinfo, 03biv | 01fi_employmentmain, 05ai_basicinfo, 03biv |
+| panel_ids              | key_hhld_info (hhno = base id)   | 01b2_roster.FPrimary (= w1 hhno)     | 00_hh_info (FPrimary, FPrimary_original) |
+| interview_date         | SEC0.dta (day/month/year)        | 01b2_roster.dta (checkdate)          | absent-x (only =round= 0/1/2)           |
+| sample                 | key_hhld_info.dta (full)         | absent-x (cols blank -- see sec. 2)  | 00_hh_info + rural-urban.dta (partial; NO weight) |
+| cluster_features       | key_hhld_info + EAs.dta (no GPS) | absent-x                             | 00_comm_info / rural-urban.dta (no GPS) |
+| shocks                 | absent-x / a-n-d (community)     | absent-x / a-n-d (community Section 7A-7C)  | absent-x / a-n-d (community)            |
+| community_prices       | absent-x / a-n-d                 | absent-x / a-n-d (community Section 4)      | absent-x / a-n-d                        |
+| food_security          | not-asked                        | not-asked                            | not-asked                               |
+| months_food_inadequate | not-asked                        | not-asked                            | not-asked                               |
+| food_coping            | not-asked                        | not-asked                            | not-asked                               |
+| people_last7days       | not-asked                        | not-asked                            | not-asked                               |
+
+Not searched for separately (no country in the library declares them in a way
+that maps onto GSPS): =consumption=, =fct=, =nutrition=, =hhsize=,
+=community_cluster_xwalk=, =earnings=, =employment=, =enterprise_income=,
+=food_security_hfias=.  The last four are covered by the =income= row's
+sources.
+
+* 4. Per-feature detail
+
+** F1. =sample= -- WAVE 1 IS COMPLETE; wave 3 partial; wave 2 genuinely absent
+
+*2009-10* -- =Data/key_hhld_info.dta= (5,009 rows, 9 columns) is a
+ready-made =sample= table:
+
+| canonical | source column | label                       | verified                                   |
+|-----------+---------------+-----------------------------+--------------------------------------------|
+| i         | =hhno=        | Household Number            | 5,009 unique                               |
+| v         | =id1-id2-id3= | Region / District / EA NO.  | 335 composite; raw =id3= is 334 (collides) |
+| weight    | =hhweight3=   | Household weight - revised3 | 5,009 non-null, mean 1419.2                |
+| (pop wt)  | =ppweight3=   | Population weight - revised3| present                                    |
+| Rural     | =urbrur=      | Locality of Residence       | {1 Urban: 2010, 2 Rural: 2999}             |
+| strata    | =loc7=        | Locality and Ecological zone| 7 strata: Accra(GAMA) / Urban & Rural x Coastal, Forest, Savannah |
+
+Do *not* use raw =id3= as =v=: 334 distinct EA numbers but 335 distinct
+=(id1,id2,id3)= tuples -- one EA number is reused across districts.  This is
+the same class of trap as Guatemala's =upm=.
+
+*2013-14* -- absent-from-extract.  Positively verified, not assumed: the sole
+file carrying geography column *names*, =01ea_employmentscreener.dta=, has 0
+non-blank rows in each of =regioncode=, =regionname=, =eacode=, =eaname=,
+=districtname=, =communitycode= (n = 13,643).  No weight variable anywhere in
+the wave (grep over all 10,778 variables: the only "weight" hits are
+=06b_anthropometry.weight_= and =07a_fertility.weightatbirth=).
+
+*2017-18* -- =00_hh_info.dta= gives =v= as =(r_code, d_code, comm_code)= for
+4,841 of 5,669 households (828 carry =comm_code = -666=), and =rural-urban.dta=
+supplies =Rural= for 3,995 of them.  *No weight variable exists in this wave
+either.*  A =sample= table here would ship =v= + =Rural= with =weight= NaN.
+
+** F2. =household_roster= -- present in all three waves, with the full kinship + residence-duration set
+
+*2009-10* =Data/S1D.dta= (18,889 rows, 5,009 households, 334 EAs):
+- =s1d_1= "Q1 Sex" -> {Female 9914, Male 8975}
+- =s1d_2= "Q2 Relationship to HH Head" -> Household Head 5009, Child 8722,
+  Spouse 2843, Grandchild 1146, Other relative 622, Adopted/Foster/Stepchild
+  231, Parent/Parent-in-Law 208, Son/Daughter-in-law 49, ...  Maps onto
+  =kinship.yml= without invention.
+- =s1d_4i= "Q4i Age (years)" (18,884 non-null, 0-120) + =s1d_4ii= age in months
+  + =sid_3i/s1d_3ii/s1d_3iii= day/month/year of birth (so =age_handler= can
+  produce fractional ages).
+- =s1d_27= "Q27 For how many months has person been away from this household in
+  last 12 months" -- *this is =MonthsAway=* (9,956 non-null).  NB one value of
+  15 appears, i.e. the field is not perfectly bounded at 12; a build must clip
+  or flag.
+- =hhmid= "Member ID" -> =pid=.
+
+*2013-14* =Data/01b2_roster.dta= (16,356 rows, 4,774 households): =FPrimary=,
+=hhmid=, =gender= {Female 8580, Male 7776}, =ageyears= (16,338 non-null),
+=relationship= (Household Head 4766, Child 7452, Spouse 2352, ...),
+=dateofbirth=/=yearofbirth=/=agemonths=, =stillmember=.
+=MonthsAway= lives in a *different file*: =01d_background.dta=,
+=awaylast12= "s01d_27 - Away in last 12", 16,353 non-null of 16,354, values
+0-12 exactly.
+
+*2017-18* =Data/01b2_roster.dta= (19,006 rows, 5,669 households): same schema
+(=gender= {F 9937, M 9069}, =relationship= Head 5667 / Child 8210 / Spouse 2587
+/ Grandchild 1425 / ..., =ageyears= 19,006 non-null).  =01b2_newroster.dta=
+(4,839 rows) carries joiners with =joinedwhy_*= and =joinedhowlong=;
+=01b2_preroster.dta= carries leavers with =howlongnotmember= and
+=notmember_died=.  =MonthsAway= again in =01d_background.awaylast12= (18,980
+non-null, max 12).
+
+*Instrument corroboration (C4)*: "Q27. For how many months has [Name] been away
+from this household in last 12 months?" appears in the wave-1 Part A PDF
+(extracted line 5677), the wave-2 Part A docx (line 1559), and the wave-3 docx
+(line 2174).  Combined with the 6-month membership rule (I4), GhanaSPS is a
+=MonthsAway= country in the CLAUDE.md taxonomy -- *not* =MonthsSpent=.
+
+** F3. =shocks= -- SETTLED.  No household shocks module in any wave.  A community shocks module exists and is not distributed.
+
+This closes the open question left by =GhanaLSS/_/CONTENTS.org=:
+
+#+begin_quote
+Ghana's LSMS-ISA participation is through the GhanaSPS (Social Panel Survey),
+not the GLSS.  Shocks data for Ghana should be sought in GhanaSPS if available.
+#+end_quote
+
+*Answer: not at household level, in any of the three waves.*
+
+Data evidence: grep over all 10,778 variable names + labels for
+=shock|drought|flood|famine|crop failure|pest|theft|robber|cope|coping|natural
+disaster|calamity|misfortune|adverse event= returns only:
+- crop-damage causes inside the agriculture module --
+  =2013-14/04n_harvestquestions.damagedhow_ELM_4= "Flood/too much rain",
+  =_ELM_5= "Drought"; =2017-18/04n_harvestquestions.damagedhow_4= "Flood",
+  =damagedhow_5= "Drought"; =2009-10/S4AV1.s4v_a86= "While on the field, was
+  any of the crop lost to rotting/pests";
+- migration-reason and household-joining codes --
+  =2017-18/01b2_newroster.joinedwhy_4= "Death of caregiver residing in former
+  household";
+- =2013-14/10di_binteractionsquestions.cropconcerns_ELM_4= "Pest infestation".
+
+None of these is a =shocks= table: there is no "did your household experience
+X", no =AffectedIncome/Assets/Production/Consumption=, no =HowCoped=.
+
+Instrument evidence (C4): searching all six extracted household instruments,
+every "flood/famine/drought" hit is an *answer-option code* -- option 12 in the
+migration "Why did you move?" list (w1 Part A lines 17973 and 21528; w2 Part A
+lines 1577/4139/4328; w3 line 2191) or a crop-loss cause list (w3 line 14368).
+No household shocks section exists in the wave-1, wave-2 or wave-3 household
+questionnaire.
+
+*But the community instrument has one, in full.*
+=2013-14/Documentation/ISSER_Yale_Community Survey_WAVE II.docx=:
+
+#+begin_quote
+SECTION 7A:  SHOCKS AND CONFLICTS:  TOWN EVENTS.
+... Now we will like to ask about major town events that have happened in this
+community since 2010. ... Q1-Conflict Type ... A Religious conflict / B Ethnic/
+tribal conflict / ... F Major theft, armed robbery and burglary / G Fire, flood
+or wind that destroyed property / H Land dispute / I Disease epidemic affecting
+people ...
+
+SECTION 7B:  SHOCKS AND CONFLICTS:  AGRICULTURAL SHOCKS.
+Now we would like to ask you about shocks to animals or crops that might have
+happened in this community.  Q1-TYPE OF SHOCK ... A Birds destroying crops / B
+Locusts / grasshoppers ... Too much rain / Too little rain / Plant disease /
+Animal disease ...
+
+SECTION 7C:  SHOCKS AND CONFLICTS:  CROPS SALES.
+#+end_quote
+
+=2013-14/Data/= ships *no* community-level file.  So the correct verdict for
+GhanaSPS =shocks= is a *split*: =not-asked= at household grain (C4 evidence
+above), and =asked-not-distributed= at community grain.  Neither is "we don't
+know".
+
+** F4. =community_prices= -- asked-not-distributed, with a documented promise
+
+The wave-2 community instrument contains "SECTION 4: CROP PRICES (GO TO THE
+LOCAL MARKET AND ASK OF THESE QUESTIONS)" and "SECTION 5A: UNIT CONVERSIONS"
+(plus 3B agricultural rentals and livestock prices).  No community data file
+ships in any wave.
+
+The wave-1 DDI report is explicit that this data exists:
+
+#+begin_quote
+The community inventory documents a broad range of natural and institutional
+features of the community, including political organizations, financial
+institutions, the presence of various development programs, and community
+infrastructure.  There was also a questionnaire for Districts and Municipal
+Assemblies.  As of December 2015, Seperate documentation for the Community
+survey and the data will be made available later.
+#+end_quote
+(=ddi-documentation-english_microdata-2534.pdf=, extracted lines 142-145.)
+
+And the same document's consumption-aggregate methodology *uses* it:
+
+#+begin_quote
+market price data taken from the community survey for the same item - unit of
+consumption combination as that of the missing price.  We take the median price
+across communities within the district, in the community data, to use for this
+imputation.
+#+end_quote
+(same file, extracted lines 534-536.)
+
+The wave-3 household instrument also references it: "[Names of financial
+institutions collected during the community survey appears for selection]"
+(=HH_Questionnaire_23_10.docx=, extracted line 10560).
+
+=> =community_prices= (and community =shocks=) go to the *acquisition queue*
+for all three waves, not to the "never asked" bin.
+
+** F5. =anthropometry= -- present in all three waves, whole-household grain (issue #140's "unique in the library")
+
+Confirmed and characterised.  Grain is *every household member*, not just
+children -- the wave-1 instrument heading is literally "Part B: ANTHROPOMETRY
+(FILL OUT FOR ALL HOUSEHOLD MEMBERS)" (=w1 Part B= extracted line 14991).
+
+| wave    | file                       | rows   | measured | variables                                                          |
+|---------+----------------------------+--------+----------+--------------------------------------------------------------------|
+| 2009-10 | =S6B.dta=                  | 18,757 | n/a*     | =s6b_4= Height cm, =s6b_5= Weight kg, =s6b_6= Hip, =s6b_7= Waist, =s6b_8= Arm circ. (+ =s6b_1= measured?, =s6b_3= standing/lying) |
+| 2013-14 | =06b_anthropometry.dta=    | 16,354 | 14,898   | =height=, =weight_=, =hipsize=, =waistsize=, =armcircumference=     |
+| 2017-18 | =01evii_anthropometry.dta= | 19,006 | 17,555   | =height=, =weight=, =hipsize=, =waistsize=, =armcircumference=      |
+
+(* 2009-10 non-null counts not tabulated; the file is the same 15-column shape
+and the questionnaire is identical B1-B8.)
+
+Measured 2013-14: median height 155 cm, median weight 52 kg, median MUAC 21 cm;
+ages of measured persons 0 to 106 (median 22).  2017-18 medians 155 / 53 / 24.
+Person-level, keyed =(FPrimary, hhmid)= / =(hhno, hhmid)=, joins 1:1 onto the
+roster.  Height/weight for *adults as well as children*, across three panel
+waves, is genuinely rare in this library.
+
+** F6. =subjective_well_being= and =life_satisfaction= -- present in all three waves
+
+- Cantril ladder, person-level: =2009-10/S10AII.dta= (=s10aii_a17= "Perceived
+  step on the ladder in relation to community", =s10aii_a18= "... in relation
+  to Ghana"); =2013-14/10aii_subjectivesocialwelfare.dta= and
+  =2017-18/10aii_subjectivesocialwelfare.dta= (=laddercommunity=, =ladderghana=;
+  9,407 and 11,666 respondents respectively -- a *respondent subset*, not the
+  full roster, gated by =10_determine_respondents.dta=).
+- Depression (K10-style), person-level: =2009-10/S10AI.dta= (=s10ai_a1= "About
+  how often did you feel tired out for no good reason", ...),
+  =2013-14/10ai_depression.dta=, =2017-18/10ai_depression.dta=.
+- A one-item life-satisfaction question sits at *household* grain in the cover
+  module: =2009-10/SEC0.s1_0= "Q0 Are you happy with your life" (5,009
+  non-null), and =01a_consent.happy= "Happy" in both later waves.
+- Also available and unusual: =10av_trust=, =10bii_riskpreferences=,
+  =10aiv_townsend= (hypothetical-windfall use + earnings expectations -- note
+  this is *not* a shocks module, I checked), =10avi_timeuseloop=,
+  =10c_socialnetworkingquestions=.
+
+** F7. =housing= -- present in all three waves, categorical (matches the CLAUDE.md "housing schema is categorical" rule)
+
+- 2009-10 =S12AI.dta=: =s12a_30= outer-wall material, =s12a_31= floor material,
+  =s12a_32= roof material, =s12a_9i/ii= water source, =s12a_22= lighting,
+  =s12a_24= cooking fuel, =s12a_28= toilet type, =s12a_25= refuse disposal.
+  =S12AII.dta=: =s12b_1= dwelling type, =s12b_2= rooms, =s12b_4= occupancy
+  status, =s12b_5= who owns, =s12b_14= electricity.
+- 2013-14 / 2017-18: same instrument, split across
+  =12a_housingcharacteristics1i_rent.dta=, =...1ii_utilities.dta=,
+  =...1iii_structure.dta= (=materialouterwall=, =materialfloor=,
+  =materialroof=, =toilettype=, =refusedisposal=) and
+  =12b_housingcharacteristics2.dta= (=dwellingtype=, =rooms=, =presentstatus=,
+  =whoowns=, =electricity=, =bedrooms=).  Household grain, 4,770 / 5,669 rows.
+- Bonus: =12a_measure.dta= + =12a_measurements.dta= carry *physically measured
+  room dimensions* (=shape=, =length=, =width=, =radius=, =circumference=,
+  =area=) -- a floor-area variable most countries lack.
+
+** F8. =individual_education= -- present in all three waves
+
+=2009-10/S1FI.dta= (=s1fi_2= ever attended, =s1fi_3= highest grade completed,
+=s1fi_4= highest qualification, =s1fi_6= still in school, =s1fi_8= current
+grade, plus per-item school expenditure =s1fi_13i..s1fi_17ii=);
+=S1FII.dta= technical/vocational; =S1FIII.dta= literacy by language.
+2013-14 =01fi_generaleducation.dta= / =01fii_edcareer= / =01fiii_literacy=
+(=attended=, =highestgrade=, =highestqual=, =attendedlast12=, =attendingstill=,
+=currentgrade=, =schooltype=).  2017-18 is the same module renumbered to
+=01gi_/01gii_/01giii_=.  All person-level on =(FPrimary, hhmid)=.
+=highestgrade= / =highestqual= are the two columns that feed
+=harmonize_education=.
+
+** F9. =assets= and =livestock= -- present in all three waves, item-long
+
+- Durables: =2009-10/S3AIII.dta= (=s3aiii_0= "ID of item", =s3aiii_a= number,
+  =s3aiii_c1/c2= current value in cedis/pesewas); =03aiii_durablegoodquestions.dta=
+  in both later waves (=durablegood=, =quantity=, =currentvalue=), 215,425 and
+  49,009 rows.
+- Farm tools: =S3AII.dta= / =03aii_toolquestions.dta=.
+- Livestock: =2009-10/S3AI.dta= (=animal_id=, =s3ai_1= number possessed,
+  =s3ai_3i/ii= value if all sold, plus a full cost block: fodder, veterinary,
+  shelter, hired labour, water; =s3ai_12i/ii= revenue from sales);
+  =03ai_animalquestions.dta= in both later waves.  2017-18 adds =_osp= variants
+  (other-specify overflow tables) for all three.
+- Note for a build: the value columns are *split cedi/pesewa pairs* throughout
+  wave 1 -- same pattern the existing =food_acquired.py= handles with
+  =value = cedis + pesewas/100= and an explicit =fillna(0)= on the pesewa leg.
+
+** F10. =interview_date= -- present in 2 of 3 waves
+
+- 2009-10 =SEC0.dta=: =day=, =month=, =year=, all 5,009 non-null; years
+  {2009, 2010}.  Also =s0_8= Interviewer ID and =s0_9= Supervisor ID.
+- 2013-14 =01b2_roster.checkdate=: a real =datetime64=, 16,356 non-null,
+  ranging *2014-03-05 to 2015-08-11*.  Two things follow: (a) the wave folder
+  label =2013-14= does not match the fieldwork window, and (b) the date is
+  recorded at *person* grain, so a household-level =Int_t= needs a documented
+  reduction.
+- 2017-18: absent-from-extract.  The only temporal marker is
+  =00_hh_info.round=  in  {0, 1, 2} (4,633 / 174 / 862 households).  Module
+  start/end *times* exist for the cognitive tests only
+  (=01eiii_math.math_starttime= etc.), no calendar date.
+- Wave 1 was a *four-visit* survey ("Each household was visited four times",
+  DDI extracted line 189), yet only one date is recorded -- so the
+  =(t, v, i, visit)= canonical index cannot be populated from the extract.
+
+** F11. =panel_ids= -- present, and cheap
+
+Household IDs are literally comparable across waves (no crosswalk file needed
+for the main panel):
+
+| pair                | overlapping household ids |
+|---------------------+---------------------------|
+| 2009-10  &  2013-14   | 4,366                     |
+| 2013-14  &  2017-18   | 4,353                     |
+| 2009-10  &  2017-18   | 4,412                     |
+
+(=2009-10.hhno= and =01b2_roster.FPrimary= share the same 9-digit form, e.g.
+=101001002=.)  Split-offs need the remap: =2017-18/00_hh_info.FPrimary_original=
+is populated for 920 households covering 682 distinct parent ids, of which 661
+are wave-1 households and 584 are wave-2 households.  =remnant=, =round= and
+=last_wave= complete the picture.  This is already half-wired in
+=_/ghanasps.py= (I8).
+
+** F12. Agriculture -- =plot_features=, =plot_inputs=, =plot_labor=, =crop_production=
+
+All three waves carry a full LSMS-ISA-style agriculture section, plot-long:
+
+| wave    | plot key                | plot rows | households with plots |
+|---------+-------------------------+-----------+-----------------------|
+| 2009-10 | =(hhno, plot_no)=       |     5,698 |                 2,812 |
+| 2013-14 | =(FPrimary, plotid)=    |     4,694 |                 2,678 |
+| 2017-18 | =(FPrimary, plotid)=    |     5,366 |                 5,366 rows, unique on the pair |
+
+- Area: =2009-10/S4AII.dta= has =s4aii_a10= "Size of plot" + =s4aii_a11= unit
+  *and a pre-converted =area_ha= "Land size in hectares"* -- the canonical unit
+  the schema wants, already computed.  2017-18 has =plotsizeacres= +
+  =plotsizeunit=; 2013-14 has =plotsizeunit= (+ size in the same table).
+- Tenure: =S4AI.dta= (=s4ai_a2= year first used/owned, =s4ai_a3= fallow rights)
+  and =04i_landtenure.dta= (103 / 139 columns) in the later waves.
+- Soil / irrigation: =2009-10/S4AIII.dta= (=s4aiii_a21= depth, =s4aiii_a23=
+  colour, =s4aiii_a24= soil type, =s4aiii_a33/a34= irrigation investment);
+  =04h_agsection.soil1..soil12= (multi-select) in later waves.
+- Inputs: chemicals =S4AVI1/S4AVI2= / =04l_chemquestions=; seed
+  =S4AVIII1/2= / =04k_seedquestions=; tractor/plough =S4AVII= /
+  =04j_tracploughuse=; organic =04l_inputs=.
+- Labour: =S4AIX1..S4AIX8= (=s4aix_290i= days of casual labour by men, hours,
+  number of workers, by season) / =04m_aglabour(questions)=.
+- Harvest & disposal: =S4BI= (=s4bi_b63i= crop id, =s4bi_b64= primary outlet),
+  =S4BII= (=s4bii_b75i= quantity stored) / =04n_harvest(questions)=,
+  =04o_cropsalesstores*=.  =04nn_gatheringquestions= adds wild-gathered produce
+  in waves 2-3.
+- 2017-18 additionally ships =Data/Crop_encrypted/= (=cropprice_W3.dta.bc=,
+  =croppriceother_W3.dta.bc=, =unitcon_W3nonpii.dta.bc=, =FolderKey.bch=) --
+  *encrypted*, not readable here.  Those filenames say crop prices and unit
+  conversions.  Flagged, not opened.
+
+** F13. =nonfood_expenditures= -- present in all three waves, and already half-harmonized
+
+=2009-10/S11B.dta= (clothing, with a 4-way split by child / elderly 60+ / male
+16-60 / female 16-60), =S11C.dta= (=item_id=, =itemname=, =s11c_1/2= total
+expenditure last 12 months in cedi/pesewa), =S11D.dta= (fuel: =fuel_id=,
+months used, average value per month, home-produced vs purchased).
+2013-14 / 2017-18: =11b_clothingquestions.dta=, =11c_otheritems.dta=,
+=11d_fuelconsumptionquestions.dta=.
+=_/notes.org= already carries a 33-row "Preferred Label" harmonization table
+across all three rounds (Babysitters, Beauty, Cement, ..., Water (tanker)) and
+a surviving producer script =\{wave\}/_/other_expenditures.py= for each wave.
+
+** F14. =food_security= / =months_food_inadequate= / =food_coping= / =people_last7days= -- not-asked (C4)
+
+Searched all 10,778 variable names + labels for
+=hungry|hunger|enough food|not enough to eat|skip.*meal|meals per day|go
+without|food insecur|worried.*food|food shortage|lean season|whole day
+without=: zero hits.
+
+Searched all six extracted household instruments (wave-1 Part A + Part B +
+Interviewers' Manual, wave-2 Part A + Part B, wave-3) for the same terms plus
+=bed hungry|reduce.*meal|fewer meal|limit.*variety|food ran out=: *one* hit,
+and it is the name of an NGO -- "To evaluate the impacts of The Hunger Project
+and MCC interventions in Ghana" (=Interviewers_Manual=, line 355).
+
+Likewise =people_last7days= ("how many men/women/boys/girls ate meals from this
+household in the past 7 days"): searched for =ate (any )?meals|took
+meals|eaten in this household|persons who ate|guests|meals.*(past|last) 7
+days= across all instruments -- zero hits.  Every "last 7 days" in GSPS is a
+*labour-force* reference period (=S1EI.s1ei_1= "Number of jobs done by person
+in the last 7 days").
+
+These four are therefore genuine =not-asked= cells with C4-grade evidence, for
+all three waves.
+
+* 5. Cheap wins / real gaps / needs questionnaire
+
+** Ranked recommendation for the next session
+
+*** Tier 1 -- cheap wins, high leverage, YAML-only or near-enough
+
+1. *=household_roster= (all 3 waves).*  Every required column exists and the
+   deleted scripts already name the sources (I7).  2009-10: =S1D.dta=
+   (=hhno=, =hhmid=, =s1d_1=, =s1d_2=, =s1d_4i=, + DOB triple, + =s1d_27=).
+   2013-14 / 2017-18: =01b2_roster.dta= (=FPrimary=, =hhmid=, =gender=,
+   =ageyears=, =relationship=) with =MonthsAway= joined from
+   =01d_background.awaylast12=.  Relationship vocabularies map onto
+   =kinship.yml= as-is.  This single table also unlocks the auto-derived
+   =household_characteristics= (=_ROSTER_DERIVED=), which =notes.org= 's demand
+   system already wants (it reads a =household_demographics.parquet= that no
+   longer has a producer).  *Do this first.*
+   - Complication to design for: the =MonthsAway= column lives in a *different
+     file* from the roster in waves 2-3, so this is a two-source table
+     (=dfs:= merge on =(FPrimary, hhmid)=, or a wave script).
+   - Watch =s1d_27= = 15 in wave 1 (out of the 0-12 range).
+
+2. *=sample= for 2009-10 only.*  =key_hhld_info.dta= is a finished =sample=
+   table (F1) -- =v=, =weight=, =Rural=, =strata=, all populated, 5,009/5,009.
+   Wave 1 is also the only wave with a documented probability design, so it is
+   the only wave where a weight is meaningful anyway.  Declaring =sample= for
+   one wave lets =_join_v_from_sample()= start attaching =v= to wave-1
+   =food_acquired= and everything else.  *Use the composite =(id1,id2,id3)= as
+   =v=, never raw =id3=.*  Correct the =data_scheme.yml= comment in the same PR
+   (section 2).
+
+3. *=anthropometry= (all 3 waves).*  One file per wave, five numeric columns,
+   person-level, joins 1:1 onto the roster, and it is whole-household rather
+   than under-5s.  This is issue #140's "unique in the library" claim and it
+   holds up.  Depends on #1 for the =pid= index to mean anything.
+
+4. *=housing= (all 3 waves).*  Roof / Floor / Wall material columns exist
+   verbatim in every wave, categorical, household grain, matching the existing
+   Uganda/Malawi pattern.  Two-file merge in wave 1 (=S12AI= + =S12AII=),
+   two-of-four in waves 2-3.
+
+5. *=individual_education= (all 3 waves).*  =highestgrade= + =highestqual=
+   present in every wave; needs a Ghana grade -> canonical-level mapping table
+   but nothing structurally hard.
+
+*** Tier 2 -- worth doing, more work
+
+6. *=panel_ids=.*  Ids are directly comparable (F11); the only real work is the
+   wave-3 split-off remap, which =_/ghanasps.py= already half-implements.  Pays
+   off immediately for anyone pooling waves -- and I1 says pooling is exactly
+   where users will go wrong.
+
+7. *=nonfood_expenditures=.*  Three files per wave, and =notes.org= already
+   contains the cross-round label harmonization *and* a live
+   =other_expenditures.py= per wave.  Mostly a matter of deciding the canonical
+   schema for a non-food table, which the library has barely settled (only 2
+   countries declare it).
+
+8. *=assets= / =livestock=.*  Item-long, straightforward, but every value is a
+   split cedi/pesewa pair in wave 1 -- reuse the =fillna(0)= pattern already
+   proven in =2009-10/_/food_acquired.py=, or you will silently drop ~74% of
+   the value.
+
+9. *=subjective_well_being= / =life_satisfaction=.*  Present everywhere.  The
+   care point is *grain*: the ladder/depression modules cover a respondent
+   subset (9,407 and 11,666 persons, selected by
+   =10_determine_respondents.dta=), while the one-item =happy= question is
+   household-level on the cover page.  Do not merge those two into one table.
+
+10. *=interview_date= for 2009-10 and 2013-14 only.*  Wave 1 is clean
+    (=SEC0= day/month/year).  Wave 2 is person-grain =checkdate= and needs an
+    explicit household reduction plus a note that the dates run into 2015.
+    Wave 3 has nothing -- leave it =absent=.
+
+*** Tier 3 -- real work, defer
+
+11. *Agriculture (=plot_features=, =plot_inputs=, =plot_labor=,
+    =crop_production=).*  All present in all three waves and plot-long, so the
+    data are good; but this is 20+ source files per wave, wave-1 file naming is
+    opaque (=S4AVIII20= etc.), and only ~50% of households farm.  Also
+    2017-18's crop-price and unit-conversion tables are *encrypted*
+    (=Data/Crop_encrypted/=), which will bite any attempt at farmgate prices.
+
+12. *=sample= / =cluster_features= for 2017-18.*  Buildable but partial: 828 of
+    5,669 households have =comm_code = -666=, the join to =rural-urban.dta=
+    reaches only 70.5%, there is no weight variable, and =rural-urban.dta= and
+    =00_comm_info.dta= disagree despite identical schemas.  Resolve that
+    disagreement first.
+
+*** Real gaps (acquisition queue -- =asked-not-distributed=)
+
+13. *Community survey, all three waves.*  This is the single largest missing
+    piece and it is *documented as existing*: the wave-1 DDI says the community
+    inventory exists and "the data will be made available later"; the wave-1
+    consumption aggregate is *built using* community market prices; the wave-2
+    community instrument is shipped in full and contains SHOCKS (Section 7A/7B/7C),
+    CROP PRICES (Section 4) and UNIT CONVERSIONS (Section 5A); the wave-3 household
+    instrument references community-collected data.  Acquiring it would deliver
+    =community_prices= and a community-grain =shocks= table in one go, and
+    would give Ghana the shocks data =GhanaLSS/_/CONTENTS.org= says to look for
+    here.  Source to chase: ISSER / University of Ghana data portal and the
+    Harvard Dataverse deposit (doi:10.7910/DVN/E5QP0F), *not* the WB catalog
+    (waves 2-3 are not there at all -- I2).
+
+14. *2013-14 geography.*  The wave-2 extract's geo columns exist and are
+    stripped (F1).  This looks like a PII scrub, not a survey gap -- the
+    instrument obviously knew where the households were.  Worth one question to
+    the data provider; if the unstripped file is obtainable, wave 2 gets =v=,
+    =Rural= and =Region= at a stroke and GhanaSPS becomes a three-wave clustered
+    panel.
+
+15. *2017-18 sample weights.*  No weight variable ships in wave 2 or wave 3.
+    Given I3 (design is not self-weighting), unweighted later-wave estimates
+    are not national.  Ask.
+
+*** Closed forever (=not-asked=, C4 evidence in F14)
+
+16. =food_security=, =months_food_inadequate=, =food_coping=,
+    =people_last7days= -- all three waves.  Searched 10,778 variables and six
+    instruments; the search terms are listed in F14 so the claim is
+    falsifiable.  These belong in =.coder/coverage/absent_verdicts.csv= as
+    =not-asked= with this file as evidence.
+
+17. Household-level =shocks= -- all three waves, =not-asked= (F3).  Record the
+    community-level half separately as =asked-not-distributed= so the two do
+    not get conflated later.
+
+* 6. Reproduction
+
+The metadata sweep, the searchable variable index, and the extracted
+questionnaire text were written to this session's scratchpad, not to the repo.
+To regenerate: iterate the =*.dta.dvc= sidecars under
+=GhanaSPS/{wave}/Data/=, call
+=lsms_library.local_tools._ensure_dvc_pulled(path)=, resolve the blob to
+=_DVC_CACHE_DIR/md5[:2]/md5[2:]=, and read it with
+=pyreadstat.read_dta(blob, metadataonly=True)=; dump
+=(file, column_name, column_label)= triples.  Questionnaire text:
+=pdfminer.high_level.extract_text= for the wave-1 PDFs,
+=unzip -p f.docx word/document.xml | sed -e 's/<[^>]*>//g'= for the .docx.

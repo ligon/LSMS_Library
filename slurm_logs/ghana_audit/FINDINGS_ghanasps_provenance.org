@@ -112,7 +112,7 @@ These are offered for a human to add; this agent is read-only and did not edit
    any config; =2017-18/= spells it correctly
    (=11a_foodconsumption_prod_purch.dta=), so the two waves genuinely differ.
 3. *=2017-18/Data/Crop_encrypted/= exists* -- an encrypted crop-data directory,
-   added in a separate commit =bf8d4c8c= "Add encrypted Ghana crop data"
+   added in a separate commit =bf8d4c2c= "Add encrypted Ghana crop data"
    (2021-05-16).  Encrypted delivery is a marker of a direct producer transfer
    rather than a public download.
 4. *Wave 1 carries three weight-like variables in three different files*, not
@@ -141,7 +141,7 @@ Traced through both path renames (=Ghana/= -> =GhanaSPS/= at =273525e5=,
 |------------+------------+-------------------------------------------------------------|
 | =8a05fff3= | 2020-12-16 | "Update dvc store of data from Ghana Panel and Rwanda." -- FIRST appearance of all three waves' =Data/= |
 | =52539c28= | 2021-05-16 | "Add some stray 2009-10 data."                              |
-| =bf8d4c8c= | 2021-05-16 | "Add encrypted Ghana crop data." (=2017-18/Data/Crop_encrypted=) |
+| =bf8d4c2c= | 2021-05-16 | "Add encrypted Ghana crop data." (=2017-18/Data/Crop_encrypted=) |
 
 So *everything we hold entered the repository on or before 2021-05-16*.  Every
 catalog date below should be read against that anchor.
@@ -621,7 +621,7 @@ Issue #140 was opened 2026-04-10 by ligon, drawing on a 2026-04-09 investigation
 | 6 | "If final/revised data is now available from the World Bank Microdata Library or elsewhere ..." | *"or elsewhere" is where it is* | Nothing later than 2016 exists at the WB.  The later public releases are IHSN/DataFirst v01 (2018-05-08 for wave 2; 2021 for wave 3) and Harvard Dataverse v1.2 (2022-11-03, all three waves). |
 | 7 | Open question 4: "WB catalog IDs for 2013-14 and 2017-18 (2009-10 is catalog 2534)" | *ANSWERED: they do not exist* | Full-catalog GHA sweep, all 23 collections, 152 entries: exactly one =_GSPS= idno.  Reproduced this session (section 3.1). |
 | 8 | Open question 6: "2009-10 =ppweight3=: per-person expansion weight or panel weight?" | *NOT re-verified this session* | The 2026-04-09 plan reasons it is per-person ("mean ~3.8x larger than =hhweight3="); the 2026-07-22 comment states it flatly.  This audit did not read the values. |
-| 9 | "Prerequisite gap: no =add-country= skill" | *STILL TRUE* | =.claude/skills/= has =add-feature=, =add-wave=, =backlog-workflow=, =cross-country-features=, =profiling=, =release=, =gitnexus= -- no =add-country=. |
+| 9 | "Prerequisite gap: no =add-country= skill" | *STILL TRUE* | =ls .claude/skills/= gives: =add-feature=, =add-wave=, =backlog-workflow=, =cross-country-features=, =demand-estimation.md=, =generated=, =gitnexus=, =multi-round-waves.md=, =profiling=, =release=, =tanzania-panel-design.md= -- no =add-country=. |
 | 10 | "GhanaSPS ... currently doesn't [appear in the Feature cross-country API]" | *PARTLY FALSE* | It now appears for the food tables.  =.coder/coverage/latest.csv= grades 12 GhanaSPS cells (=food_acquired=, =food_expenditures=, =food_prices=, =food_quantities= x 3 waves) all *=sane=*, "all checks pass".  All other features remain unregistered. |
 | 11 | P1 item 8: "Verify and add SOURCE.org / LICENSE.org for 2013-14 and 2017-18" | *HALF DONE* | =SOURCE.org= now exists for all three waves (stamped 2026-07-12).  =LICENSE.org= still exists *only* for 2009-10.  And all three =SOURCE.org= lack =#+PROVENANCE_VALIDATION:=; waves 2-3 additionally lack any source URL and any =CATALOG_IDNO=. |
 
