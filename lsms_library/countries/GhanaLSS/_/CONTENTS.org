@@ -1014,6 +1014,58 @@ taking an *arbitrary* person's birth region for the whole cluster --
 conflicting clusters, i.e. 167 of 170 clusters held members born in more than
 one region.
 
+** Trap 4: GLSS1 had no =region= table of its own, and the fallback is REVERSED
+
+Found 2026-08-20, one day after Trap 1 was fixed, and *caused* by that fix.
+
+=1987-88/_/categorical_mapping.org= carried no =region= table, so
+=code_label_map('region', _dirs)= fell through =_dirs= to the *country-level*
+=_/categorical_mapping.org=.  That table reads =9 = Upper East, 10 = Upper
+West=.  *Every wave-level table in this country reads the reverse* -- 1988-89,
+1991-92 and 1998-99 all have =9 = Upper West, 10 = Upper East=, and 1998-99's
+ordering was checked against the GLSS4 questionnaire on 2026-08-19.
+
+While GLSS1's decode was dead the disagreement was *unobservable*: =region_dict=
+was ={}=, so =Region= and =Birthplace= were 100% NA and no value could be wrong.
+Reviving the decode (=18b6ca51=) armed it, and shipped *1,511 people* with
+=Birthplace= reversed and *11 of 176 clusters* with =Region= reversed.
+
+This is the same lesson as Trap 1, one level deeper, and it is worth stating
+plainly: *a fallback that has never been exercised has never been checked.*
+The country-level table was not wrong for anything that used it before --
+nothing used it.
+
+*** The evidence, since C4 cannot be run here
+
+The GLSS1 questionnaire is a scanned image with no text layer, so the
+questionnaire check is *unrunnable* for this wave.  Four converging lines of
+non-questionnaire evidence establish the ordering instead:
+
+| # | check | result |
+|---+-------+--------|
+| 1 | =1988-89/Data/CLYR1YR2.DAT= bridges 85 clusters across the two waves | 75/85 agree on region overall, but *0 of the 6* touching an Upper region agree -- each differing in the direction a 9/10 swap predicts |
+| 2 | the three sibling waves' own tables | all read =9 = Upper West= |
+| 3 | this wave's raw =REGION= codes | run =1..11=, the 11-code era list (11 = a single "Foreign Country"), not GLSS2's 17-code list |
+| 4 | Upper East is the more populous region | every other wave has more Upper East clusters than Upper West (ratios 1.78, 2.17, 3.00); 1987-88 alone inverted at 4/7 = 0.57 |
+
+After the fix the bridge agreement rises *88.2% -> 95.3%*, the Upper-region
+pairs go *0/6 -> 6/6*, and 1987-88's ratio becomes 7/4 = 1.75, in line with its
+siblings.  The 4 residual mismatches are single scattered pairs, consistent
+with the modal-birth-region approximation of Trap 3 rather than with a coding
+error.
+
+*** Two mechanical traps this sprang on the way
+
+- *An Org =#+name:= attaches to the NEXT element.*  A comment block placed
+  between =#+name: region= and the table silently steals the name; the table is
+  then unnamed, the lookup misses, and the decode stays dead *with no error*.
+  Keep commentary above the =#+name:= line.  The first attempt at this fix was
+  a silent no-op for exactly this reason, and it looked like a successful build.
+- =1988-89= spelled code 7 =Brongahafo= where all six other waves spell it
+  =Brong Ahafo=.  Harmless-looking, but it means
+  =df[df.Region == 'Brong Ahafo']= silently dropped all 170 of that wave's
+  clusters.  Corrected in the wave's own table.
+
 ** Cluster counts, and a vocabulary trap in the documentation
 
 Post-fix cluster counts are exactly the distinct =CLUST= values in the source:
