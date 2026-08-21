@@ -77,6 +77,28 @@ _conftest = importlib.util.module_from_spec(
         'lsms_tests_conftest', pathlib.Path(__file__).with_name('conftest.py')))
 _conftest.__loader__.exec_module(_conftest)
 aws_creds_available = _conftest.aws_creds_available
+#: Applied to every test that BUILDS Uganda.
+#:
+#: NOTE there are TWO things in tests/conftest.py spelled `requires_s3`, and
+#: they are not interchangeable:
+#:
+#:   * ``conftest.requires_s3`` -- a ``pytest.mark.skipif`` whose condition is
+#:     evaluated ONCE, when conftest is imported;
+#:   * ``pytest.mark.requires_s3`` -- a registered marker that conftest's
+#:     ``pytest_collection_modifyitems`` acts on at COLLECTION time.
+#:
+#: This module uses the MARKER, deliberately.  The skipif form freezes the
+#: credentials answer at import, and the answer can change during a session:
+#: the in-tree ``countries/.dvc/s3_creds`` is not tracked in git, it is
+#: WRITTEN at import time by the auto-unlock, so a worktree that was
+#: credential-free when conftest loaded may not be a moment later.  (Observed
+#: while verifying this PR -- a run that looked credential-free silently was
+#: not.)  The marker re-asks the question when it matters.
+#:
+#: Per-TEST rather than a module-level ``pytestmark``: 8 of these tests build
+#: nothing, and a module mark would skip them in the credential-free job
+#: where they are the whole point of having them.
+requires_s3 = pytest.mark.requires_s3
 
 COUNT_COLS = ['Men', 'Women', 'Boys', 'Girls']
 LONG_WAVES = ['2018-19', '2019-20']
@@ -148,11 +170,13 @@ def built(uga):
 class TestPeopleLast7Days:
     """The member/visitor collapse: silently WRONG for ~half the households."""
 
+    @requires_s3
     def test_declared_index_is_unique(self, built):
         """``(i, t)`` must be genuinely unique, so the collapse never fires."""
         df = built['people_last7days']
         assert int(df.index.duplicated().sum()) == 0
 
+    @requires_s3
     def test_no_grain_collapse_report(self, uga):
         """The #323 audit must file nothing for this table."""
         from lsms_library.country import grain_reports
@@ -162,6 +186,7 @@ class TestPeopleLast7Days:
         assert not reports, f"people_last7days still destroys rows: {reports}"
 
     @pytest.mark.parametrize('wave,expected', [('2018-19', 4.60), ('2019-20', 4.55)])
+    @requires_s3
     def test_mean_household_size_is_members_not_visitors(self, built, wave, expected):
         """Pre-fix this was 2.81 / 2.77 -- the mean of a coin-flipped mix of
         member and visitor rows.  Members-only restores ~4.6 people/HH, in line
@@ -173,6 +198,7 @@ class TestPeopleLast7Days:
             f"(members).  ~2.8 means the visitor rows are still winning.")
 
     @pytest.mark.parametrize('wave,cap', [('2018-19', 20), ('2019-20', 20)])
+    @requires_s3
     def test_no_spurious_zero_person_households(self, built, wave, cap):
         """1,053 (2018-19) and 1,011 (2019-20) households reported ZERO people
         because the visitor row -- all zeros for two thirds of households -- won
@@ -187,6 +213,7 @@ class TestPeopleLast7Days:
             f"~1,000 means visitor rows are still winning groupby().first().")
 
     @pytest.mark.parametrize('wave,n_hh', [('2018-19', 3242), ('2019-20', 3078)])
+    @requires_s3
     def test_wave_extraction_keeps_one_row_per_household(self, uga, wave, n_hh):
         """At the wave level the extraction must already be one row per
         household -- the member row.  Asserted PRE-collapse, because after the
@@ -220,12 +247,14 @@ class TestPeopleLast7Days:
 class TestClusterFeatures:
     """The intended household->cluster projection, now declared and enforced."""
 
+    @requires_s3
     def test_cluster_grain_no_duplicates(self, built):
         cf = built['cluster_features']
         assert list(cf.index.names) == ['t', 'v']
         assert int(cf.index.duplicated().sum()) == 0
         assert 'i' not in cf.columns, "cluster_features leaks the household id"
 
+    @requires_s3
     def test_no_grain_collapse_report(self, uga):
         """The projection is now performed by the country hook with
         ``reduce_to_agreed``, so neither Site 1 nor Site 2 has anything left to
@@ -237,6 +266,7 @@ class TestClusterFeatures:
         assert not reports, f"cluster_features still destroys rows: {reports}"
 
     @pytest.mark.parametrize('wave', LONG_WAVES)
+    @requires_s3
     def test_v_is_an_actual_cluster_key(self, uga, wave):
         """Parish NAMES are not unique in Uganda: ``CENTRAL`` occurs in ten
         districts, so ``v='CENTRAL'`` fused ten different parishes into one
@@ -260,6 +290,7 @@ class TestClusterFeatures:
             f"{list(offenders.index[:5])}")
 
     @pytest.mark.parametrize('wave', LONG_WAVES)
+    @requires_s3
     def test_v_does_not_over_split_one_real_parish(self, uga, wave):
         """The converse of ``test_v_is_an_actual_cluster_key`` -- and the one
         that actually has teeth.
@@ -319,6 +350,7 @@ class TestClusterFeatures:
         assert mapping.District(pd.Series(['GULU', 'LAROO'])) == 'GULU'
 
     @pytest.mark.parametrize('wave', LONG_WAVES)
+    @requires_s3
     def test_v_is_the_district_parish_composite(self, built, wave):
         cf = built['cluster_features'].reset_index()
         vals = cf.loc[cf['t'] == wave, 'v'].dropna().astype(str)
@@ -326,6 +358,7 @@ class TestClusterFeatures:
             f"{wave}: v is not a DISTRICT/PARISH composite: "
             f"{sorted(vals[vals.str.count('/') != 1])[:5]}")
 
+    @requires_s3
     def test_2009_10_out_of_frame_households_have_a_cluster(self, built):
         """2009-10 is a panel-refresh wave: ``comm`` is the 2005-06 EA, so the
         565 movers / split-offs fall outside that frame and carry a blank
@@ -338,6 +371,7 @@ class TestClusterFeatures:
             f"only {len(synth)} synthetic @lat,lon clusters in 2009-10; the "
             f"out-of-frame households are being dropped again")
 
+    @requires_s3
     def test_cluster_features_v_is_a_subset_of_sample_v(self, built):
         """``sample()`` is the source of truth for a household's cluster and
         ``_join_v_from_sample`` hands that ``v`` to every other table.  The two
@@ -352,6 +386,7 @@ class TestClusterFeatures:
             f"{len(orphans)} cluster_features (t, v) pairs are unknown to "
             f"sample(), e.g. {sorted(orphans)[:3]}")
 
+    @requires_s3
     def test_almost_every_sample_cluster_has_a_cluster_features_row(self, built):
         """The converse direction.  Pre-fix 339 ``(t, v)`` pairs were orphaned,
         almost all of them 2009-10's out-of-frame households.
