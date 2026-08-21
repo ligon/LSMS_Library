@@ -1,3 +1,36 @@
+> ## WITHDRAWAL NOTICE (2026-08-21)
+>
+> **Fix 1 of this ledger -- deleting `cluster_features` from GLSS1 (1987-88) and
+> GLSS2 (1988-89) -- has been WITHDRAWN from the PR.** Everything below is kept
+> as the record of how it was reached, but its *conclusion* no longer holds.
+>
+> The reasoning was sound when written and was overtaken by PR #673, which gave
+> both waves a `cluster_features` df_edit hook inferring the cluster region as
+> the modal birth region of members under 12 -- rather than letting
+> `groupby().first()` elect an arbitrary person. Measured cold on `development`:
+> 176 and 170 clusters, `Region` 0% null, **zero** `GrainCollapseWarning`s, and
+> only the ten real Ghanaian regions. A foreign birth code (11 = Nigeria, 236
+> persons in 1988-89) cannot win a mode, so this ledger's headline objection --
+> "a Ghanaian EA cannot be in Nigeria" -- is structurally prevented rather than
+> merely unobserved.
+>
+> This ledger's own review section is in fact evidence *for* the surviving
+> approximation, not against it: the HEALTH.DAT / DRUG.DAT facility `REGION`
+> matches the cluster's modal birth region in **160 of 166** clusters, and the
+> mean/median share of a cluster's residents born in its HEALTH region is
+> 0.793 / 0.855.
+>
+> **The underlying concern is still right and is recorded, not dropped.** GLSS1 /
+> GLSS2 cluster region is *inferred, not measured* -- written up as "Trap 3" in
+> `GhanaLSS/_/CONTENTS.org`. The fix for that is to wire the HEALTH.DAT /
+> DRUG.DAT candidate this ledger identified (offset `CL + 2000`, 168 of 170
+> clusters covered, 14 ambiguous), bridged to 1987-88 via `CLYR1YR2.DAT`. That
+> is the most valuable thing here and is tracked as its own issue. Note C4 is
+> blocked: the GLSS1/GLSS2 questionnaires are image-only scans.
+>
+> **Fix 2 (2016-17 `food_security` rekey to `hid`) is unaffected and is what
+> this PR now delivers.** It touches no file PR #673 touched.
+
 # Prior-Art Ledger — GH #323 (GhanaLSS)
 
 **Search tier used:** ripgrep + git (gitnexus MCP tools were not available in this
