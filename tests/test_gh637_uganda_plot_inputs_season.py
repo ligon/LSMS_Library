@@ -45,10 +45,27 @@ present.  The bug is that ROWS DISAPPEAR and that surviving rows carry summed
 quantities under a borrowed unit.  These tests assert on exact row counts and
 on the specific rows that were being merged.
 """
+import importlib.util as _iu
+from pathlib import Path as _Path
+
 import pandas as pd
 import pytest
 
-from tests.conftest import requires_s3
+# `requires_s3` lives in tests/conftest.py, and importing it is fiddlier than it
+# looks: the repo ROOT also has a conftest.py, so a bare `from conftest import`
+# picks up the wrong one, while `from tests.conftest import` resolves against an
+# INSTALLED `tests` package in site-packages and dies as `No module named
+# 'tests.tests'`.  That is not hypothetical -- it is how this module failed the
+# CI `unit-tests` job (run 32451080297) while passing locally, where sys.path
+# ordering happens to favour the repo.  Load the sibling file by PATH, which is
+# the same in every import mode; this is the pattern already merged in
+# test_gh323_malawi_gb_cartesian.py and test_niger_cluster_features_geo.py.
+_conftest = _iu.module_from_spec(
+    _iu.spec_from_file_location(
+        'lsms_tests_conftest', _Path(__file__).with_name('conftest.py')))
+_conftest.__loader__.exec_module(_conftest)
+requires_s3 = _conftest.requires_s3
+
 from lsms_library.country import Country
 
 # Building Uganda hits DVC -> S3.  The CI ``unit-tests`` job is deliberately
