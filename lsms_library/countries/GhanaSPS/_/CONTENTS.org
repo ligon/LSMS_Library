@@ -375,3 +375,336 @@ written into any config file for this country.
 ** TODO household_characteristics.py
 ** TODO food_acquired.py
 ** TODO other_features.py
+
+* Cluster identity IS available -- and three ways to get it wrong (2026-08-19)
+
+For years this country carried the claim, in =_/data_scheme.yml=, that
+"cluster identity [is] unavailable: no cluster var in the food files, 2013-14
+lacks EAs.dta, and EAs.dta is EA-level only".  *That was false*, and a `sample`
+feature is now wired for all three waves.  =2009-10/Data/S11A.dta= -- the
+wave-1 food source named in that very sentence -- carries =id1=..=id4=, with
+=id3= populated in all 425,255 rows and taking exactly *334* distinct values,
+the documented EA count.
+
+Each wave's =_/data_info.yml= carries the details.  The three traps:
+
+** 1. Wave 1: use =id3= ALONE, never a composite with =id1=/=id2=
+
+=id3= runs 1..342 with 334 distinct values, i.e. it is a *globally unique* EA
+number, not an EA-within-district counter.  Households per EA: 14--15, median
+15, matching the documented "Fifteen households were selected from each of the
+EAs."
+
+Building =(id1, id2, id3)= yields *335* groups, not 334: *EA 183 spans two
+district codes* (12 households under =id2=1=, 3 under =id2=94=), so the
+composite splits one real EA in two.  =(id1, id3)= gives 334, but adds nothing
+over =id3=.  =hhweight3= is constant within =id3=, as a cluster design weight
+should be -- a useful check that the key is right.
+
+** 2. Waves 2/3: slice the household id from the RIGHT, never the left
+
+Household ids are =S | RR | EEE | HHH= -- split counter, region, EA, household
+-- so the EA is the three characters *ending three from the right*.
+
+The id is *not fixed width*.  In 2017-18 the leading split counter runs to two
+digits, so 37 rows are 10 characters long.  A left-anchored =FPrimary[3:6]=
+shifts by one on exactly those rows and yields *336* EAs, two of which do not
+exist in wave 1.  =FPrimary[-6:-3]= yields exactly *334* in both waves, all of
+them wave-1 EAs.
+
+Both rules agree on 2013-14, so *a check on that wave alone passes* and the
+error only appears in wave 3.
+
+GH #140's own hypothesis, =FPrimary[:6]=, is wrong by a wide margin: 583
+prefixes in 2013-14 and 893 in 2017-18, against 334 real EAs.  Treat it as
+refuted.
+
+** 3. Weights exist for wave 1 ONLY, and that is producer-side
+
+=hhweight3= / =ppweight3= in =2009-10/Data/key_hhld_info.dta= are the THIRD
+revision, superseding =hhweight2= (=S10AI.dta=) and =hhweight= (=S5D3.dta=),
+which differ from it for every household.  Both are *expansion* weights:
+=hhweight3= sums to 7.11M households, =ppweight3= to 24.19M persons (~ Ghana's
+2010 census population).
+
+=ppweight3= = =hhweight3= x household size for all 5,009 households (verified
+against =S1D.dta='s 18,889 members; max deviation 9.6e-07, i.e. float32
+rounding).  It is a *per-person expansion weight*, not a panel weight.  This
+settles GH #140 open question 6.
+
+*No panel weight exists in any wave*, and waves 2 and 3 have no sampling weight
+at all -- all 189 of their =.dta= files were swept and the only "weight"
+variables are anthropometric body weight.  This is *positive* evidence, not an
+absence of searching: =2013-14/Documentation/Variable Lists/key_hhinfo_panel.xlsx=
+rows 17--18 assign =hhweight=/=ppweight= to wave 1 only, with every wave-2 cell
+blank.  No config change can close that gap.
+
+** A source discrepancy the sample join exposes
+
+=key_hhld_info.dta= is *not* a superset of the households in the food module.
+At source level (both files use 9-digit =hhno=), =S11A.dta= carries 29 =hhno=
+absent from =key_hhld_info.dta=, and =key_hhld_info.dta= carries 35 absent from
+=S11A.dta=.  So 690 of 407,929 =food_acquired= rows (0.17%, 29 households) take
+a NULL =v=.  That is a property of the shipped extract.  Do not loosen the join
+to hide it.
+
+* Wave 3 (2017-18) is a MIXED-VINTAGE directory (2026-08-19)
+
+=2017-18/Data/= now holds files from two sources under two different sets of
+terms.  =2017-18/Documentation/LICENSE.org= is the authority; this section is
+the file-by-file picture, measured rather than asserted.
+
+** What was added
+
+Ten modules were *entirely absent* from this repository and were acquired from
+Harvard Dataverse (=doi:10.7910/DVN/E5QP0F= v1.2, *CC0 1.0*), in their original
+Stata-14 form:
+
+| file                              | shape        |
+|-----------------------------------+--------------|
+| =01giv_education_beliefs_pre=     | 4,807 x 1240 |
+| =09b_education_beliefs_post=      | 4,807 x 951  |
+| =10avii_financial_health=         | 5,669 x 190  |
+| =07c_ids_module=                  | 2,805 x 101  |
+| =07c_ids_roster=                  | 19,006 x 15  |
+| =03bvi_mobile_money_awareness=    | 19,008 x 43  |
+| =03bvi_mobile_money_accounts=     | 5,272 x 67   |
+| =03bvi_mobile_money_agents=       | 52 x 8       |
+| =open_ended=                      | 5,669 x 11   |
+| =commtype=                        | 5,669 x 2    |
+
+Nothing was overwritten; all ten are additions.
+
+** What our pre-existing files are, relative to the published release
+
+Compared file-by-file against Dataverse v1.2 on 2026-08-19 (md5 of our DVC
+blob vs the md5 of the Dataverse original):
+
+| relation to the public release                       | files |
+|------------------------------------------------------+-------|
+| content-identical                                    |    66 |
+| ours carries EXTRA variables                         |    30 |
+| ours carries FEWER variables                         |   *0* |
+| public-only (now acquired, above)                    |    10 |
+| ours-only (no public counterpart)                    |     3 |
+
+*Beware a measurement trap here.*  Only *8* of the 66 content-identical files
+are *byte*-identical.  The other 58 have the *same byte size* but a different
+md5: they are Stata re-saves differing only in header metadata.  Verified by
+loading three of them and comparing frames -- same shape, same columns,
+=DataFrame.equals()= True.  A byte-level comparison alone reports "88 files
+differ" and badly overstates the divergence.
+
+** What the public release strips, and why it matters
+
+For all 30 files where we carry more, *row counts are identical* -- the
+difference is columns only, always =+N -0=.  The stripped variables fall into
+three consistent groups:
+
+1. *Free-text responses* -- every =...other= variable (=joinedwhyother=,
+   =fatherworkother=, =borrowpurposeother=, =whatmediaother=, ...).
+2. *Sub-district geography* -- =d_code=, =district=, =comm_code=, and the
+   =*_community= / =*_comm= family (=whereborn_community=,
+   =plotlocation_comm=, =schoolcommunity=, =relativewhere_community=, ...).
+3. *Consent and admin flags* -- =consented= (6 files), =main_consent=,
+   =audio_consent=, =read=, =consent=, =checkpoint1..3=, =index=.
+
+That is a *disclosure-control edit*, not a data revision.  Our copies are
+pre-anonymization relative to what the producers published.  Treat that as a
+redistribution question, not merely a provenance one.
+
+** A correction worth keeping
+
+It is tempting to argue that the extra geography is what makes the =sample=
+feature possible.  *It is not.*  Checked directly: the public
+=00_hh_info.dta= retains both =FPrimary= and =region=, which is exactly what
+=2017-18/_/data_info.yml= uses (=v= from =FPrimary[-6:-3]=, =strata= from
+=region=).  What the public release removes is the *finer* geography --
+=d_code=, =district=, =comm_code= -- which a future district- or
+community-level feature would want, but the current =sample= does not.
+
+** Renames, and a duplicate, to know about
+
+- Our =public_services.dta= *is* the public =10aix_public_services.dta=:
+  same shape (5,669 x 22), same columns, =DataFrame.equals()= True.  It is a
+  rename, not a missing file -- so the gap was *10* modules, not 11.
+- Our =00_comm_info.dta= and =rural-urban.dta= are *identical to each other*
+  (both 528 x 5, =regioncode/regionname/districtcode/communitycode/communitytype=):
+  the same community lookup held twice under two names.
+- Neither is community *survey* data.  The community instrument (wave 2 ships
+  Sections 7A/7B/7C "Shocks and Conflicts") has *no microdata in any wave* --
+  these are lookup tables, and the distinction matters for the shocks verdict.
+
+** DVC remote layout: this repo now uses BOTH
+
+The S3 remote carries legacy objects at =LSMS/{md5[:2]}/{md5[2:]}= (DVC 2.x)
+and newly-pushed ones at =LSMS/files/md5/{md5[:2]}/{md5[2:]}= (DVC 3.x).  The
+ten files above went to the *latter*.  =local_tools= already probes both
+(see the =_ensure_dvc_pulled= candidate lists), and a cold read round-trip was
+verified for one of the new blobs.  Probing only the legacy path makes a
+correctly-pushed blob look missing.
+
+* household_roster: what the three rosters are, and four ways to get them wrong (2026-08-20)
+
+=household_roster= is now wired for all three waves, index =(t, i, pid)= with
+=v= joined from =sample()= at API time.  Sources: =2009-10/Data/S1D.dta=;
+=2013-14/Data/01b2_roster.dta= and =2017-18/Data/01b2_roster.dta=, each merged
+=left= with its wave's =01d_background.dta= for =MonthsAway=.  Delivered
+counts are exactly the documented ones -- 18,889 / 16,356 / 19,006 persons in
+5,009 / 4,774 / 5,669 households.
+
+** 1. Wave 1: =s1d_2= is the RELATIONSHIP and =s1d_4i= is the AGE
+
+Read off the =.dta='s own variable labels: =s1d_1= "Q1 Sex", =s1d_2= "Q2
+Relationship to HH Head", =s1d_4i= "Q4i Age (years)".  A task brief circulated
+in 2026-08 had =s1d_2= as age and =s1d_4i= as relationship; that is *wrong*,
+and both the labels and the value distributions settle it (=s1d_2= takes
+'Household Head'/'Child'/'Spouse'..., =s1d_4i= is numeric 0-120).  The
+=FINDINGS_ghanasps_module_inventory.org= F2 entry has it right.
+
+Note also the source typo =sid_3i= (not =s1d_3i=) for "Q3i Day of birth".
+
+** 2. Wave 1 has NO usable MonthsAway, and the reason is not what it looks like
+
+=s1d_27= "Q27 For how many months has person been away from this household in
+last 12 months" is the right variable and is the same question waves 2 and 3
+ask.  It is nonetheless *not wired*, because its missingness is
+household-level rather than person-level:
+
+- non-null for 9,956 of 18,889 members (52.7%);
+- *2,188 of 5,009 households have NO member answered* and 2,537 have every
+  member answered; only 284 are partial.  48 whole EAs sit at 0%;
+- inside those 2,188 households the non-null rate of =s1d_27= is exactly
+  0.000000 and of =s1d_28= exactly 0.000000, while every other roster variable
+  is populated at the *same* rate as elsewhere (Sex 100%, Relationship 100%,
+  Age 99.96%, religion 97.6%, Q23 98.5%).  The households were fully
+  enumerated; only the Q27-Q33 absence block is missing;
+- the answer rate is flat across age (51-57% in every band, infants included),
+  so it is not an eligibility skip.
+
+So NaN here does *not* mean "this person had left", which is the premise
+=roster_to_characteristics()= relies on when it drops NaN-residence members.
+Nor does NaN mean "never away": the survey records 0 *explicitly* for 8,840 of
+the 9,956 answered members, so filling 0 would fabricate data.
+
+Measured cost of wiring it anyway: the derived =household_characteristics=
+would keep 9,942 of 18,889 persons and *2,817 of 5,009 households* -- 2,192
+households (43.8%) would silently vanish from a table whose
+=household_roster= is fully populated.  Leaving it undeclared instead trips the
+documented per-wave fallback in =roster_to_characteristics= ("a wave with no
+usable residence datum at all reverts to counting every roster member"), which
+emits a =UserWarning= naming =2009-10=.  That warning is expected and is the
+honest outcome: every roster member counted, mean household size 3.771.
+
+Note the delivered =household_characteristics= nonetheless has *5,008* wave-1
+households, not 5,009.  That is a separate, unrelated step: after the
+residence filter, =roster_to_characteristics= does
+=dropna(subset=['sex','age'])=, and 5 wave-1 members have a null =s1d_4i=.
+Four of them sit in households of size 2-4 that survive on their remaining
+members; the fifth, =hhno= 107254027, is a *one-person* household whose only
+member (a female head) has no age, so the household disappears.  Waves 2 and
+3 lose 12 and 8 households respectively (4,774 -> 4,762, 5,669 -> 5,661); there
+the residence filter and the null-Sex/Age drop both contribute and this note
+does not decompose them.
+
+Waves 2 and 3 have a *clean* =awaylast12= (16,353/16,354 and 18,980/19,006
+non-null, strictly 0-12), so they are filtered normally.
+
+*** The one out-of-range value
+
+=s1d_27= takes the value *15* on exactly one row -- =hhno= 105144071,
+=hhmid= 2, a 48-year-old female spouse -- in a 12-month reference period.  No
+negatives, no other value above 12.  Its meaning could not be determined from
+any document in the corpus.  It is moot while the column is undeclared; anyone
+who wires =s1d_27= later must decide explicitly (leaving it NA is the
+documented default) rather than clip silently.  Note that
+=roster_to_characteristics= would *not* yield "-3 months present" for it: the
+conversion is =np.clip(12 - value, 0, None)=, so a 15 becomes 0 months present
+and the person is dropped -- quietly, which is the worse failure.
+
+** 3. The relationship vocabulary DRIFTS between waves
+
+Same underlying categories, three different spellings, so =kinship.yml= needed
+five new keys (added 2026-08-20) or Generation/Distance/Affinity would have
+come back null:
+
+| category            | 2009-10                  | 2013-14                       | 2017-18                   |
+|---------------------+--------------------------+-------------------------------+---------------------------|
+| head                | Household Head           | Household Head                | *Head*                    |
+| adopted/foster/step | Adopted/Foster/Stepchild | Adopted, foster, or stepchild | Adopted, foster/stepchild |
+| parent-in-law       | Parent/Parent-in-Law     | *Parent or parent-in-law*     | Parent/Parent-in-law      |
+| child-in-law        | Son/Daughter-in-law      | *Son or daughter in-law*      | Son/Daughter-in-law       |
+
+A check on one wave therefore does not transfer.  Post-fix,
+Generation/Distance/Affinity are 0.000% null in waves 1 and 3 and 0.043% null
+in wave 2 -- and those 7 rows are exactly the 7 rows where the source
+=relationship= is itself null, not a decode failure.
+
+** 4. =Distance= is CONSTANT 0 for this country, and that is real
+
+=is_this_feature_sane= flags =no_constant_columns= on =Distance=.  It is not a
+bug: GSPS's relationship list has no collateral category at all -- no
+sibling, no cousin, no niece/nephew, no uncle/aunt.  Everything is lineal
+(head/spouse/child/grandchild/parent) or a catch-all ('Other relative',
+'Non-relative', 'Househelp'), and =kinship.yml= maps 'Other relative' to
+=[0, 0, consanguineal]=.  Do not "fix" it by re-mapping 'Other relative' to a
+collateral distance the survey never asserted.
+
+** Sourcing: =01b2_roster.dta= is complete; newroster/preroster are EVENT tables
+
+The temptation is to union =01b2_newroster.dta= / =01b2_preroster.dta= into the
+roster on the theory that the roster omits split-offs and joiners.  It does
+not:
+
+- wave 3's roster carries its own =new_mem= flag -- 14,168 'No' + 4,838 'Yes'
+  = 19,006 -- i.e. continuing members and joiners are *already unioned*;
+- =01b2_newroster.dta= (4,839 rows) is the JOINER event table
+  (=joinedwhy_*=, =joinedhowlong=, =joinedfromwhere=);
+- =01b2_preroster.dta= is the LEAVER event table (=stillmember=,
+  =whynotmember=, =notmember_died=, =howlongnotmember=).  Wave 3's 4,070
+  =stillmember == 'No'= rows have a NULL =hhmid= and are absent from the
+  roster, correctly: they left.  Wave 2's =currentmember == 'Yes'= rows number
+  *exactly 16,356*, the wave-2 roster row count -- which is the check that the
+  roster is the complete current-member set.
+
+Merging the event tables in would add people who left, which the survey's own
+6-month membership rule excludes.
+
+*Residual, recorded rather than hidden*: in wave 3, 53 of the 4,839 newroster
+keys have no roster counterpart and 56 roster rows flagged =new_mem='Yes'= are
+absent from newroster.  The counts nearly balance, so this looks like =hhmid=
+renumbering for a handful of joiners rather than missing people (0.28% of
+persons either way).  Not reconciled; do not union the frames without first
+establishing the correct key.
+
+*Measurement trap*: =preroster.hhmid= is =float64= (it carries NaNs) while
+=roster.hhmid= is =int8=.  Comparing them via =astype(str)= gives '1.0' vs '1'
+and reports a spurious *zero* overlap between files that in fact overlap
+almost completely.  Normalise through =pd.to_numeric= before any key
+comparison here.
+
+** The merge is 1:1 in both waves -- verified per wave, not in aggregate
+
+=MonthsAway= lives in =01d_background.dta=, a different file from the roster,
+so waves 2 and 3 use a =dfs:= merge on =(i, pid)= (GH #323 site 4 territory).
+=(FPrimary, hhmid)= is unique in *both* frames in *both* waves, so the count of
+key values duplicated in both -- the exact cartesian test -- is 0:
+
+| wave    | roster keys | background keys | intersection | roster-only | background-only |
+|---------+-------------+-----------------+--------------+-------------+-----------------|
+| 2013-14 |      16,356 |          16,354 |       16,354 |           2 |               0 |
+| 2017-18 |      19,006 |          19,006 |       19,006 |           0 |               0 |
+
+=merge_how: left= with the roster authoritative.  In 2013-14 that is also
+output-identical to the =outer= default (background contributes no rows of its
+own), but that is a fact about this extract, not a guarantee -- which is why
+wave 3 is checked separately rather than by analogy.
+
+** Wave 1's roster and its sample key agree exactly
+
+Unlike the food module -- where =S11A.dta= and =key_hhld_info.dta= disagree by
+29 and 35 =hhno= respectively (see "A source discrepancy the sample join
+exposes" above) -- =S1D.dta= and =key_hhld_info.dta= carry *identical*
+household sets in both directions.  The =v= join is therefore total for
+=household_roster=: 0 null =v= across all 54,251 rows in all three waves, 334
+distinct EAs.

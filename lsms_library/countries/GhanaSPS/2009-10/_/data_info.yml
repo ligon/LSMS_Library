@@ -1,0 +1,142 @@
+sample:
+    # key_hhld_info.dta is the wave-1 household key: exactly 5,009 rows, one
+    # per household, carrying the EA (id3), the locality stratum (loc7),
+    # urban/rural (urbrur) and the revised weights.
+    #
+    # `hhweight3` / `ppweight3` are the THIRD revision and supersede
+    # `hhweight2` (S10AI.dta) and `hhweight` (S5D3.dta), which differ from it
+    # for every household.  Both are EXPANSION weights: hhweight3 sums to
+    # 7.11M households and ppweight3 to 24.19M persons (~ Ghana's 2010 census
+    # population).  ppweight3 == hhweight3 * household size for all 5,009
+    # households (verified against S1D.dta's 18,889 members, max deviation
+    # 9.6e-07), so it is a per-person weight, NOT a panel weight -- this
+    # settles GH #140 open question 6.
+    #
+    # No panel weight exists in ANY GhanaSPS wave.  Wave 1 is the baseline
+    # (pre-refreshment), so panel_weight carries the same value as weight, per
+    # the convention in CLAUDE.md; waves 2 and 3 have neither.
+    # KNOWN SOURCE DISCREPANCY: key_hhld_info.dta is NOT a superset of the
+    # households in the food module.  At source level (both files use 9-digit
+    # hhno), S11A.dta carries 29 hhno values absent from key_hhld_info.dta, and
+    # key_hhld_info.dta carries 35 absent from S11A.dta.  Consequence: 690 of
+    # 407,929 food_acquired rows (0.17%, 29 households) get a NULL `v` from the
+    # sample join.  This is a property of the shipped extract, not of this
+    # config -- do not "fix" it by loosening the join.
+    file: key_hhld_info.dta
+    idxvars:
+        i: hhno
+    myvars:
+        v: id3
+        weight: hhweight3
+        panel_weight: hhweight3
+        strata: loc7
+        Rural: urbrur
+
+household_roster:
+    # S1D.dta is the wave-1 person roster: 18,889 rows, 5,009 households,
+    # (hhno, hhmid) unique -- exactly the 18,889 members the Baseline
+    # Descriptive Report documents.  Its households match key_hhld_info.dta
+    # exactly in BOTH directions (0 in S1D absent from the key file, 0 in the
+    # key file absent from S1D), so the sample v-join is total here -- unlike
+    # the food module, which has the 29/35 hhno discrepancy noted above.
+    #
+    # Variable labels read off the .dta, because the obvious guess is wrong:
+    #   s1d_1  "Q1 Sex"                        -> Sex   (Male/Female)
+    #   s1d_2  "Q2 Relationship to HH Head"    -> Relationship
+    #   s1d_4i "Q4i Age (years)"               -> Age
+    # NOTE s1d_2 is the RELATIONSHIP and s1d_4i is the AGE.  A prior task brief
+    # had these two swapped; the variable labels and the value distributions
+    # both settle it (s1d_2 takes 'Household Head'/'Child'/'Spouse'..., s1d_4i
+    # is numeric 0-120).
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    #
+    # DOB triple deliberately NOT wired.  sid_3i (note the typo: `sid_`, not
+    # `s1d_`) / s1d_3ii / s1d_3iii are "Q3i Day of birth" / "Q3ii Month of
+    # birth" / "Q3 Year of birth", and age_handler() could turn them into
+    # fractional ages.  Left out because the reported age is already 18,884 of
+    # 18,889 non-null (5 missing), the day column is only 50% populated and
+    # object-dtype, and wave 1 has no interview-date table to anchor the
+    # arithmetic.  Cost exceeds the benefit; revisit if interview_date lands.
+    #
+    # ---------------------------------------------------------------------
+    # MonthsAway: s1d_27, with NaN read as 0.  Read this before changing it.
+    #
+    # s1d_27 is "Q27 For how many months has person been away from this
+    # household in last 12 months" -- the MonthsAway question in the CLAUDE.md
+    # taxonomy, and the same question waves 2 and 3 ask.  It is non-null for
+    # only 9,956 of 18,889 members (52.7%), and an earlier version of this file
+    # left it UNDECLARED on the reasoning that NaN could not mean "never away",
+    # since the survey records 0 explicitly for 8,840 of the 9,956 answered.
+    #
+    # That reasoning was WRONG, and the check that produced it was
+    # non-discriminating.  It observed that within the all-missing households
+    # s1d_27 and s1d_28 are both 0.000000 non-null -- but s1d_28 is only 0.1%
+    # non-null in the WHOLE FILE (18 rows), because Q28-Q33 are the follow-ups
+    # asked of people who ARE away.  They are ~absent everywhere, so their
+    # absence in those households discriminates nothing.
+    #
+    # Q27-Q33 is a skip block.  Confirmed on the shipped file:
+    #   - of the 8,933 members with s1d_27 missing, the number with any of
+    #     s1d_28..s1d_33 populated is NINE (0.101%), in 5 households;
+    #   - among members who DO answer, the Q28-33 block fires for 154 of the
+    #     1,116 away (s1d_27>0) and 14 of the 8,840 at home -- i.e. it is
+    #     conditional on being away, as the labels say.
+    #
+    # And the missingness is a RECORDING CONVENTION, not a person attribute.
+    # Per-EA answer rates are sharply bimodal -- 48 of 334 EAs at 0%, 128 at
+    # 100%, only 17 in the 25-75% middle -- and the share of RECORDED values
+    # that are non-zero falls monotonically as the EA answers more people:
+    #
+    #     EA answer rate |    n | % of recorded values that are NON-ZERO
+    #     ---------------+------+---------------------------------------
+    #     0-25%          |  468 | 95.9
+    #     25-50%         |  139 | 70.5
+    #     50-75%         |  227 | 12.8
+    #     75-99%         | 1745 |  4.2
+    #     100%           | 7377 |  6.3
+    #
+    # Teams that recorded almost nobody recorded almost exclusively the AWAY
+    # cases; teams that recorded everybody wrote mostly zeros.  That is the
+    # signature of "blank = not away", so the 8,840 explicit zeros are not
+    # evidence against NaN->0 -- they are what the thorough teams wrote where
+    # the others left the cell empty.  The fill is applied by the
+    # `household_roster` df_edit hook in this wave's mapping.py.
+    #
+    # Cost of getting this wrong in the other direction: leaving it undeclared
+    # made wave 1 fall back to counting every roster member; declaring it
+    # WITHOUT the fill would have dropped 2,192 households (43.8%) from the
+    # derived household_characteristics, because roster_to_characteristics()
+    # drops members whose residence datum is NaN.
+    #
+    # Residuals, both documented rather than silently smoothed:
+    #   - the 9 members above have move data but no s1d_27.  Under NaN->0 they
+    #     are recorded as never away, which for them is probably wrong.  They
+    #     are 0.05% of the roster; the hook does not special-case them.
+    #   - exactly ONE out-of-range value: hhno 105144071, hhmid 2 (female
+    #     spouse, age 48) reports 15 months away in a 12-month reference
+    #     period.  No negatives, no other value above 12.  The hook clips it to
+    #     12 -- the largest value consistent with the reference period -- rather
+    #     than guessing at a keying error.  Note that leaving it at 15 would
+    #     make roster_to_characteristics compute clip(12-15, 0, None) = 0
+    #     months present and drop the person SILENTLY.
+    #   - declaring the column costs ONE household in the derived
+    #     household_characteristics: hhno 107268086, whose three members all
+    #     report 12 months away in the source (verified raw -- not the clip
+    #     above; it is the only household in the wave where every member
+    #     reports 12).  All three therefore have zero months present and are
+    #     filtered out, so the household disappears from a table its roster
+    #     populates.  That is the framework honouring the data, not a defect,
+    #     but it is the kind of silent vanishing worth naming.  (hhno
+    #     107254027 also has no household_characteristics row, for the
+    #     unrelated pre-existing reason that its single member has no Age.)
+    # ---------------------------------------------------------------------
+    file: S1D.dta
+    idxvars:
+        i: hhno
+        pid: hhmid
+    myvars:
+        Sex: s1d_1
+        Age: s1d_4i
+        Relationship: s1d_2
+        MonthsAway: s1d_27

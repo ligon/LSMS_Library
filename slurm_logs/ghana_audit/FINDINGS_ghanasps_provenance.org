@@ -1,0 +1,758 @@
+#+title: GhanaSPS -- data vintage and provenance: evidence for the GH #140 keep-or-reacquire decision
+#+date: [2026-08-19 Wed]
+#+author: audit agent (Claude Opus 5), branch audit/ghana-correctness
+#+options: toc:2
+
+* 0. Scope, method and epistemic rules
+
+This file assembles evidence.  It does *not* make the keep-or-reacquire
+decision that GH #140 asks a human for.
+
+Conventions used throughout, and enforced:
+
+- "the catalog says X" and "the data is X" are kept apart.  Catalog metadata is
+  a claim by a cataloguer; a byte count or a Stata header is a property of the
+  bits we hold.
+- Every external claim carries its URL and the date it was retrieved.
+- Where a fetch failed, that is recorded as a failure.  Nothing in this file is
+  supplied from memory.
+- Where a finding was *reproduced this session*, it says so.  Where it is
+  quoted from prior work in the repository, it is attributed and marked as not
+  re-verified.
+
+** What was done this session (2026-08-19)
+
+Local, read-only:
+- read =GhanaSPS/_/CONTENTS.org=, =_/notes.org=, =_/README.org=, the three
+  =Documentation/SOURCE.org=, =2009-10/Documentation/LICENSE.org=,
+  =_/data_scheme.yml=, =_/Makefile= and all six wave scripts;
+- extracted text from =ddi-documentation-english_microdata-2534.pdf=;
+- parsed the Stata header (format release, n-variables, n-observations, save
+  timestamp) of *all 313* =.dta= blobs from the content-addressed L1 cache at
+  =~/.local/share/lsms_library/dvc-cache=, resolved through the =.dvc= sidecar
+  md5.  No =dvc= CLI was invoked; nothing was downloaded, modified or deleted;
+- scanned the variable names of all 313 blobs for weight-like names;
+- traced =git log --diff-filter=A= through the two path renames.
+
+Network, read-only:
+- =lsms_library.data_access.discover_waves('GhanaSPS')=;
+- =lsms_library.data_access._wb_catalog_search('GHA', collection=None)= -- the
+  full-catalog sweep;
+- WB catalog 2534 study-description and data-dictionary pages;
+- IHSN 10354 and 10355 study-description and data-dictionary pages;
+- Harvard Dataverse API for =doi:10.7910/DVN/E5QP0F= (version list; full file
+  manifest with =originalFileName= / =originalFileSize=).
+
+** Summary of the vintage verdict, one line per wave
+
+| wave    | what we hold                                        | corroborated against                    |
+|---------+-----------------------------------------------------+-----------------------------------------|
+| 2009-10 | the World Bank published distribution, exactly      | WB 2534: 124/124 files, 124/124 (cases, vars) |
+| 2013-14 | close to, but NOT identical with, a public release  | IHSN 10354: 85/89 nvar match; Dataverse: 0/87 byte-identical |
+| 2017-18 | 66/95 files are the public release bit-for-bit; 29 are a PRE-ANONYMIZATION copy; 11 public files absent | IHSN 10355 + Dataverse, partitioning our files identically |
+
+* 1. Idiosyncrasies found in the country documentation
+
+The task required naming these, not merely confirming they were read.
+
+** From =_/CONTENTS.org=
+
+1. *GSPS is a panel, not three independent cross-sections, and only wave 1 has
+   a documented probability sample of Ghana.*  Verbatim: "Only wave 1 has a
+   documented probability sample of Ghana.  Waves 2 and 3 are follow-ups of
+   that sample plus households split off from it, and *no document in the
+   corpus states a universe for them*."  This governs any pooled use.
+2. *Wave 2 is 5009 wave-1 households + 475 split-offs = 5484 selected, 4774
+   interviewed.*  The 475 split-offs "enter through the tracking rule, not
+   through a probability draw from a national frame."
+3. *=2013-14= carries no region and no urban/rural variable.*  Verbatim:
+   "'2013-14' has no regions or urban/rural data. ... For now, all of 2013-14
+   has Ghana set as its region."  CONTENTS.org is explicit that this is a
+   *data-availability* fact about the shipped extract, "*not* a coverage or
+   universe claim, and must not be read as one."
+4. *The wave-1 sample is deliberately not self-weighting*: Upper East (16 EAs)
+   and Upper West (12 EAs) were over-sampled, so "unweighted GSPS wave-1 means
+   are not national means."
+5. *5010 vs 5009*: 5010 sampled, 5009 interviewed; the Basic Information
+   Document reconciles it ("only one sampled household could not be included
+   for reason of data incompleteness").
+6. *Household membership requires 6 months' residence* -- a person-level
+   inclusion rule that matters for roster-derived counts.
+7. *Wave-label discrepancy.*  Our directory is =2017-18=; the local instrument
+   cover page reads "WAVE 3 (2018-2019)"; the IHSN entry is "Socioeconomic
+   Panel Survey 2018-2019, Wave 3".  CONTENTS.org: "The identification of this
+   directory with GSPS Wave 3 rests on the local instrument's cover page, not
+   on the microdata."
+8. *Never conflate wave 3 with the 2019 "extremely poor" northern sample* -- a
+   separate purposive sample, "*not* present in =GhanaSPS/2017-18/=".
+9. *No "Universe" field exists anywhere locally*; the only one is WB catalog
+   metadata for wave 1, "outside the repository and revisable without notice."
+10. *CONTENTS.org asserts waves 2 and 3 are not in the WB Microdata Library.*
+    Verbatim (wave 2): "*not* the World Bank catalog -- GSPS Wave 2 is not in
+    the WB Microdata Library at all."  *This session VERIFIES that claim* --
+    see section 4.1.
+11. *Wave 3's community instrument is titled "RURAL COMMUNITY INSTRUMENT"* and
+    CONTENTS.org warns this "scopes the community-level module only" and is not
+    a rural restriction on the household sample.
+
+** Idiosyncrasies found this session and NOT recorded in CONTENTS.org
+
+These are offered for a human to add; this agent is read-only and did not edit
+=CONTENTS.org=.
+
+1. *=GhanaSPS/_/README.org= is misfiled content.*  It is a variable map for
+   *GhanaLSS* years 1988, 1989, 1991 and 1998 (=SEC9B=, =fdexpcd=, =s9bq1=...)
+   -- a different survey entirely.  It contains nothing about GSPS.  (The
+   2026-04-09 plan already noted "=_/README.org= Stale (GhanaLSS content)", but
+   CONTENTS.org does not.)
+2. *The wave-2 food file name is misspelled at source*:
+   =11a_foodcomsumption_prod_purch.dta= ("comsumption").  The misspelling is
+   *not* ours -- IHSN 10354's data dictionary lists the same misspelling, and
+   so does the Harvard Dataverse manifest.  It must be preserved verbatim in
+   any config; =2017-18/= spells it correctly
+   (=11a_foodconsumption_prod_purch.dta=), so the two waves genuinely differ.
+3. *=2017-18/Data/Crop_encrypted/= exists* -- an encrypted crop-data directory,
+   added in a separate commit =bf8d4c2c= "Add encrypted Ghana crop data"
+   (2021-05-16).  Encrypted delivery is a marker of a direct producer transfer
+   rather than a public download.
+4. *Wave 1 carries three weight-like variables in three different files*, not
+   one: =key_hhld_info.dta= has =hhweight3= and =ppweight3=; =S10AI.dta= has
+   =hhweight2=; =S5D3.dta= has =hhweight=.  Section 5.3.
+5. *The WB-published wave 1 is itself labelled a first version that is
+   incomplete*: "v0.1: The first version of the data includes the household and
+   individual level data, but does not include the community level data."
+   There is no later WB version; see section 3.1.
+6. *=_/data_scheme.yml= carries a load-bearing claim about cluster identity*:
+   "GhanaSPS has NO =sample= table (cluster identity unavailable ...). So =v= is
+   not joined and the index is (t, i, j, u, s) WITHOUT v."  This is in tension
+   with the GH #140 comment of 2026-07-22, which reports (on GH #579) that the
+   EA is recoverable from the household id as =v = i[-9:][1:6]=.  Not
+   adjudicated here; flagged because the two files disagree.
+
+* 2. Per-wave: what we hold, and the vintage evidence
+
+** 2.1 Acquisition anchor (all three waves)
+
+Traced through both path renames (=Ghana/= -> =GhanaSPS/= at =273525e5=,
+2023-04-04; -> =lsms_library/countries/GhanaSPS/= at =9dddd806=, 2025-08-08,
+"Great rearrangement"):
+
+| commit     | date       | what                                                        |
+|------------+------------+-------------------------------------------------------------|
+| =8a05fff3= | 2020-12-16 | "Update dvc store of data from Ghana Panel and Rwanda." -- FIRST appearance of all three waves' =Data/= |
+| =52539c28= | 2021-05-16 | "Add some stray 2009-10 data."                              |
+| =bf8d4c2c= | 2021-05-16 | "Add encrypted Ghana crop data." (=2017-18/Data/Crop_encrypted=) |
+
+So *everything we hold entered the repository on or before 2021-05-16*.  Every
+catalog date below should be read against that anchor.
+
+The =.dvc= sidecars carry only =md5=, =size=, =path= -- *no modification time*.
+Filesystem mtimes are worthless here (the workspace holds zero materialized
+=.dta=; the bits live in the content-addressed L1 cache).  The Stata header
+timestamp is therefore the only internal vintage marker, and it records the
+*producer's last save*, not a release date.
+
+L1 cache coverage, checked this session: 2009-10 124/125 blobs present (only
+=Consumption Aggregates_STATA8.zip= absent), 2013-14 89/89, 2017-18 100/100.
+
+** 2.2 2009-10 (Wave 1) -- IS the World Bank published distribution
+
+*** SOURCE.org, verbatim
+
+#+begin_example
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2534
+
+#+CATALOG_ID: 2534
+#+CATALOG_IDNO: GHA_2009_GSPS_v01_M
+#+CATALOG_TITLE: Socioeconomic Panel Survey: 2009-2010
+#+CATALOG_YEARS: 2009-2010
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/851p-b825
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2534
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12
+#+end_example
+
+*GAP: there is no =#+PROVENANCE_VALIDATION:= keyword.*  Per CLAUDE.md that
+field records "how strongly an id is corroborated -- =content-validated= ...
+vs. =catalog-only=".  On the evidence below this wave now qualifies as
+=content-validated= by a wide margin, but the file does not say so.
+
+=LICENSE.org= is present for this wave only.  Its operative clause, quoted
+because it bears on the redistribution question in section 6: "4. Users who
+download the data may not pass the data to third parties. 5. The database
+cannot be used for commercial ends, nor can it be sold."
+
+*** Vintage evidence -- five independent checks, all reproduced this session
+
+1. *Stata save timestamps.*  All 124 =.dta= are Stata format release *113*
+   (Stata 8/9-era) and every one is stamped *07 Jan 2016*, in a 60-minute
+   window from *15:00* (=S100.dta=) to *15:59* (=S70.dta=).  One batch export.
+2. *The catalog's own production date is the same day.*  WB 2534
+   study-description, retrieved 2026-08-19: "Metadata Production Date: January
+   7, 2016".
+3. *The shipped DDI PDF was generated four days later.*
+   =ddi-documentation-english_microdata-2534.pdf=, first page, verbatim:
+   "Report generated on: January 11, 2016".  The live page's "Last Modified"
+   is the same: "January 11, 2016" (retrieved 2026-08-19).  *WB 2534 has not
+   been touched in ten and a half years.*
+4. *Filename set-difference against the WB data dictionary is empty in both
+   directions.*  https://microdata.worldbank.org/index.php/catalog/2534/data-dictionary
+   (retrieved 2026-08-19) lists *124* files.  Our =Data/= holds 124 =.dta= (plus
+   =Consumption Aggregates_STATA8.zip=).  =only-ours= = {}, =only-WB= = {}.
+5. *Every file matches the catalog's declared shape exactly.*  Comparing the
+   =(cases, variables)= the catalog declares against =(nobs, nvar)= parsed from
+   our blob headers: *124 / 124 match*.  Zero mismatches.  Spot values:
+   =EAs= 334x2, =key_hhld_info= 5009x9, =S11A= 425255x20,
+   =consumption_expenditure= 690957x42.
+
+*** What the catalog says about its own completeness
+
+WB 2534 "Version Description", verbatim (retrieved 2026-08-19):
+
+#+begin_quote
+v0.1: The first version of the data includes the household and individual level
+data, but does not include the community level data.
+#+end_quote
+
+Corroborated by the shipped DDI, verbatim: "As of December 2015, Seperate
+documentation for the Community survey and the data will be made available
+later."  [sic]
+
+*So for wave 1 there is no "final" to move to at the World Bank.*  v0.1 is the
+only version the WB has ever published, and the community module it promises
+was never added there.
+
+*** But the World Bank distribution is NOT the same bits as the producers' own
+
+This is the one genuinely new finding for wave 1, and prior notes in this repo
+do not record it.
+
+Harvard Dataverse =doi:10.7910/DVN/E5QP0F= also carries a Wave 1 -- *123* files,
+original format "Stata 14 Binary".  Compared case-insensitively against our 124:
+
+- 121 filenames shared; *0 byte-identical*; all 121 differ.
+- Every difference is in the same direction -- the Dataverse file is *larger*,
+  by between *+3,478* and *+1,711,766* bytes.  (=s11a.dta=: ours 37,426,089;
+  Dataverse 39,137,855.)
+- Only in ours: =aggregated_expenditure.dta=, =consumption_expenditure.dta=,
+  =percapita_expenditure.dta=, =Consumption Aggregates_STATA8.zip=.  Dataverse
+  files those three under =Documentation/Technical Documents/Wave 1
+  Consumption Aggregates= instead of under =Data/Wave 1=.
+- Only in Dataverse: =s11a1.dta=, =s4h_agsection_panel.dta=.
+
+Interpretation, stated as inference: our wave 1 is the *WB v0.1 Stata-8
+distribution of January 2016*; Dataverse's wave 1 is a later *Stata-14
+re-release by the producers* (2022).  Both are public and authoritative; they
+are different artefacts.  A uniform positive size delta is what re-saving in a
+newer Stata format with richer metadata looks like, but this was *not* verified
+at the variable level -- no Dataverse file was downloaded this session.
+
+Corroboration that the two distributions share their documentation: the
+Dataverse Documentation file sizes match ours byte-for-byte --
+=Aggregate documentation.pdf= 299,276; =Baseline_Descriptive_Report.pdf=
+4,947,829; =Basic_information_Document.pdf= 662,053 (= our
+=Basic_Information_Dec_2015.pdf=); =Codebook.pdf= 1,777,187 (= our
+=CODE_BOOK.pdf=); =DDI_Documentation.pdf= 118,758 (= our
+=ddi-documentation-english_microdata-2534.pdf=).
+
+** 2.3 2013-14 (Wave 2) -- close to a public release, but not identical to either
+
+*** SOURCE.org, verbatim
+
+#+begin_example
+SOURCE
+
+(source URL not recorded)
+
+#+CATALOG_ID: none
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: Ghana Socioeconomic Panel Survey wave 2 (EGC-ISSER, Yale
+University / ISSER).  Not a World Bank dataset: a GHA query across the ENTIRE
+WB catalog (all collections, 152 entries) returns exactly one GSPS study --
+2534, the 2009-2010 wave -- and nothing later.  Directory contents
+(01a_consent.dta, 01b2_roster.dta, 00_comm_info.dta) are the EGC-ISSER
+instrument, not a WB one.  CATALOG_ID is 'none', not 'unknown'.
+#+end_example
+
+*GAPS*: no free-text source URL ("(source URL not recorded)"), no
+=CATALOG_IDNO=, no =PROVENANCE_VALIDATION=, and *no =LICENSE.org= for this
+wave*.  The note's claim about the catalog sweep is re-verified in section 4.1.
+
+*** Vintage evidence
+
+- *Stata format*: all 89 files are release *118* (Stata 14+).
+- *Save-date histogram* (parsed this session from the blobs):
+
+  | save date  | files |
+  |------------+-------|
+  | 2018-05-08 |    59 |
+  | 2019-09-11 |    21 |
+  | 2019-09-12 |     1 |
+  | 2019-10-10 |     8 |
+
+- *The 2018-05-08 date is exactly the public release's production date.*
+  IHSN 10354 study-description (retrieved 2026-08-19): Study IDNO
+  "GHA_2013_GSPS_v01_M"; Version Description "Version 01: Edited, anonymous
+  dataset for public distribution."; *Production Date: 2018-05-08*.
+
+*** Comparison against IHSN 10354's data dictionary
+
+https://catalog.ihsn.org/catalog/10354/data-dictionary (retrieved 2026-08-19)
+lists *91* files with variable counts.
+
+| measure                                      | result |
+|----------------------------------------------+--------|
+| our files                                    |     89 |
+| catalog files                                |     91 |
+| shared filenames                             |     89 |
+| our =nvar= equals the catalog's variable count |   *85* |
+| our =nvar= differs                           |      4 |
+| files only in ours                           |    *0* |
+| files only in the catalog                    |      2 (=cocoa= 1 var, =temp= 12 vars) |
+
+The four disagreements, and *every one runs the same way -- our copy has FEWER
+variables than the public release*:
+
+| file                           | ours | public |
+|--------------------------------+------+--------|
+| =02a_nr_relatives_questions=   |   90 |     91 |
+| =02b_nr_spouses_questions=     |   35 |     36 |
+| =03biii_outtransfersquestions= |   52 |     54 |
+| =03biv_intransfersquestions=   |   52 |     54 |
+
+Cross-tabulating save date against agreement: *all 59 files saved 2018-05-08
+agree with the catalog exactly*; the four disagreements are all among the 30
+files re-saved in 2019-09/10.
+
+*** Comparison against Harvard Dataverse v1.2
+
+Dataverse Wave 2 holds *87* files (original format Stata 14).  All 87 filenames
+are ours.  *0 of 87 are byte-identical*; sizes differ in both directions
+(=01d_background= ours 9,539,120 vs 6,997,430; =01b2_roster= ours 508,681 vs
+539,190).  Two of our files are absent from the Dataverse Wave 2 folder:
+=01a_consent.dta= and =10_determine_respondents.dta= -- *but both ARE listed in
+IHSN 10354* (8 and 13 variables respectively), so they are published, just not
+in that distribution.
+
+*** What this wave's vintage is, stated carefully
+
+Our wave-2 holdings are *not* the Dataverse v1.2 bits (0/87 identical) and are
+*not exactly* the IHSN/DataFirst v01 bits either (4 files carry fewer variables
+than v01 declares, and we lack =cocoa= and =temp=).  The 59-file 2018-05-08
+cohort agreeing perfectly with v01 is strong but circumstantial evidence that
+much of what we hold *is* the v01 release; the 2019 re-saves are a producer
+build we cannot match to any catalogued release.  *Whether the 2019 files are
+pre-release, post-release, or a private variant could not be determined from
+the artefacts available.*
+
+** 2.4 2017-18 (Wave 3) -- part public, part pre-anonymization, part missing
+
+*** SOURCE.org, verbatim
+
+#+begin_example
+SOURCE
+
+(source URL not recorded)
+
+#+CATALOG_ID: none
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: Ghana Socioeconomic Panel Survey wave 3 (EGC-ISSER, Yale
+University / ISSER).  Not a World Bank dataset -- see the GhanaSPS/2013-14
+note; the WB catalog holds only the 2009-2010 GSPS wave (2534).  CATALOG_ID is
+'none', not 'unknown'.
+#+end_example
+
+*GAPS*: same as wave 2 -- no URL, no =CATALOG_IDNO=, no
+=PROVENANCE_VALIDATION=, no =LICENSE.org=.  This wave's entire
+=Documentation/= directory is one questionnaire file.
+
+*** Vintage evidence
+
+- All 100 files are Stata format release *118*.
+- Save-date histogram: 2019-11-13 (3), 2019-11-14 (40), 2019-12-05 (39),
+  2019-12-06 (17), 2020-01-22 (1).  Range 2019-11-13 .. 2020-01-22.
+- The public release is *later*: IHSN 10355 (retrieved 2026-08-19) gives
+  "Version 01: Edited, anonymous dataset for public distribution.", *Production
+  Date: 2021*, metadata production 2021-11-10, last modified Jul 14 2022;
+  Harvard Dataverse published 2022-11-03.  *Our bits predate every catalogued
+  public release of this wave by 1--3 years.*
+
+*** Two independent catalogs partition our files identically
+
+This is the sharpest single result in the audit.
+
+Against *IHSN 10355's data dictionary* (97 files, variable counts):
+
+| measure                          | result |
+|----------------------------------+--------|
+| our files                        |    100 |
+| shared filenames                 |     95 |
+| our =nvar= equals catalog        |     66 |
+| our =nvar= differs               |     29 |
+| only in ours                     | 5: =00_comm_info=, =01c_consentunder18=, =01fi_employmentmain=, =public_services=, =rural-urban= |
+| only in catalog                  | 2: =commtype=, =outtransfersquestions= |
+
+Against *Harvard Dataverse Wave 3* (107 files, =originalFileSize=):
+
+| measure                     | result |
+|-----------------------------+--------|
+| shared filenames            |     96 |
+| byte-size IDENTICAL         |     66 |
+| byte-size DIFFERENT         |     30 |
+| only in ours                | 4: =00_comm_info=, =01c_consentunder18=, =public_services=, =rural-urban= |
+| only in the public release  | 11: =01giv_education_beliefs_pre=, =03bvi_mobile_money_accounts=, =03bvi_mobile_money_agents=, =03bvi_mobile_money_awareness=, =07c_ids_module=, =07c_ids_roster=, =09b_education_beliefs_post=, =10aix_public_services=, =10avii_financial_health=, =commtype=, =open_ended= |
+
+Cross-tabulating the two *independent* checks over the 95 files present in all
+three places:
+
+| Dataverse byte size | IHSN variable count | files |
+|---------------------+---------------------+-------|
+| identical           | equal               |  *66* |
+| differs             | differs             |  *29* |
+| identical           | differs             |     0 |
+| differs             | equal               |     0 |
+
+*Zero disagreements.*  Two catalogs maintained by different institutions, on
+two different measures, split our 95 files into the same 66 and the same 29.
+
+*** The direction of the difference names the mechanism
+
+For *all 29* differing files our copy has *MORE* variables than the public
+release; not one has fewer.  Examples: =00_hh_info= 12 -> 9; =01a_consent=
+12 -> 5; =01d_background= 64 -> 58; =01gi_generaleducation= 95 -> 91;
+=01b2_newroster= 35 -> 32.  Both catalogs describe their release as "Version
+01: *Edited, anonymous* dataset for public distribution."
+
+So the difference is *variables removed by the producers before publication*.
+Our copy is a *pre-anonymization* build.  (The GH #140 comment of 2026-07-22
+reports the three variables dropped from =00_hh_info= are =d_code=, =district=
+and =comm_code=; that specific attribution was *not re-verified this session*
+-- we verified only that three variables are gone.)
+
+Note the compound consequence: we hold *more* per-file detail than the public
+release for 29 files, and *no data at all* for 11 files the public release
+carries (mobile money x3, education beliefs x2, an ids module x2, public
+services, financial health, commtype, open_ended).
+
+*** The three food-module source files
+
+Because the twelve currently-=sane= cells all rest on these:
+
+| wave    | file                                   | ours (nobs x nvar) | corroboration |
+|---------+----------------------------------------+--------------------+---------------|
+| 2009-10 | =S11A.dta=                             | 425255 x 20        | matches WB 2534 exactly (425,255 cases / 20 vars) |
+| 2013-14 | =11a_foodcomsumption_prod_purch.dta=   | 434162 x 18        | =nvar= matches IHSN 10354 (18); saved 2018-05-08, the v01 production date |
+| 2017-18 | =11a_foodconsumption_prod_purch.dta=   | 147479 x 16        | *byte-identical* to Dataverse (26,576,266 both) AND =nvar= matches IHSN 10355 (16) |
+
+All three food source files corroborate against a public release.  On present
+evidence *the food pipeline is not the part of GhanaSPS at provenance risk.*
+
+* 3. Live-catalog availability, as retrieved 2026-08-19
+
+** 3.1 World Bank Microdata Library
+
+=discover_waves('GhanaSPS')=, run this session, output verbatim:
+
+#+begin_example
+[{'doi': 'https://doi.org/10.48529/851p-b825',
+  'id': '2534',
+  'idno': 'GHA_2009_GSPS_v01_M',
+  'local': True,
+  'local_status': 'yes',
+  'local_waves': ['2009-10'],
+  'repository': 'lsms',
+  'title': 'Socioeconomic Panel Survey: 2009-2010',
+  'url': 'https://microdata.worldbank.org/index.php/catalog/2534',
+  'wave': '2009-10',
+  'year_end': 2010,
+  'year_start': 2009}]
+#+end_example
+
+Exactly one wave.  Note the config that produced it:
+=lsms_library/data_access.py:182= gives GhanaSPS
+=CountryCatalog("GHA", idno_pattern=r"_GSPS")= with =repositories= at its
+default =("lsms",)= -- so =discover_waves= searched *only* the =lsms=
+collection.  Per CLAUDE.md that default has hidden entire series before
+(Armenia, Liberia, South Africa), so the narrow result is not by itself
+sufficient.
+
+*The broad sweep was therefore run as well* -- =_wb_catalog_search('GHA',
+collection=None)=, all collections:
+
+- *152* GHA entries returned, spread over 23 repositories:
+  =global-findex= 9, =datafirst= 14, =central= 22, =microdata_rg= 25,
+  =impact_evaluation= 6, =Afrobarometer= 3, =fat= 2, =afrobarometer= 6,
+  =unhcr= 10, =enterprise_surveys= 4, =cos= 1, =dhs= 10, =sief= 6, =fao= 6,
+  =COS= 3, =mics= 1, =ipums= 9, =step= 1, =MCC= 4, =MICS= 2, =lsms= 5,
+  =who= 1, =WHO= 2.
+- Entries whose =idno= contains =GSPS=: *exactly one* -- id 2534,
+  =GHA_2009_GSPS_v01_M=, repository =lsms=.
+
+*=CONTENTS.org='s claim is VERIFIED, not refuted*: GSPS waves 2 and 3 are not
+in the World Bank Microdata Library, in any collection, as of 2026-08-19.
+
+WB 2534 study-description, retrieved 2026-08-19, quoted verbatim:
+- Version Description: "v0.1: The first version of the data includes the
+  household and individual level data, but does not include the community level
+  data."
+- Metadata Production Date: "January 7, 2016"
+- Study ID: "GHA_2009_GSPS_v01_M"
+- Last Modified: "January 11, 2016"
+- Universe: "Nationally representative, regionally representative for all 10
+  regions."  (identical to the string CONTENTS.org recorded on 2026-07-21)
+
+*** Failed fetch, recorded as a failure
+
+https://microdata.worldbank.org/index.php/catalog?sk=Ghana+panel returned an
+*unfiltered* result set -- "results 1-15 of 1,573", beginning with Afghanistan
+entries.  The =sk== parameter was evidently not applied on the plain catalog
+route.  *That fetch yielded nothing about Ghana and is not used as evidence
+anywhere in this file.*  The API route
+=/index.php/api/catalog/search?sk=socioeconomic+panel&country=GHA= returned
+HTTP-200 but a structurally empty body through WebFetch, and
+=/index.php/api/catalog/2534= returned *HTTP 400*.  The authenticated in-repo
+client (=_wb_catalog_search=, which sends =X-API-KEY=) worked, and is what the
+counts above come from.
+
+** 3.2 IHSN / ISSER (waves 2 and 3)
+
+https://catalog.ihsn.org/catalog/10354/study-description (retrieved 2026-08-19):
+- Study IDNO: "GHA_2013_GSPS_v01_M"
+- Title: "Socioeconomic Panel Survey 2013-2014, Wave 2"
+- Version Description: "Version 01: Edited, anonymous dataset for public distribution."
+- Production Date: "2018-05-08"
+- Version Notes: "This metadata was downloaded from the DataFirst website...The
+  following two metadata fields were edited - Document and Survey ID."
+- Metadata Production Date: "2021-11-10"; Last Modified: "Jul 14, 2022"
+- Producers: ISSER (University of Ghana); Economic Growth Center, Yale University
+- Access Policy: "Public access data, available to all"
+- *Downloadable*: yes -- a "Get Microdata" link is present.
+- Data dictionary lists *91* files.
+
+https://catalog.ihsn.org/catalog/10355/study-description (retrieved 2026-08-19):
+- Study IDNO: "GHA_2018_GSPS_v01_M"
+- Title: "Socioeconomic Panel Survey 2018-2019" (subtitle "Wave 3"); collection
+  dates 2018-2019
+- Version Description: "Version 01: Edited, anonymous dataset for public distribution."
+- Production Date: "2021"; Metadata Production Date "2021-11-10"; Last Modified "Jul 14, 2022"
+- Producer: ISSER, University of Ghana
+- Access Policy: "Public access data, available to all"
+- *Downloadable*: yes -- "Get Microdata" link and a Downloads section.
+- Page statistics reported: "4,678 views and 59 downloads".
+- Data dictionary lists *97* files.
+
+The IHSN metadata itself says it was mirrored from DataFirst.  *This session did
+not fetch DataFirst directly*; the DataFirst ids 884/885 cited in the GH #140
+comment of 2026-07-22 are therefore reported as unverified.
+
+** 3.3 Harvard Dataverse =doi:10.7910/DVN/E5QP0F=
+
+The HTML page (=dataset.xhtml?persistentId=...=) is a JavaScript application
+and returned *no content* through WebFetch -- recorded as a failed fetch.  The
+JSON API was used instead (retrieved 2026-08-19):
+
+- Title: "ISSER-Northwestern-Yale Long Term Ghana Socioeconomic Panel Survey (GSPS)"
+- Versions: *v1.0* released 2022-11-03T19:20:17Z; *v1.1* released
+  2022-11-03T19:47:18Z; *v1.2* released 2022-11-03T21:36:16Z (all three the
+  same day).  =versionState= RELEASED throughout; no =versionNote= on any.
+- =dateOfDeposit= "2022-11-03"; =distributionDate= "2022-11-05";
+  =depositor= "Alzate, David".
+- License: *CC0 1.0* (=http://creativecommons.org/publicdomain/zero/1.0=).
+  Note this is materially more permissive than the wave-1 WB licence quoted in
+  section 2.2.
+- Latest version holds *333* files:
+
+  | directory                                                   | files |
+  |-------------------------------------------------------------+-------|
+  | =Ghana_Panel_Survey/Data/Wave 1=                            |   123 |
+  | =Ghana_Panel_Survey/Data/Wave 2=                            |    87 |
+  | =Ghana_Panel_Survey/Data/Wave 3=                            |   107 |
+  | =Ghana_Panel_Survey/Documentation/Questionnaires=           |     5 |
+  | =Ghana_Panel_Survey/Documentation/Technical Documents=      |     5 |
+  | =.../Technical Documents/Wave 1 Consumption Aggregates=     |     3 |
+  | =Ghana_Panel_Survey= (root: user guides, ReadMe)            |     3 |
+
+- All data files are ingested to =.tab=; the API exposes =originalFileName=,
+  =originalFileSize= and =originalFormatLabel= ("Stata 14 Binary" for all three
+  waves).  *The exposed =md5= is the checksum of the ingested =.tab=, NOT of the
+  original =.dta=*, so md5 comparison against our sidecars is impossible; the
+  comparisons in section 2 use =originalFileSize=, which is exact.
+- Questionnaires are present for all three waves ("Wave 1 - Part A/B.pdf",
+  "Wave 2 - Part A/-Part B.docx", "Wave 3.docx") -- relevant to any future
+  =absent_verdicts= C4 check, which requires the instrument.
+- Dataverse holds *three* waves.  *No 4th wave appears in this dataset.*
+
+*** Failed fetch, recorded as a failure
+
+https://dataportal-isser.ug.edu.gh/index.php/catalog?sk=Socioeconomic+Panel
+*failed with a TLS certificate mismatch*: "Hostname/IP does not match
+certificate's altnames: Host: dataportal-isser.ug.edu.gh. is not in the cert's
+altnames: DNS:refind-isser.ug.edu.gh".  *The existence of a 4th (2018-19) GSPS
+wave on the ISSER portal -- asserted in the GH #140 comment of 2026-06-08 --
+could NOT be checked this session and is neither confirmed nor denied here.*
+Note the competing reading, which the IHSN entry supports: the producers label
+*wave 3 itself* "2018-2019" (=GHA_2018_GSPS_v01_M=), so a "2018-19 4th wave"
+may be a mislabelling of the wave we already hold as =2017-18/=.
+
+* 4. Reconciling GH #140 against today's repository
+
+Issue #140 was opened 2026-04-10 by ligon, drawing on a 2026-04-09 investigation
+(=slurm_logs/PLAN_ghanasps_cleanup.org=).  Three comments have since been added
+(2026-06-08 x2, 2026-07-22).  Claims are checked below against the branch
+=audit/ghana-correctness= as of 2026-08-19.
+
+** 4.1 Claims in the issue body
+
+| # | claim (issue #140, 2026-04-10) | status | evidence |
+|---+--------------------------------+--------+----------|
+| 1 | "No =data_scheme.yml= anywhere in =lsms_library/countries/GhanaSPS/=, so =Country('GhanaSPS')= cannot discover any feature." | *NOW FALSE* | =_/data_scheme.yml= exists, added by =2a04ed36= (2026-06-21, "feat(GhanaSPS): canonicalize + register food_acquired (#218 Phase 3)").  Run this session: =Country('GhanaSPS').waves= = =['2009-10','2013-14','2017-18']=; =.data_scheme= = =['food_acquired','food_expenditures','food_prices','food_quantities']=. |
+| 2 | "Every existing Python script is fatally broken: dead imports (=from lsms.tools=, =from ligonlibrary.dataframes=, =from ghana_panel=), =dvc.api.open= anti-pattern, stale parquet paths." | *NOW FALSE* | =grep -rn 'from lsms\.tools\|ligonlibrary\|from ghana_panel\|dvc\.api\|import dvc'= over =GhanaSPS/**/*.py= returns *nothing*.  All six wave scripts and both country scripts import from =lsms_library.local_tools= and use =get_dataframe= / =to_parquet=. |
+| 3 | (implied by the P1 list) "=food_prices_quantities_and_expenditures= ... remove =m= index, use =data_root()=" | *NOW MOOT* | That script no longer exists; the =_/Makefile= records why: "food_prices / food_quantities / food_expenditures are derived at API time by =_FOOD_DERIVED= from food_acquired -- NOT materialized to var/ (the per-country food_prices_quantities_and_expenditures.py was retired, GH #218 Phase 3)." |
+| 4 | "Sampling weights not found in any on-disk =.dta= file for 2013-14 and 2017-18.  Only 2009-10 has a clear =hhweight3=." | *STILL TRUE*, and now stronger | Variable-name scan of all 313 blobs this session.  2009-10: =key_hhld_info.dta= has =hhweight3=, =ppweight3=; =S10AI.dta= has =hhweight2=; =S5D3.dta= has =hhweight=.  2013-14 and 2017-18: the *only* weight-like names anywhere are =06b_anthropometry.weight_= / =01evii_anthropometry.weight= (body weight) and =07a_fertility.weightatbirth=.  *No sampling weight in either wave.* |
+| 5 | "*Some of the GhanaSPS data we currently have on disk is a pre-release version* (obtained before the public WB release)." | *TRUE for waves 2 and 3; FALSE for wave 1; and "the public WB release" is a category error for waves 2-3* | See section 2.  Wave 1 IS the WB release (124/124 files, 124/124 shapes).  Waves 2 and 3 have *no* WB release to be pre- or post- of.  Wave 3 is demonstrably a pre-anonymization producer build for 29 of 95 files. |
+| 6 | "If final/revised data is now available from the World Bank Microdata Library or elsewhere ..." | *"or elsewhere" is where it is* | Nothing later than 2016 exists at the WB.  The later public releases are IHSN/DataFirst v01 (2018-05-08 for wave 2; 2021 for wave 3) and Harvard Dataverse v1.2 (2022-11-03, all three waves). |
+| 7 | Open question 4: "WB catalog IDs for 2013-14 and 2017-18 (2009-10 is catalog 2534)" | *ANSWERED: they do not exist* | Full-catalog GHA sweep, all 23 collections, 152 entries: exactly one =_GSPS= idno.  Reproduced this session (section 3.1). |
+| 8 | Open question 6: "2009-10 =ppweight3=: per-person expansion weight or panel weight?" | *NOT re-verified this session* | The 2026-04-09 plan reasons it is per-person ("mean ~3.8x larger than =hhweight3="); the 2026-07-22 comment states it flatly.  This audit did not read the values. |
+| 9 | "Prerequisite gap: no =add-country= skill" | *STILL TRUE* | =ls .claude/skills/= gives: =add-feature=, =add-wave=, =backlog-workflow=, =cross-country-features=, =demand-estimation.md=, =generated=, =gitnexus=, =multi-round-waves.md=, =profiling=, =release=, =tanzania-panel-design.md= -- no =add-country=. |
+| 10 | "GhanaSPS ... currently doesn't [appear in the Feature cross-country API]" | *PARTLY FALSE* | It now appears for the food tables.  =.coder/coverage/latest.csv= grades 12 GhanaSPS cells (=food_acquired=, =food_expenditures=, =food_prices=, =food_quantities= x 3 waves) all *=sane=*, "all checks pass".  All other features remain unregistered. |
+| 11 | P1 item 8: "Verify and add SOURCE.org / LICENSE.org for 2013-14 and 2017-18" | *HALF DONE* | =SOURCE.org= now exists for all three waves (stamped 2026-07-12).  =LICENSE.org= still exists *only* for 2009-10.  And all three =SOURCE.org= lack =#+PROVENANCE_VALIDATION:=; waves 2-3 additionally lack any source URL and any =CATALOG_IDNO=. |
+
+** 4.2 Claims in the issue comments
+
+| # | claim | status | evidence |
+|---+-------+--------+----------|
+| 12 | 2026-06-08: "All 3 waves' final public data on Harvard Dataverse (DOI 10.7910/DVN/E5QP0F) + WB catalog 2534" | *HALF FALSE* | Dataverse does carry all three waves (123 / 87 / 107 files).  WB catalog 2534 carries *wave 1 only*.  The two are not alternative routes to the same three waves. |
+| 13 | 2026-06-08: "a 4th wave (2018-19) exists on the ISSER portal" | *UNVERIFIABLE this session* | The ISSER portal fetch failed on a TLS certificate mismatch (section 3.3).  Competing reading: IHSN titles *wave 3* "Socioeconomic Panel Survey 2018-2019" (=GHA_2018_GSPS_v01_M=), so this may be wave 3 under the producers' own label. |
+| 14 | 2026-06-08: "The repo currently holds 313 pre-release .dta" | *COUNT RIGHT, LABEL WRONG* | 313 is exact (124 + 89 + 100, confirmed this session).  But 124 of the 313 are the WB *published* wave 1, and 66 of wave 3's are byte-identical to the public release.  At most ~123 of 313 are demonstrably non-public. |
+| 15 | 2026-07-22: wave 1 is "CURRENT PUBLISHED VERSION ... never revised in 10 years ... all 124 .dta match the DDI file list exactly" | *CONFIRMED, and extended* | Reproduced independently (section 2.2): 124/124 filenames AND 124/124 (cases, variables).  Extension: the *match is against the live WB data-dictionary*; our shipped DDI PDF contains no data-file inventory at all.  Further extension not in that comment: the Dataverse wave-1 re-release is a *different artefact* (0/121 byte-identical, all larger). |
+| 16 | 2026-07-22: wave 1 Stata timestamps "2016-01-07 15:00-15:39" | *NEARLY* | Reproduced as 15:00 (=S100.dta=) to *15:59* (=S70.dta=).  Same day, same hour; the stated upper bound was 20 minutes short. |
+| 17 | 2026-07-22: wave 2 "PRE-RELEASE / internal.  Our Stata timestamps 2019-09/2019-10" | *INCOMPLETE -- the majority of wave 2 is NOT from 2019* | Reproduced histogram: *59* files 2018-05-08, 21 on 2019-09-11, 1 on 2019-09-12, 8 on 2019-10-10.  The 2018-05-08 cohort carries *exactly* the IHSN v01 production date and all 59 agree with the v01 variable counts. |
+| 18 | 2026-07-22: wave 2 "We additionally hold two files the producers did *not* publish (=01a_consent.dta=, =10_determine_respondents.dta=)" | *FALSE* | Both are listed in the IHSN 10354 data dictionary (8 and 13 variables).  They are absent from *Dataverse v1.2*, which is a different distribution.  Conversely, the public v01 has two files *we* lack: =cocoa= and =temp=. |
+| 19 | 2026-07-22: wave 2 "public drops internal/free-text fields and adds a =wave= variable" | *NOT SUPPORTED against IHSN; not tested against Dataverse* | Against IHSN v01, in all four disagreeing files our copy has *fewer* variables, not more.  The comment's claim was made against Dataverse v1.2, whose variable counts this session did not retrieve. |
+| 20 | 2026-07-22: wave 3 "PRE-RELEASE and INCOMPLETE ... 11 files we do not have at all ... 30 of 96 shared files differ" | *CONFIRMED exactly* | Reproduced: 11 missing, 30 of 96 differing by size, and independently 29 of 95 differing by variable count against IHSN, with a *zero-disagreement* cross-tab (section 2.4). |
+| 21 | 2026-07-22: wave 3 differences "read as anonymization" | *CONFIRMED, and now directional* | All 29 differences run ours > public; not one runs the other way.  Both catalogs describe the release as "Edited, anonymous dataset for public distribution." |
+| 22 | 2026-07-22: "The existing =food_acquired= cells are NOT invalidated" | *CONFIRMED* | Section 2.4 table: wave-1 =S11A= matches WB exactly; wave-2 food file =nvar= matches IHSN and carries the v01 production date; wave-3 food file is *byte-identical* to the public release.  The 12 =sane= cells rest on reproducible data. |
+| 23 | 2026-07-22: weights "NOT PUBLISHED for 2013-14 and 2017-18" | *CONFIRMED for our tree* | Full variable-name scan, section 4.1 row 4.  This session did *not* check the producers' public release or the Wave II report, so the stronger "not published anywhere" half is not re-verified here. |
+
+** 4.3 A claim in =_/data_scheme.yml= that the comments contradict
+
+=_/data_scheme.yml= (commit =2a04ed36=, 2026-06-21) states: "GhanaSPS has NO
+=sample= table (cluster identity unavailable: no cluster var in the food files,
+2013-14 lacks EAs.dta, and EAs.dta is EA-level only)."  The GH #140 comment of
+2026-07-22 states the opposite -- that the EA is embedded in the household id
+(=v = i[-9:][1:6]=), algebraically identical to wave 1's =id3=, 334 EAs in every
+wave, filed as GH #579.  *Not adjudicated here.*  Recorded because both are in
+force and they disagree.
+
+* 5. Decision points for the human
+
+No recommendation is made.  Each option is stated with the evidence that bears
+on it and its cost.
+
+** 5.1 2009-10 (Wave 1)
+
+*The factual position.*  What we hold *is* the World Bank's published
+distribution: 124/124 filenames and 124/124 (cases, variables) match catalog
+2534's data dictionary; the files' Stata save timestamps (2016-01-07,
+15:00-15:59) coincide with the catalog's own Metadata Production Date
+(January 7, 2016); the catalog has not been modified since January 11, 2016.
+The pre-release worry does not apply to this wave.
+
+| option | what it buys | what it costs | evidence bearing on it |
+|--------+--------------+---------------+------------------------|
+| *A. Keep as is.* | Nothing to do.  Third parties can reproduce it from WB 2534. | Retains WB v0.1, which the WB itself says "does not include the community level data".  Retains the wave-1 licence's no-redistribution clause. | 124/124 file and shape match; catalog untouched since 2016-01-11 |
+| *B. Also acquire the Dataverse wave-1 re-release.* | A Stata-14 build; adds =s11a1.dta= and =s4h_agsection_panel.dta=; CC0 1.0 licence rather than the restrictive WB terms. | Two coexisting wave-1 vintages, or a migration of every wave-1 config to different files.  The 121 shared files are all byte-different; the variable-level nature of that difference is *unverified* (no Dataverse file was downloaded this session). | 0/121 byte-identical, deltas +3,478..+1,711,766, all positive |
+| *C. Record the provenance and stop.* | Adds =#+PROVENANCE_VALIDATION: content-validated= to the wave-1 =SOURCE.org= -- which the evidence now amply supports and which the file currently lacks. | Minutes. | the field is absent today |
+
+** 5.2 2013-14 (Wave 2)
+
+*The factual position.*  There is no World Bank release, in any collection, so
+"pre-release relative to the WB" is not a meaningful frame.  Two public releases
+exist: IHSN/DataFirst v01 (production date 2018-05-08) and Harvard Dataverse
+v1.2 (2022-11-03).  Our 89 files are *not* the Dataverse bits (0 of 87
+byte-identical).  59 of our 89 carry exactly the IHSN v01 production date and
+agree exactly with its variable counts; 30 were re-saved in 2019-09/10, of which
+4 disagree with v01 by 1-2 *fewer* variables.  We lack two files v01 publishes
+(=cocoa=, =temp=).  We do *not* hold unpublished files -- the two that Dataverse
+omits are both in the IHSN v01 catalogue.
+
+| option | what it buys | what it costs | evidence bearing on it |
+|--------+--------------+---------------+------------------------|
+| *A. Keep.* | Zero work.  The food file, on which all four registered features depend, matches v01's variable count and carries the v01 production date. | Ships 30 files whose vintage could not be matched to any catalogued release, and 4 that carry fewer variables than the public release.  A third party cannot reproduce our exact bits. | 59/89 exact-date + exact-nvar; 4 nvar shortfalls; 0/87 Dataverse identity |
+| *B. Re-acquire from Harvard Dataverse v1.2 (CC0).* | One reproducible, permissively licensed vintage across all three waves.  Gains =cocoa=, =temp= if present. | Every one of the 87 shared files changes; variable names may change (the 2026-07-22 comment reports a =wave= variable added, unverified here).  Wave-level =food_acquired.py= must be re-validated.  Loses =01a_consent= and =10_determine_respondents=, which Dataverse does not carry. | Dataverse holds 87 files; both our "extras" are absent there |
+| *C. Re-acquire from IHSN/DataFirst v01.* | The distribution our 59-file majority already matches; keeps =01a_consent= and =10_determine_respondents=; gains =cocoa=, =temp=; makes the wave uniformly one catalogued vintage. | Requires a DataFirst/IHSN download path this session did not test (only that a "Get Microdata" link exists).  Changes the 4 files where we currently hold fewer variables. | IHSN 10354: 91 files; 85/89 nvar agreement |
+| *D. Nothing changes until the 4 shortfall files are explained.* | Cheapest way to bound the risk: read the 4 files' variable lists against v01. | Leaves the wave in limbo. | =02a_nr_relatives_questions= 90 vs 91; =02b_nr_spouses_questions= 35 vs 36; =03biii_outtransfersquestions= 52 vs 54; =03biv_intransfersquestions= 52 vs 54 |
+
+** 5.3 2017-18 (Wave 3)
+
+*The factual position.*  Our bits predate every catalogued public release by
+1-3 years (our saves 2019-11-13..2020-01-22; IHSN production date 2021;
+Dataverse 2022-11-03).  Two independent catalogs, on two independent measures,
+split our 95 shared files identically: *66 are the public release exactly*, *29
+are a pre-anonymization build carrying strictly more variables*.  We are
+*missing 11 files* the public release carries.  This is simultaneously the wave
+where we hold more than the public and the wave where we hold less.
+
+| option | what it buys | what it costs | evidence bearing on it |
+|--------+--------------+---------------+------------------------|
+| *A. Keep.* | Zero work.  Preserves 29 files' worth of pre-anonymization detail (including the geography in =00_hh_info=) that the public release removed -- which is precisely what a cluster/=sample= feature would want, cf. GH #579. | Ships an inventory 11 modules short of the real wave 3, so any P2 feature planning (mobile money, education beliefs, financial health, public services) is planned against the wrong inventory.  Ships, and pushes to S3, data the producers *chose to remove before publication* -- a redistribution question, not just a reproducibility one. | 29/29 differences run ours > public; 11 public files absent |
+| *B. Replace wholesale with the Dataverse public release.* | One reproducible CC0 vintage; gains all 11 missing modules; removes the redistribution exposure. | Loses the 29 files' extra variables permanently -- including the =d_code= / =district= / =comm_code= geography that a =sample= / =cluster_features= feature would likely be built on.  Loses =00_comm_info=, =01c_consentunder18=, =public_services=, =rural-urban= (not in the public Wave 3 folder). | 107 public files vs our 100; 66 already identical |
+| *C. Add the 11 missing public files; keep the 29.* | Complete inventory *and* the extra detail. | A deliberately mixed-vintage wave, which must be documented in =CONTENTS.org= or it will mislead every later reader.  Does not touch the redistribution question. | the 66/29 partition is clean and reproducible, so a mixed wave is at least *describable* file by file |
+| *D. Resolve the redistribution question first.* | The wave-1 =LICENSE.org= says "Users who download the data may not pass the data to third parties."  Waves 2 and 3 have *no =LICENSE.org= at all*, and we push their blobs to S3. | Blocks everything else until answered. | no =LICENSE.org= for 2013-14 or 2017-18; Dataverse's own terms for the public release are CC0 1.0 |
+
+** 5.4 Cross-cutting, independent of the per-wave choice
+
+1. *The food pipeline is not at risk on provenance grounds.*  All three
+   food-module source files corroborate against a public release; the wave-3
+   one is byte-identical to it.  The 12 =sane= cells in
+   =.coder/coverage/latest.csv= therefore rest on reproducible data.  (They are
+   =sane=, *not* =blessed*: =.coder/coverage/blessed.csv= contains no GhanaSPS
+   row, so no human has signed off on the numbers.)
+2. *=SOURCE.org= hygiene is a separate, cheap fix.*  None of the three carries
+   =#+PROVENANCE_VALIDATION:=.  On this session's evidence wave 1 would be
+   =content-validated=; waves 2 and 3 would be =catalog-only= at best, since
+   their =CATALOG_ID: none= is correct for the WB but leaves the IHSN
+   (10354 / 10355) and Dataverse (=doi:10.7910/DVN/E5QP0F=) identifiers
+   unrecorded anywhere in the repository.
+3. *=LICENSE.org= is missing for waves 2 and 3* and should be captured from
+   whichever distribution is chosen (Dataverse is CC0 1.0; IHSN says "Public
+   access data, available to all").
+4. *The wave-3 directory name is contested.*  =2017-18/= vs the producers'
+   =GHA_2018_GSPS_v01_M= / "2018-2019".  Any re-acquisition is the natural
+   moment to settle it -- and to settle whether the "4th wave (2018-19)" of the
+   2026-06-08 comment is a real fourth wave or this same wave 3 under its
+   producer label.  *That question is open: the ISSER portal fetch failed.*
+5. *A =add-country= skill still does not exist*, as #140 says.
+
+* 6. Everything this audit could NOT determine
+
+Stated explicitly so that no reader mistakes silence for a negative finding.
+
+1. *Whether the 30 wave-2 files re-saved in 2019-09/10 are pre-release,
+   post-release, or a private variant.*  They match no catalogued release date.
+2. *The variable-level nature of the wave-2 and wave-3 differences.*  Only
+   counts were compared.  No file from any public distribution was downloaded.
+   In particular, the specific claim that =00_hh_info='s three dropped
+   variables are =d_code=, =district= and =comm_code= is quoted from the
+   2026-07-22 GH comment and was *not* re-verified.
+3. *Whether a 4th GSPS wave exists.*  The ISSER portal fetch failed on a TLS
+   certificate mismatch; Dataverse holds three waves and nothing more.
+4. *DataFirst ids 884 / 885.*  Cited in prior work; not fetched this session.
+5. *Whether waves 2 and 3 were ever "asked but not distributed" for any module.*
+   That is a C4 questionnaire question; Dataverse does carry the Wave 2 and
+   Wave 3 instruments, so the check is *possible*, but it was not run.
+6. *md5-level identity with any public release.*  Dataverse exposes checksums of
+   its ingested =.tab= files, not of the original =.dta=.  =originalFileSize=
+   was used instead; it is exact but weaker than a hash.
+7. *=ppweight3='s interpretation* (per-person expansion vs. panel weight).  No
+   values were read.
+8. *Whether =v= is in fact recoverable from the household id* (the
+   =data_scheme.yml= vs. GH #579 conflict in section 4.3).

@@ -1,0 +1,5 @@
+outs:
+- md5: 523a0746457d4cf5d7f235eb6c98f1d4
+  size: 97212
+  hash: md5
+  path: commtype.dta

@@ -1,0 +1,87 @@
+sample:
+    # 01a_consent.dta is the wave-2 household-level file: 4,774 rows, 4,774
+    # distinct FPrimary -- exactly one row per interviewed household.
+    #
+    # NO WEIGHT EXISTS for this wave, and that is a producer-side fact, not a
+    # gap in our extract.  All 89 shipped .dta files were swept: the only
+    # "weight" variables are anthropometric body weight.  Positive documentary
+    # evidence: Documentation/Variable Lists/key_hhinfo_panel.xlsx rows 17-18
+    # assign hhweight/ppweight to WAVE 1 ONLY, with every wave-2 cell blank.
+    #
+    # No Rural and no strata either: this wave ships no geography.  CONTENTS.org
+    # records the same ("'2013-14' has no regions or urban/rural data"), and
+    # 01ea_employmentscreener.dta DECLARES regioncode/eacode/communitycode but
+    # populates 0 of 13,643 rows.  The acquisition target that would fix this is
+    # `w2_hh_geodata_w3preloads`, named in that xlsx and absent from Data/.
+    file: 01a_consent.dta
+    idxvars:
+        i: FPrimary
+    myvars:
+        v: FPrimary
+
+household_roster:
+    # TWO-SOURCE table: the roster and its residence-duration variable live in
+    # different files, so this needs a `dfs:` merge.
+    #
+    #   01b2_roster.dta   16,356 rows, 4,774 households -- Sex/Age/Relationship
+    #   01d_background.dta 16,354 rows              -- MonthsAway (awaylast12)
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave, not in aggregate:
+    # (FPrimary, hhmid) is unique in BOTH frames -- 16,356 distinct keys in
+    # 16,356 roster rows and 16,354 in 16,354 background rows -- so the number
+    # of key values duplicated in both frames is 0 and the merge is exactly
+    # 1:1.  The background keys are a strict SUBSET of the roster keys
+    # (intersection 16,354; 0 background-only rows), and the 2 roster-only
+    # members simply take a NaN MonthsAway.
+    #
+    # `merge_how: left` with the roster as the primary sub-df: the roster is
+    # authoritative for which persons exist, background is a strict enrichment.
+    # (Here it is also output-identical to the `outer` default, since
+    # background contributes no rows of its own -- but that is a fact about
+    # this wave's extract, not a guarantee, and wave 3 is checked separately.)
+    #
+    # SOURCING NOTE -- 01b2_preroster.dta is NOT merged in, deliberately.  It is
+    # the wave-1 preload used to track attrition (22,613 rows carrying
+    # `currentmember`, `whynotmember`, `howlongnotmember`, `joinedwhy`), i.e. an
+    # EVENT table about joiners and leavers, not a roster.  Its
+    # `currentmember == 'Yes'` rows number exactly 16,356 -- the roster row
+    # count -- which is the check that 01b2_roster.dta is the complete set of
+    # current members and not a subset of it.  Its `currentmember == 'No'` rows
+    # (6,257) are people who LEFT and correctly do not belong in the roster.
+    # Note preroster.hhmid is float64 and mostly null; comparing it to the
+    # roster's int8 hhmid via astype(str) gives '1.0' vs '1' and a spurious
+    # zero overlap.
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    # This wave ships no geography at all (see the `sample` note above), so
+    # every household's `v` comes from the FPrimary[-6:-3] EA slice.
+    dfs:
+        - df_roster
+        - df_background
+    df_roster:
+        file: 01b2_roster.dta
+        idxvars:
+            i: FPrimary
+            pid: hhmid
+        myvars:
+            Sex: gender
+            Age: ageyears
+            Relationship: relationship
+    df_background:
+        file: 01d_background.dta
+        idxvars:
+            i: FPrimary
+            pid: hhmid
+        myvars:
+            # "s01d_27 - Away in last 12" -- the same Q27 wave 1 asks, and
+            # here it is CLEAN: 16,353 of 16,354 non-null, values 0-12 with
+            # no out-of-range value and no sentinel.
+            MonthsAway: awaylast12
+    merge_on:
+        - i
+        - pid
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - pid
