@@ -343,7 +343,7 @@
 | Ensino Secundário           | Lower secondary              |
 | Ensino Superior             | Bachelor                     |
 | Ensino Técnico/Profissional | Vocational/Technical         |
-| Nenhum                      | None                         |
+| Nenhum                      | No education                 |
 | Pre-escolar                 | Pre-primary                  |
 
 # harmonize_assets (GH #168): per-country delta on top of the global

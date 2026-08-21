@@ -30,6 +30,306 @@ Standard EHCVM convention: =grappe= is the cluster identifier
 identifier is =(grappe, menage)= without a vague level.  See
 CLAUDE.md "EHCVM countries" for the cross-country pattern.
 
+* Sampling universe, exclusions and sub-samples
+
+What the Benin survey *claims* to represent, quoted from its own
+documentation.  This is deliberately separate from what the data look
+like: nothing below is inferred from the =.dta= files, and the one
+place where a data observation appears it is labelled as such and is
+about wave structure, not about the universe.
+
+Companion to the =Sampling Design= section in this file, which covers
+the =(grappe, menage)= identifier convention.  This section covers the
+declared population; that one covers the index.  Benin has exactly one
+configured wave, =2018-19=, so there is one universe statement.
+
+** 2018-19 -- the declared universe
+
+VERBATIM, from the local DDI report shipped in this repo at
+=lsms_library/countries/Benin/2018-19/Documentation/ddi-documentation-english_microdata-4291.pdf=,
+PDF page 3, section =Coverage=:
+
+#+begin_quote
+GEOGRAPHIC COVERAGE
+
+National coverage
+
+UNIVERSE
+
+The survey covered all de jure households excluding prisons,
+hospitals, military barracks, and school dormitories.
+#+end_quote
+
+Language: English.  The source document is the English edition of the
+DDI (=ddi-documentation-english_...=); the survey's own title is
+French (=Enquete Harmonisee sur le Conditions de Vie des Menages
+2018-2019=, printed with "le" not "les" -- see
+=Documentation/SOURCE.org=, =#+CATALOG_TITLE:=).  *No French-language
+universe statement was located* -- see "Gaps" below.
+
+*** Where the statement lives: locally, and it is verifiable
+
+Unlike the ~41 of 111 waves in the corpus whose only universe
+statement is WB catalog metadata, Benin's statement is *in this
+repository*.  The DDI PDF is a tracked DVC object
+(=ddi-documentation-english_microdata-4291.pdf.dvc=), and the copy
+downloaded independently from
+https://microdata.worldbank.org/catalog/4291/pdf-documentation has md5
+=89b38f943a8a7c5e6b14016c196beb6c=, matching the sidecar.  The WB
+catalog entry 4291 carries the identical sentence, so local and
+catalog agree exactly; the record is not a moving target.
+
+Provenance chain: =SOURCE.org='s DOI =10.48529/rn3k-z374= redirects to
+catalog study =BEN_2018_EHCVM_v02_M= = catalog entry 4291.
+
+*** WARNING: the universe sentence is WB NADA boilerplate
+
+"The survey covered all de jure households excluding prisons,
+hospitals, military barracks, and school dormitories." is *template
+text*.  It appears verbatim in 15 waves across the library -- the
+eight WAEMU/EHCVM countries where a shared instrument would explain it
+(Benin, Burkina Faso 2018-19 and 2021-22, Cote d'Ivoire, Guinea-
+Bissau, Mali, Niger, Senegal, Togo) *and also* Ethiopia 2018-19 and
+2021-22 and Nigeria 2015-16, 2018-19 and 2023-24, which share no
+instrument with EHCVM at all.
+
+So its presence attests *which metadata template the DDI was produced
+from*.  It does not independently attest that INSAE made this specific
+claim about this specific survey.  Treat it as weak evidence of
+Benin's intent and strong evidence of DECDG's template.  (Corpus-wide
+finding; see the cross-country population-statements review, GH #601.)
+
+Note also that "de jure" is used in two distinct senses across the
+corpus -- the NADA boilerplate's, and Nepal's "modified de jure
+household members (usual residents)".  The boilerplate does not define
+its own term.  Benin's own residency rule lives in the questionnaire,
+not in the universe statement: see the =Household Presence /
+MonthsSpent= section of this file for =s01q12= / =s01q13=, the two binary
+6-month filters that actually determine membership.
+
+** Exclusions
+
+*** Population exclusions (institutional): stated
+
+Prisons, hospitals, military barracks, and school dormitories -- i.e.
+the institutional/collective population.  This is the entire content
+of the exclusion clause; it is the boilerplate wording (above).
+
+Not mentioned either way, and therefore *not established for Benin*:
+the homeless, diplomatic households, and nomadic populations.  Sibling
+EHCVM documentation is explicit about two of these where Benin is
+silent -- Burkina Faso's French =Rapport general= excludes "les
+menages ayant un statut diplomatique et les sans domiciles fixes", and
+the WAEMU-common EHCVM-2 enumerator manual excludes diplomatic
+personnel.  *Do not carry those over to Benin.*  No Benin document
+found says it, and an unevidenced "excluded here too" is exactly the
+kind of claim this repo has a standing rule against.
+
+*** Geographic exclusions: NONE -- and the Littoral clause is not one
+
+The frame description contains a region name, which is easy to misread
+as a dropped region.  It is not.  VERBATIM, same PDF, page 4, section
+=Sampling= > =SAMPLING PROCEDURE=, first paragraph:
+
+#+begin_quote
+The Benin EHCVM 2018/19 used the 2013 Census of Population and Housing
+(RGPH) as the sampling frame. This frame contains 10032 enumeration
+areas, is nationally representative, and covers all regions with urban
+and rural areas surveyed in all regions apart from Littoral, a purely
+urban region.
+#+end_quote
+
+Read carefully, this says every region is surveyed, and every region
+is surveyed in *both* milieux except Littoral, which has *no rural
+milieu to survey*.  Littoral is in the sample; it simply has no rural
+stratum.
+
+The document's own stratum count corroborates that reading and
+excludes the alternative.  Same paragraph, VERBATIM:
+
+#+begin_quote
+The survey design also defined the domains as country, urban and rural
+areas, and each of the 12 regions. Taking this into account, 23
+explicit sample strata were selected.
+#+end_quote
+
+12 regions x 2 milieux = 24, minus the non-existent Littoral-rural
+cell = *23*.  Had Littoral been dropped, the count would be 22.
+
+Sibling EHCVM waves carry the same construction with a different name
+in the slot -- Guinea-Bissau's is "apart from the autonomous sector of
+Bissau (SAB) where all respondents are from urban areas", which spells
+out the intended meaning; Cote d'Ivoire's has no carve-out at all
+("all regions with urban and rural areas surveyed in all regions").
+Benin's phrasing is the terse variant of Guinea-Bissau's.
+
+*** Security carve-outs: none stated
+
+No "for security reasons" exclusion appears anywhere in the Benin DDI.
+This is a real difference from several LSMS-ISA neighbours in the
+library (Nigeria 2018-19 excluded rural Borno; Ethiopia ESPS-5
+excluded Tigray entirely).  Benin's DDI has no =Deviations from Sample
+Design= and no =Response Rate= section in which such a carve-out could
+have been recorded, so the correct statement is *"none stated"*, not
+"none occurred".
+
+*** No urban-only or rural-only restriction
+
+Both milieux are in scope nationally, and the design is explicit about
+their sizes.  VERBATIM, same page:
+
+#+begin_quote
+The total estimated survey sample size was 8040 households - 3960 from
+urban areas and 4080 from rural areas. [...] the final sample size
+comprises 8012 households, including 3940 households from urban areas
+and 4072 households from rural areas.
+#+end_quote
+
+** Oversamples and sub-populations
+
+*** No oversample of any named sub-population is documented
+
+There is no MOP/Roma-style booster sample, no ethnic or programme
+sub-sample, no module administered to a fraction of households, and no
+refresh-vs-extended panel split.  Benin 2018-19 is a single
+cross-sectional national draw.  The documentation is silent on the
+subject, which here is weak but consistent evidence of absence: the
+=SAMPLING PROCEDURE= section is otherwise detailed (frame, allocation
+rule, strata count, both stages, planned vs achieved n), so a booster
+would have had an obvious place to be described.
+
+*** The two =vague= are NOT two sub-samples
+
+This is the one thing about Benin's structure most likely to be
+misread by someone pooling the country, so state it plainly.  The two
+=vague= are two seasonal visits to *disjoint halves of one sample*,
+not two independent samples and not a panel.  VERBATIM (page 2,
+=ABSTRACT=):
+
+#+begin_quote
+The surveys took place in two waves with each wave covering half of
+the sample. The first wave was fielded between October 2018 and
+December 2018, while the second wave occurred between April 2019 and
+July 2019. The two-wave approach was chosen to account for seasonality
+of consumption.
+#+end_quote
+
+Achieved sizes, VERBATIM (page 4): "In wave one, the survey teams
+interviewed 3997 households (1940 in urban areas and 2057 in rural
+areas. In wave two, the teams interviewed 4015 households (2000 in
+urban areas and 2015 in rural areas)." (Unbalanced parenthesis in the
+original; quoted as printed.)
+
+Consequences for an analyst: the library models both =vague= as the
+single wave directory =2018-19=, which is correct -- they are one
+sample.  But =vague= is *confounded with season*, so a =vague=-level
+contrast is a season contrast, and consumption aggregates in
+particular should not be compared across =vague= as if they were two
+draws from the same moment.
+
+*** Allocation across regions is disproportionate by design
+
+Not an oversample of a sub-population, but it is the reason weights are
+not close to uniform.  VERBATIM (page 4):
+
+#+begin_quote
+In Benin, the survey design decided on the sample size using the
+poverty rate - obtained from the 2011 Integrated Modular Survey on
+living conditions of households - as a variable of interest. Then the
+survey design split the decided sample size among regions considering
+the number of households in the region and the necessity to minimize
+the relative error.
+#+end_quote
+
+Design context (VERBATIM, same page): two-stage; "At the first stage,
+670 enumeration areas (EAs) were selected with Probability
+Proportional to Size (PPS) using the 2013 RGPH and the number of
+households as a measure of size. In the second stage, 12 households
+were selected in each enumeration area randomly."
+
+Representativity claim, VERBATIM (page 2, =ABSTRACT=): "The EHCVM is a
+nationally representative survey of 8,000 households, which are also
+representative of the geopolitical zones (at both the urban and rural
+level)."
+
+** Universe vs. what the weights represent: NOT DOCUMENTED
+
+The Benin DDI has *no weighting section at all*.  There is no
+=WEIGHT=, no =Weighting= subsection under =Sampling=, and no
+=Response Rate= field; =Sampling= runs straight from =SAMPLING
+PROCEDURE= into =Data Collection=.  The data ship a weights file
+(=ehcvm_ponderations_ben2018=, named in the DDI's =VERSION NOTES=),
+but *no document in this repository states what population those
+weights inflate to*, nor whether they are adjusted for the 8040 -> 8012
+shortfall.
+
+So for Benin the universe and the weight base cannot be checked against
+each other.  Record that as a gap, not as agreement.
+
+** Gaps: what was searched and not found
+
+| looked for | where | result |
+|------------+-------+--------|
+| universe statement | =2018-19/Documentation/ddi-...-4291.pdf= | FOUND, p. 3 |
+| French universe statement | same PDF (English edition); WB catalog 4291 page (English) | not found |
+| Basic Information Document | =2018-19/Documentation/= | none shipped -- Benin has no BID, unlike Burkina Faso / Guinea-Bissau |
+| weighting / weight-base statement | same PDF, front matter pp. 1-6 | none -- no such section exists |
+| response rate, deviations from design | same PDF, front matter pp. 1-6 | none -- no such section exists |
+| universe statement in repo prose | =Benin/_/CONTENTS.org=, =2018-19/Documentation/SOURCE.org=, =LICENSE.org= | none (SOURCE.org is provenance keywords only; LICENSE.org is generic WB public-use-file terms) |
+
+The four questionnaire instruments shipped alongside
+(=ben_ehcvm1_qnr_household_excel_vague{1,2}.xls=,
+=ben_ehcvm1_qnr_community_excel_vague{1,2}.xls=) were *not* mined for
+a universe statement, since the DDI supplies one.  They remain the
+place to look if the institutional-exclusion wording ever needs to be
+corroborated independently of the NADA template.
+
+Historical note: the duplicate =Benin/2018-2019/= directory carried no
+documentation of its own and was removed on [2026-07-12] (see
+the =Overview= section of this file).  It needs no population record; it was the same
+extract, file for file.
+
+** FLAG: the DDI's account of the vague split does not match the shipped data
+
+Recorded, not adjudicated -- and flagged because the repo's
+=Sampling Design= convention above depends on which account is right.
+
+The DDI says each *enumeration area* was split in half across the two
+vague.  VERBATIM (page 4):
+
+#+begin_quote
+After that, the survey design randomly divided each enumeration area
+into two equal groups. The survey team interrogated the first group in
+wave 1 and the other in wave 2.
+#+end_quote
+
+The repo's =Sampling Design= section (and CLAUDE.md's cross-country
+EHCVM note) say the opposite about the unit that is split:
+
+#+begin_quote
+Standard EHCVM convention: =grappe= is the cluster identifier (=v=);
+each grappe is visited in exactly one =vague=, so household identifier
+is =(grappe, menage)= without a vague level.
+#+end_quote
+
+Under the DDI's sentence, every grappe would appear in *both* vague and
+=(grappe, menage)= would not identify a household.  The shipped
+=s00_me_ben2018.dta= is consistent with the repo, not with the DDI: 670
+grappes, *0* of them appearing in more than one vague, 335 grappes in
+vague 1 and 335 in vague 2, with 3997 / 4015 households -- household
+counts that match the DDI's own per-wave figures exactly.  (This is a
+wave-structure observation about the distributed file, offered only to
+adjudicate a documentation conflict.  It is *not* an inference about
+the universe, and no universe claim in this section rests on it.)
+
+Reading that reconciles them: the *list of EAs* was halved, not each
+EA's household list.  Sibling Burkina Faso's BID describes exactly
+that -- "A total of 585 EAs were selected (half (293) for the first
+wave and half (292) for the second wave)".  The Benin DDI sentence
+appears to be either loose wording or a plan not executed as written.
+The repo's index convention stands; the DDI sentence should not be
+quoted as authority for how vague and grappe relate.
+
 * Files configured
 
 (Per =data_scheme.yml=: sample, cluster_features, household_roster,
@@ -38,6 +338,106 @@ interview_date, shocks, food_expenditures, food_prices,
 food_quantities.)
 
 * Data Quality Notes
+
+** Grain: the three ways Benin's declared indexes go non-unique (GH #323)
+
+Three Benin tables hand the framework a non-unique declared index, and
+they are *three different things*.  Conflating them is how #323 stayed
+alive elsewhere, so they are separated here.  All figures are cold
+builds under =LSMS_NO_CACHE=1= into an isolated =LSMS_DATA_DIR=; never
+read them off =var/=, which is written *post*-collapse and therefore
+cannot show you the loss.
+
+| table            | dup rows | what it is                      | fixed by                        |
+|------------------+----------+---------------------------------+---------------------------------|
+| =plot_inputs=    |       71 | broken identifier — REAL LOSS   | injective =harmonize_seed_crop= |
+| =cluster_features= |    7,342 | wrong extraction grain — no loss | extraction hook + invariant     |
+| =food_acquired=  |    1,382 | intended bucketing — no loss    | nothing; core already SUMs      |
+
+*** =plot_inputs= — the identifier was broken (fixed 2026-07-13)
+
+=harmonize_input= maps every seed label onto the single =input= value
+=Seed=, so =crop= is the only index level left to tell two seed
+line-items apart — and =harmonize_seed_crop= was non-injective: four
+labels shared one =Autre crop= catch-all, three of which occur in
+Benin's =s16b=.  A household reporting both "Autres semences" (9 kg)
+and "Plants/boutures de tubercules" (6 kg) landed both on
+=(Seed, Autre crop, Kilogramme)= and =groupby().first()= discarded
+one.  71 rows destroyed, 11,445.25 units of reported input quantity,
+and 4 households' =Purchased= flag flipped True→False.
+
+Two accountings circulate for this number and both are right, so say
+which you mean.  *71* counts every non-first row on a duplicated index
+tuple, across 64 conflicting groups.  *68* is the conservative count
+used in the issue text: it drops the 3 pairs whose *measured* payload
+(=Quantity= / =Purchased= / =Quantity_purchased=) happens to be equal,
+where =first()= loses no measurement.  Those 3 are still real losses —
+the two rows name two *different* crops — which is why 71 is the figure
+used here.  Both accountings go to **0** after the fix.
+
+Tuber cuttings are not cereal seed, so *summing* them would have been
+as wrong as dropping one.  The catch-all is split instead (see the
+note above =harmonize_seed_crop= in =categorical_mapping.org=), and
+=2018-19/_/plot_inputs.py= now asserts its declared index is unique
+before writing.  API rows 10,534 → 10,605 = every reported line-item.
+Same defect, same fix, as sibling EHCVM CotedIvoire and Togo — the
+tables were copied verbatim from the Niger reference and inherited the
+bug with it.
+
+*** =cluster_features= — the extraction grain was wrong (fixed 2026-07-21)
+
+=df_main= reads Region/Rural from the *household*-level cover page
+=s00_me_ben2018.dta= while declaring only =v: grappe=, so each
+grappe's attributes are broadcast across its households: 8,012 rows on
+a 670-cluster grain, 7,342 of them duplicate =(t, v)= tuples.
+
+*No value was ever lost*: 0 of 670 grappes carry more than one
+distinct =s00q01= (Region) or =s00q04= (Rural), and
+=grappe_gps_ben2018.dta= is already grappe-level at 670/670.  The
+#323 audit is correctly silent, and it should stay silent.
+
+But that is a fact about the 2018-19 data, not about the extraction.
+=groupby().first()= skips NA *per column*, so a grappe that ever
+straddled two regions would not collapse to one of its households — it
+would collapse to a composite row assembled column-by-column from
+different households, a cluster that exists nowhere in the survey.  So
+=2018-19/_/mapping.py= now carries a =cluster_features(df)= hook that
+projects to cluster grain in the *extraction* and RAISES if any
+cluster straddles two values.  8,012 → 670 rows reach the framework;
+the API result is byte-identical.  This buys
+correctness-by-construction, not rows.
+
+*** =food_acquired= — the bucketing is intended, and core sums it
+
+1,382 rows collide, and here that is *correct*.  The raw source has no
+duplicates (=s07b_me_ben2018.dta=: 187,672 rows, unique on
+=(grappe, menage, s07bq01)=); =harmonize_food= is deliberately
+many-to-one (160 Original Labels → 146 Preferred Labels, 14 buckets
+taking 2 originals each).  Seven of the 14 merely pool an alternate or
+mis-encoded spelling of the same item ("Maïs" with "MaÃ¯s en grain");
+the five that actually collide in the data are the taxonomy's own
+residual categories — =Autres légumes en feuilles= (1,830 rows),
+=Autres poissons fumés= (712), =Riz importé non parfumé= (120),
+=Autre Riz local= (66), =Autres poissons frais= (36).
+
+=food_acquired= is in core's =_ADDITIVE_MEASURE_COLUMNS=, so these are
+SUMMED, not =first()=-ed, which is why the audit is silent.  Colliding
+rows necessarily share =u= *and* =s= (both are in the index), so the
+sums are commensurable by construction.  Verified: wave-frame and API
+totals agree exactly — Quantity 576,293.81, Expenditure 87,287,926.96
+— across the 190,618 → 189,236 row reduction.
+
+*** No =aggregation:= keys, deliberately
+
+An =aggregation: {visit: first}= block sat on =interview_date= until
+2026-07-21.  It was deleted: nothing reads the key (it appears in core
+only inside "skip these meta-keys" sets, and a test pins that the
+collapse does not honour it), the #323 consolidation decided the core
+never aggregates (D1, 2026-07-13), and =visit= is an index *level*
+anyway, so "reduce it with first" named no operation.  Do not add such
+a key back — declaring a reducer only puts a signature on the corpse.
+Where a declared index goes non-unique, the identifier is broken or a
+level is missing; fix that.
 
 ** shocks: at most 2 coping strategies per household in 2018-19
 

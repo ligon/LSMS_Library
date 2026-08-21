@@ -1,5 +1,435 @@
 #+title: Contents
 
+* Sampling universe, exclusions and sub-samples
+
+# ASCII EXCEPTION (deliberate, per the orgmode skill's "leave a comment" rule):
+# the =#+begin_quote= blocks below are VERBATIM transcriptions of survey
+# documentation.  They carry Arabic script and typographic apostrophes and are
+# NOT normalised to ASCII, because normalising them would destroy the one
+# property this record depends on.  All prose outside the quote blocks is ASCII.
+
+Evidence gathered for GH #601 / #603 (the population record).  This section
+records only *what the documentation claims*; nothing here is inferred from the
+=.dta= files, and no =.dta= was opened to write it.  It makes no proposal about
+how the library should represent any of this -- that is #603's business.
+
+Summary of the two waves:
+
+| Wave    | Universe statement? | Where it lives                       | Exclusions stated | Sub-sample inside the wave         |
+|---------+---------------------+--------------------------------------+-------------------+------------------------------------|
+| 2006-07 | yes                 | COSIT report in this repo (Vol.1)    | none              | yes -- time use, one-third of HHs  |
+| 2012    | *no -- gap*         | n/a (nowhere: local or WB catalog)   | none stated       | yes -- three modules, one-third    |
+
+Two facts hold for *both* waves and are worth stating once:
+
+- The World Bank catalog records *no* universe for either study.  The
+  machine-readable DDI carries the element, present and empty, in both cases:
+  =<universe/>= in =<stdyDscr>/<stdyInfo>/<sumDscr>= for catalog 69 (2006-07)
+  and for catalog 2334 (2012).  Verified 2026-07-21 against
+  =https://microdata.worldbank.org/index.php/metadata/export/{69,2334}/ddi=.
+  So for 2006-07 the statement below comes from the Iraqi statistical office's
+  own report -- the stronger source -- and for 2012 the equivalent report simply
+  never makes one.
+- *Neither wave carries the WB NADA boilerplate universe sentence.*  The
+  most-repeated sentence in the cross-country corpus ("The survey covered all de
+  jure household members ...", 15 waves) does not appear here, in either
+  direction: what 2006-07 has is a locally authored claim, and what 2012 has is
+  nothing at all.  Neither is template text.
+
+** 2006-07 (IHSES-I) -- declared universe
+
+Survey: Iraq Household Socio-Economic Survey 2006-2007 (IHSES).  WB catalog id
+69, IDNO =IRQ_2006_IHSES_v02_M= (see =2006-07/Documentation/SOURCE.org=).
+
+Source: =lsms_library/countries/Iraq/2006-07/Documentation/Vol.1_Objectives_methodology.pdf=,
+chapter "4. Sample", subsection "B. Sample frame", second paragraph.  PDF page
+17 of 23; the file is a two-up spread whose sheet carries printed pages 16-17,
+and the passage is on printed page 16.  Language: English (no translation
+needed).
+
+#+begin_quote
+The population covered by IHSES included all households residing in Iraq from
+November 1, 2006, to October 30, 2007, meaning that every household residing
+within Iraq’s geographical boundaries during that period potentially could be
+selected for the sample.
+#+end_quote
+
+Transcription note: the PDF is justified, so the text layer emits this sentence
+with runs of multiple spaces; those were collapsed to single spaces.  No word,
+punctuation mark or character was otherwise changed.  The apostrophe in
+"Iraq’s" is the typographic U+2019 as printed.  (Independently re-extracted and
+character-checked against the PDF on 2026-07-21.)
+
+The unit is the *household*, and the universe is *time-bounded*: it is not "all
+households in Iraq" but all households residing there in a named twelve-month
+window.  See the fieldwork-window note below, which bears on that bound.
+
+** 2006-07 -- exclusions
+
+*No exclusion from the universe is stated anywhere.*  The sentence above is
+explicitly inclusive ("every household ... potentially could be selected"), and
+neither Vol.1 nor the DDI states any exclusion of institutional, collective,
+nomadic, camp or homeless population, and no region is excluded.  Searched, in
+Vol.1 and in =ddi-documentation-english_microdata-69.pdf=, for: =universe=,
+=exclud=, =except=, =nomad=, =institution=, =collective=, =homeless=, =camp=,
+=coverage=, =target population=.  Zero hits for =nomad=, =collective=,
+=homeless=, =camp=; the =institution= hits are all acknowledgements or
+questionnaire text.
+
+*The one "excluded" sentence in the sample chapter is about the CENSUS FRAME,
+not about the universe*, and it is quoted here in full precisely so that a later
+reader does not mistake it for a coverage exclusion.  Same subsection, the
+paragraph immediately preceding the universe sentence:
+
+#+begin_quote
+The 1997 population census frame was applied to the 15 governorates that
+participated in the census (the three governorates in Kurdistan Region of Iraq
+were excluded). For Sulaimaniya, the population frame prepared for the
+compulsory education project was adopted. For Erbil and Duhouk, the enumeration
+frame implemented in the 2004 Iraq Living Conditions Survey was updated and
+used.
+#+end_quote
+
+That is: the three Kurdistan governorates were excluded from the *1997 census*,
+so alternative frames were built for them.  They are *in* the survey.  All 18
+governorates are sampled -- Vol.1 chapter 4 subsection "A. Design" (PDF page 16,
+printed page 15):
+
+#+begin_quote
+The survey was designed to visit 18,144 households—324 households in each of 56
+strata, defined as the rural, urban, and metropolitan portions of each of Iraq’s
+18 governorates. Baghdad, with five strata, was the exception.
+#+end_quote
+
+** 2006-07 -- sub-samples, extra clusters, and module-level universes
+
+*** Time-use module: an explicit one-third sub-sample
+
+Vol.1, chapter 4, subsection "H. Time-use sample" (PDF page 18 of 23; the sheet
+is a two-up spread carrying printed pages 18-19, and this passage is in the
+right-hand half, printed page 19), verbatim:
+
+#+begin_quote
+The IHSES questionnaire on time use (Annex 3, Part 5) covered all household
+members aged 10 years and older. A subsample of one-third of the households was
+selected (the second and fifth of the six households in each sample point). The
+second and fourth visits were designated for completion of the time-use sheet,
+which covered all activities performed by every member of the household.
+#+end_quote
+
+So IHSES-I already has the shape that IHSES-II repeats (below): a module inside
+the wave administered to one third of the households.  Anyone pooling
+time-use-derived quantities across Iraq waves is pooling one-third sub-samples
+in both, and the time-use sheet additionally restricts to members aged 10+.
+
+*** Per-variable universes in the DDI
+
+The 2006-07 DDI does *not* record a study-level universe, but it does record
+*variable-level* universes (37 occurrences in
+=2006-07/Documentation/ddi-documentation-english_microdata-69.pdf=), e.g.
+verbatim =Household Members that are 12 years of age or older= (marital status,
+=q0109=) and =Household members aged 6 and above= / =Household Members Aged 6 or
+more= (labour and time-use items).  These are questionnaire skip universes, not
+sampling universes, but they are the only place the documentation says who a
+given variable is asked of.  Note that no such universe is recorded for the
+education variable the library actually reads (=q0406=, "Highest diploma
+attained"); its DDI entry gives only interviewer instructions ("Ask every
+household member who previously attended school ...") and case counts.
+
+*** Sulaimaniya and Kirkuk: extra clusters, and weights that do not follow
+
+Not an oversample in the design, but the realised sample departs from the
+allocation in two governorates, and in one of them the *weights were
+deliberately not adjusted*.  Vol.1, subsection "F. Exceptional Measures"
+(PDF page 18, printed page 18), verbatim:
+
+#+begin_quote
+The required sample size of 54 clusters in Kirkuk was obtained through two
+means. First, eight new clusters were selected in previously visited sample
+points, using the approach described above. Second, 12 clusters were selected in
+new residential areas that had not existed at the time of the original sample
+frame. [...] To account for the new residential area, the population of Kirkuk
+(used for constructing weights) was increased by 38,000, bringing the revised
+population to 1,129,000.
+
+In Sulaimaniya, a new residential area was added that had not existed at the
+time of the original sample frame. Eighteen additional clusters were selected
+from among the newly identified PSUs with the same two-phase sampling method
+used for the original clusters. This brought the total number of clusters in
+Sulaimaniya to 72. The additional 18 clusters were visited after the completion
+of wave 18. The fieldwork for these additional 18 clusters is referred to as
+waves 19 and 20. The population of Sulaimaniya (used for constructing weights)
+was not increased because the population of the new residential areas moved from
+within the same governorate.
+#+end_quote
+
+("[...]" marks an elision of exactly two sentences -- one on the sampling method
+used for the 12 new Kirkuk clusters, one recording that all 54 Kirkuk clusters
+were visited during waves 1 to 18.  Nothing else is elided.)
+
+This is *visible in the library's own configuration*: the 2006-07
+=sample.Rural= mapping in =2006-07/_/data_info.yml= contains the stratum label
+=sulaimaniya - urban center - extra=, which is the extra Sulaimaniya
+metropolitan stratum.  The WB catalog's sampling text agrees, verbatim: "h
+identifies the 57 sampling strata, defined as the rural, urban and metropolitan
+sectors of each of each of the 18 governorates, with the exception of Baghdad
+(which has three metropolitan sectors,) and Suleimaniya (which has two.)"  (sic
+"each of each of"; catalog 69 / DDI PDF.)
+
+** 2006-07 -- universe vs. what the fieldwork and the weights actually cover
+
+Three documented tensions.  None of them contradicts the universe sentence; all
+three qualify it, and a reader pooling this wave should see them.
+
+1. *The fieldwork ran past the declared window.*  The universe is bounded to
+   "November 1, 2006, to October 30, 2007".  The catalog's own collection dates
+   record a second cycle beyond it, verbatim from the DDI XML for catalog 69:
+   =<collDate date="2007-11-01" event="start" cycle="Extension of data
+   collection in Kurdistan region"/>= and =<collDate date="2007-12-15"
+   event="end" .../>=.  Vol.1 supplies the reason (PDF page 18, printed page 18,
+   verbatim):
+   "In Erbil and Duhouk governorates, waves 3, 4, and 5 could not be implemented
+   as planned for logistical reasons. The fieldwork for these three waves was
+   deferred until wave 18 was completed."  So some Kurdistan households were
+   enumerated after the universe's stated end date.
+
+2. *Security-driven cluster replacement, concentrated in two strata.*  Vol.1,
+   "F. Exceptional Measures" (PDF page 18, printed page 18), verbatim:
+
+   #+begin_quote
+   Sometimes a team could not visit a cluster during the allocated wave because
+   of unsafe security conditions. When this happened, that cluster was then
+   swapped with another cluster from a randomly selected future wave that was
+   considered more secure. If none were considered secure, a sample point was
+   randomly selected from among those that had been visited already. The team
+   then visited a new cluster within that sample point. (That is, the team
+   visited six households that had not been previously interviewed.) The
+   original cluster as well as the new cluster were both selected by systematic
+   equal probability sampling. Remarkably few of the original clusters could not
+   be visited during the fieldwork. Nationally, less than 2 percent of the
+   original clusters (55 of 3,024) had to be replaced. Of the original clusters,
+   20 of 54 (37 percent) could not be visited in the stratum of “Kirkuk/other
+   urban” and 19 of 54 (35 percent) could not be visited in “Ninevah/other
+   urban.” The other strata had far fewer clusters that could not be visited
+   (Table I-2). In the city of Baghdad, all original clusters were visited; in
+   the stratum “Baghdad/rural,” only 6 of 54 original clusters (11 percent)
+   could not be visited and had to be replaced.
+   #+end_quote
+
+   This is *replacement*, not exclusion -- the design says nothing was dropped.
+   But it is a security carve-out with a strongly non-uniform geography, and
+   two strata lost roughly a third of their original clusters.
+
+   *Unreconciled numbers, flagged not resolved.*  The report says 55 of 3,024
+   clusters were replaced.  The same report's Table I-2 lists per-stratum counts
+   (6, 8, 4, 19, 8, 2, 20) that sum to 67.  The WB catalog says, verbatim, "This
+   explains why the survey datasets only contain data from 2,876 of the 3,024
+   originally selected PSUs, whereas 55 of the PSUs contain more that the six
+   households nominally dictated by the design." (sic "more that"), which leaves
+   148 unaccounted for and attaches the number 55 to a different quantity.
+   These three accountings are not reconcilable at face value.  Recorded as an
+   open discrepancy in the documentation; *do not* pick one and treat it as the
+   fact.
+
+3. *Response rate.*  Vol.1, "I. Response rates" (PDF page 18, printed page 19),
+   verbatim:
+   "IHSES reached a total of 18,144 households. Interviews were fully carried out
+   for 98.62 percent of these households." with a governorate range from 92.4
+   percent (Duhouk) to 99.8 percent (Missan).  The catalog reports the realised
+   size as "The total effective sample size of the IHSES 2007 is 17,822
+   households."
+
+** 2012 (IHSES-II) -- NO universe statement found (gap)
+
+Survey: Iraq Household Socio-Economic Survey 2012, Second Round (IHSES-II).  WB
+catalog id 2334, IDNO =IRQ_2012_IHSES_v02_M= (see =2012/Documentation/SOURCE.org=).
+
+*No document -- local or catalog -- states a target population or universe for
+this wave.*  This is a checked gap, not an unexamined one, and it is recorded
+here so it can be falsified by anyone who finds the document that was missed.
+What was searched (2026-07-21):
+
+- In the repo, =lsms_library/countries/Iraq/2012/Documentation/=:
+  =ddi-documentation-english_microdata-2334.pdf= (read in full -- it contains
+  only Sampling / Weighting / Questionnaires / Data Collection / Related
+  Materials; *there is no Scope-Coverage-Universe section at all*, re-verified
+  by extraction: zero occurrences of =Universe=, =universe=, =Coverage=,
+  =Scope=, =Target=), =IHSES_II_2012_Arabic_Reviewed.pdf= (the official
+  IHSES-II report, Arabic only, 47 pp. -- chapter 4 "عينة المسح" read in full,
+  searched for المجتمع / المستهدف / يشمل المسح / يغطي / التغطية / جميع الأسر /
+  الشمول / استثن / النطاق), =Iraq_Poverty_Methodology_Note_Final.pdf=,
+  =Part_1_Socio_Economic_Data.pdf=, =Part_3_Income_and_Other_13_24.pdf=,
+  =SOURCE.org=.
+- Catalog-hosted documents not shipped in this repo:
+  =Sampling_and_fieldwork_2012.pdf= (catalog item 34769, read in full -- zero
+  occurrences of "universe" or "target population"),
+  =Iraq_2012_IHSES_Users_Note.pdf= (34770, read in full),
+  =IHSES_2012_Manual_English.pdf= (34768, enumerator manual, grepped).
+- The catalog study description page and the DDI XML export: the Scope section
+  carries only a topic list, Coverage carries only "Geographic Coverage:
+  National coverage", and the DDI's =<universe/>= is empty.
+
+*Closest available statements -- these are SAMPLE-SIZE and SAMPLE-FRAME
+statements, NOT universe statements.*  They are recorded because they are the
+nearest thing that exists, and labelled because promoting either to a universe
+would be an inference rather than a claim the documentation makes.  Both are
+from =2012/Documentation/IHSES_II_2012_Arabic_Reviewed.pdf=, chapter
+"4. عينة المسح".
+
+Subsection "أ. تصميم العينة" (sample design), PDF page 29:
+
+#+begin_quote
+بلغ حجم العينة المختارة (25488) أسرة من جميع محافظات العراق، (216) أسرة من كل من أقضية العراق البالغة (118).
+#+end_quote
+
+Translation (not part of the quote): "The selected sample size amounted to
+(25,488) households from all governorates of Iraq, (216) households from each of
+Iraq's (118) districts."
+
+Subsection "ب. إطار العينة:" (sample frame), PDF page 30:
+
+#+begin_quote
+اعتمدت نتائج الحصر والترقيم المنجزة في إطار التعداد العام للسكان والمساكن للفترة 2009-2010 في جميع محافظات العراق بما فيها إقليم كردستان كإطار لتحديد الأسر، وقد تم اختيار العينة وسحبها في مرحلتين:
+#+end_quote
+
+Translation (not part of the quote): "The results of the listing and numbering
+carried out within the framework of the general population and housing census
+for the period 2009-2010 in all governorates of Iraq including the Kurdistan
+Region were adopted as a frame for identifying households, and the sample was
+selected and drawn in two stages:".
+
+*Why these are not promoted to a universe.*  The frame sentence says what the
+sampling frame was built from ("all governorates of Iraq including the Kurdistan
+Region").  That constrains coverage, but it does not name the set of units the
+sample stands for, says nothing about which residents of those governorates are
+in or out, and is silent on institutional, collective, nomadic and homeless
+population.
+
+*** Two transcription caveats on the Arabic above -- read before relying on it
+
+Recorded so a later reader re-verifies rather than trusts the transcription.
+
+1. *Bidi.* =pdfminer= returns this PDF's Arabic in visual order and is unusable
+   raw.  The quotes come from a per-character reconstruction (group =LTChar= by
+   y, sort by x, reverse Arabic runs only).  Two independent reconstruction
+   passes (the GH #601 sweep's, and a fresh one run while checking it) agree on
+   the letter sequences.  Arabic ligature / hamza normalisation is *not*
+   guaranteed: the raw stream renders lam-alef via presentation forms, so the
+   two passes differ on exactly that -- one yields "بالإمكان" where the other
+   yields the presentation-form spelling.  The quotations above use the
+   normalised orthography, which may differ from the source in code points
+   while being identical in letters.
+2. *The numerals are glyph-substituted in this PDF and have been decoded.*  The
+   raw extracted digits are "45288", "406", "008", "4834", "4101-4119".
+   Cross-checking against internally consistent design facts (25,488 = 118
+   qadhas x 24 EAs x 9 households; 216 per qadha; 2,832 clusters; response rate
+   98.6%) yields the glyph map 0->1, 1->0, 2->4, 4->2 (others identity), giving
+   25488 / 216 / 118 / 2832 / 2009-2010.  The *decoded* digits are substituted
+   into the quotes above.  The census-period range in particular decodes to the
+   character sequence "2010-2009", which is how a right-to-left range renders;
+   it is written "2009-2010" above because that is how it reads.  *That part is therefore not strictly verbatim*: the
+   Arabic letters are the verbatim part; anyone re-deriving the numbers must
+   repeat the decode.
+
+** 2012 -- exclusions
+
+*No exclusion from a universe is stated anywhere* -- no statement about
+institutional, collective, nomadic or homeless population, and no excluded
+governorate or region.  (Searched as listed above.)
+
+The only recorded coverage shortfall is a *fieldwork* deviation, not a design
+exclusion.  =IHSES_II_2012_Arabic_Reviewed.pdf=, PDF page 31, section
+"ز. إجراءات استثنائية:" (exceptional procedures):
+
+#+begin_quote
+اما العناقيد المؤجلة التي لم يكن بالإمكان شمولها بسبب عدم تحسن الوضع الأمني فيها فقد بلغت (5) عناقيد فقط في كركوك.
+#+end_quote
+
+Translation (not part of the quote): "As for the postponed clusters that could
+not be covered because the security situation there did not improve, they
+amounted to only (5) clusters in Kirkuk."  The preceding sentence describes the
+same swap-to-a-later-wave procedure as IHSES-I.  Same two transcription caveats
+as above apply.
+
+** 2012 -- sub-sample: three modules administered to one third of households
+
+*This is the specialization inside the wave, and it must be known before
+anything from those modules is pooled or averaged.*  Source:
+=Sampling_and_fieldwork_2012.pdf= ("Iraq Household Socio-Economic Survey 2012
+(IHSES-II) Sampling design and fieldwork organization", Beirut, July 2011
+(updated, November 2011)), section "Subsamples".  *This document is NOT in this
+repo* -- it is catalog-only (WB catalog 2334, item 34769); see the "where the
+statement lives" note below.  Verbatim:
+
+#+begin_quote
+Most questionnaire modules will be administered to all households. However, in
+order to reduce some of the fieldwork effort, three of the modules will be
+administered in subsamples, each composed of three of the nine households
+visited in each Gadha. The three modules are: Anthropometrics (Section 7), Time
+use (Section 21), and Food consumption by recall (Section 24).
+#+end_quote
+
+("Gadha" as printed; the bullet glyphs before the three module names are
+dropped.  Note the document says "the nine households visited in each Gadha"
+while its own design allocates 216 households per gadha in 24 clusters of nine,
+i.e. nine per enumeration area -- the sentence is read most naturally as nine
+per cluster, but that reading is *not* asserted here, only flagged.)
+
+*Two caveats on this source, both material.*
+
+- It is a *prospective design document*, written in the future tense ("will be
+  administered"), describing "the fieldwork procedures that could be put in
+  place".  It is not a report of what was done.
+- It *argues against its own Section 7 plan* two paragraphs later, verbatim:
+  "This suggests that it may be better to administer Section 7 to children from
+  all households in the cluster."  So whether the anthropometrics sub-sample was
+  implemented as designed is *not* attested by any document located.  Do not
+  treat the s7 sub-sample as established fact; treat it as a design intention
+  with a documented internal objection.
+
+*Which of Iraq's wired tables this touches: as of this writing, none.*  Reading
+=2012/_/data_info.yml= and =_/data_scheme.yml= (configuration, not data), the
+2012 tables the library builds come from sections 1 (roster), 4 (housing), 5
+(education), 18 (durables/assets), 20 (shocks), 23 (life satisfaction) and the
+cover page -- none of 7, 21 or 24.  The 2006-07 tables come from sections 1, 3,
+4, 16 and the cover page -- not the time-use sheet.  *This must be re-checked
+whenever a feature is added to Iraq*, in particular anything anthropometric,
+time-use, or food-consumption-by-recall: those would be built on a one-third
+sub-sample in both waves.
+
+** Where these statements live (and what that means for the record)
+
+- 2006-07 :: the universe statement *is in this repo*, in
+     =2006-07/Documentation/Vol.1_Objectives_methodology.pdf= (DVC-tracked;
+     materialise with =get_dataframe= / =data_access.get_data_file=, never the
+     =dvc= CLI).  The library therefore holds this claim rather than pointing at
+     a moving target.  The WB catalog does *not* carry it.
+- 2012 :: there is no statement to hold.  The nearest statements are in
+     =IHSES_II_2012_Arabic_Reviewed.pdf=, which *is* in this repo -- but the
+     *sub-sample* statement, which is the operationally important one, is
+     *catalog-only*: =Sampling_and_fieldwork_2012.pdf= is hosted on the WB
+     catalog and is not among this wave's DVC-tracked documentation.  It is
+     therefore a moving target: if the catalog record is revised or the item is
+     withdrawn, the only surviving copy of the one-third-sub-sample claim is the
+     verbatim quotation above.
+
+** How to re-verify this section
+
+Every quote above was re-extracted from the cited PDF on 2026-07-21 and checked
+character-by-character against the extraction, not copied from an intermediate
+summary.  The Vol.1 text layer has a known font defect: the letter "v" is
+sometimes emitted as =U+0018= (visible as "Goernorate", "isit", "Surey" in raw
+extraction).  Every "v" in the quotations above was restored from context and
+verified against the surrounding printed word; no other repair was made.  The
+Arabic caveats are stated in full at the point of use rather than here, because
+they change what the quote can be used for.
+
+The upstream evidence record for both waves is
+=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= (GH #601), sections "Iraq
+2006-07" and "Iraq 2012".  Two items in this section are *not* in that record
+and were found while checking it: the 2006-07 time-use one-third sub-sample, and
+the 2006-07 Sulaimaniya extra clusters with unadjusted weights.
+
 * Food security (non-FIES families, GH #332) --- not wired
 
 The IHSES 2012 questionnaire has no standard food-insecurity-experience

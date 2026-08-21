@@ -152,8 +152,8 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | M4                      | Lower secondary complete     |
 | m4                      | Lower secondary complete     |
 | Middle                  | Lower secondary complete     |
-| none                    | None                         |
-| None                    | None                         |
+| none                    | No education                 |
+| None                    | No education                 |
 | nursing                 | Tertiary certificate/diploma |
 | Nursing                 | Tertiary certificate/diploma |
 | Other                   | Unknown                      |
@@ -220,7 +220,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | A1                      | Upper secondary complete     |
 | A2                      | Upper secondary complete     |
 | JSS2                    | Lower secondary              |
-| B                       | None                         |
+| B                       | No education                 |
 | T1                      | Tertiary certificate/diploma |
 | T2                      | Tertiary certificate/diploma |
 | T3                      | Tertiary certificate/diploma |

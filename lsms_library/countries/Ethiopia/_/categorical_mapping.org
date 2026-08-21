@@ -854,6 +854,12 @@ appear in some waves) fall outside the WB 1-18 industry range and map to
 # onto the canonical ordinal levels (grades 1-8 primary, 9-10 lower / 11-12 upper
 # secondary; NC 10+N = TVET -> Vocational/Technical; college->diploma, university/1st
 # degree->Bachelor, above-1st/graduate->Postgraduate).
+# NB one wave-2 row (of 12,583) carries a bare, unlabelled float code (76.0) in
+# this otherwise fully-labelled column.  It CANNOT be handled here: this table's
+# Original Label column is mixed text, so df_from_orgfile reads every key as a
+# string and a float source value can never match one (contrast Guyana, whose
+# all-numeric table parses its keys as floats).  It is folded onto `Unknown` by
+# the `individual_education` df_edit hook in `2013-14/_/mapping.py`.  GH #645.
 #+name: harmonize_education
 | Original Label                                       | Preferred Label              |
 |------------------------------------------------------+------------------------------|
@@ -914,7 +920,7 @@ appear in some waves) fall outside the WB 1-18 industry range and map to
 | 94. ADULT EDUCATION                                  | Informal                     |
 | 95. ALTERNATIVE EDUCATION                            | Informal                     |
 | 96. NON-REGULAR                                      | Informal                     |
-| 98. ILLITRATE                                        | None                         |
+| 98. ILLITRATE                                        | No education                 |
 | 99. DON'T KNOW                                       | Unknown                      |
 | 9th Grade Complete                                   | Lower secondary              |
 | Above 1st Degree / Level 4                           | Postgraduate                 |
@@ -937,12 +943,12 @@ appear in some waves) fall outside the WB 1-18 industry range and map to
 | NC Certificate (10+3) Level 3 One Year Complete      | Vocational/Technical         |
 | NC Certificate (10+3) Level 3 Two Years Complete     | Vocational/Technical         |
 | NC Diploma (10+3) Level 3                            | Vocational/Technical         |
-| Not educated                                         | None                         |
-| Not educated - Can not read and write                | None                         |
+| Not educated                                         | No education                 |
+| Not educated - Can not read and write                | No education                 |
 | Teacher Training Certificate                         | Tertiary certificate/diploma |
 | adult education                                      | Informal                     |
 | alternative education                                | Informal                     |
 | basic education                                      | Informal                     |
-| illitrate                                            | None                         |
+| illitrate                                            | No education                 |
 | informal education                                   | Informal                     |
 | non-regular- literate from religious schl            | Informal                     |

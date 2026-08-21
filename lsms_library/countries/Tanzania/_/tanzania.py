@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import warnings
 import json
+import re
 import sys
 sys.path.append('../../_')
 sys.path.append('../../../_')
@@ -154,6 +155,216 @@ Waves = {'2008-15': ('upd4_hh_a.dta', ['r_hhid', 'round', 'UPHI'], map_08_15),
 
 waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
 wave_folder_map = {'2008-09':'2008-15', '2010-11':'2008-15', '2012-13':'2008-15', '2014-15':'2008-15', '2019-20':'2019-20', '2020-21':'2020-21'}
+
+
+# ---------------------------------------------------------------------------
+# GH #323 -- the NPS cluster geocode, and who is RESIDENT in a cluster.
+#
+# THE DEFECT.  `cluster_features` is declared at `(t, v)`, but every Tanzania
+# wave extracts it from the household COVER PAGE -- one row per household,
+# carrying the address where that household was INTERVIEWED.  The NPS is a
+# TRACKING panel: when a household moves, or a member splits off to form a new
+# household, the survey follows it and records its NEW address while carrying
+# its ORIGINAL sampling cluster `v` forward unchanged.  So the geo columns are
+# HOUSEHOLD attributes and the cluster is a CLUSTER attribute, and projecting
+# the former onto the latter with `.first()` hands the analyst one mover's
+# doormat as the cluster's location.  Measured cold, 2,104 of 7,167
+# cluster-attribute cells (29.4%) were contested this way -- 65.4% in 2012-13.
+#
+# WHY THIS IS AN IDENTIFIER FIX AND NOT A REDUCER.  The NPS cluster id is not an
+# opaque serial: it is a HIERARCHICAL GEOCODE whose leading fields ARE the
+# cluster's region and district.  Verified on the 2008-09 frame -- round 1, the
+# only pollution-free round, because nobody has moved yet:
+#
+#   * every one of the 26 region codes present maps to EXACTLY ONE region name
+#     (0 violations, 409 clusters); and
+#   * the district digit of the geocode equals the separately reported district
+#     code `ha_02_1` for 100.0% of rows.
+#
+# The cluster's own geography is therefore recoverable from `v` itself.  What
+# these helpers do is USE it -- to decide which households are actually
+# RESIDENT in the cluster they are being asked to describe.  A household whose
+# reported region is not the region in its own cluster's code has moved out; it
+# is evidence about where it went, not about the cluster.
+#
+# The codes below are the Tanzania NBS standard region codes, MINED from the
+# 2008-09 frame and cross-checked against 2019-20 (`t0_region`) and 2020-21
+# (`hh_a01_1`) -- the modal name agrees across all three sources for every code.
+# 22 NJOMBE / 23 KATAVI / 24 SIMIYU / 25 GEITA are the regions created in 2012
+# and appear only from 2012-13 on.  (SONGWE, split from MBEYA in 2016, has no
+# cluster code of its own: its clusters keep the 12 = MBEYA prefix they were
+# drawn under.)
+# ---------------------------------------------------------------------------
+
+TZ_REGION_BY_CODE = {
+    '01': 'DODOMA',        '02': 'ARUSHA',      '03': 'KILIMANJARO',
+    '04': 'TANGA',         '05': 'MOROGORO',    '06': 'PWANI',
+    '07': 'DAR ES SALAAM', '08': 'LINDI',       '09': 'MTWARA',
+    '10': 'RUVUMA',        '11': 'IRINGA',      '12': 'MBEYA',
+    '13': 'SINGIDA',       '14': 'TABORA',      '15': 'RUKWA',
+    '16': 'KIGOMA',        '17': 'SHINYANGA',   '18': 'KAGERA',
+    '19': 'MWANZA',        '20': 'MARA',        '21': 'MANYARA',
+    '22': 'NJOMBE',        '23': 'KATAVI',      '24': 'SIMIYU',
+    '25': 'GEITA',
+    '51': 'KASKAZINI UNGUJA', '52': 'KUSINI UNGUJA',
+    '53': 'MJINI MAGHARIBI UNGUJA',
+    '54': 'KASKAZINI PEMBA',  '55': 'KUSINI PEMBA',
+}
+
+# Field widths of the geocode, by the scheme the wave was coded under.  The
+# scheme is a property of the WAVE, never of the string's length -- 2019-20's
+# 8-character '11014002' is the 9-digit '011014002' (= DODOMA), NOT the 8-digit
+# '11014002' (= IRINGA).  Getting this wrong silently relabels a whole region,
+# which is why the caller must name the scheme.
+#
+#   'nps' : RR D WW EEE       (9 digits) -- NPS rounds 1-3 and the 2014-15
+#           RR DD WWW EE CCC (12 digits)    EXTENDED panel keep the 8-digit
+#                                           form; the 2014-15 REFRESH sample is
+#                                           drawn under the 12-digit form, so
+#                                           this scheme picks by length.
+#   'sdd' : RR D WWW EEE      (9 digits) -- NPS-SDD, 2019-20.
+#   'y5'  : RR-DD-WWW-EE-CCC             -- NPS Y5, 2020-21 (`y5_cluster`,
+#                                           already hyphen-delimited).
+_GEOCODE_SCHEMES = {
+    'nps': ((8, 2, 1), (12, 2, 2)),   # (width, region width, district width)
+    'sdd': ((9, 2, 1),),
+}
+
+
+def _geocode_fields(v, scheme='nps'):
+    """(region_code, district_code) from an NPS cluster id.  ``(pd.NA, pd.NA)``
+    if ``v`` is missing or does not fit the scheme."""
+    if v is None or (not isinstance(v, str) and pd.isna(v)):
+        return pd.NA, pd.NA
+    c = str(v).strip()
+    if c in ('', 'nan', '<NA>', 'None'):
+        return pd.NA, pd.NA
+    if c.endswith('.0'):
+        c = c[:-2]
+    if scheme == 'y5' or '-' in c:
+        bits = c.split('-')
+        if len(bits) < 2:
+            return pd.NA, pd.NA
+        return bits[0].zfill(2), bits[1].lstrip('0') or '0'
+    for width, rw, dw in _GEOCODE_SCHEMES.get(scheme, _GEOCODE_SCHEMES['nps']):
+        if len(c) <= width:
+            p = c.zfill(width)
+            return p[:rw], p[rw:rw + dw].lstrip('0') or '0'
+    return pd.NA, pd.NA
+
+
+def cluster_region_code(v, scheme='nps'):
+    """The region code carried by the cluster id itself."""
+    return _geocode_fields(v, scheme)[0]
+
+
+def cluster_district_code(v, scheme='nps'):
+    """The district code carried by the cluster id itself (leading zeros stripped)."""
+    return _geocode_fields(v, scheme)[1]
+
+
+def cluster_region(v, scheme='nps'):
+    """The cluster's OWN region name, decoded from its id.  ``pd.NA`` if the id
+    is missing or carries a region code we have no name for."""
+    rc = cluster_region_code(v, scheme)
+    if pd.isna(rc):
+        return pd.NA
+    return TZ_REGION_BY_CODE.get(rc, pd.NA)
+
+
+def normalize_place(x):
+    """Case- and punctuation-insensitive form of a place name, for COMPARISON
+    only -- never stored.  The same region is written 'MJINI/MAGHARIBI UNGUJA'
+    in 2008-15, 'MJINI MAGHARIBI UNGUJA' in 2019-20 and 'arusha' in 2020-21."""
+    if x is None or (not isinstance(x, str) and pd.isna(x)):
+        return pd.NA
+    s = re.sub(r'[^A-Z0-9]+', ' ', str(x).upper()).strip()
+    return s if s else pd.NA
+
+
+def _norm_series(s):
+    return s.map(normalize_place)
+
+
+def keep_cluster_residents(df, region='Region', district_code=None,
+                           scheme='nps', v='v', extra_mask=None, label=''):
+    """Keep only the households RESIDENT in the cluster they describe.
+
+    ``cluster_features`` asks what a CLUSTER looks like.  Only a household that
+    still lives in the cluster can answer; a tracked mover answers about
+    somewhere else.  Residency is decided against the cluster's OWN geocode (see
+    the module comment): a household is resident when its reported region is the
+    region in its cluster's id, and -- where the source also reports a district
+    CODE comparable with the geocode's -- when its district matches too.
+
+    Applied in TIERS, finest first, so that tightening the test can never empty
+    a cluster-WAVE and drop it from the table:
+
+      1. region AND district code agree with the geocode;
+      2. else region alone agrees;
+      3. else keep that cluster-wave's households unfiltered (nothing in the
+         wave places anyone in it -- the residual disagreement is then reported
+         by the framework's grain audit rather than papered over).
+
+    The tiers are evaluated per ``(t, v)``, not per ``v``: the declared grain is
+    ``(t, v)``, and a cluster can have residents in one round and none in the
+    next.  Grouping on ``v`` alone silently dropped 12 cluster-waves.
+
+    Args:
+        df: household-grain frame with ``v`` in the index (or columns).
+        region: name of the reported-region column.
+        district_code: name of a reported district-CODE column comparable with
+            the geocode's district field, or None if the wave has none.
+        scheme: geocode scheme -- 'nps', 'sdd' or 'y5'.
+        v: name of the cluster-id level/column.
+        extra_mask: optional boolean Series, ANDed into tier 1 and tier 2 --
+            for waves whose instrument states residency directly (NPS-SDD's
+            `sdd_cluster`, NPS Y5's `hh_tracking_status`).
+        label: wave label, for the diagnostic warning only.
+
+    Returns:
+        The subset of ``df`` describing each cluster from inside it.
+    """
+    flat = df.reset_index() if v not in df.columns else df.copy()
+    vs = flat[v]
+    if 't' in flat.columns:
+        grain = flat['t'].astype(str).str.cat(vs.astype(str), sep='|')
+    else:
+        grain = vs
+    geo_region = vs.map(lambda x: cluster_region(x, scheme))
+    ok_region = _norm_series(geo_region) == _norm_series(flat[region])
+    if district_code is not None and district_code in flat.columns:
+        geo_dist = vs.map(lambda x: cluster_district_code(x, scheme))
+        rep = flat[district_code].map(
+            lambda x: pd.NA if pd.isna(x) else str(x).split('.')[0].lstrip('0') or '0')
+        ok_fine = ok_region & (geo_dist == rep)
+    else:
+        ok_fine = ok_region
+    if extra_mask is not None:
+        extra = pd.Series(np.asarray(extra_mask), index=flat.index).fillna(False)
+        ok_fine = ok_fine & extra
+        ok_region = ok_region & extra
+    ok_fine = ok_fine.fillna(False).astype(bool)
+    ok_region = ok_region.fillna(False).astype(bool)
+
+    n_clusters = int(grain.nunique(dropna=False))
+    has_fine = ok_fine.groupby(grain, dropna=False).transform('max')
+    has_coarse = ok_region.groupby(grain, dropna=False).transform('max')
+    keep = ok_fine | (~has_fine & ok_region) | (~has_fine & ~has_coarse)
+
+    n_drop = int((~keep).sum())
+    n_unresolved = int((~has_fine & ~has_coarse).groupby(grain, dropna=False).max().sum())
+    if n_drop or n_unresolved:
+        warnings.warn(
+            f'cluster_features{" " + label if label else ""}: {n_drop} of '
+            f'{len(flat)} household rows describe a cluster they no longer live '
+            f'in (the NPS tracks movers and split-offs but carries their '
+            f'ORIGINAL cluster forward) and are excluded from the cluster grain; '
+            f'{n_unresolved} of {n_clusters} clusters have no resident '
+            f'household at all and are left unfiltered.  GH #323.',
+            RuntimeWarning, stacklevel=2)
+    return df[keep.to_numpy()]
+
 
 def harmonized_food_labels(fn='../../_/categorical_mapping.org', name='harmonize_food'):
     # Harmonized food labels.  Reads the canonical harmonize_food table

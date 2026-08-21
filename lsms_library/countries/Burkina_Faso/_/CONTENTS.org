@@ -3,6 +3,445 @@
 Brief table of contents and todo list.
 
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered for GH #601 (population / universe statements).  This section
+records *what the survey documentation claims* about the population each wave
+represents.  It is deliberately separate from the =sample= notes elsewhere in
+this file (the "DONE sample" subsection), which describe the *data* -- realized
+household and cluster counts, weight variables, strata columns.  Nothing here
+was inferred from the =.dta= files; every claim below is quoted from a document,
+with a citation.
+
+No schema is proposed here.  How the library should *represent* this is being
+decided in GH #603.
+
+Transcription conventions.  French quotations are reproduced with their original
+accents and punctuation -- fidelity beats the ASCII house preference here, since
+a de-accented quote is no longer verbatim.  The source PDFs are justified text,
+so pdfminer emits runs of multiple spaces between words; that whitespace has
+been collapsed to single spaces, and the typographic apostrophe (U+2019) is
+rendered as ASCII ='=.  Words the PDF hyphenates across a line break (e.g.
+"sous-\nechantillons", "EHCVM-\n1") are rejoined to their printed form.  Wording,
+accents and punctuation are otherwise unaltered.  =[...]= marks the elision of a paragraph break between two
+consecutive paragraphs.  Quotes were re-checked against the PDFs when this
+section was written.
+
+** Summary across waves
+
+| Wave    | Survey  | Universe statement held in-repo?      | Geographic exclusion | Population exclusion (as stated)           | Wave-internal structure                    |
+|---------+---------+---------------------------------------+----------------------+--------------------------------------------+--------------------------------------------|
+| 2014    | EMC     | yes -- INSD report (French)           | none stated          | collective HH, diplomatic corps, homeless  | 4 quarterly passages, same households      |
+| 2018-19 | EHCVM-1 | yes -- INSD report (fr) + NADA DDI (en) | none stated        | collective HH, diplomatic status, homeless | ZD sample split at random into 2 vagues    |
+| 2021-22 | EHCVM-2 | yes, but NADA boilerplate only (en)   | none stated          | prisons, hospitals, barracks, dormitories  | *panel sub-sample of EHCVM-1*              |
+
+Headline findings:
+
+- *No Burkina Faso wave excludes a region, and none is rural-only.*  All three
+  declare the whole national territory, urban and rural, all 13 regions.
+- *No oversample or booster is declared in any wave.*  The specialization in this
+  country is sub-sampling, not oversampling.
+- The thing a pooling analyst must know is the *2021-22 panel frame*: a strict
+  half-sub-sample of the 2018-19 households, with no tracking outside the EA of
+  origin and no top-up when an EA fell below 6 available households.
+
+** 2014 -- Enquête Multisectorielle Continue (EMC 2014)
+
+Source: =2014/Documentation/Report.pdf= (in-repo, DVC-tracked) -- INSD,
+« Rapport -- Enquête multisectorielle continue (EMC) 2014 : Profil de pauvreté
+et d'inégalités », Novembre 2015, section 1.2.1 « Champ de l'EMC », p. 20.
+WB catalog id 2538.
+
+*** Declared universe (verbatim, French)
+
+#+begin_quote
+Pour des besoins de conformité au principe de comptabilité nationale, le champ
+social est constitué de l'ensemble des ménages, toutes catégories confondues,
+nationaux ou non, résidant sur le territoire national. [...] Le champ
+géographique de l'EMC est le territoire national burkinabè. Le niveau spatial de
+représentativité des données collectées concerne les milieux de résidence
+(urbain et rural) et les 13 régions administratives du pays.
+#+end_quote
+
+TRANSLATION (not source text): "To comply with the principle of national
+accounting, the social scope consists of the totality of households, of all
+categories, nationals or non-nationals, residing on the national territory.
+[...] The geographic scope of the EMC is the Burkinabè national territory.  The
+spatial level of representativeness of the data collected concerns the areas of
+residence (urban and rural) and the 13 administrative regions of the country."
+
+*** Exclusions (verbatim, same page, immediately following)
+
+#+begin_quote
+Sont exclus de ce champ, les ménages collectifs (camps militaires, casernes,
+hôpitaux, etc.), les ménages des membres du corps diplomatique, les sans
+domiciles fixes.
+#+end_quote
+
+TRANSLATION (not source text): "Excluded from this scope are collective
+households (military camps, barracks, hospitals, etc.), households of members of
+the diplomatic corps, and the homeless."
+
+*** Independent corroboration in WB catalog metadata
+
+WB catalog 2538, DDI field =study_desc.study_info.universe=
+(https://microdata.worldbank.org/metadata/export/2538/json ; also shown as
+"Universe" on the study-description page), VERBATIM:
+
+#+begin_quote
+The universe includes all households currently living in Burkina Faso.
+Individuals living in group households (such as academic institutions, hospitals
+or military installations) are not included.
+#+end_quote
+
+Worth noting: this is *not* the WB NADA "de jure households" boilerplate that the
+two EHCVM waves carry.  2014 has a survey-specific catalog universe, and it
+agrees in substance with the INSD report.  Same record:
+=study_info.geog_coverage= = "The survey is nationally representative.";
+=study_info.analysis_unit= = "The unit of measure is the household and the
+individuals within the household."
+
+*** Sample design (context, not the universe)
+
+Report.pdf section 1.2.2 « Plan de sondage », p. 20, VERBATIM: « Le plan de
+sondage adopté est celui d'un sondage aréolaire stratifié à deux degrés. La
+stratification est faite avant le tirage des unités primaires et basée sur
+l'urbanisation des agglomérations. »  Frame, same page: « La base de sondage des
+unités primaires ou zones de dénombrement de l'EMC est constituée de la liste
+des 13 821 ZD définies lors de la cartographie du RGPH réalisée en 2006. »
+Method: 900 ZD drawn with probability proportional to size at the first stage,
+12 households per ZD systematically at the second -- « Ce qui a donné un
+échantillon de 10 800 ménages. »
+
+- The catalog DDI's =sampling_procedure= instead gives 905 EAs / ~10 860
+  households.  Recorded as a design-figure discrepancy; *not adjudicated*.
+- The realized counts recorded in the =sample= section of this file (10,224
+  households, 900 clusters) are data-side counts, a different kind of fact from
+  these design figures.  No claim is made here about which is "right".
+
+*** Sub-samples / oversamples
+
+None declared.  The EMC's four quarterly passages are *repeat visits to the same
+households* -- Report.pdf p. 20, VERBATIM: « Le dispositif de l'EMC a prévu la
+reconduite de l'ensemble des ménages enquêtés au premier passage aux trois
+passages suivants (deuxième, troisième et quatrième). »  They are not distinct
+sub-samples.  This matters when reading the =food_acquired= notes elsewhere in
+this file (only passage 1 records quantities): that is a module-coverage fact,
+not a sampling fact.
+
+** 2018-19 -- EHCVM-1 (Enquête Harmonisée sur les Conditions de Vie des Ménages)
+
+Sources, both in-repo.  PRIMARY (French):
+=2018-19/Documentation/ehcvm_2018_rapport_general.pdf= -- INSD, section 1.3
+« Champ de l'EHCVM », printed p. 16 (PDF p. 22).  SECONDARY (English):
+=2018-19/Documentation/Documentation.pdf= -- WB NADA DDI report generated
+2022-09-01, p. 3, "Coverage" > "UNIVERSE".  WB catalog id 4290.
+
+*** Declared universe (verbatim, French)
+
+#+begin_quote
+Pour des besoins de conformité au principe de comptabilité nationale, le champ
+social est constitué de l'ensemble des ménages, toutes catégories confondues,
+nationaux ou africains, résidant sur le territoire national. [...] Le champ
+géographique de l'EHCVM est le territoire national burkinabè. Le niveau de
+représentativité des données collectées concerne les milieux de résidence
+(urbaine et rurale) et les 13 régions administratives du pays.
+#+end_quote
+
+TRANSLATION (not source text): "To comply with the principle of national
+accounting, the social scope consists of the totality of households, of all
+categories, national or African, residing on the national territory. [...] The
+geographic scope of the EHCVM is the Burkinabè national territory.  The level of
+representativeness of the data collected concerns the areas of residence (urban
+and rural) and the 13 administrative regions of the country."
+
+*WORDING CHANGE vs. 2014.*  The 2014 EMC report says « nationaux ou non »
+(nationals or non-nationals); the 2018 EHCVM report says « nationaux ou
+africains » (nationals or Africans).  Each is quoted as printed.  Whether this is
+a real narrowing of the universe or loose drafting is *not* resolved here -- but
+an analyst pooling 2014 with 2018-19 should know the two documents differ on who
+counts as in scope.
+
+*** Exclusions (verbatim, same paragraph)
+
+#+begin_quote
+Sont exclus de ce champ, les ménages collectifs (camps militaires, casernes,
+hôpitaux, etc.), les ménages ayant un statut diplomatique et les sans domiciles
+fixes.
+#+end_quote
+
+TRANSLATION (not source text): "Excluded from this scope are collective
+households (military camps, barracks, hospitals, etc.), households having
+diplomatic status, and the homeless."
+
+*** The English "UNIVERSE" field is WB NADA boilerplate -- read it accordingly
+
+=Documentation.pdf=, p. 3, heading "UNIVERSE", VERBATIM:
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals, military
+barracks, and school dormitories.
+#+end_quote
+
+The same string appears byte-identically in the WB catalog DDI export
+(=study_desc.study_info.universe=, catalog 4290), so local and catalog agree.
+But *this exact sentence is the single most repeated statement in the whole
+cross-country corpus, appearing verbatim in 15 waves* -- across the WAEMU/EHCVM
+countries and also Ethiopia and Nigeria.  It is World Bank NADA template text.
+Its presence attests which metadata template was used; it does *not*
+independently attest that INSD made that claim about this survey.
+
+For this wave the French INSD report is the load-bearing statement.  The two are
+not word-for-word equivalent: the French additionally excludes
+diplomatic-status households and the homeless, which the boilerplate does not
+mention; the boilerplate names prisons and school dormitories, which the French
+does not.
+
+*** Sub-sample structure: two vagues, each a nationally representative half
+
+This is the wave-internal specialization a pooling analyst needs.  Rapport
+général, p. 16, VERBATIM:
+
+#+begin_quote
+Le dispositif de l'enquête harmonisée a prévu une répartition aléatoire de
+l'échantillon des ZD en deux sous-échantillons représentatifs au niveau
+national, en milieu urbain, en milieu rural et dans chacune des 13 régions
+administratives.
+#+end_quote
+
+And p. 17, « Méthode de sondage », VERBATIM: « L'enquête devant se dérouler par
+vague, l'échantillon des ZD est réparti de façon aléatoire en deux sous
+échantillons. Chaque sous-échantillon devrait être déployé pour une vague de
+collecte. »
+
+So each *cluster* (=grappe= / ZD) belongs to exactly one vague -- consistent with
+the library-wide EHCVM convention =v: grappe= (not =[vague, grappe]=).  Vague 1
+ran September--November 2018, vague 2 April--June 2019 (rapport, section 1.3).
+
+*DOCUMENTED TENSION, not adjudicated.*  The English Basic Information Document
+=basicinformationdocument_bfa.pdf=, "Sample", p. 10, describes the split
+differently, VERBATIM: "After that, the survey design randomly divided each
+enumeration area into two equal groups.  The survey team interrogated the first
+group in wave 1 and the other in wave 2."  That reads as a *within-EA household*
+split -- both vagues visiting every EA -- whereas the French report splits the
+*ZD sample* between vagues.  Both quotations are recorded; the repo's existing
+EHCVM handling follows the French reading, and the 2021-22 BID's "half (293) for
+the first wave and half (292) for the second" (quoted below) corroborates it.
+This note does not settle the point.
+
+*** Universe vs. what the sample is stated to represent
+
+The two documents also come apart on representativity:
+
+- French rapport, section 1.3: representativity « concerne les milieux de
+  résidence (urbaine et rurale) et les 13 régions administratives du pays »
+  -- 13 regions x 2 milieux.
+- English BID, "Sample", p. 10, VERBATIM: "The Burkina Faso EHCVM 2018/19 sample
+  covers all regions with urban and rural areas surveyed in all regions and is
+  representative for the strata of Ouagadougou, other urban areas and rural
+  areas." -- three strata, not 26.
+
+Recorded, *not* adjudicated.  Note also that the =sample= section of this file
+records "No explicit strata variable" for this wave, so a user cannot recover
+either stratification from the shipped =sample()= table without reconstructing
+it.
+
+*** Sample-size figures (context only; the documents disagree)
+
+| Source                                   | Figure                                                                                              |
+|------------------------------------------+-----------------------------------------------------------------------------------------------------|
+| Rapport général, p. 17                   | 585 ZD drawn PPS, 12 HH per ZD; target size « estimée à 7020 ménages »                              |
+| BID p. 10 / catalog =sampling_procedure= | "The total survey sample size is 7010 households - 3149 from urban areas and 3861 from rural areas." |
+| BID p. 10, by vague                      | wave 1: 3507 HH (1577 urban / 1930 rural); wave 2: 3503 HH (1572 urban / 1931 rural)                 |
+
+The precision target behind the design, rapport p. 17, VERBATIM: « Le coefficient
+de variation ne devrait pas excéder 2% au niveau national, 5% en milieu urbain et
+en zone rural et 10% dans chacune des treize régions administratives du pays. »
+
+*** Oversamples
+
+None declared.  No urban booster, no refresh cohort, no special sub-population.
+
+** 2021-22 -- EHCVM-2 Panel Survey (EHCVM-P)
+
+Sources, both in-repo:
+=2021-22/Documentation/ddi-documentation-english_microdata-6224.pdf= (WB NADA
+DDI report), p. 3, "Coverage" > "UNIVERSE"; and
+=2021-22/Documentation/bid_bfa_ehcvm2.pdf= (Basic Information Document),
+"Sample", p. 4.  WB catalog id 6224.
+
+*** Declared universe (verbatim, English) -- and it is the boilerplate
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals, military
+barracks, and school dormitories.
+#+end_quote
+
+Byte-identical to the 2018-19 wave's English universe field and to the catalog
+DDI export for 6224.  *This is the NADA boilerplate described above*, so it
+attests a template rather than an INSD claim about this particular survey.
+
+Unlike 2014 and 2018-19, *no French INSD rapport général is shipped in this
+wave's =Documentation/=*, so the repo holds no Burkina-specific « champ de
+l'enquête / champ social » paragraph for 2021-22.  The universe statement the
+repo holds for this wave is therefore template text only -- plus the panel-frame
+restrictions below, which are survey-specific and far more informative about
+what this sample can represent.
+
+*** THE THING TO KNOW: this wave is a panel sub-sample, not a fresh national draw
+
+=bid_bfa_ehcvm2.pdf=, "Sample", p. 4, VERBATIM (three separate passages from that
+page):
+
+#+begin_quote
+The panel sample of the EHCVM-2 2021/22 corresponds to half of the households
+interviewed in EHCVM-1 2018/19 Households were tracked within the EA. In other
+words, EHCVM-1 households that have left their EA of origin were not surveyed.
+#+end_quote
+
+(The missing sentence break after "EHCVM-1 2018/19" is in the source; quoted as
+printed.)
+
+#+begin_quote
+Household members in 2018 who have since left the household were not followed up
+physically. The survey collected some information on these individuals in one of
+the modules of the EHCVM-2 2021/22 questionnaire.
+#+end_quote
+
+#+begin_quote
+Sampling only 6 households out of the 12 surveyed in 2018/19 allowed for the
+possibility of replacements in cases where a previously sampled household was
+unavailable for the new round of surveys Additionally, if the number of available
+households in a given Enumeration Area (EA) fell below 6, no additional
+households were included in the survey.
+#+end_quote
+
+Consequences a user pooling this wave must weigh:
+
+1. The *declared* universe is inherited template text describing a national
+   household population.  What the 2021-22 sample can represent is bounded by a
+   frame that is half of the 2018-19 households, restricted to households still
+   in their EA of origin.
+2. *Attrition by migration is structural, not accidental.*  Households that left
+   their EA were by design not surveyed, and individuals who left the household
+   were not followed physically.
+3. There is *no replacement floor*: EAs that fell below 6 available households
+   were not topped up, so realized cluster sizes vary in a way correlated with
+   local mobility.
+4. The distinct panel weight (=hhweight_panel=, see the =sample= section of this
+   file) exists because of exactly this; =hhweight2021= and =hhweight_panel= are
+   not interchangeable.
+
+*** Sample design (context, verbatim from the same page)
+
+#+begin_quote
+The sampling strategy used is a two-stage sampling with stratification in the
+first stage. The first stage sampling frame consists of enumeration areas (EAs)
+or clusters. A study area is a portion of the population for which meaningful
+results are sought, i.e., separate estimates with sufficient precision. Each
+region is considered a study area, as is the entire urban environment and the
+entire rural environment. The different strata result from the combination of the
+13 regions with the two areas of residence (urban, rural).
+#+end_quote
+
+VERBATIM, same page: "A total of 585 EAs were selected (half (293) for the first
+wave and half (292) for the second wave).  Within each EA, 6 households out of
+the 12 surveyed in 2018 were surveyed."
+
+Planned vs. realized, VERBATIM: "The sampling plan stipulated the selection of
+3,510 households, with 1,758 to be surveyed during the initial wave and 1,972
+during the subsequent wave.  The final actual size of the panel sample is 3,227
+households, of which 1647 were interviewed in the first wave and 1,580 in the
+second wave."
+
+- The BID's own arithmetic does not close: 1,758 + 1,972 = 3,730, not 3,510.
+  Quoted as printed, not corrected.
+- The =sample= section of this file records 3,218 households across 550 clusters
+  in the data -- a data-side count, neither confirming nor refuting these design
+  figures, and not used here to adjudicate anything.
+
+*** Additional French scope statement -- but it is WAEMU-common boilerplate
+
+=2021-22/Documentation/manuelagent_ehcvm2_version_v2.pdf= -- « ENQUETE HARMONISEE
+SUR LES CONDITIONS DE VIE DES MENAGES (EHCVM 2021/2022), MANUEL DE L'AGENT
+ENQUETEUR », Août 2021 (UEMOA / INSD / Banque Mondiale), printed p. 4 (PDF p. 7),
+VERBATIM:
+
+#+begin_quote
+Attention : le personnel diplomatique ne fait pas partie du champ de l'enquête.
+En effet la résidence d'un diplomate est considérée comme extraterritorial,
+c'est-à-dire que juridiquement hors du pays concerné. Cependant les autres
+personnes travaillant dans ces organisations font partie du champ de l'enquête,
+tout comme les étrangers n'ayant pas de statut de personnel diplomatique.
+#+end_quote
+
+Same page, the residency rule defining a household member, VERBATIM: « Membre du
+ménage. Un membre du ménage est une personne résidant habituellement dans le
+ménage. Un individu réside habituellement dans le ménage dans deux situations :
+(i) il vit dans ce ménage depuis au moins 6 mois ; (ii) Il est arrivé dans le
+ménage depuis moins de 6 mois, mais avec l'intention d'y rester au moins 6
+mois. »  This is the operational counterpart of the =s01q12= / =s01q13= binary
+eligibility filters documented in the "Household Presence / MonthsSpent" section
+of this file.
+
+*CAVEAT*: this manual is the WAEMU-common EHCVM-2 instrument -- its worked
+examples name Dosso and Niamey, i.e. Niger.  These paragraphs are regional
+boilerplate shipped inside the Burkina Faso wave's =Documentation/=, not
+Burkina-specific text.  Treat them as instrument-level scope rules, not as an
+INSD claim about this survey.
+
+*** Oversamples
+
+None declared.  The specialization in this wave is *sub-sampling* (the panel
+frame above), not oversampling.
+
+** Where the statements live
+
+| Wave    | Universe statement held in-repo?                                                 | Also in WB catalog metadata?                                     |
+|---------+----------------------------------------------------------------------------------+------------------------------------------------------------------|
+| 2014    | yes -- =2014/Documentation/Report.pdf= p. 20 (French, INSD)                      | yes, in *different wording*, survey-specific; the two agree       |
+| 2018-19 | yes -- French rapport p. 16 AND English =Documentation.pdf= p. 3                 | yes, byte-identical to the local English DDI                     |
+| 2021-22 | yes, but NADA boilerplate only -- =ddi-documentation-english_microdata-6224.pdf= p. 3 | yes, byte-identical                                          |
+
+No Burkina Faso wave is in the "catalog-only" position (a statement that exists
+only in WB catalog metadata, with nothing in the repo).  All three have a local
+file, so the record is something the library holds rather than a moving target.
+The weak case is 2021-22, where the local file carries template text rather than
+an INSD-authored scope paragraph.
+
+Note that none of the three =Documentation/SOURCE.org= files carry
+=#+CATALOG_ID:= / =#+PROVENANCE_*:= keywords; each records only the catalog URL
+(2538 / 4290 / 6224).
+
+** Gaps and what was searched
+
+Recorded so a later reader knows what was and was not looked at.  No =.dta= file
+was opened for any of this: the universe is a documentation claim, and reading it
+off the data would conflate the claim with the realization.
+
+- All files under each of =2014/=, =2018-19/= and =2021-22/= were listed; every
+  =Documentation/SOURCE.org= was read.
+- Text was extracted (pdfminer) from =2014/Documentation/Report.pdf=;
+  =2018-19/Documentation/{basicinformationdocument_bfa,ehcvm_2018_rapport_general,Documentation}.pdf=;
+  =2021-22/Documentation/{bid_bfa_ehcvm2,ddi-documentation-english_microdata-6224,manuelagent_ehcvm2_version_v2}.pdf=.
+  Each was searched for: /univers/, /population/, /cible/, /couvert/, /exclu/,
+  "de jure", /base de sondage/, /champ/, /champ social/, /ménages collectifs/,
+  /sont exclus/, "Sample".
+- The WB catalog DDI JSON exports for 2538, 4290 and 6224 were pulled and their
+  study-description pages fetched.
+- *Not opened*: the 2014 questionnaire (=Questionnaire_EMC_2014_Passage_1.pdf=,
+  DVC sidecar only), the EHCVM nomenclature PDFs, and the EHCVM questionnaires
+  (=bfa_ehcvm1_qnr_household_excel_vague{1,2}.xls=, =bfa_ehcvm2_vague{1,2}.pdf=,
+  =questionnaire_ehcvm_com_bfa.pdf=).  For 2014 and 2018-19 the universe was
+  already found in multiple independent documents.  For 2021-22 the
+  questionnaires were *not* searched for a scope paragraph, so if a
+  Burkina-specific French EHCVM-2 scope statement exists it may be in those
+  files.  That is a live gap, not a negative finding.
+- *Explicit gap*: no French INSD rapport général for EHCVM-2 2021/22 is present
+  in this repo.  The absence of a Burkina-specific French « champ de l'enquête »
+  paragraph for that wave is a gap in what the repo holds; it is *not* a claim
+  that INSD never wrote one.
+
 * Files in Burkina_Faso/_/
 ** TODO food_items.org
 ** TODO nutrition

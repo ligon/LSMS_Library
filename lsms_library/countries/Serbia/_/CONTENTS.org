@@ -22,6 +22,272 @@ exists declaring =household_roster= with the standard kinship index
 =household_roster= via the CLI.  However, the full Makefile-based build
 is broken.
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence for what the Serbia LSMS *claims* to represent, kept separate from
+what the data happen to look like.  Serbia has a single wave in this library
+(=Country('Serbia').waves == ['2007']).  Everything quoted below comes from
+documents that are *in this repository* under
+=lsms_library/countries/Serbia/2007/Documentation/= (DVC-tracked); nothing here
+depends on World Bank catalog metadata alone.
+
+Related but distinct: the =Serbia and Montenegro= country directory (waves 2002
+and 2003) is a different survey series with its own universe statements, its own
+Family Income Support (MOP) and Roma Settlement sub-samples, and its own entry
+in the population-statement record.  Do not carry statements across.
+
+** 2007 -- the declared universe (verbatim)
+
+Source: =2007/Documentation/ddi-documentation-english_microdata-2291.pdf=,
+p. 3, section "Sampling" > "Sampling Procedure", first two paragraphs.
+Language: English (original; no translation needed).
+
+#+begin_quote
+The population for LSMS consists of Republic of Serbia residents, excluding
+Kosovo and Metohija . The sampling frame for the LSMS was based on the
+Enumeration District (ED) delineated for the 2002 Serbia Census, excluding those
+with less than 20 households. It is estimated that the households in the
+excluded EDs only represent about 1 percent of the population of Serbia.
+
+The sampling frame also excludes the population living in group quarters,
+institutions and temporary housing units, as well as the homeless population:
+these groups also represent less than 1 percent of the population, so the
+sampling frame should cover at least 98 percent of the Serbian population.
+#+end_quote
+
+(The stray space in "Metohija ." is in the source PDF's text layer and is
+reproduced as extracted.)
+
+*** Corroborated by a second, independent in-repo document
+
+The same statement appears in the English study report
+=2007/Documentation/studijaE.pdf= ("Living Standards Measurement Study --
+Serbia 2002-2007"), section 12.3 "Sampling" > 12.3.1 "Sample description",
+*printed p. 167* (PDF page 169):
+
+#+begin_quote
+The population for LSMS consists of Republic of Serbia residents, excluding
+Kosovo and Metohija.  The sampling frame for the LSMS was based on the
+Enumeration Districts (ED) delineated for the 2002 Serbia Census, excluding
+those with less than 20 households.  It is estimated that the households in the
+excluded EDs only represent about 1 percent of the population of Serbia.
+
+The sampling frame also excludes the population living in group quarters,
+institutions and temporary housing units, as well as the homeless population;
+these groups also represent less than 1 percent of the population, so the
+sampling frame should cover at least 98 percent of the Serbian population.
+#+end_quote
+
+Two trivial differences from the DDI text, reproduced as each source has them:
+the DDI writes "Enumeration District (ED)" (singular) and a colon before "these
+groups"; the report writes "Enumeration Districts (ED)" and a semicolon.
+
+- Citation correction :: the upstream population-statement record (GH #601,
+  =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=) cites this passage as
+  "p. 166" of =studijaE.pdf=.  The printed page is *167* (the report's own table
+  of contents lists "12.3.1. Sample description ... 167"; printed p. 166 ends
+  section 12.2).  The DDI citation ("p. 3") is correct as recorded.
+
+** 2007 -- exclusions
+
+Four exclusions are declared, three of them frame exclusions and one
+geographic.  Verbatim fragments, all from the passage quoted above:
+
+| Kind                | Verbatim fragment                                                                                 | Declared size            |
+|---------------------+---------------------------------------------------------------------------------------------------+--------------------------|
+| Geographic          | "excluding Kosovo and Metohija"                                                                     | not quantified           |
+| Frame (small EDs)   | "excluding those with less than 20 households"                                                      | "about 1 percent"        |
+| Population (collective / institutional / temporary) | "the population living in group quarters, institutions and temporary housing units" | "less than 1 percent" (jointly with the homeless) |
+| Population (homeless) | "as well as the homeless population"                                                              | (as above)               |
+
+The documents' own summary of the net effect: "the sampling frame should cover
+at least 98 percent of the Serbian population" (both sources, as quoted), and,
+in the weighting chapter, "It is estimated that the LSMS sampling frame excludes
+less than 2 percent of the population of Serbia" (=studijaE.pdf=, section 12.4.4
+"RSO population projection of 2006", printed p. 171).
+
+*NOT an exclusion*: urban/rural.  Settlement type is a *stratification*
+dimension, not a carve-out -- "Type of settlement (urban and other)"
+(DDI p. 3; =studijaE.pdf= section 12.3.1, printed p. 167).  The six regional
+strata are likewise stratification, not restriction: "Region in 6 strata
+(Vojvodina, Belgrade, West Serbia, Sumadija and Pomoravlj e, East Serbia and
+South East Serbia)" (DDI p. 3; the odd spacing "Pomoravlj e" is a PDF text-layer
+artefact, rendered "Pomoravlje" in the study report).
+
+** 2007 -- sub-samples and specialised samples INSIDE the wave
+
+Two things sit inside this single wave that a user pooling Serbia with other
+countries needs to know about before averaging anything.
+
+*** A parallel UNHCR survey of internally displaced people (2,000 HH, of which 250 Roma)
+
+Source: =2007/Documentation/studijaE.pdf=, section 12.1 "Fieldwork", printed
+p. 164 (PDF page 166), under the heading "1. United Nations High Commission for
+Refugees: Survey of IDPs":
+
+#+begin_quote
+The IDP survey took place at the same time as the national sample.  The sample
+size was 2 000 households (of which 250 are Roma households) and the sample
+frame was the UNHCR database of IDPs.  The questionnaire was identical for both
+samples. A migration module, with some items specific to the IDP population (in
+both samples) was added to the LSMS questionnaire.
+#+end_quote
+
+Corroboration in the shipped instrument: the household questionnaire
+=2007/Documentation/srb07hhqe.pdf=, PDF page 7, carries a module headed
+"HOUSEHOLD OF DISPLACED PEOPLE FROM KOSOVO-METOHIA \\ (Answers relate to whole
+household)" with items MP1-MP20+.  This is the =mp*= block already noted in the
+"shocks -- not available" section of this file (=mp20= sits in this module, not
+in a shocks roster); the documentation above is what that module is.
+
+Two points of care:
+
+- The IDP sample has a *different frame* -- "the UNHCR database of IDPs" -- and
+  therefore a different universe from the national sample quoted above.  It is
+  not a stratum of the national sample and it is not an oversample of it.
+- Whether the IDP sample is present in the *released* files is *not stated
+  anywhere in the documentation held here*.  What the documents do state is that
+  the released household file has 5,557 cases (DDI, =household= file record;
+  =studijaE.pdf= section 12.2 "Data production", printed p. 166 file table), and
+  that 5,557 is the number of *interviewed national-sample* households
+  (=studijaE.pdf= Table 12.3 "Distribution of 2007 LSMS Sample households by
+  interview status": Interviewed 5 557 of 7 140 issued).  That is consistent
+  with the release being the national sample only, but no document in this repo
+  says so.  *Recorded as an open question, not as a finding.*  Resolving it
+  requires either a statement from the producer or a separate catalog entry for
+  the IDP survey; neither has been located.
+
+*** A half-sample module: Water and Sanitation Services (WSS), 2,744 HH
+
+Source: =2007/Documentation/studijaE.pdf=, section 12.1 "Fieldwork", printed
+p. 164, under the heading "2. World Bank: Water and Sanitation Services Module
+(WSS)":
+
+#+begin_quote
+The WSS module was administered to half of the national sample (all serial
+numbers ending with an even number).  Therefore the sample size for this module
+is 2744 households.
+#+end_quote
+
+Corroboration in the shipped instrument: the water questionnaire
+=2007/Documentation/srb07water_e.pdf=, cover page (PDF page 1), states "Water
+and Sanitation completed for every EVEN numbered dwelling from the "List of
+chosen dwellings" for the National Sample".
+
+This is *design, not attrition*.  It is the documentary basis for the note
+already in =2007/_/data_info.yml= under =housing= ("Administered to a sub-sample
+(~2744 of 5557 HH; rest NaN)"), which until now recorded the count without a
+citation.  Consumers of =Country('Serbia').housing()= (columns =Water=,
+=Toilet=) are working with a designed half-sample; the missing half is missing
+by construction and must not be treated as item non-response.
+
+*** No oversample is documented
+
+No document in this repo describes an oversample, a booster sample, a refresh
+panel, or a panel link to earlier waves for LSMS 2007.  Searched: the full text
+of all five Documentation PDFs for =oversampl=, =over-sampl=, =booster=,
+=subsample=, =sub-sample=, =panel= (0 hits for each in the DDI; 0 hits for the
+oversample/booster terms in the study report).  The only within-wave
+specialisation documented is the WSS half-sample module, and the only separate
+sample is the UNHCR IDP survey -- both above.
+
+In particular, there is *no separate Roma settlement sample* documented for
+2007.  Roma appear in 2007 only as the "250 Roma households" inside the UNHCR
+IDP sample quoted above.  (Contrast the =Serbia and Montenegro= 2003 wave, which
+does carry a distinct Roma Settlement Survey -- a different country directory
+and a different universe.)
+
+** Universe vs. what the weights represent -- these come apart
+
+The declared frame excludes about 2 percent of the population (above), but the
+*shipped weights were deliberately grossed up to the whole projected national
+population*, including that excluded 2 percent.  From =studijaE.pdf=, section
+12.4.5 "Adjustment of 2007 LSMS Weights Based on Projected Population", printed
+p. 171:
+
+#+begin_quote
+In order to make the weighted estimate of the total population from the 2007
+LSMS data more consistent with the projected total population for Serbia based
+on the vital registration data and demographic analysis, the RSO decided to
+adjust the weights by a constant factor of 7 411 000/6 889 332, where the
+denominator of this ratio is the preliminary weighted total population from the
+LSMS data presented in Table 5.
+#+end_quote
+
+Before that adjustment, the design weights represented the *frame*, and the
+documentation is explicit that this is what makes the comparison legitimate --
+section 12.4.1 "Comparing number of households in LSMS 2007 and Census 2002",
+printed p. 170:
+
+#+begin_quote
+The number of households from the Census frame excludes the households in EDs
+with less than 20 households, so it should be directly comparable to weighted
+estimates from the LSMS.
+#+end_quote
+
+So: =sample().weight= (source =hhweight=; =popweight = hhweight*hhsize=, per the
+DDI's =household= variable list, V663-V664) sums to the RSO's *projected total
+population*, not to the population of the declared sampling frame.  The two
+differ by roughly the excluded 2 percent plus the survey's own ~7 percent
+shortfall against projection ("the 2007 LSMS weighted estimates of total
+population are 7.0 percent lower than the corresponding projections for 2006",
+section 12.4.4, printed p. 171).  Anyone using Serbia weights for a national
+total is using a calibrated-to-projection figure; anyone using them for
+composition is on the documentation's own recommended ground ("the relative
+distribution of the population by region, urban/rural and other characteristics
+will remain the same", section 12.4.5).
+
+The documentation also warns, in its own words, about non-response bias
+(section 12.4, printed p. 169): "the characteristics of the 19.4 percent of
+sample households that did not respond may be somewhat different from those of
+the responding sample households, resulting in a corresponding bias in the
+survey results."
+
+- Response-rate discrepancy, recorded as-is :: the DDI states "Response rate was
+  78%" (p. 3) and the study report's sample description repeats "The final
+  response rate was 78%" (printed p. 167), while the weighting chapter states
+  "Excluding the sample dwelling units in category (6), the unweighted unit
+  response rate for the 2007 LSMS is 80.6 percent" (printed p. 169) -- the
+  difference being whether the 246 empty/derelict dwellings are counted.  Both
+  figures are correct on their own definitions; neither is a typo.  Noted so a
+  future reader does not "fix" one of them.
+
+** Provenance of the statement, and boilerplate check
+
+- Held locally :: yes.  The universe statement is in two DVC-tracked files in
+  this repo (the DDI PDF and the study report).  This is *not* one of the waves
+  whose only universe statement lives in World Bank catalog metadata.
+- Not NADA boilerplate :: the statement is survey-specific (it names Kosovo and
+  Metohija, the 2002 Census ED frame, the 20-household ED threshold, and gives
+  quantified shares).  It is not the repeated WB NADA template sentence found in
+  other waves of this corpus.
+- No field labelled "Universe" :: the DDI PDF has *no* section or field called
+  "Universe" (0 hits for "universe" and 0 for "coverage" in its full extracted
+  text).  What is quoted above is the "Sampling Procedure" text.  The World Bank
+  catalog page for study 2291 likewise carries no "Universe" field; its Sampling
+  Procedure text matches the DDI.  So the library's universe record for Serbia
+  2007 rests on the sampling-procedure prose, not on a declared universe field.
+- Source registration :: =2007/Documentation/SOURCE.org= records
+  =#+CATALOG_ID: 2291=, =#+CATALOG_IDNO: SRB_2007_LSMS_v01_M=,
+  =#+PROVENANCE_SOURCE: worldbank=.
+
+** Gaps and what was searched
+
+- No universe statement is missing for this country: the single wave (2007) has
+  a high-confidence, locally held, doubly-sourced statement.
+- Searched, for this section: the full extracted text of all five in-repo
+  Documentation PDFs (=ddi-documentation-english_microdata-2291.pdf=,
+  =studijaE.pdf=, =studijaS.pdf=, =srb07hhqe.pdf=, =srb07water_e.pdf=) for
+  =universe=, =coverage=, =target population=, =sampling procedure=, =Kosovo=,
+  =Metohija=, =institution=, =collective=, =excluded=, =weight=, =Roma=, =IDP=,
+  =refugee=, =oversampl=, =booster=, =subsample=, =panel=; plus
+  =2007/Documentation/SOURCE.org= and the World Bank catalog entry 2291.
+- Not established (open) :: whether the 2,000-household UNHCR IDP sample is
+  included in the released microdata (see above).  Nothing in the repo's
+  documentation answers this, and it was deliberately not settled by inspecting
+  the =.dta= files -- what the survey *claims* and what the data *contain* are
+  different facts and are kept apart here.
+
 * Build status: BROKEN
 
 The build fails for two reasons:

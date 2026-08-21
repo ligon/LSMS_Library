@@ -8,11 +8,13 @@ Data Scheme:
     # Quantity AND Expenditure (GhanaSPS records value on all three sources).
     # The country-level _/food_acquired.py concatenates the waves.
     #
-    # GhanaSPS has NO `sample` table (cluster identity unavailable: no cluster
-    # var in the food files, 2013-14 lacks EAs.dta, and EAs.dta is EA-level
-    # only).  So `v` is not joined and the index is (t, i, j, u, s) WITHOUT v.
-    # This is an accepted data gap; in the full Feature('food_acquired')()
-    # GhanaSPS is modal-excluded by design (it lacks v while others carry it).
+    # NOTE (2026-08-19): this block previously asserted that GhanaSPS has no
+    # `sample` table because "cluster identity [is] unavailable: no cluster var
+    # in the food files".  THAT WAS FALSE and is now corrected.  2009-10's food
+    # source S11A.dta itself carries id1..id4, with `id3` populated in all
+    # 425,255 rows and taking exactly 334 distinct values -- the documented EA
+    # count.  A `sample` table is now declared below, so `v` IS joined and the
+    # index is (t, v, i, j, u, s).
     #
     # Price is api-derived; food_prices / food_quantities / food_expenditures
     # auto-derive at runtime (_FOOD_DERIVED) -- do NOT register them here.
@@ -20,3 +22,71 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     materialize: make
+
+  household_roster:
+    # Person-level roster, all three waves.  Index is (t, i, pid) -- `v` is NOT
+    # declared and must NOT be: `sample` is wired for every wave, so
+    # _join_v_from_sample() attaches `v` at API time.
+    #
+    # Sources: 2009-10 S1D.dta (one file); 2013-14 / 2017-18 01b2_roster.dta
+    # merged (left, roster authoritative) with 01d_background.dta for
+    # MonthsAway.  Each wave's _/data_info.yml carries the evidence.
+    #
+    # Generation / Distance / Affinity are NOT declared here: _expand_kinship()
+    # derives them from `Relationship` at API time via
+    # lsms_library/categorical_mapping/kinship.yml.  Five GSPS spellings were
+    # added to that file (the vocabulary drifts wave to wave -- W1
+    # 'Adopted/Foster/Stepchild', W2 'Adopted, foster, or stepchild',
+    # W3 'Adopted, foster/stepchild', and W2's 'Parent or parent-in-law' /
+    # 'Son or daughter in-law').
+    #
+    # MonthsAway is declared for ALL THREE waves.  2009-10 reads s1d_27 with
+    # BLANK TREATED AS ZERO, applied by that wave's `household_roster` df_edit
+    # hook: Q27-Q33 is a skip block, and the per-EA pattern shows the blanks
+    # are a recording convention (the EAs that recorded fewest people recorded
+    # 95.9% non-zero values; those that recorded everyone, ~6%).  The full
+    # evidence, and the two documented residuals, are in
+    # 2009-10/_/data_info.yml.  It stays `optional` because the fill is a
+    # reading of the blanks rather than a value the file states.
+    #
+    # Do NOT register household_characteristics -- it auto-derives from this
+    # table via _ROSTER_DERIVED.
+    index: (t, i, pid)
+    Sex: str
+    Age: float
+    Relationship: str
+    # Generation / Distance / Affinity are api_derived -- _expand_kinship()
+    # fills them from Relationship at query time, nothing extracts them from
+    # source.  They are declared anyway because the canonical schema marks
+    # them required and tests/test_schema_consistency.py checks the
+    # declaration, matching Ethiopia / Togo / every other roster country.
+    Generation: int
+    Distance: int
+    Affinity: str
+    MonthsAway:
+        type: float
+        optional: true
+
+  sample:
+    # Cluster identity, wave by wave.  The EA is `id3` in 2009-10 and a
+    # right-anchored slice of the household id in 2013-14 / 2017-18; each
+    # wave's _/data_info.yml carries the evidence and the traps.
+    #
+    # `weight` exists ONLY for 2009-10 (hhweight3, an expansion weight summing
+    # to 7.11M households).  Waves 2 and 3 genuinely have none -- swept all 189
+    # of their .dta files, and 2013-14's own key_hhinfo_panel.xlsx assigns the
+    # weight variables to wave 1 only.  That is a producer-side gap, not a
+    # config gap, so it cannot be closed here.
+    #
+    # No panel weight exists in any wave.  2009-10 is the pre-refreshment
+    # baseline, so panel_weight repeats weight there (CLAUDE.md convention);
+    # waves 2 and 3 are NaN.
+    #
+    # `Rural` is 2009-10 only (urbrur); `strata` is loc7 in 2009-10 and region
+    # in 2017-18.  2013-14 ships no geography at all.
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str

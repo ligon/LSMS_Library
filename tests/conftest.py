@@ -37,10 +37,23 @@ import pytest
 def aws_creds_available() -> bool:
     """True iff DVC could perform an S3 pull right now.
 
-    The single source of truth for this question.  Test modules should import
-    this rather than re-implementing it::
+    The single source of truth for this question.
 
-        from conftest import aws_creds_available
+    **Do NOT import this from a test module.**  Both obvious spellings are
+    broken in CI and were shipped broken in the first cut of this file:
+
+      * ``from conftest import aws_creds_available`` resolves to the REPO-ROOT
+        ``conftest.py`` (which exists, and has no such function), not to this
+        one;
+      * ``from tests.conftest import ...`` fails as ``tests.tests`` under
+        pytest's import mode here.
+
+    Use the marker instead -- no import, no path ambiguity::
+
+        pytestmark = pytest.mark.requires_s3
+
+    A module-scoped fixture that builds a country is the usual shape, so the
+    mark is normally applied at module level like that.
 
     (Kept as a plain function rather than a fixture so it can be used at module
     scope in a ``pytest.mark.skipif``, which is where most callers need it.)
@@ -74,6 +87,35 @@ requires_s3 = pytest.mark.skipif(
            "deliberately data-free (see the data-tests job for the "
            "credentialed run)",
 )
+
+_SKIP_REASON = (
+    "needs S3 credentials to build country data; the unit-tests job is "
+    "deliberately data-free (see the data-tests job for the credentialed run)"
+)
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers",
+        "requires_s3: test needs S3 credentials to build real country data; "
+        "skipped automatically in the data-free unit-tests job",
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip ``@pytest.mark.requires_s3`` items when there are no credentials.
+
+    This is the import-free half of the guard.  A test module declares
+    ``pytestmark = pytest.mark.requires_s3`` and needs to import nothing from
+    this file -- which matters because neither spelling of that import works
+    here (see ``aws_creds_available``).
+    """
+    if aws_creds_available():
+        return
+    skip = pytest.mark.skip(reason=_SKIP_REASON)
+    for item in items:
+        if "requires_s3" in item.keywords:
+            item.add_marker(skip)
 
 
 def _mentions_missing_credentials(exc: BaseException | None) -> bool:

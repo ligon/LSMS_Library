@@ -1168,6 +1168,61 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     raise exc
 
 
+def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
+                   idxvars: str = 'Code', fn: str = 'categorical_mapping.org',
+                   dual_keys: bool = True) -> dict[Any, Any]:
+    """Read a ``Code -> Label`` org table into a lookup dict.
+
+    Prefer this over a bare ``get_categorical_mapping(tablename=...)``.
+
+    **Why this exists.**  ``get_categorical_mapping`` passes ``idxvars='Code'``
+    and, unless the caller supplies a value column as a keyword, no myvars --
+    so ``df_data_grabber`` drops the Label column and the squeeze returns an
+    *empty dict*.  Every lookup against it then misses and silently yields
+    ``pd.NA``.  Nothing raises; the column simply comes out 100% null.
+
+    That failure mode has bitten GhanaLSS three separate times:
+
+      - GH #372 / #377 -- ``region_dict`` empty, every Region/Birthplace NA.
+      - GH #348 -- the 1991-92 ``units`` decode, same root cause.
+      - 1987-88 / 1988-89 / 1998-99 -- ``region``/``rural``/``relationship``
+        all resolved to ``{}``, leaving ``cluster_features`` dead in three
+        waves and the kinship columns of ``household_roster`` 100% null.
+
+    **Key types.**  ``df_data_grabber`` stringifies the Code index via
+    ``format_id``, so the natural keys are strings (``'1'``), while callers
+    variously look up with ``int(value)`` or ``str(value)``.  Both historical
+    bugs were partly key-type mismatches.  With ``dual_keys=True`` (the
+    default) the result is keyed by *both* the string and the integer form of
+    each numeric code, so a caller cannot get this wrong.  Non-numeric codes
+    (e.g. a table's ``.`` -> ``None`` row) are kept under their string key.
+
+    Returns ``{}`` if no file in *dirs* carries the table -- callers that need
+    to distinguish "absent" from "empty" should check the directories first.
+    """
+    for d in dirs:
+        if not d.endswith('/'):
+            d += '/'
+        try:
+            df = df_data_grabber(d + fn, idxvars, orgtbl=tablename,
+                                 **{value: value})
+        except (FileNotFoundError, KeyError, ValueError):
+            continue
+        out: dict[Any, Any] = {}
+        for k, v in df[value].to_dict().items():
+            if pd.isna(v):
+                continue
+            key = str(k).strip()
+            out[key] = v
+            if dual_keys:
+                try:
+                    out[int(key)] = v
+                except (TypeError, ValueError):
+                    pass
+        return out
+    return {}
+
+
 def harmonized_unit_labels(fn: str = '../../_/unitlabels.csv', key: str = 'Code', value: str = 'Preferred Label') -> dict[Any, str]:
     unitlabels = pd.read_csv(fn)
     unitlabels.columns = [s.strip() for s in unitlabels.columns]
@@ -1372,7 +1427,16 @@ def change_encoding(s: str, from_encoding: str, to_encoding: str = 'utf-8', erro
 # carries an audit stamped before GPS was audited, so it under-reports.  Not a
 # cosmetic bump: without it, a warm cache serves values this version would never
 # compute.
-LSMS_CACHE_SCHEMA = 4
+#
+# Bumped 4 -> 5 (GH #645): ``to_parquet`` no longer destroys the literal strings
+# 'None' / 'nan' / '<NA>'.  The loss happened IN THE ACT OF WRITING, so every
+# L2-wave and L2-country parquet on every existing machine already has the nulls
+# baked in -- and the per-table input hashes are unchanged, so without this bump
+# nothing rebuilds and the fix is invisible on exactly the machines where the
+# corruption is already present.  This CHANGES RETURNED DATA (Guatemala
+# individual_education 20,678 -> 29,527 rows), which is precisely why the
+# rebuild must be forced rather than offered.
+LSMS_CACHE_SCHEMA = 5
 
 # Schema-metadata key under which the content hash is embedded.  Embedding
 # (rather than a ``{parquet}.hash`` sidecar) means the hash rotates
@@ -1648,13 +1712,29 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             if str in [type(x) for x in cats]: # At least some categories are strings...
                 df[col] = df[col].cat.rename_categories(lambda x: str(x))
 
-    # Pyarrow can't deal with mixes of types in columns of type object. Just
-    # convert them all to str.
+    # Pyarrow can't deal with mixes of types in columns of type object -- a
+    # genuinely mixed object column still raises ArrowTypeError under
+    # pandas 3.0 / pyarrow 23 ("Expected bytes, got a 'float' object"), so
+    # this guard is still load-bearing.  Just convert them all to str.
+    #
+    # GH #645: capture the null mask BEFORE ``astype(str)``.  The previous
+    # implementation stringified first and then tried to recover the nulls
+    # with ``.replace({'nan': None, 'None': None, '<NA>': None})`` -- but
+    # once a genuine missing has become the three characters ``nan`` it is
+    # indistinguishable from a legitimate value that spells ``nan``, and the
+    # recovery therefore deleted real data.  ``None`` was the canonical
+    # library label for "no education" (see harmonize_education.org), so
+    # every such person was nulled on write and then removed outright by
+    # ``_finalize_result``'s ``dropna(how='all')`` -- 8,849 rows (30%) of
+    # Guatemala's individual_education, 5,328 of Tajikistan's, 242 of
+    # Ethiopia's.  Masking after the cast is information-preserving: only
+    # cells that were *actually* missing become null.
     idxnames = df.index.names
     all = df.reset_index()
     for column in all:
         if all[column].dtype=='O':
-            all[column] = all[column].astype(str).astype('string[pyarrow]').replace({'nan': None, 'None': None, '<NA>': None})
+            na = all[column].isna()
+            all[column] = all[column].astype(str).astype('string[pyarrow]').mask(na)
     if index:
         resolved_idxnames = []
         for i, name in enumerate(idxnames):
