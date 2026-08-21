@@ -1396,6 +1396,51 @@ sentinel-filled precisely so it does not add to this.
 because =99999= is used as a missing-value sentinel and never removed.
 Any analysis touching 2009-10 =crop_production= quantities must filter it.
 
+** TODO Uganda is the ONE country pytest deletes the cache of, and two tests rely on the cache
+
+Found 2026-08-20 while trying to verify this PR's refreshed
+=tests/fixtures/uganda_baseline.json= entries.  Not a data defect -- a
+*test-harness* idiosyncrasy that is specific to Uganda by name, and that
+makes a regression net silently vacuous.  Recorded here because the next
+person to verify a Uganda table cold will hit it in the same order.
+
+*1. The repo-root =conftest.py= purges Uganda's parquet cache at every
+pytest session start.*  =_purge_country_caches("Uganda")= runs
+unconditionally (unless =--no-purge=), calling =Country("Uganda").clear_cache()=
+plus deleting in-tree =Uganda/var/*.parquet=.  No other country is named.
+The rationale in the comment is sound (v0.7.1 shipped extraction-time
+changes that stale parquets would mask), but the consequence is not
+stated there:
+
+*2. =tests/test_uganda_invariance.py= only READS parquets -- so in a
+clean isolated =LSMS_DATA_DIR= it skips all 53 of its entries.*  Its
+=uganda_root= fixture skips with "No Uganda parquets built (requires data
+access)" because the session-start purge just emptied the directory and
+nothing in that module rebuilds it.  Whether it checks anything therefore
+depends on whether some *other* module, running *earlier in the same
+session*, happens to build the table it pins -- i.e. on alphabetical test
+ordering.  Measured: the module alone is *53 skipped*; run after
+=test_uganda_crop_condition.py= it checks a handful and skips the rest.
+
+*Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
+reliable net for a change to a Uganda parquet's shape or content.  To
+verify a baseline entry, build the table explicitly and compare
+fingerprints outside pytest.  That is how this PR's three refreshed
+entries (=var/cluster_features=, =var/sample=, =var/people_last7days=)
+were checked -- shape, columns, index names, dtypes and =content_hash=
+all matched.
+
+*3. =tests/test_uganda_tables.py= DELETES generated parquets.*  Its
+=_backup_and_remove= / =_restore_or_cleanup= pair backs a parquet up,
+removes it, and on restore -- if there was no pre-existing file to
+restore -- =unlink()=s whatever the test run generated.  In a fresh
+=LSMS_DATA_DIR= that means a session leaves *fewer* parquets than it
+built, which is the second way a later reader finds an empty cache.
+
+Fixing any of this is out of scope for a config PR; it wants its own
+change with its own before/after.  Do not "fix" it by re-adding a
+build step to the invariance module without measuring what that costs.
+
 ** TODO Missing panel weight for 2019-20
 :LOGBOOK:
 - Note taken on [2026-04-09 Wed] \\
