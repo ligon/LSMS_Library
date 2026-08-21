@@ -6,8 +6,9 @@ from lsms_library.local_tools import df_data_grabber, format_id, to_parquet
 # Guyana 1992 cover page (COVERN.dta) records the enumeration date as
 # day/month/year-of-enumeration (DDE/MDE/YDE).  The household key is the
 # THREE-level composite (ED, SN, HH) -- SN is the ED sample-segment serial, and
-# without it distinct households collide: COVERN has 305 duplicate (ED,HH) pairs
-# but ZERO duplicate (ED,SN,HH) triples (GH #323).  We hyphen-join ED+SN+HH to
+# without it distinct households collide: 257 (ED,HH) pair values are shared by
+# 562 of COVERN's 1,807 rows -- 305 rows lost to a de-dup on the pair -- while
+# ZERO (ED,SN,HH) triples repeat (GH #323).  We hyphen-join ED+SN+HH to
 # match the "ED-SN-HH" form sample/roster/housing use (e.g. "5-194-2").  YDE is
 # stored 2-digit (uniformly 93 -> 1993): enumeration ran Mar-Aug 1993 even
 # though the survey is nominally the 1992 round.

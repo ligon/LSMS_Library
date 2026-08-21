@@ -5,8 +5,8 @@ Wave: 1992
 # The survey keys a household on the THREE-level (ED, SN, HH), where SN is the
 # ED sample-segment serial (spelled `ed_smpl` in HHCHAR/WEIGHTID, `SN` in
 # COVERN/ROSTERN/EDUCN).  ED numbers are REUSED across segments, so (ED, HH)
-# alone MERGES DISTINCT REAL HOUSEHOLDS: 248 (ED,HH) buckets conflate 542 real
-# households holding 2,381 of 7,827 people (30.4%).  The survey's own household
+# alone MERGES DISTINCT REAL HOUSEHOLDS: 257 (ED,HH) buckets conflate 562 real
+# households holding 2,419 of 7,827 people (30.9%).  The survey's own household
 # id proves the key: COVERN.NEWID == ED*100000 + SN*100 + HH for 1807/1807 rows,
 # all unique.  i is therefore the hyphen-joined "ED-SN-HH".
 #
@@ -14,7 +14,10 @@ Wave: 1992
 # more than one region -- e.g. ED 5 / SN 194 is Region 4, urban (12 hh) while
 # ED 5 / SN 702 is Region 10, RURAL (12 hh): two different enumeration
 # districts that share the number 5.  Keying v on ED alone therefore forces an
-# arbitrary Region for 537 households and an arbitrary Rural for 274.  Keyed on
+# arbitrary Region for 537 households and an arbitrary Rural for 274 -- of which
+# 287 and 143 respectively were actually handed a value that is NOT their own
+# (the two figures answer different questions: 537/274 = decided by row order,
+# 287/143 = decided WRONG; both re-measured 2026-08-20).  Keyed on
 # (ED, SN): 168 segments, each a fixed take of <=12 households, SECTOR (Rural)
 # 100% homogeneous (0 of 168 ambiguous) and RGN ambiguous in only 3 segments
 # (35 hh), each a single stray household mis-coded to a neighbouring region.

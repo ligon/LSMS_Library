@@ -26,7 +26,7 @@ COVERN (genuinely out-of-sample) and are dropped.
 
 GH #323: this script previously recovered only (ED, HH) and discarded SN --
 even though the docstring above already spelled out that newid encodes ED_SMPL.
-Because 248 (ED,HH) buckets fuse 542 distinct real households, the per-item
+Because 257 (ED,HH) buckets fuse 562 distinct real households, the per-item
 ``groupby(['t','i','j']).sum()`` below was SUMMING TWO DIFFERENT HOUSEHOLDS'
 durables into one row: not merely lossy, but inventing holdings that no
 household reported.  Carrying SN through makes that sum aggregate strictly

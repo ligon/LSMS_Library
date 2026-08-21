@@ -19,8 +19,8 @@ Those are two different enumeration districts that happen to share the number 5.
 
 Until GH #323 the config declared =i: [ED, HH]= and =v: ED=.  Both are wrong,
 and both were *silently* wrong: the framework's =_normalize_dataframe_index=
-collapses a non-unique declared index with =groupby().first()=, so 248 =(ED,HH)=
-buckets fused 542 distinct real households holding 2,381 of 7,827 people (30.4%),
+collapses a non-unique declared index with =groupby().first()=, so 257 =(ED,HH)=
+buckets fused 562 distinct real households holding 2,419 of 7,827 people (30.9%),
 and one household's members were kept while another's were thrown away.  The
 survey's own id proves the key: =COVERN.NEWID == ED*100000 + SN*100 + HH= for
 1807/1807 rows, all unique.
@@ -41,6 +41,27 @@ Enforced by =tests/test_guyana_index_uniqueness.py= (pinned row counts, the ED-5
 de-fusion, and a *cold-build* no-collapse-warning check).  A warm-cache check
 would pass vacuously — the collapse is baked into the cache, so the warning
 never fires twice.  Prose here is documentation; the test is the enforcement.
+
+*Re-measured 2026-08-20* when this branch was merged up to =development=.  Two
+figures in the original write-up were wrong and are corrected above: the
+conflation is *257* buckets / *562* households / *2,419* people (30.9%), not
+248 / 542 / 2,381 (30.4%).  The corrected numbers reconcile exactly with the
+row counts — 562 − 257 = *305* = 1,807 − 1,502 — which the old ones did not
+(542 − 248 = 294, leaving an unexplained residual of 11).  No separate loss
+mechanism is involved; it was simply a miscount.  The competing branch
+=fix/503-guyana= independently reported 562, so this is a two-way agreement.
+
+*Cross-checks against the BID* (the =gy92info.pdf= evidence in the sampling
+section below), which the microdata independently corroborates:
+
+- ¶37 "twelve (12) households were selected" per segment ↔ 129 of the 168
+  =(ED, SN)= segments hold exactly 12 households (16 hold 11, the rest fewer).
+- footnote 3 "The expansion factors are missing for ED numbers 408 and 482" ↔
+  exactly EDs 408 and 482 (23 households) have no =WEIGHT.dta= row.
+- "keyed at *ED* level, not household level" ↔ =WEIGHT.dta= is one row per ED.
+- *Not* reconciled: ¶38's "154 EDs".  The microdata has 130 distinct =ED=
+  numbers and 168 distinct =(ED, SN)= segments; =WEIGHTID.dta= has 126 EDs and
+  152 segments.  None of those is 154.  Left open.
 
 * Declared aggregation / drop policies
 
@@ -67,6 +88,15 @@ the *majority (mode)*.  With =v = (ED, SN)= the segment is 100% homogeneous in
 (1-vs-10, 1-vs-11, 1-vs-11, all within one stratum and one sector) — a coding
 error, not a real split.  =first()= would have let row order decide.  A genuine
 tie has no majority and is set to =NA=, never guessed.
+
+Two different counts get quoted for the damage =v: ED= did, and they answer
+different questions — keep them apart.  Under =v: ED=, *537* households had
+their =Region= decided by row order and *274* their =Rural=; of those, *287*
+were actually handed a =Region= that is not their own and *143* a =Rural= that
+is not their own.  Under =v: (ED, SN)= with the mode reducer the residual is
+*3* wrong =Region= (the three stray households above) and *0* wrong =Rural=.
+All six figures re-measured end-to-end 2026-08-20, and the *value* half is
+pinned by =test_cluster_attributes_are_the_households_own=.
 
 ** sample — weight is a LOOKUP, not a spine
 =WEIGHT.dta= is the 616-ED *national sampling frame*.  The framework merges
@@ -99,6 +129,22 @@ with 100% value agreement.
 - =EDUCN.dta= has 7,691 rows but =HS= (highest school) is NaN for 3,058 of them;
   those rows carry no education value and do not survive into
   =individual_education= (hence 4,633, not 7,691).  This is unrelated to #323.
+- *=housing='s orphan rate goes UP with the correct key, and that is right.*
+  Measured 2026-08-20: 54 of the 1,817 =housing= households (2.97%) have no row
+  in =sample()=, against 17 of 1,508 (1.13%) under the old =(ed_dvsn, smpl_hh)=
+  key.  Those 54 are genuine — =HHCHAR='s =(ed_dvsn, ed_smpl, smpl_hh)= triple
+  matches a =COVERN= household in only 1,765 of its 1,819 rows.  The old key
+  *hid* 37 of them by letting them collide with a real household's =(ED, HH)=
+  pair; the collapse then merged the orphan into a household it does not belong
+  to.  A rising orphan count here is the defect surfacing, not a regression.
+  Those households get =v = NaN= (=_join_v_from_sample= left-joins), which is
+  also why =housing= reports 152 distinct =v= rather than 168.
+- *=household_roster= does not cover every sampled household.*  18 of the 1,807
+  =sample()= households have no =ROSTERN= row at all (e.g. =1-385-1=; six of the
+  18 are in segment =1-385=), so =household_roster= has 1,789 households and 167
+  of the 168 segments.  Under the old key this looked like only 7 — the other 11
+  were masked by the =(ED, HH)= collision.  Not a #323 defect; a source gap that
+  #323 was concealing.
 
 * Sampling universe, exclusions and sub-samples
 

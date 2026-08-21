@@ -107,7 +107,10 @@ def cluster_features(df):
     at (t, v), so it must be reduced to one row per sampling segment.  Left to
     the framework this is a silent ``groupby().first()``, which with the old
     v=ED silently invented a Region for 537 households and a Rural for 274 (an
-    ED spans regions -- see data_info.yml).
+    ED spans regions -- see data_info.yml); measured, 287 of those households
+    were handed a Region that is not their own and 143 a Rural that is not
+    their own.  ("537 decided by row order" and "287 decided wrong" are
+    different questions; both numbers are real.)
 
     With v=(ED, SN) the segment is homogeneous in Rural (0 of 168 ambiguous).
     Region is ambiguous in only 3 of 168 segments, and in each the split is a
