@@ -1,5 +1,406 @@
 #+title: Contents
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence for what each TLSS wave *claims* to represent, transcribed verbatim
+from survey documentation with citations.  Gathered under GH #601; this section
+records evidence only and proposes no schema (that is GH #603).
+
+Two standing cautions before the per-wave record:
+
+- Nothing here is inferred from the =.dta= files.  Every claim below is a
+  quotation from a document, or an explicit statement that no document was
+  found.  What the survey *claims* to represent and what the shipped data
+  actually contain are two different facts and are deliberately kept apart.
+- *No Tajikistan wave carries the World Bank NADA boilerplate universe
+  sentence* ("The survey covered all de jure households excluding prisons,
+  hospitals, military barracks, and school dormitories", which appears verbatim
+  in 15 waves elsewhere in the corpus).  In fact *no TLSS wave has a field
+  labelled "Universe" at all* -- not in the local documentation, not on the WB
+  catalog page (grep for "Universe" returns zero hits on all four study pages),
+  and not in the NADA API metadata (no =universe= key).  What is quoted below
+  as the universe statement is in every case the survey's *sample-design /
+  representativeness* statement, which is the strongest thing that exists.
+  That is a weaker kind of claim: it says what the sample was designed to
+  estimate, not who was eligible to be sampled.
+
+** Summary
+
+| wave | statement lives                       | universe as claimed                                 | oversample / sub-sample                        |
+|------+---------------------------------------+-----------------------------------------------------+------------------------------------------------|
+| 1999 | WB catalog only (not in repo)         | national; strata = oblast x urban/rural             | YES -- 15 extra PSU, 400 HH, Dangara + Varzob  |
+| 2003 | WB catalog only (not in repo)         | national; representative at 4 regions + urban/rural | YES -- Dushanbe +40%, GBAO rural +300%, GBAO urban +600% |
+| 2007 | in repo (DDI PDF) + WB catalog        | national, urban/rural, 5 oblasts                    | YES -- 7 rayons in Khatlon (for a later crop survey) |
+| 2009 | WB catalog only (not in repo)         | panel sub-sample of TLSS07; claims same representativeness | the whole wave is a 1,500-HH sub-sample of TLSS07 |
+
+Three of the four waves' universe statements exist *only in World Bank catalog
+metadata and catalog-attached technical documents that are not present in this
+repository*.  Only 2007 has its statement in a file the library ships
+(=2007/Documentation/ddi-documentation-english_microdata-72.pdf=).  For 1999,
+2003 and 2009 the =Documentation/= directories contain only =SOURCE.org= (a
+bare DOI link), =LICENSE.org=, and field instruments (questionnaires), none of
+which state a universe.  For those three waves the record is a moving target
+held by NADA, not something the library holds.
+
+** TLSS 1999
+
+*** Declared universe
+
+Source: "BASIC INFORMATION / LIVING STANDARDS SURVEY IN THE REPUBLIC OF
+TAJIKISTAN (TLSS) / JUNE 2000", technical document attached to WB Microdata
+catalog entry 279 (https://microdata.worldbank.org/catalog/279/download/11687).
+*Not present in* =lsms_library/countries/Tajikistan/1999/Documentation/=.
+Locator: section "Field work" -> "Sampling", document page 3 (PDF page 5).
+Language: English.
+
+#+begin_quote
+The TLSS sample was designed to represent the population of the country as a whole as well as the strata. The sample was stratified by oblast and by urban and rural areas.
+#+end_quote
+
+Corroborating, verbatim, same document, Introduction (document p. 2):
+
+#+begin_quote
+The TLSS was carried out between May-June of 1999. A total of 2,000 households containing 14,142 individuals were interviewed. Households were randomly selected over 125 population points, which were stratified across urban and rural areas within oblasts, to ensure a nationally representative sample.
+#+end_quote
+
+The identical first quote is reproduced word for word in the catalog's
+=study_desc.study_info.geog_coverage= ("National coverage.\nThe TLSS sample was
+designed to represent...") and =method.data_collection.sampling_procedure=.
+
+Unit of analysis, same document, section "Definitions" (document p. 4):
+
+#+begin_quote
+Households are defined as all people who normally live, eat their meals together and share expenses in a dwelling (see Instructions For Interviewers in Appendix A).
+#+end_quote
+
+*** Oversample -- Dangara and Varzob (400 households, designed to be excluded)
+
+This is the item a reader pooling Tajikistan must know about before averaging
+anything.  Same document, footnote 1 on document page 3 (PDF page 5),
+verbatim:
+
+#+begin_quote
+In addition to the main sample, the TLSS also included a secondary sample of 15 extra PSU (containing 400 households) in Dangara and  Varzob.  Data in the  oversampled areas were collected for the sole purpose of providing baseline data for the World Bank Health Project in these areas. The sampling for these additional units was carried out separately after the main sampling procedure in order to allow for their exclusion in nationally representative analysis.
+#+end_quote
+
+(The double spaces are as printed.)
+
+The oversample PSU are enumerated in the same document, *Appendix C "List of
+population points"*, document page 31 (PDF page 33).  The two block headers
+read verbatim:
+
+#+begin_quote
+Oversample
+RSS: Varzob                                (urban: 14 rural: 43-48)
+#+end_quote
+
+#+begin_quote
+Khatlon :Dangara                           (urban: 34-36 rural:121-128)
+#+end_quote
+
+with per-block totals printed as =Total: 6= (150 households) for Varzob and
+=Total: 9= (250 households) for Dangara, and a final row =TOTAL for Oversample
+15 400=; the preceding row is =TOTAL for Nat. Rep.: 125 2000=.  The same
+document, section on file structure (document p. 6), states verbatim:
+
+#+begin_quote
+Each population point is allocated a unique identifier, called a  pop_pt, ranging from 1-140, since the survey covered 140 population points.
+#+end_quote
+
+125 + 15 = 140, consistent.
+
+*Caveat, and it is a real one (this is our arithmetic on the quoted strings,
+not a quotation).*  The printed code ranges do not reconcile with the printed
+settlement counts: "urban: 14 rural: 43-48" spans 7 codes against a printed
+=Total: 6=, and "urban: 34-36 rural:121-128" spans 11 codes against a printed
+=Total: 9=.  Anyone intending to drop the oversample by =pop_pt= must read
+Appendix C of the PDF directly rather than trusting the ranges as transcribed
+here.  The library exposes =pop_pt= as =v= in this wave
+(=1999/_/data_info.yml=, =sample.myvars.v: pop_pt=), so the exclusion is
+mechanically possible once the correct code list is established.
+
+Note also that the document reports 2,000 households interviewed (the
+nationally representative sample) while stating =hhid= runs 1-2400 -- i.e.
+2,000 + 400.  Whether the oversample households are present in the =.dta=
+files shipped here has *not* been checked, and deliberately so: that is a
+question about the data, not about the declared universe.  A user who needs a
+nationally representative 1999 estimate must check it.
+
+*** Universe vs. what the weights represent
+
+The 1999 documentation supplies *no weight variable*.  Same document, section
+"Weights", verbatim:
+
+#+begin_quote
+Since the sample is nationally representative there are no weighting variables.
+#+end_quote
+
+This sits uneasily with the oversample: the stated remedy for Dangara/Varzob is
+*exclusion*, not reweighting, and no weight exists that would absorb them.
+Consistently, =1999/_/data_info.yml= declares no =weight= for the =sample=
+table in this wave (=v= and =Rural= only), unlike 2003, 2007 and 2009.
+
+*** Coverage disturbance -- Karategin Valley / United Tajik Opposition
+
+Not framed by the source as a universe exclusion, but it is a documented
+departure from the drawn sample on security/permission grounds and belongs
+here.  Same document, section "Difficulties encountered" (document p. 3),
+verbatim:
+
+#+begin_quote
+A few selected jamoats that were initially selected had to be replaced since permission to sample in those areas was not granted. Permission was obtained from the United Tajik Opposition (UTO) which control parts of the Karategin Valley.
+#+end_quote
+
+Neither the jamoats replaced nor their replacements are identified anywhere in
+the documentation examined.
+
+*** Exclusions -- nothing found
+
+No statement excluding institutional population, collective quarters, military
+barracks, dormitories, prisons, hospitals, nomads, refugees or displaced
+persons, or any region for accessibility or security reasons, was found in the
+Basic Information Document or in the catalog technical document "Methodology of
+living standard survey sampling in the Republic of Tajikistan"
+(https://microdata.worldbank.org/catalog/279/download/11689).  Searched: both
+documents grepped for =institution|collective|barrack|military|homeless|nomad|
+refugee|dormitor|prison|not covered|were excluded|does not cover|inaccessib|
+security reason=; the local =Documentation/= PDFs (=HH012007-00.pdf=,
+=com01.pdf=, =fem01.pdf=) converted and grepped for =universe|target
+population|sampling frame|all households|private household|survey
+covers|represent= -- they are field instruments and carry no universe
+statement.  *This is a recorded absence of evidence, not evidence of
+inclusion.*
+
+** TLSS 2003
+
+*** Declared universe
+
+Source: "Tajikistan Living Standards Survey, 2003 / Notes for Users of the
+Data", technical document attached to WB Microdata catalog entry 278
+(https://microdata.worldbank.org/catalog/278/download/11666).  *Not present in*
+=lsms_library/countries/Tajikistan/2003/Documentation/=.  Locator: page 1
+(unnumbered), opening paragraph; the second sentence is a standalone sentence
+four paragraphs further down the same page.  Language: English.
+
+#+begin_quote
+The Tajikistan Living Standards Survey (TLSS) for 2003 was based on a stratified random probability sample, with the sample stratified according to oblast and urban/rural settlements and with the share of each strata in the overall sample being in proportion to its share in the total number of households as recorded in the 2000 Census. ... The 2003 data are representative at the regional level (4 regions) and urban/rural.
+#+end_quote
+
+The ellipsis elides intervening sample-design text (the comparison to TLSS 1999
+and the oversample percentages quoted below, plus a paragraph naming the four
+oblasts).  The same wording appears verbatim in the catalog's
+=study_info.geog_coverage= ("National coverage. The 2003 data are
+representative at the regional level (4 regions) and urban/rural.") and in
+=method.data_collection.sampling_procedure=.
+
+*** Oversamples -- Dushanbe and GBAO (corrected by weights, not by exclusion)
+
+Same document, same opening paragraph, verbatim:
+
+#+begin_quote
+Second the TLSS 2003 over-sampled by 40 percent in Dushanbe, 300 percent  in  rural  Gorno-Badakhshan  Administrative  Oblast  (GBAO)  and  600  percent  in  urban GBAO.  Third the sample size was increased in 2003 in comparison with 1999 in order to reduce sampling  error.    In  2003,  the  overall  sample  size  was  4,156  households  compared  with  2,000 households in 1999.
+#+end_quote
+
+(Multiple spaces are PDF justification artifacts, transcribed as extracted.)
+
+Unlike 1999, *no instruction to exclude the oversampled units is given*.  The
+stated remedy is the weight.  Same document, page 1, verbatim:
+
+#+begin_quote
+The weight variable is wgt_nat.
+#+end_quote
+
+=2003/_/data_info.yml= wires exactly this variable (=weight: wgt_nat= from
+=../Data/new_expend.dta=).  Any unweighted Tajikistan 2003 statistic
+over-represents Dushanbe and GBAO by the factors quoted above.
+
+*** Not a panel with 1999
+
+Same document, page 1, verbatim:
+
+#+begin_quote
+This is not a panel survey with the Tajikistan Living Standards Survey done in 1999.
+#+end_quote
+
+*** Exclusions -- nothing found
+
+No exclusion statement of any kind (institutional population, collective
+quarters, nomads, refugees, regions dropped for security or accessibility)
+appears in the 2003 documentation examined.  Searched: local
+=2003/Documentation/= (=SOURCE.org= = DOI link only, =LICENSE.org=,
+=taj03hhq.pdf=, =taj03cmq.pdf=, =taj03fmq.pdf= -- all three converted and
+grepped, field instruments only); WB catalog entry 278 API metadata, the
+rendered study-description page (0 hits for "Universe"), and both attached
+technical documents ("Notes for Users of the Data" and "Instructions for
+Supervisors and Interviewers, TLSS 2003").  *Recorded as a gap, not as an
+absence of exclusions.*
+
+** TLSS 2007
+
+*** Declared universe -- the one wave whose statement the repo actually holds
+
+Source: =lsms_library/countries/Tajikistan/2007/Documentation/ddi-documentation-english_microdata-72.pdf=
+(local, DVC-tracked).  Locator: PDF page 3, section "Sampling" -> "Sampling
+Procedure".  The identical text appears in the Basic Information Document, TLSS
+2007 (July 2008), section "Sample Design", document page 6, and again in its
+Appendix B, document page 23.  Language: English.
+
+#+begin_quote
+The TLSS sample was designed to allow reliable estimation of poverty and most variables for a variety of other living standard indicators at the various domains of interest based on a representative probability sample on the level of:
+- Tajikistan as a whole
+- Total urban and total rural areas
+- The five main administrative regions (oblasts) of the country: Dushanbe, Rayons of Republican Subordination (RRS), Sogd, Khatlon, and Gorno-Badakhshan Autonomous Oblast (GBAO)
+#+end_quote
+
+The bullet markers in the source are typographic bullets, rendered here as
+=-=; the wording is character-for-character as printed.  The catalog's
+=study_info.geog_coverage= for this study is the single word "National".  The
+local DDI PDF has no Scope/Coverage section -- it opens at "Sampling" -- so
+this sample-design statement is the universe statement of record.
+
+*** Oversample -- 7 rayons in Khatlon (NOT flagged for exclusion)
+
+Same local DDI PDF, PDF page 3, in the list of factors determining sample size,
+verbatim:
+
+#+begin_quote
+- An oversample in 7 rayons in Khatlon
+#+end_quote
+
+The local DDI drops the footnote.  The Basic Information Document, TLSS 2007
+(https://microdata.worldbank.org/catalog/72/download/11528), document page 7,
+carries it as footnote 3, verbatim:
+
+#+begin_quote
+3  The oversample is for a crop survey that will be done at a future date.
+#+end_quote
+
+*Contrast with 1999*: no instruction is given to exclude these units from
+nationally representative analysis.  The stated remedy is the weight.  BID
+p. 12, verbatim:
+
+#+begin_quote
+Because the sample is not self weighted, the weight variable, HHWEIGHT, must be used in  analyses  of  the  data  to  have  estimates  that  are  valid  at  the  national,  urban/rural  and  oblast levels.
+#+end_quote
+
+=2007/_/data_info.yml= wires =weight: weight= from =../Data/weights.dta=.  The
+7 Khatlon rayons are *not named* in the DDI text examined.
+
+*** Two rounds plus a Sughd re-collection -- fieldwork, not universe
+
+The 2007 wave was a two-round design, and 216 Sughd households were re-fielded.
+This is a data-quality event, not a universe restriction, but it changes what
+"the 2007 sample" means and is recorded here so it is not mistaken for one.
+Local DDI PDF, verbatim:
+
+#+begin_quote
+During the monitoring process, it was discovered that data from 216 households in the Sughd Oblast had to be excluded. Information from these households was re-collected during the Second Round of data collection.
+#+end_quote
+
+and, on Second-Round coverage, verbatim:
+
+#+begin_quote
+In the Second Round, it was not possible to reach all of the households from the First Round. Of the 4,860 households in the First Round, 4,490 households were re-visited.
+#+end_quote
+
+#+begin_quote
+Three clusters or 54 households could not be revisited due to adverse conditions and 100 households could not be found. 216 households in Sughd were not revisited using the Second Round questionnaire because their First Round data had to be excluded. The Sughd households were revisited with a complete household questionnaire.
+#+end_quote
+
+Design detail from the same sources (context, *not* the universe): frame is the
+2000 census enumeration sectors as digitised for UNICEF's MICS05; 270 clusters
+x 18 households = 4,860; final cluster allocation (urban/rural) Dushanbe 50/0,
+RRP 9/45, Sogd 18/38, Khatlon 12/59, GBAO 6/33.
+
+*** Exclusions -- nothing found
+
+No statement excluding any population group or area from the survey universe
+was found.  The only "exclusion" language in the documentation is the Sughd
+data-quality event quoted above.  Searched: local =2007/Documentation/= (DDI
+PDF -- the hit; questionnaires =TLSS07HHQE.pdf=, =TLSS07HHQ2E.pdf=,
+=TLSS07HHQSE.pdf=, =TLSS07FEMQE.pdf=, =TLSS07COMQE.pdf=), WB catalog entry 72
+API metadata and study-description page (0 hits for "Universe"), and the full
+Basic Information Document.
+
+*** Not a panel with 1999 or 2003
+
+BID p. 12, verbatim:
+
+#+begin_quote
+The TLSS99, TLSS03 and TLSS07 data cannot be used as panel data. The same households were not visited in all surveys. In addition, the sample designs used in the three years were different although all three surveys are representative at the national, urban/rural and oblast levels.
+#+end_quote
+
+** TLSS 2009 -- the whole wave is a sub-sample
+
+*** Declared universe
+
+Source: "Tajikistan Living Standards Survey 2009 / Notes for Users / May 2010",
+technical document attached to WB Microdata catalog entry 73
+(https://microdata.worldbank.org/catalog/73/download/11539).  *Not present in*
+=lsms_library/countries/Tajikistan/2009/Documentation/=.  Locator: page 1,
+first and second paragraphs (the ellipsis elides only the paragraph break).
+Language: English.
+
+#+begin_quote
+The Tajikistan 2009 Living Standards Survey (TLSS09) is a panel survey of 1,500 households interviewed during the Tajikistan 2007 Living Standards Survey (TLSS07).  The households were revisited in November 2009 which is the same time period in which they were visited originally in 2007. ... The sample is representative at the national, regional level (4 regions and Dushanbe), and urban/rural.  See http://go.worldbank.org/6TUMCB3K30 for a copy of the Basic Information Document for the TLSS07 which describes in detail how the sample was designed for the TLSS07.  The same methodology was used to select the households for the TLSS09.
+#+end_quote
+
+The *first sentence only* is also present verbatim in local documentation:
+=2009/Documentation/ddi-documentation-english_microdata-73.pdf=, PDF page 5,
+"Data Collection" -> "DATA COLLECTION NOTES".  The representativeness claim
+exists only in the catalog.  The local DDI has no Scope/Coverage section; its
+entire SAMPLING PROCEDURE field reads "Sample size is 1,500 households", which
+is also the whole of the catalog's =sampling_procedure=.
+
+*** This is a 1,500-of-4,860 sub-sample and the selection rule is undocumented
+
+The universe is restricted by construction: the 2009 frame is the TLSS07
+*sample*, not the Tajik population.  The documentation asserts that the result
+is still nationally representative but *nowhere states which 1,500 of the 4,860
+TLSS07 households were retained, how they were chosen, or what happened to
+attrition*.  Searched the Notes for Users for
+=1,500|selected|attrition|replace|sub-sample|subsample|oversampl= -- the only
+hit is the sentence quoted above.  The claim "The same methodology was used to
+select the households for the TLSS09" points at the TLSS07 BID, which describes
+the *2007* design and says nothing about a 2009 sub-selection.
+
+*This is the single largest evidentiary gap in the Tajikistan record.*  A
+reader pooling TLSS09 with TLSS07 is pooling a wave with its own sub-sample and
+has no documented basis for the sub-sample's design weights beyond the wave's
+own =Weight= variable (=2009/_/data_info.yml=, =weight: Weight= from
+=../Data/weights2009.dta=).
+
+Consistent with (but not itself a statement of) the panel universe: the local
+questionnaire =2009/Documentation/TJ_Pan_09_V11.pdf=, page 1, is headed
+"TAJIKISTAN PANEL SURVEY, 2009 / MAIN QUESTIONNAIRE" and carries pre-printed
+identification fields "FROM TLSS07" and "TLSS PSU".
+
+*** Exclusions -- nothing found
+
+No exclusion statement of any kind appears in the 2009 documentation examined
+(local =SOURCE.org= = DOI link only, =LICENSE.org=, the DDI PDF, and
+=TJ_Pan_09_V11.pdf=, both converted and grepped for =universe|target
+population|scope|coverage|geographic|all households|private
+household|non-institutional|represent= -- zero hits; plus catalog entry 73 API
+metadata, study-description page with 0 hits for "Universe", and the Notes for
+Users).
+
+** What this means for pooling Tajikistan
+
+- The four waves are *four independent cross-sections plus one panel
+  sub-sample*, not a panel.  1999/2003/2007 are explicitly stated not to be
+  panel-linkable (2003 and 2007 quotes above); 2009 is a sub-sample of 2007.
+- Three of four waves carry a documented oversample, and the *prescribed remedy
+  differs between them*: 1999 says exclude (and ships no weight at all),
+  2003 and 2007 say weight.  Treating them uniformly is wrong in one direction
+  or the other.
+- The regional domain changes across waves as stated: 1999 "oblast" strata,
+  2003 "4 regions", 2007 "five main administrative regions", 2009 "4 regions
+  and Dushanbe".
+- No wave documents any institutional / collective-quarters / nomad / refugee
+  exclusion.  That is an absence of *statements*, recorded as such; it is not a
+  documented statement of full inclusion.
+
 * shocks — not available (2026-06-07, verified)
 
 =shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)

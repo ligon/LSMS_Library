@@ -10,11 +10,11 @@
 #+name: harmonize_education
 | Original Label               | Preferred Label              |
 |------------------------------+------------------------------|
-| None                         | None                         |
-| NONE                         | None                         |
-| No education                 | None                         |
-| Not educated                 | None                         |
-| Never attended               | None                         |
+| None                         | No education                 |
+| NONE                         | No education                 |
+| No education                 | No education                 |
+| Not educated                 | No education                 |
+| Never attended               | No education                 |
 | Informal                     | Informal                     |
 | Adult education              | Informal                     |
 | Quranic                      | Informal                     |

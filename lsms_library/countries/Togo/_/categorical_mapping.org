@@ -417,7 +417,7 @@
 #+name: harmonize_education
 | Original Label  | Preferred Label              |
 |-----------------+------------------------------|
-| Aucun           | None                         |
+| Aucun           | No education                 |
 | Maternelle      | Pre-primary                  |
 | Postsecondaire  | Tertiary certificate/diploma |
 | Primaire        | Primary complete             |

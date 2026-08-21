@@ -6,7 +6,23 @@ sample:
     idxvars:
         i: case_id
     myvars:
-        v: ea
+        # GH #323 SITE 2.  `ea` is NOT a cluster id: it is the EA's sequence
+        # number WITHIN its Traditional Authority, so it takes only 110
+        # distinct values for IHS2's 564 enumeration areas.  Keyed on `ea`,
+        # ~5 unrelated EAs -- in different TAs, districts and regions --
+        # merge into one `v`.  `psu` is the fully qualified 8-digit EA code
+        # (region 1 + district 2 + TA 2 + EA 3) that the same file already
+        # carries: 564 distinct values, exactly 20 households each, and it
+        # is the SAME 8-digit keyspace the later IHS3/IHS4/IHS5 waves use
+        # for `ea_id` (a different census frame vintage, hence only 3 codes
+        # in common with 2010-11 -- the FORMAT matches, the frame does not).
+        # Verified: keyed on `psu`, zero households in a cluster disagree
+        # about the cluster's region / district / urban-rural status; keyed
+        # on `ea`, 164 of 330 such cells are contested.
+        #
+        # `v` must be declared identically here and in cluster_features
+        # below or _join_v_from_sample matches nothing.
+        v: psu
         weight: hhwght
         panel_weight: hhwght
         strata:
@@ -40,7 +56,15 @@ cluster_features:
     file: sec_a.dta
     idxvars:
         i: case_id
-        v: ea
+        # GH #323 SITE 2 -- see the note on sample.v above.  `ea` is the EA's
+        # sequence number within its Traditional Authority (110 values for
+        # 564 EAs); `psu` is the fully qualified 8-digit EA code.  Keeping
+        # `ea` here merged ~5 real EAs per `v` and the household->cluster
+        # projection then served ONE arbitrary household's answer as the
+        # cluster's: 6 of Malawi's 26 districts vanished from
+        # cluster_features entirely and every one of the 110 surviving
+        # clusters came out `Rural` -- IHS2's whole urban stratum erased.
+        v: psu
     myvars:
         Region: region
         District: dist

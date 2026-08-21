@@ -10,7 +10,7 @@ BacII / Baccalaureate II higher-education-entrance certificate).
 #+name: harmonize_education
 | Original Label                                          | Preferred Label              |
 |---------------------------------------------------------+------------------------------|
-| No class completed                                      | None                         |
+| No class completed                                      | No education                 |
 | Pre-school/Kindergarten                                 | Pre-primary                  |
 | Class one completed                                     | Primary incomplete           |
 | Class two completed                                     | Primary incomplete           |

@@ -91,9 +91,11 @@ endif
 	fi
 	$(POETRY) run pytest $(PYTEST_ARGS)
 	git tag -a "v$(v)" -m "Release $(v)"
-	$(POETRY) build
 	@echo ""
-	@echo "Tagged v$(v) and built dist/ (local sanity build)."
+	@echo "Tagged v$(v).  No local build: CI builds the sdist+wheel FROM THE TAG"
+	@echo "(publish.yml, fetch-depth 0, with a guard that fails on 0.0.0), so a"
+	@echo "local dist/ would never be published.  Tagging is the last step here"
+	@echo "so a failure cannot leave a tag behind."
 	@echo "To publish to PyPI (CI does the upload — no local twine):"
 	@echo "  git push origin v$(v)"
 	@echo "  gh release create v$(v) --title v$(v) --notes-file docs/releases/v$(v).md"

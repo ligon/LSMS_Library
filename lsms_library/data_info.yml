@@ -279,9 +279,100 @@ Columns:
   individual_education:
     Educational Attainment:
       type: str
+      note: |
+        Canonical ordinal vocabulary, low -> high, defined in
+        categorical_mapping/canonical_education_labels.org.  Country grade
+        detail collapses onto these levels; `Unknown` is the non-ordinal
+        sentinel for don't-know / refused / unmappable.
+      spellings:
+        # GH #645: level 0 was spelled `None` until the to_parquet null-coercion
+        # fix.  That spelling was indistinguishable from a missing value after
+        # `astype(str)` -- and from YAML/CSV nulls -- so it was silently nulled
+        # on every parquet write and the row then deleted by
+        # `_finalize_result`'s `dropna(how='all')`.  Renamed to `No education`
+        # throughout `harmonize_education`; `None` stays here as an accepted
+        # VARIANT so parquets written before the rename, and any country whose
+        # mapping table has not been updated, still resolve at API time.
+        No education: ['None', 'NONE', 'none']
+        Informal: []
+        Pre-primary: []
+        Primary incomplete: []
+        Primary complete: []
+        Lower secondary: []
+        Lower secondary complete: []
+        Upper secondary: []
+        Upper secondary complete: []
+        Vocational/Technical: []
+        Tertiary certificate/diploma: []
+        Bachelor: []
+        Postgraduate: []
+        Doctorate: []
+        Unknown: []
   panel_ids:
     previous_i:
       type: str
+  crop_production:
+    # NOTE: `condition` is an INDEX level, not a column -- deliberately
+    # declared here anyway.  `_enforce_canonical_spellings` (country.py:3962)
+    # applies a spellings map to index levels as well as columns, so this is
+    # the working half of the mechanism.  The half that does NOT work for an
+    # index level is *enforcement*: nothing rejects a value outside the list
+    # (contrast food_acquired's `s`, enumerated in code as
+    # transformations.S_VALUES).  A follow-up should either add a
+    # CONDITION_VALUES constant alongside S_VALUES or, better, drive an
+    # index-level enumeration check from this file so `s` stops being
+    # special-cased.  Declaring the vocabulary here is not blocked on that.
+    condition:
+      type: str
+      note: |
+        Physical state of the crop at the moment the reported harvest
+        Quantity was measured.  A harvest module that asks "how much did
+        you harvest, in what unit, AND IN WHAT CONDITION" records one row
+        per condition for the same plot-crop-season, so this is a level of
+        the survey's own grain: 240 kg of dry coffee and 100 kg of fresh
+        coffee off one plot are two facts, not one 340 kg fact.  Quantities
+        in different conditions are NOT commensurable and must not be
+        summed across this level without a drying / shelling conversion.
+
+        The vocabulary crosses a DRYNESS family with a physical FORM:
+        `green` / `fresh` / `dry_at_harvest` / `dried`, each optionally
+        qualified by `_with_shell_and_stalk`, `_with_shell`, `_in_cob`,
+        `_in_pods` or `_grain`.  The unqualified family token means "state
+        not applicable" -- the survey asked, and the crop has no shell,
+        cob or pod to speak of.
+
+        Seeded from Uganda's UNPS scheme (GH #323 / #637), which is the
+        finest instrument in the library.  A country whose questionnaire
+        asks only a coarse dry/fresh distinction uses the bare family
+        tokens; a country asking something Uganda does not should extend
+        this list rather than force-fit a foreign category, per the
+        `Tenure` / `TenureSystem` precedent above.  `unknown_condition` is
+        the sentinel for a record whose condition code is missing or
+        outside the source's labelled scheme -- it is a real value, never
+        NA, because a null index key is silently dropped by the duplicate
+        collapse in a country's build script.
+      spellings:
+        green_with_shell_and_stalk: []
+        green_with_shell: []
+        green_in_cob: []
+        green_in_pods: []
+        fresh: []
+        fresh_with_shell_and_stalk: []
+        fresh_with_shell: []
+        fresh_in_cob: []
+        fresh_in_pods: []
+        dry_at_harvest_with_shell_and_stalk: []
+        dry_at_harvest_with_shell: []
+        dry_at_harvest_in_cob: []
+        dry_at_harvest_grain: []
+        dried: []
+        dried_with_shell_and_stalk: []
+        dried_with_shell: []
+        dried_in_cob: []
+        dried_in_pods: []
+        dried_grain: []
+        other_condition: []
+        unknown_condition: []
   food_acquired:
     # Acquisition source 's' is an INDEX level (see Index Info above),
     # not a column.  Canonical values: purchased, produced, inkind,
