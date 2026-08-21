@@ -118,8 +118,25 @@ def main():
     long['t'] = WAVE
 
     # DRBLS records SEVERAL detail rows for the same (household, item): e.g.
-    # household 5-194-1 lists five "BEDS" purchases made in different years at
-    # different prices.  The canonical assets index is (t, i, j) and the
+    # household 337-253-4 has FIVE rows sharing one id_nmbr and one newid, whose
+    # per-block yri* (year of acquisition) columns differ -- e.g. block 07 in
+    # 1991, 1989, 1975, 1985 and 1992.  115 of the 1,616 DRBLS households do
+    # this (317 rows).  (An earlier version of this comment named "5-194-1",
+    # which has exactly ONE DRBLS row -- it was the old fused "1-1" id
+    # mechanically rewritten into the new key.  Corrected 2026-08-20.)
+    #
+    # OPEN QUESTION, deliberately not resolved here: whether the per-block
+    # Quantity is an INCREMENT (sum it) or the household's total holding
+    # RESTATED at each acquisition (summing then over-counts).  Measured over
+    # the 658 (household, item) blocks that appear in more than one row: 372
+    # carry an IDENTICAL quantity in every row (reads as restated) and 286
+    # differ (reads as incremental).  The evidence does not settle it, and the
+    # questionnaire that would (GUY01.pdf) is an image-only scan with no OCR
+    # available -- see Guyana/_/CONTENTS.org.  This is PRE-EXISTING and
+    # untouched by GH #323: the sum was here before and is here after; #323
+    # only changed WHICH rows are in each group.
+    #
+    # The canonical assets index is (t, i, j) and the
     # framework REQUIRES it to be unique — ``_normalize_dataframe_index``
     # collapses any remaining duplicates with ``groupby().first()``, which
     # would silently drop all but one detail row (an arbitrary pick that

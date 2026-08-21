@@ -126,6 +126,24 @@ with 100% value agreement.
   real household; under the old =(ED, HH)= id the same sum silently pooled the
   durables of *two different households*, inventing holdings nobody reported.
   "We sum, so nothing is lost" is not by itself a safety argument.
+
+  =DRBLS.dta= really does carry several rows per household: 115 of its 1,616
+  households have 2-5 rows (317 rows in all), sharing one =id_nmbr= and one
+  =newid= but differing in the per-block =yri*= year-of-acquisition columns
+  (household =337-253-4=, for instance, reports block 07 acquired in 1991,
+  1989, 1975, 1985 and 1992).
+
+  *OPEN, and NOT a #323 question:* whether the per-block quantity is an
+  INCREMENT (sum it, as we do) or the household's total holding RESTATED at
+  each acquisition (in which case summing over-counts).  The data does not
+  settle it — of the 658 =(household, item)= blocks appearing in more than one
+  row, *372 carry an identical quantity in every row* (reads as restated) and
+  *286 differ* (reads as incremental).  The item labels are worded as stocks
+  ("NO. OWNED - ..."), which leans toward restated, but the questionnaire that
+  would decide it, =GUY01.pdf=, is an image-only scan and no OCR tool was
+  available (see the gaps table below).  Recorded rather than guessed.  It
+  affects ~7% of asset households and is *identical before and after* the #323
+  fix — that fix changed only which rows fall in each group, not the reducer.
 - =EDUCN.dta= has 7,691 rows but =HS= (highest school) is NaN for 3,058 of them;
   those rows carry no education value and do not survive into
   =individual_education= (hence 4,633, not 7,691).  This is unrelated to #323.
