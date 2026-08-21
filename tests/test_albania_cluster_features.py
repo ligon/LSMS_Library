@@ -24,6 +24,12 @@ import pytest
 
 import lsms_library as ll
 
+# The unit-tests CI job is deliberately data-free, so every test here that
+# builds real country data must be gated.  Without this the job fails with
+# botocore NoCredentialsError instead of skipping -- the exact failure mode
+# tests/conftest.py's docstring warns about.  The marker form needs no import.
+pytestmark = pytest.mark.requires_s3
+
 
 @pytest.fixture(scope='module')
 def cf():
