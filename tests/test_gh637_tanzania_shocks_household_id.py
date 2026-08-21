@@ -23,10 +23,17 @@ import pytest
 
 import lsms_library as ll
 
-# NB `from conftest import ...` resolves to the ROOT conftest.py (rootdir is on
-# sys.path and `tests/` is a package), so the shared skip marker has to be
-# imported by its package path.
-from tests.conftest import requires_s3
+# The S3 guard is reached by MARKER, never by import (GH #648, commit 4a57ebf9).
+# Both import spellings are broken, and an earlier cut of this module shipped the
+# second one and turned CI red at COLLECTION -- before any mark could apply:
+#   * `from conftest import ...` resolves to the repo-ROOT `conftest.py`, which
+#     has no such name;
+#   * `from tests.conftest import ...` resolves `tests` to the top-level `tests`
+#     package that the `fooddatacentral` dependency installs into site-packages,
+#     whose `__init__.py` is a broken `from .tests import *` --
+#     `ModuleNotFoundError: No module named 'tests.tests'`.  It passes locally
+#     only because `.venv/.../lsms_library.pth` puts the repo root on sys.path.
+pytestmark = pytest.mark.requires_s3
 
 # The four NPS rounds carried by the 2008-15 multi-round folder.
 UPD_WAVES = ['2008-09', '2010-11', '2012-13', '2014-15']
@@ -73,7 +80,6 @@ def _ids(df, t):
     return set(lv('i')[lv('t').astype(str) == t].astype(str))
 
 
-@requires_s3
 @pytest.mark.parametrize('t', UPD_WAVES)
 def test_shocks_i_is_a_household_known_to_sample(shocks, sample, t):
     """Every 2008-15 shocks household must be a household ``sample()`` knows.
@@ -89,7 +95,6 @@ def test_shocks_i_is_a_household_known_to_sample(shocks, sample, t):
         f'household id (GH #637: it used to be the UPHI panel-line index).')
 
 
-@requires_s3
 @pytest.mark.parametrize('t', UPD_WAVES)
 def test_shocks_i_is_not_a_bare_line_index(shocks, t):
     """The UPHI line index rendered as "1", "2", ... -- r_hhid never does.
@@ -104,7 +109,6 @@ def test_shocks_i_is_not_a_bare_line_index(shocks, t):
         f'indices, e.g. {sorted(bad)[:5]} (GH #637).')
 
 
-@requires_s3
 def test_shocks_per_wave_row_counts(shocks):
     """Pins the de-replication, and pins that it touched only 2008-15."""
     got = {str(t): int(n) for t, n
@@ -115,7 +119,6 @@ def test_shocks_per_wave_row_counts(shocks):
         f'replication is being carried as data again (GH #637).')
 
 
-@requires_s3
 def test_a_replicated_household_reports_each_shock_once(shocks):
     """Household 01010140020171, 2008-09: 3 shocks on 3 panel lines.
 
@@ -135,7 +138,6 @@ def test_a_replicated_household_reports_each_shock_once(shocks):
         EXAMPLE_SHOCKS_2008
 
 
-@requires_s3
 def test_household_ids_are_shared_across_shocks_and_roster(tanzania, shocks):
     """The point of the identifier: shocks must be joinable to the roster.
 
