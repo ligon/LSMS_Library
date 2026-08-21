@@ -20,8 +20,17 @@ aliases the SHIPPED reducer as its `cluster_features` df_edit hook ---
 --- exactly as that helper's docstring prescribes.  A private hand-rolled copy
 was written first and then removed (PR #632 review, Finding 1); the tests below
 pin the alias, because a copy is free to drift and this one already had: its
-`nunique(dropna=False)` guard read NaN as CONTRADICTION, which would have turned
-Togo's 5 GPS-less grappes into a build-breaking "conflict".
+`nunique(dropna=False)` guard read NaN as CONTRADICTION rather than as absence.
+
+That divergence was LATENT, NOT LIVE -- measured against pristine
+`origin/development`, cold (2026-08-20): on the 6,171-row pre-projection frame
+the copy's guard finds a varying column in ZERO of the 540 grappes, so it would
+NOT have raised and the build would NOT have died.  Togo's geo source is already
+one row per grappe, so a GPS-less grappe is WHOLLY GPS-less (5 grappes, 56
+household rows; 0 grappes partly GPS-less) and `nunique(dropna=False)` on an
+all-NaN group is still 1.  The copy was wrong in CONTRACT, one upstream edit
+from being wrong in FACT -- which is why it is pinned by a test rather than
+described as a bug that fired.
 
 INSTRUMENT NOTE (inherited from the CotedIvoire / Benin-Togo tests -- do not
 undo it).  Do NOT assert that the *API* index is unique: the framework collapse
@@ -55,17 +64,23 @@ import numpy as np
 import pandas as pd
 import pytest
 
-# NB `tests/` is a package (`tests/__init__.py`) AND there is a project-level
-# `conftest.py`, so the bare `from conftest import ...` that tests/conftest.py's
-# own docstring suggests resolves to the ROOT conftest and raises ImportError.
-# Import through the package.
-from tests.conftest import requires_s3
-
 from lsms_library.country import Country
 from lsms_library.transformations import (
     collapse_to_cluster_grain,
     GrainConflict,
 )
+
+# The S3 guard is reached by MARKER, never by import (GH #648, commit 4a57ebf9).
+# Both import spellings are broken, and an earlier cut of this module shipped the
+# second one and turned CI red at COLLECTION -- before any mark could apply:
+#   * `from conftest import ...` resolves to the repo-ROOT `conftest.py`, which
+#     has no such name;
+#   * `from tests.conftest import ...` resolves `tests` to the top-level `tests`
+#     package that the `fooddatacentral` dependency installs into site-packages,
+#     whose `__init__.py` is a broken `from .tests import *` --
+#     `ModuleNotFoundError: No module named 'tests.tests'`.  It passes locally
+#     only because `.venv/.../lsms_library.pth` puts the repo root on sys.path.
+pytestmark = pytest.mark.requires_s3
 
 N_GRAPPES = 540          # distinct grappe in s00_me_tgo2018.dta / grappe_gps
 N_HOUSEHOLDS = 6171      # rows in the household cover page (the pre-fix count)
@@ -79,8 +94,8 @@ def togo():
     An earlier draft wrapped this in `except Exception: pytest.skip(...)`, which
     turns a genuinely broken build into a green run -- the end-to-end tests
     become vacuous exactly when they matter.  The only environmental excuse is
-    absent S3 credentials, and that is handled twice over: the `requires_s3`
-    marker on every test below, and `tests/conftest.py`'s
+    absent S3 credentials, and that is handled twice over: the module-level
+    `pytestmark = pytest.mark.requires_s3` above, and `tests/conftest.py`'s
     `pytest_runtest_makereport` hook, which converts a missing-credentials
     failure (and ONLY that) into a skip.
     """
@@ -92,7 +107,6 @@ def wave_frame(togo):
     return togo['2018'].grab_data('cluster_features')
 
 
-@requires_s3
 def test_wave_frame_is_already_at_cluster_grain(wave_frame):
     """The extraction -- not the framework collapse -- must set the grain.
 
@@ -114,7 +128,6 @@ def test_wave_frame_is_already_at_cluster_grain(wave_frame):
     )
 
 
-@requires_s3
 def test_api_still_returns_every_cluster(togo):
     """The projection must not cost a cluster (it recovers no rows either).
 
@@ -130,7 +143,6 @@ def test_api_still_returns_every_cluster(togo):
     assert set(df.index.names) == {'t', 'v'}
 
 
-@requires_s3
 def test_region_and_rural_are_constant_within_a_grappe(togo):
     """The invariant the projection relies on, checked against the source.
 
@@ -166,7 +178,6 @@ def test_region_and_rural_are_constant_within_a_grappe(togo):
     assert (cover.groupby('grappe').size() > 1).all()
 
 
-@requires_s3
 def test_hook_is_the_shipped_reducer_not_a_private_copy(togo):
     """The hook must BE `collapse_to_cluster_grain`, not a look-alike.
 
@@ -196,7 +207,6 @@ def _conflicting_frame():
          'Rural': ['Rural', 'Rural', 'Urban']}, index=idx)
 
 
-@requires_s3
 def test_projection_hook_raises_rather_than_picking_a_row(togo):
     """Negative test: the reducer must FAIL LOUDLY, not silently pick a winner.
 
@@ -224,16 +234,22 @@ def test_projection_hook_raises_rather_than_picking_a_row(togo):
     assert out.loc[('2018', '001'), 'Region'] == 'Maritime'
 
 
-@requires_s3
 def test_nan_is_absence_not_contradiction(togo):
     """A grappe that reports a value in one row and nothing in another COMPLETES.
 
     DISCRIMINATES, and it is the specific reason the private copy had to go: its
-    `nunique(dropna=False)` guard counted NaN as a distinct value, so this frame
-    raised `ValueError` and the BUILD DIED.  Togo's own geo source carries 5
-    grappes with no GPS fix (56 household rows in the pre-projection frame), so
-    the latent case is one upstream edit away from live -- and the repo's
-    doctrine, pinned by `tests/test_gh323_grain_contract.py::
+    `nunique(dropna=False)` guard counted NaN as a distinct value, so the
+    SYNTHETIC frame below raises `ValueError` under the copy while the shipped
+    helper completes it.
+
+    On TODAY'S Togo data that divergence never fires -- LATENT, not live.  The
+    geo source is already one row per grappe, so its 5 GPS-less grappes (56
+    household rows in the 6,171-row pre-projection frame) are WHOLLY GPS-less
+    and `nunique(dropna=False)` on an all-NaN group is 1; measured cold against
+    pristine `origin/development`, the copy's guard flags 0 of 540 grappes.  A
+    single upstream edit that made one grappe PARTLY GPS-less would make it
+    live -- and the repo's doctrine, pinned by
+    `tests/test_gh323_grain_contract.py::
     test_p2_complementary_missingness_is_COMPLETION_not_fabrication`, is that
     NaN is ABSENCE.
 
