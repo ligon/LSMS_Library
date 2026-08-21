@@ -8,22 +8,27 @@ Every ~Rural~-producing cell in the corpus was measured three ways: the raw
 source column (frequencies including nulls), the config mapping, and the
 value the Country API delivers on a *cold* cache.
 
-- *150 (country, wave, table) cells measured at source*; 3 could not be
-  (Nepal, no microdata in the repo).
-- *Class D (non-canonical delivered value) is EMPTY.*  Cold, the entire
-  corpus delivers exactly four things: ~Rural~, ~Urban~, ~Informal~, ~NA~.
-  GH #602's sweep holds; the Uganda ~'0'~ precedent does not recur anywhere.
-- *Class A (collapse) is the real finding: 11 distinct (country, wave)
+- *150 of 153 (country, wave, table) cells measured at source*; 3 could not
+  be (Nepal, no microdata in the repo).
+- *Class D (non-canonical delivered value) is EMPTY.*  Cold, over all 47
+  countries and all three ~Rural~-producing tables, the corpus delivers
+  exactly four things: ~Rural~, ~Urban~, ~Informal~, ~NA~.  GH #602's sweep
+  holds; the Uganda ~'0'~ precedent does not recur anywhere.
+- *Class A (collapse) is the real finding: 12 cells across 7 (country, wave)
   survey designs whose source draws MORE THAN TWO settlement categories and
   whose config delivers two.*  The worst is Iraq 2006-07 (a documented
   three-tier =rural / urban / metropolitan= stratification, 5,413 +
   5,736 households merged into one ~Urban~); then Ethiopia ESS2/ESS3
   (small town vs. large town), Kazakhstan 1996 (a three-stratum design),
-  Azerbaijan 1995 (four codes to two).
-- *Class C (declared/expected but ~100% null) covers 9 country-waves*, of
-  which *GhanaLSS 2005-06 and GhanaSPS 2013-14/2017-18 are pure config gaps*
-  -- the information is sitting in the shipped extract (GLSS5) or joinable
-  from a sibling wave (GhanaSPS).
+  Azerbaijan 1995 (four codes to two).  Fourteen further cells have >2 raw
+  categories and were *adjudicated out* with reasons (section 3).
+- *Class C (delivered >=99% null) covers 11 cells / 7 country-waves*, of
+  which *GhanaLSS 2005-06 is a pure config gap* -- the variable is in two
+  shipped GLSS5 files at exactly the right grain -- and *GhanaSPS
+  2013-14/2017-18 is joinable from wave 1* (same 334 EAs).
+- *One cell is only a Rural by name*: India 1997-98 ~employment.Rural~ is a
+  per-activity *workplace* location, 93% null, and sits outside the GH #602
+  spellings check entirely.  Section 4A.
 - *GH #659 is partially stale*: cold on ~origin/development~, GhanaLSS
   ~sample().Rural~ is null for *15,028 of 56,330 rows (26.7%), THREE of
   seven waves* -- not 21,026 / 37% / four waves.  The 5,998-row delta is
@@ -223,15 +228,64 @@ not a data defect.
 * 3. Classification summary
 
 Counted over *(country, wave, table)* cells.  A cell can appear in more than
-one class.
+one class -- C and E overlap heavily (E is the verified *cause* of most of C).
+*Every member is enumerated below*, so the table is reconstructible from the
+committed CSVs alone.
 
-| class | what it means                                  | cells | country-waves |
-|-------+------------------------------------------------+-------+---------------|
-| A     | source >2 substantive categories, config -> 2  |    18 |            11 |
-| B     | raw values silently mapped to NA               |     1 |             1 |
-| C     | declared/expected, ~100% null delivered        |    15 |             9 |
-| D     | delivered value outside the canonical domain   | *0*   |         *0*   |
-| E     | no urban/rural indicator in the shipped extract|     8 |             4 |
+| class | what it means                                   | cells | country-waves |
+|-------+-------------------------------------------------+-------+---------------|
+| A     | source >2 substantive categories, config -> <=2 |    12 |             7 |
+| B     | a non-null raw value the config sends to NA     | *0*   |         *0*   |
+| C     | delivered >=99% null                            |    11 |             7 |
+| D     | delivered value outside the canonical domain    | *0*   |         *0*   |
+| E     | no urban/rural indicator in the shipped extract |    10 |             6 |
+
+** Class A -- 12 cells / 7 country-waves
+
+Iraq 2006-07 (sample, cluster_features); Ethiopia 2013-14 (both); Ethiopia
+2015-16 (both); Kazakhstan 1996 (both); Mali 2017-18 (both); Azerbaijan 1995
+(cluster_features); Niger 2014-15 (cluster_features).
+
+26 cells have >2 substantive raw categories.  The other 14 were *adjudicated
+out*, each for a stated reason:
+
+- *CotedIvoire* 1985-89, 8 cells -- the 5-way ~REGION~ fold is the producer's
+  own published definition (section 2).
+- *Malawi* 2016-17 / 2019-20, 4 cells -- the 4 raw values are pure casing.
+- *South Africa* 1993, 2 cells -- 3 raw categories, *3 delivered values*.  It
+  is the one cell in the corpus that does not collapse.
+
+Ethiopia 2011-12 is *not* counted (its source is genuinely 2-way) but carries
+a related and arguably worse defect; see 4.2.
+
+** Class B -- 0 cells
+
+No non-null raw value anywhere resolves to NA.  Checked mechanically over
+~rural_mapping.csv~.  Two *latent* B risks are recorded in 7.4 (Tanzania's
+~.map(dict)~, Iraq's ~else 'Urban'~); neither fires on today's data.
+
+** Class C -- 11 cells / 7 country-waves
+
+GhanaLSS 1987-88 (both), 1988-89 (both), 2005-06 (sample); GhanaSPS 2013-14
+(sample), 2017-18 (sample); Albania 2003 (both), 2004 (both).
+
+Nine further cells have *partial* nulls and are deliberately NOT class C --
+Azerbaijan 1995 ~cluster_features~ 45.8% (5.5), Pakistan 1991 ~sample~ 4.1%,
+and seven Uganda cells (5.7).  Peru 1994 is a separate case again (5.6).
+
+** Class D -- 0 cells
+
+Cold, over all 47 countries and *all three* ~Rural~-producing tables
+(~sample~, ~cluster_features~, and India's ~employment~), the delivered
+domain is exactly {~Rural~, ~Urban~, ~Informal~, NA}.
+
+** Class E -- 10 cells / 6 country-waves
+
+GhanaLSS 1987-88 (both), 1988-89 (both), GhanaSPS 2013-14 (sample), 2017-18
+(sample), Albania 2003 (both), 2004 (both).  Each verified by an exhaustive
+file/dictionary sweep, not asserted -- counts in section 8.  *GhanaLSS
+2005-06 is class C but NOT class E*: the variable is in the shipped extract
+(5.2).
 
 * 4. Class A -- COLLAPSE.  Worst first.
 
@@ -377,6 +431,63 @@ finer structure.
 - *South Africa 1993*: 3 raw values, 3 delivered values.  The one cell in the
   corpus that does NOT collapse.
 
+* 4A. Not a collapse, a MISNOMER: India 1997-98 employment.Rural
+
+Every other ~Rural~ in the corpus lives in ~sample~ or ~cluster_features~.
+India 1997-98 has a third: ~employment.Rural~, from =SECT02AD.DTA::v02a05b=.
+
+Raw (16,089 activity rows): *14,998 null* (93.2%), Urban 728, Rural 363.
+Delivered, cold, at the declared ~(t, i, pid, act)~ grain (6,158 rows):
+5,067 ~NA~ / 728 ~Urban~ / 363 ~Rural~.
+
+*The values are canonical; the concept is not.*  The config already says so,
+in a comment left by GH #323 and quoted here in full because it is the
+finding:
+
+#+begin_quote
+# NOTE (separate defect, not the GH #323 root cause): v02a05b is the
+# per-ACTIVITY WORKPLACE location (14,998/16,089 NaN; 728 'Urban' / 363
+# 'Rural'), NOT a household residence flag -- while India's `sample`
+# deliberately carries NO Rural (GH #602: "India simply has no Rural
+# indicator").  The silent collapse was laundering this sparse per-job
+# field into a column that reads as the very household Rural indicator
+# #602 removed.  Widening the index de-fangs it (it is now honestly
+# per-activity rather than a fabricated person-level value), but the NAME
+# still misleads and should become `Workplace_Rural` (or be dropped).
+# Left in place here to keep this commit scoped to GH #323.
+#+end_quote
+-- ~India/1997-98/_/data_info.yml~
+
+Three things this audit adds.
+
+1. *It is the ONLY cell of its kind*, corpus-wide.  The rename to
+   ~Workplace_Rural~ therefore costs nothing and collides with nothing.
+2. *It sits outside the GH #602 safety net.*  ~_check_declared_spellings~
+   keys on *(table, column)* as declared under ~Columns~ in
+   ~lsms_library/data_info.yml~, and only ~sample~ and ~cluster_features~
+   declare ~Rural~ there.  ~employment~ is not in ~Columns~ at all, so this
+   ~Rural~ is *unchecked* -- it happens to be canonical, which is luck, not
+   enforcement.  That is the #602 disease one level up: the check is real,
+   the column is simply not in its domain.
+3. *It does not contradict ~India/_/CONTENTS.org~*, and the distinction is
+   the point.  That file says:
+
+   #+begin_quote
+   This is the documentation-side twin of the =sample.Rural= finding (#602,
+   below in this file): the shipped data carry no urban/rural variable, and
+   the documentation asserts no urban/rural universe.
+   #+end_quote
+
+   Read strictly -- no *household residence* urban/rural variable -- that is
+   correct, and =v02a05b= is not a counter-example.  Read loosely it would be
+   false, since a column literally labelled Urban/Rural does ship.  Worth
+   tightening the wording when someone next touches that file.
+
+   The same file's *"CAUTION -- do not upgrade 'rural' from inference to
+   claim"* section is the model here: the WB abstract opens on "rural
+   poverty" and every PSU is a village, and CONTENTS.org still refuses to
+   record a rural-only universe because no document states one.
+
 * 5. Class C -- declared or expected, delivered ~100% null
 
 | country  | wave    | table            | null | of    | why (measured)                                  |
@@ -393,11 +504,11 @@ finer structure.
 | Azerbaijan | 1995  | cluster_features |   77 |   168 | *structural* -- see 5.5                         |
 | Peru     | 1994    | cluster_features |  n/a |   n/a | *unreachable* -- correctly wired, never delivered (5.6) |
 
-Partial nulls worth recording but not investigated further: Pakistan 1991
-~sample~ 204/4,967 (4.1%; the wave's own ~cluster_features.py~ docstring
-says one PSU "has NO region data.  Its Region/Rural are left <NA> --
-honestly"); Uganda ~cluster_features~ 4.1--15.6% by wave; Uganda 2019-20
-~sample~ 20/3,098 (which is 20 genuine nulls in the raw =urban= column).
+Partial nulls: Pakistan 1991 ~sample~ 204/4,967 (4.1%; the wave's own
+~cluster_features.py~ docstring says one PSU "has NO region data.  Its
+Region/Rural are left <NA> -- honestly"); Uganda 2019-20 ~sample~ 20/3,098,
+which is 20 genuine nulls in the raw =urban= column; and seven Uganda
+~cluster_features~ cells, which are *not* a defect -- see 5.7.
 
 ** 5.1 GH #659 is partially stale -- corrected measurement
 
@@ -456,11 +567,13 @@ here.
 
 ** 5.3 GhanaSPS 2013-14 / 2017-18 -- not in the extract, but joinable
 
-I read *all 89* shipped ~.dta~ files of 2013-14 and pattern-matched every
-column name for =urb|rural|milieu|semi|town|villag|sector|reside|settlem|
-locality|loc\d*|area=, keeping any column with 2--12 distinct values.  The
-only hits are unrelated (=relativeinvillage=, =villagetrustworthy=, ...).
-*No urban/rural classification variable is present in the 2013-14 extract.*
+I read *all 89* shipped ~.dta~ files of 2013-14 and *all 110* of 2017-18,
+pattern-matching every column name for =urb|rural|milieu|semi|town|villag|
+sector|reside|settlem|locality|loc\d*|area= and keeping any column with
+2--12 distinct values.  Both waves return the same six unrelated hits
+(=relativeinvillage=, =villagetrustworthy=, =ruralprimsecdifference=, ...).
+*No urban/rural classification variable is present in either extract.*
+Neither wave was extrapolated from the other.
 
 That is a statement about the *extract*, not the instrument, and I am not
 filing a closing verdict.  It is also probably moot: per GH #673, GhanaSPS
@@ -488,7 +601,7 @@ LSMS panel, so a PSU-level carry-forward is available.  *I did not check
 whether the 2003/2004 PSU identifiers match 2002's* -- that is the load-
 bearing check before anyone acts on this.
 
-** 5.5 Azerbaijan 1995 -- a structural null from an outer merge (class B/C)
+** 5.5 Azerbaijan 1995 -- a structural null from an outer merge
 
 ~cluster_features~ is a ~dfs:~ merge of =APP1.dta= (which owns ~Rural~) and
 =PP.dta= (which owns ~Region~).  Measured:
@@ -536,6 +649,54 @@ Peru has no row in ~rural_delivered_values.csv~.
 Noted without a claim: ~data_info.yml~ lists Peru's waves as ='1985-1986'=
 while the directory (and therefore ~Country.waves~) says ='1985'=.  Not
 investigated.
+
+** 5.7 Uganda cluster_features -- 4.1--15.6% null, and it is the RIGHT answer
+
+I chased this expecting Azerbaijan's mechanism.  It is not, and the country's
+own code says why.  Measured first, cold:
+
+#+begin_example
+Uganda 2018-19   sample:            3176 hh,   0 null Rural, 781 distinct v
+                 cluster_features:   781 clusters, 122 null Rural
+GSEC1.dta        urban: 0 nulls;  district-parish key -> 781 clusters,
+                 ZERO of which have all-null urban
+geovar join      3176 <-> 3176 hhid, 0 orphans either way
+#+end_example
+
+So the value is present, complete, and unambiguous at source, the merge is
+1:1, and ~sample~ delivers it with no nulls -- yet 122 clusters come back NA.
+That is not a merge artifact and not a mapping miss.
+
+~Uganda/_/uganda.py::cluster_features~ (the ~df_edit~ hook) explains it:
+
+#+begin_quote
+2. =v= is a PARISH from 2013-14 on, and a parish contains several enumeration
+   areas -- some urban, some rural, each with its own geovar fix.  =Rural= and
+   the GPS are therefore not parish attributes at all (70 / 65 / 122 / 122
+   clusters conflict on Rural in 2013-14 / 2015-16 / 2018-19 / 2019-20).
+
+Neither can be resolved from this table, and picking a winner is the bug.
+=<NA>= + a warning is the honest answer; per-household =Rural= / =Region=
+remain exact in =sample()=, which is their proper home.
+#+end_quote
+
+The hook uses ~reduce_to_agreed(on_conflict='na')~: agreement collapses
+silently, absence loses to presence, genuine disagreement becomes ~<NA>~ plus
+a ~GrainConflictWarning~.  *Three of the four counts reproduce exactly* --
+I measured 70 / 65 / 122 for 2013-14 / 2015-16 / 2018-19.
+
+*One small discrepancy, recorded not resolved*: the docstring says 122 for
+2019-20; I measure *125*.  The likeliest explanation is the 20 genuinely-null
+raw =urban= values in that wave's GSEC1 (absent from the other three waves),
+some of which land in clusters that are otherwise empty of a value -- a
+different route to NA than a conflict.  Worth a glance by whoever owns that
+hook; it does not change the finding.
+
+*This is the CLAUDE.md dispatcher rule paying for itself.*  Read as a bare
+null rate, seven Uganda cells look like the corpus's second-worst class-B
+problem.  Read against the country's own documentation, they are a survey
+fact -- a parish is not a settlement type -- handled deliberately and
+correctly, with the exact per-wave counts written down in advance.
 
 * 6. The GLSS1 / GLSS2 SU question
 
@@ -733,6 +894,12 @@ it is out of scope for this branch.
    ~'Urban '~ (trailing space, real) but ~'Rural '~ (trailing space, not
    present -- the raw value is ~'Rural'~), so one key is live and one dead.
    Correct output, both times, by accident.
+7. India 1997-98: rename ~employment.Rural~ to ~Workplace_Rural~ (or drop
+   it).  The config comment already asks for this; this audit shows it is the
+   only such cell corpus-wide, so the rename collides with nothing.  (4A)
+8. Consider declaring ~Rural~ under ~Columns~ for any table that grows one,
+   or keying ~_check_declared_spellings~ on the column where the vocabulary
+   is genuinely global.  Today the check cannot see India's ~employment~.
 
 * 8. Coverage: what I measured and what I did not
 
@@ -741,12 +908,22 @@ it is out of scope for this branch.
 - *150 of 153* producing (country, wave, table) cells read at source with
   frequencies and value types, including nulls.
 - *All 33* producing countries; *all 47* countries for the delivered pass.
+- *All three* ~Rural~-producing tables: ~sample~, ~cluster_features~, and
+  India's ~employment~ (measured separately -- section 4A -- because the
+  delivered sweep loops over the first two).
 - *14 script-path cells* attributed by hand after reading each script
   (Albania x6, Ethiopia x5, Pakistan, Tanzania x2).
 - The GLSS Appendix I table parsed and cross-checked against the document's
   own exclusion instruction.
 - All 170 GLSS1/GLSS2 data dictionaries; all 49 GLSS5 data files; all 89
-  GhanaSPS 2013-14 files; all Albania 2003 (9) and 2004 (6) files.
+  GhanaSPS 2013-14 and all 110 GhanaSPS 2017-18 files; all Albania 2003 (9)
+  and 2004 (6) files.
+- *Against the brief's frame*: of the 79 wave-level ~data_info.yml~ that
+  grep for "Rural", 77 are real country-waves (India 1997-98 matches only on
+  a GH #602 comment, and one file matches twice).  All are measured except
+  the 3 Nepal cells.  Add 14 script-path cells and the GLSS1/GLSS2,
+  GhanaSPS and Albania 2003/2004 cells, which declare no ~Rural~ and are
+  therefore invisible to that grep but are the ones the brief was about.
 
 ** NOT measured, and why
 
@@ -756,8 +933,9 @@ it is out of scope for this branch.
    way to see the values.
 2. *Iraq 2012*: I did not check whether a metropolitan tier exists under a
    column other than =q00_16=.  Given 2006-07, it probably does.
-3. *GhanaSPS 2017-18*: I scanned 2013-14 exhaustively and extrapolated.  The
-   2017-18 extract was NOT scanned.
+3. *Uganda 2019-20 cluster_features*: I measure 125 null clusters where the
+   ~uganda.cluster_features~ docstring says 122 (5.7).  The other three waves
+   reproduce exactly.  I did not chase the 3.
 4. *Azerbaijan =inout= semantics*: unresolved.  No codebook found; I did not
    read =queshhe.pdf= / the community questionnaire looking for the
    =inout= question.  The "1--3 = various urban" claim in ~CONTENTS.org~
@@ -773,9 +951,11 @@ it is out of scope for this branch.
 8. *Column-name sweeps have a blind spot.*  My probe keeps only columns with
    2--12 distinct values whose *name* matches a pattern.  A classification
    under an opaque name (=v103=, =strat2=) would be missed.  Where I say "not
-   in the extract" (GhanaSPS 2013-14, Albania 2003/2004) read it as "not
-   found by a name-pattern sweep of every shipped file", which is weaker
-   than "absent".
+   in the extract" (GhanaSPS 2013-14 / 2017-18, Albania 2003/2004) read it as
+   "not found by a name-pattern sweep of every shipped file", which is weaker
+   than "absent".  *No closing ~not-asked~ verdict is proposed for any cell*
+   -- absence in an extract is not absence in an instrument, and I read no
+   GhanaSPS or Albania questionnaire.
 9. *Peru's delivered values*: unmeasurable through the Country API (5.6).
    The raw and mapping evidence for Peru is in the CSVs; its delivered rows
    are absent because the table does not exist at country level.
@@ -785,7 +965,15 @@ it is out of scope for this branch.
 ** One negative result worth stating plainly
 
 *Class D is empty.*  Every delivered ~Rural~ value in all 47 countries, cold,
-is ~Rural~, ~Urban~, ~Informal~ or ~NA~.  The specific defect the brief asked
-me to hunt for -- the Uganda ~'0'~ shape -- does not exist anywhere in the
-corpus today.  GH #602's ~_check_declared_spellings~ plus its data fixes
-closed that class, and this is independent cold confirmation of it.
+across ~sample~, ~cluster_features~ AND India's ~employment~, is ~Rural~,
+~Urban~, ~Informal~ or ~NA~.  The specific defect the brief asked me to hunt
+for -- the Uganda ~'0'~ shape -- does not exist anywhere in the corpus today.
+GH #602's ~_check_declared_spellings~ plus its data fixes closed that class,
+and this is independent cold confirmation of it.
+
+One caveat on how much credit the *check* deserves, as opposed to the *fixes*:
+~_check_declared_spellings~ is keyed on (table, column) as declared under
+~Columns~ in the canonical schema, and only ~sample~ and ~cluster_features~
+declare ~Rural~ there.  India's ~employment.Rural~ is outside its domain and
+is canonical by luck (4A).  The check would not have caught a violation there,
+and would not catch one in a *new* table that grows a ~Rural~ column.
