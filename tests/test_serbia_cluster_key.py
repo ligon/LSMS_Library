@@ -29,6 +29,12 @@ import lsms_library as ll
 from lsms_library.local_tools import get_dataframe
 from lsms_library.paths import countries_root
 
+# The unit-tests CI job is deliberately data-free, so every test here that
+# builds real country data must be gated.  Without this the job fails with
+# botocore NoCredentialsError instead of skipping -- the exact failure mode
+# tests/conftest.py's docstring warns about.  The marker form needs no import.
+pytestmark = pytest.mark.requires_s3
+
 SERBIA = countries_root() / "Serbia"
 
 # Ground truth, counted directly off enumeration_district.dta.
