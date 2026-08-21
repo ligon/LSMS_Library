@@ -1,0 +1,465 @@
+country,wave,table,subdf,build,source_file,source_column,src_dtype,raw_value,raw_type,count,n_rows,mechanism,status
+Albania,2002,cluster_features,,script,../Data/metadata_cl.dta,m0_ur,object,Urban,str,1959,3599,script:_label,ok
+Albania,2002,cluster_features,,script,../Data/metadata_cl.dta,m0_ur,object,Rural,str,1640,3599,script:_label,ok
+Albania,2002,sample,,script,../Data/weights.dta,ur,object,Urban,str,1959,3599,script:astype(str),ok
+Albania,2002,sample,,script,../Data/weights.dta,ur,object,Rural,str,1640,3599,script:astype(str),ok
+Albania,2003,sample,,script,,,,,,,,,NEEDS_MANUAL
+Albania,2004,sample,,script,,,,,,,,,NEEDS_MANUAL
+Albania,2005,cluster_features,,script,../Data/identification_cl.dta,m0_ur,object,Urban,str,2200,3840,script:_label+cluster_reduce,ok
+Albania,2005,cluster_features,,script,../Data/identification_cl.dta,m0_ur,object,Rural,str,1640,3840,script:_label+cluster_reduce,ok
+Albania,2005,sample,,script,../Data/identification_cl.dta,m0_ur,object,Urban,str,2200,3840,script:astype(str),ok
+Albania,2005,sample,,script,../Data/identification_cl.dta,m0_ur,object,Rural,str,1640,3840,script:astype(str),ok
+Albania,2008,sample,,script,../Data/poverty.sav,urbrur,category,urban,str,1976,3599,script:astype(str).str.title(),ok
+Albania,2008,sample,,script,../Data/poverty.sav,urbrur,category,rural,str,1623,3599,script:astype(str).str.title(),ok
+Albania,2012,sample,,script,../Data/poverty.sav,urban,category,Urban,str,3608,6671,script:astype(str),ok
+Albania,2012,sample,,script,../Data/poverty.sav,urban,category,Rural,str,3063,6671,script:astype(str),ok
+Azerbaijan,1995,cluster_features,df_inout,yaml,../Data/APP1.dta,inout,float64,1.0,float,40,92,inline_dict,ok
+Azerbaijan,1995,cluster_features,df_inout,yaml,../Data/APP1.dta,inout,float64,2.0,float,20,92,inline_dict,ok
+Azerbaijan,1995,cluster_features,df_inout,yaml,../Data/APP1.dta,inout,float64,4.0,float,18,92,inline_dict,ok
+Azerbaijan,1995,cluster_features,df_inout,yaml,../Data/APP1.dta,inout,float64,3.0,float,13,92,inline_dict,ok
+Azerbaijan,1995,cluster_features,df_inout,yaml,../Data/APP1.dta,inout,float64,,NaN,1,92,inline_dict,ok
+Benin,2018-19,cluster_features,df_main,yaml,s00_me_ben2018.dta,s00q04,object,Rural,str,4072,8012,inline_dict,ok
+Benin,2018-19,cluster_features,df_main,yaml,s00_me_ben2018.dta,s00q04,object,Urbain,str,3940,8012,inline_dict,ok
+Benin,2018-19,sample,df_cover,yaml,s00_me_ben2018.dta,s00q04,object,Rural,str,4072,8012,inline_dict,ok
+Benin,2018-19,sample,df_cover,yaml,s00_me_ben2018.dta,s00q04,object,Urbain,str,3940,8012,inline_dict,ok
+Burkina_Faso,2014,cluster_features,df_main,yaml,emc2014_p1_logement_27022015.dta,milieu,object,Rural,str,6540,10800,inline_dict,ok
+Burkina_Faso,2014,cluster_features,df_main,yaml,emc2014_p1_logement_27022015.dta,milieu,object,Urbain,str,4260,10800,inline_dict,ok
+Burkina_Faso,2014,sample,,yaml,emc2014_welfare.dta,milieu,object,Rural,str,6408,10411,inline_dict,ok
+Burkina_Faso,2014,sample,,yaml,emc2014_welfare.dta,milieu,object,Urbain,str,4003,10411,inline_dict,ok
+Burkina_Faso,2018-19,cluster_features,df_main,yaml,s00_me_bfa2018.dta,s00q04,object,Rural,str,3861,7010,inline_dict,ok
+Burkina_Faso,2018-19,cluster_features,df_main,yaml,s00_me_bfa2018.dta,s00q04,object,Urbain,str,3149,7010,inline_dict,ok
+Burkina_Faso,2018-19,sample,df_cover,yaml,s00_me_bfa2018.dta,s00q04,object,Rural,str,3861,7010,inline_dict,ok
+Burkina_Faso,2018-19,sample,df_cover,yaml,s00_me_bfa2018.dta,s00q04,object,Urbain,str,3149,7010,inline_dict,ok
+Burkina_Faso,2021-22,cluster_features,,yaml,s00_me_bfa2021.dta,s00q04,object,Rural,str,1760,3227,inline_dict,ok
+Burkina_Faso,2021-22,cluster_features,,yaml,s00_me_bfa2021.dta,s00q04,object,Urbain,str,1467,3227,inline_dict,ok
+Burkina_Faso,2021-22,sample,df_cover,yaml,s00_me_bfa2021.dta,s00q04,object,Rural,str,1760,3227,inline_dict,ok
+Burkina_Faso,2021-22,sample,df_cover,yaml,s00_me_bfa2021.dta,s00q04,object,Urbain,str,1467,3227,inline_dict,ok
+Cambodia,2019-20,cluster_features,,yaml,../Data/hh_sec_1.dta,s01q06b,object,Rural,str,1056,1512,passthrough,ok
+Cambodia,2019-20,cluster_features,,yaml,../Data/hh_sec_1.dta,s01q06b,object,Urban,str,456,1512,passthrough,ok
+Cambodia,2019-20,sample,,yaml,../Data/hh_sec_1.dta,s01q06b,object,Rural,str,1056,1512,passthrough,ok
+Cambodia,2019-20,sample,,yaml,../Data/hh_sec_1.dta,s01q06b,object,Urban,str,456,1512,passthrough,ok
+CotedIvoire,1985-86,cluster_features,,yaml,../Data/WEIGHT85.DAT,REGION,str,3: EAST FOREST,str,364,1588,inline_dict,ok
+CotedIvoire,1985-86,cluster_features,,yaml,../Data/WEIGHT85.DAT,REGION,str,2: OTHER CITIES,str,344,1588,inline_dict,ok
+CotedIvoire,1985-86,cluster_features,,yaml,../Data/WEIGHT85.DAT,REGION,str,1: ABIDJAN,str,336,1588,inline_dict,ok
+CotedIvoire,1985-86,cluster_features,,yaml,../Data/WEIGHT85.DAT,REGION,str,5: SAVANNA,str,304,1588,inline_dict,ok
+CotedIvoire,1985-86,cluster_features,,yaml,../Data/WEIGHT85.DAT,REGION,str,4: WEST FOREST,str,240,1588,inline_dict,ok
+CotedIvoire,1985-86,sample,,yaml,../Data/WEIGHT85.DAT,REGION,str,3: EAST FOREST,str,364,1588,inline_dict,ok
+CotedIvoire,1985-86,sample,,yaml,../Data/WEIGHT85.DAT,REGION,str,2: OTHER CITIES,str,344,1588,inline_dict,ok
+CotedIvoire,1985-86,sample,,yaml,../Data/WEIGHT85.DAT,REGION,str,1: ABIDJAN,str,336,1588,inline_dict,ok
+CotedIvoire,1985-86,sample,,yaml,../Data/WEIGHT85.DAT,REGION,str,5: SAVANNA,str,304,1588,inline_dict,ok
+CotedIvoire,1985-86,sample,,yaml,../Data/WEIGHT85.DAT,REGION,str,4: WEST FOREST,str,240,1588,inline_dict,ok
+CotedIvoire,1986-87,cluster_features,,yaml,../Data/WEIGHT86.DAT,REGION,str,3: EAST FOREST,str,367,1600,inline_dict,ok
+CotedIvoire,1986-87,cluster_features,,yaml,../Data/WEIGHT86.DAT,REGION,str,2: OTHER CITIES,str,352,1600,inline_dict,ok
+CotedIvoire,1986-87,cluster_features,,yaml,../Data/WEIGHT86.DAT,REGION,str,1: ABIDJAN,str,337,1600,inline_dict,ok
+CotedIvoire,1986-87,cluster_features,,yaml,../Data/WEIGHT86.DAT,REGION,str,5: SAVANNA,str,304,1600,inline_dict,ok
+CotedIvoire,1986-87,cluster_features,,yaml,../Data/WEIGHT86.DAT,REGION,str,4: WEST FOREST,str,240,1600,inline_dict,ok
+CotedIvoire,1986-87,sample,,yaml,../Data/WEIGHT86.DAT,REGION,str,3: EAST FOREST,str,367,1600,inline_dict,ok
+CotedIvoire,1986-87,sample,,yaml,../Data/WEIGHT86.DAT,REGION,str,2: OTHER CITIES,str,352,1600,inline_dict,ok
+CotedIvoire,1986-87,sample,,yaml,../Data/WEIGHT86.DAT,REGION,str,1: ABIDJAN,str,337,1600,inline_dict,ok
+CotedIvoire,1986-87,sample,,yaml,../Data/WEIGHT86.DAT,REGION,str,5: SAVANNA,str,304,1600,inline_dict,ok
+CotedIvoire,1986-87,sample,,yaml,../Data/WEIGHT86.DAT,REGION,str,4: WEST FOREST,str,240,1600,inline_dict,ok
+CotedIvoire,1987-88,cluster_features,,yaml,../Data/WEIGHT87.DAT,REGION,str,2: OTHER CITIES,str,448,1600,inline_dict,ok
+CotedIvoire,1987-88,cluster_features,,yaml,../Data/WEIGHT87.DAT,REGION,str,1: ABIDJAN,str,352,1600,inline_dict,ok
+CotedIvoire,1987-88,cluster_features,,yaml,../Data/WEIGHT87.DAT,REGION,str,5: SAVANNA,str,336,1600,inline_dict,ok
+CotedIvoire,1987-88,cluster_features,,yaml,../Data/WEIGHT87.DAT,REGION,str,3: EAST FOREST,str,304,1600,inline_dict,ok
+CotedIvoire,1987-88,cluster_features,,yaml,../Data/WEIGHT87.DAT,REGION,str,4: WEST FOREST,str,160,1600,inline_dict,ok
+CotedIvoire,1987-88,sample,,yaml,../Data/WEIGHT87.DAT,REGION,str,2: OTHER CITIES,str,448,1600,inline_dict,ok
+CotedIvoire,1987-88,sample,,yaml,../Data/WEIGHT87.DAT,REGION,str,1: ABIDJAN,str,352,1600,inline_dict,ok
+CotedIvoire,1987-88,sample,,yaml,../Data/WEIGHT87.DAT,REGION,str,5: SAVANNA,str,336,1600,inline_dict,ok
+CotedIvoire,1987-88,sample,,yaml,../Data/WEIGHT87.DAT,REGION,str,3: EAST FOREST,str,304,1600,inline_dict,ok
+CotedIvoire,1987-88,sample,,yaml,../Data/WEIGHT87.DAT,REGION,str,4: WEST FOREST,str,160,1600,inline_dict,ok
+CotedIvoire,1988-89,cluster_features,,yaml,../Data/WEIGHT88.DAT,REGION,str,2: OTHER CITIES,str,432,1600,inline_dict,ok
+CotedIvoire,1988-89,cluster_features,,yaml,../Data/WEIGHT88.DAT,REGION,str,3: EAST FOREST,str,320,1600,inline_dict,ok
+CotedIvoire,1988-89,cluster_features,,yaml,../Data/WEIGHT88.DAT,REGION,str,1: ABIDJAN,str,304,1600,inline_dict,ok
+CotedIvoire,1988-89,cluster_features,,yaml,../Data/WEIGHT88.DAT,REGION,str,5: SAVANNA,str,304,1600,inline_dict,ok
+CotedIvoire,1988-89,cluster_features,,yaml,../Data/WEIGHT88.DAT,REGION,str,4: WEST FOREST,str,240,1600,inline_dict,ok
+CotedIvoire,1988-89,sample,,yaml,../Data/WEIGHT88.DAT,REGION,str,2: OTHER CITIES,str,432,1600,inline_dict,ok
+CotedIvoire,1988-89,sample,,yaml,../Data/WEIGHT88.DAT,REGION,str,3: EAST FOREST,str,320,1600,inline_dict,ok
+CotedIvoire,1988-89,sample,,yaml,../Data/WEIGHT88.DAT,REGION,str,1: ABIDJAN,str,304,1600,inline_dict,ok
+CotedIvoire,1988-89,sample,,yaml,../Data/WEIGHT88.DAT,REGION,str,5: SAVANNA,str,304,1600,inline_dict,ok
+CotedIvoire,1988-89,sample,,yaml,../Data/WEIGHT88.DAT,REGION,str,4: WEST FOREST,str,240,1600,inline_dict,ok
+CotedIvoire,2018-19,cluster_features,df_main,yaml,Menage/s00_me_CIV2018.dta,s00q04,object,Rural,str,7717,12992,inline_dict,ok
+CotedIvoire,2018-19,cluster_features,df_main,yaml,Menage/s00_me_CIV2018.dta,s00q04,object,Urbain,str,5275,12992,inline_dict,ok
+CotedIvoire,2018-19,sample,df_cover,yaml,Menage/s00_me_CIV2018.dta,s00q04,object,Rural,str,7717,12992,inline_dict,ok
+CotedIvoire,2018-19,sample,df_cover,yaml,Menage/s00_me_CIV2018.dta,s00q04,object,Urbain,str,5275,12992,inline_dict,ok
+Ethiopia,2011-12,cluster_features,df_main,yaml,sect_cover_hh_w1.dta,rural,object,rural,str,3466,3969,inline_dict,ok
+Ethiopia,2011-12,cluster_features,df_main,yaml,sect_cover_hh_w1.dta,rural,object,small town,str,503,3969,inline_dict,ok
+Ethiopia,2011-12,sample,,script,../Data/sect_cover_hh_w1.dta,rural,object,rural,str,3466,3969,script:.map(dict),ok
+Ethiopia,2011-12,sample,,script,../Data/sect_cover_hh_w1.dta,rural,object,small town,str,503,3969,script:.map(dict),ok
+Ethiopia,2013-14,cluster_features,df_main,yaml,sect_cover_hh_w2.dta,rural,object,Rural,str,3323,5262,inline_dict,ok
+Ethiopia,2013-14,cluster_features,df_main,yaml,sect_cover_hh_w2.dta,rural,object,Large town (urban),str,1486,5262,inline_dict,ok
+Ethiopia,2013-14,cluster_features,df_main,yaml,sect_cover_hh_w2.dta,rural,object,Small town (urban),str,453,5262,inline_dict,ok
+Ethiopia,2013-14,sample,,script,../Data/sect_cover_hh_w2.dta,rural,object,Rural,str,3323,5262,script:.map(dict),ok
+Ethiopia,2013-14,sample,,script,../Data/sect_cover_hh_w2.dta,rural,object,Large town (urban),str,1486,5262,script:.map(dict),ok
+Ethiopia,2013-14,sample,,script,../Data/sect_cover_hh_w2.dta,rural,object,Small town (urban),str,453,5262,script:.map(dict),ok
+Ethiopia,2015-16,cluster_features,df_main,yaml,sect_cover_hh_w3.dta,rural,object,RURAL,str,3272,4954,inline_dict,ok
+Ethiopia,2015-16,cluster_features,df_main,yaml,sect_cover_hh_w3.dta,rural,object,Meduim and large town,str,1255,4954,inline_dict,ok
+Ethiopia,2015-16,cluster_features,df_main,yaml,sect_cover_hh_w3.dta,rural,object,SMALL TOWN,str,427,4954,inline_dict,ok
+Ethiopia,2015-16,sample,,script,../Data/sect_cover_hh_w3.dta,rural,object,RURAL,str,3272,4954,script:.map(dict),ok
+Ethiopia,2015-16,sample,,script,../Data/sect_cover_hh_w3.dta,rural,object,Meduim and large town,str,1255,4954,script:.map(dict),ok
+Ethiopia,2015-16,sample,,script,../Data/sect_cover_hh_w3.dta,rural,object,SMALL TOWN,str,427,4954,script:.map(dict),ok
+Ethiopia,2018-19,cluster_features,df_main,yaml,sect_cover_hh_w4.dta,saq14,object,URBAN,str,3655,6770,inline_dict,ok
+Ethiopia,2018-19,cluster_features,df_main,yaml,sect_cover_hh_w4.dta,saq14,object,RURAL,str,3115,6770,inline_dict,ok
+Ethiopia,2018-19,sample,,script,../Data/sect_cover_hh_w4.dta,saq14,object,URBAN,str,3655,6770,script:.map(dict),ok
+Ethiopia,2018-19,sample,,script,../Data/sect_cover_hh_w4.dta,saq14,object,RURAL,str,3115,6770,script:.map(dict),ok
+Ethiopia,2021-22,cluster_features,df_main,yaml,sect_cover_hh_w5.dta,saq14,object,URBAN,str,2674,4959,inline_dict,ok
+Ethiopia,2021-22,cluster_features,df_main,yaml,sect_cover_hh_w5.dta,saq14,object,RURAL,str,2285,4959,inline_dict,ok
+Ethiopia,2021-22,sample,,script,../Data/sect_cover_hh_w5.dta,saq14,object,URBAN,str,2674,4959,script:.map(dict),ok
+Ethiopia,2021-22,sample,,script,../Data/sect_cover_hh_w5.dta,saq14,object,RURAL,str,2285,4959,script:.map(dict),ok
+GhanaLSS,1991-92,cluster_features,,yaml,POV_GH.DTA,loc2,float64,2.0,float,2945,4523,auto_function,ok
+GhanaLSS,1991-92,cluster_features,,yaml,POV_GH.DTA,loc2,float64,1.0,float,1578,4523,auto_function,ok
+GhanaLSS,1991-92,sample,,yaml,POV_GH.DTA,loc2,float64,2.0,float,2945,4523,auto_function,ok
+GhanaLSS,1991-92,sample,,yaml,POV_GH.DTA,loc2,float64,1.0,float,1578,4523,auto_function,ok
+GhanaLSS,1998-99,cluster_features,,yaml,SEC0A.DTA,loc2,float64,2.0,float,3799,5998,auto_function,ok
+GhanaLSS,1998-99,cluster_features,,yaml,SEC0A.DTA,loc2,float64,1.0,float,2199,5998,auto_function,ok
+GhanaLSS,1998-99,sample,,yaml,SEC0A.DTA,loc2,float64,2.0,float,3799,5998,auto_function,ok
+GhanaLSS,1998-99,sample,,yaml,SEC0A.DTA,loc2,float64,1.0,float,2199,5998,auto_function,ok
+GhanaLSS,2005-06,cluster_features,,yaml,aggregates/pov_gh5.dta,loc2,object,rural,str,5069,8687,auto_function,ok
+GhanaLSS,2005-06,cluster_features,,yaml,aggregates/pov_gh5.dta,loc2,object,urban,str,3618,8687,auto_function,ok
+GhanaLSS,2012-13,cluster_features,,yaml,PARTA/g6loc_edt.dta,loc2,object,Rural,str,9327,16772,passthrough,ok
+GhanaLSS,2012-13,cluster_features,,yaml,PARTA/g6loc_edt.dta,loc2,object,Urban,str,7445,16772,passthrough,ok
+GhanaLSS,2012-13,sample,,yaml,PARTA/g6loc_edt.dta,loc2,object,Rural,str,9327,16772,passthrough,ok
+GhanaLSS,2012-13,sample,,yaml,PARTA/g6loc_edt.dta,loc2,object,Urban,str,7445,16772,passthrough,ok
+GhanaLSS,2016-17,cluster_features,,yaml,g7sec8h.dta,loc2,object,Rural,str,534677,934584,inline_dict,ok
+GhanaLSS,2016-17,cluster_features,,yaml,g7sec8h.dta,loc2,object,Urban ,str,399907,934584,inline_dict,ok
+GhanaLSS,2016-17,sample,,yaml,g7sec0.dta,urbrur,object,Rural,str,7991,14009,passthrough,ok
+GhanaLSS,2016-17,sample,,yaml,g7sec0.dta,urbrur,object,Urban,str,6018,14009,passthrough,ok
+GhanaSPS,2009-10,sample,,yaml,key_hhld_info.dta,urbrur,object,Rural,str,2999,5009,auto_function,ok
+GhanaSPS,2009-10,sample,,yaml,key_hhld_info.dta,urbrur,object,Urban,str,2010,5009,auto_function,ok
+Guatemala,2000,cluster_features,,yaml,CONSUMO5.DTA,area,object,rural,str,3852,7276,inline_dict,ok
+Guatemala,2000,cluster_features,,yaml,CONSUMO5.DTA,area,object,urbana,str,3424,7276,inline_dict,ok
+Guatemala,2000,sample,,yaml,CONSUMO5.DTA,area,object,rural,str,3852,7276,inline_dict,ok
+Guatemala,2000,sample,,yaml,CONSUMO5.DTA,area,object,urbana,str,3424,7276,inline_dict,ok
+Guinea-Bissau,2018-19,cluster_features,df_main,yaml,s00_me_gnb2018.dta,s00q04,object,Rural,str,3361,5351,inline_dict,ok
+Guinea-Bissau,2018-19,cluster_features,df_main,yaml,s00_me_gnb2018.dta,s00q04,object,Urbano,str,1990,5351,inline_dict,ok
+Guinea-Bissau,2018-19,sample,df_cover,yaml,s00_me_gnb2018.dta,s00q04,object,Rural,str,3361,5351,inline_dict,ok
+Guinea-Bissau,2018-19,sample,df_cover,yaml,s00_me_gnb2018.dta,s00q04,object,Urbano,str,1990,5351,inline_dict,ok
+Guyana,1992,cluster_features,,yaml,../Data/COVERN.dta,SECTOR,int8,1,int,1153,1807,inline_dict,ok
+Guyana,1992,cluster_features,,yaml,../Data/COVERN.dta,SECTOR,int8,2,int,654,1807,inline_dict,ok
+Guyana,1992,sample,df_cover,yaml,../Data/COVERN.dta,SECTOR,int8,1,int,1153,1807,inline_dict,ok
+Guyana,1992,sample,df_cover,yaml,../Data/COVERN.dta,SECTOR,int8,2,int,654,1807,inline_dict,ok
+India,1997-98,employment,,yaml,../Data/SECT02AD.DTA,v02a05b,object,,NaN,14998,16089,passthrough,ok
+India,1997-98,employment,,yaml,../Data/SECT02AD.DTA,v02a05b,object,Urban,str,728,16089,passthrough,ok
+India,1997-98,employment,,yaml,../Data/SECT02AD.DTA,v02a05b,object,Rural,str,363,16089,passthrough,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kirkuk - urban center,str,380,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,mosul - rural,str,324,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,najaf - urban center,str,324,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,najaf - rural,str,324,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,qadisiya - urban center,str,324,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,qadisiya - other urban,str,324,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,muthanna - other urban,str,324,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,maysan - urban center,str,324,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - rural,str,323,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kerbela - rural,str,323,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,salah al-deen - other urban,str,323,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,muthanna - rural,str,323,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,maysan - other urban,str,323,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,maysan - rural,str,323,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,basrah - rural,str,323,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,mosul - urban center,str,322,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - other urban,str,322,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,salah al-deen - urban center,str,322,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,muthanna - urban center,str,322,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,duhok - other urban,str,321,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,mosul - other urban,str,321,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - al-sader,str,321,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,babylon - other urban,str,320,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,najaf - other urban,str,320,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,thi-qar - urban center,str,320,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,thi-qar - other urban,str,320,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,basrah - other urban,str,320,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,anbar - urban center,str,319,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,babylon - rural,str,319,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kerbela - urban center,str,319,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,wasit - other urban,str,319,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,wasit - rural,str,319,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - rural,str,318,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,anbar - other urban,str,318,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - al-rasafah,str,318,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,qadisiya - rural,str,318,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,basrah - urban center,str,318,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,erbil - rural,str,317,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,thi-qar - rural,str,317,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - other urban,str,316,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,wasit - urban center,str,316,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,salah al-deen - rural,str,315,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,diyala - other urban,str,314,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - al-karekh,str,314,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,babylon - urban center,str,314,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kerbela - other urban,str,314,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,erbil - urban center,str,311,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,erbil - other urban,str,310,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - urban center,str,307,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kirkuk - other urban,str,307,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,duhok - rural,str,303,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,diyala - urban center,str,297,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,diyala - rural,str,291,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,anbar - rural,str,280,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,duhok - urban center,str,274,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kirkuk - rural,str,268,17822,list_no_mapping,ok
+Iraq,2006-07,cluster_features,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - urban center - extra,str,92,17822,list_no_mapping,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kirkuk - urban center,str,380,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,mosul - rural,str,324,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,najaf - urban center,str,324,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,najaf - rural,str,324,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,qadisiya - urban center,str,324,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,qadisiya - other urban,str,324,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,muthanna - other urban,str,324,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,maysan - urban center,str,324,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - rural,str,323,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kerbela - rural,str,323,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,salah al-deen - other urban,str,323,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,muthanna - rural,str,323,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,maysan - other urban,str,323,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,maysan - rural,str,323,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,basrah - rural,str,323,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,mosul - urban center,str,322,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - other urban,str,322,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,salah al-deen - urban center,str,322,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,muthanna - urban center,str,322,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,duhok - other urban,str,321,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,mosul - other urban,str,321,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - al-sader,str,321,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,babylon - other urban,str,320,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,najaf - other urban,str,320,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,thi-qar - urban center,str,320,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,thi-qar - other urban,str,320,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,basrah - other urban,str,320,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,anbar - urban center,str,319,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,babylon - rural,str,319,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kerbela - urban center,str,319,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,wasit - other urban,str,319,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,wasit - rural,str,319,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - rural,str,318,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,anbar - other urban,str,318,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - al-rasafah,str,318,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,qadisiya - rural,str,318,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,basrah - urban center,str,318,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,erbil - rural,str,317,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,thi-qar - rural,str,317,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - other urban,str,316,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,wasit - urban center,str,316,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,salah al-deen - rural,str,315,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,diyala - other urban,str,314,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,baghdad - al-karekh,str,314,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,babylon - urban center,str,314,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kerbela - other urban,str,314,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,erbil - urban center,str,311,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,erbil - other urban,str,310,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - urban center,str,307,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kirkuk - other urban,str,307,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,duhok - rural,str,303,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,diyala - urban center,str,297,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,diyala - rural,str,291,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,anbar - rural,str,280,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,duhok - urban center,str,274,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,kirkuk - rural,str,268,17822,inline_dict,ok
+Iraq,2006-07,sample,,yaml,../Data/2007ihses00_cover_page.dta,xstrat,object,sulaimaniya - urban center - extra,str,92,17822,inline_dict,ok
+Iraq,2012,cluster_features,,yaml,../Data/2012ihses00_cover_page.dta,q00_16,object,URBAN,str,14884,25146,inline_dict,ok
+Iraq,2012,cluster_features,,yaml,../Data/2012ihses00_cover_page.dta,q00_16,object,RURAL,str,10262,25146,inline_dict,ok
+Iraq,2012,sample,,yaml,../Data/2012ihses00_cover_page.dta,q00_16,object,URBAN,str,14884,25146,inline_dict,ok
+Iraq,2012,sample,,yaml,../Data/2012ihses00_cover_page.dta,q00_16,object,RURAL,str,10262,25146,inline_dict,ok
+Kazakhstan,1996,cluster_features,,yaml,../Data/KZ96SMP_PUF.dta,type_loc,object,urban,str,3556,7224,inline_dict,ok
+Kazakhstan,1996,cluster_features,,yaml,../Data/KZ96SMP_PUF.dta,type_loc,object,rural,str,3022,7224,inline_dict,ok
+Kazakhstan,1996,cluster_features,,yaml,../Data/KZ96SMP_PUF.dta,type_loc,object,small town,str,646,7224,inline_dict,ok
+Kazakhstan,1996,sample,,yaml,../Data/KZ96SMP_PUF.dta,type_loc,object,urban,str,3556,7224,inline_dict,ok
+Kazakhstan,1996,sample,,yaml,../Data/KZ96SMP_PUF.dta,type_loc,object,rural,str,3022,7224,inline_dict,ok
+Kazakhstan,1996,sample,,yaml,../Data/KZ96SMP_PUF.dta,type_loc,object,small town,str,646,7224,inline_dict,ok
+Kosovo,2000,cluster_features,,yaml,../Data/ID.dta,s0i_q09,object,Rural,str,1440,2880,inline_dict,ok
+Kosovo,2000,cluster_features,,yaml,../Data/ID.dta,s0i_q09,object,Urban,str,1440,2880,inline_dict,ok
+Kosovo,2000,sample,,yaml,../Data/ID.dta,s0i_q09,object,Rural,str,1440,2880,inline_dict,ok
+Kosovo,2000,sample,,yaml,../Data/ID.dta,s0i_q09,object,Urban,str,1440,2880,inline_dict,ok
+Liberia,2018-19,cluster_features,,yaml,../Data/Household/sect1_public.dta,locality,object,rural,str,2950,2986,passthrough,ok
+Liberia,2018-19,cluster_features,,yaml,../Data/Household/sect1_public.dta,locality,object,urban,str,36,2986,passthrough,ok
+Liberia,2018-19,sample,,yaml,../Data/Household/sect1_public.dta,locality,object,rural,str,2950,2986,inline_dict,ok
+Liberia,2018-19,sample,,yaml,../Data/Household/sect1_public.dta,locality,object,urban,str,36,2986,inline_dict,ok
+Malawi,2004-05,cluster_features,,yaml,sec_a.dta,reside,object,Rural,str,9840,11280,passthrough,ok
+Malawi,2004-05,cluster_features,,yaml,sec_a.dta,reside,object,Urban,str,1440,11280,passthrough,ok
+Malawi,2004-05,sample,,yaml,sec_a.dta,reside,object,Rural,str,9840,11280,passthrough,ok
+Malawi,2004-05,sample,,yaml,sec_a.dta,reside,object,Urban,str,1440,11280,passthrough,ok
+Malawi,2010-11,cluster_features,df_main,yaml,Full_Sample/Household/hh_mod_a_filt.dta,reside,object,rural,str,10038,12271,passthrough,ok
+Malawi,2010-11,cluster_features,df_main,yaml,Full_Sample/Household/hh_mod_a_filt.dta,reside,object,urban,str,2233,12271,passthrough,ok
+Malawi,2010-11,sample,,yaml,Full_Sample/Household/hh_mod_a_filt.dta,reside,object,rural,str,10038,12271,passthrough,ok
+Malawi,2010-11,sample,,yaml,Full_Sample/Household/hh_mod_a_filt.dta,reside,object,urban,str,2233,12271,passthrough,ok
+Malawi,2013-14,cluster_features,df_main,yaml,HH_MOD_A_FILT_13.dta,reside,object,rural,str,2954,4000,passthrough,ok
+Malawi,2013-14,cluster_features,df_main,yaml,HH_MOD_A_FILT_13.dta,reside,object,urban,str,1046,4000,passthrough,ok
+Malawi,2013-14,sample,,yaml,HH_MOD_A_FILT_13.dta,reside,object,rural,str,2954,4000,passthrough,ok
+Malawi,2013-14,sample,,yaml,HH_MOD_A_FILT_13.dta,reside,object,urban,str,1046,4000,passthrough,ok
+Malawi,2016-17,cluster_features,df_main,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,rural,str,10175,12447,passthrough,ok
+Malawi,2016-17,cluster_features,df_main,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,urban,str,2272,12447,passthrough,ok
+Malawi,2016-17,cluster_features,df_main,yaml,Panel/hh_mod_a_filt_16.dta,reside,object,RURAL,str,1841,2508,passthrough,ok
+Malawi,2016-17,cluster_features,df_main,yaml,Panel/hh_mod_a_filt_16.dta,reside,object,URBAN,str,667,2508,passthrough,ok
+Malawi,2016-17,sample,,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,rural,str,10175,12447,passthrough,ok
+Malawi,2016-17,sample,,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,urban,str,2272,12447,passthrough,ok
+Malawi,2016-17,sample,,yaml,Panel/hh_mod_a_filt_16.dta,reside,object,RURAL,str,1841,2508,passthrough,ok
+Malawi,2016-17,sample,,yaml,Panel/hh_mod_a_filt_16.dta,reside,object,URBAN,str,667,2508,passthrough,ok
+Malawi,2019-20,cluster_features,df_main,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,RURAL,str,9342,11434,passthrough,ok
+Malawi,2019-20,cluster_features,df_main,yaml,Panel/hh_mod_a_filt_19.dta,reside,object,Rural,str,2355,3178,passthrough,ok
+Malawi,2019-20,cluster_features,df_main,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,URBAN,str,2092,11434,passthrough,ok
+Malawi,2019-20,cluster_features,df_main,yaml,Panel/hh_mod_a_filt_19.dta,reside,object,Urban,str,823,3178,passthrough,ok
+Malawi,2019-20,sample,,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,RURAL,str,9342,11434,passthrough,ok
+Malawi,2019-20,sample,,yaml,Panel/hh_mod_a_filt_19.dta,reside,object,Rural,str,2355,3178,passthrough,ok
+Malawi,2019-20,sample,,yaml,Cross_Sectional/hh_mod_a_filt.dta,reside,object,URBAN,str,2092,11434,passthrough,ok
+Malawi,2019-20,sample,,yaml,Panel/hh_mod_a_filt_19.dta,reside,object,Urban,str,823,3178,passthrough,ok
+Mali,2014-15,cluster_features,df_main,yaml,eaci2014_agregatconso.dta,milieu,object,Rural,str,2399,3804,passthrough,ok
+Mali,2014-15,cluster_features,df_main,yaml,eaci2014_agregatconso.dta,milieu,object,Urbain,str,1405,3804,passthrough,ok
+Mali,2014-15,sample,df_cover,yaml,EACICONTROLE_p1.dta,s00q04,object,Rural,str,2399,3804,inline_dict,ok
+Mali,2014-15,sample,df_cover,yaml,EACICONTROLE_p1.dta,s00q04,object,Urbain,str,1405,3804,inline_dict,ok
+Mali,2017-18,cluster_features,df_main,yaml,eaci17_s00p1.dta,s0q04,object,Rural,str,6921,8390,inline_dict,ok
+Mali,2017-18,cluster_features,df_main,yaml,eaci17_s00p1.dta,s0q04,object,Urbain (District de Bamako),str,760,8390,inline_dict,ok
+Mali,2017-18,cluster_features,df_main,yaml,eaci17_s00p1.dta,s0q04,object,Autre urbain,str,709,8390,inline_dict,ok
+Mali,2017-18,sample,df_cover,yaml,eaci17_s00p1.dta,s0q04,object,Rural,str,6921,8390,inline_dict,ok
+Mali,2017-18,sample,df_cover,yaml,eaci17_s00p1.dta,s0q04,object,Urbain (District de Bamako),str,760,8390,inline_dict,ok
+Mali,2017-18,sample,df_cover,yaml,eaci17_s00p1.dta,s0q04,object,Autre urbain,str,709,8390,inline_dict,ok
+Mali,2018-19,cluster_features,df_main,yaml,ehcvm_conso_mli2018.dta,milieu,object,Rural,str,188632,366639,passthrough,ok
+Mali,2018-19,cluster_features,df_main,yaml,ehcvm_conso_mli2018.dta,milieu,object,Urbain,str,178007,366639,passthrough,ok
+Mali,2018-19,sample,df_cover,yaml,s00_me_mli2018.dta,s00q04,object,Rural,str,3850,6602,inline_dict,ok
+Mali,2018-19,sample,df_cover,yaml,s00_me_mli2018.dta,s00q04,object,Urbain,str,2752,6602,inline_dict,ok
+Mali,2021-22,cluster_features,,yaml,s00_me_mli2021.dta,s00q04,object,Rural,str,3411,6143,passthrough,ok
+Mali,2021-22,cluster_features,,yaml,s00_me_mli2021.dta,s00q04,object,Urbain,str,2732,6143,passthrough,ok
+Mali,2021-22,sample,df_cover,yaml,s00_me_mli2021.dta,s00q04,object,Rural,str,3411,6143,inline_dict,ok
+Mali,2021-22,sample,df_cover,yaml,s00_me_mli2021.dta,s00q04,object,Urbain,str,2732,6143,inline_dict,ok
+Nepal,1995-96,sample,df_psu,yaml,../Data/sample_hh.dta,,,,,,,passthrough,READ_FAIL: PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.claude/worktrees/agent-afd7ef5c78cd20c6e/lsms_library/countries/Nepal/1995-96/Data/sample_hh.dta' does not exist in the target repos
+Nepal,2003-04,sample,df_psu,yaml,../Data/sample.dta,,,,,,,passthrough,READ_FAIL: PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.claude/worktrees/agent-afd7ef5c78cd20c6e/lsms_library/countries/Nepal/2003-04/Data/sample.dta' does not exist in the target reposito
+Nepal,2010-11,sample,,yaml,../Data/sample.dta,,,,,,,passthrough,READ_FAIL: PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.claude/worktrees/agent-afd7ef5c78cd20c6e/lsms_library/countries/Nepal/2010-11/Data/sample.dta' does not exist in the target reposito
+Niger,2011-12,cluster_features,df_main,yaml,NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta,urbrur,object,Rural,str,2430,3968,inline_dict,ok
+Niger,2011-12,cluster_features,df_main,yaml,NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1.dta,urbrur,object,Urbain,str,1538,3968,inline_dict,ok
+Niger,2011-12,sample,,yaml,NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1_en.dta,urbrur,object,Rural,str,2430,3968,inline_dict,ok
+Niger,2011-12,sample,,yaml,NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1_en.dta,urbrur,object,Urbain,str,1538,3968,inline_dict,ok
+Niger,2014-15,cluster_features,,yaml,NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta,MS00Q15,object,Rural,str,2319,3617,inline_dict,ok
+Niger,2014-15,cluster_features,,yaml,NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta,MS00Q15,object,Communauté Urbaine,str,937,3617,inline_dict,ok
+Niger,2014-15,cluster_features,,yaml,NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS00P1.dta,MS00Q15,object,Urbain,str,361,3617,inline_dict,ok
+Niger,2014-15,sample,,yaml,NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014welfare_T1c.dta,urbrur,object,Rural,str,2319,3617,inline_dict,ok
+Niger,2014-15,sample,,yaml,NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014welfare_T1c.dta,urbrur,object,Urbain,str,1298,3617,inline_dict,ok
+Niger,2018-19,cluster_features,df_main,yaml,s00_me_ner2018.dta,s00q04,object,Rural,str,4447,6024,inline_dict,ok
+Niger,2018-19,cluster_features,df_main,yaml,s00_me_ner2018.dta,s00q04,object,Urbain,str,1577,6024,inline_dict,ok
+Niger,2018-19,sample,df_cover,yaml,s00_me_ner2018.dta,s00q04,object,Rural,str,4447,6024,inline_dict,ok
+Niger,2018-19,sample,df_cover,yaml,s00_me_ner2018.dta,s00q04,object,Urbain,str,1577,6024,inline_dict,ok
+Niger,2021-22,cluster_features,,yaml,s00_me_ner2021.dta,s00q04,object,Rural,str,4111,6622,inline_dict,ok
+Niger,2021-22,cluster_features,,yaml,s00_me_ner2021.dta,s00q04,object,Urbain,str,2511,6622,inline_dict,ok
+Niger,2021-22,sample,df_cover,yaml,s00_me_ner2021.dta,s00q04,object,Rural,str,4111,6622,inline_dict,ok
+Niger,2021-22,sample,df_cover,yaml,s00_me_ner2021.dta,s00q04,object,Urbain,str,2511,6622,inline_dict,ok
+Nigeria,2010-11,cluster_features,df_main,yaml,Post Planting Wave 1/Household/secta_plantingw1.dta,sector,object,rural,str,3380,5000,inline_dict,ok
+Nigeria,2010-11,cluster_features,df_main,yaml,Post Planting Wave 1/Household/secta_plantingw1.dta,sector,object,urban,str,1620,5000,inline_dict,ok
+Nigeria,2010-11,sample,df_main,yaml,Post Planting Wave 1/Household/secta_plantingw1.dta,sector,object,rural,str,3380,5000,inline_dict,ok
+Nigeria,2010-11,sample,df_main,yaml,Post Planting Wave 1/Household/secta_plantingw1.dta,sector,object,urban,str,1620,5000,inline_dict,ok
+Nigeria,2012-13,cluster_features,df_main,yaml,Post Planting Wave 2/Household/secta_plantingw2.dta,sector,object,RURAL,str,3310,4859,inline_dict,ok
+Nigeria,2012-13,cluster_features,df_main,yaml,Post Planting Wave 2/Household/secta_plantingw2.dta,sector,object,URBAN,str,1549,4859,inline_dict,ok
+Nigeria,2012-13,sample,df_main,yaml,Post Planting Wave 2/Household/secta_plantingw2.dta,sector,object,RURAL,str,3310,4859,inline_dict,ok
+Nigeria,2012-13,sample,df_main,yaml,Post Planting Wave 2/Household/secta_plantingw2.dta,sector,object,URBAN,str,1549,4859,inline_dict,ok
+Nigeria,2015-16,cluster_features,df_main,yaml,secta_plantingw3.dta,sector,object,2. RURAL,str,3172,4696,inline_dict,ok
+Nigeria,2015-16,cluster_features,df_main,yaml,secta_plantingw3.dta,sector,object,1. URBAN,str,1524,4696,inline_dict,ok
+Nigeria,2015-16,sample,df_main,yaml,secta_plantingw3.dta,sector,object,2. RURAL,str,3172,4696,inline_dict,ok
+Nigeria,2015-16,sample,df_main,yaml,secta_plantingw3.dta,sector,object,1. URBAN,str,1524,4696,inline_dict,ok
+Nigeria,2018-19,cluster_features,df_main,yaml,secta_plantingw4.dta,sector,object,2. Rural,str,3533,5263,inline_dict,ok
+Nigeria,2018-19,cluster_features,df_main,yaml,secta_plantingw4.dta,sector,object,1. Urban,str,1730,5263,inline_dict,ok
+Nigeria,2018-19,sample,df_main,yaml,secta_plantingw4.dta,sector,object,2. Rural,str,3533,5263,inline_dict,ok
+Nigeria,2018-19,sample,df_main,yaml,secta_plantingw4.dta,sector,object,1. Urban,str,1730,5263,inline_dict,ok
+Nigeria,2023-24,sample,df_main,yaml,Post Planting Wave 5/Household/secta_plantingw5.dta,sector,object,2. RURAL,str,3432,5067,inline_dict,ok
+Nigeria,2023-24,sample,df_main,yaml,Post Planting Wave 5/Household/secta_plantingw5.dta,sector,object,1. URBAN,str,1635,5067,inline_dict,ok
+Pakistan,1991,cluster_features,,script,../Data/REGIONS.DTA,urbrural,float64,2.0,float,2386,4763,"script:.map({1:Urban,2:Rural})",ok
+Pakistan,1991,cluster_features,,script,../Data/REGIONS.DTA,urbrural,float64,1.0,float,2377,4763,"script:.map({1:Urban,2:Rural})",ok
+Pakistan,1991,sample,df_region,yaml,REGIONS.DTA,urbrural,float64,2.0,float,2386,4763,inline_dict,ok
+Pakistan,1991,sample,df_region,yaml,REGIONS.DTA,urbrural,float64,1.0,float,2377,4763,inline_dict,ok
+Peru,1994,cluster_features,,yaml,REG01.DTA,a06,str,1,str,2287,3623,passthrough,ok
+Peru,1994,cluster_features,,yaml,REG01.DTA,a06,str,2,str,1336,3623,passthrough,ok
+Senegal,2018-19,cluster_features,df_main,yaml,s00_me_sen2018.dta,s00q04,object,Urbain,str,3941,7156,inline_dict,ok
+Senegal,2018-19,cluster_features,df_main,yaml,s00_me_sen2018.dta,s00q04,object,Rural,str,3215,7156,inline_dict,ok
+Senegal,2018-19,sample,df_cover,yaml,s00_me_sen2018.dta,s00q04,object,Urbain,str,3941,7156,inline_dict,ok
+Senegal,2018-19,sample,df_cover,yaml,s00_me_sen2018.dta,s00q04,object,Rural,str,3215,7156,inline_dict,ok
+Senegal,2021-22,cluster_features,,yaml,s00_me_sen2021.dta,s00q04,object,Urbain,str,3922,7120,inline_dict,ok
+Senegal,2021-22,cluster_features,,yaml,s00_me_sen2021.dta,s00q04,object,Rural,str,3198,7120,inline_dict,ok
+Senegal,2021-22,sample,df_cover,yaml,s00_me_sen2021.dta,s00q04,object,Urbain,str,3922,7120,inline_dict,ok
+Senegal,2021-22,sample,df_cover,yaml,s00_me_sen2021.dta,s00q04,object,Rural,str,3198,7120,inline_dict,ok
+Serbia,2007,cluster_features,,yaml,../Data/enumeration_district.dta,tip,object,urban,str,298,510,inline_dict,ok
+Serbia,2007,cluster_features,,yaml,../Data/enumeration_district.dta,tip,object,rural,str,212,510,inline_dict,ok
+Serbia,2007,sample,df_ed,yaml,../Data/enumeration_district.dta,tip,object,urban,str,298,510,inline_dict,ok
+Serbia,2007,sample,df_ed,yaml,../Data/enumeration_district.dta,tip,object,rural,str,212,510,inline_dict,ok
+Serbia and Montenegro,2002,cluster_features,,yaml,../Data/2002 1 demography.dta,tip,object,Urban,str,10522,19725,inline_dict,ok
+Serbia and Montenegro,2002,cluster_features,,yaml,../Data/2002 1 demography.dta,tip,object,Other,str,9203,19725,inline_dict,ok
+Serbia and Montenegro,2002,sample,,yaml,../Data/2002 incomeconsumption.dta,tip,object,Urban,str,3525,6386,inline_dict,ok
+Serbia and Montenegro,2002,sample,,yaml,../Data/2002 incomeconsumption.dta,tip,object,Other,str,2861,6386,inline_dict,ok
+Serbia and Montenegro,2003,cluster_features,,yaml,../Data/2003 1 demography.dta,tip,object,Urban,str,4131,8027,inline_dict,ok
+Serbia and Montenegro,2003,cluster_features,,yaml,../Data/2003 1 demography.dta,tip,object,Other,str,3896,8027,inline_dict,ok
+Serbia and Montenegro,2003,sample,,yaml,../Data/2003 incomeconsumption.dta,tip,object,Urban,str,1369,2548,inline_dict,ok
+Serbia and Montenegro,2003,sample,,yaml,../Data/2003 incomeconsumption.dta,tip,object,Other,str,1179,2548,inline_dict,ok
+South Africa,1993,cluster_features,,yaml,../Data/STRATA2.dta,type,int8,1,int,4398,8809,inline_dict,ok
+South Africa,1993,cluster_features,,yaml,../Data/STRATA2.dta,type,int8,0,int,4328,8809,inline_dict,ok
+South Africa,1993,cluster_features,,yaml,../Data/STRATA2.dta,type,int8,3,int,83,8809,inline_dict,ok
+South Africa,1993,sample,,yaml,../Data/STRATA2.dta,type,int8,1,int,4398,8809,inline_dict,ok
+South Africa,1993,sample,,yaml,../Data/STRATA2.dta,type,int8,0,int,4328,8809,inline_dict,ok
+South Africa,1993,sample,,yaml,../Data/STRATA2.dta,type,int8,3,int,83,8809,inline_dict,ok
+Tajikistan,1999,cluster_features,,yaml,../Data/SHLDDTA.DTA,settlm,float32,2.0,float,1456,2000,inline_dict,ok
+Tajikistan,1999,cluster_features,,yaml,../Data/SHLDDTA.DTA,settlm,float32,1.0,float,544,2000,inline_dict,ok
+Tajikistan,1999,sample,,yaml,../Data/SHLDDTA.DTA,settlm,float32,2.0,float,1456,2000,inline_dict,ok
+Tajikistan,1999,sample,,yaml,../Data/SHLDDTA.DTA,settlm,float32,1.0,float,544,2000,inline_dict,ok
+Tajikistan,2003,cluster_features,,yaml,../Data/interview.dta,type_reg,object,rural,str,2640,4160,passthrough,ok
+Tajikistan,2003,cluster_features,,yaml,../Data/interview.dta,type_reg,object,urban,str,1520,4160,passthrough,ok
+Tajikistan,2003,sample,df_cover,yaml,../Data/interview.dta,type_reg,object,rural,str,2640,4160,passthrough,ok
+Tajikistan,2003,sample,df_cover,yaml,../Data/interview.dta,type_reg,object,urban,str,1520,4160,passthrough,ok
+Tajikistan,2007,cluster_features,,yaml,../Data/r1m0.dta,location,object,rural,str,2984,4644,passthrough,ok
+Tajikistan,2007,cluster_features,,yaml,../Data/r1m0.dta,location,object,urban,str,1660,4644,passthrough,ok
+Tajikistan,2007,sample,df_pov,yaml,../Data/Pov_final.dta,location,object,rural,str,3150,4860,passthrough,ok
+Tajikistan,2007,sample,df_pov,yaml,../Data/Pov_final.dta,location,object,urban,str,1710,4860,passthrough,ok
+Tajikistan,2009,cluster_features,,yaml,../Data/m0.dta,Location,object,Rural,str,963,1503,passthrough,ok
+Tajikistan,2009,cluster_features,,yaml,../Data/m0.dta,Location,object,Urban,str,540,1503,passthrough,ok
+Tajikistan,2009,sample,df_weights,yaml,../Data/weights2009.dta,location,object,Rural,str,963,1503,passthrough,ok
+Tajikistan,2009,sample,df_weights,yaml,../Data/weights2009.dta,location,object,Urban,str,540,1503,passthrough,ok
+Tanzania,2008-15,cluster_features,,script,../Data/upd4_hh_a.dta,urb_rur,object,RURAL,str,18932,29250,script:lambda x: 'Rural' if x.lower()!='urban' else 'Urban',ok
+Tanzania,2008-15,cluster_features,,script,../Data/upd4_hh_a.dta,urb_rur,object,URBAN,str,10318,29250,script:lambda x: 'Rural' if x.lower()!='urban' else 'Urban',ok
+Tanzania,2008-15,sample,,script,../Data/upd4_hh_a.dta,urb_rur,object,RURAL,str,18932,29250,script:.map(dict) -> NaN on unmapped,ok
+Tanzania,2008-15,sample,,script,../Data/upd4_hh_a.dta,urb_rur,object,URBAN,str,10318,29250,script:.map(dict) -> NaN on unmapped,ok
+Tanzania,2019-20,cluster_features,,yaml,HH_SEC_A.dta,sdd_rural,object,RURAL,str,682,1184,inline_dict,ok
+Tanzania,2019-20,cluster_features,,yaml,HH_SEC_A.dta,sdd_rural,object,URBAN,str,502,1184,inline_dict,ok
+Tanzania,2019-20,sample,,yaml,HH_SEC_A.dta,sdd_rural,object,RURAL,str,682,1184,inline_dict,ok
+Tanzania,2019-20,sample,,yaml,HH_SEC_A.dta,sdd_rural,object,URBAN,str,502,1184,inline_dict,ok
+Tanzania,2020-21,cluster_features,,yaml,hh_sec_a.dta,y5_rural,object,rural,str,2560,4709,inline_dict,ok
+Tanzania,2020-21,cluster_features,,yaml,hh_sec_a.dta,y5_rural,object,urban,str,2149,4709,inline_dict,ok
+Tanzania,2020-21,sample,,yaml,hh_sec_a.dta,y5_rural,object,rural,str,2560,4709,inline_dict,ok
+Tanzania,2020-21,sample,,yaml,hh_sec_a.dta,y5_rural,object,urban,str,2149,4709,inline_dict,ok
+Timor-Leste,2001,cluster_features,,yaml,../Data/WEIGHT.DTA,urbrural,object,Rural,str,183,300,inline_dict,ok
+Timor-Leste,2001,cluster_features,,yaml,../Data/WEIGHT.DTA,urbrural,object,Urban,str,117,300,inline_dict,ok
+Timor-Leste,2001,sample,df_weights,yaml,../Data/WEIGHT.DTA,urbrural,object,Rural,str,183,300,inline_dict,ok
+Timor-Leste,2001,sample,df_weights,yaml,../Data/WEIGHT.DTA,urbrural,object,Urban,str,117,300,inline_dict,ok
+Timor-Leste,2007-08,cluster_features,,yaml,../Data/basicvars.dta,urban,object,Rural,str,2502,4477,inline_dict,ok
+Timor-Leste,2007-08,cluster_features,,yaml,../Data/basicvars.dta,urban,object,Urban,str,1975,4477,inline_dict,ok
+Timor-Leste,2007-08,sample,,yaml,../Data/basicvars.dta,urban,object,Rural,str,2502,4477,inline_dict,ok
+Timor-Leste,2007-08,sample,,yaml,../Data/basicvars.dta,urban,object,Urban,str,1975,4477,inline_dict,ok
+Togo,2018,cluster_features,df_main,yaml,../Data1/s00_me_tgo2018.dta,s00q04,object,Rural,str,3901,6171,inline_dict,ok
+Togo,2018,cluster_features,df_main,yaml,../Data1/s00_me_tgo2018.dta,s00q04,object,Urbain,str,2270,6171,inline_dict,ok
+Togo,2018,sample,df_cover,yaml,../Data1/s00_me_tgo2018.dta,s00q04,object,Rural,str,3901,6171,inline_dict,ok
+Togo,2018,sample,df_cover,yaml,../Data1/s00_me_tgo2018.dta,s00q04,object,Urbain,str,2270,6171,inline_dict,ok
+Uganda,2005-06,cluster_features,df_main,yaml,GSEC1.dta,urban,object,0,int,2263,3123,inline_dict_bare,ok
+Uganda,2005-06,cluster_features,df_main,yaml,GSEC1.dta,urban,object,urban,str,860,3123,inline_dict_bare,ok
+Uganda,2005-06,sample,,yaml,GSEC1.dta,urban,object,0,int,2263,3123,inline_dict_bare,ok
+Uganda,2005-06,sample,,yaml,GSEC1.dta,urban,object,urban,str,860,3123,inline_dict_bare,ok
+Uganda,2009-10,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2206,2975,passthrough,ok
+Uganda,2009-10,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Urban,str,769,2975,passthrough,ok
+Uganda,2009-10,sample,df_main,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2206,2975,passthrough,ok
+Uganda,2009-10,sample,df_main,yaml,../Data/GSEC1.dta,urban,object,Urban,str,769,2975,passthrough,ok
+Uganda,2010-11,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2105,2716,passthrough,ok
+Uganda,2010-11,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Urban,str,611,2716,passthrough,ok
+Uganda,2010-11,sample,,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2105,2716,passthrough,ok
+Uganda,2010-11,sample,,yaml,../Data/GSEC1.dta,urban,object,Urban,str,611,2716,passthrough,ok
+Uganda,2011-12,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2266,2850,passthrough,ok
+Uganda,2011-12,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Urban,str,584,2850,passthrough,ok
+Uganda,2011-12,sample,,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2266,2850,passthrough,ok
+Uganda,2011-12,sample,,yaml,../Data/GSEC1.dta,urban,object,Urban,str,584,2850,passthrough,ok
+Uganda,2013-14,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2303,3119,passthrough,ok
+Uganda,2013-14,cluster_features,df_main,yaml,../Data/GSEC1.dta,urban,object,Urban,str,816,3119,passthrough,ok
+Uganda,2013-14,sample,,yaml,../Data/GSEC1.dta,urban,object,Rural,str,2303,3119,passthrough,ok
+Uganda,2013-14,sample,,yaml,../Data/GSEC1.dta,urban,object,Urban,str,816,3119,passthrough,ok
+Uganda,2015-16,cluster_features,df_main,yaml,gsec1.dta,urban,object,Rural,str,2470,3305,passthrough,ok
+Uganda,2015-16,cluster_features,df_main,yaml,gsec1.dta,urban,object,Urban,str,835,3305,passthrough,ok
+Uganda,2015-16,sample,,yaml,gsec1.dta,urban,object,Rural,str,2470,3305,passthrough,ok
+Uganda,2015-16,sample,,yaml,gsec1.dta,urban,object,Urban,str,835,3305,passthrough,ok
+Uganda,2018-19,cluster_features,df_main,yaml,GSEC1.dta,urban,object,Rural,str,2367,3176,passthrough,ok
+Uganda,2018-19,cluster_features,df_main,yaml,GSEC1.dta,urban,object,Urban,str,809,3176,passthrough,ok
+Uganda,2018-19,sample,,yaml,GSEC1.dta,urban,object,Rural,str,2367,3176,passthrough,ok
+Uganda,2018-19,sample,,yaml,GSEC1.dta,urban,object,Urban,str,809,3176,passthrough,ok
+Uganda,2019-20,cluster_features,,yaml,HH/gsec1.dta,urban,object,Rural,str,2333,3098,passthrough,ok
+Uganda,2019-20,cluster_features,,yaml,HH/gsec1.dta,urban,object,Urban,str,745,3098,passthrough,ok
+Uganda,2019-20,cluster_features,,yaml,HH/gsec1.dta,urban,object,,NaN,20,3098,passthrough,ok
+Uganda,2019-20,sample,,yaml,HH/gsec1.dta,urban,object,Rural,str,2333,3098,passthrough,ok
+Uganda,2019-20,sample,,yaml,HH/gsec1.dta,urban,object,Urban,str,745,3098,passthrough,ok
+Uganda,2019-20,sample,,yaml,HH/gsec1.dta,urban,object,,NaN,20,3098,passthrough,ok

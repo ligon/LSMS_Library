@@ -1,0 +1,460 @@
+country,wave,table,subdf,mechanism,source_column,raw_value,raw_type,count,config_maps_to,how,declaration
+Albania,2002,cluster_features,,script:_label,m0_ur,Urban,str,1959,(script logic),script-path,(script)
+Albania,2002,cluster_features,,script:_label,m0_ur,Rural,str,1640,(script logic),script-path,(script)
+Albania,2002,sample,,script:astype(str),ur,Urban,str,1959,(script logic),script-path,(script)
+Albania,2002,sample,,script:astype(str),ur,Rural,str,1640,(script logic),script-path,(script)
+Albania,2005,cluster_features,,script:_label+cluster_reduce,m0_ur,Urban,str,2200,(script logic),script-path,(script)
+Albania,2005,cluster_features,,script:_label+cluster_reduce,m0_ur,Rural,str,1640,(script logic),script-path,(script)
+Albania,2005,sample,,script:astype(str),m0_ur,Urban,str,2200,(script logic),script-path,(script)
+Albania,2005,sample,,script:astype(str),m0_ur,Rural,str,1640,(script logic),script-path,(script)
+Albania,2008,sample,,script:astype(str).str.title(),urbrur,urban,str,1976,(script logic),script-path,(script)
+Albania,2008,sample,,script:astype(str).str.title(),urbrur,rural,str,1623,(script logic),script-path,(script)
+Albania,2012,sample,,script:astype(str),urban,Urban,str,3608,(script logic),script-path,(script)
+Albania,2012,sample,,script:astype(str),urban,Rural,str,3063,(script logic),script-path,(script)
+Azerbaijan,1995,cluster_features,df_inout,inline_dict,inout,1.0,float,40,Urban,exact-or-str-match,"['inout', {'mapping': {1.0: 'Urban', 2.0: 'Urban', 3.0: 'Urban', 4.0: 'Rural'}}]"
+Azerbaijan,1995,cluster_features,df_inout,inline_dict,inout,2.0,float,20,Urban,exact-or-str-match,"['inout', {'mapping': {1.0: 'Urban', 2.0: 'Urban', 3.0: 'Urban', 4.0: 'Rural'}}]"
+Azerbaijan,1995,cluster_features,df_inout,inline_dict,inout,4.0,float,18,Rural,exact-or-str-match,"['inout', {'mapping': {1.0: 'Urban', 2.0: 'Urban', 3.0: 'Urban', 4.0: 'Rural'}}]"
+Azerbaijan,1995,cluster_features,df_inout,inline_dict,inout,3.0,float,13,Urban,exact-or-str-match,"['inout', {'mapping': {1.0: 'Urban', 2.0: 'Urban', 3.0: 'Urban', 4.0: 'Rural'}}]"
+Azerbaijan,1995,cluster_features,df_inout,inline_dict,inout,,NaN,1,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['inout', {'mapping': {1.0: 'Urban', 2.0: 'Urban', 3.0: 'Urban', 4.0: 'Rural'}}]"
+Benin,2018-19,cluster_features,df_main,inline_dict,s00q04,Rural,str,4072,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Benin,2018-19,cluster_features,df_main,inline_dict,s00q04,Urbain,str,3940,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Benin,2018-19,sample,df_cover,inline_dict,s00q04,Rural,str,4072,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Benin,2018-19,sample,df_cover,inline_dict,s00q04,Urbain,str,3940,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2014,cluster_features,df_main,inline_dict,milieu,Rural,str,6540,Rural,exact-or-str-match,"['milieu', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2014,cluster_features,df_main,inline_dict,milieu,Urbain,str,4260,Urban,exact-or-str-match,"['milieu', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2014,sample,,inline_dict,milieu,Rural,str,6408,Rural,exact-or-str-match,"['milieu', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2014,sample,,inline_dict,milieu,Urbain,str,4003,Urban,exact-or-str-match,"['milieu', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2018-19,cluster_features,df_main,inline_dict,s00q04,Rural,str,3861,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2018-19,cluster_features,df_main,inline_dict,s00q04,Urbain,str,3149,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2018-19,sample,df_cover,inline_dict,s00q04,Rural,str,3861,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2018-19,sample,df_cover,inline_dict,s00q04,Urbain,str,3149,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2021-22,cluster_features,,inline_dict,s00q04,Rural,str,1760,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2021-22,cluster_features,,inline_dict,s00q04,Urbain,str,1467,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2021-22,sample,df_cover,inline_dict,s00q04,Rural,str,1760,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Burkina_Faso,2021-22,sample,df_cover,inline_dict,s00q04,Urbain,str,1467,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Cambodia,2019-20,cluster_features,,passthrough,s01q06b,Rural,str,1056,"(raw value, then canonical spellings)",no mapping declared,'s01q06b'
+Cambodia,2019-20,cluster_features,,passthrough,s01q06b,Urban,str,456,"(raw value, then canonical spellings)",no mapping declared,'s01q06b'
+Cambodia,2019-20,sample,,passthrough,s01q06b,Rural,str,1056,"(raw value, then canonical spellings)",no mapping declared,'s01q06b'
+Cambodia,2019-20,sample,,passthrough,s01q06b,Urban,str,456,"(raw value, then canonical spellings)",no mapping declared,'s01q06b'
+CotedIvoire,1985-86,cluster_features,,inline_dict,REGION,3: EAST FOREST,str,364,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,cluster_features,,inline_dict,REGION,2: OTHER CITIES,str,344,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,cluster_features,,inline_dict,REGION,1: ABIDJAN,str,336,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,cluster_features,,inline_dict,REGION,5: SAVANNA,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,cluster_features,,inline_dict,REGION,4: WEST FOREST,str,240,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,sample,,inline_dict,REGION,3: EAST FOREST,str,364,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,sample,,inline_dict,REGION,2: OTHER CITIES,str,344,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,sample,,inline_dict,REGION,1: ABIDJAN,str,336,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,sample,,inline_dict,REGION,5: SAVANNA,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1985-86,sample,,inline_dict,REGION,4: WEST FOREST,str,240,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,cluster_features,,inline_dict,REGION,3: EAST FOREST,str,367,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,cluster_features,,inline_dict,REGION,2: OTHER CITIES,str,352,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,cluster_features,,inline_dict,REGION,1: ABIDJAN,str,337,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,cluster_features,,inline_dict,REGION,5: SAVANNA,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,cluster_features,,inline_dict,REGION,4: WEST FOREST,str,240,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,sample,,inline_dict,REGION,3: EAST FOREST,str,367,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,sample,,inline_dict,REGION,2: OTHER CITIES,str,352,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,sample,,inline_dict,REGION,1: ABIDJAN,str,337,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,sample,,inline_dict,REGION,5: SAVANNA,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1986-87,sample,,inline_dict,REGION,4: WEST FOREST,str,240,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,cluster_features,,inline_dict,REGION,2: OTHER CITIES,str,448,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,cluster_features,,inline_dict,REGION,1: ABIDJAN,str,352,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,cluster_features,,inline_dict,REGION,5: SAVANNA,str,336,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,cluster_features,,inline_dict,REGION,3: EAST FOREST,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,cluster_features,,inline_dict,REGION,4: WEST FOREST,str,160,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,sample,,inline_dict,REGION,2: OTHER CITIES,str,448,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,sample,,inline_dict,REGION,1: ABIDJAN,str,352,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,sample,,inline_dict,REGION,5: SAVANNA,str,336,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,sample,,inline_dict,REGION,3: EAST FOREST,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1987-88,sample,,inline_dict,REGION,4: WEST FOREST,str,160,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,cluster_features,,inline_dict,REGION,2: OTHER CITIES,str,432,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,cluster_features,,inline_dict,REGION,3: EAST FOREST,str,320,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,cluster_features,,inline_dict,REGION,1: ABIDJAN,str,304,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,cluster_features,,inline_dict,REGION,5: SAVANNA,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,cluster_features,,inline_dict,REGION,4: WEST FOREST,str,240,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,sample,,inline_dict,REGION,2: OTHER CITIES,str,432,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,sample,,inline_dict,REGION,3: EAST FOREST,str,320,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,sample,,inline_dict,REGION,1: ABIDJAN,str,304,Urban,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,sample,,inline_dict,REGION,5: SAVANNA,str,304,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,1988-89,sample,,inline_dict,REGION,4: WEST FOREST,str,240,Rural,exact-or-str-match,"['REGION', {'mapping': {'1: ABIDJAN': 'Urban', '2: OTHER CITIES': 'Urban', '3: EAST FOREST': 'Rural', '4: WEST FOREST': 'Rural', '5: SAVANNA': 'Rural'}}]"
+CotedIvoire,2018-19,cluster_features,df_main,inline_dict,s00q04,Rural,str,7717,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+CotedIvoire,2018-19,cluster_features,df_main,inline_dict,s00q04,Urbain,str,5275,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+CotedIvoire,2018-19,sample,df_cover,inline_dict,s00q04,Rural,str,7717,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+CotedIvoire,2018-19,sample,df_cover,inline_dict,s00q04,Urbain,str,5275,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Ethiopia,2011-12,cluster_features,df_main,inline_dict,rural,rural,str,3466,Rural,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban"
+Ethiopia,2011-12,cluster_features,df_main,inline_dict,rural,small town,str,503,Urban,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban"
+Ethiopia,2011-12,sample,,script:.map(dict),rural,rural,str,3466,(script logic),script-path,(script)
+Ethiopia,2011-12,sample,,script:.map(dict),rural,small town,str,503,(script logic),script-path,(script)
+Ethiopia,2013-14,cluster_features,df_main,inline_dict,rural,Rural,str,3323,Rural,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'Small town (urban)': 'Urban', 'urban': 'Urban', 'U"
+Ethiopia,2013-14,cluster_features,df_main,inline_dict,rural,Large town (urban),str,1486,Urban,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'Small town (urban)': 'Urban', 'urban': 'Urban', 'U"
+Ethiopia,2013-14,cluster_features,df_main,inline_dict,rural,Small town (urban),str,453,Urban,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'Small town (urban)': 'Urban', 'urban': 'Urban', 'U"
+Ethiopia,2013-14,sample,,script:.map(dict),rural,Rural,str,3323,(script logic),script-path,(script)
+Ethiopia,2013-14,sample,,script:.map(dict),rural,Large town (urban),str,1486,(script logic),script-path,(script)
+Ethiopia,2013-14,sample,,script:.map(dict),rural,Small town (urban),str,453,(script logic),script-path,(script)
+Ethiopia,2015-16,cluster_features,df_main,inline_dict,rural,RURAL,str,3272,Rural,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'Small town (urban)': 'Urban', 'urban': 'Urban', 'U"
+Ethiopia,2015-16,cluster_features,df_main,inline_dict,rural,Meduim and large town,str,1255,Urban,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'Small town (urban)': 'Urban', 'urban': 'Urban', 'U"
+Ethiopia,2015-16,cluster_features,df_main,inline_dict,rural,SMALL TOWN,str,427,Urban,exact-or-str-match,"['rural', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'small town': 'Urban', 'Small town': 'Urban', 'Small Town': 'Urban', 'SMALL TOWN': 'Urban', 'Small town (urban)': 'Urban', 'urban': 'Urban', 'U"
+Ethiopia,2015-16,sample,,script:.map(dict),rural,RURAL,str,3272,(script logic),script-path,(script)
+Ethiopia,2015-16,sample,,script:.map(dict),rural,Meduim and large town,str,1255,(script logic),script-path,(script)
+Ethiopia,2015-16,sample,,script:.map(dict),rural,SMALL TOWN,str,427,(script logic),script-path,(script)
+Ethiopia,2018-19,cluster_features,df_main,inline_dict,saq14,URBAN,str,3655,Urban,exact-or-str-match,"['saq14', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Ethiopia,2018-19,cluster_features,df_main,inline_dict,saq14,RURAL,str,3115,Rural,exact-or-str-match,"['saq14', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Ethiopia,2018-19,sample,,script:.map(dict),saq14,URBAN,str,3655,(script logic),script-path,(script)
+Ethiopia,2018-19,sample,,script:.map(dict),saq14,RURAL,str,3115,(script logic),script-path,(script)
+Ethiopia,2021-22,cluster_features,df_main,inline_dict,saq14,URBAN,str,2674,Urban,exact-or-str-match,"['saq14', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', '1. RURAL': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban', '2. URBAN': 'Urban'}}]"
+Ethiopia,2021-22,cluster_features,df_main,inline_dict,saq14,RURAL,str,2285,Rural,exact-or-str-match,"['saq14', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', '1. RURAL': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban', '2. URBAN': 'Urban'}}]"
+Ethiopia,2021-22,sample,,script:.map(dict),saq14,URBAN,str,2674,(script logic),script-path,(script)
+Ethiopia,2021-22,sample,,script:.map(dict),saq14,RURAL,str,2285,(script logic),script-path,(script)
+GhanaLSS,1991-92,cluster_features,,auto_function,loc2,2.0,float,2945,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,1991-92,cluster_features,,auto_function,loc2,1.0,float,1578,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,1991-92,sample,,auto_function,loc2,2.0,float,2945,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,1991-92,sample,,auto_function,loc2,1.0,float,1578,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,1998-99,cluster_features,,auto_function,loc2,2.0,float,3799,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,1998-99,cluster_features,,auto_function,loc2,1.0,float,2199,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,1998-99,sample,,auto_function,loc2,2.0,float,3799,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,1998-99,sample,,auto_function,loc2,1.0,float,2199,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,2005-06,cluster_features,,auto_function,loc2,rural,str,5069,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,2005-06,cluster_features,,auto_function,loc2,urban,str,3618,(wave mapping.py def Rural),auto-bound formatting function,'loc2'
+GhanaLSS,2012-13,cluster_features,,passthrough,loc2,Rural,str,9327,"(raw value, then canonical spellings)",no mapping declared,'loc2'
+GhanaLSS,2012-13,cluster_features,,passthrough,loc2,Urban,str,7445,"(raw value, then canonical spellings)",no mapping declared,'loc2'
+GhanaLSS,2012-13,sample,,passthrough,loc2,Rural,str,9327,"(raw value, then canonical spellings)",no mapping declared,'loc2'
+GhanaLSS,2012-13,sample,,passthrough,loc2,Urban,str,7445,"(raw value, then canonical spellings)",no mapping declared,'loc2'
+GhanaLSS,2016-17,cluster_features,,inline_dict,loc2,Rural,str,534677,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['loc2', {'mapping': {'Urban ': 'Urban', 'Rural ': 'Rural'}}]"
+GhanaLSS,2016-17,cluster_features,,inline_dict,loc2,Urban ,str,399907,Urban,exact-or-str-match,"['loc2', {'mapping': {'Urban ': 'Urban', 'Rural ': 'Rural'}}]"
+GhanaLSS,2016-17,sample,,passthrough,urbrur,Rural,str,7991,"(raw value, then canonical spellings)",no mapping declared,'urbrur'
+GhanaLSS,2016-17,sample,,passthrough,urbrur,Urban,str,6018,"(raw value, then canonical spellings)",no mapping declared,'urbrur'
+GhanaSPS,2009-10,sample,,auto_function,urbrur,Rural,str,2999,(wave mapping.py def Rural),auto-bound formatting function,'urbrur'
+GhanaSPS,2009-10,sample,,auto_function,urbrur,Urban,str,2010,(wave mapping.py def Rural),auto-bound formatting function,'urbrur'
+Guatemala,2000,cluster_features,,inline_dict,area,rural,str,3852,Rural,exact-or-str-match,"['area', {'mapping': {'urbana': 'Urban', 'rural': 'Rural'}}]"
+Guatemala,2000,cluster_features,,inline_dict,area,urbana,str,3424,Urban,exact-or-str-match,"['area', {'mapping': {'urbana': 'Urban', 'rural': 'Rural'}}]"
+Guatemala,2000,sample,,inline_dict,area,rural,str,3852,Rural,exact-or-str-match,"['area', {'mapping': {'urbana': 'Urban', 'rural': 'Rural'}}]"
+Guatemala,2000,sample,,inline_dict,area,urbana,str,3424,Urban,exact-or-str-match,"['area', {'mapping': {'urbana': 'Urban', 'rural': 'Rural'}}]"
+Guinea-Bissau,2018-19,cluster_features,df_main,inline_dict,s00q04,Rural,str,3361,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbano': 'Urban', 'urbano': 'Urban', 'URBANO': 'Urban', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Guinea-Bissau,2018-19,cluster_features,df_main,inline_dict,s00q04,Urbano,str,1990,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbano': 'Urban', 'urbano': 'Urban', 'URBANO': 'Urban', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Guinea-Bissau,2018-19,sample,df_cover,inline_dict,s00q04,Rural,str,3361,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbano': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Guinea-Bissau,2018-19,sample,df_cover,inline_dict,s00q04,Urbano,str,1990,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbano': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Guyana,1992,cluster_features,,inline_dict,SECTOR,1,int,1153,Urban,exact-or-str-match,"['SECTOR', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+Guyana,1992,cluster_features,,inline_dict,SECTOR,2,int,654,Rural,exact-or-str-match,"['SECTOR', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+Guyana,1992,sample,df_cover,inline_dict,SECTOR,1,int,1153,Urban,exact-or-str-match,"['SECTOR', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+Guyana,1992,sample,df_cover,inline_dict,SECTOR,2,int,654,Rural,exact-or-str-match,"['SECTOR', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+India,1997-98,employment,,passthrough,v02a05b,,NaN,14998,"(raw value, then canonical spellings)",no mapping declared,'v02a05b'
+India,1997-98,employment,,passthrough,v02a05b,Urban,str,728,"(raw value, then canonical spellings)",no mapping declared,'v02a05b'
+India,1997-98,employment,,passthrough,v02a05b,Rural,str,363,"(raw value, then canonical spellings)",no mapping declared,'v02a05b'
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,kirkuk - urban center,str,380,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,mosul - rural,str,324,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,najaf - urban center,str,324,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,najaf - rural,str,324,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,qadisiya - urban center,str,324,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,qadisiya - other urban,str,324,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,muthanna - other urban,str,324,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,maysan - urban center,str,324,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,baghdad - rural,str,323,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,kerbela - rural,str,323,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,salah al-deen - other urban,str,323,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,muthanna - rural,str,323,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,maysan - other urban,str,323,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,maysan - rural,str,323,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,basrah - rural,str,323,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,mosul - urban center,str,322,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,baghdad - other urban,str,322,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,salah al-deen - urban center,str,322,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,muthanna - urban center,str,322,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,duhok - other urban,str,321,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,mosul - other urban,str,321,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,baghdad - al-sader,str,321,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,babylon - other urban,str,320,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,najaf - other urban,str,320,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,thi-qar - urban center,str,320,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,thi-qar - other urban,str,320,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,basrah - other urban,str,320,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,anbar - urban center,str,319,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,babylon - rural,str,319,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,kerbela - urban center,str,319,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,wasit - other urban,str,319,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,wasit - rural,str,319,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,sulaimaniya - rural,str,318,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,anbar - other urban,str,318,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,baghdad - al-rasafah,str,318,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,qadisiya - rural,str,318,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,basrah - urban center,str,318,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,erbil - rural,str,317,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,thi-qar - rural,str,317,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,sulaimaniya - other urban,str,316,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,wasit - urban center,str,316,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,salah al-deen - rural,str,315,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,diyala - other urban,str,314,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,baghdad - al-karekh,str,314,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,babylon - urban center,str,314,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,kerbela - other urban,str,314,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,erbil - urban center,str,311,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,erbil - other urban,str,310,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,sulaimaniya - urban center,str,307,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,kirkuk - other urban,str,307,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,duhok - rural,str,303,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,diyala - urban center,str,297,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,diyala - rural,str,291,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,anbar - rural,str,280,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,duhok - urban center,str,274,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,kirkuk - rural,str,268,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,cluster_features,,list_no_mapping,xstrat,sulaimaniya - urban center - extra,str,92,(wave mapping.py def Rural),list form + auto-bound function,['xstrat']
+Iraq,2006-07,sample,,inline_dict,xstrat,kirkuk - urban center,str,380,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,mosul - rural,str,324,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,najaf - urban center,str,324,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,najaf - rural,str,324,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,qadisiya - urban center,str,324,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,qadisiya - other urban,str,324,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,muthanna - other urban,str,324,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,maysan - urban center,str,324,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,baghdad - rural,str,323,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,kerbela - rural,str,323,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,salah al-deen - other urban,str,323,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,muthanna - rural,str,323,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,maysan - other urban,str,323,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,maysan - rural,str,323,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,basrah - rural,str,323,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,mosul - urban center,str,322,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,baghdad - other urban,str,322,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,salah al-deen - urban center,str,322,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,muthanna - urban center,str,322,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,duhok - other urban,str,321,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,mosul - other urban,str,321,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,baghdad - al-sader,str,321,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,babylon - other urban,str,320,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,najaf - other urban,str,320,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,thi-qar - urban center,str,320,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,thi-qar - other urban,str,320,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,basrah - other urban,str,320,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,anbar - urban center,str,319,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,babylon - rural,str,319,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,kerbela - urban center,str,319,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,wasit - other urban,str,319,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,wasit - rural,str,319,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,sulaimaniya - rural,str,318,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,anbar - other urban,str,318,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,baghdad - al-rasafah,str,318,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,qadisiya - rural,str,318,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,basrah - urban center,str,318,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,erbil - rural,str,317,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,thi-qar - rural,str,317,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,sulaimaniya - other urban,str,316,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,wasit - urban center,str,316,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,salah al-deen - rural,str,315,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,diyala - other urban,str,314,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,baghdad - al-karekh,str,314,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,babylon - urban center,str,314,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,kerbela - other urban,str,314,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,erbil - urban center,str,311,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,erbil - other urban,str,310,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,sulaimaniya - urban center,str,307,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,kirkuk - other urban,str,307,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,duhok - rural,str,303,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,diyala - urban center,str,297,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,diyala - rural,str,291,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,anbar - rural,str,280,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,duhok - urban center,str,274,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,kirkuk - rural,str,268,Rural,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2006-07,sample,,inline_dict,xstrat,sulaimaniya - urban center - extra,str,92,Urban,exact-or-str-match,"['xstrat', {'mapping': {'anbar - other urban': 'Urban', 'anbar - rural': 'Rural', 'anbar - urban center': 'Urban', 'babylon - other urban': 'Urban', 'babylon - rural': 'Rural', 'babylon - urban center': 'Urban', 'baghdad"
+Iraq,2012,cluster_features,,inline_dict,q00_16,URBAN,str,14884,Urban,exact-or-str-match,"['q00_16', {'mapping': {'URBAN': 'Urban', 'RURAL': 'Rural'}}]"
+Iraq,2012,cluster_features,,inline_dict,q00_16,RURAL,str,10262,Rural,exact-or-str-match,"['q00_16', {'mapping': {'URBAN': 'Urban', 'RURAL': 'Rural'}}]"
+Iraq,2012,sample,,inline_dict,q00_16,URBAN,str,14884,Urban,exact-or-str-match,"['q00_16', {'mapping': {'URBAN': 'Urban', 'RURAL': 'Rural'}}]"
+Iraq,2012,sample,,inline_dict,q00_16,RURAL,str,10262,Rural,exact-or-str-match,"['q00_16', {'mapping': {'URBAN': 'Urban', 'RURAL': 'Rural'}}]"
+Kazakhstan,1996,cluster_features,,inline_dict,type_loc,urban,str,3556,Urban,exact-or-str-match,"['type_loc', {'mapping': {'urban': 'Urban', 'rural': 'Rural', 'small town': 'Urban'}}]"
+Kazakhstan,1996,cluster_features,,inline_dict,type_loc,rural,str,3022,Rural,exact-or-str-match,"['type_loc', {'mapping': {'urban': 'Urban', 'rural': 'Rural', 'small town': 'Urban'}}]"
+Kazakhstan,1996,cluster_features,,inline_dict,type_loc,small town,str,646,Urban,exact-or-str-match,"['type_loc', {'mapping': {'urban': 'Urban', 'rural': 'Rural', 'small town': 'Urban'}}]"
+Kazakhstan,1996,sample,,inline_dict,type_loc,urban,str,3556,Urban,exact-or-str-match,"['type_loc', {'mapping': {'urban': 'Urban', 'rural': 'Rural', 'small town': 'Urban'}}]"
+Kazakhstan,1996,sample,,inline_dict,type_loc,rural,str,3022,Rural,exact-or-str-match,"['type_loc', {'mapping': {'urban': 'Urban', 'rural': 'Rural', 'small town': 'Urban'}}]"
+Kazakhstan,1996,sample,,inline_dict,type_loc,small town,str,646,Urban,exact-or-str-match,"['type_loc', {'mapping': {'urban': 'Urban', 'rural': 'Rural', 'small town': 'Urban'}}]"
+Kosovo,2000,cluster_features,,inline_dict,s0i_q09,Rural,str,1440,Rural,exact-or-str-match,"['s0i_q09', {'mapping': {'Rural': 'Rural', 'Urban': 'Urban'}}]"
+Kosovo,2000,cluster_features,,inline_dict,s0i_q09,Urban,str,1440,Urban,exact-or-str-match,"['s0i_q09', {'mapping': {'Rural': 'Rural', 'Urban': 'Urban'}}]"
+Kosovo,2000,sample,,inline_dict,s0i_q09,Rural,str,1440,Rural,exact-or-str-match,"['s0i_q09', {'mapping': {'Rural': 'Rural', 'Urban': 'Urban'}}]"
+Kosovo,2000,sample,,inline_dict,s0i_q09,Urban,str,1440,Urban,exact-or-str-match,"['s0i_q09', {'mapping': {'Rural': 'Rural', 'Urban': 'Urban'}}]"
+Liberia,2018-19,cluster_features,,passthrough,locality,rural,str,2950,"(raw value, then canonical spellings)",no mapping declared,'locality'
+Liberia,2018-19,cluster_features,,passthrough,locality,urban,str,36,"(raw value, then canonical spellings)",no mapping declared,'locality'
+Liberia,2018-19,sample,,inline_dict,locality,rural,str,2950,Rural,exact-or-str-match,"['locality', {'mapping': {'rural': 'Rural', 'urban': 'Urban'}}]"
+Liberia,2018-19,sample,,inline_dict,locality,urban,str,36,Urban,exact-or-str-match,"['locality', {'mapping': {'rural': 'Rural', 'urban': 'Urban'}}]"
+Malawi,2004-05,cluster_features,,passthrough,reside,Rural,str,9840,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2004-05,cluster_features,,passthrough,reside,Urban,str,1440,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2004-05,sample,,passthrough,reside,Rural,str,9840,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2004-05,sample,,passthrough,reside,Urban,str,1440,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2010-11,cluster_features,df_main,passthrough,reside,rural,str,10038,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2010-11,cluster_features,df_main,passthrough,reside,urban,str,2233,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2010-11,sample,,passthrough,reside,rural,str,10038,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2010-11,sample,,passthrough,reside,urban,str,2233,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2013-14,cluster_features,df_main,passthrough,reside,rural,str,2954,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2013-14,cluster_features,df_main,passthrough,reside,urban,str,1046,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2013-14,sample,,passthrough,reside,rural,str,2954,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2013-14,sample,,passthrough,reside,urban,str,1046,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,cluster_features,df_main,passthrough,reside,rural,str,10175,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,cluster_features,df_main,passthrough,reside,urban,str,2272,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,cluster_features,df_main,passthrough,reside,RURAL,str,1841,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,cluster_features,df_main,passthrough,reside,URBAN,str,667,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,sample,,passthrough,reside,rural,str,10175,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,sample,,passthrough,reside,urban,str,2272,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,sample,,passthrough,reside,RURAL,str,1841,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2016-17,sample,,passthrough,reside,URBAN,str,667,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,cluster_features,df_main,passthrough,reside,RURAL,str,9342,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,cluster_features,df_main,passthrough,reside,Rural,str,2355,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,cluster_features,df_main,passthrough,reside,URBAN,str,2092,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,cluster_features,df_main,passthrough,reside,Urban,str,823,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,sample,,passthrough,reside,RURAL,str,9342,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,sample,,passthrough,reside,Rural,str,2355,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,sample,,passthrough,reside,URBAN,str,2092,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Malawi,2019-20,sample,,passthrough,reside,Urban,str,823,"(raw value, then canonical spellings)",no mapping declared,'reside'
+Mali,2014-15,cluster_features,df_main,passthrough,milieu,Rural,str,2399,"(raw value, then canonical spellings)",no mapping declared,'milieu'
+Mali,2014-15,cluster_features,df_main,passthrough,milieu,Urbain,str,1405,"(raw value, then canonical spellings)",no mapping declared,'milieu'
+Mali,2014-15,sample,df_cover,inline_dict,s00q04,Rural,str,2399,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Mali,2014-15,sample,df_cover,inline_dict,s00q04,Urbain,str,1405,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Mali,2017-18,cluster_features,df_main,inline_dict,s0q04,Rural,str,6921,Rural,exact-or-str-match,"['s0q04', {'mapping': {'Rural': 'Rural', 'Urbain (District de Bamako)': 'Urban', 'Autre urbain': 'Urban'}}]"
+Mali,2017-18,cluster_features,df_main,inline_dict,s0q04,Urbain (District de Bamako),str,760,Urban,exact-or-str-match,"['s0q04', {'mapping': {'Rural': 'Rural', 'Urbain (District de Bamako)': 'Urban', 'Autre urbain': 'Urban'}}]"
+Mali,2017-18,cluster_features,df_main,inline_dict,s0q04,Autre urbain,str,709,Urban,exact-or-str-match,"['s0q04', {'mapping': {'Rural': 'Rural', 'Urbain (District de Bamako)': 'Urban', 'Autre urbain': 'Urban'}}]"
+Mali,2017-18,sample,df_cover,inline_dict,s0q04,Rural,str,6921,Rural,exact-or-str-match,"['s0q04', {'mapping': {'Rural': 'Rural', 'Urbain (District de Bamako)': 'Urban', 'Autre urbain': 'Urban'}}]"
+Mali,2017-18,sample,df_cover,inline_dict,s0q04,Urbain (District de Bamako),str,760,Urban,exact-or-str-match,"['s0q04', {'mapping': {'Rural': 'Rural', 'Urbain (District de Bamako)': 'Urban', 'Autre urbain': 'Urban'}}]"
+Mali,2017-18,sample,df_cover,inline_dict,s0q04,Autre urbain,str,709,Urban,exact-or-str-match,"['s0q04', {'mapping': {'Rural': 'Rural', 'Urbain (District de Bamako)': 'Urban', 'Autre urbain': 'Urban'}}]"
+Mali,2018-19,cluster_features,df_main,passthrough,milieu,Rural,str,188632,"(raw value, then canonical spellings)",no mapping declared,'milieu'
+Mali,2018-19,cluster_features,df_main,passthrough,milieu,Urbain,str,178007,"(raw value, then canonical spellings)",no mapping declared,'milieu'
+Mali,2018-19,sample,df_cover,inline_dict,s00q04,Rural,str,3850,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Mali,2018-19,sample,df_cover,inline_dict,s00q04,Urbain,str,2752,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Mali,2021-22,cluster_features,,passthrough,s00q04,Rural,str,3411,"(raw value, then canonical spellings)",no mapping declared,'s00q04'
+Mali,2021-22,cluster_features,,passthrough,s00q04,Urbain,str,2732,"(raw value, then canonical spellings)",no mapping declared,'s00q04'
+Mali,2021-22,sample,df_cover,inline_dict,s00q04,Rural,str,3411,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Mali,2021-22,sample,df_cover,inline_dict,s00q04,Urbain,str,2732,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Niger,2011-12,cluster_features,df_main,inline_dict,urbrur,Rural,str,2430,Rural,exact-or-str-match,"['urbrur', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2011-12,cluster_features,df_main,inline_dict,urbrur,Urbain,str,1538,Urban,exact-or-str-match,"['urbrur', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2011-12,sample,,inline_dict,urbrur,Rural,str,2430,Rural,exact-or-str-match,"['urbrur', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2011-12,sample,,inline_dict,urbrur,Urbain,str,1538,Urban,exact-or-str-match,"['urbrur', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2014-15,cluster_features,,inline_dict,MS00Q15,Rural,str,2319,Rural,exact-or-str-match,"['MS00Q15', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban', 'Communauté Urbaine': 'Urban', 'Communauté urbaine': 'Urban'}}]"
+Niger,2014-15,cluster_features,,inline_dict,MS00Q15,Communauté Urbaine,str,937,Urban,exact-or-str-match,"['MS00Q15', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban', 'Communauté Urbaine': 'Urban', 'Communauté urbaine': 'Urban'}}]"
+Niger,2014-15,cluster_features,,inline_dict,MS00Q15,Urbain,str,361,Urban,exact-or-str-match,"['MS00Q15', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban', 'Communauté Urbaine': 'Urban', 'Communauté urbaine': 'Urban'}}]"
+Niger,2014-15,sample,,inline_dict,urbrur,Rural,str,2319,Rural,exact-or-str-match,"['urbrur', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2014-15,sample,,inline_dict,urbrur,Urbain,str,1298,Urban,exact-or-str-match,"['urbrur', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2018-19,cluster_features,df_main,inline_dict,s00q04,Rural,str,4447,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2018-19,cluster_features,df_main,inline_dict,s00q04,Urbain,str,1577,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2018-19,sample,df_cover,inline_dict,s00q04,Rural,str,4447,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2018-19,sample,df_cover,inline_dict,s00q04,Urbain,str,1577,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2021-22,cluster_features,,inline_dict,s00q04,Rural,str,4111,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2021-22,cluster_features,,inline_dict,s00q04,Urbain,str,2511,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2021-22,sample,df_cover,inline_dict,s00q04,Rural,str,4111,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Niger,2021-22,sample,df_cover,inline_dict,s00q04,Urbain,str,2511,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Nigeria,2010-11,cluster_features,df_main,inline_dict,sector,rural,str,3380,Rural,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2010-11,cluster_features,df_main,inline_dict,sector,urban,str,1620,Urban,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2010-11,sample,df_main,inline_dict,sector,rural,str,3380,Rural,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2010-11,sample,df_main,inline_dict,sector,urban,str,1620,Urban,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2012-13,cluster_features,df_main,inline_dict,sector,RURAL,str,3310,Rural,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2012-13,cluster_features,df_main,inline_dict,sector,URBAN,str,1549,Urban,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2012-13,sample,df_main,inline_dict,sector,RURAL,str,3310,Rural,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2012-13,sample,df_main,inline_dict,sector,URBAN,str,1549,Urban,exact-or-str-match,"['sector', {'mapping': {'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2015-16,cluster_features,df_main,inline_dict,sector,2. RURAL,str,3172,Rural,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2015-16,cluster_features,df_main,inline_dict,sector,1. URBAN,str,1524,Urban,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2015-16,sample,df_main,inline_dict,sector,2. RURAL,str,3172,Rural,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2015-16,sample,df_main,inline_dict,sector,1. URBAN,str,1524,Urban,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2018-19,cluster_features,df_main,inline_dict,sector,2. Rural,str,3533,Rural,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2018-19,cluster_features,df_main,inline_dict,sector,1. Urban,str,1730,Urban,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2018-19,sample,df_main,inline_dict,sector,2. Rural,str,3533,Rural,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2018-19,sample,df_main,inline_dict,sector,1. Urban,str,1730,Urban,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2023-24,sample,df_main,inline_dict,sector,2. RURAL,str,3432,Rural,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Nigeria,2023-24,sample,df_main,inline_dict,sector,1. URBAN,str,1635,Urban,exact-or-str-match,"['sector', {'mapping': {'1. URBAN': 'Urban', '2. RURAL': 'Rural', '1. Urban': 'Urban', '2. Rural': 'Rural', 'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural', 'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban'}}]"
+Pakistan,1991,cluster_features,,"script:.map({1:Urban,2:Rural})",urbrural,2.0,float,2386,(script logic),script-path,(script)
+Pakistan,1991,cluster_features,,"script:.map({1:Urban,2:Rural})",urbrural,1.0,float,2377,(script logic),script-path,(script)
+Pakistan,1991,sample,df_region,inline_dict,urbrural,2.0,float,2386,Rural,exact-or-str-match,"['urbrural', {'mapping': {1.0: 'Urban', 2.0: 'Rural'}}]"
+Pakistan,1991,sample,df_region,inline_dict,urbrural,1.0,float,2377,Urban,exact-or-str-match,"['urbrural', {'mapping': {1.0: 'Urban', 2.0: 'Rural'}}]"
+Peru,1994,cluster_features,,table_mappings,a06,1,str,2287,(categorical_mapping.org table),table-level mappings: key,'a06'
+Peru,1994,cluster_features,,table_mappings,a06,2,str,1336,(categorical_mapping.org table),table-level mappings: key,'a06'
+Senegal,2018-19,cluster_features,df_main,inline_dict,s00q04,Urbain,str,3941,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Senegal,2018-19,cluster_features,df_main,inline_dict,s00q04,Rural,str,3215,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Senegal,2018-19,sample,df_cover,inline_dict,s00q04,Urbain,str,3941,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Senegal,2018-19,sample,df_cover,inline_dict,s00q04,Rural,str,3215,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Senegal,2021-22,cluster_features,,inline_dict,s00q04,Urbain,str,3922,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Senegal,2021-22,cluster_features,,inline_dict,s00q04,Rural,str,3198,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Senegal,2021-22,sample,df_cover,inline_dict,s00q04,Urbain,str,3922,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Senegal,2021-22,sample,df_cover,inline_dict,s00q04,Rural,str,3198,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'Urbain': 'Urban'}}]"
+Serbia,2007,cluster_features,,inline_dict,tip,urban,str,298,Urban,exact-or-str-match,"['tip', {'mapping': {'urban': 'Urban', 'rural': 'Rural'}}]"
+Serbia,2007,cluster_features,,inline_dict,tip,rural,str,212,Rural,exact-or-str-match,"['tip', {'mapping': {'urban': 'Urban', 'rural': 'Rural'}}]"
+Serbia,2007,sample,df_ed,inline_dict,tip,urban,str,298,Urban,exact-or-str-match,"['tip', {'mapping': {'urban': 'Urban', 'rural': 'Rural'}}]"
+Serbia,2007,sample,df_ed,inline_dict,tip,rural,str,212,Rural,exact-or-str-match,"['tip', {'mapping': {'urban': 'Urban', 'rural': 'Rural'}}]"
+Serbia and Montenegro,2002,cluster_features,,inline_dict,tip,Urban,str,10522,Urban,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+Serbia and Montenegro,2002,cluster_features,,inline_dict,tip,Other,str,9203,Rural,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+Serbia and Montenegro,2002,sample,,inline_dict,tip,Urban,str,3525,Urban,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+Serbia and Montenegro,2002,sample,,inline_dict,tip,Other,str,2861,Rural,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+Serbia and Montenegro,2003,cluster_features,,inline_dict,tip,Urban,str,4131,Urban,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+Serbia and Montenegro,2003,cluster_features,,inline_dict,tip,Other,str,3896,Rural,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+Serbia and Montenegro,2003,sample,,inline_dict,tip,Urban,str,1369,Urban,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+Serbia and Montenegro,2003,sample,,inline_dict,tip,Other,str,1179,Rural,exact-or-str-match,"['tip', {'mapping': {'Urban': 'Urban', 'Other': 'Rural'}}]"
+South Africa,1993,cluster_features,,inline_dict,type,1,int,4398,Rural,exact-or-str-match,"['type', {'mapping': {0: 'Urban', 1: 'Rural', 3: 'Informal'}}]"
+South Africa,1993,cluster_features,,inline_dict,type,0,int,4328,Urban,exact-or-str-match,"['type', {'mapping': {0: 'Urban', 1: 'Rural', 3: 'Informal'}}]"
+South Africa,1993,cluster_features,,inline_dict,type,3,int,83,Informal,exact-or-str-match,"['type', {'mapping': {0: 'Urban', 1: 'Rural', 3: 'Informal'}}]"
+South Africa,1993,sample,,inline_dict,type,1,int,4398,Rural,exact-or-str-match,"['type', {'mapping': {0: 'Urban', 1: 'Rural', 3: 'Informal'}}]"
+South Africa,1993,sample,,inline_dict,type,0,int,4328,Urban,exact-or-str-match,"['type', {'mapping': {0: 'Urban', 1: 'Rural', 3: 'Informal'}}]"
+South Africa,1993,sample,,inline_dict,type,3,int,83,Informal,exact-or-str-match,"['type', {'mapping': {0: 'Urban', 1: 'Rural', 3: 'Informal'}}]"
+Tajikistan,1999,cluster_features,,inline_dict,settlm,2.0,float,1456,Rural,exact-or-str-match,"['settlm', {'mapping': {1.0: 'Urban', 2.0: 'Rural'}}]"
+Tajikistan,1999,cluster_features,,inline_dict,settlm,1.0,float,544,Urban,exact-or-str-match,"['settlm', {'mapping': {1.0: 'Urban', 2.0: 'Rural'}}]"
+Tajikistan,1999,sample,,inline_dict,settlm,2.0,float,1456,Rural,exact-or-str-match,"['settlm', {'mapping': {1.0: 'Urban', 2.0: 'Rural'}}]"
+Tajikistan,1999,sample,,inline_dict,settlm,1.0,float,544,Urban,exact-or-str-match,"['settlm', {'mapping': {1.0: 'Urban', 2.0: 'Rural'}}]"
+Tajikistan,2003,cluster_features,,passthrough,type_reg,rural,str,2640,"(raw value, then canonical spellings)",no mapping declared,'type_reg'
+Tajikistan,2003,cluster_features,,passthrough,type_reg,urban,str,1520,"(raw value, then canonical spellings)",no mapping declared,'type_reg'
+Tajikistan,2003,sample,df_cover,passthrough,type_reg,rural,str,2640,"(raw value, then canonical spellings)",no mapping declared,'type_reg'
+Tajikistan,2003,sample,df_cover,passthrough,type_reg,urban,str,1520,"(raw value, then canonical spellings)",no mapping declared,'type_reg'
+Tajikistan,2007,cluster_features,,passthrough,location,rural,str,2984,"(raw value, then canonical spellings)",no mapping declared,'location'
+Tajikistan,2007,cluster_features,,passthrough,location,urban,str,1660,"(raw value, then canonical spellings)",no mapping declared,'location'
+Tajikistan,2007,sample,df_pov,passthrough,location,rural,str,3150,"(raw value, then canonical spellings)",no mapping declared,'location'
+Tajikistan,2007,sample,df_pov,passthrough,location,urban,str,1710,"(raw value, then canonical spellings)",no mapping declared,'location'
+Tajikistan,2009,cluster_features,,passthrough,Location,Rural,str,963,"(raw value, then canonical spellings)",no mapping declared,'Location'
+Tajikistan,2009,cluster_features,,passthrough,Location,Urban,str,540,"(raw value, then canonical spellings)",no mapping declared,'Location'
+Tajikistan,2009,sample,df_weights,passthrough,location,Rural,str,963,"(raw value, then canonical spellings)",no mapping declared,'location'
+Tajikistan,2009,sample,df_weights,passthrough,location,Urban,str,540,"(raw value, then canonical spellings)",no mapping declared,'location'
+Tanzania,2008-15,cluster_features,,script:lambda x: 'Rural' if x.lower()!='urban' else 'Urban',urb_rur,RURAL,str,18932,(script logic),script-path,(script)
+Tanzania,2008-15,cluster_features,,script:lambda x: 'Rural' if x.lower()!='urban' else 'Urban',urb_rur,URBAN,str,10318,(script logic),script-path,(script)
+Tanzania,2008-15,sample,,script:.map(dict) -> NaN on unmapped,urb_rur,RURAL,str,18932,(script logic),script-path,(script)
+Tanzania,2008-15,sample,,script:.map(dict) -> NaN on unmapped,urb_rur,URBAN,str,10318,(script logic),script-path,(script)
+Tanzania,2019-20,cluster_features,,inline_dict,sdd_rural,RURAL,str,682,Rural,exact-or-str-match,"['sdd_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Tanzania,2019-20,cluster_features,,inline_dict,sdd_rural,URBAN,str,502,Urban,exact-or-str-match,"['sdd_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Tanzania,2019-20,sample,,inline_dict,sdd_rural,RURAL,str,682,Rural,exact-or-str-match,"['sdd_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Tanzania,2019-20,sample,,inline_dict,sdd_rural,URBAN,str,502,Urban,exact-or-str-match,"['sdd_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Tanzania,2020-21,cluster_features,,inline_dict,y5_rural,rural,str,2560,Rural,exact-or-str-match,"['y5_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Tanzania,2020-21,cluster_features,,inline_dict,y5_rural,urban,str,2149,Urban,exact-or-str-match,"['y5_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Tanzania,2020-21,sample,,inline_dict,y5_rural,rural,str,2560,Rural,exact-or-str-match,"['y5_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Tanzania,2020-21,sample,,inline_dict,y5_rural,urban,str,2149,Urban,exact-or-str-match,"['y5_rural', {'mapping': {'RURAL': 'Rural', 'Rural': 'Rural', 'rural': 'Rural', 'URBAN': 'Urban', 'Urban': 'Urban', 'urban': 'Urban'}}]"
+Timor-Leste,2001,cluster_features,,inline_dict,urbrural,Rural,str,183,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urbrural', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+Timor-Leste,2001,cluster_features,,inline_dict,urbrural,Urban,str,117,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urbrural', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+Timor-Leste,2001,sample,df_weights,inline_dict,urbrural,Rural,str,183,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urbrural', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+Timor-Leste,2001,sample,df_weights,inline_dict,urbrural,Urban,str,117,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urbrural', {'mapping': {1: 'Urban', 2: 'Rural'}}]"
+Timor-Leste,2007-08,cluster_features,,inline_dict,urban,Rural,str,2502,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urban', {'mapping': {0: 'Rural', 1: 'Urban'}}]"
+Timor-Leste,2007-08,cluster_features,,inline_dict,urban,Urban,str,1975,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urban', {'mapping': {0: 'Rural', 1: 'Urban'}}]"
+Timor-Leste,2007-08,sample,,inline_dict,urban,Rural,str,2502,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urban', {'mapping': {0: 'Rural', 1: 'Urban'}}]"
+Timor-Leste,2007-08,sample,,inline_dict,urban,Urban,str,1975,(passthrough: unmapped),"df_data_grabber f.get(x,x)","['urban', {'mapping': {0: 'Rural', 1: 'Urban'}}]"
+Togo,2018,cluster_features,df_main,inline_dict,s00q04,Rural,str,3901,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Togo,2018,cluster_features,df_main,inline_dict,s00q04,Urbain,str,2270,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Togo,2018,sample,df_cover,inline_dict,s00q04,Rural,str,3901,Rural,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Togo,2018,sample,df_cover,inline_dict,s00q04,Urbain,str,2270,Urban,exact-or-str-match,"['s00q04', {'mapping': {'Rural': 'Rural', 'rural': 'Rural', 'RURAL': 'Rural', 'Urbain': 'Urban', 'urbain': 'Urban', 'URBAIN': 'Urban'}}]"
+Uganda,2005-06,cluster_features,df_main,inline_dict_bare,urban,0,int,2263,Rural,exact-or-str-match,"['urban', {'urban': 'Urban', 0: 'Rural'}]"
+Uganda,2005-06,cluster_features,df_main,inline_dict_bare,urban,urban,str,860,Urban,exact-or-str-match,"['urban', {'urban': 'Urban', 0: 'Rural'}]"
+Uganda,2005-06,sample,,inline_dict_bare,urban,0,int,2263,Rural,exact-or-str-match,"['urban', {0: 'Rural', 'urban': 'Urban'}]"
+Uganda,2005-06,sample,,inline_dict_bare,urban,urban,str,860,Urban,exact-or-str-match,"['urban', {0: 'Rural', 'urban': 'Urban'}]"
+Uganda,2009-10,cluster_features,df_main,passthrough,urban,Rural,str,2206,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2009-10,cluster_features,df_main,passthrough,urban,Urban,str,769,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2009-10,sample,df_main,passthrough,urban,Rural,str,2206,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2009-10,sample,df_main,passthrough,urban,Urban,str,769,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2010-11,cluster_features,df_main,passthrough,urban,Rural,str,2105,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2010-11,cluster_features,df_main,passthrough,urban,Urban,str,611,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2010-11,sample,,passthrough,urban,Rural,str,2105,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2010-11,sample,,passthrough,urban,Urban,str,611,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2011-12,cluster_features,df_main,passthrough,urban,Rural,str,2266,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2011-12,cluster_features,df_main,passthrough,urban,Urban,str,584,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2011-12,sample,,passthrough,urban,Rural,str,2266,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2011-12,sample,,passthrough,urban,Urban,str,584,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2013-14,cluster_features,df_main,passthrough,urban,Rural,str,2303,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2013-14,cluster_features,df_main,passthrough,urban,Urban,str,816,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2013-14,sample,,passthrough,urban,Rural,str,2303,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2013-14,sample,,passthrough,urban,Urban,str,816,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2015-16,cluster_features,df_main,passthrough,urban,Rural,str,2470,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2015-16,cluster_features,df_main,passthrough,urban,Urban,str,835,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2015-16,sample,,passthrough,urban,Rural,str,2470,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2015-16,sample,,passthrough,urban,Urban,str,835,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2018-19,cluster_features,df_main,passthrough,urban,Rural,str,2367,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2018-19,cluster_features,df_main,passthrough,urban,Urban,str,809,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2018-19,sample,,passthrough,urban,Rural,str,2367,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2018-19,sample,,passthrough,urban,Urban,str,809,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2019-20,cluster_features,,passthrough,urban,Rural,str,2333,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2019-20,cluster_features,,passthrough,urban,Urban,str,745,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2019-20,cluster_features,,passthrough,urban,,NaN,20,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2019-20,sample,,passthrough,urban,Rural,str,2333,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2019-20,sample,,passthrough,urban,Urban,str,745,"(raw value, then canonical spellings)",no mapping declared,'urban'
+Uganda,2019-20,sample,,passthrough,urban,,NaN,20,"(raw value, then canonical spellings)",no mapping declared,'urban'
