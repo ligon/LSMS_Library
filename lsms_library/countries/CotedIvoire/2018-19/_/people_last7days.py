@@ -96,6 +96,30 @@ def _finish_people_last7days(df, t):
     keep = ['t', 'i', 'pid', 'farm_work', 'SOB_work', 'wage_work',
             'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']
     df = df[keep]
+    # --- (t, i, pid) key soundness reviewed 2026-07-21 -- GH #637 ----------
+    # This collapse is a NO-OP on the shipped CotedIvoire data: there is
+    # nothing to collapse, so `.first()`'s per-column skipna=True can form no
+    # composite row here.  Measured on the SOURCE directly (this table is
+    # `materialize: make`, so it builds out-of-process and an in-process
+    # groupby probe cannot see it -- see the #637 thread):
+    #   s04_me_CIV2018 rows 61,116; duplicate (grappe, menage, s01q00a)
+    #     groups 0
+    #   s01_me_CIV2018 rows 61,116; duplicate person-key groups 0
+    #     -> the how='left' merge fans out 0 rows (merged == 61,116)
+    #   _i() is INJECTIVE: 12,992 distinct (grappe, menage) pairs -> 12,992
+    #     distinct ids.  Worth stating why, since _i() concatenates with NO
+    #     separator: menage tops out at 30, so zeropadding=3 always yields
+    #     exactly three characters and the split point is unambiguous.  A
+    #     future CotedIvoire wave with menage > 999 would break that.
+    #   groups on (t, i, pid) 61,116 == rows 61,116  ->  0 duplicate groups
+    # So the key merges no distinct persons -- the ONLY situation in which the
+    # composite would be wrong (GH #637 correction thread; GH #323 D1: the fix
+    # for a merged entity is the identifier, never a reducer).
+    # Do NOT "fix" this to `.first(skipna=False)`: in this codebase NaN is
+    # absence, not contradiction, and skipna=False would return <NA> for
+    # values the survey actually recorded.
+    # `dropna=False` governs NA *group keys* only; rows with NA i/pid are
+    # already dropped above and `t` is a literal, so it too is inert here.
     df = (df.groupby(['t', 'i', 'pid'], dropna=False, as_index=False).first())
     df = df.set_index(['t', 'i', 'pid'])
     return df

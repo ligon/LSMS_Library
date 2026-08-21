@@ -1,0 +1,5 @@
+outs:
+- md5: e60e23ca44544440a43d8f74fd5ad8f3
+  size: 60134
+  hash: md5
+  path: grappe_gps_CIV2018.dta

@@ -833,8 +833,42 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
         'Fallow':           fallow.values,
         'ErosionProtection': erosion_protection.values,
     })
-    # Collapse any duplicate (hhid, plotkey) area rows defensively
-    # (Module C should be one row per plot; first-wins keeps it unique).
+    # GH #637 -- what this groupby actually does, measured rather than assumed.
+    #
+    # Audited cold across all six (wave x half) builds by patching
+    # DataFrameGroupBy.first in-process and driving the wave scripts with
+    # runpy (an in-process patch cannot see a `materialize: make` subprocess).
+    # Result: ZERO groups of more than one row on a non-null plot_id, in every
+    # wave.  So `.first()` collapses nothing real and cannot assemble the
+    # skipna COMPOSITE that #637 is about -- there are no duplicate rows for it
+    # to compose.  Module C is one row per plot, and (hhid, plotkey) identifies
+    # that plot: no two plots collide on it, and format_id merges no two
+    # distinct ids (both would show up here as duplicate groups, and neither
+    # does).  Left in place as a guard, not removed: it is free, and the wave
+    # scripts' `assert df.index.is_unique` depends on the frame being unique.
+    #
+    # "0 duplicates" ALONE would not license that verdict -- a key drawn from
+    # the WRONG NAMESPACE also yields 0, because every row becomes its own
+    # distinct "household" (the Tanzania shocks inversion, #637 trap 3).  So
+    # the namespace was checked separately and PER WAVE against the roster:
+    # 100% of `i` present in household_roster for 2010-11 / 2013-14 / 2016-17 /
+    # 2019-20 alike, matching literally rather than vacuously.  Pinned by
+    # tests/test_gh637_malawi_first_sites.py.
+    #
+    # What the audit DID find is a silent deletion, which is now explicit.
+    # `groupby()` defaults to dropna=True, so a row whose plot_id is NULL was
+    # being DROPPED here without a word (GH #323 §3b's delete-and-report, in a
+    # country script rather than in core):
+    #
+    #     2010-11 275   2013-14 158   2016-17 27 + 6   2019-20 0 + 2   = 468
+    #
+    # Those rows are empty Module C roster stubs, not plots: 0 of all 468
+    # carries a non-null value in ANY of ag_c04a / ag_c04b / ag_c04c, i.e. no
+    # farmer-estimated area, no unit and no GPS area.  A row with no plot id
+    # and no measurement cannot go into a (t, i, plot_id) table, so dropping it
+    # is right -- but it should say so.  Dropping them here first leaves the
+    # returned frame bit-for-bit what it was.
+    out = out.dropna(subset=['plot_id'])
     out = out.groupby(['t', 'i', 'plot_id'], as_index=False).first()
     out = out.set_index(['t', 'i', 'plot_id'])
     return out
@@ -1129,7 +1163,18 @@ def food_coping_for_wave(t, df, idcol, i_prefix=''):
     out['t'] = t
     out = out.dropna(subset=['Days'])
     out['Days'] = out['Days'].round().astype('Int64')
-    # One row per (HH, strategy); first-wins guards against duplicate HH rows.
+    # One row per (HH, strategy).  GH #637: audited cold in all four waves by
+    # patching DataFrameGroupBy.first in-process and driving the wave scripts
+    # with runpy -- rows in == groups out EXACTLY (61,355 / 19,994 / 62,232 /
+    # 57,157), zero groups of more than one row, zero rows with a null key.
+    # So this reduces nothing and cannot produce the skipna composite #637 is
+    # about.  That equality is also what rules out two of the three traps:
+    # `idcol` is one row per household in Module H, and `format_id` merges no
+    # two distinct ids -- either failure would show up right here as a
+    # duplicate (i, Strategy) group, and none exists.  The third trap needs a
+    # different instrument: a WRONG-NAMESPACE key also yields 0 duplicates
+    # (#637 trap 3), so `i` was checked PER WAVE against household_roster --
+    # 100% overlap in all four waves.  Kept as a guard, not removed.
     out = out.groupby(['t', 'i', 'Strategy'], as_index=False).first()
     out = out.set_index(['t', 'i', 'Strategy'])
     return out
@@ -1199,6 +1244,15 @@ def months_food_inadequate_for_wave(t, df, idcol, i_prefix=''):
         'MonthsInadequate': months.values,
         'AnyInadequate': any_inadequate.values,
     })
+    # GH #637: same audit as food_coping_for_wave above.  Rows in == groups out
+    # exactly in all four waves -- 12,271 / 4,000 / 12,447 / 11,434, which is
+    # precisely each wave's Module H household count -- so `i` is unique here
+    # and `.first()` is a no-op.  A `.first(skipna=False)` would change nothing
+    # and is deliberately NOT used; the composite this site could in principle
+    # build never arises, because there are no duplicate rows to build it from.
+    # Trap 3 checked here too: `i` overlaps household_roster 100% PER WAVE, so
+    # the absent duplicates are absent because the key is sound, not because it
+    # is in the wrong namespace.
     out = out.groupby(['t', 'i'], as_index=False).first()
     out = out.set_index(['t', 'i'])
     return out

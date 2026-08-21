@@ -10,3 +10,20 @@ SOURCE
 
 * Notes (preserved from the original SOURCE.org)
 (source URL not recorded)
+
+* Mixed vintage as of 2026-08-19
+
+Ten files in =Data/= were acquired from *Harvard Dataverse*, not from the
+original external source that supplied the other 100:
+
+#+SECONDARY_SOURCE: https://doi.org/10.7910/DVN/E5QP0F
+#+SECONDARY_SOURCE_VERSION: 1.2 (published 2022-11-03)
+#+SECONDARY_SOURCE_LICENSE: CC0 1.0
+#+SECONDARY_SOURCE_RETRIEVED: 2026-08-19
+#+SECONDARY_SOURCE_FILES: 01giv_education_beliefs_pre, 03bvi_mobile_money_accounts, 03bvi_mobile_money_agents, 03bvi_mobile_money_awareness, 07c_ids_module, 07c_ids_roster, 09b_education_beliefs_post, 10avii_financial_health, commtype, open_ended
+
+These ten were absent from this repository entirely; they are additions, not
+replacements.  Nothing pre-existing was overwritten.  See =LICENSE.org= for the
+two different sets of terms now in force in this wave, and
+=GhanaSPS/_/CONTENTS.org= for the file-by-file comparison against the public
+release.

@@ -2,10 +2,17 @@
 """crop_production for Uganda UNPS 2018-19 (GAP 1 item-level build).
 
 Reads AGSEC5A (season 1), AGSEC5B (season 2) and AGSEC4A (intercrop
-flag) via get_dataframe and emits a canonical (t,i,plot,j,u,season)
-parquet of REPORTED harvest values.  Harvest unit is a5aq6c (the column
-whose labels decode to Kg/Sack/Bunch); a5aq6b is the Fresh/Dry condition.
-See uganda.CROP_COLMAPS for the per-wave column map.
+flag) via get_dataframe and emits a canonical (t,i,plot,j,u,condition,season)
+parquet of REPORTED harvest values.
+
+2018-19 is the odd wave.  AGSEC5A carries NO harvest-unit column at all
+(-> u='Unknown'); its condition is a5aq6b (labelled) -- a5aq6c holds the
+same 20-code condition scheme unlabelled and disagreeing on 158 of 7 144
+rows, so the labelled column wins.  AGSEC5B does carry a unit (a5bq6b,
+40 labels) with the condition in a5bq6c, but the unit is still wired as
+None here; wiring it is a separate defect (see Uganda/_/CONTENTS.org).
+The harvest CONDITION is now an index level in its own right
+(GH #323/#637).  See uganda.CROP_COLMAPS for the per-wave column map.
 """
 import sys
 sys.path.append('../../_/')

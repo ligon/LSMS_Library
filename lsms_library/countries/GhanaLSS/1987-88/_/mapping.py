@@ -6,7 +6,18 @@ from collections import defaultdict
 from importlib.resources import files
 
 path = files("lsms_library")/'countries'/'GhanaLSS'/'1987-88'
-region_dict = tools.get_categorical_mapping(fn='categorical_mapping.org', tablename = 'region', dirs=[f'{path}/_/', f'{path}/../_', f'{path}/../../_'])
+_dirs = [f'{path}/_/', f'{path}/../_', f'{path}/../../_']
+
+# A bare tools.get_categorical_mapping(tablename=...) returns an EMPTY dict --
+# it passes no value column, so df_data_grabber drops the Label column and the
+# squeeze yields {}.  Every lookup then misses and silently produces pd.NA,
+# with nothing raised.  That is what left Region/Birthplace/Relationship 100%
+# NULL in this wave (and, downstream, the Generation/Distance/Affinity kinship
+# columns that _expand_kinship derives from Relationship).
+# tools.code_label_map passes Label='Label' and keys the result by BOTH the
+# string and the int form of each code.  See GH #372/#377/#348.
+region_dict = tools.code_label_map('region', _dirs)
+relationship_dict = tools.code_label_map('relationship', _dirs)
 
 def i(value):
     '''
@@ -37,9 +48,10 @@ def Relationship(value):
     '''
     Formatting relationship variable
     '''
-    #needs mapping
-    relationship_dict = tools.get_categorical_mapping(fn='categorical_mapping.org', tablename = 'relationship', dirs=[f'{path}/_/', f'{path}/../_', f'{path}/../../_'])
-
+    # GLSS1 uses the 14-code scheme the country-level `relationship` table
+    # documents (it cites this wave's own data dictionary: catalog 2313,
+    # y01a).  Verified against the raw data: REL takes codes 1..14, and code 1
+    # occurs 3136 times = the household count.
     return relationship_dict.get(value, pd.NA)
 
 def v(value):

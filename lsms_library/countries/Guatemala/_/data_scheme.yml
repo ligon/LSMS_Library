@@ -31,10 +31,18 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # v is the ENCOVI 2000 primary sampling unit: the composite
+    # depto-mupio-sector-segmento from CONSUMO5.DTA, assembled by
+    # guatemala.v() -- 1,065 clusters, median 6 households each (GH #323).
+    # Both columns below are genuine functions of v (no cluster spans two
+    # regions; none contains both urban and rural households), so this table
+    # is exactly one row per cluster with nothing collapsed.
+    #
+    # Until #323 this declared `v: region` (8 values) while the wave frame was
+    # household-level (7,276 rows), so the framework silently collapsed 7,268
+    # rows with groupby().first() -- picking Rural arbitrarily by row order.
     index: (t, v)
-    Region:
-      type: str
-      optional: true  # ENCOVI 2000: region is used as the v-index itself; no separate Region column (CLAUDE.md: "No PSU/cluster variable in data")
+    Region: str
     Rural: str
 
   household_roster:

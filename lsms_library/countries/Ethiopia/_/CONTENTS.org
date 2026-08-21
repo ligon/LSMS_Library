@@ -399,6 +399,449 @@ The household identifier variable changes across waves:
 | 2018-19 | =household_id=   | New ID scheme                    |
 | 2021-22 | =household_id=   | Continues wave 4 ID scheme       |
 
+* Sampling universe, exclusions and sub-samples
+
+# ASCII EXCEPTION (deliberate).  Every #+begin_quote block below is a VERBATIM
+# transcription of survey documentation.  The Basic Information Document and the
+# ESS3 survey report use typographic quotation marks around "other region"; they
+# are preserved as printed.  All prose OUTSIDE the quote blocks is ASCII.
+
+Evidence gathered for GH #601 / #603 (documentation sweep, 2026-07-21) and
+re-verified against the cited files before being written here.  This section
+records *what the ESS documentation claims the sample represents*.  Nothing
+here is inferred from the =.dta= files -- that separation is the whole point:
+what a survey claims and what its microdata look like are two different facts.
+
+This is the documentary counterpart to =* Sampling Design= above, which records
+the *mechanics* (PSU variable, strata construction, weight variables, household
+counts).  Read them together; where they disagree the disagreement is flagged
+explicitly in "Relation to =* Sampling Design=" at the end of this section.
+
+** Summary
+
+| Wave    | Survey | Declared universe (compressed -- see quotes below) | Statement lives in                          |
+|---------+--------+----------------------------------------------------+---------------------------------------------|
+| 2011-12 | ERSS / ESS1 | Rural + small-town areas only; 9 zones out of frame | repo (DDI, and the ESS3 BID retrospectively) |
+| 2013-14 | ESS2   | Rural + small town + all urban; 9 zones out of frame | repo (DDI, and the ESS3 BID)                |
+| 2015-16 | ESS3   | Rural + urban (small and large towns); 9 zones out of frame | repo (DDI =UNIVERSE= field + BID)   |
+| 2018-19 | ESS4   | All de jure households, institutional pop. excluded (NADA boilerplate) | *WB catalog only*         |
+| 2021-22 | ESPS-5 | Same boilerplate, *minus Tigray* (also excluded from the weights) | *WB catalog only*            |
+
+Two facts to carry into any pooling of these five waves:
+
+1. *ESS1 is not a national sample.*  It excludes urban areas above 10,000
+   people by design.  Waves 2 onward are national in the sense that all
+   households have positive selection probability -- but see (2).
+2. *No ESS wave has a truly national frame.*  Nine zones of Afar and Somali
+   region are outside the population frame in every wave of Panel I, and the
+   ESS4/ESPS-5 catalog records do not say the frame was changed.  ESPS-5
+   additionally drops Tigray from the represented population.
+
+** Wave by wave
+
+*** 2011-12 (ERSS / ESS1) -- rural and small towns only
+
+The wave's own DDI has no field labelled =UNIVERSE=; the closest statement is
+the opening of "Sampling Procedure", verbatim
+(=lsms_library/countries/Ethiopia/2011-12/Documentation/ddi-documentation-english_microdata-2053.pdf=,
+PDF p. 3, "Sampling" > "Sampling Procedure"):
+
+#+begin_quote
+The ERSS sample is designed to be representative of rural and small town areas of Ethiopia. The ERSS rural sample is a sub-sample of the AgSS while the small town sample comes from the universe of small town EAs. The ERSS sample size provides estimates at the national level for rural and small town households. At the regional level, it provides estimates for four regions including Amhara, Oromiya, SNNP, and Tigray.
+#+end_quote
+
+The explicit *frame* statement for wave 1 is not in the wave-1 documentation at
+all.  It is in the ESS3 Basic Information Document, which describes wave 1
+retrospectively -- quoted here as such, not merged into the above
+(=lsms_library/countries/Ethiopia/2015-16/Documentation/basic_information_document_wave__3_dec19.pdf=,
+section "3.1 Wave 1 coverage, Rural and small towns (ESS1)", printed p. 13):
+
+#+begin_quote
+In wave 1, the ESS1 sample was designed to be representative of rural and small town areas in Ethiopia.8 The ESS sample is drawn from a population frame that includes all areas of Ethiopia except for three zones of Afar and six zones of Somalie region.9 The frame for rural areas is the 2011/2012 Agricultural Sample Survey (AgSS), so the ESS rural sample is a complete subset of the AgSS sample. The small town and urban area samples come from the universe of small town and urban EAs, excluding the same three zones of Afar and six zones of Somalie. The wave 1 sample design provides representative estimates for all rural-area households and for the combination of rural-area and small-town households (excepting the 9 zones excluded from the frame).
+#+end_quote
+
+The WB catalog's GEOGRAPHIC COVERAGE field for catalog id 2053 reads, in full:
+"Rural and small towns".  The catalog record has *no* =universe= field.
+
+"Small town" is a defined term (BID footnote 8, printed p. 13):
+
+#+begin_quote
+The CSA defines small towns based on population estimates from the 2007 Population Census; a town with the population of less than 10,000 is a small town.
+#+end_quote
+
+**** Exclusions (2011-12)
+
+- *Geographic, by frame* -- nine zones, permanently.  BID footnote 9,
+  printed p. 13:
+
+  #+begin_quote
+  Zones excluded from the sampling frame include Zones 2, 4, and 5 in the Afar Region and Zones 3, 4, 5, 6, 7, and 8 in the Somali Region.
+  #+end_quote
+
+- *Geographic, by design* -- every town of 10,000 people or more.  ESS1 has no
+  large-town sample at all; the "national" estimates it supports are national
+  *for rural and small-town households*, which is not the same thing.
+
+- *Precision, not exclusion* -- the six small regions.  DDI, same page as the
+  quote above:
+
+  #+begin_quote
+  The sample is not representative for each of the small regions including Afar, Benshangul Gumuz, Dire Dawa, Gambella, Harari, and Somalie regions. However, estimates can be produced for a combination of all smaller regions as one "other region" category.
+  #+end_quote
+
+  These six regions are *in* the sample; what is missing is the precision to
+  report them separately.  Do not confuse this with the nine-zone frame
+  exclusion above, which is a genuine removal from the universe.
+
+*** 2013-14 (ESS2) -- urban supplement added
+
+The DDI for this wave has *no* =UNIVERSE= heading (verified by grep over the
+full text extraction), and neither does WB catalog id 2247 (the JSON
+=study_info.universe= field is null).  The closest statement is GEOGRAPHIC
+COVERAGE, verbatim
+(=lsms_library/countries/Ethiopia/2013-14/Documentation/ddi-documentation-english_microdata-2247.pdf=,
+PDF p. 5, "Coverage" > "GEOGRAPHIC COVERAGE"):
+
+#+begin_quote
+The Ethiopia Socioeconomic Survey 2013/2014 (ESS2) covered all regional states including the capital, Addis Ababa. The majority of the sample comprises rural areas as it was carried over from ESS1. The ESS2 was implemented in 433 enumeration areas (EAs) out of which 290 were rural, 43 were small town EAs from ESS1, and 100 were new EAs from major urban areas.
+#+end_quote
+
+The frame statement for the urban expansion is again in the ESS3 BID, section
+"3.2 Wave 2 and 3 coverage, Rural and all urban areas (ESS2 and ESS3)",
+printed p. 14:
+
+#+begin_quote
+The population frame for the urban expansion consists of all households in towns with population greater than 10,000 people. This population cut off of 10,000 people is the same threshold that is used to define small towns.12 In addition to the existing sample of rural and small towns, this expansion means now that all households in Ethiopia have some positive probability of selection into the expanded ESS2 sample.13
+#+end_quote
+
+Footnote 13 -- the exception attached to that "all households" claim -- is the
+nine zones again, and it is why the claim is not literally true (BID, printed
+p. 14):
+
+#+begin_quote
+There is an exception to this statement. The ESS and the AgSS surveys both exclude 9 zones from the population frame -- zones 2, 4, and 5 in the Afar Region and zones 3, 4, 5, 6, 7, and 8 in the Somali Region.
+#+end_quote
+
+**** Exclusions (2013-14)
+
+- Nine zones of Afar and Somali, as above (footnote 13, quoted verbatim).
+- The six small regions remain unreportable separately.  The wave's own DDI
+  carries the sentence locally (PDF p. 6, "Sampling Procedure") -- so this
+  exclusion does *not* depend on the catalog:
+
+  #+begin_quote
+  The sample is not representative for each of the small regions including Afar, Benshangul Gumuz, Dire Dawa, Gambella, Harari, and Somalie regions. However, estimates can be produced for a combination of all smaller regions as one "other region" category.
+  #+end_quote
+
+*** 2015-16 (ESS3) -- the only wave with a local =UNIVERSE= field
+
+Verbatim from
+=lsms_library/countries/Ethiopia/2015-16/Documentation/ddi-documentation-english_microdata-2783.pdf=,
+PDF p. 3, "Coverage" > "UNIVERSE":
+
+#+begin_quote
+ESS uses a nationally representative sample of over 5,000 households living in rural and urban areas. The urban areas include both small and large towns.
+#+end_quote
+
+GEOGRAPHIC COVERAGE, same page, immediately above:
+
+#+begin_quote
+National Coverage. ESS2 and ESS3 covered all regional states including the capital, Addis Ababa. The majority of the sample comprises rural areas as it was carried over from ESS1. The ESS2 and ESS3 were implemented in 433 enumeration areas (EAs) out of which 290 were rural, 43 were small town EAs from ESS1, and 100 were EAs from major urban areas.
+#+end_quote
+
+This is the *only* Ethiopia wave whose local documentation carries a field
+actually labelled =UNIVERSE=.  Its text is byte-identical to the WB catalog
+=study_info.universe= for id 2783, so local and catalog agree.  Note what the
+field does and does not do: it describes the *sample* ("uses a nationally
+representative sample of over 5,000 households"), not the set of units the
+sample stands for.  It is a representativeness claim wearing a universe label.
+
+**** Exclusions (2015-16)
+
+- Nine zones of Afar and Somali (BID footnotes 9 and 13, quoted above; the BID
+  ships in *this* wave's =Documentation/= and is the richest frame document in
+  the whole Ethiopia tree -- it covers ESS1, ESS2 and ESS3).
+- The six small regions, restated by the BID as a precision limit (printed
+  p. 13):
+
+  #+begin_quote
+  The sample size is insufficient to support region-specific estimates for each of the small regions including Afar, Benshangul Gumuz, Dire Dawa, Gambella, Harari, and Somalie regions. However, estimates can be produced for a combination of all smaller regions as one “other region” category.
+  #+end_quote
+
+  and by the survey report
+  (=lsms_library/countries/Ethiopia/2015-16/Documentation/9331_ethiopia_survey_report_web_final.pdf=;
+  the quote is reassembled across the report's hyphenated line breaks, wording
+  unaltered):
+
+  #+begin_quote
+  The results presented have been weighted to be nationally representative for rural areas, small towns, and large towns. For regional estimates, results are presented for five regions and the remaining six regions (Afar, Benshangul-Gumuz, Dire Dawa, Gambella, Harari and Somali regions) are grouped into an “other region” category.
+  #+end_quote
+
+*** 2018-19 (ESS4) -- catalog only, and the statement is template text
+
+*The universe statement for this wave exists in no file this repo ships.*  The
+local DDI (=ddi-documentation-english_microdata-3823.pdf=, 14 pp.) is a stub:
+it contains only the documentation/questionnaire listing and a variable index,
+with no Overview or Coverage section.  The ESS4 Basic Information Document,
+which the catalog and the local DDI both reference, is *not in the repo*.
+
+Verbatim from WB Microdata catalog entry 3823
+(https://microdata.worldbank.org/index.php/catalog/3823 , JSON field
+=study_desc.study_info.universe=):
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals, military barracks, and school dormitories.
+#+end_quote
+
+*BOILERPLATE WARNING.*  That sentence is World Bank NADA template text.  It
+appears verbatim in *15 waves* across this library -- the eight WAEMU/EHCVM
+countries, Nigeria 2015-16 / 2018-19 / 2023-24, and both Ethiopia Panel II
+waves.  It attests which metadata template the catalogue entry was filled from.
+It does *not* independently attest that the Ethiopian Statistical Service made
+that claim about this survey.  Do not treat it as a statistical office's
+declaration of the ESS4 universe.
+
+The substantive coverage statement in the same record
+(=series_statement.series_info=) is more informative and is Ethiopia-specific:
+
+#+begin_quote
+The 2018/19 ESS (ESS4) is a new panel. It is not a follow-up of the previous ESS waves. It is a baseline survey for the next ESS waves. It covers all nine regional states and two administrative cities, Addis Ababa and Dire Dawa. ESS4 is conducted in 565 EAs and of which 316 are rural and 219 are urban. The difference between ESS4 and previous ESS waves is that its coverage; ESS4 is representative at regional level in addition to rural and urban level.
+#+end_quote
+
+(=study_info.geog_coverage= reads, in full: "National / Regional / Urban and
+Rural".)
+
+**** Exclusions (2018-19)
+
+- *Population* -- prisons, hospitals, military barracks and school dormitories,
+  per the boilerplate universe sentence above.  This is the only ESS wave whose
+  documentation states an institutional-population exclusion at all; whether
+  Panel I excluded them too is *not recorded anywhere we could find* and must
+  not be assumed.
+- *Not a design exclusion* -- 30 EAs were dropped in the field.  The catalog's
+  =method.analysis_info.response_rate= is explicit that this is an
+  implementation shortfall:
+
+  #+begin_quote
+  ESS4 planned to interview 7,527 households from 565 enumeration areas (EAs) (Rural 316 EAs and Urban 249 EAs). A total of 6770 households from 535 EAs were interviewed for both the agriculture and household modules. The household module was not implemented in 30 EAs due to security reasons (See the Basic Information Document for additional information on survey implementation).
+  #+end_quote
+
+- *No statement found* on whether the nine Afar/Somali zones remain outside the
+  ESS4 frame.  The ESS4 frame is described as "the updated 2018 pre-census
+  cartographic database of enumeration areas", and neither the catalog record
+  nor any local file says whether the Panel I zone exclusion carried over.
+  Searched: the wave's =Documentation/= (SOURCE.org, LICENSE.org, the DDI stub,
+  all four questionnaire sidecars) and the full catalog JSON for id 3823.  The
+  ESS4 BID would answer it and is not in the repo.  *Recorded as a gap, not
+  resolved by inheritance from ESS1-ESS3.*
+
+*** 2021-22 (ESPS-5) -- catalog only, and Tigray is outside the represented population
+
+*This wave has no local documentation whatsoever* -- its =Documentation/=
+directory contains only =LICENSE=, =SOURCE= and =SOURCE.org=, no PDFs and no
+=.dvc= sidecars for any document.  The WB catalog is the sole source, which
+makes the record for this wave a moving target rather than something the
+library holds.  The ESPS-5 BID (referenced repeatedly by the catalog) is not in
+the repo and should be acquired.
+
+Verbatim from WB Microdata catalog entry 6161
+(https://microdata.worldbank.org/index.php/catalog/6161 ,
+=study_desc.study_info.universe=) -- *the same NADA boilerplate as ESS4; the
+warning above applies identically*:
+
+#+begin_quote
+The survey covered all de jure households excluding prisons, hospitals, military barracks, and school dormitories.
+#+end_quote
+
+=series_statement.series_info=, same record:
+
+#+begin_quote
+ESPS-5 covers all regions of the country except Tigray. Therefore, the survey is nationally representative and provides national and regional estimates for rural and urban areas except for Tigray.
+#+end_quote
+
+**** Exclusions (2021-22)
+
+- *Tigray -- and it is a universe exclusion, not non-response.*  It takes the
+  weighting statement to establish this.  =method.data_collection.weight=:
+
+  #+begin_quote
+  Accordingly, ESPS-5 cross-sectional weights were calculated to represent the 2021/22 Ethiopia population (excluding Tigray) at regional and rural/urban levels.
+  #+end_quote
+
+  The weights do not attempt to reweight Tigray back in.  Tigray is outside the
+  *represented* population of this wave.  Anyone pooling 2021-22 with earlier
+  waves, or differencing against 2018-19, is comparing two different
+  populations unless they drop Tigray from the other waves too.
+
+- *Sample carried forward minus Tigray* --
+  =method.data_collection.sampling_procedure=:
+
+  #+begin_quote
+  The ESPS-5 kept all the ESPS-4 samples except for those in the Tigray region and a few other places.
+  #+end_quote
+
+  Note "and a few other places" is not itemised anywhere in the catalog record.
+
+- *Afar, Amhara and Oromia -- fieldwork shortfall, NOT frame exclusion.*  The
+  catalog is careful about the distinction and so should we
+  (=method.analysis_info.response_rate=):
+
+  #+begin_quote
+  ESPS-5 planned to interview 7,527 households from 565 enumeration areas (EAs) (Rural 316 EAs and Urban 249 EAs). However, due to the security situation in northern Ethiopia and to a lesser extent in the western part of the country, only a total of 4999 households from 438 EAs were interviewed for both the agriculture and household modules. The security situation in northern parts of Ethiopia meant that, in Tigray, ESPS-5 did not cover any of the EAs and households previously sampled. In Afar, while 275 households in 44 EAs had been covered by both the ESPS-4 agriculture and household modules, in ESPS-5 only 252 households in 22 EAs were covered by both modules. During the fifth wave, security was also a problem in both the Amhara and Oromia regions, so there was a comparable reduction in the number of households and EAs covered there.
+  #+end_quote
+
+- *Population* -- the institutional exclusion, from the boilerplate sentence.
+
+** Sub-samples and oversamples INSIDE a wave
+
+Ethiopia's specialization is entirely internal to waves.  There is no
+special-population wave; there are three distinct structures living inside the
+ordinary ones, and a user who averages across them without noticing will get
+the wrong answer.
+
+*** 1. Every rural EA is 10/12 agricultural BY DESIGN (all five waves)
+
+The rural sample is not a simple draw of rural households.  It is drawn from
+the Agricultural Sample Survey's household sample, topped up with exactly two
+non-agricultural households.  ESS1 DDI (2053), PDF p. 3, verbatim:
+
+#+begin_quote
+The second stage of sampling was the selection of households to be interviewed in each EA. For rural EAs, a total of 12 households are sampled in each EA. Of these, 10 households were randomly selected from the sample of 30 AgSS households. The AgSS households are households which are involved in farming or livestock activities. Another 2 households were randomly selected from all other households in the rural EA (those not involved in agriculture or livestock). In some EAs, there is only one or no such households, in which case, less than two non-agricultural households were surveyed and more agricultural households were interviewed instead so that the total number of households per EA remains the same.
+#+end_quote
+
+The same 10 + 2 structure is still in force in ESPS-5, per catalog 6161
+=sampling_procedure=:
+
+#+begin_quote
+From the rural EAs, 10 agricultural households are selected as a subsample of the households selected for the AgSS, and 2 non-agricultural households are selected from the non-agriculture households list in that specific EA.
+#+end_quote
+
+So farm households are *structurally oversampled within every rural EA*, in
+every wave, and the fallback rule above means the agricultural share rises
+above 10/12 in sparse EAs.  Unweighted rural means are not rural-population
+means.  Small-town and urban EAs have no such stratification (12 per small-town
+EA, 15 per large-town EA, drawn without regard to economic activity).
+
+*** 2. ESS2/ESS3 carry a panel AND a fresh urban cross-section in one wave
+
+The 100 large-town EAs added in ESS2 are a new independent draw, not a
+follow-up.  ESS2 DDI (2247), PDF p. 6, "Sampling Procedure", verbatim:
+
+#+begin_quote
+ESS is designed to collect panel data in rural and urban areas on a range of household and community level characteristics linked to agricultural activities. The first wave was implemented in 2011-12 and the second wave is implemented in 2013-14. The first wave, ERSS, covered only rural and small town areas. The second wave, ESS, added samples from large town areas. The second wave is nationally representative. The existing panel data (2011/12-2013/14) is only for rural and small towns. Large towns were added during the second wave and, so far, there is only one round.
+#+end_quote
+
+Same page: "A total of 3,776 panel households and 1,486 new households (total
+5,262 households) were interviewed with a response rate of 96.2 percent."  So a
+single library wave =2013-14= mixes a rural/small-town *panel* cohort with an
+urban *refreshment* cohort that has no wave-1 antecedent.
+
+This is visible in the config, and is already documented elsewhere in this
+file: see "GH #323 ... individual_education (2013-14, 2015-16)", where
+=household_id= / =individual_id= are blank for exactly that urban refreshment
+sample (5,248 of 23,785 rows in =sect2_hh_w2.dta=).  The documentary statement
+above is the *reason* those ids are blank.  Cross-reference, do not duplicate.
+
+*** 3. ESS4 is a NEW panel -- Panel I and Panel II do not link
+
+Catalog 3823, =series_info=: "The 2018/19 ESS (ESS4) is a new panel. It is not
+a follow-up of the previous ESS waves. It is a baseline survey for the next ESS
+waves."  The same record names the two panels: "The ESS panel from ESS1, ESS2
+and ESS3 is referred as Panel I and the subsequent rounds as Panel II."
+
+Consequence for this library: 2011-12 / 2013-14 / 2015-16 form one panel and
+2018-19 / 2021-22 form another.  The five waves are *not* one five-round panel,
+whatever =panel_ids= manages to chain together within each half.
+
+** Universe vs. what the weights represent
+
+The documents keep these apart, and for Ethiopia they come apart in two places:
+
+| Wave    | Declared universe                        | What the weights are stated to represent                      |
+|---------+------------------------------------------+---------------------------------------------------------------|
+| 2013-14 | (no universe field in DDI or catalog)    | "the national-level population of rural, small and large town households" (DDI 2247, "Weighting", PDF p. 7) |
+| 2021-22 | "all de jure households excluding prisons, hospitals, military barracks, and school dormitories" | "the 2021/22 Ethiopia population (excluding Tigray)" (catalog 6161, =weight=) |
+
+The 2021-22 row is the sharp one: the universe sentence says "all de jure
+households" and the weighting sentence says "excluding Tigray".  Both are in
+the same catalog record.  Taking only the =universe= field would record this
+wave as covering a population it explicitly does not cover.
+
+** Where the statements live
+
+| Wave    | Local file in this repo?            | Field actually labelled "Universe"? |
+|---------+-------------------------------------+-------------------------------------|
+| 2011-12 | yes -- DDI 2053 (partial print, 16 pp.) | no (Sampling Procedure only)    |
+| 2013-14 | yes -- DDI 2247                     | no (Geographic Coverage only)       |
+| 2015-16 | yes -- DDI 2783 + BID + survey report | *yes*                             |
+| 2018-19 | *no* -- local DDI is a stub          | catalog only                       |
+| 2021-22 | *no* -- no documentation at all       | catalog only                       |
+
+Two documents would close most of the remaining gaps and are *not* in the repo:
+
+- ESS4 Basic Information Document ("Basic Information Document, Ethiopia
+  Socioeconomic Survey 2018-19 V2.pdf", catalog 3823, Related Materials).
+- ESPS-5 Basic Information Document (catalog 6161 refers to "Section 3 of the
+  Basic Information Document provided under the Related Materials tab").
+
+Worth acquiring: they are the only plausible source for (a) whether the
+nine-zone frame exclusion survives into Panel II, and (b) the ESPS-5
+longitudinal-weight construction.
+
+** Relation to =* Sampling Design= above
+
+Three points of contact.  None of them is silently reconciled here.
+
+1. *Extends.*  The =* Sampling Design > Overview= paragraph says the ESS covers
+   "rural and small-town areas in waves 1-3, expanding to include all urban
+   areas from wave 2 onward".  The two halves of that sentence pull against
+   each other, and the documentation supports only the second: the rural /
+   small-town-only restriction applies to *wave 1 alone*.  ESS3's own DDI says
+   "ESS2 and ESS3 covered all regional states including the capital, Addis
+   Ababa" (2783, PDF p. 3) and its =UNIVERSE= field says the urban areas
+   "include both small and large towns".  Suggested reading of that sentence:
+   "covering rural and small-town areas in wave 1, expanding to include all
+   urban areas from wave 2 onward".  Flagged, not edited.
+
+2. *Corroborates.*  The strata table's "2021-22 ... Tigray excluded (conflict)"
+   and the household-count table's "4959 | Tigray excluded due to conflict" are
+   both confirmed by the catalog -- and strengthened: Tigray is excluded from
+   the *represented population*, not merely from fieldwork (see the weighting
+   quote above).  The parenthetical "(conflict)" is right about the cause and
+   understates the consequence.
+
+3. *Tension, unresolved.*  =* Sampling Design > Sampling Weights= states "Each
+   wave provides a single weight variable; there is no separate panel weight",
+   and the =sample= table accordingly carries the same values in =weight= and
+   =panel_weight=.  The ESPS-5 catalog record says otherwise about the
+   *release*:
+
+   #+begin_quote
+   In order to cater to both kinds of analysis, separate cross-sectional and longitudinal weights were calculated and included in the ESPS-5 data.
+   #+end_quote
+
+   (catalog 6161, =method.data_collection.weight=).  These are not necessarily
+   in contradiction -- the CONTENTS claim is about the columns the config reads
+   from the cover file, the catalog claim is about what the ESPS-5 release
+   contains -- but if a longitudinal weight ships in the 2021-22 data and the
+   config is reading only =pw_w5=, then =panel_weight= for that wave is wrong.
+   *Someone should check which weight variables the ESPS-5 release actually
+   carries.*  Recorded as an open question; not resolved here, and deliberately
+   not settled by opening the =.dta=, which is a different exercise from
+   reading what the survey claims.
+
+** Verification note
+
+Quotes above were re-extracted from the cited PDFs and the cited catalog JSON
+on 2026-07-21 and matched character-for-character, with two declared repairs:
+the ESS3 survey-report quote is reassembled across the report's hyphenated line
+breaks, and all quotes have justified-text whitespace collapsed.  The BID's
+footnote 13 really does use a double hyphen ("frame -- zones 2, 4, and 5"), not
+a dash; it is reproduced as printed.  Two exclusion sentences that the original
+sweep attributed to the WB catalog (the 2013-14 "small regions" sentence) were
+found to exist *locally* in the wave's own DDI and are cited to the local file
+here instead.
+
 * plot_features (GH #167)
 
 ESS land characteristics, one row per FIELD, index =(t, i, plot_id)=.
@@ -453,6 +896,87 @@ string =**CONFIDENTIAL**= in every wave (=pp_s3q06_a/_b= in W2/W3,
 We therefore DEFER Latitude/Longitude -- they are NOT emitted.  Note
 the GPS-*measured field area* (square metres; =pp_s3q05_a= W1-W3,
 =s3q08= W4-W5) is NOT redacted and is the primary Area source.
+
+This applies to =plot_features= ONLY.  The HOUSEHOLD geovariables
+files are a different release and DO carry usable (offset) coordinates
+-- see the next section.  Do not conflate the two.
+
+** Household geovariables: four spellings across five waves (GH #323)
+
+=cluster_features= gets its Latitude/Longitude from the per-wave
+household geovariables file.  The coordinates are the WB's standard
+*modified* (randomly offset) decimal degrees -- real and usable at the
+EA/cluster grain, and NOT redacted like the plot GPS above.
+
+The catch: the WB renamed the coordinate columns in almost every wave,
+and W5 dropped the EA key entirely.  All four variants are live:
+
+| Wave    | Geovariables file                     | Lat / Lon columns          | Keys present            |
+|---------+---------------------------------------+----------------------------+-------------------------|
+| 2011-12 | =Pub_ETH_HouseholdGeovariables_Y1=    | =LAT_DD_MOD= / =LON_DD_MOD= (UPPERCASE!) | household_id, ea_id     |
+| 2013-14 | =Pub_ETH_HouseholdGeovars_Y2=         | =lat_dd_mod= / =lon_dd_mod= | household_id(2), ea_id(2) |
+| 2015-16 | =ETH_HouseholdGeovars_y3=             | =lat_dd_mod= / =lon_dd_mod= | household_id2, ea_id2   |
+| 2018-19 | =ETH_HouseholdGeovariables_Y4=        | =lat_mod= / =lon_mod= (no =_dd_=!) | household_id, ea_id     |
+| 2021-22 | =eth_householdgeovariables_y5=        | =lat_dd_mod= / =lon_dd_mod= | household_id ONLY -- *no ea_id* |
+
+Every one of these files is HOUSEHOLD-grain, not EA-grain.  So
+=cluster_features= merges the cover page to the geo file on the
+HOUSEHOLD id (1:1; unique and blank-free in both frames in all five
+waves) and lets =Wave.cluster_features='s GH #161 collapse reduce to
+the =(t, v)= EA grain.  This is why =i= is in each wave's
+=final_index=: that collapse only fires when =i= is an index level.
+
+*Correction (2026-07-21).*  This paragraph used to say the collapse
+takes =mean()= for Latitude/Longitude ("the cluster centroid") and
+=first()= for Region/District/Rural.  That is NO LONGER TRUE: the GPS
+=.mean()= was retired when core stopped aggregating anywhere -- see
+=_collapse_to_cluster_grain= in =country.py= and
+=SkunkWorks/grain_aggregation_policy.org=.  EVERY column is now
+=.first()=-ed, and the projection is audited before it destroys
+anything.
+
+And do NOT assume the flip is a no-op for Ethiopia.  It is one in W1
+and W4 -- 0 of 333 and 0 of 516 EAs carry more than one distinct
+household coordinate, i.e. the published fix really is the EA's,
+stamped on each household.  It is NOT one in the other three:
+
+| Wave    | EAs | EAs with >1 distinct household coordinate |
+|---------+-----+-------------------------------------------|
+| 2011-12 | 333 |                                         0 |
+| 2013-14 | 433 |                                        38 |
+| 2015-16 | 432 |                                        72 |
+| 2018-19 | 516 |                                         0 |
+| 2021-22 | 432 |                                        72 |
+
+and the disagreements are not jitter: W2 EA =010103010100106= holds
+three fixes spanning 0.19 deg of latitude and 0.60 deg of longitude, and
+W5 EA =020103010100203= spans 1.79 deg of longitude -- roughly 200 km.
+Points that far apart are not one enumeration area, so this is most
+likely a *cluster key that is not unique nationally* (the Malawi
+2013-14 pattern), not a GPS artifact.  Under =.first()= such an EA
+publishes one of its two real locations; under the old =.mean()= it
+published a point in between, which was worse but louder.  Either way
+the =(t, v)= key is the thing that is wrong.  The site-2 audit reports
+it on every cold build -- e.g. "Ethiopia/cluster_features/2015-16 ...
+DESTROYED 732 of 4,954 rows whose values DISAGREE (72 conflicting index
+tuples)" -- and it is UNFIXED.  See GH #323 site 2.
+
+Merging on the CLUSTER key =v= instead -- which is what the config used
+to do -- is a many-to-many join and produces a CARTESIAN PRODUCT
+(2013-14: 5,262 x 5,287 households over 433 EAs -> 65,508 rows, 60,221
+of them phantom; 2015-16: 57,786 rows, 52,832 phantom).  The downstream
+=groupby().first()= then tidied the evidence away, so the table
+reported clean.  Use =household_id2= for W2/W3, NOT =household_id=:
+the latter is the W1 baseline id and is BLANK for households new to the
+panel, so re-keying to it would trade an EA cartesian for a NULL-KEY
+cartesian.
+
+=merge_how: left= is declared in all five waves: the cover page is
+authoritative for which households exist, and the geo file carries
+households the cover does not (W2 25, W4 124, W5 35).  Under the
+default =outer= those orphans arrive with a null =v= and collapse into
+one phantom cluster -- W2 gained a spurious 434th EA
+(=030412088800105=) exactly this way.
 
 ** Area and the local-unit gap
 
@@ -600,3 +1124,100 @@ subjective-well-being / Cantril-ladder / life-satisfaction module. A variable-na
 scan of all 63-75 household section files per wave returned zero matches
 (ladder/well-being/satisfaction/step/life). Resolves the #331 "unknown" → absent.
 (Food-security IS present — see #332.) Tracked in #331.
+
+* GH #323 — verification against PR #627's core, and one further defect (2026-07-21)
+
+** cluster_features is CLEAR under #627 — verified, not assumed
+
+PR #627 (site 4) turns the GH #515 swallowed =KeyError= into a hard
+error when a dropped =dfs:= sub-frame costs a REQUIRED declared column,
+and adds an exact cartesian guard on the merge.  Its body lists
+Ethiopia as an unfixed blocker with three raising cells.  *That table
+is stale.*  The fix landed as commit =3488b791= (PR #628) and is an
+ancestor of =development=.  Measured end to end against #627's core
+(=development= merged with =fix/323-site4-dfs-merge=), cold, with an
+isolated data root:
+
+| Wave    | pre-#628 config                     | current config | phantom rows cleared |
+|---------+-------------------------------------+----------------+----------------------|
+| 2011-12 | RuntimeError (=lat_dd_mod= missing) | 3,969 rows     |                    0 |
+| 2013-14 | 65,508 rows, CARTESIAN              | 5,262 rows     |               60,221 |
+| 2015-16 | 57,786 rows, CARTESIAN              | 4,954 rows     |               52,832 |
+| 2018-19 | RuntimeError (=lat_dd_mod= missing) | 6,770 rows     |                    0 |
+| 2021-22 | RuntimeError (no =ea_id=)           | 4,959 rows     |                    0 |
+
+=Country('Ethiopia').cluster_features()= returns *2,168 rows on a
+unique (t, v)*, 2,146 with Latitude.  ALL 25 declared Ethiopia tables
+build: 0 raised, 0 cartesian cells, 0 dropped sub-dfs.  #627's own 16
+tests pass against this config.  *The same re-key that cleared the
+three raising cells also cleared both cartesian cells* -- which is why
+#627's census, taken before #628 landed, could not see it.
+
+** individual_education (2013-14, 2015-16) — the identifier was the W1 baseline
+
+Found while verifying the above; UNRELATED to #627, and unfixed until
+now.  Both waves indexed education on =household_id= / =individual_id=
+while =household_roster= and =shocks= for the SAME waves correctly used
+the wave-native =household_id2= / =individual_id2=.
+
+  - *W2*: =household_id= / =individual_id= are BLANK for the urban
+    REFRESHMENT sample, which has no W1 antecedent -- 5,248 of
+    =sect2_hh_w2.dta='s 23,785 rows.  All of them land on the single
+    tuple =('2013-14', '', '')=.  The framework audit said so exactly:
+    "DESTROYED 5,247 of 23,785 rows whose values DISAGREE (1
+    conflicting index tuples) ... Additionally 5,248 row(s) carry NaN
+    in a declared index level and are DELETED OUTRIGHT".
+  - *W3*: SPLIT-OFF households inherit their parent's baseline id (W3
+    households =010501020100105031= and =010501088800105031= -- the
+    =8888= marks the split-off -- both carry baseline
+    =01050100105031=), so 16 rows in 8 pairs collided and =first()=
+    MERGED TWO REAL, DISTINCT PEOPLE.  They disagree: baseline
+    individual =0105010010503101= is "10th Grade Complete" in one
+    household and "9th Grade Complete" in the other.
+
+It also made education UNJOINABLE to the roster: *0* of the built
+=(i, pid)= pairs matched a =household_roster= row in W2 and W3, against
+100% in W1, W4 and W5 (which use the wave-native ids and were always
+fine).  In W3, 1,231 of the 4,283 education "households" existed
+nowhere in the roster at all.
+
+Fixed by correcting the IDENTIFIER, per the standing #323 rule -- never
+by declaring a reducer.  After: both wave frames are unique
+(23,785/23,785 and 23,393/23,393), the two GrainCollapseWarnings are
+gone, the roster join is 100% in all five waves, and the country table
+goes 59,092 -> 63,181 rows under identical conditions.  Panel linkage
+is unaffected: =id_walk= plus the existing =panel_ids= chain still map
+=household_id2= back to the W1 baseline, exactly as =household_roster=
+already relies on.
+
+** Caveat: this table's country-level row count is ORDER-DEPENDENT
+
+Not caused by the fix above, and not fixed by it.  =id_walk= is applied
+only once =panel_ids= has resolved, and whether it has depends on cache
+state and on what else the process built first:
+
+  - =Country('Ethiopia').individual_education()= -> 63,139 rows
+  - the same call after touching =c.panel_ids= -> 62,939 rows
+
+The 200-row delta lands on 2011-12 / 2015-16 / 2018-19 / 2021-22 and
+reproduces identically in the pre-fix config.  The proximate cause is
+the lazy =self.updated_ids= probe in =_aggregate_wave_data=, whose
+=except (FileNotFoundError, KeyError, ValueError): pass= records a
+failed first attempt as "attempted" and then skips =id_walk= for the
+rest of the process.  Do NOT assert on this table's country-level row
+count; assert at the wave level, which is upstream of the collapse and
+deterministic.  See =.coder/ledger/323-ethiopia-config.md= §6.
+
+** Still open: the 2013-14 wave-level panel_ids: block
+
+=2013-14/_/data_info.yml= still declares =panel_ids:= against
+=sect_cover_ls_w2.dta= -- the LIVESTOCK-section cover, whose grain is
+the agricultural HOLDER (3,812 rows / 3,670 households) and which
+covers only 3,670 of the wave's 5,262 households.  =data_scheme.yml=
+declares =panel_ids= as =materialize: make=, so the country-level
+=_/panel_ids.py= (which reads the household-grain
+=sect_cover_hh_w2.dta=, 5,262 rows, unique) is authoritative and the
+block appears to be vestigial.  Left in place: "appears to be unused"
+is not evidence, and deleting config on that basis is exactly the move
+the repo forbids.  Someone should confirm it is dead and then remove
+it.

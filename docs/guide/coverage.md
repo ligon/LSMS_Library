@@ -93,6 +93,69 @@ the verdict `unsure` — silence is never evidence.
    can separate `not-asked` from `asked-not-distributed`, and those route to
    completely different queues.
 
+## Capability: adjudicate at acquisition, not by archaeology
+
+Probing an `absent` cell is expensive, and it is usually rediscovering something
+that was knowable the day the survey was acquired. South Africa's General
+Household Survey has no consumption module; once it lands,
+`South Africa / food_acquired / 2015` will grade `absent`, someone will file it
+as a gap, and a probe will eventually establish a fact the WB catalog told us
+up front.
+
+So `lsms_library/capability.py` records what a **series** measures at
+acquisition time:
+
+```python
+SeriesCapability(
+    country="South Africa", series="GHS",
+    provides=("household_roster", "housing", "individual_education", ...),
+    lacks=("food_acquired",),
+    validation=CATALOG_ONLY,
+    evidence="WB catalog id 2773: topics are 'employment', 'unemployment', "
+             "'LABOUR AND EMPLOYMENT', 'DEMOGRAPHY AND POPULATION' -- no "
+             "consumption/expenditure topic ...",
+)
+```
+
+`proposed_absent_verdicts(country, series, waves)` turns each `lacks` entry into
+`absent_verdicts.csv` rows — one per `(feature, wave)` — in the schema
+`load_verdicts()` already reads. The probe sweep then only has to adjudicate the
+cells we inherited *without* a capability record: a shrinking set, not a
+permanent tax.
+
+### A capability record may NOT close a cell on catalog metadata
+
+This is the whole discipline, and it is easy to get wrong. A capability asserted
+from a **cataloguer's topic list** is not C4. It is good evidence for *where to
+look*; it is not evidence that a question was never asked. Closing a cell on it
+would be the Albania mistake with better paperwork.
+
+So each record carries a **validation level**, and the verdict is *derived from
+it* — never chosen by the caller:
+
+| `validation` | established by | proposes | closes? |
+|---|---|---|---|
+| `catalog-only` | WB catalog topics / abstract | `unsure` | **no** |
+| `data-validated` | C1 label sweep over the shipped extract | `unsure` | **no** |
+| `questionnaire-validated` | **C4 — the questionnaire was read** | `not-asked` | **yes** |
+
+`data-validated` deliberately does not close either: a negative label sweep is
+exactly as consistent with `asked-not-distributed` as with `not-asked`. That is
+precisely why C4 exists.
+
+An `unsure` row is still worth writing — it turns "nobody has looked at this"
+into "we have a catalog-level expectation, unconfirmed", and it carries the
+evidence forward so the probe does not start cold. It simply cannot close
+anything.
+
+**Upgrading** a series from `catalog-only` to `questionnaire-validated` — one RA,
+one PDF — is what converts its `unsure` rows into permanent `not-asked`. That is
+a bounded human step **per series**, not per cell, and it is the only step that
+may close a cell.
+
+`capability.audit()` enforces the invariant; `tests/test_capability.py` proves a
+`catalog-only` record cannot close a cell through the real `load_verdicts()`.
+
 ## Blessing a cell
 
 `sane` and `blessed` answer different questions:

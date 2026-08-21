@@ -1,15 +1,53 @@
 Country: Guatemala
 Wave: 2000
 
+# GH #323 -- cluster identity.
+#
+# `v` is the ENCOVI 2000 primary sampling unit, built by guatemala.v() as the
+# composite depto-mupio-sector-segmento (1,065 clusters).  See the long comment
+# above guatemala.v() for why the survey's own `upm` column must NOT be used
+# (Stata stored it as float32; every value exceeds 2**24, so the digits
+# encoding `segmento` are rounded away and 201 upm values silently conflate
+# distinct PSUs).
+#
+# `v` was previously `region` -- only 8 values, and COARSER than the geography
+# that determines the declared `Rural` column: all 8 regions contain both urban
+# and rural households, so `Rural` was not a function of `v` at all.  The
+# framework's groupby(v).first() collapse therefore made an ARBITRARY pick,
+# putting 3,591 of 7,276 households (49.4%) in a cluster whose Rural flag
+# contradicted their own.
+#
+# The source file is CONSUMO5.DTA rather than ECV01H01.DTA because it is the
+# household-level file that carries the geographic hierarchy.  It is otherwise
+# identical on the columns used here -- same 7,276 `hogar`, and `factor`,
+# `region` and `area` match ECV01H01 exactly (max abs diff 0.0), so this
+# re-pointing changes no existing value; it only ADDS the geography.
+#
+# `sample.v` and `cluster_features.v` MUST stay in lockstep: _join_v_from_sample()
+# propagates sample's v into every household-level table.
 sample:
     file:
-        - ECV01H01.DTA
+        - CONSUMO5.DTA
     idxvars:
         i: hogar
     myvars:
-        v: region
+        v:
+            - depto
+            - mupio
+            - sector
+            - segmento
         weight: factor
         panel_weight: factor
+        # NOTE (GH #323): `strata: region` is very likely incomplete -- region
+        # alone is not the ENCOVI 2000 design stratum.  CONSUMO5.DTA carries an
+        # `estrato` column (6 levels, constant within every PSU) and crossing it
+        # with region shrinks within-cell design-weight dispersion from 0.73 to
+        # 0.40 of total variance.  But NO candidate (region, estrato, region x
+        # area, region x estrato) makes the weight constant within-stratum, so
+        # the true stratum could not be identified from the data alone.  Left as
+        # `region` and flagged rather than replaced with an unverifiable guess:
+        # `strata` is not part of the declared index and is not what caused the
+        # #323 collapse.  Resolving it needs the ENCOVI 2000 sample-design doc.
         strata: region
         Rural:
             - area
@@ -19,22 +57,32 @@ sample:
 
 cluster_features:
     file:
-        - ECV01H01.DTA
+        - CONSUMO5.DTA
+    # One row per cluster.  `i: hogar` is GONE from idxvars: it is not part of
+    # the declared (t, v) index, and it was the proximate reason the wave frame
+    # was household-level (7,276 rows) for a table that should carry one row per
+    # cluster.  The guatemala.cluster_features() df_edit hook dedups to exactly
+    # one row per v, after ENFORCING that every payload column really is
+    # constant within the cluster (it raises rather than picking arbitrarily).
     idxvars:
-        v: region
-        i: hogar
+        v:
+            - depto
+            - mupio
+            - sector
+            - segmento
     myvars:
+        # Now a genuine function of v: no cluster contains both urban and rural
+        # households, so this is exact rather than an arbitrary pick.
         Rural:
             - area
             - mapping:
                 urbana: Urban
                 rural: Rural
-        # `region` is the 8 Guatemalan geographic regions (string-labelled:
-        # central / metropolitana / norte / nororiente / noroccidente /
-        # suroriente / suroccidente / peten).  It is already the cluster index
-        # (v) but was never surfaced as a column, so market='Region' raised
-        # KeyError.  Expose it so demand estimation by region works (GH #530,
-        # same class as Azerbaijan).
+        # The 8 Guatemalan geographic regions (string-labelled: central /
+        # metropolitana / norte / nororiente / noroccidente / suroriente /
+        # suroccidente / peten).  Surfaced as a column so market='Region' works
+        # for demand estimation (GH #530, same class as Azerbaijan).  Every
+        # cluster lies in exactly one region, so this too is well-defined.
         Region: region
 
 household_roster:

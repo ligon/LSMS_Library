@@ -45,7 +45,19 @@ cluster_features:
             v: grappe
         myvars:
             Region: s0q01
-            Rural: s0q04
+            # EACI 2017 splits urban into two stratification categories --
+            # 'Urbain (District de Bamako)' and 'Autre urbain'.  Both are urban;
+            # collapse them, mirroring the `sample` block above.  (The plain
+            # 'Urbain' / 'Urbano' labels used by the other EHCVM waves are handled
+            # globally by the Rural spellings block in lsms_library/data_info.yml.)
+            # Without this, cluster_features.Rural shipped the raw French strata
+            # and `df[df.Rural == 'Urban']` returned zero rows.  GH #602.
+            Rural:
+                - s0q04
+                - mapping:
+                    Rural: Rural
+                    Urbain (District de Bamako): Urban
+                    Autre urbain: Urban
     df_geo:
         file: eaci_geovariables_2017.dta
         idxvars:

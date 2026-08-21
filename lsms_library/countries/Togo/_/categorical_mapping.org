@@ -127,9 +127,12 @@
 # harmonize_input — s16bq01 input-type label -> canonical input identity.
 # harmonize_seed_crop — EHCVM seed-type label -> the seed's crop.  The
 #   s16b roster has NO crop column; the crop is embedded in the seed-type
-#   label ('Semences de petit mil'), resolved here.  Catch-all seed slots
-#   ('Semences d'autres céréales', 'Autres semences', 'Plants/boutures de
-#   tubercules', the bare '20' slot) -> 'Autre crop'.
+#   label ('Semences de petit mil'), resolved here.  The residual seed slots
+#   each get their OWN label — 'Semences d'autres céréales' -> 'Autre
+#   céréale', 'Plants/boutures de tubercules' -> 'Autre tubercule',
+#   'Autres semences' (and the bare '20' slot) -> 'Autre crop' — because a
+#   shared catch-all makes the map non-injective and silently destroys rows
+#   on the plot_inputs index (GH #323; see the note above the table).
 
 #+NAME: harmonize_input
 | Original Label                            | Preferred Label     |
@@ -176,6 +179,44 @@
 | Autres semences                           | Seed                |
 | 20                                        | Seed                |
 
+# harmonize_seed_crop (GAP 2 plot_inputs).  EHCVM-only helper.  The EHCVM
+# s16b input roster has NO crop column — the crop is encoded in the seed-type
+# label ('Semences de petit mil').  This table resolves each EHCVM seed-type
+# label to the crop's harmonize_food `Preferred Label`, so seed rows carry the
+# SAME `crop` value a grown crop would.  Copied from the Niger EHCVM reference.
+#
+# harmonize_seed_crop MUST STAY INJECTIVE over the labels actually present
+# (GH #323).  `crop` is an INDEX level of plot_inputs (t, i, input, crop, u),
+# and harmonize_input maps every seed label onto the single `input` value
+# 'Seed' — so any two DISTINCT reported seed items sharing a Preferred Label
+# collide on one index tuple, whereupon the framework's groupby().first()
+# silently DISCARDS one of them.  Until 2026-07-13 four labels shared one
+# 'Autre crop' catch-all bucket; THREE of them actually occur in Togo's s16b
+# ("Plants/boutures de tubercules" 780 rows, "Autres semences" 591,
+# "Semences d'autres céréales" 370), they co-occur within a household 162
+# times, and 165 reported line-items were destroyed.  e.g. grappe 101 /
+# menage 9 reported "Plants/boutures de tubercules" 16 Charrette (market-
+# purchased) AND "Autres semences" 3 Charrette (own-production); one of the
+# two vanished.  The three are now split — which is also what the source
+# MEANS: one is specifically "other cereals", one is specifically tuber
+# cuttings (planting material, not grain seed at all).  The bare code '20' (an
+# unlabelled category that leaked through) keeps 'Autre crop'; it has 0 rows
+# today, as does the correctly-spelled "Semences de sésame" whose only
+# occurring variant is the source's typo "Semences de césame" (103 rows) — the
+# two ARE the same crop, so pooling them is correct, not lossy.
+#
+# NB the colliding rows often differ in `Purchased` (as above), which invites
+# the wrong fix: adding `Purchased` to the index.  Do NOT.  `Purchased` is a
+# measured ATTRIBUTE of a line-item, not part of its identity — it would not
+# separate two distinct seeds that were both purchased, and it would corrupt
+# the declared grain.  The identifier (`crop`) was lossy; the identifier is
+# what gets fixed.
+#
+# This comment is NOT the enforcement: prose does not enforce.  The guard is
+# the uniqueness assertion on the declared index at the end of
+# 2018/_/plot_inputs.py, which fails the build loudly if any future label (or
+# a re-widened bucket) re-introduces a collision.
+
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
 |-------------------------------+---------------------|
@@ -187,8 +228,8 @@
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
+| Semences d'autres céréales    | Autre céréale       |
+| Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
 
@@ -376,7 +417,7 @@
 #+name: harmonize_education
 | Original Label  | Preferred Label              |
 |-----------------+------------------------------|
-| Aucun           | None                         |
+| Aucun           | No education                 |
 | Maternelle      | Pre-primary                  |
 | Postsecondaire  | Tertiary certificate/diploma |
 | Primaire        | Primary complete             |

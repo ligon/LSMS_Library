@@ -9,6 +9,32 @@ Data Scheme:
     strata: str
     Rural: str
   cluster_features:
+    # GRAIN (GH #323).  The declared grain is the cluster, (t, v) -- 670
+    # grappes in 2018-19 -- but `df_main` in 2018-19/_/data_info.yml reads
+    # Region/Rural from the HOUSEHOLD-level cover page s00_me_ben2018.dta
+    # while declaring only `v: grappe`.  Each grappe's attributes were
+    # therefore broadcast across its households, handing the framework 8,012
+    # rows carrying 7,342 duplicate (t, v) tuples for it to reduce.
+    #
+    # The reduction was value-lossless (measured cold under LSMS_NO_CACHE=1:
+    # 0 of 670 grappes carry more than one distinct s00q01/Region or
+    # s00q04/Rural; grappe_gps_ben2018.dta is already grappe-level at
+    # 670/670), so the framework's #323 audit was correctly silent and no
+    # number here has ever been wrong.  But that is a property of the 2018-19
+    # data, not of the extraction -- a grappe that ever straddled two regions
+    # would have been resolved by groupby().first(), which skips NA per
+    # COLUMN and so returns a composite cluster assembled from different
+    # households.
+    #
+    # Fixed at the source rather than at the collapse: the
+    # `cluster_features(df)` hook in 2018-19/_/mapping.py projects to cluster
+    # grain in the EXTRACTION and RAISES if any cluster straddles two values,
+    # so the 670 rows are right by construction instead of by luck.  8,012 ->
+    # 670 rows reach the framework; the API result is byte-identical.
+    #
+    # No `aggregation:` key: per the #323 consolidation (D1, 2026-07-13) the
+    # core never aggregates, the key is not read by anything, and declaring
+    # one would be prose masquerading as enforcement.
     index: (t, v)
     Region: str
     Rural: str
@@ -63,6 +89,30 @@ Data Scheme:
     # `visit` (vague) is dropped: in EHCVM 2018-19 it's a sample split
     # (each grappe surveyed in exactly one vague), not a repeated measure,
     # so households are uniquely keyed by (t, v, i, j, u, s) without it.
+    #
+    # GRAIN (GH #323).  1,382 rows collide on the declared index, and the
+    # collision is CORRECT here -- unlike plot_inputs below, nothing is being
+    # destroyed.  The raw source has no duplicates (s07b_me_ben2018.dta:
+    # 187,672 rows, all unique on (grappe, menage, s07bq01)); the collisions
+    # are created downstream by harmonize_food, which is deliberately
+    # many-to-one (160 Original Labels -> 146 Preferred Labels; 14 buckets
+    # take 2 originals each).  Seven of those 14 merely pool an alternate
+    # spelling or a mis-encoded variant of the SAME item ('Maïs' with
+    # 'MaÃ¯s en grain'); the five that actually collide in the data are the
+    # taxonomy's own residual categories -- 'Autres légumes en feuilles'
+    # (1,830 rows), 'Autres poissons fumés' (712), 'Riz importé non parfumé'
+    # (120), 'Autre Riz local' (66), 'Autres poissons frais' (36).
+    #
+    # Two distinct items landing in one residual bucket is a genuine, intended
+    # aggregation, and core already handles it correctly: food_acquired is in
+    # `_ADDITIVE_MEASURE_COLUMNS`, so the measures are SUMMED rather than
+    # first()-ed, which is why the #323 audit is silent about this cell.
+    # Colliding rows necessarily share `u` AND `s` (both are IN the index), so
+    # the sums are commensurable BY CONSTRUCTION.  Verified cold under
+    # LSMS_NO_CACHE=1: wave-frame and API totals agree exactly -- Quantity
+    # 576,293.81, Expenditure 87,287,926.96 -- over a 190,618 -> 189,236 row
+    # reduction.  Nothing to fix; recorded so the next reader does not
+    # mistake a lossless sum for a silent drop.
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
@@ -80,11 +130,20 @@ Data Scheme:
     Floor: str
 
   interview_date:
+    # An `aggregation: {visit: first}` block used to sit here.  Removed
+    # 2026-07-21 (GH #323): NOTHING READS IT.  `aggregation` appears in core
+    # only inside "skip these meta-keys" sets, a test pins that the collapse
+    # does not honour it, and per the #323 consolidation (D1, 2026-07-13) the
+    # core never aggregates -- so the key was prose wearing the costume of
+    # enforcement.  It was also nonsense on its own terms: `visit` is an INDEX
+    # LEVEL here, not a measure, and "reduce the index level with first" names
+    # no operation.  Benin's interview_date has no duplicate-index problem
+    # to reduce (24,035 rows, zero grain reports on a cold build), so deleting
+    # it changes no returned value.
     index: (t, i, visit)
     Interview start: datetime
     Interview end: datetime
-    aggregation:
-      visit: first
+
   shocks:
     index: (t, i, Shock)
     AffectedIncome: bool
@@ -179,6 +238,23 @@ Data Scheme:
     # the framework's canonical NaN-key de-dup collapse).  `u` is in the index
     # and a missing unit is filled with 'Manquant' for the same non-null
     # reason.
+    #
+    # GRAIN (GH #323, fixed 2026-07-13).  71 rows -- 11,445.2 units of
+    # reported input quantity, and 4 households' Purchased flag flipped
+    # True->False -- used to be DESTROYED here, and unlike food_acquired above
+    # the loss was real.  `crop` is an index level and harmonize_input maps
+    # every seed label onto the single input 'Seed', so `crop` was the only
+    # level left to tell two seed line-items apart; harmonize_seed_crop was
+    # NON-INJECTIVE (four labels shared one 'Autre crop' catch-all, three of
+    # which occur in Benin's s16b), so a household reporting BOTH 'Autres
+    # semences' (9 kg) and 'Plants/boutures de tubercules' (6 kg) landed both
+    # on (Seed, Autre crop, Kilogramme) and one was dropped.  Tuber cuttings
+    # and cereal seed are not the same thing and summing them would be as
+    # wrong as dropping one: THE IDENTIFIER WAS BROKEN.  The catch-all is now
+    # split (see the note above harmonize_seed_crop in _/categorical_mapping.org)
+    # and 2018-19/_/plot_inputs.py ASSERTS the declared index is unique before
+    # writing, so a re-widened bucket fails the build instead of shipping
+    # short.  API rows 10,534 -> 10,605 = every reported line-item.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool

@@ -29,11 +29,18 @@ strata (codes 1-10) both use this list.
 
 * POV_GH
 
+# `loc2` is the standard GLSS 2-way locality split, identical in meaning to
+# GLSS4's `loc2` (1=Urban, 2=Rural).  It was previously labelled 1=Semi-urban,
+# which is wrong: loc2 nests exactly onto the finer GLSS classifications --
+#   loc2=1  ==  loc3 in {1,2}  ==  loc5 in {1,2}  ==  Accra (459) + Other Urban (1119) = 1578
+#   loc2=2  ==  loc3 == 3      ==  loc5 in {3,4,5} == Rural Coastal/Forest/Savannah = 2945
+# so code 1 is the union of the two URBAN strata, not a semi-urban category.
+# GH #602.
 #+name: rural
-| Code | Label      |
-|------+------------|
-|    1 | Semi-urban |
-|    2 | Rural      |
+| Code | Label  |
+|------+--------|
+|    1 | Urban  |
+|    2 | Rural  |
 
 
 * SEC8H

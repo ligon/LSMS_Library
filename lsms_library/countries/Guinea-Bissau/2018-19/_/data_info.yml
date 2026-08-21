@@ -48,14 +48,51 @@ cluster_features:
             Region: s00q01
             Rural:
                 - s00q04
+                # Guinea-Bissau is LUSOPHONE: the raw s00q04 labels are
+                # 'Rural' / 'Urbano'.  The French 'Urbain' keys here were
+                # copied from a francophone EHCVM sibling and never matched
+                # anything, so 'Urbano' leaked through UNMAPPED -- 169 of the
+                # 450 clusters carried the off-schema value 'Urbano' where
+                # lsms_library/data_info.yml declares the canonical domain to
+                # be {Rural, Urban}.  (The `sample` block above already maps
+                # Urbano correctly; only this block was missed.)  The French
+                # keys are kept as harmless no-ops.
                 - mapping:
                     Rural: Rural
                     rural: Rural
                     RURAL: Rural
+                    Urbano: Urban
+                    urbano: Urban
+                    URBANO: Urban
                     Urbain: Urban
                     urbain: Urban
                     URBAIN: Urban
     df_geo:
+        # GH #323 site 4 / GH #627 -- CARTESIAN, CURED BEFORE THE MERGE.
+        #
+        # `grappe_gps_gnb2018.dta` ships 450 rows for 445 grappes: five
+        # grappes appear TWICE as VERBATIM duplicate records (identical lat,
+        # lon, accuracy, altitude and GPS timestamp).  df_main is the
+        # household cover page at ~12 rows per grappe, so merging on `v` when
+        # `v` repeats on BOTH sides paired 11-12 household rows with 2 GPS
+        # rows for each of those five: 5,351 -> 5,410 rows, 59 phantom.
+        #
+        # Guinea-Bissau is NOT the Malawi/Mali shape.  There is no household
+        # id to re-key on (the GPS file is genuinely at grappe grain and
+        # carries only `grappe` + `vague`), and no single-file cure (the
+        # cover page has no GPS columns at all -- checked).  So this cell
+        # takes the OTHER remedy #627's guard names: reduce the sub-frame to
+        # the merge-key grain BEFORE the merge.  The `df_geo` hook in
+        # ../_/mapping.py does it with drop_duplicates() over every column,
+        # which removes only rows identical to one already present -- so two
+        # GPS fixes that actually DISAGREE would both survive and re-trip the
+        # guard rather than being silently reduced to one.  READ THAT
+        # DOCSTRING: the hook is dispatched by matching this sub-frame's key
+        # name, which is not obvious from either file alone.
+        #
+        # Not fixed here: 5 of the 450 grappes on the cover page have no GPS
+        # record at all, so they carry NaN coordinates.  Absent data, not
+        # manufactured data.
         file: grappe_gps_gnb2018.dta
         idxvars:
             v: grappe
