@@ -543,3 +543,168 @@ ten files above went to the *latter*.  =local_tools= already probes both
 (see the =_ensure_dvc_pulled= candidate lists), and a cold read round-trip was
 verified for one of the new blobs.  Probing only the legacy path makes a
 correctly-pushed blob look missing.
+
+* household_roster: what the three rosters are, and four ways to get them wrong (2026-08-20)
+
+=household_roster= is now wired for all three waves, index =(t, i, pid)= with
+=v= joined from =sample()= at API time.  Sources: =2009-10/Data/S1D.dta=;
+=2013-14/Data/01b2_roster.dta= and =2017-18/Data/01b2_roster.dta=, each merged
+=left= with its wave's =01d_background.dta= for =MonthsAway=.  Delivered
+counts are exactly the documented ones -- 18,889 / 16,356 / 19,006 persons in
+5,009 / 4,774 / 5,669 households.
+
+** 1. Wave 1: =s1d_2= is the RELATIONSHIP and =s1d_4i= is the AGE
+
+Read off the =.dta='s own variable labels: =s1d_1= "Q1 Sex", =s1d_2= "Q2
+Relationship to HH Head", =s1d_4i= "Q4i Age (years)".  A task brief circulated
+in 2026-08 had =s1d_2= as age and =s1d_4i= as relationship; that is *wrong*,
+and both the labels and the value distributions settle it (=s1d_2= takes
+'Household Head'/'Child'/'Spouse'..., =s1d_4i= is numeric 0-120).  The
+=FINDINGS_ghanasps_module_inventory.org= F2 entry has it right.
+
+Note also the source typo =sid_3i= (not =s1d_3i=) for "Q3i Day of birth".
+
+** 2. Wave 1 has NO usable MonthsAway, and the reason is not what it looks like
+
+=s1d_27= "Q27 For how many months has person been away from this household in
+last 12 months" is the right variable and is the same question waves 2 and 3
+ask.  It is nonetheless *not wired*, because its missingness is
+household-level rather than person-level:
+
+- non-null for 9,956 of 18,889 members (52.7%);
+- *2,188 of 5,009 households have NO member answered* and 2,537 have every
+  member answered; only 284 are partial.  48 whole EAs sit at 0%;
+- inside those 2,188 households the non-null rate of =s1d_27= is exactly
+  0.000000 and of =s1d_28= exactly 0.000000, while every other roster variable
+  is populated at the *same* rate as elsewhere (Sex 100%, Relationship 100%,
+  Age 99.96%, religion 97.6%, Q23 98.5%).  The households were fully
+  enumerated; only the Q27-Q33 absence block is missing;
+- the answer rate is flat across age (51-57% in every band, infants included),
+  so it is not an eligibility skip.
+
+So NaN here does *not* mean "this person had left", which is the premise
+=roster_to_characteristics()= relies on when it drops NaN-residence members.
+Nor does NaN mean "never away": the survey records 0 *explicitly* for 8,840 of
+the 9,956 answered members, so filling 0 would fabricate data.
+
+Measured cost of wiring it anyway: the derived =household_characteristics=
+would keep 9,942 of 18,889 persons and *2,817 of 5,009 households* -- 2,192
+households (43.8%) would silently vanish from a table whose
+=household_roster= is fully populated.  Leaving it undeclared instead trips the
+documented per-wave fallback in =roster_to_characteristics= ("a wave with no
+usable residence datum at all reverts to counting every roster member"), which
+emits a =UserWarning= naming =2009-10=.  That warning is expected and is the
+honest outcome: every roster member counted, mean household size 3.771.
+
+Note the delivered =household_characteristics= nonetheless has *5,008* wave-1
+households, not 5,009.  That is a separate, unrelated step: after the
+residence filter, =roster_to_characteristics= does
+=dropna(subset=['sex','age'])=, and 5 wave-1 members have a null =s1d_4i=.
+Four of them sit in households of size 2-4 that survive on their remaining
+members; the fifth, =hhno= 107254027, is a *one-person* household whose only
+member (a female head) has no age, so the household disappears.  Waves 2 and
+3 lose 12 and 8 households respectively (4,774 -> 4,762, 5,669 -> 5,661); there
+the residence filter and the null-Sex/Age drop both contribute and this note
+does not decompose them.
+
+Waves 2 and 3 have a *clean* =awaylast12= (16,353/16,354 and 18,980/19,006
+non-null, strictly 0-12), so they are filtered normally.
+
+*** The one out-of-range value
+
+=s1d_27= takes the value *15* on exactly one row -- =hhno= 105144071,
+=hhmid= 2, a 48-year-old female spouse -- in a 12-month reference period.  No
+negatives, no other value above 12.  Its meaning could not be determined from
+any document in the corpus.  It is moot while the column is undeclared; anyone
+who wires =s1d_27= later must decide explicitly (leaving it NA is the
+documented default) rather than clip silently.  Note that
+=roster_to_characteristics= would *not* yield "-3 months present" for it: the
+conversion is =np.clip(12 - value, 0, None)=, so a 15 becomes 0 months present
+and the person is dropped -- quietly, which is the worse failure.
+
+** 3. The relationship vocabulary DRIFTS between waves
+
+Same underlying categories, three different spellings, so =kinship.yml= needed
+five new keys (added 2026-08-20) or Generation/Distance/Affinity would have
+come back null:
+
+| category            | 2009-10                  | 2013-14                       | 2017-18                   |
+|---------------------+--------------------------+-------------------------------+---------------------------|
+| head                | Household Head           | Household Head                | *Head*                    |
+| adopted/foster/step | Adopted/Foster/Stepchild | Adopted, foster, or stepchild | Adopted, foster/stepchild |
+| parent-in-law       | Parent/Parent-in-Law     | *Parent or parent-in-law*     | Parent/Parent-in-law      |
+| child-in-law        | Son/Daughter-in-law      | *Son or daughter in-law*      | Son/Daughter-in-law       |
+
+A check on one wave therefore does not transfer.  Post-fix,
+Generation/Distance/Affinity are 0.000% null in waves 1 and 3 and 0.043% null
+in wave 2 -- and those 7 rows are exactly the 7 rows where the source
+=relationship= is itself null, not a decode failure.
+
+** 4. =Distance= is CONSTANT 0 for this country, and that is real
+
+=is_this_feature_sane= flags =no_constant_columns= on =Distance=.  It is not a
+bug: GSPS's relationship list has no collateral category at all -- no
+sibling, no cousin, no niece/nephew, no uncle/aunt.  Everything is lineal
+(head/spouse/child/grandchild/parent) or a catch-all ('Other relative',
+'Non-relative', 'Househelp'), and =kinship.yml= maps 'Other relative' to
+=[0, 0, consanguineal]=.  Do not "fix" it by re-mapping 'Other relative' to a
+collateral distance the survey never asserted.
+
+** Sourcing: =01b2_roster.dta= is complete; newroster/preroster are EVENT tables
+
+The temptation is to union =01b2_newroster.dta= / =01b2_preroster.dta= into the
+roster on the theory that the roster omits split-offs and joiners.  It does
+not:
+
+- wave 3's roster carries its own =new_mem= flag -- 14,168 'No' + 4,838 'Yes'
+  = 19,006 -- i.e. continuing members and joiners are *already unioned*;
+- =01b2_newroster.dta= (4,839 rows) is the JOINER event table
+  (=joinedwhy_*=, =joinedhowlong=, =joinedfromwhere=);
+- =01b2_preroster.dta= is the LEAVER event table (=stillmember=,
+  =whynotmember=, =notmember_died=, =howlongnotmember=).  Wave 3's 4,070
+  =stillmember == 'No'= rows have a NULL =hhmid= and are absent from the
+  roster, correctly: they left.  Wave 2's =currentmember == 'Yes'= rows number
+  *exactly 16,356*, the wave-2 roster row count -- which is the check that the
+  roster is the complete current-member set.
+
+Merging the event tables in would add people who left, which the survey's own
+6-month membership rule excludes.
+
+*Residual, recorded rather than hidden*: in wave 3, 53 of the 4,839 newroster
+keys have no roster counterpart and 56 roster rows flagged =new_mem='Yes'= are
+absent from newroster.  The counts nearly balance, so this looks like =hhmid=
+renumbering for a handful of joiners rather than missing people (0.28% of
+persons either way).  Not reconciled; do not union the frames without first
+establishing the correct key.
+
+*Measurement trap*: =preroster.hhmid= is =float64= (it carries NaNs) while
+=roster.hhmid= is =int8=.  Comparing them via =astype(str)= gives '1.0' vs '1'
+and reports a spurious *zero* overlap between files that in fact overlap
+almost completely.  Normalise through =pd.to_numeric= before any key
+comparison here.
+
+** The merge is 1:1 in both waves -- verified per wave, not in aggregate
+
+=MonthsAway= lives in =01d_background.dta=, a different file from the roster,
+so waves 2 and 3 use a =dfs:= merge on =(i, pid)= (GH #323 site 4 territory).
+=(FPrimary, hhmid)= is unique in *both* frames in *both* waves, so the count of
+key values duplicated in both -- the exact cartesian test -- is 0:
+
+| wave    | roster keys | background keys | intersection | roster-only | background-only |
+|---------+-------------+-----------------+--------------+-------------+-----------------|
+| 2013-14 |      16,356 |          16,354 |       16,354 |           2 |               0 |
+| 2017-18 |      19,006 |          19,006 |       19,006 |           0 |               0 |
+
+=merge_how: left= with the roster authoritative.  In 2013-14 that is also
+output-identical to the =outer= default (background contributes no rows of its
+own), but that is a fact about this extract, not a guarantee -- which is why
+wave 3 is checked separately rather than by analogy.
+
+** Wave 1's roster and its sample key agree exactly
+
+Unlike the food module -- where =S11A.dta= and =key_hhld_info.dta= disagree by
+29 and 35 =hhno= respectively (see "A source discrepancy the sample join
+exposes" above) -- =S1D.dta= and =key_hhld_info.dta= carry *identical*
+household sets in both directions.  The =v= join is therefore total for
+=household_roster=: 0 null =v= across all 54,251 rows in all three waves, 334
+distinct EAs.

@@ -43,3 +43,33 @@ def strata(value):
     '''loc7 -- the survey's 7-way locality stratification.  Kept as a code:
     no label table for it ships with the data.'''
     return tools.format_id(value)
+
+
+def household_roster(df):
+    '''Table-level ``df_edit`` hook: read a blank Q27 as "not away".
+
+    ``s1d_27`` ("months away in the last 12") is populated for only 52.7% of
+    members, and the blanks are a RECORDING CONVENTION rather than a person
+    attribute -- see the long note in this wave's ``data_info.yml``.  The
+    short version: Q27-Q33 is a skip block (of the 8,933 members missing
+    s1d_27, just 9 have any of Q28-Q33), and per-EA answer rates are bimodal,
+    with the share of recorded values that are NON-ZERO falling monotonically
+    from 95.9% in the EAs that recorded almost nobody to ~6% in the EAs that
+    recorded everybody.  Teams that wrote down few people wrote down the AWAY
+    ones; teams that wrote down everybody recorded the zeros too.
+
+    Without this fill, ``roster_to_characteristics()`` drops every NaN member
+    and 2,192 of 5,009 wave-1 households (43.8%) vanish from the derived
+    ``household_characteristics``.
+
+    The single out-of-range value (15 months in a 12-month window, hhno
+    105144071/hhmid 2) is clipped to 12 rather than guessed at.  Left alone it
+    would yield clip(12 - 15, 0, None) = 0 months present and drop the person
+    silently.
+    '''
+    if 'MonthsAway' not in df.columns:
+        return df
+    months = pd.to_numeric(df['MonthsAway'], errors='coerce')
+    df = df.copy()
+    df['MonthsAway'] = months.fillna(0).clip(upper=12)
+    return df

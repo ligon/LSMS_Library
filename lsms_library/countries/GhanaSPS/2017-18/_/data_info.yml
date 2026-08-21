@@ -16,3 +16,74 @@ sample:
     myvars:
         v: FPrimary
         strata: region
+
+household_roster:
+    # TWO-SOURCE table, same shape as 2013-14: roster + background for
+    # MonthsAway.
+    #
+    #   01b2_roster.dta    19,006 rows, 5,669 households
+    #   01d_background.dta 19,006 rows -- MonthsAway (awaylast12)
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave SEPARATELY -- a
+    # rule verified on 2013-14 does not transfer, which is the whole point of
+    # re-checking.  (FPrimary, hhmid) is unique in BOTH frames: 19,006 distinct
+    # keys in 19,006 rows on each side, 0 key values duplicated in both, and
+    # the intersection is all 19,006.  The merge is exactly 1:1 with no
+    # roster-only and no background-only rows.
+    #
+    # `merge_how: left`, roster authoritative -- see the 2013-14 note.
+    #
+    # SOURCING NOTE -- neither 01b2_newroster.dta nor 01b2_preroster.dta is
+    # merged in, and 01b2_roster.dta is NOT silently incomplete.  Checked:
+    #   - the roster carries its own `new_mem` flag: 14,168 'No' + 4,838 'Yes'
+    #     = 19,006, i.e. continuing members plus joiners, ALREADY UNIONED;
+    #   - 01b2_newroster.dta (4,839 rows, 2,449 households) is the JOINER
+    #     event table -- `joinedwhy_*`, `joinedhowlong`, `joinedfromwhere`.
+    #     4,782 of its keys match a roster row flagged new_mem='Yes';
+    #   - 01b2_preroster.dta (18,242 rows) is the LEAVER event table --
+    #     `stillmember`, `whynotmember`, `notmember_died`, `howlongnotmember`.
+    #     Its 4,070 `stillmember == 'No'` rows have a NULL hhmid and are
+    #     absent from the roster, which is correct: they left.  Its 13,098
+    #     `stillmember == 'Yes'` rows are in the roster on all but 55 keys.
+    # So the roster IS the current-member table and the other two are event
+    # tables about transitions.  Merging them in would add leavers, which the
+    # survey's own 6-month membership rule excludes.
+    #
+    # RESIDUAL, recorded rather than hidden: 53 of the 4,839 newroster keys
+    # have no roster counterpart, and 56 roster rows flagged new_mem='Yes' are
+    # absent from newroster.  The two counts nearly balance, so this looks like
+    # hhmid renumbering for a handful of joiners rather than missing people
+    # (0.28% of persons either way).  NOT reconciled here; do not "fix" it by
+    # unioning the frames without first establishing the correct key.
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    dfs:
+        - df_roster
+        - df_background
+    df_roster:
+        file: 01b2_roster.dta
+        idxvars:
+            i: FPrimary
+            pid: hhmid
+        myvars:
+            # 'relationship' spells the head 'Head' in this wave and
+            # 'Household Head' in waves 1-2; both are in kinship.yml.
+            Sex: gender
+            Age: ageyears
+            Relationship: relationship
+    df_background:
+        file: 01d_background.dta
+        idxvars:
+            i: FPrimary
+            pid: hhmid
+        myvars:
+            # 18,980 of 19,006 non-null, values 0-12, no out-of-range value.
+            MonthsAway: awaylast12
+    merge_on:
+        - i
+        - pid
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - pid
