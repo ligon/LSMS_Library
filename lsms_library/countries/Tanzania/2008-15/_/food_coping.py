@@ -72,6 +72,19 @@ long = long.dropna(subset=['Days', 't'])
 
 out = long[['t', 'i', 'Strategy', 'Days']].set_index(['t', 'i', 'Strategy'])
 
+# GH #637 key-soundness review -- the key is SOUND; the collapse de-replicates.
+#
+# Same UPHI line replication as housing.py / sample.py: upd4_hh_h.dta is keyed
+# on the panel-tracking LINE, so 23,122 source rows carry only 13,275
+# household-rounds and 6,814 of those arrive 2..10 times.  After the melt that
+# is 184,938 rows over 106,179 (t, i, Strategy) cells, 54,495 of them duplicated.
+#
+# The lines are copies, not different households: over the whole file, ZERO of
+# the 6,814 duplicate (round, r_hhid) groups differ on ANY hh_* column -- not
+# just the eight hh_02_* items this feature reads.  So no Days value is chosen
+# over another; identical rows are discarded.  Per-round duplicate-group counts
+# (R2 2,698 / R3 3,628 / R4 488) match housing.py's exactly, which is the same
+# replication seen through a second module.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 

@@ -56,7 +56,13 @@ shocks.insert(1, 't', '2019-20')
 
 shocks = shocks.set_index(['t', 'i', 'Shock'])
 
-# Handle duplicates by keeping first occurrence
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# i is sdd_hhid, the wave's household id -- the SAME namespace as this wave's
+# sample()/household_roster (502 of 502 distinct i overlap).  Contrast
+# 2008-15/_/shocks.py, which keyed on the panel LINE (UPHI) and overlapped the
+# household namespace by ZERO until GH #637.
+# HH_SEC_R.dta after the hh_r01=='YES' filter is (sdd_hhid, shock_id)-unique:
+# 864 rows, 864 groups, 0 duplicates.  .first() is never called.
 if not shocks.index.is_unique:
     shocks = shocks.groupby(level=shocks.index.names).first()
 

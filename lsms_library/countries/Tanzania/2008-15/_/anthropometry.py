@@ -66,6 +66,12 @@ anthro = anthro.dropna(subset=['t', 'pid'])
 
 out = anthro[['t', 'i', 'pid', 'Weight', 'Height', 'MUAC']].set_index(['t', 'i', 'pid'])
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# upd4_hh_v.dta is INDIVIDUAL-level, keyed (round, r_hhid, UPI): 83,706 rows,
+# 83,706 groups, 0 duplicates, 0 null UPI, and the pid formatting is injective
+# (45,396 distinct UPI -> 45,396 distinct pid).  Unlike the household-level
+# upd4 modules (housing, food_coping) it carries no UPHI, so the panel-line
+# replication does not reach it.  .first() is never called on a cold build.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 
