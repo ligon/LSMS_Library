@@ -66,7 +66,7 @@ individual_education:
             # the harmonize_education table on one myvar, so map to canonical here
             # (same targets the table gives the other GhanaLSS waves' text labels).
             - mapping:
-                1: None
+                1: No education
                 2: Pre-primary
                 3: Primary complete
                 4: Lower secondary complete

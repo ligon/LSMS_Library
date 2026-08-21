@@ -100,7 +100,7 @@ individual_education:
                 -4: ~          # sentinel for missing — null out
                 -3: ~          # sentinel for missing — null out
                 -1: ~          # sentinel for missing — null out
-                0: "None"
+                0: "No education"
                 1: "Primary incomplete"          # Sub A (Grade 1)
                 2: "Primary incomplete"          # Sub B (Grade 2)
                 3: "Primary incomplete"          # Standard 1 (Grade 3)

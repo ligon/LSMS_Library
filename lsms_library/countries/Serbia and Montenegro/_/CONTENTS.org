@@ -1,0 +1,360 @@
+#+title: Contents
+
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 for GH #601.  Both waves are documented by a
+*single* report that is shipped in *both* wave directories:
+
+- =2002/Documentation/LSMS_Project_2002_2003_text.pdf=
+- =2003/Documentation/LSMS_Project_2002_2003_text.pdf=
+
+These are the same file (identical DVC sidecar md5 =4aa224781967e012b8f6a76c7ad4cbc6=),
+and the report speaks for both years at once ("both surveys of general
+population in 2002 and 2003").  So the 2002 and 2003 universe statements below
+are *one joint statement*, not a 2002 statement copied forward.
+
+Bibliographic note: the shipped edition is /LSMS Project 2002-2003: Life in
+Serbia through the Survey Data/ (SMMRI / Strategic Marketing, Belgrade, 2007),
+the English edition, itself a translation of a Serbian original that is *not* in
+this repository.  All quotations below are verbatim from the English edition as
+shipped.  Printed page numbers equal PDF page numbers in this file.
+
+Transcription note: the PDF is justified, so text extraction yields hyphenated
+line breaks and runs of multiple spaces (=permanently  resident  population=,
+=Popu-\nlation=).  Hyphenated words have been rejoined and runs of spaces
+collapsed to one.  No word, punctuation mark or spelling has been altered; the
+same passage appears verbatim in the World Bank catalog's
+=method.data_collection.sampling_procedure=, which confirms the rejoining.
+
+*Not boilerplate.*  This universe statement is a statistical-agency /
+survey-firm methodology text, not the World Bank NADA template sentence that
+recurs verbatim across ~15 waves elsewhere in the corpus.  It attests a claim
+about *these* surveys.
+
+** Summary
+
+| Wave | Sample                        | Declared universe                                              | Confidence | Statement lives in           |
+|------+-------------------------------+----------------------------------------------------------------+------------+------------------------------|
+| 2002 | General population LSMS       | All permanent residents of Serbia, without Kosovo and Metohija | high       | repo PDF (+ WB catalog)      |
+| 2002 | Family Income Support (MOP)   | All current MOP recipients on the territory of Serbia          | high       | repo PDF (+ WB catalog)      |
+| 2003 | General population LSMS       | Same frame as 2002; realised as a *panel* subsample of 2002    | high       | repo PDF (+ WB catalog)      |
+| 2003 | Roma settlement survey        | Roma in settlements >=7% Roma per the 2002 Census, NOT all Roma | high       | repo PDF (+ WB catalog)      |
+
+** 2002 -- declared universe
+
+WB catalog 80, IDNO =SCG_2002_LSMS_v01_M=, "Living Standards Measurement Survey
+2002 (General Population, Wave 1 Panel) and Family Income Support Survey 2002".
+
+*General-population LSMS.*  Chapter "METHODOLOGY", section 1.3 "Basic
+Methodological Assumptions", subsection "Sample frame", p. 26:
+
+#+begin_quote
+Sample frame: Sample frame for both surveys of general population in 2002 and
+2003 consisted of all permanent residents of Serbia, without the population of
+Kosovo and Metohija, according to definition of permanently resident population
+contained in UN Recommendations for Population Censuses, which were applied in
+2002 Census of Population in the Republic of Serbia. Therefore, permanent
+residents were all persons living in the territory Serbia longer than one year,
+with the exception of diplomatic and consular staff.
+#+end_quote
+
+Section 1.1 "Objectives", p. 24:
+
+#+begin_quote
+LSMS represents multi-topical study of household living standard and is based on
+international experience in designing and conducting this type of research. The
+basic survey was carried out in 2002 on a representative sample of households in
+Serbia (without Kosovo and Metohija).
+#+end_quote
+
+Section 3.1 "Location and Time", "Survey location", p. 32:
+
+#+begin_quote
+The surveys were conducted on the whole territory of Serbia (without Kosovo and
+Metohija).
+#+end_quote
+
+(This last sentence is *also* the World Bank catalog's "Geographic coverage"
+field for catalog 80 and 81, verbatim -- but note it is held locally in this
+repo as well, so the record does not depend on the catalog.)
+
+*Family Income Support (MOP) survey* -- a separate frame, same page 26:
+
+#+begin_quote
+The sample frame for the survey of Family Income Support recipients included all
+current recipients of this program on the territory of Serbia based on the
+official list of recipients given by Ministry of Social Affairs.
+#+end_quote
+
+** 2002 -- exclusions
+
+- *Geographic*: "without the population of Kosovo and Metohija" (p. 26); "a
+  representative sample of households in Serbia (without Kosovo and Metohija)"
+  (p. 24); "the whole territory of Serbia (without Kosovo and Metohija)" (p. 32).
+- *Population*: "with the exception of diplomatic and consular staff" (p. 26).
+- *Duration-of-residence*: the frame is permanent residents only -- "all persons
+  living in the territory Serbia longer than one year" (p. 26).  Persons resident
+  under one year are outside the declared universe.
+- *Montenegro*: see "Country name vs. declared coverage" below.  No document
+  states an exclusion; it is an inference and is recorded as an observation, not
+  as a quotation.
+
+No statement was found excluding institutional / collective households, the
+homeless, or any region for security reasons.  Recorded as *not found*, not as
+absent -- see "What was searched".
+
+** 2002 -- sub-samples and oversamples
+
+*The 2002 wave directory holds TWO surveys with TWO different universes.*
+Anyone pooling this country must not average across them.
+
+| Files in =2002/Data/= | Survey                        | Universe                                     | Achieved   |
+|-----------------------+-------------------------------+----------------------------------------------+------------|
+| =2002 N *.dta=        | General-population LSMS       | Permanent residents of Serbia minus Kosovo   | 6,386 hh   |
+| =mop_*.dta=           | Family Income Support (MOP)   | Current MOP recipients per the Ministry list | 456 hh     |
+
+Section 1.1 "Objectives", p. 24, on why the MOP survey exists:
+
+#+begin_quote
+Along with these two comprehensive surveys, conducted on national and regional
+representative samples which were to give a picture of the general population,
+there were also two surveys with particular emphasis on vulnerable groups. In
+2002, it was the survey of living standard of Family Income Support recipients
+with an aim to validate this state supported program of social welfare.
+#+end_quote
+
+The MOP sample is *not* an oversample within the general-population frame: it is
+a separate frame drawn from an administrative list -- "the cases chosen randomly
+from the official list of recipients provided by Ministry of Social Affairs"
+(p. 30, section 2 "Designing the Sample for the Survey", subsection
+"Stratification").
+
+** 2003 -- declared universe
+
+WB catalog 81, IDNO =SCG_2003_LSMS_v01_M=, "Living Standards Measurement Survey
+2003 (General Population, Wave 2 Panel) and Roma Settlement Survey 2003".
+
+*General-population LSMS.*  The frame statement is the joint one quoted above
+under 2002 ("both surveys of general population in 2002 and 2003", p. 26).  The
+2003 sample is a panel of 2002 -- section 1.1 "Objectives", p. 24:
+
+#+begin_quote
+The survey was repeated in 2003 on a panel sample32.
+#+end_quote
+
+footnote 32, p. 24:
+
+#+begin_quote
+The households which participated in 2002 survey were interviewed
+#+end_quote
+
+*Roma settlement survey* -- a separate, explicitly imperfect frame, p. 26:
+
+#+begin_quote
+The definition of the Roma population from Roma settlements was faced with
+obstacles since precise data on the total number of Roma population in Serbia
+are not available. According to the last population Census from 2002 there were
+108,000 Roma citizens, but the data from the Census are thought to significantly
+underestimate the total number of the Roma population. However, since no other
+more precise data were available, this number was taken as the basis for
+estimate on Roma population from Roma settlements. According to the 2002 Census,
+settlements with at least 7% of the total population who declared itself as
+belonging to Roma nationality were selected. A total of 83% or 90,000
+self-declared Roma lived in the settlements that were defined in this way and
+this number was taken as the sample frame for Roma from Roma settlements.
+#+end_quote
+
+This is one of the corpus's clearest cases of documentation *qualifying* its own
+universe rather than asserting one cleanly: the frame is admitted to rest on a
+count "thought to significantly underestimate" the population it is meant to
+frame.
+
+** 2003 -- exclusions
+
+- *Geographic*: as 2002 -- "without the population of Kosovo and Metohija"
+  (p. 26); "the whole territory of Serbia (without Kosovo and Metohija)" (p. 32).
+- *Population*: as 2002 -- "with the exception of diplomatic and consular staff"
+  (p. 26).
+- *Roma sample, sub-population excluded by design.*  Section 1.1 "Objectives",
+  p. 25:
+
+  #+begin_quote
+  However, it is necessary to stress that the LSMS of the Roma population
+  comprised potentially most imperilled Roma, while the Roma integrated in the
+  main population were not included in this study.
+  #+end_quote
+
+  (British spelling "imperilled" is as printed.)  The Roma survey's universe is
+  therefore *not* "Roma in Serbia": it is Roma living in settlements that were at
+  least 7% Roma at the 2002 Census -- an estimated 83% of self-declared Roma.
+  Roma living outside such settlements are out of frame by construction.
+- *Montenegro*: see below.
+
+** 2003 -- sub-samples and oversamples
+
+*Again TWO surveys in one wave directory, with two universes.*
+
+| Files in =2003/Data/= | Survey                          | Universe                                        | Achieved   |
+|-----------------------+---------------------------------+-------------------------------------------------+------------|
+| =2003 N *.dta=        | General-population LSMS (panel) | 2002 frame, realised as a panel subsample       | 2,548 hh   |
+| =roma_*.dta=          | Roma settlement survey          | Roma in settlements >=7% Roma (2002 Census)     | 525 hh     |
+
+Panel construction, section 1.3, subsection "Planned sample", p. 26:
+
+#+begin_quote
+In 2003 the planned panel sample size was 3.000 households. In order to preserve
+the representative quality of the sample, we kept every other census block unit
+of the large sample realized in 2002. This way we kept the identical allocation
+by strata. In selected census block unit, the same households were interviewed
+as in the basic survey in 2002.
+#+end_quote
+
+So the 2003 general-population wave is *not* an independent draw from the 2003
+population: it is a half-of-the-PSUs panel follow-up of the 2002 sample, with a
+non-response correction applied (see below).
+
+** Country name vs. declared coverage: Montenegro
+
+The country directory is named =Serbia and Montenegro= -- the state union in
+existence at the time -- but *every* universe statement in the documentation
+covers *Serbia only*, minus Kosovo and Metohija:
+
+- "all permanent residents of Serbia" (p. 26)
+- "a representative sample of households in Serbia" (p. 24)
+- "the whole territory of Serbia" (p. 32)
+
+Montenegro is nowhere claimed as covered.  The single occurrence of the phrase
+"Serbia and Montenegro" in the methodology chapter is incidental and is *not* a
+coverage claim -- p. 24, on why the Roma survey was undertaken:
+
+#+begin_quote
+Since all present experiences indicated that this was one of the most vulnerable
+groups on the territory of Serbia and Montenegro, but with no ample research of
+poverty of Roma population made [...]
+#+end_quote
+
+*Neither the local documentation nor the World Bank catalog contains any
+statement that Montenegro was excluded.*  The exclusion is what the affirmative
+statements imply, not something a document says.  Recorded here as an
+observation, deliberately not dressed up as a quotation.
+
+** Universe vs. what the weights represent
+
+The report describes estimation separately from the frame, p. 32 ("System of
+estimation"):
+
+#+begin_quote
+The proposed sample plan was very complex from the aspect of estimation.
+Weighting had to be performed for each phase of selection. Special estimates
+were made for each stratum, and the total estimate was obtained by adding up the
+estimates on the level of strata.
+#+end_quote
+
+and, for 2003, p. 32:
+
+#+begin_quote
+In the repeated survey carried out in 2003 a correction was performed for
+non-response. The correction was performed by gender, age and number of
+household members.
+#+end_quote
+
+Consequences a user should know before weighting anything:
+
+- The general-population weights inflate to *Serbia minus Kosovo and Metohija*,
+  not to the state union the directory is named for.
+- The MOP (2002) and Roma (2003) samples are drawn from *different frames*.  They
+  carry no claim to represent the general population and must not be pooled with
+  it under general-population weights.
+- 2003 carries two weight columns and 2002 one.  Per =2003/_/data_info.yml=,
+  =weight: ponder= and =panel_weight: ponderl=; per =2002/_/data_info.yml=,
+  =weight: pobder= only.  This is consistent with the library convention that
+  =panel_weight= is longitudinal (see CLAUDE.md, "sample() and Cluster
+  Identity"), and with 2003 being a panel follow-up.
+
+** What the library wave currently reads
+
+Config-level observation (read from the YAML, *not* inferred from the =.dta=
+contents): the wave configs =2002/_/data_info.yml= and =2003/_/data_info.yml=
+declare sources only among the general-population files -- =2002 1
+demography.dta= / =2002 incomeconsumption.dta= and the 2003 equivalents.  No
+=mop_*.dta= or =roma_*.dta= file is referenced by any declared table.
+
+So the =.dta= files for both sub-population surveys are present in =Data/= and
+tracked by DVC, but the library's =2002= and =2003= waves currently surface the
+*general-population* sample only.  That is a coverage fact, not a defect claim;
+it is recorded so a reader does not assume the wave pools the sub-samples.  Any
+future work that wires in =mop_*= or =roma_*= must handle the distinct universes
+documented above.
+
+** Design detail (context; NOT the universe)
+
+Recorded so it is not mistaken for a universe statement.
+
+- Two-stage stratified design.  PSU = enumeration districts (census block units)
+  selected PPS to number of households; SSU = households.
+- Six territorial strata, p. 30 ("Stratification"): "Vojvodina, Belgrade,
+  Western Serbia, Central Serbia (Šumadija and Pomoravlje), Eastern Serbia and
+  South-east Serbia", each
+  further stratified into urban and rural enumeration districts.  (The caron in
+  "Šumadija" is as printed; the rest of this file is ASCII.)  Urban/rural is a
+  *stratification* dimension, not an exclusion -- both are in scope.
+- 2002: 6,500 planned; 7,491 contacted; 6,386 households interviewed in 621
+  census rounds; response rate 85.2%, or 91.1% excluding those not at home
+  (p. 31).
+- 2003: 3,000 planned; 3,119 selected; 2,548 realised; response rate 81.7%, or
+  91.5% excluding those not at home (p. 31).
+- MOP 2002 and Roma 2003: 500 households planned each; 456 and 525 achieved.
+- Roma sample design, p. 30 ("Stratification"): two-stage stratified, PSU =
+  "settlements where Roma population was represented in the percentage over 7%",
+  SSU = Roma households,
+  three territorial strata "Vojvodina, Beograd and Central Serbia".
+
+** Where the statement lives, and what was searched
+
+*Held in this repository.*  Both waves' statements come from a PDF tracked in
+the repo's own =Documentation/= directory -- this country is *not* one of the
+41 waves whose only universe evidence is World Bank catalog metadata.  The
+catalog corroborates but is not the sole source.
+
+The World Bank DDI records for catalog 80 and 81 have *no* field labelled
+=universe= (grep for "universe" in the exported JSON returns zero hits).  The
+sample-frame paragraph reproduced above appears verbatim (modulo whitespace) in
+=method.data_collection.sampling_procedure= for both, and the "whole territory of
+Serbia (without Kosovo and Metohija)" sentence is the =geog_coverage= field.
+
+Searched for 2002 -- =2002/Documentation/=: =SOURCE.org= (-> DOI
+=10.48529/kb2h-4476=), =LICENSE.org=, =LSMS_Project_2002_2003_text.pdf=,
+=LSMS_Project_2002_2003_annex.pdf=, =Poverty_Results_SerbianLSMS(PHHS).pdf=,
+=Serbhhq02e.pdf=.  All PDFs fetched via =data_access.get_data_file()=, text
+extracted with pdfminer, then grepped for "universe", "target population",
+"sample frame", "permanent resident", "covers all", "Kosovo", "representative".
+The annex PDF is tables only (no methodology text, zero hits).
+=Poverty_Results_SerbianLSMS(PHHS).pdf= is a poverty-measurement note (zero
+hits).  =Serbhhq02e.pdf= is the household questionnaire; "Kosovo and Metohija"
+appears there only as a region-code entry on the cover page, with no universe
+statement.  The WB catalog API (=metadata/export/80/json=) was also queried.
+
+Searched for 2003 -- =2003/Documentation/=: =SOURCE.org= (-> DOI
+=10.48529/h5ve-n970=), =LICENSE.org=, =LSMS_Project_2002_2003_text.pdf=,
+=serb03hhqe.pdf=.  Same extraction and grep terms.  =serb03hhqe.pdf= is the 2003
+household questionnaire; again "Kosovo and Metohija" only as a cover-page region
+code.  The WB catalog API (=metadata/export/81/json=) was also queried.
+
+*Gaps, recorded as gaps:*
+
+- No statement was found, in any searched document, about institutional or
+  collective households, military barracks, the homeless, or any security-driven
+  carve-out.  This is "not found after the search described above", *not* "the
+  survey covered them" and *not* "the survey excluded them".
+- No statement was found, in any searched document, addressing Montenegro's
+  coverage either way.
+- The Serbian-language original of the methodology report is not in this
+  repository, so the English quotations above cannot be checked against the
+  source language here.
+
+Compare: the separate =Serbia= country (2007, catalog 2291) *does* state the
+institutional/homeless exclusion explicitly ("The sampling frame also excludes
+the population living in group quarters, institutions and temporary housing
+units, as well as the homeless population").  That the 2002-2003 documentation
+does not say so is a silence in this documentation, and must not be filled in
+from the 2007 wave of a different country entry.

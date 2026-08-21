@@ -6,6 +6,318 @@ Liberia 2018-19 is the **National Household Forest Survey (NHFS) 2018-2019**
 survey. Confirmed from the WB DDI (catalog 3787) and the household
 questionnaire (`liberia_hh_forestry_qx_final.pdf`).
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 for GH #601.  This section records *what the
+survey documentation claims* about the population it represents.  Nothing here
+is inferred from the microdata; no =.dta= file was opened.  It extends (and
+does not contradict) the "Survey identity" section above.
+
+** Liberia 2018-19 (National Household Forest Survey, NHFS)
+
+*** The declared universe -- NOT national
+
+The NHFS universe is deliberately restricted to *forest-proximate* enumeration
+areas.  This is the single most consequential fact about the country: Liberia
+2018-19 must not be pooled with the national household surveys of other
+countries as though it represented the Liberian population.
+
+Verbatim, WB catalog 3787 study description, Coverage > Universe (identical to
+the DDI XML =<universe>= element,
+https://microdata.worldbank.org/index.php/metadata/export/3787/ddi):
+
+#+begin_quote
+All EAs within 2.5 kilometers of forests except for the EAs from the urban part
+of the Montserrado county.
+#+end_quote
+
+Verbatim, same page, Coverage > Geographic Coverage (DDI =<geogCover>=):
+
+#+begin_quote
+The NHFS is focused on forest proximate households. Therefore, the sample is
+limited to enumeration areas which fall within 2.5km of the nearest forest, as
+defined using Metria and Geoville (2019) land cover data. The final sample
+includes enumeration areas from all 15 of Liberia's counties, but excludes
+urban areas of Montserrado.
+#+end_quote
+
+The *definition of "forest"* is itself part of the universe definition -- the
+eligibility rule is geometric, not administrative.  Verbatim, Basic
+Information Document (=liberia__nhfs_basicinformationdocument_v1.pdf=, World
+Bank, 2020-08), s2.3 DEFINITION OF FOREST, p. 9:
+
+#+begin_quote
+Given the focus of the NHFS on the population living in close proximity to
+forests4, a first step was to clearly define forest for the purposes of the
+survey. Building on the national definition of forest used in Liberia, and
+modifying it in order to minimize the impact of small urban forests and
+facilitate survey operations, the NHFS employed the following definition:
+
+Forest = area with at least 30 percent tree canopy cover, with trees higher
+than 5 meters and at least 50 hectares in size5
+
+The forest cover was determined using high-resolution forest cover data
+produced in 2019 based on satellite information on forest cover in Liberia for
+2015.6 All EAs within 2.5 kilometers of forests identified with this
+definition were deemed eligible for inclusion in the NHFS.7 EAs from the
+Montserrado county (part of Greater Monrovia) were excluded from the sample
+universe due to the high rate of urbanization. However, rural parts of
+Montserrado county were included in the sample universe.
+#+end_quote
+
+Footnote 5 to that definition, verbatim (BID p. 9), adds a further eligibility
+restriction:
+
+#+begin_quote
+In addition, any forest patch with a perimeter to area ratio more than 0.02 was
+excluded. This restriction was imposed to focus on non-fragmented and
+relatively large forest areas capable of providing both consumptive and
+non-consumptive goods and services.
+#+end_quote
+
+Footnote 7, verbatim (BID p. 9), fixes how the 2.5 km is measured:
+
+#+begin_quote
+Distance from enumeration area to the nearest forest is computed from the
+centroid of the enumeration area.
+#+end_quote
+
+For scale of the covered population -- this is the survey team's own framing,
+quoted verbatim from the Policy Note abstract reproduced in the in-repo DDI
+export (=Documentation/ddi-documentation-english_microdata-3787.pdf=, p. 10),
+*not* a universe statement:
+
+#+begin_quote
+In 2019, 47.5 percent of the Liberian households (HHs) lived in proximity to
+and were significantly dependent on the country's forests.
+#+end_quote
+
+*** Exclusions
+
+Two exclusions are by design, and both are load-bearing.
+
+| Kind                | What is excluded                                    | Stated reason                   |
+|---------------------+-----------------------------------------------------+---------------------------------|
+| Geographic (urban)  | Urban part of Montserrado county (Greater Monrovia) | "high rate of urbanization"     |
+| Geographic (design) | Every EA more than 2.5 km from a qualifying forest  | survey's forest-proximate focus |
+
+Rural Montserrado is *in*; only the urban part is out.  Verbatim, BID s2.3,
+p. 9:
+
+#+begin_quote
+EAs from the Montserrado county (part of Greater Monrovia) were excluded from
+the sample universe due to the high rate of urbanization. However, rural parts
+of Montserrado county were included in the sample universe.
+#+end_quote
+
+Verbatim, catalog Geographic Coverage:
+
+#+begin_quote
+The final sample includes enumeration areas from all 15 of Liberia's counties,
+but excludes urban areas of Montserrado.
+#+end_quote
+
+Note the trap in that sentence: "all 15 of Liberia's counties" is about which
+counties are *represented*, not about coverage *within* them.  Within every
+county, only EAs within 2.5 km of a qualifying forest are in the universe.
+
+Verbatim, BID p. 13 (map note; the sentence has a broken cross-reference in the
+original, reproduced here as printed):
+
+#+begin_quote
+Finally, the map provided in illustrates the degree of forest cover in each of
+the three clusters. The NHFS sample is weighted to reflect the population in
+all areas of the map except for the areas in white, which represent areas more
+than 2.5km from an EA center.
+#+end_quote
+
+No population-type exclusion (institutional, collective, nomadic, homeless) is
+stated anywhere in the catalog metadata or the BID.  *No statement found* --
+recorded as a gap, not as an absence: searched the WB catalog 3787 study
+description (all Coverage / Methodology fields), the DDI XML export (all of
+=<universe>=, =<geogCover>=, =<sampProc>=, =<weight>=), the full text of the
+BID, the in-repo DDI export PDF, and the full text of both questionnaires
+(=liberia_hh_forestry_qx_final.pdf=, =liberia_comm_forestry_qx_final.pdf=).
+
+*** Sub-samples, strata and oversamples
+
+There is *no* booster, ethnic, or programme sub-sample, and no panel/refresh
+split -- Liberia has a single wave.  But the wave does carry two structures a
+pooling analyst must know about.
+
+**** 1. The distance-to-forest stratification was ABANDONED after fieldwork
+
+The sample was *drawn* under a purposeful (non-proportional) allocation across
+three distance-to-forest strata, then that stratification was discarded because
+the stratifying variable was computed wrongly.  Verbatim, BID s2.6
+POST-FIELDWORK ADJUSTMENT, p. 11:
+
+#+begin_quote
+Upon post-data collection analysis, it was discovered that the initial variable
+that was used to stratify EAs by distance to forest was incorrectly computed.
+Despite thorough attempts to understand the nature and source of the error, it
+was determined that a mechanical error must have occurred during the process of
+the distance calculations. This error rendered the stratification incorrect.
+Therefore, the stratification by distance to forest has been abandoned and the
+sample weighted to reflect only geographic clusters, not distance to forest.
+This was determined to be the most appropriate way forward following
+consultation with sampling experts.
+#+end_quote
+
+The design allocation, verbatim, BID s2.4 FIRST STAGE SELECTION, pp. 9-10
+(recorded as *sample design*, not as universe):
+
+#+begin_quote
+Based on the forest definition defined above, the distance from each EA in the
+country (except urban Montserrado) to the nearest forest was computed. That
+distance was subsequently used to assign each EA to one of the following
+strata: S1 (less than 2km from forest); S2 (two to 7 km from forest); S3 (7 to
+15 km from forest).
+
+Following strata classification, a total of 250 EAs were selected through a
+Probability Proportional to Size (PPS) sampling approach within each stratum,
+with the following purposeful allocation across strata: 90 EAs in S1; 90 EAs in
+S2; 70 EAs in S3.8 The measure of size for each EA was based on the total
+number of households listed in the 2008 PHC.
+#+end_quote
+
+The 90/90/70 allocation across S1/S2/S3 *is* the survey's oversample --
+disproportionate by distance-to-forest -- and it is exactly the thing the
+weights no longer correct for by stratum.  The stratum variable is not shipped.
+Verbatim, BID s2.6, p. 12:
+
+#+begin_quote
+The NHFS dataset includes only the cluster variable (reg_cluster), not the
+original stratification variable.
+#+end_quote
+
+This is consistent with the library config: =_/data_scheme.yml= declares
+=sample.strata= as =optional=, and =2018-19/_/data_info.yml= does not populate
+it (it maps only =v: ea_code=, =weight: hhweight=, =Rural: locality=).  The
+missing =strata= is the survey's, not a config oversight.
+
+**** 2. The weighting domain is three geographic CLUSTERS, not counties
+
+Verbatim, BID s2.6, p. 12:
+
+#+begin_quote
+In lieu of the distance stratification, the data has been weighted to reflect
+geographic clusters (weighting is discussed in detail in Section 6). These
+clusters were defined based on similarity in the intrinsic and exogenous
+factors relevant to the interaction between HHs and forests, such as the level
+of overall socioeconomic development, the extent of forest cover, and the
+vulnerability to forest loss and degradation. Each cluster includes multiple
+counties, as illustrated in Table 5.
+#+end_quote
+
+Cluster composition, transcribed from BID Table 5, p. 12:
+
+| Cluster | Counties                                                      |
+|---------+---------------------------------------------------------------|
+| Western | Bomi; Gbarpolu; Grand Cape Mount; Lofa                        |
+| Central | Bong; Grand Bassa; Margibi; Rural parts of Montserrado; Nimba |
+| Eastern | Grand Gedeh; Grand Kru; Maryland; River Cess; River Gee; Sinoe |
+
+Note "Rural parts of Montserrado" appearing as a cluster member -- the urban
+exclusion is carried through into the weighting domains.
+
+**** 3. Two analysis units in one wave
+
+The catalog records Analysis unit as =Household; Community= (DDI =<anlyUnit>=)
+and Kind of data as =Sample survey data [ssd]= (=<dataKind>=).  Design was 250
+EAs x 12 households = 3,000; realized 2,986 households and 245 usable community
+questionnaires of 250 (BID s2.5 SECOND STAGE SELECTION and Table 4, p. 10).
+The community
+instrument's universe is the *selected EAs*, not a separate population.
+
+*** Universe vs. what the weights represent
+
+These come apart here, and in an unusual direction: *the represented universe
+was fixed after data collection, from the achieved sample*.  The 2.5 km radius
+in the universe statement is not a design parameter -- the design used 15 km
+strata -- it is the observed upper bound of the selected EAs' recomputed
+distances.  Verbatim, BID s2.6, p. 11:
+
+#+begin_quote
+The resulting sample, therefore, is weighted to reflect all EAs in Liberia
+(with the exception of urban Montserrado) that fall within 2.5 km of the
+nearest forest, which was the upper bound of the distances for the selected
+EAs. The distribution of the distance from the center points of the selected
+EAs to the nearest forest, as recomputed by the World Bank following data
+collection, is presented in Figure 1.
+#+end_quote
+
+Verbatim, catalog 3787 Methodology > Weighting (DDI =<weight>=):
+
+#+begin_quote
+Sample weights are constructed to reflect the population in EAs within 2.5 kms
+of the forests, for three geographic clusters. The weights are also adjusted to
+reflect population estimates as of 2016.
+
+For more information on weighting please refer to the Basic Information
+Document in the External Resources
+#+end_quote
+
+The 2016 benchmark, verbatim, BID s6 WEIGHTING (section begins p. 18), p. 19:
+
+#+begin_quote
+In order to account for the outdated nature of the 2008 PHC frame and the
+erroneous distance-based stratification, the basic weights were then adjusted
+for: (i) cluster level populations, and (ii) population growth since 2008.
+First, the EAs were categorized by cluster (as defined in Section 2.6). Then, a
+weight adjustment factor was computed based on the Liberia 2016 HIES population
+estimates, assuming the cluster level population growth rate from the 2008 PHC
+to the 2016 HIES population estimates.
+#+end_quote
+
+So the frame is the 2008 PHC, the population benchmark is the 2016 HIES, the
+data are 2018-09 to 2019-01, and the domain is three post-hoc geographic
+clusters within a post-hoc 2.5 km band.  =hhweight= is a cross-sectional weight
+for that domain and nothing wider.  There is no =panel_weight= (single wave).
+
+*** Where the statement lives -- NOT in this repository
+
+*The universe statement is not held by the library.*  It exists only in live WB
+catalog metadata plus a Basic Information Document that is not mirrored here.
+This is one of the waves whose population record is a moving target.
+
+- The in-repo DDI export,
+  =lsms_library/countries/Liberia/2018-19/Documentation/ddi-documentation-english_microdata-3787.pdf=,
+  has *no* Universe, Sampling Procedure, or Weighting text at all.  Verified by
+  text extraction: the study-description pages carry no text (content streams
+  are header/footer only), and a full-text search for =Universe=, =universe=,
+  =Sampling Procedure= and =Weighting= returns zero hits.  Only the
+  documentation-listing pages and the Policy Note abstract have text.
+- The two DVC-tracked questionnaires carry no universe statement (full-text
+  searched).
+- The Basic Information Document (=liberia__nhfs_basicinformationdocument_v1.pdf=)
+  is listed as a Technical document by the DDI but is *not* among the repo's
+  tracked =Documentation/= files.  It was retrieved from
+  https://microdata.worldbank.org/catalog/3787/download/50661 .
+- Every quote above therefore comes from the live catalog study description /
+  DDI XML export, or from that externally-fetched BID.  All quotes in this
+  section were re-verified against those two sources on 2026-07-21.
+
+Acquiring the BID into =2018-19/Documentation/= would move this wave from
+"catalog-only" to a record the library actually holds.
+
+*** Boilerplate check
+
+Not boilerplate.  The Universe text here is survey-specific -- it names the
+2.5 km radius and the Montserrado carve-out -- and is *not* the WB NADA
+template sentence that recurs verbatim across other waves in the corpus.  It
+attests a real design decision.
+
+*** Provenance keyword note
+
+An earlier pass recorded that =2018-19/Documentation/SOURCE.org= carried only a
+bare DOI with none of the =#+CATALOG_ID= / =#+PROVENANCE_*= keywords.  That is
+*no longer true*: the file now carries =#+CATALOG_ID: 3787=, =#+CATALOG_IDNO:
+LBR_2018_NHFS_v01_M=, =#+PROVENANCE_SOURCE: worldbank=, =#+PROVENANCE_METHOD:
+doi-lookup=, =#+PROVENANCE_RECORDED: 2026-07-12=.  It still has no
+=#+PROVENANCE_VALIDATION=.  Recorded here only so the stale claim is not
+propagated; no action taken.
+
 * Known data issues
 
 ** housing — not available (2026-06-06)

@@ -2,6 +2,275 @@
 
 Brief table of contents and todo list.
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 (GH #601).  One wave only: Guatemala has a single
+wave directory, =2000= (ENCOVI 2000, Encuesta Nacional sobre Condiciones de Vida
+2000, INE Guatemala).  Everything below is quoted from survey documentation; no
+statement here is derived from the microdata.
+
+This section records only what the *documentation claims*.  It deliberately says
+nothing about what the distributed =.dta= files look like -- for the
+cluster/PSU variable actually present in the data see the =cluster_features=
+comment block in =Guatemala/_/data_scheme.yml= (GH #323), which is a claim about
+the data and not about the universe.
+
+** 2000 -- declared universe
+
+Confidence: high.  Source type: local documentation, corroborated against the WB
+catalog.
+
+Verbatim, Spanish (source language), from
+=Guatemala/2000/Documentation/ddi-documentation-english_microdata-586.pdf=,
+section "Sampling" -> "Sampling Procedure", block "DISEÑO DE LA MUESTRA",
+numbered item 1 (PDF page footer "3"):
+
+#+begin_quote
+1. Universo de estudio: Viviendas particulares y hogares existentes en el país,
+según ENIGFAM 98.
+#+end_quote
+
+Translation (supplied by the extracting agent, NOT source text): "Study
+universe: Private dwellings and households existing in the country, according
+to ENIGFAM 98."
+
+The DDI's dedicated =Universe= field carries the same sentence with the acronym
+spelled out.  *That field is not in the local PDF* -- the shipped PDF is a
+partial DDI that begins at "Sampling" and contains no Study-Description section
+(the string "Universe" does not occur in it at all).  It exists only in the WB
+catalog record, https://microdata.worldbank.org/index.php/catalog/586/study-description
+(field =study_desc.study_info.universe=), verbatim:
+
+#+begin_quote
+Viviendas particulares y hogares existentes en el país, según la Encuesta
+Nacional de Ingresos y Gastos - ENIGFAM 98.
+#+end_quote
+
+The two renderings are recorded separately rather than smoothed together: the
+local file has the short form "según ENIGFAM 98", the catalog the long form
+"según la Encuesta Nacional de Ingresos y Gastos - ENIGFAM 98".
+
+Geographic coverage, verbatim, Sampling-Procedure item 5 -- this sentence *is*
+in the local PDF, and is also the catalog's =Geographic Coverage= field:
+
+#+begin_quote
+5. Cobertura: ENCOVI’2000 se diseña para cubrir las áreas urbanas, áreas rurales
+y áreas indígenas del país.
+#+end_quote
+
+Translation (agent-supplied): "Coverage: ENCOVI'2000 is designed to cover the
+urban areas, rural areas and indigenous areas of the country."
+
+Sampling unit, verbatim, item 4:
+
+#+begin_quote
+4. Unidades Secundarias de Muestreo: Las Unidades Secundarias de Muestreo están
+constituidas por las viviendas particulares ocupadas y ausentes.
+#+end_quote
+
+Translation (agent-supplied): "Secondary Sampling Units: The Secondary Sampling
+Units are made up of occupied and absent private dwellings."
+
+This is *not* WB NADA boilerplate.  The universe, coverage and sampling text are
+INE Guatemala's own Spanish prose, specific to ENCOVI 2000; none of it matches
+the templated English "universe" sentence that recurs verbatim across ~15 waves
+elsewhere in this corpus.
+
+Accent caveat: =pdfminer= extraction of the local PDF silently drops every
+Spanish diacritic in the body font (it yields "DISEO DE LA MUESTRA", "en el
+pas, segn ENIGFAM 98").  Those are font-encoding artifacts, not the source
+text.  The accented spellings above were taken from the WB catalog's HTML
+rendering of the *same* DDI record, which agrees with the PDF extraction
+character-for-character on every unaccented character.  "ENCOVI’2000" uses
+U+2019 RIGHT SINGLE QUOTATION MARK in the source, not an ASCII apostrophe.
+
+** 2000 -- exclusions: none stated
+
+*No exclusion or non-coverage statement exists* -- not in any file under
+=Guatemala/2000/Documentation/=, and not in the WB catalog record.  There is no
+sentence excluding institutional or collective dwellings, nomadic or homeless
+populations, or any department or region.
+
+Searched, and what was searched:
+
+- All five PDFs in =Guatemala/2000/Documentation/=:
+  =ddi-documentation-english_microdata-586.pdf=, =FirstRound_V2.pdf=,
+  =SecondRound.pdf=, =commques.pdf=, =Capitulo7-12.pdf=.  Text extracted with
+  =pdfminer= and searched for =universe|universo|target population|población
+  objetivo|coverage|cobertura|scope|sampling|muestra|excluy|excluid|excepci|no
+  se incluy|colectiv|institucional|viviendas particulares|sobremuestra|
+  submuestra|indígena=.  The four questionnaire/manual PDFs are field
+  instruments and returned zero hits for any universe or exclusion term.
+- =Guatemala/2000/Documentation/SOURCE.org= and =LICENSE.org=.
+- WB Microdata catalog study 586, full study-description page fetched and
+  parsed.  Hit counts for =excluy=, =excluid=, =excepci=, =no se incluy=,
+  =sobremuestra=, =submuestra=: *zero in every case*.  The only occurrences of
+  =colectiv= / =institucion= are in the community-questionnaire topic list
+  ("acciones colectivas", "bienes comunales y de uso colectivo", "otras
+  instituciones") and have nothing to do with dwelling type.
+
+The only exclusion-*adjacent* language is the restriction of the frame to
+*private* dwellings, quoted verbatim above ("Viviendas particulares y hogares
+existentes en el país"; "Las Unidades Secundarias de Muestreo están constituidas
+por las viviendas particulares ocupadas y ausentes").  Whether "viviendas
+particulares" is *intended* to exclude collective or institutional dwellings is
+nowhere stated, and is not asserted here.  Recording the silence as silence.
+
+** 2000 -- oversamples and sub-populations: none documented
+
+No oversample, booster, refresh, panel or module sub-sample is documented for
+ENCOVI 2000.  The searches above found no =sobremuestra= / =submuestra= /
+=oversample= anywhere in the local documentation or the catalog record.  The
+design is described as a single stratified two-stage cluster sample of dwellings
+(item quoted under "Design context" below).
+
+Two things a reader might mistake for sub-samples, and what the documentation
+actually says about them:
+
+*** "Áreas indígenas" is a coverage claim, not a documented oversample
+
+Item 5 names =áreas indígenas= among the areas ENCOVI 2000 "se diseña para
+cubrir".  Nothing in the documentation describes an indigenous stratum, an
+indigenous oversample, or an indigenous inference domain -- and the study
+domains in item 7 are region x urban/rural only, with no indigenous domain (see
+the item-7 quote below).  The coverage sentence and the domain list are both
+quoted so that a reader can see they do not line up; no reconciliation is
+offered here because the documentation offers none.
+
+*** Round I / Round II are two visits to the SAME households
+
+The library's single wave =2000= is one sample, visited twice -- not a
+cross-section plus a panel, and not two samples pooled.  Verbatim, from the WB
+catalog record for study 586, field =Data Collection Notes= (this section is
+also in the local PDF under "DATA COLLECTION NOTES", with accents dropped by
+extraction):
+
+#+begin_quote
+La recolección de datos se realiza en dos visitas principales al hogar en
+momentos diferentes.  La recolección de datos de la información relacionada con
+las personas del hogar se lleva a cabo en la primer semana de trabajo en el
+segmento compacto.  El resto de información, es decir la referida al hogar, se
+recolecta en la tercera semana de trabajo [...]
+#+end_quote
+
+Translation (agent-supplied): "Data collection is carried out in two main visits
+to the household at different moments.  Collection of the information relating
+to the persons of the household is done in the first week of work in the compact
+segment.  The rest of the information, that is the household-level information,
+is collected in the third week of work [...]"
+
+The two questionnaire PDFs in this directory (=FirstRound_V2.pdf=,
+=SecondRound.pdf=) are the instruments for these two visits.
+
+** 2000 -- universe vs. what the weights represent
+
+The documentation states plainly that the sample is *not* self-weighting, and
+that the inference domains are region x urban/rural.  Verbatim,
+Sampling-Procedure items 7 and 8:
+
+#+begin_quote
+7. Dominios de Estudio: Los dominios de inferencia del Estudio de condiciones de
+Vida son los siguientes:
+a) Total Nacional: Urbano y rural
+b) Región Metropolitana: Urbana y Rural
+c) Región Norte: Urbana y Rural
+d) Región Nor-Oriente: Urbana y Rural
+e) Región Sur-Oriente: Urbana y Rural
+f) Región Central: Urbana y Rural
+g) Región Sur-Occidente; Urbana y Rural
+h) Región Nor-Occidente: Urbana y Rural
+i) Región Petén: Urbana y Rural.
+#+end_quote
+
+(The a)--i) list runs together in the source; line breaks inserted here only
+between the lettered items.  The stray semicolon in g) is in the source.)
+
+#+begin_quote
+8. Selección de la Muestra: Tomando en consideración que la muestra no es
+autoponderada se procedió en primera instancia al cálculo de las probabilidades
+de selección.
+#+end_quote
+
+Translation (agent-supplied): "Sample selection: Taking into account that the
+sample is not self-weighting, the selection probabilities were computed in the
+first instance."
+
+So: the declared universe is national (private dwellings and households in the
+country), the declared inference domains are the nine region x urban/rural
+domains, and unweighted household counts are *not* interpretable as a national
+sample.  Anyone pooling Guatemala with other countries must use =sample()=
+weights.
+
+Response rate, verbatim (catalog and local PDF agree):
+
+#+begin_quote
+90% dado que se esperaba que 8046 hogares contestaran pero la base de datos
+reporta 7276 hogares
+#+end_quote
+
+** 2000 -- design context (not the universe statement)
+
+Recorded because it is the frame the universe sentence points at.  Verbatim,
+same Sampling-Procedure block:
+
+#+begin_quote
+ENCOVI’2000 se aplica a una muestra que en su diseño es:
+-Bietápica
+-Estratificada
+-De conglomerados y aleatoria en su primera etapa.
+-De segmentos compactos y sistemática en su segunda etapa.
+-Sin reemplazo.
+#+end_quote
+
+#+begin_quote
+2. Marco Muestral: El marco muestral esta configurado por 11170 Unidades
+Primarias de Muestreo, que lo constituyen los sectores cartográficos del Censo
+de Población y Habitación 1994, de los cuales 3544 son urbanos y 7626 son
+rurales.
+#+end_quote
+
+#+begin_quote
+3. Unidades Primarias de Muestreo: la unidades primarias de muestreo están
+constituidas por los sectores censales, tanto urbanos como rurales.
+#+end_quote
+
+#+begin_quote
+6. Tamaño de la Muestra : Para la encuesta de condiciones de vida se seleccionó
+una muestra sin reemplazo de 8, 940 viviendas. Se espera que con una tasa de
+rechazo no mayor al 10% se obtenga una muestra total de 8,046 viviendas
+efectivas.
+#+end_quote
+
+Note the discrepancy between the *documented* frame and a claim elsewhere in
+this repository.  Item 3 above states that primary sampling units exist in the
+design (=sectores censales=); the top-level =CLAUDE.md= "Countries Without
+Microdata" table lists Guatemala with the reason "No PSU/cluster variable in
+data", while =Guatemala/_/data_scheme.yml= declares =cluster_features= with
+"v is the ENCOVI 2000 primary sampling unit: the composite
+depto-mupio-sector-segmento from CONSUMO5.DTA [...] 1,065 clusters" (GH #323).
+Those two repo claims contradict each other; neither contradicts the
+documentation quoted here, which is about the design and not about which
+identifiers survived into the distributed files.  Flagged, not resolved --
+=CLAUDE.md='s entry looks stale relative to GH #323.
+
+** Provenance of this record
+
+- Primary source held *in this repository*:
+  =Guatemala/2000/Documentation/ddi-documentation-english_microdata-586.pdf=
+  (partial DDI: Sampling, Questionnaires, Data Collection, Data Processing,
+  Related Materials).  It carries Sampling-Procedure items 1--10, the Response
+  Rate and the Weighting text.
+- Held *only* in WB catalog metadata, not in any file here: the DDI =Universe=
+  and =Geographic Coverage= fields as such, and the Abstract / Analysis-unit
+  prose.  The =Geographic Coverage= text duplicates item 5 (which is local), but
+  the long-form =Universe= sentence is catalog-only, so *that* wording is a
+  moving target the library does not hold.
+- Wave provenance keywords are recorded in
+  =Guatemala/2000/Documentation/SOURCE.org= (=#+CATALOG_ID: 586=,
+  =#+CATALOG_IDNO: GTM_2000_ENCOVI_v01_M=, =#+PROVENANCE_SOURCE: worldbank=).
+- Quotes above were re-verified against the local PDF and the catalog page on
+  2026-07-21.
+
 * Files in Guatemala/_/
 ** DONE food_items.org
 

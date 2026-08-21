@@ -1,0 +1,520 @@
+#+title: Contents
+
+* Sampling universe, exclusions and sub-samples
+
+# ASCII EXCEPTION (deliberate, per the orgmode skill's "leave a comment" rule):
+# every block inside a #+begin_quote below is a VERBATIM transcription of survey
+# documentation.  The sources use en dashes and typographic apostrophes and
+# contain sic spellings; these are NOT normalised to ASCII, because normalising
+# them would destroy the one property that makes a quote usable as evidence.
+# All prose outside the quote blocks is ASCII.
+
+Evidence gathered 2026-07-21 for GH #601 / #603.  What follows records what the
+survey documentation *claims* the sample represents.  Nothing here is inferred
+from the =.dta= files; none were opened for this record.
+
+Both Afghanistan waves are documented from files *inside this repository*, not
+from World Bank catalog metadata:
+
+- The ALCS / NRVA / IE&LFS series is a survey of the Afghan statistical office
+  (CSO, later NSIA), *not* a World Bank LSMS survey.  A query of the WB Microdata
+  Library catalog for =country=AFG= returned 120 entries and *none* of them is an
+  ALCS, NRVA or IE&LFS entry.  There is therefore no WB catalog fallback and no
+  WB NADA template universe sentence for either wave -- the boilerplate that
+  supplies the "universe" field for 15 other waves in the corpus does not apply
+  here.  What is quoted below is a statistical office's own claim about its own
+  survey.
+- Neither wave has a =Documentation/SOURCE.org=, so there is no recorded
+  =#+CATALOG_ID:= to fall back on either.  Local documentation is the only
+  source, and it is adequate: both waves are =high= confidence.
+
+| Wave    | Source of statement | Confidence | Shape of the declared universe                         |
+|---------+---------------------+------------+--------------------------------------------------------|
+| 2016-17 | local documentation | high       | explicit: entire population of Afghanistan incl. Kuchi |
+| 2020    | local documentation | high       | oblique: frame + strata + weighting target only        |
+
+** 2016-17 -- Afghanistan Living Conditions Survey (ALCS) 2016-17, CSO
+
+Source: =lsms_library/countries/Afghanistan/2016-17/Documentation/Report/ALCS - 2016-17 Analysis report draft version.pdf=
+(421 PDF pages, DVC-tracked).  Citations give the printed page first and the PDF
+page second.
+
+*** The declared universe
+
+Chapter 1, section 1.1 "General survey backgrounds", printed p. 1 (PDF p. 45):
+
+#+begin_quote
+The survey is unique in the sense that – with inclusion of the nomadic Kuchi –
+it represents the entire population of Afghanistan, and that – since the 2007-08
+survey – year-round data are collected in order to capture the seasonality of
+indicators like employment, food security and poverty. The survey was designed
+to produce representative estimates for the national and provincial levels, and
+for the Kuchi population.
+#+end_quote
+
+Corroborated in the data-quality self-assessment, Annex IX, printed p. 354 (PDF
+p. 398), as a bullet under "Completeness":
+
+#+begin_quote
+The ALCS is the only survey producing representative information for the entire
+population of Afghanistan, including the nomadic Kuchi (presently estimated at
+5.0 percent of the total population).
+#+end_quote
+
+The frame from which that universe is operationalised -- Annex IV "Sample design
+and implementation", section IV.2 "Sample frame", printed p. 327 (PDF p. 371):
+
+#+begin_quote
+The pre-census household listing that was conducted by CSO in 2003-05, updated
+in 2009, was used as the sampling frame. For seven provinces, the sampling frame
+consisted of the Socio-Demographic and Economic Survey (SDES) household
+listings: Bamyan (data collected in 2010), Ghor and Daykundi (both with data
+collected in 2012), Kapisa and Parwan (both with data collected in 2014), Kabul
+(data collected in 2013) and Samangan (data collected in 2015). Prior to the
+fieldwork, the selected enumeration areas (EAs) – urban and rural – were visited
+for a mapping update of the households, based on which the second sampling stage
+was implemented.
+#+end_quote
+
+The household unit is the UN definition -- section 3.3, printed p. 28 (PDF
+p. 72):
+
+#+begin_quote
+The ALCS follows the UN definition of households. A household is defined as
+group of people, either related or unrelated, who live together as a single unit
+in the sense that they have common housekeeping arrangements, that is, they
+share or are supported by a common budget. They live together, pool their money,
+and eat at least one meal together each day.
+#+end_quote
+
+[sic: "as group of people", no article, as printed.]
+
+*** Exclusions
+
+**** Institutional and collective households -- excluded by design
+
+Chapter 3, section 3.3.1 "Household structure", printed p. 28 (PDF p. 72):
+
+#+begin_quote
+Note that during the fieldwork only regular household were visited, as
+institutional and collective households were not in the sample.
+#+end_quote
+
+[sic: "household" singular in the original.]  This is the one categorical
+population exclusion, and it qualifies the "entire population of Afghanistan"
+claim above: the declared universe is the *regular-household* population.
+
+**** Insecure districts excluded from the reserve frame -- exclusion by design, mid-fieldwork
+
+Chapter 2, section 2.2.4 "Sampling design", printed p. 14 (PDF p. 58):
+
+#+begin_quote
+In view of sustained levels of insecurity, from the fourth month of data
+collection onward, clusters in inaccessible areas were replaced by clusters
+drawn from a reserve sampling frame that excluded insecure districts.
+#+end_quote
+
+Annex IV, section IV.6, printed p. 328 (PDF p. 372):
+
+#+begin_quote
+A reserve sample of PSUs was drawn from the sampling frame, from which districts
+that were defined as insecure by the supervisors and PSOs were excluded, as well
+as EAs that were originally sampled. EAs that were originally selected in these
+districts and not yet covered were replaced by EAs from this reserve list.
+Isolated emerging security issues in other districts could also urge the use of
+replacement from this reserve list. The districts excluded from the reserve
+sample list are listed in Table IV.1.
+#+end_quote
+
+Table IV.1, "Districts excluded from sample frame for the reserve sample"
+(printed p. 329 / PDF p. 373), names the excluded districts; they fall in
+Kapisa, Wardak, Logar, Badghis, Nangarhar, Zabul, Baghlan, Ghazni, Helmand,
+Urozgan, Jawzjan, Kandahar, Kunarha, Laghman, Paktya and other provinces.
+
+Note the mechanism, because it is stronger than plain non-response: insecure
+clusters were *replaced* by secure ones, so security-correlated non-coverage is
+not merely missing from the sample -- it is partly reweighted onto the secure
+part of the country.
+
+**** Realised non-coverage
+
+Chapter 2, section 2.3.1 "Field operations", printed p. 15 (PDF p. 59):
+
+#+begin_quote
+Provinces that faced most security challenges were Kapisa, Nangarhar, Paktya,
+Paktika, Wardak, Sar-e-Pul, Urozgan, Baghlan, Kunarha, Kunduz and Helmand. As a
+last resort, insecure areas were replaced by more secure areas. The security
+situation in Paktika did not allow data collection after month six.
+#+end_quote
+
+#+begin_quote
+Out of the 391 sampled districts and provincial centres of Afghanistan, in 342
+(87 percent) information was collected. In total, information from 1,929
+clusters was collected, against 2,042 clusters according to the sampling design
+(94 percent).
+#+end_quote
+
+#+begin_quote
+From the 60 Kuchi clusters, 55 were covered according to the sampling design,
+whereas for the five remaining the targeted Kuchi population could not be found
+in the field.
+#+end_quote
+
+*** Oversamples and sub-populations
+
+**** The nomadic Kuchi: a separate stratum, from a separate frame, in two seasons only
+
+This is the sub-population that matters most for anyone pooling this country.
+The Kuchi are not drawn from the same frame as everybody else.  Annex IV, section
+IV.2, printed p. 327 (PDF p. 371):
+
+#+begin_quote
+The sampling frame that was used for the Kuchi population was the 2003-04
+National Multi-sectoral Assessment of Kuchi (NMAK-2004). Although far from
+perfect given the rate of settlement of Kuchis in recent years and ongoing
+discussion about the definition of Kuchi, this is the best frame available for
+this part of Afghanistan’s population.
+#+end_quote
+
+That frank statement of frame weakness applies to the Kuchi stratum *only*; it is
+not transferable to the other 34 strata.
+
+The Kuchi stratum is also restricted in time.  Annex IV, section IV.4
+"Stratification", printed pp. 327-328 (PDF pp. 371-372):
+
+#+begin_quote
+The Kuchi stratum was only collected in summer 2016 and winter 2016-17 (Shamsi
+calendar 1395) in view of the practical difficulty of locating migrating
+communities in spring and autumn.
+#+end_quote
+
+Consequence for a user: the seasonal domains and the Kuchi domain are *not*
+crossed.  Any spring or autumn subset of this wave contains no Kuchi at all.
+Design size of the stratum: "The 60 clusters (600 households) for this stratum
+were divided between the summer and winter periods within the survey period,
+with 40 and 20 clusters, respectively" (Chapter 2, printed p. 14 / PDF p. 58),
+against 2,040 clusters overall.
+
+**** Disproportionate allocation across provinces -- a deliberate small-province oversample
+
+Annex IV, section IV.4 "Stratification", printed p. 327 (PDF p. 371):
+
+#+begin_quote
+The sample was stratified into 35 analytical domains: one for each of the 34
+provinces of Afghanistan and one for the Kuchi population. For an optimal sample
+allocation across the provinces, a balance was obtained between proportional
+allocation and equal-size allocation with a Kish power allocation of I = 0.25.
+This assured sufficient weight for provinces with small populations, while
+improving the comparability of results across the provinces.
+#+end_quote
+
+Small provinces are therefore over-sampled relative to their population share, by
+design.  *Unweighted national statistics from this wave are not national
+statistics.*
+
+**** Season as an analytical domain
+
+Chapter 2, section 2.2.4, printed p. 13 (PDF p. 57):
+
+#+begin_quote
+The sampling design of the ALCS 2016-17 ensured results that are representative
+at national and provincial level, for the Kuchi population and for Shamsi
+calendar seasons. In total, 35 strata were identified, 34 for the provinces of
+Afghanistan and one for the nomadic Kuchi population.
+#+end_quote
+
+Fieldwork ran continuously from April 2016 to April 2017 (Shamsi 1395), so the
+four seasons are additional analytical domains.  A partial-year subset of this
+wave is not a representative subset.
+
+**** Urban / rural: an analytical domain, but not a stratum
+
+Annex IV, section IV.1 "Introduction", printed p. 327 (PDF p. 371):
+
+#+begin_quote
+The design developed for the 2016-17 survey round was a stratified, two-stage
+cluster approach. The sample distribution is sufficiently close to the national
+urban-rural distribution that separate analysis for these populations is
+justified.
+#+end_quote
+
+Note the form of the claim: urban/rural representativeness is asserted *ex post*
+from the realised distribution, not guaranteed by the design.
+
+*** Universe vs. what the weights represent
+
+Chapter 2, section 2.2.4, printed p. 14 (PDF p. 58):
+
+#+begin_quote
+Sample weights were calculated for up-scaling the surveyed households and
+persons to the total number of households and population in Afghanistan. The
+calculation was based on the official CSO population estimate by province for
+January 2016 and average provincial household sizes derived from the survey.
+#+end_quote
+
+The weights are benchmarked to a CSO *projection*, province by province, for a
+single reference month -- not to a census.  The weight variables are named in
+Annex IV, section IV.8.3, printed p. 334 (PDF p. 378): "hh_weight" and
+"ind_weight".
+
+For the Kuchi stratum the weighting is more than a projection; it is a declared
+policy position.  Annex IV, section IV.8.2 "Kuchi population", printed p. 334
+(PDF p. 378):
+
+#+begin_quote
+In the absence of up-to-date information about the actual number of Kuchis and
+the political sensitivity of addressing this issue, the present position taken by
+CSO is that the Kuchi population is stable at a number close to 1.5 million
+people.
+#+end_quote
+
+#+begin_quote
+Apart from the sampling frame, the restriction to two seasons and the absence of
+the need to accommodate population growth, the procedures for the calculation of
+the sampling weights for the Kuchi stratum are the same as those for the resident
+population.
+#+end_quote
+
+And the report's own coverage-error assessment undercuts the Kuchi frame
+directly -- Annex IX, section IX.4.1, under "Coverage errors", printed p. 362
+(PDF p. 406):
+
+#+begin_quote
+The sampling frames used for ALCS 2013-14 included the 2003-05 pre-census
+household listing, updated in 2009, and the 2003-04 National Multi-sectoral
+Assessment of Kuchi (NMAK-2004). Whereas the former was reasonably up-to-date
+for the survey in 2013-14, the latter was outdated and it is likely that in the
+intervening period considerable changes occurred with respect to the number and
+geographic distribution of Kuchi households. Besides the observed, but
+un-quantified rate of settlement of Kuchi households and natural population
+growth, changing migration patterns will have caused a population distribution in
+2016-17 that is different to the one represented in the NMAK list.
+#+end_quote
+
+[sic: this passage in the 2016-17 report speaks of "ALCS 2013-14" and "the
+survey in 2013-14" -- evidently carried over from the previous round's report --
+while its conclusion is stated for 2016-17.  Quoted as printed; the reader should
+not silently repair it.]
+
+So for the Kuchi sub-population the document asserts a universe ("the entire
+population of Afghanistan, including the nomadic Kuchi") while simultaneously
+recording that the frame is stale, the population total is a fixed political
+assumption rather than a measurement, and two of four seasons are unobserved.
+Those are three different facts and this file keeps them separate.
+
+** 2020 -- Income and Expenditure & Labor Force Survey (IE&LFS) 2020, NSIA
+
+Source: =lsms_library/countries/Afghanistan/2020/Documentation/!Income and Expenditure _ Labor Force Surveys-2020 .pdf=
+(313 PDF pages, DVC-tracked).
+
+*** The declared universe -- stated only obliquely
+
+*No sentence of the form "the target population is ..." appears in this report.*
+That is worth stating plainly rather than papering over.  The 2016-17 wording
+("it represents the entire population of Afghanistan") has *no counterpart* in the
+2020 report and has deliberately not been carried over here.  What the 2020
+document supplies instead is a frame, a stratification, and a weighting target.
+
+Chapter 1, section 1.2.5 "Sampling Design", printed p. 5 (PDF p. 29):
+
+#+begin_quote
+The sampling design of the IE&LFS 2020 ensured results that are representative
+at the national and provincial levels for the Kuchi population and Shamsi
+calendar seasons. Thirty-five strata were identified, 34 for Afghanistan’s
+provinces and one for the nomadic Kuchi population. Stratification by season was
+achieved by equal distribution of data collection over 12 months within the
+provinces. For the Kuchi population, the design only provided sampling in winter
+and summer when communities temporarily settle.
+#+end_quote
+
+Section 1.2.5, printed p. 5 (PDF p. 29) -- the closest thing to a coverage claim:
+
+#+begin_quote
+The sampling frame used for the IE&LFS 2020 is a high-resolution imagery-based
+frame created by National Statistics Information Authority (NSIA). The frame
+consisted of 30,060 Enumeration Areas (EA). NSIA has an electronic file
+consisting of 30,060 EAs that cover the entire country.
+#+end_quote
+
+*The frame changed between the two waves*: 2016-17 used a pre-census household
+listing (2003-05, updated 2009, with SDES listings in seven provinces); 2020 used
+a satellite-imagery-derived EA frame.  A 2016-17 / 2020 comparison is not a
+comparison against a fixed frame.
+
+Preface, printed p. XXIII (PDF p. 23) -- what the report claims to report on:
+
+#+begin_quote
+The report consists of the most comprehensive data, and the main focus is on the
+national level. However, the frequently-disaggregated information is for
+residential populations (urban, rural, and Kuchi) and utmost provincial level.
+#+end_quote
+
+[sic throughout, including "utmost provincial level".]
+
+*** Exclusions
+
+**** Institutional and collective households -- excluded by design
+
+Chapter 2, section 2.3.1 "Household structure", printed p. 20 (PDF p. 44):
+
+#+begin_quote
+Note that only regular households were visited during the fieldwork, as
+institutional and collective households were not in the sample.
+#+end_quote
+
+The same exclusion as 2016-17, restated grammatically.
+
+**** Districts not covered
+
+Chapter 1, section 1.3 "Data Collection", printed p. 7 (PDF p. 31).  (The report
+numbers this subsection "3.3.1 Field Operations" even though it sits inside
+Chapter 1 -- an error in the source's own numbering, recorded here so the
+citation can be located.)
+
+#+begin_quote
+The number of districts covered was 329 out of 399 districts in Afghanistan. The
+covered districts had at least one randomly selected cluster surveyed within that
+particular district’s geographical boundaries. Fifty-eight districts were not
+covered due to security concerns, heavy snowfalls during the winter season, and
+other reasons. Twelve districts were not part of the survey as the randomly
+selected clusters did not fall in those districts. In 2100 planned clusters, 67
+clusters were replaced with the reserve clusters.
+#+end_quote
+
+**** Provinces under-covered
+
+Same section, printed p. 7 (PDF p. 31):
+
+#+begin_quote
+There were provinces like Faryab, Badghis, Paktiya, Helmand, and Kapisa that
+could not achieve the desired coverage due to poor security conditions even after
+utilizing all the reserve clusters.
+#+end_quote
+
+And section 3.5.2 "Data Limitations", numbered item 8, printed p. 11 (PDF p. 35):
+
+#+begin_quote
+Initially, there were 2100 clusters planned to be surveyed throughout the
+country. Considering Afghanistan’s tense security condition, the survey teams
+collectively managed to survey 1835 clusters in the country. The survey coverage
+was 87.4 percent. [...] Precisely, Faryab and Badghis were the provinces with
+lower coverage, followed by Kapisa, Helmand, and Paktia provinces. The reason for
+low coverage in the provinces, as mentioned above, was the worst security
+situation.
+#+end_quote
+
+("[...]" elides two intervening sentences about reserve clusters.  The source
+spells the province "Paktiya" in the first passage and "Paktia" in the second;
+both are as printed.)
+
+**** Access limits on female respondents -- a within-household coverage gap
+
+Section 3.5.2 "Data Limitations", items 6 and 7, printed p. 11 (PDF p. 35):
+
+#+begin_quote
+For instance, the area under insurgents’ control is challenging to be surveyed –
+they do not allow the fieldworkers to operate in their jurisdictions. Sometimes
+they only permit male fieldworkers while the female enumerators are not allowed
+to work.
+#+end_quote
+
+#+begin_quote
+Similarly, there are cultural limitations that do not pave the way for smoothly
+conducting the national surveys. For example, in remote areas, the females might
+not be allowed to respond to the interview questions despite being female.
+#+end_quote
+
+This is a *non-geographic* coverage gap that the report itself flags: in part of
+the sample, women were not interviewed.  The 2020 microdata in this repo is split
+by respondent sex (=household_male.dta= / =household_female.dta= /
+=roster_male.dta= / =labour_male.dta=).  We do NOT assert a link between those two
+facts -- establishing one would require reading the questionnaire and the data,
+neither of which was done for this record.  It is flagged so that anyone pooling
+the male and female files knows the documentation records a sex-differential
+coverage problem.
+
+*** Oversamples and sub-populations
+
+The same Kuchi structure as 2016-17: a separate stratum, from the same 2003-04
+frame, restricted to two seasons.  Section 1.2.5, printed p. 6 (PDF p. 30):
+
+#+begin_quote
+The Kuchi sample was designed based on the 2003-04 National Multi-Sectoral
+Assessment of Kuchi (NMAK-2004). For this stratum, a community selection was
+implemented with PPS, and a second stage selection of households was similar to
+that of the Non-Kuchi population, as discussed earlier. The 60 clusters (600
+households) for this stratum were divided between the summer and winter seasons
+within the survey period, with 40 and 20 clusters, respectively.
+#+end_quote
+
+So the Kuchi stratum is 60 of 2,040 design clusters, and the "no Kuchi in spring
+or autumn" caveat carries over from 2016-17.  Note that the 2020 report repeats
+the NMAK-2004 frame without repeating the 2016-17 report's own warning that that
+frame was outdated; the warning is not restated, which is not the same as its
+having been resolved.
+
+Urban/rural enters this design only as *implicit* stratification within the PPS
+draw -- section 1.2.5, printed p. 6 (PDF p. 30): "with implicit stratification by
+urban/rural and by the district".  It is not an explicit stratum.
+
+*** Universe vs. what the weights represent
+
+Section 1.2.5, printed p. 6 (PDF p. 30):
+
+#+begin_quote
+Sample weights were calculated for up-scaling the surveyed households and
+persons to the total number of households and Afghanistan population. The
+calculation was based on the official NSIA population for the year 1398
+(2019-20).
+#+end_quote
+
+As in 2016-17, the weights are benchmarked to the statistical office's own
+population figure rather than to a census.  Given that no explicit universe
+sentence exists in this report, *the weighting target is effectively the
+strongest available statement of what the 2020 sample stands for*, and it should
+be cited as such rather than as a universe declaration.
+
+** Caveats on this record
+
+- Transcription :: Quotes for both waves are transcribed from a =pypdf= text
+     extraction of the source PDF.  That text layer inserts spurious intra-word
+     spaces ("susta ined", "e qual", "diffic ulty", "201 5", "Socio -Demographic",
+     "7 .8"), spaces before punctuation, and hyphen breaks at line ends
+     ("stratifi-cation", "enu-merators").  Those obvious extraction artifacts
+     were rejoined and *nothing else was altered* -- no wording, ordering or
+     punctuation.  Sic spellings in the sources are preserved and marked.  Every
+     quote above was re-checked against the extracted text on 2026-07-21.
+
+- The 2016-17 report in this repo is a draft :: The file is titled "ALCS -
+     2016-17 Analysis report draft version".  A final published ALCS 2016-17
+     report exists but is not in this repository, and was *not* substituted.  If
+     a quote above is ever checked against the final report and differs, the final
+     report wins and this section should be corrected.
+
+- 2020 wave label vs. fieldwork dates :: The wave directory is named =2020=, but
+     fieldwork ran from "early October 2019 (Meezan 1398)" to "late September 2020
+     (Sunbula 1399)" (printed p. 6 / PDF p. 30).  The wave label is not the
+     reference period.
+
+- The other file in =2020/Documentation/= is a different survey ::
+     =REACH_AFG_WoAA-2022-MSNA_Main-HH_Analysis_Sept2022.xlsx= is, by its
+     filename, a REACH Whole-of-Afghanistan Assessment / MSNA 2022 analysis
+     workbook -- a different instrument in a different year.  It was not opened and
+     is not the source of any quote here.  It should not be read as documenting the
+     IE&LFS 2020 sample.  (Filename evidence only; this is a flag, not a claim
+     about its contents.)
+
+- What was searched, so the gaps are falsifiable :: For both waves: the wave's
+     own =Documentation/= tree (materialised via
+     =lsms_library.data_access.get_data_file()=, never the =dvc= CLI); a full text
+     extraction of the report PDF; grep for "target population", "universe",
+     "sampling frame", "sample frame", "covers", "coverage", "represent", "entire
+     population", "institutional", "nomad", "Kuchi", "excluded"; and full reading
+     of the survey-methodology chapter, the household-structure section, the
+     field-operations and limitations sections, and (for 2016-17) Annex IV in
+     full.  The 2020 report has no separate sample-design annex -- section 1.2.5
+     is the fullest statement it contains.  Additionally the WB Microdata catalog
+     was queried for =country=AFG= (120 entries) and filtered for "living
+     condition" / "risk and vulnerab" / "nrva" / "alcs" / "labor force" / "labour
+     force" / "income and expenditure": *zero* matches.  There is no WB catalog
+     record for either wave, and neither wave has a =Documentation/SOURCE.org=.
