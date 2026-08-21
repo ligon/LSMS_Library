@@ -44,6 +44,7 @@ data-free CI ``unit-tests`` job skips while a genuine regression is red.
 """
 import importlib.util
 import os
+import pathlib
 import warnings
 
 import pandas as pd
@@ -51,10 +52,31 @@ import pytest
 
 import lsms_library as ll
 
-# NB `from conftest import ...` -- which tests/conftest.py's own docstring
-# suggests -- resolves to the ROOT conftest.py, which does not define this.
-# `tests/` is a package (it has an __init__.py), so import it by package path.
-from tests.conftest import aws_creds_available
+# Getting at tests/conftest.py is fiddlier than it looks, and BOTH obvious
+# spellings are broken:
+#
+#   * `from conftest import ...` resolves to the repo ROOT conftest.py, which
+#     does not define this;
+#   * `from tests.conftest import ...` resolves against an unrelated `tests`
+#     package INSTALLED in site-packages, whose __init__ does `from .tests
+#     import *` and dies as `No module named 'tests.tests'`.
+#
+# An earlier revision of this file used the second spelling, with a comment
+# asserting it was safe because `tests/` has an __init__.py.  That is true of
+# the checkout and irrelevant to the resolution order: the CI `unit-tests` job
+# (run 32450451390) failed at COLLECTION on exactly that line, taking all 2,005
+# collected tests down with it, while every local run passed because it set
+# PYTHONPATH=<worktree> and so put the repo ahead of site-packages.
+#
+# Load the sibling file by PATH: identical in every import mode, and it keeps
+# tests/conftest.py the single source of truth for the credentials question
+# (PR #648) instead of growing another private copy.  Same pattern as
+# test_gh323_malawi_gb_cartesian.py and test_niger_cluster_features_geo.py.
+_conftest = importlib.util.module_from_spec(
+    importlib.util.spec_from_file_location(
+        'lsms_tests_conftest', pathlib.Path(__file__).with_name('conftest.py')))
+_conftest.__loader__.exec_module(_conftest)
+aws_creds_available = _conftest.aws_creds_available
 
 COUNT_COLS = ['Men', 'Women', 'Boys', 'Girls']
 LONG_WAVES = ['2018-19', '2019-20']
