@@ -1,5 +1,193 @@
 #+TITLE: Guyana — country notes & known data issues
 
+* Household and cluster identity (READ FIRST)
+
+The household key is the *three-level* =(ED, SN, HH)= and the sampling cluster is
+the *two-level* =(ED, SN)=.  =SN= is the ED sample-segment serial — spelled
+=ed_smpl= in =HHCHAR.dta= / =WEIGHTID.dta=, and =SN= in
+=COVERN/ROSTERN/EDUCN=.  So =i = "ED-SN-HH"= (e.g. ="5-194-2"=) and
+=v = "ED-SN"= (e.g. ="5-194"=).
+
+*ED numbers are reused across segments.*  They are NOT unique on their own:
+
+| ED | SN  | Region | Sector | households |
+|----+-----+--------+--------+------------|
+|  5 | 194 |      4 | urban  |         12 |
+|  5 | 702 |     10 | rural  |         12 |
+
+Those are two different enumeration districts that happen to share the number 5.
+
+Until GH #323 the config declared =i: [ED, HH]= and =v: ED=.  Both are wrong,
+and both were *silently* wrong: the framework's =_normalize_dataframe_index=
+collapses a non-unique declared index with =groupby().first()=, so 257 =(ED,HH)=
+buckets fused 562 distinct real households holding 2,419 of 7,827 people (30.9%),
+and one household's members were kept while another's were thrown away.  The
+survey's own id proves the key: =COVERN.NEWID == ED*100000 + SN*100 + HH= for
+1807/1807 rows, all unique.
+
+Row counts before → after the fix:
+
+| table                | before |  after |
+|----------------------+--------+--------|
+| household_roster     |  6,939 |  7,827 |
+| individual_education |  4,137 |  4,633 |
+| housing              |  1,508 |  1,817 |
+| sample               |  1,502 |  1,807 |
+| interview_date       |  1,502 |  1,807 |
+| assets               | 10,345 | 11,227 |
+| cluster_features     |    130 |    168 |
+
+Enforced by =tests/test_guyana_index_uniqueness.py= (pinned row counts, the ED-5
+de-fusion, the cluster *values*, and a *cold-build* no-collapse-warning check).
+A warm-cache check would pass vacuously — the collapse is baked into the cache,
+so the warning never fires twice.  Prose here is documentation; the test is the
+enforcement.
+
+*Two ways that enforcement can go quietly blind, both hit here.*  (1) A warm
+cache: covered by clearing the parquets and setting =LSMS_NO_CACHE=.  (2)
+Matching the warning by its *message text*: the cold-build check originally
+grepped for ="duplicate tuple"=, the GH #323 audit work later reworded the
+message, and the check then passed against the *broken* config while seven
+=GrainCollapseWarning=s were being emitted in the same run.  It now matches the
+=GrainCollapseWarning= **category**.  Match on the class, never on the prose.
+
+*Re-measured 2026-08-20* when this branch was merged up to =development=.
+Three figures in the original write-up were wrong and are corrected above: the
+conflation is *257* buckets / *562* households / *2,419* people (30.9%), not
+248 / 542 / 2,381 (30.4%).  The corrected numbers reconcile exactly with the
+row counts — 562 − 257 = *305* = 1,807 − 1,502 — which the old ones did not
+(542 − 248 = 294, leaving an unexplained residual of 11).  No separate loss
+mechanism is involved; it was simply a miscount.  The competing branch
+=fix/503-guyana= independently reported 562, so this is a two-way agreement.
+
+*Cross-checks against the BID* (the =gy92info.pdf= evidence in the sampling
+section below), which the microdata independently corroborates:
+
+- ¶29 "There were 2,610 EDs in the country, of which 616 were selected to the
+  sample for the HIES" ↔ =WEIGHT.dta= has exactly *616* rows, one per ED.  That
+  is the frame, and it is why joining it as a spine admits 488 EDs that hold no
+  surveyed household.
+- ¶37 "twelve (12) households were selected" per segment ↔ 129 of the 168
+  =(ED, SN)= segments hold exactly 12 households (16 hold 11, the rest fewer).
+- footnote 3 "The expansion factors are missing for ED numbers 408 and 482" ↔
+  exactly EDs 408 and 482 (23 households) have no =WEIGHT.dta= row.
+- "keyed at *ED* level, not household level" ↔ =WEIGHT.dta= is one row per ED.
+- *Not* reconciled: ¶38's "154 EDs".  The microdata has 130 distinct =ED=
+  numbers and 168 distinct =(ED, SN)= segments; =WEIGHTID.dta= has 126 EDs and
+  152 segments.  None of those is 154.  Left open.
+
+* Declared aggregation / drop policies
+
+These are the places where a duplicate is resolved by an *explicit, declared*
+rule instead of the framework's silent =first()=.  All live in
+=1992/_/mapping.py= as =df_edit= hooks.
+
+** housing — one household DROPPED (class-2: loudly missing)
+Exactly one duplicate survives the correct 3-level key:
+=(ed_dvsn=123, ed_smpl=722, smpl_hh=6)= — a duplicated record in the *source*
+(=WEIGHTID.dta= carries it too), whose two rows share =newid= (12372206) and
+=hhsize= (3) but disagree on ~35 columns including =totexp= (6,345 vs 25,843) and
+wall material (=bldg3= 1=Wood vs 3=Wood & Concrete).  There is no principled way
+to choose, so *both rows are dropped* with a warning naming the household.  It is
+therefore absent from =housing= but present in roster/education/sample.
+Dropping loudly beats guessing quietly.
+
+** cluster_features — MODE, not first (ties → NA)
+=COVERN= is household-level (1,807 rows); =cluster_features= is declared at
+=(t, v)=, so it must be reduced to one row per segment.  The declared reducer is
+the *majority (mode)*.  With =v = (ED, SN)= the segment is 100% homogeneous in
+=Rural= (0 of 168 ambiguous); =Region= is ambiguous in only 3 of 168 segments
+(35 households), and in each the split is a lone stray household against the rest
+(1-vs-10, 1-vs-11, 1-vs-11, all within one stratum and one sector) — a coding
+error, not a real split.  =first()= would have let row order decide.  A genuine
+tie has no majority and is set to =NA=, never guessed.
+
+Two different counts get quoted for the damage =v: ED= did, and they answer
+different questions — keep them apart.  Under =v: ED=, *537* households had
+their =Region= decided by row order and *274* their =Rural=; of those, *287*
+were actually handed a =Region= that is not their own and *143* a =Rural= that
+is not their own.  Under =v: (ED, SN)= with the mode reducer the residual is
+*3* wrong =Region= (the three stray households above) and *0* wrong =Rural=.
+All six figures re-measured end-to-end 2026-08-20, and the *value* half is
+pinned by =test_cluster_attributes_are_the_households_own=.
+
+** sample — weight is a LOOKUP, not a spine
+=WEIGHT.dta= is the 616-ED *national sampling frame*.  The framework merges
+sub-dfs with =how='outer'=, so the 488 frame EDs that were never surveyed used to
+arrive as phantom rows with =i = NaN= (1807 + 488 = 2295 rows).  The merge is now
+keyed on a raw-ED helper column and the hook drops every i-less row.
+
+EDs *408* and *482* (23 households) have no row in =WEIGHT.dta= at all; their
+=weight= stays =NaN= — loudly missing, never imputed.
+
+The weight is keyed on ED *in the source*: =WEIGHTID.dta= assigns one weight per
+ED and 0 of its 126 EDs vary across their segments.  So looking the weight up on
+ED while identifying the *cluster* as =(ED, SN)= is faithful to the survey —
+joining =WEIGHT.dta= on ED reproduces =WEIGHTID='s household weights 1795/1795
+with 100% value agreement.
+
+* Traps
+
+- *=HHCHAR.newid= is corrupt.*  Do NOT key =housing= on it: 319 duplicate values,
+  and it disagrees with its own =(ed_dvsn, ed_smpl, smpl_hh)= triple in 240 of
+  1,819 rows.  Where the two disagree the *triple* is the trustworthy one — it
+  matches a real =COVERN= household in 235 of those 240 rows, versus 201 for
+  =newid= (1,765 vs 1,731 overall).  (=COVERN.NEWID=, a different column in a
+  different file, IS clean and unique, and =_/assets.py= does use it.)
+- *=assets= sums.*  =_/assets.py= collapses per-acquisition detail rows with
+  =groupby(['t','i','j']).sum()=.  That is only safe because =i= now names ONE
+  real household; under the old =(ED, HH)= id the same sum silently pooled the
+  durables of *two different households*, inventing holdings nobody reported.
+  "We sum, so nothing is lost" is not by itself a safety argument.
+
+  =DRBLS.dta= really does carry several rows per household: 115 of its 1,616
+  households have 2-5 rows (317 rows in all), sharing one =id_nmbr= and one
+  =newid= but differing in the per-block =yri*= year-of-acquisition columns
+  (household =337-253-4=, for instance, reports block 07 acquired in 1991,
+  1989, 1975, 1985 and 1992).
+
+  *OPEN, and NOT a #323 question:* whether the per-block quantity is an
+  INCREMENT (sum it, as we do) or the household's total holding RESTATED at
+  each acquisition (in which case summing over-counts).  The data does not
+  settle it — of the 658 =(household, item)= blocks appearing in more than one
+  row, *372 carry an identical quantity in every row* (reads as restated) and
+  *286 differ* (reads as incremental).  The item labels are worded as stocks
+  ("NO. OWNED - ..."), which leans toward restated, but the questionnaire that
+  would decide it, =GUY01.pdf=, is an image-only scan and no OCR tool was
+  available (see the gaps table below).  Recorded rather than guessed.  It
+  affects ~7% of asset households and is *identical before and after* the #323
+  fix — that fix changed only which rows fall in each group, not the reducer.
+- *"Makefile not found ... Unable to generate required data" is EXPECTED here,
+  and is not a failure.*  Guyana declares two =materialize: make= tables
+  (=assets=, =interview_date=) but ships *no* =_/Makefile=.
+  =Country.run_make_target= warns and returns an empty frame when the country
+  Makefile is missing; the dynamic script dispatch then builds both tables
+  anyway — =_/assets.py= at the country level and =1992/_/interview_date.py= at
+  the wave level.  Observed on every cold build, on =development= as well as
+  after the GH #323 fix, with the correct row counts delivered both times
+  (=interview_date= 1,502 before / 1,807 after).  Do not chase it as a
+  regression; if it is ever worth silencing, that is a framework question, not
+  a Guyana one.
+- =EDUCN.dta= has 7,691 rows but =HS= (highest school) is NaN for 3,058 of them;
+  those rows carry no education value and do not survive into
+  =individual_education= (hence 4,633, not 7,691).  This is unrelated to #323.
+- *=housing='s orphan rate goes UP with the correct key, and that is right.*
+  Measured 2026-08-20: 54 of the 1,817 =housing= households (2.97%) have no row
+  in =sample()=, against 17 of 1,508 (1.13%) under the old =(ed_dvsn, smpl_hh)=
+  key.  Those 54 are genuine — =HHCHAR='s =(ed_dvsn, ed_smpl, smpl_hh)= triple
+  matches a =COVERN= household in only 1,765 of its 1,819 rows.  The old key
+  *hid* 37 of them by letting them collide with a real household's =(ED, HH)=
+  pair; the collapse then merged the orphan into a household it does not belong
+  to.  A rising orphan count here is the defect surfacing, not a regression.
+  Those households get =v = NaN= (=_join_v_from_sample= left-joins), which is
+  also why =housing= reports 152 distinct =v= rather than 168.
+- *=household_roster= does not cover every sampled household.*  18 of the 1,807
+  =sample()= households have no =ROSTERN= row at all (e.g. =1-385-1=; six of the
+  18 are in segment =1-385=), so =household_roster= has 1,789 households and 167
+  of the 168 segments.  Under the old key this looked like only 7 — the other 11
+  were masked by the =(ED, HH)= collision.  Not a #323 defect; a source gap that
+  #323 was concealing.
+
 * Sampling universe, exclusions and sub-samples
 
 Evidence gathered 2026-07-21 under GH #601.  Guyana has a single wave in this
@@ -410,9 +598,16 @@ of =gy92info.pdf= on 2026-07-21 and match.
 
 ** Notes for maintainers
 
-- This section does not contradict anything in this file.  The only pre-existing
-  note is the =shocks= availability finding under "Known data issues", which is
-  about module coverage, not sampling; the two do not interact.
+- This section does not contradict anything in this file.  When it was written
+  the only other note was the =shocks= availability finding under "Known data
+  issues", which is about module coverage, not sampling; the two do not
+  interact.  The "Household and cluster identity" section above landed later
+  (GH #323) and *corroborates* this one rather than contradicting it — see the
+  cross-references added there (12 households per =(ED, SN)= segment ↔ ¶37; the
+  two weightless EDs 408/482 ↔ footnote 3; ED-level expansion factors ↔ "keyed
+  at *ED* level, not household level").  The one figure that does NOT reconcile
+  is ¶38's "154 EDs": the microdata has 130 distinct =ED= numbers and 168
+  distinct =(ED, SN)= segments, and neither is 154.  Left unresolved.
 - Correction to the #601 evidence record: it states that this wave's
   =SOURCE.org= "contains ONLY the bare DOI link ... no =#+CATALOG_ID= /
   =#+PROVENANCE_*= keywords."  As of the 2026-07-12 provenance backfill that is

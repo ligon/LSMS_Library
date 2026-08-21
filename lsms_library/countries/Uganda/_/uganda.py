@@ -53,6 +53,179 @@ def v(x):
     return format_id(x)
 
 
+# ---------------------------------------------------------------------------
+# GH #323 -- country-level df_edit hooks.
+#
+# Both of the functions below are dispatched by the framework as the named
+# table's ``df_edit`` hook (``Wave.column_mapping`` ->
+# ``final_mapping['df_edit'] = formatting_functions.get(request)``), for EVERY
+# Uganda wave, because they live in the country module.  A wave that needs
+# something different defines a function of the same name in its own
+# ``_/mapping.py``, which wins.
+#
+# They exist because the framework's fallbacks are silent: a non-unique declared
+# index is reduced with ``groupby().first()``, which takes the first NON-NULL
+# value of each column INDEPENDENTLY and can therefore return a row that exists
+# in no source record.  Neither of these hooks aggregates.  They make the grain
+# EXPLICIT and then either prove the reduction lossless or say -- out loud --
+# exactly what it could not resolve.  See
+# SkunkWorks/grain_aggregation_policy.org and
+# slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org.
+# ---------------------------------------------------------------------------
+
+_P7_MEMBER_CATEGORY = 'Household members'
+
+
+def people_last7days(df):
+    """Keep the HOUSEHOLD-MEMBER rows of a long-form GSEC15A (GH #323).
+
+    The question ("how many people were present in the last 7 days?") is asked
+    separately for household MEMBERS and for VISITORS.  Through 2013-14 the two
+    live in parallel COLUMNS and the YAML maps ``Men/Women/Boys/Girls`` onto the
+    member block, leaving the visitor block unused:
+
+    ===========  =========  =====================  =======================
+    Wave         File       Member cols (used)     Visitor cols (ignored)
+    ===========  =========  =====================  =======================
+    2005-06      GSEC14     ``h14q1``--``h14q4``   ``h14q5``--``h14q8``
+    2009-10      GSEC15A    ``h15a1``--``h15a4``   ``h15a5``--``h15a8``
+    2013-14      GSEC15     ``T6FQ01a``--``d``     ``T6FQ01e``--``h``
+    ===========  =========  =====================  =======================
+
+    (Verified against the Stata variable labels: ``h14q1`` = "male adults hh
+    members", ``h14q5`` = "male adults visitors", and so on.)
+
+    From 2018-19 the questionnaire went LONG: the same distinction moved out of
+    the column suffix and into a ROW category.  ``GSEC15A`` now carries exactly
+    two rows per ``hhid``, discriminated by ``CEA01`` ("Household member/visitor")
+    in {'Household members', 'Visitors'}, with ``CEA01A``--``CEA01D`` holding the
+    counts *for the selected category*.  The extraction was never updated: the
+    declared index stayed ``(i, t)``, so both rows collided on one tuple and
+    ``_normalize_dataframe_index`` reduced them with ``groupby().first()`` --
+    keeping whichever row the file happened to list first, which is a coin flip.
+
+    The wave YAML now also extracts ``CEA01`` as the temporary myvar
+    ``_category``; this hook selects the member rows and drops it, after which
+    ``(i, t)`` is genuinely unique and the collapse never fires.
+
+    Members-only is not a judgement call -- it is what the three earlier waves
+    above already do.  If you want "people fed" = members + visitors, that is a
+    DIFFERENT table and should be declared as one.
+
+    On a wave whose member/visitor split is in COLUMNS there is no ``_category``
+    to filter on and this is a pass-through -- but the uniqueness of the declared
+    index is asserted either way, so a future long-form wave that forgets the
+    ``_category`` myvar fails loudly here instead of silently returning visitor
+    counts for half its households.
+    """
+    if '_category' in df.columns:
+        cat = df['_category'].astype(str).str.strip()
+        keep = cat == _P7_MEMBER_CATEGORY
+        if not keep.any():
+            raise ValueError(
+                f"people_last7days: no rows with _category == "
+                f"{_P7_MEMBER_CATEGORY!r}; observed categories are "
+                f"{sorted(cat.unique())}.  The source's member/visitor label "
+                f"changed -- fix the filter rather than letting the (i, t) "
+                f"collapse pick a row at random (GH #323)."
+            )
+        df = df[keep].drop(columns='_category')
+    if not df.index.is_unique:
+        n_dup = int(df.index.duplicated().sum())
+        raise ValueError(
+            f"people_last7days: {n_dup} duplicate rows on the declared index "
+            f"{list(df.index.names)}.  Uganda's post-2018 GSEC15A is LONG "
+            f"(one row per member/visitor category); declare CEA01 as the "
+            f"`_category` myvar so this hook can select the member rows.  "
+            f"Collapsing them with .first() returns VISITOR counts for about "
+            f"half the households (GH #323)."
+        )
+    return df
+
+
+def cluster_features(df):
+    """Project the household-grain cover page onto the ``(t, v)`` cluster grain.
+
+    Uganda builds ``cluster_features`` from GSEC1, the household COVER PAGE, so
+    the extraction is one row per HOUSEHOLD while the table is declared at
+    ``(t, v)`` -- roughly a 4-10x inflation.  The reduction is intended (GH #161);
+    what was not intended is that it was left UNDECLARED, so it fell through to
+    the framework's ``groupby().first()``.  That reducer skips NA per column, so
+    where the households of a cluster disagree it does not even return one of
+    their rows -- it assembles a composite out of the first non-null value of
+    each column independently, a "household" that appears nowhere in the survey.
+
+    This hook makes the projection explicit and hands it to ``reduce_to_agreed``
+    (``lsms_library.build_transforms``), whose contract is *lossless or loud*:
+
+    * a cluster whose households AGREE collapses to that agreed row -- silently,
+      because nothing is lost;
+    * a household that reports nothing where another reports a value is an
+      ABSENCE, not a contradiction, so the observed value survives (this is the
+      bulk of Uganda's apparent "destruction": 2005-06 loses 2,551 rows to the
+      Site-1 audit but has ZERO clusters whose households actually disagree on
+      Region/Rural/District -- they differ only in whether the geovar carried a
+      GPS fix);
+    * a cluster whose households genuinely DISAGREE gets ``<NA>`` in the
+      offending column plus a ``GrainConflictWarning`` naming it.
+
+    ``on_conflict='na'`` rather than the default ``'raise'``, deliberately, and
+    the reason is that Uganda's residual disagreements are properties of the
+    SURVEY, not defects we can configure away:
+
+    1. ``comm`` (2005-06 .. 2011-12) is the *2005-06 EA of origin*, which the
+       panel carries forward when it tracks a mover.  A household that moved
+       district still reports its origin EA, so its District/Region legitimately
+       differ from its EA-mates'.  93 clusters in 2010-11, 106 in 2011-12.
+    2. ``v`` is a PARISH from 2013-14 on, and a parish contains several
+       enumeration areas -- some urban, some rural, each with its own geovar
+       fix.  ``Rural`` and the GPS are therefore not parish attributes at all
+       (70 / 65 / 122 / 122 clusters conflict on Rural in 2013-14 / 2015-16 /
+       2018-19 / 2019-20).
+
+    Neither can be resolved from this table, and picking a winner is the bug.
+    ``<NA>`` + a warning is the honest answer; per-household ``Rural`` / ``Region``
+    remain exact in ``sample()``, which is their proper home.
+
+    NOT reduced with an average.  Where the within-cluster GPS varies at all it
+    varies by a MEDIAN of 4.6-42.9 km and by up to 584 km (measured, all waves):
+    that is a broken cluster key, not a scatter of points around a centroid, and
+    averaging it would smear two places into one and hide the evidence -- the
+    same argument that retired core's ``.mean()`` on 2026-07-13.
+
+    Rows whose ``v`` is missing are dropped HERE, with a count, rather than
+    disappearing inside a ``groupby(dropna=True)`` further downstream (GH #323
+    Site 3: delete and report, decision D2).  A cluster with no identifier cannot
+    be addressed by any consumer.
+    """
+    from lsms_library.build_transforms import reduce_to_agreed
+
+    flat = df.reset_index()
+    # The household level has no place in a cluster-grain table, and leaving it
+    # in would make every multi-household cluster look like a conflict (`i` is
+    # distinct by construction).  Drop it whether it arrived as an index level
+    # or -- via the `dfs:` merge -- as a column.
+    flat = flat.drop(columns=[c for c in ('i', 'index') if c in flat.columns])
+    missing = [lvl for lvl in ('t', 'v') if lvl not in flat.columns]
+    if missing:
+        raise ValueError(
+            f"cluster_features: {missing} absent from the extracted frame "
+            f"(have {list(flat.columns)}).  The wave's data_info.yml must "
+            f"supply `v` either as an idxvar or as a myvar."
+        )
+    n_blank = int(flat['v'].isna().sum())
+    if n_blank:
+        warnings.warn(
+            f"Uganda/cluster_features: dropping {n_blank:,} household row(s) "
+            f"with no cluster id (`v` is missing).  They cannot be addressed by "
+            f"any consumer, and keeping them would put an unnamed cluster in a "
+            f"table keyed on the cluster.  GH #323 (Site 3).",
+            stacklevel=2,
+        )
+        flat = flat[flat['v'].notna()]
+    return reduce_to_agreed(flat.set_index(['t', 'v']), on_conflict='na')
+
+
 def _format_agsec_hhid(s, t):
     """Canonical household id for Uganda's AGSEC (agricultural) modules.
 
@@ -1441,11 +1614,49 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
 
     Returns
     -------
-    pd.DataFrame indexed by ``(t, i, plot, input)`` with columns
+    pd.DataFrame indexed by ``(t, i, plot, input, j, season)`` with columns
     ``Quantity`` (Float64), ``u`` (object, native unit label), ``Purchased``
-    (boolean), ``Quantity_purchased`` (Float64), ``Improved`` (boolean,
-    seed rows), and ``j`` (object crop label, seed rows where recorded).
-    Reported values only; missing-in-wave columns are NaN.
+    (boolean), ``Quantity_purchased`` (Float64) and ``Improved`` (boolean,
+    seed rows).  Reported values only; missing-in-wave columns are NaN.
+
+    ``season`` is part of the GRAIN (GH #637).  AGSEC3A and AGSEC3B are two
+    DISTINCT plot-season questionnaires and the same plot id appears in both,
+    so without it a fertilizer/pesticide applied in season A and again in
+    season B collapses onto ONE row -- summing quantities across seasons and
+    picking one native unit at random.  This is the identical argument the
+    sibling ``plot_labor`` builder already states for the SAME two files
+    ("collapsing the two seasons into one (plot, source) row would require
+    summing across seasons (a transformation)"), and ``crop_production``
+    likewise carries ``season``; ``plot_inputs`` was the only one of the
+    three that did not.  Measured on the pre-fix build (cold, re-derived
+    2026-07-21): of the 1,342 colliding 5-key tuples across the seven waves,
+    1,196 -- 89%, NOT the "~95%" an earlier draft of this docstring claimed --
+    were season-A/season-B pairs (2009-10: 230 of 242; 2013-14: 112 of 112,
+    i.e. every collision in that wave).  In 33 of them the two seasons
+    reported the same input in DIFFERENT units (Kg vs Litre), so ``sum()``
+    added the quantities and ``.first()`` on ``u`` labelled the result with
+    one of them.  Per wave that is 5 / 6 / 0 / 5 / 4 / 3 / 10 over
+    2009-10 ... 2019-20 -- NOT "6 per wave"; 2011-12 has none at all.
+
+    Seed rows come from AGSEC4A, the FIRST-season plot-crop roster, so they
+    carry ``season = 'A'``.  The second-season roster (AGSEC4B) is present in
+    the source but is not read, so no season-B seed rows are emitted -- a
+    pre-existing coverage gap that the ``season`` level now makes visible
+    instead of silently folding into the season-A rows.
+
+    ONE SIDE EFFECT, stated rather than left silent.  Adding ``season`` makes
+    the 2013-14 index unique, so the de-dup collapse at the end of this
+    function no longer runs in that wave -- and therefore no longer deletes a
+    row whose ``plot`` is NaN via ``groupby(..., dropna=True)``.  2013-14's
+    ``Quantity`` total consequently rises by 3.0 (335,392.005 ->
+    335,395.005); the row is wave-level ``i='H16306-04-01'`` (panel id
+    2113000606), ``input='Seed'``, ``j='Cassava'``, ``Quantity=3.0``,
+    ``u='Sack (100 kgs)'``.  Every other wave's total is unchanged, so the
+    blanket claim "Quantity totals are unchanged" is FALSE and should not be
+    repeated.  Note what this exposes: whether a NaN-``plot`` row survives
+    depends on whether some UNRELATED tuple happened to collide in the same
+    wave.  Resurrecting the row is the better outcome, but the inconsistency
+    is real and pre-existing (see the collapse comment below).
     """
     input_map = _input_label_map()
     unit_map = _harvest_unit_map()        # seed unit reuses harvest scheme
@@ -1518,6 +1729,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
                 'i': hh.values,
                 'plot': plot_id.values,
                 'input': input_label.values,
+                'season': season,
                 'Quantity': qty.values,
                 'u': u.values,
                 'Purchased': purchased.values,
@@ -1575,6 +1787,9 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
             'i': hh.values,
             'plot': plot_id.values,
             'input': seed_label,
+            # AGSEC4A is the FIRST-season plot-crop roster (AGSEC4B, the
+            # second-season roster, is not read) -> every seed row is season A.
+            'season': 'A',
             'Quantity': qty.values,
             'u': u.values,
             'Purchased': purchased.values,
@@ -1610,12 +1825,59 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # level non-null so it is a valid index level.
     df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
 
-    df = df.set_index(['t', 'i', 'plot', 'input', 'j'])
-    # Collapse only EXACT-duplicate (t,i,plot,input,j) tuples — the same input
-    # identity reported twice for the same plot-crop (e.g. a fertilizer block
-    # appearing in both AGSEC3A passes, or a seed row repeated).  This is
-    # de-duplication of the index grain, NOT cross-item aggregation: Quantity
-    # / purchased quantity sum, flags/unit take first.
+    df = df.set_index(['t', 'i', 'plot', 'input', 'j', 'season'])
+    # Collapse only EXACT-duplicate (t,i,plot,input,j,season) tuples — the same
+    # input identity reported twice WITHIN one plot-season (e.g. a seed row
+    # repeated in AGSEC4A).  This is de-duplication of the index grain, NOT
+    # cross-item aggregation: Quantity / purchased quantity sum, flags/unit
+    # take first.
+    #
+    # GH #637 key-soundness review: `season` was added to the grain precisely
+    # so this collapse can no longer merge a season-A application with a
+    # season-B one.  Before it, 1,196 of the 1,342 colliding 5-key tuples (89%)
+    # were exactly that, and in 33 of them the two seasons reported the same
+    # input in DIFFERENT units so the `.first()` on `u` below picked one.
+    #
+    # WHAT REMAINS -- measured, not assumed (cold build, frame captured
+    # immediately before this block, 2026-07-21).  An earlier draft of this
+    # comment said "the collapse no longer fires at all" and "what remains is
+    # same-season repetition, which is genuinely a duplicate".  Both are false:
+    #
+    #   wave       built  returned  discarded  NaN-`plot` deleted  merged away
+    #   2009-10   14,124    13,993        131                 130            1
+    #   2010-11   13,561    13,554          7                   0            7
+    #   2011-12   12,367    12,353         14                   5            9
+    #   2013-14   11,834    11,834          0                   0            0
+    #   2015-16   11,981    11,981          0                   0            0
+    #   2018-19   10,485    10,367        118                   0          118
+    #   2019-20   10,137    10,134          3                   0            3
+    #   total     84,489    84,216        273                 135          138
+    #
+    # The index is unique in only 2 of the 7 waves (2013-14, 2015-16); this
+    # collapse still runs in the other five and still discards 273 reported
+    # line-items.  Of those, 135 are not merged at all -- `groupby(dropna=True)`
+    # DELETES them outright because `plot` is NaN (130 in 2009-10, 5 in
+    # 2011-12) -- and 138 are merged away by collapsing 135 duplicate groups.
+    # This residual is PRE-EXISTING and much smaller than before (pre-fix the
+    # same 84,489 rows returned 83,019, losing 1,470).
+    #
+    # And the residual is NOT self-evidently "genuine duplication".  All 135
+    # groups are `input='Seed'`: two AGSEC4A plot-crop rows for the same
+    # (plot, crop).  That is the SAME shape of missing identifier `season` just
+    # fixed, one level further down -- WHICH AGSEC4A crop row a seed line came
+    # from.  119 of the 135 carry no reported Quantity at all and 8 carry
+    # exactly one, so nothing is summed there; but 8 groups (all 2011-12) sum
+    # two or three reported quantities, and 4 of those sum DIFFERENT values:
+    #
+    #   2011-12  HH 2083000802  plot -1-2  Seed/Ground Nuts   9.0 + 8.0 -> 17.0 Kg
+    #   2011-12  HH 3073002502  plot -1-1  Seed/Beans        20.0 + 4.0 -> 24.0
+    #   2011-12  HH 3183000307  plot -2-2  Seed/Other Crop   0.5 + 0.25 -> 0.75
+    #   2011-12  HH 3183000310  plot -3-5  Seed/Other Crop  32.0+0.25+0.25 -> 32.5
+    #
+    # No residual group has a unit conflict among rows carrying a real (non-
+    # 'Unknown') unit.  Tracked on GH #637; NOT fixed here, because naming the
+    # missing AGSEC4A row identifier is a grain decision of its own and per
+    # GH #323 D1 the answer is an index level, never a reducer.
     if not df.index.is_unique:
         num = df[['Quantity', 'Quantity_purchased']].groupby(level=df.index.names).sum(min_count=1)
         flags = df[['Purchased', 'Improved']].groupby(level=df.index.names).max()

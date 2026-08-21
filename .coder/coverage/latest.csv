@@ -687,13 +687,13 @@ Guinea-Bissau,sample,2018-19,sane,declared,5351,all checks pass
 Guinea-Bissau,shocks,2018-19,sane,declared,9487,warn: no_constant_columns
 Guinea-Bissau,subjective_well_being,2018-19,sane,declared,5334,warn: index_levels_match_scheme
 Guyana,assets,1992,absent,absent,,source not declared for wave
-Guyana,cluster_features,1992,sane,declared,130,warn: has_household_index
-Guyana,household_characteristics,1992,sane,declared,1495,all checks pass
-Guyana,household_roster,1992,sane,declared,6939,warn: index_levels_match_scheme
-Guyana,housing,1992,sane,declared,1508,warn: index_levels_match_scheme
-Guyana,individual_education,1992,sane,declared,4137,warn: index_levels_match_scheme
-Guyana,interview_date,1992,sane,declared,1502,warn: index_levels_match_scheme
-Guyana,sample,1992,sane,declared,1502,all checks pass
+Guyana,cluster_features,1992,sane,declared,168,warn: has_household_index
+Guyana,household_characteristics,1992,sane,declared,1789,all checks pass
+Guyana,household_roster,1992,sane,declared,7827,warn: index_levels_match_scheme
+Guyana,housing,1992,sane,declared,1817,warn: index_levels_match_scheme
+Guyana,individual_education,1992,sane,declared,4633,warn: index_levels_match_scheme
+Guyana,interview_date,1992,sane,declared,1807,warn: index_levels_match_scheme
+Guyana,sample,1992,sane,declared,1807,all checks pass
 India,assets,1997-98,sane,declared,4371,all checks pass
 India,cluster_features,1997-98,sane,declared,120,warn: has_household_index
 India,employment,1997-98,sane,declared,2593,warn: index_levels_match_scheme
