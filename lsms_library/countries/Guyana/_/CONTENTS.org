@@ -38,12 +38,21 @@ Row counts before → after the fix:
 | cluster_features     |    130 |    168 |
 
 Enforced by =tests/test_guyana_index_uniqueness.py= (pinned row counts, the ED-5
-de-fusion, and a *cold-build* no-collapse-warning check).  A warm-cache check
-would pass vacuously — the collapse is baked into the cache, so the warning
-never fires twice.  Prose here is documentation; the test is the enforcement.
+de-fusion, the cluster *values*, and a *cold-build* no-collapse-warning check).
+A warm-cache check would pass vacuously — the collapse is baked into the cache,
+so the warning never fires twice.  Prose here is documentation; the test is the
+enforcement.
 
-*Re-measured 2026-08-20* when this branch was merged up to =development=.  Two
-figures in the original write-up were wrong and are corrected above: the
+*Two ways that enforcement can go quietly blind, both hit here.*  (1) A warm
+cache: covered by clearing the parquets and setting =LSMS_NO_CACHE=.  (2)
+Matching the warning by its *message text*: the cold-build check originally
+grepped for ="duplicate tuple"=, the GH #323 audit work later reworded the
+message, and the check then passed against the *broken* config while seven
+=GrainCollapseWarning=s were being emitted in the same run.  It now matches the
+=GrainCollapseWarning= **category**.  Match on the class, never on the prose.
+
+*Re-measured 2026-08-20* when this branch was merged up to =development=.
+Three figures in the original write-up were wrong and are corrected above: the
 conflation is *257* buckets / *562* households / *2,419* people (30.9%), not
 248 / 542 / 2,381 (30.4%).  The corrected numbers reconcile exactly with the
 row counts — 562 − 257 = *305* = 1,807 − 1,502 — which the old ones did not
