@@ -54,6 +54,10 @@ mechanism is involved; it was simply a miscount.  The competing branch
 *Cross-checks against the BID* (the =gy92info.pdf= evidence in the sampling
 section below), which the microdata independently corroborates:
 
+- ¶29 "There were 2,610 EDs in the country, of which 616 were selected to the
+  sample for the HIES" ↔ =WEIGHT.dta= has exactly *616* rows, one per ED.  That
+  is the frame, and it is why joining it as a spine admits 488 EDs that hold no
+  surveyed household.
 - ¶37 "twelve (12) households were selected" per segment ↔ 129 of the 168
   =(ED, SN)= segments hold exactly 12 households (16 hold 11, the rest fewer).
 - footnote 3 "The expansion factors are missing for ED numbers 408 and 482" ↔
