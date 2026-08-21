@@ -912,15 +912,303 @@ rounds.  Source files and label handling:
 Still NOT wired (genuine blockers, not feature gaps to close cheaply):
 
 - *1987-88 / 1988-89* (GLSS1/GLSS2): the education module lives in
-  =Y02A.DAT=/=Y02B.DAT= fixed-format =.DAT= files (parsed via =.DCT=
-  dictionaries), which are not in the local DVC blob cache and carry no
-  embedded value labels.  Wiring would require materializing those blobs and
+  =Y03I.DAT=/=Y03II.DAT= fixed-format =.DAT= files (parsed via =.DCT=
+  dictionaries), which carry no
+  embedded value labels.  Wiring would require
   hand-building a GLSS1/2 grade→label map from the questionnaire — but the
   GLSS1/2 questionnaires are scanned-image PDFs with no text layer (same
   blocker noted for =housing= above), so the codes cannot be reliably decoded.
+
+  /Corrected 2026-08-20 (was =Y02A.DAT=/=Y02B.DAT=)./  =Y02A=/=Y02B= are the
+  *housing* module, not education.  =Y03I.DCT= carries =READ WRITE ARITH
+  APPREN SCH GRADE TECH DIPLOMA SCHTYP …= and =Y03II.DCT= carries =EXPTA
+  EXPSCL EXPTR EXPTUI SCHOLAR …=, matching the LSMS Basic Information Document
+  (=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf=,
+  §2.1): "Section 3 SCHOOLING / 3I ATTENDANCE / 3II EXPENSES".  =Y02A.DCT= is
+  =DOMICILE COMPOUND NBLDG APT ROOMS RESWORK YRSRES …= and =Y02B.DCT= is
+  =OWNHH RENTED … DWATER … TOILET … LIGHT ELECM … FUEL WOOD …=, matching
+  "Section 2 HOUSING / 2A TYPE OF DWELLING / 2B HOUSING EXPENSES".  Also
+  corrected: the blobs *are* fetchable — a sweep on 2026-08-20 pulled all 77
+  GLSS1 and 93 GLSS2 =.DCT= dictionaries and all 155 GLSS3 =.DTA= files
+  through =get_data_file()= with zero failures.
 - *1991-92* (GLSS3): the cached =S2.DTA= blob is a cover/control file
   (interviewer codes + interview dates), NOT the Section-2 education roster.
   The GLSS3 person-level education module is among the ~140 un-cached blobs,
   GLSS3 =.dta= files carry NO embedded value labels, and the correct file is
   not identifiable from the cached set, so it is left unwired rather than
   guessed.
+
+* Categorical decodes: three traps this country has now sprung three times (2026-08-19)
+
+Read this before touching any =mapping.py= or any =Code | Label= table here.
+
+** Trap 1: a bare =get_categorical_mapping= returns an EMPTY dict, silently
+
+=local_tools.get_categorical_mapping(tablename=X)= called *without* a
+value-column keyword returns =\{\}=.  It passes =idxvars='Code'= and no myvars,
+so =df_data_grabber= drops the Label column and the =.squeeze()= yields
+nothing.  Nothing raises.  Every lookup then misses, returns =pd.NA=, and the
+column ships 100% null while the build reports success.
+
+This has bitten GhanaLSS *three separate times*:
+
+| GH        | what died                                       | fixed for      |
+|-----------+-------------------------------------------------+----------------|
+| #372/#377 | =region_dict= -- Region/Birthplace all NA       | 1991-92 only   |
+| #348      | the 1991-92 =units= decode                      | 1991-92        |
+| (2026-08) | region/rural/relationship in the other 3 waves  | all            |
+
+The first two fixes were applied to *one wave each*, so 1987-88, 1988-89 and
+1998-99 kept calling the bare form.  Consequence, measured on a cold cache
+before the 2026-08-19 fix:
+
+- =cluster_features= graded *dropped* in all three waves.  1987-88 returned
+  *zero rows* (its region inference groups by an all-NA key, and =groupby=
+  drops it); the other two returned frames whose every declared column was null.
+- =household_roster= shipped =Birthplace=, =Relationship=, =Generation=,
+  =Distance= and =Affinity= 100% NULL in those three waves -- *56,817 people*
+  with no kinship data.  The last three are *required* columns in
+  =lsms_library/data_info.yml=.
+- =sample= shipped =strata= and =Rural= 100% null for 1998-99.
+
+*Use =local_tools.code_label_map= instead.*  It passes the value column and
+keys the result by *both* the string and the int form of each numeric code --
+because the second half of this trap is key types: =df_data_grabber=
+stringifies the Code index via =format_id= (so keys are ='1'=), while wave
+mapping functions variously look up with =int(value)= or =str(value)=.  Both
+historical bugs were partly key-type mismatches.
+
+** Trap 2: GLSS4's relationship scheme is NOT GLSS1's
+
+The country-level =relationship= table in =_/categorical_mapping.org= has
+*fourteen* codes and cites *GLSS1*'s data dictionary
+(=catalog/2313/data-dictionary/F184?file_name=y01a=).  It is correct for
+GLSS1 and GLSS2 -- verified against the raw data, where =REL= takes codes 1--14
+and code 1 occurs 3,136 / 3,192 times = each wave's household count.
+
+*It is not correct for GLSS4.*  1998-99's =rel= (=SEC1.DTA=, variable label
+"Relationship to HH head") takes only *nine* codes, 1--9, with code 1 occurring
+5,998 times = the household count.  =SEC1.DTA= carries *no* embedded Stata
+value labels (=value_labels() == []=), so the GLSS4 list has to come off the
+questionnaire.
+
+1998-99 =Relationship= is therefore *deliberately left unmapped* rather than
+decoded through a table that would silently mis-label it.  A null column is
+honest; a wrong kinship label propagates into
+=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  If you
+add the GLSS4 list, add it as a *wave-level* table in
+=1998-99/_/categorical_mapping.org= and search the wave dir *first*, so it
+cannot fall through to the GLSS1 table.  (The same wave-first discipline is why
+1991-92 keeps its own =region= table: GLSS3 orders the two northern regions
+9=Upper West, 10=Upper East, the reverse of the country-level table.)
+
+** Trap 3: GLSS1/GLSS2 "cluster region" is INFERRED, not measured
+
+GLSS1 and GLSS2 have *no cluster-location variable at all*.  Both waves read
+=cluster_features.Region= and =household_roster.Birthplace= from the *same*
+source column, =Y01A.DAT:REGION= -- which is the *person's region of birth*,
+not where the cluster is.
+
+=mapping.py::cluster_features= in both waves therefore *infers* the cluster's
+region as the modal birth region among household members under 12 (young
+children being least likely to have migrated).  =Age= is pulled into
+=cluster_features= =myvars= purely so that filter can run; it is dropped before
+the frame is returned.
+
+*This is an approximation, and any analysis keyed on GLSS1/GLSS2 cluster region
+inherits it.*  It loses no clusters (checked: 176 of 176 clusters in 1987-88
+have at least one under-12 with a valid birth region), but it is a guess about
+geography derived from a migration-sensitive question.
+
+1988-89 had no such function until 2026-08-19.  Once its decode was revived,
+the framework collapsed the person-grain frame with =groupby().first()=,
+taking an *arbitrary* person's birth region for the whole cluster --
+=GrainCollapseWarning= reported 14,559 of 14,924 rows destroyed across 167
+conflicting clusters, i.e. 167 of 170 clusters held members born in more than
+one region.
+
+** Trap 4: GLSS1 had no =region= table of its own, and the fallback is REVERSED
+
+Found 2026-08-20, one day after Trap 1 was fixed, and *caused* by that fix.
+
+=1987-88/_/categorical_mapping.org= carried no =region= table, so
+=code_label_map('region', _dirs)= fell through =_dirs= to the *country-level*
+=_/categorical_mapping.org=.  That table reads =9 = Upper East, 10 = Upper
+West=.  *Every wave-level table in this country reads the reverse* -- 1988-89,
+1991-92 and 1998-99 all have =9 = Upper West, 10 = Upper East=, and 1998-99's
+ordering was checked against the GLSS4 questionnaire on 2026-08-19.
+
+While GLSS1's decode was dead the disagreement was *unobservable*: =region_dict=
+was ={}=, so =Region= and =Birthplace= were 100% NA and no value could be wrong.
+Reviving the decode (=18b6ca51=) armed it, and shipped *1,511 people* with
+=Birthplace= reversed and *11 of 176 clusters* with =Region= reversed.
+
+This is the same lesson as Trap 1, one level deeper, and it is worth stating
+plainly: *a fallback that has never been exercised has never been checked.*
+The country-level table was not wrong for anything that used it before --
+nothing used it.
+
+*** The evidence, since C4 cannot be run here
+
+The GLSS1 questionnaire is a scanned image with no text layer, so the
+questionnaire check is *unrunnable* for this wave.  Four converging lines of
+non-questionnaire evidence establish the ordering instead:
+
+| # | check | result |
+|---+-------+--------|
+| 1 | =1988-89/Data/CLYR1YR2.DAT= bridges 85 clusters across the two waves | 75/85 agree on region overall, but *0 of the 6* touching an Upper region agree -- each differing in the direction a 9/10 swap predicts |
+| 2 | the three sibling waves' own tables | all read =9 = Upper West= |
+| 3 | this wave's raw =REGION= codes | run =1..11=, the 11-code era list (11 = a single "Foreign Country"), not GLSS2's 17-code list |
+| 4 | Upper East is the more populous region | every other wave has more Upper East clusters than Upper West (ratios 1.78, 2.17, 3.00); 1987-88 alone inverted at 4/7 = 0.57 |
+
+After the fix the bridge agreement rises *88.2% -> 95.3%*, the Upper-region
+pairs go *0/6 -> 6/6*, and 1987-88's ratio becomes 7/4 = 1.75, in line with its
+siblings.  The 4 residual mismatches are single scattered pairs, consistent
+with the modal-birth-region approximation of Trap 3 rather than with a coding
+error.
+
+*** Two mechanical traps this sprang on the way
+
+- *An Org =#+name:= attaches to the NEXT element.*  A comment block placed
+  between =#+name: region= and the table silently steals the name; the table is
+  then unnamed, the lookup misses, and the decode stays dead *with no error*.
+  Keep commentary above the =#+name:= line.  The first attempt at this fix was
+  a silent no-op for exactly this reason, and it looked like a successful build.
+- =1988-89= spelled code 7 =Brongahafo= where all six other waves spell it
+  =Brong Ahafo=.  Harmless-looking, but it means
+  =df[df.Region == 'Brong Ahafo']= silently dropped all 170 of that wave's
+  clusters.  Corrected in the wave's own table.
+
+** Cluster counts, and a vocabulary trap in the documentation
+
+Post-fix cluster counts are exactly the distinct =CLUST= values in the source:
+*176* (1987-88) and *170* (1988-89).
+
+Do *not* read these as an exact match to the DDI's realised figures of 178 and
+170 "sampling areas".  The same DDI sentence defines the terms apart: "Each
+group of 16, 32 or 48 households within a sampling area is referred to as a
+cluster in the GLSS data sets".  A sampling area may hold more than one
+cluster.  Observed households per cluster (1987-88: min 10, median 16, max 48;
+1988-89: min 14, median 16, max 47) match that design.  Treat the agreement as
+corroboration, not identity.
+
+* Adjudication of the 11 =absent= coverage cells (2026-08-20)
+
+Verdicts, evidence and the checks run live in
+=.coder/coverage/absent_verdicts.csv=.  This section records the
+*idiosyncrasies* the sweep turned up, because they will trip the next person.
+
+** GLSS1/GLSS2 =.DAT= files are COMMA-SEPARATED WITH A HEADER ROW, not fixed-width
+
+The =.DCT= dictionaries look like Stata =infile= dictionaries and give
+=start-column / width / type / name= for a fixed-width layout.  *The shipped
+=.DAT= does not use that layout.*  =Y09A.DAT= line 1 is
+=CID,CLUST,YRTITLND,HID,ACRFRM,...= and every row is comma-delimited.  Reading
+one with =pd.read_fwf(colspecs=...)= built from the =.DCT= "succeeds" and
+returns garbage -- shredded comma-strings spread across the wrong columns, with
+the numeric tail silently all-NaN and =nunique=0=.  Read them with
+=pd.read_csv(..., na_values=['.'])=; use the =.DCT= only as the authoritative
+*variable list*.
+
+** The =.DCT= label layer does not exist -- C1 cannot run on GLSS1/GLSS2
+
+All 77 GLSS1 and 93 GLSS2 dictionaries carry variable *names* and nothing else:
+no variable labels, no value labels.  So a term search over GLSS1/GLSS2
+metadata that finds nothing has *not* established absence -- it has established
+that there was nothing to search.  The same trap recurs in a weaker form later:
+GLSS3's =S*.DTA= carry *zero* variable labels AND zero value-label sets;
+GLSS4's =SEC*.DTA= carry variable labels but still zero value-label sets;
+GLSS5/6/7 are fully labelled.
+
+** Which questionnaires have a text layer, and which do not
+
+| Wave    | Household questionnaire                                              | Text layer? |
+|---------+----------------------------------------------------------------------+-------------|
+| 1987-88 | =questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf= (78 pp)            | *NO*        |
+| 1988-89 | =questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf= (78 pp)  | *NO*        |
+| 1991-92 | =pdf/G3QPartA.pdf= (38 pp) + =pdf/G3QPartB.pdf= (44 pp)               | yes         |
+| 1998-99 | =questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf= (118 pp) | yes         |
+| 2005-06 | =G5QPartA.pdf= (52 pp) + =G5QPartB.pdf= (59 pp)                       | yes         |
+| 2012-13 | =QUESTIONNAIRES/GLSS6 Part A/Part B Questionnaire.pdf= (66+70 pp)     | yes         |
+| 2016-17 | =GLSS7_MODULE A/B ....docx=                                           | yes (docx)  |
+
+The two GLSS1/GLSS2 files are *image-only*: 78 CCITT-fax page scans and *zero*
+font objects, so =pdfminer= extracts 0 non-whitespace characters.  They are,
+however, *legible*, and can be read without =poppler= (which is not installed
+here): each page is a single =CCITTFaxDecode= XObject (=K = -1=, i.e. Group 4),
+which PIL will open if you wrap the raw stream in a synthetic single-strip TIFF
+header (=Compression=4=, =PhotometricInterpretation=0=, one strip, =RowsPerStrip
+= Height=).  That is how the =plot_features= C4 below was run.  There is no OCR
+in this environment, so a *targeted* read of known pages is feasible and an
+exhaustive term-search of the form is not -- which is exactly why
+=food_security= for these two waves is =unsure= and not =not-asked=.
+
+Two GLSS1/GLSS2 documents that *do* have text and are worth reaching for first:
+=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf= (the
+joint LSMS Basic Information Document, 60 pp, covers *both* rounds; its §2.1
+enumerates every module and sub-module of the household questionnaire) and the
+GLSS3 main report.  Everything else in those two =Documentation/= trees --
+=Dataentry=, =Additional=, =Interviewer= -- is image-only too.
+
+** Section numbers moved between GLSS2 and GLSS3.  Do not carry a mapping across.
+
+| Module                | GLSS1/GLSS2                                                                          | GLSS3--GLSS7 |
+|-----------------------+--------------------------------------------------------------------------------------+--------------|
+| Housing               | *Section 2* (2A dwelling, 2B expenses) *and Section 8* (walls/floor/roof/window/area) | Section 7    |
+| Schooling / education | Section 3 (3I attendance, 3II expenses)                                              | Section 2    |
+| Agriculture           | Section 9                                                                            | Section 8    |
+| Household expenditure | Sections 11 + 12                                                                     | Section 9    |
+
+So =Y08.DAT= is *not* the analogue of =SEC7.DTA=; it is only half of it.  The
+water / toilet / lighting / tenure / rooms half is in =Y02A=/=Y02B=.  (Source:
+the joint BID §2.1, corroborated variable-by-variable against the =.DCT=s.)
+
+** A "sec9c" filename is not a food-security module
+
+=food_security= is wired for 2016-17 from =g7sec9c.dta= -- the FAO FIES 8-item
+battery (=s9cq6= = "During the last 12 months, was there a time when your
+household ran out of food").  =S9C.DTA= / =SEC9C.DTA= / =sec9c.dta= exist in
+GLSS3, GLSS4, GLSS5 and GLSS6 as well, and they are a *completely different*
+module: Section 9 Part C "AVAILABILITY OF SELECTED CONSUMER ITEMS", =availcd= x
+(=s9cq1= "found items available when you tried to purchase them", =s9cq2= "how
+does availability compare with the preceding year").  A market-supply question
+about 14--15 consumer items, item-grain, not household-experience-grain, and it
+maps to none of the 8 FIES items.  GLSS7 reused the 9C slot for FIES; nothing
+else in the series did.
+
+** GLSS1/GLSS2 Section 9 Part A "LAND" is household-grain by design
+
+=Y09A.DAT= is strictly one row per household (1987-88: 2,644 rows / 2,644
+unique =HID=; 1988-89: 2,938 / 2,938), and none of =Y09B..Y09K= carries a farm
+or plot key -- they are keyed by crop code, input code, livestock code or tool.
+Confirmed against the form itself: questionnaire p.42--43 (printed 30--31, form
+blocks =9A1=/=9A2=) is 29 single-answer household questions ("How many acres of
+the land belonging to your household have been farmed during the past 12
+months", one ACRES box).  There is no farm-number column anywhere in Part A,
+and a header sweep of the whole of Section 9 shows only Parts A(Land) B(Crops)
+D(Farm inputs) F(Livestock) J(Hand tools) ... -- no roster part.
+
+*Do not read =Y09A:IDFARM= as a plot identifier.*  It cannot be one -- the file
+has one row per household.  =IDFARM= also appears in =Y07.DCT= (Section 7,
+"Respondents for round two") alongside =FARMSE= and =BUSSE=/=BID1..BID5=, which
+is where Section 7 records *who* answers the agriculture module.
+
+** 2005-06 DOES ship Section 8 agriculture
+
+An earlier =data_scheme.yml= comment said "2005-06 lacks Section 8 agriculture
+(data jumps sec9 -> sec11)".  That was false, and is corrected in place.
+=2005-06/Data/partb/= holds =sec8a1 sec8a2 sec8a3 sec8b sec8c1 sec8c2 sec8d
+sec8e sec8f sec8g sec8h=.  The file genuinely absent is =sec10= (non-farm
+enterprises) -- which is what the sec9 -> sec11 jump actually shows, and it is
+the one GLSS5 module with its own separate questionnaire (=G5Q10.pdf=).
+=partb/sec8b.dta= is a per-plot roster of 11,471 rows carrying the *same*
+variable names 2016-17 already reads (=s8bq3= farm number, =s8bq4a=/=s8bq4b=
+size + unit, =s8bq8= how obtained), so wiring =plot_features= for this wave is
+close to a copy of the GLSS7 block.  It is a =todo=, not an absence.
+
+** Blob availability
+
+Every file the sweep asked for came back through =get_data_file()=: 77 GLSS1
+=.DCT=, 93 GLSS2 =.DCT=, 155 GLSS3 =.DTA=, 156 GLSS4, 49 GLSS5, 127 GLSS6, 102
+GLSS7 -- *zero* fetch failures.  The "~140 un-cached blobs" noted under
+=individual_education= above no longer describes this checkout.

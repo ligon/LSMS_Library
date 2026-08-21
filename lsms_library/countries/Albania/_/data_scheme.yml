@@ -19,10 +19,32 @@ Data Scheme:
     strata: str
     Rural: str
 
+  # CLUSTER grain (index (t, v)).  Built by per-wave _/cluster_features.py
+  # scripts (2002, 2003, 2004, 2005; the 2008/2012 waves carry no cluster file).
+  #
+  # GH #323: every wave's only source is HOUSEHOLD grain -- 2003's is the PERSON
+  # roster -- so the old YAML extraction declared an extra household idxvar that
+  # is not part of the declared index.  _normalize_dataframe_index then dropped
+  # that level and collapsed the leftover duplicate (t, v) tuples with
+  # groupby().first(), SILENTLY discarding 3,149 / 8,229 / 1,347 / 3,360 rows in
+  # 2002 / 2003 / 2004 / 2005.
+  #
+  # The scripts reduce to cluster grain EXPLICITLY, via albania.cluster_reduce,
+  # which REQUIRES exactly one distinct non-NA value per (cluster, column) and
+  # emits <NA> + a RuntimeWarning otherwise.  Declaring the reduction here as an
+  # `aggregation:` block would NOT have worked: that key is read by nothing in
+  # the library (it sits only in `_skip` sets), so it documents a policy without
+  # enforcing one.
+  #
+  # 2004 additionally needed a SEMANTIC fix: its m0_distr is the household's
+  # CURRENT district while m0_q01 is its ORIGINAL 2002 PSU, so first() handed
+  # movers' districts to whole clusters.  Region is anchored on the 2002
+  # psu -> district map; sentinel "PSUs" 995/999 are dropped as non-clusters.
   cluster_features:
     index: (t, v)
     Region: str
     Rural: str
+    materialize: make
 
   household_roster:
     index: (t, i, pid)

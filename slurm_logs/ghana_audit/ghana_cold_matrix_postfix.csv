@@ -1,0 +1,106 @@
+country,feature,wave,tier,coverage,n_rows,detail
+GhanaLSS,cluster_features,1987-88,sane,declared,176,"warn: has_household_index,no_constant_columns"
+GhanaLSS,cluster_features,1988-89,sane,declared,170,"warn: has_household_index,no_constant_columns"
+GhanaLSS,cluster_features,1991-92,sane,declared,365,"warn: has_household_index,no_constant_columns"
+GhanaLSS,cluster_features,1998-99,sane,declared,300,"warn: has_household_index,no_constant_columns"
+GhanaLSS,cluster_features,2005-06,sane,declared,580,"warn: has_household_index,no_constant_columns"
+GhanaLSS,cluster_features,2012-13,sane,declared,1200,warn: has_household_index
+GhanaLSS,cluster_features,2016-17,sane,declared,1000,"warn: has_household_index,no_constant_columns"
+GhanaLSS,food_acquired,1987-88,sane,declared,71605,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,1988-89,sane,declared,72649,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,1991-92,sane,declared,623600,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,1998-99,sane,declared,542105,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,2005-06,sane,declared,1115420,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,2012-13,sane,declared,1709094,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,2016-17,sane,declared,1124871,warn: index_levels_match_scheme
+GhanaLSS,food_expenditures,1987-88,sane,declared,50830,all checks pass
+GhanaLSS,food_expenditures,1988-89,sane,declared,49312,all checks pass
+GhanaLSS,food_expenditures,1991-92,sane,declared,95672,all checks pass
+GhanaLSS,food_expenditures,1998-99,sane,declared,134627,all checks pass
+GhanaLSS,food_expenditures,2005-06,sane,declared,230823,all checks pass
+GhanaLSS,food_expenditures,2012-13,sane,declared,461602,all checks pass
+GhanaLSS,food_expenditures,2016-17,sane,declared,373678,all checks pass
+GhanaLSS,food_prices,1987-88,sane,declared,71605,all checks pass
+GhanaLSS,food_prices,1988-89,sane,declared,72649,all checks pass
+GhanaLSS,food_prices,1991-92,sane,declared,95672,all checks pass
+GhanaLSS,food_prices,1998-99,sane,declared,134627,all checks pass
+GhanaLSS,food_prices,2005-06,sane,declared,230823,all checks pass
+GhanaLSS,food_prices,2012-13,sane,declared,461602,all checks pass
+GhanaLSS,food_prices,2016-17,sane,declared,438773,all checks pass
+GhanaLSS,food_quantities,1987-88,sane,declared,71605,all checks pass
+GhanaLSS,food_quantities,1988-89,sane,declared,72649,all checks pass
+GhanaLSS,food_quantities,1991-92,sane,declared,114141,all checks pass
+GhanaLSS,food_quantities,1998-99,sane,declared,161176,all checks pass
+GhanaLSS,food_quantities,2005-06,sane,declared,259227,all checks pass
+GhanaLSS,food_quantities,2012-13,sane,declared,511720,all checks pass
+GhanaLSS,food_quantities,2016-17,sane,declared,420529,all checks pass
+GhanaLSS,food_security,1987-88,absent,absent,,source not declared for wave
+GhanaLSS,food_security,1988-89,absent,absent,,source not declared for wave
+GhanaLSS,food_security,1991-92,absent,absent,,source not declared for wave
+GhanaLSS,food_security,1998-99,absent,absent,,source not declared for wave
+GhanaLSS,food_security,2005-06,absent,absent,,source not declared for wave
+GhanaLSS,food_security,2012-13,absent,absent,,source not declared for wave
+GhanaLSS,food_security,2016-17,sane,declared,13892,warn: index_levels_match_scheme
+GhanaLSS,household_characteristics,1987-88,sane,declared,3136,all checks pass
+GhanaLSS,household_characteristics,1988-89,sane,declared,3192,all checks pass
+GhanaLSS,household_characteristics,1991-92,sane,declared,4543,all checks pass
+GhanaLSS,household_characteristics,1998-99,sane,declared,5996,all checks pass
+GhanaLSS,household_characteristics,2005-06,sane,declared,8687,all checks pass
+GhanaLSS,household_characteristics,2012-13,sane,declared,16769,all checks pass
+GhanaLSS,household_characteristics,2016-17,sane,declared,13990,all checks pass
+GhanaLSS,household_roster,1987-88,sane,declared,15492,warn: index_levels_match_scheme
+GhanaLSS,household_roster,1988-89,sane,declared,14924,warn: index_levels_match_scheme
+GhanaLSS,household_roster,1991-92,sane,declared,20403,warn: index_levels_match_scheme
+GhanaLSS,household_roster,1998-99,sane,declared,26411,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,2005-06,sane,declared,37128,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,2012-13,sane,declared,72372,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,household_roster,2016-17,sane,declared,59864,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,housing,1987-88,absent,absent,,source not declared for wave
+GhanaLSS,housing,1988-89,absent,absent,,source not declared for wave
+GhanaLSS,housing,1991-92,sane,declared,4528,warn: index_levels_match_scheme
+GhanaLSS,housing,1998-99,sane,declared,5998,warn: index_levels_match_scheme
+GhanaLSS,housing,2005-06,sane,declared,8687,warn: index_levels_match_scheme
+GhanaLSS,housing,2012-13,sane,declared,16772,warn: index_levels_match_scheme
+GhanaLSS,housing,2016-17,sane,declared,14009,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1987-88,sane,declared,7543,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1988-89,sane,declared,8942,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1991-92,sane,declared,10778,warn: index_levels_match_scheme
+GhanaLSS,individual_education,1998-99,sane,declared,16582,warn: index_levels_match_scheme
+GhanaLSS,individual_education,2005-06,sane,declared,23380,warn: index_levels_match_scheme
+GhanaLSS,individual_education,2012-13,sane,declared,50559,warn: index_levels_match_scheme
+GhanaLSS,individual_education,2016-17,sane,declared,42140,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1987-88,sane,declared,3147,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1988-89,sane,declared,3194,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1991-92,sane,declared,4549,warn: index_levels_match_scheme
+GhanaLSS,interview_date,1998-99,sane,declared,5998,warn: index_levels_match_scheme
+GhanaLSS,interview_date,2005-06,sane,declared,8687,warn: index_levels_match_scheme
+GhanaLSS,interview_date,2012-13,sane,declared,16757,warn: index_levels_match_scheme
+GhanaLSS,interview_date,2016-17,sane,declared,14008,warn: index_levels_match_scheme
+GhanaLSS,panel_ids,,sane,declared,714,714 entries
+GhanaLSS,plot_features,1987-88,absent,absent,,source not declared for wave
+GhanaLSS,plot_features,1988-89,absent,absent,,source not declared for wave
+GhanaLSS,plot_features,1991-92,sane,declared,5213,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,plot_features,1998-99,sane,declared,10569,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,plot_features,2005-06,absent,absent,,source not declared for wave
+GhanaLSS,plot_features,2012-13,sane,declared,21360,warn: index_levels_match_scheme
+GhanaLSS,plot_features,2016-17,sane,declared,11207,warn: index_levels_match_scheme
+GhanaLSS,sample,1987-88,sane,declared,3147,warn: no_constant_columns
+GhanaLSS,sample,1988-89,sane,declared,3194,warn: no_constant_columns
+GhanaLSS,sample,1991-92,sane,declared,4523,warn: no_constant_columns
+GhanaLSS,sample,1998-99,sane,declared,5998,warn: no_constant_columns
+GhanaLSS,sample,2005-06,sane,declared,8687,warn: no_constant_columns
+GhanaLSS,sample,2012-13,sane,declared,16772,all checks pass
+GhanaLSS,sample,2016-17,sane,declared,14009,all checks pass
+GhanaLSS,updated_ids,,sane,declared,7,7 entries
+GhanaSPS,food_acquired,2009-10,sane,declared,119847,all checks pass
+GhanaSPS,food_acquired,2013-14,sane,declared,139339,all checks pass
+GhanaSPS,food_acquired,2017-18,sane,declared,148743,all checks pass
+GhanaSPS,food_expenditures,2009-10,sane,declared,96513,all checks pass
+GhanaSPS,food_expenditures,2013-14,sane,declared,104543,all checks pass
+GhanaSPS,food_expenditures,2017-18,sane,declared,117347,all checks pass
+GhanaSPS,food_prices,2009-10,sane,declared,113722,all checks pass
+GhanaSPS,food_prices,2013-14,sane,declared,135620,all checks pass
+GhanaSPS,food_prices,2017-18,sane,declared,138098,all checks pass
+GhanaSPS,food_quantities,2009-10,sane,declared,114278,all checks pass
+GhanaSPS,food_quantities,2013-14,sane,declared,136872,all checks pass
+GhanaSPS,food_quantities,2017-18,sane,declared,138799,all checks pass

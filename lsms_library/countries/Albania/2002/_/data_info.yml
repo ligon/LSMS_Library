@@ -1,14 +1,12 @@
 Country: Albania
 Wave: 2002
 
-cluster_features:
-    file: ../Data/metadata_cl.dta
-    idxvars:
-        v: psu
-        i: hh
-    myvars:
-        Region: m0_q1a
-        Rural: m0_ur
+# cluster_features: NOT built here.  It is CLUSTER grain (index (t, v)) but the
+# only source in this wave is household/person grain, so a YAML extraction had to
+# declare an extra household idxvar -- which the framework then silently collapsed
+# with groupby().first() (GH #323).  It is now built by _/cluster_features.py
+# (materialize: make in ../../_/data_scheme.yml), which reduces to cluster grain
+# EXPLICITLY and CHECKS that each cluster carries one distinct value per column.
 
 household_roster:
     # i=[psu,hh] -> composite via mapping.py:i() ('psu-hh') to match sample()'s

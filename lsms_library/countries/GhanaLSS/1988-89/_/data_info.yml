@@ -7,6 +7,10 @@ cluster_features:
         v: CLUST
     myvars:
         Region: REGION
+        # Age is pulled ONLY so mapping.py::cluster_features can restrict the
+        # modal-birth-region heuristic to members under 12; it is dropped
+        # before the frame is returned.  Mirrors 1987-88.
+        Age: AGEY
 
 sample:
     file: Y00A.DAT
