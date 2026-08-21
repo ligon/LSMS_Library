@@ -148,6 +148,17 @@ with 100% value agreement.
   available (see the gaps table below).  Recorded rather than guessed.  It
   affects ~7% of asset households and is *identical before and after* the #323
   fix — that fix changed only which rows fall in each group, not the reducer.
+- *"Makefile not found ... Unable to generate required data" is EXPECTED here,
+  and is not a failure.*  Guyana declares two =materialize: make= tables
+  (=assets=, =interview_date=) but ships *no* =_/Makefile=.
+  =Country.run_make_target= warns and returns an empty frame when the country
+  Makefile is missing; the dynamic script dispatch then builds both tables
+  anyway — =_/assets.py= at the country level and =1992/_/interview_date.py= at
+  the wave level.  Observed on every cold build, on =development= as well as
+  after the GH #323 fix, with the correct row counts delivered both times
+  (=interview_date= 1,502 before / 1,807 after).  Do not chase it as a
+  regression; if it is ever worth silencing, that is a framework question, not
+  a Guyana one.
 - =EDUCN.dta= has 7,691 rows but =HS= (highest school) is NaN for 3,058 of them;
   those rows carry no education value and do not survive into
   =individual_education= (hence 4,633, not 7,691).  This is unrelated to #323.
