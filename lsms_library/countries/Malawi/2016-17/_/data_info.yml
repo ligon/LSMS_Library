@@ -113,9 +113,14 @@ cluster_features:
         - i
 
 subjective_well_being:
+    # ID: see the note on `food_security` below -- the cross-sectional half must
+    # go through `cs_i`, or this table lands in a different namespace from
+    # sample / household_roster and every join silently matches nothing.
     file: Cross_Sectional/hh_mod_t.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
     myvars:
         Own Step: hh_t05
         Neighbors Step: hh_t06
@@ -125,9 +130,27 @@ food_security:
     # FAO FIES 8-item battery, IHS4 (hh_t13..hh_t20 in FAO order).
     # Recall period: last 12 months.  yes->True, no->False,
     # DON'T KNOW/refused/NaN->NA (see _/mapping.py).
+    #
+    # ID: the IHS4 cross-sectional half is `cs-17-`-prefixed everywhere else in
+    # this wave (`cs_i` in _/mapping.py; see _/CONTENTS.org "2016-17
+    # cross-sectional id").  Emitting the raw `case_id` put this table in a
+    # DIFFERENT NAMESPACE from sample / household_roster / food_acquired, so
+    # every join matched ZERO of 12,446 rows -- and an empty join reads as "this
+    # wave has no food security data" rather than as an error.  This is the same
+    # failure mode the 2019-20 geo block warns about at its line ~100, and that
+    # `cluster_features` was in for this wave until GH #323; the tables here were
+    # missed by that sweep.
+    #
+    # The panel half is deliberately NOT added: Panel/hh_mod_t_16.dta stops at
+    # `hh_t12`, while the FIES battery is hh_t13..hh_t20 -- the 8 items exist
+    # only in the cross-sectional file.  That is absence in the SHIPPED EXTRACT
+    # and is NOT a claim the 2,508 panel households were never asked; separating
+    # those needs the questionnaire (see CLAUDE.md on absent verdicts).
     file: Cross_Sectional/hh_mod_t.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
     myvars:
         Worried:
             - hh_t13
@@ -220,9 +243,13 @@ panel_ids:
         previous_i: y2_hhid
 
 shocks:
+    # ID: see the note on `food_security` -- cross-sectional `case_id` must go
+    # through `cs_i` or this table cannot be joined to any other Malawi table.
     file: Cross_Sectional/hh_mod_u.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
         Shock: hh_u0a
     myvars:
         AffectedIncome:
@@ -270,9 +297,13 @@ shocks:
         HowCoped2: hh_u04c
 
 assets:
+    # ID: see the note on `food_security` -- cross-sectional `case_id` must go
+    # through `cs_i` or this table cannot be joined to any other Malawi table.
     file: Cross_Sectional/hh_mod_l.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
         j: hh_l02
     myvars:
         Quantity: hh_l03
