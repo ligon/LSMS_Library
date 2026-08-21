@@ -1,0 +1,16 @@
+=== task 24: country='Pakistan'  node=n0180.savio3  Thu Jun 25 18:48:26 PDT 2026 ===
+--- provisioning venv -> /local/job35193706/venv ---
+--- cache clear Pakistan ---
+Pakistan: removed
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/1991/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/1991/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/1991/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/1991/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Pakistan/1991/_/sample.parquet
+--- build Pakistan ---
+=== done 'Pakistan' rc=0  Thu Jun 25 18:48:59 PDT 2026 ===

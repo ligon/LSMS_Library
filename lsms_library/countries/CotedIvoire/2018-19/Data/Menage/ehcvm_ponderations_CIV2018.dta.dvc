@@ -1,0 +1,5 @@
+outs:
+- md5: 30ab9a8250251ec6b41e7e54e26dbcb8
+  size: 7018
+  hash: md5
+  path: ehcvm_ponderations_CIV2018.dta

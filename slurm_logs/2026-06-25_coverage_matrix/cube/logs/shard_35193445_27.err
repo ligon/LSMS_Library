@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py", line 132, in <module>
+    from . import transformations
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/transformations.py", line 11, in <module>
+    from cfe.df_utils import use_indices
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/cfe/__init__.py", line 2, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/cfe/estimation.py", line 1092, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/scipy/stats/__init__.py", line 629, in <module>
+ModuleNotFoundError: No module named 'scipy.stats._variation'
+savio_venv: venv mounted but import failed
+/var/spool/slurmd/job35193475/slurm_script: line 27: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory

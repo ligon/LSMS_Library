@@ -1,5 +1,218 @@
 #+title: Contents
 
+* Sampling universe, exclusions and sub-samples
+
+South Africa is a one-wave country: =Country('South Africa').waves == ['1993']=.
+Everything below therefore concerns the single 1993 wave.
+
+** 1993 (PSLSD / WB "Integrated Household Survey 1993")
+
+*** Where the statement lives
+
+- Nothing in this repository states a universe. :: The wave's local
+  =Documentation/= holds only =.gitignore=, =LICENSE.org= (WB Public Use File
+  terms), =SOURCE.org= (the catalog stub: DOI
+  =https://doi.org/10.48529/9567-t539=, =#+CATALOG_ID: 297=,
+  =#+CATALOG_IDNO: ZAF_1993_IHS_v01_M=) and =za94hh85_V2.pdf=, which is the
+  PSLSD *household questionnaire instrument*, not a basic-information
+  document.  The full extracted PDF text was keyword-scanned
+  (=universe=, =target population=, =institutional=, =excluded=, =hostel=,
+  =old age=, =represent=, =frame=, =scope=) and contains no universe or
+  coverage statement -- the only hits are a dwelling-type response option
+  ("Hostel") and an unrelated instruction line.  =_/CONTENTS.org=,
+  =_/data_scheme.yml=, =_/categorical_mapping.org= and =1993/_/data_info.yml=
+  likewise carry none.  *The universe statement below exists only in World
+  Bank catalog metadata, and is therefore a moving target rather than
+  something the library holds.*
+
+- And not even in *this wave's* catalog record. :: The record =SOURCE.org=
+  points at, =lsms= catalog 297 (=ZAF_1993_IHS_v01_M=), has *no* =<universe>=
+  element at all (verified 2026-07-21: =grep -ci universe= over its 823 KB
+  DDI XML export returns 0).  The quoted universe comes from the twin
+  =datafirst= record, catalog 902 (=ZAF_1993_PSLSD_v01_M=,
+  "Project for Statistics on Living Standards and Development 1993").  The
+  repo already treats these as the same survey --- see
+  =lsms_library/data_access.py= and =.claude/skills/add-wave/SKILL.md=
+  ("=datafirst= 902 (=ZAF_1993_PSLSD=) is the same 1993 South African survey"
+  as =lsms= 297).  Independent corroboration: the exclusion paragraph inside
+  902's =<universe>= is reproduced character-for-character as the closing
+  paragraph of 297's =<sampProc>= (down to a shared typo; see below).  Read
+  the universe as cross-record, not as record 297 speaking.
+
+*** The declared universe (verbatim)
+
+Source: WB Microdata Library DDI XML export for study 902,
+=codeBook/stdyDscr/stdyInfo/sumDscr/universe=
+(https://microdata.worldbank.org/index.php/metadata/export/902/ddi;
+landing page https://microdata.worldbank.org/index.php/catalog/902).
+Language: English.  Retrieved and verified 2026-07-21.
+
+#+begin_quote
+All Household members.
+
+Individuals in hospitals, old age homes, hotels and hostels of educational
+institutions were not included in the sample. Migrant labour hostels were
+included. In addition to those that turned up in the selected ESDs, a sample
+of three hostels was chosen from a national list provided by the Human
+Sciences Research Council and within each of these hostels a representative
+sample was drawn on a similar basis as described above for the households in
+ESDs.
+#+end_quote
+
+Supporting coverage statements, same catalog family:
+
+- =<geogCover>= (studies 297 and 902) :: "National coverage"
+- =<geogUnit>= (study 902) :: "Enumeration Area"
+- =<anlyUnit>= (297 and 902) :: "- Households / - Individuals / - Community"
+- =<abstract>= (297 and 902), opening sentences :: "The Project for
+  Statistics on Living standards and Development was a coutrywide World Bank
+  Living Standards Measurement Survey. It covered approximately 9000
+  households, drawn from a representative sample of South African
+  households." (sic: "coutrywide")
+
+*Caveat on strength.* The inclusion side of this universe is thin.  "All
+Household members." is a three-word line of the kind NADA records use
+generically; it is not a statistical office's sentence about *this* survey.
+Neither record anywhere says "all private households in ...".  The strongest
+inclusion claims available are the three quoted above.  If a crisper
+inclusion sentence is wanted, it does not exist in the local documentation or
+in either catalog record; the SALDRU final report (SALDRU, /South Africans
+Rich and Poor: Baseline Household Statistics/, 1994) is a plausible further
+source, is *not* held in this repo, and has not been consulted.  The
+paragraph that follows that opening line, by contrast, is clearly
+survey-specific SALDRU text (it recurs verbatim in 297's =<sampProc>=) and
+carries real information --- but all of it is about *exclusions*.
+
+*** Exclusions
+
+**** By design, in the universe statement
+
+Verbatim, from 902 =<universe>= and, character-identically, the closing
+paragraph of 297 =<sampProc>=
+(=codeBook/stdyDscr/method/dataColl/sampProc=):
+
+#+begin_quote
+Individuals in hospitals, old age homes, hotels and hostels of educational
+institutions were not included in the sample. Migrant labour hostels were
+included.
+#+end_quote
+
+So: an institutional-population exclusion (hospitals, old age homes,
+hotels, student hostels) with an *explicit carve-in* for migrant labour
+hostels --- unusually important in a 1993 South African survey, since migrant
+hostel residents are a large and distinctive population.  No geographic
+region is excluded: fieldwork organisations are named in =<collSitu>= (297)
+for the former homelands as well (Transkei, Bophuthatswana, Venda, Ciskei,
+Qwa-Qwa, Lebowa, Gazankulu, KwaNdebele, KwaZulu, KaNgwane).
+
+Textual note for anyone diffing the two records: 297's =<sampProc>= copy
+reads "...on a similar basis as described abovefor the households in ESDs."
+("abovefor" run together); 902's =<universe>= copy has the space.  Otherwise
+the paragraphs are identical.
+
+**** Not by design: fieldwork failure and a post-collection deletion
+
+These are *not* universe exclusions but they remove real coverage, and a
+pooled analysis should know about them.
+
+=<weight>= (study 297), verbatim:
+
+#+begin_quote
+A number of factors intervened, however, which made it essential to use
+weights after all. Amongst these was violence, which prevented survey teams
+from conducting interviews in two clusters on the East Rand; failure to
+continue interviewing in a cluster until the required take had been
+interviewed; and systematic under-representation of whites in the sample.
+#+end_quote
+
+=<dataAppr>= (studies 297 and 902), verbatim:
+
+#+begin_quote
+The data collected in clusters 217 and 218 should be viewed as highly
+unreliable and therefore removed from the data set. The data currently
+available on the web site has been revised to remove the data from these
+clusters. Researchers who have downloaded the data in the past should revise
+their data sets. For information on the data in those clusters, contact
+SALDRU http://www.saldru.uct.ac.za/.
+#+end_quote
+
+Two clusters were therefore deleted from the distributed microdata after
+collection.  (The documentation does not say whether clusters 217/218 are the
+same as the two East Rand clusters lost to violence; do not assume they are.)
+
+*** Oversamples and sub-populations
+
+- The documentation explicitly *denies* an oversample. :: =<sampProc>=
+  (297), verbatim: "The advantage of using such a design is that it provides
+  a representative sample that need not be based on accurate census
+  population distribution.in the case of South Africa, the sample will
+  automatically include many poor people, without the need to go beyond this
+  and oversample the poor." (sic: missing space after "distribution.")  The
+  design is described as "a two-stage self-weightingdesign" (sic) --- i.e.
+  self-weighting by intent, with no booster or poverty oversample.
+
+- One genuine supplementary sub-sample: hostels. :: Per the =<universe>= text
+  quoted above, three migrant labour hostels were drawn *from a national HSRC
+  list*, i.e. from outside the ESD frame, in addition to any hostels falling
+  into selected ESDs.  This is the one sub-population in this wave that was
+  sampled by a separate mechanism, and anyone pooling household-level
+  statistics should be aware that hostel households enter through two
+  different routes.
+
+- No sub-panel, no refresh, no module subsample. :: One cross-section, one
+  library wave.  Nothing in either record describes a rotating panel, a
+  split-questionnaire subsample, or a second sample read into this wave.
+
+*** Universe versus what the weights represent
+
+The two come apart here, and the documentation says so plainly.  The sample
+was *designed* to be self-weighting (see the =<sampProc>= quote above), so in
+principle the unweighted sample would represent the universe; in practice it
+does not.  From =<weight>= (297), verbatim:
+
+#+begin_quote
+A self-weighting sample design should in principle eliminate the need for
+weighting.
+#+end_quote
+
+and, on the remedy actually applied:
+
+#+begin_quote
+Accordingly it was decided to use weights as far as possible at the level of
+the old provincial/homeland boundaries and race.
+#+end_quote
+
+So the delivered weights are post-hoc corrections benchmarked on *race x old
+provincial/homeland boundary* cells, repairing systematic white
+under-representation and shortfalls in field take --- not design weights.
+Consequence for users: the weighted estimator targets the racial/geographic
+distribution of the apartheid-era administrative geography, and the frame
+behind all of it is the *1991 census* population of 38,120,853 (=<sampProc>=)
+inflated to 1993 by an assumed growth rate that "was subsequently discovered"
+to be "slightly over-estimated" (=<sampProc>=, verbatim).
+
+Minor internal inconsistency worth flagging rather than resolving: =<sampProc>=
+computes the sampling interval by dividing the 1991 census population by "the
+300 clusters to be selected", while =<weight>= refers to "The sample of 360
+clusters of 25 households each".  Both are quoted from the same DDI record;
+the repository takes no view on which is right.
+
+*** Gaps
+
+- No universe statement of any kind exists in this repository for 1993. ::
+  Searched: all of =1993/Documentation/= (including the full extracted text
+  of =za94hh85_V2.pdf=, ~103k characters, keyword-scanned as listed above),
+  =1993/_/data_info.yml=, =_/CONTENTS.org=, =_/data_scheme.yml=,
+  =_/categorical_mapping.org=.
+- The wave's own catalog record (=lsms= 297) has no =<universe>= element. ::
+  The statement recorded here is borrowed from the =datafirst= twin record
+  (902) on the corroboration described above.  If that borrowing is ever
+  judged unacceptable, this country has *no* universe statement at all.
+- Not consulted. :: The SALDRU 1994 baseline report; any PSLSD sampling
+  appendix beyond the DDI.
+- Nothing here was inferred from the microdata. :: No =.dta= file was opened
+  in constructing this section.
+
 * shocks — not available (2026-06-07, verified)
 
 =shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)

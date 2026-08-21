@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/1002
+
+#+CATALOG_ID: 1002
+#+CATALOG_IDNO: NGA_2010_GHSP-W1_v03_M
+#+CATALOG_TITLE: General Household Survey, Panel 2010-2011, Wave 1
+#+CATALOG_YEARS: 2010-2011
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/y9e2-b753
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/1002
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,0 +1,21 @@
+### 1. repopulate full Uganda cold cache (13 baseline tables) ###
+OK   sample               (24362, 6)  (0.2s)
+OK   cluster_features     (4409, 5)  (0.0s)
+OK   household_roster     (144704, 7)  (11.0s)
+OK   people_last7days     (15382, 4)  (1.1s)
+OK   earnings             (22447, 1)  (33.1s)
+OK   enterprise_income    (13935, 6)  (32.8s)
+OK   income               (13931, 1)  (14.5s)
+OK   housing              (24210, 2)  (1.7s)
+OK   fct                  (15, 113)  (0.0s)
+OK   food_acquired        (355571, 3)  (1.2s)
+OK   nutrition            (23801, 15)  (0.1s)
+OK   shocks               (14457, 10)  (0.1s)
+OK   interview_date       (24264, 1)  (32.9s)
+DONE: 13/13 built, 0 failed
+
+### 2. targeted tests, SERIAL (-p no:cacheprovider, no xdist) ###
+sssssssssssssssssssssssssssssssssssssssssssssssssssss.x.                 [100%]
+=========================== short test summary info ============================
+XFAIL tests/test_uganda_api_vs_replication.py::test_api_matches_replication[interview_date] - interview_date: API moved to canonical 'Int_t' (#325, commit 4192eb06); replication baseline still carries 'date', so no shared data column after merge.  Library output is correct; replication should regenerate.
+2 passed, 53 skipped, 1 xfailed in 68.77s (0:01:08)

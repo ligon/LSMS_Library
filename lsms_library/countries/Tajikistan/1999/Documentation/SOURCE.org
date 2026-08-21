@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/hjw2-fg61]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/279
+
+#+CATALOG_ID: 279
+#+CATALOG_IDNO: TJK_1999_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Survey 1999
+#+CATALOG_YEARS: 1999-1999
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/hjw2-fg61
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/279
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

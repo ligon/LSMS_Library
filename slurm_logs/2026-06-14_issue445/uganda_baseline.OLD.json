@@ -1,0 +1,1497 @@
+{
+  "2005-06/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "5d1c980b0870543f43913450bb4fe2b6ca47c0d073d118e47f77c6c050c2a944",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1467,
+      1
+    ]
+  },
+  "2005-06/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "5d169c96c69bb85292174a91c94a39f2974575b7a047ab79e845c60d0dfce34b",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1351,
+      6
+    ]
+  },
+  "2005-06/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "536e202451e41dafc19db5a19f6fd8e297ff35cdc514b71c9923eebcf55e2657",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      40749,
+      3
+    ]
+  },
+  "2005-06/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "74c6bdba442651cf4aef26d338f6b69123d83c5228d871f7577c78af9831623d",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3123,
+      1
+    ]
+  },
+  "2005-06/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "4c89e66ff297dc07ad1a4a47b52250c9913d620c4773f7c7757e0c0a79bc08ed",
+    "dtypes": {
+      "AffectedAssets": "float64",
+      "AffectedConsumption": "float64",
+      "AffectedIncome": "float64",
+      "AffectedProduction": "float64",
+      "Duration": "float64",
+      "HowCoped0": "object",
+      "HowCoped1": "object",
+      "HowCoped2": "object",
+      "Onset": "float64",
+      "Year": "float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      3644,
+      10
+    ]
+  },
+  "2009-10/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "568a879f2a7a3e238839557c7c2c55c19c777642efd76649157afb9aa7aea2b8",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2889,
+      1
+    ]
+  },
+  "2009-10/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "87ad5e91ac2cde43d5eeffbfcc2750fdbf321ab1b21f92666b3fea945086cc18",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2917,
+      6
+    ]
+  },
+  "2009-10/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "73a3cece383ab670f99d82461a85d13a0d305398d9061216a36a9b9e17fdaa35",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      38107,
+      3
+    ]
+  },
+  "2009-10/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "129f3f1d69eb639afac4e94fe36490e8705af5a824a48c42a32c69f6a1ef8061",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      2975,
+      1
+    ]
+  },
+  "2009-10/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "fbc9bea3aab5c354fabb97f27bdd3746bc59eae4fdf4844248bcaf9c674c40cc",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      2667,
+      10
+    ]
+  },
+  "2010-11/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "957ffd04b8b76c054f84bc5c077cbf0edaebed417cca7582a78b3ff21f0814b3",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2618,
+      1
+    ]
+  },
+  "2010-11/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "a9fade275ae68370be930a20723418acb35a9363d86dced26b8b9d5bc3c2087e",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1619,
+      6
+    ]
+  },
+  "2010-11/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "9ceaba9074df74f3830fd9e2a20b621adb6d904853ed29b3352b385bbf3a7137",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      35489,
+      3
+    ]
+  },
+  "2010-11/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "9de8b45ca42ecbda0d5ca7979407ae03c7942d966bd4c6a54bcc38a569af03ca",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      2716,
+      1
+    ]
+  },
+  "2010-11/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "13fd71e78c7e23335b756aaa8dad6f871d0f8ca5ab4a4a422630e167ffd1075c",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1541,
+      10
+    ]
+  },
+  "2011-12/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "2ba1309a2b6e2c126e3216f03d6e34018e400d13a846cbe5ff354f721b5851c1",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      2805,
+      1
+    ]
+  },
+  "2011-12/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "c90d0f62507cd686a0acaebf3975a19f92e4781b1296c57f69a47bd9c27db0ed",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1577,
+      6
+    ]
+  },
+  "2011-12/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "306479530887845374d9b735e686554f51dea9b95167f0b712ca14986cfcc5b1",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      38983,
+      3
+    ]
+  },
+  "2011-12/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "0d8b25cc6e9fe530c02cf69a42a8df409a1c3a352a07a3ebbc6379b2c065b722",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      2850,
+      1
+    ]
+  },
+  "2011-12/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "5fe219c4602b63236624296ec8de1d5f2730ef5f388155e5f2eec8762f3fad5d",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1288,
+      10
+    ]
+  },
+  "2013-14/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "6c190bf0132755a48198e55850acead1ebc72618ed802db5eb5d0197211d0176",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3119,
+      1
+    ]
+  },
+  "2013-14/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "c7903d58f7f43cbcee9eac8739eb0d509705b51c7927203a89f87d31c6363cf9",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3119,
+      6
+    ]
+  },
+  "2013-14/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "203f442b1c79c95326016709a91745878625d988cca732c1f568a6b4f076883b",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      50703,
+      3
+    ]
+  },
+  "2013-14/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "d211e3d4ce558199f69d2202c8da8e38880141a361ae84a74a79cb900488fc53",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3119,
+      1
+    ]
+  },
+  "2013-14/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "81438c5355ef475409342e0ee75b77c23bea85c6d9e917a756b338b523aedef7",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1572,
+      10
+    ]
+  },
+  "2015-16/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "6189ac751e08a1b54d6851ce341a434680828ba48b9ba33b6060432d66929276",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3305,
+      1
+    ]
+  },
+  "2015-16/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "343df81d485d0c04167821a6f8f1693c61d155a0d81dae6133a4b7b30df6f9ca",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1659,
+      6
+    ]
+  },
+  "2015-16/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "24ab0e7290307e096f2c94dd1eb42030f22d2d5e3627e32881933edfcf731ebc",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      50108,
+      3
+    ]
+  },
+  "2015-16/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "5b548b5731f30008220185de11bf6203ee9f64df5cd93dc9875126a993c694e4",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3305,
+      1
+    ]
+  },
+  "2015-16/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "2c103f35b6b798cdbabd2ced26f6605e9b3d519129b29b7e84edd5e2b407b57b",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1021,
+      10
+    ]
+  },
+  "2018-19/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "fa6212c1437118dd4dce0b19cdc195ee5b80d7d075584e158e8da5443ab98c3a",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3180,
+      1
+    ]
+  },
+  "2018-19/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "c42dc6a0388e58361090f83036e39d744590685183a546f39a4fe41c7a133475",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      543,
+      6
+    ]
+  },
+  "2018-19/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "3daa0829974d300e9c84f9eb2aac2fcac34337c1e427236da1b30d07854c88b1",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      53288,
+      3
+    ]
+  },
+  "2018-19/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "3253f8884dc0560b05679ee0cd022026e83205b0d1fed74e748eb239d204c81b",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3176,
+      1
+    ]
+  },
+  "2018-19/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "244c51e927d63caf4cd7958d621259f5a905a97e4112f3cb4396511235f879ee",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1472,
+      10
+    ]
+  },
+  "2019-20/_/earnings.parquet": {
+    "columns": [
+      "Earnings"
+    ],
+    "content_hash": "d1e1b512b4764f0ce7c104660164f31c9b3a61b11a1338b48aeecab03d1fe23c",
+    "dtypes": {
+      "Earnings": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      3064,
+      1
+    ]
+  },
+  "2019-20/_/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "1f2c700445b430a7e140a39dab2d8e9471b3d1cd7c1212362e04637b8068f4cd",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "j"
+    ],
+    "shape": [
+      1150,
+      6
+    ]
+  },
+  "2019-20/_/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "c0072df2f036f41446f1a1e452657f9053f6fd29e700a3592807df2c7ff2691a",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      48144,
+      3
+    ]
+  },
+  "2019-20/_/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "e4378281a5f351bef2fe154ee67e00f8c57fdf848aedcee16ade6d261a317907",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "j",
+      "t"
+    ],
+    "shape": [
+      3098,
+      1
+    ]
+  },
+  "2019-20/_/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "b52e39129320da662048a04cc14d04d6da48499fdd381a95752814b74470aaee",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "category",
+      "HowCoped1": "category",
+      "HowCoped2": "category",
+      "Onset": "Int64",
+      "Year": "Int64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      1252,
+      10
+    ]
+  },
+  "var/cluster_features.parquet": {
+    "columns": [
+      "District",
+      "Latitude",
+      "Longitude",
+      "Region",
+      "Rural"
+    ],
+    "content_hash": "1d6fcaba9606ce0d00ee340a0cb141475e2a05d67db9e654692bbfdfb852a982",
+    "dtypes": {
+      "District": "str",
+      "Latitude": "float32",
+      "Longitude": "float32",
+      "Region": "string",
+      "Rural": "string"
+    },
+    "index_names": [
+      "t",
+      "v"
+    ],
+    "shape": [
+      4409,
+      5
+    ]
+  },
+  "var/earnings.parquet": {
+    "columns": [
+      "earnings",
+      "level_1"
+    ],
+    "content_hash": "9b4d9b06382bd9ed3ef5491babbb987de10a5c49dc860e78d83e52ea36d0c3cc",
+    "dtypes": {
+      "earnings": "float64",
+      "level_1": "str"
+    },
+    "index_names": [
+      "t",
+      "i"
+    ],
+    "shape": [
+      129160,
+      2
+    ]
+  },
+  "var/enterprise_income.parquet": {
+    "columns": [
+      "losses",
+      "materials",
+      "otherexpense",
+      "profits",
+      "revenue",
+      "wagebill"
+    ],
+    "content_hash": "1f03ec635b2d8c0b8312b5aecc0406b36e3981eb44c05210d4d5054c6cdd5638",
+    "dtypes": {
+      "losses": "float64",
+      "materials": "float64",
+      "otherexpense": "float64",
+      "profits": "float64",
+      "revenue": "float64",
+      "wagebill": "float64"
+    },
+    "index_names": [
+      "t",
+      "i"
+    ],
+    "shape": [
+      78040,
+      6
+    ]
+  },
+  "var/fct.parquet": {
+    "columns": [
+      "Apples",
+      "Avocado",
+      "Beans (dry)",
+      "Beans (fresh)",
+      "Beef",
+      "Beer",
+      "Biscuits",
+      "Bogoya",
+      "Bongo",
+      "Bread",
+      "Cabbages",
+      "Cakes",
+      "Carrots",
+      "Cassava (dry)",
+      "Cassava (dry/flour)",
+      "Cassava (flour)",
+      "Cassava (fresh)",
+      "Chapati",
+      "Chicken",
+      "Chicken (broiler)",
+      "Chicken (local)",
+      "Chicken (off-layer)",
+      "Coffee",
+      "Cooking Oil",
+      "Cooking Oil (refined)",
+      "Cooking Oil (unrefined)",
+      "Cornflakes",
+      "Dodo",
+      "Donuts",
+      "Dry/Smoked Fish",
+      "Eggplant",
+      "Eggs",
+      "Fresh Fish",
+      "Garlic",
+      "Ghee",
+      "Ginger (fresh)",
+      "Ginger (powder)",
+      "Goat Meat",
+      "Green Pepper",
+      "Ground Nuts (in shell)",
+      "Ground Nuts (paste)",
+      "Ground Nuts (pounded)",
+      "Ground Nuts (shelled)",
+      "Honey",
+      "Ice Cream",
+      "Infant Formula",
+      "Irish Potatoes",
+      "Jackfruit (fresh)",
+      "Jam/Marmalade",
+      "Kabalagala",
+      "Macaroni/Spaghetti",
+      "Maize (cobs)",
+      "Maize (flour)",
+      "Maize (grains)",
+      "Mangos",
+      "Margarine, Butter, etc",
+      "Matoke (??)",
+      "Matoke (bunch)",
+      "Matoke (cluster)",
+      "Matoke (heap)",
+      "Matoke (other)",
+      "Milk (fresh)",
+      "Milk (powdered)",
+      "Millet",
+      "Millet Flour",
+      "Mukene",
+      "Mushrooms",
+      "Ndiizi",
+      "Nkejje (dried)",
+      "Okra",
+      "Onions",
+      "Oranges",
+      "Other Juice (packed)",
+      "Passion Fruits",
+      "Peas",
+      "Peas (dry)",
+      "Perch (dried)",
+      "Perch (fresh)",
+      "Pineapple",
+      "Plantains",
+      "Pork",
+      "Pumpkins",
+      "Restaurant (beer)",
+      "Restaurant (soda)",
+      "Rice",
+      "Salt",
+      "Samosas",
+      "Sausages",
+      "Sim Sim",
+      "Sim Sim (paste)",
+      "Soda",
+      "Sorghum",
+      "Soybeans (dry)",
+      "Soybeans (fresh)",
+      "Sugar",
+      "Sugarcane",
+      "Sweet Bananas",
+      "Sweet Potatoes (dry)",
+      "Sweet Potatoes (flour)",
+      "Sweet Potatoes (fresh)",
+      "Sweet Potatoes (white, flour)",
+      "Tea",
+      "Tea (leaves)",
+      "Tea (other)",
+      "Tilapia (dried)",
+      "Tilapia (fresh)",
+      "Tomatoes",
+      "Waragi",
+      "Water",
+      "Watermelon",
+      "Wheat (flour)",
+      "Yams (arrowroot)",
+      "Yoghurt"
+    ],
+    "content_hash": "db9f7ab890482e8c25ab4490c6bcded689adbaee5eb994c90bbc4f001ca07d4c",
+    "dtypes": {
+      "Apples": "float64",
+      "Avocado": "float64",
+      "Beans (dry)": "float64",
+      "Beans (fresh)": "float64",
+      "Beef": "float64",
+      "Beer": "float64",
+      "Biscuits": "float64",
+      "Bogoya": "float64",
+      "Bongo": "float64",
+      "Bread": "float64",
+      "Cabbages": "float64",
+      "Cakes": "float64",
+      "Carrots": "float64",
+      "Cassava (dry)": "float64",
+      "Cassava (dry/flour)": "float64",
+      "Cassava (flour)": "float64",
+      "Cassava (fresh)": "float64",
+      "Chapati": "float64",
+      "Chicken": "float64",
+      "Chicken (broiler)": "float64",
+      "Chicken (local)": "float64",
+      "Chicken (off-layer)": "float64",
+      "Coffee": "float64",
+      "Cooking Oil": "float64",
+      "Cooking Oil (refined)": "float64",
+      "Cooking Oil (unrefined)": "float64",
+      "Cornflakes": "float64",
+      "Dodo": "float64",
+      "Donuts": "float64",
+      "Dry/Smoked Fish": "float64",
+      "Eggplant": "float64",
+      "Eggs": "float64",
+      "Fresh Fish": "float64",
+      "Garlic": "float64",
+      "Ghee": "float64",
+      "Ginger (fresh)": "float64",
+      "Ginger (powder)": "float64",
+      "Goat Meat": "float64",
+      "Green Pepper": "float64",
+      "Ground Nuts (in shell)": "float64",
+      "Ground Nuts (paste)": "float64",
+      "Ground Nuts (pounded)": "float64",
+      "Ground Nuts (shelled)": "float64",
+      "Honey": "float64",
+      "Ice Cream": "float64",
+      "Infant Formula": "float64",
+      "Irish Potatoes": "float64",
+      "Jackfruit (fresh)": "float64",
+      "Jam/Marmalade": "float64",
+      "Kabalagala": "float64",
+      "Macaroni/Spaghetti": "float64",
+      "Maize (cobs)": "float64",
+      "Maize (flour)": "float64",
+      "Maize (grains)": "float64",
+      "Mangos": "float64",
+      "Margarine, Butter, etc": "float64",
+      "Matoke (??)": "float64",
+      "Matoke (bunch)": "float64",
+      "Matoke (cluster)": "float64",
+      "Matoke (heap)": "float64",
+      "Matoke (other)": "float64",
+      "Milk (fresh)": "float64",
+      "Milk (powdered)": "float64",
+      "Millet": "float64",
+      "Millet Flour": "float64",
+      "Mukene": "float64",
+      "Mushrooms": "float64",
+      "Ndiizi": "float64",
+      "Nkejje (dried)": "float64",
+      "Okra": "float64",
+      "Onions": "float64",
+      "Oranges": "float64",
+      "Other Juice (packed)": "float64",
+      "Passion Fruits": "float64",
+      "Peas": "float64",
+      "Peas (dry)": "float64",
+      "Perch (dried)": "float64",
+      "Perch (fresh)": "float64",
+      "Pineapple": "float64",
+      "Plantains": "float64",
+      "Pork": "float64",
+      "Pumpkins": "float64",
+      "Restaurant (beer)": "float64",
+      "Restaurant (soda)": "float64",
+      "Rice": "float64",
+      "Salt": "float64",
+      "Samosas": "float64",
+      "Sausages": "float64",
+      "Sim Sim": "float64",
+      "Sim Sim (paste)": "float64",
+      "Soda": "float64",
+      "Sorghum": "float64",
+      "Soybeans (dry)": "float64",
+      "Soybeans (fresh)": "float64",
+      "Sugar": "float64",
+      "Sugarcane": "float64",
+      "Sweet Bananas": "float64",
+      "Sweet Potatoes (dry)": "float64",
+      "Sweet Potatoes (flour)": "float64",
+      "Sweet Potatoes (fresh)": "float64",
+      "Sweet Potatoes (white, flour)": "float64",
+      "Tea": "float64",
+      "Tea (leaves)": "float64",
+      "Tea (other)": "float64",
+      "Tilapia (dried)": "float64",
+      "Tilapia (fresh)": "float64",
+      "Tomatoes": "float64",
+      "Waragi": "float64",
+      "Water": "float64",
+      "Watermelon": "float64",
+      "Wheat (flour)": "float64",
+      "Yams (arrowroot)": "float64",
+      "Yoghurt": "float64"
+    },
+    "index_names": [
+      "Nutrient"
+    ],
+    "shape": [
+      15,
+      113
+    ]
+  },
+  "var/food_acquired.parquet": {
+    "columns": [
+      "Expenditure",
+      "Price",
+      "Quantity"
+    ],
+    "content_hash": "48c64d990d05afdaca6b2aa8bb188738dd50729d277c2e2cea257bac6146b900",
+    "dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "j",
+      "u",
+      "s"
+    ],
+    "shape": [
+      355571,
+      3
+    ]
+  },
+  "var/household_roster.parquet": {
+    "columns": [
+      "Age",
+      "MonthsSpent",
+      "Relationship",
+      "Sex"
+    ],
+    "content_hash": "a9e52fccadbea0d565b889e3f95c1b69c6a86e86ee10a23a9b8af2eea2ad9495",
+    "dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "index_names": [
+      "t",
+      "i",
+      "pid"
+    ],
+    "shape": [
+      147612,
+      4
+    ]
+  },
+  "var/housing.parquet": {
+    "columns": [
+      "Floor",
+      "Roof"
+    ],
+    "content_hash": "aa027a50167a6f2c6570c2f73d4dcd78a2a2c95f6b0f6fecc366455dce14f815",
+    "dtypes": {
+      "Floor": "string",
+      "Roof": "string"
+    },
+    "index_names": [
+      "t",
+      "i"
+    ],
+    "shape": [
+      24290,
+      2
+    ]
+  },
+  "var/income.parquet": {
+    "columns": [
+      "income"
+    ],
+    "content_hash": "56b8f3ccc8a14eea61742cd5b6a0580a4e96c50f29f9a659ee47fd964a92d889",
+    "dtypes": {
+      "income": "float64"
+    },
+    "index_names": [
+      "t",
+      "i"
+    ],
+    "shape": [
+      13931,
+      1
+    ]
+  },
+  "var/interview_date.parquet": {
+    "columns": [
+      "date"
+    ],
+    "content_hash": "f60e9b7fd205ecbf352d6f7d1e978867e6790d9719d1b21010cb318f9f9f5166",
+    "dtypes": {
+      "date": "datetime64[us]"
+    },
+    "index_names": [
+      "i",
+      "t"
+    ],
+    "shape": [
+      24362,
+      1
+    ]
+  },
+  "var/nutrition.parquet": {
+    "columns": [
+      "Calcium",
+      "Carbohydrate",
+      "Energy",
+      "Fiber",
+      "Folate",
+      "Iron",
+      "Niacin",
+      "Protein",
+      "Riboflavin",
+      "Thiamin",
+      "Vitamin A",
+      "Vitamin B-12",
+      "Vitamin B-6",
+      "Vitamin C",
+      "Zinc"
+    ],
+    "content_hash": "7575d77349c031fcd72ec80613eb62eea5ce9426dc72af47e7663b87fd4d10e8",
+    "dtypes": {
+      "Calcium": "float64",
+      "Carbohydrate": "float64",
+      "Energy": "float64",
+      "Fiber": "float64",
+      "Folate": "float64",
+      "Iron": "float64",
+      "Niacin": "float64",
+      "Protein": "float64",
+      "Riboflavin": "float64",
+      "Thiamin": "float64",
+      "Vitamin A": "float64",
+      "Vitamin B-12": "float64",
+      "Vitamin B-6": "float64",
+      "Vitamin C": "float64",
+      "Zinc": "float64"
+    },
+    "index_names": [
+      "i",
+      "t"
+    ],
+    "shape": [
+      23801,
+      15
+    ]
+  },
+  "var/people_last7days.parquet": {
+    "columns": [
+      "Boys",
+      "Girls",
+      "Men",
+      "Women"
+    ],
+    "content_hash": "437a69109d796095f15baab42f904755dbb1e76a36a7f2c8e7f97c3ab69821c2",
+    "dtypes": {
+      "Boys": "float64",
+      "Girls": "float64",
+      "Men": "float64",
+      "Women": "float64"
+    },
+    "index_names": [
+      "i",
+      "t"
+    ],
+    "shape": [
+      15471,
+      4
+    ]
+  },
+  "var/sample.parquet": {
+    "columns": [
+      "Region",
+      "Rural",
+      "panel_weight",
+      "strata",
+      "v",
+      "weight"
+    ],
+    "content_hash": "93759186a35f9ae1984933238adc5857ba7a4b953b6a1450786efccde84117e4",
+    "dtypes": {
+      "Region": "string",
+      "Rural": "string",
+      "panel_weight": "float64",
+      "strata": "string",
+      "v": "string",
+      "weight": "float64"
+    },
+    "index_names": [
+      "i",
+      "t"
+    ],
+    "shape": [
+      24362,
+      6
+    ]
+  },
+  "var/shocks.parquet": {
+    "columns": [
+      "AffectedAssets",
+      "AffectedConsumption",
+      "AffectedIncome",
+      "AffectedProduction",
+      "Duration",
+      "HowCoped0",
+      "HowCoped1",
+      "HowCoped2",
+      "Onset",
+      "Year"
+    ],
+    "content_hash": "b011252b14589f6339de4151baebbaa9365cd2c033eb685c6b0e4888a4cc0623",
+    "dtypes": {
+      "AffectedAssets": "boolean",
+      "AffectedConsumption": "boolean",
+      "AffectedIncome": "boolean",
+      "AffectedProduction": "boolean",
+      "Duration": "float64",
+      "HowCoped0": "object",
+      "HowCoped1": "object",
+      "HowCoped2": "object",
+      "Onset": "Int64",
+      "Year": "Float64"
+    },
+    "index_names": [
+      "i",
+      "t",
+      "Shock"
+    ],
+    "shape": [
+      14457,
+      10
+    ]
+  }
+}

@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/56ce-y079]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2292
+
+#+CATALOG_ID: 2292
+#+CATALOG_IDNO: KAZ_1996_LSMS_v01_M_v01_A_PUF
+#+CATALOG_TITLE: Living Standards Measurement Survey 1996
+#+CATALOG_YEARS: 1996-1996
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/56ce-y079
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2292
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

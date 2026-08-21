@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/kb2h-4476]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/80
+
+#+CATALOG_ID: 80
+#+CATALOG_IDNO: SCG_2002_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2002 (General Population, Wave 1 Panel) and Family Income Support Survey 2002
+#+CATALOG_YEARS: 2002-2002
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/kb2h-4476
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/80
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

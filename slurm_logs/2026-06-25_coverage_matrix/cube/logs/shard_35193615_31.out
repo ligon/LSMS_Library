@@ -1,0 +1,29 @@
+=== task 31: country='Timor-Leste'  node=n0186.savio3  Thu Jun 25 18:52:02 PDT 2026 ===
+--- provisioning venv -> /local/job35193783/venv ---
+--- cache clear Timor-Leste ---
+Timor-Leste: removed
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2001/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2001/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2001/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2001/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2001/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2001/_/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2001/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Timor-Leste/2007-08/_/sample.parquet
+--- build Timor-Leste ---
+=== done 'Timor-Leste' rc=0  Thu Jun 25 18:52:55 PDT 2026 ===

@@ -1,1 +1,13 @@
-https://microdata.worldbank.org/index.php/catalog/2324/related-materials
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2324
+
+#+CATALOG_ID: 2324
+#+CATALOG_IDNO: ARM_1996_HBS_v01_M
+#+CATALOG_TITLE: Household Budget Survey 1996
+#+CATALOG_YEARS: 1996-1996
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2324
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

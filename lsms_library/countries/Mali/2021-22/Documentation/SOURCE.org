@@ -1,3 +1,13 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/6275
+
+#+CATALOG_ID: 6275
+#+CATALOG_IDNO: MLI_2021_EHCVM-2_v01_M
+#+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages, 2021-2022
+#+CATALOG_YEARS: 2021-2022
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6275
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

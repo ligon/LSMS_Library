@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/ey4q-j612]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2346
+
+#+CATALOG_ID: 2346
+#+CATALOG_IDNO: PAN_2003_ENV_v01_M
+#+CATALOG_TITLE: Encuesta de Niveles de Vida 2003
+#+CATALOG_YEARS: 2003-2003
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/ey4q-j612
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2346
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

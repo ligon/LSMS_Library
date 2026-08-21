@@ -287,9 +287,23 @@ class TestFeatureSanity:
     def test_feature_is_sane(self, country, table, path):
         """Each cached feature must pass is_this_feature_sane (no failures)."""
         from lsms_library.diagnostics import is_this_feature_sane
+        from tests.test_declared_spellings import KNOWN_UNHARMONIZED
+
         df = _read_or_skip(path)
         report = is_this_feature_sane(df, country, table)
         if not report.ok:
+            # GH #602: five countries still ship raw, unharmonized plot_features
+            # Tenure / TenureSystem labels.  The new `declared_spellings` check
+            # correctly FAILS them -- they are real defects -- but the mapping
+            # onto the canonical vocabulary needs the questionnaire codebooks
+            # (see KNOWN_UNHARMONIZED).  xfail rather than silently downgrade the
+            # check to `warn`, which is the status quo that let this rot.
+            spelling_only = all(c.name == "declared_spellings" for c in report.errors)
+            if (country, table) in KNOWN_UNHARMONIZED and spelling_only:
+                pytest.xfail(
+                    f"GH #602: {country}/{table} ships unharmonized tenure labels: "
+                    + "; ".join(c.message for c in report.errors)
+                )
             report.summarize()
             pytest.fail(
                 f"{country}/{table} failed sanity checks: "

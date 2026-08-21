@@ -1,0 +1,18 @@
+=== task 27: country='Serbia and Montenegro'  node=n0180.savio3  Thu Jun 25 18:49:47 PDT 2026 ===
+--- provisioning venv -> /local/job35193729/venv ---
+--- cache clear Serbia and Montenegro ---
+Serbia and Montenegro: removed
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2002/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2003/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2002/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2003/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/var/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2002/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2003/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2002/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Serbia and Montenegro/2003/_/sample.parquet
+--- build Serbia and Montenegro ---
+=== done 'Serbia and Montenegro' rc=0  Thu Jun 25 18:50:22 PDT 2026 ===

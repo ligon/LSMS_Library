@@ -1,0 +1,12 @@
+=== task 11: country='Guatemala'  node=n0185.savio3  Thu Jun 25 18:45:07 PDT 2026 ===
+--- provisioning venv -> /local/job35193652/venv ---
+--- cache clear Guatemala ---
+Guatemala: removed
+  /global/home/users/ligon/.local/share/lsms_library/Guatemala/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guatemala/2000/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guatemala/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guatemala/2000/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guatemala/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Guatemala/2000/_/sample.parquet
+--- build Guatemala ---
+=== done 'Guatemala' rc=0  Thu Jun 25 18:45:46 PDT 2026 ===

@@ -1,0 +1,100 @@
+=== full suite (GhanaLSS rebuilds canonical; others warm) 12:57:54 ===
+....s...................s.............s...................s............. [  3%]
+........................................................................ [  7%]
+......FX................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 19%]
+.....ssssssss........................................................... [ 23%]
+.......sssss.........................................ss................. [ 26%]
+..........................s................................s............ [ 30%]
+....................s................................s.................x [ 34%]
+.........x....s..x.............................s........................ [ 38%]
+........s................................s.............................. [ 42%]
+..s.............ss.ssx...ssss.sss..s..s.s.s...s.ssssssssssssssssss.sss.s [ 46%]
+ss.ss.ss................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 57%]
+........................................................................ [ 61%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+..........xx.x......xxx.....s....s....s....s....s....s....s....s........ [ 96%]
+.s....sss...sss.......................................................   [100%]
+=================================== FAILURES ===================================
+______ test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired] _______
+[XPASS(strict)] GhanaLSS Phase-3 reshape is deferred to GH #109.  The country-level _/food_acquired.py normalizer in PR #243 only runs as a final fallback in load_from_waves, but every Ghana wave declares food_acquired in its wave-level data_scheme so the framework aggregates per-wave parquets (non-canonical: i↔j swap in early waves, h/w naming in 1991-92/2012-13/2016-17, no `s` axis) instead of running the country-level script.  Real fix: rewrite each wave's _/food_acquired.py to emit canonical [t, i, j, u, s] directly via food_acquired_to_canonical.  When that work lands under #109, this xfail will start passing and the marker should be removed.
+----------------------------- Captured stderr call -----------------------------
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:868: DtypeWarning: Columns (0: FOODCD, 1: FOODBLV, 2: UNIQUEID) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:868: DtypeWarning: Columns (0: FOODCD, 1: FOODBLV, 2: MFOODBLY, 3: TFOODB, 4: UTFOODB, 5: CFOODB) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+=============================== warnings summary ===============================
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+tests/test_add_market_index_dedup.py::TestAddMarketIndexDedup::test_no_duplicate_index_rows
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Albania]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Albania]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:2046: UserWarning: Unknown relationship labels (add to kinship.yml): ['Father / mother-in-law', 'Grandfather / Mother', 'brother/sister in-law', 'father/mother in-law']
+    df = _expand_kinship(df)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 10 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['i', 't'] had 2 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Iraq]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Iraq]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:2017: UserWarning: Iraq: waves ['2012'] have 100% NaN v after _join_v_from_sample; these will be silently dropped from derived tables (household_characteristics, food_expenditures, food_prices, food_quantities) by the downstream groupby.  Check i-key compatibility between the roster source and the sample table -- compare wave-level data_info.yml's `idxvars.i` on each side.  See GH #256 for context and PRs #244 / #253 / #255 for the established fix pattern.
+    df = self._join_v_from_sample(df)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[South Africa]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[South Africa]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:2046: UserWarning: Unknown relationship labels (add to kinship.yml): ['-1']
+    df = _expand_kinship(df)
+
+tests/test_cache_hash_invalidation.py: 12 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:993: UserWarning: Makefile not found in /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Albania/_. Unable to generate required data.
+    warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Guyana_household_characteristics]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'pid'] had 888 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Guyana_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Azerbaijan_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Serbia_and_Montenegro_household_characteristics]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/diagnostics.py:872: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    ref_df = ref_method()
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'j', 'u', 's', 'visit'] had 35 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+    warnings.warn(
+
+tests/test_dvc_caching.py: 13 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1193: UserWarning: Country directory not found for 'TestCountry'
+    warnings.warn(f"Country directory not found for {country_name!r}")
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:405: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR243_GhanaLSS_food_acquired]
+1 failed, 1771 passed, 87 skipped, 10 xfailed, 1 xpassed, 43 warnings in 1072.39s (0:17:52)
+=== EXIT 1 13:15:51 ===

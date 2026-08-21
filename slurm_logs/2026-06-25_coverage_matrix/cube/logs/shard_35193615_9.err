@@ -1,0 +1,13 @@
+[matrix] building (full) ...
+  EthiopiaRHS: 8 waves × 17 features
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:50: UserWarning: Refusing workspace copy of DVC-tracked file ../1994a/Data/demo123.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  ros = get_dataframe('../1994a/Data/demo123.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:84: UserWarning: Refusing workspace copy of DVC-tracked file ../1994a/Data/price1234_rev.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  p1 = get_dataframe('../1994a/Data/price1234_rev.tab', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:101: UserWarning: Refusing workspace copy of DVC-tracked file ../2004/Data/rd6_kgpr_Mkt.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  rd6 = get_dataframe('../2004/Data/rd6_kgpr_Mkt.tab', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:106: UserWarning: Refusing workspace copy of DVC-tracked file ../2009/Data/price2009.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  p9 = get_dataframe('../2009/Data/price2009.tab', convert_categoricals=False)
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/EthiopiaRHS.csv (138 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=71, declared=0, dropped=1, broken=0, builds=1, sane=65, blessed=0

@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/ntxg-ed63]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/617
+
+#+CATALOG_ID: 617
+#+CATALOG_IDNO: PER_1994_ENNIV_v01_M
+#+CATALOG_TITLE: Encuesta Nacional de Hogares sobre Medición de Niveles de Vida 1994
+#+CATALOG_YEARS: 1994-1994
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/ntxg-ed63
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/617
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

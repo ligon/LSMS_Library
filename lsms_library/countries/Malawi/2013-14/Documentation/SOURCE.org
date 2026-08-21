@@ -1,1 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/2248/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2248
+
+#+CATALOG_ID: 2248
+#+CATALOG_IDNO: MWI_2010-2013_IHPS_v01_M
+#+CATALOG_TITLE: Integrated Household Panel Survey 2010-2013 (Short-Term Panel, 204 EAs)
+#+CATALOG_YEARS: 2010-2013
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/4q9f-2288
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2248
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

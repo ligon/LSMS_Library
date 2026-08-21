@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py", line 124, in <module>
+    from . import country
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 38, in <module>
+    from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py", line 66, in <module>
+    import dvc.api
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/dvc/api/__init__.py", line 1, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/dvc/fs/__init__.py", line 8, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/dvc_http/__init__.py", line 6, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/dvc_objects/fs/__init__.py", line 5, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/dvc_objects/fs/generic.py", line 9, in <module>
+ModuleNotFoundError: No module named 'fsspec.asyn'
+savio_venv: venv mounted but import failed
+/var/spool/slurmd/job35193541/slurm_script: line 30: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory
+/var/spool/slurmd/job35193541/slurm_script: line 34: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory

@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/5hyw-bv37]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/88
+
+#+CATALOG_ID: 88
+#+CATALOG_IDNO: ALB_2004_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2004 (Wave 3 Panel)
+#+CATALOG_YEARS: 2004-2004
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/5hyw-bv37
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/88
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

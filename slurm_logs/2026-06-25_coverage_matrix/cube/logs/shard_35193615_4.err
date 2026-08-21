@@ -1,0 +1,9 @@
+[matrix] building (full) ...
+  Burkina_Faso: 3 waves × 23 features
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/2018-19/_/./people_last7days.py:99: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s01_me_bfa2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  s01 = get_dataframe('../Data/s01_me_bfa2018.dta', convert_categoricals=False)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/2021-22/_/./plot_features.py:36: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_bfa2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_bfa2021.dta', convert_categoricals=False)
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Burkina_Faso.csv (71 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=18, declared=0, dropped=1, broken=0, builds=3, sane=49, blessed=0

@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/3jxw-nn78]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/281
+
+#+CATALOG_ID: 281
+#+CATALOG_IDNO: KGZ_1996_KPMS_v01_M
+#+CATALOG_TITLE: Poverty Monitoring Survey 1996
+#+CATALOG_YEARS: 1996-1996
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/3jxw-nn78
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/281
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,0 +1,139 @@
+#+TITLE: WB LSMS-ISA harmonised panel v2.0 × LSMS_Library — Incidence Map
+#+AUTHOR: wb-incidence-map synthesis agent
+#+DATE: 2026-06-13
+#+REVIEWED: Sue, 2026-06-13 — two adversary corrections applied (see below).
+
+* Corrections & additions after review
+
+- *ADDED Area 19 (Community food prices) + Label unification (maintainer)*:
+  a community-grain =(t,v,j)= surveyed-price feature the WB panel lacks
+  entirely (they HH-median-impute, =programs.do:31-89=) → OURS-ONLY
+  opportunity. Raw data in-repo, mostly unwired (Tanzania has a starter).
+  Principle: =food_acquired.j=, =crop_production.crop=, and =community_prices.j=
+  all share ONE =harmonize_food= taxonomy so foods ↔ crops ↔ prices join.
+  See GAP C + GAP 1 in GAP_RANKING.org.
+
+** Corrections applied after adversary review
+
+- *Area 18 (Food security)*: HDDS is built in ALL 7 countries (not just
+  Niger/Uganda) — verified per-country =.do=. Cells corrected OURS-ONLY →
+  BOTH^a for Ethiopia/Mali/Malawi/Nigeria/Tanzania. Parity verdict unchanged
+  (HDDS is an aggregate → a transform over diet recall, never a stored feature).
+- *Area 12 (Livestock)*: their construct is a thin HH/holder-level binary
+  *everywhere* (mostly =collapse (max)=) — the per-country item/agg buckets
+  were misassigned. Marked THEIRS-ONLY^a across all 7. GAP 4 verdict unchanged
+  (build a richer item =livestock= feature; their binary = =groupby.any()=).
+- *Area 6 split (maintainer correction)*: "Anthropometry/nutrition" wrongly
+  conflated two DISTINCT things. Their weight/height/HAZ/WAZ/WHZ z-scores are
+  *anthropometry* (body measures); our =nutrition= (ETH/UGA, =!make=) + =fct=
+  (UGA) is nutrient *intake* (consumption × food-composition tables), which
+  they do NOT construct (their HDDS = diet *diversity*, under Area 18). Split:
+  Area 6 *Anthropometry* = THEIRS-ONLY × 5 (ETH/MWI/NGA/TZA/UGA — we have NO
+  anthropometry feature); Area 6b *Nutrition-intake* = OURS-ONLY × 2 (ETH/UGA
+  — they build none). The earlier BOTH for ETH/UGA was the conflation.
+
+* Incidence map: 18 feature-areas × 7 overlap countries
+
+Cell = coverage of that feature-area in (OURS = LSMS_Library, THEIRS = WB
+harmonised panel). Superscript =a= = *theirs is dominantly aggregated* for
+that area (HH/plot/holder-level sum, ratio, constructed index, or
+median-price valuation) — i.e. a cell where parity, if pursued, must expose
+an *item-level* feature and push the aggregation into =transformations.py=,
+never store their aggregate as a data-layer parquet.
+
+| # | Feature-area               | Ethiopia      | Mali          | Malawi        | Niger         | Nigeria       | Tanzania      | Uganda        |
+|---+----------------------------+---------------+---------------+---------------+---------------+---------------+---------------+---------------|
+| 1 | Panel IDs                  | BOTH          | BOTH^a        | BOTH          | BOTH^a        | BOTH          | BOTH          | BOTH          |
+| 2 | Sampling/geography         | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          |
+| 3 | HH composition             | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        |
+| 4 | Individual roster          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          |
+| 5 | Education                  | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          |
+| 6 | Anthropometry (body meas)  | THEIRS-ONLY   | NEITHER       | THEIRS-ONLY   | NEITHER       | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   |
+| 6b| Nutrition (intake)         | OURS-ONLY     | NEITHER       | NEITHER       | NEITHER       | NEITHER       | NEITHER       | OURS-ONLY     |
+| 7 | Labor/time-use             | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | BOTH          |
+| 8 | Plots/parcels              | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          |
+| 9 | Crop production/harvest    | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a |
+| 10| Ag inputs                  | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   | THEIRS-ONLY   |
+| 11| Ag valuations              | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        |
+| 12| Livestock                  | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a | THEIRS-ONLY^a |
+| 13| Assets                     | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        |
+| 14| Consumption/welfare        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        |
+| 15| Housing/utilities          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          |
+| 16| Shocks                     | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          | BOTH          |
+| 17| Subjective wellbeing       | NEITHER       | OURS-ONLY     | OURS-ONLY     | OURS-ONLY     | NEITHER       | OURS-ONLY     | NEITHER       |
+| 18| Food security              | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        | BOTH^a        |
+| 19| Community food prices      | OURS-ONLY*    | OURS-ONLY*    | OURS-ONLY*    | OURS-ONLY*    | OURS-ONLY*    | OURS-ONLY*    | OURS-ONLY*    |
+
+* Legend
+
+- *BOTH* — both libraries cover the area for this country.
+- *OURS-ONLY* — LSMS_Library covers it; the WB panel constructs nothing.
+- *THEIRS-ONLY* — the WB panel constructs it; we have no feature.
+- *NEITHER* — neither side covers it for this country.
+- superscript =a= — *theirs is dominantly aggregated* (=collapse=/aggregating
+  =egen=/factor index/median-price valuation). On a =THEIRS-ONLY^a= cell the
+  parity move is "expose item-level feature + add a =transformations= fn",
+  NOT "build their aggregate as a feature". On a =BOTH^a= cell we already
+  hold the item-level data and reach their aggregate at query time — the =a=
+  flags that their *stored* form is the aggregate, ours is the items.
+
+* Reading notes / caveats
+
+- *Area 3 (HH composition) is BOTH^a everywhere*: =hh_size= is item-ish but
+  =hh_dependency_ratio= (their dominant construct) is a ratio of HH sums. We
+  cover the area via =household_characteristics= (runtime-derived from
+  =household_roster=), so parity is already correct — the dependency ratio is
+  a transform over our roster, not a stored column. No gap.
+- *Area 11 (Ag valuations) is BOTH^a, but our coverage is thin/indirect.*
+  Our "feature" here is =food_prices= (runtime-derived from =food_acquired=) —
+  it is *valuation logic only* (Expenditure/Quantity unit values), and it
+  values *consumed food*, not *plot harvest / seed / fertilizer / hired
+  labor*. Theirs values the agricultural production side via median-price
+  imputation. So Area 11 is BOTH only in the loose sense "both compute some
+  valuation"; for the *agricultural* valuations it is effectively a gap that
+  is *downstream* of the Area 9/10 item-feature gaps and is handled in
+  GAP_RANKING as a transformations-layer follow-on, never a data feature.
+- *Area 13 (Assets) BOTH^a*: we store item-level asset ownership (=assets=);
+  they store only the =ag_asset_index= / =hh_asset_index= PCA factor scores.
+  Full parity = add a =transformations= fn that runs the PCA, NOT store an
+  index. Already item-level on our side, so no data-layer gap.
+- *Area 14 (Consumption/welfare) BOTH^a*: we hold item-level
+  =food_acquired= (+ =nonfood_expenditures= for Nigeria/Uganda); they hold
+  only =totcons_{LCU,USD}= / =cons_quint= taken from a precomputed WB
+  consumption aggregate. =totcons= and =cons_quint= are transforms over our
+  item data — no data-layer gap, optional welfare-aggregate transform.
+- *Area 6 (Anthropometry) vs 6b (Nutrition-intake)* — two distinct areas:
+  - *6 Anthropometry* = body measures (weight, height) + WHO z-scores
+    (=haz06/waz06/whz06/bmiz06=, =wasting=). Their z-scores are item-level
+    (per child); the *score* is a reference-table transform. We have NO
+    anthropometry feature, so this is THEIRS-ONLY wherever they build it
+    (ETH/MWI/NGA/TZA/UGA = 5 countries; Mali/Niger have none). Genuine
+    item-level gap → build an =anthropometry= feature (GAP 5).
+  - *6b Nutrition-intake* = nutrient intake from consumption × food-composition
+    tables (our =nutrition= for ETH/UGA + =fct= for UGA). They construct NO
+    nutrient intake (their HDDS is diet *diversity*, filed under Area 18).
+    OURS-ONLY — a place we are ahead; nothing to build, no overlap to compare.
+- *Area 18 (Food security)*: their only construct is =HDDS= (a dietary-
+  diversity *aggregate*), built in ALL 7 countries (=egen rowtotal= +
+  =collapse (max)=; verified per-country =.do=) → BOTH^a everywhere. We carry
+  true experience-scale food security (FIES, rCSI, months_food_inadequate);
+  HDDS is NOT an experience scale, so where we want it, it is a transform over
+  item-level diet recall, never a stored feature. The "both" is loose —
+  different constructs (their diet-diversity count vs our experience scales)
+  sharing one area.
+- *Area 19 (Community food prices) — superscript =*=*: a distinct grain
+  *(t, v, j)* (cluster × food-item × time) from a *community/market price
+  questionnaire*. The WB panel does NOT survey community prices at all — its
+  =crop_price_EA= is a *median of household sale unit-values* laddered
+  EA→admin→national (=programs.do:31-89=), an HH-derived imputation, not a
+  surveyed community price. So at this grain they are effectively absent →
+  OURS-ONLY. =*= = *we have the raw data, mostly unwired*: community price
+  modules exist across LSMS-ISA (Uganda =csec3*=, Malawi =com_cc=, Nigeria
+  =sectc*= Community, Ethiopia ESS), Tanzania has a =community_prices.py=
+  starter, but there is no harmonized cross-country =community_prices= feature
+  yet. Build target: =community_prices (t,v,j)= with =j= on the SAME
+  =harmonize_food= labels as =food_acquired= (and the GAP-1 =crop_production=
+  crop labels) so consumed foods, grown crops, and surveyed prices all join.
+- *Non-overlap note*: EthiopiaRHS and our EHCVM-only countries
+  (Burkina_Faso, Benin, Togo, Senegal, Guinea-Bissau, CotedIvoire) are not in
+  the WB panel — out of scope for this map (all would read OURS-ONLY).

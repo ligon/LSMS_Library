@@ -1,0 +1,287 @@
+#+TITLE: GhanaLSS food_acquired canonicalization — Phase-0 design
+#+DATE: 2026-06-15
+#+AUTHOR: Sue (Claude Opus 4.8, 1M ctx)
+#+STARTUP: showall
+
+* Status / mandate
+PHASE-0 ONLY: define the target contract and the decisions that must be
+locked /before/ any wave script is touched.  No wave rewrites here — this doc
+is for maintainer sign-off.  Tracks under GH #109 (GhanaLSS: multiple
+incomplete features).  Extends the Uganda precedent
+=DESIGN_food_acquired_canonical_2026-05-05.org= (GH #169).
+
+* The problem (what "the mess" is)
+Two tests fail today, both pre-existing and both symptoms of one root cause —
+=food_acquired= was never migrated to the canonical schema:
+
+- =test_declared_columns_present[GhanaLSS/food_acquired]=: declared column
+  =Quantity= absent (output has =produced_quantity=, =purchased_value=, … but
+  no canonical =Quantity=).
+- =test_feature_is_sane[GhanaLSS/food_acquired]=.
+
+The full-suite run also surfaced (all pre-existing):
+
+- =Canonical index over ['t','i','j'] had 623483 … 1049585 duplicate tuple(s);
+  collapsed via groupby().first()= — real rows dropped /quietly/ when the
+  bespoke wide+visit shape is force-collapsed to =(t,i,j)=.
+- =GhanaLSS: waves ['1991-92','1998-99','2005-06'] have 100% NaN v after
+  _join_v_from_sample= — those waves vanish from every derived table.
+
+GhanaLSS is, per GH #109, "one of the least complete countries in the
+library."  =food_acquired=, =food_prices_quantities_and_expenditures=,
+=household_characteristics=, =conversion_to_kgs.json=, and =food_items.org=
+harmonization are all flagged TODO there.
+
+* Target contract (copy the Uganda playbook)
+The machinery already exists; GhanaLSS just has to /emit/ canonical wave
+parquets and let the framework do the rest.
+
+** Wave-level output (what each =<wave>/_/food_acquired.py= must write)
+- Index: =(t, i, j, u, s, visit)=.  =visit= is KEPT as a country-local extra
+  index level (Decision D1) — the library harmonizes the /interface/, not the
+  /data/, so we do not destroy GhanaLSS's repeated-visit recall structure.
+  NO =v= — the framework joins it from =sample()= at API time
+  (=_join_v_from_sample=; see CLAUDE.md "sample() and Cluster Identity").
+- Columns: =[Quantity, Expenditure, Price]=.
+- =s= ∈ ={purchased, produced}= (GhanaLSS has no in-kind module; cf. Uganda
+  which also carries =inkind=).
+- =i= = household id, =j= = harmonized food item, =u= = unit.  This is the
+  Uganda =food_acquired_to_canonical= contract (uganda.py:243) PLUS the local
+  =visit= level.
+- The canonical CROSS-COUNTRY index remains =(t,v,i,j,u,s)=; =visit= is a
+  GhanaLSS-only addition.  =Country('GhanaLSS').food_acquired()= returns the
+  visit detail; the composable interface is the DERIVED tables, which sum it
+  out (see D1).  =Feature('food_acquired')= cross-country drops the extra
+  =visit= level via =_harmonize_country_frame= (feature.py:74) — VERIFY in
+  Phase 1 that it sums rather than =first()=-collapses (else re-introduces the
+  data-loss this design eliminates).
+
+** Country level
+- =_/food_acquired.py= concatenates the wave parquets (after =id_walk=), writes
+  =var/food_acquired.parquet=.
+- RETIRE =food_prices_quantities_and_expenditures.py=.  =food_expenditures=,
+  =food_prices=, =food_quantities= are then produced at runtime by
+  =_FOOD_DERIVED= (country.py:2766) — exactly as Uganda now does post-#245.
+  Confirmed input contract of the derived transforms (transformations.py):
+  - =food_expenditures_from_acquired= (l.933): needs an =Expenditure= column;
+    groups by =[t,i,j,s]= (drops =u=, =v=).
+  - =food_quantities_from_acquired= (l.967): needs =Quantity= + a =u= index
+    level; kg-converts where a factor exists, else carries native =u=.
+  - =food_prices_from_acquired= (l.1073): derives Price.
+- =data_info.yml= =Index Info > index_info= for =food_acquired= → set canonical
+  =(t, v, i, j, u, s)=.  (Aligns with the now-declarative no-v-join policy:
+  with =v= in the canonical index the framework joins it automatically.)
+
+* Current state, per wave (surveyed 2026-06-15 — RE-VERIFY in Phase 1)
+These come from one read-only survey pass; treat as a starting map, not gospel.
+Each row is re-confirmed against the questionnaire in the Phase-1 checklist.
+
+| Wave    | Source files (purch / prod) | Food codes        | Current index         | Has Quantity?     | Has u? | Notes                              |
+|---------+-----------------------------+-------------------+-----------------------+-------------------+--------+------------------------------------|
+| 1987-88 | Y12A / Y12B                 | Code_12A/12B      | (j=hh, t, i=food, u)  | NO (values only)  | u=NA   | value-only; no qty, no units       |
+| 1988-89 | Y12A / Y12B                 | Code_12A/12B      | (j=hh, t, i=food, u)  | NO (values only)  | u=NA   | value-only; no qty, no units       |
+| 1991-92 | S9B / S8H                   | Code_9b / Code_8h | (h, w, j=food, u, vis)| produced only     | yes    | bespoke names h/w; keeps visit     |
+| 1998-99 | SEC9B / SEC8H               | Code_9b / Code_8h | (j=hh, t, i=food, u)  | produced only     | yes    | backward i/j; visit summed out     |
+| 2005-06 | sec9b / sec8h               | Code_9b / Code_8h | (j=hh, t, i=food, u)  | produced only     | yes    | backward i/j; visit summed out     |
+| 2012-13 | sec9b / sec8h               | Code_9b / Code_8h | (w, i=hh, j=food, vis,u)| produced only   | yes    | canonical i/j; keeps visit         |
+| 2016-17 | g7sec9b / g7sec8h           | Code_9b / Code_8h | (w, i=hh, j=food, vis,u)| BOTH purch+prod | yes    | the only wave w/ purchase qty      |
+
+Cross-cutting gaps vs the target contract:
+1. Source is a /column prefix/ (=purchased_*=, =produced_*=), not the =s=
+   index level.  Must reshape wide → long stacking purch/prod into =s=.
+2. Index-name drift: =i=/=j= are /swapped/ in 1987-88/88-89/98-99/05-06 (the
+   script uses =j= for household), and 1991-92 uses =h=/=w=.  Standardize to
+   =i=hh, =j=item across all waves.
+3. =visit= handled inconsistently (summed out in 98-99/05-06; kept in
+   91-92/12-13/16-17) → see D1.
+4. Purchase =Quantity= exists only in 2016-17 → see D2.
+5. 1987-88/88-89 are value-only, no units → see D3.
+6. =i=-key construction in =food_acquired.py= does not match the wave's
+   canonical =i()= helper → the NaN-=v= bug (see "Sample fix" below).
+
+* DECISIONS (resolved by maintainer 2026-06-15)
+** D1. Visit / recall handling  [RESOLVED: keep visit; aggregate in derived]
+Philosophy — harmonize the interface, not the data — so do NOT sum =visit=
+away in =food_acquired=.  KEEP =visit= as a country-local index level so
+=Country('GhanaLSS').food_acquired()= preserves the repeated-visit recall
+structure.  The DERIVED tables (=food_expenditures=, =food_prices=,
+=food_quantities=) aggregate over =visit=.
+VERIFIED this composes with the existing machinery at no framework cost:
+- =food_expenditures_from_acquired= groups by =[t,i,j,s]= (transformations.py:960)
+- =food_quantities_from_acquired= groups by =[t,i,j,u,s]= (l.1036/1068)
+- =visit= is in NONE of these group-bys → it is summed out automatically.
+- =food_prices= derives value/qty AFTER aggregation → total expenditure /
+  total quantity = the wave's average unit value (correct; price is intensive).
+Bonus: declaring =visit= in GhanaLSS's index means the data IS unique at
+=(t,i,j,u,s,visit)= grain → the =groupby().first()= duplicate-collapse
+data-loss warning disappears (it fired only because the bespoke shape was
+force-collapsed to =(t,i,j)=).  [Phase-1 check: confirm the canonical-shape
+guard reads the declared index incl. =visit=.]
+
+** D2 + D4. Missing quantities & units  [RESOLVED: price-impute in native units]
+Maintainer: "our standard cleverness should fill in quantities if we have
+prices in some known units — this also obviates (4)."
+The "standard cleverness" is =median_price_valuation= (transformations.py:2032):
+the WB/Deaton hierarchical median-price ladder — observe unit prices, take the
+median in the finest geography cell clearing a ≥threshold count (=v= →
+District → Region → national), impute that price to rows lacking one.  It
+currently runs =value = imputed_price × quantity=; here we use the INVERSE,
+=quantity = Expenditure / imputed_price=, reusing the same imputed-price ladder.
+- PRIMARY price source — the dedicated COMMUNITY/MARKET price survey that
+  EVERY wave fielded (=PRICE.DAT= in 1987-88/1988-89, =Data/Prices/G3PRICE.DTA=
+  in 1991-92, =g7price.dta= in 2016-17, price questionnaires for 1998-99/05-06).
+  This is exactly the original author's documented intent
+  (=GhanaLSS/_/CONTENTS.org:137=: "a separate price survey was conducted, and
+  could presumably be used to obtain quantities") and is the textbook Deaton
+  unit-value input — market price per =(j, geo, u)=.  =Quantity =
+  Expenditure / community_price=, with a geography fallback ladder
+  (=v= → District → Region → national) for empty cells.
+- SECONDARY price source — survey-reported prices already in =food_acquired=:
+  the PRODUCED side (Price + qty + unit, all waves except 87-88/88-89) and
+  2016-17 PURCHASES.  Used where the community survey lacks a =(j, geo)= cell.
+- "Obviates (4)": impute in the NATIVE units the price survey reports, so
+  quantities come back in known native units — NO bespoke
+  =conversion_to_kgs.json= is needed to FILL them.  (kg conversion stays a
+  SEPARATE downstream concern for =food_quantities(units='kgs')=, unchanged;
+  native-=u= rows pass through as today.)
+- PREREQUISITE: GhanaLSS has NO =community_prices= feature wired today (a GH
+  #109 gap).  Extracting the price survey into a usable =(t, v/geo, j, u) →
+  Price= table is a prerequisite for (or first step of) the imputation, and is
+  a worthwhile feature in its own right.
+- Items with NO price anywhere (not in the price survey, no production, not in
+  2016-17 purchases) cannot be imputed → =Quantity= stays NaN, =Expenditure=
+  carried.  Documented, not a bug.
+*** New sub-decisions this raises (my proposals — flag if you disagree)
+- *Where the imputation lives*: PROPOSE the DERIVED layer (=food_quantities=),
+  NOT the wave script — keep =food_acquired.parquet= the honest survey record
+  (Expenditure with NaN Quantity where unobserved), impute on read.  Cost:
+  small new framework wiring (the derived path does not call
+  =median_price_valuation= today).  Alternative (bake imputed Quantity into
+  =food_acquired=) violates "don't mutate the data" and hides provenance.
+- *Provenance*: PROPOSE an explicit marker (e.g. =Quantity_imputed= bool, or
+  =s='purchased_imputed'=) so imputed quantities are distinguishable from
+  survey-reported ones.  Honesty + reproducibility.
+- *Native-unit basis*: imputed purchase Quantity inherits the unit of the
+  observed price for that =j= (produced-side / 2016-17 modal =u=).  Assumes
+  purchases of =j= are in the same unit as observed sales/production of =j=;
+  documented assumption.
+
+** D3. 1987-88 & 1988-89 (value-only)  [RESOLVED: include now; own price survey]
+Include all 7 waves.  The expenditure module gives Expenditure only (no qty),
+BUT both waves fielded their OWN =PRICE.DAT= community price survey — so they
+are self-sufficient for imputation under D2; NO cross-wave price borrow is
+needed.  Caveat (=CONTENTS.org:141=): the 1980s waves use a single-visit
+"since my last visit" recall (not the ~dozen visits of 1991-92+), so their
+=visit= level is degenerate (one value) — harmless, but note it for
+cross-wave comparability.
+
+** D5. Household =i=-key (fixes the NaN-=v= bug)  [PROPOSAL: route through the wave i() helper]
+Confirmed root cause of "100% NaN v" (GH #256 pattern) — =food_acquired.py=
+builds =i= differently from =sample=/=roster=:
+- 1991-92: =format_id(clust)+format_id(nh)= → ="11"= vs sample/roster
+  ="101"= (no zero-pad on nh).
+- 1998-99: =f"{clust:d}/{nh:02d}"= → ="1/01"= vs sample/roster ="101"=
+  (spurious "/" separator).
+- 2005-06: reconstructs =hhid= from clust/nh vs sample/roster reading the
+  /pre-composed/ source =hhid=.
+PROPOSAL: delete the bespoke =i= construction in every =food_acquired.py= and
+call the wave's canonical =i()= (mapping.py / ghanalss.py) — the same helper
+=sample= and =household_roster= use.  This makes the keys identical by
+construction and removes the per-script drift permanently.  Re-verify with a
+=set(sample.i) ∩ set(food.i)= intersection check per wave.
+
+** D6. Food-item harmonization  [PROPOSAL: map both schemes to harmonize_food]
+Purchases use =Code_9b= (=Code_12A= in 87-88/88-89), production uses =Code_8h=
+(=Code_12B=).  Both must map to the canonical =j= via the country's
+=harmonize_food= / =food_items= table.  Gap: =food_items.org= harmonization is
+itself a GH #109 TODO.  PROPOSAL: scope the =Code_9b/8h → Preferred Label=
+mapping audit into Phase 1 (it is a prerequisite, not optional); the
+=Code_12A/12B= mapping rides on the D3 decision.
+
+* Phased plan (Phases 1–4 — NOT started; for sign-off)
+- Phase 1 — rewrite the 7 wave scripts to emit =(t,i,j,u,s,visit)= long form:
+  stack purch/prod into =s=, standardize =i=/=j=/=u= names, route =i= through
+  the canonical helper (D5), KEEP =visit= (D1), map food codes (D6).  Raw
+  Quantity stays NaN where the survey didn't record it (no imputation baked in
+  — see Phase 3).  One script at a time; per-wave parity + row-count check.
+- Phase 2 — fix =_/food_acquired.py= concatenator (uniform shape now); retire
+  =food_prices_quantities_and_expenditures.py=; wire =_FOOD_DERIVED=; set
+  GhanaLSS =data_scheme.yml= index to =(t,i,j,u,s,visit)= and global
+  =index_info= food_acquired to canonical =(t,v,i,j,u,s)=.  Confirm the derived
+  transforms sum over =visit= (D1) — should need no transform change.
+- Phase 3 — price-based quantity imputation (D2/D4).  (3a) Build a GhanaLSS
+  =community_prices= feature from the per-wave price survey (=PRICE.DAT=,
+  =G3PRICE.DTA=, =g7price.dta=) → =(t, geo, j, u) → Price=.  (3b) Wire the
+  inverse imputation (=Quantity = Expenditure / community_price=, geography
+  fallback ladder, native units) into the =food_quantities= derived path, with
+  a provenance marker.  This is the only genuinely NEW framework code; gate it
+  on its own.
+- Phase 4 — verify NaN-=v= waves now join =v= (intersection > 0 on
+  91-92/98-99/05-06); confirm no duplicate-collapse warnings; register
+  =food_acquired= in =data_scheme.yml=; add =household_characteristics=
+  (derives from roster once the food side is clean); tests; full cold gate +
+  adversarial review (the same strict-bar loop we used for #436).
+
+* Per-wave Phase-1 verification checklist (re-confirm against questionnaire)
+For EACH wave, before/while rewriting:
+- [ ] Confirm purchase source file + variable stems (=s9bq{v}a/b/c=) and visit range.
+- [ ] Confirm production source file + variable stems (=s8hq{v}q/p/u=) and visit range.
+- [ ] Confirm =i()= helper matches =sample=/=roster= (D5 intersection check).
+- [ ] Confirm =Code_9b/8h= (or =12A/12B=) decode to harmonized =j= (no '' / NA leakage).
+- [ ] Confirm unit column + decode (=units= mapping) — or document =u=NA= (87-88/88-89).
+- [ ] Confirm whether purchase quantity exists (only 2016-17 expected).
+- [ ] Confirm =visit= kept as an index level; data is unique at
+  =(t,i,j,u,s,visit)= (no collapse); spot-check row-count conservation.
+- [ ] Parity: compare against any existing baseline / the pre-migration parquet.
+
+* Tooling context (v0.8.0, merged to development 2026-06-15 — PR #454)
+Two just-landed changes materially help this migration:
+- *Automatic content-hash cache invalidation*: the L2 cache hash now covers
+  =data_info.yml=, the wave/country modules (=ghanalss.py=, =mapping.py=), the
+  =_/{table}.py= scripts, =data_scheme.yml=, the =Makefile=, and =.org= build
+  inputs (=food_items.org=, =categorical_mapping.org=) + the DVC sidecar md5 of
+  sources.  So editing any of these during the wave rewrites AUTO-invalidates
+  and rebuilds — no manual =cache clear= per iteration (kills the old
+  stale-L2-wave-parquet-shadows-a-script-fix gotcha).  Caveat to respect:
+  script-path L2-wave parquets are written hashless and self-invalidate only
+  via the L2-country eviction path — if the country table is never
+  materialized (partial cache), a hashless wave parquet can still serve stale
+  (residual F1 in =dvc_object_management.org=); during the loop, build the
+  country table (or =LSMS_NO_CACHE=1=) when verifying a wave-script edit.
+- *GhanaLSS Makefile fixed* (=cd1c95cd=/=86a10d10=): generic rule now depends on
+  =ghanalss.py= (was a stale =ghana.py=) and the =household_roster=
+  prerequisite is corrected — the Make backend our Phase-2 relies on is now
+  sound.
+
+* Risk register
+- HIGH — silent data loss: the duplicate-collapse is dropping real rows /now/;
+  a wrong visit/source reshape could keep dropping them invisibly.  Mitigation:
+  assert row-count conservation across the reshape; no =groupby().first()=.
+- MED — food-code harmonization gaps (unmapped codes → '' =j= → dropped).
+  Mitigation: leak audit per wave (cf. the =food-acquired/units= skill).
+- MED — id_walk panel chains across 7 waves (1987→2017) may not be defined;
+  cross-wave =i= continuity is a separate question (verify, don't assume).
+- LOW — kg conversion deferred (D4) → =food_quantities(units='kgs')= returns
+  native-=u= rows until the FCT lands; acceptable and documented.
+
+* Effort / approach
+Country-sized, multi-day; comparable to the Uganda food_acquired arc (its own
+PR #245 sequence).  Good fit for the loop + adversarial + per-wave parity
+approach; parallelizable per-wave with worktree agents (scrum-master pattern)
+ONCE Phase 0 (this doc) is signed off — before that, parallel waves would
+diverge on the open decisions.
+
+* Open questions for the maintainer
+D1, D2, D3, D4 resolved (2026-06-15).  Q3 (cross-wave price borrow) is now
+MOOT — every wave has its own community price survey (=PRICE.DAT= etc.).
+Remaining:
+1. Imputation layer: OK to do the price→quantity fill in the DERIVED
+   =food_quantities= path (raw =food_acquired= stays Quantity=NaN where
+   unobserved), not baked into the wave parquet?  (My proposal under D2.)
+2. Provenance: OK to add an explicit imputed-vs-reported marker on filled
+   quantities?
+3. =community_prices=: OK to build a GhanaLSS =community_prices= feature
+   (extract =PRICE.DAT=/=G3PRICE=/=g7price=) as the price source — landing it
+   as its own feature first, then wiring the imputation onto it?
+4. Is there a replication/baseline for GhanaLSS food expenditures to parity
+   against, or is canonical-shape + sanity the only available check?

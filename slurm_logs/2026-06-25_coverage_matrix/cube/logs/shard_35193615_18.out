@@ -1,0 +1,24 @@
+=== task 18: country='Liberia'  node=n0184.savio3  Thu Jun 25 18:46:39 PDT 2026 ===
+--- provisioning venv -> /local/job35193681/venv ---
+--- cache clear Liberia ---
+Liberia: removed
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Liberia/2018-19/_/shocks.parquet
+--- build Liberia ---
+=== done 'Liberia' rc=0  Thu Jun 25 18:48:24 PDT 2026 ===

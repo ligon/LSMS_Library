@@ -49,6 +49,328 @@ Ghana Food Expenditure Data with Aggregate Labels and FTC Codes:
 https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/edit?usp=sharing
 
 
+* Sampling universe, exclusions and sub-samples
+
+What the GSPS documentation *claims* about the population it represents, quoted
+verbatim.  This section records the survey's own statements; it is deliberately
+*not* inferred from the microdata, and it makes no claim about what the data
+look like.  Where a wave has no statement, that is recorded as a gap together
+with what was searched.
+
+Read the two things below as separate facts, because for this survey they come
+apart:
+
+- What the documents *say* the sample represents.
+- What the repository can currently *see* (e.g. that =2013-14= carries no region
+  or urban/rural variable -- see "Files in GhanaSPS/_/ > other_features.py"
+  above).  That is a data-availability fact about the shipped extract, *not* a
+  coverage or universe claim, and must not be read as one.
+
+One structural warning up front, because it governs the whole country: GSPS is a
+*panel*, not three independent national cross-sections.  Only wave 1 has a
+documented probability sample of Ghana.  Waves 2 and 3 are follow-ups of that
+sample plus households split off from it, and *no document in the corpus states
+a universe for them*.  Anyone pooling GhanaSPS waves, or reading a wave-2/wave-3
+estimate as "nationally representative", should read this section first.
+
+** 2009-10 (Wave 1)
+
+- Statement lives in :: local documentation, in this repository (plus a
+  corroborating WB catalog field, see below).
+- Confidence :: high.
+
+*** Declared coverage, verbatim
+
+From =lsms_library/countries/GhanaSPS/2009-10/Documentation/Basic_Information_Dec_2015.pdf=,
+section "3. Sampling and Survey Design", printed p. 8 (PDF page 9):
+
+#+begin_quote
+The survey provides regionally representative data for the 10 regions of Ghana.
+In all, 5010 households from 334 Enumeration Areas (EAs) were sampled.  Fifteen
+households were selected from each of the EAs.  The distribution of the
+enumeration areas across the regions in Ghana is presented in Table 1.  The
+number of EAs for each region was proportionately allocated based on estimated
+2009 population share for each region.  EAs for Upper East and Upper West
+regions, which have relatively smaller population sizes, were over sampled to
+allow for a reasonable number of households to be interviewed in these regions.
+#+end_quote
+
+The same paragraph appears verbatim in the locally shipped WB DDI report
+=ddi-documentation-english_microdata-2534.pdf=, under "Sampling > Sampling
+Procedure".
+
+From =Baseline_Descriptive_Report.pdf=, section "2.1. Household composition",
+printed p. 5 (PDF page 15):
+
+#+begin_quote
+The data from the baseline Ghana Socio-Economic Panel Survey consists of a
+nationally representative sample of 5009 households in 334 enumeration areas
+(EAs) containing 18,889 household members.  The survey defines household as a
+person or a group of persons, who live together in the same dwelling, share the
+same house-keeping arrangements and are catered for as one unit.
+#+end_quote
+
+(The same sampling paragraph also appears in that report at section "1.3. Sample
+Design and Organization of the Survey", printed p. 2 / PDF page 12, worded "The
+survey provides a regionally representative data for the 10 regions of Ghana.
+In all, 5009 households from 334 Enumeration Areas (EAs) were *interviewed*."
+-- note "interviewed", against "sampled" in the Basic Information Document.)
+
+*** The only field actually labelled "Universe" is catalog-only
+
+No file in this repository carries a field labelled "Universe".  The locally
+shipped DDI report has a "Sampling" section but *no* Universe field.  The one
+explicit Universe statement lives in World Bank catalog metadata, i.e. outside
+the repository and revisable without notice --
+https://microdata.worldbank.org/index.php/catalog/2534/study-description,
+"Coverage" block, "Universe" field:
+
+#+begin_quote
+Nationally representative, regionally representative for all 10 regions.
+#+end_quote
+
+(Verified against the live catalog page, 2026-07-21.  This is *not* the WB NADA
+boilerplate universe sentence that recurs across other countries in this
+library; it is specific to this study.  It is nonetheless a *representativeness*
+claim, not a definition of a target population: nothing in the corpus says which
+persons or dwellings constitute the universe, only that the sample represents
+Ghana and its regions.)
+
+*** Frame and design (context, NOT the universe)
+
+- Two-stage stratified design, stratified by region.
+- Stage 1: 334 clusters (census EAs) selected by simple random sampling from an
+  updated master sampling frame constructed from the 2000 Ghana Population and
+  Housing Census; a complete household listing was conducted in 2009 in all
+  selected clusters.
+- Stage 2: simple random sampling of 15 listed households per cluster.
+- Verbatim, =Basic_Information_Dec_2015.pdf= printed p. 9 (PDF page 10): "Since
+  the design is not self-weighting, household sample weights have been computed
+  and applied for the estimation of the survey results."  So the raw sample is
+  *not* self-weighting and unweighted GSPS wave-1 means are not national means.
+
+*** Oversample
+
+The oversample is explicit and it is regional:
+
+#+begin_quote
+EAs for Upper East and Upper West regions, which have relatively smaller
+population sizes, were over sampled to allow for a reasonable number of
+households to be interviewed in these regions.
+#+end_quote
+
+(=Basic_Information_Dec_2015.pdf=, section 3, printed p. 8.)  The realised EA
+allocation is in that document's Table 1 (printed p. 9): Upper East 16 EAs
+(4.8 per cent) and Upper West 12 EAs (3.6 per cent), against e.g. Ashanti 60
+(18.0 per cent).  This is the reason the design is not self-weighting; it is
+also the reason an unweighted pooled GhanaSPS average over-represents the two
+Upper regions.
+
+No other sub-population, booster, refresh or module subsample is documented for
+this wave.
+
+*** Exclusions: no statement found
+
+No statement of excluded regions, localities, institutional or collective
+households, nomadic or homeless populations, or any security-related carve-out
+appears in any wave-1 documentation in this repository, nor in the WB catalog
+entry.  Searched: =Basic_Information_Dec_2015.pdf= (full text),
+=Baseline_Descriptive_Report.pdf= (full text),
+=ddi-documentation-english_microdata-2534.pdf= (full text), =CODE_BOOK.pdf=,
+="Aggregate documentation.pdf"=, =LICENSE.org=, =SOURCE.org=, the household
+questionnaires and the interviewers' manual; plus WB catalog study 2534.  This
+is an *absence of a statement*, not a documented claim that nothing was
+excluded.
+
+The nearest thing to a population-definition rule is a household-membership
+eligibility rule -- a person-level inclusion criterion, *not* a geographic or
+population exclusion.  Verbatim, =Basic_Information_Dec_2015.pdf=, section 2
+preamble, printed p. 3 (PDF page 4):
+
+#+begin_quote
+The survey defined a household as a person or a group of persons, who live
+together in the same dwelling, share the same house-keeping arrangements and are
+catered for as one unit under one recognized head.  A person qualifies as a
+member of a household if he/she in the last 6 months regularly participated in
+this living arrangement with the household.
+#+end_quote
+
+The 6-month residence rule matters for roster-derived counts: a person present
+in the dwelling but resident for less than 6 months is by definition not a
+household member here.
+
+*** 5010 vs 5009
+
+The Basic Information Document and the WB catalog say 5010 households were
+*sampled*; the Baseline Descriptive Report says 5009 were *interviewed*.  The
+Basic Information Document reconciles this itself, section "5. Survey
+completion", printed p. 11 (PDF page 12):
+
+#+begin_quote
+The survey completed interviews for 5009 households in all 334 enumeration areas
+(EAs) across the country, indicating that only one sampled household could not be
+included for reason of data incompleteness.
+#+end_quote
+
+** 2013-14 (Wave 2)
+
+- Statement lives in :: *no local documentation*, and *not* the World Bank
+  catalog -- GSPS Wave 2 is not in the WB Microdata Library at all.  The only
+  statement is in an external catalog entry (IHSN NADA mirror of the ISSER /
+  University of Ghana data portal), i.e. a moving target this library does not
+  hold.
+- Confidence :: medium.
+
+*** No universe statement exists for this wave
+
+Neither the local documentation nor the catalog entry contains a universe or
+target-population statement.  The strongest available statement is a coverage
+claim.  From https://catalog.ihsn.org/catalog/10354/study-description (study
+=GHA_2013_GSPS_v01_M=), "Coverage" block, "Geographic Coverage" field -- note,
+*not* a "Universe" field; that entry has none, and has no "Sampling" section at
+all:
+
+#+begin_quote
+The survey provides regionally representative data for the 10 regions of Ghana.
+#+end_quote
+
+(Verified against the live catalog page, 2026-07-21.)
+
+Local files searched and found to contain no universe statement:
+=Documentation/ISSER_Yale_Part A_WAVE II.docx= (full text),
+=ISSER_Yale_Community Survey_WAVE II.docx= (full text),
+=ISSER_Yale_Part B_WAVE II.docx=, =Data Map.xlsx=,
+=Food Consumption Unit Codes.xlsx=, =Variable Lists/=, =Variable Labels/=.  The
+wave ships no Basic Information Document, no DDI, and no descriptive report:
+every technical document in the official Harvard Dataverse distribution
+(doi:10.7910/DVN/E5QP0F) is wave-1 only.
+
+*** This wave is a panel follow-up plus split-offs, not a fresh sample
+
+This is the sub-sample structure a pooler needs.  From the same IHSN entry,
+"Abstract" field -- a description of the achieved sample, *not* a universe
+statement:
+
+#+begin_quote
+The data from the second wave of the Ghana Socioeconomic Panel Survey covered a
+sample of 4,774 households containing 16,356 household members.  The second wave
+was unique in the sense that it tracked movement of households as well as
+individual within a household.  Thus, increasing the number of households in the
+Panel Study due to the nature of the design; tracking wholly moved and split
+households.  A total of 5484 households were selected for the survey comprising
+of 5009 households from the baseline survey and 475 households from split of
+households created of which 4774 households were successfully interviewed.
+#+end_quote
+
+So the wave-2 frame is: 5009 wave-1 households + 475 split-off households
+= 5484 selected, of which 4774 interviewed.  The 475 split-off households are a
+distinct sub-population within the wave -- they enter through the tracking rule,
+not through a probability draw from a national frame.
+
+The wave-1 design anticipated this; =Basic_Information_Dec_2015.pdf=, section
+"1.1. Introduction", printed p. 2 (PDF page 3):
+
+#+begin_quote
+In subsequent waves of the panel, a sample of moved households and individuals
+who have moved out of original households to form new households or joined other
+households originally not in the panel sample, will be interviewed in addition
+to the original sample.
+#+end_quote
+
+It is *natural* to conclude that wave 2 therefore inherits wave 1's universe.
+No document in the corpus says so, and it is not asserted here.
+
+*** Exclusions: no statement found
+
+No exclusion statement of any kind (region, locality, institutional or
+collective population, nomadic households, security-related drops) appears in
+the local wave-2 documentation or in the IHSN catalog entry.  That entry's only
+metadata sections are Identification, Scope, Coverage, Producers and sponsors,
+Survey instrument, Data collection, Data Access, Disclaimer, Metadata
+production.
+
+Do not read the wave-2 *community* instrument's title, "RURAL COMMUNITY
+INSTRUMENT", as a rural restriction on the household sample: it scopes the
+community-level module only.
+
+** 2017-18 (Wave 3)
+
+- Statement lives in :: *no local documentation*, and *not* the World Bank
+  catalog -- GSPS Wave 3 is not in the WB Microdata Library either.  Only an
+  external IHSN/ISSER catalog entry.
+- Confidence :: medium.
+
+*** No universe statement exists for this wave
+
+From https://catalog.ihsn.org/catalog/10355/study-description (study
+=GHA_2018_GSPS_v01_M=), "Coverage" block, "Geographic Coverage" field -- again
+*not* a "Universe" field; that entry has none, and no "Sampling" section:
+
+#+begin_quote
+The survey is nationally representative.
+#+end_quote
+
+(Verified against the live catalog page, 2026-07-21.)  Note the wording changed
+between waves: waves 1 and 2 are catalogued as "regionally representative data
+for the 10 regions of Ghana"; wave 3 says only "nationally representative".
+Recorded as found, not reconciled -- and in particular this is *not* evidence
+that regional representativeness was retained or dropped.
+
+The wave's entire =Documentation/= directory is one file,
+=Questionnaire/HH_Questionnaire_23_10.docx=; its full text was searched for
+universe / target population / eligibility / representativeness wording and
+contains none.  The only hits are module-level respondent-eligibility rules,
+which govern *who answers a given module*, not which households are in sample,
+e.g.:
+
+#+begin_quote
+Can you confirm that [Name] is female, 18-40 years old, speaks either English,
+Asante, Akuapem, Fanti, Ewe, Dagbani, Kokomba/Likpakpa, Wali/Dagari, Frafra/Gruni
+or Dangme and is therefore eligible to be interviewed?
+#+end_quote
+
+*** Exclusions: no statement found
+
+None of any kind, in the questionnaire or the catalog entry.
+
+*** Wave-label discrepancy
+
+Recorded because it affects citation, not coverage.  This repository's directory
+is =2017-18=, but the local instrument's own cover page reads "GHANA
+SOCIO-ECONOMIC PANEL SURVEY / HOUSEHOLD INSTRUMENT / WAVE 3 (2018-2019)", and
+the IHSN/ISSER entry is titled "Socioeconomic Panel Survey 2018-2019, Wave 3"
+with collection dates 2018-2019 -- while the Yale EGC project page and the
+"Ghana Panel Creation User Guide" both describe wave 3 as conducted in
+2017/2018.  The identification of this directory with GSPS Wave 3 rests on the
+local instrument's cover page, not on the microdata.
+
+*** Not this wave: the 2019 "extremely poor" northern sample
+
+Flagged so it is never conflated with the wave-3 directory.  From the EGC "Ghana
+Panel Creation User Guide":
+
+#+begin_quote
+In 2019, the Ghana Panel Survey was also administered to a sample of
+participants in Ghana's rural north who had been classified as "extremely poor"
+through community-level focus groups.
+#+end_quote
+
+That is a separate, purposively selected sample and is *not* present in
+=GhanaSPS/2017-18/=.
+
+** Summary
+
+| Wave    | Explicit "Universe" field?      | Where the statement lives        | Exclusions stated | Oversample / sub-sample                              |
+|---------+---------------------------------+----------------------------------+-------------------+------------------------------------------------------|
+| 2009-10 | yes, WB catalog only            | local docs + WB catalog 2534     | none found        | Upper East, Upper West EAs deliberately over-sampled |
+| 2013-14 | no                              | IHSN/ISSER catalog 10354 only    | none found        | panel follow-up: 5009 wave-1 HH + 475 split-offs     |
+| 2017-18 | no                              | IHSN/ISSER catalog 10355 only    | none found        | none documented                                      |
+
+"none found" means *no statement was found*, having searched the files named
+above.  It is not a claim that nothing was excluded.  Per the repository's
+standing rule, an unevidenced "nothing excluded here" assertion must not be
+written into any config file for this country.
+
 * Files in GhanaSPS/<SOMEYEAR>/_/
 ** TODO household_characteristics.py
 ** TODO food_acquired.py

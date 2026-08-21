@@ -1,0 +1,3 @@
+bin/savio_venv.sh: line 68: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory
+savio_venv: venv mounted but import failed
+/var/spool/slurmd/job35193447/slurm_script: line 27: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory

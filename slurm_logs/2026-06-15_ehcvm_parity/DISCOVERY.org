@@ -1,0 +1,63 @@
+#+TITLE: EHCVM parity-extension discovery (GH #438, Tier-1)
+#+DATE: 2026-06-15
+#+AUTHOR: Sue (coordinator)
+
+Wireable/blocked matrix for extending the parity item-feature stack to the 6
+EHCVM West-Africa countries.  Template = Niger 2018-19 (EHCVM, built in the
+ISA parity pass #430-#437); EHCVM is one standardized instrument so the section
+codes are shared.
+
+* Template: EHCVM section -> parity feature (Niger 2018-19)
+| feature           | EHCVM section file | template script (Niger 2018-19/_) |
+|-------------------+--------------------+-----------------------------------|
+| crop_production   | s16c_me            | crop_production.py                |
+| plot_inputs       | s16b_me            | plot_inputs.py                    |
+| plot_labor        | s16a_me            | plot_labor.py                     |
+| livestock         | s17_me             | livestock.py                      |
+| people_last7days  | s04_me (+ s01_me)  | people_last7days.py               |
+| community_prices  | _co_ (caveated)    | Niger/Mali _/community_prices.py  |
+
+* Wireable matrix (all presence confirmed via .dta/.dvc sidecars)
+| country        | wave dir / Data path        | code   | s16a | s16b | s16c | s17 | s04 | s01 |
+|----------------+-----------------------------+--------+------+------+------+-----+-----+-----|
+| Benin          | 2018-19/Data/               | ben2018| Y | Y | Y | Y | Y | Y |
+| Burkina_Faso   | 2018-19/Data/               | bfa2018| Y | Y | Y | Y | Y | Y |
+| Guinea-Bissau  | 2018-19/Data/               | gnb2018| Y | Y | Y | Y | Y | Y |
+| Senegal        | 2018-19/Data/               | sen2018| Y | Y | Y | Y | Y | Y |
+| CotedIvoire    | 2018-19/Data/Menage/        | CIV2018| Y | Y | Y | Y | Y | Y |
+| Togo           | 2018/Data1/                 | tgo2018| Y | Y | Y | Y | Y | Y |
+
+=> 5 core features (crop_production, plot_inputs, plot_labor, livestock,
+   people_last7days) WIREABLE across ALL 6.  Already present (do not rebuild):
+   food_acquired (+plot_features except CotedIvoire), shocks.
+
+* Per-country adaptation quirks (the build work; EHCVM template otherwise shared)
+- Country code in filenames: ben/bfa/civ(UPPERCASE CIV)/gnb/sen/tgo, year 2018.
+- Path layout differs: most are =2018-19/Data/=; CotedIvoire is =2018-19/Data/Menage/=;
+  Togo is =2018/Data1/= (wave dir "2018", subdir "Data1").
+- Benin has a DUPLICATE wave dir (=2018-19/= and =2018-2019/=) — data-hygiene flag; pick one.
+- Burkina_Faso + Senegal also have a 2021-22 EHCVM round, but it LACKS s04 (use
+  2018-19 for people_last7days, or treat 2021-22 separately).
+- CotedIvoire lacks =plot_features= (predates the EHCVM-list per CLAUDE.md) — wire it from s16 too.
+- Label foundation (=harmonize_food= + =u=) per country first (exists for several).
+
+* Blocked / caveated
+- *anthropometry*: BLOCKED.  EHCVM s05/s06 (Benin) carry NO body-measure
+  columns (no poids/taille/weight/height); Mali/Niger had no anthropometry in
+  the ISA pass either.  EHCVM does not field child anthropometry -> drop from
+  the extension.
+- *community_prices*: CAVEATED.  Niger _/community_prices.py notes the EHCVM
+  community price data is "not at the grappe grain" and the ehcvm_nsu median is
+  "NOT this" -> the EHCVM community-price grain is problematic.  Lower priority;
+  confirm the usable _co_ price section before wiring.
+
+* Work-list / build shape
+- 5 features x 6 countries = 30 country-feature cells, ALL from the Niger
+  template (clone + per-country path/code adaptation, data-driven).
+- anthropometry dropped (no module); community_prices deferred (caveated).
+- Approach: parity-loop style — label foundation per country (Unit#0), then one
+  branch per feature, parallel per-country worktree agents (now enabled by #436),
+  cold-build + is_this_feature_sane + adversary-verified + test-gated, merge-if-green.
+- Suggested pilot: livestock (simplest grain (t,i,animal)) cloned across the 6
+  to validate the EHCVM-clone flow, then fan out crop_production / plot_inputs /
+  plot_labor / people_last7days.

@@ -1,0 +1,32 @@
+PASS Senegal/crop_production: rows=8416 i-key=1.000
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'input', 'crop', 'u'] had 15 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+PASS Senegal/plot_inputs: rows=9901 i-key=1.000
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Senegal/2018-19/_/./plot_labor.py:131: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_sen2018.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_sen2018.dta', convert_categoricals=False)
+PASS Senegal/plot_labor: rows=10447 i-key=1.000
+PASS Senegal/livestock: rows=9404 i-key=1.000
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'plot', 'crop', 'u'] had 30 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'plot', 'crop', 'u'] had 46 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'plot', 'crop', 'u'] had 1010 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['i', 't'] had 59 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+PASS Niger/crop_production: rows=41896 i-key=1.000
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'input', 'crop', 'u'] had 73 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'input', 'crop', 'u'] had 108 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'input', 'crop', 'u'] had 6 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'input', 'crop', 'u'] had 3 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+PASS Niger/plot_inputs: rows=42364 i-key=1.000
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Niger/2021-22/_/plot_labor.py:24: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_ner2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_ner2021.dta', convert_categoricals=False)
+PASS Niger/plot_labor: rows=52909 i-key=1.000
+PASS Niger/livestock: rows=30210 i-key=1.000
+---
+ALL PASS

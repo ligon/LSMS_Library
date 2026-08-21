@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2783
+
+#+CATALOG_ID: 2783
+#+CATALOG_IDNO: ETH_2015_ESS_v03_M
+#+CATALOG_TITLE: Socioeconomic Survey 2015-2016, Wave 3
+#+CATALOG_YEARS: 2015-2016
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/ampf-7988
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2783
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

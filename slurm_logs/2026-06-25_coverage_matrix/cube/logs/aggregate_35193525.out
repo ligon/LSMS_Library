@@ -1,0 +1,39 @@
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193525/venv_img
+>> .venv -> /local/job35193525/venv_img  (verified import OK)
+=== shards present (1 of 34) ===
+=== missing countries (built no shard) ===
+Albania
+Armenia
+Azerbaijan
+Benin
+Burkina_Faso
+Cambodia
+China
+CotedIvoire
+Ethiopia
+EthiopiaRHS
+GhanaLSS
+Guatemala
+Guinea-Bissau
+Guyana
+India
+Iraq
+Kazakhstan
+Kosovo
+Liberia
+Malawi
+Mali
+Nepal
+Niger
+Nigeria
+Pakistan
+Senegal
+Serbia
+Serbia and Montenegro
+Tajikistan
+Tanzania
+Timor-Leste
+Togo
+Uganda
+
+=== aggregate done Thu Jun 25 18:40:06 PDT 2026 ===

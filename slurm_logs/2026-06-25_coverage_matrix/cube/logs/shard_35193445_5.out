@@ -1,0 +1,3 @@
+=== task 5: country='Cambodia'  node=n0181.savio3  Thu Jun 25 18:35:35 PDT 2026 ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193452/venv_img
+=== done 'Cambodia' rc=127  Thu Jun 25 18:35:36 PDT 2026 ===

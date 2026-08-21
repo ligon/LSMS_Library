@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2583
+
+#+CATALOG_ID: 2583
+#+CATALOG_IDNO: MLI_2014_EACI_v03_M
+#+CATALOG_TITLE: Enquête Agricole de Conjoncture Intégrée 2014
+#+CATALOG_YEARS: 2014-2015
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/qqam-mn86
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2583
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

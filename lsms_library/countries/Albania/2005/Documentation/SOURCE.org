@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/kzst-d297]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/64
+
+#+CATALOG_ID: 64
+#+CATALOG_IDNO: ALB_2005_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2005
+#+CATALOG_YEARS: 2005-2005
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/kzst-d297
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/64
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

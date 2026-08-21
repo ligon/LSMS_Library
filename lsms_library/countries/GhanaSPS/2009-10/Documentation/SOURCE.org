@@ -1,2 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/2534/get-microdata
-https://egc.yale.edu/data/egc-isser-northwestern-ghana-panel-survey
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2534
+
+#+CATALOG_ID: 2534
+#+CATALOG_IDNO: GHA_2009_GSPS_v01_M
+#+CATALOG_TITLE: Socioeconomic Panel Survey: 2009-2010
+#+CATALOG_YEARS: 2009-2010
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/851p-b825
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2534
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

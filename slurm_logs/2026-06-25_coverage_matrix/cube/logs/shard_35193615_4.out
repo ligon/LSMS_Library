@@ -1,0 +1,64 @@
+=== task 4: country='Burkina_Faso'  node=n0180.savio3  Thu Jun 25 18:43:32 PDT 2026 ===
+--- provisioning venv -> /local/job35193622/venv ---
+--- cache clear Burkina_Faso ---
+Burkina_Faso: removed
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/food_coping.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/food_coping.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/months_food_inadequate.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2021-22/_/subjective_well_being.parquet
+--- build Burkina_Faso ---
+=== done 'Burkina_Faso' rc=0  Thu Jun 25 18:48:15 PDT 2026 ===

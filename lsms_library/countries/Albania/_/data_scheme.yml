@@ -83,10 +83,31 @@ Data Scheme:
     aggregation:
       visit: first
 
-  # Occurrence-only shocks module (2012 wave only; earlier waves have no
-  # shocks module).  No impact (Affected*) or coping (HowCoped*) detail in
-  # the source; ``Years`` is the comma-joined list of years 2008-2012 in
-  # which each experienced shock was reported.
+  # Occurrence-only shocks module.  WIRED for the 2012 wave only.  No impact
+  # (Affected*) or coping (HowCoped*) detail in the source; ``Years`` is the
+  # comma-joined list of years 2008-2012 in which each experienced shock was
+  # reported.
+  #
+  # CORRECTION 2026-07-12: this comment previously asserted "2012 wave only;
+  # earlier waves have no shocks module".  That claim was FALSE and it
+  # suppressed work on ~5 cells.  Verified against source:
+  #
+  #   2005  Data/migrationE_cl.dta          m6e_q00 "Type of Shock Code"
+  #                                         (10 types: Dispossesion of Land,
+  #                                         Unexpected death of income earner,
+  #                                         Job loss, Flood damage, Pyramid
+  #                                         scheme, ...) + m6e_q1989..q1999
+  #                                         year-occurrence grid
+  #   2008  Data/Modul_6E_migration_e.sav   m6e_q00, identical
+  #   2003  Data/w2_hh_all.dta              B10A_Q10 "faced any shocks in last
+  #                                         12 months" + 7 shock types
+  #   2004  Data/w3_hh_all.dta              m10a_q09, same
+  #
+  # 2002 is UNRESOLVED (no household questionnaire in the repo to check).
+  #
+  # These waves are therefore TODO, not "no module".  Tracked in the absent-cell
+  # adjudication (.coder/coverage/absent_verdicts.csv); do not re-close them
+  # without evidence.  See slurm_logs/DESIGN_coverage_discipline_2026-07-11.org.
   shocks:
     index: (t, i, Shock)
     Years: str

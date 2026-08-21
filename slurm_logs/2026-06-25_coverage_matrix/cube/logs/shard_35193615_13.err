@@ -1,0 +1,7 @@
+[matrix] building (full) ...
+  Guyana: 1 waves × 8 features
+Guyana 1992 assets: 88/1818 DRBLS rows dropped (newid absent from COVERN).
+Guyana 1992 assets: wrote 10345 rows, 1246 households, 44 item types.
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Guyana.csv (8 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=1, declared=0, dropped=0, broken=0, builds=0, sane=7, blessed=0

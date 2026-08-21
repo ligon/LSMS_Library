@@ -1,1 +1,13 @@
-https://microdata.worldbank.org/index.php/catalog/3795/
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/3795
+
+#+CATALOG_ID: 3795
+#+CATALOG_IDNO: UGA_2018_UNPS_v02_M
+#+CATALOG_TITLE: Uganda National Panel Survey 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3795
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

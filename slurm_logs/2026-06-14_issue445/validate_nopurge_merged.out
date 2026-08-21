@@ -1,0 +1,5 @@
+### cold build from empty ###
+DONE: 13/13 built, 0 failed
+### invariance test, --no-purge, SERIAL (must NOT skip) ###
+.....................................................                    [100%]
+53 passed in 4.16s

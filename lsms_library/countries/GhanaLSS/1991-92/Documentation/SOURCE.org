@@ -1,3 +1,13 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2315
+
+#+CATALOG_ID: 2315
+#+CATALOG_IDNO: GHA_1991_GLSS_v02_M
+#+CATALOG_TITLE: Living Standards Survey III 1991
+#+CATALOG_YEARS: 1991-1992
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2315
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

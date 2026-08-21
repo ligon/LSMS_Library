@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/1ekb-m086]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/4293
+
+#+CATALOG_ID: 4293
+#+CATALOG_IDNO: GNB_2018_EHCVM_v02_M
+#+CATALOG_TITLE: Inquérito Harmonizado sobre as Condiçöes de vide dos Agreagados Familiares 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/1ekb-m086
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/4293
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

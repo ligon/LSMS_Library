@@ -1,0 +1,66 @@
+=== task 10: country='GhanaLSS'  node=n0190.savio3  Thu Jun 25 18:45:04 PDT 2026 ===
+--- provisioning venv -> /local/job35193650/venv ---
+--- cache clear GhanaLSS ---
+GhanaLSS: removed
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1988-89/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2005-06/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1987-88/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1988-89/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2005-06/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1987-88/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1988-89/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2005-06/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2005-06/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1987-88/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1988-89/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2005-06/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1987-88/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1988-89/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2005-06/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1987-88/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1988-89/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1991-92/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1998-99/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2005-06/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2012-13/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/2016-17/_/sample.parquet
+--- build GhanaLSS ---
+=== done 'GhanaLSS' rc=0  Thu Jun 25 18:55:13 PDT 2026 ===

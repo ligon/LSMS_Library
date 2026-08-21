@@ -1,2 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/2936/get-microdata
-https://microdata.worldbank.org/index.php/catalog/2248/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2936
+
+#+CATALOG_ID: 2936
+#+CATALOG_IDNO: MWI_2016_IHS-IV_v04_M
+#+CATALOG_TITLE: Fourth Integrated Household Survey 2016-2017
+#+CATALOG_YEARS: 2016-2017
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/g2p9-9r19
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2936
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -6,10 +6,13 @@
 # composite key; the framework needs a named `i` formatter for the
 # list-valued idxvar (see Mali/_/mali.py for the analogous helper).
 
+import warnings
+
 import numpy as np
 import pandas as pd
 
 import lsms_library.local_tools as tools
+from lsms_library.transformations import S_VALUES
 
 
 # Explicit `waves` list (consumed by Country.waves, country.py:1054-1073).
@@ -87,6 +90,48 @@ def i(value):
     return tools.format_id(value)
 
 
+#: Canonical grain of `food_acquired` (less `t`, which the framework prepends).
+_FOOD_GRAIN = ['i', 'j', 'u', 's']
+#: The measures that ride on that grain.
+_FOOD_MEASURES = ['Quantity', 'Expenditure']
+
+
+def _drop_double_punched(flat):
+    """Drop food rows that are INDISTINGUISHABLE in the canonical grain.
+
+    GH #323.  The ERHS q36 food module is a one-row-per-food-item roster with
+    NO line / transaction / occasion identifier -- all 27 source columns were
+    enumerated; q36_1a is a section flag, not a line number.  So two rows equal
+    on (i, j, u, s) AND on Quantity AND on Expenditure are not a second,
+    distinguishable acquisition: they are the SAME measurement recorded twice
+    (a data-entry double-punch -- e.g. food89.dta rows 865/866 are identical in
+    EVERY source column, incl. unrelated household-level fields).
+
+    This must happen BEFORE the framework collapses the canonical index, because
+    that collapse SUMS the additive measures: `food_acquired` is in feature.py's
+    `_ADDITIVE_MEASURE_COLUMNS`, so the sum is unconditional core behaviour (GH
+    #501/#514) -- not something this country opts into.  Left in, these rows are
+    silently DOUBLE-COUNTED: 1989 hh 20120 Fenugreek reports Quantity 4.0 / 1.0
+    Birr where the source recorded 2.0 / 0.5.  Across the five roster waves that
+    is 90 rows, 514.9 Quantity and 343.1 Birr of pure overstatement.
+
+    Rows that DIFFER in Quantity or Expenditure are NOT touched -- those are
+    real repeat measurements (a household that produced Berbere 1.0 kg and
+    30.0 kg) and core's `sum` correctly folds them together.
+
+    JUDGMENT CALL, stated plainly: a household *could* genuinely acquire the
+    same item, same unit, same source, same amount, at the same price, twice in
+    one recall week; the instrument cannot rule it out, because it records no
+    axis on which the two rows differ.  We take the conservative reading and
+    drop.  If that call is wrong we UNDERSTATE by these rows (class-2, silently
+    missing); summing them OVERSTATES (class-1, silently wrong) -- and for rows
+    that are identical on every recorded axis, asserting "two distinct events"
+    is the stronger, less defensible claim.
+    """
+    subset = [c for c in _FOOD_GRAIN + _FOOD_MEASURES if c in flat.columns]
+    return flat.drop_duplicates(subset=subset)
+
+
 def food_acquired(df):
     """Melt ERHS wide per-source food columns into canonical long form.
 
@@ -110,12 +155,37 @@ def food_acquired(df):
     s values (drops the NaN/5/6/7 source rows that have no clean
     purchased/produced/inkind meaning), drop unidentifiable rows, and
     return as-is.
+
+    The canonical set is :data:`lsms_library.transformations.S_VALUES` --
+    imported, never re-spelled.  This filter used to carry its own narrower
+    ``CANON_S = ('purchased','produced','inkind')`` which silently omitted
+    ``'other'``, so an ERHS wave that ever emitted ``s='other'`` would have had
+    those rows deleted rather than kept (GH #537).  Behaviour-neutral today (no
+    ERHS wave emits 'other'), but it removes the second competing definition.
+
+    The drop is deliberate but was previously invisible at runtime; it now
+    warns with a count, because for 1989 it discards ~25% of the raw rows.
+    Whether the NaN-source rows *should* map to 'other' rather than be deleted
+    needs the ERHS 1989 codebook and is tracked separately -- do not guess it.
     """
-    CANON_S = ('purchased', 'produced', 'inkind')
     flat = df.reset_index()
     if 'q_purch' not in flat.columns:
         idx = [c for c in ('i', 'j', 'u', 's') if c in flat.columns]
-        flat = flat[flat['s'].isin(CANON_S)]
+        keep = flat['s'].isin(S_VALUES)
+        n_drop = int((~keep).sum())
+        if n_drop:
+            n_nan = int(flat['s'].isna().sum())
+            bad = sorted(set(flat.loc[~keep & flat['s'].notna(), 's'].astype(str)))
+            warnings.warn(
+                f"EthiopiaRHS food_acquired: dropping {n_drop} of {len(flat)} rows "
+                f"({n_drop / len(flat):.1%}) whose acquisition source is not one of "
+                f"{S_VALUES}: {n_nan} with a missing source code"
+                + (f", {n_drop - n_nan} with unmapped code(s) {bad}" if bad else "")
+                + ".  These have no clean purchased/produced/inkind meaning; see "
+                  "the food_acquired docstring in ethiopiarhs.py.",
+                stacklevel=2,
+            )
+        flat = flat[keep]
         for k in ('i', 'j', 'u'):
             if k in flat.columns:
                 flat = flat[flat[k].notna() & (flat[k].astype('string')
@@ -127,6 +197,7 @@ def food_acquired(df):
         # would need Codeunit1.SPS).
         if 'u' in flat.columns:
             flat['u'] = flat['u'].astype('string').str.strip()
+        flat = _drop_double_punched(flat)
         return flat.set_index(idx)
 
     w = df.reset_index()
@@ -160,6 +231,17 @@ def food_acquired(df):
     out['u'] = out['u'].astype('string').str.strip()
     out = out[out['i'].notna()]
     out = out[out['u'].notna() & (out['u'] != '')]
+    # Drop rows with no FOOD id.  `j` is an index level, so a NaN here cannot be
+    # placed on the item axis at all.  The 1989 path above already filters j;
+    # this path did not, leaking 11 NaN-j rows (1995) that pandas then deleted
+    # by accident -- groupby(level=...) defaults to dropna=True, so any row with
+    # a NaN index key silently VANISHES during the canonical-index collapse
+    # (GH #323, and it only bites when the index happens to be non-unique).
+    # Dropping them here makes an accident an intentional, symmetric decision:
+    # the item is unidentifiable, so the row is dropped LOUDLY rather than
+    # guessed at.  Output is unchanged; the honesty is the point.
+    out = out[out['j'].notna()]
+    out = _drop_double_punched(out)
     out = out.set_index(['i', 'j', 'u', 's'])
     return out
 

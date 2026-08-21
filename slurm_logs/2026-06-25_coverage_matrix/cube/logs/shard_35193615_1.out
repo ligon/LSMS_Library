@@ -1,0 +1,6 @@
+=== task 1: country='Armenia'  node=n0186.savio3  Thu Jun 25 18:43:32 PDT 2026 ===
+--- provisioning venv -> /local/job35193619/venv ---
+--- cache clear Armenia ---
+No cached files matched the provided filters.
+--- build Armenia ---
+=== done 'Armenia' rc=0  Thu Jun 25 18:56:14 PDT 2026 ===

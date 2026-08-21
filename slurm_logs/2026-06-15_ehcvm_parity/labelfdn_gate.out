@@ -1,0 +1,33 @@
+=== gate 16:28:19 ===
+PASS Benin/food_acquired: rows=189236 j_blank=0 j_distinct=132
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:993: UserWarning: Makefile not found in /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Benin/_. Unable to generate required data.
+  warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+PASS Benin/crop_production: rows=9056 crop_blank=0 crop_distinct=39
+PASS Benin/food_expenditures: rows=150779 j_blank=0 j_distinct=131
+PASS Benin/food_prices: rows=149063 j_blank=0 j_distinct=131
+PASS Benin/food_quantities: rows=186362 j_blank=0 j_distinct=132
+PASS CotedIvoire/food_acquired: rows=296241 j_blank=0 j_distinct=136
+PASS CotedIvoire/crop_production: rows=22216 crop_blank=0 crop_distinct=45
+PASS CotedIvoire/food_expenditures: rows=215620 j_blank=0 j_distinct=135
+PASS CotedIvoire/food_prices: rows=213872 j_blank=0 j_distinct=135
+PASS CotedIvoire/food_quantities: rows=294493 j_blank=0 j_distinct=136
+PASS Togo/food_acquired: rows=112557 j_blank=0 j_distinct=133
+PASS Togo/crop_production: rows=11563 crop_blank=0 crop_distinct=39
+PASS Togo/food_expenditures: rows=74668 j_blank=0 j_distinct=130
+PASS Togo/food_prices: rows=75512 j_blank=0 j_distinct=130
+PASS Togo/food_quantities: rows=110082 j_blank=0 j_distinct=133
+PASS Guinea-Bissau/food_acquired: rows=127219 j_blank=0 j_distinct=135
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:993: UserWarning: Makefile not found in /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guinea-Bissau/_. Unable to generate required data.
+  warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:3812: RuntimeWarning: Canonical index over ['t', 'i', 'plot', 'crop', 'u'] had 15 duplicate tuple(s); collapsed via groupby().first(), dropping those rows (possible silent data loss — GH #323).
+  warnings.warn(
+PASS Guinea-Bissau/crop_production: rows=10579 crop_blank=0 crop_distinct=47
+PASS Guinea-Bissau/food_expenditures: rows=90795 j_blank=0 j_distinct=135
+PASS Guinea-Bissau/food_prices: rows=89773 j_blank=0 j_distinct=135
+PASS Guinea-Bissau/food_quantities: rows=126197 j_blank=0 j_distinct=135
+--- schema consistency ---
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+...............................................................          [100%]
+207 passed in 2.04s
+=== DONE 16:30:48 ===

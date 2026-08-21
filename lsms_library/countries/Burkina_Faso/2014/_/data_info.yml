@@ -33,7 +33,40 @@ household_roster:
         Sex: B2
         Age: B4
         Relationship: B5
-        MonthsSpent: B3A
+        # B3A -> MonthsSpent.  READ THIS BEFORE "FIXING" THE 12/0 MAPPING.
+        #
+        # B3A's variable label is a DURATION question ("durant combien de mois
+        # [NOM] a vecu dans le menage"), but the RELEASED variable is collapsed
+        # to a 6-month binary: {1: '6 mois ou plus', 2: 'moins de 6 mois',
+        # 9: 'Valeur manquante'}, distributed 77,268 / 943 / (332 NaN).
+        #
+        # So 'moins de 6 mois' does NOT mean "lived zero months": those 943
+        # people (1.2%) DID live in the household, for 1-5 months.  Read
+        # literally, mapping them to 0 is false.  This is where B3A differs
+        # from the EHCVM precedent it borrows: s01q12 ("lived continuously 6+
+        # months? Oui/Non") is a MEMBERSHIP test, so Non -> 0 is faithful
+        # there; B3A is a binned duration.
+        #
+        # We map 12/0 anyway, deliberately (Ethan, 2026-07-12): the 0 encodes
+        # "not a de-facto household member" under the standard LSMS 6-month
+        # rule -- it is not a claim about months lived -- and consistency with
+        # the EHCVM family (Burkina_Faso/2018-19, Mali/2017-18, ...) wins.
+        # roster_to_characteristics() therefore drops those 943 members, as it
+        # does the EHCVM 'Non' members.
+        #
+        # If we ever choose to KEEP them, the honest fill is 3 (the midpoint of
+        # the 1-5 month interval), NOT 6 -- 6 is the one value the respondent
+        # explicitly ruled out.
+        #
+        # The mapping is also load-bearing for a second reason: left
+        # untranslated, the French labels coerce to NaN in
+        # roster_to_characteristics() and the ENTIRE 2014 wave drops out of
+        # household_characteristics.
+        MonthsSpent:
+            - B3A
+            - mapping:
+                '6 mois ou plus': 12
+                'moins de 6 mois': 0
 
 individual_education:
     # 2014 EMC: highest formal-education level attained is B14 ("Quel est le

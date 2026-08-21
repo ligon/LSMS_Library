@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py", line 124, in <module>
+    from . import country
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 38, in <module>
+    from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py", line 60, in <module>
+    from ligonlibrary.dataframes import from_dta
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/__init__.py", line 14, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/sheets.py", line 13, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/gspread/__init__.py", line 7, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/gspread/auth.py", line 16, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/google_auth_oauthlib/__init__.py", line 21, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/google_auth_oauthlib/interactive.py", line 27, in <module>
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/google_auth_oauthlib/flow.py", line 65, in <module>
+ModuleNotFoundError: No module named 'google.auth.transport.requests'
+savio_venv: venv mounted but import failed
+/var/spool/slurmd/job35193464/slurm_script: line 27: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python: No such file or directory

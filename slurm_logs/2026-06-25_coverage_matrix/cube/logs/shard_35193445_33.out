@@ -1,0 +1,3 @@
+=== task 33: country='Uganda'  node=n0190.savio3  Thu Jun 25 18:35:50 PDT 2026 ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193445/venv_img
+>> .venv -> /local/job35193445/venv_img  (verified import OK)

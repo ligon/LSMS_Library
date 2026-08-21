@@ -1,0 +1,31 @@
+=== task 15: country='Iraq'  node=n0178.savio3  Thu Jun 25 18:46:11 PDT 2026 ===
+--- provisioning venv -> /local/job35193676/venv ---
+--- cache clear Iraq ---
+Iraq: removed
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2006-07/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2006-07/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2006-07/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2006-07/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2006-07/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2006-07/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2006-07/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Iraq/2012/_/shocks.parquet
+--- build Iraq ---
+=== done 'Iraq' rc=0  Thu Jun 25 18:48:52 PDT 2026 ===

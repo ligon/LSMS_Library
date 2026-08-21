@@ -1,0 +1,62 @@
+#+TITLE: GH #445 cleared — release gate now 0-failed (handoff)
+#+DATE: 2026-06-14
+#+AUTHOR: Sue (scrum master, Claude Opus 4.8, 1M context)
+
+* Summary
+Picked up from =2026-06-14_parity_loop/HANDOFF.org=, whose only open
+release blocker was GH #445 (5 pre-existing failures in the first full cold
+gate). Investigated read-only, fixed 4, recharacterized the 5th. Post-fix
+full cold gate is GREEN (0 failed). PR #447 open against =development=.
+
+* What landed: PR #447 (branch feat... =fix/445-uganda-baselines-albania-waves=, commit f840977c)
+- *Albania waves* (=albania.py=): added authoritative =waves= list excluding
+  1996. Root cause = =Country.waves= reads a =_/{country}.py= module's =waves=
+  attr BEFORE the data_scheme =Waves:= list, then falls through to a dir glob
+  when the module defines none; albania.py had no =waves=, so the glob
+  re-included =1996/= (has Documentation/SOURCE.org) despite the documented
+  exclusion. Albania is the ONLY country hitting this.
+- *Uganda invariance baseline* (=tests/fixtures/uganda_baseline.json=):
+  regenerated via canonical =generate_baseline.py= on a fresh cold build,
+  RESTRICTED to the original 53-key set (no test-surface expansion). 13 entries
+  changed (9 interview_date date->Int_t #325; cluster_features float32->float64
+  GPS #161; var+2005-06 shocks pandas-3.0 dtypes; nutrition deterministic
+  content drift). All 3 content_hash changes VERIFIED DETERMINISTIC across 2
+  independent cold builds. Validated 53/53 via =--no-purge= serial.
+- *interview_date api-vs-replication*: xfail (matches food_acquired/nutrition);
+  replication baseline predates #325.
+
+* What we did NOT change (correct call)
+- =api_vs_replication[food_quantities]= passes deterministically warm AND cold
+  in isolation -> its gate failure is the pre-existing #330 parallel-cold
+  cache-race flake, not a stale baseline. xfail would XPASS. Left for #330.
+
+* Gate result (authoritative)
+- =slurm_logs/2026-06-14_issue445/full_gate.out= : -n 24 --dist=loadfile
+  --rebuild-caches, 40 countries, f840977c ->
+  *1117 passed, 137 skipped, 11 xfailed, 1 xpassed, 0 FAILED* (was 5 failed).
+
+* Key learning (why plain `pytest` skipped the invariance tests)
+- =conftest.py:96-109= : in DEFAULT mode pytest PURGES the Uganda cache at
+  session start (=_purge_country_caches("Uganda")=). So a plain
+  =pytest test_uganda_invariance.py= wipes the parquets you just built ->
+  "No Uganda parquets built" -> 53 skips. Use =--no-purge= to validate a
+  hand-built cache. The same fragility (invariance tests only READ parquets,
+  depend on another test rebuilding them first) is the #330 flakiness and why
+  the invariance set "shifts between runs" under --rebuild-caches.
+
+* Remaining before the version bump + master merge (MAINTAINER CALL)
+1. Review + merge PR #447 (clean; disjoint files; gate green).
+2. Close GH #445 after merge (4/5 fixed; 5th is now #330).
+3. THEN version bump + master merge per .claude/skills/release/SKILL.md
+   (development is ~430 commits ahead of master; latest tag v0.7.2;
+   staged RELEASE_NOTES_v0.7.3.md + release_v0.7.3/).
+4. Optional follow-ups (filed/implicit): #330 parallel-cold robustness;
+   the Country.waves footgun (data_scheme Waves: ignored when a module
+   exists); regenerate the external replication parquets to un-xfail the
+   interview_date/food_acquired/nutrition comparisons.
+
+* Artifacts (this session dir)
+- cold_rebuild_uganda.py / regen_and_restrict.py / determinism_check.py /
+  validate_nopurge.sh / full_gate.sh — reproducible drivers.
+- uganda_baseline.OLD.json — pre-regen backup.
+- COMMIT_MSG.txt, PR_BODY.md.

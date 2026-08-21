@@ -1,0 +1,63 @@
+#+TITLE: Tier-2 ERHS community_prices — grain confirmation (GH #438 / #275)
+#+DATE: 2026-06-15
+
+Canonical community_prices: (t, v, j, u) Price.  v = PA (q1c == cluster v).
+
+* Sources (DEDICATED price files; commrev1-3/community_2004 have NO prices)
+| wave        | file                | grain          | price col       | items |
+|-------------+---------------------+----------------+-----------------+-------|
+| R1-R4       | price1234_rev.tab   | Woreda (q1b)   | p_r1..p_r4 /kg  | code 100=Teff,101=Barley,... |
+| R6 (2004)   | rd6_kgpr_Mkt.tab    | PA (paid)      | kg_pr6 /kg      | q36_1/item1234 |
+| R7 (2009)   | price2009.tab       | PA (paid)      | price_r7 /kg    | foodtype/item |
+
+* Grain nuance
+- R6, R7: PA-level (paid) == v.  Clean (t, v, j, u).
+- R1-R4: WOREDA-level (q1b), coarser than PA.  Each PA in a Woreda shares
+  its Woreda price -> broadcast Woreda->PA via cluster_features (v->Woreda).
+
+* Item harmonization
+- code/item1234 (100=Teff, 101=Barley, 102=Wheat, ...) -> Preferred Label j.
+  Reuse the crop_production / harmonize_food vocabulary where it overlaps.
+
+* Blocker (per #275): price1234_rev.tab not on S3 -> dvc add + push (as done
+  for anthropometry/crop_production sources).  rd6_kgpr_Mkt/price2009 too.
+
+* Build shape: per-wave data_info (price file + grain key + item->j) + a
+  community_prices df_edit hook (melt round columns for R1-R4; broadcast
+  Woreda->PA) + data_scheme (t,v,j,u) Price.  Resolves #275.
+
+* BUILD DETERMINATION (2026-06-15, decision = broadcast all 6 waves)
+Must be SCRIPT-PATH (not YAML+df_edit): the Woreda->PA broadcast for R1-R4
+cannot live in a shared per-wave df_edit hook (the hook can't distinguish the
+Woreda-keyed R1-R4 from the PA-keyed R6/R7 -- Woreda codes overlap PA codes).
+Canonical community_prices is materialize:make everywhere; Niger's template =
+per-wave _/community_prices.py (-> wave parquet) + a country concatenator.
+
+ERHS has NO _/Makefile yet (panel_ids uses the @property path) -> this is
+ERHS's FIRST real script-path feature: needs a _/Makefile + materialize:make
+plumbing + per-wave scripts + country concatenator.  Feature-sized; start fresh.
+
+** All inputs GATHERED (ready to build)
+- Sources: price1234_rev.tab (R1-4, Woreda q1b, p_r1..p_r4 /kg, item1234+code),
+  rd6_kgpr_Mkt.tab (R6, PA paid, kg_pr6, q36_1/item1234),
+  price2009.tab (R7, PA paid, price_r7, foodtype text + item).
+- item code -> label (price1234_rev 'code' value labels): 100 TEFF, 101 BARLEY,
+  102 WHEAT, 103 MAIZE, 104 SORGHUM/MILLET, 121 LENTILS, 122 HORSE BEANS,
+  141 MILK/CHEESE, 142 BEEF, 163 CHAT, 181 COFFEE, 182 SUGAR, 185 COOKING OIL,
+  ... (full list in price1234_rev.tab variable_value_labels['code']).
+  NB three item schemes to reconcile: item1234 (price1234_rev/rd6) vs
+  foodtype text (price2009) -> map all to harmonize_food Preferred Labels.
+- q1c(PA)->q1b(Woreda) crosswalk (clean, 0 PA spans >1 Woreda; from demo123):
+  PA n -> Woreda n for n in 1..16; PA 17,18,19,20 -> Woreda 4.
+  Invert for the R1-4 broadcast (Woreda 4 price -> PAs 17,18,19,20).
+- Grain target (t, v, j, u='Kg') Price; v in index (cluster feature, no i,
+  no v-join).  Resolves #275.
+
+** Build steps (next session)
+1. dvc add + push the 3 price files into the relevant wave Data dirs.
+2. Create _/Makefile + per-wave _/community_prices.py (R1-4 broadcast via the
+   crosswalk; R6/R7 PA-direct) writing (t,v,j,u) Price parquets.
+3. Country _/community_prices.py concatenator (Niger template).
+4. data_scheme.yml: community_prices (t,v,j) Price, materialize: make.
+5. Cold-build + is_this_feature_sane + adversary-verify a price cell vs raw +
+   confirm v matches sample()/cluster_features v; test-gate; PR (closes #275).

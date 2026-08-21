@@ -1,0 +1,6 @@
+=== task 12: country='Guinea-Bissau'  node=n0180.savio3  Thu Jun 25 18:39:20 PDT 2026 ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193539/venv_img
+--- cache clear Guinea-Bissau ---
+  (clear noop/failed; continuing)
+--- build Guinea-Bissau ---
+=== done 'Guinea-Bissau' rc=127  Thu Jun 25 18:39:20 PDT 2026 ===

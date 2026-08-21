@@ -1,0 +1,116 @@
+#+TITLE: food_acquired cross-country analysis — session handoff
+#+DATE: 2026-06-20
+#+AUTHOR: Sue (Claude Opus 4.8), scrum master, n0045.savio3
+
+* Scope
+Careful cross-country analysis of =food_acquired= (and the user's two probes:
+"more than 16 countries?" and "how many are CORRECT in Feature('food_acquired')?").
+Analysis-only (no code changes). Base: master @ cbd75a6a (working tree).
+
+* Baseline answer: CORRECT countries in Feature('food_acquired')
+Definitive probe: =correct_count.py= -> =correct_count.out= (cache-warming,
+parallel per-country build + Feature() assembly).
+
+- declared (data_scheme.yml): *16*
+- built + sane + present in Feature(): *15*  (all but Nepal)
+- Nepal: declared but NO microdata in repo (NSO-hosted, not WB) -> cannot
+  build -> absent from Feature(). Data-access gap, NOT a code defect.
+- assembled rows 6,793,197 == cold NO_CACHE scan's row_conservation value
+  (cross-validation: warm cache == cold build).
+
+NOTE: probe's "canonical=11" is a FALSE undercount — its column check used
+equality with [Quantity,Expenditure]. The 4 "extras" are by-design:
+- GhanaLSS: +Price, +visit level (within-wave repeated visits, #348 fixed)
+- Malawi, Nigeria: +Quantity_kg (Approach-B per-row kg, #378/#410/#413)
+- Uganda: +Price (market/farmgate)
+All 15 have the s-axis and the required [Quantity,Expenditure]. => CORRECT = 15.
+
+On development: +Cambodia (registered via merged #561) => 16 (not built here).
+
+* "More than 16?" — coverage gap (the user was right)
+5 countries have food_acquired EXTRACTION SCRIPTS but are NOT registered
+(invisible to Feature(), which enumerates */_/data_scheme.yml):
+| Country   | data_scheme | shape        | issue            |
+|-----------+-------------+--------------+------------------|
+| GhanaSPS  | MISSING     | legacy wide  | #574             |
+| Panama    | MISSING     | legacy wide  | #573             |
+| Serbia    | exists      | legacy wide  | #572             |
+| Guatemala | exists      | legacy wide  | #571 (no PSU var) |
+| Cambodia  | exists      | DONE on dev  | #561 merged      |
+All legacy scripts are pre-#169 (set_index ['j','t','i','units'], no s-axis,
+no food_acquired_to_canonical) -> need canonicalize-THEN-register (Phase 3 of
+umbrella #218). Wiring the 4 remaining -> ~19-20 countries.
+
+* #576 verdict (user was skeptical — rightly)
+- harmony.py + add_markets_from_other_features ARE dead (FileNotFound on the
+  v0.7.0-retired in-tree var/ layer). Phase-1 deletion is SAFE.
+- BUT "make test crashes because legacy pipeline KeyError('m')s" is
+  MISATTRIBUTED: make test = harmony.py crashes on (a) dead shebang
+  (#!/usr/bin/env python -> exit 127), (b) FileNotFound on var/*.parquet —
+  for BOTH a gap country (Guatemala) and a canonical one (Malawi). The
+  KeyError('m') lives in the BUILD script (food_prices_quantities_and_
+  expenditures.py), which make test never invokes. KeyError is real
+  (deterministic: legacy food_acquired index has no 'm') but not the cause
+  cited. "Not a working baseline" slightly overstates: food_expenditures is
+  written one line BEFORE the throw, so it'd partially build.
+- Suggest a correction comment on #576; does not change Phase-1 disposition.
+
+* Per-country food_acquired (master, cold-validated)
+See correct_count.out lines 8-23 for full JSON. Row counts:
+Benin 189236, Burkina_Faso 304503, CotedIvoire 296241, Ethiopia 325920,
+EthiopiaRHS 54693, GhanaLSS 5259309 (visit level), Guinea-Bissau 127219,
+Malawi 971531, Mali 430271, Niger 239031, Nigeria 1005656, Senegal 435713,
+Tanzania 251613, Togo 112557, Uganda 355571. Nepal: not built.
+
+* Stale doc to fix
+.claude/skills/add-feature/food-acquired/SKILL.md status table (dated
+2026-06-07) still lists Burkina #107 / Ethiopia #115 / EthiopiaRHS #347 /
+GhanaLSS #348 as broken. All CLOSED Jun 7-8 and now canonical+sane. Refresh.
+
+* Artifacts in this dir
+- correct_count.py / .out  — definitive per-country + Feature() assembly
+- summarize_food_acquired.py — scan-results summarizer
+- results.jsonl — partial cold scan (food_acquired complete; derived features
+  not finished — scan was stopped in favor of the warm-cache probe)
+- coldscan_food.out — cold scan log
+
+* Cache state
+Warm L2 cache now populated for all 15 buildable countries' food_acquired
+(probe ran cache-ON). Derived features / units-mode analysis will be fast.
+
+* Phase-3 canonicalization OUTCOME (2026-06-21)
+Goal: working+correct food_acquired for the unregistered countries. Cambodia was
+already done (#561), so 4 countries via implement -> 3-lens adversarial review ->
+strict-gate loop (worktree agents), scrum master re-judged every verdict + filed PRs.
+
+| Country   | PR   | State  | Notes |
+|-----------+------+--------+-------|
+| Serbia    | #577 | MERGED | 7-day diary (actual recall); 3-source izvor split |
+| Guatemala | #578 | open   | ACTUAL 15-day recall (p12a06*/p12a10a); 4-source s-split; i/j fix |
+| GhanaSPS  | #580 | open   | bespoke 3-source melt (value on all 3); cedi+pesewa fix; SANS-SAMPLE |
+| Panama    | #581 | open   | actual 15-day recall; source-flag s-split; sample v=upm; i/j fix |
+| (skill)   | #582 | open   | food-acquired skill: new "Recall fidelity" section |
+| GhanaSPS sample | issue #579 | open | build hh->cluster (v) so GhanaSPS joins default Feature() |
+
+Recall-fidelity rule (maintainer, #578): canonical food_acquired records the
+ACTUAL recalled acquisition over the survey window; never impute/annualize to a
+typical period even when the survey offers a usual-month var. Documented in each
+country's CONTENTS.org + the skill (#582).
+
+Defects the adversarial loop / re-judging caught (NOT shipped):
+- Guatemala: round-1 24% expenditure loss (15d vs monthly); round-2 wrong basis
+  (used typical-month p12a05); round-3 = actual 15-day per maintainer. Self-ref
+  "exact reconciliation" from one lens was caught by re-judging.
+- GhanaSPS: round-1 cedi+pesewa/100 NaN'd 53k rows -> dropped ~74% of value;
+  fixed (pesewa.fillna(0)).
+- Panama: round-1 double-counted monthly+15-day; fixed to 15-day + flag-split.
+- Harness bug (mine): scope-gate matched literal "none", skipped review for the
+  heavy pair; fixed (SCOPE lens is authoritative) -> review_heavy.workflow.js.
+
+Feature('food_acquired') count: 15 (master) -> ~19 once #578/#580/#581 merge
+(Serbia/Guatemala/Panama full members; Cambodia already on dev). GhanaSPS is
+registered but modal-excluded (sans-v) until #579.
+
+Workflow artifacts in this dir: canonicalize_pilot.workflow.js (Guatemala r3),
+canonicalize_heavy.workflow.js, review_heavy.workflow.js, BRIEF_pilot.md,
+BRIEF_heavy.md, BRIEF_guatemala_round3.md.

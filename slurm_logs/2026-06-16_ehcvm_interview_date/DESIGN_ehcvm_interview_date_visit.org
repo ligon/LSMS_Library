@@ -1,0 +1,136 @@
+#+TITLE: EHCVM interview_date: per-visit start/end on a `visit` index
+#+DATE: 2026-06-16
+#+AUTHOR: Sue (scrum-master)
+
+* Goal
+For the EHCVM family, record the *number of enumerator visits needed to
+complete the household questionnaire* -- and each visit's start/end
+timestamp -- *only in the interview_date feature*.  This is DISTINCT from
+the post-planting/post-harvest survey round, which is already carried by
+=t= (e.g. =2018-19=).  Each EHCVM cover records a start and end datetime
+for up to two such visits; today every EHCVM country wires only visit-1's
+start, discarding the rest.
+
+Index gains an ordinal =visit= level; columns become =Interview start= /
+=Interview end=.  A declared =first= aggregation reproduces the legacy
+single-date table when collapsed.
+
+* CRITICAL column semantics (verified from Stata variable labels 2026-06-16)
+The EHCVM cover (=s00=) has SIX date columns for up to THREE visits; do NOT
+confuse start/end (a/b) with visit number (q23/q24/q25):
+| col     | label                                | meaning       |
+|---------+--------------------------------------+---------------|
+| s00q23a | Date de début de la premiere visite  | visit 1 START |
+| s00q23b | Date de fin de la premiere visite    | visit 1 END   |
+| s00q24a | Date de début de la deuxième visite  | visit 2 START |
+| s00q24b | Date de fin de la deuxieme visite    | visit 2 END   |
+| s00q25a | Date de début de la troisième visite | visit 3 START |
+| s00q25b | Date de fin de la troisième visite   | visit 3 END   |
+=s00q23b= is visit-1's END (NOT a later visit).  No q26 (no 4th visit).
+All six are FULLY POPULATED for every household in every wave; for the
+clean waves the three visits are genuinely sequential (consecutive days,
+~2-3h each: 93%+ have 3 distinct visit days).  s00q22 ("nombre de visites
+necessaires") is UNRELIABLE (empty in Benin/Togo/Burkina-21; garbage
+outliers elsewhere) -- do NOT use it as a count.  Senegal 2018-19 is the
+lone messy wave (timestamps inconsistently entered for ~half its HH;
+documented in its data_info.yml).
+
+* Shared infrastructure (landed on branch)
+=local_tools.melt_visit_intervals(df, start_base='int_start',
+end_base='int_end', out_start='Interview start', out_end='Interview end',
+visit_level='visit')= melts per-visit =(start[, end])= timestamps for
+visit 1..N (cols =int_start=/=int_end=, =int_start_v2=/=int_end_v2=, ...)
+onto an ordinal Int64 =visit= index.  Drops a visit only when BOTH its
+start and end are NaT (never fabricates); drops the =Interview end= column
+for start-only surveys.  Generalises (replaces) the earlier
+=melt_visit_dates=; Malawi now calls
+=melt_visit_intervals(df, start_base='int_t', out_start='Int_t')= (date =
+start, no end -> keeps legacy =Int_t=; re-verified byte-identical to #473).
+
+Canonical schema (=lsms_library/data_info.yml=) gains =Interview start= /
+=Interview end= as allowed (non-required) datetime columns alongside =Int_t=.
+
+* The per-country change (uniform; 3 edits each)
+For each EHCVM country, for each EHCVM wave (all carry q23/q24/q25 a+b):
+
+1. *data_info.yml* (per wave) — replace the single =Int_t= myvar with the
+   SIX per-visit start/end sources (3 visits):
+   #+begin_example
+       myvars:
+           int_start:    s00q23a     # visit 1 START
+           int_end:      s00q23b     # visit 1 END
+           int_start_v2: s00q24a     # visit 2 START
+           int_end_v2:   s00q24b     # visit 2 END
+           int_start_v3: s00q25a     # visit 3 START
+           int_end_v3:   s00q25b     # visit 3 END
+   #+end_example
+   (q23/q24/q25 = visits 1/2/3; a=start, b=end.  Do NOT wire q23b as
+   "visit 2" -- it is visit-1's end.  No q26.)
+
+2. *<country>.py* — add the df_edit hook (dispatched by table name via
+   country.py:715 =formatting_functions.get(request)=):
+   #+begin_src python
+   def interview_date(df):
+       """q23a/q23b = visit 1 start/end, q24a/q24b = visit 2 start/end.
+       Delegates to local_tools.melt_visit_intervals -> 'Interview start' /
+       'Interview end' on an ordinal `visit` index; collapsing `visit` with
+       `first` reproduces the legacy single-date table."""
+       return tools.melt_visit_intervals(df)
+   #+end_src
+   (Module already does =import lsms_library.local_tools as tools=.)
+
+3. *data_scheme.yml* (per country):
+   #+begin_example
+     interview_date:
+       index: (t, i, visit)          # was (t, i)
+       Interview start: datetime      # was: Int_t: datetime
+       Interview end: datetime
+       aggregation:
+         visit: first
+   #+end_example
+
+Cluster =v= auto-joins from sample() -> returned grain =(t, v, i, visit)=.
+The new ordinal level is named =visit= (the user's "(t,i,v)").  EHCVM
+interview_date columns thus differ from the ~10 non-EHCVM =Int_t= countries;
+global harmonisation (=Int_t= -> =Interview start= everywhere) is a deferred
+follow-up, NOT in scope here.
+
+* Senegal pilot result (DONE, verified cold 2026-06-16)
+grain =(i,t,v,visit)=, cols =[Interview start, Interview end]=, 28551 rows,
+0 dup tuples.  per-wave x visit: 2018-19 7156/7155 (1 un-made visit-2
+dropped); 2021-22 7120/7120.  Interview start 0 NaT; Interview end 15 NaT
+(visits with start but no end, kept).  Backward-compat: collapse-by-first =
+14276 rows = visit-1 count, first[Interview start] == visit-1 start exactly.
+Tests: schema 207 passed; table_structure Senegal+Malawi interview_date 12.
+
+* Per-country wiring table (all 12 EHCVM waves, columns uniform)
+| Country       | wave    | cover file (under Data/)   | rows  | notes               |
+|---------------+---------+----------------------------+-------+---------------------|
+| Senegal       | 2018-19 | s00_me_sen2018.dta         |  7156 | DONE (pilot)        |
+| Senegal       | 2021-22 | s00_me_sen2021.dta         |  7120 | DONE (pilot)        |
+| Benin         | 2018-19 | s00_me_ben2018.dta         |  8012 |                     |
+| Burkina_Faso  | 2018-19 | s00_me_bfa2018.dta         |  7010 |                     |
+| Burkina_Faso  | 2021-22 | s00_me_bfa2021.dta         |  3227 |                     |
+| CotedIvoire   | 2018-19 | Menage/s00_me_CIV2018.dta  | 12992 | file in Menage/     |
+| Guinea-Bissau | 2018-19 | s00_me_gnb2018.dta         |  5351 | check Sim/Não keys? |
+| Mali          | 2018-19 | s00_me_mli2018.dta         |  6602 |                     |
+| Mali          | 2021-22 | s00_me_mli2021.dta         |  6143 |                     |
+| Niger         | 2018-19 | s00_me_ner2018.dta         |  6024 |                     |
+| Niger         | 2021-22 | s00_me_ner2021.dta         |  6622 |                     |
+| Togo          | 2018    | ../Data1/s00_me_tgo2018    |  6171 | wave dir is "2018"  |
+
+OUT OF SCOPE (single-visit, different date vars -- LEAVE UNCHANGED):
+Mali/2014-15 (EACI, s00q22 d/m/y split), Mali/2017-18 (eaci17, s0q21 split).
+Each country's =interview_date= myvar source col is the SAME (q23a/b,q24a/b);
+confirm via the cover before wiring (CotedIvoire/Togo have subdir paths).
+
+* Stop-list (for worker agents)
+- Do NOT touch tests/fixtures, *baseline*, *golden*, *expected*, *snapshot*.
+- Do NOT modify pyproject/poetry.lock/lockfiles.
+- Do NOT weaken/skip/xfail any test assertion.
+- Do NOT edit local_tools.py, country.py, data_info.yml (canonical), or any
+  file outside the assigned country's countries/{C}/ tree.  (Helper + schema
+  already landed.)
+- Do NOT wire q23b as visit 2 -- it is visit-1's END.
+- STOP and report if backward-compat (collapse-by-first == old single date)
+  fails, or if the cover lacks q24a/q24b.

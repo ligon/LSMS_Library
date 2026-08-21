@@ -1,1 +1,13 @@
-https://microdata.worldbank.org/index.php/catalog/2301/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2301
+
+#+CATALOG_ID: 2301
+#+CATALOG_IDNO: NPL_1995_LSS-I_v01_M
+#+CATALOG_TITLE: Living Standards Survey 1995-1996, First Round
+#+CATALOG_YEARS: 1995-1996
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2301
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

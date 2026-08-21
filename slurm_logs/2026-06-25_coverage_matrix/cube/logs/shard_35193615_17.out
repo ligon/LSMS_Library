@@ -1,0 +1,22 @@
+=== task 17: country='Kosovo'  node=n0185.savio3  Thu Jun 25 18:46:30 PDT 2026 ===
+--- provisioning venv -> /local/job35193680/venv ---
+--- cache clear Kosovo ---
+Kosovo: removed
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Kosovo/2000/_/sample.parquet
+--- build Kosovo ---
+=== done 'Kosovo' rc=0  Thu Jun 25 18:47:09 PDT 2026 ===

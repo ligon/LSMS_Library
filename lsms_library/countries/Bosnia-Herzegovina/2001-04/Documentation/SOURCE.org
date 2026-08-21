@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/em0z-s354]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2919
+
+#+CATALOG_ID: 2919
+#+CATALOG_IDNO: BIH_2001-2004_LSMS_v01_M_v01_A_EPCT
+#+CATALOG_TITLE: Living Standards Measurement Study Panel Data 2001-2004, Entrepreneurship in Post-Conflict Transition: The Role of Informality and Access to Finance
+#+CATALOG_YEARS: 2001-2004
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/em0z-s354
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2919
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

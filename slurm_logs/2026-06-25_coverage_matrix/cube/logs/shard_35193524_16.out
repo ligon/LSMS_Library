@@ -1,0 +1,6 @@
+=== task 16: country='Kazakhstan'  node=n0186.savio3  Thu Jun 25 18:39:24 PDT 2026 ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193544/venv_img
+--- cache clear Kazakhstan ---
+  (clear noop/failed; continuing)
+--- build Kazakhstan ---
+=== done 'Kazakhstan' rc=127  Thu Jun 25 18:39:25 PDT 2026 ===

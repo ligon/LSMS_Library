@@ -1,0 +1,56 @@
+=== task 7: country='CotedIvoire'  node=n0187.savio3  Thu Jun 25 18:43:32 PDT 2026 ===
+--- provisioning venv -> /local/job35193625/venv ---
+--- cache clear CotedIvoire ---
+CotedIvoire: removed
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1985-86/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1986-87/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1987-88/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1988-89/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/crop_production.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/food_acquired.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/food_security.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1985-86/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1986-87/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1987-88/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1988-89/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1985-86/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1986-87/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1987-88/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1988-89/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/livestock.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/people_last7days.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/plot_inputs.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/plot_labor.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1985-86/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1986-87/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1987-88/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/1988-89/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/shocks.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/var/subjective_well_being.parquet
+  /global/home/users/ligon/.local/share/lsms_library/CotedIvoire/2018-19/_/subjective_well_being.parquet
+--- build CotedIvoire ---
+=== done 'CotedIvoire' rc=0  Thu Jun 25 18:47:43 PDT 2026 ===

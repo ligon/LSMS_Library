@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/ebk1-rr24]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/69
+
+#+CATALOG_ID: 69
+#+CATALOG_IDNO: IRQ_2006_IHSES_v02_M
+#+CATALOG_TITLE: Household Socio-Economic Survey 2006-2007
+#+CATALOG_YEARS: 2006-2007
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/ebk1-rr24
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/69
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

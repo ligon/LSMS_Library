@@ -1,0 +1,30 @@
+=== build 1987-88 (11:46:17) ===
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:868: DtypeWarning: Columns (0: FOODCD, 1: FOODBLV, 2: UNIQUEID) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+=== build 1988-89 (11:46:22) ===
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:868: DtypeWarning: Columns (0: FOODCD, 1: FOODBLV, 2: MFOODBLY, 3: TFOODB, 4: UTFOODB, 5: CFOODB) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+=== build 1991-92 (11:46:26) ===
+=== build 1998-99 (11:46:44) ===
+=== build 2005-06 (11:46:52) ===
+=== build 2012-13 (11:47:10) ===
+=== build 2016-17 (11:48:04) ===
+=== cross-wave consistency check ===
+1987-88: rows=    72106  idx=('t', 'i', 'j', 'u', 's', 'visit')  cols=['Quantity', 'Expenditure']  s=['produced', 'purchased']
+1988-89: rows=    73132  idx=('t', 'i', 'j', 'u', 's', 'visit')  cols=['Quantity', 'Expenditure']  s=['produced', 'purchased']
+1991-92: rows=   623600  idx=('t', 'i', 'j', 'u', 's', 'visit')  cols=['Quantity', 'Expenditure', 'Price']  s=['produced', 'purchased']
+1998-99: rows=   542105  idx=('t', 'i', 'j', 'u', 's', 'visit')  cols=['Quantity', 'Expenditure', 'Price']  s=['produced', 'purchased']
+2005-06: rows=  1115420  idx=('t', 'i', 'j', 'u', 's', 'visit')  cols=['Quantity', 'Expenditure', 'Price']  s=['produced', 'purchased']
+2012-13: rows=  1709094  idx=('t', 'i', 'j', 'u', 's', 'visit')  cols=['Quantity', 'Expenditure', 'Price']  s=['produced', 'purchased']
+2016-17: rows=  1124882  idx=('t', 'i', 'j', 'u', 's', 'visit')  cols=['Quantity', 'Expenditure', 'Price']  s=['produced', 'purchased']
+
+-- consistency --
+index-name set uniform across waves: True -> {frozenset({'j', 't', 'u', 'visit', 'i', 's'})}
+column sets: {'1987-88': ('Quantity', 'Expenditure'), '1988-89': ('Quantity', 'Expenditure'), '1991-92': ('Quantity', 'Expenditure', 'Price'), '1998-99': ('Quantity', 'Expenditure', 'Price'), '2005-06': ('Quantity', 'Expenditure', 'Price'), '2012-13': ('Quantity', 'Expenditure', 'Price'), '2016-17': ('Quantity', 'Expenditure', 'Price')}
+DRY CONCAT ok: total rows=5260339  idx=('t', 'i', 'j', 'u', 's', 'visit')  index_unique=False
+per-wave row totals: {'1987-88': 72106, '1988-89': 73132, '1991-92': 623600, '1998-99': 542105, '2005-06': 1115420, '2012-13': 1709094, '2016-17': 1124882}
+s distribution (all waves):
+s
+purchased    4332097
+produced      928242
+=== GATE DONE (11:52:05) ===

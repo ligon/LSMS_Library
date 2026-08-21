@@ -1,1 +1,10 @@
+SOURCE
+
 https://microdata.statistics.gov.rw/index.php/catalog/39/get_microdata
+
+#+CATALOG_ID: none
+#+CATALOG_URL: https://microdata.statistics.gov.rw/index.php/catalog/39/get_microdata
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: external-source
+#+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: Obtained from microdata.statistics.gov.rw, not the World Bank Microdata Library.

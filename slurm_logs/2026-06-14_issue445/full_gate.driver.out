@@ -1,0 +1,6 @@
+HEAD: f840977c on fix/445-uganda-baselines-albania-waves
+=== pytest exit: 0 ===
+=== summary line ===
+1117 passed, 137 skipped, 11 xfailed, 1 xpassed, 279 warnings in 1284.64s (0:21:24)
+=== FAILED / ERROR lines ===
+  (none)

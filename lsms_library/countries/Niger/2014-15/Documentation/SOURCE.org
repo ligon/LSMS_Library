@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2676
+
+#+CATALOG_ID: 2676
+#+CATALOG_IDNO: NER_2014_ECVMA-II_v02_M
+#+CATALOG_TITLE: National Survey on Household Living Conditions and Agriculture 2014, Wave 2 Panel Data
+#+CATALOG_YEARS: 2014-2015
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/3xnb-sd96
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2676
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

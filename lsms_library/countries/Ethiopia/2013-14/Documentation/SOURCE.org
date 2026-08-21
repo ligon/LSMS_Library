@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2247
+
+#+CATALOG_ID: 2247
+#+CATALOG_IDNO: ETH_2013_ESS_v03_M
+#+CATALOG_TITLE: Socioeconomic Survey 2013-2014
+#+CATALOG_YEARS: 2013-2014
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/mccp-y123
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2247
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

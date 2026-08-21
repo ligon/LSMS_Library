@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2053
+
+#+CATALOG_ID: 2053
+#+CATALOG_IDNO: ETH_2011_ERSS_v02_M
+#+CATALOG_TITLE: Rural Socioeconomic Survey 2011-2012
+#+CATALOG_YEARS: 2011-2012
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/80xt-9m68
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2053
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

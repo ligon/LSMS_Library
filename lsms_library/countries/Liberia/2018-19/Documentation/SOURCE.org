@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/rdhm-h904]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/3787
+
+#+CATALOG_ID: 3787
+#+CATALOG_IDNO: LBR_2018_NHFS_v01_M
+#+CATALOG_TITLE: National Household Forest Survey 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/rdhm-h904
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3787
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

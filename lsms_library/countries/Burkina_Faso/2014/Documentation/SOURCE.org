@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2538
+
+#+CATALOG_ID: 2538
+#+CATALOG_IDNO: BFA_2014_EMC_v01_M
+#+CATALOG_TITLE: Enquête Multisectorielle Continue 2014
+#+CATALOG_YEARS: 2014-2014
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/e39g-m952
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2538
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

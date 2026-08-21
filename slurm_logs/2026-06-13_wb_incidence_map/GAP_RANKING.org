@@ -1,0 +1,275 @@
+#+TITLE: WB LSMS-ISA × LSMS_Library — gap ranking & parity loop seed
+#+AUTHOR: wb-incidence-map synthesis agent
+#+DATE: 2026-06-13
+
+THEIRS-ONLY and OURS-PARTIAL feature-areas ranked by *parity value* =
+(breadth across the 7 overlap countries) × (richness of their construct) ×
+(does it unlock downstream valuations/labor that are otherwise stranded).
+
+For each gap: a *tasteful dataframe decomposition* — feature(s) at their
+*natural grain*, each its own narrow-or-wide DataFrame, NEVER a wide mirror
+of their single collapsed Stata table — tagged =build-as-item-feature= vs
+=add-transformations-fn=, with the =.do= construct to consult.
+
+*Hard rule restated*: no aggregate / index / ratio / median-price valuation
+is ever a data-layer feature. Those are =transformations= functions over the
+item-level features below.
+
+*Label unification (maintainer steer)*: BOTH the item axis =j= AND the unit
+axis =u= must each share ONE harmonized table across =food_acquired=,
+=crop_production= (GAP 1) and =community_prices= (GAP C):
+- =j= → =harmonize_food= (extend =Preferred Label= to crops + price items),
+- =u= → the country's =u= table (extend to crop/harvest + price units).
+Then foods ↔ crops ↔ prices join on =(j, u)=. Do NOT invent parallel
+crop-only or price-only label schemes. This is parity *Unit #0* (the label
+foundation), done per country BEFORE the feature builds — see
+PARITY_LOOP_DESIGN.md for per-country coverage (=harmonize_food=:
+Mali/Malawi/Nigeria have it, Ethiopia/Tanzania/Uganda migrate from
+=food_items.org=, Niger creates; =u= table: all 7 except Ethiopia/Tanzania).
+
+* Ranking summary
+
+| Rank | Area                        | Cells (breadth)            | Verdict                       |
+|------+-----------------------------+----------------------------+-------------------------------|
+|  1   | 9. Crop production/harvest  | THEIRS-ONLY^a × 7          | build-item-feature (×crop)    |
+|  2   | 10. Ag inputs               | THEIRS-ONLY × 7            | build-item-feature (×input)   |
+|  3   | 7. Labor/time-use           | THEIRS-ONLY × 6 (UGA BOTH) | build-item-feature (2 grains) |
+|  4   | 12. Livestock               | THEIRS-ONLY × 7            | build-item-feature (×animal)  |
+|  5   | 6. Anthropometry (body meas)| THEIRS-ONLY × 5 (ETH/MWI/NGA/TZA/UGA) | build NEW item-feature |
+|  6   | 8. Plots/parcels (PARTIAL)  | BOTH × 7, verify item attrs| build-item-feature (audit)    |
+|  7   | 11. Ag valuations           | BOTH^a × 7 (downstream)    | add-transformations-fn        |
+|  8   | 13. Assets (PARTIAL: index) | BOTH^a × 7                 | add-transformations-fn        |
+|  C   | 19. Community food prices   | OURS-ONLY × 7 (data avail) | build-item-feature (maintainer priority) |
+
+(9-10 below the line: Area 3 dependency-ratio, Area 14 totcons — both
+already-have-items → add-transformations-fn only, no data gap.)
+
+* GAP 1 — Crop production / harvest  [THEIRS-ONLY^a × all 7]  (HIGHEST)
+
+Why #1: present for all 7, agriculturally central, and it is the *upstream
+item layer* that Areas 11 (harvest/yield/seed valuations) and parts of 9's
+own aggregates all depend on. Closing it unblocks the most downstream parity.
+
+*Tasteful decomposition — ONE item feature:*
+
+- =crop_production= at natural grain *(t, i, plot, crop)* — one row per crop
+  grown on a plot, with =crop= on the SHARED =harmonize_food= labels (see
+  Label unification, so crops join consumed foods + community prices),
+  carrying the *reported* fields only:
+  - reported harvest quantity + native unit (=Quantity=, =u=),
+  - reported quantity sold + sale value (=Quantity_sold=, =Value_sold=),
+  - planting / harvest-end month (=item= dates),
+  - intercropped / perennial flags.
+  Keep it *narrow and item-level*. Do NOT bake plot area, crop-group dummies,
+  shares, or value into it.
+
+*Everything aggregate stays in =transformations.py=* (=add-transformations-fn=):
+- =harvest_kg= : unit→kg conversion then sum over native units per (plot,crop).
+- =yield_kg= : =harvest_kg / plot_area= (joins =plot_features=).
+- =share_kg_sold= : =Quantity_sold / harvest_kg=.
+- =main_crop=, =maincrop_valueshare=, =contains_crop_*=, =share_value_*= :
+  value-rank + crop-group rollups over the item rows.
+
+*.do to consult*: harvest sum =ETH_ESS1.do:256= + =Append_ETH.do:241,296=;
+=NGA_GHS1.do:191-292= (harvest_kg / sold / yield / main_crop / contains_crop);
+=TZA_NPS1.do:205-221=; crop-group programs =main_crop_def= programs.do:110-137.
+
+* GAP 2 — Ag inputs  [THEIRS-ONLY × all 7]
+
+Why #2: all 7, and (with GAP 1) it is the second item layer feeding the
+seed/fertilizer valuations of Area 11.
+
+*Tasteful decomposition — ONE item feature:*
+
+- =plot_inputs= at natural grain *(t, i, plot, input)* — one row per input
+  applied to a plot:
+  - input type (seed / urea / DAP / NPK / organic / pesticide / herbicide /
+    tractor-use),
+  - reported quantity + native unit,
+  - purchased-vs-own flag, purchased quantity,
+  - improved-seed flag (for seed rows).
+  Narrow, item-level. Crop linkage for seeds via an optional =crop= column
+  where the source records it (plot-crop seed grain).
+
+*=add-transformations-fn=:*
+- =seed_kg=, =seeds_amount_purchased_kg= : unit→kg sums per (plot[,crop]).
+- =nitrogen_kg= : Σ(kg × N-content factor) over fertilizer rows.
+- =inorganic_fertilizer=, =organic_fertilizer=, =used_pesticides= : any-flags
+  (=groupby.max=) over the input rows.
+
+*.do to consult*: =ETH_ESS1.do:506-515 (seed_kg)=, =833-836 (nitrogen_kg)=,
+=870-874 (pesticides)=; =MLI_EACI1.do:962-965=; =NGA_GHS1.do:500-803=.
+N-content factors live inline in each ={CC}.do= nitrogen block.
+
+* GAP 3 — Labor / time-use  [THEIRS-ONLY × 6; Uganda already BOTH]
+
+Why #3: 6 of 7 (only Uganda has =people_last7days= etc.). Two *distinct
+natural grains* — do not collapse them together (that is exactly the wide-
+table trap).
+
+*Tasteful decomposition — TWO item features:*
+
+1. =people_last7days= at *(t, i, individual)* — individual 7-day activity:
+   work dummies (=farm_work=, =SOB_work=, =wage_work=), hours
+   (=farm_hrs=, =SB_hrs=, =wage_hrs=), wage-work industry (=ind_ag=…=ind_serv=),
+   =working_age=. (Mirror Uganda's existing feature so the 6 new countries
+   match the one we already have.)
+2. =plot_labor= at *(t, i, plot, source)* — plot labor *days* with
+   =source ∈ {family, hired, other}=, holding reported person-days (and, for
+   hired, reported wage paid). Item rows, NOT the pre-summed total.
+
+*=add-transformations-fn=:*
+- =total_labor_days=, =total_family_labor_days=, =total_hired_labor_days= :
+  sums over =plot_labor= by source.
+- =hired_labor_value= : median-wage valuation (shares the Area-11 valuation
+  helper) over the hired rows.
+
+*.do to consult*: individual =ETH_ESS1.do:1242-1264=, =TZA_NPS1.do:1027-1062=,
+=UGA_UNPS1.do:968-992=; plot days =ETH_ESS1.do:787-799=,
+=TZA_NPS1.do:513-546=; wage valuation =valuation_median_wages= programs.do:244-470.
+
+* GAP 4 — Livestock  [THEIRS-ONLY × all 7]
+
+Why #4: all 7, but theirs is a *degenerate single binary* (engaged y/n,
+collapse-max). We can leapfrog them cheaply with a richer item feature.
+
+*Tasteful decomposition — ONE item feature:*
+
+- =livestock= at natural grain *(t, i, animal)* — one row per species/herd:
+  species, head count owned, head acquired/sold, (value where reported).
+  Source: the raw livestock roster the WB code reads then throws away down to
+  a binary.
+
+*=add-transformations-fn=:*
+- their =livestock= HH binary = =df.groupby(['t','i']).size() > 0= (or any-row).
+- optional =tlu= (tropical-livestock-units) = Σ(head × species-TLU-factor) —
+  a transform, not a stored column.
+
+*.do to consult*: =ETH_ESS1.do:966-971=; =NGA_GHS1.do:992-998=;
+=TZA_NPS1.do:739-747= (each recodes one var then collapse-max — confirms how
+thin their target is, and which roster section the raw counts sit in).
+
+* GAP 5 — Anthropometry  [THEIRS-ONLY × 5: ETH, MWI, NGA, TZA, UGA]
+
+Why: a NEW feature — we have NO =anthropometry= feature anywhere. (Our
+=nutrition= is nutrient *intake*, a different thing — see note.) Their
+weight/height/z-scores cover 5 of 7 (Mali/Niger have none either side).
+Item-level and self-contained.
+
+*Tasteful decomposition — ONE NEW item feature (do NOT reuse =nutrition=):*
+
+- =anthropometry= at natural grain *(t, i, individual)* — raw =weight=,
+  =height= (+ child age/sex for the z-score transform; MUAC where recorded).
+  Distinct feature from =nutrition= (intake).
+
+*=add-transformations-fn=:*
+- =haz06=, =waz06=, =whz06=, =bmiz06= : WHO/2006 reference-pop z-scores —
+  a transform (reference lookup), never stored.
+- =wasting= / =stunting= : =whz06 < -2= / =haz06 < -2= over the z-score transform.
+
+*.do to consult*: =ETH_ESS1.do:1217-1235=; =MWI_IHPS1.do:1213-1231=;
+=NGA_GHS1.do:1296-1308=; =TZA_NPS1.do:1002-1024=; UGA anthro section
+(weight/height vars + the =zscore06= call).
+
+*NOTE — Nutrition-intake is OURS-ONLY, not a gap*: our =nutrition= (ETH/UGA) +
+=fct= (UGA) computes nutrient intake from consumption × food-composition
+tables; the WB panel builds none (their HDDS is diet *diversity*, Area 18).
+Nothing to build here — a place we lead. Extending =nutrition=/=fct= to more
+countries is worthwhile on its own merits, independent of this parity exercise.
+
+* GAP 6 — Plots/parcels  [OURS-PARTIAL: BOTH × 7, audit item attrs]
+
+Why #6: cell is BOTH, but their plot block is wide (area, irrigated, fallow,
+owned, certificate, erosion, slope, soil). Action is an *audit*, not a new
+feature: confirm =plot_features= carries each *item* attribute; anything
+missing is a column add at the existing grain.
+
+*Decomposition*: stay in =plot_features= at *(t, i, plot)* (or parcel where the
+survey's tenure grain is parcel). Add any missing item columns
+(=fallow=, =erosion_protection=, =plot_certificate=, =self_reported_area=).
+
+*=add-transformations-fn=* (never stored): =farm_size= (Σ area / HH),
+=nb_plots=, =nb_fallow_plots= (counts / HH), =soil_fertility_index= (PCA over
+soil-quality items).
+
+*.do to consult*: =MWI_IHPS1.do:606-632,886-939=; =UGA_UNPS1.do:396-633=;
+=soil_fertility_index= factor/predict e.g. =UGA_UNPS1.do:903-913=.
+
+* GAP 7 — Ag valuations  [BOTH^a × 7 — downstream of GAPs 1-3, pure transform]
+
+Why #7: ranked here because it is *entirely* a transformations job and only
+becomes actionable once GAPs 1/2/3 land the item rows it values. Do NOT
+build any =*_value_*= feature.
+
+*=add-transformations-fn= (the whole gap):*
+- =median_price_valuation()= : reproduce their EA→admin4→admin3→national
+  median-price ladder (≥10-obs threshold) — computes a unit price from
+  =sold_value/sold_kg= over item rows, takes the median within geography
+  cells, applies it to all rows. Drives =harvest_value=, =seed_value=,
+  =inorganic_fertilizer_value= from GAPs 1/2 and =hired_labor_value= from GAP 3.
+- =deflate_to_usd()= : CPI deflator + Atlas FX → =*_USD=.
+
+*.do to consult*: =valuation_median_crops= programs.do:4-108;
+=valuation_median_seeds= programs.do:138-243; =valuation_median_wages=
+programs.do:244-470; =valuation_median_fert_price= programs.do:471-561;
+deflator/FX in each =Append_{CC}.do:~440-520=.
+
+* GAP 8 — Assets (the INDEX only)  [BOTH^a × 7 — pure transform]
+
+Why #8: we already store the item-level =assets= ownership they discard. The
+only missing thing is their *index*, which must be a transform.
+
+*=add-transformations-fn=:*
+- =asset_index()= : PCA/factor score over our =assets= ownership dummies
+  (split ag vs household to reproduce =ag_asset_index= / =hh_asset_index=).
+  Never store the score.
+
+*.do to consult*: =ETH_ESS1.do:1077-1102=; =NGA_GHS1.do:1124-1162=;
+=TZA_NPS1.do:856-884= (reshape-wide → =factor …, pcf= → =predict=).
+
+* GAP C — Community food prices  [OURS-ONLY × 7; maintainer priority]
+
+Not a WB-parity gap (they survey no community prices — =crop_price_EA= is an
+HH-median imputation, =programs.do:31-89=), but a real gap in OUR coverage
+that the maintainer is *particularly* interested in, and a place we can be
+strictly better than the WB approach.
+
+*Tasteful decomposition — ONE new item feature:*
+
+- =community_prices= at natural grain *(t, v, j[, u])* — one row per
+  (cluster/EA × food-item × time[, unit]) from the *community/market price
+  questionnaire*, carrying the *reported* survey price (and unit). =v= is the
+  cluster the framework already joins via =sample()=; =j= on the SHARED
+  =harmonize_food= labels so it joins =food_acquired= consumption and GAP-1
+  =crop_production=. Item-level reported prices — NOT an index, NOT an
+  HH-median imputation.
+
+*=add-transformations-fn=* (never stored):
+- median / mean community price per =(t, v, j)= or per admin level, if wanted.
+- a community→household price join helper (analogue of, but better than, their
+  EA-median ladder — ours is a *surveyed* price, not an HH imputation).
+
+*Raw sources (data already in-repo, mostly unwired)*: Tanzania
+=2019-20/_/community_prices.py= (starter — generalize it); Uganda Community
+=csec3*=; Malawi =com_cc= / =com_cg2=; Nigeria =sectc*= (Post-Planting
+Community); Ethiopia ESS community module; EthiopiaRHS bespoke prices
+(=feat/ethiopiarhs-prices=, =FoodPriceIndex= already a community-level index).
+
+*Prereq*: extend =harmonize_food= to the price-questionnaire item lists
+(currently only EthiopiaRHS/Burkina/Mali/Senegal/Nigeria have the table).
+
+* Below the line — already-have-items, transform-only, no data gap
+
+- *Area 3 HH composition* (=hh_dependency_ratio=): transform over
+  =household_roster=. =ETH_ESS1.do:957-961=.
+- *Area 14 Consumption* (=totcons=, =cons_quint=, =HDDS=): transforms over
+  =food_acquired= / diet recall (or pass-through of the WB consumption file).
+  =UGA_UNPS1.do:731-737=, =NER_ECVMA1.do:1472-1486= (HDDS).
+
+* Parity-loop note
+
+GAPs 1→2→3 are the load-bearing item-feature builds (they also unblock GAP 7
+valuations and parts of GAP 1's own aggregates). GAPs 4-5 are small,
+self-contained item features. GAPs 6-8 + below-the-line are
+=transformations.py= work over data we already hold. Suggested loop order:
+1 → 2 → 3 (item layer) → 7 (valuation transform) → 4 → 5 → 6 → 8.

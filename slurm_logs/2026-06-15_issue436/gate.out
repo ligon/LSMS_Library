@@ -1,0 +1,21 @@
+INTERNALERROR> Traceback (most recent call last):
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/_pytest/main.py", line 285, in wrap_session
+INTERNALERROR>     config._do_configure()
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py", line 1119, in _do_configure
+INTERNALERROR>     self.hook.pytest_configure.call_historic(kwargs=dict(config=self))
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pluggy/_hooks.py", line 534, in call_historic
+INTERNALERROR>     res = self._hookexec(self.name, self._hookimpls.copy(), kwargs, False)
+INTERNALERROR>           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pluggy/_manager.py", line 120, in _hookexec
+INTERNALERROR>     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+INTERNALERROR>            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pluggy/_callers.py", line 167, in _multicall
+INTERNALERROR>     raise exception
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/pluggy/_callers.py", line 121, in _multicall
+INTERNALERROR>     res = hook_impl.function(*args)
+INTERNALERROR>           ^^^^^^^^^^^^^^^^^^^^^^^^^
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/conftest.py", line 86, in pytest_configure
+INTERNALERROR>     _purge_data_root_caches()
+INTERNALERROR>   File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/conftest.py", line 166, in _purge_data_root_caches
+INTERNALERROR>     from lsms_library.paths import COUNTRIES_ROOT, data_root
+INTERNALERROR> ImportError: cannot import name 'COUNTRIES_ROOT' from 'lsms_library.paths' (/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/paths.py)

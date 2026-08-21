@@ -1,0 +1,23 @@
+=== task 28: country='South Africa'  node=n0178.savio3  Thu Jun 25 18:39:29 PDT 2026 ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193557/venv_img
+>> .venv -> /local/job35193557/venv_img  (verified import OK)
+--- cache clear South Africa ---
+South Africa: removed
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/assets.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/South Africa/1993/_/sample.parquet
+--- build South Africa ---
+=== done 'South Africa' rc=0  Thu Jun 25 18:39:56 PDT 2026 ===

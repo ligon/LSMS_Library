@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/8nx3-cc48]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2319
+
+#+CATALOG_ID: 2319
+#+CATALOG_IDNO: GUY_1992_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurements Survey 1992
+#+CATALOG_YEARS: 1992-1992
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/8nx3-cc48
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2319
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

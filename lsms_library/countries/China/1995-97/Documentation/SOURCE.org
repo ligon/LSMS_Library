@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/ymjj-w136]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/409
+
+#+CATALOG_ID: 409
+#+CATALOG_IDNO: CHN_1995_LSS_v01_M
+#+CATALOG_TITLE: Living Standards Survey 1995 -1997
+#+CATALOG_YEARS: 1995-1997
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/ymjj-w136
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/409
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,0 +1,3 @@
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: v08a07d
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+India: 9 features audited

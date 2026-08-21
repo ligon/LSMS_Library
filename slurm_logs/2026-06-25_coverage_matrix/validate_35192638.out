@@ -1,0 +1,32 @@
+=== prolog ===
+node: n0183.savio3  jobid: 35192638  started: Thu Jun 25 17:41:25 PDT 2026
+
+=== mount venv (squashfs) ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35192638/venv_img
+>> .venv -> /local/job35192638/venv_img  (verified import OK)
+python 3.11.6 pandas 3.0.2
+
+=== readiness build (subset) ===
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+{996.0, 997.0, 998.0, 999.0}
+
+=== tier distribution ===
+tier     absent  builds  sane
+country                      
+Iraq          2       1    17
+Malawi       15      11    99
+Niger        17      12    61
+Uganda       35      19   165
+
+Uganda food_expenditures 2013-14 -> sane
+Uganda household_roster  2013-14 -> sane
+any 'dropped' cells:
+Empty DataFrame
+Columns: [country, feature, wave, detail]
+Index: []
+any 'broken' cells:
+Empty DataFrame
+Columns: [country, feature, wave, detail]
+Index: []
+
+=== done Thu Jun 25 18:01:52 PDT 2026 ===

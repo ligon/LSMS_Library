@@ -1,1 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/3818/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/3818
+
+#+CATALOG_ID: 3818
+#+CATALOG_IDNO: MWI_2019_IHS-V_v06_M
+#+CATALOG_TITLE: Fifth Integrated Household Survey 2019-2020
+#+CATALOG_YEARS: 2019-2020
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/mpyk-ds48
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3818
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

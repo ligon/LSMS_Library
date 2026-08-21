@@ -1,1 +1,13 @@
+SOURCE
+
 https://microdata.worldbank.org/index.php/catalog/1000
+
+#+CATALOG_ID: 1000
+#+CATALOG_IDNO: NPL_2010_LSS-III_v01_M
+#+CATALOG_TITLE: Living Standards Survey 2010-2011, Third Round
+#+CATALOG_YEARS: 2010-2011
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/1000
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -1,0 +1,96 @@
+#+TITLE: Tier-2 parity discovery — EthiopiaRHS (GH #438)
+#+DATE: 2026-06-15
+#+AUTHOR: Sue (coordinator)
+
+Read-only scoping of the WB-parity item-feature stack for the IFPRI Ethiopian
+Rural Household Survey (ERHS, 1989-2009, 8 rounds).  Distinct from the LSMS-ISA
+=Ethiopia= ESS module.  Source: IFPRI Dataverse doi:10.7910/DVN/T8G8IV.
+
+* Key difference from Tier-1 (EHCVM)
+EHCVM is ONE standardized instrument -> one template covered all 6 countries.
+ERHS is BESPOKE: per-village =.tab= files, round-specific layouts, WIDE
+crop-coded columns, and modules that move/disappear across rounds.  There is
+**no template to clone** — every feature needs column-level reverse-engineering
+against the in-repo archive.  This is closer in size to the whole Tier-1 effort
+than to a single clone, and HARDER.
+
+* Already wired (do NOT rebuild)
+household_roster, food_acquired (1989-1997), sample, cluster_features,
+plot_features (1994a R1 only; R2-R4 deferred per #278), and the bespoke HH-level
+(t,i) VALUE tables: assets (1989), livestock (1999/2004/2009), income (1999),
+consumption (2004/2009), hhsize (2009), area_output (2004/2009), panel_ids.
+
+NOTE: =area_output= already exists as a bespoke HH-level (t,i) aggregate for
+2004/2009.  Tier-2 =crop_production= would be the ITEM-level (t,i,plot/crop)
+version from the raw area_output_* files — overlapping but finer-grained.
+
+* Wireable / blocked matrix (raw sources in _dataverse_archive/ unless noted)
+| parity feature   | candidate source(s)                                   | grain target        | tractability |
+|------------------+-------------------------------------------------------+---------------------+--------------|
+| anthropometry    | Anthropometry_R1-R4.tab (pid,sex,height,weight)       | (t,i,pid)           | HIGH — PILOT |
+| crop_production  | area_output_{94,r2r3rev,97,99,04rev}.tab + erhs7 2009 | (t,i,j[,plot])      | MED-HARD     |
+| community_prices | commrev{1,2,3}.tab + community_2004.tab               | (t,v,j,u)           | MED (caveat) |
+| plot_inputs      | land_123456.tab / land1all.tab (+ landconv)           | (t,i,plot,input)    | HARD         |
+| plot_labor       | per-village *prodv.tab / *xcly.tab (labor module TBD) | (t,i,plot,source)   | HARD         |
+| people_last7days | demo123/demo4/demog89 + age_sex_r4 (activity? TBD)    | (t,i,pid)           | LIKELY BLOCKED |
+
+** anthropometry — HIGH (recommended pilot)
+- Single consolidated file =Anthropometry_R1-R4.tab=; embedded vars include
+  =q1c,q1d,pid,sex,heigh[t]= (+ weight expected) across rounds R1-R4.
+- Clean (t,i,pid) grain; the EHCVM pass DROPPED anthropometry (no body measures)
+  — ERHS would be the FIRST non-ISA anthropometry, real coverage gain.
+- Needs: round->t mapping inside the file, i via ethiopiarhs.i formatter, pid
+  join to roster, sane height/weight ranges (is_this_feature_sane).
+- Single file, single grain -> ideal flow-validation pilot (mirrors Tier-1
+  livestock pilot).
+
+** crop_production — MED-HARD
+- area_output_*.tab are WIDE: one column per crop x metric (e.g. =wtefprd04=
+  white-teff production 2004, =wtefha04= hectares).  Header strings confirm
+  "Area, production and yield for selected crops".
+- Work: parse the crop-coded column names -> melt to long (t,i,j,metric) ->
+  harmonize crop labels onto the j-axis (needs a harmonize_food / crop map that
+  covers ERHS crop codes) -> emit Quantity(=production)/Area.
+- 6 round-files with DIFFERENT column-naming conventions (94 vs 04rev vs 2009
+  cereals) -> per-wave column maps.  No plot dimension in the aggregates; plot
+  grain only if land_*.tab joins in.
+- Overlaps the existing HH-level area_output table; decide item-level vs keep.
+
+** community_prices — MED (same caveat as EHCVM)
+- commrev1-3 (community R1-R3) + community_2004; grain likely village-level.
+- EHCVM community-price grain was judged problematic ("not at grappe grain");
+  expect the same scrutiny — confirm a usable (t,v,j,u) price slice first.
+
+** plot_inputs / plot_labor — HARD
+- land_123456.tab / land1all.tab carry plot/land area (binary header; needs a
+  get_dataframe read to enumerate columns).  Input (seed/fert) and labor
+  modules are NOT obviously separate files — they may be embedded in the
+  per-village =prodv= (production value) / =xcly= (crop yield?) tables, which
+  need column-level discovery before a grain can be asserted.
+- Defer until a dedicated read-the-columns discovery agent maps land_*/prodv/
+  xcly contents.
+
+** people_last7days — LIKELY BLOCKED
+- ERHS demo files (demo123, demo4, demog89_*) feed the roster; no obvious
+  "activity in last 7 days" labor-force module surfaced.  Confirm absence (read
+  demo* columns) before declaring blocked — but expect BLOCKED, like several
+  Tier-1 cases.
+
+* Proposed phased plan (checkpoint with maintainer before building)
+1. *Pilot*: anthropometry (single file, clean grain) — validate the ERHS
+   bespoke-build flow end-to-end (cold-build + is_this_feature_sane +
+   adversary-verify + test-gate), as livestock did for Tier-1.
+2. If pilot lands clean: crop_production (the highest-value ag feature; budget
+   for per-wave column maps + a crop harmonize table).
+3. community_prices (confirm usable grain first).
+4. Column-discovery agent on land_*/prodv/xcly -> decide plot_inputs/plot_labor
+   wireability; wire what survives.
+5. Document people_last7days as blocked (after confirming no last-7d module).
+
+* Open questions for maintainer
+- crop_production ITEM-level vs the existing HH-level area_output aggregate —
+  build the finer grain, or is the aggregate sufficient?
+- Is a per-crop harmonize table for ERHS crop codes in scope (new label
+  foundation), or reuse/extend an existing harmonize_food?
+- Priority/sequencing: pilot-first (anthropometry) then reassess, vs commit to
+  the full stack now?

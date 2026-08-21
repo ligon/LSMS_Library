@@ -1,0 +1,5 @@
+[matrix] building (full) ...
+  Albania: 6 waves × 11 features
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Albania.csv (66 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=24, declared=0, dropped=0, broken=0, builds=6, sane=36, blessed=0

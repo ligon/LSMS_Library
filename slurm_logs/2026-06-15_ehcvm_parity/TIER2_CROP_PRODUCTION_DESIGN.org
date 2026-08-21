@@ -1,0 +1,86 @@
+#+TITLE: Tier-2 ERHS crop_production — design (GH #438)
+#+DATE: 2026-06-15
+#+AUTHOR: Sue
+
+Design for the EthiopiaRHS item-level crop_production feature, the next Tier-2
+feature after the anthropometry pilot (#465).  Decisions flagged [DECIDE] are
+the maintainer's call (presented to the user before building).
+
+* Source inventory (archive area_output_* + 2009 cereals)
+All WIDE: 9 crops x {ha (area), prd (production kg), yld (yield)} per round.
+Crops (stub -> label): wtef=White Teff, btef=Black Teff, barl=Barley,
+wht=Wheat, maiz=Maize, sorg=Sorghum, coff=Coffee, chat=Chat, enset=Enset.
+| wave  | round | file                              | keys                | metrics present            |
+|-------+-------+-----------------------------------+---------------------+----------------------------|
+| 1994a | R1    | area_output_94.tab                | q1c,hhid,q5,paid    | ha / prd / yld             |
+| 1994b | R2    | area_output_r2r3rev.tab (R2 cols) | paid,hhid,q1b       | prd94_2 (prod only)        |
+| 1995  | R3    | area_output_r2r3rev.tab (R3 cols) | paid,hhid,q1b       | ha95 / prd95 / prdr2r3     |
+| 1997  | R4    | area_output_97.tab                | q1c,hhid,q5,paid    | ha / prd / yld + v (VALUE) |
+| 1999  | R5    | area_output_99.tab                | hhid,paid           | ha / prd / yld             |
+| 2004  | R6    | area_output_04rev.tab             | paid,hhid           | ha / prd / yld             |
+| 2009  | R7    | erhs7_meher_area_output_cereals_2009.tab | (in 2009/Data) | 6 cereals only      |
+
+Note: keys vary per file (q1c vs paid; hhid; q5/q1b) -- the same per-wave i()
+keyspace work the anthropometry pilot did.  R2 carries production only (no area).
+
+* Grain  [DECIDE 1]
+ERHS area_output_* are HH x crop AGGREGATES -- already summed across plots, no
+plot dimension.  So ERHS crop_production can only be reduced-grain *(t, i, j)*,
+NOT the canonical (t, i, plot, crop, u).  This mirrors the documented ERHS
+reduced-grain variants (assets/livestock/income are (t,i)).  j = harmonized
+crop label; u = 'Kg' (production) -- a single unit, so u may be dropped or kept
+as a constant level.
+=> Proposed: index (t, i, j); columns Quantity (kg harvested).  Optionally
+   Area_ha and Value_sold where present (see DECIDE 3).
+
+* Overlap with the existing area_output (t,i) table  [DECIDE 2]
+The existing =area_output= (registered (t,i), 2004/2009 only) is the WIDE,
+un-melted, narrower-coverage subset of this.  crop_production (t,i,j) over
+R1-R6+R7 SUBSUMES it.  Options:
+- (A) Build crop_production AND retire area_output (deprecate -> remove; migrate
+  the 2 waves).  Cleanest; one ag-production table.  Touches existing consumers.
+- (B) Build crop_production, KEEP area_output (back-compat; some duplication).
+- (C) Reshape: make area_output a thin alias/derived view of crop_production.
+Leaning (A) (single source of truth, matches "harmonize the interface").
+
+* Columns / metrics  [DECIDE 3]
+Canonical crop_production carries Quantity (+ Quantity_sold, Value_sold,
+planting/harvest_month, intercropped, perennial).  ERHS has:
+- prd (production kg) -> Quantity. (all waves)
+- v (value of production) -> only 1997 (R4).  Quantity_sold NOT separable.
+- ha (area) -> NOT a canonical crop_production column (area is plot territory).
+- yld (yield) -> derivable (prd/ha); a transform, not stored.
+- months / intercropped / perennial -> NOT in ERHS aggregates.
+=> Proposed: Quantity (kg), u='Kg'.  Carry Area_ha as a documented EXTRA column
+   (it is the only area record ERHS has at HH x crop grain, and it is what the
+   existing area_output exposes -- dropping it loses data).  Value_sold only
+   1997 (sparse).  Skip months/intercropped/perennial (absent).
+
+* Crop-label harmonization  [DECIDE 4]
+9 fixed crop stubs -> Preferred Labels.  Two ways:
+- (i) small inline map (stub -> 'Maize'/'Sorghum'/'Teff'.../'Enset') in the
+  wave config -- simplest; ERHS-local labels.
+- (ii) a harmonize_food-style table so ERHS crop j composes with other
+  countries' food j (e.g. ERHS 'Maize' == Uganda 'Maize').
+Leaning (ii)-lite: reuse Preferred Labels that already exist in the
+cross-country harmonize_food vocabulary (Maize, Sorghum, Barley, Wheat, Coffee),
+add ERHS-specific (White/Black Teff, Chat, Enset) -- so it composes where the
+vocabulary overlaps without forcing a full new harmonize table.
+
+* Build shape (follows the anthropometry pilot pattern)
+- Per-wave data_info.yml: extract that round's {crop}prd/{crop}ha (+v for 1997);
+  i = per-wave keyspace (verify overlap vs roster as anthropometry did).
+- A crop_production df_edit hook in ethiopiarhs.py: melt the wide crop columns
+  to long (t,i,j), map stubs -> labels, set u='Kg', drop all-NaN-crop rows.
+- data_scheme.yml: register (t,i,j) [+ chosen columns].
+- dvc add/push the source files into each wave Data/ (as anthropometry did).
+- Cold-build + is_this_feature_sane + per-wave i-key + adversary-verify a
+  melted cell vs the raw wide file + test-gate, then PR.
+
+* Open [DECIDE] summary for the user
+1. Grain (t,i,j) reduced (no plot) -- OK?
+2. area_output overlap: (A) retire / (B) keep / (C) alias.
+3. Columns: Quantity(kg)+u, plus Area_ha (keep) +/- Value_sold(1997) -- OK?
+4. Crop labels: (ii)-lite reuse cross-country Preferred Labels where they exist.
+5. Wave coverage: all R1-R6 + R7, or start with the clean ha+prd subset
+   (R1/R4/R5/R6 + R7) and add R2/R3 (r2r3rev, prod-only) after?

@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/g9rb-hd09]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/66
+
+#+CATALOG_ID: 66
+#+CATALOG_IDNO: BIH_2002_LSMS_v01_M
+#+CATALOG_TITLE: Living Standards Measurement Survey 2002 (Wave 2 Panel)
+#+CATALOG_YEARS: 2002-2003
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/g9rb-hd09
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/66
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

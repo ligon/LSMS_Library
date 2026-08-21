@@ -1,0 +1,16 @@
+=== task 6: country='China'  node=n0185.savio3  Thu Jun 25 18:43:32 PDT 2026 ===
+--- provisioning venv -> /local/job35193624/venv ---
+--- cache clear China ---
+China: removed
+  /global/home/users/ligon/.local/share/lsms_library/China/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/1995-97/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/1995-97/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/1995-97/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/1995-97/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/China/1995-97/_/sample.parquet
+--- build China ---
+=== done 'China' rc=0  Thu Jun 25 18:45:04 PDT 2026 ===

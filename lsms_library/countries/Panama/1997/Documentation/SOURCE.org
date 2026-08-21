@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/2yt8-e468]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/598
+
+#+CATALOG_ID: 598
+#+CATALOG_IDNO: PAN_1997_ENV_v01_M
+#+CATALOG_TITLE: Encuesta de Niveles de Vida 1997
+#+CATALOG_YEARS: 1997-1997
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/2yt8-e468
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/598
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

@@ -106,6 +106,29 @@ def _finish_people_last7days(df, t):
     keep = ['t', 'i', 'pid', 'farm_work', 'SOB_work', 'wage_work',
             'farm_hrs', 'SB_hrs', 'wage_hrs', 'Industry', 'working_age']
     df = df[keep]
+    # --- (t, i, pid) key soundness reviewed 2026-07-21 -- GH #637 ----------
+    # This collapse is a NO-OP on the shipped Guinea-Bissau data: there is
+    # nothing to collapse, so `.first()`'s per-column skipna=True can form no
+    # composite row here.  Measured on the SOURCE directly (this table is
+    # `materialize: make`, so it builds out-of-process and an in-process
+    # groupby probe cannot see it -- see the #637 thread):
+    #   s04_me_gnb2018 rows 42,839; duplicate (grappe, menage, s01q00a)
+    #     groups 0
+    #   s01_me_gnb2018 rows 42,839; duplicate person-key groups 0
+    #     -> the how='left' merge fans out 0 rows (merged == 42,839)
+    #   i() is INJECTIVE: 5,351 distinct (grappe, menage) pairs -> 5,351
+    #     distinct ids.  Note Guinea-Bissau's grappe is a wide code (max
+    #     27,711,109, not a 3-digit cluster number as in the other EHCVM
+    #     countries); the '0'-separated form still collides on none of it.
+    #   groups on (t, i, pid) 42,839 == rows 42,839  ->  0 duplicate groups
+    # So the key merges no distinct persons -- the ONLY situation in which the
+    # composite would be wrong (GH #637 correction thread; GH #323 D1: the fix
+    # for a merged entity is the identifier, never a reducer).
+    # Do NOT "fix" this to `.first(skipna=False)`: in this codebase NaN is
+    # absence, not contradiction, and skipna=False would return <NA> for
+    # values the survey actually recorded.
+    # `dropna=False` governs NA *group keys* only; rows with NA i/pid are
+    # already dropped above and `t` is a literal, so it too is inert here.
     df = (df.groupby(['t', 'i', 'pid'], dropna=False, as_index=False).first())
     df = df.set_index(['t', 'i', 'pid'])
     return df

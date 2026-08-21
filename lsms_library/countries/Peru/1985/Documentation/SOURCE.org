@@ -1,1 +1,14 @@
-[[https://doi.org/10.48529/dsz6-gh05]]
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/597
+
+#+CATALOG_ID: 597
+#+CATALOG_IDNO: PER_1985_ENNIV_v01_M
+#+CATALOG_TITLE: Encuesta Nacional de Hogares sobre Medición de Niveles de Vida 1985
+#+CATALOG_YEARS: 1985-1986
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/dsz6-gh05
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/597
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: doi-lookup
+#+PROVENANCE_RECORDED: 2026-07-12

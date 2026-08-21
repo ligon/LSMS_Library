@@ -1,0 +1,5 @@
+[matrix] building (full) ...
+  Serbia and Montenegro: 2 waves × 5 features
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Serbia and Montenegro.csv (10 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=0, declared=0, dropped=0, broken=0, builds=1, sane=9, blessed=0

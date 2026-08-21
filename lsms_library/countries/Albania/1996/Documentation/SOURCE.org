@@ -1,1 +1,13 @@
-https://microdata.worldbank.org/index.php/catalog/2311/study-description
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2311
+
+#+CATALOG_ID: 2311
+#+CATALOG_IDNO: ALB_1996_EWS_v01_M
+#+CATALOG_TITLE: Employment and Welfare Survey 1996
+#+CATALOG_YEARS: 1996-1996
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2311
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

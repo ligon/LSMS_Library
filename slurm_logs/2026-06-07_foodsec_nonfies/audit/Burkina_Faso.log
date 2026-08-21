@@ -1,0 +1,19 @@
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/2014/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/_/cluster_features.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2014/_/cluster_features.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/2018-19/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/_/cluster_features.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/2018-19/_/cluster_features.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/_/individual_education.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/Burkina_Faso/var/individual_education.parquet still missing after running fallbacks.
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Burkina_Faso/2021-22/_/./plot_features.py:19: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/s16a_me_bfa2021.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  src = get_dataframe('../Data/s16a_me_bfa2021.dta', convert_categoricals=False)
+Burkina_Faso: 19 features audited

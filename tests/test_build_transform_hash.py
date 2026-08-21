@@ -29,6 +29,20 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.build_transforms._finalize_canonical_food_acquired",
     "lsms_library.build_transforms.fill_v_with_coord_bin",
     "lsms_library.build_transforms.apply_derived",
+    # GH #323: stamps the constant `visit` (recall-occasion) level on the
+    # single-recall waves of a country whose food_acquired index carries one.
+    # food_acquired-scoped, like its sibling food_acquired_to_canonical.
+    #
+    # NOT tagged, deliberately: build_transforms.reduce_to_agreed /
+    # .collapse_to_cluster_grain.  They are table-GENERIC, so the only honest
+    # tag is the all-tables one -- which would fold them into every table's
+    # fingerprint in every country and invalidate the whole library's cache on
+    # any edit, for a helper most countries never call.  Their build-path code
+    # is already versioned precisely by framework_imports_fingerprint, which
+    # folds the import closure of each wave's _/ *.py (mapping.py included) --
+    # i.e. of exactly the waves that call them.  See the CACHE NOTE in
+    # build_transforms.py.
+    "lsms_library.build_transforms.add_visit_level",
     "lsms_library.country._normalize_dataframe_index",
     "lsms_library.country.Wave.grab_data",
     "lsms_library.country.Country._aggregate_wave_data",

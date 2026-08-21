@@ -1,0 +1,186 @@
+#+TITLE: A plan for the backlog
+#+AUTHOR: Sue (Claude Opus 4.8)
+#+DATE: [2026-07-12 Sun]
+
+* The organizing principle
+
+Before ordering anything: *the GitHub backlog should hold exactly what the
+coverage matrix cannot.*
+
+The matrix now enumerates cells, waves, and countries --- systematically,
+refreshably, and with evidence.  Any issue that /is/ a cell ("EthiopiaRHS
+=plot_features= needs R2--R4", "India =housing= needs decoding") is
+*duplicate bookkeeping*: the Phase-1 sweep will re-derive it, sized and
+sourced, whether or not an issue exists.  Maintaining both is how a backlog
+becomes a museum.
+
+So the division of labour is:
+
+| the *matrix* owns | *which* cells are missing / broken / blocked --- the WHAT |
+| the *backlog* owns | /why/ a cell is hard, cross-cutting bugs, and *everything the matrix cannot see* |
+
+That last clause is not a throwaway.  The matrix has *known blind spots*, and
+they are exactly where issues earn their keep:
+
+- =#588= --- Uganda =earnings= is *sane cold, broken warm*.  The matrix is a
+  cold build.  It /structurally cannot/ see this.
+- =#589= --- GhanaLSS currency labels.  The grader does not check them.
+
+*Track what the instrument cannot see.  Let the instrument track the rest.*
+This shrinks the backlog structurally rather than by grinding.
+
+* The severity rule
+
+Order by *harm*, not by effort or age:
+
+1. *Silently wrong* --- the user gets a wrong number and does not know.  The
+   only /unrecoverable/ class: it propagates into published work.
+2. *Silently missing* --- the user gets less data than they think.
+3. *Loudly broken* --- it raises.  Annoying; harmless.  It cannot corrupt an
+   analysis, because there is no analysis.
+4. *Untidy* --- noise, dead code, ergonomics.
+
+A crash is a gift.  A quiet wrong answer is a liability.
+
+* Wave 0 --- finish the instrument  [IN FLIGHT]
+
+=#597= --- =discover_waves()= only searches =collection='lsms'=, hiding ~28
+in-remit waves (Armenia ILCS ×18 =repo=central=; South Africa GHS ×10
+=repo=datafirst=).  The last thing between us and an honest denominator.
+Agent running.
+
+Nothing downstream of "what work remains" can be trusted until this lands.
+
+* Wave 1 --- stop the bleeding (silent wrongness)
+
+Ranked by blast radius.  All are worktree-agent tractable, with
+=bench/feature_audit/scan.py= as the regression net.
+
+** 1a. =#503= Guyana --- *this is data corruption, and it is the worst item on the board*
+
+=i = [ED, HH]= *conflates distinct households*.  The source is at
+=(ED, HH, SN)= granularity:
+
+: COVERN.dta   1807 rows | 1502 unique (ED,HH) | 1807 unique (ED,HH,SN)
+: ROSTERN.dta            | 1495 unique (ED,HH) | 1789 unique (ED,HH,SN)
+
+So roughly *300 distinct households are silently merged into others.*  This is
+not missing data --- it is /wrong data that looks fine/.  Every Guyana number we
+have ever produced is suspect, and nothing in the matrix flags it, because the
+table builds clean and passes every sanity check.
+
+It is the purest instance of the session's theme: *=sane= is not =blessed=.*
+
+** 1b. =#591= Nigeria =food_prices()= drops ~99% of rows in 6 of 8 waves
+A =Quantity == 0= sentinel (never decoded to =NA=) → =Price = Expenditure/0 =
+inf= → deleted at =transformations.py:933=.  675--1,106 rows survive out of
+120k--160k.  *All six cells graded =sane=.*
+
+** 1c. =#548= Panel-id rename-onto-occupied collisions (Niger, GhanaLSS)
+Household-level id collisions → =groupby().first()= data loss.  Same class as
+the Mali/#536 fix, still live in countries whose bespoke =panel_ids.py= emits
+=updated_ids.json= directly, bypassing the guarded =update_id= path.
+
+** 1d. =#587= (Nigeria bloc) --- 22 half-missing PP/PH features
+Its stated hypothesis is *refuted* (corrected on the issue): the built =t=
+values are valid labels from the /opposite/ round.  =community_prices= is all
+Q1 and no Q3; =plot_features= all Q3 and no Q1.  Real losses, not artefacts.
+
+** 1e. =#588= Uganda =earnings= --- sane cold, broken warm
+A stale hashless script-path wave parquet shadows the build.  *The matrix
+cannot see this class at all* --- so it must live here.
+
+* Wave 2 --- cheap, confirmed, high-yield
+
+- =#537= --- =validate_acquisition_source= has *zero call sites*, while its
+  docstring asserts it is wired into =_finalize_result=.  *A validation we
+  believe is running, and is not.*  This is the session's theme /inverted/: an
+  unevidenced *positive*.  Same disease, opposite sign.  Either wire it or
+  delete it --- but a guarantee that does not execute is worse than no
+  guarantee, because it is trusted.
+- =#579= --- GhanaSPS =sample()= raises; no cluster (=v=) table, so
+  =food_acquired= will not join into the default =Feature()= index.  Roots
+  =#140=.
+- =#592= --- 18 waves with zero GPS.  Adjudicate per wave: never-released
+  (record it) vs. not-wired (do it).
+- CotedIvoire =food_expenditures= 1985-89 (4 cells) --- =dropped= only because
+  their /source/ is =absent=.  Derived features should inherit their source's
+  per-wave declaration in the coverage layer.  Small.
+- =#381= --- noisy =No rule to make target= for YAML-path tables.  Pure noise,
+  but noise is how real warnings get ignored.
+
+* Wave 3 --- the Phase-1 sweep (the 456 absent cells)
+
+~12--20 agent-hours, ~2--3 wall-clock parallelised 8-way.  Produces a *sized,
+sourced, evidence-backed* queue.  The pilot returned 25 todo / 13 unsure /
+*0 not-asked* --- so expect it to /confirm/ work, not retire it.
+
+*This subsumes a family of open issues*, which are individual cells:
+=#458= (EthiopiaRHS =plot_features= R2--R4), =#468= (EthiopiaRHS
+=crop_production= R5), =#562= / =#563= (GhanaLSS), =#567= (India =housing=),
+=#560= (Cambodia nutrition).
+
+*Do not close them* --- their bodies carry real diagnostic content.  *Link*
+them from their matrix cells, and stop opening new ones for cells.  The
+machine enumerates; the issue explains.
+
+* Wave 4 --- decisions, not tickets (escalate; do NOT queue)
+
+These are *Ethan's calls*.  An RA cannot close them by working harder, and
+leaving them in an engineering queue is how a judgement silently becomes a
+default.
+
+- =#575= --- =food_expenditures= is purchased-value-only library-wide.  *By
+  design, or a defect?*  This is a measurement definition, and it is upstream
+  of =#585= (impute own-production at purchase prices).
+- =#279= --- bespoke label schemes without modifying the package tree.
+- =#226= --- principled auto-aggregation for =harmonize_food=.
+- =#438= / =#439= --- extend the WB-parity stack to non-ISA; exploit LSMS+
+  intra-household disaggregation.  *Research directions*, not bugs.
+- *Vietnam* (=blocked_sources.csv=, =fee-gated=) --- VLSS/VHLSS ×5, USD
+  200--2000 + GSO permission.  A *budget* question.  It must never sit in an
+  engineering queue, where it will be "in progress" forever.
+
+* Wave 5 --- acquisition (~43 waves)
+
+Sequenced /after/ =#597=, because until discovery is fixed we do not know the
+true size.
+
+| tier | source | waves | note |
+|------+--------+-------+------|
+| 1 | EHCVM-2 ×4 (Benin, CotedIvoire, Guinea-Bissau, Togo) | 4 | *highest value, lowest effort* --- the ingest path already exists |
+| 1 | Armenia ILCS (=#597=) | 18 | in remit; invisible until =#597= |
+| 1 | South Africa GHS (=#597=) | 10 | in remit; invisible until =#597= |
+| 1 | Other genuine WB gaps (Malawi IHPS, Nigeria, Tanzania Kagera…) | ~11 | |
+| 2 | *blocked* --- Nepal ×3, Jamaica, Ecuador ×2, Albania 1996 | 7 | not actionable by us; auto-re-probed |
+| 3 | *blocked, fee-gated* --- Vietnam ×5 | 5 | escalate (Wave 4) |
+
+* Wave 6 --- the ten orphan countries (35 downloaded waves, zero config)
+
+Data already paid for and on disk.  Ordered by cost-to-first-green:
+Kyrgyz Republic → Peru → Bosnia-Herzegovina → Nicaragua → Tanzania_Kagera →
+Brazil → Afghanistan → Rwanda → Bulgaria.  (*Panama is done* --- its
+=data_scheme.yml= landed 2026-07-12 in =a0ba3e10=; =#573= closed.)
+
+*Recommend dropping =KenyaLPS=*: it is the Kenya Life Panel Survey, an
+/individual/ tracking study, not an LSMS household survey.  The canonical
+schema does not map onto it, and keeping it manufactures permanent red.
+
+* What I would actually do next
+
+1. Land =#597= (in flight) → the denominator is honest.
+2. *Wave 1 in parallel* --- five worktree agents, one per issue, audit harness
+   as the net.  =#503= first and alone if you only pick one: it is the only
+   item that makes *published numbers wrong*.
+3. Run the Phase-1 sweep (Wave 3).  Reconcile the cell-shaped issues against it.
+4. Bring Wave 4 to Ethan as a *decision memo*, not a ticket list.
+
+Waves 5 and 6 are large and should be scheduled deliberately, not squeezed in.
+
+* One meta-observation
+
+Of the ~29 open issues, a large fraction are *not defects at all* --- they are
+cells, decisions, or acquisitions that were filed as issues because there was
+nowhere else to put them.  Now there is.  The backlog should get *structurally*
+smaller as the matrix takes over the bookkeeping, and what remains should be
+harder and more interesting: real bugs, real blind spots, and real decisions.

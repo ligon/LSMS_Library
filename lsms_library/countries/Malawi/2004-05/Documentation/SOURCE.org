@@ -1,1 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/2307/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2307
+
+#+CATALOG_ID: 2307
+#+CATALOG_IDNO: MWI_2004_IHS-II_v01_M
+#+CATALOG_TITLE: Second Integrated Household Survey 2004-2005
+#+CATALOG_YEARS: 2004-2005
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/2ked-2t88
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2307
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

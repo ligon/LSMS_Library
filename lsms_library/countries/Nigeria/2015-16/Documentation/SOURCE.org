@@ -1,3 +1,14 @@
-SOURCE 
+SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2734
+
+#+CATALOG_ID: 2734
+#+CATALOG_IDNO: NGA_2015_GHSP-W3_v02_M
+#+CATALOG_TITLE: General Household Survey, Panel  2015-2016, Wave 3
+#+CATALOG_YEARS: 2015-2016
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/7xmj-q133
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2734
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

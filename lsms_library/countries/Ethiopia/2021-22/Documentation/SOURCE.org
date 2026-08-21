@@ -1,3 +1,13 @@
 SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/6161
+
+#+CATALOG_ID: 6161
+#+CATALOG_IDNO: ETH_2021_ESPS-W5_v02_M
+#+CATALOG_TITLE: Socio-Economic Panel Survey 2021-2022
+#+CATALOG_YEARS: 2021-2022
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6161
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

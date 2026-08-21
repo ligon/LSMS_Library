@@ -27,15 +27,24 @@ import pandas as pd
 sys.path.append('../../_')
 from lsms_library.local_tools import panel_ids, get_dataframe
 
-# Read the 2021-22 cover sheet (already filtered to panel households)
+# Read the 2021-22 cover sheet.  Today every row is a panel household
+# (3,227 rows, all with a non-null grappe_EHCVM1), but do not *assume* that:
+# see the full-cover cur_set below (GH #548).
 df = get_dataframe('../2021-22/Data/s00_me_bfa2021.dta', convert_categoricals=True)
 
 # Build current wave ID (2021-22 style)
 df['i'] = df['hhid'].astype(int).astype(str)
 
-# Build previous wave ID (2018-19 style: grappe + menage zero-padded to 3)
-df['previous_i'] = (df['grappe_EHCVM1'].astype(int).astype(str)
-                     + df['menage_EHCVM1'].astype(int).astype(str).str.rjust(3, '0'))
+# Build previous wave ID (2018-19 style: grappe + menage zero-padded to 3),
+# leaving it null for any household without a 2018-19 antecedent.  Such rows
+# are dropped inside panel_ids(); they still count as *occupied* 2021-22
+# slots for the collision guard below.
+_panel = df['grappe_EHCVM1'].notna() & df['menage_EHCVM1'].notna()
+df['previous_i'] = pd.NA
+df.loc[_panel, 'previous_i'] = (
+    df.loc[_panel, 'grappe_EHCVM1'].astype(int).astype(str)
+    + df.loc[_panel, 'menage_EHCVM1'].astype(int).astype(str).str.rjust(3, '0')
+)
 
 df['t'] = '2021-22'
 
@@ -62,7 +71,18 @@ D, updated_ids = panel_ids(panel_df)
 # id_walk stays idempotent. Caught by
 # check_panel_consistency's id_walk_idempotent check
 # (diagnostics.py).
-cur_set = set(updated_ids.get('2021-22', {}).keys())
+#
+# GH #548 (hardening; byte-identical today): the "occupied" set must be
+# EVERY 2021-22 household id, not just the panel-linked candidates.  Built
+# from updated_ids.keys() it saw only panel households -- the exact
+# panel-only pattern GH #536 had to fix in Mali, where a household renaming
+# onto a slot held by a NON-panel current household collided under id_walk
+# and groupby().first() silently dropped one of each pair.  Burkina's
+# 2021-22 cover happens to be 100% panel (3,227/3,227), so panel-only and
+# full-cover coincide *today* and this edit changes nothing; a future cover
+# with refreshment households would otherwise resurface the Mali bug
+# silently.  Build cur_set from the full cover.
+cur_set = set(df['i'].dropna())
 filtered_21 = {}
 skipped_chains = 0
 for cur, prev in updated_ids.get('2021-22', {}).items():

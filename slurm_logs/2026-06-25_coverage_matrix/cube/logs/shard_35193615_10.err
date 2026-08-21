@@ -1,0 +1,15 @@
+[matrix] building (full) ...
+  GhanaLSS: 7 waves × 13 features
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1987-88/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/home/users/ligon/.local/share/lsms_library/GhanaLSS/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/1987-88/_/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/_/cluster_features.parquet'.  Stop.
+Data file /global/home/users/ligon/.local/share/lsms_library/GhanaLSS/1987-88/_/cluster_features.parquet still missing after running fallbacks.
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:936: DtypeWarning: Columns (0: FOODCD, 1: FOODBLV, 2: UNIQUEID) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:936: DtypeWarning: Columns (0: FOODCD, 1: FOODBLV, 2: MFOODBLY, 3: TFOODB, 4: UTFOODB, 5: CFOODB) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/GhanaLSS.csv (93 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=11, declared=0, dropped=3, broken=0, builds=15, sane=64, blessed=0

@@ -28,7 +28,7 @@ Notes on the non-obvious levels:
 #+name: harmonize_education
 | Original Label                      | Preferred Label          |
 |-------------------------------------+--------------------------|
-| none                                | None                     |
+| none                                | No education             |
 | primary                             | Primary complete         |
 | primary (grades 1-4)                | Primary complete         |
 | basic                               | Lower secondary complete |

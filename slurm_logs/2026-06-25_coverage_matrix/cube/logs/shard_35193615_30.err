@@ -1,0 +1,5 @@
+[matrix] building (full) ...
+  Tanzania: 6 waves × 24 features
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Tanzania.csv (146 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=37, declared=0, dropped=1, broken=0, builds=6, sane=102, blessed=0

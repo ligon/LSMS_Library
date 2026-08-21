@@ -1,0 +1,43 @@
+=== task 29: country='Tajikistan'  node=n0180.savio3  Thu Jun 25 18:50:59 PDT 2026 ===
+--- provisioning venv -> /local/job35193746/venv ---
+--- cache clear Tajikistan ---
+Tajikistan: removed
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/1999/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2003/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/cluster_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/food_security_hfias.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/food_security_hfias.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/food_security_hfias.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/1999/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2003/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/household_roster.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/1999/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/housing.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/1999/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2003/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/individual_education.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/1999/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2003/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/interview_date.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/life_satisfaction.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/plot_features.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/var/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/1999/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2003/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2007/_/sample.parquet
+  /global/home/users/ligon/.local/share/lsms_library/Tajikistan/2009/_/sample.parquet
+--- build Tajikistan ---
+=== done 'Tajikistan' rc=0  Thu Jun 25 18:52:01 PDT 2026 ===

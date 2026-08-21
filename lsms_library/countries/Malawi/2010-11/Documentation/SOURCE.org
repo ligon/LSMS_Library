@@ -1,1 +1,14 @@
-https://microdata.worldbank.org/index.php/catalog/1003/get-microdata
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/1003
+
+#+CATALOG_ID: 1003
+#+CATALOG_IDNO: MWI_2010_IHS-III_v01_M
+#+CATALOG_TITLE: Third Integrated Household Survey 2010-2011
+#+CATALOG_YEARS: 2010-2011
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/w1jq-qh85
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/1003
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: source-url
+#+PROVENANCE_RECORDED: 2026-07-12

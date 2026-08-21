@@ -1,0 +1,7 @@
+[matrix] building (full) ...
+  Armenia: 1 waves × 2 features
+DVC unavailable for household_roster: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.. Falling back to manual aggregation.
+DVC unavailable for household_roster: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.. Falling back to manual aggregation.
+[matrix] snapshot -> slurm_logs/2026-06-25_coverage_matrix/cube/shards/Armenia.csv (2 cells)
+[matrix] html     -> skipped (--no-html)
+[matrix] tiers: n/a=0, absent=0, declared=0, dropped=0, broken=2, builds=0, sane=0, blessed=0

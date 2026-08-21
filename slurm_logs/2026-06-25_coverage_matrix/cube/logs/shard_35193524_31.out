@@ -1,0 +1,6 @@
+=== task 31: country='Timor-Leste'  node=n0179.savio3  Thu Jun 25 18:39:29 PDT 2026 ===
+>> mounting (squashfuse_ll + fusermount3 shim) -> /local/job35193560/venv_img
+--- cache clear Timor-Leste ---
+  (clear noop/failed; continuing)
+--- build Timor-Leste ---
+=== done 'Timor-Leste' rc=127  Thu Jun 25 18:39:29 PDT 2026 ===
