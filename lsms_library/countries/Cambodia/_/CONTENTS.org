@@ -19,6 +19,297 @@ legacy Makefile/script path exclusively---there is no =data_scheme.yml=
 and no =data_info.yml= at the country level, so Cambodia is not yet
 accessible via the =Country()= API.
 
+* Sampling universe, exclusions and sub-samples
+
+What the survey documentation *claims* about the population it represents, as
+distinct from what the data look like.  Nothing in this section was inferred
+from the =.dta= files; every statement is quoted from documentation, with a
+citation.  Cambodia has a single wave (2019-20), so this section has a single
+wave entry.
+
+Headline: *this wave has no universe statement at all.*  What it has instead is
+a frame statement, and the frame is a quarter-year sub-sample of another
+survey.  Both facts matter before anyone pools Cambodia with other countries.
+
+** 2019-20: no universe / target-population statement exists
+
+The DDI's =universe= element is *empty* -- =<universe/>= -- in both places it
+occurs in the catalog XML export
+(=stdyDscr/stdyInfo/sumDscr/universe= and =method/dataColl/sampleFrame/universe=,
+[[https://microdata.worldbank.org/index.php/metadata/export/4045/ddi]]).  No
+document in this repo or in the catalog carries a "Universe" or "Target
+population" heading.  This is a recorded gap, not an omission of this write-up.
+
+The nearest documented coverage statements, verbatim, are these two.  Neither is
+a universe declaration; both describe the *sample*, and are recorded here only
+because they are the strongest coverage language that exists.
+
+- DDI report, ABSTRACT, printed p. 2 --
+  =lsms_library/countries/Cambodia/2019-20/Documentation/ddi-documentation-english_microdata-4045.pdf=
+  (in-repo, DVC-tracked):
+
+  #+begin_quote
+  The survey attempted to conduct private interviews with all the adult
+  household members (aged 18 and older) in each sampled household as part of a
+  nationally-representative survey sample.
+  #+end_quote
+
+- DDI report, Coverage > GEOGRAPHIC COVERAGE, printed p. 3 (same file).  The
+  field's *entire* content is one word:
+
+  #+begin_quote
+  National
+  #+end_quote
+
+Read carefully, "as part of a nationally-representative survey sample" is a
+claim about the sample, not a definition of the universe it stands for.
+Nothing in any consulted document says "all private households in Cambodia" or
+any equivalent.  So: geographic coverage is asserted national; the population
+covered is *never stated*.
+
+** 2019-20: exclusions -- none stated anywhere (documented gap)
+
+*No exclusion statement of any kind appears in any consulted document* -- no
+institutional or collective-quarters exclusion, no nomadic or homeless
+exclusion, no diplomatic carve-out, no named region dropped, no security
+carve-out, no urban-only or rural-only restriction.
+
+This is a genuine negative with the search behind it recorded (see the
+"What was searched" subsection below), not an assumption.  Case-insensitive searches for
+=universe=, =target population=, =exclud=, =institution=, =nomad=, =homeless=,
+=collective= and =private household= over the full text of the in-repo DDI
+report, the Basic Information Document, the Field Operational Manual and the
+public questionnaire return *zero* relevant hits.  The only =exclud= matches in
+the DDI are ISCO occupation labels ("Engineering professionals (excluding
+electrotechnology)", "Street vendors (excluding food)") and one consumption-
+module instruction ("telephone service (exclude telephone accessories)"); the
+BID returns no hits at all for any of these terms.
+
+Note what this does *not* mean.  It does not mean the survey covered
+institutional populations; it means nobody wrote down what it covered.  The
+absence of an exclusion sentence here is an absence of documentation, and the
+real exclusions (if any) live in the CSES 2019-2020 sample design, which is not
+in this repo.
+
+** 2019-20: the frame -- a three-month sub-sample of the CSES, disjoint from it
+
+This is the substantive finding, and it is the thing a reader pooling Cambodia
+needs to know.  *The LSMS+ sample is not an independent national draw.*  It is
+drawn inside the CSES 2019/20 PSU sample, restricted to one fieldwork quarter,
+and its households were deliberately chosen *not* to be CSES households.
+
+Verbatim, Basic Information Document, "1.0 Introduction", printed p. 4:
+
+#+begin_quote
+The Cambodia LSMS Plus Survey was conducted in 25 percent of the enumeration
+areas (EAs) that was visited by the 2019/20 round of the Cambodia Socioeconomic
+Survey (CSES) which is implemented by the National Institute of Statistics
+(NIS).
+#+end_quote
+
+Same page, next sentence:
+
+#+begin_quote
+Specifically, in the CSES EAs that were visited during the period of
+October-December 2019, the NIS selected additional households that were NOT be
+part of the planned CSES sample and that constituted the LSMS Plus Survey
+sample, to whom the World Bank-required survey questionnaire modules was
+administered, based on the World Bank-required fieldwork protocols.  The LSMS
+Plus Survey data was collected in parallel with the CSES data in these EAs.
+#+end_quote
+
+BID, "3.1 Survey Sample", printed p. 5:
+
+#+begin_quote
+The survey took approximately 3 months running from October-December 2019 with
+a few final interviews in early January 2020.  The NIS sampled 6 additional
+households in the 252 enumeration areas that were visited during the period of
+October-December 2019 by the 2019/20 round of the Cambodia Socioeconomic Survey
+(CSES).  The LSMS+ Survey sample includes a total of 1,512 households.
+#+end_quote
+
+And the PSU definition, DDI report, Sampling > SAMPLING PROCEDURE, printed
+p. 3 (in-repo file):
+
+#+begin_quote
+The Primary Sampling Units (PSUs) of this survey were the subsamples of the
+selected PSUs of the Cambodia Socio-Economic Survey (CSES) 2019/20.  The PSU in
+this case can either be a village (if the village is small) or an Enumeration
+Area (EA) from the mapping operation of 2019 General Population Census of
+Cambodia (if the village is large, exceeding 120 households).  The Cambodia
+LSMS+ sample covered all the CSES' s sample villages in three months (those
+selected for interviews during the October - December period of fieldwork) out
+of its twelve-month sample.
+#+end_quote
+
+The BID gives the same passage in slightly different words (BID, "3.2 Survey
+Weights" > SAMPLING METHODOLOGY, item 1, printed p. 7): "...if the village is
+large, probably exceed 120 households).These covered all the CSES' s sample
+villages in three months...".  Where the two differ, the in-repo DDI text is the
+one quoted above.
+
+Second stage, BID p. 8 / DDI p. 3: 6 households per PSU, selected in the field
+by Circular Systematic Random Sampling (CSRS) from the household listing that
+the *CSES* enumerator had made for that PSU.
+
+Summary of the design as documented:
+
+| Element              | As documented                                                |
+|----------------------+--------------------------------------------------------------|
+| Stated universe      | none -- DDI =<universe/>= is empty                           |
+| Geographic coverage  | "National" (DDI, one word, no elaboration)                   |
+| Frame                | the CSES 2019/20 PSU sample, restricted to Oct-Dec 2019       |
+| PSU                  | village, or census EA where the village exceeds ~120 HH       |
+| PSUs selected        | 252 EAs = 25% of the CSES EAs                                |
+| SSU selection        | 6 HH per PSU, CSRS from the CSES enumerator's listing         |
+| Disjointness         | explicit -- households "NOT be part of the planned CSES sample" |
+| Sample size          | 1,512 households                                             |
+| Fieldwork            | 2019-10-08 to 2020-01-03 (DDI, Data Collection)              |
+
+*Consequence for #601/#603, stated as a fact about the documents and not as a
+design proposal*: any universe Cambodia 2019-20 has is *inherited from the CSES
+2019-2020 sample design*, and that report is not in this repo.  The BID says so
+itself, in a footnote on p. 7: "For more details on the CSES sample village
+selection, please see the CSES 2019-2020 report, NIS."  This wave therefore
+belongs in the acquisition queue: the document that would close the cell exists
+and is named, it is simply not held here.
+
+Note also that the sample covers one quarter of a twelve-month CSES fieldwork
+cycle.  Whether the resulting estimates carry the seasonality of Oct-Dec is not
+addressed by any document consulted.
+
+** Sub-samples, oversamples and eligibility rules
+
+- *No oversample and no booster sample is documented.*  There is no
+  sub-population module, no ethnic or programme sub-sample, no urban booster, no
+  panel/refresh split.  The allocation is a flat 6 households in each of 252
+  PSUs (BID Table 1, pp. 7-8), which is the opposite of an oversample design.
+- *The whole wave is itself a sub-sample* -- of the CSES, as set out above.  In
+  the taxonomy that the cross-country sweep uses, Cambodia is the case where the
+  specialization is the *wave*, not something inside it.
+- *One eligibility rule, at the individual level.*  BID, "2.0 The Survey
+  Instruments", printed p. 4, verbatim: "The Individual Questionnaire was
+  administered to all adult individuals (18 years and above) in the household"
+  (the sentence ends without a period in the source).  The DDI abstract says the
+  same ("all the adult household members (aged 18 and older)").  This is a
+  *module eligibility* rule, not a universe exclusion: the household
+  questionnaire has no age restriction, and individual-level tables built from
+  this wave are 18+ by design.  The cross-country document files this alongside
+  Tanzania NPS / Albania APS 15+ and Malawi IHPS 12+ as an age rule, explicitly
+  kept apart from universe exclusions.
+
+** Where the statements live
+
+| Document                                 | In this repo?                    |
+|------------------------------------------+----------------------------------|
+| DDI report PDF (catalog 4045)            | *yes* -- =2019-20/Documentation/=, DVC-tracked |
+| Public questionnaire (English)           | *yes* -- =2019-20/Documentation/=, DVC-tracked |
+| Basic Information Document (dl id 50889) | *no* -- WB catalog only          |
+| Field Operational Manual (dl id 50888)   | *no* -- WB catalog only          |
+| CSES 2019-2020 report (NIS)              | *no* -- not in the WB catalog either |
+
+The two DDI statements quoted above are held locally and are durable.  *Every
+frame statement -- the 25%-of-CSES sentence, the disjointness sentence, the
+1,512 households, Table 1 -- exists only in the Basic Information Document,
+which this repo does not hold.*  It is a live catalog download, i.e. a moving
+target: it can be revised or withdrawn without the repo noticing.  Transcribing
+it (or DVC-tracking the PDF) is the durability fix.
+
+Version note: =2019-20/Documentation/SOURCE.org= is provenance-stamped
+(=#+CATALOG_IDNO: KHM_2019_LSMS-PLUS_v02_M=, recorded 2026-07-12) and matches
+the local DDI PDF, which is v02.  The =v01= reference that survives in the
+preserved legacy citation block at the bottom of that file is historical.  The
+v02 version note reads "Update to HH_SEC_1.  The Urban/Rural variable was
+previously omitted from the datafile" -- it does not touch any statement quoted
+here.
+
+** Not boilerplate -- and that cuts both ways
+
+The single most-repeated sentence in the cross-country corpus is World Bank NADA
+template text: "The survey covered all de jure households excluding prisons,
+hospitals, military barracks, and school dormitories.", appearing verbatim in 15
+waves.  *Cambodia 2019-20 does not contain it*, in any form.
+
+Which is worth stating precisely.  Cambodia is not a wave whose universe is a
+template; it is a wave with *no* universe field filled in at all.  The
+comparison is therefore: 15 waves attest a template rather than a statistical
+office's claim, and Cambodia attests nothing.  Do not repair the gap by
+importing the boilerplate -- it is not this survey's claim, and no document
+supports applying it here.
+
+** Universe vs. what the weights represent
+
+The documents come apart on this, and neither side should be read as settling
+the other.
+
+- The DDI asserts geographic coverage "National" and calls the sample
+  "nationally-representative" (abstract, p. 2).
+- The weights are =finalhhweight= in =hh_sec_1.dta= (DDI, WEIGHTING, p. 3:
+  "Details can be found in the Basic Information Document and the weights can be
+  found in the household-level data file HH_SEC_1.  The variable name is
+  finalhhweight.").  Their construction is documented only in the BID (3.2
+  Survey Weights) -- i.e. only outside this repo.
+- What the weights inflate to is *not stated*.  With no universe declared, there
+  is no documented answer to "weighted totals estimate the total number of
+  what?"  A reader who needs that answer has to go to the CSES 2019-2020 report.
+
+So the documentation *asserts national representativeness while declining to
+define the population represented*.  That is the shape of the gap; recording it
+is not the same as doubting the claim.
+
+** Open observation, explicitly NOT an exclusion claim
+
+BID Table 1, "Number of sample villages and households in each province"
+(pp. 7-8), lists provinces numbered 1-22, 24 and 25 -- *24 rows*.  Province
+number 23 (Kep, in the standard Cambodian province numbering) has no row.  This
+is not a PDF-extraction dropout: the listed village counts sum to 252 and the
+household counts to 1,512, both matching the printed TOTAL row.
+
+The BID offers no explanation, and *no claim is made here that Kep was excluded
+by design*.  The documentation is simply silent.  The observation is recorded so
+that a later reader checks it against the CSES 2019-2020 sample design rather
+than re-deriving it -- and, per the repo's standing rule, so that no unevidenced
+"province X was excluded" claim gets written anywhere on the strength of a
+missing table row.
+
+** What was searched
+
+Recorded so the negatives above are falsifiable.
+
+1. Wave directories under =lsms_library/countries/Cambodia/= -- only =2019-20=
+   (plus =_= and =var=).
+2. =2019-20/Documentation/SOURCE.org= and =LICENSE.org= -- citation, URL and
+   provenance keywords only; no coverage language.
+3. =_/CONTENTS.org= (this file, prior to this section) -- build status and data
+   issues only; no universe or sampling statement, so nothing here contradicts
+   anything already recorded.
+4. All three in-repo Documentation PDFs, materialized via
+   =lsms_library.data_access.get_data_file()= and extracted with =pdfminer.six=:
+   =ddi-documentation-english_microdata-4045.pdf= (~917k chars),
+   =ddi-documentation-english_microdata-4045 (1).pdf= (~4.7k chars -- a
+   documentation-listing stub, no body), and
+   =cambodia_lsms_plus_questionnaire_english_public.pdf= (~97k chars).
+5. Full-text search of all of the above for =universe=, =target population=,
+   =exclud=, =coverage=, =represent=, =institution=, =nomad=, =homeless=,
+   =collective=, =private household=, =eligib=.
+6. The DDI XML export for catalog 4045, whole =<stdyDscr>= block read --
+   =<universe/>= empty in both occurrences.
+7. WB catalog pages =/catalog/4045/study-description= and =/related-materials=.
+   (The =/api/catalog/4045= endpoint returns =IDNO-NOT-FOUND=; the metadata
+   export endpoint works.)
+8. The Basic Information Document (download id 50889) and the Field Operational
+   Manual (download id 50888), downloaded and read in full.  Neither contains a
+   universe statement.
+
+Transcription note: the BID and DDI PDFs are justified text, so the extractor
+emits runs of multiple spaces inside phrases; those runs were collapsed to single
+spaces in the quotations above.  No words were added, removed, reordered or
+corrected.  The apparent grammatical errors -- "that was visited", "that were
+NOT be part of", "probably exceed 120 households", "CSES' s" (a stray space
+after a curly apostrophe in the source), and the missing period after "in the
+household" -- are *in the source* and are reproduced as printed.  The DDI PDF
+renders =fi=/=ff= as ligature codepoints; these are written as plain ASCII here.
+
 * Known issues
 - Makefile :: FIXED (2026-06-08).  The generic =%.parquet= rule
   previously referenced =malawi.py= (copy-paste error from Malawi); it

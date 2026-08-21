@@ -17,7 +17,7 @@ import pandas as pd
 
 # Canonical ordinal vocabulary (categorical_mapping/canonical_education_labels.org).
 CANONICAL_EDUCATION_LABELS = frozenset({
-    "None", "Informal", "Pre-primary",
+    "No education", "Informal", "Pre-primary",
     "Primary incomplete", "Primary complete",
     "Lower secondary", "Lower secondary complete",
     "Upper secondary", "Upper secondary complete",

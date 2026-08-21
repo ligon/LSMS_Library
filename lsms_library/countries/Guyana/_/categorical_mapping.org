@@ -55,7 +55,7 @@ Level rationale:
 | 12.0           | Upper secondary          |
 | 13.0           | Upper secondary complete |
 | 14.0           | Unknown                  |
-| 15.0           | None                     |
+| 15.0           | No education             |
 | 17.0           | Unknown                  |
 
 * Housing (Roof) -- canonical harmonization (GH #170)

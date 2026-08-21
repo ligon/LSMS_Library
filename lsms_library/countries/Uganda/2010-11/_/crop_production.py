@@ -2,9 +2,11 @@
 """crop_production for Uganda UNPS 2010-11 (GAP 1 item-level build).
 
 Reads AGSEC5A (season 1), AGSEC5B (season 2) and AGSEC4A (intercrop
-flag) via get_dataframe and emits a canonical (t,i,plot,j,u,season)
+flag) via get_dataframe and emits a canonical (t,i,plot,j,u,condition,season)
 parquet of REPORTED harvest values.  Harvest unit is a5aq6c (the column
-whose labels decode to Kg/Sack/Bunch); a5aq6b is the Fresh/Dry condition.
+whose labels decode to Kg/Sack/Bunch); the harvest CONDITION is a5aq6b,
+now an index level in its own right (GH #323/#637) so fresh and dry
+records for one plot-crop no longer collide and get summed.
 See uganda.CROP_COLMAPS for the per-wave column map.
 """
 import sys

@@ -71,6 +71,520 @@ There is no rotating panel or refreshment sample in the NLSS series.
 - NLSS II: https://microdata.worldbank.org/index.php/catalog/74
 - NLSS III: https://microdata.worldbank.org/index.php/catalog/1000
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered for GH #601 (population / universe statements).  This
+section records *what the survey documentation claims* about the population
+each NLSS round was meant to represent, and what it says was left out.  It
+extends --- it does not replace --- the "Sampling Design" section above,
+which records the *mechanics* (PSU/strata/weight variables).  Read the two
+together; where they disagree, see "Caveats and one contradiction with the
+existing text" at the end.
+
+Method and limits of this record:
+
+- Nothing here is inferred from microdata.  It could not be: as recorded
+  under "Data Acquisition Status" above, no Nepal =.dta= is in this
+  repository (NSO-hosted, not WB).  Every claim below is a quotation from a
+  document with a locator, or an explicit statement that no such quotation
+  was found.
+- Quotes are transcribed from the PDF text layer.  Runs of whitespace are
+  normalised to single spaces; wording, punctuation, spelling and
+  capitalisation are unaltered, with =[sic]= marking oddities in the source.
+- All three sources are in English; no translation is involved.
+- World Bank catalog fields were re-read live on 2026-07-21 via
+  =https://microdata.worldbank.org/index.php/api/catalog/{id}?id_format=id=
+  (=dataset.metadata.study_desc.study_info=).
+
+Summary:
+
+| Wave    | Catalog | Universe statement?      | Lives in                    | Stated exclusions            | Sub-samples inside the wave     |
+|---------+---------+--------------------------+-----------------------------+------------------------------+---------------------------------|
+| 1995-96 |    2301 | yes, one sentence        | *WB catalog only*           | none stated                  | Far-Western oversample          |
+| 2003-04 |      74 | *none found*             | ---                         | none stated (see gap line)   | cross-section + NLSS-I panel    |
+| 2010-11 |    1000 | yes, full =Coverage= sec | local report *and* catalog  | diplomatic + institutional   | cross-section + NLSS-I/II panel |
+
+** 1995-96 (NLSS I) --- universe exists only in World Bank catalog metadata
+
+*** Declared universe (verbatim)
+
+#+begin_quote
+The survey covered all modified de jure household members (usual residents).
+#+end_quote
+
+Citation: World Bank Microdata Library catalog id *2301*, Study Description >
+Scope > =Universe=.  Re-verified 2026-07-21 against the catalog JSON API
+(=study_info.universe=), character for character.
+
+*** Where the statement lives --- and does not
+
+This statement exists *only in World Bank catalog metadata*.  It is not in
+any document held in this repository.  Searched, with no universe/target
+population sentence found:
+
+- =1995-96/Documentation/SOURCE.org= --- bare catalog URL plus provenance
+  keywords only;
+- =1995-96/Documentation/ddi-documentation-english_microdata-2301.pdf= ---
+  contains only Sampling / Questionnaires / Data Collection; it has no
+  Universe, Coverage or Scope section;
+- =1995-96/Documentation/Nepal Living Standards Survey 1995-96 Report Vol
+  1.pdf= --- Chapter 1 (Methodology, Sample Design, pp. 1-3) read in full.
+  A full-text search of the volume for =de jure=, =de facto=, =usual
+  resident=, =usual place=, =universe=, =diplomatic=, =homeless= and =nomad=
+  returns *zero hits* for every one of those terms.
+
+Consequence for the library: for this wave the universe is a *moving
+target* --- it is whatever the WB catalog record says today, and the repo
+holds no copy of the claim.  It is also a NADA metadata slot rather than a
+sentence the Central Bureau of Statistics wrote in its own report.
+
+Boilerplate check (it is *not* the boilerplate): the single most repeated
+universe sentence in the cross-country corpus --- "The survey covered all de
+jure households excluding prisons, hospitals, military barracks, and school
+dormitories.", which appears verbatim in 15 waves and is WB NADA template
+text --- is *not* what Nepal 1995-96 carries.  Nepal's wording ("all
+*modified* de jure household members (usual residents)") is distinct and
+appears in this corpus only here.  So it is catalog-sourced but not
+template-sourced.  Note in passing that "de jure" is therefore used in two
+different senses across the corpus.
+
+*** Exclusions --- none stated (recorded as a gap)
+
+No statement of excluded populations (institutional, collective, diplomatic,
+nomadic, homeless) was found for this wave, in either the catalog record or
+the local report --- see the search list above, which included explicit
+greps for =institutional=, =diplomatic=, =homeless= and =nomad=.  Absence of
+a statement is recorded here as absence of a statement; it must not be read
+as an assertion that no population was excluded, and NLSS-III's exclusions
+(below) must not be back-propagated to this wave.
+
+*** Districts not represented --- a frame outcome, not a declared exclusion
+
+#+begin_quote
+The sample frame considered all the 75 districts in the country, and indeed
+73 of them were represented in the sample.[fn1]
+#+end_quote
+
+#+begin_quote
+[fn1] The two districts not selected in the sample due to their low
+population were Rasuwa and Mustang.
+#+end_quote
+
+Citation: Report Vol 1, Chapter 1, "Sample Design", printed pp. 2-3;
+footnote 1 at the foot of p. 3.
+
+Read this correctly: Rasuwa and Mustang were in the frame and simply were
+not drawn (low population).  This is a *selection outcome*, not a declared
+carve-out from the universe.  It is recorded here because a reader looking
+for district coverage will otherwise be surprised by it.
+
+*** Oversample: the Far-Western Development Region
+
+#+begin_quote
+[fn2] After the selection of the wards, it was decided to interview 16
+instead of 12 households in each selected ward in the Far-Western
+Development Region to increase the number of observations for that region.
+#+end_quote
+
+Citation: Report Vol 1, Chapter 1, "Sample Design", footnote 2 at the foot
+of printed p. 3.
+
+This is a genuine within-wave oversample, and it *breaks the self-weighting
+claim made two paragraphs earlier in the same section*:
+
+#+begin_quote
+It simplified the analysis by providing a self-weighted sample.
+#+end_quote
+
+(Report Vol 1, p. 3.)  Anyone pooling or averaging NLSS-I households must
+weight; the design is self-weighting *within* stratum but the Far-West wards
+carry 16 rather than 12 households.
+
+Sample design, for context only (not the universe): 3,388 households in 275
+wards; four strata --- Mountains (424 households), Hills (Urban) (604),
+Hills (Rural) (1,136), Terai (1,224); two-stage, wards drawn PPS on number
+of households, then a fixed number of households with equal probability.
+The catalog's =geog_coverage= field reads "National coverage" plus those
+four strata.
+
+** 2003-04 (NLSS II) --- NO universe statement found (checked gap)
+
+*** Gap line
+
+*No universe / target-population statement was found for this wave, in any
+source.*  This is a checked gap, not an unsearched one.  Searched:
+
+- =2003-04/Documentation/SOURCE.org= (and the older duplicate =Source.org=)
+  --- bare catalog URL plus provenance keywords;
+- =2003-04/Documentation/ddi-documentation-english_microdata-74.pdf= ---
+  Sampling / Questionnaires / Data Collection only; no Universe, Coverage or
+  Scope section;
+- =2003-04/Documentation/NLSSIIReportVol1.pdf= --- CHAPTER I: METHODOLOGY
+  read end to end (chapter preamble and Table 1.0, 1.1 Background, 1.2
+  Objectives, 1.3 Survey methodology, 1.3.1 Sample design, 1.3.2 Sample
+  frame, 1.3.3 Stratification, 1.5 Survey difficulties, 1.7 Survey
+  limitations, 1.8 Contents; printed pp. 1-17).  There is no "Coverage" and
+  no "Statistical Unit" section of the kind NLSS-III has.  Full-text search
+  of the volume for =universe=, =Universe=, =de jure=, =usual place=,
+  =diplomatic= and =institutional= returns *zero hits for every term*;
+- =2003-04/Documentation/NLSSIIReportVol2.pdf= and
+  =NepalPovertyTrendsforPovertyAssessment.pdf= --- same search, zero hits;
+- =2003-04/Documentation/nlss2_hh_questionnaire.pdf=;
+- WB catalog id *74*: re-verified live 2026-07-21 --- =study_info= carries
+  the keys =abstract=, =coll_dates=, =nation=, =geog_coverage=,
+  =analysis_unit=, =data_kind=, =notes=.  *The =universe= key is absent
+  altogether*, unlike ids 2301 and 1000, which both have it.
+
+Not opened: =nlss2_rural.pdf=, =nlss2_urban.pdf= (community questionnaires).
+
+*Do not import NLSS-III's universe wording into this wave.*  It was not
+stated here, and the institutional/diplomatic exclusions NLSS-III declares
+are not attested for NLSS-II.
+
+*** Sub-samples inside the wave: a cross-section AND a panel
+
+#+begin_quote
+The sampling design of the NLSS II included two components. The first one
+was nationally representative random cross-section sample of 4008 households
+from six explicit strata of the country. The second one was panel sample of
+1232 households drawn from those households interviewed in NLSS I.
+#+end_quote
+
+Citation: NLSSIIReportVol1.pdf, Section 1.3.1 "Sample design", printed p. 3.
+
+#+begin_quote
+The NLSS II panel sample is composed of 100 of the 275 PSUs visited by the
+NLSS I in 1995/96. The panel PSUs were selected with equal probability
+within each of the four strata defined by NLSS I, as follows: 12 (out of 33)
+in the Mountains, 18 (out of 50) in the Urban Hills, 33 (out of 92) in the
+Rural Hills and 37 (out of 100) in the Tarai.
+#+end_quote
+
+Citation: same file, Section 1.3.3 "Stratification", printed pp. 3-4.
+
+What was actually enumerated, and the panel's composition:
+
+#+begin_quote
+NLSS II enumerated 3912 households from 326 Primary Sampling Units (PSU) in
+the cross-sectional sample. In addition, this survey interviewed 1160
+households from 95 panel PSUs (962 out of 1160 households were panel
+households that were also interviewed in 1995/96). This report is based on
+results from cross-sectional household data.
+#+end_quote
+
+#+begin_quote
+*Only 962 households were tracked from NLSS I. Remaining 198 households were
+new households from panel PSUs.
+#+end_quote
+
+Citation: NLSSIIReportVol1.pdf, CHAPTER I preamble and the footnote to Table
+1.0 "Summary statistics", printed p. 1.
+
+*This is the thing a pooling user needs to know*: one library wave holds two
+differently-drawn samples.  The cross-section is the nationally
+representative draw; the panel PSUs are a re-visit of NLSS-I clusters, and
+198 of the 1,160 panel households are *new* households in those clusters,
+not tracked NLSS-I households.  The CBS report itself tabulates the
+cross-section only.
+
+*** Non-enumeration during the conflict --- implementation, NOT a design exclusion
+
+#+begin_quote
+It should be noted that 96 out of 4008 households (8 out of 334 PSUs), mostly
+from the Far Western development region, were not enumerated as a result of
+ongoing conflict in those areas.
+#+end_quote
+
+Citation: NLSSIIReportVol1.pdf, CHAPTER I preamble, printed p. 1
+(immediately above Table 1.0).
+
+#+begin_quote
+As already noted above, the survey was unable to reach/interview all the
+sampled PSUs and their households. With the consultation of the design
+experts it was decided not to replace the affected PSUs for enumeration and
+ultimately they were dropped.
+#+end_quote
+
+Citation: same file, Section 1.7 "Survey limitations", printed p. 16.
+
+*Warning, and it matters.*  This is an *implementation outcome* --- PSUs
+that could not be reached during the Maoist conflict --- and *not* a
+declared exclusion of the Far-Western region from the survey's scope.  The
+region was in the frame and in the sample; some of its PSUs went
+unenumerated and were dropped rather than replaced.  Do not record this as
+"Far-Western Nepal is out of universe".  It does, however, bear on what the
+realised sample represents, since the dropped PSUs were not replaced.
+
+Supporting detail, same volume:
+
+#+begin_quote
+Out of a total of 434 PSUs, 407 PSUs were completed in the first attempt, 14
+PSUs were enumerated in the second attempt but 13 could not be enumerated at
+all.
+#+end_quote
+
+#+begin_quote
+Some conflict-affected areas especially in the rural areas posed a great
+challenge for the CBS to conduct such an integrated household survey. The
+interviewers were on high alert in these areas, kept themselves in a very
+low profile, and in many instances were assisted by the local people. 12
+PSUs could not be enumerated even after repeated attempts.
+#+end_quote
+
+#+begin_quote
+Altogether 13[fn3] rural enumeration areas (PSUs) could not be interviewed
+constituting 8 from the cross-section and 5 from the panel sample. The
+missing PSUs include 2 from Central Hills, 2 from Mid Western Mountains, 2
+from Far Western Mountains, 6 from Far Western Hills and 1 from Far Western
+Tarai.
+#+end_quote
+
+#+begin_quote
+[fn3] One of the panel PSUs from the Far Western Tarai vanished completely
+due to the merging of enumeration area to the Royal Shukla Phanta Wildlife
+Reserve by the government.
+#+end_quote
+
+Citations: Section 1.4.4 "Data collection" (p. 15), Section 1.5 "Survey
+difficulties" and Table 1.5 "Affected enumeration areas (PSUs) by sample,
+urban/rural, zone and region" (p. 15), and the paragraph following that
+table with its footnote 3 (p. 16).
+
+Reconciling the counts, since the report is not internally consistent: 13 =
+8 cross-section + 5 panel, and Table 1.5 lists exactly those 13 enumeration
+areas by name; the preamble's "8 out of 334 PSUs" counts the cross-section
+only, consistent with the report being cross-section based.  Section 1.5's
+"12 PSUs" disagrees with the "13" given twice elsewhere; quoted as printed,
+unresolved.  (The "13[fn3]" above renders in the PDF text layer as "133" ---
+the trailing 3 is the superscript footnote marker, not a digit.)  The DDI
+PDF for catalog 74 states the same facts with different arithmetic again
+("Five PSUs out of 434 PSUs for the survey could not be carried due to
+unavoidable reasons. Thus the response rate is 98.5%.").
+
+Sample design, for context only: cross-section 4,008 households = 12
+households in each of 334 PSUs, drawn PPS on number of households from six
+explicit strata --- Mountains (408 households in 34 PSUs), Kathmandu valley
+urban area (408 in 34), Other Urban areas in the Hills (336 in 28), Rural
+Hills (1,224 in 102), Urban Tarai (408 in 34), Rural Tarai (1,224 in 102);
+frame = 36,067 enumeration areas from the 2001 Population Census.  Catalog
+=geog_coverage= = "National / Domains: Urban/rural; ecological zones
+(Mountains, Kathmandu Valley (urban), Hills (urban), Hills (rural), Tarai
+(urban), Tarai (rural))."
+
+** 2010-11 (NLSS III) --- universe stated in the CBS report itself
+
+*** Declared universe (verbatim)
+
+Section 1.5 "Coverage" opens:
+
+#+begin_quote
+The survey in principle covers the whole country, including both rural and
+urban areas. A brief description of the geographical and administrative
+division of the country follows. The country is divided into 75
+administrative districts. These 75 districts are grouped into three
+ecological belts running from north to south - the mountains, the hills and
+the Tarai. Each ecological belt is further divided into five development
+regions - eastern, central, western, mid-western and far-western region.
+Thus 15 eco-development regions (or inter-regions) are formed by the cross
+combination of three ecological belts and five development regions (Box
+1.1).
+#+end_quote
+
+and closes:
+
+#+begin_quote
+All households in the country were considered eligible for selection in the
+survey. The survey, however, excluded the households of diplomatic missions.
+The institutional households (like people living in schools hostels [sic],
+prisons, army camps and hospitals) were also excluded from the survey. The
+household members were determined on the basis of the usual place of their
+residence. Foreign nationals whose usual place of residence is within the
+country were included in the survey.
+#+end_quote
+
+Citation: =2010-11/Documentation/Statistical_Report_Vol1.pdf= (Nepal Living
+Standards Survey 2010/11, Statistical Report Volume One, CBS), Chapter I,
+Section 1.5 "Coverage", printed p. 5.  These are the first and last
+paragraphs of the section, quoted whole; nothing has been elided from within
+either.  "schools hostels" is as printed.
+
+The statistical unit, from the immediately preceding section:
+
+#+begin_quote
+The statistical unit or the enumeration unit of a survey is the basic entity
+for which the required data items are gathered. NLSS-III is basically a
+household survey and the enumeration unit of the survey is the household.
+The definition of a household for the survey is primarily adopted from the
+guidelines laid down by the United Nations in its "Principles and
+Recommendations for Population and Housing Censuses, Rev 2" (UN, 2008).
+#+end_quote
+
+Citation: same file, Section 1.4 "Statistical Unit", printed p. 5.
+
+*** Exclusions (stated, by design)
+
+- *Households of diplomatic missions* --- excluded.
+- *Institutional households* --- "(like people living in schools hostels
+  [sic], prisons, army camps and hospitals)" --- excluded.
+- *Included, explicitly*: foreign nationals whose usual place of residence
+  is within Nepal.
+
+No geographic region is excluded by design, and no "for security reasons"
+carve-out appears; unlike NLSS-II, no conflict-related non-enumeration is
+reported for this wave.
+
+*** Where the statement lives
+
+*Both* locally and in the catalog --- this is the one Nepal wave the repo
+actually holds the claim for.  The same text is the =Universe= field of WB
+catalog id *1000*.  Precisely: the catalog field reproduces the *closing
+paragraph* verbatim ("All households in the country were considered eligible
+... were included in the survey.") and omits the opening "The survey in
+principle covers the whole country ..." sentence and the geography
+description.  Re-verified live 2026-07-21.
+
+*** Districts not selected --- again a frame outcome, not a declared exclusion
+
+Box 1.1 ("Distribution of sample districts by ecological belt and
+development region", printed p. 6) marks districts with these notes,
+verbatim:
+
+#+begin_quote
+Note: [a] District not selected in the survey [b] District not selected only
+in the cross section sample [c] District not selected only in the panel
+sample
+#+end_quote
+
+(superscript letters rendered in brackets).  Carrying =[a]= --- not selected
+in the survey at all --- are *Mustang (42), Dolpa (62) and Humla (66)*.
+Manang (41) carries =[b]= (not in the cross-section).  A long list carries
+=[c]= (not in the panel).  Mustang is thus absent from NLSS-I and NLSS-III
+alike, for the same low-population reason in NLSS-I's case.  As before: a
+selection outcome, *not* a stated exclusion from the universe --- Section
+1.5 says all households in the country were eligible.
+
+*** Sub-samples inside the wave: two independent samples
+
+#+begin_quote
+For the NLSS-III, two independent samples were selected: the first was a
+cross sectional sample and the second was a panel. The panel sample
+consisted of PSUs and households previously enumerated in one or both of the
+past two rounds of the survey.
+#+end_quote
+
+Citation: Section 1.7.3 "Sample Design", printed p. 7.
+
+#+begin_quote
+The panel sample of the NLSS-III is composed of all households visited by
+the NLSS-II in 100 of its primary sampling units (PSU). Fifty of them were
+taken from the cross-sectional component of the NLSS-II, and the remaining
+fifty from its panel component. In other words, one half of the NLSS-III
+panel households were households visited for the first time during the
+NLSS-II, whereas the other half were the households visited during both the
+NLSS-I and the NLSS-II.
+#+end_quote
+
+Citation: Section 1.7.5 "Panel Sample", printed p. 9.
+
+#+begin_quote
+The survey enumerated 5988 sample households from 499 primary sampling units
+(PSUs) from the cross section sample. As regards to panel sample, from 100
+PSUs 1032 households were tracked and enumerated (out of which 513
+households were the households enumerated in the NLSS-II and the rest were
+the households enumerated in both of NLSS-I & II). Thus, in total 7020
+households were enumerated in the survey.
+#+end_quote
+
+Citation: Section 1.7.7 "Enumeration Status", printed p. 10.
+
+So the 2010-11 library wave, like 2003-04, is *one wave holding two
+samples*: a 6,000-household national cross-section (500 PSUs) and a
+1,200-household panel re-visit (100 PSUs), enumerated as 5,988 + 1,032 =
+7,020.  Pooling them without regard to which sample a household came from
+mixes a fresh national draw with a re-visit of clusters last seen in 1995-96
+and 2003-04.
+
+Sample design, for context only: the cross-section is a sub-sample of the
+2008 NLFS-II design --- 500 of NLFS-II's 800 PSUs, the NLFS-II's six strata
+regrouped into *14 explicit strata* for NLSS-III, 12 households per PSU by
+equal probability, plus "An additional 6 households were selected in each
+PSU, to be used as replacement household for non-response among the 12
+originally selected households" (Section 1.7.4, p. 8).
+
+*** Universe vs. what the estimates are claimed to support
+
+The declared universe is national ("the whole country"), but the report
+declines to claim estimates at the 14-stratum level:
+
+#+begin_quote
+The original idea was to provide an estimate for each of 14 strata formed
+for selecting the PSUs. However, it was felt that the number of sample
+households in some of these strata was insufficient for the required
+precision of the estimate. Based on experience and statistical theory, it is
+estimated that the sample can provide desegregated [sic] estimates for the
+following 12 areas (called the analytic domains): [Mountains; Urban areas of
+the Kathmandu valley; Other urban areas of the hills; Eastern rural hills;
+Central rural hills; Western rural hills; Mid-western and far-western rural
+hills; Urban areas of the Tarai; Eastern rural Tarai; Central rural Tarai;
+Western rural Tarai; Mid-western and far-western rural Tarai]
+#+end_quote
+
+Citation: Section 1.10 "Analytic Domains", printed p. 18.  The 12 domains
+are a list in the source, inlined here in brackets.
+
+That is the universe/represented-estimates split for this wave, in the
+survey's own words: national universe, 14 sampling strata, but only 12
+domains the CBS is willing to publish disaggregated estimates for
+(mid-western and far-western hills are pooled, and mid-western and
+far-western Tarai are pooled).
+
+** Caveats and one contradiction with the existing text
+
+1. *Contradiction with "Sampling Design > Weight types" above.*  That
+   section currently states:
+
+   #+begin_quote
+   There is no rotating panel or refreshment sample in the NLSS series.
+   #+end_quote
+
+   Narrowly, "rotating" and "refreshment" are the right words to deny.  But
+   as written the sentence reads as "the NLSS series has no panel", and the
+   documentation says otherwise for two of the three waves: NLSS-II drew a
+   panel sample of 1,232 households from 100 of NLSS-I's 275 PSUs (Report
+   Vol 1 §1.3.1, §1.3.3), and NLSS-III drew a panel of 100 PSUs / ~1,200
+   households as one of "two independent samples" (Statistical Report Vol 1
+   §1.7.3, §1.7.5), enumerating 1,032 of them.  This bears directly on the
+   adjacent decision recorded there --- that "both =weight= and
+   =panel_weight= map to =wt_hh=" --- because in NLSS-II and NLSS-III the
+   panel households are a *separately drawn sample*, not the same households
+   re-weighted.  Neither statement is settled here (no microdata is
+   available to check what =wt_hh= actually covers); flagged so whoever
+   acquires the data resolves it rather than inheriting the claim.  Also
+   note the NLSS-II panel is not purely a re-visit: 198 of its 1,160
+   enumerated households were *new* households in panel PSUs.
+
+2. *Catalog-id error in "Data Acquisition Status" above.*  That section
+   lists "2003-04 (NLSS II) --- WB catalog 1000" and "2010-11 (NLSS III) ---
+   WB catalog (check SOURCE.org)".  The "BID references" table lower in the
+   same file is correct and the =SOURCE.org= files agree with it: NLSS I =
+   *2301*, NLSS II = *74*, NLSS III = *1000*.  Catalog 1000 is NLSS-III, not
+   NLSS-II.  Worth correcting when that section is next touched --- the ids
+   matter here because the presence or absence of the catalog =Universe=
+   field differs by id.
+
+3. *Do not back-propagate NLSS-III's exclusions.*  The diplomatic-mission
+   and institutional-household exclusions are attested for 2010-11 only.
+   1995-96 states a universe with no exclusions; 2003-04 states no universe
+   at all.  Whatever GH #603 decides for representation, these are three
+   different evidentiary situations and should not be flattened into one.
+
+4. *The three waves' universes are not stated in commensurable terms.*
+   1995-96's is about *household members* ("all modified de jure household
+   members (usual residents)"); 2010-11's is about *households* ("All
+   households in the country were considered eligible for selection").
+   2003-04 has neither.  A cross-wave Nepal universe does not exist in the
+   documentation; only three separate claims, one of them empty.
+
 * Features configured (pending data)
 ** sample
 ** household_roster

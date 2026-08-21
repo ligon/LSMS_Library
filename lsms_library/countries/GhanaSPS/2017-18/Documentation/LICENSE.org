@@ -1,0 +1,61 @@
+LICENSE
+
+* Scope: this wave holds files from TWO sources under DIFFERENT terms
+
+=GhanaSPS/2017-18/Data/= is a *deliberately mixed-vintage* directory as of
+2026-08-19.  Do not read a single licence over the whole wave.
+
+** The 10 files acquired from Harvard Dataverse -- CC0 1.0
+
+https://doi.org/10.7910/DVN/E5QP0F  (version 1.2, published 2022-11-03)
+
+License: *CC0 1.0 Universal* -- http://creativecommons.org/publicdomain/zero/1.0
+as declared in the dataset's own metadata (=license.name= = "CC0 1.0",
+=rightsIdentifier= = "CC0-1.0"), retrieved 2026-08-19.
+
+Files (all from the distribution's =Ghana_Panel_Survey/Data/Wave 3= folder,
+downloaded in their original Stata-14 form via
+=api/access/datafile/{id}?format=original=):
+
+- =01giv_education_beliefs_pre.dta=
+- =03bvi_mobile_money_accounts.dta=
+- =03bvi_mobile_money_agents.dta=
+- =03bvi_mobile_money_awareness.dta=
+- =07c_ids_module.dta=
+- =07c_ids_roster.dta=
+- =09b_education_beliefs_post.dta=
+- =10avii_financial_health.dta=
+- =commtype.dta=
+- =open_ended.dta=
+
+CC0 places no restriction on redistribution, so these are safe to hold and to
+push to the shared DVC remote.
+
+** The 100 pre-existing files -- terms NOT RECORDED
+
+The files this repository already held for wave 3 did *not* come from the
+Dataverse distribution and their licence is *unknown*.  =SOURCE.org= records
+=PROVENANCE_SOURCE: external= with no source URL.  No licence document for
+wave 3 exists in this repository other than this file.
+
+*This is not a statement that they are unrestricted.*  It is a statement that
+nobody recorded the terms.  Two facts make that worth taking seriously:
+
+1. The wave-1 =LICENSE.org= (the only other GhanaSPS licence in the repo)
+   carries the clause: "Users who download the data may not pass the data to
+   third parties."  If wave 3 came through a comparable channel, a similar
+   restriction may apply.
+2. *30 of those files carry variables the published release removed.*
+   Measured 2026-08-19 against Dataverse v1.2: row counts are identical in
+   every case, but our copies carry extra columns and never fewer.  The
+   stripped variables are consistently disclosure-sensitive -- free-text
+   ="...other"= responses, sub-district geography (=d_code=, =district=,
+   =comm_code=, =*_community=, =plotlocation_comm=, =schoolcommunity=) and
+   consent/admin flags (=consented=, =main_consent=, =audio_consent=,
+   =checkpoint1..3=).  In other words our copies are *pre-anonymization*
+   relative to what the producers chose to publish.
+
+Anyone redistributing this wave, or deriving a public product from it, should
+resolve the terms of the 100 pre-existing files first.  See
+=slurm_logs/ghana_audit/FINDINGS_ghanasps_provenance.org= for the full
+file-by-file evidence.

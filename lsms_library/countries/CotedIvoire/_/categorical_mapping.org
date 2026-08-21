@@ -428,7 +428,7 @@
 #+name: harmonize_education
 | Original Label  | Preferred Label              |
 |-----------------+------------------------------|
-| Aucun           | None                         |
+| Aucun           | No education                 |
 | Maternelle      | Pre-primary                  |
 | Postsecondaire  | Tertiary certificate/diploma |
 | Primaire        | Primary complete             |
@@ -437,8 +437,8 @@
 | Second. tech. 1 | Vocational/Technical         |
 | Second. tech. 2 | Vocational/Technical         |
 | Superieur       | Bachelor                     |
-| NUL             | None                         |
-| B               | None                         |
+| NUL             | No education                 |
+| B               | No education                 |
 | JE              | Pre-primary                  |
 | CP1             | Primary incomplete           |
 | CP2             | Primary incomplete           |

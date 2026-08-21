@@ -101,10 +101,16 @@ cluster_features:
             Longitude: LON_DD_MOD
     merge_on:
         - v
-    # `left` is load-bearing: the offsets file has ONE trailing row with a
-    # null grappe (and null coordinates).  Under the default `outer` that row
-    # arrives as a phantom cluster with a null v; `left` drops it, since
-    # df_main is authoritative for which clusters exist.
+    # `left` is DEFENSIVE, not load-bearing -- corrected 2026-07-22 after the
+    # original claim here was measured and found false.  The offsets file does
+    # have one trailing row with a null grappe and null coordinates, but under
+    # the default `outer` that row does NOT survive as a phantom cluster: the
+    # (t, v) groupby drops it.  Built with and without `merge_how: left` the
+    # table is md5-identical (1,599 rows; 2011-12 at 270 clusters, 0 null v).
+    # Keep `left` anyway -- df_main is authoritative for which clusters exist,
+    # so it states the intent and would matter if the null-key handling
+    # downstream ever changed -- but do not cite it as the reason the null row
+    # is absent.
     merge_how: left
     final_index:
         - t

@@ -1,5 +1,319 @@
 #+TITLE: Kazakhstan — country notes & known data issues
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence assembled for GH #601 (the population record); see
+=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= for the full cross-country
+sweep.  This section records only what the *documentation claims*.  Nothing here
+is inferred from the =.dta= files, and nothing here proposes a schema (that is
+GH #603's business).
+
+Kazakhstan ships exactly one wave, =1996/=.  Everything below is that wave.
+
+** 1996 -- the declared universe
+
+The survey documentation *never uses the words "universe" or "target
+population"*, and the WB DDI's only sampling content is a sample size.  What the
+final report does say, verbatim:
+
+- Source :: =1996/Documentation/finrep1.pdf= -- "Living Standards Measurement
+     Survey 1996: Final Report (Part 1)", GOSKOMSTAT and SIGMA Institute Berlin,
+     Dec. 1996.  The PDF is an image-only scan with no text layer; page images
+     were rendered and read visually (see the verification note below).
+- Confidence :: medium (the statements are coverage/aim statements, not a
+     formally labelled universe definition).
+
+#+begin_quote
+[finrep1.pdf, PREFACE, p. II (PDF page 3)]
+
+"The survey "Living Standards Measurement Survey" (LSMS) carried out by
+"Sigma-Institute" of Berlin under the World Bank Technical Assistance Project
+named "Social Protection" was a multipurpose probability sample which covered
+2000 households of the Republic of Kazakstan."
+#+end_quote
+
+#+begin_quote
+[finrep1.pdf, sec. 1.1 "Verification of the status of living standards", p. IV
+(PDF page 5)]
+
+"The aim of this survey was to select objective, representative and as far as
+possible, total information, which would enable users to draw up a picture of
+the actual status of living standards of the population of the Republic of
+Kazakstan."
+#+end_quote
+
+#+begin_quote
+[finrep1.pdf, sec. 2 "Sampling", p. IV (PDF page 5)]
+
+"A Sample designed for LSMS had to assist to:
+
+- reflect the realistic picture of social and territorial distribution of the population in the Republic
+  of Kazakstan (representativeness); and
+- compare the outcome of LSMS in Kazakstan with the results of LSMS in other countries, which
+  were performed based on possible sample principals (comparability)."
+#+end_quote
+
+The nearest thing to a definition of the units surveyed:
+
+#+begin_quote
+[finrep1.pdf, sec. 3.1, under heading "3. Context of the survey", p. XV (PDF
+page 16)]
+
+"Households (h/h) are subjects of the survey (interviewing)."
+#+end_quote
+
+*The frame, which is where the coverage claim actually has teeth.*  The sample
+was built from three exhaustive administrative lists, each described as covering
+its units "without exception":
+
+#+begin_quote
+[finrep1.pdf, sec. 2, p. V (PDF page 6)]
+
+"To create a basis to design a probability sample GOSCOMSTAT and its oblast
+branches in May 1996 have delivered the most actual numerical material
+concerning population (01.01.1996). It contains the following information:
+
+- a list of all 2534 agricultural regions without exception with the measurement of their quantity (number
+  of households and number of inhabitants). This data has been received from rural administrations where
+  total registration is carried out;
+- a list of all 263 villages, small and middle-size cities without exception with the measurement of their
+  quantity (number of households and number of inhabitants). This data has been received from village
+  councils and from householding administration bodies for the cities where the total registration is carried
+  out.
+
+- a list of all 24 large cities without exception with measurement of their quantity (number of households
+  and number of inhabitants). This data has been received from householding administration bodies (e.g.
+  Technical Inventory Bureau, Householding Administrations, Cooperatives, Street Committees, Branch
+  Agencies and Dormitories)."
+#+end_quote
+
+#+begin_quote
+[finrep1.pdf, sec. 2, p. VIII (PDF page 9)]
+
+"We have thus accepted as a basis to define samples:
+
+- number of households and inhabitants in rural areas;
+- number of households and inhabitants in villages, small/middle-size cities;
+- extrapolated number of households and inhabitants in large cities."
+#+end_quote
+
+Table 2 on the same page gives the frame totals under the column header "Total
+within the Republic of Kazakhstan": approximately 16.432 399 inhabitants and
+4.708 277 households (source punctuation preserved).  So the frame is stated as
+the whole country's households, and the "national" claim in the WB catalog
+(Geographic Coverage: "National", catalog entry 2292) is at least consistent
+with the report.
+
+*Caution for a reader skimming the Preface.*  The Preface's other household
+figure is NOT this survey:
+
+#+begin_quote
+[finrep1.pdf, PREFACE, p. II (PDF page 3)]
+
+"The main resources of information concerning social and economic indicators of
+living standard of population of the Republic of Kazakstan, are 6000 households
+which represent a republican network."
+#+end_quote
+
+That 6000 is the standing official household-statistics network, contrasted with
+(not describing) the 2000-household LSMS sample.
+
+** 1996 -- exclusions: NO STATEMENT FOUND
+
+*No document in this repo excludes any population group* -- no institutional or
+collective population carve-out, no nomadic-household carve-out, no dropped
+oblast, no security exclusion.  This is recorded as a *gap*, not as a claim that
+no exclusions existed.
+
+What was searched (so the gap is falsifiable):
+
+- =1996/Documentation/finrep1.pdf=, the whole methodological front matter,
+  pp. I-XVII (PDF pages 1-19): Preface, Acknowledgements, sec. 1 Aims, sec. 2
+  Sampling (incl. 2.1 large cities, 2.2 rural, 2.3 villages and small/middle-size
+  cities), sec. 3 Context of the survey, sec. 4 Training, sec. 5 Data Collection
+  and Entry.
+- =1996/Documentation/ddi-documentation-english_microdata-2292.pdf= in full: it
+  has *no* universe or coverage field at all; its entire "Sampling / Sampling
+  Procedure" section reads "Sample size is 1,996 households", and
+  "Questionnaires", "Data Processing" and "Data Appraisal" each read "No content
+  available".
+- =1996/Documentation/SOURCE.org= and =LICENSE.org=.
+- The WB catalog page https://microdata.worldbank.org/index.php/catalog/2292
+  (Geographic Coverage: "National"; no universe statement).  The JSON API
+  endpoint returned HTTP 400.
+- NOT searched exhaustively :: =finrep2.pdf=, =finrep3.pdf= (Parts 2-3 of the
+     same report -- findings, not methodology), and the questionnaire scans
+     =hhq01.pdf=, =hhq02.pdf=, =KAZ02.pdf=.  These are image-only scans with no
+     text layer and no OCR was available; a cover page or instruction could in
+     principle carry coverage language this sweep did not see.
+
+*Three near-misses, quoted so nobody later promotes them into an exclusion.*
+None of these is an exclusion statement:
+
+#+begin_quote
+[finrep1.pdf, sec. 2, p. V (PDF page 6) -- a frame-QUALITY caveat, not an
+exclusion]
+
+"b) Quality of the data which had been received from some cities was not fully
+acceptable (Almaty, Akmola, Ecibastuz, Zhambyl, Kostanai and Arcalyk). It was
+noted that underregistration was up to 25% in those cities. It was impossible
+therefore to find out the precise number of households, and as a result
+extrapolation was performed."
+#+end_quote
+
+#+begin_quote
+[finrep1.pdf, p. VI (PDF page 7) -- a precision caveat, not an exclusion]
+
+"Whilst an inaccuracy up to 5 per cent /migration, underegistration/ is assumed.
+See Table 1."
+#+end_quote
+
+#+begin_quote
+[finrep1.pdf, sec. 5.2, p. XVII (PDF page 18) -- an instrument-level respondent
+restriction, not a sample-universe exclusion]
+
+"Questions from the Individual Questionnaire were discussed with all grown up
+members of a family (over 16 years old). An individual who was the most familiar
+with specific aspect of child life answered on their behalf (usually mother)."
+#+end_quote
+
+Note in passing that the large-city frame's listed sources explicitly include
+"Dormitories" (p. V, quoted above), i.e. the report gives no sign of excluding
+collective dwellings from the frame -- but it makes no positive statement about
+them either, so this is context, not evidence of inclusion.
+
+** 1996 -- oversamples and sub-samples
+
+*No oversample of a named sub-population is declared* -- no Roma/minority
+booster, no poverty-register sample, no module administered to a sub-sample of
+households, no cross-section-plus-panel wave.  Kazakhstan is a single
+cross-section.  What a pooling user does need to know is that specialization
+lives in the *stratum allocation and the within-city selection*:
+
+- Three design strata, allocated by household share, not by population share ::
+     Table 2 (p. VIII) gives portions of households 45,23% large cities /
+     18,75% villages, middle-size and small cities / 36,02% rural regions,
+     realized as 90 / 38 / 72 PSUs out of 200, with 2000 households at roughly
+     10 interviews per PSU (p. VIII: "Since we had to interview 2000 households
+     using group sample (10 interviews net in one area of interview), and we had
+     to select 200 probability selection units (PSU). See Table 2.").
+- All 24 large cities are self-representing ::
+     #+begin_quote
+     [finrep1.pdf, sec. 2.1 "Selection in large cities", p. IX (PDF page 10)]
+
+     "Cities of Almaty, Akmola, Karaganda, Temirtau, Ust-Kamenogorsk, Pavlodar,
+     Ekibastuz, Shymkent, Zhambyl, Aktobe, Uralsk, Kokshetau, Rudnyi, Kostanai,
+     Semipalatinsk, Petropavlovsk, Taldykorgan, Atyrau, Aktau, Kzyl-Orda,
+     Zheskazgan, Balhash, Arkalyk and Turkestan were involved in sample since
+     more 23666 households (sampling fraction) live in each of this cities."
+     #+end_quote
+     A footnote on p. V makes the criterion explicit: ""Large city" according to
+     our sample is a city which automatically will be included in a sample due to
+     the large number of households, which has to exceed selection pace."  This
+     is a *design* statement (certainty selection), not an exclusion of anything.
+- Within a large city, households were selected by DWELLING-TYPE QUOTA ::
+     This is the closest thing Kazakhstan 1996 has to an internal sub-population
+     structure, and it is worth knowing before averaging anything urban:
+     #+begin_quote
+     [finrep1.pdf, sec. 2.1, p. IX (PDF page 10)]
+
+     "Once the number of interviews in one city has been defined, per cent
+     portions of interviews in separate segments have been specified using table
+     of type of living distribution, i.e. municipal houses, cooperative houses,
+     private houses, etc."
+     #+end_quote
+     #+begin_quote
+     [finrep1.pdf, p. X (PDF page 11), worked example for Ust-Kamenogorsk]
+
+     "The following households therefore were subject to interview:
+
+     70% households in municipal houses = 35 households;
+     26% households in private houses = 13 households;
+     2,8% households in cooperative houses = 1 household;
+     1,8% households in company houses = 1 household.
+
+     These quotas have been inserted on a supervisor's list. A supervisor was
+     responsible for the distribution of interviewers to different segments."
+     #+end_quote
+     Flagged because the same report's Preface names quota sampling as a defect
+     of household statistics ("A significant fault of household statistics in
+     many countries is the application of quota method during sampling
+     selection.", p. II) while the large-city stage uses dwelling-type quotas
+     within PSUs.  Both sentences are the survey's own; the tension is theirs,
+     not an editorial reading.
+- The community instrument has its own, DIFFERENT coverage ::
+     #+begin_quote
+     [finrep1.pdf, sec. 3.1, p. XV (PDF page 16)]
+
+     "Community questionnaire was administered in all villages.
+
+     Additionally to compare rural and city community standards and different
+     ways of interactions between households and community units, we did not
+     follow standard guidelines for LSMS and administered it also in the villages
+     and those city regions, where PSU have been located."
+     #+end_quote
+     So community-level material (=cluster_features=, and the =KOMMU= file the
+     "Known data issues" section below refers to) does not have the same
+     coverage as the household instrument.
+
+** 1996 -- where the statement lives, and how solid it is
+
+- Source type :: =local-documentation=.  The statements are in a file this repo
+     ships (DVC-tracked =finrep1.pdf=), *not* only in WB catalog metadata.  This
+     wave is therefore NOT one of the 41 catalog-only waves whose population
+     record is a moving target.
+- Not WB boilerplate :: none of the quoted text is the WB NADA template sentence
+     that recurs verbatim across 15 other waves in the corpus.  This is a
+     statistical office's / contractor's own prose, in its own (sometimes
+     ungrammatical) English.
+- But the catalog holds nothing :: the DDI's universe/coverage content is
+     *absent*, not merely thin -- the only sampling text is "Sample size is
+     1,996 households".  If =finrep1.pdf= were ever lost from the repo, the
+     population record for Kazakhstan would go to zero.
+- Sample size, two numbers :: the DDI says "Sample size is 1,996 households";
+     the Preface says the sample "covered 2000 households".  2000 is the design
+     target (p. VIII), 1,996 the realized count -- consistent with the 1996
+     households noted in the =subjective_well_being= entry elsewhere in this
+     file.  Not a contradiction, but do not quote 2000 as an achieved sample.
+
+** 1996 -- universe versus what the weights represent
+
+The report documents *sampling fractions*, not weights: Table 2 (p. VIII) gives
+23 666 (large cities) and 23 545 (both other strata) as "Number of households of
+totally surveyed / Number of interviewed areas (PSU)", and pp. IX-X derive per
+city PSU and interview counts.  No weight variable is described anywhere in
+=finrep1.pdf= pp. I-XVII or in the DDI.
+
+Correspondingly, this country's =sample= table (=1996/_/data_info.yml=) supplies
+=v= and =Rural= only -- *there is no =weight= or =panel_weight= column for
+Kazakhstan 1996* (both are declared =optional= in
+=lsms_library/data_info.yml=).  A user pooling Kazakhstan with weighted
+countries is therefore combining an unweighted cross-section, drawn under an
+approximately self-weighting three-stratum design with quota allocation inside
+large cities, with weighted samples.  That is a fact about this wave's
+documentation and config, and it is the thing most likely to bite.
+
+** Verification note (2026-07-21)
+
+The quotes above were re-checked against the source rather than taken on trust.
+=finrep1.pdf= has no text layer, so its page images were extracted with
+pdfminer's =ImageWriter= and read directly.  Pages verified character-for-
+character this round: II (PDF 3), IV (PDF 5), V (PDF 6), VIII (PDF 9), IX
+(PDF 10), X (PDF 11), XV (PDF 16).  The DDI PDF's full text was extracted and
+read.  Pages VI (PDF 7) and XVII (PDF 18) are carried from the #601 sweep
+without independent re-verification and are marked as such where quoted.
+
+- Locator correction :: the #601 sweep placed the 24-large-cities sentence at
+     p. X.  It is on *p. IX* (PDF page 10), in sec. 2.1 "Selection in large
+     cities"; p. X is the within-PSU address-selection text and sec. 2.2.  The
+     wording of the quote itself checks out exactly.
+- Sic spellings are the source's :: "Kazakstan" (Preface, secs. 1-2) vs.
+     "Kazakhstan" (Table 2 header); "Ecibastuz" / "Arcalyk" (p. V) vs.
+     "Ekibastuz" / "Arkalyk" (p. IX); "underegistration" (p. VI);
+     "principals" for "principles"; "more 23666 households".  None of these are
+     transcription errors introduced here.
+- Nothing in this section was derived from a =.dta= file.
+
 * assets — durable goods (2026-06-08, #342)
 Source: =KZ96HSG_PUF.dta= block =b37=, a WIDE durable-goods roster (16 items x
 4 attributes, one column per (item, attribute)):
