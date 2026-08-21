@@ -1,0 +1,791 @@
+#+TITLE: Rural: what the sources say, what the configs do, what the API delivers
+#+DATE: 2026-08-21
+#+AUTHOR: rural-values audit (branch docs/rural-values-audit)
+
+* TL;DR
+
+Every ~Rural~-producing cell in the corpus was measured three ways: the raw
+source column (frequencies including nulls), the config mapping, and the
+value the Country API delivers on a *cold* cache.
+
+- *150 (country, wave, table) cells measured at source*; 3 could not be
+  (Nepal, no microdata in the repo).
+- *Class D (non-canonical delivered value) is EMPTY.*  Cold, the entire
+  corpus delivers exactly four things: ~Rural~, ~Urban~, ~Informal~, ~NA~.
+  GH #602's sweep holds; the Uganda ~'0'~ precedent does not recur anywhere.
+- *Class A (collapse) is the real finding: 11 distinct (country, wave)
+  survey designs whose source draws MORE THAN TWO settlement categories and
+  whose config delivers two.*  The worst is Iraq 2006-07 (a documented
+  three-tier =rural / urban / metropolitan= stratification, 5,413 +
+  5,736 households merged into one ~Urban~); then Ethiopia ESS2/ESS3
+  (small town vs. large town), Kazakhstan 1996 (a three-stratum design),
+  Azerbaijan 1995 (four codes to two).
+- *Class C (declared/expected but ~100% null) covers 9 country-waves*, of
+  which *GhanaLSS 2005-06 and GhanaSPS 2013-14/2017-18 are pure config gaps*
+  -- the information is sitting in the shipped extract (GLSS5) or joinable
+  from a sibling wave (GhanaSPS).
+- *GH #659 is partially stale*: cold on ~origin/development~, GhanaLSS
+  ~sample().Rural~ is null for *15,028 of 56,330 rows (26.7%), THREE of
+  seven waves* -- not 21,026 / 37% / four waves.  The 5,998-row delta is
+  GLSS4 (1998-99), fixed by GH #673.
+- *Recommendation*: add ONE new canonical value, ~Semi-urban~, and use it in
+  exactly two places (GhanaLSS GLSS1/GLSS2, Kazakhstan 1996).  Do NOT
+  generalise the ~Informal~ precedent -- it is a formality/tenure class, not a
+  settlement-size tier, and South Africa really is special.  Everything else
+  wants a *separate column*, not a third ~Rural~ value.  See section 7.
+
+* 1. What was measured, and how
+
+Three passes, all in this repo's worktree with
+~PYTHONPATH~ asserted (~assert 'worktrees' in lsms_library.__file__~):
+
+1. *Config parse* (structural, not grep).  Walk every wave ~data_info.yml~,
+   every table block AND every ~dfs:~ sub-block, collecting any ~Rural~
+   myvar; plus every script-path ~_/sample.py~ / ~_/cluster_features.py~.
+   Result: *153 producing declarations* across 33 countries, and *34
+   ~sample~/~cluster_features~ cells that declare no ~Rural~ at all*.
+
+   Note the brief's "79 wave-level ~data_info.yml~ declare ~Rural~" is a
+   *line*-grep count and over-counts: India 1997-98 matches only on a
+   comment left by GH #602 when its ~Rural~ was deleted.  It also
+   under-counts the universe, because the motivating cells (GLSS1/GLSS2)
+   declare no ~Rural~ and are therefore invisible to that grep.
+
+2. *Raw source counts.*  For each cell, read the declared source file with
+   ~get_dataframe()~ and ~value_counts(dropna=False)~ on the declared source
+   column, recording the Python *type* of each raw value (the Uganda ~'0'~
+   and GLSS4 ~rural_dict.get(value)~ defects were both type mismatches).
+
+3. *Delivered values, COLD.*  Fresh ~LSMS_DATA_DIR~ with only ~dvc-cache~
+   symlinked to the shared blob store, all 47 countries, ~sample~ and
+   ~cluster_features~.  Cold matters: GH #659's own method note records that
+   *two of four* ~Rural~ defects reported in an earlier sweep were warm-cache
+   artifacts.
+
+Evidence files in this directory:
+
+| file                          | grain                                  | rows |
+|-------------------------------+----------------------------------------+------|
+| ~rural_raw_values.csv~        | (country, wave, table, subdf, file, column, raw value) | 464 |
+| ~rural_mapping.csv~           | the same, plus what the config maps it to | 459 |
+| ~rural_delivered_values.csv~  | (country, table, wave, delivered value) | 397 |
+
+*Raw and delivered counts are at DIFFERENT GRAINS and are not reconcilable
+row-for-row.*  A raw count is over the rows of the source file (which may be
+person-, household- or cluster-level); a delivered count is over the
+table's declared index ((i,t) for ~sample~, (t,v) for ~cluster_features~).
+Kazakhstan's ~type_loc~ reads 7,224 person-rows and delivers 1,996
+households.  Both numbers are recorded; neither is wrong.
+
+* 2. CONTENTS.org idiosyncrasies this audit relied on
+
+Read before any claim was made about the country.  Quoted, not paraphrased.
+
+** CotedIvoire -- the REGION->Rural mapping is the PRODUCER'S definition, not a proxy
+
+My first reading was that mapping a *5-way agro-ecological ~REGION~* onto
+~Rural~ was a proxy defect.  ~CotedIvoire/_/CONTENTS.org~ refutes that, and
+the refutation is the result:
+
+#+begin_quote
+- 5 regions: ABIDJAN, OTHER CITIES, EAST FOREST, WEST FOREST, SAVANNA
+- Urban = ABIDJAN + OTHER CITIES; Rural = EAST/WEST FOREST + SAVANNA
+#+end_quote
+-- ~CotedIvoire/_/CONTENTS.org~ ll.92-93
+
+and, quoting the catalog's own Sampling Procedure (ll.240-246):
+
+#+begin_quote
+Regional classification was constructed so that clusters in Abidjan would be
+classified as Abidjan; clusters in other major cities in East Forest, West
+Forest and Savana would be classified as "Other Cities "; and only rural
+clusters would be included in the East Forest, West Forest and Savanna.
+Thus, the urban-rural classification is as follows: Urban - Abidjan and
+Other Cities; Rural - East Forest, West Forest and Savanna.
+#+end_quote
+
+So the eight CIV 1985-89 cells that my ">2 source categories" screen flags
+are *NOT class A*.  The distinction ~REGION~ draws that ~Rural~ does not is
+*ecological zone*, which the same config already exposes as ~Region~.
+Nothing is lost.  Recorded here so nobody re-files it.
+
+** Iraq -- a documented THREE-tier stratification, folded to two
+
+#+begin_quote
+The survey was designed to visit 18,144 households-324 households in each of
+56 strata, defined as the rural, urban, and metropolitan portions of each of
+Iraq's 18 governorates. Baghdad, with five strata, was the exception.
+#+end_quote
+-- ~Iraq/_/CONTENTS.org~ ll.98-101, quoting IHSES Vol.1 ch.4 "A. Design"
+
+The =xstrat= labels realise exactly that: =X - rural=, =X - other urban=,
+=X - urban center=.  This is the strongest class-A cell in the corpus.
+
+** Kazakhstan -- three DESIGN strata, folded to two
+
+#+begin_quote
+Three design strata, allocated by household share, not by population share ::
+Table 2 (p. VIII) gives portions of households 45,23% large cities / 18,75%
+villages, middle-size and small cities / 36,02% rural regions, realized as
+90 / 38 / 72 PSUs out of 200
+#+end_quote
+-- ~Kazakhstan/_/CONTENTS.org~ ll.191-196
+
+Note what the middle stratum *contains*: "villages, middle-size and small
+cities".  It is neither urban nor rural, and the config sends all 646
+households to ~Urban~.  This is the one cell besides GLSS where a third
+canonical value is, in my judgement, the only honest answer.
+
+** Ethiopia -- the three-way labels are already recorded; the CONSEQUENCE is not
+
+#+begin_quote
+The =rural= column in waves 1-3 has varying labels: "rural" / "small town"
+(w1), "Rural" / "Small town (urban)" / "Large town (urban)" (w2), "RURAL" /
+"SMALL TOWN" / "Meduim and large town" (w3). All non-rural categories are
+mapped to "Urban".
+#+end_quote
+-- ~Ethiopia/_/CONTENTS.org~ ll.335-338
+
+The file states the collapse plainly.  What it does *not* state is the
+cross-wave comparability consequence -- see section 4.2.
+
+** Liberia -- 1.2% urban is BY DESIGN, not a defect
+
+~locality~ delivers 2,950 rural / 36 urban.  That looked like a broken
+mapping until ~Liberia/_/CONTENTS.org~ ll.36-42:
+
+#+begin_quote
+The NHFS is focused on forest proximate households. Therefore, the sample is
+limited to enumeration areas which fall within 2.5km of the nearest forest
+[...] The final sample includes enumeration areas from all 15 of Liberia's
+counties, but excludes urban areas of Montserrado.
+#+end_quote
+
+Not filed.
+
+** Azerbaijan -- the "1--3 = various urban" claim is itself unsourced
+
+#+begin_quote
+The microdata exposes only one geographic axis: =inout= in =APP1.dta= (the
+cluster file), encoding settlement type (1--3 = various urban; 4 = rural).
+Mapped to the canonical =Rural= column.
+#+end_quote
+-- ~Azerbaijan/_/CONTENTS.org~ ll.14-17
+
+The same file records the DDI's frame description (ll.65-70):
+
+#+begin_quote
+The country is divided into towns, villages of the town type, and villages.
+Every household is located in one of those three types of population points.
+#+end_quote
+
+"Villages of the town type" is a semi-urban category by any reading.  The
+~1--3 = various urban~ claim cites nothing and no codebook for =inout= was
+found.  This is a *bare numeric code with no label*, and I am not going to
+guess which of 1/2/3 is which.  See section 4.4.
+
+** GhanaLSS -- the SU classification, and the "Not available" entries
+
+#+begin_quote
+| Rounds       | Strata definition                                | Count |
+| GLSS1--GLSS2 | Ecological zone (Coastal, Forest, Savannah)      |     9 |
+|              | x Urban classification (Urban, Semi-urban, Rural) |       |
+#+end_quote
+-- ~GhanaLSS/_/CONTENTS.org~ ll.33-35
+
+#+begin_quote
+To prepare this master sample, the 12,969 EAs from the 1984 Population
+Census were first placed in order, by region within each location
+(rural/semi-urban/urban), in turn within each ecological zone
+(coastal/forest/savannah).
+#+end_quote
+-- ~GhanaLSS/_/CONTENTS.org~ l.474, quoting the GSS master-sample description
+
+and the per-round table (ll.84-91):
+
+#+begin_quote
+| GLSS1  | ---  | ---  | Not available                   |
+| GLSS2  | ---  | ---  | Not available                   |
+| GLSS5  | ---  | ---  | Not in cover page; in =pov_gh5= |
+#+end_quote
+
+*The GLSS5 line is where CONTENTS.org and the delivered data disagree in a
+way that matters* -- see 5.2.
+
+** South Africa -- the ~Informal~ rationale is NOT in CONTENTS.org
+
+~South Africa/_/CONTENTS.org~ contains no urban/rural discussion at all
+(one incidental hit, on a dwelling-type response option).  The entire
+justification for the third canonical value lives in
+~lsms_library/data_info.yml~'s comment block.  Noted as a documentation gap,
+not a data defect.
+
+* 3. Classification summary
+
+Counted over *(country, wave, table)* cells.  A cell can appear in more than
+one class.
+
+| class | what it means                                  | cells | country-waves |
+|-------+------------------------------------------------+-------+---------------|
+| A     | source >2 substantive categories, config -> 2  |    18 |            11 |
+| B     | raw values silently mapped to NA               |     1 |             1 |
+| C     | declared/expected, ~100% null delivered        |    15 |             9 |
+| D     | delivered value outside the canonical domain   | *0*   |         *0*   |
+| E     | no urban/rural indicator in the shipped extract|     8 |             4 |
+
+* 4. Class A -- COLLAPSE.  Worst first.
+
+Every row below was read at source.  "collapsed" = households whose source
+category is neither plainly urban nor plainly rural, or which are a distinct
+tier the config merges away.
+
+** 4.1 Iraq 2006-07 -- 11,149 households, a documented three-tier design folded to two
+
+| raw =xstrat= suffix | households | config -> |
+|---------------------+------------+-----------|
+| =other urban=       |      5,736 | Urban     |
+| =rural=             |      5,628 | Rural     |
+| =urban center=      |      5,413 | Urban     |
+| Baghdad =al-sader= / =al-rasafah= / =al-karekh= | 953 | Urban |
+| =...- extra=        |         92 | Urban     |
+
+Delivered: ~Urban~ 12,194 / ~Rural~ 5,628.  5,413 + 5,736 + 953 + 92 =
+12,194 exactly.
+
+Two separate problems.
+
+1. *The collapse.*  The survey's own design document (quoted in 2.) names
+   THREE portions -- rural, urban, metropolitan.  =urban center= is the
+   metropolitan tier and =other urban= the urban tier; the config's 57-entry
+   mapping in ~Iraq/2006-07/_/data_info.yml~ sends both to ~Urban~.  This is
+   the *largest* collapse in the corpus by households (11,149 in two
+   near-equal tiers) and the best-evidenced.
+
+2. *92 households of =...- extra= are mapped to ~Urban~ with no evidence.*
+   The wave's ~mapping.py~ used by ~cluster_features~ makes it worse: it is
+   ~'Rural' if 'rural' in str(s).lower() else 'Urban'~ -- an =else= branch
+   that will label ANY future or unrecognised stratum ~Urban~.  Per
+   ~Iraq/_/CONTENTS.org~ l.172 the =extra= strata are "the extra Sulaimaniya
+   metropolitan stratum", so ~Urban~ happens to be right *here*; the rule
+   that produced it is not safe.
+
+Iraq 2012 (=q00_16=) is a clean two-way ~URBAN~/~RURAL~ (14,884 / 10,262).
+*I did not check whether 2012 has a metropolitan tier under another column.*
+
+** 4.2 Ethiopia ESS2 / ESS3 -- 3,621 households, AND a cross-wave comparability trap
+
+| wave    | raw                        |    n | config -> |
+|---------+----------------------------+------+-----------|
+| 2013-14 | Rural                      | 3323 | Rural     |
+|         | Large town (urban)         | 1486 | Urban     |
+|         | Small town (urban)         |  453 | Urban     |
+| 2015-16 | RURAL                      | 3272 | Rural     |
+|         | Meduim and large town      | 1255 | Urban     |
+|         | SMALL TOWN                 |  427 | Urban     |
+
+Both ~sample~ (script path, ~.map(dict)~) and ~cluster_features~ (YAML,
+inline dict) do the same thing, from the same column.
+
+*The folding itself is defensible*: the 2013-14 labels literally say
+"(urban)", so the producer calls both tiers urban.  What is lost is the
+small/large distinction that the ESS weighting is built on --
+~Ethiopia/_/CONTENTS.org~ l.577 quotes the BID: "The results presented have
+been weighted to be nationally representative for rural areas, *small
+towns, and large towns*."  A user cannot reproduce the published
+three-domain estimates from the delivered table.
+
+*The comparability trap is worse and is not recorded anywhere.*
+ESS1 (2011-12) is =rural= (3,466) + =small town= (503) and *nothing else* --
+by design.  ~Ethiopia/_/CONTENTS.org~ l.450:
+
+#+begin_quote
+The ERSS sample is designed to be representative of rural and small town
+areas of Ethiopia.
+#+end_quote
+
+So ~Rural == 'Urban'~ means *"small town, under 10,000 people"* in 2011-12
+and *"any town"* from 2013-14 on.  Pooling Ethiopia waves and filtering on
+~Rural~ silently compares two different populations.  The delivered urban
+share jumps 12.7% -> 36.8% -> 34.0% -> 54.0% -> 53.9% across the five waves,
+and most of the first jump is a definition change, not urbanisation.
+(Measured delivered urban share by wave: 12.7 / 36.8 / 34.0 / 54.0 / 53.9.)
+
+** 4.3 Kazakhstan 1996 -- 646 households in a stratum that is neither
+
+| raw =type_loc= | persons | config -> |
+|----------------+---------+-----------|
+| =urban=        |   3,556 | Urban     |
+| =rural=        |   3,022 | Rural     |
+| =small town=   |     646 | Urban     |
+
+Delivered (household grain): ~Urban~ 1,282 / ~Rural~ 714.
+
+The three raw values are *exactly the three design strata* named in
+~Kazakhstan/_/CONTENTS.org~ (quoted in 2.), and the middle one is described
+by the survey's own final report as "villages, middle-size and small
+cities".  Sending a stratum that explicitly contains *villages* to ~Urban~
+is the clearest single wrong-direction fold I found.
+
+** 4.4 Azerbaijan 1995 -- four bare codes to two, on an unsourced claim
+
+| raw =inout= | PSUs | config -> |
+|-------------+------+-----------|
+| 1.0         |   40 | Urban     |
+| 2.0         |   20 | Urban     |
+| 3.0         |   13 | Urban     |
+| 4.0         |   18 | Rural     |
+| (null)      |    1 | NA        |
+
+=inout= is a *bare numeric code*.  No value labels ship with =APP1.dta=; no
+codebook for it was found in the wave's Documentation.  The DDI describes a
+*three*-type frame ("towns, villages of the town type, and villages"), which
+does not obviously map onto four codes.  I am recording that 73 of 91 PSUs
+are called ~Urban~ on the strength of a repo comment that cites nothing, and
+*I am not proposing a re-mapping*, because I cannot tell which code is
+which.  The honest next step is one RA and the =APP1= questionnaire.
+
+** 4.5 Mali 2017-18 and Niger 2014-15 -- WITHIN-urban tiers, lower severity
+
+| country | wave    | raw                          |    n | -> |
+|---------+---------+------------------------------+------+----|
+| Mali    | 2017-18 | Rural                        | 6921 | Rural |
+|         |         | Urbain (District de Bamako)  |  760 | Urban |
+|         |         | Autre urbain                 |  709 | Urban |
+| Niger   | 2014-15 | Rural                        | 2319 | Rural |
+|         |         | Communaute Urbaine           |  937 | Urban |
+|         |         | Urbain                       |  361 | Urban |
+
+Both source labels call the merged tiers *urban*, so no household changes
+side.  What is lost is a capital/primate-city vs. other-urban distinction --
+which is arguably a ~Region~ fact, and in Mali's case IS already available
+as ~Region~ (=District de Bamako=).  *Lower priority than 4.1-4.3.*
+
+*Niger 2014-15 additionally has a within-wave inconsistency*: ~sample~ reads
+the 2-way =urbrur= while ~cluster_features~ reads the 3-way =MS00Q15=, from
+different files.  They agree after folding (2,319 rural either way), but the
+two tables are wired to different variables and only one of them can see the
+finer structure.
+
+** 4.6 Not class A, recorded so it is not re-filed
+
+- *CotedIvoire 1985-89* (8 cells): the 5-way ~REGION~ fold is the producer's
+  own published definition.  See section 2.
+- *Malawi 2016-17 / 2019-20* (4 cells): the "4 distinct raw values" are
+  =rural/RURAL/urban/URBAN= -- pure casing, from concatenating the
+  Cross_Sectional and Panel files.  Handled by canonical spellings.  This is
+  the residue of the GH #602 fix, and it is working.
+- *South Africa 1993*: 3 raw values, 3 delivered values.  The one cell in the
+  corpus that does NOT collapse.
+
+* 5. Class C -- declared or expected, delivered ~100% null
+
+| country  | wave    | table            | null | of    | why (measured)                                  |
+|----------+---------+------------------+------+-------+-------------------------------------------------|
+| GhanaLSS | 1987-88 | sample           | 3147 |  3147 | not in shipped extract; PDF-only (sec. 6)       |
+| GhanaLSS | 1987-88 | cluster_features |  176 |   176 | same                                            |
+| GhanaLSS | 1988-89 | sample           | 3194 |  3194 | same                                            |
+| GhanaLSS | 1988-89 | cluster_features |  170 |   170 | same                                            |
+| GhanaLSS | 2005-06 | sample           | 8687 |  8687 | *pure config gap* -- see 5.2                    |
+| GhanaSPS | 2013-14 | sample           | 4774 |  4774 | not in extract; joinable from wave 1 (5.3)      |
+| GhanaSPS | 2017-18 | sample           | 5669 |  5669 | same                                            |
+| Albania  | 2003    | sample + cf      | 1764 / 449 | -- | not in extract; joinable from 2002 (5.4)   |
+| Albania  | 2004    | sample + cf      | 1884 / 448 | -- | same                                        |
+| Azerbaijan | 1995  | cluster_features |   77 |   168 | *structural* -- see 5.5                         |
+| Peru     | 1994    | cluster_features |  n/a |   n/a | *unreachable* -- correctly wired, never delivered (5.6) |
+
+Partial nulls worth recording but not investigated further: Pakistan 1991
+~sample~ 204/4,967 (4.1%; the wave's own ~cluster_features.py~ docstring
+says one PSU "has NO region data.  Its Region/Rural are left <NA> --
+honestly"); Uganda ~cluster_features~ 4.1--15.6% by wave; Uganda 2019-20
+~sample~ 20/3,098 (which is 20 genuine nulls in the raw =urban= column).
+
+** 5.1 GH #659 is partially stale -- corrected measurement
+
+Cold, on ~origin/development~ at ~f9f8bf3c~:
+
+#+begin_example
+GhanaLSS.sample().Rural   total=56330  nulls=15028 (26.7%)
+   {NA: 15028, 'Rural': 24062, 'Urban': 17240}
+   1987-88: 3147 rows, 3147 null (100%)
+   1988-89: 3194 rows, 3194 null (100%)
+   1991-92: 4523 rows,    0 null
+   1998-99: 5998 rows,    0 null      <-- was 100% null when #659 was filed
+   2005-06: 8687 rows, 8687 null (100%)
+   2012-13: 16772 rows,   0 null
+   2016-17: 14009 rows,   0 null
+#+end_example
+
+#659 reports 21,026 / 37% / "four of seven waves".  The 5,998-row delta is
+exactly GLSS4 (1998-99), revived by GH #673's ~code_label_map~ fix.  #659's
+second claim -- "The 1991-92 wave additionally uses a non-canonical
+=Semi-urban=" -- is also fixed: GH #602 corrected that code->label table
+(=loc2=1= is the union of the two urban strata, not a semi-urban category)
+and 1991-92 now delivers clean ~Urban~/~Rural~.  *The issue should be
+updated, not closed*: three waves are still 100% null.
+
+** 5.2 GhanaLSS 2005-06 (GLSS5) -- the data is right there
+
+~GhanaLSS/_/CONTENTS.org~ says of GLSS5: "Not in cover page; in =pov_gh5=".
+That is true of the *cover page*, and the ~cluster_features~ block already
+reads =pov_gh5.dta=.  But ~sample~ reads =parta/sec0.dta= and declares no
+~Rural~, so 8,687 households ship null.
+
+A full scan of all 49 GLSS5 data files found the variable in *two* files at
+household grain:
+
+#+begin_example
+pov_gh5.dta::loc2  n=8687  {'rural': 5069, 'urban': 3618}
+sec7.dta::loc2     n=8687  {'rural': 5069, 'urban': 3618}
+#+end_example
+
+8,687 rows is exactly the ~sample~ row count.  This is a *one-line config
+fix*, not a data absence.  It answers the "Not investigated" paragraph of
+GH #659 for this wave.
+
+The same scan turned up GLSS5's finer classifications, which are *zone x
+urbanicity*, not a third settlement tier:
+
+#+begin_example
+loc5: accra (gama) / other urban / rural coastal / rural forest / rural savannah
+loc7: accra (gama) / urban coastal / urban forest / urban savannah
+      / rural coastal / rural forest / rural savannah
+#+end_example
+
+No semi-urban in GLSS5.  Whatever is done for GLSS1/GLSS2 does not extend
+here.
+
+** 5.3 GhanaSPS 2013-14 / 2017-18 -- not in the extract, but joinable
+
+I read *all 89* shipped ~.dta~ files of 2013-14 and pattern-matched every
+column name for =urb|rural|milieu|semi|town|villag|sector|reside|settlem|
+locality|loc\d*|area=, keeping any column with 2--12 distinct values.  The
+only hits are unrelated (=relativeinvillage=, =villagetrustworthy=, ...).
+*No urban/rural classification variable is present in the 2013-14 extract.*
+
+That is a statement about the *extract*, not the instrument, and I am not
+filing a closing verdict.  It is also probably moot: per GH #673, GhanaSPS
+is a panel of *the same 334 EAs in all three waves*, and 2009-10 carries
+=urbrur= at EA grain (Rural 2,999 / Urban 2,010).  Carrying wave 1's EA
+classification forward is a defensible fix -- and it is exactly the kind of
+inference that should be written down in ~CONTENTS.org~ when it is made.
+
+** 5.4 Albania 2003 / 2004 -- not in the extract
+
+The wave scripts already say so:
+
+#+begin_example
+Albania/2003/_/sample.py:  "No Urban/Rural variable available in wave 2 data."
+Albania/2004/_/sample.py:  "No strata or Urban/Rural variables available for this wave."
+#+end_example
+
+*Verified*, not taken on trust: I scanned all 9 files of 2003 and all 6 of
+2004 with the same column sweep.  Zero candidate columns.  The claims in
+those docstrings are correct -- unusual enough in this repo to be worth
+saying.
+
+Albania 2002 and 2005 both carry =m0_ur= at household grain, and this is one
+LSMS panel, so a PSU-level carry-forward is available.  *I did not check
+whether the 2003/2004 PSU identifiers match 2002's* -- that is the load-
+bearing check before anyone acts on this.
+
+** 5.5 Azerbaijan 1995 -- a structural null from an outer merge (class B/C)
+
+~cluster_features~ is a ~dfs:~ merge of =APP1.dta= (which owns ~Rural~) and
+=PP.dta= (which owns ~Region~).  Measured:
+
+#+begin_example
+APP1.dta: 92 rows,  91 distinct ppid   (1 null inout)
+PP.dta:  168 rows, 168 distinct ppid
+PP-only ppids: 77      APP1-only: 0
+#+end_example
+
+=APP1= is the *community/PSU questionnaire*, administered in 91 of 168 PSUs.
+The default ~outer~ merge admits all 168 and 77 get ~Rural = NA~ -- 45.8% of
+the delivered cluster table.  This is not a mapping bug; it is a coverage
+fact about =APP1=, made invisible by the merge.  Worth a
+~merge_how:~/documentation decision, and worth knowing before anyone
+computes an urban share from Azerbaijan ~cluster_features~.
+
+** 5.6 Peru 1994 -- correctly wired, and unreachable
+
+Not a null, a *nothing*.  ~Peru/1994/_/data_info.yml~ declares
+~cluster_features.Rural: a06~ with a table-level ~mappings: Rural: AREA~, and
+that is CORRECT: =REG01.DTA::a06= is 1 (2,287) / 2 (1,336), and
+~Peru/_/categorical_mapping.org::AREA~ maps 1 -> =Urbano=, 2 -> =Rural=,
+which canonical spellings then normalise to ~Urban~ / ~Rural~.
+
+But ~ll.Country('Peru').data_scheme~ is ~[]~, so ~cluster_features()~ does not
+exist and none of it is ever delivered.  The cause: ~Country.resources~ reads
+~_/data_scheme.yml~, and *Peru has no such file* -- its ~Data Scheme:~ block
+was written into ~_/data_info.yml~ instead.
+
+#+begin_example
+$ ls lsms_library/countries/Peru/_/
+categorical_mapping.org  CONTENTS.org  data_info.yml
+$ grep -l '^Data Scheme:' lsms_library/countries/*/_/data_info.yml
+lsms_library/countries/Peru/_/data_info.yml        <-- the only one, corpus-wide
+#+end_example
+
+Peru is absent from ~.coder/coverage/latest.csv~ altogether, consistent with
+an empty data_scheme.
+
+*This is broader than ~Rural~* -- it silences every Peru table, not just this
+one -- so it is recorded here and deliberately not acted on.  It is also why
+Peru has no row in ~rural_delivered_values.csv~.
+
+Noted without a claim: ~data_info.yml~ lists Peru's waves as ='1985-1986'=
+while the directory (and therefore ~Country.waves~) says ='1985'=.  Not
+investigated.
+
+* 6. The GLSS1 / GLSS2 SU question
+
+** 6.1 The classification is real, and I reproduced the brief's counts exactly
+
+Appendix I of ~GHA_1988_GLSS_Basicinfo_EN.pdf~ ("Complete List of GLSS
+Clusters") has a text layer.  Parsed columns: cluster name, yr1 number, yr2
+number, households yr1/yr2, map axes, *=Urb SU Rur=*, region, eco zone.
+
+#+begin_example
+all parsed rows            273  (272 by regex + 1 known miss, a >26-char name)
+                           R=117  SU=52  U=104
+minus the 10 "practice" clusters the document itself says to exclude
+  (yr2 174,177,190,209,233,238,246,685,789,790: 9 U + 1 R)
+                           R=116  SU=52  U=95      <-- the brief's figures
+#+end_example
+
+The exclusion instruction is in the same document:
+
+#+begin_quote
+All data from second year clusters 174, 177, 190, 209, 233, 238, 246, 685,
+789, and 790 should be excluded from any research done with the data.
+#+end_quote
+
+Per wave: GLSS1 (yr1) 177 rows = 77 R / 36 SU / 64 U; GLSS2 (yr2) 180 rows =
+79 R / 36 SU / 65 U.  The shipped =Y00A.DAT= has 176 GLSS1 clusters and 170
+GLSS2 clusters, so the appendix is a superset -- *a join, not a
+substitution, and the residual needs adjudicating before anyone wires it*.
+
+** 6.2 It is NOT in the shipped data.  I checked all 170 dictionaries.
+
+Every ~.DCT~ in both waves (77 for GLSS1, 93 for GLSS2) was fetched and
+grepped for =urb|rural|loc|semi|town|villag|ecolog|zone|strat|sector=.
+*Exactly one hit: =LOC= in =Y00A.DCT=, both waves.*  And it is not the
+classification:
+
+#+begin_example
+1987-88 Y00A.DAT LOC: {1: 3142, 2: 5}   176 clusters, all LOC=1 at cluster level
+1988-89 Y00A.DAT LOC: {1: 3191, 2: 3}   170 clusters, 169 LOC=1
+#+end_example
+
+99.8% constant -- a fieldwork flag, not a settlement type.  ~EXPEND.DCT~,
+~COMM.DCT~ and ~HEAD.DCT~ were read in full and carry nothing either.
+
+I also chased the document's own pointer to a machine-readable version:
+
+#+begin_quote
+The complete list of cluster names with the year 1 and year 2 cluster
+numbers is listed in Appendix I and is available on diskette in CLYR1YR2 as
+listed in Appendix B.
+#+end_quote
+
+=CLYR1YR2.DAT= *is* shipped (1988-89/Data/).  Its dictionary is two columns:
+=CLYR1=, =CLYR2=.  The crosswalk shipped; the classification did not.
+
+So: *the U/SU/R classification is PDF-only, per-cluster, and transcribable
+(~263 rows) from a text layer.*  A closing ~not-asked~ verdict would be
+wrong here; the instrument had it and the sampling frame is built on it.
+
+** 6.3 Is SU the same thing as ~Informal~?  No.
+
+The discriminator that earned ~Informal~ its place was *source-internal*:
+South Africa's own =metro= variable groups =type=3= with the non-metro
+areas, so there was positive evidence against folding it into ~Urban~.
+
+GLSS =SU= is a different kind of thing:
+
+| | GLSS =SU= | South Africa =type=3= |
+|---+---+---|
+| what it classifies | *settlement size/function* -- a tier between town and village | *formality/tenure* -- squatter and informal settlements |
+| where it lives | the cluster (EA), from the 1984 census frame | the household's area type in the sampling frame |
+| ordered? | yes: U > SU > R is a size ordering | no: informal areas exist inside and outside metros |
+| survives folding? | folding loses an ordered middle tier | folding asserts a formality fact the data denies |
+
+They are *both* reasons not to force a binary, and they are *not the same
+concept*.  ~Informal~ should not be reused for GLSS.
+
+** 6.4 Is folding defensible for GLSS?
+
+I do not think so, for three measured reasons:
+
+1. *It is 52 of 263 clusters -- 20%.*  Whichever way you fold, you move a
+   fifth of the sample frame across the only axis this column has.
+2. *The stratification is built on it.*  Nine strata = 3 zones x 3 urban
+   classes.  Fold, and the delivered ~Rural~ no longer reconstructs the
+   design.
+3. *The repo already wrote down a fold, for a different variable, and
+   disagreed with itself.*  ~GhanaLSS/1988-89/_/categorical_mapping.org~
+   carries an *unwired* 7-way table:
+
+   #+begin_example
+   | Code | Label         | Classification |
+   |    1 | City          | Urban          |
+   |    2 | Large Town    | Urban          |
+   |    3 | Medium Town   | Urban          |
+   |    4 | Small Town    | Rural          |
+   |    5 | Large Village | Rural          |
+   |    6 | Small Village | Rural          |
+   |    7 | Other         | Rural          |
+   #+end_example
+
+   Nothing in the wave's ~data_info.yml~ references this table, and I could
+   not determine which source variable it was written for -- *no shipped
+   GLSS1/GLSS2 column has 7 categories of that shape*.  It is evidence that
+   somebody met a >2-way Ghana locality variable, made a fold, and put the
+   cut at "Medium Town is urban, Small Town is rural" -- a placement nobody
+   can check, for a variable nobody can now find.  That is precisely the
+   failure a visible third value prevents.  *I am recording this as an
+   unexplained artifact and NOT acting on it.*
+
+* 7. Recommendation on the canonical vocabulary
+
+** 7.1 Add exactly one value: ~Semi-urban~
+
+Add to both ~sample.Rural~ and ~cluster_features.Rural~ ~spellings~ blocks in
+~lsms_library/data_info.yml~:
+
+#+begin_example
+  Semi-urban: [semi-urban, Semi-Urban, SEMI-URBAN, SU, semi urban]
+#+end_example
+
+Use it in *two* places, and only two:
+
+| country    | wave(s)          | source                      | n            | why |
+|------------+------------------+-----------------------------+--------------+-----|
+| GhanaLSS   | 1987-88, 1988-89 | Appendix I =SU= (transcribe)| 52 clusters  | the frame is literally stratified rural/semi-urban/urban; 20% of clusters |
+| Kazakhstan | 1996             | =type_loc= = "small town"   | 646 hh       | a named design stratum containing *villages and small cities*; currently called Urban |
+
+Both are *settlement-size tiers between town and village*, both are named as
+such by the producer, and in both the current fold puts a village-containing
+category on the urban side.  ~Semi-urban~ is the term GSS itself uses;
+Kazakhstan's report says "villages, middle-size and small cities", which is
+the same idea in more words.
+
+I am *less* confident about Kazakhstan than about GLSS.  GLSS's own
+documentation uses the word; Kazakhstan's does not, and someone may
+reasonably prefer to leave =small town= folded and record the loss.  Say so
+if you disagree -- the evidence is in section 4.3 and the CSVs.
+
+** 7.2 Do NOT add a fourth value, and do NOT generalise ~Informal~
+
+~Informal~ stays exactly where it is: South Africa 1993, 83 households, on
+the source-internal =metro= evidence.  Nothing else in the corpus has a
+formality/tenure stratum.  I checked Peru, the one other place the word
+appears -- ~Peru/_/CONTENTS.org~ l.196 records that the ENNIV *1990* Lima
+booster was drawn "en zonas urbano - marginales de Lima", i.e. in marginal
+peri-urban settlements.  That is a *sample expansion inside one wave*, not a
+settlement classification, and Peru's ~Rural~ (1994, =REG01.DTA::a06= via the
+=AREA= code table) is a clean 2-way: 2,287 / 1,336.  *South Africa is
+genuinely special.*
+
+** 7.3 The other class-A cells want a SEPARATE COLUMN, not a third ~Rural~ value
+
+Iraq (metropolitan / urban / rural), Ethiopia (large town / small town /
+rural), Mali (Bamako / autre urbain / rural), Niger (Communaute Urbaine /
+urbain / rural) are all *within-urban tier* distinctions, not a middle
+category.  Squeezing them into ~Rural~ would make one column mean four
+different vocabularies and would break the ~== 'Urban'~ filter that
+currently works.
+
+The right shape is a *new, optional, per-country column* -- call it
+~SettlementType~ -- carrying the survey's own label verbatim, with ~Rural~
+remaining the harmonised binary (plus ~Semi-urban~/~Informal~ where a genuine
+third settlement class exists).  That gives:
+
+- ~df[df.Rural == 'Urban']~ keeps working everywhere;
+- Ethiopia's three ESS weighting domains become reconstructible;
+- Iraq's metropolitan tier stops being invisible;
+- no country is forced to invent a category it does not have.
+
+*This is a design proposal, not a measurement.*  I have not prototyped it and
+it is out of scope for this branch.
+
+** 7.4 Cheap fixes this audit found that need no vocabulary change
+
+1. GhanaLSS 2005-06 ~sample~: declare ~Rural: loc2~ from =pov_gh5.dta=.
+   8,687 nulls -> 0.  (5.2)
+2. Ethiopia: record in ~CONTENTS.org~ that ~Urban~ means "small town only"
+   in 2011-12 and "any town" from 2013-14 -- the cross-wave series is not
+   comparable.  (4.2)
+3. Iraq 2006-07 ~cluster_features~: replace the
+   ~'Rural' if 'rural' in x else 'Urban'~ rule with an explicit mapping, so
+   an unknown stratum becomes NA rather than silently ~Urban~.  (4.1)
+4. Tanzania 2008-15: ~sample.py~ uses ~.map(dict)~ (unmapped -> NA) and
+   ~cluster_features.py~ uses ~lambda x: 'Rural' if x.lower() != 'urban'~
+   (unmapped -> ~Rural~, and ~AttributeError~ on NA).  =urb_rur= is
+   currently clean 2-way (RURAL 18,932 / URBAN 10,318, 0 nulls) so nothing
+   is wrong today, but the two tables would disagree the moment it is not.
+5. Azerbaijan ~cluster_features~: document (or fix) the 45.8% null from the
+   =APP1= x =PP= outer merge.  (5.5)
+6. Dead mappings, harmless but misleading: Timor-Leste 2001/2007-08 declare
+   ~{1: Urban, 2: Rural}~ / ~{0: Rural, 1: Urban}~ against columns that
+   arrive as *labels* (=Rural=/=Urban=), so the mapping never fires and the
+   raw label passes through.  GhanaLSS 2016-17 ~cluster_features~ maps
+   ~'Urban '~ (trailing space, real) but ~'Rural '~ (trailing space, not
+   present -- the raw value is ~'Rural'~), so one key is live and one dead.
+   Correct output, both times, by accident.
+
+* 8. Coverage: what I measured and what I did not
+
+** Measured
+
+- *150 of 153* producing (country, wave, table) cells read at source with
+  frequencies and value types, including nulls.
+- *All 33* producing countries; *all 47* countries for the delivered pass.
+- *14 script-path cells* attributed by hand after reading each script
+  (Albania x6, Ethiopia x5, Pakistan, Tanzania x2).
+- The GLSS Appendix I table parsed and cross-checked against the document's
+  own exclusion instruction.
+- All 170 GLSS1/GLSS2 data dictionaries; all 49 GLSS5 data files; all 89
+  GhanaSPS 2013-14 files; all Albania 2003 (9) and 2004 (6) files.
+
+** NOT measured, and why
+
+1. *Nepal 1995-96 / 2003-04 / 2010-11* (3 cells).  ~PathMissingError~ -- the
+   microdata is not in this repository (CLAUDE.md: "NSO hosts data, not
+   WB").  Config declares ~urbrural~ / ~urbrur~ from a PSU file; I have no
+   way to see the values.
+2. *Iraq 2012*: I did not check whether a metropolitan tier exists under a
+   column other than =q00_16=.  Given 2006-07, it probably does.
+3. *GhanaSPS 2017-18*: I scanned 2013-14 exhaustively and extrapolated.  The
+   2017-18 extract was NOT scanned.
+4. *Azerbaijan =inout= semantics*: unresolved.  No codebook found; I did not
+   read =queshhe.pdf= / the community questionnaire looking for the
+   =inout= question.  The "1--3 = various urban" claim in ~CONTENTS.org~
+   remains uncorroborated *and unrefuted*.
+5. *The GLSS2 7-way ~rural~ table in ~categorical_mapping.org~*: I could not
+   identify the source variable it maps.  I looked at all GLSS1/GLSS2
+   dictionaries; nothing has that shape.  Unexplained.
+6. *Albania 2003/2004 PSU continuity with 2002*: not checked.  Required
+   before any carry-forward fix.
+7. *Whether Appendix I's 273 clusters join cleanly onto the 176 + 170
+   shipped clusters*: not checked.  The counts differ and the yr1/yr2
+   renumbering is documented as a known trap.
+8. *Column-name sweeps have a blind spot.*  My probe keeps only columns with
+   2--12 distinct values whose *name* matches a pattern.  A classification
+   under an opaque name (=v103=, =strat2=) would be missed.  Where I say "not
+   in the extract" (GhanaSPS 2013-14, Albania 2003/2004) read it as "not
+   found by a name-pattern sweep of every shipped file", which is weaker
+   than "absent".
+9. *Peru's delivered values*: unmeasurable through the Country API (5.6).
+   The raw and mapping evidence for Peru is in the CSVs; its delivered rows
+   are absent because the table does not exist at country level.
+10. *No cell was blessed.*  Nothing here was read closely enough by a human
+    for that, and this audit changes no data.
+
+** One negative result worth stating plainly
+
+*Class D is empty.*  Every delivered ~Rural~ value in all 47 countries, cold,
+is ~Rural~, ~Urban~, ~Informal~ or ~NA~.  The specific defect the brief asked
+me to hunt for -- the Uganda ~'0'~ shape -- does not exist anywhere in the
+corpus today.  GH #602's ~_check_declared_spellings~ plus its data fixes
+closed that class, and this is independent cold confirmation of it.
