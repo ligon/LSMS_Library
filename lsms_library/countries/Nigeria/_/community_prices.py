@@ -3,8 +3,9 @@
 
 Item-level reported community food prices at grain (t, v, j, u) from the
 post-harvest COMMUNITY questionnaire's food-price module (Section C8).
-CLUSTER-level (no household i); v = format_id(ea) is the community EA id,
-the SAME keyspace as sample().v, so prices join households via their cluster.
+CLUSTER-level (no household i); v = cluster_id(state, lga, ea) is the community EA id -- the COMPOSITE key
+(GH #323: the bare `ea` serial is unique only within an LGA), the SAME
+keyspace as sample().v, so prices join households via their cluster.
 Stores the REPORTED surveyed Price ONLY -- no index, no cross-cluster
 median/mean, no HH-median imputation (those are transformations).
 

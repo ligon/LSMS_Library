@@ -87,6 +87,40 @@ def Age(value):
     return [age_yrs, age_mos, greg_d, greg_m, greg_y, corrected]
 
 
+def individual_education(df):
+    """``df_edit`` hook: fold unlabelled junk codes onto ``Unknown``.  GH #645.
+
+    ``hh_s2q05`` is a fully value-labelled column with exactly **one** row (of
+    12,583) carrying a bare float that never got a Stata value label: ``76.0``.
+    It cannot be handled in ``_/categorical_mapping.org`` -- that table's
+    ``Original Label`` column is mixed text, so ``df_from_orgfile`` reads every
+    key as a *string* and a float source value can never match one (contrast
+    Guyana, whose all-numeric table parses its keys as floats).
+
+    ``Unknown`` is not a guess: ``canonical_education_labels.org`` defines it as
+    the sentinel for "Don't Know / refused / **unmappable**", which is exactly
+    what an unlabelled code is.  Mapping it onto an ordinal level would be the
+    guess.  Same shape as Uganda's ``_/_education_helpers.py``.
+
+    The vocabulary is read from the canonical ``data_info.yml`` rather than
+    re-listed here, so it cannot drift from the schema of record.
+    """
+    col = "Educational Attainment"
+    if col not in df.columns:
+        return df
+    from lsms_library.diagnostics import _DECLARED_VOCABULARIES
+    vocab = (_DECLARED_VOCABULARIES
+             .get("individual_education", {}).get(col, (frozenset(), {}))[0])
+    if not vocab:
+        return df
+    s = df[col]
+    leftover = s.notna() & ~s.astype("string").isin(vocab)
+    if leftover.any():
+        df = df.copy()
+        df.loc[leftover, col] = "Unknown"
+    return df
+
+
 def household_roster(df):
     """Reduce list-valued ``Age`` to a scalar via DOB-aware fallback chain.
 

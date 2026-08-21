@@ -6,10 +6,13 @@
 # composite key; the framework needs a named `i` formatter for the
 # list-valued idxvar (see Mali/_/mali.py for the analogous helper).
 
+import warnings
+
 import numpy as np
 import pandas as pd
 
 import lsms_library.local_tools as tools
+from lsms_library.transformations import S_VALUES
 
 
 # Explicit `waves` list (consumed by Country.waves, country.py:1054-1073).
@@ -152,12 +155,37 @@ def food_acquired(df):
     s values (drops the NaN/5/6/7 source rows that have no clean
     purchased/produced/inkind meaning), drop unidentifiable rows, and
     return as-is.
+
+    The canonical set is :data:`lsms_library.transformations.S_VALUES` --
+    imported, never re-spelled.  This filter used to carry its own narrower
+    ``CANON_S = ('purchased','produced','inkind')`` which silently omitted
+    ``'other'``, so an ERHS wave that ever emitted ``s='other'`` would have had
+    those rows deleted rather than kept (GH #537).  Behaviour-neutral today (no
+    ERHS wave emits 'other'), but it removes the second competing definition.
+
+    The drop is deliberate but was previously invisible at runtime; it now
+    warns with a count, because for 1989 it discards ~25% of the raw rows.
+    Whether the NaN-source rows *should* map to 'other' rather than be deleted
+    needs the ERHS 1989 codebook and is tracked separately -- do not guess it.
     """
-    CANON_S = ('purchased', 'produced', 'inkind')
     flat = df.reset_index()
     if 'q_purch' not in flat.columns:
         idx = [c for c in ('i', 'j', 'u', 's') if c in flat.columns]
-        flat = flat[flat['s'].isin(CANON_S)]
+        keep = flat['s'].isin(S_VALUES)
+        n_drop = int((~keep).sum())
+        if n_drop:
+            n_nan = int(flat['s'].isna().sum())
+            bad = sorted(set(flat.loc[~keep & flat['s'].notna(), 's'].astype(str)))
+            warnings.warn(
+                f"EthiopiaRHS food_acquired: dropping {n_drop} of {len(flat)} rows "
+                f"({n_drop / len(flat):.1%}) whose acquisition source is not one of "
+                f"{S_VALUES}: {n_nan} with a missing source code"
+                + (f", {n_drop - n_nan} with unmapped code(s) {bad}" if bad else "")
+                + ".  These have no clean purchased/produced/inkind meaning; see "
+                  "the food_acquired docstring in ethiopiarhs.py.",
+                stacklevel=2,
+            )
+        flat = flat[keep]
         for k in ('i', 'j', 'u'):
             if k in flat.columns:
                 flat = flat[flat[k].notna() & (flat[k].astype('string')
@@ -440,5 +468,14 @@ def crop_production(df):
     for k in idx:
         out = out[out[k].notna() & (out[k].astype('string').str.strip() != '')]
     out = out.set_index(idx + ['j', 'u'])   # u is a grouping key, not a column
+    # GH #637 key-soundness review (2026-07-21).  KEY SOUND -- genuinely
+    # defensive; it has nothing to collapse.  The grain is unique BY
+    # CONSTRUCTION: the ERHS area_output_* files are WIDE one-row-per-household
+    # frames, and the melt above emits at most one row per (i, crop stub), with
+    # a constant u='Kg'.  So (t, i, j, u) can only collide if the wave's own
+    # (i,) index is non-unique.  Measured cold across all 6 waves that declare
+    # the table (1994a/1994b/1995/1997/2004/2009): 17,523 rows total --
+    # 3,404 / 1,967 / 3,350 / 3,021 / 2,998 / 2,783 -- with ZERO duplicate
+    # index tuples in every wave.  0 exact / 0 complementary / 0 conflicting.
     out = out.groupby(level=out.index.names).first()   # defensive de-dupe
     return out

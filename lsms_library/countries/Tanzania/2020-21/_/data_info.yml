@@ -2,13 +2,26 @@ Country: Tanzania
 Wave: 2020-21
 
 cluster_features:
+    # GH #323.  `v` is `y5_cluster`, NOT `clusterid` -- and this was not a
+    # cosmetic difference.  `sample` has always used `y5_cluster` (see below),
+    # so with `clusterid` here ALL 417 of this wave's `(t, v)` pairs were
+    # unknown to `sample`: `_join_v_from_sample` gave every 2020-21 household a
+    # `v` that had no cluster_features row at all.  `clusterid` is also blank
+    # for all 545 BOOSTER households (11.6%), so those were deleted outright on
+    # a NaN key, taking 68 clusters with them.  `y5_cluster` is populated for
+    # 100% of rows and is the id the Y5 design actually uses.
+    #
+    # `_status` / `_class` are carried only so the df_edit hook can tell who is
+    # still LIVING in the cluster; both are dropped there.
     file: hh_sec_a.dta
     idxvars:
         i: y5_hhid
-        v: clusterid
+        v: y5_cluster
     myvars:
         Region: hh_a01_1
         District: hh_a02_1
+        _status: hh_tracking_status
+        _class: tracking_class
         Rural:
             - y5_rural
             - mapping:

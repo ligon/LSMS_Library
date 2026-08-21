@@ -1,0 +1,507 @@
+#+title: GLSS4 (1998-99) `rel' relationship-to-head code list -- authoritative decode
+#+date: 2026-08-19
+
+* Verdict
+
+*FOUND.*  The GLSS4 nine-code scheme for =rel= (SEC1.DTA, variable label
+"Relationship to HH head") is documented in *two independent primary sources
+shipped in this repository*, and they agree with each other and with the data.
+
+Confidence: *high*.  See "Confidence statement" at the end for what is and is
+not established.
+
+The country-level 14-code =relationship= table in
+=GhanaLSS/_/categorical_mapping.org= is *confirmed WRONG for GLSS4* and must
+not be applied to this wave.
+
+* Repository state this file describes
+
+Branch =audit/ghana-correctness=, commit =18b6ca51= ("fix(GhanaLSS): revive the
+dead categorical decodes in GLSS1/GLSS2/GLSS4").
+
+*Caveat -- the working tree moved under this session.*  At session start the
+reported branch was =fix/malawi-2016-17-food-security-cs-id=; the first command
+of this session reported =audit/ghana-correctness=, and
+=1998-99/_/mapping.py= was observed in two different states during the session
+(an older =get_categorical_mapping= form, then the =code_label_map= form of
+=18b6ca51=).  Every "currently ..." claim below was re-verified against
+=18b6ca51= and is pinned to it.  Nothing in =lsms_library/= was modified by
+this session; this findings file is the only file written.
+
+* Idiosyncrasies found in GhanaLSS/_/CONTENTS.org
+
+Named, not merely "read":
+
+1. *Every GLSS round is an independent cross-section.*  "Seven rounds span
+   1987--2017.  Each round is designed as an independent nationally
+   representative cross-section; there is no rotating panel or refreshment
+   sample mechanism."  Consequence for this task: *there is no reason to
+   expect code lists to be stable across rounds*, and the GLSS1 dictionary
+   carries no authority over GLSS4.  (CONTENTS.org itself later flags this
+   sentence as in tension with the GLSS1->GLSS2 panel evidence, but the
+   cross-section framing holds for GLSS4.)
+
+2. *GLSS4 codes have been hand-decoded from the questionnaire before, and the
+   file says so.*  The =individual_education= section records for 1998-99:
+   =SEC2A.DTA=, =s2aq2=, "hand-decoded (no embedded value labels)" -- in
+   contrast to 2005-06 / 2012-13 / 2016-17, which carry "embedded value
+   labels".  This is the direct precedent for the present task and it also
+   established that *the GLSS4 household questionnaire has a usable text
+   layer*.
+
+3. *The GLSS1/GLSS2 questionnaires are scanned-image PDFs with no text
+   layer*, which is why GLSS1/GLSS2 education is left unwired ("so the codes
+   cannot be reliably decoded").  GLSS4 is *not* in that position -- verified
+   here: its household questionnaire extracts as ASCII box-art with a full
+   text layer.
+
+4. *GLSS3 is the cautionary tale about guessing.*  "the correct file is not
+   identifiable from the cached set, so it is left unwired rather than
+   guessed."  The house norm is: leave it null rather than fabricate.
+
+5. *The GH #348 silent-failure gotcha, recorded in the "Unit handling"
+   section*: "=get_categorical_mapping(tablename='units')= was called with no
+   value column, so =df_data_grabber= returned a column-less frame and the
+   dict came back *empty* -- every code passed through".  This exact failure
+   mode is reproduced and re-confirmed below, and it is what
+   =code_label_map()= exists to prevent.
+
+6. *GLSS4 sampling facts used as corroboration here*: cluster ids are =4xxx=;
+   =sample= reads =SEC0A.DTA= with =i = [clust, nh]=; =Rural= is =loc2=
+   (1=Urban, 2=Rural); GLSS1--GLSS4 carry no expansion weights.
+
+7. *Documentation-provenance discipline.*  The "Sampling universe" section
+   insists on "Verbatim or nothing", "Nothing is inferred from the data",
+   "Gaps are recorded as gaps", and declares an explicit ASCII exception for
+   verbatim transcription.  This file follows those rules, including declaring
+   its one character substitution.
+
+* What was searched, and what each source yielded
+
+All PDFs were read with =pdfminer.six= (=pdftotext=/=pdfimages= are not
+installed on this host).  Page numbers below are 1-based PDF page indices as
+produced by splitting the extracted text on form feeds; where a document
+prints its own page label, that is given too.
+
+| Source (1998-99/Documentation/)                | Yield                                                                    |
+|------------------------------------------------+--------------------------------------------------------------------------|
+| =questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf= | *AUTHORITATIVE.*  118 pp, full text layer.  Section 1 roster, column 3, PDF p.7 (printed footer "1.2"): the complete 9-code box.  Also column 10: the 11-code birthplace box. |
+| =GHA_1998_GLSS_Data_User_Guide_EN.pdf=         | *AUTHORITATIVE (independent).*  196 pp.  PDF pp.31-32: "File SEC1.SSD - SECTION 1:HOUSEHOLD ROSTER", variable =REL=, all 9 codes.  PDF p.33: =S1Q10= 11-code list.  PDF p.26: =REGION= ("Region ID") 10-code list.  PDF p.94: "Region/country lived previously". |
+| =GHA_1998_GLSS_Dataentry_EN.pdf=               | *Nothing.*  20 pp / ~31.8k chars.  No match for "relation", "Grandchild", "Wife/husband", "Servant", "Tenant".  It is a data-entry workflow manual, not a code book. |
+| =ddi-documentation-english-14.pdf=             | *Variable names and labels only, NO value labels.*  402 pp.  Carries "V79 / rel / Relationship to HH head / discrete numeric" and "V89 / s1q10 / Region/Country of birth", but zero matches for "Grandchild", "Upper West", "Foreign country". |
+| =glss4_report.pdf= and =GHA_1998_GLSS_Report_EN.pdf= | *No code list* (193 pp each).  They are *content*-identical, *not* byte-identical: extracted text is the same length (425,131 chars) and CONTENTS.org calls them "content-identical", but the files differ in size (801,077 vs 740,315 bytes) and md5 (=48e0dd86...= vs =71c89b4e...=).  Used only as supporting evidence: Table 1.1 estimated households by region. |
+| =GHA_1998_GLSS_Interviewer_EN.PDF=             | *NOT CONSULTED -- could not be obtained.*  Sidecar-only (md5 =2598bc801cc44c2544e97b112c508d8a=, 165502 bytes).  =data_access.get_data_file()= returned =None= (emitting "No SOURCE.org found for lsms_library/countries"); the blob is absent from the local DVC cache at =~/.local/share/lsms_library/dvc-cache/25/98bc80...=.  Per the hard rule, the =dvc= CLI was not invoked. |
+| =GHA_1998_GLSS_Supervisor_EN.pdf=              | *NOT CONSULTED -- could not be obtained.*  Same failure (md5 =18a4226051e1c9c33131a5e0b907acd9=). |
+
+The two unobtainable manuals do not weaken the result: they would have been a
+third and fourth corroborator, and two independent primary sources already
+agree exactly with each other and with the observed data.
+
+* Verbatim quote 1 -- the questionnaire (primary)
+
+Source: =lsms_library/countries/GhanaLSS/1998-99/Documentation/questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf=,
+*PDF page 7*, printed page footer *"1.2"*, SECTION 1: HOUSEHOLD ROSTER, the
+column headed *3*, "Relationship to Head of household".
+
+Transcription note: this is column 3 of the ASCII box-art table, sliced out
+verbatim at its column boundaries.  The dotted leaders are as printed.  This
+passage is *pure ASCII in the source* -- no substitution was needed.
+
+#+begin_quote
+             3
+      Relationship to
+     Head of household
+
+ Head ....................1
+ Wife/husband ............2
+ Son/daughter ............3
+ Grandchild ..............4
+ Father/mother ...........5
+ Relative of head
+  or head's spouse .......6
+ Servant and his/her
+  relative ...............7
+ Tenant and his/her
+  relative ...............8
+ Other not related to
+  head or head's spouse ..9
+#+end_quote
+
+The page-footer convention was verified rather than assumed: PDF page 6 ends
+with the footer "1.1" and PDF page 7 ends with "1.2", i.e. the label is
+printed at the bottom of its own page.
+
+* Verbatim quote 2 -- the Data User Guide code book (independent primary)
+
+Source: =lsms_library/countries/GhanaLSS/1998-99/Documentation/GHA_1998_GLSS_Data_User_Guide_EN.pdf=,
+*PDF pages 31-32*.  This document *prints no page numbers of its own* (checked
+by layout inspection of the page footers), so PDF page indices are cited.
+
+The entry is split across a page break: the header block and code 1 are at the
+foot of PDF p.31, codes 2-9 at the head of PDF p.32.  The Description/Format/
+Domain/Code labels sit in a left-hand column and the values in a right-hand
+column, so the extraction interleaves them; both halves are reproduced.
+
+Transcription note: the source spells the possessive with U+2019 (RIGHT SINGLE
+QUOTATION MARK) in "head's".  *That character has been replaced with an ASCII
+apostrophe here*, and only that; wording, spacing and sic spellings are as
+printed.
+
+From PDF p.31:
+
+#+begin_quote
+File  SEC1.SSD - SECTION 1:HOUSEHOLD ROSTER
+
+Variables:
+Records:
+Contents:
+
+28
+26,411
+Household information
+
+ REL
+Description:
+Format:
+Domain:
+Code:
+
+Relationship to HH head
+Numeric, 3
+All
+1   Head
+#+end_quote
+
+Continuing at the head of PDF p.32:
+
+#+begin_quote
+2   Wife/husband
+3   Son/daughter
+4   Grandchild
+5   Father/mother
+6   Relative of head/head's spouse
+7   Servant and his/her relative
+8   Tenant and his/her relative
+9   Other not relative to head or head's spouse
+#+end_quote
+
+** Where the two sources differ in wording (not in meaning)
+
+Both differences are in the *user guide*, and both look like transcription
+slips in it; the questionnaire is the instrument actually administered.
+
+| Code | Questionnaire (instrument)                 | Data User Guide (code book)                   |
+|------+--------------------------------------------+-----------------------------------------------|
+|    6 | Relative of head or head's spouse          | Relative of head/head's spouse                |
+|    9 | Other not related to head or head's spouse | Other not *relative* to head or head's spouse (sic) |
+
+"Other not relative to" in the user guide is ungrammatical and is recorded
+here as printed (sic).  *The paste-ready table below follows the questionnaire
+wording.*
+
+* Corroboration against the data (not the source of the mapping)
+
+This is a *check*, never the basis of the decode.
+
+- =SEC1.DTA= has *26,411 rows* -- exactly the "Records: 26,411" printed on the
+  user guide's =SEC1.SSD= page.  The code book page therefore describes this
+  very file.
+- =rel= takes *exactly the 9 values 1..9*, no others, no gaps.
+- =rel == 1= occurs *5,998* times, and =SEC1.DTA= contains exactly *5,998*
+  distinct =(clust, nh)= households -- one "Head" per household, consistent
+  with code 1 = Head.
+- =SEC1.DTA= carries *no embedded Stata value labels* (as stated in the task).
+
+Observed distribution against the decoded labels (all plausible):
+
+| Code | Label                                      | Count |
+|------+--------------------------------------------+-------|
+|    1 | Head                                       |  5998 |
+|    2 | Wife/husband                               |  3375 |
+|    3 | Son/daughter                               | 12694 |
+|    4 | Grandchild                                 |  1979 |
+|    5 | Father/mother                              |   369 |
+|    6 | Relative of head or head's spouse          |  1766 |
+|    7 | Servant and his/her relative               |    53 |
+|    8 | Tenant and his/her relative                |     6 |
+|    9 | Other not related to head or head's spouse |   171 |
+|------+--------------------------------------------+-------|
+|      | total                                      | 26411 |
+
+* PASTE-READY TABLE
+
+For a *wave-level* =relationship= table in
+=lsms_library/countries/GhanaLSS/1998-99/_/categorical_mapping.org=.
+Questionnaire wording; ASCII.
+
+#+begin_src org
+* Relation to head (GLSS4 nine-code scheme)
+# Source: GLSS4 Household Questionnaire, Section 1 (Household Roster),
+# column 3 "Relationship to Head of household", PDF p.7 / printed p.1.2
+# (1998-99/Documentation/questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf).
+# Independently corroborated by the GLSS4 Data User Guide, SEC1.SSD / REL,
+# PDF pp.31-32 (1998-99/Documentation/GHA_1998_GLSS_Data_User_Guide_EN.pdf).
+# NOT the GLSS1 14-code scheme in ../../_/categorical_mapping.org -- see
+# slurm_logs/ghana_audit/FINDINGS_glss4_relationship_codes.org.
+#+name: relationship
+| Code | Label                                      |
+|------+--------------------------------------------|
+|    1 | Head                                       |
+|    2 | Wife/husband                               |
+|    3 | Son/daughter                               |
+|    4 | Grandchild                                 |
+|    5 | Father/mother                              |
+|    6 | Relative of head or head's spouse          |
+|    7 | Servant and his/her relative               |
+|    8 | Tenant and his/her relative                |
+|    9 | Other not related to head or head's spouse |
+#+end_src
+
+* Why the country-level 14-code table is wrong here, and what it would cost
+
+The country-level =relationship= table cites the *GLSS1* data dictionary
+(catalog 2313, file =y01a=) and has 14 codes.  Overlaying it on GLSS4:
+
+| Code | GLSS1 table (in repo) | GLSS4 truth (this file)                    | Agrees? | Rows |
+|------+-----------------------+--------------------------------------------+---------+------|
+|    1 | Head                  | Head                                       | yes     | 5998 |
+|    2 | Spouse                | Wife/husband                               | yes     | 3375 |
+|    3 | Child                 | Son/daughter                               | yes     | 12694 |
+|    4 | Grandchild            | Grandchild                                 | yes     | 1979 |
+|    5 | Parent                | Father/mother                              | yes     |  369 |
+|    6 | Sibling               | Relative of head or head's spouse          | *NO*    | 1766 |
+|    7 | Niece/nephew          | Servant and his/her relative               | *NO*    |   53 |
+|    8 | Son/daughter in-law   | Tenant and his/her relative                | *NO*    |    6 |
+|    9 | Brother/sister in-law | Other not related to head or head's spouse | *NO*    |  171 |
+
+*This is the trap.*  Codes 1-5 coincide semantically, so a spot check of the
+common categories looks perfect while codes 6-9 are silently wrong:
+*1,996 of 26,411 person-rows (7.6%)*.
+
+The errors are *kinship-significant*, not cosmetic, because
+=_expand_kinship()= turns =Relationship= into =(Sex, Generation, Distance,
+Affinity)=:
+
+- code 7 is a *servant* but would be labelled "Niece/nephew" -- a
+  *consanguineal* blood relative;
+- code 9 is *explicitly not related to the head* but would be labelled
+  "Brother/sister in-law" -- an *affinal* relative;
+- code 6 is a *generic* "relative of head or head's spouse" but would be
+  pinned to the specific tuple for "Sibling".
+
+*Flag for whoever wires this (not acted on here):* the GLSS4 labels
+"Relative of head or head's spouse", "Servant and his/her relative", "Tenant
+and his/her relative" and "Other not related to head or head's spouse" are
+unlikely to exist in =lsms_library/categorical_mapping/kinship.yml= and will
+need entries (an unrecognized label only warns).  "Relative of head or head's
+spouse" is genuinely underdetermined as a kinship tuple -- GLSS4 simply does
+not resolve it -- and that should be represented honestly rather than guessed.
+
+* Current behaviour at commit 18b6ca51 (verified, not assumed)
+
+=Relationship= for GLSS4 is *100% NA today, by deliberate choice* -- the
+mislabeling above is a *latent* risk, not a live defect.
+=1998-99/_/mapping.py= sets =_relationship_dict = {}= behind a comment that
+independently states the same conclusion this file reaches:
+
+#+begin_quote
+# GLSS4's `rel` (SEC1.DTA, label "Relationship to HH head") uses a NINE-code
+# scheme (observed codes 1..9; code 1 occurs exactly 5998 times = the household
+# count, so 1=Head).  The country-level `relationship` table in
+# ../../_/categorical_mapping.org is the GLSS1 FOURTEEN-code scheme -- it cites
+# the GLSS1 data dictionary (catalog 2313, y01a) and GLSS1/GLSS2 raw data do
+# use codes 1..14.  Decoding GLSS4 through it would silently MIS-LABEL kinship,
+# which is worse than leaving it null, so this stays unmapped until the GLSS4
+# code list is read off the questionnaire and added as a WAVE-level
+# `relationship` table in 1998-99/_/categorical_mapping.org.
+#+end_quote
+
+*This findings file supplies exactly what that comment asks for.*  Note the
+comment's own instruction about placement: the table must go in the *wave*
+directory, with the wave dir searched *first*, so lookup cannot fall through
+to the GLSS1 table.  That matters --
+=local_tools.get_categorical_mapping= returns on the *first* directory in
+=dirs= that yields the table, and =1998-99/_/categorical_mapping.org= has *no*
+=relationship= table at present, which is precisely why a fall-through to the
+country-level GLSS1 table is the failure waiting to happen.
+
+Verified by building the wave table (=LSMS_NO_CACHE=1=, wave-level
+=grab_data('household_roster')=): 26,411 rows, =Relationship= null fraction
+*1.0000*.
+
+*The GH #348 empty-dict gotcha still reproduces* on the bare call, confirming
+CONTENTS.org's warning is live:
+=get_categorical_mapping(tablename='relationship', dirs=[...])= and the same
+call for ='region'= each return =len 0= ({}), whereas
+=code_label_map('region', _dirs)= returns 20 entries (dual-keyed, string *and*
+int).  Any fix must use =code_label_map=.
+
+* Secondary check -- s1q10 "Region/Country of birth" (11 codes)
+
+*Asked check: the repo table DISAGREES with the documentation.*
+
+Both primary sources agree with each other:
+
+Questionnaire, PDF p.7 (printed "1.2"), column 10 -- verbatim, pure ASCII in
+the source:
+
+#+begin_quote
+        10
+ In what region/
+   country was
+   (NAME) born?
+
+ Western .......1
+ Central .......2
+ Gt. Accra .....3
+ Eastern .......4
+ Volta .........5
+ Ashanti .......6
+ Brong-Ahafo ...7
+ Northern ......8
+ Upper West ....9
+ Upper East ...10
+ Foreign
+  country .....11
+#+end_quote
+
+Data User Guide, PDF p.33 -- verbatim (spacing as printed):
+
+#+begin_quote
+Region/Country of birth
+Numeric, 3
+All
+ 1     Western
+ 2    Central
+ 3     Greater Accra
+ 4     Eastern
+ 5     Volta
+ 6     Ashanti
+ 7     Brong Ahafo
+ 8     Northern
+ 9     Upper West
+10    Upper East
+11    Foreign country
+#+end_quote
+
+Compared with the repo's =region= tables:
+
+| Code | Documentation (s1q10) | Repo =region= table | Match?  |
+|------+-----------------------+---------------------+---------|
+|  1-8 | Western .. Northern   | identical           | yes     |
+|    9 | *Upper West*          | *Upper East*        | *NO*    |
+|   10 | *Upper East*          | *Upper West*        | *NO*    |
+|   11 | Foreign country       | Foreign Country (country table only) | partial |
+
+*Two defects, both live at 18b6ca51:*
+
+1. *Codes 9 and 10 are swapped.*  =Birthplace= currently mislabels *725* people
+   as "Upper East" who were born in *Upper West*, and *1,331* people as "Upper
+   West" who were born in *Upper East*.  (Codes 1-8 and the aggregate are
+   unaffected.)
+2. *Code 11 is silently dropped.*  =mapping.py='s =region_dict= is built with
+   the *wave* dir first, and =1998-99/_/categorical_mapping.org='s =region=
+   table stops at 10 -- it has no "Foreign Country" row (the *country*-level
+   table does).  So the *260* foreign-born people become =pd.NA=.
+
+   *Proof the wave-level table is the one in force*: the built wave table's
+   =Birthplace= null fraction is *0.0098* = 260/26411 exactly -- i.e. precisely
+   the code-11 rows and nothing else.  Had the country-level table been used,
+   code 11 would have decoded and the null fraction would be 0.
+
+*Supporting (not proof):* Ghana's Upper East region is the more populous of
+the two, and the questionnaire ordering puts it at code 10.  =s1q10= code 10
+has 1,331 respondents vs 725 for code 9, consistent with 10 = Upper East.
+
+* FLAGGED, UNRESOLVED -- GLSS4 appears to use TWO different region code orders
+
+This is *not* the asked check and is *deliberately left open*.
+
+The Data User Guide documents a *different* order for the cover-page region
+variable.  PDF p.26, under "FILE SEC0B.SSD - SECTION0B: SURVEY INFORMATION":
+
+#+begin_quote
+REGION
+Description:
+Format:
+Domain:
+Code:
+
+Region ID
+Numeric, 3
+All household
+  1  Western
+  2  Central
+  3  Greater Accra
+  4  Eastern
+  5  Volta
+  6  Ashanti
+  7  Brong Ahafo
+  8  Northern
+  9  Upper East
+10 Upper West
+#+end_quote
+
+So within one code book, =REGION= has 9 = *Upper East* while =S1Q10= has 9 =
+*Upper West*.  A third list, "Region/country lived previously" (PDF p.94),
+follows the =S1Q10= order (9 Upper West, 10 Upper East).  Two of the three
+lists therefore use Upper West = 9.
+
+The repo's =region= table matches the p.26 =REGION= order, so it may well be
+*correct for =Region=/=strata= while wrong for =Birthplace=* -- one table is
+currently doing two incompatible jobs.
+
+*Supporting evidence that even p.26 may be wrong* (explicitly *not* treated as
+proof): =SEC0A.DTA= has 120 households at =region==9= and 260 at =region==10=,
+while the GLSS4 main report's Table 1.1 gives estimated households of *60,000
+for Upper West* and *150,000 for Upper East*.  Sampling was ~20 households per
+EA, so 6 EAs vs 13 EAs.  Assigning 9 = Upper West / 10 = Upper East gives
+sampled-per-estimated ratios of 2.00 and 1.73, inside the range spanned by the
+other eight regions (1.12 to 2.16); the reverse assignment gives 0.80 and
+*4.33*, both outside it, 4.33 grossly so.  *This is an inference from data
+about a documentation question, and GLSS4 allocation is demonstrably not
+strictly proportional (the eight-region ratios themselves vary nearly
+two-fold), so it is recorded as supporting evidence only.*
+
+*Recommended next step:* resolve =REGION= against the GLSS4 Interviewer or
+Supervisor manual (both currently unobtainable, see the source table above) or
+against an external GSS source, before touching the =region= table.  Do not
+"fix" =Region= on the strength of the household-count argument alone.
+
+* Confidence statement
+
+- *Codes 1-9 for =rel= in GLSS4 =SEC1.DTA=: HIGH confidence.*  Two independent
+  primary documents shipped with the wave -- the administered instrument and
+  the official code book -- give the identical 9-code list; the code book page
+  names =SEC1.SSD= and states "Records: 26,411", which matches the file's row
+  count exactly; the data contains exactly codes 1-9; and code 1 occurs
+  exactly once per household.  Nothing was inferred from code frequencies, and
+  no sibling wave (GLSS5/6/7) was used at any point.
+- *The country-level 14-code table is wrong for GLSS4: HIGH confidence*, with
+  the specific consequence quantified (codes 6-9; 1,996 rows; 7.6%).
+- *=s1q10= disagrees with the repo =region= table on codes 9/10 and omits code
+  11: HIGH confidence* -- both primary sources agree against the repo, and the
+  0.0098 null fraction pins which table is in force.
+- *Which region order is correct for the cover-page =REGION=: UNRESOLVED,
+  LOW confidence either way.*  The code book contradicts itself across
+  variables; the two manuals that might settle it could not be fetched.
+- *Wording of code 6 and code 9 labels: HIGH confidence on meaning, and the
+  questionnaire wording is preferred* where the code book differs (see the
+  sic note above).
+
+* Note for CONTENTS.org (NOT applied -- this task was read-only)
+
+Worth recording in =GhanaLSS/_/CONTENTS.org= by whoever next edits it:
+
+1. *GLSS4's =rel= uses a 9-code scheme, not GLSS1's 14* -- with the source
+   citation above.  This is a genuine per-country idiosyncrasy of exactly the
+   kind CONTENTS.org exists to hold, and it is currently recorded only as a
+   comment inside =1998-99/_/mapping.py=.
+2. *GLSS4 uses two different region code orders* (=REGION= vs =S1Q10=), so the
+   single =region= table cannot serve both =Region= and =Birthplace=.
+3. *The GLSS4 household questionnaire HAS a text layer* (unlike GLSS1/GLSS2),
+   so GLSS4 codes are recoverable from documentation -- already implicitly
+   relied on by the =individual_education= and =housing= decodes.
+4. *The GLSS4 Interviewer and Supervisor manuals are sidecar-only and their
+   blobs are not in the DVC cache*, so they are currently unavailable for
+   adjudicating code lists.

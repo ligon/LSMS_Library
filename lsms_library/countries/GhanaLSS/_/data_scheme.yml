@@ -19,43 +19,9 @@ Index Info:
 
 Data Scheme:
   cluster_features:
-    # GH #323 -- what is WIRED here, and what deliberately is NOT.
-    #
-    # Every wired wave points `file:` at a HOUSEHOLD-grain source (the poverty
-    # aggregates / cover page / Section-8H food module) and projects columns that
-    # describe the CLUSTER, not the household.  So the source carries one row per
-    # household (2016-17: one row per household x food item -- 934,584 rows for
-    # 1,000 clusters) while the declared index (t, v) is one row per cluster.
-    # Collapsing to (t, v) is therefore a DE-DUPLICATION of a cluster-invariant
-    # projection -- and it is only safe because the projected columns really are
-    # cluster-invariant.  Verified so in all five wired waves at the time of
-    # writing (max distinct value per cluster = 1; zero clusters with >1):
-    #   1991-92 POV_GH.DTA          4,523 HH ->   365 clusters
-    #   1998-99 SEC0A.DTA           5,998 HH ->   300 clusters
-    #   2005-06 aggregates/pov_gh5  8,687 HH ->   580 clusters
-    #   2012-13 PARTA/g6loc_edt    16,772 HH -> 1,200 clusters
-    #   2016-17 g7sec8h.dta       934,584 rows-> 1,000 clusters
-    #
-    # 1987-88 / 1988-89 are deliberately NOT wired: the source they WERE wired to
-    # (Y01A.DAT REGION) is the person's REGION OF BIRTH, not the cluster's region
-    # -- see those waves' data_info.yml for the full argument.  That is the fix
-    # here: a column that is NOT cluster-invariant must not be projected onto the
-    # cluster at all.  (Auditing the collapse itself is core's business, not this
-    # country's -- see GH #323 Sites 1/2.)
-    #
-    # This is a `todo`, NOT a closure.  A cluster-grain region candidate DOES
-    # exist for 1988-89 -- HEALTH.DAT / DRUG.DAT carry a facility `REGION` keyed
-    # to the clusters served (CL1..CL5, CL + 2000 == CLUST), covering 168 of 170
-    # clusters -- and reaches 84 of 1987-88's 85 bridged clusters via
-    # CLYR1YR2.DAT.  It is unvalidated (14 ambiguous clusters, 2 uncovered, the
-    # +2000 mapping inferred not documented) and therefore unwired.  Do NOT read
-    # these two absent cells as "the survey never asked".
     index: (t, v)
     Region: str
     Rural: str
-    # 2012-13's cluster_features already emits Ecological_zone (`ez`); it was
-    # simply never declared here.
-    Ecological_zone: str
   household_roster:
     index: (t, i, pid)
     Sex: str
@@ -76,8 +42,21 @@ Data Scheme:
     # 1991-92, 1998-99, 2012-13, 2016-17 (the waves whose Section 8B is a
     # genuine per-plot roster with a farm identifier + per-plot area).
     # 1987-88/1988-89 store only household-level land totals (Y09A: ACRFRM
-    # etc.), so they are NOT plot_features.  2005-06 lacks Section 8
-    # agriculture (data jumps sec9 -> sec11).  AreaUnit/Tenure decoded from
+    # etc.), so they are NOT plot_features -- adjudicated `not-asked` on the
+    # questionnaire (Section 9 Part A "LAND", form blocks 9A1/9A2, is 29
+    # single-answer household questions with no farm-number column); see
+    # .coder/coverage/absent_verdicts.csv.
+    #
+    # 2005-06 is NOT wired but the data IS there -- an earlier comment here
+    # claimed "2005-06 lacks Section 8 agriculture (data jumps sec9 -> sec11)"
+    # and that was FALSE.  partb/ ships sec8a1..sec8h; the file that is absent
+    # is sec10 (non-farm enterprises), which is what the sec9->sec11 jump
+    # actually shows.  partb/sec8b.dta is a genuine per-plot roster (11,471
+    # rows; s8bq3 farm number, s8bq4a/s8bq4b size+unit, s8bq8 how obtained) --
+    # the same variable names 2016-17 already reads from g7sec8b.dta.  Verdict
+    # `todo`, 2026-08-20.
+    #
+    # AreaUnit/Tenure decoded from
     # the GLSS7 value labels; 1=Acres,2=Poles,3=Ropes,4=Hectare in the
     # older 4-code waves (no Plot/Other categories).
     index: (t, i, plot_id)
@@ -103,6 +82,14 @@ Data Scheme:
     Int_t: datetime
 
   food_security:
+    # FAO FIES 8-item battery.  Wired for 2016-17 only (g7sec9c.dta).  In
+    # GLSS3-GLSS6 the Section 9 Part C slot is a DIFFERENT module --
+    # "Availability of selected consumer items" (availcd / s9cq1 / s9cq2), a
+    # market-supply question -- so a "sec9c" filename is NOT evidence of a
+    # food-security module.  1991-92 / 1998-99 / 2005-06 / 2012-13 adjudicated
+    # `not-asked` on the questionnaire text; 1987-88 / 1988-89 left `unsure`
+    # because their questionnaires are image-only scans (C4 unrunnable without
+    # OCR).  See .coder/coverage/absent_verdicts.csv, 2026-08-20.
     index: (t, i)
     Worried: bool
     HealthyDiet: bool
@@ -124,11 +111,19 @@ Data Scheme:
     # human-readable category strings inline.  Roof/Floor/Walls present in
     # every wired wave; Water/Toilet/Rooms/Tenure/Electricity where available
     # (1998-99 has no Electricity column, only a 'main source of lighting').
-    # 1987-88/1988-89 DO field a housing module (Y08.DAT: WALLS/FLOOR/ROOF),
-    # but their GLSS1/GLSS2 questionnaires are scanned-image PDFs with no text
-    # layer and the DDI/Basic-info docs carry no value codebook, so the numeric
-    # codes (WALLS 1-8, FLOOR 1-7, ROOF 1-9) cannot be decoded to labels -- those
-    # two waves are intentionally NOT wired (see CONTENTS notes / report).
+    # 1987-88/1988-89 DO field a housing module, in THREE files, not one
+    # (corrected 2026-08-20): Y08.DAT is GLSS1/2 Section 8 "Characteristics of
+    # housing" (AREA HOWM WALLS FLOOR ROOF WINDOW), and Section 2 carries the
+    # rest -- Y02A.DAT (Section 2A "Type of dwelling": DOMICILE COMPOUND NBLDG
+    # APT ROOMS YRSRES) and Y02B.DAT (Section 2B "Housing expenses": OWNHH
+    # RENTED, DWATER, TOILET, LIGHT/ELECM, FUEL, GARBAGE).  Between them they
+    # cover every column this schema declares.  Still NOT wired because the
+    # GLSS1/GLSS2 questionnaires are scanned-image PDFs with no text
+    # layer (78 CCITT-fax pages, zero font objects) and the DDI/Basic-info docs
+    # carry no value codebook, so the numeric
+    # codes (WALLS 1-8, FLOOR 1-7, ROOF 1-9) cannot be decoded to labels.
+    # This is a DECODING blocker, not an absence: adjudicated `todo`, not
+    # `not-asked` -- see .coder/coverage/absent_verdicts.csv.
     index: (t, i)
     Roof: str
     Floor: str

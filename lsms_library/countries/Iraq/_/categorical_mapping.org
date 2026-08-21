@@ -13,10 +13,10 @@
 #+name: harmonize_education
 | Original Label                    | Preferred Label              |
 |-----------------------------------+------------------------------|
-| No diploma, do not read and write | None                         |
-| No diploma, read only             | None                         |
-| No diploma, read and write        | None                         |
-| No certificate                    | None                         |
+| No diploma, do not read and write | No education                 |
+| No diploma, read only             | No education                 |
+| No diploma, read and write        | No education                 |
+| No certificate                    | No education                 |
 | Elementary                        | Primary complete             |
 | Intermediate                      | Lower secondary complete     |
 | Intermediate (mid school)         | Lower secondary complete     |

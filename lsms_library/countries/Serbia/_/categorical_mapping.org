@@ -19,8 +19,8 @@ zero-padded raw codes ("00".."11").  One non-numeric cell forces the whole
 | Original Label | Preferred Label              |
 |----------------+------------------------------|
 | Unknown        | Unknown                      |
-| 00             | None                         |
-| 01             | None                         |
+| 00             | No education                 |
+| 01             | No education                 |
 | 02             | Primary incomplete           |
 | 03             | Primary complete             |
 | 04             | Vocational/Technical         |
