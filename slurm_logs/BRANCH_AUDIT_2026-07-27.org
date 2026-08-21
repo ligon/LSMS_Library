@@ -1,0 +1,187 @@
+#+title: Local branch audit -- 2026-07-27
+#+author: Sue (Claude Opus, via Claude Code)
+#+date: [2026-07-27 Mon]
+
+Cited by PRs #666, #667, #668, #669 as the provenance for how those branches
+were found.
+
+* Why this exists
+
+63 local branches had accumulated.  The question was which were prunable.  The
+answer turned out to be "few, and for three different reasons" -- so the audit
+became a triage of unlanded work rather than a cleanup.
+
+* Method, and two traps that produced a confident wrong answer first
+
+Patch-equivalence against =origin/development= via =git cherry=, joined to all
+418 PRs.  Both refinements were necessary:
+
+1. *=gh pr list --limit 400= silently truncated at 400 of 418.*  Every "no PR"
+   in the first pass was a potential false negative.  The tell was the round
+   number matching the limit.  Use =--paginate=.
+2. *A SHA ancestor test cannot see a squash-merge.*  =git rev-list
+   origin/development..<branch>= counts by SHA, so a squash-merged branch looks
+   like unique work.  =git cherry= compares patch-ids.  This error is
+   directional -- it over-reports work as unmerged -- but it buries the signal.
+
+A third check was needed on top of both: *patch-absence is not the same as
+"still needed."*  Every branch below that was proposed for a PR was verified
+against the *actual config on development* (e.g. Serbia still reads =v:
+popkrug=; Nigeria still maps =s10bq5a -> 'Produced'=), not against patch-ids.
+
+* Headline
+
+| category      |  n | disposition                                      |
+|---------------+----+--------------------------------------------------|
+| 2-SAFE        | 13 | every commit patch-present -- deletable          |
+| 1-KEEP        | 11 | open PR                                          |
+| 3-REVIEW      | 37 | commits absent from development -- triaged below |
+| 4-LOCAL-ONLY  |  2 | no remote -- deletion unrecoverable              |
+
+RETRACTION: an earlier draft of this file said /"this is an unmerged backlog,
+not clutter; deleting it destroys work."/  That was *wrong* -- see the
+rejected-design section below.  It holds for 3 of the 13 never-submitted
+branches and not for the other 10.
+
+* Why the 26 =fix/323-<country>= branches never merged
+
+Three distinct reasons, not one:
+
+| fate                                        |  n | detail                                      |
+|---------------------------------------------+----+---------------------------------------------|
+| superseded by a merged =-config= rework     |  8 | Ethiopia, EthiopiaRHS, Guinea-Bissau,       |
+|                                             |    | Malawi, Mali, Niger, Nigeria, Tanzania      |
+| open PR on a =-config= sibling              |  2 | Albania #620, GhanaLSS #622                 |
+| PR opened, then closed                      |  3 | Cambodia #613, Tajikistan #610, GhanaLSS #609 |
+| *no PR ever opened*                         | 13 | split below                                 |
+
+** 10 of the 13 encode a REJECTED design
+
+They declare =aggregation: mode/dedupe/unique= in =data_scheme.yml=.  That key
+is *dead config* -- CLAUDE.md ("deliberately NOT honoured by the core collapse
+(a test pins this)") under =SkunkWorks/grain_aggregation_policy.org= "NO
+AGGREGATION IN CORE".  The three *closed* PRs above are the same approach being
+rejected in review.  These branches were not neglected; the design was reversed
+out from under them.
+
+Affected: Burkina Faso, CotedIvoire, Iraq, Kazakhstan, Kosovo, Liberia,
+Senegal, Serbia-and-Montenegro, South Africa, Timor-Leste.
+
+Their *ledgers* (per-country diagnosis of what is broken) may still be worth
+salvaging independently of the remedy.  Kazakhstan is the clean example: its
+defect is documented in CLAUDE.md (cluster =v=126= returns =Rural= for 178
+Urban households) even though its branch's fix is not wanted.
+
+** 3 match current policy and were still needed -- PRs opened
+
+They fix the *identifier*, per CLAUDE.md "fix the index; do not declare a
+reducer".  None adds an =aggregation:= key.  Each was verified live on
+=development@ad4b9c1f=:
+
+| branch                | PR    | verified live                                  |
+|-----------------------+-------+------------------------------------------------|
+| =fix/323-serbia=      | #666  | =v: popkrug= at data_info.yml:6,31,49          |
+| =fix/323-china=       | #667  | =cluster_features= reads S01A2.DTA at :42-44   |
+| =fix/323-guyana=      | #668  | =i: [ED, HH]= at :24,50,89                     |
+
+=fix/323-guyana= was chosen over the competing =fix/503-guyana= (independent
+implementations, same day): its tests are gated on data access, it removes =i=
+from =cluster_features= rather than declaring-and-collapsing it, and it corrects
+its own false ledger claim in =29c16145=.  #668 carries review notes covering a
+four-test graft from =fix/503-guyana= and two numeric reconciliations.
+
+* The rest of 3-REVIEW
+
+| branch                          | disposition                                  |
+|---------------------------------+----------------------------------------------|
+| =docs/601-universe-in-contents= | merged in substance as =765f90ec= (rebased   |
+|                                 | twin).  All 38 files checked: development is |
+|                                 | strictly ahead.  SAFE.                       |
+| =docs/handoff-2026-07-22=       | PR #662 closed deliberately.  Archived copy. |
+| =fix/591-nigeria-prices=        | *PR #669* -- #591 open, ~99% of price rows   |
+|                                 | dropped in 6 of 8 waves.  Verified live.     |
+| =fix/537-dormant-validator=     | #537 open, clean merge, touches =country.py= |
+|                                 | and =transformations.py= -- wants review.    |
+| =fix/600-provenance-1to1=       | #600 open, conflicts, edits =CLAUDE.md=.     |
+| =docs/323-grain-collapse-sites= | design doc genuinely ABSENT from development. |
+| =fix/503-guyana=                | keep until #668 merges (test graft source).  |
+| =rescue/2026-07-21/*= (5)       | 07-21 snapshots of *uncommitted* work; 3 of  |
+|                                 | 5 carry the rejected design (Benin 12 refs,  |
+|                                 | Togo 12, Uganda 21); 4 of 5 conflict;        |
+|                                 | =602-spellings= is a pure 38-line deletion.  |
+|                                 | Also preserved as patches in                 |
+|                                 | =~/lsms-rescue-2026-07-21/patches/= (231K).  |
+
+* 2-SAFE -- deletable
+
+| branch | sha | PR | state |
+|--------+-----+----+-------|
+| =docs/release-notes-v0.9.0= | 611ac9e9 | 664 | MERGED |
+| =feat/coverage-blessed= | 0a0497df | 593 | MERGED |
+| =feat/wave-provenance-catalog-id= | 4cc05d3a | 595 | MERGED |
+| =fix/323-assets-item-seq= | 74d135fc | 629 | MERGED |
+| =fix/323-malawi-cartesian= | a689f88b | 653 | MERGED |
+| =fix/323-site4-dfs-merge= | 4a7df10c | 627 | MERGED |
+| =fix/323-uganda-crop-condition= | 12346608 | 649 | MERGED |
+| =fix/605-ci-skip= | 7495263e | - | none |
+| =fix/645-to-parquet-null-coercion= | 67ec061d | 655 | MERGED |
+| =fix/648-conftest-import-marker= | 4a57ebf9 | 657 | MERGED |
+| =rebase-611= | 6c54279f | - | none |
+| =test/assets-mincount= | c83947d4 | - | none |
+| =test/conftest-creds-skip= | 243cb210 | 648 | MERGED |
+
+* 4-LOCAL-ONLY -- no remote; deletion is UNRECOVERABLE
+
+| branch | sha | +ABS |
+|--------+-----+------|
+| =fix/323-uganda-config-local= | 9e8ac9de | 2 |
+| =work/646-review= | cd1ce0f1 | 2 |
+
+* 3-REVIEW -- full table
+
+| branch | sha | +ABS | PR | state |
+|--------+-----+------+----+-------|
+| =docs/323-grain-collapse-sites= | f85dcc18 | 2 | - | none |
+| =docs/601-universe-in-contents= | ed3b06a4 | 1 | 658 | MERGED |
+| =docs/handoff-2026-07-22= | 0b3c2149 | 1 | 662 | CLOSED |
+| =fix/323-albania= | cbebdce4 | 1 | - | none |
+| =fix/323-burkina-faso= | df5636d4 | 1 | - | none |
+| =fix/323-cambodia= | 9a863866 | 1 | 613 | CLOSED |
+| =fix/323-china= | e6b85dae | 1 | - | none |
+| =fix/323-cotedivoire= | fb321db0 | 2 | - | none |
+| =fix/323-ethiopia= | 38d21478 | 2 | - | none |
+| =fix/323-ethiopiarhs= | 2a761124 | 1 | - | none |
+| =fix/323-ghanalss= | 81331198 | 1 | 609 | CLOSED |
+| =fix/323-guinea-bissau= | 96f781d4 | 1 | - | none |
+| =fix/323-guyana= | 29c16145 | 3 | - | none |
+| =fix/323-iraq= | 24ac7074 | 2 | - | none |
+| =fix/323-kazakhstan= | b6ad458d | 2 | - | none |
+| =fix/323-kosovo= | 8411c171 | 1 | - | none |
+| =fix/323-liberia= | 83e536d8 | 1 | - | none |
+| =fix/323-malawi= | ce908b24 | 2 | - | none |
+| =fix/323-mali= | a8fe61cc | 1 | - | none |
+| =fix/323-niger= | 5c554ee9 | 1 | - | none |
+| =fix/323-nigeria= | 64889309 | 1 | - | none |
+| =fix/323-senegal= | fb198f4f | 1 | - | none |
+| =fix/323-serbia-and-montenegro= | 9b6436fa | 1 | - | none |
+| =fix/323-serbia= | da104078 | 1 | - | none |
+| =fix/323-south-africa= | 7bbf0ed2 | 2 | - | none |
+| =fix/323-tajikistan= | 6d0fae40 | 1 | 610 | CLOSED |
+| =fix/323-tanzania= | 01b69f86 | 1 | - | none |
+| =fix/323-timor-leste= | cfe13d42 | 1 | - | none |
+| =fix/503-guyana= | 730bc89e | 1 | - | none |
+| =fix/537-dormant-validator= | 9a8f753c | 1 | - | none |
+| =fix/591-nigeria-prices= | fe64d06e | 2 | - | none |
+| =fix/600-provenance-1to1= | 8afe909a | 1 | - | none |
+| =rescue/2026-07-21/323-assets-item-seq= | 66b0ae52 | 2 | - | none |
+| =rescue/2026-07-21/323-benin= | 2feeeb99 | 1 | - | none |
+| =rescue/2026-07-21/323-togo= | ab0d1086 | 1 | - | none |
+| =rescue/2026-07-21/323-uganda= | d4b4e04c | 1 | - | none |
+| =rescue/2026-07-21/602-spellings= | 296849a0 | 1 | - | none |
+
+* Caveat
+
+All row counts, percentages and household figures quoted in the linked PRs
+are the *branches'* own measurements, restated but *not* independently
+re-measured.  What was independently verified is narrower and stated as
+such: the current contents of the config files on =development=.

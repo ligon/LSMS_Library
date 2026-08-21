@@ -6,7 +6,21 @@ from collections import defaultdict
 from importlib.resources import files
 
 path = files('lsms_library')/'countries'/'GhanaLSS'/'1988-89'
-region_dict = tools.get_categorical_mapping(tablename = 'region', dirs=[f'{path}/_', f'{path}/../_/', f'{path}/../../_/'])
+_dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+
+# A bare tools.get_categorical_mapping(tablename=...) returns an EMPTY dict --
+# it passes no value column, so df_data_grabber drops the Label column and the
+# squeeze yields {}.  Every lookup then misses and silently produces pd.NA,
+# with nothing raised.  That is what left Region/Birthplace/Relationship 100%
+# NULL in this wave (and, downstream, the Generation/Distance/Affinity kinship
+# columns that _expand_kinship derives from Relationship).
+# tools.code_label_map passes Label='Label' and keys the result by BOTH the
+# string and the int form of each code.  See GH #372/#377/#348.
+region_dict = tools.code_label_map('region', _dirs)
+rural_dict = tools.code_label_map('rural', _dirs)
+# GLSS2 uses the same 14-code relationship scheme as GLSS1 (verified:
+# REL takes codes 1..14 and code 1 occurs 3192 times = the household count).
+relationship_dict = tools.code_label_map('relationship', _dirs)
 
 def i(value):
     '''
@@ -41,7 +55,6 @@ def Relationship(value):
     '''
     Formatting relationship variable
     '''
-    relationship_dict = tools.get_categorical_mapping(tablename = 'relationship', dirs=[f'{path}/_', f'{path}/../../_/', f'{path}/../_/'])
 
     return relationship_dict.get(value, pd.NA)
 
@@ -61,6 +74,34 @@ def Region(value):
     except ValueError:
         value_key = None
     return region_dict.get(value_key, pd.NA)
+
+def cluster_features(df):
+    '''Collapse the person-grain roster frame to (t, v) cluster grain.
+
+    Mirrors 1987-88/_/mapping.py::cluster_features -- GLSS1 and GLSS2 have NO
+    cluster-location variable.  Both waves read `Region` for cluster_features
+    and `Birthplace` for household_roster from the SAME source column,
+    Y01A.DAT:REGION, which is the *person's region of birth*, not where the
+    cluster is.  So the cluster's region is INFERRED as the modal birth region
+    among household members under 12 (young children are least likely to have
+    migrated).  This is a documented approximation, not a measured value.
+
+    Without this, the framework collapses the person-grain frame with
+    groupby().first(), which takes an ARBITRARY person's birth region as the
+    whole cluster's region.  Measured on this wave that destroyed 14,559 of
+    14,924 rows across 167 conflicting clusters (GrainCollapseWarning), i.e.
+    the majority of clusters held members born in more than one region.
+    '''
+
+    youngsters = df.query("Age<12")
+    foo = youngsters.reset_index().groupby(['t', 'v', 'Region']).count()
+
+    foo = foo.sort_values(by="Age", ascending=False).reset_index().drop_duplicates(subset=['t', 'v'], keep='first', inplace=False)
+    foo = foo.sort_values(by='v')
+    foo = foo.set_index(['t', 'v'])
+    foo['Rural'] = pd.NA
+
+    return foo[['Region', 'Rural']]
 
 def Int_t(value):
     '''

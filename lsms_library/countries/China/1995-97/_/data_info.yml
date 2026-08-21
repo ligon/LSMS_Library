@@ -40,10 +40,48 @@ household_roster:
         MonthsAway: s01a212
 
 cluster_features:
+    # GH #323.  This is a VILLAGE-level table (declared index (t, v)).  It used
+    # to be extracted from S01A2.DTA -- the person-level household roster -- with
+    # `idxvars: {i: hid, v: [hid]}`, so every PERSON emitted a cluster_features
+    # row: 3002 rows for 30 villages.  The surplus was then silently collapsed
+    # (Wave.cluster_features' un-warned groupby().first() whenever `i` is in the
+    # index, GH #161).  It survived only because Region happens to be a
+    # deterministic function of the index -- an un-enforced invariant.
+    #
+    # Now extracted at HOUSEHOLD grain from TOTEXP.DTA (787 rows -- the same file
+    # `sample` reads, so the villages here are exactly the sample's villages),
+    # with NO `i` in idxvars, and reduced to one row per village by the
+    # `cluster_features` df_edit hook in China/_/china.py, which ASSERTS that
+    # (t, v) is unique -- i.e. that Region really is single-valued within a
+    # village -- instead of relying on a collapse to hide it.
+    #
+    # Why not NPT0101.DTA, the community questionnaire?  It IS a genuine
+    # one-row-per-village file (31 rows) with real prov/county/town/village
+    # columns, and it would be the principled source -- but its village codes
+    # CANNOT be linked to the household-derived `v`, and the link is not
+    # recoverable:
+    #   * The two codings are different schemes, with no arithmetic bridge.
+    #     NPT0101 codes a village as a 4-digit prov-prefixed hierarchy
+    #     (7111 = prov 7 / county 71 / town 711 / village 7111) and encodes a
+    #     real town (711/712/713).  The household `v` is hid//100, whose TOWN
+    #     DIGIT IS ALWAYS 0 (observed: 101-105, 201-205, ... 601-605) -- the
+    #     household file carries no town information at all.
+    #   * No file in the wave carries both `hid` and a geography column, so
+    #     there is no crosswalk in the data (verified across all 90+ .DTA files).
+    #   * The crosswalk cannot be inferred either: sample size per village is
+    #     fixed by design (village 01 of each county -> 50 households, villages
+    #     02-05 -> 20 each) and is uncorrelated with NPT0101's village
+    #     population (bi1a, range 127-1034), so there is no signal to align on.
+    #   * And it is provably ambiguous regardless: county 83 has SIX villages in
+    #     NPT0101 but only five appear in the household data, so at least one
+    #     NPT0101 village has no sampled households and no way to identify which.
+    # Adopting NPT0101 would therefore require a positional GUESS at the village
+    # crosswalk.  We decline to guess.  (Region is unaffected by all of this:
+    # province is constant within a county, so it does not depend on the
+    # village-level correspondence at all.)
     file:
-        - ../Data/S01A2.DTA
+        - ../Data/TOTEXP.DTA
     idxvars:
-        i: hid
         v:
             - hid
     myvars:
