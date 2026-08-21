@@ -260,9 +260,20 @@ a related and arguably worse defect; see 4.2.
 
 ** Class B -- 0 cells
 
-No non-null raw value anywhere resolves to NA.  Checked mechanically over
-~rural_mapping.csv~.  Two *latent* B risks are recorded in 7.4 (Tanzania's
-~.map(dict)~, Iraq's ~else 'Urban'~); neither fires on today's data.
+No non-null raw value anywhere resolves to NA.  *Two different strengths of
+evidence*, and the distinction matters:
+
+- For ~inline_dict~ cells the check is *mechanical* -- ~rural_mapping.csv~
+  resolves every raw value against the declared dict, and no row lands on NA.
+- For ~auto_function~ / ~script~ cells (GhanaLSS 1991-92 and 1998-99,
+  GhanaSPS 2009-10, Ethiopia x5, Tanzania x2) the mapping is *code*, so the
+  evidence is the delivered pass instead: every one of them delivers zero
+  nulls, and every partial null anywhere in the corpus has an attributed
+  cause that is not a lost mapping (Pakistan's documented PSU, Uganda's
+  parish conflicts plus 20 raw nulls, Azerbaijan's merge).
+
+Two *latent* B risks are recorded in 7.4 (Tanzania's ~.map(dict)~, Iraq's
+~else 'Urban'~); neither fires on today's data.
 
 ** Class C -- 11 cells / 7 country-waves
 
@@ -488,7 +499,13 @@ Three things this audit adds.
    poverty" and every PSU is a village, and CONTENTS.org still refuses to
    record a rural-only universe because no document states one.
 
-* 5. Class C -- declared or expected, delivered ~100% null
+* 5. Class C and its neighbours -- nulls, and cells that deliver nothing
+
+The first nine rows below are class C -- 11 cells, since the two Albania rows
+each cover ~sample~ and ~cluster_features~.  The last two rows are *not* class
+C (Azerbaijan is 45.8%, Peru delivers no table at all) and are here because
+they belong to the same question: where does a ~Rural~ that exists fail to
+reach the user?
 
 | country  | wave    | table            | null | of    | why (measured)                                  |
 |----------+---------+------------------+------+-------+-------------------------------------------------|
