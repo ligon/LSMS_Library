@@ -1,0 +1,166 @@
+#+title: Handoff -- Ghana correctness & completeness audit, 2026-08-19
+#+author: Sue (Claude Opus 5)
+#+date: [2026-08-19 Wed]
+
+* TL;DR
+
+Branch =audit/ghana-correctness=, off =master= (=ad4b9c1f=).  Six commits.
+
+*GhanaLSS*: a silent empty-dict decode had left three of seven waves without
+kinship data -- *56,817 people* -- and had killed =cluster_features= in those
+same waves.  Fixed, verified against the survey questionnaire, and the traps
+written into =CONTENTS.org=.  =household_roster= is now complete in all seven
+waves.
+
+*GhanaSPS*: the config claimed cluster identity was unavailable.  It was not.
+=sample= is now wired for all three waves -- exactly *334 EAs* in each, the
+documented count -- with =food_acquired= row counts unchanged.
+
+* Commits
+
+| commit     | what                                                              |
+|------------+-------------------------------------------------------------------|
+| =18b6ca51= | GhanaLSS: revive the dead categorical decodes in GLSS1/GLSS2/GLSS4 |
+| =983913f5= | GhanaLSS: record the three decode traps in =CONTENTS.org=          |
+| =3acf1a07= | audit findings + cold matrix snapshots (pre/post fix)             |
+| =9b650faf= | GhanaSPS provenance + vintage findings                            |
+| =5a4041ca= | GhanaSPS weights + cluster identity, with a dispatcher correction |
+| =f5e6b66c= | GhanaLSS: correct GLSS4 region codes; decode its 9-code relationship |
+| =337d4770= | record the GLSS4 region regression + test status                  |
+| =ed3405e1= | GhanaSPS: wire =sample= for all three waves; correct a false claim |
+
+* What changed in the data
+
+** GhanaLSS
+
+| table                     | before                                  | after                    |
+|---------------------------+-----------------------------------------+--------------------------|
+| =cluster_features=        | 3 of 7 waves =dropped=                  | all 7 build, 0 grain warnings |
+| =household_roster=        | Generation/Distance/Affinity 100% null in 3 waves | 0.0% null in all 7 |
+| =sample= 1998-99          | strata + Rural 100% null                | 0.0% null                |
+| =household_roster= 1998-99 | Birthplace 100% null, Relationship 100% null | both 0.0% null      |
+
+Cold matrix, GhanaLSS + GhanaSPS: =dropped= 3 -> *0*, =sane= 91 -> *94*.
+Exactly three cells changed; zero collateral.
+
+** GhanaSPS
+
+=sample= added: 334 EAs per wave; households 5,009 / 4,774 / 5,669.
+=food_acquired= gains =v= with row counts *unchanged*.
+
+* Verification
+
+- Full suite at =f5e6b66c=: *4,015 passed, 1 failed*.
+- The one failure is =CotedIvoire/cluster_features= ("declared column
+  'Latitude' not found"), in two test classes.  *Not ours.*  Reproduced on
+  =master= in an isolated worktree with the import asserted to come from the
+  worktree, not the =.pth=-pinned main checkout.
+- It is a *stale-cache artefact of this workstation*, not a code defect: the
+  cached parquet (2026-07-21) has =['Region','Rural']=; a cold rebuild yields
+  =['Region','Rural','Latitude','Longitude']=.
+
+* Open items, roughly in order of value
+
+** 1. The =get_categorical_mapping= footgun is still armed
+
+After this work, *zero* bare callers remain (AST sweep: 70 correct sites, 0
+broken).  But the function still returns =\{\}= silently when no value column
+is requested, so the next caller gets the same 100%-null-column failure.  This
+is the *third* recurrence in this one country (#372/#377, #348, and today).
+
+Proposed: make it warn or raise when it is about to return an empty mapping
+*because no value column was requested*.  Small change plus a test, but it is a
+behaviour change to a library function with 70 call sites across 15 countries,
+so it wants its own PR and a warn-vs-raise decision.  *Not done here.*
+
+** 2. A degraded build caches as though it were fresh
+
+The CotedIvoire failure points at something general.  The parquet carries a
+content hash that grades it *fresh*, yet its content is degraded.  The likely
+path: the GH #515 optional-sub-df fallback drops a sub-df whose file could not
+be fetched, and the parquet is written *without* the column but *with* a valid
+hash.  No amount of hash-checking re-derives it.
+
+Worth a look independent of Ghana.
+
+** 3. GhanaSPS wave-3 acquisition (decision taken: hold both)
+
+Ethan chose *hold both vintages, current as primary*.  Not acted on: it means
+fetching the 11 missing public files plus public versions of the 29 we hold in
+richer form, and pushing blobs -- write credentials and a separate piece of
+work.  Scope it as its own issue.
+
+Evidence is in =FINDINGS_ghanasps_provenance.org=: we hold 29 wave-3 files with
+MORE variables than the public "Edited, anonymous" release, and lack 11 public
+files.  Wave 1 is confirmed byte-consistent with the WB release; wave 2 is
+close to IHSN v01.  Waves 2 and 3 have *no =LICENSE.org=*; all three
+=SOURCE.org= lack =PROVENANCE_VALIDATION=.
+
+** 4. GhanaSPS completeness -- the cheap wins are identified, not taken
+
+From =FINDINGS_ghanasps_module_inventory.org= (313 =.dta= swept, zero
+=unknown= cells), ranked:
+
+1. =household_roster= (=S1D= / =01b2_roster= + =awaylast12=) -- also unlocks
+   =household_characteristics=.  Residence-duration data exists in all waves.
+2. =anthropometry= -- whole-household, all three waves.  Would be distinctive
+   in this library.
+3. =housing=, =individual_education=.
+
+Also: *Cantril ladder + K10 depression in all waves* -- subjective wellbeing,
+which no other country here has.
+
+** 5. Shocks for Ghana: settled, and it is an acquisition problem
+
+- GhanaLSS: no shocks module in any of the 7 waves (already documented).
+- GhanaSPS *household* level: =not-asked= in all three waves.
+- GhanaSPS *community* level: =asked-not-distributed=.  The wave-2 community
+  instrument ships Sections 7A/7B/7C "Shocks and Conflicts", and *no community
+  =.dta= exists in any wave*.
+
+So =GhanaLSS/_/CONTENTS.org='s pointer ("Shocks data for Ghana should be sought
+in GhanaSPS if available") resolves to: *it was asked, at community level, and
+was never distributed.*  Acquisition target, not a config gap.
+
+** 6. Bookkeeping not done
+
+- *Zero =absent_verdicts.csv= rows for Ghana*, though evidence now exists for
+  several.  Note the C4 rule: =not-asked= needs questionnaire evidence, and the
+  GLSS1/GLSS2 questionnaires are scanned images with no text layer, so some
+  cells can only honestly be =unsure=.
+- *Zero blessed cells.*  Blessing requires a human to read the numbers; not
+  something this audit can do on anyone's behalf.
+- =.coder/coverage/latest.csv= refresh: a 34-country cold matrix was run this
+  session to =full_matrix_cold.csv=.  Review before promoting it to the tracked
+  snapshot.
+
+** 7. Small, unrelated, real
+
+- *GhanaLSS 1991-92 =MonthsAway= is 50.6% null.*  Pre-existing; untouched.
+- *373 DVC-tracked =.dta= files exist as local working copies* under
+  =lsms_library/countries/=.  Not git-tracked -- local workspace state only.
+  The library correctly refuses them and falls through to the blob cache.  Left
+  alone: deleting is destructive and is the human's call.
+
+* The methodological point worth carrying forward
+
+Three times this session a *plausible, confidently-reported rule* was wrong in
+a way that would have silently corrupted data, and each was caught only by
+checking it directly against the source:
+
+1. =(id1, id2, id3)= as GhanaSPS wave-1's cluster key -- splits EA 183, which
+   spans two district codes, into two pseudo-clusters.
+2. =FPrimary[3:6]= as waves 2/3's key -- shifts on the 37 ten-character ids in
+   wave 3, inventing 2 EAs.  *Agrees with the correct rule on 2013-14*, so
+   checking one wave would have passed.
+3. The repo's own GLSS4 =region= table -- 9 and 10 swapped against the
+   questionnaire.
+
+And the general lesson from (3), which is the one most likely to recur:
+*reviving a dead decode does not restore data -- it starts TRUSTING a mapping
+table that nobody has had reason to validate, precisely because while the
+decode was dead its contents could not be observed.*  This session's own fix
+(=18b6ca51=) turned 2,056 people from honest NAs into wrongly-labelled Upper
+East <-> Upper West, and it was live for about forty minutes.  Any fix of that
+shape must re-verify the table against a primary source, not merely make it
+non-empty.

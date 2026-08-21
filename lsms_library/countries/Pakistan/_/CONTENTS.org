@@ -1,5 +1,260 @@
 #+TITLE: Pakistan — country notes & known data issues
 
+* Sampling universe, exclusions and sub-samples
+
+Evidence gathered 2026-07-21 for GH #601 / #603.  This section records *what the
+survey documentation claims the sample represents*.  Nothing here is inferred
+from the =.dta= files; no microdata was opened for it.
+
+Pakistan ships exactly one wave directory, =1991/= (PIHS 1991).  There is no
+second wave, so everything below is about that single cross-section.
+
+** Where the statement lives: WB catalog only, and the DDI universe field is empty
+
+The library holds *no* file that states a universe for this wave.  The frame
+statement and every exclusion quoted below come from the World Bank Microdata
+Library catalog record named in =1991/Documentation/SOURCE.org=
+(=#+CATALOG_IDNO: PAK_1991_IHS_v01_M=, catalog id 543, DOI
+https://doi.org/10.48529/azv8-cf20).  That record is a *moving target*: it is
+maintained upstream and is not versioned in this repository.  Retrieved
+2026-07-21 from
+https://microdata.worldbank.org/index.php/api/catalog/PAK_1991_IHS_v01_M .
+
+Two facts about that record matter, and both were re-verified against the live
+API and the DDI 2.5 XML export on 2026-07-21:
+
+- The catalog has *no populated universe field.*  =study_desc.study_info= holds
+  only =abstract=, =coll_dates=, =nation=, =geog_coverage=, =analysis_unit=,
+  =data_kind= and =notes=.  In the DDI XML export
+  (https://microdata.worldbank.org/index.php/metadata/export/543/ddi) the
+  element =<universe/>= occurs exactly twice --- once in =<sumDscr>= and once
+  inside =<sampleFrame>= --- and is *present but empty* in both places.  So the
+  universe was not omitted by accident of export; the field exists in the record
+  and was left blank.
+- Consequently the frame-and-exclusions text below is quoted from
+  =study_desc.method.data_collection.sampling_procedure=, which is where this
+  record actually states the frame and what it leaves out.
+
+*Not boilerplate.*  The =sampling_procedure= text is survey-specific FBS/World
+Bank prose (named provinces, named cities, an 88-stratum table, the 1981 Census
+and the 1988 Census of Establishments).  It is not the WB NADA template sentence
+that recurs verbatim across 15 waves elsewhere in the corpus.
+
+** The declared frame (1991)
+
+Verbatim, from =sampling_procedure=, opening paragraph and the =SAMPLE FRAME:=
+paragraph.  Language: English; no translation needed.
+
+#+begin_quote
+The sample for the PIHS was drawn using a multi-stage stratified sampling
+procedure from the Master Sample Frame developed by FBS based on the 1981
+Population Census.
+
+SAMPLE FRAME:
+
+This sample frame covers all four provinces (Punjab, Sindh, NWFP, and
+Balochistan) and both urban and rural areas. Excluded, however, are the
+Federally Administered Tribal Areas, military restricted areas, the districts of
+Kohistan, Chitral and Malakand and protected areas of NWFP. According to the
+FBS, the population of the excluded areas amounts to about 4 percent of the
+total population of Pakistan. Also excluded are households which depend entirely
+on charity for their living.
+#+end_quote
+
+Read strictly, this is a statement about the *frame*, not about a target
+population.  The survey documents never name the set of units the sample stands
+for; they name the list it was drawn from and what that list omits.
+
+*** What the local documentation says (and does not say)
+
+=1991/Documentation/pak08a.pdf= --- "PAKISTAN INTEGRATED HOUSEHOLD SURVEY, Final
+Results, 1991" (FBS / World Bank / UNDP, March 1992, rev. 7/92) --- contains no
+universe or target-population sentence.  Its closest statement is section I.C
+"Sample Design", report page 3 (= page 13 of 55 in the PDF).  The PDF is a scan
+with no text layer, so this is a transcription read off the rendered page image;
+it was independently re-read and confirmed character-for-character on
+2026-07-21:
+
+#+begin_quote
+PIHS survey teams were scheduled to visit 4800 households residing in 300 urban
+and rural communities between January and December, 1991.  Each team visited
+approximately 20 communities (denoted Primary Sampling Units, or PSUs) and
+interviewed 16 households (denoted Secondary Sampling Units, or SSUs) in each.
+The sample is drawn from the master sample frame maintained by FBS.
+
+The sample is divided equally between Pakistan's urban and rural areas, with
+provincial shares roughly approximating population shares.  The sampling scheme
+is expected to yield sufficient observations within each province (with the
+possible exception of Balochistan) and within urban/rural segments to provide
+adequate statistical accuracy and sufficient variation in key economic variables
+for policy analysis.
+#+end_quote
+
+That passage names the frame but states *no exclusions*.  Table A.1 on the same
+page gives the realised sample: 4,794 households, 36,071 individuals, 300 PSUs,
+broken out by Punjab / Sindh / N.W.F.P. / Balochistan and urban / rural.
+
+** Exclusions (1991) --- recorded in catalog metadata only
+
+The exclusion clause, verbatim (same catalog field as above):
+
+#+begin_quote
+Excluded, however, are the Federally Administered Tribal Areas, military
+restricted areas, the districts of Kohistan, Chitral and Malakand and protected
+areas of NWFP. According to the FBS, the population of the excluded areas
+amounts to about 4 percent of the total population of Pakistan. Also excluded
+are households which depend entirely on charity for their living.
+#+end_quote
+
+| kind       | excluded                                                    |
+|------------+-------------------------------------------------------------|
+| geographic | Federally Administered Tribal Areas (FATA)                  |
+| geographic | military restricted areas                                   |
+| geographic | districts of Kohistan, Chitral and Malakand (NWFP)          |
+| geographic | protected areas of NWFP                                     |
+| population | households which depend entirely on charity for their living |
+
+The catalog's own sizing of the geographic exclusions is "about 4 percent of the
+total population of Pakistan"; no size is given for the charity-dependent
+exclusion.
+
+Two things a pooling user needs to know.  First, *these exclusions exist nowhere
+in this repository* --- not in =SOURCE.org=, not in =LICENSE.org=, not in any of
+the five DVC-tracked PDFs.  Drop the network and the exclusions are unknowable
+from the shipped tree.  Second, the charity-dependent exclusion is a
+*population* exclusion at the destitute tail, which is exactly the tail an LSMS
+poverty analysis is usually about.
+
+** Oversamples and sub-samples (1991)
+
+There is *one* deliberate oversample, and the documentation is explicit about it.
+
+*Urban strata are oversampled by design.*  Half the sample is urban although
+urban areas held under a third of the population.  Verbatim, from
+=study_desc.method.data_collection.weight=:
+
+#+begin_quote
+To allow adjustment to be made for over-sampling of certain strata in the PIHS
+sample, sampling weights have been calculated, and have been incorporated into
+the PIHS data sets that are distributed. These raising factors should be used to
+weight data in order to obtain nationally representative statistics.
+#+end_quote
+
+and, in the same field:
+
+#+begin_quote
+Half the sample was picked from strata in urban areas even though they
+constituted less than 32 percent of the country s estimated population in 1991.
+#+end_quote
+
+("country s" is as printed in the source --- an apostrophe lost in the
+catalog's own encoding.)  The local report states the same design at page 3 in
+the passage quoted above: "The sample is divided equally between Pakistan's
+urban and rural areas".
+
+*Consequence:* an unweighted pooled tabulation of Pakistan 1991 is roughly
+half-urban and will not describe Pakistan.  Use the supplied raising factors.
+
+*Self-representing cities are a certainty stratum.*  Ten cities enter the sample
+with certainty rather than by chance.  Verbatim, from =sampling_procedure=:
+
+#+begin_quote
+(a) Self-representing cities: All cities with a population of 500,000 or more
+are classified as self-representing cities. These include Karachi, Lahore,
+Gujranwala, Faisalabad, Rawalpindi, Multan, Hyderabad and Peshawar. In addition
+to these cities, Islamabad and Quetta are also included in this group as a
+result of being the national and provincial capitals respectively.
+#+end_quote
+
+The remaining two domains, verbatim from the same field: "(b) Other urban areas:
+All settlements with a population of 5,000 or more at the time of the 1981
+Population Census are included in this group (excluding the self-representing
+cities mentioned above)." and "(c) Rural areas: Villages and communities with
+population less than 5,000 (at the time of the Census) are classified as rural
+areas."  The frame is 88 strata in total (10 self-representing cities + 20 other
+urban + 58 rural), with Balochistan's rural strata defined at division rather
+than district level "as a result of the relatively sparse population of the
+districts".
+
+*What is NOT here.*  Unlike Serbia/Montenegro (MOP, Roma), Azerbaijan (three
+sub-populations), or Iraq 2012 (a one-third module subsample), PIHS 1991 carries
+no booster sample of a named sub-population, no module administered to a random
+subsample, and no panel or refresh component --- it is a single 1991
+cross-section, one wave directory, one =t=.  The male/female split of the
+household questionnaire (=pak-male.pdf= / =pak-fem.pdf=, female sections
+administered by female interviewers) is an *instrument* design feature, not a
+sub-sample: both are administered in the same households.
+
+** Universe vs. what the weights represent
+
+The documents come apart on this, and the gap is worth naming before anyone
+pools the wave.
+
+- The catalog asserts =geog_coverage: National=, and the abstract calls PIHS
+  "This nationwide survey" --- but the frame it was drawn from excludes about
+  4 percent of the population by the catalog's own reckoning.  "National"
+  here is a coverage claim about the frame, not a universe statement about
+  Pakistan.  The raising factors raise to the *frame*, not to the country.
+- The catalog is explicit that representativity stops at two levels.  Verbatim,
+  from =study_desc.method.analysis_info.sampling_error_estimates=:
+
+  #+begin_quote
+  The PIHS sample was designed to yield representative statistics at the
+  national and urban/rural) levels. Care however should be taken when
+  interpreting results for smaller analytic domains as the sample was not
+  designed to be representative at a more disaggregated level. Thus, even with
+  the use of the sampling weights, statistics for the smaller provinces such as
+  Balochistan are likely to have high standard errors given the relatively small
+  sample size in these domains.
+  #+end_quote
+
+  (The stray ")" after "urban/rural" is in the source.)
+
+- *Tension, flagged not resolved.*  The 1992 FBS/WB report expects the design to
+  "yield sufficient observations within each province (with the possible
+  exception of Balochistan)" (pak08a.pdf p.3), while the catalog says the sample
+  "was not designed to be representative at a more disaggregated level" than
+  national and urban/rural.  These are not flatly contradictory --- adequacy of
+  observations is not the same claim as designed representativity --- but a user
+  producing province-level estimates is relying on the more permissive of the
+  two, and should say so.
+
+- Estimates are cluster-correlated: the design is multi-stage stratified with
+  16 households per PSU, and the catalog warns that textbook simple-random
+  standard errors "underestimate the true magnitude of errors".  Cluster on the
+  PSU.
+
+** Search record for the gaps
+
+Recorded so the negative claims above are falsifiable.
+
+- *Searched:* every file under =lsms_library/countries/Pakistan/= --- the single
+  wave dir =1991/= plus =_/= and =var/=.  In =1991/Documentation/=:
+  =SOURCE.org= (one DOI URL and the =#+CATALOG_*= / =#+PROVENANCE_*= keywords,
+  no universe text), =LICENSE.org= (generic WB public-use-file terms), and five
+  DVC-tracked PDFs, all materialised via =lsms_library.data_access.get_data_file()=
+  --- =pak08a.pdf= (55 pp), =pak08b.pdf= (55 pp), =pak-male.pdf= (91 pp),
+  =pak-fem.pdf= (72 pp), =pakhh-com.pdf= (20 pp).  =pak08a= / =pak08b= are
+  scans with no text layer; their pages were rendered to images (pdfminer
+  =ImageWriter= + PIL) and read visually.  Read in full: =pak08a.pdf= title
+  page, table of contents, list of tables, and the whole Introduction (I.A
+  Design of the Survey p.1, I.B Management and Field Implementation p.2, I.C
+  Sample Design p.3, I.D The Questionnaires p.4).  =pak08b.pdf= is the
+  continuation of the statistical tables from report p.46 and carries no
+  methodological text.  The three questionnaire PDFs have text layers; grepped
+  for =universe|target population|sample is drawn|coverage|nomad|institutional|excluded|represent=.
+  The only hit is the cover-page identification-box label =SUB-UNIVERSE=, which
+  is a sampling-frame code field, not a universe statement.
+  =_/CONTENTS.org= carries no population statement.
+- *Not found in the repo:* any universe or target-population sentence, and any
+  statement of the exclusions.  Both exist only in the upstream catalog record.
+- *Not found anywhere:* a populated DDI =<universe>= element (present, empty,
+  twice); any statement about institutional, collective, nomadic or homeless
+  populations beyond the charity-dependent clause; any security-related carve-out
+  other than "military restricted areas".
+- *No inference was made from the microdata.*  No =.dta= file was opened for this
+  section, and no =dvc= CLI command was run.
+
 * Known data issues
 
 ** individual_education — only primary grade available (2026-06-06)

@@ -887,7 +887,7 @@
 | MSCE/GCSE              | Lower secondary complete     |
 | NON-UNIV DIPLOMA       | Tertiary certificate/diploma |
 | NON-UNIVERSITY DIPLOMA | Tertiary certificate/diploma |
-| NONE                   | None                         |
+| NONE                   | No education                 |
 | Non-Univ Diploma       | Tertiary certificate/diploma |
 | POST-GRAD DEGREE       | Postgraduate                 |
 | POST-GRADUATE DEGREE   | Postgraduate                 |
@@ -899,5 +899,5 @@
 | Univer Diploma         | Tertiary certificate/diploma |
 | jce                    | Lower secondary              |
 | msce                   | Lower secondary complete     |
-| none                   | None                         |
+| none                   | No education                 |
 | pslc                   | Primary complete             |

@@ -207,3 +207,49 @@ units.to_csv('unitlabels.csv')
 
 #+results:
 : None
+
+* Y01A
+
+# GLSS1 Y01A.DAT:REGION.  This wave had NO `region` table of its own until
+# 2026-08-20, so `code_label_map('region', _dirs)` fell through to the
+# country-level `_/categorical_mapping.org`, whose codes 9 and 10 are
+# Upper East / Upper West -- the REVERSE of every wave-level table in this
+# country (1988-89, 1991-92 and 1998-99 all read 9 = Upper West, 10 = Upper
+# East, and 1998-99's ordering was checked against the GLSS4 questionnaire).
+#
+# While this wave's decode was dead (`region_dict == {}`) the disagreement
+# was unobservable, because Region and Birthplace were 100% NA.  Reviving
+# the decode armed it, mislabelling 1,511 people and 11 clusters.
+#
+# The GLSS1 questionnaire is a scanned image with no text layer, so check C4
+# CANNOT be run for this wave.  The ordering below is therefore established
+# from four converging non-questionnaire lines of evidence, recorded in
+# `_/CONTENTS.org`:
+#   1. the 1988-89 cluster bridge (CLYR1YR2.DAT): of 85 linked clusters 75
+#      agree on region, but 0 of the 6 touching an Upper region agree -- and
+#      each differs in the direction a 9/10 swap predicts;
+#   2. the three sibling waves' own tables agree on 9 = Upper West;
+#   3. this wave's raw REGION codes run 1..11, i.e. the 11-code era list
+#      whose 11 is a single "Foreign Country", not GLSS2's 17-code list;
+#   4. Upper East is the more populous region, and every other wave shows
+#      more Upper East clusters than Upper West (ratios 1.78-3.00).  Under
+#      the fallback table 1987-88 alone inverted (4/7 = 0.57); corrected it
+#      reads 7/4 = 1.75, in line with its siblings.
+#
+# NOTE: the comments must stay ABOVE `#+name:`.  An Org `#+name:` keyword
+# attaches to the NEXT element, so a comment block between the keyword and
+# the table silently steals the name and the decode stays dead.
+#+name: region
+| Code | Label           |
+|------+-----------------|
+|    1 | Western         |
+|    2 | Central         |
+|    3 | Greater Accra   |
+|    4 | Eastern         |
+|    5 | Volta           |
+|    6 | Ashanti         |
+|    7 | Brong Ahafo     |
+|    8 | Northern        |
+|    9 | Upper West      |
+|   10 | Upper East      |
+|   11 | Foreign Country |

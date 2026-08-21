@@ -826,6 +826,153 @@
 |  119 | Nomi Tin (1kg)                    |
 |  120 | Nomi Tin (500g)                   |
 
+# harvest_conditions: harvest CONDITION/STATE code -> Preferred Label for the
+# `condition` index level of crop_production (GH #323 / #637).  UNPS question
+# 6c, "in what condition/state was the crop harvested" -- asked jointly with
+# the quantity and unit, so the SAME plot-crop-season yields one record per
+# state and the states must not be summed together (dry weight + fresh weight
+# is not a quantity of anything).
+#
+# The integer scheme is a 2-D cross of a DRYNESS family (tens digit) with a
+# physical FORM (units digit):
+#
+#     1x  Green harvested          x0  state not applicable
+#     2x  Fresh / raw harvested    x1  with shell/cob and with stalk
+#     3x  Dry at harvest           x2  with shell/cob, without stalk
+#     4x  Dry after additional     x3  in the cob
+#         drying                   x4  in pods or shell/husks
+#                                  x5  grain
+#
+# The Preferred Labels below encode exactly that cross in snake_case, so a
+# sibling LSMS-ISA country with a coarser instrument can reuse the family
+# tokens (`fresh`, `dried`) and a finer one can extend the list.  The
+# canonical vocabulary is declared cross-country in
+# lsms_library/data_info.yml (Columns > crop_production > condition).
+#
+# Source Label is a NORMALIZED, CROSS-VINTAGE REPRESENTATIVE of the Stata
+# value label -- NOT a verbatim quote of any one wave.  (It is provenance
+# only; get_categorical_mapping reads Code + Preferred Label and never looks
+# at this column.)  Measured 2026-07-21 over all 216 (code, wave, season)
+# label pairs in the five labelled waves: 60 match this column literally,
+# 156 do not.  The column is the 2018-20 wording with runs of whitespace
+# collapsed, with four documented exceptions.  What was normalized away:
+#
+#   * en-dash -> hyphen           2011-12 / 2013-14 / 2015-16 write "Green
+#                                 harvested <en-dash> in the cob".
+#   * mojibake -> hyphen          2015-16 AGSEC5B writes the same separator
+#                                 as the literal bytes "ï¿½".
+#   * double space -> single      2018-19 writes "Green harvested  - ...".
+#
+# FOUR CODES take their text from a DIFFERENT WAVE than a 2018-20 row's own,
+# because there the two vintages differ in WORDING, not just punctuation --
+# this column keeps the longer 2009-16 phrasing:
+#
+#   | code | 2018-20 label                          | this column                                 |
+#   |   24 | Fresh/raw harvested - in pods          | Fresh/raw harvested - in pods or shell/husks |
+#   |   32 | Dry at harvest - with shell            | Dry at harvest - with shell/cob without stalk |
+#   |   42 | Dry after additional drying - with shell | Dry after additional drying - with shell and without stalk |
+#   |   99 | Not Applicable                         | Others / Not Applicable                     |
+#
+# Code 99's entry is not a quote at all: no wave writes "Others / Not
+# Applicable".  It is a composite, and it is the one place in this table
+# where reading the Source Label as a quotation would mislead.
+#
+# THE SINGLE `Source Label` COLUMN IS THE ROOT CAUSE, not just the place the
+# error sits: one cell cannot hold two vintages' wordings.  The `u` table
+# further up THIS FILE already solves exactly this, with one column PER WAVE
+# (2005-06 ... 2019-20) carrying that wave's raw string verbatim, typos
+# included -- see CONTENTS.org "Unit handling for food_acquired", which
+# predates this table and which `harvest_conditions` did not follow.  The
+# recommended fix is to adopt the `u` shape here (runtime-inert:
+# get_categorical_mapping reads only Code + Preferred Label); it is written
+# up under CONTENTS.org "The house convention for per-wave label drift".
+#
+# Code 45's PREFERRED Label is likewise an inference, not a reading.  Every
+# labelled wave writes exactly "Dry - grain"; `dried_grain` (i.e. dry AFTER
+# ADDITIONAL DRYING, the 4x family) is inferred from the code's position in
+# the grid -- 35 already occupies "Dry at harvest - grain", so 45 must be
+# the additional-drying counterpart.  It covers ~30% of all records, so the
+# inference is load-bearing; it is stated here rather than buried.
+#
+# The CODES are identical across the labelled waves with ONE exception:
+# 2011-12, 2018-19 and 2019-20 ship all 20; 2013-14 and 2015-16 ship the
+# same 19 without 99.  That is why one table serves all vintages.
+#
+# CODE 99 IS MERGED ACROSS VINTAGES, AND ITS MEANING GENUINELY DIFFERS.
+# Measured (cold rebuild, isolated LSMS_DATA_DIR, 2026-07-21): 381 raw
+# source rows carry code 99 with a reported measure, and 340 rows of the
+# built table carry `other_condition` --
+#
+#   | wave    | 2009-10 | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+#   | rows    |       1 |       0 |     120 |      32 |      32 |      32 |     123 |
+#
+# so 219 of the 340 are AFTER 2011-12.  (An earlier version of this comment
+# claimed "only 3 rows in the whole panel and none after 2011-12".  That was
+# false by ~100x and it was the stated basis for the merge; it is corrected
+# here rather than left to suppress scrutiny.)  Across those waves 99 means
+# three different things: "Others" (2011-12, the only wave that labels it
+# that way), "Not Applicable" (2018-19 / 2019-20), and NOTHING AT ALL in
+# 2013-14 / 2015-16, whose 19-code label sets omit 99 entirely although 32
+# rows per wave use it.
+#
+# Why one row here is nonetheless the right shape, on the corrected numbers:
+#   1. `t` is an index level of crop_production, so a 2011-12 "Others" tuple
+#      and a 2019-20 "Not Applicable" tuple can never coincide.  Nothing is
+#      summed, aggregated or de-duplicated across the vintage boundary; the
+#      merge is a naming choice, and the vintage stays recoverable by the
+#      reader from `t`.  (Verified: no wave-crossing collision exists.)
+#   2. 99 is the scheme's own residual slot in every vintage -- it is the
+#      code the instrument uses when the 2-D dryness x form grid does not
+#      apply.  `other_condition` names that slot without asserting which
+#      residual reading applies, which is what the evidence supports.
+#   3. Splitting it would require a THIRD value for 2013-14 / 2015-16, where
+#      no wave says what 99 means -- i.e. inventing a label the source does
+#      not carry, which is exactly what `unknown_condition` exists to avoid.
+# A future PR that wants finer semantics should split 99 into
+# `other_condition` (2011-12) / `not_applicable_condition` (2018-20) and
+# leave 2009-10 / 2013-14 / 2015-16 on the sentinel; that MOVES 340 rows
+# between index values, so it needs its own before/after and is deliberately
+# not done as part of a comment correction.
+#
+# 2009-10 and 2010-11 carry NO value labels at all; their condition codes were
+# matched to this scheme by distribution (their modes are 20 / 45 / 24, the
+# same as the labelled waves).  Measured 2026-07-21: 1.1% of 2009-10 rows
+# (297 / 26 085) and 0.9% of 2010-11 rows (192 / 21 051) carry a code outside
+# the 20 below -- 492 rows panel-wide (data-entry noise plus, plausibly, the
+# unlabelled grid cells 10/15/25/30/34 -- a HYPOTHESIS, deliberately NOT given
+# labels here).  Those rows get the `unknown_condition` sentinel from
+# uganda._CONDITION_UNKNOWN rather than an invented label.
+#
+# OFF-SCHEME CODES ARE THE SMALL PART OF THE SENTINEL.  The sentinel also
+# absorbs rows whose condition column is simply NULL, and those dominate:
+# 7 994 of 133 683 built rows (6.0%) carry `unknown_condition`, of which only
+# ~490 are off-scheme codes.  Per wave the sentinel share is 23.2% (2009-10),
+# 4.4%, 3.5%, 2.3%, 0.1%, 0.1%, 0.1%.  Do not read "~1%" as the sentinel rate;
+# it is the off-scheme rate in the two unlabelled waves only.
+#+name: harvest_conditions
+| Code | Preferred Label                     | Source Label                                              |
+|------+-------------------------------------+-----------------------------------------------------------|
+|   11 | green_with_shell_and_stalk          | Green harvested - with shell/cob and with stalk           |
+|   12 | green_with_shell                    | Green harvested - with shell/cob without stalk            |
+|   13 | green_in_cob                        | Green harvested - in the cob                              |
+|   14 | green_in_pods                       | Green harvested - in the pods                             |
+|   20 | fresh                               | Fresh/raw harvested - state not applicable                |
+|   21 | fresh_with_shell_and_stalk          | Fresh/raw harvested - with shell/cob and with stalk       |
+|   22 | fresh_with_shell                    | Fresh/raw harvested - with shell/cob without stalk        |
+|   23 | fresh_in_cob                        | Fresh/raw harvested - in the cob                          |
+|   24 | fresh_in_pods                       | Fresh/raw harvested - in pods or shell/husks              |
+|   31 | dry_at_harvest_with_shell_and_stalk | Dry at harvest - with shell/cob and with stalk            |
+|   32 | dry_at_harvest_with_shell           | Dry at harvest - with shell/cob without stalk             |
+|   33 | dry_at_harvest_in_cob               | Dry at harvest - in the cob                               |
+|   35 | dry_at_harvest_grain                | Dry at harvest - grain                                    |
+|   40 | dried                               | Dry after additional drying - state not applicable        |
+|   41 | dried_with_shell_and_stalk          | Dry after additional drying - with shell and with stalk   |
+|   42 | dried_with_shell                    | Dry after additional drying - with shell and without stalk |
+|   43 | dried_in_cob                        | Dry after additional drying - in the cob                  |
+|   44 | dried_in_pods                       | Dry after additional drying - In pods or shell/husks      |
+|   45 | dried_grain                         | Dry - grain                                               |
+|   99 | other_condition                     | Others / Not Applicable                                   |
+
 # harmonize_input: agricultural-input identity Code -> Preferred Label for
 # the plot_inputs feature (GAP 2).  One row per REPORTED input applied to a
 # plot, ``input`` axis.  The UNPS plot-input module (AGSEC3A/3B) records four

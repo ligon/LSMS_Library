@@ -624,3 +624,22 @@ P:                                       [1, 0, consanguineal]   # low-confidenc
 "Grandfather / Mother":          [2, 0, consanguineal]
 "Brother/Sister In-Law":         [0, 1, affinal]
 "Father/Mother In-Law":          [1, 0, affinal]
+
+# --- GhanaSPS (Ghana Socio-Economic Panel Survey) variants ---
+# The relationship vocabulary DRIFTS across the three GSPS waves for the same
+# underlying category, so each spelling needs its own key.  Keys are given in
+# the title-cased form that _expand_kinship tries first ('X'.title()):
+#   adopted/foster/step  W1 'Adopted/Foster/Stepchild'
+#                        W2 'Adopted, foster, or stepchild'
+#                        W3 'Adopted, foster/stepchild'
+#   parent-in-law        W2 'Parent or parent-in-law'      (W1/W3 use 'Parent/Parent-in-Law')
+#   child-in-law         W2 'Son or daughter in-law'       (W1/W3 use 'Son/Daughter-in-law')
+# Tuples follow the existing composite precedents in this file:
+#   "Adopted / Foster/ Step Child" -> [-1, 0, step]
+#   "Parent/Parent-In-Law"         -> [1, 0, consanguineal]
+#   "Son/Daughter-in-law"          -> [-1, 0, affinal]
+"Adopted/Foster/Stepchild":      [-1, 0, step]
+"Adopted, Foster, Or Stepchild": [-1, 0, step]
+"Adopted, Foster/Stepchild":     [-1, 0, step]
+"Parent Or Parent-In-Law":       [1, 0, consanguineal]
+"Son Or Daughter In-Law":        [-1, 0, affinal]
