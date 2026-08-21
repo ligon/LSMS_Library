@@ -23,6 +23,47 @@ Data Scheme:
     Expenditure: float
     materialize: make
 
+  household_roster:
+    # Person-level roster, all three waves.  Index is (t, i, pid) -- `v` is NOT
+    # declared and must NOT be: `sample` is wired for every wave, so
+    # _join_v_from_sample() attaches `v` at API time.
+    #
+    # Sources: 2009-10 S1D.dta (one file); 2013-14 / 2017-18 01b2_roster.dta
+    # merged (left, roster authoritative) with 01d_background.dta for
+    # MonthsAway.  Each wave's _/data_info.yml carries the evidence.
+    #
+    # Generation / Distance / Affinity are NOT declared here: _expand_kinship()
+    # derives them from `Relationship` at API time via
+    # lsms_library/categorical_mapping/kinship.yml.  Five GSPS spellings were
+    # added to that file (the vocabulary drifts wave to wave -- W1
+    # 'Adopted/Foster/Stepchild', W2 'Adopted, foster, or stepchild',
+    # W3 'Adopted, foster/stepchild', and W2's 'Parent or parent-in-law' /
+    # 'Son or daughter in-law').
+    #
+    # MonthsAway is DELIBERATELY declared for 2013-14 and 2017-18 ONLY.  It is
+    # `optional` here because 2009-10 cannot supply a usable one: see that
+    # wave's data_info.yml for the measured evidence (the Q27-Q33 block is
+    # absent for 2,188 of 5,009 households, and declaring it would delete 44%
+    # of wave-1 households from the derived household_characteristics).
+    #
+    # Do NOT register household_characteristics -- it auto-derives from this
+    # table via _ROSTER_DERIVED.
+    index: (t, i, pid)
+    Sex: str
+    Age: float
+    Relationship: str
+    # Generation / Distance / Affinity are api_derived -- _expand_kinship()
+    # fills them from Relationship at query time, nothing extracts them from
+    # source.  They are declared anyway because the canonical schema marks
+    # them required and tests/test_schema_consistency.py checks the
+    # declaration, matching Ethiopia / Togo / every other roster country.
+    Generation: int
+    Distance: int
+    Affinity: str
+    MonthsAway:
+        type: float
+        optional: true
+
   sample:
     # Cluster identity, wave by wave.  The EA is `id3` in 2009-10 and a
     # right-anchored slice of the household id in 2013-14 / 2017-18; each

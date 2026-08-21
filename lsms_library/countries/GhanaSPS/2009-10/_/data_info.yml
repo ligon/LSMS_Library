@@ -31,3 +31,93 @@ sample:
         panel_weight: hhweight3
         strata: loc7
         Rural: urbrur
+
+household_roster:
+    # S1D.dta is the wave-1 person roster: 18,889 rows, 5,009 households,
+    # (hhno, hhmid) unique -- exactly the 18,889 members the Baseline
+    # Descriptive Report documents.  Its households match key_hhld_info.dta
+    # exactly in BOTH directions (0 in S1D absent from the key file, 0 in the
+    # key file absent from S1D), so the sample v-join is total here -- unlike
+    # the food module, which has the 29/35 hhno discrepancy noted above.
+    #
+    # Variable labels read off the .dta, because the obvious guess is wrong:
+    #   s1d_1  "Q1 Sex"                        -> Sex   (Male/Female)
+    #   s1d_2  "Q2 Relationship to HH Head"    -> Relationship
+    #   s1d_4i "Q4i Age (years)"               -> Age
+    # NOTE s1d_2 is the RELATIONSHIP and s1d_4i is the AGE.  A prior task brief
+    # had these two swapped; the variable labels and the value distributions
+    # both settle it (s1d_2 takes 'Household Head'/'Child'/'Spouse'..., s1d_4i
+    # is numeric 0-120).
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    #
+    # DOB triple deliberately NOT wired.  sid_3i (note the typo: `sid_`, not
+    # `s1d_`) / s1d_3ii / s1d_3iii are "Q3i Day of birth" / "Q3ii Month of
+    # birth" / "Q3 Year of birth", and age_handler() could turn them into
+    # fractional ages.  Left out because the reported age is already 18,884 of
+    # 18,889 non-null (5 missing), the day column is only 50% populated and
+    # object-dtype, and wave 1 has no interview-date table to anchor the
+    # arithmetic.  Cost exceeds the benefit; revisit if interview_date lands.
+    #
+    # ---------------------------------------------------------------------
+    # MonthsAway is DELIBERATELY NOT DECLARED FOR THIS WAVE.  Read this before
+    # "fixing" the omission.
+    #
+    # s1d_27 IS the right variable -- "Q27 For how many months has person been
+    # away from this household in last 12 months", the MonthsAway question in
+    # the CLAUDE.md taxonomy, and the same question waves 2 and 3 ask.  It is
+    # not wired because its MISSINGNESS is not the missingness the framework
+    # assumes.
+    #
+    # roster_to_characteristics() drops any member whose residence datum is
+    # NaN, on the premise (true for Uganda) that NaN means "question not asked
+    # because the person had left".  Here NaN means "this household's Q27-Q33
+    # block was never captured".  Measured on the shipped file:
+    #   - s1d_27 is non-null for 9,956 of 18,889 members (52.7%);
+    #   - the gap is HOUSEHOLD-level, not person-level: 2,188 of 5,009
+    #     households have NO member answered and 2,537 have EVERY member
+    #     answered, with only 284 partial.  48 whole EAs are at 0%;
+    #   - within the 2,188 all-missing households the non-null rate of s1d_27
+    #     is exactly 0.000000 and of s1d_28 exactly 0.000000, while every other
+    #     roster variable is populated at the SAME rate as in the answering
+    #     households (Sex 100%, Relationship 100%, Age 99.96%, religion 97.6%,
+    #     Q23 political office 98.5%).  So those households were fully
+    #     enumerated and only the Q27+ absence block is absent;
+    #   - answer rate is flat across age (51-57% in every band, infants
+    #     included), so it is not an eligibility skip.
+    #
+    # NaN is therefore NOT "never away", and filling 0 would fabricate data:
+    # the survey records 0 explicitly for 8,840 of the 9,956 answered members,
+    # so the 0-vs-NaN distinction is real and meaningful.
+    #
+    # Consequence of declaring it anyway, measured end-to-end: the derived
+    # household_characteristics would keep 9,942 of 18,889 persons and only
+    # 2,817 of 5,009 households -- 2,192 households (43.8%) would silently
+    # VANISH from a table whose household_roster is fully populated.
+    #
+    # Leaving it undeclared makes wave 1 hit the documented per-wave fallback
+    # in roster_to_characteristics ("a wave with no usable residence datum at
+    # all reverts to counting every roster member"), which emits a UserWarning
+    # naming the wave.  That is the honest outcome: every roster member
+    # counted, mean household size 3.771 = 18,889/5,009.  (The delivered
+    # household_characteristics shows 5,008 wave-1 households, not 5,009, for
+    # an unrelated reason: roster_to_characteristics then drops rows with a
+    # null Sex or Age, and hhno 107254027 is a ONE-PERSON household whose only
+    # member has no age.  See CONTENTS.org.)
+    #
+    # Also note s1d_27 has exactly ONE out-of-range value: hhno 105144071,
+    # hhmid 2 (female spouse, age 48) reports 15 months away in a 12-month
+    # reference period.  No negatives and no other value above 12.  Its meaning
+    # could not be determined from any document in the corpus.  It is moot
+    # while the column is undeclared; anyone wiring it later must decide
+    # explicitly (leaving it NA is the documented default) rather than clip
+    # silently.
+    # ---------------------------------------------------------------------
+    file: S1D.dta
+    idxvars:
+        i: hhno
+        pid: hhmid
+    myvars:
+        Sex: s1d_1
+        Age: s1d_4i
+        Relationship: s1d_2
