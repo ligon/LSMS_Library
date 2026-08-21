@@ -69,22 +69,39 @@ def Region(value):
 
 
 def cluster_features(df):
+    """Attach Appendix I's cluster attributes to this wave's cluster universe.
 
-    '''
-    Formatting dataframe for cluster features
-    
-    infers the region for each cluster via where most young kids have their birthplace as (less likely to move?)
-    '''
+    GLSS1/GLSS2 have NO cluster-location variable in the microdata.  This used
+    to infer the cluster's region as the modal birth region of its members
+    under 12 -- a documented approximation that agreed with the Appendix on
+    172/176 clusters and was wrong on the rest, always naming an
+    ADJACENT region (the border-migration failure the under-12 filter cannot
+    dodge).  Appendix I is authoritative; the inference is retired.
 
-    youngsters = df.query("Age<12")
-    foo = youngsters.reset_index().groupby(['t', 'v','Region']).count()
+    The cluster universe comes from the DATA (176 clusters), not from the
+    Appendix, which lists sampling areas.  A cluster absent from the Appendix
+    keeps `Region` NA rather than being dropped or guessed.
 
-    foo = foo.sort_values(by = "Age", ascending=False).reset_index().drop_duplicates(subset=['t', 'v'], keep='first', inplace = False)
-    foo = foo.sort_values(by = 'v')
-    foo = foo.set_index(['t', 'v'])
-    foo['Rural'] = pd.NA
+    `Rural` stays NA here: the Appendix is three-way (U/R/SU) against a
+    canonical vocabulary of {Urban, Rural} -- see GH #685.
+    """
+    # Load the country module BY PATH: `countries/GhanaLSS/_/` is not an
+    # importable package, and a path built from countries_root() honours
+    # LSMS_COUNTRIES_ROOT.
+    import importlib.util as _ilu
+    from lsms_library.paths import countries_root
+    _p = countries_root()/'GhanaLSS'/'_'/'ghanalss.py'
+    _spec = _ilu.spec_from_file_location('_ghanalss_country', _p)
+    _c = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_c)
+    attrs = _c.appendix_i_cluster_attributes('yr1', 1000)
 
-    return foo[['Region', 'Rural']]
+    out = df.reset_index()[['t', 'v']].drop_duplicates()
+    out['v'] = out['v'].astype(str)
+    out = out.set_index(['t', 'v'])
+
+    joined = out.join(attrs, how='left')
+    joined['Rural'] = pd.NA
+    return joined[['Region', 'Rural', 'Ecological_zone']]
 
 def Int_t(value):
     '''

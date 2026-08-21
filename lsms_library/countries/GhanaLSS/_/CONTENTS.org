@@ -1002,30 +1002,67 @@ cannot fall through to the GLSS1 table.  (The same wave-first discipline is why
 1991-92 keeps its own =region= table: GLSS3 orders the two northern regions
 9=Upper West, 10=Upper East, the reverse of the country-level table.)
 
-** Trap 3: GLSS1/GLSS2 "cluster region" is INFERRED, not measured
+** Trap 3 (RESOLVED 2026-08-21): GLSS1/GLSS2 cluster region is now MEASURED
 
-GLSS1 and GLSS2 have *no cluster-location variable at all*.  Both waves read
-=cluster_features.Region= and =household_roster.Birthplace= from the *same*
-source column, =Y01A.DAT:REGION= -- which is the *person's region of birth*,
-not where the cluster is.
+*Kept as history.*  For the record of what the inference was and what it cost,
+because the shape of the mistake recurs.
 
-=mapping.py::cluster_features= in both waves therefore *infers* the cluster's
-region as the modal birth region among household members under 12 (young
-children being least likely to have migrated).  =Age= is pulled into
-=cluster_features= =myvars= purely so that filter can run; it is dropped before
-the frame is returned.
+*** What it was
 
-*This is an approximation, and any analysis keyed on GLSS1/GLSS2 cluster region
-inherits it.*  It loses no clusters (checked: 176 of 176 clusters in 1987-88
-have at least one under-12 with a valid birth region), but it is a guess about
-geography derived from a migration-sensitive question.
+GLSS1 and GLSS2 have *no cluster-location variable in the microdata* -- a sweep
+of all 170 dictionaries finds none; the only near-hit, =Y00A::LOC=, is 99.8%
+constant at 1 and is a fieldwork flag.
 
-1988-89 had no such function until 2026-08-19.  Once its decode was revived,
-the framework collapsed the person-grain frame with =groupby().first()=,
-taking an *arbitrary* person's birth region for the whole cluster --
-=GrainCollapseWarning= reported 14,559 of 14,924 rows destroyed across 167
-conflicting clusters, i.e. 167 of 170 clusters held members born in more than
-one region.
+So both waves read =cluster_features.Region= and =household_roster.Birthplace=
+from the *same* column, =Y01A.DAT:REGION= -- the person's *region of birth*.
+=mapping.py::cluster_features= then *inferred* the cluster's region as the modal
+birth region among members under 12 (young children being least likely to have
+migrated), with =Age: AGEY= pulled into =myvars= purely to feed that filter.
+
+The inference was strong on its own terms: 0 ties, the mode an outright
+majority in all 346 clusters, median modal share 91.5%, minimum 55%, off a
+median of 31 children per cluster.  It was *not* a coin flip.
+
+It was still a guess about geography derived from a migration-sensitive
+question, and it was *wrong for five clusters* -- every one naming an
+*adjacent* region, which is exactly the border-migration failure an under-12
+filter cannot dodge:
+
+| wave    |    v | name                | correct     | inferred |
+|---------+------+---------------------+-------------+----------|
+| 1987-88 | 1080 | Adwamasek/Wiwasi    | Ashanti     | Central  |
+| 1987-88 | 1107 | Ahantamwa(Tipokrom) | Brong Ahafo | Ashanti  |
+| 1987-88 | 1168 | Tato Bator          | Brong Ahafo | Volta    |
+| 1987-88 | 1188 | Damanko             | Volta       | Northern |
+| 1988-89 | 2334 | Huni Ofori          | Central     | Eastern  |
+
+*** What replaced it
+
+*Appendix I of =GHA_1988_GLSS_Basicinfo_EN.pdf=* -- "Complete List of GLSS
+Clusters" -- is the survey's own cluster list, and the BID carries a real text
+layer (no OCR).  It is *authoritative* for GLSS1/GLSS2 cluster attributes
+(decision, 2026-08-21).  Transcribed to =_/appendix_i_clusters.org=; the ten
+clusters the document itself marks "should be excluded" are in
+=_/appendix_i_extra_workloads.org= (none of which appear in the shipped data --
+checked).
+
+It matches *176 of 176* and *170 of 170* shipped clusters on
+=CLUST = 1000 + yr1= / =2000 + yr2=, and additionally supplies
+=Ecological_zone=, which these waves previously lacked.
+
+*** The lesson worth keeping
+
+The inference was reasonable, well-documented, measured, and *nobody looked for
+a better source for a year*.  The better source was a text-layer PDF sitting in
+=Documentation/= the whole time.  Before building an approximation, read the
+documentation the survey shipped with itself.
+
+Note also what the fix does NOT do: =Rural= stays =NA=.  The Appendix
+classifies clusters *three* ways -- =U= / =R= / =SU= (semi-urban, 52 clusters,
+20%) -- against a canonical vocabulary of ={Urban, Rural}=.  Folding =SU= would
+destroy a distinction the survey drew, so it waits on GH #685/#682 rather than
+being guessed away.  After this change =Y01A.DAT:REGION= feeds
+=household_roster.Birthplace= *only*, which is what it actually is.
 
 ** Trap 4: GLSS1 had no =region= table of its own, and the fallback is REVERSED
 

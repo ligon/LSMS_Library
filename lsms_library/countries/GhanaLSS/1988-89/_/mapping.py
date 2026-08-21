@@ -76,32 +76,39 @@ def Region(value):
     return region_dict.get(value_key, pd.NA)
 
 def cluster_features(df):
-    '''Collapse the person-grain roster frame to (t, v) cluster grain.
+    """Attach Appendix I's cluster attributes to this wave's cluster universe.
 
-    Mirrors 1987-88/_/mapping.py::cluster_features -- GLSS1 and GLSS2 have NO
-    cluster-location variable.  Both waves read `Region` for cluster_features
-    and `Birthplace` for household_roster from the SAME source column,
-    Y01A.DAT:REGION, which is the *person's region of birth*, not where the
-    cluster is.  So the cluster's region is INFERRED as the modal birth region
-    among household members under 12 (young children are least likely to have
-    migrated).  This is a documented approximation, not a measured value.
+    GLSS1/GLSS2 have NO cluster-location variable in the microdata.  This used
+    to infer the cluster's region as the modal birth region of its members
+    under 12 -- a documented approximation that agreed with the Appendix on
+    169/170 clusters and was wrong on the rest, always naming an
+    ADJACENT region (the border-migration failure the under-12 filter cannot
+    dodge).  Appendix I is authoritative; the inference is retired.
 
-    Without this, the framework collapses the person-grain frame with
-    groupby().first(), which takes an ARBITRARY person's birth region as the
-    whole cluster's region.  Measured on this wave that destroyed 14,559 of
-    14,924 rows across 167 conflicting clusters (GrainCollapseWarning), i.e.
-    the majority of clusters held members born in more than one region.
-    '''
+    The cluster universe comes from the DATA (170 clusters), not from the
+    Appendix, which lists sampling areas.  A cluster absent from the Appendix
+    keeps `Region` NA rather than being dropped or guessed.
 
-    youngsters = df.query("Age<12")
-    foo = youngsters.reset_index().groupby(['t', 'v', 'Region']).count()
+    `Rural` stays NA here: the Appendix is three-way (U/R/SU) against a
+    canonical vocabulary of {Urban, Rural} -- see GH #685.
+    """
+    # Load the country module BY PATH: `countries/GhanaLSS/_/` is not an
+    # importable package, and a path built from countries_root() honours
+    # LSMS_COUNTRIES_ROOT.
+    import importlib.util as _ilu
+    from lsms_library.paths import countries_root
+    _p = countries_root()/'GhanaLSS'/'_'/'ghanalss.py'
+    _spec = _ilu.spec_from_file_location('_ghanalss_country', _p)
+    _c = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_c)
+    attrs = _c.appendix_i_cluster_attributes('yr2', 2000)
 
-    foo = foo.sort_values(by="Age", ascending=False).reset_index().drop_duplicates(subset=['t', 'v'], keep='first', inplace=False)
-    foo = foo.sort_values(by='v')
-    foo = foo.set_index(['t', 'v'])
-    foo['Rural'] = pd.NA
+    out = df.reset_index()[['t', 'v']].drop_duplicates()
+    out['v'] = out['v'].astype(str)
+    out = out.set_index(['t', 'v'])
 
-    return foo[['Region', 'Rural']]
+    joined = out.join(attrs, how='left')
+    joined['Rural'] = pd.NA
+    return joined[['Region', 'Rural', 'Ecological_zone']]
 
 def Int_t(value):
     '''
