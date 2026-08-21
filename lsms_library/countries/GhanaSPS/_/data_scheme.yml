@@ -40,11 +40,14 @@ Data Scheme:
     # W3 'Adopted, foster/stepchild', and W2's 'Parent or parent-in-law' /
     # 'Son or daughter in-law').
     #
-    # MonthsAway is DELIBERATELY declared for 2013-14 and 2017-18 ONLY.  It is
-    # `optional` here because 2009-10 cannot supply a usable one: see that
-    # wave's data_info.yml for the measured evidence (the Q27-Q33 block is
-    # absent for 2,188 of 5,009 households, and declaring it would delete 44%
-    # of wave-1 households from the derived household_characteristics).
+    # MonthsAway is declared for ALL THREE waves.  2009-10 reads s1d_27 with
+    # BLANK TREATED AS ZERO, applied by that wave's `household_roster` df_edit
+    # hook: Q27-Q33 is a skip block, and the per-EA pattern shows the blanks
+    # are a recording convention (the EAs that recorded fewest people recorded
+    # 95.9% non-zero values; those that recorded everyone, ~6%).  The full
+    # evidence, and the two documented residuals, are in
+    # 2009-10/_/data_info.yml.  It stays `optional` because the fill is a
+    # reading of the blanks rather than a value the file states.
     #
     # Do NOT register household_characteristics -- it auto-derives from this
     # table via _ROSTER_DERIVED.

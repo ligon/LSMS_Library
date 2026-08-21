@@ -60,58 +60,76 @@ household_roster:
     # arithmetic.  Cost exceeds the benefit; revisit if interview_date lands.
     #
     # ---------------------------------------------------------------------
-    # MonthsAway is DELIBERATELY NOT DECLARED FOR THIS WAVE.  Read this before
-    # "fixing" the omission.
+    # MonthsAway: s1d_27, with NaN read as 0.  Read this before changing it.
     #
-    # s1d_27 IS the right variable -- "Q27 For how many months has person been
-    # away from this household in last 12 months", the MonthsAway question in
-    # the CLAUDE.md taxonomy, and the same question waves 2 and 3 ask.  It is
-    # not wired because its MISSINGNESS is not the missingness the framework
-    # assumes.
+    # s1d_27 is "Q27 For how many months has person been away from this
+    # household in last 12 months" -- the MonthsAway question in the CLAUDE.md
+    # taxonomy, and the same question waves 2 and 3 ask.  It is non-null for
+    # only 9,956 of 18,889 members (52.7%), and an earlier version of this file
+    # left it UNDECLARED on the reasoning that NaN could not mean "never away",
+    # since the survey records 0 explicitly for 8,840 of the 9,956 answered.
     #
-    # roster_to_characteristics() drops any member whose residence datum is
-    # NaN, on the premise (true for Uganda) that NaN means "question not asked
-    # because the person had left".  Here NaN means "this household's Q27-Q33
-    # block was never captured".  Measured on the shipped file:
-    #   - s1d_27 is non-null for 9,956 of 18,889 members (52.7%);
-    #   - the gap is HOUSEHOLD-level, not person-level: 2,188 of 5,009
-    #     households have NO member answered and 2,537 have EVERY member
-    #     answered, with only 284 partial.  48 whole EAs are at 0%;
-    #   - within the 2,188 all-missing households the non-null rate of s1d_27
-    #     is exactly 0.000000 and of s1d_28 exactly 0.000000, while every other
-    #     roster variable is populated at the SAME rate as in the answering
-    #     households (Sex 100%, Relationship 100%, Age 99.96%, religion 97.6%,
-    #     Q23 political office 98.5%).  So those households were fully
-    #     enumerated and only the Q27+ absence block is absent;
-    #   - answer rate is flat across age (51-57% in every band, infants
-    #     included), so it is not an eligibility skip.
+    # That reasoning was WRONG, and the check that produced it was
+    # non-discriminating.  It observed that within the all-missing households
+    # s1d_27 and s1d_28 are both 0.000000 non-null -- but s1d_28 is only 0.1%
+    # non-null in the WHOLE FILE (18 rows), because Q28-Q33 are the follow-ups
+    # asked of people who ARE away.  They are ~absent everywhere, so their
+    # absence in those households discriminates nothing.
     #
-    # NaN is therefore NOT "never away", and filling 0 would fabricate data:
-    # the survey records 0 explicitly for 8,840 of the 9,956 answered members,
-    # so the 0-vs-NaN distinction is real and meaningful.
+    # Q27-Q33 is a skip block.  Confirmed on the shipped file:
+    #   - of the 8,933 members with s1d_27 missing, the number with any of
+    #     s1d_28..s1d_33 populated is NINE (0.101%), in 5 households;
+    #   - among members who DO answer, the Q28-33 block fires for 154 of the
+    #     1,116 away (s1d_27>0) and 14 of the 8,840 at home -- i.e. it is
+    #     conditional on being away, as the labels say.
     #
-    # Consequence of declaring it anyway, measured end-to-end: the derived
-    # household_characteristics would keep 9,942 of 18,889 persons and only
-    # 2,817 of 5,009 households -- 2,192 households (43.8%) would silently
-    # VANISH from a table whose household_roster is fully populated.
+    # And the missingness is a RECORDING CONVENTION, not a person attribute.
+    # Per-EA answer rates are sharply bimodal -- 48 of 334 EAs at 0%, 128 at
+    # 100%, only 17 in the 25-75% middle -- and the share of RECORDED values
+    # that are non-zero falls monotonically as the EA answers more people:
     #
-    # Leaving it undeclared makes wave 1 hit the documented per-wave fallback
-    # in roster_to_characteristics ("a wave with no usable residence datum at
-    # all reverts to counting every roster member"), which emits a UserWarning
-    # naming the wave.  That is the honest outcome: every roster member
-    # counted, mean household size 3.771 = 18,889/5,009.  (The delivered
-    # household_characteristics shows 5,008 wave-1 households, not 5,009, for
-    # an unrelated reason: roster_to_characteristics then drops rows with a
-    # null Sex or Age, and hhno 107254027 is a ONE-PERSON household whose only
-    # member has no age.  See CONTENTS.org.)
+    #     EA answer rate |    n | % of recorded values that are NON-ZERO
+    #     ---------------+------+---------------------------------------
+    #     0-25%          |  468 | 95.9
+    #     25-50%         |  139 | 70.5
+    #     50-75%         |  227 | 12.8
+    #     75-99%         | 1745 |  4.2
+    #     100%           | 7377 |  6.3
     #
-    # Also note s1d_27 has exactly ONE out-of-range value: hhno 105144071,
-    # hhmid 2 (female spouse, age 48) reports 15 months away in a 12-month
-    # reference period.  No negatives and no other value above 12.  Its meaning
-    # could not be determined from any document in the corpus.  It is moot
-    # while the column is undeclared; anyone wiring it later must decide
-    # explicitly (leaving it NA is the documented default) rather than clip
-    # silently.
+    # Teams that recorded almost nobody recorded almost exclusively the AWAY
+    # cases; teams that recorded everybody wrote mostly zeros.  That is the
+    # signature of "blank = not away", so the 8,840 explicit zeros are not
+    # evidence against NaN->0 -- they are what the thorough teams wrote where
+    # the others left the cell empty.  The fill is applied by the
+    # `household_roster` df_edit hook in this wave's mapping.py.
+    #
+    # Cost of getting this wrong in the other direction: leaving it undeclared
+    # made wave 1 fall back to counting every roster member; declaring it
+    # WITHOUT the fill would have dropped 2,192 households (43.8%) from the
+    # derived household_characteristics, because roster_to_characteristics()
+    # drops members whose residence datum is NaN.
+    #
+    # Residuals, both documented rather than silently smoothed:
+    #   - the 9 members above have move data but no s1d_27.  Under NaN->0 they
+    #     are recorded as never away, which for them is probably wrong.  They
+    #     are 0.05% of the roster; the hook does not special-case them.
+    #   - exactly ONE out-of-range value: hhno 105144071, hhmid 2 (female
+    #     spouse, age 48) reports 15 months away in a 12-month reference
+    #     period.  No negatives, no other value above 12.  The hook clips it to
+    #     12 -- the largest value consistent with the reference period -- rather
+    #     than guessing at a keying error.  Note that leaving it at 15 would
+    #     make roster_to_characteristics compute clip(12-15, 0, None) = 0
+    #     months present and drop the person SILENTLY.
+    #   - declaring the column costs ONE household in the derived
+    #     household_characteristics: hhno 107268086, whose three members all
+    #     report 12 months away in the source (verified raw -- not the clip
+    #     above; it is the only household in the wave where every member
+    #     reports 12).  All three therefore have zero months present and are
+    #     filtered out, so the household disappears from a table its roster
+    #     populates.  That is the framework honouring the data, not a defect,
+    #     but it is the kind of silent vanishing worth naming.  (hhno
+    #     107254027 also has no household_characteristics row, for the
+    #     unrelated pre-existing reason that its single member has no Age.)
     # ---------------------------------------------------------------------
     file: S1D.dta
     idxvars:
@@ -121,3 +139,4 @@ household_roster:
         Sex: s1d_1
         Age: s1d_4i
         Relationship: s1d_2
+        MonthsAway: s1d_27
