@@ -452,6 +452,28 @@ Lodger:                                  [0, 0, guest]
 "Empleada Domestica":                    [0, 0, servant]
 "Pensionista - Huesped":                 [0, 0, guest]
 
+# --- Spanish variants (Peru ENNIV 1994, B01-PARENTESCO 0..9) ---
+# The ten codes are printed VERBATIM on the 1994 questionnaire
+# (Peru/1994/Documentation/pe94hhq1.pdf, SECCION 1 FICHA DEL HOGAR, column
+# "RELACION DE PARENTESCO CON EL JEFE") and reproduced with that evidence in
+# Peru/_/categorical_mapping.org.  Keys are title-cased because
+# _expand_kinship tries `.str.title()` before the raw label.
+# 'Padre/Suegro' (code 6) CONFLATES parent and parent-in-law in a single
+# survey code; it is filed [1, 0, consanguineal], the same treatment given to
+# Guyana's 'Father/Mother/T-In-Law/M-In-Law' above.  The conflation is in the
+# instrument, not in this file.
+# 'Otro pariente' (code 7) title-cases to 'Otro Pariente', already defined
+# above for Guatemala ENCOVI with the same tuple, so it is not repeated.
+"Jefe":                                  [0, 0, consanguineal]
+"Conyuge":                               [0, 0, affinal]
+"Hijo/A":                                [-1, 0, consanguineal]
+"Yerno/Nuera":                           [-1, 0, affinal]
+"Nieto/A":                               [-2, 0, consanguineal]
+"Padre/Suegro":                          [1, 0, consanguineal]
+"Trabajador Domestico":                  [0, 0, servant]
+"Pensionista":                           [0, 0, guest]
+"Persona No Pariente":                   [0, 0, unrelated]
+
 # --- French Burkina Faso EMC/EHCVM variants ---
 # These use longer descriptive forms or different punctuation than the
 # labels already covered above.

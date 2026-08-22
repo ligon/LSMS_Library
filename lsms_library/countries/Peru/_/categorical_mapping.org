@@ -1,10 +1,51 @@
 Categorical mappings for Peru ENNIV surveys.
 
-Value labels sourced from the 1991 ENNIV "Diccionario de Variables"
-(DICCIONA.ASC), verified against 1994 frequency distributions.
-Codes are consistent across waves (1985, 1990, 1991, 1994).
+* Provenance and what has actually been checked (GH #684, GH #676)
+
+This file's original header read: "Value labels sourced from the 1991 ENNIV
+/Diccionario de Variables/ (DICCIONA.ASC), verified against 1994 frequency
+distributions.  Codes are consistent across waves (1985, 1990, 1991, 1994)."
+
+Two corrections, both established 2026-08-21:
+
+- *=DICCIONA.ASC= is not in this repository.*  The only data dictionary
+  shipped for any Peru wave is =1994/Documentation/dicciona.pdf=.  The cited
+  source therefore cannot be re-read, so nothing here rests on it any more.
+- *"Codes are consistent across waves" is not established and should not be
+  assumed.*  1985 and 1991 ship World-Bank-processed extracts with entirely
+  different, English-named variables (=relation=, =sex=, =agey= in
+  =1991/Data/N01.DTA=; =s01a_*= in =1985/Data/F1A.DTA=) rather than 1994's
+  INE/Cuanto =b01= / =b02=.  Whether their code lists agree with the tables
+  below is an OPEN question.  Check it wave by wave before reusing these
+  tables; none of them has been applied to any wave but 1994.
+
+Until 2026-08-21 none of these tables had ever been applied to anything: the
+country config lived in a filename the framework does not read (GH #684).  A
+mapping nobody has run is a mapping nobody has checked -- the GhanaLSS
+=region= defect (GH #676) was exactly this, and had Upper East and Upper West
+reversed for 1,511 people.  So each table below now records how it was
+validated.
 
 * Relationship
+
+Source: =B01-PARENTESCO= in REG02.DTA (1994).  =dicciona.pdf= gives only the
+range ("PARENTESCO 0:9") with no labels; the labels below are transcribed
+*verbatim from the questionnaire*, =1994/Documentation/pe94hhq1.pdf=, SECCION
+1 (FICHA DEL HOGAR), the column headed "RELACION DE PARENTESCO CON EL JEFE",
+which prints:
+
+: CONYUGE (ESPOSO, CONVIVIENTE, COMPAÑERO) ... 2   NIETO(A) ... 5
+: HIJO ... 3   YERNO/NUERA ... 4   PADRE/SUEGRO ... 6   OTRO PARIENTE ... 7
+: TRABAJADOR DOMESTICO ... 8   PENSIONISTA ... 9   OTRA PERSONA NO PARIENTE ... 0
+
+Corroborated in the data: code 1 (Jefe) occurs 3,624 times against 3,623
+households -- one head each, plus a single household (segmento 243 /
+vivienda 5 / hogar 22) that records two heads.  No household has zero.
+
+Code 6 CONFLATES parent and parent-in-law in the instrument itself; the
+kinship decomposition files it as [1, 0, consanguineal], the same treatment
+Guyana's "Father/Mother/T-in-law/M-in-law" gets.  The conflation is the
+survey's, not this file's.
 
 #+name: Relationship
 | Code | Preferred Label        |
@@ -22,56 +63,75 @@ Codes are consistent across waves (1985, 1990, 1991, 1994).
 
 * Sex
 
+Source: =B02-SEXO= in REG02.DTA (1994).  =dicciona.pdf= gives "SEXO 1:2" with
+no labels; =pe94hhq1.pdf= SECCION 1 prints "HOMBRE ... 1 / MUJER ..... 2" in
+the SEXO column.  =cenpob94.pdf= independently declares SEXO1..SEXO5 as
+"HOMBRE 1 / MUJER 2".  Observed split 9,402 / 9,883.
+
 #+name: Sex
 | Code | Preferred Label |
 |------+-----------------|
 |    1 | M               |
 |    2 | F               |
 
-* Marital Status
+* Region (=A01-DPTO=)
 
-#+name: EST-CIVIL
-| Code | Preferred Label |
-|------+-----------------|
-|    1 | Conviviente     |
-|    2 | Casado/a        |
-|    3 | Viudo/a         |
-|    4 | Divorciado/a    |
-|    5 | Separado/a      |
-|    6 | Soltero/a       |
+Named =Region= (not =DPTO=) so the framework's auto-dispatch applies it: a
+categorical_mapping table is applied automatically when its name matches a
+column or index level of the returned frame, and the canonical column here is
+=Region=.  Under its old name =DPTO= this table matched nothing and was dead.
 
-* Language
+*A01 arrives ZERO-PADDED* ("06") while the org reader parses this =Code=
+column as int64 and strips the leading zeros.  The =cluster_features()= hook
+in =1994/_/mapping.py= normalises the raw value to an integer first;
+without that step the mapping is a SILENT no-op.
 
-#+name: LENGUA
-| Code | Preferred Label    |
-|------+--------------------|
-|    1 | Castellano         |
-|    2 | Quechua            |
-|    3 | Aymara             |
-|    4 | Otra lengua nativa |
-|    5 | Ingles             |
-|    6 | Otro extranjero    |
-|    7 | No habla           |
+** How this list was validated
 
-* Area
+*No shipped Peru document contains a department code list.*  =cenpob94.pdf=
+declares "DEPARTAMENTO 01:25" with no labels, =dicciona.pdf= likewise
+("DPTO 01:25"), and the questionnaires carry only blank boxes.  The list below
+is the standard INEI /ubigeo/ ordering -- Peru's 24 departments plus the
+Constitutional Province of Callao, in Spanish alphabetical order -- and it is
+retained because four independent internal checks are consistent with it and
+none contradicts it:
 
-#+name: AREA
-| Code | Preferred Label |
-|------+-----------------|
-|    1 | Urbano          |
-|    2 | Rural           |
+1. *Callao (07) is 100% urban* -- 85 of 85 households across 14 segments.
+   Callao is the one department-level unit in Peru that is entirely
+   metropolitan.  (Tacna and Tumbes are also 100% urban but have 13 and 12
+   households, one segment each, so they carry no information.)
+2. *Lima (15) is by far the largest* -- 860 of 3,623 households.  Its
+   provincia 01 plus Callao together hold 855 dwellings, against the
+   documented Lima Metropolitana allocation of "820 viviendas"
+   (=m-encues.pdf=); the remaining urban dwellings number ~1,383 against a
+   documented 1,380, and rural 1,330 against 1,344.
+3. *The four departments whose ENTIRE 1994 sample sits in the "new draw"
+   segment range (>600) are Amazonas (01), Loreto (16), Madre de Dios (17)
+   and Ucayali (25)* -- precisely Peru's Amazon departments.  Catalog 617 and
+   =m-encues.pdf= say ENNIV-94 = the ENNIV-1991 dwellings "mas ... las
+   unidades muestrales en las areas no estudiadas en 1991", and =CONTENTS.org=
+   records that Selva is absent from the 1991 coverage list.  Every other
+   department with a substantial share of >600 segments (San Martin 22,
+   Huanuco 10, Junin 12, Cusco 08, Cajamarca 06, Pasco 19) also has Selva
+   territory; no department without Selva has any.
+4. Place names in =a07= (street/locality) fall in the expected department
+   where the name is a rural toponym rather than a common street name --
+   NAUTA 3/3 in Loreto, CHACHAPOYAS 4/4 in Amazonas, TINGO MARIA 6/6 and
+   HUANUCO 11/15 in Huanuco, CAJAMARCA 10/12 in Cajamarca, CAMANA 3/4 in
+   Arequipa, (PUERTO) MALDONADO 1/1 in Madre de Dios, TARAPOTO 1/1 in San
+   Martin, CUSCO 1/1 in Cusco, HUANCAYO 3/4 in Junin.  This check is WEAK in
+   general and must not be read as falsifying anything where it disagrees:
+   Peruvian streets are routinely named after other cities ("Jr. Ayacucho",
+   "Av. Arequipa", "Jr. Tacna"), so a mismatch is the expected result for any
+   toponym that is also a common street name.
 
-* Yes/No
+*Residual uncertainty, stated rather than hidden*: none of the above pins an
+individual label; they pin the pattern.  A swap between two departments that
+are similar in size, urbanisation and Selva status would survive all four
+checks.  Resolving that needs an ENNIV code list, which this repository does
+not hold.
 
-#+name: SI_NO
-| Code | Preferred Label |
-|------+-----------------|
-|    1 | Si              |
-|    2 | No              |
-
-* Department
-
-#+name: DPTO
+#+name: Region
 | Code | Preferred Label |
 |------+-----------------|
 |   01 | Amazonas        |
@@ -99,3 +159,75 @@ Codes are consistent across waves (1985, 1990, 1991, 1994).
 |   23 | Tacna           |
 |   24 | Tumbes          |
 |   25 | Ucayali         |
+
+* Rural (=A06-AREA=)
+
+Named =Rural= (not =AREA=) for the same auto-dispatch reason as =Region=
+above.  "Urbano" is an accepted variant spelling of the canonical "Urban"
+(=lsms_library/data_info.yml=, GH #602), so the Spanish source label is kept
+here and harmonised at API time.
+
+Validated, and this one is decisive: *the ENNIV community questionnaire
+(CCPP0.DTA, "CENPOB94") covers 111 segments -- exactly the 111 whose modal
+=a06= is 2, and no others.*  The 253 segments whose modal =a06= is 1 have no
+community record at all.  A /Cuestionario de Centro Poblado/ is by design
+administered in rural areas, so code 2 = Rural and code 1 = Urbano.
+Corroborating: 2,287 households are coded 1 and 1,336 coded 2, against the
+documented design of 820 + 1,380 urban and 1,344 rural dwellings.
+
+#+name: Rural
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Urbano          |
+|    2 | Rural           |
+
+* Tables not yet applied to anything
+
+The three tables below decode variables no wave currently extracts.  They are
+kept because the variables are present in REG02.DTA and the decodes are
+useful, but *they have not been validated against source* -- unlike the four
+tables above.  Do not rely on them without checking first.
+
+** Marital status (=B05-EST-CIVIL=)
+
+=dicciona.pdf= record HOGA1 does print these labels: CONVIVIENTE 1, CASADO 2,
+VIUDO 3, DIVORCIADO 4, SEPARADO 5, SOLTERO 6, NO-RESPONDE 9.  The table below
+omits code 9; add it before using this table.
+
+#+name: EST-CIVIL
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Conviviente     |
+|    2 | Casado/a        |
+|    3 | Viudo/a         |
+|    4 | Divorciado/a    |
+|    5 | Separado/a      |
+|    6 | Soltero/a       |
+
+** Language (=B06-LENGUA=)
+
+*This table is WRONG for 1994 and is retained only as a warning.*
+=dicciona.pdf= record HOGA1 declares B06-LENGUA as: CASTELLANO 1, QUECHUA 2,
+AYMARA 3, *CAMPA 4, SHIPIBO 5*, OTRO-NATIVO 6, INGLES 7, OTRO-EXTRANJERO 8,
+NO-HABLA 9 -- nine codes.  The list below has seven and shifts everything from
+code 4 upward.  It presumably came from the 1991 dictionary that is not in
+this repository.  Fix it against =dicciona.pdf= before extracting B06.
+
+#+name: LENGUA
+| Code | Preferred Label    |
+|------+--------------------|
+|    1 | Castellano         |
+|    2 | Quechua            |
+|    3 | Aymara             |
+|    4 | Otra lengua nativa |
+|    5 | Ingles             |
+|    6 | Otro extranjero    |
+|    7 | No habla           |
+
+** Yes/No
+
+#+name: SI_NO
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Si              |
+|    2 | No              |

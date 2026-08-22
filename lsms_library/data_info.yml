@@ -473,6 +473,16 @@ Currency:
   Nigeria: NGN
   Pakistan: PKR
   Panama: PAB                       # Balboa pegged 1:1 to USD; USD also circulates (dual currency)
+  Peru:                             # 1991 reform, 1 PEN (nuevo sol) = 1,000,000 PEI (inti)
+    default: PEN                    # ENNIV 1991 was fielded Sep-Nov 1991 and 1994
+    overrides:                      # May-Aug 1994, both after the 1 Jul 1991 reform
+      '1985': PEI                   # inti, which replaced the sol de oro on 1 Feb 1985;
+      '1990': PEI                   # ENNIV 85-86 ran late 1985 into 1986, ENNIV 90 in Jun 1990
+  # The fieldwork months above are measured from the data (1991 N00A.moi is
+  # 9/10/11; 1994 REG01.a18 is 5..8) and from the ENNIV 90 questionnaire cover
+  # ("JUNIO 1990"); the reform dates are external.  NOTE that no Peru wave
+  # currently extracts a monetary column at all -- food_acquired is declared but
+  # unwired -- so nothing in the returned data depends on these codes yet.
   Senegal: XOF
   Serbia: RSD                       # 2007 wave (RSD since 2006)
   'Serbia and Montenegro':          # 2002, 2003 waves

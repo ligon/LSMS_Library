@@ -1,0 +1,138 @@
+Country: Peru
+
+# ---------------------------------------------------------------------------
+# WHY THIS FILE IS NAMED data_scheme.yml (GH #684).
+#
+# It used to be `_/data_info.yml`, which `Country.resources` does not read.
+# Peru was the ONLY country in the corpus that spelled it that way, so none of
+# this config had ever executed: `Country('Peru').data_scheme` was `[]`, every
+# table was unreachable, and Peru contributed zero cells to the coverage
+# matrix -- a country whose config does not load cannot even be graded
+# `broken`.  Nothing below had been exercised against source before
+# 2026-08-21.  Treat a claim here as evidence-backed only where a comment
+# cites the evidence.
+#
+# ---------------------------------------------------------------------------
+# `Waves:` is deliberately NOT declared.
+#
+# The key that used to live here named the first wave '1985-1986' -- the WB
+# catalog's CATALOG_YEARS for ENNIV 85-86, which ran twelve months from late
+# 1985 into 1986 -- while the directory on disk is `1985/`.  Declaring it made
+# `Country.waves` name a directory that does not exist.  Omitting it lets
+# directory discovery find the four real wave dirs (1985, 1990, 1991, 1994),
+# which is what the library has always actually done.  `_/CONTENTS.org` records
+# the label/directory mismatch.  Do not "reconcile" it by renaming the
+# directory: the wave label is the `t` index value and appears in published
+# data.
+#
+# ---------------------------------------------------------------------------
+# ONLY 1994 IS WIRED.  1985 / 1990 / 1991 ship data (133 / 39 / 108 DVC
+# sidecars) but have no `_/` wave config, so every table below is `absent` for
+# those three waves.  `_/CONTENTS.org` ("Wiring status of the four waves")
+# says what each would need -- in particular 1990 ships SPSS/PC+ `.SSP` files,
+# which `get_dataframe()` cannot read at all, and 1985/1991 use an entirely
+# different (World-Bank-processed, English-named) variable scheme from 1994's
+# INE/Cuanto layout, so 1994's config does not transfer.
+#
+# ---------------------------------------------------------------------------
+# The former `Index Info:` block was dropped.  It was inert -- only the
+# canonical `lsms_library/data_info.yml` `Index Info` is read -- and its note
+# ("no interview date (int_t)") is now stated where it belongs, on the
+# interview_date entry below.
+# ---------------------------------------------------------------------------
+
+Data Scheme:
+
+  cluster_features:
+    # (t, v) where v = SEGMENTO, the ENNIV sampling segment.  The evidence for
+    # that key -- and for why it is NOT a composite with the department code --
+    # is in `1994/_/data_info.yml` and `_/CONTENTS.org`.
+    index: (t, v)
+    Region: str
+    Rural: str
+
+  household_roster:
+    # (t, i, pid).  `v` is NOT declared: Peru has no `sample` table, so
+    # `_join_v_from_sample()` has no source and `v` never appears.  Wiring
+    # `sample` (v and Rural, both from REG01) is the natural follow-up and
+    # needs no new source file.  Do NOT put `v` in this index until it exists.
+    #
+    # i is the composite SEGMENTO-VIVIENDA-HOGAR, joined by `i()` in
+    # `1994/_/mapping.py`; pid is B00-ORDEN.
+    #
+    # Generation / Distance / Affinity are `api_derived` -- _expand_kinship()
+    # fills them from Relationship at query time via
+    # lsms_library/categorical_mapping/kinship.yml, to which the ten Peruvian
+    # PARENTESCO labels were added.  They are declared anyway because the
+    # canonical schema marks them required and
+    # tests/test_schema_consistency.py checks the DECLARATION, matching
+    # Guyana / Tajikistan / Serbia / every other roster country.
+    #
+    # Do NOT register household_characteristics -- it auto-derives from this
+    # table via _ROSTER_DERIVED.
+    index: (t, i, pid)
+    Sex: str
+    Age: float
+    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
+    # B08-AUSENTE, "months absent from the household in the last 12 months"
+    # (m-encues.pdf, Pregunta No 8).  NOTE that ENNIV's OWN membership rule is
+    # not the framework's: the manual makes non-members those absent 10, 11 or
+    # 12 months (except the head and infants under 3 months), and records that
+    # verdict in B09-MIEMBRO, for which this library has no column.  So
+    # household_characteristics' residence filter approximates Peru's rule,
+    # it does not implement it.  See `_/CONTENTS.org`.
+    MonthsAway: float
+
+  # -------------------------------------------------------------------------
+  # The three tables below are declared by the COUNTRY but implemented by NO
+  # wave, so every cell grades `absent` -- an un-adjudicated gap where the data
+  # is present and the config is not.  They are kept rather than deleted
+  # precisely because of this issue's own lesson: a table that is not declared
+  # is invisible to the coverage matrix, and invisibility is what made Peru rot
+  # unnoticed.  Sources identified 2026-08-21 against dicciona.pdf and the
+  # files themselves.
+  # -------------------------------------------------------------------------
+
+  individual_education:
+    # 1994 REG05.DTA (record type 05, EDU31).  15,942 rows.  e00 = B00-ORDEN's
+    # twin (E00-ORDEN), e05a = E05A-NIVEL-ESTU (1:7), e05b = E05B-ANO-ESTUDI
+    # (1:6).  Needs a level x year -> `harmonize_education` decode that has
+    # not been written; the ENNIV level labels are NOT in the shipped PDFs as
+    # a code list.
+    index: (t, i, pid)
+    Educational Attainment: str
+
+  food_acquired:
+    # 1994 REG36.DTA (record type 36, ALIMB), 30,681 rows: ak01 = one of THIRTY
+    # aggregated food-group codes (301..330), ak02 = how obtained (1 compra,
+    # 2 autosuministro, 3 autoconsumo, 4 ambos), ak03 = amount in soles.
+    #
+    # There is NO quantity and NO unit anywhere in the module -- verified both
+    # in dicciona.pdf (record ALIMB, type 36: the only numeric fields are
+    # AK03E-TOTA-ENTER and AK03D-TOTA-DECIM, a soles amount split into whole
+    # and decimal parts) and in the file's own column list.  `Quantity` is
+    # therefore declared `optional: true`: this is a column Peru 1994
+    # genuinely never has, which is the documented use for that flag.  A wired
+    # Peru food_acquired would be (t, i, j, s) carrying Expenditure only, and
+    # `food_prices` / `food_quantities` would be structurally unreachable.
+    #
+    # `Produced` and a required `Price`, declared in the never-loaded original
+    # of this file, are dropped: neither is substantiated by the module.
+    index: (t, i, j, s)
+    Quantity:
+        type: float
+        optional: true
+    Expenditure: float
+
+  interview_date:
+    # 1994 REG01.DTA a17 (A17-DIA) + a18 (A18-MES), year 1994.  There is no
+    # int_t anywhere in the ENNIV extracts -- only this day/month pair on the
+    # cover page -- so Int_t has to be assembled.  Two traps for whoever does:
+    # a17 mixes padded and unpadded values ('01' and '1' both occur), and a18
+    # takes the value 8 for 248 households although dicciona.pdf declares
+    # "MES 05:07".  ENNIV 1994 is single-visit, so `visit` is a constant.
+    index: (t, i, visit)
+    Int_t: str
