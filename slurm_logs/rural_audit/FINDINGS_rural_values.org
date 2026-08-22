@@ -33,11 +33,17 @@ value the Country API delivers on a *cold* cache.
   ~sample().Rural~ is null for *15,028 of 56,330 rows (26.7%), THREE of
   seven waves* -- not 21,026 / 37% / four waves.  The 5,998-row delta is
   GLSS4 (1998-99), fixed by GH #673.
-- *Recommendation*: add ONE new canonical value, ~Semi-urban~, and use it in
-  exactly two places (GhanaLSS GLSS1/GLSS2, Kazakhstan 1996).  Do NOT
-  generalise the ~Informal~ precedent -- it is a formality/tenure class, not a
-  settlement-size tier, and South Africa really is special.  Everything else
-  wants a *separate column*, not a third ~Rural~ value.  See section 7.
+- *Recommendation [SUPERSEDED 2026-08-22 --- see §7.1]*: this audit recommended
+  adding ONE new canonical value, ~Semi-urban~, in exactly two places
+  (GhanaLSS GLSS1/GLSS2, Kazakhstan 1996).  *That was not done.*  EL decided
+  (2026-08-21) to keep ~Rural~ a strict binary and fold GhanaLSS's ~SU~ onto
+  *~Rural~*; shipped in PR #690.  *Kazakhstan was not adjudicated and is still
+  open.*  The parts of this bullet that still hold: do NOT generalise the
+  ~Informal~ precedent (a formality/tenure class, not a settlement-size tier
+  --- South Africa really is special), and the remaining class-A cells want a
+  *separate column* rather than a third ~Rural~ value --- now being built as
+  a per-country ~labels=~ selection in PR #697, not as a shared vocabulary
+  (§7.3, as amended).
 
 * 1. What was measured, and how
 
@@ -826,7 +832,43 @@ I do not think so, for three measured reasons:
 
 * 7. Recommendation on the canonical vocabulary
 
-** 7.1 Add exactly one value: ~Semi-urban~
+** 7.1 [SUPERSEDED 2026-08-22] Add exactly one value: ~Semi-urban~
+
+#+begin_quote
+*SUPERSEDED --- DO NOT ACT ON THIS SECTION.*  Decision by EL, 2026-08-21:
+*no canonical ~Semi-urban~ value was added.*  ~Rural~ stays the binary
+~{Urban, Rural}~, and GhanaLSS's ~SU~ folds to *~Rural~*.  Shipped in PR #690
+(merged =22c66949=): GLSS1/GLSS2 ~sample().Rural~ 6,341 NA -> 0, delivered
+vocabulary asserted as exactly ~{Urban, Rural}~.  ~lsms_library/data_info.yml~
+is byte-identical to ~development~ --- no canonical value was introduced.
+
+*The measurements below are unchanged and still correct.*  What is superseded
+is the *recommendation*, not the evidence: the GLSS frame really is stratified
+rural / semi-urban / urban, and ~SU~ really is 52 of 263 clusters.
+
+*Three things learned after this section was written*, each of which would
+have changed it:
+
+1. *The fold now has survey evidence, and it points this way.*  The joint
+   GLSS1/GLSS2 Basic Information Document §3.1 defines the tiers by *1984
+   Census locality population* --- urban >5,000, semi-urban 1,500--5,000,
+   rural <1,500 --- so the whole ~SU~ band sits *below the survey's own urban
+   threshold*.  GSS itself nests Semi-urban under Rural in the GLSS3 report.
+2. *The precedent this section leaned on does not exist.*  The GLSS2 7-way
+   ~rural~ table's ~Classification~ column is *editorial --- it is not on the
+   questionnaire*, and the table decodes ~Y01C:NRCPL~, a *non-resident
+   child's* place of residence, not the household's settlement class (#692).
+   Do not cite it for anything.
+3. *Ghana's cutoff MOVES across waves* --- 5,000 -> 1,500 -> 5,000, with the
+   middle band absorbed into ~urban~ for GLSS4 (#705).  So a third canonical
+   value would not have made the series comparable anyway.
+
+*Kazakhstan was NOT decided.*  The hedge below stands untouched: the
+recommendation there was always weaker than for GLSS, nobody has adjudicated
+it, and it remains open.  Whatever is done must not assume the Ghana decision
+transfers --- Kazakhstan's producer does not use the word.
+#+end_quote
+
 
 Add to both ~sample.Rural~ and ~cluster_features.Rural~ ~spellings~ blocks in
 ~lsms_library/data_info.yml~:
@@ -866,6 +908,29 @@ settlement classification, and Peru's ~Rural~ (1994, =REG01.DTA::a06= via the
 genuinely special.*
 
 ** 7.3 The other class-A cells want a SEPARATE COLUMN, not a third ~Rural~ value
+
+#+begin_quote
+*Amended 2026-08-22.*  This section's direction was right and is being built,
+but two later findings bound it.
+
+*Being built*: PR #697 generalises query-time ~labels=~ beyond food's ~j~
+level, so a country can carry its own finer settlement labels alongside a
+binary ~Rural~ *without a new canonical value*.  Iraq 2006-07 is the worked
+example (7 raw ~xstrat~ tiers collapse to 2; 12,194 households in one bucket).
+Note the mechanism had to live at ~_apply_categorical_mappings~, not at
+~_relabel_j~: the latter keys on ~Preferred Label~, which is a function for
+food (fine->coarse) but *one-to-many* for a settlement ladder (coarse->fine),
+so it yields ~{Urban: 'Medium Town', Rural: 'Other'}~ --- last-row-wins garbage.
+
+*Bounded by*: a corpus sweep (PR #704) found that *entity* variation, not
+threshold variation, defeats cross-country settlement harmonisation.  Only
+4 of 45 countries state a population rule at all, and the object measured
+differs --- locality (Peru /centro poblado/), enumeration area, /commune/,
+/corregimiento/, /cellule/.  Two countries could pick the *identical* number
+and still not be comparable.  So a ~SettlementType~ column is defensible as
+*per-country* detail; it is not a route to a shared vocabulary.
+#+end_quote
+
 
 Iraq (metropolitan / urban / rural), Ethiopia (large town / small town /
 rural), Mali (Bamako / autre urbain / rural), Niger (Communaute Urbaine /
