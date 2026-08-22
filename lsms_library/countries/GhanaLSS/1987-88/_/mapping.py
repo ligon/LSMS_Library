@@ -33,9 +33,21 @@ def Sex(value):
 
 def Age(value):
     '''
-    Formatting age variable
+    Formatting age variable.
+
+    Dtype-agnostic on purpose.  This used to be
+    ``int(value) if value.isdigit() else pd.NA``, which requires a *string*
+    and raises ``AttributeError`` on any number -- it only ever worked
+    because AGEY happened to contain Stata's '.' missing marker and so
+    arrived as a str column.  Since GH #704 the .DAT reader honours that
+    marker, AGEY arrives as float64, and the whole wave's
+    ``household_roster`` build died.  (The sibling 1988-89 wave already
+    used the number-tolerant ``int(value)``.)
     '''
-    return int(value) if value.isdigit() else pd.NA
+    try:
+        return pd.NA if pd.isna(value) else int(float(value))
+    except (TypeError, ValueError):
+        return pd.NA
 
 def Birthplace(value):
     '''
