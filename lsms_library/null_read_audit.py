@@ -311,11 +311,14 @@ def _format_null_read_report(report: dict[str, Any]) -> str:
     if report.get("site") == "get_dataframe":
         where = "/".join(str(x) for x in
                          (report.get("country"), report.get("wave")) if x)
-        where = where or "?"
+        # No "?:" placeholder when the path is not under the countries tree --
+        # the source path is right there in the next clause, and a bare "?"
+        # reads as a defect in the guard rather than in the data.
+        where = f"{where}: " if where else ""
         shown = report["null_columns"][:12]
         more = len(report["null_columns"]) - len(shown)
         return (
-            f"{where}: read of {report['source']} returned "
+            f"{where}read of {report['source']} returned "
             f"{report['rows']:,} row(s) x {report['columns']} column(s) but "
             f"{len(report['null_columns'])} of those columns "
             f"({report['null_fraction']:.0%}) are 100% NULL: "
