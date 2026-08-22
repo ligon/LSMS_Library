@@ -1247,13 +1247,26 @@ sentence saying "semi-urban is rural"; take them for exactly what they are.
 
 *What was searched, so the negative is falsifiable.*  Searched for any
 statement assigning =SU= to a side of a two-way split: the 1987 BID, the 1988
-BID, the GLSS1 DDI (decoded in full), the GLSS2 DDI, the GLSS3 main report,
-and the GLSS1 First Year Report (its text layer plus rendered pages ix, x, xi,
-6, 8).  In GLSS1/GLSS2 documentation every mention keeps *three* tiers: the
-definition sentence, BID Table 1a (printed p. 13), the =IMPRENT= regression
-dummies "rural, semi-urban, coastal, savannah" (printed p. 22), and the
-master-sample ordering "by region within each location (rural/semi-urban/urban)"
-quoted under /Oversamples and sub-samples/ above.  *Not* searched, and so
+BID, the GLSS1 DDI (decoded end to end -- the glyph map is partial, 48 of 84
+cids, but it resolves every letter and digit in the terms searched), the GLSS2
+DDI, the GLSS3 main report, and the GLSS1 First Year Report (its text layer
+plus rendered pages ix, x, xi, 6, 8).  In GLSS1/GLSS2 documentation every
+*classification* keeps three tiers: the definition sentence, BID Table 1a
+(printed p. 13), the =IMPRENT= regression dummies "rural, semi-urban, coastal,
+savannah" (printed p. 22), and the master-sample ordering "by region within
+each location (rural/semi-urban/urban)" quoted under /Oversamples and
+sub-samples/ above.
+
+One phrase in that corpus *is* two-way, and it is not a classification -- flagged
+so the next reader does not mistake it for one.  The GLSS1 DDI's Overview says a
+"price questionnaire was used in both urban and rural areas", and the BID says
+supervisors completed community questionnaires "for almost all rural, most
+semi-urban clusters and one urban cluster" (PDF p. 10 / printed p. 8).  Both describe *which
+clusters got which instrument*; the BID's version, which is the more specific of
+the two, names semi-urban separately.  Fieldwork coverage, not a settlement
+taxonomy.
+
+*Not* searched, and so
 establishing nothing: the bodies of the image-only GLSS1/GLSS2 documents
 beyond the pages named (the First Year Report's text layer is *front matter
 only* -- 9 of 115 pages carry any text; the Preliminary Report has 93
@@ -1285,8 +1298,10 @@ divergence a crib-echo could not produce.
 
 *Corroboration of the wiring (not of the direction).*  BID Table 1a, titled as
 printed "Survey Coverage / Number of Clusters in Household, Community, and
-Price Surveys by Region" -- the "by Region" is a sic; the rows are
-*localities* -- PDF p. 15 / printed p. 13.  Household-survey clusters:
+Price Surveys by Region" -- but its rows are *localities*, not regions, and
+the column totals are corroborated by the prose beneath it (102 and 71
+community questionnaires; 165 and 108 price) -- PDF p. 15 / printed p. 13.
+Household-survey clusters:
 
 | Round             | Urban | Semi-Urban | Rural | Total |
 |-------------------+-------+------------+-------+-------|
