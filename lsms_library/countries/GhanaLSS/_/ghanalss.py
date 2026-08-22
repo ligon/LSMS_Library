@@ -438,12 +438,23 @@ def appendix_i_cluster_attributes(year_column, offset):
     Returns
     -------
     DataFrame indexed by ``v`` (zero-free string ``CLUST``) with columns
-    ``Region`` and ``Ecological_zone``.
+    ``Region``, ``Rural`` and ``Ecological_zone``.
 
-    ``Rural`` is deliberately NOT returned.  The Appendix classifies clusters
-    THREE ways -- U / R / SU (semi-urban, 52 clusters) -- and canonical
-    ``Rural`` is {Urban, Rural}.  Folding ``SU`` would destroy a distinction
-    the survey drew, so it waits on the vocabulary decision in GH #685/#682.
+    ``Rural`` IS returned, folded to the canonical binary {Urban, Rural} by
+    the ``urbrur_abbrev`` table in the same org file.  The Appendix classifies
+    clusters THREE ways -- U / R / SU (semi-urban, 52 of 263 clusters, 20%) --
+    and ``SU`` is delivered as ``Rural`` **by decision** (@ligon, 2026-08-21).
+
+    That is a judgement call and **the survey offers no evidence either way**.
+    The GLSS2 7-way ``rural`` table's ``Classification`` column was cited on
+    GH #690 as precedent for folding a middle tier to Rural; it is *editorial,
+    not on the questionnaire* (GH #692), and it decodes ``Y01C:NRCPL`` -- a
+    *non-resident child's* place of residence, not the household's settlement
+    class.  Do not cite it.
+
+    The U/R/SU distinction IS lost in the delivered column.  The raw three-way
+    survives in the ``UrbRur`` column of ``_/appendix_i_clusters.org`` for
+    anyone who needs it.
     """
     # countries_root() honours LSMS_COUNTRIES_ROOT; a hardcoded
     # files("lsms_library")/"countries" would silently read the installed
@@ -458,6 +469,10 @@ def appendix_i_cluster_attributes(year_column, offset):
     regions.columns = [str(c).strip() for c in regions.columns]
     region_map = dict(zip(regions['Reg'].str.strip(), regions['Region'].str.strip()))
 
+    urbrur = tools.df_from_orgfile(path, name='urbrur_abbrev', to_numeric=False)
+    urbrur.columns = [str(c).strip() for c in urbrur.columns]
+    urbrur_map = dict(zip(urbrur['UrbRur'].str.strip(), urbrur['Rural'].str.strip()))
+
     zones = tools.df_from_orgfile(path, name='ecozone_abbrev', to_numeric=False)
     zones.columns = [str(c).strip() for c in zones.columns]
     zone_map = dict(zip(zones['EcoZone'].str.strip(), zones['Ecological_zone'].str.strip()))
@@ -467,15 +482,19 @@ def appendix_i_cluster_attributes(year_column, offset):
     # Assert rather than discover it as a 100%-null column downstream.
     assert region_map, 'region_abbrev decoded to an EMPTY dict'
     assert zone_map, 'ecozone_abbrev decoded to an EMPTY dict'
+    assert urbrur_map, 'urbrur_abbrev decoded to an EMPTY dict'
 
     tbl = tbl[tbl[year_column].astype(str).str.strip().ne('.')].copy()
     tbl['v'] = (tbl[year_column].astype(int) + offset).astype(str)
 
     out = pd.DataFrame({
         'Region': tbl['Reg'].map(region_map).values,
+        'Rural': tbl['UrbRur'].map(urbrur_map).values,
         'Ecological_zone': tbl['EcoZone'].map(zone_map).values,
     }, index=pd.Index(tbl['v'].values, name='v'))
 
     unmapped = tbl.loc[out['Region'].isna().values, 'Reg'].unique()
     assert len(unmapped) == 0, f'unmapped region abbreviations: {list(unmapped)}'
+    bad_ur = tbl.loc[out['Rural'].isna().values, 'UrbRur'].unique()
+    assert len(bad_ur) == 0, f'unmapped urb/rur abbreviations: {list(bad_ur)}'
     return out

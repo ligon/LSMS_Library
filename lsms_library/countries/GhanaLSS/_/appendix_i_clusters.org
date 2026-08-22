@@ -51,9 +51,14 @@ the GH #323 review, before this table was found.
 
 - =Reg= and =EcoZone= are the Appendix's own abbreviations, kept *raw* so this
   table can be audited against the PDF.  =region_abbrev= below decodes them.
-- =UrbRur= has *three* values -- =U=, =R= and =SU= (semi-urban).  It is NOT
-  wired yet: canonical =Rural= is ={Urban, Rural}= and folding =SU= would
-  destroy a distinction the survey drew (52 clusters, 20%).  See GH #685.
+- =UrbRur= has *three* values -- =U=, =R= and =SU= (semi-urban) -- and this
+  column keeps all three, *raw*.  The column the library *delivers* is the
+  canonical binary ={Urban, Rural}=, so =urbrur_abbrev= below folds =SU= onto
+  =Rural= (decision, @ligon, 2026-08-21).  *That fold is a judgement call; the
+  survey offers no evidence either way* -- see the note above that table.  The
+  three-way distinction (52 of 263 clusters, 20%) is therefore *lost* in the
+  delivered =Rural= column.  It is *not* lost here: anyone who needs it reads
+  =UrbRur= off the cluster table above.
 - =EcoZone= is 3-way (C/F/S).  GLSS6 (2012-13) additionally uses =GAMA= for
   Greater Accra; the Appendix has no such category, so Accra clusters here are
   =C= (coastal).  That is a difference between the *sources*, not an error.
@@ -344,6 +349,33 @@ the GH #323 review, before this table was found.
 | Nort | Northern      |
 | UppE | Upper East    |
 | UppW | Upper West    |
+
+The fold below is a *decision*, not a measurement.  =SU= (semi-urban) is
+delivered as =Rural= by @ligon's call, 2026-08-21.  Canonical =Rural= stays the
+binary ={Urban, Rural}=; no =Semi-urban= value was added to
+=lsms_library/data_info.yml=.
+
+*The survey offers no evidence either way.*  The GLSS2 7-way =rural= table's
+=Classification= column was previously cited on GH #690 as this country's own
+precedent for folding a middle tier to =Rural=.  It is not: that column is
+*editorial -- it is not on the questionnaire* (see GH #692), and the table
+decodes =Y01C:NRCPL=, a *non-resident child's* place of residence, not the
+household's settlement class.  *Do not cite it.*
+
+The raw three-way is preserved in the =UrbRur= column of the cluster table
+above, which this fold does not touch.
+
+(Keep commentary *above* the =#+name:= line.  An Org =#+name:= attaches to the
+NEXT element, so a block wedged between the keyword and the table steals the
+name and kills the decode with no error -- =CONTENTS.org= Trap 4 records that
+this already cost one silent no-op "fix" in this country.)
+
+#+name: urbrur_abbrev
+| UrbRur | Rural |
+|--------+-------|
+| U      | Urban |
+| R      | Rural |
+| SU     | Rural |
 
 #+name: ecozone_abbrev
 | EcoZone | Ecological_zone |
