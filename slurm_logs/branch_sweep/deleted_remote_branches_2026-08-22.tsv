@@ -1,8 +1,13 @@
-# remote branches deleted 2026-08-22, all merged into origin/development (328c7d8b)
+# 59 remote branches deleted 2026-08-22 (60 listed; one was a false entry, see correction below), all merged into origin/development (328c7d8b)
 # restore any with:  git push origin <sha>:refs/heads/<branch>
 #
 #branch	sha	subject
-origin	7200488045d48c6c9007ac3a074aee00fdecadd0	docs: v0.9.1 release notes
+# CORRECTION: the row below was a FALSE ENTRY and nothing was deleted for it.
+# `origin` is the SHORT name of refs/remotes/origin/HEAD (the symbolic default-branch
+# pointer), not a branch.  My filter grepped -v "origin/HEAD" against the SHORT name,
+# which is "origin", so it never matched and HEAD entered the list.  The delete
+# correctly failed with "remote ref does not exist".  59 branches were actually deleted.
+#origin	7200488045d48c6c9007ac3a074aee00fdecadd0	docs: v0.9.1 release notes
 audit/ghana-correctness	c3beba362a1ad407923368ce38afc821b09545cc	Merge pull request #678 from ligon/docs/ghanalss-absent-verdicts
 chore/218-phase1-retire-harmony	8f3fe9c3f6a7604b8d4bdc3af35af9b9cdb18c0d	chore(#218): retire harmony.py (Phase 1) + rev-2 design note
 ci/publish-workflow-dispatch	a87d6a10933ae3e06145e9b3a11a15968d16a298	ci(publish): add workflow_dispatch(tag) trigger + build from the tag e
