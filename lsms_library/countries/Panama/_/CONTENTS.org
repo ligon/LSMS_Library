@@ -821,3 +821,50 @@ D = pd.concat(L)
 ** DONE household_characteristics.py
 ** DONE food_acquired.py
 ** DONE nutrition.py
+
+* ENV-97 ships at =.dta= format 104/105, and its missing doubles are 2^333
+
+*This is a reader fact, not a data defect, and the library already handles it.*
+Recorded here because it looks exactly like corruption if you meet it cold, and
+one sweep (PR #704) already did -- it reported =COMUN1.DTA:c103= as a
+"corruption" when it is the ordinary missing marker.
+
+All 17 =.DTA= in =1997/Data/= are pre-Stata-6: *15 at format 104* and *2 at
+format 105*.  In format 105 and earlier Stata's system-missing (=.=) for a
+*=double=* is *2^333* = =1.7498005798264095e+100= (IEEE-754
+=0x54C0000000000000=); Stata 6 (format 108) changed it to 2^1023 =
+=8.98846567431158e+307=, which is the code everyone recognises.  Measured:
+*6,139,756 cells* across *2,127 =double= columns* in *15 files* --
+reader-confirmed; the parser-free byte floor is 7,226,544, the difference
+sitting in a file =pyreadstat= cannot open.  *2003 (all 45 files at format 110)
+and 2008 (all 33 at 113) are unaffected.*
+
+=pandas.io.stata.StataReader= recodes it, so =get_dataframe()= returns =NaN= and
+the delivered tables are correct (verified: 0 delivered cells).  =pyreadstat=
+does *not*, and *the pandas fix is in pandas 3.0 only* (PR #59325) while
+=pyproject.toml= still says =pandas >=2.2=.
+
+*=GAST-A.DTA= is the wave that matters*, because =1997/_/food_acquired.py= reads
+eleven affected columns from it:
+
+| column   | wired to                    | sentinel share |
+|----------+-----------------------------+----------------|
+| =ga106a= | =Quantity= (purchased)      |         13.6 % |
+| =ga106b= | unit code -> =u=            |         37.2 % |
+| =ga106c= | =Expenditure= (purchased)   |         34.6 % |
+| =ga110a= | non-purchased quantity      |         82.7 % |
+| =ga110b= | unit code -> =u=            |         90.7 % |
+| =ga111a-d= | source flags -> =s=       |       ~83 % ea |
+
+On pandas 2.2.x the =Expenditure= total would be *1.31e105* instead of
+*7.65e7*.  Worse, the script selects rows with
+=df['ga106a'].notna() | df['ga106c'].notna()= -- and =notna()= is *True* for the
+sentinel -- so 74,657 empty expenditure records would be admitted as
+observations.  The row count changes, not only the values.
+
+Do *not* "fix" this with a sentinel list: it is a legitimate,
+type-and-format-specific missing code the supported reader already understands.
+The discriminator is *format stamp <= 105 AND storage type =double=*, never the
+survey year.
+
+Full audit: =slurm_logs/sentinel_audit/FINDINGS_1.7498e100.org=.

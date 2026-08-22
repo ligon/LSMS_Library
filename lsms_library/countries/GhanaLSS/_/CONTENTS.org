@@ -1588,3 +1588,38 @@ Every file the sweep asked for came back through =get_data_file()=: 77 GLSS1
 =.DCT=, 93 GLSS2 =.DCT=, 155 GLSS3 =.DTA=, 156 GLSS4, 49 GLSS5, 127 GLSS6, 102
 GLSS7 -- *zero* fetch failures.  The "~140 un-cached blobs" noted under
 =individual_education= above no longer describes this checkout.
+
+* GLSS3 and GLSS4 ship at =.dta= format 105, and their missing doubles are 2^333
+
+*This is a reader fact, not a data defect, and the library already handles it.*
+Recorded here because it looks exactly like corruption if you meet it cold, and
+one sweep (PR #704) already did.
+
+Every =.DTA= in =1991-92/= (155 files) and =1998-99/= (156 files) carries the
+=.dta= format stamp *105* -- Stata 5.  In format 105 and earlier, Stata's
+system-missing (=.=) for a *=double=* is *2^333* = =1.7498005798264095e+100=
+(IEEE-754 =0x54C0000000000000=).  Stata 6 (format 108) changed it to 2^1023 =
+=8.98846567431158e+307=, which is the code everyone recognises.  Measured in
+these two waves: *8,680,566 cells* across *1,873 =double= columns* in *126
+files*.
+
+- =pandas.io.stata.StataReader= recodes it (the =_format_version <= 105= branch
+  of =_do_convert_missing=), so =get_dataframe()= returns =NaN= and the
+  delivered tables are correct.  Verified: 0 delivered cells carry the value.
+- *=pyreadstat= does not.*  Any script that reaches for =pyreadstat.read_dta=
+  directly on a GLSS3/GLSS4 file gets =1.7498e100= where the answer is
+  "missing", and it will pass every =notna()= / =isna()= check you write.
+- *The pandas fix is in pandas 3.0 only* (PR #59325).  =pyproject.toml= still
+  says =pandas >=2.2=.  On pandas 2.2.x, =food_acquired.Price= for 1991-92
+  (=S8H.DTA:s8hq14=, 9.8 % sentinel) has a mean of *1.71e99* instead of *342.6*,
+  and =household_roster.MonthsAway= (=S1.DTA:s1q22=) is sentinel for *50.6 %* of
+  the 20,403 roster rows.
+
+Do *not* "fix" this with a sentinel list: the value is a legitimate,
+type-and-format-specific missing code that the supported reader already
+understands, and a second copy of that rule here would diverge from it.  The
+discriminator is *format stamp <= 105 AND storage type =double=*, never the
+survey year.  GLSS1/GLSS2 (=COMM.DAT= etc.) carry *none* of it; GLSS5/6/7 are
+format 113+ and carry none either.
+
+Full audit: =slurm_logs/sentinel_audit/FINDINGS_1.7498e100.org=.
