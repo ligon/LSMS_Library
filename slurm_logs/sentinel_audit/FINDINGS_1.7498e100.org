@@ -22,6 +22,12 @@ declares =pandas >=2.2=; the pandas fix landed in *3.0* (PR #59325, milestone
 straight into delivered tables.  Measured below: GhanaLSS 1991-92's
 =food_acquired.Price= would have a mean of *1.71e99* instead of *342.6 cedis*.
 
+*It has been met here before and the note did not survive.*
+=China/1995-97/_/mapping.py= already calls it "the Stata sentinel ~1.75e+100
+(extreme encoding for a missing/refused value)" and filters one column against
+it -- a correct defence with a non-reusable diagnosis.  Counting that, this value
+has been *rediscovered cold three times*.
+
 *Recommended treatment: none at the reader.  Do not add a sentinel list.*  Raise
 the =pandas= floor to =>=3.0=, correct the PR #704 characterisation, and report
 the gap upstream to ReadStat.  Details in [[*What treatment the evidence supports][What treatment the evidence supports]].
@@ -55,6 +61,10 @@ blur.
 8. *No delivered cell carries it* under the installed pandas 3.0.2 -- across
    5,151 successfully-read source files and 1,274 materialized parquets in the
    shared cache.
+9. *It has been met here before.*  =China/1995-97/_/mapping.py= and its
+   =data_info.yml= already describe "the Stata sentinel ~1.75e+100" and defend
+   one column against it with a plausibility filter -- correctly, and without
+   identifying the mechanism.  Three independent cold rediscoveries so far.
 
 ** Not ruled out / not established
 
@@ -76,6 +86,10 @@ blur.
    would happen; I did not measure who is exposed.
 4. The [[*Adjacent finding][adjacent finding]] (one cell, Kyrgyz 1998) is *unexplained*.  I did not
    determine its cause.
+5. *510 of 1,008 dictionary/syntax sidecars* (=.DCT=, =.SPS=, =.SSP=, =.VAR=,
+   =.FMT=) are uncached blobs and were not grepped.  The 498 that were cached
+   returned 0 hits, and the ten affected waves ship =.DTA= only, so I do not
+   think anything is hiding there -- but I did not read them.
 
 * The bit pattern
 
@@ -314,13 +328,55 @@ sentinel-bearing columns, =KCOMM.DTA= 32, =COMUN1.DTA= *144*.
 
 * Does anything in this repo declare it?
 
-*No.*  Nothing in =lsms_library/data_info.yml=, any country =data_scheme.yml=,
-any =categorical_mapping.org=, any =.DCT=, or any =CONTENTS.org= mentions
-=1.7498=, =2^333=, or a large-magnitude missing code.  That absence is precisely
-what made it look like corruption.  Nor does it need declaring as a *sentinel* --
-it is a *reader-layer* fact, and the reader already handles it.  What was missing
-is the *documentation*, which is what this file and the two =CONTENTS.org=
-additions in this PR supply.
+*Yes -- in exactly one place, informally, and only half-identified.*  I initially
+wrote "no" here and that was wrong; a tree-wide grep for =1.7498= / =2^333= /
+=0x1.0p333= / =54c0000000000000= / =e+100= found *China 1995-97*:
+
+- =China/1995-97/_/mapping.py=, =PlotArea()= docstring, l.54: "A handful of rows
+  carry the Stata sentinel ~1.75e+100 (extreme encoding for a missing/refused
+  value); coerce anything outside a plausible plot range to NA."
+- =China/1995-97/_/data_info.yml= l.102: "PlotArea() nulls the ~11 Stata
+  1.75e+100 missing-sentinel rows and any non-positive / implausible (>=1000 mu)
+  values."
+
+*"~11" is exactly right* -- my census counts *11* sentinel cells in
+=S05B.DTA:s05b02=.  Whoever wrote that met the same value, guessed correctly
+that it was a Stata missing marker, and defended against it with a *plausibility
+filter* (=(s > 0) & (s < 1000)=) rather than by identifying it.  That is the
+right defensive move and the wrong diagnosis to leave behind: "extreme encoding"
+is not a mechanism, so the next person could not reuse it -- and did not.  *This
+value has now been rediscovered cold three times*: China's =plot_features=
+author, PR #704's sweep, and this audit.  That is the argument for recording it
+centrally.
+
+The corollary matters.  China declares *two* sentinel-bearing columns, and only
+one is defended:
+
+| declared column                       | source                    | sentinel | protected on pandas 2.2? |
+|---------------------------------------+---------------------------+----------+--------------------------|
+| =plot_features.Area= <- =s05b02=      | =S05B.DTA=, 11/3,186      |    0.3 % | *yes*, by =PlotArea()=   |
+| =household_roster.MonthsAway= <- =s01a212= | =S01A2.DTA=, 18/3,002 |    0.6 % | *no* -- bare mapping     |
+
+Beyond that one place, the value is genuinely undeclared.  Searched and clean:
+
+- every =CONTENTS.org= in the corpus (grep for =1.7498=, =2^333=, =0x1.0p333=,
+  =54c0000000000000=, =e+100=; only my own two additions in this PR hit).  For
+  the six other affected countries -- China, India, Pakistan, Guatemala, Peru,
+  Tajikistan -- a wider grep (=format 10x=, =Stata 4/5=, =dta format=,
+  =missing code=, =sentinel=, =8.98846=, =1.70141=) also returns nothing, so
+  *China's knowledge lives in two code comments and never reached its
+  =CONTENTS.org=*.
+- =lsms_library/data_info.yml=, every country =data_scheme.yml=, every
+  =categorical_mapping.org=.
+- *498 of 1,008* cached =.DCT= / =.SPS= / =.SSP= / =.VAR= / =.FMT= dictionary
+  and syntax sidecars, grepped bytewise for =1.7498=, =2^333=, =e+100=, =1.75e=:
+  *0 hits*.  (The remaining 510 sidecars are uncached blobs; and note the ten
+  affected waves ship =.DTA= only, so the =.DCT= layer -- GLSS1/GLSS2 -- is not
+  where this could hide anyway.)
+
+It does not need declaring as a *sentinel*: it is a *reader-layer* fact, and the
+reader already handles it.  What was missing is the *documentation*, which is
+what this file and the =CONTENTS.org= additions in this PR supply.
 
 * Damage
 
@@ -354,6 +410,8 @@ repo's config *actually reads* are listed:
 | GhanaLSS 1991-92 =S1.DTA=        | =s1q22=  | =household_roster.MonthsAway= | *50.6 %* | sum *3,564*   | sum *1.81e104* |
 | GhanaLSS 1998-99 =SEC8H.DTA=     | =s8hq9=  | =food_acquired= unit -> =u= |    0.3 % | sum *635,804* | sum *2.27e102* |
 | GhanaLSS 1998-99 =SEC2A.DTA=     | =s2aq2=  | education level             |   25.3 % |               |                |
+| China 1995-97 =S01A2.DTA=        | =s01a212= | =household_roster.MonthsAway= |  0.6 % | sum *1,627.4* | sum *3.15e101* |
+| China 1995-97 =S05B.DTA=         | =s05b02= | =plot_features.Area=        |    0.3 % | sum 8,225.8   | *defended* -- see below |
 | Panama 1997 =GAST-A.DTA=         | =ga106c= | =food_acquired.Expenditure= |   34.6 % | sum *7.65e7*  | sum *1.31e105* |
 | Panama 1997 =GAST-A.DTA=         | =ga106a= | =food_acquired.Quantity=    |   13.6 % | sum *5.80e7*  | sum *5.14e104* |
 | Panama 1997 =GAST-A.DTA=         | =ga110a= | non-purchased quantity      | *82.7 %* | sum *1.17e7*  | sum *3.13e105* |
@@ -370,6 +428,15 @@ Concretely, on pandas 2.2 a user would get:
   =df['ga106a'].notna() | df['ga106c'].notna()= -- and =notna()= is *True* for
   the sentinel, so 74,657 empty expenditure records would be *admitted* as
   observations rather than dropped.  The row count changes, not just the values.
+- *China 1995-97 =plot_features.Area= is the one column in the corpus that is
+  already immune*, and by accident of good hygiene rather than by knowing what
+  the value was.  =PlotArea()='s plausibility filter =(s > 0) & (s < 1000)= is
+  applied to the raw column, so on a poisoned pandas-2.2 read it still returns
+  3,175 non-null values with max 99.0 mu and *0 sentinel survivors* -- identical
+  to the pandas-3.0 result.  China's sibling column =household_roster.MonthsAway=
+  (=s01a212=) has no such filter and *is* exposed (sum 1,627.4 -> 3.15e101).
+  Which is the general lesson: a plausibility filter defends; a bare column
+  mapping does not.
 - *GhanaLSS 1991-92 =household_roster.MonthsAway=*: 10,326 of 20,403 members
   (50.6 %) carry the sentinel.  =roster_to_characteristics()= computes
   =MonthsSpent = 12 - MonthsAway= -> =-1.7498e100=.  Here the blast is
@@ -484,12 +551,23 @@ I have deliberately *not* created =Kyrgyz Republic/_/CONTENTS.org=: adding a =_/
 directory to a country that has none is a config change, and this task is
 documentation-only.  It is flagged in the issue instead.
 
-** China, India, Pakistan, Guatemala, Peru, Tajikistan
+** China -- the knowledge was already here, in two code comments
 
-All have a =CONTENTS.org=; none records a Stata-format idiosyncrasy.  Their
-exposure is small (China 61k cells, Pakistan 199k, India <=35k) or nil
-(Guatemala, Peru, Tajikistan).  I did not edit these, to keep the PR's blast
-radius to the two countries where the finding is material.
+=China/_/CONTENTS.org= (400 lines) records *nothing* about Stata formats or
+missing codes -- verified by grep for =format 10x=, =Stata 4/5=, =dta format=,
+=missing code=, =sentinel=, =1.7498=, =2^333=, =8.98846=, =1.70141=.  But
+=China/1995-97/_/mapping.py= and =.../data_info.yml= *both* describe the value
+(see [[*Does anything in this repo declare it?][Does anything in this repo declare it?]]).  So China had the observation and
+the defence, and never promoted either to the place the next person looks.
+Added to =CONTENTS.org= in this PR, together with the fact that its *other*
+declared sentinel column (=household_roster.MonthsAway=) is undefended.
+
+** India, Pakistan, Guatemala, Peru, Tajikistan
+
+All have a =CONTENTS.org=; none records a Stata-format idiosyncrasy (same grep).
+Exposure is small (Pakistan 199k cells, India <=35k) or nil (Guatemala, Peru,
+Tajikistan).  I did not edit these, to keep the PR's blast radius to the three
+countries where the finding is material.
 
 * What treatment the evidence supports
 
@@ -559,6 +637,8 @@ Scripts used (kept out of the repo deliberately; they are one-shot probes, and
 | record-offset verification | offsets from =StataReader._typlist=, raw bytes at the missing cells      |
 | pandas-2.2 simulation      | neutralise the =fmt <= 105= recode; validated against pyreadstat + v2.2.3 |
 | parquet scan               | 1,274 materialized parquets under the shared cache, read-only            |
+| config-tree grep           | =1.7498= / =2^333= / =0x1.0p333= / =54c0000000000000= / =e+100= over all of =lsms_library/= -- found China |
+| sidecar grep               | 498 cached =.DCT=/=.SPS=/=.SSP=/=.VAR=/=.FMT= blobs, bytewise: 0 hits    |
 
 * Sources
 
