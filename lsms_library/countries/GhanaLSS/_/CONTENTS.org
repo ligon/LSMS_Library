@@ -1358,6 +1358,116 @@ cluster.  Observed households per cluster (1987-88: min 10, median 16, max 48;
 1988-89: min 14, median 16, max 47) match that design.  Treat the agreement as
 corroboration, not identity.
 
+** Trap 5: the =rural= table in 1988-89 is NOT a rural table (2026-08-21)
+
+=1988-89/_/categorical_mapping.org= carries, under its =* Y01C= heading,
+
+: #+name: rural
+: | Code | Label         | Classification |
+: |    1 | City          | Urban          |
+: ...
+: |    7 | Other         | Rural          |
+
+*It decodes =Y01C:NRCPL=, the settlement type of the place where a
+NON-RESIDENT CHILD lives.*  Established from the questionnaire (C4):
+=1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=,
+PDF page 8, form block *1C*, printed page *3a* -- "SECTION 1.  PART C.
+CHILDREN RESIDING ELSEWHERE", column 13, "Where does he/she live?  Is it a ...?
+READ TO THE RESPONDENT: City...1 / Large town...2 / Medium town...3 / Small
+town...4 / Large village...5 / Small village...6 / Other...7".  All seven
+labels and their order match verbatim.  The image-only PDF was read with the
+CCITT->TIFF->PIL technique documented above.
+
+The sibling =#+name: region= table under the same heading is that page's
+column *12* ("In what region or country does ...[NAME]... live?", 17 codes
+through OTHER (SPECIFY)...17) -- which is why it carries foreign countries.
+Corroborated by the WB data dictionary (catalog 2314, F22 =y01c=):
+=nrcreg= = "01cq12: region of residence", =nrcpl= = "01cq13: place of
+residence".  Data: =NRCPL= takes exactly 1..7 in both waves (n=4,725 / 5,278;
+code 7 is a 26 / 14-observation rump).  An exhaustive sweep of all 170
+GLSS1/GLSS2 =.DAT= files found only one other candidate family with that
+shape -- Y06's =BIRTYP= / =PRETYP= (Section 6 MIGRATION), which uses the same
+code list.
+
+Two consequences.
+
+- *The =Classification= column is editorial.*  It is not on the form.  It folds
+  =Small Town -> Rural=, which is the very =SU=-style guess Trap 3 and GH
+  #682/#685 refuse.  Do not wire it.
+- *Do not read this table as anything to do with =Rural=.*  GLSS1/GLSS2's
+  urban/rural classification comes from BID Appendix I (=urbrur_abbrev= in
+  =_/appendix_i_clusters.org=), not from here.  /That table is wired on
+  =feat/682-semi-urban= (=553ed2b0=, GH #685) and is not yet on =development=;
+  the canonical =Semi-urban= value it emits arrives with #682./
+
+*** A categorical table has THREE consumption paths, and they do not agree
+
+Worth stating once, because "is this table live?" has no single answer:
+
+| # | path | reads | sees wave tables? |
+|---+------+-------+-------------------|
+| 1 | =Country._apply_categorical_mappings= (=country.py:2236=) | =Country.categorical_mapping= (=country.py:1637=) = global u country | *NO -- never opens a wave dir* |
+| 2 | =mappings:= / =mapping:= in a wave =data_info.yml= (=country.py:793=, =:809=) | =Wave.categorical_mapping= (=country.py:862=) = country dict =.update(wave)= | yes; *wave wins, unconditionally* |
+| 3 | =code_label_map(name, _dirs)= in a wave =mapping.py= | its own filesystem search, *wave dir first* | yes |
+
+So of this country's three =rural= tables, *only one is dead*:
+
+- =1991-92= (2-way) -- *LIVE* via path 3 (=mapping.py:53=, consumed by
+  =Rural()= at =:115=).  This is where GLSS3's =Rural= values come from.
+- =1998-99= (2-way) -- *LIVE* via path 3 (=mapping.py:19=, =Rural()= at =:82=).
+- =1988-89= (7-way) -- *DEAD*: =mapping.py:20= assigns =rural_dict= correctly
+  (=code_label_map= returns a 13-key dual-keyed dict, not the Trap-1 ={}=) and
+  *no function in the module ever references it*.  A correctly-loaded,
+  wrongly-named dict sitting one line from where someone will write
+  =def Rural(value)=.
+
+Note that =_ADDITIVE_CATEGORICAL_TABLES= (=u=, =harmonize_assets=,
+=harmonize_education=) governs the *global/country* boundary only.  The
+country/wave boundary is a plain =dict.update=: no row-union, ever.
+
+Full workings, including the measured effect of adding a country-level =rural=
+table (it arms previously-absent fallbacks in 1987-88 and 2005-06 -- the Trap 4
+shape), are in =slurm_logs/ghana_audit/FINDINGS_orphan_rural_table.org=.
+
+** 1988-89 =Birthplace= decodes an 11-code variable with the 17-code Y01C table (2026-08-21)
+
+=1988-89/_/data_info.yml:51= declares =Birthplace: REGION= -- i.e.
+=Y01A.DAT:REGION=.  =mapping.py:19= decodes it through the wave's =region=
+table, which per Trap 5 is *Y01C's* 17-code list.
+
+Measured: =Y01A:REGION= runs *1..11* in *both* waves (1987-88 n=15,492;
+1988-89 n=14,918), with *zero* observations of codes 12--17 among 14,918
+people -- while the sibling =NAT= column shows several hundred non-Ghanaian
+nationals, so the absence is real rather than sparsity.
+
+Consequence: 1988-89 labels *236 people* =Nigeria=, where 1987-88's own table
+(added 2026-08-20 on four converging lines of evidence) reads
+=11 = Foreign Country=.  The same variable, in two consecutive waves, decoded
+two different ways.
+
+This refines -- and partly contradicts -- a line in Trap 4 above, which says of
+1987-88:
+
+#+begin_quote
+this wave's raw =REGION= codes run =1..11=, i.e. the 11-code era list whose 11
+is a single "Foreign Country", not GLSS2's 17-code list
+#+end_quote
+
+The measurement says GLSS2's =Y01A:REGION= *also* runs 1..11.  The 17-code list
+is GLSS2's =Y01C:NRCREG= list, not its =Y01A:REGION= list.  Both sides are
+quoted; *not resolved here* -- closing it needs the Section 1A questionnaire
+page, which was *not located* in the pages examined (4--16, 76--78): the
+printed sequence runs 1a (0B), 2 (0C), 2a (Part B divider), 3 (1B), 3a (1C),
+4 (2A) with no 1A block.  An exhaustive 78-page sweep was not run.
+
+** The two GLSS1/GLSS2 =categorical_mapping.org= files each name the other wave
+
+=1987-88/_/categorical_mapping.org= line 1 says "...for *1988-89*";
+=1988-89/_/categorical_mapping.org= line 1 says "...for *1987-88*".  Harmless,
+but it is evidence the two are near-copies: =diff= is the header line, three
+=Refined= / =Regined oil= typos, and the =* Y01C= section, which exists only in
+1988-89.  Fix when either file is next touched.
+
 * Adjudication of the 11 =absent= coverage cells (2026-08-20)
 
 Verdicts, evidence and the checks run live in

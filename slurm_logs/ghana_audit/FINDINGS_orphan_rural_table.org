@@ -1,0 +1,798 @@
+#+title: The orphan 7-way =rural= table in GhanaLSS 1988-89 -- sourced, and the name-collision question answered
+#+date: 2026-08-21
+#+author: read-only investigation, branch =docs/orphan-rural-table= off =development=
+
+Bottom line, up front:
+
+1. *Q1 is RESOLVED, verdict (a).*  The table decodes =Y01C:NRCPL= -- GLSS2
+   Household Questionnaire *Section 1 Part C, "CHILDREN RESIDING ELSEWHERE"*,
+   column 13.  Established by *C4, the questionnaire itself*, read off the
+   image-only PDF: all seven labels and their code order match verbatim.  It is
+   a *migration attribute of a non-resident child*, not an urban/rural
+   classification of anything.  Its =Classification= column is *editorial* --
+   it is not on the form.
+2. *Q2: it is SAFE to name a new country-level table =rural=* -- the collision
+   the brief feared cannot occur, for a structural reason (=_apply_categorical_mappings=
+   never sees wave-level tables).  *But do not do it anyway*, and *do not adopt
+   the `Preferred Label` / `Settlement Label` rename the brief contemplates*:
+   the wiring already shipped on =feat/682-semi-urban= (=urbrur_abbrev= in
+   =_/appendix_i_clusters.org=) is the better design and needs no such table.
+   Rename the orphan on its own merits.
+3. *The coordinator's "all three =rural= tables are inert" is half wrong.*  Only
+   *one* of the three is dead.  1991-92's and 1998-99's are *live* -- through a
+   different consumption path (=code_label_map= in the wave =mapping.py=), which
+   is also where the real collision surface is.
+4. Three side findings, each filed separately: a Y01A =REGION= code-11
+   mis-decode in 1988-89; a parser bug that makes =#+begin_example= tables in a
+   *global* =.org= live; and a =.str.strip()= call that nulls non-string values
+   in any column matching a categorical table name.
+
+* Environment
+
+| item | value |
+|------+-------|
+| python | =/global/scratch/.../LSMS_Library/.venv/bin/python= (squashfs) |
+| =PYTHONPATH= | the worktree; asserted in every script (=assert 'worktrees' in lsms_library.__file__=) |
+| =LSMS_DATA_DIR= | =/global/scratch/fsa/fc_jevons/ligon/tmp/ghana_orphan_cache= (private; shared =dvc-cache= symlinked in) |
+| =LSMS_COUNTRIES_ROOT= | the worktree's =lsms_library/countries= |
+| DVC | never invoked.  All source reads via =get_dataframe()= / =data_access.get_data_file()=. |
+| branch | =docs/orphan-rural-table=, off =development= (=5290f25c=) |
+
+Every config edit made during the Q2 simulation was reverted in a =finally=
+block and byte-compared against the original.  No library behaviour changed.
+
+* Q1 -- what does the table decode?
+
+** Verdict: (a) it decodes =Y01C:NRCPL=, and the label ORDER is questionnaire-verified
+
+*** The decisive evidence: the questionnaire (C4)
+
+=1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=,
+PDF page 8, form block *1C*, printed page *3a*.
+
+The file is image-only (78 CCITT Group-4 page scans, zero font objects), so
+=pdfminer= yields nothing and there is no OCR in this environment.  It was read
+using the technique =GhanaLSS/_/CONTENTS.org= records: wrap each page's raw
+=CCITTFaxDecode= stream in a synthetic single-strip TIFF header
+(=Compression=4=, =PhotometricInterpretation=0=, =RowsPerStrip = Height=), open
+with PIL, render to PNG, read the page.
+
+Header: =SECTION 1.  PART C.  CHILDREN RESIDING ELSEWHERE=.
+Lead-in: "Does any member of your household have children under 30 years of age
+not living here in this household?"
+
+Column *12* -- "In what region or country does ...[NAME]... live?"
+
+: WESTERN..........1   BRONG-AHAFO......7   TOGO.............13
+: CENTRAL..........2   NORTHERN.........8   BURKINA FASO.....14
+: GREATER ACCRA....3   UPPER WEST.......9   MALI.............15
+: EASTERN..........4   UPPER EAST......10   OTHER AFRICA
+: VOLTA............5   NIGERIA.........11     (SPECIFY).......16
+: ASHANTI..........6   IVORY COAST.....12   OTHER (SPECIFY)..17
+
+Column *13* -- "Where does he/she live?  Is it a ...?  READ TO THE RESPONDENT:"
+
+: City...........1
+: Large town.....2
+: Medium town....3
+: Small town.....4
+: Large village..5
+: Small village..6
+: Other..........7
+
+Those are, *verbatim and in order*, the two tables that sit under the
+=* Y01C= heading in
+=lsms_library/countries/GhanaLSS/1988-89/_/categorical_mapping.org= --
+=#+name: region= (17 codes) at line 132 and =#+name: rural= (7 codes) at line
+154.  The =region= table's =9 = Upper West / 10 = Upper East= ordering is
+confirmed by the same page.
+
+*The =Classification= column is NOT on the form.*  The questionnaire prints the
+seven labels and nothing else.  Whoever added the table folded 1--3 to Urban and
+4--7 to Rural themselves.  That fold is unsourced, and it is exactly the
+=Small Town -> Rural= judgement that the =Semi-urban= decision (GH #682/#685)
+exists to avoid making.
+
+*** Corroboration 1 -- the data has exactly that shape, in both waves
+
+Read as comma-separated-with-header per the documented GhanaLSS idiosyncrasy
+(see "Idiosyncrasies" below).
+
+| wave    | file       | var    | n     | observed codes | code 7 |
+|---------+------------+--------+-------+----------------+--------|
+| 1987-88 | =Y01C.DAT= | NRCPL  | 4,725 | 1..7, all seven | 26 (0.55%) |
+| 1988-89 | =Y01C.DAT= | NRCPL  | 5,278 | 1..7, all seven | 14 (0.27%) |
+| 1987-88 | =Y01C.DAT= | NRCREG | 4,72x | 1..17          | -- |
+| 1988-89 | =Y01C.DAT= | NRCREG | 5,277 | 1..17 (15=Mali unused; 16 -> 37 obs, 17 -> 45) | -- |
+
+1988-89 NRCPL: 1 -> 1,172; 2 -> 739; 3 -> 837; 4 -> 831; 5 -> 778; 6 -> 907;
+7 -> 14.  A settlement-size distribution with a rump "Other", which is what the
+form's code 7 is.
+
+*** Corroboration 2 -- the WB catalog data dictionary names the questions
+
+=https://microdata.worldbank.org/index.php/catalog/2314/data-dictionary/F22?file_name=y01c=
+(5,278 cases, 16 variables -- matches the local read exactly):
+
+- =nrcreg= -- "01cq12: region of residence"
+- =nrcpl=  -- "01cq13: place of residence"
+
+Adjacent questions, region then place, in the same order as the two org tables.
+
+*** Corroboration 3 -- the module identity, from the Basic Information Document
+
+=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf= (the
+joint BID; real text layer), fetched via =get_data_file()=:
+
+#+begin_quote
+Information on schooling and occupation for non-resident (including deceased) parents of household members and on the age, sex, and schooling of (currently living) non-resident children of household members were collected in Sections 1B and 1C, respectively.
+#+end_quote
+
+*** Corroboration 4 -- provenance: the table was born under that heading
+
+=git log --follow= on the file gives three commits only:
+
+| commit     | date       | author      | what |
+|------------+------------+-------------+------|
+| =171b5d5e= | 2023-11-09 | Amy Ai      | "Complete setup for all rounds in GhanaLSS" -- *adds the file, with the table already in it* |
+| =9dddd806= | 2025-08-08 | Ethan Ligon | "Great rearrangement." -- =R100= path move only, byte-identical |
+| =e0f6e36b= | 2026-08-20 | (GLSS1 fix) | touched the 1987-88 sibling file's =region= section, not this table |
+
+=git show 171b5d5e:GhanaLSS/1988-89/_/categorical_mapping.org= confirms the
+2023 file's structure is *per-source-file decode sections*: =* Y12A=, =* Y12B=,
+=* Y01C=, then =* Harmonizing Food Lables ...=.  The table has never been
+edited.
+
+*** The exhaustive negative -- what else could it have been
+
+The audit that reported this unexplained said "I looked at all GLSS1/GLSS2
+dictionaries; nothing has that shape."  That is not right, and the sweep is
+cheap, so here it is.
+
+Every variable in *all* GLSS1 (77 files) and GLSS2 (93 files) =.DAT= files was
+scanned for integer codes within 0..7 with >=5 distinct values: *237 candidates*
+(=scratchpad/ladder_candidates.csv=).  Filtering to *exactly* ={1..7}* with a
+rare top code leaves *five*:
+
+| variable | file | what it is (WB dictionary label) |
+|----------+------+----------------------------------|
+| =NRCPL=  | Y01C | "01cq13: place of residence" (non-resident child) |
+| =BIRTYP= | Y06  | "06q3: birth place - type" |
+| =PRETYP= | Y06  | "06q9: typ of prev place of res" |
+| =BIRRES= | Y06  | "06q5: reason for move" -- *not* a place type despite the shape |
+| =TYPRES= | PRICE | 1987-88 only; not in the 1988-89 PRICE file |
+
+*Y06 (Section 6, MIGRATION) is the only real rival, and it is the same code
+list.*  Y06 pairs a 1..7 place type with a 1..17 region variable too (=REGMOV=,
+"06q8: came from region/country"), so on shape alone it is indistinguishable.
+The BID summarises Section 6 as "If not born at current residence, was place of
+birth a village, town, city, or other? ... From what region did the person come
+to the current place, was it a village, town or city?" -- the same
+village/town/city vocabulary.
+
+What settles it for Y01C is the *heading the author wrote* (=* Y01C=), plus the
+q12 -> q13 adjacency and ordering mirrored by the org file's region -> rural
+ordering.  The honest statement is: *the table decodes the GLSS1/GLSS2
+settlement-type code list, and the file says it was written for Y01C's
+instance of it (NRCPL); the identical list also governs Y06's BIRTYP and
+PRETYP.*
+
+** Rejected: hypothesis (b), a misplaced canonical-vocabulary draft
+
+Rejected on four independent grounds:
+
+1. *It matches an instrument verbatim.*  A canonical cross-country vocabulary
+   would not reproduce one survey's seven labels in one survey's code order.
+2. *Its position is a source-file decode section.*  =* Y01C=, immediately below
+   that file's =region= decode.  The 2023 file has no non-source-file sections
+   other than the food-harmonization one, which is explicitly titled as such.
+3. *It is anachronistic.*  Authored 2023-11-09; the settlement-vocabulary work
+   (GH #682/#685, =Semi-urban=) is 2026-08.
+4. *A canonical vocabulary would not be keyed on =Code=.*  Codes are
+   survey-scoped.  Compare the actual global spec document,
+   =categorical_mapping/canonical_housing_labels.org=, which keys on
+   =Alternate Spelling= precisely because label strings are country-independent.
+
+** Rejected: hypothesis (c), copied from a later wave
+
+Corpus-wide =grep= over every =categorical_mapping.org= finds four =rural=
+tables in total and *no other 7-way one anywhere in the library*:
+
+| file | shape |
+|------+-------|
+| =GhanaLSS/1988-89/_/= line 154 | =Code / Label / Classification=, 7 rows |
+| =GhanaLSS/1991-92/_/= line 39  | =Code / Label=, 2 rows (1=Urban, 2=Rural) |
+| =GhanaLSS/1998-99/_/= line 72  | =Code / Label=, 2 rows (1=Urban, 2=Rural) |
+| Uganda / Malawi                | not =rural= tables -- ordinary spelling rows containing the word |
+
+GLSS3--GLSS7 all use a two-way =loc2= / =urbrur=; there is nothing to have
+copied backwards from.
+
+** What it does today: nothing.  And that is TWO independent deaths, not one.
+
+*** Death 1 -- it is structurally invisible to =_apply_categorical_mappings=
+
+=Country._apply_categorical_mappings= (=country.py:2236=) reads
+=self.categorical_mapping= where =self= is a *Country*.  =Country.categorical_mapping=
+(=country.py:1637=) merges *global* =lsms_library/categorical_mapping/*.org= with
+the *country-level* =GhanaLSS/_/categorical_mapping.org= and stops there.  It
+never opens a wave directory.  So *no wave-level table in any country is ever
+auto-applied*, with or without a =Preferred Label= column.
+
+Measured: =Country('GhanaLSS').categorical_mapping= keys are
+
+: ['Floor', 'Roof', 'ehcvm_units', 'harmonize_assets', 'harmonize_education',
+:  'region', 'relationship', 'u', 'unit_9b']
+
+-- no =rural=, and none of the three wave tables.
+
+*** Death 2 -- =rural_dict= is loaded and never used
+
+=1988-89/_/mapping.py:20=:
+
+#+begin_src python
+rural_dict = tools.code_label_map('rural', _dirs)
+#+end_src
+
+The dict is populated correctly (13 keys -- =code_label_map= dual-keys every
+code as both =str= and =int=), and *no function in that module references it*.
+=Rural= is not among the wave's formatting functions; =cluster_features= sets
+=joined['Rural'] = pd.NA= explicitly.
+
+That dead assignment is the actively dangerous part.  It is an in-scope,
+correctly-populated, wrongly-named dict sitting one line away from where
+someone will eventually write =def Rural(value)=.
+
+** CORRECTION to the coordinator's fact 2: only ONE of the three is inert
+
+The claim "All three are inert.  None has a =Preferred Label= column, so
+=_build_replace_dict= returns None" is true *of the =_apply_categorical_mappings=
+path only*, and that path was never their consumer.  There are three
+consumption paths for a categorical table, and the wave tables use the third:
+
+| # | path | reads | rural? |
+|---+------+-------+--------|
+| 1 | =Country._apply_categorical_mappings= (=country.py:2236=) | =Country.categorical_mapping= | never sees wave tables at all |
+| 2 | =mappings:= / =mapping:= in a wave =data_info.yml= (=country.py:793=, =:809=) | =Wave.categorical_mapping= | *no GhanaLSS =data_info.yml= references =rural=* (verified by grep) |
+| 3 | =code_label_map(name, _dirs)= in a wave =mapping.py= | its own filesystem search, *wave dir first* | *this is the live consumer* |
+
+Path 3, measured:
+
+- =1991-92/_/mapping.py:53,115-119= -- =rural_dict = _code_label_map('rural', _dirs)=,
+  consumed by =def Rural(value): return rural_dict.get(int(value), pd.NA)=.
+  *LIVE.*  This is where GLSS3's =Rural= values come from.
+- =1998-99/_/mapping.py:19,82-85= -- same shape via the shared
+  =tools.code_label_map=.  *LIVE.*  This is where GLSS4's =Rural= values come from.
+- =1988-89/_/mapping.py:20= -- loaded, never referenced.  *DEAD.*
+
+So the finding is not "three dead tables".  It is: *two live tables that the
+=Preferred Label= convention does not describe, and one dead one that is
+mis-named.*  Any change that assumes the =_apply= path is the only path will
+walk straight into paths 2 and 3.
+
+* Q2 -- the name-collision hazard
+
+** Merge semantics, exactly
+
+*Tier 1 -> 2: global u country.*  =Country.categorical_mapping= (=country.py:1637=)
+loads every =lsms_library/categorical_mapping/*.org= into =global_maps=, then the
+country's own =_/categorical_mapping.org= into =country_maps=, then calls
+=_merge_categorical_tables= (=country.py:174=):
+
+#+begin_src python
+merged = dict(global_maps)
+for name, ctab in country_maps.items():
+    if name in _ADDITIVE_CATEGORICAL_TABLES and name in merged:
+        merged[name] = _row_union_categorical(merged[name], ctab)
+    else:
+        merged[name] = ctab
+#+end_src
+
+Measured: =_ADDITIVE_CATEGORICAL_TABLES = {'harmonize_assets', 'harmonize_education', 'u'}=.
+*=rural= is not in it*, so a country =rural= would *fully override* a global
+=rural= by name.  Deterministic; the result is cached in
+=_categorical_mapping_cache=.
+
+*Tier 2 -> 3: country u wave.*  =Wave.categorical_mapping= (=country.py:862=):
+
+#+begin_src python
+dic = dict(self.country.categorical_mapping)
+dic.update(all_dfs_from_orgfile(org_fn))
+return dic
+#+end_src
+
+*Plain =dict.update=.  The wave wins, unconditionally.  There is no additive
+branch at this boundary at all* -- =_ADDITIVE_CATEGORICAL_TABLES= is consulted
+only at the global/country boundary.  Deterministic, and =dict.update= order is
+fixed by the code, not by filesystem iteration.
+
+*Tier 3 is not consulted by =_apply_categorical_mappings=.*  That is the
+structural fact that defuses the brief's worry.
+
+** Demonstrated: today, and with a country-level =rural= added
+
+Simulation: appended to the worktree's =GhanaLSS/_/categorical_mapping.org=
+
+#+begin_src org
+#+name: rural
+| Original Label | Preferred Label |
+|----------------+-----------------|
+| U              | Urban           |
+| R              | Rural           |
+| SU             | Semi-urban      |
+#+end_src
+
+then reverted (byte-compared: identical).  Fresh =Country= objects were used
+throughout -- the property caches.
+
+|                                     | BEFORE | AFTER |
+|-------------------------------------+--------+-------|
+| =Country('GhanaLSS').categorical_mapping['rural']= | *KeyError* (absent) | the U/R/SU table |
+| =c['1987-88'].categorical_mapping['rural']=        | *absent*             | *the U/R/SU table (inherited)* |
+| =c['1988-89'].categorical_mapping['rural']=        | 7-way =Code/Label/Classification= | *still* the 7-way table |
+| =c['1991-92'].categorical_mapping['rural']=        | 2-way =Code/Label=   | *still* the 2-way table |
+| =c['1998-99'].categorical_mapping['rural']=        | 2-way =Code/Label=   | *still* the 2-way table |
+| =c['2005-06'].categorical_mapping['rural']=        | *absent*             | *the U/R/SU table (inherited)* |
+| =code_label_map('rural', <any wave's _dirs>)=      | 1988-89: 7-way; 1991-92 / 1998-99: 2-way; 1987-88 / 2005-06: ={}= | *identical, all five* |
+
+Two things to read off this.
+
+*The wave shadows the country, deterministically.*  Three of the seven waves
+would carry a =rural= that is not the country's =rural=.  Nothing consumes
+=Wave.categorical_mapping['rural']= today (path 2 has no such declaration), so
+nothing breaks -- but "two different tables under one name, distinguished only
+by which tier you ask" is a defect waiting for its first consumer.
+
+*It arms two previously-empty fallbacks.*  1987-88 and 2005-06 go from
+*absent* to *inheriting the country table*.  That is precisely the shape of
+=CONTENTS.org='s *Trap 4*: "a fallback that has never been exercised has never
+been checked."  In this instance it is harmless -- neither wave's =mapping.py=
+consults =rural=, and =code_label_map= misses it anyway because it defaults
+=value='Label'= and the new table has no =Label= column.  *That last point is a
+near-miss, not a design*: a country table headed =| Code | Label |= *would*
+have been picked up by both waves' =_dirs= fallback.
+
+** =_apply_categorical_mappings= with the country table live
+
+Toy frame, =Rural= column, run through the real method:
+
+| in      | out          |
+|---------+--------------|
+| =U=     | =Urban=      |
+| =R=     | =Rural=      |
+| =SU=    | =Semi-urban= |
+| =Urban= | =Urban=      | (already-decoded GLSS3--7 values pass through -- idempotent)
+| =Rural= | =Rural=      |
+| =None=  | =None=       |
+| =1=     | *=NaN=*      |
+| =4=     | *=NaN=*      |
+
+The last two rows are a *pre-existing framework hazard*, not a consequence of
+this table's content.  =_apply_categorical_mappings= does
+
+#+begin_src python
+if hasattr(df[col], 'str'):
+    df[col] = df[col].str.strip()
+#+end_src
+
+An object-dtype Series *always* has =.str=, and =.str.strip()= maps every
+non-string element to =NaN=.  So the mere *existence* of a table whose name
+matches a column silently nulls that column's non-string values, before any
+replacement is attempted.
+
+GhanaLSS is safe today: every wave's =Rural= is a Python string by the time it
+reaches the API (GLSS3/4 via =rural_dict.get(...)=, GLSS5--7 via
+=value.title()=).  But it is a live tripwire for any future wave that emits a
+numeric =Rural=.  Filed as a separate issue.
+
+** The row-union what-if (unreachable today; run anyway)
+
+=rural= is not in =_ADDITIVE_CATEGORICAL_TABLES=, and the union only ever fires
+at the global/country boundary, so this cannot happen as things stand.  It was
+run because the brief asked, and the result is worth recording.
+
+- *Different key columns* (=Code= vs =Original Label=): =_row_union_categorical=
+  compares =_categorical_key_column= of each side, finds =gk != ck=, and
+  *returns the country table wholesale*.  Safe -- and note that this makes the
+  *choice of key-column name a safety mechanism in its own right*.
+- *Both keyed =Code=*: the union produces 10 rows, and the seven numeric rows
+  get =Preferred Label = NaN= (they never had such a column).  The replace-dict
+  a consumer then builds is
+
+  : {'U': 'Urban', 'R': 'Rural', 'SU': 'Semi-urban',
+  :  1: nan, 2: nan, 3: nan, 4: nan, 5: nan, 6: nan, 7: nan}
+
+  =.replace()= with that *nulls every surviving numeric code*, and
+  =_augment_numeric_code_keys= would widen it to ='1'= and ='1.0'= as well.
+  Silent data loss dressed as a decode.
+
+** Is a GLOBAL =Code=-keyed table safe?  No.
+
+=_build_replace_dict= keys on =source_cols[0]= -- "the first column that is not
+=Preferred Label=".  It does not care what that column *means*.
+
+- Codes are *survey-scoped*.  Iraq's 1/2/3 is not Ghana's 1..7 is not GLSS3's
+  1/2.  A global =Code=-keyed =rural= would rewrite the =Rural= column of every
+  country in the corpus that still carries a numeric code, all at once, with
+  Ghana's GLSS2 non-resident-children vocabulary.
+- =_augment_numeric_code_keys= then registers ='1'= and ='1.0'= variants of every
+  integer key, so the blast radius covers the float-stringified case too -- the
+  documented "=format_id= is applied to =idxvars= but not =myvars=" gotcha.
+- This is exactly why =Roof= / =Floor= *can* live globally: they key on
+  =Alternate Spelling=, a country-independent label string.
+
+** RECOMMENDATION
+
+*** 1.  Do not add a country-level table named =rural=.  The wiring already exists, and it is better.
+
+The brief's premise -- "we intend to add a new categorical-mapping table, also
+naturally named =rural=, carrying the BID Appendix I decode (U/R/SU) with a
+=Preferred Label= column" -- has been *overtaken*.  =feat/682-semi-urban=
+(=553ed2b0=, 2026-08-21) already wired it, and deliberately did not do it that
+way:
+
+- table named *=urbrur_abbrev=*, not =rural=;
+- living in =_/appendix_i_clusters.org=, *not* =categorical_mapping.org=, so
+  =Country.categorical_mapping= never loads it and it cannot collide with
+  anything;
+- headed =| UrbRur | Rural |= -- keyed on the abbreviation, value column named
+  for its target;
+- read *explicitly* by =ghanalss.py::appendix_i_cluster_attributes= via
+  =df_from_orgfile(name='urbrur_abbrev')=, with =assert urbrur_map= and an
+  unmapped-abbreviation assert -- so the Trap-1 silent-empty-dict failure
+  cannot recur.
+
+That design has no name collision, no tier ambiguity, no =Code= key, no
+=.str.strip()= exposure, and it fails loudly.  *Keep it.*  Nothing in this
+investigation argues for changing it.
+
+*Ordering dependency*, for whoever merges: =Semi-urban= is *not* a canonical
+=Rural= spelling on =development= (grep: absent).  It is added by =553ed2b0= on
+=feat/682-semi-urban=.  #682 must land before anything emits =Semi-urban=.
+
+*** 2.  Rename the orphan anyway -- for its own reasons, not for collision safety.
+
+Proposed: =#+name: nrcpl_place_type= in
+=GhanaLSS/1988-89/_/categorical_mapping.org=, with a comment recording the
+questionnaire citation.  Three reasons, none of which is the collision:
+
+1. *The name is factually wrong, and the wrong name is why the audit could not
+   source it.*  Anyone searching for what a table called =rural= decodes will
+   look at urban/rural variables and find nothing, because it decodes a
+   non-resident child's settlement type.
+2. *The dead =rural_dict= at =1988-89/_/mapping.py:20= is a loaded gun.*  Delete
+   the assignment in the same change.
+3. *The =Classification= column contradicts a recorded decision.*  It folds
+   =Small Town -> Rural=; GH #685/#682 exists to preserve the three-way
+   distinction.  If the table is kept, that column should go or be marked
+   unsourced.
+
+*Mechanical care*: keep any commentary *above* the =#+name:= line.  An Org
+=#+name:= attaches to the next element; a comment block between the keyword and
+the table silently steals the name and the decode goes dead with no error.
+=CONTENTS.org= records that this already cost one silent no-op "fix".
+
+*** 3.  If a global settlement spec is ever written, write it with NO tables at all.
+
+Mirror =canonical_housing_labels.org= in intent, but *not* in form -- see the
+parser bug below.  Concretely:
+
+- =lsms_library/categorical_mapping/canonical_settlement_labels.org= -- prose
+  only, defining the vocabulary =Urban / Semi-urban / Rural= and what it is not
+  (not =Informal=; not a home for within-urban tiers).  *No =#+name:= line
+  anywhere in the file*, not even inside =#+begin_example= -- such tables are
+  parsed live (proved below).  Show the intended per-country shape as an
+  indented code listing with the =#+name:= line broken (e.g. =#+ name:=) or as
+  a fenced block with the keyword written as prose.
+- Per-country table, in the country's own =categorical_mapping.org=:
+
+  : #+name: rural
+  : | Original Label | Preferred Label |
+  : |----------------+-----------------|
+  : | <survey label> | Urban           |
+  : | <survey label> | Semi-urban      |
+  : | <survey label> | Rural           |
+
+  Keyed on a *label string*, never on =Code=.  A country whose source carries
+  numeric codes decodes them to labels in its wave =mapping.py= first, exactly
+  as GLSS3/GLSS4 already do.
+- And: rename any wave-level =rural= table that is not that shape, so the name
+  means one thing at every tier.
+
+  *Do NOT read that as a licence to rename the 1991-92 and 1998-99 tables on
+  their own.*  Both are *live* via path 3 -- =code_label_map('rural', _dirs)= at
+  =1991-92/_/mapping.py:53= and =1998-99/_/mapping.py:19=, consumed by each
+  wave's =Rural()=.  =code_label_map= returns ={}= for a table name it cannot
+  find, so a rename without touching the caller *silently nulls GLSS3's and
+  GLSS4's =Rural== -- the exact Trap 1 symptom.  Either rename the table and its
+  =mapping.py= caller *in the same change*, or leave them alone.  Only the
+  1988-89 table can be renamed unilaterally, because nothing reads it (that is
+  what GH #692 proposes, and it is deliberately scoped to that one table).
+
+* GhanaLSS idiosyncrasies bearing on this -- named and quoted
+
+All from =lsms_library/countries/GhanaLSS/_/CONTENTS.org= (1,251 lines, read in
+full including the =DONE= / =DEFERRED= / open-item entries).
+
+** Trap 1 -- a bare =get_categorical_mapping= returns an EMPTY dict, silently
+
+#+begin_quote
+=local_tools.get_categorical_mapping(tablename=X)= called *without* a
+value-column keyword returns ={}=.  It passes =idxvars='Code'= and no myvars,
+so =df_data_grabber= drops the Label column and the =.squeeze()= yields
+nothing.  Nothing raises.  Every lookup then misses, returns =pd.NA=, and the
+column ships 100% null while the build reports success.
+
+This has bitten GhanaLSS *three separate times* [...]
+#+end_quote
+
+*Bearing.*  This is the country's signature failure mode and the reason the
+brief calls the orphan "a candidate fourth".  It is *not* a fourth instance of
+Trap 1 -- =code_label_map= is being called correctly at
+=1988-89/_/mapping.py:20= and returns a *correct, non-empty* 13-key dict.  The
+death here is different and simpler: *the correctly-loaded dict is never used.*
+Worth distinguishing, because the Trap-1 remedy (use =code_label_map=) has
+already been applied and did not help.
+
+** Trap 3 -- Appendix I is authoritative, and =Rural= was deliberately left NA
+
+#+begin_quote
+Note also what the fix does NOT do: =Rural= stays =NA=.  The Appendix
+classifies clusters *three* ways -- =U= / =R= / =SU= (semi-urban, 52 clusters,
+20%) -- against a canonical vocabulary of ={Urban, Rural}=.  Folding =SU= would
+destroy a distinction the survey drew, so it waits on GH #685/#682 rather than
+being guessed away.
+#+end_quote
+
+and:
+
+#+begin_quote
+The inference was reasonable, well-documented, measured, and *nobody looked for
+a better source for a year*.  The better source was a text-layer PDF sitting in
+=Documentation/= the whole time.  Before building an approximation, read the
+documentation the survey shipped with itself.
+#+end_quote
+
+*Bearing.*  Direct.  The orphan's =Classification= column is exactly the
+=SU=-folding that this entry refuses -- worse, it folds =Small Town= into Rural
+on no authority at all.  And the second quote is the method that resolved Q1:
+the answer was on a questionnaire page in =Documentation/=, and the previous
+audit reported "unexplained" without opening it.
+
+** Trap 4 -- a fallback that has never been exercised has never been checked
+
+#+begin_quote
+=1987-88/_/categorical_mapping.org= carried no =region= table, so
+=code_label_map('region', _dirs)= fell through =_dirs= to the *country-level*
+=_/categorical_mapping.org=.  That table reads =9 = Upper East, 10 = Upper
+West=.  *Every wave-level table in this country reads the reverse* [...]
+
+While GLSS1's decode was dead the disagreement was *unobservable* [...]
+Reviving the decode (=18b6ca51=) armed it, and shipped *1,511 people* with
+=Birthplace= reversed and *11 of 176 clusters* with =Region= reversed.
+
+This is the same lesson as Trap 1, one level deeper, and it is worth stating
+plainly: *a fallback that has never been exercised has never been checked.*
+#+end_quote
+
+*Bearing.*  This is the whole of Q2 in one paragraph, and the measured
+before/after table above is that shape exactly: adding a country-level =rural=
+takes 1987-88 and 2005-06 from "no =rural= at any tier" to "inherits the country
+table".  It happens to be harmless here; it was not harmless last time.
+
+** The Org =#+name:= trap
+
+#+begin_quote
+*An Org =#+name:= attaches to the NEXT element.*  A comment block placed
+between =#+name: region= and the table silently steals the name; the table is
+then unnamed, the lookup misses, and the decode stays dead *with no error*.
+Keep commentary above the =#+name:= line.  The first attempt at this fix was
+a silent no-op for exactly this reason, and it looked like a successful build.
+#+end_quote
+
+*Bearing.*  Binding on the proposed rename.  Also the *mirror image* of the
+parser bug below: here a comment steals a name Org would have given the table;
+there, a table inside a block Org would never export still gets its name.
+
+** GLSS1/GLSS2 =.DAT= files are comma-separated with a header row
+
+#+begin_quote
+The =.DCT= dictionaries look like Stata =infile= dictionaries and give
+=start-column / width / type / name= for a fixed-width layout.  *The shipped
+=.DAT= does not use that layout.* [...] Reading one with
+=pd.read_fwf(colspecs=...)= built from the =.DCT= "succeeds" and returns
+garbage [...] Read them with =pd.read_csv(..., na_values=['.'])=; use the
+=.DCT= only as the authoritative *variable list*.
+#+end_quote
+
+*Bearing.*  Every frequency in this document depends on it.  Following the
+=.DCT= layout would have produced a plausible-looking, wrong distribution.
+
+** Which questionnaires have a text layer -- and how to read the ones that don't
+
+#+begin_quote
+The two GLSS1/GLSS2 files are *image-only*: 78 CCITT-fax page scans and *zero*
+font objects, so =pdfminer= extracts 0 non-whitespace characters.  They are,
+however, *legible* [...] each page is a single =CCITTFaxDecode= XObject
+(=K = -1=, i.e. Group 4), which PIL will open if you wrap the raw stream in a
+synthetic single-strip TIFF header [...] There is no OCR in this environment,
+so a *targeted* read of known pages is feasible and an exhaustive term-search
+of the form is not
+#+end_quote
+
+*Bearing.*  This is the technique that produced the C4 evidence.  It is the
+reason Q1 could be *closed* rather than left =unsure=: absence of a text layer
+is not absence of a questionnaire.
+
+** Trap 2 -- GLSS4's relationship scheme is not GLSS1's; search the wave dir first
+
+#+begin_quote
+If you add the GLSS4 list, add it as a *wave-level* table in
+=1998-99/_/categorical_mapping.org= and search the wave dir *first*, so it
+cannot fall through to the GLSS1 table.
+#+end_quote
+
+*Bearing.*  It is the established local convention that wave-first search is a
+*safety* mechanism.  Q2's answer is consistent with it: the wave *does* win, at
+both the =Wave.categorical_mapping= tier and in =code_label_map='s =_dirs=
+order.  The problem is not the precedence rule; it is one wrongly-named table.
+
+* Side findings -- each to be filed separately
+
+** SF-1.  1988-89 =Birthplace= decodes an 11-code variable with a 17-code table
+
+=1988-89/_/data_info.yml:51= declares =Birthplace: REGION= -- i.e. =Y01A.DAT:REGION=.
+=1988-89/_/mapping.py:19= builds =region_dict= from the wave's =region= table,
+which (per Q1) is *Y01C's* 17-code list.
+
+Measured on =Y01A.DAT=, both waves:
+
+| wave    | =REGION= n | observed codes | code 11 |
+|---------+------------+----------------+---------|
+| 1987-88 | 15,492     | 1..11          | 221     |
+| 1988-89 | 14,918     | 1..11          | 236     |
+
+Zero observations of codes 12--17 among 14,918 people, while the sibling =NAT=
+(nationality) column shows 195 + 81 + ... non-Ghanaian nationals -- so the
+absence is real, not sparsity.  =Y01A:REGION= is the 11-code era list.
+
+Consequence: 1988-89 labels those *236 people* =Nigeria=, where 1987-88's own
+table (added 2026-08-20 on four converging lines of evidence) reads
+=11 = Foreign Country=.  The same variable, in two consecutive waves, decoded
+inconsistently.
+
+This refines a line in =CONTENTS.org= Trap 4, which contrasts
+
+#+begin_quote
+this wave's raw =REGION= codes run =1..11=, the 11-code era list (11 = a single
+"Foreign Country"), not GLSS2's 17-code list
+#+end_quote
+
+The measurement says GLSS2's =Y01A:REGION= *also* runs 1..11.  The 17-code list
+is GLSS2's =Y01C:NRCREG= list, not its =Y01A:REGION= list, and the =CONTENTS.org=
+phrasing "GLSS2's 17-code list" reads as though it were the latter.  Both sides
+quoted; not resolved here.
+
+** SF-2.  A =#+begin_example= table in a GLOBAL =.org= is parsed as a LIVE mapping
+
+Confirmed.  =all_dfs_from_orgfile('lsms_library/categorical_mapping/canonical_housing_labels.org')=
+returns =['Roof', 'Floor']= -- the *documentation templates* at lines 111 and
+117, inside a =#+begin_example ... #+end_example= block:
+
+: Roof  -> {'<local variant 1>': '<canonical>', '...': '...'}
+: Floor -> {'...': '...'}
+
+*Mechanism, pinned.*  =all_dfs_from_orgfile= (=local_tools.py:2597=) is a
+line-oriented scanner with *no block awareness*.  It matches any line starting
+=#+name:=, then runs a "skip any extra =#+= lines" loop (=:2621=) which steps
+*straight over* =#+begin_example=, landing on the table.  (=canonical_education_labels.org=
+parses to =[]= not because example blocks are handled, but because that file
+contains no bare =#+name:= line at all -- its only match is inside a =#+ =
+comment prefix.)
+
+*Blast radius, measured.*  A corpus scan of every =.org= under =countries/= and
+=categorical_mapping/= finds *exactly two* such tables, both in
+=canonical_housing_labels.org=.  Six countries declare =housing= and have no
+=Roof=/=Floor= table of their own -- Albania, Azerbaijan, India, Kazakhstan,
+Kosovo, Serbia -- so for those six the placeholder *is* the live table.
+
+*Effect today: zero, verified against real data.*  Five of the six do not emit
+=Roof=/=Floor= columns from =housing()= at all; India does, both are =string=
+dtype, and the null counts are identical with and without the placeholder
+tables removed from the cached dict (3/2251 either way).
+
+*Why it still matters.*  Two failure modes are waiting:
+1. via SF-3, a country that ever emits a non-string =Roof=/=Floor= would be
+   silently nulled by the placeholder's mere existence;
+2. any future global spec document that illustrates its convention with a
+   *realistic* example row creates a live global mapping out of a placeholder.
+   That is precisely what a =canonical_settlement_labels.org= containing
+   =| U | Urban |= inside a =#+begin_example= would do -- hence the "no tables
+   at all" recommendation above.
+
+** SF-3.  =_apply_categorical_mappings= nulls non-string values in a matching column
+
+=country.py=, inside =_apply_categorical_mappings=:
+
+#+begin_src python
+if hasattr(df[col], 'str'):
+    df[col] = df[col].str.strip()
+df[col] = df[col].replace(rdict)
+#+end_src
+
+An object-dtype Series always satisfies =hasattr(s, 'str')=, and
+=.str.strip()= returns =NaN= for every non-string element.  Demonstrated:
+
+: pd.Series(['U', 'Urban', None, 1, 4], dtype=object).str.strip()
+: -> ['U', 'Urban', None, nan, nan]
+
+So merely *naming* a categorical table after a column silently destroys that
+column's non-string values, before any replacement is attempted.  No warning.
+No effect in the corpus today (SF-2), but it converts SF-2 from cosmetic to
+data-destroying the moment a numeric-coded column meets a matching table name.
+
+** SF-4.  The two GLSS1/GLSS2 =categorical_mapping.org= files each name the other wave
+
+=1987-88/_/categorical_mapping.org= line 1: "...for *1988-89*".
+=1988-89/_/categorical_mapping.org= line 1: "...for *1987-88*".
+
+Harmless, but it is shared-ancestry evidence: the two files are near-copies
+(=diff= is the header line, three =Refined/Regined oil= typos, and the =* Y01C=
+section, which exists only in 1988-89).  Worth a one-line fix when either file
+is next touched.
+
+** SF-5.  Section 1 Part A is not in the shipped GLSS2 questionnaire scan
+
+Rendered pages 4--16 and 76--78.  The printed-page sequence runs 1a (block 0B),
+2 (0C), 2a (Part B divider), 3 (1B), 3a (1C), 4 (2A), 5 (2B2), ... -- no *1A*
+block, i.e. no household-roster page, which is where =Y01A:REGION='s own code
+list would be.  *An exhaustive 78-page sweep was not run*, so this is "not
+located in the pages examined", not "absent".  Recorded because it is why SF-1
+cannot be closed by C4 the way Q1 was.
+
+* Gaps -- what could not be established
+
+1. *Y01C vs Y06 cannot be separated on evidence internal to the data.*  Both
+   carry a 1..7 place-type paired with a 1..17 region, and the BID indicates
+   Section 6 uses the same village/town/city vocabulary.  The attribution to
+   Y01C rests on the org file's own =* Y01C= heading and the q12/q13 adjacency.
+   The *code list* is settled by C4 either way; only *which variable the author
+   meant* is inferential.  If it matters, the Section 6 questionnaire page
+   (form block 6, printed page ~11) can be rendered with the same technique and
+   its column 3 / column 9 code lists read directly.
+2. *SF-1 is not closed by C4.*  The =Y01A:REGION= code list would settle
+   whether 11 is "Nigeria" or "Foreign Country" in GLSS2, and the 1A page was
+   not located (SF-5).  The finding therefore rests on the measured code range
+   (1..11 in both waves, zero 12--17) plus the four converging lines already
+   recorded for 1987-88 in =CONTENTS.org= -- strong, but not the instrument.
+3. *No claim is made about the 1987-88 wave's NRCPL labels.*  The GLSS1
+   questionnaire was not rendered.  GLSS1's =Y01C:NRCPL= has the same 1..7
+   range and the joint BID covers both rounds, so the same list almost
+   certainly applies -- but "almost certainly" is not C4, and 1987-88 has no
+   =rural= table anyway.
+4. *The =Classification= fold's origin is unknown.*  It is not on the
+   questionnaire and not in the BID.  Whether it came from a published GLSS
+   tabulation, an analyst's working note, or was invented at the keyboard could
+   not be determined; the introducing commit message ("Complete setup for all
+   rounds in GhanaLSS") says nothing.
+5. *SF-2's blast radius was measured for =Roof=/=Floor= only.*  The corpus scan
+   for =#+name:= inside blocks is complete (2 hits, both there), so no other
+   table is affected today, but the =housing()=-builds check covered only the
+   six countries lacking their own tables.
+
+* Reproduction
+
+Scripts are in the session scratchpad, all run with the environment in s1:
+
+| script | what |
+|--------+------|
+| =t1_y01c.py= | Y01A/Y01B/Y01C =.DCT= variable lists, both waves |
+| =t2_nrcpl.py= | NRCPL / NRCREG / Y01A:REGION frequencies |
+| =t4_bid.py= | fetch + text-search the two Basic Information Documents |
+| =t5_sweep.py= | exhaustive 0..7 code-shape sweep over all 170 =.DAT= files |
+| =t6_rivals.py= | Y06 / PRICE rival candidates, with distributions |
+| =t7_qpages.py= | render image-only questionnaire pages to PNG (CCITT -> TIFF -> PIL) |
+| =t8_q2.py= | the Q2 before/after merge demonstration (self-reverting) |
+| =t9_extras.py= | =.str.strip()= behaviour; placeholder blast radius |
+| =t10_placeholder_impact.py= | =housing()= built with and without the placeholders, 6 countries |
+| =t11_blockscan.py= | corpus scan for =#+name:= inside =#+begin_.../#+end_...= |
