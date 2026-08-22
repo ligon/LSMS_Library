@@ -11,15 +11,54 @@ cluster_features:
 
 
 sample:
-    file: SEC0A.DTA
-    idxvars:
-        i:
-            - clust
-            - nh
-    myvars:
-        v: clust
-        strata: region
-        Rural: loc2
+    # GH #713: `weight` and `panel_weight` were 100% NULL for all 5,998
+    # households in this wave.  The sampling weight is not missing from the
+    # survey -- it ships in POV_GH.DTA, a sibling file at EXACTLY this table's
+    # grain, and was simply never declared.  Same shape as GH #659 (GLSS5), and
+    # the fix is the same: add the sub-df rather than invent a value.
+    #
+    # It is a real weight, not a placeholder: min 0.127, median 0.85, max 6.02,
+    # 5,998/5,998 non-null.  Contrast GLSS3 1991-92, whose POV_GH.DTA `weight`
+    # is identically 1.0 across all 4,523 rows -- deliberately NOT wired there,
+    # because declaring it would make a self-weighting wave look weighted.
+    #
+    # The merge is provably safe: `(clust, nh)` is unique in BOTH frames
+    # (5,998/5,998 each) with FULL overlap and zero orphans either way, so the
+    # GH #323 site-4 cartesian condition (key non-unique in both) cannot hold.
+    # `merge_how: left` keeps SEC0A authoritative for which households exist.
+    #
+    # `panel_weight` mirrors `weight` per the convention in CLAUDE.md ("Pre-
+    # refreshment waves have the same value in both columns"), matching what
+    # GLSS5 does with the same source column.  GLSS4 carries no refreshment
+    # sample, so the two are not distinguishable here.
+    dfs:
+        - df_cover
+        - df_weight
+    df_cover:
+        file: SEC0A.DTA
+        idxvars:
+            i:
+                - clust
+                - nh
+        myvars:
+            v: clust
+            strata: region
+            Rural: loc2
+    df_weight:
+        file: POV_GH.DTA
+        idxvars:
+            i:
+                - clust
+                - nh
+        myvars:
+            weight: weight
+            panel_weight: weight
+    merge_on:
+        - i
+    merge_how: left
+    final_index:
+        - i
+        - t
 
 interview_date:
     file: SEC0A.DTA
