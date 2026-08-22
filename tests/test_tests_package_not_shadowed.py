@@ -37,6 +37,18 @@ Do **not** "fix" it by adding the import back.  Either:
   * or load `tests/conftest.py` **by path** (`importlib.util.spec_from_file_location`),
     which is identical in every import mode.
 
+## What this guard can and cannot do
+
+**It cannot save CI.** If a module ships the bad import, pytest aborts at
+COLLECTION and this test never runs. By the time CI is red, the guard is moot.
+
+**Its value is local, and that is precisely where the mistake hides.** On a
+developer checkout the bad import *works* -- `lsms_library.pth` puts the repo
+root ahead of site-packages -- so the mistake is invisible exactly where it is
+made, and only surfaces in CI as a `ModuleNotFoundError` naming neither the
+test nor the change. Running the suite locally before pushing now names the
+offending file and line instead.
+
 See GH #680 for the upstream report and the durable options.
 """
 import importlib.util
@@ -45,18 +57,27 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
-def test_tests_package_resolves_inside_this_repo():
-    """`import tests` must not reach a dependency's top-level `tests` package."""
+def test_shadowing_is_reported_but_not_asserted_away():
+    """Report where `tests` resolves; do NOT require it to be ours.
+
+    An earlier cut of this test asserted `tests` resolves inside the repo.
+    **That was wrong, and it failed in CI on the first run** -- because the
+    shadowing genuinely IS present there, and this repo cannot fix a
+    dependency's packaging.  Asserting the absence of a condition we do not
+    control makes a permanently-red test, not a guard.
+
+    What we DO control is whether our own modules depend on the broken
+    resolution, which is what the next test enforces.  This one exists to put
+    the resolved path in the failure output when that test trips, so the cause
+    is visible without a separate investigation.
+    """
     spec = importlib.util.find_spec("tests")
     assert spec is not None, "no `tests` package on sys.path at all"
     origin = Path(spec.origin).resolve()
-    assert REPO_ROOT in origin.parents, (
-        f"`tests` resolves to {origin}, OUTSIDE this repo ({REPO_ROOT}).\n"
-        "A dependency is shadowing our tests package -- see GH #680.  Any\n"
-        "`from tests.conftest import ...` will abort collection for the WHOLE\n"
-        "session.  Use `pytestmark = pytest.mark.requires_s3` or load\n"
-        "tests/conftest.py by path instead."
-    )
+    shadowed = REPO_ROOT not in origin.parents
+    # Not an assertion about the environment -- just a durable record of it.
+    print(f"`tests` resolves to: {origin}"
+          f"  [{'SHADOWED by a dependency (see GH #680)' if shadowed else 'ours'}]")
 
 
 def test_no_test_module_imports_conftest_by_package_path():
