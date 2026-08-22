@@ -23,6 +23,14 @@ would be the main way this sweep misleads.*  Knowing a country's rule lets you
 *describe* its definition.  Only a population variable in the data lets you
 *re-cut* it to a common threshold.
 
+*A third question turned out to dominate both*, and it was not in the original
+brief: *what geographical entity are the population numbers for?*  A locality, a
+sampling enumeration area and an administrative commune are different objects,
+and a threshold is not a definition until you know which one it counts.
+Restructuring around that question is what turned a "the numbers disagree"
+conclusion into a "the numbers are not on a common scale" conclusion.  See
+*THE ENTITY PROBLEM* below.
+
 *Independence note.*  A separate agent verified the GLSS1 claim against the
 primary PDF; its result arrived after this sweep's Ghana evidence was already
 collected, and the two agree.  Everything cited below as "this sweep" was
@@ -140,8 +148,14 @@ Kazakhstan and Guyana should be treated as *unexamined*, not as negatives.
 ** THE BASE RATE
 
 *4 of 45 countries with extractable documentation state a population threshold
-bearing on settlement class -- about 9%.  Only 2 (Ghana, Panama) state a rule
-that actually partitions settlements into the classes the survey then uses.*
+bearing on settlement class -- about 9%.  Three of them (Ghana, Panama, Peru)
+state a rule that partitions the classes the survey actually uses; Ethiopia's
+only threshold subdivides "urban" and never separates urban from rural.*
+
+(Peru was initially recorded as a "partial" hit from a single questionnaire
+response option.  Reading its interviewer manual upgraded it to the
+best-specified rule in the corpus -- and showed that a threshold is only one of
+its three clauses.  See the Q1 table.)
 
 That is the deliverable number, and its error bar has to be stated in three
 separate pieces, because they are bounded very differently:
@@ -160,20 +174,50 @@ OCR pile is read.*  That is the single strongest argument for doing OCR next.
 
 ** The hits
 
-*A threshold without its census vintage is only half a definition* -- it is
-exactly the axis on which #683-style drift happens, so the reference year is a
-column here, not a footnote.
+*A threshold is not a definition until you know three things*: the number, the
+census vintage it is measured against, and -- most easily overlooked -- *the
+geographical entity whose population is being counted*.  All three are columns
+below.  The =entity= column records *the exact word the source uses*,
+deliberately unnormalised, because the variation between those words is itself
+the finding.  =classified unit= records what the class is actually attached to,
+which is frequently *not* the same object.
 
-| country     | wave    | classes defined                               | thresholds                                              | measured on         | source (file, page)                                                |
-|-------------+---------+-----------------------------------------------+---------------------------------------------------------+---------------------+--------------------------------------------------------------------|
-| GhanaLSS    | 1987-88 (GLSS1/2) | urban / semi-urban / rural          | >5,000 / 1,500-5,000 / <1,500                           | *1984 Census*       | Basic Information Document §3.1 "Sample Design", PDF p.13 / printed p.11 *(from the Ghana pilot)* |
-| GhanaLSS    | 1987-88 | urban / semi-urban / rural                    | >=5,000 / 1,500-4,999 / <1,500                          | *1984 Census*       | =Distribution_of_Welfare.pdf= p.86                                 |
-| GhanaLSS    | 1991-92 | (small) rural / semi-urban / [urban]          | <1,500 / >=1,500 and <5,000 / [>=5,000]                 | *1984 Census*       | =G3report.pdf= pp.75, 79, 106; =G3REPORT.DOC=                      |
-| GhanaLSS    | 1998-99 | urban / rural  (semi-urban *folded into urban*) | urban >1,500 ; rural <=1,500                          | *1984 Census*       | =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11                        |
-| GhanaLSS    | 2012-13 | urban / rural                                 | >=5,000 / <5,000                                        | not stated          | =GLSS6_Labour Force Report.pdf= pp.15-16                           |
-| Ethiopia    | 2015-16 | small town / large town (*partitions urban only*) | <10,000 / >10,000                                   | *2007 Census*       | =9331_ethiopia_survey_report_web_final.pdf= p.15 fn.2; =basic_information_document_wave__3_dec19.pdf= pp.13,14,24 |
-| Panama      | 2003    | 4 bands (large city / intermediate / other urban / rural) | >=100,000 / 20,000-99,999 / 1,500-19,999 / 1-1,499 | not stated      | =FormulariodeHogares_V2.pdf= p.21                             |
-| Peru        | 1994    | "other rural area" (partial -- one band only) | <2,000                                                  | not stated          | =pe94hhq1.pdf= p.58                                                |
+| country  | wave              | classes                    | thresholds                              | *entity* (source's own word)                    | *classified unit*                    | measured on | source                                                |
+|----------+-------------------+----------------------------+-----------------------------------------+-------------------------------------------------+--------------------------------------+-------------+-------------------------------------------------------|
+| GhanaLSS | 1987-88 (GLSS1/2) | urban / semi-urban / rural | >5,000 / 1,500-5,000 / <1,500           | *"areas"* -- unspecified                        | *cannot tell from the wording*       | 1984 Census | BID §3.1, PDF p.13 /(Ghana pilot)/                    |
+| GhanaLSS | 1987-88           | urban / semi-urban / rural | >=5,000 / 1,500-4,999 / <1,500          | *"people"*, applied to *"enumeration areas"*    | *enumeration area*                   | 1984 Census | =Distribution_of_Welfare.pdf= p.86                    |
+| GhanaLSS | 1991-92           | rural / semi-urban / urban | <1,500 / 1,500-<5,000 / >=5,000         | *"localities"*                                  | *locality*                           | 1984 Census | =G3report.pdf= pp.75, 79, 106                         |
+| GhanaLSS | 1998-99           | urban / rural              | >1,500 / <=1,500                        | *"an EA ... had a population"*                  | *enumeration area*                   | 1984 Census | =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11           |
+| GhanaLSS | 2012-13           | urban / rural              | >=5,000 / <5,000                        | *"Localities"*                                  | *locality*                           | not stated  | =GLSS6_Labour Force Report.pdf= pp.15-16              |
+| Ethiopia | 2015-16           | small / large town (*splits urban only*) | <10,000 / >10,000         | *"a town"*                                      | *town*                               | 2007 Census | =9331_ethiopia_survey_report_web_final.pdf= p.15 fn.2 |
+| Panama   | 2003              | 4 bands                    | >=100,000 / 20,000-99,999 / 1,500-19,999 / 1-1,499 | *"habitantes"* of a named place, the address field being =LOCALIDAD/ LUGAR POBLADO/ COMUNIDAD/ BARRIO= | *named place* -- but the survey's own =ÁREA= urbana/rural/indígena flag sits on the *corregimiento* | not stated | =FormulariodeHogares_V2.pdf= pp.1, 21 |
+| Peru     | 1994              | urban / rural              | >=2,000 / <2,000, *plus two non-population clauses* | *"centro poblado"*, formally defined        | *centro poblado* (named place)       | not stated  | =m-encues.pdf= p.59 §3 DEFINICIONES                   |
+
+*Peru is the only country in the corpus that defines its entity before using
+it*, and doing so exposes that the threshold is one clause of three.
+=m-encues.pdf= p.59:
+
+#+begin_quote
+*Centro Poblado.*  Es todo lugar o sitio del territorio nacional identificado
+con un nombre, en el que viven con ánimo de permanencia por lo general varias
+familias ...
+
+a) *Centro poblado urbano.*  Es aquel que tiene como mínimo dos mil habitantes
+*con viviendas contiguas*, se incluye en este grupo a *las capitales
+distritales, aún cuando no reúnan las condiciones indicadas*.
+
+b) *Centro poblado rural.*  Es aquel que tiene menos de dos mil habitantes y en
+el cual, generalmente, sus viviendas se hallan dispersas.
+#+end_quote
+
+So Peru's urban test is =(population >= 2,000 AND dwellings contiguous) OR is a
+district capital=.  A population threshold alone reproduces neither branch: the
+contiguity clause is *morphological* and the capital clause is *administrative*,
+and the latter explicitly overrides the population test.  I had previously
+recorded Peru as a "partial" hit on the strength of a single questionnaire
+response option; reading the manual upgrades it to the *best-specified rule in
+the corpus* -- and simultaneously shows that being well-specified is what
+reveals a threshold-only reading to be inadequate.
 
 *Where the rule lives matters for how you search for it.*  Ghana's canonical
 statement is in the *sampling design* section of a Basic Information Document,
@@ -330,6 +374,111 @@ four; none states a population threshold:
   national statistical-office definition by reference, which is precisely the
   case a documentation sweep cannot close.
 
+* THE ENTITY PROBLEM -- and it is larger than the threshold problem
+
+/Added after @ligon asked: what geographical entity are these population
+numbers even for?  Restructuring the table around that question changed the
+conclusion, so it gets its own section./
+
+** Entity variation swamps threshold variation
+
+Line the hits up by *what is being counted* rather than by *how many*:
+
+| country  | entity            | what that object is                                                        |
+|----------+-------------------+----------------------------------------------------------------------------|
+| Ghana    | locality *or* EA  | *inconsistent across its own documents* -- see below                        |
+| Ethiopia | town              | an urban place; the rural side of the partition is not defined by size at all |
+| Panama   | named place       | =LOCALIDAD/ LUGAR POBLADO/ COMUNIDAD/ BARRIO= -- four words for the address field, and the urban/rural flag lives one level up on the *corregimiento* |
+| Peru     | centro poblado    | a *named site* where families live with intent to remain -- a settlement-morphology object, not an administrative one |
+
+These are not the same kind of object, and the differences are not
+reconcilable by arithmetic:
+
+- A *locality* / *centro poblado* / *lugar poblado* is a **settlement** -- it
+  exists because people live there together.  Thresholds on it measure
+  agglomeration.
+- An *EA* is a **sampling construct**, sized to a target household count.  A
+  town of 50,000 contains many EAs; a sparse rural EA may span several
+  villages.  A threshold on an EA measures something closer to enumerator
+  workload than to settlement size.
+- A *corregimiento* / *commune* / *ward* is an **administrative division**.  It
+  can bundle many settlements, so its population is a sum over objects the rule
+  was never about.
+
+"5,000 people in a locality" and "2,000 people in a commune" are not two
+settings of one dial.  They are *different measurements*, and no rescaling maps
+one onto the other, because the number of settlements bundled into an
+administrative unit varies within a country as well as between countries.
+
+** Ghana is internally inconsistent, in documents this sweep extracted itself
+
+Ghana was the motivating case, and it turns out to use *three different words*
+without reconciling them.  All three quotes are from documents extracted here:
+
+| source                                 | the word used                                                                  |
+|----------------------------------------+---------------------------------------------------------------------------------|
+| BID §3.1 /(pilot)/                     | "urban, semi-urban and rural *areas* (population greater than 5000 ...)"        |
+| =G3report.pdf= p.75                    | "Semi-urban *localities* are those with a 1984 population of at least 1500 ..." |
+| =Distribution_of_Welfare.pdf= p.86     | "About 13,000 *enumeration areas (EAs)* ... were stratified further into urban (5,000 or more people), semi-urban (1,500-4,999) and rural (less than 1,500 persons)" |
+| =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11 | "*An EA* was considered to be urban if *it* had a population greater than 1,500 people" |
+
+The threshold is stated on *localities* in the reports and applied to *EAs* in
+the frame and the user guide.  *Those are different objects and the mapping
+between them is documented nowhere in anything read here.*  In the urban
+direction inheritance is harmless -- every EA inside a 50,000-person town is
+urban however you slice it.  In the *rural* direction it is not: an EA spanning
+several hamlets has no single locality population, and the 1,500 boundary is
+exactly where that ambiguity bites.
+
+/Ghana's own reconciliation is the pilot agent's to make; this section takes
+only the structural lesson./
+
+** The same problem, one level down, in the Q2 data
+
+The entity question does not stop at the rule -- it recurs in the variable.
+The LSMS-ISA community questionnaires define their subject explicitly, and the
+definition is *a disjunction*:
+
+#+begin_quote
+NOTE THAT IN THE QUESTIONS IN THIS QUESTIONNAIRE, THE TERM COMMUNITY MEANS THE
+*VILLAGE, GROUP OF VILLAGES, OR URBAN LOCATION* IN WHICH THIS QUESTIONNAIRE IS
+BEING ADMINISTERED.
+#+end_quote
+
+-- =Malawi/2013-14/IHPS.Community.Qx.FINAL.PRINT.pdf= p.2, and verbatim the
+same in =Nigeria/2018-19/pp_w4_community_quest.pdf= p.2.  Tanzania's is "THE
+VILLAGE OR MTAA" (=nps_community_qx_y5.pdf= p.2).
+
+So Malawi's =com_cc02= ("What is the population of this community?") is *not a
+locality population*.  It is the population of *whichever* of three different
+kinds of object the enumerator was standing in -- and the entity therefore
+*varies from row to row inside a single column*.  Some rows are one village;
+some are several villages summed.
+
+*This is the mechanism behind the Ghana 2.7% anomaly*, stated in general form:
+a tier-(a) population column can be perfectly populated, perfectly clean, and
+still not be the quantity any stated threshold is about.  Presence of the
+variable was never the binding constraint.  *Entity match is.*
+
+** Consequence for the bottom line
+
+Before this reframing I concluded that thresholds fail as a harmonisation basis
+because *the numbers disagree* (Panama 1,500 vs Ghana 5,000).  That was true
+but too generous.  The stronger and more accurate statement is:
+
+*The numbers are not even on a common scale, so "the numbers disagree" understates
+the problem.*  Two countries could pick the identical number and still not be
+comparable, if one applies it to localities and the other to communes.
+Conversely, harmonising the numbers while ignoring the entity would produce a
+variable that looks comparable and is not -- which is *worse than the status
+quo*, because the current per-survey labels at least advertise that they are
+per-survey.
+
+Entity variation is therefore not an additional caveat on the threshold
+programme.  *It is the reason the threshold programme cannot deliver a
+cross-country basis*, and it would remain the reason even if every country in
+the corpus stated a number tomorrow.
+
 * Q1 -- the finding that actually matters: WITHIN-country drift
 
 Ghana is the only country where enough waves state a rule to check the rule
@@ -442,194 +591,298 @@ expressible.
 
 * Q2 -- Does the DATA carry locality population?
 
-This is the sharper question, and it answers *better* than Q1.
+This is the sharper question, and it answers *better* than Q1 -- a survey can
+ship the variable without ever stating a rule (Malawi, Ethiopia) and can state
+a rule without shipping anything (Panama).  The two are close to independent.
 
-A survey can carry a locality-population variable without ever stating a
-threshold (Malawi), and can state a threshold without shipping the variable.
-The two are close to independent.
+*Coverage*: 3,915 cached =.dta= / =.sav= headers scanned by name + label in
+EN/FR/ES/PT, plus every community-named file for the priority countries opened
+directly.
 
 *Three tiers, and only the first permits an arbitrary re-cut:*
 
-- *(a) continuous population* -- a headcount of the locality.  Re-cut at any threshold.
-- *(b) household count* -- a proxy; needs a household-size assumption, which is
+- *(a) continuous population* -- a headcount.
+- *(b) household count* -- a proxy needing a household-size assumption, which is
   itself correlated with settlement size, so the assumption is not innocuous.
 - *(c) size code / band / stratum* -- re-cut only at existing band boundaries.
 
-** Verified in the distributed microdata
+** Headline: tier (c) does not exist in this corpus
 
-| country  | wave    | file                                        | variable   | label                                          | tier | populated   | distribution                                  |
-|----------+---------+---------------------------------------------+------------+------------------------------------------------+------+-------------+-----------------------------------------------|
-| GhanaLSS | 2016-17 | =Data/g7comSEC1.dta=                        | =cs1q1=    | "Community population"                         | (a)  | 891/892     | min 10, med 2,500, max 999999 *(sentinel)*    |
-| GhanaLSS | 2012-13 | =Data/COMMUNITY/sec1.dta=                   | =cs1q1=    | "community population"                         | (a)  | *112/693*   | min 0, med 800, max 12,000                    |
-| GhanaLSS | 1991-92 | =Data/Community/cs1.dta=                    | =num84=    | "S1Q1" -- *NOT a population* (binary 1/2)      | --   | n/a         | 67x code 1, 214x code 2 -- *see correction below* |
-| GhanaLSS | 1998-99 | =Data/Community/CS1.DTA=                    | =s1q1=     | *label stripped* (= the Q1 population figure)  | (a)  | 183/223 usable | 40/223 corrupt; plausible: min 3, med 516, max 7,620 |
-| Malawi   | 2010-11 | =Data/Full_Sample/Community/com_cc.dta=     | =com_cc02= | "What is the population of this community?"    | (a)  | 767/768     | min 44, med 1,900, max 80,000                 |
-| Malawi   | 2010-11 | =Data/Full_Sample/Community/com_cc.dta=     | =com_cc03= | "How many households are found in this community?" | (b) | 768/768  | min 17, med 360, max 18,000                   |
+A dedicated pass over *every value-label set in all 3,915 cached files* --
+looking for labels containing a number >=500 next to a population or settlement
+word -- returned 54 candidates and *all 54 were false positives* (food items,
+ISCO/ISIC codes, "25 KG / 50 KG").
+
+*No country in the corpus ships a labelled size-of-place stratum.*  The two
+things that looked like one are degenerate: Serbia & Montenegro 2002's =tip=
+("Type of settlement") is a bare Urban/Other binary, and Kyrgyz 1993's =a1x14=
+("TYPE OF POPULATION POINT", 4 codes) *ships no value labels at all*, so its
+bands are unknown.  Tier (c) is therefore not a fallback for countries lacking
+tier (a); it is simply absent.
+
+** Tier (a) -- continuous population, verified in the data
+
+Sentinel-cleaned.  The *entity* column is the variable's own stated subject --
+the Q2 analogue of the Q1 entity column, and the reason most of these cannot be
+fed to a stated threshold.
+
+| country         | wave    | file / variable                               | label                                    | entity the variable measures                    | nn/rows     | min / med / max        |
+|-----------------+---------+-----------------------------------------------+------------------------------------------+-------------------------------------------------+-------------+------------------------|
+| GhanaLSS        | 1987-88 | =Data/COMM.DAT= =POPUL=                       | (name only)                              | "the community"                                 | 116/137     | 110 / 2,000 / 23,000   |
+| GhanaLSS        | 1988-89 | =Data/COMM.DAT= =POPUL=                       | (name only)                              | "the community"                                 | 68/86       | 150 / 2,000 / 23,000   |
+| GhanaLSS        | 1998-99 | =Data/Community/CS1.DTA= =s1q1=               | (labels stripped)                        | "the community", 1984 census figure             | 183/223     | 3 / 516 / 7,620        |
+| GhanaLSS        | 2012-13 | =Data/COMMUNITY/sec1.dta= =cs1q1=             | "community population"                   | "the community", 2010 census figure             | *112/693*   | 0 / 800 / 12,000       |
+| GhanaLSS        | 2016-17 | =Data/g7comSEC1.dta= =cs1q1=                  | "Community population"                   | "the community", free estimate                  | 887/892     | 10 / 2,500 / 998,955   |
+| Ethiopia        | 2011-12 → 2021-22 (all 5 waves) | =sect*_com_w*.dta= =cs3q02=  | "What is the population of this community?" | "this community"                          | ~100%       | med 4,850 → 8,000      |
+| Malawi          | 2010-11, 2013-14, 2016-17 (×2) | =com_cc.dta= =com_cc02=       | "What is the population of this community?" | *"the village, group of villages, or urban location"* | ~100% | med 2,145 → 5,000 |
+| Tanzania_Kegera | 2004-05 | =community.dta= =cs1q2=                       | "PEOPLE LIVING IN COMMUNITY"             | "community"                                     | 48/49       | 540 / 2,531 / 9,142    |
+| Rwanda          | 2000-01 | =Comm_Sect1.sav= =CS1Q1=                      | "What is the population of your cellule?" | *cellule* -- an administrative unit             | 438/439     | 59 / 845 / 6,843       |
+| Kosovo          | 2000    | =R_BASIC_COMMUNITY_CHARACTERISTICS.dta= =s02_q02= | "Number of people living in comm"    | "comm[unity]"                                   | 150/150     | 113 / 1,189 / 7,000    |
+| Albania         | 2002    | =c_basic.dta= =c1a_q02=                       | "Population of this community/town/city" | *three entities in one label*                   | *62/288*    | 226 rows are =999999=  |
+| Albania         | 2005    | =community_all.dta= =m1a_q2a=                 | "population of this community"           | "this community"                                | 332/458     | 0 / 2,400 / 80,000     |
+| Kazakhstan      | 1996    | =KOMMU.dta= =a1=                              | "number of people"                       | unspecified                                     | 135/135     | 474 / 5,000 / 440,600  |
+| *Kazakhstan*    | 1996    | *=KZ96INF_PUF.dta= =n_inhab=*                 | *"number of inhabitants/locality"*       | *LOCALITY -- the only explicit one in the corpus* | *7,224/7,224* | 474 / 14,943 / 1,139,900 |
+| Kyrgyz Republic | 1993    | =KCOMM.DTA= =a1x2= / =a1x9= / =a1x4=          | "POPULATION OF ENUMERATION DISTR" / "…OF VILLAGE" / "…OF CITY" | *three different entities, three columns* | 155 / 59 / 153 of 213 | see below |
+| Kyrgyz Republic | 1996-98 | =COMM96/97/98.DTA=                            | 1996 ships *zero labels*; 1997-98 "Численность населения (тыс. чел.)" | unspecified | ~ full | *units ambiguous -- see below* |
+| South Africa    | 1993    | =PSAMPLE4.dta= =pop=                          | "8:Population"                           | the sampling frame's ESD, *not a survey answer* | 358/358     | 0 / 734 / 596,632 (53 zeros) |
+
+*** Tier (b) -- household counts only
+
+Ethiopia (=cs3q03=, all 5 waves), Malawi (=com_cc03=), Kazakhstan 1996 (=a3=),
+*Uganda* (=c6q1= / =C6AQ1= / =s6q01=, "How many households reside in this
+community?", 5 waves 2010-11 → 2019-20, ~200 median) and *India* 1997-98
+(=q1a04= "Number of households", 120/120).  Uganda and India have *no headcount
+in any wave*.
+
+** The entity problem, restated with the full data in hand
+
+Now that the whole corpus is visible, the Q1 entity finding gets sharper rather
+than softer:
+
+1. *Almost every tier-(a) variable measures "this community"* -- and the LSMS-ISA
+   instruments define that as *"the village, group of villages, or urban
+   location"* (Malawi, Nigeria verbatim; Tanzania "the village or mtaa").  The
+   entity therefore *varies from row to row inside a single column*.  This is
+   the general form of the Ghana 2.7% anomaly: the column is clean, and it still
+   is not the quantity any locality threshold is about.
+2. *Rwanda counts a =cellule=* -- an administrative unit, not a settlement.
+   Applying a settlement threshold to it measures something else entirely.
+3. *Kyrgyz Republic 1993 could not settle on one entity and shipped three*:
+   population of the *enumeration district*, of the *village*, and of the *city*,
+   as three separate columns, each populated for a different subset (155 / 59 /
+   153 of 213 rows).  A single survey instrument, three incompatible answers to
+   "what is the population here?".  If one wanted a single artefact proving the
+   entity question is real, this is it.
+4. *Exactly one variable in the entire corpus names a locality*: Kazakhstan
+   1996's =n_inhab=, "number of inhabitants/locality" -- and it is already at
+   household grain across 7,224 rows, which is the shape a re-cut would actually
+   want.  One country out of 45.
+5. *South Africa 1993's =pop= is a sampling-frame attribute*, not a survey
+   response -- a different provenance again, and 53 of 358 values are zero.
+
+** Data-quality landmines found along the way
+
+- *The =1.7498005798264095e+100= corruption is corpus-wide, not Ghanaian.*  It
+  appears in GhanaLSS 1998-99 =s1q1= (40 rows), GhanaLSS 1991-92 =numcom=,
+  *Panama 1997 =c103=* (2 rows) and *Kyrgyz 1993 =a1x4=* (60 rows).  It is a
+  1990s-vintage Stata float artifact, *absent from every post-2000 file*, and it
+  is not a documented missing-value sentinel.  Filter on plausibility, never on
+  a sentinel list.
+- *Albania 2002 =c1a_q02= is effectively unusable*: 226 of 288 rows are
+  =999999=.  GhanaLSS 2012-13 =cs1q1= is 16% populated.  Shipped is not the same
+  as usable.
+- *Kyrgyz 1997/98 units are ambiguous*: the label says *thousands* of people, but
+  the 1997 median is 30.0 and the 1998 median is 6.16 on the same instrument --
+  respondents mixed thousands and raw counts.  Needs a unit-repair pass before
+  any use.
+- *GhanaLSS 1987-88 / 1988-89 =COMM.DAT= has a parsing trap*: the =.DCT= sidecar
+  declares fixed-width, but the shipped =.DAT= is *comma-delimited with a header
+  row*.  A fixed-width parse returns all-NaN *silently*.  =pd.read_csv(p,
+  na_values=['.'])= works.  (Both waves' =COMM.DCT= also point to the same md5
+  while the =.DAT= files differ.)
+
+** A closable coverage verdict, with C4 evidence
+
+*GhanaLSS 1991-92 =num84= is degenerate* (values 1 and 2 only; 281/281
+non-null), so GLSS3 ships no population figure.  But the GLSS3 community
+questionnaire (=GHA_1991_GLSS_Community_Questionnaire_EN.pdf=) Section 1 Q1
+reads verbatim *"Number of people living in the community?"* with a printed
+field *"1984 POPULATION FIGURE:"*.
+
+The instrument asked; the shipped =cs1.dta= does not carry the answer.  That is
+a *questionnaire-validated =asked-not-distributed=*, not =not-asked= -- the one
+kind of negative that can be closed, and it belongs in the acquisition queue
+rather than the work queue.  /Recorded here as evidence; no verdict file was
+written, since this sweep is documentation-only./
 
 *** Correction, and a warning about inferring a variable from a questionnaire
 
 I first recorded GLSS3's =num84= as the 1984-census population variable, on the
 strength of its =S1Q1= label plus the GLSS4 questionnaire's "Q1 = 1984
-POPULATION".  *That was wrong.*  Its values are 1 (67x) and 2 (214x) -- a
-yes/no, not a headcount.  *GLSS3 ships no locality-population variable*,
-despite GLSS3's report being one of the clearest statements of the threshold
-rule in the whole corpus.
+POPULATION".  *That was wrong* -- and note the irony: the questionnaire evidence
+was right about the *question* and wrong about the *column*.  Both halves of
+that had to be checked separately.
 
-The general lesson, which cost me a wrong table row: *a questionnaire question
-number is not evidence that the shipped variable is what you think it is.*
-Open the column.  This is the same =asked= vs =distributed= gap the coverage
-verdicts exist to track, appearing one level down.
-
-*** A corruption marker worth knowing about
-
-GLSS4's =s1q1= carries *40 of 223 values above 1e6*, including =1.7498e100=.
-The identical =1.7498005798264095e+100= also appears in GLSS3's =numcom=.  That
-is a systematic float corruption in this vintage of GSS Stata files, not a
-one-off, and it is *not* a documented missing-value sentinel.  Anything reading
-these columns must filter on plausibility, not on a sentinel list.
+The general lesson: *a questionnaire question number is not evidence that the
+shipped variable is what you think it is.*  Open the column.
 
 *** The re-cut is harder than "apply the threshold to the column"
 
-Applying Ghana's own three-way rule to GLSS4's 183 usable community
-populations gives *79.8% rural / 17.5% semi-urban / 2.7% urban*.  No published
-Ghanaian urban share is anywhere near 2.7%.
+Applying Ghana's own three-way rule to GLSS4's 183 usable community populations
+gives *79.8% rural / 17.5% semi-urban / 2.7% urban*.  No published Ghanaian
+urban share is anywhere near 2.7%.
 
-The gap is not an error in either number -- it is that *the community-reported
-population of a sampled community is not the census population of a locality*,
-and the sample is EA-based with EAs nested inside larger localities.  So the
-tier-(a) variable does **not** drop into the stated rule and reproduce the
-survey's own classification.
+The gap is not an error in either number -- it is the entity mismatch above: the
+community-reported population of a sampled community is not the census
+population of a locality, and EAs nest inside larger localities.
 
 *This materially weakens the "genuine re-cut" case* and is the most important
 single caveat in this document.  A re-cut using these columns produces a
 *different* classification, defensible on its own terms, but it is not
 "recovering the survey's definition" and must never be presented as such.
-Whether the two can be reconciled (by matching communities to census
-localities) was not investigated.
 
-*Two further caveats, both found in the strongest country:*
+** Asked in the instrument but not verified in data
 
-1. *GhanaLSS 2012-13 is 16% populated* (112 of 693 clusters).  The question was
-   asked and the variable shipped, and it is still unusable for a re-cut.
-   "Documented" and "delivered" are different facts -- exactly the distinction
-   =capability.py='s validation ladder exists to keep.
-2. *GhanaLSS 2016-17 has =max=999999=* -- an unguarded missing-value sentinel.
-   Any naive threshold applied to this column classifies those clusters urban.
+Community-questionnaire population questions whose shipped column was not
+located: *Kyrgyz Republic 1993* (=kyrcomm.pdf= p.2, "population of the village
+or settlement", rural only -- the 1993 =KCOMM.DTA= columns above are the likely
+home).  Panama 1997 (=pn97com.pdf= p.2) and Guatemala 2000 (=commques.pdf= p.4)
+ask only whether the number of inhabitants *changed*, not its level -- confirmed
+in data for Panama, whose =c103= turns out to be a 1/2/3 direction-of-change
+code.  *Panama therefore states the corpus's cleanest four-band rule and ships
+no headcount at all in either wave* -- the sharpest single instance of Q1 and Q2
+coming apart.
 
-** Asked in the instrument (community questionnaires)
+** Negatives, split three ways
 
-Section-1 "population of this community" questions, quoted from the extracted
-questionnaires -- these establish the variable *should* exist:
+*Bucket 1 -- community file(s) opened, no locality population.*  *Nigeria* (all
+5 waves, every =sectc*= file); *Tanzania* 2019-20 and 2020-21 (all =CM_SEC_A..G=
+-- migration/shock flows only, no stock); *Uganda* (all 347 community files
+2005-06 → 2019-20 -- household count only); the *entire EHCVM 2018-19 / 2021-22
+block* (Senegal, Mali, Niger, Burkina Faso, Benin, Togo, Guinea-Bissau: the
+=s00*_co= files are respondent rosters, no population module) and CotedIvoire
+2018-19; *Niger* 2011-12 / 2014-15 ECVMA; *Mali* 2014-15; *Liberia* 2018-19 (all
+9 sections); *Malawi 2004-05* (the variable first appears in IHS3) and *Malawi
+2019-20, which ships no community module at all*; Nicaragua 1993, Peru 1985,
+Timor-Leste, Iraq, Tajikistan, Serbia 2007, Albania 2003/2008/2012, Cambodia,
+China, Guyana, Azerbaijan, GhanaSPS, Pakistan, EthiopiaRHS.
 
-| country         | wave    | questionnaire                                        | question                                                                 |
-|-----------------+---------+------------------------------------------------------+--------------------------------------------------------------------------|
-| GhanaLSS        | 1998-99 | =GHA_1998_GLSS_Community_Questionnaire_EN.pdf= p.3   | "Number of people living / *1984* POPULATION in the community? FIGURE:"  |
-| GhanaLSS        | 2005-06 | =G5QComm.pdf= p.4                                    | "NUMBER OF PEOPLE LIVING / *2000* POPULATION IN THE COMMUNITY. FIGURE:"  |
-| GhanaLSS        | 2012-13 | =GLSS6 Community Questionnaire.pdf= p.4              | "NUMBER OF PEOPLE LIVING / *2010* POPULATION IN THE COMMUNITY. FIGURE:"  |
-| GhanaLSS        | 2016-17 | =7GLSS7_Community Quest.docx=                        | "NUMBER OF PEOPLE LIVING POPULATION IN THE COMMUNITY. FIGURE (Estimate):" |
-| Rwanda          | 2005-06 | =rwa_eicv_2005_questionnaire_communautaire.pdf= p.3  | "Votre cellule compte combien d'habitants ?  Nombre d'Habitants"         |
-| Kyrgyz Republic | 1993    | =kyrcomm.pdf= p.2                                    | "What is the population of the village or settlement where the households you are surveying live? ____ persons" (rural only) |
-| Malawi          | 2013-14 | =IHPS.Community.Qx.FINAL.PRINT.pdf= p.9              | "RECORD NUMBER OF HOUSEHOLDS IN COMMUNITY FROM MODULE CC QUESTION 3" (tier b) |
-| India           | 1997-98 | =slc-cq97.pdf= p.4                                   | "NUMBER OF HOUSEHOLDS IN THE VILLAGE: (MOST RECENT ESTIMATE)" (tier b)   |
-| Uganda          | 2010-11 / 2011-12 | =UNPS_2010.Community.Manual.pdf= p.9, =UNPS2011-12_CommunityQx_Manual.pdf= p.9 | "the total number of households in the community" (tier b) |
+*Bucket 2 -- no community/locality file found.*  Tanzania 2008-15 and all
+pre-2019 NPS waves; CotedIvoire 2018-19; GhanaSPS; Cambodia; Iraq; Guyana;
+Azerbaijan; China; Pakistan; EthiopiaRHS; Burkina Faso 2014 & 2021-22; Mali
+2017-18 & 2021-22; Senegal 2021-22; Niger 2021-22.
 
-Note the *moving reference census* in the Ghana column: 1984 -> 2000 -> 2010 ->
-free estimate.  A re-cut using this variable is not measuring the same thing
-across waves either.
-
-Panama 1997 (=pn97com.pdf= p.2) and Guatemala 2000 (=commques.pdf= p.4) ask
-whether the number of inhabitants *changed* over five years, not its level --
-those are *not* usable and should not be counted as tier (a).
+*Bucket 3 -- never checked or load failed.  DO NOT record these as absences.*
+Never opened: *Afghanistan, Bosnia-Herzegovina, Brazil, Bulgaria, KenyaLPS*.  No
+microdata in repo: Nepal, Armenia.  *Format unsupported*: CotedIvoire 1985-89
+=COMM85–88.DAT= / =.DCT= -- *these are the same shape as Ghana's =COMM.DAT=, so
+the =read_csv= trick above will very likely read them*; the highest-value
+outstanding follow-up in Q2.  *GhanaLSS 2005-06* ships community data only as an
+unopened =community.zip=.  89 load failures (India 35, Mali 42, Guatemala 4,
+others 8) -- India's are pyreadstat memory errors where =pandas.read_stata=
+succeeds.
 
 * Assessment: is this a viable cross-country basis?
 
-I was asked to test the hypothesis rather than confirm it.  It is *mostly
-false in its naive form*, and the reasons are specific.
+I was asked to test the hypothesis rather than confirm it, and to say so if the
+evidence contradicts the expected payoffs.  *It is false in its naive form, and
+the reason is not the one I expected when I started.*
 
 ** Where it fails
 
-1. *The base rate is too low to harmonise on.*  4 of 45 countries state
-   anything; 2 state a usable rule.  A rule you can read for Ghana and Panama
-   and nobody else is not a corpus-wide basis.
-2. *The stated thresholds do not agree, and disagree in the worst possible
-   way.*  Panama's urban floor is *1,500*; Ghana GLSS6's is *5,000*; Ethiopia's
-   only stated cutoff (*10,000*) does not even mark urban/rural.  A Panamanian
-   locality of 3,000 is urban; an identical Ghanaian one is rural.  Re-cutting
-   everyone at any single value would *change* the published national statistics
-   of every country it touched -- which is a defensible research choice but is
-   emphatically not "recovering their definition".
-3. *Many countries have no threshold to recover, and say so.*  Afghanistan and
-   Timor-Leste classify administratively.  For these the population-threshold
-   frame does not apply at all -- there is no number being rounded off, and no
-   amount of documentation work will produce one.
+1. *The base rate is too low to harmonise on.*  4 of 45 countries state anything
+   at all; 3 state a rule that partitions the classes the survey uses.
+2. *The stated numbers disagree.*  Panama's urban floor is 1,500; Ghana GLSS6's
+   is 5,000; Peru's is 2,000; Ethiopia's only stated cutoff (10,000) does not
+   even mark urban vs rural.
+3. *The numbers are not on a common scale, which is worse than disagreeing.*
+   Ghana counts localities in one document and EAs in another; Rwanda's data
+   counts a =cellule=; Panama's flag sits on a =corregimiento=; Peru counts a
+   =centro poblado=.  A settlement, a sampling construct and an administrative
+   division are different objects, and no rescaling maps one onto another.  *Two
+   countries could choose the identical number and still not be comparable.*
+4. *A threshold is often not the whole rule even where one exists.*  Peru --
+   the best-specified case in the corpus -- defines urban as =(>=2,000
+   inhabitants AND contiguous dwellings) OR is a district capital=.  The
+   administrative clause explicitly overrides the population test.  Reading only
+   the number would misclassify every small district capital in the country.
+5. *Many countries have no threshold to recover and say so.*  Afghanistan and
+   Timor-Leste classify administratively.  No documentation work will produce a
+   number that was never used.
 
-** Where it holds up -- and these are the parts worth keeping
+** Where it holds up
 
-1. *Making incomparability measurable instead of invisible.*  This works, and it
-   is the strongest result here.  We can now say concretely: Ghana GLSS3/GLSS4/
-   GLSS6 urban shares are not comparable, with a known direction (GLSS4 biased
-   *up*); Panama-vs-Ghana urban shares are not comparable, with a known
-   direction (Panama's floor is 3.3x lower, so Panama's urban share is
-   mechanically inflated relative to Ghana's).  That is a real, citable
-   statement about a real cross-country comparison, produced from documentation
-   alone.
-2. *Q2 is not a subset of Q1, and that structural point survives everything
-   else.*  Malawi ships a clean tier-(a) population variable and *never states a
-   rule*.  Panama states the cleanest rule in the corpus and (on the evidence so
-   far) ships no level variable.  GLSS3 states the rule beautifully and ships
-   nothing; GLSS4 states a different rule and ships a corrupted column.  *The
-   two questions must be tracked separately* -- this is the main structural
-   recommendation of this sweep.
+1. *Making incomparability measurable instead of invisible* -- this works, and it
+   is the strongest result here.  We can now state which comparisons are unsafe
+   and in which direction: Ghana GLSS3/4/6 urban shares are not comparable
+   (GLSS4 biased *up*); Panama-vs-Ghana is not comparable (Panama's floor is
+   3.3x lower, inflating its urban share); and, more fundamentally, Ghana-vs-
+   Rwanda is not comparable *at all*, because one counts settlements and the
+   other counts administrative cells.
+2. *Catching within-country drift* -- confirmed three times, all new, and all
+   from prose rather than data: Ghana's 5,000 → 1,500 → 5,000 oscillation,
+   Timor-Leste's 71 → 60 → 38 urban sucos with no criterion, and Ethiopia's
+   frame expansion.  *This is the cheapest defect-detection channel available*,
+   and it is the payoff I would actually invest in.
+3. *Q1 and Q2 are near-independent, and that is a durable structural finding.*
+   Malawi and Ethiopia ship clean population variables and state no rule; Panama
+   states the cleanest rule and ships no headcount at all.  They must be tracked
+   as separate facts.
 
-   *But the re-cut itself is weaker than I expected before checking.*  Applying
-   Ghana's own rule to Ghana's own tier-(a) column yields 2.7% urban against a
-   published share an order of magnitude higher (see the Q2 section).  A
-   population variable in the data is *necessary but not sufficient* for a
-   re-cut: you also need the population to be measured on the same geographic
-   unit the rule is about, and in Ghana's case it is not.  Treat "we can re-cut
-   this country" as a hypothesis requiring per-country validation, not as
-   something that follows from tier (a).
-3. *Catching within-country drift* -- confirmed, twice, and both were new.
-   Ghana's threshold oscillation (5,000 -> 1,500 -> 5,000) and Timor-Leste's
-   71 -> 60 -> 38 suco reclassification are both #683-class defects that nobody
-   had recorded.  Notably, *neither was found by looking at the data* -- both
-   came from prose.  This is the cheapest defect-detection channel we have.
+** Where the re-cut idea lands
+
+*Weaker than the presence of tier-(a) data suggests, and the binding constraint
+is entity, not availability.*
+
+There is more tier-(a) data than I expected -- Ghana (5 waves), Ethiopia (all
+5), Malawi (4), Albania, Rwanda, Kosovo, Kazakhstan, Kyrgyz, Tanzania_Kegera,
+South Africa.  But:
+
+- *Tier (c) is empty corpus-wide*, so there is no band-level fallback anywhere.
+- *Almost every tier-(a) column measures "this community"* = "the village, group
+  of villages, or urban location" -- an entity that varies *within* the column.
+- *Exactly one variable in 45 countries names a locality* (Kazakhstan 1996
+  =n_inhab=).
+- And the one place the re-cut could be checked against a stated rule -- Ghana --
+  *fails*: 2.7% urban against a published share an order of magnitude higher.
+
+So availability was never the bottleneck.  *A population variable is necessary
+but nowhere near sufficient*; you also need it measured on the entity the rule
+is about, and in 44 of 45 countries it demonstrably is not.
 
 ** What I'd actually recommend
 
 Treat the population threshold as *metadata about comparability*, not as a
-harmonisation mechanism.  Concretely: record, per country-wave, (i) the stated
-rule if any *and the census vintage it is measured against*, (ii) whether the
-classification is administrative, and (iii) whether a locality-population
-variable exists in the data, how populated it is, and *what geographic unit it
+harmonisation mechanism.  Record, per country-wave: (i) the stated rule if any,
+(ii) *the entity it is stated on, in the source's own word*, (iii) the census
+vintage, (iv) whether the classification is administrative, (v) any
+non-population clauses (Peru's contiguity and capital-city rules), and (vi)
+whether a population variable exists, how populated it is, and *what entity it
 measures*.  Then a user comparing two cells can be *told* the comparison is
-unsafe.
+unsafe, and why.
 
-*Do not attempt a corpus-wide re-cut.*  Do not even promise a per-country one on
-the strength of tier-(a) data alone -- Ghana has tier-(a) data and the re-cut
-still does not reproduce its own classification.  The defensible deliverable is
-the comparability metadata; a re-cut is a per-country research project on top
-of it.
+*Do not attempt a corpus-wide re-cut.*  Do not promise a per-country one on the
+strength of tier-(a) data alone.  The defensible deliverable is the
+comparability metadata; a re-cut is a per-country research project that must
+begin by reconciling entities, and for most countries that reconciliation is not
+documented anywhere we hold.
 
-*On the =capability.py= shape*: yes, it fits, and the fit is close enough to be
-worth saying precisely.  The validation ladder is the right control here for the
-same reason it is right there --
+*On the =capability.py= shape*: the validation ladder transfers well --
 
 - =catalog-only= <-> "a threshold is asserted in a secondary/summary report"
-- =data-validated= <-> "a population variable is present and populated in the data"
-- =questionnaire-validated= <-> "the *questionnaire or user guide* states the rule"
+- =data-validated= <-> "a population variable is present and populated"
+- =questionnaire-validated= <-> "the questionnaire or user guide states the rule"
 
-and *only the last should be allowed to close* "what is this country's
-settlement rule?".  This sweep found the GLSS6 rule in a *Labour Force Report*
-and the GLSS4 rule in the *Data User Guide* -- different document classes with
-different authority, and the GLSS4 one contradicts the others.  A record that
-could not distinguish them would have silently picked whichever was extracted
-first.  I have *not* built this; flagging only that the shape transfers.
+and *only the last should close* "what is this country's settlement rule?".
+This sweep found the GLSS6 rule in a *Labour Force Report* and the GLSS4 rule in
+a *Data User Guide* -- different authority, and they contradict each other.  A
+record that could not distinguish them would silently keep whichever was read
+first.  I have *not* built this.
 
-One caution if it is built: a threshold record needs a field the capability
-record does not have -- *the reference census the threshold is applied
-against*.  Ghana's rule is stable-looking only until you notice the underlying
-census moves.
+Two fields the capability record lacks and a threshold record would need:
+*the census vintage*, and -- on this sweep's evidence, the more important of the
+two -- *the entity*.  A threshold record without an entity field would encode
+precisely the ambiguity that makes the whole programme fail.
 
 * Gaps -- what could not be established, and why
 
@@ -655,15 +908,25 @@ threshold."*
    rural= constantly and *never define them* in any document extracted here.
    That is consistent with a national-definition-by-reference convention, but I
    did not confirm it -- record as *unsure*, not as =not-asked=.
-3. *Q2 coverage is partial.*  Only a targeted set of community files was opened.
-   A parallel broader sweep was dispatched; where its results are not reflected
-   above, Q2 for that country is *unchecked*, not negative.  In particular
-   Nigeria, Tanzania, Uganda, Ethiopia, Niger/Senegal and the EHCVM community
-   files have questionnaire-level evidence but no data-level verification here.
-4. *Rwanda and Kyrgyz Republic* have a clear tier-(a) *question* in the
-   community instrument but their community =.dta= was not located/opened -- the
-   =asked-not-distributed= vs =delivered= distinction is unresolved for both.
-5. *No blessing / no wiring changed.*  This is documentation only.  Nothing in
+3. *The entity mapping is undocumented, and that is the central gap.*  For no
+   country did I find a document stating *how* the classified unit relates to the
+   entity the threshold is stated on -- how an EA inherits a locality's
+   population, or which locality governs an EA spanning several hamlets.  Ghana
+   states the rule on localities and applies it to EAs with no bridge in
+   between.  *Until that mapping is known for a country, neither its stated rule
+   nor its population column can be used to reproduce its own classification* --
+   which is why the Ghana check came out at 2.7%.
+4. *Q2 follow-ups, in value order.*  (a) *CotedIvoire 1985-89* =COMM85–88.DAT= /
+   =.DCT= are the same shape as Ghana's =COMM.DAT= and are very likely readable
+   with the =read_csv= trick -- four unexamined waves.  (b) *GhanaLSS 2005-06*
+   community data sits in an unopened =community.zip=.  (c) *Kyrgyz 1997/98*
+   needs a units-repair pass (thousands vs raw counts mixed on one instrument).
+   (d) *Afghanistan, Bosnia-Herzegovina, Brazil, Bulgaria, KenyaLPS* were never
+   opened for Q2 at all.
+5. *No verdict or blessing files were written*, though the GLSS3 finding is a
+   closable =asked-not-distributed= with questionnaire evidence and would qualify
+   -- deliberately left for a non-documentation-only change.
+6. *No blessing / no wiring changed.*  This is documentation only.  Nothing in
    =data_info.yml=, =data_scheme.yml=, =categorical_mapping.org= or any country
    config was touched, and =GhanaLSS/_/CONTENTS.org= was deliberately left alone
    (another agent holds it).
