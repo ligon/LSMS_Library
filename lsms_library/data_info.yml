@@ -152,20 +152,6 @@ Columns:
         # stratum is entirely metro=1), so there is no evidence they are urban.
         # Kept as a distinct, VISIBLE value rather than guessed away.  GH #602.
         Informal: []
-        # Third settlement stratum #2: a settlement-size tier BETWEEN village and
-        # town, named as such by the producer.  Used by GhanaLSS GLSS1/GLSS2
-        # (BID Appendix I stratifies every cluster U / R / SU -- 52 of 263
-        # clusters, 20%) and nowhere else at present.  GH #682/#685.
-        #
-        # NOT the same concept as `Informal` above: that is a formality/tenure
-        # class (squatter settlement), this is settlement SIZE.  Do not merge
-        # them, and do not reach for this for a WITHIN-URBAN tier -- Iraq's
-        # metropolitan, Ethiopia's large/small town, Mali's Bamako and Niger's
-        # Communaute Urbaine are all sub-divisions of Urban, not a middle
-        # category.  Those want a separate `SettlementType` column (#682 s7.3);
-        # folding them here would make one column carry four vocabularies and
-        # break the `== 'Urban'` filter that works today.
-        Semi-urban: [semi-urban, Semi-Urban, SEMI-URBAN, SU, semi urban]
   cluster_features:
     Region:
       type: str
@@ -190,20 +176,6 @@ Columns:
         # stratum is entirely metro=1), so there is no evidence they are urban.
         # Kept as a distinct, VISIBLE value rather than guessed away.  GH #602.
         Informal: []
-        # Third settlement stratum #2: a settlement-size tier BETWEEN village and
-        # town, named as such by the producer.  Used by GhanaLSS GLSS1/GLSS2
-        # (BID Appendix I stratifies every cluster U / R / SU -- 52 of 263
-        # clusters, 20%) and nowhere else at present.  GH #682/#685.
-        #
-        # NOT the same concept as `Informal` above: that is a formality/tenure
-        # class (squatter settlement), this is settlement SIZE.  Do not merge
-        # them, and do not reach for this for a WITHIN-URBAN tier -- Iraq's
-        # metropolitan, Ethiopia's large/small town, Mali's Bamako and Niger's
-        # Communaute Urbaine are all sub-divisions of Urban, not a middle
-        # category.  Those want a separate `SettlementType` column (#682 s7.3);
-        # folding them here would make one column carry four vocabularies and
-        # break the `== 'Urban'` filter that works today.
-        Semi-urban: [semi-urban, Semi-Urban, SEMI-URBAN, SU, semi urban]
     District:
       type: str
     Latitude:

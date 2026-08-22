@@ -438,13 +438,23 @@ def appendix_i_cluster_attributes(year_column, offset):
     Returns
     -------
     DataFrame indexed by ``v`` (zero-free string ``CLUST``) with columns
-    ``Region`` and ``Ecological_zone``.
+    ``Region``, ``Rural`` and ``Ecological_zone``.
 
-    ``Rural`` IS returned, as of GH #682: the canonical vocabulary gained a
-    ``Semi-urban`` value, so the Appendix's three-way U / R / SU no longer has
-    to be folded onto two.  ``SU`` is 52 of 263 clusters (20%); folding it
-    would have destroyed a distinction the survey drew and made the 9-stratum
-    design (3 ecological zones x 3 settlement classes) unreconstructible.
+    ``Rural`` IS returned, folded to the canonical binary {Urban, Rural} by
+    the ``urbrur_abbrev`` table in the same org file.  The Appendix classifies
+    clusters THREE ways -- U / R / SU (semi-urban, 52 of 263 clusters, 20%) --
+    and ``SU`` is delivered as ``Rural`` **by decision** (@ligon, 2026-08-21).
+
+    That is a judgement call and **the survey offers no evidence either way**.
+    The GLSS2 7-way ``rural`` table's ``Classification`` column was cited on
+    GH #690 as precedent for folding a middle tier to Rural; it is *editorial,
+    not on the questionnaire* (GH #692), and it decodes ``Y01C:NRCPL`` -- a
+    *non-resident child's* place of residence, not the household's settlement
+    class.  Do not cite it.
+
+    The U/R/SU distinction IS lost in the delivered column.  The raw three-way
+    survives in the ``UrbRur`` column of ``_/appendix_i_clusters.org`` for
+    anyone who needs it.
     """
     # countries_root() honours LSMS_COUNTRIES_ROOT; a hardcoded
     # files("lsms_library")/"countries" would silently read the installed

@@ -89,9 +89,14 @@ def cluster_features(df):
     Appendix, which lists sampling areas.  A cluster absent from the Appendix
     keeps `Region` NA rather than being dropped or guessed.
 
-    `Rural` now comes from the Appendix too: canonical `Rural` gained a
-    `Semi-urban` value (GH #682), so the three-way U/R/SU no longer has to be
-    folded onto two.
+    `Rural` now comes from the Appendix too.  The Appendix is three-way --
+    U / R / SU -- and `SU` is folded onto `Rural` by decision (@ligon,
+    2026-08-21); canonical `Rural` stays the binary {Urban, Rural}.  That fold
+    is a judgement call and the survey offers no evidence either way (the GLSS2
+    7-way `rural` table once cited as precedent is editorial, is not on the
+    questionnaire, and decodes a non-resident child's place of residence -- see
+    GH #692; do not cite it).  The U/R/SU distinction IS lost here; the raw
+    three-way survives in `_/appendix_i_clusters.org`.
     """
     # Load the country module BY PATH: `countries/GhanaLSS/_/` is not an
     # importable package, and a path built from countries_root() honours
@@ -141,6 +146,12 @@ def sample(df):
     cluster (BID Appendix I, U / R / SU), and every household in an enumeration
     area shares its EA's settlement class by construction, so broadcasting is
     the meaning of the variable rather than an imputation.
+
+    The Appendix's `SU` (semi-urban) is folded onto `Rural` by decision
+    (@ligon, 2026-08-21) -- canonical `Rural` is the binary {Urban, Rural}.
+    The fold is a judgement call with no survey evidence either way; see
+    `_/appendix_i_clusters.org` and GH #692.  The distinction is lost in this
+    column and preserved raw in that org file.
 
     Households whose cluster is absent from the Appendix keep `Rural` NA rather
     than being guessed.  GH #685.
