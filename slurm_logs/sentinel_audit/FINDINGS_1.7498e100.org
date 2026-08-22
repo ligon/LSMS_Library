@@ -1,0 +1,571 @@
+#+TITLE: What =1.7498005798264095e+100= is
+#+SUBTITLE: Establishing a magic value across Ghana, Panama, Kyrgyz and seven other waves
+#+DATE: 2026-08-22
+#+AUTHOR: sentinel audit (agent), on behalf of the settlement-threshold follow-up
+
+* Bottom line
+
+=1.7498005798264095e+100= is *exactly 2^333*, and it is *Stata's documented
+system-missing (=.=) code for a =double= in =.dta= format 104/105* (Stata 5 and
+earlier).  Stata format 108 (Stata 6) replaced it with 2^1023.  It is not
+corruption, it is not a "1990s Stata artifact" in any loose sense, and it is not
+undocumented -- it is a *missing-value marker whose spelling changed in 1999*.
+
+The library *already reads it correctly today*.  =get_dataframe()= goes through
+=ligonlibrary.dataframes.from_dta= -> =pandas.io.stata.StataReader=, and pandas
+3.0 nulls the value.  *Zero delivered cells carry it.*  What produced the
+sighting in PR #704 is =pyreadstat=, which does not implement the pre-108 code.
+
+*The live exposure is a dependency floor, not the data.*  =pyproject.toml=
+declares =pandas >=2.2=; the pandas fix landed in *3.0* (PR #59325, milestone
+3.0, merged 2024-07-26).  On any allowed pandas 2.2.x install the value flows
+straight into delivered tables.  Measured below: GhanaLSS 1991-92's
+=food_acquired.Price= would have a mean of *1.71e99* instead of *342.6 cedis*.
+
+*Recommended treatment: none at the reader.  Do not add a sentinel list.*  Raise
+the =pandas= floor to =>=3.0=, correct the PR #704 characterisation, and report
+the gap upstream to ReadStat.  Details in [[*What treatment the evidence supports][What treatment the evidence supports]].
+
+* Proved vs. not ruled out
+
+This separation is the point of the document; please do not let the two halves
+blur.
+
+** Proved (direct measurement, reproducible)
+
+1. The value is *bit-exactly 2^333* -- IEEE-754 =0x54C0000000000000=, sign 0,
+   biased exponent 1356, *mantissa all zero*.  One value, not several.
+2. It is *bit-identical everywhere it occurs*.  A census of every value with
+   =|x| > 1e30= across 8,220 source files found exactly *two* distinct bit
+   patterns in the whole corpus: this one, and one unrelated single cell
+   ([[*Adjacent finding][Adjacent finding]]).
+3. Those bytes are *literally on disk* in the =.dta=.  Verified by computing the
+   record offset from the =typlist= and reading the raw bytes:
+   =000000000000c054= at exactly the cells in question.
+4. It occurs in *=double=-typed columns only* -- 12,453 of 12,453 columns
+   carrying it are =double=.  Never =byte=, =int=, =long=, =float=, or =str=.
+5. It occurs in *=.dta= format 104 and 105 only* -- never in 108, 110, 111, 113,
+   114, 115 or 117, over 4,623 format-stamped files.
+6. It occupies *exactly and only the cells pandas treats as missing*.  Tested as
+   an identity per column: =pyreadstat_nonnull - pandas_nonnull == n(2^333)=.
+   *Holds 12,453 / 12,453.  Zero failures.*
+7. The mechanism is a *reader disagreement*, sited in one line of
+   =pandas/io/stata.py= (see [[*Mechanism][Mechanism]]).  Neutralising that one line reproduces
+   pyreadstat's output exactly.
+8. *No delivered cell carries it* under the installed pandas 3.0.2 -- across
+   5,151 successfully-read source files and 1,274 materialized parquets in the
+   shared cache.
+
+** Not ruled out / not established
+
+1. *2,180 =.dta= blobs (32% of 6,803) could not be obtained* -- neither in the
+   local L1 cache nor fetchable from the S3 remote.  *20 waves are entirely
+   unscanned*, several of them prime candidates: Brazil 1996-97, Bulgaria
+   1995/1997, Nicaragua 1993/1998-99, Bosnia-Herzegovina 2001-04.  *Their status
+   is unknown, not clean.*  A further 48 waves are partially unscanned, so
+   *Pakistan 1991 (107/185 files missing) and Peru 1985/1991/1994 counts are
+   floors, not totals*.
+2. *Whether the value is ever a real datum.*  Nothing observed is consistent
+   with real data -- every occurrence sits in a missing cell, in a =double=
+   column, in a pre-108 file -- but "no counterexample in the 68% of the corpus
+   I could read" is not "impossible".  A survey response of 1.7e100 is absurd on
+   its face, and Stata 5 could not have stored a legitimate 2^333 in a =double=
+   column of a file it also used 2^333 to mark missing.  I regard the risk as
+   negligible but it is an *inference*, not a measurement.
+3. *Whether any consumer outside this repo is on pandas < 3.0.*  I measured what
+   would happen; I did not measure who is exposed.
+4. The [[*Adjacent finding][adjacent finding]] (one cell, Kyrgyz 1998) is *unexplained*.  I did not
+   determine its cause.
+
+* The bit pattern
+
+#+begin_src python
+>>> v = 1.7498005798264095e+100
+>>> v.hex()
+'0x1.0000000000000p+333'
+>>> struct.pack('<d', v).hex()
+'000000000000c054'                  # little-endian bytes as stored
+>>> hex(struct.unpack('<Q', struct.pack('<d', v))[0])
+'0x54c0000000000000'
+>>> v == 2.0**333
+True
+#+end_src
+
+Sign 0, biased exponent 0x54C = 1356 (unbiased 333), *mantissa exactly zero*.  A
+clean power of two.  That already rules out a mangled decimal literal: =1e100=
+as a double has a nonzero mantissa, so whatever wrote this wrote *bits*, not
+digits.
+
+Two of the sentinels named in the brief are the *modern* Stata codes and are
+correctly reported as non-matches:
+
+| code                       | hex                  | what it is                        |
+|----------------------------+----------------------+-----------------------------------|
+| =8.98846567431158e+307=    | =0x7FE0000000000000= | Stata =double= missing, fmt >=108 |
+| =1.70141173319e+38=        | =0x7F000000= (f32)   | Stata =float= missing (unchanged) |
+| *=1.7498005798264095e+100=* | *=0x54C0000000000000=* | *Stata =double= missing, fmt <=105* |
+
+The brief's scepticism was right on its own terms and wrong in its conclusion:
+it *is* a Stata missing code, just not one of the two everybody knows.
+
+* Mechanism
+
+** The one line
+
+=pandas/io/stata.py=, =StataReader._do_convert_missing= (pandas 3.0.2, installed
+at =.venv/lib/python3.11/site-packages/pandas/io/stata.py=, line 1779):
+
+#+begin_src python
+def _do_convert_missing(self, data: DataFrame, convert_missing: bool) -> DataFrame:
+    # missing code for double was different in version 105 and prior
+    old_missingdouble = float.fromhex("0x1.0p333")
+
+    # Check for missing values, and replace if found
+    replacements = {}
+    for i in range(len(data.columns)):
+        fmt = self._typlist[i]
+        # recode instances of the old missing code to the currently used value
+        if self._format_version <= 105 and fmt == "d":
+            data.iloc[:, i] = data.iloc[:, i].replace(
+                old_missingdouble, self.MISSING_VALUES["d"]
+            )
+#+end_src
+
+=float.fromhex("0x1.0p333")= is our value.  Note *why* the special case is
+needed: =OLD_VALID_RANGE["d"]= is =(-8.988e307, +8.988e307)=, and 2^333 = 1.75e100
+sits comfortably *inside* it.  The generic range check cannot catch this; only
+the explicit recode can.
+
+** Upstream provenance
+
+- pandas issue [[https://github.com/pandas-dev/pandas/issues/58149][#58149]]: "Stata format 108 (corresponding to Stata 6) changed the
+  code used to signify a missing value of type double (from 2^333 to 2^1023)."
+- Fixed by pandas PR [[https://github.com/pandas-dev/pandas/pull/59325][#59325]], *milestone 3.0*, merged 2024-07-26.
+- Verified absent from =v2.2.3=: that tag's =_do_convert_missing= contains no
+  =old_missingdouble=, no =0x1.0p333=, and no =OLD_VALID_RANGE= attribute at all.
+
+So *this is documented -- upstream.*  PR #704's "it is not a documented
+missing-value sentinel" is true only of *this repository*, and that gap is what
+this document closes.
+
+** Why the two readers disagree
+
+=get_dataframe()= -> =read_file()= tries readers in order, and for a
+format-104/105 =.dta= the *pandas* branch succeeds first:
+
+: pd.read_spss -> pd.read_parquet -> from_dta (pandas StataReader) -> pyreadstat.read_dta -> read_csv -> ...
+
+=ligonlibrary.dataframes.from_dta= calls =reader.read(convert_dates=True,
+convert_categoricals=False)= and applies value labels itself afterwards.  That
+matters twice over: =_do_convert_missing= runs regardless of
+=convert_categoricals=, *and* sidestepping pandas' own categorical conversion
+avoids the =ValueError= on duplicate value labels that would otherwise drop
+these 1990s files through to the =pyreadstat= fallback.  The fallback never
+fires on format grounds either: *0 of 4,623* format-stamped =.dta= files use a
+version pandas cannot parse.
+
+=pyreadstat= 1.3.3 (ReadStat) implements the >=108 code only, so it returns the
+raw 2^333.
+
+** Direct demonstration
+
+Reading the same three blobs four ways:
+
+| file                                    | col   | pandas 3.0.2 | pyreadstat 1.3.3 | =get_dataframe()= |
+|-----------------------------------------+-------+--------------+------------------+-------------------|
+| =GhanaLSS/1998-99/Data/Community/CS1.DTA= | =s1q1= | 183/223 nn, 0 hits | 223/223 nn, *40* hits | 183/223 nn, 0 hits |
+| =Panama/1997/Data/COMUN1.DTA=            | =c103= | 436/438 nn, 0 hits | 438/438 nn, *2* hits  | 436/438 nn, 0 hits |
+| =Kyrgyz Republic/1993/Data/KCOMM.DTA=    | =a1x4= | 153/213 nn, 0 hits | 213/213 nn, *60* hits | 153/213 nn, 0 hits |
+
+40 = 223-183.  2 = 438-436.  60 = 213-153.  The raw record bytes at those rows,
+read at the offset computed from the =typlist=, are =000000000000c054= in every
+case; a populated neighbour row reads e.g. =0000000000888040= = 529.0.
+
+* Where exactly
+
+Reader-based census, =pyreadstat= over every =.dta= blob obtainable (4,623
+format-stamped files of 6,803):
+
+| country / wave         | fmt      | files | columns |      cells |
+|------------------------+----------+-------+---------+------------|
+| China / 1995-97        | 105      |    41 |     182 |     61,180 |
+| GhanaLSS / 1991-92     | 105      |    61 |   1,058 |  4,034,474 |
+| GhanaLSS / 1998-99     | 105      |    65 |     815 |  4,646,092 |
+| India / 1997-98        | 105      |     4 |      22 |        453 |
+| Kyrgyz Republic / 1993 | 105      |    10 |     775 |    785,862 |
+| Kyrgyz Republic / 1996 | 104, 105 |    21 |   6,055 |  5,973,669 |
+| Kyrgyz Republic / 1997 | 105      |    14 |     719 |    303,031 |
+| Kyrgyz Republic / 1998 | 105      |    20 |     685 |  6,383,662 |
+| Pakistan / 1991        | 104      |     7 |      15 |    198,743 |
+| Panama / 1997          | 104      |    15 |   2,127 |  6,139,756 |
+|------------------------+----------+-------+---------+------------|
+| *TOTAL*                |          | *258* | *12,453* | *28,526,922* |
+
+*So the sighting was five times narrower than the thing.*  PR #704 named three
+countries and four columns; it is ten country-waves and 12,453 columns.
+
+** A reader-independent floor
+
+=pyreadstat= itself failed on 34 of the format-<=105 files (=ReadstatError= /
+=UnicodeDecodeError=), so the table above is a floor.  A *byte-level* scan for
+the 8-byte sequence =00 00 00 00 00 00 c0 54= closes that gap -- it needs no
+parser at all:
+
+| country / wave         | raw 8-byte matches | reader-confirmed |     excess |
+|------------------------+--------------------+------------------+------------|
+| China / 1995-97        |             61,183 |           61,180 |          3 |
+| GhanaLSS / 1991-92     |          4,034,624 |        4,034,474 |        150 |
+| GhanaLSS / 1998-99     |          4,646,124 |        4,646,092 |         32 |
+| India / 1997-98        |             34,788 |              453 |     34,335 |
+| Kyrgyz Republic / 1993 |            785,863 |          785,862 |          1 |
+| Kyrgyz Republic / 1996 |         10,658,471 |        5,973,669 |  4,684,802 |
+| Kyrgyz Republic / 1997 |            303,075 |          303,031 |         44 |
+| Kyrgyz Republic / 1998 |         15,114,122 |        6,383,662 |  8,730,460 |
+| Pakistan / 1991        |            198,743 |          198,743 |          0 |
+| Panama / 1997          |          7,226,544 |        6,139,756 |  1,086,788 |
+| Tajikistan / 1999      |                  1 |                0 |          1 |
+|------------------------+--------------------+------------------+------------|
+| *TOTAL*                |       *43,063,538* |     *28,526,922* | *14,536,616* |
+
+The excess tracks the pyreadstat failures precisely: where pyreadstat read every
+file (Pakistan, Kyrgyz 1993, China, both Ghanas) the excess is 0-150 incidental
+matches; where it failed on files (Kyrgyz 1996/1998, Panama, India) the excess is
+millions.  *Read ~43.1M as the corpus figure and 28.5M as the reader-confirmed
+subset.*
+
+** The byte scan's false positives, and why they are not counterexamples
+
+The byte scan also fires in *147 modern-format files* (fmt 108-117: Uganda,
+Malawi, Nigeria, Ethiopia, Mali, ...), 2,543 matches in total.  *These are
+one-byte-misaligned reads, not real values.*  Context around the worst case
+(=Mali/2017-18/Data/eaci17_s07c2p2.dta=, fmt 117, 558 matches):
+
+: ... 00 00 00 00 00 00 e0 7f | 00 00 00 00 00 00 c0 54 40 | 00 00 00 00 00 00 38 40 ...
+:      \____ modern missing ____/       \___ our pattern ___/
+:                                    \___ the real double: 0x4054C00000000000 = 83.0 ___/
+
+The aligned double is =0x4054C00000000000= = *83.0*; sliding the window one byte
+left across the preceding zero byte manufactures our pattern.  Any file
+containing the value 83 in a double can do this.  Confirmed by reading the file:
+=max |numeric| = 10,203,806=, =any cell == 2^333: False=.
+
+This is *positive* evidence of absence rather than silence: pandas applies the
+recode only when =_format_version <= 105=, so for a format-117 file pandas is
+*not* hiding anything -- if it reports no =|x| > 1e30=, there is none.
+
+** The boundary is the format version, not the year
+
+PR #704 said "absent from every post-2000 file".  That is *accidentally true in
+this corpus and is the wrong rule*.  The discriminator is the =.dta= format
+stamp:
+
+- *Guatemala 2000* is a year-2000 wave with 5 files at format <=105.  Zero byte
+  matches -- clean, but for a reason that has nothing to do with the year.
+- *Tajikistan 1999* (13 files, fmt <=105) and *Peru 1985/1991/1994* (14 files,
+  fmt <=105): zero real occurrences.
+- Conversely, a 2005 =.dta= re-saved from a Stata 5 file would still be format
+  104/105 and would still carry it.
+
+Rule to use: *fmt <= 105 and storage type =double=*, which is exactly what
+pandas keys on.
+
+* Is it always the identical value?
+
+Yes.  Every occurrence is bit-identical =0x54C0000000000000=.  The full census of
+=|x| > 1e30= over 8,220 source files returned exactly two distinct patterns:
+
+| bits                 | value                     |      count |
+|----------------------+---------------------------+------------|
+| =0x54c0000000000000= | =1.7498005798264095e+100= | 28,526,922 |
+| =0xfcfeb39d47f00000= | =-1.2255105620988645e+294= |          1 |
+
+* What it co-occurs with
+
+*It is confined to =double= columns and to missing cells; the surrounding record
+is intact.*  Three independent checks:
+
+1. *Storage type.*  12,453 / 12,453 columns are =double=.  In
+   =Kyrgyz/1993/KCOMM.DTA= the neighbouring population variables =a1x2=
+   ("POPULATION OF ENUMERATION DISTR") and =a1x9= ("POPULATION OF VILLAGE") are
+   =int16= -- their missings use the integer code and *never* show 2^333, while
+   =a1x3=/=a1x4=/=a1x5= (=double=) do.  Same file, same rows, same respondents;
+   the split is by *storage type*, which is the signature of a type-specific
+   missing code and of nothing else.
+2. *Record completeness.*  Rows carrying the sentinel are no less populated than
+   rows that do not.  GhanaLSS 1998-99 =CS1.DTA=: mean completeness of the rest
+   of the row is *0.885* for sentinel rows vs *0.861* for non-sentinel rows.
+   The record exists; one field is absent.
+3. *It follows the questionnaire's skip pattern.*  Kyrgyz 1993 =a1x4=
+   ("POPULATION OF CITY") vs =a1x9= ("POPULATION OF VILLAGE"):
+
+   |                  | =a1x9= absent | =a1x9= present |
+   |------------------+---------------+----------------|
+   | =a1x4= sentinel  |             3 |         *57*   |
+   | =a1x4= populated |        *151*  |              2 |
+
+   Cities have a city population and no village population; villages the
+   reverse.  *The sentinel marks "not applicable to this community"* -- exactly
+   what a missing marker should mark.  Cross-checked against =a1x2=
+   (enumeration-district population, asked of everyone): 153/153 rows with a
+   populated =a1x4= also have =a1x2=.
+
+It is also far denser than PR #704 implies within a single file: =CS1.DTA= has 8
+sentinel-bearing columns, =KCOMM.DTA= 32, =COMUN1.DTA= *144*.
+
+* Does anything in this repo declare it?
+
+*No.*  Nothing in =lsms_library/data_info.yml=, any country =data_scheme.yml=,
+any =categorical_mapping.org=, any =.DCT=, or any =CONTENTS.org= mentions
+=1.7498=, =2^333=, or a large-magnitude missing code.  That absence is precisely
+what made it look like corruption.  Nor does it need declaring as a *sentinel* --
+it is a *reader-layer* fact, and the reader already handles it.  What was missing
+is the *documentation*, which is what this file and the two =CONTENTS.org=
+additions in this PR supply.
+
+* Damage
+
+** Today, on the installed stack: zero
+
+- =pandas 3.0.2=, =pyreadstat 1.3.3=, =numpy 2.4.4=, Python 3.11.6.
+- *0* delivered cells carry the value across *5,151* successfully-read source
+  files (every one of the 735 format-<=105 files with an obtainable blob was
+  read successfully by the library, including all 298 that carry the pattern).
+- *0* occurrences across *1,274* materialized parquets in the shared cache
+  (=~/.local/share/lsms_library/**/*.parquet=), scanned read-only.
+- Therefore *no =Feature()= aggregate is currently wrong because of this*, and
+  no coverage cell needs regrading.  I looked for damage and did not find any;
+  I am not going to manufacture some.
+
+** On pandas 2.2.x, which =pyproject.toml= still permits: severe
+
+=dependencies = ["pandas >=2.2", ...]=.  The fix is in *3.0*.  There is no lock
+file and no CI pin, so =pip install lsms-library= into a pandas-2.2 environment
+is a supported install that silently returns poisoned numbers.
+
+Simulated by neutralising exactly the one line pandas 3.0 added (=fmt <= 105=
+recode) and changing nothing else -- the simulation reproduces pyreadstat's
+counts exactly, which is the check that it is faithful.  Only columns that the
+repo's config *actually reads* are listed:
+
+| wave / file                      | column   | wired to                    | sentinel |  pandas >=3.0 |   pandas 2.2.x |
+|----------------------------------+----------+-----------------------------+----------+---------------+----------------|
+| GhanaLSS 1991-92 =S8H.DTA=       | =s8hq14= | =food_acquired.Price=       |    9.8 % | mean *342.6*  | mean *1.71e99* |
+| GhanaLSS 1991-92 =S8H.DTA=       | =s8hq13= | quantity                    |    9.6 % | sum *477,671* | sum *5.38e103* |
+| GhanaLSS 1991-92 =S1.DTA=        | =s1q22=  | =household_roster.MonthsAway= | *50.6 %* | sum *3,564*   | sum *1.81e104* |
+| GhanaLSS 1998-99 =SEC8H.DTA=     | =s8hq9=  | =food_acquired= unit -> =u= |    0.3 % | sum *635,804* | sum *2.27e102* |
+| GhanaLSS 1998-99 =SEC2A.DTA=     | =s2aq2=  | education level             |   25.3 % |               |                |
+| Panama 1997 =GAST-A.DTA=         | =ga106c= | =food_acquired.Expenditure= |   34.6 % | sum *7.65e7*  | sum *1.31e105* |
+| Panama 1997 =GAST-A.DTA=         | =ga106a= | =food_acquired.Quantity=    |   13.6 % | sum *5.80e7*  | sum *5.14e104* |
+| Panama 1997 =GAST-A.DTA=         | =ga110a= | non-purchased quantity      | *82.7 %* | sum *1.17e7*  | sum *3.13e105* |
+| Panama 1997 =GAST-A.DTA=         | =ga110b= | unit code -> =u=            | *90.7 %* |               |                |
+| Panama 1997 =GAST-A.DTA=         | =ga106b= | unit code -> =u=            |   37.2 % |               |                |
+
+Concretely, on pandas 2.2 a user would get:
+
+- *GhanaLSS 1991-92 =food_prices=*: mean price 1.71e99 instead of 342.6 cedis.
+  Every downstream budget share, elasticity and demand system built on it is
+  meaningless rather than merely noisy.
+- *Panama 1997 =food_expenditures=*: total 1.31e105 instead of 7.65e7.  Worse,
+  =Panama/1997/_/food_acquired.py= selects rows with
+  =df['ga106a'].notna() | df['ga106c'].notna()= -- and =notna()= is *True* for
+  the sentinel, so 74,657 empty expenditure records would be *admitted* as
+  observations rather than dropped.  The row count changes, not just the values.
+- *GhanaLSS 1991-92 =household_roster.MonthsAway=*: 10,326 of 20,403 members
+  (50.6 %) carry the sentinel.  =roster_to_characteristics()= computes
+  =MonthsSpent = 12 - MonthsAway= -> =-1.7498e100=.  Here the blast is
+  *contained by luck*: the residence filter keeps =MonthsSpent > 0=, and a
+  hugely negative number fails that test, so the *membership* count is
+  unchanged at 10,077 either way.  The =MonthsAway= / =MonthsSpent= *column* is
+  still wrong for half the roster.
+
+None of that is happening now.  All of it is one =pip install= away.
+
+* Adjacent finding (different phenomenon -- do not conflate)
+
+=Kyrgyz Republic/1998/Data/SECT_06.DTA=, row 10,333, column =fprimary= ("Key
+field", =double=, fmt 105) = *-1.2255105620988645e+294* (=0xfcfeb39d47f00000=).
+
+The other 10,371 values are plausible 10-digit household keys (1.167e9 to
+8.241e9, median 4.224e9).  The rest of that row is ordinary.  This is *not* the
+2^333 mechanism -- wrong bit pattern, negative, in a fully-populated key column --
+and it is *not* filtered by pandas, because it lies inside =VALID_RANGE["d"]=.
+It is the *only* other extreme value in the entire corpus and it *is* delivered
+by =get_dataframe()=.
+
+I did not establish its cause.  Kyrgyz Republic has no =_/= config, so it does
+not reach the =Country= API; a raw reader gets it.  One corrupt key in one row.
+
+* Coverage and limits of this sweep
+
+| quantity                                                   |          n |
+|------------------------------------------------------------+------------|
+| DVC-tracked tabular source files enumerated                 |      8,220 |
+| ... of which =.dta=                                         |      6,803 |
+| files the library could read (basis for "0 delivered")      |      5,151 |
+| files whose blob could not be obtained at all               |      3,069 |
+| =.dta= blobs missing from L1 and unfetchable from S3        |      2,180 |
+| =.dta= files with a readable format stamp                   |      4,623 |
+| ... at format <= 105                                        |        735 |
+| materialized parquets scanned in the shared cache           |      1,274 |
+
+*20 waves are entirely unscanned* -- no =.dta= blob obtainable.  In wave order:
+Afghanistan 2016-17, 2020; Bosnia-Herzegovina 2001, 2001-04, 2002, 2003, 2004;
+*Brazil 1996-97*; *Bulgaria 1995, 1997*, 2001, 2003, 2007; KenyaLPS 2011-2014,
+2015, 2017-2022; *Nicaragua 1993, 1998-99*; Tanzania_Kegera 2004-05, 2010-11.
+The bolded ones are 1990s LSMS rounds and are exactly the vintage that would use
+format <= 105.  *Nothing in this document should be read as clearing them.*
+
+A further 48 waves are partially unscanned; the largest shortfalls that matter
+here are *Pakistan 1991 (107/185 files unobtainable)* and *Peru 1985 (63/65),
+1991 (51/53), 1994 (57/67)*.  Pakistan's 198,743 cells and Peru's zeros are
+therefore *floors*.
+
+Other caveats:
+
+- The reader census only inspects columns pandas/pyreadstat surface as numeric;
+  a =double= column converted to a categorical by value labels is skipped.  The
+  byte scan does not have that limitation and its per-wave totals bound it.
+- =get_dataframe()= is called without =convert_categoricals=False=; the library's
+  own default path was deliberately reproduced rather than second-guessed.
+- The pandas-2.2 numbers are a *simulation* of 2.2's code path on a 3.0.2
+  install, validated two ways: (a) against the =v2.2.3= source tag, which lacks
+  both =old_missingdouble= and =OLD_VALID_RANGE=, and for which
+  =VALID_RANGE["d"]= admits 2^333; (b) against real pyreadstat output, which the
+  simulation matches cell-for-cell.  *No pandas 2.2 was installed.*
+
+* Country idiosyncrasies (read, quoted, and added to)
+
+Per =CLAUDE.md= the relevant =_/CONTENTS.org= were read before touching anything.
+
+** GhanaLSS -- read, and it bears on this directly
+
+=GhanaLSS/_/CONTENTS.org= (l.1152-1158) already records the *label* layer being
+absent, which is why PR #704 saw =s1q1= as "(labels stripped)":
+
+#+begin_quote
+All 77 GLSS1 and 93 GLSS2 dictionaries carry variable *names* and nothing else:
+no variable labels, no value labels.  So a term search over GLSS1/GLSS2 metadata
+that finds nothing has *not* established absence -- it has established that
+there was nothing to search.  The same trap recurs in a weaker form later:
+GLSS3's =S*.DTA= carry *zero* variable labels AND zero value-label sets; GLSS4's
+=SEC*.DTA= carry variable labels but still zero value-label sets; GLSS5/6/7 are
+fully labelled.
+#+end_quote
+
+It also documents the =.DAT=/=.DCT= trap the brief warned me about (l.1136-1148,
+"the =.DCT= dictionaries look like Stata =infile= dictionaries ... Reading one
+with =pd.read_fwf(colspecs=...)= built from the =.DCT= 'succeeds' and returns
+garbage").  *That trap is unrelated to this one and did not confound it*: the
+2^333 findings are all in =.DTA= files, and GLSS1/GLSS2 (1987-88, 1988-89) --
+the only waves with =COMM.DAT= -- carry *no* 2^333 at all, in either the reader
+or the byte census.  I did not touch those files.
+
+*Not previously recorded, added in this PR*: GLSS3 and GLSS4 ship at =.dta=
+format 105, and 8.68M of their cells use the pre-108 =double= missing code.
+
+** Panama -- read; nothing on file formats
+
+=Panama/_/CONTENTS.org= (823 lines) documents sampling, benchmark censuses and
+the food-item concordance -- including the line that made the damage estimate
+possible, =1997:(GAST-A.DTA, ga100)= at l.639 -- but records *no* Stata-format or reader
+idiosyncrasy.  Added in this PR: ENV-97 ships at format *104* (15 files) and
+*105* (2), and =GAST-A.DTA=, the =food_acquired= source, has 11 declared columns
+affected, one of them (=ga110b=) 90.7 % sentinel.  Panama 2003 (format 110) and
+2008 (113) are unaffected.
+
+** Kyrgyz Republic -- there is no CONTENTS.org, and no config at all
+
+*=Kyrgyz Republic/= has no =_/= directory.*  No =data_scheme.yml=, no
+=CONTENTS.org=, no wave configs for 1993/1996/1997/1998.  It is a *data-only*
+country: 13.4M of its cells carry the sentinel -- the largest share in the
+corpus -- and *none of it reaches the =Country= API*, because nothing reads it.
+
+I have deliberately *not* created =Kyrgyz Republic/_/CONTENTS.org=: adding a =_/=
+directory to a country that has none is a config change, and this task is
+documentation-only.  It is flagged in the issue instead.
+
+** China, India, Pakistan, Guatemala, Peru, Tajikistan
+
+All have a =CONTENTS.org=; none records a Stata-format idiosyncrasy.  Their
+exposure is small (China 61k cells, Pakistan 199k, India <=35k) or nil
+(Guatemala, Peru, Tajikistan).  I did not edit these, to keep the PR's blast
+radius to the two countries where the finding is material.
+
+* What treatment the evidence supports
+
+** Do NOT add a sentinel list or null this at read time
+
+The value is *already handled correctly* by the reader the library uses.  Adding
+a repo-level "null 1.7498e100" rule would be redundant on the supported stack,
+and it would be *worse than redundant*: it would (a) create a second, divergent
+copy of a rule pandas already owns, (b) apply unconditionally rather than
+type-and-format-conditionally as pandas does, and (c) paper over the actual
+defect, which is a stale dependency floor.
+
+This is the "document, do not treat" answer the brief allowed for, and it is the
+one the evidence supports.
+
+** Do this instead, in decreasing order of value
+
+1. *Raise the =pandas= floor to =>= 3.0= in =pyproject.toml=.*  One line.  It
+   closes the only live exposure, and =CLAUDE.md= already says "This codebase
+   targets pandas 3.0+" -- so the floor is simply out of date with the stated
+   target.  (Not done here: this task is documentation-only, and it is a
+   packaging change that deserves its own PR and a check for other 2.2-era
+   consumers.)
+2. *Correct the PR #704 characterisation.*  "A 1990s-vintage Stata float
+   artifact ... not a documented missing-value sentinel" is wrong three ways: it
+   is a =double= not a float code, it *is* documented (upstream), and the
+   boundary is the format stamp not the decade.  Its practical advice --
+   "filter on plausibility, never on a sentinel list" -- happens to be right,
+   for a different reason than the one given.
+3. *Report the gap to ReadStat / pyreadstat.*  Any consumer of this corpus using
+   =haven=, =readstat=, =pyreadstat= or =pandas < 3.0= on these ten waves gets
+   28.5M-43M poisoned cells with no warning.  That is a genuine upstream bug
+   worth filing, and it costs us nothing.
+4. *Consider a build-time guard, later, and only if someone wants it.*  A cheap
+   assertion in =get_dataframe()= -- "if the =.dta= header says format <= 105 and
+   the parse came back via the pyreadstat fallback, warn" -- would catch a future
+   regression.  *Recommended, not implemented*: it is a reader change, out of
+   scope here, and it has no work to do while the pandas floor is correct.
+5. *Do not write an =absent_verdicts= entry from this.*  Nothing here closes a
+   coverage cell.
+
+** What would change the recommendation
+
+If a delivered cell carrying 2^333 is ever found -- e.g. in one of the 20
+unscanned waves once its blobs are recoverable, or in a column reached by a
+=pyreadstat.read_dta= call added to some future country script -- that is a
+different finding and the reader-guard in (4) stops being optional.
+
+* Reproduction
+
+Environment: =PYTHONPATH= = this worktree (asserted via
+=assert 'worktrees' in lsms_library.__file__=), a private =LSMS_DATA_DIR= with
+=dvc-cache= symlinked to the shared content-addressed L1 blob store.  All reads
+via =get_dataframe()= / the =.dvc= sidecar md5; *the =dvc= CLI was never
+invoked*, and no lock file was touched.  Nothing outside this worktree was
+written except content-addressed L1 blobs pulled by ordinary library reads.
+
+Scripts used (kept out of the repo deliberately; they are one-shot probes, and
+=slurm_logs/= is for findings):
+
+| step                       | what it did                                                             |
+|----------------------------+-------------------------------------------------------------------------|
+| bit decomposition          | =struct.pack('<d', v)=, =v.hex()= -> 2^333, =0x54C0000000000000=          |
+| header scan                | format byte 0 of every =.dta= blob -> the 735 format-<=105 files         |
+| dual-reader corpus scan    | 8,220 files x {=get_dataframe()=, =pyreadstat=}, exact bit census        |
+| raw byte scan              | =00 00 00 00 00 00 c0 54= / big-endian, parser-free floor                 |
+| record-offset verification | offsets from =StataReader._typlist=, raw bytes at the missing cells      |
+| pandas-2.2 simulation      | neutralise the =fmt <= 105= recode; validated against pyreadstat + v2.2.3 |
+| parquet scan               | 1,274 materialized parquets under the shared cache, read-only            |
+
+* Sources
+
+- pandas issue [[https://github.com/pandas-dev/pandas/issues/58149][#58149]] -- "Stata format 108 ... changed the code ... from 2^333 to
+  2^1023".
+- pandas PR [[https://github.com/pandas-dev/pandas/pull/59325][#59325]] -- the fix; milestone 3.0, merged 2024-07-26.
+- =pandas/io/stata.py= =StataReader._do_convert_missing= (installed 3.0.2,
+  line 1779) and the =v2.2.3= tag of the same file.
+- =slurm_logs/settlement_thresholds/FINDINGS_threshold_rules.org= (PR #704), the
+  sighting this document was written to adjudicate.
