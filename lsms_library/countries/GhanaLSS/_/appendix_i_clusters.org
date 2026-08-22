@@ -51,9 +51,11 @@ the GH #323 review, before this table was found.
 
 - =Reg= and =EcoZone= are the Appendix's own abbreviations, kept *raw* so this
   table can be audited against the PDF.  =region_abbrev= below decodes them.
-- =UrbRur= has *three* values -- =U=, =R= and =SU= (semi-urban).  It is NOT
-  wired yet: canonical =Rural= is ={Urban, Rural}= and folding =SU= would
-  destroy a distinction the survey drew (52 clusters, 20%).  See GH #685.
+- =UrbRur= has *three* values -- =U=, =R= and =SU= (semi-urban) -- and all
+  three are wired.  Canonical =Rural= gained a =Semi-urban= value for exactly
+  this (GH #682); folding =SU= onto =Urban= or =Rural= would have destroyed a
+  distinction the survey drew (52 clusters, 20%) and made the 9-stratum design
+  (3 ecological zones x 3 settlement classes) unreconstructible.
 - =EcoZone= is 3-way (C/F/S).  GLSS6 (2012-13) additionally uses =GAMA= for
   Greater Accra; the Appendix has no such category, so Accra clusters here are
   =C= (coastal).  That is a difference between the *sources*, not an error.
@@ -344,6 +346,13 @@ the GH #323 review, before this table was found.
 | Nort | Northern      |
 | UppE | Upper East    |
 | UppW | Upper West    |
+
+#+name: urbrur_abbrev
+| UrbRur | Rural      |
+|--------+------------|
+| U      | Urban      |
+| R      | Rural      |
+| SU     | Semi-urban |
 
 #+name: ecozone_abbrev
 | EcoZone | Ecological_zone |

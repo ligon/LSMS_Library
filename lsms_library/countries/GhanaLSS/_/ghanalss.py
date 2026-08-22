@@ -440,10 +440,11 @@ def appendix_i_cluster_attributes(year_column, offset):
     DataFrame indexed by ``v`` (zero-free string ``CLUST``) with columns
     ``Region`` and ``Ecological_zone``.
 
-    ``Rural`` is deliberately NOT returned.  The Appendix classifies clusters
-    THREE ways -- U / R / SU (semi-urban, 52 clusters) -- and canonical
-    ``Rural`` is {Urban, Rural}.  Folding ``SU`` would destroy a distinction
-    the survey drew, so it waits on the vocabulary decision in GH #685/#682.
+    ``Rural`` IS returned, as of GH #682: the canonical vocabulary gained a
+    ``Semi-urban`` value, so the Appendix's three-way U / R / SU no longer has
+    to be folded onto two.  ``SU`` is 52 of 263 clusters (20%); folding it
+    would have destroyed a distinction the survey drew and made the 9-stratum
+    design (3 ecological zones x 3 settlement classes) unreconstructible.
     """
     # countries_root() honours LSMS_COUNTRIES_ROOT; a hardcoded
     # files("lsms_library")/"countries" would silently read the installed
@@ -458,6 +459,10 @@ def appendix_i_cluster_attributes(year_column, offset):
     regions.columns = [str(c).strip() for c in regions.columns]
     region_map = dict(zip(regions['Reg'].str.strip(), regions['Region'].str.strip()))
 
+    urbrur = tools.df_from_orgfile(path, name='urbrur_abbrev', to_numeric=False)
+    urbrur.columns = [str(c).strip() for c in urbrur.columns]
+    urbrur_map = dict(zip(urbrur['UrbRur'].str.strip(), urbrur['Rural'].str.strip()))
+
     zones = tools.df_from_orgfile(path, name='ecozone_abbrev', to_numeric=False)
     zones.columns = [str(c).strip() for c in zones.columns]
     zone_map = dict(zip(zones['EcoZone'].str.strip(), zones['Ecological_zone'].str.strip()))
@@ -467,15 +472,19 @@ def appendix_i_cluster_attributes(year_column, offset):
     # Assert rather than discover it as a 100%-null column downstream.
     assert region_map, 'region_abbrev decoded to an EMPTY dict'
     assert zone_map, 'ecozone_abbrev decoded to an EMPTY dict'
+    assert urbrur_map, 'urbrur_abbrev decoded to an EMPTY dict'
 
     tbl = tbl[tbl[year_column].astype(str).str.strip().ne('.')].copy()
     tbl['v'] = (tbl[year_column].astype(int) + offset).astype(str)
 
     out = pd.DataFrame({
         'Region': tbl['Reg'].map(region_map).values,
+        'Rural': tbl['UrbRur'].map(urbrur_map).values,
         'Ecological_zone': tbl['EcoZone'].map(zone_map).values,
     }, index=pd.Index(tbl['v'].values, name='v'))
 
     unmapped = tbl.loc[out['Region'].isna().values, 'Reg'].unique()
     assert len(unmapped) == 0, f'unmapped region abbreviations: {list(unmapped)}'
+    bad_ur = tbl.loc[out['Rural'].isna().values, 'UrbRur'].unique()
+    assert len(bad_ur) == 0, f'unmapped urb/rur abbreviations: {list(bad_ur)}'
     return out

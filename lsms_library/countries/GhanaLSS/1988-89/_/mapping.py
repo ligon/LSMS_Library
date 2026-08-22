@@ -89,8 +89,9 @@ def cluster_features(df):
     Appendix, which lists sampling areas.  A cluster absent from the Appendix
     keeps `Region` NA rather than being dropped or guessed.
 
-    `Rural` stays NA here: the Appendix is three-way (U/R/SU) against a
-    canonical vocabulary of {Urban, Rural} -- see GH #685.
+    `Rural` now comes from the Appendix too: canonical `Rural` gained a
+    `Semi-urban` value (GH #682), so the three-way U/R/SU no longer has to be
+    folded onto two.
     """
     # Load the country module BY PATH: `countries/GhanaLSS/_/` is not an
     # importable package, and a path built from countries_root() honours
@@ -107,7 +108,6 @@ def cluster_features(df):
     out = out.set_index(['t', 'v'])
 
     joined = out.join(attrs, how='left')
-    joined['Rural'] = pd.NA
     return joined[['Region', 'Rural', 'Ecological_zone']]
 
 def Int_t(value):
@@ -131,3 +131,27 @@ def Int_t(value):
     return pd.to_datetime(f"{y}-{m}-{d}", format='%Y-%m-%d', errors='coerce')
 
 Visits = range(1,7)
+
+
+def sample(df):
+    """Broadcast the cluster's Appendix I `Rural` onto its households.
+
+    GLSS1/GLSS2 ship no household-level urban/rural variable -- a sweep of all
+    170 dictionaries finds none.  The classification that DOES exist is of the
+    cluster (BID Appendix I, U / R / SU), and every household in an enumeration
+    area shares its EA's settlement class by construction, so broadcasting is
+    the meaning of the variable rather than an imputation.
+
+    Households whose cluster is absent from the Appendix keep `Rural` NA rather
+    than being guessed.  GH #685.
+    """
+    import importlib.util as _ilu
+    from lsms_library.paths import countries_root
+    _p = countries_root()/'GhanaLSS'/'_'/'ghanalss.py'
+    _spec = _ilu.spec_from_file_location('_ghanalss_country', _p)
+    _c = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_c)
+    attrs = _c.appendix_i_cluster_attributes('yr2', 2000)
+
+    out = df.copy()
+    out['Rural'] = out['v'].astype(str).map(attrs['Rural'])
+    return out

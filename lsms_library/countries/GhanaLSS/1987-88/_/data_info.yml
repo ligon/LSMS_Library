@@ -23,6 +23,9 @@ cluster_features:
     myvars: {}
 
 sample:
+    # `Rural` is NOT read from a source column -- GLSS1/GLSS2 ship none.  The
+    # `sample` df_edit hook in mapping.py broadcasts the cluster's BID
+    # Appendix I classification (U / R / SU) onto its households.  GH #685.
     file: Y00A.DAT
     idxvars:
         i: HID
