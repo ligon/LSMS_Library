@@ -300,21 +300,79 @@ def test_dict_j_key_is_the_scalar_request():
 
 
 # ---------------------------------------------------------------------------
-# Absent target -> plain KeyError (consistent with _relabel_j's no-'j' rule)
+# Absent target -> LabelUnavailableError (degrade), per @ligon on PR #697
 # ---------------------------------------------------------------------------
 
-def test_absent_target_is_a_plain_keyerror():
+def test_absent_target_degrades():
+    """A target the frame lacks is missing CURATION, not a defect.
+
+    ``Rural`` is deliberately not ``required`` on ``sample`` (data_info.yml:
+    "many countries' sample table carries only (v, weight, strata)"), so a
+    country lacking it is a normal state of the corpus and ``Feature`` should
+    degrade over it -- exactly as it already does for a country that has the
+    column but not the requested label variant.
+    """
     df = _sample_frame()
     assert _label_targets_missing(df, {"Rural": "Settlement"}) == []
     assert _label_targets_missing(df, {"Roof": "Detail"}) == ["Roof"]
-    with pytest.raises(KeyError) as ei:
+    with pytest.raises(LabelUnavailableError):
         _assert_label_targets_present(df, {"Roof": "Detail"},
                                       country="Fixtureland", table="sample")
-    assert not isinstance(ei.value, LabelUnavailableError)
     _assert_label_targets_present(df, {"Rural": "Settlement"},
                                   country="Fixtureland", table="sample")   # no raise
     _assert_label_targets_present(df, None,
                                   country="Fixtureland", table="sample")   # no raise
+
+
+def test_absent_target_and_absent_label_column_raise_the_SAME_class():
+    """The two curation gaps are one case to the caller, so one exception.
+
+    Left: the country has ``Rural`` but curates no ``Settlement Label``.
+    Right: the country curates the ladder but its frame has no ``Rural`` at all.
+    A caller cannot tell these apart and should not have to.
+    """
+    no_such_column = _fake_country({"Rural": _settlement_table()})
+    with pytest.raises(LabelUnavailableError):
+        no_such_column._apply_categorical_mappings(
+            _sample_frame(), labels={"Rural": "Nutrition"})
+
+    with pytest.raises(LabelUnavailableError):
+        _assert_label_targets_present(
+            _sample_frame().drop(columns=["Rural"]), {"Rural": "Settlement"},
+            country="Fixtureland", table="sample")
+
+
+def test_malformed_table_still_outranks_the_degrade():
+    """The distinction that DOES matter survives the flip.
+
+    A malformed table is a defect in curated config, not an absence, so it
+    stays a plain ``KeyError`` and is NOT degraded over.
+    """
+    tbl = _settlement_table().rename(columns={"Preferred Label": "Canonical Label"})
+    with pytest.raises(KeyError) as ei:
+        _fake_country({"Rural": tbl})._apply_categorical_mappings(
+            _sample_frame(), labels={"Rural": "Settlement"})
+    assert not isinstance(ei.value, LabelUnavailableError)
+
+
+def test_relabel_j_no_j_level_stays_a_plain_keyerror():
+    """Deliberately NOT flipped with the dict form -- the two differ.
+
+    A dict names an OPTIONAL column, so its absence is a coverage fact about
+    the country.  A scalar names no target: ``j`` is implicit because the
+    caller is asking for a food relabel, and ``j`` is required on every table
+    that has one -- so a food table without ``j`` is a structural defect of
+    the frame, not a country that never curated something.  Degrading it would
+    drop the country from a ``Feature`` assembly under a warning that names
+    the wrong cause.
+    """
+    fake = SimpleNamespace(name="Fixtureland",
+                           categorical_mapping={"food_items": _settlement_table()})
+    fake._relabel_j = _CountryCls._relabel_j.__get__(fake)
+    with pytest.raises(KeyError) as ei:
+        fake._relabel_j(_sample_frame(), "Aggregate", reaggregate=False)
+    assert not isinstance(ei.value, LabelUnavailableError)
+    assert "no 'j' index level" in str(ei.value)
 
 
 def test_index_levels_count_as_present_targets():
@@ -445,7 +503,8 @@ _SETTLEMENT_ORG = """\
 """
 
 
-def _make_country(countries_root: Path, name: str, cat_org: str | None) -> None:
+def _make_country(countries_root: Path, name: str, cat_org: str | None,
+                  *, with_rural: bool = True) -> None:
     """A minimal one-wave country whose ``sample`` reads a local CSV.
 
     No ``#+begin_example`` blocks anywhere: ``all_dfs_from_orgfile`` parses the
@@ -456,6 +515,7 @@ def _make_country(countries_root: Path, name: str, cat_org: str | None) -> None:
     (c / "_").mkdir(parents=True)
     (c / "2000" / "_").mkdir(parents=True)
     (c / "2000" / "Data").mkdir(parents=True)
+    rural_decl = "    Rural: str\n" if with_rural else ""
     (c / "_" / "data_scheme.yml").write_text(textwrap.dedent(f"""\
         Country: {name}
 
@@ -467,10 +527,10 @@ def _make_country(countries_root: Path, name: str, cat_org: str | None) -> None:
             index: (i, t)
             v: str
             weight: float
-            Rural: str
-        """))
+        """) + rural_decl)
     if cat_org is not None:
         (c / "_" / "categorical_mapping.org").write_text(cat_org)
+    rural_var = "        Rural: settlement\n" if with_rural else ""
     (c / "2000" / "_" / "data_info.yml").write_text(textwrap.dedent(f"""\
         Country: {name}
         Wave: '2000'
@@ -482,8 +542,7 @@ def _make_country(countries_root: Path, name: str, cat_org: str | None) -> None:
             myvars:
                 v: clust
                 weight: wt
-                Rural: settlement
-        """))
+        """) + rural_var)
     pd.DataFrame({
         "hhid": [f"h{n}" for n in range(1, 8)],
         "clust": ["c1", "c1", "c2", "c2", "c3", "c3", "c3"],
@@ -501,6 +560,9 @@ def synthetic_tree(tmp_path_factory):
     _make_country(countries, "Otherland", None)          # curates nothing
     _make_country(countries, "Malformedland",
                   _SETTLEMENT_ORG.replace("Preferred Label", "Canonical Label"))
+    # Curates the ladder, but its sample() has no Rural column at all -- the
+    # documented normal state for a country whose sample is (v, weight, strata).
+    _make_country(countries, "Columnlessland", _SETTLEMENT_ORG, with_rural=False)
     return {"LSMS_COUNTRIES_ROOT": str(countries),
             "LSMS_DATA_DIR": str(root / "data")}
 
@@ -588,13 +650,11 @@ def test_end_to_end_error_taxonomy(synthetic_tree):
         except KeyError:
             print('MALFORMED_PLAIN_KEYERROR')
 
-        # (c) target not in the frame -> plain KeyError
+        # (c) target not in the frame -> degrade, same as (a)
         try:
             Country('Fixtureland').sample(labels={'Roof': 'Detail'})
         except LabelUnavailableError:
-            raise AssertionError('absent target degraded instead of raising')
-        except KeyError:
-            print('ABSENT_TARGET_PLAIN_KEYERROR')
+            print('ABSENT_TARGET_LABEL_UNAVAILABLE')
 
         # (d) bad type
         try:
@@ -603,7 +663,7 @@ def test_end_to_end_error_taxonomy(synthetic_tree):
             print('BAD_TYPE_TYPEERROR')
         """, synthetic_tree)
     for marker in ("OTHERLAND_LABEL_UNAVAILABLE", "MALFORMED_PLAIN_KEYERROR",
-                   "ABSENT_TARGET_PLAIN_KEYERROR", "BAD_TYPE_TYPEERROR"):
+                   "ABSENT_TARGET_LABEL_UNAVAILABLE", "BAD_TYPE_TYPEERROR"):
         assert marker in out, out
 
 
@@ -643,6 +703,51 @@ def test_feature_degrades_for_an_uncurated_country(synthetic_tree):
         print('FEATURE_DEGRADE_OK')
         """, synthetic_tree)
     assert "FEATURE_DEGRADE_OK" in out
+
+
+def test_feature_degrades_for_a_country_with_no_such_column(synthetic_tree):
+    """@ligon, PR #697: a country whose frame lacks the target degrades too.
+
+    ``Otherland`` HAS ``Rural`` but curates no ``Settlement Label``;
+    ``Columnlessland`` curates the ladder but has no ``Rural`` column at all.
+    Both are missing curation from the caller's point of view, so both must be
+    dropped and reported the same way -- never as "Failed to load".
+    """
+    out = _run(f"""
+        import warnings
+        from lsms_library import Feature
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            df = Feature('sample')(['Fixtureland', 'Otherland', 'Columnlessland'],
+                                   labels={{'Rural': 'Settlement'}})
+        assert sorted(set(df.index.get_level_values('country'))) == ['Fixtureland'], df.index
+        assert list(df['Rural']) == {LADDER!r}, list(df['Rural'])
+        assert sorted(df.attrs['labels_unavailable']) == ['Columnlessland', 'Otherland'], \
+            df.attrs
+        msgs = [str(m.message) for m in w]
+        assert any('unavailable' in m and 'Columnlessland' in m for m in msgs), msgs
+        assert not any('Failed to load' in m for m in msgs), msgs
+        print('FEATURE_DEGRADE_BOTH_OK')
+        """, synthetic_tree)
+    assert "FEATURE_DEGRADE_BOTH_OK" in out
+
+
+def test_columnless_country_is_otherwise_healthy(synthetic_tree):
+    """Guard against the fixture proving the wrong thing.
+
+    ``Columnlessland`` must build fine WITHOUT a labels= request -- otherwise
+    the degradation above could be masking a broken country rather than
+    demonstrating the intended behaviour.
+    """
+    out = _run("""
+        from lsms_library import Country
+        df = Country('Columnlessland').sample()
+        assert len(df) == 7, len(df)
+        assert 'Rural' not in df.columns, df.columns
+        assert list(df['weight']) == [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]
+        print('COLUMNLESS_HEALTHY_OK')
+        """, synthetic_tree)
+    assert "COLUMNLESS_HEALTHY_OK" in out
 
 
 def test_feature_default_is_unaffected(synthetic_tree):

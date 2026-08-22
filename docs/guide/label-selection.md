@@ -30,6 +30,15 @@ Mali (Bamako / autre urbain / rural), Niger (Communauté Urbaine / urbain /
 rural) and Kazakhstan 1996 — see the corpus-wide audit in
 [#682], class A.
 
+And a shared *vocabulary* would not fix it. A later corpus sweep ([#704]) found
+that what defeats cross-country settlement harmonisation is variation in the
+**entity being classified** — locality vs. enumeration area vs. commune — not
+variation in the population threshold. Two surveys can agree on the word "town"
+and still be classifying different objects. That is an argument for exactly
+this design: a per-country label column, selected by name at query time, with
+no pretence that one country's ladder means the same thing as another's. The
+canonical binary stays the only cross-country claim the library makes.
+
 `labels=` is the query-time escape hatch: the canonical value stays canonical,
 and a caller who wants the tier asks for it.
 
@@ -148,19 +157,43 @@ Two rules about that table:
 | situation | raises | `Feature` behaviour |
 |---|---|---|
 | country curates no such mapping table, or no such label column | `LabelUnavailableError` (a `KeyError` subclass) | drops the country, one aggregated warning, `df.attrs['labels_unavailable']` |
+| the result has no such column or index level | `LabelUnavailableError` | **same** — drops the country |
 | table exists but has no `Preferred Label`, or no key column left | plain `KeyError` | surfaces as a per-country "Failed to load" warning |
-| the result has no such column or index level | plain `KeyError` | as above |
 | `labels=` is neither a `str` nor a dict, or a dict value is not a `str` | `TypeError` | as above |
 
-The distinction is the point: *missing curation* is a normal state of the
-corpus and `Feature` degrades over it; a *malformed table* or a *target that
-isn't there* is a defect and stays loud.
+The distinction that matters is **absence vs. defect**. *Missing curation* — a
+country that curates no such label column, or has no such column at all — is a
+normal state of the corpus, and `Feature` degrades over it. A *malformed table*
+is a defect in curated config, and stays loud.
 
-One consequence worth stating plainly: `Rural` is not a required column of
-`sample`, so `Feature('sample')(labels={'Rural': …})` warns "Failed to load"
-for countries whose `sample` has no `Rural` column at all, rather than dropping
-them gracefully. That follows from making an absent target a plain `KeyError`,
-consistent with `_relabel_j`'s existing "result has no `'j'` index level".
+The first two rows are deliberately one case. A caller cannot tell them apart:
+`Rural` is not a required column of `sample` — "many countries' sample table
+carries only (v, weight, strata) and has no urban/rural indicator at all"
+(`lsms_library/data_info.yml`) — so a country lacking the column is a coverage
+fact about that country, exactly like a country lacking the label variant. A
+column that genuinely *is* declared required going missing is the business of
+the required-column guards (`Country._assert_built_required_columns`, the
+`grab_data` dropped-sub-df guard), which fire on the build path and say so
+loudly; it is not `labels=`'s job to re-report it.
+
+### Why the scalar form's "no `j`" case is *not* the same
+
+`_relabel_j` still raises a plain `KeyError` when the result has no `j` index
+level, and that asymmetry is intentional:
+
+- A **dict** names its target, and the target it names is typically an
+  *optional* column. Its absence is a coverage fact — missing curation.
+- A **scalar** names no target. `j` is implicit, and it is implicit because the
+  caller is asking for a *food* relabel. `j` is required on every table that has
+  one, so a food table without `j` is a structural defect of the frame, not a
+  country that never curated something. Degrading it would drop the country
+  from a `Feature` assembly under a warning naming the wrong cause.
+
+That branch is also near-unreachable: the registered-table path guards the call
+with `if 'j' in result.index.names`, and the derived-food path only reaches it
+for tables that have `j` by construction. It is a defensive guard, and
+weakening a defensive guard to match an unrelated case buys nothing. Pinned by
+`test_relabel_j_no_j_level_stays_a_plain_keyerror`.
 
 ---
 
@@ -274,3 +307,4 @@ Verification, both ways:
 [#682]: https://github.com/ligon/LSMS_Library/pull/682
 [#693]: https://github.com/ligon/LSMS_Library/issues/693
 [#694]: https://github.com/ligon/LSMS_Library/issues/694
+[#704]: https://github.com/ligon/LSMS_Library/pull/704

@@ -29,10 +29,15 @@ GLSS1/GLSS2, but the GLSS2 7-way `rural` table was subsequently shown to decode
 `Y01C:NRCPL` — Household Questionnaire §1 Part C col. 13, *"Where does
 he/she live?"* for a **non-resident child** — i.e. a migration attribute, not a
 classification of the household's own settlement. GhanaLSS has no settlement
-ladder to preserve. The mechanism is still wanted for the audit's class-A cells,
-which are unaffected: **Iraq 2006-07** (measured here: 7 raw `xstrat` tiers →
-2 delivered values, 12,194 households in one bucket), Ethiopia ESS2/ESS3,
-Mali, Niger, Kazakhstan 1996.
+ladder to preserve. (#690/#691 have since merged: GLSS1/GLSS2 `Rural` is wired
+with `SU` folded to `Rural`, and no canonical `Semi-urban` was added.) The
+mechanism is still wanted for the audit's class-A cells, which are unaffected:
+**Iraq 2006-07** (measured here: 7 raw `xstrat` tiers → 2 delivered values,
+12,194 households in one bucket), Ethiopia ESS2/ESS3, Mali, Niger,
+Kazakhstan 1996. #704 additionally found that the obstacle to a *shared*
+settlement vocabulary is entity variation (locality vs. enumeration area vs.
+commune), not threshold variation — which argues for per-country label
+selection over any single harmonised ladder.
 
 It is **core only**. No country config is wired here, and none of the class-A
 cells is wired either — Iraq's `Rural` currently decodes through an inline
@@ -75,8 +80,10 @@ is a separate wiring change.
 - **`labels=` on the generated methods** — current contract in the generated
   docstring, `country.py:3906`.
 - **Error taxonomy** — `errors.py:9` docstring: `LabelUnavailableError` =
-  missing *curation* (degradable by `Feature`); plain `KeyError` = malformed
-  table or a caller asking for a target that is not there (loud).
+  missing *curation*, degradable by `Feature`; plain `KeyError` = a *defect*,
+  loud. As of the 2026-08-22 decision (§6) an absent target counts as missing
+  curation, so "defect" means specifically a malformed mapping table — and, for
+  the scalar form only, a food frame with no `j` level (§4.9).
 - Repo-wide conventions (IO sanctions, pandas 3.0, `attrs['id_converted']`):
   per `STANDING.md` §3/§4 and `CLAUDE.md`.
 
@@ -132,6 +139,16 @@ Repo-wide ones per `STANDING.md §4`. Task-specific:
    consults it. A wave-level table therefore cannot be selected with `labels=`.
    Verified, not assumed.
 
+9. **Absence and defect are the axis, not curation and structure.** An absent
+   target and an absent label column are one case (`LabelUnavailableError`,
+   degradable); a malformed table is the other (plain `KeyError`, loud). The
+   scalar form's "no `'j'` index level" stays loud because `j` is *required*
+   wherever it exists (`data_info.yml`), so its absence is a defect in the
+   frame — whereas `Rural` is explicitly not required on `sample`, so its
+   absence is a coverage fact. Pinned by
+   `test_relabel_j_no_j_level_stays_a_plain_keyerror` and
+   `test_absent_target_and_absent_label_column_raise_the_SAME_class`.
+
 8. **Two live defects sit in the same neighbourhood and are deliberately NOT
    touched here** (owned elsewhere): **#693** — `#+begin_example` blocks in a
    global `.org` are parsed as live tables by `all_dfs_from_orgfile`
@@ -156,13 +173,17 @@ Repo-wide ones per `STANDING.md §4`. Task-specific:
 - **Should a `Code`-keyed table at *global* scope be rejected?** (§4.5) It would
   need an allowlist for `ehcvm_units.org`. Out of scope for a contained core
   change; noted for follow-up.
-- **`Feature('sample')(labels={'Rural': …})` warns rather than degrading for
-  countries whose `sample` has no `Rural` column at all.** That follows from
-  making an absent target a plain `KeyError`, consistent with the existing
-  "result has no `'j'` index level" rule. If the graceful drop is wanted for
-  absent targets too, that is a one-line change of exception class — but it
-  would also change the `j` behaviour, so it is a deliberate decision, not a
-  default.
+- ~~**`Feature('sample')(labels={'Rural': …})` warns rather than degrading for
+  countries whose `sample` has no `Rural` column at all.**~~ **RESOLVED
+  2026-08-22, @ligon: degrade gracefully.** An absent target now raises
+  `LabelUnavailableError` like any other curation gap. Rationale: a country
+  simply not having the column is what `Feature` was built to degrade over, and
+  it is indistinguishable *to the caller* from a country that has the column but
+  not the requested variant. The malformed-table case stays a plain `KeyError`;
+  that is the distinction that matters and it is unchanged.
+  `_relabel_j`'s "no `'j'` index level" was re-examined and deliberately **not**
+  flipped — `j` is required wherever it exists, so its absence is a structural
+  defect rather than a coverage fact (§4.9).
 
 ---
 ### Phase 3 — verification
@@ -178,6 +199,9 @@ Repo-wide ones per `STANDING.md §4`. Task-specific:
   not a reinvention (nothing else in the repo carries read-path request state).
 - `_split_labels_arg` / `_label_targets_missing` — **OK (§2)**: new helpers, no
   existing equivalent; `_split_labels_arg` preserves the scalar contract byte-for-byte.
+- `_assert_label_targets_present` — **OK (§4.9)**: raises `LabelUnavailableError`,
+  per the 2026-08-22 decision in §6; the malformed-table plain `KeyError` and
+  `_relabel_j`'s no-`j` plain `KeyError` are untouched and separately pinned.
 - `Country._relabel_j` — **OK (§5)**: unchanged.
 - `Feature._mark_labels_unavailable` — **OK (§2)**: warning wording generalised
   from "food-label column" to "label column"; contract unchanged.

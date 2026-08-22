@@ -197,17 +197,37 @@ def _label_targets_missing(df, labels: dict | None) -> list:
 
 def _assert_label_targets_present(df, labels: dict | None, *,
                                   country: str, table: str) -> None:
-    """Raise a plain ``KeyError`` for a ``labels=`` target *df* does not have.
+    """Raise :class:`LabelUnavailableError` for a ``labels=`` target *df* lacks.
 
-    Deliberately a plain ``KeyError``, not :class:`LabelUnavailableError`:
-    consistent with :meth:`Country._relabel_j`'s "result has no ``'j'`` index
-    level", and distinct from the missing-CURATION case (the target IS there
-    but the country curates no such label column), which stays degradable by
-    :class:`~lsms_library.feature.Feature`.
+    A country simply not having the column is **missing curation**, which is
+    exactly what :class:`~lsms_library.feature.Feature` was built to degrade
+    over — and it is indistinguishable, to the caller, from a country that has
+    the column but not the requested label variant, which already degrades.
+    So both take the same path: drop the country, one aggregated warning,
+    ``df.attrs['labels_unavailable']``.
+
+    This is not a defect being swallowed.  ``Rural`` is *deliberately* not
+    ``required`` on ``sample`` — "many countries' sample table carries only
+    (v, weight, strata) and has no urban/rural indicator at all"
+    (``lsms_library/data_info.yml``) — so its absence is a documented, normal
+    state of the corpus, not a broken build.  A column that genuinely IS
+    declared required going missing is the business of the required-column
+    guards (``Country._assert_built_required_columns``, the ``grab_data``
+    dropped-sub-df guard), which fire on the build path and say so loudly;
+    it is not ``labels=``'s job to re-report it.
+
+    What stays loud is the **malformed** table: it exists, but has no
+    ``Preferred Label`` or no key column left.  That is a defect in curated
+    config, not an absence, and it raises a plain ``KeyError`` from
+    :meth:`Country._apply_categorical_mappings`.  That is the distinction that
+    matters, and it is unchanged.
+
+    Deliberately NOT mirrored onto :meth:`Country._relabel_j`'s "result has no
+    ``'j'`` index level" — see the note there for why the two genuinely differ.
     """
     missing = _label_targets_missing(df, labels)
     if missing:
-        raise KeyError(
+        raise LabelUnavailableError(
             f"Cannot apply labels={ {k: labels[k] for k in missing} !r} to "
             f"{country}/{table}: the result has no such column or index level "
             f"(has: {sorted(map(str, df.columns))} + index "
@@ -2532,6 +2552,27 @@ class Country:
         if labels in (None, 'Preferred'):
             return df
         if not isinstance(df, pd.DataFrame) or 'j' not in (df.index.names or []):
+            # Stays a PLAIN KeyError while the dict form's absent-target case
+            # degrades (see _assert_label_targets_present).  The two look alike
+            # and are not:
+            #
+            #   * a DICT names its target, and the target it names is typically
+            #     an OPTIONAL column -- `Rural` is explicitly not `required` on
+            #     `sample` (data_info.yml).  Its absence is a coverage fact
+            #     about that country: missing curation, degradable.
+            #   * a SCALAR names no target; `j` is implicit, and it is implicit
+            #     because the caller is asking for a FOOD relabel.  `j` is
+            #     required on every table that has one, so a food table without
+            #     `j` is a structural defect of the frame, not a country that
+            #     never curated something.  Degrading would drop it from a
+            #     Feature assembly with a "no such label" warning that names
+            #     the wrong cause.
+            #
+            # This branch is also near-unreachable in practice: the registered
+            # -table path guards the call with `if 'j' in result.index.names`,
+            # and the derived-food path only reaches it for tables that have
+            # `j` by construction.  It is a defensive guard, and weakening a
+            # defensive guard to match an unrelated case buys nothing.
             raise KeyError(
                 f"Cannot apply labels={labels!r}: result has no 'j' index level"
             )
@@ -4178,9 +4219,11 @@ class Country:
                 "    the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and\n",
                 "    ``labels='Aggregate'`` are the same request.\n",
                 "    Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)\n",
-                "    when the country curates no such label column, and a plain\n",
-                "    ``KeyError`` when the result has no such target at all or\n",
-                "    the mapping table is malformed.\n",
+                "    when the country cannot honour the request -- it curates no\n",
+                "    such label column, or the result has no such target at all;\n",
+                "    ``Feature`` degrades over both.  A plain ``KeyError`` means\n",
+                "    the mapping table is MALFORMED (no ``Preferred Label``, or\n",
+                "    no key column left), which stays loud.\n",
             ]
             if name in {'food_prices', 'food_quantities'}:
                 if name == 'food_prices':
