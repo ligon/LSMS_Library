@@ -7,6 +7,13 @@ Data Scheme:
     weight: float
     panel_weight: float
     strata: str
+    # GH #683: `Rural` is NOT comparable across waves.  ESS1 (2011-12) covered
+    # "rural and small town areas" only, so `Urban` there means SMALL TOWN;
+    # from ESS2 it means any urban area including Addis Ababa.  The urban share
+    # runs 12.7% -> 36.8% -> 34.0% -> 54.0% -> 53.9%, while the RURAL count is
+    # nearly flat (3,466 -> 3,115): the sample is being extended into urban
+    # strata, not shifted.  A pooled urban dummy mixes two definitions.
+    # Full note, with the measurements, in _/CONTENTS.org.
     Rural: str
 
   cluster_features:
