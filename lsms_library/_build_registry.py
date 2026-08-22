@@ -131,9 +131,10 @@ _EXCLUDED_CALLABLES = frozenset({
     # which every build-path callable reaches -- so WITHOUT this exclusion,
     # re-wording one warning would move build_transforms_fingerprint for every
     # table in every country and cold-rebuild the corpus.  Measured both ways;
-    # see tests/test_null_read_guard.py::test_editing_the_audit_module_does_not
-    # _move_any_cache_hash.  (Editing get_dataframe ITSELF still invalidates,
-    # correctly: its parser dispatch does determine content.)
+    # pinned by tests/test_null_read_guard.py::
+    # test_the_audit_module_is_not_folded_into_any_build_fingerprint.
+    # (Editing get_dataframe ITSELF still invalidates, correctly: its parser
+    # dispatch does determine content.)
     "lsms_library.null_read_audit.check_read",
     "lsms_library.null_read_audit.check_declared_columns",
     "lsms_library.null_read_audit.audit_read",

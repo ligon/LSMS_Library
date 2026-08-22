@@ -113,6 +113,9 @@ Three motivating instances:
 
 ## §7 Measurement (the half of the task that decided the design)
 
+**Raw records, scripts and hash probes: `slurm_logs/null_read_guard/`** (see its
+`README.org`). The numbers below are reproducible from there.
+
 Cold. `LSMS_DATA_DIR=/global/scratch/.../nullguard_data`, private, empty at
 start; its `dvc-cache` symlinked to the shared L1 (content-addressed immutable
 blobs — sharing them changes nothing measurable, and the *parquet* tiers, which

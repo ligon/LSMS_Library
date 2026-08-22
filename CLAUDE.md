@@ -302,7 +302,9 @@ Warn by default; `LSMS_READ_STRICT=1` makes it fatal (`NullReadError`). **Its ow
 | Site R in `get_dataframe` | **37** — one-time corpus-wide invalidation |
 | a later edit to `null_read_audit.py` itself | **0** — its callables are in `_EXCLUDED_CALLABLES`; pinned by a test |
 
-Site R's invalidation is unavoidable for *any* edit to `get_dataframe`: `df_data_grabber` is `@build_transform()`-tagged and references it, so its source is in every table's fingerprint. The concurrent `.DAT`/`.DCT` parse fix incurs the identical rebuild. Overhead of the audit itself on the corpus's largest read (Malawi 2016-17 `hh_mod_g1.dta`, 1.75M×28): 0.49 s on a 14–18 s read, ~3%.
+Site R's invalidation is unavoidable for *any* edit to `get_dataframe`: `df_data_grabber` is `@build_transform()`-tagged and references it, so its source is in every table's fingerprint (measured with a bare no-op stub — the same 37/37). The concurrent `.DAT`/`.DCT` parse fix incurs the identical rebuild. Overhead of the audit itself: Site R 0.49 s on the corpus's largest read (Malawi 2016-17 `hh_mod_g1.dta`, 1.75M×28, a 14–18 s read → ~3%); Site B 196 ms on the largest built table (GhanaLSS `food_acquired`, 5.26M×3, a 167 s warm read → 0.1%).
+
+**Raw sweep records, analysis scripts and the hash probes are in `slurm_logs/null_read_guard/`** — the threshold is re-checkable, not just asserted.
 
 > **Known granularity mismatch, not fixed here.** Niger's `CONTENTS.org` records that 2014-15's missing coordinates are *correct* ("genuinely ships no geovariables/offsets file of any kind … honestly absent — not mis-addressed"). The guard still reports it, and should — the point is visibility, not adjudication. But `optional:` is **country**-grain while the absence is **wave**-grain, so there is no way to record that judgement today. Do **not** reach for `optional: true` to silence one wave. This is what gates turning `LSMS_READ_STRICT=1` on in CI.
 
