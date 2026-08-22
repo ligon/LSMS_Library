@@ -110,7 +110,7 @@ _U_SENTINEL_PROTECTED_METHODS = frozenset({'food_quantities', 'food_prices'})
 #     'Rural': 'Other'}``.  The fine information only exists BEFORE
 #     :meth:`Country._apply_categorical_mappings` collapses the raw code onto
 #     ``Preferred Label``, so the selection has to happen THERE, keyed on the
-#     raw code.  See ``docs/design/label_selection.md``.
+#     raw code.  See ``docs/guide/label-selection.md``.
 #
 # The request therefore has to reach ``_apply_categorical_mappings``, which
 # sits inside ``_finalize_result``, which is called from inside

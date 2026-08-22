@@ -14,7 +14,12 @@ Three blocks:
    real ``Country(...).sample(labels=...)`` path cold *and* warm, the error
    taxonomy end to end, and ``Feature``'s graceful degradation.
 
-Why the mapping site and not ``_relabel_j``: see ``docs/design/label_selection.md``.
+Why the mapping site and not ``_relabel_j``: see ``docs/guide/label-selection.md``.
+The real-world cells this exists for are the corpus audit's class A (GH #682):
+Iraq 2006-07 folds 7 raw ``xstrat`` settlement tiers onto 2 delivered values
+(12,194 households in one bucket), and Ethiopia ESS2/ESS3, Mali, Niger and
+Kazakhstan 1996 do the same at smaller scale.  None is wired; the fixture
+country below stands in for all of them so the test needs no microdata.
 """
 from __future__ import annotations
 

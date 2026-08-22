@@ -20,13 +20,24 @@ to the finished frame.
 
 This task gives the same *user-facing affordance* to non-food, non-`j` targets —
 the motivating one being the `Rural` **column** of `sample()` / `cluster_features()`,
-where a survey's finer settlement ladder (City / Large Town / … / Small Village)
-should be selectable while `Rural` keeps its canonical binary vocabulary
-(`data_info.yml` → `sample.Rural.spellings` / `cluster_features.Rural.spellings`:
-`{Urban, Rural}` plus `Informal`).
+where a survey's finer settlement ladder should be selectable while `Rural` keeps
+its canonical binary vocabulary (`data_info.yml` → `sample.Rural.spellings` /
+`cluster_features.Rural.spellings`: `{Urban, Rural}` plus `Informal`).
 
-It is **PR 1 of 2**: core only. No country config is wired here — GhanaLSS
-GLSS1/GLSS2 (#685) is a separate agent's change on top.
+**Motivation re-pointed mid-task (2026-08-21).** The brief opened on GhanaLSS
+GLSS1/GLSS2, but the GLSS2 7-way `rural` table was subsequently shown to decode
+`Y01C:NRCPL` — Household Questionnaire §1 Part C col. 13, *"Where does
+he/she live?"* for a **non-resident child** — i.e. a migration attribute, not a
+classification of the household's own settlement. GhanaLSS has no settlement
+ladder to preserve. The mechanism is still wanted for the audit's class-A cells,
+which are unaffected: **Iraq 2006-07** (measured here: 7 raw `xstrat` tiers →
+2 delivered values, 12,194 households in one bucket), Ethiopia ESS2/ESS3,
+Mali, Niger, Kazakhstan 1996.
+
+It is **core only**. No country config is wired here, and none of the class-A
+cells is wired either — Iraq's `Rural` currently decodes through an inline
+`mapping:` dict in its wave YAML (route 4 below), so using this mechanism there
+is a separate wiring change.
 
 ## §2 Existing machinery (this task's area)
 
@@ -51,7 +62,12 @@ GLSS1/GLSS2 (#685) is a separate agent's change on top.
 - **Categorical mapping auto-dispatch** — "If a column/index name in a returned
   DataFrame matches a table name in the country's `categorical_mapping.org`
   (case-insensitive) and that table has a `Preferred Label` column, the mapping
-  is applied automatically" (`CLAUDE.md` §"Canonical Schema").
+  is applied automatically" (`CLAUDE.md` §"Canonical Schema"). This is **route 1**
+  of four decode routes; see `docs/guide/label-selection.md` §"Which decode path
+  this extends". The other three — an explicit `mappings:` key in wave YAML
+  (2 occurrences corpus-wide), `tools.code_label_map` consumed by a wave's own
+  formatter (`GhanaLSS/1991-92/_/mapping.py`), and an inline `mapping:` dict under
+  a `myvars` entry (Iraq's `Rural`, Malawi's housing) — are untouched.
 - **Cache exclusion class** — "*Excluded by design* (they re-run post-read,
   never touching the parquet): `_finalize_result`, kinship, spellings,
   categorical mappings" (`CLAUDE.md` §"Cache Behavior"). Verified, with a
@@ -72,7 +88,7 @@ Repo-wide ones per `STANDING.md §4`. Task-specific:
    relabel can work.** `_relabel_j` keys on `Preferred Label`; for a 7-way
    settlement ladder that has 2 distinct `Preferred Label` values, `.to_dict()`
    is last-row-wins and yields `{'Urban': 'Medium Town', 'Rural': 'Other'}`.
-   Measured; see `docs/design/label_selection.md`. This is *why* the
+   Measured; see `docs/guide/label-selection.md`. This is *why* the
    implementation point is the mapping site, where the raw code still exists.
 
 2. **`_aggregate_wave_data` is `@build_transform()`-tagged, so its source AST is
@@ -106,6 +122,24 @@ Repo-wide ones per `STANDING.md §4`. Task-specific:
 
 6. **`attrs['id_converted']` must survive** the mapping step
    (`STANDING.md §4`; `CLAUDE.md` §"Panel ID Transitive Chains").
+
+7. **Route 1 is country ∪ global scope, never wave.**
+   `_apply_categorical_mappings` reads `Country.categorical_mapping`
+   (`country.py:1637`), which merges `lsms_library/categorical_mapping/*.org`
+   with `{country}/_/categorical_mapping.org` and never opens a wave directory.
+   `Wave.categorical_mapping` (`country.py:862`) layers the wave's own tables on
+   top by plain `dict.update`, but nothing on the `Country(...)` read path
+   consults it. A wave-level table therefore cannot be selected with `labels=`.
+   Verified, not assumed.
+
+8. **Two live defects sit in the same neighbourhood and are deliberately NOT
+   touched here** (owned elsewhere): **#693** — `#+begin_example` blocks in a
+   global `.org` are parsed as live tables by `all_dfs_from_orgfile`
+   (`canonical_housing_labels.org`, 2 instances); **#694** — the unguarded
+   `df[col].str.strip()` inside `_apply_categorical_mappings` nulls non-string
+   values in an object column. The selection path reuses the *same* strip call,
+   so it neither worsens nor fixes #694, and #693's tables are label-keyed so
+   their key-column resolution is unchanged.
 
 ## §5 Reuse decision
 
