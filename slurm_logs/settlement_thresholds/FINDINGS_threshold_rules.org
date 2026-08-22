@@ -461,12 +461,53 @@ The two are close to independent.
 |----------+---------+---------------------------------------------+------------+------------------------------------------------+------+-------------+-----------------------------------------------|
 | GhanaLSS | 2016-17 | =Data/g7comSEC1.dta=                        | =cs1q1=    | "Community population"                         | (a)  | 891/892     | min 10, med 2,500, max 999999 *(sentinel)*    |
 | GhanaLSS | 2012-13 | =Data/COMMUNITY/sec1.dta=                   | =cs1q1=    | "community population"                         | (a)  | *112/693*   | min 0, med 800, max 12,000                    |
-| GhanaLSS | 1991-92 | =Data/Community/cs1.dta=                    | =num84=    | "S1Q1" (= 1984 census population question)     | (a)  | (see below) |                                               |
-| GhanaLSS | 1998-99 | =Data/Community/CS1.DTA=                    | =s1q1=     | *label stripped* (= same question)             | (a)  | (see below) |                                               |
+| GhanaLSS | 1991-92 | =Data/Community/cs1.dta=                    | =num84=    | "S1Q1" -- *NOT a population* (binary 1/2)      | --   | n/a         | 67x code 1, 214x code 2 -- *see correction below* |
+| GhanaLSS | 1998-99 | =Data/Community/CS1.DTA=                    | =s1q1=     | *label stripped* (= the Q1 population figure)  | (a)  | 183/223 usable | 40/223 corrupt; plausible: min 3, med 516, max 7,620 |
 | Malawi   | 2010-11 | =Data/Full_Sample/Community/com_cc.dta=     | =com_cc02= | "What is the population of this community?"    | (a)  | 767/768     | min 44, med 1,900, max 80,000                 |
 | Malawi   | 2010-11 | =Data/Full_Sample/Community/com_cc.dta=     | =com_cc03= | "How many households are found in this community?" | (b) | 768/768  | min 17, med 360, max 18,000                   |
 
-*Two caveats with teeth, both found in the strongest country:*
+*** Correction, and a warning about inferring a variable from a questionnaire
+
+I first recorded GLSS3's =num84= as the 1984-census population variable, on the
+strength of its =S1Q1= label plus the GLSS4 questionnaire's "Q1 = 1984
+POPULATION".  *That was wrong.*  Its values are 1 (67x) and 2 (214x) -- a
+yes/no, not a headcount.  *GLSS3 ships no locality-population variable*,
+despite GLSS3's report being one of the clearest statements of the threshold
+rule in the whole corpus.
+
+The general lesson, which cost me a wrong table row: *a questionnaire question
+number is not evidence that the shipped variable is what you think it is.*
+Open the column.  This is the same =asked= vs =distributed= gap the coverage
+verdicts exist to track, appearing one level down.
+
+*** A corruption marker worth knowing about
+
+GLSS4's =s1q1= carries *40 of 223 values above 1e6*, including =1.7498e100=.
+The identical =1.7498005798264095e+100= also appears in GLSS3's =numcom=.  That
+is a systematic float corruption in this vintage of GSS Stata files, not a
+one-off, and it is *not* a documented missing-value sentinel.  Anything reading
+these columns must filter on plausibility, not on a sentinel list.
+
+*** The re-cut is harder than "apply the threshold to the column"
+
+Applying Ghana's own three-way rule to GLSS4's 183 usable community
+populations gives *79.8% rural / 17.5% semi-urban / 2.7% urban*.  No published
+Ghanaian urban share is anywhere near 2.7%.
+
+The gap is not an error in either number -- it is that *the community-reported
+population of a sampled community is not the census population of a locality*,
+and the sample is EA-based with EAs nested inside larger localities.  So the
+tier-(a) variable does **not** drop into the stated rule and reproduce the
+survey's own classification.
+
+*This materially weakens the "genuine re-cut" case* and is the most important
+single caveat in this document.  A re-cut using these columns produces a
+*different* classification, defensible on its own terms, but it is not
+"recovering the survey's definition" and must never be presented as such.
+Whether the two can be reconciled (by matching communities to census
+localities) was not investigated.
+
+*Two further caveats, both found in the strongest country:*
 
 1. *GhanaLSS 2012-13 is 16% populated* (112 of 693 clusters).  The question was
    asked and the variable shipped, and it is still unusable for a re-cut.
@@ -532,12 +573,22 @@ false in its naive form*, and the reasons are specific.
    mechanically inflated relative to Ghana's).  That is a real, citable
    statement about a real cross-country comparison, produced from documentation
    alone.
-2. *A genuine re-cut is possible -- but in fewer places than Q1 suggests, and
-   the two sets barely overlap.*  Ghana can be re-cut (multiple waves, tier (a)).
-   Malawi can be re-cut *and never stated a rule*.  Conversely Panama states the
-   cleanest rule in the corpus and (on the evidence so far) ships no level
-   variable.  *Q2 is therefore not a subset of Q1 and must be tracked
-   separately* -- which is the main structural recommendation of this sweep.
+2. *Q2 is not a subset of Q1, and that structural point survives everything
+   else.*  Malawi ships a clean tier-(a) population variable and *never states a
+   rule*.  Panama states the cleanest rule in the corpus and (on the evidence so
+   far) ships no level variable.  GLSS3 states the rule beautifully and ships
+   nothing; GLSS4 states a different rule and ships a corrupted column.  *The
+   two questions must be tracked separately* -- this is the main structural
+   recommendation of this sweep.
+
+   *But the re-cut itself is weaker than I expected before checking.*  Applying
+   Ghana's own rule to Ghana's own tier-(a) column yields 2.7% urban against a
+   published share an order of magnitude higher (see the Q2 section).  A
+   population variable in the data is *necessary but not sufficient* for a
+   re-cut: you also need the population to be measured on the same geographic
+   unit the rule is about, and in Ghana's case it is not.  Treat "we can re-cut
+   this country" as a hypothesis requiring per-country validation, not as
+   something that follows from tier (a).
 3. *Catching within-country drift* -- confirmed, twice, and both were new.
    Ghana's threshold oscillation (5,000 -> 1,500 -> 5,000) and Timor-Leste's
    71 -> 60 -> 38 suco reclassification are both #683-class defects that nobody
@@ -548,11 +599,17 @@ false in its naive form*, and the reasons are specific.
 
 Treat the population threshold as *metadata about comparability*, not as a
 harmonisation mechanism.  Concretely: record, per country-wave, (i) the stated
-rule if any, (ii) whether the classification is administrative, and (iii)
-whether a locality-population variable exists in the data and how populated it
-is.  Then a user comparing two cells can be *told* the comparison is unsafe.
-Do not attempt a corpus-wide re-cut; do enable a per-country one where tier (a)
-data exists.
+rule if any *and the census vintage it is measured against*, (ii) whether the
+classification is administrative, and (iii) whether a locality-population
+variable exists in the data, how populated it is, and *what geographic unit it
+measures*.  Then a user comparing two cells can be *told* the comparison is
+unsafe.
+
+*Do not attempt a corpus-wide re-cut.*  Do not even promise a per-country one on
+the strength of tier-(a) data alone -- Ghana has tier-(a) data and the re-cut
+still does not reproduce its own classification.  The defensible deliverable is
+the comparability metadata; a re-cut is a per-country research project on top
+of it.
 
 *On the =capability.py= shape*: yes, it fits, and the fit is close enough to be
 worth saying precisely.  The validation ladder is the right control here for the
