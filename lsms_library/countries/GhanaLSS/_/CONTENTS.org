@@ -1132,11 +1132,19 @@ error.
   =df[df.Region == 'Brong Ahafo']= silently dropped all 170 of that wave's
   clusters.  Corrected in the wave's own table.
 
-** The =SU= -> =Rural= fold: a decision with no survey evidence (2026-08-21)
+** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
 
 Not a trap.  A *decision*, recorded here because the reasoning that was first
 published for it turned out to be false, and the next person to look at this
 will otherwise reconstruct the false version.
+
+The 2026-08-21 version of this section said the survey "offers no evidence
+either way" and carried the settlement-population definition below as an
+unverified second-hand quote.  Both statements were wrong: the definition is
+real and is verbatim in *four* files this repository ships, and it *is*
+evidence bearing on the fold -- see /What the survey says/.  Corrected
+2026-08-22 (GH #690).  The decision itself is unchanged and is not in
+question here.
 
 *What was decided.*  BID Appendix I classifies every GLSS1/GLSS2 cluster three
 ways -- =U=, =R=, =SU= (semi-urban).  =SU= is *52 of 263* Appendix clusters,
@@ -1156,30 +1164,140 @@ from GLSS2's own 7-way =rural= table in
   =Y01C:NRCPL= -- a *non-resident child's* place of residence, GLSS2 Household
   Questionnaire Section 1 Part C, column 13 (GH #692, PR #696).
 
-So GLSS does *not* "already answer the folding question for the middle of its
-ladder".  *The survey offers no evidence either way.*  The fold rests on
-judgement alone.  Do not cite the 7-way table for it.
+So the 7-way =rural= table does *not* "already answer the folding question for
+the middle of its ladder".  Do not cite it for the fold.  (The survey *does*
+have something to say -- just not there.  See the next heading.)
 
-*What the survey DOES say -- and why it still is not evidence.*  GLSS1's
-Sampling Procedure defines the three tiers by *settlement population*:
+*What the survey says.*  GLSS1's own sample design defines the three tiers by
+*settlement population*.  Verbatim, from the joint Basic Information Document
+covering both rounds, §3.1 "Sample Design",
+=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf=,
+PDF page 13, printed page 11:
 
 #+begin_quote
 A final concern was that all three of the country's ecological zones (coastal, forest and savannah), and each of urban, semi-urban and rural areas (population greater than 5000, 1500 to 5000, and less than 1500, respectively) form the same proportion in the sample as they do in the national population.
 #+end_quote
 
-So =SU= is a real, *defined* tier -- settlements of 1,500 to 5,000 people --
-and not a residual or a coding artefact.  But the definition is a *size band*;
-it takes no position whatever on which side of a two-value collapse the band
-belongs to.  It sharpens what is being lost; it does not license the fold.
+The same sentence appears, word for word, in three further files this
+repository ships -- so the numbers are not resting on one transcription:
 
-/Provenance caveat, stated because this file's rules require it./  This quote
-is *second-hand*: it is transcribed from
-=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= (the GH #601 documentation
-sweep), which cites =1987-88/Documentation/GLSS 1987-88 Report.pdf=, "Sampling
-Procedure".  It was *not* re-verified against the PDF here -- that file's text
-layer is a CID-encoded subset font with no ToUnicode map and needs the glyph-map
-decode described in the transcription caveat above.  Re-verify before leaning on
-the exact numbers.
+| File                                                                      | Where                                        | Text layer     |
+|---------------------------------------------------------------------------+----------------------------------------------+----------------|
+| =1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf= | §3.1, PDF p. 13 / printed p. 11              | plain          |
+| =1988-89/Documentation/technical document/GHA_1988_GLSS_Basicinfo_EN.pdf= | §3.1, same text                              | plain          |
+| =1988-89/Documentation/ddi-documentation-english-4.pdf=                   | "Sampling" -> "Sampling Procedure", PDF p. 7 | plain          |
+| =1987-88/Documentation/GLSS 1987-88 Report.pdf=                           | "Sampling Procedure"                         | CID -- decoded |
+
+So =SU= is a real, *defined* tier -- and the fold is being made across a
+boundary the survey drew itself.
+
+*Band boundaries.*  The BID's "1500 to 5000" is inclusive-ambiguous at both
+ends.  The GLSS3 main report sharpens it, =1991-92/Documentation/pdf/G3report.pdf=,
+note to Table 7.3, PDF p. 75 / printed p. 57 (repeated under Table 7.9, printed
+p. 61):
+
+#+begin_quote
+Note:  Small rural localities are those with a 1984 population of less than 1500.  Semi-urban localities are those with a 1984 population of at least 1500 but less than 5000.
+#+end_quote
+
+Read together: rural < 1500 <= semi-urban < 5000 <= urban.  Note the one
+inconsistency, quoted rather than reconciled: the BID says urban is "greater
+than 5000", GLSS3's wording implies urban is *at least* 5000.  The population
+is the *1984 Census* population of the locality, not anything measured by the
+survey.
+
+*What this does and does not settle.*  It is a *size* band, and no
+GLSS1/GLSS2 document says in words "semi-urban is rural".  What it does
+establish is narrower and still useful: *the survey's own urban threshold is
+5,000, and the whole semi-urban band sits below it.*  So =SU= is not
+ambiguous relative to the survey's definition of urban -- it is, by that
+definition, not urban.  That is an argument about the fold's *direction*, and
+a far better one than the withdrawn =Classification= column.  It is not a
+statement that GSS intended =SU= to be reported as rural.
+
+Three further pieces of evidence point the same way.  None is a GLSS1/GLSS2
+sentence saying "semi-urban is rural"; take them for exactly what they are.
+
+- *GLSS1's own report never uses a semi-urban category, and its three
+  locality buckets exhaust the sample.*  =1987-88/Documentation/reports/GHA_1987_GLSS_Firstyear_Report_EN.pdf=
+  (GSS, August 1989) reports throughout by LOCALITY = ACCRA / OTHER URBAN /
+  RURAL / COUNTRY (Table 1, printed p. 6; Figure 3, printed p. 8), and its
+  Method section, printed p. ix, describes the very design quoted above as
+  "Stratification criteria were urban/rural and ecological zones."  Table 1's
+  sample sizes are Accra 1,393, Other Urban 3,956, Rural 10,143 -- summing to
+  *15,492*, which is exactly the BID's GLSS1 individual count.  The
+  semi-urban clusters are therefore inside one of those three, and the report
+  does not say which.
+- *The arithmetic says which.*  This is *inference from published totals*, not
+  a quote.  Urban = 65 clusters (BID Table 1a, below) against 5,349 urban
+  persons is 82 persons per cluster, and rural+SU = 111 clusters against
+  10,143 persons is 91 -- both near the overall 15,492/176 = 88.  Counting SU
+  as urban instead gives 100 clusters at 53 persons and 76 clusters at 133, a
+  2.5x spread that a design of 16/32/48-household workloads cannot produce.
+- *GSS itself performs this exact collapse one round later.*  In the GLSS3
+  main report, Tables 7.3 (printed p. 57) and 7.9 (printed p. 61) nest
+  "Semi-urban" and "Small rural" as the two sub-rows of a *Rural* total,
+  opposite Urban (Accra, Other urban); the prose reads "Within rural areas,
+  incomes were rather higher in semi-urban areas than in small rural areas"
+  (printed p. 61); and printed p. 85 lists "Accra/other urban/rural" and
+  "Accra/other urban/semi-urban/small rural" as alternative breakdowns of one
+  locality axis -- i.e. rural = semi-urban + small rural.  Same statistical
+  office, same 1984-Census thresholds, *different round*: GLSS3's sample is
+  not GLSS1/GLSS2's and its locality variable is not Appendix I's =UrbRur=.
+
+*What was searched, so the negative is falsifiable.*  Searched for any
+statement assigning =SU= to a side of a two-way split: the 1987 BID, the 1988
+BID, the GLSS1 DDI (decoded in full), the GLSS2 DDI, the GLSS3 main report,
+and the GLSS1 First Year Report (its text layer plus rendered pages ix, x, xi,
+6, 8).  In GLSS1/GLSS2 documentation every mention keeps *three* tiers: the
+definition sentence, BID Table 1a (printed p. 13), the =IMPRENT= regression
+dummies "rural, semi-urban, coastal, savannah" (printed p. 22), and the
+master-sample ordering "by region within each location (rural/semi-urban/urban)"
+quoted under /Oversamples and sub-samples/ above.  *Not* searched, and so
+establishing nothing: the bodies of the image-only GLSS1/GLSS2 documents
+beyond the pages named (the First Year Report's text layer is *front matter
+only* -- 9 of 115 pages carry any text; the Preliminary Report has 93
+characters, i.e. none), and the questionnaires, which are image-only.
+
+/Provenance of the quote./  The GH #601 sweep
+(=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=, GhanaLSS 1987-88,
+"Exclusions") was *first-hand*: its extractor decoded
+=1987-88/Documentation/GLSS 1987-88 Report.pdf= itself and recorded the
+method.  Its citation to that file's "Sampling Procedure" section is
+*accurate* -- confirmed here by an independent decode.  Only the copy into
+this file was second-hand, and it is now replaced by the text-layer sources
+above.
+
+/How the CID file was decoded, 2026-08-22, in case it is needed again./  The
+PDF embeds one subset font (=1E1ba2Arial=, 88 glyphs, =Identity-H=, no
+=cmap=, no =post=, no =ToUnicode=), so =pdfminer= emits =(cid:NN)= per glyph
+*but preserves real spaces and newlines*.  That makes it a plain
+monoalphabetic substitution with word boundaries intact.  Solve it by sliding
+long known cribs over the stream and keeping placements consistent with a
+partial bijection; a 60-character crib pins a placement uniquely.  The
+sentence under test was *excluded from the crib set* so that finding it is
+evidence and not assumption.  Two checks that the decode is not echoing its
+cribs: the digit =5= is pinned independently by "August 5, 2008" on the cover
+and by the table-of-contents page sequence 14/15/16; and the decoded GLSS1
+DDI reads "The methodology that was *used* reflects the purpose of the
+survey", where the BID and the GLSS2 DDI both read "that was *chosen*" -- a
+divergence a crib-echo could not produce.
+
+*Corroboration of the wiring (not of the direction).*  BID Table 1a, titled as
+printed "Survey Coverage / Number of Clusters in Household, Community, and
+Price Surveys by Region" -- the "by Region" is a sic; the rows are
+*localities* -- PDF p. 15 / printed p. 13.  Household-survey clusters:
+
+| Round             | Urban | Semi-Urban | Rural | Total |
+|-------------------+-------+------------+-------+-------|
+| Year 1 (1987-88)  |    65 |         35 |    76 |   176 |
+| Year 2 (1988-89)  |    56 |         31 |    83 |   170 |
+
+The delivered fold's cold counts (below: 111 Rural / 65 Urban and 114 Rural /
+56 Urban) reconcile with this *exactly* -- 76+35 = 111, 83+31 = 114, Urban
+unchanged in both rounds.  That is a check on the Appendix I classification
+and on the fold arithmetic.  It is *not* an argument about direction: Table
+1a itself keeps the three tiers.
 
 *What the fold costs, stated plainly.*  The U/R/SU distinction *is lost* in the
 delivered =Rural= column.  It is not recoverable from =sample()= or from
