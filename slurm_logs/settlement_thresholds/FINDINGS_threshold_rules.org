@@ -143,7 +143,7 @@ Kazakhstan and Guyana should be treated as *unexamined*, not as negatives.
 bearing on settlement class -- about 9%.  Only 2 (Ghana, Panama) state a rule
 that actually partitions settlements into the classes the survey then uses.*
 
-That is the deliverable number, and it needs its error bar stated in two
+That is the deliverable number, and its error bar has to be stated in three
 separate pieces, because they are bounded very differently:
 
 - *Among text that was actually read, the count is exactly 4/45.*
