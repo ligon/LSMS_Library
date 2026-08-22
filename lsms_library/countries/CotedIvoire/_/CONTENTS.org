@@ -121,6 +121,116 @@ REL codes (F01A / SEC01A):
 - interview_date: date split across DAY1/MO1/YR1 — YAML path can't construct datetime
   (would need a Python script; not yet implemented)
 - shocks, assets, food_acquired: not attempted yet (complex multi-file modules)
+- community module: *available but NOT wired* — see the next section.
+
+** There IS a community module for all four CILSS waves (found 2026-08-22, GH #704)
+
+=COMM85.DAT= / =COMM86.DAT= / =COMM87.DAT= / =COMM88.DAT= (one per wave, each
+with a =.DCT=).  Nothing in this repository referenced them before 2026-08-22
+and no feature reads them; the =Implementation Status= table above lists only
+=sample=, =cluster_features= and =household_roster= for these waves.  They
+were reachable all along.
+
+*** Why they went unexamined: the same =.DAT=/=.DCT= trap as Ghana's
+
+The =.DCT= declares a fixed-width record (241 variables / 3132 columns for
+1985-86 and 1986-87; 213 / 2768 for 1987-88 and 1988-89).  *The shipped
+=.DAT= is comma-delimited with a header row* — actual line lengths are
+~530-560, not 3132.  A dictionary-driven =read_fwf= therefore returns a
+right-shaped frame of garbage without raising, which is exactly the failure
+=GhanaLSS/_/CONTENTS.org= records for GLSS1/GLSS2 =COMM.DAT=.  The #704
+settlement-threshold sweep filed all four as "Format unsupported" and
+predicted they were "the same shape as Ghana's =COMM.DAT=".  *Confirmed:
+they are.*  =get_dataframe= now detects the layout (GH #704); see the
+=.DAT=/=.DCT= block comment in =lsms_library/local_tools.py=.
+
+Note this does *not* contradict the =Implementation Status= claim that "the
+=.DAT/.DCT= files are readable by =get_dataframe()=".  They were readable —
+the fallback chain reached a bare =pd.read_csv=, which happens to be right
+about the delimiter.  What it got wrong was the =.= missing marker (so
+numeric columns shipped as strings) and, on large files, chunked dtype
+inference (the same code appearing as both =318= and ='318'=).
+
+*** What the four files contain
+
+| wave    | file        | vars | rows | clusters | schema                       |
+|---------+-------------+------+------+----------+------------------------------|
+| 1985-86 | =COMM85.DAT= |  241 |   54 |       54 | =CnnQnn=, 20 sections        |
+| 1986-87 | =COMM86.DAT= |  241 |   57 |       57 | =CnnQnn=, 20 sections        |
+| 1987-88 | =COMM87.DAT= |  213 |   47 |       47 | =SnnQnn=, 5 sections + dates |
+| 1988-89 | =COMM88.DAT= |  213 |   29 |       29 | =SnnQnn=, 5 sections + dates |
+
+One row per cluster, no duplicates.  *The instrument was redesigned between
+1986-87 and 1987-88*: the first two waves use =CLUSTER, C01Q01..C20Q03= with
+per-section repeat keys (=CL2=, =CL3=, ...), the last two use =CLUSTER,
+DAYINT, MOINT, YRINT, SUPID, INTMIN, S01Q01..S05Q24=.  Do not carry a
+variable mapping across that break.
+
+*** The key joins the existing cluster inventory exactly
+
+=CLUSTER= is the same =v= the library already uses.  Every community record
+matches a cluster in the wave's own =WEIGHT8x.DAT= — *54/54, 57/57, 47/47,
+29/29, zero orphans* — so these tables are join-ready against =sample= and
+=cluster_features= with no re-keying.
+
+*** IT IS A RURAL-ONLY INSTRUMENT.  This is the thing to know before using it.
+
+Cross-tabulating community-record coverage against the producer's own
+Urban/Rural definition (quoted verbatim in §1.1 point 3 below: /"Urban -
+Abidjan and Other Cities; Rural - East Forest, West Forest and Savanna"/)
+gives:
+
+| wave    | rural clusters covered | urban clusters covered |
+|---------+------------------------+------------------------|
+| 1985-86 | 53 / 57                | 1 / 43                 |
+| 1986-87 | 57 / 57                | 0 / 43                 |
+| 1987-88 | 46 / 50                | 1 / 50                 |
+| 1988-89 | 28 / 54                | 1 / 46                 |
+
+2 of 182 urban clusters across four waves.  *Any statistic computed from
+these files is a rural statistic*, whatever it is computed on.  In
+particular a settlement-population threshold applied to this module
+classifies only rural clusters and cannot produce a national urban share —
+the Q2 use case that surfaced the files in the first place.
+
+*** A population-shaped column, NOT confirmed to be population
+
+=C02Q01= (1985-86, 1986-87) and =S01Q01= (1987-88, 1988-89) are numeric,
+near-complete (50/54, 57/57, 46/47, 28/29) and distributed like community
+headcounts (medians 1125 / 1700 / 1000 / 750; ranges 85–16,000 / 120–19,000
+/ 100–13,000 / 150–9,000).  On the 25 clusters that appear in both the
+1986-87 and the 1987-88 files, the two *differently named* columns from the
+two *different* instrument designs correlate at r=0.79 (log r=0.77), with
+several exact agreements (4056↔4056, 500↔500).
+
+*That is evidence, and it is not proof.*  C4 — the questionnaire — is
+*unrunnable* here: all twelve CILSS questionnaire PDFs are image-only scans
+with no text layer and no OCR available (see /Where the statements live/
+below).  There is no =.DCT= label layer either: the dictionaries carry
+variable names and nothing else.  The #704 sweep's own hard-won lesson
+applies directly — /"a questionnaire question number is not evidence that
+the shipped variable is what you think it is.  Open the column."/ — and it
+cuts both ways: opening the column is also not evidence of what the
+question asked.  *Do not label these =Population= in any config until the
+instrument is read.*  Acquiring the 1996 CILSS Basic Information Document
+(catalog-hosted, listed in the acquisition queue below) is the cheap fix:
+its variable documentation would settle it.
+
+One methodological caveat on the above, recorded because it weakens the
+argument: the "control" column chosen to show that an arbitrary coded
+variable would *not* track across waves (=C02Q02=) turned out to track
+*more* tightly than the candidate (44/52 exact matches vs 5/49).  So the
+cross-wave correlation shows these two columns are the same quantity as
+each other; it does not by itself show that quantity is a headcount.  The
+magnitudes do the rest of the work, and magnitudes are suggestive, not
+dispositive.
+
+*** Status: reachable, not wired
+
+No feature is wired to these files and none is proposed here.  A
+=cluster_features= enrichment or a community-level table is the obvious
+candidate, gated on the rural-only caveat above and on identifying the
+variables from the instrument.
 
 ** Legacy food_expenditures
 
