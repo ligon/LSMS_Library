@@ -41,17 +41,6 @@ for c, tables in TARGETS.items():
         except Exception as e:
             h = f'ERR {type(e).__name__}: {e}'
         out[f'{c}/{t}'] = h
-    # per-wave input hashes for the first two waves
-    for w in waves[:2]:
-        try:
-            W = C.wave(w) if hasattr(C, 'wave') else None
-        except Exception:
-            W = None
-    # framework imports fingerprint over the country's _/ *.py
-    try:
-        root = C.file_path() if callable(getattr(C, 'file_path', None)) else None
-    except Exception:
-        root = None
 
 print(json.dumps(out, indent=1, sort_keys=True))
 with open(sys.argv[1], 'w') as f:
