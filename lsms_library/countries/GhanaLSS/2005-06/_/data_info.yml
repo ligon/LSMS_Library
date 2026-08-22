@@ -11,14 +11,46 @@ cluster_features:
 
 
 sample:
-    file: parta/sec0.dta
-    idxvars:
-        i: hhid
-    myvars:
-        v: clust
-        weight: weight
-        panel_weight: weight
-        strata: region
+    # GH #659: `Rural` was 100% NULL for all 8,687 households in this wave.
+    # It is not missing from the survey -- `loc2` ("urban/rural-corr") ships in
+    # parta/sec7.dta at EXACTLY this table's grain, carrying its own Stata value
+    # labels {1: urban, 2: rural}.  So no code-guessing is involved; mapping.py's
+    # Rural() just title-cases the decoded label.
+    #
+    # Two decoys, recorded so nobody re-picks them: a name-match finds `loc2` in
+    # three files.  aggregates/pov_gh5.dta has the same 8,687 rows and the same
+    # distribution but NO `hhid` column, so there is nothing to join on; and
+    # parta/sec2a.dta has the column present and 100% NULL across 33,677 rows.
+    # Column presence is not content.
+    #
+    # The merge is provably safe: `hhid` is unique in BOTH frames (8,687/8,687
+    # each) with full overlap and zero orphans either way, so the GH #323 site-4
+    # cartesian condition (key non-unique in both) cannot hold.  `merge_how:
+    # left` keeps sec0 authoritative for which households exist.
+    dfs:
+        - df_cover
+        - df_locality
+    df_cover:
+        file: parta/sec0.dta
+        idxvars:
+            i: hhid
+        myvars:
+            v: clust
+            weight: weight
+            panel_weight: weight
+            strata: region
+    df_locality:
+        file: parta/sec7.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Rural: loc2
+    merge_on:
+        - i
+    merge_how: left
+    final_index:
+        - i
+        - t
 
 interview_date:
     file: parta/sec0.dta
