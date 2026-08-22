@@ -1,0 +1,33 @@
+Country: Peru
+
+Index Info:
+  note: no interview date (int_t), compared with global index info
+  index_info:
+    cluster_features: (t, v)
+    household_roster: (t, v, i, pid)
+    individual_education: (t, v, i, pid)
+    food_acquired: (t, v, visit, i, j, u)
+    interview_date: (t, v, visit, i)
+
+Data Scheme:
+  sample:
+    index: (i, t)
+    v: str
+    Rural: str
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+  household_roster:
+    index: (t, v, i, pid)
+    Sex: str
+    Age: int
+    Relationship: str
+    MonthsAway: float
+  individual_education:
+    index: (t, v, i, pid)
+    Educational Attainment: str
+  interview_date:
+    index: (t, i)
+    Int_t: str
+    Int_m: str

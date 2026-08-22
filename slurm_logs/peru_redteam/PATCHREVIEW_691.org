@@ -1,0 +1,747 @@
+#+title: Independent red-team review of PR #691 (fix/684-peru-functional)
+#+date: 2026-08-21
+
+* Bottom line: FIX-THEN-MERGE
+
+The build is sound and I reproduced every measurement the PR reports, cold, in a
+private cache.  The data work is unusually well evidenced -- more so than the PR
+itself claims in two places, where I was able to /upgrade/ the author's own
+admissions.  Two things should change before merge, both cheap:
+
+1. *=CONTENTS.org= asserts a false negative about the 1990 wave* and prescribes
+   an expensive wrong remedy (re-acquisition) for what is a five-line library
+   gap.  This is the Albania shape and it goes into the repo's durable
+   idiosyncrasy record.  [[#f1][F1]]
+2. *The promised follow-up issue for =Otro Pariente= was never filed* -- and it
+   is a stronger issue than the PR realised.  The enumerator's manual, shipped
+   in this repository, defines code 7 as "hermano, tío, primo, consuegro,
+   bisnieto, abuelo, cuñado, bisabuelo, sobrino".  The tuple assigned to those
+   884 people is refuted by the survey's own documentation, not merely
+   uninformative.  [[#n1][N1]]
+
+Everything else is either verified correct or a note for the record.
+
+I was able to decode the three ENNIV PDFs (they are LZW-compressed text, which
+is why every reader in this environment failed on them).  *Every documentary
+transcription in the PR that I could locate is verbatim accurate* -- the
+=(SEGMENTO, VIVIENDA, HOGAR)= widths, the =HOGAR= fraction, Recuadro A/B, the
+membership rule, the 3,544/820/1380/1344 design figures, the PARENTESCO labels,
+and the nine-code =LENGUA= list.  That is worth stating plainly: the evidence in
+this PR is real, and I checked it rather than taking it on trust.  One thing I
+initially flagged as an internal citation conflict (Pregunta 8 vs 9) I have
+withdrawn -- both citations are right.
+
+*Provenance convention*: "MEASURED" = I ran it and quote the output.  I keep
+"I proved this is wrong" and "I could not verify this" in separate sections.
+
+* Environment (so the numbers can be re-run)
+
+#+begin_example
+worktree      .claude/worktrees/agent-aaceca2f61b886c2b, detached at 720ab52d (PR head)
+base          /global/scratch/fsa/fc_jevons/ligon/tmp/peru_rt/base, detached at 5290f25c (merge-base = development)
+python        /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+PYTHONPATH    <worktree>            (asserted: lsms_library.__file__ contains 'worktrees')
+LSMS_DATA_DIR /global/scratch/fsa/fc_jevons/ligon/tmp/peru_patchreview_cache
+              -- created empty; only `dvc-cache` symlinked to the shared L1 blob store.
+              Every Peru number below is therefore from a GENUINELY COLD build.
+#+end_example
+
+No =dvc= CLI was invoked.  No lock file was touched.  Nothing was pushed.
+
+* Mandatory first step: =Peru/_/CONTENTS.org=, before and after
+
+Read on =development= (=git show 5290f25c:...=) and at PR head.  The pre-PR file
+is 602 lines and is /entirely/ about the declared sampling universe of the four
+ENNIV rounds (GH #601).  Two pre-existing idiosyncrasies bear on this review,
+quoted verbatim:
+
+#+begin_quote
+(=_/data_info.yml= labels the first wave =1985-1986= while the directory is
+=1985/=; the survey ran twelve months from late 1985 into 1986.)
+#+end_quote
+
+#+begin_quote
+Read the 1985 and 1990 entries before pooling ENNIV rounds.  Two of the four
+waves do *not* declare a national universe: 1985 subtracts three departments and
+1990 is Lima-only.
+#+end_quote
+
+Both are respected by the PR: it drops the =Waves:= key precisely because
+='1985-1986'= named a directory that does not exist, and it wires only 1994.
+*The pre-PR file contains no build-path note and nothing at all about the
+=data_info.yml= / =data_scheme.yml= misfiling* -- consistent with #684's claim
+that the config had never executed.  Nothing in the PR contradicts the
+pre-existing file.
+
+The PR adds 360 lines.  I checked its added claims individually; results below.
+
+* PROVED WRONG
+:PROPERTIES:
+:CUSTOM_ID: proved-wrong
+:END:
+
+** F1 [HIGH] -- Peru 1990 is NOT SPSS/PC+ and is NOT unreadable
+:PROPERTIES:
+:CUSTOM_ID: f1
+:END:
+
+The PR writes into =CONTENTS.org=:
+
+#+begin_quote
+Every data file in =1990/Data/= is =.SSP= (...).  That is the SPSS/PC+
+system-file format; =get_dataframe()= handles =.dta= / =.csv= / =.parquet= only,
+and =pyreadstat= does not read =.SSP= either.  *This is an acquisition /
+conversion blocker, not a config gap*: no amount of YAML makes this wave
+readable.  Either a Stata/SPSS conversion has to be produced and pushed, or the
+wave has to be re-acquired in a readable format.
+#+end_quote
+
+Three assertions, all false.  MEASURED
+(=/global/scratch/fsa/fc_jevons/ligon/tmp/peru_rt/ssp.py=):
+
+#+begin_example
+--- N00A.SSP  blob=.../dvc-cache/a7/e26161b090c1484559af3691ef85a8
+   magic[0:80]  : b'HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!0000000000...'
+   magic[80:160]: b'SAS     SAS     SASLIB  6.06    World          09JUL92:16:50:38'
+   read_sav         FAIL ReadstatError: Invalid file, or file has unsupported features
+   read_xport       OK shape=(1528, 10)
+   read_sas7bdat    FAIL ReadstatError
+   read_xport(.xpt) OK shape=(1528, 10) cols=['CID','HID','ZONE','CONGLOM','SEGMENT','HHNO','NH1','NH2','DAYI','MOI']
+   pd.read_sas(xport) OK shape=(1528, 10)
+--- EXPEND.SSP  ... SASLIB  6.07    VM/ESA   19JUL93
+   read_xport OK shape=(1509, 5) cols=['HID','HHSIZE','PCFDEXP','WT','TOTPCX']
+--- PANEL.SSP  ... SASLIB  6.07    VM/ESA   19JUL93
+   read_xport OK shape=(3326, 4) cols=['HID','PID85','PID90','HHID']
+get_dataframe FAIL ReadstatError Invalid file, or file has unsupported features
+#+end_example
+
+1. The format is *SAS Transport (XPORT) V5*, written by SAS 6.06/6.07 in
+   1992-93.  Not SPSS/PC+.
+2. =pyreadstat= *does* read them -- =pyreadstat.read_xport= succeeds.  Note I
+   read the *bare DVC blob path*, which has no extension at all: contrary to the
+   blind agent's report, no =.xpt= rename is required.  =pandas.read_sas(...,
+   format='xport')= also works.
+3. It is therefore a *library* gap in =local_tools.read_file=, not an
+   acquisition blocker.  The data is on disk today.
+
+Why this matters more than a wrong format name: the sentence prescribes
+"re-acquire the wave" -- real money and months -- for something a branch in the
+existing fallback chain unlocks, and it does so in the file this repo treats as
+the authoritative record of a country's idiosyncrasies.  =CLAUDE.md= is explicit
+that an unevidenced negative in that position is the worst failure mode
+available ("Never write an unevidenced 'no module here' claim, in a verdict file
+or in a YAML comment").
+
+Bonus, from the same run: =EXPEND.SSP= carries a =WT= column -- as far as I can
+see the *only real sampling weight anywhere in the Peru series* (=_weight_= in
+every 1994 file is =int8= and identically 1; MEASURED on REG36).
+
+The coordinator has already posted this to #691 (comment =5377908847=); this
+section is my independent confirmation plus the two additions above.
+
+** F2 [LOW-MED] -- the new =v=-padding entry overstates its own scope by ~5x
+
+The PR's newly added =CONTENTS.org= section says:
+
+#+begin_quote
+A naive join of a cluster attribute onto households by splitting =i= fails for
+every segmento below 100 -- i.e. *for most of the file*, silently, as an empty
+match rather than an error.
+#+end_quote
+
+The non-join itself is real and I reproduce it.  "Most of the file" is not.
+MEASURED (=measure.py=, on the cold-built tables):
+
+#+begin_example
+distinct segments in i          : 364
+distinct v in cluster_features  : 364
+segments in i that MATCH a v    : 304
+segments in i that DO NOT match : 60 (16.5% of segments)
+PEOPLE in non-joining segments  : 3862 (20.0% of the 19,285 roster rows)
+HOUSEHOLDS in non-joining segs  : 720 (19.9% of 3623 households)
+#+end_example
+
+One fifth, not "most".  Everything else in that entry -- that =v= is ='1'= while
+=i= is ='001-01-11'=, that they do not join, that it is inert today because Peru
+has no =sample=, and that it goes live silently the moment =sample= is wired --
+is true and correctly flagged.  I agree with the author that this should *not*
+block: it is a documented trap on a table that does not exist yet.  Fix the
+sentence.
+
+* SOURCE VERIFICATION: I read the PDFs, and the PR's transcriptions are exact
+
+This started as my largest could-not-verify.  The environment has no PDF tooling
+(no poppler/=pdftotext=, no pdfplumber/pypdf/pymupdf; the Read tool needs
+=pdftoppm=), but the three documents are text PDFs whose content streams use
+=/Filter /LZWDecode=.  I wrote a PDF-LZW decoder
+(=/global/scratch/fsa/fc_jevons/ligon/tmp/peru_rt/lzw.py=) and extracted all
+three: =dicciona.pdf= (88 streams, 195,303 chars), =pe94hhq1.pdf= (64 streams,
+129,880), =m-encues.pdf= (95 streams, 178,997).
+
+*Every documentary claim in the PR that I could locate checks out verbatim.*
+This is a substantial positive result; the PR's evidence is real, not decorative.
+
+** =dicciona.pdf=
+
+#+begin_example
+SEGMENTO N 3-5 3 VIVIENDA N 6-7 2 VIVI 01:12
+HOGAR N 8-9 2 HOGAR01 11:15 HOGAR02 22:25 HOGAR03 33:35 HOGAR04 44:45
+B00-ORDEN N 10-11 2 ORDEN 01:15   B01-PARENTESCO N 12 1 PARENTESCO 0:9
+B02-SEXO N 13 1 SEXO 1:2          B03-ANOS N 14-15 2 AGNO 00:99
+B04D-DIA N 16-17 2 DIA 01:31 99   B04M-MES N 18-19 2 MES 01:12 99
+B04A-ANO N 20-21 2 AGNO 01:94 99
+B06-LENGUA N 23 1 CASTELLANO 1 QUECHUA 2 AYMARA 3 CAMPA 4 SHIPIBO 5
+                  OTRO-NATIVO 6 INGLES 7 OTRO-EXTRANJERO 8 NO-HABLA 9
+B08-AUSENTE N 26-27 2 AUSENTE 00:12 | [page break] 99 | B09-MIEMBRO N 28 1 SI 1 NO 2
+AK01-COD-PRODUCT N 11-13 3 ARROZ 301 ... OTROS 330            (30 codes)
+AK02-COMO-OBTUVO N 14 1 COMPRA 1 AUTOSUMINISTRO 2 AUTOCONSUMO 3 AMBOS 4
+AK03E-TOTA-ENTER N 15-19 5 MONTO 00000:01000   AK03D-TOTA-DECIM N 20-21 2 00:99
+#+end_example
+
+- The COMMON-block field widths (3/2/2) are exactly the PR's =_I_WIDTHS=.
+- =B01-PARENTESCO= really does carry *only* the range =0:9=, no labels -- as the
+  PR says, forcing the labels to come from the questionnaire.
+- =B03-ANOS= really is a plain =00:99= range while B04D/B04M/B04A each print a
+  separate standalone =99=.  The PR's "this is a READING of the source, not a
+  statement in it" is precisely calibrated.  (The empirical half also holds:
+  MEASURED, Age >= 90 after the sentinel is removed is
+  =90:12, 91:4, 92:7, 94:1, 96:1, 97:1, 98:2=, then six at 99 -- a spike.)
+- =B08-AUSENTE=: the separate =99= is there, but it sits across a page break, at
+  the head of the continuation list before =B09-MIEMBRO=.  The same layout
+  recurs (=B10-MADRE-VIVE ... 01:15 99=), so the PR's reading is right; the word
+  "unambiguous" is slightly generous.
+- *=B06-LENGUA= has nine codes, exactly the list the PR prints in prose* -- so
+  the shipped seven-row =LENGUA= table is confirmed WRONG *from source*, not
+  merely asserted.  See N3.
+- The ALIMB record confirms *no quantity, no unit, no price* -- and note that
+  the declared amount range is =00000:01000=, which makes the observed
+  =ak03= max of 99999.99 far out of range.  See N4.
+- Bonus, stronger than the PR's own argument: =HOGAR01 11:15 / HOGAR02 22:25 /
+  HOGAR03 33:35 / HOGAR04 44:45= is the *fraction* structure stated by the data
+  dictionary itself.  The PR justifies that reading from the manual; the
+  dictionary alone settles it.
+
+** =pe94hhq1.pdf= -- the PARENTESCO column, verbatim
+
+#+begin_example
+CONYUGE (ESPOSO, CONVIVIENTE, COMPANERO) ... 2   HIJO ... 3
+YERNO/NUERA ... 4   NIETO(A) ... 5   PADRE/SUEGRO ... 6   OTRO PARIENTE ... 7
+TRABAJADOR DOMESTICO ... 8   PENSIONISTA ... 9
+SEXO: HOMBRE ... 1   MUJER ..... 2
+listing order: A) JEFE DE HOGAR  B) CONYUGE  C) HIJOS SOLTEROS, DE MAYOR A MENOR
+  D) HIJOS CASADOS, CON SUS CONYUGES E HIJOS  E) OTROS PARIENTES
+  F) PERSONAS NO PARIENTES (PENSIONISTAS, TRABAJADORES DEL HOGAR, ETC.)
+  G) PERSONAS NO PRESENTES PERO QUE VIVEN HABITUALMENTE ...
+#+end_example
+
+Matches the PR's transcription exactly, and matches the =Relationship= table
+(which is unchanged from =development=).  It also confirms the cédula listing
+order the pid repair relies on.  *And it confirms there is no =HERMANO= code* --
+see N1.
+
+** =m-encues.pdf=
+
+Recuadro A / Recuadro B, the =Hogar Nº= fraction rule, the membership rule and
+the infant-counting convention are all reproduced *word for word* in the PR.  So
+is the design figure: "La ENNIV 1994 será efectuada en *3,544 viviendas* en todo
+el País.  La muestra incluye: *820* viviendas en Lima Metropolitana, *1380*
+viviendas en el área urbana y *1344* viviendas en el área rural."
+
+** One thing I flagged and must now withdraw
+
+I suspected a citation conflict -- the wave YAML cites B08 as "Pregunta Nº 8"
+while =CONTENTS.org= quotes the membership rule under "Pregunta Nº 9".  *Both
+are correct.*  Pregunta 8 is the months-absent question; Pregunta 9 is the
+member/non-member classification, which reads off the answer to 8.  The "en la
+pregunta 9" inside the quoted passage is a typo *in the manual itself*, and the
+PR reproduced it verbatim rather than silently correcting it -- which is the
+right thing to do with a quotation.  No defect.
+
+** Still unverified
+
+Nothing material.  I did not attempt =cenpob94.pdf= or =COD_BENS.pdf=; no claim
+under review depends on them.
+
+* VERIFIED -- the claims under test, and how they held up
+
+** Claim 3 (cold rebuild): VERIFIED, exactly
+
+Built in a private, empty =LSMS_DATA_DIR= (only the L1 blob store symlinked in).
+MEASURED (=cold_build.py=):
+
+#+begin_example
+DATA_ROOT: /global/scratch/fsa/fc_jevons/ligon/tmp/peru_patchreview_cache
+WAVES: ['1985', '1990', '1991', '1994']
+cluster_features           OK (364, 2)     idx ['t','v']        unique=True
+household_roster           OK (19285, 7)   idx ['i','t','pid']  unique=True
+household_characteristics  OK (3621, 15)   idx ['t','i']        unique=True
+GRAIN REPORTS: 0
+WARN[RuntimeWarning]: Peru 1994 household_roster: restored B00-ORDEN ... 1994/081-02-11 (3->2)
+#+end_example
+
+Region 25 labels / 0 null; Rural {Urban 253, Rural 111}; Sex {F 9883, M 9402};
+Age 0-98 with 6 null; MonthsAway 0-12 with 3 null; Generation/Distance/Affinity
+0 null.  Every figure in the PR table matches.  The repair warning fires exactly
+once, for exactly the documented household.  *No divergence.*
+
+** Grain-strict pass (brief-mandated): CLEAN
+
+=LSMS_GRAIN_STRICT=1 LSMS_NO_CACHE=1= -- Peru is YAML-path, so =NO_CACHE= is not
+soft here.  All three tables build, indexes unique, =grain_reports: 0=, no
+=GrainCollapseError=.  (=strict.py= / =strict.log=.)
+
+** =segmento 634=: GENUINELY FIXED, not merely unreported
+
+This was the highest-value check and the PR passes it.  MEASURED (=seg634.py=)
+on raw REG01:
+
+#+begin_example
+a01: 7 segmentos disagree -> [106, 120, 125, 165, 177, 620, 628]
+a06: 10 segmentos disagree -> [4, 13, 45, 62, 476, 524, 624, 634, 637, 658]
+
+segmento 634: a06 counts {'1': 11, '2': 1}
+  first() would give a06 = 2      <- Rural, WRONG (this is the Kazakhstan shape)
+  mode()  would give a06 = 1      <- Urban
+  PR build returns: ('Loreto', 'Urban')
+#+end_example
+
+All 17 conflicting segments resolve to their majority in the PR build.  The MODE
+hook changes the *answer*, it does not merely suppress the warning.
+
+** Claim 4a (=kinship.yml=): SAFE, and proven so rather than argued
+
+*Purely additive at the YAML level.*  MEASURED (=blast.py=): base 483 keys, PR
+492.  =ADDED= = the nine Peru labels.  =REMOVED= = none.  =CHANGED= = none.
+=Otro Pariente= is pre-existing and untouched.  No duplicate top-level key is
+introduced (the 13 pre-existing duplicates are unchanged).
+
+*Zero cross-country blast radius.*  I swept every cached country-level
+=household_roster.parquet= in the shared warm cache -- 33 countries.  Cached
+parquets store the PRE-finalize =Relationship= strings, i.e. exactly the input
+=_expand_kinship= sees.  Title-cased label sets intersected with the nine new
+keys:
+
+#+begin_example
+=== COLLISIONS with the 9 new keys, outside Peru ===
+{'Peru': [...]}          # i.e. NONE outside Peru
+countries scanned: 33
+#+end_example
+
+*No existing country's decomposition changes.*  Proven, not assumed.
+
+*All nine tuples match corpus precedent.*  MEASURED (=kincheck.py=), each new
+key against pre-existing entries for the same semantic category:
+
+| new key                | tuple                    | precedent                                            |
+|------------------------+--------------------------+------------------------------------------------------|
+| =Jefe=                 | =[0, 0, consanguineal]=  | = Head, Head Of Household, Chef De Menage            |
+| =Conyuge=              | =[0, 0, affinal]=        | = Spouse, Wife, Husband, Epoux/Epouse                |
+| =Hijo/A=               | =[-1, 0, consanguineal]= | = Son, Daughter, Son/Daughter, Child, Fils/Fille     |
+| =Yerno/Nuera=          | =[-1, 0, affinal]=       | = Son/Daughter-In-Law, Son-In-Law, Daughter-In-Law   |
+| =Nieto/A=              | =[-2, 0, consanguineal]= | = Grandchild, Grandson, Nieto (A)                    |
+| =Padre/Suegro=         | =[1, 0, consanguineal]=  | = Father/Mother/T-In-Law/M-In-Law (conflated); the corpus files pure =Father/Mother-In-Law= as =[1,0,affinal]= |
+| =Trabajador Domestico= | =[0, 0, servant]=        | = Empleada Domestica, Servant, House Help            |
+| =Pensionista=          | =[0, 0, guest]=          | = Pensionista - Huesped, Lodger, Boarder, Tenant     |
+| =Persona No Pariente=  | =[0, 0, unrelated]=      | = Other Not Related, Not Related, Other Non-Relative |
+
+Eight are exact matches with no conflict.  The ninth, =Padre/Suegro=, conflates
+parent and parent-in-law in the *instrument*; the PR files it as the corpus's
+only existing conflated precedent does (Guyana's
+=Father/Mother/T-In-Law/M-In-Law=) and says so in a comment.  Defensible; the
+=Affinity= is wrong for the in-law subset of 279 people, but no tuple is right
+for a code that conflates two affinities, and the alternative (=affinal=) would
+be wrong for the larger subset.
+
+=tests/test_schema_consistency.py= + =tests/test_currency.py= at PR head:
+*318 passed, 0 failed*, 427 s.
+
+On "run the kinship tests": *there is no dedicated kinship test file* --
+=ls tests/ | grep -iE 'kin|relation'= returns nothing.  Kinship is exercised
+indirectly by =test_table_structure=, =test_feature=, =test_categorical_merge=
+and the schema suite (which checks the *declaration* of
+Generation/Distance/Affinity, and passes for Peru).  Recording that explicitly
+rather than leaving the brief item silent.  The substantive check -- does this
+edit change any other country? -- I ran directly, above, and it does not.
+
+** Claim 4b (Currency): mechanism REQUIRED, dates CORRECT
+
+The "required by the rename" argument is exact.  =catalog._country_dirs=
+(=catalog.py:22-35=) admits a directory only if =_/data_scheme.yml= exists, and
+=test_every_country_has_currency= is =@pytest.mark.parametrize("country",
+_country_dirs())=.  So Peru becomes visible to that test only on the rename, and
+=currency_for('Peru')= would return =pd.NA= without the entry.  Not incidental.
+
+Dates check out against an external source: the inti (ISO 4217 *PEI*) replaced
+the sol de oro on *1 February 1985*; the nuevo sol (*PEN*) replaced it on
+*1 July 1991* at 1,000,000:1.  Against the fieldwork months: ENNIV 85-86 (late
+1985 into 1986) and ENNIV 90 (June 1990) are inti -> PEI overrides, correct;
+ENNIV 91 (Sep-Nov 1991) and ENNIV 94 (May-Aug 1994) are post-reform -> PEN
+default, correct.  The PR's own note that "no Peru wave currently extracts a
+monetary column at all" is true.
+
+** Claim 5 (pre-existing CotedIvoire failures): VERIFIED on an unmodified base
+
+Ran on my own scratch checkout of the merge-base =5290f25c=, PR code nowhere in
+=sys.path=:
+
+#+begin_example
+$ PYTHONPATH=<base> pytest tests/test_table_structure.py -q -p no:randomly -k CotedIvoire
+FAILED ...::TestTableStructure::test_declared_columns_present[CotedIvoire/cluster_features]
+FAILED ...::TestFeatureSanity::test_feature_is_sane[CotedIvoire/cluster_features]
+  -> CotedIvoire/cluster_features failed sanity checks: Missing: ['Latitude', 'Longitude']
+2 failed, 102 passed, 2190 deselected
+#+end_example
+
+Exactly the two the PR names, exactly the reported cause, on code that does not
+contain the PR.  *Pre-existing (GH #592) -- confirmed independently.*  I did not
+re-run the full 2,575; I verified the load-bearing part and spot-ran the new
+guard + currency suite at PR head instead (318/318).
+
+** Claim 6 (=Age: int -> float=): CORRECT
+
+Canonical =lsms_library/data_info.yml=, =Columns > household_roster > Age=:
+=type: float, required: true=.  The old country file said =int=; the PR matches
+canonical.  Downstream is unaffected in practice for Peru -- =age_handler='s
+fractional-DOB path needs a DOB, and Peru extracts none (=b04a= exists but is
+not wired), so every Age is a whole number.  The built column comes back
+=Float64= with =min 0 / max 98 / 6 null=.
+
+** Claim 7 (the new guard): CORRECT, honest scope, no false positive
+
+MEASURED (=guard.py=) at PR head:
+
+#+begin_example
+country-level _/data_info.yml offenders : []                      # guard #1 passes
+ALL_SCHEME_PATHS                        : 37 countries            # guard #2 parametrization
+country dirs WITH a _/ but NO data_scheme.yml : ['Afghanistan']   # the only one
+unconfigured_countries() : Afghanistan, Bosnia-Herzegovina, Brazil, Bulgaria,
+                           KenyaLPS, Kyrgyz Republic, Nicaragua, Rwanda, Tanzania_Kegera
+Peru in unconfigured? False       # left the list, as intended
+Afghanistan in unconfigured? True
+#+end_example
+
+=ALL_SCHEME_PATHS= globs =*/_/data_scheme.yml=, so Afghanistan is not
+parametrized and guard #2 structurally cannot see it; guard #1 only globs
+country-level =data_info.yml=, which Afghanistan does not have.  *The PR's own
+note is accurate.*  And the omission is defensible rather than a hole:
+Afghanistan is *not invisible* -- =coverage_matrix.unconfigured_countries()=
+already names it.  Peru's problem was specifically that it had a config that
+looked complete and was never read; Afghanistan has no config at all and is
+reported as such.
+
+One correction to the PR's framing while I am here.  It says
+=unconfigured_countries()= "missed this because Peru's config was not missing,
+it was misfiled."  It did not miss Peru -- its docstring names Peru explicitly
+among ten unconfigured countries.  What it could not distinguish is *unstarted*
+from *finished-but-misfiled*.  That is a real and interesting distinction; the
+sentence just overstates it.
+
+** Claim 2 (six tables raise; "declared -> absent -> work queue"): VERIFIED, on two legs
+
+*Leg 1 -- the grading mechanism.*  Read =coverage_matrix.grade_feature=.  The
+build error can only become =broken= for a wave where =covered[w]= is true, and
+=covered[w] = feature in wave_available_features(co[w])= -- i.e. what the *wave*
+declares.  No Peru wave declares any of the six, so every cell is graded via
+=_absent_tier= -> =absent=, detail ="source not declared for wave"=.  The
+=RuntimeError= never reaches the tier.
+
+*Leg 2 -- the precedents are the same kind.*  MEASURED on
+=.coder/coverage/latest.csv=: 21 =(country, feature)= pairs where every wave is
+=absent=, and the list is exactly the PR's:
+
+#+begin_example
+Ethiopia/nutrition, EthiopiaRHS/{community_prices,updated_ids}, Guyana/assets,
+Nepal x9, Nigeria x6, Uganda/{income,nutrition}          -> 21
+detail for 455 of 456 absent rows: "source not declared for wave"
+Peru rows in latest.csv: 0        # #684's premise, confirmed
+#+end_example
+
+Spot-checked the shape: =Guyana/_/data_scheme.yml= declares =assets= and no
+Guyana wave declares it -- identical to Peru.
+
+*Leg 3 -- and this is where I disagree with the objection raised mid-review.*
+The concern was that Peru's declarations are unedited Nepal-template residue, so
+they are fictional gaps rather than a work queue.  That is *true of
+=development= and false of this PR*.  MEASURED, the two files side by side:
+
+| | Nepal =_/data_scheme.yml= | Peru PRE-PR | Peru AT PR HEAD |
+|---+---+---+---|
+| top-level keys | Country, Data Scheme, Index Info, Waves, data_available, wave_folder_map | Country, Waves, Index Info, Data Scheme | *Country, Data Scheme* |
+| =household_roster= | =(t, i, pid)= | =(t, v, i, pid)= | =(t, i, pid)= |
+| =food_acquired= | =(t, visit, i, j, u)= | =(t, v, visit, i, j, u)= | =(t, i, j, s)= |
+| =interview_date= | =(t, visit, i)= | =(t, v, visit, i)= | =(t, i, visit)= |
+
+The PR deletes =Waves:= and =Index Info:= outright, strips =v= from every
+household-grain index, drops =Price= and =Produced=, adds =Expenditure=, and
+makes =Quantity= optional.  Whatever the pre-PR file was, the post-PR file is
+not it.  The blind agent's T9 ("the declared =food_acquired= is unsatisfiable")
+is a finding *about the file this PR deletes*.
+
+And I checked satisfiability directly rather than inferring it
+(=satisfiable.py=).  All three declared-but-unwired tables name real, present
+1994 columns:
+
+#+begin_example
+food_acquired        REG36.DTA 30,681 rows; ak01 = 30 codes 301..330 (j),
+                     ak02 = 4 codes 1..4 (s), ak03 = soles (Expenditure).
+                     87 duplicate (i,j,s) tuples -- absorbed losslessly by
+                     food_acquired's additive SUM path.
+individual_education REG05.DTA 15,942 rows; e00 (pid), e05a 1..7, e05b 0..8.
+                     26 duplicate (i,pid) tuples -- NOT additive; see N4.
+interview_date       REG01 a17 (34 values) + a18 (5:3, 6:1617, 7:1755, 8:248);
+                     0 nulls -> assemblable for 3,623 of 3,623 households.
+#+end_example
+
+These are a work queue.  I do not think the "fictional gaps" objection survives.
+
+** Region labels: I can UPGRADE the author's own admission
+
+The PR says the department list is "not provable from anything shipped" and that
+"a swap between two departments similar in size, urbanisation and Selva status
+would survive all four checks."  That is honest but pessimistic, and the two
+halves of the problem are pinned by different evidence:
+
+- *The rule and the endpoints* are external.  The list it ships is exactly the
+  INEI /ubigeo/ departmental ordering -- Peru's 24 departments plus the
+  Constitutional Province of Callao, numbered 01..25 in Spanish alphabetical
+  order, 01 Amazonas through 25 Ucayali.  That is documented independently of
+  this repository.  A pairwise swap would have to break alphabetical order,
+  which is visible on inspection of the table.
+- *The middle* is pinned by the author's own check 1: Callao lands at 07 and is
+  85/85 urban, which is only true if the offset is right.
+
+Together those close most of the stated residual.  Worth softening the
+admission -- an under-claim in a =CONTENTS.org= costs the next reader work just
+as an over-claim does.
+
+** Repo-specific traps (brief-mandated sweep)
+
+| trap | result |
+|---+---|
+| =GrainCollapseWarning= / =LSMS_GRAIN_STRICT=1= | clean; =grain_reports: 0= under strict + no-cache |
+| duplicate keys on a declared index | none: all three tables =index.is_unique == True= |
+| NaN in a declared index level | none |
+| =dfs:= cartesian merge | *not applicable* -- Peru declares no =dfs:= block; one file per table |
+| =format_id= on =idxvars= not =myvars= | not exposed: Peru's myvars are Sex/Age/Relationship/MonthsAway/Region/Rural, no id-like column.  Region/Rural come back as label strings, not floats |
+| categorical columns from =.dta= | =get_dataframe= returns =a01=/=a06= as =str=; the hook coerces via =pd.to_numeric(...).astype('Int64')= before the decode -- correct, and it is the fix for T2 |
+| =attrs['id_converted']= across =set_index= | handled: =_repair_duplicate_pids= does =out.attrs = dict(df.attrs)= after its =set_index=.  Peru has no =panel_ids=, so nothing to double-apply anyway |
+| pandas 3.0 | no =inplace=, uses =pd.NA=, =pd.notna=, =.astype('Int64')=; nothing flagged |
+| dead table-level =mappings:= key (blind agent T2b) | *gone in this PR*: =grep '^    mappings:'= over =countries/= returns nothing corpus-wide |
+| T5 spurious "SILENTLY NARROWED" | *gone*: =v= removed from the household-grain indexes |
+| T11 false header in =categorical_mapping.org= | *fixed*: the PR deletes both "verified against 1994 frequency distributions" and "Codes are consistent across waves"; see N3 for what remains |
+
+* NEW FINDINGS the PR does not raise
+
+** N1 [MED] -- =Distance= is identically 0, and the promised issue was never filed
+:PROPERTIES:
+:CUSTOM_ID: n1
+:END:
+
+MEASURED, on the cold build:
+
+#+begin_example
+Generation  nulls=0  nunique=4  [-2, -1, 0, 1]
+Distance    nulls=0  nunique=1  [0]              <- constant across all 19,285 people
+Affinity    nulls=0  nunique=5  [affinal, consanguineal, guest, servant, unrelated]
+
+Relationship: Hijo/a 9594, Jefe 3624, Conyuge 2831, Nieto/a 1456,
+              Otro pariente 884, Yerno/Nuera 395, Padre/Suegro 279,
+              Trabajador domestico 134, Persona no pariente 71, Pensionista 17
+#+end_example
+
+*Half of this is the instrument, not the mapping.*  ENNIV's B01-PARENTESCO has
+ten codes and -- verified against the questionnaire above -- *none of them is a
+sibling or a cousin*.  Peru's =Distance= would therefore be degenerate under any
+mapping, so a constant column is not by itself the mapping's fault.  For
+context, MEASURED across the 33 countries with a cached roster: Peru is one of
+only three whose recomputed =Distance= is =[0]= (with GhanaSPS and
+Serbia-and-Montenegro); the other 30 span ={0,1}= or ={0,1,2}=.
+
+*The other half is the mapping's fault, and the survey's own manual proves it.*
+=m-encues.pdf=, "Pregunta Nº 1: Parentesco o relación con el jefe", verbatim
+(decoded from the shipped PDF; accents as printed):
+
+#+begin_quote
+Otro pariente (código 7) comprende a los parientes consanguíneos y de
+matrimonio con el jefe: hermano, tío, primo, consuegro, bisnieto, abuelo,
+cuñado, bisabuelo, sobrino.
+#+end_quote
+
+Translation (mine, not source text): code 7 comprises the head's *blood and
+marriage* relatives -- brother, uncle, cousin, co-parent-in-law,
+great-grandchild, grandfather, brother-in-law, great-grandfather, nephew.
+
+That single sentence spans *Generation -3 to +3*, *Distance 0 to 2*, and *both
+affinities*.  =Otro Pariente -> [0, 0, consanguineal]= -- same generation,
+lineal, blood, i.e. Kroeber's cell for ego itself -- is not merely uninformative
+for those 884 people (4.58% of the roster, in 474 of 3,623 households).  It is a
+*single tuple contradicted by a document this repository ships*, and the
+document is the same manual the PR quotes twice elsewhere.
+
+So the honest reading is not "0-null proves the mapping works".  It is: the
+mapping produced a non-null value for 884 people by asserting something the
+source denies.  =Distance= is the most visible symptom, but =Generation= is
+equally wrong for the =abuelo= / =bisabuelo= / =bisnieto= members and
+=Affinity= for the =cuñado= / =consuegro= members.
+
+And honestly-missing *is* expressible.  =_expand_kinship._component= is
+=lambda x: x[i] if isinstance(x, (list, tuple)) else pd.NA=, and the components
+are built with =pd.array(..., dtype=Int64Dtype())=, so a =null= in a tuple slot
+propagates to =pd.NA= cleanly.  No entry in =kinship.yml= uses one today.
+
+And honestly-missing *is* expressible.  =_expand_kinship._component= is
+=lambda x: x[i] if isinstance(x, (list, tuple)) else pd.NA=, and the components
+are built with =pd.array(..., dtype=Int64Dtype())=, so a =null= in a tuple slot
+propagates to =pd.NA= cleanly.  No entry in =kinship.yml= uses one today.
+
+*I still would not block on the tuple itself.*  =Otro Pariente= is pre-existing
+(Guatemala), =[0,0,consanguineal]= is the corpus's dominant filing for "other
+relative" (12 entries), and Peru's raw label title-cases straight onto
+Guatemala's key, so changing it changes another country.  The PR is right that
+the edit does not belong here.
+
+*I do press on the bookkeeping, and now on the evidence.*  The PR says the tuple
+is "flagged for its own issue".  The only flag is a bullet in the PR
+description.  MEASURED: =gh issue list --state all --search "Otro Pariente"=
+returns one hit, closed #28 (unrelated).  *Nothing is filed.*  A deferral with
+no issue is a deletion -- and this one now has a source quotation behind it that
+turns it from a matter of convention into a documented contradiction.
+
+Two cheap asks, neither blocking the merge:
+
+1. File the issue, *with the Pregunta Nº 1 quotation above*.  Without it the
+   next reader sees a stylistic preference; with it they see a claim the survey
+   manual refutes.  The issue should also cover the fact that the canonical file
+   is already self-inconsistent on this exact concept -- ="Other relative of
+   head or spouse"= is =[0, 0, consanguineal]= (kinship.yml:282) while ="Other
+   relative of head"= is =[0, 2, consanguineal]= (:631).  Same semantics, two
+   tuples.
+2. Record the Pregunta Nº 1 definition of code 7 in
+   =Peru/_/categorical_mapping.org=, next to the =Relationship= table.  It is
+   the single most decision-relevant sentence about that table and it is
+   currently absent from a PR that quotes the same manual for Recuadro A/B and
+   for the membership rule.
+
+** N2 [MED] -- the MODE hook discards silently
+
+=cluster_features()= warns only on a *tie*.  It does not report the values it
+overrules.  MEASURED (=seg634.py=): 18 household-row values are overruled by the
+mode across the 17 conflicting segments, and 3,259 household rows in total are
+projected away by the =(t, v)= reduction.
+
+The counts live in the function's docstring as a one-time 2026-08-21
+measurement.  Nothing re-checks them at build time, so if REG01 were re-pushed
+or the key changed, the drift would be silent -- and it is silent *precisely
+where the framework's own audit used to speak*, because the hook runs upstream
+of =_normalize_dataframe_index=.  "Zero =GrainCollapseWarning=" is true, and it
+is true partly because the collapse was moved above the auditor.
+
+The reduction is *correct* (see =segmento 634=), so this is not a data defect.
+But the tie branch already knows how to warn; extending it to report the
+overrule count would keep the signal and cost four lines.  I would ask for it.
+
+** N3 [LOW-MED] -- =LENGUA=: a knowingly-wrong lookup table is still shipped
+
+Credit first: the PR *removes* two false claims from the pre-PR header
+("Value labels sourced from ... verified against 1994 frequency distributions",
+"Codes are consistent across waves") and states plainly that the table is wrong.
+That is the right instinct and it closes the blind agent's T11 as filed.
+
+What remains is that the file now prints the *correct* nine-code list in prose
+three lines above a =#+name: LENGUA= table that contains seven rows with
+everything from code 4 shifted.  *I verified the nine-code list against source*
+-- =dicciona.pdf=, record HOGA1, verbatim: =B06-LENGUA N 23 1 CASTELLANO 1
+QUECHUA 2 AYMARA 3 CAMPA 4 SHIPIBO 5 OTRO-NATIVO 6 INGLES 7 OTRO-EXTRANJERO 8
+NO-HABLA 9=, and independently on the questionnaire's LENGUA MATERNA column.  So
+the shipped table is *demonstrably* wrong, not merely suspected.
+
+The PR's defence is that nothing extracts B06 and the name matches no canonical
+column, so auto-dispatch cannot fire -- I checked and that is correct *today*.
+
+But this is the GH #676 setup verbatim: a dead decode that a later reader
+revives and trusts.  The correct list is already typed out in the same file.
+Either put it in the table or delete the table; leaving a wrong one in the tree
+because it is currently unreachable is the bet #676 lost.
+
+** N4 [LOW] -- index non-uniqueness waiting for whoever wires the declared tables
+
+Not defects in this PR -- the tables are unwired -- but the PR declares indexes
+it did not test for uniqueness, and the next agent will inherit them.  MEASURED:
+
+- =individual_education (t, i, pid)=: *26 duplicate tuples* in REG05
+  (15,916 groups / 15,942 rows).  Not an additive measure, so this lands
+  straight on =groupby().first()=.
+- =food_acquired (t, i, j, s)=: *87 duplicate tuples* in REG36.  Benign --
+  =food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS= and Expenditure sums
+  losslessly -- but worth saying so in the config comment rather than leaving it
+  to be discovered.
+- =ak03= reaches *99999.99*, and =dicciona.pdf= declares
+  =AK03E-TOTA-ENTER N 15-19 5 MONTO 00000:01000= -- i.e. the shipped value is
+  two orders of magnitude outside the declared range.  Sentinel, near
+  certainly, and nothing would catch it.  (Note also that the dictionary splits
+  the amount into =AK03E-TOTA-ENTER= + =AK03D-TOTA-DECIM=, so the single
+  =ak03= float32 in the =.dta= is already a derived recombination -- worth
+  saying in the config comment, which currently just calls it "amount in
+  soles".)
+- =_weight_= is =int8= and identically 1 in every 1994 file -- an export
+  artefact, not a sampling weight.  (Relevant if anyone wires =sample= from
+  these files; the real weight for the series appears to be =WT= in 1990's
+  =EXPEND.SSP=.)
+
+** N5 [LOW] -- =food_acquired= drops =u= from the canonical index
+
+Canonical =index_info= is =food_acquired: (t, v, i, j, u, s)=; Peru declares
+=(t, i, j, s)=.  Dropping =v= is consistent with the rest of the PR (no
+=sample=) and dropping =u= is justified (the module records no unit).  But
+=Feature('food_acquired')= assembles on the canonical index, so this is worth a
+line in the config comment for the day it is wired.
+
+* Ranked summary
+
+| # | sev | finding | status |
+|---+-----+---------+--------|
+| F1 | HIGH | 1990 is SAS XPORT and readable; =CONTENTS.org= says SPSS/PC+, unreadable, acquisition blocker | *proved wrong* (source) |
+| N1 | MED-HIGH | 884 people given =[0,0,consanguineal]=, a tuple the survey manual's own definition of code 7 refutes; =Distance= identically 0; promised issue never filed | new; *source-proved* |
+| N2 | MED | MODE hook overrules 18 values with no build-time report | new; measured |
+| N3 | MED | knowingly-wrong =LENGUA= table shipped; the correct 9-code list is in prose beside it and now confirmed from source | new (T11 partly fixed) |
+| F2 | LOW-MED | "most of the file" is 16.5% of segments / 20% of households | *proved wrong* |
+| N4 | LOW | 26 + 87 duplicate index tuples; =ak03= 99999.99 vs a declared max of 1000; =_weight_= == 1 | new; measured |
+| N5 | LOW | =u= dropped from canonical =food_acquired= index | new |
+
+Verified sound and needing nothing: the cold rebuild, grain-strict, =segmento
+634=, the =kinship.yml= blast radius, all nine tuples, the currency mechanism
+and its dates, the guard's scope, the CotedIvoire pre-existing failures, the
+=absent=-grading argument and its 21 precedents, the satisfiability of all three
+declared-but-unwired tables, and -- checked against the PDFs themselves -- every
+documentary transcription in the PR.
+
+* Merge conditions
+
+1. Correct the 1990 paragraph in =CONTENTS.org=: SAS XPORT V5, readable today by
+   =pyreadstat.read_xport= (on the bare blob -- no =.xpt= rename needed), a
+   =local_tools.read_file= gap and not an acquisition blocker.  File the library
+   issue.  (F1)
+2. File the =Otro Pariente= / =Distance= issue the PR promises, *carrying the
+   Pregunta Nº 1 quotation*, and record that quotation in
+   =Peru/_/categorical_mapping.org= next to the =Relationship= table.  (N1)
+3. One-line fix to the "most of the file" sentence.  (F2)
+
+Worth doing in the same pass, not blocking: report the MODE overrule count at
+build time (N2); resolve =LENGUA= one way or the other, now that the correct
+list is confirmed from source (N3); note N4/N5 in the config comments; soften
+the Region "not provable" admission, which is better supported than the author
+claims.
+
+* Note on method
+
+The three ENNIV PDFs are text, not scans, and their streams are
+=/Filter /LZWDecode= -- which is why every off-the-shelf reader in this
+environment failed on them.  The decoder is at
+=/global/scratch/fsa/fc_jevons/ligon/tmp/peru_rt/lzw.py= (~50 lines, stdlib
+only).  If Peru documentation gets checked again, start there rather than
+concluding the PDFs are unreadable; that mistake is available in both
+directions, and F1 is what it looks like in the other one.
+
+=blessed.csv= being untouched is right and I would not change it.  I read these
+numbers as a reviewer, not as a human who has validated Peru against the
+published ENNIV tabulations.
