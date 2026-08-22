@@ -125,6 +125,19 @@ _EXCLUDED_CALLABLES = frozenset({
     # tagged orchestrator _aggregate_wave_data; excluding it keeps the build
     # fingerprint from over-invalidating on read-path edits (kinship/spellings).
     "lsms_library.country.Country._finalize_result",
+    # The null-content audit (null_read_audit): pure REPORTING.  It measures the
+    # frame and warns; it provably returns its input unchanged, so no byte of
+    # any parquet depends on it.  `check_read` is called from `get_dataframe`,
+    # which every build-path callable reaches -- so WITHOUT this exclusion,
+    # re-wording one warning would move build_transforms_fingerprint for every
+    # table in every country and cold-rebuild the corpus.  Measured both ways;
+    # see tests/test_null_read_guard.py::test_editing_the_audit_module_does_not
+    # _move_any_cache_hash.  (Editing get_dataframe ITSELF still invalidates,
+    # correctly: its parser dispatch does determine content.)
+    "lsms_library.null_read_audit.check_read",
+    "lsms_library.null_read_audit.check_declared_columns",
+    "lsms_library.null_read_audit.audit_read",
+    "lsms_library.null_read_audit.audit_declared_columns",
 })
 
 
