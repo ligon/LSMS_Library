@@ -1,0 +1,354 @@
+#+TITLE: GLSS1/GLSS2 cluster attributes, from BID Appendix I
+#+AUTHOR: Sue the Coder
+
+* Provenance
+
+Transcribed from *Appendix I, "Complete List of GLSS Clusters"* of
+=1988-89/Documentation/technical document/GHA_1988_GLSS_Basicinfo_EN.pdf=
+(the joint GLSS1/GLSS2 Basic Information Document, 56pp, which carries a real
+text layer -- no OCR involved).
+
+This is the survey's own cluster list.  It is *authoritative* for GLSS1/GLSS2
+cluster attributes: where it disagrees with the shipped microdata or with a
+value derived from it, the Appendix wins (decision, 2026-08-21).
+
+GLSS1 and GLSS2 ship *no cluster-location variable at all* -- a sweep of all
+170 dictionaries finds none; the only near-hit, =Y00A::LOC=, is 99.8% constant
+at 1 and is a fieldwork flag.  Before this table, =cluster_features.Region= was
+*inferred* as the modal birth region of a cluster's under-12s, and =Rural= was
+=NA= outright.
+
+** Join key
+
+The Appendix numbers clusters within each year; the microdata offsets them:
+
+: 1987-88 (GLSS1):  CLUST = 1000 + yr1
+: 1988-89 (GLSS2):  CLUST = 2000 + yr2
+
+Verified: *176 of 176* and *170 of 170* shipped clusters match.  The same
+=+2000= offset was independently derived from =HEALTH.DAT= value ranges during
+the GH #323 review, before this table was found.
+
+** Checks that this transcription is faithful
+
+- 273 data rows parsed from the PDF, *zero dropped* (every unmatched line is a
+  title, column header, page number, or the "Extra Workloads" marker).
+- The 85 rows carrying *both* year numbers match =1988-89/Data/CLYR1YR2.DAT='s
+  85 linked pairs exactly.
+- Dropping the 10 clusters the document itself lists under "Extra Workloads:
+  (should be excluded)" reproduces its urban/rural counts exactly:
+  95 =U= / 116 =R= / 52 =SU=.
+- 8 rows spot-checked character-by-character against the raw PDF text.
+
+** Counts
+
+- yr1: *178* rows.  The DDI's realised figure is 178 *sampling areas*; the
+  microdata has *176 clusters*.  A sampling area may hold more than one
+  cluster, so these are not the same unit -- do not "reconcile" them.
+- yr2: *170* rows, matching the microdata exactly.
+
+** Caveats
+
+- =Reg= and =EcoZone= are the Appendix's own abbreviations, kept *raw* so this
+  table can be audited against the PDF.  =region_abbrev= below decodes them.
+- =UrbRur= has *three* values -- =U=, =R= and =SU= (semi-urban).  It is NOT
+  wired yet: canonical =Rural= is ={Urban, Rural}= and folding =SU= would
+  destroy a distinction the survey drew (52 clusters, 20%).  See GH #685.
+- =EcoZone= is 3-way (C/F/S).  GLSS6 (2012-13) additionally uses =GAMA= for
+  Greater Accra; the Appendix has no such category, so Accra clusters here are
+  =C= (coastal).  That is a difference between the *sources*, not an error.
+- The 10 "Extra Workloads" clusters are in =appendix_i_extra_workloads.org=,
+  NOT here.
+
+* Cluster table
+
+#+name: appendix_i_clusters
+| yr1 | yr2 | Name | UrbRur | Reg | EcoZone |
+|-----+-----+------+--------+-----+---------|
+| 1 | 1 | Jewi Wharf | R | West | C |
+| 2 | . | Eikwe | R | West | C |
+| . | 6 | Nyamebekyere | R | West | C |
+| 3 | 9 | Bonzokrom | R | West | C |
+| 4 | . | Adiembra | R | West | C |
+| 5 | 5 | Mpehin | R | Cent | C |
+| . | 14 | New Kedadwin | R | West | C |
+| . | 22 | Etwia | R | Cent | C |
+| 6 | . | Ndansimon | R | Cent | C |
+| 7 | 25 | Oboom | R | Cent | C |
+| 8 | . | Nyamedome | R | Cent | C |
+| 9 | 33 | Nyakawadzi | R | Cent | C |
+| 10 | . | Nantsifa | R | Cent | C |
+| . | 38 | Kwanyaku/Obusamasi | R | Cent | C |
+| . | 46 | Lakpesedom | R | Gr.A | C |
+| 12 | . | Nkuntunse | R | Gr.A | C |
+| 13 | 49 | Bonikope | R | Gr.A | C |
+| 14 | . | Kortey/Queitsewe | R | East | C |
+| 15 | 57 | Tokpo (Dzokpo) | R | Gr.A | C |
+| 16 | . | Verkope | R | Volt | C |
+| . | 62 | Adusakope | R | Volt | C |
+| 17 | 65 | Sokpekope | R | Volt | C |
+| 19 | 73 | Ohawu | R | Volt | C |
+| . | 78 | Live Ga | R | Volt | C |
+| 20 | . | Tordzinu | R | Volt | C |
+| 21 | 81 | Elubo | SU | West | C |
+| 22 | . | Agona:BP Filling Station | SU | West | C |
+| . | 86 | Takoradi:Tanokrom | SU | West | C |
+| 23 | 89 | Inchaban | SU | West | C |
+| . | 94 | Cape Coast: Ahm Sch | U | Cent | C |
+| 25 | 97 | Narkwa | SU | Cent | C |
+| 26 | . | Sunkwaa | SU | Cent | C |
+| . | 102 | Owumaso | SU | Cent | C |
+| . | 110 | Bontrase | SU | Cent | C |
+| 28 | 113 | Agomeda | SU | Gr.A | C |
+| 29 | . | Mamfe | SU | East | C |
+| . | 118 | Adukrom | U | East | C |
+| 30 | 121 | Adidome | SU | Volt | C |
+| . | 126 | Tadzewu | SU | Volt | C |
+| 31 | 70 | Agbosome/Adina Mornu | SU | Volt | C |
+| 32 | 129 | Kwesimintsim | U | West | C |
+| 33 | . | Takoradi:Columbia Hot | U | West | C |
+| . | 134 | Takoradi:Windy Ridge | U | West | C |
+| 34 | 137 | Sekondi:Effiakuma | U | West | C |
+| 35 | . | Shama | U | West | C |
+| . | 142 | Elmina | U | Cent | C |
+| 36 | 145 | Cape Coast:Soc Welfare | U | Cent | C |
+| 37 | . | Moree | U | Cent | C |
+| 38 | . | Odoben | U | Cent | C |
+| 39 | 105 | Apam | U | Cent | C |
+| 40 | . | Senya Beraku | U | Cent | C |
+| . | 150 | Anomabo | U | Cent | C |
+| . | 158 | Bawjiase | U | Cent | C |
+| 41 | 161 | Agona Swedru | U | Cent | C |
+| 42 | 166 | Medina: Soc Welfare | U | Gr.A | C |
+| 43 | . | Accra: Chorkor Tea Garden | U | Gr.A | C |
+| 44 | . | Accra:Mamprobi | U | Gr.A | C |
+| . | 169 | Accra:Dansoman Est | U | Gr.A | C |
+| 45 | . | Accra:TownCouncil | U | Gr.A | C |
+| 46 | . | Accra:Abossey | U | Gr.A | C |
+| 48 | . | Accra:Darkuman | U | Gr.A | C |
+| 49 | 193 | Acc:No Kan Yoga Res | U | Gr.A | C |
+| 50 | . | Accra:Nii Boi Town | U | Gr.A | C |
+| 51 | 201 | Accra:Jamestown Police | U | Gr.A | C |
+| . | 206 | Acc:MAAB MedCenter | U | Gr.A | C |
+| 53 | . | Accra:GoBliss | U | Gr.A | C |
+| 54 | . | Accra:Osu Busi | U | Gr.A | C |
+| 55 | . | Acc:TeshieChrApoChurch | U | Gr.A | C |
+| 56 | . | Acc:Teshie Continen | U | Gr.A | C |
+| . | 214 | Labadi:SBC | U | Gr.A | C |
+| . | 217 | Accra: Teshie CAC | U | Gr.A | C |
+| . | 222 | Acc:Teshie Faith Cl | U | Gr.A | C |
+| 57 | 225 | Labadi: Lakpa House | U | Gr.A | C |
+| 58 | . | Acc:East Cantonments | U | Gr.A | C |
+| . | 230 | Burma Camp | U | Gr.A | C |
+| 59 | . | Accra:Nima market | U | Gr.A | C |
+| 60 | . | Accra:Nima Makolanta | U | Gr.A | C |
+| 62 | . | Accra:Alajo | U | Gr.A | C |
+| 63 | 249 | Tema:Comm2 trotro | U | Gr.A | C |
+| 64 | . | Tema:Comm4 market | U | Gr.A | C |
+| . | 254 | Tema:Gen Hosp | U | Gr.A | C |
+| 65 | 257 | Tema:New Town | U | Gr.A | C |
+| 66 | . | Tema:Ashiman | U | Gr.A | C |
+| . | 262 | Ashaiman | U | Gr.A | C |
+| 67 | 265 | Aburi | U | East | C |
+| 68 | . | Koforidua:Old Cemetery | U | East | C |
+| 69 | 273 | Koforidua:Zion | U | East | C |
+| 70 | . | Afiadenyigba | U | Volt | C |
+| . | 278 | Keta | U | Volt | C |
+| 71 | 281 | Dzodze | U | Volt | C |
+| . | 286 | Daaman | R | West | C |
+| 73 | 289 | Tarkwa-Aboso:Mantriam | R | West | F |
+| 74 | . | Moseaso | R | West | F |
+| . | 294 | Wassa Dunkwa | SU | West | F |
+| 75 | 297 | Techimantia | R | West | F |
+| 76 | . | Ahibenso | R | West | F |
+| . | 302 | Danielkrom | R | West | F |
+| 77 | 305 | Apronsie | R | West | F |
+| 78 | . | Fuakyekron | R | West | F |
+| . | 310 | Punikrom | R | West | F |
+| 79 | 313 | Dametsikrom | R | Cent | F |
+| 80 | 406 | Adwamasek/Wiwasi | R | Asha | F |
+| . | 318 | Odumase | R | Cent | C |
+| 81 | 321 | Agona Jema | R | Cent | F |
+| 82 | . | Praho | R | East | F |
+| . | 326 | Tabita | R | East | F |
+| 83 | 329 | Asuboa | R | East | F |
+| . | 334 | Huni Ofori | R | Cent | F |
+| 85 | 337 | Susumawu | R | East | F |
+| 86 | . | Shai Mameng | R | East | F |
+| . | 342 | Aponapon II | R | East | F |
+| 87 | 345 | Sageyimase | R | East | F |
+| . | 350 | Abepawtia | R | East | F |
+| 89 | 353 | Oframase | R | East | F |
+| 90 | . | Gbledi | R | Volt | F |
+| . | 358 | Alavanyo Deme | R | Volt | F |
+| 91 | 361 | Dzoko | R | Volt | F |
+| . | 366 | Botirampa | R | Asha | F |
+| 92 | . | Sereso | SU | Asha | F |
+| 93 | 369 | Konkromase | R | Asha | F |
+| . | 374 | Boankra | R | Asha | F |
+| 94 | . | Ofuase | R | Asha | F |
+| 95 | 377 | Kumasi:Oduom | U | Asha | F |
+| . | 382 | Nketia | R | Asha | F |
+| 96 | . | Kontomire | R | Asha | F |
+| 97 | 385 | Kyenkyenase | R | Asha | F |
+| . | 390 | Morontua | R | Asha | F |
+| 98 | . | Nsuaem | R | Asha | F |
+| 99 | 393 | Sefwi | R | Asha | F |
+| 100 | . | Nkoranza | R | Asha | F |
+| . | 398 | Akrofuom | R | Asha | F |
+| 101 | 401 | Old Ayasi/Omena | R | Asha | F |
+| 102 | . | Brahabebome | R | Asha | F |
+| 103 | 409 | Wioso | R | Asha | F |
+| 104 | . | Agyei Baah | R | Asha | F |
+| 105 | 417 | Kwakuben | R | Asha | F |
+| . | 422 | Ntabana | R | Asha | F |
+| 107 | 430 | Ahantamwa(Tipokrom) | R | Bron | F |
+| 108 | 429 | Yankye/Kukuom | R | Bron | F |
+| 109 | . | Bechem/New Bansakrom | R | Bron | F |
+| 111 | . | Asunsu No.1 | R | Bron | F |
+| . | 438 | Brofoyedru | R | Bron | F |
+| 112 | 445 | Heman | SU | West | F |
+| . | 446 | Abosso | U | West | F |
+| 113 | . | Boizan | SU | West | F |
+| 114 | 453 | Assin Manso | SU | Cent | F |
+| 115 | . | Nkontunse | SU | Cent | F |
+| . | 454 | Worakeso | R | Cent | F |
+| 117 | . | Bawduaa | SU | East | F |
+| . | 462 | Nkwateng | SU | East | F |
+| 118 | 469 | Anum Apapam | SU | East | F |
+| . | 470 | Kukurantumi | SU | East | F |
+| 119 | . | Bunso | SU | East | F |
+| 120 | 477 | Kwahu Praso | SU | East | F |
+| . | 478 | Asakraka | SU | East | F |
+| 121 | . | Kpandu Fesi | SU | Volt | F |
+| . | 486 | Nerebehi | SU | Asha | F |
+| 123 | . | Achiasi | SU | Asha | F |
+| 124 | 493 | Manso Abore | SU | Asha | F |
+| . | 494 | Fereso | SU | Asha | F |
+| 125 | . | Ampunyasi | SU | Asha | F |
+| 126 | 501 | Bompata | SU | Asha | F |
+| . | 502 | Nyaboe | SU | Asha | F |
+| 127 | . | Boanim | SU | Asha | F |
+| 128 | 509 | Bodomasi | SU | Asha | F |
+| . | 510 | Banko | SU | Asha | F |
+| 130 | 517 | Ahwiriwma | SU | Asha | F |
+| . | 518 | Gaoso(Gambia #2) | R | Bron | F |
+| 131 | . | Susuanso | SU | Bron | F |
+| 132 | 525 | Tanoso | SU | Bron | F |
+| . | 526 | Aworokowa | SU | Bron | F |
+| 133 | . | Tarkwa | U | West | F |
+| 134 | 533 | Bibiani | U | West | F |
+| . | 534 | Assin Foso | U | Cent | F |
+| 135 | . | Oda | U | East | F |
+| 136 | 541 | Akwatia | U | East | F |
+| . | 542 | Kade | U | East | F |
+| 137 | . | Asamankese | U | East | F |
+| 138 | 549 | Anyinam | U | East | F |
+| . | 550 | Begoro | U | East | F |
+| 139 | . | Mpraeso | U | East | F |
+| 140 | 557 | Kpandu: Adombo | U | Volt | F |
+| . | 558 | Kwamikrom | U | Volt | F |
+| 142 | 565 | Kumasi:City Hotel | U | Asha | F |
+| . | 566 | Kumasi: Bomso | U | Asha | F |
+| 143 | . | Kumasi:Military Sta | U | Asha | F |
+| 144 | 573 | Kumasi:Aboabo | U | Asha | F |
+| . | 574 | Kumasi: New Amakom | U | Asha | F |
+| 145 | . | Kumasi:Zongo | U | Asha | F |
+| 147 | . | Kumasi:Old tafo Moshi | U | Asha | F |
+| . | 582 | No Kumasi: Manhiya | U | Asha | F |
+| 148 | 589 | Kumasi:Old Tafo GOIL | U | Asha | F |
+| 149 | . | Obuasi | U | Asha | F |
+| 150 | 597 | Odumasi | U | Asha | F |
+| 151 | . | Effiduase | U | Asha | F |
+| . | 598 | Agogo | U | Asha | F |
+| . | 606 | Akumadan | U | Asha | F |
+| . | 614 | Sunyani:Park | U | Bron | F |
+| 153 | . | Kenyase No.2 | U | Bron | F |
+| 155 | . | Nsuare | U | Bron | F |
+| 156 | 621 | Dormaa Ahenkro | U | Bron | F |
+| . | 622 | Techiman | U | Bron | F |
+| 157 | . | Warapong | R | East | S |
+| 158 | 629 | Senchi | R | East | S |
+| . | 630 | Aboma Yaw | R | East | F |
+| 159 | . | Catterpillar | R | East | S |
+| 160 | 637 | Vudese | R | Volt | F |
+| 161 | . | Tokor | R | Volt | F |
+| . | 638 | Abutia-Agove | R | Volt | F |
+| 162 | 645 | Suhuem | R | Volt | S |
+| . | 646 | Amanfrom/Dodofie | R | Volt | F |
+| 163 | . | Duflumkpa | R | Volt | S |
+| 164 | 653 | Duodoso | R | Bron | S |
+| 165 | . | Boase | R | Bron | S |
+| . | 654 | Yaa Mansa I | R | Bron | F |
+| . | 662 | Buaben | R | Bron | F |
+| 167 | . | Jato Zongo | R | Bron | S |
+| 168 | 669 | Tato Bator | R | Bron | S |
+| 169 | . | Bobenyuron | R | Nort | S |
+| . | 670 | Kwakro Akura | R | Bron | S |
+| 170 | 677 | Kpandai/Kitare | R | Nort | S |
+| . | 678 | Dobum No.2 | R | Nort | S |
+| 171 | . | Tangmaya | R | Nort | S |
+| 172 | . | Zang | R | Nort | S |
+| . | 686 | Yeshie | R | Nort | S |
+| 173 | . | Zozali | R | Nort | S |
+| 174 | 693 | Tuni | R | Nort | S |
+| . | 694 | Gbenduri | R | Nort | S |
+| 175 | . | Chagu | R | UppW | S |
+| 176 | 701 | Jeyin Jamayiri | R | UppW | S |
+| 177 | . | Brutu | R | UppW | S |
+| 179 | . | Navrongo | R | UppE | S |
+| . | 710 | Anur Yeri | R | UppE | S |
+| 180 | 717 | Channia | R | UppE | S |
+| . | 718 | Shiega-Won/Tongo | R | UppE | S |
+| 181 | . | Kulbia-Nayire | R | UppE | S |
+| 182 | 725 | Dua II | R | UppE | S |
+| . | 726 | Zoko Kanga | R | UppE | S |
+| 183 | . | Yeliwoko | R | UppE | S |
+| 184 | 733 | Nafkoliga | R | UppE | S |
+| . | 734 | Zorsi-Natingo | R | UppE | S |
+| 186 | 741 | Amankwakrom | SU | East | S |
+| . | 742 | Tsito | SU | Volt | F |
+| 187 | . | Anfoega | SU | Volt | F |
+| 188 | 749 | Damanko | SU | Volt | S |
+| . | 750 | Dwenem | R | Bron | F |
+| 189 | . | Ewisa | SU | Bron | S |
+| 190 | 757 | Gyema | SU | Bron | S |
+| . | 758 | Okyeamekrom | SU | Bron | S |
+| 191 | . | Adibo | SU | Nort | S |
+| 192 | 765 | Charria | SU | UppW | S |
+| . | 766 | Tampala | SU | UppW | S |
+| 193 | . | Kpong | U | East | S |
+| 194 | 773 | Ho: Ahliha | U | Volt | F |
+| . | 774 | Ho: Estate House | U | Volt | F |
+| 195 | . | Wenchi | U | Bron | S |
+| 196 | 781 | Yeji | SU | Bron | S |
+| . | 782 | Bole | U | Nort | S |
+| 197 | . | Yendi | U | Nort | S |
+| 198 | . | Tamale: Zogbeli | U | Nort | S |
+| 199 | . | Kumbumgu | U | Nort | S |
+| 200 | 797 | Bolgatonga: Police | U | UppE | S |
+| . | 798 | Bolgatonga: Nawongo | U | UppE | S |
+
+* Decode tables
+
+#+name: region_abbrev
+| Reg  | Region        |
+|------+---------------|
+| West | Western       |
+| Cent | Central       |
+| Gr.A | Greater Accra |
+| East | Eastern       |
+| Volt | Volta         |
+| Asha | Ashanti       |
+| Bron | Brong Ahafo   |
+| Nort | Northern      |
+| UppE | Upper East    |
+| UppW | Upper West    |
+
+#+name: ecozone_abbrev
+| EcoZone | Ecological_zone |
+|---------+-----------------|
+| C       | Coastal         |
+| F       | Forest          |
+| S       | Savannah        |
+
