@@ -316,6 +316,20 @@ urban units went 71 -> 60 -> (re-districted) 38, with *no stated criterion at
 all*.  Where there is no rule, the drift is not merely unmeasurable -- it is
 invisible.
 
+*Spot-checked negatives in the most-used LSMS-ISA countries* (these matter most,
+so a false negative here would be expensive).  Text extracted cleanly for all
+four; none states a population threshold:
+
+- *Tanzania* 2019-20 BID p.11 defines the classes *structurally*, inheriting the
+  census frame: "In rural areas a cluster is defined as an entire village.  In
+  urban areas, a cluster is defined as a census enumeration area."  Rural/urban
+  is a stratification dimension, not a population rule.
+- *Nigeria*, *Uganda*, *Malawi*: zero hits for definitional urban/rural language
+  in any extracted document.  Recorded as *"searched, extraction OK, no
+  statement found"* -- not as "no rule exists"; all three plausibly inherit a
+  national statistical-office definition by reference, which is precisely the
+  case a documentation sweep cannot close.
+
 * Q1 -- the finding that actually matters: WITHIN-country drift
 
 Ghana is the only country where enough waves state a rule to check the rule
@@ -388,6 +402,43 @@ census (the 1984 census) in GLSS1/GLSS3/GLSS4, but the community questionnaire
 changes its reference census wave by wave (1984 -> 2000 -> 2010 -> "estimate";
 see Q2).  A locality's class can therefore change without either the threshold
 or the locality changing.
+
+* Bonus: Ethiopia's 10,000 threshold explains #683, and the explanation is not "definition drift"
+
+GH #683 records Ethiopia's ~Urban~ share moving 12.7% -> 54% across waves and
+calls it design rather than growth.  The documentation says *exactly what the
+design change was*, and it is worth pinning down because "the definition
+changed" and "the sample frame changed" call for different fixes.
+
+=9331_ethiopia_survey_report_web_final.pdf= p.15:
+
+#+begin_quote
+The first wave, (originally referred to as ERSS, but since retitled ESS1),
+covered only rural and small town areas.  The second and the third waves, ESS2
+and ESS3, respectively, added samples from large town areas.
+#+end_quote
+
+and =basic_information_document_wave__3_dec19.pdf= p.4:
+
+#+begin_quote
+ESS1, ESS2, and ESS3 together create a panel data set of households from rural
+and small town areas ... ESS2 and ESS3 together represent a panel of households
+and individuals for rural and *all urban* areas.
+#+end_quote
+
+*The urban/rural definition did not change.  The sampling frame did.*  ESS1
+simply contained no large towns, and "large town" is precisely the class the
+10,000 threshold delimits (=basic_information_document_wave__3_dec19.pdf= p.14:
+"The population frame for the urban expansion consists of all households in
+towns with population greater than 10,000 people").
+
+Consequences that differ from a definition change: the ESS1 ~Urban~ label is
+*internally correct*, so no relabelling will fix the series; and the rural +
+small-town subset *is* comparable across all three waves, because that is
+exactly the panel ESS1/2/3 share.  The comparable series exists -- it just is
+not the headline one.  This is a stronger and more actionable statement than
+"Ethiopia's Urban is not comparable", and the 10,000 threshold is what makes it
+expressible.
 
 * Q2 -- Does the DATA carry locality population?
 
