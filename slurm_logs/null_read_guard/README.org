@@ -66,6 +66,26 @@ declared table reads =COMM.DAT= (0 matches in the manifest), so neither can fire
 on today's corpus.  Site R protects the parse work now in flight (GH #699 and
 the =.DAT=/=.DCT= reader), it does not clean up after it.
 
+** Closing the sweep's blind spot: Site R on the LIVE cold build path
+
+The file-level sweep above reads *declared source files*.  It structurally
+cannot see reads of INTERMEDIATE wave parquets: those do not exist until a build
+creates them, and country-level concatenators read them through =get_dataframe=
+like anything else.  =siteR_live.py= closes that -- six countries (Niger,
+Uganda, GhanaLSS, Nigeria, Albania, Malawi), every table, genuinely cold L2 in a
+third private data dir, guard live, counting what Site R actually emits:
+
+: SITE R firings on the live cold build path: 1
+:    Nigeria/plot_features: read of .../Nigeria/2010-11/_/plot_features.parquet
+:    returned 6,086 rows x 10 columns but 5 of those columns (50%) are 100% NULL
+: SITE B firings: 65 (55 distinct)
+
+One firing over six countries' full cold builds -- and it is a TRUE POSITIVE
+that corroborates Site B from a different layer: the build sweep independently
+records =Nigeria/plot_features= with =Irrigated=, =SoilType= and =TenureSystem=
+all-null in 2010Q3.  Site R caught it in the wave parquet, Site B in the
+delivered table.
+
 * Site B -- every declared table built cold
 
 - =sweep_build.py= / =build_sweep.jsonl.gz= / =analyze_build.py=.
@@ -109,6 +129,22 @@ the same function and pays the identical bill.
   1,755,027 x 28): 0.49 s on a 14--18 s read, ~3%.
 - Site B, largest built table (GhanaLSS =food_acquired=, 5,259,344 x 3):
   196 ms on a 167 s warm read, 0.1%.  (=bench_siteb.py=.)
+
+* Regression run
+
+Full =pytest tests/= against the (warm) private dir, =--no-purge=:
+*4431 passed, 4 failed, 104 skipped, 9 xfailed, 1 xpassed* in 47:48.
+
+The 4 failures are PRE-EXISTING -- verified, not assumed: the same four tests
+fail identically on =development= (=5290f25c=) in the same data dir with the
+guard absent.
+
+- =Uganda/earnings= (=test_declared_columns_present=, =test_feature_is_sane=):
+  the declared column =Earnings= is ABSENT -- built columns are
+  ={earnings, i, level_1, t}=.  A *presence* failure, which is the other guard's
+  department; this one only speaks about columns that are present.
+- =var/fct.parquet= / =var/nutrition.parquet= (=test_uganda_invariance=):
+  baseline shape drift, e.g. 15x106 against a recorded 15x113.
 
 * What this did NOT measure
 
