@@ -1143,9 +1143,47 @@ The =.DCT= dictionaries look like Stata =infile= dictionaries and give
 =CID,CLUST,YRTITLND,HID,ACRFRM,...= and every row is comma-delimited.  Reading
 one with =pd.read_fwf(colspecs=...)= built from the =.DCT= "succeeds" and
 returns garbage -- shredded comma-strings spread across the wrong columns, with
-the numeric tail silently all-NaN and =nunique=0=.  Read them with
-=pd.read_csv(..., na_values=['.'])=; use the =.DCT= only as the authoritative
-*variable list*.
+the numeric tail silently all-NaN and =nunique=0=.  Use the =.DCT= only as the
+authoritative *variable list*.
+
+*** RESOLVED in the library reader (2026-08-22, GH #704)
+
+=get_dataframe= now reads a =.DAT= through its sibling =.DCT= and *detects*
+the layout rather than assuming one, so callers no longer need the
+=pd.read_csv(..., na_values=['.'])= workaround this section used to
+prescribe.  See the =.DAT=/=.DCT= block comment in =lsms_library/local_tools.py=
+for the detection rule.  Two things it fixes that were live here:
+
+1. *=.= is Stata's ASCII missing marker, and nothing was honouring it.*  A
+   single =.= in a numeric column silently demoted the whole column to
+   =str=.  Across the corpus's 531 =.DCT=-paired =.DAT= files, 449 gained
+   correctly-typed columns.
+2. *Worse than a =str= column: a MIXED =int=/=str= object column.*  Pandas
+   infers dtypes per chunk, so a bare =read_csv= on a large =.DAT= with a
+   =.= in it assigned =int64= to some chunks and =object= to others -- and
+   the same code then appeared *twice*, once as =318= and once as ='318'=.
+   Measured on =1987-88/Data/Y12A.DAT=: =FOODCD= has *61* real food codes
+   and one =.=, and the old reader reported *123* distinct values
+   (61 ints + 61 strings + the dot).  =FOODBLV= 2 -> 5, =MFOODBLY= 12 -> 25.
+   This is the =food_acquired= item code =j= for both GLSS1 and GLSS2.  A
+   groupby on such a column silently splits every key in two.  *This one
+   was not previously recorded anywhere.*
+
+*** Why this belongs with Traps 1-4
+
+Same signature as the categorical-decode traps above: *a thing that exists,
+looks authoritative, and silently does nothing (or does the wrong thing)
+while the build reports success.*  Trap 1 was a lookup dict that came back
+empty; Trap 4 was a fallback table nobody had ever exercised; the
+=#+name:= trap was an Org keyword attaching to the wrong element.  Here it
+is a *data dictionary that is wrong about its own file's layout* -- and,
+underneath it, a missing-value marker that no reader was reading.  In every
+case the failure is silent and looks exactly like success.
+
+The general rule these keep re-teaching: *when a declaration and the data
+disagree, the declaration is not automatically the loser -- but neither is
+it automatically the winner.  Test one against the other and fail loudly
+when they cannot be reconciled.*
 
 ** The =.DCT= label layer does not exist -- C1 cannot run on GLSS1/GLSS2
 
