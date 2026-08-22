@@ -256,6 +256,58 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 - **Core aggregates nothing here — not even GPS** (decided 2026-07-13). `Latitude`/`Longitude` used to be reduced with `.mean()` (a cluster centroid); that was the last aggregation core performed anywhere, and the corpus showed it earned its keep nowhere. It is a **provable no-op in 4 of the 5 cells** where it could fire (the published GPS *is* the cluster's displaced fix, stamped on each household — it was never household GPS), and in the 5th (Malawi 2013-14) it averaged points a median of 148 km and up to **783 km** apart: a broken cluster key, not a centroid, in a cell that already warned for Region/District/Rural. GPS is now audited and `.first()`-ed like every other column. Cost of the flip, measured end-to-end: **zero new warning cells**. `SkunkWorks/grain_aggregation_policy.org` now has **no exception left in it**. An analyst who wants a centroid computes one (`transformations.py`); a country with genuine per-household GPS has put a household column in a cluster table and should move it.
 - `i` arriving as a **column** rather than an index level (Uganda's 7 other waves) is Site 2's twin: `drop(columns='i')` launders a household-grain frame into a `(t, v)` frame with unexplained duplicates. Site 1 reduces and audits those with the same `.first()`, so the loss is reported either way (9,890 destroyed + 934 NaN-key).
 *Known open (§3b of that doc)*: `groupby()` defaults to `dropna=True`, so a row with NaN in a declared index level is **deleted outright** by the collapse — 14 cells / 485,231 rows (worst: Burkina Faso `food_acquired` 2014, 82.5% of rows). Currently **reported, not fixed**.
+## The Silent All-Null Read: Right Shape, No Content (`null_read_audit.py`)
+
+Every guard above checks **shape**. `Country._assert_built_required_columns` checks a declared column is *present*; the `dfs:` sub-frame check (#515/#323) checks it is *present*; `_audit_index_collapse` checks the index is *unique*. **None looks inside the column**, and `get_dataframe` — the only sanctioned reader — did no post-read content validation at all. A parse that returns a correctly-shaped frame of NaN was therefore served silently:
+
+- `pyreadstat.read_xport` on Peru 1990 `N00A.SSP` → 1528×10 with **7 of 10 columns entirely NaN**, no exception (`pandas.read_sas` reads all 10). GH #699.
+- GhanaLSS `COMM.DAT` parsed fixed-width per its own `COMM.DCT` (the `.DAT` actually ships comma-delimited) → 86×311 with **254 of 311 columns (82%) NaN**, no exception.
+- Niger 2014-15 `Latitude`, declared `float` **required**, served 0 of 270 populated.
+
+**The trigger is a fraction of the FRAME, not "any all-null column" — and the measurement is why.** Swept cold over every source file the corpus declares (2,264 declared reads; 1,337 held and read through `get_dataframe`; 65,099 columns):
+
+| test | firings |
+|---|---|
+| any column 100% null after read | **887** cells across 153 files |
+| …of which a table had actually *asked* for the column | **3** |
+| frames where ≥ 1/3 of columns are all-null | **0** (corpus max 28.3%) |
+
+The per-column form is a firehose: 884 of 887 firings are raw columns of a source file nothing reads. **A warning nobody reads is exactly how #323 survived its first fix.** The frame-fraction form separates cleanly — corpus max 28.3% (Albania 2004 `w3_hh_basic.dta`, 169/598) versus 40–82% for every known-bad parse measured. `_NULL_FRACTION_TRIGGER = 1/3` sits in that gap.
+
+**Site B's firing rate, measured the same way** — a cold build of every declared table in every country (504 builds; 488 completed, the rest being Nepal/Armenia with no microdata plus three `make` failures that build clean on retry):
+
+| test | firings |
+|---|---|
+| required declared column 100% null in *every* wave | **0** |
+| required declared column 100% null in *some* wave's `t` slice | **86**, across 42 of 488 tables |
+
+86 corpus-wide — and only the country you build warns (Uganda: 5) — is a work queue, not a firehose. Several are plainly real: `GhanaLSS/sample/weight` and `panel_weight` are empty in four of six waves, i.e. that country has been served with no sampling weights. **Deliberately no allowlist** — same reasoning as `_grain_strict`: an allowlist is the same disease with a registry.
+
+**Two sites, because no single probe sees all three instances.** Same shape as #323's Site 1 / Site 2:
+
+- **Site R** — `local_tools.get_dataframe`. The mis-parse class, *including columns nothing has wired yet* (a wave is usually mis-parsed before anyone wires it).
+- **Site B** — `Country._finalize_result`. A **required declared** column that is present and empty, reported whole-table or per-wave `t` slice. Niger 2014-15 is invisible to Site R: that wave's `data_info.yml` declares no `Latitude`, so no read ever produces it — the column materialises as NaN in the cross-wave concat.
+
+`optional: true` columns are exempt at Site B (the author's own signed statement), read through the same `_required_scheme_columns` the other two guards use so the readings cannot drift.
+
+**Site B needs no stamp-and-replay, and that is a real difference from #323.** `_finalize_result` re-runs on **every** read, warm cache included, and unlike a grain collapse the evidence is *in* the parquet rather than destroyed before it is written. Site R is a cold-build signal only; a mis-parse that empties a *declared* column is caught warm by Site B, one that empties only undeclared columns is not (stated gap).
+
+Warn by default; `LSMS_READ_STRICT=1` makes it fatal (`NullReadError`). **Its own lever, not `LSMS_GRAIN_STRICT`** — a destroyed row and an empty column are different concerns and must ratchet separately — with identical `{1,true,yes}` spelling. `null_read_reports(country=, table=)` is the public accessor (twin of `grain_reports()`); `bench/feature_audit/scan.py` drains it into structured `null_content` findings.
+
+**Cache-hash cost, measured both ways:**
+
+| change | `Country._table_cache_hash` values moved (of 37 probed) |
+|---|---|
+| Site B in `_finalize_result` | **0** — it is already in `_build_registry._EXCLUDED_CALLABLES` as read-path code |
+| Site R in `get_dataframe` | **37** — one-time corpus-wide invalidation |
+| a later edit to `null_read_audit.py` itself | **0** — its callables are in `_EXCLUDED_CALLABLES`; pinned by a test |
+
+Site R's invalidation is unavoidable for *any* edit to `get_dataframe`: `df_data_grabber` is `@build_transform()`-tagged and references it, so its source is in every table's fingerprint (measured with a bare no-op stub — the same 37/37). The concurrent `.DAT`/`.DCT` parse fix incurs the identical rebuild. Overhead of the audit itself: Site R 0.49 s on the corpus's largest read (Malawi 2016-17 `hh_mod_g1.dta`, 1.75M×28, a 14–18 s read → ~3%); Site B 196 ms on the largest built table (GhanaLSS `food_acquired`, 5.26M×3, a 167 s warm read → 0.1%).
+
+**Raw sweep records, analysis scripts and the hash probes are in `slurm_logs/null_read_guard/`** — the threshold is re-checkable, not just asserted.
+
+> **Known granularity mismatch, not fixed here.** Niger's `CONTENTS.org` records that 2014-15's missing coordinates are *correct* ("genuinely ships no geovariables/offsets file of any kind … honestly absent — not mis-addressed"). The guard still reports it, and should — the point is visibility, not adjudication. But `optional:` is **country**-grain while the absence is **wave**-grain, so there is no way to record that judgement today. Do **not** reach for `optional: true` to silence one wave. This is what gates turning `LSMS_READ_STRICT=1` on in CI.
+
 ## Coverage Matrix (v0.9.0+)
 
 `make matrix` grades every `(country, feature, wave)` cell on a tier ladder — `absent` / `dropped` / `broken` / `builds` / `sane` / `blessed` — and commits a snapshot to `.coder/coverage/latest.csv`. `ll.coverage()` reads it back. See `docs/guide/coverage.md`.

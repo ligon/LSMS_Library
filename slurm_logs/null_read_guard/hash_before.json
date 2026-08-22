@@ -1,0 +1,51 @@
+{
+ "GhanaLSS/food_acquired": "2a5fecb8c23a69bca4aeebf77e4478f1fd9fc4786c987ce805a180f4d95bc8df",
+ "GhanaLSS/household_roster": "4ed09503ee94fc7139bc24678106332a3d91e95c68e472f10845d8150f481db7",
+ "GhanaLSS/panel_ids": "0f11180aa995c22eadad8c3478fd01b39b8582d2661d68ac1fa54aad096d240f",
+ "GhanaLSS|btf": {
+  "food_acquired": "8bc3968933e24d4c42eb780676650e2333e4911e868d25a1fcc9da7939039b4c",
+  "household_roster": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c",
+  "panel_ids": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c"
+ },
+ "Guyana/household_roster": "b277d831143071ca84fbeb8e4e15386d3c21751f88730ab3491b70e5af3aa8fe",
+ "Guyana|btf": {
+  "household_roster": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c"
+ },
+ "Niger/cluster_features": "919bb6405bfcaf1610cbd5fb0c6cc98362bb455ba8639a47bef58fa41b851748",
+ "Niger/food_acquired": "d050ef3a84b57058e474838e49b02d0df87b651a3821ddf22b1c50a1a945f3d1",
+ "Niger/household_roster": "6e235026d3776d66f1e61e43c12f635213453c54c45073ee35c4e57c354f6411",
+ "Niger/sample": "d3e97914c8210273e5a4fd211ec528be772adb975a8778d22d59c6a25382ab5a",
+ "Nigeria/food_acquired": "5c4a4eb955086ec787f00350dec1fbf75b3a8aa4878bfc32c19ef16371f4f0ed",
+ "Nigeria/household_roster": "5d02c048cc75572f92f772cfee1194e3a38057576d56ee565bb160ef37e47192",
+ "Nigeria/sample": "2a7c055cf1a3d3e802d9f6655ee11cf867bfdc384260feb560a75ae5438f4739",
+ "Nigeria|btf": {
+  "food_acquired": "8bc3968933e24d4c42eb780676650e2333e4911e868d25a1fcc9da7939039b4c",
+  "household_roster": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c",
+  "sample": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c"
+ },
+ "Niger|btf": {
+  "cluster_features": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c",
+  "food_acquired": "8bc3968933e24d4c42eb780676650e2333e4911e868d25a1fcc9da7939039b4c",
+  "household_roster": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c",
+  "sample": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c"
+ },
+ "Tanzania/food_acquired": "a8e9a978d9abbc544168795f513d501ea22cadb302002633691adf0332e8bbde",
+ "Tanzania/household_roster": "70e50216f8c522dc5f38c0414c380fc79d3e72352d0a56226f7956ea61f0b68b",
+ "Tanzania/sample": "271185f79a2204c5fc38df129f7613ecaec873c9a369616f88336d39df619a8d",
+ "Tanzania|btf": {
+  "food_acquired": "8bc3968933e24d4c42eb780676650e2333e4911e868d25a1fcc9da7939039b4c",
+  "household_roster": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c",
+  "sample": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c"
+ },
+ "Uganda/cluster_features": "3251263edd91fa7ba884bac397f2ec23033d5a60c4cbbf93668bb615c554d194",
+ "Uganda/food_acquired": "6403496789cae281bd4e15ec35137b2d166e51f7c9e43e1ff6f6065a39611e6d",
+ "Uganda/household_roster": "f327988c856ddd0e79e6e27f050ba6b0d49004252f2fb4a42cab94232bed7b7d",
+ "Uganda/sample": "67d0055dc5d918877e887a2c194da06415630e604bd77f8eee3fb7ba4a873e71",
+ "Uganda|btf": {
+  "cluster_features": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c",
+  "food_acquired": "8bc3968933e24d4c42eb780676650e2333e4911e868d25a1fcc9da7939039b4c",
+  "household_roster": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c",
+  "sample": "1acba6d6b7ef53b9b11a56756c95d24d70d86667edc1540310ae53bbb213fd0c"
+ },
+ "build_transforms_fingerprint(None)": "8bc3968933e24d4c42eb780676650e2333e4911e868d25a1fcc9da7939039b4c"
+}

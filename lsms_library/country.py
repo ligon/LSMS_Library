@@ -58,6 +58,7 @@ from .currency import attach_currency, is_monetary_table
 from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
+from .null_read_audit import check_declared_columns
 import importlib.util
 import hashlib
 import logging
@@ -2799,6 +2800,25 @@ class Country:
             # Record the country so a later standalone convert() can recover it
             # (Feature output instead carries `country` in the index).
             df.attrs['country'] = self.name
+
+            # SITE B of the null-content audit.  Every other guard on this
+            # table checks that a required declared column is PRESENT; this one
+            # checks it holds something.  Niger 2014-15's `Latitude` is present,
+            # `float`, and 0-of-270 populated, and passes all of them.
+            #
+            # Here rather than beside `_assert_built_required_columns` for two
+            # reasons, both load-bearing:
+            #   (1) `_finalize_result` runs on EVERY read, warm cache included,
+            #       so unlike GH #323's collapse audit this signal does not have
+            #       to be stamped into the parquet and replayed -- it simply
+            #       re-runs.  (#323 could not do that: its evidence is destroyed
+            #       before the parquet is written.  Ours is IN the parquet.)
+            #   (2) `_finalize_result` is in `_build_registry._EXCLUDED_CALLABLES`
+            #       as read-path code, so adding this costs no cache
+            #       invalidation.  MEASURED, not assumed.
+            check_declared_columns(
+                df, _required_scheme_columns(scheme_entry),
+                country=self.name, table=str(method_name or "?"))
 
         return df
 

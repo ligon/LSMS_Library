@@ -89,6 +89,7 @@ import pyreadstat
 import inspect
 from typing import Any
 from .paths import data_root, var_path, wave_data_path, countries_root
+from .null_read_audit import check_read
 from .config import s3_creds_path as _s3_creds_path
 
 # Initialize DVC filesystem once and reuse it.
@@ -1309,7 +1310,14 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             else:
                 raise
 
-    return df
+    # SITE R of the null-content audit.  The reader's ONLY post-read content
+    # check: a frame of the right shape holding nothing is a mis-parse, not
+    # empty data, and until this line nothing anywhere looked.  Reporting only
+    # -- `check_read` returns `df` unchanged by contract.  Threshold and
+    # measurement rationale live in `null_read_audit`; see also its CACHE note
+    # (this module's `get_dataframe` IS build-path, so its own source is
+    # fingerprinted -- the audit module's is deliberately not).
+    return check_read(df, fn)
 
 #def regularize_string(s):
 
