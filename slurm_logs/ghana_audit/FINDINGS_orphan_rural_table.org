@@ -499,6 +499,16 @@ parser bug below.  Concretely:
 - And: rename any wave-level =rural= table that is not that shape, so the name
   means one thing at every tier.
 
+  *Do NOT read that as a licence to rename the 1991-92 and 1998-99 tables on
+  their own.*  Both are *live* via path 3 -- =code_label_map('rural', _dirs)= at
+  =1991-92/_/mapping.py:53= and =1998-99/_/mapping.py:19=, consumed by each
+  wave's =Rural()=.  =code_label_map= returns ={}= for a table name it cannot
+  find, so a rename without touching the caller *silently nulls GLSS3's and
+  GLSS4's =Rural== -- the exact Trap 1 symptom.  Either rename the table and its
+  =mapping.py= caller *in the same change*, or leave them alone.  Only the
+  1988-89 table can be renamed unilaterally, because nothing reads it (that is
+  what GH #692 proposes, and it is deliberately scoped to that one table).
+
 * GhanaLSS idiosyncrasies bearing on this -- named and quoted
 
 All from =lsms_library/countries/GhanaLSS/_/CONTENTS.org= (1,251 lines, read in

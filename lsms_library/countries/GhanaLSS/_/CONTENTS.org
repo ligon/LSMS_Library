@@ -1167,7 +1167,9 @@ Two consequences.
   #682/#685 refuse.  Do not wire it.
 - *Do not read this table as anything to do with =Rural=.*  GLSS1/GLSS2's
   urban/rural classification comes from BID Appendix I (=urbrur_abbrev= in
-  =_/appendix_i_clusters.org=), not from here.
+  =_/appendix_i_clusters.org=), not from here.  /That table is wired on
+  =feat/682-semi-urban= (=553ed2b0=, GH #685) and is not yet on =development=;
+  the canonical =Semi-urban= value it emits arrives with #682./
 
 *** A categorical table has THREE consumption paths, and they do not agree
 
