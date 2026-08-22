@@ -47,6 +47,31 @@ kinship decomposition files it as [1, 0, consanguineal], the same treatment
 Guyana's "Father/Mother/T-in-law/M-in-law" gets.  The conflation is the
 survey's, not this file's.
 
+*Code 7 (OTRO PARIENTE) is not decomposable, and the manual says so.*
+=m-encues.pdf=, "Pregunta Nº 1: Parentesco o relación con el jefe", verbatim:
+
+#+begin_quote
+Otro pariente (código 7) comprende a los parientes consanguíneos y de
+matrimonio con el jefe: hermano, tío, primo, consuegro, bisnieto, abuelo,
+cuñado, bisabuelo, sobrino.
+#+end_quote
+
+Translation (agent-supplied, NOT source text): code 7 comprises the head's
+blood *and* marriage relatives -- brother, uncle, cousin, co-parent-in-law,
+great-grandchild, grandfather, brother-in-law, great-grandfather, nephew.
+
+That single code therefore spans *Generation -3..+3*, *Distance 0..2* and
+*both affinities*.  884 people (4.58% of the roster, in 474 households) carry
+it.  No single kinship tuple is correct for them, so
+=lsms_library/categorical_mapping/kinship.yml= maps ="Otro Pariente"= to
+=[null, null, null]= -- an explicit unknown.  Generation / Distance / Affinity
+come back =pd.NA= for exactly those 884 people.
+
+Until 2026-08-22 it was filed =[0, 0, consanguineal]= ("same generation,
+lineal, blood" -- Kroeber's cell for ego itself), which is *refuted by the
+quotation above*, not merely uninformative.  Do not re-add a tuple.  See
+GH #698.
+
 #+name: Relationship
 | Code | Preferred Label        |
 |------+------------------------|
@@ -125,11 +150,29 @@ none contradicts it:
    "Av. Arequipa", "Jr. Tacna"), so a mismatch is the expected result for any
    toponym that is also a common street name.
 
-*Residual uncertainty, stated rather than hidden*: none of the above pins an
-individual label; they pin the pattern.  A swap between two departments that
-are similar in size, urbanisation and Selva status would survive all four
-checks.  Resolving that needs an ENNIV code list, which this repository does
-not hold.
+*Residual uncertainty, stated rather than hidden* -- but narrower than an
+earlier draft of this section claimed, and the two halves of the problem are
+pinned by different evidence:
+
+- *The rule and its endpoints are external and checkable.*  The list is the
+  INEI /ubigeo/ departmental ordering: Peru's 24 departments plus the
+  Constitutional Province of Callao, numbered 01..25 in Spanish alphabetical
+  order, 01 Amazonas through 25 Ucayali.  That ordering is documented
+  independently of this repository, and any pairwise swap would have to break
+  alphabetical order -- which is visible on inspection of the table below.
+- *The offset is pinned by check 1.*  Callao lands at 07 and is 85/85 urban,
+  which is only true if the numbering is aligned.
+
+What survives is narrow: an error that preserved alphabetical order *and* the
+Callao offset -- i.e. essentially a systematic re-lettering, not a swap.  The
+four data checks above then have to carry it, and they would catch any such
+shift.  Resolving the residue outright still needs an ENNIV code list, which
+this repository does not hold.
+
+(An earlier version said flatly that "a swap between two departments similar
+in size, urbanisation and Selva status would survive all four checks".  That
+ignored the alphabetical constraint, and an under-claim costs the next reader
+the same wasted work an over-claim does.)
 
 #+name: Region
 | Code | Preferred Label |
@@ -185,14 +228,17 @@ documented design of 820 + 1,380 urban and 1,344 rural dwellings.
 
 The three tables below decode variables no wave currently extracts.  They are
 kept because the variables are present in REG02.DTA and the decodes are
-useful, but *they have not been validated against source* -- unlike the four
-tables above.  Do not rely on them without checking first.
+useful.  =EST-CIVIL= and =LENGUA= have now been checked against
+=dicciona.pdf= (see each); =SI_NO= has not been validated against source.  Do
+not rely on an unvalidated table without checking first.
 
 ** Marital status (=B05-EST-CIVIL=)
 
 =dicciona.pdf= record HOGA1 does print these labels: CONVIVIENTE 1, CASADO 2,
-VIUDO 3, DIVORCIADO 4, SEPARADO 5, SOLTERO 6, NO-RESPONDE 9.  The table below
-omits code 9; add it before using this table.
+VIUDO 3, DIVORCIADO 4, SEPARADO 5, SOLTERO 6, NO-RESPONDE 9.  Code 9 was
+missing from this table and is *added 2026-08-22*: MEASURED, =REG02.b05= takes
+the values {1, 2, 3, 4, 5, 6, 9}, so a decode without 9 would have left those
+rows unlabelled.
 
 #+name: EST-CIVIL
 | Code | Preferred Label |
@@ -203,26 +249,58 @@ omits code 9; add it before using this table.
 |    4 | Divorciado/a    |
 |    5 | Separado/a      |
 |    6 | Soltero/a       |
+|    9 | No responde     |
 
 ** Language (=B06-LENGUA=)
 
-*This table is WRONG for 1994 and is retained only as a warning.*
-=dicciona.pdf= record HOGA1 declares B06-LENGUA as: CASTELLANO 1, QUECHUA 2,
-AYMARA 3, *CAMPA 4, SHIPIBO 5*, OTRO-NATIVO 6, INGLES 7, OTRO-EXTRANJERO 8,
-NO-HABLA 9 -- nine codes.  The list below has seven and shifts everything from
-code 4 upward.  It presumably came from the 1991 dictionary that is not in
-this repository.  Fix it against =dicciona.pdf= before extracting B06.
+*CORRECTED 2026-08-22 against source.*  This table previously carried SEVEN
+codes, shifting everything from code 4 upward, and was shipped knowingly wrong
+with a warning attached.  That is the GH #676 setup verbatim -- a dead decode
+that a later reader revives and trusts -- so it is now fixed rather than
+flagged.  The nine codes below are =dicciona.pdf= record HOGA1, verbatim:
+
+: B06-LENGUA N 23 1 CASTELLANO 1 QUECHUA 2 AYMARA 3 CAMPA 4 SHIPIBO 5
+:                   OTRO-NATIVO 6 INGLES 7 OTRO-EXTRANJERO 8 NO-HABLA 9
+
+Corroborated in the data, and decisively -- MEASURED 2026-08-22, =REG02.b06=
+takes exactly nine distinct values and their frequencies fit the nine-code
+list and *not* the seven-code one:
+
+| code | corrected label | n      | fits? |
+|------+-----------------+--------+-------|
+|    1 | Castellano      | 15,305 | dominant, as expected for Spanish |
+|    2 | Quechua         |  2,619 | second, as expected |
+|    3 | Aymara          |    398 | third |
+|    4 | Campa           |     39 | small Amazonian language |
+|    5 | Shipibo         |    123 | small Amazonian language |
+|    6 | Otro nativo     |     93 | |
+|    7 | Ingles          |      2 | two English speakers -- plausible |
+|    8 | Otro extranjero |     17 | |
+|    9 | No habla        |    689 | infants and toddlers who do not yet speak |
+
+The old table had no code 8 or 9 at all, so it silently dropped the 706 people
+there, and it labelled the 2 people at code 7 "No habla" when they are the
+English speakers.  689 at "No habla" against 2 at "Ingles" is the pattern a
+roster including infants must produce; the reverse is not.
+The superseded seven-code list is recorded here so the error is traceable
+rather than merely gone -- it read
+=4 Otra lengua nativa / 5 Ingles / 6 Otro extranjero / 7 No habla=, i.e. it
+omitted CAMPA and SHIPIBO and shifted codes 4-7.  Its provenance was the 1991
+=DICCIONA.ASC= that this repository does not hold, so it may still be right
+*for 1991*; it is wrong for 1994.  Nothing extracts B06 today.
 
 #+name: LENGUA
-| Code | Preferred Label    |
-|------+--------------------|
-|    1 | Castellano         |
-|    2 | Quechua            |
-|    3 | Aymara             |
-|    4 | Otra lengua nativa |
-|    5 | Ingles             |
-|    6 | Otro extranjero    |
-|    7 | No habla           |
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | Castellano      |
+|    2 | Quechua         |
+|    3 | Aymara          |
+|    4 | Campa           |
+|    5 | Shipibo         |
+|    6 | Otro nativo     |
+|    7 | Ingles          |
+|    8 | Otro extranjero |
+|    9 | No habla        |
 
 ** Yes/No
 

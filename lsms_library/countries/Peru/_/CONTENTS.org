@@ -747,15 +747,22 @@ do NOT join to each other:
 : -> False
 
 A naive join of a cluster attribute onto households by splitting =i= fails for
-every segmento below 100 -- i.e. for most of the file, silently, as an empty
-match rather than an error.
+every segmento below 100, silently, as an empty match rather than an error.
+MEASURED 2026-08-22 on the cold-built tables: *60 of 364 segments (16.5%) do
+not join*, carrying *720 of 3,623 households (19.9%)* and *3,862 of 19,285
+people (20.0%)*.  The 304 three-digit segmentos match because padding to width
+3 is a no-op for them.
+
+(An earlier version of this entry said "most of the file".  It is one fifth --
+corrected rather than deleted, because an over-claim here costs the next
+reader the same trust an under-claim does.)
 
 *Today this is harmless*: Peru has no =sample= table, so
 =_join_v_from_sample()= never runs and =v= never reaches a household-level
 table.  It becomes live the moment somebody wires =sample= (=v= and =Rural=,
-both already in REG01 -- the natural follow-up).  *Whoever does that must
-decide the padding once and apply it to both*, or the household-to-cluster
-join will be quietly wrong rather than loudly broken.
+both already in REG01 -- the natural follow-up, *filed as GH #700*).
+*Whoever does that must decide the padding once and apply it to both*, or the
+household-to-cluster join will be quietly wrong rather than loudly broken.
 
 ** The Guatemala float32 trap does NOT apply to 1994 -- but check 1985/1991
 
@@ -906,16 +913,75 @@ macOS-style duplicates of files whose originals are DVC-tracked.  They have no
 =.dvc= sidecar and are committed into git directly, which is the opposite of
 this repository's convention.  Nothing reads them; they should probably go.
 
-** 1990 -- 39 DVC sidecars, and NOT readable by this library
+** 1990 -- 39 DVC sidecars, =.SSP= = SAS XPORT, readable TODAY
 
-Every data file in =1990/Data/= is =.SSP= (=N00A.SSP=, =EXPEND.SSP=,
-=PANEL.SSP=, ... plus =FORMAT.ZIP=).  That is the SPSS/PC+ system-file format;
-=get_dataframe()= handles =.dta= / =.csv= / =.parquet= only, and =pyreadstat=
-does not read =.SSP= either.  *This is an acquisition / conversion blocker,
-not a config gap*: no amount of YAML makes this wave readable.  Either a
-Stata/SPSS conversion has to be produced and pushed, or the wave has to be
-re-acquired in a readable format.  Note also that 1990 is Lima-only (see the
-universe section above), so it is the least useful of the four.
+*CORRECTED 2026-08-22.*  An earlier version of this entry said the =.SSP= files
+were SPSS/PC+, that =pyreadstat= could not read them, and that the wave was
+"an acquisition / conversion blocker" needing re-acquisition.  *All three were
+wrong*, and the third was the expensive kind of wrong -- it prescribed money
+and months for what is a branch in a fallback chain.  Recorded as a correction
+rather than silently overwritten, because an unevidenced negative in this file
+closes a line of work permanently (=CLAUDE.md=, "Never write an unevidenced
+'no module here' claim").
+
+The files are *SAS Transport (XPORT) V5*, written by SAS 6.06/6.07 in 1992-93.
+Magic bytes, MEASURED on the bare DVC blob of =N00A.SSP= (md5 =a7e26161...=):
+
+: HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!000...
+: SAS     SAS     SASLIB  6.06    World          09JUL92:16:50:38
+
+=get_dataframe()= still fails on them -- =local_tools.read_file= tries
+=.dta= / =.csv= / =.parquet= and never an XPORT branch -- so this is a
+*library gap, not an acquisition gap*.  The data is on disk today.
+*Filed as GH #699* with the reproduction.
+
+*** Use =pandas.read_sas=, NOT =pyreadstat.read_xport=
+
+This matters more than which library you reach for.  MEASURED 2026-08-22 on
+the three blobs present locally, both readers against the same bytes:
+
+| file        | rows  | columns | non-empty via =pyreadstat= | non-empty via =pandas= |
+|-------------+-------+---------+----------------------------+------------------------|
+| =N00A.SSP=  | 1,528 |      10 |                          3 |                     10 |
+| =EXPEND.SSP=| 1,509 |       5 |                          3 |                      5 |
+| =PANEL.SSP= | 3,326 |       4 |                          2 |                      4 |
+| *total*     |       |      19 |                        *8* |                   *19* |
+
+=pyreadstat.read_xport()= returns *100% NaN for 11 of the 19 columns* and
+raises nothing.  In =EXPEND.SSP= the loss alternates exactly -- =HID= ok,
+=HHSIZE= NaN, =PCFDEXP= ok, =WT= NaN, =TOTPCX= ok -- which is the signature of
+a field-width misalignment, not of empty data.  =pandas.read_sas(blob,
+format='xport')= reads all 19 columns correctly *from the bare blob, with no
+=.xpt= rename*.
+
+*Anyone wiring this wave with =read_xport= would ship half of it silently
+empty.*  That is why the reader choice is recorded here and not left to
+whoever picks the task up.
+
+*** What the recovered columns actually contain
+
+- =EXPEND.SSP= carries *=WT=*, and it is a real sampling weight: 1,509 values,
+  range 0.5..1.0, mean 0.854, taking essentially the two values 0.5 and 1.0.
+  A two-valued weight is what the documented 1990 design predicts -- the
+  1985-86 Lima panel of 1,280 dwellings plus the 260-dwelling urbano-marginal
+  =ampliación= (see the universe section), i.e. two strata sampled at
+  different rates.  *This appears to be the only real sampling weight anywhere
+  in the Peru series*: =_weight_= in every 1994 file is =int8= and identically
+  1, an export artefact rather than a weight.
+- =PANEL.SSP= is a person-level 1985<->1990 link: =HID=, =PID85=, =PID90=,
+  =HHID=, all 3,326 rows populated.  *=PID90= is NOT empty* -- reading it as
+  empty is the =read_xport= artefact above.  So 1990 does have a usable person
+  key, and the wave is panel-linkable to 1985.
+- =N00A.SSP= household cover: =HID= unique (1,528), =SEGMENT= 152 distinct
+  (235..526, a Lima subset of 1991's range), =CID= constant 1.0 -- so =CID= is
+  *not* a cluster id here, =SEGMENT= is.  =ZONE=, =CONGLOM=, =HHNO=, =NH1=,
+  =NH2=, =DAYI=, =MOI= all read via pandas.
+
+Only 3 of the 39 sidecars had blobs in the local L1 cache when this was
+measured; the other files are unexamined.  Note also that 1990 is Lima-only
+(see the universe section above), which bears on its usefulness -- but that is
+a *scope* judgement, not a readability one, and the two were previously
+conflated here.
 
 ** 1991 -- 108 DVC sidecars, Stata =.DTA=, closest to a quick win
 
@@ -936,11 +1002,21 @@ rather than as 1994's combined two-digit code.  So =(segment, hhno)= is NOT
 unique -- multi-household dwellings -- but =hid= is, and being scalar it needs
 no wave-level =i()=.
 
-What 1991 still needs: a wave =_/data_info.yml=; its own code lists (the
-=Relationship= / =Sex= tables in =_/categorical_mapping.org= are established
-for 1994 only); a float32 re-check on whatever files it reads; and above all
-*a decision on the cluster, settled from the 1991 documentation rather than by
-inspection*.  =segment= has 240 distinct values over 2,308 households and is
+What 1991 still needs (*filed as GH #701*): a wave =_/data_info.yml=; its own
+code lists (the =Relationship= / =Sex= tables in =_/categorical_mapping.org=
+are established for 1994 only); a float32 re-check on whatever files it reads;
+and above all *a decision on the cluster, settled from the 1991 documentation
+rather than by inspection*.
+
+*And a hard blocker on any monetary column.*  The =_i= / =_d= column-suffix
+pairs in 1990/1991 are NOT integer and decimal parts, despite the analogy with
+1994's dictionary-proven =AK03E= / =AK03D= split.  Falsified on 1991
+=N09A.DTA=: =fdexp_i= is 64% non-integer, =fdexp_d= takes only five distinct
+values, is almost always 0, and reaches 315 -- which no decimal part can --
+and =corr(fdexp_i, fdexp_d) = 0.0063=.  The true meaning is unknown and there
+is no 1990/1991 data dictionary in this repository.  Reading it as
+=Expenditure = i + d/100= would silently corrupt every 1990/1991 expenditure
+number.  (Measured by the GH #684 red-team, not re-derived here.)  =segment= has 240 distinct values over 2,308 households and is
 100% populated, but =zone= (58 values) and =conglom= (28 values) are also
 present and only partly populated -- 1,282 and 1,594 of 2,308 rows are null --
 while =seccion= and =aer= are 100% null.  A partly-populated geography column

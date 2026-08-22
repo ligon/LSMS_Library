@@ -165,7 +165,7 @@ build**, and every one reproduced §4's claims.
 | table | result |
 |---|---|
 | `cluster_features` | 364 x 2, index `(t, v)`, unique; Region 25 labels 0 null; Rural {Urban 253, Rural 111} |
-| `household_roster` | 19,285 x 7, index `(i, t, pid)`, unique; Sex {F 9883, M 9402}; Age 0--98, 6 null; Relationship 10 labels; MonthsAway 0--12, 3 null; Generation/Distance/Affinity **0 null** |
+| `household_roster` | 19,285 x 7, index `(i, t, pid)`, unique; Sex {F 9883, M 9402}; Age 0--98, 6 null; Relationship 10 labels; MonthsAway 0--12, 3 null; Generation/Distance/Affinity 884 null each (see §8.2 -- this said "**0 null**" before review) |
 | `household_characteristics` | 3,621 x 15, index `(t, i)`, unique |
 | `individual_education`, `food_acquired`, `interview_date`, `food_expenditures`, `food_prices`, `food_quantities` | clean `RuntimeError` ("no wave-level build succeeded") -- declared, no wave implements them |
 
@@ -198,9 +198,10 @@ correctly lacks `v` (no `sample` table).
 - **`categorical_mapping/kinship.yml`** -- additive, 9 new keys, no collision
   with the 483 existing ones (`Otro Pariente` deliberately not re-added; it
   already exists from Guatemala ENCOVI with the same tuple).  Proven load-
-  bearing: Generation / Distance / Affinity come back **0 null** over all
-  19,285 people, which is only possible if every one of the ten PARENTESCO
-  labels resolves.
+  bearing: every one of the ten PARENTESCO labels resolves, where before the
+  addition nine of ten did not.  **This section originally cited "0 null over
+  all 19,285 people" as evidence of correctness. That was wrong reasoning and
+  is retracted -- see §8.2.**
 
 One residual, **not** changed here: `Otro Pariente` -> `[0, 0, consanguineal]`
 is Guatemala's pre-existing tuple, and it makes Peru's `Distance` identically 0
@@ -278,3 +279,172 @@ there is no misfiled registry to rename.
 `blessed.csv` remains untouched, per §6 and the repo rule: every number here was
 checked against source by an agent, and an agent-written blessing would make
 `blessed` a synonym for `sane`.
+
+---
+
+## §8 Red-team round (2026-08-22)
+
+An independent red-team returned **FIX-THEN-MERGE** on PR #691
+(`PATCHREVIEW_691.org`), using a blind ground-truth derivation
+(`GROUNDTRUTH_684.org`) as an oracle.  It reproduced every measurement in §7
+cold, confirmed the build sound, and decoded the three ENNIV PDFs (they are
+LZW-compressed text, which is why every reader here had failed on them) to
+check the documentary transcriptions verbatim.  All of them held.
+
+What follows is what **changed** as a result, and — importantly — the three
+places where my own measurement **contradicted what the review told me**.
+
+### §8.1 F1 — the 1990 wave: I was wrong, and the review was partly wrong too
+
+§7 / `CONTENTS.org` asserted the 1990 `.SSP` files were SPSS/PC+, that
+`pyreadstat` could not read them, and that the wave needed **re-acquisition**.
+All three false.  They are **SAS Transport (XPORT) V5** (SAS 6.06/6.07,
+1992–93), on disk today.  This was the worst defect in the PR: an unevidenced
+negative in `CONTENTS.org` prescribing months of work, which is precisely the
+Albania shape `CLAUDE.md` warns about.  Corrected in full, as a visible
+correction rather than a silent overwrite.
+
+**But the review's prescribed remedy is itself a trap, and I caught it by
+measuring instead of adopting.**  The review (and the coordinator relaying it)
+said to use `pyreadstat.read_xport`.  Measured, both readers on the same bytes:
+
+| file | cols | non-empty via `pyreadstat` | non-empty via `pandas` |
+|---|---|---|---|
+| `N00A.SSP` | 10 | 3 | 10 |
+| `EXPEND.SSP` | 5 | 3 | 5 |
+| `PANEL.SSP` | 4 | 2 | 4 |
+| **total** | **19** | **8** | **19** |
+
+`pyreadstat.read_xport` returns **100% NaN for 11 of 19 columns and raises
+nothing**.  In `EXPEND.SSP` the loss alternates exactly (`HID` ok, `HHSIZE`
+NaN, `PCFDEXP` ok, `WT` NaN, `TOTPCX` ok) — a field-width misalignment, not
+empty data.  `pandas.read_sas(blob, format='xport')` reads all 19 from the
+bare blob with no `.xpt` rename.  **Anyone following the review's advice would
+ship 1990 with half its columns silently empty.**
+
+Two consequences the review could not have reached:
+
+- **`WT` is real** — 1,509 values, 0.5–1.0, mean 0.854, essentially
+  two-valued, which is what the documented two-stratum 1990 design predicts
+  (the 1,280-dwelling Lima panel plus the 260-dwelling urbano-marginal
+  *ampliación*).  I was told `WT` was "apparently the only real sampling
+  weight in the Peru series"; via `read_xport` it reads as **entirely NaN**,
+  so that claim was true in substance but unsupported by the method offered
+  for it.  It is now supported.
+- **`PID85`/`PID90` are real** (3,326 rows each), which **resolves
+  `GROUNDTRUTH_684.org` open Gap #2** ("genuinely empty variable, or an
+  XPORT-reader artefact").  It is the artefact.  1990 has a usable person key
+  and is panel-linkable to 1985.
+
+Filed as **GH #699** with the reproduction.  Reader implemented: **no** — out
+of scope for this PR, as instructed.
+
+### §8.2 N1 — `Otro Pariente`, and the retraction of my own evidence
+
+`m-encues.pdf` "Pregunta Nº 1" defines B01 code 7 as *"hermano, tío, primo,
+consuegro, bisnieto, abuelo, cuñado, bisabuelo, sobrino"* — spanning
+Generation −3..+3, Distance 0..2 and both affinities.  `[0, 0,
+consanguineal]` is therefore **refuted by a document this repo ships**, not
+merely uninformative.
+
+Now `[null, null, null]`.  Verified this needs **no framework change**
+(`_load_kinship_map` does `tuple(vals)`; `_component` returns `x[i]` for any
+tuple; `pd.array(..., Int64Dtype())` maps `None` → `pd.NA`) and that **no
+"unknown relationship labels" warning fires**, because the key still matches —
+which is the point: removing the entry instead would produce a recurring
+warning whose own text invites the next reader to supply a fresh guess.
+
+Blast radius measured before and after, cold, on the shared key:
+
+| | rows | `Otro Pariente` | Gen/Dist/Affinity nulls before → after |
+|---|---|---|---|
+| Peru | 19,285 | 884 (4.58%) | 0 → 884 |
+| Guatemala | 37,771 | 596 (1.58%) | 0 → 596 |
+
+No other value in either country changed; Guatemala's `Distance` still spans
+{0, 1}.  `test_feature_is_sane[Guatemala/household_roster]` passes.  This is a
+correctness gain for Guatemala too — the tuple was equally unjustified there —
+so it is not a degradation and I did not stop.
+
+**Retraction.**  §7 asserted "Generation/Distance/Affinity 0 null over all
+19,285 people" three times *as evidence the mapping was correct*.  That was
+bad reasoning: zero-null is a **coverage** measure, not a correctness one, and
+it was asserted alongside the separate observation that `Distance` was
+constant — which should have been the tell.  The mapping produced a non-null
+value for 884 people by asserting something the source denies.  Corrected
+throughout.
+
+Half the degeneracy is *not* the mapping's fault and is worth keeping
+straight: ENNIV's ten codes contain **no sibling or cousin category at all**,
+so Peru's `Distance` would be degenerate under any mapping.  Filed as
+**GH #698**, which also covers the canonical file's self-inconsistency
+(`Other relative of head or spouse` = `[0,0,consanguineal]` at kinship.yml:282
+vs `Other relative of head` = `[0,2,consanguineal]` at :631).
+
+### §8.3 F2, N2, N3, N4/N5, and the Region admission
+
+- **F2** — "most of the file" was wrong.  Re-measured independently, matching
+  the review exactly: **60/364 segments (16.5%), 720/3,623 households (19.9%),
+  3,862/19,285 people (20.0%)**.  Corrected.
+- **N2** — the MODE hook reported nothing at build time; its counts lived in a
+  docstring measured once.  It now warns on **every** build with the projected
+  row count, the number of disagreeing (column, segment) pairs and the number
+  of overruled values, plus the 2026-08-21 expectation, so drift is loud.
+  Fires with exactly **17 pairs / 18 values**.  This matters because moving
+  the collapse into a `df_edit` hook also moved it *above* the framework's
+  own grain auditor.
+- **N3 — `LENGUA` is FIXED, not merely flagged.**  The review confirmed the
+  nine-code list from `dicciona.pdf`, so shipping a knowingly-wrong table was
+  no longer defensible (the GH #676 bet).  The frequency distribution settles
+  it independently: `b06` takes exactly 1..9, and 689 people sit at code 9
+  (`No habla` — infants) against 2 at code 7 (`Ingles`).  The old table had no
+  code 8 or 9 at all, silently dropping 706 people, and labelled the two
+  English speakers "No habla".  Also **added `EST-CIVIL` code 9** — measured,
+  `b05` takes {1..6, 9}, and the table omitted 9.
+- **N4/N5** — recorded in the config comments where the next agent will hit
+  them, each re-measured here: `individual_education (t,i,pid)` has **26**
+  duplicate tuples (not additive → would land on `groupby().first()`);
+  `food_acquired (t,i,j,s)` has **87** (benign, additive SUM); `ak03` reaches
+  **99999.99** against a declared max of 1000 and the scrubber only fires
+  above 1e99; `u` and `v` are dropped from the canonical `food_acquired`
+  index, which matters to `Feature()`.
+- **Region** — the review judged my "not provable" admission *pessimistic*,
+  and it was right.  The INEI *ubigeo* ordering is externally documented and
+  the shipped table is **strictly alphabetical** (verified programmatically,
+  0 violations), so a pairwise swap would have to break alphabetical order,
+  which is visible on inspection; check 1 (Callao at 07, 85/85 urban) pins the
+  offset.  What survives is only a systematic re-lettering, which the four
+  data checks would catch.  Softened accordingly — an under-claim wastes the
+  next reader's time exactly as an over-claim does.
+
+Withdrawn by the review and correctly **not** changed: the Pregunta 8-vs-9
+citation.  Both are right; the "pregunta 9" inside the quoted passage is a
+typo *in the manual*, reproduced verbatim as a quotation should be.
+
+Withdrawn by the coordinator: the claim that the declared-but-unwired tables
+are stale Nepal-template residue.  The review measured all three as
+satisfiable from real 1994 columns.
+
+### §8.4 Issues filed (the §7 promise, now kept)
+
+The review's sharpest bookkeeping point: "a deferral with no issue is a
+deletion."  §7 promised five follow-ups and filed none.  All five now exist:
+
+| # | subject |
+|---|---|
+| **#698** | `Otro Pariente` undetermined; corpus-wide "other relative" policy |
+| **#699** | `local_tools.read_file` has no XPORT branch (with the `read_xport` trap) |
+| **#700** | Peru `sample` wiring; settles the v/i padding; do **not** use `_weight_` |
+| **#701** | Peru 1991 wiring; carries the `_i`/`_d` blocker |
+| **#702** | Afghanistan declares no `Data Scheme:` at all |
+
+### §8.5 A caveat on what the test suite proves
+
+`tests/test_table_structure.py` enumerates `CACHED` at **collection time** and
+only tests tables already in the cache — clearing Peru's cache de-collects
+every Peru case.  So a green run there is **not** a cold guarantee; it grades
+whatever the cache happens to hold.  Discovered by clearing the cache and
+watching the Peru tests silently vanish rather than fail.  The cold evidence
+in this ledger comes from the private-`LSMS_DATA_DIR` builds, not from pytest.
+
+`blessed.csv` still untouched.

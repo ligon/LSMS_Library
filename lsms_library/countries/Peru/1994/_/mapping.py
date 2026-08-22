@@ -166,6 +166,8 @@ def cluster_features(df):
     grouped = df.groupby(level=levels, observed=True)
 
     ties: list[str] = []
+    overruled = 0                 # household rows whose value != their segment's mode
+    conflicting: list[str] = []   # (col, segment) pairs that disagreed at all
     out = {}
     for col in df.columns:
         vals = {}
@@ -173,6 +175,10 @@ def cluster_features(df):
             m = s.dropna().mode()
             if len(m) == 1:
                 vals[key] = m.iloc[0]
+                n_diff = int((s.dropna() != m.iloc[0]).sum())
+                if n_diff:
+                    overruled += n_diff
+                    conflicting.append(f"{col}@{key}")
             else:
                 vals[key] = pd.NA
                 if len(m) > 1:
@@ -182,6 +188,24 @@ def cluster_features(df):
     res = pd.DataFrame(out)
     res.index = grouped.size().index
 
+    # Report the reduction EVERY build, not just on a tie.  The framework's own
+    # GrainCollapse audit cannot see this projection -- the hook runs upstream
+    # of `_normalize_dataframe_index`, so moving the collapse here also moved it
+    # above the auditor.  Without this the counts would live only in a docstring
+    # measured once on 2026-08-21, and a re-pushed REG01 or a changed key would
+    # drift silently.  (GH #691 review, N2.)
+    n_rows, n_groups = len(df), len(res)
+    if overruled or conflicting:
+        warnings.warn(
+            f"Peru 1994 cluster_features: projected {n_rows} household rows onto "
+            f"{n_groups} segments by MODE; {len(conflicting)} (column, segment) "
+            f"pair(s) disagreed and {overruled} household value(s) were overruled "
+            f"by their segment's majority. Expected as of 2026-08-21: 17 pairs, "
+            f"18 values. A CHANGE HERE MEANS THE SOURCE OR THE KEY MOVED -- "
+            f"re-read `_/CONTENTS.org` before trusting the result. "
+            f"Disagreeing: {', '.join(sorted(conflicting)[:8])}",
+            RuntimeWarning,
+        )
     if ties:
         warnings.warn(
             f"Peru 1994 cluster_features: {len(ties)} cluster attribute(s) had "

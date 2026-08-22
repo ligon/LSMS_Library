@@ -68,6 +68,16 @@ Data Scheme:
     # tests/test_schema_consistency.py checks the DECLARATION, matching
     # Guyana / Tajikistan / Serbia / every other roster country.
     #
+    # THEY ARE NOT FULLY POPULATED, and that is correct.  B01 code 7 ("Otro
+    # pariente") is defined by m-encues.pdf Pregunta No 1 as brother / uncle /
+    # cousin / co-parent-in-law / great-grandchild / grandfather /
+    # brother-in-law / great-grandfather / nephew -- spanning Generation -3..+3,
+    # Distance 0..2 and both affinities.  No single tuple is right, so kinship
+    # maps it to [null, null, null] and those 884 people (4.58%) get pd.NA in
+    # all three columns.  Distance is 0 for everyone else because ENNIV's ten
+    # codes contain no sibling or cousin category at all -- the degeneracy is
+    # the instrument's, not the mapping's.  See GH #698.
+    #
     # Do NOT register household_characteristics -- it auto-derives from this
     # table via _ROSTER_DERIVED.
     index: (t, i, pid)
@@ -102,6 +112,13 @@ Data Scheme:
     # (1:6).  Needs a level x year -> `harmonize_education` decode that has
     # not been written; the ENNIV level labels are NOT in the shipped PDFs as
     # a code list.
+    #
+    # MEASURED (GH #691 review, N4): the declared (t, i, pid) index carries 26
+    # DUPLICATE tuples in REG05 (15,916 groups / 15,942 rows).  Educational
+    # Attainment is not an additive measure, so these would land straight on
+    # the framework's silent groupby().first().  Resolve the key explicitly --
+    # a df_edit hook, as household_roster does -- rather than letting core
+    # reduce them.
     index: (t, i, pid)
     Educational Attainment: str
 
@@ -121,6 +138,23 @@ Data Scheme:
     #
     # `Produced` and a required `Price`, declared in the never-loaded original
     # of this file, are dropped: neither is substantiated by the module.
+    #
+    # NOTE for whoever wires this (GH #691 review, N4/N5):
+    #   * The canonical `index_info` for food_acquired is (t, v, i, j, u, s);
+    #     this declares (t, i, j, s).  `v` is absent because Peru has no
+    #     `sample`, and `u` because the module records no unit -- but
+    #     `Feature('food_acquired')` assembles on the CANONICAL index, so the
+    #     difference matters the day it is wired.
+    #   * MEASURED: (i, j, s) carries 87 duplicate tuples in REG36.  Benign --
+    #     food_acquired is in `_ADDITIVE_MEASURE_COLUMNS`, so Expenditure SUMs
+    #     losslessly rather than being first()-collapsed.
+    #   * MEASURED: ak03 reaches 99999.99 while dicciona.pdf declares
+    #     AK03E-TOTA-ENTER "MONTO 00000:01000".  Two orders of magnitude out of
+    #     range -- almost certainly a sentinel, and `grab_data`'s scrubber only
+    #     fires above 1e99, so it would pass through as a real expenditure.
+    #     Decide what to do with it BEFORE wiring Expenditure.
+    #   * ak03 is itself a recombination: the dictionary splits the amount into
+    #     AK03E-TOTA-ENTER (whole) + AK03D-TOTA-DECIM (decimal).
     index: (t, i, j, s)
     Quantity:
         type: float
