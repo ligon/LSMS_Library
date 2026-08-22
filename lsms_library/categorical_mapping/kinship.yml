@@ -447,10 +447,57 @@ Lodger:                                  [0, 0, guest]
 "Suegro (A)":                            [1, 0, affinal]
 "Yerno - Nuera":                         [-1, 0, affinal]
 "CuÑado (A)":                           [0, 1, affinal]
-"Otro Pariente":                         [0, 0, consanguineal]
+# "Otro Pariente" is UNDETERMINED by the instruments that use it, and is
+# recorded as an explicit unknown rather than a guess.  Peru ENNIV 1994's
+# enumerator manual (Peru/1994/Documentation/m-encues.pdf, "Pregunta No 1:
+# Parentesco o relacion con el jefe") defines the category verbatim:
+#
+#   "Otro pariente (codigo 7) comprende a los parientes consanguineos y de
+#    matrimonio con el jefe: hermano, tio, primo, consuegro, bisnieto,
+#    abuelo, cunado, bisabuelo, sobrino."
+#
+# Brother, uncle, cousin, co-parent-in-law, great-grandchild, grandfather,
+# brother-in-law, great-grandfather, nephew -- that single code spans
+# Generation -3..+3, Distance 0..2, and BOTH affinities.  Any single tuple is
+# therefore refuted by the source, not merely uninformative; the previous
+# [0, 0, consanguineal] asserted "same generation, lineal, blood", which is
+# Kroeber's cell for ego itself, for 884 Peruvian and 596 Guatemalan people.
+#
+# A null tuple is expressible with no framework change: `_load_kinship_map`
+# does `tuple(vals)`, `_expand_kinship._component` returns `x[i]` for any
+# tuple, and `pd.array(..., Int64Dtype())` turns None into pd.NA.  The key
+# still MATCHES, so no "unknown relationship labels" warning fires -- which is
+# the point: a warning would invite the next reader to supply a fresh guess.
+# DO NOT "fix" this by inventing a tuple.  See GH #698.
+"Otro Pariente":                         [null, null, null]
 "Otro No Pariente":                      [0, 0, unrelated]
 "Empleada Domestica":                    [0, 0, servant]
 "Pensionista - Huesped":                 [0, 0, guest]
+
+# --- Spanish variants (Peru ENNIV 1994, B01-PARENTESCO 0..9) ---
+# The ten codes are printed VERBATIM on the 1994 questionnaire
+# (Peru/1994/Documentation/pe94hhq1.pdf, SECCION 1 FICHA DEL HOGAR, column
+# "RELACION DE PARENTESCO CON EL JEFE") and reproduced with that evidence in
+# Peru/_/categorical_mapping.org.  Keys are title-cased because
+# _expand_kinship tries `.str.title()` before the raw label.
+# 'Padre/Suegro' (code 6) CONFLATES parent and parent-in-law in a single
+# survey code; it is filed [1, 0, consanguineal], the same treatment given to
+# Guyana's 'Father/Mother/T-In-Law/M-In-Law' above.  The conflation is in the
+# instrument, not in this file.
+# 'Otro pariente' (code 7) title-cases to 'Otro Pariente', defined above (and
+# shared with Guatemala ENCOVI) as an explicit UNKNOWN [null, null, null] --
+# the manual's own definition of code 7 spans three generations, three
+# distances and both affinities, so no single tuple is correct.  See the
+# comment on that entry, and GH #698.
+"Jefe":                                  [0, 0, consanguineal]
+"Conyuge":                               [0, 0, affinal]
+"Hijo/A":                                [-1, 0, consanguineal]
+"Yerno/Nuera":                           [-1, 0, affinal]
+"Nieto/A":                               [-2, 0, consanguineal]
+"Padre/Suegro":                          [1, 0, consanguineal]
+"Trabajador Domestico":                  [0, 0, servant]
+"Pensionista":                           [0, 0, guest]
+"Persona No Pariente":                   [0, 0, unrelated]
 
 # --- French Burkina Faso EMC/EHCVM variants ---
 # These use longer descriptive forms or different punctuation than the

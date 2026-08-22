@@ -1,18 +1,172 @@
 Country: Peru
 Wave: 1994
 
+# ===========================================================================
+# ENNIV 1994 -- IDENTITY AND CLUSTER KEY (GH #684).
+#
+# READ Peru/_/CONTENTS.org FIRST.  Nothing in this file had ever executed
+# before 2026-08-21: the country-level config lived in a filename the
+# framework does not read, so no wave config was ever reached either.  Every
+# claim below was established from source or documentation on that date, and
+# the measurements are quoted so the next reader can re-run them.
+#
+# --- The survey's own key -------------------------------------------------
+# `dicciona.pdf` (Data Dictionary: ENNIV94) defines FOUR items as COMMON to
+# every record type in the survey:
+#
+#     RECTYPE   A  1-2   2
+#     SEGMENTO  N  3-5   3
+#     VIVIENDA  N  6-7   2   VIVI     01:12
+#     HOGAR     N  8-9   2   HOGAR01  11:15   HOGAR02  22:25 ...
+#
+# So (SEGMENTO, VIVIENDA, HOGAR) is the survey's universal household key, and
+# it is EXACTLY UNIQUE in REG01: 3,623 rows, 3,623 groups, 0 duplicates.
+# `i()` in `_/mapping.py` joins it zero-padded to the dictionary's own field
+# widths -> "001-01-11".
+#
+# Two realised-range notes, neither an error but both worth knowing: VIVIENDA
+# runs to 21 although the dictionary declares 01:12, and B00-ORDEN runs to 20
+# although it declares 01:15.
+#
+# --- HOGAR is a FRACTION, not a sequence number ---------------------------
+# `m-encues.pdf` (MANUAL DEL ENCUESTADOR) 7.2.3, "Recuadro B", verbatim:
+#
+#   "En el renglon Hogar No, anote el numero correlativo que le corresponde a
+#    cada hogar que existe en la vivienda, utilizando una fraccion; en donde
+#    el numerador indica el correlativo del hogar y el denominador el numero
+#    total de hogares en la vivienda.  Ejemplo: Si existe un hogar en la
+#    vivienda se anotara 1/1.  Si existen tres hogares en la vivienda se
+#    anotara: En la cedula del primer hogar 1/3 ... y en la cedula del tercer
+#    hogar 3/3."
+#
+# The two-digit code is that fraction with the slash removed: 11 = 1 of 1,
+# 12 = 1 of 2, 22 = 2 of 2, 33 = 3 of 3.  Observed values are exactly
+# {11, 12, 13, 14, 22, 23, 33}, the numerator never exceeds the denominator,
+# and the declared denominator equals the number of households actually
+# present in the dwelling in 3,622 of 3,623 rows (the exception is
+# segmento 78 / vivienda 8, coded 1-of-4 with only one household in the file).
+# The denominator is therefore a DWELLING attribute embedded in a HOUSEHOLD
+# id: a household's code changes if the dwelling's household count changes.
+# It is kept raw because that is what the file contains and it is reversible.
+#
+# --- v = SEGMENTO, and NOT a composite ------------------------------------
+# `m-encues.pdf` 7.2.3 separates two boxes on the cover sheet, verbatim:
+#
+#   "Recuadro A: UBICACION GEOGRAFICA -- Copie la informacion de Departamento,
+#    Provincia, Distrito y Centro Poblado del 'Listado de Viviendas
+#    Seleccionadas'."
+#   "Recuadro B: UBICACION MUESTRAL -- Copie la informacion del Segmento No,
+#    Vivienda No del 'Listado de Viviendas Seleccionadas' ..."
+#
+# The SAMPLE location is the segment; the department / province / district are
+# a GEOGRAPHIC DESCRIPTION copied from the same listing.  Both come from one
+# source document, so a segment has ONE true (dpto, prov, dist) and any
+# disagreement inside a segment is a transcription error in Recuadro A.
+#
+# GH #684 proposed a composite key on the Guatemala precedent, whose
+# `segmento` was a LOCAL serial reused across departments.  Peru's is not:
+# 357 of 364 segmentos map to exactly one department, so it is a NATIONAL
+# serial (values run 1..662 with large gaps -- drawn from a larger frame, not
+# renumbered per department).  Measured on REG01 (3,623 households, 364
+# segmentos):
+#
+#   a01 DPTO varies within  7 of 364 segmentos -- minority is 1 household in
+#                           six of them and 2 in the seventh
+#   a06 AREA varies within 10 of 364 segmentos -- minority is exactly 1
+#                           household in ALL ten
+#
+# In every DPTO case the rest of the geography is IDENTICAL across the split
+# (same provincia, distrito, centro poblado, categoria, area) and the two
+# departments are not adjacent -- segmento 106 is 11 households in Piura (20)
+# and 1 in Ucayali (25), opposite ends of the country.  These are keying
+# typos, not an id collision.  A composite (a01, segmento) key would SPLIT
+# seven real clusters on those typos: uniqueness without correctness.
+#
+# The reduction to (t, v) is therefore done by MODE, not by the framework's
+# groupby().first() -- see `cluster_features()` in `_/mapping.py`.  There are
+# ZERO ties: every one of the 364 segmentos has a unique modal a01 and a06.
+#
+# --- Independent corroboration of v = segmento ----------------------------
+#   * (segmento, vivienda) yields 3,543 dwellings; `m-encues.pdf` and catalog
+#     617 both state "La ENNIV 1994 sera efectuada en 3,544 viviendas en todo
+#     el Pais".  One dwelling apart.
+#   * The community questionnaire (CCPP0.DTA, 204 records) is keyed on
+#     segmento and covers 111 segments -- exactly the 111 whose modal a06 is
+#     Rural, and no others.  Its own `departa` agrees with REG01's modal a01
+#     in 203 of 204 records (the exception is segmento 39: CCPP0 says
+#     departa=2, REG01's twelve households all say 22).
+#   * 3,623 households / 364 segmentos = 9.95, matching the ~12-dwelling take
+#     per cluster the ENNIV design describes.
+#
+# --- The Guatemala float32 trap does NOT apply here -----------------------
+# CLAUDE.md warns that Guatemala's `upm` lost its low-order digits because
+# Stata stored it as float32 above 2^24.  Checked: in REG01 and REG02 the id
+# columns are `segmento` int16, `vivienda` / `hogar` / `b00` int8, and every
+# geographic code (a01..a19) is a STRING.  No float column in either file has
+# a magnitude anywhere near 2^24 (the largest is 99).  CCPP0.DTA is float32
+# throughout, but its largest value is 662.  There is no precision loss to
+# undo.  (1985 and 1991 ARE float32 throughout -- re-check before wiring.)
+# ===========================================================================
+
 cluster_features:
+    # REG01.DTA is the HOUSEHOLD cover page (3,623 rows, 364 segmentos);
+    # cluster_features is declared at (t, v), so it must be projected onto the
+    # segment.  Left to the framework that is a silent groupby().first() which
+    # destroys 187 of 3,623 rows and lets ROW ORDER decide the Region/Rural of
+    # every segment whose households disagree.  The `cluster_features()`
+    # df_edit hook in `_/mapping.py` reduces by MODE instead and refuses to
+    # guess a tie.
+    #
+    # Region <- a01 (A01-DPTO, "01".."25"), Rural <- a06 (A06-AREA, "1"/"2").
+    # Both are labelled by the same-named tables in
+    # `Peru/_/categorical_mapping.org`, auto-applied by name at API time.  The
+    # hook normalises the raw codes to integers first: a01 arrives ZERO-PADDED
+    # ("06") while the org reader parses the table's Code column as int64
+    # (leading zeros stripped), so without the normalisation the label mapping
+    # is a SILENT no-op and raw numeric codes reach the user -- the exact
+    # failure mode this issue is about.
     file: REG01.DTA
     idxvars:
         v: segmento
     myvars:
         Region: a01
         Rural: a06
-    mappings:
-        Region: DPTO
-        Rural: AREA
 
 household_roster:
+    # REG02.DTA = record type 02 (HOGA1), the FICHA DEL HOGAR.  19,285 people
+    # in 3,623 households; the household key matches REG01 exactly (0 orphans
+    # in either direction).
+    #
+    #   Sex          <- b02  B02-SEXO         1 HOMBRE / 2 MUJER
+    #   Age          <- b03  B03-ANOS         reported completed years
+    #   Relationship <- b01  B01-PARENTESCO   0..9
+    #   MonthsAway   <- b08  B08-AUSENTE      months absent of the last 12
+    #
+    # Sex and Relationship are decoded from the same-named tables in
+    # `Peru/_/categorical_mapping.org` -- ONE source of truth, referenced, not
+    # copied.  Both code lists were verified VERBATIM against the 1994
+    # questionnaire; see that file for the transcription and the evidence.
+    #
+    # They are decoded HERE, at grab time, and NOT left to the by-name
+    # auto-dispatch that labels cluster_features' Region/Rural at API time.
+    # That is not a style choice: `_finalize_result` runs `_expand_kinship`
+    # BEFORE `_apply_categorical_mappings`, so an API-time Relationship decode
+    # arrives too late -- kinship sees the raw codes '0'..'9', matches none of
+    # them, and Generation / Distance / Affinity come back 100% null with a
+    # warning.  (Measured, before this was moved.)  Decoding at grab time also
+    # keeps the cached parquet readable instead of storing bare numbers.
+    #
+    # The `household_roster()` df_edit hook in `_/mapping.py` repairs the one
+    # duplicated person id in the file and maps the 99 non-response sentinels
+    # in Age and MonthsAway to NA.  Its docstrings carry the evidence.
+    #
+    # NOT extracted, and worth knowing before you use this table:
+    #   b09 (B09-MIEMBRO) is the survey's OWN membership verdict -- 641 of the
+    #   19,285 people are flagged NOT members -- and this library has no column
+    #   for it, so every roster row is returned.  b05 (marital status), b06/b07
+    #   (language) and b04d/b04m/b04a (date of birth) are likewise present and
+    #   unextracted; the categorical_mapping.org tables EST-CIVIL and LENGUA
+    #   already carry their decodes.
     file: REG02.DTA
     idxvars:
         i:
@@ -21,9 +175,11 @@ household_roster:
             - hogar
         pid: b00
     myvars:
-        Sex: b02
+        Sex:
+            - b02
+            - mappings: ['Sex', 'Code', 'Preferred Label']
         Age: b03
-        Relationship: b01
-    mappings:
-        Sex: Sex
-        Relationship: Relationship
+        Relationship:
+            - b01
+            - mappings: ['Relationship', 'Code', 'Preferred Label']
+        MonthsAway: b08
