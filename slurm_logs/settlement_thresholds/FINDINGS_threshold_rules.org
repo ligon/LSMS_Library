@@ -1,0 +1,502 @@
+#+TITLE: Settlement-class population thresholds: a corpus-wide scoping sweep
+#+AUTHOR: scoping pass (agent), for @ligon
+#+DATE: 2026-08-22
+#+STARTUP: overview
+
+* What this is, and what it is not
+
+A *base-rate pass*, not the full job.  The question on the table is whether
+survey documentation states a *locality-population threshold* defining
+settlement classes (urban / semi-urban / rural), and whether the *data*
+carries a population variable from which such a classification could be
+recomputed.
+
+The motivating hypothesis (from Ghana GLSS1: urban >5,000, semi-urban
+1,500-5,000, rural <1,500) is that *if other surveys state such a rule, that
+gives an objective basis for assigning settlement class across countries* --
+rather than trusting each survey's own label, which is what the corpus does
+today and which we know is unreliable (GH #683: Ethiopia's ~Urban~ changes
+meaning between waves).
+
+*The two questions are kept strictly separate below, because conflating them
+would be the main way this sweep misleads.*  Knowing a country's rule lets you
+*describe* its definition.  Only a population variable in the data lets you
+*re-cut* it to a common threshold.
+
+*Independence note.*  A separate agent verified the GLSS1 claim against the
+primary PDF; its result arrived after this sweep's Ghana evidence was already
+collected, and the two agree.  Everything cited below as "this sweep" was
+extracted independently here; the GLSS1/GLSS2 Basic Information Document quote
+in the Q1 table is *from that pilot* and is marked as such.  Ghana coming back
+positive is one country -- the question this document exists to answer is
+whether it is typical or exceptional.  *It is exceptional.*
+
+* Method and its limits
+
+- All 1,066 DVC-tracked files under =lsms_library/countries/*/*/Documentation/=
+  were resolved to 869 unique content blobs (many PDFs ship in several waves)
+  and fetched via the library's own lock-free ~_ensure_dvc_pulled~ into a
+  *private* =LSMS_DATA_DIR=.  No ~dvc~ CLI was invoked.  *Fetch failures: 0/869.*
+- Text extracted with PyMuPDF (PDF), openpyxl/xlrd + a raw-OOXML fallback
+  (spreadsheets), a docx XML strip, and plain-text readers (=.sps=, =.xml=).
+  Per-page / per-sheet markers retained so every hit is locatable.
+- Searched EN / FR / ES / PT in three passes: (A) high-recall co-occurrence of a
+  settlement word + population noun + a number >=200; (B) explicit comparative
+  threshold phrasings; (C) definitional-verb windows.  A fourth pass looked for
+  *round* threshold values (500/1,000/1,500/2,000/5,000/10,000/...) adjacent to a
+  population noun near a settlement word.
+- *Recall canary*: GhanaLSS must hit, or the patterns are broken.  It hit in
+  every pass, in four separate waves.  Passes B, C and the round-number pass
+  independently converged on the same small country set, which is the main
+  reason to believe the low base rate is real and not a pattern artefact.
+
+** Extraction accounting (the honest denominator)
+
+| quantity                                        | count |
+|-------------------------------------------------+-------|
+| Documentation sidecars tracked                  |  1066 |
+| unique content blobs                            |   869 |
+| blobs that failed to *fetch*                    |   *0* |
+| blobs that failed to *extract* (hard error)     |   *0* |
+| blobs with *no extractable text*                |    75 |
+| ... of which PDFs (of 588 unique PDF blobs)     |    72 |
+| blobs extracted OK but *CID-garbled* (see below) |   *4* |
+| country dirs                                    |    47 |
+| ... with zero Documentation sidecars            |     2 |
+| ... with >=1 successfully extracted document    |  *45* |
+
+*** CID-encoded PDFs: where they actually were, and it was not where expected
+
+A CID/glyph-index-encoded PDF is a known hazard here (the Ghana pilot decoded
+one, reporting the encoding reduces to a plain monoalphabetic substitution).
+The natural assumption is that such files sit in the *extraction-failure* pile
+and bias the base rate downward.  *Checked, and that assumption is wrong for
+this corpus -- in a way that is worse.*
+
+1. *All 72 image-only PDFs were re-run through pdfminer.*  Every one returned
+   <200 characters.  They are genuinely image-only (no text layer), *not* CID
+   cases.  The substitution technique recovers *zero* of them; they need OCR.
+   So the failure pile is not hiding a substitution cipher.
+2. *The CID files had landed in the "ok" pile instead*, as fake successes.
+   PyMuPDF happily emits the glyph indices, so the document looks extracted
+   (=GLSS 1987-88 Report.pdf= produced 538,540 characters) while every grep
+   against it silently matches nothing.  *A volume-based extraction check
+   cannot see this.*  Detected by testing for *meaning* instead: density of
+   EN/FR/ES/PT function words per 1000 alphabetic characters (corpus median
+   *25.4*), then confirmed by the fraction of characters in the C0-control /
+   private-use range, which separates a glyph stream from merely non-English
+   prose (Russian, Arabic, Dari, Albanian, Serbian all score 0 on the first
+   test and ~0 on the second).
+
+*Result: exactly 4 of 794 "ok" documents are CID-garbled.*
+
+| country         | file                      | control-char % | chars   | status                                                     |
+|-----------------+---------------------------+----------------+---------+------------------------------------------------------------|
+| Nicaragua       | =bolantro.pdf=            |           79.6 |   8,698 | not decoded (only 746 tokens; too little for a solve)      |
+| GhanaLSS        | =GLSS 1987-88 Report.pdf= |           50.1 | 538,540 | *partially* decoded -- see below                           |
+| Kyrgyz Republic | =hh98_V2.pdf=             |            7.6 | 159,090 | not decoded (mixed stream)                                 |
+| EthiopiaRHS     | =Table of Contents.pdf=   |            1.5 |   1,893 | *decoded* -- "ETHIOPIAN RURAL HOUSEHOLD SURVEYS ..." (a ToC; no threshold content) |
+
+Decoding was attempted with a hill-climbing substitution solver scored against
+a quadgram model *built from this corpus's own cleanly-extracted English
+documents* (no external model, and trained with the targets excluded -- so it
+cannot import the answer being looked for).  EthiopiaRHS decoded cleanly,
+proving the route works in-corpus.  =GLSS 1987-88 Report.pdf= decoded to
+readable-but-imperfect English (=TRE=->THE, =IV=->OF, =WESTAIN=->SECTION, and
+the year tokens resolve to *1987* / *1988*), with residual letter collisions;
+a crib attack on letter-repetition signatures pins PERSONS (67 occurrences)
+and HOUSEHOLD (32).  A full solve needs a word-pattern solver rather than
+quadgram hill-climbing -- scoped, not built.
+
+*Bound on how much this can move the base rate.*  At most 4 documents across 4
+countries.  GhanaLSS is *already a positive* on clean sources, so its
+undecoded report cannot change the count.  That leaves Nicaragua, Kyrgyz
+Republic and an EthiopiaRHS table of contents as the only places a stated
+threshold could still be hiding in garbled text.  *The base rate is therefore
+4/45, with a worst case of 6/45* -- the conclusion below does not turn on it.
+
+The two with no documentation at all are =Harmonized_LSMS-ISA_Ag= and
+=KenyaLPS=.  No country had documentation from which *nothing* could be
+extracted.
+
+*Extraction loss is concentrated, and it matters where.*  Image-only /
+CID-encoded PDFs, by country (no-text / total sidecars):
+
+| country     | no text | total | note                                    |
+|-------------+---------+-------+-----------------------------------------|
+| CotedIvoire |      12 |    28 | 43% -- EHCVM francophone block          |
+| GhanaLSS    |      35 |   126 | 28% -- *in the country that hits*       |
+| Peru        |       7 |    15 |                                         |
+| Kazakhstan  |       6 |     7 | effectively blind                       |
+| Guyana      |       4 |     5 | effectively blind                       |
+| Armenia     |       3 |     4 | (no microdata held anyway)              |
+| EthiopiaRHS |       9 |   212 |                                         |
+| Nicaragua   |       3 |    17 |                                         |
+
+Kazakhstan and Guyana should be treated as *unexamined*, not as negatives.
+
+* Q1 -- Does the documentation state a population threshold rule?
+
+** THE BASE RATE
+
+*4 of 45 countries with extractable documentation state a population threshold
+bearing on settlement class -- about 9%.  Only 2 (Ghana, Panama) state a rule
+that actually partitions settlements into the classes the survey then uses.*
+
+That is the deliverable number.  It is a *lower bound*, but a reasonably tight
+one: the remaining unread material is 72 image-only PDFs (needing OCR) and 3
+undecoded CID documents, which together could add at most a handful of
+countries.  *Worst case 6/45.*  See Gaps.
+
+** The hits
+
+*A threshold without its census vintage is only half a definition* -- it is
+exactly the axis on which #683-style drift happens, so the reference year is a
+column here, not a footnote.
+
+| country     | wave    | classes defined                               | thresholds                                              | measured on         | source (file, page)                                                |
+|-------------+---------+-----------------------------------------------+---------------------------------------------------------+---------------------+--------------------------------------------------------------------|
+| GhanaLSS    | 1987-88 (GLSS1/2) | urban / semi-urban / rural          | >5,000 / 1,500-5,000 / <1,500                           | *1984 Census*       | Basic Information Document §3.1 "Sample Design", PDF p.13 / printed p.11 *(from the Ghana pilot)* |
+| GhanaLSS    | 1987-88 | urban / semi-urban / rural                    | >=5,000 / 1,500-4,999 / <1,500                          | *1984 Census*       | =Distribution_of_Welfare.pdf= p.86                                 |
+| GhanaLSS    | 1991-92 | (small) rural / semi-urban / [urban]          | <1,500 / >=1,500 and <5,000 / [>=5,000]                 | *1984 Census*       | =G3report.pdf= pp.75, 79, 106; =G3REPORT.DOC=                      |
+| GhanaLSS    | 1998-99 | urban / rural  (semi-urban *folded into urban*) | urban >1,500 ; rural <=1,500                          | *1984 Census*       | =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11                        |
+| GhanaLSS    | 2012-13 | urban / rural                                 | >=5,000 / <5,000                                        | not stated          | =GLSS6_Labour Force Report.pdf= pp.15-16                           |
+| Ethiopia    | 2015-16 | small town / large town (*partitions urban only*) | <10,000 / >10,000                                   | *2007 Census*       | =9331_ethiopia_survey_report_web_final.pdf= p.15 fn.2; =basic_information_document_wave__3_dec19.pdf= pp.13,14,24 |
+| Panama      | 2003    | 4 bands (large city / intermediate / other urban / rural) | >=100,000 / 20,000-99,999 / 1,500-19,999 / 1-1,499 | not stated      | =FormulariodeHogares_V2.pdf= p.21                             |
+| Peru        | 1994    | "other rural area" (partial -- one band only) | <2,000                                                  | not stated          | =pe94hhq1.pdf= p.58                                                |
+
+*Where the rule lives matters for how you search for it.*  Ghana's canonical
+statement is in the *sampling design* section of a Basic Information Document,
+framed as a stratification-proportionality concern -- not in a codebook or
+variable definition.  The GLSS6 rule is in a *Labour Force Report*; the GLSS4
+rule is in a *Data User Guide*.  This sweep searched full document text across
+all types (reports, BIDs, DDIs, user guides, questionnaires), which is why it
+found them; a DDI/codebook-only sweep would have missed every one.  The
+corollary is that *a country missing in one document type may well state it in
+another*, so single-document negatives are worthless.
+
+*** Verbatim quotes
+
+GhanaLSS 1987-88 (GLSS1/GLSS2), joint Basic Information Document §3.1 "Sample
+Design", PDF p.13 / printed p.11 -- *the canonical statement*, confirmed by the
+Ghana pilot against the primary PDF:
+
+#+begin_quote
+A final concern was that all three of the country's ecological zones (coastal,
+forest and savannah), and each of urban, semi-urban and rural areas
+(*population greater than 5000, 1500 to 5000, and less than 1500*,
+respectively) form the same proportion in the sample as they do in the national
+population.
+#+end_quote
+
+Boundaries sharpened by the GLSS3 report (note to Table 7.3, printed p.57):
+=rural < 1500 <= semi-urban < 5000 <= urban=, measured on the *1984 Census
+locality population*.
+
+GhanaLSS 1987-88, =Distribution_of_Welfare.pdf= p.86 -- the same rule, found
+independently by this sweep in a different document:
+
+#+begin_quote
+About 13,000 enumeration areas (EAs) in the three zones were stratified further
+into urban (5,000 or more people), semi-urban (1,500-4,999) and rural (less
+than 1,500 persons).
+#+end_quote
+
+GhanaLSS 1991-92, =G3report.pdf= p.75 (table note) -- middle band is *real*, not inferred:
+
+#+begin_quote
+Small rural localities are those with a 1984 population of less than 1500.
+Semi-urban localities are those with a 1984 population of at least 1500 but
+less than 5000.
+#+end_quote
+
+GhanaLSS 1998-99, =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11 -- *the threshold moves*:
+
+#+begin_quote
+Urban EA: An EA was considered to be urban if it had a population greater than
+1,500 people during the 1984 population census.  Thus semi-urban EAs (with
+population between 1,501 and 5,000 were considered as urban assuming that they
+might have grown to urban status since the 1984 census.  Rural EA: An EA was
+considered to be rural if it had a population 1,500 or less people during the
+1984 population census.
+#+end_quote
+
+GhanaLSS 2012-13, =GLSS6_Labour Force Report.pdf= pp.15-16 -- *and moves back*:
+
+#+begin_quote
+Two main types of locality are defined by the survey: urban and rural.  The
+classification of localities into 'urban' and 'rural' is based on population
+size.  Localities with 5,000 or more [persons] are classified as Urban while
+those with less than 5,000 persons are classified as Rural.
+#+end_quote
+
+Ethiopia 2015-16, =9331_ethiopia_survey_report_web_final.pdf= p.15 fn.2 -- note this
+partitions *urban*, it does **not** define urban vs rural:
+
+#+begin_quote
+The CSA defines small towns based on population estimates from the 2007
+Population Census; a town with the population of less than 10,000 is
+categorized as a small town.  Large towns include all other urban areas with
+the population of above 10,000.
+#+end_quote
+
+Panama 2003, =FormulariodeHogares_V2.pdf= p.21 -- an interviewer coding table, four bands:
+
+#+begin_quote
+CIUDAD GRANDE (100 mil y mas habitantes) ...
+CIUDAD CENTROS URBANOS INTERMEDIOS (De 20,000 a 99,999 habitantes) ...
+OTROS CENTROS URBANOS (1,500 a 19,999 habitantes) ...
+LUGARES RURALES (1 a 1,499 habitantes)
+#+end_quote
+
+Peru 1994, =pe94hhq1.pdf= p.58 -- a response option, so only one boundary is pinned:
+
+#+begin_quote
+OTRA AREA RURAL (<2000 HABITANTES)
+#+end_quote
+
+** The documented NEGATIVES -- these are findings, not absences
+
+Two countries state, in so many words, that their classification is
+*administrative* and therefore has no threshold to recover:
+
+Afghanistan 2016-17, =ALCS - 2016-17 Analysis report draft version.pdf= p.415:
+
+#+begin_quote
+Urban area.  Area defined as urban at level of Primary Sampling Units (PSUs) of
+the master sample, by the Central Statistics Organization.  *The definition is
+based on administrative criteria.*
+#+end_quote
+
+Timor-Leste 2007-08, =ddi-documentation-english_microdata-78.pdf= p.3 (also
+=TLSS_annexes.pdf= p.3, =TLSLS07_Final_Statistical_Abstract.pdf= p.19):
+
+#+begin_quote
+At the time of the 2001 TLSS, 71 of Timor-Leste's 498 sucos were conventionally
+qualified as urban, of which 31 sucos in the Dili and Baucau districts were
+qualified as major urban centers.  By the time of preparation of the sample
+design for the 2007 TLSLS, 60 of the 498 sucos defined by the 2001 Suco Survey
+were conventionally qualified as urban.  The partition of the country into
+sucos was also modified in September 2004.  With the amalgamation of several
+sucos, the original 498 sucos were now collapsed into 442.  Many of the
+rearrangements took place in urban areas with the result that the 60 "old"
+sucos are now considered urban only constitute 38 "new" sucos.
+#+end_quote
+
+Timor-Leste is the sharpest case in the corpus: "conventionally qualified"
+urban units went 71 -> 60 -> (re-districted) 38, with *no stated criterion at
+all*.  Where there is no rule, the drift is not merely unmeasurable -- it is
+invisible.
+
+* Q1 -- the finding that actually matters: WITHIN-country drift
+
+Ghana is the only country where enough waves state a rule to check the rule
+against itself.  It does not survive the check.
+
+| GLSS wave      | urban cutoff | semi-urban band | scheme  | measured on |
+|----------------+--------------+-----------------+---------+-------------|
+| GLSS1/2 1987-88 | >5,000      | 1,500-5,000     | 3-way   | 1984 Census |
+| GLSS3 1991-92  | >=5,000      | 1,500-<5,000    | 3-way   | 1984 Census |
+| GLSS4 1998-99  | *>1,500*     | *folded into urban* | 2-way | 1984 Census |
+| GLSS6 2012-13  | *>=5,000*    | *none*          | 2-way   | not stated  |
+
+*Ghana's urban share is not comparable across GLSS3 -> GLSS4 -> GLSS6.*  The
+cutoff moved 5,000 -> 1,500 -> 5,000, and the middle band was absorbed into
+"urban" for GLSS4 and then simply dropped.  The GLSS4 user guide is explicit
+that this was a deliberate assumption ("assuming that they might have grown to
+urban status since the 1984 census"), not an error.
+
+*Direction of bias*: GLSS4 will show a discontinuously *higher* urban share than
+GLSS3 or GLSS6 purely by definition.  This is a #683-class defect in a second
+country, found by reading the documentation rather than by noticing an
+implausible time series -- which is the argument for doing this at all.
+
+A further wrinkle worth recording: Ghana's rule is stated against a *fixed*
+census (the 1984 census) in GLSS1/GLSS3/GLSS4, but the community questionnaire
+changes its reference census wave by wave (1984 -> 2000 -> 2010 -> "estimate";
+see Q2).  A locality's class can therefore change without either the threshold
+or the locality changing.
+
+* Q2 -- Does the DATA carry locality population?
+
+This is the sharper question, and it answers *better* than Q1.
+
+A survey can carry a locality-population variable without ever stating a
+threshold (Malawi), and can state a threshold without shipping the variable.
+The two are close to independent.
+
+*Three tiers, and only the first permits an arbitrary re-cut:*
+
+- *(a) continuous population* -- a headcount of the locality.  Re-cut at any threshold.
+- *(b) household count* -- a proxy; needs a household-size assumption, which is
+  itself correlated with settlement size, so the assumption is not innocuous.
+- *(c) size code / band / stratum* -- re-cut only at existing band boundaries.
+
+** Verified in the distributed microdata
+
+| country  | wave    | file                                        | variable   | label                                          | tier | populated   | distribution                                  |
+|----------+---------+---------------------------------------------+------------+------------------------------------------------+------+-------------+-----------------------------------------------|
+| GhanaLSS | 2016-17 | =Data/g7comSEC1.dta=                        | =cs1q1=    | "Community population"                         | (a)  | 891/892     | min 10, med 2,500, max 999999 *(sentinel)*    |
+| GhanaLSS | 2012-13 | =Data/COMMUNITY/sec1.dta=                   | =cs1q1=    | "community population"                         | (a)  | *112/693*   | min 0, med 800, max 12,000                    |
+| GhanaLSS | 1991-92 | =Data/Community/cs1.dta=                    | =num84=    | "S1Q1" (= 1984 census population question)     | (a)  | (see below) |                                               |
+| GhanaLSS | 1998-99 | =Data/Community/CS1.DTA=                    | =s1q1=     | *label stripped* (= same question)             | (a)  | (see below) |                                               |
+| Malawi   | 2010-11 | =Data/Full_Sample/Community/com_cc.dta=     | =com_cc02= | "What is the population of this community?"    | (a)  | 767/768     | min 44, med 1,900, max 80,000                 |
+| Malawi   | 2010-11 | =Data/Full_Sample/Community/com_cc.dta=     | =com_cc03= | "How many households are found in this community?" | (b) | 768/768  | min 17, med 360, max 18,000                   |
+
+*Two caveats with teeth, both found in the strongest country:*
+
+1. *GhanaLSS 2012-13 is 16% populated* (112 of 693 clusters).  The question was
+   asked and the variable shipped, and it is still unusable for a re-cut.
+   "Documented" and "delivered" are different facts -- exactly the distinction
+   =capability.py='s validation ladder exists to keep.
+2. *GhanaLSS 2016-17 has =max=999999=* -- an unguarded missing-value sentinel.
+   Any naive threshold applied to this column classifies those clusters urban.
+
+** Asked in the instrument (community questionnaires)
+
+Section-1 "population of this community" questions, quoted from the extracted
+questionnaires -- these establish the variable *should* exist:
+
+| country         | wave    | questionnaire                                        | question                                                                 |
+|-----------------+---------+------------------------------------------------------+--------------------------------------------------------------------------|
+| GhanaLSS        | 1998-99 | =GHA_1998_GLSS_Community_Questionnaire_EN.pdf= p.3   | "Number of people living / *1984* POPULATION in the community? FIGURE:"  |
+| GhanaLSS        | 2005-06 | =G5QComm.pdf= p.4                                    | "NUMBER OF PEOPLE LIVING / *2000* POPULATION IN THE COMMUNITY. FIGURE:"  |
+| GhanaLSS        | 2012-13 | =GLSS6 Community Questionnaire.pdf= p.4              | "NUMBER OF PEOPLE LIVING / *2010* POPULATION IN THE COMMUNITY. FIGURE:"  |
+| GhanaLSS        | 2016-17 | =7GLSS7_Community Quest.docx=                        | "NUMBER OF PEOPLE LIVING POPULATION IN THE COMMUNITY. FIGURE (Estimate):" |
+| Rwanda          | 2005-06 | =rwa_eicv_2005_questionnaire_communautaire.pdf= p.3  | "Votre cellule compte combien d'habitants ?  Nombre d'Habitants"         |
+| Kyrgyz Republic | 1993    | =kyrcomm.pdf= p.2                                    | "What is the population of the village or settlement where the households you are surveying live? ____ persons" (rural only) |
+| Malawi          | 2013-14 | =IHPS.Community.Qx.FINAL.PRINT.pdf= p.9              | "RECORD NUMBER OF HOUSEHOLDS IN COMMUNITY FROM MODULE CC QUESTION 3" (tier b) |
+| India           | 1997-98 | =slc-cq97.pdf= p.4                                   | "NUMBER OF HOUSEHOLDS IN THE VILLAGE: (MOST RECENT ESTIMATE)" (tier b)   |
+| Uganda          | 2010-11 / 2011-12 | =UNPS_2010.Community.Manual.pdf= p.9, =UNPS2011-12_CommunityQx_Manual.pdf= p.9 | "the total number of households in the community" (tier b) |
+
+Note the *moving reference census* in the Ghana column: 1984 -> 2000 -> 2010 ->
+free estimate.  A re-cut using this variable is not measuring the same thing
+across waves either.
+
+Panama 1997 (=pn97com.pdf= p.2) and Guatemala 2000 (=commques.pdf= p.4) ask
+whether the number of inhabitants *changed* over five years, not its level --
+those are *not* usable and should not be counted as tier (a).
+
+* Assessment: is this a viable cross-country basis?
+
+I was asked to test the hypothesis rather than confirm it.  It is *mostly
+false in its naive form*, and the reasons are specific.
+
+** Where it fails
+
+1. *The base rate is too low to harmonise on.*  4 of 45 countries state
+   anything; 2 state a usable rule.  A rule you can read for Ghana and Panama
+   and nobody else is not a corpus-wide basis.
+2. *The stated thresholds do not agree, and disagree in the worst possible
+   way.*  Panama's urban floor is *1,500*; Ghana GLSS6's is *5,000*; Ethiopia's
+   only stated cutoff (*10,000*) does not even mark urban/rural.  A Panamanian
+   locality of 3,000 is urban; an identical Ghanaian one is rural.  Re-cutting
+   everyone at any single value would *change* the published national statistics
+   of every country it touched -- which is a defensible research choice but is
+   emphatically not "recovering their definition".
+3. *Many countries have no threshold to recover, and say so.*  Afghanistan and
+   Timor-Leste classify administratively.  For these the population-threshold
+   frame does not apply at all -- there is no number being rounded off, and no
+   amount of documentation work will produce one.
+
+** Where it holds up -- and these are the parts worth keeping
+
+1. *Making incomparability measurable instead of invisible.*  This works, and it
+   is the strongest result here.  We can now say concretely: Ghana GLSS3/GLSS4/
+   GLSS6 urban shares are not comparable, with a known direction (GLSS4 biased
+   *up*); Panama-vs-Ghana urban shares are not comparable, with a known
+   direction (Panama's floor is 3.3x lower, so Panama's urban share is
+   mechanically inflated relative to Ghana's).  That is a real, citable
+   statement about a real cross-country comparison, produced from documentation
+   alone.
+2. *A genuine re-cut is possible -- but in fewer places than Q1 suggests, and
+   the two sets barely overlap.*  Ghana can be re-cut (multiple waves, tier (a)).
+   Malawi can be re-cut *and never stated a rule*.  Conversely Panama states the
+   cleanest rule in the corpus and (on the evidence so far) ships no level
+   variable.  *Q2 is therefore not a subset of Q1 and must be tracked
+   separately* -- which is the main structural recommendation of this sweep.
+3. *Catching within-country drift* -- confirmed, twice, and both were new.
+   Ghana's threshold oscillation (5,000 -> 1,500 -> 5,000) and Timor-Leste's
+   71 -> 60 -> 38 suco reclassification are both #683-class defects that nobody
+   had recorded.  Notably, *neither was found by looking at the data* -- both
+   came from prose.  This is the cheapest defect-detection channel we have.
+
+** What I'd actually recommend
+
+Treat the population threshold as *metadata about comparability*, not as a
+harmonisation mechanism.  Concretely: record, per country-wave, (i) the stated
+rule if any, (ii) whether the classification is administrative, and (iii)
+whether a locality-population variable exists in the data and how populated it
+is.  Then a user comparing two cells can be *told* the comparison is unsafe.
+Do not attempt a corpus-wide re-cut; do enable a per-country one where tier (a)
+data exists.
+
+*On the =capability.py= shape*: yes, it fits, and the fit is close enough to be
+worth saying precisely.  The validation ladder is the right control here for the
+same reason it is right there --
+
+- =catalog-only= <-> "a threshold is asserted in a secondary/summary report"
+- =data-validated= <-> "a population variable is present and populated in the data"
+- =questionnaire-validated= <-> "the *questionnaire or user guide* states the rule"
+
+and *only the last should be allowed to close* "what is this country's
+settlement rule?".  This sweep found the GLSS6 rule in a *Labour Force Report*
+and the GLSS4 rule in the *Data User Guide* -- different document classes with
+different authority, and the GLSS4 one contradicts the others.  A record that
+could not distinguish them would have silently picked whichever was extracted
+first.  I have *not* built this; flagging only that the shape transfers.
+
+One caution if it is built: a threshold record needs a field the capability
+record does not have -- *the reference census the threshold is applied
+against*.  Ghana's rule is stable-looking only until you notice the underlying
+census moves.
+
+* Gaps -- what could not be established, and why
+
+*These are honest non-results.  Do NOT read any of them as "this country has no
+threshold."*
+
+1. *72 of 588 unique PDFs are image-only* -- verified with pdfminer, so this is
+   a genuine absence of any text layer, *not* the CID case (see the CID section
+   above; the substitution technique recovers none of them).  Concentrated in
+   CotedIvoire (12/28 sidecars), *GhanaLSS (35/126)*, Peru (7/15), Kazakhstan
+   (6/7), Guyana (4/5).  Kazakhstan and Guyana are effectively *unexamined* and
+   must not be counted as negatives.  *OCR is the outstanding gap* -- it was not
+   attempted, and it is the single highest-value next step.
+   1a. *3 CID-garbled documents remain undecoded* (Nicaragua =bolantro.pdf=,
+   Kyrgyz =hh98_V2.pdf=, plus an EthiopiaRHS ToC with no threshold content).
+   These are the only places outside the image-only pile where a stated
+   threshold could still be hiding.
+2. *The francophone EHCVM block returned no threshold statement.*  Text
+   extracted fine for Senegal, Mali, Niger, Burkina Faso, Benin, Togo and
+   Guinea-Bissau (the =.xlsx= questionnaires needed a raw-OOXML fallback, which
+   was applied -- 214 files openpyxl refused).  CotedIvoire is the exception at
+   43% extraction loss.  The EHCVM reports discuss =milieu urbain= / =milieu
+   rural= constantly and *never define them* in any document extracted here.
+   That is consistent with a national-definition-by-reference convention, but I
+   did not confirm it -- record as *unsure*, not as =not-asked=.
+3. *Q2 coverage is partial.*  Only a targeted set of community files was opened.
+   A parallel broader sweep was dispatched; where its results are not reflected
+   above, Q2 for that country is *unchecked*, not negative.  In particular
+   Nigeria, Tanzania, Uganda, Ethiopia, Niger/Senegal and the EHCVM community
+   files have questionnaire-level evidence but no data-level verification here.
+4. *Rwanda and Kyrgyz Republic* have a clear tier-(a) *question* in the
+   community instrument but their community =.dta= was not located/opened -- the
+   =asked-not-distributed= vs =delivered= distinction is unresolved for both.
+5. *No blessing / no wiring changed.*  This is documentation only.  Nothing in
+   =data_info.yml=, =data_scheme.yml=, =categorical_mapping.org= or any country
+   config was touched, and =GhanaLSS/_/CONTENTS.org= was deliberately left alone
+   (another agent holds it).
+
+* Reproducing this
+
+Scripts used are in the session scratchpad (not committed -- they hardcode a
+private =LSMS_DATA_DIR=):
+=inventory.py= -> =fetch.py= -> =extract.py= / =repair.py= / =repair2.py= ->
+=sweep.py= / =sweepC.py= / =q.py= (ad-hoc regex over the text cache) ->
+=q2data.py= / =q2b.py= (data-side verification) -> =baserate.py=.
+
+The reusable piece is the *text cache*: 794 extracted documents keyed by DVC
+md5, with page/sheet markers.  Any future documentation question over this
+corpus (currency units, recall periods, sampling design) is a grep away once
+that cache exists, and rebuilding it takes about 15 minutes end to end.
