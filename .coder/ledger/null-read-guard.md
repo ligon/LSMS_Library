@@ -111,7 +111,86 @@ Three motivating instances:
   *wave-grain* optionality, which does not exist (`optional:` is country-grain).
   Not built here. Blocks: turning `LSMS_READ_STRICT=1` on in CI.
 
+## §7 Measurement (the half of the task that decided the design)
+
+Cold. `LSMS_DATA_DIR=/global/scratch/.../nullguard_data`, private, empty at
+start; its `dvc-cache` symlinked to the shared L1 (content-addressed immutable
+blobs — sharing them changes nothing measurable, and the *parquet* tiers, which
+are what could fake a clean result by skipping `get_dataframe`, were private and
+cold).
+
+**Site R — reads.** 2,264 declared source references enumerated from every
+`data_info.yml` (`file:` + `dfs:`) plus `scan_script_data_refs` over every
+wave/country `_/ *.py`. 1,337 held and read through the real `get_dataframe`
+with its own defaults; 909 not held (772 are `.parquet` *outputs*, not sources);
+18 unmeasured (read raised).
+
+| test | firings |
+|---|---|
+| any column 100% null | 887 cells / 153 files (1.4% of 65,099 columns) |
+| ...that a table actually asked for | **3** (Albania 2002 `metadata_cl.dta` → `int_t_v2@interview_date`) |
+| frame ≥ 1/3 columns all-null | **0** — corpus max 0.283 |
+| frame 100% null | **0** |
+
+**Site B — built tables.** 504 cold builds; 488 completed.
+
+| test | firings |
+|---|---|
+| required declared column null in EVERY wave | **0** |
+| required declared column null in SOME wave | **86**, over 42 of 488 tables, 17 countries |
+
+**Known-bad parses, reproduced on the real blobs** (evidence the threshold is in
+a real gap, not fitted to noise): `pyreadstat.read_xport` on Peru
+`EXPEND.SSP` 2/5, `PANEL.SSP` 2/4, `N00A.SSP` 7/10; `read_fwf` on GhanaLSS
+`COMM.DAT` per `COMM.DCT` 254/311. Range 0.40–0.82 vs. corpus max 0.283.
+
+**Both #699 and the `COMM.DAT` class are PROSPECTIVE, not currently firing.**
+`Peru.data_scheme == []` (no table reads a `.SSP`; `get_dataframe` raises
+"Unknown file type" on them today — loud, not silent), and no declared table
+reads `COMM.DAT` (0 matches in the manifest). The corpus cannot fire Site R
+today. Its value is protecting the parse work now in flight.
+
+**Unmeasured, stated as gaps** — never counted as clean: 137 script-route
+non-parquet refs whose relative path my resolver could not resolve (Nigeria's
+`Nigeria/2010-11/Data/*.csv` literals are root-relative, not `_/`-relative);
+Nepal (11 tables) and Armenia (2) hold no microdata; Peru is unreadable today.
+
 ---
 ### Phase 3 — verification
 
-<filled at task end>
+- `null_read_audit._all_null_columns` / `audit_read` / `audit_declared_columns`
+  — **OK (§2, §5)**: no existing helper measures *values*; the three named
+  guards are shape-only. Not a reinvention of `_audit_index_collapse` (that
+  measures row destruction under a collapse; this measures emptiness), but
+  deliberately the same report-dict/`None`-means-clean shape.
+- `NullReadWarning` / `NullReadError` / `_read_strict` / `_NULL_READ_LEDGER` /
+  `null_read_reports` — **OK (§2, §5)**: structural mirrors of
+  `GrainCollapseWarning` / `GrainCollapseError` / `_grain_strict` /
+  `_GRAIN_LEDGER` / `grain_reports`, per the brief's "one learnable shape".
+  Own env lever, same `{1,true,yes}` spelling (`country.py:4462`).
+- Site B placement in `Country._finalize_result` — **OK (§4)**: it is the
+  documented read-path stage and is already in `_EXCLUDED_CALLABLES`. Measured:
+  0 of 37 probed `_table_cache_hash` values move. Placing it beside
+  `_assert_built_required_columns` in `_aggregate_wave_data` would have moved
+  all 37 (that method is a tagged build orchestrator). Pinned by
+  `test_site_b_host_is_excluded_so_site_b_costs_no_invalidation`.
+- Site R placement in `local_tools.get_dataframe` — **CONTRADICTION of the
+  brief's expectation, reported not hidden (§4)**: it moves all 37 hashes. Not
+  avoidable at the sanctioned chokepoint — `df_data_grabber` is
+  `@build_transform()`-tagged and references `get_dataframe`, so its source is
+  in every table's fingerprint. The concurrent `.DAT`/`.DCT` parse fix edits
+  the same function and incurs the identical one-time rebuild.
+- `_EXCLUDED_CALLABLES` additions for the audit's own callables — **OK (§4)**:
+  same rationale the file already gives for `_finalize_result`. Without them a
+  reworded warning would rebuild the corpus. Pinned by
+  `test_the_audit_module_is_not_folded_into_any_build_fingerprint`.
+- Required-vs-optional reading — **OK (§3)**: reuses
+  `country._required_scheme_columns`, the existing single source of truth, so
+  this guard cannot drift from the two that already use it.
+- `bench/feature_audit/scan.py` `_null_read_findings` — **OK (§2)**: drains the
+  public accessor into typed findings. Note it duplicates the string capture
+  (`runtime_warning`) for the same event; `cluster.py` dedups by fingerprint.
+- **Not touched, per lane**: `read_file`'s parse chain (sibling agent) and
+  `_apply_categorical_mappings` (GH #694). Neither site is inside or upstream of
+  `_apply_categorical_mappings`; Site B runs *after* it in `_finalize_result`,
+  so it will *report* #694's damage rather than obstruct its fix.

@@ -61,6 +61,28 @@ cleanly instead -- the corpus tops out at 28.3% (Albania 2004
 ``w3_hh_basic.dta``, 169 of 598 columns) while every known-bad parse sits at
 40%-82%.  ``_NULL_FRACTION_TRIGGER`` is set in that gap.
 
+AND WHAT SITE B COSTS, measured the same way -- a cold build of every declared
+table in every country (504 builds, 488 of which completed; the 16 that did not
+are Nepal + Armenia, which hold no microdata at all, plus three ``make``
+failures that build clean on retry and are parallel-make contention, not
+defects):
+
+=================================================================  =======
+REQUIRED declared column 100% null in EVERY wave                       0
+REQUIRED declared column 100% null in SOME wave's ``t`` slice         86
+...spread over                                                        42 of 488 tables
+=================================================================  =======
+
+86 across the whole corpus, appearing only on the country being built (a user
+of Uganda sees 5), is a work queue, not a firehose -- and several are plainly
+real: ``GhanaLSS/sample/weight`` and ``panel_weight`` are empty in four of six
+waves, so that country has been served without sampling weights.  Others are
+legitimate (Niger 2014-15 ``Latitude``; see the note in
+:func:`audit_declared_columns`).  Deliberately no allowlist: a known-legitimate
+cell stays loud until the config can say so, for the reason
+``country._grain_strict`` gives -- an allowlist is the same disease with a
+registry.
+
 WHAT THIS DOES NOT DO.  It does not change returned data -- not one value, not
 one dtype.  It is a reporting layer, which is why its own edits are exempt from
 the build fingerprint (see ``_build_registry._EXCLUDED_CALLABLES``).
