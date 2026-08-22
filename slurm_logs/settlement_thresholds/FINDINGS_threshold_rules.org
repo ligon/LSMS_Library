@@ -143,10 +143,20 @@ Kazakhstan and Guyana should be treated as *unexamined*, not as negatives.
 bearing on settlement class -- about 9%.  Only 2 (Ghana, Panama) state a rule
 that actually partitions settlements into the classes the survey then uses.*
 
-That is the deliverable number.  It is a *lower bound*, but a reasonably tight
-one: the remaining unread material is 72 image-only PDFs (needing OCR) and 3
-undecoded CID documents, which together could add at most a handful of
-countries.  *Worst case 6/45.*  See Gaps.
+That is the deliverable number, and it needs its error bar stated in two
+separate pieces, because they are bounded very differently:
+
+- *Among text that was actually read, the count is exactly 4/45.*
+- *Garbled text can add at most 2* (Nicaragua, Kyrgyz Republic -- the only
+  undecoded CID documents in countries not already counted).  Ceiling *6/45*.
+- *The image-only pile is NOT similarly bounded.*  Its 72 PDFs touch *16
+  countries* (GhanaLSS 35 sidecars, CotedIvoire 12, EthiopiaRHS 9, Peru 7,
+  Kazakhstan 6, Guyana 4, Nicaragua 3, Armenia 3, Pakistan 2, Kyrgyz 2, and one
+  each in Afghanistan, Brazil, China, Nepal, Uganda, GhanaSPS).  Until those are
+  OCR'd, no ceiling can honestly be put on them.
+
+So: *4/45 measured; 6/45 if garble is unkind; genuinely unbounded until the
+OCR pile is read.*  That is the single strongest argument for doing OCR next.
 
 ** The hits
 
@@ -192,6 +202,24 @@ population.
 Boundaries sharpened by the GLSS3 report (note to Table 7.3, printed p.57):
 =rural < 1500 <= semi-urban < 5000 <= urban=, measured on the *1984 Census
 locality population*.
+
+*The sources disagree about where 5,000 itself falls*, and the brief asked
+specifically about inclusive/exclusive, so it is recorded rather than
+silently resolved:
+
+| source                            | urban boundary      | semi-urban upper |
+|-----------------------------------+---------------------+------------------|
+| GLSS1/2 BID §3.1                  | "greater than 5000" | "1500 to 5000"   |
+| =Distribution_of_Welfare.pdf= p.86 | "5,000 or more"    | "1,500-4,999"    |
+| =G3report.pdf= p.75                | (implied >=5,000)  | "at least 1500 but less than 5000" |
+
+The BID's "1500 to 5000" for semi-urban *overlaps* its own ">5000" urban
+boundary at exactly 5,000; the other two sources are internally consistent
+and put 5,000 in urban.  The discrepancy affects only localities of exactly
+1,500 or exactly 5,000 people, so it is unlikely to matter numerically -- but
+anyone implementing the rule has to pick, and should pick =rural < 1500 <=
+semi-urban < 5000 <= urban= (the GLSS3 formulation, which is the only
+unambiguous one).
 
 GhanaLSS 1987-88, =Distribution_of_Welfare.pdf= p.86 -- the same rule, found
 independently by this sweep in a different document:
@@ -306,10 +334,54 @@ cutoff moved 5,000 -> 1,500 -> 5,000, and the middle band was absorbed into
 that this was a deliberate assumption ("assuming that they might have grown to
 urban status since the 1984 census"), not an error.
 
-*Direction of bias*: GLSS4 will show a discontinuously *higher* urban share than
-GLSS3 or GLSS6 purely by definition.  This is a #683-class defect in a second
-country, found by reading the documentation rather than by noticing an
+*Direction of bias*: GLSS4 should show a discontinuously *higher* urban share
+than GLSS3 or GLSS6 purely by definition.  This is a #683-class defect in a
+second country, found by reading the documentation rather than by noticing an
 implausible time series -- which is the argument for doing this at all.
+
+*** Caveat that must travel with the above: sampling strata != published variable
+
+I tried to confirm the GLSS4 prediction empirically and *could not*, for a
+reason worth recording.  Measured on this branch:
+
+#+begin_example
+Country('GhanaLSS').sample()  ->  Rural populated for only 3 of 7 waves
+  t          Rural%  Urban%
+  1991-92     65.1    34.9
+  2012-13     55.6    44.4
+  2016-17     57.0    43.0
+#+end_example
+
+*GLSS4 (1998-99) carries no settlement-class variable at all* in the current
+configuration -- neither do 1987-88, 1988-89 or 2005-06.  The one wave whose
+definition demonstrably changed is the one wave with nothing wired to check it
+against.  (That is a config gap, not a data absence; noted, deliberately not
+fixed here.)
+
+More importantly, all three populated waves are *two-way* Rural/Urban -- there
+is no =Semi-urban= even in GLSS3, whose own documentation defines three
+classes.  The repo already knows why, in
+=GhanaLSS/1991-92/_/categorical_mapping.org=:
+
+#+begin_quote
+=loc2= is the standard GLSS 2-way locality split ... code 1 is the union of the
+two URBAN strata, not a semi-urban category.  loc2=1 == loc3 in {1,2} == loc5
+in {1,2} == Accra (459) + Other Urban (1119) = 1578
+#+end_quote
+
+So GLSS3's finer published variables are =loc3= (Accra / Other Urban / Rural)
+and =loc5= (5-way ecological) -- *neither of which is the urban / semi-urban /
+rural of the sampling design*.  The three-way scheme lives in the *sample
+design and the report tabulations*; it was not published as an analysis
+variable in GLSS3.
+
+*Therefore*: the threshold drift documented above is established for the
+*sampling-design and published-report* classification.  Whether it propagated
+into a published microdata variable is *unverified for GLSS4*, and for GLSS3 the
+answer appears to be "the semi-urban category never reached the microdata at
+all".  Do not restate the drift as a defect in the delivered =Rural= column
+without checking that separately.  This distinction -- *design stratum vs.
+analysis variable* -- is the single easiest way to get this whole topic wrong.
 
 A further wrinkle worth recording: Ghana's rule is stated against a *fixed*
 census (the 1984 census) in GLSS1/GLSS3/GLSS4, but the community questionnaire
