@@ -437,6 +437,57 @@ Two facts to carry into any pooling of these five waves:
    ESS4/ESPS-5 catalog records do not say the frame was changed.  ESPS-5
    additionally drops Tigray from the represented population.
 
+** The =Rural= COLUMN changes meaning between waves (GH #683)
+
+The wave-by-wave universe statements below record what each round *covers*.
+This section records the operational consequence, which is a different fact and
+is the one that reaches users: *=sample().Rural= is not comparable across waves.*
+
+Measured cold on =development=:
+
+| wave    |    n | Urban | urban share | Rural |
+|---------+------+-------+-------------+-------|
+| 2011-12 | 3969 |   503 |       12.7% |  3466 |
+| 2013-14 | 5262 |  1939 |       36.8% |  3323 |
+| 2015-16 | 4954 |  1682 |       34.0% |  3272 |
+| 2018-19 | 6770 |  3655 |       54.0% |  3115 |
+| 2021-22 | 4959 |  2674 |       53.9% |  2285 |
+
+*This is not urbanisation, and it is not a reweighting.*  Note the *Rural*
+column: 3466 -> 3115 across a decade, essentially flat, while Urban grows
+seven-fold.  The sample is being *extended into urban strata*, not shifted.
+
+ESS1 was designed for "rural and small town areas" (see 2011-12 below).  So
+=Urban= in 2011-12 denotes *small towns only*, while from ESS2 it denotes *any
+urban area, including Addis Ababa*.  The same canonical value denotes two
+different populations, and until this note nothing in the config, the schema or
+this file said so.
+
+*** What breaks
+
+- A pooled regression with an urban dummy silently mixes two definitions.
+- Any wave-over-wave comparison of an urban/rural gap is confounded by the
+  definition shift.
+- The 12.7% -> 36.8% step between ESS1 and ESS2 is *mostly* that shift, not a
+  change in Ethiopia.
+
+*** Related, and not the same thing
+
+- =Rural= for 2013-14 and 2015-16 additionally *collapses* a small-town / large-
+  town distinction that exists in the source (3,621 households).  See the
+  corpus-wide audit in PR #682, which proposes a separate =SettlementType=
+  column for within-urban tiers rather than more =Rural= values.
+- ESS4 / ESPS-5 put *zero* of their urban households through the agriculture
+  questionnaire while urban is 54% of the sample, whereas ESS1--ESS3 did.  That
+  is a *module-conditionality* change, a second regime shift in the same
+  country, and it is likewise invisible at the API.
+
+*** Not claimed here
+
+The often-quoted "small town = under 10,000" threshold is *not* verified in
+this repo.  It should be confirmed against the survey report before anyone
+relies on it or repeats it in a tracked file.
+
 ** Wave by wave
 
 *** 2011-12 (ERSS / ESS1) -- rural and small towns only
