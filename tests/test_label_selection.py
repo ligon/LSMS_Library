@@ -510,6 +510,16 @@ def _make_country(countries_root: Path, name: str, cat_org: str | None,
     No ``#+begin_example`` blocks anywhere: ``all_dfs_from_orgfile`` parses the
     tables inside them as live mappings, so an illustrative block would become a
     real (and wrong) categorical table.
+
+    Source files are **parquet, not CSV**, on purpose.  ``get_dataframe`` is a
+    try-every-reader chain, not an extension dispatch: it attempts parquet, then
+    Stata, then pyreadstat, and only then ``read_csv``.  The Stata attempt
+    catches ``(ValueError, struct.error)`` only, and a CSV whose bytes happen to
+    parse as an old-format Stata header raises ``KeyError`` instead -- which
+    escapes and kills the read.  A CSV fixture therefore passes or fails by
+    luck about its own bytes.  Parquet is matched by the first reader.
+    (``pd.DataFrame.to_parquet`` here writes fixture SOURCE data, not a library
+    cache artifact, so the ``local_tools.to_parquet`` sanction does not apply.)
     """
     c = countries_root / name
     (c / "_").mkdir(parents=True)
@@ -536,7 +546,7 @@ def _make_country(countries_root: Path, name: str, cat_org: str | None,
         Wave: '2000'
 
         sample:
-            file: ../Data/hh.csv
+            file: ../Data/hh.parquet
             idxvars:
                 i: hhid
             myvars:
@@ -548,7 +558,71 @@ def _make_country(countries_root: Path, name: str, cat_org: str | None,
         "clust": ["c1", "c1", "c2", "c2", "c3", "c3", "c3"],
         "wt": [float(n) for n in range(1, 8)],
         "settlement": [1, 2, 3, 4, 5, 6, 7],
-    }).to_csv(c / "2000" / "Data" / "hh.csv", index=False)
+    }).to_parquet(c / "2000" / "Data" / "hh.parquet", index=False)
+
+
+_FOOD_ITEMS_ORG = """\
+#+name: food_items
+| Code | Preferred Label | Aggregate Label |
+|------+-----------------+-----------------|
+|  101 | Beans (fresh)   | Beans           |
+|  102 | Beans (dry)     | Beans           |
+|  103 | Matoke (bunch)  | Matoke          |
+|  104 | Matoke (heap)   | Matoke          |
+"""
+
+
+def _make_food_country(countries_root: Path, name: str = "Foodland") -> None:
+    """A country with ``food_acquired``, so ``food_expenditures`` DERIVES.
+
+    The derived-food branch of the generated ``method()`` is the one place a
+    ``labels=`` error can be swallowed (see the tests below), and no
+    ``sample``-only fixture reaches it.
+    """
+    c = countries_root / name
+    (c / "_").mkdir(parents=True)
+    (c / "2000" / "_").mkdir(parents=True)
+    (c / "2000" / "Data").mkdir(parents=True)
+    (c / "_" / "data_scheme.yml").write_text(textwrap.dedent(f"""\
+        Country: {name}
+
+        Waves:
+          - '2000'
+
+        Data Scheme:
+          food_acquired:
+            index: (i, t, j, u, s)
+            Quantity: float
+            Expenditure: float
+            Price: float
+        """))
+    (c / "_" / "categorical_mapping.org").write_text(_FOOD_ITEMS_ORG)
+    (c / "2000" / "_" / "data_info.yml").write_text(textwrap.dedent(f"""\
+        Country: {name}
+        Wave: '2000'
+
+        food_acquired:
+            file: ../Data/food.parquet
+            idxvars:
+                i: hhid
+                j: item
+                u: unit
+                s: source
+            myvars:
+                Quantity: qty
+                Expenditure: exp
+                Price: price
+        """))
+    pd.DataFrame({
+        "hhid": ["h1", "h1", "h1", "h2", "h2"],
+        "item": ["Beans (fresh)", "Beans (dry)", "Matoke (bunch)",
+                 "Matoke (heap)", "Beans (fresh)"],
+        "unit": ["Kg"] * 5,
+        "source": ["purchased"] * 5,
+        "qty": [1.0, 2.0, 3.0, 4.0, 5.0],
+        "exp": [10.0, 20.0, 30.0, 40.0, 50.0],
+        "price": [10.0, 10.0, 10.0, 10.0, 10.0],
+    }).to_parquet(c / "2000" / "Data" / "food.parquet", index=False)
 
 
 @pytest.fixture(scope="module")
@@ -556,6 +630,7 @@ def synthetic_tree(tmp_path_factory):
     root = tmp_path_factory.mktemp("label_selection")
     countries = root / "countries"
     countries.mkdir()
+    _make_food_country(countries)
     _make_country(countries, "Fixtureland", _SETTLEMENT_ORG)
     _make_country(countries, "Otherland", None)          # curates nothing
     _make_country(countries, "Malformedland",
@@ -748,6 +823,74 @@ def test_columnless_country_is_otherwise_healthy(synthetic_tree):
         print('COLUMNLESS_HEALTHY_OK')
         """, synthetic_tree)
     assert "COLUMNLESS_HEALTHY_OK" in out
+
+
+# ---------------------------------------------------------------------------
+# 4. The DERIVED-food branch
+#
+# Derived food tables take a different route through `method()` than
+# registered ones, so the `sample`-only fixtures never exercise the label
+# machinery there at all -- hence `Foodland`.
+#
+# Deliberately NOT keyed off a warm Uganda cache: the guard the other food
+# tests use (`Uganda/var/food_acquired.parquet` exists) is cleared by the test
+# suite itself, so such a test skips in exactly the runs that would exercise it.
+#
+# SCOPE NOTE, measured rather than assumed.  `method()`'s derived branch calls
+# `_finalize_result(..., labels=...)` inside a try whose
+# `except (..., KeyError, ...)` falls back to legacy aggregation, and
+# `LabelUnavailableError` IS a KeyError -- so there is a
+# `if units is not None or map_labels: raise` clause to stop the degrade being
+# swallowed.  These tests do NOT pin that clause: deleting `or map_labels` and
+# re-running leaves them green.  Two reasons, both real:
+#   * an ABSENT target is caught by `_assert_label_targets_present`, which sits
+#     OUTSIDE the try, so it never reaches the clause; and
+#   * when the fallthrough does happen here, the legacy path finds no
+#     registered `food_expenditures`, returns an empty frame, and the same
+#     outside-the-try guard raises the same class anyway.
+# The clause still earns its place -- a country with a REGISTERED legacy
+# `food_expenditures` could fall through to a frame that HAS the target, and
+# then the caller would silently receive Preferred labels instead of the
+# variant they asked for -- but that shape is not constructible from this
+# fixture, so it is stated here rather than claimed as covered.
+# ---------------------------------------------------------------------------
+
+def test_derived_food_path_propagates_the_degrade(synthetic_tree):
+    """A labels= error must reach the caller from the derived branch."""
+    out = _run("""
+        from lsms_library import Country
+        from lsms_library.errors import LabelUnavailableError
+        try:
+            Country('Foodland').food_expenditures(labels={'Rural': 'Settlement'})
+            raise AssertionError('derived path swallowed the degrade')
+        except LabelUnavailableError as e:
+            assert 'food_expenditures' in str(e), e
+            print('DERIVED_DEGRADE_PROPAGATED')
+        """, synthetic_tree)
+    assert "DERIVED_DEGRADE_PROPAGATED" in out
+
+
+def test_dict_j_equals_scalar_on_a_derived_table(synthetic_tree):
+    """The documented equivalence, on a real derived table.
+
+    Also pins `reaggregate`: four items collapse to two aggregates and the
+    expenditure total is preserved.
+    """
+    out = _run("""
+        import pandas as pd
+        from lsms_library import Country
+        f = Country('Foodland')
+        pref = f.food_expenditures()
+        scalar = f.food_expenditures(labels='Aggregate')
+        dict_j = f.food_expenditures(labels={'j': 'Aggregate'})
+        pd.testing.assert_frame_equal(scalar.sort_index(), dict_j.sort_index())
+        assert set(pref.index.get_level_values('j')) == {
+            'Beans (fresh)', 'Beans (dry)', 'Matoke (bunch)', 'Matoke (heap)'}
+        assert set(scalar.index.get_level_values('j')) == {'Beans', 'Matoke'}
+        assert pref['Expenditure'].sum() == scalar['Expenditure'].sum() == 150.0
+        print('DERIVED_DICT_J_OK')
+        """, synthetic_tree)
+    assert "DERIVED_DICT_J_OK" in out
 
 
 def test_feature_default_is_unaffected(synthetic_tree):
