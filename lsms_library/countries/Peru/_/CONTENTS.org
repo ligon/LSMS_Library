@@ -602,3 +602,363 @@ every quote here was verified against the PDF on 2026-07-21.
 Per GH #601 this records *evidence only*.  It proposes no schema, no
 =data_scheme.yml= key and no code; how the library should represent a wave's
 declared universe is being decided in GH #603.
+
+* Identity: the household and cluster keys (GH #684, 2026-08-21)
+
+Everything in this section is about *1994*, the only wired wave.  Measurements
+are quoted so they can be re-run; the documentary quotations are verbatim.
+
+** The country config had never loaded, so nothing in it was ever validated
+
+=Peru/_/= held a *=data_info.yml=* where =Country.resources= reads
+*=data_scheme.yml=*.  Peru was the only country in the corpus that spelled it
+that way, so =Country('Peru').data_scheme= was =[]=, every table was
+unreachable, and Peru contributed *zero cells* to the coverage matrix -- a
+country whose config does not load cannot even be graded =broken=.  The file
+was renamed on 2026-08-21 and the wave config exercised for the first time.
+
+Read that as a standing warning about the rest of =Peru/_/=: a mapping nobody
+has ever run is a mapping nobody has ever checked.  Two defects found on the
+first execution are recorded below (=LENGUA=, and the mis-cited source of the
+whole =categorical_mapping.org=).
+
+** =(SEGMENTO, VIVIENDA, HOGAR)= is the survey's own household key
+
+=1994/Documentation/dicciona.pdf= ("Data Dictionary: ENNIV94") defines four
+items as COMMON to *every* record type in the survey:
+
+: RECTYPE   A  1-2   2
+: SEGMENTO  N  3-5   3
+: VIVIENDA  N  6-7   2   VIVI     01:12
+: HOGAR     N  8-9   2   HOGAR01  11:15   HOGAR02  22:25 ...
+
+That triple is exactly unique in REG01: 3,623 rows, 3,623 groups, 0
+duplicates.  =i= is the hyphen-joined, zero-padded form =001-01-11=, built by
+=i()= in =1994/_/mapping.py=; the padding widths are the dictionary's own field
+widths, so the string id sorts in numeric order.
+
+Two realised ranges exceed their declared ones, neither an error but both
+worth knowing: VIVIENDA runs to 21 against a declared 01:12, and B00-ORDEN to
+20 against a declared 01:15.
+
+** =HOGAR= is a FRACTION, not a sequence number
+
+=1994/Documentation/m-encues.pdf= (MANUAL DEL ENCUESTADOR) 7.2.3,
+"Recuadro B", verbatim:
+
+#+begin_quote
+En el renglón Hogar Nº, anote el número correlativo que le corresponde a cada
+hogar que existe en la vivienda, utilizando una fracción; en donde el numerador
+indica el correlativo del hogar y el denominador el número total de hogares en
+la vivienda.  Ejemplo: Si existe un hogar en la vivienda se anotará 1/1.  Si
+existen tres hogares en la vivienda se anotará: En la cédula del primer hogar
+1/3, en la cédula del segundo hogar 2/3, y en la cédula del tercer hogar 3/3.
+#+end_quote
+
+The two-digit code is that fraction with the slash removed: 11 = 1 of 1,
+12 = 1 of 2, 22 = 2 of 2, 33 = 3 of 3.  Confirmed in the data: the observed
+values are exactly ={11, 12, 13, 14, 22, 23, 33}=, the numerator never exceeds
+the denominator, and the declared denominator equals the number of households
+actually present in the dwelling in *3,622 of 3,623* rows.  The one exception
+is segmento 78 / vivienda 8, coded 1-of-4 with only one household in the file.
+
+*Consequence*: the denominator is a *dwelling* attribute embedded in a
+*household* id, so a household's =i= changes if the dwelling's household count
+changes between rounds.  The raw code is kept anyway -- it is what the file
+contains and it is reversible -- but a future 1991-1994 panel link cannot use
+=i= naively.
+
+** =v = segmento=, and deliberately NOT a composite
+
+=m-encues.pdf= 7.2.3 splits the cover sheet into two boxes, verbatim:
+
+#+begin_quote
+Recuadro A: UBICACION GEOGRAFICA
+Copie la información de Departamento, Provincia, Distrito y Centro Poblado del
+"Listado de Viviendas Seleccionadas".
+
+Recuadro B: UBICACION MUESTRAL
+Copie la información del Segmento Nº, Vivienda Nº del "Listado de Viviendas
+Seleccionadas", en donde corresponda, según sea área urbana o área rural.
+#+end_quote
+
+Translation (agent-supplied, NOT source text): Box A is the geographic
+location -- department, province, district, populated place -- copied from the
+listing of selected dwellings; Box B is the *sample* location -- segment
+number, dwelling number -- copied from the same listing.
+
+So the sampling unit is the SEGMENT, and the department / province / district
+are a geographic *description*.  Both are copied from one source document, so
+a segment has one true (dpto, prov, dist) and any disagreement inside a
+segment is a transcription error in Box A.
+
+GH #684 proposed a *composite* key on the Guatemala precedent, whose
+=segmento= was a local serial reused across departments.  *Peru's is not.*
+357 of 364 segmentos map to exactly one department; the numbers run 1..662
+with large gaps, i.e. a national serial drawn from a larger frame rather than
+renumbered per department.  Measured on =1994/Data/REG01.DTA= (3,623
+households, 364 segmentos):
+
+| column       | segmentos where it varies | minority size            |
+|--------------+---------------------------+--------------------------|
+| =a01= DPTO   | 7 of 364                  | 1 household (2 in seg 125) |
+| =a06= AREA   | 10 of 364                 | 1 household, in all ten  |
+
+In every DPTO case the *rest* of the geography is identical across the split
+-- same provincia, distrito, centro poblado, categoría, área -- and the two
+departments are not adjacent.  Segmento 106 is 11 households in Piura (20) and
+1 in Ucayali (25), opposite ends of the country.  These are keying typos, not
+an id collision.  A composite =(a01, segmento)= key would *split seven real
+clusters* on those typos: uniqueness without correctness.
+
+=cluster_features= is therefore reduced to =(t, v)= by *MODE*, in the
+=cluster_features()= df_edit hook, not by the framework's silent
+=groupby().first()= (which destroyed 187 of 3,623 rows and let row order pick
+the value).  There are *zero ties*: all 364 segmentos have a unique modal
+=a01= and =a06=.  18 household rows are overruled by their segment's mode.
+
+*** Corroboration that the segment is the cluster
+
+- =(segmento, vivienda)= yields *3,543 dwellings*; =m-encues.pdf= and catalog
+  617 both state "La ENNIV 1994 será efectuada en 3,544 viviendas en todo el
+  País".  One dwelling apart.
+- The community questionnaire =CCPP0.DTA= (CENPOB94, 204 records) is keyed on
+  segmento and covers *111 segments -- exactly the 111 whose modal =a06= is
+  Rural, and no others*.  Its own =departa= agrees with REG01's modal =a01= in
+  203 of 204 records; the exception is segmento 39 (CCPP0 says 2, REG01's
+  twelve households all say 22).
+- 3,623 households / 364 segmentos = 9.95, matching the ~12-dwelling take per
+  cluster the ENNIV design describes.
+
+*** =v= is UNPADDED while =i='s segmento component is ZERO-PADDED
+
+Measured 2026-08-21, on the built tables.  =cluster_features= returns
+=v= = ='1'=, ='10'=, ='100'= -- the framework's default =format_id= with no
+=zeropadding= -- while =household_roster= returns =i= = ='001-01-11'=, whose
+first component is the SAME segmento zero-padded to the data dictionary's
+declared width of 3.
+
+Both are deliberate and neither is wrong on its own: =i= is padded so the
+composite string sorts in numeric order (see =i()= in =1994/_/mapping.py=),
+and =v= is simply what the framework produces for a scalar idxvar.  But they
+do NOT join to each other:
+
+: set(cluster_features.v) == {s.split('-')[0] for s in household_roster.i}
+: -> False
+
+A naive join of a cluster attribute onto households by splitting =i= fails for
+every segmento below 100 -- i.e. for most of the file, silently, as an empty
+match rather than an error.
+
+*Today this is harmless*: Peru has no =sample= table, so
+=_join_v_from_sample()= never runs and =v= never reaches a household-level
+table.  It becomes live the moment somebody wires =sample= (=v= and =Rural=,
+both already in REG01 -- the natural follow-up).  *Whoever does that must
+decide the padding once and apply it to both*, or the household-to-cluster
+join will be quietly wrong rather than loudly broken.
+
+** The Guatemala float32 trap does NOT apply to 1994 -- but check 1985/1991
+
+=CLAUDE.md= records that Guatemala's =upm= lost its low-order digits because
+Stata stored it as float32 above 2^24.  Checked on 2026-08-21: in REG01 and
+REG02 the id columns are =segmento= int16 and =vivienda= / =hogar= / =b00=
+int8, and every geographic code (=a01=..=a19=) is a *string*.  No float column
+in either file has a magnitude anywhere near 2^24; the largest value is 99.
+=CCPP0.DTA= is float32 throughout, but its largest value is 662.  There is no
+precision loss to undo.
+
+*1985 and 1991 are float32 throughout* (=hhid=, =hid=, =cluster=, =segment=
+...).  Their largest values are 362,931 (1985 =F0A.DTA= / =F1A.DTA=) and
+526,192 (1991 =N00A.DTA= / =N01.DTA=), both far below 2^24 = 16,777,216, so
+those files are safe too -- but the check was run on the identification and
+roster files only, and must be repeated on whatever files a future wiring
+actually reads.
+
+* Data defects and decisions taken in 1994
+
+Each of these is implemented in =1994/_/mapping.py= with the same evidence in
+its docstring.
+
+** One household's person ids are corrupt, and are repaired
+
+=(segmento 81, vivienda 2, hogar 11)= has three people numbered =b00= 1, 3, 3
+in REG02.DTA -- the head (63, =b01=1), a =conyuge= (61, =b01=2) and a daughter
+(15, =b01=3).  ORDEN 2 is missing.  This is the only duplicated =(i, pid)= in
+the whole roster.
+
+It is *reconcilable*, and not by guesswork: the same household is numbered
+1, 2, 3 in three other person-level modules shipped in the same dataset --
+REG05 (=e00=), REG07 (=g00=) and REG08 (=h00=/=h00a=) -- and REG05 records its
+code-3 person as attending school (=e01=1, =e03=1) while codes 1 and 2 are
+not, matching the 15-year-old being code 3.  The =conyuge='s ORDEN was
+mis-keyed 3-for-2.  Renumbering by cédula row order therefore *restores* the
+cross-module join for both people; dropping them (the Guyana =housing=
+precedent) would orphan two people's records in four other modules.
+
+The repair is guarded by an explicit precondition and warns on every build.
+Any future duplicate that fails the precondition is *dropped* with a warning
+rather than silently =first()=-collapsed.
+
+** =b01= = 1 (Jefe) occurs 3,624 times for 3,623 households
+
+=(segmento 243, vivienda 5, hogar 22)= records *two* household heads.  No
+household records zero.  Left as-is: nothing in the shipped documentation
+adjudicates which is the head, and both people are real.
+
+** =b03= (Age) = 99 is a non-response sentinel, not an age
+
+Six people.  =dicciona.pdf= prints "AGNO 00:99" for B03-ANOS as a plain
+*range*, which read literally makes 99 a real age; for B04D / B04M / B04A it
+prints 99 as a separate standalone value.  The data resolves the tension:
+
+- all six people with =b03= = 99 also have =b04a= (year of birth) = 99, the
+  dictionary's own explicit non-response code;
+- four of the six are one household's four "otro pariente" members
+  (=segmento 47 / vivienda 12=) -- relatives who were not enumerated;
+- ages 96, 97 and 98 have 1, 1 and 2 people respectively, so the six at 99 are
+  a spike, not a tail.
+
+They are mapped to NA.  *This is a reading of the source, not a statement in
+it*, and the dictionary's declared range is the residual against it.
+
+** =b08= (MonthsAway) = 99 is likewise non-response
+
+Three people.  Here =dicciona.pdf= is unambiguous ("AUSENTE 00:12" plus a
+separate 99).  Mapped to NA.
+
+** ENNIV's membership rule is NOT the library's residence filter
+
+=MonthsAway= is extracted from B08-AUSENTE, "months absent from the household
+in the last 12".  =m-encues.pdf= "Pregunta Nº 9" states the survey's own
+membership rule, verbatim:
+
+#+begin_quote
+Son miembros del hogar todas las personas que respondieron 0 a 9 meses de
+ausencia en la pregunta 9 (esto es, si anotaron 00, 01, 02, 03, 04, 05, 06,
+07, 08, 09 meses), excepto los trabajadores domésticos, (código 8, pregunta
+1), los pensionistas (código 9, pregunta 1) y sus parientes (códigos 8, 9
+pregunta 1).
+
+No son miembros del hogar todas las personas que respondieron más de 9 meses
+de ausencia; es decir, (10, 11, 12 meses) a la pregunta 9.  Excepto, el jefe
+del hogar y los recién nacidos (menores de 3 meses).
+#+end_quote
+
+The survey records that verdict in *=B09-MIEMBRO=*, which flags *641 of the
+19,285 people as NOT members*.  This library has no column for it, so
+=household_roster()= returns every roster row, members and non-members alike.
+
+Reconstructing the rule from =b08= and =b01= reproduces =b09= for *19,098 of
+19,285 people (99.03%)*, which is the empirical confirmation that =b08= is the
+months-absent variable.
+
+=household_characteristics= is derived with the framework's generic residence
+filter (=12 - MonthsAway > 0=, infants under 1 exempt), which is *not* ENNIV's
+rule: it keeps the 446 people absent 10 or 11 months whom ENNIV excludes, and
+drops the 3 whose absence is unknown.  Net effect measured: 19,190 of 19,285
+people kept, and *two households vanish entirely* -- =100-01-11= and
+=100-02-11=, in both of which every member is coded 12 months absent -- so
+=household_characteristics= has 3,621 households against the roster's 3,623.
+
+Note also the manual's counting convention for infants, which inflates their
+absence by construction: "En el caso de niños entre 3 meses y 1 año de edad,
+debe contarse como meses ausente del hogar durante los últimos 12 meses, a los
+meses previos a su nacimiento."
+
+** Not extracted, but present in REG02.DTA
+
+=b05= (EST-CIVIL, marital status), =b06= / =b07= (language), =b04d= / =b04m= /
+=b04a= (date of birth) and =b09= (MIEMBRO).  The first three have decode
+tables in =_/categorical_mapping.org= already -- see the warning on =LENGUA=
+there before using it.
+
+** Cosmetic coding inconsistencies in REG01
+
+Recorded because they will bite anyone who keys or filters on these columns:
+=a17= (DIA) and =a05= (CATEGORIA) each mix zero-padded and unpadded forms
+(both ='01'= and ='1'= occur), and =a18= (MES) takes the value 8 for 248
+households although =dicciona.pdf= declares "MES 05:07".  Fieldwork ran
+May-August 1994.
+
+* Wiring status of the four waves (2026-08-21)
+
+Only =1994/= has a =_/= wave config.  The other three ship data with nothing
+to read it, so every table is =absent= for them.  What each would need:
+
+** 1985 -- 133 DVC sidecars, Stata =.DTA=, a DIFFERENT variable scheme
+
+=1985/Data/= holds World-Bank-processed LSMS extracts with *English* variable
+names -- =F0A.DTA= carries =s00a_01=..=s00a_09=, =cid=, =cluster=, =nh=,
+=hhid=; =F1A.DTA= the roster as =s01a_*=.  This is not the INE / Cuánto
+=segmento= / =vivienda= / =hogar= / =a01= / =b01= layout of 1994, so *none of
+1994's config transfers*.  The household id is the scalar =hhid= (e.g. 1011),
+the cluster is =cluster=, and =hhid = cluster*1000 + nh= where =nh= itself
+encodes dwelling and household (=nh= = 11, 21, 31 for the first three
+dwellings of cluster 1).  A wave-level composite =i()= is therefore *not*
+needed: =hhid= is already the household key.  Wiring it needs a wave
+=_/data_info.yml= mapping =s01a_*= to Sex / Age / Relationship, its own
+=Relationship= code list (the tables in =_/categorical_mapping.org= are *not*
+established to apply -- see there), and a float32 re-check.
+
+There are also 25-odd *git-tracked* (not DVC-tracked) files in =1985/Data/=
+whose names carry a =" 2"= suffix -- =F0A 2.VAR=, =DEFLSCL5 2.VAR=, ... --
+macOS-style duplicates of files whose originals are DVC-tracked.  They have no
+=.dvc= sidecar and are committed into git directly, which is the opposite of
+this repository's convention.  Nothing reads them; they should probably go.
+
+** 1990 -- 39 DVC sidecars, and NOT readable by this library
+
+Every data file in =1990/Data/= is =.SSP= (=N00A.SSP=, =EXPEND.SSP=,
+=PANEL.SSP=, ... plus =FORMAT.ZIP=).  That is the SPSS/PC+ system-file format;
+=get_dataframe()= handles =.dta= / =.csv= / =.parquet= only, and =pyreadstat=
+does not read =.SSP= either.  *This is an acquisition / conversion blocker,
+not a config gap*: no amount of YAML makes this wave readable.  Either a
+Stata/SPSS conversion has to be produced and pushed, or the wave has to be
+re-acquired in a readable format.  Note also that 1990 is Lima-only (see the
+universe section above), so it is the least useful of the four.
+
+** 1991 -- 108 DVC sidecars, Stata =.DTA=, closest to a quick win
+
+=1991/Data/= holds =N00A.DTA= (2,308 households: =cid=, =hid=, =zone=,
+=conglom=, =seccion=, =aer=, =segment=, =hhno=, =nh1=, =nh2=, =dayi=, =moi=),
+=N01.DTA= (11,846 people: =relation=, =sex=, =db=/=mb=/=yb=, =agey=, =agem=,
+=marst=, =language=, =mosabs=, =memb=, ...) and =Ccpp91.dta=.  Same
+World-Bank-processed scheme as 1985, and *richer than 1994 for our purposes*:
+=mosabs= is MonthsAway, =memb= is the membership flag 1994 lacks a column
+for, and =dayi= / =moi= give an interview date directly (fieldwork
+September-November 1991, measured: =moi= is 9 / 10 / 11 for 118 / 1,227 / 963
+households).
+
+Structure, measured 2026-08-21: =hid= is unique across all 2,308 rows and
+decomposes as =segment*1000 + hhno*10 + nh1=; =nh1= and =nh2= are the hogar
+fraction's numerator and denominator carried as *separate* columns (both 1..5)
+rather than as 1994's combined two-digit code.  So =(segment, hhno)= is NOT
+unique -- multi-household dwellings -- but =hid= is, and being scalar it needs
+no wave-level =i()=.
+
+What 1991 still needs: a wave =_/data_info.yml=; its own code lists (the
+=Relationship= / =Sex= tables in =_/categorical_mapping.org= are established
+for 1994 only); a float32 re-check on whatever files it reads; and above all
+*a decision on the cluster, settled from the 1991 documentation rather than by
+inspection*.  =segment= has 240 distinct values over 2,308 households and is
+100% populated, but =zone= (58 values) and =conglom= (28 values) are also
+present and only partly populated -- 1,282 and 1,594 of 2,308 rows are null --
+while =seccion= and =aer= are 100% null.  A partly-populated geography column
+is exactly the shape that invites a wrong guess.
+
+** Why the country-level tables are declared anyway
+
+=individual_education=, =food_acquired= and =interview_date= are declared in
+=_/data_scheme.yml= with their 1994 sources named, even though no wave
+implements them.  A table that is not declared is invisible to the coverage
+matrix, and invisibility is exactly what let Peru rot unnoticed (GH #684).
+Declared, they grade =absent= -- an un-adjudicated gap with the data present
+and the config missing, which is the work queue.
+
+Note one structural limit found while identifying them: *ENNIV 1994 records no
+food quantities and no units*.  REG36.DTA (ALIMB) has =ak01= (one of thirty
+aggregated food-group codes 301..330), =ak02= (how obtained: compra /
+autosuministro / autoconsumo / ambos) and =ak03= (an amount in soles), and
+that is all -- confirmed in both =dicciona.pdf= and the file.  So a wired Peru
+=food_acquired= would carry Expenditure only, and =food_prices= /
+=food_quantities= are structurally unreachable for this wave.
