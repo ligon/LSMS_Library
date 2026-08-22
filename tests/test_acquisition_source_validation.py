@@ -53,7 +53,8 @@ class _Stub:
     def _augment_index_from_related_tables(self, df, scheme_entry, _):
         return df
 
-    def _apply_categorical_mappings(self, df, protect_u_sentinels=False):
+    def _apply_categorical_mappings(self, df, protect_u_sentinels=False,
+                                    labels=None):
         return df
 
 

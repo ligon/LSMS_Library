@@ -573,9 +573,9 @@ class Feature:
             warnings.warn(
                 f"{self.table_name}: labels={kwargs.get('labels')!r} unavailable "
                 f"for {len(labels_unavailable)} country(ies) {labels_unavailable} "
-                f"-- they curate no such food-label column and were dropped from "
-                f"the assembly (kept {n_kept}). Add the column or pass a country "
-                f"subset to silence this."
+                f"-- they curate no such label column, or lack the target "
+                f"entirely, and were dropped from the assembly (kept {n_kept}). "
+                f"Add the column or pass a country subset to silence this."
             )
             result.attrs['labels_unavailable'] = list(labels_unavailable)
             return result
