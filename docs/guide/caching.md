@@ -194,11 +194,20 @@ default behavior. It remains useful as a stricter bypass that skips even
 the `LSMS_NO_CACHE` check.
 
 What `assume_cache_fresh=True` does **not** skip: `_finalize_result`. Kinship
-expansion, canonical spelling normalization, dtype coercion, and the
-`_join_v_from_sample` augmentation all still apply on read. The returned
-DataFrame is **not** byte-identical to the on-disk parquet — the parquet
-is closer to the raw source data, and `_finalize_result` is the
+expansion, canonical spelling normalization, dtype coercion, sampling-weight
+normalization, and the `_join_v_from_sample` augmentation all still apply on
+read. The returned DataFrame is **not** byte-identical to the on-disk parquet
+— the parquet is closer to the raw source data, and `_finalize_result` is the
 harmonization layer applied at every read.
+
+A concrete example of that gap, worth knowing before you read a parquet
+directly: `sample.weight` and `sample.panel_weight` are stored **raw** (an
+expansion weight summing to a national population, or whatever the survey
+shipped) but are served rescaled to **within-wave mean 1**. So
+`pd.read_parquet(.../var/sample.parquet)['weight'].mean()` can be 630 while
+`Country(...).sample()['weight']` has mean 1.0 in every wave — both are
+correct, at different layers. See `CLAUDE.md` §"`sample()` and Cluster
+Identity".
 
 **Do not use `assume_cache_fresh=True`** after editing source data or a wave's
 configuration unless you have cleared the affected caches first — you
