@@ -256,9 +256,17 @@ class TestSample:
         if "weight" not in sample_df.columns or "Rural" not in sample_df.columns:
             pytest.skip("need weight and Rural")
         from lsms_library.country import _normalise_sample_weights
-        x = pd.to_numeric(sample_df["Rural"], errors="coerce")
+        # `Rural` is a categorical label ('Rural' / 'Urban' / 'Semi-urban'),
+        # not a number — turn it into a 0/1 indicator.  Coercing it with
+        # pd.to_numeric would silently produce an all-NaN x and make this test
+        # skip everywhere while appearing to pass.
+        x = (sample_df["Rural"].astype("string").str.strip().str.lower()
+             .map({"rural": 1.0, "true": 1.0,
+                   "urban": 0.0, "semi-urban": 0.0, "false": 0.0}))
         if x.notna().sum() == 0:
-            pytest.skip("Rural is all-null")
+            x = pd.to_numeric(sample_df["Rural"], errors="coerce")
+        if x.notna().sum() == 0:
+            pytest.skip("Rural carries no usable indicator")
         waves = list(dict.fromkeys(sample_df.index.get_level_values("t")))
         factors = {w: 10.0 ** (i + 1) for i, w in enumerate(waves)}
         scrambled = sample_df.copy()
@@ -266,19 +274,25 @@ class TestSample:
             pd.Series(scrambled.index.get_level_values("t"),
                       index=scrambled.index).map(factors).astype("float64")
         restored = _normalise_sample_weights(scrambled, country=country_name)
+        w_all = pd.to_numeric(sample_df["weight"], errors="coerce")
+        w_new = pd.to_numeric(restored["weight"], errors="coerce")
+        tvals = sample_df.index.get_level_values("t")
+        compared = 0
         for wave in waves:
-            w0 = pd.to_numeric(sample_df.xs(wave, level="t")["weight"], errors="coerce")
-            w1 = pd.to_numeric(restored.xs(wave, level="t")["weight"], errors="coerce")
-            xv = pd.to_numeric(sample_df.xs(wave, level="t")["Rural"], errors="coerce")
-            ok = w0.notna() & xv.notna()
+            m = (tvals == wave)
+            w0, w1, xv = w_all[m], w_new[m], x[m]
+            ok = (w0.notna() & xv.notna()).to_numpy()
             if not ok.any() or w0[ok].sum() <= 0:
                 continue
+            compared += 1
             share0 = (w0[ok] * xv[ok]).sum() / w0[ok].sum()
             share1 = (w1[ok] * xv[ok]).sum() / w1[ok].sum()
             assert abs(share0 - share1) < 1e-9, (
                 f"{country_name} {wave}: weighted Rural share moved "
                 f"{share0:.12g} -> {share1:.12g} under rescaling"
             )
+        if not compared:
+            pytest.skip("no wave with both positive weights and a Rural indicator")
 
     def test_cross_section_weight_positive_when_panel_null(self, country_name, sample_df):
         """Refreshment-sample households (panel_weight NaN but weight present)
