@@ -194,12 +194,14 @@ def sample(df):
     # NOT self-weighting for the population at interview time, and no updated
     # population figures exist here to adjust for the drift.
     #
-    # Contrast GLSS4, which used the SAME 1984 figures for PPS selection but
-    # then assigned weights ex post from EA population change between the 1984
-    # and 2000 censuses.  So GLSS4's weights pull toward a ~2000 population
-    # while GLSS1-GLSS3 represent 1984 as drawn.  After normalisation the
-    # SCALES match; the POPULATIONS REPRESENTED still do not.  Anything
-    # comparing weighted levels across GLSS3 and GLSS4 must say which it means.
+    # Contrast GLSS4, which GSS states outright is NOT self-weighting
+    # (`1998-99/Documentation/GHA_1998_GLSS_Report_EN.pdf` p.114) -- same 1984
+    # frame for PPS, but EAs grew unevenly over 14 years and GSS also admits
+    # the listing was incomplete and the segmentation "a bit arbitrary".  Its
+    # weights are an ex-post correction.  So GLSS4 pulls toward a later
+    # population while GLSS1-GLSS3 represent 1984 as drawn.  Normalisation
+    # equalises the SCALES; the POPULATIONS REPRESENTED still differ.  See that
+    # wave's data_info.yml for the quotes.
     #
     # `panel_weight` mirrors `weight` per the convention in `_/CONTENTS.org`.
     # For GLSS2 that is thin: the retained panel half is not distinguished from
