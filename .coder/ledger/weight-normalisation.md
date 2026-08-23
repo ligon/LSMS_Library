@@ -171,6 +171,41 @@ data that is present; they do not force a materialization. In this session
 that meant 30 of 34 countries exercised the class check and 17 the stability
 check.
 
+## §8 Operational note — I purged Uganda from the SHARED cache by accident
+
+Recorded so the next agent does not repeat it.
+
+`conftest.py::pytest_configure` calls `_purge_country_caches("Uganda")`
+**unconditionally** in its `else` branch — i.e. on *every* pytest session that
+does not pass `--rebuild-caches`, `--rebuild` or `--no-purge`. It resolves the
+data root through `Country("Uganda").clear_cache()`, which reads
+`data_dir` from `~/.config/lsms_library/config.yml` when `LSMS_DATA_DIR` is
+unset. On this machine that config points at the **shared** root
+`/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library`.
+
+I ran exactly one command without `LSMS_DATA_DIR` that invoked pytest —
+`pytest tests/ --collect-only`, purely to count tests — and it deleted
+`Uganda/var/{sample,household_roster,housing}.parquet` plus the wave-level
+Uganda parquets from the shared cache at 18:25. **`--collect-only` runs
+`pytest_configure`; collection is not a dry run.**
+
+- **Harm: low and self-healing.** Only derived cache was removed; no source
+  data, no DVC blobs. The next Uganda build regenerates it (conftest's own
+  comment estimates ~5–10 s plus any DVC fetch).
+- **Not restored deliberately.** My private root has rebuilt copies, but they
+  were produced by this unmerged branch; seeding a shared cache from an
+  unmerged branch is a worse risk than letting the designed
+  rebuild-on-demand path run. The content-hash gate would accept them, which
+  is precisely why hand-placing them is unwise.
+- **Rule for next time: set `LSMS_DATA_DIR` on _every_ pytest invocation,
+  including `--collect-only` and data-free unit runs.** "It only collects" /
+  "these tests do not touch data" is not sufficient — the purge is a
+  `pytest_configure` side effect, upstream of both.
+- Separately worth a maintainer's attention (not this PR's scope): a
+  session-start destructive purge that fires on `--collect-only`, and against
+  whatever root the *config* names rather than the one the session is using,
+  is a footgun for exactly this reason.
+
 ---
 ### Phase 3 — verification
 
