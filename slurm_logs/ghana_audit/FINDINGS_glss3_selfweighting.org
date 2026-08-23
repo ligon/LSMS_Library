@@ -7,10 +7,9 @@
 *SELF-WEIGHTING, WIRE IT.*  =weight = 1.0= in
 =GhanaLSS/1991-92/Data/POV_GH.DTA= is the *correct, producer-documented*
 value, not a placeholder.  Ghana Statistical Service (GSS) states the
-GLSS3 sample is self-weighting in *four independent shipped documents*,
-and a fifth (the GLSS3 Poverty Profile) names the published statistical
-procedure that was applied *specifically to GLSS3* to /restore/
-self-weighting -- and states that the same procedure was *not* applied to
+GLSS3 sample is self-weighting in *four shipped documents*, and a fifth
+(the GLSS3 Poverty Profile) names the published statistical procedure that
+was applied *specifically to GLSS3* to /restore/ self-weighting -- and states that the same procedure was *not* applied to
 GLSS4, which is exactly why GLSS4 needs a real weight distribution and
 GLSS3 does not.
 
@@ -436,6 +435,44 @@ The household shortfall decomposes exactly:
 
 *Three of these matches are numerically exact against a table published in
 1995 (79, 10, 11, 31).  That is not coincidence; it settles the mechanism.*
+
+** Is there an EA identifier distinct from =clust=?  No.
+
+Asked directly in review, because a separate EA column would settle
+=clust='s grain outright rather than by inference.
+
+*There is none.*  =POV_GH.DTA='s 45 columns contain no =ea=, =eanum=,
+=psu= or equivalent.  The full geographic/identifier set is =clust=, =nh=,
+=pid=, =seg=, =loc2=, =loc3=, =loc5=, =loc7=, =ez=, =region=.
+
+*=seg= is not it, despite the suggestive name.*  Appendix 1 does describe
+segmenting oversized EAs ("a decision was made to divide the EA into
+smaller segments, and to select one segment at random", printed p. 109), so
+=seg= was checked against that reading and *fails it*:
+
+- =seg= takes 7 values and *varies within a cluster* -- a single take-10
+  cluster can carry up to 6 distinct =seg= values.
+- It does *not* partition clusters into workload-sized pieces: households
+  per =(clust, seg)= in the take-20 and take-30 clusters range from 1 to 17
+  with no mass at 10 or 15.
+- It cross-cuts =loc2= and =loc7= rather than nesting inside them.
+
+=seg= is the household's *socioeconomic group* -- an analytic
+classification, not a sampling unit.  The GLSS3 Poverty Profile tabulates
+poverty by exactly seven such groups (printed p. ~30, "1991/1992" table):
+*Public sector empl. / Private formal empl. / Private informal empl. /
+Export farmers / Food crop farmers / Non-farm self empl. / Non-working*.
+The observed distribution matches: =seg=5= is by far the largest (1876
+households) and is 91 per cent rural -- the "large numbers of food crop
+farmers" the Profile discusses -- while =seg=4= is 92 per cent rural
+(export farmers) and =seg=6= urban-skewed (non-farm self-employed).
+/Inference: the specific value-to-label mapping is not documented in any
+shipped file (the =.dta= carries no value labels), so the group ordering
+above is matched by pattern, not read off a codebook./
+
+*Consequence:* nothing in the shipped data distinguishes EA from workload,
+so inference #1 (=clust= = EA) rests entirely on the Table 2 cell matches --
+which is where this document leaves it.
 
 ** Consequences for the hypotheses that were on the table
 
