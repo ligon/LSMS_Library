@@ -72,6 +72,15 @@ page or location file: =weight= in =sec0.dta= (GLSS5), =weight= in
 =g6loc_edt.dta= (GLSS6), =WTA_S= in =g7sec0.dta= (GLSS7).  These
 sum to the national population.
 
+Since every round is an independent cross-section, there is no
+panel weight.  =panel_weight= equals =weight= for all waves.
+
+*Scale note (2026-08-22):* the =sample= feature now returns weights
+rescaled to within-wave mean 1, so the GLSS5--GLSS7 expansion weights
+above no longer read back as population counts through the API.  The
+raw values are unchanged in the source and in the cached parquet.  See
+the SUPERSEDED subsection below.
+
 *** GLSS3 self-weighting -- the citations
 :PROPERTIES:
 :ADDED: 2026-08-22
@@ -164,9 +173,6 @@ That documented design change is why GLSS3 ships a constant weight and
 GLSS4 a real distribution (min 0.127 / median 0.85 / max 6.02), and the
 contrast is a survey fact that must survive the rescaling, not be read
 as an artefact of it.
-
-Since every round is an independent cross-section, there is no
-panel weight.  =panel_weight= equals =weight= for all waves.
 
 ** Cluster (PSU) variable
 
