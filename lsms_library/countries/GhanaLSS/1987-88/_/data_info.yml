@@ -34,6 +34,9 @@ sample:
         i: HID
     myvars:
         v: CLUST
+    # `weight` / `panel_weight` are SYNTHESISED as 1.0 by the `sample` df_edit
+    # hook in mapping.py -- this wave ships no weight column at all.  See that
+    # docstring for the evidence tier and the 1984-population qualifier.
 
 interview_date:
     file: Y00A.DAT

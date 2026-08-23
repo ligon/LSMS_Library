@@ -154,8 +154,12 @@ def sample(df):
 
     The Appendix's `SU` (semi-urban) is folded onto `Rural` by decision
     (@ligon, 2026-08-21) -- canonical `Rural` is the binary {Urban, Rural}.
-    The fold is a judgement call with no survey evidence either way; see
-    `_/appendix_i_clusters.org` and GH #692.  The distinction is lost in this
+    The fold is @ligon's call, and it IS supported by the survey: the joint
+    BID Sec 3.1 defines the tiers by 1984 Census locality population -- urban
+    >5,000, semi-urban 1,500-5,000, rural <1,500 -- so the whole SU band sits
+    below the survey's own urban threshold.  See `_/appendix_i_clusters.org`
+    and GH #692.  (An earlier version of this docstring said "no survey
+    evidence either way"; that predates the verification.)  The distinction is lost in this
     column and preserved raw in that org file.
 
     Households whose cluster is absent from the Appendix keep `Rural` NA rather
@@ -170,4 +174,42 @@ def sample(df):
 
     out = df.copy()
     out['Rural'] = out['v'].astype(str).map(attrs['Rural'])
+
+    # ---- Sampling weights (GH #713; @ligon, 2026-08-22) -------------------
+    # GLSS1 ships NO weight column of any kind -- a sweep of every
+    # readable source file in this wave found only anthropometric body weight
+    # (Y16A `WTA` beside `HTA` height; ZSCORE `WEIGHT` beside HAZ/WAZ).
+    #
+    # THE 1.0 BELOW IS OURS, NOT GSS's.  That is the sharp difference from
+    # GLSS3, where GSS shipped an explicit 1.0 and stated in writing that the
+    # sample "can be considered as being self-weighting".  Here we ASSERT a
+    # design weight from the documented design rather than relaying a producer
+    # value.  Evidence tier: (a) STATED.
+    #
+    # GLSS1 is the stronger case: report Appendix 1 states the self-weighting
+    # property for round 1 directly, anchored to the 3,200-household draw.
+    #
+    # THE QUALIFIER THAT MATTERS: self-weighting is with respect to the *1984
+    # Census* population -- the frame the master sample was drawn from.  It is
+    # NOT self-weighting for the population at interview time, and no updated
+    # population figures exist here to adjust for the drift.
+    #
+    # Contrast GLSS4, which used the SAME 1984 figures for PPS selection but
+    # then assigned weights ex post from EA population change between the 1984
+    # and 2000 censuses.  So GLSS4's weights pull toward a ~2000 population
+    # while GLSS1-GLSS3 represent 1984 as drawn.  After normalisation the
+    # SCALES match; the POPULATIONS REPRESENTED still do not.  Anything
+    # comparing weighted levels across GLSS3 and GLSS4 must say which it means.
+    #
+    # `panel_weight` mirrors `weight` per the convention in `_/CONTENTS.org`.
+    # For GLSS2 that is thin: the retained panel half is not distinguished from
+    # the fresh half here, so `panel_weight` does no real longitudinal work.
+    # `PANELC.DAT` carries the GLSS1->GLSS2 linkage if a genuine panel weight
+    # is ever needed.
+    #
+    # Acquisition target that would settle GLSS2 (cited in a footnote, not
+    # held): "Sample Design and Implementation in the First Three Rounds of
+    # the GLSS".
+    out['weight'] = 1.0
+    out['panel_weight'] = 1.0
     return out
