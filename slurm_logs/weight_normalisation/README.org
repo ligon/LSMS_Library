@@ -78,6 +78,7 @@ survey's own scale.  See =.coder/ledger/weight-normalisation.md= §7.
 | =raw_probe.py=         | per-wave RAW mean/sum from every =var/sample.parquet=        |
 | =negative_control.py=  | doctors real parquets with two miscodings, checks each fires |
 | =negative_control.txt= | its output -- the proof the new tests are not vacuous        |
+| =xpass_attrib.py=      | attributes the suite's 1 xpassed by neutralising the transform |
 
 ** The two classes are separated by an empty band
 
