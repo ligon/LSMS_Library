@@ -25,6 +25,14 @@ difference between the two sweeps is the read-path transform.
 | =ratio_proof.py=      | raw L2-country parquet vs. API weights, per-wave and pooled           |
 | =ratio_invariance.txt= | its output: worst per-wave weighted-share difference 2.2e-16         |
 
+*Reading =ratio_invariance.txt=:* one "mean api" cell reads =1.000189=
+(Uganda 2019-20), not =1=.  That is not a miss.  =ratio_proof.py= restricts
+to rows with a non-null =Rural= so a share can be computed, and Uganda's
+=Rural= is =<NA>= for 96 households; the figure is the mean over that
+/subset/, while the wave's actual mean is 1 (=corpus_after.csv=, which uses
+every row).  Every other country's =Rural= is complete, which is why only
+that one cell shows it.
+
 * Headline numbers
 
 ** Before: two scales, nothing marking which

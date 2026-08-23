@@ -819,7 +819,12 @@ def test_columnless_country_is_otherwise_healthy(synthetic_tree):
         df = Country('Columnlessland').sample()
         assert len(df) == 7, len(df)
         assert 'Rural' not in df.columns, df.columns
-        assert list(df['weight']) == [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]
+        # The fixture's raw weights are 1..7 (one wave, mean 4).  sample()
+        # rescales each wave's weights to mean 1 at API time, so the served
+        # values are 1/4 .. 7/4 -- same relative magnitudes, mean 1.0.
+        # See country._normalise_sample_weights.
+        assert list(df['weight']) == [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75], \
+            list(df['weight'])
         print('COLUMNLESS_HEALTHY_OK')
         """, synthetic_tree)
     assert "COLUMNLESS_HEALTHY_OK" in out

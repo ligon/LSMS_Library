@@ -135,3 +135,14 @@ only references are (a) `data_scheme` `optional:` bookkeeping in
   `dropna(how='all')`, before `attach_currency`. No signature change.
 - `tests/test_sample.py` — **OK (anchored on §2/§6)**: xfail removed because
   the documented cause was removed; new invariant + unit tests added.
+- `tests/test_label_selection.py::test_columnless_country_is_otherwise_healthy`
+  — **OK (anchored on §1)**: a synthetic-fixture expectation, not a consumer.
+  Its `Columnlessland` sample ships raw weights 1..7 in one wave (mean 4) and
+  the test pinned those literals; they are now served as 1/4..7/4. Re-pinned
+  with the reason at the assertion. **Found by grepping for build-time and
+  test-time weight consumers *after* the corpus sweep passed** — the sweep
+  could not have caught it, because the fixture lives outside the corpus.
+  The same grep confirmed **no country `_/*.py` build script calls
+  `Country(...).sample()`**, so no build path bakes normalised weights into
+  another table's parquet (which would have violated §4's "parquets keep raw
+  values").
