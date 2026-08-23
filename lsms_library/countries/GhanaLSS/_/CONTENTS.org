@@ -22,8 +22,30 @@ or refreshment sample mechanism.
 ** Overview
 
 Two-stage stratified cluster sample.  Enumeration Areas (EAs) from
-the national census serve as the PSU, with a fixed take of
-households per EA.
+the national census serve as the PSU.
+
+*The take of households is fixed per /workload/ and per /stratum/, NOT
+per EA.*  A second PPS stage (on the ratio of listed households to
+1984-census households) allocates workloads among the selected EAs, so
+an EA receives 0, 1, 2 or 3 workloads.  GLSS3: 15 households per urban
+workload, 10 per rural workload, 407 workloads across 366 EAs that
+received at least one.  Main report Appendix 1 (=1991-92/Documentation/pdf/G3report.pdf=,
+printed p.109) states it verbatim for GLSS1's 16-household workloads:
+
+#+begin_quote
+an EA, for example, which received two workloads provided 32 households for the sample.
+#+end_quote
+
+/Corrected 2026-08-22./  This subsection previously read "with a fixed
+take of households per EA", and that imprecision was load-bearing: it
+led a reader to infer that a =clust= code /bundles/ EAs (from GLSS1/2's
+32 = 2x16) and to write that inference into a config comment.  *That
+inference is refuted*: =clust= /is/ the EA -- one EA, two workloads.
+The decisive check is that take-15 clusters are 100 per cent urban
+while take-20 clusters are 100 per cent rural, which no bundling story
+produces.  See =slurm_logs/ghana_audit/FINDINGS_glss3_selfweighting.org=
+(PR #715) for the full reconciliation, which matches GSS's own design
+table cell-for-cell.
 
 ** Strata
 
@@ -50,9 +72,98 @@ page or location file: =weight= in =sec0.dta= (GLSS5), =weight= in
 =g6loc_edt.dta= (GLSS6), =WTA_S= in =g7sec0.dta= (GLSS7).  These
 sum to the national population.
 
+*** GLSS3 self-weighting -- the citations
+:PROPERTIES:
+:ADDED: 2026-08-22
+:END:
+
+The "GLSS3 ... is constant 1.0 (self-weighting)" claim above was
+correct but *uncited* -- it read as an observation about the data with
+a parenthetical interpretation attached, and nothing recorded how the
+interpretation was reached.  Under this repo's rule against unevidenced
+claims it could not be relied on, and in fact it was not (PR #714
+asserted the opposite reading).  The citations, from GSS's own shipped
+documents:
+
+- =1991-92/Documentation/pdf/g3usersg.pdf= (Data User's Guide, PDF p.3);
+- =1991-92/Documentation/pdf/G3report.pdf= (main report, printed p.1 /
+  PDF p.19; Appendix 1, printed pp.109--113).
+
+*Two sentence variants exist across these sources and must not be
+blended.*  Quoting the main report (printed p.1) cleanly:
+
+#+begin_quote
+A multi-stage sampling technique was used in selecting the GLSS sample. Technical details of the sample design are given in Appendix 1.  Initially, 4565 households were selected for GLSS3, spread around the country in 407 small clusters;  in general, 15 households were taken in an urban cluster and 10 households in a rural cluster.  The actual achieved sample was 4552 households.  Because of the sample design used, and the very high response rate achieved, the sample can be considered as being self-weighting, though in the case of expenditure data (as discussed below) weighting of the expenditure values is required.
+#+end_quote
+
+(The User's Guide's variant reads "The sample designed used for the
+GLSS3 ... /should be done/" -- sic; the report's reads "Because of the
+sample design used ... /is required/".)
+
+*The response rate the claim conditions on is 99.72 per cent* --
+4,552 of 4,565 (main report Appendix 1, Table 3, printed p.113).  That
+is the second of the two conditions GSS attaches; the first is the
+design itself.
+
+*CAVEAT -- the carve-out is a CPI deflator, not a sampling weight.*
+The clause "weighting of the expenditure values is required" is
+routinely truncated out of short quotations, and someone will otherwise
+read it as contradicting the constant =weight=.  It resolves (Appendix
+1, "Re-weighting", printed pp.113--114) to a *monthly national CPI
+deflator to March 1992 prices*, keyed on interview date -- e.g. the
+September 1991 factor is 17925.4/17066.4 = 1.0503, identical for every
+household interviewed that month.  It is orthogonal to =weight= and
+must *never* be wired as one.  =POV_GH.DTA= carries =month= and =year=,
+so a user who wants it can reconstruct it.
+
+*** SUPERSEDED (2026-08-22): "only expansion weights, to avoid mixing"
+
+The decision recorded here until 2026-08-22 read, verbatim:
+
+#+begin_quote
 The =sample= feature only includes expansion weights (GLSS5--GLSS7)
 to avoid mixing weight types.  GLSS1--GLSS4 have =weight= and
 =panel_weight= as NaN.
+#+end_quote
+
+*The hazard it guarded against is now handled library-wide, so the
+workaround is no longer needed.*  =Country._finalize_result= rescales
+every wave's =weight= and =panel_weight= to within-wave mean 1 at API
+time, dividing by that wave's own mean over non-null values (see
+=lsms_library/country.py::_normalise_sample_weights= and =CLAUDE.md=
+§"=sample()= and Cluster Identity").  A normalised column is divided by
+1.0000 and is unchanged; an expansion column becomes normalised.  The
+two types are therefore indistinguishable at the API and cannot be
+mixed by a user summing across waves.  Raw values remain in the cached
+parquet.
+
+*Cost of the superseded workaround: four waves of usable weights* --
+GLSS1, GLSS2, GLSS3 and GLSS4 all have =weight= and =panel_weight=
+NaN today, and =null_read_audit= reports exactly that ("GhanaLSS/sample/weight
+and panel_weight are empty in four of six waves", =CLAUDE.md=).  GLSS3's
+constant 1.0 and GLSS4's genuine probability weights *can now be wired*
+without creating a mixed-scale table.
+
+*This entry does not wire them.*  PR #714 (draft) owns GLSS3 + GLSS4;
+GLSS1/GLSS2 have no weight variable in the data at all, so for those two
+the NaN is the honest answer and stays.
+
+*Normalisation makes the two /scales/ comparable; it does not make the
+two /designs/ the same.*  GLSS3 was deliberately amended to /restore/ a
+self-weighting sample by a published procedure and GLSS4 was not --
+Poverty Profile Appendix 4 (=1991-92/Documentation/pdf/PovProf.pdf=,
+printed p.57):
+
+#+begin_quote
+The latter [restoring a self-weighting sample] was done for GLSS 3 following a procedure devised by Scott and Amenuvegbe (1991).
+
+The same procedure though was not applied for GLSS 4.
+#+end_quote
+
+That documented design change is why GLSS3 ships a constant weight and
+GLSS4 a real distribution (min 0.127 / median 0.85 / max 6.02), and the
+contrast is a survey fact that must survive the rescaling, not be read
+as an artefact of it.
 
 Since every round is an independent cross-section, there is no
 panel weight.  =panel_weight= equals =weight= for all waves.

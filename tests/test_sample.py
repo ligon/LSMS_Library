@@ -178,34 +178,106 @@ class TestSample:
                 f"{country_name} has {(weights < 0).sum()} negative values in {col}"
             )
 
-    def test_weighted_population_stable_across_waves(self, country_name, sample_df):
-        """Weighted population (sum of cross-sectional weights) should not
-        jump more than 5x between adjacent waves — catches miscoded weights
-        or wrong variable assignments.
+    def test_weights_normalised_to_within_wave_mean_one(self, country_name, sample_df):
+        """Every wave's non-null weights have mean 1.
 
-        Exception: countries whose waves span different survey instruments
-        (e.g., CotedIvoire's 1985-89 LSMS + 2018-19 EHCVM) may legitimately
-        have incommensurate weight scales — the 1980s LSMS uses ALLWAITN
-        (sum ~ N households), EHCVM uses population-scaled weights.  Xfail
-        those with a clear reason.
+        `Country._finalize_result` divides each wave's `weight` /
+        `panel_weight` by that wave's own non-null mean, so the two scales the
+        corpus ships (13 already-normalised cells, 80 expansion cells summing
+        to a national population) are indistinguishable at the API.  The raw
+        values stay in the parquet.  See `_normalise_sample_weights`.
         """
-        if country_name == "CotedIvoire":
-            pytest.xfail(
-                "CotedIvoire weights span LSMS (1985-89, ALLWAITN ~ N households) "
-                "and EHCVM (2018-19, population-scaled) — incommensurate by design"
-            )
+        checked = 0
+        for col in ("weight", "panel_weight"):
+            if col not in sample_df.columns:
+                continue
+            for wave, g in sample_df.groupby("t", observed=True):
+                w = pd.to_numeric(g[col], errors="coerce").dropna()
+                if w.empty:
+                    continue  # all-null wave: nothing to normalise
+                if not (w.mean() > 0):
+                    continue  # zero/negative mean: skipped by design, warns
+                checked += 1
+                assert abs(w.mean() - 1.0) < 1e-9, (
+                    f"{country_name} {wave} {col}: mean {w.mean():.6g}, expected 1.0. "
+                    f"Weights should be normalised at API time."
+                )
+        if not checked:
+            pytest.skip("no non-null weights in any wave")
+
+    def test_weighted_sum_equals_household_count(self, country_name, sample_df):
+        """Corollary of mean-1: sum(weight) over a wave is its non-null count.
+
+        This replaces the former `test_weighted_population_stable_across_waves`,
+        which compared adjacent waves' weighted population totals to catch a
+        miscoded weight variable.  That signal is no longer expressible at API
+        level — the totals are sample sizes now, by construction — and the
+        CotedIvoire xfail it carried ("LSMS ALLWAITN vs EHCVM population-scaled
+        — incommensurate by design") described exactly the mixing this
+        normalisation removes.  A miscoded weight variable must now be caught
+        against the raw parquet or at the wave config.
+        """
         if "weight" not in sample_df.columns:
             pytest.skip("no weight column")
-        pop = sample_df.groupby("t")["weight"].sum().sort_index()
-        pop = pop[pop > 0]
-        if len(pop) < 2:
-            pytest.skip("fewer than 2 waves with positive weights")
-        ratios = pop / pop.shift(1)
-        ratios = ratios.dropna()
-        for wave, r in ratios.items():
-            assert 0.2 < r < 5.0, (
-                f"{country_name}: weighted population ratio {wave} vs prior = {r:.2f} "
-                f"(sum={pop[wave]:,.0f}). Possible weight variable error."
+        for wave, g in sample_df.groupby("t", observed=True):
+            w = pd.to_numeric(g["weight"], errors="coerce").dropna()
+            if w.empty or not (w.mean() > 0):
+                continue
+            assert abs(w.sum() - len(w)) < 1e-6 * max(len(w), 1), (
+                f"{country_name} {wave}: sum(weight)={w.sum():.6g} but "
+                f"{len(w)} non-null weights"
+            )
+
+    def test_weight_normalisation_is_idempotent(self, country_name, sample_df):
+        """Re-applying the transform to an already-normalised frame is a no-op.
+
+        Load-bearing: `_join_v_from_sample` re-enters `sample()` while
+        finalising every other household-level table.
+        """
+        from lsms_library.country import _normalise_sample_weights
+        again = _normalise_sample_weights(sample_df.copy(), country=country_name)
+        for col in ("weight", "panel_weight"):
+            if col not in sample_df.columns:
+                continue
+            before = pd.to_numeric(sample_df[col], errors="coerce")
+            after = pd.to_numeric(again[col], errors="coerce")
+            pd.testing.assert_series_equal(before, after, check_names=False,
+                                           rtol=1e-12, atol=0)
+
+    def test_weighted_ratios_unchanged_by_normalisation(self, country_name, sample_df):
+        """A weighted share is invariant under within-wave rescaling.
+
+        This is the mathematical guarantee that makes the change safe:
+        sum(w*x)/sum(w) is unchanged when every w in a wave is multiplied by
+        the same positive constant.  Checked here against a deliberately
+        de-normalised copy (each wave scaled by a distinct factor), using
+        `Rural` as x where present.
+        """
+        if "weight" not in sample_df.columns or "Rural" not in sample_df.columns:
+            pytest.skip("need weight and Rural")
+        from lsms_library.country import _normalise_sample_weights
+        x = pd.to_numeric(sample_df["Rural"], errors="coerce")
+        if x.notna().sum() == 0:
+            pytest.skip("Rural is all-null")
+        waves = list(dict.fromkeys(sample_df.index.get_level_values("t")))
+        factors = {w: 10.0 ** (i + 1) for i, w in enumerate(waves)}
+        scrambled = sample_df.copy()
+        scrambled["weight"] = pd.to_numeric(scrambled["weight"], errors="coerce") * \
+            pd.Series(scrambled.index.get_level_values("t"),
+                      index=scrambled.index).map(factors).astype("float64")
+        restored = _normalise_sample_weights(scrambled, country=country_name)
+        for wave in waves:
+            w0 = pd.to_numeric(sample_df.xs(wave, level="t")["weight"], errors="coerce")
+            w1 = pd.to_numeric(restored.xs(wave, level="t")["weight"], errors="coerce")
+            xv = pd.to_numeric(sample_df.xs(wave, level="t")["Rural"], errors="coerce")
+            ok = w0.notna() & xv.notna()
+            if not ok.any() or w0[ok].sum() <= 0:
+                continue
+            share0 = (w0[ok] * xv[ok]).sum() / w0[ok].sum()
+            share1 = (w1[ok] * xv[ok]).sum() / w1[ok].sum()
+            assert abs(share0 - share1) < 1e-9, (
+                f"{country_name} {wave}: weighted Rural share moved "
+                f"{share0:.12g} -> {share1:.12g} under rescaling"
             )
 
     def test_cross_section_weight_positive_when_panel_null(self, country_name, sample_df):
