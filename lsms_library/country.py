@@ -4859,8 +4859,18 @@ def _normalise_sample_weights(df: pd.DataFrame,
     if not cols:
         return df
 
+    # Find the wave axis wherever it is.  Falling back to a whole-frame mean
+    # when `t` is merely a COLUMN would pool every wave into one divisor --
+    # which is the exact bug this function exists to prevent -- so look in the
+    # columns too before giving up.  (`sample` declares `(i, t)` everywhere
+    # today; this is a guard against a future shape, not a live case.)
     index_names = list(df.index.names)
-    groups = df.index.get_level_values('t') if 't' in index_names else None
+    if 't' in index_names:
+        groups = df.index.get_level_values('t')
+    elif 't' in df.columns:
+        groups = df['t']
+    else:
+        groups = None
     where = country or '?'
 
     for col in cols:

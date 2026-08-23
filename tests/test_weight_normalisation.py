@@ -160,6 +160,16 @@ def test_no_weight_columns_is_a_noop():
     assert out is df and list(out.columns) == ['v']
 
 
+def test_t_as_a_column_still_groups_by_wave():
+    """Falling back to a whole-frame mean when `t` is a COLUMN would pool every
+    wave into one divisor -- the exact bug this function prevents."""
+    df = pd.DataFrame({'t': ['2010', '2010', '2018', '2018'],
+                       'weight': [100.0, 300.0, 4000.0, 6000.0]},
+                      index=pd.Index(['a', 'b', 'c', 'd'], name='i'))
+    out = _normalise_sample_weights(df, country='T')
+    assert out['weight'].tolist() == pytest.approx([0.5, 1.5, 0.8, 1.2])
+
+
 def test_no_t_level_normalises_over_the_whole_frame():
     df = pd.DataFrame({'weight': [100.0, 300.0]},
                       index=pd.Index(['a', 'b'], name='i'))
