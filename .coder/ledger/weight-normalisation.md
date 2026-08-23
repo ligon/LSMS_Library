@@ -113,14 +113,63 @@ only references are (a) `data_scheme` `optional:` bookkeeping in
 
 ## §6 Open questions for the human
 
-- `tests/test_sample.py::test_weighted_population_stable_across_waves` was a
-  *miscoded-weight* detector working through cross-wave population jumps.
-  After normalisation `sum == n`, so at API level it degrades to a
-  sample-size stability check. The miscoding signal now only exists in the
-  raw parquet. Amended + re-documented here rather than deleted; whether to
-  add a raw-parquet-level replacement is a maintainer call.
+- ~~Whether to add a raw-parquet-level replacement for the deleted
+  miscoded-weight detector.~~ **RESOLVED 2026-08-22 — see §7.** The check did
+  not disappear; it moved layers.
 - GLSS1–GLSS4 weights become wireable, but **PR #714 owns that** and this PR
   deliberately wires nothing.
+
+## §7 The scale check moved layers — it was not lost
+
+`test_weighted_population_stable_across_waves` detected a miscoded weight
+variable by comparing adjacent waves' weighted population totals. After this
+change every API-level total is the wave's household count, so the check could
+only ever pass — it was tautological, not merely weaker.
+
+**Why the raw layer is now the right home for it.** This PR makes the API
+*deliberately erase scale*: that is the whole point, and it is what makes the
+two survey conventions interchangeable to a user. A scale check therefore has
+to live where scale still exists — the L2-country parquet, which stores
+pre-transformation data by design (`CLAUDE.md` §"Cache vs. API"). Keeping the
+check at the API would have meant keeping scale at the API, i.e. not making
+this change at all. So the layer move is forced by the design, not a
+workaround for it.
+
+**What replaced it** (both in `tests/test_sample.py`, both reading
+`_read_raw_sample_weights`):
+
+| test | catches | tolerates |
+|---|---|---|
+| `test_raw_weight_scale_classes_are_unambiguous` | a wave whose raw mean lands in the empty band between the two legitimate scales — the signature of a weight wired to household size or a per-capita figure | a raw mean of exactly 1 (13 cells) as fully correct |
+| `test_raw_expansion_totals_stable_across_waves` | the original signal: an adjacent-wave jump in the implied population, same (0.2, 5.0) bounds | compares only *within* the expansion class, so a mean-1 wave is never measured against a population total |
+
+**The band is measured, not tuned.** Across the corpus the self-weighting class
+tops out at mean `1.00016665` and the expansion class starts at `25.7197` — a
+25.7× gap containing **zero** cells. The constants (`1.01`, `10.0`) bracket
+that empty band, and the first test is what keeps them honest: if a real wave
+ever lands between them, it fails and a human looks.
+
+**Negative control run — a test that never fails is not a test.**
+`slurm_logs/weight_normalisation/negative_control.{py,txt}` doctors real
+parquets and confirms each check fires on the miscoding it claims to catch,
+and that the two are **complementary** — neither alone catches both:
+
+| injected fault | class check | stability check |
+|---|---|---|
+| Uganda 2018-19 weight ← household size (mean → 5.10) | **FIRES**, naming that wave | passes (the wave leaves the expansion class, and the remaining 7 stay stable) |
+| GhanaLSS 2016-17 weight × 10 (mean → 5210) | passes (5210 is a plausible expansion mean) | **FIRES**, ratio 11.06 |
+| CotedIvoire / Malawi / GhanaLSS / Uganda untouched | silent | pass, or skip where < 2 expansion waves |
+
+**CotedIvoire is the tolerance case and behaves correctly**: four waves at raw
+mean 1.0000 and one at 443.42 all classify cleanly, and the stability test
+skips it with an explicit reason (one comparable wave), rather than comparing a
+population estimate against a sample size.
+
+**Known limitation, stated:** both tests skip when no L2-country parquet
+exists (a genuinely cold data root, or `LSMS_BUILD_BACKEND=make`). They check
+data that is present; they do not force a materialization. In this session
+that meant 30 of 34 countries exercised the class check and 17 the stability
+check.
 
 ---
 ### Phase 3 — verification
@@ -135,6 +184,10 @@ only references are (a) `data_scheme` `optional:` bookkeeping in
   `dropna(how='all')`, before `attach_currency`. No signature change.
 - `tests/test_sample.py` — **OK (anchored on §2/§6)**: xfail removed because
   the documented cause was removed; new invariant + unit tests added.
+- `_read_raw_sample_weights` + the two raw-layer tests — **OK (anchored on
+  §7)**: no existing symbol reads the raw parquet for a scale check (grepped
+  `var/sample.parquet`, `read_parquet.*sample`, `expansion`). Reuses the
+  deleted test's intent and bounds; negative-controlled.
 - `tests/test_label_selection.py::test_columnless_country_is_otherwise_healthy`
   — **OK (anchored on §1)**: a synthetic-fixture expectation, not a consumer.
   Its `Columnlessland` sample ships raw weights 1..7 in one wave (mean 4) and

@@ -65,6 +65,45 @@ only country holding both types (4 LSMS waves at mean 1.0000, 2018-19 EHCVM at
   Tajikistan 1999.
 - *No =WeightNormalisationWarning= fired anywhere in the corpus.*
 
+* The scale check moved layers (added 2026-08-22)
+
+=test_weighted_population_stable_across_waves= detected a miscoded weight
+variable through cross-wave population jumps.  After this change every
+API-level total is the wave's household count, so that form could only ever
+pass.  The check now reads the *raw* L2-country parquet, which still holds the
+survey's own scale.  See =.coder/ledger/weight-normalisation.md= §7.
+
+| file                   | what                                                         |
+|------------------------+--------------------------------------------------------------|
+| =raw_probe.py=         | per-wave RAW mean/sum from every =var/sample.parquet=        |
+| =negative_control.py=  | doctors real parquets with two miscodings, checks each fires |
+| =negative_control.txt= | its output -- the proof the new tests are not vacuous        |
+
+** The two classes are separated by an empty band
+
+| class                               | cells | raw mean range           |
+|-------------------------------------+-------+--------------------------|
+| self-weighting / already-normalised |    13 | 0.99999999 .. 1.00016665 |
+| expansion                           |    80 | 25.7197 .. 8658.9664     |
+
+Gap = *25.7x, containing zero cells*.  The test constants (1.01, 10.0)
+bracket that measured band; they are not tuned knobs, and
+=test_raw_weight_scale_classes_are_unambiguous= fails if a real wave ever
+lands inside it.  A weight wired to household size lands at mean ~5 --
+squarely inside.
+
+** Negative control: each check fires on its own fault, and they are complementary
+
+| injected fault                                      | class check | stability check |
+|-----------------------------------------------------+-------------+-----------------|
+| Uganda 2018-19 weight <- household size (mean 5.10) | *FIRES*     | passes          |
+| GhanaLSS 2016-17 weight x10 (mean 5210)             | passes      | *FIRES* (11.06) |
+| four untouched countries                            | silent      | pass / skip     |
+
+Neither check alone catches both faults, which is why there are two.
+CotedIvoire (four waves at raw mean 1.0000 + one at 443.42) classifies
+cleanly and skips the stability check with an explicit reason.
+
 ** Pre-existing gaps (identical before and after, not caused by this change)
 
 - =Nepal= -- =sample()= raises =PathMissingError= (no microdata in this
