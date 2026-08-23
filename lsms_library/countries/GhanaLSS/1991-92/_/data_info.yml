@@ -11,6 +11,35 @@ cluster_features:
 
 
 sample:
+    # GH #713: `weight` / `panel_weight` were 100% NULL here.  POV_GH.DTA has a
+    # `weight` column that is EXACTLY 1.0 for all 4,523 rows, and an earlier
+    # pass on this issue called that a placeholder and left it unwired.
+    #
+    # THAT WAS WRONG.  GLSS3 is a self-weighting sample, and GSS says so --
+    # `Documentation/GHA_1991_GLSS_Data_User_Guide_EN.pdf`:
+    #
+    #     The sample designed used for the GLSS3, and with the very high
+    #     response rate achieved, the sample can be considered as being
+    #     self-weighting
+    #
+    # So 1.0 is the producer's own, correct value, not a fill.  Serving NULL
+    # instead made the wave needlessly unusable for weighted analysis.
+    #
+    # Note GSS's hedge -- "can be CONSIDERED AS being self-weighting" -- and
+    # that the claim rests on two conditions, the design AND the high response
+    # rate.  Treat the constant as GSS licensing equal weighting in practice,
+    # not as a proof of exact EPSEM.
+    #
+    # One thing the User Guide does NOT explain, recorded so nobody thinks it
+    # was overlooked: households per cluster are NOT uniform.  Of 365 clusters,
+    # 234 hold exactly 10 households, 73 hold 15, 31 hold 20, with ragged
+    # values (6, 8, 9, 14, 24, 27, 29, 30) besides.  Under textbook PPS the
+    # inclusion probability tracks the take, so 10-vs-20 would be a factor of
+    # two -- which is not self-weighting.  Possible readings: the take was
+    # fixed and the round 15s/20s are structural (replicates? two EAs per
+    # `clust` code?); or the takes vary and GSS's claim is a practical
+    # approximation.  Unresolved from anything shipped; see the "main report"
+    # the User Guide refers to.  GH #713.
     file: POV_GH.DTA
     idxvars:
         i:
@@ -18,6 +47,8 @@ sample:
             - nh
     myvars:
         v: clust
+        weight: weight
+        panel_weight: weight
         strata: region
         Rural: loc2
 

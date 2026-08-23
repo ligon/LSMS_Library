@@ -17,10 +17,14 @@ sample:
     # grain, and was simply never declared.  Same shape as GH #659 (GLSS5), and
     # the fix is the same: add the sub-df rather than invent a value.
     #
-    # It is a real weight, not a placeholder: min 0.127, median 0.85, max 6.02,
+    # It is a real weight distribution: min 0.127, median 0.85, max 6.02,
     # 5,998/5,998 non-null.  Contrast GLSS3 1991-92, whose POV_GH.DTA `weight`
-    # is identically 1.0 across all 4,523 rows -- deliberately NOT wired there,
-    # because declaring it would make a self-weighting wave look weighted.
+    # is identically 1.0 -- that is ALSO correct and is now wired too, because
+    # GSS documents GLSS3 as self-weighting (see that wave's data_info.yml).
+    # An earlier version of this comment called GLSS3's 1.0 a placeholder and
+    # said wiring it "would make a self-weighting wave look weighted".  That was
+    # backwards and unevidenced: a documented self-weighting design is exactly
+    # where a constant 1.0 is the right answer.
     #
     # The merge is provably safe: `(clust, nh)` is unique in BOTH frames
     # (5,998/5,998 each) with FULL overlap and zero orphans either way, so the
