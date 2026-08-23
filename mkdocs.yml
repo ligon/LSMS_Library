@@ -70,6 +70,7 @@ nav:
       - Caching: guide/caching.md
       - Panel Data: guide/panel-data.md
       - Coverage Matrix: guide/coverage.md
+      - Population Record: guide/population.md
       - Label Selection: guide/label-selection.md
   - API Reference:
       - Country: api/country.md
