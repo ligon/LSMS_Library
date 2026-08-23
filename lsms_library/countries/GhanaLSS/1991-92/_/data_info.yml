@@ -30,6 +30,64 @@ sample:
     # rate.  Treat the constant as GSS licensing equal weighting in practice,
     # not as a proof of exact EPSEM.
     #
+    # The varying take is EXPLAINED, and not the way an earlier draft of this
+    # comment guessed.  `clust` IS the EA; the unit mismatch is between EA and
+    # *workload*: 407 workloads across 366 EAs.  Takes are fixed per workload
+    # per stratum -- 15 urban / 10 rural -- and a second PPS stage on the
+    # listed/census growth ratio gives some EAs two workloads, producing 30 and
+    # 20.  Report Appendix 1 states it: "an EA, for example, which received two
+    # workloads provided 32 households for the sample."  The decisive check is
+    # in the data: take-15 clusters are 100% urban and take-20 clusters 100%
+    # rural, which no EA-bundling story can produce.  (An earlier guess here --
+    # that a `clust` code bundles EAs, on the analogy of GLSS1/GLSS2's 32=2x16
+    # -- was wrong; 10 and 15 are both multiples of 5 by coincidence.)
+    #
+    # GSS documents the compensation that makes it EPSEM: "rural EAs had to be
+    # oversampled and urban EAs undersampled, to counterbalance the fact that
+    # at the second stage of selection 15 households were to be taken in
+    # selected urban EA but only 10 households in each rural EA."
+    #
+    # And the self-weighting property was RESTORED deliberately -- Poverty
+    # Profile Appendix 4 (`Documentation/pdf/PovProf.pdf`, printed p.57):
+    # "The latter [restoring a self-weighting sample] was done for GLSS 3
+    # following a procedure devised by Scott and Amenuvegbe (1991).  The same
+    # procedure though was not applied for GLSS 4."  That is the documented
+    # GLSS3 -> GLSS4 design change, and it is why GLSS4 ships a real weight
+    # DISTRIBUTION while GLSS3 ships a constant.  Response rate 99.72%
+    # (4,552/4,565).
+    #
+    # CAUTION on the User Guide sentence: its "weighting ... is required"
+    # carve-out refers to a monthly CPI DEFLATOR (to March 1992, keyed on
+    # interview date; Sept 1991 = 1.0503), NOT to a sampling weight.  Do not
+    # read it as contradicting the constant weight.
+    file: POV_GH.DTA
+    idxvars:
+        v: clust
+    myvars:
+        Region: region
+        Rural: loc2
+
+
+sample:
+    # GH #713: `weight` / `panel_weight` were 100% NULL here.  POV_GH.DTA has a
+    # `weight` column that is EXACTLY 1.0 for all 4,523 rows, and an earlier
+    # pass on this issue called that a placeholder and left it unwired.
+    #
+    # THAT WAS WRONG.  GLSS3 is a self-weighting sample, and GSS says so --
+    # `Documentation/GHA_1991_GLSS_Data_User_Guide_EN.pdf`:
+    #
+    #     The sample designed used for the GLSS3, and with the very high
+    #     response rate achieved, the sample can be considered as being
+    #     self-weighting
+    #
+    # So 1.0 is the producer's own, correct value, not a fill.  Serving NULL
+    # instead made the wave needlessly unusable for weighted analysis.
+    #
+    # Note GSS's hedge -- "can be CONSIDERED AS being self-weighting" -- and
+    # that the claim rests on two conditions, the design AND the high response
+    # rate.  Treat the constant as GSS licensing equal weighting in practice,
+    # not as a proof of exact EPSEM.
+    #
     # One thing the User Guide does NOT explain, recorded so nobody thinks it
     # was overlooked: households per cluster are NOT uniform.  Of 365 clusters,
     # 234 hold exactly 10 households, 73 hold 15, 31 hold 20, with ragged
