@@ -69,7 +69,8 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 TIER_ORDER = [
     "n/a", "not-asked", "asked-not-distributed", "blocked", "unconfigured",
-    "absent", "declared", "dropped", "broken", "builds", "sane", "blessed",
+    "undeclared", "absent", "declared", "dropped", "broken", "builds", "sane",
+    "blessed",
 ]
 # Worst → best, for rolling several wave tiers up into one grid cell. The most
 # actionable (a real defect) sorts first so problems surface in the summary.
@@ -81,9 +82,16 @@ TIER_ORDER = [
 # harder) but ABOVE the settled tiers -- it is a gap we still WANT, and it must
 # never read as "nothing to see here".  That is precisely the mistake `n/a` made.
 ROLLUP_PRIORITY = [
-    "broken", "dropped", "builds", "unconfigured", "absent", "declared",
-    "sane", "blessed", "blocked", "asked-not-distributed", "not-asked", "n/a",
+    "broken", "dropped", "builds", "unconfigured", "undeclared", "absent",
+    "declared", "sane", "blessed", "blocked", "asked-not-distributed",
+    "not-asked", "n/a",
 ]
+# ``undeclared`` sits beside ``unconfigured`` in both lists because it is the
+# same fact one level down: ``unconfigured`` = a country with microdata but no
+# config; ``undeclared`` = a configured country that never declared a feature
+# the corpus grades everyone on (GH #724).  It sorts as actionable -- it is
+# work not started, not work settled -- and an adjudication in
+# ``absent_verdicts.csv`` is what moves it to a quiet tier.
 COLUMNS = ["country", "feature", "wave", "tier", "coverage", "n_rows", "detail"]
 
 # ---------------------------------------------------------------------------
@@ -199,7 +207,30 @@ def load_verdicts(path: Path | None = None) -> dict[tuple[str, str, str], dict]:
     return out
 
 
-def _absent_tier(country, feature, wave, verdicts) -> tuple[str, str]:
+def feature_vocabulary(path: Path | None = None) -> list[str]:
+    """The features the matrix grades EVERY country against (GH #724).
+
+    Pinned in ``lsms_library/data_info.yml`` under ``Feature Vocabulary``; see
+    the rationale recorded there.  Missing key -> empty list, which degrades to
+    the pre-#724 behaviour (grade only what each country declares) rather than
+    crashing a matrix build on a config edit.
+    """
+    import yaml
+    from .paths import countries_root
+    path = Path(path) if path is not None else (
+        Path(countries_root()).parent / "data_info.yml")
+    try:
+        with open(path) as f:
+            doc = yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        return []
+    return list(doc.get("Feature Vocabulary", []) or [])
+
+
+def _absent_tier(country, feature, wave, verdicts, *,
+                 default_tier: str = "absent",
+                 default_detail: str = "source not declared for wave",
+                 ) -> tuple[str, str]:
     """Grade a not-declared cell: ``(tier, detail)``.
 
     The single place ``absent`` is decided.  Without an adjudication the cell is
@@ -210,10 +241,14 @@ def _absent_tier(country, feature, wave, verdicts) -> tuple[str, str]:
     """
     v = verdicts.get((country, feature, str(wave) if wave is not None else ""))
     if not v:
-        return "absent", "source not declared for wave"
+        return default_tier, default_detail
     verdict = v.get("verdict", "")
     detail = f"{verdict}: {v.get('evidence', '')}".strip().rstrip(":")
-    return _VERDICT_TO_TIER.get(verdict, "absent"), detail
+    # An un-closing verdict (`todo` / `unsure`) falls back to *this cell's own*
+    # open tier, not hard-coded `absent` -- otherwise filing `todo` against an
+    # `undeclared` cell would silently relabel it `absent`, i.e. claim the
+    # feature is declared somewhere for that country when it is not.
+    return _VERDICT_TO_TIER.get(verdict, default_tier), detail
 
 
 def load_blessed(path: Path | None = None) -> set[tuple[str, str, str]]:
@@ -691,6 +726,7 @@ def build_matrix(countries=None, features=None, *, readiness=True,
     if countries is None:
         countries = catalog.countries()
     feat_filter = set(features) if features else None
+    vocabulary = feature_vocabulary()
 
     rows: list[dict] = []
 
@@ -749,6 +785,19 @@ def build_matrix(countries=None, features=None, *, readiness=True,
                                       blocked=blocked,
                                       readiness=readiness))
 
+        # GH #724: a feature the corpus grades everyone on that THIS country
+        # never declares.  One row per (country, feature) with a blank wave --
+        # the country has no per-wave information to report, because nobody has
+        # looked.  Config reads only: no build, no auth, no wave loop.
+        for uf in sorted(set(vocabulary) - set(co.data_scheme)):
+            if feat_filter is not None and uf not in feat_filter:
+                continue
+            tier, detail = _absent_tier(
+                c, uf, None, verdicts,
+                default_tier="undeclared",
+                default_detail="not declared by this country for any wave")
+            rows.append(_cell(c, uf, None, tier, "absent", detail=detail))
+
         for clf in country_level_only:
             if feat_filter is not None and clf not in feat_filter:
                 continue
@@ -774,7 +823,7 @@ def build_matrix(countries=None, features=None, *, readiness=True,
 
 
 def save_snapshot(df: pd.DataFrame, path: Path | None = None, *,
-                  merge: bool = True) -> Path:
+                  merge: bool = True, authoritative_countries=None) -> Path:
     """Write the status table to the git-tracked snapshot CSV.
 
     ``merge=True`` (default) **upserts** ``df``'s cells into the existing
@@ -798,6 +847,7 @@ def save_snapshot(df: pd.DataFrame, path: Path | None = None, *,
     path.parent.mkdir(parents=True, exist_ok=True)
     out = df.copy()
     out["tier"] = out["tier"].astype(str)
+    fully_graded = set(authoritative_countries or ())
 
     if merge and path.exists():
         try:
@@ -812,6 +862,24 @@ def save_snapshot(df: pd.DataFrame, path: Path | None = None, *,
             keep = prev.merge(fresh[key].drop_duplicates(), on=key,
                               how="left", indicator=True)
             keep = keep[keep["_merge"] == "left_only"].drop(columns="_merge")
+
+            # Upsert alone LEAKS (GH #724).  The merge above only ever adds or
+            # overwrites, so a row whose KEY stops being emitted survives for
+            # ever.  That is not hypothetical: an `undeclared` row is keyed
+            # (country, feature, "") and, the moment someone declares that
+            # feature, the next run emits (country, feature, <wave>) rows
+            # instead -- a different key -- so the stale "not declared by this
+            # country" row would sit in the snapshot contradicting the very
+            # cells that replaced it.  `unconfigured` -> configured has the
+            # identical shape.
+            #
+            # So for any country this run graded IN FULL -- i.e. no feature
+            # filter, so the run is authoritative about which cells that
+            # country has -- drop its previous rows that the new frame does not
+            # carry.  A feature-scoped run stays purely additive, because it is
+            # NOT authoritative: it knows nothing about the features it skipped.
+            if fully_graded:
+                keep = keep[~keep["country"].isin(fully_graded)]
             out = pd.concat([keep, fresh], ignore_index=True)
 
     out = out.reindex(columns=COLUMNS)

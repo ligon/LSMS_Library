@@ -401,6 +401,64 @@ Columns:
 
 # Spellings that must never appear in column names.  Key is the rejected
 # spelling; value is the canonical replacement.
+# The set of features the coverage matrix grades EVERY country against.
+#
+# Why this exists (GH #724).  `coverage_matrix.build_matrix` used to derive its
+# feature axis from each country's own `data_scheme`, so a feature a country
+# never declared produced NO ROW AT ALL -- not `absent`, not `unconfigured`.
+# GhanaSPS then reported 21/21 = 100% `sane` while ~300 of its 328 tracked
+# source files sat unwired.  A denominator that omits the work you have not
+# started is not a denominator -- the same principle `build_matrix` already
+# applies to `unconfigured` COUNTRIES, one level down.
+#
+# Why PINNED here rather than computed as the union of what countries declare:
+# a live union makes every country's denominator move whenever ONE country
+# adds a feature, so a country's score would change without anything about it
+# changing.  Editing this list is the deliberate act of widening the corpus's
+# ambit.  `tests/test_feature_vocabulary.py` ratchets it: a source feature any
+# country declares that is missing here fails, so growth is loud.
+#
+# Membership, as MEASURED (2026-08-24) -- not a tuned threshold.  Ranking the
+# 33 source features by how many countries declare each leaves a real GAP:
+# 22 features are declared by >= 6 countries, and the next most common is
+# declared by 2.  Nothing is declared by 3, 4 or 5.  So ">= 3" and ">= 6" pick
+# out the IDENTICAL set, and the cut is a property of the corpus rather than a
+# knob.  The excluded tail is local helper tables, not corpus vocabulary --
+# e.g. Tanzania's `community_cluster_xwalk`, EthiopiaRHS's `hhsize`, Uganda's
+# `fct`/`earnings`/`enterprise_income`, India's `employment`.  Including a
+# one-country helper would manufacture ~35 false `undeclared` rows apiece and
+# discredit the tier.
+#
+# DERIVED features are deliberately absent: `food_expenditures`, `food_prices`,
+# `food_quantities` and `household_characteristics` auto-derive from
+# `food_acquired` / `household_roster` (`feature._DERIVED_SOURCE`), so an
+# "undeclared food_expenditures" is just "undeclared food_acquired" restated.
+# Country-level-only features (`panel_ids`, `updated_ids`) are absent too --
+# they are graded by their own path.
+Feature Vocabulary:
+  - anthropometry
+  - assets
+  - cluster_features
+  - community_prices
+  - crop_production
+  - food_acquired
+  - food_coping
+  - food_security
+  - household_roster
+  - housing
+  - individual_education
+  - interview_date
+  - life_satisfaction
+  - livestock
+  - months_food_inadequate
+  - people_last7days
+  - plot_features
+  - plot_inputs
+  - plot_labor
+  - sample
+  - shocks
+  - subjective_well_being
+
 Rejected Spellings:
   Effected: Affected
   Highest_education: Educational Attainment
