@@ -1,0 +1,130 @@
+#+title: Categorical mappings for GhanaSPS
+
+* Educational attainment (GH #171)
+
+Maps the GSPS grade and qualification labels onto the canonical ordinal
+vocabulary in =lsms_library/categorical_mapping/canonical_education_labels.org=.
+Row-additive over the global base in
+=lsms_library/categorical_mapping/harmonize_education.org= (=harmonize_education=
+is in =country._ADDITIVE_CATEGORICAL_TABLES=), so only GSPS-specific labels and
+GSPS spellings are listed here; country rows win on key collision.
+
+*ONE table serves TWO source variables.*  =individual_education= reads the
+grade ladder (=s1fi_3= / =highestgrade=) and, as a fallback, the qualification
+ladder (=s1fi_4= / =highestqual=) -- see the =data_scheme.yml= comment for why
+both are needed.  Every label below is unique to one ladder or means the same
+thing in both (=Masters= grade / =Master's= qual both -> =Postgraduate=;
+=Vocational/Commercial= grade / =Voc/Comm= qual both -> =Vocational/Technical=),
+so a single table is unambiguous.  Check that before adding a row.
+
+*Map on the DECODED LABEL, never on the numeric code.*  The codes diverge
+between waves while the labels do not: code 27 is ='S1'= in 2009-10 and
+2013-14 but ='SSS4'= in 2017-18, and every code above 26 is shifted by one in
+wave 3.  =get_dataframe= decodes the Stata value labels, so this table keys on
+the label and the divergence is harmless -- but a mapping written against the
+codes would be silently wrong for one wave in three.
+
+*Case and punctuation matter*: the lookup is an exact dict lookup
+(=df_data_grabber= does =df[col].map(lambda x: f.get(x, x))=), and an unmapped
+label PASSES THROUGH RAW rather than becoming NA.  The three waves spell the
+same category three ways (='Pre-School'= / ='Preschool'= / ='Pre-school'=;
+='GCE O Level'= / ="GCE 'O' level"=), so each spelling needs its own row.
+
+** Two rulings worth recording
+
+1. =Level 100= .. =Level 400= are Ghanaian *university* year designations.
+   The sibling survey has two precedents that point different ways --
+   =GhanaLSS/_/categorical_mapping.org= maps its GLSS7 =Year one..three= ->
+   =Tertiary certificate/diploma= and =Year four/five= -> =Bachelor= (a
+   commented, deliberate decision covering tertiary years generically), but
+   maps its GLSS1-3 letter-ladder =U1..U4= (University years 1-4) ->
+   =Bachelor=.  We follow the *commented* convention: 100/200/300 ->
+   =Tertiary certificate/diploma=, 400 -> =Bachelor=.  It keeps an in-progress
+   year below the completion rung, which is how the canonical vocabulary
+   already treats partially-completed primary and secondary cycles (=P1..P5=
+   -> =Primary incomplete=, =SSS1..SSS2= -> =Upper secondary=), and the
+   canonical ladder has no "tertiary incomplete" rung to use instead.
+   Affects 22 rows at Levels 100-300 and 54 at Level 400, all in 2009-10.
+
+2. =L6= / =U6= are Lower and Upper Sixth Form, which in the old Ghanaian
+   system follow =S1..S5= and lead to GCE A-Level; both -> =Upper secondary
+   complete= (37 rows, 2017-18 only).  NOTE: =GhanaLSS/_/categorical_mapping.org=
+   contains =U6= *twice with conflicting targets* -- =Upper secondary complete=
+   in its case-duplicated block and =Postgraduate= in its GLSS1-3 letter-ladder
+   block, where =U= means University rather than Upper Sixth.  Per-country
+   tables do not leak across countries, so that defect cannot reach GhanaSPS;
+   it is recorded here because it is a real ambiguity in a sibling file and
+   should be fixed there, not silently inherited.
+
+#+name: harmonize_education
+| Original Label                 | Preferred Label              |
+|--------------------------------+------------------------------|
+| Pre-School                     | Pre-primary                  |
+| Preschool                      | Pre-primary                  |
+| Pre-school                     | Pre-primary                  |
+| P1                             | Primary incomplete           |
+| P2                             | Primary incomplete           |
+| P3                             | Primary incomplete           |
+| P4                             | Primary incomplete           |
+| P5                             | Primary incomplete           |
+| P6                             | Primary complete             |
+| JSS1                           | Lower secondary              |
+| JSS2                           | Lower secondary              |
+| JSS3                           | Lower secondary complete     |
+| M1                             | Lower secondary              |
+| M2                             | Lower secondary              |
+| M3                             | Lower secondary              |
+| M4                             | Lower secondary complete     |
+| SSS1                           | Upper secondary              |
+| SSS2                           | Upper secondary              |
+| SSS3                           | Upper secondary complete     |
+| SSS4                           | Upper secondary complete     |
+| S1                             | Upper secondary              |
+| S2                             | Upper secondary              |
+| S3                             | Upper secondary              |
+| S4                             | Upper secondary              |
+| S5                             | Upper secondary complete     |
+| L6                             | Upper secondary complete     |
+| U6                             | Upper secondary complete     |
+| O Level                        | Upper secondary complete     |
+| A Level                        | Upper secondary complete     |
+| Koranic School                 | Informal                     |
+| Vocational/Commercial          | Vocational/Technical         |
+| Teacher/Nursing Training       | Tertiary certificate/diploma |
+| Polytechnic                    | Tertiary certificate/diploma |
+| Professional certificate       | Tertiary certificate/diploma |
+| HND 1                          | Tertiary certificate/diploma |
+| HND 2                          | Tertiary certificate/diploma |
+| HND 3                          | Tertiary certificate/diploma |
+| Level 100                      | Tertiary certificate/diploma |
+| Level 200                      | Tertiary certificate/diploma |
+| Level 300                      | Tertiary certificate/diploma |
+| Level 400                      | Bachelor                     |
+| Other                          | Unknown                      |
+| Other - Specify                | Unknown                      |
+| Other (please specify)         | Unknown                      |
+| Don't know                     | Unknown                      |
+| Refuse to answer               | Unknown                      |
+| MSLC                           | Lower secondary complete     |
+| BECE                           | Lower secondary complete     |
+| SSCE                           | Upper secondary complete     |
+| GCE O Level                    | Upper secondary complete     |
+| GCE 'O' level                  | Upper secondary complete     |
+| GCE A Level                    | Upper secondary complete     |
+| GCE 'A' level                  | Upper secondary complete     |
+| Voc/Comm                       | Vocational/Technical         |
+| Vocation/Comm                  | Vocational/Technical         |
+| Teacher Training               | Tertiary certificate/diploma |
+| Teacher training               | Tertiary certificate/diploma |
+| Teacher Post Secondary         | Tertiary certificate/diploma |
+| Teacher post-secondary         | Tertiary certificate/diploma |
+| Tech/Prof Cert                 | Tertiary certificate/diploma |
+| Tech/prof. certificate         | Tertiary certificate/diploma |
+| Tech/Prof. Dip.                | Tertiary certificate/diploma |
+| Technical/Professional Diploma | Tertiary certificate/diploma |
+| Tech/prof. diploma             | Tertiary certificate/diploma |
+| HND                            | Tertiary certificate/diploma |
+| Bachelor's                     | Bachelor                     |
+| Bachelors                      | Bachelor                     |
+| Master's                       | Postgraduate                 |
+| Masters                        | Postgraduate                 |
