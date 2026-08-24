@@ -59,6 +59,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from .population import attach as attach_population, population_records
 import importlib.util
 import hashlib
 import logging
@@ -1876,6 +1877,24 @@ class Country:
         ]
         return sorted(waves)
 
+    @property
+    def population(self) -> dict[str, "PopulationRecord"]:
+        """``{wave: PopulationRecord}`` -- what each wave's sample REPRESENTS.
+
+        The universe is a property of the ``(country, wave)`` cell, not of the
+        country: Ethiopia ESS W1 covered rural areas and small towns while W4
+        is national, so a panel across them pools two populations.  Read from
+        ``{country}/_/population.yml``; see :mod:`lsms_library.population`.
+
+        Every record carries ``universe_tag`` (an EDITORIAL reading, never a
+        quote) together with ``source_type`` and ``confidence``, which say where
+        the statement came from and how strongly it is a universe statement at
+        all.  Quoting the tag without those two turns a judgement into a fact.
+
+        Empty for a country the 2026-07-21 sweep did not reach.
+        """
+        return population_records(self.name)
+
     def provenance(self) -> pd.DataFrame:
         """Tabular survey of source + license per wave.
 
@@ -2268,7 +2287,12 @@ class Country:
         if 'm' not in new_idx:
             new_idx.append('m')
         result = flat.set_index(new_idx)
-        result.attrs = dict(df.attrs)  # set_index drops attrs (pandas 2.x)
+        # Kept deliberately, though `set_index` PRESERVES attrs on the pinned
+        # pandas 3.0.2 (single input -- nothing to disagree with; see the
+        # measured table in CLAUDE.md).  It was load-bearing under 2.x and
+        # costs nothing now; removing it would re-arm the `id_converted`
+        # double-walk the moment this grows a second input.
+        result.attrs = dict(df.attrs)
         return result
 
     def _location_lookup(self) -> pd.DataFrame:
@@ -2811,6 +2835,15 @@ class Country:
             # Record the country so a later standalone convert() can recover it
             # (Feature output instead carries `country` in the index).
             df.attrs['country'] = self.name
+
+            # Attach what this survey's documentation says the sample
+            # REPRESENTS, per wave (GH #603/#601).  Metadata only: it adds
+            # `attrs`, never a row, a column or a value.  Here rather than at
+            # cache-write time for the same two reasons as SITE B below --
+            # `_finalize_result` re-runs on every read (warm cache included),
+            # and it is in `_build_registry._EXCLUDED_CALLABLES`, so attaching
+            # here costs no cache invalidation.  MEASURED, not assumed.
+            attach_population(df, self.name)
 
             # SITE B of the null-content audit.  Every other guard on this
             # table checks that a required declared column is PRESENT; this one
