@@ -890,3 +890,166 @@ in the =add-feature= skill does not work on this file.  Use
 =pd.io.stata.StataReader= for its labels.  (Note: a task brief circulated in
 2026-08 placed this warning on the *2009-10* wave; measured, 2009-10's =S1FI= /
 =S1FII= / =S1FIII= read clean and it is wave 2 that warns.)
+
+* Agriculture (Section 4) and livestock (Section 3AI): traps found while scoping (2026-08-24)
+
+No agriculture feature is wired.  These are the idiosyncrasies a build would
+hit, measured rather than assumed.  Full working:
+=slurm_logs/ghanasps/FINDINGS_agriculture.org=.
+
+** The unit of observation is the PLOT in all three waves, and the key is clean
+
+=(hhno, plot_no)= in 2009-10; =(FPrimary, plotid)= in 2013-14 and 2017-18,
+where =plotid= is a within-household sequence 1..10.  Unique in every
+agriculture file checked.  All six entry files (=S4AII=, =S3AI=,
+both =04h_agsection=, both =03ai_animalquestions=) join *100.0 per cent* into
+=sample()= with no id transformation -- better than =food_acquired=, whose
+29/35 =hhno= discrepancy is documented above.
+
+2013-14's =InstanceNumber= is 1:1 with =plotid= within household and carries no
+extra information.
+
+** 2009-10 has TWO SEASONS; 2013-14 and 2017-18 have one
+
+=S4AV1/S4AV2= (crop harvest), =S4AVI1/S4AVI2= (chemicals),
+=S4AVIII1/S4AVIII2= (seed) and =S4AIX1-4/S4AIX5-8= (labour) are *major* and
+*minor* season pairs.  Corroborated by fill rates: =S4AV1= crop-1 quantity
+non-null on 4,825 plots, =S4AV2= on 1,412; major-season start months cluster
+February-June, minor August-September.  The later waves ask only about "last
+season".
+
+*** ... and =S4AV2='s variable labels LIE about which season it is
+
+Every quantity/value label in =S4AV2= says "in the last *major* season"
+(e.g. =s4v_a122i=).  The questionnaire says otherwise --
+=Documentation/Household_questionnaire_Part_A.pdf= at A120:
+
+#+begin_quote
+CROPS LAST MINOR SEASON: CROP (HARVESTS) 1 ... A122. What is the quantity
+harvested in the last minor season?
+#+end_quote
+
+=S4AVI2='s own label ("In the past *minor* season, have you used chemical 1 on
+your plot") agrees.  Trusting the =.dta= labels stamps both blocks =major= and
+silently double-counts the season.
+
+** The four 2009-10 labour blocks are STAGES, named only in the questionnaire
+
+=S4AIX1= land preparation (A290-A298); =S4AIX2= field management, i.e. weeding
+after planting, fertiliser and pesticide application, irrigation (A299-A307);
+=S4AIX3= harvesting (A308-A316); =S4AIX4= post-harvest incl. storage
+preservation (A317-A325).  =S4AIX5-8= repeat the four for the minor season
+(A327-A362).  *The variable labels are identical across the four files* -- a
+wrong stage assignment is invisible to every automated check.
+
+** Plot area converts to hectares exactly, and 2009-10 hands you the factors
+
+=S4AII.dta= ships a producer-computed =area_ha= (97.5 per cent populated).
+Dividing by the reported native size recovers the constants to float precision
+(within-unit sd ~1e-8): *Acre 0.404694, Pole 0.409551, Rope 0.236342, Plot
+0.102388* hectares.  2013-14 and 2017-18 ship no =area_ha= but report the same
+native units, so =Area= is reachable in all three waves using wave 1's factors.
+
+*Trap*: in 2017-18 the acre answer is in =plotunit= (4,791 plots), NOT
+=plotsizeunit=, which lists only Poles/Robes/Plots/Other.  Reading
+=plotsizeunit= alone loses 89 per cent of the plots' units.  Note also 2017-18
+spells "Rope" as *"Robes"*.
+
+** 2013-14's chemical-to-plot key is an UNRESOLVED TEMPLATE STRING
+
+=04l_chemquestions= records chemical quantity per household and allocates it to
+plots via =chemplots1..30=.  The values are the literal survey-software
+placeholders =%pplotnamearray[1]= ... =%pplotnamearray[9]= -- the plot's
+*ordinal position* in the household's plot array, never substituted.  Mapping
+that to =plotid= needs an ordering assumption nothing in the corpus records.
+2017-18 does not have this problem (=chemplots= is a plain space-separated plot
+list, ='1 2 3'=).  The same placeholders appear in
+=04l_inputs.greenmanureplots*= / =animalmanureplots*= / =compostedplots*=.
+
+** 2013-14's livestock roster is a fixed 7-species grid with free text; 2009-10 and 2017-18 are not
+
+| wave    |   rows | hh    | shape                                                    |
+|---------+--------+-------+----------------------------------------------------------|
+| 2009-10 |  4,280 | 2,142 | 8 labelled species, owned only                           |
+| 2013-14 | 14,860 | 2,098 | 7 species asked of EVERYONE (7 x 2,098) + 174 free-text   |
+| 2017-18 |  4,203 | 2,358 | 8 labelled species, owned only, + 91 rows in =_osp=        |
+
+In 2013-14, *10,884 of 14,860 rows have =quantity= == 0* and =animal= is *free
+text with 69 distinct spellings* (=guinea fowl=, =GINUEA FOWL=, =GUINNEA FOWL=,
+=GUNEA FOWL=, =Giunea fowl=, ... plus =CAT=, =DOG=, =Turkey=, and one row
+spelled ='50'=).  The seven core species are clean and lower-case; the mess is
+the 174-row "other" tail.
+
+=HeadSold= (=quantitysold=) exists in *2017-18 only*; nothing equivalent to
+=HeadAcquired= is asked in any wave.
+
+*=Value= is a HERD TOTAL in all three waves, not a per-head price.*  The
+=.dta= labels only say "Current Value" in 2013-14 and 2017-18, so this was
+settled against the instruments, which agree verbatim:
+
+- 2009-10, =S3AI= variable label :: "Q3.1 What is the current value of these
+  animals if you sold *all of them* (cedis)".
+- 2013-14, =ISSER_Yale_Part A_WAVE II.docx= :: "What is the current value of
+  these animals, *if you sold all of them*?  Gh Cedis and pesewas".
+- 2017-18, =HH_Questionnaire_23_10.docx= :: "What is the current value of the
+  [animal type], *if you sold all of them*?  Indicate amount as a decimal
+  value (in Ghana cedis and pesewas).  For example, enter 2.50 for 2 Ghana
+  cedis and 50 pesewas."
+
+Uganda's and Nigeria's canonical =livestock.Value= is the value of *one* head
+("if you sold one today").  These are not the same quantity.  Do not map
+GhanaSPS's column onto it silently; either divide by =HeadCount= in a
+transformation or declare a distinct column.  Note 2017-18 states the amount
+as a *decimal cedis* value, so it needs no cedis/pesewas recombination.
+
+** =_osp= means "other -- specify"
+
+=2017-18/03ai_animalquestions_osp.dta= (91 x 43) is the free-text tail of the
+livestock roster; its =animal= column is labelled "Other animal".  Same suffix
+on =03aii_toolquestions_osp=, =03aiii_durablegoodquestions_osp=,
+=05aii_assetquestions_osp=.
+
+** Every 2009-10 money variable is split cedis / pesewas
+
+=S4AIV=, =S4AV1/2=, =S4AVI1/2=, =S4AVIII1/2=, =S4BI=, =S3AI=: value is a pair,
+".1 (cedis)" and ".2 (pessewas)" (the misspelling is the producer's).  The
+amount is =cedis + pesewas/100=; reading only the =i= member truncates
+silently.  2013-14 and 2017-18 record a single amount.
+
+** =2017-18/Data/Crop_encrypted/= is Boxcryptor-encrypted AND unobtainable
+
+=cropprice_W3.dta.bc=, =croppriceother_W3.dta.bc=, =unitcon_W3nonpii.dta.bc=,
+=FolderKey.bch=.  The =.bc= / =.bch= pair is the Boxcryptor file/folder-key
+convention and no passphrase exists in this repository.  Independently,
+=get_data_file()= returns *None* for all four, while =permissions()= reports
+={'wb_api': 'read', 'ligonresearch_s3': 'read'}= -- so the refusal is not a
+permissions gate.  Consequence: wave 3 has *no usable crop price table and no
+usable unit-conversion table*.
+
+** =04o_cropsalesstoresservices= is NOT crop sales
+
+It is *agricultural services* -- tractor/plough hire and fertiliser/chemical
+application (=ploughtractor_serviced*=, =fertilizers_chem_serviced*=).  234
+rows in 2013-14, 9,872 in 2017-18.  Crop sales live in
+=04o_cropsalesstoresquestions=, which carries =plotid= in 2017-18 (plot-crop
+grain) but *not* in 2013-14 (household-crop grain) -- and records sales across
+*nine separate buyer channels*, each with its own quantity, unit and price.
+
+** GhanaSPS is NOT a post-planting / post-harvest country
+
+=.claude/skills/add-feature/pp-ph/SKILL.md= lists it as
+"Some waves | Planting/harvest questionnaires".  *No wave has two rounds.*
+Searched every wave's =04h_agsection= / =S4AII= for a round / visit / season /
+wave variable: none.  Each wave is a single visit collecting the season by
+recall.  Wave 1's major/minor season split is the same *hazard* (two blocks
+about one plot needing distinct index values) but it is not a second round, and
+looking for one wastes time.
+
+** Module 4 IS agriculture in every wave -- tested, not assumed
+
+Given the documented =01f*= education/employment swap between 2013-14 and
+2017-18, the same instability was checked here: every =04*= file opened in
+2013-14 and 2017-18 is agriculture *by content* (variable and value labels),
+and =03ai_animalquestions= is livestock by content in both.  In 2009-10 the
+same content is =S4A*= (Section 4 Part A, land) / =S4B*= (Part B, crop
+marketing and storage) and =S3AI= (livestock).

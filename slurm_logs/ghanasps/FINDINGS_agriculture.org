@@ -1,0 +1,690 @@
+#+title: GhanaSPS agriculture --- what can actually be constructed
+#+date: [2026-08-24 Mon]
+#+author: Sue the Coder
+
+Research note.  *No config was changed by this work.*  Measured on
+=docs/ghanasps-agriculture=, branched from =origin/development= at
+=a61e563d= (0 commits behind; =sample= confirmed declared in
+=GhanaSPS/_/data_scheme.yml=).  All reads went through =get_dataframe()= /
+=get_data_file()= into a private =LSMS_DATA_DIR=; the =dvc= CLI was never
+invoked.
+
+* The one-paragraph answer
+
+GhanaSPS is *not* the poor relation its non-LSMS provenance suggests.  Its
+Section 4 is a *plot-level* agricultural module in *all three waves*, with a
+plot identifier that joins 100 per cent to the already-wired =sample()=
+household set.  All five corpus agriculture features have real source data in
+all three waves.  =plot_features=, =crop_production=, =plot_labor= and
+=livestock= are genuinely constructible panel-wide; =plot_inputs= is
+constructible but *asymmetric* --- the wave that has input quantities for
+chemicals (2009-10) has none for seed, and the two waves that have seed
+quantities (2013-14, 2017-18) attribute chemical quantities to plots only
+through a decodable but *inferred* index.  Nothing here warrants a closing
+=absent_verdicts= row; every cell is =todo=.
+
+The single most consequential finding is the one the brief asked for: *the
+unit of observation is the plot in every wave*, and it does not change.  What
+changes is the *shape* of the questionnaire around it --- wide-per-plot in
+2009-10, long-per-plot in 2013-14 and 2017-18 --- and the presence of a
+*second season* in 2009-10 that the later waves dropped.
+
+* Idiosyncrasies I was required to find, and did
+
+Read in full: =GhanaSPS/_/CONTENTS.org= (710 lines),
+=.claude/skills/add-feature/SKILL.md=, =.claude/skills/add-feature/pp-ph/SKILL.md=,
+=docs/guide/coverage.md=, and =slurm_logs/ghanasps/SCOPING_2026-08-24.org=.
+
+** Already recorded in =CONTENTS.org=, and load-bearing here
+
+- Household id form differs by wave :: 2009-10 uses a 9-digit =hhno=;
+  2013-14 / 2017-18 use =FPrimary=.  Confirmed on the agriculture files: both
+  are 9 characters here and *2,455 households appear in both W1 and W2 by raw
+  string match*, so no id normalisation is needed for the agriculture join.
+- The cluster =v= is joined from =sample()= at API time :: so no agriculture
+  table should declare =v=.  All six agriculture/livestock entry files join
+  *100.0 per cent* into =sample()= with no id transformation (see the
+  inventory below).  This is *better* than =food_acquired=, whose 29-household
+  =S11A.dta= / =key_hhld_info.dta= discrepancy =CONTENTS.org= documents.
+- Wave 3 is a mixed-vintage directory :: relevant because
+  =2017-18/Data/Crop_encrypted/= is one of the "ours-only" holdings, and it is
+  unusable (below).
+- The "module letters are not stable across waves" trap :: =CONTENTS.org=
+  and the brief both flag =01f*= being education in W2 and employment in W3.
+  *I tested the analogous claim for agriculture and it holds up*: every
+  =04*= file in W2 and W3 that I opened is agriculture by content, and
+  =03ai_animalquestions= is livestock by content in both.  In W1 the same
+  content sits under =S4A*= / =S4B*= (Section 4 Part A land, Part B crop
+  marketing) and =S3AI= (livestock).  So for agriculture, module 4 = ag
+  and module 3AI = livestock in all three waves --- verified by variable
+  labels and value labels, not assumed from the number.
+- =_osp= :: the scoping note asked what it means.  It is *"other --- specify"*.
+  =2017-18/Data/03ai_animalquestions_osp.dta= is 91 rows whose =animal= column
+  is labelled *"Other animal"* (free text), against the main file's labelled
+  8-category =animal=.  The same suffix appears on
+  =03aii_toolquestions_osp=, =03aiii_durablegoodquestions_osp= and
+  =05aii_assetquestions_osp=.
+
+** Not previously recorded --- new, and each cost real measurement
+
+*** 1. =Crop_encrypted/= is Boxcryptor-encrypted AND unobtainable
+
+=2017-18/Data/Crop_encrypted/= holds =cropprice_W3.dta.bc=,
+=croppriceother_W3.dta.bc=, =unitcon_W3nonpii.dta.bc= and =FolderKey.bch=.
+=.bc= / =.bch= is the Boxcryptor file/folder-key convention, and there is no
+passphrase anywhere in this repository.  Independently of the encryption,
+=get_data_file()= returns *=None=* for all four --- =permissions()= reports
+={'wb_api': 'read', 'ligonresearch_s3': 'read'}=, so the refusal is not a
+permissions gate; the blob simply does not come back through the sanctioned
+path.
+
+Consequence, and it is scoped: *wave 3 has no usable crop price table and no
+usable unit-conversion table.*  That does not block =crop_production= (the
+harvest module carries its own reported quantity and native unit), but it does
+mean W3 crop *valuation* and any kg conversion would have to come from
+somewhere else.
+
+*** 2. Plot size converts to hectares exactly, and 2009-10 hands you the factors
+
+=2009-10/Data/S4AII.dta= ships a producer-computed =area_ha= ("Land size in
+hectares"), non-null for *5,553 of 5,698 plots (97.5 per cent)*.  Dividing it
+by the reported native size recovers the conversion constants to float
+precision (standard deviation ~1e-8 within each unit):
+
+| native unit | hectares per unit | plots |
+|-------------+-------------------+-------|
+| Acre        |          0.404694 |  4,538 |
+| Pole        |          0.409551 |    717 |
+| Rope        |          0.236342 |    238 |
+| Plot        |          0.102388 |     60 |
+
+W2 and W3 ship *no* =area_ha= --- but they report the same native units
+(=totalsize= non-null 100.0 per cent in W2, 99.6 per cent in W3; units
+Acres / Poles / Ropes-or-"Robes" / Plots).  So the canonical
+=plot_features.Area= in hectares is reachable in all three waves *using wave
+1's own factors*.  Note W3 spells "Rope" as *"Robes"* and splits the acre
+answer across =plotsizeacres= (yes/no) and =plotunit=; the naive
+=plotsizeunit= column omits acres entirely (4,791 acre plots are only visible
+in =plotunit=).  Reading =plotsizeunit= alone in W3 loses 89 per cent of the
+plots' units.
+
+*** 3. 2009-10 is a TWO-SEASON wave; 2013-14 and 2017-18 are not
+
+This is the largest cross-wave asymmetry and it is invisible from filenames.
+
+- =S4AV1= / =S4AV2= are the *major* and *minor* season crop-harvest blocks.
+- =S4AVI1= / =S4AVI2= are the major and minor season chemical blocks.
+- =S4AVIII1= / =S4AVIII2= are the major and minor season seed blocks.
+- =S4AIX1..4= are four *stages* of major-season labour; =S4AIX5..8= the same
+  four stages for the minor season.
+
+Fill rates corroborate the split: =S4AV1= crop-1 harvest quantity is non-null
+on 4,825 plots, =S4AV2= on *1,412*; major-season labour fills 2,516 plots,
+minor-season 544.  Major-season start months cluster February--June, minor
+August--September.
+
+*** 4. A producer LABEL ERROR in =S4AV2=, settled by the questionnaire (C4)
+
+Every quantity/value variable in =S4AV2= carries a variable label saying
+*"in the last major season"* --- e.g. =s4v_a122i= reads "A122.1 Quantity of
+the crop harvested in the last major season-crop 1".  *That label is wrong.*
+=Documentation/Household_questionnaire_Part_A.pdf= reads, verbatim at A120:
+
+#+begin_quote
+CROPS LAST MINOR SEASON: CROP (HARVESTS) 1 --- ASK ABOUT CROP HARVESTS IN ORDER
+OF MOST IMPORTANT TO LEAST IMPORTANT ... A122. What is the quantity harvested
+in the last minor season?
+#+end_quote
+
+Anyone wiring =crop_production= for wave 1 off the =.dta= labels alone will
+stamp both blocks =major= and silently double-count the season.  The
+questionnaire, and the parallel =S4AVI2= label ("In the past *minor* season,
+have you used chemical 1 on your plot"), both settle it.
+
+*** 5. The four wave-1 labour blocks are stages, named in the questionnaire
+
+Also from Part A, verbatim section headers:
+
+| file    | questions | stage                                                                                          |
+|---------+-----------+------------------------------------------------------------------------------------------------|
+| S4AIX1  | A290--A298 | land preparation (clearing/weeding before planting, seeding/nursery, planting, transplanting) |
+| S4AIX2  | A299--A307 | field management (weeding after planting, fertilizer and pesticide application, irrigation)   |
+| S4AIX3  | A308--A316 | harvesting                                                                                    |
+| S4AIX4  | A317--A325 | post-harvest activities (including preservation for storage)                                  |
+| S4AIX5--8 | A327--A362 | the same four stages, minor season                                                          |
+
+Nothing in the =.dta= says this; the variable labels are identical across the
+four files.  Without the questionnaire the four blocks are indistinguishable
+and would be summed.
+
+*** 6. Wave 2's chemical-to-plot key is an UNRESOLVED TEMPLATE STRING
+
+=2013-14/04l_chemquestions.dta= records chemical quantity at the household
+level and allocates it to plots via =chemplots1..30= plus
+=chemperplot1..10_chemquant=.  The *values* of =chemplots1= are the literal
+survey-software placeholders:
+
+: '%pplotnamearray[1]', '%pplotnamearray[2]', ... '%pplotnamearray[9]'
+
+i.e. the plot's *ordinal position in the household's plot array*, never
+substituted with a plot name.  Recovering =plotid= from that requires assuming
+array position k is the k-th plot in the household's roster.  That assumption
+is probably right and is definitely *not recorded anywhere*.
+
+Wave 3 does not have this problem: =2017-18/04l_chemquestions.chemplots= is a
+plain space-separated plot list (=''=, ='1'=, ='1 2'=, ='1 2 3 4'=, ...).
+
+*** 7. Wave 2's livestock roster is a fixed 7-species grid with 73 per cent zeros, plus free text
+
+| wave    | rows   | households | shape                                                             |
+|---------+--------+------------+-------------------------------------------------------------------|
+| 2009-10 |  4,280 |      2,142 | 8 labelled species, *owned only* (2.0 rows/hh)                     |
+| 2013-14 | 14,860 |      2,098 | 7 species asked of *every* household (7 x 2,098 = 14,686) + 174 free-text rows |
+| 2017-18 |  4,203 |      2,358 | 8 labelled species, owned only (1.78 rows/hh) + 91 in =_osp=       |
+
+In 2013-14, *10,884 of 14,860 rows have =quantity= == 0* and the =animal=
+column is *free text with 69 distinct spellings* --- =guinea fowl=,
+=guinea fowls=, =GUINEA FOWL=, =GINUEA FOWL=, =GUINNEA FOWL=, =GUNEA FOWL=,
+=Giunea fowl=, and so on, plus =CAT=, =DOG=, =DUCK=, =Turkey=, and one row
+literally spelled ='50'=.  The seven core species (=cattle=, =sheep=, =goats=,
+=pigs=, =rabbits=, =chickens=, =draught animals=) are lower-case and clean; the
+mess is confined to the 174-row "other" tail.  A =livestock= build must both
+drop the zero rows and normalise that tail.
+
+*** 8. Every wave-1 money variable is split cedis / pesewas
+
+=S4AIV=, =S4AV1/2=, =S4AVI1/2=, =S4AVIII1/2=, =S4BI=, =S3AI= all record value
+as a *pair* --- ".1 (cedis)" and ".2 (pessewas)" (the misspelling is the
+producer's).  Any value column is =cedis + pesewas/100=.  Reading only the
+=i= member silently truncates.  W2 and W3 record a single amount.
+
+*** 9. =04o_cropsalesstoresservices= is not crop sales
+
+Despite the name it is *agricultural services* --- tractor/plough hire and
+fertiliser/chemical application services (=ploughtractor_serviced*=,
+=fertilizers_chem_serviced*=).  234 rows in W2, 9,872 in W3.  Crop sales are
+in =04o_cropsalesstoresquestions=.
+
+*** 10. The pp/ph skill's GhanaSPS row does not describe these waves
+
+=.claude/skills/add-feature/pp-ph/SKILL.md= lists GhanaSPS as
+"Some waves | Planting/harvest questionnaires".  *No wave of GhanaSPS has a
+post-planting and a post-harvest round.*  I searched every wave's
+=04h_agsection= / =S4AII= for a round / visit / season / wave variable and
+found none; each wave is a single visit collecting the season by recall.
+
+The skill is not useless here --- wave 1's major/minor season split is
+*exactly* the same duplicate-index hazard one level in (two blocks about the
+same plot needing distinct index values) --- but a reader who takes the row
+literally will go looking for a second round that does not exist.  I have not
+edited the skill; flagging it for the owner.
+
+* Per-wave inventory
+
+Household counts for reference (from =sample()=): 5,009 / 4,774 / 5,669.
+"n_hh" below is households appearing in that file.  Every =n_hh= listed joins
+*100.0 per cent* into =sample()= with no id transformation --- checked for
+=S4AII=, =S3AI=, both =04h_agsection= and both =03ai_animalquestions=.
+
+** 2009-10 (wave 1) --- Section 4 Part A/B, Section 3AI
+
+Unit of observation: *plot*, key =(hhno, plot_no)= (the plot column is renamed
+per file: =plot_no=, =s4aiii_plotno=, =s4aiv_plotno=, ...).  Wide layout: the
+questionnaire is a matrix with columns Plot 1 .. Plot 10 and up to 5 harvest
+records per plot-season.
+
+| file          | rows x cols | unit           | key                  | unique?                      | n_hh |
+|---------------+-------------+----------------+----------------------+------------------------------+------|
+| S40           |     5009x7  | household      | =hhno=                 | yes                          | 5009 |
+| S4AI          |    5688x17  | plot (tenure/dispute) | =(hhno,plot_no)= | *yes*, 0 dup 0 null          | 2802 |
+| S4AII         |    5698x15  | plot (size, =area_ha=) | =(hhno,plot_no)= | yes, 0 dup, 12 null plot_no | 2812 |
+| S4AIII        |    5705x36  | plot (fallow, soil, water) | =(hhno,s4aiii_plotno)= | 14 dup, 19 null | 2803 |
+| S4AIV         |    5702x55  | plot (structures, tenure payments) | ... | 14 dup, 16 null | 2801 |
+| S4AV1         |    5702x82  | plot-crop *wide*, MAJOR season | ... | 14 dup, 16 null | 2802 |
+| S4AV2         |    5701x82  | plot-crop *wide*, MINOR season | ... | 14 dup, 15 null | 2801 |
+| S4AVI1        |    2972x86  | plot-chemical *wide*, MAJOR | ...      | 29 dup, 44 null              | 1303 |
+| S4AVI2        |     976x86  | plot-chemical *wide*, MINOR | ...      | 15 dup, 20 null              |  443 |
+| S4AVII        |    5701x12  | plot (tractor/equipment hire cost) | ... | 14 dup, 15 null         | 2801 |
+| S4AVIII1      |    5198x34  | plot-seed *wide* (4 seeds)  | ...      | 19 dup, 22 null              | 2503 |
+| S4AVIII2      |    1440x34  | plot-seed *wide*, second block | ...   | 14 dup, 18 null              |  745 |
+| S4AIX1..4     |  ~5700x33   | plot, MAJOR-season labour, one file per stage | ... | 0--14 dup     | 2800 |
+| S4AIX5..8     |  ~5700x33   | plot, MINOR-season labour, one file per stage | ... | 14 dup        | 2801 |
+| S4BI          |   27591x25  | plot-crop-slot (crop marketing) | =(hhno,plotno,crop_no)= | 19 dup; only *4,752* rows carry a crop | 1849 |
+| S4BII         |   22108x18  | household-crop-slot (storage)   | =(hhno,cropno)= | 59 dup; only *3,522* rows carry a crop | 1483 |
+| S3AI          |    4280x28  | household-animal | =(hhno,animal_id)= | 25 dup, 8 null             | 2142 |
+| S3AI0         |     5009x6  | household screener | =hhno=            | yes                          | 5009 |
+
+The =*0=-suffixed siblings (=S4AVI10=, =S4AVI20=, =S4AVIII10=, =S4AVIII20=,
+=S4BI0=, =S4BII0=) are ~2,800 x 6 household-level screeners for their block.
+
+*Reading the "dup" column.* The 14--29 duplicates in most files are an artefact
+of the 12--44 rows whose plot number is NaN, not a broken key.  =S4AI= and
+=S4AIX1= have *zero* nulls and *zero* duplicates, which is the clean reading of
+the key.  Under the repository's grain rules a NaN index level is *deleted* by
+=groupby(dropna=True)=, so those rows must be dropped deliberately, not
+silently.
+
+Cross-file plot-set agreement, against =S4AII= as the base: =S4AI= 5,686 of
+5,688 shared; =S4AIII/IV/V1/V2/VII/IX5= all 5,686 shared with 15--19 extras of
+their own.  The chemical and seed blocks are proper subsets (they are asked
+only of plots that used them).  So one plot key spans the whole module.
+
+** 2013-14 (wave 2) --- module 04, plus 03ai
+
+Unit of observation: *plot*, key =(FPrimary, plotid)=, =plotid= a
+within-household sequence 1..10.  =InstanceNumber= is 1:1 with =plotid= within
+household (both give 4,694 unique pairs) and carries no extra information.
+Long layout: one row per plot, one row per plot-crop, one row per plot-stage.
+
+| file                          | rows x cols | unit                      | key                              | unique?          | n_hh |
+|-------------------------------+-------------+---------------------------+----------------------------------+------------------+------|
+| 04h_preroster                 |   6823x11   | plot carried forward      | =(FPrimary,plotid)=                | *yes*            | 3070 |
+| 04h_agsection                 |  4694x228   | plot (size, soil, water, crops) | =(FPrimary,plotid)=          | *yes*            | 2678 |
+| 04i_landtenure                |  4694x103   | plot (tenure)             | =(FPrimary,plotid)=                | *yes*            | 2678 |
+| 04j_tracploughuse             |   4694x43   | plot (traction/ploughing) | =(FPrimary,plotid)=                | *yes*            | 2678 |
+| 04m_aglabour                  |   4693x29   | plot (hired wage rates)   | =(FPrimary,plotid)=                | *yes*            | 2677 |
+| 04m_aglabourquestions         |  32851x43   | *plot-stage*              | =(FPrimary,plotid,stagenum)=       | *yes*            | 2677 |
+| 04n_harvest                   |   4693x38   | plot (crop list, wide)    | =(FPrimary,plotid)=                | *yes*            | 2677 |
+| 04n_harvestquestions          |   8229x65   | *plot-crop*               | =(FPrimary,plotid,cropcode)=       | 10 dup           | 2431 |
+| 04k_seedquestions             |   7838x51   | *plot-crop* (seed)        | =(FPrimary,plotid,cropcode)=       | 5 dup            | 2431 |
+| 04l_inputs                    |  2677x101   | household (organic flags) | =FPrimary=                         | yes              | 2677 |
+| 04l_chemquestions             |  2475x132   | household-chemical        | =(FPrimary,chemcode)=              | *234 dup*        | 1471 |
+| 04o_cropsalesstoresquestions  |   7438x82   | *household-crop* (no plotid) | =(FPrimary,cropcode)=           | 13 dup           | 2430 |
+| 04o_cropsalesstoresservices   |    234x236  | household (ag services)   | =(FPrimary,InstanceNumber)=        | ---              |  --- |
+| 04nn_gatheringquestions       |   2207x35   | household-gathered item   | =FPrimary=                         | 906 dup (needs item key) | 1301 |
+| 03ai_animalquestions          |  14860x44   | household-animal          | =(FPrimary,animal)=                | *yes*            | 2098 |
+
+** 2017-18 (wave 3) --- module 04, plus 03ai
+
+Same plot grain, same key.  =InstanceNumber= is gone; =04_plotroster= appears.
+
+| file                          | rows x cols | unit               | key                        | unique?                       | n_hh |
+|-------------------------------+-------------+--------------------+----------------------------+-------------------------------+------|
+| 04_plotroster                 |    5366x5   | plot enumeration   | =(FPrimary,plotid)=          | *yes*                         | 3041 |
+| 04h_agsection                 |  5366x176   | plot               | =(FPrimary,plotid)=          | *yes*                         | 3041 |
+| 04i_landtenure                |  5366x139   | plot (tenure)      | =(FPrimary,plotid)=          | *yes*                         | 3041 |
+| 04j_tracploughuse             |   5366x43   | plot (traction)    | =(FPrimary,plotid)=          | *yes*                         | 3041 |
+| 04m_aglabourquestions         |  20663x64   | *plot-stage* (+ wage block folded in) | =(FPrimary,plotid,stageid)= | yes; *640 null-key* | 3041 |
+| 04n_harvestquestions          |   9317x62   | *plot-crop*        | =(FPrimary,plotid,cropcode)= | yes; *1,926 null-key* skips   | 3041 |
+| 04k_seedquestions             |  10525x164  | *plot-crop* (seed) | =(FPrimary,plotid,cropcode)= | yes; 796 null-key             | 3041 |
+| 04l_inputs                    |   3041x68   | household (organic flags) | =FPrimary=            | yes                           | 3041 |
+| 04l_chemquestions             |  4802x164   | household-chemical | =(FPrimary,chemcode)=        | 456 dup; 1,044 null-key       | 3041 |
+| 04o_cropsalesstoresquestions  |  10573x88   | *plot-crop* (carries =plotid=!) | =(FPrimary,plotid,cropcode)= | *yes, 0 dup* | 3041 |
+| 04o_cropsalesstoresservices   |   9872x82   | household (ag services) | =FPrimary=              | ---                           | 3041 |
+| 04nn_gatheringquestions       |   3661x12   | household-gathered item | =FPrimary=              | ---                           |  --- |
+| 03ai_animalquestions          |   4203x44   | household-animal   | =(FPrimary,animal)=          | *yes*                         | 2358 |
+| 03ai_animalquestions_osp      |     91x43   | household-animal (free text) | =(FPrimary,animal)=  | *yes*                         |   78 |
+
+Wave 3's null-key rows are *empty skips*, not lost data: of the 1,926
+=04n_harvestquestions= rows with a null =cropcode=, *0* carry a harvest
+quantity.  They are the plot rows for plots that were not cultivated.  Drop
+them explicitly.
+
+* The grain question, answered plainly
+
+*The unit of observation is the plot in every wave, and it does not differ
+between waves.*  What differs:
+
+1. *Layout.*  W1 is wide (one row per plot, crop/chemical/seed detail spread
+   across numbered variable families, capped at 5 harvest records and 4 seeds
+   per plot-season).  W2 and W3 are long (a separate file at plot-crop and
+   plot-stage grain).  A W1 build needs a melt; W2/W3 do not.
+2. *Season.*  W1 carries an explicit major/minor season level.  W2 and W3 ask
+   about "last season" only.
+3. *Stage naming.*  W1's labour stages are four fixed operations known only
+   from the questionnaire; W2 has 7 stages in a =stagenum= / =stage= column;
+   W3 has =stageid= / =stagename=.
+4. *Crop-sales grain.*  Plot-crop in W1 (=S4BI= carries =plotno=) and W3
+   (=04o= carries =plotid=), but *household-crop in W2* --- W2's =04o= has no
+   =plotid= at all.
+5. *Livestock roster shape.*  W2 asks all 7 species of everyone (73 per cent
+   zero rows) with a free-text tail; W1 and W3 list only what is owned, with
+   clean labelled categories.
+
+*Is =plotid= a panel identifier?*  Partly, and this matters for anyone
+tempted to pool.  Among the 2,455 households present in both W1 and W2,
+*4,916 of W1's 5,082 plots (96.7 per cent) reappear as the same
+=(household, plot number)= in W2's =04h_preroster=* --- which is explicitly a
+carry-forward list (=knowplot=, =stillowner=).  So the numbering *is* carried
+across W1 -> W2.  W2 -> W3 is weaker evidence: among the 2,181 households with
+plots in both, 2,851 of W2's 3,996 plots (71.3 per cent) have a matching plot
+number in W3, but W3 ships no preroster with a =stillowner= flag, so I *cannot
+confirm* that plot 3 in W3 is the same land as plot 3 in W2.  Treat =plot_id=
+as wave-local unless someone establishes the W2 -> W3 link.
+
+* Per-feature verdicts
+
+** =plot_features= --- CONSTRUCTIBLE, all three waves
+
+Canonical schema requires =Area= (hectares) only; =AreaUnit=, =Tenure=,
+=TenureSystem=, =SoilType=, =Irrigated=, =Latitude=, =Longitude= are optional.
+
+| column        | 2009-10                                   | 2013-14                        | 2017-18                        |
+|---------------+-------------------------------------------+--------------------------------+--------------------------------|
+| =Area=          | *=area_ha= direct, 97.5%*                   | derive from =totalsize= x factor | derive from =totalsize= x factor |
+| =AreaUnit=      | =s4aii_a11= (Acre/Pole/Rope/Plot)           | =plotsizeunit= (100%)            | =plotunit= --- *not* =plotsizeunit= |
+| =Tenure=        | =s4aiv_a45= (6 categories)                  | =obtainhow= (7)                  | =obtainhow= (7)                  |
+| =TenureSystem=  | not asked                                 | not asked                      | not asked                      |
+| =SoilType=      | =S4AIII= soil block                         | =soil1..12= + colour/depth/drain  | =soil= x15 + colour/depth/drain   |
+| =Irrigated=     | investment spend only, no flag            | =othersource= (399 Yes)          | =othersource= (340 Yes)          |
+| GPS           | absent                                    | absent                         | absent                         |
+
+Evidence for =Tenure= harmonising cleanly --- the vocabulary is stable:
+
+| category                 | 2009-10 | 2013-14 | 2017-18 |
+|--------------------------+---------+---------+---------|
+| Inherited                |   2,445 |   2,811 |   3,342 |
+| Allocated free of charge |   2,091 |     648 |     637 |
+| Rented / sharecropped    |   1,013 |     702 |     700 |
+| Purchased                |     112 |     155 |     223 |
+| Begged                   |     ---  |     225 |     316 |
+| Borrowed                 |     ---  |      80 |      79 |
+
+The 2009-10 "Rented / sharecropped" figure folds three source categories that
+the later waves collapse into one: =Rent for cash or kind= 387, =Sharecrop=
+563, =Sharecrop with initial payment= 63.  Whether the third deserves its own
+canonical =Tenure= value is a judgement call for whoever wires it.
+
+Rows: ~5,690 (W1) / 4,694 (W2) / 5,366 (W3).
+
+*Risks*: (a) the W3 =plotsizeunit= trap above; (b) =Irrigated= would be
+recording "has a non-rain water source", which is *weaker* than the canonical
+note's "irrigation infrastructure / customary water access" --- I would leave
+it undeclared rather than overstate it; (c) =plot_id= panel identity for
+W2 -> W3 is unproven.
+
+** =crop_production= --- CONSTRUCTIBLE, all three waves; sales column asymmetric
+
+Canonical grain is =(t, i, plot, j, u, condition, season)= (Uganda) or
+=(t, i, plot, crop)= (Nigeria).  GhanaSPS gives:
+
+| wave    | source                | grain                              | rows with a real record |
+|---------+-----------------------+------------------------------------+-------------------------|
+| 2009-10 | =S4AV1= + =S4AV2=         | plot x season x crop-slot (melt)   | ~4,825 major / 1,412 minor plots, <= 5 crops each |
+| 2013-14 | =04n_harvestquestions=  | plot-crop                          | 8,229 (10 dup tuples)   |
+| 2017-18 | =04n_harvestquestions=  | plot-crop                          | 7,391 after dropping 1,926 skips |
+
+Columns available: =Quantity= (=harvestquantity= / =s4v_a81i=), =u=
+(=harvestunit= / =s4v_a81ii=, a ~45-code native unit list in all waves),
+harvest month (W2/W3 =harvestmonths=; W1 season months in =S4AIX1/5=), damage
+quantity, and expected-still-to-harvest quantity.
+
+=Quantity_sold= / =Value_sold=:
+
+- *W1*: =S4BI= is plot-crop (=plotno= present, 27,576 of 27,591 non-null) ---
+  4,752 real sale records with total revenue in cedis+pesewas.
+- *W2*: =04o_cropsalesstoresquestions= has *no =plotid=* --- household-crop
+  only.  Worse, sales are split across *nine buyer channels*, each with its own
+  quantity, unit and price (=samecomm=, =othercomm=, =traders=, =contractors=,
+  =orgs=, =agg=, =outgrow=, =coop=, =other=).  Summing them is a
+  transformation, and the units can differ between channels.  I would emit NaN
+  for W2, exactly as Nigeria does for its W3--W5.
+- *W3*: same nine-channel structure but *with* =plotid=, key unique on
+  =(FPrimary, plotid, cropcode)= with 0 duplicates.
+
+*No =condition= level exists* in any wave.  GhanaSPS instead records the
+*part* of the crop harvested (=s4bi_b63ii= / =s4v_a80ii=: Leaves / Branches /
+Bark / Sap / Stem / Roots-tuber / Fruit-Seeds-Nuts / Bulb) --- a different
+distinction, and one the canonical schema has no home for.  Do not force-fit
+it into =condition=.
+
+*Risks*: (a) the =S4AV2= major/minor label error, which is a silent
+double-count if missed; (b) W1's 5-harvest-record cap per plot-season truncates
+plots with more crops (=A78= lists up to 10 crops grown); (c) crop
+vocabularies drift --- 42 crop names in W2, 41 in W3, 31 shared, and the
+differences are mostly spelling (=papaya= + =pawpaw= in W2 vs =pawpaw/papaya=
+in W3; =groundnut/peanut= vs =groundnut/ pea nut=) so a =harmonize_crop= table
+is needed but is not hard; (d) crop *codes* are not stable (W3 introduces
+=-666= for "other").
+
+** =plot_labor= --- CONSTRUCTIBLE, all three waves, at a RICHER grain than the corpus has
+
+| wave    | source        | grain                                                    | rows   |
+|---------+---------------+----------------------------------------------------------+--------|
+| 2009-10 | =S4AIX1..8=     | plot x season(2) x stage(4) x source(casual/permanent/family) x group(men/women/children) | 8 files x ~5,700 |
+| 2013-14 | =04m_aglabourquestions= | plot x stage(7) x source(self/family/communal/hired/other) | 32,851 |
+| 2017-18 | =04m_aglabourquestions= | plot x stage x source                                | 20,663 |
+
+Person-days are directly reported: W1 gives days *and* average hours/day *and*
+number of workers separately for each of nine cells; W2/W3 give
+=familymendays= / =familywomendays= / =communal*days= / =hired*days= /
+=other*days= plus =personaldays= for the respondent's own labour.  Uganda's
+=PersonDays= convention (row-sum of the man/woman/child day cells of *one*
+question) transfers directly.
+
+=Wage=: W2 has =hiredavgpayman= / =hiredavgpaywoman= / =hiredavepaychild= plus
+=hiredpayunit= (per day / week / month / plot / acre / pole / rope) in the
+*plot*-level =04m_aglabour=; W3 folds the same block into the stage-level file
+and *drops the child rate*.  W1 has hired-labour payment in the =S4AIX=
+blocks.  Note the wage is a *rate with a unit*, not a total cash amount ---
+Uganda's and Nigeria's =Wage= is cash paid.  These are not the same quantity.
+
+*The honest complication*: GhanaSPS's natural extra index level is =stage=,
+which does not exist in the corpus vocabulary (Uganda and Nigeria carry
+=season= instead).  =CLAUDE.md= already records that =plot_labor= is
+deliberately *not* registered in =index_info= because per-country index names
+diverge; adding =stage= (and, for W1 only, =season=) widens that divergence.
+That is a design decision for the owner, not a data problem.
+
+*Risks*: (a) the four W1 stage files are indistinguishable from their variable
+labels --- get the stage assignment wrong and the rows are mislabelled but
+still present, which is the quiet kind of error; (b) W1 has no =stage= or
+=season= column to read, so both levels must be *assigned by the script* from
+which file the row came; (c) W3's =04m= has 640 null-key rows to drop.
+
+** =livestock= --- CONSTRUCTIBLE, all three waves; wave 2 needs real cleaning
+
+Canonical grain =(t, i, animal)= with =HeadCount= / =HeadAcquired= /
+=HeadSold= / =Value=.
+
+| column       | 2009-10                        | 2013-14                | 2017-18                |
+|--------------+--------------------------------+------------------------+------------------------|
+| =HeadCount=    | =s3ai_1=                         | =quantity=               | =quantity=               |
+| =HeadAcquired= | *not asked*                    | *not asked*            | *not asked*            |
+| =HeadSold=     | *not asked*                    | *not asked*            | =quantitysold=           |
+| =Value=        | =s3ai_3i/ii= (cedis+pesewas)     | =currentvalue=           | =currentvalue=           |
+
+*=Value= is a herd total, not a per-head price, in ALL THREE waves.*  This was
+the biggest open item in an earlier draft of this note and it is now *settled
+by C4 on all three instruments*, which agree verbatim:
+
+- W1, =S4AI= variable label :: "Q3.1 What is the current value of these
+  animals if you sold *all of them* (cedis)".
+- W2, =ISSER_Yale_Part A_WAVE II.docx= :: "What is the current value of these
+  animals, *if you sold all of them*?  Gh Cedis and pesewas".
+- W3, =HH_Questionnaire_23_10.docx= :: "What is the current value of the
+  [animal type], *if you sold all of them*?  Indicate amount as a decimal
+  value (in Ghana cedis and pesewas).  For example, enter 2.50 for 2 Ghana
+  cedis and 50 pesewas."
+
+Uganda's and Nigeria's =Value= is the reported value of *one* head ("if you
+sold one today").  These are *not the same quantity*, and mapping GhanaSPS's
+column onto the canonical =Value= without saying so would put a herd total in
+a per-head column.  Either divide by =HeadCount= (a transformation, so not in
+core) or declare a distinct column.  Note also that W3 states the amount as a
+*decimal cedis* value, so no cedis/pesewas recombination is needed there.
+
+GhanaSPS also carries per-species *expenses* (feed bought, feed home-produced,
+veterinary, shelter, labour, water, other) and *revenue* in all three waves ---
+richer than the canonical =livestock= schema, and with no home in it.
+
+*Risks*: (a) W2's 10,884 zero rows and 69-spelling free-text tail; (b) the
+herd-total-vs-per-head mismatch above --- now a *known* mismatch to declare
+around, not an unknown; (c) W1's cedis/pesewas pair; (d) species vocabulary
+differs --- W1 has "Drought Animal" and "Other Farm Animals", W3 has "Fish" and
+"Draught animal (donkey, horse, bullock)", W2 has lower-case free text; a
+=harmonize_species= mapping is needed per wave.
+
+** =plot_inputs= --- PARTLY constructible; the gap is wave-shaped
+
+This is the one feature I would not call constructible without qualification.
+The canonical convention (Uganda, Nigeria) is that *every row carries a
+reported quantity, never a bare any-use flag*, with =Quantity= + =u=.
+GhanaSPS meets that unevenly:
+
+| input          | 2009-10                                            | 2013-14                                        | 2017-18                                    |
+|----------------+----------------------------------------------------+------------------------------------------------+--------------------------------------------|
+| Chemicals      | *plot-level, quantity + unit + value* (=S4AVI1/2=)   | household-level quantity; plot split via *unresolved template* | household-level quantity; plot split via a *clean* space-separated plot list |
+| Seed           | *value only --- NO quantity* (=S4AVIII1/2=, =A252=)    | *quantity + unit*, plot-crop (7,816/7,838)     | *quantity + unit*, plot-crop (8,276/10,525) |
+| Organic        | ---                                                 | *flags only* --- which plots got green manure / animal manure / compost, no quantity | same |
+| Animal traction | =S4AVII=: hire *cost* only                          | =04j_tracploughuse=: plot-level type/month/owner/*payment*, no days | same |
+
+So: chemicals have a clean plot-level quantity in W1 only; seed has a clean
+plot-crop quantity in W2 and W3 only; organic inputs have *no* quantity in any
+wave; animal traction has cost, not the person-days or animal-days the corpus
+schema expects.
+
+A defensible =plot_inputs= is buildable --- chemicals in all three waves
+(accepting the W2 array-position inference), seed in W2/W3 --- but it would be
+*materially thinner in W1* than in W2/W3 and would have to leave organic
+inputs out entirely, or introduce a flag-only row type the corpus explicitly
+rejects.
+
+*Risks*: (a) the =%pplotnamearray[k]= inference in W2 is the single riskiest
+step in this whole note --- it is an assumption about ordering that nothing
+records, and getting it wrong silently attributes fertiliser to the wrong
+plot; (b) W2 =04l_chemquestions= has 234 duplicate =(FPrimary, chemcode)=
+tuples (W3 has 456) --- a household reporting the same chemical from two
+acquisition events --- so a repeat index is needed or the duplicate collapse
+will destroy rows; (c) the seed asymmetry means a panel-wide =Quantity= column
+is NaN for all of W1.
+
+* Proposed =absent_verdicts.csv= rows
+
+*None of these close a cell.*  All five are =todo= --- "the data is there,
+nobody wrote the config" --- which is the verdict the evidence supports and the
+only one that does not require C4 on all three waves' questionnaires.  =wave=
+is blank because these are country-grain =undeclared= cells.
+
+Checks run: *C1* (metadata-only variable and value-label sweep over all 59
+agriculture/livestock source files across the three waves) and *C2*
+(sibling-wave differential --- all three waves compared against each other) for
+every row.  *C3 is not applicable*: =Harmonized_LSMS-ISA_Ag/lsms_ag.parquet=
+covers 7 LSMS-ISA countries and Ghana is not one of them (GSPS is a Yale
+EGC / ISSER panel, not LSMS-ISA).
+
+*C4 coverage is uneven and is stated per row rather than averaged.*  All three
+instruments are held locally --- =2009-10/Documentation/Household_questionnaire_Part_A.pdf=,
+=2013-14/Documentation/ISSER_Yale_Part A_WAVE II.docx=, and
+=2017-18/Documentation/Questionnaire/HH_Questionnaire_23_10.docx=.  I read
+wave 1's Part A *in full*, and searched the wave 2 and wave 3 instruments
+*targetedly* (livestock valuation, crop sales wording).  For =livestock= that
+makes C4 complete across all three waves; for the four plot features it is
+complete for 2009-10 and partial for 2013-14 / 2017-18.  None of this blocks a
+=todo= verdict --- C4 is mandatory only to *close* a cell --- but the
+distinction is recorded so nobody later reads "C4" as "the instrument was read
+cover to cover".
+
+#+begin_src csv
+country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date
+GhanaSPS,plot_features,,todo,C1;C2;C4(2009-10 only),"Plot-level in all 3 waves. 2009-10 S4AII.dta 5698x15 (hhno,plot_no) with producer-computed area_ha 97.5% populated; 2013-14 04h_agsection.dta 4694x228 (FPrimary,plotid) unique; 2017-18 04h_agsection.dta 5366x176 unique. Tenure from S4AIV s4aiv_a45 / 04i_landtenure obtainhow, same 6-7 category vocabulary in all waves. See slurm_logs/ghanasps/FINDINGS_agriculture.org",sue,2026-08-24
+GhanaSPS,crop_production,,todo,C1;C2;C4(2009-10 only),"Plot-crop harvest in all 3 waves. 2009-10 S4AV1 (major) + S4AV2 (minor season) wide, up to 5 harvest records/plot-season; 2013-14 04n_harvestquestions.dta 8229x65 (FPrimary,plotid,cropcode); 2017-18 04n_harvestquestions.dta 9317x62 (7391 real rows). Quantity + native unit (~45-code list) present in every wave. WARNING: S4AV2 variable labels wrongly say 'major season'; questionnaire Part A A120-A122 says minor. See slurm_logs/ghanasps/FINDINGS_agriculture.org",sue,2026-08-24
+GhanaSPS,plot_labor,,todo,C1;C2;C4(2009-10 only),"Plot-stage labour in all 3 waves. 2009-10 S4AIX1-4 (major) / S4AIX5-8 (minor), four questionnaire-named stages per season; 2013-14 04m_aglabourquestions.dta 32851x43 (FPrimary,plotid,stagenum) unique; 2017-18 04m_aglabourquestions.dta 20663x64 (FPrimary,plotid,stageid). Reported person-days by source and sex in every wave. Natural extra index level is `stage`, not `season`. See slurm_logs/ghanasps/FINDINGS_agriculture.org",sue,2026-08-24
+GhanaSPS,livestock,,todo,C1;C2;C4,"Household-animal roster in all 3 waves. 2009-10 S3AI.dta 4280x28 (hhno,animal_id) 8 labelled species 2142 hh; 2013-14 03ai_animalquestions.dta 14860x44 (FPrimary,animal) 2098 hh -- but 10884 rows are quantity==0 and `animal` is free text with 69 spellings; 2017-18 03ai_animalquestions.dta 4203x44 8 clean labels + _osp free-text file 91x43. HeadCount and Value in all waves; HeadSold 2017-18 only; HeadAcquired never asked. C4 on all three instruments: Value is a HERD TOTAL in every wave ('if you sold all of them'), NOT the per-head price Uganda/Nigeria put in that column. See slurm_logs/ghanasps/FINDINGS_agriculture.org",sue,2026-08-24
+GhanaSPS,plot_inputs,,todo,C1;C2;C4(2009-10 only),"Partial in every wave, in different places. Chemicals: 2009-10 S4AVI1/S4AVI2 plot-level quantity+unit+value; 2013-14 04l_chemquestions.dta 2475x132 household-chemical with plot split via UNRESOLVED template string '%pplotnamearray[k]'; 2017-18 04l_chemquestions.dta 4802x164 with clean space-separated plot list. Seed: quantity+unit in 2013-14 (7816/7838) and 2017-18 (8276/10525) 04k_seedquestions, but 2009-10 S4AVIII1/2 records seed VALUE only, no quantity. Organic inputs are per-plot FLAGS with no quantity in all waves. See slurm_logs/ghanasps/FINDINGS_agriculture.org",sue,2026-08-24
+#+end_src
+
+* Ranked recommendation
+
+Effort estimates are relative and assume a competent agent with this note in
+hand.  All five need =materialize: make= --- none of them is expressible in
+=data_info.yml=, because every one requires either a melt (W1) or a
+concatenation of per-wave files with different column names.
+
+** 1. =livestock= --- do this first
+
+- Effort :: *small*.  One source file per wave, household-animal grain,
+  key already unique in all three.
+- Why first :: it is the only one of the five with no plot key to get wrong, it
+  exercises the =(t, i, animal)= index that is already registered in
+  =index_info=, and it produces a table three other countries can be compared
+  against immediately.
+- Specific risk :: W2's free-text tail and 73 per cent zero rows.  The
+  =Value= question that used to sit here is *settled*: all three instruments
+  ask for the herd total ("if you sold all of them"), so the column must be
+  declared as a herd value or divided by =HeadCount= in a transformation ---
+  it must not be quietly aligned to Uganda's per-head =Value=.
+
+** 2. =plot_features= --- highest value per unit of effort
+
+- Effort :: *small-to-medium*.  Two files per wave (size/soil from
+  =04h_agsection= or =S4AII=+=S4AIII=, tenure from =04i_landtenure= or =S4AIV=),
+  a 1:1 merge on a key that is already unique.
+- Why second :: it establishes the =plot_id= that the other three plot features
+  key on, and =Area= --- the only *required* column --- is reachable in all
+  three waves with exact factors.  Roughly 15,750 plot-rows panel-wide.
+- Specific risk :: read =plotunit=, not =plotsizeunit=, in W3.  And do not
+  declare =Irrigated= from =othersource= without deciding that "non-rain water
+  source" is what the canonical column means.
+
+** 3. =crop_production= --- the substantive prize, but W1 is real work
+
+- Effort :: *medium* for W2/W3 (already long-format, one file each);
+  *medium-to-large* for W1 (melt 5 crop slots x 2 seasons out of a wide file,
+  and get the season assignment right against a label that lies).
+- Why third :: it is what most users mean by "agriculture data", and W2/W3
+  alone give ~15,600 plot-crop harvest records.  Consider shipping W2+W3
+  first and adding W1 as a second PR --- the wave asymmetry is honest and the
+  =t= slice makes it visible.
+- Specific risk :: the =S4AV2= label error (silent season double-count); the
+  =Quantity_sold= asymmetry (plot-crop in W1/W3, household-crop in W2, and
+  nine buyer channels in W2/W3 that must not be summed in core).
+
+** 4. =plot_labor= --- constructible but needs an index decision first
+
+- Effort :: *medium* for W2/W3; *large* for W1 (eight files, four
+  script-assigned stages, two script-assigned seasons).
+- Why fourth :: the data is excellent --- 53,500 plot-stage rows in W2+W3
+  alone --- but the natural index carries a =stage= level the corpus does not
+  have, and that is a decision the owner should take before an agent bakes it
+  into a script.
+- Specific risk :: W1's stage assignment comes from the questionnaire, not the
+  data.  A wrong assignment is invisible in every automated check.
+
+** 5. =plot_inputs= --- wire it last, or scope it down
+
+- Effort :: *large*, and the effort does not buy a uniform table.
+- Why last :: the coverage is genuinely ragged (chemicals-with-quantity in W1
+  only at plot level; seed-with-quantity in W2/W3 only; organic never), and the
+  W2 plot attribution rests on an unrecorded ordering assumption.
+- Recommendation :: either (a) build only the rows that carry a real reported
+  quantity and accept that W1 has no seed rows and W2/W3 have inferred
+  chemical-plot links, or (b) defer until someone reads the W2 instrument and
+  confirms the =%pplotnamearray= ordering.  Do *not* introduce flag-only rows
+  to fill the organic gap.
+
+** Two cheap wins outside the five features
+
+Not requested, recorded because the measurement was already done:
+
+- =2017-18/04o_cropsalesstoresservices.dta= (9,872 x 82) and its W2 sibling
+  are *agricultural services*, an =income=- or =assets=-adjacent table with no
+  current home.
+- =04nn_gatheringquestions= (2,207 W2 / 3,661 W3) is gathered wild produce ---
+  arguably =food_acquired= source material with =s= = produced.
+
+* What I could not determine
+
+1. *Whether W3's =plotid= refers to the same physical land as W2's.*  71.3 per
+   cent positional overlap is consistent with both continuity and coincidence,
+   and W3 ships no =stillowner=-style carry-forward flag.  W1 -> W2 *is*
+   established (96.7 per cent via =04h_preroster=).
+2. *What is in =Crop_encrypted/=.*  Boxcryptor-encrypted, no passphrase in the
+   repository, and =get_data_file()= returns =None= for all four files anyway.
+   I could not establish whether the blobs are simply absent from the remote or
+   whether the =.bc= extension defeats the fetch path --- I did not investigate
+   further because reading them is blocked either way.
+3. *Whether =TenureSystem= is asked anywhere.*  I found no freehold /
+   leasehold / customary regime question in any wave's variable labels, and W1's
+   questionnaire Part A has none.  I did not read the W2/W3 instruments, so
+   this is =unsure=, not "not asked".
+4. *W2's 04l organic-input plot lists.*  I confirmed they are per-plot flags
+   with no quantity, but did not decode =greenmanureplots1..30= to actual plot
+   ids --- they carry the same =%pplotnamearray[k]= placeholders as the
+   chemical block.
+5. *The exact stage vocabulary in W2 vs W3.*  W2 has =stagenum= / =stage=, W3
+   has =stageid= / =stagename=; I confirmed both exist and are unique within
+   plot, but did not enumerate and compare the stage label sets across waves.
+6. *W1 =S4AIII= soil detail.*  I confirmed a soil/water block exists at plot
+   level but did not enumerate its variables, so the W1 =SoilType= claim in the
+   =plot_features= table above is weaker than the W2/W3 ones.
