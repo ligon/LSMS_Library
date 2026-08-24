@@ -72,3 +72,29 @@ style = "pep440"
 [build-system]
 requires = ["poetry-core>=2.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
 build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.pytest.ini_options]
+# Collect ONLY from tests/.  Without this pytest scans the repo root, so ANY
+# file matching `test_*.py` or `*_test.py` anywhere in the tree is imported at
+# collection -- including analysis scripts under `slurm_logs/` and `SkunkWorks/`.
+#
+# That is not theoretical.  `slurm_logs/ghanasps/plot_identity_permutation_test.py`
+# (a re-checkable permutation test shipped alongside a findings doc, GH #729)
+# matched `*_test.py`, did its data loading at MODULE level, and hit
+# `NoCredentialsError` in CI:
+#
+#   ERROR collecting slurm_logs/ghanasps/plot_identity_permutation_test.py
+#   !!!!!! Interrupted: 1 error during collection !!!!!!
+#
+# An error at COLLECTION aborts the whole session -- zero tests ran, and the
+# message named neither a test nor the change under review.  Same failure shape
+# as GH #680 (the `fooddatacentral` top-level `tests` package).
+#
+# `SkunkWorks/` already holds four `test_*.py` files that are collected today
+# and are harmless only because their module-level code happens not to raise.
+# Naming discipline was the only thing standing between us and this, and naming
+# discipline is not enforcement.
+#
+# Measured before pinning: repo-root collection and `tests/`-only collection
+# both yield **4,851** items, so this scopes without losing coverage.
+testpaths = ["tests"]
