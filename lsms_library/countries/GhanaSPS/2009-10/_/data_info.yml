@@ -140,3 +140,63 @@ household_roster:
         Age: s1d_4i
         Relationship: s1d_2
         MonthsAway: s1d_27
+
+housing:
+    # S12AI.dta is the wave-1 housing module: 4,972 rows, one per household
+    # (`hhno` unique, 0 duplicates, 0 nulls), covering Q1-Q36 of Section 12A.
+    # Waves 2 and 3 split this same content across four files; wave 1 keeps
+    # it in one, so there is no `dfs:` merge here.
+    #
+    # Variable labels read off the .dta:
+    #   s12a_30 "Q30 What is the main construction material used for the
+    #            outer wall of the main b[uilding]"   -> NOT wired (Wall is
+    #                                                    not in the schema)
+    #   s12a_31 "Q31 What is the main construction material used for the
+    #            floor"                               -> Floor
+    #   s12a_32 "Q32 What is the main material used for the roof"  -> Roof
+    # Note 31 is the FLOOR and 32 is the ROOF, in that order -- the reverse
+    # of the (Roof, Floor) order the schema lists them in.
+    #
+    # A wave-1 naming trap worth knowing: the sibling file S12AII.dta spells
+    # its variables `s12b_*`, not `s12a_*`, despite being section 12A part
+    # II.  S12AII is the twin of waves 2/3's 12b_housingcharacteristics2.dta
+    # (dwelling type, rooms, occupancy, electricity) and carries NO material
+    # variable, so it cannot be used to fill wave 1's gap (see below).
+    #
+    # COVERAGE GAP, source-side: S12AI holds 4,972 of the wave's 5,009
+    # households.  The 37 absentees are absent from S12AI entirely; they are
+    # present in key_hhld_info.dta and S1D.dta (both 5,009).  S12AII covers
+    # 30 of the 37, but has no roof/floor variable.  Not recoverable from
+    # this extract.  The housing households are a strict SUBSET of the sample
+    # households (0 in housing but not in key_hhld_info), so the v-join is
+    # total -- 0 null `v`.
+    #
+    # DELIVERED ROWS: 4,899, not 4,972.  The 73 missing rows are the ones
+    # with BOTH Roof and Floor null; _finalize_result's dropna(how='all')
+    # (country.py, GH #645) removes them.  That is framework behaviour, not
+    # a filter written here, and it loses no material datum -- a row survives
+    # if EITHER column is populated.
+    #
+    # NULLS, left as NULL deliberately: in the source, Roof is non-null for
+    # 4,890/4,972 (82 missing) and Floor for 4,897/4,972 (75 missing); 73 of
+    # those overlap, so the delivered table carries 82-73 = 9 null Roof and
+    # 75-73 = 2 null Floor.  These are Stata missings, not sentinels -- wave
+    # 1 declares no Don't-know/Refuse codes on either variable (labels are
+    # just codes 1-9).  Nowhere near the null-read guard's 1/3-of-frame
+    # trigger and not an all-null column; do NOT reach for `optional: true`.
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    #
+    # Label harmonisation is NOT done here.  It is done once, for all three
+    # waves, by the `Roof` / `Floor` tables in ../../_/categorical_mapping.org,
+    # which _apply_categorical_mappings auto-discovers by column name.  This
+    # wave contributes the two nastiest alternate spellings: `Cement/ concrete`
+    # (internal space after the slash, 3,921 rows) and `Corrugate iron sheets`
+    # (source typo: no 'd', 3,747 rows).  Its code-8 floor label `Terrazo`
+    # (one z, 0 observations) is mapped too, as insurance.
+    file: S12AI.dta
+    idxvars:
+        i: hhno
+    myvars:
+        Roof: s12a_32
+        Floor: s12a_31

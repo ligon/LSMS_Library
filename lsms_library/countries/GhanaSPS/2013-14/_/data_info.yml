@@ -85,3 +85,47 @@ household_roster:
         - t
         - i
         - pid
+
+housing:
+    # 12a_housingcharacteristics1iii_structure.dta is the wave-2 dwelling-
+    # structure file: 4,772 rows, `FPrimary` unique (0 duplicates, 0 nulls).
+    # Single file, single extraction -- no `dfs:` merge, so no cartesian risk.
+    #
+    # THE MODULE IS THE SAME ONE WAVE 1 USES, verified by content and not by
+    # the filename.  The source's own variable labels name the wave-1
+    # variables: `materialroof` is labelled "s12a_32 - Roof material" and
+    # `materialfloor` "s12a_31 - Floor material".  That matters here because
+    # GhanaSPS module letters do move between waves -- 01f is education in
+    # this wave and EMPLOYMENT in 2017-18 -- so filename continuity alone
+    # would not have been evidence.
+    #
+    # The other three 12* files were checked and are not candidates:
+    # …1i_rent (rent/construction cost), …1ii_utilities (water, lighting,
+    # cooking fuel), 12b_housingcharacteristics2 (dwelling type, rooms,
+    # occupancy, electricity).  None carries a roof or floor material.
+    # `materialouterwall` is here too and is deliberately not wired.
+    #
+    # COVERAGE: 4,772 of the wave's 4,774 households.  The two missing are
+    # 106199032 and 205163009, absent from this file but present in
+    # 01a_consent.dta.  Housing households are a strict SUBSET of the sample
+    # households, so the v-join is total.
+    #
+    # NULLS: none.  Roof and Floor are both 4,772/4,772 non-null.  This wave
+    # declares no Don't-know / Refuse sentinel on either variable (codes
+    # 1-8 plus 95 'Other - specify').
+    #
+    # `InstanceNumber` is a per-interview counter, not part of the key --
+    # FPrimary alone is unique, so it is not declared.
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    #
+    # Label harmonisation is done once for all three waves by the `Roof` /
+    # `Floor` tables in ../../_/categorical_mapping.org.  This wave's
+    # distinctive spellings are `Corrugated iron sheets` (plural; wave 1 says
+    # `Corrugate`, wave 3 says `sheet`) and `Other - specify` (code 95).
+    file: 12a_housingcharacteristics1iii_structure.dta
+    idxvars:
+        i: FPrimary
+    myvars:
+        Roof: materialroof
+        Floor: materialfloor

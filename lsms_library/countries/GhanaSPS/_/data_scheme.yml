@@ -90,3 +90,70 @@ Data Scheme:
     panel_weight: float
     strata: str
     Rural: str
+
+  housing:
+    # Dwelling roof / floor material, all three waves, YAML path (no script:
+    # one source file per wave, a straight column extraction, and the label
+    # harmonisation lives in _/categorical_mapping.org rather than in code).
+    #
+    # Sources -- the module is stable at 12/12a across waves, CONFIRMED BY
+    # CONTENT rather than by filename (GhanaSPS module letters are not
+    # reliable -- verified on the shipped file lists, 01f is EDUCATION in
+    # 2013-14 (01fi_generaleducation, 01fii_edcareer, 01fiii_literacy) and
+    # EMPLOYMENT in 2017-18 (01fi_employmentmain, 01fii_employmentsecondary,
+    # 01fiii_unemployed), education having moved to 01g).  The wave-2/3
+    # variables carry the WAVE-1 variable name in their own Stata labels:
+    # `materialroof` is labelled
+    # "s12a_32 - Roof material" and `materialfloor` "s12a_31 - Floor
+    # material" -- which is the producers themselves asserting the
+    # continuity:
+    #
+    #   2009-10  S12AI.dta                                  s12a_32 / s12a_31
+    #   2013-14  12a_housingcharacteristics1iii_structure.dta  materialroof /
+    #   2017-18  12a_housingcharacteristics1iii_structure.dta  materialfloor
+    #
+    # Wave 1 keeps in ONE file (S12AI, Q1-Q36) what waves 2 and 3 split into
+    # four (…1i_rent, …1ii_utilities, …1iii_structure, 12b_…2).  Roof/floor
+    # are Q30-Q32 of S12AI; S12AII is the wave-1 twin of 12b and carries no
+    # material variable, so there is nothing to merge and no `dfs:` block.
+    #
+    # `v` is NOT declared and must NOT be: `sample` is wired for every wave,
+    # so _join_v_from_sample() attaches it at API time.  The join is total --
+    # the housing households are a strict SUBSET of the sample households in
+    # all three waves (0 housing-only ids anywhere), so `v` is 0% null.
+    #
+    # ROW COUNTS ARE BELOW THE HOUSEHOLD COUNTS IN EVERY WAVE, from two
+    # independent causes.  Both are benign; neither is a config defect.
+    #
+    #   wave     households  source rows  delivered  absent  all-null
+    #   2009-10       5,009        4,972      4,899      37        73
+    #   2013-14       4,774        4,772      4,772       2         0
+    #   2017-18       5,669        5,669      5,645       0        24
+    #
+    # (a) ABSENT -- households with no housing record at all in the shipped
+    #     extract.  Wave 1's 37 are absent from S12AI entirely (they ARE in
+    #     key_hhld_info.dta and S1D.dta, both 5,009); S12AII covers 30 of
+    #     them but has no material variable, so they are not recoverable.
+    #     Wave 2's 2 are 106199032 and 205163009.
+    # (b) ALL-NULL -- rows present in the source with BOTH Roof and Floor
+    #     missing, removed by _finalize_result's dropna(how='all')
+    #     (country.py, GH #645).  This is framework behaviour, not a filter
+    #     written here, and it costs no material data: a row survives if
+    #     EITHER column is populated, which is why 9 Roof-nulls and 2
+    #     Floor-nulls remain in wave 1 and 10 / 3 in wave 3.
+    #
+    # Checked arithmetic, wave 1: 82 Roof-null and 75 Floor-null source rows,
+    # of which 73 are null in both -> 4,972 - 73 = 4,899 delivered, with
+    # 82 - 73 = 9 and 75 - 73 = 2 nulls left.  Wave 3: 34 / 27 / 24 -> 5,645
+    # delivered with 10 and 3 nulls.  Wave 2 has no nulls at all.
+    #
+    # Roof / Floor are harmonised at API time by the `Roof` and `Floor`
+    # tables in _/categorical_mapping.org, auto-discovered by column name.
+    # Every Preferred Label is drawn from the shared vocabulary in
+    # lsms_library/categorical_mapping/canonical_housing_labels.org; the
+    # per-judgement reasoning, including the one genuine merge
+    # (GSPS separates Bamboo from Wood; the canon does not), is in that file.
+    # Wall material exists in every wave and is deliberately not wired.
+    index: (t, i)
+    Roof: str
+    Floor: str
