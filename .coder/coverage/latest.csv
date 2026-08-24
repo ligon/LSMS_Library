@@ -642,18 +642,27 @@ GhanaLSS,sample,2005-06,builds,declared,8687,fail: no_all_null_columns; warn: no
 GhanaLSS,sample,2012-13,sane,declared,16772,all checks pass
 GhanaLSS,sample,2016-17,sane,declared,14009,all checks pass
 GhanaLSS,updated_ids,,sane,declared,7,7 entries
-GhanaSPS,food_acquired,2009-10,sane,declared,119847,all checks pass
-GhanaSPS,food_acquired,2013-14,sane,declared,139339,all checks pass
-GhanaSPS,food_acquired,2017-18,sane,declared,148743,all checks pass
-GhanaSPS,food_expenditures,2009-10,sane,declared,119169,all checks pass
-GhanaSPS,food_expenditures,2013-14,sane,declared,133163,all checks pass
-GhanaSPS,food_expenditures,2017-18,sane,declared,145872,all checks pass
+GhanaSPS,food_acquired,2009-10,sane,declared,119847,warn: index_levels_match_scheme
+GhanaSPS,food_acquired,2013-14,sane,declared,139339,warn: index_levels_match_scheme
+GhanaSPS,food_acquired,2017-18,sane,declared,148743,warn: index_levels_match_scheme
+GhanaSPS,food_expenditures,2009-10,sane,declared,96513,all checks pass
+GhanaSPS,food_expenditures,2013-14,sane,declared,104543,all checks pass
+GhanaSPS,food_expenditures,2017-18,sane,declared,117347,all checks pass
 GhanaSPS,food_prices,2009-10,sane,declared,113722,all checks pass
 GhanaSPS,food_prices,2013-14,sane,declared,135620,all checks pass
 GhanaSPS,food_prices,2017-18,sane,declared,138098,all checks pass
 GhanaSPS,food_quantities,2009-10,sane,declared,114278,all checks pass
 GhanaSPS,food_quantities,2013-14,sane,declared,136872,all checks pass
 GhanaSPS,food_quantities,2017-18,sane,declared,138799,all checks pass
+GhanaSPS,household_characteristics,2009-10,sane,declared,5007,all checks pass
+GhanaSPS,household_characteristics,2013-14,sane,declared,4762,all checks pass
+GhanaSPS,household_characteristics,2017-18,sane,declared,5661,all checks pass
+GhanaSPS,household_roster,2009-10,sane,declared,18889,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaSPS,household_roster,2013-14,sane,declared,16356,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaSPS,household_roster,2017-18,sane,declared,19006,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaSPS,sample,2009-10,sane,declared,5009,all checks pass
+GhanaSPS,sample,2013-14,sane,declared,4774,warn: no_constant_columns
+GhanaSPS,sample,2017-18,sane,declared,5669,warn: no_constant_columns
 Guatemala,assets,2000,sane,declared,37995,all checks pass
 Guatemala,cluster_features,2000,sane,declared,8,"warn: has_household_index,reasonable_size"
 Guatemala,food_acquired,2000,sane,declared,215982,warn: index_levels_match_scheme
