@@ -1,0 +1,863 @@
+#+title: Peru / GH #684 -- independent ground truth
+#+date: 2026-08-21
+
+Blind red-team run.  I did not read branch =fix/684-peru-functional=, commit
+=22008332=, =.coder/ledger/684-peru.md=, or worktree =agent-a8d532db97abe7bc7=,
+and nothing from them appeared in any tool output I saw.  Everything below is
+derived from =development= (=5290f25c=), the raw ENNIV microdata, the shipped
+1994 data dictionary, and the framework source.
+
+Environment: =PYTHONPATH= + =LSMS_COUNTRIES_ROOT= pinned to this worktree
+(asserted =worktrees= in =lsms_library.__file__= in every script);
+=LSMS_DATA_DIR=/global/scratch/fsa/fc_jevons/ligon/tmp/peru_redteam_cache= (private,
+cold); =LSMS_NO_CACHE=1= on all build runs.  No =dvc= CLI was invoked.
+
+*Provenance convention used below*: "MEASURED" = I ran it and quote the output.
+"TAKEN ON TRUST" = read from the issue or a document and not re-derived.  Two
+figures in the #684 owner comment (187 destroyed rows; the post-move table
+count) I *reproduced independently* and say so.  The two CI failure names I did
+not re-run.
+
+* 1. Verdict on the #684 diagnosis: CORRECT BUT RADICALLY INCOMPLETE
+
+** The stated mechanism is exactly right
+
+Country-level scheme file, =lsms_library/country.py:1602-1610=:
+
+#+begin_src python
+    @property
+    def resources(self) -> dict[str, Any]:
+        if '_resources_cache' not in self.__dict__:
+            var = self.file_path / "_" / "data_scheme.yml"      # <-- country.py:1604
+            if var.exists():
+                with open(var) as f:
+                    self.__dict__['_resources_cache'] = load_yaml(f)
+            else:
+                self.__dict__['_resources_cache'] = {}
+#+end_src
+
+=Country.data_scheme= (=country.py:1782-1800=) reads =self.resources['Data Scheme']=;
+=Country.waves= (=country.py:1725=) reads =self.resources['Waves']=;
+=Wave.column_mapping= reads =self.country.resources['Data Scheme']= for its
+=declared_tables= guard (=country.py:775-777=).  All three see =<{}>=.
+
+Wave-level file, =country.py:565-572=: =Wave.resources= reads
+={wave}/_/data_info.yml=.  Peru's =_/data_info.yml= is at the *country* level,
+so no code path reads it at all.
+
+MEASURED, on =development=, cold cache:
+
+#+begin_example
+waves: ['1985', '1990', '1991', '1994']
+data_scheme: []
+resources keys: []
+#+end_example
+
+So yes: five declared tables, zero reachable.  The uniqueness claim holds, and is
+in fact *stronger* than #684 states -- MEASURED against the git index (my
+worktree has the file deleted):
+
+#+begin_src sh
+git ls-files "lsms_library/countries/" | grep -E "^lsms_library/countries/[^/]+/_/data_info\.yml$"
+# -> lsms_library/countries/Peru/_/data_info.yml     (the only line)
+#+end_src
+
+Peru is not merely the only country whose country-level =data_info.yml= contains
+=Data Scheme:= -- it is the only country that *has* a country-level
+=_/data_info.yml= at all.  (Careful with the obvious glob: =git ls-files
+"lsms_library/countries/*/_/data_info.yml"= returns 101 paths, because git's =*=
+crosses =/= and matches every *wave*-level file.)
+
+** But the filename is the *first* thing that breaks, not the cause of the rest
+
+I made the move in this worktree (wrote =_/data_scheme.yml= with the =Data
+Scheme:= block, dropped the stale =Waves:= key, deleted =_/data_info.yml=) and
+built every table cold.  MEASURED:
+
+| table                  | outcome after the move                                        |
+|------------------------+---------------------------------------------------------------|
+| =cluster_features=     | builds, 364x2, *GrainCollapseWarning*, Region/Rural UNMAPPED  |
+| =household_roster=     | *raises* =ValueError= at =local_tools.py:1872= (=format_id=)   |
+| =individual_education= | *raises* =RuntimeError: Could not materialize=                 |
+| =food_acquired=        | *raises* =RuntimeError: Could not materialize=                 |
+| =interview_date=       | *raises* =RuntimeError: Could not materialize=                 |
+
+=Country('Peru').data_scheme= goes =[]= -> 9 entries (5 declared + 4 derived) --
+*independently reproduced*, matching the owner comment.
+
+The grain warning, verbatim and *independently reproduced* (same 187):
+
+#+begin_example
+Peru/cluster_features/1994: declared index (t, v) is NOT UNIQUE.  Collapsing it
+with groupby().first() DESTROYED 187 of 3,623 rows whose values DISAGREE
+(17 conflicting index tuples).
+#+end_example
+
+Three of the five declared tables have *no wave that declares them anywhere* --
+1994's wave YAML declares only =cluster_features= and =household_roster=, and
+1985/1990/1991 have no =_/= directory at all.  They fall through =grab_data= to
+the Makefile branch, warn "No Makefile or script found for Peru/_ <table>", and
+raise.  A user calling =Peru.food_acquired()= after the trivial fix gets an
+exception, not an empty frame.
+
+** The deeper finding: Peru's country file is the *Nepal template*, unedited
+
+=Peru/_/data_info.yml= and =Nepal/_/data_scheme.yml= share a byte-identical
+=Index Info:= block (same five entries, same order) and a =Data Scheme:= that is
+Nepal's minus =sample= and =assets=.  *Nepal has no microdata in this repo.*
+
+That reframes the issue.  It is not "a correctly-wired config behind a wrong
+filename".  It is a template that was never confronted with Peru's data, and the
+filename is why nobody found out.  Concretely, the template's declarations are
+*contradicted by the ENNIV 1994 data dictionary* (see S5, trap T9):
+=food_acquired= is declared =(t, v, visit, i, j, u)= with =Quantity=, =Price=,
+=Produced=, and Peru 1994's food modules record *expenditure only*, for 30
+aggregate food groups, with no quantity, no unit, and no visit.  That table can
+never be built from 1994 as declared.
+
+** Two claims in #684 I would soften
+
+1. "Peru contributes *zero* cells to the coverage matrix ... invisible to a
+   grader."  MEASURED: =grep -c '^Peru,' .coder/coverage/latest.csv= -> *0*, so
+   the committed snapshot is indeed blind.  But
+   =coverage_matrix.unconfigured_countries()= (=coverage_matrix.py:235-268=)
+   *already names Peru* and =build_matrix= emits an =unconfigured= row for it
+   (=coverage_matrix.py:711-718=).  The blind spot was closed in code on
+   2026-07-11; the committed snapshot just predates it.  The invisibility is a
+   stale artefact, not a live structural hole.
+
+2. "the fix is a composite key, exactly as Guatemala needed" (owner comment,
+   Defect 2).  I believe this is *wrong for Peru* -- see S5 / trap T3.  Peru's
+   =segmento= is not the Guatemala =upm= case.
+
+* 2. Peru idiosyncrasies, QUOTED from =_/CONTENTS.org=
+
+=Peru/_/CONTENTS.org= is 604 lines and contains *no* =LOGBOOK=, =WAITING=,
+=TODO= or =DONE= entries (=grep= returns nothing) -- it is one long GH #601
+evidence section on sampling universes.  It records *no* identifier convention,
+*no* build-path note, and *nothing at all* about the =data_info.yml= /
+=data_scheme.yml= defect.  The idiosyncrasies it *does* record, verbatim:
+
+1. *The waves do not share a universe.*
+   #+begin_quote
+   Read the 1985 and 1990 entries before pooling ENNIV rounds.  Two of the four
+   waves do *not* declare a national universe: 1985 subtracts three departments
+   and 1990 is Lima-only.  Stacking all four rounds into one "Peru" panel
+   without saying so averages across three different declared populations.
+   #+end_quote
+
+2. *1990 is Metropolitan Lima only.*
+   #+begin_quote
+   *This wave is not a national survey.*  It is the most consequential single
+   fact in this section for anyone pooling ENNIV rounds ... A =Feature()= call
+   that stacks Peru's four waves and takes a mean over =t= mixes a Lima-only
+   population into a national series.
+   #+end_quote
+
+3. *1985 excludes three departments by design*, quoting catalog 597:
+   #+begin_quote
+   Cobertura nacional con la exepción de tres departamentos que se encontraban
+   en emergencia, a saber: Ayacucho / Apurímac / Huancavelica
+   #+end_quote
+   and the file's own gloss: "a national aggregate computed from this wave is a
+   national-minus-three-departments aggregate."
+
+4. *The wave label mismatch is already recorded.*
+   #+begin_quote
+   (=_/data_info.yml= labels the first wave =1985-1986= while the directory is
+   =1985/=; the survey ran twelve months from late 1985 into 1986.)
+   #+end_quote
+   This is load-bearing for the fix, but the mechanics are conditional and worth
+   getting exactly right.  =Country.waves= (=country.py:1712-1731=) is an
+   if/elif chain: it first tries =_/peru.py= for a =waves= / =Waves= attribute,
+   and reaches =elif self.resources.get('Waves')= *only when
+   =_/peru.py= does not exist*.  So:
+   - *No country module* (today's state): carrying =Waves:= into
+     =data_scheme.yml= makes =Country.waves= return =['1985-1986','1990','1991',
+     '1994']=, naming a directory that does not exist -- a live breakage.
+   - *With a country module* (which the =i()= fix requires, S4): the =elif= is
+     never reached and a carried-over =Waves:= is merely *dead config* -- inert,
+     but a second, wrong statement of the wave list sitting next to the real one.
+   Either way, drop it.  Omitting it keeps directory discovery, which is what
+   happens today and is correct.
+
+5. *1994's two shipped documents give two different residence thresholds* --
+   =programa.pdf= §4.4 "residen habitualmente más de 7 meses en los últimos 12
+   meses"; =m-encues.pdf= §6.4 "si reside al menos 3 de los últimos 12 meses".
+   #+begin_quote
+   Anyone deriving a residence filter for Peru 1994 (cf. the =MonthsSpent= /
+   =MonthsAway= handling described in =CLAUDE.md=) is choosing between two
+   documented rules, not applying one.
+   #+end_quote
+   This is *directly actionable now*: I found the variable (=B08-AUSENTE=, see
+   S3), so the choice is live rather than hypothetical.
+
+6. *Lodgers and domestic workers are excluded from membership by rule* --
+   =m-encues.pdf= §6.5 "excepto los pensionistas y trabajadores del hogar, que
+   nunca se considera como miembros del hogar."  Peru's own
+   =categorical_mapping.org= nevertheless ships codes 8 =Trabajador domestico=
+   and 9 =Pensionista=, and 1994's =REG02= carries 134 and 17 such rows -- the
+   instrument's rule and the delivered data disagree, and the roster will
+   include people the manual says are not members.
+
+7. *All four universe statements are catalog-only*: "the record is a moving
+   target.  A WB metadata revision changes what Peru's declared universe is,
+   with no diff in this repo."
+
+* 3. Data inventory -- MEASURED
+
+All row counts via =get_dataframe()= (=convert_categoricals=False=).
+
+** Wave directories
+
+| wave  | =_/= config | data files                     | notes                              |
+|-------+-------------+--------------------------------+------------------------------------|
+| 1985/ | *absent*    | 65 =.DTA= (130 sidecars)       | LSMS-style =cluster= / =hhid= / =mb= |
+| 1990/ | *absent*    | 36 =.SSP= (37 sidecars)        | *UNREADABLE* -- see T1             |
+| 1991/ | *absent*    | 53 =.DTA= (106 sidecars)       | LSMS-style =cid= / =hid= / =pid91= |
+| 1994/ | present     | 65 =.DTA= (130 sidecars)       | INEI record-type layout, Spanish   |
+
+Only =1994/_/data_info.yml= exists, and it declares 2 tables.
+
+** 1994 -- ENNIV94, INEI record-type layout
+
+The shipped =Documentation/dicciona.pdf= ("Data Dictionary: ENNIV94", created
+13/07/94) maps =RECTYPE 01..49= one-for-one onto =REG01..REG49=.  This is
+authoritative and I read it directly rather than inferring from row counts:
+
+| file  | RECTYPE record | rows   | grain / key                        |
+|-------+----------------+--------+------------------------------------|
+| REG01 | IDENTIFICACION | 3,623  | household cover page               |
+| REG02 | HOGA1          | 19,285 | person (=b00=)                     |
+| REG03 | VIV2A          | 3,623  | housing A                          |
+| REG04 | VIV2B          | 3,623  | housing B                          |
+| REG05 | EDU31          | 15,942 | person (=e00=) -- *education*      |
+| REG06 | EDU32          | 6,637  | education spending                 |
+| REG08 | SAL41          | 18,696 | health                             |
+| REG34 | ALI12          | 18,820 | meals away from home               |
+| REG35 | ALIMA          | 32,639 | *food, by informant* (=aj04a=)     |
+| REG36 | ALIMB          | 30,681 | *food, household* (=ak01=)         |
+| REG40..46 | AG13A-G    | var.   | agriculture / plots / crops        |
+| GASHOG94 | --          | 3,623  | expenditure aggregate              |
+| INGHOG94 | --          | 3,623  | income aggregate                   |
+| CCPP0..9 | --          | 204..6133 | community, keyed by =segmento=  |
+
+*The household key is a documented triple.*  =dicciona.pdf=, "COMMON items ...
+occur on all records":
+
+#+begin_example
+SEGMENTO   N   3-5    3
+VIVIENDA   N   6-7    2   VIVI     01:12
+HOGAR      N   8-9    2   HOGAR01  11:15 / HOGAR02 22:25 / HOGAR03 33:35 ...
+#+end_example
+
+MEASURED on REG01 (3,623 rows):
+
+| key                            | groups | dup rows |
+|--------------------------------+--------+----------|
+| =(segmento)=                   |    364 |    3,259 |
+| =(segmento,vivienda)=          |  3,543 |       80 |
+| =(segmento,vivienda,hogar)=    |  3,623 |      *0* |
+
+=segmento= int16, 364 distinct in 1..662; =vivienda= int8 1..21 (dictionary says
+01:12 -- a documented-range violation); =hogar= int8 in {11,12,13,14,22,23,33}.
+REG01 and REG02 cover *exactly* the same 3,623 households (0 either way).
+
+Person id: =b00= (ORDEN, 01:15).  =(segmento,vivienda,hogar,b00)= gives *19,284*
+groups from 19,285 rows -- *one* collision, and it is *conflicting*, not a
+duplicate row (segmento 81 / vivienda 2 / hogar 11 / b00 3 is both a 61-year-old
+=b01=2 spouse and a 15-year-old =b01=3 child).  Separately, one household
+(segmento 243 / vivienda 5 / hogar 22) has *two* people coded =b01=1= (jefe);
+that is a quality note, not an index break -- 3,624 jefes for 3,623 households.
+
+Residence duration exists: =B08-AUSENTE  N 26-27  AUSENTE 00:12= -- months
+absent, i.e. canonical =MonthsAway=.  The current config ignores it.
+
+Interview date exists: =A17-DIA (01:31)=, =A18-MES (05:07)=, =A19-COMPLETA=.
+MEASURED =a18= distribution: {7: 1755, 6: 1617, 8: 248, 5: 3} -- month 8 is
+outside the dictionary's declared 05:07 range.  There is *no year field*.
+
+*Sampling weight: there is none usable.*  =_weight_= is =int8= and equals =1= in
+every row of every 1994 file.  The catalog prints seven domain expansion factors
+(1746.488 Costa Urbana ... 1563.636 Lima) which are *not* in the microdata, and
+no domain variable that I could identify carries them.
+
+** 1994 food: the declared =food_acquired= cannot be built
+
+=dicciona.pdf=, record ALIMA (35) and ALIMB (36).  =AJ04A-COD-PRODUC= /
+=AK01-COD-PRODUCT= are a *30-category* code list (301 ARROZ ... 330 OTROS).
+The only measure is money, which the dictionary splits integer/decimal
+(=AJ04B-MONT-PRODU= + =AJ04D-MONT-DECIM=, =AK03E-TOTA-ENTER= +
+=AK03D-TOTA-DECIM=).  ALIMB adds =AK02-COMO-OBTUVO= (1 COMPRA / 2
+AUTOSUMINISTRO / 3 AUTOCONSUMO / 4 AMBOS) -- a =source= dimension.
+
+*But the shipped =.dta= does not carry the dictionary's column names.*  MEASURED:
+
+#+begin_example
+REG35 cols: [_date, aj04, _casenum, _weight_, rectype, segmento, vivienda,
+             hogar, aj01, aj02, aj03, aj04a]
+REG36 cols: [_date, ak03, _casenum, _weight_, rectype, segmento, vivienda,
+             hogar, ak00, ak01, ak02]
+#+end_example
+
+There is no =aj04b=, =aj04d=, =ak03e= or =ak03d=.  The ENTER/DECIM pairs were
+already merged at export into single float32 columns =aj04= and =ak03=
+(=aj04=: 30,639 nonnull, 0.05..1040, 31% non-integer, median 5.40;
+=ak03=: 30,660 nonnull, 28% non-integer).  Coding from the dictionary gives a
+=KeyError=.
+
+*No quantity.  No unit.  No price.  No visit.*  Peru 1994 supports
+=Expenditure= by a 30-group =j= and a 4-value =s=, and nothing else.
+
+** 1991 -- ENNIV91, LSMS layout (English variable names)
+
+53 =.DTA=.  Cover =N00A.DTA= 2,308 households; roster =N01.DTA= 11,846 persons.
+
+- =hid= float32, *2,308 distinct, unique* -- min 1011, max 526192.  Structure is
+  =segment*1000 + dwelling=; safely under 2^24 so float32 is exact (unlike
+  Guatemala's =upm=).
+- =(hid, pid91)= is *unique* (11,846 of 11,846).  Every =hid= in N01 is in N00A.
+- *=cid= is NOT a cluster id*: MEASURED =nunique() == 1= (all =1.0=).  The
+  cluster is =segment= (240 distinct, 1..526).  =conglom= is 1,594/2,308 NaN;
+  =seccion= and =aer= are 100% NaN.
+- =N01.mosabs= is 100% populated, range 0-12 -> =MonthsAway=.
+- =N00A.dayi= / =moi= populated (moi in {9,10,11}) -> =interview_date=.
+- =N00B.DTA= (4,298) carries =pid90= *and* =pid91= -> person-level 1990<->1991 link.
+- Food: =N09A= (22,616) / =N09B= (17,687) by =foodcd=, with a =fdexp_i= /
+  =fdexp_d= column pair -- again expenditure only, no quantity.  *The =_i=/=_d=
+  suffixes are NOT an integer/decimal split* -- see T13; I could not determine
+  what they are.
+- Agriculture is rich: =N13B= has =cropcd=, =totcrop=, *=kgequiv=*, =crprice=,
+  =qhomcons= -- real quantities, unlike 1994.
+
+** 1990 -- ENNIV90, Lima only, SAS XPORT
+
+36 =.SSP=.  *=get_dataframe()= cannot read a single one of them* -- all 36 fail
+with =ReadstatError: Invalid file, or file has unsupported features=.
+
+I identified the format from the blob's magic bytes:
+
+#+begin_example
+b'HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!000000...  SAS     SAS
+  SASLIB  6.06    World                    09JUL92:16:50:49...'
+#+end_example
+
+These are *SAS XPORT (transport) V5* files written by SAS 6.06 in July 1992.
+=pyreadstat.read_xport()= reads them perfectly -- but only when the file has an
+=.xpt= suffix, and =local_tools.read_file()= never tries =read_xport= at any
+point in its fallback chain.  *This is a library gap, not a config gap.*
+
+Contents (read via a copied =.xpt= tempfile):
+
+- =N00A.SSP= 1,528 households.  =HID= unique; =SEGMENT= 152 distinct (235..526,
+  a Lima subset of 1991's range).  =CID= again constant =1.0=.
+  *=ZONE=, =CONGLOM=, =HHNO=, =DAYI=, =MOI= are 100% NaN* -- 1990 has no
+  interview date.
+- =N01.SSP= 7,720 persons -- but =PID90= reads as *entirely NaN*, so
+  =(HID,PID90)= collapses to 1,524 groups.  Unresolved: genuinely empty variable,
+  or an XPORT-reader artefact.  1990's roster has no usable person id via this
+  route.  =MOSABS= is also 100% NaN.
+- =PANEL.SSP= 3,326 rows: =HID=, =PID85=, =PID90=, =HHID= -- a person-level
+  1985<->1990 link (746 HID / 745 HHID).  Panel-ids material.
+- =EXPEND.SSP= 1,509: =HID=, =HHSIZE=, *=WT=* -- the only real sampling weight
+  I found anywhere in the Peru series.
+
+** 1985 -- ENNIV85-86, LSMS layout
+
+65 =.DTA=.  Cover =F0A.DTA= 5,982; roster =F1A.DTA= 27,445 persons.
+
+- =hhid= float32, 5,982 distinct, unique; = =cluster*1000 + nh= (=(cluster,nh)=
+  gives the same 5,982 groups).  Max 362,931 -- exact in float32.
+- =cluster= 362 distinct.  =PERUCOMM.DTA= (1,845 rows, 117 clusters) gives
+  =cluster -> dept= *1:1* -- =cluster= is a sound cluster key.
+- Roster person id is =mb=: =(hhid, mb)= is unique (27,445/27,445).
+  =s01a_01= is 100% NaN.
+- =EXPEND.DTA= (4,996) carries =natreg= (4 values), =regtype= (7 values -- the
+  seven study domains), =langua=, =hhsize=.
+- =FOODS.DTA= 74,878 rows -- the classic LSMS food module (=catno=, =s12a_*=,
+  =s12b_*=); =PLOTS= 8,002, =CROPS= 14,826.
+- =PRICER.DTA= 951: cluster-level commodity prices + =region=, =typeres=.
+
+*Row counts vs. documented sample sizes* (a tension worth recording): CONTENTS
+quotes catalog 597 at "5,024 viviendas" selected / 4,906 yielding information,
+and =PER14.pdf= at "5,120".  MEASURED: F0A 5,982; SIZE 5,108; EXPEND 4,996.
+None matches any of the three.  I did not reconcile this.
+
+* 4. What Peru *should* declare, on the evidence
+
+I built and ran a candidate.  This is *my* answer, written to be compared, not a
+patch I am proposing.  Everything below was executed cold.
+
+** Country =_/data_scheme.yml=
+
+The rule from the code (S6 answers Q2 formally) is: this file is the *table
+registry* -- =Data Scheme= (+ =Waves= / =wave_folder_map=) only.  Do NOT declare
+=Waves:= (CONTENTS idiosyncrasy #4).  =Index Info:= here is *inert*: every
+consumer (=country._no_v_join_tables=, =feature._canonical_index_levels=,
+=feature._fabricates_missing_levels=) reads the *package-global*
+=files("lsms_library")/"data_info.yml"=, never the country file.  GhanaLSS and
+Nepal carry the same inert block, so it is a harmless documentation convention --
+but it is documentation, and Peru's copy is Nepal's.
+
+#+begin_src yaml
+Country: Peru
+
+Data Scheme:
+  sample:
+    index: (i, t)
+    v: str
+    Rural: str
+  cluster_features:
+    index: (t, v)
+    Region: str
+    Rural: str
+  household_roster:
+    index: (t, i, pid)         # NOT (t, v, i, pid) -- see T5
+    Sex: str
+    Age: int
+    Relationship: str
+    MonthsAway: float
+  individual_education:
+    index: (t, i, pid)
+    Educational Attainment: str
+  interview_date:
+    index: (t, i)
+    Int_t: str
+  # food_acquired: NOT declarable from 1994 -- see T9.
+#+end_src
+
+** Wave =1994/_/data_info.yml=
+
+#+begin_src yaml
+Country: Peru
+Wave: 1994
+
+cluster_features:
+    file: REG01.DTA
+    idxvars:
+        v: segmento
+    myvars:
+        Region: [a01, {mapping: {'01': Amazonas, '02': Ancash, ...}}]   # string keys! T2
+        Rural:  [a06, {mapping: {'1': Urban, '2': Rural}}]
+
+sample:
+    file: REG01.DTA
+    idxvars:
+        i: [segmento, vivienda, hogar]
+    myvars:
+        v: segmento
+        Rural: [a06, {mapping: {'1': Urban, '2': Rural}}]
+        # no `weight`: _weight_ is identically 1 (T7)
+
+household_roster:
+    file: REG02.DTA
+    idxvars:
+        i: [segmento, vivienda, hogar]
+        pid: b00
+    myvars:
+        Sex: b02                                                   # auto-maps by name
+        Age: b03
+        Relationship: [b01, {mapping: [Relationship, Code, Preferred Label]}]  # T6
+        MonthsAway: b08
+
+individual_education:
+    file: REG05.DTA
+    idxvars:
+        i: [segmento, vivienda, hogar]
+        pid: e00
+    myvars:
+        Educational Attainment: e05a     # needs a NIVEL-ESTUDIO decode -- T8
+
+interview_date:
+    file: REG01.DTA
+    idxvars:
+        i: [segmento, vivienda, hogar]
+    myvars:
+        Int_t: <a17 + a18 + literal 1994, combined>   # NOT a17 alone -- T10
+#+end_src
+
+** Country =_/peru.py= -- the missing =i()=
+
+#+begin_src python
+from lsms_library import local_tools as tools
+
+def i(value):
+    """SEGMENTO(3) + VIVIENDA(2) + HOGAR(2), per dicciona.pdf COMMON items."""
+    parts = [tools.format_id(value.iloc[0], zeropadding=3),
+             tools.format_id(value.iloc[1], zeropadding=2),
+             tools.format_id(value.iloc[2], zeropadding=2)]
+    if any(p is None for p in parts):
+        return None
+    return ''.join(parts)
+#+end_src
+
+MEASURED with that in place: household ids look like =0010111=, =sample= builds
+3,623x2, and the =format_id= =ValueError= is gone.
+
+** Declarable but not declared (Q4 flags)
+
+- *1985 and 1991 are wireable today* and are in some ways *easier* than 1994:
+  both have a unique household id, a unique person id, a real cluster, months
+  absent (1991), and an interview date (1991).  1991 also has =kgequiv= crop
+  quantities that 1994 lacks entirely.  Wiring only 1994 leaves the two
+  best-documented, most-national waves =absent=.
+- *=panel_ids= is declarable* from =1990/PANEL.SSP= (=PID85=/=PID90=/=HHID=) and
+  =1991/N00B.DTA= (=pid90=/=pid91=) -- the ENNIV chain 1985->1990->1991->1994 is
+  in the data.  Nothing declares it.  NB: this is a *transitive* chain, so the
+  =attrs['id_converted']= rule in CLAUDE.md applies.
+- *=housing=* from 1994 REG03/REG04 (VIV2A/VIV2B), 1991 N02A/N02B, 1990 N02A/N02B.
+- *Community/cluster tables* from 1994 CCPP0-9, 1991 =Ccpp91.dta=, 1985
+  =PERUCOMM.DTA= + =PRICER.DTA= (cluster commodity prices).
+- *1990 is declarable only after a library change* (T1).
+
+* 5. Trap list, with detection commands
+
+Each has a MEASURED demonstration unless marked otherwise.
+
+** T1 -- 1990 is SAS XPORT and =get_dataframe()= silently cannot read it
+
+All 36 =.SSP= files fail.  No config fixes this; =local_tools.read_file()= needs
+=pyreadstat.read_xport= added to its chain (and the chain is *suffix-sensitive*:
+=read_xport= needs an =.xpt= name, so the tempfile helper must pass one).
+A fixer who "checks 1990" via =get_dataframe= will conclude the data is corrupt.
+
+Detect:
+#+begin_src python
+from lsms_library.local_tools import _ensure_dvc_pulled, _dvc_cache_path
+_ensure_dvc_pulled(fn); open(_dvc_cache_path(fn),'rb').read(80)
+# -> b'HEADER RECORD*******LIBRARY HEADER RECORD...SAS'
+#+end_src
+
+** T2 -- the org-table =Code= column is int64; the =.dta= codes are strings
+
+=DPTO.Code= and =AREA.Code= parse as *int64* (leading zeros lost: =01= -> =1=).
+=REG01.a01= is =str= with values ='06'=, ='14'=; =a06= is =str= ='1'/'2'=.
+So =[a01, {mapping: [DPTO, Code, Preferred Label]}]= builds ={1:'Amazonas',...}=
+and matches *nothing*.  It fails *silently* -- you get the raw codes.
+
+MEASURED, with the explicit org-table mapping in place:
+=Region: {'15': 132, '06': 19, '13': 19, ...}= -- still department numbers.
+Switching to a string-keyed inline dict fixes it:
+=Rural: {'Urban': 2287, 'Rural': 1336}=.
+
+This is the exact CLAUDE.md gotcha ("YAML mapping keys must be string keys ...
+not numeric ... when the raw labels are strings"), and it bites =Region= and
+=Rural= -- the two columns #684 singles out as "correctly-wired".
+
+Detect: =df['Region'].value_counts()= after the build; digits mean it failed.
+
+*Corroboration that the AREA direction (1=Urbano, 2=Rural) is right*: MEASURED
+2,287 urban / 1,336 rural households, against the catalog's documented allocation
+of 820 Lima + 1,380 urban (= 2,200) and 1,344 rural.  And 252 urban / 112 rural
+clusters against CCPP0's 111 rural community records.  Both match.
+
+** T2b -- the shipped wave YAML uses a =mappings:= key NO CODE READS
+
+=Peru/1994/_/data_info.yml= declares a *table-level* =mappings:= block
+(=Region: DPTO=, =Rural: AREA=, =Sex: Sex=, =Relationship: Relationship=).
+=Wave.column_mapping= reads only =file=, =idxvars=, =myvars=
+(=country.py:830-833=); the =mapping=/=mappings= handling lives inside
+=map_formatting_function= and fires only when a *myvar's value* is a list whose
+last element is a dict.  Peru is the *only* place in the corpus with this syntax:
+
+#+begin_src sh
+grep -rn "^    mappings:" lsms_library/countries/*/*/_/data_info.yml
+# -> Peru/1994/_/data_info.yml:11 and :27, nothing else
+#+end_src
+
+=Sex= and =Relationship= happen to work anyway via the auto-categorical
+name-match path; =Region= and =Rural= do not, because the table names are =DPTO=
+and =AREA=.  A fixer reading the YAML will believe four mappings are declared
+when zero are.
+
+** T3 -- =v: segmento= is *sound*; the composite-key remedy would make it worse
+
+MEASURED conflicts within =segmento=: 7 of 364 disagree on =a01= (DPTO), 10 of
+364 on =a06= (AREA).  But look at the shape -- every single one is
+*eleven-or-twelve households against one*:
+
+#+begin_example
+segmento 106: a01 {'20': 11, '25': 1}     segmento   4: a06 {'2': 11, '1': 1}
+segmento 120: a01 {'13': 12, '11': 1}     segmento 476: a06 {'2': 13, '1': 1}
+segmento 125: a01 {'13': 10, '01':1,'12':1}  segmento 637: a06 {'1': 13, '2': 1}
+#+end_example
+
+That is *single-household keying error*, not a reused segment number.  And it is
+corroborated: =CCPP0.DTA='s 111 rural community records give =segmento -> (dept,
+prov, dist)= that is *1:1* (0 segmentos with more than one district), and *110 of
+111* agree with REG01's modal geography.  =segmento= is globally unique.
+
+So Peru is *not* the Guatemala case.  Guatemala's =upm= was float32-rounded so
+distinct PSUs genuinely collided; Peru's =segmento= is int16 and clean.  Adding
+=(a01,a02,a03)= to the key does *not* remove the =a06= conflicts (still 10) and
+*manufactures 34 spurious clusters* (398 vs 364) by splitting real segments
+around a mis-keyed household.
+
+The remaining exposure is the Kazakhstan failure mode, and *one cluster has it*:
+#+begin_example
+segmento 634: a06 counts {'1': 11, '2': 1}  -> groupby.first() returns '2'
+#+end_example
+Eleven urban households and one rural, and =cluster_features= serves *Rural*.
+
+Detect:
+#+begin_src python
+r1.groupby('segmento')['a06'].agg(lambda s: (s.value_counts().idxmax(), s.iloc[0]))
+# flag rows where the two differ
+#+end_src
+
+*Gap*: CCPP0 covers only the 111 rural segments (all 111 have modal =a06='2'=).
+=segmento= uniqueness for the ~253 urban segments is *not* independently
+corroborated.
+
+** T4 -- one *conflicting* duplicate person id in the 1994 roster
+
+=(segmento,vivienda,hogar,b00)=: 19,284 groups / 19,285 rows.  It is not a
+repeated row -- two different people share =b00=3=.  MEASURED after the build:
+"DESTROYED 1 of 19,285 rows whose values DISAGREE".  One person vanishes.
+
+Detect: =r2[r2.duplicated(subset=['segmento','vivienda','hogar','b00'], keep=False)]=
+
+** T5 -- declaring =v= in a household table's =index:= fires a spurious
+   "SILENTLY NARROWED" warning on every call
+
+=_normalize_dataframe_index= runs *before* =_join_v_from_sample=.  So even with a
+correct =sample= table (which does deliver =v= -- MEASURED, roster index came out
+=['i','t','v','pid']=), declaring =index: (t, v, i, pid)= produces:
+
+#+begin_example
+Peru/household_roster: declared index was SILENTLY NARROWED to (t, i, pid).
+Declared index level(s) ['v'] are ABSENT from the data...
+#+end_example
+
+The Nepal template declares =v= for =household_roster=, =individual_education=
+*and* =food_acquired=.  CLAUDE.md's rule -- "Do NOT put =v= in feature
+=data_scheme.yml= indexes other than =cluster_features=" -- says the template is
+wrong.  The naive file move preserves the violation.
+
+** T6 -- kinship expansion runs BEFORE categorical mapping, and Peru is the only
+   country that trips it
+
+=_finalize_result= (=country.py:2441= then =:2447=): =_expand_kinship(df)= then
+=_apply_categorical_mappings(df)=.  Peru is the *only* country in the corpus with
+a =#+name: Relationship= table in =categorical_mapping.org=
+(=grep -rn "name: Relationship" countries/*/_/categorical_mapping.org= -> Peru
+alone), so it is the only country where kinship sees raw codes.
+
+MEASURED, decoding via the auto-categorical path:
+#+begin_example
+UserWarning: Unknown relationship labels (add to kinship.yml):
+  ['0','1','2','3','4','5','6','7','8','9']
+Affinity: {<NA>: 19284}          # 100% NA
+#+end_example
+
+MEASURED, after moving the decode into the wave YAML (so the extracted column
+already holds labels):
+#+begin_example
+UserWarning: Unknown relationship labels (add to kinship.yml):
+  ['Conyuge','Hijo/a','Jefe','Nieto/a','Padre/Suegro','Pensionista',
+   'Persona no pariente','Trabajador domestico','Yerno/Nuera']
+Affinity: {<NA>: 18400, 'consanguineal': 884}    # only 'Otro pariente' resolves
+#+end_example
+
+=kinship.yml= has Spanish entries, but they are *Guatemala ENCOVI's* strings --
+="Jefe (A)"=, ="Yerno - Nuera"=, ="Nieto (A)"=.  Nine of Peru's ten labels are
+absent.  =Generation=/=Distance=/=Affinity= are *required* columns for
+=household_roster=, so the roster is broken (95.4% NA) even after the =i()= fix.
+
+Note also =Padre/Suegro= conflates a consanguineal parent with an affinal
+parent-in-law -- one code, two kinship tuples.  I flag it; I do not resolve it.
+
+Detect: =grep -i "jefe\|conyuge\|yerno" lsms_library/categorical_mapping/kinship.yml=
+
+** T7 -- =_weight_= is an export artefact, not a sampling weight
+
+Every 1994 file: =_weight_= is =int8=, =nunique()==1=, value =1=.  The catalog
+prints seven domain expansion factors that are nowhere in the data.  Wiring
+=weight: _weight_= into =sample= would ship a weight column of ones that looks
+plausible and silently defeats every weighted computation.  (1990's
+=EXPEND.SSP.WT= is the only real weight in the series -- and 1990 is unreadable.)
+
+** T8 -- =format_id= is not applied to myvars -> float-stringified values
+
+MEASURED, =individual_education= built from =REG05.e05a=:
+#+begin_example
+Educational Attainment: {'2.0': 6583, '3.0': 5233, '6.0': 1280, '5.0': 809, ...}
+#+end_example
+=e05a= is float (it has NaNs), reaches =myvars=, and stringifies with =.0=.
+The dictionary gives =E05A-NIVEL-ESTU  N 16  NIVEL-ESTUDIO 1:7= with *no value
+labels*, and =categorical_mapping.org= has no NIVEL-ESTUDIO table -- so the
+labels are not in the repo at all and would have to come from =pe94hhq1.pdf=.
+
+Same build also reported: "DESTROYED 5 of 15,942 rows ... Additionally *1 row(s)
+carry NaN in a declared index level and are DELETED OUTRIGHT*".
+
+Detect: =is_this_feature_sane()= / =_check_float_stringified_index=, or
+=df['Educational Attainment'].str.endswith('.0').any()=.
+
+** T9 -- the declared =food_acquired= schema is unsatisfiable from 1994
+
+Declared: =(t, v, visit, i, j, u)= with =Quantity=, =Price=, =Produced=.
+Available (dicciona.pdf, ALIMA/ALIMB): a 30-code =j=, an =s=-like
+=AK02-COMO-OBTUVO=, and money only.  No quantity, no unit, no visit, no price.
+Anyone "wiring food_acquired for Peru" from the template is being asked for
+columns the survey did not collect.  1991/1985 have quantity data
+(=N13B.kgequiv=, =FOODS.DTA=); 1994 does not.
+
+** T10 -- =Int_t= wired to the day field yields 100% NaT, silently
+
+MEASURED with =Int_t: a17= (DIA): the delivered column is =NaT= for all 3,623
+rows.  Mechanism: the *canonical* schema declares
+=Columns: interview_date: Int_t: {type: datetime}=
+(=lsms_library/data_info.yml:267-274=), and =_enforce_canonical_dtypes= runs
+*after* =_enforce_declared_dtypes= and wins over the country file -- so Peru's
+=Int_t: str= is overridden and a bare day-of-month is handed to =to_datetime=,
+which yields =NaT= (with only a "Could not infer format" warning).  The date must
+be assembled from =a17= (day) + =a18= (month) + a *literal* 1994 (there is no
+year field), and =a18= runs to 8 though the dictionary declares 05:07.
+Downstream, =conversion.py:110= is the consumer that would silently fall back to
+wave-nominal dates.
+
+Detect: =df['Int_t'].isna().mean()= immediately after the build.
+
+** T11 -- =LENGUA= in =categorical_mapping.org= is WRONG for 1994
+
+Not on my task list, but it is a live decode error in the file a fixer will
+touch.  The org table claims 7 codes; =dicciona.pdf= =B06-LENGUA= declares 9:
+
+| code | org file           | dicciona.pdf (1994) |
+|------+--------------------+---------------------|
+|    4 | Otra lengua nativa | CAMPA               |
+|    5 | Ingles             | SHIPIBO             |
+|    6 | Otro extranjero    | OTRO-NATIVO         |
+|    7 | No habla           | INGLES              |
+|    8 | (absent)           | OTRO-EXTRANJERO     |
+|    9 | (absent)           | NO-HABLA            |
+
+MEASURED: =REG02.b06= takes 9 distinct values, 1..9.  The org file's header
+asserts "verified against 1994 frequency distributions" and "Codes are consistent
+across waves" -- for =LENGUA= that is false.  (=EST-CIVIL=, =Sex=, =AREA= and
+=DPTO= do check out against the dictionary.)  This is the #676 shape exactly: an
+unobservable mapping that turns out to be wrong the moment it becomes observable.
+
+** T12 -- =cid= is not a cluster id in 1990 or 1991
+
+MEASURED: =nunique() == 1= in both.  The cluster is =segment= (or =hid // 1000=).
+A wiring that reads "cid" as "cluster id" puts every household in one cluster.
+
+** T13 -- the 1990/1991 =_i= / =_d= column pairs are NOT integer+decimal
+
+I asserted this by analogy with 1994's dictionary-proven ENTER/DECIM split and
+then tested it.  *The analogy is false.*  MEASURED on 1991 =N09A.DTA= (22,616 rows):
+
+| column     | min  | max | >99 | fraction non-integer | distinct |
+|------------+------+-----+-----+----------------------+----------|
+| =fdexp_i=  | 0.01 | 300 |   1 |               0.6437 |      414 |
+| =fdexp_d=  | 0.00 | 315 |   1 |               0.0000 |        5 |
+
+=corr(fdexp_i, fdexp_d) = 0.0063=.  Three facts each independently kill the
+integer/decimal reading: =_i= carries its own decimals (64% non-integer -- 2.50,
+6.60, 1.20); =_d= takes only *five* distinct values and is almost always 0; and
+=_d= exceeds 99 (max 315; =N05B1.amtpdb1d= reaches 5,000), which no decimal part
+can.  The same shape holds in =N08A= (=expd_d=: 2 distinct values) and in 1990
+(=FDEXP_D=: 5 distinct).  Note also that =N02B= orders its pair =lpmt_d,
+lpmt_i= -- d before i.
+
+I do *not* know what they are.  A plausible reading given the period -- ENNIV 90
+was fielded in intis during hyperinflation, ENNIV 91 in =moi= 9-11, months after
+the July-1991 nuevo sol reform, and =1990/DEFLATE.SSP= carries =EXRATEI= -- is
+*intis vs. dólares* (amount reported in either currency).  That is a hypothesis,
+not a finding.  Recorded in Gaps.
+
+*Why this matters*: it is the difference between =Expenditure = i + d/100= and
+=Expenditure = i= (with =d= a separate hard-currency amount needing conversion).
+Getting it backwards silently corrupts every 1990/1991 expenditure number.
+
+** T14 -- 1994 =ak03= has a 99999.99 sentinel the framework will not catch
+
+MEASURED: =REG36.ak03= max = =99999.9921875= (float32 for 99999.99).
+=grab_data='s large-sentinel scrubber only fires above =1e99=
+(=country.py:1112-1115=), so this passes straight through as a real expenditure.
+
+Also MEASURED: neither =(segmento,vivienda,hogar,ak01)= (30,592 of 30,681) nor
+=(segmento,vivienda,hogar,ak01,ak02)= (30,615 of 30,681) is unique -- so even a
+correctly-scoped =(t,i,j,s)= food index for 1994 carries ~66 duplicate tuples
+before any collapse.
+
+* 6. The file-semantics split (Q2), stated from the code
+
+| file                              | read by                                   | keys the reader looks for                                       |
+|-----------------------------------+-------------------------------------------+-----------------------------------------------------------------|
+| =countries/{C}/_/data_scheme.yml= | =Country.resources= (=country.py:1604=)   | =Data Scheme= (table registry, per-table =index:= + dtypes + =materialize=), =Waves=, =wave_folder_map= |
+| =countries/{C}/{w}/_/data_info.yml= | =Wave.resources= (=country.py:567=)     | one block per table: =file=, =idxvars=, =myvars=, =dfs=, =derived=, =drop= |
+| =lsms_library/data_info.yml=      | =feature._canonical_index_levels=, =country._no_v_join_tables=, =_load_canonical_spellings= | =Index Info=, =Columns=, =Join v from sample= |
+
+The country-level =index:= key is *not* decorative -- =_declared_index_levels=
+(=country.py:4059=) feeds =_normalize_dataframe_index= (=country.py:4852=), which
+synthesises missing levels, reorders, drops undeclared levels, and collapses
+duplicates.  That is where the =GrainCollapseWarning= comes from.
+
+*Peru files on the wrong side of the line*:
+
+1. =Peru/_/data_info.yml= is a *country* file with a wave-file *name*.  Its
+   =Data Scheme:= belongs in =_/data_scheme.yml= -- this is #684, and it is right.
+2. Its =Waves:= key must be *dropped*, not carried over (idiosyncrasy #4).
+   It breaks =Country.waves= outright if there is no =_/peru.py=, and is dead
+   config if there is one.
+3. Its =Index Info:= is inert at country level.  Harmless (GhanaLSS/Nepal do it),
+   but it is Nepal's block verbatim and should not be treated as a Peru decision.
+4. =Peru/1994/_/data_info.yml='s table-level =mappings:= key is on *neither*
+   side -- no reader anywhere consumes it (T2b).
+5. The per-table =index:= values are Nepal's, and three of the five
+   (=household_roster=, =individual_education=, =food_acquired=) declare =v= in
+   violation of CLAUDE.md's rule (T5).
+
+* 7. Gaps -- things I could NOT establish
+
+1. *1994 sampling weights.*  =_weight_= is identically 1; the catalog's seven
+   domain factors are not in the microdata, and I could not identify a variable
+   carrying the study domain.  =a05-CATEGORIA= (12 values) and =a04-NOMBRE=
+   (centro poblado, 385 codes) are the candidates I did not resolve.  Decision
+   needed, not a bug.
+2. *1990 =PID90= reads as entirely NaN* via the XPORT route.  I could not tell
+   whether the variable is genuinely empty or the reader mis-parses it.  Until
+   that is settled, 1990 has no person key.
+3. *=NIVEL-ESTUDIO= (=e05a=) labels* are not in this repository -- the dictionary
+   gives the range 1:7 and no labels, and there is no org table.  Wiring
+   =individual_education= without reading =pe94hhq1.pdf= would ship unlabelled
+   codes.
+4. *=segmento= uniqueness for urban segments.*  Corroborated only for the 111
+   rural segments CCPP0 covers.
+5. *1985 row counts vs. documented sample sizes* -- F0A 5,982 / SIZE 5,108 /
+   EXPEND 4,996 against the documented 5,024 / 4,906 / 5,120.  Not reconciled.
+   Similarly 1991: N00A has 2,308 households against the catalog's "2,252
+   viviendas".
+6. *The 1991 Selva / Costa Rural tension* (CONTENTS §1991) is untouched; that
+   file deliberately declines to adjudicate it and so do I.  It matters for
+   =cluster_features.Region= only if someone aggregates.
+7. *The two CI failures named in the #684 owner comment*
+   (=test_schema_consistency=, =test_table_structure=) I did *not* re-run --
+   taken on trust.  My independent build reproduces the two underlying defects
+   they would be reporting.
+8. I did not open =pe94hhq1.pdf= / =pe94hhq3.pdf= / =m-encues.pdf=; my 1994
+   variable semantics come from =dicciona.pdf=, which is authoritative for
+   positions/ranges but sparse on value labels.
+9. *The meaning of the 1990/1991 =_i= / =_d= column suffixes is unresolved*
+   (T13).  I falsified the integer/decimal reading empirically but could not
+   establish the true one; my intis-vs-dólares hypothesis is untested.  No
+   1990/1991 monetary column should be wired until this is settled -- there is no
+   1990/1991 data dictionary in this repository, so it likely needs the INE /
+   Instituto Cuanto technical document that CONTENTS already records as missing.
+10. My earlier draft of this report asserted the integer/decimal reading for
+    1990/1991 by analogy with 1994.  It was wrong and is corrected here; I record
+    the error rather than quietly deleting it, because the analogy is exactly the
+    one a fixer is likely to make.
+
+* 8. What is on disk in this worktree
+
+Experimental only -- *not a proposed patch*, not committed, not pushed:
+
+- =lsms_library/countries/Peru/_/data_scheme.yml= (new; my candidate)
+- =lsms_library/countries/Peru/_/data_info.yml= (deleted)
+- =lsms_library/countries/Peru/_/peru.py= (new; the =i()= formatter)
+- =lsms_library/countries/Peru/1994/_/data_info.yml= (rewritten; candidate)
+- this file

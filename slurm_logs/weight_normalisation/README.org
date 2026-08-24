@@ -1,0 +1,112 @@
+#+title: Evidence -- within-wave sampling-weight normalisation
+#+date: 2026-08-22
+
+Raw measurements behind the change that rescales =sample.weight= and
+=sample.panel_weight= to within-wave mean 1 in =Country._finalize_result=
+(=lsms_library/country.py::_normalise_sample_weights=).
+
+All runs: worktree code (=PYTHONPATH= asserted via
+=assert 'worktrees' in lsms_library.__file__=), private =LSMS_DATA_DIR= with
+the shared =dvc-cache= symlinked in.  Warm =sample= parquets copied from the
+shared root, so before and after read the same cached bytes -- the only
+difference between the two sweeps is the read-path transform.
+
+* Files
+
+| file                  | what                                                                 |
+|-----------------------+----------------------------------------------------------------------|
+| =sweep.py=            | builds =Country(c).sample()= for every country, per-wave weight stats |
+| =corpus_before.csv=   | that sweep on =origin/development= (328c7d8b), pre-change             |
+| =corpus_after.csv=    | the same sweep with the change applied                                |
+| =analyse.py=          | before/after comparison that produced the PR table                    |
+| =hash_probe.py=       | =Country._table_cache_hash= x 10 countries x 5 tables, plus every     |
+|                       | =build_transforms_fingerprint=                                        |
+| =hash_before.json= / =hash_after.json= | byte-identical: 0 of 50 table hashes and 0 of 6 fingerprints moved |
+| =ratio_proof.py=      | raw L2-country parquet vs. API weights, per-wave and pooled           |
+| =ratio_invariance.txt= | its output: worst per-wave weighted-share difference 2.2e-16         |
+
+*Reading =ratio_invariance.txt=:* one "mean api" cell reads =1.000189=
+(Uganda 2019-20), not =1=.  That is not a miss.  =ratio_proof.py= restricts
+to rows with a non-null =Rural= so a share can be computed, and Uganda's
+=Rural= is =<NA>= for 96 households; the figure is the mean over that
+/subset/, while the wave's actual mean is 1 (=corpus_after.csv=, which uses
+every row).  Every other country's =Rural= is complete, which is why only
+that one cell shows it.
+
+* Headline numbers
+
+** Before: two scales, nothing marking which
+
+| type       | cells | min mean | median mean | max mean |
+|------------+-------+----------+-------------+----------|
+| normalised |    13 | 1.000000 |    1.000000 | 1.000167 |
+| expansion  |    80 |    25.72 |      630.98 |  8658.97 |
+
+93 weighted (country, wave) cells across 31 countries.  =CotedIvoire= is the
+only country holding both types (4 LSMS waves at mean 1.0000, 2018-19 EHCVM at
+443.42).
+
+** After
+
+- =weight=: 93 of 93 cells at mean 1; max |mean - 1| = *4.44e-16* (2 ULP).
+- =panel_weight=: 83 of 83 cells at mean 1; same max deviation.
+- =sum(weight)= equals the wave's non-null count in 93 of 93 cells.
+- Row counts, index, and the set of weighted cells are unchanged.
+
+** Edge cases found in the corpus
+
+- *No negative weights anywhere* (0 cells, both columns).
+- *Zero-valued weights*: 2 cells, 1,959 rows, all =panel_weight= (Uganda
+  2013-14: 412 rows; 2015-16: 1,547) -- refreshment households.  Their waves'
+  means are positive, so they normalise correctly and the zeros stay zero.
+- *All-null cells* (skipped silently, no divisor exists): 11 cells in 7
+  countries -- China 1995-97; GhanaLSS 1987-88, 1988-89, 1991-92, 1998-99;
+  GhanaSPS 2013-14, 2017-18; Kazakhstan 1996; Pakistan 1991; Panama 1997;
+  Tajikistan 1999.
+- *No =WeightNormalisationWarning= fired anywhere in the corpus.*
+
+* The scale check moved layers (added 2026-08-22)
+
+=test_weighted_population_stable_across_waves= detected a miscoded weight
+variable through cross-wave population jumps.  After this change every
+API-level total is the wave's household count, so that form could only ever
+pass.  The check now reads the *raw* L2-country parquet, which still holds the
+survey's own scale.  See =.coder/ledger/weight-normalisation.md= §7.
+
+| file                   | what                                                         |
+|------------------------+--------------------------------------------------------------|
+| =raw_probe.py=         | per-wave RAW mean/sum from every =var/sample.parquet=        |
+| =negative_control.py=  | doctors real parquets with two miscodings, checks each fires |
+| =negative_control.txt= | its output -- the proof the new tests are not vacuous        |
+| =xpass_attrib.py=      | attributes the suite's 1 xpassed by neutralising the transform |
+
+** The two classes are separated by an empty band
+
+| class                               | cells | raw mean range           |
+|-------------------------------------+-------+--------------------------|
+| self-weighting / already-normalised |    13 | 0.99999999 .. 1.00016665 |
+| expansion                           |    80 | 25.7197 .. 8658.9664     |
+
+Gap = *25.7x, containing zero cells*.  The test constants (1.01, 10.0)
+bracket that measured band; they are not tuned knobs, and
+=test_raw_weight_scale_classes_are_unambiguous= fails if a real wave ever
+lands inside it.  A weight wired to household size lands at mean ~5 --
+squarely inside.
+
+** Negative control: each check fires on its own fault, and they are complementary
+
+| injected fault                                      | class check | stability check |
+|-----------------------------------------------------+-------------+-----------------|
+| Uganda 2018-19 weight <- household size (mean 5.10) | *FIRES*     | passes          |
+| GhanaLSS 2016-17 weight x10 (mean 5210)             | passes      | *FIRES* (11.06) |
+| four untouched countries                            | silent      | pass / skip     |
+
+Neither check alone catches both faults, which is why there are two.
+CotedIvoire (four waves at raw mean 1.0000 + one at 443.42) classifies
+cleanly and skips the stability check with an explicit reason.
+
+** Pre-existing gaps (identical before and after, not caused by this change)
+
+- =Nepal= -- =sample()= raises =PathMissingError= (no microdata in this
+  checkout; see =CLAUDE.md= §"Countries Without Microdata").
+- =Armenia=, =Peru= -- no =sample= in =data_scheme=.

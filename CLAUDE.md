@@ -368,6 +368,14 @@ Rules:
 - Do NOT bake `v` into feature parquets. Wave scripts should write `(t, i, ...)` and let the framework join.
 - Do NOT use `dfs:` merge blocks just to join `v` from a cover page — collapse to a single-file extraction.
 - Two weight types: `weight` (cross-sectional; positive for all interviewed HH including refreshment); `panel_weight` (longitudinal; NaN/zero for refreshment). Pre-refreshment waves have the same value in both columns.
+
+**Weights are normalised to within-wave mean 1 at API time.** For each `(country, wave)`, `_normalise_sample_weights()` in `_finalize_result` divides `weight` and `panel_weight` — each by *its own* non-null mean — so both columns come back with mean 1.0 in every wave. **The parquet keeps the raw values**; this is a read-path transform like kinship and spellings, so `pd.read_parquet(cache_path)` still shows expansion weights. A future `weights='expansion'` kwarg on `sample()` therefore stays possible; it is deliberately **not** built.
+
+*Why.* The corpus shipped two incompatible scales with nothing marking which was which: 13 of 93 weighted cells were already normalised (mean 1.0000), 80 were expansion weights summing to a national population (wave means 25.7 → 8,659). **CotedIvoire mixed both across its own waves** (1985–89 LSMS `ALLWAITN` ≈ N households vs. 2018–19 EHCVM population-scaled), so a user summing across waves got numbers three orders of magnitude apart, silently. GhanaLSS avoided the hazard by leaving four waves' weights NULL — a workaround this supersedes (see `GhanaLSS/_/CONTENTS.org`).
+
+*The rule needs no threshold and no configuration*: divide by the wave's own mean. Already-normalised weights are divided by 1.0000 and are unchanged; expansion weights become normalised. Deterministic and idempotent — which matters because `_join_v_from_sample` re-enters `sample()` while finalising every other household-level table. A `(wave, column)` group whose non-null mean is 0, negative or non-finite is **left at its raw scale** with a `WeightNormalisationWarning` rather than emitting `inf`; an all-null column (GhanaLSS GLSS1–4) is skipped silently. **Do not add a "mean > N" heuristic** — it would be a magic threshold where none is needed.
+
+*What it costs, stated plainly.* **Weighted ratios, shares and means are exactly unchanged** — scaling every weight in a wave by one positive constant cancels in `Σwx/Σw`, and that invariance is what makes the change safe. But `sum(weight)` is now a wave's household count, not a population estimate, so **cross-wave pooling no longer reflects relative wave sizes**: each wave contributes in proportion to its sample size, not its population. That is fine for the stated use (we are not estimating population totals) and is already what the corpus did for the 13 normalised cells — but it is a real property, not a rounding detail. It also means a miscoded weight variable can no longer be caught by a cross-wave population jump at API level; check the raw parquet or the wave config instead (the former `test_weighted_population_stable_across_waves` did exactly that, and its CotedIvoire xfail described precisely the mixing this removes).
 - Country caveat: `Country(name).household_roster()` only gets `v` in the index if the country has `sample` in its `data_scheme.yml`.
 - `_join_v_from_sample()` skips when `v` is already in `df.columns` (not just `df.index.names`), so legacy scripts with `v` as a non-index column still work. Prefer putting `v` in the index or nowhere in new code.
 
@@ -384,6 +392,41 @@ Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_l
 result = flat.set_index(new_idx)
 result.attrs = dict(df.attrs)  # preserve id_converted flag
 ```
+
+**Re-measured under the pinned pandas 3.0.2 (2026-08-22).** The 2.x claim above is no longer accurate, and the replacement is *one rule*, not a list of methods:
+
+> **`attrs` survive an operation only when every input agrees. Any disagreement — including one side having none — yields `{}`.**
+
+That single sentence covers `merge` and `concat` together, and makes single-input operations (`set_index`, `reset_index`, `rename`, `astype`, `dropna`, `groupby().first()`, `copy`) obviously safe: one input, nothing to disagree with. Measured, all seven cells:
+
+| operation | inputs | `attrs` |
+|---|---|---|
+| `set_index` (and every single-input op above) | one | **preserved** |
+| `merge` | both sides identical | **preserved** |
+| `merge` | sides differ | `{}` |
+| `merge` | other side has none | `{}` |
+| `merge` | neither side has any | `{}` (nothing to keep) |
+| `concat` | inputs identical | **preserved** |
+| `concat` | inputs differ, or one has none | `{}` |
+
+**State it as the rule, never as "merge drops".** The per-method framing is wrong in *both* directions, which is what makes it dangerous: "merge always drops" is false, and someone who tests `merge` with matching `attrs`, watches it preserve, and generalises reaches the opposite falsehood. Test the *disagreeing* case or you have not tested anything.
+
+The rule is also what tells you the **mitigation, of which there are two**: copy `attrs` across explicitly after the operation (what this repo does for `id_converted`), *or* make the inputs agree beforehand. Told only "merge drops", you will never reach for the second — and the second is sometimes what is already happening. `Country._join_v_from_sample` is a live example: since both `sample()` and the table being joined pass through `_finalize_result`, both now carry the *same* population record, so that merge lands in the **preserving** row (measured on Liberia, Ethiopia and Albania). It *also* copies `attrs` explicitly, which is what keeps it correct for a country whose two tables cover different waves and therefore disagree. Belt and braces there is deliberate; do not remove either.
+
+Where a disagreement is **by design**, the drop is guaranteed and an explicit re-attach is load-bearing rather than decorative: cross-country `Feature()` assembly is a `concat` over frames whose population records differ on purpose (one per country), so it lands in the `{}` row on every multi-country call. `tests/test_population.py::TestAttrsSurvival` pins all seven cells — deliberately including the **preserving** ones, so a future pandas that dropped unconditionally goes red instead of silently making the re-attach look redundant.
+
+## The Population Record — what a sample REPRESENTS (GH #603/#601)
+
+Two "nationally representative" surveys can represent different populations. `countries/{C}/_/population.yml` records, per **wave**, what the survey's own documentation says its sample represents. Read it via `Country(name).population` (a `{wave: PopulationRecord}` dict) or off `df.attrs['population']`, which has the shape `{country: {wave: record}}` from both `Country(...)` and `Feature(...)`. Full guide: `docs/guide/population.md`.
+
+- **The universe is a property of the `(country, wave)` cell.** Ethiopia ESS W1 was designed for rural areas and small towns (503 urban households); 2018-19 has 3,655. A panel across W1→W5 pools a universe that moved. Every one of those waves grades `sane`.
+- **`Feature()` warns; it never fences.** #603 proposed excluding `specialized` frames by default and @ligon declined: a default that silently drops data is the same disease as one that silently pools it. The warning (`PopulationHeterogeneityWarning`) fires once per `Feature()` call, names the classes, and says nothing was dropped. `Country(...)` calls attach the record and stay silent.
+- **`universe_tag` NEVER travels alone.** It is an *editorial* reading — the source sweep says so in capitals — so it is stored, returned and reported only alongside `source_type` (`local-documentation` / `wb-catalog` / `not-found`) and `confidence` (`high` / `medium` / `low`, where `low` means "this is sample-design text and should not be laundered into a universe"). `PopulationRecord.from_config` refuses a record missing any of the three, and validates all three against their vocabularies. Same invariant, same reason, as `capability.audit()`.
+- **The warn-time `national` collapse is not a re-tagging.** `national-all-households` and `national-claimed` compare as one `national` class *in the warning only*; the difference between them is epistemic (does any document name the population?), which `source_type`/`confidence` already carry. The two tags stay distinct in config, in `attrs`, and in every report — 28 waves are `national-claimed`. Do not "simplify" the vocabulary to nine tags.
+- **`unrecorded` ≠ `not-stated`.** `not-stated` (7 waves) means the sweep looked and found no statement; `unrecorded` is a library-side sentinel meaning nobody has looked. Both surface as UNKNOWN in the warning, never as "different".
+- **The files are GENERATED.** Edit `slurm_logs/POPULATION_STATEMENTS_2026-07-21.org` (the verbatim evidence base for all 111 waves) and re-run `python scripts/promote_population_records.py`. It aborts unless every entry agrees with the document's own summary table and the tag / source / confidence histograms match the counts the document publishes.
+- **Config placement is load-bearing, not taste.** `population.yml` is a *sibling* of `data_scheme.yml`, never a block inside it: `Country._table_cache_hash` hashes `data_scheme.yml` by name, and `_input_hash` / `_table_cache_hash` glob `_/*` only for `_BUILD_INPUT_SUFFIXES = {.py,.csv,.json,.txt,.tab,.tsv}` plus `*.org`. A new `.yml` moves no cache hash; a `Population:` block in `data_scheme.yml` would cold-rebuild the whole corpus. Measured: all 524 `(country, table)` hashes byte-identical before/after.
+- **Attach point is load-bearing too.** The record is attached in `Country._finalize_result`, which is in `_build_registry._EXCLUDED_CALLABLES` — so it costs no cache invalidation. Attaching from `_aggregate_wave_data`, `Wave.grab_data`, or the generated method would move `build_transforms_fingerprint` for every table.
 
 ## Gotchas with Teeth
 

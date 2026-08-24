@@ -1,0 +1,40 @@
+#+title: Peru #684 / PR #691 --- independent review artifacts
+#+date: [2026-08-22 Sat]
+
+Rescued from agent worktrees before pruning.  *None of this was ever
+committed*; all three artifacts existed only as untracked files inside
+=.claude/worktrees/=, one =git worktree remove= away from gone --- while being
+cited by name in =slurm_logs/HANDOFF_2026-08-21_recovered.org= and in the
+review trail on PR #691.
+
+* Contents
+- =GROUNDTRUTH_684.org= (863 lines) --- a *blind* derivation of the Peru config.
+  The agent was forbidden to read the fix branch, the rescue commit, or the
+  task ledger, and derived a candidate config from the raw data alone.  Its
+  value is that divergence from the fix is *evidence*, not opinion.
+- =PATCHREVIEW_691.org= (747 lines) --- the adversarial patch review of PR #691,
+  which used the blind derivation above as its oracle.  Verdict:
+  FIX-THEN-MERGE.
+- =blind_candidate_config/= --- the blind agent's own =data_scheme.yml= and
+  =peru.py=, never applied.  Keep for comparison against what shipped.
+
+* Why these mattered
+Two of the merged PR's claims were overturned by this pair:
+1. *1990 is not an acquisition blocker.*  The =.SSP= files are SAS Transport
+   V5 and readable today --- a =local_tools= reader gap (#699).  Note
+   =pyreadstat.read_xport= reads them *incorrectly and silently* (7 of 10
+   columns all-NaN); =pandas.read_sas(..., format='xport')= is the correct
+   route.
+2. =Otro Pariente -> [0,0,consanguineal]= was *refuted by a manual this repo
+   ships* --- =m-encues.pdf= Pregunta No 1 defines code 7 across Generation
+   -3..+3, Distance 0..2 and both affinities.  Now =[null, null, null]=.
+
+Both survived only because the derivation was run *blind*.  A reviewer given
+the fix to check would have had no independent ground truth to check it
+against.
+
+* Caveat
+These are agent work products, not curated documentation.  The blind report
+self-corrects at least one of its own claims mid-document (the 1990/1991
+=_i=/=_d= column-pair hypothesis, tested and found false).  Read them as
+evidence with provenance, not as settled fact.

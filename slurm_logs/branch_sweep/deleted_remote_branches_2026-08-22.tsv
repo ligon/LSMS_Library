@@ -1,0 +1,69 @@
+# 59 remote branches deleted 2026-08-22 (60 listed; one was a false entry, see correction below), all merged into origin/development (328c7d8b)
+# restore any with:  git push origin <sha>:refs/heads/<branch>
+#
+#branch	sha	subject
+# CORRECTION: the row below was a FALSE ENTRY and nothing was deleted for it.
+# `origin` is the SHORT name of refs/remotes/origin/HEAD (the symbolic default-branch
+# pointer), not a branch.  My filter grepped -v "origin/HEAD" against the SHORT name,
+# which is "origin", so it never matched and HEAD entered the list.  The delete
+# correctly failed with "remote ref does not exist".  59 branches were actually deleted.
+#origin	7200488045d48c6c9007ac3a074aee00fdecadd0	docs: v0.9.1 release notes
+audit/ghana-correctness	c3beba362a1ad407923368ce38afc821b09545cc	Merge pull request #678 from ligon/docs/ghanalss-absent-verdicts
+chore/218-phase1-retire-harmony	8f3fe9c3f6a7604b8d4bdc3af35af9b9cdb18c0d	chore(#218): retire harmony.py (Phase 1) + rev-2 design note
+ci/publish-workflow-dispatch	a87d6a10933ae3e06145e9b3a11a15968d16a298	ci(publish): add workflow_dispatch(tag) trigger + build from the tag e
+ci/pypi-publish-on-release	dd522ea7ab1f8f66966e965988e286875dbde758	ci: publish to PyPI on GitHub Release (Trusted Publishing / OIDC)
+claude/trusting-goldberg-7i60sv	78ccc5a347be4b90e867c8b520acd2c90cc75a9d	docs(slurm_logs): scope LSMS+ individual/intra-household disaggregatio
+docs/601-universe-in-contents	765f90ec8535a880c3d7f5af6dc98a5675aba04b	docs(#601): record the sampling universe, exclusions and sub-samples i
+docs/683-ethiopia-urban-definition	9035b92d3a82f8512b1e1dce8300b2a01a7c9491	docs(#683): Ethiopia's `Rural` column is not comparable across waves
+docs/branch-audit-2026-07-27	1b5b6eed3399b2c30e59333b9ada15dcc0c92d30	docs: branch audit — why 26 #323 country fixes never merged
+docs/ghanalss-absent-verdicts	566a9dde2f1ceab70538fa334417d2128bff7ff2	docs(ghanalss): adjudicate the 11 absent coverage cells
+docs/orphan-rural-table	9b9682937b10927654e85384ea9d580cf57ececa	docs(GhanaLSS): qualify the rename recommendation; date the urbrur_abb
+docs/release-0.8.0	915ef5f6df97299752f0e7a1349bf5cac6028f04	docs(release): document automated CI publish + finalize v0.8.0 notes
+docs/release-notes-v0.9.0	611ac9e93a3b69600d3be5b18ed378ee2e10920f	docs(release): v0.9.0 notes
+docs/rural-values-audit	4981d264f7a844de0d1be4b78a95083911795a21	docs(rural): mark the Semi-urban recommendation superseded by the ship
+docs/sentinel-1p7498e100	d66cace5addd315fbc1ad48b0fdd7df1aeacb1c4	docs: correct "nothing declares it" — China 1995-97 already did
+docs/settlement-threshold-scoping	db8b651e3e9e1cbf5976ffbc71881802bfda6e94	docs: restructure around the ENTITY question; integrate full Q2 sweep
+docs/units-skill-densefile-addendum	f3c24c58f1a043fce51d6b827a6f8ea97a37dac9	docs(skill): food-acquired/units — huge-file metadata-only label lift 
+feat/170-housing-harmonization-rollout	51d0545dd86c13f0f5dab71cf4208b036205047e	feat(#170): roll out housing Roof/Floor harmonization to 8 more countr
+feat/218-ghanasps-food-acquired-canonical	2a04ed3663b4a7bc8886dc4bb10336a9814ad685	feat(GhanaSPS): canonicalize + register food_acquired (#218 Phase 3)
+feat/218-serbia-food-acquired-canonical	425f7ceb14a58d081a8e858dc10ad166fb06f8f4	feat(#218): canonical Serbia food_acquired + register; derived food ta
+feat/682-label-selection	7b623028dcb2c383f16ca41329c8542036524fe8	test(#682): cover the derived-food branch, and stop the fixtures passi
+feat/682-semi-urban	3da45b45f75efb1cb56e6593396dc5690157255f	docs(#690): tighten three claims in the SU->Rural evidence note
+feat/ghanasps-household-roster	5d72c56f32667e6bf1dd98b61168ef46409c5232	fix(GhanaSPS): wire wave-1 MonthsAway — a blank Q27 means "not away"
+feat/labels-unavailable-contract	d6af528fbf04a77d5fbbcb1c7047b2e34c8a0109	feat(labels): loud structured degrade for labels=X on countries lackin
+feature/coverage-matrix	7c06bb2afc8a917f0269e303be72ac99a0803e47	feat(coverage): opt-in self-resubmitting auto-refresh (Savio) + expiry
+fix/323-albania-config	8992b835538907be8ab5cf95a34eb07367bb30ed	Merge remote-tracking branch 'origin/development' into fix/323-albania
+fix/323-assets-item-seq	74d135fcc88f27f47c21ca023f68fea5a1b13f27	docs(#323): record where this departs from Nigeria's KNOWN OPEN DEFECT
+fix/323-china	e6b85dae8c5dc5830ce911c9224d6018502d3cdc	fix(china): make declared indexes unique at source, not by silent coll
+fix/323-ghanalss-config	8945b7100e409d79a64feb643a0bcb29df8f69a3	docs(#622): withdraw Fix 1 (GLSS1/GLSS2 cluster_features) -- supersede
+fix/323-guyana	2e3a1e5b128d97d67ae59ae5509b170014850eeb	docs(Guyana): record the two ways the #323 enforcement went blind
+fix/323-malawi-cartesian	a689f88b8da1e4a461c37a59b313568b39234535	Merge remote-tracking branch 'origin/development' into fix/323-malawi-
+fix/323-niger-geo-regression-test	65969df6c799f887801ee9b922609531b6867fc8	test(#323): belt as well as braces — `requires_s3` on the Niger data t
+fix/323-pakistan	64633a261f398162fe5f950da19f6a364269bcf4	Merge remote-tracking branch 'origin/development' into fix/323-pakista
+fix/323-serbia	8a4f1058f0921da32502b3036b94dc91058414b8	Merge remote-tracking branch 'origin/development' into fix/323-serbia
+fix/323-site4-dfs-merge	4a7df10cf223f3ee0c91b72e700f7290d0dbb806	docs(#627 review): record the full-suite run — 2 failures, both pre-ex
+fix/323-togo-config	c14b95b0455c9c4fc6a26ab87106865e086a634d	fix(#632): unbreak CI collection, and correct a false LIVE claim
+fix/323-uganda-config	b589e638388c71aa07d09e9f6c7d96aee379e1af	test(#323): gate the 19 data-building tests with pytest.mark.requires_
+fix/323-uganda-crop-condition	12346608ed17dfe2d772e0c36f9ac000e65d5a75	docs(#323): record the per-wave-label-drift convention harvest_conditi
+fix/508-feature-mirrors-country	a64733ed551da719b90468828c0ce13976f8b1c4	feat(#508): Feature() mirrors the Country(...).<table> interface (forw
+fix/513-plot-features-collisions	ab1cf7bac885b9e1f5c9726b397c5f3e8736d909	fix(#513): resolve EthiopiaRHS plot_features (i,plot_id) collisions
+fix/516-kinship-albania	c7985233cbe987e6f54c2ab133985342010936b4	fix(#516): decode 4 Albania kinship labels + SA rel_head int sentinel 
+fix/537-dormant-validator	9a8f753cf04bd1d7cc93fdaf3ebf432d524e2f7a	fix(#537): wire validate_acquisition_source in, harden it, kill the s 
+fix/548-panelids	c96d605877ce96b8e0c57d68507eeebfb4c216b4	fix(#548): GhanaLSS split households merged into one by bespoke panel_
+fix/591-nigeria-prices	fe64d06ebd055b1e0291a3bdf103be1ceef0dac5	docs(ledger): record cross-country byte-identity regression evidence (
+fix/637-key-soundness-six-sites	b905076cf64fbfaa7a46b050b6c5267076362226	test(#637): load tests/conftest.py by PATH, not `from tests.conftest i
+fix/637-tanzania-key-soundness	922ee18af27991ef061deb95d0e24575f076a2f1	Merge remote-tracking branch 'origin/development' into scratch/651-ci
+fix/645-to-parquet-null-coercion	67ec061d1be833a24cec47171349a14abb1fa67d	test(#645): load requires_s3 by path — the by-name import fails in CI
+fix/648-conftest-import-marker	4a57ebf95305fae3e89db9509443fbed5a7cf276	fix(#648): the documented conftest import does not work — use a marker
+fix/659-glss5-rural	2973edf1bbd3a7ae84b6e7a246d6d52be3d98913	fix(#680): the shadowing guard asserted a condition we do not control
+fix/681-glss12-appendix-i	89a04312cb84a43df11615a22edc9f995315fff9	fix(#681): GLSS1/GLSS2 cluster Region is now MEASURED, from BID Append
+fix/684-peru-functional	7c92fb1a418d2c60fc8ff0e935f2875c8aa24f91	fix(#684): address red-team review of #691 — correct three false claim
+fix/704-dat-dct-delimited	45daf48eb58636bbf74c234ecff3f84291327e5e	fix(#704): repair the three GhanaLSS consumers the dtype change breaks
+fix/audit-framework	e1fbf516cdc4df523bfcf9d5391a48e32c08f3cf	fix: Feature() rejects unknown/mistyped table names with a suggestion
+fix/ghanalss-glss1-region-codes	e0f6e36b17b7b300c5218f572a88223ace7e0070	fix(GhanaLSS): GLSS1 Upper East/West were reversed by an unexercised f
+fix/malawi-2016-17-food-security-cs-id	b693d3fb40b06443f993a154b7d7250d491ea4e7	Merge remote-tracking branch 'origin/development' into fix/malawi-2016
+fix/niger-merge-how-comment	fcab92ba5efb8880e505eb0d7c1377df3a057f49	fix(Niger): the `merge_how: left` comment claims a load-bearing effect
+fix/null-read-guard	6e629127d40cee6d2d15cdc32932770750b49be8	evidence(null-read): close the sweep's blind spot, and pin the 4 suite
+fix/pandas-floor-3.0	f38bcf96cb09bea2cffbb9d89574027e005cffab	build: require pandas >=3.0 — 2.2 silently corrupts pre-Stata-6 double
+fix/release-target-drop-local-build	140315525e0dd0a3f2f3f86e6b511ee834e733a9	build(release): drop the vestigial local poetry build; tag last
+rescue/2026-07-21/master-601-design	47d583242971d13f0fb56c436a0a02d40d172a1a	docs(#601): design — the population record (declaring what a sample re

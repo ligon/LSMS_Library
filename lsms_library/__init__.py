@@ -129,6 +129,8 @@ from .coverage_matrix import coverage
 from .currency import currency_for
 from .conversion import convert
 from . import local_tools as tools
+from . import population
+from .population import PopulationRecord, population_records
 from . import transformations
 from .dvc_permissions import authenticate
 try:
