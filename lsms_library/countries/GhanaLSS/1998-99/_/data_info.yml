@@ -11,15 +11,92 @@ cluster_features:
 
 
 sample:
-    file: SEC0A.DTA
-    idxvars:
-        i:
-            - clust
-            - nh
-    myvars:
-        v: clust
-        strata: region
-        Rural: loc2
+    # GH #713: `weight` and `panel_weight` were 100% NULL for all 5,998
+    # households in this wave.  The sampling weight is not missing from the
+    # survey -- it ships in POV_GH.DTA, a sibling file at EXACTLY this table's
+    # grain, and was simply never declared.  Same shape as GH #659 (GLSS5), and
+    # the fix is the same: add the sub-df rather than invent a value.
+    #
+    # It is a real weight distribution: min 0.127, median 0.85, max 6.02,
+    # 5,998/5,998 non-null.  Contrast GLSS3 1991-92, whose POV_GH.DTA `weight`
+    # is identically 1.0 -- that is ALSO correct and is now wired too, because
+    # GSS documents GLSS3 as self-weighting (see that wave's data_info.yml).
+    # An earlier version of this comment called GLSS3's 1.0 a placeholder and
+    # said wiring it "would make a self-weighting wave look weighted".  That was
+    # backwards and unevidenced: a documented self-weighting design is exactly
+    # where a constant 1.0 is the right answer.
+    #
+    # The merge is provably safe: `(clust, nh)` is unique in BOTH frames
+    # (5,998/5,998 each) with FULL overlap and zero orphans either way, so the
+    # GH #323 site-4 cartesian condition (key non-unique in both) cannot hold.
+    # `merge_how: left` keeps SEC0A authoritative for which households exist.
+    #
+    # WHY GLSS4 HAS A REAL DISTRIBUTION WHERE GLSS3 HAS A CONSTANT.  GSS says
+    # it outright in `Documentation/GHA_1998_GLSS_Report_EN.pdf` (p.114):
+    #
+    #     NOTE: The above sample selection procedure deviated slightly from
+    #     that used for the earlier rounds of the GLSS, as such the sample is
+    #     not self-weighting.
+    #
+    # and gives two reasons -- the second of which is an admitted FIELDWORK
+    # DEFECT, not just frame drift:
+    #
+    #     1. given the long period between 1984 and the GLSS 4 fieldwork the
+    #        number of households in the various EAs are likely to have grown
+    #        at different rates.
+    #     2. the listing exercise was not properly done as some of the selected
+    #        EAs were not listed completely.  Moreover, it was noted that the
+    #        segmentation done for larger EAs during the listing was a bit
+    #        arbitrary.
+    #
+    # The design is PPS on the *1984* household counts (the same old frame the
+    # earlier rounds used -- "This frame, though quite old, was considered
+    # inadequate, it being the best available at the time"), 300 EAs, then a
+    # FIXED take of 20 households per EA, "in order to reflect the labour force
+    # focus of the survey".  PPS x equal take would be EPSEM if the size
+    # measure were current; it is 1984, and EAs grew unevenly, so it is not.
+    # @ligon notes the ex-post weights are built from EA population change
+    # between the 1984 and 2000 censuses -- i.e. corrected using a census taken
+    # AFTER the survey.
+    #
+    # So GLSS4's weights pull toward a ~2000 population while GLSS1-GLSS3
+    # represent 1984 as drawn.  Normalisation equalises the SCALES; it does not
+    # make the represented populations the same, and it cannot repair the
+    # listing defect GSS admits above.  Anything comparing weighted levels
+    # across GLSS3 and GLSS4 has to say which population it means.
+    #
+    # `panel_weight` mirrors `weight` per the convention in CLAUDE.md ("Pre-
+    # refreshment waves have the same value in both columns"), matching what
+    # GLSS5 does with the same source column.  GLSS4 carries no refreshment
+    # sample, so the two are not distinguishable here.
+    dfs:
+        - df_cover
+        - df_weight
+    df_cover:
+        file: SEC0A.DTA
+        idxvars:
+            i:
+                - clust
+                - nh
+        myvars:
+            v: clust
+            strata: region
+            Rural: loc2
+    df_weight:
+        file: POV_GH.DTA
+        idxvars:
+            i:
+                - clust
+                - nh
+        myvars:
+            weight: weight
+            panel_weight: weight
+    merge_on:
+        - i
+    merge_how: left
+    final_index:
+        - i
+        - t
 
 interview_date:
     file: SEC0A.DTA
