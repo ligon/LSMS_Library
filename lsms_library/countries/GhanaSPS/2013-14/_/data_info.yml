@@ -85,3 +85,46 @@ household_roster:
         - t
         - i
         - pid
+
+individual_education:
+    # 01fi_generaleducation.dta -- Section 1F(i) "General Education".  IN THIS
+    # WAVE module `f` is education and `e` is employment; in 2017-18 both shift
+    # one letter (`f` becomes employment, `g` education) while keeping the same
+    # variable names.  See the country data_scheme.yml comment.
+    #
+    # 15,316 rows, 4,774 households, (FPrimary, hhmid) unique, every key in the
+    # roster.  The roster has 16,356 people: the 1,040 with no education record
+    # are children aged 0-2 (1,019 of the 1,022 with a recorded age; the module
+    # has an age floor of 3).  That is the whole of the shortfall -- a
+    # module-eligibility rule, not attrition.
+    #
+    # This wave's screener is EXACT: `attended == 'No'` <-> null grade, 3,779
+    # rows on both sides, 0 exceptions.  So the hook's step 2 recovers exactly
+    # the never-schooled and invents nothing.
+    #
+    # `highestgrade` here has NO tertiary rung -- its code list stops at S5 and
+    # sends every tertiary respondent to 95 'Other - Specify' (501 rows, all
+    # 501 with a non-null `highestqual`, overwhelmingly Bachelors / diploma /
+    # HND).  That is what the `_qual` fallback exists for.
+    #
+    # NOTE: this file triggers a UnicodeWarning (latin-1 fallback) on read --
+    # some strings in it are not valid UTF-8.  The decoded value labels were
+    # checked and are sane.  `pyreadstat` refuses the file outright
+    # (UnicodeDecodeError) where pandas falls back, so inspect it through
+    # `get_dataframe` / pandas, not pyreadstat.
+    #
+    # `_attended` / `_qual` are temporary and are dropped by
+    # ghanasps.individual_education().  `v` is NOT declared --
+    # _join_v_from_sample() attaches it at API time.
+    file: 01fi_generaleducation.dta
+    idxvars:
+        i: FPrimary
+        pid: hhmid
+    myvars:
+        Educational Attainment:
+            - highestgrade
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+        _qual:
+            - highestqual
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+        _attended: attended

@@ -67,6 +67,70 @@ Data Scheme:
         type: float
         optional: true
 
+  individual_education:
+    # Person-level educational attainment, all three waves.  Index is
+    # (t, i, pid) -- `v` is NOT declared and must NOT be: `sample` is wired for
+    # every wave, so _join_v_from_sample() attaches `v` at API time.
+    #
+    # Sources -- AND THE MODULE LETTER SHIFTS BETWEEN WAVES:
+    #   2009-10  S1FI.dta                    (s1fi_2 / s1fi_3 / s1fi_4)
+    #   2013-14  01fi_generaleducation.dta   (attended / highestgrade /
+    #                                         highestqual)
+    #   2017-18  01gi_generaleducation.dta   (SAME three variable names)
+    #
+    # In 2013-14 module `f` is education and `e` is employment; in 2017-18 both
+    # shifted one letter, so `f` is EMPLOYMENT and education is `g`.  The
+    # variable names are IDENTICAL in both waves, so pointing wave 3 at
+    # `01fi_employmentmain.dta` -- the name that matches wave 2's education
+    # file -- yields a plausible, silently wrong table.  Row count is the tell:
+    # wave-3 education is 19,006 (= the roster), employment is 1,481.  Worse,
+    # `01gi_generaleducation.dta`'s own VARIABLE LABELS still read `s01fi_02`,
+    # `s01fi_03`, `s01fi_04`, so the labels corroborate the wrong file.  See
+    # CONTENTS.org.
+    #
+    # WHY THE `df_edit` HOOK (ghanasps.individual_education).  A YAML `mapping:`
+    # maps one source column onto one target; the attainment answer here is
+    # split across three.  `_attended` and `_qual` are extracted as temporary
+    # columns and consumed -- and dropped -- by the hook.  Measured cost of
+    # NOT combining them, i.e. of wiring `highestgrade` alone:
+    #   - 12,827 people the survey POSITIVELY RECORDS as never having attended
+    #     school carry a null grade and would be deleted by `dropna(how='all')`.
+    #     Wave 2 would then report `No education` for 9.6% of its rows where
+    #     the survey says 24.7%.
+    #   - 501 (W2) + 775 (W3) people would come back `Unknown` although the
+    #     survey records a Bachelors / HND / diploma for them: waves 2 and 3
+    #     have NO tertiary rung in `highestgrade` at all and put every tertiary
+    #     respondent in the survey's own 'Other' bucket.
+    # The fallback is deliberately NARROW (only where the grade is absent or
+    # `Unknown`), not a max() over both ladders -- below the 'Other' bucket the
+    # qualification is essentially a function of the grade and substituting it
+    # would override an explicit grade with an exam result.  The hook's
+    # docstring carries the resolution order and its justification.
+    #
+    # Vocabulary: `lsms_library/categorical_mapping/canonical_education_labels.org`,
+    # via the row-additive `harmonize_education` table in this directory's
+    # `categorical_mapping.org` (which also records the two mapping rulings --
+    # university Levels 100-400, and Sixth Form L6/U6).  Map on the DECODED
+    # LABEL, never the numeric code: code 27 is 'S1' in waves 1-2 but 'SSS4' in
+    # wave 3.
+    #
+    # Age floor of 3: the module is not administered to children under 3.  Wave
+    # 2 omits them from the file entirely (1,040 roster people, ages 0-2); wave
+    # 3 keeps the rows with every education variable null (1,075, ages 0-2).
+    # Either way they have no attainment datum and are dropped.
+    #
+    # Delivered rows and roster coverage (measured on a cold build):
+    #   2009-10  16,955 of 18,889 roster people   89.8%
+    #   2013-14  15,314 of 16,356                 93.6%
+    #   2017-18  17,910 of 19,006                 94.2%
+    # 0 people appear here who are not in `household_roster`, in any wave.
+    # Waves 2 and 3 lose essentially only the under-3s; WAVE 1 ALSO LOSES 287
+    # people aged 6+ whose module row is simply blank -- a wave-1 recording
+    # defect, documented in 2009-10/_/data_info.yml, deliberately left NA
+    # rather than filled.
+    index: (t, i, pid)
+    Educational Attainment: str
+
   sample:
     # Cluster identity, wave by wave.  The EA is `id3` in 2009-10 and a
     # right-anchored slice of the household id in 2013-14 / 2017-18; each
