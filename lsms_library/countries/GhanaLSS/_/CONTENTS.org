@@ -7,7 +7,18 @@ The Ghana Living Standards Survey (Ghana LSS) is one of two major surveys we hav
 The GLSS is conducted by the Ghana Statistical Service (GSS).  Seven
 rounds span 1987--2017.  Each round is designed as an independent
 nationally representative cross-section; there is no rotating panel
-or refreshment sample mechanism.
+or refreshment sample mechanism --- /from GLSS3 onward/.
+
+/Corrected 2026-08-24./  That sentence used to carry no qualifier, and as
+written it was *false for the GLSS1 -> GLSS2 pair*.  GSS's own GLSS3 report
+(printed p.110) states that a rotating panel /was/ the design for rounds 1--2:
+half the GLSS1 workloads were retained for re-interview in GLSS2 and the other
+half drawn fresh from replicate 6 of the master sample.  The rotation was
+abandoned at GLSS3, which is where the unqualified claim becomes true.  Both
+sides are quoted under /Tensions with the existing text in this file/ s1; the
+=Panel Linkage (GLSS1 to GLSS2)= section records the 714 panel households
+empirically.  *Not deleted --- qualified*, because the sentence is right for
+five of the seven rounds.
 
 - [[https://microdata.worldbank.org/index.php/catalog/2313][GLSS1 (1987-88)]]
 - [[https://microdata.worldbank.org/index.php/catalog/2314][GLSS2 (1988-89)]]
@@ -72,8 +83,20 @@ page or location file: =weight= in =sec0.dta= (GLSS5), =weight= in
 =g6loc_edt.dta= (GLSS6), =WTA_S= in =g7sec0.dta= (GLSS7).  These
 sum to the national population.
 
-Since every round is an independent cross-section, there is no
-panel weight.  =panel_weight= equals =weight= for all waves.
+=panel_weight= equals =weight= for all waves.
+
+/Corrected 2026-08-24./  This used to read "Since every round is an
+independent cross-section, there is no panel weight."  *The premise is false
+for GLSS1 -> GLSS2* (see /Survey Program/ above and /Tensions/ s1): those two
+rounds are a rotating panel, half retained.  The mirroring is therefore
+a *house convention*, not a consequence of independent sampling --- and for
+GLSS2 it is thin, because the retained half is not distinguished from the
+fresh half, so =panel_weight= does no real longitudinal work there.
+=PANELC.DAT= (shipped in both =1987-88/Data/= and =1988-89/Data/=) carries the
+GLSS1 -> GLSS2 linkage if a genuine panel weight is ever built; it is what the
+=Panel Linkage= section's 714 households are derived from.  The per-wave
+docstrings in =1987-88/_/mapping.py= and =1988-89/_/mapping.py= state the same
+caveat at the point of use (GH #713, #714).
 
 *Scale note (2026-08-22):* the =sample= feature now returns weights
 rescaled to within-wave mean 1, so the GLSS5--GLSS7 expansion weights
@@ -743,7 +766,10 @@ Consequences a user must not miss:
 
 ** Tensions with the existing text in this file
 
-Flagged, both sides quoted, *not* resolved.
+Flagged, both sides quoted.  *s1 is now resolved in place* (2026-08-24) --- the
+two assertions it contradicted have been qualified where they stand, rather
+than left to be found 700 lines later; the tension is kept below with both
+quotes intact.  s2--s4 remain *unresolved*.
 
 *** 1. "no rotating panel or refreshment sample mechanism"
 
@@ -829,12 +855,19 @@ recorded so the hedge can be retired for GLSS5 and GLSS6 at least.
 
 * Panel Linkage (GLSS1 to GLSS2)
 
-Despite being designed as independent cross-sections, a sub-sample
-of GLSS1 households was re-interviewed in GLSS2.  The linkage is in
+A sub-sample of GLSS1 households was re-interviewed in GLSS2, and it
+was *by design, not an accident of fieldwork*.  The linkage is in
 =PANELC.DAT= (present in both the 1987-88 and 1988-89 Data
 directories), mapping =HID1= (GLSS1) to =HID2= (GLSS2) at the
 person level.  Deduplicating to household level yields 714 panel
 households.
+
+/Corrected 2026-08-24./  This paragraph opened "Despite being designed as
+independent cross-sections ...", which framed the panel as an anomaly.  GSS's
+GLSS3 report (printed p.110) states the rotating panel /was/ the intended
+design for rounds 1--2 --- half the GLSS1 workloads retained, half replaced ---
+so the re-interviews are the design working, not surviving it.  See /Survey
+Program/ and /Tensions/ s1.
 
 No cross-wave linkage exists for GLSS3 onward --- cluster numbering
 schemes changed between rounds and no prior-wave household ID
