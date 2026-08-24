@@ -233,9 +233,36 @@ def main(argv=None) -> int:
     df = build_matrix(args.countries, args.features, readiness=readiness,
                       log=lambda m: print(m, file=sys.stderr))
 
-    snap_path = args.snapshot or default_snapshot_path()
-    snap = save_snapshot(df, snap_path)
-    print(f"[matrix] snapshot -> {snap} ({len(df)} cells)", file=sys.stderr)
+    # A cheap-layer run is a VIEW, not a snapshot update.  `--no-readiness`
+    # grades every cell `declared` (no builds), and `save_snapshot` upserts by
+    # (country, feature, wave) -- so writing it to the committed snapshot
+    # silently DOWNGRADES every readiness tier it touches.  Measured on this
+    # corpus: 1,217 `sane` + 138 `builds` + 39 `dropped` + 8 `broken` all
+    # became `declared` in one run.  This is pre-existing (the overwrite is the
+    # upsert, not the #724 deletion -- verified with deletion disabled), and it
+    # is what `make matrix-coverage` does by default.
+    #
+    # So a no-readiness run refuses the DEFAULT snapshot and requires an
+    # explicit `--snapshot` path.  It still prints and still renders HTML.
+    if not readiness and not args.snapshot:
+        print("[matrix] snapshot -> SKIPPED: --no-readiness grades every cell "
+              "`declared`, which would overwrite the readiness tiers in the "
+              "committed snapshot.  Pass an explicit --snapshot PATH to write "
+              "a cheap-layer view somewhere else.", file=sys.stderr)
+        snap_path = None
+    else:
+        snap_path = args.snapshot or default_snapshot_path()
+    if snap_path is not None:
+        # A run with no --features filter is AUTHORITATIVE about which cells
+        # each country it graded has, so stale rows for those countries are
+        # dropped rather than left to contradict the fresh ones (GH #724).
+        # With a feature filter the run knows nothing about the features it
+        # skipped, so it stays purely additive.
+        authoritative = None if args.features else sorted(
+            {str(c) for c in df["country"].unique()})
+        snap = save_snapshot(df, snap_path,
+                             authoritative_countries=authoritative)
+        print(f"[matrix] snapshot -> {snap} ({len(df)} cells)", file=sys.stderr)
 
     if args.no_html:
         print("[matrix] html     -> skipped (--no-html)", file=sys.stderr)
