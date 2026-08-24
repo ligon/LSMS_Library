@@ -33,6 +33,14 @@ Three-tier test strategy
 
 Use ``make test`` for the fast tier and ``make test-full`` (now passes
 ``--rebuild-caches``) for a fully cold rebuild.
+
+**Collection is a dry run** (GH #719).  Under ``--collect-only`` / ``--co`` no
+purge of any tier runs, because such an invocation executes no tests and must
+therefore have no side effects.  This matters beyond tidiness: the purge target
+resolves through ``data_root()``, which is a *shared* scratch path, so asking
+"what tests exist?" used to evict parquets belonging to other sessions -- and
+under ``--rebuild-caches`` it took every country, not just Uganda.  The purge
+itself is unchanged and still fires on every real run.
 """
 
 from __future__ import annotations
@@ -80,6 +88,29 @@ def pytest_configure(config):
         "markers",
         "slow: mark test as slow (requires network or full data loading).",
     )
+
+    if getattr(config.option, "collectonly", False):
+        # GH #719: collection is a DRY RUN.  ``--collect-only`` (and ``--co``)
+        # answers "what tests exist?" and executes none of them, so it must
+        # have no side effects -- yet every branch below deletes cached
+        # parquets out of ``data_root()``.
+        #
+        # That path is resolved from *config*, so on a shared checkout it is
+        # shared state: since the 2026-08-22 migration it points at the FCA
+        # scratch cache used by other sessions and other `fc_jevons` members,
+        # not at a private `~/.local/share`.  A `--collect-only` run would
+        # evict their warm parquets, and with `--rebuild-caches` it would take
+        # *every country*, not just Uganda.
+        #
+        # The purge itself is right and is deliberately left alone (stale
+        # parquets predating the v0.7.1 extraction fixes really do mask them --
+        # GH #196 / #197 / #161).  Only the TRIGGER is wrong.  `--no-purge` is
+        # not the answer here: it asks the operator to opt out of a correct
+        # default to dodge an incorrect side effect.
+        #
+        # Markers are registered above, before this return, because collection
+        # needs them.
+        return
 
     rebuild_caches = config.getoption("--rebuild-caches", default=False)
     if rebuild_caches:
