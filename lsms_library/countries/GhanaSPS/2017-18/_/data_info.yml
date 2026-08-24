@@ -88,6 +88,66 @@ household_roster:
         - i
         - pid
 
+housing:
+    # 12a_housingcharacteristics1iii_structure.dta is the wave-3 dwelling-
+    # structure file: 5,669 rows, `FPrimary` unique (0 duplicates, 0 nulls) --
+    # complete coverage of the wave's 5,669 households, the only one of the
+    # three waves where housing is not short of the household count.
+    # Single file, single extraction -- no `dfs:` merge.
+    #
+    # SAME MODULE AS WAVES 1 AND 2, verified by content: `materialroof` is
+    # labelled "s12a_32 - Roof material" and `materialfloor` "s12a_31 - Floor
+    # material", i.e. the file carries wave 1's variable names in its own
+    # labels.  Checking the filename would NOT have been sufficient in this
+    # wave of all waves -- 01f is education in 2013-14 but EMPLOYMENT here
+    # (01fi_employmentmain / 01fii_employmentsecondary / 01fiii_unemployed),
+    # education having shifted to 01g.  Housing did not move; that is a fact
+    # established from the labels, not assumed from the name.
+    #
+    # `interviewedid` (wave 2 spells it `InstanceNumber`) is a per-interview
+    # counter, not part of the key.  Not declared.
+    #
+    # DELIVERED ROWS: 5,645, not 5,669.  The 24 missing rows are the ones
+    # with BOTH Roof and Floor null; _finalize_result's dropna(how='all')
+    # (country.py, GH #645) removes them.  Framework behaviour, not a filter
+    # written here; no material datum is lost, since a row survives if either
+    # column is populated.
+    #
+    # NULLS: in the source, Roof is 5,635/5,669 non-null (34 missing) and
+    # Floor 5,642/5,669 (27 missing); 24 of those overlap, so the delivered
+    # table carries 34-24 = 10 null Roof and 27-24 = 3 null Floor.
+    # These are Stata missings.  This wave DOES declare sentinels that the
+    # earlier waves do not -- -999 "Don't know", -888 "Refuse to answer",
+    # -777 "Not applicable", -666 "Other (please specify)" -- but only -666
+    # actually occurs (5 roof rows, 11 floor rows), and it is just this
+    # wave's spelling of "Other".  The three genuine non-response sentinels
+    # are absent from the shipped data, so no mapping row exists for them;
+    # if a future extract carries one it will survive unmapped and show up
+    # as a non-canonical value, which is the correct loud outcome.
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    # Wave-3 `v` comes from the FPrimary[-6:-3] EA slice (see the `sample`
+    # note above and mapping.py); housing households are a strict subset of
+    # the sample households, so the join is total.
+    #
+    # MIXED-VINTAGE DIRECTORY NOTE (see CONTENTS.org): 2017-18/Data/ holds
+    # both our pre-anonymization copies and files acquired from Harvard
+    # Dataverse.  This file is one of the pre-existing ones; it carries
+    # `materialroof`/`materialfloor` either way, so nothing here depends on
+    # the extra variables our copy retains.
+    #
+    # Label harmonisation is done once for all three waves by the `Roof` /
+    # `Floor` tables in ../../_/categorical_mapping.org.  This wave's
+    # distinctive spellings are `Corrugated iron sheet` (SINGULAR -- wave 2
+    # says `sheets`, wave 1 `Corrugate iron sheets`), `Ceramic/marble tiles`
+    # (no slash before `tiles`, unlike waves 1-2) and `Other (please
+    # specify)`.
+    file: 12a_housingcharacteristics1iii_structure.dta
+    idxvars:
+        i: FPrimary
+    myvars:
+        Roof: materialroof
+        Floor: materialfloor
 individual_education:
     # 01gi_generaleducation.dta -- Section 1G(i) "General Education".  READ THE
     # FILENAME TWICE.  In 2013-14 education is module `f`; in THIS wave every

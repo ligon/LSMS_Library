@@ -128,3 +128,173 @@ same category three ways (='Pre-School'= / ='Preschool'= / ='Pre-school'=;
 | Bachelors                      | Bachelor                     |
 | Master's                       | Postgraduate                 |
 | Masters                        | Postgraduate                 |
+
+* Roof / Floor (housing)
+
+These two tables are auto-discovered by ~Country._apply_categorical_mappings~
+(the table name matches the column name, case-insensitively) and applied at
+API time to ~housing.Roof~ / ~housing.Floor~.  They are NOT baked into the
+cached parquet, so the raw survey labels remain recoverable from
+~{data_root}/GhanaSPS/*/_/housing.parquet~.
+
+The ~Preferred Label~ column is drawn ENTIRELY from the shared vocabulary in
+=lsms_library/categorical_mapping/canonical_housing_labels.org= (GH #170).
+No new canonical label is coined here: Uganda and Malawi both emit only
+canonical values, and a country that invents one defeats the point of the
+shared list.  Delivered value sets:
+
+  Roof  : Iron Sheets, Thatch, Asbestos, Concrete, Clay Tiles, Mud, Wood, Other
+  Floor : Earth, Concrete, Tiles, Vinyl/Linoleum, Bricks, Stone, Wood, Other
+
+** Two jobs, and the first one is the load-bearing one
+
+*** 1. Cross-wave drift WITHIN GhanaSPS
+
+The GSPS roof/floor code frames are identical across the three waves (same
+codes 1-8, same materials), but the Stata value LABELS are re-typed each
+wave.  The drift is punctuation and wording, not case -- so the case
+normalisation the ~housing~ sub-skill describes would not have caught it:
+
+| code | 2009-10                   | 2013-14                   | 2017-18                   |
+|------+---------------------------+---------------------------+---------------------------|
+|    3 | Corrugate iron sheets     | Corrugated iron sheets    | Corrugated iron sheet     |
+|    1 | Palm leaves/Raffia/Thatch | Palm leaves/raffia/thatch | Palm leaves/raffia/thatch |
+|    7 | Mud bricks /Earth         | Mud bricks/earth          | Mud bricks/earth          |
+|    9 | Other                     | Other - specify (95)      | Other (please specify) (-666) |
+
+Note code 3 in wave 1 is "Corrugate", not "Corrugated" -- a source typo --
+and wave 3 drops the plural.  Three spellings of the modal roof material.
+Floor is the same story: wave 1's code 4 is =Cement/ concrete= with an
+INTERNAL space after the slash, and its code 8 is =Terrazo= with one z.
+Internal whitespace survives ~.str.strip()~, so both must appear verbatim.
+
+*** 2. Mapping GSPS's categories onto the canonical vocabulary
+
+Every judgement made, and its basis:
+
+- =Corrugate(d) iron sheet(s)= -> *Iron Sheets*.  Canonical roof label,
+  "Most common across LSMS-ISA"; Uganda maps =Iron sheets=/=Tin= to it.
+- =Palm leaves/raffia/thatch= -> *Thatch*.  Canonical "dried plant
+  material"; Malawi maps =Grass= to it, Uganda =Thatch, Straw=.
+- =Cement/concrete= (roof AND floor) -> *Concrete*.  The canon deliberately
+  keeps =Cement= and =Concrete= distinct, but GSPS offers ONE combined
+  option, so the distinction is not recoverable for Ghana.  Uganda's tables
+  resolve the identical compound (=Concrete/cement=, =Concrete/ Cement=) to
+  =Concrete= in both its Roof and Floor tables; that precedent breaks the
+  tie.  For a roof this is also unambiguous on the merits (a cement-screed
+  roof is not a thing); for a floor a Ghanaian "cement/concrete" floor is
+  more often a screed, so this call is precedent-driven, not physical.
+- =Asbestos/slate= -> *Asbestos*.  The canon carries BOTH =Asbestos= and
+  =Slate= (the latter added for Tajikistan), and GSPS lumps them into one
+  option.  Asbestos (fibre-cement) sheet is the common Ghanaian roofing of
+  the two; slate roofing is essentially absent.  NOT verified against the
+  questionnaire -- the instrument prints the same compound option.
+- =Roofing tiles= -> *Clay Tiles*.  GSPS does not say "clay", but the canon
+  has no generic roof-tile label and Uganda maps its own unqualified
+  =Tiles=/=tiles= to =Clay Tiles=.  Exact precedent.
+- =Mud bricks/earth= -> *Mud*.  Canonical =Mud= is documented as
+  "Includes Adobe (sun-dried mud brick)", which is this category.
+- =Bamboo= -> *Wood*.  Canonical =Wood= is documented as "Includes bamboo
+  planks/strips".  BUT SEE THE CAVEAT BELOW -- this is the one mapping that
+  merges two distinct GSPS categories.
+- =Earth/mud/mud bricks= -> *Earth*.  Canonical, matching Uganda
+  (=Rammed earth=) and Malawi (=Smoothed mud=).
+- =Ceramic/marble(/) tiles= -> *Tiles*; =Vinyl tiles= -> *Vinyl/Linoleum*.
+  The canon's separate =Vinyl/Linoleum= label ("resilient sheet/tile
+  flooring (linoleum, vinyl, vinyl tiles)") is what keeps these two GSPS
+  categories from colliding on =Tiles=.  Without it this would have been a
+  merge.
+- =Burnt bricks= -> *Bricks*.  Canonical floor label.  Note GSPS's
+  =Earth/mud/mud bricks= is the UNFIRED brick category and goes to =Earth=,
+  so the two brick categories stay apart.
+- =Terrazo=/=Terrazzo= -> *Stone*.  THE WEAKEST CALL IN THIS FILE.  The
+  canon has no terrazzo label, and every available canonical label merges
+  terrazzo with some other GSPS floor category: =Concrete= merges it with
+  the 4,673-row =Cement/concrete=, =Tiles= with =Ceramic/marble tiles=,
+  =Other= with GSPS's own =Other=.  =Stone= is documented as "Includes
+  polished stone / marble", which is literally what terrazzo is (marble
+  chips in cement, ground and polished), and it keeps terrazzo among the
+  premium floors for welfare work.  It merges with GSPS's =Stone= (17-18
+  rows/wave).  Recorded as a judgement, not a fact.
+- =Other= / =Other - specify= / =Other (please specify)= -> *Other*.
+
+*** CAVEAT: Bamboo -> Wood is a real merge, and GSPS is why the canon should change
+
+GSPS's roof question offers *Wood* (code 2) and *Bamboo* (code 8) as
+SEPARATE options -- 20/10/11 and 29/7/8 observations respectively across
+the three waves.  The canonical vocabulary folds bamboo into =Wood=, so
+the two collapse.  That is a genuine loss of a distinction the survey drew,
+and it is the only such loss in this file.
+
+It is done anyway because unilaterally coining a canonical label in a
+country-wiring change would break the invariant that makes
+=canonical_housing_labels.org= worth having.  The loss is mitigated: the
+mapping is applied at API time only, so ~pd.read_parquet~ on the cached
+housing parquet still shows =Bamboo=, and ~s12a_32~ / ~materialroof~ in
+the source are untouched.
+
+RECOMMENDATION for whoever owns GH #170: add *Bamboo* (and possibly
+*Terrazzo*) to the canonical roof/floor lists and re-point the two rows
+below.  GhanaSPS appears to be the first country in the corpus whose roof
+question separates bamboo from wood.
+
+*** What is deliberately NOT mapped
+
+- Wave 3 declares the sentinels -999 "Don't know", -888 "Refuse to answer"
+  and -777 "Not applicable" on both variables.  NONE of them occurs in the
+  data (checked on the shipped file), so no row is written for them.  If a
+  future extract carries one it will pass through unmapped and show up as a
+  non-canonical value -- which is the correct, loud outcome.  (-666 DOES
+  occur and is just wave 3's spelling of "Other".)
+- Outer wall (=s12a_30= / =materialouterwall=) is present in every wave and
+  is deliberately not wired: the `housing` schema is Roof + Floor only.
+
+*** How this fails silently, and why the test is a subset assertion
+
+~_apply_categorical_mappings~ applies ~Series.replace(rdict)~, which leaves
+an unmatched value UNCHANGED rather than nulling it.  So a missing or
+mistyped Alternate Spelling does not raise and does not show up as a null --
+the raw label simply survives into the delivered table.  The discriminating
+check is therefore "is the delivered per-wave value set a SUBSET of the
+canonical set above", never "do the distributions look plausible".
+
+#+name: Roof
+| Alternate Spelling     | Preferred Label |
+|------------------------+-----------------|
+| Corrugate iron sheets  | Iron Sheets     |
+| Corrugated iron sheets | Iron Sheets     |
+| Corrugated iron sheet  | Iron Sheets     |
+| Palm leaves/Raffia/Thatch | Thatch       |
+| Palm leaves/raffia/thatch | Thatch       |
+| Asbestos/Slate         | Asbestos        |
+| Asbestos/slate         | Asbestos        |
+| Cement/Concrete        | Concrete        |
+| Cement/concrete        | Concrete        |
+| Roofing tiles          | Clay Tiles      |
+| Mud bricks /Earth      | Mud             |
+| Mud bricks/earth       | Mud             |
+| Bamboo                 | Wood            |
+| Wood                   | Wood            |
+| Other                  | Other           |
+| Other - specify        | Other           |
+| Other (please specify) | Other           |
+
+#+name: Floor
+| Alternate Spelling     | Preferred Label |
+|------------------------+-----------------|
+| Earth/Mud/Mud bricks   | Earth           |
+| Earth/mud/mud bricks   | Earth           |
+| Cement/ concrete       | Concrete        |
+| Cement/concrete        | Concrete        |
+| Ceramic/Marble/Tiles   | Tiles           |
+| Ceramic/marble/tiles   | Tiles           |
+| Ceramic/marble tiles   | Tiles           |
+| Vinyl tiles            | Vinyl/Linoleum  |
+| Burnt bricks           | Bricks          |
+| Terrazo                | Stone           |
+| Terrazzo               | Stone           |
+| Stone                  | Stone           |
+| Wood                   | Wood            |
+| Other                  | Other           |
+| Other - specify        | Other           |
+| Other (please specify) | Other           |
