@@ -15,7 +15,32 @@ altogether would fail here rather than pass.
 """
 from __future__ import annotations
 
-import conftest
+import importlib.util
+import sys
+from pathlib import Path
+
+# NOT ``import conftest``.  That spelling resolves to the broken top-level
+# ``tests``/``conftest`` shipped by a dependency and aborts pytest COLLECTION in
+# CI (GH #680), while passing locally because ``lsms_library.pth`` puts the repo
+# root ahead of site-packages -- invisible exactly where the mistake is made.
+# ``tests/test_tests_package_not_shadowed.py`` enforces this, and caught this
+# file.  Prefer the object pytest itself already loaded; fall back to loading
+# the root conftest by path, which is identical in every import mode.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def _load_root_conftest():
+    mod = sys.modules.get("conftest")
+    if mod is not None and getattr(mod, "__file__", None) == str(_REPO_ROOT / "conftest.py"):
+        return mod
+    spec = importlib.util.spec_from_file_location(
+        "_lsms_root_conftest", _REPO_ROOT / "conftest.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+conftest = _load_root_conftest()
 
 
 class _Opt:
