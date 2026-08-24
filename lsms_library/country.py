@@ -2792,6 +2792,17 @@ class Country:
             # a bare string literal in 19 of the 20 build scripts that set it.
             validate_acquisition_source(df)
 
+            # Rescale sampling weights to within-wave mean 1.  Read-path only:
+            # the parquet keeps the raw (expansion or already-normalised)
+            # values.  Runs after `_enforce_canonical_dtypes` -- so no dtype
+            # coercion follows the division -- and after the `dropna(how='all')`
+            # above, so the divisor is the mean over exactly the rows the caller
+            # receives.  Scoped to `sample`: no other table's `weight` column,
+            # should one ever exist, is touched.  See
+            # `_normalise_sample_weights` for the rule and its cost.
+            if method_name == 'sample':
+                df = _normalise_sample_weights(df, country=self.name)
+
             # Attach the ISO 4217 currency label (last, so it rides through the
             # caller's _relabel_j / _add_market_index without being dropped).
             if currency is not None and method_name and not df.empty:
@@ -4762,6 +4773,158 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
                 df[col] = df[col].astype(target)
         except (ValueError, TypeError):
             pass  # best-effort; don't break loading
+
+
+# ---------------------------------------------------------------------------
+# Sampling-weight scale harmonisation (read-path).
+#
+# THE PROBLEM.  `sample.weight` arrived on TWO incompatible scales and nothing
+# in the returned frame said which.  Measured over the corpus (93 weighted
+# (country, wave) cells in 31 countries): 13 cells ship weights already
+# NORMALISED (within-wave mean 1.0000, so the column sums to the wave's
+# household count) and 80 ship EXPANSION weights that sum to a national
+# population (wave means 25.7 -> 8,659).  CotedIvoire mixes BOTH across its own
+# waves -- 1985-89 LSMS `ALLWAITN` (~ N households) against 2018-19 EHCVM
+# population-scaled -- so a user summing `weight` across that country's waves
+# silently gets numbers three orders of magnitude apart.  GhanaLSS worked around
+# the hazard by leaving four waves' weights NULL rather than mix types.
+#
+# THE RULE.  Divide each wave's weights by that wave's own mean over non-null
+# values.  No threshold, no configuration, nothing to tune: a column that is
+# already mean-1 is divided by 1.0000 and is unchanged, an expansion column
+# becomes mean-1.  Deterministic and idempotent -- which matters, because
+# `_join_v_from_sample` re-enters `sample()` while finalising other tables.
+#
+# WHY HERE AND NOT AT BUILD TIME.  The parquet keeps the RAW weights, so nothing
+# is destroyed and a future `weights='expansion'` kwarg stays possible.  Placing
+# it in `_finalize_result` also keeps the cache hash still: that method is in
+# `_build_registry._EXCLUDED_CALLABLES` as read-path code, so the closure walk
+# never descends into it and a helper reached only from it is invisible to
+# `build_transforms_fingerprint`.  Measured: 0 of 50 probed
+# `Country._table_cache_hash` values move.
+#
+# THE COST, STATED.  Within-wave normalisation means cross-wave pooling no
+# longer reflects relative wave SIZES -- each wave contributes in proportion to
+# its sample size, not its population.  That is fine for the stated use (we are
+# not estimating population totals) and is already what the corpus does for the
+# 13 normalised cells, but it is a real property, not a rounding detail.
+# ---------------------------------------------------------------------------
+
+#: Columns in ``sample`` that carry a sampling weight and are rescaled to
+#: within-wave mean 1 at API time.  Each is normalised by *its own* non-null
+#: mean: ``panel_weight`` is NaN for refreshment households in several
+#: countries, and those rows must not drag the divisor down.
+_SAMPLE_WEIGHT_COLUMNS: tuple[str, ...] = ('weight', 'panel_weight')
+
+
+class WeightNormalisationWarning(UserWarning):
+    """A wave's sampling weights could not be rescaled to mean 1.
+
+    Raised when a ``(wave, column)`` group's non-null mean is zero, negative or
+    non-finite -- dividing would emit ``inf`` or flip signs, so the group is
+    left at its raw scale and said so out loud.  Also raised when negative
+    weights are present at all, which is a data defect worth surfacing even
+    where the group mean is positive and the rescale proceeds.
+    """
+
+
+def _normalise_sample_weights(df: pd.DataFrame,
+                              country: str | None = None) -> pd.DataFrame:
+    """Rescale ``weight`` / ``panel_weight`` to within-wave mean 1.
+
+    For each ``t`` (wave) and each weight column independently, divide by that
+    group's mean over **non-null** values.  Returns *df* (mutated in place, in
+    the style of :func:`_enforce_canonical_dtypes`, so ``attrs`` -- notably
+    ``id_converted`` -- is preserved by construction).
+
+    Properties this relies on and the tests pin:
+
+    - **Idempotent.**  A mean-1 column divided by its mean (1.0) is unchanged,
+      so re-entry through ``_join_v_from_sample`` / ``Feature`` is safe.
+    - **Ratio-preserving.**  Any weighted mean, share or ratio is invariant:
+      scaling every weight in a wave by the same positive constant cancels in
+      ``sum(w*x)/sum(w)``.  This is what makes the change safe for analysis.
+    - **Scale-destroying, deliberately.**  ``sum(weight)`` is now the wave's
+      non-null household count, not a population estimate.
+
+    The cached parquets keep the raw values, so a future ``weights='expansion'``
+    kwarg on :meth:`Country.sample` could serve them unchanged.  That kwarg is
+    **not** implemented here.
+
+    Skipped without modification: a column with no non-null values at all, and
+    any ``(wave, column)`` group whose mean is 0, negative or non-finite (a
+    :class:`WeightNormalisationWarning` names it).
+    """
+    cols = [c for c in _SAMPLE_WEIGHT_COLUMNS if c in df.columns]
+    if not cols:
+        return df
+
+    # Find the wave axis wherever it is.  Falling back to a whole-frame mean
+    # when `t` is merely a COLUMN would pool every wave into one divisor --
+    # which is the exact bug this function exists to prevent -- so look in the
+    # columns too before giving up.  (`sample` declares `(i, t)` everywhere
+    # today; this is a guard against a future shape, not a live case.)
+    index_names = list(df.index.names)
+    if 't' in index_names:
+        groups = df.index.get_level_values('t')
+    elif 't' in df.columns:
+        groups = df['t']
+    else:
+        groups = None
+    where = country or '?'
+
+    for col in cols:
+        # float64 (not the nullable Float64) so pd.NA becomes np.nan and the
+        # numpy finiteness test below is well-defined.
+        s = pd.to_numeric(df[col], errors='coerce').astype('float64')
+        if not s.notna().any():
+            continue  # all-null: no mean to divide by, nothing to rescale
+
+        n_neg = int((s < 0).sum())
+        if n_neg:
+            warnings.warn(
+                f"{where}/sample: {n_neg} negative value(s) in `{col}`. "
+                f"Sampling weights should be non-negative; normalising anyway "
+                f"where the wave mean is positive, but the source is suspect.",
+                WeightNormalisationWarning, stacklevel=2)
+
+        if groups is None:
+            means = pd.Series(s.mean(), index=s.index, dtype='float64')
+        else:
+            # `transform('mean')` skips NaN, which IS the required non-null-mean
+            # semantics; dropna=False keeps a NaN-`t` group together instead of
+            # silently leaving those rows unscaled.
+            means = s.groupby(groups, dropna=False,
+                              observed=True).transform('mean')
+
+        usable = means.notna() & np.isfinite(means) & (means > 0)
+        # A group whose mean is NaN is a wave with NO non-null weights at all
+        # (GhanaLSS GLSS1-4).  That is a normal, already-documented data gap,
+        # not a defect -- skip it silently, exactly as an all-null column is
+        # skipped above.  Only a group that HAS data but whose mean is <= 0 or
+        # non-finite is worth a warning: there the division is refused.
+        defective = ~usable & means.notna()
+        if defective.any():
+            bad = sorted({str(w) for w in
+                          (groups[defective] if groups is not None
+                           else ['<all>'] * int(defective.sum()))})
+            warnings.warn(
+                f"{where}/sample: `{col}` left un-normalised for "
+                f"{int(defective.sum())} row(s) in wave(s) {bad} -- the "
+                f"non-null mean is zero, negative or non-finite, so dividing "
+                f"would emit inf or flip signs.",
+                WeightNormalisationWarning, stacklevel=2)
+        if not usable.any():
+            continue
+
+        scaled = s / means.where(usable, other=1.0)
+        # Preserve a nullable float column as nullable; never cast back to an
+        # integer dtype, which would round every rescaled weight to 0 or 1.
+        if isinstance(df[col].dtype, pd.Float64Dtype):
+            scaled = scaled.astype('Float64')
+        df[col] = scaled
+
+    return df
 
 
 # ---------------------------------------------------------------------------

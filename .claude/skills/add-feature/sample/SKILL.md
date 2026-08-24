@@ -44,6 +44,14 @@ For waves before a rotating panel was introduced (e.g., Uganda 2005--2012), or w
 
 The BID (Basic Information Document) for each wave describes the weight construction. These are available from the World Bank Microdata Library under "Related Materials" for each catalog entry.
 
+### Wire the RAW weight — the library rescales it at read time
+
+**Do not pre-scale, pre-normalise or otherwise adjust a weight in the config.** Wire whatever the survey ships — an expansion weight summing to the national population, a probability weight of mean 1, anything. `Country._finalize_result` divides each wave's `weight` and `panel_weight` by that wave's own non-null mean, so **whatever you wire comes back with mean 1 per wave**. The raw values stay in the cached parquet.
+
+This is why you should **not** be alarmed when a freshly-wired expansion weight of mean ~600 reads back as ~1 through `Country(...).sample()`; check the parquet (`~/.local/share/lsms_library/{C}/var/sample.parquet`) if you want to confirm what you actually extracted. It also means you no longer need to worry about whether your wave's weight type matches its siblings' — that mixing hazard is handled centrally. See `CLAUDE.md` §"`sample()` and Cluster Identity" and `lsms_library/country.py::_normalise_sample_weights`.
+
+A weight that comes back all-NaN, or a wave whose mean is 0 or negative (a `WeightNormalisationWarning` names it), *is* a wiring problem worth chasing.
+
 ## Finding the source variables
 
 All variables typically live in the **cover page / Section 1 / household identification** file --- the same file used for `cluster_features`. Check the existing `cluster_features` block in each wave's `data_info.yml` to find the file path.

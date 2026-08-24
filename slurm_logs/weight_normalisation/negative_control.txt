@@ -1,0 +1,43 @@
+==========================================================================
+A. MISCODED: weight wired to household size (Uganda 2018-19, mean -> ~5)
+
+--- weight = household size  (Uganda)
+            n         mean           sum
+t                                       
+2005-06  3123  1675.743688  5.233348e+06
+2009-10  2973  1779.866444  5.291543e+06
+2010-11  2715  2207.801830  5.994182e+06
+2011-12  2826  2119.024541  5.988363e+06
+2013-14  3119  2166.371440  6.756913e+06
+2015-16  3256  2282.877135  7.433048e+06
+2018-19  3176     5.102015  1.620400e+04
+2019-20  3098  2745.974051  8.507028e+06
+  class-separation : FAIL (fires)
+            n      mean      sum
+t                               
+2018-19  3176  5.102015  16204.0
+  total-stability  : PASS
+
+==========================================================================
+B. MISCODED: one wave off by 10x (GhanaLSS 2016-17)
+
+--- one wave 10x  (GhanaLSS)
+             n         mean           sum
+t                                        
+2005-06   8687   637.519589  5.538133e+06
+2012-13  16772   393.601475  6.601484e+06
+2016-17  14009  5210.882073  7.299925e+07
+  class-separation : PASS (silent)
+  total-stability  : FAIL  offending ratios {'2016-17': np.float64(11.06)}
+
+==========================================================================
+C/D. CONTROL: untouched countries must NOT fire
+  CotedIvoire    classes silent   stability SKIP
+  Malawi         classes silent   stability PASS
+  GhanaLSS       classes silent   stability PASS
+  Uganda         classes silent   stability PASS
+
+==========================================================================
+VERDICT
+  A (household-size miscoding) caught by class check : True
+  B (10x miscoding) caught by stability check        : True
