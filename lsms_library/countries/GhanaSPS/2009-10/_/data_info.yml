@@ -200,3 +200,59 @@ housing:
     myvars:
         Roof: s12a_32
         Floor: s12a_31
+individual_education:
+    # S1FI.dta -- wave 1's Section 1F(i) "General Education" module.  18,894
+    # rows against a 18,889-person roster; the 5 extras all have a NULL
+    # `s1fi_hhmid` and are dropped by the df_edit hook (see below).  Every
+    # remaining (hhno, s1fi_hhmid) is unique and is in S1D.dta.
+    #
+    # Variable labels read off the .dta, since the names carry no meaning:
+    #   s1fi_2 "Q2 Has person ever attended school"                 -> _attended
+    #   s1fi_3 "Q3 What was the highest grade successfully completed"-> the ladder
+    #   s1fi_4 "Q4 What is the highest educational qualification"   -> _qual
+    #
+    # `_attended` and `_qual` are TEMPORARY: ghanasps.individual_education()
+    # consumes them and drops them, so the built table has only the declared
+    # `Educational Attainment` column.  The country's data_scheme.yml comment
+    # carries the measured argument for why all three are needed.
+    #
+    # Wave 1 is the only wave whose GRADE ladder reaches tertiary -- it has
+    # Level 100..400, Polytechnic, Diploma, HND 1..3, Masters, Teacher/Nursing
+    # Training and Koranic School as grades, none of which exist in the wave-2
+    # or wave-3 code list.  So the qualification fallback fires on only 203
+    # rows here ('Other'), against 501 and 775 later.
+    #
+    # Wave 1's screener is NOT clean, unlike waves 2 and 3, and the hook's
+    # ordering is written for that: `s1fi_2` is null for 1,577 rows of which
+    # 247 nonetheless carry a grade, answers 'No' for 4,878 of which 29 carry a
+    # grade and 51 a qualification, and answers 'Yes' for 12,439 of which 719
+    # carry no grade (636 of those do carry a qualification).  The grade wins
+    # wherever it exists; the qualification is consulted next; 'No' is applied
+    # last.  Nothing here is fabricated -- a row with none of the three stays
+    # NA and is dropped downstream.
+    #
+    # DELIVERED: 16,955 of the 18,889 roster people (89.8%), the LOWEST of the
+    # three waves.  Waves 2 and 3 lose essentially only under-3s (a clean
+    # module age floor); WAVE 1 DOES NOT.  Of its 1,934 unresolved people
+    # 1,266 are under 3 and 381 are aged 3-5, but 224 are aged 6-17 and 63 are
+    # 18+.  Those 287 school-age-and-older people have a row in S1FI.dta with
+    # `s1fi_2` null (or 'Yes') and no grade and no usable qualification -- the
+    # module reached them and recorded nothing.  Do NOT read that as "never
+    # attended": the survey records 'No' explicitly 4,878 times, so a blank is
+    # a different fact from a 'No' and is left NA rather than filled.  This is
+    # the same shape of wave-1 recording defect as the `s1d_27` blank block in
+    # `household_roster` above, and it is recorded, not repaired.
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    file: S1FI.dta
+    idxvars:
+        i: hhno
+        pid: s1fi_hhmid
+    myvars:
+        Educational Attainment:
+            - s1fi_3
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+        _qual:
+            - s1fi_4
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+        _attended: s1fi_2

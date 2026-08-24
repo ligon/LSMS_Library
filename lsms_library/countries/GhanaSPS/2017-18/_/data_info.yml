@@ -148,3 +148,57 @@ housing:
     myvars:
         Roof: materialroof
         Floor: materialfloor
+individual_education:
+    # 01gi_generaleducation.dta -- Section 1G(i) "General Education".  READ THE
+    # FILENAME TWICE.  In 2013-14 education is module `f`; in THIS wave every
+    # module letter shifted by one, so `f` is EMPLOYMENT
+    # (01fi_employmentmain.dta) and education is `g`.  The three variables are
+    # spelled IDENTICALLY in both waves -- `attended`, `highestgrade`,
+    # `highestqual` -- so wiring this wave to `01fi_employmentmain.dta` (the
+    # name that matches wave 2's education file) produces a plausible, silently
+    # wrong table rather than an error.
+    #
+    # Two tells, both measured:
+    #   - row count.  Education is 19,006 here (exactly the roster);
+    #     01fi_employmentmain.dta is 1,481 x 66 and carries `paidemployed` /
+    #     `maintasks` / `jobhoursperday`, no education variable at all.
+    #   - the variable LABELS DO NOT HELP -- they make it worse.  This file's
+    #     own labels still read `s01fi_02 - Ever Attended School`,
+    #     `s01fi_03 - Highest Grade`, `s01fi_04 - Highest Qualification`: the
+    #     instrument was renumbered but the labels were not, so a search for
+    #     `s01fi_` corroborates the WRONG file.  Trust the module content, not
+    #     the label prefix.
+    #
+    # 19,006 rows = the roster exactly, 5,669 households, (FPrimary, hhmid)
+    # unique, no roster-only and no file-only person.  Unlike wave 2, the
+    # under-3s ARE present here -- as rows with `attended`, `highestgrade` and
+    # `highestqual` all null (1,075 rows; 1,072 are aged 0-2).  Same age floor
+    # of 3, different shipping convention.  They resolve to NA and are dropped
+    # downstream, so both waves deliver the same population.
+    #
+    # This wave's code list is the one that DIVERGES from waves 1-2: it inserts
+    # SSS4 at 27 and shifts everything above it by one (27 = 'S1' in waves 1-2,
+    # 'SSS4' here), and adds L6 / U6 at 33 / 34.  Harmless because the mapping
+    # keys on the DECODED LABEL -- but fatal to any mapping written on codes.
+    # It also adds the explicit -999 "Don't know" / -888 "Refuse to answer"
+    # sentinels, both mapped to `Unknown`; neither occurs in the shipped data.
+    #
+    # `highestgrade` has no tertiary rung (it stops at U6), so all 775 tertiary
+    # respondents sit in -666 'Other (please specify)'; 774 of them have a
+    # non-null `highestqual` and the `_qual` fallback recovers them.
+    #
+    # `_attended` / `_qual` are temporary and are dropped by
+    # ghanasps.individual_education().  `v` is NOT declared --
+    # _join_v_from_sample() attaches it at API time.
+    file: 01gi_generaleducation.dta
+    idxvars:
+        i: FPrimary
+        pid: hhmid
+    myvars:
+        Educational Attainment:
+            - highestgrade
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+        _qual:
+            - highestqual
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+        _attended: attended

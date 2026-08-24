@@ -237,13 +237,29 @@ def test_coverage_layer_is_auth_free_and_nonempty(monkeypatch):
     assert len(df) > 0
     assert set(df.columns) == set(cov.COLUMNS)
     tiers = set(df["tier"].astype(str))
-    # coverage-only run yields only declared / absent / n/a
-    assert tiers <= {"declared", "absent", "n/a"}
+    # coverage-only run yields only declared / absent / undeclared / n/a.
+    # `undeclared` (GH #724) belongs in the CHEAP layer by construction: it is
+    # a pure config fact -- the country does not declare a feature the corpus
+    # vocabulary grades everyone on -- so it needs no build and no auth.
+    assert tiers <= {"declared", "absent", "undeclared", "n/a"}
     assert "declared" in tiers
     # every cell is a real (Uganda) wave
     uga_waves = set(ll.Country("Uganda").waves)
     wave_cells = df[df["wave"] != ""]
     assert set(wave_cells["wave"]).issubset(uga_waves)
+
+    # GH #724 asserted positively, not merely tolerated above: Uganda declares
+    # 17 of the 22 vocabulary features, so the auth-free layer must SEE the
+    # other five rather than omit them.  Before #724 they produced no row at
+    # all and Uganda's denominator quietly excluded them.
+    und = df[df["tier"].astype(str) == "undeclared"]
+    assert not und.empty, "coverage layer emitted no `undeclared` rows"
+    assert (und["wave"] == "").all(), (
+        "`undeclared` is a country-level fact -- no per-wave information "
+        "exists, because nobody has looked")
+    vocab = set(cov.feature_vocabulary())
+    declared = set(ll.Country("Uganda", preload_panel_ids=False).data_scheme)
+    assert set(und["feature"]) == vocab - declared
 
 
 def test_build_matrix_covers_declared_features(monkeypatch):
