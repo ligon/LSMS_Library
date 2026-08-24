@@ -1769,6 +1769,46 @@ def add_wave(country: str, catalog_id: str,
 # Main entry point
 # ---------------------------------------------------------------------------
 
+def _as_countries_relative(path: Path) -> Path:
+    """Normalise the path conventions callers actually use (GH #716).
+
+    ``get_data_file`` is documented as taking a path *relative to the
+    countries directory* (``GhanaLSS/1998-99/Documentation/x.pdf``).  But
+    :func:`local_tools.get_dataframe` -- the accessor ``CLAUDE.md`` points
+    everyone at first -- also accepts the **repo-relative** form
+    (``lsms_library/countries/GhanaLSS/.../x.pdf``), which is how paths are
+    written in scripts and in every ``CONTENTS.org`` example.  Passing that
+    form here used to build ``…/countries/lsms_library/countries/…``, derive
+    ``country='lsms_library'``/``wave='countries'``, and return ``None`` for a
+    file sitting on disk.
+
+    Accepted, in order:
+
+    * absolute under the countries root -> made relative to it;
+    * relative, carrying any trailing run of the countries-root parts as a
+      prefix (``lsms_library/countries/X``, ``countries/X``) -> prefix stripped;
+    * already countries-relative -> unchanged.
+
+    A path this cannot interpret is returned unchanged, so genuinely
+    unavailable files behave exactly as before.  The normalisation is
+    **structural**, not existence-based, because the whole point of this
+    function is to fetch files that are not on disk yet.
+    """
+    if path.is_absolute():
+        try:
+            return path.relative_to(_COUNTRIES_DIR)
+        except ValueError:
+            return path
+
+    root_parts = _COUNTRIES_DIR.parts
+    parts = path.parts
+    # Longest match first: strip 'lsms_library/countries' before 'countries'.
+    for n in range(min(len(root_parts), len(parts) - 1), 0, -1):
+        if parts[:n] == root_parts[-n:]:
+            return Path(*parts[n:])
+    return path
+
+
 def get_data_file(path: str | Path,
                   populate_cache: bool = False) -> Path | None:
     """Obtain a raw data file, trying local -> DVC remotes -> World Bank.
@@ -1788,7 +1828,7 @@ def get_data_file(path: str | Path,
         Absolute path to the file on local disk, or ``None`` if
         unavailable.
     """
-    path = Path(path)
+    path = _as_countries_relative(Path(path))
     abs_path = _COUNTRIES_DIR / path
     target_filename = path.name
 
