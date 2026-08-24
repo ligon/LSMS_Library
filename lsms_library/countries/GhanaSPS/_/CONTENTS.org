@@ -909,6 +909,34 @@ both =04h_agsection=, both =03ai_animalquestions=) join *100.0 per cent* into
 2013-14's =InstanceNumber= is 1:1 with =plotid= within household and carries no
 extra information.
 
+*But =plotid= is NOT a panel identifier after wave 2.*  2013-14's
+=04h_preroster= is a genuine carry-forward list (=knowplot=, =stillowner=), and
+4,916 of wave 1's 5,082 plots in the 2,455 common households (96.7 per cent)
+reappear under the same =(household, plot number)= -- so W1 -> W2 numbering is
+carried by construction.  2017-18 ships no such file, and the 71.3 per cent
+positional overlap between W2 and W3 is *not* evidence: a household with three
+plots in each wave overlaps on three plot numbers whatever the numbers mean.
+
+Tested against a permutation null -- time-invariant plot attributes compared
+under the true =(i, plotid)= pairing versus =plotid= permuted *within
+household* in W3, 20 draws:
+
+| attribute (2,851 matched W2/W3 plots) |  true | null         |    lift |
+|---------------------------------------+-------+--------------+---------|
+| plot area within 10 per cent          | 15.2% | 14.1 +/- 0.4 | +1.1 pt |
+| soil colour identical                 | 34.9% | 34.6 +/- 0.3 | +0.3 pt |
+| distance from home within 20 per cent | 22.0% | 21.8 +/- 0.3 | +0.2 pt |
+
+Restricting to multi-plot households (561 of the 2,181 common households have
+exactly one plot in each wave, where permuting is a no-op) barely moves it:
+area 15.9 per cent true against 14.4 per cent null.
+
+*The true pairing does not beat chance.*  =plotid= in 2013-14 and 2017-18 is a
+within-interview enumeration order, not a persistent plot id.  *Do not join
+plot-level data across those two waves on =(i, plotid)=.*  (Caveat: the
+=plotlocation_region= column was also tested and is useless for this -- it is
+populated for only 66 of the 2,851 matched plots.)
+
 ** 2009-10 has TWO SEASONS; 2013-14 and 2017-18 have one
 
 =S4AV1/S4AV2= (crop harvest), =S4AVI1/S4AVI2= (chemicals),

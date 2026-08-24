@@ -341,16 +341,51 @@ between waves.*  What differs:
    zero rows) with a free-text tail; W1 and W3 list only what is owned, with
    clean labelled categories.
 
-*Is =plotid= a panel identifier?*  Partly, and this matters for anyone
-tempted to pool.  Among the 2,455 households present in both W1 and W2,
-*4,916 of W1's 5,082 plots (96.7 per cent) reappear as the same
-=(household, plot number)= in W2's =04h_preroster=* --- which is explicitly a
-carry-forward list (=knowplot=, =stillowner=).  So the numbering *is* carried
-across W1 -> W2.  W2 -> W3 is weaker evidence: among the 2,181 households with
-plots in both, 2,851 of W2's 3,996 plots (71.3 per cent) have a matching plot
-number in W3, but W3 ships no preroster with a =stillowner= flag, so I *cannot
-confirm* that plot 3 in W3 is the same land as plot 3 in W2.  Treat =plot_id=
-as wave-local unless someone establishes the W2 -> W3 link.
+*Is =plotid= a panel identifier?*  *W1 -> W2 yes; W2 -> W3 no.*  This was
+filed as undetermined in the first draft of this note and has since been
+*tested*.
+
+Among the 2,455 households present in both W1 and W2, *4,916 of W1's 5,082
+plots (96.7 per cent) reappear as the same =(household, plot number)= in W2's
+=04h_preroster=* --- which is explicitly a carry-forward list (=knowplot=,
+=stillowner=).  The numbering is carried across W1 -> W2 by construction.
+
+W3 ships no such carry-forward file, so the 71.3 per cent positional overlap
+between W2 and W3 (2,851 of W2's 3,996 plots in the 2,181 common households)
+proves nothing on its own --- it is consistent with continuity *and* with
+coincidence, because a household with three plots in each wave overlaps on
+three plot numbers whatever the numbering means.
+
+So it was tested against a *permutation null*: compare attributes that ought to
+be time-invariant for a given piece of land, under the true =(i, plotid)=
+pairing, against the same comparison with =plotid= permuted *within household*
+in W3 (20 draws).  If the numbering carries information, the true pairing must
+beat the null.
+
+| attribute (matched W2/W3 plots)  |  true | null (permuted)  |    lift |
+|----------------------------------+-------+------------------+---------|
+| plot area within 10 per cent     | 15.2% | 14.1 +/- 0.4     | +1.1 pt |
+| soil colour identical            | 34.9% | 34.6 +/- 0.3     | +0.3 pt |
+| distance from home within 20%    | 22.0% | 21.8 +/- 0.3     | +0.2 pt |
+
+Restricting to *multi-plot* households --- 561 of the 2,181 common households
+have exactly one plot in each wave, for which permuting is a no-op and the null
+is therefore inflated --- barely moves it: area 15.9 per cent true against 14.4
+per cent null, a lift of *+1.5 points*.
+
+*That is a negative result, not an inconclusive one.*  If =plotid= tracked the
+same land, area agreement would sit far above the null; it sits on top of it.
+The reading is that *=plotid= in W2 and W3 is a within-interview enumeration
+order, not a persistent plot identifier*.  Do not join plot-level GhanaSPS data
+across those two waves on =(i, plotid)=.
+
+Two honest caveats on the test.  =plotlocation_region= was included and is
+useless here --- it is populated for only 66 of the 2,851 matched plots, so its
+0.0 per cent agreement is an artefact of emptiness and is *not* evidence.  And
+the low *absolute* agreement rates partly reflect genuine recall noise (farmers
+re-estimating plot size four years apart); that is exactly why the comparison
+is against a null rather than against a threshold --- the null absorbs the
+noise, and the lift is what carries the signal.
 
 * Per-feature verdicts
 
@@ -390,8 +425,9 @@ Rows: ~5,690 (W1) / 4,694 (W2) / 5,366 (W3).
 *Risks*: (a) the W3 =plotsizeunit= trap above; (b) =Irrigated= would be
 recording "has a non-rain water source", which is *weaker* than the canonical
 note's "irrigation infrastructure / customary water access" --- I would leave
-it undeclared rather than overstate it; (c) =plot_id= panel identity for
-W2 -> W3 is unproven.
+it undeclared rather than overstate it; (c) =plot_id= does *not* identify the
+same land across W2 and W3 (tested against a permutation null, above), so the
+build must say so --- see the recommendation below.
 
 ** =crop_production= --- CONSTRUCTIBLE, all three waves; sales column asymmetric
 
@@ -591,6 +627,26 @@ hand.  All five need =materialize: make= --- none of them is expressible in
 =data_info.yml=, because every one requires either a melt (W1) or a
 concatenation of per-wave files with different column names.
 
+*If only one gets dispatched, dispatch =plot_features=.*  The list below is
+ordered by effort, and on effort alone =livestock= is the easier start.  On
+*leverage* the answer is different, and leverage is what matters when the
+question is what to build first:
+
+1. =plot_features= is the keystone.  Three of the other four features key on
+   the plot identifier it defines.  Wiring it first sets that convention once,
+   deliberately; wiring anything else first leaves the convention to be
+   invented ad hoc by whoever gets to =crop_production=.
+2. It carries =Area=, the *only* column the canonical schema marks *required*
+   anywhere in the agriculture set, and that column is provably reachable in
+   all three waves (the wave-1 hectare factors above).  High confidence, high
+   value.
+3. Its risks are mechanical and checkable --- read the right unit column, apply
+   the right factor, map a stable tenure vocabulary.  None of them is a
+   judgement call about what a number means.
+4. It is now also the natural home for the =plotid=-is-not-a-panel-id finding.
+   That fact has to be written down in the first plot-keyed feature that lands,
+   or the second one to land will quietly join on it.
+
 ** 1. =livestock= --- do this first
 
 - Effort :: *small*.  One source file per wave, household-animal grain,
@@ -613,9 +669,21 @@ concatenation of per-wave files with different column names.
 - Why second :: it establishes the =plot_id= that the other three plot features
   key on, and =Area= --- the only *required* column --- is reachable in all
   three waves with exact factors.  Roughly 15,750 plot-rows panel-wide.
-- Specific risk :: read =plotunit=, not =plotsizeunit=, in W3.  And do not
-  declare =Irrigated= from =othersource= without deciding that "non-rain water
-  source" is what the canonical column means.
+- Specific risk :: *the W3 unit column, and it is silent.*  Read =plotunit=,
+  not =plotsizeunit=.  =plotsizeunit= omits acres entirely, so 4,791 of 5,366
+  W3 plots (*89.3 per cent*) have a null unit under the naive reading --- and
+  therefore a null =Area=, the required column.  Note what does *not* save you:
+  the Site B null-read guard fires on a required column that is *100 per cent*
+  null in a wave, and this lands at 89.3 per cent.  It will not fire.  Nor will
+  =_assert_built_required_columns=, which checks presence, not content.  This
+  failure ships green.
+- Second risk :: do not declare =Irrigated= from =othersource= without deciding
+  that "non-rain water source" is what the canonical column means.
+- Third risk :: =plot_id= does not identify the same land across W2 and W3
+  (permutation test above).  Build per-wave and *say so* in
+  =data_scheme.yml= --- the =t= level already scopes every row correctly, so
+  nothing needs to be prevented, but the limitation must be written down where
+  the next person will read it.
 
 ** 3. =crop_production= --- the substantive prize, but W1 is real work
 
@@ -665,26 +733,22 @@ Not requested, recorded because the measurement was already done:
 
 * What I could not determine
 
-1. *Whether W3's =plotid= refers to the same physical land as W2's.*  71.3 per
-   cent positional overlap is consistent with both continuity and coincidence,
-   and W3 ships no =stillowner=-style carry-forward flag.  W1 -> W2 *is*
-   established (96.7 per cent via =04h_preroster=).
-2. *What is in =Crop_encrypted/=.*  Boxcryptor-encrypted, no passphrase in the
+1. *What is in =Crop_encrypted/=.*  Boxcryptor-encrypted, no passphrase in the
    repository, and =get_data_file()= returns =None= for all four files anyway.
    I could not establish whether the blobs are simply absent from the remote or
    whether the =.bc= extension defeats the fetch path --- I did not investigate
    further because reading them is blocked either way.
-3. *Whether =TenureSystem= is asked anywhere.*  I found no freehold /
+2. *Whether =TenureSystem= is asked anywhere.*  I found no freehold /
    leasehold / customary regime question in any wave's variable labels, and W1's
    questionnaire Part A has none.  I did not read the W2/W3 instruments, so
    this is =unsure=, not "not asked".
-4. *W2's 04l organic-input plot lists.*  I confirmed they are per-plot flags
+3. *W2's 04l organic-input plot lists.*  I confirmed they are per-plot flags
    with no quantity, but did not decode =greenmanureplots1..30= to actual plot
    ids --- they carry the same =%pplotnamearray[k]= placeholders as the
    chemical block.
-5. *The exact stage vocabulary in W2 vs W3.*  W2 has =stagenum= / =stage=, W3
+4. *The exact stage vocabulary in W2 vs W3.*  W2 has =stagenum= / =stage=, W3
    has =stageid= / =stagename=; I confirmed both exist and are unique within
    plot, but did not enumerate and compare the stage label sets across waves.
-6. *W1 =S4AIII= soil detail.*  I confirmed a soil/water block exists at plot
+5. *W1 =S4AIII= soil detail.*  I confirmed a soil/water block exists at plot
    level but did not enumerate its variables, so the W1 =SoilType= claim in the
    =plot_features= table above is weaker than the W2/W3 ones.
