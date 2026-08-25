@@ -15,9 +15,9 @@ Variable map traced from MLI_EACI1.do + the s4a questionnaire labels:
   HeadCount      = s4aq04   "Nombre actuellement dans le troupeau"
   HeadAcquired   = s4aq15   "Nombre achete au cours des 12 derniers mois"
   HeadSold       = s4aq22   "Nombre vendu appartenant au menage"
-  Value (sales)  = s4aq24   "Valeur brute des ventes" (FCFA)
+  SalesValue     = s4aq24   "Valeur brute des ventes" (FCFA)
 
-The EACI roster carries NO current herd-value question, so Value is the
+The EACI roster carries NO current herd-value question, so SalesValue is the
 gross SALES value where reported (else NaN), matching the GAP-4 brief
 ("value where the source reports it; else NaN").  NO TLU, NO herd-value
 total, NO engaged-in-livestock binary — those are transformations over
@@ -55,7 +55,7 @@ df = pd.DataFrame({
     'HeadCount': owned['s4aq04'],
     'HeadAcquired': owned['s4aq15'],
     'HeadSold': owned['s4aq22'],
-    'Value': owned['s4aq24'],
+    'SalesValue': owned['s4aq24'],
 })
 
 df = livestock_finalize(df)

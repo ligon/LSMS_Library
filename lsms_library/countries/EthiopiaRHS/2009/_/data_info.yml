@@ -58,7 +58,7 @@ livestock:
             - pa
             - hhid
     myvars:
-        LivestockValue: lvs_val7
+        HerdValue: lvs_val7
         TLU: tlu7
 
 # crop_production (#438): R7 (2009) HH x cereal production (kg) + area (ha),

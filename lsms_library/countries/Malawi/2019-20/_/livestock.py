@@ -7,7 +7,7 @@ crop_production / plot_features.  Source per half: ag_mod_r1 (Module R
 livestock roster), one row per (HH, species).
     animal = ag_r0a (LIVESTOCK CODE, coarse scheme),
     HeadCount = ag_r02, HeadAcquired = ag_r10 (bought to raise),
-    HeadSold = ag_r16, Value = ag_r04 (per-head current value).
+    HeadSold = ag_r16, ValuePerAnimal = ag_r04 (per-head current value).
 
 Same roster the World Bank code collapses to a binary
 (MWI_IHPS4.do:1043-1051); we keep the pre-collapse rows.  See

@@ -194,11 +194,16 @@ Data Scheme:
     #   HeadCount     current head owned/kept by the HH.
     #   HeadAcquired  head PURCHASED alive in the last 12 months.
     #   HeadSold      head SOLD alive in the last 12 months.
-    #   Value         total income from livestock SALES in the last 12 months
-    #                 (Birr).  The §8 roster records NO current herd-value
-    #                 question in any ESS wave, so Value carries the reported
-    #                 sale income (the only monetary §8 field); it is NOT a
-    #                 herd valuation.
+    #   SalesValue    total value of livestock SALES in the last 12 months
+    #                 (Birr; ls_s8aq60 "What was the total value of sales of
+    #                 [LIVESTOCK] in the last 12 months?").  The §8 roster
+    #                 records NO current herd-value question in any ESS wave,
+    #                 so there is no HerdValue here.  It is ADDITIVE over
+    #                 `animal` and it values HeadSold, NOT HeadCount -- so it
+    #                 is a sales FLOW, not a herd valuation, and NOT a
+    #                 per-animal price (contrast Uganda/Malawi/Nigeria's
+    #                 ValuePerAnimal).  See `Columns: livestock` in
+    #                 lsms_library/data_info.yml.
     # This is the PRE-COLLAPSE §8 roster the WB code reads then throws away
     # down to a single engaged-in-livestock y/n binary (their recode of the
     # post-planting cover pp_saq13 + collapse-max).  We keep the head counts
@@ -225,7 +230,7 @@ Data Scheme:
     HeadCount: float
     HeadAcquired: float
     HeadSold: float
-    Value: float
+    SalesValue: float
     materialize: make
 
   food_security:

@@ -1581,7 +1581,7 @@ def livestock_for_wave(t, count, txn, colmap):
     -------
     pd.DataFrame indexed by ``(t, i, animal)`` with columns
         HeadCount (float), HeadAcquired (float), HeadSold (float),
-        Value (float).  Summed over the raw animal sub-codes that share a
+        SalesValue (float).  Summed over the raw animal sub-codes that share a
         canonical species within a household (e.g. Bulls+Oxen+Cows ->
         Cattle), which is the within-household roll-up to the (t, i, animal)
         grain -- NOT a WB-style collapse-to-binary.  Rows where the
@@ -1622,8 +1622,8 @@ def livestock_for_wave(t, count, txn, colmap):
                          pd.Series(pd.NA, index=tx.index, dtype='Float64')).values,
         'HeadSold': (_num(tx, 'head_sold') if c.get('head_sold') else
                      pd.Series(pd.NA, index=tx.index, dtype='Float64')).values,
-        'Value':   (_num(tx, 'sale_value') if c.get('sale_value') else
-                    pd.Series(pd.NA, index=tx.index, dtype='Float64')).values,
+        'SalesValue': (_num(tx, 'sale_value') if c.get('sale_value') else
+                       pd.Series(pd.NA, index=tx.index, dtype='Float64')).values,
     })
 
     if txn is None:
@@ -1639,7 +1639,7 @@ def livestock_for_wave(t, count, txn, colmap):
     # counts / transactions over the raw codes that share a canonical
     # species (and over multiple holders in one household).
     agg = merged.groupby(['i', 'animal'], dropna=True)[
-        ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']].sum(min_count=1)
+        ['HeadCount', 'HeadAcquired', 'HeadSold', 'SalesValue']].sum(min_count=1)
 
     # Drop species the household neither owns nor transacts (all-NaN or
     # all-zero across every reported column).
@@ -1650,10 +1650,10 @@ def livestock_for_wave(t, count, txn, colmap):
     agg['t'] = t
     agg['i'] = agg['i'].astype('string')
     agg['animal'] = agg['animal'].astype('string')
-    for col in ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']:
+    for col in ['HeadCount', 'HeadAcquired', 'HeadSold', 'SalesValue']:
         agg[col] = agg[col].astype('Float64')
     agg = agg.set_index(['t', 'i', 'animal'])
-    agg = agg[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
+    agg = agg[['HeadCount', 'HeadAcquired', 'HeadSold', 'SalesValue']]
     return agg.sort_index()
 
 

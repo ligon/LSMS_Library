@@ -4,7 +4,7 @@ Item-level (t, i, animal) livestock-roster feature.  Source:
   * AG_MOD_R1_13 -- Module R livestock roster, one row per (HH, species).
     animal = ag_r0a (LIVESTOCK CODE, coarse scheme with Ox=3304 etc.),
     HeadCount = ag_r02, HeadAcquired = ag_r10 (bought to raise),
-    HeadSold = ag_r16, Value = ag_r04 (per-head current value).
+    HeadSold = ag_r16, ValuePerAnimal = ag_r04 (per-head current value).
 
 i = format_id(y2_hhid), aligning with plot_features / crop_production
 2013-14.  Same roster the World Bank code collapses to a binary

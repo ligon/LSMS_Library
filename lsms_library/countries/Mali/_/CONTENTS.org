@@ -603,3 +603,24 @@ a sampled household).
   tuples (9 dups).  The parquet stores the pre-walk (unique) index and
   lets the framework's idempotent id_walk in =_finalize_result= do the
   panel remap, consistent with every other Mali table.
+
+** livestock: =SalesValue=, NOT a herd value and NOT a per-animal price
+
+The EACI roster (s4a in 2014-15, s8a + s8b1 in 2017-18) has no current
+herd-value question.  Its only monetary livestock field is =s4aq24= /
+=s8b1q14=, "Valeur brute des ventes" -- the gross value of the animals SOLD
+in the last 12 months.  That column is called *=SalesValue=* (canonical
+vocabulary in =lsms_library/data_info.yml=, =Columns: livestock:=).  It was
+called =Value= until 2026-08-24.
+
+- *ADDITIVE* over =animal=; it is a total, not a unit price.
+- It values *HeadSold*, not HeadCount -- a transaction FLOW, so it must NOT be
+  summed into a livestock-wealth aggregate.  Mali has no =HerdValue=.
+- A per-animal sale price is =SalesValue / HeadSold=.
+
+*Measured*: among rows where the household sold nothing, *0.0%* carry a
+positive value (2014-15 and 2017-18 alike) -- versus 92-98% in Nigeria /
+Malawi, whose =ValuePerAnimal= is a reservation price asked whether or not
+anything was sold.  Note that correlation with HeadCount does NOT distinguish
+the two readings; both are near zero.  The sold-nothing conditional plus the
+questionnaire wording are what settle it.

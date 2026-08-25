@@ -2047,10 +2047,11 @@ INPUT_COLMAPS = {
 #   HeadCount      head owned now              (q5 / q5a / q3a / s..q03a)
 #   HeadAcquired   head bought to raise        (q12 / q13a / s..q13a)
 #   HeadSold       head sold alive             (q14 / q14a / s..q14a)
-#   Value          reported per-head value     (q6 'value if sold one today',
+#   ValuePerAnimal reported PER-HEAD value  (q6 'value if sold one today',
 #                  2009-10/2010-11; q14b 's..q14b' 'avg value of each sold' for
-#                  2011-12+ which dropped the sell-today question)
-# Herd value (= Value x HeadCount), TLU, and the WB engaged-livestock binary
+#                  2011-12+ which dropped the sell-today question).  Both
+#                  variants are per head, so the column is NOT additive.
+# Herd value (= ValuePerAnimal x HeadCount), TLU, and the WB engaged-livestock binary
 # (= groupby.any over these rows) are TRANSFORMATIONS, never stored here.
 #
 # Per-wave the animal type lives in different columns and two encodings:
@@ -2129,12 +2130,12 @@ def livestock_for_wave(t, df6a, df6b, df6c, colmap):
     Returns
     -------
     pd.DataFrame indexed ``(t, i, animal)`` with Float64 columns
-        ``HeadCount``, ``HeadAcquired``, ``HeadSold``, ``Value``.
+        ``HeadCount``, ``HeadAcquired``, ``HeadSold``, ``ValuePerAnimal``.
         One row per (household, species) -- duplicate species rows within
         a household (e.g. exotic + indigenous cattle, both mapping to
         'Cattle') are summed for the head columns and value-weighted-mean
-        for ``Value`` so the (t, i, animal) index is unique.  NO TLU, NO
-        herd-value total, NO engaged binary (all transformations).
+        for ``ValuePerAnimal`` so the (t, i, animal) index is unique.  NO
+        TLU, NO herd-value total, NO engaged binary (all transformations).
     """
     code_map = _species_code_map()
     str_map = _species_string_map()
@@ -2179,11 +2180,11 @@ def livestock_for_wave(t, df6a, df6b, df6c, colmap):
             'HeadCount':    _num('headcount').values,
             'HeadAcquired': _num('acquired').values,
             'HeadSold':     _num('sold').values,
-            'Value':        _num('value').values,
+            'ValuePerAnimal': _num('value').values,
         })
         pieces.append(piece)
 
-    cols = ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']
+    cols = ['HeadCount', 'HeadAcquired', 'HeadSold', 'ValuePerAnimal']
     if not pieces:
         return pd.DataFrame(columns=cols)
 
@@ -2198,17 +2199,17 @@ def livestock_for_wave(t, df6a, df6b, df6c, colmap):
         df[c] = pd.to_numeric(df[c], errors='coerce')
     measure = ['HeadCount', 'HeadAcquired', 'HeadSold']
     # Keep a row when ANY head measure is a positive number (owned now,
-    # bought, or sold).  Value alone (per-head price with no head count)
-    # is not evidence of ownership.
+    # bought, or sold).  ValuePerAnimal alone (a per-head price with no
+    # head count) is not evidence of ownership.
     has_head = (df[measure].fillna(0) > 0).any(axis=1)
     df = df[has_head]
 
     # Collapse to (t, i, animal): the roster splits a species across
     # exotic/indigenous and age/sex lines; those are the SAME species for
     # this axis, so sum the head columns and take a head-weighted mean of
-    # the reported per-head Value (NaN where no line reported a value).
+    # the reported ValuePerAnimal (NaN where no line reported a value).
     df['_w'] = df['HeadCount'].fillna(0)
-    df['_vw'] = df['Value'] * df['_w']
+    df['_vw'] = df['ValuePerAnimal'] * df['_w']
     grouped = df.groupby(['t', 'i', 'animal'], dropna=False)
     out = grouped[measure].sum(min_count=1)
     vw_sum = grouped['_vw'].sum(min_count=1)
@@ -2216,8 +2217,8 @@ def livestock_for_wave(t, df6a, df6b, df6c, colmap):
     value = vw_sum / w_sum.where(w_sum > 0, pd.NA)
     # Fall back to a simple mean of reported values where head weights are
     # all zero/NaN but a value was nonetheless reported.
-    plain = grouped['Value'].mean()
-    out['Value'] = value.where(value.notna(), plain)
+    plain = grouped['ValuePerAnimal'].mean()
+    out['ValuePerAnimal'] = value.where(value.notna(), plain)
 
     for c in cols:
         out[c] = pd.to_numeric(out[c], errors='coerce').astype('Float64')
@@ -2226,7 +2227,7 @@ def livestock_for_wave(t, df6a, df6b, df6c, colmap):
 
 # Per-wave column maps for livestock_for_wave.  ``type`` is the animal-type
 # column; ``type_kind`` 'code' (harmonize_species) or 'string'
-# (_species_string_map).  Value is the reported per-head animal value: the
+# (_species_string_map).  ValuePerAnimal is the reported per-head value: the
 # 'sell one today' question (q6) where the wave asks it (2009-10, 2010-11),
 # else the 'average value of each sold' (q14b) for 2011-12+.
 LIVESTOCK_COLMAPS = {

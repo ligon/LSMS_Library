@@ -821,11 +821,12 @@ def assemble_plot_inputs(t, parts):
 #   HeadAcquired   head bought to raise this period (s11iq10 W1-W4;
 #                  s11iq17 W5)
 #   HeadSold       head sold alive this period (s11iq16 W1-W4; s11iq23 W5)
-#   Value          reported reservation value of ONE head -- "if you sold
-#                  one today, how much would you receive" (s11iq3 W1-W4;
-#                  s11iq7 W5).  This is a per-head reported price, NOT a
-#                  herd-value total and NOT the WB engaged binary; a herd
-#                  value (HeadCount x Value) and TLU are transformations.
+#   ValuePerAnimal reported reservation value of ONE head -- "If you would
+#                  sell one of the [ANIMAL] today, how much would you
+#                  receive?" (s11iq3 W1-W4; s11iq7 W5).  A per-head reported
+#                  price, so NOT additive, and NOT a herd-value total nor the
+#                  WB engaged binary; a herd value (HeadCount x
+#                  ValuePerAnimal) and TLU are transformations.
 # NO TLU, NO herd-value total, NO engaged-in-livestock binary -- those
 # are transformations over these rows (their binary = groupby.any()).
 #
@@ -871,7 +872,7 @@ def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
         owned rows).
     head_now, head_acquired, head_sold, value : str or None
         Reported column names for HeadCount / HeadAcquired / HeadSold /
-        Value.  None -> that column is all-NA for the wave.
+        ValuePerAnimal.  None -> that column is all-NA for the wave.
     species_labels : dict
         {int animal_code: Preferred Label} from harmonize_species.
 
@@ -879,7 +880,7 @@ def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
     -------
     DataFrame indexed by (t, i, animal) with reported numeric columns.
     Keeps a row when the animal label resolves AND the household reports
-    something for it (any of HeadCount / HeadAcquired / HeadSold / Value
+    something for it (any of HeadCount / HeadAcquired / HeadSold / ValuePerAnimal
     non-missing-and-nonzero) so the roster grid's never-owned all-zero
     rows (W2-W4 enumerate every animal for every HH) do not bloat the
     feature.  A row with own==yes but all-zero quantities is still kept
@@ -901,7 +902,7 @@ def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
         'HeadCount': num(head_now).astype('Float64').values,
         'HeadAcquired': num(head_acquired).astype('Float64').values,
         'HeadSold': num(head_sold).astype('Float64').values,
-        'Value': num(value).astype('Float64').values,
+        'ValuePerAnimal': num(value).astype('Float64').values,
     }, index=df.index)
 
     if owned is not None and owned in df.columns:
@@ -916,7 +917,7 @@ def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
     # Keep rows the HH actually engaged with: either flagged owned, or any
     # reported quantity is non-null and nonzero.  Drop the roster-grid
     # not-owned all-zero filler rows (W2-W4) and unresolved animal labels.
-    qcols = ['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']
+    qcols = ['HeadCount', 'HeadAcquired', 'HeadSold', 'ValuePerAnimal']
     has_qty = pd.Series(False, index=piece.index)
     for c in qcols:
         v = piece[c]
@@ -931,7 +932,7 @@ def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
     out = out.drop_duplicates(subset=['t', 'i', 'animal'], keep='first')
 
     out = out.set_index(['t', 'i', 'animal']).sort_index()
-    return out[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
+    return out[['HeadCount', 'HeadAcquired', 'HeadSold', 'ValuePerAnimal']]
 
 
 # ---------------------------------------------------------------------

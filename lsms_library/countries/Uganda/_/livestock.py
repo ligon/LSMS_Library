@@ -2,8 +2,8 @@
 
 Each wave's ``Uganda/<wave>/_/livestock.py`` produces a parquet indexed
 ``(t, i, animal)`` with the REPORTED livestock columns (HeadCount,
-HeadAcquired, HeadSold, Value).  This script concatenates them across waves
-and applies cross-wave id_walk so the household index uses the panel
+HeadAcquired, HeadSold, ValuePerAnimal).  This script concatenates them
+across waves and applies cross-wave id_walk so the household index uses the panel
 canonical id scheme.
 
 Source: the UNPS livestock roster (AGSEC6A/6B/6C) that the WB code reads

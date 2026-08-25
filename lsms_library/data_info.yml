@@ -311,6 +311,133 @@ Columns:
   panel_ids:
     previous_i:
       type: str
+  livestock:
+    # Grain (t, i, animal) for the 13 roster countries; EthiopiaRHS is the
+    # documented (t, i) household-total variant (pre-aggregated herd scalars
+    # from the IFPRI ERHS deposit -- it has no per-species roster).
+    #
+    # NOTHING here is `required: true`, deliberately.  `required` in this file
+    # makes tests/test_schema_consistency.py::TestRequiredColumns demand the
+    # column of EVERY country declaring the table, and livestock's column set
+    # genuinely varies with the instrument: the 7 EHCVM countries record head
+    # counts and no value at all, EthiopiaRHS records value and no head
+    # counts.  Any `required` livestock column would be a false universal.
+    #
+    # ---- THE VALUE COLUMNS ARE SPLIT BY ADDITIVITY, NOT BY GRAIN ----
+    #
+    # Three distinct quantities were all spelled `Value`.  They share a dtype,
+    # a grain and a currency, so nothing in the library could tell them apart
+    # and all three graded `sane`.  Summing the wrong one is silent.  The
+    # split is by WHAT ARITHMETIC IS LEGAL:
+    #
+    #   ValuePerAnimal  price per head          -- NOT additive
+    #   HerdValue       stock total             -- additive over `animal`
+    #   SalesValue      transaction-flow total  -- additive over `animal`
+    #
+    # Which one a country has is settled on the QUESTIONNAIRE WORDING (quoted
+    # per column below), corroborated by a conditional test.  Correlation with
+    # HeadCount does NOT discriminate -- neither a unit price nor a sales
+    # total tracks herd size, so both look alike under it.  The test that
+    # separates them is: IS THE VALUE REPORTED WHEN NOTHING WAS SOLD?
+    #
+    #   % rows with value > 0 | given HeadSold == 0 | given HeadSold > 0
+    #   ----------------------+---------------------+--------------------
+    #   Nigeria               |         98.0        |        98.2
+    #   Malawi                |         92.1        |        91.4
+    #   Uganda 2009-10        |         99.2        |        89.6
+    #   Uganda 2011-12+       |          0.0        |        94.9
+    #   Ethiopia              |          2.0        |        95.6
+    #   Mali                  |          0.0        |        92.5
+    #
+    # A price reported regardless of any sale is a reservation price
+    # (Nigeria / Malawi / early Uganda).  A number that exists only when a
+    # sale happened is sale-linked -- but that alone does NOT prove it is a
+    # total: Uganda 2011-12+ is also 0.0 and is still PER HEAD ("the value of
+    # each sold").  Only the wording settles it, which is why it is quoted.
+    HeadCount:
+      type: float
+      note: |
+        Head of this animal owned / kept by the household at interview.
+        A stock.  Summing over `animal` adds cattle to chickens; the
+        meaningful aggregate is TLU (sum of head x species factor).  For the
+        roster countries TLU is a transformation over these rows and is
+        deliberately NOT stored -- see the TLU entry below for the one case
+        where the source ships it pre-aggregated.
+    HeadAcquired:
+      type: float
+      note: |
+        Head PURCHASED alive during the survey's recall window (12 months in
+        every country that records it).  A flow.  Births and gifts are
+        separate reported flows and are deliberately NOT folded in.
+    HeadSold:
+      type: float
+      note: |
+        Head SOLD alive during the recall window.  A flow, and the
+        denominator that turns SalesValue into a per-animal sale price.
+    ValuePerAnimal:
+      type: float
+      monetary: true
+      note: |
+        Price of ONE head, in local currency.  NOT ADDITIVE -- summing it
+        over `animal`, or over households, produces a number with no meaning.
+        A household's holding value is ValuePerAnimal * HeadCount, computed
+        by the analyst; the library does not store it.
+
+        Two instrument variants, both per-head:
+          - RESERVATION price -- "If you would sell one of the [ANIMAL]
+            today, how much would you receive?"  Reported whether or not
+            anything was sold.  Nigeria (s11iq3), Malawi (ag_r04), Uganda
+            2009-10 / 2010-11 (a6aq6).
+          - REALISED average -- "What was, on average, the value of each
+            sold?"  Defined only where the household sold.  Uganda 2011-12
+            onward (a6aq14b / s6aq14b), which dropped the sell-today question.
+
+        The switch is within-concept -- both are per head -- so it does not
+        change the column, but it DOES change coverage: Uganda's non-null
+        rate falls from ~96% to ~21% at 2011-12, and every non-null row from
+        then on is conditional on a sale.
+    HerdValue:
+      type: float
+      monetary: true
+      note: |
+        Total value of the animals described by this row, in local currency.
+        ADDITIVE: at (t, i, animal) it is the per-species herd total and sums
+        over `animal` to the household's livestock wealth; at the (t, i)
+        grain the row already IS the household total.
+
+        A stock -- it values HeadCount.  Contrast SalesValue, which values
+        HeadSold.  Declared by EthiopiaRHS (lvsval80 / livval6 / lvs_val7,
+        "total value of livestock herd", Birr, at the (t, i) grain).
+    SalesValue:
+      type: float
+      monetary: true
+      note: |
+        Gross value of the animals SOLD during the recall window, in local
+        currency.  ADDITIVE over `animal`, but a FLOW: it values HeadSold,
+        not HeadCount, so it is NOT a herd valuation and must never be summed
+        into a wealth aggregate.  A per-animal sale price is
+        SalesValue / HeadSold.
+
+        Declared by Ethiopia (ls_s8aq60, "What was the total value of sales
+        of [LIVESTOCK] in the last 12 months? (BIRR)") and Mali (s4aq24 /
+        s8b1q14, "Valeur brute des ventes").  Both rosters record NO current
+        herd value, which is why neither country has a HerdValue -- an
+        earlier reading that mapped these onto ValuePerAnimal would have
+        relabelled an additive total as a unit price.
+    TLU:
+      type: float
+      note: |
+        Tropical Livestock Units -- head weighted by a species conversion
+        factor, so herds of different composition are commensurable.  A
+        stock, additive over `animal`, and NOT monetary (it is an animal
+        count in cattle-equivalents, not a currency amount), which is why it
+        is absent from currency._DEFAULT_MONETARY['livestock'].
+
+        Stored ONLY where the source ships it pre-aggregated: EthiopiaRHS
+        (lsu80 / lsu6 / tlu7, at the (t, i) grain).  For the 13 roster
+        countries TLU is a transformation over HeadCount and is deliberately
+        not stored -- their configs say so individually, and computing it
+        needs a species factor table the library does not yet carry.
   crop_production:
     # NOTE: `condition` is an INDEX level, not a column -- deliberately
     # declared here anyway.  `_enforce_canonical_spellings` (country.py:3962)

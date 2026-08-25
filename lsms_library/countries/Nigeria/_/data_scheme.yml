@@ -334,9 +334,11 @@ Data Scheme:
     #   HeadCount      head owned/kept now (s11iq2 W1-W3/W5; s11iq2a W4)
     #   HeadAcquired   head bought to raise (s11iq10 W1-W4; s11iq17 W5)
     #   HeadSold       head sold alive      (s11iq16 W1-W4; s11iq23 W5)
-    #   Value          reported reservation value of ONE head -- "if you
-    #                  sold one today, how much would you receive"
-    #                  (s11iq3 W1-W4; s11iq7 W5).  Per-head reported price,
+    #   ValuePerAnimal reported reservation value of ONE head -- "If you
+    #                  would sell one of the [ANIMAL] today, how much would
+    #                  you receive?" (s11iq3 W1-W4; s11iq7 W5).  A per-head
+    #                  price, so NOT additive; reported whether or not the
+    #                  household sold anything.  Reported price,
     #                  NOT a herd-value total and NOT the WB engaged
     #                  binary.
     # NO TLU, NO herd-value total, NO engaged-in-livestock binary -- those
@@ -345,7 +347,7 @@ Data Scheme:
     HeadCount: float
     HeadAcquired: float
     HeadSold: float
-    Value: float
+    ValuePerAnimal: float
     materialize: make
 
   anthropometry:

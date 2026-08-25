@@ -60,7 +60,7 @@ Data Scheme:
   # All wired via the existing _no_v_join exemption for `livestock`.
   livestock:
     index: (t, i)
-    LivestockValue: float   # total value of livestock herd (Birr)
+    HerdValue: float   # total value of livestock herd (Birr)
     TLU: float              # Livestock Standard Units (tropical livestock units)
 
   # income (#277): HH-level income-VALUE aggregates from the R5 (1999)

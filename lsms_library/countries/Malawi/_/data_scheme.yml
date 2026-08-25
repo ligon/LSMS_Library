@@ -250,10 +250,12 @@ Data Scheme:
     #   HeadCount    (ag_r02, head owned now),
     #   HeadAcquired (ag_r10, head bought to raise in last 12 months),
     #   HeadSold     (ag_r16, head sold alive in last 12 months),
-    #   Value        (ag_r04, REPORTED per-head current value -- "if you
-    #                 sold one today, how much would you receive?";  a herd
-    #                 value = Value x HeadCount and a TLU rollup are
-    #                 transformations, NOT stored columns).
+    #   ValuePerAnimal (ag_r04, REPORTED per-head current value -- "If you
+    #                 sold one of the [LIVESTOCK] today, how much would you
+    #                 receive from the sale?").  NOT additive: a herd value
+    #                 (ValuePerAnimal x HeadCount) and a TLU rollup are
+    #                 transformations, NOT stored columns.  See
+    #                 `Columns: livestock` in lsms_library/data_info.yml.
     # `animal` is the harmonize_species Preferred Label (the wave scripts
     # reconcile 2010-11's fine 301-318 code scheme with the later coarse
     # scheme -- Ox=3304, Donkey/Horse=3305, Chicken=3310,
@@ -266,7 +268,7 @@ Data Scheme:
     HeadCount: float
     HeadAcquired: float
     HeadSold: float
-    Value: float
+    ValuePerAnimal: float
     materialize: make
   anthropometry:
     # Item-level (t, i, pid) body-measurement feature for the four IHS3+/

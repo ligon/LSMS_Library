@@ -12,7 +12,7 @@ structurally identical to W4:
       head acquired ls_s8_2q04    (purchased alive in last 12 months)
       head sold     ls_s8_2q13    (sold alive in last 12 months)
       sale value    ls_s8_2q14    (total income from sales, Birr)
-No current herd value asked -> Value = reported sale income.
+No current herd value asked -> SalesValue = reported sale income.
 i = household_id.
 """
 import sys
