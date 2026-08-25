@@ -13,7 +13,7 @@ W4 splits the §8 roster across two files joined on (holder_id, ls_code):
       sale value    ls_s8_2q14    (total income from sales, Birr)
 ls_code (Bulls/Oxen/Cows/Steers/Heifers/Calves -> Cattle; chicken sub-types
 -> Poultry) folds to canonical species via harmonize_species and is summed
-within household.  No current herd value asked -> Value = sale income.
+within household.  No current herd value asked -> SalesValue = sale income.
 i = household_id (W4 is an entirely new sample).
 """
 import sys

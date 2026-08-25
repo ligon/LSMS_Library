@@ -112,7 +112,7 @@ livestock:
     idxvars:
         i: hhid             # packed 5-digit region+PA+HH, unique per HH
     myvars:
-        LivestockValue: lvsval80  # total value of livestock herd (Birr), current year
+        HerdValue: lvsval80  # total value of livestock herd (Birr), current year
         TLU: lsu80                # Livestock Standard Units (tropical livestock units)
 
 # income: only 4 of the 7 villages have an R5 inc5 file in the IFPRI

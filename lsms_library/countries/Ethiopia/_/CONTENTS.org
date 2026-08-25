@@ -1272,3 +1272,30 @@ block appears to be vestigial.  Left in place: "appears to be unused"
 is not evidence, and deleting config on that basis is exactly the move
 the repo forbids.  Someone should confirm it is dead and then remove
 it.
+
+** livestock: =SalesValue=, NOT a herd value and NOT a per-animal price
+
+The ESS section-8 roster records no current herd-value question in ANY wave.
+The only monetary field it carries is =ls_s8aq60= (W1/W2) / =ls_s8_2q14=
+(W4/W5): "What was the total value of sales of [LIVESTOCK] in the last 12
+months? (BIRR)".  That column is called *=SalesValue=* (canonical vocabulary
+in =lsms_library/data_info.yml=, =Columns: livestock:=).  It was called
+=Value= until 2026-08-24.
+
+Three properties, all load-bearing:
+
+- It is *ADDITIVE* over =animal= -- it is a total, so summing per-species rows
+  to a household total is legitimate.
+- It values *HeadSold*, not HeadCount, so it is a transaction FLOW.  It must
+  NOT be summed into a livestock-wealth aggregate; that would be =HerdValue=,
+  which Ethiopia does not have.
+- It is *NOT a per-animal price*.  Uganda / Malawi / Nigeria's
+  =ValuePerAnimal= is a reservation price per head; Ethiopia's is a total.  A
+  per-animal sale price here is =SalesValue / HeadSold=.
+
+*Measured, so the distinction is checkable*: among rows where the household
+sold nothing, only *2.0%* carry a positive value -- versus *98.0%* in Nigeria
+and *92.1%* in Malawi, where the price is asked regardless of any sale.
+Correlation with HeadCount does NOT separate these cases (neither a unit price
+nor a sales total tracks the herd size), which is why the sold-nothing
+conditional and the questionnaire wording are the tests to use.

@@ -14,7 +14,7 @@ Sources (passage 2 / post-harvest livestock module s8):
                        acquired / sold / sale-value the WB code never reads.
 
 i = (grappe, exploitation) — the 2017-18 household key (cf. crop_production
-/ plot_features).  HeadCount from s8a; HeadAcquired / HeadSold / Value
+/ plot_features).  HeadCount from s8a; HeadAcquired / HeadSold / SalesValue
 joined from s8b1 on (grappe, exploitation, species_code).
 
 Variable map traced from the s8a / s8b1 questionnaire labels:
@@ -23,9 +23,9 @@ Variable map traced from the s8a / s8b1 questionnaire labels:
   HeadCount      = s8aq06   "Nombre d'animaux ... actuellement dans le troupeau"
   HeadAcquired   = s8b1q10  "Nbre d'animaux ... achetes au cours des 12 ... mois"
   HeadSold       = s8b1q13  "Nbre ... appartenant au menage vendus ... 12 ... mois"
-  Value (sales)  = s8b1q14  "Valeur brute de la vente de ces animaux ... fcfa"
+  SalesValue     = s8b1q14  "Valeur brute de la vente de ces animaux ... fcfa"
 
-The EACI roster carries NO current herd-value question, so Value is the
+The EACI roster carries NO current herd-value question, so SalesValue is the
 gross SALES value where reported (else NaN).  NO TLU, NO herd-value total,
 NO engaged-in-livestock binary — those are transformations over these rows.
 """
@@ -61,7 +61,7 @@ flow = s8b1[['grappe', 'exploitation', 'animal_code',
              's8b1q10', 's8b1q13', 's8b1q14']].rename(columns={
     's8b1q10': 'HeadAcquired',
     's8b1q13': 'HeadSold',
-    's8b1q14': 'Value',
+    's8b1q14': 'SalesValue',
 })
 # Collapse the flow file to one row per (grappe, exploitation, species) in
 # case a species appears more than once; sum the reported flows.
@@ -69,7 +69,7 @@ flow = flow.groupby(['grappe', 'exploitation', 'animal_code'],
                     as_index=False).agg(
     HeadAcquired=('HeadAcquired', lambda s: pd.to_numeric(s, errors='coerce').sum(min_count=1)),
     HeadSold=('HeadSold', lambda s: pd.to_numeric(s, errors='coerce').sum(min_count=1)),
-    Value=('Value', lambda s: pd.to_numeric(s, errors='coerce').sum(min_count=1)),
+    SalesValue=('SalesValue', lambda s: pd.to_numeric(s, errors='coerce').sum(min_count=1)),
 )
 
 merged = s8a.merge(flow, on=['grappe', 'exploitation', 'animal_code'], how='left')
@@ -82,7 +82,7 @@ df = pd.DataFrame({
     'HeadCount': merged['s8aq06'],
     'HeadAcquired': merged['HeadAcquired'],
     'HeadSold': merged['HeadSold'],
-    'Value': merged['Value'],
+    'SalesValue': merged['SalesValue'],
 })
 
 df = livestock_finalize(df)

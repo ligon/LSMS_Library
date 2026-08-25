@@ -261,12 +261,19 @@ Data Scheme:
     #   HeadCount     — head owned now
     #   HeadAcquired  — head bought to raise (last reference period)
     #   HeadSold      — head sold alive
-    #   Value         — reported per-head animal value ('value if you sold
-    #                   one today' in 2009-10/2010-11; 'average value of
-    #                   each one sold' for 2011-12+, which dropped the
-    #                   sell-today question)
+    #   ValuePerAnimal — reported PER-HEAD animal value, so NOT additive.
+    #                   Two instrument variants, both per head: 'If you
+    #                   would sell one of the [...] today, how much would
+    #                   you receive?' (a6aq6) in 2009-10/2010-11, and 'What
+    #                   was, on average, the value of each sold?' (a6aq14b /
+    #                   s6aq14b) for 2011-12+, which dropped the sell-today
+    #                   question.  The switch is within-concept but changes
+    #                   COVERAGE: the later variant is defined only where the
+    #                   household sold, so the non-null rate falls from ~96%
+    #                   to ~21% at 2011-12.  See `Columns: livestock` in
+    #                   lsms_library/data_info.yml.
     # The WB engaged-livestock binary = groupby(['t','i']).any() over these
-    # rows; herd value = Value * HeadCount; TLU = sum(head * TLU-factor).
+    # rows; herd value = ValuePerAnimal * HeadCount; TLU = sum(head * TLU-factor).
     # All three are TRANSFORMATIONS -- never stored here.
     #
     # No v level: livestock is in the framework _no_v_join set
@@ -276,7 +283,7 @@ Data Scheme:
     HeadCount: float
     HeadAcquired: float
     HeadSold: float
-    Value: float
+    ValuePerAnimal: float
     materialize: make
   anthropometry:
     # Item-level anthropometry module (GAP 5 parity build).  One row per

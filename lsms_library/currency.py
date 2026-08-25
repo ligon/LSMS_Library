@@ -58,7 +58,14 @@ _DEFAULT_MONETARY: dict[str, frozenset[str]] = {
     "food_prices": frozenset({"Price"}),
     "community_prices": frozenset({"Price"}),
     "assets": frozenset({"Value", "Purchase Price"}),
-    "livestock": frozenset({"Value", "Purchase Price"}),
+    # livestock: the three canonical value columns, split by additivity
+    # (ValuePerAnimal / HerdValue / SalesValue -- see `Columns: livestock`
+    # in data_info.yml).  `Purchase Price` was here as a copy-paste from the
+    # `assets` line above and is dropped: NO country declares it in
+    # livestock (it is an assets-only column, in Senegal / Mali / Togo /
+    # Benin).  Kept in lockstep with the YAML by
+    # tests/test_currency_livestock_registry.py -- see the note below.
+    "livestock": frozenset({"ValuePerAnimal", "HerdValue", "SalesValue"}),
     "crop_production": frozenset({"Value_sold"}),
     "plot_labor": frozenset({"Wage"}),
     "earnings": frozenset({"Earnings"}),

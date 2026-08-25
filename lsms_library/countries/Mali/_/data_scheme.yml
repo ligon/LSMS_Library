@@ -227,9 +227,13 @@ Data Scheme:
     # HeadCount    = number currently in the herd (s4aq04 / s8aq06).
     # HeadAcquired = number bought in the recall period (s4aq15 / s8b1q10).
     # HeadSold     = number owned by the HH sold (s4aq22 / s8b1q13).
-    # Value        = gross SALES value (FCFA) where reported (s4aq24 /
-    #                s8b1q14); NaN otherwise — the EACI roster carries NO
-    #                current herd-value question.
+    # SalesValue   = gross value of the animals SOLD (FCFA) where reported
+    #                (s4aq24 / s8b1q14 "Valeur brute des ventes"); NaN
+    #                otherwise — the EACI roster carries NO current
+    #                herd-value question, so there is no HerdValue.
+    #                ADDITIVE over `animal`; it values HeadSold, NOT
+    #                HeadCount, so it is a sales FLOW and NOT a per-animal
+    #                price.  See `Columns: livestock` in data_info.yml.
     #
     # NO TLU / herd-value total / engaged-in-livestock binary — those are
     # transformations.py rollups over these item rows.  Built by per-wave
@@ -238,7 +242,7 @@ Data Scheme:
     HeadCount: float
     HeadAcquired: float
     HeadSold: float
-    Value: float
+    SalesValue: float
     materialize: make
   plot_labor:
     # Item-level plot labor by source, GAP 3a (parity loop).  One row per

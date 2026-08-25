@@ -3,8 +3,8 @@
 
 Each wave's ``Ethiopia/<wave>/_/livestock.py`` produces a parquet with
 index ``(t, i, animal)`` and the canonical livestock columns (HeadCount,
-HeadAcquired, HeadSold, Value).  This script concatenates them across the
-five ESS waves and applies the cross-wave ``id_walk`` so the household
+HeadAcquired, HeadSold, SalesValue).  This script concatenates them across
+the five ESS waves and applies the cross-wave ``id_walk`` so the household
 index uses the panel canonical id scheme (the same conversion ``sample()``
 receives at API time -- though livestock is in the framework ``_no_v_join``
 set, so no ``v`` is joined; ``id_walk`` keeps ``i`` aligned with the panel

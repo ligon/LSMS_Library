@@ -2,8 +2,8 @@
 
 Each buildable wave's ``Malawi/<wave>/_/livestock.py`` produces a parquet
 indexed (t, i, animal) with the canonical item-level columns (HeadCount,
-HeadAcquired, HeadSold, Value).  This script concatenates them.  Cross-wave
-id_walk (panel-id chaining) is applied by the framework at API time in
+HeadAcquired, HeadSold, ValuePerAnimal).  This script concatenates them.
+Cross-wave id_walk (panel-id chaining) is applied by the framework at API time in
 _finalize_result.  ``v`` is NOT joined: 'livestock' is in the framework
 _no_v_join set (a household-level holding, not a cluster-keyed roster), so
 the grain stays (t, i, animal) with no cluster level.
