@@ -102,11 +102,21 @@ cluster_features:
 #   3. Per-village hhid overlap of {v}lvs5.tab with asset{v}.tab:
 #      ars 96/101, deb 65/68, din 53/54, sid 45/46, wol 55/64, har 72/109
 #      (gam 4/99 -- see the assetgam keying oddity in _/CONTENTS.org).
-#      Overlap with the R5 roster is ZERO; with the round-1..6 file
-#      2004/Data/livestockaggregates_123456.tab it is ZERO (0 of 541).
-#   4. The true R5 herd scalars ARE shipped, in that rounds-1..6 file, as
-#      livval5/lsu5 (n=1452, mean 1772 Birr / 2.72 TLU).  They are not
-#      these numbers.
+#      Against the 338-HH 1989 roster demog89_1.dta: 322/541 (95% of the
+#      roster).  Against the R5 roster.tab: ZERO.
+#   4. The true R5 herd scalars ARE shipped, in the rounds-1..6 file
+#      2004/Data/livestockaggregates_123456.tab, as livval5/lsu5
+#      (n=1452, mean 1772 Birr / 2.72 TLU).  They are not these numbers.
+#      That file is a DIFFERENT SAMPLE FRAME, which is the point: it
+#      keys on (paid, within-PA hhid) -- its `hhid` is a 1..~1000
+#      sequence number, not a packed id -- over the *19* peasant
+#      associations of the 1994+ panel, including the Tigray sites
+#      (paid=1 is `haresaw`) that the 1989 round could not visit.  The
+#      lvs5 files cover 7 PAs, all of them 1989 sites.  (Do NOT cite a
+#      raw-hhid overlap of 0 between the two as evidence -- the key
+#      constructions differ, so 0 is trivially true and proves nothing.
+#      Reconstructing paid*1000+hhid or paid*10000+hhid yields 4 and 35
+#      coincidental hits out of 1611, i.e. noise, not a join.)
 #   5. The EC year suffixes run 77..81 = Gregorian 1984/85..1988/89 --
 #      the 1984-85 famine through the 1989 fieldwork, which is exactly
 #      the recall window the Overview describes for the 1989 round.

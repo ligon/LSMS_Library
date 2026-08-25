@@ -129,14 +129,26 @@ files are the R6 slice.
      | har     |     109 |       72 |      72 |  66.1 |
      | gam     |      99 |       99 |       4 |   4.0 |
 
-     Overlap with the R5 person =roster.tab= is *ZERO* (already measured
-     and recorded in =1999/_/data_info.yml=, which drew the opposite
-     conclusion from it).  Overlap with
-     =2004/Data/livestockaggregates_123456.tab= is also *ZERO* (0 of 541).
-  4. *The real R5 numbers exist elsewhere.*  That rounds-1..6 file ships
-     =livval5=/=lsu5= (n=1452, mean 1772 Birr / 2.72 TLU, median 1127 /
-     2.05) -- plausible smallholder values, and not these numbers.  The
-     per-village =lvsval80= means run 20 (gam) to 11712 (sid) Birr.
+     Against the 338-HH 1989 roster =demog89_1.dta=: *322/541*, i.e. 95%
+     of that roster.  Against the R5 person =roster.tab=: *ZERO* (already
+     measured and recorded in =1999/_/data_info.yml=, which drew the
+     opposite conclusion from it).
+  4. *The real R5 numbers exist elsewhere, in a different sample frame.*
+     =2004/Data/livestockaggregates_123456.tab= ships =livval5=/=lsu5=
+     (n=1452, mean 1772 Birr / 2.72 TLU, median 1127 / 2.05) --
+     plausible smallholder values, and not these numbers (the per-village
+     =lvsval80= means run 20 (gam) to 11712 (sid) Birr).  That file keys
+     on =(paid, within-PA hhid)= -- its =hhid= is a 1..~1000 sequence
+     number, not a packed id -- across the *19* peasant associations of
+     the 1994+ panel, =paid=1= being =haresaw=, a Tigray site the 1989
+     round could not visit.  The lvs5 files cover 7 PAs, all 1989 sites.
+
+     *Do not cite a raw-hhid overlap of 0 between lvs5 and that file as
+     evidence.*  The two key constructions differ, so 0 is trivially true
+     and proves nothing about the round; reconstructing =paid*1000+hhid=
+     or =paid*10000+hhid= gives 4 and 35 coincidental hits out of 1611,
+     which is noise, not a join.  (An earlier draft of this section did
+     cite it.  The load-bearing overlap is the 1989 one, in item 3.)
   5. *Calendar.*  The EC year suffixes run 77..81 = Gregorian
      1984/85..1988/89 -- the 1984-85 famine through the 1989 fieldwork.
      The Overview describes the 1989 round as sampling "areas that had
@@ -542,8 +554,9 @@ files are the R6 slice.
   (=livestock=) and =*inc5.tab= (=income=) files wired to the 1999 wave
   are *1989-round data*.  SPSS =_date= 1989-05..1990-04, the 1989 packed
   =hhid= keyspace, 66-98% household overlap with the already-1989-wired
-  =asset{v}.tab= siblings, and ZERO overlap with both the R5 roster and
-  the rounds-1..6 aggregate (which ships the real R5 =livval5=/=lsu5=).
+  =asset{v}.tab= siblings, 322/541 against the 1989 roster, ZERO against
+  the R5 roster, and a village set that is the seven 1989 PAs rather than
+  the 1994+ panel's nineteen (which ships the real R5 =livval5=/=lsu5=).
   *Not rewired* -- re-dating a wave changes shipped data.  Full evidence
   and the blocked (t,i,animal) roster proposal: see the "WRONG WAVE"
   section above.
