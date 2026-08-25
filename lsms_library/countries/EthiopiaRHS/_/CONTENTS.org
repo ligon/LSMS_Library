@@ -64,6 +64,7 @@ Confirmed core files:
 | 1995  | demo123 (pooled R1--R3)     | food3                                            |
 | 1997  | demo4, age_sex_r4           | food4                                            |
 | 1999  | roster.tab                  | livestock: 7x *lvs5.tab; income: 4x *inc5.tab    |
+|       |                             | (*lvs5/*inc5 are 1989 DATA -- see WRONG WAVE)    |
 | 2004  | (no roster -- aggregates)   | consumption/livestock: *6 slice of consumption/  |
 |       |                             | livestockaggregates_123456; area_output_04rev    |
 | 2009  | (no roster -- aggregates)   | consumptionAggrgates_r7; hhsize_round7;          |
@@ -77,6 +78,303 @@ IFPRI archive -- only pre-aggregated HH-level scalars -- so they are wired as
 bespoke HH-level (t,i) aggregate waves (consumption, livestock, area_output,
 and 2009-only hhsize); the *6-suffixed columns of the pooled R1-R6 aggregate
 files are the R6 slice.
+
+* WRONG WAVE: =*lvs5.tab= / =*inc5.tab= are 1989 data served at t='1999'
+
+  *Status: WAITING on @ligon.*  Reported 2026-08-24 while investigating
+  whether the =livestock= aggregate could be replaced by the per-species
+  roster these files carry.  *Nothing was rewired* -- the defect is
+  documented, not fixed, because re-dating a wave changes shipped data
+  and interacts with =sample=, =cluster_features=, =panel_ids= and the
+  coverage matrix.  The roster work is *blocked on this*, not on
+  feasibility (see "The roster that is actually in there", below).
+
+** The claim
+
+  The seven ={village}lvs5.tab= files (wired as =livestock=, t='1999')
+  and the four ={village}inc5.tab= files (wired as =income=, t='1999')
+  are *not* round-5 / 1999 data.  They are the *1989 IFPRI survey* --
+  the same fieldwork that produced the =asset{village}.tab= files
+  already wired to the *1989* wave.
+
+  The =5= in =lvs5=/=inc5= is *not* a round index.  Its meaning is
+  unresolved and is deliberately not guessed at here.  (The panel's own
+  round-suffix convention -- =food1..food4=, =demo123= -- is real, which
+  is almost certainly why =lvs5= was read as "round 5"; but that
+  convention belongs to the 1994+ modular redesign, while these files
+  follow the 1989 ={module}{village}= convention.)
+
+** Evidence (convergent -- no single line carries the claim)
+
+  1. *SPSS =_date=.*  All 7 lvs5 files stamp 1989-05 .. 1990-04; all 4
+     inc5 files 1989-05 .. 1989-12.  The =asset{v}.tab= siblings, already
+     wired to 1989, stamp 1989-04 .. 1990-07.  Data cannot postdate the
+     file that holds it.  (A hand-entered column, so treated as one
+     strand, not the linchpin.)
+  2. *Keyspace.*  The Dataverse "Overview and Acknowledgements and Data
+     Description" (sec. iii, /Data format/) states that the files in the
+     *1989* survey are identified by the packed =HHID = Region*100000 +
+     PA*1000 + hh=, whereas 1994+ rounds key on the =q1a/q1c/hh=
+     composite.  A bare packed =hhid= is the documented 1989 signature,
+     and it is what these files carry.
+  3. *Household overlap with the 1989 asset siblings*, per village:
+
+     | village | lvs5 HH | asset HH | overlap |     % |
+     |---------+---------+----------+---------+-------|
+     | ars     |     101 |       97 |      96 |  95.0 |
+     | deb     |      68 |       65 |      65 |  95.6 |
+     | din     |      54 |       55 |      53 |  98.1 |
+     | sid     |      46 |       45 |      45 |  97.8 |
+     | wol     |      64 |       55 |      55 |  85.9 |
+     | har     |     109 |       72 |      72 |  66.1 |
+     | gam     |      99 |       99 |       4 |   4.0 |
+
+     Overlap with the R5 person =roster.tab= is *ZERO* (already measured
+     and recorded in =1999/_/data_info.yml=, which drew the opposite
+     conclusion from it).  Overlap with
+     =2004/Data/livestockaggregates_123456.tab= is also *ZERO* (0 of 541).
+  4. *The real R5 numbers exist elsewhere.*  That rounds-1..6 file ships
+     =livval5=/=lsu5= (n=1452, mean 1772 Birr / 2.72 TLU, median 1127 /
+     2.05) -- plausible smallholder values, and not these numbers.  The
+     per-village =lvsval80= means run 20 (gam) to 11712 (sid) Birr.
+  5. *Calendar.*  The EC year suffixes run 77..81 = Gregorian
+     1984/85..1988/89 -- the 1984-85 famine through the 1989 fieldwork.
+     The Overview describes the 1989 round as sampling "areas that had
+     suffered from the 1984-1985 famine and other droughts that followed
+     between 1987 and 1989".  A five-year EC 1977-1981 livestock history
+     is what that round would collect; a 1999 round would not.
+  6. *Village set.*  The seven prefixes are the seven *1989* IFPRI
+     peasant associations -- deb Debre Berhan, din Dinki, ars Arsi
+     (Korodegaga), gam Gamo Gofa (Gara Godo), wol Wolayta, har Hararghe
+     (Adele Keke), sid Sidamo -- not the 1994-panel village set (which
+     includes the Tigray sites Haresaw and Geblen; the Overview records
+     that "civil conflict prevented survey work from being undertaken in
+     Tigray" in 1989).  =sid= is the semi-pastoralist southern village
+     that "could not be revisited" in 1994, which is why it *alone* has
+     camels and 40-TLU herds.  Its magnitudes are real, not a scale bug.
+
+** What this means for what we ship today
+
+  - =EthiopiaRHS.livestock()= and =.income()= return 1989 observations
+    labelled t='1999'.  =livestock= is the larger cell: 541 HH.
+  - The 2004 / 2009 =livestock= rows are unaffected and correct.
+  - Recommended fix (*not applied* -- @ligon's call): move the 11 =.dvc=
+    sidecars from =1999/Data/= to =1989/Data/=, move the =livestock= /
+    =income= blocks from =1999/_/data_info.yml= to =1989/_/data_info.yml=,
+    and re-run the coverage matrix.  The 1989 wave already uses exactly
+    this key, so the =i= formatter needs no change.  Note the 1989 wave
+    then gains =livestock= + =income=, and the 1999 wave loses both --
+    a real change to =Feature('livestock')= output, which is why it is
+    not being done under a brief that said "only if it loses nothing".
+
+** Also found while checking
+
+  - =din= is served its *second-to-last* year.  It uniquely carries
+    EC-81 columns, and =lvsval81=/=lsu81= are nonzero for 47 HH against
+    44 at EC-80.  The wired myvars take EC-80.
+  - =assetgam.tab= keys 50002..50202 against =gamlvs5.tab='s 50101..50201
+    -- 4/99 overlap where every other village is 66-98%.  Possible latent
+    defect in the *1989 assets* wiring; flagged, not investigated.
+  - =gam= genuinely has almost no livestock (7 head total across 99 HH,
+    only calf/heifer/ox nonzero).  Gara Godo is an enset village.  Real,
+    not a broken read.
+
+* EthiopiaRHS 1989 livestock module: schema, and the roster in it
+
+  Everything below is about the =*lvs5.tab= files.  It is recorded now
+  because it is expensive to re-derive; it is *not* wired.
+
+** The "identical schema" claim was false
+
+  =1999/_/data_info.yml= asserted "The 7 village files share an identical
+  schema".  Measured: the *union is 842 columns and the intersection is
+  14* (=_casenum=, =_date=, =_weight_=, =control=, =site=, =hhid=,
+  =bulq80=, =cowq80=, =hefq80=, =oxq80=, =shpq80=, =lsu80=, =lvsval80=,
+  =purval80=).  Row-concatenation still works -- =missing_ok= takes the
+  column union -- but *any myvar outside those 14 is silently NaN for the
+  villages that lack it*.  The two currently-wired myvars are both inside
+  the intersection, so today's =livestock= table is not damaged by this;
+  a naive extension would be.
+
+  Seven files, seven naming systems, different year coverage:
+
+  | village | cols | EC years  | naming system for flows                  |
+  |---------+------+-----------+------------------------------------------|
+  | ars     |  126 | 79-80     | =bgt{sp3}80=, =sld{sp3}80=, =sla{sp3}80=, =di{sp}80= |
+  | gam     |  133 | 79-80     | same as ars                              |
+  | deb     |  274 | 78-79-80  | ={sp3}bgt78=, ={sp3}sld80=, ={sp3}kil80=, ={sp3}did80= |
+  | din     |  403 | 77..81    | ={sp2}{flow}q{yr}=: birq/dzq/losq/purq/salq/sltq |
+  | sid     |  226 | 79-80     | as din, plus =gfaq=/=gfiq= (gifts) and camels |
+  | har     |  102 | 80        | English words: ={sp}owned/sold/bowt/dead/lost= |
+  | wol     |   74 | 80        | as har, fewer concepts                   |
+
+  Proof that ={sp}q80= is the current-stock answer: in har and wol the
+  file carries *both* systems, and =bulq80 == bulowned= (109/109),
+  =cowq80 == cowowned=, =oxq80 == oxowned=, =calfq80 == calfownd=,
+  =gotq80 == gotowned=, =dnkq80 == dnkowned= (each 109/109 in har).
+
+** Species stock at EC-80: head / households-with-any
+
+  | sub-type | ars    | deb    | din   | gam  | har   | sid    | wol   |
+  |----------+--------+--------+-------+------+-------+--------+-------|
+  | calf     | 38/20  | 104/49 | 12/9  | 1/1  | 16/12 | 425/44 | 19/17 |
+  | bull     | 3/3    | 48/35  | 9/8   | 0/0  | 10/6  | 145/29 | 3/3   |
+  | ox       | 22/18  | 133/61 | 32/30 | 5/2  | 11/8  | 57/12  | 14/13 |
+  | heifer   | 10/9   | 82/46  | 8/7   | 1/1  | 6/6   | 222/37 | 9/8   |
+  | cow      | 44/29  | 142/61 | 32/27 | 0/0  | 23/22 | 794/44 | 17/14 |
+  | sheep    | 72/16  | 719/61 | 3/2   | 0/0  | 34/17 | 64/8   | 2/2   |
+  | goat     | 125/28 | --     | 61/16 | 0/0  | 21/10 | 916/31 | 5/3   |
+  | horse    | 1/1    | 74/49  | --    | 0/0  | --    | --     | --    |
+  | donkey   | 27/23  | 107/60 | 13/12 | 0/0  | 14/13 | 5/2    | 4/4   |
+  | mule     | 1/1    | 10/9   | 3/3   | 0/0  | --    | 3/3    | --    |
+  | camel    | --     | --     | --    | --   | --    | 278/23 | --    |
+
+  =--= means the column does not exist in that file -- *not* zero head.
+  =deb= has goats only at EC-78 (=gotq78=) and camels only at EC-78.
+  Pooled: 541 HH, 4942 (i, sub-type) cells, 1088 with head > 0, and
+  *zero duplicate (i, sub-type) keys*.
+
+** Flow availability at EC-80 (probed on =cow=)
+
+  | concept                     | ars      | deb      | din      | gam      | har      | sid      | wol      |
+  |-----------------------------+----------+----------+----------+----------+----------+----------+----------|
+  | owned now                   | cowq80   | cowq80   | cowq80   | cowq80   | cowq80   | cowq80   | cowq80   |
+  | owned one year ago          | cowq79   | cowq79   | cowq79   | cowq79   | --       | cowq79   | --       |
+  | reservation price per head  | --       | cowpr80  | --       | cowpr80  | cowpr80  | --       | cowpr80  |
+  | not owned but cared for     | --       | cowcar80 | --       | --       | cowcared | --       | cowcared |
+  | owned but away              | --       | cowawy80 | --       | --       | cowaway  | --       | cowaway  |
+  | born or found               | --       | cowbir80 | cwbirq80 | --       | --       | cwbirq80 | --       |
+  | died                        | --       | cowdid80 | cwdzq80  | --       | cowdead  | cwdzq80  | --       |
+  | lost                        | --       | (78 only)| cwlosq80 | --       | cowlost  | cwlosq80 | --       |
+  | bought                      | bgtcow80 | (78 only)| cwpurq80 | bgtcow80 | cowbowt  | cwpurq80 | cowbowt  |
+  | sold                        | sldcow80 | cowsld80 | cwsalq80 | sldcow80 | cowsold  | cwsalq80 | cowsold  |
+  | total value of all sold     | cwsalv80 | --       | cwsalv80 | cwsalv80 | cwsalv80 | cwsalv80 | cwsalv80 |
+  | slaughtered                 | slacow80 | cowkil80 | cwsltq80 | slacow80 | cowkiled | cwsltq80 | --       |
+  | gift out / gift in          | --       | (78 only)| --       | --       | --       | cwgfaq80 | --       |
+
+  Only *owned now* and *sold* are present in all seven villages.
+
+** =lsu80= and =lvsval80= are exact functions of the head counts
+
+  Regressing each on the eleven per-sub-type head counts, no intercept:
+
+  - =lsu80=: *R^2 = 1.0000*, pooled and in every village separately, with
+    the *same* coefficients everywhere.  This is IFPRI's own TLU table,
+    recovered exactly:
+
+    | species              | IFPRI (recovered) | library =_TLU_FACTORS= |
+    |----------------------+-------------------+------------------------|
+    | cattle (all 5 types) |              0.83 |                   0.70 |
+    | sheep                |              0.20 |                   0.10 |
+    | goats                |              0.20 |                   0.10 |
+    | donkeys              |              0.50 |                   0.50 |
+    | horses               |              1.00 |                   0.80 |
+    | mules                |              1.00 |            *no factor* |
+    | camels               |              1.00 |            *no factor* |
+
+    Direct evidence for *GH #737*: the divergence is not only the cattle
+    0.83-vs-0.70 already suspected, but sheep/goats (2x) and horses, plus
+    two species the library cannot weight at all.  All five bovine
+    sub-types share the single 0.83 factor, so *collapsing cow/ox/bull/
+    calf/heifer to =Cattle= is TLU-lossless*.
+
+  - =lvsval80=: *R^2 = 1.0000* per village, against a *village-constant
+    integer-Birr price vector*.  So it is a constructed valuation, not a
+    sum of household answers -- the household's own reservation prices
+    (={sp}pr80=) exist in only 4 villages and are answered by 0-33
+    households per species.  Recovered vectors (Birr/head):
+
+    | village | calf | bull=ox | heifer | cow | sheep | goat | donkey | horse | mule | camel |
+    |---------+------+---------+--------+-----+-------+------+--------+-------+------+-------|
+    | ars     |   93 |     482 |    278 | 278 |    72 |   64 |     50 |     * |    * |    -- |
+    | deb     |   74 |     455 |    290 | 290 |    60 |   -- |     91 |   101 |  200 |    -- |
+    | din     |   97 |     455 |    290 | 290 |    60 |   53 |     91 |    -- |  382 |    -- |
+    | gam     |   74 |     340 |    223 |  -- |    -- |   -- |     -- |    -- |   -- |    -- |
+    | har     |   80 |     411 |    240 | 240 |    47 |   43 |     79 |    -- |   -- |    -- |
+    | sid     |   93 |     449 |    279 | 279 |    50 |   42 |      0 |    -- |    0 |   300 |
+    | wol     |   56 |     127 |     47 |  70 |    22 |   22 |    110 |    -- |   -- |    -- |
+
+    =*= = not identified (ars has 1 head each of horse and mule, so the
+    coefficient is a least-squares artifact, not a price).  =sid='s
+    donkey and mule coefficients of *exactly 0.0* are not an artifact --
+    with R^2 = 1.0000 they say IFPRI's valuation assigns those species
+    zero in sid.  Recorded as found.  Note bull and ox take the *same*
+    price in all seven villages, and heifer and cow in six of seven
+    (wol splits them) -- so =lvsval80= cannot distinguish the bovine
+    sub-types either, even though the head counts can.
+
+** The roster that is actually in there -- design proposal, NOT wired
+
+  Because both shipped scalars are exact functions of the head counts,
+  a =(t, i, animal)= roster *loses nothing* and gains ~1088 populated
+  species rows plus the flows.  Two options were weighed:
+
+  - *(a) move =livestock= to (t,i,animal)* and re-home the 2004/2009
+    household totals.  Rejected *for now*: those two waves ship only
+    pre-aggregated scalars, and folding them into an animal-indexed
+    table means either NaN in a declared index level -- which the core
+    collapse *deletes outright* (=groupby(dropna=True)=, the documented
+    section-3b behaviour) -- or an =animal='total'= sentinel, which in
+    1989 would sit alongside real per-species rows and double-count any
+    sum over =animal=, besides polluting the =harmonize_species=
+    vocabulary.  Either way it violates "do not lose 2004/2009".
+  - *(b) keep =livestock= at (t,i) and add a second feature* (e.g.
+    =livestock_roster=) at (t,i,animal).  Loses nothing, no churn, and
+    does not contradict the canonical notes in =lsms_library/data_info.yml=,
+    which cite EthiopiaRHS's =lvsval80=/=lsu80= at the (t,i) grain by
+    name.  *This is the recommended shape* -- once the wave question is
+    settled, because the feature would carry t='1989', not t='1999'.
+
+  Column mapping onto the canonical =livestock= block, where the
+  semantics genuinely match:
+
+  | canonical      | 1989 source                          | villages |
+  |----------------+--------------------------------------+----------|
+  | =HeadCount=    | ={sp}q80= (owned and present now)  |      7/7 |
+  | =HeadSold=     | sold-alive count                     |      7/7 |
+  | =HeadAcquired= | bought count (canonical = PURCHASED) |      6/7 |
+  | =SalesValue=   | ={sp2}salv80= (total value of all sold) |   6/7 |
+  | =HerdValue=    | *do not map* -- see below            |        - |
+  | =ValuePerAnimal= | ={sp}pr80= reservation price      |      4/7 |
+  | =TLU=          | *do not map* -- it is HH-level       |        - |
+
+  - =HerdValue= is *not* mappable at the row grain: =lvsval80= is a
+    household total, and the per-species split would have to be
+    manufactured from the recovered price vector.  Leave it in the (t,i)
+    feature where it belongs.
+  - =TLU= likewise: =lsu80= is a household total.  At (t,i,animal) it is
+    =transformations.tlu()='s job -- with the caveat that =tlu()=
+    silently contributes *zero* for any label absent from
+    =_TLU_FACTORS=, so camels and mules would vanish without an explicit
+    factor map (see #737 above).
+  - =ValuePerAnimal= is the canonical *reservation-price* variant and the
+    wording matches it exactly, but coverage is 0-33 HH per species in
+    4 villages -- thin enough to be worth a warning if wired.
+
+  Flows with *no canonical home*.  These must *not* be forced into a
+  column that means something else -- proposed names, for adjudication:
+  born-or-found (=HeadBorn=), died (=HeadDied=), lost (=HeadLost=),
+  slaughtered (=HeadSlaughtered=), gifted out / received
+  (=HeadGiftedOut= / =HeadGiftedIn=), owned-but-away (=HeadAway=), not-
+  owned-but-cared-for (=HeadCaredFor=), the lagged stock ={sp}q79=
+  (=HeadCountLagged=, or better: a second =t=, since it is a genuine
+  prior-year stock), and the household-level purchase total =purval80=
+  (canonical has =SalesValue= but no purchase twin).
+
+  Open semantic calls for @ligon:
+  - =HeadCount= is "owned *and present*, excluding those away".  Whether
+    the canonical =HeadCount= should be that, or that plus =HeadAway=,
+    is a real choice; the 1989 =lsu80=/=lvsval80= use the *present-only*
+    number (that is what makes R^2 = 1.0000).
+  - Cattle sub-types: keep cow/ox/bull/calf/heifer, or collapse to
+    =Cattle=?  Collapsing is lossless for TLU *and* for value (both tie
+    bull=ox and heifer=cow), and matches what =Ethiopia/= already does
+    via =harmonize_species=.  Keeping them preserves real economic
+    detail -- oxen are traction capital in this economy -- which no
+    aggregate in the file can recover.  Recommend *keeping* the detail
+    and letting =labels=/=harmonize_species= collapse on demand.
+  - *Camels have no =_TLU_FACTORS= entry* (nor do mules).  The 1989 data
+    says both are 1.00.  Flagged, not invented -- see #737.
 
 * Open Questions (from GH #271)
 
@@ -240,6 +538,15 @@ files are the R6 slice.
   residual = HH dropped by the roster's NA-Sex round filter -- those
   edges simply link nothing).  id_walk fires with no roster
   regression.
+- [!] *WRONG WAVE (2026-08-24, WAITING on @ligon)*: the =*lvs5.tab=
+  (=livestock=) and =*inc5.tab= (=income=) files wired to the 1999 wave
+  are *1989-round data*.  SPSS =_date= 1989-05..1990-04, the 1989 packed
+  =hhid= keyspace, 66-98% household overlap with the already-1989-wired
+  =asset{v}.tab= siblings, and ZERO overlap with both the R5 roster and
+  the rounds-1..6 aggregate (which ships the real R5 =livval5=/=lsu5=).
+  *Not rewired* -- re-dating a wave changes shipped data.  Full evidence
+  and the blocked (t,i,animal) roster proposal: see the "WRONG WAVE"
+  section above.
 - [X] =income= wired for 1999 (R5): bespoke (t,i) HH-level income
   totals + major-source subtotals from the 4 village =*inc5.tab= files
   (ars/deb/din/sid; gam/har/wol have no R5 inc5).  The 2004 income file
