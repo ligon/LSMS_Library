@@ -767,7 +767,7 @@ GhanaSPS,anthropometry,,undeclared,absent,,not declared by this country for any 
 GhanaSPS,assets,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,cluster_features,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,community_prices,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,crop_production,,undeclared,absent,,not declared by this country for any wave
+GhanaSPS,crop_production,,undeclared,absent,,"todo: Plot-crop harvest in all 3 waves. 2009-10 S4AV1 (major) + S4AV2 (minor season) wide, up to 5 harvest records/plot-season; 2013-14 04n_harvestquestions.dta 8229x65 (FPrimary,plotid,cropcode); 2017-18 04n_harvestquestions.dta 9317x62 (7391 real rows). Quantity + native unit (~45-code list) present in every wave. WARNING: S4AV2 variable labels wrongly say 'major season'; questionnaire Part A A120-A122 says minor. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
 GhanaSPS,food_acquired,2009-10,sane,declared,119847,warn: index_levels_match_scheme
 GhanaSPS,food_acquired,2013-14,sane,declared,139339,warn: index_levels_match_scheme
 GhanaSPS,food_acquired,2017-18,sane,declared,148743,warn: index_levels_match_scheme
@@ -788,16 +788,20 @@ GhanaSPS,household_characteristics,2017-18,sane,declared,5661,all checks pass
 GhanaSPS,household_roster,2009-10,sane,declared,18889,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaSPS,household_roster,2013-14,sane,declared,16356,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaSPS,household_roster,2017-18,sane,declared,19006,"warn: index_levels_match_scheme,no_constant_columns"
-GhanaSPS,housing,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,individual_education,,undeclared,absent,,not declared by this country for any wave
+GhanaSPS,housing,2009-10,sane,declared,4899,warn: index_levels_match_scheme
+GhanaSPS,housing,2013-14,sane,declared,4772,warn: index_levels_match_scheme
+GhanaSPS,housing,2017-18,sane,declared,5645,warn: index_levels_match_scheme
+GhanaSPS,individual_education,2009-10,sane,declared,16955,warn: index_levels_match_scheme
+GhanaSPS,individual_education,2013-14,sane,declared,15314,warn: index_levels_match_scheme
+GhanaSPS,individual_education,2017-18,sane,declared,17910,warn: index_levels_match_scheme
 GhanaSPS,interview_date,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,livestock,,undeclared,absent,,not declared by this country for any wave
+GhanaSPS,livestock,,undeclared,absent,,"todo: Household-animal roster in all 3 waves. 2009-10 S3AI.dta 4280x28 (hhno,animal_id) 8 labelled species 2142 hh; 2013-14 03ai_animalquestions.dta 14860x44 (FPrimary,animal) 2098 hh -- but 10884 rows are quantity==0 and `animal` is free text with 69 spellings; 2017-18 03ai_animalquestions.dta 4203x44 8 clean labels + _osp free-text file 91x43. HeadCount and Value in all waves; HeadSold 2017-18 only; HeadAcquired never asked. C4 on all three instruments: Value is a HERD TOTAL in every wave ('if you sold all of them'), NOT the per-head price Uganda/Nigeria put in that column. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
 GhanaSPS,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,people_last7days,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,plot_features,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,plot_inputs,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,plot_labor,,undeclared,absent,,not declared by this country for any wave
+GhanaSPS,plot_features,,undeclared,absent,,"todo: Plot-level in all 3 waves. 2009-10 S4AII.dta 5698x15 (hhno,plot_no) with producer-computed area_ha 97.5% populated; 2013-14 04h_agsection.dta 4694x228 (FPrimary,plotid) unique; 2017-18 04h_agsection.dta 5366x176 unique. Tenure from S4AIV s4aiv_a45 / 04i_landtenure obtainhow, same 6-7 category vocabulary in all waves. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
+GhanaSPS,plot_inputs,,undeclared,absent,,"todo: Partial in every wave, in different places. Chemicals: 2009-10 S4AVI1/S4AVI2 plot-level quantity+unit+value; 2013-14 04l_chemquestions.dta 2475x132 household-chemical with plot split via UNRESOLVED template string '%pplotnamearray[k]'; 2017-18 04l_chemquestions.dta 4802x164 with clean space-separated plot list. Seed: quantity+unit in 2013-14 (7816/7838) and 2017-18 (8276/10525) 04k_seedquestions, but 2009-10 S4AVIII1/2 records seed VALUE only, no quantity. Organic inputs are per-plot FLAGS with no quantity in all waves. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
+GhanaSPS,plot_labor,,undeclared,absent,,"todo: Plot-stage labour in all 3 waves. 2009-10 S4AIX1-4 (major) / S4AIX5-8 (minor), four questionnaire-named stages per season; 2013-14 04m_aglabourquestions.dta 32851x43 (FPrimary,plotid,stagenum) unique; 2017-18 04m_aglabourquestions.dta 20663x64 (FPrimary,plotid,stageid). Reported person-days by source and sex in every wave. Natural extra index level is `stage`, not `season`. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
 GhanaSPS,sample,2009-10,sane,declared,5009,all checks pass
 GhanaSPS,sample,2013-14,sane,declared,4774,warn: no_constant_columns
 GhanaSPS,sample,2017-18,sane,declared,5669,warn: no_constant_columns

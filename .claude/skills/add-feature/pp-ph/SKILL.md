@@ -18,7 +18,47 @@ countries.
 | **Nigeria** | GHS/LSMS-ISA | All waves | `sect*_plantingw*.dta` / `sect*_harvestw*.dta` | Wave dirs like `2018-19/` contain both pp and ph data |
 | **Ethiopia** | ESS | All 5 waves | `sect*_pp_w*.dta` / `sect*_ph_w*.dta` | Heavy `!make` usage — most features need scripts |
 | **Tanzania** | NPS | `2008-15/` only | Single file with `round` column covering rounds 1–4 | Later waves (`2019-20`, `2020-21`) are single-round; see also `.claude/skills/multi-round-waves.md` |
-| **GhanaSPS** | SPS | Some waves | Planting/harvest questionnaires | Less structured than Nigeria/Ethiopia |
+| ~~GhanaSPS~~ | SPS | **NONE — see below** | — | **Does NOT belong here.** No wave ships two rounds; each is a single visit with recall. GH #730 |
+
+### GhanaSPS is NOT a pp/ph country (corrected 2026-08-24, GH #730)
+
+This table used to list GhanaSPS as having "Some waves" with
+"Planting/harvest questionnaires". **That was wrong about the shipped data**,
+and it is the kind of wrong that costs an agent an afternoon: told the country
+is pp/ph, it goes looking for a second round, fails to find one, and either
+invents a round dimension or concludes the extract is broken.
+
+Measured across every wave's agriculture entry file — **no `round`, `visit` or
+`season` column exists in any of them**:
+
+| wave | file | cols | round/visit/season column |
+|---|---|---|---|
+| 2009-10 | `S4AI.dta` | 17 | none |
+| 2009-10 | `S4AV1.dta` / `S4AV2.dta` | 82 | none |
+| 2013-14 | `04h_agsection.dta` | 228 | none |
+| 2017-18 | `04h_agsection.dta` | 176 | none |
+
+The only season-ish variable labels are **recall** phrasing (`cultivated =
+"Cultivated last season"`, `"Quantity of the crop harvested in the last ..."`).
+Each wave is **one visit with recall**, so the distinct-`t` pattern this skill
+exists to teach does not apply.
+
+**What IS true, and is probably what the row meant.** 2009-10 has a **major and
+a minor season** *within a single visit* — `S4AV1` (major) and `S4AV2` (minor),
+fill rates 4,825 vs 1,412. 2013-14 and 2017-18 have no such split. That is a
+season dimension inside one recall period, which is a different thing from two
+data-collection rounds: it needs no distinct `t`, and if it is ever modelled it
+belongs as its own index level, not as a second wave.
+
+*(A trap while checking this: a naive substring search reports dozens of false
+hits, because `intercroppedlist*` contains `pp`. Read the matched names, not
+the count.)*
+
+**Not verified**: whether the GhanaSPS *questionnaire* has separately-titled
+planting/harvest sections. The correction is only about the shipped data having
+two rounds — it does not.
+
+Evidence: `slurm_logs/ghanasps/FINDINGS_agriculture.org` (GH #729).
 
 ## Why YAML cannot express this
 
