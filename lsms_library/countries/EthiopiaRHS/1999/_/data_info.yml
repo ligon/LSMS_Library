@@ -120,11 +120,24 @@ cluster_features:
 #   5. The EC year suffixes run 77..81 = Gregorian 1984/85..1988/89 --
 #      the 1984-85 famine through the 1989 fieldwork, which is exactly
 #      the recall window the Overview describes for the 1989 round.
-#   6. The seven villages are the seven 1989 IFPRI peasant associations
-#      (Debre Berhan, Dinki, Arsi, Gamo Gofa, Wolayta, Hararghe, Sidamo),
-#      not the 1994-panel village set.  `sid` is the semi-pastoralist
-#      southern village dropped from the 1994 panel -- which is why it,
-#      alone, has camels and 40-TLU herds.
+#   6. Village SET (fact): the seven prefixes are exactly the seven used
+#      by the 1989 asset{v}.tab files, and the 1989 round had seven PAs
+#      while the 1994 panel has nineteen.  The Overview records that the
+#      1989 PAs were in Amhara/Oromiya/SNNPR with TIGRAY ADDED ONLY IN
+#      THE 1994 EXPANSION (corroborated in-repo: erhs_village_region
+#      puts codes 1-2, Haresaw/Geblen, in Tigray).  No lvs5 village is
+#      a Tigray site.
+#      Village NAMES (inference, flagged): the prefixes read naturally as
+#      deb=Debre Berhan, din=Dinki, ars=Arsi, gam=Gamo Gofa, wol=Wolayta,
+#      har=Hararghe (the Overview names Debre Berhan and Adele Keke, in
+#      Hararghe, as 1989 sites), sid=Sidamo.  This is NOT verified: the
+#      repo's own categorical_mapping.org states the 1989 site->village
+#      key "would come from Dercon-Hoddinott" and that cross-era
+#      reconciliation is an open follow-up.  Do not cite these names as
+#      established -- the ROUND claim does not rest on them.
+#      Likewise inference: `sid` matches the Overview's description of a
+#      semi-pastoralist southern village that could not be revisited in
+#      1994 -- it alone has camels and 40-TLU herds.
 #
 # The i-KEY paragraph below already MEASURED point 3 and drew the
 # opposite conclusion from it -- it read the 1989 keyspace as an oddity

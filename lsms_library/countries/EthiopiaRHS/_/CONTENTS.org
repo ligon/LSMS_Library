@@ -155,15 +155,32 @@ files are the R6 slice.
      suffered from the 1984-1985 famine and other droughts that followed
      between 1987 and 1989".  A five-year EC 1977-1981 livestock history
      is what that round would collect; a 1999 round would not.
-  6. *Village set.*  The seven prefixes are the seven *1989* IFPRI
-     peasant associations -- deb Debre Berhan, din Dinki, ars Arsi
-     (Korodegaga), gam Gamo Gofa (Gara Godo), wol Wolayta, har Hararghe
-     (Adele Keke), sid Sidamo -- not the 1994-panel village set (which
-     includes the Tigray sites Haresaw and Geblen; the Overview records
-     that "civil conflict prevented survey work from being undertaken in
-     Tigray" in 1989).  =sid= is the semi-pastoralist southern village
-     that "could not be revisited" in 1994, which is why it *alone* has
-     camels and 40-TLU herds.  Its magnitudes are real, not a scale bug.
+  6. *Village set* -- and here the FACT and the INFERENCE are separated
+     deliberately, because only the fact is load-bearing.
+
+     *Fact.*  The seven prefixes are exactly the seven used by the 1989
+     =asset{v}.tab= files.  The 1989 round had seven PAs; the 1994 panel
+     has nineteen.  The Overview records that the 1989 PAs were in
+     Amhara / Oromiya / SNNPR and that *Tigray was added only in the 1994
+     expansion* ("civil conflict prevented survey work from being
+     undertaken in Tigray"), which this repo's own
+     =erhs_village_region= corroborates by putting codes 1-2
+     (Haresaw, Geblen) in Tigray.  No lvs5 village is a Tigray site.
+
+     *Inference, flagged as such.*  The prefixes read naturally as deb
+     Debre Berhan, din Dinki, ars Arsi (Korodegaga), gam Gamo Gofa (Gara
+     Godo), wol Wolayta, har Hararghe (Adele Keke), sid Sidamo -- and the
+     Overview does name Debre Berhan and Adele Keke as 1989 sites.  *This
+     mapping is NOT verified.*  =_/categorical_mapping.org= says in
+     terms that the 1989 =site= -> village key "would come from
+     Dercon-Hoddinott" and that cross-era reconciliation is an open
+     follow-up.  Do not cite these names as established; the round claim
+     does not rest on them.
+
+     Also inference: =sid= matches the Overview's semi-pastoralist
+     southern village that "could not be revisited" in 1994 -- it alone
+     has camels and 40-TLU herds.  Its magnitudes are real (its recovered
+     TLU factors are identical to every other village's), not a scale bug.
 
 ** What this means for what we ship today
 
