@@ -1,0 +1,369 @@
+#+TITLE: Release v0.10.0 -- which issues the development -> master merge should close
+#+DATE: 2026-09-02
+#+AUTHOR: verification sweep (read-only)
+
+* Bottom line
+
+*The =Closes= line is EMPTY.  Do not put closing keywords in the merge PR body.*
+
+Every issue that the 199 commits since =v0.9.1= actually resolved has *already
+been closed by hand*, at the moment its PR merged into =development=.  All 29
+such issues carry =stateReason: COMPLETED= with a =closedAt= that matches its
+PR's =mergedAt= to within hours (see [[*ALREADY CLOSED][ALREADY CLOSED]]).  GitHub closing keywords are
+no-ops on an already-closed issue, so adding them buys nothing.
+
+Of the issues still OPEN and mentioned anywhere in the range, *none* is
+genuinely resolved.  Twenty-four of them were *filed by* this range's own audits
+(created 2026-08-20 .. 2026-08-25) and are the work that v0.10.0 hands forward,
+not work it finished.
+
+If a =Closes= line is wanted anyway for the record, the only defensible content
+is *nothing*, with the reconciliation below in the PR body as prose.
+
+* Method and completeness
+
+Range: =v0.9.1= (=7200488=, 2026-07-27) .. =development= (=d298e67=).
+
+** Commit / PR reconciliation (closes the "63 PRs" question)
+
+: git log v0.9.1..development --oneline           | wc -l   ->  199
+: git log v0.9.1..development --merges            | wc -l   ->   63
+: git log v0.9.1..development --merges | grep -c '^Merge pull request'  -> 49
+
+The 63 *merges* in the brief are merge *commits*, not distinct PRs.  They
+decompose as:
+
+| kind                                                   | n |
+|--------------------------------------------------------+----|
+| =Merge pull request #N from ...= (49 unique PR numbers) | 49 |
+| =Merge origin/development into <branch>= (branch syncs) | 14 |
+| *total merge commits*                                   | *63* |
+
+Of the 49 PRs, *46 merged into =development=* and *3* (#676, #677, #678) merged
+into the integration branch =audit/ghana-correctness=, arriving on =development=
+via PR #673.  Verified with
+=gh pr list --json baseRefName -q 'select(.baseRefName=="audit/ghana-correctness")'=.
+
+** Two completeness holes, both closed
+
+1. *Squash-merged PRs would leave no merge commit.*  Checked:
+   =git log v0.9.1..development --no-merges --format='%s' | grep -E '\(#[0-9]+\)$'=
+   returns 4 lines, and all four are conventional-commit issue trailers
+   (=... (#323)=, =... (#591)=), not GitHub's squash suffix.  *No squash merges
+   in the range.*
+2. *Date hole 2026-07-27 .. 2026-08-21.*  =gh pr list --state merged= filtered to
+   that window returns *zero* PRs.  Work resumed 2026-08-21.  The 49-PR set is
+   therefore complete.
+
+** Candidate harvest (deliberately wider than the release skill's grep)
+
+The release skill's =grep -oE '(fix|feat)/[0-9]+'= misses this delta badly:
+branch prefixes in range are =fix/=, =feat/=, =docs/=, =chore/=, =audit/=,
+=test/=, =build/=, =scratch/=.  Harvested from *all* of:
+
+- branch names with any prefix (=<anything>/<N>-...=) -- 49 PR head refs;
+- PR titles and PR bodies (=gh pr view N --json body= grepped for
+  =clos(e|es|ed)/fix(es|ed)/resolv(e|es|ed) #N=) -- yielded #323, #659, #681,
+  #683, #684, #685, #719, #724;
+- every commit subject and body:
+  =git log v0.9.1..development --format='%s%n%b' | grep -oE '#[0-9]+'= -- 112
+  distinct numbers.
+
+After removing numbers that are PRs, not issues (#2, #603, #609, #610, #612,
+#613, #614, #617, #618, #620, #622, #627, #632, #634, #635, #640, #642, #643,
+#646, #648, #649, #651, #657, #661, #665--#673, #676--#678, #682, #686--#688,
+#690, #691, #696, #697, #704, #707, #708, #710, #711, #714, #715, #717, #718,
+#720--#723, #725, #726, #728, #729, #733, #735, #736) and two upstream pandas
+numbers (#58149 = pandas issue, #59325 = pandas PR), *47 real issue numbers*
+remain.  29 are already CLOSED; 18 are OPEN and verified below.
+
+Note on =#704=: the commits =fix(#704): decide .DAT layout from its .DCT= and
+=fix(#704): repair the three GhanaLSS consumers= point at *PR* #704 (the
+settlement-threshold scoping doc that discovered the =COMM.DAT= parse trap).
+There is no issue #704.  Do not chase one.
+
+* CLOSE -- safe to auto-close
+
+*(empty)*
+
+| issue | title | resolved by | evidence |
+|-------+-------+-------------+----------|
+| --    | --    | --          | Nothing qualified.  See DO NOT CLOSE / UNCERTAIN. |
+
+Copy-pasteable line for the merge PR body:
+
+: (no Closes line -- every issue this range resolved is already closed)
+
+* DO NOT CLOSE -- touched but not resolved
+
+** Umbrella / class issues
+
+*** #323 -- bug: framework silently drops rows on duplicate canonical index (groupby().first())
+
+- *What landed*: eight country instances in this range alone -- Pakistan (#612),
+  Albania (#620), GhanaLSS (#622), Togo (#632), Uganda (#634), Serbia (#666),
+  China (#667), Guyana (#668) -- plus the Niger geo regression test (#643).
+  PR #612's body literally says =close #323=.
+- *Still open*: =CLAUDE.md= line 250, in force on =development= today:
+  #+begin_quote
+  *Known open (Sec 3b of that doc)*: =groupby()= defaults to =dropna=True=, so a
+  row with NaN in a declared index level is *deleted outright* by the collapse
+  -- 14 cells / 485,231 rows (worst: Burkina Faso =food_acquired= 2014, 82.5% of
+  rows).  Currently *reported, not fixed* (decision D2, 2026-07-13:
+  delete-and-report; retaining would change returned data library-wide).
+  #+end_quote
+  And =CLAUDE.md= on the CI ratchet: "flipping it on in CI is therefore gated on
+  all of #323 being clean, not just this site's census."  =LSMS_GRAIN_STRICT= is
+  still opt-in.
+- Sibling PRs #609/#610/#613 titled themselves "one instance; class stays open".
+  *The class is still open.*
+
+*** #637 -- groupby().first() is not first_row(): skipna=True fabricates composite rows (49 sites)
+
+- *What landed*: PR #646 (six-site key-soundness review, Uganda =plot_inputs=
+  gains =season=) and PR #651 (Tanzania 2008-15 =shocks= keyed on the panel LINE).
+- *Still open*: the issue's remediation item 1 is "=.first(skipna=False)= in
+  core's two sites".  Measured on =development= now:
+  - =lsms_library/country.py:5341= -- =return df.groupby(level=keep_levels, observed=True).first()=
+  - =lsms_library/country.py:5527= -- =df = df.groupby(level=present_levels, observed=True).first()=
+  - =lsms_library/feature.py:220= -- =return grouped.first()=
+  All three are still bare =.first()=.  Item 2 (the EHCVM six) was *deliberately
+  declined* in place -- =Benin/2018-19/_/people_last7days.py:117= now reads
+  ="Do NOT 'fix' this to `.first(skipna=False)`: in this codebase NaN is ..."= --
+  which is a decision, not a closure.  =grep -rn "groupby([^)]*)\.first()"
+  lsms_library/ --include=*.py | wc -l= -> *102*.
+
+*** #140 -- [umbrella] Rebuild GhanaSPS: registration, data refresh, feature gap
+
+- *What landed*: =sample= (78336043), =household_roster= (#677), =housing= (#726),
+  =individual_education= (#728), 10 wave-3 modules acquired from Dataverse
+  (c0b73a57), matrix refresh (#723).
+- *Still open*: PR #735's own commit ed38e021 =docs(#730): GhanaSPS is not a
+  pp/ph country, and size the ag work as `todo`= -- the agriculture features are
+  sized as *todo*, not built (PR #729 =docs(GhanaSPS): what agriculture features
+  can actually be constructed=).  And #732 (OPEN, filed 2026-08-24) is a live
+  GhanaSPS defect: "W3: reading =plotsizeunit= instead of =plotunit= nulls Area
+  for 89.3% of plots".  An umbrella with an open child is not resolved.
+
+*** #575 / #585 / #438 -- mentioned only in passing
+
+| issue | mention in range | verdict |
+|-------+------------------+---------|
+| #575 food_expenditures purchased-value-only | e4c3bf45 =docs(ghana-audit): record the food_expenditures near-miss (GH #575, not a regression)= -- a docs note that explicitly says it is *not* a fix; the =basis== kwarg landed in PR #584, merged 2026-06-25, i.e. *before* v0.9.1 and not in this delta | not touched |
+| #585 impute own-production value | appears only inside 0307b56f's coverage-matrix refresh text | not touched |
+| #438 WB-parity item stack to non-ISA | appears only as an incidental token in 9ab4b1ac (Togo cluster_features) | not touched |
+
+** Issues whose landed work stops short
+
+*** #692 -- GhanaLSS: the 7-way `rural` table in GLSS2 decodes Y01C:NRCPL -- rename it
+
+- *What landed*: PR #696, whose *entire* file list is
+  =lsms_library/countries/GhanaLSS/_/CONTENTS.org= and
+  =slurm_logs/ghana_audit/FINDINGS_orphan_rural_table.org= (=gh pr view 696
+  --json files=).  It *sources* the table; it changes no config.
+- *Still open*: the issue's three asks are all unimplemented on =development=:
+  - =git show development:.../GhanaLSS/1988-89/_/categorical_mapping.org | grep -n 'name: rural'=
+    -> =154:#+name: rural= (not renamed to =nrcpl_place_type=);
+  - =git show development:.../GhanaLSS/1988-89/_/mapping.py | grep -n rural_dict=
+    -> =20:rural_dict = tools.code_label_map('rural', _dirs)= (the "loaded gun"
+    the issue asks to delete is still loaded);
+  - the editorial =Classification= column is untouched.
+
+*** #705 -- GhanaLSS: the urban cutoff MOVES across waves (5,000 -> 1,500 -> 5,000)
+
+- *What landed*: PR #704's scoping sweep (which *found* it) and PR #690's
+  GLSS1/GLSS2 =SU -> Rural= fold, whose BID band boundaries were written into
+  =GhanaLSS/_/CONTENTS.org= (lines 1328--1353: "rural < 1500 <= semi-urban <
+  5000 <= urban").
+- *Still open*: the issue's suggested action 1 is to record the *four-wave
+  moving-cutoff table* with the bias direction in =CONTENTS.org=.  Grepping
+  =CONTENTS.org= for the GLSS4 cutoff finds *nothing*: no ">1,500" for GLSS4, no
+  cross-wave comparability statement.  The precedent it names -- #683, Ethiopia
+  -- was closed by a docs PR (#688) that *did* write the statement into the
+  country's docs (9035b92d =docs(#683): Ethiopia's `Rural` column is not
+  comparable across waves=).  Ghana has not had its equivalent.
+
+*** #709 -- `1.7498e100` is Stata's pre-108 double missing code, not corruption
+
+- *What landed*: checklist item 1 only.  =pyproject.toml:10= is now
+  =dependencies = ["pandas >=3.0", ...]= (commit f38bcf96, PR #710).
+- *Still open*: checklist item 2 is "*Correct the #704 characterisation*
+  (=slurm_logs/settlement_thresholds/FINDINGS_threshold_rules.org=).  Wrong three
+  ways."  That file on =development= still reads, verbatim at line 685:
+  #+begin_quote
+  - *The =1.7498005798264095e+100= corruption is corpus-wide, not Ghanaian.* ...
+    It is a 1990s-vintage Stata float artifact, *absent from every post-2000
+    file*, and it is not a documented missing-value sentinel.
+  #+end_quote
+  which is exactly the three-way-wrong claim the issue exists to retract.
+  =git log v0.9.1..development -- slurm_logs/settlement_thresholds/= shows six
+  commits, none of them the correction.  Checklist item 3 (report upstream to
+  ReadStat / pyreadstat) has no evidence of having been filed; item 4 (build-time
+  guard) is marked "deliberately not implemented", and @ligon's own comment of
+  2026-08-22 adds a *fifth* checklist item ("China 1995-97
+  =household_roster.MonthsAway= is the third undefended declared column").
+
+*** #680 -- fooddatacentral ships a broken top-level `tests` package that shadows ours
+
+- *What landed*: option 4 only, and then weakened.  c14f6bce added
+  =tests/test_tests_package_not_shadowed.py=; 2973edf1 then removed its
+  assertion, and its own commit message says why:
+  #+begin_quote
+  =fix(#680): the shadowing guard asserted a condition we do not control= ...
+  "this repo cannot fix a dependency's packaging, so asserting its absence makes
+  a permanently-red test rather than a guard." ... "*this guard cannot save CI.*
+  If a module ships the bad import, pytest aborts at collection and the guard
+  never runs.  Its value is LOCAL."
+  #+end_quote
+- PR #733's =testpaths= scoping is a *different* failure (a stray =*_test.py=
+  outside =tests/=; see the comment at =pyproject.toml:77-82= naming
+  =slurm_logs/ghanasps/plot_identity_permutation_test.py=).  It does not change
+  how =import tests= resolves.
+- *Still open*: options 1 (report upstream), 2 (pin/avoid the version) and 3
+  (make the collision impossible) are the ones that remove the cause, and none
+  landed.  Corroborating: #734 (OPEN) is a second, distinct =sys.path= defect in
+  the same area.
+
+*** #693, #694, #698, #699, #700, #701, #702 -- filed BY this range, only mentioned
+
+Each appears in the range solely inside a *docs* or *review* commit that files or
+cross-references it, never in a fix:
+
+| issue | only mention in range | independently verified unfixed |
+|-------+-----------------------+--------------------------------|
+| #693 =#+begin_example= parsed as a LIVE categorical mapping | dd87b260 =docs(#682): design note for label selection= | -- |
+| #694 =_apply_categorical_mappings= =.str.strip()= nulls non-strings | dd87b260 (same design note) | -- |
+| #698 kinship =Otro Pariente= | 7c92fb1a =fix(#684): address red-team review of #691= (lists it as filed) | -- |
+| #699 =read_file= has no SAS XPORT branch | 5984899e, c5158595, 7c92fb1a -- all docs | =grep -rniE 'read_xport\|read_sas' lsms_library/= -> *no call sites* (the only =xport= match in =local_tools.py= is the substring of "export" in a comment at line 844, and the range diff of that file adds none).  The null-read guard (PR #711) *detects* the Peru 1990 mis-parse (=null_read_audit.py:18= cites GH #699); it adds no reader. |
+| #700 Peru =sample= for 1994 | 7c92fb1a | -- |
+| #701 Peru ENNIV 1991 | 7c92fb1a | -- |
+| #702 Afghanistan no =Data Scheme:= | 7c92fb1a | -- |
+
+* UNCERTAIN
+
+** #601 -- Liberia NHFS silently pooled; the library has no way to say so
+
+*Lean: DO NOT CLOSE.*  This is the strongest close candidate in the set and I
+could not settle it from artifacts alone.
+
+*For closing.*  @ligon's own restated ask, in his second comment on the issue, is:
+#+begin_quote
+*Record the population being sampled, per (country, wave)*: the target universe,
+deliberate exclusions ("urban excluded by design"), what the weights inflate to,
+and the source (the DDI sampling appendix).  Machine-readable, so it can travel
+with the frame and be warned on -- not prose in a =CONTENTS.org=.
+#+end_quote
+PR #720 (=feat/603-population-record=, commits 1c7a919b + 7279778b) delivers
+essentially that.  =git show development:lsms_library/countries/Liberia/_/population.yml=
+carries =universe_tag: specialized=, =source_type=, =confidence=, a verbatim
+=population_statement=, a dedicated =exclusions= field quoting the Montserrado
+carve-out, and the weighting caveat in =notes=.  =PopulationRecord= is attached
+to =df.attrs['population']= and =PopulationHeterogeneityWarning= fires on mixed
+pools.
+
+*Against closing.*  Three concrete residuals:
+1. The issue's *suggested fix item 4*, which @ligon explicitly agreed to
+   ("Unchanged, and @ligon has agreed: *keep but fence.* ... Follow the
+   GhanaLSS/GhanaSPS precedent (=Liberia= = the HIES now ruled in remit; a
+   separate directory for the NHFS)"), is *not done*.  Liberia is still one
+   directory whose only wave is the NHFS.
+2. The third of his three "what =Feature()= can do" items -- "*Let the user
+   filter explicitly* on the recorded attributes" -- has no API.
+   =docs/guide/population.md:123= states the shipped position plainly: "this is a
+   comparability warning, not a filter."  (Item 2 of the same list, the fence,
+   was formally declined -- PR #603 =design(#601): ... [DECISION NEEDED]= is
+   CLOSED unmerged, and =docs/guide/population.md:30= records the refusal.)
+3. *Behavioural evidence.*  PR #720 merged 2026-08-24T15:14Z.  The same
+   maintainer closed #713, #716 and #719 at 2026-08-24T17:53Z and #724 at
+   18:45Z, i.e. he was closing issues that afternoon and left #601 open.
+
+*Independent corroboration (found after the sweep).*  An untracked sibling
+artifact, =docs/releases/v0.10.0.md= (written by the parallel release-notes
+work), attributes PR #720 as "(#720, closes #603; *refs* #601)".  Its author
+independently treated #601 as a *reference*, not a closure, while writing
+"closes #716 / #591 / #537 / #503 / #684 / #685 / #659 / #683 / #724 / #719 /
+#730" for exactly the issues in the ALREADY CLOSED table below.  Two independent
+readings agree.
+
+*Evidence that would decide it*: a statement from @ligon that the population
+record as shipped discharges #601 and that the Liberia HIES split belongs to a
+separate issue (#552 / #597 acquisition backlog).  Absent that, leave it open.
+
+* ALREADY CLOSED -- appeared in the range, state is already CLOSED (no action)
+
+All 29 carry =stateReason: COMPLETED= (verified individually with
+=gh issue view N --json state,stateReason,closedAt=).
+
+** Closed at this range's dev-merges (2026-08-21 .. 2026-08-25) -- this work did close them
+
+| issue | closedAt | title (trimmed) | the work |
+|-------+----------+-----------------+----------|
+| #503 | 2026-08-22 | Guyana sample/roster conflate distinct households: i=[ED,HH] needs SN | PR #668 =fix(#503/#323)=, commit d3f2833b |
+| #537 | 2026-08-22 | =validate_acquisition_source= is dormant: 0 call sites | PR #671, commit 9a8f753c |
+| #589 | 2026-08-22 | =test_feature_ghana_per_wave= failing -- GhanaLSS per-wave currency labels | *No fixing commit exists.*  @ligon's closing comment: "Does not reproduce -- closing on evidence ... The honest statement remains 'does not reproduce', not 'fixed by X' -- the fixing commit was never identified."  Re-run cold on =fd9efc1b= after 19 merges incl. #673/#676/#622. |
+| #591 | 2026-08-22 | Nigeria =food_prices()= silently drops ~99% of rows | PR #669, commits ec903dc4 + fe64d06e |
+| #659 | 2026-08-22 | GhanaLSS 2005-06 =sample().Rural= 100% NULL | PR #687 (body: =Closes #659=), commit de5fa1cd |
+| #681 | 2026-08-22 | GLSS1/GLSS2: wire cluster attributes from BID Appendix I | PR #686 (=Closes #681=), commit 89a04312 |
+| #683 | 2026-08-22 | Ethiopia's =Urban= changes MEANING between waves | PR #688 (=Closes #683=), commit 9035b92d |
+| #684 | 2026-08-22 | Peru's entire config is unreachable | PR #691 (=Closes #684=), commits 4879499d + 720ab52d + 7c92fb1a |
+| #685 | 2026-08-22 | GLSS1/GLSS2 =sample().Rural= 100% NULL | PR #690 (=Closes #685=), commits 553ed2b0 + 62c091a9 |
+| #713 | 2026-08-24 | GhanaLSS served with NO SAMPLING WEIGHTS in 4 of 7 waves | PR #714, commits c34c2cd8 / f659d722 / 65b1964c |
+| #716 | 2026-08-24 | =get_data_file()= silently returns None for a repo-relative path | PR #717, commit f88e3fd4 |
+| #719 | 2026-08-24 | conftest purges caches on =pytest --collect-only= | PR #722 (=Closes #719=), commits 4b148ed4 + 4c5ddd69 |
+| #724 | 2026-08-24 | Coverage matrix grades only features a country DECLARES | PR #725 (=Closes #724=), commit f285c8b7 |
+| #730 | 2026-08-25 | =add-feature/pp-ph= wrongly lists GhanaSPS as pp/ph | PR #735, commit ed38e021 |
+
+** Closed before this range -- incidental mentions only, NOT this range's work
+
+Listed so the harvest reads complete; the range merely cites them.
+
+| issue | closedAt | title (trimmed) |
+|-------+----------+-----------------|
+| #196 | 2026-05-08 | bug(uganda): inconsistent =v= encoding across tables and waves |
+| #197 | 2026-04-28 | bug(household_characteristics): silent HH drop when v is NaN |
+| #251 | 2026-06-07 | Extract canonical food_acquired filter+groupby tail into shared utility |
+| #372 | 2026-06-07 | GhanaLSS 1991-92 household_roster build fails -- KeyError in Birthplace |
+| #348 | 2026-06-08 | GhanaLSS: food_acquired =u= codes + #223 Tier-4 unit-label lift |
+| #377 | 2026-06-08 | GhanaLSS 1991-92: Birthplace/Region NA |
+| #436 | 2026-06-15 | code/data separation: =LSMS_COUNTRIES_ROOT= |
+| #161 | 2026-06-17 | Uganda cluster_features: wrong grain, stringified-float District |
+| #513 | 2026-06-20 | [feature-audit] plot_features duplicate tuples |
+| #515 | 2026-06-20 | [feature-audit] =_market_lookup= Burkina_Faso 2014 KeyError |
+| #500 | 2026-06-20 | Feature('sample'): non-unique cluster joins multiply then collapse |
+| #109 | 2026-06-20 | GhanaLSS: multiple incomplete features |
+| #170 | 2026-06-20 | Housing: cross-country vocabulary harmonization (Roof / Floor) |
+| #602 | 2026-07-22 | Declared 'spellings' mapped but never ENFORCED |
+| #645 | 2026-07-22 | Country table row count is call-order dependent |
+
+* Inverse-error sweep -- open issues NOT referenced anywhere in the range
+
+The brief warns about "an issue whose fix landed but whose number never appears
+in a branch name".  All 55 open issues were checked title-by-title against the 49
+PR titles; the plausible ones were checked in the tree.  *Result: none resolved.*
+
+Spot checks that could have gone the other way:
+
+| issue | why it looked plausible | what I checked | verdict |
+|-------+-------------------------+----------------+---------|
+| #712 =get_dataframe= Stata attempt catches only =(ValueError, struct.error)= | PR #708 rewrote the =.DAT=/=.DCT= branch of the same function | =grep -n "struct.error" lsms_library/local_tools.py= -> =1216: except (ValueError, struct.error):= -- unchanged | not fixed |
+| #706 CotedIvoire =COMM85-88.DAT= unwired | PR #708 made =.DAT= readable via its =.DCT= | the fix enables reading; no CotedIvoire config wires the four files | not fixed |
+| #674 =get_categorical_mapping= returns ={}= silently | #692's body calls it a "third recurrence"; the Ghana audit touched decodes | =grep -n 674 lsms_library/*.py= -> no hits; no guard added | not fixed |
+| #689 Uganda =cluster_features= at PARISH grain | PR #634 is a Uganda cluster-key fix, commit 9e8ac9de "the district component over-split 3 real parishes" | that commit fixes the *district component* of the key, not the parish-vs-EA *grain* | not fixed |
+| #695 GLSS1 Birthplace decoded with the wrong 17-code table | PR #673 revived dead decodes; feb53dd7 unwired birthplace-as-cluster-region | #695 was *created 2026-08-22*, i.e. filed by that audit as its residue | not fixed |
+| #607 Nigeria unit codes wave-blind | PR #669 is a Nigeria food-price fix | #669 corrects the =food_acquired= source mapping and the price drop; the unit decode is untouched | not fixed |
+| #592 18 waves with zero GPS | PR #643 is a Niger geo PR | #643 adds a *regression test* pinning existing wiring ("pin the geo wiring that the fix did not carry"); wires no new GPS | not fixed |
+| #587 triage 39 'dropped' cells | PR #725 added a coverage tier | #725 adds the =undeclared= tier (the matrix's *denominator*); =dropped= cells are a different tier and untriaged | not fixed |
+
+Remaining open issues confirmed untouched by title match against all 49 PR
+titles: #218, #226, #279, #381, #439, #449, #450, #458, #468, #506, #552, #560,
+#562, #563, #567, #569, #588, #600, #647, #650, #660, #675, #679, #703, #727,
+#731, #732, #734, #737.  (#727, #731, #732, #734, #737 were *created* 2026-08-24
+/ 2026-08-25 by the GhanaSPS-housing, Ghana-audit, worktree and livestock work in
+this very range -- they are v0.10.0's outbox, not its inbox.)
+
+* Constraints observed
+
+Read-only throughout.  No issue closed, no PR created, no merge, no push, no
+tracked file edited.  =gh= did not rate-limit; every =gh issue view= /
+=gh pr view= call in this report completed.  No test run, no data build, no
+=Country(...)= call.  This file is the only artifact written.

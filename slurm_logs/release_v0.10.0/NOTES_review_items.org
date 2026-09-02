@@ -1,0 +1,67 @@
+#+title: v0.10.0 release notes -- reviewer's open items
+#+date: 2026-09-02
+
+Split out of =docs/releases/v0.10.0.md= before shipping: these are notes to
+the human reviewer, not release content.  All six were checked by Sue and
+accepted as written; recorded here so the reasoning is not lost.
+
+* Verbatim REVIEW block
+
+#+begin_example
+<!--
+REVIEW: The brief's headline item 4 ("grain-collapse site 2 -- Wave.cluster_features
+is now audited; core no longer averages GPS") is NOT in this delta, so it is omitted
+rather than asserted.  Verified: `_collapse_to_cluster_grain`, `_audit_index_collapse`
+and the "used to be reduced with `.mean()`" comment are all present in
+`lsms_library/country.py` at tag v0.9.1 (lines 4749 / 4473 / 4716), and
+`git diff v0.9.1..development -- lsms_library/country.py` touches no hunk in that
+region.  v0.9.0.md already claims it ("Sites 1, 2 and 4 ... are addressed").  What
+v0.10.0 has is the country-level `cluster_features` fixes that route through that
+machinery (Pakistan #612, China #667, Togo #632, Albania #620, Serbia #666,
+Guyana #668), covered under "Country data correctness".
+
+REVIEW: The brief's item 7 mentions the `units=` kwarg; that shipped 2026-05-06
+(Phase 4) and predates v0.9.1, so it is not credited here.  Only the dict form of
+`labels=` (#697) is new -- the scalar `labels='Aggregate'` form predates this release
+too.
+
+REVIEW: Source is ASCII per the workspace style rules, so this file uses `--` where
+v0.9.0.md / v0.9.1.md use em-dashes, and a plain `##` heading where v0.9.0.md uses a
+warning emoji.  One search-and-replace pass restores the older typography if the
+house format is meant to win over the ASCII rule.
+
+REVIEW: Where PR bodies and the shipped tree disagree because of later commits, the
+numbers above are the ones measured on the tree: 116 population wave records across
+38 countries (parsed from all 38 `population.yml` files); 415 `undeclared` cells and
+1,849 -> 2,279 snapshot rows in `.coder/coverage/latest.csv` (PR #725 says 417 and
+1,859 -> 2,276).  Separately, CLAUDE.md says 28 `national-claimed` waves; the shipped
+config has 29.  Re-check the tag histogram against the source sweep document's
+published table if they must agree.
+
+REVIEW: The brief says 63 merged PRs; `git log v0.9.1..development --merges` has 49
+"Merge pull request" lines, the rest being branch-sync merges.  No PR or commit count
+is stated above, since neither v0.9.0.md nor v0.9.1.md states one.
+
+REVIEW: Guyana's figures are the RE-MEASURED ones in the shipped tree (257 buckets /
+562 households / 2,419 people, per `Guyana/_/CONTENTS.org` and
+`Guyana/1992/_/data_info.yml`), not the 248 / 542 in PR #668's body -- that PR says
+its figures were "the branch's, not independently re-measured", and commit 5c03a9a6
+re-measured them.  The fix is confirmed present in `development`'s tree.
+-->
+#+end_example
+
+* Adjudication (Sue, 2026-09-02)
+
+- Items 1, 2, 6 (site-2 omission, =units== not new, Guyana re-measured):
+  ACCEPTED.  Item 1 was a briefing error of mine -- grain-collapse Site 2
+  landed before v0.9.1 and is already claimed in =docs/releases/v0.9.0.md=.
+  The agent verified this against the tag and declined to assert it.
+- Item 3 (ASCII vs em-dash): ASCII kept, per the workspace source rule.  The
+  one exception made is the warning emoji on the cache heading, restored to
+  match =v0.9.0.md='s signal for a cache-invalidating release.
+- Item 4 (tree numbers over PR-body numbers): ACCEPTED -- the tree is the
+  shipped artifact.  Independently re-measured: 38 =population.yml= files,
+  116 wave records, ten tags.  =national-claimed= is *29*; CLAUDE.md says 28
+  and is stale by one.  Worth a follow-up commit to CLAUDE.md; not a release
+  blocker.
+- Item 5 (PR count): ACCEPTED -- no count is stated, matching precedent.
