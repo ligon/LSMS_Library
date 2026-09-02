@@ -1,25 +1,34 @@
-#+title: Handoff -- v0.10.0 release
+#+title: Handoff -- v0.10.0 / v0.10.1 releases
 #+date: 2026-09-02
 #+author: Sue (Claude Opus 5, 1M context)
 
 * State
-- Branch =development= at =bc8aa2df=, pushed.  =master= is 204 behind, 0 ahead --
-  the merge is a fast-forward with no conflict risk.
-- *PR #739* open: =development= -> =master=, "Release v0.10.0".
-- PR #738 (EthiopiaRHS docs) was merged into =development= first, per @ligon.
+- *v0.10.0 SHIPPED* (2026-09-02).  PR #739 merged; =master= = =c0300a4a=; tag
+  =v0.10.0=; =publish.yml= fired on the =release= event (no dispatch fallback
+  needed) and PyPI has both artifacts:
+  =lsms_library-0.10.0-py3-none-any.whl= (7,630,071 B) and the sdist.
+  Test gate: burst job 38419369 on that exact commit, 16 cores --
+  *4648 passed, 0 failed, exit 0*.
+- *v0.10.1 IN FLIGHT*: PR #742 (GH #741, gpg-free S3 unlock) is merged into
+  =development=, notes written.  Next: merge =development= -> =master=, tag.
 
-* Next concrete action
-1. Review + merge PR #739.
-2. =git checkout master && git pull=  -- =make release= tags the *current*
-   HEAD, not =master=.  (See item 4: this is ordinary care, NOT a fix for a
-   past mistake -- my earlier "v0.9.1 was an orphan tag" claim was wrong.)
-3. =make release v=0.10.0=  (re-runs pytest, then tags the checked-out master)
-4. =git push origin v0.10.0=
-5. Publish the GitHub Release *from the web UI* -- a =gh=-created release
-   sometimes fails to fire =publish.yml=.  Verify with
-   =gh run list --workflow=publish.yml=; fallback is
-   =gh workflow run publish.yml --ref master -f tag=v0.10.0=.
-   Notes file: =docs/releases/v0.10.0.md=.
+* Next concrete action (v0.10.1)
+1. Merge the =development= -> =master= PR for v0.10.1.
+2. =git checkout master && git pull=  -- =make release= tags the *current* HEAD.
+3. Tag =v0.10.1=.  NOTE: =make release= runs =poetry run pytest= at
+   =PYTEST_WORKERS = $SLURM_CPUS_ON_NODE=, which is 4 on this condo slice --
+   about an hour, and the target prompt forbids running the full suite locally.
+   For v0.10.0 the gate was instead burst job 38419369 (=sbatch ... -c 16=,
+   =slurm_logs/release_v0.10.0/burst_pytest.sh=) and the tag was then created
+   with the identical command the target uses,
+   =git tag -a v0.10.1 -m "Release 0.10.1"=.  Do the same.
+   (=poetry run= works fine here; it is =poetry build= that gets killed on the
+   4-core slice.  CI builds the wheel from the tag anyway.)
+4. =git push origin master && git push origin v0.10.1=
+5. =gh release create v0.10.1 --title v0.10.1 --notes-file docs/releases/v0.10.1.md=
+   then confirm =gh run list --workflow=publish.yml= shows a =release= run.
+   It fired correctly for v0.10.0; the =workflow_dispatch= fallback was not
+   needed but remains documented in the release skill.
 
 * Decisions taken (with @ligon)
 - Version *v0.10.0* (not 1.0.0 -- 55 issues open, #323 umbrella live,
