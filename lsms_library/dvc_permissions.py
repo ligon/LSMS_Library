@@ -3,9 +3,15 @@
 
 This is the fallback path for users who don't have a World Bank
 Microdata API key but still want access to the S3-cached ``.dta``
-files. It prompts for a shared passphrase, decrypts
-``s3_reader_creds.gpg`` with ``gnupg``, and writes the plaintext
-credentials to the DVC config's expected location.
+files. It prompts for a shared passphrase, decrypts the bundled
+credentials, and writes the plaintext to the DVC config's expected
+location.
+
+As of GH #741 that decryption is pure Python -- Fernet, via
+``cryptography`` -- with ``s3_reader_creds.gpg`` kept as a fallback.
+``python-gnupg`` only wraps a ``gpg`` binary that Windows and macOS do
+not ship, which made this path unusable for a good share of the users
+it exists to serve.
 
 The preferred (non-interactive) path runs automatically at import time
 via :mod:`lsms_library.data_access` when a valid ``MICRODATA_API_KEY``
@@ -20,8 +26,8 @@ import git
 from pathlib import Path
 import getpass
 import pkgutil
-import gnupg
 
+from .data_access import _fernet_decrypt, _gpg_decrypt
 from .paths import countries_root
 
 def is_git_repo(path='.'):
@@ -59,15 +65,24 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
     Raises:
     ValueError: If decryption fails due to an incorrect passphrase or other issues.
     """
-    # Construct the path to the encrypted file relative to this function's location
+    # Construct the path to the encrypted files relative to this function's location
     gpg_path = countries_root() / '.dvc'
     encrypted_file = gpg_path / gpg_key_file
+    enc_file = encrypted_file.with_suffix('.enc')
 
-    # Load the encrypted data
-    encrypted_data = encrypted_file.read_bytes()
+    def _try_decrypt(pp: str) -> str | None:
+        """Decrypt with the pure-Python path, falling back to gpg.
 
-    # Initialize GPG
-    gpg = gnupg.GPG()
+        Order matters: ``cryptography`` is a hard dependency, while ``gpg`` is
+        a binary Windows and macOS do not ship (GH #741).
+        """
+        if enc_file.exists():
+            plain = _fernet_decrypt(enc_file, pp)
+            if plain is not None:
+                return plain
+        if encrypted_file.exists():
+            return _gpg_decrypt(encrypted_file, pp)
+        return None
 
     def _write_creds(decrypted_data, interactive: bool = True):
         """Write decrypted credentials to disk."""
@@ -92,8 +107,8 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
 
     # Non-interactive path: single attempt with the supplied passphrase
     if passphrase is not None:
-        decrypted_data = gpg.decrypt(encrypted_data, passphrase=passphrase)
-        if decrypted_data.ok:
+        decrypted_data = _try_decrypt(passphrase)
+        if decrypted_data is not None:
             _write_creds(decrypted_data, interactive=False)
             return
         raise ValueError("Decryption failed: incorrect passphrase.")
@@ -113,9 +128,9 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
 
     for attempt in range(1, max_attempts + 1):
         pp = getpass.getpass(prompt='Enter passphrase for decryption: ')
-        decrypted_data = gpg.decrypt(encrypted_data, passphrase=pp)
+        decrypted_data = _try_decrypt(pp)
 
-        if decrypted_data.ok:
+        if decrypted_data is not None:
             _write_creds(decrypted_data, interactive=True)
             return
 

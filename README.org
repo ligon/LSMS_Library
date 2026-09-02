@@ -84,6 +84,10 @@ Once your WB API key is validated, the library unlocks a read-only S3 cache that
 
 Decrypted plaintext credentials are written to =~/.config/lsms_library/s3_creds= (or the path in the =LSMS_S3_CREDS= environment variable), not into the package tree -- so the library is safe to install from a wheel into a read-only site-packages directory.
 
+*A valid WB API key is sufficient on its own.*  No other software is required: the unlock is pure Python, via =cryptography=, which installs with the library.  Before v0.10.1 it also needed the =gpg= binary -- not a Python package, and absent by default on Windows and macOS -- so a user with a perfectly good key hit =NoCredentialsError= from botocore with nothing pointing at the real cause (GH #741).
+
+If the unlock does fail, the library says so and falls back to downloading directly from the World Bank: slower, but nothing is blocked.  The =gpg= binary is now needed only for the interactive keyless fallback below, and even that prefers the pure-Python path.
+
 ** Non-interactive environments
 
 In CI, Docker builds, or other non-interactive contexts, set =LSMS_SKIP_AUTH=1= to suppress the import-time authentication flow.  In that mode you are responsible for ensuring =~/.config/lsms_library/s3_creds= exists (e.g. via a CI secret mount) before the first data access.

@@ -1,6 +1,6 @@
 [project]
 name = "LSMS_Library"
-dynamic = ["version"]
+dynamic = []
 description = "Abstraction layer for Living Standards Measurement Survey data"
 authors = [ {name = "Ethan Ligon", email = "ligon@berkeley.edu"}
     ]
@@ -11,6 +11,11 @@ dependencies = ["pandas >=3.0",
              "CFEDemands>=0.8.2",
              "PyYAML >=6.0,<7.0",
              "python-gnupg >=0.5,<1.0",
+             # Explicit, though dvc[s3]/botocore pull it in anyway: this is the
+             # S3 unlock path (GH #741), and it must not depend on another
+             # package's extras continuing to ship it.  python-gnupg above is
+             # now only needed for the interactive keyless fallback.
+             "cryptography >=3.4",
              "scikit-learn (>=1.7.0,<2.0.0)",
              "dvc[s3] (>=3.67.0,<4.0.0)",
              "pyarrow (>=21.0.0)",
@@ -22,6 +27,7 @@ dependencies = ["pandas >=3.0",
              "fooddatacentral (>=1.0.10,<2.0.0)",
              "pint (>=0.25.2,<0.26.0)",
              "platformdirs (>=4.0.0,<5.0.0)"]
+version = "0.9.1.post208.dev0+fcec3642"
 
 [project.scripts]
 lsms-library = "lsms_library.cli:main"
@@ -36,8 +42,8 @@ include = [
     "lsms_library/countries/.dvc/.gitignore",
     "lsms_library/countries/.dvc/plots/*.json",
     "lsms_library/countries/.dvc/s3_reader_creds.gpg",
+    "lsms_library/countries/.dvc/s3_reader_creds.enc",
 ]
-version = "0.0.0"
 
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
@@ -65,7 +71,7 @@ pyinstrument = ">=4.6,<6.0"
 snakeviz = "^2.2"
 
 [tool.poetry-dynamic-versioning]
-enable = true
+enable = false
 vcs = "git"
 style = "pep440"
 
