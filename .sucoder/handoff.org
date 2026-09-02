@@ -1,0 +1,58 @@
+#+title: Handoff -- v0.10.0 release
+#+date: 2026-09-02
+#+author: Sue (Claude Opus 5, 1M context)
+
+* State
+- Branch =development= at =bc8aa2df=, pushed.  =master= is 204 behind, 0 ahead --
+  the merge is a fast-forward with no conflict risk.
+- *PR #739* open: =development= -> =master=, "Release v0.10.0".
+- PR #738 (EthiopiaRHS docs) was merged into =development= first, per @ligon.
+
+* Next concrete action
+1. Review + merge PR #739.
+2. =git checkout master && git pull=  -- =make release= tags the *current*
+   HEAD, not =master=.  (See item 4: this is ordinary care, NOT a fix for a
+   past mistake -- my earlier "v0.9.1 was an orphan tag" claim was wrong.)
+3. =make release v=0.10.0=  (re-runs pytest, then tags the checked-out master)
+4. =git push origin v0.10.0=
+5. Publish the GitHub Release *from the web UI* -- a =gh=-created release
+   sometimes fails to fire =publish.yml=.  Verify with
+   =gh run list --workflow=publish.yml=; fallback is
+   =gh workflow run publish.yml --ref master -f tag=v0.10.0=.
+   Notes file: =docs/releases/v0.10.0.md=.
+
+* Decisions taken (with @ligon)
+- Version *v0.10.0* (not 1.0.0 -- 55 issues open, #323 umbrella live,
+  =LSMS_GRAIN_STRICT= not yet on in CI).
+- Coverage matrix snapshot shipped as-is (one PR stale; regenerable).
+- =Closes:= list deliberately *empty* -- see PR #739 body and
+  =slurm_logs/RELEASE_v0.10.0_closes.org=.
+
+* Open questions / follow-ups (none blocking)
+1. *GH #740* filed: =test_extraction_is_cluster_grain= fails on any
+   data-credentialed machine.  Now =xfail(strict=False)= so =make release= is
+   not blocked -- without that, step 3 above would have failed on this very
+   box.  The open question is substantive: =data_scheme.yml= claims the wave
+   script is what keeps =groupby().first()= from firing on Pakistan, and that
+   script does not appear to run.  Delivered data is correct; "right output"
+   and "the guard is live" are different facts and only the first is verified.
+2. CLAUDE.md says 28 =national-claimed= population waves; the shipped config has
+   *29*.  One-line doc fix.
+3. DONE -- superseded parquets removed (@ligon, 2026-09-02) after confirming all
+   three live equivalents had rebuilt.  Nothing outstanding.
+4. *CORRECTION (Sue, 2026-09-02).*  An earlier version of this note, of the
+   =bc8aa2df= commit message, and of PR #739's body claimed =v0.9.1= was "an
+   orphan tag two commits past =master=, never merged back".  *That is false.*
+   I checked =merge-base= against a *stale local* =master= (last updated
+   2026-07-22) instead of =origin/master=.  =v0.9.1= (=72004880=) *is*
+   =origin/master=: its two commits -- Zenodo/CFF metadata and the release
+   notes -- were made directly on =master= after the v0.9.0 merge and tagged
+   there, which is the correct workflow.  Nothing was orphaned and nothing
+   needed avoiding.
+   The *advice* in step 2 survives the correction on its own merits: =make
+   release= tags the current HEAD, so you do need =master= checked out.  But it
+   is ordinary care, not a fix for a past mistake.
+
+* Environment note
+=.venv= was a stale symlink to a dead job's =/local=.  Restored with
+=bash bin/savio_venv.sh mount=.  Do that first on any new allocation.

@@ -515,7 +515,7 @@ def plot_inputs_finalize(df):
 #   HeadCount        — number currently in the herd (owned + raised),
 #   HeadAcquired     — number bought in the recall period,
 #   HeadSold         — number owned by the HH sold in the recall period,
-#   Value            — gross value of those sales (FCFA) where the source
+#   SalesValue       — gross value of those sales (FCFA) where the source
 #                      records it; NaN otherwise (the EACI roster carries NO
 #                      current herd-value question, only a sales value).
 #
@@ -547,7 +547,7 @@ def livestock_finalize(df):
 
     Expects raw columns already assembled:
         t, i, animal (numeric species code), HeadCount, HeadAcquired,
-        HeadSold, Value.
+        HeadSold, SalesValue.
     Maps the species code -> harmonize_species Preferred Label, coerces the
     reported count/value columns to numeric (clearing the EACI Manquant
     sentinels), drops content-free rows (a species the household does not
@@ -559,7 +559,7 @@ def livestock_finalize(df):
     df['animal'] = _species_labels(df['animal'])
     df = df.dropna(subset=['animal'])  # drop unmapped species codes
 
-    for c in ('HeadCount', 'HeadAcquired', 'HeadSold', 'Value'):
+    for c in ('HeadCount', 'HeadAcquired', 'HeadSold', 'SalesValue'):
         if c not in df.columns:
             df[c] = pd.NA
         df[c] = pd.to_numeric(df[c], errors='coerce')
@@ -573,7 +573,7 @@ def livestock_finalize(df):
     has_content = (df['HeadCount'].fillna(0).gt(0)
                    | df['HeadAcquired'].fillna(0).gt(0)
                    | df['HeadSold'].fillna(0).gt(0)
-                   | df['Value'].fillna(0).gt(0))
+                   | df['SalesValue'].fillna(0).gt(0))
     df = df[has_content]
 
     keys = ['t', 'i', 'animal']
@@ -582,9 +582,9 @@ def livestock_finalize(df):
         'HeadCount':    g['HeadCount'].sum(min_count=1),
         'HeadAcquired': g['HeadAcquired'].sum(min_count=1),
         'HeadSold':     g['HeadSold'].sum(min_count=1),
-        'Value':        g['Value'].sum(min_count=1),
+        'SalesValue':   g['SalesValue'].sum(min_count=1),
     })
-    out = out[['HeadCount', 'HeadAcquired', 'HeadSold', 'Value']]
+    out = out[['HeadCount', 'HeadAcquired', 'HeadSold', 'SalesValue']]
     return out.sort_index()
 
 

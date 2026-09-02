@@ -1,0 +1,49 @@
+==============================================================================
+CotedIvoire
+  Rural sample values: ['Urban', 'Rural']
+  matched rows with weight+Rural: 19380
+  wave               n       mean raw  mean api      share raw      share api   absdiff
+  1985-86         1588         1.0000  1.000000  0.57178841237  0.57178841237   1.1e-16
+  1986-87         1600         1.0000  1.000000  0.56937499980  0.56937499980   0.0e+00
+  1987-88         1600         1.0000  1.000000  0.57498422123  0.57498422123   1.1e-16
+  1988-89         1600         1.0000  1.000000  0.60999999254  0.60999999254   0.0e+00
+  2018-19        12992       443.4196  1.000000  0.47526080640  0.47526080640   5.6e-17
+  WORST per-wave |share_raw - share_api| = 1.110e-16  -> PASS (invariant)
+  POOLED cross-wave weighted Rural share: raw 0.475379  normalised 0.510297  diff +0.034919
+==============================================================================
+Malawi
+  Rural sample values: ['Rural', 'Urban']
+  matched rows with weight+Rural: 57118
+  wave               n       mean raw  mean api      share raw      share api   absdiff
+  2004-05        11280       242.1489  1.000000  0.87052104493  0.87052104493   1.1e-16
+  2010-11        12271       250.3891  1.000000  0.84397760679  0.84397760679   1.1e-16
+  2013-14         4000       925.3408  1.000000  0.82669320280  0.82669320280   1.1e-16
+  2016-17        14955       620.0112  1.000000  0.81075723534  0.81075723534   0.0e+00
+  2019-20        14612       757.8203  1.000000  0.81893686085  0.81893686085   1.1e-16
+  WORST per-wave |share_raw - share_api| = 1.110e-16  -> PASS (invariant)
+  POOLED cross-wave weighted Rural share: raw 0.824655  normalised 0.832905  diff +0.008250
+==============================================================================
+Uganda
+  Rural sample values: ['Rural', 'Urban', <NA>]
+  matched rows with weight+Rural: 24266
+  wave               n       mean raw  mean api      share raw      share api   absdiff
+  2005-06         3123      1675.7437  1.000000  0.80916524980  0.80916524980   0.0e+00
+  2009-10         2973      1779.8664  1.000000  0.74461501015  0.74461501015   2.2e-16
+  2010-11         2715      2207.8018  1.000000  0.83505607993  0.83505607993   1.1e-16
+  2011-12         2826      2119.0245  1.000000  0.81392606429  0.81392606429   1.1e-16
+  2013-14         3119      2166.3714  1.000000  0.74657979847  0.74657979847   0.0e+00
+  2015-16         3256      2282.8771  1.000000  0.74916603251  0.74916603251   1.1e-16
+  2018-19         3176      2716.6210  1.000000  0.65871455951  0.65871455951   1.1e-16
+  2019-20         3078      2746.4938  1.000189  0.68483435285  0.68483435285   0.0e+00
+  WORST per-wave |share_raw - share_api| = 2.220e-16  -> PASS (invariant)
+  POOLED cross-wave weighted Rural share: raw 0.746392  normalised 0.753149  diff +0.006757
+==============================================================================
+GhanaLSS
+  Rural sample values: ['Rural', 'Urban']
+  matched rows with weight+Rural: 39468
+  wave               n       mean raw  mean api      share raw      share api   absdiff
+  2005-06         8687       637.5196  1.000000  0.56808902183  0.56808902183   0.0e+00
+  2012-13        16772       393.6015  1.000000  0.44611532499  0.44611532499   0.0e+00
+  2016-17        14009       521.0882  1.000000  0.43981213180  0.43981213180   5.6e-17
+  WORST per-wave |share_raw - share_api| = 5.551e-17  -> PASS (invariant)
+  POOLED cross-wave weighted Rural share: raw 0.478497  normalised 0.470725  diff -0.007773

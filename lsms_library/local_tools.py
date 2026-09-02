@@ -71,6 +71,7 @@ import warnings
 import yaml
 import json
 import difflib
+import io
 import re
 import types
 from pyarrow.lib import ArrowInvalid
@@ -88,6 +89,7 @@ import pyreadstat
 import inspect
 from typing import Any
 from .paths import data_root, var_path, wave_data_path, countries_root
+from .null_read_audit import check_read
 from .config import s3_creds_path as _s3_creds_path
 
 # Initialize DVC filesystem once and reuse it.
@@ -802,6 +804,288 @@ def _try_get_data_file(fn: str | Path) -> Path | None:
     return get_data_file(rel)
 
 
+# ---------------------------------------------------------------------------
+# ``.DAT`` / ``.DCT`` -- LSMS 1980s/90s ASCII extracts
+# ---------------------------------------------------------------------------
+#
+# The oldest surveys in the corpus (Côte d'Ivoire CILSS 1985-89, Ghana GLSS1/2,
+# Nicaragua EMNV 2001) ship each table as a pair: a ``.DAT`` payload and a
+# ``.DCT`` "data dictionary" in the Stata ``infile dictionary`` idiom --
+#
+#     dictionary
+#     parmfile=ascii
+#     variables
+#          1     12 R NO_CLST
+#         14     12 R CLUST
+#         ...
+#     endvars
+#
+# i.e. ``start-column  width  type  name``, describing a FIXED-WIDTH layout.
+#
+# *** The shipped .DAT files do not use that layout. ***  They are
+# comma-delimited with a header row.  A ``read_fwf(colspecs=...)`` built from
+# the dictionary "succeeds" and returns a frame of exactly the right shape
+# whose contents are shredded comma-strings and an all-NaN numeric tail --
+# silently, raising nothing.  That trap is recorded in
+# ``countries/GhanaLSS/_/CONTENTS.org`` ("GLSS1/GLSS2 .DAT files are
+# COMMA-SEPARATED WITH A HEADER ROW, not fixed-width") and was found by the
+# settlement-threshold sweep, PR #704.
+#
+# So the dictionary cannot be trusted about *layout*.  It is authoritative
+# about the *variable list*, and that is what makes the layout decidable:
+# ``_detect_dat_layout`` below tests the file against the dictionary rather
+# than guessing from the bytes alone.  The reason to route these files
+# through the dictionary at all, rather than leaving them to the bare
+# ``read_csv`` in the fallback chain, is that a bare ``read_csv`` has the
+# mirror-image failure: on a genuinely fixed-width file it returns a single
+# column of whole lines, equally silently.
+_DCT_VAR_RE = re.compile(r'^\s*(\d+)\s+(\d+)\s+(\S+)\s+(\S+)\s*$')
+
+#: Field value meaning "missing" in a Stata ASCII export.  Matched against
+#: the *whole* field, so ``2.5`` is untouched.
+_DAT_NA_VALUES = ['.']
+
+
+class DatLayoutError(ValueError):
+    """A ``.DAT``/``.DCT`` pair whose layout could not be established.
+
+    Raised rather than guessed at: both candidate parses (fixed-width and
+    comma-delimited) fail silently on the wrong file, returning a
+    plausibly-shaped frame full of garbage.
+    """
+
+
+def _parse_dct(text: str) -> "tuple[list[str], list[tuple[int, int]]] | None":
+    """Parse an LSMS ``.DCT`` ASCII data dictionary.
+
+    Returns ``(names, colspecs)`` where ``colspecs`` is the pandas
+    half-open 0-based ``[(start, end), ...]`` form, or ``None`` if *text*
+    is not a dictionary we recognise.
+
+    Only lines between ``variables`` and ``endvars`` are considered, and
+    every one of them must parse -- a dictionary we only half-understand
+    is not a dictionary we may act on.
+    """
+    names: list[str] = []
+    colspecs: list[tuple[int, int]] = []
+    in_vars = False
+    saw_block = False
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped == 'variables':
+            in_vars = True
+            saw_block = True
+            continue
+        if stripped == 'endvars':
+            in_vars = False
+            continue
+        if not in_vars or not stripped:
+            continue
+        m = _DCT_VAR_RE.match(line)
+        if m is None:
+            return None          # unrecognised grammar -> not our dictionary
+        start, width = int(m.group(1)), int(m.group(2))
+        if start < 1 or width < 1:
+            return None
+        names.append(m.group(4))
+        colspecs.append((start - 1, start - 1 + width))
+    if not saw_block or not names:
+        return None
+    return names, colspecs
+
+
+def _dct_path_for(fn: str | Path) -> "tuple[Path, tuple[str, ...]] | None":
+    """``(path, suffixes-to-try)`` for the sibling ``.DCT`` of a ``.DAT``.
+
+    Purely lexical -- no I/O -- so every non-``.DAT`` read pays a single
+    string compare.  Case variants are tried in a deterministic order,
+    the payload's own suffix case first.
+    """
+    p = Path(fn)
+    if p.suffix.lower() != '.dat':
+        return None
+    order = ('.DCT', '.dct') if p.suffix.isupper() else ('.dct', '.DCT')
+    return p, order
+
+
+def _read_sidecar_bytes(fn: str | Path) -> "bytes | None":
+    """Raw bytes of a non-tabular sidecar, or ``None`` if unreachable.
+
+    Deliberately narrower than ``get_dataframe``'s chain: a local file,
+    else the DVC blob cache (sidecar md5 -> direct S3 on a miss).  It
+    stops there rather than falling through to ``DVCFS.open`` or the WB
+    NADA download, because this runs *speculatively* on every ``.DAT``
+    read, including ones with no dictionary at all.  ``DVCFS.open`` walks
+    the ``.dvc`` sidecar tree (~10-20s on Lustre per call, see
+    ``get_dataframe``) and the NADA path is a network round trip; paying
+    either to discover a file's absence would be a serious regression.
+    Unreachable simply means the caller keeps its old behaviour.
+    """
+    p = Path(fn)
+    for cand in ([p] if p.is_absolute() else [p, _COUNTRIES_DIR / p]):
+        try:
+            if cand.is_file() and not _is_polluted_workspace_copy(cand):
+                return cand.read_bytes()
+        except OSError:
+            continue
+    try:
+        _ensure_dvc_pulled(fn)
+        cache_path = _dvc_cache_path(fn)
+        if cache_path is not None:
+            return cache_path.read_bytes()
+    except OSError:
+        pass
+    return None
+
+
+def _load_dct_for(fn: str | Path) -> "tuple[list[str], list[tuple[int, int]]] | None":
+    """Locate and parse the ``.DCT`` dictionary belonging to ``.DAT`` *fn*.
+
+    Returns ``None`` -- leaving the caller on the untouched legacy reader
+    chain -- when *fn* is not a ``.DAT``, when no sibling dictionary can be
+    reached, or when the dictionary's grammar is unrecognised.  Only a
+    dictionary we fully parsed licenses the dictionary-driven read.
+    """
+    found = _dct_path_for(fn)
+    if found is None:
+        return None
+    p, suffixes = found
+    for suffix in suffixes:
+        raw = _read_sidecar_bytes(p.with_suffix(suffix))
+        if raw is None:
+            continue
+        for enc in ('utf-8', 'latin-1'):
+            try:
+                text = raw.decode(enc)
+            except UnicodeDecodeError:
+                continue
+            parsed = _parse_dct(text)
+            if parsed is not None:
+                return parsed
+            break
+    return None
+
+
+def _detect_dat_layout(lines: list[str], names: list[str],
+                       colspecs: list[tuple[int, int]]) -> str:
+    """Decide how a ``.DAT`` payload is laid out, given its dictionary.
+
+    *lines* is a sample of the file's non-empty lines (first line first).
+    Returns one of ``'csv-header'``, ``'fixed'``, ``'csv-noheader'``, or
+    ``'unknown'``.  Deterministic: no thresholds, no scoring, no
+    tie-breaking on row counts.
+
+    The three tests, in order, and why none of them can misfire:
+
+    ``csv-header``
+        Line 1 comma-splits into *exactly* the dictionary's variable names,
+        in order (case-insensitively).  A fixed-width file's line 1 is a
+        data record; for it to comma-split into its own dictionary's name
+        list it would have to literally contain that list -- at which point
+        it *is* a header row.
+
+    ``fixed``
+        Every sampled line fits inside the declared record, and every
+        column the dictionary leaves *between* fields is blank wherever the
+        line reaches it.  Comma-delimited numeric payloads carry no spaces,
+        so a comma-delimited line fails this on its first inter-field
+        column.  (Where the dictionary declares contiguous fields there are
+        no gap columns and this rests on the length test alone.)
+
+    ``csv-noheader``
+        Every sampled line comma-splits into exactly ``len(names)`` fields
+        and the fixed-width test already failed.
+
+    A fixed-width file that happens to carry commas *inside a text field*
+    is the case worth stating plainly: it fails ``csv-header`` (its first
+    record is not the name list), passes ``fixed`` (the commas sit inside
+    declared fields, so the gap columns are still blank), and never
+    reaches ``csv-noheader``.  It is read fixed-width, which is correct.
+    Had its comma count coincidentally equalled ``len(names) - 1``, the
+    earlier ``fixed`` verdict still wins.
+    """
+    if not lines:
+        return 'unknown'
+
+    header = [tok.strip().upper() for tok in lines[0].split(',')]
+    if header == [n.upper() for n in names]:
+        return 'csv-header'
+
+    reclen = max(end for _, end in colspecs)
+    last_start = max(start for start, _ in colspecs)
+    gap_cols = sorted(set(range(reclen)) -
+                      {c for start, end in colspecs for c in range(start, end)})
+    lengths = [len(line.rstrip('\r\n')) for line in lines]
+    fits = all(n <= reclen for n in lengths)
+    reaches = max(lengths) > last_start
+    gaps_blank = all(line[c] == ' '
+                     for line in lines
+                     for c in gap_cols if c < len(line))
+    if fits and reaches and gaps_blank:
+        return 'fixed'
+
+    if all(len(line.split(',')) == len(names) for line in lines):
+        return 'csv-noheader'
+
+    return 'unknown'
+
+
+def _read_dat_with_dct(raw: bytes, names: list[str],
+                       colspecs: list[tuple[int, int]],
+                       fn: str | Path,
+                       encoding: str | None = None,
+                       sample: int = 50) -> pd.DataFrame:
+    """Read a ``.DAT`` payload using its ``.DCT`` dictionary.
+
+    Detects the layout (see :func:`_detect_dat_layout`) and parses
+    accordingly, honouring the Stata ASCII missing-value marker ``.`` in
+    every mode -- without which a numeric column holding a single missing
+    value ships as a ``str`` column of digit-strings and dots.
+
+    Raises :class:`DatLayoutError` when the layout cannot be established.
+    """
+    for enc in ([encoding] if encoding else []) + ['utf-8', 'latin-1']:
+        try:
+            text = raw.decode(enc)
+            break
+        except (UnicodeDecodeError, LookupError):
+            continue
+    else:
+        raise DatLayoutError(f"{fn}: could not decode as text")
+
+    lines = [ln for ln in text.splitlines() if ln.strip()][:sample]
+    layout = _detect_dat_layout(lines, names, colspecs)
+
+    # ``low_memory=False`` is not an optimisation here, it is a correctness
+    # requirement.  Chunked type inference assigns dtypes per chunk, so a
+    # large ``.DAT`` could come back as an *object* column mixing ``int``
+    # and ``str`` for the same value -- measured on GhanaLSS 1987-88
+    # ``Y12A.DAT``, whose 61 real ``FOODCD`` food codes were reported as
+    # 123 distinct values (61 ints + 61 strings + the ``.``).  A groupby on
+    # such a column silently splits every key in two.
+    if layout == 'csv-header':
+        return pd.read_csv(io.StringIO(text), na_values=_DAT_NA_VALUES,
+                           low_memory=False)
+    if layout == 'csv-noheader':
+        return pd.read_csv(io.StringIO(text), header=None, names=names,
+                           na_values=_DAT_NA_VALUES, low_memory=False)
+    if layout == 'fixed':
+        return pd.read_fwf(io.StringIO(text), colspecs=colspecs, names=names,
+                           header=None, na_values=_DAT_NA_VALUES)
+
+    reclen = max(end for _, end in colspecs)
+    raise DatLayoutError(
+        f"{fn}: cannot establish the layout of this .DAT from its .DCT. "
+        f"The dictionary declares {len(names)} variables in a "
+        f"{reclen}-column fixed-width record, but the payload matches "
+        f"neither that record nor a {len(names)}-field comma-delimited "
+        f"one (first line has {len(lines[0].split(',')) if lines else 0} "
+        f"comma-separated fields and is {len(lines[0]) if lines else 0} "
+        f"characters long). Refusing to guess: both candidate parses "
+        f"return a plausibly-shaped frame of garbage without raising. "
+        f"See the .DAT/.DCT note in local_tools.py and GH #704.")
+
+
 def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
@@ -879,6 +1163,22 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             os.unlink(tmp_path)
 
     def read_file(f,convert_categoricals=convert_categoricals,encoding=encoding):
+        # ``.DAT`` with a sibling ``.DCT`` dictionary: read it through the
+        # dictionary (see the block comment above ``_parse_dct``).  The
+        # suffix test is a pure string compare, so every other file type
+        # pays nothing.  A ``.DAT`` whose dictionary is missing or written
+        # in a grammar we do not recognise falls through to the legacy
+        # chain below, unchanged.
+        dct = _load_dct_for(fn)
+        if dct is not None:
+            if isinstance(f, str):
+                raw = Path(f).read_bytes()
+            else:
+                f.seek(0)
+                raw = f.read()
+            return _read_dat_with_dct(raw, dct[0], dct[1], fn=fn,
+                                      encoding=encoding)
+
         if isinstance(f,str):
             try:
                 return pd.read_spss(f,convert_categoricals=convert_categoricals)
@@ -1010,7 +1310,14 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             else:
                 raise
 
-    return df
+    # SITE R of the null-content audit.  The reader's ONLY post-read content
+    # check: a frame of the right shape holding nothing is a mis-parse, not
+    # empty data, and until this line nothing anywhere looked.  Reporting only
+    # -- `check_read` returns `df` unchanged by contract.  Threshold and
+    # measurement rationale live in `null_read_audit`; see also its CACHE note
+    # (this module's `get_dataframe` IS build-path, so its own source is
+    # fingerprinted -- the audit module's is deliberately not).
+    return check_read(df, fn)
 
 #def regularize_string(s):
 
@@ -1166,6 +1473,61 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
 
     exc.add_note(f"No table {tablename} found in any file {fn} in directories {dirs}.")
     raise exc
+
+
+def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
+                   idxvars: str = 'Code', fn: str = 'categorical_mapping.org',
+                   dual_keys: bool = True) -> dict[Any, Any]:
+    """Read a ``Code -> Label`` org table into a lookup dict.
+
+    Prefer this over a bare ``get_categorical_mapping(tablename=...)``.
+
+    **Why this exists.**  ``get_categorical_mapping`` passes ``idxvars='Code'``
+    and, unless the caller supplies a value column as a keyword, no myvars --
+    so ``df_data_grabber`` drops the Label column and the squeeze returns an
+    *empty dict*.  Every lookup against it then misses and silently yields
+    ``pd.NA``.  Nothing raises; the column simply comes out 100% null.
+
+    That failure mode has bitten GhanaLSS three separate times:
+
+      - GH #372 / #377 -- ``region_dict`` empty, every Region/Birthplace NA.
+      - GH #348 -- the 1991-92 ``units`` decode, same root cause.
+      - 1987-88 / 1988-89 / 1998-99 -- ``region``/``rural``/``relationship``
+        all resolved to ``{}``, leaving ``cluster_features`` dead in three
+        waves and the kinship columns of ``household_roster`` 100% null.
+
+    **Key types.**  ``df_data_grabber`` stringifies the Code index via
+    ``format_id``, so the natural keys are strings (``'1'``), while callers
+    variously look up with ``int(value)`` or ``str(value)``.  Both historical
+    bugs were partly key-type mismatches.  With ``dual_keys=True`` (the
+    default) the result is keyed by *both* the string and the integer form of
+    each numeric code, so a caller cannot get this wrong.  Non-numeric codes
+    (e.g. a table's ``.`` -> ``None`` row) are kept under their string key.
+
+    Returns ``{}`` if no file in *dirs* carries the table -- callers that need
+    to distinguish "absent" from "empty" should check the directories first.
+    """
+    for d in dirs:
+        if not d.endswith('/'):
+            d += '/'
+        try:
+            df = df_data_grabber(d + fn, idxvars, orgtbl=tablename,
+                                 **{value: value})
+        except (FileNotFoundError, KeyError, ValueError):
+            continue
+        out: dict[Any, Any] = {}
+        for k, v in df[value].to_dict().items():
+            if pd.isna(v):
+                continue
+            key = str(k).strip()
+            out[key] = v
+            if dual_keys:
+                try:
+                    out[int(key)] = v
+                except (TypeError, ValueError):
+                    pass
+        return out
+    return {}
 
 
 def harmonized_unit_labels(fn: str = '../../_/unitlabels.csv', key: str = 'Code', value: str = 'Preferred Label') -> dict[Any, str]:

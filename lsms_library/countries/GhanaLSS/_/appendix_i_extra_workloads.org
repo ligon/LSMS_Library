@@ -1,0 +1,31 @@
+#+TITLE: GLSS1/GLSS2 "Extra Workloads" -- clusters the BID says to EXCLUDE
+#+AUTHOR: Sue the Coder
+
+Appendix I of =GHA_1988_GLSS_Basicinfo_EN.pdf= ends with a section headed
+*"Extra Workloads:  (should be excluded)"*.  These ten clusters are listed
+there and are deliberately NOT part of =appendix_i_clusters.org=.
+
+Kept as a separate tracked file rather than dropped, so that (a) the exclusion
+is auditable against the PDF, and (b) anyone who finds one of these ids in the
+microdata knows the document's position on it.
+
+*Not yet checked*: whether any of these appear in the shipped data.  If they
+do, that is a finding to report, not something to silently filter.
+
+Dropping these ten from the parsed 273 rows reproduces the Appendix's own
+urban/rural counts exactly (95 =U= / 116 =R= / 52 =SU=), which is one of the
+checks that the transcription is faithful.
+
+#+name: appendix_i_extra_workloads
+| yr1 | yr2 | Name | UrbRur | Reg | EcoZone |
+|-----+-----+------+--------+-----+---------|
+| . | 174 | Accra:Dansoman | U | Gr.A | C |
+| . | 177 | Accra:Town Council | U | Gr.A | C |
+| . | 190 | Accra:Bubrashie | U | Gr.A | C |
+| . | 209 | Accra | U | Gr.A | C |
+| . | 233 | Accra:Nima market | U | Gr.A | C |
+| . | 238 | Accra:Nima Pleasant | U | Gr.A | C |
+| . | 246 | Accra:W.Af Sec School | U | Gr.A | C |
+| . | 685 | Zang | R | Nort | S |
+| . | 789 | Tamale: Zogbeli | U | Nort | S |
+| . | 790 | Tamale | U | Nort | S |

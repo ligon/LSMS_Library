@@ -26,7 +26,8 @@ from mapping import i as i_helper
 import numpy as np
 import pandas as pd
 sys.path.append('../../../_/')
-from lsms_library.local_tools import df_from_orgfile, to_parquet, get_dataframe
+from lsms_library.local_tools import (df_from_orgfile, format_id, get_dataframe,
+                                      to_parquet)
 
 t = '1987-88'
 VISIT = 1  # single "since my last visit" recall (D1: degenerate but kept)
@@ -53,7 +54,16 @@ def _value_only_side(fn, code_col, value_col, s):
     df['i'] = df['HID'].apply(i_helper)
 
     # food code -> harmonized Preferred Label (j)
-    df['j'] = df['FOODCD'].astype('string').replace(labelsd[code_col]['Preferred Label'])
+    #
+    # Normalize via format_id, NOT .astype('string').  The label table's keys
+    # are bare integer strings ('301'), and since GH #704 the .DAT reader
+    # honours Stata's '.' missing marker, so FOODCD arrives as float64 --
+    # .astype('string') would yield '301.0' and miss every code, shipping the
+    # raw number as the food label.  format_id strips the '.0' (its documented
+    # job) and returns None for NaN.  Same fix, same reason, as the GH #348
+    # unit decode in 1991-92.
+    df['j'] = (df['FOODCD'].apply(format_id).astype('string')
+                           .replace(labelsd[code_col]['Preferred Label']))
 
     # per-recall-period value (NOT the pre-annualized *_yearly column)
     df['value'] = pd.to_numeric(df[value_col].replace({'.': np.nan}), errors='coerce')

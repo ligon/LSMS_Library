@@ -14,8 +14,9 @@ per holder x animal code):
   - head sold     ls_s8aq46a (amount of SALES in last 12 months, Total)
   - sale value    ls_s8aq60  (total value of sales in last 12 months, Birr)
 All transaction columns are in the SAME file as the count (txn=None).
-W1 reports NO current herd value -> Value carries the reported sale value,
-which is the only monetary livestock field the §8 roster records this wave.
+W1 reports NO current herd value -> SalesValue carries the reported sale
+value, which is the only monetary livestock field the §8 roster records
+this wave.
 i = household_id (matches sample().i for W1).
 """
 import sys

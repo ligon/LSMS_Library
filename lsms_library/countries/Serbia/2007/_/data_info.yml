@@ -3,7 +3,14 @@ Country: Serbia
 cluster_features:
     file: "../Data/enumeration_district.dta"
     idxvars:
-        v: popkrug
+        # GH #323: the census-district key is (opstina, popkrug), NOT popkrug
+        # alone -- popkrug is a serial number local to a municipality, so it
+        # repeats across opstina (510 districts, only 328 distinct popkrug).
+        # `v: popkrug` made _normalize_dataframe_index collapse the (t, v)
+        # index via groupby().first(), silently dropping 182 of 510 clusters.
+        # Composed by mapping.py:v() -- MUST stay in lockstep with the `v` in
+        # sample.df_hh.myvars below (that is the join key onto this table).
+        v: [opstina, popkrug]
     myvars:
         Region: region2
         Rural:
@@ -25,10 +32,14 @@ assets:
             - mappings: to_float
 
 household_roster:
+    # GH #323: no `v` here.  Only cluster_features owns v (CLAUDE.md); the
+    # framework joins it from sample() via _join_v_from_sample().  The old
+    # `v: popkrug` was both wrong (bare popkrug is not a cluster id) and dead
+    # -- the declared roster index is (t, i, pid), so _normalize_dataframe_index
+    # dropped the level anyway and the surfaced v came from sample() regardless.
     file:
         - "../Data/individual.dta"
     idxvars:
-        v: popkrug
         i: [opstina, popkrug, dom]
         pid: lice
     myvars:
@@ -46,7 +57,12 @@ sample:
         idxvars:
             i: [opstina, popkrug, dom]
         myvars:
-            v: popkrug
+            # GH #323: v is the COMPOSITE settlement key (opstina, popkrug),
+            # matching cluster_features.idxvars.v above.  These two MUST land
+            # together: sample.v is the join key onto cluster_features (t, v).
+            # Keying one on bare popkrug and the other on the composite makes
+            # the join miss and every household gets NaN cluster attributes.
+            v: [opstina, popkrug]
             # GH #500: carry the full settlement key (opstina, popkrug) as
             # plain columns so the df_hh<->df_ed join can match on it.  The
             # household id `i` collapses [opstina, popkrug, dom] into one

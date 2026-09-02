@@ -138,6 +138,11 @@ WARNING_TAXONOMY: list[tuple[str, str, bool]] = [
     ("No data for", "A", True),                      # empty per-country frame
     ("Failed to load", "A", True),                   # per-country build error (often no-microdata)
     ("duplicate", "B", False),                       # GH#323 dup-collapse
+    # Null-content audit (lsms_library.null_read_audit).  Class C: nothing
+    # throws, the shape is right, and only a human can say whether the emptiness
+    # is a mis-parse, an unwired column, or a survey that genuinely never asked.
+    ("100% NULL", "C", False),
+    ("are 100% NULL", "C", False),
 ]
 
 
@@ -214,6 +219,39 @@ def _warnings_to_findings(
     return out
 
 
+def _null_read_findings(feature: str, country: str) -> list[Finding]:
+    """Drain the null-content ledger for this (country, feature) into findings.
+
+    The structured twin of the warning capture above.  ``null_read_audit`` files
+    every finding in a process-wide ledger as well as warning, for exactly this
+    reason: a warning is a string a downstream consumer has to re-parse, whereas
+    a report dict carries the column, the scope and the wave list already
+    separated.  Same pattern ``country.grain_reports()`` exists for.
+
+    Only Site-B reports are drained here -- they are keyed by (country, table)
+    and so attributable to this cell.  Site-R reports name a FILE, not a table,
+    and are already captured as ``runtime_warning`` by ``_build``.
+    """
+    try:
+        from lsms_library.null_read_audit import null_read_reports
+        reports = null_read_reports(country=country, table=feature)
+    except Exception:                                   # noqa: BLE001
+        return []
+    out = []
+    for r in reports:
+        waves = r.get("waves")
+        out.append(Finding(
+            phase="1a-sanity", feature=feature, country=country,
+            check="null_content", status="warn", severity="C", expected=False,
+            detail=(f"required declared column {r.get('column')!r} is 100% "
+                    f"null " + (f"in wave(s) {waves}" if waves
+                                else "across every wave")),
+            metrics={"column": r.get("column"), "scope": r.get("scope"),
+                     "waves": waves, "rows": r.get("rows")},
+        ))
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Phase 1a -- per-country sanity (no kwargs)
 # ---------------------------------------------------------------------------
@@ -256,6 +294,8 @@ def _scan_one_country(feature: str, name: str) -> tuple[list[Finding], str, int 
                 detail="empty / non-DataFrame result",
             ))
             return findings, name, None
+
+        findings += _null_read_findings(feature, name)
 
         report = is_this_feature_sane(result, name, feature)
         for c in report.checks:

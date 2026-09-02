@@ -1,0 +1,809 @@
+#+title: GLSS3 (1991-92) weight = 1.0 -- self-weighting by design, documented
+#+date: 2026-08-22
+#+author: audit agent (GH #713 / PR #714)
+
+* Verdict
+
+*SELF-WEIGHTING, WIRE IT.*  =weight = 1.0= in
+=GhanaLSS/1991-92/Data/POV_GH.DTA= is the *correct, producer-documented*
+value, not a placeholder.  Ghana Statistical Service (GSS) states the
+GLSS3 sample is self-weighting in *four shipped documents*, and a fifth
+(the GLSS3 Poverty Profile) names the published statistical procedure that
+was applied *specifically to GLSS3* to /restore/ self-weighting -- and states that the same procedure was *not* applied to
+GLSS4, which is exactly why GLSS4 needs a real weight distribution and
+GLSS3 does not.
+
+The claim in PR #714 and issue #713 -- that wiring 1.0 "would make a
+self-weighting wave /look/ weighted -- strictly worse than the honest NULL
+it has today" -- is *backwards*.  Serving NULL suppresses a usable, correct
+constant and makes the wave needlessly unusable in weighted analysis.
+
+The varying households-per-cluster take (10 / 15 / 20 / 30) that motivated
+the doubt is *fully explained by the documented design*, and the observed
+distribution matches GSS's own design table cell-for-cell.  See
+[[*The take reconciliation][The take reconciliation]] -- there is no residual puzzle.
+
+*What is documented vs. inferred* is marked throughout.  Section
+[[*Inference, clearly labelled][Inference, clearly labelled]] collects everything that is mine rather than
+GSS's.
+
+* GhanaLSS idiosyncrasies bearing on this question
+
+Per the standing rule, the country's =_/CONTENTS.org= was read in full
+before any conclusion.  Four recorded idiosyncrasies bear directly on this
+question; two of them are *wrong or imprecise* and this document corrects
+them with citations.
+
+** 1. The signature failure: things that exist, look authoritative, and silently do nothing
+
+=CONTENTS.org= records the *GH #348* defect verbatim: the 1991-92 wave's
+=units= decode
+
+#+begin_quote
+was silently dead: =get_categorical_mapping(tablename='units')= was called
+with no value column, so =df_data_grabber= returned a column-less frame and
+the dict came back *empty* -- every code passed through
+#+end_quote
+
+An all-1.0 =weight= column is a textbook candidate for that failure mode,
+which is precisely why the doubt was reasonable and why it needed settling
+with documents rather than intuition.  *In this instance the constant is
+real.*  The distinguishing test was not the data -- a dead decode and a
+correct constant look identical in the =.dta= -- but the producer
+documentation.
+
+** 2. The Weights subsection already asserted this, but *uncited*
+
+=CONTENTS.org= "Sampling Design > Weights" says:
+
+#+begin_quote
+GLSS3 (1991-92) has a =weight= variable in =POV_GH.DTA= but it is constant
+1.0 (self-weighting).
+#+end_quote
+
+This was *correct but unevidenced* -- it reads as an observation about the
+data ("it is constant 1.0") with a parenthetical interpretation attached,
+and nothing recorded /how/ that interpretation was reached.  Under this
+repo's own rule against unevidenced claims it could not be relied on, and
+in fact it was not: PR #714 asserted the opposite reading.  This document
+supplies the missing citations.
+
+** 3. =CONTENTS.org= "Overview" says "a fixed take of households per EA" -- imprecise, flagged
+
+#+begin_quote
+Two-stage stratified cluster sample.  Enumeration Areas (EAs) from the
+national census serve as the PSU, with a fixed take of households per EA.
+#+end_quote
+
+*This is not what the GLSS3 main report describes*, and the imprecision is
+load-bearing for exactly this question.  The take is fixed *per workload
+and per stratum*, not per EA:
+
+- GLSS1/GLSS2: 16 households per *workload*;
+- GLSS3: 15 per urban workload, 10 per rural workload;
+- an EA may receive *0, 1, 2 or 3 workloads* from a second PPS stage, so
+  households *per EA* take values 0, 10, 15, 20 or 30 (GLSS3).
+
+Flagged here in the file's own /Tensions/ style rather than silently
+rewritten, per the read-only mandate on this task.  Note the tension is
+internal to GSS's own corpus as well: the GLSS3 Poverty Profile's own
+one-paragraph summary *does* say "a fixed number of households were selected
+by systematic sampling within each of the selected enumeration areas"
+(Appendix 4, printed p. 57).  The main report's Appendix 1 is the more
+detailed and more authoritative account, and it is the one that matches the
+data.
+
+** 4. The =sample= feature deliberately excludes GLSS1--GLSS4 to avoid mixing weight types
+
+#+begin_quote
+The =sample= feature only includes expansion weights (GLSS5--GLSS7) to
+avoid mixing weight types.  GLSS1--GLSS4 have =weight= and =panel_weight=
+as NaN.
+#+end_quote
+
+*This is the one genuine design question wiring GLSS3 raises*, and it is
+not settled by anything in this document.  See
+[[*The weight-type question (unresolved, and not mine to resolve)][The weight-type question]].
+
+* 1. The documentary record
+
+Five shipped sources.  All quotes verbatim; per the =CONTENTS.org=
+transcription convention, PDF justified-line-wrapping whitespace has been
+rejoined and superscript footnote markers dropped, and *nothing else* is
+changed -- sic spellings and missing/stray spaces are as printed.  All text
+was extracted with =pdfminer=; every one of these PDFs has a clean text
+layer (*no* CID decode was required, unlike GLSS1's report).
+
+** Source A -- GLSS3 Data User's Guide
+
+File: =GhanaLSS/1991-92/Documentation/pdf/g3usersg.pdf=, section
+"Sample design", *PDF page 3* (the document has no printed page numbers).
+
+Title page reads: "GHANA LIVING STANDARDS SURVEY / ROUND THREE (GLSS 3)
+1991/92 / DATA USER'S GUIDE / GHANA STATISTICAL SERVICE".
+
+#+begin_quote
+A multi-stage sampling technique was used in selecting the GLSS3 sample. Technical details of the sample design are given in Appendix 1 of the main report.  Initially, 4565 households were selected for GLSS3, spread around the country in 407 EAs; in general, 15 households were taken in an urban EA and 10 households in a rural EA.  The actual achieved sample was 4552 households.   The sample designed used for the GLSS3, and with the very high response rate achieved, the sample can be considered as being self-weighting, though in the case of expenditure data (as discussed below) weighting of the expenditure values should be done.
+#+end_quote
+
+Typography preserved as printed: ="The sample designed used for the GLSS3"=
+(sic -- the sentence is ungrammatical in the original).
+
+*This is the file @ligon quoted.*  He named it
+=GHA_1991_GLSS_Data_User_Guide_EN.pdf=; *that filename is not tracked in
+this repository* (verified with =git ls-files= across all of GhanaLSS --
+the only =*Data_User_Guide*= we hold is GLSS4's).  It is the World Bank
+catalog name for the same GSS document we ship as =pdf/g3usersg.pdf= (Word
+source =Glss3 qsts and manuals docs/G3USERSG.DOC=).  The sentence he quoted
+is present verbatim, so the identification is secure.
+
+*Note two things the chat excerpt dropped*, both material:
+
+1. the *conditions* -- "The sample designed used for the GLSS3, *and with
+   the very high response rate achieved*" (two conditions: the design AND
+   the response rate);
+2. the *carve-out* -- "*though in the case of expenditure data (as
+   discussed below) weighting of the expenditure values should be done*".
+   This is not a sampling weight.  See [[*The expenditure "weighting" is a CPI deflator, NOT a sampling weight][the CPI deflator section]].
+
+** Source B -- GLSS3 main report, METHODOLOGY
+
+File: =GhanaLSS/1991-92/Documentation/pdf/G3report.pdf=, "METHODOLOGY" ->
+"Sample design", *printed page 1* (PDF page 19).
+
+*Document identity confirmed*: the title page reads "GHANA LIVING STANDARDS
+SURVEY / REPORT ON THE THIRD ROUND (GLSS3) / September 1991 - September
+1992 / March 1995 / Ghana Statistical Service".  204 pages, clean text
+layer, and it *does* contain "Appendix 1 / SAMPLE DESIGN FOR ROUND 3 OF THE
+GLSS" whose first substantive heading is "Sample design for GLSS1 and
+GLSS2" -- exactly as @ligon described ("which also discusses sampling of
+the 1st two rounds").  =G3report.pdf= *is* the "main report" the User's
+Guide points at.  (@ligon named =GHA_1991_GLSS_Report_EN.pdf.pdf=; as with
+the User Guide, that filename is not tracked here.  This corpus does carry
+WB-style doubled extensions elsewhere --
+=GHA_1991_GLSS_Price_Questionnaire_EN.pdf.pdf= is tracked -- so his name is
+plausibly a WB copy of the same document.)
+
+#+begin_quote
+A multi-stage sampling technique was used in selecting the GLSS sample. Technical details of the sample design are given in Appendix 1.  Initially, 4565 households were selected for GLSS3, spread around the country in 407 small clusters;  in general, 15 households were taken in an urban cluster and 10 households in a rural cluster.  The actual achieved sample was 4552 households.  Because of the sample design used, and the very high response rate achieved, the sample can be considered as being self-weighting, though in the case of expenditure data (as discussed below) weighting of the expenditure values is required.
+#+end_quote
+
+*Two variants of this sentence exist and must not be conflated.*  The User's
+Guide (Source A) reads "The sample designed used for the GLSS3 ... should be
+done"; the main report reads "Because of the sample design used ... *is
+required*".  Quote each from its own source.
+
+Note also that the main report says *"407 small clusters"* where the User's
+Guide says "407 EAs".  The report's Appendix 1 shows the report's usage is
+the loose one -- there were 407 *workloads* drawn from 366 EAs that received
+at least one.  This matters; see the reconciliation.
+
+** Source C -- GLSS3 main report, Appendix 1, "Survey response"
+
+Same file, *printed page 113* (PDF page 131).
+
+#+begin_quote
+The design chosen for this survey was intended to ensure that the sample was self-weighting, provided an adequate response was secured on the survey.  The number of households achieved in the survey almost exactly matched the number required.  The small shortfall arose in cases where an interviewer failed to secure interviews from several of the selected households, and then used up all the reserve list of households in the EA without managing to complete the quota.  The number of such cases is so few that it has not been considered necessary to do any imputations or re-weighting for missing households.  Re-weighting of income and expenditure has, however, been necessary, for the reasons given below.
+#+end_quote
+
+*This is the strongest single statement in the corpus*, because it is the
+only one that states the *decision*: GSS considered whether non-response
+required re-weighting and *decided it did not*.  A constant weight is
+therefore GSS's actual analytic treatment, not an omission.
+
+*The response rate the claim leans on*, Table 3 (printed p. 113):
+
+| Area  | Covered by  | Workloads | Expected | Achieved |
+|-------+-------------+-----------+----------+----------|
+| Urban | Urban team  |        99 |     1485 |     1482 |
+| Urban | Rural team  |        11 |      110 |      110 |
+| Rural | Rural team  |       297 |     2970 |     2960 |
+| Total |             |       407 |     4565 |     4552 |
+
+*4552 / 4565 = 99.72 per cent.*  That is the "very high response rate
+achieved" the self-weighting claim conditions on, and it is a documented
+number.
+
+** Source D -- GLSS3 DDI metadata
+
+File: =GhanaLSS/1991-92/Documentation/ddi-documentation-english-12.pdf=.
+The DDI carries a structured *"Weighting"* field which reproduces the
+Appendix 1 paragraph, plus two adjacent fields:
+
+#+begin_quote
+Deviations from Sample Design
+
+There was no deviation from the sampling design.
+#+end_quote
+
+#+begin_quote
+Response Rate
+
+Of the selected 4565 households 4552 were successfully interviewed .
+#+end_quote
+
+#+begin_quote
+Weighting
+
+The design chosen for this survey was intended to ensure that the sample was self-weighting, provided an adequate response was secured on the survey.
+#+end_quote
+
+Typography preserved: ="interviewed ."= (space before the period).
+
+This matters because it is the *machine-readable metadata field named
+"Weighting"* -- the canonical place a producer records a weighting scheme --
+and what GSS put there is the self-weighting statement, *not* a weight
+variable name.  Contrast GLSS5, whose DDI Weighting field says "The
+household weight variable is called WEIGHT which is attached to each section
+data" (quoted in =CONTENTS.org=).
+
+** Source E -- GLSS3 Poverty Profile, Appendix 4  [the decisive one]
+
+File: =GhanaLSS/1991-92/Documentation/pdf/PovProf.pdf= ("Poverty Trends in
+Ghana in the 1990s"), "APPENDIX 4: GLSS SAMPLE DESIGN", *printed page 57*.
+
+#+begin_quote
+Both the third and fourth rounds of the GLSS were conducted on a nationwide basis.  Households were selected based on a two stage sampling procedure, conducted as follows.  In the first stage enumeration areas (EAs) were selected based on those used for the 1984 population census, with probability proportional to size (number of households) as recorded in the 1984 census.  At the second stage a fixed number of households were selected by systematic sampling within each of the selected enumeration areas.
+
+Given the long period of time between the population census and either the GLSS 3 or GLSS 4 surveys, the above procedure will generally not give a self-weighting sample (where the probability of inclusion of each household is equal).  This is because the numbers of households in different enumeration areas are likely to have grown at different rates.  The selected enumeration areas will then not have been picked with probability proportional to their true sizes.
+
+If the selected enumeration areas were fully listed after their selection however, then it is possible either (i) to compute weights reflecting differential probabilities of selection of households in different EAs; or (ii) to amend the above procedure to restore a self-weighting sample.  The latter was done for GLSS 3 following a procedure devised by Scott and Amenuvegbe (1991).
+
+The same procedure though was not applied for GLSS 4.  Moreover, it was not possible to compute the weights at the time of the survey, because some of the EAs selected for GLSS 4 were only partially listed.  It was therefore not possible to know the growth in the number of households in the selected EAs, the information which would form the basis for the calculation of the weights.  Fortunately though, these weights could be computed from the results of the recent Population Census conducted in March - April 2000.  These weights have been applied throughout this study.  Their application gives a slightly larger reduction in poverty between GLSS 3 and GLSS 4 than if they were not applied, but do not change the trends significantly.
+#+end_quote
+
+*This single appendix answers the original brief's question 4 outright.*  It
+states, in one place:
+
+- self-weighting is *not automatic* under PPS with a stale frame -- GSS
+  understood the exact objection raised in #714/#713;
+- *GLSS3 was deliberately amended to restore self-weighting*, by a named,
+  published procedure;
+- *GLSS4 was not*, and therefore required weights, which had to be computed
+  retrospectively from the 2000 Census.
+
+That is the documented design change between GLSS3 and GLSS4, and it
+explains the empirical contrast the brief noted (GLSS3 weight identically
+1.0; GLSS4 a real distribution, min 0.127 / median 0.85 / max 6.02).
+
+*The procedure is published and citable.*  Main report Appendix 1,
+footnote 14 (printed p. 109):
+
+#+begin_quote
+A full description of this procedure is given in Chris Scott and Ben Amenuvegbe, "Reconciling fixed interview workloads with self-weighting sampling when size measures are defective", Journal of Official Statistics, Vol. 7, No. 3, 1991, pp. 367-373
+#+end_quote
+
+The title alone is the answer to #713: *reconciling fixed interview
+workloads with self-weighting sampling when size measures are defective.*
+
+* 2. The take reconciliation
+
+This is the part PR #714 could not explain.  It is *fully resolved*, and the
+resolution is documented, not inferred.
+
+** The mechanism, as documented
+
+Main report Appendix 1, printed pp. 109--112.  Three stages:
+
+1. *Master sample* (printed p. 109).  12,969 EAs from the 1984 Census
+   ordered by region within location (rural/semi-urban/urban) within
+   ecological zone; 800 selected systematically with PPS; assigned to eight
+   replicates of 100.  (Already quoted in =CONTENTS.org=.)
+
+2. *Second PPS stage on the listing ratio* (printed pp. 109--110).  Because
+   the 1984 size measures were stale, EAs were re-listed and a ratio
+   computed (households listed / households in census).  Workloads were then
+   allocated among EAs *with probability proportional to that ratio*.  For
+   GLSS1:
+
+   #+begin_quote
+   Using the same PPS method as described above, 200 'workloads' were then allocated among these 200 EAs, with probability proportional to this calculated ratio.  With this method of allocation most EAs received one workload, but a few received two or three or none at all.  At the next stage of sample selection 16 households were selected to make up each workload;  thus an EA, for example, which received two workloads provided 32 households for the sample.  The total sample therefore consisted of 3200 households, and the sample design provided a self-weighting sample, since each household in Ghana had an equal probability of being selected.
+   #+end_quote
+
+   *This is the sentence that makes the whole thing work.*  It is the second
+   PPS stage that restores EPSEM despite the defective size measures, and it
+   is why an EA can hold 1x, 2x or 3x the workload take.
+
+3. *Fixed take per workload, differing by stratum* (printed p. 111):
+
+   #+begin_quote
+   Each workload in urban areas contained 15 households,  while rural workloads contained 10 households.  The final sample consisted of (99 x 15 =) 1485 households in urban areas, and (308 x 10 =) 3080 households in rural areas, making a total of 4565.
+   #+end_quote
+
+** Why differing takes are still self-weighting -- documented, not inferred
+
+Printed p. 112, "Selection of enumeration areas":
+
+#+begin_quote
+The selection of these 307 EAs was made more complicated by two considerations.  In the first place, rural EAs had to be oversampled and urban EAs undersampled, to counterbalance the fact that at the second stage of selection 15 households were to be taken in selected urban EA but only 10 households in each rural EA.  The balance between urban and rural EAs was also upset by the effect of introducing a second PPS stage following the listing exercise, which resulted in some EAs receiving two workloads and a corresponding number receiving none at all.  The correct balance between urban and rural workloads was finally achieved, with 113 urban and 294 rural EAs being selected.
+#+end_quote
+
+*That is the answer to the brief's question 2, and it is reconciliation
+option (b) -- "the takes genuinely vary by stratum and the PPS selection
+probabilities were compensated so the product is constant" -- stated
+explicitly by GSS in its own words.*  The factor-of-1.5 difference in
+second-stage take is deliberately offset by a compensating factor at the
+first stage.
+
+GSS also documents the *residual* approximation and how it was handled
+(printed p. 111):
+
+#+begin_quote
+Urban households in this sample therefore constitute (1485/45650 x 100 =) 32.5 per cent of the total sample.  This chosen fieldwork design thus produces a 32.5/67.5 split between urban and rural households, which happens to mirror almost exactly the anticipated 35/65 split in the population as a whole, based on the 1984 census results.  If the sample of 4565 households had been split on a 35/65 basis, this would have resulted in 1598 households in urban areas.  We thus have a shortfall of 113 households in urban areas, and a corresponding excess in rural areas, as compared with the expected number which would be achieved using random sampling.  It was realised that,  if allowances for this small imbalance between urban and rural households could be made at the design stage, this would avoid the need for re-weighting of the data at the analysis stage.
+#+end_quote
+
+#+begin_quote
+This shortfall can be approximately made up by counting 11 urban areas as "rural" for fieldwork purposes (ie. 11 x 10 = 110) and then reassigning them back to urban at the analysis stage.  The aim was therefore to select 110 urban workloads and 297 rural ones, but to allocate 11 urban workloads as "rural" for fieldwork purposes, producing the desired 99/308 urban/rural split.
+#+end_quote
+
+Typography preserved: ="(1485/45650 x 100 =)"= is as printed (an evident
+typo for 4565; 1485/4565 = 32.5 per cent, which is the figure GSS then
+uses).
+
+*This is why the hedge "can be considered as being self-weighting" is the
+honest register, and should be relayed rather than upgraded.*  The design
+targets EPSEM and corrects the urban/rural imbalance *"approximately"* at
+the design stage.  GSS is not claiming an exact algebraic identity; it is
+claiming a design built to be EPSEM, with the residual departures judged
+small enough to ignore -- and it says so in the same breath as the phrase
+"avoid the need for re-weighting of the data at the analysis stage".
+
+** GSS's own design table
+
+Main report Appendix 1, Table 2 (printed p. 113), "Effect on final sample of
+second PPS selection and reallocation of some EAs":
+
+| Type of EA                   | EAs selected | after realloc | 0 wl | 1 wl | 2 wl | Total wl |
+|------------------------------+--------------+---------------+------+------+------+----------|
+| Urban allocated to urban team |          100 |           100 |   11 |   79 |   10 |       99 |
+| Urban allocated to rural team |           13 |            13 |    2 |   11 |    0 |       11 |
+| Rural                         |          294 |           294 |   28 |  235 |   31 |      297 |
+| Total                         |          407 |           407 |   41 |  325 |   41 |      407 |
+
+Note the wrinkle GSS records but does not resolve, quoted as printed
+(printed p. 112):
+
+#+begin_quote
+Initially 113 urban and 294 rural EAs were selected for GLSS3, making a total of 407 EAs, with 14 urban EAs being chosen for reclassification from urban to rural.  However, when these EAs were listed and 407 workloads selected, using the same procedure as for GLSS1 and GLSS2, two reclassified EAs did not receive any workloads.
+#+end_quote
+
+The prose says *14* EAs were chosen for reclassification; Table 2's
+"Urban allocated to rural team" row says *13*.  Quoted as printed, *not*
+resolved here.
+
+** Predicted vs. observed, cell by cell
+
+From Table 2 plus the takes (15 per urban-team workload, 10 per
+rural-team workload -- the 11 reclassified urban EAs were worked by rural
+teams and therefore took 10):
+
+| EA class                       | workloads/EA | households/EA | EAs designed |
+|--------------------------------+--------------+---------------+--------------|
+| Urban, urban team              |            1 |            15 |           79 |
+| Urban, urban team              |            2 |            30 |           10 |
+| Urban, reallocated to rural team |          1 |            10 |           11 |
+| Rural                          |            1 |            10 |          235 |
+| Rural                          |            2 |            20 |           31 |
+|--------------------------------+--------------+---------------+--------------|
+| Total EAs holding >= 1 workload |             |               |          366 |
+
+Design total: 79x15 + 10x30 + 11x10 + 235x10 + 31x20 = *4565* -- matches
+GSS's stated expected sample exactly.
+
+*Observed*, measured cold from =POV_GH.DTA= (4523 households, 365 distinct
+=clust=), cross-tabulated by =loc2= (1=Urban, 2=Rural):
+
+| households per =clust= | urban clusters | rural clusters |
+|------------------------+----------------+----------------|
+|                      6 |              0 |              1 |
+|                      8 |              0 |              1 |
+|                      9 |              0 |              9 |
+|                     10 |             11 |            223 |
+|                     14 |              6 |              0 |
+|                     15 |             73 |              0 |
+|                     20 |              0 |             31 |
+|                     24 |              1 |              0 |
+|                     27 |              1 |              0 |
+|                     29 |              2 |              0 |
+|                     30 |              6 |              0 |
+
+*The mapping is exact in four of five cells:*
+
+| design cell                   | designed EAs | observed EAs                       | match |
+|-------------------------------+--------------+------------------------------------+-------|
+| Urban, 1 workload (15)        |           79 | 73 @15 + 6 @14 = *79*              | exact |
+| Urban, 2 workloads (30)       |           10 | 6 @30 + 2 @29 + 1 @27 + 1 @24 = *10* | exact |
+| Urban -> rural team (10)      |           11 | *11* @10, all urban                | exact |
+| Rural, 2 workloads (20)       |           31 | *31* @20, all rural                | exact |
+| Rural, 1 workload (10)        |          235 | 223 @10 + 9 @9 + 1 @8 + 1 @6 = 234 | -1 EA |
+|-------------------------------+--------------+------------------------------------+-------|
+| Total                         |          366 | *365*                              | -1 EA |
+
+*Every clean take value is a documented design cell, and every ragged value
+sits below a design cell -- exactly the "used up all the reserve list ...
+without managing to complete the quota" shortfall GSS describes.*  The
+shortfalls cluster at quota-minus-one (all six 14s are urban, all nine 9s
+are rural), which is what interviewer-level non-response looks like.
+
+The household shortfall decomposes exactly:
+
+- urban 1-workload: 6 EAs one short = 6
+- urban 2-workload: 2x1 + 1x3 + 1x6 = 11
+- rural 1-workload: 9x1 + 1x2 + 1x4 = 15
+- one rural EA absent entirely = 10
+- *total 42 = 4565 - 4523.*
+
+*Three of these matches are numerically exact against a table published in
+1995 (79, 10, 11, 31).  That is not coincidence; it settles the mechanism.*
+
+** Is there an EA identifier distinct from =clust=?  No.
+
+Asked directly in review, because a separate EA column would settle
+=clust='s grain outright rather than by inference.
+
+*There is none.*  =POV_GH.DTA='s 45 columns contain no =ea=, =eanum=,
+=psu= or equivalent.  The full geographic/identifier set is =clust=, =nh=,
+=pid=, =seg=, =loc2=, =loc3=, =loc5=, =loc7=, =ez=, =region=.
+
+*=seg= is not it, despite the suggestive name.*  Appendix 1 does describe
+segmenting oversized EAs ("a decision was made to divide the EA into
+smaller segments, and to select one segment at random", printed p. 109), so
+=seg= was checked against that reading and *fails it*:
+
+- =seg= takes 7 values and *varies within a cluster* -- a single take-10
+  cluster can carry up to 6 distinct =seg= values.
+- It does *not* partition clusters into workload-sized pieces: households
+  per =(clust, seg)= in the take-20 and take-30 clusters range from 1 to 17
+  with no mass at 10 or 15.
+- It cross-cuts =loc2= and =loc7= rather than nesting inside them.
+
+=seg= is the household's *socioeconomic group* -- an analytic
+classification, not a sampling unit.  The GLSS3 Poverty Profile tabulates
+poverty by exactly seven such groups (printed p. ~30, "1991/1992" table):
+*Public sector empl. / Private formal empl. / Private informal empl. /
+Export farmers / Food crop farmers / Non-farm self empl. / Non-working*.
+The observed distribution matches: =seg=5= is by far the largest (1876
+households) and is 91 per cent rural -- the "large numbers of food crop
+farmers" the Profile discusses -- while =seg=4= is 92 per cent rural
+(export farmers) and =seg=6= urban-skewed (non-farm self-employed).
+/Inference: the specific value-to-label mapping is not documented in any
+shipped file (the =.dta= carries no value labels), so the group ordering
+above is matched by pattern, not read off a codebook./
+
+*Consequence:* nothing in the shipped data distinguishes EA from workload,
+so inference #1 (=clust= = EA) rests entirely on the Table 2 cell matches --
+which is where this document leaves it.
+
+** Consequences for the hypotheses that were on the table
+
+- *"=clust= is not the sampling EA"* (flagged as the cheapest and most
+  likely error) -- *false, but productively so.*  =clust= *is* the EA.  What
+  is not the EA is the *workload*: there were 407 workloads across 366
+  EAs that received at least one.  The unit mismatch was real, but it sits
+  between "workload" and "EA", not between "=clust=" and "EA".
+
+- *"a =clust= code with 32 households is almost certainly TWO EAs"*
+  (proposed for GLSS1/2) -- *refuted verbatim* by the main report: "an EA,
+  for example, which received two workloads provided 32 households for the
+  sample."  One EA, two workloads.
+
+- *"a fixed per-EA take of 5, with =clust= bundling 2/3/4/6 EAs"*
+  (proposed because every clean GLSS3 value is a multiple of 5) -- *refuted*
+  by Appendix 1 Table 1 and by the =loc2= crosstab.  10 and 15 are both
+  multiples of 5 by arithmetic accident; the takes are 10 and 15 and are
+  stratum-specific.  Decisively, take-15 clusters are *100 per cent urban*
+  and take-20 clusters are *100 per cent rural* -- a bundling explanation
+  cannot produce that separation, and a fixed-take-of-5 explanation cannot
+  explain why 5 never appears.
+
+- *"the takes vary and the probabilities were compensated"* -- *this is the
+  documented one.*
+
+- *"self-weighting is an approximation GSS licenses for practical use"* --
+  *partly true and worth relaying.*  The design is EPSEM by construction,
+  but the urban/rural balance was corrected only "approximately", and
+  non-response leaves a 0.28 per cent shortfall GSS explicitly declined to
+  adjust for.  Hence "can be considered as being".
+
+** Residual not determinable from shipped documents
+
+The main report says *4552* households were achieved; =POV_GH.DTA= holds
+*4523* -- a gap of *29*.  Likewise 366 EAs designed vs 365 in the file.
+Whether the missing EA's households fall inside the report's 13-household
+fieldwork shortfall or inside this 29-household file gap *cannot be
+determined from anything shipped in this repository*, and no document
+consulted mentions dropping households from the poverty file.  Recorded as
+open; not chased.
+
+* 3. The expenditure "weighting" is a CPI deflator, NOT a sampling weight
+
+*This is the single most important operational caveat in this document*,
+because the clause was truncated out of the chat quote at exactly the point
+where it starts to matter, and because misreading it would put a temporal
+price index into a sampling-weight column.
+
+The "(as discussed below)" in Sources A and B resolves to Appendix 1,
+"Re-weighting", *printed pp. 113--114*:
+
+#+begin_quote
+Since GLSS3 was spread out over a whole year, but households only interviewed during a short period of the year, any statement of household income or expenditure will be affected by when the household was interviewed.  Because of the effects of inflation, a household interviewed near the end of the survey will tend to have a higher expenditure than if they were interviewed at the beginning of the year.
+#+end_quote
+
+#+begin_quote
+In order to put all households on the same basis for comparison, we have taken the midpoint of the survey year (March 1992) and then calculated weights (deflators/inflators) which can be used to adjust all expenditure data. Ideally we might have calculated separate indices for different localities in the country, and for different items of expenditure, but this approach would have become extremely complicated;  in any case, the movement of prices in the three main localities of interest (Accra, urban, and rural) appears to have been almost the same during the survey period.  We have therefore preferred to use a single weight for each month of the survey, irrespective of locality or region.
+#+end_quote
+
+#+begin_quote
+To get these weights, we have taken the national CPI index for Ghana and calculated the ratio of the March 1992 figure to the figure for each month from September 1991 to September 1992.  For instance, the weight for September 1991 is (17925.4/17066.4) = 1.0503;  this means that any expenditure data for a household interviewed in September 1991 has been multiplied by 1.0503 before any tables of expenditure are produced.
+#+end_quote
+
+So the "weighting of the expenditure values [that] is required" is a
+*monthly national CPI deflator to March 1992 prices*, keyed on interview
+date and *identical for every household interviewed in the same month*.
+
+*Operationally:*
+
+- It is *not* a sampling weight and must *never* be wired as one.
+- It is *orthogonal* to =weight=: a household's sampling weight is 1.0 and
+  its expenditure deflator depends only on =month=/=year=.
+- =POV_GH.DTA= carries both =month= and =year= columns, so the deflator is
+  reconstructible for any user who wants it (given a Ghana CPI series).
+- The report confirms it applied this throughout, at printed page (xviii):
+  "All income and expenditure data given in this report have been deflated,
+  so as to give values for March 1992.  This was done using the monthly
+  national Consumer Price Index, produced by the Ghana Statistical Service.
+  The same national deflators were used for urban and rural areas."
+
+*Inference (labelled):* =POV_GH.DTA= carries paired columns where one member
+has a =c= suffix (=income=/=incomec=, =expend=/=expendc=,
+=expfoodc=, =othexpc=, =impfoodc=, =agri1c=, =agri2c=, =fexpendc=), and the
+User's Guide glosses these as e.g. "EXPFOODC = Food expenditure (actual)-
+corrected".  *It is plausible that "corrected" means CPI-deflated*, which
+would mean the deflator is already applied in the =c= columns.  *No document
+consulted states this.*  Anyone relying on it should verify empirically
+against =month= before use.
+
+* 4. Grossing up: a single scalar, which corroborates EPSEM
+
+Appendix 1, "Grossing up sample figures", printed p. 114:
+
+#+begin_quote
+Since the 4552 households covered in GLSS3 contained 20,403 household members, the average household size was 4.5 .  Using the official estimate of 2.6 percent for the annual rate of population growth, it is estimated that the total population in private households grew from a figure of 12.1 million at the time of the last Population Census (March 1984) to a figure of 14.9 million in March 1992.  The national estimates presented in this report, which are based on the sample results of GLSS3, were obtained by using a multiplier of 14.9 million divided by 20,403, i.e. 730.
+#+end_quote
+
+Typography preserved: ="was 4.5 ."= (space before the period).
+
+*GSS grossed the entire GLSS3 sample to national totals with ONE scalar,
+730*, applied to *persons*.  That is only valid if every person carries the
+same inclusion probability -- so it is independent corroboration that GSS
+treated the sample as EPSEM in its own published estimates.
+
+The contrast with GLSS6 is stark and is already recorded in
+=CONTENTS.org=: GLSS6's "overall raising factor for the survey is 368", but
+GSS immediately qualifies that "interviewing rates ranged from as low as 1
+in 97 in Upper West Region ... to as high as 1 in 703 in the Greater Accra
+Region".  *GLSS3 states a single rate with no such range.*
+
+*Do not wire 730 as a weight column.*  It is a person-level multiplier GSS
+used for its own report tables, computed against an assumed 2.6 per cent
+growth rate that the report itself then argues is probably too low (it
+offers 3.4 per cent as better supported, implying a ~7 per cent upward
+revision to every published estimate).  It is recorded here as procedure and
+as corroboration, not as a recommended value.
+
+* 5. GLSS1 (1987-88) and GLSS2 (1988-89)
+
+Answering the coordinator's (a)/(b)/(c) question.  *Nothing wired; evidence
+only.*
+
+** GLSS1: (a) -- Appendix 1 states it
+
+The sentence is in the section headed "Sample design for GLSS1 and GLSS2",
+printed p. 110, and is quoted in full above:
+
+#+begin_quote
+The total sample therefore consisted of 3200 households, and the sample design provided a self-weighting sample, since each household in Ghana had an equal probability of being selected.
+#+end_quote
+
+It is *explicit* ("each household in Ghana had an equal probability of being
+selected"), but note it is *anchored to the 3200-household draw* -- 200
+workloads x 16 households, i.e. GLSS1's two replicates (1 and 5).  This
+already appears in =CONTENTS.org= under "Universe vs. what the weights
+represent", where it is correctly described as corroborating the existing
+"GLSS1 and GLSS2 are self-weighting" line "with a documentary citation,
+which it previously lacked".
+
+** GLSS2: (b) -- design-level, with a realization caveat
+
+The same section covers GLSS2, and the design is the same (16-household
+workloads off the same master sample).  But:
+
+- there is *no separate sentence* asserting GLSS2 is self-weighting;
+- GLSS2 is *half retained GLSS1 workloads* -- "attempts were made to
+  re-interview the same households" -- and *half fresh from replicate 6*;
+- *Appendix 1 says nothing about re-interview attrition* or how it was
+  treated.
+
+So for GLSS2 the design is EPSEM and self-weighting *follows*, but GSS does
+not state it and does not address the one thing that could break it in
+realization.  *Do not state GLSS2 more strongly than the document does.*
+
+** Corroboration already in the repo
+
+The GLSS1 DDI overview, already quoted in =CONTENTS.org=:
+
+#+begin_quote
+The resulting list is 3200 households and 800 replacement households in something less than 200 sampling areas (specifically 178 in 1987-88 and 170 in 1988-89).  Each group of 16, 32 or 48 households within a sampling area is referred to as a cluster in the GLSS data sets and in this document.
+#+end_quote
+
+*"16, 32 or 48" is the double/triple-workload mechanism*, in GSS's own words,
+for rounds 1 and 2 -- the same pattern this document reconstructs for GLSS3.
+It also confirms *=clust= = EA ("sampling area") in GLSS1/2*, and that fewer
+than 200 distinct EAs carry 200 workloads.  The measured GLSS1/GLSS2 take
+distributions (modal 16; 32s and one 48 in GLSS1; 32s in GLSS2, with 31/30/47
+one or two short) are exactly this design plus non-response -- *not* evidence
+of EA bundling.
+
+** The judgement this leaves open
+
+GSS *shipped no weight column at all* for GLSS1/GLSS2, whereas for GLSS3 it
+shipped an explicit 1.0.  Wiring 1.0 for rounds 1--2 would be *the library
+asserting EPSEM*, not relaying the producer -- a different act, and the
+repo's discipline distinguishes them.  Evidence tiers:
+
+| wave  | self-weighting status                                  | tier |
+|-------+--------------------------------------------------------+------|
+| GLSS1 | stated in Appendix 1, anchored to the 3200-hh draw     | (a)  |
+| GLSS2 | same design section; not separately stated; attrition untreated | (b)  |
+| GLSS3 | stated in five sources; procedure named; 1.0 shipped   | (a)+ |
+
+*No raising factors for GLSS1/GLSS2 appear anywhere in Appendix 1*, nor in
+any GLSS3 document swept (see the search table).  So the
+=asked-not-distributed= route is *not* supported by present evidence either.
+This is @ligon's call, not mine.
+
+* 6. What was searched (negative evidence)
+
+Per the standing rule that a "nothing here" claim must record what was
+searched.  All GLSS3 =Documentation/= PDFs were fetched via
+=data_access.get_data_file()= and swept with =pdfminer= for =self-weight=,
+=self weight=, =raising factor=, =grossing=, =weight=.
+
+| file                                | self-weighting | raising factor | notes                                    |
+|-------------------------------------+----------------+----------------+------------------------------------------|
+| =pdf/g3usersg.pdf= (User's Guide)   | 1 hit          | 0              | Source A                                 |
+| =pdf/G3report.pdf= (main report)    | 4 hits         | 0              | Sources B, C; Appendix 1 in full         |
+| =pdf/PovProf.pdf= (Poverty Profile) | 3 hits         | 0              | Source E; Appendix 4                     |
+| =ddi-documentation-english-12.pdf=  | 2 hits         | 0              | Source D                                 |
+| =pdf/oveglss3.pdf= (overview)       | 1 hit          | 0              | reproduces the User's Guide sentence     |
+| =pdf/data.pdf= (data description)   | 0              | 0              | no weight discussion at all              |
+| =pdf/G3Supman.pdf= (supervisors)    | 0              | 0              | fieldwork only                           |
+| =pdf/G3Intman.pdf= (interviewers)   | 0              | 0              | fieldwork only                           |
+| =pdf/G3DEOman.pdf= (data entry)     | 0              | 0              | data entry only                          |
+| =pdf/Aggregat.pdf= (aggregation)    | 0              | 0              | aggregate construction                   |
+
+*No separate GSS raising-factor or weight file for GLSS3 is documented or
+shipped.*  This is a *positive* finding, not a gap: GSS did not publish
+GLSS3 weights because the design did not require them.
+
+*Tooling note.*  This node has no =antiword=, =libreoffice= or =soffice=, so
+the =Glss3 qsts and manuals docs/*.DOC= Word originals were not opened
+directly.  They are not a gap: the =pdf/= directory ships a PDF mirror of
+every one of them (=G3USERSG.DOC= -> =g3usersg.pdf=, =G3REPORT.DOC= ->
+=G3report.pdf=, =Povprof.doc= -> =PovProf.pdf=, =overview_glss3.doc= ->
+=oveglss3.pdf=, etc.), and all the PDFs have clean text layers.
+
+* 7. Acquisition target
+
+Main report Appendix 1, footnote 13 (printed p. 109):
+
+#+begin_quote
+A much fuller description of the sample design is contained in Sample Design and Implementation in the First Three Rounds of the Ghana Living Standards Survey, to be published by the Ghana Statistical Service.
+#+end_quote
+
+*This is the definitive design document for GLSS1--GLSS3 and this repository
+does not hold it.*  It is the single highest-value acquisition for settling
+the GLSS1/GLSS2 weight question at tier (a) rather than (b).  Whether GSS
+ever published it is unknown.
+
+Secondary: Scott & Amenuvegbe (1991), /Journal of Official Statistics/ 7(3),
+367--373 -- the published procedure that makes GLSS3 self-weighting.  JOS is
+open access.
+
+* 8. The weight-type question (unresolved, and not mine to resolve)
+
+Wiring GLSS3 makes an existing latent heterogeneity real, and this should be
+decided deliberately rather than discovered later.
+
+=CONTENTS.org= records the current policy:
+
+#+begin_quote
+The =sample= feature only includes expansion weights (GLSS5--GLSS7) to avoid mixing weight types.  GLSS1--GLSS4 have =weight= and =panel_weight= as NaN.
+#+end_quote
+
+The three types now in play for Ghana:
+
+| waves       | weight type                       | scale                       |
+|-------------+-----------------------------------+-----------------------------|
+| GLSS3       | *relative*, constant 1.0          | mean 1, sum = n             |
+| GLSS4       | *relative*, computed post hoc     | mean ~1, sum ~ n            |
+| GLSS5--GLSS7 | *expansion* / raising factors    | sums to national population |
+
+Wiring GLSS3 (and, if #714 also wires GLSS4) puts *relative* weights in the
+same column as *expansion* weights.  Within a wave that is harmless -- both
+give correct weighted means.  *Across waves it is not*: any user summing
+=weight= to get a population total, or pooling waves, gets a silently wrong
+answer, because GLSS3 would contribute 4,523 and GLSS7 would contribute
+~30 million.
+
+Options (not chosen here): document the heterogeneity loudly; normalize
+everything to relative weights; carry a =weight_type= column; or keep the
+current exclusion.  *This is @ligon's call.*  Flagging it because it is a
+consequence of the fix that neither #713 nor #714 has yet addressed, and
+because the existing =CONTENTS.org= sentence will become false the moment
+GLSS3 is wired.
+
+* 9. Documented vs. inferred -- the ledger
+
+*Documented* (verbatim quotes above, all from shipped files):
+
+1. GLSS3 "can be considered as being self-weighting" -- User's Guide, main
+   report, DDI Weighting field, overview.
+2. The design "was intended to ensure that the sample was self-weighting,
+   provided an adequate response was secured".
+3. Response: 4565 expected, 4552 achieved (99.72 per cent).
+4. GSS decided *not* to re-weight for non-response.
+5. Takes: 15 per urban workload, 10 per rural workload.
+6. Rural EAs oversampled / urban undersampled *to counterbalance* the
+   differing take.
+7. A second PPS stage gives some EAs two workloads -- hence 20 and 30.
+8. Table 2's exact EA counts: 79 / 10 / 11 / 235 / 31.
+9. GLSS3 was amended to *restore* self-weighting by the Scott--Amenuvegbe
+   (1991) procedure; *GLSS4 was not*, and needed weights computed from the
+   2000 Census.
+10. The expenditure "weighting" is a monthly national CPI deflator to March
+    1992 (Sept 1991 = 1.0503).
+11. National grossing used a single scalar, 730, on persons.
+12. GLSS1: "the sample design provided a self-weighting sample".
+
+*Inference* (mine, not GSS's):
+
+1. *That =clust= = EA in =POV_GH.DTA=.*  Not stated in any document.
+   Established by the cell-for-cell match against Table 2 -- in particular
+   the exact 31 rural take-20 clusters and the exact 11 urban take-10
+   clusters.  Very strong, but inferential.
+2. *That the ragged takes (6, 8, 9, 14, 24, 27, 29) are non-response.*
+   Consistent with GSS's stated shortfall mechanism and with the exact
+   42-household arithmetic, but no document enumerates per-EA shortfalls.
+3. *That the =c=-suffixed columns are the CPI-deflated ones.*  Plausible
+   from the report's page-(xviii) statement; *not* documented.
+4. *That GLSS2 is self-weighting.*  Follows from the design; GSS does not
+   say it, and does not address re-interview attrition.
+5. *That the 29-household gap between the report's 4552 and =POV_GH.DTA='s
+   4523 is a file-construction difference.*  Undetermined; no document
+   mentions it.
+
+* 10. Reproduction
+
+Environment (as required): worktree =PYTHONPATH= asserted
+(=assert 'worktrees' in lsms_library.__file__=), private =LSMS_DATA_DIR=, all
+file access via =get_dataframe()= / =data_access.get_data_file()=.  *The
+=dvc= CLI was never invoked.*  No wiring, YAML or library code was changed by
+this task.
+
+#+begin_src python
+from lsms_library.local_tools import get_dataframe
+df = get_dataframe('GhanaLSS/1991-92/Data/POV_GH.DTA')
+
+# weight: 4523 rows, float64, nunique == 1, value 1.0, zero nulls
+print(df['weight'].describe(), df['weight'].nunique())
+
+# take distribution by urban/rural -- reproduces the table in section 2
+take = df.groupby('clust').size()
+import pandas as pd
+t = df.groupby(['clust', 'loc2'], observed=True).size().reset_index(name='n')
+print(pd.crosstab(t['n'], t['loc2']))
+#+end_src
+
+Documents were extracted with =pdfminer.high_level.extract_text=; all GLSS3
+PDFs cited have clean text layers and needed no CID decode.

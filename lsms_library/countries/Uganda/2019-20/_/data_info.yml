@@ -34,10 +34,15 @@ individual_education:
 
 people_last7days:
     file: HH/gsec15a.dta
+    # GH #323 -- see 2018-19's data_info.yml for the full rationale.  Same
+    # LONG-format gsec15a: two rows per hhid keyed by CEA01, which collided on
+    # the declared (i, t) index and were reduced with groupby().first(),
+    # destroying 3,038 of 6,156 rows.  `_category` carries CEA01 so the
+    # country-level hook uganda.people_last7days() can select the member rows.
     idxvars:
         i: hhid
-        #member: CEA01
     myvars:
+        _category: CEA01
         Men : CEA01A
         Women : CEA01B
         Boys : CEA01C
@@ -56,7 +61,17 @@ sample:
     idxvars:
         i: hhid
     myvars:
-        v: s1aq04a
+        # GH #323: composite DISTRICT/PARISH key built by this wave's
+        # mapping.v().  s1aq04a (the parish NAME) alone is not a cluster key --
+        # 23 parish names recur across districts.  The reverse error (one real
+        # parish split across two districts as coded) is handled by the three
+        # `_V_ALIASES` entries in mapping.py; the "spans >1 district" metric
+        # cannot see it, so read that comment before trusting this key.
+        # `sample` and `cluster_features` MUST declare the identical pair so
+        # _join_v_from_sample propagates a key that exists in both.
+        v:
+            - district
+            - s1aq04a
         weight: wgt  # only weight provided; wave 8 appears to be panel-only (no refreshment)
         panel_weight: wgt
         strata: subreg
@@ -67,8 +82,20 @@ cluster_features:
     file: HH/gsec1.dta
     idxvars:
         i: hhid
-        v: s1aq04a  # String for parish name.  Parish codes broken as in 2018-19.
+        # GH #323: same composite DISTRICT/PARISH key as `sample` above.
+        # (s1aq04a is the parish NAME; the parish codes are broken as in
+        # 2018-19.)
+        v:
+            - district
+            - s1aq04a
     myvars:
         Region: region
         Rural: urban
-        District: district
+        # GH #323: row-valued so mapping.District() can resolve the same three
+        # `_V_ALIASES` entries that mapping.v() does.  If District were left as
+        # the bare `district` column, the three aliased clusters would contain
+        # households whose raw district strings disagree and reduce_to_agreed
+        # would blank District for all three.
+        District:
+            - district
+            - s1aq04a

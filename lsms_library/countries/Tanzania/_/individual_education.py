@@ -55,6 +55,11 @@ if list(p.index.names) != target_idx:
 updated_ids = json.load(open('updated_ids.json'))
 p = id_walk(p, updated_ids, hh_index='i')
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# Every wave parquet is already (t, i, pid)-unique (see each wave script's own
+# note), the folders contribute disjoint t values, and id_walk renames only the
+# `i` level -- measured on a cold build it produces 0 collisions here.  So the
+# concatenation cannot introduce a duplicate and .first() is never called.
 if not p.index.is_unique:
     p = p.groupby(level=p.index.names).first()
 

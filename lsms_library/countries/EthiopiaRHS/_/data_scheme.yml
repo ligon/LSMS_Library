@@ -51,23 +51,33 @@ Data Scheme:
   # livestock (#277): HH-level livestock-VALUE aggregates.  Pre-aggregated
   # household TOTALS (herd value + TLU), NOT canonical item-level (t,i,j) --
   # a documented HH-level (t,i) variant, like `assets`.  Three wired waves:
-  #  - 1999 (R5): one {village}lvs5.tab per original-7-village peasant
+  #  - 1999: one {village}lvs5.tab per original-7-village peasant
   #    association; i = the packed 5-digit hhid (same scalar scheme as the
   #    1989 roster; ZERO overlap with the 1999 roster's [q1c,hh] composite).
+  #    *** KNOWN DEFECT: these files are 1989-round data, NOT R5/1999.
+  #    They are served at t='1999' pending adjudication -- do not build on
+  #    the label.  The zero-overlap fact recorded on the line above is
+  #    itself part of the evidence.  Full case + the per-species roster
+  #    these files actually carry: 1999/_/data_info.yml and _/CONTENTS.org.
+  #    Same defect applies to `income` below ({village}inc5.tab). ***
   #  - 2004 (R6): livestockaggregates_123456.tab, the livval6/lsu6 slice;
   #    i = composite (paid, hhid) via the shared ethiopiarhs.i formatter.
   #  - 2009 (R7): livestock_agg_round7.tab (lvs_val7/tlu7); i = (pa, hhid).
   # All wired via the existing _no_v_join exemption for `livestock`.
   livestock:
     index: (t, i)
-    LivestockValue: float   # total value of livestock herd (Birr)
+    HerdValue: float   # total value of livestock herd (Birr)
     TLU: float              # Livestock Standard Units (tropical livestock units)
 
-  # income (#277): HH-level income-VALUE aggregates from the R5 (1999)
-  # income module ({village}inc5.tab; only 4 of 7 villages have an inc5
+  # income (#277): HH-level income-VALUE aggregates from the
+  # {village}inc5.tab income module (only 4 of 7 villages have an inc5
   # file -- ars/deb/din/sid).  Pre-aggregated household income TOTALS +
   # major source subtotals, NOT item-level -- a documented HH-level (t,i)
   # variant.  i = the same packed 5-digit hhid as `livestock`.
+  # *** KNOWN DEFECT, same as `livestock`: the inc5 files carry SPSS
+  # _date stamps of 1989-05..1989-12 and the 1989 packed-hhid keyspace,
+  # so they are 1989-round data served at t='1999'.  Adjudication
+  # pending; see 1999/_/data_info.yml and _/CONTENTS.org. ***
   income:
     index: (t, i)
     TotalIncome: float      # total household income (Birr)

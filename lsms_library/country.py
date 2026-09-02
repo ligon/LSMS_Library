@@ -50,8 +50,16 @@ from .local_tools import (
 from .paths import data_root, countries_root
 from .yaml_utils import load_yaml
 from .currency import attach_currency, is_monetary_table
+# Safe at module level: transformations imports only local_tools /
+# build_transforms / cfe, never country -- so there is no cycle -- and
+# lsms_library/__init__.py imports it anyway.  The other `transformations`
+# imports in this file are function-local for historical reasons; this one is
+# on the hot read path (_finalize_result), so it is hoisted.
+from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
+from .null_read_audit import check_declared_columns
+from .population import attach as attach_population, population_records
 import importlib.util
 import hashlib
 import logging
@@ -70,6 +78,7 @@ from pyarrow.lib import ArrowInvalid
 from datetime import datetime
 from typing import Any, Callable, Iterable
 from contextlib import contextmanager, redirect_stdout
+from contextvars import ContextVar
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +93,147 @@ _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
 
 # Derived food tables whose ``u`` level can carry the reserved sentinels.
 _U_SENTINEL_PROTECTED_METHODS = frozenset({'food_quantities', 'food_prices'})
+
+
+# ---------------------------------------------------------------------------
+# Query-time label selection (GH #682 / #685)
+#
+# Two DIFFERENT faces of the same user-facing ``labels=`` affordance:
+#
+#   * fine -> coarse (food).  ``labels='Aggregate'`` renames the ``j`` index
+#     from ``Preferred Label`` to ``Aggregate Label``.  Each item has exactly
+#     one Preferred Label, so canonical -> variant is a FUNCTION and can be
+#     applied to the finished frame.  That is :meth:`Country._relabel_j`.
+#
+#   * coarse -> fine (everything else, e.g. ``Rural``).  Here ``Preferred
+#     Label`` is the COARSE end: two canonical values against a seven-way
+#     settlement ladder.  Keying the rename on ``Preferred Label`` is
+#     last-row-wins garbage -- measured, ``{'Urban': 'Medium Town',
+#     'Rural': 'Other'}``.  The fine information only exists BEFORE
+#     :meth:`Country._apply_categorical_mappings` collapses the raw code onto
+#     ``Preferred Label``, so the selection has to happen THERE, keyed on the
+#     raw code.  See ``docs/guide/label-selection.md``.
+#
+# The request therefore has to reach ``_apply_categorical_mappings``, which
+# sits inside ``_finalize_result``, which is called from inside
+# ``_aggregate_wave_data``.  ``_aggregate_wave_data`` carries
+# ``@build_transform()``: its source AST is folded into every
+# ``lsms_cache_hash`` (``_build_registry.build_transforms_fingerprint``).
+# Adding even one defaulted keyword argument to its signature was measured to
+# move the fingerprint for EVERY table -- a corpus-wide rebuild for a
+# read-path feature that cannot change a single cached byte.  So that one hop
+# is carried out of band by the ContextVar below rather than by a parameter.
+# ``_finalize_result`` and ``_apply_categorical_mappings`` do take an explicit
+# ``labels=``; both are outside the build closure (``_finalize_result`` is in
+# ``_build_registry._EXCLUDED_CALLABLES`` by name).
+#
+# The stored value is ``(method_name, {target: variant})``.  The method name is
+# load-bearing, not decoration: ``_finalize_result`` RE-ENTERS itself via
+# ``_join_v_from_sample`` / ``_location_lookup``, and without the check a
+# selection requested for ``household_roster`` would also be applied to the
+# ``sample`` frame fetched underneath it.
+# ---------------------------------------------------------------------------
+_LABEL_SELECTION: ContextVar = ContextVar("lsms_label_selection", default=None)
+
+
+@contextmanager
+def _label_selection(method_name: str | None, labels: dict | None):
+    """Scope a mapping-site label selection to one top-level table request."""
+    if not labels:
+        yield
+        return
+    token = _LABEL_SELECTION.set((method_name, dict(labels)))
+    try:
+        yield
+    finally:
+        _LABEL_SELECTION.reset(token)
+
+
+def _split_labels_arg(labels) -> tuple:
+    """Split the public ``labels=`` argument into its two faces.
+
+    Returns ``(j_labels, mapping_labels)``:
+
+    * ``j_labels`` -- the scalar handed to :meth:`Country._relabel_j`.
+      ``'Preferred'`` / ``None`` mean "no relabel".
+    * ``mapping_labels`` -- ``{target: variant}`` for the mapping-site
+      selection, or ``None``.
+
+    A **scalar** ``labels=`` keeps its historical meaning exactly: it targets
+    the ``j`` index level and nothing else, even on a table that also has a
+    mapped column.  A **dict** names its targets explicitly; the key ``'j'``
+    is routed to ``_relabel_j`` so that ``labels={'j': 'Aggregate'}`` is
+    identical to ``labels='Aggregate'`` and there is one mechanism per face.
+    """
+    if labels is None or isinstance(labels, str):
+        return labels, None
+    if isinstance(labels, dict):
+        d = {str(k): v for k, v in labels.items()}
+        j = d.pop('j', 'Preferred')
+        bad = [k for k, v in list(d.items()) + [('j', j)]
+               if not isinstance(v, str)]
+        if bad:
+            raise TypeError(
+                f"labels= dict values must be strings (the label variant); "
+                f"non-string value for {bad!r}")
+        return j, (d or None)
+    raise TypeError(
+        f"labels= must be a str (the 'j' label variant) or a "
+        f"{{target: variant}} dict; got {type(labels).__name__}")
+
+
+def _label_targets_missing(df, labels: dict | None) -> list:
+    """Keys of a ``labels=`` dict that name nothing in *df*.
+
+    Matching is case-insensitive, mirroring the categorical-mapping
+    auto-dispatch, and covers both columns and index levels.
+    """
+    if not labels or not isinstance(df, pd.DataFrame):
+        return []
+    present = {str(c).lower() for c in df.columns}
+    names = (list(df.index.names) if isinstance(df.index, pd.MultiIndex)
+             else [df.index.name])
+    present |= {str(n).lower() for n in names if n is not None}
+    return [k for k in labels if str(k).lower() not in present]
+
+
+def _assert_label_targets_present(df, labels: dict | None, *,
+                                  country: str, table: str) -> None:
+    """Raise :class:`LabelUnavailableError` for a ``labels=`` target *df* lacks.
+
+    A country simply not having the column is **missing curation**, which is
+    exactly what :class:`~lsms_library.feature.Feature` was built to degrade
+    over — and it is indistinguishable, to the caller, from a country that has
+    the column but not the requested label variant, which already degrades.
+    So both take the same path: drop the country, one aggregated warning,
+    ``df.attrs['labels_unavailable']``.
+
+    This is not a defect being swallowed.  ``Rural`` is *deliberately* not
+    ``required`` on ``sample`` — "many countries' sample table carries only
+    (v, weight, strata) and has no urban/rural indicator at all"
+    (``lsms_library/data_info.yml``) — so its absence is a documented, normal
+    state of the corpus, not a broken build.  A column that genuinely IS
+    declared required going missing is the business of the required-column
+    guards (``Country._assert_built_required_columns``, the ``grab_data``
+    dropped-sub-df guard), which fire on the build path and say so loudly;
+    it is not ``labels=``'s job to re-report it.
+
+    What stays loud is the **malformed** table: it exists, but has no
+    ``Preferred Label`` or no key column left.  That is a defect in curated
+    config, not an absence, and it raises a plain ``KeyError`` from
+    :meth:`Country._apply_categorical_mappings`.  That is the distinction that
+    matters, and it is unchanged.
+
+    Deliberately NOT mirrored onto :meth:`Country._relabel_j`'s "result has no
+    ``'j'`` index level" — see the note there for why the two genuinely differ.
+    """
+    missing = _label_targets_missing(df, labels)
+    if missing:
+        raise LabelUnavailableError(
+            f"Cannot apply labels={ {k: labels[k] for k in missing} !r} to "
+            f"{country}/{table}: the result has no such column or index level "
+            f"(has: {sorted(map(str, df.columns))} + index "
+            f"{[n for n in (df.index.names or []) if n is not None]})")
 
 
 def _augment_numeric_code_keys(rdict: dict) -> dict:
@@ -1727,6 +1877,24 @@ class Country:
         ]
         return sorted(waves)
 
+    @property
+    def population(self) -> dict[str, "PopulationRecord"]:
+        """``{wave: PopulationRecord}`` -- what each wave's sample REPRESENTS.
+
+        The universe is a property of the ``(country, wave)`` cell, not of the
+        country: Ethiopia ESS W1 covered rural areas and small towns while W4
+        is national, so a panel across them pools two populations.  Read from
+        ``{country}/_/population.yml``; see :mod:`lsms_library.population`.
+
+        Every record carries ``universe_tag`` (an EDITORIAL reading, never a
+        quote) together with ``source_type`` and ``confidence``, which say where
+        the statement came from and how strongly it is a universe statement at
+        all.  Quoting the tag without those two turns a judgement into a fact.
+
+        Empty for a country the 2026-07-21 sweep did not reach.
+        """
+        return population_records(self.name)
+
     def provenance(self) -> pd.DataFrame:
         """Tabular survey of source + license per wave.
 
@@ -2119,7 +2287,12 @@ class Country:
         if 'm' not in new_idx:
             new_idx.append('m')
         result = flat.set_index(new_idx)
-        result.attrs = dict(df.attrs)  # set_index drops attrs (pandas 2.x)
+        # Kept deliberately, though `set_index` PRESERVES attrs on the pinned
+        # pandas 3.0.2 (single input -- nothing to disagree with; see the
+        # measured table in CLAUDE.md).  It was load-bearing under 2.x and
+        # costs nothing now; removing it would re-arm the `id_converted`
+        # double-walk the moment this grows a second input.
+        result.attrs = dict(df.attrs)
         return result
 
     def _location_lookup(self) -> pd.DataFrame:
@@ -2228,7 +2401,8 @@ class Country:
     
 
     def _apply_categorical_mappings(self, df: pd.DataFrame,
-                                    protect_u_sentinels: bool = False) -> pd.DataFrame:
+                                    protect_u_sentinels: bool = False,
+                                    labels: dict | None = None) -> pd.DataFrame:
         """Auto-apply categorical mappings where table names match columns or indices.
 
         For each column or index level in *df*, check whether
@@ -2248,22 +2422,67 @@ class Country:
         ``xs('kg', level='u')`` silently misses it.  food_acquired itself
         passes ``protect_u_sentinels=False`` so its raw unit-label
         canonicalization is unaffected.
+
+        ``labels`` (GH #682) selects a DIFFERENT label column of the matching
+        table for named targets: ``{'Rural': 'Settlement'}`` resolves each raw
+        ``Rural`` code to the table's ``'Settlement Label'`` column instead of
+        its ``'Preferred Label'``.  The key column is unchanged -- it is still
+        the raw code -- so this is information-preserving in a way no
+        output-side rename can be (see the module-level note above
+        ``_LABEL_SELECTION``).  ``None`` (the default) is the historical
+        behaviour, byte for byte.
         """
+        attrs = dict(getattr(df, "attrs", {}) or {})
+        # Case-insensitive, mirroring the table-name dispatch below.
+        wanted = {str(k).lower(): v for k, v in (labels or {}).items()}
         cat_maps = self.categorical_mapping
         if not cat_maps:
+            if wanted:
+                raise LabelUnavailableError(
+                    f"{self.name!r} curates no categorical_mapping tables at "
+                    f"all, so it cannot honour labels={labels!r}")
             return df
 
         # Build case-insensitive lookup
         lower_lookup = {name.lower(): name for name in cat_maps}
 
+        def _resolve_target(table: pd.DataFrame, variant: str,
+                            table_name: str) -> str:
+            """Column of *table* holding the requested label *variant*.
+
+            Same resolution rule as :meth:`_relabel_j`: ``'X Label'`` first,
+            then a bare ``'X'``.
+            """
+            candidate = f"{variant} Label"
+            if candidate in table.columns:
+                return candidate
+            if variant in table.columns:
+                return variant
+            available = [c for c in table.columns if c != "Preferred Label"]
+            # Country curates the table but not THIS label column -> missing
+            # curation, degradable by Feature (mirrors _relabel_j).
+            raise LabelUnavailableError(
+                f"Column {candidate!r} not in categorical_mapping table "
+                f"{table_name!r} on {self.name!r}; available: {available}")
+
         def _build_replace_dict(table: pd.DataFrame, *,
-                                drop_keys: set | None = None) -> dict | None:
+                                drop_keys: set | None = None,
+                                target: str = "Preferred Label") -> dict | None:
             if "Preferred Label" not in table.columns:
                 return None
-            source_cols = [c for c in table.columns if c != "Preferred Label"]
+            # The key column is "the first column that is neither the canonical
+            # label nor the requested variant".  Excluding *target* is a
+            # provable no-op when target IS 'Preferred Label' (the default
+            # path); it matters only for a multi-label table whose variant
+            # column precedes its code column, where keying on the target
+            # would map every value to itself.  NOTE: the ordering itself is
+            # load-bearing and unguarded -- see the test
+            # ``test_source_cols_ordering_is_the_key_column``.
+            source_cols = [c for c in table.columns
+                           if c not in ("Preferred Label", target)]
             if not source_cols:
                 return None
-            rdict = table.set_index(source_cols[0])["Preferred Label"].to_dict()
+            rdict = table.set_index(source_cols[0])[target].to_dict()
             # Numeric-code tables (e.g. a `Code` column 1, 2, 3) don't match
             # data that arrives as float-strings ('1.0') -- the documented
             # "format_id is applied to idxvars but not myvars" gotcha, which
@@ -2278,13 +2497,51 @@ class Country:
                 rdict = {k: v for k, v in rdict.items() if k not in drop_keys}
             return rdict
 
+        def _target_for(name: str, key: str | None) -> str | None:
+            """Label column to apply for frame element *name*, or None to skip.
+
+            Raises for the requested-but-uncurated cases, with the same
+            taxonomy as :meth:`_relabel_j`.
+            """
+            variant = wanted.get(name.lower())
+            if variant is None:
+                return "Preferred Label" if key is not None else None
+            if key is None:
+                # No mapping table of this name at all -> missing curation.
+                raise LabelUnavailableError(
+                    f"No categorical_mapping table named {name!r} on "
+                    f"{self.name!r}, so labels={{{name!r}: {variant!r}}} "
+                    f"cannot be honoured")
+            table = cat_maps[key]
+            if "Preferred Label" not in table.columns:
+                # Malformed: the table exists but has no canonical column, so
+                # nothing anchors the variant.  Loud, not degradable.
+                raise KeyError(
+                    f"categorical_mapping table {key!r} on {self.name!r} has "
+                    f"no 'Preferred Label' column; cannot select "
+                    f"labels={variant!r}")
+            return _resolve_target(table, variant, key)
+
+        def _dict_for(name: str, key: str, target: str) -> dict | None:
+            drop = (_RESERVED_U_SENTINELS
+                    if (protect_u_sentinels and name == 'u') else None)
+            rdict = _build_replace_dict(cat_maps[key], drop_keys=drop,
+                                        target=target)
+            if rdict is None and target != "Preferred Label":
+                raise KeyError(
+                    f"categorical_mapping table {key!r} on {self.name!r} has "
+                    f"no key column left once 'Preferred Label' and "
+                    f"{target!r} are excluded (columns: "
+                    f"{list(cat_maps[key].columns)})")
+            return rdict
+
         # Apply to columns
         for col in df.columns:
             key = lower_lookup.get(col.lower())
-            if key is None:
+            target = _target_for(col, key)
+            if target is None:
                 continue
-            drop = _RESERVED_U_SENTINELS if (protect_u_sentinels and col == 'u') else None
-            rdict = _build_replace_dict(cat_maps[key], drop_keys=drop)
+            rdict = _dict_for(col, key, target)
             if rdict:
                 if hasattr(df[col], 'str'):
                     df[col] = df[col].str.strip()
@@ -2296,14 +2553,17 @@ class Country:
                 if level_name is None:
                     continue
                 key = lower_lookup.get(level_name.lower())
-                if key is None:
+                target = _target_for(level_name, key)
+                if target is None:
                     continue
-                drop = (_RESERVED_U_SENTINELS
-                        if (protect_u_sentinels and level_name == 'u') else None)
-                rdict = _build_replace_dict(cat_maps[key], drop_keys=drop)
+                rdict = _dict_for(level_name, key, target)
                 if rdict:
                     df = df.rename(index=rdict, level=level_name)
 
+        # rename() builds a new object; keep attrs (notably id_converted, whose
+        # loss makes id_walk double-apply on transitive panel chains -- see
+        # CLAUDE.md "Panel ID Transitive Chains and the attrs Flag").
+        df.attrs = attrs
         return df
 
     def _relabel_j(self, df: pd.DataFrame, labels: str | None, *, reaggregate: bool) -> pd.DataFrame:
@@ -2317,6 +2577,27 @@ class Country:
         if labels in (None, 'Preferred'):
             return df
         if not isinstance(df, pd.DataFrame) or 'j' not in (df.index.names or []):
+            # Stays a PLAIN KeyError while the dict form's absent-target case
+            # degrades (see _assert_label_targets_present).  The two look alike
+            # and are not:
+            #
+            #   * a DICT names its target, and the target it names is typically
+            #     an OPTIONAL column -- `Rural` is explicitly not `required` on
+            #     `sample` (data_info.yml).  Its absence is a coverage fact
+            #     about that country: missing curation, degradable.
+            #   * a SCALAR names no target; `j` is implicit, and it is implicit
+            #     because the caller is asking for a FOOD relabel.  `j` is
+            #     required on every table that has one, so a food table without
+            #     `j` is a structural defect of the frame, not a country that
+            #     never curated something.  Degrading would drop it from a
+            #     Feature assembly with a "no such label" warning that names
+            #     the wrong cause.
+            #
+            # This branch is also near-unreachable in practice: the registered
+            # -table path guards the call with `if 'j' in result.index.names`,
+            # and the derived-food path only reaches it for tables that have
+            # `j` by construction.  It is a defensive guard, and weakening a
+            # defensive guard to match an unrelated case buys nothing.
             raise KeyError(
                 f"Cannot apply labels={labels!r}: result has no 'j' index level"
             )
@@ -2367,7 +2648,8 @@ class Country:
         return result
 
     def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str,
-                         currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
+                         currency: str | None = None,
+                         labels: dict | None = None) -> pd.DataFrame | dict[str, Any]:
         """
         Apply final harmonization steps (index augmentation, normalization, id walk)
         before returning a dataset to callers.
@@ -2377,7 +2659,22 @@ class Country:
         :func:`lsms_library.currency.attach_currency`.  Applied last so it sits
         on the fully-finalized frame and is preserved by the downstream
         ``_relabel_j`` / ``_add_market_index`` steps in the caller.
+
+        ``labels`` (GH #682) is the mapping-site label selection
+        ``{target: variant}``, forwarded to
+        :meth:`_apply_categorical_mappings`.  When not passed explicitly it is
+        read from the ``_LABEL_SELECTION`` ContextVar, and ONLY when the stored
+        request names this same ``method_name`` -- this method re-enters itself
+        via ``_join_v_from_sample`` / ``_location_lookup``, and a selection
+        asked of one table must not be applied to another table fetched
+        underneath it.  See the module-level note above ``_LABEL_SELECTION``
+        for why this one hop is out of band instead of a parameter.
         """
+        if labels is None:
+            requested = _LABEL_SELECTION.get()
+            if requested is not None and requested[0] == method_name:
+                labels = requested[1]
+
         if isinstance(df, dict):
             return df
 
@@ -2441,6 +2738,7 @@ class Country:
             df = self._apply_categorical_mappings(
                 df,
                 protect_u_sentinels=method_name in _U_SENTINEL_PROTECTED_METHODS,
+                labels=labels,
             )
 
             # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
@@ -2506,6 +2804,29 @@ class Country:
                     self.name, method_name or "?", n_dropped, n_before,
                     100.0 * n_dropped / n_before)
 
+            # Post-condition: the `s` (acquisition source) axis is canonical.
+            # Runs here -- after mappings/spellings/dropna -- so it validates the
+            # frame the caller actually receives, and so a country's
+            # categorical_mapping or `spellings` entry cannot smuggle a
+            # non-canonical source past it.  No-op for the tables without an `s`
+            # level, i.e. everything but food_acquired + _FOOD_DERIVED.
+            #
+            # This guard passes on all current data (GH #537); it exists to make
+            # a future regression loud rather than silently wrong, because `s` is
+            # a bare string literal in 19 of the 20 build scripts that set it.
+            validate_acquisition_source(df)
+
+            # Rescale sampling weights to within-wave mean 1.  Read-path only:
+            # the parquet keeps the raw (expansion or already-normalised)
+            # values.  Runs after `_enforce_canonical_dtypes` -- so no dtype
+            # coercion follows the division -- and after the `dropna(how='all')`
+            # above, so the divisor is the mean over exactly the rows the caller
+            # receives.  Scoped to `sample`: no other table's `weight` column,
+            # should one ever exist, is touched.  See
+            # `_normalise_sample_weights` for the rule and its cost.
+            if method_name == 'sample':
+                df = _normalise_sample_weights(df, country=self.name)
+
             # Attach the ISO 4217 currency label (last, so it rides through the
             # caller's _relabel_j / _add_market_index without being dropped).
             if currency is not None and method_name and not df.empty:
@@ -2514,6 +2835,34 @@ class Country:
             # Record the country so a later standalone convert() can recover it
             # (Feature output instead carries `country` in the index).
             df.attrs['country'] = self.name
+
+            # Attach what this survey's documentation says the sample
+            # REPRESENTS, per wave (GH #603/#601).  Metadata only: it adds
+            # `attrs`, never a row, a column or a value.  Here rather than at
+            # cache-write time for the same two reasons as SITE B below --
+            # `_finalize_result` re-runs on every read (warm cache included),
+            # and it is in `_build_registry._EXCLUDED_CALLABLES`, so attaching
+            # here costs no cache invalidation.  MEASURED, not assumed.
+            attach_population(df, self.name)
+
+            # SITE B of the null-content audit.  Every other guard on this
+            # table checks that a required declared column is PRESENT; this one
+            # checks it holds something.  Niger 2014-15's `Latitude` is present,
+            # `float`, and 0-of-270 populated, and passes all of them.
+            #
+            # Here rather than beside `_assert_built_required_columns` for two
+            # reasons, both load-bearing:
+            #   (1) `_finalize_result` runs on EVERY read, warm cache included,
+            #       so unlike GH #323's collapse audit this signal does not have
+            #       to be stamped into the parquet and replayed -- it simply
+            #       re-runs.  (#323 could not do that: its evidence is destroyed
+            #       before the parquet is written.  Ours is IN the parquet.)
+            #   (2) `_finalize_result` is in `_build_registry._EXCLUDED_CALLABLES`
+            #       as read-path code, so adding this costs no cache
+            #       invalidation.  MEASURED, not assumed.
+            check_declared_columns(
+                df, _required_scheme_columns(scheme_entry),
+                country=self.name, table=str(method_name or "?"))
 
         return df
 
@@ -3717,6 +4066,11 @@ class Country:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
                        units=None, volume_as_mass=True, currency=None, numeraire=None,
                        basis=None):
+                # `labels` has two faces; see _split_labels_arg.  `j_labels` is
+                # the historical scalar (food's fine->coarse rename of the `j`
+                # level); `map_labels` is the {target: variant} selection
+                # applied at the categorical-mapping site.
+                j_labels, map_labels = _split_labels_arg(labels)
                 if age_cuts is not None and name not in self._ROSTER_DERIVED:
                     raise TypeError(
                         f"{name}() got an unexpected keyword argument 'age_cuts'; "
@@ -3804,13 +4158,17 @@ class Country:
                             derived = transform_fn(fa, **transform_kwargs)
                             scheme_entry = self._materialization_entry(name)
                             derived = self._finalize_result(derived, scheme_entry, name,
-                                                            currency=currency)
+                                                            currency=currency,
+                                                            labels=map_labels)
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if units is not None:
-                            # Caller explicitly asked for canonical units= behaviour;
-                            # the legacy fall-through path can't honour that, so
-                            # surface the failure rather than silently returning
-                            # un-units-aware data.
+                        if units is not None or map_labels:
+                            # Caller explicitly asked for canonical units= /
+                            # labels= behaviour; the legacy fall-through path
+                            # can't honour either, so surface the failure rather
+                            # than silently returning un-units-aware or
+                            # un-relabelled data.  (Without this, a bad labels=
+                            # dict raised by _apply_categorical_mappings would be
+                            # swallowed here and degrade to the legacy path.)
                             raise
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
@@ -3820,8 +4178,10 @@ class Country:
                         # Relabel is outside the except so user-facing KeyErrors
                         # (bad labels=) propagate instead of silently falling
                         # through to the legacy aggregation path.
+                        _assert_label_targets_present(derived, map_labels,
+                                                      country=self.name, table=name)
                         reagg = name in {'food_expenditures', 'food_quantities'}
-                        derived = self._relabel_j(derived, labels, reaggregate=reagg)
+                        derived = self._relabel_j(derived, j_labels, reaggregate=reagg)
                         if market is not None:
                             derived = self._add_market_index(derived, column=market)
                         if numeraire is not None:
@@ -3852,6 +4212,16 @@ class Country:
                             "falling back to legacy aggregation", name, exc)
                         derived = None
                     if derived is not None:
+                        # This path never calls _finalize_result, so a mapping-site
+                        # `labels=` selection has nowhere to land.  Rather than
+                        # ignore it silently, assert the targets exist -- which for
+                        # a roster-DERIVED table they never do, because the roster
+                        # is aggregated away.  Post-hoc selection here would be
+                        # structurally broken anyway: the roster it derives from has
+                        # already been mapped onto Preferred Label, so the raw codes
+                        # are gone (the same argument as for _relabel_j).
+                        _assert_label_targets_present(derived, map_labels,
+                                                      country=self.name, table=name)
                         # _add_market_index lives OUTSIDE the except so a
                         # user-facing KeyError (a market= column this country
                         # lacks) propagates, instead of being misread as a
@@ -3865,12 +4235,19 @@ class Country:
                             derived = self._add_market_index(derived, column=market)
                         return derived
 
-                result = self._aggregate_wave_data(waves, name, currency=currency)
+                # The selection is carried to _finalize_result out of band (see
+                # _LABEL_SELECTION): _aggregate_wave_data is @build_transform()-
+                # tagged, so widening its signature would move every table's
+                # lsms_cache_hash for a change that cannot alter a cached byte.
+                with _label_selection(name, map_labels):
+                    result = self._aggregate_wave_data(waves, name, currency=currency)
+                _assert_label_targets_present(result, map_labels,
+                                              country=self.name, table=name)
                 # Apply relabeling to any table with a j index level
                 if (isinstance(result, pd.DataFrame) and not result.empty
                         and 'j' in (result.index.names or [])):
                     reagg = name in {'food_expenditures', 'food_quantities'}
-                    result = self._relabel_j(result, labels, reaggregate=reagg)
+                    result = self._relabel_j(result, j_labels, reaggregate=reagg)
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     result = self._add_market_index(result, column=market)
                 if numeraire is not None and isinstance(result, pd.DataFrame) and not result.empty:
@@ -3885,15 +4262,32 @@ class Country:
                 "market : str, optional\n",
                 "    Column from cluster_features (e.g. 'Region') to add as\n",
                 "    an ``m`` index level for demand estimation.\n",
-                "labels : str, optional\n",
-                "    Label column to use for the ``j`` index on derived food\n",
-                "    tables (food_expenditures, food_quantities, food_prices).\n",
-                "    Defaults to ``'Preferred'`` (current behaviour).  Other\n",
-                "    values (e.g. ``'Aggregate'``) select a same-named column\n",
-                "    from the country's ``food_items`` / ``harmonize_food``\n",
-                "    table; ``food_expenditures`` and ``food_quantities`` are\n",
-                "    re-aggregated after renaming.  Raises ``KeyError`` if the\n",
-                "    column is absent.\n",
+                "labels : str or dict, optional\n",
+                "    **Scalar form** -- label column to use for the ``j`` index\n",
+                "    on derived food tables (food_expenditures,\n",
+                "    food_quantities, food_prices).  Defaults to\n",
+                "    ``'Preferred'`` (current behaviour).  Other values (e.g.\n",
+                "    ``'Aggregate'``) select a same-named column from the\n",
+                "    country's ``food_items`` / ``harmonize_food`` table;\n",
+                "    ``food_expenditures`` and ``food_quantities`` are\n",
+                "    re-aggregated after renaming.  A scalar targets ``j`` and\n",
+                "    ONLY ``j``, even on a table that also has a mapped column.\n",
+                "    **Dict form** -- ``{target: variant}``, where *target*\n",
+                "    names a column or index level (case-insensitive) and\n",
+                "    *variant* selects the ``'<variant> Label'`` column (falling\n",
+                "    back to ``'<variant>'``) of the country's same-named\n",
+                "    ``categorical_mapping`` table.  E.g.\n",
+                "    ``labels={'Rural': 'Settlement'}`` decodes the raw\n",
+                "    settlement code to the finer ladder instead of the\n",
+                "    canonical ``Urban``/``Rural``.  The key ``'j'`` is routed to\n",
+                "    the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and\n",
+                "    ``labels='Aggregate'`` are the same request.\n",
+                "    Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)\n",
+                "    when the country cannot honour the request -- it curates no\n",
+                "    such label column, or the result has no such target at all;\n",
+                "    ``Feature`` degrades over both.  A plain ``KeyError`` means\n",
+                "    the mapping table is MALFORMED (no ``Preferred Label``, or\n",
+                "    no key column left), which stays loud.\n",
             ]
             if name in {'food_prices', 'food_quantities'}:
                 if name == 'food_prices':
@@ -4412,6 +4806,158 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
                 df[col] = df[col].astype(target)
         except (ValueError, TypeError):
             pass  # best-effort; don't break loading
+
+
+# ---------------------------------------------------------------------------
+# Sampling-weight scale harmonisation (read-path).
+#
+# THE PROBLEM.  `sample.weight` arrived on TWO incompatible scales and nothing
+# in the returned frame said which.  Measured over the corpus (93 weighted
+# (country, wave) cells in 31 countries): 13 cells ship weights already
+# NORMALISED (within-wave mean 1.0000, so the column sums to the wave's
+# household count) and 80 ship EXPANSION weights that sum to a national
+# population (wave means 25.7 -> 8,659).  CotedIvoire mixes BOTH across its own
+# waves -- 1985-89 LSMS `ALLWAITN` (~ N households) against 2018-19 EHCVM
+# population-scaled -- so a user summing `weight` across that country's waves
+# silently gets numbers three orders of magnitude apart.  GhanaLSS worked around
+# the hazard by leaving four waves' weights NULL rather than mix types.
+#
+# THE RULE.  Divide each wave's weights by that wave's own mean over non-null
+# values.  No threshold, no configuration, nothing to tune: a column that is
+# already mean-1 is divided by 1.0000 and is unchanged, an expansion column
+# becomes mean-1.  Deterministic and idempotent -- which matters, because
+# `_join_v_from_sample` re-enters `sample()` while finalising other tables.
+#
+# WHY HERE AND NOT AT BUILD TIME.  The parquet keeps the RAW weights, so nothing
+# is destroyed and a future `weights='expansion'` kwarg stays possible.  Placing
+# it in `_finalize_result` also keeps the cache hash still: that method is in
+# `_build_registry._EXCLUDED_CALLABLES` as read-path code, so the closure walk
+# never descends into it and a helper reached only from it is invisible to
+# `build_transforms_fingerprint`.  Measured: 0 of 50 probed
+# `Country._table_cache_hash` values move.
+#
+# THE COST, STATED.  Within-wave normalisation means cross-wave pooling no
+# longer reflects relative wave SIZES -- each wave contributes in proportion to
+# its sample size, not its population.  That is fine for the stated use (we are
+# not estimating population totals) and is already what the corpus does for the
+# 13 normalised cells, but it is a real property, not a rounding detail.
+# ---------------------------------------------------------------------------
+
+#: Columns in ``sample`` that carry a sampling weight and are rescaled to
+#: within-wave mean 1 at API time.  Each is normalised by *its own* non-null
+#: mean: ``panel_weight`` is NaN for refreshment households in several
+#: countries, and those rows must not drag the divisor down.
+_SAMPLE_WEIGHT_COLUMNS: tuple[str, ...] = ('weight', 'panel_weight')
+
+
+class WeightNormalisationWarning(UserWarning):
+    """A wave's sampling weights could not be rescaled to mean 1.
+
+    Raised when a ``(wave, column)`` group's non-null mean is zero, negative or
+    non-finite -- dividing would emit ``inf`` or flip signs, so the group is
+    left at its raw scale and said so out loud.  Also raised when negative
+    weights are present at all, which is a data defect worth surfacing even
+    where the group mean is positive and the rescale proceeds.
+    """
+
+
+def _normalise_sample_weights(df: pd.DataFrame,
+                              country: str | None = None) -> pd.DataFrame:
+    """Rescale ``weight`` / ``panel_weight`` to within-wave mean 1.
+
+    For each ``t`` (wave) and each weight column independently, divide by that
+    group's mean over **non-null** values.  Returns *df* (mutated in place, in
+    the style of :func:`_enforce_canonical_dtypes`, so ``attrs`` -- notably
+    ``id_converted`` -- is preserved by construction).
+
+    Properties this relies on and the tests pin:
+
+    - **Idempotent.**  A mean-1 column divided by its mean (1.0) is unchanged,
+      so re-entry through ``_join_v_from_sample`` / ``Feature`` is safe.
+    - **Ratio-preserving.**  Any weighted mean, share or ratio is invariant:
+      scaling every weight in a wave by the same positive constant cancels in
+      ``sum(w*x)/sum(w)``.  This is what makes the change safe for analysis.
+    - **Scale-destroying, deliberately.**  ``sum(weight)`` is now the wave's
+      non-null household count, not a population estimate.
+
+    The cached parquets keep the raw values, so a future ``weights='expansion'``
+    kwarg on :meth:`Country.sample` could serve them unchanged.  That kwarg is
+    **not** implemented here.
+
+    Skipped without modification: a column with no non-null values at all, and
+    any ``(wave, column)`` group whose mean is 0, negative or non-finite (a
+    :class:`WeightNormalisationWarning` names it).
+    """
+    cols = [c for c in _SAMPLE_WEIGHT_COLUMNS if c in df.columns]
+    if not cols:
+        return df
+
+    # Find the wave axis wherever it is.  Falling back to a whole-frame mean
+    # when `t` is merely a COLUMN would pool every wave into one divisor --
+    # which is the exact bug this function exists to prevent -- so look in the
+    # columns too before giving up.  (`sample` declares `(i, t)` everywhere
+    # today; this is a guard against a future shape, not a live case.)
+    index_names = list(df.index.names)
+    if 't' in index_names:
+        groups = df.index.get_level_values('t')
+    elif 't' in df.columns:
+        groups = df['t']
+    else:
+        groups = None
+    where = country or '?'
+
+    for col in cols:
+        # float64 (not the nullable Float64) so pd.NA becomes np.nan and the
+        # numpy finiteness test below is well-defined.
+        s = pd.to_numeric(df[col], errors='coerce').astype('float64')
+        if not s.notna().any():
+            continue  # all-null: no mean to divide by, nothing to rescale
+
+        n_neg = int((s < 0).sum())
+        if n_neg:
+            warnings.warn(
+                f"{where}/sample: {n_neg} negative value(s) in `{col}`. "
+                f"Sampling weights should be non-negative; normalising anyway "
+                f"where the wave mean is positive, but the source is suspect.",
+                WeightNormalisationWarning, stacklevel=2)
+
+        if groups is None:
+            means = pd.Series(s.mean(), index=s.index, dtype='float64')
+        else:
+            # `transform('mean')` skips NaN, which IS the required non-null-mean
+            # semantics; dropna=False keeps a NaN-`t` group together instead of
+            # silently leaving those rows unscaled.
+            means = s.groupby(groups, dropna=False,
+                              observed=True).transform('mean')
+
+        usable = means.notna() & np.isfinite(means) & (means > 0)
+        # A group whose mean is NaN is a wave with NO non-null weights at all
+        # (GhanaLSS GLSS1-4).  That is a normal, already-documented data gap,
+        # not a defect -- skip it silently, exactly as an all-null column is
+        # skipped above.  Only a group that HAS data but whose mean is <= 0 or
+        # non-finite is worth a warning: there the division is refused.
+        defective = ~usable & means.notna()
+        if defective.any():
+            bad = sorted({str(w) for w in
+                          (groups[defective] if groups is not None
+                           else ['<all>'] * int(defective.sum()))})
+            warnings.warn(
+                f"{where}/sample: `{col}` left un-normalised for "
+                f"{int(defective.sum())} row(s) in wave(s) {bad} -- the "
+                f"non-null mean is zero, negative or non-finite, so dividing "
+                f"would emit inf or flip signs.",
+                WeightNormalisationWarning, stacklevel=2)
+        if not usable.any():
+            continue
+
+        scaled = s / means.where(usable, other=1.0)
+        # Preserve a nullable float column as nullable; never cast back to an
+        # integer dtype, which would round every rescaled weight to 0 or 1.
+        if isinstance(df[col].dtype, pd.Float64Dtype):
+            scaled = scaled.astype('Float64')
+        df[col] = scaled
+
+    return df
 
 
 # ---------------------------------------------------------------------------

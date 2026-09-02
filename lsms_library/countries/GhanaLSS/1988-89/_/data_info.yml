@@ -2,18 +2,41 @@ Country: GhanaLSS
 Wave: 1988-89
 
 cluster_features:
+    # Region and Ecological_zone come from BID Appendix I, NOT from this file.
+    # GLSS1/GLSS2 ship no cluster-location variable at all, so `Region` used to
+    # be INFERRED from Y01A.DAT:REGION -- the person's region of BIRTH -- as the
+    # modal value among a cluster's under-12s.  That was ~98% right and wrong
+    # for five clusters.  The Appendix is the survey's own cluster list and is
+    # authoritative (decision 2026-08-21); see `_/appendix_i_clusters.org`.
+    #
+    # `myvars` is intentionally EMPTY: this extraction exists only to enumerate
+    # the wave's cluster universe (170 clusters) from the microdata.  The
+    # attributes are attached by mapping.py::cluster_features.  Taking the
+    # universe from the data rather than the Appendix matters -- the Appendix
+    # lists 178 SAMPLING AREAS for 1987-88, which is not the same unit as a
+    # cluster.
+    #
+    # `Age: AGEY` was removed with the hook it fed (an `Age<12` filter).
     file: Y01A.DAT
     idxvars:
         v: CLUST
-    myvars:
-        Region: REGION
+    myvars: {}
 
 sample:
+    # `Rural` is NOT read from a source column -- GLSS1/GLSS2 ship none.  The
+    # `sample` df_edit hook in mapping.py broadcasts the cluster's BID
+    # Appendix I classification onto its households.  The Appendix is three-way
+    # (U / R / SU); `SU` is folded onto `Rural` by decision (@ligon,
+    # 2026-08-21), so the delivered vocabulary is the canonical binary.
+    # GH #685.
     file: Y00A.DAT
     idxvars:
         i: HID
     myvars:
         v: CLUST
+    # `weight` / `panel_weight` are SYNTHESISED as 1.0 by the `sample` df_edit
+    # hook in mapping.py -- this wave ships no weight column at all.  See that
+    # docstring for the evidence tier and the 1984-population qualifier.
 
 interview_date:
     file: Y00A.DAT

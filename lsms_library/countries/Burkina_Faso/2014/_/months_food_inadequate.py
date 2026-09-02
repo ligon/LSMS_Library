@@ -54,6 +54,13 @@ out.loc[out['MonthsInadequate'].isna(), 'AnyInadequate'] = pd.NA
 
 out = out.set_index(['t', 'i'])
 
+# GH #637 key-soundness review (2026-07-21).  KEY SOUND -- this guard never
+# fires.  Same `i` construction as food_coping.py (unpadded zd + 3-padded
+# menage), and the same measurement on the same source file: menage ranges
+# 1..17 over 900 zd, so the concatenation stays injective -- 10,230 source rows
+# -> 10,230 distinct (zd, menage) -> 10,230 distinct `i`, zero collisions.  The
+# table is one row per household, so (t, i) carries 10,230 rows with 0
+# duplicates: 0 exact / 0 complementary / 0 conflicting groups.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 

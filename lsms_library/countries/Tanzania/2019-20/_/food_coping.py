@@ -57,6 +57,10 @@ long = long.dropna(subset=['Days'])
 long['t'] = '2019-20'
 out = long[['t', 'i', 'Strategy', 'Days']].set_index(['t', 'i', 'Strategy'])
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# HH_SEC_H.dta is one row per household: 1,184 rows, 1,184 distinct sdd_hhid,
+# 0 duplicates, 0 nulls.  The melt makes (t, i, Strategy) unique by
+# construction.  .first() is never called on a cold build.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 

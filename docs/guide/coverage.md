@@ -51,6 +51,46 @@ country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date
 Albania,shocks,2005,todo,C1;C2,Data/migrationE_cl.dta m6e_q00 = 'Type of Shock Code' (10 types),sue,2026-07-12
 ```
 
+### `undeclared` — the feature a country never declared (GH #724)
+
+`absent` means *"declared for other waves of this country, but not this one."*
+It cannot describe a feature the country declares **nowhere**, and until #724
+the matrix emitted **no row at all** for that case — its feature axis came from
+each country's own `data_scheme`. GhanaSPS therefore reported **21/21 = 100%
+`sane`** while ~300 of its 328 tracked source files sat unwired.
+
+That is the same failure the matrix already fixed one level up, where a country
+directory holding microdata but no `_/data_scheme.yml` is surfaced as
+`unconfigured` rather than omitted: *a denominator that omits the work you have
+not started is not a denominator.*
+
+So every country is now graded against the **`Feature Vocabulary`** pinned in
+`lsms_library/data_info.yml` (22 features; see the rationale in that file). A
+feature in the vocabulary that a country does not declare emits one row with a
+**blank wave** — blank because there is no per-wave information to report:
+nobody has looked yet.
+
+Adjudicate it exactly like `absent`, with a blank `wave` in
+`.coder/coverage/absent_verdicts.csv`:
+
+| verdict | effect on an `undeclared` cell |
+|---|---|
+| *(none)* | stays `undeclared` — an open, un-triaged gap |
+| `todo` | stays `undeclared`, but carries its evidence forward |
+| `unsure` | stays `undeclared`, and records why the check could not run |
+| `not-asked` / `asked-not-distributed` | **closes it** — evidence mandatory, C4 required |
+
+`todo` deliberately does **not** relabel the cell `absent`: that would assert
+the country declares the feature somewhere, which is false.
+
+> **A cheap-layer run will not write the snapshot.** `--no-readiness` (i.e.
+> `make matrix-coverage`) grades every cell `declared`, and the snapshot
+> upserts by `(country, feature, wave)` — so writing it to
+> `.coder/coverage/latest.csv` silently **downgrades** every readiness tier it
+> touches (measured: 1,217 `sane` + 138 `builds` + 39 `dropped` + 8 `broken`
+> became `declared` in one run). It now refuses the default snapshot and needs
+> an explicit `--snapshot PATH`.
+
 ### Evidence is not optional
 
 A **closing** verdict (`not-asked` / `asked-not-distributed`) is a *permanent,

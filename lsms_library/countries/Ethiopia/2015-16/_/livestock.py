@@ -13,8 +13,8 @@ W3 splits the §8 roster across two files joined on (holder_id, ls_code):
       sale value    ls_sec_8_2aq14   (total income from sales, Birr)
 The finer ls_code (Bulls/Oxen/Cows/... ; Goats-He/She/Kids; etc.) folds to
 canonical species via the wave-keyed harmonize_species table and is summed
-within household.  No current herd value is asked -> Value = reported sale
-income (the only monetary §8 field).
+within household.  No current herd value is asked -> SalesValue = reported
+sale income (the only monetary §8 field).
 i = household_id2 (matches sample().i / plot_features for W3).
 """
 import sys

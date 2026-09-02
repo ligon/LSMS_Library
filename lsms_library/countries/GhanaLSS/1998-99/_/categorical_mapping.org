@@ -2,19 +2,72 @@ The following tables are mapping of numerical codes to categorical labels for 19
 
 * SEC0A
 
+# GLSS4 region codes, transcribed from the GLSS4 Household Questionnaire,
+# PDF page 7, Section 1 column 10 ("In what region/country was (NAME) born?").
+# Note two things that make this table wave-specific and NOT interchangeable
+# with the country-level `region` table:
+#   - GLSS4 orders 4=Eastern, 5=Volta (the country-level table's order), but
+#     puts 9=Upper WEST and 10=Upper EAST -- the reverse of the country-level
+#     table.  GLSS3 (1991-92) has the same northern reversal; see that wave's
+#     own table and mapping.py.
+#   - Code 11 is "Foreign" and IS used: 260 people in SEC1.DTA:s1q10.
+# This table previously had 9/10 swapped and no code 11, so 2,056 people were
+# mislabelled Upper East<->Upper West and 260 foreign-born came out NA.
+# Corroboration: the cover page carries 120 households in code 9 against 260
+# in code 10, and Upper East is the more populous of the two regions.
 #+name: region
-| Code | Label         |
-|------+---------------|
-|    1 | Western       |
-|    2 | Central       |
-|    3 | Greater Accra |
-|    4 | Eastern       |
-|    5 | Volta         |
-|    6 | Ashanti       |
-|    7 | Brong Ahafo   |
-|    8 | Northern      |
-|    9 | Upper East    |
-|   10 | Upper West    |
+| Code | Label           |
+|------+-----------------|
+|    1 | Western         |
+|    2 | Central         |
+|    3 | Greater Accra   |
+|    4 | Eastern         |
+|    5 | Volta           |
+|    6 | Ashanti         |
+|    7 | Brong Ahafo     |
+|    8 | Northern        |
+|    9 | Upper West      |
+|   10 | Upper East      |
+|   11 | Foreign Country |
+
+# GLSS4 relationship-to-head codes, transcribed from the GLSS4 Household
+# Questionnaire, PDF page 7, Section 1 column 3 ("Relationship to Head of
+# household").  Corroborated by the Data User Guide, PDF pp.31-32 (File
+# SEC1.SSD, variable REL, "Records: 26,411" -- the exact row count of
+# SEC1.DTA).  SEC1.DTA carries NO embedded Stata value labels.
+#
+# CRITICAL: this is a NINE-code scheme and is NOT the country-level
+# `relationship` table, which is GLSS1's FOURTEEN-code scheme.  Decoding GLSS4
+# through that table would mis-label 1,996 rows (7.6%), e.g. code 6 (1,766
+# people, "Relative of head") would become "Sibling" and code 7 (53, "Servant")
+# would become "Niece/nephew".  mapping.py searches the WAVE dir first so this
+# table wins.
+#
+# Labels are the library's canonical forms rather than the questionnaire's
+# verbatim wording, so GhanaLSS speaks one vocabulary across waves and the
+# labels resolve in categorical_mapping/kinship.yml.  Verbatim source wording,
+# for provenance:
+#   1 Head                                        -> Head
+#   2 Wife/husband                                -> Wife/husband
+#   3 Son/daughter                                -> Son/daughter
+#   4 Grandchild                                  -> Grandchild
+#   5 Father/mother                               -> Father/mother
+#   6 Relative of head or head's spouse           -> Other relative
+#   7 Servant and his/her relative                -> Servant
+#   8 Tenant and his/her relative                 -> Tenant
+#   9 Other not related to head or head's spouse  -> Others not related
+#+name: relationship
+| Code | Label              |
+|------+--------------------|
+|    1 | Head               |
+|    2 | Wife/husband       |
+|    3 | Son/daughter       |
+|    4 | Grandchild         |
+|    5 | Father/mother      |
+|    6 | Other relative     |
+|    7 | Servant            |
+|    8 | Tenant             |
+|    9 | Others not related |
 
 #+name: rural
 | Code | Label |

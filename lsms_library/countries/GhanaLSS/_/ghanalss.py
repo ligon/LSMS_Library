@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from collections import defaultdict
+from importlib.resources import files
 from lsms_library.local_tools import get_dataframe, DVCFS
 
 # Formatting  Functions for Ghana 2016-17
@@ -410,3 +411,90 @@ def concate_id(df, parta, partb, leading_zero = False, digit = None):
     na_id = df.loc[df[parta].isna(), 'newid'].iloc[0]
     df['newid'] = df['newid'].replace(na_id, pd.NA)
     return df['newid']
+
+
+# ---------------------------------------------------------------------------
+# BID Appendix I -- the authoritative GLSS1/GLSS2 cluster attribute table.
+# ---------------------------------------------------------------------------
+
+def appendix_i_cluster_attributes(year_column, offset):
+    """Cluster attributes for a GLSS1/GLSS2 wave, from BID Appendix I.
+
+    GLSS1 and GLSS2 ship NO cluster-location variable -- a sweep of all 170
+    dictionaries finds none.  `cluster_features.Region` used to be INFERRED as
+    the modal birth region of a cluster's under-12s, which was ~98% right and
+    wrong for five clusters.  Appendix I of the joint Basic Information
+    Document is the survey's own cluster list and is authoritative for these
+    waves (decision, 2026-08-21); see `_/appendix_i_clusters.org`.
+
+    Parameters
+    ----------
+    year_column : {'yr1', 'yr2'}
+        Appendix column holding this wave's cluster number.
+    offset : int
+        Added to that number to reach the microdata's ``CLUST``
+        (1000 for 1987-88, 2000 for 1988-89).  Verified: 176/176 and 170/170.
+
+    Returns
+    -------
+    DataFrame indexed by ``v`` (zero-free string ``CLUST``) with columns
+    ``Region``, ``Rural`` and ``Ecological_zone``.
+
+    ``Rural`` IS returned, folded to the canonical binary {Urban, Rural} by
+    the ``urbrur_abbrev`` table in the same org file.  The Appendix classifies
+    clusters THREE ways -- U / R / SU (semi-urban, 52 of 263 clusters, 20%) --
+    and ``SU`` is delivered as ``Rural`` **by decision** (@ligon, 2026-08-21).
+
+    That is a judgement call and **the survey offers no evidence either way**.
+    The GLSS2 7-way ``rural`` table's ``Classification`` column was cited on
+    GH #690 as precedent for folding a middle tier to Rural; it is *editorial,
+    not on the questionnaire* (GH #692), and it decodes ``Y01C:NRCPL`` -- a
+    *non-resident child's* place of residence, not the household's settlement
+    class.  Do not cite it.
+
+    The U/R/SU distinction IS lost in the delivered column.  The raw three-way
+    survives in the ``UrbRur`` column of ``_/appendix_i_clusters.org`` for
+    anyone who needs it.
+    """
+    # countries_root() honours LSMS_COUNTRIES_ROOT; a hardcoded
+    # files("lsms_library")/"countries" would silently read the installed
+    # package's config tree instead of a worktree under development (GH #436).
+    from lsms_library.paths import countries_root
+    path = countries_root()/'GhanaLSS'/'_'/'appendix_i_clusters.org'
+    tbl = tools.df_from_orgfile(path, name='appendix_i_clusters', to_numeric=False)
+    tbl.columns = [str(c).strip() for c in tbl.columns]
+    tbl = tbl.map(lambda x: str(x).strip() if pd.notna(x) else x)
+
+    regions = tools.df_from_orgfile(path, name='region_abbrev', to_numeric=False)
+    regions.columns = [str(c).strip() for c in regions.columns]
+    region_map = dict(zip(regions['Reg'].str.strip(), regions['Region'].str.strip()))
+
+    urbrur = tools.df_from_orgfile(path, name='urbrur_abbrev', to_numeric=False)
+    urbrur.columns = [str(c).strip() for c in urbrur.columns]
+    urbrur_map = dict(zip(urbrur['UrbRur'].str.strip(), urbrur['Rural'].str.strip()))
+
+    zones = tools.df_from_orgfile(path, name='ecozone_abbrev', to_numeric=False)
+    zones.columns = [str(c).strip() for c in zones.columns]
+    zone_map = dict(zip(zones['EcoZone'].str.strip(), zones['Ecological_zone'].str.strip()))
+
+    # A decode that silently yields {} is this country's most expensive
+    # recurring defect (GH #372/#377, #348, and the 2026-08-19 revival).
+    # Assert rather than discover it as a 100%-null column downstream.
+    assert region_map, 'region_abbrev decoded to an EMPTY dict'
+    assert zone_map, 'ecozone_abbrev decoded to an EMPTY dict'
+    assert urbrur_map, 'urbrur_abbrev decoded to an EMPTY dict'
+
+    tbl = tbl[tbl[year_column].astype(str).str.strip().ne('.')].copy()
+    tbl['v'] = (tbl[year_column].astype(int) + offset).astype(str)
+
+    out = pd.DataFrame({
+        'Region': tbl['Reg'].map(region_map).values,
+        'Rural': tbl['UrbRur'].map(urbrur_map).values,
+        'Ecological_zone': tbl['EcoZone'].map(zone_map).values,
+    }, index=pd.Index(tbl['v'].values, name='v'))
+
+    unmapped = tbl.loc[out['Region'].isna().values, 'Reg'].unique()
+    assert len(unmapped) == 0, f'unmapped region abbreviations: {list(unmapped)}'
+    bad_ur = tbl.loc[out['Rural'].isna().values, 'UrbRur'].unique()
+    assert len(bad_ur) == 0, f'unmapped urb/rur abbreviations: {list(bad_ur)}'
+    return out

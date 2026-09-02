@@ -51,7 +51,7 @@ livestock:
             - paid
             - hhid
     myvars:
-        LivestockValue: livval6
+        HerdValue: livval6
         TLU: lsu6
 
 # crop_production (#438): R6 (2004) HH x crop production (kg) + area (ha).

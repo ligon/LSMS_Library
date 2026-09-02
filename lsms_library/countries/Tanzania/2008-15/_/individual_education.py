@@ -48,6 +48,11 @@ edu['Educational Attainment'] = harmonize_education_labels(edu['Educational Atta
 
 edu = edu.set_index(['t', 'i', 'pid'])
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# upd4_hh_c.dta is INDIVIDUAL-level, keyed (round, r_hhid, UPI): 83,706 rows,
+# 83,706 groups, 0 duplicates, 0 null UPI; pid formatting injective (45,396 ->
+# 45,396).  No UPHI column, so no panel-line replication (cf. housing.py).
+# .first() is never called on a cold build.
 if not edu.index.is_unique:
     edu = edu.groupby(level=edu.index.names).first()
 

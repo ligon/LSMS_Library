@@ -311,6 +311,133 @@ Columns:
   panel_ids:
     previous_i:
       type: str
+  livestock:
+    # Grain (t, i, animal) for the 13 roster countries; EthiopiaRHS is the
+    # documented (t, i) household-total variant (pre-aggregated herd scalars
+    # from the IFPRI ERHS deposit -- it has no per-species roster).
+    #
+    # NOTHING here is `required: true`, deliberately.  `required` in this file
+    # makes tests/test_schema_consistency.py::TestRequiredColumns demand the
+    # column of EVERY country declaring the table, and livestock's column set
+    # genuinely varies with the instrument: the 7 EHCVM countries record head
+    # counts and no value at all, EthiopiaRHS records value and no head
+    # counts.  Any `required` livestock column would be a false universal.
+    #
+    # ---- THE VALUE COLUMNS ARE SPLIT BY ADDITIVITY, NOT BY GRAIN ----
+    #
+    # Three distinct quantities were all spelled `Value`.  They share a dtype,
+    # a grain and a currency, so nothing in the library could tell them apart
+    # and all three graded `sane`.  Summing the wrong one is silent.  The
+    # split is by WHAT ARITHMETIC IS LEGAL:
+    #
+    #   ValuePerAnimal  price per head          -- NOT additive
+    #   HerdValue       stock total             -- additive over `animal`
+    #   SalesValue      transaction-flow total  -- additive over `animal`
+    #
+    # Which one a country has is settled on the QUESTIONNAIRE WORDING (quoted
+    # per column below), corroborated by a conditional test.  Correlation with
+    # HeadCount does NOT discriminate -- neither a unit price nor a sales
+    # total tracks herd size, so both look alike under it.  The test that
+    # separates them is: IS THE VALUE REPORTED WHEN NOTHING WAS SOLD?
+    #
+    #   % rows with value > 0 | given HeadSold == 0 | given HeadSold > 0
+    #   ----------------------+---------------------+--------------------
+    #   Nigeria               |         98.0        |        98.2
+    #   Malawi                |         92.1        |        91.4
+    #   Uganda 2009-10        |         99.2        |        89.6
+    #   Uganda 2011-12+       |          0.0        |        94.9
+    #   Ethiopia              |          2.0        |        95.6
+    #   Mali                  |          0.0        |        92.5
+    #
+    # A price reported regardless of any sale is a reservation price
+    # (Nigeria / Malawi / early Uganda).  A number that exists only when a
+    # sale happened is sale-linked -- but that alone does NOT prove it is a
+    # total: Uganda 2011-12+ is also 0.0 and is still PER HEAD ("the value of
+    # each sold").  Only the wording settles it, which is why it is quoted.
+    HeadCount:
+      type: float
+      note: |
+        Head of this animal owned / kept by the household at interview.
+        A stock.  Summing over `animal` adds cattle to chickens; the
+        meaningful aggregate is TLU (sum of head x species factor).  For the
+        roster countries TLU is a transformation over these rows and is
+        deliberately NOT stored -- see the TLU entry below for the one case
+        where the source ships it pre-aggregated.
+    HeadAcquired:
+      type: float
+      note: |
+        Head PURCHASED alive during the survey's recall window (12 months in
+        every country that records it).  A flow.  Births and gifts are
+        separate reported flows and are deliberately NOT folded in.
+    HeadSold:
+      type: float
+      note: |
+        Head SOLD alive during the recall window.  A flow, and the
+        denominator that turns SalesValue into a per-animal sale price.
+    ValuePerAnimal:
+      type: float
+      monetary: true
+      note: |
+        Price of ONE head, in local currency.  NOT ADDITIVE -- summing it
+        over `animal`, or over households, produces a number with no meaning.
+        A household's holding value is ValuePerAnimal * HeadCount, computed
+        by the analyst; the library does not store it.
+
+        Two instrument variants, both per-head:
+          - RESERVATION price -- "If you would sell one of the [ANIMAL]
+            today, how much would you receive?"  Reported whether or not
+            anything was sold.  Nigeria (s11iq3), Malawi (ag_r04), Uganda
+            2009-10 / 2010-11 (a6aq6).
+          - REALISED average -- "What was, on average, the value of each
+            sold?"  Defined only where the household sold.  Uganda 2011-12
+            onward (a6aq14b / s6aq14b), which dropped the sell-today question.
+
+        The switch is within-concept -- both are per head -- so it does not
+        change the column, but it DOES change coverage: Uganda's non-null
+        rate falls from ~96% to ~21% at 2011-12, and every non-null row from
+        then on is conditional on a sale.
+    HerdValue:
+      type: float
+      monetary: true
+      note: |
+        Total value of the animals described by this row, in local currency.
+        ADDITIVE: at (t, i, animal) it is the per-species herd total and sums
+        over `animal` to the household's livestock wealth; at the (t, i)
+        grain the row already IS the household total.
+
+        A stock -- it values HeadCount.  Contrast SalesValue, which values
+        HeadSold.  Declared by EthiopiaRHS (lvsval80 / livval6 / lvs_val7,
+        "total value of livestock herd", Birr, at the (t, i) grain).
+    SalesValue:
+      type: float
+      monetary: true
+      note: |
+        Gross value of the animals SOLD during the recall window, in local
+        currency.  ADDITIVE over `animal`, but a FLOW: it values HeadSold,
+        not HeadCount, so it is NOT a herd valuation and must never be summed
+        into a wealth aggregate.  A per-animal sale price is
+        SalesValue / HeadSold.
+
+        Declared by Ethiopia (ls_s8aq60, "What was the total value of sales
+        of [LIVESTOCK] in the last 12 months? (BIRR)") and Mali (s4aq24 /
+        s8b1q14, "Valeur brute des ventes").  Both rosters record NO current
+        herd value, which is why neither country has a HerdValue -- an
+        earlier reading that mapped these onto ValuePerAnimal would have
+        relabelled an additive total as a unit price.
+    TLU:
+      type: float
+      note: |
+        Tropical Livestock Units -- head weighted by a species conversion
+        factor, so herds of different composition are commensurable.  A
+        stock, additive over `animal`, and NOT monetary (it is an animal
+        count in cattle-equivalents, not a currency amount), which is why it
+        is absent from currency._DEFAULT_MONETARY['livestock'].
+
+        Stored ONLY where the source ships it pre-aggregated: EthiopiaRHS
+        (lsu80 / lsu6 / tlu7, at the (t, i) grain).  For the 13 roster
+        countries TLU is a transformation over HeadCount and is deliberately
+        not stored -- their configs say so individually, and computing it
+        needs a species factor table the library does not yet carry.
   crop_production:
     # NOTE: `condition` is an INDEX level, not a column -- deliberately
     # declared here anyway.  `_enforce_canonical_spellings` (country.py:3962)
@@ -401,6 +528,64 @@ Columns:
 
 # Spellings that must never appear in column names.  Key is the rejected
 # spelling; value is the canonical replacement.
+# The set of features the coverage matrix grades EVERY country against.
+#
+# Why this exists (GH #724).  `coverage_matrix.build_matrix` used to derive its
+# feature axis from each country's own `data_scheme`, so a feature a country
+# never declared produced NO ROW AT ALL -- not `absent`, not `unconfigured`.
+# GhanaSPS then reported 21/21 = 100% `sane` while ~300 of its 328 tracked
+# source files sat unwired.  A denominator that omits the work you have not
+# started is not a denominator -- the same principle `build_matrix` already
+# applies to `unconfigured` COUNTRIES, one level down.
+#
+# Why PINNED here rather than computed as the union of what countries declare:
+# a live union makes every country's denominator move whenever ONE country
+# adds a feature, so a country's score would change without anything about it
+# changing.  Editing this list is the deliberate act of widening the corpus's
+# ambit.  `tests/test_feature_vocabulary.py` ratchets it: a source feature any
+# country declares that is missing here fails, so growth is loud.
+#
+# Membership, as MEASURED (2026-08-24) -- not a tuned threshold.  Ranking the
+# 33 source features by how many countries declare each leaves a real GAP:
+# 22 features are declared by >= 6 countries, and the next most common is
+# declared by 2.  Nothing is declared by 3, 4 or 5.  So ">= 3" and ">= 6" pick
+# out the IDENTICAL set, and the cut is a property of the corpus rather than a
+# knob.  The excluded tail is local helper tables, not corpus vocabulary --
+# e.g. Tanzania's `community_cluster_xwalk`, EthiopiaRHS's `hhsize`, Uganda's
+# `fct`/`earnings`/`enterprise_income`, India's `employment`.  Including a
+# one-country helper would manufacture ~35 false `undeclared` rows apiece and
+# discredit the tier.
+#
+# DERIVED features are deliberately absent: `food_expenditures`, `food_prices`,
+# `food_quantities` and `household_characteristics` auto-derive from
+# `food_acquired` / `household_roster` (`feature._DERIVED_SOURCE`), so an
+# "undeclared food_expenditures" is just "undeclared food_acquired" restated.
+# Country-level-only features (`panel_ids`, `updated_ids`) are absent too --
+# they are graded by their own path.
+Feature Vocabulary:
+  - anthropometry
+  - assets
+  - cluster_features
+  - community_prices
+  - crop_production
+  - food_acquired
+  - food_coping
+  - food_security
+  - household_roster
+  - housing
+  - individual_education
+  - interview_date
+  - life_satisfaction
+  - livestock
+  - months_food_inadequate
+  - people_last7days
+  - plot_features
+  - plot_inputs
+  - plot_labor
+  - sample
+  - shocks
+  - subjective_well_being
+
 Rejected Spellings:
   Effected: Affected
   Highest_education: Educational Attainment
@@ -473,6 +658,16 @@ Currency:
   Nigeria: NGN
   Pakistan: PKR
   Panama: PAB                       # Balboa pegged 1:1 to USD; USD also circulates (dual currency)
+  Peru:                             # 1991 reform, 1 PEN (nuevo sol) = 1,000,000 PEI (inti)
+    default: PEN                    # ENNIV 1991 was fielded Sep-Nov 1991 and 1994
+    overrides:                      # May-Aug 1994, both after the 1 Jul 1991 reform
+      '1985': PEI                   # inti, which replaced the sol de oro on 1 Feb 1985;
+      '1990': PEI                   # ENNIV 85-86 ran late 1985 into 1986, ENNIV 90 in Jun 1990
+  # The fieldwork months above are measured from the data (1991 N00A.moi is
+  # 9/10/11; 1994 REG01.a18 is 5..8) and from the ENNIV 90 questionnaire cover
+  # ("JUNIO 1990"); the reform dates are external.  NOTE that no Peru wave
+  # currently extracts a monetary column at all -- food_acquired is declared but
+  # unwired -- so nothing in the returned data depends on these codes yet.
   Senegal: XOF
   Serbia: RSD                       # 2007 wave (RSD since 2006)
   'Serbia and Montenegro':          # 2002, 2003 waves

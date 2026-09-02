@@ -437,6 +437,57 @@ Two facts to carry into any pooling of these five waves:
    ESS4/ESPS-5 catalog records do not say the frame was changed.  ESPS-5
    additionally drops Tigray from the represented population.
 
+** The =Rural= COLUMN changes meaning between waves (GH #683)
+
+The wave-by-wave universe statements below record what each round *covers*.
+This section records the operational consequence, which is a different fact and
+is the one that reaches users: *=sample().Rural= is not comparable across waves.*
+
+Measured cold on =development=:
+
+| wave    |    n | Urban | urban share | Rural |
+|---------+------+-------+-------------+-------|
+| 2011-12 | 3969 |   503 |       12.7% |  3466 |
+| 2013-14 | 5262 |  1939 |       36.8% |  3323 |
+| 2015-16 | 4954 |  1682 |       34.0% |  3272 |
+| 2018-19 | 6770 |  3655 |       54.0% |  3115 |
+| 2021-22 | 4959 |  2674 |       53.9% |  2285 |
+
+*This is not urbanisation, and it is not a reweighting.*  Note the *Rural*
+column: 3466 -> 3115 across a decade, essentially flat, while Urban grows
+seven-fold.  The sample is being *extended into urban strata*, not shifted.
+
+ESS1 was designed for "rural and small town areas" (see 2011-12 below).  So
+=Urban= in 2011-12 denotes *small towns only*, while from ESS2 it denotes *any
+urban area, including Addis Ababa*.  The same canonical value denotes two
+different populations, and until this note nothing in the config, the schema or
+this file said so.
+
+*** What breaks
+
+- A pooled regression with an urban dummy silently mixes two definitions.
+- Any wave-over-wave comparison of an urban/rural gap is confounded by the
+  definition shift.
+- The 12.7% -> 36.8% step between ESS1 and ESS2 is *mostly* that shift, not a
+  change in Ethiopia.
+
+*** Related, and not the same thing
+
+- =Rural= for 2013-14 and 2015-16 additionally *collapses* a small-town / large-
+  town distinction that exists in the source (3,621 households).  See the
+  corpus-wide audit in PR #682, which proposes a separate =SettlementType=
+  column for within-urban tiers rather than more =Rural= values.
+- ESS4 / ESPS-5 put *zero* of their urban households through the agriculture
+  questionnaire while urban is 54% of the sample, whereas ESS1--ESS3 did.  That
+  is a *module-conditionality* change, a second regime shift in the same
+  country, and it is likewise invisible at the API.
+
+*** Not claimed here
+
+The often-quoted "small town = under 10,000" threshold is *not* verified in
+this repo.  It should be confirmed against the survey report before anyone
+relies on it or repeats it in a tracked file.
+
 ** Wave by wave
 
 *** 2011-12 (ERSS / ESS1) -- rural and small towns only
@@ -1221,3 +1272,30 @@ block appears to be vestigial.  Left in place: "appears to be unused"
 is not evidence, and deleting config on that basis is exactly the move
 the repo forbids.  Someone should confirm it is dead and then remove
 it.
+
+** livestock: =SalesValue=, NOT a herd value and NOT a per-animal price
+
+The ESS section-8 roster records no current herd-value question in ANY wave.
+The only monetary field it carries is =ls_s8aq60= (W1/W2) / =ls_s8_2q14=
+(W4/W5): "What was the total value of sales of [LIVESTOCK] in the last 12
+months? (BIRR)".  That column is called *=SalesValue=* (canonical vocabulary
+in =lsms_library/data_info.yml=, =Columns: livestock:=).  It was called
+=Value= until 2026-08-24.
+
+Three properties, all load-bearing:
+
+- It is *ADDITIVE* over =animal= -- it is a total, so summing per-species rows
+  to a household total is legitimate.
+- It values *HeadSold*, not HeadCount, so it is a transaction FLOW.  It must
+  NOT be summed into a livestock-wealth aggregate; that would be =HerdValue=,
+  which Ethiopia does not have.
+- It is *NOT a per-animal price*.  Uganda / Malawi / Nigeria's
+  =ValuePerAnimal= is a reservation price per head; Ethiopia's is a total.  A
+  per-animal sale price here is =SalesValue / HeadSold=.
+
+*Measured, so the distinction is checkable*: among rows where the household
+sold nothing, only *2.0%* carry a positive value -- versus *98.0%* in Nigeria
+and *92.1%* in Malawi, where the price is asked regardless of any sale.
+Correlation with HeadCount does NOT separate these cases (neither a unit price
+nor a sales total tracks the herd size), which is why the sold-nothing
+conditional and the questionnaire wording are the tests to use.

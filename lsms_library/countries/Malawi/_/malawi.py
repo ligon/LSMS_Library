@@ -1656,10 +1656,11 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
 #                      the closest single reported "acquired" figure -- a
 #                      born+gifts+bought total would be a transformation).
 #   * HeadSold      -- ag_r16: head sold alive in the last 12 months.
-#   * Value         -- ag_r04: REPORTED per-head current value ("if you sold
-#                      one [LIVESTOCK] today, how much would you receive?").
-#                      This is the per-head value the survey records; a herd
-#                      value (Value x HeadCount) and a TLU rollup are
+#   * ValuePerAnimal -- ag_r04: REPORTED per-head current value ("If you sold
+#                      one of the [LIVESTOCK] today, how much would you
+#                      receive from the sale?").  A per-head price, so NOT
+#                      additive; a herd value (ValuePerAnimal x HeadCount)
+#                      and a TLU rollup are
 #                      transformations, NOT stored columns.  Malawi reports
 #                      no herd-total value column, so we carry the honest
 #                      per-head figure rather than fabricating a total.
@@ -1690,8 +1691,9 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
     All keyword args are RAW column names in ``df`` (or None when a wave
     lacks that field).  ``df`` must already carry an ``hhid`` string column.
     Returns a long DataFrame at grain (t, i, animal) with the reported item
-    columns (HeadCount, HeadAcquired, HeadSold, Value) and an internal
-    ``_animal_code`` used for the keep-filter / dedup.  NO aggregation.
+    columns (HeadCount, HeadAcquired, HeadSold, ValuePerAnimal) and an
+    internal ``_animal_code`` used for the keep-filter / dedup.  NO
+    aggregation.
     """
     species_map = _malawi_code_map('harmonize_species')
     code = pd.to_numeric(df[animalcode], errors='coerce').astype('Int64')
@@ -1723,7 +1725,7 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
         'HeadCount':    head.values,
         'HeadAcquired': acq.values,
         'HeadSold':     sold_n.values,
-        'Value':        val.values,
+        'ValuePerAnimal': val.values,
         '_owns':        owns.values,
     })
     # Keep a roster row when the household genuinely holds the species:
@@ -1751,7 +1753,7 @@ def assemble_livestock(t, pieces):
     Returns
     -------
     pd.DataFrame indexed (t, i, animal) with columns HeadCount,
-    HeadAcquired, HeadSold, Value.  Item-level reported values only.
+    HeadAcquired, HeadSold, ValuePerAnimal.  Item-level reported values only.
     """
     cat = pd.concat(pieces, ignore_index=True)
 
@@ -1765,13 +1767,13 @@ def assemble_livestock(t, pieces):
     # is 1:1 per wave), so a duplicate here means the household reported the
     # same species on two roster lines: sum the head movements (HeadCount /
     # HeadAcquired / HeadSold are additive counts of the same herd) and take
-    # the first reported per-head Value (a per-head price is not additive).
+    # the first reported ValuePerAnimal (a per-head price is not additive).
     cat['t'] = t
     grp = cat.groupby(['t', 'i', 'animal'], as_index=False, dropna=False).agg({
         'HeadCount':    'sum',
         'HeadAcquired': 'sum',
         'HeadSold':     'sum',
-        'Value':        'first',
+        'ValuePerAnimal': 'first',
     })
     out = grp.set_index(['t', 'i', 'animal'])
     assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"

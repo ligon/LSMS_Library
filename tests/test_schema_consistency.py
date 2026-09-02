@@ -217,3 +217,57 @@ class TestNoDuplicateYamlKeys:
             f"{path.parent.parent.name}: duplicate keys under 'Data Scheme': "
             f"{duplicates}"
         )
+
+
+class TestCountryConfigIsReachable:
+    """A country's table registry must live in a filename the framework reads.
+
+    GH #684: `Peru/_/` held a fully-populated `Data Scheme:` block inside a
+    file called `data_info.yml`.  `Country.resources` reads `data_scheme.yml`,
+    so `Country('Peru').data_scheme` was `[]`, every table was unreachable, and
+    Peru contributed ZERO cells to the coverage matrix.
+
+    The failure was silent and TOTAL, which is why it survived so long: an
+    empty `data_scheme` produces no tables, so there is no build to fail.  The
+    country could not even be graded `broken` -- a grader that iterates over
+    declared features cannot see a country that declares none.  Every guard we
+    had sat downstream of the config that never loaded.
+
+    `data_info.yml` is the WAVE-level extraction spec (`{country}/{wave}/_/`).
+    At COUNTRY level (`{country}/_/`) it is always a mistake, and the mistake
+    is invisible at runtime, so it is asserted here instead.
+    """
+
+    def test_no_country_level_data_info_yml(self):
+        """`{country}/_/data_info.yml` is never read; the registry is `data_scheme.yml`."""
+        offenders = sorted(
+            p.parent.parent.name
+            for p in countries_root().glob("*/_/data_info.yml")
+        )
+        assert not offenders, (
+            f"{offenders}: a COUNTRY-level `_/data_info.yml` is never read by "
+            f"`Country.resources`, which loads `_/data_scheme.yml`.  Any "
+            f"`Data Scheme:` block in it is dead text and the country's tables "
+            f"are silently unreachable (GH #684).  Rename the file to "
+            f"`_/data_scheme.yml`.  (Wave-level `{{wave}}/_/data_info.yml` is "
+            f"correct and unaffected.)"
+        )
+
+    @pytest.mark.parametrize(
+        "path",
+        ALL_SCHEME_PATHS,
+        ids=[p.parent.parent.name for p in ALL_SCHEME_PATHS],
+    )
+    def test_data_scheme_declares_at_least_one_table(self, path):
+        """A `Data Scheme:` block that declares nothing makes the country invisible."""
+        data = _load_yaml(path)
+        scheme = data.get("Data Scheme") or {}
+        country = path.parent.parent.name
+        assert scheme, (
+            f"{country}: `Data Scheme:` is empty, so `Country({country!r})"
+            f".data_scheme` is `[]` and the country contributes no cells to "
+            f"the coverage matrix -- it cannot even be graded `broken` "
+            f"(GH #684).  Declare its tables, or remove `{path}` so the "
+            f"country is reported as `unconfigured` instead of silently "
+            f"absent."
+        )

@@ -258,3 +258,117 @@ def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     assert x.index.is_unique, "Non-unique index."
 
     return x
+
+
+# ---------------------------------------------------------------------------
+# individual_education (GH #171)
+# ---------------------------------------------------------------------------
+#
+# `df_edit` hook for the `individual_education` table, shared by ALL THREE
+# waves: `Wave.formatting_functions` starts from `Country.formatting_functions`
+# (which loads this module, `ghanasps.py`) and only then overlays the wave's own
+# `mapping.py`, so defining the hook once here binds it everywhere.  Each wave's
+# `data_info.yml` supplies the same three columns under the same names, which is
+# what makes one implementation legitimate rather than merely convenient.
+#
+# WHY A HOOK AT ALL.  The YAML `mapping:` machinery maps ONE source column onto
+# one target.  GSPS splits the attainment answer across three:
+#
+#   attended     ever attended school (Yes/No)
+#   highestgrade highest grade successfully completed  -- the primary ladder
+#   highestqual  highest educational qualification     -- the only ladder that
+#                reaches tertiary in waves 2 and 3
+#
+# Measured cost of wiring `highestgrade` alone (full numbers in CONTENTS.org):
+# 12,827 people whom the survey POSITIVELY RECORDS as never having attended
+# school would have a null grade and be deleted by `_finalize_result`'s
+# `dropna(how='all')` -- in wave 2 that would report `No education` for 9.6% of
+# the table when the survey says 24.7% -- and a further 501 (W2) + 775 (W3)
+# people would be reported `Unknown` when the survey knows they hold a degree,
+# diploma or HND.  Both are "an empty or wrong answer wearing the shape of a
+# right one".
+#
+# The two ladders are COMPLEMENTARY, not redundant, and that is why the
+# fallback is narrow rather than a max().  Waves 2 and 3 have NO tertiary rung
+# in `highestgrade` at all -- every tertiary person is dumped into the
+# 'Other - Specify' / 'Other (please specify)' bucket, whose qualification is
+# non-null for 501/501 (W2) and 774/775 (W3) and overwhelmingly tertiary.
+# Below that bucket the qualification is essentially a function of the grade
+# (W2: 7,470 people with qual 'None' against 7,488 whose grade is at or below
+# JSS2/M3), so substituting it there would add nothing and would risk
+# overriding an explicit grade with an exam result.
+
+# Harmonized qualification values that carry no information the grade ladder
+# did not already have.  'No education' is excluded because `highestqual`
+# 'None' means "holds no certificate", NOT "never went to school" -- a P6
+# leaver has qual 'None'.  Substituting it would silently demote them.
+_EDU_UNINFORMATIVE_QUAL = frozenset({'Unknown', 'No education'})
+
+
+def individual_education(df):
+    """Resolve `Educational Attainment` from grade + qualification + attended.
+
+    Receives the frame `Wave.grab_data` has already extracted and indexed as
+    `(t, i, pid)`, carrying:
+
+      Educational Attainment  -- harmonized `highestgrade`
+      _qual                   -- harmonized `highestqual`
+      _attended               -- raw Yes/No screener
+
+    Resolution order, and why:
+
+    1. Qualification fallback, applied where the grade is absent or resolved to
+       `Unknown` (i.e. it was the survey's own 'Other' bucket).  A qualification
+       that is itself `Unknown` or `No education` is not informative here (see
+       `_EDU_UNINFORMATIVE_QUAL`) and is skipped, leaving the row for step 2.
+    2. `attended == 'No'` -> `No education`, for rows still unresolved.  This is
+       the never-schooled case the canonical vocabulary explicitly says to KEEP
+       (canonical_education_labels.org, "Never-schooled handling"), and it is
+       ~exactly complementary to a null grade: in waves 2 and 3 every
+       `attended == 'No'` row has a null grade, and in wave 1 4,849 of 4,878 do.
+       Applied AFTER step 1 so that wave 1's rows which answer 'No' yet carry a
+       real qualification keep the qualification rather than being flattened.
+
+    Rows still unresolved keep NA and are dropped downstream by
+    `_finalize_result`'s `dropna(how='all')` -- the survey recorded nothing for
+    them.  In waves 2 and 3 those are overwhelmingly children under the
+    module's age floor of 3.
+
+    Finally drops the five wave-1 rows whose person id is null.  `format_id`
+    turns a NaN `s1fi_hhmid` into None, which would (a) fail the framework's
+    `no_null_index_levels` check and (b) make the index non-unique -- three of
+    the five share `hhno` 108294010.  Four carry no education data at all; the
+    fifth (hhno 105159025) records 'Yes'/P6/'None' and IS a real loss, recorded
+    in CONTENTS.org rather than hidden.  There is no way to attach it to a
+    person: S1D.dta has no member with that id.
+    """
+    if 'Educational Attainment' not in df.columns:
+        return df
+
+    df = df.copy()
+    ea = df['Educational Attainment'].astype(object)
+    ea = ea.where(ea.notna(), pd.NA)
+
+    # 1. qualification fallback
+    if '_qual' in df.columns:
+        qual = df['_qual'].astype(object)
+        qual = qual.where(qual.notna(), pd.NA)
+        usable = qual.notna() & ~qual.isin(_EDU_UNINFORMATIVE_QUAL)
+        unresolved = ea.isna() | ea.eq('Unknown')
+        ea = ea.mask(unresolved & usable, qual)
+
+    # 2. never-schooled
+    if '_attended' in df.columns:
+        att = df['_attended'].astype(str).str.strip().str.casefold()
+        ea = ea.mask(ea.isna() & att.eq('no'), 'No education')
+
+    df['Educational Attainment'] = ea
+    df = df.drop(columns=[c for c in ('_attended', '_qual') if c in df.columns])
+
+    # A null person id cannot be a row of a (t, i, pid) table.
+    if df.index.names is not None and 'pid' in list(df.index.names):
+        keep = pd.notna(df.index.get_level_values('pid'))
+        if not keep.all():
+            df = df[keep]
+
+    return df

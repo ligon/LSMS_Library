@@ -26,6 +26,7 @@ from .yaml_utils import load_yaml
 from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
 from .errors import LabelUnavailableError
+from . import population as _population
 
 
 def _load_global_columns() -> dict[str, dict[str, Any]]:
@@ -421,6 +422,43 @@ class Feature:
             if isinstance(meta, dict) and meta.get("required", False)
         ]
 
+    def _attach_population(self, result: pd.DataFrame,
+                           captured: dict[str, dict[str, Any]]) -> None:
+        """Re-attach the population record to the assembled frame, and warn if
+        the pool mixes materially different universes (GH #603/#601).
+
+        Only the countries actually present in *result* contribute: a frame
+        dropped by the modal-index-shape filter above is not in the answer, so
+        it must not be in the answer's metadata or in the warning.
+
+        The warning is advisory and one-per-call.  It NEVER removes a row --
+        see the note at the call site.
+        """
+        try:
+            try:
+                kept = set(result.index.get_level_values("country").unique())
+            except (KeyError, ValueError):
+                kept = set(captured)
+            _population.merge_attrs(
+                result, [v for k, v in captured.items() if k in kept])
+            report = _population.pool_report(
+                _population.records_from_attrs(result), self.table_name)
+        except Exception as exc:
+            # A metadata annotation must never break a data call -- the same
+            # rule `population.attach` obeys on the Country side.  Loud, though:
+            # a silently absent record would be indistinguishable from a
+            # homogeneous pool, which is the one thing this must not look like.
+            warnings.warn(
+                f"{self.table_name}: could not attach the population record "
+                f"({type(exc).__name__}: {exc}). The result is unaffected, but "
+                f"df.attrs['population'] may be incomplete and no comparability "
+                f"warning was computed."
+            )
+            return
+        if report:
+            warnings.warn(report, _population.PopulationHeterogeneityWarning,
+                          stacklevel=3)
+
     def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None,
                  currency: str | None = 'index', numeraire: str | None = None,
                  **kwargs: Any) -> pd.DataFrame:
@@ -516,6 +554,28 @@ class Feature:
         # df.attrs marker -- distinct from genuine per-country build failures.
         labels_unavailable: list[str] = []
 
+        # The population record each country's frame arrived with (GH #603).
+        # Captured HERE, before _harmonize_country_frame / pd.concat, and
+        # re-attached after assembly for the KEPT frames only -- so `attrs`
+        # describes what the caller actually receives.
+        #
+        # The capture is not belt-and-braces, and the reason is a RULE, not a
+        # per-method quirk.  Measured on the pinned pandas 3.0.2 (all seven
+        # cells are pinned by tests/test_population.py::TestAttrsSurvival):
+        #
+        #     `attrs` survive only when every input AGREES; any disagreement --
+        #     including one side having none -- yields {}.
+        #
+        # So `merge` with matching attrs PRESERVES, and a single-input op like
+        # `set_index` is trivially safe.  What makes the drop certain here is
+        # that the population records DIFFER BY DESIGN -- one per country, which
+        # is the entire point of the record -- so the final `pd.concat` below
+        # lands in the {} case on every call with more than one country.  Do not
+        # "simplify" this away after testing concat with matching inputs and
+        # watching it preserve.  Same family of hazard as the `id_converted` bug
+        # (CLAUDE.md, "Panel ID Transitive Chains and the attrs Flag").
+        captured_population: dict[str, dict[str, Any]] = {}
+
         for name in targets:
             try:
                 c = Country(name, trust_cache=effective_trust_cache)
@@ -544,6 +604,11 @@ class Feature:
                         f"No data for {self.table_name} in {name}"
                     )
                     continue
+                captured_population[name] = {
+                    k: df.attrs[k] for k in
+                    (_population.ATTRS_KEY, _population.ATTRS_RESOLUTION_KEY)
+                    if k in df.attrs
+                }
                 # Coerce toward the canonical shape so one country's stray
                 # column / extra index level can't collapse the whole
                 # concatenated index to object tuples (GH #325).
@@ -573,9 +638,9 @@ class Feature:
             warnings.warn(
                 f"{self.table_name}: labels={kwargs.get('labels')!r} unavailable "
                 f"for {len(labels_unavailable)} country(ies) {labels_unavailable} "
-                f"-- they curate no such food-label column and were dropped from "
-                f"the assembly (kept {n_kept}). Add the column or pass a country "
-                f"subset to silence this."
+                f"-- they curate no such label column, or lack the target "
+                f"entirely, and were dropped from the assembly (kept {n_kept}). "
+                f"Add the column or pass a country subset to silence this."
             )
             result.attrs['labels_unavailable'] = list(labels_unavailable)
             return result
@@ -613,6 +678,13 @@ class Feature:
 
         result = pd.concat(frames)
         n_kept = result.index.get_level_values("country").nunique()
+
+        # GH #603/#601 -- SURFACE, then WARN.  Never fence: every country that
+        # got this far is in `result`, and the population record is metadata
+        # about it, not a filter on it.  #603 proposed excluding `specialized`
+        # frames by default and @ligon declined; a default that silently drops
+        # data is the same disease as one that silently pools it.
+        self._attach_population(result, captured_population)
 
         # GH #326: pd.concat can leave the (structurally-consistent) index
         # levels UNNAMED, forcing callers to index positionally instead of

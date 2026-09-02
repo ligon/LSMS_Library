@@ -2,8 +2,8 @@
 
 Each EACI wave's ``Mali/<wave>/_/livestock.py`` writes a parquet indexed by
 ``(t, i, animal)`` with the reported item-level columns (HeadCount,
-HeadAcquired, HeadSold, Value).  The livestock module lives in the EACI
-waves only (2014-15 EACIS4A_p2 / s4a, 2017-18 eaci17_s8ap2 + eaci17_s8b1p2 /
+HeadAcquired, HeadSold, SalesValue).  The livestock module lives in the
+EACI waves only (2014-15 EACIS4A_p2 / s4a, 2017-18 eaci17_s8ap2 + eaci17_s8b1p2 /
 s8a+s8b1).  The EHCVM waves (2018-19, 2021-22) carry no livestock roster, so
 they contribute nothing — the same wave split as crop_production /
 plot_inputs.

@@ -33,7 +33,8 @@ import pandas as pd
 sys.path.append('../../_')          # ghanalss.py (country-level helpers)
 sys.path.append('.')                # mapping.py  (this wave's i() helper)
 import mapping
-from lsms_library.local_tools import df_from_orgfile, to_parquet, get_dataframe
+from lsms_library.local_tools import (df_from_orgfile, format_id, get_dataframe,
+                                      to_parquet)
 
 t = '1988-89'
 # Single, degenerate recall window for this 1980s wave (design doc D3).
@@ -62,7 +63,14 @@ def _load_side(fn, code_col, value_col, source):
     df['i'] = df['HID'].apply(mapping.i)
 
     # Harmonized food item.
-    df['j'] = (df['FOODCD'].astype('string')
+    #
+    # Normalize via format_id, NOT .astype('string').  The label table's keys
+    # are bare integer strings ('301'), and since GH #704 the .DAT reader
+    # honours Stata's '.' missing marker, so FOODCD arrives as float64 --
+    # .astype('string') would yield '301.0' and miss every code, shipping the
+    # raw number as the food label.  format_id strips the '.0' (its documented
+    # job) and returns None for NaN.
+    df['j'] = (df['FOODCD'].apply(format_id).astype('string')
                            .replace(labelsd[code_col]['Preferred Label']))
 
     # Per-recall-period monetary value -> Expenditure (== Quantity, u='Value').

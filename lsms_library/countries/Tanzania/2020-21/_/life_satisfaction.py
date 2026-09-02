@@ -72,6 +72,12 @@ long = long.dropna(subset=['Satisfaction'])
 long['t'] = '2020-21'
 out = long[['t', 'i', 'Domain', 'Satisfaction']].set_index(['t', 'i', 'Domain'])
 
+# GH #637 key-soundness review -- key SOUND, collapse is dead code.
+# The head reduction is what makes (t, i, Domain) a key, so it was checked
+# directly: hh_sec_b.dta has EXACTLY ONE hh_b05=='HEAD' row per household
+# (4,709 heads over 4,709 households, 0 with more than one), and hh_sec_g.dta
+# is (y5_hhid, indidy5)-unique, so the join cannot fan out.  .first() is never
+# called on a cold build.
 if not out.index.is_unique:
     out = out.groupby(level=out.index.names).first()
 

@@ -7,7 +7,18 @@ The Ghana Living Standards Survey (Ghana LSS) is one of two major surveys we hav
 The GLSS is conducted by the Ghana Statistical Service (GSS).  Seven
 rounds span 1987--2017.  Each round is designed as an independent
 nationally representative cross-section; there is no rotating panel
-or refreshment sample mechanism.
+or refreshment sample mechanism --- /from GLSS3 onward/.
+
+/Corrected 2026-08-24./  That sentence used to carry no qualifier, and as
+written it was *false for the GLSS1 -> GLSS2 pair*.  GSS's own GLSS3 report
+(printed p.110) states that a rotating panel /was/ the design for rounds 1--2:
+half the GLSS1 workloads were retained for re-interview in GLSS2 and the other
+half drawn fresh from replicate 6 of the master sample.  The rotation was
+abandoned at GLSS3, which is where the unqualified claim becomes true.  Both
+sides are quoted under /Tensions with the existing text in this file/ s1; the
+=Panel Linkage (GLSS1 to GLSS2)= section records the 714 panel households
+empirically.  *Not deleted --- qualified*, because the sentence is right for
+five of the seven rounds.
 
 - [[https://microdata.worldbank.org/index.php/catalog/2313][GLSS1 (1987-88)]]
 - [[https://microdata.worldbank.org/index.php/catalog/2314][GLSS2 (1988-89)]]
@@ -22,8 +33,30 @@ or refreshment sample mechanism.
 ** Overview
 
 Two-stage stratified cluster sample.  Enumeration Areas (EAs) from
-the national census serve as the PSU, with a fixed take of
-households per EA.
+the national census serve as the PSU.
+
+*The take of households is fixed per /workload/ and per /stratum/, NOT
+per EA.*  A second PPS stage (on the ratio of listed households to
+1984-census households) allocates workloads among the selected EAs, so
+an EA receives 0, 1, 2 or 3 workloads.  GLSS3: 15 households per urban
+workload, 10 per rural workload, 407 workloads across 366 EAs that
+received at least one.  Main report Appendix 1 (=1991-92/Documentation/pdf/G3report.pdf=,
+printed p.109) states it verbatim for GLSS1's 16-household workloads:
+
+#+begin_quote
+an EA, for example, which received two workloads provided 32 households for the sample.
+#+end_quote
+
+/Corrected 2026-08-22./  This subsection previously read "with a fixed
+take of households per EA", and that imprecision was load-bearing: it
+led a reader to infer that a =clust= code /bundles/ EAs (from GLSS1/2's
+32 = 2x16) and to write that inference into a config comment.  *That
+inference is refuted*: =clust= /is/ the EA -- one EA, two workloads.
+The decisive check is that take-15 clusters are 100 per cent urban
+while take-20 clusters are 100 per cent rural, which no bundling story
+produces.  See =slurm_logs/ghana_audit/FINDINGS_glss3_selfweighting.org=
+(PR #715) for the full reconciliation, which matches GSS's own design
+table cell-for-cell.
 
 ** Strata
 
@@ -50,12 +83,119 @@ page or location file: =weight= in =sec0.dta= (GLSS5), =weight= in
 =g6loc_edt.dta= (GLSS6), =WTA_S= in =g7sec0.dta= (GLSS7).  These
 sum to the national population.
 
+=panel_weight= equals =weight= for all waves.
+
+/Corrected 2026-08-24./  This used to read "Since every round is an
+independent cross-section, there is no panel weight."  *The premise is false
+for GLSS1 -> GLSS2* (see /Survey Program/ above and /Tensions/ s1): those two
+rounds are a rotating panel, half retained.  The mirroring is therefore
+a *house convention*, not a consequence of independent sampling --- and for
+GLSS2 it is thin, because the retained half is not distinguished from the
+fresh half, so =panel_weight= does no real longitudinal work there.
+=PANELC.DAT= (shipped in both =1987-88/Data/= and =1988-89/Data/=) carries the
+GLSS1 -> GLSS2 linkage if a genuine panel weight is ever built; it is what the
+=Panel Linkage= section's 714 households are derived from.  The per-wave
+docstrings in =1987-88/_/mapping.py= and =1988-89/_/mapping.py= state the same
+caveat at the point of use (GH #713, #714).
+
+*Scale note (2026-08-22):* the =sample= feature now returns weights
+rescaled to within-wave mean 1, so the GLSS5--GLSS7 expansion weights
+above no longer read back as population counts through the API.  The
+raw values are unchanged in the source and in the cached parquet.  See
+the SUPERSEDED subsection below.
+
+*** GLSS3 self-weighting -- the citations
+:PROPERTIES:
+:ADDED: 2026-08-22
+:END:
+
+The "GLSS3 ... is constant 1.0 (self-weighting)" claim above was
+correct but *uncited* -- it read as an observation about the data with
+a parenthetical interpretation attached, and nothing recorded how the
+interpretation was reached.  Under this repo's rule against unevidenced
+claims it could not be relied on, and in fact it was not (PR #714
+asserted the opposite reading).  The citations, from GSS's own shipped
+documents:
+
+- =1991-92/Documentation/pdf/g3usersg.pdf= (Data User's Guide, PDF p.3);
+- =1991-92/Documentation/pdf/G3report.pdf= (main report, printed p.1 /
+  PDF p.19; Appendix 1, printed pp.109--113).
+
+*Two sentence variants exist across these sources and must not be
+blended.*  Quoting the main report (printed p.1) cleanly:
+
+#+begin_quote
+A multi-stage sampling technique was used in selecting the GLSS sample. Technical details of the sample design are given in Appendix 1.  Initially, 4565 households were selected for GLSS3, spread around the country in 407 small clusters;  in general, 15 households were taken in an urban cluster and 10 households in a rural cluster.  The actual achieved sample was 4552 households.  Because of the sample design used, and the very high response rate achieved, the sample can be considered as being self-weighting, though in the case of expenditure data (as discussed below) weighting of the expenditure values is required.
+#+end_quote
+
+(The User's Guide's variant reads "The sample designed used for the
+GLSS3 ... /should be done/" -- sic; the report's reads "Because of the
+sample design used ... /is required/".)
+
+*The response rate the claim conditions on is 99.72 per cent* --
+4,552 of 4,565 (main report Appendix 1, Table 3, printed p.113).  That
+is the second of the two conditions GSS attaches; the first is the
+design itself.
+
+*CAVEAT -- the carve-out is a CPI deflator, not a sampling weight.*
+The clause "weighting of the expenditure values is required" is
+routinely truncated out of short quotations, and someone will otherwise
+read it as contradicting the constant =weight=.  It resolves (Appendix
+1, "Re-weighting", printed pp.113--114) to a *monthly national CPI
+deflator to March 1992 prices*, keyed on interview date -- e.g. the
+September 1991 factor is 17925.4/17066.4 = 1.0503, identical for every
+household interviewed that month.  It is orthogonal to =weight= and
+must *never* be wired as one.  =POV_GH.DTA= carries =month= and =year=,
+so a user who wants it can reconstruct it.
+
+*** SUPERSEDED (2026-08-22): "only expansion weights, to avoid mixing"
+
+The decision recorded here until 2026-08-22 read, verbatim:
+
+#+begin_quote
 The =sample= feature only includes expansion weights (GLSS5--GLSS7)
 to avoid mixing weight types.  GLSS1--GLSS4 have =weight= and
 =panel_weight= as NaN.
+#+end_quote
 
-Since every round is an independent cross-section, there is no
-panel weight.  =panel_weight= equals =weight= for all waves.
+*The hazard it guarded against is now handled library-wide, so the
+workaround is no longer needed.*  =Country._finalize_result= rescales
+every wave's =weight= and =panel_weight= to within-wave mean 1 at API
+time, dividing by that wave's own mean over non-null values (see
+=lsms_library/country.py::_normalise_sample_weights= and =CLAUDE.md=
+§"=sample()= and Cluster Identity").  A normalised column is divided by
+1.0000 and is unchanged; an expansion column becomes normalised.  The
+two types are therefore indistinguishable at the API and cannot be
+mixed by a user summing across waves.  Raw values remain in the cached
+parquet.
+
+*Cost of the superseded workaround: four waves of usable weights* --
+GLSS1, GLSS2, GLSS3 and GLSS4 all have =weight= and =panel_weight=
+NaN today, and =null_read_audit= reports exactly that ("GhanaLSS/sample/weight
+and panel_weight are empty in four of six waves", =CLAUDE.md=).  GLSS3's
+constant 1.0 and GLSS4's genuine probability weights *can now be wired*
+without creating a mixed-scale table.
+
+*This entry does not wire them.*  PR #714 (draft) owns GLSS3 + GLSS4;
+GLSS1/GLSS2 have no weight variable in the data at all, so for those two
+the NaN is the honest answer and stays.
+
+*Normalisation makes the two /scales/ comparable; it does not make the
+two /designs/ the same.*  GLSS3 was deliberately amended to /restore/ a
+self-weighting sample by a published procedure and GLSS4 was not --
+Poverty Profile Appendix 4 (=1991-92/Documentation/pdf/PovProf.pdf=,
+printed p.57):
+
+#+begin_quote
+The latter [restoring a self-weighting sample] was done for GLSS 3 following a procedure devised by Scott and Amenuvegbe (1991).
+
+The same procedure though was not applied for GLSS 4.
+#+end_quote
+
+That documented design change is why GLSS3 ships a constant weight and
+GLSS4 a real distribution (min 0.127 / median 0.85 / max 6.02), and the
+contrast is a survey fact that must survive the rescaling, not be read
+as an artefact of it.
 
 ** Cluster (PSU) variable
 
@@ -78,27 +218,40 @@ without an explicit mapping file.
 
 | Round  | Source file        | Variable | Values                           |
 |--------+--------------------+----------+----------------------------------|
-| GLSS1  | ---                | ---      | Not available                    |
-| GLSS2  | ---                | ---      | Not available                    |
+| GLSS1  | BID Appendix I     | =UrbRur= | U / R / SU (cluster-level)       |
+| GLSS2  | BID Appendix I     | =UrbRur= | U / R / SU (cluster-level)       |
 | GLSS3  | =POV_GH.DTA=      | =loc2=   | 1=Urban, 2=Rural (numeric)       |
 | GLSS4  | =SEC0A.DTA=        | =loc2=   | 1=Urban, 2=Rural (numeric)       |
-| GLSS5  | ---                | ---      | Not in cover page; in =pov_gh5=  |
+| GLSS5  | =parta/sec7.dta=   | =loc2=   | urban, rural (Stata value labels) |
 | GLSS6  | =g6loc_edt.dta=    | =loc2=   | Rural, Urban (string)            |
 | GLSS7  | =g7sec0.dta=       | =urbrur= | Rural, Urban (string)            |
 
-GLSS5 cover page (=sec0.dta=) has no urban/rural variable; =Rural= is
-NaN for that wave.  The cluster-level =loc2= is available in
-=pov_gh5.dta= and in =cluster_features= for GLSS5.
+GLSS5's cover page (=parta/sec0.dta=) has no urban/rural variable.  =Rural= was
+=NaN= for that wave until GH #659 (PR #687) wired it from =loc2= in
+*=parta/sec7.dta=*, which ships at exactly the =sample= grain with its own
+Stata value labels ={1: urban, 2: rural}=; measured cold 2026-08-22, 2005-06
+=sample().Rural= has *zero* nulls.  (This paragraph previously said "=Rural= is
+NaN for that wave"; that is stale.)
+
+*Do not reach for =aggregates/pov_gh5.dta= here.*  It is a documented decoy --
+same 8,687 rows and same distribution, but *no =hhid= column*, so there is
+nothing to join on.  =parta/sec2a.dta= carries a =loc2= that is 100% NULL.
+Both are recorded in =2005-06/_/data_info.yml=.
+
+GLSS1/GLSS2 have *no urban/rural variable in the microdata at all* -- see
+/Trap 3/ and /The =SU= -> =Rural= fold/ below.  Their =Rural= comes from BID
+Appendix I at the *cluster* level and is broadcast to the households of each
+cluster.  The Appendix's third value =SU= is folded onto =Rural=.
 
 ** =sample= feature source variables
 
 | Round | File             | i        | v     | weight   | strata | Rural  |
 |-------+------------------+----------+-------+----------+--------+--------|
-| GLSS1 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | ---    |
-| GLSS2 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | ---    |
+| GLSS1 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | Appendix I (broadcast) |
+| GLSS2 | =Y00A.DAT=       | =HID=    | =CLUST= | ---    | ---    | Appendix I (broadcast) |
 | GLSS3 | =POV_GH.DTA=     | =[clust,nh]= | =clust= | --- | =region= | =loc2= |
 | GLSS4 | =SEC0A.DTA=      | =[clust,nh]= | =clust= | --- | =region= | =loc2= |
-| GLSS5 | =parta/sec0.dta= | =hhid=   | =clust= | =weight= | =region= | --- |
+| GLSS5 | =parta/sec0.dta= | =hhid=   | =clust= | =weight= | =region= | =loc2= (=parta/sec7.dta=) |
 | GLSS6 | =PARTA/g6loc_edt.dta= | =HID= | =clust= | =weight= | =region= | =loc2= |
 | GLSS7 | =g7sec0.dta=     | =[clust,nh]= | =clust= | =WTA_S= | =region= | =urbrur= |
 
@@ -613,7 +766,10 @@ Consequences a user must not miss:
 
 ** Tensions with the existing text in this file
 
-Flagged, both sides quoted, *not* resolved.
+Flagged, both sides quoted.  *s1 is now resolved in place* (2026-08-24) --- the
+two assertions it contradicted have been qualified where they stand, rather
+than left to be found 700 lines later; the tension is kept below with both
+quotes intact.  s2--s4 remain *unresolved*.
 
 *** 1. "no rotating panel or refreshment sample mechanism"
 
@@ -699,12 +855,19 @@ recorded so the hedge can be retired for GLSS5 and GLSS6 at least.
 
 * Panel Linkage (GLSS1 to GLSS2)
 
-Despite being designed as independent cross-sections, a sub-sample
-of GLSS1 households was re-interviewed in GLSS2.  The linkage is in
+A sub-sample of GLSS1 households was re-interviewed in GLSS2, and it
+was *by design, not an accident of fieldwork*.  The linkage is in
 =PANELC.DAT= (present in both the 1987-88 and 1988-89 Data
 directories), mapping =HID1= (GLSS1) to =HID2= (GLSS2) at the
 person level.  Deduplicating to household level yields 714 panel
 households.
+
+/Corrected 2026-08-24./  This paragraph opened "Despite being designed as
+independent cross-sections ...", which framed the panel as an anomaly.  GSS's
+GLSS3 report (printed p.110) states the rotating panel /was/ the intended
+design for rounds 1--2 --- half the GLSS1 workloads retained, half replaced ---
+so the re-interviews are the design working, not surviving it.  See /Survey
+Program/ and /Tensions/ s1.
 
 No cross-wave linkage exists for GLSS3 onward --- cluster numbering
 schemes changed between rounds and no prior-wave household ID
@@ -912,15 +1075,739 @@ rounds.  Source files and label handling:
 Still NOT wired (genuine blockers, not feature gaps to close cheaply):
 
 - *1987-88 / 1988-89* (GLSS1/GLSS2): the education module lives in
-  =Y02A.DAT=/=Y02B.DAT= fixed-format =.DAT= files (parsed via =.DCT=
-  dictionaries), which are not in the local DVC blob cache and carry no
-  embedded value labels.  Wiring would require materializing those blobs and
+  =Y03I.DAT=/=Y03II.DAT= fixed-format =.DAT= files (parsed via =.DCT=
+  dictionaries), which carry no
+  embedded value labels.  Wiring would require
   hand-building a GLSS1/2 grade→label map from the questionnaire — but the
   GLSS1/2 questionnaires are scanned-image PDFs with no text layer (same
   blocker noted for =housing= above), so the codes cannot be reliably decoded.
+
+  /Corrected 2026-08-20 (was =Y02A.DAT=/=Y02B.DAT=)./  =Y02A=/=Y02B= are the
+  *housing* module, not education.  =Y03I.DCT= carries =READ WRITE ARITH
+  APPREN SCH GRADE TECH DIPLOMA SCHTYP …= and =Y03II.DCT= carries =EXPTA
+  EXPSCL EXPTR EXPTUI SCHOLAR …=, matching the LSMS Basic Information Document
+  (=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf=,
+  §2.1): "Section 3 SCHOOLING / 3I ATTENDANCE / 3II EXPENSES".  =Y02A.DCT= is
+  =DOMICILE COMPOUND NBLDG APT ROOMS RESWORK YRSRES …= and =Y02B.DCT= is
+  =OWNHH RENTED … DWATER … TOILET … LIGHT ELECM … FUEL WOOD …=, matching
+  "Section 2 HOUSING / 2A TYPE OF DWELLING / 2B HOUSING EXPENSES".  Also
+  corrected: the blobs *are* fetchable — a sweep on 2026-08-20 pulled all 77
+  GLSS1 and 93 GLSS2 =.DCT= dictionaries and all 155 GLSS3 =.DTA= files
+  through =get_data_file()= with zero failures.
 - *1991-92* (GLSS3): the cached =S2.DTA= blob is a cover/control file
   (interviewer codes + interview dates), NOT the Section-2 education roster.
   The GLSS3 person-level education module is among the ~140 un-cached blobs,
   GLSS3 =.dta= files carry NO embedded value labels, and the correct file is
   not identifiable from the cached set, so it is left unwired rather than
   guessed.
+
+* Categorical decodes: three traps this country has now sprung three times (2026-08-19)
+
+Read this before touching any =mapping.py= or any =Code | Label= table here.
+
+** Trap 1: a bare =get_categorical_mapping= returns an EMPTY dict, silently
+
+=local_tools.get_categorical_mapping(tablename=X)= called *without* a
+value-column keyword returns =\{\}=.  It passes =idxvars='Code'= and no myvars,
+so =df_data_grabber= drops the Label column and the =.squeeze()= yields
+nothing.  Nothing raises.  Every lookup then misses, returns =pd.NA=, and the
+column ships 100% null while the build reports success.
+
+This has bitten GhanaLSS *three separate times*:
+
+| GH        | what died                                       | fixed for      |
+|-----------+-------------------------------------------------+----------------|
+| #372/#377 | =region_dict= -- Region/Birthplace all NA       | 1991-92 only   |
+| #348      | the 1991-92 =units= decode                      | 1991-92        |
+| (2026-08) | region/rural/relationship in the other 3 waves  | all            |
+
+The first two fixes were applied to *one wave each*, so 1987-88, 1988-89 and
+1998-99 kept calling the bare form.  Consequence, measured on a cold cache
+before the 2026-08-19 fix:
+
+- =cluster_features= graded *dropped* in all three waves.  1987-88 returned
+  *zero rows* (its region inference groups by an all-NA key, and =groupby=
+  drops it); the other two returned frames whose every declared column was null.
+- =household_roster= shipped =Birthplace=, =Relationship=, =Generation=,
+  =Distance= and =Affinity= 100% NULL in those three waves -- *56,817 people*
+  with no kinship data.  The last three are *required* columns in
+  =lsms_library/data_info.yml=.
+- =sample= shipped =strata= and =Rural= 100% null for 1998-99.
+
+*Use =local_tools.code_label_map= instead.*  It passes the value column and
+keys the result by *both* the string and the int form of each numeric code --
+because the second half of this trap is key types: =df_data_grabber=
+stringifies the Code index via =format_id= (so keys are ='1'=), while wave
+mapping functions variously look up with =int(value)= or =str(value)=.  Both
+historical bugs were partly key-type mismatches.
+
+** Trap 2: GLSS4's relationship scheme is NOT GLSS1's
+
+The country-level =relationship= table in =_/categorical_mapping.org= has
+*fourteen* codes and cites *GLSS1*'s data dictionary
+(=catalog/2313/data-dictionary/F184?file_name=y01a=).  It is correct for
+GLSS1 and GLSS2 -- verified against the raw data, where =REL= takes codes 1--14
+and code 1 occurs 3,136 / 3,192 times = each wave's household count.
+
+*It is not correct for GLSS4.*  1998-99's =rel= (=SEC1.DTA=, variable label
+"Relationship to HH head") takes only *nine* codes, 1--9, with code 1 occurring
+5,998 times = the household count.  =SEC1.DTA= carries *no* embedded Stata
+value labels (=value_labels() == []=), so the GLSS4 list has to come off the
+questionnaire.
+
+1998-99 =Relationship= is therefore *deliberately left unmapped* rather than
+decoded through a table that would silently mis-label it.  A null column is
+honest; a wrong kinship label propagates into
+=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  If you
+add the GLSS4 list, add it as a *wave-level* table in
+=1998-99/_/categorical_mapping.org= and search the wave dir *first*, so it
+cannot fall through to the GLSS1 table.  (The same wave-first discipline is why
+1991-92 keeps its own =region= table: GLSS3 orders the two northern regions
+9=Upper West, 10=Upper East, the reverse of the country-level table.)
+
+** Trap 3 (RESOLVED 2026-08-21): GLSS1/GLSS2 cluster region is now MEASURED
+
+*Kept as history.*  For the record of what the inference was and what it cost,
+because the shape of the mistake recurs.
+
+*** What it was
+
+GLSS1 and GLSS2 have *no cluster-location variable in the microdata* -- a sweep
+of all 170 dictionaries finds none; the only near-hit, =Y00A::LOC=, is 99.8%
+constant at 1 and is a fieldwork flag.
+
+So both waves read =cluster_features.Region= and =household_roster.Birthplace=
+from the *same* column, =Y01A.DAT:REGION= -- the person's *region of birth*.
+=mapping.py::cluster_features= then *inferred* the cluster's region as the modal
+birth region among members under 12 (young children being least likely to have
+migrated), with =Age: AGEY= pulled into =myvars= purely to feed that filter.
+
+The inference was strong on its own terms: 0 ties, the mode an outright
+majority in all 346 clusters, median modal share 91.5%, minimum 55%, off a
+median of 31 children per cluster.  It was *not* a coin flip.
+
+It was still a guess about geography derived from a migration-sensitive
+question, and it was *wrong for five clusters* -- every one naming an
+*adjacent* region, which is exactly the border-migration failure an under-12
+filter cannot dodge:
+
+| wave    |    v | name                | correct     | inferred |
+|---------+------+---------------------+-------------+----------|
+| 1987-88 | 1080 | Adwamasek/Wiwasi    | Ashanti     | Central  |
+| 1987-88 | 1107 | Ahantamwa(Tipokrom) | Brong Ahafo | Ashanti  |
+| 1987-88 | 1168 | Tato Bator          | Brong Ahafo | Volta    |
+| 1987-88 | 1188 | Damanko             | Volta       | Northern |
+| 1988-89 | 2334 | Huni Ofori          | Central     | Eastern  |
+
+*** What replaced it
+
+*Appendix I of =GHA_1988_GLSS_Basicinfo_EN.pdf=* -- "Complete List of GLSS
+Clusters" -- is the survey's own cluster list, and the BID carries a real text
+layer (no OCR).  It is *authoritative* for GLSS1/GLSS2 cluster attributes
+(decision, 2026-08-21).  Transcribed to =_/appendix_i_clusters.org=; the ten
+clusters the document itself marks "should be excluded" are in
+=_/appendix_i_extra_workloads.org= (none of which appear in the shipped data --
+checked).
+
+It matches *176 of 176* and *170 of 170* shipped clusters on
+=CLUST = 1000 + yr1= / =2000 + yr2=, and additionally supplies
+=Ecological_zone=, which these waves previously lacked.
+
+*** The lesson worth keeping
+
+The inference was reasonable, well-documented, measured, and *nobody looked for
+a better source for a year*.  The better source was a text-layer PDF sitting in
+=Documentation/= the whole time.  Before building an approximation, read the
+documentation the survey shipped with itself.
+
+After this change =Y01A.DAT:REGION= feeds =household_roster.Birthplace=
+*only*, which is what it actually is.
+
+/Superseded note./  This section originally continued: "Note also what the fix
+does NOT do: =Rural= stays =NA= ... Folding =SU= would destroy a distinction the
+survey drew, so it waits on GH #685/#682 rather than being guessed away."  That
+was true when written and is *no longer the state of the code*: =Rural= is now
+wired from the Appendix, with =SU= folded onto =Rural=.  See /The =SU= ->
+=Rural= fold/ below for the decision and, more importantly, for what it costs.
+
+** Trap 4: GLSS1 had no =region= table of its own, and the fallback is REVERSED
+
+Found 2026-08-20, one day after Trap 1 was fixed, and *caused* by that fix.
+
+=1987-88/_/categorical_mapping.org= carried no =region= table, so
+=code_label_map('region', _dirs)= fell through =_dirs= to the *country-level*
+=_/categorical_mapping.org=.  That table reads =9 = Upper East, 10 = Upper
+West=.  *Every wave-level table in this country reads the reverse* -- 1988-89,
+1991-92 and 1998-99 all have =9 = Upper West, 10 = Upper East=, and 1998-99's
+ordering was checked against the GLSS4 questionnaire on 2026-08-19.
+
+While GLSS1's decode was dead the disagreement was *unobservable*: =region_dict=
+was ={}=, so =Region= and =Birthplace= were 100% NA and no value could be wrong.
+Reviving the decode (=18b6ca51=) armed it, and shipped *1,511 people* with
+=Birthplace= reversed and *11 of 176 clusters* with =Region= reversed.
+
+This is the same lesson as Trap 1, one level deeper, and it is worth stating
+plainly: *a fallback that has never been exercised has never been checked.*
+The country-level table was not wrong for anything that used it before --
+nothing used it.
+
+*** The evidence, since C4 cannot be run here
+
+The GLSS1 questionnaire is a scanned image with no text layer, so the
+questionnaire check is *unrunnable* for this wave.  Four converging lines of
+non-questionnaire evidence establish the ordering instead:
+
+| # | check | result |
+|---+-------+--------|
+| 1 | =1988-89/Data/CLYR1YR2.DAT= bridges 85 clusters across the two waves | 75/85 agree on region overall, but *0 of the 6* touching an Upper region agree -- each differing in the direction a 9/10 swap predicts |
+| 2 | the three sibling waves' own tables | all read =9 = Upper West= |
+| 3 | this wave's raw =REGION= codes | run =1..11=, the 11-code era list (11 = a single "Foreign Country"), not GLSS2's 17-code list |
+| 4 | Upper East is the more populous region | every other wave has more Upper East clusters than Upper West (ratios 1.78, 2.17, 3.00); 1987-88 alone inverted at 4/7 = 0.57 |
+
+After the fix the bridge agreement rises *88.2% -> 95.3%*, the Upper-region
+pairs go *0/6 -> 6/6*, and 1987-88's ratio becomes 7/4 = 1.75, in line with its
+siblings.  The 4 residual mismatches are single scattered pairs, consistent
+with the modal-birth-region approximation of Trap 3 rather than with a coding
+error.
+
+*** Two mechanical traps this sprang on the way
+
+- *An Org =#+name:= attaches to the NEXT element.*  A comment block placed
+  between =#+name: region= and the table silently steals the name; the table is
+  then unnamed, the lookup misses, and the decode stays dead *with no error*.
+  Keep commentary above the =#+name:= line.  The first attempt at this fix was
+  a silent no-op for exactly this reason, and it looked like a successful build.
+- =1988-89= spelled code 7 =Brongahafo= where all six other waves spell it
+  =Brong Ahafo=.  Harmless-looking, but it means
+  =df[df.Region == 'Brong Ahafo']= silently dropped all 170 of that wave's
+  clusters.  Corrected in the wave's own table.
+
+** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
+
+Not a trap.  A *decision*, recorded here because the reasoning that was first
+published for it turned out to be false, and the next person to look at this
+will otherwise reconstruct the false version.
+
+The 2026-08-21 version of this section said the survey "offers no evidence
+either way" and carried the settlement-population definition below as an
+unverified second-hand quote.  Both statements were wrong: the definition is
+real and is verbatim in *four* files this repository ships, and it *is*
+evidence bearing on the fold -- see /What the survey says/.  Corrected
+2026-08-22 (GH #690).  The decision itself is unchanged and is not in
+question here.
+
+*What was decided.*  BID Appendix I classifies every GLSS1/GLSS2 cluster three
+ways -- =U=, =R=, =SU= (semi-urban).  =SU= is *52 of 263* Appendix clusters,
+20%.  Canonical =Rural= stays the binary ={Urban, Rural}=; =SU= is delivered as
+*=Rural=*.  @ligon's call, 2026-08-21, on GH #690.  An earlier iteration of
+that PR added a canonical =Semi-urban= value to =lsms_library/data_info.yml=;
+*it was withdrawn*, and the file is byte-identical to =development= again.
+
+*What is NOT true, and must not be re-cited.*  The fold was originally argued
+from GLSS2's own 7-way =rural= table in
+=1988-89/_/categorical_mapping.org=, whose =Classification= column puts
+=Small Town -> Rural=:
+
+- that =Classification= column is *editorial*.  It is *not on the
+  questionnaire*; someone added it (GH #692).
+- the table is not a settlement ladder for the household at all.  It decodes
+  =Y01C:NRCPL= -- a *non-resident child's* place of residence, GLSS2 Household
+  Questionnaire Section 1 Part C, column 13 (GH #692, PR #696).
+
+So the 7-way =rural= table does *not* "already answer the folding question for
+the middle of its ladder".  Do not cite it for the fold.  (The survey *does*
+have something to say -- just not there.  See the next heading.)
+
+*What the survey says.*  GLSS1's own sample design defines the three tiers by
+*settlement population*.  Verbatim, from the joint Basic Information Document
+covering both rounds, §3.1 "Sample Design",
+=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf=,
+PDF page 13, printed page 11:
+
+#+begin_quote
+A final concern was that all three of the country's ecological zones (coastal, forest and savannah), and each of urban, semi-urban and rural areas (population greater than 5000, 1500 to 5000, and less than 1500, respectively) form the same proportion in the sample as they do in the national population.
+#+end_quote
+
+The same sentence appears, word for word, in three further files this
+repository ships -- so the numbers are not resting on one transcription:
+
+| File                                                                      | Where                                        | Text layer     |
+|---------------------------------------------------------------------------+----------------------------------------------+----------------|
+| =1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf= | §3.1, PDF p. 13 / printed p. 11              | plain          |
+| =1988-89/Documentation/technical document/GHA_1988_GLSS_Basicinfo_EN.pdf= | §3.1, same text                              | plain          |
+| =1988-89/Documentation/ddi-documentation-english-4.pdf=                   | "Sampling" -> "Sampling Procedure", PDF p. 7 | plain          |
+| =1987-88/Documentation/GLSS 1987-88 Report.pdf=                           | "Sampling Procedure"                         | CID -- decoded |
+
+So =SU= is a real, *defined* tier -- and the fold is being made across a
+boundary the survey drew itself.
+
+*Band boundaries.*  The BID's "1500 to 5000" is inclusive-ambiguous at both
+ends.  The GLSS3 main report sharpens it, =1991-92/Documentation/pdf/G3report.pdf=,
+note to Table 7.3, PDF p. 75 / printed p. 57 (repeated under Table 7.9, printed
+p. 61):
+
+#+begin_quote
+Note:  Small rural localities are those with a 1984 population of less than 1500.  Semi-urban localities are those with a 1984 population of at least 1500 but less than 5000.
+#+end_quote
+
+Read together: rural < 1500 <= semi-urban < 5000 <= urban.  Note the one
+inconsistency, quoted rather than reconciled: the BID says urban is "greater
+than 5000", GLSS3's wording implies urban is *at least* 5000.  The population
+is the *1984 Census* population of the locality, not anything measured by the
+survey.
+
+*What this does and does not settle.*  It is a *size* band, and no
+GLSS1/GLSS2 document says in words "semi-urban is rural".  What it does
+establish is narrower and still useful: *the survey's own urban threshold is
+5,000, and the whole semi-urban band sits below it.*  So =SU= is not
+ambiguous relative to the survey's definition of urban -- it is, by that
+definition, not urban.  That is an argument about the fold's *direction*, and
+a far better one than the withdrawn =Classification= column.  It is not a
+statement that GSS intended =SU= to be reported as rural.
+
+Three further pieces of evidence point the same way.  None is a GLSS1/GLSS2
+sentence saying "semi-urban is rural"; take them for exactly what they are.
+
+- *GLSS1's own report never uses a semi-urban category, and its three
+  locality buckets exhaust the sample.*  =1987-88/Documentation/reports/GHA_1987_GLSS_Firstyear_Report_EN.pdf=
+  (GSS, August 1989) reports throughout by LOCALITY = ACCRA / OTHER URBAN /
+  RURAL / COUNTRY (Table 1, printed p. 6; Figure 3, printed p. 8), and its
+  Method section, printed p. ix, describes the very design quoted above as
+  "Stratification criteria were urban/rural and ecological zones."  Table 1's
+  sample sizes are Accra 1,393, Other Urban 3,956, Rural 10,143 -- summing to
+  *15,492*, which is exactly the BID's GLSS1 individual count.  The
+  semi-urban clusters are therefore inside one of those three, and the report
+  does not say which.
+- *The arithmetic says which.*  This is *inference from published totals*, not
+  a quote.  Urban = 65 clusters (BID Table 1a, below) against 5,349 urban
+  persons is 82 persons per cluster, and rural+SU = 111 clusters against
+  10,143 persons is 91 -- both near the overall 15,492/176 = 88.  Counting SU
+  as urban instead gives 100 clusters at 53 persons and 76 clusters at 133, a
+  2.5x spread that a design of 16/32/48-household workloads cannot produce.
+- *GSS itself performs this exact collapse one round later.*  In the GLSS3
+  main report, Tables 7.3 (printed p. 57) and 7.9 (printed p. 61) nest
+  "Semi-urban" and "Small rural" as the two sub-rows of a *Rural* total,
+  opposite Urban (Accra, Other urban); the prose reads "Within rural areas,
+  incomes were rather higher in semi-urban areas than in small rural areas"
+  (printed p. 61); and printed p. 85 lists "Accra/other urban/rural" and
+  "Accra/other urban/semi-urban/small rural" as alternative breakdowns of one
+  locality axis -- i.e. rural = semi-urban + small rural.  Same statistical
+  office, same 1984-Census thresholds, *different round*: GLSS3's sample is
+  not GLSS1/GLSS2's and its locality variable is not Appendix I's =UrbRur=.
+
+*What was searched, so the negative is falsifiable.*  Searched for any
+statement assigning =SU= to a side of a two-way split: the 1987 BID, the 1988
+BID, the GLSS1 DDI (decoded end to end -- the glyph map is partial, 48 of 84
+cids, but it resolves every letter and digit in the terms searched), the GLSS2
+DDI, the GLSS3 main report, and the GLSS1 First Year Report (its text layer
+plus rendered pages ix, x, xi, 6, 8).  In GLSS1/GLSS2 documentation every
+*classification* keeps three tiers: the definition sentence, BID Table 1a
+(printed p. 13), the =IMPRENT= regression dummies "rural, semi-urban, coastal,
+savannah" (printed p. 22), and the master-sample ordering "by region within
+each location (rural/semi-urban/urban)" quoted under /Oversamples and
+sub-samples/ above.
+
+One phrase in that corpus *is* two-way, and it is not a classification -- flagged
+so the next reader does not mistake it for one.  The GLSS1 DDI's Overview says a
+"price questionnaire was used in both urban and rural areas", and the BID says
+supervisors completed community questionnaires "for almost all rural, most
+semi-urban clusters and one urban cluster" (PDF p. 10 / printed p. 8).  Both describe *which
+clusters got which instrument*; the BID's version, which is the more specific of
+the two, names semi-urban separately.  Fieldwork coverage, not a settlement
+taxonomy.
+
+*Not* searched, and so
+establishing nothing: the bodies of the image-only GLSS1/GLSS2 documents
+beyond the pages named (the First Year Report's text layer is *front matter
+only* -- 9 of 115 pages carry any text; the Preliminary Report has 93
+characters, i.e. none), and the questionnaires, which are image-only.
+
+/Provenance of the quote./  The GH #601 sweep
+(=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=, GhanaLSS 1987-88,
+"Exclusions") was *first-hand*: its extractor decoded
+=1987-88/Documentation/GLSS 1987-88 Report.pdf= itself and recorded the
+method.  Its citation to that file's "Sampling Procedure" section is
+*accurate* -- confirmed here by an independent decode.  Only the copy into
+this file was second-hand, and it is now replaced by the text-layer sources
+above.
+
+/How the CID file was decoded, 2026-08-22, in case it is needed again./  The
+PDF embeds one subset font (=1E1ba2Arial=, 88 glyphs, =Identity-H=, no
+=cmap=, no =post=, no =ToUnicode=), so =pdfminer= emits =(cid:NN)= per glyph
+*but preserves real spaces and newlines*.  That makes it a plain
+monoalphabetic substitution with word boundaries intact.  Solve it by sliding
+long known cribs over the stream and keeping placements consistent with a
+partial bijection; a 60-character crib pins a placement uniquely.  The
+sentence under test was *excluded from the crib set* so that finding it is
+evidence and not assumption.  Two checks that the decode is not echoing its
+cribs: the digit =5= is pinned independently by "August 5, 2008" on the cover
+and by the table-of-contents page sequence 14/15/16; and the decoded GLSS1
+DDI reads "The methodology that was *used* reflects the purpose of the
+survey", where the BID and the GLSS2 DDI both read "that was *chosen*" -- a
+divergence a crib-echo could not produce.
+
+*Corroboration of the wiring (not of the direction).*  BID Table 1a, titled as
+printed "Survey Coverage / Number of Clusters in Household, Community, and
+Price Surveys by Region" -- but its rows are *localities*, not regions, and
+the column totals are corroborated by the prose beneath it (102 and 71
+community questionnaires; 165 and 108 price) -- PDF p. 15 / printed p. 13.
+Household-survey clusters:
+
+| Round             | Urban | Semi-Urban | Rural | Total |
+|-------------------+-------+------------+-------+-------|
+| Year 1 (1987-88)  |    65 |         35 |    76 |   176 |
+| Year 2 (1988-89)  |    56 |         31 |    83 |   170 |
+
+The delivered fold's cold counts (below: 111 Rural / 65 Urban and 114 Rural /
+56 Urban) reconcile with this *exactly* -- 76+35 = 111, 83+31 = 114, Urban
+unchanged in both rounds.  That is a check on the Appendix I classification
+and on the fold arithmetic.  It is *not* an argument about direction: Table
+1a itself keeps the three tiers.
+
+*What the fold costs, stated plainly.*  The U/R/SU distinction *is lost* in the
+delivered =Rural= column.  It is not recoverable from =sample()= or from
+=cluster_features()=.  This is a real loss, not a re-expression: the GLSS1/GLSS2
+design is 9 strata (3 ecological zones x 3 settlement classes), and the
+settlement axis now reaches the API as 2 values.  The raw three-way is
+*preserved* in the =UrbRur= column of =_/appendix_i_clusters.org=, which is
+where anyone reconstructing the design should read it.
+
+*What it buys.*  =Rural= was 100% NULL for both waves -- *6,341 households* and
+*346 clusters* -- because there is no urban/rural variable in the microdata at
+all.  Cold measurement, 2026-08-22: those nulls go to zero, 1987-88 delivers
+111 Rural / 65 Urban clusters and 1988-89 delivers 114 Rural / 56 Urban.
+Households whose cluster is absent from the Appendix would keep =NA=; in
+practice the Appendix matches 176/176 and 170/170, so none do.
+
+*Where the wiring lives, and why it is shaped that way.*  =urbrur_abbrev= in
+=_/appendix_i_clusters.org=, read explicitly by
+=ghanalss.py::appendix_i_cluster_attributes= with two asserts (non-empty dict;
+no unmapped abbreviation).  Deliberately *not* a =Code=-keyed
+=categorical_mapping.org= table: it is never auto-applied, cannot collide with
+the wave-level =rural= table, and *fails loudly* rather than shipping a null
+column -- which is this country's most expensive recurring defect (Traps 1 and
+4).  Two designs were proposed during GH #690 and *rejected*: a country-level
+=rural= categorical table (measured: it makes 1987-88 and 2005-06 inherit a
+table they do not have today -- the Trap 4 shape), and a
+=Preferred Label= / =Settlement Label= rename.  Do not revive either.
+
+*Superseded reading.*  =slurm_logs/rural_audit/FINDINGS_rural_values.org= s7.1
+recommends adding a canonical =Semi-urban=.  It is superseded by the above.  Do
+not re-file it.
+
+** Cluster counts, and a vocabulary trap in the documentation
+
+Post-fix cluster counts are exactly the distinct =CLUST= values in the source:
+*176* (1987-88) and *170* (1988-89).
+
+Do *not* read these as an exact match to the DDI's realised figures of 178 and
+170 "sampling areas".  The same DDI sentence defines the terms apart: "Each
+group of 16, 32 or 48 households within a sampling area is referred to as a
+cluster in the GLSS data sets".  A sampling area may hold more than one
+cluster.  Observed households per cluster (1987-88: min 10, median 16, max 48;
+1988-89: min 14, median 16, max 47) match that design.  Treat the agreement as
+corroboration, not identity.
+
+** Trap 5: the =rural= table in 1988-89 is NOT a rural table (2026-08-21)
+
+=1988-89/_/categorical_mapping.org= carries, under its =* Y01C= heading,
+
+: #+name: rural
+: | Code | Label         | Classification |
+: |    1 | City          | Urban          |
+: ...
+: |    7 | Other         | Rural          |
+
+*It decodes =Y01C:NRCPL=, the settlement type of the place where a
+NON-RESIDENT CHILD lives.*  Established from the questionnaire (C4):
+=1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=,
+PDF page 8, form block *1C*, printed page *3a* -- "SECTION 1.  PART C.
+CHILDREN RESIDING ELSEWHERE", column 13, "Where does he/she live?  Is it a ...?
+READ TO THE RESPONDENT: City...1 / Large town...2 / Medium town...3 / Small
+town...4 / Large village...5 / Small village...6 / Other...7".  All seven
+labels and their order match verbatim.  The image-only PDF was read with the
+CCITT->TIFF->PIL technique documented above.
+
+The sibling =#+name: region= table under the same heading is that page's
+column *12* ("In what region or country does ...[NAME]... live?", 17 codes
+through OTHER (SPECIFY)...17) -- which is why it carries foreign countries.
+Corroborated by the WB data dictionary (catalog 2314, F22 =y01c=):
+=nrcreg= = "01cq12: region of residence", =nrcpl= = "01cq13: place of
+residence".  Data: =NRCPL= takes exactly 1..7 in both waves (n=4,725 / 5,278;
+code 7 is a 26 / 14-observation rump).  An exhaustive sweep of all 170
+GLSS1/GLSS2 =.DAT= files found only one other candidate family with that
+shape -- Y06's =BIRTYP= / =PRETYP= (Section 6 MIGRATION), which uses the same
+code list.
+
+Two consequences.
+
+- *The =Classification= column is editorial.*  It is not on the form.  It folds
+  =Small Town -> Rural=, which is the very =SU=-style guess Trap 3 and GH
+  #682/#685 refuse.  Do not wire it.
+- *Do not read this table as anything to do with =Rural=.*  GLSS1/GLSS2's
+  urban/rural classification comes from BID Appendix I (=urbrur_abbrev= in
+  =_/appendix_i_clusters.org=), not from here.  /That table is wired on
+  =feat/682-semi-urban= (=553ed2b0=, GH #685) and is not yet on =development=;
+  the canonical =Semi-urban= value it emits arrives with #682./
+
+*** A categorical table has THREE consumption paths, and they do not agree
+
+Worth stating once, because "is this table live?" has no single answer:
+
+| # | path | reads | sees wave tables? |
+|---+------+-------+-------------------|
+| 1 | =Country._apply_categorical_mappings= (=country.py:2236=) | =Country.categorical_mapping= (=country.py:1637=) = global u country | *NO -- never opens a wave dir* |
+| 2 | =mappings:= / =mapping:= in a wave =data_info.yml= (=country.py:793=, =:809=) | =Wave.categorical_mapping= (=country.py:862=) = country dict =.update(wave)= | yes; *wave wins, unconditionally* |
+| 3 | =code_label_map(name, _dirs)= in a wave =mapping.py= | its own filesystem search, *wave dir first* | yes |
+
+So of this country's three =rural= tables, *only one is dead*:
+
+- =1991-92= (2-way) -- *LIVE* via path 3 (=mapping.py:53=, consumed by
+  =Rural()= at =:115=).  This is where GLSS3's =Rural= values come from.
+- =1998-99= (2-way) -- *LIVE* via path 3 (=mapping.py:19=, =Rural()= at =:82=).
+- =1988-89= (7-way) -- *DEAD*: =mapping.py:20= assigns =rural_dict= correctly
+  (=code_label_map= returns a 13-key dual-keyed dict, not the Trap-1 ={}=) and
+  *no function in the module ever references it*.  A correctly-loaded,
+  wrongly-named dict sitting one line from where someone will write
+  =def Rural(value)=.
+
+Note that =_ADDITIVE_CATEGORICAL_TABLES= (=u=, =harmonize_assets=,
+=harmonize_education=) governs the *global/country* boundary only.  The
+country/wave boundary is a plain =dict.update=: no row-union, ever.
+
+Full workings, including the measured effect of adding a country-level =rural=
+table (it arms previously-absent fallbacks in 1987-88 and 2005-06 -- the Trap 4
+shape), are in =slurm_logs/ghana_audit/FINDINGS_orphan_rural_table.org=.
+
+** 1988-89 =Birthplace= decodes an 11-code variable with the 17-code Y01C table (2026-08-21)
+
+=1988-89/_/data_info.yml:51= declares =Birthplace: REGION= -- i.e.
+=Y01A.DAT:REGION=.  =mapping.py:19= decodes it through the wave's =region=
+table, which per Trap 5 is *Y01C's* 17-code list.
+
+Measured: =Y01A:REGION= runs *1..11* in *both* waves (1987-88 n=15,492;
+1988-89 n=14,918), with *zero* observations of codes 12--17 among 14,918
+people -- while the sibling =NAT= column shows several hundred non-Ghanaian
+nationals, so the absence is real rather than sparsity.
+
+Consequence: 1988-89 labels *236 people* =Nigeria=, where 1987-88's own table
+(added 2026-08-20 on four converging lines of evidence) reads
+=11 = Foreign Country=.  The same variable, in two consecutive waves, decoded
+two different ways.
+
+This refines -- and partly contradicts -- a line in Trap 4 above, which says of
+1987-88:
+
+#+begin_quote
+this wave's raw =REGION= codes run =1..11=, i.e. the 11-code era list whose 11
+is a single "Foreign Country", not GLSS2's 17-code list
+#+end_quote
+
+The measurement says GLSS2's =Y01A:REGION= *also* runs 1..11.  The 17-code list
+is GLSS2's =Y01C:NRCREG= list, not its =Y01A:REGION= list.  Both sides are
+quoted; *not resolved here* -- closing it needs the Section 1A questionnaire
+page, which was *not located* in the pages examined (4--16, 76--78): the
+printed sequence runs 1a (0B), 2 (0C), 2a (Part B divider), 3 (1B), 3a (1C),
+4 (2A) with no 1A block.  An exhaustive 78-page sweep was not run.
+
+** The two GLSS1/GLSS2 =categorical_mapping.org= files each name the other wave
+
+=1987-88/_/categorical_mapping.org= line 1 says "...for *1988-89*";
+=1988-89/_/categorical_mapping.org= line 1 says "...for *1987-88*".  Harmless,
+but it is evidence the two are near-copies: =diff= is the header line, three
+=Refined= / =Regined oil= typos, and the =* Y01C= section, which exists only in
+1988-89.  Fix when either file is next touched.
+
+* Adjudication of the 11 =absent= coverage cells (2026-08-20)
+
+Verdicts, evidence and the checks run live in
+=.coder/coverage/absent_verdicts.csv=.  This section records the
+*idiosyncrasies* the sweep turned up, because they will trip the next person.
+
+** GLSS1/GLSS2 =.DAT= files are COMMA-SEPARATED WITH A HEADER ROW, not fixed-width
+
+The =.DCT= dictionaries look like Stata =infile= dictionaries and give
+=start-column / width / type / name= for a fixed-width layout.  *The shipped
+=.DAT= does not use that layout.*  =Y09A.DAT= line 1 is
+=CID,CLUST,YRTITLND,HID,ACRFRM,...= and every row is comma-delimited.  Reading
+one with =pd.read_fwf(colspecs=...)= built from the =.DCT= "succeeds" and
+returns garbage -- shredded comma-strings spread across the wrong columns, with
+the numeric tail silently all-NaN and =nunique=0=.  Use the =.DCT= only as the
+authoritative *variable list*.
+
+*** RESOLVED in the library reader (2026-08-22, GH #704)
+
+=get_dataframe= now reads a =.DAT= through its sibling =.DCT= and *detects*
+the layout rather than assuming one, so callers no longer need the
+=pd.read_csv(..., na_values=['.'])= workaround this section used to
+prescribe.  See the =.DAT=/=.DCT= block comment in =lsms_library/local_tools.py=
+for the detection rule.  Two things it fixes that were live here:
+
+1. *=.= is Stata's ASCII missing marker, and nothing was honouring it.*  A
+   single =.= in a numeric column silently demoted the whole column to
+   =str=.  Across the corpus's 531 =.DCT=-paired =.DAT= files, 449 gained
+   correctly-typed columns.
+2. *Worse than a =str= column: a MIXED =int=/=str= object column.*  Pandas
+   infers dtypes per chunk, so a bare =read_csv= on a large =.DAT= with a
+   =.= in it assigned =int64= to some chunks and =object= to others -- and
+   the same code then appeared *twice*, once as =318= and once as ='318'=.
+   Measured on =1987-88/Data/Y12A.DAT=: =FOODCD= has *61* real food codes
+   and one =.=, and the old reader reported *123* distinct values
+   (61 ints + 61 strings + the dot).  =FOODBLV= 2 -> 5, =MFOODBLY= 12 -> 25.
+   This is the =food_acquired= item code =j= for both GLSS1 and GLSS2.  A
+   groupby on such a column silently splits every key in two.  *This one
+   was not previously recorded anywhere.*
+
+*** Why this belongs with Traps 1-4
+
+Same signature as the categorical-decode traps above: *a thing that exists,
+looks authoritative, and silently does nothing (or does the wrong thing)
+while the build reports success.*  Trap 1 was a lookup dict that came back
+empty; Trap 4 was a fallback table nobody had ever exercised; the
+=#+name:= trap was an Org keyword attaching to the wrong element.  Here it
+is a *data dictionary that is wrong about its own file's layout* -- and,
+underneath it, a missing-value marker that no reader was reading.  In every
+case the failure is silent and looks exactly like success.
+
+The general rule these keep re-teaching: *when a declaration and the data
+disagree, the declaration is not automatically the loser -- but neither is
+it automatically the winner.  Test one against the other and fail loudly
+when they cannot be reconciled.*
+
+** The =.DCT= label layer does not exist -- C1 cannot run on GLSS1/GLSS2
+
+All 77 GLSS1 and 93 GLSS2 dictionaries carry variable *names* and nothing else:
+no variable labels, no value labels.  So a term search over GLSS1/GLSS2
+metadata that finds nothing has *not* established absence -- it has established
+that there was nothing to search.  The same trap recurs in a weaker form later:
+GLSS3's =S*.DTA= carry *zero* variable labels AND zero value-label sets;
+GLSS4's =SEC*.DTA= carry variable labels but still zero value-label sets;
+GLSS5/6/7 are fully labelled.
+
+** Which questionnaires have a text layer, and which do not
+
+| Wave    | Household questionnaire                                              | Text layer? |
+|---------+----------------------------------------------------------------------+-------------|
+| 1987-88 | =questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf= (78 pp)            | *NO*        |
+| 1988-89 | =questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf= (78 pp)  | *NO*        |
+| 1991-92 | =pdf/G3QPartA.pdf= (38 pp) + =pdf/G3QPartB.pdf= (44 pp)               | yes         |
+| 1998-99 | =questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf= (118 pp) | yes         |
+| 2005-06 | =G5QPartA.pdf= (52 pp) + =G5QPartB.pdf= (59 pp)                       | yes         |
+| 2012-13 | =QUESTIONNAIRES/GLSS6 Part A/Part B Questionnaire.pdf= (66+70 pp)     | yes         |
+| 2016-17 | =GLSS7_MODULE A/B ....docx=                                           | yes (docx)  |
+
+The two GLSS1/GLSS2 files are *image-only*: 78 CCITT-fax page scans and *zero*
+font objects, so =pdfminer= extracts 0 non-whitespace characters.  They are,
+however, *legible*, and can be read without =poppler= (which is not installed
+here): each page is a single =CCITTFaxDecode= XObject (=K = -1=, i.e. Group 4),
+which PIL will open if you wrap the raw stream in a synthetic single-strip TIFF
+header (=Compression=4=, =PhotometricInterpretation=0=, one strip, =RowsPerStrip
+= Height=).  That is how the =plot_features= C4 below was run.  There is no OCR
+in this environment, so a *targeted* read of known pages is feasible and an
+exhaustive term-search of the form is not -- which is exactly why
+=food_security= for these two waves is =unsure= and not =not-asked=.
+
+Two GLSS1/GLSS2 documents that *do* have text and are worth reaching for first:
+=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf= (the
+joint LSMS Basic Information Document, 60 pp, covers *both* rounds; its §2.1
+enumerates every module and sub-module of the household questionnaire) and the
+GLSS3 main report.  Everything else in those two =Documentation/= trees --
+=Dataentry=, =Additional=, =Interviewer= -- is image-only too.
+
+** Section numbers moved between GLSS2 and GLSS3.  Do not carry a mapping across.
+
+| Module                | GLSS1/GLSS2                                                                          | GLSS3--GLSS7 |
+|-----------------------+--------------------------------------------------------------------------------------+--------------|
+| Housing               | *Section 2* (2A dwelling, 2B expenses) *and Section 8* (walls/floor/roof/window/area) | Section 7    |
+| Schooling / education | Section 3 (3I attendance, 3II expenses)                                              | Section 2    |
+| Agriculture           | Section 9                                                                            | Section 8    |
+| Household expenditure | Sections 11 + 12                                                                     | Section 9    |
+
+So =Y08.DAT= is *not* the analogue of =SEC7.DTA=; it is only half of it.  The
+water / toilet / lighting / tenure / rooms half is in =Y02A=/=Y02B=.  (Source:
+the joint BID §2.1, corroborated variable-by-variable against the =.DCT=s.)
+
+** A "sec9c" filename is not a food-security module
+
+=food_security= is wired for 2016-17 from =g7sec9c.dta= -- the FAO FIES 8-item
+battery (=s9cq6= = "During the last 12 months, was there a time when your
+household ran out of food").  =S9C.DTA= / =SEC9C.DTA= / =sec9c.dta= exist in
+GLSS3, GLSS4, GLSS5 and GLSS6 as well, and they are a *completely different*
+module: Section 9 Part C "AVAILABILITY OF SELECTED CONSUMER ITEMS", =availcd= x
+(=s9cq1= "found items available when you tried to purchase them", =s9cq2= "how
+does availability compare with the preceding year").  A market-supply question
+about 14--15 consumer items, item-grain, not household-experience-grain, and it
+maps to none of the 8 FIES items.  GLSS7 reused the 9C slot for FIES; nothing
+else in the series did.
+
+** GLSS1/GLSS2 Section 9 Part A "LAND" is household-grain by design
+
+=Y09A.DAT= is strictly one row per household (1987-88: 2,644 rows / 2,644
+unique =HID=; 1988-89: 2,938 / 2,938), and none of =Y09B..Y09K= carries a farm
+or plot key -- they are keyed by crop code, input code, livestock code or tool.
+Confirmed against the form itself: questionnaire p.42--43 (printed 30--31, form
+blocks =9A1=/=9A2=) is 29 single-answer household questions ("How many acres of
+the land belonging to your household have been farmed during the past 12
+months", one ACRES box).  There is no farm-number column anywhere in Part A,
+and a header sweep of the whole of Section 9 shows only Parts A(Land) B(Crops)
+D(Farm inputs) F(Livestock) J(Hand tools) ... -- no roster part.
+
+*Do not read =Y09A:IDFARM= as a plot identifier.*  It cannot be one -- the file
+has one row per household.  =IDFARM= also appears in =Y07.DCT= (Section 7,
+"Respondents for round two") alongside =FARMSE= and =BUSSE=/=BID1..BID5=, which
+is where Section 7 records *who* answers the agriculture module.
+
+** 2005-06 DOES ship Section 8 agriculture
+
+An earlier =data_scheme.yml= comment said "2005-06 lacks Section 8 agriculture
+(data jumps sec9 -> sec11)".  That was false, and is corrected in place.
+=2005-06/Data/partb/= holds =sec8a1 sec8a2 sec8a3 sec8b sec8c1 sec8c2 sec8d
+sec8e sec8f sec8g sec8h=.  The file genuinely absent is =sec10= (non-farm
+enterprises) -- which is what the sec9 -> sec11 jump actually shows, and it is
+the one GLSS5 module with its own separate questionnaire (=G5Q10.pdf=).
+=partb/sec8b.dta= is a per-plot roster of 11,471 rows carrying the *same*
+variable names 2016-17 already reads (=s8bq3= farm number, =s8bq4a=/=s8bq4b=
+size + unit, =s8bq8= how obtained), so wiring =plot_features= for this wave is
+close to a copy of the GLSS7 block.  It is a =todo=, not an absence.
+
+** Blob availability
+
+Every file the sweep asked for came back through =get_data_file()=: 77 GLSS1
+=.DCT=, 93 GLSS2 =.DCT=, 155 GLSS3 =.DTA=, 156 GLSS4, 49 GLSS5, 127 GLSS6, 102
+GLSS7 -- *zero* fetch failures.  The "~140 un-cached blobs" noted under
+=individual_education= above no longer describes this checkout.
+
+* GLSS3 and GLSS4 ship at =.dta= format 105, and their missing doubles are 2^333
+
+*This is a reader fact, not a data defect, and the library already handles it.*
+Recorded here because it looks exactly like corruption if you meet it cold, and
+one sweep (PR #704) already did.
+
+Every =.DTA= in =1991-92/= (155 files) and =1998-99/= (156 files) carries the
+=.dta= format stamp *105* -- Stata 5.  In format 105 and earlier, Stata's
+system-missing (=.=) for a *=double=* is *2^333* = =1.7498005798264095e+100=
+(IEEE-754 =0x54C0000000000000=).  Stata 6 (format 108) changed it to 2^1023 =
+=8.98846567431158e+307=, which is the code everyone recognises.  Measured in
+these two waves: *8,680,566 cells* across *1,873 =double= columns* in *126
+files*.
+
+- =pandas.io.stata.StataReader= recodes it (the =_format_version <= 105= branch
+  of =_do_convert_missing=), so =get_dataframe()= returns =NaN= and the
+  delivered tables are correct.  Verified: 0 delivered cells carry the value.
+- *=pyreadstat= does not.*  Any script that reaches for =pyreadstat.read_dta=
+  directly on a GLSS3/GLSS4 file gets =1.7498e100= where the answer is
+  "missing", and it will pass every =notna()= / =isna()= check you write.
+- *The pandas fix is in pandas 3.0 only* (PR #59325).  =pyproject.toml= still
+  says =pandas >=2.2=.  On pandas 2.2.x, =food_acquired.Price= for 1991-92
+  (=S8H.DTA:s8hq14=, 9.8 % sentinel) has a mean of *1.71e99* instead of *342.6*,
+  and =household_roster.MonthsAway= (=S1.DTA:s1q22=) is sentinel for *50.6 %* of
+  the 20,403 roster rows.
+
+Do *not* "fix" this with a sentinel list: the value is a legitimate,
+type-and-format-specific missing code that the supported reader already
+understands, and a second copy of that rule here would diverge from it.  The
+discriminator is *format stamp <= 105 AND storage type =double=*, never the
+survey year.  GLSS1/GLSS2 (=COMM.DAT= etc.) carry *none* of it; GLSS5/6/7 are
+format 113+ and carry none either.
+
+Full audit: =slurm_logs/sentinel_audit/FINDINGS_1.7498e100.org=.

@@ -10,8 +10,8 @@ roster richer: per-animal head counts, acquisitions, sales, and the
 reported per-head reservation value.
 
 Stores REPORTED item-level fields ONLY -- HeadCount (owned/kept now),
-HeadAcquired (bought to raise), HeadSold (sold alive), Value (reported
-reservation value of ONE head).  NO TLU, NO herd-value total, NO
+HeadAcquired (bought to raise), HeadSold (sold alive), ValuePerAnimal
+(reported reservation value of ONE head).  NO TLU, NO herd-value total, NO
 engaged-in-livestock binary (those are transformations over these rows;
 their binary = groupby.any()).
 
@@ -33,7 +33,7 @@ round; each wave maps to a single t = PP_QUARTER[wave]):
               questions (HeadCount s11iq2, acquire s11iq17, sold s11iq23,
               value s11iq7)
 
-Column-name map (HeadCount | HeadAcquired | HeadSold | Value):
+Column-name map (HeadCount | HeadAcquired | HeadSold | ValuePerAnimal):
   W1  s11iq2  | s11iq10 | s11iq16 | s11iq3
   W2  s11iq2  | s11iq10 | s11iq16 | s11iq3
   W3  s11iq2  | s11iq10 | s11iq16 | s11iq3
@@ -50,7 +50,7 @@ from nigeria import PP_QUARTER, _species_labels, livestock_for_wave
 
 species_labels = _species_labels()
 
-# (wave, file, animal_code, owned, HeadCount, HeadAcquired, HeadSold, Value)
+# (wave, file, animal_code, owned, HeadCount, HeadAcquired, HeadSold, ValuePerAnimal)
 SPECS = [
     ('2010-11',
      '../2010-11/Data/Post Planting Wave 1/Agriculture/sect11i_plantingw1.dta',

@@ -1,11 +1,5 @@
 Country: Peru
 
-Waves:
-  - '1985-1986'
-  - '1990'
-  - '1991'
-  - '1994'
-
 Index Info:
   note: no interview date (int_t), compared with global index info
   index_info:
@@ -16,6 +10,10 @@ Index Info:
     interview_date: (t, v, visit, i)
 
 Data Scheme:
+  sample:
+    index: (i, t)
+    v: str
+    Rural: str
   cluster_features:
     index: (t, v)
     Region: str
@@ -25,16 +23,11 @@ Data Scheme:
     Sex: str
     Age: int
     Relationship: str
+    MonthsAway: float
   individual_education:
     index: (t, v, i, pid)
     Educational Attainment: str
-  food_acquired:
-    index: (t, v, visit, i, j, u)
-    Quantity: float
-    Price: float
-    Produced: float
   interview_date:
-    index: (t, v, visit, i)
+    index: (t, i)
     Int_t: str
-
-
+    Int_m: str

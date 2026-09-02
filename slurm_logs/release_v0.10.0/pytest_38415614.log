@@ -1,0 +1,691 @@
+=== node=n0052.savio4 cpus=16 ===
+venv OK: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+..........................................s............s................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+...........................................s................ss.......... [ 10%]
+.s.....ss........s......s.s............s......s.s....................... [ 11%]
+s.......................ss.........s....ss.....................s...s..s. [ 13%]
+........s......ss.ssss.sss.ssss......................................... [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+...............s........................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+.............................................s.......................... [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................sssssssssssssss................. [ 38%]
+...................................................................s.... [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+...........................................F............................ [ 44%]
+.............................................s.......................... [ 46%]
+.........ssss....................sssss.................................. [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+..........................s......................F....s................. [ 53%]
+.........................................s.............................. [ 55%]
+........................................F............................... [ 56%]
+........................................................................ [ 58%]
+...s.................................................................... [ 59%]
+.....s.................................................................. [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+.s.s........................................ssss........................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+..........s..................................s.......................... [ 76%]
+........s...................x...........x....s..x....................... [ 77%]
+...........................s............................................ [ 79%]
+...s..................................s................................. [ 80%]
+.s..................s..........s....s...s.................s...........s. [ 82%]
+...s..s................................................................. [ 83%]
+...............................s..................................s....s [ 85%]
+.................s..s.........s....ss.............................s..... [ 86%]
+........s......s....s......x...........s...s..sss..s...ss.sss.sss..s...s [ 87%]
+..s.s...s.sssssssssssssssssss.sss.ssss.ss.ss............................ [ 89%]
+..................x.........F..........................s................ [ 90%]
+................s....................................................... [ 92%]
+.......................x................................................ [ 93%]
+.............................................s.......................F.. [ 95%]
+.....................................s......................x........... [ 96%]
+..................x.......sss...................s.....sss............... [ 98%]
+X....................................................................... [ 99%]
+....                                                                     [100%]
+=================================== FAILURES ===================================
+_ TestTableStructure.test_declared_columns_present[CotedIvoire/cluster_features] _
+[gw11] linux -- Python 3.11.6 /local/job38415614/venv_img/bin/python
+
+self = <LSMS_Library.tests.test_table_structure.TestTableStructure object at 0x1502fcf77110>
+country = 'CotedIvoire', table = 'cluster_features'
+path = PosixPath('/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/CotedIvoire/var/cluster_features.parquet')
+
+    def test_declared_columns_present(self, country, table, path):
+        """Columns declared in data_scheme exist in the DataFrame.
+    
+        Columns marked ``api_derived`` in data_info.yml are skipped: they are
+        added by ``_finalize_result()`` at API read time and are intentionally
+        absent from the raw cached parquets.
+    
+        Columns declared with ``optional: true`` in data_scheme.yml are also
+        skipped when absent — they represent data that is genuinely unavailable
+        for some countries (e.g., ``panel_weight`` in cross-sectional surveys).
+        """
+        spec = ALL_SCHEMES[country][table]
+        expected_cols = spec["columns"]
+        if not expected_cols:
+            pytest.skip(f"{country}/{table} has no declared columns")
+    
+        # Columns produced at API time (e.g., kinship decomposition).
+        api_derived = _API_DERIVED.get(table, set())
+        # Columns declared optional in data_scheme.yml (genuinely unavailable data).
+        optional_cols = spec.get("optional", set())
+    
+        df = _read_or_skip(path)
+        all_names = set(df.columns.tolist() + list(df.index.names))
+    
+        for col_name in expected_cols:
+            if col_name in api_derived:
+                continue  # present in API output, not in raw parquet
+            if col_name in optional_cols:
+                continue  # genuinely absent from this country's source data
+>           assert col_name in all_names, (
+                f"{country}/{table}: declared column '{col_name}' "
+                f"not found in {sorted(all_names)}"
+            )
+E           AssertionError: CotedIvoire/cluster_features: declared column 'Latitude' not found in ['Region', 'Rural', 't', 'v']
+E           assert 'Latitude' in {'Region', 'Rural', 't', 'v'}
+
+tests/test_table_structure.py:245: AssertionError
+_____ TestTableStructure.test_declared_columns_present[Nigeria/livestock] ______
+[gw11] linux -- Python 3.11.6 /local/job38415614/venv_img/bin/python
+
+self = <LSMS_Library.tests.test_table_structure.TestTableStructure object at 0x1502fcfe1d90>
+country = 'Nigeria', table = 'livestock'
+path = PosixPath('/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nigeria/var/livestock.parquet')
+
+    def test_declared_columns_present(self, country, table, path):
+        """Columns declared in data_scheme exist in the DataFrame.
+    
+        Columns marked ``api_derived`` in data_info.yml are skipped: they are
+        added by ``_finalize_result()`` at API read time and are intentionally
+        absent from the raw cached parquets.
+    
+        Columns declared with ``optional: true`` in data_scheme.yml are also
+        skipped when absent — they represent data that is genuinely unavailable
+        for some countries (e.g., ``panel_weight`` in cross-sectional surveys).
+        """
+        spec = ALL_SCHEMES[country][table]
+        expected_cols = spec["columns"]
+        if not expected_cols:
+            pytest.skip(f"{country}/{table} has no declared columns")
+    
+        # Columns produced at API time (e.g., kinship decomposition).
+        api_derived = _API_DERIVED.get(table, set())
+        # Columns declared optional in data_scheme.yml (genuinely unavailable data).
+        optional_cols = spec.get("optional", set())
+    
+        df = _read_or_skip(path)
+        all_names = set(df.columns.tolist() + list(df.index.names))
+    
+        for col_name in expected_cols:
+            if col_name in api_derived:
+                continue  # present in API output, not in raw parquet
+            if col_name in optional_cols:
+                continue  # genuinely absent from this country's source data
+>           assert col_name in all_names, (
+                f"{country}/{table}: declared column '{col_name}' "
+                f"not found in {sorted(all_names)}"
+            )
+E           AssertionError: Nigeria/livestock: declared column 'ValuePerAnimal' not found in ['HeadAcquired', 'HeadCount', 'HeadSold', 'Value', 'animal', 'i', 't']
+E           assert 'ValuePerAnimal' in {'HeadAcquired', 'HeadCount', 'HeadSold', 'Value', 'animal', 'i', ...}
+
+tests/test_table_structure.py:245: AssertionError
+_______________________ test_extraction_is_cluster_grain _______________________
+[gw1] linux -- Python 3.11.6 /local/job38415614/venv_img/bin/python
+
+api =                    Region  Rural
+t    v                          
+1991 1101001       Punjab  Urban
+     1101016       ...  4203015  Balochistan  Rural
+     4204009  Balochistan  Rural
+     4204033  Balochistan  Rural
+
+[300 rows x 2 columns]
+
+    def test_extraction_is_cluster_grain(api):
+        """THE structural regression test.
+    
+        Asserts on the wave-level artifact -- the frame that is FED to the silent
+        reducer.  It must already be one row per CLUSTER.  Pre-fix it was one row per
+        HOUSEHOLD (4,957 rows indexed (t, v, i)), which is exactly what gave
+        `Wave.cluster_features()`'s `groupby().first()` something to collapse.  If
+        `i` is ever reintroduced into this table's idxvars, this test fails and the
+        silent reducer is back.
+    
+        Depends on `api` so the wave parquet is materialized before we read it.
+        """
+        from lsms_library.local_tools import data_root
+    
+        pq = Path(data_root()) / "Pakistan" / "1991" / "_" / "cluster_features.parquet"
+>       assert pq.exists(), f"wave-level cluster_features parquet not materialized at {pq}"
+E       AssertionError: wave-level cluster_features parquet not materialized at /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Pakistan/1991/_/cluster_features.parquet
+E       assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Pakistan/1991/_/cluster_features.parquet').exists
+
+tests/test_pakistan_cluster_features.py:97: AssertionError
+_____ TestFeatureSanity.test_feature_is_sane[CotedIvoire/cluster_features] _____
+[gw11] linux -- Python 3.11.6 /local/job38415614/venv_img/bin/python
+
+self = <LSMS_Library.tests.test_table_structure.TestFeatureSanity object at 0x1502fcca1b50>
+country = 'CotedIvoire', table = 'cluster_features'
+path = PosixPath('/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/CotedIvoire/var/cluster_features.parquet')
+
+    def test_feature_is_sane(self, country, table, path):
+        """Each cached feature must pass is_this_feature_sane (no failures)."""
+        from lsms_library.diagnostics import is_this_feature_sane
+        from tests.test_declared_spellings import KNOWN_UNHARMONIZED
+    
+        df = _read_or_skip(path)
+        report = is_this_feature_sane(df, country, table)
+        if not report.ok:
+            # GH #602: five countries still ship raw, unharmonized plot_features
+            # Tenure / TenureSystem labels.  The new `declared_spellings` check
+            # correctly FAILS them -- they are real defects -- but the mapping
+            # onto the canonical vocabulary needs the questionnaire codebooks
+            # (see KNOWN_UNHARMONIZED).  xfail rather than silently downgrade the
+            # check to `warn`, which is the status quo that let this rot.
+            spelling_only = all(c.name == "declared_spellings" for c in report.errors)
+            if (country, table) in KNOWN_UNHARMONIZED and spelling_only:
+                pytest.xfail(
+                    f"GH #602: {country}/{table} ships unharmonized tenure labels: "
+                    + "; ".join(c.message for c in report.errors)
+                )
+            report.summarize()
+>           pytest.fail(
+                f"{country}/{table} failed sanity checks: "
+                + "; ".join(c.message for c in report.errors)
+            )
+E           Failed: CotedIvoire/cluster_features failed sanity checks: Missing: ['Latitude', 'Longitude']
+
+tests/test_table_structure.py:308: Failed
+----------------------------- Captured stdout call -----------------------------
+Sanity report: CotedIvoire/cluster_features
+  17 checks: 15 pass, 1 warn, 1 fail
+  [+] not_empty: 1484 rows
+  [+] has_named_index: Index levels: ['t', 'v']
+  [+] index_levels_match_scheme: All declared levels present: ['t', 'v']
+  [+] no_null_index_levels
+  [+] has_time_index: 5 distinct periods
+  [~] has_household_index: No 'i' level in index
+  [+] reasonable_size: 1,484 rows
+  [+] no_all_null_columns: 2 columns, none all-null
+  [+] no_constant_columns
+  [!] declared_columns_present: Missing: ['Latitude', 'Longitude']
+  [+] dtype_consistency
+  [+] value_constraints: No constrained columns (skipped)
+  [+] declared_spellings: 1 column(s) match declared vocabulary: ['Rural']
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_float_stringified_index: No float-stringified index values
+  [+] ids_format_id_canonical: All id index levels are canonical format_id output
+  [+] index_overlap_with_spine: No 'i' index (skipped)
+__________ TestFeatureSanity.test_feature_is_sane[Nigeria/livestock] ___________
+[gw11] linux -- Python 3.11.6 /local/job38415614/venv_img/bin/python
+
+self = <LSMS_Library.tests.test_table_structure.TestFeatureSanity object at 0x1502fccfc7d0>
+country = 'Nigeria', table = 'livestock'
+path = PosixPath('/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nigeria/var/livestock.parquet')
+
+    def test_feature_is_sane(self, country, table, path):
+        """Each cached feature must pass is_this_feature_sane (no failures)."""
+        from lsms_library.diagnostics import is_this_feature_sane
+        from tests.test_declared_spellings import KNOWN_UNHARMONIZED
+    
+        df = _read_or_skip(path)
+        report = is_this_feature_sane(df, country, table)
+        if not report.ok:
+            # GH #602: five countries still ship raw, unharmonized plot_features
+            # Tenure / TenureSystem labels.  The new `declared_spellings` check
+            # correctly FAILS them -- they are real defects -- but the mapping
+            # onto the canonical vocabulary needs the questionnaire codebooks
+            # (see KNOWN_UNHARMONIZED).  xfail rather than silently downgrade the
+            # check to `warn`, which is the status quo that let this rot.
+            spelling_only = all(c.name == "declared_spellings" for c in report.errors)
+            if (country, table) in KNOWN_UNHARMONIZED and spelling_only:
+                pytest.xfail(
+                    f"GH #602: {country}/{table} ships unharmonized tenure labels: "
+                    + "; ".join(c.message for c in report.errors)
+                )
+            report.summarize()
+>           pytest.fail(
+                f"{country}/{table} failed sanity checks: "
+                + "; ".join(c.message for c in report.errors)
+            )
+E           Failed: Nigeria/livestock failed sanity checks: Missing: ['ValuePerAnimal']
+
+tests/test_table_structure.py:308: Failed
+----------------------------- Captured stdout call -----------------------------
+Sanity report: Nigeria/livestock
+  17 checks: 16 pass, 0 warn, 1 fail
+  [+] not_empty: 23198 rows
+  [+] has_named_index: Index levels: ['t', 'i', 'animal']
+  [+] index_levels_match_scheme: All declared levels present: ['t', 'i', 'animal']
+  [+] no_null_index_levels
+  [+] has_time_index: 5 distinct periods
+  [+] has_household_index: 5227 distinct households
+  [+] reasonable_size: 23,198 rows
+  [+] no_all_null_columns: 4 columns, none all-null
+  [+] no_constant_columns
+  [!] declared_columns_present: Missing: ['ValuePerAnimal']
+  [+] dtype_consistency
+  [+] value_constraints: No constrained columns (skipped)
+  [+] declared_spellings: No declared vocabulary for this table (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_float_stringified_index: No float-stringified index values
+  [+] ids_format_id_canonical: All id index levels are canonical format_id output
+  [+] index_overlap_with_spine: other_features not cached (skipped)
+=============================== warnings summary ===============================
+tests/test_volume_as_mass_kwarg.py::test_food_prices_volume_as_mass_false_drops_litre_kgvalue
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_volume_as_mass_kwarg.py:192: UnpriceableRowsWarning: food_prices(units='kgvalue'): dropped 2 of 2 priceable rows (100.0%) because Price was inf (0), NaN (2) or zero (0).  An inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question.  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  See GH #591.
+    out = food_prices_from_acquired(
+
+tests/test_dvc_caching.py: 13 warnings
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:1713: UserWarning: Country directory not found for 'TestCountry'
+    warnings.warn(f"Country directory not found for {country_name!r}")
+
+tests/test_gh323_site4_dfs_merge.py: 23 warnings
+  /local/job38415614/venv_img/lib/python3.11/site-packages/pandas/io/stata.py:1381: RuntimeWarning: overflow encountered in scalar subtract
+    typlist.append(tp - 127)  # bytes
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Albania]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Albania]
+tests/test_cache_hash_invalidation.py::test_stale_country_parquet_is_not_served
+tests/test_cache_hash_invalidation.py::test_stale_country_read_evicts_hashless_wave_parquet
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Albania]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Albania/sample: required declared column 'Rural' is 100% NULL in wave(s) [2003, 2004] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Albania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Albania]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Albania]
+tests/test_cache_hash_invalidation.py::test_stale_country_parquet_is_not_served
+tests/test_cache_hash_invalidation.py::test_stale_country_read_evicts_hashless_wave_parquet
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Albania]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Albania/sample: required declared column 'strata' is 100% NULL in wave(s) [2004] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Albania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_guyana_index_uniqueness.py::test_declared_index_is_unique[household_roster]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guyana/1992/_/mapping.py:60: RuntimeWarning: Guyana 1992 sample: dropped 488 weight-only row(s) from the WEIGHT.dta national frame (no household; i is NaN). 1807 real households retained.
+    warnings.warn(
+
+tests/test_guyana_index_uniqueness.py::test_declared_index_is_unique[housing]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Guyana/1992/_/mapping.py:91: RuntimeWarning: Guyana 1992 housing: dropping 2 row(s) for 1 household(s) with irreconcilable duplicate dwelling records in HHCHAR.dta (no principled way to choose between them; dropped rather than silently first()-collapsed -- GH #323): ('1992', '123-722-6')
+    warnings.warn(
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Burkina_Faso]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Burkina_Faso]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Burkina_Faso]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Burkina_Faso/sample: required declared column 'strata' is 100% NULL in wave(s) [2018-19, 2021-22] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Burkina_Faso/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[CotedIvoire]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[CotedIvoire]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: CotedIvoire/household_roster/1988-89: declared index (t, i, pid) is NOT UNIQUE. Collapsing it with groupby().first() DESTROYED 2 of 10,563 rows whose values DISAGREE (2 conflicting index tuples). These rows are gone from the returned data. Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN or an index LEVEL IS MISSING -- fix the index (source a real id, or declare the level the survey actually varies over). Do NOT declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323.
+    _emit_grain_report(report)
+
+tests/test_gh637_malawi_first_sites.py::test_plot_features_index_is_unique_and_fully_keyed
+tests/test_gh637_malawi_first_sites.py::test_i_lives_in_the_same_namespace_as_the_roster[plot_features]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Malawi/plot_features: required declared column 'PlotOwned' is 100% NULL in wave(s) [2016-17, 2019-20] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Malawi/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh637_malawi_first_sites.py::test_plot_features_index_is_unique_and_fully_keyed
+tests/test_gh637_malawi_first_sites.py::test_i_lives_in_the_same_namespace_as_the_roster[plot_features]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Malawi/plot_features: required declared column 'Tenure' is 100% NULL in wave(s) [2016-17, 2019-20] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Malawi/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh637_malawi_first_sites.py::test_plot_features_index_is_unique_and_fully_keyed
+tests/test_gh637_malawi_first_sites.py::test_i_lives_in_the_same_namespace_as_the_roster[plot_features]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Malawi/plot_features: required declared column 'TenureSystem' is 100% NULL in wave(s) [2016-17, 2019-20] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Malawi/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_assets_additive.py::test_assets_value_is_summed_not_first
+tests/test_assets_additive.py::test_assets_quantity_is_not_summed
+tests/test_assets_additive.py::test_assets_age_is_not_summed
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: ?/assets: declared index (t, i, j) is NOT UNIQUE. Collapsing it with groupby().first() DESTROYED 3 of 4 rows whose values DISAGREE (1 conflicting index tuples). These rows are gone from the returned data. Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN or an index LEVEL IS MISSING -- fix the index (source a real id, or declare the level the survey actually varies over). Do NOT declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323.
+    _emit_grain_report(report)
+
+tests/test_assets_additive.py::test_table_without_additive_policy_still_uses_first
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: ?/shocks: declared index (t, i, j) is NOT UNIQUE. Collapsing it with groupby().first() DESTROYED 3 of 4 rows whose values DISAGREE (1 conflicting index tuples). These rows are gone from the returned data. Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN or an index LEVEL IS MISSING -- fix the index (source a real id, or declare the level the survey actually varies over). Do NOT declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323.
+    _emit_grain_report(report)
+
+tests/test_currency.py::test_country_default_is_backward_compatible
+tests/test_declared_spellings.py::TestCountryRegressions::test_uganda_2005_06_rural_is_canonical
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_currency.py::test_country_default_is_backward_compatible
+tests/test_declared_spellings.py::TestCountryRegressions::test_uganda_2005_06_rural_is_canonical
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_gh323_malawi_gb_cartesian.py::test_wave_cluster_features_is_not_a_cartesian[cell2]
+tests/test_gh323_malawi_gb_cartesian.py::test_wave_cluster_features_is_not_a_cartesian[cell2]
+tests/test_gh323_malawi_gb_cartesian.py::test_malawi_main_and_geo_are_exactly_one_to_one_on_case_id[2019-20]
+tests/test_gh323_malawi_gb_cartesian.py::test_malawi_2019_20_panel_half_has_no_geovariables
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a22
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_gh323_malawi_gb_cartesian.py::test_wave_cluster_features_is_not_a_cartesian[cell2]
+tests/test_gh323_malawi_gb_cartesian.py::test_wave_cluster_features_is_not_a_cartesian[cell2]
+tests/test_gh323_malawi_gb_cartesian.py::test_malawi_main_and_geo_are_exactly_one_to_one_on_case_id[2019-20]
+tests/test_gh323_malawi_gb_cartesian.py::test_malawi_2019_20_panel_half_has_no_geovariables
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a23
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_gh323_malawi_gb_cartesian.py::test_wave_cluster_features_is_not_a_cartesian[cell2]
+tests/test_gh323_malawi_gb_cartesian.py::test_malawi_2019_20_panel_half_has_no_geovariables
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a37
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_gh323_malawi_gb_cartesian.py::test_wave_cluster_features_is_not_a_cartesian[cell2]
+tests/test_gh323_malawi_gb_cartesian.py::test_malawi_2019_20_panel_half_has_no_geovariables
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a40
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[EthiopiaRHS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[EthiopiaRHS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1391: UserWarning: Refusing workspace copy of DVC-tracked file EthiopiaRHS/1999/Data/roster.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[GhanaLSS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaLSS]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaLSS]
+tests/test_currency.py::test_feature_ghana_per_wave
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[GH109_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaSPS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'Rural' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaSPS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'panel_weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaSPS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'strata' is 100% NULL in wave(s) [2013-14] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[GhanaSPS]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[GhanaSPS]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Malawi/cluster_features/2013-14: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 3,540 of 4,000 rows whose values DISAGREE (188 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Malawi/cluster_features/2016-17: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 1,994 of 14,955 rows whose values DISAGREE (85 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Malawi/cluster_features/2019-20: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 3,146 of 14,612 rows whose values DISAGREE (108 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Malawi/cluster_features: required declared column 'Latitude' is 100% NULL in wave(s) [2004-05] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Malawi/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh323_malawi_cluster_key.py::test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum
+tests/test_declared_spellings.py::TestCountryRegressions::test_malawi_cluster_features_rural_not_sign_flipped
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Malawi/cluster_features: required declared column 'Longitude' is 100% NULL in wave(s) [2004-05] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Malawi/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_grain_collapse_cluster_features.py::test_gps_is_not_averaged__core_does_not_aggregate
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Testland/cluster_features/2020: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 1 of 2 rows whose values DISAGREE (1 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_gh323_mali_cartesian.py::test_wave_cluster_features_is_not_a_cartesian[2017-18]
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+  One or more strings in the dta file could not be decoded using utf-8, and
+  so the fallback encoding of latin-1 is being used.  This can happen when a file
+  has been incorrectly encoded by Stata or some other software. You should verify
+  the string values returned are correct.
+    values = reader.value_labels()
+
+tests/test_food_prices_units_kwarg.py::test_food_prices_kgvalue_default_is_kgvalue
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_food_prices_units_kwarg.py:52: UnpriceableRowsWarning: food_prices(units='kgvalue'): dropped 1 of 4 priceable rows (25.0%) because Price was inf (0), NaN (1) or zero (0).  An inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question.  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  See GH #591.
+    out_default = food_prices_from_acquired(synthetic_food_acquired)
+
+tests/test_food_prices_units_kwarg.py::test_food_prices_kgvalue_default_is_kgvalue
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_food_prices_units_kwarg.py:53: UnpriceableRowsWarning: food_prices(units='kgvalue'): dropped 1 of 4 priceable rows (25.0%) because Price was inf (0), NaN (1) or zero (0).  An inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question.  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  See GH #591.
+    out_explicit = food_prices_from_acquired(synthetic_food_acquired, units='kgvalue')
+
+tests/test_food_prices_units_kwarg.py::test_food_prices_kgvalue_drops_lcu_rows
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_food_prices_units_kwarg.py:59: UnpriceableRowsWarning: food_prices(units='kgvalue'): dropped 1 of 4 priceable rows (25.0%) because Price was inf (0), NaN (1) or zero (0).  An inf Price means the survey recorded an Expenditure against a ZERO Quantity -- typically a 0-as-missing sentinel or a quantity variable mapped to the wrong survey question.  These rows are DROPPED, not returned as NaN, so the gap is otherwise invisible.  See GH #591.
+    out = food_prices_from_acquired(synthetic_food_acquired, units='kgvalue')
+
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_323_grain.py::TestClusterFeatures::test_no_grain_collapse_report
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Uganda/cluster_features: required declared column 'Latitude' is 100% NULL in wave(s) [2019-20] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Uganda/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_uganda_v_grain_invariants.py::TestVEncodingMatchesAcrossTables::test_sample_v_matches_cluster_features_v[2005-06]
+tests/test_uganda_323_grain.py::TestClusterFeatures::test_no_grain_collapse_report
+tests/test_locality_deprecation.py::test_legacy_locality_shape
+tests/test_uganda_tables.py::test_uganda_makefile_backfill[cluster_features]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Uganda/cluster_features: required declared column 'Longitude' is 100% NULL in wave(s) [2019-20] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Uganda/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_uganda_crop_condition.py::test_crop_colmap_columns_resolve_in_source
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_uganda_crop_condition.py:311: UserWarning: Refusing workspace copy of DVC-tracked file /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/Data/Agric/agsec5a.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+    df = get_dataframe(str(path), convert_categoricals=False)
+
+tests/test_tanzania_grain_gh323.py::test_all_four_rounds_survive_the_multi_round_folder[cluster_features]
+tests/test_tanzania_grain_gh323.py::test_no_empty_string_geography[Region]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Tanzania/cluster_features/2010-11: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 605 of 3,465 rows whose values DISAGREE (78 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_tanzania_grain_gh323.py::test_all_four_rounds_survive_the_multi_round_folder[cluster_features]
+tests/test_tanzania_grain_gh323.py::test_no_empty_string_geography[Region]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Tanzania/cluster_features/2012-13: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 1,304 of 4,023 rows whose values DISAGREE (138 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_tanzania_grain_gh323.py::test_all_four_rounds_survive_the_multi_round_folder[cluster_features]
+tests/test_tanzania_grain_gh323.py::test_no_empty_string_geography[Region]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Tanzania/cluster_features/2014-15: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 404 of 4,129 rows whose values DISAGREE (37 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_tanzania_grain_gh323.py::test_all_four_rounds_survive_the_multi_round_folder[cluster_features]
+tests/test_tanzania_grain_gh323.py::test_no_empty_string_geography[Region]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Tanzania/cluster_features/2019-20: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 197 of 679 rows whose values DISAGREE (52 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_tanzania_grain_gh323.py::test_all_four_rounds_survive_the_multi_round_folder[cluster_features]
+tests/test_tanzania_grain_gh323.py::test_no_empty_string_geography[Region]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Tanzania/cluster_features/2020-21: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it with groupby().first() DESTROYED 177 of 2,863 rows whose values DISAGREE (42 conflicting index tuples). These rows are gone from the returned data. cluster_features is reduced with groupby().first(), which skips NA per column -- so a conflicting cluster does not even yield one of its households' rows, it yields a COMPOSITE. The comment that used to license this ('Region/Rural/District are invariant within a cluster by construction of the LSMS-ISA sampling design') is false here: this cluster id is NOT unique at the grain it is being used at. Fix the cluster key (e.g. make v a composite of district+cluster code), do not declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323 (Site 2), GH #161.
+    _emit_grain_report(report)
+
+tests/test_tanzania_grain_gh323.py::test_all_four_rounds_survive_the_multi_round_folder[cluster_features]
+tests/test_tanzania_grain_gh323.py::test_no_empty_string_geography[Region]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Tanzania/cluster_features: required declared column 'District' is 100% NULL in wave(s) [2008-09, 2010-11] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Tanzania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Mali]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Mali]
+tests/test_currency.py::test_feature_xof_consistency
+tests/test_conversion.py::test_feature_numeraire_end_to_end
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Mali]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-19, 2021-22] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Mali/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Niger]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Niger]
+tests/test_currency.py::test_feature_xof_consistency
+tests/test_conversion.py::test_feature_numeraire_end_to_end
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Niger]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Niger/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-19, 2021-22] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Niger/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh637_tanzania_shocks_household_id.py::test_shocks_i_is_a_household_known_to_sample[2008-09]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Tanzania/shocks: required declared column 'HowCoped0' is 100% NULL in wave(s) [2008-09, 2010-11] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Tanzania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh637_tanzania_shocks_household_id.py::test_shocks_i_is_a_household_known_to_sample[2008-09]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Tanzania/shocks: required declared column 'HowCoped1' is 100% NULL in wave(s) [2008-09, 2010-11] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Tanzania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_gh637_tanzania_shocks_household_id.py::test_shocks_i_is_a_household_known_to_sample[2008-09]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Tanzania/shocks: required declared column 'HowCoped2' is 100% NULL in wave(s) [2008-09, 2010-11, 2014-15, 2019-20, 2020-21] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Tanzania/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Niger]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Niger]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py:5187: GrainCollapseWarning: Niger/household_roster/2014-15: declared index (t, i, pid) is NOT UNIQUE. Collapsing it with groupby().first() DESTROYED 210 of 26,579 rows whose values DISAGREE (210 conflicting index tuples). These rows are gone from the returned data. Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN or an index LEVEL IS MISSING -- fix the index (source a real id, or declare the level the survey actually varies over). Do NOT declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323.
+    _emit_grain_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_nigeria_food_acquired_sources.py::test_all_waves_present
+tests/test_nigeria_food_acquired_sources.py::test_all_waves_present
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq13y
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_nigeria_food_acquired_sources.py::test_all_waves_present
+tests/test_nigeria_food_acquired_sources.py::test_all_waves_present
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq16y
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_sample.py::TestSample::test_index_is_i_t[Nigeria]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Nigeria]
+tests/test_nigeria_food_acquired_sources.py::test_all_waves_present
+tests/test_nigeria_food_acquired_sources.py::test_all_waves_present
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR242_Nigeria_food_expenditures]
+  /local/job38415614/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: tracked_obs
+    warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Panama]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Panama/sample: required declared column 'panel_weight' is 100% NULL in wave(s) [1997] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Panama/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Panama]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Panama/sample: required declared column 'weight' is 100% NULL in wave(s) [1997] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Panama/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Serbia and Montenegro]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Serbia and Montenegro]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Serbia_and_Montenegro_household_characteristics]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Serbia and Montenegro]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Serbia and Montenegro/sample: required declared column 'panel_weight' is 100% NULL in wave(s) [2002] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Serbia and Montenegro/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Tajikistan/sample: required declared column 'strata' is 100% NULL in wave(s) [1999, 2003] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Tajikistan/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_sample.py::TestSample::test_index_is_i_t[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_dtype_is_float64[Tajikistan]
+tests/test_age_dtype_consistency.py::test_age_no_negative_values[Tajikistan]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: Tajikistan/sample: required declared column 'weight' is 100% NULL in wave(s) [1999] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in Tajikistan/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Guyana_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Azerbaijan_household_characteristics]
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[PR230_Serbia_and_Montenegro_household_characteristics]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/diagnostics.py:1012: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    ref_df = ref_method()
+
+tests/test_sample.py::TestSample::test_v_mostly_populated[Albania]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:183: UserWarning: Albania sample has 1.0% null v values (218 rows) — investigate per-wave
+    warnings.warn(
+
+tests/test_sample.py::TestUganda2009MarketFallback::test_household_characteristics_retains_hybrid_v_HH
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_sample.py:627: UserWarning: household_characteristics: replaced 448 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'2009-10': 110, '2013-14': 7, '2018-19': 328, '2019-20': 3}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    return ll.Country("Uganda").household_characteristics(market="Region")
+
+tests/test_currency.py::test_feature_xof_consistency
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_currency.py:201: PopulationHeterogeneityWarning: food_expenditures: this result pools 2 materially different population universes, plus 1 wave(s) whose universe is not documented at all. Nothing was dropped -- every country you asked for is in the result; this is a comparability warning, not a filter.
+    national [national (documented or claimed)] -- 2 wave(s), 1 country(ies): Niger 2018-19, Niger 2021-22
+    region-excluded [national minus named regions/districts] -- 2 wave(s), 1 country(ies): Mali 2014-15, Mali 2018-19
+    not-stated [UNKNOWN -- swept, and no document states a population] -- 1 wave(s), 1 country(ies): Mali 2021-22
+    ('national-all-households' and 'national-claimed' are pooled as one 'national' class here: the difference between them is whether a document NAMES the population, which is a provenance fact carried by source_type/confidence, not a different target population. The two tags stay distinct in df.attrs.)
+    confidence=low in this pool (the source is sample-design text and should not be read as a universe): Niger 2021-22
+    The full per-wave record, with the verbatim population statements and exclusions, is on df.attrs['population'].
+    f = Feature("food_expenditures")(["Mali", "Niger"])
+
+tests/test_conversion.py::test_feature_numeraire_end_to_end
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/tests/test_conversion.py:243: PopulationHeterogeneityWarning: food_expenditures: this result pools 2 materially different population universes, plus 1 wave(s) whose universe is not documented at all. Nothing was dropped -- every country you asked for is in the result; this is a comparability warning, not a filter.
+    national [national (documented or claimed)] -- 2 wave(s), 1 country(ies): Niger 2018-19, Niger 2021-22
+    region-excluded [national minus named regions/districts] -- 2 wave(s), 1 country(ies): Mali 2014-15, Mali 2018-19
+    not-stated [UNKNOWN -- swept, and no document states a population] -- 1 wave(s), 1 country(ies): Mali 2021-22
+    ('national-all-households' and 'national-claimed' are pooled as one 'national' class here: the difference between them is whether a document NAMES the population, which is a provenance fact carried by source_type/confidence, not a different target population. The two tags stay distinct in df.attrs.)
+    confidence=low in this pool (the source is sample-design text and should not be read as a universe): Niger 2021-22
+    The full per-wave record, with the verbatim population statements and exclusions, is on df.attrs['population'].
+    f = Feature("food_expenditures")(["Mali", "Niger"], numeraire="PPP-2017")
+
+tests/test_currency.py::test_feature_ghana_per_wave
+tests/test_canonical_shape_via_cache_miss.py::test_canonical_shape_via_cache_miss[GH109_GhanaLSS_food_acquired]
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/food_acquired: required declared column 'Price' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[CotedIvoire/cluster_features]
+FAILED tests/test_table_structure.py::TestTableStructure::test_declared_columns_present[Nigeria/livestock]
+FAILED tests/test_pakistan_cluster_features.py::test_extraction_is_cluster_grain
+FAILED tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[CotedIvoire/cluster_features]
+FAILED tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Nigeria/livestock]
+5 failed, 4650 passed, 164 skipped, 8 xfailed, 1 xpassed, 198 warnings in 990.32s (0:16:30)
+=== pytest exit=1 ===

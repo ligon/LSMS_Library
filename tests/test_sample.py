@@ -17,7 +17,7 @@ import pandas as pd
 # touching DVC locks.
 
 import lsms_library as ll
-from lsms_library.paths import countries_root
+from lsms_library.paths import countries_root, data_root
 from lsms_library.yaml_utils import load_yaml
 
 
@@ -41,6 +41,62 @@ SAMPLE_COUNTRIES = _countries_with_sample()
 # micro-data simply has no weight column.  test_has_weight_column is
 # xfailed for these.
 NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan"}
+
+# ---------------------------------------------------------------------------
+# Raw-layer weight-scale checks (the home of the scale check after the
+# API-level one became meaningless).
+#
+# sample() rescales every wave's weights to mean 1, so the API deliberately
+# ERASES scale.  A scale check therefore has to read the L2-country parquet,
+# which still holds the raw values.  See `_read_raw_sample_weights` and the
+# two tests that use it.
+#
+# The two classes, measured across the whole corpus on 2026-08-22
+# (slurm_logs/weight_normalisation/corpus_before.csv):
+#
+#   self-weighting / already-normalised : 13 cells, raw mean 0.99999999 .. 1.00016665
+#   expansion                           : 80 cells, raw mean 25.7197 .. 8658.9664
+#
+# Nothing lies between: the gap is 25.7x wide and EMPTY.  The two constants
+# below bracket that empty band -- they are the observed gap, not tuned knobs,
+# and `test_raw_weight_scale_classes_are_unambiguous` is what keeps them
+# honest.  A weight accidentally wired to household size would land at mean
+# ~5, i.e. squarely inside the band, and fail loudly.
+_RAW_SELF_WEIGHTING_RTOL = 0.01   # |mean - 1| <= 1%  -> self-weighting scale
+_RAW_EXPANSION_FLOOR = 10.0       # mean >= 10        -> expansion scale
+
+
+def _read_raw_sample_weights(country_name: str):
+    """Per-wave RAW weight stats from the L2-country parquet, or None.
+
+    The parquet stores weights PRE-normalisation (CLAUDE.md §Cache Behavior:
+    "cached parquets store pre-transformation data"), which is the only place
+    the survey's own scale still exists once `_normalise_sample_weights` has
+    run.  Returns a DataFrame indexed by wave with columns n / mean / sum.
+
+    Returns None when there is no parquet to read -- a genuinely cold data
+    root, `LSMS_BUILD_BACKEND=make`, or a country with no `weight` column.
+    Callers skip; this is a check on data that exists, not a demand that it be
+    materialized.
+    """
+    path = data_root(country_name) / "var" / "sample.parquet"
+    if not path.exists():
+        return None
+    raw = pd.read_parquet(path)
+    if "weight" not in raw.columns:
+        return None
+    if "t" in (raw.index.names or []):
+        waves = raw.index.get_level_values("t")
+    elif "t" in raw.columns:
+        waves = raw["t"]
+    else:
+        return None
+    w = pd.to_numeric(raw["weight"], errors="coerce")
+    flat = pd.DataFrame({"t": pd.Index(waves).astype(str), "w": w.to_numpy()})
+    out = (flat.dropna(subset=["w"])
+               .groupby("t")["w"]
+               .agg(n="size", mean="mean", sum="sum"))
+    return out if len(out) else None
 
 # Countries whose microdata is not available in this checkout — marked
 # with `data_available: false` in their data_scheme.yml.  Calling sample()
@@ -178,34 +234,193 @@ class TestSample:
                 f"{country_name} has {(weights < 0).sum()} negative values in {col}"
             )
 
-    def test_weighted_population_stable_across_waves(self, country_name, sample_df):
-        """Weighted population (sum of cross-sectional weights) should not
-        jump more than 5x between adjacent waves — catches miscoded weights
-        or wrong variable assignments.
+    def test_weights_normalised_to_within_wave_mean_one(self, country_name, sample_df):
+        """Every wave's non-null weights have mean 1.
 
-        Exception: countries whose waves span different survey instruments
-        (e.g., CotedIvoire's 1985-89 LSMS + 2018-19 EHCVM) may legitimately
-        have incommensurate weight scales — the 1980s LSMS uses ALLWAITN
-        (sum ~ N households), EHCVM uses population-scaled weights.  Xfail
-        those with a clear reason.
+        `Country._finalize_result` divides each wave's `weight` /
+        `panel_weight` by that wave's own non-null mean, so the two scales the
+        corpus ships (13 already-normalised cells, 80 expansion cells summing
+        to a national population) are indistinguishable at the API.  The raw
+        values stay in the parquet.  See `_normalise_sample_weights`.
         """
-        if country_name == "CotedIvoire":
-            pytest.xfail(
-                "CotedIvoire weights span LSMS (1985-89, ALLWAITN ~ N households) "
-                "and EHCVM (2018-19, population-scaled) — incommensurate by design"
-            )
+        checked = 0
+        for col in ("weight", "panel_weight"):
+            if col not in sample_df.columns:
+                continue
+            for wave, g in sample_df.groupby("t", observed=True):
+                w = pd.to_numeric(g[col], errors="coerce").dropna()
+                if w.empty:
+                    continue  # all-null wave: nothing to normalise
+                if not (w.mean() > 0):
+                    continue  # zero/negative mean: skipped by design, warns
+                checked += 1
+                assert abs(w.mean() - 1.0) < 1e-9, (
+                    f"{country_name} {wave} {col}: mean {w.mean():.6g}, expected 1.0. "
+                    f"Weights should be normalised at API time."
+                )
+        if not checked:
+            pytest.skip("no non-null weights in any wave")
+
+    def test_weighted_sum_equals_household_count(self, country_name, sample_df):
+        """Corollary of mean-1: sum(weight) over a wave is its non-null count.
+
+        This replaces the former `test_weighted_population_stable_across_waves`,
+        which compared adjacent waves' weighted population totals to catch a
+        miscoded weight variable.  That signal is no longer expressible at API
+        level — the totals are sample sizes now, by construction — and the
+        CotedIvoire xfail it carried ("LSMS ALLWAITN vs EHCVM population-scaled
+        — incommensurate by design") described exactly the mixing this
+        normalisation removes.  A miscoded weight variable must now be caught
+        against the raw parquet or at the wave config.
+        """
         if "weight" not in sample_df.columns:
             pytest.skip("no weight column")
-        pop = sample_df.groupby("t")["weight"].sum().sort_index()
-        pop = pop[pop > 0]
-        if len(pop) < 2:
-            pytest.skip("fewer than 2 waves with positive weights")
-        ratios = pop / pop.shift(1)
-        ratios = ratios.dropna()
+        for wave, g in sample_df.groupby("t", observed=True):
+            w = pd.to_numeric(g["weight"], errors="coerce").dropna()
+            if w.empty or not (w.mean() > 0):
+                continue
+            assert abs(w.sum() - len(w)) < 1e-6 * max(len(w), 1), (
+                f"{country_name} {wave}: sum(weight)={w.sum():.6g} but "
+                f"{len(w)} non-null weights"
+            )
+
+    def test_weight_normalisation_is_idempotent(self, country_name, sample_df):
+        """Re-applying the transform to an already-normalised frame is a no-op.
+
+        Load-bearing: `_join_v_from_sample` re-enters `sample()` while
+        finalising every other household-level table.
+        """
+        from lsms_library.country import _normalise_sample_weights
+        again = _normalise_sample_weights(sample_df.copy(), country=country_name)
+        for col in ("weight", "panel_weight"):
+            if col not in sample_df.columns:
+                continue
+            before = pd.to_numeric(sample_df[col], errors="coerce")
+            after = pd.to_numeric(again[col], errors="coerce")
+            pd.testing.assert_series_equal(before, after, check_names=False,
+                                           rtol=1e-12, atol=0)
+
+    def test_weighted_ratios_unchanged_by_normalisation(self, country_name, sample_df):
+        """A weighted share is invariant under within-wave rescaling.
+
+        This is the mathematical guarantee that makes the change safe:
+        sum(w*x)/sum(w) is unchanged when every w in a wave is multiplied by
+        the same positive constant.  Checked here against a deliberately
+        de-normalised copy (each wave scaled by a distinct factor), using
+        `Rural` as x where present.
+        """
+        if "weight" not in sample_df.columns or "Rural" not in sample_df.columns:
+            pytest.skip("need weight and Rural")
+        from lsms_library.country import _normalise_sample_weights
+        # `Rural` is a categorical label ('Rural' / 'Urban' / 'Semi-urban'),
+        # not a number — turn it into a 0/1 indicator.  Coercing it with
+        # pd.to_numeric would silently produce an all-NaN x and make this test
+        # skip everywhere while appearing to pass.
+        x = (sample_df["Rural"].astype("string").str.strip().str.lower()
+             .map({"rural": 1.0, "true": 1.0,
+                   "urban": 0.0, "semi-urban": 0.0, "false": 0.0}))
+        if x.notna().sum() == 0:
+            x = pd.to_numeric(sample_df["Rural"], errors="coerce")
+        if x.notna().sum() == 0:
+            pytest.skip("Rural carries no usable indicator")
+        waves = list(dict.fromkeys(sample_df.index.get_level_values("t")))
+        factors = {w: 10.0 ** (i + 1) for i, w in enumerate(waves)}
+        scrambled = sample_df.copy()
+        scrambled["weight"] = pd.to_numeric(scrambled["weight"], errors="coerce") * \
+            pd.Series(scrambled.index.get_level_values("t"),
+                      index=scrambled.index).map(factors).astype("float64")
+        restored = _normalise_sample_weights(scrambled, country=country_name)
+        w_all = pd.to_numeric(sample_df["weight"], errors="coerce")
+        w_new = pd.to_numeric(restored["weight"], errors="coerce")
+        tvals = sample_df.index.get_level_values("t")
+        compared = 0
+        for wave in waves:
+            m = (tvals == wave)
+            w0, w1, xv = w_all[m], w_new[m], x[m]
+            ok = (w0.notna() & xv.notna()).to_numpy()
+            if not ok.any() or w0[ok].sum() <= 0:
+                continue
+            compared += 1
+            share0 = (w0[ok] * xv[ok]).sum() / w0[ok].sum()
+            share1 = (w1[ok] * xv[ok]).sum() / w1[ok].sum()
+            assert abs(share0 - share1) < 1e-9, (
+                f"{country_name} {wave}: weighted Rural share moved "
+                f"{share0:.12g} -> {share1:.12g} under rescaling"
+            )
+        if not compared:
+            pytest.skip("no wave with both positive weights and a Rural indicator")
+
+    # -- raw-layer scale checks -------------------------------------------
+    # `sample_df` is requested (not used) purely to force the build, so the
+    # L2-country parquet these read is present.
+
+    def test_raw_weight_scale_classes_are_unambiguous(self, country_name, sample_df):
+        """Each wave's RAW weight mean is either ~1 or >= 10, never between.
+
+        Half of the restored miscoded-weight check.  The corpus has exactly
+        two legitimate scales -- self-weighting/normalised (mean 1.0000) and
+        expansion (mean >= 25.72) -- separated by an empty 25.7x band.  A
+        weight variable wired to the wrong column lands in that band: household
+        size gives mean ~5, a per-capita or per-adult-equivalent figure
+        similar.  Anything landing there is a wiring bug, not a third scale.
+
+        Deliberately NOT a "weights must be big" check: a raw mean of 1 is
+        correct for 13 cells and must pass.  CotedIvoire is the case that
+        proves it -- four waves at raw mean 1.0000 (1980s LSMS `ALLWAITN`) and
+        one at 443.42 (2018-19 EHCVM), all legitimate.
+        """
+        raw = _read_raw_sample_weights(country_name)
+        if raw is None:
+            pytest.skip("no raw sample parquet to read (cold data root?)")
+        bad = raw[~(
+            ((raw["mean"] - 1.0).abs() <= _RAW_SELF_WEIGHTING_RTOL)
+            | (raw["mean"] >= _RAW_EXPANSION_FLOOR)
+        )]
+        assert bad.empty, (
+            f"{country_name}: raw weight mean falls in the empty band between "
+            f"the self-weighting (~1) and expansion (>={_RAW_EXPANSION_FLOOR:g}) "
+            f"scales, which no legitimate weight in the corpus does:\n"
+            f"{bad[['n', 'mean', 'sum']].to_string()}\n"
+            f"Check the wave's data_info.yml -- a mean near household size is "
+            f"the signature of a weight wired to the wrong column. Read the "
+            f"parquet at {data_root(country_name) / 'var' / 'sample.parquet'}."
+        )
+
+    def test_raw_expansion_totals_stable_across_waves(self, country_name, sample_df):
+        """Adjacent expansion waves' RAW weighted totals stay within 5x.
+
+        The other half, and the direct successor to the deleted
+        `test_weighted_population_stable_across_waves`: same intent (a
+        miscoded weight variable moves the implied population), same (0.2,
+        5.0) bounds, moved to the layer where scale still exists.  At the API
+        every total is now the wave's household count, so the old form could
+        only ever pass.
+
+        Restricted to the EXPANSION class, because comparing an expansion
+        total against a self-weighting one is comparing a population estimate
+        against a sample size -- which is the very mixing this PR removed, not
+        a defect. CotedIvoire consequently has one comparable wave and skips.
+
+        Measured headroom (2026-08-22): the widest real ratios are Malawi 2.51
+        and Tanzania 2.07/0.48; every country passes.
+        """
+        raw = _read_raw_sample_weights(country_name)
+        if raw is None:
+            pytest.skip("no raw sample parquet to read (cold data root?)")
+        exp = raw[raw["mean"] >= _RAW_EXPANSION_FLOOR].sort_index()
+        if len(exp) < 2:
+            pytest.skip(
+                f"{country_name} has {len(exp)} expansion-scale wave(s); "
+                f"nothing to compare"
+            )
+        totals = exp["sum"]
+        ratios = (totals / totals.shift(1)).dropna()
         for wave, r in ratios.items():
             assert 0.2 < r < 5.0, (
-                f"{country_name}: weighted population ratio {wave} vs prior = {r:.2f} "
-                f"(sum={pop[wave]:,.0f}). Possible weight variable error."
+                f"{country_name}: RAW weighted total ratio {wave} vs prior "
+                f"= {r:.2f} (total {totals[wave]:,.0f}). A jump this size in "
+                f"the implied population is the signature of a miscoded "
+                f"weight variable. Totals:\n{totals.to_string()}"
             )
 
     def test_cross_section_weight_positive_when_panel_null(self, country_name, sample_df):
