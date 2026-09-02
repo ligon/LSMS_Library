@@ -73,16 +73,78 @@ cluster_features:
             - q1c
             - mappings: ['erhs_village_woreda', 'Code', 'Woreda']
 
-# livestock + income (#277): HH-level VALUE aggregates from the R5
-# livestock ({village}lvs5.tab) and income ({village}inc5.tab) modules,
-# one .tab per ORIGINAL-7-village peasant association.  These are
-# pre-aggregated household TOTALS (herd value, TLU, income subtotals),
-# NOT the canonical item-level (t,i,j) Quantity/Value -- so EthiopiaRHS
+# livestock + income (#277): HH-level VALUE aggregates from the
+# {village}lvs5.tab / {village}inc5.tab modules, one .tab per
+# ORIGINAL-7-village peasant association.  These are pre-aggregated
+# household TOTALS (herd value, TLU, income subtotals), NOT the
+# canonical item-level (t,i,j) Quantity/Value -- so EthiopiaRHS
 # `livestock`/`income` are documented HH-level (t,i) variants (see
 # data_scheme.yml + the 1989 `assets` precedent + Liberia's reduced
 # `assets`).
 #
-# i-KEY (CRITICAL).  The R5 lvs5/inc5 files key on the *packed 5-digit*
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# KNOWN DEFECT -- WRONG WAVE.  ADJUDICATION PENDING; DO NOT BUILD ON IT.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# These files are NOT round-5 (1999) data.  They are the 1989 IFPRI
+# survey -- the same fieldwork that produced the `asset{village}.tab`
+# files already wired to the 1989 wave.  The `5` in `lvs5`/`inc5` is NOT
+# a round index (its meaning is unresolved; do not guess).  Serving them
+# at t='1999' mislabels them by a decade.  Evidence, convergent (2026-08-24):
+#
+#   1. SPSS `_date` in all 7 lvs5 files is 1989-05 .. 1990-04 (and in all
+#      4 inc5 files 1989-05 .. 1989-12).  The already-1989-wired
+#      asset{village}.tab siblings carry the same 1989-04 .. 1990-07
+#      stamps.  Data cannot postdate the file that holds it.
+#   2. Keyspace.  The Dataverse Overview ("Data Description", sec. iii)
+#      states the packed HHID = Region*100000 + PA*1000 + hh is THE
+#      1989-survey identifier; the 1994+ rounds key on the q1a/q1c/hh
+#      composite instead.  A bare packed hhid is the 1989 signature.
+#   3. Per-village hhid overlap of {v}lvs5.tab with asset{v}.tab:
+#      ars 96/101, deb 65/68, din 53/54, sid 45/46, wol 55/64, har 72/109
+#      (gam 4/99 -- see the assetgam keying oddity in _/CONTENTS.org).
+#      Against the 338-HH 1989 roster demog89_1.dta: 322/541 (95% of the
+#      roster).  Against the R5 roster.tab: ZERO.
+#   4. The true R5 herd scalars ARE shipped, in the rounds-1..6 file
+#      2004/Data/livestockaggregates_123456.tab, as livval5/lsu5
+#      (n=1452, mean 1772 Birr / 2.72 TLU).  They are not these numbers.
+#      That file is a DIFFERENT SAMPLE FRAME, which is the point: it
+#      keys on (paid, within-PA hhid) -- its `hhid` is a 1..~1000
+#      sequence number, not a packed id -- over the *19* peasant
+#      associations of the 1994+ panel, including the Tigray sites
+#      (paid=1 is `haresaw`) that the 1989 round could not visit.  The
+#      lvs5 files cover 7 PAs, all of them 1989 sites.  (Do NOT cite a
+#      raw-hhid overlap of 0 between the two as evidence -- the key
+#      constructions differ, so 0 is trivially true and proves nothing.
+#      Reconstructing paid*1000+hhid or paid*10000+hhid yields 4 and 35
+#      coincidental hits out of 1611, i.e. noise, not a join.)
+#   5. The EC year suffixes run 77..81 = Gregorian 1984/85..1988/89 --
+#      the 1984-85 famine through the 1989 fieldwork, which is exactly
+#      the recall window the Overview describes for the 1989 round.
+#   6. Village SET (fact): the seven prefixes are exactly the seven used
+#      by the 1989 asset{v}.tab files, and the 1989 round had seven PAs
+#      while the 1994 panel has nineteen.  The Overview records that the
+#      1989 PAs were in Amhara/Oromiya/SNNPR with TIGRAY ADDED ONLY IN
+#      THE 1994 EXPANSION (corroborated in-repo: erhs_village_region
+#      puts codes 1-2, Haresaw/Geblen, in Tigray).  No lvs5 village is
+#      a Tigray site.
+#      Village NAMES (inference, flagged): the prefixes read naturally as
+#      deb=Debre Berhan, din=Dinki, ars=Arsi, gam=Gamo Gofa, wol=Wolayta,
+#      har=Hararghe (the Overview names Debre Berhan and Adele Keke, in
+#      Hararghe, as 1989 sites), sid=Sidamo.  This is NOT verified: the
+#      repo's own categorical_mapping.org states the 1989 site->village
+#      key "would come from Dercon-Hoddinott" and that cross-era
+#      reconciliation is an open follow-up.  Do not cite these names as
+#      established -- the ROUND claim does not rest on them.
+#      Likewise inference: `sid` matches the Overview's description of a
+#      semi-pastoralist southern village that could not be revisited in
+#      1994 -- it alone has camels and 40-TLU herds.
+#
+# The i-KEY paragraph below already MEASURED point 3 and drew the
+# opposite conclusion from it -- it read the 1989 keyspace as an oddity
+# of the R5 module rather than as evidence of the round.  Kept, because
+# its measurements are correct and are half the case above.
+#
+# i-KEY (CRITICAL).  The lvs5/inc5 files key on the *packed 5-digit*
 # `hhid` (region+PA+HH, e.g. 10101) -- the SAME pre-expansion scalar
 # scheme as the 1989 roster/assets, NOT the 1999 roster's named
 # composite [q1c, hh] (= 'Haresaw_1.2.').  Measured overlap of the
@@ -93,13 +155,39 @@ cluster_features:
 # 1989 roster (and, transitively, the 1994+ panel via the `q2`/panel_ids
 # linkage) -- exactly as the 1989 `assets` block does.  lvs5/inc5 HH
 # absent from the 1999 person roster keep v=NA, mirroring the documented
-# 1989 roster<asset gap.  The 7 village files share an identical schema,
-# so listing them together row-concatenates (missing_ok column union).
+# 1989 roster<asset gap.
 #
-# Calendar note: the `*80` suffix is the Ethiopian-calendar reference
-# year of the R5 current-stock columns (lvsval80 = total livestock value
-# in Birr; lsu80 = Livestock Standard Units = TLU).  All chosen myvars
-# are present and populated in every listed file (statically verified).
+# SCHEMA.  An earlier version of this comment said "The 7 village files
+# share an identical schema".  That is FALSE: the union is 842 columns
+# and the INTERSECTION IS 14.  The seven files use seven different
+# variable-naming systems, cover different numbers of EC years (din
+# 77..81, deb 78..80, most 79..80, har/wol 80 only) and record different
+# flow concepts.  Row-concatenation still works -- missing_ok takes the
+# column union -- but any myvar beyond the intersection would silently
+# be NaN for the villages that lack it.  The per-village systems and the
+# full flow-availability matrix are tabulated in _/CONTENTS.org.
+#
+# Calendar note: the `*80` suffix IS an Ethiopian-calendar reference year
+# (EC 1980 ~ Gregorian 1987/88), but it is NOT "the R5 current-stock
+# year" -- see the KNOWN DEFECT block.  lvsval80 = total livestock value
+# in Birr; lsu80 = Livestock Standard Units = TLU.  Both chosen myvars
+# are present and populated in every listed file (statically verified --
+# this part of the original note is correct; they are 2 of the 14
+# intersection columns).  Caveat: for `din`, EC-81 is the LATER and
+# better-populated year (lvsval81/lsu81 nonzero for 47 HH vs 44 at
+# EC-80), so din is currently served its second-to-last year.
+#
+# Both scalars are EXACTLY reconstructible from the per-species head
+# counts these same files carry (R^2 = 1.0000, all 7 villages):
+#   lsu80    = sum(head x IFPRI TLU factor), factors universal across
+#              villages -- cattle .83, sheep .20, goats .20, donkeys .50,
+#              horses 1.00, mules 1.00, camels 1.00  (cf. GH #737: the
+#              library's _TLU_FACTORS uses cattle .70, sheep/goats .10,
+#              horses .80, and has no mule or camel factor at all)
+#   lvsval80 = sum(head x a village-constant integer-Birr price vector)
+# So a (t, i, animal) roster would lose neither.  See _/CONTENTS.org for
+# the recovered tables and the roster design proposal -- blocked on the
+# wave question above, not on feasibility.
 livestock:
     file:
         - arslvs5.tab
