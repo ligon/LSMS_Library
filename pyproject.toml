@@ -1,6 +1,6 @@
 [project]
 name = "LSMS_Library"
-dynamic = []
+dynamic = ["version"]
 description = "Abstraction layer for Living Standards Measurement Survey data"
 authors = [ {name = "Ethan Ligon", email = "ligon@berkeley.edu"}
     ]
@@ -27,7 +27,6 @@ dependencies = ["pandas >=3.0",
              "fooddatacentral (>=1.0.10,<2.0.0)",
              "pint (>=0.25.2,<0.26.0)",
              "platformdirs (>=4.0.0,<5.0.0)"]
-version = "0.0.0"
 
 [project.scripts]
 lsms-library = "lsms_library.cli:main"
@@ -44,6 +43,7 @@ include = [
     "lsms_library/countries/.dvc/s3_reader_creds.gpg",
     "lsms_library/countries/.dvc/s3_reader_creds.enc",
 ]
+version = "0.0.0"
 
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
@@ -71,7 +71,7 @@ pyinstrument = ">=4.6,<6.0"
 snakeviz = "^2.2"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 vcs = "git"
 style = "pep440"
 
