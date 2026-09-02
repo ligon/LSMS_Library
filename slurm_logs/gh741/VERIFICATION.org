@@ -1,0 +1,66 @@
+#+title: GH #741 -- verification against the built wheel
+#+date: 2026-09-02
+
+Not "the tests pass": the tests run against the repo tree, and #741 is about
+what reaches a *pip user*.  The checks below run against the artifact itself.
+
+* 1. The .enc actually ships
+Built with the =poetry-core= backend directly (not the =poetry= CLI -- see
+=slurm_logs/release_v0.10.0/burst_wheel.sh= for why):
+
+: built: lsms_library-0.9.1.post208.dev0+fcec3642-py3-none-any.whl
+: total entries: 11652
+:   s3_reader_creds.enc  -> SHIPPED: lsms_library/countries/.dvc/s3_reader_creds.enc
+:   s3_reader_creds.gpg  -> SHIPPED: lsms_library/countries/.dvc/s3_reader_creds.gpg
+
+This is the check that matters most.  =.gitignore= has =**/.dvc/=, so the file
+needs =git add -f=; and poetry ships nothing from that directory that is not
+named in =[tool.poetry] include=.  Miss either and the fix works in the repo
+and reaches nobody.
+
+* 2. The issue's own repro, against the wheel's files, with no gpg
+PATH rebuilt to hold =git= (GitPython needs it at import, as the issue's repro
+has) but *not* =gpg=:
+
+: git on PATH: True | gpg on PATH: None
+: wheel creds files: ['s3_reader_creds.enc', 's3_reader_creds.gpg']
+: UNLOCK SUCCEEDED: True
+: creds INI-shaped : True
+: warnings         : none
+
+Before this change that path ended in =NoCredentialsError= from botocore.
+
+* 3. The failure still degrades legibly
+Same no-gpg PATH, with the =.enc= also removed from the extracted wheel:
+
+: unlock succeeded: False (expected False)
+: LSMS_Library: your World Bank API key validated, but unlocking the S3 read cache failed.
+:   Falling back to direct World Bank downloads -- slower, but functional; nothing is blocked.
+:   Tried: s3_reader_creds.enc (MISSING, needs the `cryptography` package) and
+:          s3_reader_creds.gpg (present, needs the `gpg` binary).
+:   If `cryptography` is missing, `pip install cryptography` restores the fast path.
+:   See https://github.com/ligon/LSMS_Library/issues/741
+
+It warns rather than raising on purpose: the NADA download path still works, so
+this is a degraded mode, not a failure.
+
+* 4. No cache invalidation
+=_table_cache_hash= before and after the change, byte-identical:
+
+| country/table                | hash (first 16)  |
+|------------------------------+------------------|
+| Uganda/household_roster      | 03c338be0ce67cca |
+| Nigeria/livestock            | 6d46e49aba0ae281 |
+| Pakistan/cluster_features    | cd2150ebb0f40b75 |
+| CotedIvoire/cluster_features | 7d4deeff663ebbd8 |
+| Malawi/food_acquired         | bee4b792cdeb2663 |
+
+Unlike =get_dataframe= (whose edit forced the v0.10.0 corpus-wide rebuild),
+=data_access.py= is not in the build fingerprint.  Upgrading v0.10.0 -> v0.10.1
+rebuilds nothing.
+
+* What is NOT verified here
+A real =pip install= into a clean venv on Windows or macOS.  Savio has no
+outbound network for PyPI and no such host available.  What is verified is the
+wheel's *contents* and the unlock running against those contents with the gpg
+binary unreachable, which is the mechanism the issue describes.

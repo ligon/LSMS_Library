@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import base64
 import configparser
+import hashlib
 import json
 import logging
 import os
@@ -53,6 +54,7 @@ import subprocess
 import tempfile
 import time
 import urllib.error
+import warnings
 import zipfile
 from collections.abc import Sequence
 from contextlib import contextmanager
@@ -481,6 +483,42 @@ def _validate_wb_api_key(api_key: str) -> bool:
 # GPG decryption helpers
 # ---------------------------------------------------------------------------
 
+def _derive_fernet_key(passphrase: str) -> bytes:
+    """Derive the Fernet key for ``s3_reader_creds.enc`` from *passphrase*.
+
+    Unsalted and deterministic ON PURPOSE.  This is not a KDF protecting a
+    secret; it is the same cosmetic anti-grep obfuscation the GPG passphrase
+    always was, in a form pure-Python ``cryptography`` can open.  The World
+    Bank API key check remains the authoritative access gate (see ``CLAUDE.md``,
+    "Three-Tier Credential Model"), and these are read-only cache credentials.
+
+    Must stay byte-identical to ``scripts/reencrypt_s3_creds.py``; a test pins
+    it, because a silent drift here bricks the unlock for every pip user at
+    once and the symptom would be an unrelated-looking botocore error.
+    """
+    return base64.urlsafe_b64encode(hashlib.sha256(passphrase.encode()).digest())
+
+
+def _fernet_decrypt(enc_file: Path, passphrase: str) -> str | None:
+    """Decrypt the Fernet-encrypted credentials file.  ``None`` on failure.
+
+    Pure Python -- no ``gpg`` binary.  This is the primary unlock path as of
+    GH #741: ``python-gnupg`` wraps a binary that is absent by default on
+    Windows and macOS, so a valid WB API key was necessary but not sufficient.
+    """
+    try:
+        from cryptography.fernet import Fernet, InvalidToken
+    except ImportError:
+        logger.debug("cryptography not installed; cannot use the .enc path")
+        return None
+    try:
+        return Fernet(_derive_fernet_key(passphrase)).decrypt(
+            enc_file.read_bytes()).decode()
+    except (InvalidToken, OSError, ValueError) as exc:
+        logger.debug("Fernet decryption failed: %s", exc)
+        return None
+
+
 def _gpg_decrypt(gpg_file: Path, passphrase: str) -> str | None:
     """Decrypt a symmetric-GPG file, trying python-gnupg then ``gpg(1)``.
 
@@ -605,15 +643,46 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
         _sync_legacy_dvc_creds(dvc_dir)
         return True
 
+    enc_file = dvc_dir / "s3_reader_creds.enc"
     gpg_file = dvc_dir / "s3_reader_creds.gpg"
-    if not gpg_file.exists():
+    if not enc_file.exists() and not gpg_file.exists():
         return False
 
     passphrase = base64.b64decode(_S3_UNLOCK_PASSPHRASE).decode()
-    decrypted = _gpg_decrypt(gpg_file, passphrase)
+
+    # Pure-Python path first (GH #741): `cryptography` is a hard dependency,
+    # whereas `python-gnupg` only wraps a `gpg` binary that Windows and macOS
+    # do not ship.  The .gpg fallback is kept, not deprecated -- it still
+    # serves wheels built before the .enc existed, and costs nothing here.
+    decrypted = None
+    if enc_file.exists():
+        decrypted = _fernet_decrypt(enc_file, passphrase)
+    if decrypted is None and gpg_file.exists():
+        decrypted = _gpg_decrypt(gpg_file, passphrase)
+
     if decrypted is None:
-        logger.warning("Auto-unlock of S3 read credentials failed "
-                       "(GPG decryption error).")
+        # warnings.warn, not logger.warning: the people this strands are new
+        # users who have not configured logging, and the failure they would
+        # otherwise see is `NoCredentialsError` from botocore three layers
+        # down -- which sends them to inspect their AWS config and their WB
+        # account, neither of which is the problem.
+        warnings.warn(
+            "LSMS_Library: your World Bank API key validated, but unlocking "
+            "the S3 read cache failed.\n"
+            "  Falling back to direct World Bank downloads -- slower, but "
+            "functional; nothing is blocked.\n"
+            f"  Tried: {enc_file.name} "
+            f"({'present' if enc_file.exists() else 'MISSING'}, needs the "
+            "`cryptography` package) and "
+            f"{gpg_file.name} "
+            f"({'present' if gpg_file.exists() else 'MISSING'}, needs the "
+            "`gpg` binary).\n"
+            "  If `cryptography` is missing, `pip install cryptography` "
+            "restores the fast path.\n"
+            "  See https://github.com/ligon/LSMS_Library/issues/741",
+            RuntimeWarning,
+            stacklevel=2,
+        )
         return False
 
     try:
