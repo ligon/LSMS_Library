@@ -372,3 +372,110 @@ def individual_education(df):
             df = df[keep]
 
     return df
+
+
+# ---------------------------------------------------------------------------
+# plot_features (GH #732, #729)
+# ---------------------------------------------------------------------------
+#
+# `df_edit` hook for the `plot_features` table, shared by ALL THREE waves --
+# the same binding rule as `individual_education` above: a callable named after
+# a declared table in this module is that table's hook, applied by
+# `Wave.grab_data` to the merged and indexed (t, i, plot_id) frame after the
+# per-wave `dfs:` merge.  Each wave's data_info.yml supplies the same temporary
+# columns under the same names, which is what makes one implementation
+# legitimate rather than merely convenient.
+#
+# WHY A HOOK AT ALL.  Two things the YAML path cannot do:
+#
+#   1. MULTIPLY.  `Area` (hectares -- the one column the canonical schema marks
+#      REQUIRED anywhere in the agriculture set) is the reported native size
+#      times a per-unit factor.  A `derived:` block dispatches to exactly one
+#      registered transformer (`coalesce_coord_bin`), and a column formatting
+#      function maps one row of one column at a time; neither multiplies two
+#      columns.  Adding a transformer kind is a core (`build_transforms.py`)
+#      change, not a country change.
+#   2. DROP ROWS.  2009-10's S4AII.dta has 12 rows with a null plot number
+#      (S4AIV.dta has 16; none of the 28 carries any datum).  `format_id`
+#      turns a null plot_no into a null `plot_id` index level, which the
+#      framework's (t, i, plot_id) collapse deletes with a
+#      GrainCollapseWarning -- fatal under LSMS_GRAIN_STRICT=1 -- and, because
+#      pd.merge matches null keys, the left merge first fans one household's
+#      null row out 1 -> 15.  Dropping them HERE is the deliberate drop
+#      slurm_logs/ghanasps/FINDINGS_agriculture.org asks for ("must be dropped
+#      deliberately, not silently").  2013-14 and 2017-18 have no null keys.
+#
+# HECTARES PER NATIVE UNIT.  2009-10 ships a producer-computed `area_ha`;
+# dividing it by the reported size recovers these constants to float precision
+# (within-unit standard deviation ~1e-8 across 4,538 / 717 / 238 / 60 plots).
+# 2013-14 and 2017-18 ship no area_ha, so THEIR sizes are converted with wave
+# 1's own factors -- internal consistency with the shipped wave-1 numbers was
+# preferred to the standard acre (0.404686 ha; a 2e-5 relative difference,
+# seen and not used).  Keys are the canonical `AreaUnit` labels, because the
+# per-wave YAML maps the raw unit spellings (Acre/Acres, Rope/Ropes/Robes,
+# Plot/Plots, ...) through the `AreaUnit` table in _/categorical_mapping.org
+# at extraction, i.e. BEFORE this hook runs.  `Other` has no factor and
+# yields a NaN Area, as it should.
+_PLOT_HECTARES_PER_UNIT = {
+    'Acres': 0.404694,
+    'Poles': 0.409551,
+    'Ropes': 0.236342,
+    'Plot':  0.102388,
+}
+
+
+def plot_features(df):
+    """Compute `Area` in hectares and drop the null-plot rows.
+
+    Receives the frame `Wave.grab_data` has merged and indexed as
+    `(t, i, plot_id)`, carrying:
+
+      AreaUnit  -- canonical unit label (Acres / Poles / Ropes / Plot / Other)
+      _size     -- the reported size in that unit            (all waves)
+      _area_ha  -- the producer-computed hectares            (2009-10 only)
+      Tenure    -- already canonical
+
+    Rules, and why:
+
+    1. `Area = _area_ha` where the producer supplied it, else
+       `_size x _PLOT_HECTARES_PER_UNIT[AreaUnit]`.  The shipped number is
+       preferred because it is the producer's own; measured on 2009-10 the
+       fallback fires on 0 rows (area_ha is null exactly where the size or
+       the unit is null, or the unit is 'Other'), so the two paths never
+       disagree in practice.  In 2013-14 / 2017-18 there is no `_area_ha` and
+       every Area is derived.  No value is filled, clipped or aggregated:
+       a unit without a factor gives NaN, a reported size of 0 gives 0, and
+       2017-18's two 70,000-pole plots come back as 28,669 ha each.
+    2. The temporary `_size` / `_area_ha` columns are dropped, so the built
+       table has exactly the declared columns.
+    3. Rows whose `plot_id` index level is null are dropped (2009-10 only:
+       12 source rows plus the 14-row merge fan-out, none carrying a datum).
+       See the module comment for why this must happen here.
+    """
+    df = df.copy()
+
+    if '_size' in df.columns:
+        size = pd.to_numeric(df['_size'], errors='coerce')
+        if 'AreaUnit' in df.columns:
+            unit = df['AreaUnit'].astype(object)
+        else:
+            unit = pd.Series(pd.NA, index=df.index, dtype=object)
+        factor = pd.to_numeric(unit.map(_PLOT_HECTARES_PER_UNIT), errors='coerce')
+        area = size * factor
+        if '_area_ha' in df.columns:
+            shipped = pd.to_numeric(df['_area_ha'], errors='coerce')
+            area = shipped.where(shipped.notna(), area)
+        df['Area'] = area.astype(float)
+
+    df = df.drop(columns=[c for c in ('_size', '_area_ha') if c in df.columns])
+
+    # Declared order: Area first, then the rest as extracted.
+    if 'Area' in df.columns:
+        df = df[['Area'] + [c for c in df.columns if c != 'Area']]
+
+    if df.index.names is not None and 'plot_id' in list(df.index.names):
+        keep = pd.notna(df.index.get_level_values('plot_id'))
+        if not keep.all():
+            df = df[keep]
+
+    return df

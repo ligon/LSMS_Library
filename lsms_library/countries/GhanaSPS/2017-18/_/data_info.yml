@@ -202,3 +202,112 @@ individual_education:
             - highestqual
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
         _attended: attended
+
+plot_features:
+    # TWO-SOURCE table, same shape as 2013-14: size + tenure.
+    #
+    #   04h_agsection.dta   5,366 x 176 -- plot size: totalsize, PLOTUNIT
+    #   04i_landtenure.dta  5,366 x 139 -- tenure: obtainhow
+    #
+    # Module 04 is agriculture BY CONTENT here too -- checked, because this
+    # is the wave in which 01f silently became employment.
+    #
+    # THE UNIT TRAP (GH #732) -- READ `plotunit`, NOT `plotsizeunit`.  This
+    # wave's instrument asks H8 "Can [Name] provide the size of plot [#] in
+    # acres?  1-Yes >> H9 / 5-No" and asks the unit list ("1-Poles 2-Robes
+    # 3-Plots -666-Other (please specify)") ONLY of the No's.  So
+    # `plotsizeunit` -- the column wave 2 uses, and the natural name -- is
+    # populated for 575 of 5,366 plots (10.7%): Poles 262 / Plots 154 /
+    # Robes 153 / Other 6.  The producer-resolved unit for EVERY plot is
+    # `plotunit` (5,366/5,366): Acres 4,791 / Poles 262 / Plots 154 /
+    # Robes 153 / free text 6.  Reading plotsizeunit leaves 4,791 plots
+    # (89.3%) with no unit and no Area, and NEITHER framework guard fires
+    # (Site B needs 100% null; _assert_built_required_columns checks
+    # presence).  Measured: where plotsizeacres == 'No', plotunit equals
+    # plotsizeunit on 569 of 575 rows; the 6 exceptions are the 'Other
+    # (please specify)' rows, for which plotunit carries the
+    # plotsizeunitother free text instead:
+    #   '2 miles squared'; 'It has never been measured before. It is a
+    #   family land that belongs to forsfathers'; '-999' (x3); "Don't know".
+    # The `AreaUnit` table in ../../_/categorical_mapping.org maps all six to
+    # 'Other' -- the closed-question answer the respondent actually gave --
+    # and they get no factor, hence a NaN Area (5 of the 6 also have a null
+    # totalsize).  '-999' is this wave's "Don't know" sentinel typed into the
+    # specify box.
+    #
+    # "ROBES" is this wave's spelling of Rope in BOTH the instrument and the
+    # data label (wave 2's instrument also prints Robes; its data label was
+    # corrected).  Folded onto 'Ropes' by the same table.
+    #
+    # KEY: (FPrimary, plotid), plotid 1..9.  FPrimary is the same id
+    # 00_hh_info.dta uses; 5 of the 5,366 rows carry the 10-character split
+    # form, and v = FPrimary[-6:-3] slices from the RIGHT so it is unaffected
+    # (mapping.py).  The sample v-join needs no transformation and is TOTAL
+    # (all 3,041 plot households are in 00_hh_info.dta).
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave SEPARATELY --
+    # a rule verified on 2013-14 does not transfer: (FPrimary, plotid) is
+    # unique in BOTH frames -- 5,366 distinct keys in 5,366 rows on each
+    # side, intersection 5,366, 0 size-only, 0 tenure-only, 0 key values
+    # duplicated in either frame, 0 null keys.  Exactly 1:1.
+    #
+    # AREA.  No producer area_ha.  totalsize is 5,347/5,366 non-null (the 19
+    # missing: 10 Acres, 2 Plots, 1 Robes, 1 Poles and 5 of the 6 free-text
+    # rows); the hook multiplies `_size` by wave 1's producer factor for the
+    # unit.  Delivered Area is ~99.6% populated, median ~0.8 ha, 99th
+    # percentile ~12 ha.  TWO PLOTS REPORT 70,000 POLES = 28,669 ha EACH (the
+    # next largest is 800 acres); left exactly as reported -- core does not
+    # edit data -- and flagged here for anyone using the wave-3 tail.
+    #
+    # Tenure: obtainhow (5,364/5,366 non-null; the 2 nulls are FPrimary
+    # 107241063 plot 1 and 107272008 plot 2, left NA) -> canonical vocabulary
+    # via the `Tenure` table.  Instrument I1 "How did [Name] obtain plot [#],
+    # or gain the right to farm plot [#]?": 1 Purchased / 2 Inherited from
+    # family member / 3 Rented (for cash or kind), or sharecropped /
+    # 4 Allocated free of charge / 5 Begged / 6 Borrowed / -666 Other.  The
+    # data label of option 3 drops the comma ("Rented (for cash or kind) or
+    # sharecropped") -- a third spelling of the merged rent/sharecrop option,
+    # so it has its own row.  The country data_scheme.yml has every target.
+    # The 'Other' free text (obtainother, 67 rows) is not decoded.
+    #
+    # `merge_how: left`, size file primary.  `v` is NOT declared --
+    # _join_v_from_sample() attaches it at API time.
+    #
+    # MIXED-VINTAGE DIRECTORY NOTE (CONTENTS.org): totalsize, plotunit and
+    # obtainhow are questionnaire variables, not members of the free-text
+    # `*other` / sub-district geography / consent families the public
+    # Dataverse release strips, so nothing here depends on the extra columns
+    # our pre-anonymization copies retain.
+    dfs:
+        - df_size
+        - df_tenure
+    df_size:
+        file: 04h_agsection.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            # `_size` is TEMPORARY: consumed and dropped by
+            # ghanasps.plot_features, which writes `Area`.
+            _size: totalsize
+            # plotunit, NOT plotsizeunit -- GH #732, see above.
+            AreaUnit:
+                - plotunit
+                - mappings: ['AreaUnit', 'Alternate Spelling', 'Preferred Label']
+    df_tenure:
+        file: 04i_landtenure.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            Tenure:
+                - obtainhow
+                - mappings: ['Tenure', 'Alternate Spelling', 'Preferred Label']
+    merge_on:
+        - i
+        - plot_id
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - plot_id
