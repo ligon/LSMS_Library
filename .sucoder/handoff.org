@@ -38,9 +38,8 @@
    and "the guard is live" are different facts and only the first is verified.
 2. CLAUDE.md says 28 =national-claimed= population waves; the shipped config has
    *29*.  One-line doc fix.
-3. Superseded parquets parked (not deleted) at
-   =/global/scratch/fsa/fc_jevons/ligon/cache/_stale_backup_20260902/=.
-   Safe to remove once v0.10.0 is out.
+3. DONE -- superseded parquets removed (@ligon, 2026-09-02) after confirming all
+   three live equivalents had rebuilt.  Nothing outstanding.
 4. =v0.9.1= was tagged two commits *past* =master= and never merged back, which
    is why =master= sat at the v0.9.0 merge.  Avoided this time by committing the
    notes to =development= first and tagging =master= after the merge.
