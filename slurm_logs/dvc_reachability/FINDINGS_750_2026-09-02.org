@@ -1,0 +1,74 @@
+#+title: GH #750 --- what is actually unreachable on the S3 remote, and where it came from
+#+date: [2026-09-02 Wed]
+#+author: Sue (Claude Fable 5.1)
+
+Sweep: =scripts/dvc_remote_reachability.py= (both DVC layouts, no lock).
+Raw output in this directory (=sweep_*.log=, =missing_*.tsv=, =layout_artifact_*.log=).
+
+* The issue's premise is a layout artefact
+| population                                        | count |
+|---------------------------------------------------+-------|
+| sidecars                                          |  9984 |
+| blob under flat DVC-2 path only                   |  7622 |
+| blob under =files/md5/= only (DVC-3 form sidecars) |  2326 |
+| under both                                        |    15 |
+| under neither --- truly missing                   |    21 |
+A flat-only check (what =prewarm_dvc_cache.py --report-missing= does)
+reports the 2,326 as missing.  The two Uganda files #750 names 404 under
+=LSMS/<md5[:2]>/<md5[2:]>= and are PRESENT under =LSMS/files/md5/...=; all
+43 Uganda =Documentation/= sidecars are DVC-3 form.  Documentation missing
+from the remote: *0 of 1,066*.
+
+* The 21 truly missing blobs, by provenance
+None has a local workspace copy or an L1 blob on this box.  None feeds a
+declared table.
+
+** KenyaLPS --- 12 (of 22).  Harvard Dataverse, CC0.  RE-OBTAINABLE.
+=dvc add=ed 2026-04-16 (=a611fa3b=, =204b6dad=), never pushed.  No
+=Documentation/= directory in any data wave; the only =SOURCE= is under
+=2003-2005/= and names KLPS-1, =doi:10.7910/DVN/ZW1LGR=.
+
+Checked every KenyaLPS sidecar md5 against the Dataverse API's per-file
+checksum (the checksum of the ORIGINAL uploaded file), without downloading:
+| round  | dir         | DOI                       | ours vs Dataverse original                                   |
+|--------+-------------+---------------------------+--------------------------------------------------------------|
+| KLPS-1 | =2015/=       | =10.7910/DVN/ZW1LGR= v2.1   | 10/10 MATCH (on the remote already)                          |
+| KLPS-2 | =2007-2009/=  | =10.7910/DVN/PBFXVK= v1.0   | 4/4 are the Dataverse *=.tab= ingest derivatives*, not the originals --- md5 of the original does not apply; re-download the =.tab= and compare, or replace with the =.dta= originals (a sidecar change) |
+| KLPS-3 | =2011-2014/=  | =10.7910/DVN/PXVFJD= v2.0   | 4/4 MATCH the =.dta= originals                                 |
+| KLPS-4 | =2017-2022/=  | =10.7910/DVN/O0BBKI= v4.0   | 4/4 MATCH the =.dta= originals                                 |
+So 8 of the 12 are byte-identical to public files and will md5-verify on
+re-download; the other 4 (KLPS-2) are derivatives whose md5 Dataverse does
+not publish.
+
+Side finding: =2015/= holds KLPS-1 (fieldwork 2003--2005, released
+2015-12) while =2003-2005/= holds only its documentation --- foldered by
+release date, not fieldwork.  KLPS-5 (=RJMWD2=) and the COVID phone survey
+(=VEFP9Y=) exist and are not held.
+
+** Togo 2018 --- 5 (of 7).  Collaborator extracts.  NOT publicly re-obtainable as such.
+The whole wave is seven researcher-prepared files: =*_forEthan.dta=
+(2021-01-30, =24bd9155= "Initial commit for Togo") and
+=Togo_survey2018_nonfooditems{7days,30days,3months,6months,12months}.csv=
+(2021-03-10, =fd109502= "Add data on Togo non-food expenditures").  The two
+=.dta= are on the remote and feed the declared tables; the five =.csv= are
+read only by an undeclared =2018/_/nonfood_expenditures.py=.
+
+=Documentation/SOURCE.org= says WB catalog 4298 (=TGO_2018_EHCVM_v02_M=),
+stamped 2026-07-12 by the provenance backfill (=PROVENANCE_METHOD:
+source-url=, no =PROVENANCE_VALIDATION=).  That records the survey, not the
+files: nothing in =2018/Data/= is a WB distribution file.  The csvs' only
+copies are wherever they were added from in 2021; the underlying EHCVM
+raw data is on WB 4298, from which equivalent extracts could be re-derived
+but not byte-matched.
+
+** GhanaSPS 2017-18 =Crop_encrypted/= --- 4.  Boxcryptor.  Unobtainable.
+Already documented in =GhanaSPS/_/CONTENTS.org= l.1188 and
+=slurm_logs/ghanasps/FINDINGS_agriculture.org=: =.bc=/=.bch= with no
+passphrase in the repository.  Now also known never to have been pushed.
+The public Dataverse release (=10.7910/DVN/E5QP0F=) does not carry them.
+
+* Consequence for the "S3 is a cache over the World Bank" model
+True for =.dta= via =get_data_file()='s Stata-zip fallback.  Not true for
+documentation (no resource-level WB fetch exists) --- latent, since all
+documentation is on S3.  Not true for the three non-LSMS sources above,
+which is exactly where the 21 gaps are.
