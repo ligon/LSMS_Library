@@ -1596,7 +1596,7 @@ So of this country's three =rural= tables, *only one is dead*:
   =Rural()= at =:115=).  This is where GLSS3's =Rural= values come from.
 - =1998-99= (2-way) -- *LIVE* via path 3 (=mapping.py:19=, =Rural()= at =:82=).
 - =1988-89= (7-way) -- *DEAD*: =mapping.py:20= assigns =rural_dict= correctly
-  (=code_label_map= returns a 13-key dual-keyed dict, not the Trap-1 ={}=) and
+  (=code_label_map= returned a 14-key dual-keyed dict -- ='1'..'7'= and =1..7= -- not the Trap-1 ={}=; measured 2026-09-02, earlier text said 13) and
   *no function in the module ever references it*.  A correctly-loaded,
   wrongly-named dict sitting one line from where someone will write
   =def Rural(value)=.  /Deleted 2026-09-02 with the rename to
