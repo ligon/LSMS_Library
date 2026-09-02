@@ -11,8 +11,8 @@
 * Next concrete action
 1. Review + merge PR #739.
 2. =git checkout master && git pull=  -- =make release= tags the *current*
-   HEAD, not =master=.  Running it from =development= is how v0.9.1 became an
-   orphan tag (item 4 below).
+   HEAD, not =master=.  (See item 4: this is ordinary care, NOT a fix for a
+   past mistake -- my earlier "v0.9.1 was an orphan tag" claim was wrong.)
 3. =make release v=0.10.0=  (re-runs pytest, then tags the checked-out master)
 4. =git push origin v0.10.0=
 5. Publish the GitHub Release *from the web UI* -- a =gh=-created release
@@ -40,9 +40,18 @@
    *29*.  One-line doc fix.
 3. DONE -- superseded parquets removed (@ligon, 2026-09-02) after confirming all
    three live equivalents had rebuilt.  Nothing outstanding.
-4. =v0.9.1= was tagged two commits *past* =master= and never merged back, which
-   is why =master= sat at the v0.9.0 merge.  Avoided this time by committing the
-   notes to =development= first and tagging =master= after the merge.
+4. *CORRECTION (Sue, 2026-09-02).*  An earlier version of this note, of the
+   =bc8aa2df= commit message, and of PR #739's body claimed =v0.9.1= was "an
+   orphan tag two commits past =master=, never merged back".  *That is false.*
+   I checked =merge-base= against a *stale local* =master= (last updated
+   2026-07-22) instead of =origin/master=.  =v0.9.1= (=72004880=) *is*
+   =origin/master=: its two commits -- Zenodo/CFF metadata and the release
+   notes -- were made directly on =master= after the v0.9.0 merge and tagged
+   there, which is the correct workflow.  Nothing was orphaned and nothing
+   needed avoiding.
+   The *advice* in step 2 survives the correction on its own merits: =make
+   release= tags the current HEAD, so you do need =master= checked out.  But it
+   is ordinary care, not a fix for a past mistake.
 
 * Environment note
 =.venv= was a stale symlink to a dead job's =/local=.  Restored with
