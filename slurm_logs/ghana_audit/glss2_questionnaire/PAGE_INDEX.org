@@ -1,0 +1,110 @@
+#+title: GLSS2 (1988-89) Household Questionnaire -- what each of the 78 PDF pages is
+#+date: [2026-09-02 Wed]
+
+Source: =1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=
+(DVC md5 =0a79d2e09aadb16a25c48e25bb9bd6af=, 4,068,588 bytes), obtained via
+=data_access.get_data_file()= (576.6 s -- it walks the DVCFS index; the
+content-addressed L1 blob is the same file).  Image-only: 78 CCITT Group-4
+XObjects (=K=-1=, =BlackIs1=false=), no text layer.  Rendered with
+=render_pages.py= here (pdfminer object tree -> synthetic single-strip TIFF ->
+PIL), 16 s for all pages.  Pages 1-73 are landscape (~3300x2570); 74-78 are
+portrait (2496x3300) and scanned rotated 90 degrees.  Read by eye; no OCR.
+
+Only the evidence pages are committed as PNG (=page_38_*=, =page_39_*= and
+the 2x crops); the rest are reproducible from the script.
+
+"Block" is the boxed form-block id printed at the bottom right of each page
+(e.g. =1A2=); "p." is the printed page number beside it.
+
+| PDF | block | p.   | what the page is |
+|-----+-------+------+------------------|
+|   1 |       |      | Cover: Republic of Ghana Statistical Service / Ghana Living Standards Survey / Household Questionnaire (handwritten "Cluster 03 Household 07") |
+|   2 |       |      | Title page (near-blank): Ghana Living Standards Survey Household Questionnaire |
+|   3 | 0A    | 1    | Survey Information: cluster, head, address; first / second round, verification, data entry |
+|   4 | 0B    | 1a   | Summary of Survey Results (per-section visit/result grid, both rounds) |
+|   5 | 0C    | 2    | Observations and Comments |
+|   6 |       | 2a   | Divider: PART B -- TO BE COMPLETED FOR ALL HOUSEHOLD MEMBERS |
+|   7 | 1B    | 3    | Section 1 Part B: Information on Parents of Household Members |
+|   8 | 1C    | 3a   | Section 1 Part C: Children Residing Elsewhere (col.12 = 17-code region/country list; col.13 = 7-code place type) |
+|   9 | 2A    | 4    | Section 2 Housing, Part A: Type of Dwelling |
+|  10 | 2B1   | 4a   | Section 2 Part B: Housing Expenses (Q1-21) |
+|  11 | 2B2   | 5    | Section 2 Part B (cont., Q22-41) |
+|  12 |       | 5a   | Divider: Section 3 Education (members 5 years or older) |
+|  13 | 3i    | 6    | Section 3 Education (Q1-18) |
+|  14 | 3ii   | 7    | Section 3 Education (Q19-25, expenses) |
+|  15 |       | 7a   | Divider: Section 4 Health |
+|  16 | 4     | 8    | Section 4 Health |
+|  17 |       | 8a   | Divider: Section 5 Economic Activities (members 7 or older), Part A Time Use |
+|  18 | 5A    | 9    | Section 5 Part A: Time Use and Job Search |
+|  19 | 5B1   | 10   | Section 5 Part B: Main Job During the Past 7 Days |
+|  20 | 5B2   | 11   | Part B (cont.) |
+|  21 | 5B3   | 12   | Part B (cont.) |
+|  22 | 5B4   | 13   | Part B (end) |
+|  23 | 5C1   | 14   | Section 5 Part C: Secondary Job During the Past 7 Days |
+|  24 | 5C2   | 15   | Part C (end) |
+|  25 | 5D    | 16   | Section 5 Part D: Search for Additional Employment |
+|  26 | 5E1   | 17   | Section 5 Part E: Main Job During the Past 12 Months |
+|  27 | 5E2   | 18   | Part E (cont.) |
+|  28 | 5E3   | 19   | Part E (cont.) |
+|  29 | 5E4   | 20   | Part E (end) |
+|  30 | 5F    | 21   | Section 5 Part F: Employment History |
+|  31 | 5G1   | 22   | Section 5 Part G: Secondary Job During the Past 12 Months |
+|  32 | 5G2   | 23   | Part G (end) |
+|  33 | 5H    | 24   | Section 5 Part H: Other Activities |
+|  34 |       | 24a  | Divider: Section 6 Migration (members 7 or older) |
+|  35 | 6     | 25   | Section 6 Migration (col.3 = 7-code place type; col.8 = 17-code region/country "From which Region or country were you coming from?"; col.9 = 7-code place type) |
+|  36 | 7i    | 26   | Section 7 Respondents for Round Two (Q1-6) |
+|  37 | 7ii   | 27   | Section 7 (Q7-10, incl. random selection of a woman for Section 13) |
+|  38 | 1A1   | 27a  | *SECTION 1 PART A HOUSEHOLD ROSTER* -- interviewer instructions (Q1-3 listing rules, Q4-13, Q14 membership criteria, filling in the household card) |
+|  39 | 1A2   | 28   | *SECTION 1 PART A HOUSEHOLD ROSTER* -- the grid.  col.3 relationship (14 codes); col.10 "In what Region was ...[NAME]... born?" = *11 codes, 11 = FOREIGN COUNTRY (SPECIFY)*; col.11 nationality (8 codes); col.13 months away |
+|  40 | 8     | 29   | Section 8 Characteristics of Housing; END OF ROUND ONE |
+|  41 |       | 29a  | Divider: ROUND TWO (explain objectives again; read the list of household members) |
+|  42 | 9A1   | 30   | Section 9 Agro-Pastoral Activities, Part A Land (Q1-14) |
+|  43 | 9A2   | 31   | Part A Land (Q15-29) |
+|  44 | 9B1   | 31a  | Part B Crops (crops 1-16) |
+|  45 | 9B2   | 32   | Part B Crops (end; crops 17-32) |
+|  46 | 9C    | 32a  | Part C Age of Tree Crops |
+|  47 | 9D1   | 33   | Part D Farm Inputs (Q1-19) |
+|  48 | 9D2   | 33a  | Part D (cont., Q20-36) |
+|  49 | 9D3   | 34   | Part D (cont., Q37-46) |
+|  50 | 9D4   | 34a  | Part D (cont., Q47-57) |
+|  51 | 9D5   | 35   | Part D (end, Q58-61) |
+|  52 | 9E    | 35a  | Part E Sales of Food Products Made from Homegrown Crops |
+|  53 | 9F    | 36   | Part F Livestock |
+|  54 | 9G/9H/9I | 36a | Part G Animal Products; Part H Extension Contacts for Livestock; Part I Livestock Expenditures |
+|  55 | 9J/9K | 37   | Part J Hand Tools; Part K Farming Equipment |
+|  56 | 10A   | 37a  | Section 10 Non-Farm Self-Employment, Part A Working Conditions |
+|  57 | 10B   | 38   | Part B Expenditures |
+|  58 | 10C   | 38a  | Part C Revenues |
+|  59 | 10D   | 39   | Part D Business Assets |
+|  60 | 11A   | 39a  | Section 11 Expenditures and Inventory of Durable Goods, Part A Daily Expenses |
+|  61 | 11B   | 40   | Part B Annual Expenses |
+|  62 | 11C   | 40a  | Part C Inventory of Durable Goods |
+|  63 | 11D   | 41   | Part D Expenses for Remittances (col.4 = 7-code place type; col.5 = 17-code region/country list) |
+|  64 | 12A1  | 41a  | Section 12 Food Expenses and Home Production, Part A Food Expenses (codes 301-315) |
+|  65 | 12A2  | 42   | Part A (316-331) |
+|  66 | 12A3  | 42a  | Part A (332-346) |
+|  67 | 12A4  | 43   | Part A (347-361, end) |
+|  68 | 12B1  | 43a  | Part B Consumption of Home Production (301-330) |
+|  69 | 12B2  | 44   | Part B (332-360, end) |
+|  70 | 13A1  | 45   | Section 13 Fertility, Part A Fertility History (Q1-11) |
+|  71 | 13A2  | 45a  | Part A (Q12-26) |
+|  72 | 13B   | 46   | Part B Birth Control |
+|  73 | 14A   | 46a  | Section 14 Other Income, Part A Income from Remittances (col.4 = 7-code place type; col.5 = *14-code* region/country list: ...10 Upper East, 11 Nigeria, 12 Ivory Coast, 13 Other Africa, 14 Other) |
+|  74 |       |      | (portrait, rotated) Section 15 Credit and Savings, Part A Money and Goods Lent and Borrowed |
+|  75 |       |      | (portrait, rotated) Section 15 Part B Loans Contracted; Part C Savings; END OF SECOND ROUND |
+|  76 |       |      | (portrait, rotated) Section 16 Part A Anthropometrics -- Round One |
+|  77 |       |      | (portrait, rotated) Section 17 Part A Cognitive Skills Tests -- Round One (handwritten "GLSY2.17A", "AGEY = age in years") |
+|  78 |       |      | (portrait, rotated) Section 17 Part C Cognitive Skills Tests -- Household Level Information (handwritten "GLSY2.17C") |
+
+* The three region code lists in one instrument
+
+| list | codes | printed on |
+|------+-------+------------|
+| birth region (=1A2= col.10, Y01A:REGION) | 11; 11 = FOREIGN COUNTRY (SPECIFY) | p.39 |
+| region/country of residence or origin | 17; 11 NIGERIA, 12 IVORY COAST, 13 TOGO, 14 BURKINA FASO, 15 MALI, 16 OTHER AFRICA (SPECIFY), 17 OTHER (SPECIFY) | p.8 (=1C= col.12, Y01C:NRCREG), p.35 (Section 6 col.8, Y06:REGMOV), p.63 (=11D= col.5) |
+| remittance sender's region (=14A= col.5) | 14; 11 NIGERIA, 12 IVORY COAST, 13 OTHER AFRICA, 14 OTHER | p.73 |
+
+The 7-code place-type list (City 1 ... Other 7) is printed identically on
+p.8 (=1C= col.13, Y01C:NRCPL), p.35 (Section 6 cols 3 and 9), p.63 (=11D=
+col.4) and p.73 (=14A= col.4).

@@ -127,9 +127,68 @@ The following tables are mapping of numerical codes to categorical labels for 19
 |  360 | Other foods                                                         |
 
 
+* Y01A
+
+# GLSS2 Y01A.DAT:REGION -- the household roster's "In what Region was
+# ...[NAME IN QUESTION 1]... born?", which feeds household_roster.Birthplace.
+# Read off the questionnaire itself (check C4): GLSS2 Household Questionnaire,
+# SECTION 1 PART A HOUSEHOLD ROSTER, form block 1A2, printed page 28 / PDF
+# page 39, column 10.  The form prints, verbatim:
+#   WESTERN.....1   CENTRAL.....2   GREATER ACCRA.....3   EASTERN.....4
+#   VOLTA.......5   ASHANTI.....6   BRONG-AHAFO.......7   NORTHERN....8
+#   UPPER WEST..9   UPPER EAST.10   FOREIGN COUNTRY (SPECIFY).......11
+# Eleven codes, with a SINGLE foreign-country code.  Data: Y01A:REGION takes
+# exactly 1..11 (n=14,918; code 11 = 236 people) and never 12-17.  Column 11
+# of the same block (nationality, 8 codes: Ghana 1 ... Other 8) is Y01A:NAT.
+# Rendered evidence pages and a one-line index of all 78 questionnaire pages:
+# slurm_logs/ghana_audit/glss2_questionnaire/.
+#
+# Until 2026-09-02 this wave had no Y01A table, so `code_label_map('region',
+# _dirs)` in mapping.py resolved to the Y01C table below (now named
+# `nrcreg_region`): 17 codes, from a DIFFERENT question, whose code 11 is
+# NIGERIA -- so 236 people born abroad were labelled `Nigeria` (GH #695).
+# Label spellings follow 1987-88's own Y01A table (same instrument, same
+# list): `Brong Ahafo` spaced (the form hyphenates it; every other wave's
+# table spaces it) and `Foreign Country`.
+#
+# NOTE: commentary must stay ABOVE `#+name:`.  An Org `#+name:` attaches to
+# the NEXT element; a comment between the keyword and the table silently
+# steals the name and the decode goes dead with no error (CONTENTS.org Trap 4).
+#+name: region
+| Code | Label           |
+|------+-----------------|
+|    1 | Western         |
+|    2 | Central         |
+|    3 | Greater Accra   |
+|    4 | Eastern         |
+|    5 | Volta           |
+|    6 | Ashanti         |
+|    7 | Brong Ahafo     |
+|    8 | Northern        |
+|    9 | Upper West      |
+|   10 | Upper East      |
+|   11 | Foreign Country |
+
 * Y01C
 
-#+name: region
+# Y01C.DAT:NRCREG -- Section 1 Part C "CHILDREN RESIDING ELSEWHERE", form
+# block 1C, printed page 3a / PDF page 8, column 12: "In what region or
+# country does ...[NAME]... live?" -- 17 codes through OTHER (SPECIFY)...17.
+# WB data dictionary: catalog 2314, F22 `y01c`, `nrcreg` = "01cq12: region
+# of residence".  Data: NRCREG takes 1..17 (n=5,277; 15 = Mali unused).
+# The SAME 17-code list is printed for Section 6 col.8 (Y06:REGMOV, PDF
+# p.35) and Section 11 Part D col.5 (remittances sent, PDF p.63).  It is NOT
+# the roster's birth-region list (11 codes, `region` above) nor Section 14
+# Part A's (14 codes, PDF p.73).  Region code lists in GLSS2 are
+# question-specific: never carry one across sections.
+#
+# Renamed from `region` on 2026-09-02 (GH #695) so that
+# `code_label_map('region', _dirs)` can no longer pick it up for Y01A:REGION.
+# Nothing reads it today; kept as the verified decode for whoever wires
+# NRCREG.
+#
+# NOTE: commentary must stay ABOVE `#+name:` (see the Y01A note).
+#+name: nrcreg_region
 | Code | Label         |
 |------+---------------|
 |    1 | Western       |
