@@ -1,0 +1,47 @@
+#+title: Handoff -- v0.10.0 release
+#+date: 2026-09-02
+#+author: Sue (Claude Opus 5, 1M context)
+
+* State
+- Branch =development= at =bc8aa2df=, pushed.  =master= is 204 behind, 0 ahead --
+  the merge is a fast-forward with no conflict risk.
+- *PR #739* open: =development= -> =master=, "Release v0.10.0".
+- PR #738 (EthiopiaRHS docs) was merged into =development= first, per @ligon.
+
+* Next concrete action
+1. Review + merge PR #739.
+2. =make release v=0.10.0=  (re-runs pytest, then tags =master=)
+3. =git push origin v0.10.0=
+4. Publish the GitHub Release *from the web UI* -- a =gh=-created release
+   sometimes fails to fire =publish.yml=.  Verify with
+   =gh run list --workflow=publish.yml=; fallback is
+   =gh workflow run publish.yml --ref master -f tag=v0.10.0=.
+   Notes file: =docs/releases/v0.10.0.md=.
+
+* Decisions taken (with @ligon)
+- Version *v0.10.0* (not 1.0.0 -- 55 issues open, #323 umbrella live,
+  =LSMS_GRAIN_STRICT= not yet on in CI).
+- Coverage matrix snapshot shipped as-is (one PR stale; regenerable).
+- =Closes:= list deliberately *empty* -- see PR #739 body and
+  =slurm_logs/RELEASE_v0.10.0_closes.org=.
+
+* Open questions / follow-ups (none blocking)
+1. =tests/test_pakistan_cluster_features.py::test_extraction_is_cluster_grain=
+   fails on real data.  Data is correct; the test's proxy assertion is
+   environment-dependent.  *14 countries* declare =materialize: make= with no
+   =_/Makefile= and survive on =country.py='s =try_script= fallback.  Worth an
+   issue -- and worth checking whether #612's Pakistan wave script is exercised
+   at all, since =data_scheme.yml= claims it is what keeps =groupby().first()=
+   from firing.  See =slurm_logs/release_v0.10.0/PREFLIGHT.org=.
+2. CLAUDE.md says 28 =national-claimed= population waves; the shipped config has
+   *29*.  One-line doc fix.
+3. Superseded parquets parked (not deleted) at
+   =/global/scratch/fsa/fc_jevons/ligon/cache/_stale_backup_20260902/=.
+   Safe to remove once v0.10.0 is out.
+4. =v0.9.1= was tagged two commits *past* =master= and never merged back, which
+   is why =master= sat at the v0.9.0 merge.  Avoided this time by committing the
+   notes to =development= first and tagging =master= after the merge.
+
+* Environment note
+=.venv= was a stale symlink to a dead job's =/local=.  Restored with
+=bash bin/savio_venv.sh mount=.  Do that first on any new allocation.
