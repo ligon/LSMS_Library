@@ -10,9 +10,12 @@
 
 * Next concrete action
 1. Review + merge PR #739.
-2. =make release v=0.10.0=  (re-runs pytest, then tags =master=)
-3. =git push origin v0.10.0=
-4. Publish the GitHub Release *from the web UI* -- a =gh=-created release
+2. =git checkout master && git pull=  -- =make release= tags the *current*
+   HEAD, not =master=.  Running it from =development= is how v0.9.1 became an
+   orphan tag (item 4 below).
+3. =make release v=0.10.0=  (re-runs pytest, then tags the checked-out master)
+4. =git push origin v0.10.0=
+5. Publish the GitHub Release *from the web UI* -- a =gh=-created release
    sometimes fails to fire =publish.yml=.  Verify with
    =gh run list --workflow=publish.yml=; fallback is
    =gh workflow run publish.yml --ref master -f tag=v0.10.0=.
@@ -26,13 +29,13 @@
   =slurm_logs/RELEASE_v0.10.0_closes.org=.
 
 * Open questions / follow-ups (none blocking)
-1. =tests/test_pakistan_cluster_features.py::test_extraction_is_cluster_grain=
-   fails on real data.  Data is correct; the test's proxy assertion is
-   environment-dependent.  *14 countries* declare =materialize: make= with no
-   =_/Makefile= and survive on =country.py='s =try_script= fallback.  Worth an
-   issue -- and worth checking whether #612's Pakistan wave script is exercised
-   at all, since =data_scheme.yml= claims it is what keeps =groupby().first()=
-   from firing.  See =slurm_logs/release_v0.10.0/PREFLIGHT.org=.
+1. *GH #740* filed: =test_extraction_is_cluster_grain= fails on any
+   data-credentialed machine.  Now =xfail(strict=False)= so =make release= is
+   not blocked -- without that, step 3 above would have failed on this very
+   box.  The open question is substantive: =data_scheme.yml= claims the wave
+   script is what keeps =groupby().first()= from firing on Pakistan, and that
+   script does not appear to run.  Delivered data is correct; "right output"
+   and "the guard is live" are different facts and only the first is verified.
 2. CLAUDE.md says 28 =national-claimed= population waves; the shipped config has
    *29*.  One-line doc fix.
 3. Superseded parquets parked (not deleted) at
