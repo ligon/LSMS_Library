@@ -30,7 +30,8 @@ import pandas as pd
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
 from glss_prices import (assemble, canon_unit, melt_observations,
-                         price_item_table, unit_label_map, v_from_clust)
+                         other_unit_map, price_item_table, unit_label_map,
+                         v_from_clust)
 
 WAVE = '2016-17'
 SRC = '../Data/g7price.dta'
@@ -41,6 +42,7 @@ def build():
     labels = get_dataframe(SRC, convert_categoricals=True, categories_only=True)
     ulab = {int(k): str(v).strip() for k, v in labels['unita'].items()}
     umap = unit_label_map()
+    omap = other_unit_map(WAVE)
     items = price_item_table(WAVE)
 
     code = pd.to_numeric(raw['ln'], errors='coerce').astype('Int64')
@@ -66,7 +68,7 @@ def build():
             if pd.isna(c):
                 out.append(pd.NA)
             elif int(c) == 99 and o:
-                out.append(canon_unit(o, umap))
+                out.append(canon_unit(o, umap, omap))
             else:
                 out.append(canon_unit(ulab.get(int(c)), umap))
         return pd.Series(out, index=raw.index, dtype='string'), other

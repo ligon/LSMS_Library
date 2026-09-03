@@ -2166,8 +2166,8 @@ here; nothing in =transformations.py= was touched.
 
 | Wave    | Price file                          | Form is keyed on                                   | Price clusters | ... in sample().v | sample().v priced |
 |---------+-------------------------------------+----------------------------------------------------+----------------+-------------------+-------------------|
-| 1987-88 | =Data/PRICE.DAT= (+ =PRICE.DCT=)      | LOCALITY / CLUSTER (1987 form, rendered)           |            165 | 165/165           | 165/176           |
-| 1988-89 | =Data/PRICE.DAT=                      | same form (the 1988 PDF is the same blob as 1987's) |            112 | 112/112           | 112/170           |
+| 1987-88 | =Data/PRICE.DAT= (+ =PRICE.DCT=)      | LOCALITY / CLUSTER (1987 form, rendered)           |            165 | 163/165           | 163/176           |
+| 1988-89 | =Data/PRICE.DAT=                      | same form (the 1988 PDF is the same blob as 1987's) |            112 | 106/112           | 106/170           |
 | 1991-92 | =Data/Prices/G3PRICE.DTA=             | REGION / DISTRICT / NAME OF LOCALITY / EA          |            256 | 256/256           | 256/365           |
 | 1998-99 | =Data/Prices/G4PRICE.DTA=             | same instrument as GLSS3 (text layer)              |            253 | 251/253           | 251/300           |
 | 2005-06 | NONE distributed                    | REGION / E.A. NUMBER / MARKET NUMBER (=G5QPrice.pdf=) |            -- | --                | --                |
@@ -2180,8 +2180,12 @@ carried NATIVELY in the index.  No cluster id is fabricated anywhere.
 Corroboration beyond the key match: =loc5= in =G3PRICE.DTA= agrees 100% with
 =POV_GH.DTA='s =loc5= on all 256 clusters; the BID's "165 ... price
 questionnaires" for year one (Table 1a, printed p.13; p.17 "coded for 164 of
-176 first year clusters") is the 165 distinct =CLUST= in the file.  Two
-1998-99 price clusters (of 253) are not in =SEC0A.DTA=.
+176 first year clusters") is the 165 distinct =CLUST= in the file.  Price
+clusters with no household in the wave's sample: 1987-88 clusters 1020 and
+1167 (85 rows); 1988-89 clusters 2007, 2036, 2177, 2198, 2209 and 2692 (271
+rows -- BID p.17 lists price forms "coded for 107 of the 170 second year
+clusters", and these six are price forms for clusters the household file
+does not carry); 1998-99 two clusters (of 253) are not in =SEC0A.DTA=.
 
 ** The grain is (t, v, j, u, obs) -- three vendors per item, in every wave
 
@@ -2195,7 +2199,12 @@ observations are kept as rows under =obs= (core does not aggregate), so
 GhanaLSS departs from the precedent by one index level.  =obs= 1-3 is the
 form's slot; larger values occur only where the source holds more than one
 record for a (cluster, item, unit) and are enumerated deterministically
-(interview month, then description/brand, then slot):
+(interview month, then description/brand, then slot).  A fourth cause is the
+=j= axis itself: where several price items fold onto one label (Nescafe tin
++ sachet -> =Coffee=; the five chocolate drinks -> =Chocolate Drink=, 5 x 9
+rows = =obs= 45 in 1998-99) the rows stack under one (v, j, u) and
+=Description= tells the items apart.  Share of rows at =obs= <= 3: 1987-88
+98%, 1988-89 97%, 1991-92 90%, 1998-99 88%, 2012-13 87%, 2016-17 81%.
 
 - 1988-89: two clusters were priced twice -- 2305 in June AND September
   1989 (a genuine repeat visit), 2310 twice in one month (25 of its 48 item

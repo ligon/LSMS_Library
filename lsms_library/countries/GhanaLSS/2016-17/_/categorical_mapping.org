@@ -1308,3 +1308,110 @@ cluster/region pairs) -- kept native, told apart by =obs=.
 | 829  | MOTOR VEHICLE INSURANCE (THIRD | Motor vehicle insurance (third | no   |      |       |                                                                                 |
 | 830  | PHOTOCOPY CHARGE PER A4 SHEET  | Photocopy charge per a4 sheet  | no   |      |       |                                                                                 |
 | 831  | PUBLIC TOILETS FEES PER ADULT  | Public toilets fees per adult  | no   |      |       |                                                                                 |
+
+When =unit{a,b,c}= is 99 ("Other unit") the reader wrote the unit in
+=unito{a,b,c}=; 132 distinct spellings.  The table below folds the ones that
+are plain misspellings or case variants of a unit onto the shared axis
+(=_/unit_labels.org= Preferred Labels, plus Tablet / Capsule / Bottle /
+Milligram / Page / Person / Month / Feet / Inch / Gigabyte which the axis
+lacks); anything not listed stays as written (title-cased) so it is visible
+as NEW rather than silently dropped.  Matching is case-insensitive on the
+stripped text.
+#+name: harmonize_price_unit
+| Text            | Preferred Label |
+|-----------------+-----------------|
+| kg              | Kilogram        |
+| ml              | Milliliter      |
+| mls.            | Milliliter      |
+| mml             | Milliliter      |
+| cl              | Milliliter      |
+| mg              | Milligram       |
+| milligram       | Milligram       |
+| milligrams      | Milligram       |
+| milligramme     | Milligram       |
+| milligramd      | Milligram       |
+| milligrsms      | Milligram       |
+| millllgram      | Milligram       |
+| miligram        | Milligram       |
+| 9mg             | Milligram       |
+| 9milligrams     | Milligram       |
+| 200mg           | Milligram       |
+| mm              | Millimeter      |
+| millimeter      | Millimeter      |
+| millimetre      | Millimeter      |
+| millimetres     | Millimeter      |
+| milimeter       | Millimeter      |
+| milimetre       | Millimeter      |
+| capsule         | Capsule         |
+| capsules        | Capsule         |
+| capsuls         | Capsule         |
+| casules         | Capsule         |
+| tablet          | Tablet          |
+| tablets         | Tablet          |
+| tablt           | Tablet          |
+| strip           | Blister/Strip   |
+| blister         | Blister/Strip   |
+| gallon          | Gallon          |
+| gallo           | Gallon          |
+| galon           | Gallon          |
+| frytol gallon   | Gallon          |
+| bottle          | Bottle          |
+| small bottle    | Bottle          |
+| can             | Can             |
+| bag             | Bag             |
+| buckets         | Bucket          |
+| pieces of 330ml | Piece           |
+| 330ml pieces    | Piece           |
+| 325ml pieces    | Piece           |
+| page            | Page            |
+| 1 page          | Page            |
+| 1page           | Page            |
+| per page        | Page            |
+| per sheet       | Sheet           |
+| person          | Person          |
+| per person      | Person          |
+| per perdon      | Person          |
+| passenger       | Person          |
+| passengaer      | Person          |
+| passenager      | Person          |
+| passage         | Person          |
+| month           | Month           |
+| monthly         | Month           |
+| months          | Month           |
+| per month       | Month           |
+| year            | Year            |
+| yearly          | Year            |
+| per day         | Day             |
+| room            | Room            |
+| per room        | Room            |
+| feet            | Feet            |
+| inch            | Inch            |
+| inches          | Inch            |
+| gigabyte        | Gigabyte        |
+| gigabite        | Gigabyte        |
+| gig             | Gigabyte        |
+| 4 gigabytes     | Gigabyte        |
+| kwh             | Kilowatts       |
+| kilowatts       | Kilowatts       |
+| watts           | Watts           |
+| volt            | Volt            |
+| ampere          | Ampere          |
+| ampoule         | Ampoule         |
+| acre            | Acre            |
+| plot            | Plot            |
+| kilometre       | Kilometre       |
+| service         | Service         |
+| dose            | Dose            |
+| course          | Course          |
+| stamp           | Stamp           |
+| olunka          | American Tin    |
+| calabash        | Calabash        |
+| board           | Board           |
+| rod             | Rod             |
+| wheel           | Wheel           |
+| ounce           | Ounce           |
+| carat           | Carat           |
+| meter square    | Square Meter    |
+| cubic metre     | Cubic Meter     |
+| metric cubic    | Cubic Meter     |
+| m3              | Cubic Meter     |

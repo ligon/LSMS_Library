@@ -101,9 +101,14 @@ def main():
         med = {}
         for k, labs in STAPLES.items():
             sub = g[g.j.isin(labs)]
-            med[k] = (round(float(sub.Price.median()), 3) if len(sub) else None, len(sub),
-                      sorted(sub.u.dropna().unique())[:3])
-        print('   staple median Price (n, units):', med)
+            # a per-unit value (Price / NumberOfUnits) is a TRANSFORMATION --
+            # computed here for the report only, never stored.
+            kg = sub[sub.u.isin(['Kg', 'Kilogram']) & sub.NumberOfUnits.gt(0)]
+            per_kg = (kg.Price / kg.NumberOfUnits).median() if len(kg) else None
+            med[k] = dict(n=len(sub), median_Price=round(float(sub.Price.median()), 3) if len(sub) else None,
+                          median_per_kg=round(float(per_kg), 3) if per_kg is not None and pd.notna(per_kg) else None,
+                          units=sorted(sub.u.dropna().unique())[:4])
+        print('   staples:', med)
 
     print('\n===== overall:', cp.shape, ' t values:', sorted(flat.t.unique()))
 

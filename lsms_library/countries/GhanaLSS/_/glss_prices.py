@@ -134,12 +134,29 @@ def unit_label_map() -> dict[str, str]:
     return m
 
 
-def canon_unit(label, umap: dict[str, str] | None = None):
+def other_unit_map(wave: str) -> dict[str, str]:
+    """``{lower-cased free-text spelling: Preferred Label}`` from the wave's
+    ``harmonize_price_unit`` org table (the reader's "other unit" text);
+    ``{}`` if the wave has no such table."""
+    path = wave_dir(wave) / 'categorical_mapping.org'
+    try:
+        t = _strip_table(df_from_orgfile(path, name='harmonize_price_unit',
+                                         to_numeric=False))
+    except KeyError:
+        return {}
+    m = {k.lower(): v for k, v in zip(t['Text'], t['Preferred Label']) if k and v}
+    assert m, f'{path}: harmonize_price_unit decoded to an EMPTY dict'
+    return m
+
+
+def canon_unit(label, umap: dict[str, str] | None = None,
+               extra: dict[str, str] | None = None):
     """Native unit spelling -> Preferred Label on the shared ``u`` axis.
 
-    Exact match first, then case-insensitive; a spelling the table does not
-    know is returned unchanged (title-cased) so it is visible as NEW rather
-    than silently dropped.  ``None``/blank -> ``pd.NA``.
+    Exact match first, then case-insensitive, then the wave's free-text
+    spelling table ``extra`` (lower-cased keys); a spelling no table knows is
+    returned unchanged (title-cased) so it is visible as NEW rather than
+    silently dropped.  ``None``/blank -> ``pd.NA``.
     """
     if label is None or (isinstance(label, float) and pd.isna(label)):
         return pd.NA
@@ -152,6 +169,8 @@ def canon_unit(label, umap: dict[str, str] | None = None):
     low = {k.lower(): v for k, v in umap.items()}
     if s.lower() in low:
         return low[s.lower()]
+    if extra and s.lower() in extra:
+        return extra[s.lower()]
     return s.title()
 
 
@@ -219,7 +238,12 @@ def melt_observations(df: pd.DataFrame, slots: list[tuple],
             part[out] = df[src].values
         for out in ('Price', 'NumberOfUnits', 'u', 'unit_other'):
             src = cols.get(out)
-            part[out] = df[src].values if src is not None and src in df.columns else pd.NA
+            if src is not None and src in df.columns:
+                part[out] = df[src].values
+            elif out not in part.columns:
+                # Not a per-slot field for this source; keep a per-record
+                # value from base_cols if one was given, else NA.
+                part[out] = pd.NA
         part['slot'] = slot
         pieces.append(part)
     return pd.concat(pieces, ignore_index=True)

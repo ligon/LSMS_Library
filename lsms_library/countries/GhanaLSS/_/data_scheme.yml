@@ -82,10 +82,12 @@ Data Scheme:
     # here, not imputed.
     #   v   -- the price survey's own cluster id (CLUST/clust), the SAME
     #          keyspace as sample().v, NATIVE in the index (no household i, so
-    #          _join_v_from_sample does not apply).  Measured joins: 1987-88
-    #          165/176 household clusters priced, 1988-89 112/170, 1991-92
-    #          256/365, 1998-99 251/300 (2 price clusters not in the sample),
-    #          2012-13 1015/1200, 2016-17 398/1000.
+    #          _join_v_from_sample does not apply).  Measured joins (price clusters
+    #          in sample().v / household clusters priced): 1987-88 163/165,
+    #          163/176; 1988-89 106/112, 106/170; 1991-92 256/256, 256/365;
+    #          1998-99 251/253, 251/300; 2012-13 1015/1015, 1015/1200;
+    #          2016-17 398/398, 398/1000.  The price clusters outside the
+    #          sample are named in CONTENTS.org.
     #   j   -- the priced item on the wave's harmonize_food Preferred-Label
     #          axis (joins food_acquired.j); non-foods, and the few foods a
     #          wave's axis does not name, carry their own label.  Every wave's
@@ -102,8 +104,10 @@ Data Scheme:
     #          a/b/c; BID §2.3 "prices from up to three vendors"): obs 1-3 is
     #          the form's slot; values above 3 arise only where the source
     #          holds more than one record for a (cluster, item, unit) -- a
-    #          repeat visit, several brand lines, a mis-keyed cluster -- and
-    #          are enumerated deterministically.  This is the departure from
+    #          repeat visit, several brand lines, a mis-keyed cluster, or
+    #          several price items folding onto one j label (Nescafe tin +
+    #          sachet -> Coffee; Description keeps them apart) -- and are
+    #          enumerated deterministically.  This is the departure from
     #          the Malawi / Nigeria (t, v, j, u) precedent: nothing is
     #          averaged or first()-ed away.
     # Reported columns only (see _/glss_prices.py):
