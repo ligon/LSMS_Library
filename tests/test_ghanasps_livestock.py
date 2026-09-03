@@ -207,9 +207,10 @@ def test_index_unique_no_grain_warning_no_null_read(gsps_build):
 @pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", WAVES)
 def test_row_counts_pin_the_bounded_reducer(gsps_build, wave):
-    """The hook SUMS duplicate (t, i, animal) lines.  These counts are the
-    source's -- 20 / 0 / 1 groups -- and a change means a new duplicate
-    appeared that must be looked at, not summed away."""
+    """Delivered rows per wave.  Any change here means the SOURCE or the
+    HOOK changed (a new duplicate, a keep-rule edge case, a re-issued .dta)
+    and must be looked at; the duplicate groups themselves are pinned
+    directly by ``test_dedup_groups_are_exactly_the_known_ones`` below."""
     df, _, _ = gsps_build
     w = df[df["t"] == wave]
     assert len(w) == EXPECTED_ROWS[wave], (wave, len(w))
@@ -263,6 +264,56 @@ def test_HeadSold_is_2017_18_only(gsps_build):
     w3 = df[df["t"] == "2017-18"]
     assert w3["HeadSold"].notna().mean() > 0.99
     assert (w3["HeadSold"] > 0).sum() > 1000
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize("wave", WAVES)
+def test_dedup_groups_are_exactly_the_known_ones(species_table, wave):
+    """Recompute, from the SOURCE files, the duplicate (i, animal) groups the
+    hook sums -- after the null-animal drop and the keep-rule, exactly as
+    the hook sees them -- and pin their number: 20 / 0 / 1.  A NEW
+    duplicate is a change in the source that must be looked at, not summed
+    away; this is what keeps the reducer bounded."""
+    import pandas as pd
+    from lsms_library.local_tools import get_dataframe
+
+    root = countries_root() / "GhanaSPS"
+    label = species_table.set_index("Alternate Spelling")["Preferred Label"].to_dict()
+    if wave == "2009-10":
+        r = get_dataframe(str(root / "2009-10/Data/S3AI.dta"))
+        cedis = pd.to_numeric(r["s3ai_3i"], errors="coerce")
+        pes = pd.to_numeric(r["s3ai_3ii"], errors="coerce")
+        frame = pd.DataFrame({
+            "i": r["hhno"].astype(str), "animal_raw": r["animal_id"].astype(object),
+            "HeadCount": pd.to_numeric(r["s3ai_1"], errors="coerce"),
+            "HeadSold": float("nan"),
+            "HerdValue": (cedis.fillna(0) + pes.fillna(0) / 100).where(cedis.notna() | (pes.fillna(0) > 0)),
+        })
+    else:
+        parts = [get_dataframe(str(root / wave / "Data/03ai_animalquestions.dta"))]
+        if wave == "2017-18":
+            parts.append(get_dataframe(str(root / wave / "Data/03ai_animalquestions_osp.dta")))
+        r = pd.concat(parts, axis=0, sort=False)
+        frame = pd.DataFrame({
+            "i": r["FPrimary"].astype(str), "animal_raw": r["animal"].astype(object),
+            "HeadCount": pd.to_numeric(r["quantity"], errors="coerce"),
+            "HeadSold": (pd.to_numeric(r["quantitysold"], errors="coerce")
+                         if "quantitysold" in r.columns else float("nan")),
+            "HerdValue": pd.to_numeric(r["currentvalue"], errors="coerce"),
+        })
+    frame["animal"] = frame["animal_raw"].map(lambda x: label.get(x, x))
+    frame = frame[frame["animal"].notna()]
+    holds = (frame[["HeadCount", "HeadSold", "HerdValue"]].fillna(0) > 0).any(axis=1)
+    frame = frame[holds]
+    dup = frame.duplicated(subset=["i", "animal"], keep=False)
+    groups = frame[dup].groupby(["i", "animal"]).size()
+    assert len(groups) == EXPECTED_DEDUP_GROUPS[wave], (
+        f"{wave}: {len(groups)} duplicate (i, animal) groups, expected "
+        f"{EXPECTED_DEDUP_GROUPS[wave]} -- a new duplicate must be looked at:\n{groups}")
+    if wave == "2009-10":
+        assert set(groups.index.get_level_values("animal")) == {"Other Livestock"}
+    if wave == "2017-18":
+        assert list(groups.index) == [("106183008", "Chicken")]
 
 
 @pytest.mark.requires_s3
