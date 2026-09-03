@@ -1379,3 +1379,147 @@ instrument); GPS (absent).  The 'Other' tenure free text (73 / 67 rows:
 ="no man's land"=, ="I just saw it and started farming on it"=, ="Caretaker"=)
 is not decoded; some of it is plausibly =squatted=, and a later pass could
 say so with the questionnaire in hand.
+
+** Livestock: wired for all three waves, and what the build taught (2026-09-02)
+
+=livestock= is now wired for all three waves at the canonical grain =(t, i,
+animal)= -- YAML path, one source file per wave (wave 3 lists its =_osp=
+"other -- specify" file as a second =file:= entry, row-concatenated), the
+=animal= label harmonised at EXTRACTION through a new =harmonize_species=
+table in =_/categorical_mapping.org=, plus ONE country-level =df_edit= hook,
+=ghanasps.livestock=, for the four things YAML cannot do (recombine wave 1's
+cedis + pesewas; drop wave 1's null-animal rows; drop wave 2's roster-grid
+filler; sum the duplicate lines).  Delivered on a cold build under
+=LSMS_GRAIN_STRICT=1=: *4,248 / 3,963 / 4,284* rows in *2,137 / 2,081 /
+2,361* households, index unique, 0 =GrainCollapseWarning=, 0 null-read
+reports against the table, =is_this_feature_sane().ok= True.  Working:
+=slurm_logs/ghanasps/livestock_verify.py= and its =_cold.log=; every label
+-> target and every judgement is in the =livestock= block of
+=_/data_scheme.yml= and the =harmonize_species= section of
+=_/categorical_mapping.org=; per-wave evidence is in each wave's
+=data_info.yml=.  What follows is only what was NOT already on record in
+the scoping section above.
+
+*** The value column is =HerdValue=, and the data corroborate the wording
+
+The scoping note above already settled, on all three instruments, that the
+value question asks for the herd total ("if you sold *all of them*").  The
+canonical schema (=lsms_library/data_info.yml=, =Columns: livestock=) splits
+the value columns by ADDITIVITY -- =ValuePerAnimal= (per head, not
+additive) / =HerdValue= (stock total) / =SalesValue= (sales flow) -- and
+prescribes a conditional test to corroborate the wording: is the value
+reported when there is nothing to value?  Measured on wave 2's fixed grid:
+*0 of 10,884* zero-head rows carry a value.  A herd total vanishes with the
+herd; a per-head reservation price (Nigeria, Malawi, early Uganda: reported
+whether or not anything is sold) would not.  So GhanaSPS is the first
+roster-grain country in the corpus to declare =HerdValue= (EthiopiaRHS
+declares it at the household grain).  =ValuePerAnimal= is *not* declared;
+a per-head figure is =HerdValue / HeadCount=, an analyst's transformation.
+
+Per-head medians (GHS), as a scale check: cattle 300 / 700 / 1,155, goats
+and sheep 33 / 80 / 150, chicken 5 / 10 / 20 across the three waves --
+cattle >> goats >> chicken in every wave, and wave 1 sits on the same
+scale as the decimal-cedis waves, which is what shows the cedis + pesewas
+recombination is right (a pesewas-as-cedis error would be x100).
+
+*** Wave 1's null-animal rows are a real loss; its multi-line catch-all is summed
+
+Eight =S3AI= rows have a null =animal_id= -- 181 head, values up to 1,400
+GHS, four of them one household (108280011) which also records revenue on
+them.  No column identifies the species, =format_id= would hand the
+=(t, i, animal)= collapse a null index level to delete (fatal under strict),
+so the hook drops them deliberately.  Five households (104119034,
+106184083, 106193108, 107239025, 108280011) had *only* such rows and are
+therefore absent from the delivered wave-1 table.  Recorded here rather
+than hidden.
+
+Twenty households list =Other Farm Animals= on two or three lines each (42
+rows; 108286013 reports 2 + 6 + 15 head, 107248016 600 + 600) -- different
+unnamed species the wave-1 instrument never asks to name.  At the
+=(t, i, animal)= grain they collide.  The hook SUMS =HeadCount= and
+=HerdValue= per key, which is legal only because every declared column is
+additive at this grain (that is what the =HerdValue= / =ValuePerAnimal=
+split buys), and it is the same thing Malawi's =assemble_livestock= and
+Uganda's =livestock_for_wave= do.  It is nonetheless a reducer, so it is
+kept *bounded*: the verify script prints every group it collapsed and
+=tests/test_ghanasps_livestock.py= pins the per-wave counts (20 groups in
+wave 1, 0 in wave 2, 1 in wave 3), so a new duplicate turns the test red
+instead of being quietly summed.  Note what the wave-1 sum means: 20
+=Other Livestock= rows each add several species into one line -- the level
+that instrument never recorded.
+
+*** Wave 2's grid, and why the keep-rule is Nigeria's inclusive form
+
+Wave 2 asks a fixed seven-species grid of every one of its 2,098
+households and 10,884 of the resulting 14,686 rows are zeros (plus 13 with
+a null quantity and nothing else).  All three precedent countries drop the
+never-owned roster filler; the rule adopted is Nigeria's -- keep a row iff
+*any* of =HeadCount= / =HeadSold= / =HerdValue= is non-null and positive.
+The inclusive form matters here and the reason is the column semantics,
+not taste: a positive =HerdValue= alone IS evidence of a holding because it
+values the herd, whereas Uganda's rule excludes value-alone rows because
+*its* value is a per-head price, which is not.  Measured, the two forms
+differ on 9 wave-1 and 11 wave-3 rows (null head, no sale, positive value)
+and on 0 wave-2 rows.  Seventeen wave-2 households answer zero on every
+grid row and have no tail row, so they have no delivered row.
+
+*** The =animal= vocabulary: precedent label wins, species never folded
+
+The rule and the whole table are in =_/categorical_mapping.org=.  Two
+things worth knowing without opening it: (a) the list mixes Uganda's
+species-level plurals (=Cattle Sheep Goats Pigs Rabbits Chicken Donkeys
+Other Poultry=) with Nigeria's and Malawi's singular =Duck= / =Turkey=
+(and =Guinea Fowl= / =Fish= / =Dove/Pigeon= / =Other Livestock=), because
+cross-country coincidence in =Feature('livestock')= was preferred to
+internal tidiness; seven coinages have no precedent (=Draught Animals=,
+=Dogs=, =Cats=, =Grasscutters=, =Guinea Pigs=, =Peacocks=, =Quails=); (b)
+three wave-2 free-text spellings -- ='50'=, ='cut'=, ='dake'= -- are
+genuinely unmappable and are delivered as their own =animal= values rather
+than guessed at.  The delivered per-wave value sets are 8 / 22 / 17 labels,
+each a subset of the table's Preferred Labels plus those three.
+
+Cross-wave artefacts to know: =Other Livestock= exists only in 2009-10
+(that instrument has no slot to *name* a guinea fowl or a duck, so 261
+rows / 3,978 head of them live in the catch-all), while waves 2 and 3 name
+them -- 1,198 and 442 guinea fowl.  =Donkeys= (named in the free text)
+overlaps with =Draught Animals= (the grid row whose label says "donkey,
+horse, bullock").  Dogs and cats are reported with sale values in waves 2
+and 3 and are delivered under their own labels so a wealth aggregate can
+exclude them.
+
+*** =HeadSold= exists in wave 3 only, and it is a flow
+
+=quantitysold= (2017-18): 4,276 of 4,284 delivered rows non-null, 1,245
+positive, 51,133 head sold in total.  It is a 12-month flow against a
+current stock, so =HeadSold > HeadCount= on 76 delivered rows is not an
+error; the two outliers -- 107258039, 1,000 chickens held / 40,000 sold;
+101025002, 10 cattle held / 3,300 sold -- are left exactly as reported, the
+same policy as the two 70,000-pole plots.  =HeadSold= is declared
+=optional= so the Site B null-read guard does not fire on the two waves
+that never ask it.  =HeadAcquired= is asked nowhere.
+
+*** =v= is not attached, by canonical design -- not by omission
+
+=livestock='s canonical index in =data_info.yml='s =index_info= is
+=(t, i, animal)= with no =v=, and the table is also in =Join v from
+sample > skip_extra=, so =_no_v_join_tables()= skips it -- the same "No v
+level" every precedent country documents.  The equivalent check was run
+instead: every delivered livestock household is in its wave's =sample()=
+(2,137/2,137, 2,081/2,081, 2,361/2,361), so =v= is one join away for
+anyone who wants it.  A task brief circulated for this table asked for
+"=v= 100% non-null"; that check cannot be satisfied for livestock anywhere
+in the corpus and the brief should be read with this in mind.
+
+*** Not wired, deliberately
+
+Per-species EXPENSES (feed bought, feed home-produced, veterinary,
+shelter, hired labour, water, other) and REVENUE (animals and products
+together) exist in every wave -- =s3ai_5= .. =s3ai_12= in wave 1,
+=feedfromoutside= .. =productrevenue= later -- and have no canonical home
+in the =livestock= schema.  The revenue is *not* =SalesValue= either: it
+is sales of animals AND products in one number.  Wave 1's per-species
+owner ids (=s3ai_2i/ii=) and waves 2-3's =ownersask*= member flags are
+likewise unwired.  =LSMS_READ_STRICT=1= still cannot build this table on
+this branch for the =sample()= reason recorded under plot features above;
+the read-strict condition was asserted directly
+(=null_read_reports(country='GhanaSPS', table='livestock') == []=).
