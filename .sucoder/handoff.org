@@ -37,6 +37,10 @@ allocation.
   Proposes a canonical index_info entry + fabricate_missing_levels so
   Feature() stops modal-excluding one side.  Reviewed; recommend merge with
   the caveat.
+- *#765* #727 housing canon: Bamboo + Terrazzo added; 8 exact rows
+  re-pointed (GhanaSPS, GhanaLSS, Timor-Leste incl. lower-case `bamboo`,
+  Nigeria); data-free tests/test_housing_canon.py (47 passed).  Reviewed;
+  recommend merge.
 - Issues filed: #753 (Trap 6 _dirs), #763 (get_data_file walks the DVC
   index), #764 (make -j from os.cpu_count: -j28 on a 4-core slice).
 
@@ -48,10 +52,11 @@ allocation.
 - KLPS-4's 4 blobs pushed (files/md5/); remote now 17 short (KLPS-2/3 x8
   need EL's browser zip -> =tmp/klps_upload/=, Togo x5, Crop_encrypted x4).
   #750 commented twice (correction + progress).  #753 (Trap 6) filed.
-- Round 3 DONE: =crop_production= (PR #761), =community_prices= (PR #762).
-  Both slots free.  NEXT DISPATCH: #727 canon on =wt-canon-727= (being cut
-  alone, ~23:26); =plot_labor= on =wt-gsps-labor= AFTER #761 merges (shares
-  five GhanaSPS files with it); =plot_inputs= after plot_labor.
+- Round 3 DONE: =crop_production= (PR #761), =community_prices= (PR #762);
+  #727 DONE (PR #765).  Both slots free.  NEXT DISPATCH: =plot_labor= on
+  =wt-gsps-labor= AFTER #761 (and ideally #765) merge -- shares five
+  GhanaSPS files; then =plot_inputs= on =wt-gsps-inputs=; #563 on
+  =wt-glss-fct= once EL drops the FCT export in =tmp/fct_upload/=.
 - Round 4 STAGED, EL's rulings taken: plot_labor keeps =stage= as an index
   level with WageRate/WageUnit (BRIEF_plot_labor_2026-09-02.org);
   plot_inputs = real-quantity rows only (BRIEF_plot_inputs_2026-09-02.org);
