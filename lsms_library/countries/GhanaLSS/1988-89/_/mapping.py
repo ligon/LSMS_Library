@@ -17,7 +17,6 @@ _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
 # tools.code_label_map passes Label='Label' and keys the result by BOTH the
 # string and the int form of each code.  See GH #372/#377/#348.
 region_dict = tools.code_label_map('region', _dirs)
-rural_dict = tools.code_label_map('rural', _dirs)
 # GLSS2 uses the same 14-code relationship scheme as GLSS1 (verified:
 # REL takes codes 1..14 and code 1 occurs 3192 times = the household count).
 relationship_dict = tools.code_label_map('relationship', _dirs)

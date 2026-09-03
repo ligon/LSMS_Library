@@ -2,7 +2,7 @@
 #+AUTHOR: Ethan Ligon
 #+OPTIONS: toc:nil
 
-[[https://doi.org/10.5281/zenodo.17258079][https://zenodo.org/badge/796958546.svg]]
+[[https://doi.org/10.5281/zenodo.17258079][https://img.shields.io/badge/DOI-10.5281%2Fzenodo.17258079-blue.svg]]
 
 A Python library providing a uniform interface to Living Standards Measurement Study (LSMS) household surveys from multiple countries and years, without the data loss typical of traditional harmonization approaches.
 

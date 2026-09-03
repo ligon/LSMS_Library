@@ -1,0 +1,10 @@
+[remote] 10410 objects under s3://dvcbucket0/LSMS/, 10398 content-addressed
+[summary] 21 of 9984 sidecar blobs missing from the remote (0.2%); 163.8 MB
+[summary] documentation      0 /  1066
+[summary] data              21 /  8918
+[summary] by country (missing/total, documentation | data):
+  GhanaSPS             doc    0/ 209   data    4/  328
+  KenyaLPS             doc    0/   0   data   12/   22
+  Togo                 doc    0/   5   data    5/   59
+[summary] local copies: 0 md5-match (pushable as-is), 0 differ from their sidecar
+rc=1

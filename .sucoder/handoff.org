@@ -2,33 +2,41 @@
 #+date: 2026-09-02
 #+author: Sue (Claude Opus 5, 1M context)
 
-* State
-- *v0.10.0 SHIPPED* (2026-09-02).  PR #739 merged; =master= = =c0300a4a=; tag
-  =v0.10.0=; =publish.yml= fired on the =release= event (no dispatch fallback
-  needed) and PyPI has both artifacts:
-  =lsms_library-0.10.0-py3-none-any.whl= (7,630,071 B) and the sdist.
-  Test gate: burst job 38419369 on that exact commit, 16 cores --
-  *4648 passed, 0 failed, exit 0*.
-- *v0.10.1 IN FLIGHT*: PR #742 (GH #741, gpg-free S3 unlock) is merged into
-  =development=, notes written.  Next: merge =development= -> =master=, tag.
+* State -- BOTH RELEASES SHIPPED (2026-09-02)
+- *v0.10.0* on PyPI: =lsms_library-0.10.0-py3-none-any.whl= (7,630,071 B) + sdist.
+  Tag =v0.10.0= = =c0300a4a=.  Gate: burst 38419369, 4648 passed / 0 failed.
+- *v0.10.1* on PyPI: =lsms_library-0.10.1-py3-none-any.whl= (7,632,248 B) + sdist.
+  Tag =v0.10.1= = =ad20f6e8=.  Gate: burst 38420184, 4666 passed / 0 failed.
+  Published wheel verified to contain =s3_reader_creds.enc= and declare
+  =cryptography=; =Version: 0.10.1= in METADATA.
+- =master= = =ad20f6e8=; =development= in sync.  Nothing in flight.
 
-* Next concrete action (v0.10.1)
-1. Merge the =development= -> =master= PR for v0.10.1.
-2. =git checkout master && git pull=  -- =make release= tags the *current* HEAD.
-3. Tag =v0.10.1=.  NOTE: =make release= runs =poetry run pytest= at
-   =PYTEST_WORKERS = $SLURM_CPUS_ON_NODE=, which is 4 on this condo slice --
-   about an hour, and the target prompt forbids running the full suite locally.
-   For v0.10.0 the gate was instead burst job 38419369 (=sbatch ... -c 16=,
-   =slurm_logs/release_v0.10.0/burst_pytest.sh=) and the tag was then created
-   with the identical command the target uses,
-   =git tag -a v0.10.1 -m "Release 0.10.1"=.  Do the same.
-   (=poetry run= works fine here; it is =poetry build= that gets killed on the
-   4-core slice.  CI builds the wheel from the tag anyway.)
-4. =git push origin master && git push origin v0.10.1=
-5. =gh release create v0.10.1 --title v0.10.1 --notes-file docs/releases/v0.10.1.md=
-   then confirm =gh run list --workflow=publish.yml= shows a =release= run.
-   It fired correctly for v0.10.0; the =workflow_dispatch= fallback was not
-   needed but remains documented in the release skill.
+* Next concrete action
+None -- both releases are out.  Open follow-ups are below.
+
+* THE LESSON FROM v0.10.1 (read this before the next release)
+=poetry-dynamic-versioning= REWRITES =pyproject.toml= to build and restores it
+after.  A killed build never restores, and it changes *three coupled things*:
+
+: dynamic = ["version"]  ->  dynamic = []
+: version = "0.0.0"      ->  version = "<computed>"   (moved into [project])
+: enable = true          ->  enable = false
+
+v0.10.1 took three attempts because I reverted only the middle one and wrote a
+guard that checked only the middle one -- so the guard passed on a broken file
+and certified it clean.  =publish.yml= then failed with "Building 0.0.0 from
+v0.10.1".  Nothing reached PyPI (build failed, publish skipped).
+
+=tests/test_version_placeholder.py= now asserts all three, verified against the
+actual broken file.  *A guard covering one of three coupled invariants is worse
+than none.*
+
+Practical rule: *do not run =poetry build= on the condo slice.*  It gets killed
+(exit 144) partway and leaves the mutation.  =poetry run= and =poetry version=
+are fine, though they too can be killed under load -- an EMPTY =poetry version
+-s= means "killed", not "version is wrong"; re-run with a longer timeout.  CI
+builds the wheel from the tag anyway.  To inspect wheel contents locally, drive
+=poetry.core.masonry.api.build_wheel= directly (no venv creation, no mutation).
 
 * Decisions taken (with @ligon)
 - Version *v0.10.0* (not 1.0.0 -- 55 issues open, #323 umbrella live,

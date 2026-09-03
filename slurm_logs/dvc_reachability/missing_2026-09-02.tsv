@@ -1,0 +1,22 @@
+sidecar	md5	size	kind	local_copy	local_md5_matches
+GhanaSPS/2017-18/Data/Crop_encrypted/FolderKey.bch.dvc	4c306811ae31496e596cbfa5e7817b90	4096	data	no	
+GhanaSPS/2017-18/Data/Crop_encrypted/cropprice_W3.dta.bc.dvc	e7ea0641dd7eccdbfb073ea65eba9bea	282368	data	no	
+GhanaSPS/2017-18/Data/Crop_encrypted/croppriceother_W3.dta.bc.dvc	2fe09b9af84730eda025d3cdee0f63e2	29248	data	no	
+GhanaSPS/2017-18/Data/Crop_encrypted/unitcon_W3nonpii.dta.bc.dvc	93791c9ac92153dcc9547822ee28ba5f	1291152	data	no	
+KenyaLPS/2007-2009/Data/KLPS2_E-Module_PUBLIC_2021-05.tab.dvc	e7dd5f564631e31582fee9ab61b86cd4	759834	data	no	
+KenyaLPS/2007-2009/Data/KLPS2_I-Module_PUBLIC_2021-05.tab.dvc	74245f7db251eb5292b9e01146426cad	12324865	data	no	
+KenyaLPS/2007-2009/Data/KLPS2_SampleMaster_PUBLIC_2015-12.tab.dvc	ba7d65d404444392f46f9d283937d7b3	367956	data	no	
+KenyaLPS/2007-2009/Data/KLPS2_Status_PUBLIC_2015-12.tab.dvc	6185f940e99fdafc61db7e38a3c96be8	500818	data	no	
+KenyaLPS/2011-2014/Data/KLPS3_E-Plus-Module_PUBLIC_2022-02.dta.dvc	129417ec996298393d7f01e38e18c0e1	6151718	data	no	
+KenyaLPS/2011-2014/Data/KLPS3_I-Module_PUBLIC_2022-02.dta.dvc	12cb427ce3b25d0a20eeceb64b89183a	29979126	data	no	
+KenyaLPS/2011-2014/Data/KLPS3_SampleMaster_PUBLIC_2015-12.dta.dvc	91068e4c2d832cbb6c21f1899133a3a0	519295	data	no	
+KenyaLPS/2011-2014/Data/KLPS3_Status_PUBLIC_2022-02.dta.dvc	44bf84a6ecfae711ba6e8ce6e23fb05b	433678	data	no	
+KenyaLPS/2017-2022/Data/KLPS4-Kids-SampleMaster_PUBLIC_2025-12.dta.dvc	270cc77133b803124e7111fe929bf22a	528805	data	no	
+KenyaLPS/2017-2022/Data/KLPS4-Kids-Status_PUBLIC_2025-12.dta.dvc	af0ca3ee4a7b9fd17586efa29bf6015a	611453	data	no	
+KenyaLPS/2017-2022/Data/KLPS4_E-Module_PUBLIC_2025-12.dta.dvc	32e0394c80240244fccd1847316ec1b8	34551362	data	no	
+KenyaLPS/2017-2022/Data/KLPS4_I-Module_PUBLIC_2025-12.dta.dvc	faaf32afc5d9900499049294fb4d3b43	69352787	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems12months.csv.dvc	ce4196b25fdb72efb122c0d1e620498a	1094290	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems30days.csv.dvc	2158eaf455ed80549c52cc7b86b43773	1551901	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems3months.csv.dvc	04ebb49d0ab2b6c2cc531c78adbd8c33	610464	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems6months.csv.dvc	f3315bf5ab201c93e041f8c086a0f3c7	1835583	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems7days.csv.dvc	0c5113cf08979140cd1594883bca8122	1001205	data	no	

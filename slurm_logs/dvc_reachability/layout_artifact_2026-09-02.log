@@ -1,0 +1,3 @@
+sidecars=9984  remote flat=7866 files/=2544
+sidecar md5 only under files/: 2326 (23.3%) <- reported 'missing' by a flat-only check
+under both: 15; under neither (truly missing): 21
