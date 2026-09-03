@@ -16,6 +16,7 @@ Index Info:
     individual_education: (t, i, pid)
     food_acquired: (t, v, i, j, u, s, visit)
     food_security: (t, i)
+    community_prices: (t, v, j, u, obs)
 
 Data Scheme:
   cluster_features:
@@ -68,6 +69,70 @@ Data Scheme:
     Expenditure: float
     Quantity: float
     Price: float
+
+  community_prices:
+    # Item-level REPORTED market prices from each wave's OWN price survey
+    # (GH #562 phase 3a; design DESIGN_ghanalss_food_acquired_2026-06-15.org
+    # Phase 3).  Every GLSS round fielded a dedicated PRICE questionnaire,
+    # separate from the household instrument: 1987-88/1988-89 PRICE.DAT,
+    # 1991-92 Prices/G3PRICE.DTA, 1998-99 Prices/G4PRICE.DTA, 2012-13
+    # PRICES/price_sec{0,1,2}.dta, 2016-17 g7price.dta.  2005-06 fielded the
+    # same questionnaire (G5QPrice.pdf) but distributes NO price dataset --
+    # `asked-not-distributed` in .coder/coverage/absent_verdicts.csv; absent
+    # here, not imputed.
+    #   v   -- the price survey's own cluster id (CLUST/clust), the SAME
+    #          keyspace as sample().v, NATIVE in the index (no household i, so
+    #          _join_v_from_sample does not apply).  Measured joins (price clusters
+    #          in sample().v / household clusters priced): 1987-88 163/165,
+    #          163/176; 1988-89 106/112, 106/170; 1991-92 256/256, 256/365;
+    #          1998-99 251/253, 251/300; 2012-13 1015/1015, 1015/1200;
+    #          2016-17 398/398, 398/1000.  The price clusters outside the
+    #          sample are named in CONTENTS.org.
+    #   j   -- the priced item on the wave's harmonize_food Preferred-Label
+    #          axis (joins food_acquired.j); non-foods, and the few foods a
+    #          wave's axis does not name, carry their own label.  Every wave's
+    #          price list is its OWN code scheme (none is the Code_9b
+    #          consumption scheme) -> decoded by NAME through the per-wave
+    #          harmonize_price_item table in <wave>/_/categorical_mapping.org.
+    #   u   -- the unit the price refers to, on the shared unit_labels.org
+    #          axis: the form's stated basis per item (KG for weighed foods,
+    #          tablets, beer bottle, 6 yards ...) or, in 2016-17, the
+    #          per-observation unit code.  2012-13 non-foods are priced on a
+    #          free-text basis -> u = 'Other Unit', the text in Description.
+    #   obs -- the vendor observation.  EVERY GLSS price form records up to
+    #          three observations per item ("1ST/2ND/3RD OBSERVATION"; GLSS7
+    #          a/b/c; BID §2.3 "prices from up to three vendors"): obs 1-3 is
+    #          the form's slot for a single source record; values above 3
+    #          arise only where the source
+    #          holds more than one record for a (cluster, item, unit) -- a
+    #          repeat visit, several brand lines, a mis-keyed cluster, or
+    #          several price items folding onto one j label (Nescafe tin +
+    #          sachet -> Coffee) -- and are enumerated deterministically;
+    #          where records fold, Description identifies the item.  This is the departure from
+    #          the Malawi / Nigeria (t, v, j, u) precedent: nothing is
+    #          averaged or first()-ed away.
+    # Reported columns only (see _/glss_prices.py):
+    #   Price          the surveyed price, native cedi of the wave (GHC before
+    #                  the 2007 redenomination, GHS after; currency.py labels
+    #                  it; NO conversion).  The 1980s files' PRICEnU / DEFL /
+    #                  PRICE are calculated fields (BID §6.2) and are NOT stored.
+    #   NumberOfUnits  the quantity of u that Price refers to: the weighed /
+    #                  measured quantity where the file has one (QUANn,
+    #                  s1stkg, quantity{a,b,c}), else the form's stated basis
+    #                  (GLSS3/4 ship only the per-unit value p = PRICE/KG).
+    #   Description    the survey's own free text for the row: the form's
+    #                  item label, the 2012-13 non-food basis (s2desc), the
+    #                  2016-17 brand line and other-unit text.  Instrument-
+    #                  specific by design -> optional.
+    # Per-unit price, kg-standardisation, cross-cluster medians and the
+    # price->quantity imputation (phase 3b) are transformations, never stored.
+    index: (t, v, j, u, obs)
+    Price: float
+    NumberOfUnits: float
+    Description:
+      type: str
+      optional: true
+    materialize: make
 
   sample:
     index: (i, t)

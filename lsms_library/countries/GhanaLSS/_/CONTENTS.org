@@ -2152,3 +2152,210 @@ survey year.  GLSS1/GLSS2 (=COMM.DAT= etc.) carry *none* of it; GLSS5/6/7 are
 format 113+ and carry none either.
 
 Full audit: =slurm_logs/sentinel_audit/FINDINGS_1.7498e100.org=.
+
+* Community price survey -- =community_prices= (GH #562 phase 3a, 2026-09-02)
+
+Every GLSS round fielded a dedicated market/community PRICE questionnaire,
+separate from the household instrument, and six of the seven waves ship its
+data.  =community_prices= is that survey at its own grain, REPORTED fields
+only (see =_/glss_prices.py= and the =data_scheme.yml= block for the column
+contract).  Phase 3b -- the inverse price->quantity imputation -- is NOT wired
+here; nothing in =transformations.py= was touched.
+
+** Sources, geography and the join to =sample().v=
+
+| Wave    | Price file                          | Form is keyed on                                   | Price clusters | ... in sample().v | sample().v priced |
+|---------+-------------------------------------+----------------------------------------------------+----------------+-------------------+-------------------|
+| 1987-88 | =Data/PRICE.DAT= (+ =PRICE.DCT=)      | LOCALITY / CLUSTER (1987 form, rendered)           |            165 | 163/165           | 163/176           |
+| 1988-89 | =Data/PRICE.DAT=                      | same form (the 1988 PDF is the same blob as 1987's) |            112 | 106/112           | 106/170           |
+| 1991-92 | =Data/Prices/G3PRICE.DTA=             | REGION / DISTRICT / NAME OF LOCALITY / EA          |            256 | 256/256           | 256/365           |
+| 1998-99 | =Data/Prices/G4PRICE.DTA=             | same instrument as GLSS3 (text layer)              |            253 | 251/253           | 251/300           |
+| 2005-06 | NONE distributed                    | REGION / E.A. NUMBER / MARKET NUMBER (=G5QPrice.pdf=) |            -- | --                | --                |
+| 2012-13 | =Data/PRICES/price_sec{0,1,2}.dta=    | REGION / DISTRICT / LOCALITY / EA / MARKET NUMBER  |          1,015 | 1015/1015         | 1015/1200         |
+| 2016-17 | =Data/g7price.dta=                    | REGION / DISTRICT / CLUSTER / MARKET NAME (xlsx + cover docx) |    398 | 398/398           | 398/1000          |
+
+=v= is therefore the survey's own cluster / EA number in every wave -- the
+same =CLUST= / =clust= keyspace =sample= uses (1xxx ... 7xxxx) -- and is
+carried NATIVELY in the index.  No cluster id is fabricated anywhere.
+Corroboration beyond the key match: =loc5= in =G3PRICE.DTA= agrees 100% with
+=POV_GH.DTA='s =loc5= on all 256 clusters; the BID's "165 ... price
+questionnaires" for year one (Table 1a, printed p.13; p.17 "coded for 164 of
+176 first year clusters") is the 165 distinct =CLUST= in the file.  Price
+clusters with no household in the wave's sample: 1987-88 clusters 1020 and
+1167 (85 rows); 1988-89 clusters 2007, 2036, 2177, 2198, 2209 and 2692 (271
+rows -- BID p.17 lists price forms "coded for 107 of the 170 second year
+clusters", and these six are price forms for clusters the household file
+does not carry); 1998-99 two clusters (of 253) are not in =SEC0A.DTA=.
+
+** The grain is (t, v, j, u, obs) -- three vendors per item, in every wave
+
+Every form records up to THREE observations per item: the 1987 form's "1ST /
+2ND / 3RD OBSERVATION" (KG + PRICE), BID §2.3 "Prices from up to three
+vendors are collected", GLSS3/4/5/6 "1ST / 2ND / 3RD OBSERVATION" (KG or
+KG/LITRE + PRICE; DESCRIPTION + 1ST/2ND/3RD PRICE for non-foods), GLSS7's
+a/b/c PRICE / QTY / UOM.  Malawi's and Nigeria's =community_prices= are
+=(t, v, j, u)=; Nigeria =.first()=-s same-cell duplicates.  Here the three
+observations are kept as rows under =obs= (core does not aggregate), so
+GhanaLSS departs from the precedent by one index level.  =obs= 1-3 is the
+form's slot; larger values occur only where the source holds more than one
+record for a (cluster, item, unit) and are enumerated deterministically
+(interview month, then description/brand, then slot).  A fourth cause is the
+=j= axis itself: where several price items fold onto one label (Nescafe tin
++ sachet -> =Coffee=; the five chocolate drinks -> =Chocolate Drink=, 5 x 9
+rows = =obs= 45 in 1998-99) the rows stack under one (v, j, u) and
+=Description= tells the items apart.  Share of rows at =obs= <= 3: 1987-88
+98%, 1988-89 97%, 1991-92 90%, 1998-99 88%, 2012-13 87%, 2016-17 81%.
+
+An observation slot with no reported price is not a row (an empty slot is
+not a reported price).  Slots dropped, per wave: 1987-88 1,262 of 17,844
+(7.1%); 1988-89 2,265 of 14,907 (15.2%); 1991-92 and 1998-99 none (the files
+are already one row per observation); 2012-13 191,223 of 479,466 (39.9% --
+second and third vendors are often blank, and so are non-food items a
+market does not sell); 2016-17 31,458 of 252,366 (12.5%).
+
+- 1988-89: two clusters were priced twice -- 2305 in June AND September
+  1989 (a genuine repeat visit), 2310 twice in one month (25 of its 48 item
+  pairs byte-identical).  Cluster 2726's rows carry =YRINT=88, MOINT=3=: a
+  first-year price carried into the second-year set (BID p.17: "price data
+  are available from the first year for 43 additional clusters" -- only this
+  one materialises in the shipped file).
+- 1991-92 / 1998-99: the files are already long (one row per observation)
+  and carry no slot; typically three rows per (clust, item), but 546 / 744
+  (clust, item) pairs carry six and 8 / 108 carry nine.
+- 2016-17: several brand lines per item and the two mis-keyed clusters below.
+
+** What is and is not in the file, per wave
+
+- *1987-88 / 1988-89.*  =PRICE.DAT= is comma-delimited with a header (Trap
+  above; the reader handles it).  Per (CLUST, ITEMNO): =QUANn=/=PRICEn= for
+  n=1..3, =MOINT=/=YRINT= (the price interview, "may not correspond to the
+  date of the household interview", BID §6.2), and =PRICEnU= (=PRICEn/QUANn),
+  =DEFL= (Appendix E CPI) and =PRICE= (mean of PRICEnU / DEFL) -- CALCULATED
+  fields, verified (99.1% / 99.4% of rows reproduce them) and NOT stored.
+  1987-88 has =TYPRES= (BID's 7-way location type); 1988-89 does not.  BID
+  §2.3: "Weighing scales were used to determine the exact weight of food
+  items", and the file confirms the form's bases item by item: eggs =QUAN=1=
+  (priced each), the evaporated-milk tin =0.17=, the four drugs 3-4 tablets,
+  akpeteshie =0.25= (the "1 quarter" bottle), every DESCRIPTION item =1=.
+  1988-89 carries one extra code 48 (QUAN median 0.5, PRICE1 120) on no form
+  we hold: kept as "Unidentified price item 48".
+- *1991-92 / 1998-99.*  =G3PRICE.DTA= / =G4PRICE.DTA= ship ONLY the per-unit
+  value (=p= / =price= = PRICE/KG -- values like 500/7 = 71.4286 give it
+  away); the weighed KG is not distributed and the files carry no labels
+  (GLSS3/4 Stata 5 files, as noted above).  =NumberOfUnits= is therefore the
+  form's stated basis per item (=Basis= in =harmonize_price_item=).  =time=
+  in G3PRICE is the survey month (251 of 256 clusters have exactly one
+  value), not a visit counter.
+- *2012-13.*  Foods: =s1stkg=/=s1stpx= etc. -- the KG/LITRE figure and the
+  price per observation.  Whether a figure is kg or litres is NOT in the file;
+  the =Unit= column of the 2012-13 table records a per-item judgement
+  (liquids in litres).  Non-foods: the reader's free-text basis =s2desc=
+  (3,437 distinct strings: "20PCS", "20 PIECES", "20 PICES" ...) -> =u= is
+  =Other Unit= and the text goes to =Description=.  The =.dta= value labels
+  (=fcode= 1-102, =nfcode= 103-157) are the coding of the shipped file; the
+  PRINTED GLSS6 form lists 89 + 47 items under a different numbering (its 006
+  is "Bread - sugar bread" where the file's 6 is; its 016 "Chicken" is the
+  file's 16; but 017 "Game birds" is nowhere in the file and the file's 17 is
+  crustaceans).  Decode from the labels, never from the printed form.
+  Prices are stamped per EA but were collected at 41 market numbers (323
+  region/district/market keys for 1,015 EAs; up to 20 EAs share one key, and
+  EAs sharing a key carry identical prices -- =s1stpx= has one distinct value
+  within 18,854 of the 32,000 non-null (key, item) cells).  The cover's
+  =remarks= say why: "KOKOLIGU HAS NO MARKET AND THEY USE THAT OF NANDOM".
+  Kept native; a consumer who wants market-grain prices dedups on
+  (region, district, market).
+- *2016-17.*  =ln= is the item code (644 values), =bname= the item,
+  =itname= the brand line (1,207 values), =price{a,b,c}= / =quantity{a,b,c}= /
+  =unit{a,b,c}= / =unito{a,b,c}=.  The unit codes carry the file's OWN value
+  labels: the =unit_9b= list, except code 72 = "Service" (=unit_9b= says
+  Visit) and an extra 75 = "Visit".  Decode from the price file's labels.
+  ALL 398 price =clust= values are in =g7sec0.dta='s 1,000 EAs, but the price
+  file's =region=/=district= contradict the household cover for 11
+  (clust, region) pairs -- clusters 70002 and 70909 hold a second EA's rows
+  under region 5 (cover: 1 and 10), and 70195/70210/70211/70247/70327/
+  70747/70906/70908 are stamped with a wrong region for their single set of
+  rows.  =v= is =clust= regardless (the cover is authoritative for region);
+  the duplicated content shows up as =obs= 4-6.  Phase 3b may want to drop
+  70002 and 70909.
+
+** GLSS3's price form is the GLSS4 form; GLSS3's own code list is reconstructed
+
+All three GLSS3 price-form files (=pdf/G3QPrice.pdf=,
+=GHA_1991_GLSS_Price_Questionnaire_EN.pdf.pdf=, =Glss3 qsts and manuals
+docs/G3QPrice.doc=) carry the 123-item list that
+=GHA_1998_GLSS_Price_Questionnaire_EN.pdf= carries (the text diff is the
+title only), while =G3PRICE.DTA= has codes 1-117.  Aligning per-item median
+prices and observation counts between the two waves shows the offset
+growing from 0 to 6 at identifiable points -- exactly 123 - 117 -- so
+GLSS3's list is the GLSS4 list WITHOUT six items, renumbered:
+
+| G3 codes | G4 codes | offset | item absent from GLSS3          | anchors (G3 median -> G4 median) |
+|----------+----------+--------+---------------------------------+----------------------------------|
+| 1-5      | 1-5      |      0 |                                 | maize 94 -> 480, rice local 250 -> 1333 |
+| 6-33     | 7-34     |      1 | 6 Sorghum (G4 n=68)             | wheat bread 375 -> 2000, MARGARINE 1200 -> 6222 per kg, okro 267 -> 1429 |
+| 34-43    | 36-45    |      2 | 35 Pepper (sweet green) (n=369) | tomato paste 1143 -> 7143, beef 889 -> 5333, bushmeat 1294 -> 13333 |
+| 44-48    | 47-51    |      3 | 46 Live chicken (poultry)       | eggs 50 -> 250, evaporated-milk tin 180 -> 1100, sugar 311 -> 1600, salt 100 -> 506, NESCAFE TIN 13000 -> 60000 |
+| 49       | 53       |      4 | 52 Nescafe (sachet)             | Bournvita tin 1889 -> 12500 |
+| 50       | 55       |      5 | 54 Bournvita (sachet)           | Milo tin 2000 -> 13750 |
+| 51-117   | 57-123   |      6 | 56 Milo (sachet)                | tea 6000 -> 50000, aspirin 50 -> 100, wax print (6 yd) 10000 -> 55000, handkerchiefs (dozen) 1440 -> 9600 |
+
+The tail (G3 51-117 = G4 57-123, 67 items, ratios 3-8 throughout) and the
+anchors are unambiguous.  The weakest links, flagged in the 1991-92 table's
+=Note= column: code 5 is read as "Rice (Imported)" rather than "Sorghum" on
+price level (289 vs rice local 250; sorghum would sit near guinea corn 163)
+despite its low count (n=50), and codes 49-51 are assigned among the
+tin/chocolate-drink set by price level.  A GSS-held GLSS3 price form would
+settle both; until then this is an INFERENCE and is labelled as one.
+
+** =j=, =u= and the shared axes
+
+No wave's price code scheme is its consumption (=Code_9b=) scheme -- 0 of 644
+GLSS7 codes and 5 of 102 GLSS6 codes are label-identical -- so =j= is decoded
+by NAME through a per-wave =harmonize_price_item= table (=Code | Label |
+Preferred Label | Food | Unit | Basis | Note=) appended to each wave's
+=categorical_mapping.org=, onto that wave's =harmonize_food= Preferred Label
+where the axis names the item (=Food=yes=), the later waves' spelling where a
+food is not on the wave's axis (=Food=own=: 1987-88 has no Bread / Pepper /
+Juice / Guinea corn / specific-oil labels; 1998-99 no Cocoyam leaves / Tomato
+paste / Snail), and an own label for non-foods -- made unique per code (=Orange [ln 771]= is
+a toilet roll, =Apple [ln 812]= a wrist watch, =Sony [ln 640]= a corded
+phone, =Sony [ln 669]= a radio) wherever a non-food name is also a food
+label, recurs across blocks, or is an "OTHER (SPECIFY)" line: 80 such codes
+in 2016-17, none elsewhere.  Where the axis folds two
+price items together (Goat (fresh) + Fresh mutton -> =Goat=; Onion +
+Shallots -> =Onion=; palm wine -> =Wine=, pito -> =Beer=) both are kept and
+=Description= tells them apart.  The overlap with =food_acquired().j= was
+checked against the =harmonize_food= tables, not a built =food_acquired=
+(the corpus's largest table; not built on this slice).
+
+=u= is the =_/unit_labels.org= Preferred Label.  Labels the price surveys
+need that the axis lacks: =Tablet=, =Capsule=, =Bottle= (the 1980s/1990s
+drug bases) -- reported, not added (=unit_labels.org= is not in this task's
+ownership).  While there: =unit_labels.org= maps "Margarin tin" to
+=Margarin tin= and "margarin tin" to =Margarine Tin= -- two Preferred Labels
+for one spelling pair.
+
+** 2005-06: asked, not distributed
+
+GLSS5 fielded the price questionnaire (=Documentation/G5QPrice.pdf=, 9 pp
+with a text layer: EA + MARKET NUMBER, three observations, KG/LITRE + PRICE,
+89 food codes -- the same instrument GLSS6 used), and the GSS NADA DDI
+shipped with the wave names it as one of the five instruments, but the DDI's
+data-file inventory (sec0-sec12c, com-sec0-com-sec52) has no price file,
+nor does the tree (49 parta/partb files, the 14 files in =community.zip=,
+every file in the ten =aggregates/*.zip=).  The WB Microdata Library holds
+no raw GLSS5 entry at all (only the SHIP harmonized extract, id 1064); the
+wave came from GSS NADA catalog/5, unreachable from this node.  Adjudicated
+=asked-not-distributed= (C1;C2;C4) in =.coder/coverage/absent_verdicts.csv=
+-- an acquisition item, not an absence.
+
+** Trap 6, applied
+
+The new scripts resolve every config path through =countries_root()=
+(=_/glss_prices.py=: =wave_dir()=, =price_item_table()=, =unit_label_map()=)
+and assert during verification that it points at the worktree; nothing here
+goes through the wave =mapping.py= modules.  Documentation blobs were fetched
+lock-free through =local_tools._ensure_dvc_pulled= + the sidecar md5
+(=slurm_logs/ghana_audit/community_prices/fetch_docs.py=) because
+=data_access.get_data_file= walks the DVC index through =DVCFS.exists()= and
+hung for more than ten minutes on this Lustre slice.

@@ -644,3 +644,774 @@ Obtained from values_list() in ../Data/g7sec9b.dta.
 | Year five          | Bachelor                     |
 | Year six and above | Postgraduate                 |
 | Other              | Unknown                      |
+
+* Community price survey (GH #562)
+GLSS7's price survey (=Documentation/GLSS7_price questionnaire.xlsx=, cover
+=COVER PAGE _PRICE.docx=) is keyed REGION / DISTRICT / CLUSTER / MARKET NAME
+and records, per item and BRAND line, three observations each with PRICE,
+QTY and UOM.  =Data/g7price.dta= carries =ln= (the item code), =bname= (the
+item), =itname= (the brand line), =price{a,b,c}=, =quantity{a,b,c}=,
+=unit{a,b,c}= (its own value labels: the =unit_9b= list plus 72=Service,
+75=Visit) and =unito{a,b,c}= (other-unit text).  So =Unit= and =Basis= are
+blank here -- both are decoded per row -- and the brand goes to
+=Description=.  Foods are codes 1-297 (cigarette, tobacco and kola are on
+the food axis) plus the restaurant meals 751-758; every one is placed
+explicitly on the 2016-17 =harmonize_food= axis (the price code scheme is
+NOT the =Code_9b= consumption scheme: 0 of 644 codes coincide).  Non-foods
+keep their own label.  Two clusters (70002, 70909) carry a mis-keyed sibling
+EA's rows (the price file's region contradicts the household cover for 11
+cluster/region pairs) -- kept native, told apart by =obs=.
+
+#+name: harmonize_price_item
+| Code | Label                          | Preferred Label                         | Food | Unit | Basis | Note                                                                            |
+|------+--------------------------------+-----------------------------------------+------+------+-------+---------------------------------------------------------------------------------|
+| 1    | RICE - LOCAL                   | Rice (local)                            | yes  |      |       |                                                                                 |
+| 2    | RICE - IMPORTED                | Rice (imported)                         | yes  |      |       |                                                                                 |
+| 8    | GUINEA CORN/SORGHUM RED GRAINS | Guinea corn/sorghum                     | yes  |      |       |                                                                                 |
+| 9    | GUINEA CORN/SORGHUM WHITE GRAI | Guinea corn/sorghum                     | yes  |      |       |                                                                                 |
+| 10   | MAIZE (DRIED, WHITE GRAINS)    | Maize (grain)                           | yes  |      |       |                                                                                 |
+| 11   | MAIZE (DRIED, YELLOW GRAINS)   | Maize (grain)                           | yes  |      |       |                                                                                 |
+| 12   | MAIZE, NEW DRIED GRAINS        | Maize (grain)                           | yes  |      |       |                                                                                 |
+| 13   | MILLET                         | Millet                                  | yes  |      |       |                                                                                 |
+| 14   | MILLET FLOUR                   | Millet (flour)                          | yes  |      |       |                                                                                 |
+| 15   | TAKORADI FLOUR MILL            | Wheat Flour                             | yes  |      |       |                                                                                 |
+| 16   | GMG                            | Wheat Flour                             | yes  |      |       |                                                                                 |
+| 17   | WHEAT SEMOLINA, SUJI           | Wheat Flour                             | yes  |      |       |                                                                                 |
+| 18   | MAIZE, GROUND (FLOUR)          | Maize (flour/dough)                     | yes  |      |       |                                                                                 |
+| 19   | CORN DOUGH                     | Maize (flour/dough)                     | yes  |      |       |                                                                                 |
+| 20   | CERELAC MADE FROM MAIZE        | Cerelac (Baby food)                     | yes  |      |       |                                                                                 |
+| 21   | CERELAC MADE FROM MILLET       | Cerelac (Baby food)                     | yes  |      |       |                                                                                 |
+| 22   | CERELAC MADE FROM RICE         | Cerelac (Baby food)                     | yes  |      |       |                                                                                 |
+| 23   | CERELAC MADE FROM WHEAT        | Cerelac (Baby food)                     | yes  |      |       |                                                                                 |
+| 24   | WHITE OATS                     | White Oats                              | yes  |      |       |                                                                                 |
+| 25   | CASSAVA - KOKONTE              | Cassava (dried)                         | yes  |      |       |                                                                                 |
+| 26   | CASSAVA DOUGH                  | Cassava (dough)                         | yes  |      |       |                                                                                 |
+| 27   | CASSAVA - GARI                 | Cassava (yellow, flour)                 | yes  |      |       | unqualified gari; the axis places Code_8h "Cassava-gari" under the yellow label |
+| 28   | SUGAR BREAD                    | Sugar Bread                             | yes  |      |       |                                                                                 |
+| 29   | WHOLE WHEAT BREAD              | Bread                                   | yes  |      |       |                                                                                 |
+| 30   | BUTTER BREAD                   | Bread                                   | yes  |      |       |                                                                                 |
+| 31   | TEA BREAD                      | Bread                                   | yes  |      |       |                                                                                 |
+| 32   | PICADILLY BISCUIT              | Biscuit                                 | yes  |      |       |                                                                                 |
+| 33   | KINGS CRACKERS                 | Biscuit                                 | yes  |      |       |                                                                                 |
+| 34   | MALT AND MILK BISCUIT          | Biscuit                                 | yes  |      |       |                                                                                 |
+| 35   | CREAM CRACKERS                 | Biscuit                                 | yes  |      |       |                                                                                 |
+| 36   | DIGESTIVE BISCUIT              | Biscuit                                 | yes  |      |       |                                                                                 |
+| 37   | JACK AND JILL                  | Biscuit                                 | yes  |      |       |                                                                                 |
+| 38   | OTHER (SPECIFY) _ _ _ _ _ _ _  | Biscuit                                 | yes  |      |       | other (specify) in the biscuit block                                            |
+| 42   | INDOMIE OR INSTANT NOODLES     | Instant Noodle                          | yes  |      |       |                                                                                 |
+| 43   | CORNFLAKES (KELLOGG'S)         | Corflake                                | yes  |      |       |                                                                                 |
+| 44   | MACARONI                       | Macaroni                                | yes  |      |       |                                                                                 |
+| 45   | SPAGHETTI                      | Spaghetti                               | yes  |      |       |                                                                                 |
+| 46   | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other Cereal                            | yes  |      |       | other (specify) in the pasta/cereal block                                       |
+| 50   | BEEF WITH BONES                | Beef                                    | yes  |      |       |                                                                                 |
+| 51   | BEEF WITHOUT BONES             | Beef                                    | yes  |      |       |                                                                                 |
+| 52   | COW LEG , LOCAL                | Beef (leg)                              | yes  |      |       |                                                                                 |
+| 53   | COW LEG IMPORTED               | Beef (leg)                              | yes  |      |       |                                                                                 |
+| 54   | PORK MEAT                      | Pork                                    | yes  |      |       |                                                                                 |
+| 55   | PORK - RIBS                    | Pork (rib)                              | yes  |      |       |                                                                                 |
+| 56   | PORK , FILLET                  | Pork (fillet)                           | yes  |      |       |                                                                                 |
+| 57   | PORK FEET                      | Pork (feet)                             | yes  |      |       |                                                                                 |
+| 58   | MUTTON CHOP                    | Goat                                    | yes  |      |       | axis folds mutton into Goat                                                     |
+| 59   | MUTTON MIXED CUT               | Goat                                    | yes  |      |       | axis folds mutton into Goat                                                     |
+| 60   | SHEEP - LIVE                   | Goat                                    | yes  |      |       | live sheep; axis has no sheep label                                             |
+| 61   | GOAT - LIVE                    | Goat                                    | yes  |      |       | live goat                                                                       |
+| 62   | GOAT MEAT                      | Goat                                    | yes  |      |       |                                                                                 |
+| 63   | LIVE CHICKEN (LOCAL)           | Chicken (live)                          | yes  |      |       |                                                                                 |
+| 64   | LIVE CHICKEN (BROILER)         | Chicken (broiler)                       | yes  |      |       |                                                                                 |
+| 65   | LIVE CHICKEN (LAYERS)          | Chicken (live)                          | yes  |      |       |                                                                                 |
+| 66   | CHICKEN PARTS(TIGHS) - FROZEN  | Chicken (thigh)                         | yes  |      |       |                                                                                 |
+| 67   | CHICKEN PARTS(WINGS)           | Chicken (wing)                          | yes  |      |       |                                                                                 |
+| 68   | GUINEA FOWL - LIVE             | Guineafowl                              | yes  |      |       |                                                                                 |
+| 69   | EXETER CORNED BEEF             | Beef (corned)                           | yes  |      |       |                                                                                 |
+| 70   | CORNED BEEF (OTHER BRANDS)     | Beef (corned)                           | yes  |      |       |                                                                                 |
+| 71   | SAUSAGE                        | Sausage (beef)                          | yes  |      |       |                                                                                 |
+| 72   | BUSHMEAT (GRASSCUTTER)         | Other Meat                              | yes  |      |       |                                                                                 |
+| 73   | KPALA (STARVIDS) FROZEN        | Kapla                                   | yes  |      |       |                                                                                 |
+| 74   | SHRIMPS                        | Shrimp                                  | yes  |      |       |                                                                                 |
+| 75   | SNAILS                         | Snail                                   | yes  |      |       |                                                                                 |
+| 77   | CRABS                          | Crab                                    | yes  |      |       |                                                                                 |
+| 78   | FRESH RIVER FISH               | Other Fish                              | yes  |      |       |                                                                                 |
+| 79   | TILAPIA - FRESH /FROZEN        | Tilapia                                 | yes  |      |       |                                                                                 |
+| 80   | SMOKED RIVER FISH              | Fish (smoked, river)                    | yes  |      |       |                                                                                 |
+| 81   | HERRINGS -SMOKED               | Herring (smoked)                        | yes  |      |       |                                                                                 |
+| 82   | DRIED FISH - KOOBI             | Fish (dried)                            | yes  |      |       |                                                                                 |
+| 83   | FISH (SALTED)                  | Fish (salted)                           | yes  |      |       |                                                                                 |
+| 84   | TITUS                          | Fish (canned)                           | yes  |      |       |                                                                                 |
+| 85   | PRINCESS                       | Fish (canned)                           | yes  |      |       |                                                                                 |
+| 86   | OBAAPA                         | Fish (canned)                           | yes  |      |       |                                                                                 |
+| 87   | GINO                           | Fish (canned)                           | yes  |      |       |                                                                                 |
+| 88   | STAR KIST                      | Tuna (processed)                        | yes  |      |       |                                                                                 |
+| 89   | OTHER (SPECIFY) _ _ _ _ _ _ _  | Tuna (processed)                        | yes  |      |       | other (specify), tuna block                                                     |
+| 90   | GEISHA                         | Mackerel (processed)                    | yes  |      |       |                                                                                 |
+| 91   | AFRICAN QUEEN                  | Mackerel (processed)                    | yes  |      |       |                                                                                 |
+| 92   | GEISHA                         | Mackerel (processed)                    | yes  |      |       |                                                                                 |
+| 93   | ENA PA                         | Mackerel (processed)                    | yes  |      |       |                                                                                 |
+| 94   | OBAAPA                         | Mackerel (processed)                    | yes  |      |       |                                                                                 |
+| 95   | DELAY                          | Mackerel (processed)                    | yes  |      |       |                                                                                 |
+| 96   | OTHER (SPECIFY) _ _ _ _ _ _ _  | Mackerel (processed)                    | yes  |      |       | other (specify), mackerel block                                                 |
+| 100  | EVAPORATED MILK - IDEAL        | Milk (evaporated)                       | yes  |      |       |                                                                                 |
+| 101  | EVAPORATED MILK - PEAK         | Milk (evaporated)                       | yes  |      |       |                                                                                 |
+| 102  | EVAPORATED MILK - NUNU         | Milk (evaporated)                       | yes  |      |       |                                                                                 |
+| 103  | EVAPORATED MILK - VEGA         | Milk (evaporated)                       | yes  |      |       |                                                                                 |
+| 104  | EVAPORATED MILK - CARNATION    | Milk (evaporated)                       | yes  |      |       |                                                                                 |
+| 105  | CONDENSED MILK, TIN - PEAK     | Milk (tinned, condensed)                | yes  |      |       |                                                                                 |
+| 106  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Milk (evaporated)                       | yes  |      |       | other (specify), tinned-milk block                                              |
+| 110  | NIDO MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 111  | PEAK MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 112  | COWBELL (SACHET)               | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 113  | IDEAL MILK (SACHET)            | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 114  | NUNU MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 115  | LOYA MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 116  | MIKSI MILK (SACHET)            | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 117  | VEGA MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 118  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Milk (powdered)                         | yes  |      |       | other (specify), milk-sachet block                                              |
+| 122  | NIDO (SACHET)                  | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 123  | PEAK MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 124  | COWBELL (SACHET)               | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 125  | IDEAL MILK (SACHET)            | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 126  | NUNU MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 127  | LOYA MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 128  | MIKSI MILK (SACHET)            | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 129  | VEGA MILK (SACHET)             | Milk (powdered)                         | yes  |      |       |                                                                                 |
+| 130  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Milk (powdered)                         | yes  |      |       | other (specify), powdered-milk block                                            |
+| 134  | FRESH MILK                     | Milk (fresh)                            | yes  |      |       |                                                                                 |
+| 135  | BABY MILK (LACTOGEN)           | Milk (powdered)                         | yes  |      |       | infant formula, as 2012-13                                                      |
+| 136  | FAN MILK                       | Other Milk Products                     | yes  |      |       | Fan Milk (frozen milk product)                                                  |
+| 137  | FAN ICE                        | Ice Cream                               | yes  |      |       |                                                                                 |
+| 138  | FAN YOGHURT                    | Yoghurt                                 | yes  |      |       |                                                                                 |
+| 139  | FANDANGO                       | Other Milk Products                     | yes  |      |       |                                                                                 |
+| 140  | FAN CHOCO                      | Other Milk Products                     | yes  |      |       |                                                                                 |
+| 141  | CHICKEN EGGS (FRESH, SINGLE)   | Eggs                                    | yes  |      |       |                                                                                 |
+| 142  | MARGARINE                      | Margarine                               | yes  |      |       |                                                                                 |
+| 143  | COCONUT OIL                    | Oil (coconut)                           | yes  |      |       |                                                                                 |
+| 144  | GROUNDNUT OIL                  | Oil (groundnut)                         | yes  |      |       |                                                                                 |
+| 145  | PALM OIL (RED OIL)             | Oil (palm)                              | yes  |      |       |                                                                                 |
+| 146  | VEGETABLE OIL - FRYTOL         | Oil (vegetable)                         | yes  |      |       |                                                                                 |
+| 147  | VEGETABLE OIL - GINO           | Oil (vegetable)                         | yes  |      |       |                                                                                 |
+| 148  | VEGETABLE OIL - OBAAPA         | Oil (vegetable)                         | yes  |      |       |                                                                                 |
+| 149  | VEGETABLE OIL (OTHER SPECIFY _ | Oil (vegetable)                         | yes  |      |       |                                                                                 |
+| 153  | SHEA BUTTER                    | Shea Butter                             | yes  |      |       |                                                                                 |
+| 154  | PALM KERNEL OIL                | Oil (palm kernel)                       | yes  |      |       |                                                                                 |
+| 155  | COCONUT (FRESH)                | Coconut (fresh)                         | yes  |      |       |                                                                                 |
+| 156  | BANANA                         | Banana                                  | yes  |      |       |                                                                                 |
+| 157  | ORANGES                        | Orange                                  | yes  |      |       |                                                                                 |
+| 158  | PINEAPPLE                      | Pineapple                               | yes  |      |       |                                                                                 |
+| 159  | MANGO (LOCAL)                  | Mango                                   | yes  |      |       |                                                                                 |
+| 160  | MANGO (GRAFTED)                | Mango                                   | yes  |      |       |                                                                                 |
+| 161  | WATER MELON                    | Watermelon                              | yes  |      |       |                                                                                 |
+| 162  | AVOCADO PEAR                   | Avocado                                 | yes  |      |       |                                                                                 |
+| 163  | APPLES (FOREIGN)               | Apple                                   | yes  |      |       |                                                                                 |
+| 164  | GRAPES                         | Grape                                   | yes  |      |       |                                                                                 |
+| 165  | SWEET APPLE                    | Apple                                   | yes  |      |       |                                                                                 |
+| 166  | GROUNDNUTS (SHELLED)           | Groundnut                               | yes  |      |       |                                                                                 |
+| 167  | GROUNDNUTS (ROASTED)           | Groundnut                               | yes  |      |       |                                                                                 |
+| 168  | PALM FRUITS                    | Palm Nut                                | yes  |      |       |                                                                                 |
+| 169  | LIME                           | Lime                                    | yes  |      |       |                                                                                 |
+| 170  | PAW - PAW                      | Pawpaw                                  | yes  |      |       |                                                                                 |
+| 171  | CANNED (PROCESSED) FRUITS      | Canned Fruits                           | yes  |      |       |                                                                                 |
+| 172  | PLANTAIN (GREEN)               | Plantain                                | yes  |      |       |                                                                                 |
+| 173  | COCOYAM LEAVES (KONTOMIRE) OR  | Cocoyam Leaves                          | yes  |      |       |                                                                                 |
+| 174  | SWEET PEPPER                   | Sweet Pepper                            | yes  |      |       |                                                                                 |
+| 175  | LOCAL CARROT                   | Carrot                                  | yes  |      |       |                                                                                 |
+| 176  | CARROT                         | Carrot                                  | yes  |      |       |                                                                                 |
+| 177  | GARDEN EGGS                    | Eggplant                                | yes  |      |       |                                                                                 |
+| 178  | OKRO (FRESH)                   | Okra                                    | yes  |      |       |                                                                                 |
+| 179  | PEPPER (FRESH)                 | Pepper (fresh)                          | yes  |      |       |                                                                                 |
+| 180  | PEPPER (DRIED)                 | Pepper (dried, red)                     | yes  |      |       |                                                                                 |
+| 181  | CHILLI POWDER(BLACK PEPPER)    | Chilli Powder (black pepper)            | yes  |      |       |                                                                                 |
+| 182  | VINEGAR                        | Vinegar                                 | yes  |      |       |                                                                                 |
+| 183  | POWDER PEPPER                  | Pepper (powder)                         | yes  |      |       |                                                                                 |
+| 184  | ONIONS (LARGE)                 | Onion                                   | yes  |      |       |                                                                                 |
+| 185  | ONIONS (SMALL/SHALLOT)         | Shallot                                 | yes  |      |       |                                                                                 |
+| 186  | TOMATOES (FRESH)               | Tomato (fresh)                          | yes  |      |       |                                                                                 |
+| 190  | GINO                           | Tomato (paste)                          | yes  |      |       |                                                                                 |
+| 191  | OBAAPA                         | Tomato (paste)                          | yes  |      |       |                                                                                 |
+| 192  | POMO                           | Tomato (paste)                          | yes  |      |       |                                                                                 |
+| 193  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Tomato (paste)                          | yes  |      |       | other (specify), canned tomato paste                                            |
+| 197  | GINO                           | Tomato (paste)                          | yes  |      |       |                                                                                 |
+| 198  | OBAAPA                         | Tomato (paste)                          | yes  |      |       |                                                                                 |
+| 199  | POMO                           | Tomato (paste)                          | yes  |      |       |                                                                                 |
+| 200  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Tomato (paste)                          | yes  |      |       | other (specify), sachet tomato paste                                            |
+| 201  | GARLIC                         | Garlic                                  | yes  |      |       |                                                                                 |
+| 202  | WHITE BEANS (COWPEA)           | Cowpea                                  | yes  |      |       |                                                                                 |
+| 203  | CASSAVA (FRESH)                | Cassava (fresh)                         | yes  |      |       |                                                                                 |
+| 204  | COCOYAM                        | Cocoyam                                 | yes  |      |       |                                                                                 |
+| 205  | YAM - PUNA                     | Yam                                     | yes  |      |       |                                                                                 |
+| 206  | WATER YAM                      | Water Yam                               | yes  |      |       |                                                                                 |
+| 207  | CUBED SUGAR (SAINT LOUIS)      | Sugar (cubed)                           | yes  |      |       |                                                                                 |
+| 208  | GRANULATED SUGAR               | Sugar (granulated)                      | yes  |      |       |                                                                                 |
+| 209  | HONEY (BOTTLE)                 | Honey                                   | yes  |      |       |                                                                                 |
+| 213  | KINGS BITE                     | Chocolate                               | yes  |      |       |                                                                                 |
+| 214  | GOLDEN TREE CHOCOLATE          | Chocolate                               | yes  |      |       |                                                                                 |
+| 215  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Chocolate                               | yes  |      |       | other (specify), chocolate block                                                |
+| 219  | CHEWING GUM                    | Chewing Gum                             | yes  |      |       |                                                                                 |
+| 220  | TRIDENT                        | Chewing Gum                             | yes  |      |       |                                                                                 |
+| 221  | PK                             | Chewing Gum                             | yes  |      |       |                                                                                 |
+| 222  | MENTOS                         | Chewing Gum                             | yes  |      |       |                                                                                 |
+| 223  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Chewing Gum                             | yes  |      |       | other (specify), chewing-gum block                                              |
+| 227  | SALT (IODISED - LOCAL)         | Salt                                    | yes  |      |       |                                                                                 |
+| 228  | ANAPUNA IODATED SALT           | Salt                                    | yes  |      |       |                                                                                 |
+| 229  | U2 IODATED SALT                | Salt                                    | yes  |      |       |                                                                                 |
+| 230  | GINGER                         | Ginger                                  | yes  |      |       |                                                                                 |
+| 231  | VINEGAR                        | Vinegar                                 | yes  |      |       |                                                                                 |
+| 232  | ROYCO                          | Condiments                              | yes  |      |       |                                                                                 |
+| 233  | ONGA CUBE                      | Condiments                              | yes  |      |       |                                                                                 |
+| 234  | BENNY                          | Condiments                              | yes  |      |       |                                                                                 |
+| 235  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Condiments                              | yes  |      |       | other (specify), stock-cube block                                               |
+| 239  | NESCAFE - TIN                  | Coffee                                  | yes  |      |       |                                                                                 |
+| 240  | PURE COCOA POWDER (EG. BROWN G | Cocoa Powder                            | yes  |      |       |                                                                                 |
+| 241  | TEA BAGS, (EG. LIPTON)         | Tea bag                                 | yes  |      |       |                                                                                 |
+| 242  | COCOA WITH MILK POWDER         | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
+| 243  | BOURNVITA                      | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
+| 244  | COW BELL (COFFEE,CHOCO ETC)    | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
+| 245  | THIS WAY CHOCOLATE DRINK       | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
+| 246  | COUNTRY MILK - CHOCOLATE       | Other Beverages                         | yes  |      |       | chocolate-flavoured milk drink                                                  |
+| 247  | MILO                           | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
+| 248  | RICHOCO                        | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
+| 250  | VOLTIC                         | Water                                   | yes  |      |       |                                                                                 |
+| 251  | BEL AQUA                       | Water                                   | yes  |      |       |                                                                                 |
+| 252  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Water                                   | yes  |      |       | other (specify), bottled water                                                  |
+| 256  | SATCHET WATER                  | Water                                   | yes  |      |       |                                                                                 |
+| 257  | COCA COLA /FANTA (BOTTLE)/SPRI | Soft Drinks                             | yes  |      |       |                                                                                 |
+| 259  | MALTA GUINNESS                 | Malt Drinks (bottle)                    | yes  |      |       |                                                                                 |
+| 260  | MAGIC MALT                     | Malt Drinks (bottle)                    | yes  |      |       |                                                                                 |
+| 261  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Malt Drinks (bottle)                    | yes  |      |       | other (specify), bottled malt                                                   |
+| 266  | MAGIC MALT                     | Malt Drinks (canned)                    | yes  |      |       |                                                                                 |
+| 267  | MALTA GUINNESS                 | Malt Drinks (canned)                    | yes  |      |       |                                                                                 |
+| 268  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Malt Drinks (canned)                    | yes  |      |       | other (specify), canned malt                                                    |
+| 273  | DON SIMON                      | Juice                                   | yes  |      |       |                                                                                 |
+| 274  | FRU TELLI                      | Juice                                   | yes  |      |       |                                                                                 |
+| 275  | BLUE SKIES                     | Juice                                   | yes  |      |       |                                                                                 |
+| 276  | PURE HEAVEN                    | Juice                                   | yes  |      |       |                                                                                 |
+| 277  | KALIPO                         | Juice                                   | yes  |      |       |                                                                                 |
+| 278  | HEALTHY LIVE                   | Juice                                   | yes  |      |       |                                                                                 |
+| 279  | CERES                          | Juice                                   | yes  |      |       |                                                                                 |
+| 280  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Juice                                   | yes  |      |       | other (specify), juice block                                                    |
+| 284  | GIN                            | Gin                                     | yes  |      |       |                                                                                 |
+| 285  | WHISKY                         | Whisky                                  | yes  |      |       |                                                                                 |
+| 286  | AKPETESHIE                     | Akpeteshie                              | yes  |      |       |                                                                                 |
+| 287  | BITTERS (EG. ALOMO, AGYA APPIA | Bitters                                 | yes  |      |       |                                                                                 |
+| 288  | SCHNAPPS                       | Schnapps                                | yes  |      |       |                                                                                 |
+| 289  | PALM WINE/RAFFIA PALM          | Wine                                    | yes  |      |       | axis codes Palm Wine as Wine                                                    |
+| 290  | IMPORTED WINE (SPECIFY)        | Wine                                    | yes  |      |       |                                                                                 |
+| 291  | NATIONAL BEER (STAR/CLUB)      | Beer                                    | yes  |      |       |                                                                                 |
+| 292  | DARK BEER (EG GUILDER, GUINNES | Beer                                    | yes  |      |       |                                                                                 |
+| 293  | BEER (IMPORTED)                | Beer                                    | yes  |      |       |                                                                                 |
+| 294  | TRADITINAL BEER (PITO/BRUKUTU) | Beer                                    | yes  |      |       | axis codes pito as Beer                                                         |
+| 295  | CIGARETTE (555)                | Cigarette                               | yes  |      |       |                                                                                 |
+| 296  | TOBACCO (PROCESSED)            | Tobacco                                 | yes  |      |       |                                                                                 |
+| 297  | KOLA NUTS                      | Kola Nut                                | yes  |      |       |                                                                                 |
+| 298  | CLOTHS: LOCAL (SUPER AND ORDIN | Cloths: local (super and ordin          | no   |      |       |                                                                                 |
+| 299  | IMPORTED (WEST AFRICA)         | Imported (west africa)                  | no   |      |       |                                                                                 |
+| 300  | IMPORTED (EUROPE)              | Imported (europe)                       | no   |      |       |                                                                                 |
+| 301  | IMPORTED (CHINA)               | Imported (china)                        | no   |      |       |                                                                                 |
+| 302  | DRESS MATERIAL (LOCAL - SUPER  | Dress material (local - super           | no   |      |       |                                                                                 |
+| 303  | KENTE (MEN)                    | Kente (men)                             | no   |      |       |                                                                                 |
+| 304  | KENTE (WOMEN)                  | Kente (women)                           | no   |      |       |                                                                                 |
+| 305  | SUIT - MEN                     | Suit - men                              | no   |      |       |                                                                                 |
+| 306  | MEN -WOMEN                     | Men -women                              | no   |      |       |                                                                                 |
+| 307  | WOMEN'S BLOUSE                 | Women's blouse                          | no   |      |       |                                                                                 |
+| 308  | WOMEN'S JACKET/BLAZER          | Women's jacket/blazer                   | no   |      |       |                                                                                 |
+| 309  | WOMENS POLYESTER SKIRT        | Womens polyester skirt                 | no   |      |       |                                                                                 |
+| 310  | WOMEN'S DENIM SKIRT(JEANS)     | Women's denim skirt(jeans)              | no   |      |       |                                                                                 |
+| 311  | WOMEN'S NIGHTGOWN              | Women's nightgown                       | no   |      |       |                                                                                 |
+| 312  | WOMEN'S BATHROBE               | Women's bathrobe                        | no   |      |       |                                                                                 |
+| 313  | WOMEN'S SPORTSWEAR             | Women's sportswear                      | no   |      |       |                                                                                 |
+| 314  | WOMEN'S PULLOVER               | Women's pullover                        | no   |      |       |                                                                                 |
+| 315  | LADIES' STRAIGHT TROUSERS      | Ladies' straight trousers               | no   |      |       |                                                                                 |
+| 316  | BOUBOU                         | Boubou                                  | no   |      |       |                                                                                 |
+| 317  | SKIRT                          | Skirt                                   | no   |      |       |                                                                                 |
+| 318  | BOY'S TWO PIECE DRESS          | Boy's two piece dress                   | no   |      |       |                                                                                 |
+| 319  | BOY'S UNDERSHIRT (SINGLET)     | Boy's undershirt (singlet)              | no   |      |       |                                                                                 |
+| 320  | BOY'S SHIRT, SHORT SLEEVES     | Boy's shirt, short sleeves              | no   |      |       |                                                                                 |
+| 321  | BOY'S SHIRT, LONG SLEEVES      | Boy's shirt, long sleeves               | no   |      |       |                                                                                 |
+| 322  | BOY'S JOGGING SUIT             | Boy's jogging suit                      | no   |      |       |                                                                                 |
+| 323  | BOY'S UNDERPANTS               | Boy's underpants                        | no   |      |       |                                                                                 |
+| 324  | GIRL'S UNDERPANTS              | Girl's underpants                       | no   |      |       |                                                                                 |
+| 325  | GIRL'S DRESS                   | Girl's dress                            | no   |      |       |                                                                                 |
+| 326  | BABIES BODYSUIT               | Babies bodysuit                        | no   |      |       |                                                                                 |
+| 327  | TROUSERS FOR MEN               | Trousers for men                        | no   |      |       |                                                                                 |
+| 328  | SHIRTS FOR MEN                 | Shirts for men                          | no   |      |       |                                                                                 |
+| 329  | MEN'S T-SHIRT                  | Men's t-shirt                           | no   |      |       |                                                                                 |
+| 330  | MEN'S SHIRT - OPEN FRONT (LONG | Men's shirt - open front (long          | no   |      |       |                                                                                 |
+| 331  | JEANS JACKET                   | Jeans jacket                            | no   |      |       |                                                                                 |
+| 332  | BRANDED T-SHIRT                | Branded t-shirt                         | no   |      |       |                                                                                 |
+| 333  | WAX DESIGN SHIRT               | Wax design shirt                        | no   |      |       |                                                                                 |
+| 334  | SHORTS - MEN                   | Shorts - men                            | no   |      |       |                                                                                 |
+| 335  | SPORTS SHIRT                   | Sports shirt                            | no   |      |       |                                                                                 |
+| 336  | JEANS (MEN)                    | Jeans (men)                             | no   |      |       |                                                                                 |
+| 337  | UNDERWEAR WOMEN                | Underwear women                         | no   |      |       |                                                                                 |
+| 338  | UNDERWEAR MEN                  | Underwear men                           | no   |      |       |                                                                                 |
+| 339  | UNDERWEAR CHILDREN             | Underwear children                      | no   |      |       |                                                                                 |
+| 340  | UNIFORM EXCLUDING SCHOOL UNIFO | Uniform excluding school unifo [ln 340] | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 341  | UNIFORM EXCLUDING SCHOOL UNIFO | Uniform excluding school unifo [ln 341] | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 342  | SMOCK - MEN                    | Smock - men                             | no   |      |       |                                                                                 |
+| 343  | SMOCK - WOMEN                  | Smock - women                           | no   |      |       |                                                                                 |
+| 344  | SCHOOL UNIFORMS FOR BOYS       | School uniforms for boys                | no   |      |       |                                                                                 |
+| 345  | SCHOOL UNIFORMS FOR GIRLS      | School uniforms for girls               | no   |      |       |                                                                                 |
+| 346  | HANDKERCHIEF (WOMEN)           | Handkerchief (women)                    | no   |      |       |                                                                                 |
+| 347  | HANDKERCHIEF (MEN)             | Handkerchief (men)                      | no   |      |       |                                                                                 |
+| 348  | MENS BELT (LEATHER OR SYNTHET | Mens belt (leather or synthet          | no   |      |       |                                                                                 |
+| 349  | MEN'S SOCKS                    | Men's socks                             | no   |      |       |                                                                                 |
+| 350  | POLYESTER TIE                  | Polyester tie                           | no   |      |       |                                                                                 |
+| 351  | RAINCOAT                       | Raincoat                                | no   |      |       |                                                                                 |
+| 352  | SPORT SHOES - BRAND IMITATION  | Sport shoes - brand imitation [ln 352]  | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 353  | LOCAL STREET SANDALS - MEN     | Local street sandals - men              | no   |      |       |                                                                                 |
+| 354  | RUBBER STREET SANDALS (CHALEW  | Rubber street sandals (chalew           | no   |      |       |                                                                                 |
+| 355  | MEN'S DRESS SHOES              | Men's dress shoes                       | no   |      |       |                                                                                 |
+| 356  | MENS' LONG BOOTS               | Mens' long boots                        | no   |      |       |                                                                                 |
+| 357  | SPORT SHOES - BRAND IMITATION  | Sport shoes - brand imitation [ln 357]  | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 358  | LOCAL STREET SANDALS (SLIPPER  | Local street sandals (slipper           | no   |      |       |                                                                                 |
+| 359  | PLASTIC STREET SANDALS (CHALE  | Plastic street sandals (chale           | no   |      |       |                                                                                 |
+| 360  | WOMEN'S DRESS SHOES            | Women's dress shoes                     | no   |      |       |                                                                                 |
+| 361  | HIGH HEEL SHOES                | High heel shoes                         | no   |      |       |                                                                                 |
+| 362  | SPORT SHOES - BRAND IMITATION  | Sport shoes - brand imitation [ln 362]  | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 363  | LOCAL STREET SANDALS - CHILDR  | Local street sandals - childr           | no   |      |       |                                                                                 |
+| 364  | RUBBER STREET SANDALS (CHALEWO | Rubber street sandals (chalewo          | no   |      |       |                                                                                 |
+| 365  | CHILDREN'S DRESS SHOES         | Children's dress shoes                  | no   |      |       |                                                                                 |
+| 366  | CHILDREN'S LONG BOOTS          | Children's long boots                   | no   |      |       |                                                                                 |
+| 367  | MONTHLY RENT - SINGLE ROOM     | Monthly rent - single room              | no   |      |       |                                                                                 |
+| 368  | MONTHLY RENT - CHAMBER AND HAL | Monthly rent - chamber and hal          | no   |      |       |                                                                                 |
+| 369  | MONTHLY RENT - 2 BEDROOM SEL-C | Monthly rent - 2 bedroom sel-c          | no   |      |       |                                                                                 |
+| 370  | CEMENT - GHACEM                | Cement - ghacem                         | no   |      |       |                                                                                 |
+| 371  | CEMENT - DANGOTE               | Cement - dangote                        | no   |      |       |                                                                                 |
+| 372  | CEMENT - DIAMOND               | Cement - diamond                        | no   |      |       |                                                                                 |
+| 373  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 373]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 378  | IRON RODS (1/4") DIAMETER      | Iron rods (1/4") diameter               | no   |      |       |                                                                                 |
+| 379  | IRON RODS(3/8") DIAMETER       | Iron rods(3/8") diameter                | no   |      |       |                                                                                 |
+| 380  | IRON RODS(1/2") DIAMETER       | Iron rods(1/2") diameter                | no   |      |       |                                                                                 |
+| 381  | IRON RODS (3/4") DIAMETER      | Iron rods (3/4") diameter               | no   |      |       |                                                                                 |
+| 382  | IRON RODS (5/8") DIAMETER      | Iron rods (5/8") diameter               | no   |      |       |                                                                                 |
+| 383  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 383]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 388  | ALUMINUM SHEETS                | Aluminum sheets                         | no   |      |       |                                                                                 |
+| 389  | GALVANISED SHEETS              | Galvanised sheets                       | no   |      |       |                                                                                 |
+| 390  | ASBESTOS/SLATE SHEETS          | Asbestos/slate sheets                   | no   |      |       |                                                                                 |
+| 391  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 391]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 395  | BRICKS                         | Bricks                                  | no   |      |       |                                                                                 |
+| 396  | CEMENT BLOCKS - 5" SOLID       | Cement blocks - 5" solid                | no   |      |       |                                                                                 |
+| 397  | LEYLAND EMULSION               | Leyland emulsion                        | no   |      |       |                                                                                 |
+| 398  | SAVANNAH EMULSION              | Savannah emulsion                       | no   |      |       |                                                                                 |
+| 399  | SUVINIL EMULSION               | Suvinil emulsion                        | no   |      |       |                                                                                 |
+| 400  | CORAL EMULSION                 | Coral emulsion                          | no   |      |       |                                                                                 |
+| 401  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 401]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 405  | LEYLAND OIL                    | Leyland oil                             | no   |      |       |                                                                                 |
+| 406  | AZARGLOSS EMULSION             | Azargloss emulsion                      | no   |      |       |                                                                                 |
+| 407  | AZARGLOSS OIL                  | Azargloss oil                           | no   |      |       |                                                                                 |
+| 408  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 408]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 412  | QUICKLIME                      | Quicklime                               | no   |      |       |                                                                                 |
+| 414  | SAPELE - BOARD                 | Sapele - board                          | no   |      |       |                                                                                 |
+| 415  | MAHOGANY - BOARD               | Mahogany - board                        | no   |      |       |                                                                                 |
+| 416  | WAWA - BOARD                   | Wawa - board                            | no   |      |       |                                                                                 |
+| 417  | OFRAM - BOARD                  | Ofram - board                           | no   |      |       |                                                                                 |
+| 418  | ODUM - BOARD                   | Odum - board                            | no   |      |       |                                                                                 |
+| 419  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 419]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 423  | DOORS- PANEL                   | Doors- panel                            | no   |      |       |                                                                                 |
+| 424  | DOORS - PLAIN                  | Doors - plain                           | no   |      |       |                                                                                 |
+| 425  | ELECTRICITY, CENTRAL SUPPLY (5 | Electricity, central supply (5          | no   |      |       |                                                                                 |
+| 426  | TAP WATER, INDIVIDUAL CONSUMPT | Tap water, individual consumpt          | no   |      |       |                                                                                 |
+| 427  | RE-SOLD TAP WATER IN BUCKETS/B | Re-sold tap water in buckets/b          | no   |      |       |                                                                                 |
+| 428  | LIQUEFIED GAS: PROPANE         | Liquefied gas: propane                  | no   |      |       |                                                                                 |
+| 429  | KEROSENE                       | Kerosene                                | no   |      |       |                                                                                 |
+| 430  | CHARCOAL                       | Charcoal                                | no   |      |       |                                                                                 |
+| 431  | FIREWOOD                       | Firewood                                | no   |      |       |                                                                                 |
+| 432  | ICE BLOCK (HOUSEHOLD COOLING A | Ice block (household cooling a          | no   |      |       |                                                                                 |
+| 434  | SIMPLE DOUBLE BED              | Simple double bed                       | no   |      |       |                                                                                 |
+| 435  | SIMPLE SINGLE BED              | Simple single bed                       | no   |      |       |                                                                                 |
+| 436  | FOAM MATTRESS 20 CM-THICK FOR  | Foam mattress 20 cm-thick for [ln 436]  | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 437  | FOAM MATTRESS 20 CM-THICK FOR  | Foam mattress 20 cm-thick for [ln 437]  | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 438  | SPRING MATTRESS (SINGLE) 0 LAT | Spring mattress (single) 0 lat          | no   |      |       |                                                                                 |
+| 439  | SPRING MATTRESS (SINGLE) - ASH | Spring mattress (single) - ash          | no   |      |       |                                                                                 |
+| 440  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 440]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 444  | ROOM FURNITURE SET             | Room furniture set                      | no   |      |       |                                                                                 |
+| 445  | KITCHEN TABLE                  | Kitchen table                           | no   |      |       |                                                                                 |
+| 446  | KITCHEN CHAIR                  | Kitchen chair                           | no   |      |       |                                                                                 |
+| 447  | CHEST OF DRAWERS (3 PULL OUT D | Chest of drawers (3 pull out d          | no   |      |       |                                                                                 |
+| 448  | TWO DOORS WARDROBE             | Two doors wardrobe                      | no   |      |       |                                                                                 |
+| 449  | PLASTIC TABLE                  | Plastic table                           | no   |      |       |                                                                                 |
+| 450  | PLASTIC CHAIR                  | Plastic chair                           | no   |      |       |                                                                                 |
+| 451  | FLOOR MAT (TILES)              | Floor mat (tiles)                       | no   |      |       |                                                                                 |
+| 452  | LINOLEUM                       | Linoleum                                | no   |      |       |                                                                                 |
+| 453  | WOLLEN CARPETS                 | Wollen carpets                          | no   |      |       |                                                                                 |
+| 454  | VINYL FLOOR COVERING           | Vinyl floor covering                    | no   |      |       |                                                                                 |
+| 455  | POLYPROPYLENE CARPET           | Polypropylene carpet                    | no   |      |       |                                                                                 |
+| 456  | BEDSHEET (COTTON) DOUBLE BED   | Bedsheet (cotton) double bed            | no   |      |       |                                                                                 |
+| 457  | BEDSHEET (COTTON) SINGLE BED   | Bedsheet (cotton) single bed            | no   |      |       |                                                                                 |
+| 458  | BLANKET, POLYESTER - SINGLE    | Blanket, polyester - single             | no   |      |       |                                                                                 |
+| 459  | BLANKET, POLYESTER - DOUBLE    | Blanket, polyester - double             | no   |      |       |                                                                                 |
+| 460  | TOWELS                         | Towels                                  | no   |      |       |                                                                                 |
+| 461  | REFRIGERATOR WITH FREEZER COMP | Refrigerator with freezer comp          | no   |      |       |                                                                                 |
+| 462  | WASHING MACHINE (FRONT LOADER) | Washing machine (front loader)          | no   |      |       |                                                                                 |
+| 463  | WASHING MACHINE (TOP LOADER)   | Washing machine (top loader)            | no   |      |       |                                                                                 |
+| 464  | DISHWASHER                     | Dishwasher                              | no   |      |       |                                                                                 |
+| 465  | VACUUM CLEANER                 | Vacuum cleaner                          | no   |      |       |                                                                                 |
+| 466  | AIR CONDITIONER - SPLIT CHASSI | Air conditioner - split chassi          | no   |      |       |                                                                                 |
+| 467  | GAS STOVE, WITH OVEN           | Gas stove, with oven                    | no   |      |       |                                                                                 |
+| 468  | GAS STOVE, 2 BURNERS           | Gas stove, 2 burners                    | no   |      |       |                                                                                 |
+| 469  | MICROWAVE OVEN (16-22 LITERS)  | Microwave oven (16-22 liters)           | no   |      |       |                                                                                 |
+| 470  | GENERATORS (HOUSEHOLD USE)     | Generators (household use)              | no   |      |       |                                                                                 |
+| 471  | ELECTRIC SEWING MACHINE        | Electric sewing machine                 | no   |      |       |                                                                                 |
+| 472  | ELECTRIC KETTLE                | Electric kettle                         | no   |      |       |                                                                                 |
+| 473  | ELECTRIC IRONS                 | Electric irons                          | no   |      |       |                                                                                 |
+| 474  | STEAM IRON                     | Steam iron                              | no   |      |       |                                                                                 |
+| 475  | ELECTRIC FANS                  | Electric fans                           | no   |      |       |                                                                                 |
+| 476  | TABLE FAN (DESK FAN)           | Table fan (desk fan)                    | no   |      |       |                                                                                 |
+| 477  | BLENDERS                       | Blenders                                | no   |      |       |                                                                                 |
+| 478  | LANTERNS,GAS LIGHTS            | Lanterns,gas lights                     | no   |      |       |                                                                                 |
+| 479  | HAND MIXER                     | Hand mixer                              | no   |      |       |                                                                                 |
+| 480  | TOASTER                        | Toaster                                 | no   |      |       |                                                                                 |
+| 481  | CUPS                           | Cups                                    | no   |      |       |                                                                                 |
+| 482  | PLATES                         | Plates                                  | no   |      |       |                                                                                 |
+| 483  | CUTLERIES                      | Cutleries                               | no   |      |       |                                                                                 |
+| 484  | ALUMINIUM COOKING UTENSILS (LO | Aluminium cooking utensils (lo          | no   |      |       |                                                                                 |
+| 485  | NON-STICK FRYING PAN           | Non-stick frying pan                    | no   |      |       |                                                                                 |
+| 486  | BUCKET                         | Bucket                                  | no   |      |       |                                                                                 |
+| 487  | ROLLING PIN                    | Rolling pin                             | no   |      |       |                                                                                 |
+| 488  | JUG                            | Jug                                     | no   |      |       |                                                                                 |
+| 489  | WATER PUMPS                    | Water pumps                             | no   |      |       |                                                                                 |
+| 490  | CUTLASSES                      | Cutlasses                               | no   |      |       |                                                                                 |
+| 491  | SHOVELS                        | Shovels                                 | no   |      |       |                                                                                 |
+| 492  | RAKES                          | Rakes                                   | no   |      |       |                                                                                 |
+| 493  | WHEELBARROW                    | Wheelbarrow                             | no   |      |       |                                                                                 |
+| 494  | INCANDESCENT LIGHT BULB        | Incandescent light bulb                 | no   |      |       |                                                                                 |
+| 495  | ENERGY SAVING LIGHT BULB       | Energy saving light bulb                | no   |      |       |                                                                                 |
+| 496  | FLUORESCENT BULBS              | Fluorescent bulbs                       | no   |      |       |                                                                                 |
+| 497  | TORCHES                        | Torches                                 | no   |      |       |                                                                                 |
+| 498  | AA ALKALINE BATTERIES          | Aa alkaline batteries                   | no   |      |       |                                                                                 |
+| 499  | PADLOCK                        | Padlock                                 | no   |      |       |                                                                                 |
+| 501  | OMO WASHING POWDER             | Omo washing powder                      | no   |      |       |                                                                                 |
+| 502  | ARIEL WASHING POWDER           | Ariel washing powder                    | no   |      |       |                                                                                 |
+| 503  | YAZZ WASHING POWDER            | Yazz washing powder                     | no   |      |       |                                                                                 |
+| 504  | SUNLIGHT WASHING POWDER        | Sunlight washing powder                 | no   |      |       |                                                                                 |
+| 505  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 505]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 509  | SUNLIGHT SOAP                  | Sunlight soap                           | no   |      |       |                                                                                 |
+| 510  | KEY SOAP                       | Key soap                                | no   |      |       |                                                                                 |
+| 511  | AMEEN SOAP                     | Ameen soap                              | no   |      |       |                                                                                 |
+| 512  | DUCK SOAP                      | Duck soap                               | no   |      |       |                                                                                 |
+| 513  | KLEENSOFT                      | Kleensoft                               | no   |      |       |                                                                                 |
+| 514  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 514]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 520  | LUX SOAP                       | Lux soap                                | no   |      |       |                                                                                 |
+| 521  | REXONA                         | Rexona [ln 521]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 522  | MEDISOFT                       | Medisoft                                | no   |      |       |                                                                                 |
+| 523  | GESHIA                         | Geshia                                  | no   |      |       |                                                                                 |
+| 525  | SUNLIGHT                       | Sunlight                                | no   |      |       |                                                                                 |
+| 526  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 526]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 530  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 530]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 531  | BLEACHES (PARAZONE)            | Bleaches (parazone)                     | no   |      |       |                                                                                 |
+| 532  | DISINFECTANTS AND CLEANERS (CA | Disinfectants and cleaners (ca          | no   |      |       |                                                                                 |
+| 534  | RAID                           | Raid [ln 534]                           | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 535  | HEAVEN                         | Heaven [ln 535]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 536  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 536]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 541  | RAID                           | Raid [ln 541]                           | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 542  | HEAVEN                         | Heaven [ln 542]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 543  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 543]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 547  | MATCHES                        | Matches                                 | no   |      |       |                                                                                 |
+| 548  | TOILET PAPERS                  | Toilet papers                           | no   |      |       |                                                                                 |
+| 555  | HOUSEHOLD CANDLES              | Household candles                       | no   |      |       |                                                                                 |
+| 556  | BROOMS                         | Brooms                                  | no   |      |       |                                                                                 |
+| 557  | PAPER NAPKINS (TISSUE,100 SHEE | Paper napkins (tissue,100 shee          | no   |      |       |                                                                                 |
+| 558  | KITCHEN PAPER ROLL             | Kitchen paper roll                      | no   |      |       |                                                                                 |
+| 559  | TOILET BOWL CLEANER            | Toilet bowl cleaner                     | no   |      |       |                                                                                 |
+| 560  | SHOE POLISH                    | Shoe polish                             | no   |      |       |                                                                                 |
+| 561  | BROOM, PLASTIC                 | Broom, plastic                          | no   |      |       |                                                                                 |
+| 562  | MOP, WITH HANDLE               | Mop, with handle                        | no   |      |       |                                                                                 |
+| 563  | PAIN KILLERS (PARACETAMOL, APC | Pain killers (paracetamol, apc          | no   |      |       |                                                                                 |
+| 564  | ANTIBIOTICS (AMOXICILLIN, ETC) | Antibiotics (amoxicillin, etc)          | no   |      |       |                                                                                 |
+| 565  | AMOXICILLIN                    | Amoxicillin                             | no   |      |       |                                                                                 |
+| 567  | ARTEMETHER + LUMEFANTRINE      | Artemether + lumefantrine               | no   |      |       |                                                                                 |
+| 568  | ARTESUNATE AMMODIAQUIN         | Artesunate ammodiaquin                  | no   |      |       |                                                                                 |
+| 569  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 569]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 573  | SULPHA DOXINE                  | Sulpha doxine                           | no   |      |       |                                                                                 |
+| 574  | IBUPROFEN                      | Ibuprofen                               | no   |      |       |                                                                                 |
+| 575  | METRONIDAZOLE (ORIGINAL)       | Metronidazole (original)                | no   |      |       |                                                                                 |
+| 576  | METRONIDAZOLE (GENERIC)        | Metronidazole (generic)                 | no   |      |       |                                                                                 |
+| 577  | ORAL REHYDRATION SALTS         | Oral rehydration salts                  | no   |      |       |                                                                                 |
+| 579  | KISS CONDOM                    | Kiss condom                             | no   |      |       |                                                                                 |
+| 580  | CHAMPION CONDOM                | Champion condom                         | no   |      |       |                                                                                 |
+| 581  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 581]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 586  | KINGDOM KOOKOO CAPSULES        | Kingdom kookoo capsules                 | no   |      |       |                                                                                 |
+| 587  | ADOM TABLETS                   | Adom tablets                            | no   |      |       |                                                                                 |
+| 588  | ABGEVE SYRUP                   | Abgeve syrup                            | no   |      |       |                                                                                 |
+| 589  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 589]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 593  | CONTRACEPTIVE PILLS (SPECIFY)  | Contraceptive pills (specify)           | no   |      |       |                                                                                 |
+| 597  | WALKING STICK                  | Walking stick                           | no   |      |       |                                                                                 |
+| 598  | CORRECTIVE EYE-GLASSES         | Corrective eye-glasses                  | no   |      |       |                                                                                 |
+| 600  | MOTOR CAR, PETROL ENGINE, 1, 7 | Motor car, petrol engine, 1, 7          | no   |      |       |                                                                                 |
+| 602  | YAMAHA MOTOR CYCLES, 100 TO 15 | Yamaha motor cycles, 100 to 15          | no   |      |       |                                                                                 |
+| 603  | HONDA MOTORCYCLE, 125 CC       | Honda motorcycle, 125 cc                | no   |      |       |                                                                                 |
+| 604  | SUZUKI MOTORCYCLE, 600 CC      | Suzuki motorcycle, 600 cc               | no   |      |       |                                                                                 |
+| 605  | PURCHASE OF NEW BICYCLES       | Purchase of new bicycles                | no   |      |       |                                                                                 |
+| 606  | PURCHASE OF CAR TYRE - R14     | Purchase of car tyre - r14              | no   |      |       |                                                                                 |
+| 607  | PURCHASE OF CAR TYRE - R15     | Purchase of car tyre - r15              | no   |      |       |                                                                                 |
+| 608  | CAR BATTERY - BOSCH (15 PLATE) | Car battery - bosch (15 plate)          | no   |      |       |                                                                                 |
+| 609  | CAR BATTERY - BOLIDON (15 PLAT | Car battery - bolidon (15 plat          | no   |      |       |                                                                                 |
+| 610  | CAR BATTERY - GANIVA (15 PLATE | Car battery - ganiva (15 plate          | no   |      |       |                                                                                 |
+| 612  | SUPER PREMIER                  | Super premier                           | no   |      |       |                                                                                 |
+| 613  | SUPER EFFIMAX                  | Super effimax                           | no   |      |       |                                                                                 |
+| 614  | GOIL SUPER XP                  | Goil super xp                           | no   |      |       |                                                                                 |
+| 615  | DIESEL PREMIER                 | Diesel premier                          | no   |      |       |                                                                                 |
+| 616  | DIESELEFFIMAX                  | Dieseleffimax                           | no   |      |       |                                                                                 |
+| 617  | GOIL DIESEL XP                 | Goil diesel xp                          | no   |      |       |                                                                                 |
+| 619  | WHEEL ALIGNMENT                | Wheel alignment                         | no   |      |       |                                                                                 |
+| 620  | CAR WASHING                    | Car washing                             | no   |      |       |                                                                                 |
+| 621  | DRIVERS LICENCE FEES           | Drivers licence fees                    | no   |      |       |                                                                                 |
+| 622  | ROAD WORTHY (SALOON CAR)       | Road worthy (saloon car)                | no   |      |       |                                                                                 |
+| 623  | BUS FARES (STC,METRO MASS TRAN | Bus fares (stc,metro mass tran          | no   |      |       |                                                                                 |
+| 624  | TROTRO (INTRA-CITY)            | Trotro (intra-city)                     | no   |      |       |                                                                                 |
+| 625  | MASS TRANSPORT (INTRA-CITY)    | Mass transport (intra-city)             | no   |      |       |                                                                                 |
+| 626  | TAXI, FIXED-ROUTE SHARED TAXI  | Taxi, fixed-route shared taxi           | no   |      |       |                                                                                 |
+| 629  | INTERNATIONAL FLIGHT 2 HOURS   | International flight 2 hours            | no   |      |       |                                                                                 |
+| 630  | DOMESTIC FLIGHT 2 HOURS ONE WA | Domestic flight 2 hours one wa          | no   |      |       |                                                                                 |
+| 632  | RIVER CROSSING (BIG FERRY)     | River crossing (big ferry)              | no   |      |       |                                                                                 |
+| 633  | RIVER CROSSING (CANOE)         | River crossing (canoe)                  | no   |      |       |                                                                                 |
+| 634  | POSTAGE (WITHIN GHANA)         | Postage (within ghana)                  | no   |      |       |                                                                                 |
+| 635  | POSTAGE (OUTSIDE)              | Postage (outside)                       | no   |      |       |                                                                                 |
+| 637  | PANASONIC                      | Panasonic [ln 637]                      | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 638  | SIEMENS                        | Siemens                                 | no   |      |       |                                                                                 |
+| 639  | MOTOROLA                       | Motorola                                | no   |      |       |                                                                                 |
+| 640  | SONY                           | Sony [ln 640]                           | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 641  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 641]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 646  | TECNO                          | Tecno                                   | no   |      |       |                                                                                 |
+| 647  | NOKIA                          | Nokia                                   | no   |      |       |                                                                                 |
+| 648  | SAMSUNG                        | Samsung                                 | no   |      |       |                                                                                 |
+| 649  | APPLE IPHONE                   | Apple iphone                            | no   |      |       |                                                                                 |
+| 650  | HTC                            | Htc                                     | no   |      |       |                                                                                 |
+| 651  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 651]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 654  | CANON                          | Canon                                   | no   |      |       |                                                                                 |
+| 656  | PANASONIC                      | Panasonic [ln 656]                      | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 657  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 657]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 659  | SCANNING (1 PAGE)              | Scanning (1 page)                       | no   |      |       |                                                                                 |
+| 660  | PRINTING (1 PAGE)              | Printing (1 page)                       | no   |      |       |                                                                                 |
+| 662  | SANYO                          | Sanyo [ln 662]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 663  | SHARP                          | Sharp [ln 663]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 664  | SUNNY                          | Sunny                                   | no   |      |       |                                                                                 |
+| 665  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 665]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 668  | DVD-PLAYER                     | Dvd-player                              | no   |      |       |                                                                                 |
+| 669  | SONY                           | Sony [ln 669]                           | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 670  | AUTOMOBILE RADIO WITH CD PLAYE | Automobile radio with cd playe          | no   |      |       |                                                                                 |
+| 672  | LG                             | Lg                                      | no   |      |       |                                                                                 |
+| 673  | SUMSUNG                        | Sumsung [ln 673]                        | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 674  | HISENSE                        | Hisense                                 | no   |      |       |                                                                                 |
+| 675  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 675]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 678  | 26 INCHES LCD TELEVISION - MED | 26 inches lcd television - med          | no   |      |       |                                                                                 |
+| 680  | CANNON                         | Cannon                                  | no   |      |       |                                                                                 |
+| 681  | SANYO                          | Sanyo [ln 681]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 682  | SUMSUNG                        | Sumsung [ln 682]                        | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 683  | NIKON                          | Nikon                                   | no   |      |       |                                                                                 |
+| 684  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 684]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 687  | DESKTOP PERSONAL COMPUTER      | Desktop personal computer               | no   |      |       |                                                                                 |
+| 688  | DELL                           | Dell [ln 688]                           | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 689  | HP                             | Hp [ln 689]                             | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 690  | COMPAQ                         | Compaq [ln 690]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 691  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 691]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 695  | DELL                           | Dell [ln 695]                           | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 696  | HP                             | Hp [ln 696]                             | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 697  | TOSHIBA                        | Toshiba                                 | no   |      |       |                                                                                 |
+| 698  | LENOVO                         | Lenovo                                  | no   |      |       |                                                                                 |
+| 699  | COMPAQ                         | Compaq [ln 699]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 700  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 700]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 705  | CASIO                          | Casio [ln 705]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 706  | SHARP                          | Sharp [ln 706]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 707  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 707]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 710  | TRENCENT                       | Trencent                                | no   |      |       |                                                                                 |
+| 711  | TRUS                           | Trus                                    | no   |      |       |                                                                                 |
+| 712  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 712]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 715  | DVD-MOVIE                      | Dvd-movie                               | no   |      |       |                                                                                 |
+| 716  | 6-STRING BASIC ACOUSTIC GUITAR | 6-string basic acoustic guitar          | no   |      |       |                                                                                 |
+| 717  | PORTABLE ELECTRONIC KEYBOARD ( | Portable electronic keyboard (          | no   |      |       |                                                                                 |
+| 719  | CASIO                          | Casio [ln 719]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 720  | SHARP                          | Sharp [ln 720]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 721  | YAMAHA                         | Yamaha                                  | no   |      |       |                                                                                 |
+| 725  | GIBSON                         | Gibson                                  | no   |      |       |                                                                                 |
+| 726  | PEAVEY                         | Peavey                                  | no   |      |       |                                                                                 |
+| 727  | BOSE                           | Bose                                    | no   |      |       |                                                                                 |
+| 728  | FENDER                         | Fender                                  | no   |      |       |                                                                                 |
+| 729  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 729]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 732  | PACK OF 52 PLAYING CARD GAME   | Pack of 52 playing card game            | no   |      |       |                                                                                 |
+| 733  | LEATHER FOOTBALL               | Leather football                        | no   |      |       |                                                                                 |
+| 734  | DICTIONARY (OXFORD LEARNERS')  | Dictionary (oxford learners')           | no   |      |       |                                                                                 |
+| 735  | LONGMAN                        | Longman                                 | no   |      |       |                                                                                 |
+| 736  | CAMBRIDGE                      | Cambridge                               | no   |      |       |                                                                                 |
+| 738  | CRUSADING GUIDE                | Crusading guide                         | no   |      |       |                                                                                 |
+| 739  | INSIGHT NEWS PAPER             | Insight news paper                      | no   |      |       |                                                                                 |
+| 740  | NATIONAL DAILY NEWSPAPER (GRAP | National daily newspaper (grap          | no   |      |       |                                                                                 |
+| 741  | NATIONAL DAILY NEWSPAPER (TIME | National daily newspaper (time          | no   |      |       |                                                                                 |
+| 742  | GRAPHIC SPORTS                 | Graphic sports                          | no   |      |       |                                                                                 |
+| 743  | EXERCISE BOOK (20 SHEETS)      | Exercise book (20 sheets)               | no   |      |       |                                                                                 |
+| 745  | 2B                             | 2b                                      | no   |      |       |                                                                                 |
+| 746  | HB                             | Hb                                      | no   |      |       |                                                                                 |
+| 747  | PEN                            | Pen                                     | no   |      |       |                                                                                 |
+| 748  | BIC                            | Bic [ln 748]                            | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 749  | PELIKAN                        | Pelikan                                 | no   |      |       |                                                                                 |
+| 750  | ERASER                         | Eraser                                  | no   |      |       |                                                                                 |
+| 751  | PIZZA MARGUERITE AT RESTAURANT | Pizza                                   | yes  |      |       |                                                                                 |
+| 752  | SPAGHETTI BOLOGNAISE AT RESTAU | Other Prepared Meals                    | yes  |      |       | restaurant dish                                                                 |
+| 753  | KFC RICE AND CHICKEN           | Other Prepared Meals                    | yes  |      |       | restaurant dish                                                                 |
+| 754  | PAPAYE RICE AND CHICKEN        | Other Prepared Meals                    | yes  |      |       | restaurant dish                                                                 |
+| 756  | COOKED RICE AND STEW           | Cooked Rice and Stew                    | yes  |      |       |                                                                                 |
+| 757  | FUFU AND LIGHT SOUP            | Soup                                    | yes  |      |       | axis codes fufu and light soup as Soup                                          |
+| 758  | BANKU & STEW                   | Kenkey/Banku                            | yes  |      |       |                                                                                 |
+| 759  | HOTEL, CAPITAL CITY - 3 STAR B | Hotel, capital city - 3 star b          | no   |      |       |                                                                                 |
+| 760  | HOTEL, CAPITAL CITY - 2 STAR B | Hotel, capital city - 2 star b          | no   |      |       |                                                                                 |
+| 761  | MEN'S HAIRCUT                  | Men's haircut                           | no   |      |       |                                                                                 |
+| 762  | HAIR WASH & STYLING            | Hair wash & styling                     | no   |      |       |                                                                                 |
+| 763  | RETOUCH OF HAIR                | Retouch of hair                         | no   |      |       |                                                                                 |
+| 764  | FIXING OF WEAVE- ON            | Fixing of weave- on                     | no   |      |       |                                                                                 |
+| 765  | BRAIDING                       | Braiding                                | no   |      |       |                                                                                 |
+| 766  | HAIR CUT - WOMEN               | Hair cut - women                        | no   |      |       |                                                                                 |
+| 767  | EYELID TRIMMING/SHAPING        | Eyelid trimming/shaping                 | no   |      |       |                                                                                 |
+| 771  | ORANGE                         | Orange [ln 771]                         | no   |      |       | name is a food label; code appended to keep its own j                           |
+| 772  | TANGO                          | Tango                                   | no   |      |       |                                                                                 |
+| 773  | ROSE                           | Rose                                    | no   |      |       |                                                                                 |
+| 774  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 774]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 776  | DARLING                        | Darling                                 | no   |      |       |                                                                                 |
+| 777  | AUNTIE LIZY                    | Auntie lizy                             | no   |      |       |                                                                                 |
+| 778  | ULTRA                          | Ultra                                   | no   |      |       |                                                                                 |
+| 779  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 779]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 781  | PEPSODENT                      | Pepsodent [ln 781]                      | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 782  | CLOSE UP                       | Close up                                | no   |      |       |                                                                                 |
+| 783  | COLGATE                        | Colgate [ln 783]                        | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 785  | BLUE ICE                       | Blue ice                                | no   |      |       |                                                                                 |
+| 786  | SURE                           | Sure                                    | no   |      |       |                                                                                 |
+| 787  | REXONA                         | Rexona [ln 787]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 788  | FA                             | Fa                                      | no   |      |       |                                                                                 |
+| 789  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 789]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 792  | BIC                            | Bic [ln 792]                            | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 793  | LORD                           | Lord                                    | no   |      |       |                                                                                 |
+| 794  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 794]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 796  | COLGATE                        | Colgate [ln 796]                        | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 797  | PEPSODENT                      | Pepsodent [ln 797]                      | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 798  | QUEEN ELIZABETH BODY LOTION    | Queen elizabeth body lotion             | no   |      |       |                                                                                 |
+| 799  | AZURA POWDER                   | Azura powder                            | no   |      |       |                                                                                 |
+| 800  | DUSTIN POWDER                  | Dustin powder                           | no   |      |       |                                                                                 |
+| 801  | STAY POWDER                    | Stay powder                             | no   |      |       |                                                                                 |
+| 802  | TAMPONS (SANITARY PAD)         | Tampons (sanitary pad)                  | no   |      |       |                                                                                 |
+| 803  | ALWAYS                         | Always                                  | no   |      |       |                                                                                 |
+| 804  | YAZZ                           | Yazz                                    | no   |      |       |                                                                                 |
+| 805  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 805]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 810  | GUCCI                          | Gucci [ln 810]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 811  | OMEGA                          | Omega [ln 811]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 812  | APPLE                          | Apple [ln 812]                          | no   |      |       | name is a food label; code appended to keep its own j                           |
+| 813  | QUARTZ                         | Quartz [ln 813]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 814  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Other (specify) [ln 814]                | no   |      |       | other (specify) line of a non-food block                                        |
+| 817  | WRIST WATCH (DIGITAL WATCH)    | Wrist watch (digital watch)             | no   |      |       |                                                                                 |
+| 818  | GUCCI                          | Gucci [ln 818]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 819  | OMEGA                          | Omega [ln 819]                          | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 820  | APPLE                          | Apple [ln 820]                          | no   |      |       | name is a food label; code appended to keep its own j                           |
+| 821  | QUARTZ                         | Quartz [ln 821]                         | no   |      |       | brand name recurs across blocks; code appended to keep its own j                |
+| 822  | WALL CLOCK                     | Wall clock                              | no   |      |       |                                                                                 |
+| 823  | NECKLACE (CHAIN), 21 KARAT GOL | Necklace (chain), 21 karat gol          | no   |      |       |                                                                                 |
+| 824  | FOLDABLE UMBRELLA              | Foldable umbrella                       | no   |      |       |                                                                                 |
+| 825  | SUITCASE, WITH TROLLEY SYSTEM  | Suitcase, with trolley system           | no   |      |       |                                                                                 |
+| 826  | LEATHER WALLET                 | Leather wallet                          | no   |      |       |                                                                                 |
+| 827  | DVD PLAYER                     | Dvd player                              | no   |      |       |                                                                                 |
+| 828  | TABLET COMPUTER                | Tablet computer                         | no   |      |       |                                                                                 |
+| 829  | MOTOR VEHICLE INSURANCE (THIRD | Motor vehicle insurance (third          | no   |      |       |                                                                                 |
+| 830  | PHOTOCOPY CHARGE PER A4 SHEET  | Photocopy charge per a4 sheet           | no   |      |       |                                                                                 |
+| 831  | PUBLIC TOILETS FEES PER ADULT  | Public toilets fees per adult           | no   |      |       |                                                                                 |
+
+When =unit{a,b,c}= is 99 ("Other unit") the reader wrote the unit in
+=unito{a,b,c}=; 132 distinct spellings.  The table below folds the ones that
+are plain misspellings or case variants of a unit onto the shared axis
+(=_/unit_labels.org= Preferred Labels, plus Tablet / Capsule / Bottle /
+Milligram / Page / Person / Month / Feet / Inch / Gigabyte which the axis
+lacks); anything not listed stays as written (title-cased) so it is visible
+as NEW rather than silently dropped.  Matching is case-insensitive on the
+stripped text.
+#+name: harmonize_price_unit
+| Text            | Preferred Label |
+|-----------------+-----------------|
+| kg              | Kilogram        |
+| ml              | Milliliter      |
+| mls.            | Milliliter      |
+| mml             | Milliliter      |
+| cl              | Milliliter      |
+| mg              | Milligram       |
+| milligram       | Milligram       |
+| milligrams      | Milligram       |
+| milligramme     | Milligram       |
+| milligramd      | Milligram       |
+| milligrsms      | Milligram       |
+| millllgram      | Milligram       |
+| miligram        | Milligram       |
+| 9mg             | Milligram       |
+| 9milligrams     | Milligram       |
+| 200mg           | Milligram       |
+| mm              | Millimeter      |
+| millimeter      | Millimeter      |
+| millimetre      | Millimeter      |
+| millimetres     | Millimeter      |
+| milimeter       | Millimeter      |
+| milimetre       | Millimeter      |
+| capsule         | Capsule         |
+| capsules        | Capsule         |
+| capsuls         | Capsule         |
+| casules         | Capsule         |
+| tablet          | Tablet          |
+| tablets         | Tablet          |
+| tablt           | Tablet          |
+| strip           | Blister/Strip   |
+| blister         | Blister/Strip   |
+| gallon          | Gallon          |
+| gallo           | Gallon          |
+| galon           | Gallon          |
+| frytol gallon   | Gallon          |
+| bottle          | Bottle          |
+| small bottle    | Bottle          |
+| can             | Can             |
+| bag             | Bag             |
+| buckets         | Bucket          |
+| pieces of 330ml | Piece           |
+| 330ml pieces    | Piece           |
+| 325ml pieces    | Piece           |
+| page            | Page            |
+| 1 page          | Page            |
+| 1page           | Page            |
+| per page        | Page            |
+| per sheet       | Sheet           |
+| person          | Person          |
+| per person      | Person          |
+| per perdon      | Person          |
+| passenger       | Person          |
+| passengaer      | Person          |
+| passenager      | Person          |
+| passage         | Person          |
+| month           | Month           |
+| monthly         | Month           |
+| months          | Month           |
+| per month       | Month           |
+| year            | Year            |
+| yearly          | Year            |
+| per day         | Day             |
+| room            | Room            |
+| per room        | Room            |
+| feet            | Feet            |
+| inch            | Inch            |
+| inches          | Inch            |
+| gigabyte        | Gigabyte        |
+| gigabite        | Gigabyte        |
+| gig             | Gigabyte        |
+| 4 gigabytes     | Gigabyte        |
+| kwh             | Kilowatts       |
+| kilowatts       | Kilowatts       |
+| watts           | Watts           |
+| volt            | Volt            |
+| ampere          | Ampere          |
+| ampoule         | Ampoule         |
+| acre            | Acre            |
+| plot            | Plot            |
+| kilometre       | Kilometre       |
+| service         | Service         |
+| dose            | Dose            |
+| course          | Course          |
+| stamp           | Stamp           |
+| olunka          | American Tin    |
+| calabash        | Calabash        |
+| board           | Board           |
+| rod             | Rod             |
+| wheel           | Wheel           |
+| ounce           | Ounce           |
+| carat           | Carat           |
+| meter square    | Square Meter    |
+| cubic metre     | Cubic Meter     |
+| metric cubic    | Cubic Meter     |
+| m3              | Cubic Meter     |

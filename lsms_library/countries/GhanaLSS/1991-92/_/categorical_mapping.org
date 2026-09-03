@@ -392,3 +392,143 @@ units.to_csv('unitlabels.csv')
 
 #+results:
 : None
+
+* Community price survey (GH #562)
+GLSS3's price survey is keyed REGION / DISTRICT / NAME OF LOCALITY / EA
+("DOES THIS EA INCLUDE MORE THAN ONE LOCALITY?") with three observations
+per item, each a weighed KG + PRICE for foods and a fixed DESCRIPTION +
+PRICE for pharmaceuticals and non-foods.  =Data/Prices/G3PRICE.DTA= ships
+only the per-unit value =p= (= PRICE/KG, e.g. 500/7) with no KG column and
+no labels, so =Basis= (the form's stated basis) is what =NumberOfUnits=
+becomes.  CAUTION -- all three price-form files this wave ships
+(=pdf/G3QPrice.pdf=, =GHA_1991_GLSS_Price_Questionnaire_EN.pdf.pdf=,
+=Glss3 qsts and manuals docs/G3QPrice.doc=) carry the 123-item GLSS4 list,
+while =G3PRICE.DTA= has codes 1-117.  The list below is RECONSTRUCTED by
+aligning per-item median prices and observation counts with GLSS4
+(=GhanaLSS/_/CONTENTS.org=, "Community price survey"): GLSS3 = GLSS4 minus
+Sorghum (G4 6), Pepper sweet green (G4 35), Live chicken poultry (G4 46) and
+the three sachet variants (G4 52/54/56), renumbered.  The tail (G3 66-117 =
+G4 72-123) and the anchors (margarine per kg, the 0.170 kg milk tin, the
+Nescafe tin, wax print per 6 yards) are unambiguous; the weakest links are
+code 5 (Rice imported vs Sorghum, n=50) and codes 47-49, flagged in =Note=.
+
+#+name: harmonize_price_item
+| Code | Label                                                           | Preferred Label                  | Food | Unit         | Basis | Note                                                                         |
+|------+-----------------------------------------------------------------+----------------------------------+------+--------------+-------+------------------------------------------------------------------------------|
+| 1    | Guinea corn                                                     | Guinea corn/sorghum              | yes  | Kilogram     | 1     |                                                                              |
+| 2    | Maize (shelled)                                                 | Maize                            | yes  | Kilogram     | 1     |                                                                              |
+| 3    | Millet                                                          | Millet                           | yes  | Kilogram     | 1     |                                                                              |
+| 4    | Rice (Local)                                                    | Rice                             | yes  | Kilogram     | 1     |                                                                              |
+| 5    | Rice (Imported)                                                 | Rice                             | yes  | Kilogram     | 1     | code identification by price level (n=50); Sorghum absent from GLSS3         |
+| 6    | Wheat bread (White)                                             | Bread                            | yes  | Kilogram     | 1     | GLSS4 code 7                                                                 |
+| 7    | Corn dough                                                      | Maize (flour/dough)              | yes  | Kilogram     | 1     | GLSS4 code 8                                                                 |
+| 8    | Kenkey                                                          | Kenkey                           | yes  | Kilogram     | 1     | GLSS4 code 9                                                                 |
+| 9    | Cocoyam                                                         | Cocoyam                          | yes  | Kilogram     | 1     | GLSS4 code 10                                                                |
+| 10   | Yam                                                             | Yam                              | yes  | Kilogram     | 1     | GLSS4 code 11                                                                |
+| 11   | Plantain                                                        | Plantain                         | yes  | Kilogram     | 1     | GLSS4 code 12                                                                |
+| 12   | Cassava (fresh)                                                 | Cassava                          | yes  | Kilogram     | 1     | GLSS4 code 13                                                                |
+| 13   | Gari                                                            | Cassava (flour)                  | yes  | Kilogram     | 1     | gari = cassava flour, as the axis codes it; GLSS4 code 14                    |
+| 14   | Cassava dough                                                   | Cassava (dough)                  | yes  | Kilogram     | 1     | GLSS4 code 15                                                                |
+| 15   | Konkonte (flour)                                                | Konkonte                         | yes  | Kilogram     | 1     | GLSS4 code 16                                                                |
+| 16   | Cowpeas (small beans)                                           | Small Bean                       | yes  | Kilogram     | 1     | the 9b consumption label is Small beans; GLSS4 code 17                       |
+| 17   | Bambara beans                                                   | Bambara Bean                     | yes  | Kilogram     | 1     | GLSS4 code 18                                                                |
+| 18   | Palmnuts                                                        | Palm Nut                         | yes  | Kilogram     | 1     | GLSS4 code 19                                                                |
+| 19   | Groundnuts (shelled)                                            | Groundnut                        | yes  | Kilogram     | 1     | GLSS4 code 20                                                                |
+| 20   | Groundnut oil (1 beer bottle)                                   | Oil (groundnut)                  | yes  | Beer Bottle  | 1     | GLSS4 code 21                                                                |
+| 21   | Palm kernel oil (1 beer bottle)                                 | Oil (palm kernel)                | yes  | Beer Bottle  | 1     | GLSS4 code 22                                                                |
+| 22   | Palm oil (1 beer bottle)                                        | Oil (red palm)                   | yes  | Beer Bottle  | 1     | GLSS4 code 23                                                                |
+| 23   | Margarine (Blue Band)                                           | Margarine                        | yes  | Kilogram     | 1     | GLSS4 code 24                                                                |
+| 24   | Avocado pear                                                    | Avocado                          | yes  | Kilogram     | 1     | GLSS4 code 25                                                                |
+| 25   | Banana                                                          | Banana                           | yes  | Kilogram     | 1     | GLSS4 code 26                                                                |
+| 26   | Orange                                                          | Orange                           | yes  | Kilogram     | 1     | GLSS4 code 27                                                                |
+| 27   | Pineapple fresh                                                 | Pineapple                        | yes  | Kilogram     | 1     | GLSS4 code 28                                                                |
+| 28   | Pineapple juice                                                 | Juice                            | yes  | Kilogram     | 1     | KG-column item on the form; GLSS4 code 29                                    |
+| 29   | Cocoyam leaves                                                  | Cocoyam Leaves                   | yes  | Kilogram     | 1     | on the 1991-92 axis; the 1998-99 axis has no kontomire label; GLSS4 code 30  |
+| 30   | Garden eggs                                                     | Eggplant/Cucumber                | yes  | Kilogram     | 1     | GLSS4 code 31                                                                |
+| 31   | Okro                                                            | Okra                             | yes  | Kilogram     | 1     | GLSS4 code 32                                                                |
+| 32   | Onion                                                           | Onion                            | yes  | Kilogram     | 1     | GLSS4 code 33                                                                |
+| 33   | Shallots                                                        | Onion                            | yes  | Kilogram     | 1     | axis folds Onions and Shallot; GLSS4 code 34                                 |
+| 34   | Pepper (dried)                                                  | Pepper (dry)                     | yes  | Kilogram     | 1     | GLSS4 code 36                                                                |
+| 35   | Tomato (fresh)                                                  | Tomato                           | yes  | Kilogram     | 1     | GLSS4 code 37                                                                |
+| 36   | Tomato (paste)                                                  | Tomato Puree                     | yes  | Kilogram     | 1     | the 1998-99 axis has no tomato-paste label; GLSS4 code 38                    |
+| 37   | Fresh beef (with bones)                                         | Beef                             | yes  | Kilogram     | 1     | GLSS4 code 39                                                                |
+| 38   | Goat (fresh)                                                    | Goat                             | yes  | Kilogram     | 1     | GLSS4 code 40                                                                |
+| 39   | Fresh mutton                                                    | Goat                             | yes  | Kilogram     | 1     | axis folds Fresh Mutton into Goat; Description keeps it apart; GLSS4 code 41 |
+| 40   | Pork                                                            | Pork                             | yes  | Kilogram     | 1     | GLSS4 code 42                                                                |
+| 41   | Bushmeat (smoked) - Grass cutter                                | Other Meat                       | yes  | Kilogram     | 1     | axis codes Bushmeat as Other Meat; GLSS4 code 43                             |
+| 42   | Snail (fresh)                                                   | Snail                            | yes  | Kilogram     | 1     | on the 1991-92 axis; not on the 1998-99 axis; GLSS4 code 44                  |
+| 43   | Live Chicken (Local)                                            | Chicken                          | yes  | Kilogram     | 1     | GLSS4 code 45                                                                |
+| 44   | Chicken eggs                                                    | Eggs                             | yes  | Kilogram     | 1     | KG-column item on the GLSS3/4 form (1987 priced each); GLSS4 code 47         |
+| 45   | Evaporated milk (Ideal), 0.170 kg tin                           | Milk (tinned, unsweetened)       | yes  | Kilogram     | 0.17  | form pre-fills 0.170 per observation; GLSS4 code 48                          |
+| 46   | White granulated sugar                                          | Sugar                            | yes  | Kilogram     | 1     | GLSS4 code 49                                                                |
+| 47   | Salt                                                            | Salt                             | yes  | Kilogram     | 1     | alignment: GLSS4 code 52 (Nescafe sachet) absent from GLSS3                  |
+| 48   | Nescafe (Tin)                                                   | Coffee                           | yes  | Kilogram     | 1     | alignment: GLSS4 code 54 (Bournvita sachet) absent from GLSS3                |
+| 49   | Bournvita (Tin)                                                 | Chocolate Drink                  | yes  | Kilogram     | 1     | alignment: GLSS4 code 56 (Milo sachet) absent from GLSS3                     |
+| 50   | Milo (Tin)                                                      | Chocolate Drink                  | yes  | Kilogram     | 1     | GLSS4 code 55                                                                |
+| 51   | Chocolate drink                                                 | Chocolate Drink                  | yes  | Kilogram     | 1     | GLSS4 code 57                                                                |
+| 52   | Tea (Lipton)                                                    | Tea                              | yes  | Kilogram     | 1     | GLSS4 code 58                                                                |
+| 53   | Herring (Smoked)                                                | Fish (smoked)                    | yes  | Kilogram     | 1     | GLSS4 code 59                                                                |
+| 54   | Herring (Fresh)                                                 | Fish (fresh and frozen)          | yes  | Kilogram     | 1     | GLSS4 code 60                                                                |
+| 55   | Red fish (Fresh)                                                | Fish (fresh and frozen)          | yes  | Kilogram     | 1     | GLSS4 code 61                                                                |
+| 56   | Dried fish (Tilapia - Koobi)                                    | Fish (dried)                     | yes  | Kilogram     | 1     | GLSS4 code 62                                                                |
+| 57   | Pilchards (Geisha)                                              | Fish (canned)                    | yes  | Kilogram     | 1     | GLSS4 code 63                                                                |
+| 58   | Sardine (Titus)                                                 | Fish (canned)                    | yes  | Kilogram     | 1     | GLSS4 code 64                                                                |
+| 59   | Fanta/Coke/Pepsi (standard 300 ml bottle)                       | Soft Drinks                      | yes  | Fanta Bottle | 1     | the standard 300 ml bottle; GLSS4 code 65                                    |
+| 60   | Palm wine (1 beer bottle)                                       | Wine                             | yes  | Beer Bottle  | 1     | axis codes Palm Wine as Wine; GLSS4 code 66                                  |
+| 61   | Pito (1 beer bottle)                                            | Beer                             | yes  | Beer Bottle  | 1     | axis codes Pito as Beer; GLSS4 code 67                                       |
+| 62   | Akpeteshie (1 beer bottle)                                      | Akpeteshie                       | yes  | Beer Bottle  | 1     | GLSS4 code 68                                                                |
+| 63   | Gin (Local) (720 ml)                                            | Gin                              | yes  | Milliliter   | 720   | form basis 720 ml; GLSS4 code 69                                             |
+| 64   | Jam (Specify)                                                   | Jam                              | yes  | Kilogram     | 1     | GLSS4 code 70                                                                |
+| 65   | Honey (1 beer bottle)                                           | Honey                            | yes  | Beer Bottle  | 1     | GLSS4 code 71                                                                |
+| 66   | Aspirin (10 tablets)                                            | Aspirin                          | no   | Tablet       | 10    | GLSS4 code 72                                                                |
+| 67   | Paracetamol (10 tablets)                                        | Paracetamol                      | no   | Tablet       | 10    | GLSS4 code 73                                                                |
+| 68   | Nivaquine/Chloroquine (10 tablets)                              | Nivaquine (chloroquine)          | no   | Tablet       | 10    | GLSS4 code 74                                                                |
+| 69   | Vitamin B Complex (10 tablets)                                  | Vitamin B complex                | no   | Tablet       | 10    | GLSS4 code 75                                                                |
+| 70   | Penicillin oral 400,000 units (20 tablets)                      | Penicillin (oral)                | no   | Tablet       | 20    | GLSS4 code 76                                                                |
+| 71   | Terramycin 250 mg (20 capsules)                                 | Terramycin                       | no   | Capsule      | 20    | GLSS4 code 77                                                                |
+| 72   | Andrews/Starwin liver salt (1 packet of 10 sachets)             | Andrews liver salt               | no   | Packet       | 1     | GLSS4 code 78                                                                |
+| 73   | Milk of Magnesia (1 large bottle)                               | Milk of magnesia                 | no   | Bottle       | 1     | GLSS4 code 79                                                                |
+| 74   | Omo (medium size)                                               | Omo (detergent)                  | no   | Piece        | 1     | medium-size packet; GLSS4 code 80                                            |
+| 75   | Guardian Soap (one tablet)                                      | Soap (Guardian)                  | no   | Piece        | 1     | GLSS4 code 81                                                                |
+| 76   | Key Soap (one bar)                                              | Key soap                         | no   | Bar          | 1     | GLSS4 code 82                                                                |
+| 77   | Lantern globe/shade (one standard size)                         | Lantern globe                    | no   | Piece        | 1     | GLSS4 code 83                                                                |
+| 78   | Light bulb (White) (60 watts)                                   | Light bulb                       | no   | Piece        | 1     | GLSS4 code 84                                                                |
+| 79   | Candle (one stick)                                              | Candle                           | no   | Stick        | 1     | GLSS4 code 85                                                                |
+| 80   | Dry cell battery (Tiger head) (1.5 volts)                       | Dry cell battery                 | no   | Piece        | 1     | GLSS4 code 86                                                                |
+| 81   | Matches (one box)                                               | Matches                          | no   | Box          | 1     | GLSS4 code 87                                                                |
+| 82   | Iron coal pot (medium size)                                     | Iron coal pot                    | no   | Piece        | 1     | GLSS4 code 88                                                                |
+| 83   | Kerosene (one beer bottle)                                      | Kerosene                         | no   | Beer Bottle  | 1     | GLSS4 code 89                                                                |
+| 84   | Firewood (9 kg bundle)                                          | Firewood                         | no   | Kilogram     | 9     | GLSS4 code 90                                                                |
+| 85   | Charcoal (one maxi bag of std. size)                            | Charcoal                         | no   | Maxi Bag     | 1     | GLSS4 code 91                                                                |
+| 86   | Liquified petroleum gas (medium cylinder)                       | Liquefied petroleum gas          | no   | Piece        | 1     | medium cylinder; GLSS4 code 92                                               |
+| 87   | Metal bucket (standard size, 34 cm)                             | Metal bucket                     | no   | Piece        | 1     | GLSS4 code 93                                                                |
+| 88   | Plastic bucket (standard size, 32 cm)                           | Plastic bucket                   | no   | Piece        | 1     | GLSS4 code 94                                                                |
+| 89   | Hurricane lamp (Medium) (Anchor brand)                          | Hurricane lamp                   | no   | Piece        | 1     | GLSS4 code 95                                                                |
+| 90   | Fertilizer N.P.K 15-15-15 (one mini bag)                        | Fertilizer (NPK)                 | no   | Mini Bag     | 1     | GLSS4 code 96                                                                |
+| 91   | Fertilizer Sulphate of Ammonia (one mini bag)                   | Fertilizer (sulphate of ammonia) | no   | Mini Bag     | 1     | GLSS4 code 97                                                                |
+| 92   | Mosquito Coil (a packet of 10)                                  | Mosquito coil                    | no   | Coil         | 10    | GLSS4 code 98                                                                |
+| 93   | Toilet Paper (Rose) (one roll)                                  | Toilet paper                     | no   | Roll         | 1     | GLSS4 code 99                                                                |
+| 94   | Razor blade (Tatra) (packet of 10)                              | Razor blade                      | no   | Piece        | 10    | GLSS4 code 100                                                               |
+| 95   | Tooth paste, Pepsodent (large)                                  | Toothpaste                       | no   | Piece        | 1     | large tube; GLSS4 code 101                                                   |
+| 96   | Vim (large size)                                                | Vim (scouring powder)            | no   | Piece        | 1     | GLSS4 code 102                                                               |
+| 97   | Cutlass (Crocodile brand) (one standard size)                   | Cutlass/machete                  | no   | Piece        | 1     | GLSS4 code 103                                                               |
+| 98   | Tobacco leaf (1 kg)                                             | Tobacco                          | yes  | Kilogram     | 1     | on the food axis (9b consumption list); GLSS4 code 104                       |
+| 99   | '555' Cigarette (a packet of 20)                                | Cigarette                        | yes  | Stick        | 20    | GLSS4 code 105                                                               |
+| 100  | Embassy Cigarette (a packet of 20)                              | Cigarette                        | yes  | Stick        | 20    | GLSS4 code 106                                                               |
+| 101  | Local Real Wax Print (GTP) (6 yards)                            | Wax print cloth                  | no   | Yard         | 6     | GLSS4 code 107                                                               |
+| 102  | Kente Cloth (men) (Fathia Fata Nkrumah)                         | Kente cloth (men)                | no   | Piece        | 1     | GLSS4 code 108                                                               |
+| 103  | Kente Cloth (women) (Fathia Fata Nkrumah)                       | Kente cloth (women)              | no   | Piece        | 1     | GLSS4 code 109                                                               |
+| 104  | Adinkra (cotton) (medium quality)                               | Adinkra cloth                    | no   | Piece        | 1     | GLSS4 code 110                                                               |
+| 105  | Polyester material (one metre, ordinary quality)                | Polyester material               | no   | Meter        | 1     | GLSS4 code 111                                                               |
+| 106  | Shirt (long sleeves) (65% synthetic 35% cotton, medium quality) | Shirt (long sleeves)             | no   | Piece        | 1     | GLSS4 code 112                                                               |
+| 107  | School uniform (boys, 10-12 yrs) (ready made set)               | School uniform (boys)            | no   | Set          | 1     | GLSS4 code 113                                                               |
+| 108  | School uniform (girls, 10-12 yrs) (ready made set)              | School uniform (girls)           | no   | Set          | 1     | GLSS4 code 114                                                               |
+| 109  | Rubber Sandals (Local) (pair, charlie wote)                     | Rubber sandals                   | no   | Pair         | 1     | GLSS4 code 115                                                               |
+| 110  | Vest (cotton) (women) (one medium size)                         | Vest (women)                     | no   | Piece        | 1     | GLSS4 code 116                                                               |
+| 111  | Singlet (cotton) (men) (one medium size)                        | Singlet (men)                    | no   | Piece        | 1     | GLSS4 code 117                                                               |
+| 112  | Bedsheet (cotton) (single bed)                                  | Bedsheet (single)                | no   | Piece        | 1     | GLSS4 code 118                                                               |
+| 113  | Bedsheet (cotton) (double bed)                                  | Bedsheet (double)                | no   | Piece        | 1     | GLSS4 code 119                                                               |
+| 114  | Singlet (children) (cotton)                                     | Singlet (children)               | no   | Piece        | 1     | GLSS4 code 120                                                               |
+| 115  | Vest (children) (cotton)                                        | Vest (children)                  | no   | Piece        | 1     | GLSS4 code 121                                                               |
+| 116  | Handkerchief (women) (one dozen)                                | Handkerchief (women)             | no   | Dozen        | 1     | GLSS4 code 122                                                               |
+| 117  | Handkerchief (men) (one dozen)                                  | Handkerchief (men)               | no   | Dozen        | 1     | GLSS4 code 123                                                               |
