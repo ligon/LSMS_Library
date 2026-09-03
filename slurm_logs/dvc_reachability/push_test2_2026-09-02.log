@@ -1,0 +1,9 @@
+start Wed Sep  2 18:06:30 PDT 2026
+pushed: [PosixPath('/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/KenyaLPS/2017-2022/Data/KLPS4-Kids-Status_PUBLIC_2025-12.dta')]
+rc=0 end Wed Sep  2 18:15:05 PDT 2026
+--- git effect ---
+--- S3 ---
+404 LSMS/af/0ca3ee4a7b9fd17586efa29bf6015a
+PRESENT LSMS/files/md5/af/0ca3ee4a7b9fd17586efa29bf6015a
+--- locks after ---
+-rw-r--r-- 1 ligon ucb   12 Sep  2 18:14 rwlock

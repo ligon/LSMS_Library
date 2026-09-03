@@ -1,0 +1,16 @@
+12 KenyaLPS sidecars to recover
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_E-Module_PUBLIC_2021-05.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_I-Module_PUBLIC_2021-05.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_SampleMaster_PUBLIC_2015-12.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_Status_PUBLIC_2015-12.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_E-Plus-Module_PUBLIC_2022-02.dta.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_I-Module_PUBLIC_2022-02.dta.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_SampleMaster_PUBLIC_2015-12.dta.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_Status_PUBLIC_2022-02.dta.dvc: HTTP Error 400: Bad Request
+  MATCH       KenyaLPS/2017-2022/Data/KLPS4-Kids-SampleMaster_PUBLIC_2025-12.dta.dvc  0.5 MB  sidecar=270cc77133b803124e7111fe929bf22a got=270cc77133b803124e7111fe929bf22a
+  MATCH       KenyaLPS/2017-2022/Data/KLPS4-Kids-Status_PUBLIC_2025-12.dta.dvc  0.6 MB  sidecar=af0ca3ee4a7b9fd17586efa29bf6015a got=af0ca3ee4a7b9fd17586efa29bf6015a
+  MATCH       KenyaLPS/2017-2022/Data/KLPS4_E-Module_PUBLIC_2025-12.dta.dvc  34.6 MB  sidecar=32e0394c80240244fccd1847316ec1b8 got=32e0394c80240244fccd1847316ec1b8
+  MATCH       KenyaLPS/2017-2022/Data/KLPS4_I-Module_PUBLIC_2025-12.dta.dvc  69.4 MB  sidecar=faaf32afc5d9900499049294fb4d3b43 got=faaf32afc5d9900499049294fb4d3b43
+
+summary: {'MATCH': 4, 'failed': 8}
+rc=0

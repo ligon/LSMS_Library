@@ -1,0 +1,16 @@
+12 KenyaLPS sidecars to recover
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_E-Module_PUBLIC_2021-05.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_I-Module_PUBLIC_2021-05.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_SampleMaster_PUBLIC_2015-12.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2007-2009/Data/KLPS2_Status_PUBLIC_2015-12.tab.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_E-Plus-Module_PUBLIC_2022-02.dta.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_I-Module_PUBLIC_2022-02.dta.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_SampleMaster_PUBLIC_2015-12.dta.dvc: HTTP Error 400: Bad Request
+  FAILED    KenyaLPS/2011-2014/Data/KLPS3_Status_PUBLIC_2022-02.dta.dvc: HTTP Error 400: Bad Request
+  ALREADY   KenyaLPS/2017-2022/Data/KLPS4-Kids-SampleMaster_PUBLIC_2025-12.dta.dvc (workspace copy md5-matches)
+  ALREADY   KenyaLPS/2017-2022/Data/KLPS4-Kids-Status_PUBLIC_2025-12.dta.dvc (workspace copy md5-matches)
+  ALREADY   KenyaLPS/2017-2022/Data/KLPS4_E-Module_PUBLIC_2025-12.dta.dvc (workspace copy md5-matches)
+  ALREADY   KenyaLPS/2017-2022/Data/KLPS4_I-Module_PUBLIC_2025-12.dta.dvc (workspace copy md5-matches)
+
+summary: {'MATCH': 4, 'failed': 8}
+rc=0
