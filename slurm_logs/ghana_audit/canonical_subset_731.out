@@ -1,0 +1,5 @@
+canonical labels: 15
+delivered labels: 14
+SUBSET ASSERT PASSED: every delivered label is canonical; non-canonical = set()
+clean-rebuild Postgraduate row: {'1987-88': 6, '1988-89': 7, '1991-92': 20, '1998-99': 0, '2005-06': 0, '2012-13': 0, '2016-17': 39}
+clean-rebuild Upper secondary complete row: {'1987-88': 234, '1988-89': 226, '1991-92': 445, '1998-99': 888, '2005-06': 1386, '2012-13': 3875, '2016-17': 3311}

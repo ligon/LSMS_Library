@@ -1072,6 +1072,16 @@ rounds.  Source files and label handling:
 | 2012-13 | =PARTA/SEC2a.dta= | s2aq2 | embedded value labels                     |
 | 2016-17 | =g7sec2.dta=      | s2aq2 | embedded value labels                     |
 
+/Corrected 2026-09-02 (GH #731)./  The paragraph and table above and the
+"Still NOT wired" list below are *stale*: all *seven* waves declare
+=individual_education= today.  1987-88 and 1988-89 read =Y03I.DAT:GRADE= and
+1991-92 reads =S2.DTA:s2q2= (17,168 rows carrying the full letter ladder --
+the cached =S2.DTA= *is* the Section 2 education file, not a cover/control
+file), all three through the country =harmonize_education= table (GH #171);
+GLSS5/6/7 read their own wave-level tables since 2026-09-02.  Kept as written
+for the record of what was thought to block them.  See /Trap 7/ for the letter
+ladder and the =U6= collision.
+
 Still NOT wired (genuine blockers, not feature gaps to close cheaply):
 
 - *1987-88 / 1988-89* (GLSS1/GLSS2): the education module lives in
@@ -1303,6 +1313,103 @@ the worktree); =_/ghanalss.py= already does it right with =countries_root()=
 (GH #436).  =tests/test_declared_spellings.py= records the same trap for
 1991-92 ("worth its own issue").  Not fixed here; the fix is
 =countries_root()/'GhanaLSS'/'<wave>'= in each module.
+
+** Trap 7: one label, two instruments -- =U6= is a university year in GLSS1/2/3 and Upper Sixth in GLSS5/6/7 (2026-09-02, GH #731)
+
+Found by the GhanaSPS =individual_education= task (PR #728) while reading this
+country's table as precedent; measured and fixed here.
+
+*What it was.*  =_/categorical_mapping.org= =harmonize_education= listed =U6=
+twice: =U6 -> Upper secondary complete= (inside the block of GLSS5/6/7 labels,
+first in file order) and =U6 -> Postgraduate= (in the =U1..U8= ladder, later).
+Nothing raised.  =_row_union_categorical= (=country.py= ~l.305-316)
+concatenates =[country, global]= and runs
+=drop_duplicates(subset=[key], keep='first')=, so the first row won and the
+second was gone before any wave ever saw the table --
+=Wave.categorical_mapping['harmonize_education']= reported =dup_keys=[]= on
+every wave.  A duplicate key is Trap 1's disease in a new coat: not a wrong
+answer that raises, but a plausible one chosen by file order, indistinguishable
+from a correct table.
+
+*Which meaning occurs where* -- measured on the raw source variable of every
+wave (=slurm_logs/ghana_audit/u6_measure_731.py=, output =.out= alongside):
+
+| wave    | variable                | raw label |   n | neighbours in the same ladder                                | meaning (source read)                                                                                                            |
+|---------+-------------------------+-----------+-----+--------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------|
+| 1987-88 | =Y03I.DAT:GRADE=        | =U6=      |   1 | =S4 S5 / A1 A2 / PS1 PS2 PS3 / T1 T2 T3 T4 / U1 U2 U3 U4 / U5 U6 U7 U8 / K (Koranic)= | university year 6.  Household questionnaire Section 3 block =3i= (printed p.6) col.7 "What was the highest grade he/she completed?", CODES box |
+| 1988-89 | =Y03I.DAT:GRADE=        | =U6=      |   4 | same                                                         | same instrument: the GLSS1 and GLSS2 questionnaire PDFs are one scan (78/78 pages pixel-identical; see below)                   |
+| 1991-92 | =S2.DTA:s2q2=           | =U6=      |   8 | =S1 throu S5 / A1 A2 PS1, PS2, PS3, T1 throu T4 / U1 throu U8 / K (Koranic) / JSS1 throu JSS3= | university year 6.  =pdf/G3QPartA.pdf= p.10, Section 2A Q2 "What was the highest class or form completed?"          |
+| 1998-99 | =SEC2A.DTA:s2aq2=       | --        |   0 | numeric codes: =Sec. (O Level) 08, Sixth Form 09, ... University 16= | no =U6= in this instrument (household questionnaire p.10, Section 2A Q2 "highest level completed")                    |
+| 2005-06 | =parta/sec2a.dta:s2aq2= | =u6=      |  74 | =s5=31, l6=32, u6=33, voc=41 ... polytechnic=51, university=52= | Upper Sixth.  =G5QPartA.pdf= p.11, Section 2A Q2 "What was the highest grade completed?"                                 |
+| 2012-13 | =PARTA/SEC2a.dta:s2aq2= | =U6=      | 131 | =S5=32, L6=33, U6=34, Voc/Tech=41 ... Polytechnic=51, University=52= | Upper Sixth.  GLSS6 Part A questionnaire p.10, Section 2A Q2 "What is the highest grade completed?"                 |
+| 2016-17 | =g7sec2.dta:s2aq2=      | =U6=      |  77 | =S5=32, L6=33, U6=34, Year one=41 .. Year six and above=46=  | Upper Sixth.  GLSS7 Module A (=GLSS7_MODULE A_30_9_16_for print.docx=), Section 2A Q2                                           |
+
+The reading is decided by the *neighbours*, not by the letter.  Where the
+ladder has =A1 A2= for the sixth form and =U1..U8= as a block, =U= is
+university; where it has =L6= then =U6= and university is a separate rung
+(=University=, or =Year one..=), =U6= is Upper Sixth.  Both readings occur in
+the data -- 13 people in the first, 282 in the second -- in *different waves*,
+never in one wave from two variables.  (=U5/U7/U8= occur only in GLSS1/2/3;
+=L6/l6= only in GLSS5/6/7.)
+
+*What was decided (2026-09-02).*  The country table keeps the *letter-ladder*
+reading, =U6 -> Postgraduate=, alongside =U5/U7/U8= in the same ladder --
+because the country table is where GLSS1-era vocabulary lives in this country
+(Traps 2 and 4: the country =relationship= and =region= tables are GLSS1's
+too), and because it is the only table the three letter-ladder waves read.
+The GLSS5/6/7 reading moved to *wave-level* =#+name: harmonize_education=
+tables in =2005-06/_/=, =2012-13/_/= and =2016-17/_/categorical_mapping.org=.
+Two mechanical facts shaped that, both measured:
+
+- A wave table *replaces* the country U global dict for its wave --
+  =Wave.categorical_mapping= (=country.py= ~l.1006) is a plain =dict.update=;
+  the row-union is global/country only.  Verified with a one-row sentinel
+  table appended to =2012-13/_/=: that wave saw *one* row and lost =L6=;
+  1991-92 and 2016-17 were untouched.  So each wave table lists *every* label
+  its source variable emits (32 / 33 / 33 rows), generated from the pre-edit
+  country mapping and asserted equal to it -- which is why the modern waves'
+  delivered counts are byte-identical before and after.
+- The two consumption paths resolve a within-table duplicate in *opposite*
+  directions: first-wins at the global/country union (=keep='first'=),
+  last-wins where a wave table becomes a dict
+  (=cat_table.set_index(k)[v].to_dict()=, =country.py= ~l.938).  Measured on a
+  three-row frame.  A guard against duplicate keys therefore belongs at
+  org-load time, before either path runs -- GH #674's family; proposed in the
+  #731 PR, not built there.
+
+*What moved.*  Exactly the 13 =U6= people: 1987-88 Postgraduate 5 -> 6 and
+Upper secondary complete 235 -> 234; 1988-89 3 -> 7 and 230 -> 226; 1991-92
+12 -> 20 and 453 -> 445.  Every other cell of every wave is unchanged
+(=slurm_logs/ghana_audit/api_before_731.out= vs =api_after_*_731.out=).
+1988-89 moved through the country table alone; its =_/= was not edited.
+
+*Not settled, on purpose.*  =U1..U4 -> Bachelor= (this ladder) versus
+GhanaSPS's =Level 100..300 -> Tertiary certificate/diploma=, =Level 400 ->
+Bachelor= (PR #728).  The instruments *sharpen* this without settling it: the
+letter codes are *years completed*, and the qualification is asked separately
+-- GLSS3 Q3 "What was the highest educational level attained?" (=O'level 5,
+A'Level 6, ... Bachelor 9, Master 10, Doctorate 11=), GLSS1/2 col.10 "What
+was the highest diploma obtained?" (=GCE A LEVEL 7 ... BACHELOR 10, MASTER
+11, DOCTORATE 12=) -- so a completed =U3= is "some university", a rung the
+canonical vocabulary does not have.  Wiring the qualification variable
+(=s2q3=; Y03I's diploma column) instead of, or alongside, the year ladder
+would be the principled fix.  Left as found: changing it is a separate
+decision with its own before/after.
+
+*Two things found on the way.*
+- The GLSS1 and GLSS2 "questionnaire" PDFs
+  (=1987-88/Documentation/questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf=
+  and =1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=)
+  differ in md5 (metadata; 18 bytes apart in size) but render to *78 of 78
+  pixel-identical pages*.  One scan, two catalog entries.  PR #751's page
+  index for GLSS2 (=slurm_logs/ghana_audit/glss2_questionnaire/PAGE_INDEX.org=)
+  therefore indexes GLSS1 as well.  Evidence crop for this trap:
+  =slurm_logs/ghana_audit/glss12_education_u6/=.
+- The country table's modern-vocabulary rows are now *inert* -- shadowed for
+  GLSS5/6/7, never emitted by GLSS1/2/3.  They are kept and labelled as
+  documentation; pruning them is a follow-up.  A future wave must bring its
+  own wave table: inheriting the country table would hand it the *university*
+  =U6=.
 
 ** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
 
@@ -1589,6 +1696,14 @@ Worth stating once, because "is this table live?" has no single answer:
 | 1 | =Country._apply_categorical_mappings= (=country.py:2236=) | =Country.categorical_mapping= (=country.py:1637=) = global u country | *NO -- never opens a wave dir* |
 | 2 | =mappings:= / =mapping:= in a wave =data_info.yml= (=country.py:793=, =:809=) | =Wave.categorical_mapping= (=country.py:862=) = country dict =.update(wave)= | yes; *wave wins, unconditionally* |
 | 3 | =code_label_map(name, _dirs)= in a wave =mapping.py= | its own filesystem search, *wave dir first* | yes |
+
+/Corrected 2026-09-02./  Line numbers drift; as of =bed7c99a= they are
+=_apply_categorical_mappings= at =country.py:2403=,
+=Country.categorical_mapping= at =:1781=, =Wave.categorical_mapping= at
+=:1006=, the =mappings:= consumer at =:926-960=, and =_row_union_categorical=
+at =:305-316=.  Path 2's =cat_table.set_index(k)[v].to_dict()= is *last-wins*
+on a duplicate key, while the global/country union is *first-wins*
+(=keep='first'=) -- see /Trap 7/.
 
 So of this country's three =rural= tables, *only one is dead*:
 

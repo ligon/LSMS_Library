@@ -184,3 +184,59 @@
 |                              |                              |     272 | other personal grooming services                            |         |                            |
 |                              |                              |     276 | goods for personal care(toothpaste,razor blades,combs,scent |         |                            |
 |                              |                              |     277 | other articles and products                                 |         |                            |
+
+* Education (GLSS5 Section 2A, s2aq2) -- GH #171 / #731
+
+# harmonize_education, WAVE-LEVEL (2026-09-02, GH #731).  This table SHADOWS
+# the country-level GhanaLSS/_/categorical_mapping.org table wholesale for
+# this wave (Wave.categorical_mapping is a plain dict.update over the country
+# dict; no row-union at the country/wave boundary), so it must be COMPLETE for
+# every label parta/sec2a.dta:s2aq2 emits.  All 32 labels the file carries
+# (2026-09-02, slurm_logs/ghana_audit/u6_measure_731.out) are listed; an
+# unlisted label would pass through raw and trip the canonical-vocabulary
+# check.
+#
+# Why a wave table: `u6` here is UPPER SIXTH.  The GLSS5 questionnaire
+# (G5QPartA.pdf p.11, Section 2A Q2 "What was the highest grade completed?")
+# codes  S5=31, L6=32, U6=33, Voc/Technical=41, Teacher Train=42, Nursing=43,
+# Polytechnic=51, University=52, Other Tertiary=53  -- university is its own
+# rung, so u6 is the end of secondary school.  In GLSS1/2/3 the same letters
+# U1..U8 are YEARS OF UNIVERSITY, which is what the country table now says;
+# the two readings cannot share one table.  The rows below are byte-for-byte
+# the values the country table gave this wave before 2026-09-02 (verified:
+# api_before_731.out == api_after_731.out for 2005-06).
+#+name: harmonize_education
+| Original Label   | Preferred Label              |
+|------------------+------------------------------|
+| none             | No education                 |
+| preschool        | Pre-primary                  |
+| p1               | Primary incomplete           |
+| p2               | Primary incomplete           |
+| p3               | Primary incomplete           |
+| p4               | Primary incomplete           |
+| p5               | Primary incomplete           |
+| p6               | Primary complete             |
+| m1               | Lower secondary              |
+| m2               | Lower secondary              |
+| m3               | Lower secondary              |
+| m4               | Lower secondary complete     |
+| jss1             | Lower secondary              |
+| jss2             | Lower secondary              |
+| jss3             | Lower secondary complete     |
+| s1               | Upper secondary              |
+| s2               | Upper secondary              |
+| s3               | Upper secondary              |
+| s4               | Upper secondary              |
+| s5               | Upper secondary complete     |
+| sss1             | Upper secondary              |
+| sss2             | Upper secondary              |
+| sss3             | Upper secondary complete     |
+| l6               | Upper secondary complete     |
+| u6               | Upper secondary complete     |
+| voc              | Vocational/Technical         |
+| teacher training | Tertiary certificate/diploma |
+| nursing          | Tertiary certificate/diploma |
+| polytechnic      | Tertiary certificate/diploma |
+| other tertiary   | Tertiary certificate/diploma |
+| university       | Bachelor                     |
+| other            | Unknown                      |
