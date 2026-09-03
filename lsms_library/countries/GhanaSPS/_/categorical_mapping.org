@@ -394,3 +394,163 @@ that separates sharecropping from renting, so =sharecropped_in= occurs only in
 | Borrowed                                  | use_right       |
 | Other - specify                           | other_tenure    |
 | Other (please specify)                    | other_tenure    |
+
+* Livestock: harmonize_species (GH #729, #736)
+
+The =livestock= table's =animal= index level carries the =Preferred Label=
+from this table.  It is the corpus name (Uganda, Nigeria and Malawi each
+keep a =harmonize_species= table) and it is applied at EXTRACTION -- every
+wave's =data_info.yml= references it with
+=mappings: ['harmonize_species', 'Alternate Spelling', 'Preferred Label']=
+on the =animal= idxvar -- so the cached parquet is already canonical.  The
+lookup is an exact dict lookup on the decoded source label, and an unmatched
+value passes through UNCHANGED (it is not nulled and nothing raises), so the
+discriminating test is "is the delivered per-wave value set a subset of the
+Preferred Labels plus the listed pass-throughs", never "does the
+distribution look plausible".
+
+** Three instruments, three vocabularies
+
+- 2009-10 =S3AI.dta= :: =animal_id= is a labelled categorical with eight
+  values: =Drought Animal= (sic), =Cattle=, =Sheep=, =Goats=, =Pigs=,
+  =Rabbits=, =Chicken/Rosters=, =Other Farm Animals=.  The last is a
+  catch-all the instrument never asks to name, and 20 households list it on
+  two or three lines.
+- 2013-14 =03ai_animalquestions.dta= :: a FIXED seven-species grid asked of
+  every household (lower-case: =draught animals=, =cattle=, =sheep=,
+  =goats=, =pigs=, =rabbits=, =chickens=), plus a 174-row "other" tail whose
+  =animal= is FREE TEXT -- 62 distinct spellings, 26 of them guinea fowl
+  (=GINUEA FOWL=, =GUINNEA FOWL=, =gueni folws=, =GUINE  FOWL= with two
+  internal spaces, ...).
+- 2017-18 =03ai_animalquestions.dta= :: eight clean labels (=Cattle=,
+  =Sheep=, =Goats=, =Pigs=, =Rabbits=, =Chickens/roosters=, =Draught animal
+  (donkey, horse, bullock)=, =Fish=); its =_osp= "other -- specify" sibling
+  carries eleven title-case free-text species.
+
+** The rule: harmonise the SPELLING, never fold a SPECIES
+
+A precedent label wins wherever one exists -- Uganda's species-level
+=Cattle= / =Sheep= / =Goats= / =Pigs= / =Rabbits= / =Chicken= / =Donkeys= /
+=Other Poultry=, and Nigeria's and Malawi's =Guinea Fowl= / =Duck= / =Turkey=
+/ =Fish= / =Dove/Pigeon= / =Other Livestock= -- so that =Feature('livestock')=
+agrees across countries on every label that has one.  That is why the list
+mixes plurals with a singular =Duck= and =Turkey=: cross-country
+coincidence was preferred to internal tidiness.  Where no precedent exists
+the coinage is plural: =Draught Animals=, =Dogs=, =Cats=, =Grasscutters=,
+=Guinea Pigs=, =Peacocks=, =Quails=.
+
+Only a label that names NO species goes to a catch-all: =BIRDS= / =Bird= to
+=Other Poultry=, =Other Farm Animals= to =Other Livestock=.  Ducks, turkeys
+and guinea fowl are NOT folded into =Other Poultry= -- the respondent named
+them, and Nigeria and Malawi keep them distinct.  Dogs and cats are reported
+with sale values in waves 2 and 3 and are kept under their own labels rather
+than hidden inside =Other Livestock=, so an analyst can exclude them from a
+wealth aggregate.
+
+Note the consequence for cross-wave reading: wave 1's =Other Farm Animals=
+catch-all is where its guinea fowl, ducks and turkeys live (the instrument
+offered no other slot), while waves 2 and 3 name them.  =Other Livestock=
+therefore exists only in 2009-10, and a wave-over-wave comparison of =Guinea
+Fowl= or =Other Livestock= is an instrument artefact.  Likewise =Donkeys=
+(named in the free text) overlaps conceptually with =Draught Animals= (the
+grid row that includes donkeys); a household that wrote "donkey" in the
+other slot is delivered as =Donkeys=, as reported.
+
+** Three spellings are left UNMAPPED, deliberately
+
+='50'= (a number typed where a species should be), ='cut'= (cat?) and
+='dake'= (duck?) each occur once in 2013-14.  They are genuinely
+unmappable -- a guess would be a fabrication -- so they are not in the table
+and pass through as their own =animal= values.  ='50'= is also excluded
+because the org parser coerces an all-numeric column cell to a number, so a
+row for it would never match the string anyway.
+
+Every Alternate Spelling appears exactly once: =set_index().to_dict()= keeps
+the LAST row on a duplicate key, so a spelling shared by two waves
+(=Guinea Fowl=, =Turkey=, =Dog=, =Cat=, =Donkey=, =Grasscutter=) has one row.
+
+#+name: harmonize_species
+| Alternate Spelling                        | Preferred Label |
+|-------------------------------------------+-----------------|
+| Drought Animal                            | Draught Animals |
+| draught animals                           | Draught Animals |
+| Draught animal (donkey, horse, bullock)   | Draught Animals |
+| Cattle                                    | Cattle          |
+| cattle                                    | Cattle          |
+| Sheep                                     | Sheep           |
+| sheep                                     | Sheep           |
+| Goats                                     | Goats           |
+| goats                                     | Goats           |
+| Pigs                                      | Pigs            |
+| pigs                                      | Pigs            |
+| Rabbits                                   | Rabbits         |
+| rabbits                                   | Rabbits         |
+| Rabbit                                    | Rabbits         |
+| Chicken/Rosters                           | Chicken         |
+| chickens                                  | Chicken         |
+| Chickens/roosters                         | Chicken         |
+| Chickens                                  | Chicken         |
+| Other Farm Animals                        | Other Livestock |
+| Fish                                      | Fish            |
+| fish                                      | Fish            |
+| GINUEA FOWL                               | Guinea Fowl     |
+| GINUEA FOWLS                              | Guinea Fowl     |
+| GUINE  FOWL                               | Guinea Fowl     |
+| GUINE FOWOLS                              | Guinea Fowl     |
+| GUINEA FOWL                               | Guinea Fowl     |
+| GUINEA FOWLS                              | Guinea Fowl     |
+| GUINEA fowl                               | Guinea Fowl     |
+| GUINNEA FOWL                              | Guinea Fowl     |
+| GUINNEA FOWLS                             | Guinea Fowl     |
+| GUINUE FOWL                               | Guinea Fowl     |
+| GUNEA FOWL                                | Guinea Fowl     |
+| Giunea fowl                               | Guinea Fowl     |
+| Guinea Fowl                               | Guinea Fowl     |
+| Guinea fowl                               | Guinea Fowl     |
+| Guinnea Foul                              | Guinea Fowl     |
+| ginue falws                               | Guinea Fowl     |
+| ginuea falws                              | Guinea Fowl     |
+| ginuea fawls                              | Guinea Fowl     |
+| giunea fowls                              | Guinea Fowl     |
+| gueni folws                               | Guinea Fowl     |
+| guimea fowls                              | Guinea Fowl     |
+| guinea fawl                               | Guinea Fowl     |
+| guinea fowl                               | Guinea Fowl     |
+| guinea fowls                              | Guinea Fowl     |
+| guineea fowls (young ones)                | Guinea Fowl     |
+| guiney fowl                               | Guinea Fowl     |
+| DUCK                                      | Duck            |
+| DUCKS                                     | Duck            |
+| Ducks                                     | Duck            |
+| duck                                      | Duck            |
+| ducks                                     | Duck            |
+| Duck                                      | Duck            |
+| TURKEY                                    | Turkey          |
+| TURKEYS                                   | Turkey          |
+| Turkey                                    | Turkey          |
+| turkey                                    | Turkey          |
+| DOVE                                      | Dove/Pigeon     |
+| dove                                      | Dove/Pigeon     |
+| doves                                     | Dove/Pigeon     |
+| DONKEY                                    | Donkeys         |
+| Donkey                                    | Donkeys         |
+| donkeys                                   | Donkeys         |
+| DOG                                       | Dogs            |
+| DOGS                                      | Dogs            |
+| Dog                                       | Dogs            |
+| Dogs                                      | Dogs            |
+| dog                                       | Dogs            |
+| dogs                                      | Dogs            |
+| CAT                                       | Cats            |
+| CATS                                      | Cats            |
+| Cat                                       | Cats            |
+| Cats                                      | Cats            |
+| cat                                       | Cats            |
+| GRASSCUTTER                               | Grasscutters    |
+| Grasscutter                               | Grasscutters    |
+| grasscutter                               | Grasscutters    |
+| guinea pigs                               | Guinea Pigs     |
+| peacock                                   | Peacocks        |
+| Quails                                    | Quails          |
+| BIRDS                                     | Other Poultry   |
+| Bird                                      | Other Poultry   |

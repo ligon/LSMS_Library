@@ -258,3 +258,54 @@ plot_features:
         - t
         - i
         - plot_id
+
+livestock:
+    # 03ai_animalquestions.dta -- Section 3A(i), the wave-2 livestock
+    # roster: 14,860 rows, 2,098 households, (FPrimary, animal) unique.
+    # Livestock BY CONTENT (quantity / owners / current value / expenses /
+    # revenue), the same module as wave 1's S3AI; the wave-2 variable labels
+    # even carry the wave-1 numbering ("s03ai_01 - Quantity", "s03ai_03 -
+    # Current Value").
+    #
+    # A FIXED SEVEN-SPECIES GRID, NOT AN OWNED-ONLY ROSTER.  Every household
+    # gets a row for each of draught animals / cattle / sheep / goats /
+    # pigs / rabbits / chickens (7 x 2,098 = 14,686 rows), and 10,884 of
+    # those rows have quantity == 0 -- the household simply does not keep
+    # that species.  The remaining 174 rows are the "other" tail, entered
+    # as FREE TEXT (62 distinct spellings; see harmonize_species in
+    # ../../_/categorical_mapping.org).  The ghanasps.livestock hook drops
+    # every row with no positive HeadCount / HeadSold / HerdValue (the
+    # Nigeria / Uganda / Malawi convention for roster-grid filler), which
+    # here is exactly the quantity == 0 rows plus 13 rows with quantity
+    # null and no value: 0 of the 10,884 zero-head rows carry a value.
+    # That zero is also the corroborating test data_info.yml asks for --
+    # a herd total vanishes when the herd does; a per-head reservation
+    # price would not -- so the column is HerdValue.
+    #
+    #   animal        "Animal"                    -> animal (via table)
+    #   quantity      "s03ai_01 - Quantity"       -> HeadCount
+    #   currentvalue  "s03ai_03 - Current Value"  -> HerdValue
+    #
+    # THE VALUE IS A HERD TOTAL.  The .dta label says only "Current Value";
+    # the instrument (Documentation/ISSER_Yale_Part A_WAVE II.docx) asks
+    # "What is the current value of these animals, if you sold all of
+    # them?  Gh Cedis and pesewas".  currentvalue is ONE decimal-cedis
+    # amount (chicken herd median 100 GHS, against 40 in 2009-10 and 200 in
+    # 2017-18 -- inflation, not a x100), so no recombination is needed.
+    #
+    # DELIVERED: 3,963 rows, 2,081 households -- 17 households answer zero
+    # on every grid row and have no tail row, so they have no holding and
+    # no delivered row.  HeadSold is NOT asked in this wave.  After the mapping no household
+    # carries the same species twice (post-mapping duplicate rows: 0), so
+    # the hook's duplicate-line sum is a no-op here.  All 2,098 households
+    # are in 01a_consent.dta (100.0%); `v` is not attached by canonical
+    # design.
+    file: 03ai_animalquestions.dta
+    idxvars:
+        i: FPrimary
+        animal:
+            - animal
+            - mappings: ['harmonize_species', 'Alternate Spelling', 'Preferred Label']
+    myvars:
+        HeadCount: quantity
+        HerdValue: currentvalue

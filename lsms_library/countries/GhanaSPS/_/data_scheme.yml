@@ -340,3 +340,129 @@ Data Scheme:
     Area: float
     AreaUnit: str
     Tenure: str
+
+  livestock:
+    # Household-animal roster, all three waves, YAML path: one source file
+    # per wave (wave 3 lists its `_osp` "other -- specify" tail as a second
+    # file, row-concatenated), the `animal` label harmonised at EXTRACTION
+    # through the `harmonize_species` table in _/categorical_mapping.org,
+    # plus ONE country-level df_edit hook (ghanasps.livestock) for what YAML
+    # cannot do -- see below.  Index (t, i, animal), the canonical grain in
+    # lsms_library/data_info.yml `index_info`.  `v` is NOT declared and is
+    # NOT joined: livestock's canonical index omits v and the table is in
+    # data_info.yml's `Join v from sample > skip_extra`, exactly as Uganda /
+    # Nigeria / Malawi document ("No v level").  Every livestock household
+    # is nonetheless in its wave's sample() -- 2,142 / 2,098 / 2,363, 100.0%.
+    #
+    # SOURCES -- module 03ai is livestock BY CONTENT in every wave (quantity
+    # possessed, sale value, per-species expenses, revenue), never assumed
+    # from the number, because GhanaSPS module letters move (01f is
+    # education in 2013-14 and EMPLOYMENT in 2017-18):
+    #
+    #   wave     file                                   HeadCount  HeadSold      HerdValue
+    #   2009-10  S3AI.dta                               s3ai_1     --            s3ai_3i (cedis) + s3ai_3ii (pesewas)/100
+    #   2013-14  03ai_animalquestions.dta               quantity   --            currentvalue
+    #   2017-18  03ai_animalquestions.dta + _osp.dta    quantity   quantitysold  currentvalue
+    #
+    # THE VALUE COLUMN IS HerdValue, NOT ValuePerAnimal.  data_info.yml splits
+    # the livestock value columns by ADDITIVITY and says the wording settles
+    # it.  All three GhanaSPS instruments ask for the HERD TOTAL, verbatim:
+    #
+    #   2009-10  S3AI variable label: "Q3.1 What is the current value of
+    #            these animals if you sold all of them (cedis)" / "Q3.2 ...
+    #            (pessewa[s])".
+    #   2013-14  ISSER_Yale_Part A_WAVE II.docx: "What is the current value
+    #            of these animals, if you sold all of them?  Gh Cedis and
+    #            pesewas".
+    #   2017-18  HH_Questionnaire_23_10.docx: "What is the current value of
+    #            the [animal type], if you sold all of them?  Indicate amount
+    #            as a decimal value (in Ghana cedis and pesewas).  For
+    #            example, enter 2.50 for 2 Ghana cedis and 50 pesewas."
+    #
+    # Uganda, Nigeria and Malawi ask "If you sold ONE of the [ANIMAL] today,
+    # how much would you receive?" -- a per-head reservation price.  These
+    # are NOT the same quantity: the GhanaSPS number sums over `animal` to a
+    # household's livestock wealth; theirs does not.  Corroborated by the
+    # conditional test data_info.yml prescribes: in the wave-2 grid, 0 of
+    # the 10,884 zero-head rows carry a value -- a herd total vanishes with
+    # the herd, a per-head price would not.  Per-head sanity (median
+    # HerdValue / HeadCount, GHS): cattle 300 / 700 / 1,155, goats 30 / 71 /
+    # 133, chicken 5 / 10 / 20 across the three waves -- cattle >> goats >>
+    # chicken in every wave, and the wave-1 numbers are on the same scale as
+    # the later decimal-cedis waves (a pesewas-as-cedis error would be x100).
+    #
+    # COLUMNS.  Only what the instruments record:
+    #   HeadCount  head possessed now.  A stock.  Wave 1 and wave 3 are
+    #              owned-only rosters (no zeros); wave 2 is a fixed
+    #              seven-species GRID asked of every household, whose
+    #              10,884 zero rows the hook drops (below).
+    #   HeadSold   head sold in the last 12 months -- ASKED IN 2017-18 ONLY
+    #              (quantitysold), hence `optional` so the Site B null-read
+    #              guard does not fire on the two waves that never ask it.
+    #              A flow against a stock: quantitysold > quantity on 72
+    #              wave-3 rows is not an error.
+    #   HerdValue  the herd total above, decimal GHS in every wave (wave 1
+    #              recombined from the cedis / pesewas pair by the hook).
+    # NOT declared, deliberately: ValuePerAnimal (never asked -- a per-head
+    # figure would be HerdValue / HeadCount, an analyst's transformation);
+    # SalesValue (the revenue questions -- s3ai_12, animalrevenue /
+    # productrevenue -- are animals AND products together, so they are not
+    # the canonical sales-of-animals total); HeadAcquired (never asked);
+    # TLU (a transformation).  The per-species EXPENSES (feed bought, feed
+    # home-produced, veterinary, shelter, labour, water, other) and REVENUE
+    # exist in every wave and have no canonical home -- left unwired,
+    # recorded in CONTENTS.org.
+    #
+    # `animal` VOCABULARY.  A precedent label wins wherever one exists so
+    # that Feature('livestock') agrees across countries: Uganda's
+    # species-level Cattle / Sheep / Goats / Pigs / Rabbits / Chicken /
+    # Donkeys / Other Poultry; Nigeria's and Malawi's Guinea Fowl / Duck /
+    # Turkey / Fish / Dove/Pigeon / Other Livestock.  Coinages where none
+    # exists (plural): Draught Animals, Dogs, Cats, Grasscutters, Guinea
+    # Pigs, Peacocks, Quails.  Spelling is harmonised, a named species is
+    # NEVER folded; only labels naming no species go to a catch-all (BIRDS /
+    # Bird -> Other Poultry; wave 1's `Other Farm Animals` -> Other
+    # Livestock).  Three wave-2 free-text spellings are genuinely
+    # unmappable and pass through as their own labels: '50', 'cut', 'dake'.
+    # Cross-wave caveats, all instrument artefacts: `Other Livestock` exists
+    # only in 2009-10 (that instrument offers no slot to name a guinea fowl
+    # or a duck, so they live in the catch-all); `Donkeys` (named in the
+    # free text) overlaps with `Draught Animals` (the grid row that includes
+    # donkeys).  The full table, its rule and every judgement are in
+    # _/categorical_mapping.org.
+    #
+    # THE HOOK (ghanasps.livestock), and why each step is there:
+    #   1. HerdValue = cedis + pesewas/100 for 2009-10 (YAML maps one column
+    #      to one column).  NaN only where cedis is null AND pesewas is 0.
+    #   2. Drops 2009-10's 8 null-animal rows (181 head, a REAL loss that no
+    #      column can identify; format_id would otherwise hand the collapse
+    #      a null index level to delete with a GrainCollapseWarning).
+    #   3. Keep-rule: a row survives iff ANY of HeadCount / HeadSold /
+    #      HerdValue is non-null and > 0 -- Nigeria's inclusive form of the
+    #      convention all three precedent countries apply to roster-grid
+    #      filler.  Inclusive because HerdValue is a stock valuation, so a
+    #      value alone IS evidence of a holding (9 wave-1 and 11 wave-3 rows
+    #      have a null head and a positive value; Uganda's value-excluding
+    #      form is about per-head prices and does not transfer).  Drops
+    #      10,884 + 13 wave-2 rows, 2 wave-1 rows and 9 wave-3 rows.
+    #   4. Sums duplicate (t, i, animal) lines with min_count=1: 2009-10's 20
+    #      households with 2-3 `Other Farm Animals` lines (42 rows -> 20;
+    #      DIFFERENT unnamed species added into one Other Livestock row --
+    #      the level that instrument never recorded) and 2017-18's one
+    #      household with Chickens/roosters in the main file and Chickens in
+    #      _osp.  Legal because every declared column is additive at this
+    #      grain; the Malawi / Uganda precedent.  It is a reducer and it is
+    #      kept bounded -- the test pins the per-wave counts so a NEW
+    #      duplicate turns red instead of being summed.
+    #
+    # Delivered on a cold build under LSMS_GRAIN_STRICT=1: 4,248 / 3,963 /
+    # 4,284 rows in 2,137 / 2,081 / 2,361 households, index unique, 0
+    # GrainCollapseWarning, 0 null-read reports, is_this_feature_sane().ok
+    # True.  See CONTENTS.org "Livestock" and
+    # slurm_logs/ghanasps/livestock_verify_cold.log.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadSold:
+        type: float
+        optional: true
+    HerdValue: float

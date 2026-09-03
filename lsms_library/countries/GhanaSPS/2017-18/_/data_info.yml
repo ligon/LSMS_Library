@@ -311,3 +311,77 @@ plot_features:
         - t
         - i
         - plot_id
+
+livestock:
+    # TWO SOURCE FILES, ROW-CONCATENATED (not merged): the wave-3 livestock
+    # roster and its "other -- specify" tail.
+    #
+    #   03ai_animalquestions.dta      4,203 x 44 -- eight closed labels
+    #                                 (Cattle, Sheep, Goats, Pigs, Rabbits,
+    #                                 Chickens/roosters, Draught animal
+    #                                 (donkey, horse, bullock), Fish), owned
+    #                                 only, 2,358 households
+    #   03ai_animalquestions_osp.dta     91 x 43 -- the `_osp` free-text
+    #                                 tail (eleven title-case species, 78
+    #                                 households), SAME column names
+    #
+    # `_osp` means "other -- specify" (the suffix recurs on 03aii_tool-,
+    # 03aiii_durablegood- and 05aii_assetquestions_osp).  The main file has
+    # NO "Other" placeholder row for those households (its animal column
+    # takes only the eight labels above; `xmoreanimals == 'Yes'` is what
+    # routed them to the second file), so listing both under `file:`
+    # concatenates without double counting.  Livestock BY CONTENT in both,
+    # checked because this is the wave in which 01f silently became
+    # employment.
+    #
+    #   animal        "Animal" / "Other animal"                 -> animal
+    #   quantity      "s03ai_01 - Quantity"                     -> HeadCount
+    #   quantitysold  "s03ai_11 - Quantity of animal sold in last 12
+    #                 months"                                   -> HeadSold
+    #   currentvalue  "s03ai_03 - Current Value"                -> HerdValue
+    #
+    # THE VALUE IS A HERD TOTAL, and this instrument is the most explicit
+    # of the three (Documentation/Questionnaire/HH_Questionnaire_23_10.docx):
+    # "What is the current value of the [animal type], if you sold all of
+    # them?  Indicate amount as a decimal value (in Ghana cedis and
+    # pesewas).  For example, enter 2.50 for 2 Ghana cedis and 50
+    # pesewas."  Decimal cedis; nothing to recombine.
+    #
+    # HeadSold exists in THIS WAVE ONLY (quantitysold, 4,195/4,203 + 90/91
+    # non-null, 2,978 + 62 zeros).  It is a 12-month flow against a
+    # current stock, so quantitysold > quantity on 72 main-file rows (76
+    # delivered, with _osp) is not an error;
+    # two outliers are left exactly as reported (FPrimary 107258039,
+    # chickens, 1,000 head / 40,000 sold; 101025002, cattle, 10 head /
+    # 3,300 sold).  HeadAcquired is not asked.
+    #
+    # quantity is null on 23 main-file rows; 14 of them carry a value (11)
+    # or only a sale (3) and are KEPT with HeadCount NaN, the other 9 carry
+    # nothing and are dropped by the keep-rule (two households, 107240011
+    # and 107250028, lose their only row that way).  quantity has no zeros
+    # (owned-only roster, min 1).  DELIVERED: 4,284 rows, 2,361 households
+    # (4,203 + 91 - 9 - 1).
+    #
+    # ONE DUPLICATE after the species mapping: FPrimary 106183008 reports
+    # `Chickens/roosters` in the main file and `Chickens` in `_osp`; both
+    # map to `Chicken` and the hook sums them (HeadCount, HeadSold and
+    # HerdValue are all additive at this grain).  Pinned by the test.
+    #
+    # All 2,363 households (2,358 main, 78 _osp, union 2,363) are in
+    # 00_hh_info.dta (100.0%); `v` is not attached by canonical design.
+    # MIXED-VINTAGE DIRECTORY NOTE (CONTENTS.org): both files are among the
+    # pre-existing copies; quantity / currentvalue / quantitysold are
+    # questionnaire variables, not members of the families the public
+    # Dataverse release strips.
+    file:
+        - 03ai_animalquestions.dta
+        - 03ai_animalquestions_osp.dta
+    idxvars:
+        i: FPrimary
+        animal:
+            - animal
+            - mappings: ['harmonize_species', 'Alternate Spelling', 'Preferred Label']
+    myvars:
+        HeadCount: quantity
+        HeadSold: quantitysold
+        HerdValue: currentvalue

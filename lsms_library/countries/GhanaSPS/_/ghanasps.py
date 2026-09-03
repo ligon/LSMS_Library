@@ -479,3 +479,125 @@ def plot_features(df):
             df = df[keep]
 
     return df
+
+
+# ---------------------------------------------------------------------------
+# livestock (GH #729, #736)
+# ---------------------------------------------------------------------------
+#
+# `df_edit` hook for the `livestock` table, shared by ALL THREE waves -- the
+# same binding rule as `individual_education` and `plot_features` above: a
+# callable named after a declared table in this module is that table's hook,
+# applied by `Wave.grab_data` to the extracted and indexed (t, i, animal)
+# frame (after the wave-3 two-file concat).  Each wave's data_info.yml
+# supplies the same column names, which is what makes one implementation
+# legitimate rather than merely convenient.
+#
+# WHY A HOOK AT ALL.  Four things the YAML path cannot do, each measured on
+# the shipped files and each pinned by tests/test_ghanasps_livestock.py:
+#
+#   1. ADD TWO COLUMNS.  2009-10 records the herd value as a cedis /
+#      pesewas PAIR (s3ai_3i / s3ai_3ii); HerdValue = cedis + pesewas/100.
+#      A YAML `mapping:` is one column to one column and `derived:` has one
+#      registered kind (adding one edits build_transforms.py).  Reading the
+#      cedis member alone truncates 25 rows silently.
+#   2. DROP NULL-ANIMAL ROWS.  2009-10 has 8 rows with a null animal_id
+#      (181 head).  format_id turns them into a null `animal` index level,
+#      which the (t, i, animal) collapse deletes with a GrainCollapseWarning
+#      -- fatal under LSMS_GRAIN_STRICT=1.  Dropped deliberately and counted
+#      in that wave's data_info.yml; they are a real loss.
+#   3. DROP THE ROSTER-GRID FILLER.  2013-14 asks a fixed seven-species grid
+#      of every household, so 10,884 of its 14,860 rows have quantity == 0
+#      and nothing else.  Every precedent country (Uganda, Nigeria, Malawi)
+#      drops the never-owned filler; the rule here is Nigeria's INCLUSIVE
+#      form -- keep a row iff ANY of HeadCount / HeadSold / HerdValue is
+#      non-null and > 0.  A positive value alone keeps the row because
+#      HerdValue is a stock valuation of the herd; Uganda excludes
+#      value-alone rows because ITS value is a per-head price, which is not
+#      evidence of ownership, and that reasoning does not transfer.
+#      Measured: the two forms differ on 9 wave-1 and 11 wave-3 rows (null
+#      head, no sale, positive value) and on 0 wave-2 rows.
+#   4. RESOLVE DUPLICATE (t, i, animal) LINES.  2009-10: 20 households list
+#      `Other Farm Animals` on 2-3 lines each (42 rows) -- different unnamed
+#      species the instrument never asks to name.  2017-18: one household
+#      (106183008) has `Chickens/roosters` in the main file and `Chickens`
+#      in `_osp`.  Left alone, the framework's collapse would `.first()`
+#      them and file a GrainCollapseWarning.  Here they are SUMMED, which is
+#      legal because every declared column is additive at this grain --
+#      HeadCount / HeadSold are counts of the same label and HerdValue is a
+#      herd total by definition (data_info.yml `Columns: livestock`).  This
+#      is the Malawi assemble_livestock / Uganda livestock_for_wave
+#      precedent, with `min_count=1` so an all-NaN group stays NaN rather
+#      than becoming 0.  It is a REDUCER, and it is kept BOUNDED: the
+#      verify script prints the groups collapsed per wave and the test pins
+#      their number, so a new duplicate turns red instead of being summed.
+#
+# Nothing else is edited: no fill, no clip, no sentinel handling.  The
+# 0.01-GHS goat (1 pesewa, null cedis) and the 40,000-chicken sale are
+# delivered as reported.
+_LIVESTOCK_MEASURES = ('HeadCount', 'HeadSold', 'HerdValue')
+
+
+def livestock(df):
+    """Recombine W1 cedis + pesewas, drop null-animal and filler rows, sum
+    duplicate (t, i, animal) lines.
+
+    Receives the frame `Wave.grab_data` has extracted and indexed as
+    `(t, i, animal)`, carrying (per wave):
+
+      HeadCount  -- head possessed now                      (all waves)
+      HeadSold   -- head sold in the last 12 months         (2017-18 only)
+      HerdValue  -- "if you sold all of them", decimal GHS  (2013-14, 2017-18)
+      _cedis, _pesewas -- the 2009-10 value pair, TEMPORARY
+
+    Rules, in order:
+
+    1. `HerdValue = _cedis + _pesewas / 100` where the temporaries are
+       present; NaN only where cedis is null AND pesewas is 0 (a null
+       cedis with 1 pesewa is 0.01, as reported).  The temporaries are
+       dropped.
+    2. Every measure is coerced to float.
+    3. Rows whose `animal` index level is null are dropped.
+    4. Rows with no positive measure are dropped (the keep-rule above).
+    5. Duplicate `(t, i, animal)` keys are summed with `min_count=1`.
+    6. Columns come back in declared order: HeadCount, HeadSold, HerdValue.
+    """
+    df = df.copy()
+
+    # 1. wave-1 cedis + pesewas -> HerdValue
+    if '_cedis' in df.columns or '_pesewas' in df.columns:
+        cedis = (pd.to_numeric(df['_cedis'], errors='coerce')
+                 if '_cedis' in df.columns
+                 else pd.Series(np.nan, index=df.index, dtype=float))
+        pesewas = (pd.to_numeric(df['_pesewas'], errors='coerce')
+                   if '_pesewas' in df.columns
+                   else pd.Series(np.nan, index=df.index, dtype=float))
+        reported = cedis.notna() | (pesewas.fillna(0) > 0)
+        value = cedis.fillna(0) + pesewas.fillna(0) / 100
+        df['HerdValue'] = value.where(reported)
+    df = df.drop(columns=[c for c in ('_cedis', '_pesewas') if c in df.columns])
+
+    # 2. numeric measures
+    present = [c for c in _LIVESTOCK_MEASURES if c in df.columns]
+    for c in present:
+        df[c] = pd.to_numeric(df[c], errors='coerce').astype(float)
+
+    # 3. a null species cannot be a row of a (t, i, animal) table
+    if df.index.names is not None and 'animal' in list(df.index.names):
+        keep = pd.notna(df.index.get_level_values('animal'))
+        if not keep.all():
+            df = df[keep]
+
+    # 4. keep-rule: any measure non-null and > 0 (numpy, not Series, so a
+    #    not-yet-unique index cannot trigger an alignment)
+    holds = np.zeros(len(df), dtype=bool)
+    for c in present:
+        holds |= (df[c].fillna(0) > 0).to_numpy()
+    df = df[holds]
+
+    # 5. duplicate lines: sum (all measures additive at this grain)
+    if df.index.has_duplicates:
+        levels = list(df.index.names)
+        df = df.groupby(level=levels, sort=False, dropna=False)[present].sum(min_count=1)
+
+    return df[present]
