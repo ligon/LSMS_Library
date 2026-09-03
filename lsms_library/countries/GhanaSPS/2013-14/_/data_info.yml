@@ -309,3 +309,64 @@ livestock:
     myvars:
         HeadCount: quantity
         HerdValue: currentvalue
+
+crop_production:
+    # 04n_harvestquestions.dta -- Section N "Harvest", the wave-2 plot-crop
+    # harvest file: 8,229 rows, one per (FPrimary, plotid, crop planted).
+    # Agriculture BY CONTENT (harvest status, unit, quantity, months, damage),
+    # never assumed from the module number.  Long layout, so the YAML path
+    # extracts it and the ghanasps.crop_production df_edit hook does what
+    # YAML cannot (see the hook's comment): drops the 1,341 rows with neither
+    # a quantity nor a unit (1,322 "No, all of the crop is yet to be
+    # harvested" + 19 null status; none carries a month), folds the 226
+    # `Other - specify` units whose free text names a vocabulary unit
+    # (`tubers` / `TUBERS`, 51 rows -> Tuber), joins harvestmonths1..6 into
+    # one token string, adds the constant `season`, and sums the two
+    # duplicate (plot, crop, unit) pairs (107250012/1 cassava 10 + 20
+    # baskets; 109315002/1 millet 0.5 + 0.5 maxi bags).
+    #
+    # Variable labels read off the .dta:
+    #   cropname        "cropname" (free-ish text; cropcode is a STRING and is
+    #                   blank on 8 rows -- `papaya`, `potatoes/sweet potat`)
+    #                                                          -> j (via harmonize_crop)
+    #   harvestunit     "s04n_03 - Unit", a 20-code labelled subset
+    #                                                          -> u (via harvest_units)
+    #   harvestquantity "s04n_05 - How much harvested"         -> Quantity
+    #   harvestmonths1..6 "s04n_06 - Months harvested"         -> _m1.._m6 (TEMPORARY)
+    #   harvestunitother "s04n_03oth - Other - specify"        -> _u_other (TEMPORARY)
+    #
+    # THE RECALL IS TWELVE MONTHS, NOT A SEASON.  Part A(N) N5: "How many
+    # units of this CROP TYPE has been harvested from PLOT A?  If there has
+    # been more than one harvest from the plot, give the total quantity which
+    # has been harvested over the last 12 months."  `season` is therefore the
+    # constant `annual`, kept as a level so the wave shares 2009-10's shape.
+    #
+    # NO plot-crop SALES in this wave.  04o_cropsalesstoresquestions.dta is
+    # keyed (FPrimary, cropcode) -- it has no plotid at all -- and splits each
+    # sale across nine buyer channels.  Quantity_sold and Value_sold are NaN
+    # here by design (both `optional` in data_scheme.yml so the Site B guard
+    # does not fire); Nigeria's W3-W5 make the same call.
+    #
+    # KEY: (FPrimary, plotid) exactly as plot_features keys it; every one of
+    # the 3,826 harvest plots is in 04h_agsection.dta (100.0%).  The crop
+    # label is mapped on the DECODED cropname (lower case here), never on
+    # cropcode.  `v` is NOT declared -- _join_v_from_sample() attaches it.
+    file: 04n_harvestquestions.dta
+    idxvars:
+        i: FPrimary
+        plot_id: plotid
+        j:
+            - cropname
+            - mappings: ['harmonize_crop', 'Alternate Spelling', 'Preferred Label']
+        u:
+            - harvestunit
+            - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+    myvars:
+        Quantity: harvestquantity
+        _u_other: harvestunitother
+        _m1: harvestmonths1
+        _m2: harvestmonths2
+        _m3: harvestmonths3
+        _m4: harvestmonths4
+        _m5: harvestmonths5
+        _m6: harvestmonths6
