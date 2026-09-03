@@ -4,6 +4,9 @@ on:
   push:
     branches: ["**"]
   pull_request:
+  schedule:
+    # Weekly DVC remote reachability sweep (GH #750); see the job below.
+    - cron: '17 6 * * 1'
 
 jobs:
   # Fast tests — no data access needed
@@ -22,6 +25,42 @@ jobs:
         env:
           LSMS_SKIP_AUTH: "1"
         run: poetry run pytest
+
+  # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
+  # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
+  # silent until someone needs the file.  scripts/dvc_remote_reachability.py
+  # lists the remote once and set-differences the md5s -- no `dvc` CLI, no
+  # repo lock -- and exits 1 on any miss.  Runs weekly and on pushes to the
+  # integration branches; reader creds only.
+  dvc-remote-reachability:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/development' || github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install boto3 + pyyaml (the script needs nothing else)
+        run: pip install boto3 pyyaml
+      - name: Configure DVC credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          cat > lsms_library/countries/.dvc/s3_creds <<EOF
+          [default]
+          aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+          aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+          EOF
+      - name: Sweep the remote
+        run: python scripts/dvc_remote_reachability.py --out dvc_remote_missing.tsv
+      - name: Upload the missing-blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dvc-remote-missing
+          path: dvc_remote_missing.tsv
+          if-no-files-found: ignore
 
   # DVC lockfile freshness — detect stale lockfiles and auto-commit fixes.
   # Core library changes (country.py, local_tools.py) dirty every country's
