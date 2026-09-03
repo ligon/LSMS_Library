@@ -1,0 +1,17 @@
+SOURCE
+
+https://doi.org/10.7910/DVN/PBFXVK
+
+#+CATALOG_ID: none
+#+CATALOG_TITLE: Kenya Life Panel Survey, Round 2 (KLPS-2)
+#+CATALOG_YEARS: 2007-2009
+#+CATALOG_DOI: https://doi.org/10.7910/DVN/PBFXVK
+#+CATALOG_URL: https://doi.org/10.7910/DVN/PBFXVK
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: catalog-only
+#+PROVENANCE_RECORDED: 2026-09-02
+#+PROVENANCE_NOTE: KLPS-2: Harvard Dataverse, not a World Bank dataset (CATALOG_ID 'none'); CC0 1.0.
+
+* Notes (preserved from the original SOURCE.org)
+Kenya Life Panel Survey Round 2 (KLPS-2), Harvard Dataverse dataset doi:10.7910/DVN/PBFXVK version 1.0, published 2021-06-01.  Retrieved via the Dataverse API.  License as declared in the dataset metadata: CC0 1.0.  Validation: the 4 committed files are the Dataverse tab-delimited ingest derivatives (.tab), whose md5 Dataverse does not publish, so content could not be verified against the catalog; downloads are guestbook-gated.
