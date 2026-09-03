@@ -1261,7 +1261,7 @@ non-questionnaire evidence establish the ordering instead:
 |---+-------+--------|
 | 1 | =1988-89/Data/CLYR1YR2.DAT= bridges 85 clusters across the two waves | 75/85 agree on region overall, but *0 of the 6* touching an Upper region agree -- each differing in the direction a 9/10 swap predicts |
 | 2 | the three sibling waves' own tables | all read =9 = Upper West= |
-| 3 | this wave's raw =REGION= codes | run =1..11=, the 11-code era list (11 = a single "Foreign Country"), not GLSS2's 17-code list |
+| 3 | this wave's raw =REGION= codes | run =1..11=, the 11-code era list (11 = a single "Foreign Country"), not GLSS2's 17-code list.  /Corrected 2026-09-02: "GLSS2's 17-code list" is =Y01C:NRCREG='s list (a non-resident child's region of residence), which the 1988-89 config had mis-filed as =region=.  GLSS2's own =Y01A:REGION= is the SAME 11-code list as this wave's -- questionnaire-verified, block 1A2, PDF p.39.  See "1988-89 =Birthplace= ..." below./ |
 | 4 | Upper East is the more populous region | every other wave has more Upper East clusters than Upper West (ratios 1.78, 2.17, 3.00); 1987-88 alone inverted at 4/7 = 0.57 |
 
 After the fix the bridge agreement rises *88.2% -> 95.3%*, the Upper-region
@@ -1281,6 +1281,28 @@ error.
   =Brong Ahafo=.  Harmless-looking, but it means
   =df[df.Region == 'Brong Ahafo']= silently dropped all 170 of that wave's
   clusters.  Corrected in the wave's own table.
+
+** Trap 6 (verification, not data): the wave =mapping.py= files' =_dirs= ignore =LSMS_COUNTRIES_ROOT= (2026-09-02)
+
+All four wave modules -- =1987-88=, =1988-89=, =1991-92=, =1998-99/_/mapping.py=
+-- build the =code_label_map= search path as
+
+: path = files('lsms_library')/'countries'/'GhanaLSS'/'<wave>'
+: _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+
+=files('lsms_library')= is the *imported package's* location, which the
+=.venv= =.pth= pins to the main checkout.  So with only =LSMS_COUNTRIES_ROOT=
+pointing at a worktree, =Wave.grab_data= reads the worktree's =data_info.yml=
+while =region_dict= / =relationship_dict= / =rural_dict= are built from the
+*main checkout's* =categorical_mapping.org= -- a before/after comparison of a
+table edit is then silently a no-op.  Measured 2026-09-02: =_dirs[0]= was
+=.../mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/1988-89/_= under the
+override.  The honest route is =PYTHONPATH=<worktree>= from a *neutral cwd*
+plus =assert 'wt-...' in lsms_library.__file__= (then =files()= resolves to
+the worktree); =_/ghanalss.py= already does it right with =countries_root()=
+(GH #436).  =tests/test_declared_spellings.py= records the same trap for
+1991-92 ("worth its own issue").  Not fixed here; the fix is
+=countries_root()/'GhanaLSS'/'<wave>'= in each module.
 
 ** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
 
@@ -1508,7 +1530,15 @@ cluster.  Observed households per cluster (1987-88: min 10, median 16, max 48;
 1988-89: min 14, median 16, max 47) match that design.  Treat the agreement as
 corroboration, not identity.
 
-** Trap 5: the =rural= table in 1988-89 is NOT a rural table (2026-08-21)
+** Trap 5: the =rural= table in 1988-89 is NOT a rural table (2026-08-21; RESOLVED 2026-09-02)
+
+/Resolved 2026-09-02 (GH #692)./  The table is now =#+name: nrcpl_place_type=
+with the questionnaire citation as commentary above the name line, the
+editorial =Classification= column is gone, and the dead =rural_dict= in
+=1988-89/_/mapping.py= is deleted.  The Y01C =region= table beside it is now
+=nrcreg_region= (GH #695, below).  The rest of this entry is kept as the
+record of what it was and how it was sourced.
+
 
 =1988-89/_/categorical_mapping.org= carries, under its =* Y01C= heading,
 
@@ -1566,10 +1596,11 @@ So of this country's three =rural= tables, *only one is dead*:
   =Rural()= at =:115=).  This is where GLSS3's =Rural= values come from.
 - =1998-99= (2-way) -- *LIVE* via path 3 (=mapping.py:19=, =Rural()= at =:82=).
 - =1988-89= (7-way) -- *DEAD*: =mapping.py:20= assigns =rural_dict= correctly
-  (=code_label_map= returns a 13-key dual-keyed dict, not the Trap-1 ={}=) and
+  (=code_label_map= returned a 14-key dual-keyed dict -- ='1'..'7'= and =1..7= -- not the Trap-1 ={}=; measured 2026-09-02, earlier text said 13) and
   *no function in the module ever references it*.  A correctly-loaded,
   wrongly-named dict sitting one line from where someone will write
-  =def Rural(value)=.
+  =def Rural(value)=.  /Deleted 2026-09-02 with the rename to
+  =nrcpl_place_type= (GH #692)./
 
 Note that =_ADDITIVE_CATEGORICAL_TABLES= (=u=, =harmonize_assets=,
 =harmonize_education=) governs the *global/country* boundary only.  The
@@ -1579,7 +1610,7 @@ Full workings, including the measured effect of adding a country-level =rural=
 table (it arms previously-absent fallbacks in 1987-88 and 2005-06 -- the Trap 4
 shape), are in =slurm_logs/ghana_audit/FINDINGS_orphan_rural_table.org=.
 
-** 1988-89 =Birthplace= decodes an 11-code variable with the 17-code Y01C table (2026-08-21)
+** 1988-89 =Birthplace= decoded an 11-code variable with the 17-code Y01C table (2026-08-21; RESOLVED 2026-09-02)
 
 =1988-89/_/data_info.yml:51= declares =Birthplace: REGION= -- i.e.
 =Y01A.DAT:REGION=.  =mapping.py:19= decodes it through the wave's =region=
@@ -1610,13 +1641,68 @@ page, which was *not located* in the pages examined (4--16, 76--78): the
 printed sequence runs 1a (0B), 2 (0C), 2a (Part B divider), 3 (1B), 3a (1C),
 4 (2A) with no 1A block.  An exhaustive 78-page sweep was not run.
 
+*** RESOLVED 2026-09-02 by the exhaustive sweep (GH #695) -- C4 run, outcome (i)
+
+All 78 pages of
+=1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=
+were rendered (CCITT -> synthetic TIFF -> PIL, script and one-line-per-page
+index in =slurm_logs/ghana_audit/glss2_questionnaire/=).  *Block 1A exists*:
+=SECTION 1.  PART A.  HOUSEHOLD ROSTER= is *PDF pages 38-39* (printed 27a =
+instructions, block =1A1=; printed 28 = the grid, block =1A2=).  It is bound
+*after* Section 7 (respondents for round two) and *before* Section 8, whose
+page ends =END OF ROUND ONE= -- not between =0C= and =1B= where the section
+numbering would put it.  That binder order is why a sweep of pages 4-16
+concluded "no 1A block".
+
+Block =1A2=, column 10, "In what Region was ...[NAME IN QUESTION 1]... born?",
+verbatim:
+
+: WESTERN.....1   CENTRAL.....2   GREATER ACCRA.....3   EASTERN.....4
+: VOLTA.......5   ASHANTI.....6   BRONG-AHAFO.......7   NORTHERN....8
+: UPPER WEST..9   UPPER EAST.10   FOREIGN COUNTRY (SPECIFY).......11
+
+Eleven codes; a *single* foreign-country code.  Column 11 of the same block
+("What is his/her nationality?") is the 8-code =NAT= list (Ghana 1, Burkina
+Faso 2, Mali 3, Nigeria 4, Ivory Coast 5, Togo 6, Other Africa 7, Other 8),
+column 3 is the 14-code relationship list, column 13 is =MON= (months away).
+Everything the data showed -- =REGION= 1..11, =NAT= 1..8, =REL= 1..14 -- is
+what the form prints.
+
+*GLSS2 prints THREE different region code lists*, and they are
+question-specific:
+
+| list | codes | where |
+|------+-------+-------|
+| birth region | 11 (11 = Foreign Country) | =1A2= col.10 (Y01A:REGION), PDF p.39 |
+| region of residence / origin | 17 (11 = Nigeria ... 17 = Other) | =1C= col.12 (Y01C:NRCREG), PDF p.8; Section 6 col.8 (Y06:REGMOV), p.35; =11D= col.5, p.63 |
+| remittance sender's region | 14 (11 = Nigeria, 12 = Ivory Coast, 13 = Other Africa, 14 = Other) | =14A= col.5, PDF p.73 |
+
+Never carry a region list across sections here.
+
+*The fix* mirrors =e0f6e36b= and Trap 2's wave-first discipline:
+=1988-89/_/categorical_mapping.org= gains a =* Y01A= heading with a
+=#+name: region= table transcribed from block =1A2= (same label spellings as
+1987-88's table -- =Brong Ahafo= spaced, =Foreign Country=), and the Y01C
+17-code table is renamed =nrcreg_region= so the two cannot be confused.
+=mapping.py='s =code_label_map('region', _dirs)= is untouched and now
+resolves to the Y01A table (=df_from_orgfile= matches the whole
+=#+name: region= line exactly, so =nrcreg_region= cannot shadow it).
+
+Verified cold in a private =LSMS_DATA_DIR= with =LSMS_NO_CACHE=1=:
+=household_roster= 1988-89 has 14,924 rows before and after; *exactly 236
+rows change*, all =Nigeria -> Foreign Country=; the ten Ghanaian labels and
+their counts, the 6 NA, =Relationship= and the kinship columns are
+byte-identical.  1987-88 and 1988-89 now share one =Birthplace= vocabulary.
+
 ** The two GLSS1/GLSS2 =categorical_mapping.org= files each name the other wave
 
 =1987-88/_/categorical_mapping.org= line 1 says "...for *1988-89*";
 =1988-89/_/categorical_mapping.org= line 1 says "...for *1987-88*".  Harmless,
 but it is evidence the two are near-copies: =diff= is the header line, three
 =Refined= / =Regined oil= typos, and the =* Y01C= section, which exists only in
-1988-89.  Fix when either file is next touched.
+1988-89.  Fix when either file is next touched.  /1988-89's header was fixed
+2026-09-02 (GH #692); 1987-88's still says "1988-89" -- fix when that file is
+next touched./
 
 * Adjudication of the 11 =absent= coverage cells (2026-08-20)
 
@@ -1706,6 +1792,16 @@ header (=Compression=4=, =PhotometricInterpretation=0=, one strip, =RowsPerStrip
 in this environment, so a *targeted* read of known pages is feasible and an
 exhaustive term-search of the form is not -- which is exactly why
 =food_security= for these two waves is =unsure= and not =not-asked=.
+
+/Added 2026-09-02./  An *exhaustive* render of the GLSS2 file is now cheap
+and done: =slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py=
+(pdfminer for the object tree, PIL for the TIFF; 16 s for all 78 pages) and
+=PAGE_INDEX.org= there lists what every page is, with the form-block id and
+printed page number.  Two things it settled that a targeted read could not:
+the household roster (Section 1 Part A) is bound at *PDF pp.38-39*, after
+Section 7 and before Section 8's =END OF ROUND ONE= -- not where its section
+number says -- and pages 74-78 are portrait scans (Sections 15-17) rotated
+90 degrees.  Read the index before assuming a block is absent.
 
 Two GLSS1/GLSS2 documents that *do* have text and are worth reaching for first:
 =1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf= (the
