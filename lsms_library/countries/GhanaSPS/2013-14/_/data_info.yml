@@ -171,3 +171,90 @@ individual_education:
             - highestqual
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
         _attended: attended
+
+plot_features:
+    # TWO-SOURCE table: plot size and plot tenure live in different files.
+    #
+    #   04h_agsection.dta   4,694 x 228 -- plot size: totalsize, plotsizeunit
+    #   04i_landtenure.dta  4,694 x 103 -- tenure: obtainhow
+    #
+    # Module 04 is agriculture BY CONTENT (the files carry plot size, soil,
+    # water and "How did you obtain this plot..." variables), checked rather
+    # than assumed because GhanaSPS module letters move between waves (01f is
+    # education here and EMPLOYMENT in 2017-18).
+    #
+    # KEY: (FPrimary, plotid), plotid a within-household counter 1..10.
+    # InstanceNumber is 1:1 with plotid and is not declared.  FPrimary is the
+    # same 9-character id 01a_consent.dta uses, so the sample v-join needs no
+    # transformation and is TOTAL (all 2,678 plot households are in the
+    # consent file); v itself is the FPrimary[-6:-3] EA slice (mapping.py).
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave: (FPrimary,
+    # plotid) is unique in BOTH frames -- 4,694 distinct keys in 4,694 rows
+    # on each side, intersection 4,694, 0 size-only, 0 tenure-only, 0 key
+    # values duplicated in either frame, 0 null keys.  Exactly 1:1.
+    #
+    # AREA.  No producer area_ha in this wave.  totalsize is 4,694/4,694
+    # non-null (min 0, median 3, max 800 in native units); plotsizeunit is
+    # Acres 3,775 / Poles 570 / Ropes 208 / Plot 131 / 'Other - Specify' 10.
+    # The ghanasps.plot_features hook multiplies `_size` by wave 1's producer
+    # factor for the unit (country data_scheme.yml).  The 10 'Other' plots
+    # have no factor and get a NaN Area -- their plotsizeunitother free text
+    # is '1 bedroom', '25 BY 30 FEET', '18 sq', '16 Squares', '16 sqaures',
+    # '16 squares', '24 sq', '36 square', 'do not know', 'No plot please' --
+    # so Area is 99.79% populated here, not 100%.  10 plots report a
+    # totalsize of 0 (5 Acres, 2 Poles, 1 Plot, 2 Other); kept as reported.
+    #
+    # plotsizeunit is the RESOLVED unit for every plot in THIS wave -- unlike
+    # 2017-18, where the same column name is a skip-pattern remnant and the
+    # resolved unit is `plotunit` (GH #732).  Note that this wave's INSTRUMENT
+    # prints the rope unit as "Robes" (Part A, H: "1---Acre 2----Poles
+    # 3----Robes 4-----Plots 95----Other"); the data label was corrected to
+    # 'Ropes'.  The `AreaUnit` table in ../../_/categorical_mapping.org maps
+    # every spelling at extraction time.
+    #
+    # Tenure: obtainhow (7 categories, 4,694/4,694 non-null) -> canonical
+    # vocabulary via the `Tenure` table in the same file.  The instrument
+    # (Part A, I1: "How did you obtain this plot, or gain the right to farm
+    # this plot?") offers 1 Purchased / 2 Inherited from deceased family
+    # member / 3 Rented (for cash or kind), or sharecropped / 4 Allocated
+    # free of charge / 5 Begged / 6 Borrowed / 95 Other.  Rent and sharecrop
+    # are ONE option here (702 plots) where wave 1 has three; the country
+    # data_scheme.yml has the mapping and its consequences.  The 'Other'
+    # free text (obtainother, 73 rows) is not decoded.
+    #
+    # `merge_how: left`, size file primary (also output-identical to `outer`
+    # here: the key sets coincide).  `v` is NOT declared --
+    # _join_v_from_sample() attaches it at API time.
+    dfs:
+        - df_size
+        - df_tenure
+    df_size:
+        file: 04h_agsection.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            # `_size` is TEMPORARY: consumed and dropped by
+            # ghanasps.plot_features, which writes `Area`.
+            _size: totalsize
+            AreaUnit:
+                - plotsizeunit
+                - mappings: ['AreaUnit', 'Alternate Spelling', 'Preferred Label']
+    df_tenure:
+        file: 04i_landtenure.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            Tenure:
+                - obtainhow
+                - mappings: ['Tenure', 'Alternate Spelling', 'Preferred Label']
+    merge_on:
+        - i
+        - plot_id
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - plot_id

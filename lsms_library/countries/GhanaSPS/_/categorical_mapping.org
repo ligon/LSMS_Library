@@ -298,3 +298,99 @@ canonical set above", never "do the distributions look plausible".
 | Other                  | Other           |
 | Other - specify        | Other           |
 | Other (please specify) | Other           |
+
+* Plot features: AreaUnit / Tenure (GH #732, #729)
+
+Two tables for =plot_features=.  Unlike =Roof= / =Floor= above, these are
+referenced EXPLICITLY from each wave's =data_info.yml=
+(=mappings: ['Tenure', 'Alternate Spelling', 'Preferred Label']=) and so are
+applied at EXTRACTION time: the cached =plot_features.parquet= already carries
+the canonical values.  That is deliberate -- =tests/test_table_structure.py=
+runs the declared-spellings check on the cached parquet, and =Tenure= has a
+declared vocabulary in =lsms_library/data_info.yml=, so an API-time mapping
+would leave the parquet failing a check the delivered table passes.  Because
+the table names also match the column names,
+~Country._apply_categorical_mappings~ applies them a SECOND time at API time;
+that pass is idempotent (no Preferred Label below is also somebody else's
+Alternate Spelling), and it is what would repair a parquet written before a
+row was added.
+
+** AreaUnit
+
+The native unit as the respondent reported it, folded onto the vocabulary
+GhanaLSS's =plot_features= already emits (=Acres / Poles / Ropes / Plot /
+Other=) so that ~Feature('plot_features')~ agrees across the two Ghanas.
+Three spelling systems for the same four units:
+
+| code | 2009-10 =s4aii_a11= | 2013-14 =plotsizeunit= | 2017-18 =plotunit= |
+|------+---------------------+------------------------+--------------------|
+|    1 | Acre                | Acres                  | Acres              |
+|    2 | Pole                | Poles                  | Poles              |
+|    3 | Rope                | Ropes                  | *Robes*            |
+|    4 | Plot                | Plot                   | Plots              |
+|  oth | Other               | Other - Specify        | (free text)        |
+
+"Robes" is what BOTH the wave-2 and the wave-3 instrument print; wave 2's
+data label was corrected, wave 3's was not.  2017-18's =plotunit= is a
+producer-resolved column that, for its six 'Other (please specify)' plots,
+carries the specify-box free text in place of the closed answer; those six
+strings map to =Other= -- the closed answer the respondent gave -- and are
+listed verbatim so the mapping is checkable (=-999= is the wave-3 "Don't know"
+sentinel typed into the specify box; the =_to_numeric= pass over this table
+leaves it a string because the column is not numeric as a whole).  Only the
+four named units carry a hectare factor (~ghanasps._PLOT_HECTARES_PER_UNIT~);
+=Other= yields a NaN =Area=.
+
+#+name: AreaUnit
+| Alternate Spelling                                                                | Preferred Label |
+|----------------------------------------------------------------------------------+-----------------|
+| Acre                                                                             | Acres           |
+| Acres                                                                            | Acres           |
+| Pole                                                                             | Poles           |
+| Poles                                                                            | Poles           |
+| Rope                                                                             | Ropes           |
+| Ropes                                                                            | Ropes           |
+| Robes                                                                            | Ropes           |
+| Plot                                                                             | Plot            |
+| Plots                                                                            | Plot            |
+| Other                                                                            | Other           |
+| Other - Specify                                                                  | Other           |
+| Other (please specify)                                                           | Other           |
+| 2 miles squared                                                                  | Other           |
+| It has never been measured before. It is a family land that belongs to forsfathers | Other         |
+| -999                                                                             | Other           |
+| Don't know                                                                       | Other           |
+
+** Tenure
+
+Every Preferred Label is drawn from the =Tenure= =spellings= vocabulary in
+=lsms_library/data_info.yml=; no country-local value is coined (the vocabulary
+cannot be extended from a country config, and =_check_declared_spellings=
+would fail one).  The per-label reasoning -- including the two judgement calls,
+=Allocated free of charge= -> =communal= (the waves-2/3 follow-up "What
+qualifies you to be allocated this plot free of charge?" answers Lineage or
+Member-of-the-community for 70% / 74% of such plots) and the merged waves-2/3
+rent-or-sharecrop option -> =rented_in= -- is in the =plot_features= block of
+=_/data_scheme.yml=, next to the column declaration.  Wave 1 is the only wave
+that separates sharecropping from renting, so =sharecropped_in= occurs only in
+2009-10.  =Other= free text (73 / 67 rows) is not decoded.
+
+#+name: Tenure
+| Alternate Spelling                        | Preferred Label |
+|-------------------------------------------+-----------------|
+| Purchase                                  | owned           |
+| Purchased                                 | owned           |
+| Inherit                                   | inherited       |
+| Inherited from deceased family member     | inherited       |
+| Inherited from family member              | inherited       |
+| Rent for cash or kind                     | rented_in       |
+| Rented (for cash or kind), or sharecrop   | rented_in       |
+| Rented (for cash or kind) or sharecropped | rented_in       |
+| Sharecrop                                 | sharecropped_in |
+| Sharecrop with initial payment            | sharecropped_in |
+| Allocated free                            | communal        |
+| Allocated free of charge                  | communal        |
+| Begged                                    | use_right       |
+| Borrowed                                  | use_right       |
+| Other - specify                           | other_tenure    |
+| Other (please specify)                    | other_tenure    |

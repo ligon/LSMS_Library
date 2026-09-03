@@ -1,0 +1,107 @@
+countries_root: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries
+data_root: /global/scratch/fsa/fc_jevons/ligon/tmp/lsms_data_gsps_plot
+cold? country parquet exists before build: False
+
+=== delivered frame ===
+index: ['i', 't', 'v', 'plot_id']  columns: ['Area', 'AreaUnit', 'Tenure']  shape: (15742, 3)
+GrainCollapseWarning count: 0
+NullRead warning count (whole build, incl. the sample re-entry): 4
+   NULLREAD: GhanaSPS/sample: required declared column 'Rural' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_colu
+   NULLREAD: GhanaSPS/sample: required declared column 'panel_weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_requir
+   NULLREAD: GhanaSPS/sample: required declared column 'strata' is 100% NULL in wave(s) [2013-14] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the
+   NULLREAD: GhanaSPS/sample: required declared column 'weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_col
+null_read_reports(GhanaSPS): tables -> ["{'site': 'built-table', 'country': 'GhanaSPS', 'table': 'sample', 'column': 'Rural', 'scope': 'waves', 'waves': ['2013-14', '2017-18'], 'rows': 15452}", "{'site': 'built-table', 'country': 'GhanaSPS', 'table': 'sample', 'column': 'panel_weight', 'scope': 'waves', 'waves': ['2013-14', '2017-18'], 'rows': 15452}", "{'site': 'built-table', 'country': 'GhanaSPS', 'table': 'sample', 'column': 'strata', 'scope': 'waves', 'waves': ['2013-14'], 'rows': 15452}", "{'site': 'built-table', 'country': 'GhanaSPS', 'table': 'sample', 'column': 'weight', 'scope': 'waves', 'waves': ['2013-14', '2017-18'], 'rows': 15452}"]
+null_read_reports(GhanaSPS, plot_features): 0 (read-strict condition asserted directly: must be 0)
+other warnings (deduped):
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2009-10/_/food_acquired.py' mode='r'
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2009-10/_/mapping.py' mode='r' encod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2009-10/_/other_expenditures.py' mod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2013-14/_/food_acquired.py' mode='r'
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2013-14/_/mapping.py' mode='r' encod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2013-14/_/other_expenditures.py' mod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2017-18/_/food_acquired.py' mode='r'
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2017-18/_/mapping.py' mode='r' encod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/2017-18/_/other_expenditures.py' mod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/_/food_acquired.py' mode='r' encodin
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries/GhanaSPS/_/ghanasps.py' mode='r' encoding='ut
+
+declared Tenure vocabulary: ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']
+
+=== 2009-10 ===
+1. rows: 5,682  (keyed source plots 5,686; gap 4 = rows with Area, AreaUnit AND Tenure all null, removed by _finalize_result dropna(how="all"))
+2. Area non-null: 5,553/5,682 = 97.73%  OK (>=97%)
+3. (t, i, plot_id) unique: True
+4. v non-null: 5,682/5,682 = 100.00%   distinct v: 264
+5. Tenure delivered: {'inherited': 2445, 'communal': 2091, 'sharecropped_in': 626, 'rented_in': 387, 'owned': 112, <NA>: 21}
+   Tenure raw source: {'Inherit': 2445, 'Allocated free': 2091, 'Sharecrop': 563, 'Rent for cash or kind': 387, 'Purchase': 112, 'Sharecrop with initial payment': 63, nan: 41}
+   Tenure SUBSET of declared vocabulary: True  offenders: []
+6. AreaUnit: {'Acres': 4547, 'Poles': 718, 'Ropes': 238, <NA>: 117, 'Plot': 60, 'Other': 2}
+   AreaUnit SUBSET of ['Acres', 'Other', 'Plot', 'Poles', 'Ropes']: True  offenders: []
+7. Area ha: median 0.809  p99 9.58  max 40.5  min 0.020  zeros 0
+
+=== 2013-14 ===
+1. rows: 4,694  (keyed source plots 4,694; gap 0 = rows with Area, AreaUnit AND Tenure all null, removed by _finalize_result dropna(how="all"))
+2. Area non-null: 4,684/4,694 = 99.79%  OK (>=97%)
+3. (t, i, plot_id) unique: True
+4. v non-null: 4,694/4,694 = 100.00%   distinct v: 289
+5. Tenure delivered: {'inherited': 2811, 'rented_in': 702, 'communal': 648, 'use_right': 305, 'owned': 155, 'other_tenure': 73}
+   Tenure raw source: {'Inherited from deceased family member': 2811, 'Rented (for cash or kind), or sharecrop': 702, 'Allocated free of charge': 648, 'Begged': 225, 'Purchased': 155, 'Borrowed': 80, 'Other - specify': 73}
+   Tenure SUBSET of declared vocabulary: True  offenders: []
+6. AreaUnit: {'Acres': 3775, 'Poles': 570, 'Ropes': 208, 'Plot': 131, 'Other': 10}
+   AreaUnit SUBSET of ['Acres', 'Other', 'Plot', 'Poles', 'Ropes']: True  offenders: []
+7. Area ha: median 1.214  p99 14.37  max 323.8  min 0.000  zeros 8
+
+=== 2017-18 ===
+1. rows: 5,366  (keyed source plots 5,366; gap 0 = rows with Area, AreaUnit AND Tenure all null, removed by _finalize_result dropna(how="all"))
+2. Area non-null: 5,346/5,366 = 99.63%  OK (>=97%)
+3. (t, i, plot_id) unique: True
+4. v non-null: 5,366/5,366 = 100.00%   distinct v: 290
+5. Tenure delivered: {'inherited': 3342, 'rented_in': 700, 'communal': 637, 'use_right': 395, 'owned': 223, 'other_tenure': 67, <NA>: 2}
+   Tenure raw source: {'Inherited from family member': 3342, 'Rented (for cash or kind) or sharecropped': 700, 'Allocated free of charge': 637, 'Begged': 316, 'Purchased': 223, 'Borrowed': 79, 'Other (please specify)': 67, nan: 2}
+   Tenure SUBSET of declared vocabulary: True  offenders: []
+6. AreaUnit: {'Acres': 4791, 'Poles': 262, 'Plot': 154, 'Ropes': 153, 'Other': 6}
+   AreaUnit SUBSET of ['Acres', 'Other', 'Plot', 'Poles', 'Ropes']: True  offenders: []
+7. Area ha: median 0.819  p99 11.96  max 28668.6  min 0.008  zeros 0
+
+W1 Area path counts: shipped area_ha 5,553; derived (area_ha null but size+factor present) 0; neither 133; null-plot_no source rows dropped 12
+
+=== is_this_feature_sane ===
+Sanity report: GhanaSPS/plot_features
+  17 checks: 16 pass, 1 warn, 0 fail
+  [+] not_empty: 15742 rows
+  [+] has_named_index: Index levels: ['i', 't', 'v', 'plot_id']
+  [~] index_levels_match_scheme: Extra index levels not in scheme: ['v']; expected: ['t', 'i', 'plot_id'], actual: ['i', 't', 'v', 'plot_id']
+  [+] no_null_index_levels
+  [+] has_time_index: 3 distinct periods
+  [+] has_household_index: 3836 distinct households
+  [+] reasonable_size: 15,742 rows
+  [+] no_all_null_columns: 3 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: All 3 declared columns present
+  [+] dtype_consistency
+  [+] value_constraints: No constrained columns (skipped)
+  [+] declared_spellings: 1 column(s) match declared vocabulary: ['Tenure']
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_float_stringified_index: No float-stringified index values
+  [+] ids_format_id_canonical: All id index levels are canonical format_id output
+  [+] index_overlap_with_spine: other_features not cached (skipped)
+report.ok: True
+
+=== parquet read-back (pre-finalize) ===
+2009-10 wave parquet: shape (5686, 3) cols ['Area', 'AreaUnit', 'Tenure'] Tenure values ['communal', 'inherited', 'owned', 'rented_in', 'sharecropped_in'] AreaUnit ['Acres', 'Other', 'Plot', 'Poles', 'Ropes'] null plot_id 0
+2013-14 wave parquet: shape (4694, 3) cols ['Area', 'AreaUnit', 'Tenure'] Tenure values ['communal', 'inherited', 'other_tenure', 'owned', 'rented_in', 'use_right'] AreaUnit ['Acres', 'Other', 'Plot', 'Poles', 'Ropes'] null plot_id 0
+2017-18 wave parquet: shape (5366, 3) cols ['Area', 'AreaUnit', 'Tenure'] Tenure values ['communal', 'inherited', 'other_tenure', 'owned', 'rented_in', 'use_right'] AreaUnit ['Acres', 'Other', 'Plot', 'Poles', 'Ropes'] null plot_id 0
+country parquet: shape (15746, 3) index ['t', 'i', 'plot_id'] Tenure subset of vocab: True
+
+=== Feature() assembly (GhanaSPS only) ===
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'Rural' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'panel_weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'strata' is 100% NULL in wave(s) [2013-14] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaSPS/sample: required declared column 'weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+Feature index: ['country', 't', 'v', 'i', 'plot_id']  shape: (15742, 3)
+
+ALL STEP-3 GATES PASS: True

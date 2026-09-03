@@ -256,3 +256,99 @@ individual_education:
             - s1fi_4
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
         _attended: s1fi_2
+
+plot_features:
+    # TWO-SOURCE table: plot size and plot tenure are in different files.
+    #
+    #   S4AII.dta  5,698 x 15 -- Section 4A Part II, plot size: s4aii_a10
+    #              (size), s4aii_a11 (unit: Acre/Pole/Rope/Plot/Other) and
+    #              the producer-computed area_ha "Land size in hectares".
+    #   S4AIV.dta  5,702 x 55 -- Section 4A Part IV, tenure: s4aiv_a45 (how
+    #              the household obtained the plot, 6 categories).
+    #
+    # KEY: (hhno, plot_no) / (hhno, s4aiv_plotno) -- the plot number is a
+    # within-household counter 1..10, renamed per file.  hhno is the 9-digit
+    # wave-1 household id, the same form key_hhld_info.dta and S1D.dta use,
+    # so the sample v-join needs no transformation and is TOTAL (all 2,812
+    # plot households are in key_hhld_info.dta).
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave: among rows
+    # with a plot number, (hhno, plot_no) is unique in BOTH frames -- 5,686
+    # distinct keys in 5,686 S4AII rows and 5,686 in 5,686 S4AIV rows,
+    # intersection 5,686, 0 size-only, 0 tenure-only, 0 key values
+    # duplicated in either frame.  Exactly 1:1.
+    #
+    # NULL PLOT NUMBERS.  S4AII has 12 rows with a null plot_no (12 distinct
+    # households); S4AIV has 16 (15 of them household 105158048, which also
+    # has one null row in S4AII).  None of the 28 carries a size, a unit, an
+    # area_ha or a tenure.  format_id turns a null plot_no into a null
+    # `plot_id` index level, which the framework's (t, i, plot_id) collapse
+    # would DELETE with a GrainCollapseWarning (fatal under
+    # LSMS_GRAIN_STRICT=1) -- and pd.merge matches null keys, so the left
+    # merge fans 105158048's one null row out to 15.  The
+    # ghanasps.plot_features df_edit hook drops every null-plot_id row
+    # deliberately (26 rows here: 12 + the 14-row fan-out); no datum is lost.
+    #
+    # AREA.  area_ha is populated for 5,553 of the 5,686 keyed plots (97.7%)
+    # and equals s4aii_a10 x factor to float precision wherever both exist
+    # (Acre 0.404694, Pole 0.409551, Rope 0.236342, Plot 0.102388 ha; 0 rows
+    # differ by > 1e-4 ha).  The hook prefers the shipped area_ha and derives
+    # `_size` x factor(AreaUnit) where it is missing -- measured, that
+    # fallback fires on 0 rows, because area_ha is null exactly where the
+    # unit (121 rows) or the size is null, or the unit is 'Other' (2 rows,
+    # sizes 6 and 1 of an unnamed unit).  Wave-1 Area is therefore the
+    # producer's own number.
+    #
+    # AreaUnit: s4aii_a11 spells the units in the SINGULAR (Acre/Pole/Rope/
+    # Plot); the `AreaUnit` table in ../../_/categorical_mapping.org maps
+    # them onto the GhanaLSS vocabulary (Acres/Poles/Ropes/Plot/Other) at
+    # extraction time, so the cached parquet is already canonical.
+    #
+    # Tenure: s4aiv_a45 -> canonical vocabulary via the `Tenure` table in the
+    # same file.  This is the only wave that separates 'Sharecrop' (563) and
+    # 'Sharecrop with initial payment' (63) from 'Rent for cash or kind'
+    # (387); waves 2 and 3 merge them.  Its 'Allocated free' (2,091) is
+    # broader than waves 2-3's 'Allocated free of charge', because this
+    # instrument has no Begged / Borrowed option.  The country
+    # data_scheme.yml has every label -> target.  s4aiv_a45 is null on 41
+    # source rows (25 among keyed plots) and stays NA.
+    #
+    # `merge_how: left` with the size file primary: S4AII is authoritative
+    # for which plots exist, S4AIV a strict enrichment (here also
+    # output-identical to `outer`, since the keyed sets coincide -- a fact
+    # about this extract, not a guarantee).
+    #
+    # `v` is NOT declared -- _join_v_from_sample() attaches it at API time.
+    dfs:
+        - df_size
+        - df_tenure
+    df_size:
+        file: S4AII.dta
+        idxvars:
+            i: hhno
+            plot_id: plot_no
+        myvars:
+            # `_area_ha` and `_size` are TEMPORARY: consumed and dropped by
+            # ghanasps.plot_features, which writes `Area`.
+            _area_ha: area_ha
+            _size: s4aii_a10
+            AreaUnit:
+                - s4aii_a11
+                - mappings: ['AreaUnit', 'Alternate Spelling', 'Preferred Label']
+    df_tenure:
+        file: S4AIV.dta
+        idxvars:
+            i: hhno
+            plot_id: s4aiv_plotno
+        myvars:
+            Tenure:
+                - s4aiv_a45
+                - mappings: ['Tenure', 'Alternate Spelling', 'Preferred Label']
+    merge_on:
+        - i
+        - plot_id
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - plot_id

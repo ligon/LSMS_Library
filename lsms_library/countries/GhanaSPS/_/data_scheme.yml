@@ -221,3 +221,122 @@ Data Scheme:
     index: (t, i)
     Roof: str
     Floor: str
+
+  plot_features:
+    # Lasting plot characteristics, all three waves, YAML path: one `dfs:`
+    # merge per wave (size file primary, tenure file secondary,
+    # `merge_how: left`) on the plot key, plus ONE country-level df_edit hook
+    # (ghanasps.plot_features) that turns the native size into hectares and
+    # drops the null-plot rows.  Index (t, i, plot_id); `v` is NOT declared
+    # and must NOT be -- `sample` is wired for every wave and
+    # _join_v_from_sample() attaches it at API time.  The join is TOTAL: every
+    # plot household is in its wave's sample key file (2,812 / 2,678 / 3,041).
+    #
+    # SOURCES -- module 4 is agriculture BY CONTENT in every wave (variable
+    # and value labels checked, CONTENTS.org), never assumed from the number:
+    #
+    #   wave     size / unit                                   tenure
+    #   2009-10  S4AII.dta  area_ha, s4aii_a10, s4aii_a11      S4AIV.dta  s4aiv_a45
+    #   2013-14  04h_agsection.dta  totalsize, plotsizeunit    04i_landtenure.dta  obtainhow
+    #   2017-18  04h_agsection.dta  totalsize, PLOTUNIT        04i_landtenure.dta  obtainhow
+    #
+    # THE 2017-18 UNIT TRAP (GH #732).  Wave 3 first asks "Can [Name] provide
+    # the size of plot in acres?" (plotsizeacres: 4,791 Yes / 575 No) and asks
+    # `plotsizeunit` ONLY of the 575 who said No.  The resolved unit for every
+    # plot is `plotunit` (5,366/5,366 non-null).  Reading the natural-looking
+    # `plotsizeunit` -- the column wave 2 uses -- leaves 4,791 of 5,366 plots
+    # (89.3%) with no unit and therefore no Area, and NEITHER framework guard
+    # fires: the Site B null-read guard needs 100% null, and
+    # _assert_built_required_columns checks presence, not content.
+    # tests/test_ghanasps_plot_features.py pins Area >= 95% non-null per wave.
+    #
+    # "ROBES".  The unit list is spelled Acre/Pole/Rope/Plot in 2009-10,
+    # Acres/Poles/Ropes/Plot in 2013-14 and Acres/Poles/ROBES/Plots in
+    # 2017-18.  Both the wave-2 and the wave-3 INSTRUMENT print "Robes"; wave
+    # 2's data label was corrected to "Ropes", wave 3's was not.  The
+    # `AreaUnit` table in _/categorical_mapping.org folds every spelling onto
+    # GhanaLSS's vocabulary (Acres / Poles / Ropes / Plot / Other) at
+    # extraction time.
+    #
+    # HECTARES.  2009-10 ships a producer-computed `area_ha`; dividing it by
+    # the reported native size recovers the factors to float precision
+    # (within-unit sd ~1e-8; slurm_logs/ghanasps/FINDINGS_agriculture.org):
+    #     Acre 0.404694   Pole 0.409551   Rope 0.236342   Plot 0.102388  ha
+    # Waves 2 and 3 ship no area_ha, so the hook applies WAVE 1's OWN factors
+    # to their native sizes -- chosen for internal consistency with the
+    # shipped wave-1 numbers rather than the standard acre (0.404686 ha, a
+    # 2e-5 relative difference; seen, noted, not used).  Wave 1 prefers the
+    # shipped area_ha where present and derives from size x factor otherwise;
+    # measured, that fallback takes 0 rows: area_ha equals size x factor
+    # wherever both exist (0 of 5,553 rows differ by > 1e-4 ha) and is null
+    # exactly where the unit or the size is missing (133 of 5,686 plots, 2 of
+    # which report the unit 'Other').  Area is NaN wherever the unit has no
+    # factor: 10 wave-2 'Other - Specify' plots ('1 bedroom', '25 BY 30 FEET',
+    # '16 Squares', ...) and 6 wave-3 free-text plots (see 2017-18).
+    #
+    # Two wave-3 plots report 70,000 Poles (28,669 ha each; the next largest
+    # is 800 acres).  Left exactly as reported -- core does not edit data --
+    # and the wave-3 99th percentile (~12 ha, median ~0.8) shows the factor,
+    # not the tail, is right.
+    #
+    # `plot_id` IS a panel id from wave 1 to wave 2 (4,916 of 5,082 wave-1
+    # plots, 96.7%, reappear under the same number in 04h_preroster, an
+    # explicit carry-forward list) but NOT from wave 2 to wave 3: tested
+    # against a permutation null, the true (i, plotid) pairing does not beat
+    # chance on area, soil colour or distance (CONTENTS.org, FINDINGS).  Do
+    # NOT join plot-level GhanaSPS data across waves 2 and 3 on (i, plot_id);
+    # the `t` level already scopes every row, so nothing has to be prevented
+    # -- it only has to be known.
+    #
+    # TENURE -- every source label and its target.  The same table lives in
+    # _/categorical_mapping.org and is applied at EXTRACTION (unlike
+    # housing's Roof/Floor, which are API-time), because
+    # tests/test_table_structure.py runs the declared-spellings check on the
+    # CACHED parquet and Tenure has a declared vocabulary:
+    #
+    #   2009-10 s4aiv_a45               2013-14 / 2017-18 obtainhow                 -> Tenure
+    #   Purchase                        Purchased                                   owned
+    #   Inherit                         Inherited from deceased family member       inherited
+    #                                   Inherited from family member                inherited
+    #   Rent for cash or kind           Rented (for cash or kind), or sharecrop(ped) rented_in
+    #   Sharecrop                       --                                          sharecropped_in
+    #   Sharecrop with initial payment  --                                          sharecropped_in
+    #   Allocated free                  Allocated free of charge                    communal
+    #   --                              Begged                                      use_right
+    #   --                              Borrowed                                    use_right
+    #   --                              Other - specify / Other (please specify)    other_tenure
+    #
+    # Judgements, and what each rests on:
+    #  * 'Allocated free (of charge)' -> communal, NOT use_right.  The
+    #    waves-2/3 follow-up "What qualifies you to be allocated this plot
+    #    free of charge?" answers Lineage or Member-of-the-community for 456
+    #    of 648 (70%) and 474 of 637 (74%) such plots, and the grantor is a
+    #    relative or the chief for 69% / 75%; the friend-/employee-of-owner
+    #    minority (~20%) would read as use_right.  GhanaLSS maps its
+    #    equivalent 'Distributed by village/family' to communal.  In WAVE 1
+    #    the category is BROADER: that instrument has no Begged / Borrowed
+    #    option, so those plots land here too (2,091 plots against
+    #    648 + 225 + 80 in wave 2).
+    #  * Begged / Borrowed -> use_right ("held under agreement with a
+    #    use-rights owner, often non-cash", data_info.yml).
+    #  * Waves 2 and 3 MERGE rent and sharecrop into one option; it goes to
+    #    rented_in (sharecropping is rent paid in kind), because the canonical
+    #    vocabulary cannot be extended from a country config.  Wave 1 keeps
+    #    the distinction (387 rented_in + 626 sharecropped_in).  Consequence:
+    #    sharecropped_in exists ONLY in 2009-10, and waves 2-3 rented_in
+    #    includes sharecropping -- a cross-wave comparison of those two values
+    #    is an instrument artefact, not a trend.
+    #  * 'Other' free text (73 / 67 rows: "no man's land", "I just saw it and
+    #    started farming on it", "Caretaker", ...) is NOT decoded ->
+    #    other_tenure.
+    #
+    # NOT declared, deliberately: Irrigated (the source is "has a non-rain
+    # water source", weaker than the canonical meaning -- FINDINGS risk b);
+    # SoilType (not a straight extraction in any wave: a multi-variable
+    # S4AIII block in 2009-10, 12- and 15-way multi-select soil flags in
+    # 2013-14 / 2017-18); TenureSystem (no freehold/leasehold/customary
+    # question found); Latitude/Longitude (absent).
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
