@@ -288,6 +288,17 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 
 * Housing (Roof / Floor) -- canonical harmonization (GH #170)
 
+The wave-level =mapping:= blocks in each =data_info.yml= normalise the
+GLSS value labels to one spelling per category; these two tables then
+fold that spelling onto =canonical_housing_labels.org=.  Since 2026-09-02
+(GH #727) the canon carries =Bamboo= and =Terrazzo= as labels of their
+own, so =Bamboo= (roof; was *Wood*) and =Terrazzo= (floor; was
+*Concrete*) target them -- 60 / 110 / 42 bamboo roofs and 74 / 154 / 155
+terrazzo floors in 2005-06 / 2012-13 / 2016-17 (the GLSS3-4 label sets
+carry neither).  Compound =Cement/Concrete= stays *Concrete* (ruling
+restated under #727).  Prose stays ABOVE the =#+name:= lines: the org
+parser attaches a name to the next table and skips nothing in between.
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
@@ -296,7 +307,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Cement/Concrete    | Concrete        |
 | Roofing Tiles      | Clay Tiles      |
 | Thatch             | Thatch          |
-| Bamboo             | Wood            |
+| Bamboo             | Bamboo          |
 | Mud/Earth          | Mud             |
 | Wood               | Wood            |
 | Other              | Other           |
@@ -308,7 +319,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Earth/Mud            | Earth           |
 | Ceramic/Marble Tiles | Tiles           |
 | Vinyl Tiles          | Vinyl/Linoleum  |
-| Terrazzo             | Concrete        |
+| Terrazzo             | Terrazzo        |
 | Burnt Bricks         | Bricks          |
 | Stone                | Stone           |
 | Stone/Brick          | Stone           |
