@@ -1,0 +1,24 @@
+LICENSE
+
+* KLPS-4 -- CC0 1.0 Universal (Public Domain Dedication)
+
+https://doi.org/10.7910/DVN/O0BBKI  (version 4.0, published 2023-09-08)
+
+License: *CC0 1.0 Universal* -- http://creativecommons.org/publicdomain/zero/1.0
+as declared in the dataset's own Dataverse metadata (=license.name= = "CC0 1.0"),
+retrieved 2026-09-02.  The dataset declares no custom terms of use, no terms of
+access, no confidentiality declaration and no restricted files; the files
+held here are the producers' own =_PUBLIC_= releases.
+
+CC0 places no restriction on redistribution, so these files may be held and
+pushed to the shared DVC remote.  Decision recorded 2026-09-02 (GH #750).
+
+** Courtesy, not a condition
+
+The Dataverse asks downloaders to fill a guestbook (id 63) before a browser or
+API download -- KLPS-4 downloads without it.  That collects who uses the data for the
+producers; it is not a licence term and cannot add conditions to CC0.  Users
+of this library get the files from the S3 cache without seeing it, so please
+cite the data as the producers ask:
+
+  Miguel, Edward; Kremer, Michael; Hamory, Joan; Walker, Michael, 2023, "Kenya Life Panel Survey, Round 4 (KLPS-4)", Harvard Dataverse, V4, https://doi.org/10.7910/DVN/O0BBKI

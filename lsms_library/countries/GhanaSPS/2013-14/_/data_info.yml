@@ -171,3 +171,202 @@ individual_education:
             - highestqual
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
         _attended: attended
+
+plot_features:
+    # TWO-SOURCE table: plot size and plot tenure live in different files.
+    #
+    #   04h_agsection.dta   4,694 x 228 -- plot size: totalsize, plotsizeunit
+    #   04i_landtenure.dta  4,694 x 103 -- tenure: obtainhow
+    #
+    # Module 04 is agriculture BY CONTENT (the files carry plot size, soil,
+    # water and "How did you obtain this plot..." variables), checked rather
+    # than assumed because GhanaSPS module letters move between waves (01f is
+    # education here and EMPLOYMENT in 2017-18).
+    #
+    # KEY: (FPrimary, plotid), plotid a within-household counter 1..10.
+    # InstanceNumber is 1:1 with plotid and is not declared.  FPrimary is the
+    # same 9-character id 01a_consent.dta uses, so the sample v-join needs no
+    # transformation and is TOTAL (all 2,678 plot households are in the
+    # consent file); v itself is the FPrimary[-6:-3] EA slice (mapping.py).
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave: (FPrimary,
+    # plotid) is unique in BOTH frames -- 4,694 distinct keys in 4,694 rows
+    # on each side, intersection 4,694, 0 size-only, 0 tenure-only, 0 key
+    # values duplicated in either frame, 0 null keys.  Exactly 1:1.
+    #
+    # AREA.  No producer area_ha in this wave.  totalsize is 4,694/4,694
+    # non-null (min 0, median 3, max 800 in native units); plotsizeunit is
+    # Acres 3,775 / Poles 570 / Ropes 208 / Plot 131 / 'Other - Specify' 10.
+    # The ghanasps.plot_features hook multiplies `_size` by wave 1's producer
+    # factor for the unit (country data_scheme.yml).  The 10 'Other' plots
+    # have no factor and get a NaN Area -- their plotsizeunitother free text
+    # is '1 bedroom', '25 BY 30 FEET', '18 sq', '16 Squares', '16 sqaures',
+    # '16 squares', '24 sq', '36 square', 'do not know', 'No plot please' --
+    # so Area is 99.79% populated here, not 100%.  10 plots report a
+    # totalsize of 0 (5 Acres, 2 Poles, 1 Plot, 2 Other); kept as reported.
+    #
+    # plotsizeunit is the RESOLVED unit for every plot in THIS wave -- unlike
+    # 2017-18, where the same column name is a skip-pattern remnant and the
+    # resolved unit is `plotunit` (GH #732).  Note that this wave's INSTRUMENT
+    # prints the rope unit as "Robes" (Part A, H: "1---Acre 2----Poles
+    # 3----Robes 4-----Plots 95----Other"); the data label was corrected to
+    # 'Ropes'.  The `AreaUnit` table in ../../_/categorical_mapping.org maps
+    # every spelling at extraction time.
+    #
+    # Tenure: obtainhow (7 categories, 4,694/4,694 non-null) -> canonical
+    # vocabulary via the `Tenure` table in the same file.  The instrument
+    # (Part A, I1: "How did you obtain this plot, or gain the right to farm
+    # this plot?") offers 1 Purchased / 2 Inherited from deceased family
+    # member / 3 Rented (for cash or kind), or sharecropped / 4 Allocated
+    # free of charge / 5 Begged / 6 Borrowed / 95 Other.  Rent and sharecrop
+    # are ONE option here (702 plots) where wave 1 has three; the country
+    # data_scheme.yml has the mapping and its consequences.  The 'Other'
+    # free text (obtainother, 73 rows) is not decoded.
+    #
+    # `merge_how: left`, size file primary (also output-identical to `outer`
+    # here: the key sets coincide).  `v` is NOT declared --
+    # _join_v_from_sample() attaches it at API time.
+    dfs:
+        - df_size
+        - df_tenure
+    df_size:
+        file: 04h_agsection.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            # `_size` is TEMPORARY: consumed and dropped by
+            # ghanasps.plot_features, which writes `Area`.
+            _size: totalsize
+            AreaUnit:
+                - plotsizeunit
+                - mappings: ['AreaUnit', 'Alternate Spelling', 'Preferred Label']
+    df_tenure:
+        file: 04i_landtenure.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            Tenure:
+                - obtainhow
+                - mappings: ['Tenure', 'Alternate Spelling', 'Preferred Label']
+    merge_on:
+        - i
+        - plot_id
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - plot_id
+
+livestock:
+    # 03ai_animalquestions.dta -- Section 3A(i), the wave-2 livestock
+    # roster: 14,860 rows, 2,098 households, (FPrimary, animal) unique.
+    # Livestock BY CONTENT (quantity / owners / current value / expenses /
+    # revenue), the same module as wave 1's S3AI; the wave-2 variable labels
+    # even carry the wave-1 numbering ("s03ai_01 - Quantity", "s03ai_03 -
+    # Current Value").
+    #
+    # A FIXED SEVEN-SPECIES GRID, NOT AN OWNED-ONLY ROSTER.  Every household
+    # gets a row for each of draught animals / cattle / sheep / goats /
+    # pigs / rabbits / chickens (7 x 2,098 = 14,686 rows), and 10,884 of
+    # those rows have quantity == 0 -- the household simply does not keep
+    # that species.  The remaining 174 rows are the "other" tail, entered
+    # as FREE TEXT (62 distinct spellings; see harmonize_species in
+    # ../../_/categorical_mapping.org).  The ghanasps.livestock hook drops
+    # every row with no positive HeadCount / HeadSold / HerdValue (the
+    # Nigeria / Uganda / Malawi convention for roster-grid filler), which
+    # here is exactly the quantity == 0 rows plus 13 rows with quantity
+    # null and no value: 0 of the 10,884 zero-head rows carry a value.
+    # That zero is also the corroborating test data_info.yml asks for --
+    # a herd total vanishes when the herd does; a per-head reservation
+    # price would not -- so the column is HerdValue.
+    #
+    #   animal        "Animal"                    -> animal (via table)
+    #   quantity      "s03ai_01 - Quantity"       -> HeadCount
+    #   currentvalue  "s03ai_03 - Current Value"  -> HerdValue
+    #
+    # THE VALUE IS A HERD TOTAL.  The .dta label says only "Current Value";
+    # the instrument (Documentation/ISSER_Yale_Part A_WAVE II.docx) asks
+    # "What is the current value of these animals, if you sold all of
+    # them?  Gh Cedis and pesewas".  currentvalue is ONE decimal-cedis
+    # amount (chicken herd median 100 GHS, against 40 in 2009-10 and 200 in
+    # 2017-18 -- inflation, not a x100), so no recombination is needed.
+    #
+    # DELIVERED: 3,963 rows, 2,081 households -- 17 households answer zero
+    # on every grid row and have no tail row, so they have no holding and
+    # no delivered row.  HeadSold is NOT asked in this wave.  After the mapping no household
+    # carries the same species twice (post-mapping duplicate rows: 0), so
+    # the hook's duplicate-line sum is a no-op here.  All 2,098 households
+    # are in 01a_consent.dta (100.0%); `v` is not attached by canonical
+    # design.
+    file: 03ai_animalquestions.dta
+    idxvars:
+        i: FPrimary
+        animal:
+            - animal
+            - mappings: ['harmonize_species', 'Alternate Spelling', 'Preferred Label']
+    myvars:
+        HeadCount: quantity
+        HerdValue: currentvalue
+
+crop_production:
+    # 04n_harvestquestions.dta -- Section N "Harvest", the wave-2 plot-crop
+    # harvest file: 8,229 rows, one per (FPrimary, plotid, crop planted).
+    # Agriculture BY CONTENT (harvest status, unit, quantity, months, damage),
+    # never assumed from the module number.  Long layout, so the YAML path
+    # extracts it and the ghanasps.crop_production df_edit hook does what
+    # YAML cannot (see the hook's comment): drops the 1,341 rows with neither
+    # a quantity nor a unit (1,322 "No, all of the crop is yet to be
+    # harvested" + 19 null status; none carries a month), folds the 226
+    # `Other - specify` units whose free text names a vocabulary unit
+    # (`tubers` / `TUBERS`, 51 rows -> Tuber), joins harvestmonths1..6 into
+    # one token string, adds the constant `season`, and sums the two
+    # duplicate (plot, crop, unit) pairs (107250012/1 cassava 10 + 20
+    # baskets; 109315002/1 millet 0.5 + 0.5 maxi bags).
+    #
+    # Variable labels read off the .dta:
+    #   cropname        "cropname" (free-ish text; cropcode is a STRING and is
+    #                   blank on 8 rows -- `papaya`, `potatoes/sweet potat`)
+    #                                                          -> j (via harmonize_crop)
+    #   harvestunit     "s04n_03 - Unit", a 20-code labelled subset
+    #                                                          -> u (via harvest_units)
+    #   harvestquantity "s04n_05 - How much harvested"         -> Quantity
+    #   harvestmonths1..6 "s04n_06 - Months harvested"         -> _m1.._m6 (TEMPORARY)
+    #   harvestunitother "s04n_03oth - Other - specify"        -> _u_other (TEMPORARY)
+    #
+    # THE RECALL IS TWELVE MONTHS, NOT A SEASON.  Part A(N) N5: "How many
+    # units of this CROP TYPE has been harvested from PLOT A?  If there has
+    # been more than one harvest from the plot, give the total quantity which
+    # has been harvested over the last 12 months."  `season` is therefore the
+    # constant `annual`, kept as a level so the wave shares 2009-10's shape.
+    #
+    # NO plot-crop SALES in this wave.  04o_cropsalesstoresquestions.dta is
+    # keyed (FPrimary, cropcode) -- it has no plotid at all -- and splits each
+    # sale across nine buyer channels.  Quantity_sold and Value_sold are NaN
+    # here by design (both `optional` in data_scheme.yml so the Site B guard
+    # does not fire); Nigeria's W3-W5 make the same call.
+    #
+    # KEY: (FPrimary, plotid) exactly as plot_features keys it; every one of
+    # the 3,826 harvest plots is in 04h_agsection.dta (100.0%).  The crop
+    # label is mapped on the DECODED cropname (lower case here), never on
+    # cropcode.  `v` is NOT declared -- _join_v_from_sample() attaches it.
+    file: 04n_harvestquestions.dta
+    idxvars:
+        i: FPrimary
+        plot_id: plotid
+        j:
+            - cropname
+            - mappings: ['harmonize_crop', 'Alternate Spelling', 'Preferred Label']
+        u:
+            - harvestunit
+            - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+    myvars:
+        Quantity: harvestquantity
+        _u_other: harvestunitother
+        _m1: harvestmonths1
+        _m2: harvestmonths2
+        _m3: harvestmonths3
+        _m4: harvestmonths4
+        _m5: harvestmonths5
+        _m6: harvestmonths6

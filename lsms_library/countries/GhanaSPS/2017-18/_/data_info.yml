@@ -202,3 +202,323 @@ individual_education:
             - highestqual
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
         _attended: attended
+
+plot_features:
+    # TWO-SOURCE table, same shape as 2013-14: size + tenure.
+    #
+    #   04h_agsection.dta   5,366 x 176 -- plot size: totalsize, PLOTUNIT
+    #   04i_landtenure.dta  5,366 x 139 -- tenure: obtainhow
+    #
+    # Module 04 is agriculture BY CONTENT here too -- checked, because this
+    # is the wave in which 01f silently became employment.
+    #
+    # THE UNIT TRAP (GH #732) -- READ `plotunit`, NOT `plotsizeunit`.  This
+    # wave's instrument asks H8 "Can [Name] provide the size of plot [#] in
+    # acres?  1-Yes >> H9 / 5-No" and asks the unit list ("1-Poles 2-Robes
+    # 3-Plots -666-Other (please specify)") ONLY of the No's.  So
+    # `plotsizeunit` -- the column wave 2 uses, and the natural name -- is
+    # populated for 575 of 5,366 plots (10.7%): Poles 262 / Plots 154 /
+    # Robes 153 / Other 6.  The producer-resolved unit for EVERY plot is
+    # `plotunit` (5,366/5,366): Acres 4,791 / Poles 262 / Plots 154 /
+    # Robes 153 / free text 6.  Reading plotsizeunit leaves 4,791 plots
+    # (89.3%) with no unit and no Area, and NEITHER framework guard fires
+    # (Site B needs 100% null; _assert_built_required_columns checks
+    # presence).  Measured: where plotsizeacres == 'No', plotunit equals
+    # plotsizeunit on 569 of 575 rows; the 6 exceptions are the 'Other
+    # (please specify)' rows, for which plotunit carries the
+    # plotsizeunitother free text instead:
+    #   '2 miles squared'; 'It has never been measured before. It is a
+    #   family land that belongs to forsfathers'; '-999' (x3); "Don't know".
+    # The `AreaUnit` table in ../../_/categorical_mapping.org maps all six to
+    # 'Other' -- the closed-question answer the respondent actually gave --
+    # and they get no factor, hence a NaN Area (5 of the 6 also have a null
+    # totalsize).  '-999' is this wave's "Don't know" sentinel typed into the
+    # specify box.
+    #
+    # "ROBES" is this wave's spelling of Rope in BOTH the instrument and the
+    # data label (wave 2's instrument also prints Robes; its data label was
+    # corrected).  Folded onto 'Ropes' by the same table.
+    #
+    # KEY: (FPrimary, plotid), plotid 1..9.  FPrimary is the same id
+    # 00_hh_info.dta uses; 5 of the 5,366 rows carry the 10-character split
+    # form, and v = FPrimary[-6:-3] slices from the RIGHT so it is unaffected
+    # (mapping.py).  The sample v-join needs no transformation and is TOTAL
+    # (all 3,041 plot households are in 00_hh_info.dta).
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave SEPARATELY --
+    # a rule verified on 2013-14 does not transfer: (FPrimary, plotid) is
+    # unique in BOTH frames -- 5,366 distinct keys in 5,366 rows on each
+    # side, intersection 5,366, 0 size-only, 0 tenure-only, 0 key values
+    # duplicated in either frame, 0 null keys.  Exactly 1:1.
+    #
+    # AREA.  No producer area_ha.  totalsize is 5,347/5,366 non-null (the 19
+    # missing: 10 Acres, 2 Plots, 1 Robes, 1 Poles and 5 of the 6 free-text
+    # rows); the hook multiplies `_size` by wave 1's producer factor for the
+    # unit.  Delivered Area is ~99.6% populated, median ~0.8 ha, 99th
+    # percentile ~12 ha.  TWO PLOTS REPORT 70,000 POLES = 28,669 ha EACH (the
+    # next largest is 800 acres); left exactly as reported -- core does not
+    # edit data -- and flagged here for anyone using the wave-3 tail.
+    #
+    # Tenure: obtainhow (5,364/5,366 non-null; the 2 nulls are FPrimary
+    # 107241063 plot 1 and 107272008 plot 2, left NA) -> canonical vocabulary
+    # via the `Tenure` table.  Instrument I1 "How did [Name] obtain plot [#],
+    # or gain the right to farm plot [#]?": 1 Purchased / 2 Inherited from
+    # family member / 3 Rented (for cash or kind), or sharecropped /
+    # 4 Allocated free of charge / 5 Begged / 6 Borrowed / -666 Other.  The
+    # data label of option 3 drops the comma ("Rented (for cash or kind) or
+    # sharecropped") -- a third spelling of the merged rent/sharecrop option,
+    # so it has its own row.  The country data_scheme.yml has every target.
+    # The 'Other' free text (obtainother, 67 rows) is not decoded.
+    #
+    # `merge_how: left`, size file primary.  `v` is NOT declared --
+    # _join_v_from_sample() attaches it at API time.
+    #
+    # MIXED-VINTAGE DIRECTORY NOTE (CONTENTS.org): totalsize, plotunit and
+    # obtainhow are questionnaire variables, not members of the free-text
+    # `*other` / sub-district geography / consent families the public
+    # Dataverse release strips, so nothing here depends on the extra columns
+    # our pre-anonymization copies retain.
+    dfs:
+        - df_size
+        - df_tenure
+    df_size:
+        file: 04h_agsection.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            # `_size` is TEMPORARY: consumed and dropped by
+            # ghanasps.plot_features, which writes `Area`.
+            _size: totalsize
+            # plotunit, NOT plotsizeunit -- GH #732, see above.
+            AreaUnit:
+                - plotunit
+                - mappings: ['AreaUnit', 'Alternate Spelling', 'Preferred Label']
+    df_tenure:
+        file: 04i_landtenure.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+        myvars:
+            Tenure:
+                - obtainhow
+                - mappings: ['Tenure', 'Alternate Spelling', 'Preferred Label']
+    merge_on:
+        - i
+        - plot_id
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - plot_id
+
+livestock:
+    # TWO SOURCE FILES, ROW-CONCATENATED (not merged): the wave-3 livestock
+    # roster and its "other -- specify" tail.
+    #
+    #   03ai_animalquestions.dta      4,203 x 44 -- eight closed labels
+    #                                 (Cattle, Sheep, Goats, Pigs, Rabbits,
+    #                                 Chickens/roosters, Draught animal
+    #                                 (donkey, horse, bullock), Fish), owned
+    #                                 only, 2,358 households
+    #   03ai_animalquestions_osp.dta     91 x 43 -- the `_osp` free-text
+    #                                 tail (eleven title-case species, 78
+    #                                 households), SAME column names
+    #
+    # `_osp` means "other -- specify" (the suffix recurs on 03aii_tool-,
+    # 03aiii_durablegood- and 05aii_assetquestions_osp).  The main file has
+    # NO "Other" placeholder row for those households (its animal column
+    # takes only the eight labels above; `xmoreanimals == 'Yes'` is what
+    # routed them to the second file), so listing both under `file:`
+    # concatenates without double counting.  Livestock BY CONTENT in both,
+    # checked because this is the wave in which 01f silently became
+    # employment.
+    #
+    #   animal        "Animal" / "Other animal"                 -> animal
+    #   quantity      "s03ai_01 - Quantity"                     -> HeadCount
+    #   quantitysold  "s03ai_11 - Quantity of animal sold in last 12
+    #                 months"                                   -> HeadSold
+    #   currentvalue  "s03ai_03 - Current Value"                -> HerdValue
+    #
+    # THE VALUE IS A HERD TOTAL, and this instrument is the most explicit
+    # of the three (Documentation/Questionnaire/HH_Questionnaire_23_10.docx):
+    # "What is the current value of the [animal type], if you sold all of
+    # them?  Indicate amount as a decimal value (in Ghana cedis and
+    # pesewas).  For example, enter 2.50 for 2 Ghana cedis and 50
+    # pesewas."  Decimal cedis; nothing to recombine.
+    #
+    # HeadSold exists in THIS WAVE ONLY (quantitysold, 4,195/4,203 + 90/91
+    # non-null, 2,978 + 62 zeros).  It is a 12-month flow against a
+    # current stock, so quantitysold > quantity on 72 main-file rows (76
+    # delivered, with _osp) is not an error;
+    # two outliers are left exactly as reported (FPrimary 107258039,
+    # chickens, 1,000 head / 40,000 sold; 101025002, cattle, 10 head /
+    # 3,300 sold).  HeadAcquired is not asked.
+    #
+    # quantity is null on 23 main-file rows; 14 of them carry a value (11)
+    # or only a sale (3) and are KEPT with HeadCount NaN, the other 9 carry
+    # nothing and are dropped by the keep-rule (two households, 107240011
+    # and 107250028, lose their only row that way).  quantity has no zeros
+    # (owned-only roster, min 1).  DELIVERED: 4,284 rows, 2,361 households
+    # (4,203 + 91 - 9 - 1).
+    #
+    # ONE DUPLICATE after the species mapping: FPrimary 106183008 reports
+    # `Chickens/roosters` in the main file and `Chickens` in `_osp`; both
+    # map to `Chicken` and the hook sums them (HeadCount, HeadSold and
+    # HerdValue are all additive at this grain).  Pinned by the test.
+    #
+    # All 2,363 households (2,358 main, 78 _osp, union 2,363) are in
+    # 00_hh_info.dta (100.0%); `v` is not attached by canonical design.
+    # MIXED-VINTAGE DIRECTORY NOTE (CONTENTS.org): both files are among the
+    # pre-existing copies; quantity / currentvalue / quantitysold are
+    # questionnaire variables, not members of the families the public
+    # Dataverse release strips.
+    file:
+        - 03ai_animalquestions.dta
+        - 03ai_animalquestions_osp.dta
+    idxvars:
+        i: FPrimary
+        animal:
+            - animal
+            - mappings: ['harmonize_species', 'Alternate Spelling', 'Preferred Label']
+    myvars:
+        HeadCount: quantity
+        HeadSold: quantitysold
+        HerdValue: currentvalue
+
+crop_production:
+    # TWO-SOURCE table: the plot-crop harvest and the plot-crop SALES live in
+    # different files, merged `left` on (i, plot_id, j) with the harvest file
+    # authoritative for which rows exist.
+    #
+    #   04n_harvestquestions.dta          9,317 x 62 -- Part N "Harvesting":
+    #       cropname / cropcode (float, -666 = Other), harvestunit (the full
+    #       labelled unit list, -666 = Other), harvestquantity, harvestmonths
+    #       (a space-separated month string, '10 11'), harvestunitother.
+    #   04o_cropsalesstoresquestions.dta 10,573 x 88 -- Part O "Crop sales and
+    #       storage", and in THIS wave it carries plotid (2013-14's does not):
+    #       nine buyer channels, each `<ch>soldquantity` / `<ch>soldunit` /
+    #       `<ch>soldprice`, the price per unit ("What was the price for which
+    #       [Name] sold one [unit] of [crop type] to ...").
+    #
+    # Agriculture BY CONTENT in both, checked because this is the wave in
+    # which 01f silently became employment.  NOT 04o_cropsalesstoresSERVICES,
+    # which despite its name is tractor / plough hire and chemical
+    # application services.
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave INCLUDING the
+    # null-crop placeholder rows (pd.merge matches null keys): (FPrimary,
+    # plotid, cropname) is unique in BOTH frames -- 9,317 distinct keys in
+    # 9,317 harvest rows (1,926 of them the blank-crop placeholder of an
+    # uncultivated plot, one per plot) and 10,573 in 10,573 sales rows (701
+    # blank) -- so 0 key values are duplicated in either frame and the merge
+    # is exactly 1:1.  The hook then drops the blank-crop rows and the 963
+    # rows with neither a quantity nor a unit (794 "No, all yet to be
+    # harvested" + 169 null status; none carries a month).
+    #
+    # THE RECALL IS TWELVE MONTHS (N5: "If there has been more than one
+    # harvest from the plot, give the total quantity which has been harvested
+    # over the last 12 months"), so `season` is the constant `annual`.
+    #
+    # SALES.  The hook computes Value_sold = sum over channels of quantity x
+    # unit price (money is additive across channels) and Quantity_sold = the
+    # summed channel quantity ONLY where every selling channel used one unit
+    # equal to the row's harvest `u` (3,062 rows); 432 rows sold in a
+    # different unit, 7 in two units and the `Other`-unit sales give NaN.
+    # 12 rows have a channel quantity with no price -> Value_sold NaN.  1,237
+    # sale records belong to plot-crops with NO harvest row and are not
+    # delivered (this is a table of harvest records).  One sale computes to
+    # 42.8M GHS (a keying error in quantity x unit price) and is delivered as
+    # reported -- core does not edit data.  The 27 `_sq_*` / `_su_*` /
+    # `_sp_*` columns are TEMPORARY, consumed and dropped by the hook.
+    #
+    # KEY: (FPrimary, plotid) exactly as plot_features keys it; every one of
+    # the 3,440 harvest plots is in 04h_agsection.dta (100.0%); 9 harvest
+    # rows carry the 10-character split-household FPrimary, which the sample
+    # v-join handles (v = FPrimary[-6:-3]).  The crop label is mapped on the
+    # DECODED cropname (title case here; `Guinea` is this wave's truncation
+    # of Guinea corn/Sorghum; `Other` is the -666 catch-all, 106 rows), never
+    # on cropcode.  `v` is NOT declared -- _join_v_from_sample() attaches it.
+    dfs:
+        - df_harvest
+        - df_sales
+    df_harvest:
+        file: 04n_harvestquestions.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+            j:
+                - cropname
+                - mappings: ['harmonize_crop', 'Alternate Spelling', 'Preferred Label']
+            u:
+                - harvestunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+        myvars:
+            Quantity: harvestquantity
+            harvest_month: harvestmonths
+            _u_other: harvestunitother
+    df_sales:
+        file: 04o_cropsalesstoresquestions.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+            j:
+                - cropname
+                - mappings: ['harmonize_crop', 'Alternate Spelling', 'Preferred Label']
+        myvars:
+            _sq_samecomm: samecommsoldquantity
+            _su_samecomm:
+                - samecommsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_samecomm: samecommsoldprice
+            _sq_othercomm: othercommsoldquantity
+            _su_othercomm:
+                - othercommsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_othercomm: othercommsoldprice
+            _sq_traders: traderssoldquantity
+            _su_traders:
+                - traderssoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_traders: traderssoldprice
+            _sq_contractors: contractorssoldquantity
+            _su_contractors:
+                - contractorssoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_contractors: contractorssoldprice
+            _sq_orgs: orgssoldquantity
+            _su_orgs:
+                - orgssoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_orgs: orgssoldprice
+            _sq_agg: aggsoldquantity
+            _su_agg:
+                - aggsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_agg: aggsoldprice
+            _sq_outgrow: outgrowsoldquantity
+            _su_outgrow:
+                - outgrowsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_outgrow: outgrowsoldprice
+            _sq_coop: coopsoldquantity
+            _su_coop:
+                - coopsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_coop: coopsoldprice
+            _sq_other: othersoldquantity
+            _su_other:
+                - othersoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_other: othersoldprice
+    merge_on:
+        - i
+        - plot_id
+        - j
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - plot_id
+        - j
+        - u

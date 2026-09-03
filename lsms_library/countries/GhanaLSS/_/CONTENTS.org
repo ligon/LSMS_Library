@@ -243,6 +243,129 @@ GLSS1/GLSS2 have *no urban/rural variable in the microdata at all* -- see
 Appendix I at the *cluster* level and is broadcast to the households of each
 cluster.  The Appendix's third value =SU= is folded onto =Rural=.
 
+The *population cutoff* behind every row of the table above is not the same
+from round to round -- see the next subsection before comparing =Rural= across
+waves.
+
+** The urban cutoff MOVES across rounds: 5,000 -> 1,500 -> 5,000 (GH #705, 2026-09-02)
+
+GSS changed the population cutoff that defines an urban locality between
+GLSS rounds, and absorbed the 1,500--5,000 "semi-urban" band differently each
+time.  Recorded here, next to the source table above, because the delivered
+=Rural= column carries no trace of it -- the same defect class as Ethiopia's
+=Urban= (GH #683, PR #688), found in this country by reading documentation
+rather than by noticing an implausible series (GH #705, from the
+settlement-threshold sweep of PR #704).
+
+*The cutoff, per round, from documents this repository ships:*
+
+| Round             | urban cutoff | semi-urban band                | scheme | measured on | source (verbatim quote below or in the /SU -> Rural/ section)                                                        |
+|-------------------+--------------+--------------------------------+--------+-------------+-----------------------------------------------------------------------------------------------------------------------|
+| GLSS1/2 1987-89   | > 5,000      | 1,500--5,000, its own stratum  | 3-way  | 1984 Census | joint BID §3.1, PDF p.13 / printed p.11 -- quoted under /The =SU= -> =Rural= fold/ below                              |
+| GLSS3 1991-92     | >= 5,000     | 1,500--<5,000, reported inside *Rural* | 3-way (2-way in =loc2=) | 1984 Census | =G3report.pdf= note to Table 7.3, PDF p.75 / printed p.57 -- quoted under /Band boundaries/ in the same section |
+| *GLSS4 1998-99*   | *> 1,500*    | *1,501--5,000, folded into URBAN* | 2-way | 1984 Census | =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11 -- quoted below                                                          |
+| GLSS5 2005-06     | not stated   | --                             | 2-way  | 2000 PHC frame | searched =ddi-documentation-english-5.pdf= end to end (p.5 says only that EAs "were further sub-divided according to their rural and urban areas of location"); no number anywhere |
+| GLSS6 2012-13     | >= 5,000     | none                           | 2-way  | not stated  | =REPORTS/GLSS6_Labour Force Report.pdf= pp.15-16 -- quoted below.  The Main Report (Appendix 1, p.23) says only "The EAs were further divided into urban and rural localities of residence" |
+| GLSS7 2016-17     | not stated   | --                             | 2-way  | 2010 PHC frame | searched =ddi-documentation-english-97.pdf= end to end; neither a cutoff nor a description of =urbrur= |
+
+"Not stated" is a searched negative for the two named files, not for the
+questionnaires or manuals (GLSS7's =GLSS7 Final Manual.docx= and GLSS5's
+questionnaires were not read for this); a later reader may well find the
+rule in another document type -- the GLSS4 rule is in a *user guide* and the
+GLSS6 rule in a *labour-force report*, which is why single-document negatives
+are worthless here.
+
+GLSS4, =GHA_1998_GLSS_Data_User_Guide_EN.pdf=, §6 definitions, p.11 (plain
+text layer; typography as printed, including the unclosed parenthesis):
+
+#+begin_quote
+Urban EA:  An EA was considered to be urban if it had a population greater than 1,500 people during the 1984 population census.  Thus semi-urban EAs (with population between 1,501 and 5,000 were considered as urban assuming that they might have grown to urban status since the 1984 census.
+Rural EA:  An EA was considered to be rural if it had a population 1,500 or less people during the 1984 population census.
+#+end_quote
+
+GLSS6, =REPORTS/GLSS6_Labour Force Report.pdf=, "Locality", pp.15-16 (the
+sentence breaks across the page):
+
+#+begin_quote
+Two main types of locality are defined by the survey: urban and rural. The classification of localities into 'urban' and 'rural' is based on population size. Localities with 5,000 or more persons are classified as Urban while those with less than 5,000 persons are classified as Rural.
+#+end_quote
+
+*Direction of bias, by construction.*  Under GLSS4's rule every locality the
+1984 Census put at 1,501--5,000 is urban; under GLSS1/2's, GLSS3's and
+GLSS6's rule none of them is.  Holding the frame fixed (GLSS1/2, GLSS3 and
+GLSS4 all sit on the 1984 Census), GLSS4's urban share must therefore be
+*higher* than a 5,000-rule share of the same country, and GLSS4 says so
+itself: the fold was a deliberate *assumption* -- "assuming that they might
+have grown to urban status since the 1984 census" -- not an error.  Any
+GhanaLSS urbanisation series that crosses 1998-99 is measuring that
+definition, not only the country.
+
+*What the delivered column actually shows* (=Country('GhanaLSS').sample()=,
+cold, 2026-09-02; the unweighted share is a *design allocation* -- GSS chose
+how many urban EAs to draw -- and can neither confirm nor refute the
+definitional claim above; weights are the API's within-wave mean-1 values,
+which leave the weighted share unchanged):
+
+| Round   |      n | Urban share, unweighted | Urban share, weighted | note                                                              |
+|---------+--------+-------------------------+-----------------------+-------------------------------------------------------------------|
+| GLSS1   |  3,147 |                   37.6% |               (=)     | self-weighting: one weight value                                  |
+| GLSS2   |  3,194 |                   33.5% |               (=)     | self-weighting                                                    |
+| GLSS3   |  4,523 |                   34.9% |               (=)     | self-weighting                                                    |
+| GLSS4   |  5,998 |                   36.7% |                 36.7% | 298 distinct weights; weighted equals unweighted to 0.1 pt        |
+| GLSS5   |  8,687 |                   41.6% |                 43.2% |                                                                   |
+| GLSS6   | 16,772 |                   44.4% |                 55.4% | 2010 PHC frame; ">= 5,000" rule                                   |
+| GLSS7   | 14,009 |                   43.0% |                 56.0% |                                                                   |
+
+Read honestly: the GLSS3 -> GLSS4 step in the *sample* is +1.8 points -- the
+sign the definition predicts, but small, and the sample share is an
+allocation, not a population estimate.  The large weighted jump is GLSS5 ->
+GLSS6 (43.2% -> 55.4%), which confounds a new frame (2000 -> 2010 PHC), a
+stated rule (none -> ">= 5,000"), and genuine urbanisation (the 2010 PHC
+itself reports 50.9% urban), and this file does not apportion it.
+
+*Consequence after PR #690.*  GLSS1/GLSS2 =Rural= now comes from BID
+Appendix I with the =SU= stratum (52 of 263 clusters, 1,500--5,000) folded
+onto *=Rural=*.  GLSS4 folds the *same* 1,501--5,000 band onto *=Urban=*.
+So a settlement of the same 1984 size is delivered as =Rural= in 1987-89 and
+=Urban= in 1998-99.  Before #690 GLSS1/2 =Rural= was 100% NULL and the
+inconsistency was invisible rather than absent; after it, the column is
+present but not comparable across that boundary, and that is now a
+documented property rather than an unknown.  The #690 decision is not wrong
+on this evidence: GLSS4's fold rests on an explicitly *time-dependent*
+rationale ("might have grown" by 1998) that cannot transfer to a 1987-88
+survey contemporaneous with the very census being used.  GLSS3, per its own
+report's nesting of "Semi-urban" under a *Rural* total (Tables 7.3 and 7.9;
+see the /SU -> Rural/ section), sits with GLSS1/2 on this -- an inference
+from the report's tables, since no =loc2= variable description was found.
+
+*Which variable each wave's =Rural= actually reflects* -- GH #705's caveat
+is that sampling strata are not necessarily the published variable, so this
+was checked per wave before the cutoff table was asserted to apply.  Measured
+2026-09-02: in *every* wave =Rural= takes exactly one value within each
+cluster =v= (0 mixed clusters of 176 / 170 / 365 / 300 / 580 / 1,200 /
+1,000), so all seven are EA-level classifications, not household attributes.
+How firmly each is tied to the *frame's* population rule differs:
+
+| Round | delivered =Rural= reads             | grain            | tie to the frame's size rule                                                                                                        |
+|-------+-------------------------------------+------------------+-------------------------------------------------------------------------------------------------------------------------------------|
+| GLSS1 | BID Appendix I =UrbRur= (U/R/SU)    | cluster, broadcast | *is* the sampling stratum (BID §3.1 defines it by 1984 population).  Documented                                                     |
+| GLSS2 | BID Appendix I =UrbRur=             | cluster, broadcast | same                                                                                                                                |
+| GLSS3 | =POV_GH.DTA:loc2= (1 urban / 2 rural) | EA (0/365 mixed) | *inferred*: the report defines the tiers by 1984 population and nests semi-urban under rural; no variable description found for =loc2= |
+| GLSS4 | =SEC0A.DTA:loc2= "Locality classification of HH" (user guide p.26: 1 Urban, 2 Rural) | EA (0/300 mixed) | documented: p.8 "stratification was done based on the size of the locality into rural or urban", p.11 defines the size (> 1,500)      |
+| GLSS5 | =parta/sec7.dta:loc2=, DDI label *"urban/rural-corr"* (V110, V1279) | EA (0/580 mixed) | *not stated*, and the DDI label says the variable was *corrected* -- do not assert it equals the frame stratum                       |
+| GLSS6 | =PARTA/g6loc_edt.dta:loc2= (Urban/Rural strings) | EA (0/1,200 mixed) | documented by the Labour Force Report's ">= 5,000" rule; the Main Report does not describe =loc2=                                    |
+| GLSS7 | =sample=: =g7sec0.dta:urbrur=; =cluster_features=: =loc2= | EA (0/1,000 mixed) | *not stated*: the DDI describes neither variable and gives no cutoff                                                                |
+
+*Decision: documentation, not an API-time warning.*  A per-wave
+comparability warning on =Rural= was considered and not built.  #683 took
+the documentation route for Ethiopia (PR #688) and consistency argues for the
+same here, even though Ghana now carries *two* discontinuities (GLSS3 ->
+GLSS4 and GLSS4 -> GLSS6); the library's posture is to make the data honest
+and let the analyst decide, not to police pooling.  PR #688 also left a
+one-line pointer on =sample.Rural= in Ethiopia's =data_scheme.yml=; the
+GhanaLSS =data_scheme.yml= was out of scope for the #705 change and carries
+no such pointer yet -- adding one is a one-line follow-up.
+
 ** =sample= feature source variables
 
 | Round | File             | i        | v     | weight   | strata | Rural  |
@@ -1072,6 +1195,16 @@ rounds.  Source files and label handling:
 | 2012-13 | =PARTA/SEC2a.dta= | s2aq2 | embedded value labels                     |
 | 2016-17 | =g7sec2.dta=      | s2aq2 | embedded value labels                     |
 
+/Corrected 2026-09-02 (GH #731)./  The paragraph and table above and the
+"Still NOT wired" list below are *stale*: all *seven* waves declare
+=individual_education= today.  1987-88 and 1988-89 read =Y03I.DAT:GRADE= and
+1991-92 reads =S2.DTA:s2q2= (17,168 rows carrying the full letter ladder --
+the cached =S2.DTA= *is* the Section 2 education file, not a cover/control
+file), all three through the country =harmonize_education= table (GH #171);
+GLSS5/6/7 read their own wave-level tables since 2026-09-02.  Kept as written
+for the record of what was thought to block them.  See /Trap 7/ for the letter
+ladder and the =U6= collision.
+
 Still NOT wired (genuine blockers, not feature gaps to close cheaply):
 
 - *1987-88 / 1988-89* (GLSS1/GLSS2): the education module lives in
@@ -1261,7 +1394,7 @@ non-questionnaire evidence establish the ordering instead:
 |---+-------+--------|
 | 1 | =1988-89/Data/CLYR1YR2.DAT= bridges 85 clusters across the two waves | 75/85 agree on region overall, but *0 of the 6* touching an Upper region agree -- each differing in the direction a 9/10 swap predicts |
 | 2 | the three sibling waves' own tables | all read =9 = Upper West= |
-| 3 | this wave's raw =REGION= codes | run =1..11=, the 11-code era list (11 = a single "Foreign Country"), not GLSS2's 17-code list |
+| 3 | this wave's raw =REGION= codes | run =1..11=, the 11-code era list (11 = a single "Foreign Country"), not GLSS2's 17-code list.  /Corrected 2026-09-02: "GLSS2's 17-code list" is =Y01C:NRCREG='s list (a non-resident child's region of residence), which the 1988-89 config had mis-filed as =region=.  GLSS2's own =Y01A:REGION= is the SAME 11-code list as this wave's -- questionnaire-verified, block 1A2, PDF p.39.  See "1988-89 =Birthplace= ..." below./ |
 | 4 | Upper East is the more populous region | every other wave has more Upper East clusters than Upper West (ratios 1.78, 2.17, 3.00); 1987-88 alone inverted at 4/7 = 0.57 |
 
 After the fix the bridge agreement rises *88.2% -> 95.3%*, the Upper-region
@@ -1281,6 +1414,125 @@ error.
   =Brong Ahafo=.  Harmless-looking, but it means
   =df[df.Region == 'Brong Ahafo']= silently dropped all 170 of that wave's
   clusters.  Corrected in the wave's own table.
+
+** Trap 6 (verification, not data): the wave =mapping.py= files' =_dirs= ignore =LSMS_COUNTRIES_ROOT= (2026-09-02)
+
+All four wave modules -- =1987-88=, =1988-89=, =1991-92=, =1998-99/_/mapping.py=
+-- build the =code_label_map= search path as
+
+: path = files('lsms_library')/'countries'/'GhanaLSS'/'<wave>'
+: _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+
+=files('lsms_library')= is the *imported package's* location, which the
+=.venv= =.pth= pins to the main checkout.  So with only =LSMS_COUNTRIES_ROOT=
+pointing at a worktree, =Wave.grab_data= reads the worktree's =data_info.yml=
+while =region_dict= / =relationship_dict= / =rural_dict= are built from the
+*main checkout's* =categorical_mapping.org= -- a before/after comparison of a
+table edit is then silently a no-op.  Measured 2026-09-02: =_dirs[0]= was
+=.../mirrors/LSMS_Library/lsms_library/countries/GhanaLSS/1988-89/_= under the
+override.  The honest route is =PYTHONPATH=<worktree>= from a *neutral cwd*
+plus =assert 'wt-...' in lsms_library.__file__= (then =files()= resolves to
+the worktree); =_/ghanalss.py= already does it right with =countries_root()=
+(GH #436).  =tests/test_declared_spellings.py= records the same trap for
+1991-92 ("worth its own issue").  Not fixed here; the fix is
+=countries_root()/'GhanaLSS'/'<wave>'= in each module.
+
+** Trap 7: one label, two instruments -- =U6= is a university year in GLSS1/2/3 and Upper Sixth in GLSS5/6/7 (2026-09-02, GH #731)
+
+Found by the GhanaSPS =individual_education= task (PR #728) while reading this
+country's table as precedent; measured and fixed here.
+
+*What it was.*  =_/categorical_mapping.org= =harmonize_education= listed =U6=
+twice: =U6 -> Upper secondary complete= (inside the block of GLSS5/6/7 labels,
+first in file order) and =U6 -> Postgraduate= (in the =U1..U8= ladder, later).
+Nothing raised.  =_row_union_categorical= (=country.py= ~l.305-316)
+concatenates =[country, global]= and runs
+=drop_duplicates(subset=[key], keep='first')=, so the first row won and the
+second was gone before any wave ever saw the table --
+=Wave.categorical_mapping['harmonize_education']= reported =dup_keys=[]= on
+every wave.  A duplicate key is Trap 1's disease in a new coat: not a wrong
+answer that raises, but a plausible one chosen by file order, indistinguishable
+from a correct table.
+
+*Which meaning occurs where* -- measured on the raw source variable of every
+wave (=slurm_logs/ghana_audit/u6_measure_731.py=, output =.out= alongside):
+
+| wave    | variable                | raw label |   n | neighbours in the same ladder                                | meaning (source read)                                                                                                            |
+|---------+-------------------------+-----------+-----+--------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------|
+| 1987-88 | =Y03I.DAT:GRADE=        | =U6=      |   1 | =S4 S5 / A1 A2 / PS1 PS2 PS3 / T1 T2 T3 T4 / U1 U2 U3 U4 / U5 U6 U7 U8 / K (Koranic)= | university year 6.  Household questionnaire Section 3 block =3i= (printed p.6) col.7 "What was the highest grade he/she completed?", CODES box |
+| 1988-89 | =Y03I.DAT:GRADE=        | =U6=      |   4 | same                                                         | same instrument: the GLSS1 and GLSS2 questionnaire PDFs are one scan (78/78 pages pixel-identical; see below)                   |
+| 1991-92 | =S2.DTA:s2q2=           | =U6=      |   8 | =S1 throu S5 / A1 A2 PS1, PS2, PS3, T1 throu T4 / U1 throu U8 / K (Koranic) / JSS1 throu JSS3= | university year 6.  =pdf/G3QPartA.pdf= p.10, Section 2A Q2 "What was the highest class or form completed?"          |
+| 1998-99 | =SEC2A.DTA:s2aq2=       | --        |   0 | numeric codes: =Sec. (O Level) 08, Sixth Form 09, ... University 16= | no =U6= in this instrument (household questionnaire p.10, Section 2A Q2 "highest level completed")                    |
+| 2005-06 | =parta/sec2a.dta:s2aq2= | =u6=      |  74 | =s5=31, l6=32, u6=33, voc=41 ... polytechnic=51, university=52= | Upper Sixth.  =G5QPartA.pdf= p.11, Section 2A Q2 "What was the highest grade completed?"                                 |
+| 2012-13 | =PARTA/SEC2a.dta:s2aq2= | =U6=      | 131 | =S5=32, L6=33, U6=34, Voc/Tech=41 ... Polytechnic=51, University=52= | Upper Sixth.  GLSS6 Part A questionnaire p.10, Section 2A Q2 "What is the highest grade completed?"                 |
+| 2016-17 | =g7sec2.dta:s2aq2=      | =U6=      |  77 | =S5=32, L6=33, U6=34, Year one=41 .. Year six and above=46=  | Upper Sixth.  GLSS7 Module A (=GLSS7_MODULE A_30_9_16_for print.docx=), Section 2A Q2                                           |
+
+The reading is decided by the *neighbours*, not by the letter.  Where the
+ladder has =A1 A2= for the sixth form and =U1..U8= as a block, =U= is
+university; where it has =L6= then =U6= and university is a separate rung
+(=University=, or =Year one..=), =U6= is Upper Sixth.  Both readings occur in
+the data -- 13 people in the first, 282 in the second -- in *different waves*,
+never in one wave from two variables.  (=U5/U7/U8= occur only in GLSS1/2/3;
+=L6/l6= only in GLSS5/6/7.)
+
+*What was decided (2026-09-02).*  The country table keeps the *letter-ladder*
+reading, =U6 -> Postgraduate=, alongside =U5/U7/U8= in the same ladder --
+because the country table is where GLSS1-era vocabulary lives in this country
+(Traps 2 and 4: the country =relationship= and =region= tables are GLSS1's
+too), and because it is the only table the three letter-ladder waves read.
+The GLSS5/6/7 reading moved to *wave-level* =#+name: harmonize_education=
+tables in =2005-06/_/=, =2012-13/_/= and =2016-17/_/categorical_mapping.org=.
+Two mechanical facts shaped that, both measured:
+
+- A wave table *replaces* the country U global dict for its wave --
+  =Wave.categorical_mapping= (=country.py= ~l.1006) is a plain =dict.update=;
+  the row-union is global/country only.  Verified with a one-row sentinel
+  table appended to =2012-13/_/=: that wave saw *one* row and lost =L6=;
+  1991-92 and 2016-17 were untouched.  So each wave table lists *every* label
+  its source variable emits (32 / 33 / 33 rows), generated from the pre-edit
+  country mapping and asserted equal to it -- which is why the modern waves'
+  delivered counts are byte-identical before and after.
+- The two consumption paths resolve a within-table duplicate in *opposite*
+  directions: first-wins at the global/country union (=keep='first'=),
+  last-wins where a wave table becomes a dict
+  (=cat_table.set_index(k)[v].to_dict()=, =country.py= ~l.938).  Measured on a
+  three-row frame.  A guard against duplicate keys therefore belongs at
+  org-load time, before either path runs -- GH #674's family; proposed in the
+  #731 PR, not built there.
+
+*What moved.*  Exactly the 13 =U6= people: 1987-88 Postgraduate 5 -> 6 and
+Upper secondary complete 235 -> 234; 1988-89 3 -> 7 and 230 -> 226; 1991-92
+12 -> 20 and 453 -> 445.  Every other cell of every wave is unchanged
+(=slurm_logs/ghana_audit/api_before_731.out= vs =api_after_*_731.out=).
+1988-89 moved through the country table alone; its =_/= was not edited.
+
+*Not settled, on purpose.*  =U1..U4 -> Bachelor= (this ladder) versus
+GhanaSPS's =Level 100..300 -> Tertiary certificate/diploma=, =Level 400 ->
+Bachelor= (PR #728).  The instruments *sharpen* this without settling it: the
+letter codes are *years completed*, and the qualification is asked separately
+-- GLSS3 Q3 "What was the highest educational level attained?" (=O'level 5,
+A'Level 6, ... Bachelor 9, Master 10, Doctorate 11=), GLSS1/2 col.10 "What
+was the highest diploma obtained?" (=GCE A LEVEL 7 ... BACHELOR 10, MASTER
+11, DOCTORATE 12=) -- so a completed =U3= is "some university", a rung the
+canonical vocabulary does not have.  Wiring the qualification variable
+(=s2q3=; Y03I's diploma column) instead of, or alongside, the year ladder
+would be the principled fix.  Left as found: changing it is a separate
+decision with its own before/after.
+
+*Two things found on the way.*
+- The GLSS1 and GLSS2 "questionnaire" PDFs
+  (=1987-88/Documentation/questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf=
+  and =1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=)
+  differ in md5 (metadata; 18 bytes apart in size) but render to *78 of 78
+  pixel-identical pages*.  One scan, two catalog entries.  PR #751's page
+  index for GLSS2 (=slurm_logs/ghana_audit/glss2_questionnaire/PAGE_INDEX.org=)
+  therefore indexes GLSS1 as well.  Evidence crop for this trap:
+  =slurm_logs/ghana_audit/glss12_education_u6/=.
+- The country table's modern-vocabulary rows are now *inert* -- shadowed for
+  GLSS5/6/7, never emitted by GLSS1/2/3.  They are kept and labelled as
+  documentation; pruning them is a follow-up.  A future wave must bring its
+  own wave table: inheriting the country table would hand it the *university*
+  =U6=.
 
 ** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
 
@@ -1364,6 +1616,13 @@ ambiguous relative to the survey's definition of urban -- it is, by that
 definition, not urban.  That is an argument about the fold's *direction*, and
 a far better one than the withdrawn =Classification= column.  It is not a
 statement that GSS intended =SU= to be reported as rural.
+
+/Corrected 2026-09-02 (GH #705)./  "The survey's own urban threshold" above
+means *GLSS1/GLSS2's* -- and GLSS3's and GLSS6's -- not the programme's:
+GLSS4 set its urban threshold at *1,500* and folded the same 1,501--5,000
+band onto *urban*.  See /The urban cutoff MOVES across rounds/ under
+/Sampling Design/ for the round-by-round table and what it does to the
+delivered =Rural= column.
 
 Three further pieces of evidence point the same way.  None is a GLSS1/GLSS2
 sentence saying "semi-urban is rural"; take them for exactly what they are.
@@ -1508,7 +1767,15 @@ cluster.  Observed households per cluster (1987-88: min 10, median 16, max 48;
 1988-89: min 14, median 16, max 47) match that design.  Treat the agreement as
 corroboration, not identity.
 
-** Trap 5: the =rural= table in 1988-89 is NOT a rural table (2026-08-21)
+** Trap 5: the =rural= table in 1988-89 is NOT a rural table (2026-08-21; RESOLVED 2026-09-02)
+
+/Resolved 2026-09-02 (GH #692)./  The table is now =#+name: nrcpl_place_type=
+with the questionnaire citation as commentary above the name line, the
+editorial =Classification= column is gone, and the dead =rural_dict= in
+=1988-89/_/mapping.py= is deleted.  The Y01C =region= table beside it is now
+=nrcreg_region= (GH #695, below).  The rest of this entry is kept as the
+record of what it was and how it was sourced.
+
 
 =1988-89/_/categorical_mapping.org= carries, under its =* Y01C= heading,
 
@@ -1560,16 +1827,25 @@ Worth stating once, because "is this table live?" has no single answer:
 | 2 | =mappings:= / =mapping:= in a wave =data_info.yml= (=country.py:793=, =:809=) | =Wave.categorical_mapping= (=country.py:862=) = country dict =.update(wave)= | yes; *wave wins, unconditionally* |
 | 3 | =code_label_map(name, _dirs)= in a wave =mapping.py= | its own filesystem search, *wave dir first* | yes |
 
+/Corrected 2026-09-02./  Line numbers drift; as of =bed7c99a= they are
+=_apply_categorical_mappings= at =country.py:2403=,
+=Country.categorical_mapping= at =:1781=, =Wave.categorical_mapping= at
+=:1006=, the =mappings:= consumer at =:926-960=, and =_row_union_categorical=
+at =:305-316=.  Path 2's =cat_table.set_index(k)[v].to_dict()= is *last-wins*
+on a duplicate key, while the global/country union is *first-wins*
+(=keep='first'=) -- see /Trap 7/.
+
 So of this country's three =rural= tables, *only one is dead*:
 
 - =1991-92= (2-way) -- *LIVE* via path 3 (=mapping.py:53=, consumed by
   =Rural()= at =:115=).  This is where GLSS3's =Rural= values come from.
 - =1998-99= (2-way) -- *LIVE* via path 3 (=mapping.py:19=, =Rural()= at =:82=).
 - =1988-89= (7-way) -- *DEAD*: =mapping.py:20= assigns =rural_dict= correctly
-  (=code_label_map= returns a 13-key dual-keyed dict, not the Trap-1 ={}=) and
+  (=code_label_map= returned a 14-key dual-keyed dict -- ='1'..'7'= and =1..7= -- not the Trap-1 ={}=; measured 2026-09-02, earlier text said 13) and
   *no function in the module ever references it*.  A correctly-loaded,
   wrongly-named dict sitting one line from where someone will write
-  =def Rural(value)=.
+  =def Rural(value)=.  /Deleted 2026-09-02 with the rename to
+  =nrcpl_place_type= (GH #692)./
 
 Note that =_ADDITIVE_CATEGORICAL_TABLES= (=u=, =harmonize_assets=,
 =harmonize_education=) governs the *global/country* boundary only.  The
@@ -1579,7 +1855,7 @@ Full workings, including the measured effect of adding a country-level =rural=
 table (it arms previously-absent fallbacks in 1987-88 and 2005-06 -- the Trap 4
 shape), are in =slurm_logs/ghana_audit/FINDINGS_orphan_rural_table.org=.
 
-** 1988-89 =Birthplace= decodes an 11-code variable with the 17-code Y01C table (2026-08-21)
+** 1988-89 =Birthplace= decoded an 11-code variable with the 17-code Y01C table (2026-08-21; RESOLVED 2026-09-02)
 
 =1988-89/_/data_info.yml:51= declares =Birthplace: REGION= -- i.e.
 =Y01A.DAT:REGION=.  =mapping.py:19= decodes it through the wave's =region=
@@ -1610,13 +1886,68 @@ page, which was *not located* in the pages examined (4--16, 76--78): the
 printed sequence runs 1a (0B), 2 (0C), 2a (Part B divider), 3 (1B), 3a (1C),
 4 (2A) with no 1A block.  An exhaustive 78-page sweep was not run.
 
+*** RESOLVED 2026-09-02 by the exhaustive sweep (GH #695) -- C4 run, outcome (i)
+
+All 78 pages of
+=1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=
+were rendered (CCITT -> synthetic TIFF -> PIL, script and one-line-per-page
+index in =slurm_logs/ghana_audit/glss2_questionnaire/=).  *Block 1A exists*:
+=SECTION 1.  PART A.  HOUSEHOLD ROSTER= is *PDF pages 38-39* (printed 27a =
+instructions, block =1A1=; printed 28 = the grid, block =1A2=).  It is bound
+*after* Section 7 (respondents for round two) and *before* Section 8, whose
+page ends =END OF ROUND ONE= -- not between =0C= and =1B= where the section
+numbering would put it.  That binder order is why a sweep of pages 4-16
+concluded "no 1A block".
+
+Block =1A2=, column 10, "In what Region was ...[NAME IN QUESTION 1]... born?",
+verbatim:
+
+: WESTERN.....1   CENTRAL.....2   GREATER ACCRA.....3   EASTERN.....4
+: VOLTA.......5   ASHANTI.....6   BRONG-AHAFO.......7   NORTHERN....8
+: UPPER WEST..9   UPPER EAST.10   FOREIGN COUNTRY (SPECIFY).......11
+
+Eleven codes; a *single* foreign-country code.  Column 11 of the same block
+("What is his/her nationality?") is the 8-code =NAT= list (Ghana 1, Burkina
+Faso 2, Mali 3, Nigeria 4, Ivory Coast 5, Togo 6, Other Africa 7, Other 8),
+column 3 is the 14-code relationship list, column 13 is =MON= (months away).
+Everything the data showed -- =REGION= 1..11, =NAT= 1..8, =REL= 1..14 -- is
+what the form prints.
+
+*GLSS2 prints THREE different region code lists*, and they are
+question-specific:
+
+| list | codes | where |
+|------+-------+-------|
+| birth region | 11 (11 = Foreign Country) | =1A2= col.10 (Y01A:REGION), PDF p.39 |
+| region of residence / origin | 17 (11 = Nigeria ... 17 = Other) | =1C= col.12 (Y01C:NRCREG), PDF p.8; Section 6 col.8 (Y06:REGMOV), p.35; =11D= col.5, p.63 |
+| remittance sender's region | 14 (11 = Nigeria, 12 = Ivory Coast, 13 = Other Africa, 14 = Other) | =14A= col.5, PDF p.73 |
+
+Never carry a region list across sections here.
+
+*The fix* mirrors =e0f6e36b= and Trap 2's wave-first discipline:
+=1988-89/_/categorical_mapping.org= gains a =* Y01A= heading with a
+=#+name: region= table transcribed from block =1A2= (same label spellings as
+1987-88's table -- =Brong Ahafo= spaced, =Foreign Country=), and the Y01C
+17-code table is renamed =nrcreg_region= so the two cannot be confused.
+=mapping.py='s =code_label_map('region', _dirs)= is untouched and now
+resolves to the Y01A table (=df_from_orgfile= matches the whole
+=#+name: region= line exactly, so =nrcreg_region= cannot shadow it).
+
+Verified cold in a private =LSMS_DATA_DIR= with =LSMS_NO_CACHE=1=:
+=household_roster= 1988-89 has 14,924 rows before and after; *exactly 236
+rows change*, all =Nigeria -> Foreign Country=; the ten Ghanaian labels and
+their counts, the 6 NA, =Relationship= and the kinship columns are
+byte-identical.  1987-88 and 1988-89 now share one =Birthplace= vocabulary.
+
 ** The two GLSS1/GLSS2 =categorical_mapping.org= files each name the other wave
 
 =1987-88/_/categorical_mapping.org= line 1 says "...for *1988-89*";
 =1988-89/_/categorical_mapping.org= line 1 says "...for *1987-88*".  Harmless,
 but it is evidence the two are near-copies: =diff= is the header line, three
 =Refined= / =Regined oil= typos, and the =* Y01C= section, which exists only in
-1988-89.  Fix when either file is next touched.
+1988-89.  Fix when either file is next touched.  /1988-89's header was fixed
+2026-09-02 (GH #692); 1987-88's still says "1988-89" -- fix when that file is
+next touched./
 
 * Adjudication of the 11 =absent= coverage cells (2026-08-20)
 
@@ -1706,6 +2037,16 @@ header (=Compression=4=, =PhotometricInterpretation=0=, one strip, =RowsPerStrip
 in this environment, so a *targeted* read of known pages is feasible and an
 exhaustive term-search of the form is not -- which is exactly why
 =food_security= for these two waves is =unsure= and not =not-asked=.
+
+/Added 2026-09-02./  An *exhaustive* render of the GLSS2 file is now cheap
+and done: =slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py=
+(pdfminer for the object tree, PIL for the TIFF; 16 s for all 78 pages) and
+=PAGE_INDEX.org= there lists what every page is, with the form-block id and
+printed page number.  Two things it settled that a targeted read could not:
+the household roster (Section 1 Part A) is bound at *PDF pp.38-39*, after
+Section 7 and before Section 8's =END OF ROUND ONE= -- not where its section
+number says -- and pages 74-78 are portrait scans (Sections 15-17) rotated
+90 degrees.  Read the index before assuming a block is absent.
 
 Two GLSS1/GLSS2 documents that *do* have text and are worth reaching for first:
 =1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf= (the
@@ -1811,3 +2152,210 @@ survey year.  GLSS1/GLSS2 (=COMM.DAT= etc.) carry *none* of it; GLSS5/6/7 are
 format 113+ and carry none either.
 
 Full audit: =slurm_logs/sentinel_audit/FINDINGS_1.7498e100.org=.
+
+* Community price survey -- =community_prices= (GH #562 phase 3a, 2026-09-02)
+
+Every GLSS round fielded a dedicated market/community PRICE questionnaire,
+separate from the household instrument, and six of the seven waves ship its
+data.  =community_prices= is that survey at its own grain, REPORTED fields
+only (see =_/glss_prices.py= and the =data_scheme.yml= block for the column
+contract).  Phase 3b -- the inverse price->quantity imputation -- is NOT wired
+here; nothing in =transformations.py= was touched.
+
+** Sources, geography and the join to =sample().v=
+
+| Wave    | Price file                          | Form is keyed on                                   | Price clusters | ... in sample().v | sample().v priced |
+|---------+-------------------------------------+----------------------------------------------------+----------------+-------------------+-------------------|
+| 1987-88 | =Data/PRICE.DAT= (+ =PRICE.DCT=)      | LOCALITY / CLUSTER (1987 form, rendered)           |            165 | 163/165           | 163/176           |
+| 1988-89 | =Data/PRICE.DAT=                      | same form (the 1988 PDF is the same blob as 1987's) |            112 | 106/112           | 106/170           |
+| 1991-92 | =Data/Prices/G3PRICE.DTA=             | REGION / DISTRICT / NAME OF LOCALITY / EA          |            256 | 256/256           | 256/365           |
+| 1998-99 | =Data/Prices/G4PRICE.DTA=             | same instrument as GLSS3 (text layer)              |            253 | 251/253           | 251/300           |
+| 2005-06 | NONE distributed                    | REGION / E.A. NUMBER / MARKET NUMBER (=G5QPrice.pdf=) |            -- | --                | --                |
+| 2012-13 | =Data/PRICES/price_sec{0,1,2}.dta=    | REGION / DISTRICT / LOCALITY / EA / MARKET NUMBER  |          1,015 | 1015/1015         | 1015/1200         |
+| 2016-17 | =Data/g7price.dta=                    | REGION / DISTRICT / CLUSTER / MARKET NAME (xlsx + cover docx) |    398 | 398/398           | 398/1000          |
+
+=v= is therefore the survey's own cluster / EA number in every wave -- the
+same =CLUST= / =clust= keyspace =sample= uses (1xxx ... 7xxxx) -- and is
+carried NATIVELY in the index.  No cluster id is fabricated anywhere.
+Corroboration beyond the key match: =loc5= in =G3PRICE.DTA= agrees 100% with
+=POV_GH.DTA='s =loc5= on all 256 clusters; the BID's "165 ... price
+questionnaires" for year one (Table 1a, printed p.13; p.17 "coded for 164 of
+176 first year clusters") is the 165 distinct =CLUST= in the file.  Price
+clusters with no household in the wave's sample: 1987-88 clusters 1020 and
+1167 (85 rows); 1988-89 clusters 2007, 2036, 2177, 2198, 2209 and 2692 (271
+rows -- BID p.17 lists price forms "coded for 107 of the 170 second year
+clusters", and these six are price forms for clusters the household file
+does not carry); 1998-99 two clusters (of 253) are not in =SEC0A.DTA=.
+
+** The grain is (t, v, j, u, obs) -- three vendors per item, in every wave
+
+Every form records up to THREE observations per item: the 1987 form's "1ST /
+2ND / 3RD OBSERVATION" (KG + PRICE), BID §2.3 "Prices from up to three
+vendors are collected", GLSS3/4/5/6 "1ST / 2ND / 3RD OBSERVATION" (KG or
+KG/LITRE + PRICE; DESCRIPTION + 1ST/2ND/3RD PRICE for non-foods), GLSS7's
+a/b/c PRICE / QTY / UOM.  Malawi's and Nigeria's =community_prices= are
+=(t, v, j, u)=; Nigeria =.first()=-s same-cell duplicates.  Here the three
+observations are kept as rows under =obs= (core does not aggregate), so
+GhanaLSS departs from the precedent by one index level.  =obs= 1-3 is the
+form's slot; larger values occur only where the source holds more than one
+record for a (cluster, item, unit) and are enumerated deterministically
+(interview month, then description/brand, then slot).  A fourth cause is the
+=j= axis itself: where several price items fold onto one label (Nescafe tin
++ sachet -> =Coffee=; the five chocolate drinks -> =Chocolate Drink=, 5 x 9
+rows = =obs= 45 in 1998-99) the rows stack under one (v, j, u) and
+=Description= tells the items apart.  Share of rows at =obs= <= 3: 1987-88
+98%, 1988-89 97%, 1991-92 90%, 1998-99 88%, 2012-13 87%, 2016-17 81%.
+
+An observation slot with no reported price is not a row (an empty slot is
+not a reported price).  Slots dropped, per wave: 1987-88 1,262 of 17,844
+(7.1%); 1988-89 2,265 of 14,907 (15.2%); 1991-92 and 1998-99 none (the files
+are already one row per observation); 2012-13 191,223 of 479,466 (39.9% --
+second and third vendors are often blank, and so are non-food items a
+market does not sell); 2016-17 31,458 of 252,366 (12.5%).
+
+- 1988-89: two clusters were priced twice -- 2305 in June AND September
+  1989 (a genuine repeat visit), 2310 twice in one month (25 of its 48 item
+  pairs byte-identical).  Cluster 2726's rows carry =YRINT=88, MOINT=3=: a
+  first-year price carried into the second-year set (BID p.17: "price data
+  are available from the first year for 43 additional clusters" -- only this
+  one materialises in the shipped file).
+- 1991-92 / 1998-99: the files are already long (one row per observation)
+  and carry no slot; typically three rows per (clust, item), but 546 / 744
+  (clust, item) pairs carry six and 8 / 108 carry nine.
+- 2016-17: several brand lines per item and the two mis-keyed clusters below.
+
+** What is and is not in the file, per wave
+
+- *1987-88 / 1988-89.*  =PRICE.DAT= is comma-delimited with a header (Trap
+  above; the reader handles it).  Per (CLUST, ITEMNO): =QUANn=/=PRICEn= for
+  n=1..3, =MOINT=/=YRINT= (the price interview, "may not correspond to the
+  date of the household interview", BID §6.2), and =PRICEnU= (=PRICEn/QUANn),
+  =DEFL= (Appendix E CPI) and =PRICE= (mean of PRICEnU / DEFL) -- CALCULATED
+  fields, verified (99.1% / 99.4% of rows reproduce them) and NOT stored.
+  1987-88 has =TYPRES= (BID's 7-way location type); 1988-89 does not.  BID
+  §2.3: "Weighing scales were used to determine the exact weight of food
+  items", and the file confirms the form's bases item by item: eggs =QUAN=1=
+  (priced each), the evaporated-milk tin =0.17=, the four drugs 3-4 tablets,
+  akpeteshie =0.25= (the "1 quarter" bottle), every DESCRIPTION item =1=.
+  1988-89 carries one extra code 48 (QUAN median 0.5, PRICE1 120) on no form
+  we hold: kept as "Unidentified price item 48".
+- *1991-92 / 1998-99.*  =G3PRICE.DTA= / =G4PRICE.DTA= ship ONLY the per-unit
+  value (=p= / =price= = PRICE/KG -- values like 500/7 = 71.4286 give it
+  away); the weighed KG is not distributed and the files carry no labels
+  (GLSS3/4 Stata 5 files, as noted above).  =NumberOfUnits= is therefore the
+  form's stated basis per item (=Basis= in =harmonize_price_item=).  =time=
+  in G3PRICE is the survey month (251 of 256 clusters have exactly one
+  value), not a visit counter.
+- *2012-13.*  Foods: =s1stkg=/=s1stpx= etc. -- the KG/LITRE figure and the
+  price per observation.  Whether a figure is kg or litres is NOT in the file;
+  the =Unit= column of the 2012-13 table records a per-item judgement
+  (liquids in litres).  Non-foods: the reader's free-text basis =s2desc=
+  (3,437 distinct strings: "20PCS", "20 PIECES", "20 PICES" ...) -> =u= is
+  =Other Unit= and the text goes to =Description=.  The =.dta= value labels
+  (=fcode= 1-102, =nfcode= 103-157) are the coding of the shipped file; the
+  PRINTED GLSS6 form lists 89 + 47 items under a different numbering (its 006
+  is "Bread - sugar bread" where the file's 6 is; its 016 "Chicken" is the
+  file's 16; but 017 "Game birds" is nowhere in the file and the file's 17 is
+  crustaceans).  Decode from the labels, never from the printed form.
+  Prices are stamped per EA but were collected at 41 market numbers (323
+  region/district/market keys for 1,015 EAs; up to 20 EAs share one key, and
+  EAs sharing a key carry identical prices -- =s1stpx= has one distinct value
+  within 18,854 of the 32,000 non-null (key, item) cells).  The cover's
+  =remarks= say why: "KOKOLIGU HAS NO MARKET AND THEY USE THAT OF NANDOM".
+  Kept native; a consumer who wants market-grain prices dedups on
+  (region, district, market).
+- *2016-17.*  =ln= is the item code (644 values), =bname= the item,
+  =itname= the brand line (1,207 values), =price{a,b,c}= / =quantity{a,b,c}= /
+  =unit{a,b,c}= / =unito{a,b,c}=.  The unit codes carry the file's OWN value
+  labels: the =unit_9b= list, except code 72 = "Service" (=unit_9b= says
+  Visit) and an extra 75 = "Visit".  Decode from the price file's labels.
+  ALL 398 price =clust= values are in =g7sec0.dta='s 1,000 EAs, but the price
+  file's =region=/=district= contradict the household cover for 11
+  (clust, region) pairs -- clusters 70002 and 70909 hold a second EA's rows
+  under region 5 (cover: 1 and 10), and 70195/70210/70211/70247/70327/
+  70747/70906/70908 are stamped with a wrong region for their single set of
+  rows.  =v= is =clust= regardless (the cover is authoritative for region);
+  the duplicated content shows up as =obs= 4-6.  Phase 3b may want to drop
+  70002 and 70909.
+
+** GLSS3's price form is the GLSS4 form; GLSS3's own code list is reconstructed
+
+All three GLSS3 price-form files (=pdf/G3QPrice.pdf=,
+=GHA_1991_GLSS_Price_Questionnaire_EN.pdf.pdf=, =Glss3 qsts and manuals
+docs/G3QPrice.doc=) carry the 123-item list that
+=GHA_1998_GLSS_Price_Questionnaire_EN.pdf= carries (the text diff is the
+title only), while =G3PRICE.DTA= has codes 1-117.  Aligning per-item median
+prices and observation counts between the two waves shows the offset
+growing from 0 to 6 at identifiable points -- exactly 123 - 117 -- so
+GLSS3's list is the GLSS4 list WITHOUT six items, renumbered:
+
+| G3 codes | G4 codes | offset | item absent from GLSS3          | anchors (G3 median -> G4 median) |
+|----------+----------+--------+---------------------------------+----------------------------------|
+| 1-5      | 1-5      |      0 |                                 | maize 94 -> 480, rice local 250 -> 1333 |
+| 6-33     | 7-34     |      1 | 6 Sorghum (G4 n=68)             | wheat bread 375 -> 2000, MARGARINE 1200 -> 6222 per kg, okro 267 -> 1429 |
+| 34-43    | 36-45    |      2 | 35 Pepper (sweet green) (n=369) | tomato paste 1143 -> 7143, beef 889 -> 5333, bushmeat 1294 -> 13333 |
+| 44-48    | 47-51    |      3 | 46 Live chicken (poultry)       | eggs 50 -> 250, evaporated-milk tin 180 -> 1100, sugar 311 -> 1600, salt 100 -> 506, NESCAFE TIN 13000 -> 60000 |
+| 49       | 53       |      4 | 52 Nescafe (sachet)             | Bournvita tin 1889 -> 12500 |
+| 50       | 55       |      5 | 54 Bournvita (sachet)           | Milo tin 2000 -> 13750 |
+| 51-117   | 57-123   |      6 | 56 Milo (sachet)                | tea 6000 -> 50000, aspirin 50 -> 100, wax print (6 yd) 10000 -> 55000, handkerchiefs (dozen) 1440 -> 9600 |
+
+The tail (G3 51-117 = G4 57-123, 67 items, ratios 3-8 throughout) and the
+anchors are unambiguous.  The weakest links, flagged in the 1991-92 table's
+=Note= column: code 5 is read as "Rice (Imported)" rather than "Sorghum" on
+price level (289 vs rice local 250; sorghum would sit near guinea corn 163)
+despite its low count (n=50), and codes 49-51 are assigned among the
+tin/chocolate-drink set by price level.  A GSS-held GLSS3 price form would
+settle both; until then this is an INFERENCE and is labelled as one.
+
+** =j=, =u= and the shared axes
+
+No wave's price code scheme is its consumption (=Code_9b=) scheme -- 0 of 644
+GLSS7 codes and 5 of 102 GLSS6 codes are label-identical -- so =j= is decoded
+by NAME through a per-wave =harmonize_price_item= table (=Code | Label |
+Preferred Label | Food | Unit | Basis | Note=) appended to each wave's
+=categorical_mapping.org=, onto that wave's =harmonize_food= Preferred Label
+where the axis names the item (=Food=yes=), the later waves' spelling where a
+food is not on the wave's axis (=Food=own=: 1987-88 has no Bread / Pepper /
+Juice / Guinea corn / specific-oil labels; 1998-99 no Cocoyam leaves / Tomato
+paste / Snail), and an own label for non-foods -- made unique per code (=Orange [ln 771]= is
+a toilet roll, =Apple [ln 812]= a wrist watch, =Sony [ln 640]= a corded
+phone, =Sony [ln 669]= a radio) wherever a non-food name is also a food
+label, recurs across blocks, or is an "OTHER (SPECIFY)" line: 80 such codes
+in 2016-17, none elsewhere.  Where the axis folds two
+price items together (Goat (fresh) + Fresh mutton -> =Goat=; Onion +
+Shallots -> =Onion=; palm wine -> =Wine=, pito -> =Beer=) both are kept and
+=Description= tells them apart.  The overlap with =food_acquired().j= was
+checked against the =harmonize_food= tables, not a built =food_acquired=
+(the corpus's largest table; not built on this slice).
+
+=u= is the =_/unit_labels.org= Preferred Label.  Labels the price surveys
+need that the axis lacks: =Tablet=, =Capsule=, =Bottle= (the 1980s/1990s
+drug bases) -- reported, not added (=unit_labels.org= is not in this task's
+ownership).  While there: =unit_labels.org= maps "Margarin tin" to
+=Margarin tin= and "margarin tin" to =Margarine Tin= -- two Preferred Labels
+for one spelling pair.
+
+** 2005-06: asked, not distributed
+
+GLSS5 fielded the price questionnaire (=Documentation/G5QPrice.pdf=, 9 pp
+with a text layer: EA + MARKET NUMBER, three observations, KG/LITRE + PRICE,
+89 food codes -- the same instrument GLSS6 used), and the GSS NADA DDI
+shipped with the wave names it as one of the five instruments, but the DDI's
+data-file inventory (sec0-sec12c, com-sec0-com-sec52) has no price file,
+nor does the tree (49 parta/partb files, the 14 files in =community.zip=,
+every file in the ten =aggregates/*.zip=).  The WB Microdata Library holds
+no raw GLSS5 entry at all (only the SHIP harmonized extract, id 1064); the
+wave came from GSS NADA catalog/5, unreachable from this node.  Adjudicated
+=asked-not-distributed= (C1;C2;C4) in =.coder/coverage/absent_verdicts.csv=
+-- an acquisition item, not an absence.
+
+** Trap 6, applied
+
+The new scripts resolve every config path through =countries_root()=
+(=_/glss_prices.py=: =wave_dir()=, =price_item_table()=, =unit_label_map()=)
+and assert during verification that it points at the worktree; nothing here
+goes through the wave =mapping.py= modules.  Documentation blobs were fetched
+lock-free through =local_tools._ensure_dvc_pulled= + the sidecar md5
+(=slurm_logs/ghana_audit/community_prices/fetch_docs.py=) because
+=data_access.get_data_file= walks the DVC index through =DVCFS.exists()= and
+hung for more than ten minutes on this Lustre slice.

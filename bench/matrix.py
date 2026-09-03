@@ -55,6 +55,9 @@ TIER_COLOR = {
     # exactly the mistake of grading Nepal `n/a`.
     "blocked":               "#e8590c",
     "unconfigured":          "#fd7e14",
+    # A configured country that never declared this feature (#724/#725):
+    # same "work not started" family as `unconfigured`, one shade lighter.
+    "undeclared":            "#ffa94d",
     "declared": "#cfe2ff",
     "dropped":  "#f5c2c7",
     "broken":   "#dc3545",
@@ -66,7 +69,7 @@ TIER_GLYPH = {
     "n/a": "·", "absent": "–", "declared": "?", "dropped": "✗!",
     "broken": "✗", "builds": "⚠", "sane": "✓", "blessed": "★",
     "not-asked": "∅", "asked-not-distributed": "⤓", "unconfigured": "⌀",
-    "blocked": "⛔",
+    "blocked": "⛔", "undeclared": "⌀",
 }
 
 

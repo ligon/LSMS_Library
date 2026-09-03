@@ -221,3 +221,381 @@ Data Scheme:
     index: (t, i)
     Roof: str
     Floor: str
+
+  plot_features:
+    # Lasting plot characteristics, all three waves, YAML path: one `dfs:`
+    # merge per wave (size file primary, tenure file secondary,
+    # `merge_how: left`) on the plot key, plus ONE country-level df_edit hook
+    # (ghanasps.plot_features) that turns the native size into hectares and
+    # drops the null-plot rows.  Index (t, i, plot_id); `v` is NOT declared
+    # and must NOT be -- `sample` is wired for every wave and
+    # _join_v_from_sample() attaches it at API time.  The join is TOTAL: every
+    # plot household is in its wave's sample key file (2,812 / 2,678 / 3,041).
+    #
+    # SOURCES -- module 4 is agriculture BY CONTENT in every wave (variable
+    # and value labels checked, CONTENTS.org), never assumed from the number:
+    #
+    #   wave     size / unit                                   tenure
+    #   2009-10  S4AII.dta  area_ha, s4aii_a10, s4aii_a11      S4AIV.dta  s4aiv_a45
+    #   2013-14  04h_agsection.dta  totalsize, plotsizeunit    04i_landtenure.dta  obtainhow
+    #   2017-18  04h_agsection.dta  totalsize, PLOTUNIT        04i_landtenure.dta  obtainhow
+    #
+    # THE 2017-18 UNIT TRAP (GH #732).  Wave 3 first asks "Can [Name] provide
+    # the size of plot in acres?" (plotsizeacres: 4,791 Yes / 575 No) and asks
+    # `plotsizeunit` ONLY of the 575 who said No.  The resolved unit for every
+    # plot is `plotunit` (5,366/5,366 non-null).  Reading the natural-looking
+    # `plotsizeunit` -- the column wave 2 uses -- leaves 4,791 of 5,366 plots
+    # (89.3%) with no unit and therefore no Area, and NEITHER framework guard
+    # fires: the Site B null-read guard needs 100% null, and
+    # _assert_built_required_columns checks presence, not content.
+    # tests/test_ghanasps_plot_features.py pins Area >= 95% non-null per wave.
+    #
+    # "ROBES".  The unit list is spelled Acre/Pole/Rope/Plot in 2009-10,
+    # Acres/Poles/Ropes/Plot in 2013-14 and Acres/Poles/ROBES/Plots in
+    # 2017-18.  Both the wave-2 and the wave-3 INSTRUMENT print "Robes"; wave
+    # 2's data label was corrected to "Ropes", wave 3's was not.  The
+    # `AreaUnit` table in _/categorical_mapping.org folds every spelling onto
+    # GhanaLSS's vocabulary (Acres / Poles / Ropes / Plot / Other) at
+    # extraction time.
+    #
+    # HECTARES.  2009-10 ships a producer-computed `area_ha`; dividing it by
+    # the reported native size recovers the factors to float precision
+    # (within-unit sd ~1e-8; slurm_logs/ghanasps/FINDINGS_agriculture.org):
+    #     Acre 0.404694   Pole 0.409551   Rope 0.236342   Plot 0.102388  ha
+    # Waves 2 and 3 ship no area_ha, so the hook applies WAVE 1's OWN factors
+    # to their native sizes -- chosen for internal consistency with the
+    # shipped wave-1 numbers rather than the standard acre (0.404686 ha, a
+    # 2e-5 relative difference; seen, noted, not used).  Wave 1 prefers the
+    # shipped area_ha where present and derives from size x factor otherwise;
+    # measured, that fallback takes 0 rows: area_ha equals size x factor
+    # wherever both exist (0 of 5,553 rows differ by > 1e-4 ha) and is null
+    # exactly where the unit or the size is missing (133 of 5,686 plots, 2 of
+    # which report the unit 'Other').  Area is NaN wherever the unit has no
+    # factor: 10 wave-2 'Other - Specify' plots ('1 bedroom', '25 BY 30 FEET',
+    # '16 Squares', ...) and 6 wave-3 free-text plots (see 2017-18).
+    #
+    # Two wave-3 plots report 70,000 Poles (28,669 ha each; the next largest
+    # is 800 acres).  Left exactly as reported -- core does not edit data --
+    # and the wave-3 99th percentile (~12 ha, median ~0.8) shows the factor,
+    # not the tail, is right.
+    #
+    # `plot_id` IS a panel id from wave 1 to wave 2 (4,916 of 5,082 wave-1
+    # plots, 96.7%, reappear under the same number in 04h_preroster, an
+    # explicit carry-forward list) but NOT from wave 2 to wave 3: tested
+    # against a permutation null, the true (i, plotid) pairing does not beat
+    # chance on area, soil colour or distance (CONTENTS.org, FINDINGS).  Do
+    # NOT join plot-level GhanaSPS data across waves 2 and 3 on (i, plot_id);
+    # the `t` level already scopes every row, so nothing has to be prevented
+    # -- it only has to be known.
+    #
+    # TENURE -- every source label and its target.  The same table lives in
+    # _/categorical_mapping.org and is applied at EXTRACTION (unlike
+    # housing's Roof/Floor, which are API-time), because
+    # tests/test_table_structure.py runs the declared-spellings check on the
+    # CACHED parquet and Tenure has a declared vocabulary:
+    #
+    #   2009-10 s4aiv_a45               2013-14 / 2017-18 obtainhow                 -> Tenure
+    #   Purchase                        Purchased                                   owned
+    #   Inherit                         Inherited from deceased family member       inherited
+    #                                   Inherited from family member                inherited
+    #   Rent for cash or kind           Rented (for cash or kind), or sharecrop(ped) rented_in
+    #   Sharecrop                       --                                          sharecropped_in
+    #   Sharecrop with initial payment  --                                          sharecropped_in
+    #   Allocated free                  Allocated free of charge                    communal
+    #   --                              Begged                                      use_right
+    #   --                              Borrowed                                    use_right
+    #   --                              Other - specify / Other (please specify)    other_tenure
+    #
+    # Judgements, and what each rests on:
+    #  * 'Allocated free (of charge)' -> communal, NOT use_right.  The
+    #    waves-2/3 follow-up "What qualifies you to be allocated this plot
+    #    free of charge?" answers Lineage or Member-of-the-community for 456
+    #    of 648 (70%) and 474 of 637 (74%) such plots, and the grantor is a
+    #    relative or the chief for 69% / 75%; the friend-/employee-of-owner
+    #    minority (~20%) would read as use_right.  GhanaLSS maps its
+    #    equivalent 'Distributed by village/family' to communal.  In WAVE 1
+    #    the category is BROADER: that instrument has no Begged / Borrowed
+    #    option, so those plots land here too (2,091 plots against
+    #    648 + 225 + 80 in wave 2).
+    #  * Begged / Borrowed -> use_right ("held under agreement with a
+    #    use-rights owner, often non-cash", data_info.yml).
+    #  * Waves 2 and 3 MERGE rent and sharecrop into one option; it goes to
+    #    rented_in (sharecropping is rent paid in kind), because the canonical
+    #    vocabulary cannot be extended from a country config.  Wave 1 keeps
+    #    the distinction (387 rented_in + 626 sharecropped_in).  Consequence:
+    #    sharecropped_in exists ONLY in 2009-10, and waves 2-3 rented_in
+    #    includes sharecropping -- a cross-wave comparison of those two values
+    #    is an instrument artefact, not a trend.
+    #  * 'Other' free text (73 / 67 rows: "no man's land", "I just saw it and
+    #    started farming on it", "Caretaker", ...) is NOT decoded ->
+    #    other_tenure.
+    #
+    # NOT declared, deliberately: Irrigated (the source is "has a non-rain
+    # water source", weaker than the canonical meaning -- FINDINGS risk b);
+    # SoilType (not a straight extraction in any wave: a multi-variable
+    # S4AIII block in 2009-10, 12- and 15-way multi-select soil flags in
+    # 2013-14 / 2017-18); TenureSystem (no freehold/leasehold/customary
+    # question found); Latitude/Longitude (absent).
+    index: (t, i, plot_id)
+    Area: float
+    AreaUnit: str
+    Tenure: str
+
+  livestock:
+    # Household-animal roster, all three waves, YAML path: one source file
+    # per wave (wave 3 lists its `_osp` "other -- specify" tail as a second
+    # file, row-concatenated), the `animal` label harmonised at EXTRACTION
+    # through the `harmonize_species` table in _/categorical_mapping.org,
+    # plus ONE country-level df_edit hook (ghanasps.livestock) for what YAML
+    # cannot do -- see below.  Index (t, i, animal), the canonical grain in
+    # lsms_library/data_info.yml `index_info`.  `v` is NOT declared and is
+    # NOT joined: livestock's canonical index omits v and the table is in
+    # data_info.yml's `Join v from sample > skip_extra`, exactly as Uganda /
+    # Nigeria / Malawi document ("No v level").  Every livestock household
+    # is nonetheless in its wave's sample() -- 2,142 / 2,098 / 2,363, 100.0%.
+    #
+    # SOURCES -- module 03ai is livestock BY CONTENT in every wave (quantity
+    # possessed, sale value, per-species expenses, revenue), never assumed
+    # from the number, because GhanaSPS module letters move (01f is
+    # education in 2013-14 and EMPLOYMENT in 2017-18):
+    #
+    #   wave     file                                   HeadCount  HeadSold      HerdValue
+    #   2009-10  S3AI.dta                               s3ai_1     --            s3ai_3i (cedis) + s3ai_3ii (pesewas)/100
+    #   2013-14  03ai_animalquestions.dta               quantity   --            currentvalue
+    #   2017-18  03ai_animalquestions.dta + _osp.dta    quantity   quantitysold  currentvalue
+    #
+    # THE VALUE COLUMN IS HerdValue, NOT ValuePerAnimal.  data_info.yml splits
+    # the livestock value columns by ADDITIVITY and says the wording settles
+    # it.  All three GhanaSPS instruments ask for the HERD TOTAL, verbatim:
+    #
+    #   2009-10  S3AI variable label: "Q3.1 What is the current value of
+    #            these animals if you sold all of them (cedis)" / "Q3.2 ...
+    #            (pessewa[s])".
+    #   2013-14  ISSER_Yale_Part A_WAVE II.docx: "What is the current value
+    #            of these animals, if you sold all of them?  Gh Cedis and
+    #            pesewas".
+    #   2017-18  HH_Questionnaire_23_10.docx: "What is the current value of
+    #            the [animal type], if you sold all of them?  Indicate amount
+    #            as a decimal value (in Ghana cedis and pesewas).  For
+    #            example, enter 2.50 for 2 Ghana cedis and 50 pesewas."
+    #
+    # Uganda, Nigeria and Malawi ask "If you sold ONE of the [ANIMAL] today,
+    # how much would you receive?" -- a per-head reservation price.  These
+    # are NOT the same quantity: the GhanaSPS number sums over `animal` to a
+    # household's livestock wealth; theirs does not.  Corroborated by the
+    # conditional test data_info.yml prescribes: in the wave-2 grid, 0 of
+    # the 10,884 zero-head rows carry a value -- a herd total vanishes with
+    # the herd, a per-head price would not.  Per-head sanity (median
+    # HerdValue / HeadCount, GHS): cattle 300 / 700 / 1,155, goats 30 / 71 /
+    # 133, chicken 5 / 10 / 20 across the three waves -- cattle >> goats >>
+    # chicken in every wave, and the wave-1 numbers are on the same scale as
+    # the later decimal-cedis waves (a pesewas-as-cedis error would be x100).
+    #
+    # COLUMNS.  Only what the instruments record:
+    #   HeadCount  head possessed now.  A stock.  Wave 1 and wave 3 are
+    #              owned-only rosters (no zeros); wave 2 is a fixed
+    #              seven-species GRID asked of every household, whose
+    #              10,884 zero rows the hook drops (below).
+    #   HeadSold   head sold in the last 12 months -- ASKED IN 2017-18 ONLY
+    #              (quantitysold), hence `optional` so the Site B null-read
+    #              guard does not fire on the two waves that never ask it.
+    #              A flow against a stock: quantitysold > quantity on 72
+    #              wave-3 rows is not an error.
+    #   HerdValue  the herd total above, decimal GHS in every wave (wave 1
+    #              recombined from the cedis / pesewas pair by the hook).
+    # NOT declared, deliberately: ValuePerAnimal (never asked -- a per-head
+    # figure would be HerdValue / HeadCount, an analyst's transformation);
+    # SalesValue (the revenue questions -- s3ai_12, animalrevenue /
+    # productrevenue -- are animals AND products together, so they are not
+    # the canonical sales-of-animals total); HeadAcquired (never asked);
+    # TLU (a transformation).  The per-species EXPENSES (feed bought, feed
+    # home-produced, veterinary, shelter, labour, water, other) and REVENUE
+    # exist in every wave and have no canonical home -- left unwired,
+    # recorded in CONTENTS.org.
+    #
+    # `animal` VOCABULARY.  A precedent label wins wherever one exists so
+    # that Feature('livestock') agrees across countries: Uganda's
+    # species-level Cattle / Sheep / Goats / Pigs / Rabbits / Chicken /
+    # Donkeys / Other Poultry; Nigeria's and Malawi's Guinea Fowl / Duck /
+    # Turkey / Fish / Dove/Pigeon / Other Livestock.  Coinages where none
+    # exists (plural): Draught Animals, Dogs, Cats, Grasscutters, Guinea
+    # Pigs, Peacocks, Quails.  Spelling is harmonised, a named species is
+    # NEVER folded; only labels naming no species go to a catch-all (BIRDS /
+    # Bird -> Other Poultry; wave 1's `Other Farm Animals` -> Other
+    # Livestock).  Three wave-2 free-text spellings are genuinely
+    # unmappable and pass through as their own labels: '50', 'cut', 'dake'.
+    # Cross-wave caveats, all instrument artefacts: `Other Livestock` exists
+    # only in 2009-10 (that instrument offers no slot to name a guinea fowl
+    # or a duck, so they live in the catch-all); `Donkeys` (named in the
+    # free text) overlaps with `Draught Animals` (the grid row that includes
+    # donkeys).  The full table, its rule and every judgement are in
+    # _/categorical_mapping.org.
+    #
+    # THE HOOK (ghanasps.livestock), and why each step is there:
+    #   1. HerdValue = cedis + pesewas/100 for 2009-10 (YAML maps one column
+    #      to one column).  NaN only where cedis is null AND pesewas is 0.
+    #   2. Drops 2009-10's 8 null-animal rows (181 head, a REAL loss that no
+    #      column can identify; format_id would otherwise hand the collapse
+    #      a null index level to delete with a GrainCollapseWarning).
+    #   3. Keep-rule: a row survives iff ANY of HeadCount / HeadSold /
+    #      HerdValue is non-null and > 0 -- Nigeria's inclusive form of the
+    #      convention all three precedent countries apply to roster-grid
+    #      filler.  Inclusive because HerdValue is a stock valuation, so a
+    #      value alone IS evidence of a holding (9 wave-1 and 11 wave-3 rows
+    #      have a null head and a positive value; Uganda's value-excluding
+    #      form is about per-head prices and does not transfer).  Drops
+    #      10,884 + 13 wave-2 rows, 2 wave-1 rows and 9 wave-3 rows.
+    #   4. Sums duplicate (t, i, animal) lines with min_count=1: 2009-10's 20
+    #      households with 2-3 `Other Farm Animals` lines (42 rows -> 20;
+    #      DIFFERENT unnamed species added into one Other Livestock row --
+    #      the level that instrument never recorded) and 2017-18's one
+    #      household with Chickens/roosters in the main file and Chickens in
+    #      _osp.  Legal because every declared column is additive at this
+    #      grain; the Malawi / Uganda precedent.  It is a reducer and it is
+    #      kept bounded -- the test pins the per-wave counts so a NEW
+    #      duplicate turns red instead of being summed.
+    #
+    # Delivered on a cold build under LSMS_GRAIN_STRICT=1: 4,248 / 3,963 /
+    # 4,284 rows in 2,137 / 2,081 / 2,361 households, index unique, 0
+    # GrainCollapseWarning, 0 null-read reports, is_this_feature_sane().ok
+    # True.  See CONTENTS.org "Livestock" and
+    # slurm_logs/ghanasps/livestock_verify_cold.log.
+    index: (t, i, animal)
+    HeadCount: float
+    HeadSold:
+        type: float
+        optional: true
+    HerdValue: float
+
+  crop_production:
+    # Plot-crop harvest records, all three waves, at the grain
+    # (t, i, plot_id, j, u, season) -- Nigeria's shape (no `condition`: the
+    # instruments never ask the physical state of the harvest, so the
+    # canonical `unknown_condition` sentinel -- "a record whose condition
+    # code is missing or outside the source's labelled scheme" -- does not
+    # apply; there is no scheme to be outside of) plus Uganda's `season`
+    # level.  `v` is NOT declared and must NOT be -- `sample` is wired for
+    # every wave and _join_v_from_sample() attaches it.  `plot_id` is
+    # derived EXACTLY as plot_features derives it (2009-10 plot_no; 2013-14
+    # / 2017-18 plotid, via format_id) and every harvest plot is in that
+    # wave's plot_features key file (5,034 / 3,826 / 3,440 = 100.0%).
+    #
+    # MIXED BUILD PATH, declared `materialize: make`:
+    #   2009-10  a wave SCRIPT (2009-10/_/crop_production.py).  The
+    #            instrument is a plot-by-crop MATRIX -- S4AV1.dta (last MAJOR
+    #            season) and S4AV2.dta (last MINOR season), five harvest
+    #            slots per plot each -- and YAML cannot melt it.
+    #   2013-14  YAML (04n_harvestquestions) + the ghanasps.crop_production
+    #   2017-18  df_edit hook; 2017-18 `dfs:`-merges 04o_cropsalesstores-
+    #            questions for the plot-crop sales.
+    # Under the default build backend Country.load_from_waves dispatches
+    # per wave (YAML block -> grab_data; no block -> the wave script), which
+    # is how Tanzania's 2008-15 tables and Iraq's assets already build.
+    # Under LSMS_BUILD_BACKEND=make the flag routes to a COUNTRY-level make
+    # target, which a mixed table has no honest way to supply (a country
+    # concatenator would have to re-run the YAML waves itself), so that
+    # backend cannot build this table; nothing in tests/ uses it.  Recorded
+    # rather than hidden.
+    #
+    # THE S4AV2 LABEL ERROR (2009-10).  Every quantity / value label in
+    # S4AV2 says "harvested in the last major season".  The questionnaire
+    # (Documentation/Household_questionnaire_Part_A.pdf) heads the block
+    # "LAST MINOR SEASON: CROP (HARVESTS) 1" and asks "A122. What is the
+    # quantity harvested in the last minor season?"; S4AVI2's own chemical
+    # label agrees ("In the past minor season ...").  `season` is assigned
+    # from the FILE -- S4AV1 -> major, S4AV2 -> minor -- and the
+    # discriminating check is that the minor set is the SMALLER one (crop-1
+    # quantity on 4,825 vs 1,412 plots).  2013-14 / 2017-18 ask for "the
+    # total quantity which has been harvested over the last 12 months", so
+    # their `season` is the constant `annual` -- a recall period, not a
+    # season -- kept as a level so the waves share one shape.
+    #
+    # COLUMNS -- reported values only, native units, no kg conversion:
+    #   Quantity       harvested quantity in unit `u`.  2009-10 A81/A122;
+    #                  later `harvestquantity`.
+    #   Quantity_sold  2017-18 ONLY: the summed sale-channel quantity where
+    #                  every selling channel used the row's harvest unit
+    #                  (3,062 rows).  2009-10 never asks a sold quantity
+    #                  (S4BI and A83 are revenue only); 2013-14's sales file
+    #                  has no plotid.  `optional`, or the Site B null-read
+    #                  guard fires on the two waves that never have it.
+    #   Value_sold     2009-10 A83/A124 "What was the total revenue from this
+    #                  crop harvest (sold)?", cedis + pesewas/100, per season
+    #                  harvest record (S4BI's B71 is a season-less 12-month
+    #                  sales roster and is NOT used -- its crop rows match a
+    #                  major harvest slot for only 2,976 of 4,752 rows, and
+    #                  where both exist B71 == A83 for 891 of 2,156).
+    #                  2017-18: sum over the nine buyer channels of quantity x
+    #                  per-unit price ("the price for which [Name] sold one
+    #                  [unit]"), money being additive whatever the units.
+    #                  2013-14: NaN (no plotid).  `optional` for the 2013-14
+    #                  slice.  Decimal GHS in every wave.
+    #   harvest_month  str: sorted zero-padded month tokens, space-separated
+    #                  ('10 11'), because the later waves are multi-select.
+    #                  2009-10 is a PROXY -- the ending month of the major /
+    #                  minor season of the plot's DOMINANT crop (S4AIX1
+    #                  A289.2 / S4AIX5 A326.2) stamped on every harvest
+    #                  record of that plot-season; read it as the season's
+    #                  end, not the crop's own harvest date.
+    #
+    # `j` VOCABULARY: the `harmonize_crop` table in _/categorical_mapping.org,
+    # mapped on the DECODED label (codes are not stable: 2017-18 introduces
+    # -666 for Other; 2013-14 ships blank codes).  Preferred Label = the
+    # GhanaSPS food_items.org label where the harvested crop IS that food
+    # (Maize, Cocoyam, Groundnuts, Onions, Palm Nuts, Pepper (fresh or
+    # dried), Tomatoes (fresh) ...) so a crop `j` joins food_acquired.j --
+    # Uganda's stated purpose for its table; else Uganda's crop label (Beans,
+    # Cocoa, Coffee, Cotton, Rice, Other Crop); else a title-case coinage.
+    # Spelling harmonised, no crop folded.  2009-10 crop codes 0 / 44-47 /
+    # 90 (12 records) are defined nowhere in that instrument and are dropped.
+    #
+    # THE HARVESTED PART (2009-10 only) IS NOT `condition`.  A80.2 / A121.2
+    # "ID of part of crop harvested (e.g. Cocoa, Cocoa Leaves)": Leaves /
+    # Branches / Bark / Sap / Stem / Roots-tuber / Fruit-Seeds-Nuts / Bulb.
+    # That is WHICH product of the plant was taken, not the physical state
+    # of one product, and it is not force-fitted into the canonical level.
+    # But it cannot simply be dropped: 47 (plot, crop, unit, season) keys
+    # carry two records, and in 18 of them the parts DIFFER (cocoyam
+    # roots/tuber and cocoyam leaves, both in baskets) -- summing those adds
+    # tubers to leaves.  So, following the instrument's own example, a
+    # record whose part is a different PRODUCT (Leaves / Branches / Bark /
+    # Sap / Stem, except where that is the crop's principal product) gets a
+    # qualified `j`: `Cocoyam Leaves` (an existing food_items label, 88
+    # records) or `Crop (part)` for the rare rest.  Roots-tuber /
+    # Fruit-Seeds-Nuts / Bulb never qualify (yam "seeds" and cassava "fruit"
+    # are the main harvest with an odd code).  These labels exist ONLY in
+    # 2009-10, because only that instrument records the part -- a
+    # cross-wave instrument artefact like Tenure's sharecropped_in.  The
+    # remaining same-product duplicates (two harvest events of one product
+    # in one unit) are SUMMED, a bounded reducer whose per-wave group count
+    # tests/test_ghanasps_crop_production.py pins.
+    #
+    # `u` VOCABULARY: the harmonizedunit Preferred Labels of _/units.org --
+    # what food_acquired.u already delivers (Maxi bag, Tuber, Kilogram,
+    # Single ...).  2009-10 stores a unit CODE with no labels, decoded
+    # through the same unit09 -> harmonizedunit chain as its food_acquired
+    # script; 2013-14 / 2017-18 spellings are folded by the `harvest_units`
+    # table (NOT a table named `u`, which would be auto-dispatched onto
+    # every `u` level at API time).  `Unknown` where a quantity has no unit
+    # (194 2009-10 records) or the code is 0 / -1; a positive 2009-10 code
+    # the codebook does not define (1, 46, 50, 51, 53, 57, 58, 61, 80, 94;
+    # ~25 records) stays as the code string -- an accepted residual, never a
+    # guessed label.  `Other` where the respondent chose it, with the
+    # specify text folded only on an exact match to a vocabulary unit.
+    #
+    # NOT declared, deliberately: condition (never asked); intercropped
+    # (2013-14 / 2017-18 record a plot-level multi-select list of which crops
+    # were intercropped, not a per-crop flag); planting_month; perennial;
+    # market value of the harvest (A82 / A123, no canonical home); damage
+    # and expected-still-to-harvest quantities; the harvested part as a
+    # level.
+    index: (t, i, plot_id, j, u, season)
+    Quantity: float
+    Quantity_sold:
+        type: float
+        optional: true
+    Value_sold:
+        type: float
+        optional: true
+    harvest_month: str
+    materialize: make

@@ -788,7 +788,16 @@ surviving into the delivered table.  The discriminating test is "is the
 delivered per-wave value set a SUBSET of the canonical vocabulary", never
 "do the distributions look plausible".
 
-** GSPS separates Bamboo from Wood; the canonical vocabulary does not
+** GSPS separates Bamboo from Wood; the canonical vocabulary did not (RESOLVED 2026-09-02, GH #727)
+
+RESOLVED 2026-09-02: EL ruled that =Bamboo= (roof and floor) and =Terrazzo=
+(floor) join =canonical_housing_labels.org=, and that compound
+=Cement/Concrete= stays *Concrete*.  The =Bamboo= roof row now targets
+*Bamboo* (29 / 7 / 8 households by wave leave =Wood=) and the =Terrazo= /
+=Terrazzo= floor rows target *Terrazzo* (0 / 16 / 18 leave =Stone=);
+nothing else moves, and every delivered value is still inside the canon.
+The paragraphs below are the caveat as originally written, kept as the
+record of why the canon changed.
 
 The GSPS roof question offers *Wood* (code 2) and *Bamboo* (code 8) as
 separate options -- 20/10/11 and 29/7/8 observations across the three waves.
@@ -1222,3 +1231,480 @@ Given the documented =01f*= education/employment swap between 2013-14 and
 and =03ai_animalquestions= is livestock by content in both.  In 2009-10 the
 same content is =S4A*= (Section 4 Part A, land) / =S4B*= (Part B, crop
 marketing and storage) and =S3AI= (livestock).
+
+** Plot features: wired for all three waves, and what the build taught (2026-09-02)
+
+=plot_features= is now wired for all three waves, index =(t, i, plot_id)= with
+=v= joined from =sample()= at API time -- YAML path, one =dfs:= merge per wave
+(size file primary, tenure file secondary, =merge_how: left=) on the plot key,
+plus ONE country-level =df_edit= hook, =ghanasps.plot_features=, for the two
+things YAML cannot do (multiply the native size by a per-unit hectare factor;
+drop wave 1's null-plot rows).  Delivered on a cold build under
+=LSMS_GRAIN_STRICT=1=: *5,682 / 4,694 / 5,366* plots, =Area= non-null *97.73% /
+99.79% / 99.63%*, index unique, 0 =GrainCollapseWarning=, =v= 100% non-null,
+=is_this_feature_sane().ok= True.  Working: =slurm_logs/ghanasps/plot_features_verify.py=
+and its =_cold.log=.  Every label -> target and every judgement is in the
+=plot_features= block of =_/data_scheme.yml=; per-wave evidence is in each
+wave's =data_info.yml=.  What follows is only what was NOT already on record
+above.
+
+*** The wave-3 unit trap is real, and here is its exact anatomy (GH #732)
+
+=2017-18/04h_agsection.dta=: =plotsizeacres= ("Can [Name] provide the size of
+plot in acres?") is Yes for 4,791 and No for 575; =plotsizeunit= is asked
+only of the 575 (Poles 262 / Plots 154 / Robes 153 / Other 6); the
+producer-resolved =plotunit= is populated for all 5,366.  Where
+=plotsizeacres == 'No'=, =plotunit= equals =plotsizeunit= on 569 of 575 rows;
+the six exceptions are the 'Other (please specify)' plots, for which
+=plotunit= carries the *specify-box free text* instead of the closed answer:
+='2 miles squared'=, ='It has never been measured before. It is a family land
+that belongs to forsfathers'=, ='-999'= (x3), ="Don't know"=.  =-999= is this
+wave's "Don't know" sentinel typed into a text box.  All six map to
+=AreaUnit = Other= (the closed answer given) and get no hectare factor.
+
+*** "Robes" is in BOTH later instruments; only wave 2's data label was corrected
+
+The wave-2 instrument (Part A, section H) prints ="1---Acre 2----Poles
+3----Robes 4-----Plots 95----Other"= and the wave-3 instrument ="1-Poles
+2-Robes 3-Plots -666-Other"=.  Wave 2's =.dta= value label reads =Ropes=;
+wave 3's reads =Robes=.  So the misspelling is the *instrument's*, carried
+into the data in one wave and silently fixed in the other.  Wave 1 (A11)
+spells them in the singular: =Acre / Pole / Rope / Plot / Other=.  The
+=AreaUnit= table in =_/categorical_mapping.org= folds all three spelling
+systems onto GhanaLSS's =Acres / Poles / Ropes / Plot / Other=.
+
+*** The tenure question, C4 on all three instruments
+
+- Wave 1, Part A, *A45* :: "How did you obtain this plot?  1. Purchase
+  2. Inherit >>A50  3. Rent for cash or kind >>A52  4. Sharecrop >>A56
+  5. Allocated free >>A59  6. Sharecrop with initial payment >>A52".
+- Waves 2 and 3, *I1* :: "How did you obtain this plot, or gain the right to
+  farm this plot?  1 Purchased  2 Inherited from (deceased) family member
+  3 Rented (for cash or kind), or sharecropped  4 Allocated free of charge
+  5 Begged  6 Borrowed  95/-666 Other".
+
+Three things follow.  (a) Waves 2-3 *merge* rent and sharecrop into one
+option and *add* Begged / Borrowed; wave 1 does the reverse.  So
+=sharecropped_in= exists only in 2009-10 (626 plots), waves 2-3's =rented_in=
+(702 / 700) includes sharecropping, and wave 1's =communal= (2,091) is broader
+than waves 2-3's (648 / 637) because it also absorbs what later became Begged
+/ Borrowed (225 + 80 in wave 2).  A cross-wave comparison of any of those
+three values is an instrument artefact.  (b) Wave 1 routes option 6,
+"Sharecrop with initial payment", through the *rent* follow-up block (=>>A52=,
+the same skip as option 3) rather than the sharecrop block (A56) -- the
+instrument treats the initial payment as rent -- yet only 5 of its 63 plots
+record a cash amount there.  It is mapped to =sharecropped_in= (it is a crop
+share) and recorded here so nobody later reads the A52 routing as a
+contradiction.  (c) "Allocated free (of charge)" is a *communal / customary
+allocation*, not a use-right, and that is data, not taste: the follow-up
+"What qualifies you to be allocated this land?" (A59 / I36) answers
+Member-of-lineage or Member-of-village for *1,824 of 2,091* wave-1 plots
+(87%), and Lineage or Member-of-the-community for *456 of 648* (70%) and *474
+of 637* (74%) in waves 2 and 3; the grantor (A60 / "from whom") is a relative,
+the family head or the chief for the large majority.  The friend- /
+employee-of-owner minority (7% / 19% / 20%) would read as =use_right=.  Begged
+and Borrowed go to =use_right=.
+
+*** Area: wave 1's =area_ha= IS size x factor, so the fallback never fires
+
+The hook prefers the shipped =area_ha= and would derive =size x factor= where
+it is missing.  Measured: =area_ha= equals =s4aii_a10 x factor= to float
+precision on all 5,553 plots where both exist (0 differ by > 1e-4 ha), and is
+null exactly where the unit (121 plots) or the size is null or the unit is
+'Other' (2 plots).  So the derive path takes *0* wave-1 rows and wave-1 Area
+is the producer's own number.  Waves 2 and 3 are converted with wave 1's
+factors (Acre 0.404694, Pole 0.409551, Rope 0.236342, Plot 0.102388 ha; the
+standard acre is 0.404686, a 2e-5 relative difference, seen and not used).
+Wave 2 lands at 99.79% rather than 100% because its 10 'Other - Specify'
+plots (='1 bedroom'=, ='25 BY 30 FEET'=, ='16 Squares'=, ...) have no factor;
+8 wave-2 plots report a size of 0 and are delivered as 0 ha.
+
+*** Two wave-3 plots are 28,669 ha each, and they stay that way
+
+Two plots report =70000 Poles=; the next largest is 800 acres (324 ha).
+Neither is edited or clipped -- core does not edit data -- and the wave-3
+99th percentile (12.0 ha, median 0.82) is what shows the *factor* is right.
+Anyone using the wave-3 area tail should know these two rows exist.
+
+*** Wave 1's 12 null-plot rows, and a 1 -> 15 merge fan-out
+
+=S4AII.dta= has 12 rows with a null =plot_no= (12 distinct households) and
+=S4AIV.dta= has 16 (15 of them household 105158048, which also has one null
+row in S4AII).  None of the 28 carries a size, unit, =area_ha= or tenure.
+Two framework facts make this worth a hook rather than a shrug: =format_id=
+turns a null plot number into a null =plot_id= index level, which the
+=(t, i, plot_id)= collapse deletes with a =GrainCollapseWarning= (fatal under
+strict); and =pd.merge= *matches null keys*, so the left merge fans
+105158048's single null row out to 15 first.  The hook drops every
+null-=plot_id= row (26 in wave 1: 12 + the 14-row fan-out) and the delivered
+count is 5,686 keyed plots minus 4 that carry a plot number and nothing
+else (removed by =_finalize_result='s =dropna(how='all')=) = 5,682.
+
+*** =plot_id=: a 1:1 key within each wave, and (still) not a panel id after wave 2
+
+=(hhno, plot_no)= / =(FPrimary, plotid)= is unique in BOTH the size and the
+tenure file in every wave -- 5,686 / 4,694 / 5,366 keys, intersection equal
+to both sides, 0 key values duplicated on either side -- so the =dfs:= merge
+is exactly 1:1 and the GH #323 site-4 cartesian test is moot.  Nothing here
+changes the finding above that =plotid= tracks the same land W1 -> W2 (96.7%
+via =04h_preroster=) but NOT W2 -> W3 (permutation null); it is repeated in
+=data_scheme.yml= where the next plot-keyed feature will read it.
+
+*** =Tenure= and =AreaUnit= are harmonised at EXTRACTION, unlike Roof / Floor
+
+The =Tenure= / =AreaUnit= tables in =_/categorical_mapping.org= are referenced
+explicitly from each wave's =data_info.yml= (=mappings: [...]=) so the cached
+parquet is already canonical.  Roof / Floor rely on the API-time
+auto-dispatch instead.  The difference is forced: =tests/test_table_structure.py=
+runs =_check_declared_spellings= on the *cached* =var/plot_features.parquet=,
+and =Tenure= has a declared vocabulary in =lsms_library/data_info.yml=, so an
+API-time-only mapping would pass the delivered table and fail the parquet.
+The auto-dispatch still runs a second, idempotent pass at API time.
+
+*** =LSMS_READ_STRICT=1= cannot build ANY GhanaSPS household table on this branch
+
+Found while verifying, and not fixed here because it is a =sample= fact.  The
+Site B null-read guard fires on =sample= for =Rural= (100% null in 2013-14 /
+2017-18), =weight= and =panel_weight= (same), and =strata= (2013-14) -- all
+already documented above as producer-side gaps -- and under =LSMS_READ_STRICT=1=
+that is a =NullReadError= *inside* =_join_v_from_sample=, which every
+household-level table re-enters.  So the strict read mode aborts
+=plot_features=, =housing=, =household_roster=, ... before their own data is
+even looked at (=slurm_logs/ghanasps/plot_features_verify_cold_READSTRICT_sample_Rural.log=).
+=CLAUDE.md= already says not to reach for =optional: true= to silence a
+wave-grain absence, and that this granularity mismatch is what gates turning
+the flag on in CI; recorded here so the next person who exports it does not
+spend an hour thinking their table is at fault.  The read-strict condition
+for =plot_features= itself is asserted directly instead:
+=null_read_reports(country='GhanaSPS', table='plot_features') == []=.
+
+*** Not wired, deliberately
+
+=Irrigated= (the source is "has a non-rain water source", weaker than the
+canonical meaning); =SoilType= (a multi-variable =S4AIII= block in wave 1, 12-
+and 15-way multi-select =soil*= flags later -- not a straight extraction);
+=TenureSystem= (no freehold / leasehold / customary question found in any
+instrument); GPS (absent).  The 'Other' tenure free text (73 / 67 rows:
+="no man's land"=, ="I just saw it and started farming on it"=, ="Caretaker"=)
+is not decoded; some of it is plausibly =squatted=, and a later pass could
+say so with the questionnaire in hand.
+
+** Livestock: wired for all three waves, and what the build taught (2026-09-02)
+
+=livestock= is now wired for all three waves at the canonical grain =(t, i,
+animal)= -- YAML path, one source file per wave (wave 3 lists its =_osp=
+"other -- specify" file as a second =file:= entry, row-concatenated), the
+=animal= label harmonised at EXTRACTION through a new =harmonize_species=
+table in =_/categorical_mapping.org=, plus ONE country-level =df_edit= hook,
+=ghanasps.livestock=, for the four things YAML cannot do (recombine wave 1's
+cedis + pesewas; drop wave 1's null-animal rows; drop wave 2's roster-grid
+filler; sum the duplicate lines).  Delivered on a cold build under
+=LSMS_GRAIN_STRICT=1=: *4,248 / 3,963 / 4,284* rows in *2,137 / 2,081 /
+2,361* households, index unique, 0 =GrainCollapseWarning=, 0 null-read
+reports against the table, =is_this_feature_sane().ok= True.  Working:
+=slurm_logs/ghanasps/livestock_verify.py= and its =_cold.log=; every label
+-> target and every judgement is in the =livestock= block of
+=_/data_scheme.yml= and the =harmonize_species= section of
+=_/categorical_mapping.org=; per-wave evidence is in each wave's
+=data_info.yml=.  What follows is only what was NOT already on record in
+the scoping section above.
+
+*** The value column is =HerdValue=, and the data corroborate the wording
+
+The scoping note above already settled, on all three instruments, that the
+value question asks for the herd total ("if you sold *all of them*").  The
+canonical schema (=lsms_library/data_info.yml=, =Columns: livestock=) splits
+the value columns by ADDITIVITY -- =ValuePerAnimal= (per head, not
+additive) / =HerdValue= (stock total) / =SalesValue= (sales flow) -- and
+prescribes a conditional test to corroborate the wording: is the value
+reported when there is nothing to value?  Measured on wave 2's fixed grid:
+*0 of 10,884* zero-head rows carry a value.  A herd total vanishes with the
+herd; a per-head reservation price (Nigeria, Malawi, early Uganda: reported
+whether or not anything is sold) would not.  So GhanaSPS is the first
+roster-grain country in the corpus to declare =HerdValue= (EthiopiaRHS
+declares it at the household grain).  =ValuePerAnimal= is *not* declared;
+a per-head figure is =HerdValue / HeadCount=, an analyst's transformation.
+
+Per-head medians (GHS), as a scale check: cattle 300 / 700 / 1,155, goats
+and sheep 33 / 80 / 150, chicken 5 / 10 / 20 across the three waves --
+cattle >> goats >> chicken in every wave, and wave 1 sits on the same
+scale as the decimal-cedis waves, which is what shows the cedis + pesewas
+recombination is right (a pesewas-as-cedis error would be x100).
+
+*** Wave 1's null-animal rows are a real loss; its multi-line catch-all is summed
+
+Eight =S3AI= rows have a null =animal_id= -- 181 head, values up to 1,400
+GHS, four of them one household (108280011) which also records revenue on
+them.  No column identifies the species, =format_id= would hand the
+=(t, i, animal)= collapse a null index level to delete (fatal under strict),
+so the hook drops them deliberately.  Five households (104119034,
+106184083, 106193108, 107239025, 108280011) had *only* such rows and are
+therefore absent from the delivered wave-1 table.  Recorded here rather
+than hidden.
+
+Twenty households list =Other Farm Animals= on two or three lines each (42
+rows; 108286013 reports 2 + 6 + 15 head, 107248016 600 + 600) -- different
+unnamed species the wave-1 instrument never asks to name.  At the
+=(t, i, animal)= grain they collide.  The hook SUMS =HeadCount= and
+=HerdValue= per key, which is legal only because every declared column is
+additive at this grain (that is what the =HerdValue= / =ValuePerAnimal=
+split buys), and it is the same thing Malawi's =assemble_livestock= and
+Uganda's =livestock_for_wave= do.  It is nonetheless a reducer, so it is
+kept *bounded*: the verify script prints every group it collapsed and
+=tests/test_ghanasps_livestock.py= pins the per-wave counts (20 groups in
+wave 1, 0 in wave 2, 1 in wave 3), so a new duplicate turns the test red
+instead of being quietly summed.  Note what the wave-1 sum means: 20
+=Other Livestock= rows each add several species into one line -- the level
+that instrument never recorded.
+
+*** Wave 2's grid, and why the keep-rule is Nigeria's inclusive form
+
+Wave 2 asks a fixed seven-species grid of every one of its 2,098
+households and 10,884 of the resulting 14,686 rows are zeros (plus 13 with
+a null quantity and nothing else).  All three precedent countries drop the
+never-owned roster filler; the rule adopted is Nigeria's -- keep a row iff
+*any* of =HeadCount= / =HeadSold= / =HerdValue= is non-null and positive.
+The inclusive form matters here and the reason is the column semantics,
+not taste: a positive =HerdValue= alone IS evidence of a holding because it
+values the herd, whereas Uganda's rule excludes value-alone rows because
+*its* value is a per-head price, which is not.  Measured, the two forms
+differ on 9 wave-1 and 11 wave-3 rows (null head, no sale, positive value)
+and on 0 wave-2 rows.  Seventeen wave-2 households answer zero on every
+grid row and have no tail row, so they have no delivered row.
+
+*** The =animal= vocabulary: precedent label wins, species never folded
+
+The rule and the whole table are in =_/categorical_mapping.org=.  Two
+things worth knowing without opening it: (a) the list mixes Uganda's
+species-level plurals (=Cattle Sheep Goats Pigs Rabbits Chicken Donkeys
+Other Poultry=) with Nigeria's and Malawi's singular =Duck= / =Turkey=
+(and =Guinea Fowl= / =Fish= / =Dove/Pigeon= / =Other Livestock=), because
+cross-country coincidence in =Feature('livestock')= was preferred to
+internal tidiness; seven coinages have no precedent (=Draught Animals=,
+=Dogs=, =Cats=, =Grasscutters=, =Guinea Pigs=, =Peacocks=, =Quails=); (b)
+three wave-2 free-text spellings -- ='50'=, ='cut'=, ='dake'= -- are
+genuinely unmappable and are delivered as their own =animal= values rather
+than guessed at.  The delivered per-wave value sets are 8 / 22 / 17 labels,
+each a subset of the table's Preferred Labels plus those three.
+
+Cross-wave artefacts to know: =Other Livestock= exists only in 2009-10
+(that instrument has no slot to *name* a guinea fowl or a duck, so 261
+rows / 3,978 head of them live in the catch-all), while waves 2 and 3 name
+them -- 1,198 and 442 guinea fowl.  =Donkeys= (named in the free text)
+overlaps with =Draught Animals= (the grid row whose label says "donkey,
+horse, bullock").  Dogs and cats are reported with sale values in waves 2
+and 3 and are delivered under their own labels so a wealth aggregate can
+exclude them.
+
+*** =HeadSold= exists in wave 3 only, and it is a flow
+
+=quantitysold= (2017-18): 4,276 of 4,284 delivered rows non-null, 1,245
+positive, 51,133 head sold in total.  It is a 12-month flow against a
+current stock, so =HeadSold > HeadCount= on 76 delivered rows is not an
+error; the two outliers -- 107258039, 1,000 chickens held / 40,000 sold;
+101025002, 10 cattle held / 3,300 sold -- are left exactly as reported, the
+same policy as the two 70,000-pole plots.  =HeadSold= is declared
+=optional= so the Site B null-read guard does not fire on the two waves
+that never ask it.  =HeadAcquired= is asked nowhere.
+
+*** =v= is not attached, by canonical design -- not by omission
+
+=livestock='s canonical index in =data_info.yml='s =index_info= is
+=(t, i, animal)= with no =v=, and the table is also in =Join v from
+sample > skip_extra=, so =_no_v_join_tables()= skips it -- the same "No v
+level" every precedent country documents.  The equivalent check was run
+instead: every delivered livestock household is in its wave's =sample()=
+(2,137/2,137, 2,081/2,081, 2,361/2,361), so =v= is one join away for
+anyone who wants it.  A task brief circulated for this table asked for
+"=v= 100% non-null"; that check cannot be satisfied for livestock anywhere
+in the corpus and the brief should be read with this in mind.
+
+*** Not wired, deliberately
+
+Per-species EXPENSES (feed bought, feed home-produced, veterinary,
+shelter, hired labour, water, other) and REVENUE (animals and products
+together) exist in every wave -- =s3ai_5= .. =s3ai_12= in wave 1,
+=feedfromoutside= .. =productrevenue= later -- and have no canonical home
+in the =livestock= schema.  The revenue is *not* =SalesValue= either: it
+is sales of animals AND products in one number.  Wave 1's per-species
+owner ids (=s3ai_2i/ii=) and waves 2-3's =ownersask*= member flags are
+likewise unwired.  =LSMS_READ_STRICT=1= still cannot build this table on
+this branch for the =sample()= reason recorded under plot features above;
+the read-strict condition was asserted directly
+(=null_read_reports(country='GhanaSPS', table='livestock') == []=).
+
+** Crop production: wired for all three waves, and what the build taught (2026-09-02)
+
+=crop_production= is now wired for all three waves at =(t, i, plot_id, j, u,
+season)= with =v= joined from =sample()= at API time -- a MIXED build path:
+2009-10 is a wave script (=2009-10/_/crop_production.py=; the two-season
+=S4AV1= / =S4AV2= matrix has to be melted), 2013-14 and 2017-18 are YAML
+plus one country-level =df_edit= hook, =ghanasps.crop_production=.  Delivered
+on a cold build under =LSMS_GRAIN_STRICT=1=: *11,795 / 6,886 / 6,428* harvest
+records (25,109) in 4,954 / 3,541 / 3,195 plots, index unique, 0
+=GrainCollapseWarning=, 0 null-read reports against the table, =v= 100%
+non-null, every harvest plot in that wave's =plot_features()= (100.0% in all
+three), =is_this_feature_sane().ok= True.  Working:
+=slurm_logs/ghanasps/crop_production_verify.py= and its =_cold.log=; every
+label -> target is in =harmonize_crop= / =harvest_units= in
+=_/categorical_mapping.org=; every judgement is in the =crop_production=
+block of =_/data_scheme.yml=; per-wave evidence is in each wave's
+=data_info.yml= and the script's docstring.  What follows is only what was
+NOT already on record in the scoping section above.
+
+*** The S4AV2 label error, settled and pinned
+
+The scoping note found it; the build confirms it from the instrument text
+(=Documentation/Household_questionnaire_Part_A.pdf=, read this session):
+the block is headed "LAST MINOR SEASON: CROP (HARVESTS) 1 -- ASK ABOUT CROP
+HARVESTS IN ORDER OF MOST IMPORTANT TO LEAST IMPORTANT", and A122 reads
+"What is the quantity harvested in the last minor season?" -- while every
+S4AV2 variable label says "in the last major season".  =season= is assigned
+from the FILE (=S4AV1= -> =major=, =S4AV2= -> =minor=).  The discriminating
+numbers: crop-1 quantity is non-null on 4,825 =S4AV1= plots and 1,412 =S4AV2=
+plots; the delivered wave carries 9,292 major and 2,503 minor rows.
+=tests/test_ghanasps_crop_production.py= pins both facts and recomputes,
+from =S4AV2.dta= itself, that every plot with a minor-season quantity is
+delivered under =season == 'minor'=.
+
+*** The later waves are a 12-month recall, not a season
+
+Both later instruments ask (N5) "How many units of this CROP TYPE has been
+harvested from PLOT A?  If there has been more than one harvest from the
+plot, give the total quantity which has been harvested over the last 12
+months."  So their =season= is the constant =annual= -- a recall period --
+kept as a level so the three waves share one shape.  Summing 2009-10's two
+seasons is the nearest equivalent; it is not the same instrument.
+
+*** The harvested PART is not =condition=, and the instrument says what it is
+
+A80.2 / A121.2 "ID of part of crop harvested (e.g. Cocoa, Cocoa Leaves)":
+Leaves / Branches / Bark / Sap / Stem-stalk / Roots-tuber / Fruit-Seeds-Nut
+/ Bulb.  It is *which product of the plant was taken*, not the physical
+state of one product, and it was not force-fitted into the canonical level.
+It could not simply be dropped either: at =(plot, crop, unit, season)= 47
+keys carried two harvest records, and in 18 of them the parts DIFFER
+(cocoyam roots/tuber and cocoyam leaves, both in baskets), so an
+unconditional sum would add tubers to leaves.  Following the instrument's
+own example, a record whose part is a different product -- Leaves,
+Branches, Bark, Sap or Stem, except where that IS the crop's principal
+product (leafy / other vegetables, sugarcane, woodlot) -- gets a qualified
+=j=: =Cocoyam Leaves= (88 records; an existing =food_items.org= label, so it
+joins =food_acquired.j= like any other crop) or =Crop (part)= for the rest
+(=Cassava (stem/stick)= 49, =Plantain (stem/stick)= 25, =Maize (leaves)= 11,
+and ~30 further labels of 1-7 records).  Roots-tuber / Fruit-Seeds-Nuts /
+Bulb never qualify: 88 cassava and 43 yam records sit under
+Fruit/Seeds/Nuts, i.e. the main harvest with an odd part code, and
+relabelling those would fabricate products.  *These labels exist ONLY in
+2009-10*, because only that instrument records the part -- the same
+cross-wave artefact as =Tenure='s =sharecropped_in=.  The remaining
+same-product duplicates -- two harvest events of one product in one unit --
+are SUMMED (=min_count=1=, months unioned): 33 groups in 2009-10, 2 in
+2013-14 (107250012 plot 1 cassava 10 + 20 baskets; 109315002 plot 1 millet
+0.5 + 0.5 maxi bags), 0 in 2017-18.  It is a reducer and it is kept bounded:
+the test pins the per-wave group counts.
+
+*** Sales: three instruments, three grains, one honest asymmetry
+
+- 2009-10 :: =Value_sold= is A83 / A124 -- "What was the total revenue from
+  this crop harvest (sold)?" -- inside each season's harvest record, cedis +
+  pesewas/100 (63.8% of rows non-null).  =S4BI= (Part B, "Crop Sales and
+  Storage") is NOT used: it is a season-less 12-month roster ("B62. Were
+  there any crops ... sold to other people last 12 months?", B71 "What was
+  the total revenue from this crop?") whose crop rows match a major harvest
+  slot on =(plot, crop)= for only 2,976 of 4,752, and where both exist B71
+  equals A83 for only 891 of 2,156 rows.  The scoping note and the task brief
+  both pointed at S4BI; the season-specific A83 is the right source for a
+  season-keyed row.  A sold *quantity* is asked nowhere in 2009-10, so
+  =Quantity_sold= is NaN there.
+- 2013-14 :: =04o_cropsalesstoresquestions= has no =plotid= -> both sales
+  columns NaN by design (declared =optional= so the Site B null-read guard
+  does not fire).
+- 2017-18 :: =04o= carries =plotid= and NINE buyer channels, each a
+  quantity / unit / price, and the price is per unit ("What was the price for
+  which [Name] sold one [unit] of [crop type] to ...").  =Value_sold= =
+  sum of quantity x price over channels (money adds whatever the units;
+  54.3% of rows); =Quantity_sold= = the summed quantity ONLY where every
+  selling channel used one unit equal to the row's harvest =u= (3,062 rows,
+  46.9%); 432 rows sold in a different unit, 7 in two units and the
+  =Other=-unit sales give NaN, as do 12 rows with a channel quantity and no
+  price.  1,237 sale records belong to plot-crops with no harvest row and
+  are not delivered.  One sale computes to *42.8M GHS* (a keying error in
+  quantity x unit price); it is delivered as reported -- core does not edit
+  data -- and flagged here for anyone summing wave-3 sales.
+
+*** Units: the food_acquired vocabulary, and the residual codes
+
+=u= is the =harmonizedunit= Preferred Label set of =_/units.org= -- exactly
+what =food_acquired.u= delivers -- so a harvest and a purchase of maize in
+this country share a unit label (=Maxi bag=, =Mini bag=, =Tuber=, =Bunch=
+...).  Note the framework's global =categorical_mapping/u.org= folds
+=Kilogram= onto =Kg= at API time for every table with a =u= level; the
+parquet carries =Kilogram=.  2009-10 stores a numeric code with no value
+labels and is decoded through the same =unit09= -> =harmonizedunit= chain as
+its =food_acquired= script (the codebook's own unit list has a typo, Gallon
+"14"; =unit09= gives 13).  Off-list 2009-10 codes: 0 and -1 (52 records) are
+read as missing and join the 194 quantity-without-unit records as =Unknown=
+(250 in all); positive codes the codebook does not define -- 1, 46, 50, 51,
+53, 57, 58, 61, 80, 94, 25 records -- are delivered as the code string, an
+accepted residual per the units skill, never a guessed label.  2013-14
+offers only a 20-code subset with =Other - specify= (226 records); 51 of
+them wrote =tubers= / =TUBERS= -- a unit the other waves offer as code 26 --
+and are folded to =Tuber=; the rest (=ropes=, =pan=, =cocoa bag=, =bashing
+rubber= ...) stay =Other=, as do 2017-18's =-666= rows (=Pan=, =Motor King=,
+=Lines= ...).
+
+*** harvest_month is per crop later, a plot-level proxy in 2009-10
+
+2013-14 stores up to six month columns (decoded to month NAMES --
+=January= -- which the first build silently turned into 0% coverage; now
+parsed), 2017-18 one space-separated string; both become sorted zero-padded
+tokens (='09 10 11'=; 259 wave-3 records span all twelve months, mostly tree
+crops).  2009-10 asks no harvest month per crop; the delivered value is the
+ENDING month of the major / minor season of the plot's DOMINANT crop (A289.2
+/ A326.2, "Months for the major season of dominant crop?"), stamped on every
+harvest record of that plot-season.  Read it as the season's end, not the
+crop's own harvest date.
+
+*** Dropped, deliberately and counted
+
+2009-10: 25 + 5 slots with a quantity but no crop id; 12 with a crop code
+the instrument does not define (0, 44-47, 90 -- 44 is =Soya beans= only in
+the later lists and is not asserted here); 193 slots with a crop id but no
+quantity, unit or revenue.  2013-14: 1,341 rows with neither a quantity nor
+a unit (1,322 "No, all yet to be harvested"), none carrying a month.
+2017-18: 1,926 blank-crop placeholders (one per uncultivated plot) and 963
+quantity-and-unit-null rows (794 "No, all yet to be harvested"), none with a
+month.  A null =u= or =j= is a null index level, which the framework's
+collapse would delete with a =GrainCollapseWarning= (fatal under strict);
+these drops are the deliberate ones.
+
+*** The mixed build path, and what =materialize: make= costs
+
+Under the default backend =Country.load_from_waves= dispatches per wave (a
+=data_info.yml= block -> =grab_data=; none -> the wave script), the same way
+Tanzania's =2008-15= tables and Iraq's =assets= already build -- neither of
+which declares =materialize: make=.  This table declares it, as the brief
+asked; the cost is that =LSMS_BUILD_BACKEND=make= routes to a COUNTRY-level
+make target a mixed table has no honest way to supply (a concatenator would
+have to re-run the YAML waves itself), so that backend cannot build this
+table.  Nothing in =tests/= uses it.  The =Makefile= gains the wave-script
+rule only.
+
+*** Not wired, deliberately
+
+=condition= (never asked); =intercropped= (2013-14 / 2017-18 record a
+plot-level multi-select list of WHICH crops were intercropped --
+=intercroppedlist*= -- not a per-crop flag); =planting_month=; =perennial=;
+the market value of the harvest (A82 / A123 / no later equivalent); damage
+and expected-still-to-harvest quantities; =S4BI='s outlet, transport and
+payment-delay detail; the harvested part as a level.  Two agent-time facts
+worth one line each: =data_access.get_data_file= is the DVCFileSystem walk
+and took 1,599 s on this node for a file already in the cache
+(=get_dataframe= took 3 s; =local_tools._ensure_dvc_pulled= fetched the two
+questionnaire PDFs in 10 s), and it materialises the file INTO the package
+tree, where =get_dataframe= then refuses it ("Refusing workspace copy of
+DVC-tracked file"); and =LSMS_READ_STRICT=1= still cannot build this table
+on this branch for the =sample()= reason recorded under plot features above
+(=null_read_reports(country='GhanaSPS', table='crop_production') == []=
+asserted directly instead).

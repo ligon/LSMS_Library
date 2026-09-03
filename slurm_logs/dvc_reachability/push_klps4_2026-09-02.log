@@ -1,0 +1,16 @@
+start Wed Sep  2 18:40:19 PDT 2026
+pushed: ['KLPS4-Kids-SampleMaster_PUBLIC_2025-12.dta', 'KLPS4_E-Module_PUBLIC_2025-12.dta', 'KLPS4_I-Module_PUBLIC_2025-12.dta']
+rc=0 end Wed Sep  2 18:49:37 PDT 2026
+--- git effect ---
+--- S3 (all 4 KLPS-4 md5s) ---
+270cc77133b803124e7111fe929bf22a PRESENT at ['LSMS/files/md5/27/0cc77133b803124e7111fe929bf22a']
+af0ca3ee4a7b9fd17586efa29bf6015a PRESENT at ['LSMS/files/md5/af/0ca3ee4a7b9fd17586efa29bf6015a']
+32e0394c80240244fccd1847316ec1b8 PRESENT at ['LSMS/files/md5/32/e0394c80240244fccd1847316ec1b8']
+faaf32afc5d9900499049294fb4d3b43 PRESENT at ['LSMS/files/md5/fa/af32afc5d9900499049294fb4d3b43']
+--- locks ---
+rwlock
+--- reachability re-sweep ---
+[summary] 17 of 9984 sidecar blobs missing from the remote (0.2%); 58.7 MB
+[summary] documentation      0 /  1066
+[summary] data              17 /  8918
+[summary] by country (missing/total, documentation | data):

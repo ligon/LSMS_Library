@@ -122,13 +122,60 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 |   74 | Gram                          |
 |   99 | Other unit                    |
 
-# harmonize_education (GH #171): GhanaLSS attainment labels onto the canonical
-# ordinal levels.  Ghana ran TWO school systems: OLD (Primary P1-6, Middle M1-4,
-# Secondary S1-5/O-Level, Sixth Form L6/U6/A-Level) and NEW post-1987 (Primary,
-# JSS/JHS, SSS/SHS).  Basic-cycle completions (M4/Middle, JSS3) -> Lower secondary
-# complete; any senior-secondary completion (S5/O-Level, A-Level/Sixth Form,
-# SSS3/SHS) -> Upper secondary complete; 2016-17 'Year one..six' = tertiary years
-# (1-3 diploma, 4-5 Bachelor, 6+ Postgraduate).  Case-duplicated across waves.
+# harmonize_education (GH #171, #731): GhanaLSS attainment labels onto the
+# canonical ordinal levels.  Ghana ran TWO school systems: OLD (Primary P1-6,
+# Middle M1-4, Secondary S1-5/O-Level, Sixth Form/A-Level) and NEW post-1987
+# (Primary, JSS/JHS, SSS/SHS).  Basic-cycle completions (M4/Middle, JSS3) ->
+# Lower secondary complete; any senior-secondary completion (S5/O-Level,
+# A-Level/Sixth Form, SSS3/SHS) -> Upper secondary complete.
+#
+# WHO READS THIS TABLE (2026-09-02, GH #731).  Only the three LETTER-LADDER
+# waves resolve through it: 1987-88 and 1988-89 (Y03I.DAT:GRADE) and 1991-92
+# (S2.DTA:s2q2), via `mappings: [harmonize_education, ...]` in their
+# data_info.yml.  1998-99 maps its numeric s2aq2 codes inline in data_info.yml
+# and never touches this table.  2005-06, 2012-13 and 2016-17 each carry their
+# OWN `#+name: harmonize_education` in <wave>/_/categorical_mapping.org, which
+# SHADOWS this table wholesale for that wave: Wave.categorical_mapping
+# (country.py ~l.1006) is a plain dict.update over the country dict -- there is
+# no row-union at the country/wave boundary (the row-union in
+# _row_union_categorical, ~l.312, is global/country only).  A future wave must
+# therefore add its OWN wave table rather than lean on this one.
+#
+# WHY (GH #731): the label `U6` means two different things in the two
+# instruments.  GLSS1/2/3 ask "What was the highest class or form completed?"
+# and print the ladder  NONE / P1-P6 / M1-M4 / S1-S5 / A1 A2 / PS1-PS3 /
+# T1-T4 / U1-U8 / K (Koranic)  [+ JSS1-JSS3 in GLSS3] -- the sixth form is
+# A1/A2 and U1..U8 are YEARS OF UNIVERSITY, so U6 is the sixth university year
+# (GLSS1/GLSS2 household questionnaire, Section 3 block 3i printed p.6 col.7;
+# GLSS3 G3QPartA.pdf p.10, Section 2A Q2).  GLSS5/6/7 ask "What was the highest
+# grade completed?" and print  ... S5 / L6 / U6 / Voc-Tech / Teacher Training /
+# Nursing / Polytechnic / University [GLSS7: Year one .. Year six and above]
+# -- there U6 follows L6 and is UPPER SIXTH, a secondary rung (G5QPartA.pdf
+# p.11 codes 32/33; GLSS6 Part A questionnaire p.10 codes 33/34; GLSS7 Module A
+# codes 33/34).  This table used to list U6 TWICE (-> Upper secondary complete
+# at the top of the modern block, -> Postgraduate in the U1..U8 ladder);
+# _row_union_categorical's drop_duplicates(keep='first') silently kept the
+# first, so the 13 GLSS1/2/3 people with U6 (1 / 4 / 8) were delivered as
+# Upper secondary complete.  Now: U6 -> Postgraduate here, alongside U5/U7/U8;
+# the modern waves' U6 -> Upper secondary complete lives in their wave tables.
+# Measured 2026-09-02: slurm_logs/ghana_audit/u6_measure_731.out (raw labels
+# per wave) and api_{before,after}_731.out (delivered counts).
+#
+# NOT settled here, deliberately: U1..U4 -> Bachelor.  The letter codes are
+# YEARS COMPLETED, and the same instruments ask the qualification separately
+# (GLSS3 Q3 "highest educational level attained": Bachelor=9, Master=10,
+# Doctorate=11; GLSS2 col.10 "highest diploma obtained": BACHELOR=10,
+# MASTER=11, DOCTORATE=12), so a completed U1..U3 is "some university" with no
+# canonical rung of its own.  GhanaSPS reads its Level 100..300 as Tertiary
+# certificate/diploma (PR #728).  Left as found; see CONTENTS.org Trap 7.
+#
+# ROW LAYOUT.  The rows the letter ladder needs are: NONE / None / none, B
+# (GLSS1/2 never-attended skip code), K, P1-P6, M1-M4, S1-S5, A1, A2, PS1-PS3,
+# T1-T4, U1-U8, JSS1-JSS3.  Every other row (lowercase GLSS5 labels,
+# 'JSS3/JHS3', 'SSS3/SHS3', 'Year one..', 'L6', 'u6', 'Sixth Form', ...) is
+# GLSS5/6/7 vocabulary that is INERT since 2026-09-02 -- shadowed by the wave
+# tables and never emitted by GLSS1/2/3.  They are kept as documentation of the
+# modern vocabulary only; pruning them is a follow-up, not done in GH #731.
 #+name: harmonize_education
 | Original Label          | Preferred Label              |
 |-------------------------+------------------------------|
@@ -204,7 +251,6 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | tech training           | Vocational/Technical         |
 | Technical               | Vocational/Technical         |
 | u6                      | Upper secondary complete     |
-| U6                      | Upper secondary complete     |
 | university              | Bachelor                     |
 | University              | Bachelor                     |
 | voc                     | Vocational/Technical         |
@@ -216,6 +262,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Year six and above      | Postgraduate                 |
 | Year three              | Tertiary certificate/diploma |
 | Year two                | Tertiary certificate/diploma |
+| NONE                    | No education                 |
 | K                       | Informal                     |
 | A1                      | Upper secondary complete     |
 | A2                      | Upper secondary complete     |
@@ -241,6 +288,17 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 
 * Housing (Roof / Floor) -- canonical harmonization (GH #170)
 
+The wave-level =mapping:= blocks in each =data_info.yml= normalise the
+GLSS value labels to one spelling per category; these two tables then
+fold that spelling onto =canonical_housing_labels.org=.  Since 2026-09-02
+(GH #727) the canon carries =Bamboo= and =Terrazzo= as labels of their
+own, so =Bamboo= (roof; was *Wood*) and =Terrazzo= (floor; was
+*Concrete*) target them -- 60 / 110 / 42 bamboo roofs and 74 / 154 / 155
+terrazzo floors in 2005-06 / 2012-13 / 2016-17 (the GLSS3-4 label sets
+carry neither).  Compound =Cement/Concrete= stays *Concrete* (ruling
+restated under #727).  Prose stays ABOVE the =#+name:= lines: the org
+parser attaches a name to the next table and skips nothing in between.
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
@@ -249,7 +307,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Cement/Concrete    | Concrete        |
 | Roofing Tiles      | Clay Tiles      |
 | Thatch             | Thatch          |
-| Bamboo             | Wood            |
+| Bamboo             | Bamboo          |
 | Mud/Earth          | Mud             |
 | Wood               | Wood            |
 | Other              | Other           |
@@ -261,7 +319,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Earth/Mud            | Earth           |
 | Ceramic/Marble Tiles | Tiles           |
 | Vinyl Tiles          | Vinyl/Linoleum  |
-| Terrazzo             | Concrete        |
+| Terrazzo             | Terrazzo        |
 | Burnt Bricks         | Bricks          |
 | Stone                | Stone           |
 | Stone/Brick          | Stone           |

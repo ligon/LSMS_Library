@@ -405,3 +405,144 @@ units.to_csv('unitlabels.csv')
 
 #+results:
 : None
+
+* Community price survey (GH #562)
+GLSS4's price survey (=Documentation/questionnaire/GHA_1998_GLSS_Price_Questionnaire_EN.pdf=,
+text layer) is keyed REGION / DISTRICT / NAME OF LOCALITY / EA with three
+observations per item: foods 1-71 as a weighed KG + PRICE (a few with a
+pre-filled container: 1 beer bottle for the oils / palm wine / pito /
+akpeteshie / honey, 0.170 for the evaporated-milk tin, the standard 300 ml
+bottle for soft drinks, 720 ml for local gin); pharmaceuticals 72-79 and
+non-foods 80-123 with a fixed DESCRIPTION and 1ST/2ND/3RD PRICE.
+=Data/Prices/G4PRICE.DTA= ships only the per-unit value =price= (no KG
+column, no labels), so =Basis= is the form's stated basis and becomes
+=NumberOfUnits=.  =Preferred Label= is the 1998-99 =harmonize_food= label
+where the axis names the item; Cocoyam leaves, Tomato paste and Snail are
+not on this wave's axis and keep their own label (=Food=own=).
+
+#+name: harmonize_price_item
+| Code | Label                                                           | Preferred Label                  | Food | Unit         | Basis | Note                                                          |
+|------+-----------------------------------------------------------------+----------------------------------+------+--------------+-------+---------------------------------------------------------------|
+| 1    | Guinea corn                                                     | Guinea corn/sorghum              | yes  | Kilogram     | 1     |                                                               |
+| 2    | Maize (shelled)                                                 | Maize                            | yes  | Kilogram     | 1     |                                                               |
+| 3    | Millet                                                          | Millet                           | yes  | Kilogram     | 1     |                                                               |
+| 4    | Rice (Local)                                                    | Rice                             | yes  | Kilogram     | 1     |                                                               |
+| 5    | Rice (Imported)                                                 | Rice                             | yes  | Kilogram     | 1     |                                                               |
+| 6    | Sorghum                                                         | Sorghum                          | yes  | Kilogram     | 1     |                                                               |
+| 7    | Wheat bread (White)                                             | Bread                            | yes  | Kilogram     | 1     |                                                               |
+| 8    | Corn dough                                                      | Maize (flour/dough)              | yes  | Kilogram     | 1     |                                                               |
+| 9    | Kenkey                                                          | Kenkey                           | yes  | Kilogram     | 1     |                                                               |
+| 10   | Cocoyam                                                         | Cocoyam                          | yes  | Kilogram     | 1     |                                                               |
+| 11   | Yam                                                             | Yam                              | yes  | Kilogram     | 1     |                                                               |
+| 12   | Plantain                                                        | Plantain                         | yes  | Kilogram     | 1     |                                                               |
+| 13   | Cassava (fresh)                                                 | Cassava                          | yes  | Kilogram     | 1     |                                                               |
+| 14   | Gari                                                            | Cassava (flour)                  | yes  | Kilogram     | 1     | gari = cassava flour, as the axis codes it                    |
+| 15   | Cassava dough                                                   | Cassava (dough)                  | yes  | Kilogram     | 1     |                                                               |
+| 16   | Konkonte (flour)                                                | Konkonte                         | yes  | Kilogram     | 1     |                                                               |
+| 17   | Cowpeas (small beans)                                           | Small Bean                       | yes  | Kilogram     | 1     | the 9b consumption label is Small beans                       |
+| 18   | Bambara beans                                                   | Bambara Bean                     | yes  | Kilogram     | 1     |                                                               |
+| 19   | Palmnuts                                                        | Palm Nut                         | yes  | Kilogram     | 1     |                                                               |
+| 20   | Groundnuts (shelled)                                            | Groundnut                        | yes  | Kilogram     | 1     |                                                               |
+| 21   | Groundnut oil (1 beer bottle)                                   | Oil (groundnut)                  | yes  | Beer Bottle  | 1     |                                                               |
+| 22   | Palm kernel oil (1 beer bottle)                                 | Oil (palm kernel)                | yes  | Beer Bottle  | 1     |                                                               |
+| 23   | Palm oil (1 beer bottle)                                        | Oil (red palm)                   | yes  | Beer Bottle  | 1     |                                                               |
+| 24   | Margarine (Blue Band)                                           | Margarine                        | yes  | Kilogram     | 1     |                                                               |
+| 25   | Avocado pear                                                    | Avocado                          | yes  | Kilogram     | 1     |                                                               |
+| 26   | Banana                                                          | Banana                           | yes  | Kilogram     | 1     |                                                               |
+| 27   | Orange                                                          | Orange                           | yes  | Kilogram     | 1     |                                                               |
+| 28   | Pineapple fresh                                                 | Pineapple                        | yes  | Kilogram     | 1     |                                                               |
+| 29   | Pineapple juice                                                 | Juice                            | yes  | Kilogram     | 1     | KG-column item on the form                                    |
+| 30   | Cocoyam leaves                                                  | Cocoyam Leaves                   | own  | Kilogram     | 1     | on the 1991-92 axis; the 1998-99 axis has no kontomire label  |
+| 31   | Garden eggs                                                     | Eggplant/Cucumber                | yes  | Kilogram     | 1     |                                                               |
+| 32   | Okro                                                            | Okra                             | yes  | Kilogram     | 1     |                                                               |
+| 33   | Onion                                                           | Onion                            | yes  | Kilogram     | 1     |                                                               |
+| 34   | Shallots                                                        | Onion                            | yes  | Kilogram     | 1     | axis folds Onions and Shallot                                 |
+| 35   | Pepper (sweet green)                                            | Pepper                           | yes  | Kilogram     | 1     |                                                               |
+| 36   | Pepper (dried)                                                  | Pepper (dry)                     | yes  | Kilogram     | 1     |                                                               |
+| 37   | Tomato (fresh)                                                  | Tomato                           | yes  | Kilogram     | 1     |                                                               |
+| 38   | Tomato (paste)                                                  | Tomato (paste)                   | own  | Kilogram     | 1     | the 1998-99 axis has no tomato-paste label                    |
+| 39   | Fresh beef (with bones)                                         | Beef                             | yes  | Kilogram     | 1     |                                                               |
+| 40   | Goat (fresh)                                                    | Goat                             | yes  | Kilogram     | 1     |                                                               |
+| 41   | Fresh mutton                                                    | Goat                             | yes  | Kilogram     | 1     | axis folds Fresh Mutton into Goat; Description keeps it apart |
+| 42   | Pork                                                            | Pork                             | yes  | Kilogram     | 1     |                                                               |
+| 43   | Bushmeat (smoked) - Grass cutter                                | Other Meat                       | yes  | Kilogram     | 1     | axis codes Bushmeat as Other Meat                             |
+| 44   | Snail (fresh)                                                   | Snail                            | own  | Kilogram     | 1     | on the 1991-92 axis; not on the 1998-99 axis                  |
+| 45   | Live Chicken (Local)                                            | Chicken                          | yes  | Kilogram     | 1     |                                                               |
+| 46   | Live Chicken (Poultry)                                          | Chicken                          | yes  | Kilogram     | 1     |                                                               |
+| 47   | Chicken eggs                                                    | Eggs                             | yes  | Kilogram     | 1     | KG-column item on the GLSS3/4 form (1987 priced each)         |
+| 48   | Evaporated milk (Ideal), 0.170 kg tin                           | Milk (tinned, unsweetened)       | yes  | Kilogram     | 0.17  | form pre-fills 0.170 per observation                          |
+| 49   | White granulated sugar                                          | Sugar                            | yes  | Kilogram     | 1     |                                                               |
+| 50   | Salt                                                            | Salt                             | yes  | Kilogram     | 1     |                                                               |
+| 51   | Nescafe (Tin)                                                   | Coffee                           | yes  | Kilogram     | 1     |                                                               |
+| 52   | Nescafe (Sachet)                                                | Coffee                           | yes  | Kilogram     | 1     |                                                               |
+| 53   | Bournvita (Tin)                                                 | Chocolate Drink                  | yes  | Kilogram     | 1     |                                                               |
+| 54   | Bournvita (Sachet)                                              | Chocolate Drink                  | yes  | Kilogram     | 1     |                                                               |
+| 55   | Milo (Tin)                                                      | Chocolate Drink                  | yes  | Kilogram     | 1     |                                                               |
+| 56   | Milo (Sachet)                                                   | Chocolate Drink                  | yes  | Kilogram     | 1     |                                                               |
+| 57   | Chocolate drink                                                 | Chocolate Drink                  | yes  | Kilogram     | 1     |                                                               |
+| 58   | Tea (Lipton)                                                    | Tea                              | yes  | Kilogram     | 1     |                                                               |
+| 59   | Herring (Smoked)                                                | Fish (smoked)                    | yes  | Kilogram     | 1     |                                                               |
+| 60   | Herring (Fresh)                                                 | Fish (fresh and frozen)          | yes  | Kilogram     | 1     |                                                               |
+| 61   | Red fish (Fresh)                                                | Fish (fresh and frozen)          | yes  | Kilogram     | 1     |                                                               |
+| 62   | Dried fish (Tilapia - Koobi)                                    | Fish (dried)                     | yes  | Kilogram     | 1     |                                                               |
+| 63   | Pilchards (Geisha)                                              | Fish (canned)                    | yes  | Kilogram     | 1     |                                                               |
+| 64   | Sardine (Titus)                                                 | Fish (canned)                    | yes  | Kilogram     | 1     |                                                               |
+| 65   | Fanta/Coke/Pepsi (standard 300 ml bottle)                       | Soft Drinks                      | yes  | Fanta Bottle | 1     | the standard 300 ml bottle                                    |
+| 66   | Palm wine (1 beer bottle)                                       | Wine                             | yes  | Beer Bottle  | 1     | axis codes Palm Wine as Wine                                  |
+| 67   | Pito (1 beer bottle)                                            | Beer                             | yes  | Beer Bottle  | 1     | axis codes Pito as Beer                                       |
+| 68   | Akpeteshie (1 beer bottle)                                      | Akpeteshie                       | yes  | Beer Bottle  | 1     |                                                               |
+| 69   | Gin (Local) (720 ml)                                            | Gin                              | yes  | Milliliter   | 720   | form basis 720 ml                                             |
+| 70   | Jam (Specify)                                                   | Jam                              | yes  | Kilogram     | 1     |                                                               |
+| 71   | Honey (1 beer bottle)                                           | Honey                            | yes  | Beer Bottle  | 1     |                                                               |
+| 72   | Aspirin (10 tablets)                                            | Aspirin                          | no   | Tablet       | 10    |                                                               |
+| 73   | Paracetamol (10 tablets)                                        | Paracetamol                      | no   | Tablet       | 10    |                                                               |
+| 74   | Nivaquine/Chloroquine (10 tablets)                              | Nivaquine (chloroquine)          | no   | Tablet       | 10    |                                                               |
+| 75   | Vitamin B Complex (10 tablets)                                  | Vitamin B complex                | no   | Tablet       | 10    |                                                               |
+| 76   | Penicillin oral 400,000 units (20 tablets)                      | Penicillin (oral)                | no   | Tablet       | 20    |                                                               |
+| 77   | Terramycin 250 mg (20 capsules)                                 | Terramycin                       | no   | Capsule      | 20    |                                                               |
+| 78   | Andrews/Starwin liver salt (1 packet of 10 sachets)             | Andrews liver salt               | no   | Packet       | 1     |                                                               |
+| 79   | Milk of Magnesia (1 large bottle)                               | Milk of magnesia                 | no   | Bottle       | 1     |                                                               |
+| 80   | Omo (medium size)                                               | Omo (detergent)                  | no   | Piece        | 1     | medium-size packet                                            |
+| 81   | Guardian Soap (one tablet)                                      | Soap (Guardian)                  | no   | Piece        | 1     |                                                               |
+| 82   | Key Soap (one bar)                                              | Key soap                         | no   | Bar          | 1     |                                                               |
+| 83   | Lantern globe/shade (one standard size)                         | Lantern globe                    | no   | Piece        | 1     |                                                               |
+| 84   | Light bulb (White) (60 watts)                                   | Light bulb                       | no   | Piece        | 1     |                                                               |
+| 85   | Candle (one stick)                                              | Candle                           | no   | Stick        | 1     |                                                               |
+| 86   | Dry cell battery (Tiger head) (1.5 volts)                       | Dry cell battery                 | no   | Piece        | 1     |                                                               |
+| 87   | Matches (one box)                                               | Matches                          | no   | Box          | 1     |                                                               |
+| 88   | Iron coal pot (medium size)                                     | Iron coal pot                    | no   | Piece        | 1     |                                                               |
+| 89   | Kerosene (one beer bottle)                                      | Kerosene                         | no   | Beer Bottle  | 1     |                                                               |
+| 90   | Firewood (9 kg bundle)                                          | Firewood                         | no   | Kilogram     | 9     |                                                               |
+| 91   | Charcoal (one maxi bag of std. size)                            | Charcoal                         | no   | Maxi Bag     | 1     |                                                               |
+| 92   | Liquified petroleum gas (medium cylinder)                       | Liquefied petroleum gas          | no   | Piece        | 1     | medium cylinder                                               |
+| 93   | Metal bucket (standard size, 34 cm)                             | Metal bucket                     | no   | Piece        | 1     |                                                               |
+| 94   | Plastic bucket (standard size, 32 cm)                           | Plastic bucket                   | no   | Piece        | 1     |                                                               |
+| 95   | Hurricane lamp (Medium) (Anchor brand)                          | Hurricane lamp                   | no   | Piece        | 1     |                                                               |
+| 96   | Fertilizer N.P.K 15-15-15 (one mini bag)                        | Fertilizer (NPK)                 | no   | Mini Bag     | 1     |                                                               |
+| 97   | Fertilizer Sulphate of Ammonia (one mini bag)                   | Fertilizer (sulphate of ammonia) | no   | Mini Bag     | 1     |                                                               |
+| 98   | Mosquito Coil (a packet of 10)                                  | Mosquito coil                    | no   | Coil         | 10    |                                                               |
+| 99   | Toilet Paper (Rose) (one roll)                                  | Toilet paper                     | no   | Roll         | 1     |                                                               |
+| 100  | Razor blade (Tatra) (packet of 10)                              | Razor blade                      | no   | Piece        | 10    |                                                               |
+| 101  | Tooth paste, Pepsodent (large)                                  | Toothpaste                       | no   | Piece        | 1     | large tube                                                    |
+| 102  | Vim (large size)                                                | Vim (scouring powder)            | no   | Piece        | 1     |                                                               |
+| 103  | Cutlass (Crocodile brand) (one standard size)                   | Cutlass/machete                  | no   | Piece        | 1     |                                                               |
+| 104  | Tobacco leaf (1 kg)                                             | Tobacco                          | yes  | Kilogram     | 1     | on the food axis (9b consumption list)                        |
+| 105  | '555' Cigarette (a packet of 20)                                | Cigarette                        | yes  | Stick        | 20    |                                                               |
+| 106  | Embassy Cigarette (a packet of 20)                              | Cigarette                        | yes  | Stick        | 20    |                                                               |
+| 107  | Local Real Wax Print (GTP) (6 yards)                            | Wax print cloth                  | no   | Yard         | 6     |                                                               |
+| 108  | Kente Cloth (men) (Fathia Fata Nkrumah)                         | Kente cloth (men)                | no   | Piece        | 1     |                                                               |
+| 109  | Kente Cloth (women) (Fathia Fata Nkrumah)                       | Kente cloth (women)              | no   | Piece        | 1     |                                                               |
+| 110  | Adinkra (cotton) (medium quality)                               | Adinkra cloth                    | no   | Piece        | 1     |                                                               |
+| 111  | Polyester material (one metre, ordinary quality)                | Polyester material               | no   | Meter        | 1     |                                                               |
+| 112  | Shirt (long sleeves) (65% synthetic 35% cotton, medium quality) | Shirt (long sleeves)             | no   | Piece        | 1     |                                                               |
+| 113  | School uniform (boys, 10-12 yrs) (ready made set)               | School uniform (boys)            | no   | Set          | 1     |                                                               |
+| 114  | School uniform (girls, 10-12 yrs) (ready made set)              | School uniform (girls)           | no   | Set          | 1     |                                                               |
+| 115  | Rubber Sandals (Local) (pair, charlie wote)                     | Rubber sandals                   | no   | Pair         | 1     |                                                               |
+| 116  | Vest (cotton) (women) (one medium size)                         | Vest (women)                     | no   | Piece        | 1     |                                                               |
+| 117  | Singlet (cotton) (men) (one medium size)                        | Singlet (men)                    | no   | Piece        | 1     |                                                               |
+| 118  | Bedsheet (cotton) (single bed)                                  | Bedsheet (single)                | no   | Piece        | 1     |                                                               |
+| 119  | Bedsheet (cotton) (double bed)                                  | Bedsheet (double)                | no   | Piece        | 1     |                                                               |
+| 120  | Singlet (children) (cotton)                                     | Singlet (children)               | no   | Piece        | 1     |                                                               |
+| 121  | Vest (children) (cotton)                                        | Vest (children)                  | no   | Piece        | 1     |                                                               |
+| 122  | Handkerchief (women) (one dozen)                                | Handkerchief (women)             | no   | Dozen        | 1     |                                                               |
+| 123  | Handkerchief (men) (one dozen)                                  | Handkerchief (men)               | no   | Dozen        | 1     |                                                               |

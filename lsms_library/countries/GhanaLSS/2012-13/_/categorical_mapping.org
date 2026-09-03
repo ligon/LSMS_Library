@@ -188,3 +188,237 @@
 |                              |                              |     272 | other personal grooming services                             |         |                            |
 |                              |                              |     276 | goods for personal care(toothpaste,razor blades,combs,scentÊ |         |                            |
 |                              |                              |     277 | other articles and products                                  |         |                            |
+
+* Education (GLSS6 Section 2A, s2aq2) -- GH #171 / #731
+
+# harmonize_education, WAVE-LEVEL (2026-09-02, GH #731).  This table SHADOWS
+# the country-level GhanaLSS/_/categorical_mapping.org table wholesale for
+# this wave (Wave.categorical_mapping is a plain dict.update over the country
+# dict; no row-union at the country/wave boundary), so it must be COMPLETE for
+# every label PARTA/SEC2a.dta:s2aq2 emits.  All 33 labels the file carries
+# (2026-09-02, slurm_logs/ghana_audit/u6_measure_731.out) are listed; an
+# unlisted label would pass through raw and trip the canonical-vocabulary
+# check.
+#
+# Why a wave table: `U6` here is UPPER SIXTH.  The GLSS6 Part A questionnaire
+# (p.10, Section 2A Q2 "What is the highest grade completed?") codes
+# S5=32, L6=33, U6=34, Voc/Tech/Computer/Comm/Agric=41, Teacher Training=42,
+# Nursing=43, Polytechnic=51, University=52, Other tertiary=53 -- university
+# is its own rung, so U6 is the end of secondary school.  In GLSS1/2/3 the
+# same letters U1..U8 are YEARS OF UNIVERSITY, which is what the country table
+# now says; the two readings cannot share one table.  The rows below are
+# byte-for-byte the values the country table gave this wave before 2026-09-02
+# (verified: api_before_731.out == api_after_731.out for 2012-13).
+#+name: harmonize_education
+| Original Label | Preferred Label              |
+|----------------+------------------------------|
+| None           | No education                 |
+| Pre school     | Pre-primary                  |
+| P1             | Primary incomplete           |
+| P2             | Primary incomplete           |
+| P3             | Primary incomplete           |
+| P4             | Primary incomplete           |
+| P5             | Primary incomplete           |
+| P6             | Primary complete             |
+| M1             | Lower secondary              |
+| M2             | Lower secondary              |
+| M3             | Lower secondary              |
+| M4             | Lower secondary complete     |
+| JSS1/JHS1      | Lower secondary              |
+| JSS/JHS 2      | Lower secondary              |
+| JSS3/JHS3      | Lower secondary complete     |
+| S1             | Upper secondary              |
+| S2             | Upper secondary              |
+| S3             | Upper secondary              |
+| S4             | Upper secondary              |
+| S5             | Upper secondary complete     |
+| SS1/SHS1       | Upper secondary              |
+| SSS2/SHS2      | Upper secondary              |
+| SSS3/SHS3      | Upper secondary complete     |
+| SHS4           | Upper secondary complete     |
+| L6             | Upper secondary complete     |
+| U6             | Upper secondary complete     |
+| Voc//Tec       | Vocational/Technical         |
+| tech training  | Vocational/Technical         |
+| Nursing        | Tertiary certificate/diploma |
+| Polytechnic    | Tertiary certificate/diploma |
+| Other tertiary | Tertiary certificate/diploma |
+| University     | Bachelor                     |
+| Other          | Unknown                      |
+
+* Community price survey (GH #562)
+GLSS6's price survey (=Documentation/QUESTIONNAIRES/GLSS6 Prices Questionnaire.pdf=)
+is keyed REGION / DISTRICT / NAME OF LOCALITY / EA / MARKET NUMBER with three
+observations per item: foods as KG/LITRE + PRICE, non-foods as a free
+DESCRIPTION + PRICE.  The codes and labels below are the Stata value labels
+of =Data/PRICES/price_sec1.dta= (=fcode= 1-102) and =price_sec2.dta=
+(=nfcode= 103-157) -- the printed form lists 89 + 47 items under a different
+numbering and is NOT the coding of the shipped file.  =s1stkg= etc. carry
+the weighed/measured quantity, so =Basis= is blank; =Unit= records whether
+the KG/LITRE figure is a weight or a volume (liquids in litres -- a per-item
+judgement).  Non-food prices refer to the reader's free-text description
+(=s2desc=, 3,437 distinct strings): =Unit= is =Other Unit= and the text goes
+to =Description=.  The survey stamps prices per EA but collected them at 41
+market numbers (323 region/district/market keys for 1,015 EAs; EAs sharing a
+market carry identical prices) -- kept native.
+
+#+name: harmonize_price_item
+| Code | Label                                                               | Preferred Label                                                     | Food | Unit       | Basis | Note                                         |
+|------+---------------------------------------------------------------------+---------------------------------------------------------------------+------+------------+-------+----------------------------------------------|
+| 1    | guinea corn/sorghum                                                 | Guinea corn/sorghum                                                 | yes  | Kilogram   |       |                                              |
+| 2    | maize                                                               | Maize (cob)                                                         | yes  | Kilogram   |       |                                              |
+| 3    | millet                                                              | Millet                                                              | yes  | Kilogram   |       |                                              |
+| 4    | rice (local)                                                        | Rice (local)                                                        | yes  | Kilogram   |       |                                              |
+| 5    | rice (imported)                                                     | Rice (imported)                                                     | yes  | Kilogram   |       |                                              |
+| 6    | bread-sugar bread                                                   | Sugar Bread                                                         | yes  | Kilogram   |       |                                              |
+| 7    | biscuits (cookies)                                                  | Biscuit                                                             | yes  | Kilogram   |       |                                              |
+| 8    | flour (wheat)                                                       | Wheat Flour                                                         | yes  | Kilogram   |       |                                              |
+| 9    | maize ground/corn dough                                             | Maize (flour/dough)                                                 | yes  | Kilogram   |       |                                              |
+| 10   | corned beef                                                         | Beef (corned)                                                       | yes  | Kilogram   |       |                                              |
+| 11   | snail                                                               | Snail                                                               | yes  | Kilogram   |       |                                              |
+| 12   | beef                                                                | Beef                                                                | yes  | Kilogram   |       |                                              |
+| 13   | goat meat                                                           | Goat                                                                | yes  | Kilogram   |       |                                              |
+| 14   | mutton                                                              | Goat                                                                | yes  | Kilogram   |       |                                              |
+| 15   | bushmeat/wild game (grasscutter)                                    | Other Meat                                                          | yes  | Kilogram   |       |                                              |
+| 16   | chicken                                                             | Chicken (live)                                                      | yes  | Kilogram   |       |                                              |
+| 17   | crustaceans (lobsters, crabs, prawns)                               | Crustaceans                                                         | yes  | Kilogram   |       |                                              |
+| 18   | fish (fresh and frozen)                                             | Fish (fresh and frozen)                                             | yes  | Kilogram   |       |                                              |
+| 19   | fish (dried-koobi)                                                  | Fish (dried)                                                        | yes  | Kilogram   |       |                                              |
+| 20   | fish (smoked-river fish)                                            | Fish (smoked)                                                       | yes  | Kilogram   |       |                                              |
+| 21   | fish (smoked herrings)                                              | Fish (smoked)                                                       | yes  | Kilogram   |       |                                              |
+| 22   | fish (canned-tuna)                                                  | Fish (canned)                                                       | yes  | Kilogram   |       |                                              |
+| 23   | fish (canned-sardines)                                              | Fish (canned)                                                       | yes  | Kilogram   |       |                                              |
+| 24   | fish (mackerel in tomato sauce)                                     | Fish (canned)                                                       | yes  | Kilogram   |       |                                              |
+| 25   | milk (fresh)                                                        | Milk (fresh)                                                        | yes  | Liter      |       |                                              |
+| 26   | milk (powdered)                                                     | Milk (powdered)                                                     | yes  | Kilogram   |       |                                              |
+| 27   | baby milk (lactogen)                                                | Milk (powdered)                                                     | yes  | Kilogram   |       |                                              |
+| 28   | tinned milk - ideal, peak etc. (evaporated)                         | Milk (evaporated)                                                   | yes  | Kilogram   |       |                                              |
+| 29   | tinned milk (sweetened)                                             | Milk (tinned, condensed)                                            | yes  | Kilogram   |       |                                              |
+| 30   | chicken eggs                                                        | Eggs                                                                | yes  | Kilogram   |       |                                              |
+| 31   | coconut oil                                                         | Oil (coconut)                                                       | yes  | Liter      |       |                                              |
+| 32   | ground nut oil                                                      | Oil (groundnut)                                                     | yes  | Liter      |       |                                              |
+| 33   | vegetable oil (frytol, obaapa)                                      | Other Oils                                                          | yes  | Liter      |       |                                              |
+| 34   | palm oil                                                            | Oil (palm)                                                          | yes  | Liter      |       |                                              |
+| 35   | shea butter                                                         | Shea Butter                                                         | yes  | Kilogram   |       |                                              |
+| 36   | margarine (canned, sachet)                                          | Margarine                                                           | yes  | Kilogram   |       |                                              |
+| 37   | kolanut                                                             | Cola Nut                                                            | yes  | Kilogram   |       |                                              |
+| 38   | coconut (fresh)                                                     | Coconut (fresh)                                                     | yes  | Kilogram   |       |                                              |
+| 39   | banana                                                              | Banana                                                              | yes  | Kilogram   |       |                                              |
+| 40   | oranges/tangerines                                                  | Orange                                                              | yes  | Kilogram   |       |                                              |
+| 41   | pineapple                                                           | Pineapple                                                           | yes  | Kilogram   |       |                                              |
+| 42   | mango (grafted)                                                     | Mango                                                               | yes  | Kilogram   |       |                                              |
+| 43   | avocado pear                                                        | Avocado                                                             | yes  | Kilogram   |       |                                              |
+| 44   | apples (imported)                                                   | Other Fruits                                                        | yes  | Kilogram   |       |                                              |
+| 45   | cocoyam leaves (kontomire/alefu)                                    | Cocoyam Leaves                                                      | yes  | Kilogram   |       |                                              |
+| 46   | garden eggs                                                         | Eggplant                                                            | yes  | Kilogram   |       |                                              |
+| 47   | okro                                                                | Okra                                                                | yes  | Kilogram   |       |                                              |
+| 48   | carrots                                                             | Carrot                                                              | yes  | Kilogram   |       |                                              |
+| 49   | pepper (fresh)                                                      | Pepper                                                              | yes  | Kilogram   |       |                                              |
+| 50   | pepper (dried)                                                      | Pepper                                                              | yes  | Kilogram   |       |                                              |
+| 51   | onions/shallot (large/small)                                        | Onion                                                               | yes  | Kilogram   |       |                                              |
+| 52   | tomatoes (fresh)                                                    | Tomato (fresh)                                                      | yes  | Kilogram   |       |                                              |
+| 53   | tomato paste (canned)                                               | Tomato (paste)                                                      | yes  | Kilogram   |       |                                              |
+| 54   | garlic                                                              | Condiments                                                          | yes  | Kilogram   |       |                                              |
+| 55   | sugar (cube, st. louis)                                             | Sugar                                                               | yes  | Kilogram   |       |                                              |
+| 56   | sugar (granulated)                                                  | Sugar                                                               | yes  | Kilogram   |       |                                              |
+| 57   | honey (bottle)                                                      | Honey                                                               | yes  | Liter      |       |                                              |
+| 58   | ice cream (fan ice, yoghurt)                                        | Ice Cream                                                           | yes  | Kilogram   |       |                                              |
+| 59   | chocolate (bar)                                                     | Chocolate                                                           | yes  | Kilogram   |       |                                              |
+| 60   | chewing gum (pk, mentos)                                            | Other Confectioneries                                               | yes  | Kilogram   |       |                                              |
+| 61   | black pepper                                                        | Chilli Powder (black pepper)                                        | yes  | Kilogram   |       |                                              |
+| 62   | salt (iodized)                                                      | Salt                                                                | yes  | Kilogram   |       |                                              |
+| 63   | ginger                                                              | Ginger                                                              | yes  | Kilogram   |       |                                              |
+| 64   | maggi cubes                                                         | Condiments                                                          | yes  | Kilogram   |       |                                              |
+| 65   | cassava (fresh)                                                     | Cassava (fresh)                                                     | yes  | Kilogram   |       |                                              |
+| 66   | cassava dough                                                       | Cassava (dough)                                                     | yes  | Kilogram   |       |                                              |
+| 67   | cassava flour (konkonte)                                            | Cassava (flour)                                                     | yes  | Kilogram   |       |                                              |
+| 68   | cocoyam                                                             | Cocoyam                                                             | yes  | Kilogram   |       |                                              |
+| 69   | plantain                                                            | Plantain                                                            | yes  | Kilogram   |       |                                              |
+| 70   | yam                                                                 | Yam                                                                 | yes  | Kilogram   |       |                                              |
+| 71   | beans (white)                                                       | Bean                                                                | yes  | Kilogram   |       |                                              |
+| 72   | groundnut (shelled)                                                 | Groundnut                                                           | yes  | Kilogram   |       |                                              |
+| 73   | groundnut (roasted)                                                 | Groundnut                                                           | yes  | Kilogram   |       |                                              |
+| 74   | palm nut fruits                                                     | Palm Nut                                                            | yes  | Kilogram   |       |                                              |
+| 75   | other pulse and nuts specified (e.g. cashew nut, tiger nuts)        | Other Nut/Seed                                                      | yes  | Kilogram   |       |                                              |
+| 76   | gari                                                                | Cassava (flour)                                                     | yes  | Kilogram   |       |                                              |
+| 77   | coffee (nescafe - tin)                                              | Coffee                                                              | yes  | Kilogram   |       |                                              |
+| 78   | chocolate drinks (milo, bournvita, other specified)                 | Cocoa Powder                                                        | yes  | Kilogram   |       |                                              |
+| 79   | pure cocoa powder (without milk, e.g. brown gold)                   | Cocoa Powder                                                        | yes  | Kilogram   |       |                                              |
+| 80   | tea (lipton)                                                        | Tea bags                                                            | yes  | Kilogram   |       |                                              |
+| 81   | coca cola / fanta (bottled)                                         | Soft Drinks                                                         | yes  | Liter      |       |                                              |
+| 82   | malt drinks                                                         | Malt Drinks (bottle)                                                | yes  | Liter      |       |                                              |
+| 83   | fruits juices (don simon multifruita, ceres)                        | Juice                                                               | yes  | Liter      |       |                                              |
+| 84   | mineral water (bottled)                                             | Water                                                               | yes  | Liter      |       |                                              |
+| 85   | mineral water (sachet)                                              | Water                                                               | yes  | Liter      |       |                                              |
+| 86   | gin                                                                 | Other Spirits                                                       | yes  | Liter      |       |                                              |
+| 87   | whisky                                                              | Whisky                                                              | yes  | Liter      |       |                                              |
+| 88   | akpeteshie                                                          | Akpeteshie                                                          | yes  | Liter      |       |                                              |
+| 89   | bitters (alomo, agya appiah, herbafric)                             | Other Spirits                                                       | yes  | Liter      |       |                                              |
+| 90   | palm wine / raffia palm wine, etc.                                  | Wine                                                                | yes  | Liter      |       |                                              |
+| 91   | imported wine                                                       | Wine                                                                | yes  | Liter      |       |                                              |
+| 92   | pito / brukutu, etc.                                                | Wine                                                                | yes  | Liter      |       |                                              |
+| 93   | beer (star, club)                                                   | Beer                                                                | yes  | Liter      |       |                                              |
+| 94   | beer (imported)                                                     | Beer                                                                | yes  | Liter      |       |                                              |
+| 95   | guinness and other stout                                            | Beer                                                                | yes  | Liter      |       |                                              |
+| 96   | cooked rice and stew                                                | Cooked Rice and Stew                                                | yes  | Kilogram   |       |                                              |
+| 97   | fufu/tuo with soup                                                  | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
+| 98   | kenkey with fried fish                                              | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
+| 99   | fast foods (fried rice)                                             | Fast Food                                                           | yes  | Kilogram   |       |                                              |
+| 100  | fried plantain and beans (red red)                                  | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
+| 101  | rice and chicken sauce                                              | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
+| 102  | banku and stew                                                      | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
+| 103  | cigarette (555)                                                     | Cigarrette                                                          | yes  | Other Unit |       | basis is the free-text s2desc -> Description |
+| 104  | refuse disposal (payment per month)                                 | Refuse disposal (payment per month)                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 105  | expenditure on public toilets fees (wc and others)                  | Expenditure on public toilets fees (wc and others)                  | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 106  | charcoal (bag-mini)                                                 | Charcoal (bag-mini)                                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 107  | charcoal (loose - heap/container)                                   | Charcoal (loose - heap/container)                                   | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 108  | firewood and other solid fuels                                      | Firewood and other solid fuels                                      | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 109  | ice block (household cooling and refrigeration only)                | Ice block (household cooling and refrigeration only)                | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 110  | omo (medium)                                                        | Omo (medium)                                                        | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 111  | washing soaps and powder (arial / kleesoft - small/medium)          | Washing soaps and powder (arial / kleesoft - small/medium)          | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 112  | bathing/toilet soaps bottled (liquid - sunlight)                    | Bathing/toilet soaps bottled (liquid - sunlight)                    | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 113  | key soap (bar)                                                      | Key soap (bar)                                                      | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 114  | bathing/toilet soaps tablet (solid - sunlight)                      | Bathing/toilet soaps tablet (solid - sunlight)                      | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 115  | bleaches (parazone)                                                 | Bleaches (parazone)                                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 116  | disinfectants and cleaners (dettol, camel, etc.)                    | Disinfectants and cleaners (dettol, camel, etc.)                    | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 117  | mosquito coil (heaven)                                              | Mosquito coil (heaven)                                              | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 118  | insecticide spray (raid - tin)                                      | Insecticide spray (raid - tin)                                      | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 119  | matches (one box)                                                   | Matches (one box)                                                   | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 120  | toilet roll/paper (rose, orange - one roll)                         | Toilet roll/paper (rose, orange - one roll)                         | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 121  | candles (one stick)                                                 | Candles (one stick)                                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 122  | pain killers (paracetamol, apc, etc.)                               | Pain killers (paracetamol, apc, etc.)                               | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 123  | antibiotics                                                         | Antibiotics                                                         | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 124  | anti malaria medicines (artesunate amodiaquine/atc)                 | Anti malaria medicines (artesunate amodiaquine/atc)                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 125  | condoms (men - one pack of 3 pieces)                                | Condoms (men - one pack of 3 pieces)                                | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 126  | corrective eye glasses                                              | Corrective eye glasses                                              | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 127  | ghanaian traditional drug (tablet/syrup)                            | Ghanaian traditional drug (tablet/syrup)                            | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 128  | petrol (one litre)                                                  | Petrol (one litre)                                                  | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 129  | diesel (one litre)                                                  | Diesel (one litre)                                                  | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 130  | kerosene                                                            | Kerosene                                                            | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 131  | gas                                                                 | Gas                                                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 132  | electricity, centralized supply                                     | Electricity, centralized supply                                     | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 133  | maintenance, repair of vehicle, e.g. wheel alignment, change of oil | Maintenance, repair of vehicle, e.g. wheel alignment, change of oil | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 134  | washing/ packing space services                                     | Washing/ packing space services                                     | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 135  | cost of travel by rail (specified distance)                         | Cost of travel by rail (specified distance)                         | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 136  | intercity bus fares (stc, neoplan etc.)                             | Intercity bus fares (stc, neoplan etc.)                             | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 137  | trotro, taxi and other transport fares                              | Trotro, taxi and other transport fares                              | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 138  | cost of travel by air                                               | Cost of travel by air                                               | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 139  | cost of travel by ferries and canoes                                | Cost of travel by ferries and canoes                                | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 140  | porters (kayaye, male porters etc.)                                 | Porters (kayaye, male porters etc.)                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 141  | cost of luggage and items transported unaccompanied (private/stc)   | Cost of luggage and items transported unaccompanied (private/stc)   | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 142  | postage (within ghana)                                              | Postage (within ghana)                                              | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 143  | postage (outside ghana)                                             | Postage (outside ghana)                                             | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 144  | national lotteries                                                  | National lotteries                                                  | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 145  | exercise books                                                      | Exercise books                                                      | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 146  | textbooks, story books, pamphlets/dictionaries etc.                 | Textbooks, story books, pamphlets/dictionaries etc.                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 147  | graphic and times                                                   | Graphic and times                                                   | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 148  | private newspaper                                                   | Private newspaper                                                   | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 149  | magazines                                                           | Magazines                                                           | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 150  | services of barbers, beauty shops etc. (men)                        | Services of barbers, beauty shops etc. (men)                        | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 151  | services of beauty shops including manicure and pedicure (women)    | Services of beauty shops including manicure and pedicure (women)    | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 152  | mesh/wigs (human hair)                                              | Mesh/wigs (human hair)                                              | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 153  | mesh/wigs (synthetic)                                               | Mesh/wigs (synthetic)                                               | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 154  | tooth paste (pepsodent)                                             | Tooth paste (pepsodent)                                             | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 155  | razor blades (e.g. lords, bic etc.)                                 | Razor blades (e.g. lords, bic etc.)                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 156  | combs                                                               | Combs                                                               | no   | Other Unit |       | basis is the free-text s2desc -> Description |
+| 157  | scent spray                                                         | Scent spray                                                         | no   | Other Unit |       | basis is the free-text s2desc -> Description |
