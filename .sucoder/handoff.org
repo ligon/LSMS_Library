@@ -30,8 +30,15 @@ allocation.
   FILE; part-qualified j; bounded additive reducer pinned 33/2/0; W1 sales
   from A83/A124 not S4BI).  Reviewed by me; recommend merge.  Edits
   =ghanasps.py=/=Makefile= -> every GhanaSPS table cold-rebuilds once.
+- *#762* GhanaLSS =community_prices= (#562 3a): 660k rows, six waves at
+  (t, v, j, u, obs); 2005-06 asked-not-distributed; GLSS3's 117 item codes
+  RECONSTRUCTED from the GLSS4 form (documented per row as inference) --
+  EL should know before merging.  New module GhanaLSS/_/glss_prices.py.
+  Proposes a canonical index_info entry + fabricate_missing_levels so
+  Feature() stops modal-excluding one side.  Reviewed; recommend merge with
+  the caveat.
 - Issues filed: #753 (Trap 6 _dirs), #763 (get_data_file walks the DVC
-  index: 1,599 s on a cached PDF vs 10 s via _ensure_dvc_pulled).
+  index), #764 (make -j from os.cpu_count: -j28 on a 4-core slice).
 
 * Merged this session (all reviewed by me before EL's merge word)
 #751 GhanaLSS #692/#695 | #752 GhanaSPS plot_features | #754 reachability CI |
@@ -41,9 +48,10 @@ allocation.
 - KLPS-4's 4 blobs pushed (files/md5/); remote now 17 short (KLPS-2/3 x8
   need EL's browser zip -> =tmp/klps_upload/=, Togo x5, Crop_encrypted x4).
   #750 commented twice (correction + progress).  #753 (Trap 6) filed.
-- Round 3: =crop_production= DONE (PR #761).  Agent on =wt-glss-prices=
-  (GhanaLSS =community_prices= 3a, GH #562,
-  BRIEF_community_prices_2026-09-02.org) still running.
+- Round 3 DONE: =crop_production= (PR #761), =community_prices= (PR #762).
+  Both slots free.  NEXT DISPATCH: #727 canon on =wt-canon-727= (being cut
+  alone, ~23:26); =plot_labor= on =wt-gsps-labor= AFTER #761 merges (shares
+  five GhanaSPS files with it); =plot_inputs= after plot_labor.
 - Round 4 STAGED, EL's rulings taken: plot_labor keeps =stage= as an index
   level with WageRate/WageUnit (BRIEF_plot_labor_2026-09-02.org);
   plot_inputs = real-quantity rows only (BRIEF_plot_inputs_2026-09-02.org);
