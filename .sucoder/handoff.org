@@ -2,8 +2,9 @@
 #+date: 2026-09-02
 #+author: Sue (Claude Fable 5.1)
 
-* State at last update (2026-09-02, ~19:30 PDT)
-Branch =development= = =fc9a9ad9= (PRs #751, #752, #754 merged) + local == origin.
+* State at last update (2026-09-02, ~21:15 PDT)
+Branch =development= = =9c21ab89= (PRs #751 #752 #754 #756 #759 #760 merged) + local == origin.
+Shared GhanaLSS cache CLEARED after #756 (GH #757), so the next GhanaLSS read here is cold.
 Slurm job 38425803 (savio4_htc slice, 4 cores).  =.venv= remounted via
 =bin/savio_venv.sh mount= at session start -- do that first on any new
 allocation.
@@ -24,35 +25,37 @@ allocation.
 - *PR #754* opened: weekly =dvc-remote-reachability= CI job (red until the
   21 are pushed or retired -- by design).
 
-* Open PRs awaiting EL's merge word (all reviewed by me, all recommended)
-- *#756* GhanaLSS #731 (U6 split by wave: university year in GLSS1-3, Upper
-  Sixth in GLSS5-7) + #705 (urban cutoff doc).  After merge: run
-  =lsms-library cache clear --country GhanaLSS= on the shared cache (GH #757:
-  a country categorical_mapping.org edit is invisible to Wave._input_hash).
-- *#759* KenyaLPS SOURCE.org + LICENSE.org per wave (Dataverse, CC0).
-- *#760* GhanaSPS =livestock= (HerdValue; bounded additive reducer pinned by test).
+* Merged this session (all reviewed by me before EL's merge word)
+#751 GhanaLSS #692/#695 | #752 GhanaSPS plot_features | #754 reachability CI |
+#756 GhanaLSS #731 U6 + #705 | #759 KenyaLPS provenance/licence | #760 GhanaSPS livestock.
 
 * Done since the previous handoff
 - KLPS-4's 4 blobs pushed (files/md5/); remote now 17 short (KLPS-2/3 x8
   need EL's browser zip -> =tmp/klps_upload/=, Togo x5, Crop_encrypted x4).
   #750 commented twice (correction + progress).  #753 (Trap 6) filed.
-- Round 3 briefs written + worktrees ready: =wt-gsps-crop=
-  (BRIEF_crop_production_2026-09-02.org; dispatch after #760 merges) and
-  =wt-glss-prices= (BRIEF_community_prices_2026-09-02.org; dispatch after
-  #756 merges).  Then plot_labor, plot_inputs, #727 canon, #563 FCT.
+- Round 3 DISPATCHED (~21:00): agent on =wt-gsps-crop= (GhanaSPS
+  =crop_production=, BRIEF_crop_production_2026-09-02.org) and agent on
+  =wt-glss-prices= (GhanaLSS =community_prices= 3a, GH #562,
+  BRIEF_community_prices_2026-09-02.org).  Verify their PRs the same way
+  (scope, diff, primary source, CI) before recommending merge.
+- #727 ruled by EL: add Bamboo + Terrazzo to the housing canon AND re-point
+  every exact-match row corpus-wide (GhanaSPS, GhanaLSS x2, Timor-Leste,
+  Nigeria); compounds untouched.  Brief written
+  (=slurm_logs/ghana_audit/BRIEF_727_housing_canon_2026-09-02.org=);
+  worktree =wt-canon-727= cutting; DISPATCH when a Round 3 slot frees.
+- After Round 3 + #727 land: burst =make matrix C="GhanaLSS GhanaSPS"=
+  (template =slurm_logs/ghana_audit/matrix_refresh_ghana.sbatch=), then
+  plot_labor -> plot_inputs (GhanaSPS), #563 FCT nutrition (GhanaLSS).
 
 * In flight
-- KenyaLPS recovery (#750): KLPS-4's 4 files downloaded from Dataverse
-  (=O0BBKI=), md5 MATCH sidecars, sitting at their workspace paths.  One-file
-  =push_to_cache_batch= test running (log
-  =slurm_logs/dvc_reachability/push_test2_2026-09-02.log=) after EL
-  authorised removing two stale flufl locks my killed first attempt left in
-  =.dvc/tmp/=.  If the test pushes cleanly and does not rewrite the sidecar,
-  push the other three; if it rewrites the sidecar (DVC 3 form), that is a
-  sidecar change -> branch + PR.
-- KLPS-2 (=PBFXVK=) / KLPS-3 (=PXVFJD=): Dataverse guestbook 63 gates the
-  API download; EL must fill it once (or download the 8 files by hand).
-  KLPS-2 sidecars are =.tab= ingest derivatives (no published md5).
+- KenyaLPS (#750): KLPS-4 x4 PUSHED (files/md5/), remote 17 short.  KLPS-2/3
+  x8: Dataverse guestbook 63 blocks EVERY API route even with EL's valid
+  token (per-file, multi-file, dataset zip, gbrecs=true) -- the browser zip
+  is the only way.  Watcher armed on =tmp/klps_upload/=; when it lands:
+  unzip, md5 vs sidecars (KLPS-3 wants ORIGINAL .dta, KLPS-2 wants the
+  .tab derivatives), then =push_to_cache_batch= (~9 min per batch on Lustre;
+  never a short timeout -- a killed =dvc add= leaves a stale flufl lock).
+  =/tmp/dataverse_token= (EL's, mode 600) is useless now -- ask before deleting.
 
 * Next concrete actions
 1. Read push_test2 log -> push remaining KLPS-4 files (or branch if sidecars
