@@ -25,6 +25,14 @@ allocation.
 - *PR #754* opened: weekly =dvc-remote-reachability= CI job (red until the
   21 are pushed or retired -- by design).
 
+* Open PR awaiting EL's merge word
+- *#761* GhanaSPS =crop_production= (W1 two-season melt; season from the
+  FILE; part-qualified j; bounded additive reducer pinned 33/2/0; W1 sales
+  from A83/A124 not S4BI).  Reviewed by me; recommend merge.  Edits
+  =ghanasps.py=/=Makefile= -> every GhanaSPS table cold-rebuilds once.
+- Issues filed: #753 (Trap 6 _dirs), #763 (get_data_file walks the DVC
+  index: 1,599 s on a cached PDF vs 10 s via _ensure_dvc_pulled).
+
 * Merged this session (all reviewed by me before EL's merge word)
 #751 GhanaLSS #692/#695 | #752 GhanaSPS plot_features | #754 reachability CI |
 #756 GhanaLSS #731 U6 + #705 | #759 KenyaLPS provenance/licence | #760 GhanaSPS livestock.
@@ -33,11 +41,19 @@ allocation.
 - KLPS-4's 4 blobs pushed (files/md5/); remote now 17 short (KLPS-2/3 x8
   need EL's browser zip -> =tmp/klps_upload/=, Togo x5, Crop_encrypted x4).
   #750 commented twice (correction + progress).  #753 (Trap 6) filed.
-- Round 3 DISPATCHED (~21:00): agent on =wt-gsps-crop= (GhanaSPS
-  =crop_production=, BRIEF_crop_production_2026-09-02.org) and agent on
-  =wt-glss-prices= (GhanaLSS =community_prices= 3a, GH #562,
-  BRIEF_community_prices_2026-09-02.org).  Verify their PRs the same way
-  (scope, diff, primary source, CI) before recommending merge.
+- Round 3: =crop_production= DONE (PR #761).  Agent on =wt-glss-prices=
+  (GhanaLSS =community_prices= 3a, GH #562,
+  BRIEF_community_prices_2026-09-02.org) still running.
+- Round 4 STAGED, EL's rulings taken: plot_labor keeps =stage= as an index
+  level with WageRate/WageUnit (BRIEF_plot_labor_2026-09-02.org);
+  plot_inputs = real-quantity rows only (BRIEF_plot_inputs_2026-09-02.org);
+  #563 nutrition/FCT (BRIEF_563_nutrition_fct_2026-09-02.org) BLOCKED on EL
+  dropping the West Africa FCT export into =tmp/fct_upload/= (sheet is 401).
+  Worktrees =wt-gsps-labor=, =wt-gsps-inputs=, =wt-glss-fct= cutting
+  (log /tmp/wt_create_r4_*.log); =wt-canon-727= must be re-cut ALONE after
+  they finish (two concurrent checkouts hit EINTR on Lustre twice).
+- Hardcoded USDA FDC API key in =Uganda/_/nutrition.py= and
+  =Ethiopia/_/nutrition.py= -- reported to EL; decision pending.
 - #727 ruled by EL: add Bamboo + Terrazzo to the housing canon AND re-point
   every exact-match row corpus-wide (GhanaSPS, GhanaLSS x2, Timor-Leste,
   Nigeria); compounds untouched.  Brief written
