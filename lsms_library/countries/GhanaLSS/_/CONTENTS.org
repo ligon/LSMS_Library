@@ -243,6 +243,129 @@ GLSS1/GLSS2 have *no urban/rural variable in the microdata at all* -- see
 Appendix I at the *cluster* level and is broadcast to the households of each
 cluster.  The Appendix's third value =SU= is folded onto =Rural=.
 
+The *population cutoff* behind every row of the table above is not the same
+from round to round -- see the next subsection before comparing =Rural= across
+waves.
+
+** The urban cutoff MOVES across rounds: 5,000 -> 1,500 -> 5,000 (GH #705, 2026-09-02)
+
+GSS changed the population cutoff that defines an urban locality between
+GLSS rounds, and absorbed the 1,500--5,000 "semi-urban" band differently each
+time.  Recorded here, next to the source table above, because the delivered
+=Rural= column carries no trace of it -- the same defect class as Ethiopia's
+=Urban= (GH #683, PR #688), found in this country by reading documentation
+rather than by noticing an implausible series (GH #705, from the
+settlement-threshold sweep of PR #704).
+
+*The cutoff, per round, from documents this repository ships:*
+
+| Round             | urban cutoff | semi-urban band                | scheme | measured on | source (verbatim quote below or in the /SU -> Rural/ section)                                                        |
+|-------------------+--------------+--------------------------------+--------+-------------+-----------------------------------------------------------------------------------------------------------------------|
+| GLSS1/2 1987-89   | > 5,000      | 1,500--5,000, its own stratum  | 3-way  | 1984 Census | joint BID §3.1, PDF p.13 / printed p.11 -- quoted under /The =SU= -> =Rural= fold/ below                              |
+| GLSS3 1991-92     | >= 5,000     | 1,500--<5,000, reported inside *Rural* | 3-way (2-way in =loc2=) | 1984 Census | =G3report.pdf= note to Table 7.3, PDF p.75 / printed p.57 -- quoted under /Band boundaries/ in the same section |
+| *GLSS4 1998-99*   | *> 1,500*    | *1,501--5,000, folded into URBAN* | 2-way | 1984 Census | =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11 -- quoted below                                                          |
+| GLSS5 2005-06     | not stated   | --                             | 2-way  | 2000 PHC frame | searched =ddi-documentation-english-5.pdf= end to end (p.5 says only that EAs "were further sub-divided according to their rural and urban areas of location"); no number anywhere |
+| GLSS6 2012-13     | >= 5,000     | none                           | 2-way  | not stated  | =REPORTS/GLSS6_Labour Force Report.pdf= pp.15-16 -- quoted below.  The Main Report (Appendix 1, p.23) says only "The EAs were further divided into urban and rural localities of residence" |
+| GLSS7 2016-17     | not stated   | --                             | 2-way  | 2010 PHC frame | searched =ddi-documentation-english-97.pdf= end to end; neither a cutoff nor a description of =urbrur= |
+
+"Not stated" is a searched negative for the two named files, not for the
+questionnaires or manuals (GLSS7's =GLSS7 Final Manual.docx= and GLSS5's
+questionnaires were not read for this); a later reader may well find the
+rule in another document type -- the GLSS4 rule is in a *user guide* and the
+GLSS6 rule in a *labour-force report*, which is why single-document negatives
+are worthless here.
+
+GLSS4, =GHA_1998_GLSS_Data_User_Guide_EN.pdf=, §6 definitions, p.11 (plain
+text layer; typography as printed, including the unclosed parenthesis):
+
+#+begin_quote
+Urban EA:  An EA was considered to be urban if it had a population greater than 1,500 people during the 1984 population census.  Thus semi-urban EAs (with population between 1,501 and 5,000 were considered as urban assuming that they might have grown to urban status since the 1984 census.
+Rural EA:  An EA was considered to be rural if it had a population 1,500 or less people during the 1984 population census.
+#+end_quote
+
+GLSS6, =REPORTS/GLSS6_Labour Force Report.pdf=, "Locality", pp.15-16 (the
+sentence breaks across the page):
+
+#+begin_quote
+Two main types of locality are defined by the survey: urban and rural. The classification of localities into 'urban' and 'rural' is based on population size. Localities with 5,000 or more persons are classified as Urban while those with less than 5,000 persons are classified as Rural.
+#+end_quote
+
+*Direction of bias, by construction.*  Under GLSS4's rule every locality the
+1984 Census put at 1,501--5,000 is urban; under GLSS1/2's, GLSS3's and
+GLSS6's rule none of them is.  Holding the frame fixed (GLSS1/2, GLSS3 and
+GLSS4 all sit on the 1984 Census), GLSS4's urban share must therefore be
+*higher* than a 5,000-rule share of the same country, and GLSS4 says so
+itself: the fold was a deliberate *assumption* -- "assuming that they might
+have grown to urban status since the 1984 census" -- not an error.  Any
+GhanaLSS urbanisation series that crosses 1998-99 is measuring that
+definition, not only the country.
+
+*What the delivered column actually shows* (=Country('GhanaLSS').sample()=,
+cold, 2026-09-02; the unweighted share is a *design allocation* -- GSS chose
+how many urban EAs to draw -- and can neither confirm nor refute the
+definitional claim above; weights are the API's within-wave mean-1 values,
+which leave the weighted share unchanged):
+
+| Round   |      n | Urban share, unweighted | Urban share, weighted | note                                                              |
+|---------+--------+-------------------------+-----------------------+-------------------------------------------------------------------|
+| GLSS1   |  3,147 |                   37.6% |               (=)     | self-weighting: one weight value                                  |
+| GLSS2   |  3,194 |                   33.5% |               (=)     | self-weighting                                                    |
+| GLSS3   |  4,523 |                   34.9% |               (=)     | self-weighting                                                    |
+| GLSS4   |  5,998 |                   36.7% |                 36.7% | 298 distinct weights; weighted equals unweighted to 0.1 pt        |
+| GLSS5   |  8,687 |                   41.6% |                 43.2% |                                                                   |
+| GLSS6   | 16,772 |                   44.4% |                 55.4% | 2010 PHC frame; ">= 5,000" rule                                   |
+| GLSS7   | 14,009 |                   43.0% |                 56.0% |                                                                   |
+
+Read honestly: the GLSS3 -> GLSS4 step in the *sample* is +1.8 points -- the
+sign the definition predicts, but small, and the sample share is an
+allocation, not a population estimate.  The large weighted jump is GLSS5 ->
+GLSS6 (43.2% -> 55.4%), which confounds a new frame (2000 -> 2010 PHC), a
+stated rule (none -> ">= 5,000"), and genuine urbanisation (the 2010 PHC
+itself reports 50.9% urban), and this file does not apportion it.
+
+*Consequence after PR #690.*  GLSS1/GLSS2 =Rural= now comes from BID
+Appendix I with the =SU= stratum (52 of 263 clusters, 1,500--5,000) folded
+onto *=Rural=*.  GLSS4 folds the *same* 1,501--5,000 band onto *=Urban=*.
+So a settlement of the same 1984 size is delivered as =Rural= in 1987-89 and
+=Urban= in 1998-99.  Before #690 GLSS1/2 =Rural= was 100% NULL and the
+inconsistency was invisible rather than absent; after it, the column is
+present but not comparable across that boundary, and that is now a
+documented property rather than an unknown.  The #690 decision is not wrong
+on this evidence: GLSS4's fold rests on an explicitly *time-dependent*
+rationale ("might have grown" by 1998) that cannot transfer to a 1987-88
+survey contemporaneous with the very census being used.  GLSS3, per its own
+report's nesting of "Semi-urban" under a *Rural* total (Tables 7.3 and 7.9;
+see the /SU -> Rural/ section), sits with GLSS1/2 on this -- an inference
+from the report's tables, since no =loc2= variable description was found.
+
+*Which variable each wave's =Rural= actually reflects* -- GH #705's caveat
+is that sampling strata are not necessarily the published variable, so this
+was checked per wave before the cutoff table was asserted to apply.  Measured
+2026-09-02: in *every* wave =Rural= takes exactly one value within each
+cluster =v= (0 mixed clusters of 176 / 170 / 365 / 300 / 580 / 1,200 /
+1,000), so all seven are EA-level classifications, not household attributes.
+How firmly each is tied to the *frame's* population rule differs:
+
+| Round | delivered =Rural= reads             | grain            | tie to the frame's size rule                                                                                                        |
+|-------+-------------------------------------+------------------+-------------------------------------------------------------------------------------------------------------------------------------|
+| GLSS1 | BID Appendix I =UrbRur= (U/R/SU)    | cluster, broadcast | *is* the sampling stratum (BID §3.1 defines it by 1984 population).  Documented                                                     |
+| GLSS2 | BID Appendix I =UrbRur=             | cluster, broadcast | same                                                                                                                                |
+| GLSS3 | =POV_GH.DTA:loc2= (1 urban / 2 rural) | EA (0/365 mixed) | *inferred*: the report defines the tiers by 1984 population and nests semi-urban under rural; no variable description found for =loc2= |
+| GLSS4 | =SEC0A.DTA:loc2= "Locality classification of HH" (user guide p.26: 1 Urban, 2 Rural) | EA (0/300 mixed) | documented: p.8 "stratification was done based on the size of the locality into rural or urban", p.11 defines the size (> 1,500)      |
+| GLSS5 | =parta/sec7.dta:loc2=, DDI label *"urban/rural-corr"* (V110, V1279) | EA (0/580 mixed) | *not stated*, and the DDI label says the variable was *corrected* -- do not assert it equals the frame stratum                       |
+| GLSS6 | =PARTA/g6loc_edt.dta:loc2= (Urban/Rural strings) | EA (0/1,200 mixed) | documented by the Labour Force Report's ">= 5,000" rule; the Main Report does not describe =loc2=                                    |
+| GLSS7 | =sample=: =g7sec0.dta:urbrur=; =cluster_features=: =loc2= | EA (0/1,000 mixed) | *not stated*: the DDI describes neither variable and gives no cutoff                                                                |
+
+*Decision: documentation, not an API-time warning.*  A per-wave
+comparability warning on =Rural= was considered and not built.  #683 took
+the documentation route for Ethiopia (PR #688) and consistency argues for the
+same here, even though Ghana now carries *two* discontinuities (GLSS3 ->
+GLSS4 and GLSS4 -> GLSS6); the library's posture is to make the data honest
+and let the analyst decide, not to police pooling.  PR #688 also left a
+one-line pointer on =sample.Rural= in Ethiopia's =data_scheme.yml=; the
+GhanaLSS =data_scheme.yml= was out of scope for the #705 change and carries
+no such pointer yet -- adding one is a one-line follow-up.
+
 ** =sample= feature source variables
 
 | Round | File             | i        | v     | weight   | strata | Rural  |
@@ -1493,6 +1616,13 @@ ambiguous relative to the survey's definition of urban -- it is, by that
 definition, not urban.  That is an argument about the fold's *direction*, and
 a far better one than the withdrawn =Classification= column.  It is not a
 statement that GSS intended =SU= to be reported as rural.
+
+/Corrected 2026-09-02 (GH #705)./  "The survey's own urban threshold" above
+means *GLSS1/GLSS2's* -- and GLSS3's and GLSS6's -- not the programme's:
+GLSS4 set its urban threshold at *1,500* and folded the same 1,501--5,000
+band onto *urban*.  See /The urban cutoff MOVES across rounds/ under
+/Sampling Design/ for the round-by-round table and what it does to the
+delivered =Rural= column.
 
 Three further pieces of evidence point the same way.  None is a GLSS1/GLSS2
 sentence saying "semi-urban is rural"; take them for exactly what they are.
