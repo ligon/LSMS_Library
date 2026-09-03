@@ -66,7 +66,9 @@ in `.coder/coverage/absent_verdicts.csv`.
 - **GLSS3/GLSS4 ship only the per-unit value** (`p` = PRICE/KG, e.g. 500/7); the weighed KG is not distributed → `NumberOfUnits` comes from the form's stated basis per item.
 - **2012-13 prices are stamped per cluster but collected per market**: 1,015 clusters, 323 `(region, district, market)` keys, identical prices across clusters sharing a market; `clust` values 60001–61200 ⊂ `g6loc_edt.clust`.
 - **2016-17 `clust` is nationally unique in the household cover** (1000 EAs, 0 spanning regions) but the price file stamps 11 `(clust, region)` pairs with a region the cover contradicts (clusters 70002, 70909 carry a sibling EA's rows). Kept native, named, not "fixed".
-- `map_index` renames a `pd.NA` `u` level to the string `'unit'` on every read (`local_tools.py`), so 2012-13 non-food rows (free-text basis, no fixed unit) will show `u='unit'` at the API with the basis in `Description`.
+- 2012-13 non-food rows carry `u='Other Unit'` (free-text basis in `Description`) rather than `pd.NA`, because `map_index` renames a `pd.NA` `u` level to the string `'unit'` on every read (`local_tools.py`).
+- The global `lsms_library/categorical_mapping/u.org` relabels `Kilogram` -> `Kg` at API time (its only scope); the parquet keeps `Kilogram`.
+- `Feature('community_prices')` keeps the MODAL index shape and excludes the rest (`feature._harmonize_country_frame`, `_canonical_index_levels` is `[]` here): measured, Malawi is excluded from `(['GhanaLSS','Malawi'])` and GhanaLSS from `(['GhanaLSS','Malawi','Nigeria'])`, each with a `UserWarning`.  Motivates the §6 proposal.
 - `LSMS_COUNTRIES_ROOT` + private `LSMS_DATA_DIR` (shared `dvc-cache` symlink) for every run; assert `'wt-glss-prices' in str(countries_root())`.
 - `get_data_file()` walks the DVC index (`DVCFS.exists`) and hung >10 min on Lustre; documentation blobs were fetched lock-free through `_ensure_dvc_pulled` + the sidecar md5 (`slurm_logs/ghana_audit/community_prices/fetch_docs.py`).
 
@@ -85,7 +87,7 @@ in `.coder/coverage/absent_verdicts.csv`.
 
 ## §6 Open questions for the human
 
-- Canonical `community_prices` block for `lsms_library/data_info.yml`: proposed in the report (`(t, v, j, u, obs)` + `obs` in `fabricate_missing_levels`), not edited here.
+- Canonical `community_prices` block for `lsms_library/data_info.yml`: proposed in the report (`index_info: community_prices: (t, v, j, u, obs)` + `community_prices` in `fabricate_missing_levels`), not edited here.  Without it a cross-country call excludes one side (see §4).
 - GLSS3 codes 5 (Rice imported vs Sorghum, n=50) and 49–51 (tin/chocolate set) are the weakest links of the reconstruction; a GSS-held GLSS3 price form would settle them.
 - `_/unit_labels.org` maps `Margarin tin` and `margarin tin` to two different Preferred Labels (`Margarin tin` / `Margarine Tin`); not in ownership, reported.
 
