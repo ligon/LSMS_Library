@@ -27,3 +27,14 @@ $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 clean:
 	-rm $(parquet)
 	-rm $(VAR_DIR)/*.parquet
+
+# crop_production: 2009-10 is a wave script (the two-season S4AV1 / S4AV2
+# matrix has to be melted); 2013-14 and 2017-18 are YAML-path waves with no
+# script, so there is no country-level $(VAR_DIR)/crop_production.parquet
+# target -- the library's load_from_waves assembles the three waves
+# (data_scheme.yml, crop_production block).
+crop_production = $(shell find $(rounds) -name crop_production.py)
+crop_production_parquet := $(crop_production:.py=.parquet)
+
+../%/_/crop_production.parquet: $(crop_production)
+	(cd $(@D) && python crop_production.py)

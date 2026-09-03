@@ -385,3 +385,140 @@ livestock:
         HeadCount: quantity
         HeadSold: quantitysold
         HerdValue: currentvalue
+
+crop_production:
+    # TWO-SOURCE table: the plot-crop harvest and the plot-crop SALES live in
+    # different files, merged `left` on (i, plot_id, j) with the harvest file
+    # authoritative for which rows exist.
+    #
+    #   04n_harvestquestions.dta          9,317 x 62 -- Part N "Harvesting":
+    #       cropname / cropcode (float, -666 = Other), harvestunit (the full
+    #       labelled unit list, -666 = Other), harvestquantity, harvestmonths
+    #       (a space-separated month string, '10 11'), harvestunitother.
+    #   04o_cropsalesstoresquestions.dta 10,573 x 88 -- Part O "Crop sales and
+    #       storage", and in THIS wave it carries plotid (2013-14's does not):
+    #       nine buyer channels, each `<ch>soldquantity` / `<ch>soldunit` /
+    #       `<ch>soldprice`, the price per unit ("What was the price for which
+    #       [Name] sold one [unit] of [crop type] to ...").
+    #
+    # Agriculture BY CONTENT in both, checked because this is the wave in
+    # which 01f silently became employment.  NOT 04o_cropsalesstoresSERVICES,
+    # which despite its name is tractor / plough hire and chemical
+    # application services.
+    #
+    # CARTESIAN CHECK (GH #323 site 4), measured on THIS wave INCLUDING the
+    # null-crop placeholder rows (pd.merge matches null keys): (FPrimary,
+    # plotid, cropname) is unique in BOTH frames -- 9,317 distinct keys in
+    # 9,317 harvest rows (1,926 of them the blank-crop placeholder of an
+    # uncultivated plot, one per plot) and 10,573 in 10,573 sales rows (701
+    # blank) -- so 0 key values are duplicated in either frame and the merge
+    # is exactly 1:1.  The hook then drops the blank-crop rows and the 963
+    # rows with neither a quantity nor a unit (794 "No, all yet to be
+    # harvested" + 169 null status; none carries a month).
+    #
+    # THE RECALL IS TWELVE MONTHS (N5: "If there has been more than one
+    # harvest from the plot, give the total quantity which has been harvested
+    # over the last 12 months"), so `season` is the constant `annual`.
+    #
+    # SALES.  The hook computes Value_sold = sum over channels of quantity x
+    # unit price (money is additive across channels) and Quantity_sold = the
+    # summed channel quantity ONLY where every selling channel used one unit
+    # equal to the row's harvest `u` (3,062 rows); 432 rows sold in a
+    # different unit, 7 in two units and the `Other`-unit sales give NaN.
+    # 12 rows have a channel quantity with no price -> Value_sold NaN.  1,237
+    # sale records belong to plot-crops with NO harvest row and are not
+    # delivered (this is a table of harvest records).  One sale computes to
+    # 42.8M GHS (a keying error in quantity x unit price) and is delivered as
+    # reported -- core does not edit data.  The 27 `_sq_*` / `_su_*` /
+    # `_sp_*` columns are TEMPORARY, consumed and dropped by the hook.
+    #
+    # KEY: (FPrimary, plotid) exactly as plot_features keys it; every one of
+    # the 3,440 harvest plots is in 04h_agsection.dta (100.0%); 9 harvest
+    # rows carry the 10-character split-household FPrimary, which the sample
+    # v-join handles (v = FPrimary[-6:-3]).  The crop label is mapped on the
+    # DECODED cropname (title case here; `Guinea` is this wave's truncation
+    # of Guinea corn/Sorghum; `Other` is the -666 catch-all, 106 rows), never
+    # on cropcode.  `v` is NOT declared -- _join_v_from_sample() attaches it.
+    dfs:
+        - df_harvest
+        - df_sales
+    df_harvest:
+        file: 04n_harvestquestions.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+            j:
+                - cropname
+                - mappings: ['harmonize_crop', 'Alternate Spelling', 'Preferred Label']
+            u:
+                - harvestunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+        myvars:
+            Quantity: harvestquantity
+            harvest_month: harvestmonths
+            _u_other: harvestunitother
+    df_sales:
+        file: 04o_cropsalesstoresquestions.dta
+        idxvars:
+            i: FPrimary
+            plot_id: plotid
+            j:
+                - cropname
+                - mappings: ['harmonize_crop', 'Alternate Spelling', 'Preferred Label']
+        myvars:
+            _sq_samecomm: samecommsoldquantity
+            _su_samecomm:
+                - samecommsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_samecomm: samecommsoldprice
+            _sq_othercomm: othercommsoldquantity
+            _su_othercomm:
+                - othercommsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_othercomm: othercommsoldprice
+            _sq_traders: traderssoldquantity
+            _su_traders:
+                - traderssoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_traders: traderssoldprice
+            _sq_contractors: contractorssoldquantity
+            _su_contractors:
+                - contractorssoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_contractors: contractorssoldprice
+            _sq_orgs: orgssoldquantity
+            _su_orgs:
+                - orgssoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_orgs: orgssoldprice
+            _sq_agg: aggsoldquantity
+            _su_agg:
+                - aggsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_agg: aggsoldprice
+            _sq_outgrow: outgrowsoldquantity
+            _su_outgrow:
+                - outgrowsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_outgrow: outgrowsoldprice
+            _sq_coop: coopsoldquantity
+            _su_coop:
+                - coopsoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_coop: coopsoldprice
+            _sq_other: othersoldquantity
+            _su_other:
+                - othersoldunit
+                - mappings: ['harvest_units', 'Alternate Spelling', 'Preferred Label']
+            _sp_other: othersoldprice
+    merge_on:
+        - i
+        - plot_id
+        - j
+    merge_how: left
+    final_index:
+        - t
+        - i
+        - plot_id
+        - j
+        - u

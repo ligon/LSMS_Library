@@ -1523,3 +1523,179 @@ likewise unwired.  =LSMS_READ_STRICT=1= still cannot build this table on
 this branch for the =sample()= reason recorded under plot features above;
 the read-strict condition was asserted directly
 (=null_read_reports(country='GhanaSPS', table='livestock') == []=).
+
+** Crop production: wired for all three waves, and what the build taught (2026-09-02)
+
+=crop_production= is now wired for all three waves at =(t, i, plot_id, j, u,
+season)= with =v= joined from =sample()= at API time -- a MIXED build path:
+2009-10 is a wave script (=2009-10/_/crop_production.py=; the two-season
+=S4AV1= / =S4AV2= matrix has to be melted), 2013-14 and 2017-18 are YAML
+plus one country-level =df_edit= hook, =ghanasps.crop_production=.  Delivered
+on a cold build under =LSMS_GRAIN_STRICT=1=: *11,795 / 6,886 / 6,428* harvest
+records (25,109) in 4,954 / 3,541 / 3,195 plots, index unique, 0
+=GrainCollapseWarning=, 0 null-read reports against the table, =v= 100%
+non-null, every harvest plot in that wave's =plot_features()= (100.0% in all
+three), =is_this_feature_sane().ok= True.  Working:
+=slurm_logs/ghanasps/crop_production_verify.py= and its =_cold.log=; every
+label -> target is in =harmonize_crop= / =harvest_units= in
+=_/categorical_mapping.org=; every judgement is in the =crop_production=
+block of =_/data_scheme.yml=; per-wave evidence is in each wave's
+=data_info.yml= and the script's docstring.  What follows is only what was
+NOT already on record in the scoping section above.
+
+*** The S4AV2 label error, settled and pinned
+
+The scoping note found it; the build confirms it from the instrument text
+(=Documentation/Household_questionnaire_Part_A.pdf=, read this session):
+the block is headed "LAST MINOR SEASON: CROP (HARVESTS) 1 -- ASK ABOUT CROP
+HARVESTS IN ORDER OF MOST IMPORTANT TO LEAST IMPORTANT", and A122 reads
+"What is the quantity harvested in the last minor season?" -- while every
+S4AV2 variable label says "in the last major season".  =season= is assigned
+from the FILE (=S4AV1= -> =major=, =S4AV2= -> =minor=).  The discriminating
+numbers: crop-1 quantity is non-null on 4,825 =S4AV1= plots and 1,412 =S4AV2=
+plots; the delivered wave carries 9,292 major and 2,503 minor rows.
+=tests/test_ghanasps_crop_production.py= pins both facts and recomputes,
+from =S4AV2.dta= itself, that every plot with a minor-season quantity is
+delivered under =season == 'minor'=.
+
+*** The later waves are a 12-month recall, not a season
+
+Both later instruments ask (N5) "How many units of this CROP TYPE has been
+harvested from PLOT A?  If there has been more than one harvest from the
+plot, give the total quantity which has been harvested over the last 12
+months."  So their =season= is the constant =annual= -- a recall period --
+kept as a level so the three waves share one shape.  Summing 2009-10's two
+seasons is the nearest equivalent; it is not the same instrument.
+
+*** The harvested PART is not =condition=, and the instrument says what it is
+
+A80.2 / A121.2 "ID of part of crop harvested (e.g. Cocoa, Cocoa Leaves)":
+Leaves / Branches / Bark / Sap / Stem-stalk / Roots-tuber / Fruit-Seeds-Nut
+/ Bulb.  It is *which product of the plant was taken*, not the physical
+state of one product, and it was not force-fitted into the canonical level.
+It could not simply be dropped either: at =(plot, crop, unit, season)= 47
+keys carried two harvest records, and in 18 of them the parts DIFFER
+(cocoyam roots/tuber and cocoyam leaves, both in baskets), so an
+unconditional sum would add tubers to leaves.  Following the instrument's
+own example, a record whose part is a different product -- Leaves,
+Branches, Bark, Sap or Stem, except where that IS the crop's principal
+product (leafy / other vegetables, sugarcane, woodlot) -- gets a qualified
+=j=: =Cocoyam Leaves= (88 records; an existing =food_items.org= label, so it
+joins =food_acquired.j= like any other crop) or =Crop (part)= for the rest
+(=Cassava (stem/stick)= 49, =Plantain (stem/stick)= 25, =Maize (leaves)= 11,
+and ~30 further labels of 1-7 records).  Roots-tuber / Fruit-Seeds-Nuts /
+Bulb never qualify: 88 cassava and 43 yam records sit under
+Fruit/Seeds/Nuts, i.e. the main harvest with an odd part code, and
+relabelling those would fabricate products.  *These labels exist ONLY in
+2009-10*, because only that instrument records the part -- the same
+cross-wave artefact as =Tenure='s =sharecropped_in=.  The remaining
+same-product duplicates -- two harvest events of one product in one unit --
+are SUMMED (=min_count=1=, months unioned): 33 groups in 2009-10, 2 in
+2013-14 (107250012 plot 1 cassava 10 + 20 baskets; 109315002 plot 1 millet
+0.5 + 0.5 maxi bags), 0 in 2017-18.  It is a reducer and it is kept bounded:
+the test pins the per-wave group counts.
+
+*** Sales: three instruments, three grains, one honest asymmetry
+
+- 2009-10 :: =Value_sold= is A83 / A124 -- "What was the total revenue from
+  this crop harvest (sold)?" -- inside each season's harvest record, cedis +
+  pesewas/100 (63.8% of rows non-null).  =S4BI= (Part B, "Crop Sales and
+  Storage") is NOT used: it is a season-less 12-month roster ("B62. Were
+  there any crops ... sold to other people last 12 months?", B71 "What was
+  the total revenue from this crop?") whose crop rows match a major harvest
+  slot on =(plot, crop)= for only 2,976 of 4,752, and where both exist B71
+  equals A83 for only 891 of 2,156 rows.  The scoping note and the task brief
+  both pointed at S4BI; the season-specific A83 is the right source for a
+  season-keyed row.  A sold *quantity* is asked nowhere in 2009-10, so
+  =Quantity_sold= is NaN there.
+- 2013-14 :: =04o_cropsalesstoresquestions= has no =plotid= -> both sales
+  columns NaN by design (declared =optional= so the Site B null-read guard
+  does not fire).
+- 2017-18 :: =04o= carries =plotid= and NINE buyer channels, each a
+  quantity / unit / price, and the price is per unit ("What was the price for
+  which [Name] sold one [unit] of [crop type] to ...").  =Value_sold= =
+  sum of quantity x price over channels (money adds whatever the units;
+  54.3% of rows); =Quantity_sold= = the summed quantity ONLY where every
+  selling channel used one unit equal to the row's harvest =u= (3,062 rows,
+  46.9%); 432 rows sold in a different unit, 7 in two units and the
+  =Other=-unit sales give NaN, as do 12 rows with a channel quantity and no
+  price.  1,237 sale records belong to plot-crops with no harvest row and
+  are not delivered.  One sale computes to *42.8M GHS* (a keying error in
+  quantity x unit price); it is delivered as reported -- core does not edit
+  data -- and flagged here for anyone summing wave-3 sales.
+
+*** Units: the food_acquired vocabulary, and the residual codes
+
+=u= is the =harmonizedunit= Preferred Label set of =_/units.org= -- exactly
+what =food_acquired.u= delivers -- so a harvest and a purchase of maize in
+this country share a unit label (=Maxi bag=, =Mini bag=, =Tuber=, =Bunch=
+...).  Note the framework's global =categorical_mapping/u.org= folds
+=Kilogram= onto =Kg= at API time for every table with a =u= level; the
+parquet carries =Kilogram=.  2009-10 stores a numeric code with no value
+labels and is decoded through the same =unit09= -> =harmonizedunit= chain as
+its =food_acquired= script (the codebook's own unit list has a typo, Gallon
+"14"; =unit09= gives 13).  Off-list 2009-10 codes: 0 and -1 (52 records) are
+read as missing and join the 194 quantity-without-unit records as =Unknown=
+(250 in all); positive codes the codebook does not define -- 1, 46, 50, 51,
+53, 57, 58, 61, 80, 94, 25 records -- are delivered as the code string, an
+accepted residual per the units skill, never a guessed label.  2013-14
+offers only a 20-code subset with =Other - specify= (226 records); 51 of
+them wrote =tubers= / =TUBERS= -- a unit the other waves offer as code 26 --
+and are folded to =Tuber=; the rest (=ropes=, =pan=, =cocoa bag=, =bashing
+rubber= ...) stay =Other=, as do 2017-18's =-666= rows (=Pan=, =Motor King=,
+=Lines= ...).
+
+*** harvest_month is per crop later, a plot-level proxy in 2009-10
+
+2013-14 stores up to six month columns (decoded to month NAMES --
+=January= -- which the first build silently turned into 0% coverage; now
+parsed), 2017-18 one space-separated string; both become sorted zero-padded
+tokens (='09 10 11'=; 259 wave-3 records span all twelve months, mostly tree
+crops).  2009-10 asks no harvest month per crop; the delivered value is the
+ENDING month of the major / minor season of the plot's DOMINANT crop (A289.2
+/ A326.2, "Months for the major season of dominant crop?"), stamped on every
+harvest record of that plot-season.  Read it as the season's end, not the
+crop's own harvest date.
+
+*** Dropped, deliberately and counted
+
+2009-10: 25 + 5 slots with a quantity but no crop id; 12 with a crop code
+the instrument does not define (0, 44-47, 90 -- 44 is =Soya beans= only in
+the later lists and is not asserted here); 193 slots with a crop id but no
+quantity, unit or revenue.  2013-14: 1,341 rows with neither a quantity nor
+a unit (1,322 "No, all yet to be harvested"), none carrying a month.
+2017-18: 1,926 blank-crop placeholders (one per uncultivated plot) and 963
+quantity-and-unit-null rows (794 "No, all yet to be harvested"), none with a
+month.  A null =u= or =j= is a null index level, which the framework's
+collapse would delete with a =GrainCollapseWarning= (fatal under strict);
+these drops are the deliberate ones.
+
+*** The mixed build path, and what =materialize: make= costs
+
+Under the default backend =Country.load_from_waves= dispatches per wave (a
+=data_info.yml= block -> =grab_data=; none -> the wave script), the same way
+Tanzania's =2008-15= tables and Iraq's =assets= already build -- neither of
+which declares =materialize: make=.  This table declares it, as the brief
+asked; the cost is that =LSMS_BUILD_BACKEND=make= routes to a COUNTRY-level
+make target a mixed table has no honest way to supply (a concatenator would
+have to re-run the YAML waves itself), so that backend cannot build this
+table.  Nothing in =tests/= uses it.  The =Makefile= gains the wave-script
+rule only.
+
+*** Not wired, deliberately
+
+=condition= (never asked); =intercropped= (2013-14 / 2017-18 record a
+plot-level multi-select list of WHICH crops were intercropped --
+=intercroppedlist*= -- not a per-crop flag); =planting_month=; =perennial=;
+the market value of the harvest (A82 / A123 / no later equivalent); damage
+and expected-still-to-harvest quantities; =S4BI='s outlet, transport and
+payment-delay detail; the harvested part as a level.  Two agent-time facts
+worth one line each: =data_access.get_data_file= is the DVCFileSystem walk
+and took 1,599 s on this node for a file already in the cache
+(=get_dataframe= took 3 s; =local_tools._ensure_dvc_pulled= fetched the two
+questionnaire PDFs in 10 s), and it materialises the file INTO the package
+tree, where =get_dataframe= then refuses it ("Refusing workspace copy of
+DVC-tracked file"); and =LSMS_READ_STRICT=1= still cannot build this table
+on this branch for the =sample()= reason recorded under plot features above
+(=null_read_reports(country='GhanaSPS', table='crop_production') == []=
+asserted directly instead).
