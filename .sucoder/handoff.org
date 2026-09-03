@@ -2,8 +2,8 @@
 #+date: 2026-09-02
 #+author: Sue (Claude Fable 5.1)
 
-* State at last update (2026-09-02, ~17:40 PDT)
-Branch =development= = =bed7c99a= (PR #751 merged) + local == origin.
+* State at last update (2026-09-02, ~19:30 PDT)
+Branch =development= = =fc9a9ad9= (PRs #751, #752, #754 merged) + local == origin.
 Slurm job 38425803 (savio4_htc slice, 4 cores).  =.venv= remounted via
 =bin/savio_venv.sh mount= at session start -- do that first on any new
 allocation.
@@ -24,13 +24,24 @@ allocation.
 - *PR #754* opened: weekly =dvc-remote-reachability= CI job (red until the
   21 are pushed or retired -- by design).
 
+* Open PRs awaiting EL's merge word (all reviewed by me, all recommended)
+- *#756* GhanaLSS #731 (U6 split by wave: university year in GLSS1-3, Upper
+  Sixth in GLSS5-7) + #705 (urban cutoff doc).  After merge: run
+  =lsms-library cache clear --country GhanaLSS= on the shared cache (GH #757:
+  a country categorical_mapping.org edit is invisible to Wave._input_hash).
+- *#759* KenyaLPS SOURCE.org + LICENSE.org per wave (Dataverse, CC0).
+- *#760* GhanaSPS =livestock= (HerdValue; bounded additive reducer pinned by test).
+
+* Done since the previous handoff
+- KLPS-4's 4 blobs pushed (files/md5/); remote now 17 short (KLPS-2/3 x8
+  need EL's browser zip -> =tmp/klps_upload/=, Togo x5, Crop_encrypted x4).
+  #750 commented twice (correction + progress).  #753 (Trap 6) filed.
+- Round 3 briefs written + worktrees ready: =wt-gsps-crop=
+  (BRIEF_crop_production_2026-09-02.org; dispatch after #760 merges) and
+  =wt-glss-prices= (BRIEF_community_prices_2026-09-02.org; dispatch after
+  #756 merges).  Then plot_labor, plot_inputs, #727 canon, #563 FCT.
+
 * In flight
-- *PR #752* GhanaSPS =plot_features= (all 3 waves, #732 trap wired) --
-  reviewed by me, CI green; AWAITING EL's merge call.  Edits =ghanasps.py=
-  -> every GhanaSPS table cold-rebuilds once after merge.
-- Agent on =wt-glss-731-705= (branch =fix/ghanalss-731-705-education-urban=):
-  #731 U6 duplicate in =harmonize_education=; #705 urban-cutoff doc.  Brief:
-  =slurm_logs/ghana_audit/BRIEF_731_705_2026-09-02.org=.
 - KenyaLPS recovery (#750): KLPS-4's 4 files downloaded from Dataverse
   (=O0BBKI=), md5 MATCH sidecars, sitting at their workspace paths.  One-file
   =push_to_cache_batch= test running (log
