@@ -324,3 +324,67 @@ units.to_csv('unitlabels.csv')
 
 #+results:
 : None
+
+* Community price survey (GH #562)
+The GLSS2 price questionnaire the wave ships
+(=Documentation/questionnaire/GHA_1988_GLSS_Price_Questionnaire_EN.pdf=) is
+the SAME blob as 1987-88's (identical md5), so the item list below is the
+GLSS1 form's 47 items; =PRICE.DAT= carries one extra code 48 (QUAN median
+0.5 in the KG column, PRICE1 median 120) that is on no form we hold and is
+kept under its own label.  See the 1987-88 table for the reading of the form
+and BID §2.3/§6.2 for the file layout.  Two clusters were priced twice (2305
+in June and September 1989; 2310 twice in one month) -- those repeat records
+become =obs= 4-6; cluster 2726's rows are dated March 1988 (a first-year
+price carried into the second-year set, BID p.17).
+
+#+name: harmonize_price_item
+| Code | Label                              | Preferred Label               | Food | Unit        | Basis | Note                                                             |
+|------+------------------------------------+-------------------------------+------+-------------+-------+------------------------------------------------------------------|
+| 1    | Cassava (fresh)                    | Cassava (fresh)               | yes  | Kilogram    |       |                                                                  |
+| 2    | Maize (shelled)                    | Maize                         | yes  | Kilogram    |       |                                                                  |
+| 3    | Guinea Corn                        | Guinea corn/sorghum           | own  | Kilogram    |       | no guinea corn label on the 1987-88 axis                         |
+| 4    | Millet                             | Millet                        | yes  | Kilogram    |       |                                                                  |
+| 5    | Wheat bread                        | Bread                         | own  | Kilogram    |       | axis has Wheat Flour / Biscuit, no Bread                         |
+| 6    | Garri                              | Cassava (flour)               | yes  | Kilogram    |       | gari = cassava flour, as the axis codes it                       |
+| 7    | Yam                                | Yam                           | yes  | Kilogram    |       |                                                                  |
+| 8    | Cocoyam                            | Cocoyam                       | yes  | Kilogram    |       |                                                                  |
+| 9    | Plantain                           | Plantain                      | yes  | Kilogram    |       |                                                                  |
+| 10   | Onion (local)                      | Onion                         | yes  | Kilogram    |       |                                                                  |
+| 11   | Garden egg                         | Eggplant                      | yes  | Kilogram    |       |                                                                  |
+| 12   | Tomato (fresh)                     | Tomato (fresh)                | yes  | Kilogram    |       |                                                                  |
+| 13   | Tomato paste                       | Tomato (paste)                | yes  | Kilogram    |       |                                                                  |
+| 14   | Pepper (dried)                     | Pepper (dry)                  | own  | Kilogram    |       | no pepper label on the 1987-88 axis                              |
+| 15   | Oranges                            | Orange                        | yes  | Kilogram    |       |                                                                  |
+| 16   | Pineapple juice                    | Juice                         | own  | Kilogram    |       | axis has only Other Beverages                                    |
+| 17   | Chicken eggs (ea)                  | Egg                           | yes  | Piece       |       | form pre-fills 1 per observation: priced each                    |
+| 18   | Chicken (cock)                     | Chicken                       | yes  | Kilogram    |       | weighed live (QUAN median 1.5 kg)                                |
+| 19   | Smoked fish (Herring)              | Fish                          | yes  | Kilogram    |       | the 1987-88 axis has a single Fish label                         |
+| 20   | Dried fish (Tilapia)               | Fish                          | yes  | Kilogram    |       |                                                                  |
+| 21   | Beef, with bones                   | Beef                          | yes  | Kilogram    |       |                                                                  |
+| 22   | Palm oil                           | Oil (palm)                    | yes  | Kilogram    |       | weighed (QUAN median 0.79 kg)                                    |
+| 23   | Palm kernel oil                    | Oil (palm kernel)             | own  | Kilogram    |       | axis has only Other Oils                                         |
+| 24   | Groundnut oil                      | Oil (groundnut)               | own  | Kilogram    |       | axis has only Other Oils                                         |
+| 25   | Groundnuts (shelled)               | Groundnut                     | yes  | Kilogram    |       |                                                                  |
+| 26   | Akpeteshie (1 quarter)             | Akpeteshie                    | own  | Kilogram    |       | KG column carries the quarter-bottle fraction (QUAN median 0.25) |
+| 27   | White sugar                        | Sugar                         | yes  | Kilogram    |       |                                                                  |
+| 28   | Evaporated milk IDEAL, 170 g       | Milk                          | yes  | Kilogram    |       | QUAN median 0.17 = the 170 g tin                                 |
+| 29   | Aspirin                            | Aspirin                       | no   | Tablet      |       | QUAN = number of tablets                                         |
+| 30   | Paracetamol                        | Paracetamol                   | no   | Tablet      |       |                                                                  |
+| 31   | Nivaquine                          | Nivaquine (chloroquine)       | no   | Tablet      |       |                                                                  |
+| 32   | Other anti-malarial tablets        | Anti-malarial tablets (other) | no   | Tablet      |       |                                                                  |
+| 33   | Andrew's liver salt (1 packet)     | Andrews liver salt            | no   | Packet      |       |                                                                  |
+| 34   | Milk of magnesia (1 bottle)        | Milk of magnesia              | no   | Bottle      |       |                                                                  |
+| 35   | Kerosene (1 beer bottle)           | Kerosene                      | no   | Beer Bottle |       |                                                                  |
+| 36   | Firewood (bunch, 1 ft diameter)    | Firewood                      | no   | Bunch       |       |                                                                  |
+| 37   | Dry cell battery (1.5 volts)       | Dry cell battery              | no   | Piece       |       |                                                                  |
+| 38   | Iron coal pot (standard home size) | Iron coal pot                 | no   | Piece       |       |                                                                  |
+| 39   | Hurricane lamp (1)                 | Hurricane lamp                | no   | Piece       |       |                                                                  |
+| 40   | Matches (Kade, standard size)      | Matches                       | no   | Box         |       |                                                                  |
+| 41   | Charcoal (small quantity)          | Charcoal                      | no   | Kilogram    |       | KG-column item (weighed)                                         |
+| 42   | Soap (Guardian, standard size)     | Soap (Guardian)               | no   | Piece       |       |                                                                  |
+| 43   | Local cloth, wax (6 yards)         | Wax print cloth               | no   | Yard        | 6     | QUAN counts 6-yard lots                                          |
+| 44   | Machete (Cutlass, std size)        | Cutlass/machete               | no   | Piece       |       |                                                                  |
+| 45   | Fertilizer (mini bag)              | Fertilizer                    | no   | Mini Bag    |       |                                                                  |
+| 46   | Metal bucket (std size)            | Metal bucket                  | no   | Piece       |       |                                                                  |
+| 47   | Plastic bucket (std size)          | Plastic bucket                | no   | Piece       |       |                                                                  |
+| 48   | Item 48 (not on the form)          | Unidentified price item 48    | no   | Kilogram    |       | absent from the GLSS1 form the wave ships; KG-column values      |

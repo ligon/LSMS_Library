@@ -11,7 +11,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # they are auto-derived at runtime by the framework's _FOOD_DERIVED from
 # the canonical food_acquired.parquet (cf. Uganda post-#245).  Registering
 # or building them is forbidden.
-var = $(VAR_DIR)/food_acquired.parquet
+var = $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/community_prices.parquet
 
 all: $(parquet) $(var) panel_ids.json
 
@@ -26,6 +26,15 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
+
+community_prices = $(shell find $(rounds) -name community_prices.py)
+community_prices_parquet := $(community_prices:.py=.parquet)
+
+../%/_/community_prices.parquet: ../%/_/community_prices.py glss_prices.py
+	(cd $(@D) && python community_prices.py)
+
+$(VAR_DIR)/community_prices.parquet: community_prices.py glss_prices.py $(community_prices_parquet)
+	python community_prices.py
 
 household_roster = $(shell find $(rounds) -name household_roster.py)
 household_roster_parquet := $(household_roster:.py=.parquet)
