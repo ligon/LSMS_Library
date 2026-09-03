@@ -1,75 +1,70 @@
-#+title: Handoff -- v0.10.0 / v0.10.1 releases
+#+title: Handoff -- Ghana issues (GhanaLSS / GhanaSPS) + GH #750
 #+date: 2026-09-02
-#+author: Sue (Claude Opus 5, 1M context)
+#+author: Sue (Claude Fable 5.1)
 
-* State -- BOTH RELEASES SHIPPED (2026-09-02)
-- *v0.10.0* on PyPI: =lsms_library-0.10.0-py3-none-any.whl= (7,630,071 B) + sdist.
-  Tag =v0.10.0= = =c0300a4a=.  Gate: burst 38419369, 4648 passed / 0 failed.
-- *v0.10.1* on PyPI: =lsms_library-0.10.1-py3-none-any.whl= (7,632,248 B) + sdist.
-  Tag =v0.10.1= = =ad20f6e8=.  Gate: burst 38420184, 4666 passed / 0 failed.
-  Published wheel verified to contain =s3_reader_creds.enc= and declare
-  =cryptography=; =Version: 0.10.1= in METADATA.
-- =master= = =ad20f6e8=; =development= in sync.  Nothing in flight.
+* State at last update (2026-09-02, ~17:40 PDT)
+Branch =development= = =bed7c99a= (PR #751 merged) + local == origin.
+Slurm job 38425803 (savio4_htc slice, 4 cores).  =.venv= remounted via
+=bin/savio_venv.sh mount= at session start -- do that first on any new
+allocation.
 
-* Next concrete action
-None -- both releases are out.  Open follow-ups are below.
+* Landed this session
+- =9d2d6ce0= matrix refresh (GhanaLSS 64->82 sane; stale rows were phantoms)
+  + fix: =bench/matrix.py= lacked TIER_COLOR/GLYPH for =undeclared= (#725), so
+  every =make matrix= since had crashed AFTER writing the snapshot.
+- =4dda752a= =scripts/dvc_remote_reachability.py= (both DVC layouts, no lock)
+  + first sweep; =1db8ca6e= FINDINGS_750 (provenance of the 21 misses).
+- *PR #751 MERGED* (GhanaLSS #692 rename orphan =rural= table; #695
+  Birthplace decoded with Y01A's own 11-code list, C4 on the questionnaire,
+  block 1A at PDF pp.38-39).  Closes #692, #695.
+- *#753* filed: GhanaLSS wave =mapping.py= =_dirs= ignore LSMS_COUNTRIES_ROOT.
+- *#750* commented with the correction: the "missing documentation" was a
+  flat-layout-only check; 2,326 sidecars live under =files/md5/=; truly
+  missing = 21 data blobs (KenyaLPS 12, Togo 5, GhanaSPS Crop_encrypted 4).
+- *PR #754* opened: weekly =dvc-remote-reachability= CI job (red until the
+  21 are pushed or retired -- by design).
 
-* THE LESSON FROM v0.10.1 (read this before the next release)
-=poetry-dynamic-versioning= REWRITES =pyproject.toml= to build and restores it
-after.  A killed build never restores, and it changes *three coupled things*:
+* In flight
+- *PR #752* GhanaSPS =plot_features= (all 3 waves, #732 trap wired) --
+  reviewed by me, CI green; AWAITING EL's merge call.  Edits =ghanasps.py=
+  -> every GhanaSPS table cold-rebuilds once after merge.
+- Agent on =wt-glss-731-705= (branch =fix/ghanalss-731-705-education-urban=):
+  #731 U6 duplicate in =harmonize_education=; #705 urban-cutoff doc.  Brief:
+  =slurm_logs/ghana_audit/BRIEF_731_705_2026-09-02.org=.
+- KenyaLPS recovery (#750): KLPS-4's 4 files downloaded from Dataverse
+  (=O0BBKI=), md5 MATCH sidecars, sitting at their workspace paths.  One-file
+  =push_to_cache_batch= test running (log
+  =slurm_logs/dvc_reachability/push_test2_2026-09-02.log=) after EL
+  authorised removing two stale flufl locks my killed first attempt left in
+  =.dvc/tmp/=.  If the test pushes cleanly and does not rewrite the sidecar,
+  push the other three; if it rewrites the sidecar (DVC 3 form), that is a
+  sidecar change -> branch + PR.
+- KLPS-2 (=PBFXVK=) / KLPS-3 (=PXVFJD=): Dataverse guestbook 63 gates the
+  API download; EL must fill it once (or download the 8 files by hand).
+  KLPS-2 sidecars are =.tab= ingest derivatives (no published md5).
 
-: dynamic = ["version"]  ->  dynamic = []
-: version = "0.0.0"      ->  version = "<computed>"   (moved into [project])
-: enable = true          ->  enable = false
+* Next concrete actions
+1. Read push_test2 log -> push remaining KLPS-4 files (or branch if sidecars
+   moved).  Re-run =scripts/dvc_remote_reachability.py= -> 17 missing.
+2. When #752 merges: dispatch =livestock= on =wt-gsps-livestock= (brief
+   =slurm_logs/ghanasps/BRIEF_livestock_2026-09-02.org=; STEP 0 fast-forwards
+   to origin/development).  Then =crop_production= -> =plot_labor= ->
+   =plot_inputs= (FINDINGS_agriculture ranks them).
+3. When the #731/#705 agent reports: verify (scope, diff, primary source),
+   PR, EL merges.
+4. Round 3: #727 canon (EL ruled: add Bamboo + Terrazzo to
+   =canonical_housing_labels.org=; keep Cement/Concrete -> Concrete) -- small,
+   its own PR; then #562 community_prices and #563 FCT nutrition (EL: both in
+   scope, after the smaller items).
+5. EL decisions still open: retire Togo csv + Crop_encrypted sidecars?;
+   #752 merge.
 
-v0.10.1 took three attempts because I reverted only the middle one and wrote a
-guard that checked only the middle one -- so the guard passed on a broken file
-and certified it clean.  =publish.yml= then failed with "Building 0.0.0 from
-v0.10.1".  Nothing reached PyPI (build failed, publish skipped).
-
-=tests/test_version_placeholder.py= now asserts all three, verified against the
-actual broken file.  *A guard covering one of three coupled invariants is worse
-than none.*
-
-Practical rule: *do not run =poetry build= on the condo slice.*  It gets killed
-(exit 144) partway and leaves the mutation.  =poetry run= and =poetry version=
-are fine, though they too can be killed under load -- an EMPTY =poetry version
--s= means "killed", not "version is wrong"; re-run with a longer timeout.  CI
-builds the wheel from the tag anyway.  To inspect wheel contents locally, drive
-=poetry.core.masonry.api.build_wheel= directly (no venv creation, no mutation).
-
-* Decisions taken (with @ligon)
-- Version *v0.10.0* (not 1.0.0 -- 55 issues open, #323 umbrella live,
-  =LSMS_GRAIN_STRICT= not yet on in CI).
-- Coverage matrix snapshot shipped as-is (one PR stale; regenerable).
-- =Closes:= list deliberately *empty* -- see PR #739 body and
-  =slurm_logs/RELEASE_v0.10.0_closes.org=.
-
-* Open questions / follow-ups (none blocking)
-1. *GH #740* filed: =test_extraction_is_cluster_grain= fails on any
-   data-credentialed machine.  Now =xfail(strict=False)= so =make release= is
-   not blocked -- without that, step 3 above would have failed on this very
-   box.  The open question is substantive: =data_scheme.yml= claims the wave
-   script is what keeps =groupby().first()= from firing on Pakistan, and that
-   script does not appear to run.  Delivered data is correct; "right output"
-   and "the guard is live" are different facts and only the first is verified.
-2. CLAUDE.md says 28 =national-claimed= population waves; the shipped config has
-   *29*.  One-line doc fix.
-3. DONE -- superseded parquets removed (@ligon, 2026-09-02) after confirming all
-   three live equivalents had rebuilt.  Nothing outstanding.
-4. *CORRECTION (Sue, 2026-09-02).*  An earlier version of this note, of the
-   =bc8aa2df= commit message, and of PR #739's body claimed =v0.9.1= was "an
-   orphan tag two commits past =master=, never merged back".  *That is false.*
-   I checked =merge-base= against a *stale local* =master= (last updated
-   2026-07-22) instead of =origin/master=.  =v0.9.1= (=72004880=) *is*
-   =origin/master=: its two commits -- Zenodo/CFF metadata and the release
-   notes -- were made directly on =master= after the v0.9.0 merge and tagged
-   there, which is the correct workflow.  Nothing was orphaned and nothing
-   needed avoiding.
-   The *advice* in step 2 survives the correction on its own merits: =make
-   release= tags the current HEAD, so you do need =master= checked out.  But it
-   is ordinary care, not a fix for a past mistake.
-
-* Environment note
-=.venv= was a stale symlink to a dead job's =/local=.  Restored with
-=bash bin/savio_venv.sh mount=.  Do that first on any new allocation.
+* Housekeeping
+- 9 stale agent worktrees under =.claude/worktrees/= from merged branches
+  (EL's call to delete); plus a half-created dir
+  =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-ghanasps-plot-features= (my
+  timed-out first worktree add; branch =feat/ghanasps-plot-features= is the
+  live one at =tmp/wt-gsps-plot=).
+- Untracked handoffs in =slurm_logs/= from earlier sessions, unchanged.
+- Cache: shared =/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=;
+  agents used private LSMS_DATA_DIRs under =.../ligon/tmp/lsms_data_*=.
