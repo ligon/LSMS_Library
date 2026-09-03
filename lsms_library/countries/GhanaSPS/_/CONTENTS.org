@@ -788,7 +788,16 @@ surviving into the delivered table.  The discriminating test is "is the
 delivered per-wave value set a SUBSET of the canonical vocabulary", never
 "do the distributions look plausible".
 
-** GSPS separates Bamboo from Wood; the canonical vocabulary does not
+** GSPS separates Bamboo from Wood; the canonical vocabulary did not (RESOLVED 2026-09-02, GH #727)
+
+RESOLVED 2026-09-02: EL ruled that =Bamboo= (roof and floor) and =Terrazzo=
+(floor) join =canonical_housing_labels.org=, and that compound
+=Cement/Concrete= stays *Concrete*.  The =Bamboo= roof row now targets
+*Bamboo* (29 / 7 / 8 households by wave leave =Wood=) and the =Terrazo= /
+=Terrazzo= floor rows target *Terrazzo* (0 / 16 / 18 leave =Stone=);
+nothing else moves, and every delivered value is still inside the canon.
+The paragraphs below are the caveat as originally written, kept as the
+record of why the canon changed.
 
 The GSPS roof question offers *Wood* (code 2) and *Bamboo* (code 8) as
 separate options -- 20/10/11 and 29/7/8 observations across the three waves.

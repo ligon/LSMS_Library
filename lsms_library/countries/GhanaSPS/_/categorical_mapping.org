@@ -194,9 +194,9 @@ Every judgement made, and its basis:
   =Tiles=/=tiles= to =Clay Tiles=.  Exact precedent.
 - =Mud bricks/earth= -> *Mud*.  Canonical =Mud= is documented as
   "Includes Adobe (sun-dried mud brick)", which is this category.
-- =Bamboo= -> *Wood*.  Canonical =Wood= is documented as "Includes bamboo
-  planks/strips".  BUT SEE THE CAVEAT BELOW -- this is the one mapping that
-  merges two distinct GSPS categories.
+- =Bamboo= -> *Bamboo* (since 2026-09-02, GH #727; was *Wood*).  The canon
+  now carries =Bamboo= as its own roof label, so the one merge this file
+  used to make is gone.  The RESOLVED caveat below keeps the history.
 - =Earth/mud/mud bricks= -> *Earth*.  Canonical, matching Uganda
   (=Rammed earth=) and Malawi (=Smoothed mud=).
 - =Ceramic/marble(/) tiles= -> *Tiles*; =Vinyl tiles= -> *Vinyl/Linoleum*.
@@ -207,8 +207,12 @@ Every judgement made, and its basis:
 - =Burnt bricks= -> *Bricks*.  Canonical floor label.  Note GSPS's
   =Earth/mud/mud bricks= is the UNFIRED brick category and goes to =Earth=,
   so the two brick categories stay apart.
-- =Terrazo=/=Terrazzo= -> *Stone*.  THE WEAKEST CALL IN THIS FILE.  The
-  canon has no terrazzo label, and every available canonical label merges
+- =Terrazo=/=Terrazzo= -> *Terrazzo* (since 2026-09-02, GH #727; was
+  *Stone*).  The canon now carries =Terrazzo= as its own floor label, so
+  GSPS's =Stone= (17-18 rows/wave) and its terrazzo (16-18 rows/wave) no
+  longer merge.  SUPERSEDED reasoning for the old target, kept for the
+  record: it was THE WEAKEST CALL IN THIS FILE.  The canon had no
+  terrazzo label, and every available canonical label merged
   terrazzo with some other GSPS floor category: =Concrete= merges it with
   the 4,673-row =Cement/concrete=, =Tiles= with =Ceramic/marble tiles=,
   =Other= with GSPS's own =Other=.  =Stone= is documented as "Includes
@@ -218,7 +222,14 @@ Every judgement made, and its basis:
   rows/wave).  Recorded as a judgement, not a fact.
 - =Other= / =Other - specify= / =Other (please specify)= -> *Other*.
 
-*** CAVEAT: Bamboo -> Wood is a real merge, and GSPS is why the canon should change
+*** CAVEAT (RESOLVED 2026-09-02, GH #727): Bamboo -> Wood was a real merge, and GSPS is why the canon changed
+
+RESOLVED 2026-09-02: =Bamboo= (roof and floor) and =Terrazzo= (floor) were
+added to =canonical_housing_labels.org= under GH #727, and the =Bamboo=,
+=Terrazo= and =Terrazzo= rows below now target them (29 / 7 / 8 bamboo
+roofs and 0 / 16 / 18 terrazzo floors by wave move out of =Wood= and
+=Stone=; nothing else moves).  The caveat as originally written follows,
+kept as the record of why the canon changed.
 
 GSPS's roof question offers *Wood* (code 2) and *Bamboo* (code 8) as
 SEPARATE options -- 20/10/11 and 29/7/8 observations respectively across
@@ -233,10 +244,10 @@ mapping is applied at API time only, so ~pd.read_parquet~ on the cached
 housing parquet still shows =Bamboo=, and ~s12a_32~ / ~materialroof~ in
 the source are untouched.
 
-RECOMMENDATION for whoever owns GH #170: add *Bamboo* (and possibly
-*Terrazzo*) to the canonical roof/floor lists and re-point the two rows
-below.  GhanaSPS appears to be the first country in the corpus whose roof
-question separates bamboo from wood.
+RECOMMENDATION (DONE under GH #727, 2026-09-02) for whoever owns GH #170:
+add *Bamboo* (and possibly *Terrazzo*) to the canonical roof/floor lists
+and re-point the two rows below.  GhanaSPS appears to be the first country
+in the corpus whose roof question separates bamboo from wood.
 
 *** What is deliberately NOT mapped
 
@@ -273,7 +284,7 @@ canonical set above", never "do the distributions look plausible".
 | Roofing tiles          | Clay Tiles      |
 | Mud bricks /Earth      | Mud             |
 | Mud bricks/earth       | Mud             |
-| Bamboo                 | Wood            |
+| Bamboo                 | Bamboo          |
 | Wood                   | Wood            |
 | Other                  | Other           |
 | Other - specify        | Other           |
@@ -291,8 +302,8 @@ canonical set above", never "do the distributions look plausible".
 | Ceramic/marble tiles   | Tiles           |
 | Vinyl tiles            | Vinyl/Linoleum  |
 | Burnt bricks           | Bricks          |
-| Terrazo                | Stone           |
-| Terrazzo               | Stone           |
+| Terrazo                | Terrazzo        |
+| Terrazzo               | Terrazzo        |
 | Stone                  | Stone           |
 | Wood                   | Wood            |
 | Other                  | Other           |
