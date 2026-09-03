@@ -1,0 +1,135 @@
+countries_root: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries
+data_root: /global/scratch/fsa/fc_jevons/ligon/tmp/lsms_data_gsps_livestock
+cold? country parquet exists before build: False
+
+=== delivered frame ===
+index: ['i', 't', 'animal']  columns: ['HeadCount', 'HerdValue', 'HeadSold']  shape: (12495, 3)
+dtypes: {'HeadCount': Float64Dtype(), 'HerdValue': Float64Dtype(), 'HeadSold': Float64Dtype()}
+GrainCollapseWarning count (whole build): 0
+NullRead warning count (whole build, incl. the sample re-entry): 0
+null_read_reports(GhanaSPS, livestock): 0 (read-strict condition asserted directly: must be 0)
+other warnings (deduped):
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2009-10/_/food_acquired.py' mod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2009-10/_/mapping.py' mode='r' 
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2009-10/_/other_expenditures.py
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2013-14/_/food_acquired.py' mod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2013-14/_/mapping.py' mode='r' 
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2013-14/_/other_expenditures.py
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2017-18/_/food_acquired.py' mod
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2017-18/_/mapping.py' mode='r' 
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/2017-18/_/other_expenditures.py
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/_/food_acquired.py' mode='r' en
+    ResourceWarning | unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-livestock/lsms_library/countries/GhanaSPS/_/ghanasps.py' mode='r' encodin
+
+Preferred Labels (21): ['Cats', 'Cattle', 'Chicken', 'Dogs', 'Donkeys', 'Dove/Pigeon', 'Draught Animals', 'Duck', 'Fish', 'Goats', 'Grasscutters', 'Guinea Fowl', 'Guinea Pigs', 'Other Livestock', 'Other Poultry', 'Peacocks', 'Pigs', 'Quails', 'Rabbits', 'Sheep', 'Turkey']
+documented pass-throughs: ['50', 'cut', 'dake']
+
+=== 2009-10 ===
+1. rows: 4,248  households: 2,137  distinct animal (8): ['Cattle', 'Chicken', 'Draught Animals', 'Goats', 'Other Livestock', 'Pigs', 'Rabbits', 'Sheep']
+   animal counts: {'Chicken': 1664, 'Goats': 1103, 'Sheep': 648, 'Cattle': 292, 'Other Livestock': 239, 'Pigs': 201, 'Draught Animals': 92, 'Rabbits': 9}
+   animal SUBSET of Preferred Labels + pass-throughs: True  offenders: []
+2. (t, i, animal) unique: True  null animal in delivered: 0  GrainCollapseWarning (this build): 0
+   v attached: False  (livestock has NO v by canonical design: index_info omits v; skip_extra)  -> households in sample(): 2,137/2,137 = 100.0%
+3. HeadCount sum per species: {'Chicken': 25437, 'Goats': 6542, 'Sheep': 4153, 'Other Livestock': 3978, 'Cattle': 2505, 'Pigs': 1041, 'Draught Animals': 256, 'Rabbits': 79}
+   HeadCount == 0 share: delivered 0.00% (0 rows); pre-hook source 0.00% (0 of 4,280 rows)  HeadCount null delivered: 9
+4. PRE-HOOK  HerdValue > 0 | HeadCount > 0: 97.45% (4,269 rows);  | HeadCount == 0: nan% (0 of 0 zero-head rows carry a value)
+   DELIVERED HerdValue > 0 | HeadCount > 0: 97.52%;  HerdValue non-null: 99.93%;  HerdValue == 0 rows: 105
+5. median HerdValue/HeadCount (GHS): cattle 300.0  goats/sheep 33.3  chicken 5.0  -> cattle >> goats >> chicken: True
+6. HeadSold: not asked in this wave -> all null (True)
+   dedup audit: source rows after null-animal drop + keep-rule 4,270; duplicate (i, animal) groups summed by the hook: 20 (42 lines) -> delivered 4,248 (expected 4,248: True)
+                           lines  HeadCount  HerdValue
+i         animal                                      
+102054032 Other Livestock      2        2.0        8.0
+105142059 Other Livestock      2        6.0       50.0
+105154061 Other Livestock      2        6.0       22.0
+107248016 Other Livestock      2     1200.0     9600.0
+107264022 Other Livestock      2        8.0      300.0
+108282008 Other Livestock      2       12.0      110.0
+108283022 Other Livestock      2        5.0       33.0
+108285011 Other Livestock      2       11.0       44.0
+108285015 Other Livestock      2       11.0       38.0
+108286013 Other Livestock      3       23.0       82.0
+108287009 Other Livestock      2       11.0       41.0
+108288007 Other Livestock      2       11.0       65.0
+108288015 Other Livestock      2        9.0       54.0
+108288016 Other Livestock      2       15.0      109.0
+108289037 Other Livestock      3       36.0      115.0
+108292012 Other Livestock      2        9.0      210.0
+109326022 Other Livestock      2        8.0      360.0
+109328037 Other Livestock      2       40.0     1184.0
+110329054 Other Livestock      2        7.0      185.0
+110333003 Other Livestock      2        5.0      172.0
+   null-animal source rows dropped: 8; keep-rule dropped: 2
+   households: source 2,142 -> delivered 2,137; lost 5: 5 had ONLY null-animal rows ['104119034', '106184083', '106193108', '107239025', '108280011'], 0 had nothing positive (all filler) []
+
+=== 2013-14 ===
+1. rows: 3,963  households: 2,081  distinct animal (22): ['50', 'Cats', 'Cattle', 'Chicken', 'Dogs', 'Donkeys', 'Dove/Pigeon', 'Draught Animals', 'Duck', 'Fish', 'Goats', 'Grasscutters', 'Guinea Fowl', 'Guinea Pigs', 'Other Poultry', 'Peacocks', 'Pigs', 'Rabbits', 'Sheep', 'Turkey', 'cut', 'dake']
+   animal counts: {'Chicken': 1630, 'Goats': 1059, 'Sheep': 595, 'Cattle': 268, 'Pigs': 170, 'Guinea Fowl': 87, 'Draught Animals': 47, 'Duck': 28, 'Rabbits': 20, 'Dogs': 15, 'Cats': 12, 'Turkey': 9, 'Dove/Pigeon': 6, 'Grasscutters': 4, 'Donkeys': 3, 'Fish': 2, 'Guinea Pigs': 2, 'Other Poultry': 2, 'dake': 1, 'Peacocks': 1, '50': 1, 'cut': 1}
+   animal SUBSET of Preferred Labels + pass-throughs: True  offenders: []
+2. (t, i, animal) unique: True  null animal in delivered: 0  GrainCollapseWarning (this build): 0
+   v attached: False  (livestock has NO v by canonical design: index_info omits v; skip_extra)  -> households in sample(): 2,081/2,081 = 100.0%
+3. HeadCount sum per species: {'Chicken': 24280, 'Goats': 6027, 'Sheep': 3985, 'Cattle': 2556, 'Fish': 2000, 'Guinea Fowl': 1198, 'Pigs': 1020, 'Duck': 245, 'Dove/Pigeon': 177, 'Rabbits': 147, 'Turkey': 109, 'Draught Animals': 102, '50': 50, 'Cats': 43, 'Dogs': 40, 'Other Poultry': 37, 'Guinea Pigs': 32, 'dake': 10, 'Grasscutters': 8, 'Donkeys': 6, 'Peacocks': 2, 'cut': 1}
+   HeadCount == 0 share: delivered 0.00% (0 rows); pre-hook source 73.24% (10,884 of 14,860 rows)  HeadCount null delivered: 0
+4. PRE-HOOK  HerdValue > 0 | HeadCount > 0: 96.16% (3,963 rows);  | HeadCount == 0: 0.00% (0 of 10,884 zero-head rows carry a value)
+   DELIVERED HerdValue > 0 | HeadCount > 0: 99.61%;  HerdValue non-null: 96.54%;  HerdValue == 0 rows: 15
+5. median HerdValue/HeadCount (GHS): cattle 700.0  goats/sheep 80.0  chicken 10.0  -> cattle >> goats >> chicken: True
+6. HeadSold: not asked in this wave -> all null (True)
+   dedup audit: source rows after null-animal drop + keep-rule 3,963; duplicate (i, animal) groups summed by the hook: 0 (0 lines) -> delivered 3,963 (expected 3,963: True)
+   null-animal source rows dropped: 0; keep-rule dropped: 10,897
+   households: source 2,098 -> delivered 2,081; lost 17: 0 had ONLY null-animal rows [], 17 had nothing positive (all filler) ['101004031', '101014033', '101015120', '103072002', '103100017', '105168078', '106183034', '106190004', '108306027', '108307021', '108307033', '108308026', '108311033', '109314005', '110339017', '208301004', '409317001']
+
+=== 2017-18 ===
+1. rows: 4,284  households: 2,361  distinct animal (17): ['Cats', 'Cattle', 'Chicken', 'Dogs', 'Donkeys', 'Draught Animals', 'Duck', 'Fish', 'Goats', 'Grasscutters', 'Guinea Fowl', 'Other Poultry', 'Pigs', 'Quails', 'Rabbits', 'Sheep', 'Turkey']
+   animal counts: {'Chicken': 1807, 'Goats': 1214, 'Sheep': 683, 'Cattle': 212, 'Pigs': 184, 'Draught Animals': 68, 'Guinea Fowl': 42, 'Rabbits': 25, 'Dogs': 16, 'Duck': 12, 'Cats': 6, 'Grasscutters': 5, 'Turkey': 4, 'Fish': 2, 'Other Poultry': 2, 'Donkeys': 1, 'Quails': 1}
+   animal SUBSET of Preferred Labels + pass-throughs: True  offenders: []
+2. (t, i, animal) unique: True  null animal in delivered: 0  GrainCollapseWarning (this build): 0
+   v attached: False  (livestock has NO v by canonical design: index_info omits v; skip_extra)  -> households in sample(): 2,361/2,361 = 100.0%
+3. HeadCount sum per species: {'Chicken': 26502, 'Goats': 7063, 'Fish': 5000, 'Sheep': 4436, 'Cattle': 1753, 'Pigs': 1218, 'Guinea Fowl': 442, 'Duck': 254, 'Rabbits': 184, 'Draught Animals': 172, 'Grasscutters': 63, 'Dogs': 35, 'Other Poultry': 29, 'Turkey': 18, 'Quails': 15, 'Cats': 14, 'Donkeys': 3}
+   HeadCount == 0 share: delivered 0.00% (0 rows); pre-hook source 0.00% (0 of 4,294 rows)  HeadCount null delivered: 14
+4. PRE-HOOK  HerdValue > 0 | HeadCount > 0: 99.34% (4,271 rows);  | HeadCount == 0: nan% (0 of 0 zero-head rows carry a value)
+   DELIVERED HerdValue > 0 | HeadCount > 0: 100.00%;  HerdValue non-null: 99.28%;  HerdValue == 0 rows: 0
+5. median HerdValue/HeadCount (GHS): cattle 1154.8  goats/sheep 150.0  chicken 20.0  -> cattle >> goats >> chicken: True
+6. HeadSold non-null: 4,276/4,284 = 99.81%  sum 51,133  > 0 rows 1,245  HeadSold > HeadCount rows 76  max 40,000
+   dedup audit: source rows after null-animal drop + keep-rule 4,285; duplicate (i, animal) groups summed by the hook: 1 (2 lines) -> delivered 4,284 (expected 4,284: True)
+                   lines  HeadCount  HerdValue
+i         animal                              
+106183008 Chicken      2       15.0      150.0
+   null-animal source rows dropped: 0; keep-rule dropped: 9
+   households: source 2,363 -> delivered 2,361; lost 2: 0 had ONLY null-animal rows [], 2 had nothing positive (all filler) ['107240011', '107250028']
+
+=== is_this_feature_sane ===
+Sanity report: GhanaSPS/livestock
+  17 checks: 17 pass, 0 warn, 0 fail
+  [+] not_empty: 12495 rows
+  [+] has_named_index: Index levels: ['i', 't', 'animal']
+  [+] index_levels_match_scheme: All declared levels present: ['t', 'i', 'animal']
+  [+] no_null_index_levels
+  [+] has_time_index: 3 distinct periods
+  [+] has_household_index: 3452 distinct households
+  [+] reasonable_size: 12,495 rows
+  [+] no_all_null_columns: 3 columns, none all-null
+  [+] no_constant_columns
+  [+] declared_columns_present: All 3 declared columns present
+  [+] dtype_consistency
+  [+] value_constraints: No constrained columns (skipped)
+  [+] declared_spellings: No declared vocabulary for this table (skipped)
+  [+] low_duplicate_rate: No duplicate indices
+  [+] no_float_stringified_index: No float-stringified index values
+  [+] ids_format_id_canonical: All id index levels are canonical format_id output
+  [+] index_overlap_with_spine: other_features not cached (skipped)
+report.ok: True
+
+=== parquet read-back (pre-finalize) ===
+2009-10 wave parquet: shape (4248, 2) cols ['HeadCount', 'HerdValue'] index ['t', 'i', 'animal'] null animal 0 unique True animal subset True
+2013-14 wave parquet: shape (3963, 2) cols ['HeadCount', 'HerdValue'] index ['t', 'i', 'animal'] null animal 0 unique True animal subset True
+2017-18 wave parquet: shape (4284, 3) cols ['HeadCount', 'HeadSold', 'HerdValue'] index ['t', 'i', 'animal'] null animal 0 unique True animal subset True
+country parquet: shape (12495, 3) index ['t', 'i', 'animal'] cols ['HeadCount', 'HerdValue', 'HeadSold']
+
+=== Feature() assembly (GhanaSPS only) ===
+Feature index: ['country', 't', 'i', 'animal', 'currency']  shape: (12495, 3)  columns: ['HeadCount', 'HerdValue', 'HeadSold']
+
+=== currency ===
+currency_for(GhanaSPS, wave): {'2009-10': 'GHS', '2013-14': 'GHS', '2017-18': 'GHS'}
+_monetary_columns('livestock', 'GhanaSPS'): ['HerdValue', 'SalesValue', 'ValuePerAnimal']
+
+ALL STEP-3 GATES PASS: True
