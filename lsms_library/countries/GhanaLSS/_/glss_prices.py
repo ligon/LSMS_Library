@@ -27,11 +27,14 @@ own price file and calls :func:`assemble` here to produce the canonical table:
 * ``obs`` the vendor observation.  EVERY GLSS price form records up to THREE
           observations per item ("1ST / 2ND / 3RD OBSERVATION"; GLSS7 a/b/c;
           BID §2.3 "prices from up to three vendors").  ``obs`` 1-3 is the
-          form's slot.  Values above 3 arise ONLY where the source holds more
-          than one record for the same (cluster, item, unit) -- a repeat visit
-          (1988-89 clusters 2305/2310), several brand lines of one item
-          (2016-17), or a mis-keyed sibling cluster -- and are enumerated in a
-          deterministic order (the wave script's sort keys, then the slot).
+          form's slot for a single source record.  Values above 3 arise ONLY
+          where the source holds more than one record for the same (cluster,
+          item, unit) -- a repeat visit (1988-89 clusters 2305/2310), several
+          brand lines of one item (2016-17), a mis-keyed sibling cluster, or
+          several price items folding onto one ``j`` label (Nescafe tin +
+          sachet -> Coffee) -- and are enumerated in a deterministic order (the
+          wave script's sort keys, then the slot); where records fold,
+          ``Description`` identifies the item.
           Nothing is averaged and nothing is dropped except rows with no
           reported price at all.
 

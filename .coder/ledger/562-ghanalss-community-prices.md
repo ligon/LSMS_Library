@@ -69,6 +69,7 @@ in `.coder/coverage/absent_verdicts.csv`.
 - 2012-13 non-food rows carry `u='Other Unit'` (free-text basis in `Description`) rather than `pd.NA`, because `map_index` renames a `pd.NA` `u` level to the string `'unit'` on every read (`local_tools.py`).
 - The global `lsms_library/categorical_mapping/u.org` relabels `Kilogram` -> `Kg` at API time (its only scope); the parquet keeps `Kilogram`.
 - `Feature('community_prices')` keeps the MODAL index shape and excludes the rest (`feature._harmonize_country_frame`, `_canonical_index_levels` is `[]` here): measured, Malawi is excluded from `(['GhanaLSS','Malawi'])` and GhanaLSS from `(['GhanaLSS','Malawi','Nigeria'])`, each with a `UserWarning`.  Motivates the §6 proposal.
+- **Cache-hash coverage, measured** (`Country._table_cache_hash('community_prices', waves)`): a comment-only edit to `_/glss_prices.py`, to `1987-88/_/categorical_mapping.org`, to `1987-88/_/community_prices.py` or to `_/community_prices.py` each moves the hash -- the `_/*.py` glob and the `*.org` build inputs of `CLAUDE.md` "Automatic content-hash staleness" cover everything this feature decodes through.
 - `LSMS_COUNTRIES_ROOT` + private `LSMS_DATA_DIR` (shared `dvc-cache` symlink) for every run; assert `'wt-glss-prices' in str(countries_root())`.
 - `get_data_file()` walks the DVC index (`DVCFS.exists`) and hung >10 min on Lustre; documentation blobs were fetched lock-free through `_ensure_dvc_pulled` + the sidecar md5 (`slurm_logs/ghana_audit/community_prices/fetch_docs.py`).
 

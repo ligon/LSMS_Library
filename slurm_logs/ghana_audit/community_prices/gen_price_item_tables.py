@@ -506,6 +506,118 @@ market carry identical prices) -- kept native.""",
 
 TITLE = '* Community price survey (GH #562)'
 
+# 2016-17 only: the reader's free-text "other unit" spellings -> u axis.
+# Lives INSIDE the section so a regeneration keeps it (it was lost once).
+UNIT_TABLE_2016 = '''\
+When =unit{a,b,c}= is 99 ("Other unit") the reader wrote the unit in
+=unito{a,b,c}=; 132 distinct spellings.  The table below folds the ones that
+are plain misspellings or case variants of a unit onto the shared axis
+(=_/unit_labels.org= Preferred Labels, plus Tablet / Capsule / Bottle /
+Milligram / Page / Person / Month / Feet / Inch / Gigabyte which the axis
+lacks); anything not listed stays as written (title-cased) so it is visible
+as NEW rather than silently dropped.  Matching is case-insensitive on the
+stripped text.
+#+name: harmonize_price_unit
+| Text            | Preferred Label |
+|-----------------+-----------------|
+| kg              | Kilogram        |
+| ml              | Milliliter      |
+| mls.            | Milliliter      |
+| mml             | Milliliter      |
+| cl              | Milliliter      |
+| mg              | Milligram       |
+| milligram       | Milligram       |
+| milligrams      | Milligram       |
+| milligramme     | Milligram       |
+| milligramd      | Milligram       |
+| milligrsms      | Milligram       |
+| millllgram      | Milligram       |
+| miligram        | Milligram       |
+| 9mg             | Milligram       |
+| 9milligrams     | Milligram       |
+| 200mg           | Milligram       |
+| mm              | Millimeter      |
+| millimeter      | Millimeter      |
+| millimetre      | Millimeter      |
+| millimetres     | Millimeter      |
+| milimeter       | Millimeter      |
+| milimetre       | Millimeter      |
+| capsule         | Capsule         |
+| capsules        | Capsule         |
+| capsuls         | Capsule         |
+| casules         | Capsule         |
+| tablet          | Tablet          |
+| tablets         | Tablet          |
+| tablt           | Tablet          |
+| strip           | Blister/Strip   |
+| blister         | Blister/Strip   |
+| gallon          | Gallon          |
+| gallo           | Gallon          |
+| galon           | Gallon          |
+| frytol gallon   | Gallon          |
+| bottle          | Bottle          |
+| small bottle    | Bottle          |
+| can             | Can             |
+| bag             | Bag             |
+| buckets         | Bucket          |
+| pieces of 330ml | Piece           |
+| 330ml pieces    | Piece           |
+| 325ml pieces    | Piece           |
+| page            | Page            |
+| 1 page          | Page            |
+| 1page           | Page            |
+| per page        | Page            |
+| per sheet       | Sheet           |
+| person          | Person          |
+| per person      | Person          |
+| per perdon      | Person          |
+| passenger       | Person          |
+| passengaer      | Person          |
+| passenager      | Person          |
+| passage         | Person          |
+| month           | Month           |
+| monthly         | Month           |
+| months          | Month           |
+| per month       | Month           |
+| year            | Year            |
+| yearly          | Year            |
+| per day         | Day             |
+| room            | Room            |
+| per room        | Room            |
+| feet            | Feet            |
+| inch            | Inch            |
+| inches          | Inch            |
+| gigabyte        | Gigabyte        |
+| gigabite        | Gigabyte        |
+| gig             | Gigabyte        |
+| 4 gigabytes     | Gigabyte        |
+| kwh             | Kilowatts       |
+| kilowatts       | Kilowatts       |
+| watts           | Watts           |
+| volt            | Volt            |
+| ampere          | Ampere          |
+| ampoule         | Ampoule         |
+| acre            | Acre            |
+| plot            | Plot            |
+| kilometre       | Kilometre       |
+| service         | Service         |
+| dose            | Dose            |
+| course          | Course          |
+| stamp           | Stamp           |
+| olunka          | American Tin    |
+| calabash        | Calabash        |
+| board           | Board           |
+| rod             | Rod             |
+| wheel           | Wheel           |
+| ounce           | Ounce           |
+| carat           | Carat           |
+| meter square    | Square Meter    |
+| cubic metre     | Cubic Meter     |
+| metric cubic    | Cubic Meter     |
+| m3              | Cubic Meter     |
+'''
+
+
 
 def fmt(v):
     if v == '' or v is None:
@@ -526,8 +638,11 @@ def org_table(rows):
 
 
 def section(wave, rows):
-    return (f"{TITLE}\n{HEADER[wave]}\n\n#+name: harmonize_price_item\n"
+    body = (f"{TITLE}\n{HEADER[wave]}\n\n#+name: harmonize_price_item\n"
             f"{org_table(rows)}\n")
+    if wave == '2016-17':
+        body += '\n' + UNIT_TABLE_2016
+    return body
 
 
 def write(wave, rows):
@@ -648,21 +763,46 @@ G7_NOTE = {
 
 
 def w2016():
-    from lsms_library.local_tools import get_dataframe
+    from lsms_library.local_tools import get_dataframe, df_from_orgfile
     g7 = get_dataframe(str(ROOT / '2016-17' / 'Data' / 'g7price.dta'), convert_categoricals=False)
     items = (g7.groupby('ln')['bname'].agg(lambda s: s.mode().iloc[0] if len(s.mode()) else '')
                .reset_index())
+    hf = df_from_orgfile(ROOT / '2016-17' / '_' / 'categorical_mapping.org', name='harmonize_food',
+                         to_numeric=False)
+    hf.columns = [c.strip() for c in hf.columns]
+    food_axis = {str(x).strip().lower() for x in hf['Preferred Label'] if str(x).strip()}
+    # Non-food own labels must not land on the food axis (ln 771 "ORANGE" is a
+    # toilet roll, ln 812/820 "APPLE" a wrist watch) and a brand name that
+    # recurs across blocks (SONY 640/669, SHARP 663/706/720, RAID 534/541) or
+    # an "OTHER (SPECIFY)" line must not fold unrelated products onto one j:
+    # such labels get the item code appended so each code keeps its own j.
+    labels = {int(r['ln']): re.sub(r'\s+', ' ', str(r['bname']).strip()) for _, r in items.iterrows()}
+    nonfood_counts = {}
+    for code, lab in labels.items():
+        if code and lab and code not in G7_FOOD:
+            nonfood_counts[lab.lower()] = nonfood_counts.get(lab.lower(), 0) + 1
     rows = []
-    for _, r in items.iterrows():
-        code = int(r['ln']); lab = re.sub(r'\s+', ' ', str(r['bname']).strip())
+    for code, lab in sorted(labels.items()):
         if code == 0 or lab == '':
             continue
+        note = G7_NOTE.get(code, '')
         if code in G7_FOOD:
             pl, food = G7_FOOD[code], 'yes'
         else:
             assert code > 297 and not (751 <= code <= 758), f'2016-17 food code {code} ({lab}) not placed'
-            pl, food = _own_label(lab.lower()), 'no'
-        rows.append((code, lab, pl, food, '', '', G7_NOTE.get(code, '')))
+            own = _own_label(lab.lower())
+            key = lab.lower()
+            if key.startswith('other (specify)'):
+                pl = f'Other (specify) [ln {code}]'
+                note = (note + '; ' if note else '') + 'other (specify) line of a non-food block'
+            elif key in food_axis or nonfood_counts[key] > 1:
+                pl = f'{own} [ln {code}]'
+                why = 'name is a food label' if key in food_axis else 'brand name recurs across blocks'
+                note = (note + '; ' if note else '') + f'{why}; code appended to keep its own j'
+            else:
+                pl = own
+            food = 'no'
+        rows.append((code, lab, pl, food, '', '', note))
     return rows
 
 

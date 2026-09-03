@@ -43,6 +43,10 @@ def build():
     ulab = {int(k): str(v).strip() for k, v in labels['unita'].items()}
     umap = unit_label_map()
     omap = other_unit_map(WAVE)
+    # A decode that silently yields {} is this country's most expensive
+    # recurring defect (CONTENTS.org Trap 1): the spelling table was once
+    # lost to a section regeneration and 56 labels came back unmapped.
+    assert omap, f'{WAVE}: harmonize_price_unit decoded to an EMPTY dict'
     items = price_item_table(WAVE)
 
     code = pd.to_numeric(raw['ln'], errors='coerce').astype('Int64')

@@ -2206,6 +2206,13 @@ rows = =obs= 45 in 1998-99) the rows stack under one (v, j, u) and
 =Description= tells the items apart.  Share of rows at =obs= <= 3: 1987-88
 98%, 1988-89 97%, 1991-92 90%, 1998-99 88%, 2012-13 87%, 2016-17 81%.
 
+An observation slot with no reported price is not a row (an empty slot is
+not a reported price).  Slots dropped, per wave: 1987-88 1,262 of 17,844
+(7.1%); 1988-89 2,265 of 14,907 (15.2%); 1991-92 and 1998-99 none (the files
+are already one row per observation); 2012-13 191,223 of 479,466 (39.9% --
+second and third vendors are often blank, and so are non-food items a
+market does not sell); 2016-17 31,458 of 252,366 (12.5%).
+
 - 1988-89: two clusters were priced twice -- 2305 in June AND September
   1989 (a genuine repeat visit), 2310 twice in one month (25 of its 48 item
   pairs byte-identical).  Cluster 2726's rows carry =YRINT=88, MOINT=3=: a
@@ -2310,7 +2317,11 @@ Preferred Label | Food | Unit | Basis | Note=) appended to each wave's
 where the axis names the item (=Food=yes=), the later waves' spelling where a
 food is not on the wave's axis (=Food=own=: 1987-88 has no Bread / Pepper /
 Juice / Guinea corn / specific-oil labels; 1998-99 no Cocoyam leaves / Tomato
-paste / Snail), and an own label for non-foods.  Where the axis folds two
+paste / Snail), and an own label for non-foods -- made unique per code (=Orange [ln 771]= is
+a toilet roll, =Apple [ln 812]= a wrist watch, =Sony [ln 640]= a corded
+phone, =Sony [ln 669]= a radio) wherever a non-food name is also a food
+label, recurs across blocks, or is an "OTHER (SPECIFY)" line: 80 such codes
+in 2016-17, none elsewhere.  Where the axis folds two
 price items together (Goat (fresh) + Fresh mutton -> =Goat=; Onion +
 Shallots -> =Onion=; palm wine -> =Wine=, pito -> =Beer=) both are kept and
 =Description= tells them apart.  The overlap with =food_acquired().j= was
