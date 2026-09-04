@@ -4,10 +4,13 @@
 
 When you call a table method (e.g. `uga.food_expenditures()`), the library
 reads the relevant raw data files, harmonizes them, and writes the result
-as a Parquet file under `data_root()`. Subsequent calls in the same
-process return immediately from in-memory state; subsequent calls in a
-fresh process read the Parquet directly without re-running the
-harmonization. The raw `.dta` blobs themselves are also cached locally,
+as a Parquet file under `data_root()`. Subsequent calls -- in this process
+or a fresh one -- read that Parquet instead of rebuilding from source. There
+is no in-memory memoization: each call re-reads the Parquet and re-runs
+`_finalize_result` (kinship expansion, canonical spellings, categorical
+mappings, dtype coercion, the `v` join, weight normalisation), so repeat
+calls are much cheaper than the first but not free, and they return a new
+object each time. The raw `.dta` blobs themselves are also cached locally,
 so cold rebuilds (e.g. after editing a wave's `data_info.yml`) don't have
 to re-download from S3.
 
@@ -18,7 +21,8 @@ uga = ll.Country('Uganda')
 # First call: builds from source (10s of seconds to minutes depending on country)
 hh = uga.household_characteristics()
 
-# Subsequent calls in the same session: in-memory state, ~0 cost
+# Subsequent calls: served from the Parquet, but finalization still runs
+# (measured on Uganda `sample`: 0.44s cold -> 0.08s warm, new object each time)
 hh = uga.household_characteristics()
 ```
 
@@ -214,7 +218,8 @@ configuration unless you have cleared the affected caches first — you
 will silently get stale results.
 
 > **Deprecated**: `trust_cache=True` is a legacy alias for `assume_cache_fresh=True`.
-> It still works but emits a `DeprecationWarning` and will be removed in v0.8.0.
+> It still works but emits a `DeprecationWarning`, and is slated for removal in
+> a future release.
 
 ## Managing Cache
 
@@ -250,10 +255,19 @@ Two workflows for getting new survey data into the library, both of
 which write `.dta` (or other source) files into a `Data/` directory
 under the package tree as a transient step:
 
-1. **Manual** (per CONTRIBUTING.org). Download the source files,
-   place them in the appropriate `lsms_library/countries/{Country}/{wave}/Data/`
-   directory, and run `dvc add` to generate the `.dvc` sidecar. Then
-   `dvc push` to upload the blob to the S3 remote.
+1. **Manual** (per CONTRIBUTING.org). Download the source files, place them in
+   the appropriate `lsms_library/countries/{Country}/{wave}/Data/` directory,
+   and publish them with `data_access.push_to_cache()` -- or
+   `push_to_cache_batch()` for more than one file. These generate the `.dvc`
+   sidecar and upload the blob.
+
+    !!! warning "Do not shell out to `dvc`"
+
+        Never invoke the `dvc` CLI yourself -- not `add`, not `push`, not
+        `pull`. The CLI takes the global `.dvc/tmp/lock` and rebuilds the repo
+        index by walking ~7k sidecars; concurrent callers collide (measured
+        91.7% failure at 12 concurrent). The library's writers take the lock
+        with backoff-and-jitter retry, and its readers bypass it entirely.
 2. **Automated via the World Bank Microdata API**. The
    `data_access.get_data_file()` fallback in `local_tools.py` can
    download missing files from the World Bank Microdata Library
@@ -267,7 +281,7 @@ it keeps the package tree clean and consistent with the architectural
 rule above.
 
 ```bash
-# After dvc add succeeds:
+# After push_to_cache() succeeds:
 rm lsms_library/countries/Niger/2024-25/Data/new_section.dta
 # The blob is in ~/.local/share/lsms_library/dvc-cache/...
 # and DVC.open will serve it from there.
@@ -281,19 +295,17 @@ country and environment:
 | Backend | When Used | Description |
 |---------|-----------|-------------|
 | Python aggregator | Default for all countries | Reads wave-level `data_info.yml` and builds in memory; the L2-country parquet is written and read across sessions via the v0.7.0 top read, and each wave's intermediate is cached as L2-wave |
-| DVC stage layer | The 7 countries with a populated `dvc.yaml` (Uganda, Senegal, Malawi, Togo, Kazakhstan, Serbia, GhanaLSS) | DVC hashes stage deps and reads cache when clean. Note: on hosts where `python3` resolves to Python < 3.9 (e.g. Savio login nodes with Python 3.6.8), `stage.reproduce()` fails with `ModuleNotFoundError` and the library silently falls back to the Python aggregator path |
 | Make / script | When `data_scheme.yml` marks a table `materialize: make` | Per-country/wave Makefiles and standalone Python scripts; the only choice for tables that cannot be expressed purely in YAML (post-planting/post-harvest dual rounds, multi-wave source files, etc.). These also write L2-wave parquets via `to_parquet()` |
 
 ```bash
-# Force the Python aggregator path (bypasses the DVC stage layer for
-# the 7 stage-configured countries; mostly useful for debugging stage
-# resolution issues)
+# Rebuild from source on every call, bypassing both Parquet tiers
 export LSMS_BUILD_BACKEND=make
 ```
 
-Note that `LSMS_BUILD_BACKEND=make` dispatches `_aggregate_wave_data`
-directly to `load_from_waves` (`country.py:1830`), bypassing both the
-DVC stage layer and both L2 parquet tiers. L1 is still used to serve
+Note that `LSMS_BUILD_BACKEND=make` changes how `_aggregate_wave_data`
+dispatches (`country.py:3727`): a table with a `data_scheme.yml` entry goes to
+`load_from_waves`, otherwise to `run_make_target()`. Either way both L2 parquet
+tiers are bypassed. L1 is still used to serve
 raw blobs. Use only when actively debugging.
 
 ## Build Parallelism
