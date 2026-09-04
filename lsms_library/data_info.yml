@@ -546,11 +546,31 @@ Columns:
 # country declares that is missing here fails, so growth is loud.
 #
 # Membership, as MEASURED (2026-08-24) -- not a tuned threshold.  Ranking the
-# 33 source features by how many countries declare each leaves a real GAP:
-# 22 features are declared by >= 6 countries, and the next most common is
-# declared by 2.  Nothing is declared by 3, 4 or 5.  So ">= 3" and ">= 6" pick
-# out the IDENTICAL set, and the cut is a property of the corpus rather than a
-# knob.  The excluded tail is local helper tables, not corpus vocabulary --
+# 33 source features by how many countries declare each left a real GAP:
+# 22 features were declared by >= 6 countries, and the next most common by 2.
+# Nothing was declared by 3, 4 or 5.  So ">= 3" and ">= 6" picked out the
+# IDENTICAL set, and the cut was a property of the corpus rather than a knob.
+#
+# THE GAP HAS SINCE CLOSED (2026-09-04), and the threshold now does real work.
+# `nutrition` (Uganda, Ethiopia + GhanaLSS, #563/PR #769) and
+# `nonfood_expenditures` (Uganda, Nigeria + Togo, PR #773) each landed a THIRD
+# declarer, so both sit at exactly 3 -- inside ">= 3", outside ">= 6".  They
+# are added below because they are genuinely cross-country, not local helpers:
+# `nutrition` is constructible wherever `food_quantities` is, and the EHCVM
+# `s09` non-food modules ship in 12 (country, wave) cells across all eight
+# WAEMU countries, of which 11 remain unwired.  ">= 3" is retained rather than
+# raised to ">= 6": a feature three independent countries declare is corpus
+# vocabulary by any reading, and raising the bar to keep the old coincidence
+# would be tuning the threshold to avoid the answer.
+#
+# The COST is real and is the reason this is a deliberate edit: each entry puts
+# its feature on the matrix axis, so every country not declaring it grades
+# `undeclared` -- about 34 cells apiece at present, ~68 for the two together.
+# That is the intended reading (work not started is not the same as work not
+# applicable), which is exactly #724's argument, but it does move every
+# country's denominator.
+#
+# The excluded tail is local helper tables, not corpus vocabulary --
 # e.g. Tanzania's `community_cluster_xwalk`, EthiopiaRHS's `hhsize`, Uganda's
 # `fct`/`earnings`/`enterprise_income`, India's `employment`.  Including a
 # one-country helper would manufacture ~35 false `undeclared` rows apiece and
@@ -578,6 +598,8 @@ Feature Vocabulary:
   - life_satisfaction
   - livestock
   - months_food_inadequate
+  - nonfood_expenditures
+  - nutrition
   - people_last7days
   - plot_features
   - plot_inputs
