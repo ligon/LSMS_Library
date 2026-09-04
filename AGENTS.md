@@ -62,6 +62,23 @@ The returned DataFrame prepends a `country` index level.
 - Country root-level symlinks (e.g. `Uganda -> lsms_library/countries/Uganda`) are convenience only; actual config lives under `lsms_library/countries/`.
 - **DVC repository is rooted at `lsms_library/countries/`, NOT the top-level repo.** `.dvc/`, remotes, and credentials all live there. Run `dvc` CLI commands from that directory or they fail with missing-remote errors.
 - **Two Makefiles**: top-level `Makefile` (Poetry setup, pytest, build); `lsms_library/Makefile` (country-specific test/build/materialize/demands). `make -C lsms_library help` for details.
+- **Refreshing the GitNexus index** — always pass all three flags:
+
+  ```bash
+  npx gitnexus analyze --skip-agents-md --skip-skills --embeddings
+  ```
+
+  `--embeddings` builds semantic search (off by default; a plain `analyze`
+  preserves embeddings already present but won't generate them). The other two
+  suppress **injection into tracked files**, which is otherwise a recurring
+  source of dirty-tree churn: without `--skip-agents-md` it rewrites the
+  `<!-- gitnexus -->` block in `AGENTS.md` *and* `CLAUDE.md`; without
+  `--skip-skills` it reinstalls all six `.claude/skills/gitnexus/*/SKILL.md`.
+  Both are tracked, so an unflagged run leaves edits for the next unrelated
+  commit to sweep up. **The stale-index hook's suggested command omits
+  `--skip-skills`** — add it. The block at the bottom of this file and the
+  gitnexus skill files are generated: refresh them by re-running `analyze`,
+  never by hand.
 
 ## Cache Behavior (v0.7.0+)
 
