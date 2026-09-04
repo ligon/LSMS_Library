@@ -1140,13 +1140,84 @@ r.get_gamma_se()
 r.to_pickle('../var/cfe_demands.rgsn')
 #+end_src
 
-** DEFERRED Food Conversion Table -- tracked in #563
-West Africa FCT -> a =nutrition= feature; split out of #109 as a data-gap so it
-does not block the food harmonization (cf. Cambodia #560).  Sources:
-West Africa Food Conversion Table (Inputs into Ghana Food Expenditure Data):
-https://docs.google.com/spreadsheets/d/1Ar88nD6jQl4u8iCIsAIkLxOjHpfvi6ZBVJlwf91HOOQ/edit?usp=sharing
-Ghana Food Expenditure Data with Aggregate Labels and FTC Codes:
-https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/edit?usp=sharing
+** DONE Food Conversion Table -- =nutrition= landed (#563, 2026-09-04)
+The FCT is the *FAO/INFOODS West African Food Composition Table 2019*
+(Vincent, Grande, Compaore et al.), materialised as
+=GhanaLSS/_/fct_west_africa.org= (1,028 foods x 20 nutrients, per 100 g
+edible portion as published) by
+=slurm_logs/ghana_audit/build_fct_west_africa.py=.  The label -> code map is
+the =FCT Code= column of =food_items.org= =#+name: food_label=, written by
+=slurm_logs/ghana_audit/build_fct_code_column.py=.  See the org file's own
+commentary for the datasheet / energy-unit / edible-portion decisions.
+
+Sources originally listed here:
+- "West Africa Food Conversion Table (Inputs into Ghana Food Expenditure
+  Data)",
+  https://docs.google.com/spreadsheets/d/1Ar88nD6jQl4u8iCIsAIkLxOjHpfvi6ZBVJlwf91HOOQ/
+  -- *NOT PUBLIC*.  An anonymous export returns a Google sign-in page
+  (checked 2026-09-04).  Unused.
+- "Ghana Food Expenditure Data with Aggregate Labels and FTC Codes",
+  https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/
+  -- public; exported to
+  =slurm_logs/ghana_audit/ghana_aggregate_labels_fct_2026-09-04.csv=.
+  **It is keyed to GhanaSPS, not GhanaLSS**: its wave columns are 2009-10 /
+  2013-14 / 2017-2018, and only 39 of GhanaLSS's 195 Preferred Labels appear
+  in it verbatim.  Used as ANCHORS; every departure from it is recorded in
+  =build_fct_code_column.py= (it maps every cooking oil to margarine,
+  sugarcane to cabbage, chocolate and ice cream to honey, "garden eggs" to a
+  chicken egg, and watermelon to avocado).  It is, however, exactly what a
+  GhanaSPS =nutrition= task would want.
+
+*** Idiosyncrasies this work surfaced -- read before touching =nutrition=
+
+1. *=u='Value'= is served as kilograms.*  =transformations.conversion_to_kgs=
+   infers a kg-per-unit factor of *0.49139* for =u='Value'=, where =Quantity=
+   IS the cedi expenditure, and the conversion then relabels those rows
+   =u='kg'=.  1987-88 has 71,605 =u='Value'= rows and
+   =food_quantities(units='kgs')= emits exactly 71,605 =u='kg'= rows.  Median
+   household "kg" runs 2,228 (1987-88) to 251,592 (2005-06) against 85 for
+   2016-17 -- it tracks the cedi, not any mass.  This contradicts
+   =food_quantities_from_acquired='s own docstring, which names =u='Value'=
+   as the canonical carry-through case.  *A library defect, not config*: see
+   =slurm_logs/ghana_audit/ISSUE_value_kg_factor.org=.  =nutrition.py= works
+   around it by dropping non-physical units BEFORE deriving; it cannot filter
+   afterwards, because the kg relabel destroys the native =u=.  **Do not
+   "simplify" nutrition.py to call =Country.food_quantities()= like Uganda's
+   and Ethiopia's do.**
+
+2. *Own production is the only physical-quantity source before 2016-17.*
+   After the filter, the surviving kg rows in 1991-92 / 1998-99 / 2005-06 /
+   2012-13 are *100% =s='produced'=* -- purchases were elicited by value.
+   =nutrition= for those waves describes the own-production basket only: a
+   biased subset (rural, staple-heavy), not scaled-down total intake.
+
+3. *2005-06's own-production module was never harmonised.*  =food_label='s
+   2005-06 column covers 101 of the 102 =s='purchased'= item labels but *0 of
+   the 63 =s='produced'= labels* (=cassava-tubers=, =maize-flour/dough=,
+   =okro=, =pepper=, ...).  Since 2005-06's only physical quantities are own
+   production, the wave maps at 0% and =nutrition= is empty for it.  This
+   CONTRADICTS the "DONE food_items.org / Food labels harmonized across all 7
+   waves" entry above, which is true of the purchase module only.  Left
+   unfixed here (harmonisation is #109's, not #563's); worth ~110,213 kg.
+
+4. *Three 2016-17 labels are missing from =food_label= entirely*:
+   =Oil (vegetable)= (69,025 kg), =Sugar Bread= (15,701 kg) and =Kola Nut=
+   (2,888 kg) appear as =j= in the data but in no column of the table.  They
+   are worth *+27.4% of 2016-17 Energy* on their own.  Also #109's.
+
+5. *The FCT is per 100 g EDIBLE PORTION; =food_quantities= is quantity
+   ACQUIRED.*  =EDIBLE1= is carried in =fct_west_africa.org= but NOT applied,
+   because both precedents multiply acquired mass by per-EP densities and
+   =Feature('nutrition')= assembles the three countries together.  GhanaLSS
+   therefore overstates in exactly the way Uganda and Ethiopia do.
+
+6. *Vitamin K is absent from the WAFCT* (no phylloquinone component), so
+   GhanaLSS returns 20 of =nutrient_labels.org='s 21 Preferred Labels.  It is
+   omitted, NOT zero-filled -- a zero would assert these foods contain none.
+
+7. =food_items.csv= is a stale artifact: nothing reads it.  GhanaLSS reads
+   =food_items.org= only, via =ghanalss.py::harmonized_food_labels=.  It was
+   NOT regenerated with the new =FCT Code= column.
 
 * Features NOT available in GhanaLSS
 

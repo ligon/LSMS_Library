@@ -11,7 +11,8 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # they are auto-derived at runtime by the framework's _FOOD_DERIVED from
 # the canonical food_acquired.parquet (cf. Uganda post-#245).  Registering
 # or building them is forbidden.
-var = $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/community_prices.parquet
+var = $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/community_prices.parquet \
+      $(VAR_DIR)/nutrition.parquet
 
 all: $(parquet) $(var) panel_ids.json
 
@@ -35,6 +36,14 @@ community_prices_parquet := $(community_prices:.py=.parquet)
 
 $(VAR_DIR)/community_prices.parquet: community_prices.py glss_prices.py $(community_prices_parquet)
 	python community_prices.py
+
+# nutrition: food_quantities (derived from food_acquired) x the West African
+# Food Composition Table.  Depends on the FCT extract and on food_items.org,
+# which carries the label -> FCT Code map.  See nutrition.py's docstring for
+# why it filters non-physical units before deriving kg.
+$(VAR_DIR)/nutrition.parquet: nutrition.py fct_west_africa.org food_items.org \
+                              $(VAR_DIR)/food_acquired.parquet
+	python nutrition.py
 
 household_roster = $(shell find $(rounds) -name household_roster.py)
 household_roster_parquet := $(household_roster:.py=.parquet)

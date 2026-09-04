@@ -1,0 +1,105 @@
+#+title: =conversion_to_kgs= infers a kg-per-unit factor for =u='Value'=, so cedis are served as kilograms
+#+date: [2026-09-04 Fri]
+#+author: found while landing GH #563 (GhanaLSS =nutrition=)
+
+*Filed as a file, not via =gh=: this is outside the #563 brief's scope
+(=lsms_library/transformations.py= is on its stop-list).  Dispatcher's call
+whether to open it.*
+
+* Summary
+
+=transformations._get_kg_factors= finishes by inferring kg-per-unit factors
+from price ratios (=conversion_to_kgs=).  For rows whose unit is =Value= --
+where =Quantity= *is* the expenditure, in local currency -- the ratio is
+degenerate and it infers a **kg-per-cedi** factor.  =_apply_kg_conversion=
+then multiplies the cedi amount by it and **relabels the row =u='kg'=**.
+
+=food_quantities(units='kgs')= therefore serves currency as mass, silently.
+
+This contradicts the function's own docstring
+(=transformations.py:997-1002=), which names =u='Value'= as the canonical
+*carry-through* case:
+
+#+begin_quote
+Rows whose unit lacks a factor (e.g. ``u='Value'`` for LCU-only goods such as
+"meals in restaurants", or ``u='tin'`` when no per-tin kg conversion is
+known) are *carried through* with their native ``Quantity`` and original
+``u`` label, NOT dropped.
+#+end_quote
+
+The docstring describes the intended behaviour.  The inference pass defeats
+it.
+
+* Evidence (GhanaLSS, measured 2026-09-04 on =development= @ =9aea120f=)
+
+#+begin_src python
+from lsms_library.transformations import _get_kg_factors
+fa = pd.read_parquet('.../GhanaLSS/var/food_acquired.parquet')
+_get_kg_factors(fa)['value']      # -> 0.49139133333333335
+#+end_src
+
+GhanaLSS elicits expenditure rather than quantity before 2016-17
+(=GhanaLSS/_/CONTENTS.org=), so =u='Value'= dominates its early waves.
+
+| wave    | =food_acquired= rows with =Quantity=, =u='Value'= | =food_quantities(units='kgs')= rows tagged =u='kg'= |
+|---------+---------------------------------------------------+-----------------------------------------------------|
+| 1987-88 |                                            71,605 |                                              71,605 |
+| 1988-89 |                                            72,649 |                                              72,649 |
+
+The whole wave.  The counts are equal because *every* value row was
+converted.
+
+Median household total "kg" per wave, against a physically plausible ~85-130
+kg for a monthly acquisition basket:
+
+| wave    | median hh "kg" (as served) | median hh kg (=Value= dropped) |
+|---------+----------------------------+--------------------------------|
+| 1987-88 |                      2,228 | -- (no physical rows at all)   |
+| 1988-89 |                      2,533 | --                             |
+| 1991-92 |                      4,379 |                            8.6 |
+| 1998-99 |                     54,893 |                           10.9 |
+| 2005-06 |                    251,592 |                           12.0 |
+| 2012-13 |                        129 |                           15.7 |
+| 2016-17 |                         85 |                           59.3 |
+
+The as-served column tracks the *cedi*, not any mass: it grows monotonically
+backwards in time with Ghanaian inflation and the 2007 redenomination, then
+collapses once 2016-17 starts eliciting real quantities.
+
+* Blast radius -- NOT GhanaLSS-only
+
+Any country with =u='Value'= rows is exposed.  =CLAUDE.md= already documents
+that such rows exist elsewhere (the =food_prices(units='unitvalue')= note
+about "1 = Kwacha per Kwacha" is about Malawi), so Malawi's
+=food_quantities(units='kgs')= and every =Feature('food_quantities')= /
+=Feature('food_prices')= consumer may carry the same contamination.
+
+*Not measured here* -- that compute is not this task's to spend.  Naming it
+so the sweep is scoped, not asserting the result.
+
+* Why this is NOT GH #562 phase 3b
+
+#562 phase 3b is the *intended* inverse price -> quantity imputation for the
+value-only waves.  This is a pre-existing defect that would corrupt 3b's
+output too: 3b would produce a real imputed quantity in some native unit, and
+this inference pass would still be free to invent a factor for =Value= rows
+that remain.  Fix them independently.
+
+* Suggested fix
+
+Exclude non-physical unit labels from =conversion_to_kgs='s inference, or --
+more robustly, since the label vocabulary is open -- refuse to infer a factor
+for a unit whose =Quantity= and =Expenditure= are identical (or perfectly
+collinear) across the group, which is exactly the degeneracy that makes the
+inferred number meaningless.
+
+A test would assert that for a frame containing a =u='Value'= row,
+=food_quantities_from_acquired(df, units='kgs')= carries that row through
+with =u='Value'= -- i.e. that the docstring is true.
+
+* Work-around in force
+
+=GhanaLSS/_/nutrition.py= drops =value= / =all= / =none= units from
+=food_acquired= *before* calling =food_quantities_from_acquired=.  It cannot
+filter afterwards: the kg relabel destroys the native =u=.  See that module's
+docstring.
