@@ -102,7 +102,31 @@ adjudicating them).  They surface downstream as implausible kcal in
 
 * Review findings (advisor, 2026-09-04) -- folded in before implementation
 
-** STRUCTURAL HOLE: Step 2 never says WHERE =Quantity_kg= is computed
+** RESOLVED (EL, 2026-09-04): API-time, from two parquets
+/"community_prices can be a new parquet, alongside food_acquired.  Then let
+prices and quantities be determined at api-time."/  So: NO build-time
+cross-table dependency, no =Quantity_kg= written into =food_acquired=, and no
+new cache semantics -- =community_prices= is read through the SAME
+=_aggregate_wave_data= path as =food_acquired= (it is already an L2-country
+parquet, warm).
+
+*Measured, and it is the detail the review could not resolve*: the dispatch at
+=country.py:4155-4161= is
+: fa = self._aggregate_wave_data(waves, 'food_acquired')   # PRE-finalize
+: derived = transform_fn(fa, **transform_kwargs)            # transform runs HERE
+: derived = self._finalize_result(derived, ...)             # v joined AFTER
+so the transform receives =food_acquired= *without =v=* -- =_join_v_from_sample=
+runs inside =_finalize_result=, after the transform.  =community_prices= carries
+=v= natively, so only the =food_acquired= side needs resolving: the dispatch
+passes the =i -> v= map from =sample()=.
+
+Shape: =food_prices_from_acquired(fa, *, community_prices=None,
+hh_to_cluster=None, source='auto', units=..., volume_as_mass=...)=, and the
+same for =food_quantities_from_acquired=.  *When the kwargs are =None= --
+29 of 37 countries have no =community_prices= -- behaviour must be
+BYTE-IDENTICAL to today.*  Pin that with a test.
+
+** SUPERSEDED: the build-time-vs-API-time question (kept for the reasoning)
 "Through the existing hatch" names the CONSUMER, not the PRODUCER.  Malawi and
 Nigeria write =Quantity_kg= in their WAVE SCRIPTS at build time, from a
 survey-provided column *in the same file*.  GhanaLSS's would come from a
@@ -125,6 +149,29 @@ costs -- and *"not a big lift" is not established until this is answered*:
 Step 1 is small, safe, and is what the course needs.  Step 2 carries the
 unresolved injection site above plus an unmeasured match rate.  Ship Step 1
 alone the moment the red team clears it; Step 2 is a second PR.
+
+** Step 2 is a =source== argument, not a =Value= special case (EL, 2026-09-04)
+=food_prices(source=...)= selects the price SERIES: =individual= | =community=
+| =auto= (default -- individual where it exists, else community).  The #770 case
+then falls out of the general mechanism: after Step 1 a =Value= row's individual
+price is NaN, so =auto= falls back to community *with no special-casing
+anywhere*.  It also matches an idiom already in the repo --
+=median_price_valuation= walks a geography ladder finest-to-coarsest with a
+national fallback; this is the same shape one level up.
+
+*Open, my recommendation absent further steer:*
+- *Provenance marker: INCLUDE IT.*  If =auto= silently mixes household unit
+  values with cluster prices, one column holds two different quantities,
+  indistinguishable -- this repo's signature failure.  #562's own design doc
+  lists /"add an imputed-vs-reported provenance marker?"/ as an open question.
+  Return the source per row so =groupby= can separate them.
+- *=units== stays exactly as shipped* (documented; pinned by
+  =tests/test_food_prices_units_kwarg.py=).  It already encodes denominator x
+  derivation, so =source= x =units= has meaningless cells (a community price is
+  not "derived from expenditure").  Reject contradictory combinations
+  explicitly rather than silently coercing.
+- *Defaulting to =auto= changes returned data for all 8 community-price
+  countries*, not just GhanaLSS -- wider than #770 itself.  Say so in the PR.
 
 ** Step 2 makes =food_prices= a TAUTOLOGY for =Value= rows -- name it
 =food_prices(kgvalue) = Expenditure / Quantity_kg
