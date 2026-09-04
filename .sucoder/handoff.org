@@ -3,7 +3,7 @@
 #+author: Sue (Claude Opus 5, 1M context)
 
 * State
-=development= = =853ce496= (local == origin).  v0.10.2 released 2026-09-03
+=development= = =6010a05f= (local == origin).  *Board clear: 0 open PRs.*  v0.10.2 released 2026-09-03
 from =master= =38fabb27=; publish workflow SUCCESS, on PyPI (wheel + sdist).
 =master= and =development= trees are BYTE-IDENTICAL -- the 5 "master ahead"
 commits are development->master merge commits only.  Nothing to back-merge.
@@ -28,7 +28,22 @@ squashfs mount: run =bash bin/savio_venv.sh mount= FIRST on any new allocation.
 | #773 | Togo =nonfood_expenditures= from EHCVM s09; 5 orphan sidecars retired |
 | #774 | vocabulary: admit =nutrition= + =nonfood_expenditures= (the ratchet) |
 
-* IN FLIGHT -- verify the MERGED tree (no PR's CI saw the combination)
+* Verification of the merged tree -- DONE
+- Full pytest on =853ce496=: *5,045 passed, 2 real failures*, both =Uganda/earnings=
+  (#772, pre-existing).  A third failure --- =test_ghanalss_split_household_food_not_summed_into_one=
+  --- was a FLAKE, not a regression: mtimes show =GhanaLSS/var/food_acquired.parquet=
+  was written at 08:02 and the run ended 08:02:48.  =to_parquet= IS atomic, so
+  this was not a torn read: with 32 xdist workers on a cold cache one worker
+  wrote a country aggregate built from a PARTIAL wave set, and it then carried a
+  valid content hash.  Filed as *#778*; test passes serially (20 passed).
+- Full-corpus matrix on the merged tree: *2,420 cells / 37 countries*, all 37
+  shards rc=0.  Candidate at
+  =coverage-refresh/slurm_logs/matrix_full/latest_candidate.csv= + =matrix_full.html=.
+  *NOT promoted* --- review its 32 dropped / 10 builds / 8 broken first
+  (Nepal + Armenia broken = no microdata, expected).
+- Uganda invariance failures FIXED by restoring the April =fct_usda.csv= (#771).
+
+* IN FLIGHT (previous round -- superseded, kept for the job ids)
 Jobs on the dedicated clone =/global/scratch/fsa/fc_jevons/ligon/coverage-refresh=
 at =853ce496= (co_carleton / savio3 / savio_lowprio -- free, pre-emptible):
 - *38525387* matrix shard array (37 tasks x 32 cores, =%12=)
@@ -54,6 +69,15 @@ Previous run (pre-merge, at =9aea120f=): matrix 2,342 cells / 37 countries in
 | #771 | Uganda/Ethiopia =nutrition.py= rebuild their FCT from the LIVE USDA API when the untracked =fct_usda.csv= is missing -- not reproducible |
 | #772 | =Uganda/earnings= delivers =earnings= vs declared =Earnings= (+ stray =level_1=) |
 | #775 | =Feature()= modal exclusion is ARGUMENT-ORDER dependent |
+| #777 | Panama 1997: 99.1% of =u='Value'= rows carry =Quantity=7.70=, an undecoded sentinel |
+| #778 | =pytest -n= on a cold cache: a partial country aggregate caches as fresh |
+
+*#770 is the one to fix first.*  EL's own session showed the visible symptom:
+=glss.food_prices()= returns a CONSTANT (2.035038 = 1/0.49139, the reciprocal of
+the bogus kg factor) for every item, and =groupby('t').std()= is 0.0 in six of
+seven waves.  Blast radius MEASURED and narrower than first filed: only
+*2 countries* carry =u='Value'= rows (GhanaLSS 3,492,915; Panama 17,821); the
+other 18 that declare schemes mentioning "Value" have none.
 
 * GH #750 -- essentially closed
 21 real misses (never the ~1,300 documentation the issue claimed -- that was a
@@ -61,7 +85,55 @@ flat-vs-=files/md5/= layout artefact) -> *4*, all =GhanaSPS/2017-18/Data/Crop_en
 Boxcryptor files with no passphrase.  EL's call: retire those 4 sidecars
 (closes #750, turns #754 green) or keep them as a record.
 
+* A degenerate-column check (EL's idea) -- MEASURED, not yet filed
+EL: /"a check which would have detected both: groupby('t').std() equal to zero"/.
+Measured over *4,909 (country, feature, wave, column) cells* on 35 countries
+(scan: =coverage-refresh/slurm_logs/degenerate/=):
+- =nunique==1= MISSES both (float noise: GhanaLSS Price has nunique=2, std 4e-16
+  -- pandas *displays* 0.0, which is why the eyeball caught it).
+- =CV = std/|mean|= catches #770 cleanly (1e-18..2e-16 vs 18.2 for the healthy
+  wave) but MISSES #777.
+- *mode share* (one value >= 99% of the wave) catches BOTH: 99.8-100% vs 8.9%.
+- Firing rate at >= 0.99: *109 of 4,909 cells (2.2%)*, 13 countries -- a work
+  queue, not a firehose (cf. null_read_audit Site B's 86).
+- ~22 of the 109 are =weight=/=panel_weight= (EthiopiaRHS, GhanaLSS) and are
+  plausibly LEGITIMATE -- GLSS3 is self-weighting by design (#715).  So: WARN.
+- Caveat: at column level it misses #777, because Panama's sentinel is only
+  99% within the =u='Value'= subset (~7% of the whole column).  The conditional
+  case needs a separate, more expensive check.
+
+* Data-restriction design (discussed with EL, agreed)
+Split the problem: *(A) don't leak* (never push restricted data to the shared
+bucket) is ~90% of the value for ~10% of the work and needs no second bucket;
+*(B) share under a protocol* is a governance system.  *AGREED: build (A), defer
+(B) until a second consumer exists.*  Bucket-level enforcement forces
+file-level granularity -- fine for GPS (geovariables are separate files),
+impossible for "restrict one column".
+
+*EL's correction, verified*: the corpus's GPS is the WB/DHS *displaced* fix
+(CLAUDE.md:273 says so; the files are the =Pub_*Geovariables*= releases), so the
+14 GPS countries need NO restriction.
+
+*MY EARLIER CLAIM "nothing in the bucket needs unwinding" WAS WRONG.*  Measured:
+23 waves are =PROVENANCE_SOURCE: external=, and they split:
+| GhanaLSS x6 (1987-88..2016-17) | GSS NADA: /"will not be redistributed or sold ... without the written agreement of the National Data Archive"/ -- ALREADY IN THE BUCKET |
+| KenyaLPS x4 + GhanaSPS 2017-18 | CC0, fine |
+| GhanaSPS 2013-14, KenyaLPS 2003-2005, Rwanda 2000-01, Rwanda 2005-06 | *NO LICENSE.org at all* |
+| EthiopiaRHS x8 | no clear term found; needs reading |
+
+*Why the API-key argument fails here*: our cache is gated on a WB Microdata API
+key, which discharges the WB boilerplate (63 of 112 licences carry it -- see the
+#140 comment) because a reader could get the file from the WB anyway.  That
+argument is PROVENANCE-SPECIFIC: a WB key does not entitle anyone to Ghana
+Statistical Service data.  The gate must match the source.  And
+=PROVENANCE_SOURCE= records where we GOT it, not what we may DO with it, so it
+cannot be borrowed as the permission field -- it must be its own field, naming
+the authority.
+
 * EL decisions outstanding
+0. *The GhanaLSS x6 GSS terms* -- is there a written agreement already (just not
+   recorded)?  And are the 4 =LICENSE.org=-less waves worth chasing terms for, or
+   do they predate the convention?  Both are judgement calls, not facts.
 1. Retire the 4 Boxcryptor sidecars?  (see above)
 2. Promote the full-corpus matrix candidate to =.coder/coverage/latest.csv=
    after reviewing its =dropped= / =broken= / =builds= cells.
