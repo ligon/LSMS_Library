@@ -1708,3 +1708,313 @@ DVC-tracked file"); and =LSMS_READ_STRICT=1= still cannot build this table
 on this branch for the =sample()= reason recorded under plot features above
 (=null_read_reports(country='GhanaSPS', table='crop_production') == []=
 asserted directly instead).
+
+** Plot labour: wired for all three waves, and the two silent mislabels it dodges (2026-09-04)
+
+=plot_labor= is now wired for all three waves at =(t, i, plot_id, season,
+stage, source)= with =v= joined from =sample()= at API time -- ALL THREE waves
+are wave scripts (=({wave})/_/plot_labor.py=), because the =source= axis is a
+melt across column GROUPS and =df_data_grabber= cannot express that.  Shared
+vocabulary and arithmetic live in =_/ghanasps.py= as plain helpers; there is
+no country-level =df_edit= hook, because there is no YAML wave to hook.
+Delivered on a cold build under =LSMS_GRAIN_STRICT=1=: *30,864 / 27,874 /
+31,149* rows (89,887) on 5,103 / 4,120 / 4,705 plots, index unique, 0
+=GrainCollapseWarning=, 0 null-read reports against the table, =v= 100%
+non-null (263 / 287 / 284 clusters), *100.0%* of labour plots present in that
+wave's =plot_features()=, =is_this_feature_sane().ok= True.  Working:
+=slurm_logs/ghanasps/plot_labor_verify.py= and its =_cold.log=; the
+vocabularies and their instrument sources are in =harmonize_stage= /
+=harmonize_labor_source= / =WageUnit= in =_/categorical_mapping.org=; every
+judgement is in the =plot_labor= block of =_/data_scheme.yml=;
+=tests/test_ghanasps_plot_labor.py= pins the two traps below.
+
+*** 2009-10 asks NO labour payment -- FINDINGS_agriculture.org is wrong
+
+=slurm_logs/ghanasps/FINDINGS_agriculture.org= says, under "=plot_labor= ---
+CONSTRUCTIBLE":
+
+#+begin_quote
+=Wage=: W2 has =hiredavgpayman= / =hiredavgpaywoman= / =hiredavepaychild= plus
+=hiredpayunit= ... in the *plot*-level =04m_aglabour=; W3 folds the same block
+into the stage-level file and *drops the child rate*.  *W1 has hired-labour
+payment in the =S4AIX= blocks.*
+#+end_quote
+
+The last sentence is false.  Section 4 IX "LABOR INPUTS" runs A289 to A362
+and every one of its 72 labour questions is a days / hours / workers triple
+("A290. How much casual labor was provided by men?  1. # of days  2. Average
+hours per day  3. Average # of workers").  Each of the eight =S4AIX= files has
+exactly 33 columns -- four ids, a plot number and nine question triples -- and
+no payment cell among them.  Searching the whole of
+=Documentation/Household_questionnaire_Part_A.pdf= from the start of Section 4
+onward, the only "pay" questions are A47 ("How much, if any, cash did you pay
+...", plot rent, already used by =plot_features=) and Part B's B71/B72 crop
+revenue.  So =WageRateMen= / =WageRateWomen= / =WageRateChildren= / =WageUnit=
+are 100% null in 2009-10, which is why all four are declared =optional: true=
+(the Site B null-read guard fires on a *required* column 100% null in any
+wave's =t= slice).  The task brief inherited the same error ("W1 from the
+=S4AIX= payment cells (state units)"); there are none to state.
+
+*** The four 2009-10 stage files are NOT indistinguishable -- the A-number is in the label
+
+=CONTENTS.org= above and =FINDINGS= §5 both say "*The variable labels are
+identical across the four files* -- a wrong stage assignment is invisible to
+every automated check."  The label *TEXT* is identical; the *question number*
+is not, and it is the whole check:
+
+| file   | plot column     | labour cells | questionnaire section header (verbatim)                                                                                                                 |
+|--------+-----------------+--------------+---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| S4AIX1 | =s4aix1_plotno= | A290--A298   | "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USE ON LAND PREPARATION E.G. CLEARING OR WEEDING BEFORE PLANTING, SEEDING/NURSERY, PLANTING AND TRANSPLANTING DURING THE MAJOR SEASON:" |
+| S4AIX2 | =s4aix2_plotno= | A299--A307   | "... LABOR USED ON FIELD MANAGEMENT (WEEDING AFTER PLANTING, FERTILIZED AND PESTICIDE APPLICATIONS, IRRIGATION, MANAGEMENT ETC DURING THE MAJOR SEASON:" |
+| S4AIX3 | =s4aix3_plotno= | A308--A316   | "... LABOR USED ON HARVESTING OF CROPS DURING THE MAJOR SEASON:"                                                                                          |
+| S4AIX4 | =s4aix4_plotno= | A317--A325   | "... LABOR USED ON POST-HARVEST ACTIVITIES (INCLUDING PRESERVATION FOR STORAGE ETC) OF CROPS DURING THE MAJOR SEASON:"                                    |
+| S4AIX5 | =s4aix5_plotno= | A327--A335   | the land-preparation header again, "DURING THE MINOR SEASON"                                                                                             |
+| S4AIX6 | =s4aix6_plotno= | A336--A344   | "The following questions pertain to labor used on field management ... during the minor season:" (lower case in the PDF)                                  |
+| S4AIX7 | =s4aix7_plotno= | A345--A353   | "... HARVESTING OF CROPS DURING THE MINOR SEASON:"                                                                                                        |
+| S4AIX8 | =s4aix8_plotno= | A354--A362   | "The following questions pertain to labor used post-harvest activities (including preservation for storage) during the minor season:"                     |
+
+Every label reads =A{n}.{1,2,3} ...= with =n= the number the column name
+carries (=s4aix_290i= -> "A290.1 Number of days casual labor provided by
+men"), so the file -> stage map is *asserted*: =2009-10/_/plot_labor.py=
+=_assert_block()= reads each file's own labels off the DVC-cached blob and
+fails the build unless its labour cells are exactly the A-range the
+questionnaire heads with that stage.  A file swap, a re-export in a different
+order or a renamed column is a build failure rather than a silent mislabel.
+
+Season is anchored twice over in the data as well: S4AIX1 carries
+=s4aix_289i/ii= "Starting/Ending month for the *MAJOR* season of dominant
+crop" and S4AIX5 carries =s4aix_326i/ii= "... *MINOR* ...", and *no other
+S4AIX file carries a months question at all* -- so files 1 and 5 are the files
+that OPEN their season, which is where the questionnaire puts land
+preparation.  The month distributions agree: A289.1 is 77.1% February--June
+and 11.4% July--October; A326.1 is 23.5% February--June and 65.2%
+July--October.
+
+**** What the indirect checks actually showed, including the one that did not confirm
+
+The brief asked for an indirect check on the stage assignment.  Four were run
+(=plot_labor_verify.py=, CHECK 7); they do not all point the same way and the
+honest summary is that *the direct A-number anchor is what settles it*:
+
+- *Person-day SHARE by coarse stage, folded to 2009-10's four* (check i) --
+  *did NOT confirm.*  2009-10 reads land_prep 29.5% / field_mgmt 36.1% /
+  harvest 23.0% / post 11.3%, against 38.1 / 23.5 / 24.5 / 13.9 (2013-14) and
+  30.4 / 27.0 / 30.9 / 11.6 (2017-18).  The true assignment deviates 10.9 pp
+  from the later-wave mean, and the best of the 24 permutations -- the one
+  that SWAPS land preparation and field management -- deviates only 2.2 pp.
+  Two things bound what that means.  (a) The two later waves, which both carry
+  the stage in their own data, disagree with each other by up to 7.7 pp, so
+  the test's noise floor is most of the gap it is being asked to resolve.
+  (b) The fold is a containment, not an identity: 2009-14's field management
+  explicitly includes *irrigation* and generic "MANAGEMENT ETC", which the
+  later instruments never ask, and the later waves' =ploughing= is carved out
+  of a stage 2009-10 does not carve.  Recorded as a negative result rather
+  than buried.
+- *Plot COVERAGE by coarse stage* (check ia) -- *confirms, and rejects the
+  swap.*  The share of a wave's labour plots recording any labour at each
+  coarse stage is field_mgmt > harvest > land_prep > post_harvest in *all
+  three waves* (2009-10 96.6 / 91.5 / 90.9 / 81.2; 2013-14 92.0 / 88.9 / 87.6
+  / 57.2; 2017-18 94.5 / 86.3 / 83.7 / 43.7).  The 1<->2 swap check (i)
+  prefers would make 2009-10 read 90.9 / 96.6, inverting the order both later
+  waves show.
+- *Harvest-stage labour against a =crop_production= harvest record* (check ii,
+  the brief's own suggestion) -- *confirms for blocks 3 and 4.*  2009-10 is
+  (plot, season) grain in BOTH tables, so the seasons are checked separately:
+  major harvesting 98.7% and post-harvest 98.8% of labour plots have a harvest
+  record, against 94.5% for land preparation; minor 96.6% / 96.2% against
+  81.3%.  The ordering is what a correct assignment predicts (you can prepare
+  land and not harvest; you cannot harvest nothing), and the minor season --
+  where far more plots prepare land and fail to harvest -- shows it more
+  sharply.
+- *Hired share of person-days by stage* (check ib) -- *ambiguous on the 1<->2
+  pair*, decisive on 3 and 4: harvest and post-harvest are the least
+  hired-intensive stages in all three waves.
+
+*** 2017-18's =stageid= is an ORDINAL, and it looks exactly like 2013-14's =stagenum=
+
+The single most dangerous column in this table.
+
+- 2013-14 =04m_aglabourquestions.dta= (32,851 x 43): =stagenum= 1..7 *is* the
+  stage -- a full grid, 4,693 rows (one per plot) for each value, with =stage=
+  its lower-case name and an =any= Yes/No screener (18,617 Yes / 14,225 No / 9
+  null).
+- 2017-18 =04m_aglabourquestions.dta= (20,663 x 64): =stageid= is the *ordinal
+  position* of the stage among the ones that plot actually did (mean 3.85 rows
+  per plot, min 1, max 7).  =stageid == 1= is "Clearing and land preparation"
+  on 2,285 rows, "Planting" on 1,130, "Plowing" on 554, "Chemical application"
+  on 460, "Weeding" on 248, "Harvesting" on 42 and "Post-harvest processing"
+  on 4.
+
+Reading =stageid= through 2013-14's vocabulary would mislabel roughly 60 per
+cent of wave-3 rows and *nothing would catch it*: both are small integers, the
+index stays unique, no column goes null, every sanity check passes.  Both
+scripts key on the stage NAME, and each asserts its own file's shape (2013-14
+that =stagenum= is a full grid; 2017-18 that =stageid= is not).
+
+*The 640 null-key rows* the FINDINGS flag are these: rows with a blank
+=stagename= and a null =stageid=, which are the 640 plots whose =cultivated=
+is null.  They carry no person-days at all and are dropped (5 source rows
+each, 3,200 candidate cells).  A null index level would otherwise be deleted
+by the framework's collapse with a =GrainCollapseWarning=, fatal under strict.
+
+*** PersonDays is NOT the =*days= column in the later waves
+
+Part M asks the worker count and the per-worker duration as two separate
+questions: "Approximately how many hired laborers WHO ARE MEN worked on this
+plot during the [...] stage?  *Number of people*" then "Approximately how many
+days *ON AVERAGE did EACH OF* the hired laborers WHO ARE MEN work on this
+plot during the [...] stage?  *Number of days*".  So
+
+  : PersonDays = women x womendays + men x mendays
+
+per source, and =personaldays= ("How many days did you personally work") is
+the respondent alone and needs no multiplication.  Reading =hiredmendays= as
+person-days -- which the FINDINGS' "W2/W3 give =familymendays= / ... plus
+=personaldays=" invites -- undercounts by the worker count, a mean 3.4 hired
+men per plot-stage in 2013-14.  The worker totals corroborate the reading:
+=familyworkers == familywomen + familymen= on *all* 8,954 (2013-14) and 11,463
+(2017-18) rows that report them, and likewise for communal, hired and other.
+
+2009-10 is the same arithmetic in its own shape: =(A29x.1 "# of days") x
+(A29x.3 "Average # of workers")=, summed over men / women / children of ONE
+question.  =Hours= (2009-10 only; A29x.2 "Average hours per day") is the
+person-day-weighted mean over those three groups -- the number that multiplies
+=PersonDays= to give person-hours.  Delivered 99.9% non-null in 2009-10,
+median 5.6 hours, and null throughout the later waves, which never ask it.
+
+*27 of the 58,583 reported hours-per-day cells (0.05%) exceed 24* -- 42, 51,
+54, 80, 86 hours "per day" -- almost certainly the respondent giving a weekly
+or per-task total.  They are delivered as reported (core does not edit data)
+and the delivered =Hours= tops out at 80; anyone using the =Hours= tail should
+know they are there.
+
+*** The wage is a RATE with a unit -- so there is no =Wage= column
+
+Uganda's and Nigeria's =plot_labor.Wage= is *cash paid* (Nigeria: "sum over
+man/woman/child of (reported daily wage x hired days)").  GhanaSPS asks a
+rate: "How much on average did [Name] pay each man as hired labor during the
+last farming season?" (M191) plus "Does [Name] pay those amounts per day or
+per acre?" (M194/M196).  Those are different quantities and must not share a
+column name; EL ruled the same way on 2026-09-02.
+
+- *Three rate columns, not one.*  =WageRateMen= / =WageRateWomen= /
+  =WageRateChildren= are three separately reported cells and no weight exists
+  that could combine them -- least of all on the 495 + 409 =Acres= and 132 +
+  178 =Plot= rows, where the rate is a piece rate for the job and not the
+  price of a person-day at all.  Combining them is a transformation; core does
+  not aggregate.  A single headline =WageRate= would have to pick one sex
+  silently or invent a weighting.
+- *2017-18 drops the child rate* that 2013-14's M193 asks, so
+  =WageRateChildren= is null in that wave (119 non-null rows in 2013-14).
+- *A rate of <= 0 is not a rate.*  2013-14 fills all three cells for every
+  cash-paying plot and uses -1 and 0 as "no such worker": 591 of its 1,811
+  woman cells are -1 and 701 are 0, against 449 plots that hired any woman at
+  all.  2017-18 has no -1 but 38 man and 4 woman zeros.  Read as missing and
+  counted: 81 / 1,292 / 1,764 cells in 2013-14, 38 / 4 in 2017-18.  Delivered
+  non-null share among hired rows: men 89.2% / 88.2%, women 35.6% / 13.9%.
+- *The two later waves store the block at DIFFERENT GRAINS, and that is the
+  data.*  2013-14's is asked and shipped once per PLOT (=04m_aglabour.dta=,
+  under "IF M2=4 OR M29=4 OR ..."), so it is stamped on all seven of the
+  plot's stage rows.  2017-18's instrument also prints it once per plot, but
+  the shipped file stores it per stage row and it genuinely varies -- *620 of
+  5,366 plots carry two or more distinct man rates* across their stage rows --
+  so it is delivered at stage grain.
+- *=hiredpayunit= is a bare numeric code in 2017-18*, with NO value label
+  (that wave's =.dta= labels only =cultivated= and =interviewedid=), so the
+  closed answers come from M196 itself: 1 Per day / 2 Per week / 3 Per month /
+  4 Per plot / 5 Per acre / 6 Per pole / 7 Per rope / -666 Other.  2013-14
+  ships the same list AS a value label (=thiredpayunit=).  *Reading the codes
+  as strings leaves =WageUnit= 100% null* and nothing complains -- the column
+  is =optional=, so Site B stays silent.  It happened once during this build
+  and is now an assertion.
+- =WageUnit= reuses =plot_features='s =AreaUnit= spellings for its four area
+  members (=Acres= / =Poles= / =Ropes= / =Plot=), so a per-area rate converts
+  with =plot_features().Area= without a second vocabulary.  Delivered:
+  2013-14 Day 2,404 / Acres 495 / <NA> 289 / Ropes 154 / Plot 132 / Other 128
+  / Poles 122 / Week 68 / Month 39; 2017-18 Day 2,692 / Acres 409 / Other 206
+  / Plot 178 / <NA> 163 / Ropes 76 / Poles 54 / Week 41 / Month 13.
+- *Median per-day man rate: 10 GHS (2013-14), 20 GHS (2017-18)* -- the
+  sanity range the brief asked for, and the doubling over four years is what
+  Ghanaian nominal wage growth over 2013--2017 looks like.
+- =monetary: true= on the three rates is what makes =currency.py= attach GHS:
+  =_monetary_columns()= unions =_DEFAULT_MONETARY=, the canonical =Columns=
+  block AND the country's own =data_scheme.yml=, which the =currency.py=
+  docstring names as the extension point.  Verified: =_monetary_columns(
+  'plot_labor', 'GhanaSPS')= returns the three plus the seed's =Wage=, and
+  =plot_labor(currency='index')= carries a =currency= level of =GHS=.  *Real
+  gap, reported not fixed*: =_all_monetary_columns()= -- used only by the
+  standalone =lsms_library.conversion.convert=, which sees a frame but not a
+  table name -- does NOT read country schemes, so it would not scale these
+  columns.  Closing it means editing =lsms_library/currency.py= or the
+  canonical =data_info.yml=, both outside a country-config task.
+
+*** Nine stages and seven sources, folded nowhere
+
+2009-10 asks the battery FOUR times per season, the later waves SEVEN, and the
+seven are not a refinement of the same four: 2009-10's blocks are strictly
+coarser and its first block is not a subset of anything in the later list.
+Neither vocabulary can be dropped without inventing data, so both are kept and
+the containment is tabulated in =harmonize_stage= -- =land_preparation= ⊇
+{clearing_and_land_preparation, ploughing, planting}, =field_management= ⊇
+{chemical_application, weeding}, =harvesting= and =post_harvest= coincide.  A
+consumer folds 7 -> 4 by summing =PersonDays=; the reverse is impossible.
+Same for =source=: 2009-10's =casual= + =permanent= are the later waves'
+=hired= (both non-household paid labour; only 2009-10 splits by contract
+length), and 2009-10's =family= is BROADER than the later waves' -- that
+instrument has no "yourself" question, so the respondent's own days have
+nowhere else to go, and A362's own wording is "How much family labor is worked
+by children? (*including exchanged labor*)", i.e. it also absorbs what the
+later waves call communal.  Exactly the shape of this country's
+=Tenure.sharecropped_in= and =crop_production='s =Cocoyam Leaves=: an
+instrument artefact, recorded rather than smoothed.
+
+*One placement is a reading, not a quotation*: =ploughing=.  2009-10's land-
+preparation header names clearing, weeding-before-planting, seeding/nursery,
+planting and transplanting and does not mention ploughing -- but neither does
+it exclude it, whereas both later instruments explicitly DO ("Activities such
+as plowing, tilling, or mound-making should NOT be included as land
+preparation"), which is why they need a separate stage for it.  Hoe ploughing
+therefore has nowhere else to go in 2009-10.  Flagged in
+=_/categorical_mapping.org= as the one cell of the fold table that is inferred.
+
+*** =season=: two named seasons, then a constant the instrument does not name
+
+2009-10 is genuinely two-season (=major= S4AIX1..4, =minor= S4AIX5..8).  The
+later waves ask about "the last farming season" ("the last farming season
+(2017)" in wave 3) and never say which, so their constant is =last= --
+deliberately NOT =major= (unnamed) and deliberately NOT =crop_production='s
+=annual=, which is that table's own explicit 12-month recall (N5, "give the
+total quantity which has been harvested over the last 12 months") and a
+different question in the same interview.  So =plot_labor= and
+=crop_production= do NOT share a =season= vocabulary in any wave, and a join
+across the two on =season= will match nothing -- by design, because the two
+modules are asking about different periods.
+
+*** The keep rule is =PersonDays > 0=, and the later waves force it
+
+2013-14 ships a full seven-stages-x-every-plot grid with an =any= Yes/No
+screener; 2017-18 ships only the stages a plot actually did.  Keeping zero or
+null rows would emit 2013-14's "No" rows with no 2017-18 equivalent -- a pure
+artefact of how the two extracts were exported.  Counted: 136,464 / 164,255 /
+100,115 candidate (plot, season, stage, source) cells -> 30,864 / 27,874 /
+31,149 kept, dropping 515 / 85 / 43 cells with a reported zero and 105,085 /
+136,296 / 68,923 never reported (plus 2017-18's 3,200 blank-stage cells).
+
+*Other counted drops*: 15--17 null-plot rows in each of S4AIX2..8 (none in
+S4AIX1; the non-null key sets of all eight files are IDENTICAL, 5,686 keys);
+=-10= (90 cells) and =-1= (34 cells) in the 2009-10 day / hour / worker cells,
+which the CODE_BOOK documents nowhere and which are read as missing; and
+2009-10 sex-group cells reporting days with no worker count (~10 per block).
+
+*** Not wired, deliberately
+
+The supervision block (=communalsupervision= / =hiredsupervision= and the
+who-supervised person ids -- a household-member reference, not labour input);
+the food provided to communal and hired labour (=commlabfoodcost= /
+=hiredfoodcost= / =commlabhowmanyfed= / =hiredhowmanyfed= -- an in-kind cost
+at plot grain with no canonical home, and the 2013-14 instrument's own M199/
+M200 labels are a copy-paste of the communal ones); =hiredhowpay= (Cash 1,733
+/ In kind 117 / Both 78 / Other 28 in 2013-14) and =hiredinkindpay=; the
+=whoworked= multi-select flags (redundant with which source rows carry
+person-days); 2009-10's A289 / A326 season months (=crop_production= already
+delivers the ending month as =harvest_month=).

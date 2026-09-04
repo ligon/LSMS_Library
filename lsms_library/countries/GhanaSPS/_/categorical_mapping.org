@@ -879,6 +879,15 @@ label spells it =Plowing=, 2013-14's spells it =ploughing=.  Both fold to
 | Post-harvest processing       | post_harvest                  |
 | land preparation              | land_preparation              |
 | field management              | field_management              |
+| clearing_and_land_preparation | clearing_and_land_preparation |
+| ploughing                     | ploughing                     |
+| planting                      | planting                      |
+| chemical_application          | chemical_application          |
+| weeding                       | weeding                       |
+| harvesting                    | harvesting                    |
+| post_harvest                  | post_harvest                  |
+| land_preparation              | land_preparation              |
+| field_management              | field_management              |
 
 ** harmonize_labor_source -- the =source= index level
 
