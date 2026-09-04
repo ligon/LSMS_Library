@@ -1,0 +1,150 @@
+#+title: Access-restricted data: terms in the record, permission in the config
+#+date: [2026-09-04 Fri]
+#+author: Sue, from a design discussion with EL
+
+* Status / mandate
+Design sketch for discussion.  *Nothing implemented.*  The shape below is EL's;
+the measurements, trade-offs and the two open questions are mine.
+
+* The problem
+The library will keep acquiring datasets whose terms are not the standard
+self-service ones: the 2021 Togo/Novissi phone survey (permission to use
+obtained; redistribution unconfirmed), un-displaced LSMS GPS files for several
+West African countries (explicit World Bank permission required).  Today there
+is no way to say so in config: *all 112 =LICENSE.org= files are free prose with
+ZERO machine-readable fields*, so the difference between "boilerplate, already
+covered" and "genuinely restricted" can only be established by reading.
+
+That gap has already cost real time.  GH #140 carried an unadjudicated
+redistribution flag on GhanaSPS wave 1 for five months on the strength of one
+sentence; it is boilerplate present in *63 of the 112* licences, sitting
+directly above "Public use files, accessible to all" in the World Bank's own
+catalog page.  Withdrawn 2026-09-04 with the count as evidence.
+
+* What is NOT the problem (measured, so it does not get re-litigated)
+- *The corpus's GPS is already the displaced/jittered public release.*  The
+  files are the =Pub_*Geovariables*= products, and =CLAUDE.md:273= records the
+  same fact from a different direction: /"the published GPS *is* the cluster's
+  displaced fix, stamped on each household"/.  The 14 countries declaring
+  =Latitude= need no restriction.
+- *Nothing currently in the bucket needs unwinding.*  23 waves are
+  =PROVENANCE_SOURCE: external=; of these GhanaLSS x6 and Rwanda x2 come from
+  national NADA instances (=statsghana.gov.gh=, =microdata.statistics.gov.rw=)
+  running the same software and the same self-service API-key generation as the
+  World Bank -- *112 of the catalog URLs are NADA-style*; only the 13 =doi.org=
+  (Dataverse) ones differ.  The population that can obtain GSS data is the
+  population that can obtain WB data, so those waves are symmetric with the 63
+  boilerplate licences.  KenyaLPS x4 and GhanaSPS 2017-18 are CC0.
+  (I argued the opposite mid-discussion -- that our WB-key gate could not
+  discharge terms naming a different authority -- and EL corrected it.  Recorded
+  so the wrong step is not repeated.)
+
+* The design (EL's)
+Terms and *the method of obtaining permission* live in the data record; *evidence
+of permission for a given user* lives in that user's config.  Nothing blocks a
+push.
+
+** Data side -- machine-readable fields in =SOURCE.org= / =LICENSE.org=
+Mirroring =SOURCE.org='s existing =#+PROVENANCE_*= convention, which
+=provenance.py= already parses:
+
+: #+ACCESS_MECHANISM: self-service | bespoke-agreement | encrypted
+: #+ACCESS_CLASS: wb-nada | gha-gss | novissi-2021 | wb-gps-unjittered
+: #+ACCESS_PROTOCOL: how a user obtains permission -- contact, URL, what to ask for
+: #+ACCESS_EVIDENCE: what the user's config must then contain
+
+*The key field is the MECHANISM, not the authority.*  What predicts whether our
+existing gate suffices is how permission is obtained, not who grants it:
+- =self-service= -- NADA registration, or a public licence (CC0).  Discharged by
+  the existing WB-API-key gate, which is a proxy for "a researcher who
+  registers", and that population is identical across NADA instances.
+- =bespoke-agreement= / =encrypted= -- a negotiated permission naming
+  individuals.  NOT discharged; this is the only category needing new machinery.
+
+=PROVENANCE_SOURCE= cannot be borrowed for this.  It records where we GOT a wave,
+not what may be DONE with it -- six GhanaLSS waves are =external= and entirely
+fine.
+
+** User side -- evidence in =~/.config/lsms_library/config.yml=
+Alongside the existing =microdata_api_key=, keyed by access class, and read
+through the existing =config.get(key, env_var=...)= lookup order
+(env var -> config file -> None):
+
+: microdata_api_key: ...
+: grants:
+:   gha-gss:            true                     # nothing more needed
+:   novissi-2021:       {key_file: ~/.keys/novissi.key}
+:   wb-gps-unjittered:  {credentialpath: ~/.aws/wb-gps}
+
+Three evidence shapes, all already precedented in this codebase: an API key, S3
+credentials, or a *decryption key for publicly-stored ciphertext*.
+
+** Read path
+Resolve the wave's access class -> look for evidence in config -> decrypt if the
+class says so.  On absence, raise an error that *names the protocol* rather than
+surfacing a =403= or a =None=.
+
+** Write path -- unchanged
+A push is never blocked.  A class marked =encrypted= is encrypted *before* being
+pushed: a transformation, not a prohibition.  This is the point of the design --
+the bucket stays open, content-addressing still works, no second bucket or
+per-user ACL is needed, and the only governance surface is key distribution.
+
+* Why this is assembly, not invention
+| piece | already in the tree |
+|-------+---------------------|
+| symmetric decryption | =data_access._fernet_decrypt=, =_derive_fernet_key=, =_gpg_decrypt= |
+| the dependency | =cryptography >=3.4= in =pyproject.toml= |
+| per-user config with env override | =config.get()=, =config.microdata_api_key()= |
+| machine-readable org keywords + reader + =audit()= | =provenance.py=, =capability.py= |
+| tiered credentials | the three-tier model in =CLAUDE.md= |
+
+*And an accidental instance of the design already exists*:
+=GhanaSPS/2017-18/Data/Crop_encrypted/= holds four Boxcryptor =.bc= / =.bch=
+files -- ciphertext, in the open bucket, content-addressed, pushed like anything
+else.  They are unusable *only because nobody recorded the protocol for
+obtaining the key*.  Under this design they stop being "unobtainable, retire the
+sidecars" (the standing GH #750 question) and become "encrypted, protocol
+unrecorded" -- which is both more honest and actionable.
+
+* Decisions taken (EL, 2026-09-04)
+- *D1. Do not block pushes.*  An earlier sketch of mine made =push_to_cache*=
+  refuse restricted paths.  Rejected: the mechanism above achieves the same
+  protection without a prohibition.
+- *D2. Split the problem, build only the first half.*  (A) do not leak vs
+  (B) share under a protocol.  (B) is a governance system -- an owner, granting,
+  revocation -- and is deferred until a second consumer actually exists rather
+  than designed for a population of one.
+- *D3. Plaintext exposure and revocation are the USER's responsibility, not
+  ours.*  The user's DUA is with the provider, not with this repository; we are a
+  distribution mechanism, not a compliance system.  This is what makes the
+  design tractable: the software need not pretend to be a security boundary,
+  because enforcement lives in the legal relationship.
+  - Residual, adopted as a *default* rather than a control: decrypt to a
+    user-private path, not the shared L1 cache.  Not policing -- simply
+    declining to *create* the exposure, since on a shared filesystem the default
+    location is world-readable.
+
+* Open question
+*Q1. Deterministic encryption?*  Content-addressing wants the same plaintext to
+produce the same ciphertext; otherwise every re-encrypt mints a new blob and
+orphans the old one, and a sidecar's md5 stops being reproducible from source.
+Fernet is randomised by default.  Options: (a) derive a fixed nonce from the
+plaintext hash, giving reproducible ciphertext at the cost of leaking equality
+between identical files -- harmless here, since the file list is public anyway;
+(b) accept non-determinism and treat the sidecar as pinning one particular
+ciphertext forever, which makes re-encryption a deliberate, breaking act.
+*Proposal: (a).*  Purely mechanical; no liability dimension.
+
+* What remains to record (not blocking)
+| gap | waves |
+|-----+-------|
+| no =LICENSE.org= at all | GhanaSPS 2013-14, KenyaLPS 2003-2005, Rwanda 2000-01, Rwanda 2005-06 |
+| no clear term found | EthiopiaRHS x8 (IFPRI / Addis Ababa via Harvard Dataverse) |
+Only GhanaSPS 2013-14 is substantively unclear, and that is already GH #140's
+pre-release vintage question.
+
+* First customers
+The Togo/Novissi 2021 survey, and the un-displaced West African GPS files.
+Neither is in the bucket, so the mechanism can be built *before* exposure --
+the easy direction, and the reason not to hurry into (B).
