@@ -1,0 +1,9 @@
+=== Fri Sep  4 06:31:41 PDT 2026 node=n0037.savio4 cpus=8 ===
+HEAD=9d6166f1 branch=feat/ghanalss-nutrition-fct
+LSMS_MAKE_JOBS=8
+countries_root: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-fct/lsms_library/countries
+lsms_library  : /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/__init__.py
+
+==============================================================================
+CHECK 1 -- Country("GhanaLSS").nutrition() builds (COLD)
+==============================================================================
