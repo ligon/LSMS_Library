@@ -200,3 +200,41 @@ Data Scheme:
     Electricity: str
 
   panel_ids: !make
+
+  # Household nutrient intake: food_quantities(kg) x the FAO/INFOODS West
+  # African Food Composition Table 2019 (GH #563).  Registered `!make`, like
+  # Uganda's and Ethiopia's -- NOT derived.
+  #
+  # GRAIN   (i, t) -- one row per household per wave.  No `v`: nutrition is
+  #         a household aggregate, and the index declares no cluster level.
+  # COLUMNS the `Preferred Label` nutrient axis of
+  #         Ethiopia/_/nutrient_labels.org, less `Vitamin K`, which the WAFCT
+  #         does not carry.  It is OMITTED, not zero-filled.
+  # UNITS   absolute nutrient amount ACQUIRED over the wave's recall period
+  #         (kcal for Energy; the WAFCT's own unit otherwise -- see
+  #         fct_west_africa.org#wafct_components).  Not per-capita, not
+  #         per-day, not per 100 g.  Densities are per-EP and the edible
+  #         portion coefficient is NOT applied, matching both precedents.
+  #
+  # WAVE COVERAGE -- read this before using the numbers:
+  #   1987-88, 1988-89  NO ROWS.  100% of these waves' food_acquired rows are
+  #                     u='Value' (expenditure, not quantity), so no physical
+  #                     quantity survives.  Empty by design.
+  #   1991-92, 1998-99, 2012-13
+  #                     OWN PRODUCTION ONLY (s='produced' is 100% of the
+  #                     surviving kg rows); purchases were elicited by value.
+  #                     A biased subset, not scaled-down total intake.
+  #   2005-06           NO ROWS.  Its own-production module's 63 item labels
+  #                     are absent from food_items.org#food_label (the
+  #                     PURCHASE module's 101/102 are present), so none maps
+  #                     to an FCT code.  A harmonisation gap, not an absence.
+  #   2016-17           The usable wave: purchases and own production both
+  #                     carry physical quantities.  92.5% of its kg maps.
+  #
+  # FDC FALLBACK: none.  The WAFCT covers the basket; no FoodData Central key
+  # is read or embedded (the precedents embed a literal key -- not copied).
+  #
+  # See nutrition.py's docstring for why it does not call
+  # Country.food_quantities(), and slurm_logs/ghana_audit/ISSUE_value_kg_factor.org.
+  nutrition: !make
+
