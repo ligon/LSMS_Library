@@ -135,3 +135,22 @@ reported as a RATE with its unit, not as the corpus's cash `Wage`.
   sibling country computes GhanaSPS labour person-days.
 - No CONTRADICTION found: `Wage` is deliberately absent (§3) rather than
   redefined, so Uganda's and Nigeria's definition stands untouched.
+
+Two things the build added to §4 that the ledger did not anticipate:
+
+- **§4.8 (new) — 2017-18's `hiredpayunit` is a bare numeric code with no value
+  label.** Mapping it as a string left `WageUnit` 100% null in that wave, and
+  nothing complained: the column is `optional: true`, so the Site B guard is
+  disarmed on it by design. Caught by reading the STEP 3 `value_counts`, not
+  by a guard. Now decoded through the instrument's own M196 list
+  (`ghanasps._WAGE_UNIT_CODES`) with an assertion that every reported code
+  maps.
+- **§4.9 (new) — the cross-wave person-day-share check does NOT confirm the
+  2009-10 stage assignment.** The true assignment deviates 10.9 pp from the
+  later-wave mean while the land-prep/field-management swap deviates 2.2 pp.
+  Two bounds on what that means: the two later waves disagree with each other
+  by up to 7.7 pp, and the fold is a containment rather than an identity
+  (2009-10's field management includes irrigation, which the later
+  instruments never ask). The plot-coverage ordering check *does* confirm and
+  rejects that swap, and the direct A-number anchor (§4.1) is what settles
+  it. Recorded as a negative result in `CONTENTS.org` rather than dropped.
