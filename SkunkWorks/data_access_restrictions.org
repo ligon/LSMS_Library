@@ -120,10 +120,16 @@ unrecorded" -- which is both more honest and actionable.
   distribution mechanism, not a compliance system.  This is what makes the
   design tractable: the software need not pretend to be a security boundary,
   because enforcement lives in the legal relationship.
-  - Residual, adopted as a *default* rather than a control: decrypt to a
-    user-private path, not the shared L1 cache.  Not policing -- simply
-    declining to *create* the exposure, since on a shared filesystem the default
-    location is world-readable.
+  - *I proposed a user-private decrypt path as a default; WITHDRAWN* (EL,
+    2026-09-04).  It is wrong for the scenario that matters most: a course
+    server where dozens of students share compute and all hold the same
+    entitlement.  Per-user copies of the same data there are pure waste.
+    The principle is instead *the cache's audience should match the grant's
+    audience*, and only the operator knows the tenancy -- so it is a
+    configuration question, not a library default.  =data_dir= /
+    =LSMS_DATA_DIR= already expresses it: one shared cache where everyone is
+    entitled, a narrower root where entitlements are mixed.  No new mechanism,
+    and no special-casing in the library.
 
 * Open question
 *Q1. Deterministic encryption?*  Content-addressing wants the same plaintext to
@@ -143,6 +149,24 @@ ciphertext forever, which makes re-encryption a deliberate, breaking act.
 | no clear term found | EthiopiaRHS x8 (IFPRI / Addis Ababa via Harvard Dataverse) |
 Only GhanaSPS 2013-14 is substantively unclear, and that is already GH #140's
 pre-release vintage question.
+
+* Shared-compute is a first-class scenario, not an edge case
+The immediate application is a course using GLSS on a shared cloud server.
+GLSS is =self-service= (GSS NADA), so it is never encrypted and none of the
+machinery above applies to it -- it uses the shared cache exactly as today.
+
+Worth recording because it constrains the design: *measured 2026-09-04*, a user
+with NO config file and NO World Bank API key reads GhanaLSS =food_acquired=
+(5,259,344 rows) and =household_roster= (246,594 rows) from a warm shared cache,
+because =load_dataframe_with_dvc= reads the L2-country parquet before consulting
+DVC at all.  So a pre-warmed shared cache lets a class of students work with no
+credentials whatsoever.  (Caveat: that run still had the repo's =.dvc/s3_creds=
+on disk, so it demonstrates "no USER credentials needed" rather than "no S3
+contact at all"; a pip-installed environment with no checkout is the
+configuration to rehearse.)
+
+Any future restriction machinery must not break this: whatever gates restricted
+data must leave the unrestricted, pre-warmed, credential-free path intact.
 
 * First customers
 The Togo/Novissi 2021 survey, and the un-displaced West African GPS files.
