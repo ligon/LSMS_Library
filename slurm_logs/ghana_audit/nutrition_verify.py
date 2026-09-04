@@ -18,6 +18,18 @@ print('countries_root:', R)
 print('lsms_library  :', ll.__file__)
 
 
+def household_size(hc):
+    """Resident head count from household_characteristics.
+
+    ``roster_to_characteristics`` returns one column per sex-age bucket PLUS
+    ``log HSize``; summing all of them would add a log term to the count.
+    Buckets already exclude non-resident members (the MonthsSpent/MonthsAway
+    filter), so this is the resident count, not the raw roster row count.
+    """
+    buckets = [c for c in hc.columns if c != 'log HSize']
+    return hc[buckets].sum(axis=1).rename('n')
+
+
 def hdr(s):
     print('\n' + '=' * 78 + f'\n{s}\n' + '=' * 78)
 
@@ -74,9 +86,12 @@ mod.build(report=True)
 # ---------------------------------------------------------------- CHECK 3
 hdr('CHECK 3 -- median per-capita daily Energy (kcal), per wave')
 hc = c.household_characteristics()
-print('household_characteristics index:', list(hc.index.names),
-      '| columns:', list(hc.columns)[:12])
-size = hc.sum(axis=1).rename('n') if 'n' not in hc.columns else hc['n']
+print('household_characteristics index:', list(hc.index.names))
+print('household_characteristics columns:', list(hc.columns))
+# roster_to_characteristics returns sex_age BUCKET COUNTS plus a `log HSize`
+# column.  Summing every column would add the log term to the head count.
+size = household_size(hc)
+print('summed bucket columns:', [c for c in hc.columns if c != "log HSize"])
 d = n[['Energy']].join(size, how='inner')
 print(f'joined {len(d)} of {len(n)} nutrition rows to a household size')
 DAYS = 30.0     # GLSS visits are spread over about a month (CONTENTS.org)

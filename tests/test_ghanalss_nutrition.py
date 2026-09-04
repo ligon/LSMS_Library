@@ -66,6 +66,19 @@ KCAL_2016_17 = (600, 2_000)
 DAYS = 30.0
 
 
+def _household_size(c):
+    """Resident head count per (i, t).
+
+    ``household_characteristics`` is one column per sex-age bucket PLUS a
+    ``log HSize`` column -- summing every column would add the log term to the
+    head count, inflating size and deflating per-capita Energy.  Sum the
+    buckets only.
+    """
+    hc = c.household_characteristics()
+    buckets = [x for x in hc.columns if x != 'log HSize']
+    return hc[buckets].sum(axis=1).rename('n')
+
+
 @pytest.fixture(scope='module')
 def nutrition():
     try:
@@ -85,10 +98,26 @@ def canonical_nutrients():
 
 
 def test_grain_is_household_wave(nutrition):
-    """(i, t), unique -- the grain Feature('nutrition') assembles on."""
+    """One row per household per wave, the grain Feature() assembles on.
+
+    ``nutrition.py`` writes ``(i, t)`` -- what the parquet carries, and what
+    Uganda's and Ethiopia's write too.  The API then adds ``v`` via
+    ``_join_v_from_sample``, because ``lsms_library/data_info.yml`` has no
+    canonical ``nutrition`` block for the table to opt out of the join with
+    (GH #436/#455).  That applies uniformly to all three countries, so
+    ``Feature('nutrition')`` still assembles -- but the returned index is
+    ``(i, t, v)`` today and would become ``(i, t)`` the moment a canonical
+    block declaring an index without ``v`` lands.
+
+    So pin what is a CONTRACT (household x wave, unique, not per-food) rather
+    than what is a consequence of config that does not exist yet.
+    """
     _c, n = nutrition
-    assert list(n.index.names) == ['i', 't'], list(n.index.names)
+    assert {'i', 't'} <= set(n.index.names), list(n.index.names)
+    assert 'j' not in n.index.names, 'nutrition is a household aggregate'
     assert n.index.is_unique, 'nutrition must be one row per household per wave'
+    flat = n.reset_index()[['i', 't']].drop_duplicates()
+    assert len(flat) == len(n), 'joined index levels duplicated (i, t) rows'
 
 
 def test_no_fourth_nutrient_vocabulary(nutrition, canonical_nutrients):
@@ -135,9 +164,7 @@ def test_energy_not_absurd(nutrition):
     several orders of magnitude.
     """
     c, n = nutrition
-    hc = c.household_characteristics()
-    size = hc['n'] if 'n' in hc.columns else hc.sum(axis=1)
-    d = n[['Energy']].join(size.rename('n'), how='inner')
+    d = n[['Energy']].join(_household_size(c), how='inner')
     d = d[d['n'] > 0]
     assert len(d), 'no nutrition row joined a household size'
     med = (d['Energy'] / d['n'] / DAYS).groupby(d.index.get_level_values('t')).median()
@@ -167,9 +194,7 @@ def test_energy_2016_17_measured(nutrition):
     c, n = nutrition
     if '2016-17' not in set(n.index.get_level_values('t').astype(str)):
         pytest.skip('2016-17 not built here')
-    hc = c.household_characteristics()
-    size = hc['n'] if 'n' in hc.columns else hc.sum(axis=1)
-    d = n[['Energy']].join(size.rename('n'), how='inner')
+    d = n[['Energy']].join(_household_size(c), how='inner')
     d = d[(d['n'] > 0) & (d.index.get_level_values('t').astype(str) == '2016-17')]
     med = (d['Energy'] / d['n'] / DAYS).median()
     lo, hi = KCAL_2016_17

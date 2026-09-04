@@ -7,3 +7,161 @@ lsms_library  : /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_li
 ==============================================================================
 CHECK 1 -- Country("GhanaLSS").nutrition() builds (COLD)
 ==============================================================================
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/food_acquired: required declared column 'Price' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+nutrition: dropped 3638216 of 5259344 food_acquired rows whose unit is non-physical ['all', 'none', 'value'] -- see this module's docstring
+
+nutrition: 29095 rows x 20 nutrients; index ['i', 't']
+          rows
+t             
+1991-92   2532
+1998-99   3745
+2012-13   8908
+2016-17  13910
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+built in 148.4 s
+shape       : (29095, 20)
+index names : ['i', 't', 'v']
+columns     : ['Energy', 'Protein', 'Carbohydrate', 'Fiber', 'Calcium', 'Iron', 'Magnesium', 'Phosphorus', 'Potassium', 'Zinc', 'Vitamin A', 'Vitamin D', 'Vitamin E', 'Thiamin', 'Riboflavin', 'Niacin', 'Vitamin B-6', 'Folate', 'Vitamin B-12', 'Vitamin C']
+dtypes      : ['float64']
+
+rows per wave:
+          rows
+t             
+1991-92   2532
+1998-99   3745
+2012-13   8908
+2016-17  13910
+
+-- comparison with the precedents --
+/local/job38509375/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+Ethiopia source: Country("Ethiopia").nutrition()
+Ethiopia index names: ['i', 't', 'v'] | GhanaLSS: ['i', 't', 'v']
+index names identical: True
+columns in Ethiopia not in GhanaLSS: ['Vitamin K']
+columns in GhanaLSS not in Ethiopia: []
+
+==============================================================================
+CHECK 2 -- FCT coverage of food_quantities mass (kg), per wave
+==============================================================================
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/food_acquired: required declared column 'Price' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+nutrition: dropped 3638216 of 5259344 food_acquired rows whose unit is non-physical ['all', 'none', 'value'] -- see this module's docstring
+
+--- FCT coverage of GhanaLSS food quantities (kg) ---
+overall: 88.26% of 1,710,361 kg maps to an FCT row
+                   kg  mapped_share
+t                                  
+1991-92  4.154398e+04      1.000000
+1998-99  6.201152e+04      1.000000
+2005-06  1.102126e+05      0.000000
+2012-13  2.882875e+05      1.000000
+2016-17  1.208306e+06      0.925102
+
+top-10 unmapped j by kg:
+j
+Oil (vegetable)               69025.236490
+maize-flour/dough             19951.053572
+Sugar Bread                   15701.236765
+pepper                        11710.845052
+okro                           8340.990764
+cassava-tubers                 7549.053479
+groundnuts(roasted or raw)     6018.396845
+maize-cob (fresh)              5973.940220
+plantain                       5088.672665
+cassava(other forms)           5053.942022
+
+==============================================================================
+CHECK 3 -- median per-capita daily Energy (kcal), per wave
+==============================================================================
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-fct/slurm_logs/ghana_audit/nutrition_verify.py:76: UserWarning: household_characteristics: replaced 84 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'1987-88': 9, '1988-89': 1, '1991-92': 74}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+  
+household_characteristics index: ['t', 'v', 'i'] | columns: ['F 00-03', 'F 04-08', 'F 09-13', 'F 14-18', 'F 19-30', 'F 31-50', 'F 51+', 'M 00-03', 'M 04-08', 'M 09-13', 'M 14-18', 'M 19-30']
+joined 29073 of 29095 nutrition rows to a household size
+         households  median_hh_size  median_kcal_cap_day
+t                                                       
+1991-92        2529        2.693147                251.5
+1998-99        3745        6.609438                139.5
+2012-13        8908        6.609438                233.7
+2016-17       13891        5.386294                784.1
+
+SANITY BAND 1,500-3,500 kcal/cap/day -- in band?
+  1991-92:     251.5  OUT OF BAND
+  1998-99:     139.5  OUT OF BAND
+  2012-13:     233.7  OUT OF BAND
+  2016-17:     784.1  OUT OF BAND
+
+==============================================================================
+CHECK 4 -- Feature("nutrition") assembles across countries
+==============================================================================
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-fct/slurm_logs/ghana_audit/nutrition_verify.py:99: PopulationHeterogeneityWarning: nutrition: this result pools 3 materially different population universes. Nothing was dropped -- every country you asked for is in the result; this is a comparability warning, not a filter.
+  national [national (documented or claimed)] -- 5 wave(s), 2 country(ies): Ethiopia 2018-19, GhanaLSS 1991-92, GhanaLSS 1998-99, GhanaLSS 2012-13, GhanaLSS 2016-17
+  region-excluded [national minus named regions/districts] -- 3 wave(s), 1 country(ies): Ethiopia 2013-14, Ethiopia 2015-16, Ethiopia 2021-22
+  rural-and-small-town [rural areas and small towns only] -- 1 wave(s), 1 country(ies): Ethiopia 2011-12
+  ('national-all-households' and 'national-claimed' are pooled as one 'national' class here: the difference between them is whether a document NAMES the population, which is a provenance fact carried by source_type/confidence, not a different target population. The two tags stay distinct in df.attrs.)
+  confidence=medium (a coverage or representativeness claim, not a universe declaration): GhanaLSS 2016-17
+  The full per-wave record, with the verbatim population statements and exclusions, is on df.attrs['population'].
+  d['kcal_cap_day'] = d['Energy'] / d['n'] / DAYS
+['GhanaLSS', 'Ethiopia']: OK  shape=(54742, 21)  index=['country', 'i', 't', 'v']  (8.9 s)
+   rows per country: {'Ethiopia': 25647, 'GhanaLSS': 29095}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-fct/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-fct/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{996.0, 997.0, 998.0, 999.0}
+/local/job38509375/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job38509375/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+Look up nutrients for Apples.
+Look up nutrients for Butter.
+Look up nutrients for Cheese.
+/local/job38509375/venv_img/lib/python3.11/site-packages/fooddatacentral/fooddatacentral.py:87: UserWarning: Couldn't find fdc_id=746767.
+  warnings.warn("Couldn't find fdc_id=%s." % fdc_id)
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-fct/lsms_library/countries/Uganda/_/fct_addition.py:21: UserWarning: Couldn't find FDC Code Cheese for food 746767.
+  warnings.warn("Couldn't find FDC Code %s for food %s." % (food,FDC))
+Look up nutrients for Chicken (broiler).
+Look up nutrients for Coffee.
+Look up nutrients for Coffee (other).
+Look up nutrients for Cornflakes.
+Look up nutrients for Cucumber.
+Look up nutrients for Donuts.
+Look up nutrients for Ginger (fresh).
+Look up nutrients for Ginger (powder).
+Look up nutrients for Ice Cream.
+Look up nutrients for Infant Formula.
+Look up nutrients for Jam/Marmalade.
+Look up nutrients for Margarine, Butter, etc.
+Look up nutrients for Salt.
+Look up nutrients for Sausages.
+Look up nutrients for Soybeans (fresh).
+Look up nutrients for Tea.
+Look up nutrients for Tea (green).
+Look up nutrients for Tea (leaves).
+Look up nutrients for Tea (other).
+Look up nutrients for Water.
+Look up nutrients for Yoghurt.
+/local/job38509375/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job38509375/venv_img/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+['GhanaLSS', 'Uganda']: OK  shape=(52896, 20)  index=['country', 'i', 't', 'v']  (100.7 s)
+   rows per country: {'GhanaLSS': 29095, 'Uganda': 23801}
+
+DONE
+=== verify rc=0 Fri Sep  4 06:37:58 PDT 2026 ===
