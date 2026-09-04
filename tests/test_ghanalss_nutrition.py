@@ -105,9 +105,10 @@ def test_grain_is_household_wave(nutrition):
     ``_join_v_from_sample``, because ``lsms_library/data_info.yml`` has no
     canonical ``nutrition`` block for the table to opt out of the join with
     (GH #436/#455).  That applies uniformly to all three countries, so
-    ``Feature('nutrition')`` still assembles -- but the returned index is
-    ``(i, t, v)`` today and would become ``(i, t)`` the moment a canonical
-    block declaring an index without ``v`` lands.
+    ``Feature('nutrition')`` still assembles.  The block proposed in PR #769
+    is ``nutrition: (t, v, i)`` -- matching ``household_characteristics``
+    and KEEPING the join, so landing it changes nothing here; a block that
+    omitted ``v`` would instead return ``(i, t)``.
 
     So pin what is a CONTRACT (household x wave, unique, not per-food) rather
     than what is a consequence of config that does not exist yet.

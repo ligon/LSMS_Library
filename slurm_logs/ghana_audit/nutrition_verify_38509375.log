@@ -1,3 +1,14 @@
+#+CORRECTION [2026-09-04]: CHECK 3 IN THIS LOG IS SUPERSEDED.
+# household_characteristics is one column per sex-age bucket PLUS `log
+# HSize`; this run summed ALL columns, adding the log term to the head
+# count -- visible below as median_hh_size 6.609438 (= 5 + ln 5) and
+# 2.693147 (= 2 + ln 2).  That deflated per-capita Energy by ~20%.
+# Fixed in commit 2bfaeaa3 (sum the 14 bucket columns only).
+# CORRECTED medians, kcal/capita/day, 30-day recall:
+#     1991-92 317.9 | 1998-99 179.0 | 2012-13 298.1 | 2016-17 1004.3
+# (this run reported 2016-17 as 784.1).  CHECKS 1, 2 and 4 are unaffected.
+# The corrected figures are in PR #769 and GhanaLSS/_/CONTENTS.org.
+# ----------------------------------------------------------------------
 === Fri Sep  4 06:31:41 PDT 2026 node=n0037.savio4 cpus=8 ===
 HEAD=9d6166f1 branch=feat/ghanalss-nutrition-fct
 LSMS_MAKE_JOBS=8
