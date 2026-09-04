@@ -98,3 +98,36 @@ imports `cfe.df_utils`, which the library no longer carries).
 
 ---
 ### Phase 3 — verification (fill at task end)
+
+Anchored check against the entries above, not a general review.
+
+- `2018/_/nonfood_expenditures.py` — **OK (anchored on §2, §4, §5)**. Reuses
+  `togo.i()` verbatim (§2) and `_harmonized_codes` from `livestock.py` (§2);
+  emits no `v` (§3); asserts the label map injective and `(t,i,j)` unique
+  before writing, which is the §4 lesson from `harmonize_seed_crop`.
+- `nonfood_items` org table — **OK (anchored on §4)**. Header written
+  `#+NAME: nonfood_items` — one space after the colon, so the `local_tools.py:1636`
+  matcher finds it; verified by loading it (122 entries, 0 duplicate labels,
+  no missing codes). Read through `get_categorical_mapping` *with* the value
+  kwarg, so the §4 empty-dict trap does not apply.
+- `RecallWindow` column — **OK (anchored on §3, §5)**. Reported value, not a
+  transformation; annualisation is documented but not computed.
+- `data_scheme.yml` `index: (t, i, j)` — **OK (anchored on §3)**. Matches
+  `assets: (t, i, j)`; `v` is joined by the framework, measured as
+  `['i','t','v','j']` at the API with 540 clusters and no nulls.
+- s09a exclusion — **OK (anchored on §5, §6)**. Documented in `data_scheme.yml`,
+  `CONTENTS.org` and the script docstring, with the resulting clothing/jewellery
+  undercount stated and the follow-up named.
+- **No REINVENTION found**: nothing in the library already reads EHCVM s09 (the
+  cross-EHCVM sweep in §6 confirms all 8 countries ship it and none declares
+  the feature).
+- **No CONTRADICTION found**, with one deliberate DEVIATION recorded in §5: the
+  long index departs from both wide precedents. It is a deviation from the
+  brief's instruction, not from a repo convention — the repo convention
+  (`assets`, `food_acquired`, `crop_production`) is long.
+
+Residual, reported not fixed: `Feature('nonfood_expenditures')` modal-excludes
+2 of 3 countries and **which one survives depends on argument order** —
+`['Togo','Uganda','Nigeria']` keeps Togo, `['Uganda','Nigeria','Togo']` keeps
+Uganda. Measured, not inferred. The canonical `index_info` block proposed in §6
+is the fix; applying it is out of scope here.
