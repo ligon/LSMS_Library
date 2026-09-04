@@ -147,17 +147,39 @@ column on the country's existing food-label table.
   may carry the same defect. Not measured here (compute not owned).
 
 ---
-### Phase 3 — verification (fill at task end)
+### Phase 3 — verification (2026-09-04, after the cold build)
 
 - `GhanaLSS/_/nutrition.py` — **OK (anchored on §2/§4/§5)**: reuses the
-  precedents' shape and the public `food_quantities_from_acquired`; the one
-  departure (non-physical-`u` filter) is the §4 defect work-around and is
-  documented in the script.
+  precedents' shape and the public `food_quantities_from_acquired`.  The one
+  departure — the non-physical-`u` filter — is the §4 defect work-around and
+  is documented at length in the module docstring.  Verified cold: 29,095
+  rows x 20 nutrients in 148 s.
 - `GhanaLSS/_/fct_west_africa.org` — **OK (anchored on §3)**: stored per
   100 g EP as published, columns renamed onto `nutrient_labels.org`
-  `Preferred Label`; ×10 happens in the consumer, per the corpus convention.
-- Vitamin K omission — **OK (anchored on §4)**: deliberate, not a
-  reinvention of Ethiopia's `fillna(0)`; zero-filling an unmeasured
-  nutrient would assert a false value.
-- Nutrient vocabulary — **OK (anchored on §3)**: no fourth vocabulary; the
-  build asserts `set(fct.columns) <= set(nutrient_labels['Preferred Label'])`.
+  `Preferred Label`; the x10 happens in the consumer, per the corpus
+  convention.  1,028 foods, codes preserved as `NN_NNN` strings.
+- Vitamin K omission — **OK (anchored on §4)**: deliberate, and NOT a
+  reinvention of Ethiopia's `fillna(0)`.  Pinned by
+  `test_vitamin_k_omitted_not_zero_filled`.
+- Nutrient vocabulary — **OK (anchored on §3)**: no fourth vocabulary; both
+  the build script and `test_no_fourth_nutrient_vocabulary` assert the columns
+  are a subset of Ethiopia's `Preferred Label` axis.
+- `_household_size` in the test / verify script — **CONTRADICTION found and
+  fixed (§3)**: the first verification run summed *every*
+  `household_characteristics` column, including `log HSize`, giving median
+  household sizes of 6.609438 (= 5 + ln 5).  Corrected to the 14 bucket
+  columns; 2016-17 median per-capita Energy 784.1 -> 1,004.3 kcal/day.
+- `food_items.csv` (§6) — **resolved as: stale, unread, left alone.**  Nothing
+  reads it; GhanaLSS reads `food_items.org` only, via
+  `ghanalss.py::harmonized_food_labels`.  It was deliberately NOT regenerated
+  with the new `FCT Code` column, and that is recorded in `CONTENTS.org`.
+- Index grain (§3) — **amended**: `nutrition.py` writes `(i, t)` as the
+  precedents do, but the API returns `(i, t, v)`, because `data_info.yml`
+  carries no canonical `nutrition` block to opt out of `_join_v_from_sample`
+  (GH #436/#455).  Uniform across all three countries, so
+  `Feature('nutrition')` assembles — verified for both
+  `['GhanaLSS','Ethiopia']` (54,742 x 21) and `['GhanaLSS','Uganda']`
+  (52,896 x 20).  A canonical block is proposed in the PR, not written.
+- **REINVENTION avoided**: the kg conversion is the library's own
+  `food_quantities_from_acquired`, called on a filtered frame.  No factor
+  table, unit parser or price-ratio inference was re-implemented here.
