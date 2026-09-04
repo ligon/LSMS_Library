@@ -801,3 +801,169 @@ plural (=tubers= -> =Tuber=); the rest (=ropes=, =pan=, =bashing rubber=,
 | Trees                | Tree                 |
 | Tubers               | Tuber                |
 | Yards/metres         | Yard/metre           |
+
+* Plot labour: harmonize_stage / harmonize_labor_source / WageUnit (GH #729, #140)
+
+The =plot_labor= index is =(t, i, plot_id, season, stage, source)=.  All three
+waves are wave scripts, so each script emits the Preferred Label directly
+(mirroring =harmonize_species=); these tables are the canonical REGISTRY for
+the three vocabularies, and =WageUnit= additionally auto-dispatches at API time
+onto the column of the same name (idempotent -- every Preferred Label is its
+own Alternate Spelling).
+
+** harmonize_stage -- the =stage= index level
+
+*Nine values, and the reason there are nine rather than four or seven.*  The
+2009-10 instrument asks the labour battery FOUR times per season; 2013-14 and
+2017-18 ask it SEVEN times.  The later seven are not a refinement of the same
+four: 2009-10's blocks are strictly COARSER, and its first block is not a
+subset of anything in the later list.  So neither vocabulary can be dropped
+without inventing data, and folding the later waves onto the earlier four
+would throw away grain the survey collected.  Both are kept, exactly as each
+instrument asked them, and the containment is recorded here so a consumer can
+fold in the one direction that is sound (7 -> 4, by summing =PersonDays=):
+
+| 2009-10 (4, coarse)             | 2013-14 / 2017-18 (7)                             |
+|---------------------------------+---------------------------------------------------|
+| =land_preparation=              | =clearing_and_land_preparation= + =ploughing= + =planting= |
+| =field_management=              | =chemical_application= + =weeding=                |
+| =harvesting=                    | =harvesting=                                      |
+| =post_harvest=                  | =post_harvest=                                    |
+
+The 2009-10 blocks are named ONLY in the questionnaire
+(=2009-10/Documentation/Household_questionnaire_Part_A.pdf=, Section 4
+"IX. LABOR INPUTS"), whose eight section headers read verbatim:
+
+- A290--A298 / A327--A335 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USE ON
+  LAND PREPARATION E.G. CLEARING OR WEEDING BEFORE PLANTING, SEEDING/NURSERY,
+  PLANTING AND TRANSPLANTING DURING THE MAJOR [MINOR] SEASON:"
+- A299--A307 / A336--A344 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USED ON
+  FIELD MANAGEMENT (WEEDING AFTER PLANTING, FERTILIZED AND PESTICIDE
+  APPLICATIONS, IRRIGATION, MANAGEMENT ETC DURING THE MAJOR [MINOR] SEASON:"
+- A308--A316 / A345--A353 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USED ON
+  HARVESTING OF CROPS DURING THE MAJOR [MINOR] SEASON:"
+- A317--A325 / A354--A362 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USED ON
+  POST-HARVEST ACTIVITIES (INCLUDING PRESERVATION FOR STORAGE ETC) OF CROPS
+  DURING THE MAJOR [MINOR] SEASON:"
+
+*=ploughing= is the one placement the 2009-10 header does not settle.*  It
+names clearing, weeding-before-planting, seeding/nursery, planting and
+transplanting, and does not mention ploughing -- but neither does it exclude
+it, whereas 2013-14 and 2017-18 explicitly DO ("Activities such as plowing,
+tilling, or mound-making should NOT be included as land preparation"), which
+is why they need a separate stage for it.  Hoe ploughing therefore has nowhere
+else to go in 2009-10 and the fold above puts it in =land_preparation=; that
+one cell is a reading, not a quotation, and is flagged as such.
+
+2017-18's instrument prints the stage definitions in full ("Ploughing: Hoe
+ploughing only.  This does not include any tractor activities."); the data
+label spells it =Plowing=, 2013-14's spells it =ploughing=.  Both fold to
+=ploughing=.
+
+#+name: harmonize_stage
+| Alternate Spelling            | Preferred Label               |
+|-------------------------------+-------------------------------|
+| clearing and land preparation | clearing_and_land_preparation |
+| Clearing and land preparation | clearing_and_land_preparation |
+| ploughing                     | ploughing                     |
+| Plowing                       | ploughing                     |
+| planting                      | planting                      |
+| Planting                      | planting                      |
+| chemical application          | chemical_application          |
+| Chemical application          | chemical_application          |
+| weeding                       | weeding                       |
+| Weeding                       | weeding                       |
+| harvesting                    | harvesting                    |
+| Harvesting                    | harvesting                    |
+| post-harvest processing       | post_harvest                  |
+| Post-harvest processing       | post_harvest                  |
+| land preparation              | land_preparation              |
+| field management              | field_management              |
+| clearing_and_land_preparation | clearing_and_land_preparation |
+| ploughing                     | ploughing                     |
+| planting                      | planting                      |
+| chemical_application          | chemical_application          |
+| weeding                       | weeding                       |
+| harvesting                    | harvesting                    |
+| post_harvest                  | post_harvest                  |
+| land_preparation              | land_preparation              |
+| field_management              | field_management              |
+
+** harmonize_labor_source -- the =source= index level
+
+Extends Nigeria's =harmonize_labor_source= registry
+(=countries/Nigeria/_/categorical_mapping.org=, family / hired / other) with
+the two labels the later GhanaSPS waves add and the two 2009-10 splits.  The
+same asymmetry as =harmonize_stage=: the survey's own grain is kept and the
+containment is recorded, rather than folded.
+
+| 2009-10 (3)   | 2013-14 / 2017-18 (5)              | why                                                                 |
+|---------------+------------------------------------+---------------------------------------------------------------------|
+| =casual= + =permanent= | =hired=                   | both 2009-10 blocks are non-household paid labour; the later waves ask one "hired laborers (includes payment in kind)" question and do not split by contract length |
+| =family=      | =self= + =family= + =communal=     | 2009-10 has no "yourself" question, so the respondent's own days have nowhere else to go, and A362's own wording is "How much family labor is worked by children? (*including exchanged labor*)" -- exchanged labour is what the later waves call communal |
+| ---           | =other=                            | 2009-10 offers no other-specify labour block                        |
+
+Later-wave source wording, verbatim from Part M ("Who worked on this plot
+during the ... stage?  Select all that apply"): =1 Yourself= / =1 Self=,
+=2 Family, Relatives, or friends=, =3 Communal labor=, =4 Hired labor= (2013-14
+adds "HIRED LABOR INCLUDES PAYMENT IN-KIND (SUCH AS WOMEN WHO HELP WITH
+GROUNDNUT HARVEST)"), =5 Other (SPECIFY)= / =-666 Other (please specify)=.
+2009-10's wording is "How much *casual* labor was provided by men?" (A290),
+"How much *permanent* labor was provided by men?" (A293), "How much *family*
+labor worked by men?" (A296).
+
+#+name: harmonize_labor_source
+| Alternate Spelling      | Preferred Label |
+|-------------------------+-----------------|
+| Yourself                | self            |
+| Self                    | self            |
+| self                    | self            |
+| Family, Relatives, or friends | family    |
+| Family/Relatives/friends | family         |
+| family                  | family          |
+| Communal labor          | communal        |
+| communal                | communal        |
+| Hired labor             | hired           |
+| hired                   | hired           |
+| Other (SPECIFY)         | other           |
+| Other (please specify)  | other           |
+| other                   | other           |
+| casual                  | casual          |
+| permanent               | permanent       |
+
+** WageUnit -- what the hired-labour rate is a rate PER
+
+=hiredpayunit=, asked once per plot in 2013-14 (M194 "Do you pay those amounts
+per day or per acre?") and stored once per stage row in 2017-18 (M196).
+2009-10 asks no payment question at all, so =WageUnit= is null throughout that
+wave.
+
+The four area members deliberately reuse the =AreaUnit= Preferred Labels above
+(=Acres= / =Poles= / =Ropes= / =Plot=), so a per-area rate can be converted
+with =plot_features().Area= without a second spelling system.  The free text
+behind =Other= (=hiredpayunitother=: "the whole farm", "per tank of spraying
+machine", "per 3 hours", "Per bottle", "Per farming season", ...) is NOT
+decoded -- some of it is a period and some an area and some neither.
+
+#+name: WageUnit
+| Alternate Spelling     | Preferred Label |
+|------------------------+-----------------|
+| Per day                | Day             |
+| Per week               | Week            |
+| Per month              | Month           |
+| Per plot               | Plot            |
+| Per acre               | Acres           |
+| Per pole               | Poles           |
+| Per rope               | Ropes           |
+| Other - specify        | Other           |
+| Other Specify          | Other           |
+| Other (specify)        | Other           |
+| Other (please specify) | Other           |
+| Day                    | Day             |
+| Week                   | Week            |
+| Month                  | Month           |
+| Plot                   | Plot            |
+| Acres                  | Acres           |
+| Poles                  | Poles           |
+| Ropes                  | Ropes           |
+| Other                  | Other           |
