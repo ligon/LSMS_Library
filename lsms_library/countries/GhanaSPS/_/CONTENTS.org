@@ -1805,7 +1805,7 @@ honest summary is that *the direct A-number anchor is what settles it*:
   Two things bound what that means.  (a) The two later waves, which both carry
   the stage in their own data, disagree with each other by up to 7.7 pp, so
   the test's noise floor is most of the gap it is being asked to resolve.
-  (b) The fold is a containment, not an identity: 2009-14's field management
+  (b) The fold is a containment, not an identity: 2009-10's field management
   explicitly includes *irrigation* and generic "MANAGEMENT ETC", which the
   later instruments never ask, and the later waves' =ploughing= is carved out
   of a stage 2009-10 does not carve.  Recorded as a negative result rather
@@ -1886,7 +1886,10 @@ median 5.6 hours, and null throughout the later waves, which never ask it.
 54, 80, 86 hours "per day" -- almost certainly the respondent giving a weekly
 or per-task total.  They are delivered as reported (core does not edit data)
 and the delivered =Hours= tops out at 80; anyone using the =Hours= tail should
-know they are there.
+know they are there.  The other tail is empty: exactly *1 of 49,628* sex-group
+cells with positive person-days reports *zero* hours per day, so unlike the
+pay cells (where 0 is the producer's filler for "no such worker") a zero hours
+cell is not a sentinel and is not treated as one.
 
 *** The wage is a RATE with a unit -- so there is no =Wage= column
 

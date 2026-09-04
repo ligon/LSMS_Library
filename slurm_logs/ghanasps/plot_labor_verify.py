@@ -151,6 +151,7 @@ def main():
     from lsms_library.diagnostics import is_this_feature_sane
     try:
         r = is_this_feature_sane(df, 'GhanaSPS', 'plot_labor')
+        print('is_this_feature_sane().ok:', r.ok)
         print('is_this_feature_sane:', r)
     except Exception as e:
         print('is_this_feature_sane raised:', type(e).__name__, e)

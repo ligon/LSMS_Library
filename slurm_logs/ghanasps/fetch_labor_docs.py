@@ -37,8 +37,7 @@ def docx_text(p):
     return re.sub(r'<[^>]+>', '', xml)
 
 
-DOCS = []
-_DOCS_DONE = [
+DOCS = [
     '2009-10/Documentation/Household_questionnaire_Part_A.pdf',
     '2013-14/Documentation/ISSER_Yale_Part A_WAVE II.docx',
     '2017-18/Documentation/Questionnaire/HH_Questionnaire_23_10.docx',
