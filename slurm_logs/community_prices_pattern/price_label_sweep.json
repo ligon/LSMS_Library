@@ -1,0 +1,3211 @@
+{
+ "scanned": 6941,
+ "not_in_L1": 2142,
+ "hits": [
+  {
+   "rel": "Uganda/2010-11/Data/GSEC15c.dta",
+   "rows": 24815,
+   "cols": 11,
+   "file_label": "HH consumption data (1 rec. per consumption item in cons. category C-E per HH)",
+   "n_price": 1,
+   "price_vars": {
+    "h15cq10": "Market Price"
+   }
+  },
+  {
+   "rel": "Uganda/2010-11/Data/GSEC15b.dta",
+   "rows": 35232,
+   "cols": 22,
+   "file_label": "HH food cons. (1 rec per item cons. cat A& B per HH; Cat B: only T6SQ1 + T6AEQ3)",
+   "n_price": 2,
+   "price_vars": {
+    "h15bq12": "Market Price",
+    "h15bq13": "Farm Gate Price"
+   }
+  },
+  {
+   "rel": "Uganda/2009-10/Data/GSEC15c.dta",
+   "rows": 29295,
+   "cols": 10,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "h15cq10": "Unit Price"
+   }
+  },
+  {
+   "rel": "Uganda/2009-10/Data/GSEC15b.dta",
+   "rows": 37890,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "h15bq12": "Market Price",
+    "h15bq13": "Farm-Gate price"
+   }
+  },
+  {
+   "rel": "Albania/2005/Data/check_form_food_cl.dta",
+   "rows": 3840,
+   "cols": 8,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "m11_q03": "Amounts units or prices were not filled"
+   }
+  },
+  {
+   "rel": "Uganda/2018-19/Data/GSEC15B.dta",
+   "rows": 415532,
+   "cols": 26,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "CEB14a": "Market price for purchasing [item] for consumption at home per unit of consumptn",
+    "CEB14b": "Market price for purchasg[item] for consumptn Away from home per unit of consmpn",
+    "CEB15": "Farm gate/producer price per unit of consumption",
+    "CEB14c": "Price of  [item] if you were to sell it in the market per unit of consump"
+   }
+  },
+  {
+   "rel": "Uganda/2018-19/Data/GSEC15C.dta",
+   "rows": 161976,
+   "cols": 20,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "CEC10": "Unit Price for item"
+   }
+  },
+  {
+   "rel": "Uganda/2018-19/Data/CSEC2A.dta",
+   "rows": 305,
+   "cols": 33,
+   "file_label": "None",
+   "n_price": 8,
+   "price_vars": {
+    "s2a_q12_1_1": "12.1 What is the current rental price of 1 ha of agricultural land in this villa",
+    "s2a_q12_2_1": "12.2 What was the rental price of 1 ha of agricultural land in this village 5 ye",
+    "s2a_q12_3_1": "12.3. What is the current sales price of 1 ha of agricultural land in this villa",
+    "s2a_12_4_1": "12.4 What was the sales price of 1 ha of agricultural land  in this village 5 ye",
+    "s2a_q12_1_2": "12.1 What is the current rental price of 200 sq. meters of residential land in t",
+    "s2a_q12_2_2": "12.2 What was the rental price of 200 sq. meters of residential land in this vil",
+    "s2a_q12_3_2": "12.3 What is the current sales price of 200 sq. meters of residential land in th",
+    "s2a_12_4_2": "12.4 What was the sales price of 200 sq. meters of residential land  in this vil"
+   }
+  },
+  {
+   "rel": "Uganda/2011-12/Data/GSEC15B.dta",
+   "rows": 38743,
+   "cols": 19,
+   "file_label": "HH food cons. (1 rec per item cons. cat A& B per HH; Cat B: only T6SQ1 + T6AEQ3)",
+   "n_price": 2,
+   "price_vars": {
+    "h15bq12": "Market Price",
+    "h15bq13": "Farm Gate Price"
+   }
+  },
+  {
+   "rel": "Uganda/2011-12/Data/GSEC15C.dta",
+   "rows": 26522,
+   "cols": 11,
+   "file_label": "HH consumption data (1 rec. per consumption item in cons. category C-E per HH)",
+   "n_price": 1,
+   "price_vars": {
+    "h15cq10": "Market Price"
+   }
+  },
+  {
+   "rel": "Uganda/2013-14/Data/GSEC15B.dta",
+   "rows": 50422,
+   "cols": 19,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "h15bq12": "Market Price",
+    "h15bq13": "Farm Gate Price"
+   }
+  },
+  {
+   "rel": "Uganda/2013-14/Data/GSEC15C.dta",
+   "rows": 34136,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "h15cq10": "Market Price"
+   }
+  },
+  {
+   "rel": "Uganda/2015-16/Data/gsec15b.dta",
+   "rows": 49751,
+   "cols": 21,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "h15bq12": "Market price",
+    "h15bq13": "Farm gate price"
+   }
+  },
+  {
+   "rel": "Uganda/2015-16/Data/gsec15c.dta",
+   "rows": 35702,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "h15cq10": "Market price"
+   }
+  },
+  {
+   "rel": "Uganda/2005-06/Data/GSEC14A.dta",
+   "rows": 40394,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "h14aq12": "market price",
+    "h14aq13": "farm gate price"
+   }
+  },
+  {
+   "rel": "Uganda/2005-06/Data/csec41.dta",
+   "rows": 312,
+   "cols": 51,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c41q31a": "average agricultural land price (per acre) in the community"
+   }
+  },
+  {
+   "rel": "Uganda/2005-06/Data/csec4.dta",
+   "rows": 312,
+   "cols": 51,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c4q31a": "average agricultural land price (per acre) in the community"
+   }
+  },
+  {
+   "rel": "Uganda/2005-06/Data/AGSEC2A.dta",
+   "rows": 3695,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "a2aq11": "would u b willing to sell this parcel at that price"
+   }
+  },
+  {
+   "rel": "Uganda/2005-06/Data/GSEC14B.dta",
+   "rows": 33876,
+   "cols": 10,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "h14bq10": "unit price"
+   }
+  },
+  {
+   "rel": "Uganda/2005-06/Data/csec7.dta",
+   "rows": 514,
+   "cols": 35,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "c7q22": "price for fansidar (sp) adult dosage (shs)",
+    "c7q23": "price for cotrimaxadol adult dosage"
+   }
+  },
+  {
+   "rel": "Albania/2002/Data/agr_c_cl_2.dta",
+   "rows": 60300,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "mcc_q05": "Price obtained"
+   }
+  },
+  {
+   "rel": "Albania/2002/Data/agr_e_cl_2.dta",
+   "rows": 17340,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "mce_q4a": "Estimated price (old)",
+    "mce_q4b": "Estimated price (young)"
+   }
+  },
+  {
+   "rel": "Albania/2002/Data/c_price_cl.dta",
+   "rows": 24192,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "c11_q03": "Item Price",
+    "c11_q04": "Item Price",
+    "c11_q05": "Item Price"
+   }
+  },
+  {
+   "rel": "Albania/2002/Data/c_basic.dta",
+   "rows": 288,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c11_q0a": "N Columns in Price list"
+   }
+  },
+  {
+   "rel": "Albania/2002/Data/price_list_cl1.dta",
+   "rows": 27360,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "m11_q03": "Item Price",
+    "m11_q04": "Item Price",
+    "m11_q05": "Item Price"
+   }
+  },
+  {
+   "rel": "Tajikistan/2009/Data/m9.dta",
+   "rows": 99198,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "M9Q6": "Estimate the total cost of food in Q5 as per current prices (SOMONI)"
+   }
+  },
+  {
+   "rel": "Tajikistan/2009/Data/m4b.dta",
+   "rows": 10069,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "M4BQ4_1": "Official co-payment or government-approved price (SOMONI)"
+   }
+  },
+  {
+   "rel": "Tajikistan/2009/Data/POV_FINAL & INCOME.dta",
+   "rows": 1503,
+   "cols": 78,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "stratapi": "Regional (Strata) price deflator",
+    "pccd": "Per capita consumption adjusted with Strata Price Deflators"
+   }
+  },
+  {
+   "rel": "Albania/2012/Data/Modul_13C2_Household_Durables.sav",
+   "rows": 61289,
+   "cols": 6,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "M13C_Q06": "Sell price"
+   }
+  },
+  {
+   "rel": "Tajikistan/2007/Data/r1m12c1.dta",
+   "rows": 60460,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "m12cq5": "What price did you get for the [....] that you sold?"
+   }
+  },
+  {
+   "rel": "Tajikistan/2007/Data/r1m4c.dta",
+   "rows": 28957,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "m4cq5a": "a. official co-payment or government-approved price"
+   }
+  },
+  {
+   "rel": "Tajikistan/2007/Data/comm_r8.dta",
+   "rows": 19440,
+   "cols": 6,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "c8q2": "SHOP 1 PRICE",
+    "c8q3": "SHOP 2 PRICE",
+    "c8q4": "SHOP 3 PRICE"
+   }
+  },
+  {
+   "rel": "Tajikistan/2007/Data/r1m10.dta",
+   "rows": 306504,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "m10q5": "estimate the total cost of [item] in question 4 as per current prices"
+   }
+  },
+  {
+   "rel": "Tajikistan/2007/Data/r1m12c2.dta",
+   "rows": 60440,
+   "cols": 8,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "m12c2q5": "What price did you get for the [....] that you sold?"
+   }
+  },
+  {
+   "rel": "Tajikistan/2007/Data/Pov_final.dta",
+   "rows": 4860,
+   "cols": 75,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "StrataPI": "Regional (Strata) price deflator",
+    "pccd": "Monthly per capita consumption adjusted with Strata Price Deflators"
+   }
+  },
+  {
+   "rel": "Tanzania_Kegera/2010-11/Data/HHPriceData.dta",
+   "rows": 32057,
+   "cols": 4,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "ItemCode": "Price item code",
+    "ItemPrice": "Price"
+   }
+  },
+  {
+   "rel": "Tanzania_Kegera/2004-05/Data/community.dta",
+   "rows": 49,
+   "cols": 800,
+   "file_label": "KHDS2004 COMMUNITY SURVEY",
+   "n_price": 1,
+   "price_vars": {
+    "cs5q21a": "WHAT WOULD BE THE PRICE OF AN ACRE OF LAND WITHOUT CROPS? TS"
+   }
+  },
+  {
+   "rel": "Kosovo/2000/Data/R_INSTITUTIONS_AND_INFRASTRUCTURE_4.dta",
+   "rows": 150,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "s3c_q16a": "Price of charcoal in DM",
+    "s3c_q17a": "Price per liter of gasoline",
+    "s3c_q17b": "Price per liter of oil",
+    "s3c_q17c": "Price per liter of kerosene",
+    "s3c_q17d": "Price for wood"
+   }
+  },
+  {
+   "rel": "Kosovo/2000/Data/Serb_INSTITUTIONS_AND_INFRASTRUCTURE_4.dta",
+   "rows": 60,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "s3c_q16a": "Price of charcoal in DM",
+    "s3c_q17a": "Price per liter of gasoline",
+    "s3c_q17b": "Price per liter of oil",
+    "s3c_q17c": "Price per liter of kerosene",
+    "s3c_q17d": "Price for wood"
+   }
+  },
+  {
+   "rel": "Kosovo/2000/Data/DURGOODS.dta",
+   "rows": 23544,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s10e_4a": "price of item if sold"
+   }
+  },
+  {
+   "rel": "Kosovo/2000/Data/LIVESTK.dta",
+   "rows": 2980,
+   "cols": 39,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s8f1_q4a": "current price"
+   }
+  },
+  {
+   "rel": "Kosovo/2000/Data/U_INSTITUTIONS_AND_INFRASTRUCTURE_4.dta",
+   "rows": 150,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "s3c_q16a": "Price of charcoal in DM",
+    "s3c_q17a": "Price per liter of gasoline",
+    "s3c_q17b": "Price per liter of oil",
+    "s3c_q17c": "Price per liter of kerosene",
+    "s3c_q17d": "Price for wood"
+   }
+  },
+  {
+   "rel": "Nigeria/2018-19/Data/sectc2_plantingw4.dta",
+   "rows": 57054,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "c2q0a": "Location of main source of the food price data",
+    "c2q3": "Price of the item"
+   }
+  },
+  {
+   "rel": "Nigeria/2018-19/Data/sectc8_harvestw4.dta",
+   "rows": 57387,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c8q3": "Price of the item"
+   }
+  },
+  {
+   "rel": "Iraq/2006-07/Data/2007ihses02_ration_items.dta",
+   "rows": 227865,
+   "cols": 36,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "q0208": "Market price"
+   }
+  },
+  {
+   "rel": "Nigeria/2015-16/Data/sectc2b_plantingw3.dta",
+   "rows": 10172,
+   "cols": 10,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c2q3": "What is the price for the item (in Naira) ?"
+   }
+  },
+  {
+   "rel": "Nigeria/2015-16/Data/sectc8b_harvestw3.dta",
+   "rows": 8887,
+   "cols": 10,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c8q3": "What is the price for the item (in Naira) ?"
+   }
+  },
+  {
+   "rel": "Nigeria/2015-16/Data/sectc8a_harvestw3.dta",
+   "rows": 28869,
+   "cols": 10,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c8q3": "What is the price for the item (in Naira) ?"
+   }
+  },
+  {
+   "rel": "Nigeria/2015-16/Data/sectc2a_plantingw3.dta",
+   "rows": 27780,
+   "cols": 10,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c2q3": "What is the price for the item (in Naira) ?"
+   }
+  },
+  {
+   "rel": "Iraq/2012/Data/2012ihses03_rations.dta",
+   "rows": 198404,
+   "cols": 32,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "q0308": "q308: Price of this rations of [ITEM] in the market"
+   }
+  },
+  {
+   "rel": "GhanaLSS/1991-92/Data/POV_GH.DTA",
+   "rows": 4523,
+   "cols": 45,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "povpi": "Price index - Accra Jan99=1",
+    "povfpi": "Food Price index - Accra Jan99="
+   }
+  },
+  {
+   "rel": "Senegal/2018-19/Data/s16c_me_sen2018.dta",
+   "rows": 8428,
+   "cols": 50,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Senegal/2018-19/Data/s12_me_sen2018.dta",
+   "rows": 322020,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Senegal/2021-22/Data/ehcvm_prix_sen2021.dta",
+   "rows": 118136,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "prix": "Prix selon poids/unit\u00e9"
+   }
+  },
+  {
+   "rel": "Senegal/2021-22/Data/s16d_me_sen2021.dta",
+   "rows": 9475,
+   "cols": 52,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16dq18": "16D.18. Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 en 16D.17?",
+    "s16dq20__7": "16D.20. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Senegal/2021-22/Data/s12_me_sen2021.dta",
+   "rows": 320400,
+   "cols": 36,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec12b.dta",
+   "rows": 719441,
+   "cols": 29,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s12bq3a1": "Price of first item",
+    "s12bq3b1": "Price of second item",
+    "s12bq3c1": "Price of third item"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7price.dta",
+   "rows": 84122,
+   "cols": 20,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "pricea": "Price - 1st observation",
+    "priceb": "Price - 2nd observation",
+    "pricec": "Price - 3rd observation"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec10d_1ii.dta",
+   "rows": 1585,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s10d15a": "Unit price (on average)"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec13.dta",
+   "rows": 13833,
+   "cols": 395,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s13eq14": "Given the prevailing conditions you have mentioned in your community, would you"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/14_GHA_2017_PINDEX.dta",
+   "rows": 14009,
+   "cols": 9,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "pindex_nfd": "Non-food price index",
+    "pindex_fd": "Food price index"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/18_GHA_POV_2017_GLSS7.dta",
+   "rows": 14009,
+   "cols": 152,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "pindex_nfd": "Non-food price index",
+    "pindex_fd": "Food price index",
+    "pindex": "Price index",
+    "povpi": "Price index/100"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec10d4.dta",
+   "rows": 17176,
+   "cols": 21,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s10d4q2c": "Unit price of sale"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/15_GHA_2017_E_final.dta",
+   "rows": 14009,
+   "cols": 136,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "pindex_nfd": "Non-food price index",
+    "pindex_fd": "Food price index"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7comSEC6.dta",
+   "rows": 43639,
+   "cols": 22,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "cs6q1b": "Price",
+    "cs6q1d": "Price",
+    "cs6q1f": "Price",
+    "cs6q1h": "Price",
+    "cs6q1k": "Price"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec10d_1II AND 2II.dta",
+   "rows": 1585,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s10d15a": "Unit price (on average)"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec10d_1i.dta",
+   "rows": 5078,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s10d1q4b": "Unit price"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec8h.dta",
+   "rows": 934584,
+   "cols": 28,
+   "file_label": "None",
+   "n_price": 6,
+   "price_vars": {
+    "s8hq3p": "Selling price for one unit now-2nd visit",
+    "s8hq4p": "Selling price for one unit now-3rd visit",
+    "s8hq5p": "Selling price for one unit now-4th visit",
+    "s8hq6p": "Selling price for one unit now-5th visit",
+    "s8hq7p": "Selling price for one unit now-6th visit",
+    "s8hq8p": "Selling price for one unit now-7th visit"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2016-17/Data/g7sec10d_1I 2I AND 3.dta",
+   "rows": 5078,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s10d1q4b": "Unit price"
+   }
+  },
+  {
+   "rel": "GhanaLSS/1998-99/Data/SEC12B.DTA",
+   "rows": 19813,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s12bq3a": "Purchase price of item1",
+    "s12bq3b": "Purchase price of item2",
+    "s12bq3c": "Purchase price of item3"
+   }
+  },
+  {
+   "rel": "GhanaLSS/1998-99/Data/SEC10C.DTA",
+   "rows": 2724,
+   "cols": 21,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s10cq4a": "Purchase price for item1",
+    "s10cq4b": "Purchase price for item2",
+    "s10cq4c": "Purchase price for item3"
+   }
+  },
+  {
+   "rel": "GhanaLSS/1998-99/Data/POV_GH.DTA",
+   "rows": 5998,
+   "cols": 45,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "povpi": "Price index - Accra Jan99=1",
+    "povfpi": "Food Price index - Accra Jan99="
+   }
+  },
+  {
+   "rel": "Pakistan/1991/Data/F09F2.DTA",
+   "rows": 3830,
+   "cols": 21,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "an_cval": "09FQ04: CURRENT SALE PRICE"
+   }
+  },
+  {
+   "rel": "Pakistan/1991/Data/F07AC.DTA",
+   "rows": 58,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "purstov": "7AQ15: PURCHASE PRICE - STOVE -"
+   }
+  },
+  {
+   "rel": "Pakistan/1991/Data/F02B.DTA",
+   "rows": 4788,
+   "cols": 21,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "rentv": "02BQ13A: CURRENT RENTAL PRICE -"
+   }
+  },
+  {
+   "rel": "Mali/2018-19/Data/s19_me_mli2018.dta",
+   "rows": 141156,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s19q06": "19.06.Prix (ou la valeur) d'acquisition du dernier?"
+   }
+  },
+  {
+   "rel": "Mali/2018-19/Data/s05_co_mli2018.dta",
+   "rows": 54669,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s05q03": "5.03. Relev\u00e9 1-Prix (en FCFA)",
+    "s05q04": "5.04. Relev\u00e9 2-Prix (en FCFA)"
+   }
+  },
+  {
+   "rel": "Mali/2018-19/Data/s12_me_mli2018.dta",
+   "rows": 297090,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Mali/2018-19/Data/s16c_me_mli2018.dta",
+   "rows": 7992,
+   "cols": 53,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Mali/2017-18/Data/eaci17_s7gp2.dta",
+   "rows": 16054,
+   "cols": 72,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s7gq34": "Prix unitaire envisag\u00c3\u00a9e de vente selon unit\u00c3\u00a9 relev\u00c3\u00a9e en 7G.33"
+   }
+  },
+  {
+   "rel": "Mali/2017-18/Data/eaci17_s9p2.dta",
+   "rows": 260090,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s09q05": "Prix (ou la valeur) d'acquisition du dernier \u00c3\u00a9quipement du genre"
+   }
+  },
+  {
+   "rel": "Mali/2017-18/Data/eaci17_s06bp2.dta",
+   "rows": 83855,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s6bq05": "Prix ou valeur d'acquisition du dernier \u00c3\u00a9quipement de ce type"
+   }
+  },
+  {
+   "rel": "Mali/2021-22/Data/ehcvm_prix_mli2021.dta",
+   "rows": 175352,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "prix": "Prix des produits"
+   }
+  },
+  {
+   "rel": "Mali/2021-22/Data/s12_me_mli2021.dta",
+   "rows": 276415,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Mali/2021-22/Data/ehcvm_welfare_mli2021.dta",
+   "rows": 6143,
+   "cols": 44,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "def_temp_prix2021m10": "temporal deflator for international poverty, 1 = 2021m10 prices"
+   }
+  },
+  {
+   "rel": "Mali/2021-22/Data/s16d_me_mli2021.dta",
+   "rows": 5068,
+   "cols": 51,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16dq18": "16D.18. Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 en 16D.17?",
+    "s16dq20__7": "16D.20. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Mali/2021-22/Data/ehcvm_ihpc_mli2021.dta",
+   "rows": 60,
+   "cols": 3,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "ipc": "Indice Harmonis\u00e9 des prix"
+   }
+  },
+  {
+   "rel": "Mali/2021-22/Data/s19_me_mli2021.dta",
+   "rows": 119736,
+   "cols": 32,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s19q08": "19.08. Prix (ou valeur) d'acquisition du dernier ? (en F CFA)"
+   }
+  },
+  {
+   "rel": "Mali/2014-15/Data/EACIACT_p1.dta",
+   "rows": 117924,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s08q06": "Valeur (ou prix de vente) actuelle de l'ARTICLE"
+   }
+  },
+  {
+   "rel": "Mali/2014-15/Data/EACIS04_p1.dta",
+   "rows": 66555,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s04q05": "Prix du produit du 1er relev\u00e9",
+    "s04q08": "Prix du produit du 2eme relev\u00e9",
+    "s04q11": "Prix du produit du 3eme relev\u00e9"
+   }
+  },
+  {
+   "rel": "Mali/2014-15/Data/EACIS04_p2.dta",
+   "rows": 78752,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s04q05": "Prix du produit du 1er relev\u00e9",
+    "s04q08": "Prix du produit du 2eme relev\u00e9",
+    "s04q11": "Prix du produit du 3eme relev\u00e9"
+   }
+  },
+  {
+   "rel": "Mali/2014-15/Data/EACIS3A_p2.dta",
+   "rows": 9995,
+   "cols": 66,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s3aq32": "Prix unitaire que vous envisagez de le vendre selon l'unit\u00e9 relev\u00e9e en 3A.31"
+   }
+  },
+  {
+   "rel": "Mali/2014-15/Data/EACIS5_p2.dta",
+   "rows": 68460,
+   "cols": 25,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "as05q05": "Prix d'acquisition du dernier \u00e9quipement",
+    "as05q06": "Prix de revente du dernier \u00e9quipement"
+   }
+  },
+  {
+   "rel": "Mali/2014-15/Data/EACISECURITE_p2.dta",
+   "rows": 38040,
+   "cols": 24,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16q07m": "Mois au cours duquel le m\u00e9nage a re\u00e7u cette aide pour la derni\u00e8re fois au cours",
+    "s16q07a": "Ann\u00e9e au cours duquel le m\u00e9nage a re\u00e7u cette aide pour la derni\u00e8re fois au cours"
+   }
+  },
+  {
+   "rel": "Niger/2018-19/Data/s16c_me_ner2018.dta",
+   "rows": 13719,
+   "cols": 50,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Niger/2018-19/Data/s12_me_ner2018.dta",
+   "rows": 271080,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Niger/2021-22/Data/s16d_me_ner2021.dta",
+   "rows": 12232,
+   "cols": 47,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16dq18": "16D.18. Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 en 16D.17?",
+    "s16dq20__7": "16D.20. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Niger/2021-22/Data/s12_me_ner2021.dta",
+   "rows": 297655,
+   "cols": 19,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Niger/2021-22/Data/ehcvm_prix_ner2021.dta",
+   "rows": 105112,
+   "cols": 23,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "prix2": "2 prix"
+   }
+  },
+  {
+   "rel": "GhanaSPS/2013-14/Data/04o_cropsalesstoresquestions.dta",
+   "rows": 7438,
+   "cols": 82,
+   "file_label": "b04o_cropsalesstoresquestions",
+   "n_price": 9,
+   "price_vars": {
+    "samecommsoldprice": "s04o_13 - Same community price",
+    "othercommsoldprice": "s04o_15 - Other community price",
+    "traderssoldprice": "s04o_17 - Market traders price",
+    "contractorssoldprice": "s04o_19 - Pre-harvest price",
+    "orgssoldprice": "s04o_21 - Trade orgs. price",
+    "aggsoldprice": "s04o_23 - Aggregators price",
+    "outgrowsoldprice": "s04o_25 - Outgrowers price",
+    "coopsoldprice": "s04o_27 - Co-op price",
+    "othersoldprice": "s04o_29 - Others price"
+   }
+  },
+  {
+   "rel": "GhanaSPS/2017-18/Data/04o_cropsalesstoresquestions.dta",
+   "rows": 10573,
+   "cols": 88,
+   "file_label": "None",
+   "n_price": 9,
+   "price_vars": {
+    "samecommsoldprice": "s04o_13 - Same community price",
+    "othercommsoldprice": "s04o_15 - Other community price",
+    "traderssoldprice": "s04o_17 - Market traders price",
+    "contractorssoldprice": "s04o_19 - Pre-harvest price",
+    "orgssoldprice": "s04o_21 - Trade orgs. price",
+    "aggsoldprice": "s04o_23 - Aggregators price",
+    "outgrowsoldprice": "s04o_25 - Outgrowers price",
+    "coopsoldprice": "s04o_27 - Co-op price",
+    "othersoldprice": "s04o_29 - Others price"
+   }
+  },
+  {
+   "rel": "GhanaSPS/2009-10/Data/S5C3.dta",
+   "rows": 2078,
+   "cols": 80,
+   "file_label": "None",
+   "n_price": 16,
+   "price_vars": {
+    "s5c_29iva": "Q29.4a Unit price of principal finished product (cedis)",
+    "s5c_29ivb": "Q29.4b Unit price of principal finished product (pessewas)",
+    "s5c_31iva": "Q31.4a Unit price of secondary finished product (cedis)",
+    "s5c_31ivb": "Q31.4b Unit price of secondary finished product (pessewas)",
+    "s5c_33iva": "Q33.4a Unit price of principal raw material possessed (cedis)",
+    "s5c_33ivb": "Q33.4b Unit price of principal raw material possessed (pessewas)",
+    "s5c_36iva": "Q36.4a Unit price of secondary raw material possessed (cedis)",
+    "s5c_36ivb": "Q36.4b Unit price of secondary raw material possessed (pessewas)",
+    "s5c_39iva": "Q39.4a Unit price of principal product work in progress (cedis)",
+    "s5c_39ivb": "Q39.4b Unit price of principal product work in progress (pessewas)",
+    "s5c_40iva": "Q40.4a Unit price of secondary product work in progress (cedis)",
+    "s5c_40ivb": "Q40.4b Unit price of secondary product work in progress (pessewas)",
+    "s5c_41iva": "Q41.4a Unit price of principal goods for resale (cedis)",
+    "s5c_41ivb": "Q41.4b Unit price of principal goods for resale (pessewas)"
+   }
+  },
+  {
+   "rel": "Tanzania/2019-20/Data/CM_SEC_F.dta",
+   "rows": 99,
+   "cols": 22,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "village_source": "Source of prices within the village / MTAA",
+    "village_source_os": "Source of prices within the village / MTAA (Other, specify)",
+    "district_cap": "ARE DISTRICT CAPITAL PRICES RECORDED ON ANOTHER COMMUNITY QUESTIONNAIRE?",
+    "district_source": "Source of prices within the district capital",
+    "district_source_os": "Source of prices within the district capital (Other, specify)"
+   }
+  },
+  {
+   "rel": "Tanzania/2019-20/Data/CM_SEC_F_ID.dta",
+   "rows": 5148,
+   "cols": 9,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "cm_f063": "Price (Village/MTAA)",
+    "cm_f066": "Price (District Capital)"
+   }
+  },
+  {
+   "rel": "Tanzania/2019-20/Data/CM_SEC_E.dta",
+   "rows": 99,
+   "cols": 39,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "cm_e06": "During planting time, what is the price of improved maize seed per KG in the vil",
+    "cm_e08": "During planting time, what is the price of improved maize seeds per KG at this p"
+   }
+  },
+  {
+   "rel": "Tanzania/2019-20/Data/CM_SEC_G.dta",
+   "rows": 4455,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "vil_loc_price": "LOCAL UNIT PRICE",
+    "dist_loc_price": "LOCAL UNIT PRICE"
+   }
+  },
+  {
+   "rel": "Tanzania/2019-20/Data/HH_SEC_M.dta",
+   "rows": 62752,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "hh_m03": "At what price did you purchase [ITEM]?"
+   }
+  },
+  {
+   "rel": "Tanzania/2008-15/Data/upd4_hh_i2.dta",
+   "rows": 114282,
+   "cols": 9,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "hi_51": "What is the average price for a 20 liter jerry can from [SOURCE]?"
+   }
+  },
+  {
+   "rel": "Tanzania/2008-15/Data/upd4_hh_m.dta",
+   "rows": 1295155,
+   "cols": 8,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "hm_03": "At what price did you buy [ITEM]?"
+   }
+  },
+  {
+   "rel": "Tanzania/2020-21/Data/cm_sec_f_id.dta",
+   "rows": 25376,
+   "cols": 9,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "cm_f063": "Price (Village/MTAA)",
+    "cm_f066": "Price (District Capital)"
+   }
+  },
+  {
+   "rel": "Tanzania/2020-21/Data/hh_sec_m.dta",
+   "rows": 263704,
+   "cols": 8,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "hh_m03": "At what price did you purchase [ITEM]?"
+   }
+  },
+  {
+   "rel": "Tanzania/2020-21/Data/ag_sec_12b.dta",
+   "rows": 22480,
+   "cols": 6,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "ag12b_08": "HH received information about agricultural prices from [SOURCE] in last 12months"
+   }
+  },
+  {
+   "rel": "Tanzania/2020-21/Data/cm_sec_e.dta",
+   "rows": 488,
+   "cols": 39,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "cm_e06": "During planting time, what is the price of improved maize seed per KG in the vil",
+    "cm_e08": "During planting time, what is the price of improved maize seeds per KG at this p"
+   }
+  },
+  {
+   "rel": "Tanzania/2020-21/Data/cm_sec_f.dta",
+   "rows": 488,
+   "cols": 23,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "village_source": "Source of prices within the village / MTAA",
+    "village_source_os": "Source of prices within the village / MTAA (Other, specify)",
+    "district_source": "Source of prices within the district capital",
+    "district_source_os": "Source of prices within the district capital (Other, specify)"
+   }
+  },
+  {
+   "rel": "Tanzania/2020-21/Data/cm_sec_g.dta",
+   "rows": 21960,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "vil_loc_price": "LOCAL UNIT PRICE",
+    "dist_loc_price": "LOCAL UNIT PRICE"
+   }
+  },
+  {
+   "rel": "Togo/2018/Data1/s12_me_tgo2018.dta",
+   "rows": 277695,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Togo/2018/Data1/s16c_me_tgo2018.dta",
+   "rows": 11565,
+   "cols": 50,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Malawi/2013-14/Data/Round 2 (2013) Consumption Aggregate.dta",
+   "rows": 4000,
+   "cols": 116,
+   "file_label": "ALL CONSUMPTION VARIABLES SPATIALLY/TEMPORALLY DEFLATED, IN 2013 PRICES",
+   "n_price": 5,
+   "price_vars": {
+    "price_indexL": "Laspeyres monthly Spatial and Temporal Price Index (Base National March 2013)",
+    "rexpagg": "Total real annual consumption per household - 2013 Prices, Spatially & Temporall",
+    "pcrexpagg": "Total real annual consumption per capita        - 2013 Prices, Spatially & Tempo",
+    "absolute_povline": "Absolute Poverty Line - 2013 Prices",
+    "extreme_povline": "Ultra Poverty Line    - 2013 Prices"
+   }
+  },
+  {
+   "rel": "Malawi/2013-14/Data/COM_MOD_K_13.dta",
+   "rows": 6528,
+   "cols": 8,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "com_ck00b1": "What is the price for the item? (MK)",
+    "com_ck00b2": "What is the price for the item? (NUMBER OF UNITS)",
+    "com_ck00b3": "What is the price for the item? (UNIT CODES)"
+   }
+  },
+  {
+   "rel": "Serbia and Montenegro/2003/Data/2003 incomeconsumption.dta",
+   "rows": 2548,
+   "cols": 221,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "cpi": "Regional price index"
+   }
+  },
+  {
+   "rel": "Serbia and Montenegro/2002/Data/2002 4 health.dta",
+   "rows": 19725,
+   "cols": 169,
+   "file_label": "None",
+   "n_price": 8,
+   "price_vars": {
+    "hd4_2x": "How much did you pay full price for doctor visits and/or nurses interventions?",
+    "hd4_2": "How much did you pay full price for doctor visits and/or nurses interventions-am",
+    "hd4_6x": "How much did you pay full price for prescribed drugs?",
+    "hd4_6": "How much did you pay full price for prescribed drugs-amount?",
+    "hz4_2": "How much did you pay full price for dentists examination and intervention-amount",
+    "hz4_2x": "How much did you pay full price for dentists examination and intervention?",
+    "hz4_6": "How much did you pay full price for prescribed drugs-amount?",
+    "hz4_6x": "How much did you pay full price for prescribed drugs?"
+   }
+  },
+  {
+   "rel": "Serbia and Montenegro/2002/Data/2002 incomeconsumption.dta",
+   "rows": 6386,
+   "cols": 243,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "cpi": "Regional price index"
+   }
+  },
+  {
+   "rel": "Serbia and Montenegro/2002/Data/mop_4_health.dta",
+   "rows": 1624,
+   "cols": 167,
+   "file_label": "None",
+   "n_price": 8,
+   "price_vars": {
+    "hd4_2x": "how much did you pay full price for doctor visits and/or nurses interventions?",
+    "hd4_2": "how much did you pay full price for doctor visits and/or nurses interventions-am",
+    "hd4_6x": "how much did you pay full price for prescribed drugs?",
+    "hd4_6": "how much did you pay full price for prescribed drugs-amount?",
+    "hz4_2x": "how much did you pay full price for dentists examination and intervention?",
+    "hz4_2": "how much did you pay full price for dentists examination and intervention-amount",
+    "hz4_6x": "how much did you pay full price for prescribed drugs?",
+    "hz4_6": "how much did you pay full price for prescribed drugs-amount?"
+   }
+  },
+  {
+   "rel": "Serbia and Montenegro/2002/Data/mop_incomeconsumption.dta",
+   "rows": 529,
+   "cols": 70,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "cpi": "regional price index"
+   }
+  },
+  {
+   "rel": "China/1995-97/Data/S06C.DTA",
+   "rows": 751,
+   "cols": 63,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "s06c08a": "8 PRICE SOLD",
+    "s06c08b": "8 PRICE SOLD",
+    "s06c08c": "8 PRICE SOLD",
+    "s06c08d": "8 PRICE SOLD",
+    "s06c08e": "8 PRICE SOLD"
+   }
+  },
+  {
+   "rel": "China/1995-97/Data/TOTEXP.DTA",
+   "rows": 787,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "valhouse": "use value of house in 94 price"
+   }
+  },
+  {
+   "rel": "China/1995-97/Data/S06D1.DTA",
+   "rows": 1779,
+   "cols": 23,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s06d105c": "GVNMT FIXED:         PRICE",
+    "s06d106c": "GVNMT NEGOT:         PRICE",
+    "s06d107c": "TO MARKET (1):       PRICE"
+   }
+  },
+  {
+   "rel": "China/1995-97/Data/S05A5.DTA",
+   "rows": 757,
+   "cols": 30,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s05a26": "26 WISHED MU AT USUAL PRICE?"
+   }
+  },
+  {
+   "rel": "China/1995-97/Data/S06D2.DTA",
+   "rows": 1707,
+   "cols": 24,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s06d108c": "TO MARKET (2):       PRICE",
+    "s06d109c": "TO MARKET (3):       PRICE"
+   }
+  },
+  {
+   "rel": "Panama/2003/Data/E03PR01.DTA",
+   "rows": 31926,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 6,
+   "price_vars": {
+    "aa2": "AA2-Precios",
+    "ab2": "AB2-Precios",
+    "aa3": "AA3-Precios",
+    "ab3": "AB3-Precios",
+    "aa4": "AA4-Precios",
+    "ab4": "AB4-Precios"
+   }
+  },
+  {
+   "rel": "Panama/2003/Data/E03PR02.DTA",
+   "rows": 14398,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 6,
+   "price_vars": {
+    "ba2": "BA2-Precios",
+    "bb2": "BB2-Precios",
+    "ba3": "BA3-Precios",
+    "bb3": "BB3-Precios",
+    "ba4": "BA4-Precios",
+    "bb4": "BB4-Precios"
+   }
+  },
+  {
+   "rel": "Malawi/2004-05/Data/ihs2_exp.dta",
+   "rows": 11280,
+   "cols": 79,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "area": "4 geographical domains with price series"
+   }
+  },
+  {
+   "rel": "Malawi/2004-05/Data/mod_h.dta",
+   "rows": 26508,
+   "cols": 9,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "ch2": "What is the price for the item MK",
+    "ch3": "Number of units corresponding to price",
+    "ch4": "Unit code corresponding to price"
+   }
+  },
+  {
+   "rel": "Malawi/2004-05/Data/ihs2_household.dta",
+   "rows": 11280,
+   "cols": 76,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "area": "4 geographical domains with price series"
+   }
+  },
+  {
+   "rel": "Malawi/2004-05/Data/sec_q1.dta",
+   "rows": 11280,
+   "cols": 68,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "q06d": "Benefits of membership in tobacco club-Better prices"
+   }
+  },
+  {
+   "rel": "Malawi/2004-05/Data/ihs2_pov.dta",
+   "rows": 11280,
+   "cols": 34,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "area": "4 geographical domains with price series"
+   }
+  },
+  {
+   "rel": "Benin/2018-19/Data/s12_me_ben2018.dta",
+   "rows": 360540,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Benin/2018-19/Data/s16c_me_ben2018.dta",
+   "rows": 9056,
+   "cols": 50,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Panama/2008/Data/comunidad.dta",
+   "rows": 781,
+   "cols": 515,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "c10p3_a": "precios importancia"
+   }
+  },
+  {
+   "rel": "Panama/2008/Data/precios.dta",
+   "rows": 48457,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "p2precio": "2.precio",
+    "p4precio": "4.precio",
+    "p6precio": "6.precio"
+   }
+  },
+  {
+   "rel": "Ethiopia/2018-19/Data/sect10b_com_w4.dta",
+   "rows": 33245,
+   "cols": 15,
+   "file_label": "Ethiopia Socioeconomic Survey Community Section 10b - Market Prices",
+   "n_price": 1,
+   "price_vars": {
+    "cs10bq05": "PRICE"
+   }
+  },
+  {
+   "rel": "Ethiopia/2018-19/Data/sect10a_com_w4.dta",
+   "rows": 525,
+   "cols": 19,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs10q04a": "4. DATE OF PRICE DATA COLLECTION (DAY)",
+    "cs10q04b": "4. DATE OF PRICE DATA COLLECTION (MONTH)",
+    "cs10q04c": "4. DATE OF PRICE DATA COLLECTION (YEAR)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2018-19/Data/cons_agg_w4.dta",
+   "rows": 6770,
+   "cols": 20,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "spat_totcons_aeq": "Annual consumption per AEQ, spatially adjusted (food prices only)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2013-14/Data/sect10b2_com_w2.dta",
+   "rows": 16713,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "cs10b2q05": "Price"
+   }
+  },
+  {
+   "rel": "Ethiopia/2013-14/Data/sect10a2_com_w2.dta",
+   "rows": 17673,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "cs10a2q05": "Price"
+   }
+  },
+  {
+   "rel": "Ethiopia/2013-14/Data/sect10b1_com_w2.dta",
+   "rows": 433,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs10b1q04_a": "Date of Price Data Collection (Day)",
+    "cs10b1q04_b": "Date of Price Data Collection (Month)",
+    "cs10b1q04_c": "Date of Price Data Collection (Year)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2013-14/Data/cons_agg_w2.dta",
+   "rows": 5262,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "price_index_hce": "regional spatial price index from MFED, HCE report"
+   }
+  },
+  {
+   "rel": "Ethiopia/2013-14/Data/sect10a1_com_w2.dta",
+   "rows": 433,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs10a1q04_a": "Date of Price Data Collection (Day)",
+    "cs10a1q04_b": "Date of Price Data Collection (Month)",
+    "cs10a1q04_c": "Date of Price Data Collection (Year)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2015-16/Data/sect10a2_com_w3.dta",
+   "rows": 28747,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "cs10a2q05": "Price"
+   }
+  },
+  {
+   "rel": "Ethiopia/2015-16/Data/sect10a1_com_w3.dta",
+   "rows": 433,
+   "cols": 22,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs10a1q04_a": "Date of Price Data Collection (Day)",
+    "cs10a1q04_b": "Date of Price Data Collection (Month)",
+    "cs10a1q04_c": "Date of Price Data Collection (Year)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2015-16/Data/cons_agg_w3.dta",
+   "rows": 4954,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "price_index_hce": "regional spatial price index from MFED, HCE report"
+   }
+  },
+  {
+   "rel": "Guinea-Bissau/2018-19/Data/s16c_me_gnb2018.dta",
+   "rows": 12188,
+   "cols": 50,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Guinea-Bissau/2018-19/Data/s12_me_gnb2018.dta",
+   "rows": 240795,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Ethiopia/2021-22/Data/sect10b_com_w5.dta",
+   "rows": 27155,
+   "cols": 16,
+   "file_label": "Ethiopia Socioeconomic Survey Community Section 10b - Market Prices",
+   "n_price": 1,
+   "price_vars": {
+    "cs10bq05": "PRICE"
+   }
+  },
+  {
+   "rel": "Ethiopia/2021-22/Data/sect11_com_w5.dta",
+   "rows": 3464,
+   "cols": 43,
+   "file_label": "Ethiopia Socioeconomic Survey Community Section 11 - Mechanization",
+   "n_price": 1,
+   "price_vars": {
+    "cs11q09a": "9a. This agriculture season, how much did farmers pay for [MACHINES] rent? PRICE"
+   }
+  },
+  {
+   "rel": "Ethiopia/2021-22/Data/sect10a_com_w5.dta",
+   "rows": 433,
+   "cols": 19,
+   "file_label": "Ethiopia Socioeconomic Survey Community Section 10 - Market Information",
+   "n_price": 3,
+   "price_vars": {
+    "cs10q04a": "4. DATE OF PRICE DATA COLLECTION (DAY)",
+    "cs10q04b": "4. DATE OF PRICE DATA COLLECTION (MONTH)",
+    "cs10q04c": "4. DATE OF PRICE DATA COLLECTION (YEAR)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2021-22/Data/cons_agg_w5.dta",
+   "rows": 4959,
+   "cols": 22,
+   "file_label": "Ethiopia Socioeconomic Survey Consumption Aggregate",
+   "n_price": 1,
+   "price_vars": {
+    "spat_totcons_aeq": "Annual consumption per AEQ, spatially adjusted (food prices only)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2011-12/Data/cons_agg_w1.dta",
+   "rows": 3969,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "price_index_hce": "regional spatial price index from MFED, HCE report"
+   }
+  },
+  {
+   "rel": "Ethiopia/2011-12/Data/sect10b1_com_w1.dta",
+   "rows": 12759,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "cs10b1q07_f1": "Price",
+    "cs10b1q07_f2": "Price (Cents)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2011-12/Data/sect10a1_com_w1.dta",
+   "rows": 333,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs10a1q04_a": "Date of Price Data Collection (Day)",
+    "cs10a1q04_b": "Date of Price Data Collection (Month)",
+    "cs10a1q04_c": "Date of Price Data Collection (Year)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2011-12/Data/sect10b2_com_w1.dta",
+   "rows": 10697,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "cs10b2q07_f1": "Price",
+    "cs10b2q07_f2": "Price (Cents)"
+   }
+  },
+  {
+   "rel": "Ethiopia/2011-12/Data/sect10a2_com_w1.dta",
+   "rows": 332,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs10a2q04_a": "Date of Price Data Collection (Day)",
+    "cs10a2q04_b": "Date of Price Data Collection (Month)",
+    "cs10a2q04_c": "Date of Price Data Collection (Year)"
+   }
+  },
+  {
+   "rel": "Peru/1985/Data/PRICER.DTA",
+   "rows": 951,
+   "cols": 17,
+   "file_label": "None",
+   "n_price": 11,
+   "price_vars": {
+    "pcrice": "RL PRICE OF   RICE, COMM.Q.",
+    "pcmilk": "RL PRICE OF   MILK, COMM.Q.",
+    "pcckoil": "RL PRICE OF CKNG OIL, COMM.Q.",
+    "pconion": "RL PRICE OF  ONION, COMM.Q.",
+    "pcpotat": "RL PRICE OF POTATO, COMM.Q.",
+    "pcsugar": "RL PRICE OF  SUGAR, COMM.Q.",
+    "pcnoodl": "RL PRICE OF NOODLES, COMM.Q.",
+    "pcaspir": "RL PRICE OF ASPIRIN, COMM.Q.",
+    "pcdetg1": "RL PRICE DETRGNT1(ACE), COMM.Q.",
+    "pcdetg2": "RL PRICE DETG2(NAPCH), COMM.Q.",
+    "pccfuel": "RL PRICE OF CKNG FUEL, COMM.Q."
+   }
+  },
+  {
+   "rel": "Kyrgyz Republic/1993/Data/KPRICE2.DTA",
+   "rows": 212,
+   "cols": 886,
+   "file_label": "None",
+   "n_price": 180,
+   "price_vars": {
+    "aye1_1b": "MILK STATE GENERAL LOW PRICE",
+    "aye1_1d": "MILK STATE GENERAL HI PRICE",
+    "aye1_3b": "KEFIR STATE GENERAL LOW PRICE",
+    "aye1_3d": "KEFIR STATE GENERAL HI PRICE",
+    "aye1_4b": "AIRAN STATE GENERAL LOW PRICE",
+    "aye1_4d": "AIRAN STATE GENERAL HI PRICE",
+    "aye1_5b": "CREAM STATE GENERAL LOW PRICE",
+    "aye1_5d": "CREAM STATE GENERAL HI PRICE",
+    "aye1_8b": "BUTTER STATE GENERAL LOW PRICE",
+    "aye1_8d": "BUTTER STATE GENERAL HI PRICE",
+    "aye1_10b": "KURT STATE GENERAL LOW PRICE",
+    "aye1_10d": "KURT STATE GENERAL HI PRICE",
+    "aye1_19b": "BEEF STATE GENERAL LOW PRICE",
+    "aye1_19d": "BEEF STATE GENERAL HI PRICE"
+   }
+  },
+  {
+   "rel": "Kyrgyz Republic/1993/Data/KPRICE3.DTA",
+   "rows": 212,
+   "cols": 1000,
+   "file_label": "None",
+   "n_price": 250,
+   "price_vars": {
+    "aye6_1b": "VODKA STATE LIQUOR LOW PRICE",
+    "aye6_1d": "VODKA STATE LIQUOR HI PRICE",
+    "aye6_2b": "COGNAC STATE LIQUOR LOW PRICE?",
+    "aye6_2d": "COGNAC STATE LIQUOR HI PRICE?",
+    "aye6_6b": "BOUZA STATE LIQUOR LOW PRICE?",
+    "aye6_6d": "BOUZA STATE LIQUOR HI PRICE?",
+    "aye7_1d": "PAPIROSI STATE TOBACCO HI PRICE",
+    "aye8_1b": "MILK PRIV GENERAL LOW PRICE",
+    "aye8_1d": "MILK PRIV GENERAL HI PRICE",
+    "aye8_2d": "MARE MILK PRIV GENERAL HI PRICE",
+    "aye8_3b": "KEFIR PRIV GENERAL LOW PRICE",
+    "aye8_3d": "KEFIR PRIV GENERAL HI PRICE",
+    "aye8_4b": "AIRAN PRIV GENERAL LOW PRICE",
+    "aye8_4d": "AIRAN PRIV GENERAL HI PRICE"
+   }
+  },
+  {
+   "rel": "Kyrgyz Republic/1993/Data/KCOMM.DTA",
+   "rows": 213,
+   "cols": 273,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "a1x45": "REGULAR PRICE OF MOVIE TICKET ("
+   }
+  },
+  {
+   "rel": "Kyrgyz Republic/1993/Data/KHHLD.DTA",
+   "rows": 1937,
+   "cols": 901,
+   "file_label": "None",
+   "n_price": 29,
+   "price_vars": {
+    "ac37_1c": "CURRENT PRICE OF REFRIGERATOR",
+    "ac37_10c": "CURRENT PRICE OF TAPE RECORDER",
+    "ac37_11c": "CURRENT PRICE OF AUTO/TRUCK",
+    "ac37_12c": "CURRENT PRICE OF MOTORCYCLES",
+    "ac37_13c": "CURRENT PRICE OF TRACTOR",
+    "ac37_14c": "CURRENT PRICE OF CARPETS",
+    "ac37_2c": "CURRENT PRICE OF FREEZER",
+    "ac37_3c": "CURRENT PRICE OF WASHING MACHIN",
+    "ac37_4c": "CURRENT PRICE OF SEWING MACHINE",
+    "ac37_5c": "CURRENT PRICE OF B/W TV SET",
+    "ac37_6c": "CURRENT PRICE OF COLOR TV",
+    "ac37_7c": "CURRENT PRICE OF VCR",
+    "ac37_8c": "CURRENT PRICE OF STEREO",
+    "ac37_9c": "CURRENT PRICE OF RECORD PLAYER"
+   }
+  },
+  {
+   "rel": "Kyrgyz Republic/1997/Data/SEC02AB1.DTA",
+   "rows": 2784,
+   "cols": 58,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "v02b05a": "Purchase price - amount",
+    "v02b05b": "Purchase price - unit"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2018-19/Data/s16c_me_bfa2018.dta",
+   "rows": 15593,
+   "cols": 50,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2018-19/Data/s12_me_bfa2018.dta",
+   "rows": 315450,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2014/Data/emc2014_p3_prix_27022015.dta",
+   "rows": 3674,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "prix1": "Prix 1",
+    "prix2": "Prix 2",
+    "prix3": "Prix 3"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2014/Data/emc2014_p1_prix_27022015.dta",
+   "rows": 13266,
+   "cols": 22,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "poids1": "Prix relev\u00e9 1 homog\u00e8ne 02 & 03",
+    "poids2": "Prix relev\u00e9 2 homog\u00e8ne 02 & 03",
+    "poids3": "Prix relev\u00e9 3 homog\u00e8ne 02 & 03"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2014/Data/emc2014_p2_prix_27022015.dta",
+   "rows": 3705,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "prix1": "Prix 1",
+    "prix2": "Prix 2",
+    "prix3": "Prix 3"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2014/Data/emc2014_agri_equipements.dta",
+   "rows": 169820,
+   "cols": 51,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "X5": "Quel est le prix (ou la valeur) d'acquisition"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2014/Data/emc2014_p1_biensdurables_27022015.dta",
+   "rows": 280775,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "pm5": "Quelle est la valeur (ou prix de vente) actuelle de l'ARTICLE?"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2014/Data/emc2014_agri_caracteristiques_cultures.dta",
+   "rows": 35264,
+   "cols": 87,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "Y29": "A quel prix unitaire envisagez-vous de le vendre selon l'unit\u00e9 relev\u00e9e en Y28?"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2014/Data/emc2014_p4_prix_27022015.dta",
+   "rows": 3522,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "prix1": "Prix 1",
+    "prix2": "Prix 2",
+    "prix3": "Prix 3"
+   }
+  },
+  {
+   "rel": "Burkina_Faso/2021-22/Data/s12_me_bfa2021.dta",
+   "rows": 145215,
+   "cols": 36,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ %rostertitle% ] ?"
+   }
+  },
+  {
+   "rel": "Bulgaria/1995/Data/PRICEADJ.dta",
+   "rows": 19,
+   "cols": 4,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "padj": "Price adjustment for June '95"
+   }
+  },
+  {
+   "rel": "Bulgaria/2001/Data/DistrictPriceIndex.dta",
+   "rows": 2633,
+   "cols": 4,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "pr_defl": "regional weighted price deflators"
+   }
+  },
+  {
+   "rel": "Bulgaria/1997/Data/PRICEADJ.dta",
+   "rows": 39,
+   "cols": 4,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "padj": "Price adjustment for June '97"
+   }
+  },
+  {
+   "rel": "Kazakhstan/1996/Data/KZ96AGR2_PUF.dta",
+   "rows": 1996,
+   "cols": 312,
+   "file_label": "None",
+   "n_price": 11,
+   "price_vars": {
+    "w29_01": "cattle: price of one adult, in",
+    "w29_02": "pigs: price of one adult, in te",
+    "w29_03": "sheep: price of one adult, in t",
+    "w29_04": "goats: price of one adult, in t",
+    "w29_05": "horses: price of one adult, in",
+    "w29_06": "donkeys: price of one adult, in",
+    "w29_07": "camels: price of one adult, in",
+    "w29_08": "hens: price of one adult, in te",
+    "w29_09": "other poultry: price of one adu",
+    "w29_10": "rabbits: price of one adult, in",
+    "w29_11": "bees (swarms) : price of one ,"
+   }
+  },
+  {
+   "rel": "Kazakhstan/1996/Data/KOMMU.dta",
+   "rows": 135,
+   "cols": 907,
+   "file_label": "None",
+   "n_price": 65,
+   "price_vars": {
+    "c2502": "rice in price of transp./carria",
+    "c2511": "prohibitive prices for agr. mac",
+    "p011": "wheat bread, price in POS 1",
+    "p012": "wheat bread, price in POS 2",
+    "p013": "wheat bread, price in POS 3",
+    "p021": "wheat flour, price in POS 1",
+    "p022": "wheat flour, price in POS 2",
+    "p023": "wheat flour, price in POS 3",
+    "p031": "rice, price in POS 1",
+    "p032": "rice, price in POS 2",
+    "p033": "rice, price in POS 3",
+    "p041": "macaroni, price in POS 1",
+    "p042": "macaroni, price in POS 2",
+    "p043": "macaroni, price in POS 3"
+   }
+  },
+  {
+   "rel": "Kazakhstan/1996/Data/KZ96HSG_PUF.dta",
+   "rows": 7224,
+   "cols": 184,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "b36_01": "house: current price",
+    "b36_02": "dacha: current price",
+    "b36_03": "apartment: current price",
+    "b36_04": "room: current price",
+    "b36_05": "yourta: current price"
+   }
+  },
+  {
+   "rel": "Serbia/2007/Data/individual.dta",
+   "rows": 17375,
+   "cols": 346,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "xd4_2_2": "the amount in dinars if service was paid for 2. full price (according to price l",
+    "xd4_6_1": "have you used and paid, and how much the following health services? 6.full price",
+    "xd4_6_2": "the amount in dinars if service was paid for full price for prescribed drug",
+    "xz3_2_2": "the amount in dinars full price for  dentists examination and intervention",
+    "xz3_6_2": "the amount in dinars- full price for prescribed drugs"
+   }
+  },
+  {
+   "rel": "Serbia/2007/Data/m2_durables.dta",
+   "rows": 48060,
+   "cols": 8,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s30": "according to current market prices, what amount would you be able to receive for"
+   }
+  },
+  {
+   "rel": "Serbia/2007/Data/household.dta",
+   "rows": 5557,
+   "cols": 445,
+   "file_label": "None",
+   "n_price": 18,
+   "price_vars": {
+    "cons1": "coicop group 1 (food): per equivalence scale, current prices",
+    "cons3": "coicop group 3 (clothing): per ae, current prices",
+    "cons4": "coicop group 4 (housing/utilities): per ae, current prices",
+    "cons42": "adj imputed rent, per ae, current prices",
+    "cons5": "coicop group 5 (furnishings/hh equipment): per ae, current prices",
+    "cons6": "coicop group 6 (health): per ae, current prices",
+    "cons7": "coicop group 7 (transport): per ae, current prices",
+    "cons8": "coicop group 8 (communications): per ae, current prices",
+    "cons9": "coicop group 9 (recreation): per ae, current prices",
+    "cons10": "coicop group 10 (education): per ae, current prices",
+    "cons12": "coicop group 12 (miscellaneous): per ae, current prices",
+    "cons21": "coicop group 21 (alcohol): per ae, current prices",
+    "cons22": "coicop group 22 (tobacco): per ae, current prices",
+    "cons11_1": "coicop group 11 (food/drinks out): per ae, current prices"
+   }
+  },
+  {
+   "rel": "Guatemala/2000/Data/ECV05H03.DTA",
+   "rows": 7276,
+   "cols": 38,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "p03a01k": "aumento general de precios",
+    "p03a06m": "caida  de precios de prod."
+   }
+  },
+  {
+   "rel": "Guatemala/2000/Data/ECV39R17.DTA",
+   "rows": 676,
+   "cols": 37,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "p17c16": "precio de contado"
+   }
+  },
+  {
+   "rel": "Guatemala/2000/Data/PRECIOS.DTA",
+   "rows": 55205,
+   "cols": 11,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "precio": "PRECIO COTIZADO",
+    "flag": "Precio estimado"
+   }
+  },
+  {
+   "rel": "Guatemala/2000/Data/ECV21A16.DTA",
+   "rows": 3729,
+   "cols": 25,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "p16a13a": "precio de renta"
+   }
+  },
+  {
+   "rel": "South Africa/1993/Data/CFPRI03.dta",
+   "rows": 9464,
+   "cols": 11,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "cfpri1": "Cluster Food Price source 1",
+    "cfpri2": "Cluster Food Price source 2",
+    "cfpri": "Cluster Food Price",
+    "imprice": "Median Implicit Cluster Price"
+   }
+  },
+  {
+   "rel": "South Africa/1993/Data/CFPRI01.dta",
+   "rows": 9667,
+   "cols": 4,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "cfpri1": "Cluster Food Price source 1",
+    "cfpri2": "Cluster Food Price source 2"
+   }
+  },
+  {
+   "rel": "South Africa/1993/Data/FCODE2.dta",
+   "rows": 31,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "mdprice": "Imputed Median Kg Price",
+    "mprice": "Imputed Mean Kg Price"
+   }
+  },
+  {
+   "rel": "South Africa/1993/Data/M2_AGR1.dta",
+   "rows": 1409,
+   "cols": 9,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "unit_pri": "1e:Price per unit"
+   }
+  },
+  {
+   "rel": "Albania/2005/Data/agric/agriculture_hhlevel.dta",
+   "rows": 1849,
+   "cols": 225,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "fallow_lowcropprice": "land is fallow b/c crop price is low"
+   }
+  },
+  {
+   "rel": "Uganda/2019-20/Data/Community/csec2a.dta",
+   "rows": 307,
+   "cols": 30,
+   "file_label": "None",
+   "n_price": 8,
+   "price_vars": {
+    "s2a_q12_1_1": "12.1 What is the current rental price of 1 ha of agricultural land in this villa",
+    "s2a_q12_2_1": "12.2 What was the rental price of 1 ha of agricultural land in this village 5 ye",
+    "s2a_q12_3_1": "12.3. What is the current sales price of 1 ha of agricultural land in this villa",
+    "s2a_12_4_1": "12.4 What was the sales price of 1 ha of agricultural land  in this village 5 ye",
+    "s2a_q12_1_2": "12.1 What is the current rental price of 200 sq. meters of residential land in t",
+    "s2a_q12_2_2": "12.2 What was the rental price of 200 sq. meters of residential land in this vil",
+    "s2a_q12_3_2": "12.3 What is the current sales price of 200 sq. meters of residential land in th",
+    "s2a_12_4_2": "12.4 What was the sales price of 200 sq. meters of residential land  in this vil"
+   }
+  },
+  {
+   "rel": "Uganda/2019-20/Data/HH/gsec15b.dta",
+   "rows": 385434,
+   "cols": 23,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "CEB14a": "Market price for purchasing [item] for consumption at home per unit of consumptn",
+    "CEB14b": "Market price for purchasg[item] for consumptn Away from home per unit of consmpn",
+    "CEB14c": "Price of  [item] if you were to sell it in the market per unit of consump",
+    "CEB15": "Farm gate/producer price per unit of consumption"
+   }
+  },
+  {
+   "rel": "Uganda/2019-20/Data/HH/gsec15c.dta",
+   "rows": 196260,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "CEC10": "CEC10. Unit Price for item"
+   }
+  },
+  {
+   "rel": "Uganda/2019-20/Data1/Community/csec2a.dta",
+   "rows": 307,
+   "cols": 30,
+   "file_label": "None",
+   "n_price": 8,
+   "price_vars": {
+    "s2a_q12_1_1": "12.1 What is the current rental price of 1 ha of agricultural land in this villa",
+    "s2a_q12_2_1": "12.2 What was the rental price of 1 ha of agricultural land in this village 5 ye",
+    "s2a_q12_3_1": "12.3. What is the current sales price of 1 ha of agricultural land in this villa",
+    "s2a_12_4_1": "12.4 What was the sales price of 1 ha of agricultural land  in this village 5 ye",
+    "s2a_q12_1_2": "12.1 What is the current rental price of 200 sq. meters of residential land in t",
+    "s2a_q12_2_2": "12.2 What was the rental price of 200 sq. meters of residential land in this vil",
+    "s2a_q12_3_2": "12.3 What is the current sales price of 200 sq. meters of residential land in th",
+    "s2a_12_4_2": "12.4 What was the sales price of 200 sq. meters of residential land  in this vil"
+   }
+  },
+  {
+   "rel": "Uganda/2019-20/Data1/HH/gsec15b.dta",
+   "rows": 385434,
+   "cols": 23,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "CEB14a": "Market price for purchasing [item] for consumption at home per unit of consumptn",
+    "CEB14b": "Market price for purchasg[item] for consumptn Away from home per unit of consmpn",
+    "CEB14c": "Price of  [item] if you were to sell it in the market per unit of consump",
+    "CEB15": "Farm gate/producer price per unit of consumption"
+   }
+  },
+  {
+   "rel": "Uganda/2019-20/Data1/HH/gsec15c.dta",
+   "rows": 196260,
+   "cols": 18,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "CEC10": "CEC10. Unit Price for item"
+   }
+  },
+  {
+   "rel": "Tanzania_Kegera/2004-05/Data/constructed_data/price2004_hh.dta",
+   "rows": 2774,
+   "cols": 4,
+   "file_label": "KHDS 2004 price indices",
+   "n_price": 1,
+   "price_vars": {
+    "laspeyre": "2004 laspeyres index based on price qx"
+   }
+  },
+  {
+   "rel": "Tanzania_Kegera/2004-05/Data/constructed_data/price2004_cl.dta",
+   "rows": 255,
+   "cols": 4,
+   "file_label": "KHDS 1991-1994 and 2004 price indices per original cluster",
+   "n_price": 1,
+   "price_vars": {
+    "laspeyre": "laspeyres index for cluster based on price qx"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/AGGREGATES/POV_GHA_2013_GLSS6-updated.dta",
+   "rows": 16772,
+   "cols": 96,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "pindex_fd": "Food price index",
+    "pindex_nonfd": "Non food price index",
+    "pindex": "price index",
+    "povpi": "price index/100"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/AGGREGATES/13_GHA_2013_PINDEX.dta",
+   "rows": 16772,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "pindex": "price index",
+    "povpi": "price index/100"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/AGGREGATES/GHA_2013_H.dta",
+   "rows": 16772,
+   "cols": 191,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "FDPINDEX": "Food price index",
+    "pindex_nonfd": "Non food price index",
+    "pindex": "price index",
+    "povpi": "price index/100"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/PARTB/sec8h.dta",
+   "rows": 1056270,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s8hq10": "selling price for one unit now"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/PARTB/sec12b.dta",
+   "rows": 754476,
+   "cols": 23,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s12bq3a1": "price of first item",
+    "s12bq3b1": "price of second item",
+    "s12bq3c1": "price of third item"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/SECTION_10/sec10H.dta",
+   "rows": 8916,
+   "cols": 24,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s10hq2c": "Unit price of products consumed by hhold in last 2wks in GH\u00a2"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/PRICES/price_sec2.dta",
+   "rows": 55933,
+   "cols": 9,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s2stpx": "first price",
+    "s2ndpx": "second price",
+    "s2rdpx": "third price"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2012-13/Data/PARTA/SEC4e.dta",
+   "rows": 61747,
+   "cols": 47,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s4eq18": "Employer give free accomodation/reduced price"
+   }
+  },
+  {
+   "rel": "Liberia/2018-19/Data/Household/sect8_public.dta",
+   "rows": 9500,
+   "cols": 33,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "S8_9C": "what is the estimated price per unit of [product]  consumed? ld",
+    "S8_10C": "what is the estimated price per unit of [product] sold? ld"
+   }
+  },
+  {
+   "rel": "Liberia/2018-19/Data/Household/sect15_public.dta",
+   "rows": 102087,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "S15_5": "what price would you get today if you resold the most recently purchased [item]?"
+   }
+  },
+  {
+   "rel": "Liberia/2018-19/Data/Household/sect11_public.dta",
+   "rows": 186021,
+   "cols": 45,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "S11_8AP": "what is the estimated price per(unit) of product? ld",
+    "S11_8BP": "what is the estimated price per(unit) of product? ld",
+    "S11_8CP": "what is the estimated price per(unit) of product? ld",
+    "S11_8DP": "what is the estimated price per(unit) of product? ld",
+    "S11_8EP": "what is the estimated price per(unit) of product? ld"
+   }
+  },
+  {
+   "rel": "Liberia/2018-19/Data/Household/sect7_public.dta",
+   "rows": 85162,
+   "cols": 33,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "S7_9C": "what is the estimated price per unit of [product]  consumed? ld",
+    "S7_11C": "what is the estimated price per unit of [product] sold? ld"
+   }
+  },
+  {
+   "rel": "Liberia/2018-19/Data/Community/comm_sect7_public.dta",
+   "rows": 3773,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "S7_3": "Price per local unit (LD)"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2005-06/Data/partb/sec8h.dta",
+   "rows": 424052,
+   "cols": 21,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s8hq14": "selling price for one unit"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2005-06/Data/partb/sec12b.dta",
+   "rows": 335373,
+   "cols": 22,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "s12bq3a1": "price of first item",
+    "s12bq3b1": "price of second item",
+    "s12bq3c1": "price of third item"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2005-06/Data/parta/sec4e.dta",
+   "rows": 28047,
+   "cols": 46,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s4eq16": "employer give free accomodation/reduced price"
+   }
+  },
+  {
+   "rel": "GhanaLSS/2005-06/Data/aggregates/pov_gh5.dta",
+   "rows": 8687,
+   "cols": 45,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "povpi": "Price Index - Accra jan99=1.00"
+   }
+  },
+  {
+   "rel": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS07P1.dta",
+   "rows": 122978,
+   "cols": 11,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "MS07Q06": "Valeur (ou prix de vente) actuelle de l'ARTICLE"
+   }
+  },
+  {
+   "rel": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta",
+   "rows": 5226,
+   "cols": 62,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "AS02EQ32": "Prix unitaire envisag\u00e9 de la vente selon l'unit\u00e9 en 2E.31"
+   }
+  },
+  {
+   "rel": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta",
+   "rows": 21960,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs07q04": "prix du produit du 1er relev\u00e9",
+    "cs07q06": "prix du produit du 2eme relev\u00e9",
+    "cs07q08": "prix du produit du 3eme relev\u00e9"
+   }
+  },
+  {
+   "rel": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS1P1.dta",
+   "rows": 5634,
+   "cols": 68,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "AS01Q20": "Prix de vente actuelle de la parcelle Si vous deviez vendre (en FCFA)"
+   }
+  },
+  {
+   "rel": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs08.dta",
+   "rows": 9760,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "cs08q09": "prix"
+   }
+  },
+  {
+   "rel": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/COMPRIXC08P2.dta",
+   "rows": 1110,
+   "cols": 12,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "CS08Q09": "Prix"
+   }
+  },
+  {
+   "rel": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/COMPRIXC07P2.dta",
+   "rows": 19800,
+   "cols": 14,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "CS07Q04": "Prix du produit du 1er relev\u00e9",
+    "CS07Q06": "Prix du produit du 2eme relev\u00e9",
+    "CS07Q08": "Prix du produit du 3eme relev\u00e9"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas06_p2.dta",
+   "rows": 95232,
+   "cols": 19,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "as06q07": "prix d'acquisition du dernier \u00e9quipement"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta",
+   "rows": 34380,
+   "cols": 16,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs07q03": "prix du produit du 1er relev\u00e9",
+    "cs07q06": "prix du produit du 2eme relev\u00e9",
+    "cs07q09": "prix du produit du 3eme relev\u00e9"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas2b_p1.dta",
+   "rows": 13032,
+   "cols": 20,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "as02bq11": "mois au cours duquel vous avez plant\u00e9 ce produit pour la premi\u00e8re fois cette sai"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta",
+   "rows": 23409,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 3,
+   "price_vars": {
+    "cs07q03": "Prix du produit du 1er relev\u00e9",
+    "cs07q06": "Prix du produit du 2eme relev\u00e9",
+    "cs07q09": "Prix du produit du 3eme relev\u00e9"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas4h3_p2.dta",
+   "rows": 31622,
+   "cols": 10,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "as4h3q3": "prix du litre"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaactif_p1.dta",
+   "rows": 134912,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "ms07q06": "valeur (ou prix de vente) actuelle de l'article"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas1_p1.dta",
+   "rows": 6664,
+   "cols": 118,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "as01q20": "prix de vente actuelle de la parcelle si vous deviez vendre (en fcfa)"
+   }
+  },
+  {
+   "rel": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaactif_p1_en.dta",
+   "rows": 134912,
+   "cols": 13,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "ms07q06": "What is the current value (or selling price)of the [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Cross_Sectional/ihs5_consumption_aggregate.dta",
+   "rows": 11434,
+   "cols": 73,
+   "file_label": "None",
+   "n_price": 48,
+   "price_vars": {
+    "rexp_cat021": "Alcohol, real(April 2019 price) annual consumption",
+    "rexp_cat111": "Vendors/Cafes/Restaurants, real(April 2019 price) annual consumption",
+    "rexp_cat011": "Food, real(April 2019 price) annual consumption",
+    "rexp_cat101": "Education, real(April 2019 price) annual consumption",
+    "rexp_cat061": "Health drugs, real(April 2019 price) annual consumption",
+    "rexp_cat062": "Health out-patient, real(April 2019 price) annual consumption",
+    "rexp_cat063": "Health hospitalization, real(April 2019 price) annual consumption",
+    "rexp_cat083": "Phone and fax services, real(April 2019 price) annual consumption",
+    "rexp_cat022": "Tobacco, real(April 2019 price) annual consumption",
+    "rexp_cat073": "Transport, real(April 2019 price) annual consumption",
+    "rexp_cat121": "Personal care, real(April 2019 price) annual consumption",
+    "rexp_cat081": "Postal services, real(April 2019 price) annual consumption",
+    "rexp_cat072": "Operation of vehicles, real(April 2019 price) annual consumption",
+    "rexp_cat093": "Other recreational items, pets, real(April 2019 price) annual consumption"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Cross_Sectional/com_ck.dta",
+   "rows": 36210,
+   "cols": 6,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "ckb": "What is the price for the %rostertitle%?"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Cross_Sectional/fs_mod_e1.dta",
+   "rows": 193,
+   "cols": 58,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_e08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_e08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Cross_Sectional/fs_mod_j1.dta",
+   "rows": 375,
+   "cols": 30,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_j02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03l": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Cross_Sectional/fs_mod_f1.dta",
+   "rows": 458,
+   "cols": 30,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_f02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03m": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Cross_Sectional/fs_mod_i1.dta",
+   "rows": 92,
+   "cols": 59,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_i08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_i08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Panel/fs_mod_e1_19.dta",
+   "rows": 37,
+   "cols": 59,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_e08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_e08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Panel/fs_mod_j1_19.dta",
+   "rows": 108,
+   "cols": 31,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_j02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03l": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Panel/fs_mod_i1_19.dta",
+   "rows": 26,
+   "cols": 60,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_i08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_i08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Panel/com_ck_19.dta",
+   "rows": 5151,
+   "cols": 6,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "ckb": "What is the price for the %rostertitle%?"
+   }
+  },
+  {
+   "rel": "Malawi/2019-20/Data/Panel/fs_mod_f1_19.dta",
+   "rows": 124,
+   "cols": 31,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_f02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03m": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Full_Sample/ihs3fc2M_consumption.dta",
+   "rows": 12271,
+   "cols": 96,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "price_index": "Spatial and Temporal Price Index (Base National Feb/Mar 2010)"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Panel/Round 1 (2010) Consumption Aggregate.dta",
+   "rows": 3246,
+   "cols": 114,
+   "file_label": "None",
+   "n_price": 5,
+   "price_vars": {
+    "price_indexL": "Laspeyres monthly Spatial and Temporal Price Index (Base National March 2010)",
+    "rexpagg": "Total real annual consumption per household - 2013 Prices, Spatially & Temporall",
+    "pcrexpagg": "Total real annual consumption per capita        - 2013 Prices, Spatially & Tempo",
+    "absolute_povline": "Absolute Poverty Line - 2013 Prices",
+    "extreme_povline": "Ultra Poverty Line - 2013 Prices"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Panel/fs_mod_j1_16.dta",
+   "rows": 66,
+   "cols": 32,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_j02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03l": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Panel/fs_mod_i1_16.dta",
+   "rows": 16,
+   "cols": 60,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_i08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_i08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Panel/fs_mod_f1_16.dta",
+   "rows": 81,
+   "cols": 32,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_f02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03m": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Panel/fs_mod_e1_16.dta",
+   "rows": 21,
+   "cols": 59,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_e08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_e08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Cross_Sectional/ihs4 consumption aggregate.dta",
+   "rows": 12447,
+   "cols": 71,
+   "file_label": "None",
+   "n_price": 48,
+   "price_vars": {
+    "price_index": "Spatial and Temporal Price Index (Base National Feb/Mar 2010)",
+    "rexp_cat011": "Food, real(April 2016 price) annual consumption",
+    "rexp_cat012": "Beverage, real(April 2016 price) annual consumption",
+    "rexp_cat021": "Alcohol, real(April 2016 price) annual consumption",
+    "rexp_cat022": "Tobacco, real(April 2016 price) annual consumption",
+    "rexp_cat031": "Clothing, real(April 2016 price) annual consumption",
+    "rexp_cat032": "Footwear, real(April 2016 price) annual consumption",
+    "rexp_cat041": "Actual rents for housing, real(April 2016 price) annual consumption",
+    "rexp_cat042": "Estimated rents for housing, real(April 2016 price) annual consumption",
+    "rexp_cat045": "Electricity, gas, other fuels, real(April 2016 price) annual consumption",
+    "rexp_cat051": "Decorations, carpets, real(April 2016 price) annual consumption",
+    "rexp_cat052": "Household textiles, real(April 2016 price) annual consumption",
+    "rexp_cat053": "Appliances, real(April 2016 price) annual consumption",
+    "rexp_cat054": "Dishes, real(April 2016 price) annual consumption"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Cross_Sectional/fs_mod_e1.dta",
+   "rows": 248,
+   "cols": 59,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_e08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_e08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Cross_Sectional/fs_mod_j1.dta",
+   "rows": 433,
+   "cols": 31,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_j02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_j03l": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Cross_Sectional/fs_mod_f1.dta",
+   "rows": 553,
+   "cols": 31,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_f02f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f02m": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03f": "During the weeks of operation,..average price per packaging unit",
+    "fs_f03m": "During the weeks of operation,..average price per packaging unit"
+   }
+  },
+  {
+   "rel": "Malawi/2016-17/Data/Cross_Sectional/fs_mod_i1.dta",
+   "rows": 142,
+   "cols": 65,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_i08f": "During the weeks of operation, what was the average price per packaging un",
+    "fs_i08l": "During the weeks of operation, what was the average price per packaging un"
+   }
+  },
+  {
+   "rel": "CotedIvoire/2018-19/Data/Menage/s12_me_CIV2018.dta",
+   "rows": 584640,
+   "cols": 15,
+   "file_label": "None",
+   "n_price": 1,
+   "price_vars": {
+    "s12q09": "12.09. Quelle est la valeur (ou prix de revente) actuelle de [ARTICLE]?"
+   }
+  },
+  {
+   "rel": "CotedIvoire/2018-19/Data/Menage/s16c_me_CIV2018.dta",
+   "rows": 22223,
+   "cols": 50,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "s16cq27": "16C.27.Quel prix unit envisagez-vous de le vendre selon l'unit\u00e9 de 16C.26?",
+    "s16cq29__6": "16C.29. 02 princ difflt\u00e9s renc vente prod: Prix faibles"
+   }
+  },
+  {
+   "rel": "Nigeria/2010-11/Data/Post Planting Wave 1/Community/sectc2_plantingw1.dta",
+   "rows": 23441,
+   "cols": 10,
+   "file_label": "Nigeria GHS-Panel Wave 1 PP Community Section 2 - Food Prices",
+   "n_price": 3,
+   "price_vars": {
+    "sc2q3a": "What is the price for [ITEM]? (Naira)",
+    "sc2q3b": "What is the price for [ITEM]? (Number of units)",
+    "sc2q3c": "What is the price for [ITEM]? (unit code)"
+   }
+  },
+  {
+   "rel": "Nigeria/2010-11/Data/Post Harvest Wave 1/Community/sectc8_harvestw1.dta",
+   "rows": 46471,
+   "cols": 8,
+   "file_label": "Nigeria GHS-Panel Wave 1 PH Community Section 8 - Food Prices",
+   "n_price": 1,
+   "price_vars": {
+    "sc8q2": "(3). what is the price for the item?   [naira]"
+   }
+  },
+  {
+   "rel": "Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect3b_harvestw5.dta",
+   "rows": 25662,
+   "cols": 119,
+   "file_label": "Nigeria GHS-Panel Wave 5 PH HH Section 3B - Migration Aspirations",
+   "n_price": 6,
+   "price_vars": {
+    "s3bq8d__17": "Unexpected shock?: UNUSUAL INCREASE IN PRICE OF INPUTS",
+    "s3bq8d__18": "Unexpected shock?: UNUSUAL FALL IN THE PRICE OF OUTPUT",
+    "s3bq8d__19": "Unexpected shock?: INCREASE IN PRICE OF MAJOR FOOD ITEMS CONSUMED",
+    "s3bq18a__17": "UNEXPECTED SHOCK?: UNUSUAL INCREASE IN PRICE OF INPUTS",
+    "s3bq18a__18": "UNEXPECTED SHOCK?: UNUSUAL FALL IN THE PRICE OF OUTPUT",
+    "s3bq18a__19": "UNEXPECTED SHOCK?: INCREASE IN PRICE OF MAJOR FOOD ITEMS CONSUMED"
+   }
+  },
+  {
+   "rel": "Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect10_harvestw5.dta",
+   "rows": 4715,
+   "cols": 54,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "s10q11a": "Did your HH face difficult times as a result of increased prices of agricultural",
+    "s10q11b": "How severe would you say the impact of increased prices (agricultural/livestock)",
+    "s10q15a": "Did your household face difficult times as a result of increasing food prices?",
+    "s10q15b": "How severe would you say the impact of increasing food prices was on your HH?"
+   }
+  },
+  {
+   "rel": "Nigeria/2023-24/Data/Post Harvest Wave 5/Community/sectc8_harvestw5.dta",
+   "rows": 56388,
+   "cols": 15,
+   "file_label": "Nigeria GHS-Panel Wave 5 PH Community Section C8 - Food Prices",
+   "n_price": 1,
+   "price_vars": {
+    "c8aq3": "What is the price for [ONE UNIT] of [ITEM]? (NAIRA)"
+   }
+  },
+  {
+   "rel": "Nigeria/2023-24/Data/Post Harvest Wave 5/Agriculture/secta12_harvestw5.dta",
+   "rows": 1860,
+   "cols": 219,
+   "file_label": "Nigeria GHS-Panel Wave 5 PH AG Section A12 - Agricultural Digital Farming",
+   "n_price": 4,
+   "price_vars": {
+    "s12q2__6": "Receive information or advice on: INFORMATION ON PRICES",
+    "s12q7__6": "What info came from the digital provider: INFORMATION ON PRICES",
+    "s12q13": "Did you think the price charged by the digital information provider(s) was:",
+    "s12q40": "Did you think the price of insurance was:"
+   }
+  },
+  {
+   "rel": "Nigeria/2023-24/Data/Post Planting Wave 5/Household/sect1d_plantingw5.dta",
+   "rows": 27421,
+   "cols": 58,
+   "file_label": "Nigeria GHS-Panel Wave 5 PP HH Section 1D - Migration Aspirations (Q1-Q8D)",
+   "n_price": 3,
+   "price_vars": {
+    "s1dq8d__17": "Unexpected shock?: Unusual increase in price of inputs",
+    "s1dq8d__18": "Unexpected shock?: unusual Fall in the price of output",
+    "s1dq8d__19": "Unexpected shock?: increase in price of major food items consumed"
+   }
+  },
+  {
+   "rel": "Nigeria/2023-24/Data/Post Planting Wave 5/Community/sectc2_plantingw5.dta",
+   "rows": 56277,
+   "cols": 17,
+   "file_label": "Nigeria GHS-Panel Wave 5 PP Community Section C2 - Food Prices",
+   "n_price": 2,
+   "price_vars": {
+    "c2q0a": "Location of main source of the food price data",
+    "c2q3": "What is the price for the item?"
+   }
+  },
+  {
+   "rel": "Nigeria/2023-24/Data/Post Planting Wave 5/Agriculture/sect12_plantingw5.dta",
+   "rows": 4771,
+   "cols": 222,
+   "file_label": "Nigeria GHS-Panel Wave 5 PP Ag Section 12 - Digital Farming Information",
+   "n_price": 7,
+   "price_vars": {
+    "s12q12": "Did you think the price charged by the digital information provider(s) was?",
+    "s12q20__2": "Did you receive: Information on buyers and/or prices for produce",
+    "s12q37__3": "Activities with digital seller?: Get info on seller location, stock, and price",
+    "s12q40": "The price charged by the digital seller to rent or purchase was:",
+    "s12q48__1": "Did you receive: Information on price for produce",
+    "s12q51__3": "Activities to acquire inputs/equipment?: Get info on seller location/stock/price",
+    "s12q68": "How was the price at which your household sold most of the products decided?"
+   }
+  },
+  {
+   "rel": "Nigeria/2012-13/Data/Post Planting Wave 2/Community/sectc2_plantingw2.dta",
+   "rows": 21405,
+   "cols": 9,
+   "file_label": "Nigeria GHS-Panel Wave 2 PP Community Section 2 - Food Prices",
+   "n_price": 1,
+   "price_vars": {
+    "c2q3": "What is the price for the item?   Naira"
+   }
+  },
+  {
+   "rel": "Nigeria/2012-13/Data/Post Harvest Wave 2/Community/sectc8_harvestw2.dta",
+   "rows": 45456,
+   "cols": 8,
+   "file_label": "Nigeria GHS-Panel Wave 2 PH Community Section 8 - Food Prices",
+   "n_price": 1,
+   "price_vars": {
+    "c8q2": "(3). WHAT IS THE PRICE FOR THE ITEM?   [NAIRA]"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Panel/Fisheries/fs_mod_e1.dta",
+   "rows": 104,
+   "cols": 54,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_e08d": "How much sold per week during the last HIGH fishing season? (Price MK #1)",
+    "fs_e08h": "How much sold per week during the last HIGH fishing season? (Price MK #2)"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Panel/Fisheries/fs_mod_j1.dta",
+   "rows": 94,
+   "cols": 29,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_j02d": "How much [SPECIES] purchased per week as part of trade business? (Price MK #1)",
+    "fs_j02h": "How much [SPECIES] purchased per week as part of trade business? (Price MK #2)",
+    "fs_j03d": "How much [SPECIES] sell per week as part of trade business? (Price MK#1)",
+    "fs_j03h": "How much [SPECIES] sell per week as part of trade business? (Price MK #2)"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Panel/Fisheries/fs_mod_f1.dta",
+   "rows": 125,
+   "cols": 27,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "fs_f02d": "How much [SPECIES] purchased per week as part of trade business? (Price MK #1)",
+    "fs_f02h": "How much [SPECIES] purchased per week as part of trade business? (Price MK #2)",
+    "fs_f03d": "How much [SPECIES] sell per week as part of trade business? (Price MK#1)",
+    "fs_f03h": "How much [SPECIES] sell per week as part of trade business? (Price MK #2)"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Panel/Fisheries/fs_mod_i1.dta",
+   "rows": 81,
+   "cols": 55,
+   "file_label": "None",
+   "n_price": 2,
+   "price_vars": {
+    "fs_i08d": "How much sold per week during the last LOW fishing season? (Price MK #1)",
+    "fs_i08h": "How much sold per week during the last LOW fishing season? (Price MK #2)"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Full_Sample/Community/com_ck.dta",
+   "rows": 39168,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "com_ck00b1": "What is the price for the item? (MK)",
+    "com_ck00b2": "What is the price for the item? (NUMBER OF UNITS)",
+    "com_ck00b3": "What is the price for the item? (UNIT CODES)",
+    "com_ck00b3_os": "What is the price for the item? (UNIT CODES/OTHER SPECIFY)"
+   }
+  },
+  {
+   "rel": "Malawi/2010-11/Data/Panel/Community/com_ck.dta",
+   "rows": 10404,
+   "cols": 7,
+   "file_label": "None",
+   "n_price": 4,
+   "price_vars": {
+    "com_ck00b1": "What is the price for the item? (MK)",
+    "com_ck00b2": "What is the price for the item? (NUMBER OF UNITS)",
+    "com_ck00b3": "What is the price for the item? (UNIT CODES)",
+    "com_ck00b3_os": "What is the price for the item? (UNIT CODES/OTHER SPECIFY)"
+   }
+  }
+ ]
+}
