@@ -114,21 +114,36 @@ impossible for "restrict one column".
 (CLAUDE.md:273 says so; the files are the =Pub_*Geovariables*= releases), so the
 14 GPS countries need NO restriction.
 
-*MY EARLIER CLAIM "nothing in the bucket needs unwinding" WAS WRONG.*  Measured:
-23 waves are =PROVENANCE_SOURCE: external=, and they split:
-| GhanaLSS x6 (1987-88..2016-17) | GSS NADA: /"will not be redistributed or sold ... without the written agreement of the National Data Archive"/ -- ALREADY IN THE BUCKET |
-| KenyaLPS x4 + GhanaSPS 2017-18 | CC0, fine |
+*The audit: nothing needs unwinding after all* (I claimed that, then withdrew
+it on a bad distinction, then re-confirmed it -- the middle step is recorded
+here so the reasoning is not repeated).  23 waves are
+=PROVENANCE_SOURCE: external=:
+| GhanaLSS x6, Rwanda x2 | national NADA instances (=statsghana.gov.gh=, =microdata.statistics.gov.rw=) |
+| KenyaLPS x4 + GhanaSPS 2017-18 | CC0 (Harvard Dataverse) |
 | GhanaSPS 2013-14, KenyaLPS 2003-2005, Rwanda 2000-01, Rwanda 2005-06 | *NO LICENSE.org at all* |
-| EthiopiaRHS x8 | no clear term found; needs reading |
+| EthiopiaRHS x8 | IFPRI/Addis Ababa via Dataverse; no clear term found -- needs reading |
 
-*Why the API-key argument fails here*: our cache is gated on a WB Microdata API
-key, which discharges the WB boilerplate (63 of 112 licences carry it -- see the
-#140 comment) because a reader could get the file from the WB anyway.  That
-argument is PROVENANCE-SPECIFIC: a WB key does not entitle anyone to Ghana
-Statistical Service data.  The gate must match the source.  And
-=PROVENANCE_SOURCE= records where we GOT it, not what we may DO with it, so it
-cannot be borrowed as the permission field -- it must be its own field, naming
-the authority.
+I briefly argued the GSS/Rwanda waves were exposed because our cache is gated on
+a *WB* key while their terms name a different authority.  *EL corrected this and
+he is right*: GSS runs the same NADA software as the WB, with the same
+self-service API-key generation -- measured, *112 of the catalog URLs are
+NADA-style*, WB and GSS and Rwanda among them; only the 13 =doi.org= (Dataverse)
+ones differ.  So the population that can obtain GSS data is the same population
+that can obtain WB data, and the six GhanaLSS waves are symmetric with the 63 WB
+boilerplate licences.  Accept both or reject both; we accept both.
+
+*Design consequence*: the permission record's key field is the ACCESS MECHANISM,
+not the authority --
+- =self-service= (NADA registration, or a public licence like CC0) -> discharged
+  by the existing WB-API-key gate;
+- =bespoke-agreement= (Novissi; un-displaced GPS) -> NOT discharged; this is the
+  only category needing (A)'s default-deny.
+=PROVENANCE_SOURCE= still cannot be borrowed for this: it records where we GOT a
+wave, not what we may DO with it (6 GhanaLSS waves are =external= yet fine).
+
+What remains is RECORDING, not moving: 4 waves have no =LICENSE.org=, and
+EthiopiaRHS x8 have no clear term.  Only GhanaSPS 2013-14 is substantively
+unclear, and that is already #140's pre-release vintage question.
 
 * EL decisions outstanding
 0. *The GhanaLSS x6 GSS terms* -- is there a written agreement already (just not
