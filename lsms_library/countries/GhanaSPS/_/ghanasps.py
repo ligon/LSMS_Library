@@ -676,7 +676,7 @@ def livestock(df):
 # 42.8M GHS (a quantity x unit-price keying error) and is delivered as is.
 from pathlib import Path
 
-from lsms_library.local_tools import all_dfs_from_orgfile, df_from_orgfile
+from lsms_library.local_tools import all_dfs_from_orgfile, df_from_orgfile, format_id
 
 _CROP_MEASURES = ('Quantity', 'Quantity_sold', 'Value_sold')
 _CROP_COLUMNS = ('Quantity', 'Quantity_sold', 'Value_sold', 'harvest_month')
@@ -941,3 +941,268 @@ def crop_production(df):
     flat['harvest_month'] = flat['harvest_month'].astype('string')
     out = flat.set_index(list(_CROP_INDEX))[list(_CROP_COLUMNS)]
     return out
+
+
+# ---------------------------------------------------------------------------
+# plot_labor (GH #729, #140) -- shared vocabulary + arithmetic for the three
+# wave scripts.  There is NO country-level df_edit hook: every wave is a
+# script (the `source` axis is a melt across column GROUPS, which
+# df_data_grabber cannot express), so the shared code lives here as plain
+# helpers rather than as a hook the framework calls.
+# ---------------------------------------------------------------------------
+
+_LABOR_INDEX = ('t', 'i', 'plot_id', 'season', 'stage', 'source')
+_LABOR_COLUMNS = ('PersonDays', 'Hours', 'WageRateMen', 'WageRateWomen',
+                  'WageRateChildren', 'WageUnit')
+
+#: The 2013-14 / 2017-18 recall period, verbatim from Part M: "how much time
+#: you and others spent working on your farms in the last farming season"
+#: (2013-14) / "in the last farming season (2017)" (2017-18).  Deliberately
+#: NOT `major` -- neither instrument names the season -- and deliberately not
+#: crop_production's `annual`, which is that table's own explicit 12-month
+#: recall (N5) and a different question in the same wave.
+LABOR_SEASON_LATER = 'last'
+
+#: 2009-10 stage -> the (major, minor) S4AIX file numbers and the A-number
+#: range each file's labour cells must carry.  The stage names come from the
+#: questionnaire's eight section headers (quoted in full in
+#: _/categorical_mapping.org); the A-numbers come from the .dta variable
+#: labels, so the mapping is ASSERTED against the data rather than assumed.
+_W1_STAGE_BLOCKS = (
+    ('land_preparation', 1, 5, (290, 298), (327, 335)),
+    ('field_management', 2, 6, (299, 307), (336, 344)),
+    ('harvesting',       3, 7, (308, 316), (345, 353)),
+    ('post_harvest',     4, 8, (317, 325), (354, 362)),
+)
+
+#: 2009-10 source -> the offset of its (men, women, children) question triple
+#: from the block's first A-number.  A290/A291/A292 casual, A293/A294/A295
+#: permanent, A296/A297/A298 family -- and the same 0/3/6 offsets in every
+#: one of the eight blocks.
+_W1_SOURCE_OFFSETS = (('casual', 0), ('permanent', 3), ('family', 6))
+
+#: The three per-question cells: .1 number of days, .2 average hours per day,
+#: .3 average number of workers.
+_W1_CELL_SUFFIXES = ('i', 'ii', 'iii')
+
+#: 2013-14 / 2017-18 source -> (worker-count column, days-per-worker column)
+#: pairs by sex.  `self` is special: `personaldays` is the respondent alone,
+#: so it is already person-days and has no worker count.
+_LATER_SOURCE_COLUMNS = {
+    'family':   (('familywomen', 'familywomendays'), ('familymen', 'familymendays')),
+    'communal': (('communalwomen', 'communalwomendays'), ('communalmen', 'communalmendays')),
+    'hired':    (('hiredwomen', 'hiredwomendays'), ('hiredmen', 'hiredmendays')),
+    'other':    (('otherwomen', 'otherwomendays'), ('othermen', 'othermendays')),
+}
+
+#: The source that carries the hired-labour pay block.
+LABOR_HIRED_SOURCE = 'hired'
+
+#: 2017-18's `hiredpayunit` ships as a bare numeric code with NO value label
+#: (that wave's .dta carries value labels for `cultivated` and `interviewedid`
+#: only), so the closed answers have to come from the instrument itself --
+#: M196 "Does [Name] pay those amounts per day or per acre?  1 Per day
+#: 2 Per week  3 Per month  4 Per plot  5 Per acre  6 Per pole  7 Per rope
+#: -666 Other (specify)".  2013-14 ships the same list AS a value label
+#: (`thiredpayunit`), which is why only this wave needs the table.  Reading
+#: the codes as strings would silently leave WageUnit 100% null.
+_WAGE_UNIT_CODES = {1: 'Per day', 2: 'Per week', 3: 'Per month',
+                    4: 'Per plot', 5: 'Per acre', 6: 'Per pole',
+                    7: 'Per rope', -666: 'Other (specify)'}
+
+
+def wage_unit_labels(s, unit_map):
+    """`hiredpayunit` -> a WageUnit Preferred Label, labelled or coded.
+
+    2013-14 delivers the value label ('Per day'); 2017-18 delivers the bare
+    code (1.0), which is decoded through _WAGE_UNIT_CODES first.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        codes = pd.to_numeric(s, errors='coerce')
+        raw = codes.map(lambda c: _WAGE_UNIT_CODES.get(int(c)) if pd.notna(c) else pd.NA)
+        unknown = sorted({int(c) for c in codes.dropna().unique()
+                          if int(c) not in _WAGE_UNIT_CODES})
+        assert not unknown, f'hiredpayunit codes not in the instrument list: {unknown}'
+    else:
+        raw = s.astype(str).str.strip().replace({'': pd.NA, 'nan': pd.NA})
+    return raw.map(lambda x: unit_map.get(x, pd.NA) if pd.notna(x) else pd.NA)
+
+
+def labor_stage_map() -> dict:
+    """`harmonize_stage` (Alternate Spelling -> Preferred Label)."""
+    tbl = all_dfs_from_orgfile(_country_dir() / 'categorical_mapping.org')['harmonize_stage']
+    return dict(zip(tbl['Alternate Spelling'].astype(str).str.strip(),
+                    tbl['Preferred Label'].astype(str).str.strip()))
+
+
+def labor_source_map() -> dict:
+    """`harmonize_labor_source` (Alternate Spelling -> Preferred Label)."""
+    tbl = all_dfs_from_orgfile(_country_dir() / 'categorical_mapping.org')['harmonize_labor_source']
+    return dict(zip(tbl['Alternate Spelling'].astype(str).str.strip(),
+                    tbl['Preferred Label'].astype(str).str.strip()))
+
+
+def wage_unit_map() -> dict:
+    """`WageUnit` (Alternate Spelling -> Preferred Label)."""
+    tbl = all_dfs_from_orgfile(_country_dir() / 'categorical_mapping.org')['WageUnit']
+    return dict(zip(tbl['Alternate Spelling'].astype(str).str.strip(),
+                    tbl['Preferred Label'].astype(str).str.strip()))
+
+
+def drop_labor_sentinels(s):
+    """A negative day / hour / worker / rate cell is a sentinel, not a datum.
+
+    2009-10 uses -10 (90 cells) and -1 (34 cells) across the eight S4AIX
+    files; 2013-14 uses -1 in its three pay cells (24 / 591 / 832).  The
+    2009-10 CODE_BOOK documents neither, so they are read as missing and
+    counted rather than guessed at.
+    """
+    s = pd.to_numeric(s, errors='coerce')
+    return s.where(s >= 0)
+
+
+def finish_labor_frame(flat, t):
+    """Common tail for the three wave scripts: keep rule, dtypes, index.
+
+    The keep rule is ``PersonDays > 0``.  It is forced by the two later waves
+    having INCOMPATIBLE fill patterns for a stage nobody worked: 2013-14 ships
+    a full 7-stages-x-every-plot grid with an `any` Yes/No screener, while
+    2017-18 ships only the stages the plot actually did (~3.85 rows per plot).
+    Keeping zero / null rows would emit 2013-14's "No" rows and no 2017-18
+    equivalent -- a pure artefact of how the two extracts were exported.
+    """
+    n_in = len(flat)
+    kept = flat['PersonDays'] > 0
+    n_zero = int((flat['PersonDays'] == 0).sum())
+    n_null = int(flat['PersonDays'].isna().sum())
+    flat = flat[kept].copy()
+    print(f'{t}: {n_in:,} candidate (plot, season, stage, source) cells -> '
+          f'{len(flat):,} kept; dropped {n_zero:,} with PersonDays == 0 and '
+          f'{n_null:,} with no reported person-days')
+    for c in ('PersonDays', 'Hours', 'WageRateMen', 'WageRateWomen', 'WageRateChildren'):
+        if c not in flat.columns:
+            flat[c] = np.nan
+        flat[c] = pd.to_numeric(flat[c], errors='coerce').astype(float)
+    if 'WageUnit' not in flat.columns:
+        flat['WageUnit'] = pd.NA
+    flat['WageUnit'] = flat['WageUnit'].astype('string')
+    out = flat.set_index(list(_LABOR_INDEX))[list(_LABOR_COLUMNS)].sort_index()
+    assert len(out) > 0, f'plot_labor produced no rows for {t}'
+    assert out.index.is_unique, f'Non-unique plot_labor index for {t}'
+    assert not out.index.to_frame().isna().any().any(), f'Null index level in plot_labor for {t}'
+    return out
+
+
+def drop_nonpositive_rate(s):
+    """A reported hired-labour pay rate of <= 0 is not a rate.
+
+    2013-14 fills the three "How much on average did you pay each man / woman
+    / child" cells for every plot that paid in cash, using -1 and 0 where the
+    category does not apply: 591 of 1,811 woman cells are -1 and 701 are 0,
+    but only 449 plots hired any woman at all.  2017-18 has no -1 but 38 man
+    and 4 woman zeros.  Zero is not an answer to "how much did you pay", so
+    both are read as missing; the count is printed by each wave script.
+    """
+    s = pd.to_numeric(s, errors='coerce')
+    return s.where(s > 0)
+
+
+def later_wave_labor(stage_df, stage_col, pay_df, pay_per_stage, t,
+                     source_map, stage_map, unit_map):
+    """2013-14 / 2017-18 plot_labor: melt the stage grid onto the source axis.
+
+    *stage_df* is the plot-x-stage file keyed (FPrimary, plotid, *stage_col*);
+    *pay_df* carries the hired-pay block, keyed on the PLOT when
+    *pay_per_stage* is False (2013-14's plot-level 04m_aglabour) and on the
+    plot-stage row when it is True (2017-18, where the block is folded into
+    the stage file and genuinely varies within a plot).
+
+    PERSON-DAYS ARE NOT THE ``*days`` COLUMNS.  Part M asks the worker count
+    and the per-worker duration as separate questions -- "Approximately how
+    many hired laborers WHO ARE MEN worked on this plot ...?  Number of
+    people" then "Approximately how many days ON AVERAGE did EACH OF the
+    hired laborers WHO ARE MEN work on this plot ...?  Number of days" -- so
+    PersonDays = workers x days, summed over the two sexes of ONE question.
+    Reading ``hiredmendays`` as person-days undercounts by the mean worker
+    count (~3.4 hired men per plot-stage in 2013-14).  ``personaldays`` is the
+    respondent alone and IS already person-days.
+    """
+    def _norm_stage(s):
+        s = s.astype(str).str.strip()
+        return s.map(lambda x: stage_map.get(x, x if x else pd.NA))
+
+    pieces = []
+    for source, sexes in _LATER_SOURCE_COLUMNS.items():
+        person_days = None
+        for wcol, dcol in sexes:
+            pd_g = drop_labor_sentinels(stage_df[wcol]) * drop_labor_sentinels(stage_df[dcol])
+            person_days = pd_g if person_days is None else person_days.add(pd_g, fill_value=0)
+        pieces.append(pd.DataFrame({
+            'i': stage_df['FPrimary'].to_numpy(),
+            'plot_id': stage_df['plotid'].to_numpy(),
+            'stage': _norm_stage(stage_df[stage_col]).to_numpy(),
+            'source': source_map.get(source, source),
+            'PersonDays': person_days.to_numpy(),
+        }))
+    pieces.append(pd.DataFrame({
+        'i': stage_df['FPrimary'].to_numpy(),
+        'plot_id': stage_df['plotid'].to_numpy(),
+        'stage': _norm_stage(stage_df[stage_col]).to_numpy(),
+        'source': 'self',
+        'PersonDays': drop_labor_sentinels(stage_df['personaldays']).to_numpy(),
+    }))
+    flat = pd.concat(pieces, ignore_index=True)
+
+    n_nullstage = int(flat['stage'].isna().sum())
+    if n_nullstage:
+        print(f'{t}: dropped {n_nullstage:,} candidate cells whose stage is blank '
+              f'(the uncultivated-plot placeholder rows)')
+        flat = flat[flat['stage'].notna()].copy()
+    unmapped = sorted(set(flat['stage']) - set(stage_map.values()))
+    assert not unmapped, f'{t}: stage labels missing from harmonize_stage: {unmapped}'
+
+    # --- the hired-pay block ------------------------------------------------
+    rate_cols = {'WageRateMen': 'hiredavgpayman',
+                 'WageRateWomen': 'hiredavgpaywoman',
+                 'WageRateChildren': 'hiredavepaychild'}
+    pay = pd.DataFrame({
+        'i': pay_df['FPrimary'].to_numpy(),
+        'plot_id': pay_df['plotid'].to_numpy(),
+    })
+    if pay_per_stage:
+        pay['stage'] = _norm_stage(pay_df[stage_col]).to_numpy()
+    dropped = {}
+    for target, src in rate_cols.items():
+        if src in pay_df.columns:
+            raw = pd.to_numeric(pay_df[src], errors='coerce')
+            pay[target] = drop_nonpositive_rate(raw).to_numpy()
+            dropped[target] = int((raw.notna() & pay[target].isna().to_numpy()).sum())
+        else:
+            pay[target] = np.nan
+            dropped[target] = 'not asked in this wave'
+    pay['WageUnit'] = wage_unit_labels(pay_df['hiredpayunit'], unit_map).to_numpy()
+    n_unit_lost = int((pay_df['hiredpayunit'].notna().to_numpy()
+                       & pd.isna(pay['WageUnit']).to_numpy()).sum())
+    assert n_unit_lost == 0, (
+        f'{t}: {n_unit_lost} reported hiredpayunit values did not map to a '
+        f'WageUnit Preferred Label')
+    print(f'{t}: non-positive pay cells read as missing: {dropped}')
+
+    keys = ['i', 'plot_id'] + (['stage'] if pay_per_stage else [])
+    pay = pay.dropna(subset=keys)
+    assert not pay.duplicated(keys).any(), (
+        f'{t}: the hired-pay block is not unique on {keys}')
+    pay = pay[keys + list(rate_cols) + ['WageUnit']]
+
+    hired = flat['source'] == LABOR_HIRED_SOURCE
+    merged = flat.loc[hired, keys].merge(pay, on=keys, how='left')
+    assert len(merged) == int(hired.sum()), f'{t}: the pay join changed the row count'
+    for c in list(rate_cols) + ['WageUnit']:
+        flat[c] = pd.NA
+        flat.loc[hired, c] = merged[c].to_numpy()
+
+    flat['t'] = t
+    flat['season'] = LABOR_SEASON_LATER
+    flat['i'] = flat['i'].astype(str)
+    flat['plot_id'] = flat['plot_id'].map(format_id)
+    return flat

@@ -599,3 +599,204 @@ Data Scheme:
         optional: true
     harvest_month: str
     materialize: make
+
+  plot_labor:
+    # Plot-stage labour, all three waves, at the survey's own grain
+    # (t, i, plot_id, season, stage, source).  `v` is NOT declared and must
+    # NOT be -- `sample` is wired for every wave and _join_v_from_sample()
+    # attaches it at API time (plot_labor is in neither exclusion list of
+    # lsms_library/data_info.yml: it is absent from `index_info`, whose
+    # comment says the plot-level ag features are held back until their
+    # per-country index NAMES converge, and absent from `skip_extra`).
+    #
+    # ALL THREE WAVES ARE WAVE SCRIPTS ({wave}/_/plot_labor.py).  The `source`
+    # axis is a melt across column GROUPS -- five (workers, days-per-worker)
+    # column pairs in the later waves, nine (days, hours, workers) cells in
+    # 2009-10 -- which df_data_grabber cannot express.  Shared vocabulary and
+    # arithmetic live in _/ghanasps.py as plain helpers; there is no
+    # country-level df_edit hook, because there is no YAML wave to hook.  As
+    # with crop_production, `materialize: make` means LSMS_BUILD_BACKEND=make
+    # would route to a country-level target that does not exist; nothing in
+    # tests/ uses that backend.
+    #
+    # SOURCES -- module 4 is agriculture BY CONTENT in every wave:
+    #
+    #   2009-10  S4AIX1..8      8 files: 4 stages x 2 seasons, 5,686 plots each
+    #   2013-14  04m_aglabourquestions (32,851 = 7 stages x 4,693 plots)
+    #            + 04m_aglabour        ( 4,693, the PLOT-level hired-pay block)
+    #   2017-18  04m_aglabourquestions (20,663; done stages only, pay folded in)
+    #
+    # STAGE.  Nine values, and the count is the honest one.  2009-10 asks the
+    # battery FOUR times per season; the later waves ask it SEVEN times, and
+    # the later seven are not a refinement of the same four -- 2009-10's
+    # blocks are strictly COARSER (land_preparation covers clearing +
+    # ploughing + planting; field_management covers chemical_application +
+    # weeding; harvesting and post_harvest coincide).  Folding the later waves
+    # onto four would throw away grain the survey collected, and 2009-10
+    # cannot be split into seven without inventing data.  Both vocabularies
+    # are kept and the containment is tabulated in _/categorical_mapping.org
+    # (harmonize_stage) so a consumer can fold 7 -> 4 by summing PersonDays.
+    # Same shape as this country's Tenure.sharecropped_in and
+    # crop_production's `Cocoyam Leaves` -- an instrument artefact, recorded
+    # rather than smoothed.
+    #
+    # THE 2009-10 STAGE ASSIGNMENT IS THE RISKIEST THING IN THIS TABLE, and
+    # it is asserted rather than assumed.  The four stage files' variable
+    # label TEXT is identical ("Number of days casual labor provided by men",
+    # ...), but each label is PREFIXED WITH ITS QUESTION NUMBER -- S4AIX1
+    # carries A290..A298, S4AIX2 A299..A307, S4AIX3 A308..A316, S4AIX4
+    # A317..A325, and A327..A362 for the minor-season four -- and the
+    # questionnaire's eight section headers name the stage of each A-range
+    # (quoted verbatim in _/categorical_mapping.org).  2009-10/_/plot_labor.py
+    # reads each file's own labels and FAILS THE BUILD if the A-numbers are
+    # not the ones its stage claims.  Season is anchored twice over: S4AIX1's
+    # A289 label says "MAJOR season of dominant crop" and S4AIX5's A326 says
+    # "MINOR", and the month distributions agree (A289.1 clusters Feb-Jun,
+    # A326.1 Jul-Oct).
+    #
+    # THE 2017-18 `stageid` TRAP.  It looks like 2013-14's `stagenum` and is
+    # not: `stagenum` IS the stage (a full 7 x 4,693 grid, 4,693 rows per
+    # value), while `stageid` is the ORDINAL POSITION of the stage in the
+    # plot's list of stages actually done -- stageid == 1 is Clearing on
+    # 2,285 rows, Planting on 1,130, Chemical application on 460, Harvesting
+    # on 42, ...  Reading it as a stage code would mislabel ~60% of wave-3
+    # rows with NOTHING to catch it: both are small integers, the index stays
+    # unique and every sanity check passes.  Both scripts key on the stage
+    # NAME and each asserts its own file's shape.
+    #
+    # SEASON.  2009-10 is genuinely two-season: major (S4AIX1..4) and minor
+    # (S4AIX5..8).  2013-14 and 2017-18 ask about "the last farming season"
+    # ("the last farming season (2017)" in wave 3) and never name which, so
+    # their constant is `last` -- deliberately NOT `major` (unnamed by the
+    # instrument) and deliberately NOT crop_production's `annual`, which is
+    # that table's own explicit 12-month recall (N5, "give the total quantity
+    # which has been harvested over the last 12 months") and a different
+    # question in the same interview.
+    #
+    # SOURCE.  Five later-wave values (self / family / communal / hired /
+    # other, the Part M "Who worked on this plot ...?" options) and three
+    # 2009-10 values (casual / permanent / family).  Not folded, for the
+    # stage reason: casual + permanent = the later waves' `hired` (both are
+    # non-household paid labour; 2009-10 splits by contract length and the
+    # later waves do not ask), and 2009-10's `family` is BROADER than the
+    # later waves' -- that instrument has no "yourself" question, so the
+    # respondent's own days have nowhere else to go, and A362's own wording
+    # is "How much family labor is worked by children? (including exchanged
+    # labor)", i.e. it also absorbs what the later waves call communal.  Both
+    # containments are tabulated in harmonize_labor_source.
+    #
+    # PERSONDAYS is within-question arithmetic (Uganda's convention), and the
+    # multiplication differs by wave because the instruments do:
+    #   2009-10  sum over men / women / children of (A29x.1 "# of days") x
+    #            (A29x.3 "Average # of workers") -- the .1 and .3 cells of ONE
+    #            question.  A group needs both cells; the row is NaN only if
+    #            no group has both.
+    #   later    sum over women / men of (M5/M6-style "Number of people") x
+    #            ("how many days ON AVERAGE did EACH OF ... Number of days").
+    #            THE `*days` COLUMNS ARE PER-WORKER DURATIONS: reading them as
+    #            person-days undercounts by the worker count (mean 3.4 hired
+    #            men per plot-stage in 2013-14).  `personaldays` is the
+    #            respondent alone and is already person-days -> the `self` row.
+    # The worker totals corroborate the reading: familyworkers ==
+    # familywomen + familymen on all 8,954 / 11,463 rows that report them,
+    # and likewise for communal, hired and other.
+    #
+    # HOURS is 2009-10 ONLY (A29x.2 "Average hours per day worked by ...").
+    # Delivered as the person-day-weighted mean of the three sex groups'
+    # hours cells -- the number that multiplies PersonDays to give
+    # person-hours.  A group whose hours cell is null is excluded from BOTH
+    # the numerator and the denominator.  The later waves never ask it.
+    #
+    # WAGE IS A RATE HERE, NOT CASH PAID -- so there is deliberately NO
+    # `Wage` column.  Uganda's and Nigeria's plot_labor.Wage is the cash
+    # actually paid to hired labour (Nigeria: "sum over man/woman/child of
+    # (reported daily wage x hired days)"); GhanaSPS asks "How much on
+    # average did [Name] pay each man as hired labor during the last farming
+    # season?" plus "Does [Name] pay those amounts per day or per acre?".
+    # Those are not the same quantity and must not share a column name.
+    #   * THREE rate columns, not one.  The man / woman / child rates are
+    #     three separately reported cells, and no weight exists that could
+    #     combine them -- least of all for the 235 + 415 `Per acre` and
+    #     84 + 187 `Per plot` rows, where the rate is a piece rate for the
+    #     job and not a price of a person-day at all.  Combining them is a
+    #     transformation; core does not aggregate.
+    #   * 2017-18 DROPS the child rate -> WageRateChildren is null in that
+    #     wave.  Hence `optional: true` on all three (and on Hours, WageUnit)
+    #     -- the Site B null-read guard fires on a REQUIRED column that is
+    #     100% null in any wave's t slice.
+    #   * A rate of <= 0 is not a rate.  2013-14 fills all three cells for
+    #     every cash-paying plot and uses -1 / 0 for "no such worker" (591 -1
+    #     and 701 zeros among 1,811 woman cells, against 449 plots that hired
+    #     any woman); 2017-18 has no -1 but 38 man and 4 woman zeros.  Read as
+    #     missing, counted on stdout (81 / 1,292 / 1,764 cells in 2013-14,
+    #     38 / 4 in 2017-18).
+    #   * GRAIN DIFFERS BETWEEN THE LATER WAVES, and that is the data, not a
+    #     choice: 2013-14's block is asked and stored once per PLOT (M190-M196
+    #     under "IF M2=4 OR M29=4 OR ..."), so its rate is stamped on all
+    #     seven of the plot's stage rows; 2017-18's instrument also prints it
+    #     once per plot but the shipped file stores it per stage row and it
+    #     genuinely varies -- 620 of 5,366 plots carry two or more distinct
+    #     man rates -- so it is delivered at stage grain.
+    #   * WageUnit reuses plot_features' AreaUnit spellings for its four area
+    #     members (Acres / Poles / Ropes / Plot), so a per-area rate can be
+    #     converted with plot_features().Area without a second vocabulary.
+    #     The `Other` free text is not decoded (some of it is a period, some
+    #     an area, some neither: "per tank of spraying machine", "per 3
+    #     hours", "Per bottle", "the whole farm").
+    #   * `monetary: true` on the three rates is what makes currency.py
+    #     attach GHS: _monetary_columns() unions _DEFAULT_MONETARY, the
+    #     canonical Columns block AND this file (currency.py docstring names
+    #     a country's data_scheme.yml as the extension point), and
+    #     attach_currency is table-level.  NOTE a real gap, reported not
+    #     fixed: _all_monetary_columns() -- used only by the standalone
+    #     lsms_library.conversion.convert, which sees a frame but not a table
+    #     name -- does NOT read country schemes, so it would not scale these
+    #     columns.  Closing it means editing lsms_library/currency.py or the
+    #     canonical data_info.yml.
+    #
+    # KEEP RULE: PersonDays > 0.  Forced by the two later waves' incompatible
+    # fill patterns for a stage nobody worked -- 2013-14 ships a full
+    # 7-stages-x-every-plot grid with an `any` Yes/No screener, 2017-18 ships
+    # only the stages actually done (mean 3.85 rows per plot).  Keeping zero
+    # or null rows would emit 2013-14's "No" rows with no 2017-18 equivalent,
+    # a pure artefact of how the two extracts were exported.  Counted on
+    # stdout: 515 / 85 / 43 zero cells and 105,085 / 136,296 / 68,923
+    # never-reported cells dropped.
+    #
+    # KEY: (hhno, plot_no) in 2009-10, (FPrimary, plotid) later -- exactly as
+    # plot_features and crop_production key it, so (t, i, plot_id) joins those
+    # tables.  2009-10's eight files share ONE key set: 5,686 non-null keys,
+    # identical across all eight, with 15-17 null-plot rows in S4AIX2..8 (none
+    # in S4AIX1) dropped.  As recorded for plot_features, plot_id tracks the
+    # same land 2009-10 -> 2013-14 but NOT 2013-14 -> 2017-18.
+    #
+    # NOT declared, deliberately: the supervision block (communalsupervision /
+    # hiredsupervision and the who-supervised person ids -- a household-member
+    # reference, not labour input); the food provided to communal and hired
+    # labour (commlabfoodcost / hiredfoodcost / howmanyfed -- an in-kind cost
+    # at plot grain with no canonical home); hiredhowpay (cash / in-kind /
+    # both) and hiredinkindpay; the whoworked multi-select flags (redundant
+    # with which source rows carry person-days); 2009-10's A289 / A326 season
+    # months (crop_production already delivers the ending month as
+    # harvest_month).
+    index: (t, i, plot_id, season, stage, source)
+    PersonDays: float
+    Hours:
+        type: float
+        optional: true
+    WageRateMen:
+        type: float
+        optional: true
+        monetary: true
+    WageRateWomen:
+        type: float
+        optional: true
+        monetary: true
+    WageRateChildren:
+        type: float
+        optional: true
+        monetary: true
+    WageUnit:
+        type: str
+        optional: true
+    materialize: make

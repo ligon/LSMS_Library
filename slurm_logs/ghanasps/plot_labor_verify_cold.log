@@ -1,0 +1,286 @@
+2009-10 major/land_preparation/casual: 25 sex-group cells report days with no worker count -> no person-days
+2009-10 major/land_preparation/permanent: 7 sex-group cells report days with no worker count -> no person-days
+2009-10 major/land_preparation/family: 21 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/land_preparation/family: 2 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/land_preparation: dropped 16 rows of S4AIX5 with a null plot number
+2009-10 major/field_management/casual: 15 sex-group cells report days with no worker count -> no person-days
+2009-10 major/field_management/permanent: 6 sex-group cells report days with no worker count -> no person-days
+2009-10 major/field_management/family: 23 sex-group cells report days with no worker count -> no person-days
+2009-10 major/field_management: dropped 15 rows of S4AIX2 with a null plot number
+2009-10 minor/field_management/permanent: 2 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/field_management/family: 2 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/field_management: dropped 16 rows of S4AIX6 with a null plot number
+2009-10 major/harvesting/casual: 13 sex-group cells report days with no worker count -> no person-days
+2009-10 major/harvesting/permanent: 9 sex-group cells report days with no worker count -> no person-days
+2009-10 major/harvesting/family: 23 sex-group cells report days with no worker count -> no person-days
+2009-10 major/harvesting: dropped 16 rows of S4AIX3 with a null plot number
+2009-10 minor/harvesting/casual: 1 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/harvesting/permanent: 2 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/harvesting/family: 8 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/harvesting: dropped 17 rows of S4AIX7 with a null plot number
+2009-10 major/post_harvest/casual: 15 sex-group cells report days with no worker count -> no person-days
+2009-10 major/post_harvest/permanent: 7 sex-group cells report days with no worker count -> no person-days
+2009-10 major/post_harvest/family: 15 sex-group cells report days with no worker count -> no person-days
+2009-10 major/post_harvest: dropped 15 rows of S4AIX4 with a null plot number
+2009-10 minor/post_harvest/permanent: 1 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/post_harvest/family: 5 sex-group cells report days with no worker count -> no person-days
+2009-10 minor/post_harvest: dropped 15 rows of S4AIX8 with a null plot number
+2009-10: 136,464 candidate (plot, season, stage, source) cells -> 30,864 kept; dropped 515 with PersonDays == 0 and 105,085 with no reported person-days
+2009-10: rows per (season, stage): {('major', 'field_management'): 6761, ('major', 'harvesting'): 5949, ('major', 'land_preparation'): 6866, ('major', 'post_harvest'): 4652, ('minor', 'field_management'): 2133, ('minor', 'harvesting'): 1709, ('minor', 'land_preparation'): 1511, ('minor', 'post_harvest'): 1283}
+2009-10: PersonDays sum by source: {'casual': 223970.0, 'family': 551779.0, 'permanent': 91501.0}
+2013-14: non-positive pay cells read as missing: {'WageRateMen': 81, 'WageRateWomen': 1292, 'WageRateChildren': 1764}
+2013-14: 164,255 candidate (plot, season, stage, source) cells -> 27,874 kept; dropped 85 with PersonDays == 0 and 136,296 with no reported person-days
+2013-14: rows per stage: {'chemical_application': 2449, 'clearing_and_land_preparation': 3434, 'harvesting': 5957, 'planting': 5510, 'ploughing': 1675, 'post_harvest': 3763, 'weeding': 5086}
+2013-14: PersonDays sum by source: {'communal': 33070.0, 'family': 217516.0, 'hired': 93086.0, 'other': 4573.0, 'self': 137086.0}
+2017-18: dropped 3,200 candidate cells whose stage is blank (the uncultivated-plot placeholder rows)
+2017-18: non-positive pay cells read as missing: {'WageRateMen': 38, 'WageRateWomen': 4, 'WageRateChildren': 'not asked in this wave'}
+2017-18: 100,115 candidate (plot, season, stage, source) cells -> 31,149 kept; dropped 43 with PersonDays == 0 and 68,923 with no reported person-days
+2017-18: rows per stage: {'chemical_application': 3962, 'clearing_and_land_preparation': 3176, 'harvesting': 7116, 'planting': 6384, 'ploughing': 1267, 'post_harvest': 3550, 'weeding': 5694}
+2017-18: PersonDays sum by source: {'communal': 19546.0, 'family': 248438.0, 'hired': 72264.0, 'other': 2097.0, 'self': 117204.0}
+plot_labor: (89887, 6), index ['i', 't', 'v', 'plot_id', 'season', 'stage', 'source']
+columns: ['PersonDays', 'Hours', 'WageRateMen', 'WageRateWomen', 'WageRateChildren', 'WageUnit'] ['Float64', 'float64', 'float64', 'float64', 'float64', 'string']
+GrainCollapseWarnings during the build: 0
+other warnings: 19
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2009-10/_/crop_production.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2009-10/_/food_acquired.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2009-10/_/mapping.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2009-10/_/other_expenditures.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2009-10/_/plot_labor.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/_/food_acquired.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/_/ghanasps.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2013-14/_/food_acquired.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2013-14/_/mapping.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2013-14/_/other_expenditures.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2013-14/_/plot_labor.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2017-18/_/food_acquired.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2017-18/_/mapping.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2017-18/_/other_expenditures.py' mode='r' encoding='utf-8'>
+   [ResourceWarning] unclosed file <_io.TextIOWrapper name='/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-labor/lsms_library/countries/GhanaSPS/2017-18/_/plot_labor.py' mode='r' encoding='utf-8'>
+   [NullReadWarning] GhanaSPS/sample: required declared column 'Rural' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does no
+   [NullReadWarning] GhanaSPS/sample: required declared column 'panel_weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml 
+   [NullReadWarning] GhanaSPS/sample: required declared column 'strata' is 100% NULL in wave(s) [2013-14] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire t
+   [NullReadWarning] GhanaSPS/sample: required declared column 'weight' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does n
+
+==============================================================================
+CHECK 1 -- rows; distinct stage / source / season, per wave
+==============================================================================
+2009-10: 30,864 rows | season=['major', 'minor'] | stage=['field_management', 'harvesting', 'land_preparation', 'post_harvest'] | source=['casual', 'family', 'permanent']
+2013-14: 27,874 rows | season=['last'] | stage=['chemical_application', 'clearing_and_land_preparation', 'harvesting', 'planting', 'ploughing', 'post_harvest', 'weeding'] | source=['communal', 'family', 'hired', 'other', 'self']
+2017-18: 31,149 rows | season=['last'] | stage=['chemical_application', 'clearing_and_land_preparation', 'harvesting', 'planting', 'ploughing', 'post_harvest', 'weeding'] | source=['communal', 'family', 'hired', 'other', 'self']
+plots per wave: {'2009-10': 5103, '2013-14': 4120, '2017-18': 4705}
+
+==============================================================================
+CHECK 2 -- index unique; grain reports; v coverage
+==============================================================================
+index unique: True
+duplicated index tuples: 0
+grain_reports() for plot_labor: 0
+'v' in index names: True
+v non-null: 89,887 / 89,887 = 100.00%
+  2009-10: v non-null 100.00% (263 clusters)
+  2013-14: v non-null 100.00% (287 clusters)
+  2017-18: v non-null 100.00% (284 clusters)
+null_read_reports(GhanaSPS, plot_labor): []
+
+==============================================================================
+CHECK 3 -- join rate of (t, i, plot_id) into plot_features()
+==============================================================================
+2009-10: 5,103 / 5,103 labour plots in plot_features() = 100.00%
+2013-14: 4,120 / 4,120 labour plots in plot_features() = 100.00%
+2017-18: 4,705 / 4,705 labour plots in plot_features() = 100.00%
+
+==============================================================================
+CHECK 4 -- 2009-10 rows per (season, stage): 8 cells, minor << major
+==============================================================================
+season            major  minor
+stage                         
+field_management   6761   2133
+harvesting         5949   1709
+land_preparation   6866   1511
+post_harvest       4652   1283
+all 8 cells populated: True
+minor/major ratio per stage: {'field_management': 0.315, 'harvesting': 0.287, 'land_preparation': 0.22, 'post_harvest': 0.276}
+PersonDays by (season, stage):
+season               major    minor
+stage                              
+field_management  247757.0  65496.0
+harvesting        172605.0  27210.0
+land_preparation  225944.0  29848.0
+post_harvest       79174.0  19216.0
+
+==============================================================================
+CHECK 5 -- PersonDays sum by source per wave; zero-row rule
+==============================================================================
+                    size       sum   mean  median      max
+t       source                                            
+2009-10 casual      7775  223970.0  28.81    12.0  10000.0
+        family     19291  551779.0   28.6    14.0   2360.0
+        permanent   3798   91501.0  24.09    14.0    990.0
+2013-14 communal     975   33070.0  33.92    18.0    900.0
+        family      8894  217516.0  24.46    14.0    750.0
+        hired       3831   93086.0   24.3    10.0   1350.0
+        other        256    4573.0  17.86     7.0    360.0
+        self       13918  137086.0   9.85     6.0    100.0
+2017-18 communal     948   19546.0  20.62    10.0    650.0
+        family     11292  248438.0   22.0    10.0    600.0
+        hired       3832   72264.0  18.86     8.0   1300.0
+        other        180    2097.0  11.65     4.0    174.0
+        self       14897  117204.0   7.87     5.0    180.0
+
+rows with PersonDays == 0 delivered: 0 (the keep rule is PersonDays > 0)
+rows with PersonDays null delivered: 0
+
+Candidate / kept / dropped per wave (from the wave scripts):
+  2009-10  136,464 candidates -> 30,864 kept; 515 zero, 105,085 never reported
+  2013-14  164,255 candidates -> 27,874 kept;  85 zero, 136,296 never reported
+  2017-18  100,115 candidates -> 31,149 kept;  43 zero,  68,923 never reported (+3,200 blank-stage cells dropped first)
+
+==============================================================================
+CHECK 6 -- WageRate* and WageUnit on hired rows
+==============================================================================
+
+--- 2009-10: 11,573 rows on ['casual', 'permanent'] ---
+  WageRateMen: non-null 0 / 11,573 = 0.00%
+  WageRateWomen: non-null 0 / 11,573 = 0.00%
+  WageRateChildren: non-null 0 / 11,573 = 0.00%
+  WageUnit value_counts: {<NA>: 11573}
+  non-hired rows carrying any wage datum: 0
+
+--- 2013-14: 3,831 rows on ['hired'] ---
+  WageRateMen: non-null 3,418 / 3,831 = 89.22%
+  WageRateWomen: non-null 1,365 / 3,831 = 35.63%
+  WageRateChildren: non-null 119 / 3,831 = 3.11%
+  WageUnit value_counts: {'Day': 2404, 'Acres': 495, <NA>: 289, 'Ropes': 154, 'Plot': 132, 'Other': 128, 'Poles': 122, 'Week': 68, 'Month': 39}
+  median rate by WageUnit:
+          WageRateMen  WageRateWomen  WageRateChildren
+    WageUnit                                              
+    Acres            40.0           15.0              10.0
+    Day              10.0            7.0               5.0
+    Month           100.0           50.0              15.0
+    Other            92.0           30.0               2.0
+    Plot             48.0           15.0               5.0
+    Poles            30.0           15.0              10.0
+    Ropes            10.0           10.0               5.0
+    Week             40.0           30.0              15.0
+  non-hired rows carrying any wage datum: 0
+
+--- 2017-18: 3,832 rows on ['hired'] ---
+  WageRateMen: non-null 3,378 / 3,832 = 88.15%
+  WageRateWomen: non-null 532 / 3,832 = 13.88%
+  WageRateChildren: non-null 0 / 3,832 = 0.00%
+  WageUnit value_counts: {'Day': 2692, 'Acres': 409, 'Other': 206, 'Plot': 178, <NA>: 163, 'Ropes': 76, 'Poles': 54, 'Week': 41, 'Month': 13}
+  median rate by WageUnit:
+          WageRateMen  WageRateWomen  WageRateChildren
+    WageUnit                                              
+    Acres            70.0           25.0               NaN
+    Day              20.0           15.0               NaN
+    Month           300.0          750.0               NaN
+    Other           100.0           50.0               NaN
+    Plot             50.0           20.0               NaN
+    Poles            60.0            NaN               NaN
+    Ropes            15.0           20.0               NaN
+    Week             85.0           60.0               NaN
+  non-hired rows carrying any wage datum: 0
+
+==============================================================================
+CHECK 6b -- currency attaches GHS
+==============================================================================
+index names with currency=index: ['i', 't', 'v', 'plot_id', 'season', 'stage', 'source', 'currency']
+currency values: ['GHS']
+
+==============================================================================
+CHECK 7 -- the indirect stage checks (2009-10 assignment)
+==============================================================================
+--- (i) cross-wave coarse-stage PersonDays profile ---
+    A permuted 2009-10 file -> stage map would show a permuted profile.
+                  2009-10  2013-14  2017-18
+land_preparation     29.5     38.1     30.4
+field_management     36.1     23.5     27.0
+harvesting           23.0     24.5     30.9
+post_harvest         11.3     13.9     11.6
+  rank of 2009-10 : ['field_management', 'land_preparation', 'harvesting', 'post_harvest']
+  rank of 2013/17 : ['land_preparation', 'harvesting', 'field_management', 'post_harvest']
+  max |share diff| vs later mean: 10.9 pp
+  the TRUE assignment deviates 10.9 pp; the best of all 24 permutations deviates 2.2 pp (a permutation: ('harvesting', 'land_preparation', 'field_management', 'post_harvest'))
+  BETWEEN-WAVE NOISE FLOOR -- the two later waves both carry the stage
+  in their own data, so their disagreement bounds what this test can
+  resolve: max |2013-14 - 2017-18| = 7.7 pp.
+
+--- (ia) plot COVERAGE by coarse stage -- the ORDERING is the test ---
+    No directional prior: what is tested is whether 2009-10's four
+    blocks reproduce the ORDER the two later waves show, since those
+    two carry the stage in their own data.  The 1<->2 swap that check
+    (i) prefers would INVERT 2009-10's first two entries.
+  2009-10: of 5,103 labour plots, land_preparation 90.9%, field_management 96.6%, harvesting 91.5%, post_harvest 81.2%
+  2013-14: of 4,120 labour plots, land_preparation 87.6%, field_management 92.0%, harvesting 88.9%, post_harvest 57.2%
+  2017-18: of 4,705 labour plots, land_preparation 83.7%, field_management 94.5%, harvesting 86.3%, post_harvest 43.7%
+
+--- (ib) hired / non-household share of person-days by coarse stage ---
+    Same ordering test on a different quantity.
+  2009-10: land_preparation 45.4%, field_management 37.4%, harvesting 30.0%, post_harvest 22.7%
+  2013-14: land_preparation 22.7%, field_management 25.4%, harvesting 14.6%, post_harvest 7.0%
+  2017-18: land_preparation 19.4%, field_management 21.2%, harvesting 11.8%, post_harvest 3.8%
+
+--- (ii) harvest-stage labour vs a crop_production harvest record ---
+    2009-10 is (plot, season) grain in BOTH tables, so the two seasons
+    are checked separately: S4AIX3 -> major, S4AIX7 -> minor.
+2009-10 major: 9,535 harvest records; dropped 25 with no crop id, 10 with an undefined crop code [0, 44, 45, 46, 47, 90], 0 with a null plot number, 180 with a crop id but no quantity, unit or revenue
+2009-10 major: unit residual codes (kept as code strings): {'53': 6, '57': 4, '1': 3, '58': 2, '61': 1, '46': 1, '50': 1, '51': 1, '94': 1}; Unknown: 209
+2009-10 minor: 2,528 harvest records; dropped 5 with no crop id, 2 with an undefined crop code [46, 47], 0 with a null plot number, 13 with a crop id but no quantity, unit or revenue
+2009-10 minor: unit residual codes (kept as code strings): {'53': 3, '80': 1}; Unknown: 41
+2009-10: 11,795 rows after summing 33 duplicate (t, i, plot_id, j, u, season) groups; per season {'major': 9292, 'minor': 2503}
+  2009-10/major/harvesting                     : 4,492 / 4,549 =  98.7% of labour plots have a harvest record
+  2009-10/major/post_harvest                   : 3,976 / 4,023 =  98.8% of labour plots have a harvest record
+  2009-10/major/land_preparation               : 4,242 / 4,490 =  94.5% of labour plots have a harvest record
+  2009-10/minor/harvesting                     : 1,287 / 1,332 =  96.6% of labour plots have a harvest record
+  2009-10/minor/post_harvest                   : 1,071 / 1,113 =  96.2% of labour plots have a harvest record
+  2009-10/minor/land_preparation               :   783 /   963 =  81.3% of labour plots have a harvest record
+  2013-14/last/harvesting                     : 3,369 / 3,662 =  92.0% of labour plots have a harvest record
+  2013-14/last/post_harvest                   : 2,168 / 2,355 =  92.1% of labour plots have a harvest record
+  2013-14/last/clearing_and_land_preparation  : 2,223 / 2,494 =  89.1% of labour plots have a harvest record
+  2017-18/last/harvesting                     : 2,888 / 4,062 =  71.1% of labour plots have a harvest record
+  2017-18/last/post_harvest                   : 1,600 / 2,058 =  77.7% of labour plots have a harvest record
+  2017-18/last/clearing_and_land_preparation  : 1,539 / 2,258 =  68.2% of labour plots have a harvest record
+
+--- (iii) the season anchor, in the 2009-10 data itself ---
+  S4AIX1 A289.1 "Starting month for the MAJOR season of dominant crop":
+    {'January': 402, 'February': 753, 'March': 883, 'April': 540, 'May': 488, 'June': 1034, 'July': 199, 'August': 83, 'September': 149, 'October': 117, 'November': 71, 'December': 77}
+  S4AIX5 A326.1 "Starting month for the MINOR season of dominant crop":
+    {'January': 81, 'February': 68, 'March': 34, 'April': 146, 'May': 54, 'June': 55, 'July': 166, 'August': 446, 'September': 246, 'October': 132, 'November': 56, 'December': 35}
+  Feb-Jun share: major 77.1%, minor 23.5%
+  Jul-Oct share: major 11.4%, minor 65.2%
+
+--- (iiia) which S4AIX file OPENS each season ---
+    A289 / A326 ("months for the MAJOR / MINOR season of dominant
+    crop") are asked ONCE per season, at the head of the season's
+    labour sequence.  Whichever file carries them is the season's
+    FIRST block, and the questionnaire heads the first block
+    "LAND PREPARATION".  A swap of blocks 1 and 2 would put field
+    management before the season had been dated.
+    S4AIX1: season-month columns ['s4aix_289i', 's4aix_289ii']
+    S4AIX2: season-month columns none
+    S4AIX3: season-month columns none
+    S4AIX4: season-month columns none
+    S4AIX5: season-month columns ['s4aix_326i', 's4aix_326ii']
+    S4AIX6: season-month columns none
+    S4AIX7: season-month columns none
+    S4AIX8: season-month columns none
+
+--- (iv) the DIRECT in-data anchor (asserted by the wave script) ---
+    2009-10/_/plot_labor.py::_assert_block reads each S4AIX file's own
+    variable labels and fails the build unless its labour cells carry
+    the A-number range the questionnaire heads with that stage.
+    A290-A298 land preparation / A299-A307 field management /
+    A308-A316 harvesting / A317-A325 post-harvest, + A327-A362 minor.
+
+==============================================================================
+CHECK 8 -- Hours
+==============================================================================
+2009-10: Hours non-null 30,840 / 30,864 | median 5.591914722445695 | mean 5.59 | max 80.0
+2013-14: Hours non-null 0 / 27,874 | median nan | mean None | max nan
+2017-18: Hours non-null 0 / 31,149 | median nan | mean None | max nan
+
+==============================================================================
+SANITY
+==============================================================================
+is_this_feature_sane: SanityReport(country='GhanaSPS', feature='plot_labor', checks=[Check(name='not_empty', status='pass', message='89887 rows'), Check(name='has_named_index', status='pass', message="Index levels: ['i', 't', 'v', 'plot_id', 'season', 'stage', 'source']"), Check(name='index_levels_match_scheme', status='warn', message="Extra index levels not in scheme: ['v']; expected: ['t', 'i', 'plot_id', 'season', 'stage', 'source'], actual: ['i', 't', 'v', 'plot_id', 'season', 'stage', 'source']"), Check(name='no_null_index_levels', status='pass', message=''), Check(name='has_time_index', status='pass', message='3 distinct periods'), Check(name='has_household_index', status='pass', message='3682 distinct households'), Check(name='reasonable_size', status='pass', message='89,887 rows'), Check(name='no_all_null_columns', status='pass', message='6 columns, none all-null'), Check(name='no_constant_columns', status='pass', message=''), Check(name='declared_columns_present', status='pass', message='All 6 declared columns present'), Check(name='dtype_consistency', status='pass', message=''), Check(name='value_constraints', status='pass', message='No constrained columns (skipped)'), Check(name='declared_spellings', status='pass', message='No declared vocabulary for this table (skipped)'), Check(name='low_duplicate_rate', status='pass', message='No duplicate indices'), Check(name='no_float_stringified_index', status='pass', message='No float-stringified index values'), Check(name='ids_format_id_canonical', status='pass', message='All id index levels are canonical format_id output'), Check(name='index_overlap_with_spine', status='pass', message='other_features not cached (skipped)')])
