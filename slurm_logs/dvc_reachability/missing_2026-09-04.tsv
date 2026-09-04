@@ -1,0 +1,10 @@
+sidecar	md5	size	kind	local_copy	local_md5_matches
+GhanaSPS/2017-18/Data/Crop_encrypted/FolderKey.bch.dvc	4c306811ae31496e596cbfa5e7817b90	4096	data	no	
+GhanaSPS/2017-18/Data/Crop_encrypted/cropprice_W3.dta.bc.dvc	e7ea0641dd7eccdbfb073ea65eba9bea	282368	data	no	
+GhanaSPS/2017-18/Data/Crop_encrypted/croppriceother_W3.dta.bc.dvc	2fe09b9af84730eda025d3cdee0f63e2	29248	data	no	
+GhanaSPS/2017-18/Data/Crop_encrypted/unitcon_W3nonpii.dta.bc.dvc	93791c9ac92153dcc9547822ee28ba5f	1291152	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems12months.csv.dvc	ce4196b25fdb72efb122c0d1e620498a	1094290	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems30days.csv.dvc	2158eaf455ed80549c52cc7b86b43773	1551901	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems3months.csv.dvc	04ebb49d0ab2b6c2cc531c78adbd8c33	610464	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems6months.csv.dvc	f3315bf5ab201c93e041f8c086a0f3c7	1835583	data	no	
+Togo/2018/Data/Togo_survey2018_nonfooditems7days.csv.dvc	0c5113cf08979140cd1594883bca8122	1001205	data	no	
