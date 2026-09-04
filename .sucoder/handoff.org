@@ -1,113 +1,117 @@
-#+title: Handoff -- Ghana issues (GhanaLSS / GhanaSPS) + GH #750
-#+date: 2026-09-02
-#+author: Sue (Claude Fable 5.1)
+#+title: Handoff -- Ghana / Togo / KenyaLPS campaign
+#+date: 2026-09-04
+#+author: Sue (Claude Opus 5, 1M context)
 
-* State at last update (2026-09-02, ~21:15 PDT)
-Branch =development= = =9c21ab89= (PRs #751 #752 #754 #756 #759 #760 merged) + local == origin.
-Shared GhanaLSS cache CLEARED after #756 (GH #757), so the next GhanaLSS read here is cold.
-Slurm job 38425803 (savio4_htc slice, 4 cores).  =.venv= remounted via
-=bin/savio_venv.sh mount= at session start -- do that first on any new
-allocation.
+* State
+=development= = =853ce496= (local == origin).  v0.10.2 released 2026-09-03
+from =master= =38fabb27=; publish workflow SUCCESS, on PyPI (wheel + sdist).
+=master= and =development= trees are BYTE-IDENTICAL -- the 5 "master ahead"
+commits are development->master merge commits only.  Nothing to back-merge.
+Slurm slice job 38425803 (savio4_htc, 4 cores).  =.venv= is a per-job
+squashfs mount: run =bash bin/savio_venv.sh mount= FIRST on any new allocation.
 
-* Landed this session
-- =9d2d6ce0= matrix refresh (GhanaLSS 64->82 sane; stale rows were phantoms)
-  + fix: =bench/matrix.py= lacked TIER_COLOR/GLYPH for =undeclared= (#725), so
-  every =make matrix= since had crashed AFTER writing the snapshot.
-- =4dda752a= =scripts/dvc_remote_reachability.py= (both DVC layouts, no lock)
-  + first sweep; =1db8ca6e= FINDINGS_750 (provenance of the 21 misses).
-- *PR #751 MERGED* (GhanaLSS #692 rename orphan =rural= table; #695
-  Birthplace decoded with Y01A's own 11-code list, C4 on the questionnaire,
-  block 1A at PDF pp.38-39).  Closes #692, #695.
-- *#753* filed: GhanaLSS wave =mapping.py= =_dirs= ignore LSMS_COUNTRIES_ROOT.
-- *#750* commented with the correction: the "missing documentation" was a
-  flat-layout-only check; 2,326 sidecars live under =files/md5/=; truly
-  missing = 21 data blobs (KenyaLPS 12, Togo 5, GhanaSPS Crop_encrypted 4).
-- *PR #754* opened: weekly =dvc-remote-reachability= CI job (red until the
-  21 are pushed or retired -- by design).
+* Merged this session (12 PRs, all reviewed by me before EL's word)
+| PR | what |
+|----+------|
+| #751 | GhanaLSS #692 orphan =rural= table + #695 Birthplace (C4 on the questionnaire) |
+| #752 | GhanaSPS =plot_features= (#732 trap wired) |
+| #754 | weekly =dvc-remote-reachability= CI job |
+| #756 | GhanaLSS #731 =U6= split by wave + #705 urban-cutoff doc |
+| #759 | KenyaLPS SOURCE.org + LICENSE.org per wave (Dataverse, CC0) |
+| #760 | GhanaSPS =livestock= (HerdValue, not ValuePerAnimal) |
+| #761 | GhanaSPS =crop_production= (W1 two-season melt) |
+| #762 | GhanaLSS =community_prices= (#562 3a, 660k rows, 6 waves) |
+| #765 | #727 housing canon: Bamboo + Terrazzo, 8 exact rows re-pointed |
+| #767 | KenyaLPS KLPS-2 tracks .dta originals, not .tab derivatives |
+| #768 | GhanaSPS =plot_labor= (stage as an index level; WageRate + WageUnit) |
+| #769 | GhanaLSS =nutrition= from the FAO WAFCT 2019 |
+| #773 | Togo =nonfood_expenditures= from EHCVM s09; 5 orphan sidecars retired |
+| #774 | vocabulary: admit =nutrition= + =nonfood_expenditures= (the ratchet) |
 
-* Open PR awaiting EL's merge word
-- *#761* GhanaSPS =crop_production= (W1 two-season melt; season from the
-  FILE; part-qualified j; bounded additive reducer pinned 33/2/0; W1 sales
-  from A83/A124 not S4BI).  Reviewed by me; recommend merge.  Edits
-  =ghanasps.py=/=Makefile= -> every GhanaSPS table cold-rebuilds once.
-- *#762* GhanaLSS =community_prices= (#562 3a): 660k rows, six waves at
-  (t, v, j, u, obs); 2005-06 asked-not-distributed; GLSS3's 117 item codes
-  RECONSTRUCTED from the GLSS4 form (documented per row as inference) --
-  EL should know before merging.  New module GhanaLSS/_/glss_prices.py.
-  Proposes a canonical index_info entry + fabricate_missing_levels so
-  Feature() stops modal-excluding one side.  Reviewed; recommend merge with
-  the caveat.
-- *#765* #727 housing canon: Bamboo + Terrazzo added; 8 exact rows
-  re-pointed (GhanaSPS, GhanaLSS, Timor-Leste incl. lower-case `bamboo`,
-  Nigeria); data-free tests/test_housing_canon.py (47 passed).  Reviewed;
-  recommend merge.
-- Issues filed: #753 (Trap 6 _dirs), #763 (get_data_file walks the DVC
-  index), #764 (make -j from os.cpu_count: -j28 on a 4-core slice).
+* IN FLIGHT -- verify the MERGED tree (no PR's CI saw the combination)
+Jobs on the dedicated clone =/global/scratch/fsa/fc_jevons/ligon/coverage-refresh=
+at =853ce496= (co_carleton / savio3 / savio_lowprio -- free, pre-emptible):
+- *38525387* matrix shard array (37 tasks x 32 cores, =%12=)
+- *38525388* aggregate -> =slurm_logs/matrix_full/latest_candidate.csv= + HTML
+  (a CANDIDATE; review before promoting to =.coder/coverage/latest.csv=)
+- *38525389* full pytest =--no-purge -n 32=
+Scripts live in =slurm_logs/matrix_full/*.sbatch= (main repo, untracked).
+*Each job pins =PYTHONPATH= to the clone and ASSERTS it* -- the squashfs venv's
+=.pth= hardcodes the MAIN checkout, so without that every shard silently
+grades the wrong branch's code.
 
-* Merged this session (all reviewed by me before EL's merge word)
-#751 GhanaLSS #692/#695 | #752 GhanaSPS plot_features | #754 reachability CI |
-#756 GhanaLSS #731 U6 + #705 | #759 KenyaLPS provenance/licence | #760 GhanaSPS livestock.
+Previous run (pre-merge, at =9aea120f=): matrix 2,342 cells / 37 countries in
+19 min, all shards rc=0; pytest 4,986 passed / 4 failed (-> #771, #772).
 
-* Done since the previous handoff
-- KLPS-4's 4 blobs pushed (files/md5/); remote now 17 short (KLPS-2/3 x8
-  need EL's browser zip -> =tmp/klps_upload/=, Togo x5, Crop_encrypted x4).
-  #750 commented twice (correction + progress).  #753 (Trap 6) filed.
-- Round 3 DONE: =crop_production= (PR #761), =community_prices= (PR #762);
-  #727 DONE (PR #765).  Both slots free.  NEXT DISPATCH: =plot_labor= on
-  =wt-gsps-labor= AFTER #761 (and ideally #765) merge -- shares five
-  GhanaSPS files; then =plot_inputs= on =wt-gsps-inputs=; #563 on
-  =wt-glss-fct= once EL drops the FCT export in =tmp/fct_upload/=.
-- Round 4 STAGED, EL's rulings taken: plot_labor keeps =stage= as an index
-  level with WageRate/WageUnit (BRIEF_plot_labor_2026-09-02.org);
-  plot_inputs = real-quantity rows only (BRIEF_plot_inputs_2026-09-02.org);
-  #563 nutrition/FCT (BRIEF_563_nutrition_fct_2026-09-02.org) BLOCKED on EL
-  dropping the West Africa FCT export into =tmp/fct_upload/= (sheet is 401).
-  Worktrees =wt-gsps-labor=, =wt-gsps-inputs=, =wt-glss-fct= cutting
-  (log /tmp/wt_create_r4_*.log); =wt-canon-727= must be re-cut ALONE after
-  they finish (two concurrent checkouts hit EINTR on Lustre twice).
-- Hardcoded USDA FDC API key in =Uganda/_/nutrition.py= and
-  =Ethiopia/_/nutrition.py= -- reported to EL; decision pending.
-- #727 ruled by EL: add Bamboo + Terrazzo to the housing canon AND re-point
-  every exact-match row corpus-wide (GhanaSPS, GhanaLSS x2, Timor-Leste,
-  Nigeria); compounds untouched.  Brief written
-  (=slurm_logs/ghana_audit/BRIEF_727_housing_canon_2026-09-02.org=);
-  worktree =wt-canon-727= cutting; DISPATCH when a Round 3 slot frees.
-- After Round 3 + #727 land: burst =make matrix C="GhanaLSS GhanaSPS"=
-  (template =slurm_logs/ghana_audit/matrix_refresh_ghana.sbatch=), then
-  plot_labor -> plot_inputs (GhanaSPS), #563 FCT nutrition (GhanaLSS).
+* Open issues I filed
+| # | what |
+|---+------|
+| #753 | GhanaLSS wave =mapping.py= =_dirs= ignore LSMS_COUNTRIES_ROOT |
+| #757 | a country =categorical_mapping.org= edit is invisible to =Wave._input_hash= |
+| #763 | =get_data_file()= walks the DVC index (1,599 s on a cached PDF) |
+| #764 | =make -j= from =os.cpu_count()= -> -j28 on a 4-core slice |
+| #770 | =conversion_to_kgs= gives =u='Value'= a kg factor: currency served as mass (18 countries declare schemes mentioning Value) |
+| #771 | Uganda/Ethiopia =nutrition.py= rebuild their FCT from the LIVE USDA API when the untracked =fct_usda.csv= is missing -- not reproducible |
+| #772 | =Uganda/earnings= delivers =earnings= vs declared =Earnings= (+ stray =level_1=) |
+| #775 | =Feature()= modal exclusion is ARGUMENT-ORDER dependent |
 
-* In flight
-- KenyaLPS (#750): KLPS-4 x4 PUSHED (files/md5/), remote 17 short.  KLPS-2/3
-  x8: Dataverse guestbook 63 blocks EVERY API route even with EL's valid
-  token (per-file, multi-file, dataset zip, gbrecs=true) -- the browser zip
-  is the only way.  Watcher armed on =tmp/klps_upload/=; when it lands:
-  unzip, md5 vs sidecars (KLPS-3 wants ORIGINAL .dta, KLPS-2 wants the
-  .tab derivatives), then =push_to_cache_batch= (~9 min per batch on Lustre;
-  never a short timeout -- a killed =dvc add= leaves a stale flufl lock).
-  =/tmp/dataverse_token= (EL's, mode 600) is useless now -- ask before deleting.
+* GH #750 -- essentially closed
+21 real misses (never the ~1,300 documentation the issue claimed -- that was a
+flat-vs-=files/md5/= layout artefact) -> *4*, all =GhanaSPS/2017-18/Data/Crop_encrypted/=
+Boxcryptor files with no passphrase.  EL's call: retire those 4 sidecars
+(closes #750, turns #754 green) or keep them as a record.
 
-* Next concrete actions
-1. Read push_test2 log -> push remaining KLPS-4 files (or branch if sidecars
-   moved).  Re-run =scripts/dvc_remote_reachability.py= -> 17 missing.
-2. When #752 merges: dispatch =livestock= on =wt-gsps-livestock= (brief
-   =slurm_logs/ghanasps/BRIEF_livestock_2026-09-02.org=; STEP 0 fast-forwards
-   to origin/development).  Then =crop_production= -> =plot_labor= ->
-   =plot_inputs= (FINDINGS_agriculture ranks them).
-3. When the #731/#705 agent reports: verify (scope, diff, primary source),
-   PR, EL merges.
-4. Round 3: #727 canon (EL ruled: add Bamboo + Terrazzo to
-   =canonical_housing_labels.org=; keep Cement/Concrete -> Concrete) -- small,
-   its own PR; then #562 community_prices and #563 FCT nutrition (EL: both in
-   scope, after the smaller items).
-5. EL decisions still open: retire Togo csv + Crop_encrypted sidecars?;
-   #752 merge.
+* EL decisions outstanding
+1. Retire the 4 Boxcryptor sidecars?  (see above)
+2. Promote the full-corpus matrix candidate to =.coder/coverage/latest.csv=
+   after reviewing its =dropped= / =broken= / =builds= cells.
+3. The hardcoded USDA FDC key in =Uganda/_/nutrition.py= and
+   =Ethiopia/_/nutrition.py= (same literal) -- rotate + move to config (#771).
+4. =/tmp/dataverse_token= (EL's, mode 600) -- useless now; delete?
+5. *The new Togo/Novissi data* -- see below.
 
-* Housekeeping
-- 9 stale agent worktrees under =.claude/worktrees/= from merged branches
-  (EL's call to delete); plus a half-created dir
-  =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-ghanasps-plot-features= (my
-  timed-out first worktree add; branch =feat/ghanasps-plot-features= is the
-  live one at =tmp/wt-gsps-plot=).
-- Untracked handoffs in =slurm_logs/= from earlier sessions, unchanged.
-- Cache: shared =/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=;
-  agents used private LSMS_DATA_DIRs under =.../ligon/tmp/lsms_data_*=.
+* The Togo/Novissi consumption data (NOT in the repo, deliberately)
+Zip at =/global/scratch/users/ligon/tmp/231030impact_consumptiondata.zip=
+(password =togoconso2021=); extracted read-only at
+=/global/scratch/users/ligon/tmp/.togo_conso_work/= (mode 700 -- delete when done).
+9,511 respondents x 87 cols, 4 survey weeks, balanced RCT (=nov_t= 4,741/4,770),
+10 food items x 5 questions = 95,110 respondent-item records.
+
+*DO NOT PUSH TO S3.*  The senders wrote /"Please don't share the data further
+without checking with us first"/, and our DVC remote is a shared read cache
+that any WB-API-key holder can read.  A =.dvc= sidecar would also advertise a
+blob that must not be fetchable and would sit in #754 forever.  Bounded
+question to put back to them: /is a credentialed cache, readable only by
+WB-API-key holders, acceptable?/
+
+Two substantive notes if it is ever wired:
+- =c10= is spend on the LAST PURCHASE OCCASION, not over a recall window --
+  =food_acquired.Expenditure= is a per-period flow everywhere else.  Converting
+  needs the inter-purchase interval (=c08a=/=c08b=); that is modelling, not
+  harmonisation, and must be recorded rather than mapped away.
+- It is a phone RCT of Novissi registrants, respondent-level.  Needs its own
+  =population.yml= record tagged =specialized= and its OWN country entry (like
+  =KenyaLPS=), NOT a wave of =Togo/= -- pooling it with EHCVM 2018 is exactly
+  what =PopulationHeterogeneityWarning= exists to catch.
+- The zip is world-readable in a world-traversable dir and uses legacy
+  ZipCrypto (broken).  Recommended =chmod 600= the zip / =700= the dir; EL's
+  files, so not done.
+
+* Next work, ranked
+1. Review + promote the matrix candidate; act on the pytest result.
+2. =plot_inputs= (GhanaSPS) -- brief written
+   (=slurm_logs/ghanasps/BRIEF_plot_inputs_2026-09-02.org=), worktree
+   =wt-gsps-inputs= ready.  EL ruled: real-quantity rows only.
+3. The EHCVM =s09= lift: 11 more (country, wave) cells across 7 countries.
+   *CotedIvoire's is at =Data/Menage/s09?_me_CIV2018.dta=* -- nested dir,
+   UPPERCASE tag, which a glob written for the other seven silently misses.
+4. #770 is the highest-value bug: it corrupts =food_quantities(units='kgs')=
+   corpus-wide and would corrupt #562 phase 3b.
+5. #562 phase 3b (price -> quantity imputation) -- gated on #770.
+
+* Worktrees (all at =/global/scratch/fsa/fc_jevons/ligon/tmp/=)
+=wt-gsps-plot=, =wt-gsps-livestock=, =wt-gsps-crop=, =wt-gsps-labor=,
+=wt-glss-692-695=, =wt-glss-731-705=, =wt-glss-prices=, =wt-glss-fct=,
+=wt-canon-727=, =wt-togo-nonfood= -- ALL MERGED, safe to remove (EL's call).
+=wt-gsps-inputs= is unused and ready for item 2.
+Plus 9 stale ones under =.claude/worktrees/= from earlier sessions.
