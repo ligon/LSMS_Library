@@ -425,7 +425,15 @@ def _env():
     from .paths import countries_root
     return {
         "catalog": catalog, "Country": Country,
-        "COUNTRY_LEVEL_ONLY": frozenset(JSON_CACHE_METHODS),
+        # `nutrition` joins the JSON-cache methods here: it is declared by no
+        # wave anywhere in the corpus (every country that ships it has a single
+        # country-level `_/nutrition.py` writing `../var/nutrition.parquet`),
+        # so per-wave grading asks a question the feature cannot answer and
+        # returns `absent` for every wave of the countries that DO have it.
+        # Measured 2026-09-04, when #774 put it on the matrix axis: Uganda 8,
+        # GhanaLSS 7, Ethiopia 5 -- 20 `absent` cells for three countries whose
+        # nutrition tables build fine.  Graded country-level it is one row each.
+        "COUNTRY_LEVEL_ONLY": frozenset(JSON_CACHE_METHODS) | {"nutrition"},
         "is_this_feature_sane": is_this_feature_sane, "load_feature": load_feature,
         "DERIVED_SOURCE": dict(_DERIVED_SOURCE), "countries_root": countries_root,
     }
