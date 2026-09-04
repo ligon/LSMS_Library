@@ -231,3 +231,54 @@ Data Scheme:
     Industry: {type: str, optional: true}
     working_age: bool
     materialize: make
+
+  nonfood_expenditures:
+    # Household non-food expenditure, item-level, from the EHCVM section-9
+    # modules 2018/Data1/s09b..s09f_me_tgo2018.dta.  (NOT from 2018/Data/,
+    # which held the five Togo_survey2018_nonfooditems*.csv researcher
+    # extracts — `dvc add`ed in 2021, never pushed, unrecoverable per GH
+    # #750, and retired with this feature.  Data1/ carries the same five
+    # recall windows in the published EHCVM distribution.)
+    #
+    # THE INSTRUMENT, quoted (2018/Documentation/
+    # tgo_ehcvm1_qnr_household_excel_vague1.xls, sheets S9b..S9f, row 0/1;
+    # vague1 and vague2 are byte-identical over section 9):
+    #   "SECTION 9 : DÉPENSES RÉTROSPECTIVES NON ALIMENTAIRES DU MÉNAGE"
+    #   "PARTIE B: DEPENSES NON ALIMENTAIRES DES 7 DERNIERS JOURS"
+    #   "PARTIE C: DEPENSES NON ALIMENTAIRES DES 30 DERNIERS JOURS"
+    #   "PARTIE D: DEPENSES NON ALIMENTAIRES DES 3 DERNIERS MOIS"
+    #   "PARTIE E: DEPENSES NON ALIMENTAIRES DES 6 DERNIERS MOIS"
+    #   "PARTIE F: DEPENSES NON ALIMENTAIRES DES 12 DERNIERS MOIS"
+    # So the five sub-modules ARE a recall-window split, and s09?q03 is the
+    # amount spent OVER THAT WINDOW.
+    #
+    # WINDOW DECISION: NOT ANNUALISED.  `Expenditure` is the FCFA figure the
+    # household reported, and `RecallWindow` names its window verbatim.
+    # Annualising is a transformation, and REPORTED values only is the rule
+    # this file already applies to crop_production / plot_labor.  To scale:
+    #   annual = Expenditure * 365.25 / days, days = {'7 days': 7,
+    #     '30 days': 30, '3 months': 91.3125, '6 months': 182.625,
+    #     '12 months': 365.25}[RecallWindow]
+    # RecallWindow is a COLUMN, not an index level, because EHCVM gives each
+    # sub-module a disjoint item-code block (201-217 / 301-322 / 401-418 /
+    # 501-512 / 601-653), so `j` already determines the window; making it a
+    # level would bake a functional dependency into the key.
+    #
+    # GRAIN (t, i, j).  No `v` — the framework joins it from sample() at API
+    # time.  No `vague` — each grappe is visited in exactly one vague.
+    # (t, i, j) is unique in the source; the wave script asserts it, so
+    # nothing is reduced.  j = nonfood_items Preferred Label (122 items,
+    # decoded from the instrument, injectivity asserted at build time).
+    #
+    # PARTIE A (s09a, 'DEPENSES DES FETES ET CEREMONIES AU COURS DES 12
+    # DERNIERS MOIS') IS EXCLUDED: it is keyed by EVENT, not product, and two
+    # of its five amount columns are food.  Consequence, stated because it is
+    # a real bias: 9E/9F instruct the enumerator NOT to include clothing,
+    # footwear and jewellery bought for ceremonies (those go in 9A.05), so
+    # this table UNDERCOUNTS those categories.  See _/CONTENTS.org
+    # "nonfood_expenditures (EHCVM section 9)" for the proposed follow-up
+    # (a ceremony_expenditures feature keyed (t, i, event)).
+    index: (t, i, j)
+    Expenditure: float
+    RecallWindow: str
+    materialize: make

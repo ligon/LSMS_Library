@@ -205,6 +205,234 @@ cannot be read as a Togo-specific claim.
 their own.  No universe statement is available for those files, and none was
 inferred from their contents.  Recorded as a gap.
 
+**** RESOLVED for the =.csv= half, 2026-09-04 (GH #750)
+
+The five =Togo_survey2018_nonfooditems{7days,30days,3months,6months,12months}.csv=
+extracts are *gone*, and the gap they represented is closed rather than
+merely noted.  They were =dvc add=ed in 2021 and never pushed: their blobs
+are absent from =s3://dvcbucket0/LSMS=, from every local workspace, and
+from the L1 cache, so =dvc pull= could never have succeeded for anyone and
+their undocumented universe could never have been established.  Their
+sidecars were deleted; the md5s are preserved in the commit message
+(=retire(Togo): drop the 5 unrecoverable nonfooditems*.csv sidecars=).
+
+What replaced them is documented under "nonfood_expenditures (EHCVM
+section 9)" below: the *published* EHCVM modules
+=2018/Data1/s09b..s09f_me_tgo2018.dta=, which cover the same five recall
+windows and whose universe is the wave's own -- i.e. the one this section
+documents at length.  So the substantive gap ("no documented universe") is
+answered for the non-food half, by replacing the undocumented source, not
+by finding documentation for it.
+
+The =.dta= half is UNCHANGED and the gap above still stands for it:
+=Togo_survey2018_fooditems_forEthan.dta= and
+=Togo_survey2018_hhroster_forEthan.dta= are still tracked, their blobs *are*
+on the remote, and they still have no documented universe.  As of
+2026-09-04 the only code that names either is =2018/_/food_expenditures.py=
+(which is dead by the same test as the old nonfood script: it is not
+declared in =data_scheme.yml=, and the generic =%.parquet= rule in
+=_/Makefile= cannot fire for it because the =food_items.org= / =malawi.py=
+prerequisites are absent) and =2018/_/notes.org= (a research notebook,
+using the forbidden =pd.read_stata=).  Retiring that script -- and with it
+the last reader of an undocumented extract -- is the obvious next step, but
+it was out of scope for GH #750 and is deliberately left alone.
+
+* nonfood_expenditures (EHCVM section 9)
+
+Item-level household non-food expenditure, from
+=2018/Data1/s09b..s09f_me_tgo2018.dta=.  Added 2026-09-04 (GH #750), which
+also retired the five unrecoverable CSV extracts described above.
+
+*** SOURCE LOCATION (read this first): the section-9 modules live in
+=2018/Data1/= — *NOT* in =2018/Data/=.  =2018/Data/= used to hold five
+=Togo_survey2018_nonfooditems*.csv= extracts covering the same five recall
+windows; those are gone and unrecoverable.  Do not try to resurrect them.
+=Data1/= is the published EHCVM distribution and is complete. ***
+
+** What section 9 is (from the INSTRUMENT, not from convention)
+
+EHCVM section 9 is *conventionally* a recall-period split, and the retired
+CSVs were split that way -- but convention is not evidence, so this was
+checked against the questionnaire.
+=2018/Documentation/tgo_ehcvm1_qnr_household_excel_vague1.xls=, sheets
+=S9b__Conso_NA= .. =S9f__Conso_NA=, rows 0-1, verbatim:
+
+#+begin_quote
+SECTION 9 : DÉPENSES RÉTROSPECTIVES NON ALIMENTAIRES DU MÉNAGE
+PARTIE A: DEPENSES DES FETES ET CEREMONIES AU COURS DES 12 DERNIERS MOIS
+PARTIE B: DEPENSES NON ALIMENTAIRES DES 7 DERNIERS JOURS
+PARTIE C: DEPENSES NON ALIMENTAIRES DES 30 DERNIERS JOURS
+PARTIE D: DEPENSES NON ALIMENTAIRES DES 3 DERNIERS MOIS
+PARTIE E: DEPENSES NON ALIMENTAIRES DES 6 DERNIERS MOIS
+PARTIE F: DEPENSES NON ALIMENTAIRES DES 12 DERNIERS MOIS
+#+end_quote
+
+(=vague1= and =vague2= are byte-identical over section 9 -- diffed, 178
+rows each.)  So B..F *are* recall-window modules and =s09?q03= is the
+amount spent over that window.  Parts A and B..F are different animals; see
+"Partie A is excluded" below.
+
+| file | part | recall window  | items | rows   |
+|------+------+----------------+-------+--------|
+| s09b | B    | last 7 days    |    17 | 17,932 |
+| s09c | C    | last 30 days   |    22 | 27,871 |
+| s09d | D    | last 3 months  |    18 | 10,999 |
+| s09e | E    | last 6 months  |    12 | 32,326 |
+| s09f | F    | last 12 months |    53 | 19,317 |
+
+** The window is carried, NOT annualised
+
+=Expenditure= is the FCFA figure the household reported, and =RecallWindow=
+names its window verbatim, so the raw number and its period both stay
+recoverable.  Annualising is a *transformation*, and REPORTED-values-only is
+the rule this country already applies to =crop_production= and =plot_labor=.
+One defensible scaling, spelled out so nobody has to guess:
+
+: annual = Expenditure * 365.25 / {'7 days': 7, '30 days': 30,
+:            '3 months': 91.3125, '6 months': 182.625,
+:            '12 months': 365.25}[RecallWindow]
+
+=RecallWindow= is a COLUMN, not an index level, because EHCVM gives each
+sub-module a *disjoint* item-code block (201-217 / 301-322 / 401-418 /
+501-512 / 601-653), so =j= already determines the window.  Making it a level
+would bake a functional dependency into the key.  The wave script asserts the
+dependency (=nunique() == 1= per =j=), so a future release that reused a code
+across modules would fail the build rather than mislabel a window.
+
+Sanity, measured: median expenditure rises monotonically with the window --
+500 / 900 / 1,200 / 3,000 / 3,500 FCFA.  A 7-day median at 14.3% of the
+12-month median is the shape a correct window mapping produces.
+
+** Partie A (=s09a=) is EXCLUDED — and that has a cost, stated
+
+=s09a= is *not* wired into =nonfood_expenditures=.  Three reasons, in order
+of weight:
+
+1. *Different grain.*  It is keyed by EVENT (13 fêtes / cérémonies: Fin du
+   Ramadan, Tabaski, Noël, Pâques, Nouvel an, Mariage, Baptêmes,
+   Communion/Confirmation, Funérailles, ...), not by product/service, with
+   five FIXED amount columns per event rather than one amount per item.
+2. *Two of those five columns are food* -- =s09aq03= alimentation and
+   =s09aq04= boissons.  They do not belong in a table called
+   /non-food/ expenditures at all.
+3. *Replacement parity.*  The five retired CSVs were the five recall
+   windows, i.e. s09b..s09f.  s09a was not in them either, so excluding it
+   loses nothing that was previously delivered.
+
+Folding it in would require either summing over the 13 events (destroying
+the event dimension) or minting 39 compound =event × category= item labels
+(polluting the =j= axis).  Neither is obviously right, and neither should be
+decided silently.
+
+*THE COST, because it is real and easy to miss.*  Sheets =S9e=/=S9f= carry a
+standing instruction in the item-label column:
+
+#+begin_quote
+(NE PAS INCLURE LES PAGNES, VETEMENTS, CHAUSSURES ET BIJOUX ACHETES A
+L'OCCASION DES FETES ET CEREMONIES COMME LA TABASKI, LA FIN DE RAMADAN,
+NOEL, PAQUES, NOUVEL AN, MARIAGE, FUNERAILLES, BAPTEMES, ETC. QUI ONT ÉTÉ
+INSCRITES DANS LES SECTIONS PRÉCÉDENTES)
+#+end_quote
+
+So ceremony clothing, footwear and jewellery were deliberately routed to
+=s09aq05= and are therefore *absent from 9E/9F by design*.
+=nonfood_expenditures= consequently *UNDERCOUNTS clothing, footwear and
+jewellery*.  It is not a bug in the wiring; it is what excluding 9A means,
+and anyone using these categories must know it.
+
+*Follow-up (not done here).*  A separate =ceremony_expenditures= feature
+keyed =(t, i, event)= with the five reported category columns is the honest
+shape for =s09a=: it keeps the event, keeps food and non-food apart, and
+does not distort the =j= axis.  =s09a= is a complete grid -- 6,171
+households × 13 events = 80,223 rows, of which 13,921 have the gate
+=s09aq02 == 1= and carry amounts.
+
+** Grain, keys, and what the framework adds
+
+Declared =(t, i, j)= in =data_scheme.yml=; DELIVERED =(i, t, v, j)=, because
+=_join_v_from_sample= adds =v= at API time (540 grappes, no nulls).  Do not
+declare =v= here -- =nonfood_expenditures= is not in
+=lsms_library/data_info.yml='s =index_info=, so the join fires, and emitting
+=v= from the wave script would duplicate it.
+
+No =vague= level: each grappe is visited in exactly one vague, so
+=(grappe, menage)= identifies a household uniquely (the standard EHCVM
+convention recorded under "Sampling Design").  =i= is the composite id
+=format_id(grappe) + '0' + format_id(menage, zeropadding=2)=, inlined
+verbatim from =togo.i()= exactly as =livestock.py= does.
+
+=(t, i, j)= is unique *in the source* -- the wave script asserts it -- so
+nothing is reduced and =LSMS_GRAIN_STRICT=1= produces zero
+=GrainCollapseWarning=.
+
+** Idiosyncrasies worth knowing
+
+- *The modules ship PRE-FILTERED to the gate.*  Every row of s09b..s09f as
+  distributed has =s09?q02 == 1= ("Oui"); the "Non" rows are not published.
+  So the absence of a =(household, item)= pair means /did not buy/, NOT
+  /not asked/.  Do not read a missing pair as missing data.  (=s09a= is the
+  opposite: a complete 6,171 × 13 grid with both gate values present.)
+  The wave script keeps the gate filter anyway, so a future re-release that
+  ships the "Non" rows cannot leak them in as zero-value purchases.
+- *A typo in the shipped Stata labels.*  =s09aq02='s variable label reads
+  "9A.02. 12 derniers *jours*, avez-vous effectué des dépenses pour les
+  fêtes?" where the instrument says "Au cours des 12 derniers *mois*".  The
+  instrument is right; the =.dta= label is wrong.  This is exactly why the
+  window question was settled against the questionnaire and not against the
+  variable labels.
+- Relatedly, the =s09aq01= value label for event 02 says "Tabaski *2018*"
+  where the questionnaire prints "Tabaski *2017*".  Recorded, not corrected.
+- *The item labels come from the INSTRUMENT, not the =.dta=.*  Unlike
+  =s07bq03b= (whose value labels were lost -- see "food_acquired units"
+  above), the s09 code variables *do* carry Stata value labels.  But those
+  are truncated at ~110 characters, so the questionnaire sheets are the
+  source for =nonfood_items= in =categorical_mapping.org=.
+- *Two declared items are never reported*: 627 "Vignette automobile/moto"
+  (Vehicle Road Tax) and 649 "Taxes d'habitation ... taxes de voiries"
+  (Property and Municipal Taxes).  120 of 122 items are delivered.  They are
+  kept in the table because they are on the instrument; their absence is a
+  fact about Togolese households, not a wiring defect.
+- *12 of the 6,171 sample households report no section-9 purchase at all* in
+  any of the five modules, so =nonfood_expenditures= covers 6,159 households
+  (99.81%).  There are zero orphans in the other direction.
+- *121 rows report a purchase with no amount* (gate = Oui, =s09?q03= null).
+  These are kept: "bought it, amount not recorded" is a reported fact and is
+  not the same as "did not buy".
+
+** The =#+name:= trap (if you add or rename an org table)
+
+=df_from_orgfile= (=lsms_library/local_tools.py:1636=) locates a table by
+*exact string equality* against ~f'#+name: {name}'.lower()~ after
+=.strip().lower()=.  Case is free -- this file mixes =#+name:= and =#+NAME:=
+and both work -- but *the single space after the colon is mandatory*, and
+nothing may follow the table name on that line.  A miss raises =KeyError=
+(GH #461) rather than silently returning the file's *first* table, which is
+the behaviour that once labelled every crop with a unit.  Note also that a
+bare =get_categorical_mapping(tablename=...)= with no value column returns
+an *empty dict* and every lookup then silently yields =pd.NA=; prefer
+=code_label_map= (GH #372 / #377 / #348).
+
+** Cross-EHCVM: this lifts to all eight countries, and none of them is wired
+
+All eight EHCVM countries ship the same =s09a..s09f= block, 12 (country,
+wave) cells in total, and =Togo/2018= is the only one wired:
+
+| country       | waves with s09    | location                          |
+|---------------+-------------------+-----------------------------------|
+| Benin         | 2018-19           | =Data1/s09?_me_ben2018.dta=       |
+| Burkina Faso  | 2018-19, 2021-22  | =Data1/s09?_me_bfa{2018,2021}.dta= |
+| CotedIvoire   | 2018-19           | =Data/Menage/s09?_me_CIV2018.dta= (note the nested dir and the UPPERCASE country tag -- a glob written for the others misses it) |
+| Guinea-Bissau | 2018-19           | =Data1/s09?_me_gnb2018.dta=       |
+| Mali          | 2018-19, 2021-22  | =Data1/s09?_me_mli{2018,2021}.dta= |
+| Niger         | 2018-19, 2021-22  | =Data1/s09?_me_ner{2018,2021}.dta= |
+| Senegal       | 2018-19, 2021-22  | =Data1/s09?_me_sen{2018,2021}.dta= |
+| Togo          | 2018              | =Data1/s09?_me_tgo2018.dta= — WIRED |
+
+The item codes are the harmonized EHCVM scheme, so the =nonfood_items= table
+should port directly, as =harmonize_input= / =harmonize_seed_crop= did from
+Niger.  *Verify per country before assuming it* -- that is what the
+=nonfood_items= coverage assertion in the wave script is for.
+
 * food_acquired units (Benin<->Togo codebook link)
 
 Togo's =s07bq03b= unit variable stores bare numeric codes (100-662): its
