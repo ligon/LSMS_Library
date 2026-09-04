@@ -1,0 +1,9 @@
+start Fri Sep  4 06:04:25 PDT 2026
+pushed: ['KLPS3_E-Plus-Module_PUBLIC_2022-02.dta', 'KLPS3_I-Module_PUBLIC_2022-02.dta', 'KLPS3_SampleMaster_PUBLIC_2015-12.dta', 'KLPS3_Status_PUBLIC_2022-02.dta']
+rc=0 end Fri Sep  4 06:08:25 PDT 2026
+--- sidecars changed? ---
+--- reachability re-sweep ---
+[summary] 9 of 9984 sidecar blobs missing from the remote (0.1%); 7.7 MB
+[summary] documentation      0 /  1066
+[summary] data               9 /  8918
+[summary] by country (missing/total, documentation | data):
