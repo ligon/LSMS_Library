@@ -19,7 +19,7 @@
 | Kenkey/Banku                 | Kenkey/Banku                 |      12 | kenkey/banku (without sauce)                                |         |                            |
 | Cerelac (Baby food)          | Cerelac (Baby food)          |      13 | baby food (cerelac,etc)                                     |         |                            |
 | Other Cereal                 | Other Cereal                 |      14 | other cereal products                                       |         |                            |
-| Other Grain                  | Other Grain                  |         |                                                             |       8 | other grains               |
+| Other Grains                 | Other Grains                 |         |                                                             |       8 | other grains               |
 | Beef (corned)                | Corned Beef                  |      18 | corned beef                                                 |         |                            |
 | Pork                         | Pork                         |      19 | pork                                                        |      65 | pork                       |
 | Beef                         | Beef                         |      20 | beef                                                        |      63 | beef                       |
@@ -45,8 +45,8 @@
 | Milk (evaporated)            | Milk                         |      47 | tinned milk (unsweetened,evaporated)                        |         |                            |
 | Milk (tinned, condensed)     | Milk                         |      48 | tinned milk (condensed)                                     |         |                            |
 | Other Milk Products          | Other Milk Products          |      49 | other milk products including cheese                        |         |                            |
-| Eggs                         | Eggs                         |      53 | chicken eggs                                                |      70 | eggs                       |
-| Eggs                         | Eggs                         |      54 | other eggs                                                  |         |                            |
+| Egg                          | Egg                          |      53 | chicken eggs                                                |      70 | eggs                       |
+| Egg                          | Egg                          |      54 | other eggs                                                  |         |                            |
 | Oil (coconut)                | Oils, Fats                   |      58 | coconut oil                                                 |      30 | coconut oil                |
 | Oil (groundnut)              | Oils, Fats                   |      59 | groundnut oil                                               |      31 | groundnut oil              |
 | Oil (palm kernel)            | Oils, Fats                   |      60 | palm kernel oil                                             |      29 | palm kernel oil            |
@@ -84,7 +84,7 @@
 | Chilli Powder (black pepper) | Chilli Powder (black pepper) |     100 | black pepper                                                |         |                            |
 | Salt                         | Salt                         |     101 | salt                                                        |         |                            |
 | Ginger                       | Ginger                       |     102 | ginger                                                      |         |                            |
-| Condiments                   | Condiments                   |     103 | other condiments (royco,maggie,etc)                         |         |                            |
+| Condiment                    | Condiment                    |     103 | other condiments (royco,maggie,etc)                         |         |                            |
 | Cassava (fresh)              | Cassava                      |     107 | cassava                                                     |      10 | cassava-tubers             |
 | Cocoyam                      | Cocoyam                      |     108 | cocoyam                                                     |      14 | cocoyam                    |
 | Plantain                     | Plantain                     |     109 | plantain                                                    |      15 | plantain                   |
@@ -106,7 +106,7 @@
 | Coffee                       | Coffee                       |     129 | coffee                                                      |         |                            |
 | Cocoa Powder                 | Cocoa Powder                 |     130 | chocolate drinks (including milo,bournvita etc)             |         |                            |
 | Tea                          | Tea                          |     131 | tea                                                         |         |                            |
-| Other Beverages              | Other Beverages              |     132 | other beverage drinks                                       |      92 | non-alcoholic beverages    |
+| Other Beverages              | Other Beverages              |     132 | other beverage drinks                                       |      92 | non-alchoholic beverages   |
 | Soft Drinks                  | Soft Drinks                  |     136 | soft drinks and minerals                                    |         |                            |
 | Malt Drinks (bottle)         | Malt Drinks (bottle)         |     137 | malta and malt drinks                                       |         |                            |
 | Juice                        | Juice                        |     138 | fruits juices                                               |         |                            |
@@ -122,7 +122,7 @@
 | Beer                         | Beer                         |     157 | beer (local)                                                |         |                            |
 | Beer                         | Beer                         |     158 | beer (imported)                                             |         |                            |
 | Beer                         | Beer                         |     159 | guinness & other stout                                      |         |                            |
-| Other Alcoholic Beverages    | Other Alcoholic Beverages    |         |                                                             |      91 | alcoholic beverages        |
+| Other Alcoholic Beverages    | Other Alcoholic Beverages    |         |                                                             |      91 | alchoholic beverages       |
 | Cigarrette                   | Tobacco                      |     163 | cigarrette,cigar                                            |         |                            |
 | Tobacco                      | Tobacco                      |     164 | tobacco (processed)                                         |         |                            |
 | Other Tobacco                | Other Tobacco                |     165 | other tobacco products                                      |         |                            |

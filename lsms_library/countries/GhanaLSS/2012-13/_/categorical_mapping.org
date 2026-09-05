@@ -21,7 +21,7 @@
 | Cerelac (Baby food)          | Cerelac (Baby food)          |      13 | baby food (cerelac,etc)                                      |         |                            |
 | Other Cereal                 | Other Cereal                 |      14 | other cereal products                                        |         |                            |
 | Other Cereal                 | Other Cereal                 |      15 | processing of cereals                                        |         |                            |
-| Other Grain                  | Other Grain                  |         |                                                              |       8 | other grains               |
+| Other Grains                 | Other Grains                 |         |                                                              |       8 | other grains               |
 | Beef (corned)                | Corned Beef                  |      18 | corned beef                                                  |         |                            |
 | Pork                         | Pork                         |      19 | pork                                                         |      65 | pork                       |
 | Beef                         | Beef                         |      20 | beef                                                         |      63 | beef                       |
@@ -47,8 +47,8 @@
 | Milk (evaporated)            | Milk                         |      47 | tinned milk (unsweetened,evaporated)                         |         |                            |
 | Milk (tinned, condensed)     | Milk                         |      48 | tinned milk (condensed)                                      |         |                            |
 | Other Milk Products          | Other Milk Products          |      49 | other milk products including cheese                         |         |                            |
-| Eggs                         | Eggs                         |      53 | chicken eggs                                                 |      70 | eggs                       |
-| Eggs                         | Eggs                         |      54 | other eggs                                                   |         |                            |
+| Egg                          | Egg                          |      53 | chicken eggs                                                 |      70 | eggs                       |
+| Egg                          | Egg                          |      54 | other eggs                                                   |         |                            |
 | Oil (coconut)                | Oils, Fats                   |      58 | coconut oil                                                  |      30 | coconut oil                |
 | Oil (groundnut)              | Oils, Fats                   |      59 | groundnut oil                                                |      31 | groundnut oil              |
 | Oil (palm kernel)            | Oils, Fats                   |      60 | palm kernel oil                                              |      29 | palm kernel oil            |
@@ -87,7 +87,7 @@
 | Salt                         | Salt                         |     101 | salt                                                         |         |                            |
 | Ginger                       | Ginger                       |     102 | ginger                                                       |         |                            |
 | Dawadawa                     | Dawadawa                     |     103 | dawadawa                                                     |         |                            |
-| Condiments                   | Condiments                   |     104 | other condiments (royco,maggie,etc)                          |         |                            |
+| Condiment                    | Condiment                    |     104 | other condiments (royco,maggie,etc)                          |         |                            |
 | Cassava (fresh)              | Cassava                      |     107 | cassava                                                      |      10 | cassava-tubers             |
 | Cocoyam                      | Cocoyam                      |     108 | cocoyam                                                      |      14 | cocoyam                    |
 | Plantain                     | Plantain                     |     109 | plantain                                                     |      15 | plantain                   |
@@ -108,7 +108,7 @@
 | Other Flours                 | Other Flours                 |     125 | other processed starchy staples                              |       9 | other flours               |
 | Coffee                       | Coffee                       |     129 | coffee                                                       |         |                            |
 | Cocoa Powder                 | Cocoa Powder                 |     130 | chocolate drinks (including milo,bournvita etc)              |         |                            |
-| Tea bags                     | Tea                          |     131 | tea                                                          |         |                            |
+| Tea                          | Tea                          |     131 | tea                                                          |         |                            |
 | Other Beverages              | Other Beverages              |     132 | other beverage drinks                                        |      92 | non-alcoholic beverages    |
 | Soft Drinks                  | Soft Drinks                  |     136 | soft drinks and minerals                                     |         |                            |
 | Malt Drinks (bottle)         | Malt Drinks (bottle)         |     137 | malta and malt drinks                                        |         |                            |
@@ -178,7 +178,7 @@
 | Kenkey/Banku                 | Kenkey/Banku                 |     256 | banku or kenkey with sauce                                   |         |                            |
 | Other Prepared Meals         | Other Prepared Meals         |     257 | other prepared meals                                         |         |                            |
 | Fast Food                    | Fast Food                    |     258 | fast foods                                                   |         |                            |
-| Cooked Rice and Stew         | Cooked Rice and Stew Ê Ê     |     262 | cooked rice and sauce                                        |         |                            |
+| Cooked Rice and Stew         | Cooked Rice and Stew           |     262 | cooked rice and sauce                                        |         |                            |
 | Soup                         | Soup                         |     263 | fufu or tuo with soup                                        |         |                            |
 | Kenkey/Banku                 | Kenkey/Banku                 |     264 | banku or kenkey with sauce                                   |         |                            |
 | Other Prepared Meals         | Other Prepared Meals         |     265 | other meals                                                  |         |                            |
@@ -294,7 +294,7 @@ market carry identical prices) -- kept native.
 | 27   | baby milk (lactogen)                                                | Milk (powdered)                                                     | yes  | Kilogram   |       |                                              |
 | 28   | tinned milk - ideal, peak etc. (evaporated)                         | Milk (evaporated)                                                   | yes  | Kilogram   |       |                                              |
 | 29   | tinned milk (sweetened)                                             | Milk (tinned, condensed)                                            | yes  | Kilogram   |       |                                              |
-| 30   | chicken eggs                                                        | Eggs                                                                | yes  | Kilogram   |       |                                              |
+| 30   | chicken eggs                                                        | Egg                                                                 | yes  | Kilogram   |       |                                              |
 | 31   | coconut oil                                                         | Oil (coconut)                                                       | yes  | Liter      |       |                                              |
 | 32   | ground nut oil                                                      | Oil (groundnut)                                                     | yes  | Liter      |       |                                              |
 | 33   | vegetable oil (frytol, obaapa)                                      | Other Oils                                                          | yes  | Liter      |       |                                              |
@@ -318,7 +318,7 @@ market carry identical prices) -- kept native.
 | 51   | onions/shallot (large/small)                                        | Onion                                                               | yes  | Kilogram   |       |                                              |
 | 52   | tomatoes (fresh)                                                    | Tomato (fresh)                                                      | yes  | Kilogram   |       |                                              |
 | 53   | tomato paste (canned)                                               | Tomato (paste)                                                      | yes  | Kilogram   |       |                                              |
-| 54   | garlic                                                              | Condiments                                                          | yes  | Kilogram   |       |                                              |
+| 54   | garlic                                                              | Condiment                                                           | yes  | Kilogram   |       |                                              |
 | 55   | sugar (cube, st. louis)                                             | Sugar                                                               | yes  | Kilogram   |       |                                              |
 | 56   | sugar (granulated)                                                  | Sugar                                                               | yes  | Kilogram   |       |                                              |
 | 57   | honey (bottle)                                                      | Honey                                                               | yes  | Liter      |       |                                              |
@@ -328,7 +328,7 @@ market carry identical prices) -- kept native.
 | 61   | black pepper                                                        | Chilli Powder (black pepper)                                        | yes  | Kilogram   |       |                                              |
 | 62   | salt (iodized)                                                      | Salt                                                                | yes  | Kilogram   |       |                                              |
 | 63   | ginger                                                              | Ginger                                                              | yes  | Kilogram   |       |                                              |
-| 64   | maggi cubes                                                         | Condiments                                                          | yes  | Kilogram   |       |                                              |
+| 64   | maggi cubes                                                         | Condiment                                                           | yes  | Kilogram   |       |                                              |
 | 65   | cassava (fresh)                                                     | Cassava (fresh)                                                     | yes  | Kilogram   |       |                                              |
 | 66   | cassava dough                                                       | Cassava (dough)                                                     | yes  | Kilogram   |       |                                              |
 | 67   | cassava flour (konkonte)                                            | Cassava (flour)                                                     | yes  | Kilogram   |       |                                              |
@@ -344,7 +344,7 @@ market carry identical prices) -- kept native.
 | 77   | coffee (nescafe - tin)                                              | Coffee                                                              | yes  | Kilogram   |       |                                              |
 | 78   | chocolate drinks (milo, bournvita, other specified)                 | Cocoa Powder                                                        | yes  | Kilogram   |       |                                              |
 | 79   | pure cocoa powder (without milk, e.g. brown gold)                   | Cocoa Powder                                                        | yes  | Kilogram   |       |                                              |
-| 80   | tea (lipton)                                                        | Tea bags                                                            | yes  | Kilogram   |       |                                              |
+| 80   | tea (lipton)                                                        | Tea                                                                 | yes  | Kilogram   |       |                                              |
 | 81   | coca cola / fanta (bottled)                                         | Soft Drinks                                                         | yes  | Liter      |       |                                              |
 | 82   | malt drinks                                                         | Malt Drinks (bottle)                                                | yes  | Liter      |       |                                              |
 | 83   | fruits juices (don simon multifruita, ceres)                        | Juice                                                               | yes  | Liter      |       |                                              |
@@ -367,7 +367,7 @@ market carry identical prices) -- kept native.
 | 100  | fried plantain and beans (red red)                                  | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
 | 101  | rice and chicken sauce                                              | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
 | 102  | banku and stew                                                      | Other Prepared Meals                                                | yes  | Kilogram   |       |                                              |
-| 103  | cigarette (555)                                                     | Cigarrette                                                          | yes  | Other Unit |       | basis is the free-text s2desc -> Description |
+| 103  | cigarette (555)                                                     | Tobacco                                                             | yes  | Other Unit |       | basis is the free-text s2desc -> Description |
 | 104  | refuse disposal (payment per month)                                 | Refuse disposal (payment per month)                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |
 | 105  | expenditure on public toilets fees (wc and others)                  | Expenditure on public toilets fees (wc and others)                  | no   | Other Unit |       | basis is the free-text s2desc -> Description |
 | 106  | charcoal (bag-mini)                                                 | Charcoal (bag-mini)                                                 | no   | Other Unit |       | basis is the free-text s2desc -> Description |

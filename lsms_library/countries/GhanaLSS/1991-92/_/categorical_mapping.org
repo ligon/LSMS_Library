@@ -268,8 +268,8 @@ strata (codes 1-10) both use this list.
 | Millet (flour)                 | Millet                         |         |                                                 |       6 | Millet flour                   |
 | Bread                          | Bread                          |       6 | Bread, buns                                     |         |                                |
 | Biscuit                        | Biscuit                        |       7 | Biscuits                                        |         |                                |
-| Other Grain                    | Other Grain                    |         |                                                 |       8 | Other grains                   |
-| Other Flour                    | Other Flour                    |       8 | Flour and other cereal products                 |       9 | Other flours                   |
+| Other Grains                   | Other Grains                   |         |                                                 |       8 | Other grains                   |
+| Other Flours                   | Other Flours                   |       8 | Flour and other cereal products                 |       9 | Other flours                   |
 | Cassava                        | Cassava                        |       9 | Cassava                                         |      10 | Cassava –roots                 |
 | Cocoyam                        | Cocoyam                        |      10 | Cocoyam                                         |      14 | Cocoyams                       |
 | Plantain                       | Plantain                       |      11 | Plantain                                        |      15 | Plantain                       |
@@ -326,7 +326,7 @@ strata (codes 1-10) both use this list.
 | Guinea Fowl                    | Guinea Fowl                    |      62 | Guinea fowl                                     |         |                                |
 | Other Poultry                  | Other Poultry                  |      63 | Other poultry                                   |      61 | Other Dom. Poultry             |
 | Other Meat                     | Other Meat                     |         |                                                 |      62 | Game birds                     |
-| Eggs                           | Eggs                           |      64 | Chicken eggs                                    |      70 | Eggs                           |
+| Egg                            | Egg                            |      64 | Chicken eggs                                    |      70 | Eggs                           |
 | Other Eggs                     | Other Eggs                     |      65 | Other eggs (not chicken)                        |         |                                |
 | Beef                           | Beef                           |      53 | Fresh Beef (Cattle)                             |      63 | Beef                           |
 | Beef (corned)                  | Beef                           |      52 | Corned Beef                                     |         |                                |
@@ -356,7 +356,7 @@ strata (codes 1-10) both use this list.
 | Chocolate Drink                | Chocolate Drink                |      83 | Chocolate Drinks                                |         |                                |
 | Tea                            | Tea                            |      84 | Tea                                             |         |                                |
 | Other Drink                    | Other Drink                    |      85 | Other (not beverage)                            |         |                                |
-| Other Beverage                 | Other Beverage                 |         |                                                 |      91 | Non-alcoholic beverages        |
+| Other Beverages                | Other Beverages                |         |                                                 |      91 | Non-alcoholic beverages        |
 | Cooked Rice and Stew           | Cooked Rice and Stew           |      86 | Cooked Rice and Stew                            |         |                                |
 | Soup                           | Soup                           |      87 | Fufu and Soup                                   |         |                                |
 | Soup                           | Soup                           |      88 | Tuo and Soup                                    |         |                                |
@@ -458,7 +458,7 @@ code 5 (Rice imported vs Sorghum, n=50) and codes 47-49, flagged in =Note=.
 | 41   | Bushmeat (smoked) - Grass cutter                                | Other Meat                       | yes  | Kilogram     | 1     | axis codes Bushmeat as Other Meat; GLSS4 code 43                             |
 | 42   | Snail (fresh)                                                   | Snail                            | yes  | Kilogram     | 1     | on the 1991-92 axis; not on the 1998-99 axis; GLSS4 code 44                  |
 | 43   | Live Chicken (Local)                                            | Chicken                          | yes  | Kilogram     | 1     | GLSS4 code 45                                                                |
-| 44   | Chicken eggs                                                    | Eggs                             | yes  | Kilogram     | 1     | KG-column item on the GLSS3/4 form (1987 priced each); GLSS4 code 47         |
+| 44   | Chicken eggs                                                    | Egg                              | yes  | Kilogram     | 1     | KG-column item on the GLSS3/4 form (1987 priced each); GLSS4 code 47         |
 | 45   | Evaporated milk (Ideal), 0.170 kg tin                           | Milk (tinned, unsweetened)       | yes  | Kilogram     | 0.17  | form pre-fills 0.170 per observation; GLSS4 code 48                          |
 | 46   | White granulated sugar                                          | Sugar                            | yes  | Kilogram     | 1     | GLSS4 code 49                                                                |
 | 47   | Salt                                                            | Salt                             | yes  | Kilogram     | 1     | alignment: GLSS4 code 52 (Nescafe sachet) absent from GLSS3                  |
