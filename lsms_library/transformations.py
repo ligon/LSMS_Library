@@ -99,6 +99,10 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
         variable bound to the wrong survey question.
     ``nan``
         Quantity missing, or a unit with no kg factor (the ``kg*`` modes).
+        NOT always a defect: a currency-denominated unit
+        (:data:`_CURRENCY_DENOMINATED_UNITS`, e.g. GhanaLSS's ``u='Value'``)
+        deliberately has no per-label kg factor, so every such row lands
+        here by design (GH #770).
     ``zero``
         Zero Expenditure (``*value``) or a zero reported Price (``*price``).
 
@@ -142,11 +146,19 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
             f"food_prices(units={units!r}): dropped {lost:,} of {n_expected:,} "
             f"priceable rows ({lost / n_expected:.1%}) because Price was "
             f"inf ({tally['inf']:,}), NaN ({tally['nan']:,}) or zero "
-            f"({tally['zero']:,}).  An inf Price means the survey recorded an "
-            f"Expenditure against a ZERO Quantity -- typically a 0-as-missing "
-            f"sentinel or a quantity variable mapped to the wrong survey "
-            f"question.  These rows are DROPPED, not returned as NaN, so the "
-            f"gap is otherwise invisible.  See GH #591.",
+            f"({tally['zero']:,}).  These rows are DROPPED, not returned as "
+            f"NaN, so the gap is otherwise invisible.  The causes are "
+            f"DIFFERENT and only the first is always a defect: an inf Price "
+            f"means the survey recorded an Expenditure against a ZERO "
+            f"Quantity -- typically a 0-as-missing sentinel or a quantity "
+            f"variable mapped to the wrong survey question (GH #591).  A NaN "
+            f"Price means the quantity was missing OR the unit has no kg "
+            f"factor -- and for a CURRENCY-DENOMINATED unit "
+            f"(u='Value': the survey deliberately elicited value, not a "
+            f"physical amount) that is BY DESIGN, because the factor is "
+            f"1/price at (j, t, m) and no per-label constant can represent "
+            f"it (GH #770).  Check the u composition of the dropped rows "
+            f"before treating this as a defect.  See GH #591, GH #770.",
             UnpriceableRowsWarning,
             stacklevel=3,
         )
@@ -609,6 +621,59 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
     return result
 
 
+# Unit labels denominated in local currency rather than in a physical
+# amount (GH #770).  Matched case-insensitively against the lower-cased
+# ``u`` label.
+#
+# These are EXCLUDED from the price-ratio inference in
+# :func:`conversion_to_kgs` and from the merge in :func:`_get_kg_factors`,
+# so no kg factor is produced for them and ``Quantity_kg`` stays NaN.
+#
+# WHY -- and the name matters.  ``u='Value'`` is NOT a "non-physical" unit:
+# Value = Quantity x Price, so ``Value / Price = Quantity`` and a kg factor
+# for it *does* exist -- it is ``1/price``.  Prices are the units in which
+# value measures quantity.  The defect is one of GRANULARITY, not of
+# existence: :func:`conversion_to_kgs` returns ONE factor per unit label,
+# while ``1/price`` varies over ``(j, t, m)``.  A per-label constant cannot
+# represent it, so the inference must not pretend otherwise.  Calling these
+# labels "non-physical" would teach the next reader the very error this
+# constant fixes.
+#
+# NaN is therefore the honest INTERIM state, not a terminal verdict: the
+# factor is recoverable per ``(j, t, m)`` from a price source, which is the
+# separate ``source=`` work (Step 2 of #770), not this.
+#
+# Deliberately a hardcoded set, not a detector.  Across the 662 distinct
+# unit labels the corpus holds, only ``value`` qualifies, in GhanaLSS and
+# Panama.  The obvious detector (``Quantity == Expenditure``) tests the
+# SYMPTOM rather than the cause and misses Panama 1997 outright (0.5%
+# there, because 99.1% of those rows carry the undecoded 7.70 sentinel of
+# GH #777) -- recall of 1 of the 2 countries we actually hold.  If a
+# detector is ever founded on the real cause, note that compiled-regex
+# module constants must NOT be used: they land in the hashed import closure
+# and are un-serialisable (GH #780).
+#
+# Kept in sync with ``lsms_library.country._RESERVED_U_SENTINELS`` (the
+# capital-``V`` spelling of the same concept, GH #361) by
+# ``tests/test_u_sentinel_protection.py``; a plain import would be circular
+# (``country`` imports ``transformations``).
+_CURRENCY_DENOMINATED_UNITS = frozenset({'value'})
+
+
+def _is_currency_denominated(labels):
+    """Boolean ndarray over raw ``u`` labels, matched case-insensitively.
+
+    Accepts a Series, an Index or a plain sequence; always returns a numpy
+    bool array so the caller need not care which it passed (``pd.Index.isin``
+    already returns an ndarray, ``Series.isin`` a Series).
+    """
+    return np.asarray(
+        pd.Index(labels).astype(str).str.lower().isin(
+            _CURRENCY_DENOMINATED_UNITS),
+        dtype=bool,
+    )
+
+
 def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
     """Infer local-unit → kg conversion factors from price ratios.
 
@@ -623,6 +688,11 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     then the median across rows is compared to the unit-wise median to
     back out kg per unit. Used by :func:`_get_kg_factors` as a fallback
     when a survey doesn't ship its own conversion table.
+
+    Labels in :data:`_CURRENCY_DENOMINATED_UNITS` (e.g. ``u='Value'``) are
+    dropped from the whole computation before anything is inferred, so they
+    never appear as a key of the result: their factor is ``1/price`` at
+    ``(j, t, m)`` and a per-label constant cannot represent it (GH #770).
 
     Parameters
     ----------
@@ -642,8 +712,9 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     -------
     dict[str, float]
         Mapping of (lowercased) unit label → inferred kg factor.
-        Units already in :data:`KNOWN_METRIC` or that cannot be inferred
-        are absent from the output.
+        Units already in :data:`KNOWN_METRIC`, units in
+        :data:`_CURRENCY_DENOMINATED_UNITS`, or units that cannot be
+        inferred are absent from the output.
     """
     v = df.copy()
     v = v.replace(0, np.nan)
@@ -661,6 +732,13 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     v = v.reset_index(unit_col)
     if unit_col != 'u':
         v = v.rename(columns={unit_col: 'u'})
+    # Currency-denominated labels leave the computation ENTIRELY, not just
+    # the ``v_infer`` step below (GH #770).  They must not contribute to the
+    # ``pkg`` price-per-kg baseline either -- a ``Value`` row carrying a
+    # non-null ``Quantity_kg`` would otherwise enter it through the
+    # ``.where(..., Quantity_kg)`` fill and move OTHER units' factors.  The
+    # acceptance criterion is that exactly one key disappears.
+    v = v[~_is_currency_denominated(v['u'])]
     # Vectorize: ``astype(str)`` followed by ``.str.lower()`` handles any
     # underlying dtype (object with NaN, pyarrow string with pd.NA,
     # Categorical from a .dta read), whereas the previous row-by-row
@@ -861,10 +939,18 @@ def _get_kg_factors(df, *, volume_as_mass=True):
         if group_levels:
             try:
                 inferred = conversion_to_kgs(df, index=group_levels)
-                # Inferred factors fill in where known metric doesn't cover
+                # Inferred factors fill in where known metric doesn't cover.
+                # Currency-denominated labels are already dropped inside
+                # ``conversion_to_kgs``; re-checking here is belt and braces
+                # so a future caller of that function with different
+                # arguments -- or a future inference path -- cannot
+                # reintroduce the key (GH #770).
                 for unit, factor in inferred.items():
-                    if unit.lower() not in factors and np.isfinite(factor) and factor > 0:
-                        factors[unit.lower()] = factor
+                    key = unit.lower()
+                    if key in _CURRENCY_DENOMINATED_UNITS:
+                        continue
+                    if key not in factors and np.isfinite(factor) and factor > 0:
+                        factors[key] = factor
             except (ValueError, ZeroDivisionError, KeyError):
                 # Inference is best-effort; numeric / lookup failure means
                 # we proceed with the known-metric factors only.  Programmer

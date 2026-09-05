@@ -1105,6 +1105,75 @@ print(pd.read_parquet('../var/food_expenditures.parquet').describe())
 #+end_src
 
 
+*** food_prices returns ONE wave, and the other six are CORRECTLY empty (GH #770, 2026-09-05)
+
+*Read this before filing =GhanaLSS/food_prices= as broken.*  After GH #770
+Step 1, =Country('GhanaLSS').food_prices()= returns *407,478 rows in
+2016-17 only*.  1987-88, 1988-89, 1991-92, 1998-99, 2005-06 and 2012-13
+return *nothing*.  That is the intended, correct answer, and it is a
+deliberate replacement for a worse one.
+
+*What it returned before, and why that was worse.*  1,505,751 rows over
+seven waves -- of which 1,067,978 (the six waves above) all carried the
+*same number*, =2.035038=, for every item, household and year.  Within-wave
+=std= was exactly =0.0= in six of seven waves.  =2.035038 = 1/0.49139133=,
+the reciprocal of a fabricated kg-per-cedi factor:
+=transformations.conversion_to_kgs= inferred a factor for =u='Value'= rows
+(where =Quantity= *is* the cedi expenditure), so
+=kgvalue = Expenditure / (Expenditure x f) = 1/f= identically.  It was not a
+price.  @ligon's ruling, recorded: /"empty food prices is better than a made
+up constant."/
+
+*Why SIX waves and not two.*  Two mechanisms compose, and the second is
+already documented in this file:
+1. Before 2016-17 GLSS elicited *purchases by value*: =u='Value'= is 100% of
+   =food_acquired= in 1987-88 / 1988-89, and 54--88% in 1991-92 through
+   2012-13.  Those rows now have no kg factor, so =kgvalue= is NaN and
+   =food_prices_from_acquired= *drops* them (it ends in =_drop_unpriceable=;
+   the rows do not come back as NaN, they cease to exist).
+2. The non-=Value= rows in those waves are almost entirely =s='produced'=
+   -- see idiosyncrasy 2 under =nutrition= below -- and produced rows carry
+   *no Expenditure*, so they price to NaN and drop as well.  What is left is
+   nothing.
+
+GhanaLSS is the worst-hit country in the corpus for a third reason recorded
+above: =conversion_to_kgs.json -- intentionally NOT used=.  This country
+ships *no* kg table at all, so *every* kg factor it has is inferred from
+price ratios, and =Value= was inferred alongside =Heap=, =Bowl= and =Piece=
+for exactly the same reason.
+
+*What did NOT change, and is the provable control.*  The factor map loses
+*exactly* the =value= key -- 57 -> 56 factors, with every remaining key
+byte-identical (measured).  =unitvalue=, =unitprice= and
+=food_quantities(units='units')= are unchanged (delta 0 rows).
+=food_prices(units='kgprice')= is unchanged *here* (136,387 rows both ways)
+only because GhanaLSS's =Value= rows carry a reported =Price= 0.0% of the
+time; Panama's carry one 97.4% of the time and it loses 17,366 rows there.
+
+*2016-17 is NOT untouched* -- the intuitive control is false.  It shrinks
+438,773 -> 407,478 (*-7.13%*): that wave has 31,295 grouped =Value= rows of
+its own.  Median =Price= moves 4.899 -> 5.512, =std= 314.86 -> 326.70.
+
+*=_drop_unpriceable= now warns on every =food_prices()= call for this
+country*, with =lost_fraction= 0.0097% -> *79.84%*.  The warning text was
+widened in the same PR so it no longer asserts the loss is /"typically a
+0-as-missing sentinel or a quantity variable mapped to the wrong survey
+question"/ -- for a currency-denominated unit the NaN is *by design*.  The
+warning is correct and expected; it is not a new defect.
+
+*Coverage regrade: six =GhanaLSS,food_prices= cells go =sane -> dropped=.*
+=dropped= is the tier whose own docstring calls it /"the silent-drop bug
+class"/, and there is no verdict vocabulary able to record *"correctly
+empty"* -- that gap is *GH #781*.  Until #781 gives it a word, this entry is
+the record: the six cells are empty *on purpose*, and re-grading them back
+to =sane= by restoring a constant would be a regression, not a fix.
+
+*NaN is interim, not terminal.*  The kg factor for =u='Value'= exists and
+equals =1/price=; it just varies over =(j, t, m)=, which a per-label
+constant cannot represent.  Recovering it from a price source (=community_prices=
+via a =source== argument) is Step 2 of #770 and is gated on the item-label
+work in #782.  Do not reintroduce a per-label constant in the meantime.
+
 *** DONE food_expenditures
 Now derived canonically by =_FOOD_DERIVED= -- index =(i, t, v, j, s)=.  The old
 non-standard build (missing =(t, m)=, indices borrowed from
@@ -1170,20 +1239,44 @@ Sources originally listed here:
 
 *** Idiosyncrasies this work surfaced -- read before touching =nutrition=
 
-1. *=u='Value'= is served as kilograms.*  =transformations.conversion_to_kgs=
-   infers a kg-per-unit factor of *0.49139* for =u='Value'=, where =Quantity=
-   IS the cedi expenditure, and the conversion then relabels those rows
-   =u='kg'=.  1987-88 has 71,605 =u='Value'= rows and
-   =food_quantities(units='kgs')= emits exactly 71,605 =u='kg'= rows.  Median
-   household "kg" runs 2,228 (1987-88) to 251,592 (2005-06) against 85 for
-   2016-17 -- it tracks the cedi, not any mass.  This contradicts
-   =food_quantities_from_acquired='s own docstring, which names =u='Value'=
-   as the canonical carry-through case.  *A library defect, not config*: see
-   =slurm_logs/ghana_audit/ISSUE_value_kg_factor.org=.  =nutrition.py= works
-   around it by dropping non-physical units BEFORE deriving; it cannot filter
-   afterwards, because the kg relabel destroys the native =u=.  **Do not
+1. *=u='Value'= was served as kilograms -- FIXED in the library, GH #770
+   Step 1 (2026-09-05).*  =transformations.conversion_to_kgs= used to infer a
+   kg-per-unit factor of *0.49139* for =u='Value'=, where =Quantity= IS the
+   cedi expenditure, and the conversion then relabelled those rows =u='kg'=.
+   1987-88 had 71,605 =u='Value'= rows and =food_quantities(units='kgs')=
+   emitted exactly 71,605 =u='kg'= rows.  Median household "kg" ran 2,228
+   (1987-88) to 251,592 (2005-06) against 85 for 2016-17 -- it tracked the
+   cedi, not any mass.  This contradicted =food_quantities_from_acquired='s
+   own docstring, which names =u='Value'= as the canonical carry-through
+   case.  *A library defect, not config*: see
+   =slurm_logs/ghana_audit/ISSUE_value_kg_factor.org= and
+   =slurm_logs/770/PLAN_2026-09-05.org=.
+
+   *What the fix does.*  =transformations._CURRENCY_DENOMINATED_UNITS=
+   ={'value'}= is excluded from the price-ratio inference, so no factor is
+   produced and =Quantity_kg= stays NaN; the rows are carried through with
+   their native =u='Value'=, exactly as the docstring always promised.
+   =food_quantities(units='kgs')= now tags 468,105 rows =u='kg'= for this
+   country, not 1,566,368, and =sum(u=='kg')= for 2016-17 falls 1,613,235 ->
+   1,208,306 (-25%) -- the fix working.
+
+   *The name is =currency-denominated=, NOT =non-physical=, and that
+   matters.*  Value = Quantity x Price, so =Value / Price = Quantity=:
+   prices are the units in which value measures quantity, and the kg factor
+   for =Value= *exists* -- it equals =1/price=.  The bug was one of
+   *granularity*: =conversion_to_kgs= returns one factor per unit LABEL and
+   =1/price= varies over =(j, t, m)=.  NaN is the honest interim state, not
+   a verdict that the quantity is unknowable.
+
+   *=nutrition.py='s own filter STAYS.*  It drops =NON_PHYSICAL_UNITS =
+   {'value','all','none'}= BEFORE deriving; it cannot filter afterwards,
+   because the kg relabel destroys the native =u=.  Measured on the filtered
+   frame, the factor map is *byte-identical* before and after #770 (56 keys
+   both ways), so =nutrition= is provably unchanged by the fix.  **Do not
    "simplify" nutrition.py to call =Country.food_quantities()= like Uganda's
-   and Ethiopia's do.**
+   and Ethiopia's do** -- and do not remove the filter now that the library
+   is fixed either: it also drops =all= and =none=, which #770 does not
+   touch.
 
 2. *Own production is the only physical-quantity source before 2016-17.*
    After the filter, the surviving kg rows in 1991-92 / 1998-99 / 2005-06 /

@@ -43,6 +43,29 @@ def test_kg_in_reserved_sentinels():
     assert "Value" in _RESERVED_U_SENTINELS
 
 
+def test_currency_registry_is_derivable_from_the_reserved_sentinels():
+    """GH #770 + GH #361: two registries, one concept -- pinned, not copied.
+
+    ``country._RESERVED_U_SENTINELS`` ({'kg', 'Value'}) and
+    ``transformations._CURRENCY_DENOMINATED_UNITS`` ({'value'}) name the same
+    set of reserved ``u`` labels in two modules with two spellings.  A plain
+    import cannot join them (``country`` imports ``transformations``, so the
+    reverse direction is circular), so this assertion is the join: add a
+    future ``Valeur`` to only one of them and this goes red.
+
+    ``KNOWN_METRIC`` is the discriminator rather than a hardcoded
+    ``- {'kg'}``, because it states WHY ``kg`` is in one set and not the
+    other: ``kg`` is a real metric unit with a real factor, and only the
+    labels that have no per-label factor at all belong to the currency set.
+    """
+    from lsms_library.transformations import (
+        KNOWN_METRIC, _CURRENCY_DENOMINATED_UNITS,
+    )
+
+    lowered = {s.lower() for s in _RESERVED_U_SENTINELS}
+    assert _CURRENCY_DENOMINATED_UNITS == lowered - set(KNOWN_METRIC)
+
+
 def test_protected_keeps_kg_sentinel():
     """Derived food tables: the lowercase 'kg' conversion tag survives."""
     out = Country._apply_categorical_mappings(
