@@ -21,7 +21,7 @@
 | Cerelac (Baby food)          | Cerelac (Baby food)          |      13 | baby food (cerelac,etc)                                      |         |                            |
 | Other Cereal                 | Other Cereal                 |      14 | other cereal products                                        |         |                            |
 | Other Cereal                 | Other Cereal                 |      15 | processing of cereals                                        |         |                            |
-| Other Grain                  | Other Grain                  |         |                                                              |       8 | other grains               |
+| Other Grains                 | Other Grains                 |         |                                                              |       8 | other grains               |
 | Beef (corned)                | Corned Beef                  |      18 | corned beef                                                  |         |                            |
 | Pork                         | Pork                         |      19 | pork                                                         |      65 | pork                       |
 | Beef                         | Beef                         |      20 | beef                                                         |      63 | beef                       |
@@ -47,8 +47,8 @@
 | Milk (evaporated)            | Milk                         |      47 | tinned milk (unsweetened,evaporated)                         |         |                            |
 | Milk (tinned, condensed)     | Milk                         |      48 | tinned milk (condensed)                                      |         |                            |
 | Other Milk Products          | Other Milk Products          |      49 | other milk products including cheese                         |         |                            |
-| Eggs                         | Eggs                         |      53 | chicken eggs                                                 |      70 | eggs                       |
-| Eggs                         | Eggs                         |      54 | other eggs                                                   |         |                            |
+| Egg                          | Egg                          |      53 | chicken eggs                                                 |      70 | eggs                       |
+| Egg                          | Egg                          |      54 | other eggs                                                   |         |                            |
 | Oil (coconut)                | Oils, Fats                   |      58 | coconut oil                                                  |      30 | coconut oil                |
 | Oil (groundnut)              | Oils, Fats                   |      59 | groundnut oil                                                |      31 | groundnut oil              |
 | Oil (palm kernel)            | Oils, Fats                   |      60 | palm kernel oil                                              |      29 | palm kernel oil            |
@@ -87,7 +87,7 @@
 | Salt                         | Salt                         |     101 | salt                                                         |         |                            |
 | Ginger                       | Ginger                       |     102 | ginger                                                       |         |                            |
 | Dawadawa                     | Dawadawa                     |     103 | dawadawa                                                     |         |                            |
-| Condiments                   | Condiments                   |     104 | other condiments (royco,maggie,etc)                          |         |                            |
+| Condiment                    | Condiment                    |     104 | other condiments (royco,maggie,etc)                          |         |                            |
 | Cassava (fresh)              | Cassava                      |     107 | cassava                                                      |      10 | cassava-tubers             |
 | Cocoyam                      | Cocoyam                      |     108 | cocoyam                                                      |      14 | cocoyam                    |
 | Plantain                     | Plantain                     |     109 | plantain                                                     |      15 | plantain                   |
@@ -108,7 +108,7 @@
 | Other Flours                 | Other Flours                 |     125 | other processed starchy staples                              |       9 | other flours               |
 | Coffee                       | Coffee                       |     129 | coffee                                                       |         |                            |
 | Cocoa Powder                 | Cocoa Powder                 |     130 | chocolate drinks (including milo,bournvita etc)              |         |                            |
-| Tea bags                     | Tea                          |     131 | tea                                                          |         |                            |
+| Tea                          | Tea                          |     131 | tea                                                          |         |                            |
 | Other Beverages              | Other Beverages              |     132 | other beverage drinks                                        |      92 | non-alcoholic beverages    |
 | Soft Drinks                  | Soft Drinks                  |     136 | soft drinks and minerals                                     |         |                            |
 | Malt Drinks (bottle)         | Malt Drinks (bottle)         |     137 | malta and malt drinks                                        |         |                            |
@@ -178,7 +178,7 @@
 | Kenkey/Banku                 | Kenkey/Banku                 |     256 | banku or kenkey with sauce                                   |         |                            |
 | Other Prepared Meals         | Other Prepared Meals         |     257 | other prepared meals                                         |         |                            |
 | Fast Food                    | Fast Food                    |     258 | fast foods                                                   |         |                            |
-| Cooked Rice and Stew         | Cooked Rice and Stew Ê Ê     |     262 | cooked rice and sauce                                        |         |                            |
+| Cooked Rice and Stew         | Cooked Rice and Stew           |     262 | cooked rice and sauce                                        |         |                            |
 | Soup                         | Soup                         |     263 | fufu or tuo with soup                                        |         |                            |
 | Kenkey/Banku                 | Kenkey/Banku                 |     264 | banku or kenkey with sauce                                   |         |                            |
 | Other Prepared Meals         | Other Prepared Meals         |     265 | other meals                                                  |         |                            |

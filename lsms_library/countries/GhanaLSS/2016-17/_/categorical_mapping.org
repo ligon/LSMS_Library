@@ -172,8 +172,8 @@
 | Other Milk Products           | Other Milk Products           |     409 | FanDango                                             |         |                                |
 | Other Milk Products           | Other Milk Products           |     410 | Fan Choco                                            |         |                                |
 | Ice Cream                     | Other Milk Products           |     411 | Other ice cream                                      |         |                                |
-| Eggs                          | Eggs                          |     416 | Chicken eggs (fresh, single)                         |      74 | 74. Eggs                       |
-| Eggs                          | Eggs                          |     417 | Other eggs                                           |         |                                |
+| Egg                           | Egg                           |     416 | Chicken eggs (fresh, single)                         |      74 | 74. Eggs                       |
+| Egg                           | Egg                           |     417 | Other eggs                                           |         |                                |
 | Margarine                     | Oils, Fats                    |     421 | Margarine                                            |         |                                |
 | Oil (coconut)                 | Oils, Fats                    |     422 | Coconut oil                                          |      30 | 30. Coconut oil                |
 | Oil (groundnut)               | Oils, Fats                    |     423 | Groundnut oil                                        |      31 | 31. Groundnut oil              |
@@ -214,7 +214,7 @@
 | Jute Leaf                     | Jute Leaf                     |         |                                                      |      59 | 59. Ayoyo/Ahefu                |
 | Other Leafy Vegetable         | Other Leafy Vegetable         |         |                                                      |      61 | 61. Other leafy vegetables     |
 | Tomato (fresh)                | Tomato                        |     463 | Tomatoes (Fresh)                                     |      50 | 50. Tomatoes                   |
-| Other Vegetable               | Other Vegetable               |     464 | Other vegetables                                     |      62 | 62. Other vegetables           |
+| Other Vegetables              | Other Vegetables              |     464 | Other vegetables                                     |      62 | 62. Other vegetables           |
 | Tomato (paste)                | Tomato                        |     473 | Gino                                                 |         |                                |
 | Tomato (paste)                | Tomato                        |     474 | Obaapa                                               |         |                                |
 | Tomato (paste)                | Tomato                        |     475 | Pomo                                                 |         |                                |
@@ -259,18 +259,18 @@
 | Curry Power                   | Curry Power                   |     527 | Curry powder                                         |         |                                |
 | Chilli Powder (black pepper)  | Chilli Powder (black pepper)  |     528 | Chilli powder (black pepper)                         |         |                                |
 | Other Spices                  | Other Spices                  |     529 | Other spices                                         |         |                                |
-| Condiments                    | Condiments                    |     535 | Maggi Cube                                           |         |                                |
-| Condiments                    | Condiments                    |     536 | Royco cube                                           |         |                                |
-| Condiments                    | Condiments                    |     537 | Onga cube                                            |         |                                |
-| Condiments                    | Condiments                    |     538 | Onga 3-in-1                                          |         |                                |
-| Condiments                    | Condiments                    |     539 | Benny                                                |         |                                |
-| Condiments                    | Condiments                    |     540 | Other condiments                                     |         |                                |
+| Condiment                     | Condiment                     |     535 | Maggi Cube                                           |         |                                |
+| Condiment                     | Condiment                     |     536 | Royco cube                                           |         |                                |
+| Condiment                     | Condiment                     |     537 | Onga cube                                            |         |                                |
+| Condiment                     | Condiment                     |     538 | Onga 3-in-1                                          |         |                                |
+| Condiment                     | Condiment                     |     539 | Benny                                                |         |                                |
+| Condiment                     | Condiment                     |     540 | Other condiments                                     |         |                                |
 | Salt                          | Salt                          |     545 | Anapuna iodated salt                                 |         |                                |
 | Salt                          | Salt                          |     546 | U2 iodated salt                                      |         |                                |
 | Salt                          | Salt                          |     547 | Other salt                                           |         |                                |
 | Coffee                        | Coffee                        |     550 | Nescafe                                              |         |                                |
 | Cocoa Powder                  | Cocoa Powder                  |     551 | Pure Cocoa Powder (eg. Brown gold)                   |         |                                |
-| Tea bag                       | Tea bag                       |     552 | Tea bags, (eg. Lipton)                               |         |                                |
+| Tea                           | Tea                           |     552 | Tea bags, (eg. Lipton)                               |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     554 | Bournvita                                            |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     555 | Cow bell (coffee, choco etc.)                        |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     556 | This way chocolate drink                             |         |                                |

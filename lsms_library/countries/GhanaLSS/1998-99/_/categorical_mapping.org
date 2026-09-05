@@ -285,8 +285,8 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Millet (flour)                 | Millet                         |         |                                                 |       6 | Millet flour                   |
 | Bread                          | Bread                          |       6 | Bread, buns                                     |         |                                |
 | Biscuit                        | Biscuit                        |       7 | Biscuits                                        |         |                                |
-| Other Grain                    | Other Grain                    |         |                                                 |       8 | Other grains                   |
-| Other Flour                    | Other Flour                    |       8 | Flour and other cereal products                 |       9 | Other flours                   |
+| Other Grains                   | Other Grains                   |         |                                                 |       8 | Other grains                   |
+| Other Flours                   | Other Flours                   |       8 | Flour and other cereal products                 |       9 | Other flours                   |
 | Cassava                        | Cassava                        |       9 | Cassava                                         |      10 | Cassava –roots                 |
 | Cocoyam                        | Cocoyam                        |      10 | Cocoyam                                         |      14 | Cocoyams                       |
 | Plantain                       | Plantain                       |      11 | Plantain                                        |      15 | Plantain                       |
@@ -340,7 +340,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Guinea Fowl                    | Guinea Fowl                    |      62 | Guinea fowl                                     |         |                                |
 | Other Poultry                  | Other Poultry                  |      63 | Other poultry                                   |      61 | Other Dom. Poultry             |
 | Other Meat                     | Other Meat                     |         |                                                 |      62 | Game birds                     |
-| Eggs                           | Eggs                           |      64 | Chicken eggs                                    |      70 | Eggs                           |
+| Egg                            | Egg                            |      64 | Chicken eggs                                    |      70 | Eggs                           |
 | Other Eggs                     | Other Eggs                     |      65 | Other eggs (not chicken)                        |         |                                |
 | Beef                           | Beef                           |         |                                                 |      63 | Beef                           |
 | Goat                           | Goat                           |         |                                                 |      64 | Mutton                         |
@@ -368,7 +368,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Chocolate Drink                | Chocolate Drink                |      83 | Chocolate Drinks                                |         |                                |
 | Tea                            | Tea                            |      84 | Tea                                             |         |                                |
 | Other Drink                    | Other Drink                    |      85 | Other (not beverage)                            |         |                                |
-| Other Beverage                 | Other Beverage                 |         |                                                 |      91 | Non-alcoholic beverages        |
+| Other Beverages                | Other Beverages                |         |                                                 |      91 | Non-alcoholic beverages        |
 | Cooked Rice and Stew           | Cooked Rice and Stew           |      86 | Cooked Rice and Stew                            |         |                                |
 | Soup                           | Soup                           |      87 | Fufu and Soup                                   |         |                                |
 | Soup                           | Soup                           |      88 | Tuo and Soup                                    |         |                                |
