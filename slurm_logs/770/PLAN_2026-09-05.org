@@ -214,8 +214,27 @@ regressor with a clean one.
   =food_acquired= is household.  Joining a cluster/market price onto household
   rows is a broadcast, and a broadcast is not a measurement -- say so in the
   provenance marker.
-- Whether =food_prices()= should be renamed, or gain a =unit_values()= sibling.
-  Deferred: it is an API break and the ladder is the substance.
+** RESOLVED: no =unit_values()= sibling, and =units== is the vocabulary (EL)
+#+begin_quote
+food_prices already takes a units kwarg; we certainly don't need a unit_value
+#+end_quote
+=food_prices(units='unitvalue')= already *is* "give me unit values".  A second
+method would be a second way to say the same thing.  The naming tension noted
+above is therefore already resolved by the existing kwarg -- the method name is
+the generic access point, =units== names the basis.  Dropped.
+
+*The provenance marker must reuse that vocabulary*, not invent a parallel one:
+a row is =unitvalue=-derived or =community=-derived, in the words =units==
+already uses.
+
+** CONSTRAINT this implies: the ladder MUST be opt-in
+=units== has a documented guarantee (=AGENTS.md:370=): the =*price= modes
+"return NaN where the survey did not record a unit price; *no silent fallback*
+to the =*value= modes."  A row-level ladder IS a fallback.  So Step 2 must not
+change what =units== alone returns -- the ladder is reached only by passing
+=source==, and =food_prices(units='kgprice')= keeps returning NaN rather than
+quietly borrowing a community price.  Otherwise Step 2 silently revokes a
+promise the library currently makes, which is worse than the gap it fills.
 - =NumberOfUnits=: =community_prices.Price= is the price of =NumberOfUnits=,
   not of one unit (measured: ratio 0.9946 with the division, 2.2917 without).
   Any join must divide first.
