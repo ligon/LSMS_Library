@@ -306,3 +306,71 @@ promise the library currently makes, which is worse than the gap it fills.
 - =NumberOfUnits=: =community_prices.Price= is the price of =NumberOfUnits=,
   not of one unit (measured: ratio 0.9946 with the division, 2.2917 without).
   Any join must divide first.
+
+** CORRECTION: what the median is FOR (EL, 2026-09-05)
+#+begin_quote
+I was thinking of how median prices for a given good are computed within a
+market-period in order to compute food_quantities (and I guess prices).  That
+aggregation is useful because screw-ups in individually reported prices
+(measurement error, incorrect units) can have a huge effect on inferred
+quantities, but where that kind of inference isn't required that aggregation
+isn't necessary. ... Robustness and also a fix to missing data on individually
+reported prices.
+#+end_quote
+
+*I recorded the median as a GRAIN requirement.  That was wrong.*  The section
+above says stitching two sources "requires a common grain, so =price_source=
+forces the question".  It does not.  The median is not about making two sources
+line up; it serves two purposes, both tied to *inversion*:
+
+1. *Robustness.*  When a quantity is inferred as =Value / Price=, an erroneous
+   individual price -- measurement error, or a mis-decoded unit -- produces a
+   wildly wrong quantity.  A median over a market-period cell is resistant to
+   that; a single household's own report is not.
+2. *Imputation of missing prices.*  Many rows have NO individually reported
+   price at all.  The canonical case is home-consumed output, which was never
+   sold and so has no transaction price -- the reason the WB ladder values
+   *all* output at a common local price.
+
+*Consequence: the median is conditional on the use, not on the source.*  Where
+no inversion is required -- the caller just wants a price series --
+=price_source='hh'= may return per-household unit values at today's
+=(t, v, i, j, u, s)= grain, unaggregated.  No median, no shape change, no
+migration.  The grain dilemma I posed (median-up vs broadcast-down) applies
+only to the *inversion* path.
+
+*Where inversion is unavoidable, the price source DETERMINES the quantities.*
+GhanaLSS before 2016-17 does not elicit quantities at all
+(=GhanaLSS/_/CONTENTS.org:1034=: the instrument "elicits the amount spent ...
+but does not elicit quantities purchased"), so every quantity in six of seven
+waves comes from an inversion.  That is the same population Step 1 empties.
+=price_source== is therefore not a convenience there -- it is the only input
+that decides what the quantities ARE.
+
+** ASSET: =median_price_valuation= already implements this ladder, and is UNUSED
+=transformations.py:2128=.  It imputes a unit price for *every* item row from
+prices observed in sale transactions, taking the median of the finest
+geographic cell clearing a >=10-observation threshold, walking
+EA -> admin_4 -> admin_3 -> admin_2 -> admin_1 -> national.  Both of EL's
+purposes, already built: robustness (median + threshold) and imputation (rows
+with a zero/missing price are excluded from the median *pool* but still
+*receive* an imputed price).  It reproduces the WB =valuation_median_crops=
+ladder (=Reproduction_v2 programs.do:4-103=).
+
+*Measured: it has ZERO callers* -- the only references in the tree are its own
+=def= and =GhanaLSS/_/CONTENTS.org:1024=, which asserts that GhanaLSS's
+canonicalization "fills quantities via the inverse market-price ladder
+(=transformations.median_price_valuation=)".  Nothing calls it, and no test
+covers it.
+
+Two things follow:
+- *Do not reinvent this for Step 2.*  Per =prior-art-ledger=, cite it and reuse
+  it, or state why it does not fit.  A second median ladder in the same module
+  would be the exact failure that skill exists to prevent.
+- *Verify the =CONTENTS.org:1024= claim before relying on it.*  This is the
+  SECOND claim in that file this session found to name a function with no
+  callers (the first: =ghanalss.py::harmonized_food_labels=, cited at
+  =CONTENTS.org:1219= as the live reader of =food_items.org=, also zero
+  callers).  Either the canonicalization path uses different code and the file
+  names the wrong function, or the ladder was built for GAP 7 and never wired
+  in.  Determine which; do not assume.
