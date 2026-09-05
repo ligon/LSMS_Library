@@ -469,7 +469,7 @@ not on this wave's axis and keep their own label (=Food=own=).
 | 44   | Snail (fresh)                                                   | Snail                            | own  | Kilogram     | 1     | on the 1991-92 axis; not on the 1998-99 axis                  |
 | 45   | Live Chicken (Local)                                            | Chicken                          | yes  | Kilogram     | 1     |                                                               |
 | 46   | Live Chicken (Poultry)                                          | Chicken                          | yes  | Kilogram     | 1     |                                                               |
-| 47   | Chicken eggs                                                    | Eggs                             | yes  | Kilogram     | 1     | KG-column item on the GLSS3/4 form (1987 priced each)         |
+| 47   | Chicken eggs                                                    | Egg                              | yes  | Kilogram     | 1     | KG-column item on the GLSS3/4 form (1987 priced each)         |
 | 48   | Evaporated milk (Ideal), 0.170 kg tin                           | Milk (tinned, unsweetened)       | yes  | Kilogram     | 0.17  | form pre-fills 0.170 per observation                          |
 | 49   | White granulated sugar                                          | Sugar                            | yes  | Kilogram     | 1     |                                                               |
 | 50   | Salt                                                            | Salt                             | yes  | Kilogram     | 1     |                                                               |

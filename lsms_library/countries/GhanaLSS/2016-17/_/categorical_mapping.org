@@ -781,7 +781,7 @@ cluster/region pairs) -- kept native, told apart by =obs=.
 | 138  | FAN YOGHURT                    | Yoghurt                                 | yes  |      |       |                                                                                 |
 | 139  | FANDANGO                       | Other Milk Products                     | yes  |      |       |                                                                                 |
 | 140  | FAN CHOCO                      | Other Milk Products                     | yes  |      |       |                                                                                 |
-| 141  | CHICKEN EGGS (FRESH, SINGLE)   | Eggs                                    | yes  |      |       |                                                                                 |
+| 141  | CHICKEN EGGS (FRESH, SINGLE)   | Egg                                     | yes  |      |       |                                                                                 |
 | 142  | MARGARINE                      | Margarine                               | yes  |      |       |                                                                                 |
 | 143  | COCONUT OIL                    | Oil (coconut)                           | yes  |      |       |                                                                                 |
 | 144  | GROUNDNUT OIL                  | Oil (groundnut)                         | yes  |      |       |                                                                                 |
@@ -854,13 +854,13 @@ cluster/region pairs) -- kept native, told apart by =obs=.
 | 229  | U2 IODATED SALT                | Salt                                    | yes  |      |       |                                                                                 |
 | 230  | GINGER                         | Ginger                                  | yes  |      |       |                                                                                 |
 | 231  | VINEGAR                        | Vinegar                                 | yes  |      |       |                                                                                 |
-| 232  | ROYCO                          | Condiments                              | yes  |      |       |                                                                                 |
-| 233  | ONGA CUBE                      | Condiments                              | yes  |      |       |                                                                                 |
-| 234  | BENNY                          | Condiments                              | yes  |      |       |                                                                                 |
-| 235  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Condiments                              | yes  |      |       | other (specify), stock-cube block                                               |
+| 232  | ROYCO                          | Condiment                               | yes  |      |       |                                                                                 |
+| 233  | ONGA CUBE                      | Condiment                               | yes  |      |       |                                                                                 |
+| 234  | BENNY                          | Condiment                               | yes  |      |       |                                                                                 |
+| 235  | OTHER (SPECIFY) _ _ _ _ _ _ _  | Condiment                               | yes  |      |       | other (specify), stock-cube block                                               |
 | 239  | NESCAFE - TIN                  | Coffee                                  | yes  |      |       |                                                                                 |
 | 240  | PURE COCOA POWDER (EG. BROWN G | Cocoa Powder                            | yes  |      |       |                                                                                 |
-| 241  | TEA BAGS, (EG. LIPTON)         | Tea bag                                 | yes  |      |       |                                                                                 |
+| 241  | TEA BAGS, (EG. LIPTON)         | Tea                                     | yes  |      |       |                                                                                 |
 | 242  | COCOA WITH MILK POWDER         | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
 | 243  | BOURNVITA                      | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
 | 244  | COW BELL (COFFEE,CHOCO ETC)    | Cocoa (milk powder beverages)           | yes  |      |       |                                                                                 |
