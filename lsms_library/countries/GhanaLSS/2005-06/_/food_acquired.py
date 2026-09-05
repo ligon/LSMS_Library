@@ -134,6 +134,29 @@ y = y.groupby(['i', 'j', 'u', 'Price']).sum(min_count=1).reset_index()
 y = pd.wide_to_long(y, ['Quantity'], ['i', 'j', 'u', 'Price'], 'visit', sep='_v')
 y = y.dropna(subset=['Quantity'])        # keep only visits with a recorded quantity
 y = y.reset_index()
+
+# `Price` is in the groupby key above (two farmgate prices for one commodity are
+# two real observations), but it is NOT an index level of the canonical schema
+# -- so once several foodcd harmonize to one j, a household can hold two rows on
+# the same (i, j, u, visit) differing only in Price.  Resolve that HERE, on the
+# canonical grain, rather than leaving it to the framework: `_normalize_dataframe_index`
+# would reduce it with `groupby().first()`, i.e. keep one farmgate price and
+# silently discard the other (GH #323's hazard, and measured to be exactly this
+# -- 24 rows in 12 groups, all 12 disagreeing on Price).  Core is right not to
+# aggregate; the wave script is where this belongs.
+#
+# Quantity SUMS (the household consumed both) and Price becomes the
+# QUANTITY-WEIGHTED MEAN, which is the price of the harmonized commodity and is
+# what makes Expenditure = Quantity * Price hold across the merge.  Affects only
+# the Goat (mutton+goat) and Other Meat (game birds + other domestic meat + wild
+# game) merges; every other row is already unique on this grain.
+y['_qp'] = y['Quantity'] * y['Price']
+g = y.groupby(['i', 'j', 'u', 'visit'], sort=False)
+y = g.agg(Quantity=('Quantity', 'sum'), _qp=('_qp', 'sum'),
+          _pf=('Price', 'first')).reset_index()
+y['Price'] = (y['_qp'] / y['Quantity']).where(y['Quantity'] != 0, y['_pf'])
+y = y.drop(columns=['_qp', '_pf'])
+
 y['s'] = 'produced'
 y['Expenditure'] = np.nan
 
