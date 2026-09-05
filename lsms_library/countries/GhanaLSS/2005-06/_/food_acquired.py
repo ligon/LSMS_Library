@@ -13,8 +13,10 @@ imputation is a later, out-of-scope phase).  Production (Section 8H / Code_8h)
 carries a real Quantity in a native unit ``u`` plus a farmgate Price; its
 Expenditure is left NaN (no produced value is recorded).
 
-Food codes map to canonical ``j`` via the harmonize_food table; rows whose label
-is empty ('') are the non-food Section-9B block (codes ~165-277) and are dropped.
+Food codes map to canonical ``j`` via the harmonize_food table, decoded on the
+NUMERIC CODE axis for both modules and asserted to be exhaustive (GH #782); rows
+whose label is empty ('') are the non-food Section-9B block (codes ~165-277) and
+are dropped.
 
 Household id ``i`` is built EXACTLY as sample()/household_roster() build it -- by
 running this wave's mapping.i() over the pre-composed source ``hhid`` column --
@@ -33,18 +35,42 @@ import mapping
 t = '2005-06'
 
 # --- food-item harmonization (purchases: Code_9b; production: Code_8h) ----------
+# BOTH modules decode on the NUMERIC CODE axis.  The org table's Label_9b /
+# Label_8h columns transcribe the survey's own label text and are documentation
+# only -- decoding on them is fragile, because a transcription is one well-meant
+# typo fix away from silently matching nothing (GH #782): the 8h labels for codes
+# 91/92 read 'alcoholic beverages' / 'non-alcoholic beverages' in the org table
+# but 'alchoholic beverages' / 'non-alchoholic beverages' (sic) in the .dta.
+# The code axis has no such failure mode: Code_8h agrees with the data's foodcd
+# codes for all 63 items, and Code_9b with freqcd for all 164.
 labels = df_from_orgfile('./categorical_mapping.org', name='harmonize_food',
                          encoding='ISO-8859-1')
 labelsd = {}
 for column in ['Code_9b', 'Code_8h']:
     labelsd[column] = (labels[['Preferred Label', column]]
                        .dropna(subset=[column])
+                       .astype({column: int})
                        .set_index(column)['Preferred Label'].to_dict())
 
 
 def _drop_nonfood(s):
     """Keep only rows whose harmonized j is a non-empty string label."""
     return s.apply(lambda x: isinstance(x, str) and x.strip() != '')
+
+
+def _assert_decoded(codes, j, column):
+    """Fail loudly if any source code fell through the harmonize_food map.
+
+    ``.map()`` yields NaN for an unmatched code, which ``_drop_nonfood`` would
+    then discard silently; ``.replace()`` (used here before GH #782) was worse
+    still -- it passed the unmatched value through unchanged, so 149,047 rows of
+    2005-06 own production shipped the survey's raw labels as ``j`` for years.
+    Neither failure is acceptable without a noise, so assert coverage instead.
+    """
+    missing = sorted(set(codes[j.isna()].unique()))
+    assert not missing, (
+        f'GhanaLSS 2005-06: {len(missing)} source code(s) absent from '
+        f'harmonize_food[{column}] -- {missing[:20]}')
 
 
 # ================================ PURCHASES (s9b) ==============================
@@ -54,7 +80,8 @@ df = get_dataframe('../Data/partb/sec9b.dta', convert_categoricals=False)
 # i exactly as sample()/roster() build it: mapping.i() over the *pre-composed*
 # source 'hhid' column (sample reads idxvars i: hhid -> format_id(hhid)).
 df['i'] = df['hhid'].apply(mapping.i)
-df['j'] = df['freqcd'].replace(labelsd['Code_9b'])
+df['j'] = df['freqcd'].astype('int64').map(labelsd['Code_9b'])
+_assert_decoded(df['freqcd'], df['j'], 'Code_9b')
 df = df[_drop_nonfood(df['j'])]          # drop non-food Section-9B block (j == '')
 
 pur_visit_cols = {f's9bq{v}': f'Expenditure_v{v}' for v in range(1, 11)}
@@ -74,10 +101,23 @@ x = x.reset_index()
 # ================================ PRODUCED (s8h) ==============================
 # Real quantity (visits 4..12) in a native unit (s8hq13), with a farmgate Price
 # (s8hq14).  Expenditure left NaN -- no produced value is recorded.
+#
+# The file is read TWICE, and both reads are load-bearing (GH #782).  The
+# ``convert_categoricals=True`` read is required for ``s8hq1`` ('yes'/'no', not
+# 1/2) and for ``s8hq13`` (the native unit as text, which this wave decodes
+# nowhere else).  But that same conversion turns ``foodcd`` into the survey's
+# label text, and the harmonize_food map is keyed by the numeric code -- so j
+# must be taken from a ``convert_categoricals=False`` read.  The second read
+# costs 0.3s and the two frames are row-aligned (asserted below).
 prod = get_dataframe('../Data/partb/sec8h.dta', convert_categoricals=True)
+prod_codes = get_dataframe('../Data/partb/sec8h.dta', convert_categoricals=False)
+assert len(prod) == len(prod_codes), 'sec8h.dta read twice, row counts differ'
+prod['foodcd_code'] = prod_codes['foodcd'].to_numpy()
+
 prod = prod[prod['s8hq1'] == 'yes']      # only HH that consumed own produce
 prod['i'] = prod['hhid'].apply(mapping.i)
-prod['j'] = prod['foodcd'].replace(labelsd['Code_8h'])
+prod['j'] = prod['foodcd_code'].astype('int64').map(labelsd['Code_8h'])
+_assert_decoded(prod['foodcd_code'], prod['j'], 'Code_8h')
 prod = prod[_drop_nonfood(prod['j'])]
 
 # Native unit label (decoded text, e.g. 'basket', 'kilogram') and farmgate price.
