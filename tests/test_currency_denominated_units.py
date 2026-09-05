@@ -220,9 +220,13 @@ def test_food_prices_kgvalue_drops_currency_rows(canonical_frame):
     out = food_prices_from_acquired(canonical_frame, units='kgvalue')
     u = out.index.get_level_values('u').astype(str)
     assert not (u == 'Value').any()
-    assert (u == 'Heap').any()               # positive control priced
-    # and no constant: two distinct unit-labels price differently
-    assert out['Price'].nunique() >= 1
+    # Positive control, and the sharper half of it: the inferred factor
+    # yields a PHYSICALLY SENSIBLE price.  Heap costs 15 for 3 kg, the kg
+    # anchor 10 for 2 kg -- both 5 per kg, which is exactly the premise the
+    # inference rests on.  ``Value`` produced a constant instead, and that
+    # is the difference this whole change is about.
+    assert out.loc[u == 'Heap', 'Price'].unique() == pytest.approx([5.0])
+    assert out.loc[u == 'kg', 'Price'].unique() == pytest.approx([5.0])
 
 
 def test_food_prices_unitvalue_unaffected(canonical_frame):
@@ -261,8 +265,6 @@ def test_drop_unpriceable_warning_names_the_currency_case():
 # ---------------------------------------------------------------------------
 # Data-gated: the measured corpus numbers (GH #770 plan, 2026-09-05)
 # ---------------------------------------------------------------------------
-
-pytestmark_slow = pytest.mark.slow
 
 #: Measured on `development` @ 30c06c56 with Step 1 applied.
 GHANALSS_FOOD_PRICES_ROWS = 407_478
