@@ -176,7 +176,75 @@ community source is *not merely a fallback for missing data* -- for demand
 estimation it is arguably the cleaner instrument, and that is an argument for
 =source== being an explicit, documented choice rather than a silent rescue.
 
-** The ladder is ROW-level, not source-level
+** SUPERSEDED by =price_source== -- source is its OWN AXIS (EL, 2026-09-05)
+#+begin_quote
+Whether we're using individually reported prices (or really the median) or
+community prices is a different axis than whether we're computing unit values
+or kgvalues, etc.  I think we should add a price_source flag, with values
+'hh', 'community', ..., and 'auto', the last being the default which stitches
+things together as well as possible.
+#+end_quote
+
+My "row-level ladder" folded the fallback INTO =units==.  That crosses two
+independent axes and is wrong:
+
+| axis | kwarg | question it answers |
+|------+-------+---------------------|
+| basis | =units== | kg or native unit; value-derived or reported price |
+| source | =price_source== | WHOSE report: =hh= (median of household reports), =community=, ..., =auto= |
+
+They compose: a =kgvalue= can be computed from =hh= or from =community=.
+Neither axis is a special case of the other.  =auto= is the default and
+stitches as well as possible.
+
+*** The grain problem -- this is the hard part, MEASURED
+The two sources are not at the same grain:
+
+| source | grain |
+|--------+-------|
+| =food_prices= today | =(t, v, i, j, u, s)= -- *household* (=data_info.yml:26=) |
+| =community_prices= | market/community -- *no =i== |
+
+=food_prices_from_acquired= already medians over =visit= (a sub-household
+recall level), but it returns *per-household* rows.  So "individually reported
+prices" are not yet prices in the usable sense -- EL's "(or really the median)"
+names the missing step.  Stitching two sources requires a common grain, so
+=price_source== forces the question =units== never had to ask:
+
+1. *Median hh up to market grain.*  Economically the natural object -- a price
+   at =(j, t, m)=, which is what Deaton-style demand work wants and what
+   =community_prices= already is.  But it CHANGES THE SHAPE of =food_prices()=
+   from household to market grain.
+2. *Broadcast community down to household rows.*  Preserves today's shape and
+   today's callers.  But a broadcast value repeated across households is NOT a
+   measurement, and must be marked as such.
+
+Not resolved here.  Note =m= is itself user-chosen (=_add_market_index()= fires
+only when the caller passes =market='Region'=), so the join key for a community
+price depends on a kwarg -- =price_source= and =market== interact.
+
+*** INVARIANT for =auto=: fill, never override
+=auto= must supply a price only where the higher-precedence source is absent,
+and must never replace a well-defined =hh= value with a =community= one.  Then
+the change is *additive*: every row today's callers get keeps the value it has
+today, and previously-dropped rows appear.  (Recall =_drop_unpriceable= DROPS
+unpriceable rows rather than returning NaN, so filling them is visible as a row
+count rising, not as values moving.)  Without this invariant =auto= silently
+rewrites existing numbers, which is not a default anyone can adopt safely.
+
+*** This REVISES the constraint recorded in 11dd02c1
+That commit said a fallback must be opt-in, reading =AGENTS.md:370= ("the
+=*price= modes return NaN where the survey did not record a unit price; *no
+silent fallback* to the =*value= modes").  With the axes separated, that
+guarantee is about crossing *within =units==* -- value-derived vs
+reported-price -- and it stays intact.  =auto= stitches along the *source*
+axis, which the guarantee never covered, and EL has chosen it as the default.
+The two are consistent.  What makes =auto= safe is not opt-in but the
+fill-never-override invariant *plus* per-row provenance: with =auto= as the
+default, the marker stops being a nicety and becomes the only way a caller can
+tell what they were served.
+
+** (superseded) The ladder was framed as ROW-level, not source-level
 The earlier reading of "default to individual, fall over to community" was
 source-level: pick one source per call.  EL's formulation is sharper -- the
 condition is *well-definedness of Expenditure and Quantity*, which is a
