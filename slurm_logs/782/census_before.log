@@ -1,0 +1,49 @@
+===== BEFORE =====
+total rows : 5,259,344
+distinct j : 304
+
+-- per wave --
+  1987-88: rows=   71,605  distinct_j=  58  lowercase_rows=      0  distinct_lowercase=  0
+  1988-89: rows=   72,649  distinct_j=  58  lowercase_rows=      0  distinct_lowercase=  0
+  1991-92: rows=  623,600  distinct_j= 117  lowercase_rows=      0  distinct_lowercase=  0
+  1998-99: rows=  542,105  distinct_j= 112  lowercase_rows=      0  distinct_lowercase=  0
+  2005-06: rows=1,115,420  distinct_j= 165  lowercase_rows=149,047  distinct_lowercase= 63
+  2012-13: rows=1,709,094  distinct_j= 114  lowercase_rows=      0  distinct_lowercase=  0
+  2016-17: rows=1,124,871  distinct_j= 179  lowercase_rows=      0  distinct_lowercase=  0
+
+-- collision groups: 35   rows involved: 1,468,238 (27.9%) --
+    ['Bambara Bean', 'bambara beans']
+    ['Banana', 'bananas']
+    ['Beef', 'beef']
+    ['Carrot', 'carrots']
+    ['Chicken', 'chicken']
+    ['Coconut', 'coconut']
+    ['Cocoyam', 'cocoyam']
+    ['Condiment', 'Condiments']
+    ['Cowpea', 'cowpeas']
+    ['Egg', 'Eggs', 'eggs']
+    ['Goat', 'goat']
+    ['Maize (flour/dough)', 'maize-flour/dough']
+    ['Milk (fresh)', 'milk (fresh)']
+    ['Millet (flour)', 'millet flour']
+    ['Mutton', 'mutton']
+    ['Onion', 'onions']
+    ['Other Beverage', 'Other Beverages']
+    ['Other Domestic Poultry', 'other domestic poultry']
+    ['Other Flour', 'Other Flours', 'other flours']
+    ['Other Fruits', 'other fruits']
+    ['Other Grain', 'Other Grains', 'other grains']
+    ['Other Leafy Vegetable', 'other leafy vegetables']
+    ['Other Nut/Seed', 'other nuts/seeds']
+    ['Other Oils', 'other oil']
+    ['Other Vegetable', 'Other Vegetables', 'other vegetables']
+    ['Palm Nut', 'palm nuts']
+    ['Pawpaw', 'pawpaw']
+    ['Pepper', 'pepper']
+    ['Pineapple', 'pineapples']
+    ['Plantain', 'plantain']
+    ['Pork', 'pork']
+    ['Shea Butter', 'shea butter']
+    ['Snail', 'snail']
+    ['Tea bag', 'Tea bags']
+    ['Yam', 'yam']
