@@ -1,0 +1,150 @@
+#+title: GH #770 -- Step 1 plan (rewritten after red-team)
+#+date: [2026-09-05 Sat]
+#+author: Sue, with EL; corrected by an independent red team
+
+*Supersedes* =PLAN_2026-09-04.org=, whose "Blast radius, expected" section was
+wrong in every clause and whose causal account of the defect was false.  The
+superseded file is kept: the wrong reasoning is part of the record.
+
+*Scope: STEP 1 ONLY.*  Step 2 (the =source== argument drawing on
+=community_prices=) is deferred -- it is gated on the item-label work (#782) and
+on its own measurements, and it does not rescue the waves Step 1 empties.
+
+* What is actually wrong (corrected)
+=conversion_to_kgs= infers a kg-per-unit factor for *every non-metric label that
+carries an Expenditure*.  =Value= gets one for exactly the same reason =Heap=
+(0.2268), =Bowl= (0.6048) and =Piece= (0.2041) do.
+
+*My earlier causal claim was FALSE.*  I wrote that the factor is degenerate
+"because =Quantity == Expenditure=".  It is not: in =conversion_to_kgs=,
+=po= is the median *Expenditure*, and =Quantity= enters only through
+=Kgs = Quantity x unit_conversion=, which is NaN for =Value=.  *The inferred
+factor does not depend on =Quantity= at all* -- verified by holding Expenditure
+fixed and scaling =Value=-row =Quantity= by 1x / 3x / 100x and by a constant
+sentinel: the factor is =1.9= in every case.  GhanaLSS's =all= (142,997 rows)
+and =none= (2,304 rows) escape only because their =Expenditure= is 100% null --
+an accident, not a recognition.
+
+What *does* depend on =Quantity == Expenditure= is the SYMPTOM: with it,
+=food_prices(kgvalue) = Expenditure / (Expenditure x f) = 1/f= exactly.  That
+link is real (GhanaLSS: =1/0.49139133 = 2.035038=, per-wave =std= 2.1e-17 in six
+of seven waves).
+
+* The diagnosis (EL's -- unchanged, and it survives)
+=Value= is not a non-physical unit.  Value = Quantity x Price, so Value is
+denominated in LCU, and Value / Price = Quantity: *prices are the units in which
+value measures quantity*.  The kg factor for =Value= exists and equals
+=1/price=.  The bug is a *granularity error* -- =conversion_to_kgs= returns one
+factor PER UNIT LABEL, but =1/price= varies over =(j, t, m)=.  NaN is therefore
+the honest INTERIM state, not a terminal verdict.
+
+* Step 1: what it does, MEASURED (this is the acceptance criteria)
+Exclude currency-denominated labels from the inference, so no factor is
+produced and =Quantity_kg= stays NaN.
+
+*=food_prices= DROPS the rows; it does not return NaN.*
+=food_prices_from_acquired= ends in =_drop_unpriceable=
+(=transformations.py:154=: =out = v[~dropped][['Price']]=).
+
+| GhanaLSS =food_prices()= | rows      | waves returned |
+|--------------------------+-----------+----------------|
+| today                    | 1,505,751 |              7 |
+| after Step 1             |   407,478 |            *1* |
+
+*Six of seven waves return empty.*  EL's ruling, recorded: /"empty food prices
+is better than a made up constant."/
+
+*2016-17 is NOT the control.*  It shrinks 438,773 -> 407,478 (*-7.13%*, the
+31,295 grouped =Value= rows); median Price 4.899 -> 5.512; std 314.86 -> 326.70.
+An acceptance test asserting "2016-17 unchanged" FAILS.
+
+*The provable control*: no non-=Value= row changes.  The only key that moves in
+=_get_kg_factors= is =value= -- GhanaLSS 57 -> 56 factors, Panama 86 -> 85.
+Assert THAT.
+
+*Other modes*: =kgprice= is also affected -- it calls =_get_kg_factors=
+(=transformations.py:1198=).  Panama's =Value= rows carry a reported =Price=
+97.4% of the time, so Panama =food_prices(units='kgprice')= drops
+501,027 -> 483,661 (*-17,366*).  GhanaLSS is unaffected there only because its
+=Value= rows have =Price= 0.0% non-null.  =unitvalue=, =unitprice= and
+=units='units'= are *unchanged* (measured delta 0); =volume_as_mass=False= is
+orthogonal.
+
+* Consequences to accept EXPLICITLY (not discover)
+1. *=_drop_unpriceable= will warn on every call.*  =lost_fraction= goes 0.0097%
+   -> *79.84%*, over =PRICE_LOSS_WARN_THRESHOLD = 0.05=, and its text asserts
+   /"typically a 0-as-missing sentinel or a quantity variable mapped to the wrong
+   survey question"/ -- a MISDIAGNOSIS here (the survey deliberately elicited
+   value).  Either widen that message to name this case, or the fix ships a
+   loud, wrong explanation on every GhanaLSS call.
+2. *=make matrix= regrades six =GhanaLSS,food_prices= cells =sane -> dropped=* --
+   the tier whose own docstring calls it /"the silent-drop bug class"/ -- and
+   there is no verdict vocabulary able to say "correctly empty" (*#781*).
+   Record the reason in =GhanaLSS/_/CONTENTS.org= in the same PR.
+3. *A naive =food_quantities= consumer gets a BIGGER number, silently.*  Summed
+   over all =u=, GhanaLSS totals roughly DOUBLE (1987-88 8.91e6 -> 1.81e7;
+   2005-06 7.19e9 -> 1.46e10) because currency previously entered at x0.49139
+   and now enters at x1.0.  Both are garbage; only a consumer slicing
+   =u == 'kg'= is protected.  This is the one respect in which the constant was
+   *less* harmful, and it belongs in the release note.  (2016-17 =sum(u=='kg')=
+   falls 1,613,235 -> 1,208,306, *-25%* -- the fix working.)
+
+* The detector: DROP IT, or re-found it
+The proposed =Quantity == Expenditure= detector tests the symptom, not the
+cause.  *Panama 1997 evades it*: 11,072 of Panama's 17,821 =Value= rows are in
+1997, where =Quantity == Expenditure= is *0.48%* (99.1% carry the =7.70=
+sentinel of #777).  Country-level Panama is 37.9%, nowhere near "~all".  Recall
+is 1 of the 2 countries we actually hold.
+*Decision: ship Step 1 without a detector.*  A hardcoded set covers everything
+in the corpus today (662 distinct unit labels; only =value=, in GhanaLSS and
+Panama).  A detector founded on the real cause -- "a non-metric label whose
+inferred factor comes from a cell with no kg anchor" -- is a separate piece of
+work and should not ride along.
+
+* Naming and registry
+- =_CURRENCY_DENOMINATED_UNITS=, documented as /"factor is 1/price at (j,t,m);
+  a per-label constant cannot represent it"/.  NOT "non-physical" -- that name
+  would teach the next reader the error being fixed.
+- *=country.py:92= already has =_RESERVED_U_SENTINELS = frozenset({'kg','Value'})=*
+  -- capital-V, same concept, different module (GH #361).  Derive one from the
+  other or pin the relationship with a test; otherwise a future =Valeur= must be
+  added twice and nothing goes red if only one is updated.
+- If a detector is ever added: *no compiled-regex module constants* -- they land
+  in the hashed import closure and are un-serialisable (#780).
+
+* Cache
+=build_transforms_fingerprint= does *not* move for any table on a simulated edit
+to any of the five affected functions -- verified.  But note *#780*: GhanaLSS's
+=framework_imports_fingerprint= raises and is swallowed, so its =fwimp= is
+empty; the "no invalidation" result is partly true for a broken reason.
+=nutrition= is invariant -- =GhanaLSS/_/nutrition.py:165= filters
+={'value','all','none'}= before calling the transform, and the factor dicts are
+byte-identical before/after on the filtered frame.  *Checked, not assumed.*
+
+* Tests
+- Data-free: =conversion_to_kgs= / =_get_kg_factors= emit no =value= key; a
+  genuinely physical unit in the SAME frame still gets one (*positive control*,
+  so the exclusion cannot quietly widen); =_apply_kg_conversion= leaves
+  =Quantity_kg= NaN for those rows.
+- Data-gated: GhanaLSS =food_prices()= returns 407,478 rows over exactly one
+  wave; per-wave =Price= is never constant where non-empty; the factor map loses
+  exactly the =value= key and nothing else; Panama =kgprice= loses 17,366 rows.
+- Note: =test_food_prices_kgvalue_drops_lcu_rows= and
+  =test_food_quantities_kgs_carries_lcu_rows= *already assert the intended
+  post-fix behaviour* and pass today only because their fixture's lone =Value=
+  row sits in a household with no kg anchor.  They look like protection and are
+  not; say so in the PR.
+- Full suite: 65 passed / 4 skipped across the five price/kg suites with Step 1
+  simulated -- *no existing test breaks*.
+
+* Out of scope (named so it does not creep)
+- Step 2 / =source==: deferred, gated on #782.
+- #777 (Panama's =7.70= sentinel), #780 (fwimp), #781 (=dropped= vocabulary),
+  #782 (non-canonical =j=): separate.
+- =po= being expenditure PER TRANSACTION ROW, and the group levels collapsing to
+  =['t','i']= because =i= was the ITEM index in the legacy schema the docstring
+  still describes -- this means the plan's old premise ("for a physical unit a
+  per-label constant is approximately right") is UNVERIFIED.  Do not assert it;
+  file it.
+- Uganda =plot_inputs= carries 43,653 rows of =u='unknown'= -- same class of
+  label, same inferred-factor treatment.  Out of scope, worth its own look.
