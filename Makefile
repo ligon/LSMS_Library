@@ -25,7 +25,8 @@ PYTEST_WORKERS ?= $(or $(SLURM_CPUS_ON_NODE),$(shell nproc 2>/dev/null || echo 1
 PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 
 .PHONY: setup test test-full retest test-ff build release clean help \
-        profile profile-cold profile-cprofile matrix matrix-coverage
+        profile profile-cold profile-cprofile matrix matrix-coverage \
+        api-audit docs-gen
 
 # Use a stamp file in .make/ rather than .venv/pyvenv.cfg --- Poetry's
 # default ``virtualenvs.in-project = false`` puts the venv under
@@ -158,6 +159,22 @@ matrix: setup
 matrix-coverage: setup
 	$(POETRY) run python bench/matrix.py --no-readiness \
 	    $(if $(C),--countries $(C)) $(if $(F),--features $(F))
+
+# Discoverability of the API surface (see docs/guide/data-methods.md).
+#
+# api-audit reports two blind spots that no ordinary search finds:
+# data-method kwargs missing from the docs (the methods are generated at
+# attribute-access time, so mkdocstrings cannot see them), and public
+# machinery with no call site (invisible precisely because nothing calls
+# it yet).  --strict makes the kwarg half fatal, which is what CI wants.
+api-audit: setup
+	$(POETRY) run python scripts/api_surface_audit.py $(if $(STRICT),--strict)
+
+# Regenerate docs/guide/data-methods.md from the live docstrings.  The page
+# is generated so it cannot drift from country.py's doc_parts; commit the
+# result.  tests/test_api_discoverability.py fails when it is stale.
+docs-gen: setup
+	$(POETRY) run python scripts/gen_data_method_docs.py
 
 clean:
 	rm -rf dist/ build/ *.egg-info
