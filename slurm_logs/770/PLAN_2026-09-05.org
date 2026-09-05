@@ -148,3 +148,74 @@ byte-identical before/after on the filtered frame.  *Checked, not assumed.*
   file it.
 - Uganda =plot_inputs= carries 43,653 rows of =u='unknown'= -- same class of
   label, same inferred-factor treatment.  Out of scope, worth its own look.
+
+* Step 2: the price ladder (EL's rule, 2026-09-05)
+
+** The rule
+#+begin_quote
+Price = Expenditure/Quantity | those being well-defined; otherwise look for
+alternative price data.  (Also: the first formula is really for unit values,
+isn't it?)
+#+end_quote
+
+Two things, and the second reframes the first.
+
+** It IS a unit value, and the distinction is economic, not nominal
+=Expenditure / Quantity= is a *unit value*, not a price.  The library already
+encodes this in its mode names -- =kgvalue= / =unitvalue= are denominator-
+explicit precisely so they are not mistaken for the survey's reported price
+(=kgprice= / =unitprice=); see =AGENTS.md:372= on the deliberate departure from
+the Deaton (1988, 1997) term-of-art.  What remains mis-named is the *method*:
+=food_prices()= returns unit values by default.
+
+Why it matters beyond naming: a unit value is expenditure over quantity *within
+an item aggregate*, so it moves with quality choice and with measurement error
+in the quantity.  A household buying better rice records a higher "price" that
+is partly quality.  Community/market prices carry no such quality term.  So the
+community source is *not merely a fallback for missing data* -- for demand
+estimation it is arguably the cleaner instrument, and that is an argument for
+=source== being an explicit, documented choice rather than a silent rescue.
+
+** The ladder is ROW-level, not source-level
+The earlier reading of "default to individual, fall over to community" was
+source-level: pick one source per call.  EL's formulation is sharper -- the
+condition is *well-definedness of Expenditure and Quantity*, which is a
+property of a ROW, not of a country or a wave:
+
+1. Expenditure and Quantity both well-defined -> unit value.
+2. Otherwise -> alternative price data at the coarsest granularity that has it.
+
+This closes the loop Step 1 deliberately left open.  Step 1 makes
+=Quantity_kg= NaN for currency-denominated =u= (the factor is =1/price=, which
+varies over =(j, t, m)= and no per-label constant can represent it), and its
+own comment calls NaN "the honest INTERIM state ... recoverable per =(j, t, m)=
+from a price source".  Step 2 IS that recovery: with a community price at
+=(j, t, m)=, =Quantity = Value / Price= for exactly the rows Step 1 emptied.
+The two steps are one mechanism split across two PRs, not a bug fix plus a
+feature.
+
+** REQUIREMENT: the output must say which rung it came from
+A row-level ladder that returns one column silently mixes unit values and
+reported prices.  That is the same disease as every other defect this repo has
+had to dig out: =u='Value'= served as kilograms, the two incompatible weight
+scales, the =.replace()= / =rename= pass-through of #782.  A number whose
+provenance is unrecoverable is a number no one can audit.
+
+So Step 2 must return provenance alongside the value -- an index level or a
+companion column marking each row =unitvalue= / =community= (and, where the
+survey reports one, =reported=).  *Do not* merge the two into an unmarked
+=Price= column, however tempting the tidy shape is.  A caller doing demand
+estimation has to be able to drop or instrument the unit-value rows; a caller
+who cannot tell them apart is silently pooling a quality-contaminated
+regressor with a clean one.
+
+** Consequently, still open
+- Granularity of the community source: =community_prices= is =(t, m, j)=-ish,
+  =food_acquired= is household.  Joining a cluster/market price onto household
+  rows is a broadcast, and a broadcast is not a measurement -- say so in the
+  provenance marker.
+- Whether =food_prices()= should be renamed, or gain a =unit_values()= sibling.
+  Deferred: it is an API break and the ladder is the substance.
+- =NumberOfUnits=: =community_prices.Price= is the price of =NumberOfUnits=,
+  not of one unit (measured: ratio 0.9946 with the division, 2.2917 without).
+  Any join must divide first.
