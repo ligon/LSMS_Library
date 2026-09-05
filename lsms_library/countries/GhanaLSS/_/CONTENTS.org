@@ -1605,6 +1605,134 @@ decision with its own before/after.
   own wave table: inheriting the country table would hand it the *university*
   =U6=.
 
+** Trap 8: =convert_categoricals=True= turns the CODE you decode on into a LABEL (2026-09-05, GH #782)
+
+The most expensive instance of Trap 1's family so far: *149,047 rows shipped
+the survey's own raw labels as =j= for years*, and every guard we own said the
+build succeeded.
+
+=2005-06/_/food_acquired.py= read =sec8h.dta= (own production) with
+=convert_categoricals=True=, which returns =foodcd= as *decoded label text*
+(='beef'=, ='maize-flour/dough'=), then decoded it against
+=labelsd['Code_8h']=, which is keyed by the *numeric code*.  Match rate:
+*0 of 424,052*.  And =Series.replace()= passes an unmatched value through
+*unchanged*, so instead of an error, or even a NaN, every produced row emitted
+the survey's label as though it were a Preferred Label.
+
+The purchase block was fine and *must not be "fixed"*: =sec9b.dta= is read with
+=convert_categoricals=False=, so =freqcd= stays numeric and matches its
+=Code_9b= map 1,436,956/1,436,956 = *100%*.  The two blocks differ only in that
+one flag.
+
+*Why the file must be read TWICE.*  Both reads are load-bearing, and this is
+not gold-plating:
+- =convert_categoricals=True= is *required* for =s8hq1= (the consumed-own-produce
+  filter is ='yes'=/='no'=, not =1=/=2=) and for =s8hq13= (the native unit as
+  text -- 2005-06 has no =units= table, so nothing else decodes it);
+- =j= must come from a =convert_categoricals=False= read, or it is a label.
+The second read costs 0.3 s; the frames are asserted row-aligned.
+
+*Decode on the CODE axis, not the label axis.*  The label axis is the obvious
+fix and is the wrong one.  =harmonize_food='s =Label_8h= column transcribes the
+survey's own text, and for codes 91/92 it had been transcribed with the
+spelling *corrected* -- =alcoholic beverages= / =non-alcoholic beverages=,
+where the =.dta= says =alchoholic beverages= / =non-alchoholic beverages= (sic).
+A =Label_8h= decode therefore covers only *96.8%*, and is one well-meant typo
+fix away from silently matching nothing again.  =Code_8h= agrees with the data's
+codes for all 63 items; =Code_9b= with =freqcd= for all 164.  The =Label_*=
+columns are *documentation of the source spelling* -- =Label_9b= matches its
+source 164/164 -- so the two 8h cells were corrected to the survey's spelling,
+misspelling and all.  *Do not "fix" them again.*
+
+*=.map()= is necessary but NOT sufficient.*  Swapping =.replace()= for =.map()=
+turns an unmatched code into NaN, which =_drop_nonfood= (=isinstance(x, str)=)
+would then discard *silently* -- the same disease with a different face.  The
+script asserts coverage explicitly (=_assert_decoded=).
+
+*What this cost, and why nothing caught it.*  Every guard the library owns
+checks *shape*.  =_assert_built_required_columns= checks =j= is present; the
+grain audit checks the index is unique; the null-read guard checks a column is
+not all-NaN.  =j= was present, unique and fully populated -- with the wrong
+vocabulary.  CLAUDE.md already names the only check that discriminates: /"a
+plausible-looking distribution therefore proves nothing; the discriminating
+check is a subset assertion against the canonical vocabulary."/  There was
+none on =j=.  There is now: =tests/test_ghanalss_food_label_canonical.py=.
+
+Note the =community_prices= section below says, in its own words, that the
+overlap with =food_acquired().j= /"was checked against the =harmonize_food=
+tables, not a built =food_acquired="/.  That is exactly the gap: the config was
+right and the built table did not match it.
+
+** One food vocabulary, not seven: the cross-wave drift (2026-09-05, GH #782)
+
+Each wave's =harmonize_food= carries its *own* =Preferred Label= column and
+nothing reconciled them.  Seven commodities therefore shipped under two
+spellings depending on the wave -- =Egg=/=Eggs=, =Tea bag=/=Tea bags=,
+=Condiment=/=Condiments= and four =Other X=/=Other Xs=.
+
+*This is invisible to any per-wave check.*  All seven waves are internally
+clean (0 collisions each, measured); the defect exists *only in the assembled
+cross-wave frame*.  Any guard that reads one wave at a time will pass forever.
+That is why the guard reads all seven tables at once, and why it is
+config-only: reading org tables costs milliseconds, so it need not be gated on
+a warm cache.
+
+*The country-level =_/food_items.org= =#+name: food_label= is the authority*,
+and not merely by preference: =_/nutrition.py:187= resolves an unmatched =j=
+through a =by_label= fallback keyed on *that* table's Preferred Label, so a
+wave spelling it differently gets no FCT code and drops out of =nutrition=.
+The table already knew about all seven -- it carries one column per wave
+recording each wave's own label -- so every canonical form was read off it.
+
+Two consequences worth stating plainly:
+- =Condiment= and =Egg= follow the country table *against majority wave usage*
+  (five waves said =Eggs=).  Popularity is not authority here; =by_label= is.
+- =Tea= is emitted by *neither* 2012-13 nor 2016-17, but the country table lists
+  =Tea bags= / =Tea bag= in those columns against Preferred =Tea= (FCT 12_008).
+  A recorded decision, not a guess.
+
+The =Aggregate Label= axis had the *same* six drifts and is user-visible
+through =labels='Aggregate'=; it was fixed in the same pass, along with an
+encoding artefact (2012-13 code 262's Aggregate read =Cooked Rice and Stew=
+followed by two mojibake =Ê= characters, a twin of code 254's clean label).
+
+*Why a rename here is provably safe.*  For the six singular/plural pairs, both
+variants share the collision key, so the measured "0 internal collisions per
+wave" is a proof that no wave holds both -- a rename cannot merge two distinct
+foods.  =Tea= needed checking by hand, because its key differs: 2012-13 carries
+only =Tea bags=, 2016-17 only =Tea bag=, neither has a separate =Tea=.
+
+** =harmonize_price_item= and =harmonize_food= are ONE vocabulary (2026-09-05, GH #782)
+
+A price item flagged =Food: yes= asserts it sits on that wave's
+=harmonize_food= axis -- which is the whole reason =community_prices.j= can
+join =food_acquired.j=.  Nothing enforced it, and a one-sided edit drifts
+silently; renaming the food axis above immediately broke four waves' price
+items.
+
+*Derivation was considered and rejected*, with a reason rather than a shrug:
+the price item =Code= (=ln=, 644 values in 2016-17) is a *different code space*
+from =Code_9b=/=Code_8h=, and the survey ships no crosswalk.  The only link IS
+the Preferred Label string, so "deriving" would mean adding a foreign-key
+column -- exactly as much config as the column it replaces, and one more thing
+to drift.  Derivation is also wrong-shaped: *400 of 2016-17's 643 price items
+are non-foods* (charcoal, refuse disposal, public-toilet fees) that
+=harmonize_food= must never gain.  The =Food= column already carries the
+author's signed statement (=yes= on the axis / =own= a food the axis does not
+name / =no= non-food), so the invariant to enforce is a *subset over
+=Food == 'yes'=*, and the guard asserts exactly that.
+
+That check immediately found a *pre-existing* violation unrelated to the
+rename: 2012-13 price item 103 ='cigarette (555)'= was flagged =Food: yes= with
+Preferred Label =Cigarrette= -- a double-r spelling that appears nowhere on
+2012-13's food axis, nor anywhere else in the corpus (the other three price
+waves spell it =Cigarette=).  2012-13's =harmonize_food= has no separate
+cigarette label at all: source code 163 ='cigarrette, cigar'= resolves to
+=Tobacco=.  The price item is now =Tobacco=, which is what that wave's own axis
+calls the commodity.  Re-flagging it =Food: own= was rejected as a *false
+statement*: =own= means the axis does not name the food, and this axis does.
+
+
 ** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
 
 Not a trap.  A *decision*, recorded here because the reasoning that was first
