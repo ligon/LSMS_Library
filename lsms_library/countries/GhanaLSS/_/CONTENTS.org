@@ -1683,6 +1683,54 @@ overlap with =food_acquired().j= /"was checked against the =harmonize_food=
 tables, not a built =food_acquired="/.  That is exactly the gap: the config was
 right and the built table did not match it.
 
+** Trap 9: a duplicate index in =food_acquired= silently REWRITES =Price= table-wide (2026-09-05, GH #782/#323)
+
+*This one is armed and waiting.*  It did not fire in the shipped data, but only
+because =2005-06/_/food_acquired.py= now keeps its index unique on purpose.  Any
+future duplicate in GhanaLSS =food_acquired= re-arms it.
+
+=food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so when its index is
+non-unique =Country._normalize_dataframe_index= does *not* collapse with
+=.first()= -- it SUMs =Quantity= / =Expenditure= and then, at
+=country.py:5522=, re-derives
+
+: df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
+
+The grain audit lists =Price= as =reconciled= on the grounds that it is
+"re-derived from the summed totals", finds the residual lossless, and correctly
+emits *no* =GrainCollapseWarning=.  Nothing here is a bug in core --- for a
+survey where =Expenditure = Quantity x Price=, the reconciliation is exactly
+right.
+
+*GhanaLSS is not such a survey.*  =Expenditure= is structurally =NaN= for
+=s='produced'= (the instrument records a farmgate =Price= and a =Quantity=, and
+never a produced value), and the re-derivation is applied to the *whole frame*,
+not merely to the duplicated groups.  Measured on the delivered table:
+
+| rows with a Price     | block does not fire | block fires |
+|-----------------------+---------------------+-------------|
+| =s='produced'=        |   883,789 (95.2%)   |  44,112 (4.8%) |
+| whole table           |   883,789           |   4,375,274 |
+
+So a single duplicate anywhere in the table would *destroy 839,677 recorded
+farmgate prices* and *fabricate* a =Price= on ~4.33M purchased rows, where
+=u='Value'= makes =Quantity == Expenditure= and the "price" is therefore 1.0 ---
+the "Kwacha per Kwacha" quantity =CLAUDE.md= warns about.  Silently, and with the
+audit correctly reporting nothing, because the audit's premise is that the
+re-derivation is information-preserving.
+
+Fixing 2005-06's decode (Trap 8) *created* 24 such duplicates in 12 groups --- two
+farmgate prices for one harmonised commodity, e.g. =mutton= and =goat= both
+becoming =Goat=.  They are resolved in the wave script (=Quantity= sums, =Price=
+becomes the quantity-weighted mean) rather than left to core, which is what
+=CLAUDE.md= prescribes: core does not aggregate, and a reducer applied
+downstream "only puts a signature on the corpse".
+
+*Corrects the commit message of =b93f9c2c=*, which described core's behaviour as
+=groupby().first()= discarding one price.  That was measured to be wrong: the
+mechanism is the additive re-derivation above, and it is considerably worse than
+=.first()= would have been.
+
 ** One food vocabulary, not seven: the cross-wave drift (2026-09-05, GH #782)
 
 Each wave's =harmonize_food= carries its *own* =Preferred Label= column and
