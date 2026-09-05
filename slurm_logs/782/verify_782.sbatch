@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# SUPERSEDED by phase2.sbatch + phase2.py: the `fa.to_parquet()` dump here fails
+# because food_acquired's `visit` level is mixed-type ('since last visit' in the
+# 1980s waves, ints elsewhere) and pyarrow refuses it.  phase2 censuses in-process
+# instead.  Kept for the record of the cold builds it did produce.
 #SBATCH --job-name=glss782
 #SBATCH --account=co_carleton
 #SBATCH --partition=savio3

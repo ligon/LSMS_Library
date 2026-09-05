@@ -1200,6 +1200,26 @@ Sources originally listed here:
    waves" entry above, which is true of the purchase module only.  Left
    unfixed here (harmonisation is #109's, not #563's); worth ~110,213 kg.
 
+   /Corrected 2026-09-05 (GH #782)./  *Fixed, and the diagnosis above was
+   right about the symptom but wrong about the cause.*  The 63 labels were
+   never a harmonisation gap in =food_label=: they are the *survey's own raw
+   labels*, leaking through =2005-06/_/food_acquired.py='s own-production
+   decode, which matched nothing and passed its input through unchanged (Trap
+   8 below).  =food_label= was not missing them --- they were never supposed
+   to reach it.  With the decode fixed, 2005-06's produced =j= is a Preferred
+   Label like every other wave's, =nutrition= resolves it through the
+   =by_label= fallback, and the wave is no longer empty.  Measured
+   end-to-end, cold, before and after: FCT coverage of GhanaLSS food mass
+   *88.26% -> 94.71%* (1,509,649 -> 1,619,862 kg), i.e. *+110,213 kg* ---
+   which is the "worth ~110,213 kg" this entry predicted, to the kilogram.
+   No change to =nutrition.py= was needed or made.
+
+   Of the unmapped mass that remains, only =Oil (vegetable)= (69,025 kg) and
+   =Sugar Bread= (15,701 kg) are real gaps --- both are item 4 below, still
+   open.  The rest is =Cigarette= / =Tobacco= / =Other Tobacco= / =Chewing
+   Gum=, which are on the food-expenditure axis but have no FCT row, and
+   should not have one.
+
 4. *Three 2016-17 labels are missing from =food_label= entirely*:
    =Oil (vegetable)= (69,025 kg), =Sugar Bread= (15,701 kg) and =Kola Nut=
    (2,888 kg) appear as =j= in the data but in no column of the table.  They
