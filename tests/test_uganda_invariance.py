@@ -18,7 +18,9 @@ the entry would silently drop the parquet from the sweep, and failing would
 leave the suite red for everyone with data until someone regenerated.  The
 whole entry is still checked on every field that IS pinned.  ``null`` is a
 debt marker -- ``generate_baseline.py`` never writes one, so a regeneration
-run clears it.
+run clears it.  No entry currently carries a null: the two that did (GH #772)
+were regenerated once data access was available.  The mechanism is kept for
+the next fix that lands without it.
 """
 
 import hashlib

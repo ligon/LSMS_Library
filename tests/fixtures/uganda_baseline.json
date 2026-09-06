@@ -980,7 +980,7 @@
     "columns": [
       "Earnings"
     ],
-    "content_hash": null,
+    "content_hash": "bfc2324ebbf322a519b8b4c6dd14b426a8c08ebb11ec6094d9f9c4b308b70e31",
     "dtypes": {
       "Earnings": "float64"
     },
@@ -1331,7 +1331,7 @@
     "columns": [
       "income"
     ],
-    "content_hash": null,
+    "content_hash": "960a7bedafa71fffa5af1fbff54223153764ddf9c54cf5ccba92255082865fbb",
     "dtypes": {
       "income": "float64"
     },
@@ -1339,7 +1339,10 @@
       "t",
       "i"
     ],
-    "shape": null
+    "shape": [
+      14740,
+      1
+    ]
   },
   "var/interview_date.parquet": {
     "columns": [

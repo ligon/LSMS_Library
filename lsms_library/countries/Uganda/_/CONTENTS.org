@@ -1354,24 +1354,41 @@ a household absent from one source earned nothing *from that source*, which
 is not the same as having undefined total income.  All-zero totals are still
 dropped, as before.
 
-*Still open, same root cause, deliberately not fixed here.*
-=_/enterprise_income.py= is dense in exactly the same way, and by the same
-two artefacts: the [2026-06-26] coverage snapshot sums its eight wave slices
-to *13 935* rows, =uganda_baseline.json= records =var/enterprise_income.parquet=
-at *78 040* = 9 755 ids x 8 waves.  =_/assets.py= uses the same =stack()= /
-dict / =stack()= idiom (its column axis carries the asset type rather than a
-single measure, so the cross product is over =(id, asset)= pairs), but
-*its density is not measured here* -- no =var/assets.parquet= entry exists in
-the baseline to compare against the 116 808 rows the coverage snapshot sums
-to.  Neither table has the naming defect, so neither shows up in the test
-suite; both want the same rewrite, each measured on its own.
+*Measured on a cold build with real data* [2026-09-06]: =income= goes from
+*13 931* rows (the figure pinned in =uganda_baseline.json=) to *14 740*, i.e.
+*+809*.  Those 809 are exactly the enterprise-only households the intersection
+=+= was discarding.  The fix therefore *widens* coverage; it does not narrow
+it.
 
-*Baseline debt.*  =tests/fixtures/uganda_baseline.json= pins content hashes,
-and the new ones are not computable without microdata access.  The two
-affected entries carry =null= in the fields that could not be recomputed
-(see the =test_uganda_invariance.py= docstring); =python
-tests/generate_baseline.py lsms_library/countries/Uganda= on a machine with
-data clears them.
+*Verified on a cold build with real data* [2026-09-06], comparing each
+country table against the sum of its own wave parquets:
+
+| table               | wave sum | country |  ratio | all-null rows |
+|---------------------+----------+---------+--------+---------------|
+| =earnings=          |   22 447 |  22 447 | 1.00x  |             0 |
+| =enterprise_income= |   13 935 |  78 040 | 5.60x  |        64 105 |
+| =assets=            |  116 808 | 116 808 | 1.00x  |             0 |
+
+=earnings= is fixed, and its per-wave counts reproduce the [2026-06-26]
+coverage snapshot digit for digit (1467 / 2889 / 2618 / 2805 / 3119 / 3305 /
+3180 / 3064).
+
+*=enterprise_income= is still dense -- confirmed, not inferred.*  64 105 of
+its 78 040 rows (*82.1 %*) are entirely null.  It has no naming defect, so
+nothing in the test suite reports it.  It wants the same =pd.concat= rewrite.
+
+*=assets= is NOT dense, and the reason is its own puzzle.*  It measures 1.00x
+with zero all-null rows despite =_/assets.py= using the identical =stack()= /
+dict / =stack()= idiom -- because *the served table is not that script's
+output at all*.  =assets.py= writes a column named =assets= indexed
+=(i, t, m)=; =var/assets.parquet= holds a column named =Value= indexed
+=(t, i, j)=, which is exactly the wave parquets concatenated.  The bare
+=!make= tag desugars to ={materialize: make}= (=yaml_utils._construct_make=),
+identical to the =materialize: make= that =earnings= uses and that *did* run
+its script -- so this is not a config difference.  Either =assets.py= is dead
+code or the framework is silently serving a wave concatenation in its place.
+*Recorded as an open question, deliberately not chased here*; it wants its own
+issue, because whichever answer is true is worth knowing corpus-wide.
 
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
