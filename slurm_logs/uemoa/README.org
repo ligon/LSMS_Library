@@ -1,0 +1,57 @@
+#+TITLE: UEMOA PHMECV catalogue -- inventory and access findings
+#+DATE: 2026-09-06
+
+* What this is
+=catalog_inventory_2026-09-06.json= is a harvest of the UEMOA microdata
+catalogue at https://phmecv.uemoa.int/nada/ -- 24 studies, 338 resources,
+metadata only.  No microdata was downloaded, and no credential is recorded
+here.
+
+* Why it matters
+UEMOA is the EHCVM block: the same eight countries this library already
+carries as Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, Mali, Niger,
+Senegal and Togo.  Three series, one per country:
+
+| series          | years     | our holdings |
+|-----------------+-----------+--------------|
+| =EHCVM-V2.0=    | 2021-2022 | 4 of 8 -- *missing Benin, CotedIvoire, Guinea-Bissau, Togo* |
+| =PHMECV-V1.0=   | 2018      | held as the =2018-19= waves |
+| =ERI-ESI-V1.0=  | 2018      | *held nowhere* -- employment / informal sector |
+
+* Access, measured 2026-09-06
+An API key in =~/.config/lsms_library/config.yml= as =phmecv_api_key=
+authenticates the *metadata* endpoints and nothing more:
+
+| endpoint                                | result |
+|-----------------------------------------+--------|
+| =api/catalog/search=                    | 200 -- 24 studies |
+| =api/catalog/{idno}=                    | 200 -- study record |
+| =api/resources/{idno}=                  | 200 -- per-study file inventory |
+| =api/catalog/{idno}/data_files=         | 200 but *empty*, authenticated or not |
+| =catalog/{id}/download/{rid}/{file}=    | *500* |
+| =catalog/{idno}/download/{rid}=         | 200, but redirects to a =Connexion= page |
+| =catalog/{id}/get-microdata=            | 200 with *zero bytes* |
+
+Every study reports =data_access_type: licensed=, and downloads require a
+logged-in web session.  The key is therefore sufficient to plan an
+acquisition and insufficient to perform one.
+
+* Two adaptations any wiring will need
+1. =_find_stata_zip= (=data_access.py=) matches only =.zip= whose name or
+   title contains "stata".  UEMOA ships =.rar= archives and 39 bare =.dta=
+   resources, none of which that predicate selects.
+2. Auth is session-based here, not the header-only =X-API-KEY= flow the
+   World Bank path uses.
+
+* The open question this does NOT settle
+Whether UEMOA's files carry *un-displaced* GPS.  Reported but unconfirmed;
+the catalogue publishes no variable list (=varcount: 0= on every study) so
+metadata cannot corroborate it.  16 of 24 studies ship a =Fichiers_Communautaire=
+resource, which is where cluster coordinates would live.
+
+*The test is cheap once one such file exists.*  This library already holds
+WB =Latitude= / =Longitude= in =cluster_features= for all eight countries.
+The offset between the two sets is the displacement, and the WB/DHS scheme
+has a signature: rural offsets up to 5 km with 1% out to 10 km, urban up to
+2 km.  Offsets in that pattern would confirm the claim; offsets of ~0 would
+refute it.
