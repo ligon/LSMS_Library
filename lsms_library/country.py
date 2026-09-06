@@ -727,6 +727,14 @@ class Wave:
         its country's -- a table wired for some waves and not others is the
         normal case, and comparing ``country.features`` with
         ``wave.features`` is how you see which.
+
+        **A wave does not list the runtime-derived tables, and that is
+        correct.**  ``food_expenditures``, ``food_prices``,
+        ``food_quantities`` and ``household_characteristics`` are built in
+        ``Country.__getattr__`` from ``_aggregate_wave_data(waves, ...)`` --
+        a concatenation ACROSS waves -- so they are country-level by
+        construction rather than something a wave failed to declare.  Uganda:
+        country 28, wave 23, the difference being exactly those.
         """
         return self.data_scheme
 
