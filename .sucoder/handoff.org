@@ -41,8 +41,8 @@ arranging it).
   corrected it in-branch; both attempts are documented in the PR.
 
 * Issues filed today
-=#783= food-vocabulary consolidation (six countries); =#787= =labels== map ·
-=#790= gitignored-yet-hashed build inputs; =#791= UEMOA PHMECV source ·
+=#783= food-vocabulary consolidation (six countries); =#787= =labels== map;
+=#790= gitignored-yet-hashed build inputs; =#791= UEMOA PHMECV source;
 =#792= 774 warnings, 746 from one unclosed file; =#794= dta encoding.
 
 * Decisions waiting on a human
@@ -88,10 +88,10 @@ operation that fails *quietly*.
 
 * Shipped today besides the PRs
 =Country.notes()= / =note_topics= (CONTENTS.org through the API); all 38
-=CONTENTS.org= declare =#+TODO= and synonym headlines merged ·
-=visualizations.py= with =population_pyramid= and =coordinate_map= ·
+=CONTENTS.org= declare =#+TODO= and synonym headlines merged;
+=visualizations.py= with =population_pyramid= and =coordinate_map=;
 =Country.features= / =Wave.features=; =make api-audit= (undocumented kwargs,
-uncalled machinery, unindexed skills, untracked hashed inputs) ·
-=docs/guide/data-methods.md= generated from live docstrings ·
+uncalled machinery, unindexed skills, untracked hashed inputs);
+=docs/guide/data-methods.md= generated from live docstrings;
 =lectures/glss7_sample_design.org=; GLSS7 Main Report acquired and
 DVC-tracked, with the sample design verified against the served weights.
