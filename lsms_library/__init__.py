@@ -221,3 +221,20 @@ elif not SKIP_AUTH and creds_file.exists():
         # Sync failure is non-fatal --- legacy `dvc.api.open()` callers
         # will surface a clear NoCredentialsError if it matters.
         pass
+
+if not SKIP_AUTH:
+    # The DVCFS singleton is built when `local_tools` is imported, which is
+    # before either branch above can have written the credentials file.  On a
+    # first-ever import it was therefore built without explicit S3
+    # credentials, leaving it on the `credentialpath` fallback that an
+    # ambient AWS environment silently defeats (see
+    # `local_tools._s3_explicit_credentials`).  Rebuild it once, now that
+    # the file exists.  No-op when the credentials were already present at
+    # import time, which is the common path.
+    try:
+        from .local_tools import refresh_s3_credentials as _refresh_s3
+        _refresh_s3()
+    except (ImportError, OSError, AttributeError):
+        # Best-effort: a failure here leaves the credentialpath fallback,
+        # which is what shipped before.
+        pass
