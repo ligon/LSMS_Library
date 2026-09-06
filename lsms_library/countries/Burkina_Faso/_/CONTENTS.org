@@ -580,17 +580,47 @@ Unlike the =Boîte -> Bote= hazard above (latent, in dead code), this one is
 *live in the served table today*.  =Country('Burkina_Faso').food_acquired()=
 returns three =j= values that are mojibake:
 
-| rows  | wave    | =j= as served (non-ASCII as codepoints) | intended                  |
-|-------+---------+-----------------------------------------+---------------------------|
-| 9,635 | 2014    | =Cube (Maggi, Jumbo,<0085>)=            | =...= cp1252 ellipsis 0x85 |
-| 1,901 | 2014    | =Viandes de b<009C>ufs fraîches=        | =oe= ligature, cp1252 0x9C |
-| 1,397 | 2018-19 | =Viande de b<00C5><0093>uf=             | =oe= ligature, double-encoded |
+| rows  | wave    | =j= as served (non-ASCII as codepoints) | intended                     |
+|-------+---------+-----------------------------------------+------------------------------|
+| 9,635 | 2014    | =Cube (Maggi, Jumbo,<0085>)=            | =Cube (Maggi, Jumbo,…)=      |
+| 1,901 | 2014    | =Viandes de b<009C>ufs fraîches=        | =Viandes de bœufs fraîches=  |
+| 1,397 | 2018-19 | =Viande de b<00C5><0093>uf=             | =Viande de bœuf=             |
 
-Two *distinct* failures are mixed here: 0x85 and 0x9C are *cp1252* bytes read
-as latin-1 (the C1-control signature), while =<00C5><0093>= is the familiar
-double-encoding.  A single =.encode('latin-1').decode('utf-8')= repairs the
-third and *not* the first two, which need a cp1252 decode -- so the existing
-=_decode_mojibake= helper is necessary but not sufficient for this country.
+*Verified on a fully cold build* (empty =LSMS_DATA_DIR=, only =dvc-cache=
+symlinked in): identical counts, so this is not a stale-cache artifact.
+
+*Root cause, confirmed at the source.*  The 2014 files
+(=emc2014_p{1..4}_conso7jours_16032015.dta=) are Stata *format 113*, so pandas
+forces latin-1 -- but the files are actually *cp1252*.  Decoding their
+=product= value labels as cp1252 recovers every one cleanly:
+
+: <009C> -> oe-ligature   <008C> -> OE-ligature
+: <0085> -> ellipsis      <0092> -> right single quote
+: 'Viandes de b<009C>ufs fra<00EE>ches'  -> 'Viandes de bœufs fraîches'
+: 'Facture d<0092><00E9>lectricit<00E9>' -> 'Facture d’électricité'
+
+Note =product= is an =int16= column with a value-label set -- so this is a
+*value-label* fault, not a string column and not something the wave script
+introduces.  2014 is built through the YAML path (a four-file =file:= list in
+=2014/_/data_info.yml=), *not* the legacy script route.
+
+Two *distinct* failures are therefore mixed in the table above: 0x85/0x9C/0x92
+are *cp1252* bytes read as latin-1 (the C1-control signature), while
+=<00C5><0093>= is the familiar double-encoding.  A single
+=.encode('latin-1').decode('utf-8')= repairs the third and *not* the first
+two, which need =.decode('cp1252')= -- so the existing =_decode_mojibake=
+helper is *necessary but not sufficient* for this country.
+
+*Most of the damage is absorbed by the crosswalk; only the uncovered rows
+leak.*  Measured on the raw reads:
+
+| wave    | rows w/ non-ASCII =j= label | matched a =harmonize_food= key (cancelled) | unmatched (leak) |
+|---------+-----------------------------+--------------------------------------------+------------------|
+| 2018-19 | 48,634                      | 47,240                                     | 1,394            |
+| 2014 (p1) | 54,435                    | 34,133                                     | 20,302           |
+
+so the load-bearing and leaking sets are *disjoint*: the crosswalk cancels the
+covered ones and the rest ship corrupted.
 
 *The cost is category fragmentation in the very axis that exists to
 harmonize.*  Beef is served as *three* separate =j= values:
@@ -613,7 +643,15 @@ damage reads clean.  "0 leaks" is not "nothing wrong"; see the section above.
 
 This is a whole-cohort pattern, not a Burkina Faso quirk -- see GH #794.
 Benin, Guinea-Bissau, Niger, Senegal and Togo all key =harmonize_food= on the
-same mojibake.  Three of the EHCVM countries (CotedIvoire, Guinea-Bissau,
+same mojibake.
+
+*The cohort figure is a LOWER BOUND.*  The census that produced it keyed on
+the =Ã=/=Â= (double-encoding) signature only, so it misses the cp1252-C1
+subclass entirely -- Burkina Faso's 2014 wave contributes *0* to the 278,777
+under that predicate while actually carrying 34,133 crosswalk-matched
+non-ASCII rows.  Widening the predicate to "any non-ASCII" raises every
+country's count.
+  Three of the EHCVM countries (CotedIvoire, Guinea-Bissau,
 Niger) instead repair the data with a =_decode_mojibake= =df_edit= hook in
 =<wave>/_/mapping.py= and keep their crosswalk clean.  *Burkina Faso does
 not have that hook.*  Whichever way this is unified, the read and the

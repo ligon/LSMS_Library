@@ -427,6 +427,14 @@ Measured on 2018-19: *63,989 of 214,528 rows* key on a mojibake
 *cohort* property -- Benin, Burkina Faso, Guinea-Bissau, Niger, Senegal and
 Togo all do it, ~278,777 rows across the six waves that are cached (GH #794).
 
+*The cohort figure is a LOWER BOUND.*  The census that produced it keyed on
+the =Ã=/=Â= (double-encoding) signature only, so it misses the cp1252-C1
+subclass entirely -- Burkina Faso's 2014 wave contributes *0* to the 278,777
+under that predicate while actually carrying 34,133 crosswalk-matched
+non-ASCII rows.  Widening the predicate to "any non-ASCII" raises every
+country's count.
+
+
 *There is already a better answer in-repo, and Senegal does not use it.*
 CotedIvoire, Guinea-Bissau and Niger each carry a =_decode_mojibake= helper in
 =<wave>/_/mapping.py= that repairs the *data* instead of the crosswalk:
