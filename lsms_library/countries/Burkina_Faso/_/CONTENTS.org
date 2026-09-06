@@ -531,3 +531,41 @@ uses a different instrument and is out of scope.
 - Placeholder rows (no field/parcel number) for non-farming households
   are dropped.  Latitude / Longitude deferred (no decimal-degree parcel
   GPS in EHCVM s16a).
+
+* =2018-19= / =2021-22= =food_acquired.py= are DEAD CODE, and their =encoding== is a trap
+
+Both =Burkina_Faso/2018-19/_/food_acquired.py= and
+=Burkina_Faso/2021-22/_/food_acquired.py= read the =.dta= with
+=encoding='iso-8859-1'=.  Neither script is the builder: both waves declare
+=food_acquired= fully in =<wave>/_/data_info.yml= (the YAML path), and
+=_/data_scheme.yml= does *not* mark the table =materialize: make=.  The wave
+parquet's shape settles it -- canonical =(t, v, i, j, u, s)= with
+=Quantity=/=Expenditure=, not the =['j','i','t']= / =quantity, units, total
+expenses= shape those scripts write.  (The country-level =_/food_acquired.py=
+still expects the *legacy* column names, so it could not consume the current
+wave parquets either.)
+
+*Why this matters beyond tidiness.*  =encoding== activates
+=ligonlibrary.dataframes._coerce_label=, which is
+~str(v).encode(enc, errors="ignore").decode("utf-8", errors="ignore")~.  For a
+*format 118* file -- which =s07b_me_bfa2018.dta= is -- pandas has *already*
+decoded the labels correctly as UTF-8, so the "repair" is not merely
+unnecessary, it is destructive: the =errors="ignore"= on the *decode* leg
+silently deletes any character that encodes into latin-1 but is not a legal
+UTF-8 start byte.  Measured on that file:
+
+: 'Boîte de tomate' -> 'Bote de tomate'   (5,235 rows)
+: 'Boîte de lait'   -> 'Bote de lait'     (  326 rows)
+
+=î= (U+00EE) encodes to the single byte =0xEE=, which is not valid UTF-8, and
+is dropped without an exception.  Were these scripts revived as-is, those
+5,561 rows would stop matching the =Boîte de tomate= / =Boîte de lait= keys in
+=_/categorical_mapping.org= =#+NAME: u= and the unit harmonization would fail
+*silently*.
+
+*Burkina Faso is nevertheless immune today*, for the reason recorded above
+under GH #223 Layer 2: =u= is decoded from the *numeric* =s07bq03b= code via
+=mappings: ['ehcvm_units', 'Code', 'Preferred Label']=, so the =.dta= value
+*labels* never enter the key path at all.  Contrast Senegal, which declares a
+bare =u: s07bq03b= and therefore keys on the label text -- see
+=Senegal/_/CONTENTS.org=, where the mojibake is *load-bearing*.

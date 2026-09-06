@@ -387,3 +387,57 @@ at the country level concatenates them.
 - Senegal-specific delta :: the 2021-22 instrument relabels =s16aq10=
   code 3 "Fermage" -> "Fermage/colonage", but the integer code is
   unchanged, so it still maps to =rented_in=.
+
+* WARNING: the =u= crosswalk is keyed on MOJIBAKE, and that is load-bearing
+
+=_/categorical_mapping.org= table =#+NAME: u= maps unit labels to preferred
+labels.  Its *Original Label* column does not hold the unit names as a human
+would write them -- it holds them *double-encoded*:
+
+: | unitÃ©                    | Unité   |
+: | BoÃ®te                    | Boîte   |
+: | cuillÃ¨re Ã &nbsp; soupe    | Cuillère à soupe |
+
+On disk those keys are the UTF-8 encoding of =Ã©= (U+00C3 U+00A9), i.e. bytes
+=c3 83 c2 a9=, *not* of =é= (U+00E9).  This is deliberate and it is *correct*,
+because of how the source file is read:
+
+- =Data/s07b_me_sen2018.dta= is Stata *format 115*.  ~pandas.io.stata.StataReader~
+  chooses its string encoding purely from the format version
+  (~_set_encoding~: =< 118 -> latin-1=, =>= 118 -> utf-8=).  Format 115 is
+  therefore decoded as *latin-1, silently -- no ~UnicodeWarning~ is raised*.
+- The file's value labels are actually UTF-8 bytes.  Decoding them as latin-1
+  yields =unitÃ©= for =unité=.  That mojibake is what reaches the =u= index.
+- The =u= crosswalk keys on exactly that string and maps it to the clean
+  =Unité=.  *The crosswalk is the repair.*
+
+*Consequence: "fixing" the encoding would BREAK this table.*  Measured on
+2018-19 (=s07bq03b=, 214,528 rows): 41,000 rows carry a mojibake unit label,
+and every one of them matches a =u= crosswalk key.  Re-decode them correctly
+(e.g. by passing =encoding== through to the reader) and all 41,000 stop
+matching -- =unité= is *not* a key in the table, =unitÃ©= is.  The API
+currently returns 0 mojibake =u= values precisely because the two wrongs
+cancel.
+
+*Do not* "clean up" these keys in isolation.  Either leave both halves alone,
+or change the read and the crosswalk in the same commit, and re-verify that
+=Country('Senegal').food_acquired()= still returns 0 mojibake =u= values.
+
+** =2018-19/_/food_acquired.py= is DEAD CODE -- do not reason from it
+
+That script reads the =.dta= with =encoding='ISO-8859-1'= and would repair the
+mojibake before it ever reached the crosswalk.  It is *not the builder*:
+=2018-19/_/data_info.yml= declares =food_acquired= with a full =file=/=idxvars=/
+=myvars= block (the YAML path), and =_/data_scheme.yml= does *not* mark the
+table =materialize: make=.  The wave parquet's shape confirms it -- canonical
+=(t, v, i, j, u, s)= with =Quantity=/=Expenditure=, which is what the YAML
+route plus ~food_acquired_to_canonical~ emit, not the =['j','i','t']= /
+=quantity, units, total expenses= shape the script writes.
+
+The =encoding== argument in that script is consequently inert today.  It is
+also *not a safe thing to revive*: see the section above, and note that
+=ligonlibrary.dataframes._coerce_label= (which =encoding== activates) is
+lossy -- it does
+~str(v).encode(enc, errors="ignore").decode("utf-8", errors="ignore")~, and the
+=errors="ignore"= on the *decode* silently deletes any character that survived
+the encode but is not a valid UTF-8 start byte.
