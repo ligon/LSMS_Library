@@ -1312,12 +1312,27 @@ time; Panama's carry one 97.4% of the time and it loses 17,366 rows there.
 438,773 -> 407,478 (*-7.13%*): that wave has 31,295 grouped =Value= rows of
 its own.  Median =Price= moves 4.899 -> 5.512, =std= 314.86 -> 326.70.
 
-*=_drop_unpriceable= now warns on every =food_prices()= call for this
-country*, with =lost_fraction= 0.0097% -> *79.84%*.  The warning text was
-widened in the same PR so it no longer asserts the loss is /"typically a
-0-as-missing sentinel or a quantity variable mapped to the wrong survey
-question"/ -- for a currency-denominated unit the NaN is *by design*.  The
-warning is correct and expected; it is not a new defect.
+*=_drop_unpriceable= gives currency rows their own bucket, and therefore
+does NOT warn here.*  An earlier revision of this PR let the by-design drops
+into =lost=, which took =lost_fraction= from 0.0097% to *79.84%* and made
+the warning fire on every =food_prices()= call.  That was corrected in
+review, because the number was *99.988% by design*: of the 3,493,339 rows
+dropped, *3,492,915 are =u='Value'=* and *424* are everything else.
+
+The reported figure is now the *residual real loss* -- =424 / 882,361 =
+*0.048%*= -- which is below =PRICE_LOSS_WARN_THRESHOLD= and correctly
+silent.  The currency rows are still COUNTED, in
+=attrs['price_rows_dropped']['currency']=, alongside =expected_gross=; they
+are excluded from the fraction, not hidden.
+
+*Why that mattered enough to change.*  A warning pinned at ~79.8% forever
+cannot report the next defect in its own cell: 10,000 genuinely-broken new
+rows would move it to 80.07% and nobody would look.  That is this repo's own
+GH #323 failure -- /"a warning nobody reads is exactly how #323 survived its
+first fix"/ -- reproduced inside the warning meant to prevent it.  Measured
+corpus-wide, the change takes the warning census from *8 cells back to 7*:
+=GhanaLSS/kgvalue= is the only one that stops firing, and *nothing new
+starts*.
 
 *Coverage regrade: six =GhanaLSS,food_prices= cells go =sane -> dropped=.*
 =dropped= is the tier whose own docstring calls it /"the silent-drop bug

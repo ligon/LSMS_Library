@@ -99,12 +99,28 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
         variable bound to the wrong survey question.
     ``nan``
         Quantity missing, or a unit with no kg factor (the ``kg*`` modes).
-        NOT always a defect: a currency-denominated unit
-        (:data:`_CURRENCY_DENOMINATED_UNITS`, e.g. GhanaLSS's ``u='Value'``)
-        deliberately has no per-label kg factor, so every such row lands
-        here by design (GH #770).
     ``zero``
         Zero Expenditure (``*value``) or a zero reported Price (``*price``).
+
+    Currency rows are NOT one of the causes -- they get their own bucket
+    ----------------------------------------------------------------------
+    A currency-denominated unit (:data:`_CURRENCY_DENOMINATED_UNITS`, e.g.
+    ``u='Value'``) has no per-label kg factor *by design* (GH #770), so in
+    the ``kg*`` modes every such row would land in ``nan``.  Counting them
+    as loss destroys the signal this warning exists to carry: measured on
+    GhanaLSS ``kgvalue``, 3,492,915 of the 3,493,339 lost rows are
+    by-design currency and **424** are everything else -- 79.84% reported
+    versus 0.048% real.  A warning pinned at ~79.8% forever cannot report
+    the next defect in its own cell (a new 10,000-row break moves it to
+    80.07%), which is the repo's own GH #323 failure with a warning
+    attached.
+
+    So currency rows in the ``kg*`` modes are excluded from BOTH ``lost``
+    and ``expected`` and tallied separately as ``currency``: they were
+    never expected to produce a kg price.  ``expected_gross`` keeps the
+    unadjusted denominator so nothing is hidden.  The ``unit*`` modes need
+    no adjustment -- a currency row is perfectly priceable there
+    (``Expenditure / Quantity``), so it stays in the denominator.
 
     Parameters
     ----------
@@ -127,21 +143,52 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     dropped = is_inf | is_nan | is_zero
 
     expected = np.asarray(expected, dtype=bool)
-    lost = int((dropped & expected).sum())
-    n_expected = int(expected.sum())
+
+    # Currency-denominated rows have no kg factor BY DESIGN (GH #770), so in
+    # the kg* modes they are not rows that "ought to have produced a price".
+    # Give them their own bucket and take them out of both sides of the
+    # fraction, so what remains is the residual REAL loss -- the only number
+    # a threshold can usefully bite on.  In the unit* modes a currency row is
+    # priceable (Expenditure / Quantity), so nothing is excluded there.
+    if units in ('kgvalue', 'kgprice') and 'u' in (v.index.names or []):
+        by_design = _is_currency_denominated(
+            v.index.get_level_values('u')) & expected
+    else:
+        by_design = np.zeros(len(v), dtype=bool)
+    effective = expected & ~by_design
+
+    lost = int((dropped & effective).sum())
+    n_expected = int(effective.sum())
     tally = {
         'units': units,
         'rows_in': int(len(v)),
+        # Denominator of `lost_fraction`: expected MINUS by-design currency.
         'expected': n_expected,
+        # The unadjusted denominator, so the adjustment is auditable.
+        'expected_gross': int(expected.sum()),
+        # Dropped by design because the unit is currency-denominated; NOT
+        # counted in `dropped_expected` / `lost_fraction`.
+        'currency': int((dropped & by_design).sum()),
+        'currency_expected': int(by_design.sum()),
         'dropped_total': int(dropped.sum()),
         'dropped_expected': lost,
-        'inf': int((is_inf & expected).sum()),
-        'nan': int((is_nan & expected).sum()),
-        'zero': int((is_zero & expected).sum()),
+        'inf': int((is_inf & effective).sum()),
+        'nan': int((is_nan & effective).sum()),
+        'zero': int((is_zero & effective).sum()),
         'lost_fraction': (lost / n_expected) if n_expected else 0.0,
     }
 
     if n_expected and lost / n_expected > threshold:
+        currency_note = (
+            f"  A further {tally['currency']:,} row(s) were dropped because "
+            f"their unit is CURRENCY-DENOMINATED (u='Value': the survey "
+            f"deliberately elicited value, not a physical amount).  Those "
+            f"are BY DESIGN -- the factor is 1/price at (j, t, m) and no "
+            f"per-label constant can represent it (GH #770) -- so they are "
+            f"EXCLUDED from the count and the fraction above, which report "
+            f"the residual real loss."
+            if tally['currency'] else ""
+        )
         warnings.warn(
             f"food_prices(units={units!r}): dropped {lost:,} of {n_expected:,} "
             f"priceable rows ({lost / n_expected:.1%}) because Price was "
@@ -153,12 +200,7 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
             f"Quantity -- typically a 0-as-missing sentinel or a quantity "
             f"variable mapped to the wrong survey question (GH #591).  A NaN "
             f"Price means the quantity was missing OR the unit has no kg "
-            f"factor -- and for a CURRENCY-DENOMINATED unit "
-            f"(u='Value': the survey deliberately elicited value, not a "
-            f"physical amount) that is BY DESIGN, because the factor is "
-            f"1/price at (j, t, m) and no per-label constant can represent "
-            f"it (GH #770).  Check the u composition of the dropped rows "
-            f"before treating this as a defect.  See GH #591, GH #770.",
+            f"factor.{currency_note}  See GH #591, GH #770.",
             UnpriceableRowsWarning,
             stacklevel=3,
         )

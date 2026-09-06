@@ -31,6 +31,8 @@ the positive control below is what stops this exclusion quietly widening.
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -238,28 +240,99 @@ def test_food_prices_unitvalue_unaffected(canonical_frame):
     assert out[u == 'Value']['Price'].unique() == pytest.approx([1.0])
 
 
-def test_drop_unpriceable_warning_names_the_currency_case():
-    """The warning must not misdiagnose a by-design NaN as a sentinel bug.
+def _unpriceable_frame(labels):
+    """(t, i, j, u, s) frame with an all-NaN Price, one row per ``u`` label."""
+    idx = pd.MultiIndex.from_tuples(
+        [('2020', 'H1', 'maize', u, 'purchased') for u in labels],
+        names=['t', 'i', 'j', 'u', 's'])
+    return pd.DataFrame({'Price': [np.nan] * len(labels)}, index=idx)
 
-    Post-fix, GhanaLSS's ``lost_fraction`` goes from 0.0097% to ~79.8% and
-    every one of those drops is a NaN from a currency-denominated unit --
-    for which the old text asserted "typically a 0-as-missing sentinel or a
-    quantity variable mapped to the wrong survey question".
+
+def test_drop_unpriceable_is_silent_when_the_whole_loss_is_by_design():
+    """An all-currency loss must NOT fire the threshold (GH #770 review).
+
+    This is the concentration defect the review measured on GhanaLSS
+    ``kgvalue``: 3,492,915 of 3,493,339 lost rows were by-design currency
+    and 424 were everything else, so the warning read 79.84% forever and
+    could no longer report a NEW defect in its own cell.  With currency in
+    its own bucket the residual loss here is 0 of 0 and nothing is emitted
+    -- but the rows are still COUNTED, so the drop is not invisible.
     """
     from lsms_library.transformations import (
         UnpriceableRowsWarning, _drop_unpriceable,
     )
-    idx = pd.MultiIndex.from_tuples(
-        [('2020', 'H1', 'maize', 'Value', 'purchased')] * 2,
-        names=['t', 'i', 'j', 'u', 's'])
-    v = pd.DataFrame({'Price': [np.nan, np.nan]}, index=idx)
+    v = _unpriceable_frame(['Value'] * 4)
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter('always')
+        out = _drop_unpriceable(v, 'kgvalue', np.array([True] * 4))
+    assert not [w for w in rec
+                if issubclass(w.category, UnpriceableRowsWarning)]
+    tally = out.attrs['price_rows_dropped']
+    assert tally['currency'] == 4          # counted, not hidden
+    assert tally['expected'] == 0          # excluded from the denominator
+    assert tally['expected_gross'] == 4    # ... and the raw figure kept
+    assert tally['dropped_expected'] == 0
+    assert tally['lost_fraction'] == 0.0
+
+
+def test_drop_unpriceable_reports_the_residual_loss_beside_the_bucket():
+    """A REAL loss still fires, and the message separates the two causes.
+
+    The discriminating case: 1 genuinely-broken row among 4 currency rows.
+    Pre-bucket this was 5/5 = 100% with one undifferentiated explanation;
+    post-bucket it is 1/1 with the 4 named separately as by-design.
+    """
+    from lsms_library.transformations import (
+        UnpriceableRowsWarning, _drop_unpriceable,
+    )
+    v = _unpriceable_frame(['Value'] * 4 + ['Heap'])
     with pytest.warns(UnpriceableRowsWarning) as rec:
-        _drop_unpriceable(v, 'kgvalue', np.array([True, True]))
+        _drop_unpriceable(v, 'kgvalue', np.array([True] * 5))
     msg = str(rec[0].message)
-    assert '#770' in msg
+    assert 'dropped 1 of 1' in msg          # the residual, not 5 of 5
+    assert 'A further 4 row(s)' in msg      # the bucket, reported
     assert 'CURRENCY-DENOMINATED' in msg
+    assert '#770' in msg
     # the inf explanation must stay, scoped to inf
     assert '0-as-missing' in msg
+
+
+def test_drop_unpriceable_omits_the_currency_sentence_when_none_present():
+    """NIT 3: don't explain u='Value' on a drop that is entirely about litres.
+
+    Observed in ``test_volume_as_mass_kwarg.py`` -- the widened text lectured
+    about currency on a pure litre drop.  The sentence is now gated on the
+    bucket being non-empty.
+    """
+    from lsms_library.transformations import (
+        UnpriceableRowsWarning, _drop_unpriceable,
+    )
+    v = _unpriceable_frame(['litre'] * 3)
+    with pytest.warns(UnpriceableRowsWarning) as rec:
+        _drop_unpriceable(v, 'kgvalue', np.array([True] * 3))
+    msg = str(rec[0].message)
+    assert 'dropped 3 of 3' in msg
+    assert 'CURRENCY-DENOMINATED' not in msg
+    assert 'A further' not in msg
+    assert '0-as-missing' in msg            # the inf explanation still there
+
+
+def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
+    """``unitvalue`` CAN price a currency row, so nothing is excluded there.
+
+    The exclusion is mode-conditional on purpose: it is licensed by "there is
+    no kg factor", which is true only of the ``kg*`` modes.
+    """
+    from lsms_library.transformations import _drop_unpriceable
+    v = _unpriceable_frame(['Value'] * 4)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        out = _drop_unpriceable(v, 'unitvalue', np.array([True] * 4))
+    tally = out.attrs['price_rows_dropped']
+    assert tally['currency'] == 0
+    assert tally['expected'] == 4
+    assert tally['dropped_expected'] == 4
+    assert tally['lost_fraction'] == 1.0
 
 
 # ---------------------------------------------------------------------------
