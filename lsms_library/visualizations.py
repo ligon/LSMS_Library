@@ -456,24 +456,43 @@ _MISSING_FOLIUM = (
 )
 
 
-def _radius_by_area(values, r_max=14.0, r_floor=2.0):
-    """Marker radii whose AREA is proportional to ``values``.
+def _radius_by_area(values, r_max=14.0, r_floor=2.0, scale="area"):
+    """Marker radii, and how many were floored.
 
-    Radius-proportional symbols are the classic lie of this chart type: a
-    cluster carrying 197x the weight of another -- the observed range on
-    Uganda 2013-14 -- would be drawn 197x wider and therefore ~38,000x larger
-    by area.  Area is what the eye reads, so radius must go as the square
-    root.  A floor keeps the smallest markers clickable; it is the one place
-    the mapping is deliberately not proportional, so :func:`coordinate_map`
-    says so in the caption rather than leaving the reader to assume otherwise.
+    Returns ``(radii, n_floored)``.
+
+    ``scale='area'`` makes AREA proportional to the value, i.e. radius as its
+    square root.  Radius-proportional symbols are the standard lie of this
+    chart type -- Uganda 2013-14's cluster weights span 197x, which drawn as a
+    radius reads as ~38,000x by area.
+
+    ``scale='log'`` makes area proportional to ``log1p(value)`` instead.  It
+    is not a prettier version of the same thing: it deliberately understates
+    differences, so a 197x range reads as 5x, and the caption must say so.
+
+    **The floor is the honest problem with ``'area'``, and the caller reports
+    it.**  Spanning 197x within a 14px budget puts the smallest markers at 1px,
+    so a floor is needed to keep them visible -- and the floor breaks exactly
+    the proportionality the mode promises.  Measured on Uganda: 188 of 620
+    markers (30%) are floored, overstating their area by up to 4x.  Hence the
+    count comes back with the radii rather than being swallowed: a caption
+    claiming "area proportional to weight" while it is untrue for a third of
+    the markers is the kind of quiet falsehood this module exists to avoid.
+    ``'log'`` needs no floor at all (min radius 2.8px on the same data).
     """
     import numpy as np
 
     v = np.asarray(values, dtype=float)
+    if scale not in ("area", "log"):
+        raise ValueError(f"scale must be 'area' or 'log'; got {scale!r}")
+    if scale == "log":
+        v = np.log1p(np.clip(v, 0, None))
     top = np.nanmax(v) if v.size else 1.0
     if not np.isfinite(top) or top <= 0:
-        return np.full(v.shape, r_floor)
-    return np.maximum(r_floor, r_max * np.sqrt(np.clip(v, 0, None) / top))
+        return np.full(v.shape, r_floor), 0
+    true_r = r_max * np.sqrt(np.clip(v, 0, None) / top)
+    n_floored = int((true_r < r_floor).sum())
+    return np.maximum(r_floor, true_r), n_floored
 
 
 def _cluster_frame(data, wave, size):
@@ -522,7 +541,8 @@ def _cluster_frame(data, wave, size):
 
 
 def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude",
-                   label=None, interactive=True, colors=None, tiles=None):
+                   label=None, interactive=True, scale="area", colors=None,
+                   tiles=None):
     """Map point coordinates, optionally sizing each marker by a third variable.
 
     The leading case is survey clusters sized by the sampling weight they
@@ -540,6 +560,12 @@ def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude
     size : str, optional
         Column whose value sets marker AREA (not radius -- see
         :func:`_radius_by_area`).  ``None`` draws uniform markers.
+    scale : {'area', 'log'}, default 'area'
+        ``'area'`` makes marker area proportional to ``size``.  ``'log'``
+        uses ``log1p(size)`` instead, which compresses a wide range into a
+        legible one -- Uganda's 197x weight span reads as 5x -- and needs no
+        size floor.  It understates differences by construction, so the
+        caption says which was used.
     interactive : bool, default True
         Render a pan/zoom Leaflet map via ``folium``, which displays inline in
         Jupyter and can be saved as standalone HTML.  ``False`` draws a static
@@ -577,9 +603,10 @@ def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude
     if df.empty:
         raise ValueError("no rows with usable coordinates")
 
+    n_floored = 0
     if size is not None and size in df.columns:
         vals = pd.to_numeric(df[size], errors="coerce").fillna(0.0)
-        radii = _radius_by_area(vals)
+        radii, n_floored = _radius_by_area(vals, scale=scale)
     else:
         vals, radii = None, [5.0] * len(df)
 
@@ -590,7 +617,11 @@ def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude
     if dropped:
         note.append(f"{dropped} cluster(s) without coordinates, not shown")
     if vals is not None:
-        note.append(f"marker area ∝ {size}")
+        note.append(f"marker area ∝ {size}" if scale == "area"
+                    else f"marker area ∝ log({size})")
+        if n_floored:
+            # Say it rather than let the caption over-claim for these markers.
+            note.append(f"{n_floored} at the minimum size, area overstated")
     caption = "; ".join(note)
 
     if not interactive:

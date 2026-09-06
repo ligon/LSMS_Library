@@ -252,9 +252,10 @@ def test_marker_area_not_radius_is_proportional():
     """
     from lsms_library.visualizations import _radius_by_area
 
-    r = _radius_by_area([1.0, 4.0], r_max=10.0, r_floor=0.0)
+    r, n_floored = _radius_by_area([1.0, 4.0], r_max=10.0, r_floor=0.0)
     assert r[1] == pytest.approx(10.0)
     assert r[1] / r[0] == pytest.approx(2.0), "radius should go as sqrt(value)"
+    assert n_floored == 0
 
 
 def test_aspect_is_corrected_for_latitude():
@@ -303,3 +304,44 @@ def test_interactive_without_folium_says_how_to_fix_it(monkeypatch):
     monkeypatch.setattr(builtins, "__import__", no_folium)
     with pytest.raises(ImportError, match="pip install folium"):
         coordinate_map(_geo(), interactive=True)
+
+
+def test_the_size_floor_is_counted_and_disclosed():
+    """The floor breaks the proportionality the caption promises, so say so.
+
+    Measured on Uganda 2013-14: weights span 197x, and within a 14px budget
+    188 of 620 markers (30%) fall below the 2px floor, overstating their area
+    by up to 4x.  A caption reading "area proportional to weight" while that
+    is untrue for a third of the markers is exactly the quiet falsehood this
+    module exists to avoid.
+    """
+    from lsms_library.visualizations import _radius_by_area
+
+    _, n = _radius_by_area([1.0, 400.0], r_max=14.0, r_floor=2.0)
+    assert n == 1, "a 400x span must floor the small marker"
+
+    df = _geo(12)
+    df.loc[:5, "weight"] = 0.01
+    df.loc[6:, "weight"] = 100.0
+    ax = coordinate_map(df, size="weight", interactive=False)
+    assert "at the minimum size" in _all_text(ax)
+
+
+def test_log_scale_says_it_is_log_and_needs_no_floor():
+    from lsms_library.visualizations import _radius_by_area
+
+    _, n = _radius_by_area([1.0, 400.0], r_max=14.0, r_floor=2.0, scale="log")
+    assert n == 0, "log compresses enough that nothing needs flooring"
+
+    df = _geo(10)
+    ax = coordinate_map(df, size="weight", interactive=False, scale="log")
+    txt = _all_text(ax)
+    assert "log(weight)" in txt
+    assert "at the minimum size" not in txt
+
+
+def test_bad_scale_rejected():
+    from lsms_library.visualizations import _radius_by_area
+
+    with pytest.raises(ValueError, match="scale must be"):
+        _radius_by_area([1.0], scale="sqrt")
