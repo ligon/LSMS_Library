@@ -1286,6 +1286,93 @@ Mali, Nigeria and Tanzania.  Adding =condition= cannot and does not change
 the set of countries Feature keeps.
 
 * Known Issues
+** DONE =earnings= shipped a dense phantom panel, and the column was named =earnings= (GH #772)
+
+The country-level =_/earnings.py= built its =(t, i)= panel by stacking each
+wave's frame, collecting the results in a =pd.DataFrame(dict)= and stacking
+again.  That round trip cost three defects at once, of which only the first
+was visible to the test suite:
+
+1. *Wrong column name, plus a residue column.*  The final
+   =pd.DataFrame({'earnings': ...})= named the measure =earnings=, but
+   =data_scheme.yml= declares =Earnings= and =lsms_library/currency.py=
+   registers ={"Earnings"}= as this table's monetary column.  Anything
+   selecting =Earnings= got a =KeyError=.  The stacked column axis was
+   unnamed, so =reset_index()= left it behind as a =level_1= column holding
+   the constant string ='Earnings'=.  This is what
+   =test_declared_columns_present= and =test_feature_is_sane= reported.
+
+2. *A dense (households x waves) cross product.*  Under pandas 3
+   =DataFrame.stack= no longer drops all-null rows (it did under 2.x, via
+   the =dropna=True= default of the legacy implementation).  Aligning the
+   waves as a dict of Series therefore materialised every id in the union
+   against every wave: *129 160 rows = 16 145 ids x 8 waves*, against
+   *22 447* real household-wave observations (the sum of the wave parquet
+   row counts, pinned in =tests/fixtures/uganda_baseline.json=).  *82.6 % of
+   the delivered table -- 106 713 rows -- was fabricated*: a NaN earnings
+   row for every household in every wave it was not surveyed in.
+
+   *This one is dated by two committed artefacts, and it is a regression,
+   not an ancient defect.*  =.coder/coverage/latest.csv= (refreshed
+   [2026-06-26], i.e. under pandas 2.x) grades the eight Uganda =earnings=
+   cells at 1467 / 2889 / 2618 / 2805 / 3119 / 3305 / 3180 / 3064 rows --
+   =len(df[t == wave])= on the built country table, and exactly the wave
+   parquet counts, summing to 22 447.  =uganda_baseline.json=, regenerated
+   under the pandas 3 floor (PR #710, [2026-08-22]), records 129 160.  The
+   naming defect (1) is old; the densification arrived with the floor.  So
+   the row count this fix restores is not an estimate -- it is what the
+   table held before, measured.
+
+   No guard could see it.  It is not a grain collapse (nothing is
+   destroyed -- rows are *manufactured*, as in GH #323 site 4), and it is
+   not a null read: =Earnings= is not 100 % null, whole-table or per-wave
+   =t= slice, so neither =null_read_audit= site fires.  Nor is there a
+   "mostly null" sanity check.  It surfaced only because the *naming* bug
+   sat on top of it.
+
+3. *=.squeeze()= on a length-1 Series returns a scalar*, which
+   =pd.DataFrame(dict)= then broadcasts across every row.  Latent -- no
+   Uganda wave yields one household -- but it is a landmine, not a style
+   point.
+
+Fixed by concatenating the waves under a =t= key
+(=pd.concat(dict, names=['t','i'])=), which is what the shape was always
+meant to be.  The wave scripts' household index was also labelled =j=,
+which in this library means a *good* (see =Index Info= in
+=lsms_library/data_info.yml=); it is now =i=, and =id_walk= no longer has to
+warn that it fell back to a level it was not asked for.
+
+*=income= was propped up by the phantom rows, and the fix had to account for
+that.*  =_/income.py= combined its sources with a plain =+=, which aligns on
+the *intersection*: a household missing from either source became NaN and was
+dropped.  That was nearly invisible while earnings carried a row for every
+=(household, wave)= pair -- =[cols].sum(axis=1)= turns an all-NaN row into
+=0.0=, so the intersection was very nearly the union.  Removing the phantoms
+would have silently dropped the enterprise-only households they had been
+standing in for, so =income.py= now aligns with =.add(..., fill_value=0)=:
+a household absent from one source earned nothing *from that source*, which
+is not the same as having undefined total income.  All-zero totals are still
+dropped, as before.
+
+*Still open, same root cause, deliberately not fixed here.*
+=_/enterprise_income.py= is dense in exactly the same way, and by the same
+two artefacts: the [2026-06-26] coverage snapshot sums its eight wave slices
+to *13 935* rows, =uganda_baseline.json= records =var/enterprise_income.parquet=
+at *78 040* = 9 755 ids x 8 waves.  =_/assets.py= uses the same =stack()= /
+dict / =stack()= idiom (its column axis carries the asset type rather than a
+single measure, so the cross product is over =(id, asset)= pairs), but
+*its density is not measured here* -- no =var/assets.parquet= entry exists in
+the baseline to compare against the 116 808 rows the coverage snapshot sums
+to.  Neither table has the naming defect, so neither shows up in the test
+suite; both want the same rewrite, each measured on its own.
+
+*Baseline debt.*  =tests/fixtures/uganda_baseline.json= pins content hashes,
+and the new ones are not computable without microdata access.  The two
+affected entries carry =null= in the fields that could not be recomputed
+(see the =test_uganda_invariance.py= docstring); =python
+tests/generate_baseline.py lsms_library/countries/Uganda= on a machine with
+data clears them.
+
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
 - Note taken on [2026-07-21 Tue] \\
