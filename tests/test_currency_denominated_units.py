@@ -156,21 +156,21 @@ def test_get_kg_factors_emits_no_currency_key(inference_frame):
     assert factors['kg'] == 1                        # KNOWN_METRIC untouched
 
 
-def test_all_currency_frame_infers_nothing_without_raising(inference_frame):
-    """The edge case this change CREATES: filtering can empty the frame.
-
-    ``_get_kg_factors`` swallows ValueError / ZeroDivisionError / KeyError
-    but lets TypeError / AttributeError propagate as programmer bugs, so an
-    empty-frame crash here would surface as a hard failure, not a fallback.
-    GhanaLSS 1987-88 and 1988-89 are 100% ``u='Value'``, so this is a real
-    corpus shape, not a hypothetical.
-    """
-    u = inference_frame.index.get_level_values('u').astype(str).str.lower()
-    only_currency = inference_frame[u.isin(_CURRENCY_DENOMINATED_UNITS)]
-    assert len(only_currency) > 0
-    assert conversion_to_kgs(only_currency) == {}
-    factors = _get_kg_factors(only_currency)
-    assert not (set(factors) & _CURRENCY_DENOMINATED_UNITS)
+# DELETED: ``test_all_currency_frame_infers_nothing_without_raising``.
+#
+# Its docstring claimed to test "the edge case this change CREATES: filtering
+# can empty the frame".  It did not.  Measured by mutation in the adversarial
+# review of PR #784: the test PASSES with the behaviour reverted, because a
+# pre-fix all-currency frame is not emptied either -- it produces all-NaN and
+# ``kgper.dropna()`` returns ``{}`` regardless.  It could not distinguish the
+# two worlds it named, which is precisely the "looked like protection and was
+# not" failure this PR's own body warns about; leaving a third such test after
+# calling out two would be worse than having none.
+#
+# The empty-frame path is exercised for real by the data-gated
+# ``test_ghanalss_food_prices_rows_and_waves`` below: GhanaLSS 1987-88 and
+# 1988-89 are 100% ``u='Value'``, and the assertion that only ``2016-17``
+# survives is only reachable if those waves empty without raising.
 
 
 def test_currency_rows_cannot_move_other_units_factors(inference_frame):
