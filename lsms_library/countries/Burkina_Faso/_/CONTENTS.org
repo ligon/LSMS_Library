@@ -574,6 +574,43 @@ Senegal's =u= table is.  Measured on 2018-19: *47,240 of 136,888 rows* key on a
 mojibake =harmonize_food= entry.  So Burkina Faso's =j= *is* load-bearing
 mojibake; the immunity is only on =u=.
 
+** SHIPPING DEFECT: 12,933 rows of =food_acquired.j= carry corrupted labels
+
+Unlike the =Boîte -> Bote= hazard above (latent, in dead code), this one is
+*live in the served table today*.  =Country('Burkina_Faso').food_acquired()=
+returns three =j= values that are mojibake:
+
+| rows  | wave    | =j= as served (non-ASCII as codepoints) | intended                  |
+|-------+---------+-----------------------------------------+---------------------------|
+| 9,635 | 2014    | =Cube (Maggi, Jumbo,<0085>)=            | =...= cp1252 ellipsis 0x85 |
+| 1,901 | 2014    | =Viandes de b<009C>ufs fraîches=        | =oe= ligature, cp1252 0x9C |
+| 1,397 | 2018-19 | =Viande de b<00C5><0093>uf=             | =oe= ligature, double-encoded |
+
+Two *distinct* failures are mixed here: 0x85 and 0x9C are *cp1252* bytes read
+as latin-1 (the C1-control signature), while =<00C5><0093>= is the familiar
+double-encoding.  A single =.encode('latin-1').decode('utf-8')= repairs the
+third and *not* the first two, which need a cp1252 decode -- so the existing
+=_decode_mojibake= helper is necessary but not sufficient for this country.
+
+*The cost is category fragmentation in the very axis that exists to
+harmonize.*  Beef is served as *three* separate =j= values:
+
+: 660 rows  'Viande de boeuf'                  (clean ASCII)
+: 1,397     'Viande de b<00C5><0093>uf'        (2018-19)
+: 1,901     'Viandes de b<009C>ufs fraîches'   (2014)
+
+so a beef rollup through =food_expenditures= / =food_quantities= splits three
+ways and silently understates each.
+
+Scoped by measurement: the same leak-scan over Benin, Togo, Guinea-Bissau,
+Niger, CotedIvoire, Senegal and Cambodia returns *0* leaking =j= or =u=
+values.  Burkina Faso is the cohort member with *neither* a
+=_decode_mojibake= hook *nor* a =_LOST_PREFIX_REPLACEMENTS= dict.
+
+*Caveat on those zeros*: the scan finds *leaked* mojibake and is structurally
+blind to *load-bearing* mojibake -- a country whose crosswalk is keyed on the
+damage reads clean.  "0 leaks" is not "nothing wrong"; see the section above.
+
 This is a whole-cohort pattern, not a Burkina Faso quirk -- see GH #794.
 Benin, Guinea-Bissau, Niger, Senegal and Togo all key =harmonize_food= on the
 same mojibake.  Three of the EHCVM countries (CotedIvoire, Guinea-Bissau,
