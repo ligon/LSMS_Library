@@ -77,6 +77,7 @@ import types
 from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
+import configparser
 import os
 import ast
 import hashlib
@@ -123,17 +124,106 @@ _PACKAGE_ROOT = Path(__file__).resolve().parent
 _COUNTRIES_DIR = countries_root()
 _DVC_CACHE_DIR = data_root() / "dvc-cache"
 _DVC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-DVCFS = DVCFileSystem(
-    os.fspath(_COUNTRIES_DIR),
-    config={
-        "remote": {
-            "ligonresearch_s3": {
-                "credentialpath": str(_s3_creds_path()),
+def _s3_explicit_credentials() -> dict[str, str]:
+    """Reader credentials as EXPLICIT dvc_s3 config keys, or ``{}``.
+
+    ``credentialpath`` alone is not enough, and the reason is worth
+    stating because the failure it produces is a bare
+    ``PermissionError: Forbidden`` from inside s3fs with nothing naming
+    the cause.  ``dvc_s3`` implements that option as::
+
+        shared_creds = config.get("credentialpath")
+        if shared_creds:
+            os.environ.setdefault("AWS_SHARED_CREDENTIALS_FILE", shared_creds)
+
+    which loses to an ambient AWS environment two different ways:
+
+    1. ``setdefault`` -- if ``AWS_SHARED_CREDENTIALS_FILE`` is already
+       exported, our path is discarded outright and never consulted.
+    2. Even when it does apply, the shared *credentials file* sits BELOW
+       ``AWS_ACCESS_KEY_ID`` / ``AWS_SECRET_ACCESS_KEY`` in botocore's
+       resolution order, so exported keys win.
+
+    Anyone with AWS credentials exported for unrelated work therefore
+    reads this bucket with *their* identity, gets 403 on every blob, and
+    is given no hint why.  ``access_key_id`` / ``secret_access_key``
+    (``dvc_s3.S3FileSystem._prepare_credentials``) instead become the
+    ``key`` / ``secret`` passed straight to ``S3FileSystem``, which are
+    explicit credentials and outrank both.
+
+    Returns ``{}`` when the file is absent or unparseable, so the
+    ``credentialpath`` fallback below still governs -- notably for a user
+    whose own AWS credentials or instance role legitimately grant access.
+    Values are never logged.
+    """
+    path = _s3_creds_path()
+    try:
+        if not path.exists() or path.stat().st_size == 0:
+            return {}
+        parser = configparser.ConfigParser()
+        parser.read(path)
+        for section in parser.sections():
+            key_id = parser[section].get("aws_access_key_id")
+            secret = parser[section].get("aws_secret_access_key")
+            if key_id and secret:
+                creds = {"access_key_id": key_id, "secret_access_key": secret}
+                token = parser[section].get("aws_session_token")
+                if token:
+                    creds["session_token"] = token
+                return creds
+    except (OSError, configparser.Error):
+        # Unreadable or malformed -> fall back to credentialpath.
+        pass
+    return {}
+
+
+def _build_dvcfs() -> DVCFileSystem:
+    return DVCFileSystem(
+        os.fspath(_COUNTRIES_DIR),
+        config={
+            "remote": {
+                "ligonresearch_s3": {
+                    # Kept as the fallback for the case where the creds
+                    # file does not exist yet; see _s3_explicit_credentials.
+                    "credentialpath": str(_s3_creds_path()),
+                    **_s3_explicit_credentials(),
+                },
             },
+            "cache": {"dir": os.fspath(_DVC_CACHE_DIR)},
         },
-        "cache": {"dir": os.fspath(_DVC_CACHE_DIR)},
-    },
-)
+    )
+
+
+DVCFS = _build_dvcfs()
+
+
+def refresh_s3_credentials() -> bool:
+    """Rebuild :data:`DVCFS` so it picks up newly-written reader credentials.
+
+    ``DVCFS`` is constructed when this module is imported, which happens
+    *before* ``lsms_library/__init__.py`` runs the auto-unlock that writes
+    the credentials file.  On a first-ever import there is therefore
+    nothing for :func:`_s3_explicit_credentials` to read, and the
+    singleton would be left on the ``credentialpath`` fallback that an
+    ambient AWS environment defeats.  ``__init__`` calls this once after
+    unlocking.
+
+    No-op (and cheap) when the credentials were already present at import
+    or are still unavailable, so the common path builds ``DVCFS`` exactly
+    once.  Consumers resolve the singleton at call time
+    (``from .local_tools import DVCFS`` inside a function body), so
+    rebinding the module global is enough.
+
+    Returns True if the singleton was rebuilt.
+    """
+    global DVCFS
+    if not _s3_explicit_credentials():
+        return False
+    if DVCFS.repo.config.get("remote", {}).get(
+            "ligonresearch_s3", {}).get("access_key_id"):
+        return False  # already built with explicit credentials
+    DVCFS = _build_dvcfs()
+    return True
 
 
 @contextmanager
