@@ -7,8 +7,8 @@ Albania,assets,2005,absent,absent,,source not declared for wave
 Albania,assets,2008,absent,absent,,source not declared for wave
 Albania,assets,2012,absent,absent,,source not declared for wave
 Albania,cluster_features,2002,sane,declared,450,warn: has_household_index
-Albania,cluster_features,2003,builds,declared,449,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Albania,cluster_features,2004,builds,declared,450,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Albania,cluster_features,2003,sane,declared,449,"warn: has_household_index,no_constant_columns"
+Albania,cluster_features,2004,sane,declared,448,"warn: has_household_index,no_constant_columns"
 Albania,cluster_features,2005,sane,declared,480,warn: has_household_index
 Albania,cluster_features,2008,absent,absent,,source not declared for wave
 Albania,cluster_features,2012,absent,absent,,source not declared for wave
@@ -50,18 +50,20 @@ Albania,interview_date,2012,absent,absent,,source not declared for wave
 Albania,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Albania,livestock,,undeclared,absent,,not declared by this country for any wave
 Albania,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Albania,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Albania,nutrition,,undeclared,absent,,not declared by this country for any wave
 Albania,people_last7days,,undeclared,absent,,not declared by this country for any wave
-Albania,plot_features,2002,sane,declared,6082,"warn: index_levels_match_scheme,no_constant_columns"
+Albania,plot_features,2002,builds,declared,6082,"fail: declared_spellings; warn: index_levels_match_scheme,no_constant_columns"
 Albania,plot_features,2003,absent,absent,,source not declared for wave
 Albania,plot_features,2004,absent,absent,,source not declared for wave
-Albania,plot_features,2005,sane,declared,5456,"warn: index_levels_match_scheme,no_constant_columns"
-Albania,plot_features,2008,builds,declared,3977,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Albania,plot_features,2012,builds,declared,4661,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Albania,plot_features,2005,builds,declared,5456,"fail: declared_spellings; warn: index_levels_match_scheme,no_constant_columns"
+Albania,plot_features,2008,sane,declared,3977,"warn: index_levels_match_scheme,no_constant_columns"
+Albania,plot_features,2012,builds,declared,4661,"fail: declared_spellings; warn: index_levels_match_scheme,no_constant_columns"
 Albania,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Albania,plot_labor,,undeclared,absent,,not declared by this country for any wave
 Albania,sample,2002,sane,declared,3599,all checks pass
-Albania,sample,2003,builds,declared,1764,fail: no_all_null_columns; warn: no_constant_columns
-Albania,sample,2004,builds,declared,1884,fail: no_all_null_columns; warn: no_constant_columns
+Albania,sample,2003,sane,declared,1764,warn: no_constant_columns
+Albania,sample,2004,sane,declared,1884,warn: no_constant_columns
 Albania,sample,2005,sane,declared,3840,all checks pass
 Albania,sample,2008,sane,declared,3599,all checks pass
 Albania,sample,2012,sane,declared,6671,all checks pass
@@ -85,14 +87,16 @@ Armenia,crop_production,,undeclared,absent,,not declared by this country for any
 Armenia,food_acquired,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_coping,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_security,,undeclared,absent,,not declared by this country for any wave
-Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
-Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
 Armenia,housing,,undeclared,absent,,not declared by this country for any wave
 Armenia,individual_education,,undeclared,absent,,not declared by this country for any wave
 Armenia,interview_date,,undeclared,absent,,not declared by this country for any wave
 Armenia,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Armenia,livestock,,undeclared,absent,,not declared by this country for any wave
 Armenia,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Armenia,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Armenia,nutrition,,undeclared,absent,,not declared by this country for any wave
 Armenia,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Armenia,plot_features,,undeclared,absent,,not declared by this country for any wave
 Armenia,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -116,6 +120,8 @@ Azerbaijan,interview_date,1995,sane,declared,2015,warn: index_levels_match_schem
 Azerbaijan,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Azerbaijan,livestock,,undeclared,absent,,not declared by this country for any wave
 Azerbaijan,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Azerbaijan,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Azerbaijan,nutrition,,undeclared,absent,,not declared by this country for any wave
 Azerbaijan,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Azerbaijan,plot_features,,undeclared,absent,,not declared by this country for any wave
 Azerbaijan,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -142,9 +148,11 @@ Benin,interview_date,2018-19,sane,declared,24035,warn: index_levels_match_scheme
 Benin,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Benin,livestock,2018-19,sane,declared,7334,all checks pass
 Benin,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Benin,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Benin,nutrition,,undeclared,absent,,not declared by this country for any wave
 Benin,people_last7days,2018-19,sane,declared,35042,"warn: index_levels_match_scheme,no_constant_columns"
 Benin,plot_features,2018-19,sane,declared,7588,"warn: index_levels_match_scheme,no_constant_columns"
-Benin,plot_inputs,2018-19,sane,declared,10534,warn: index_levels_match_scheme
+Benin,plot_inputs,2018-19,sane,declared,10605,warn: index_levels_match_scheme
 Benin,plot_labor,2018-19,sane,declared,10738,warn: index_levels_match_scheme
 Benin,sample,2018-19,sane,declared,8012,all checks pass
 Benin,shocks,2018-19,sane,declared,12305,all checks pass
@@ -178,7 +186,7 @@ Burkina_Faso,food_quantities,2021-22,sane,declared,69017,all checks pass
 Burkina_Faso,food_security,2014,absent,absent,,source not declared for wave
 Burkina_Faso,food_security,2018-19,sane,declared,7009,warn: index_levels_match_scheme
 Burkina_Faso,food_security,2021-22,sane,declared,3224,warn: index_levels_match_scheme
-Burkina_Faso,household_characteristics,2014,dropped,declared,,declared for wave but absent from built t-index
+Burkina_Faso,household_characteristics,2014,sane,declared,10729,all checks pass
 Burkina_Faso,household_characteristics,2018-19,sane,declared,7004,all checks pass
 Burkina_Faso,household_characteristics,2021-22,sane,declared,3226,all checks pass
 Burkina_Faso,household_roster,2014,sane,declared,78543,warn: index_levels_match_scheme
@@ -200,6 +208,8 @@ Burkina_Faso,livestock,2021-22,absent,absent,,source not declared for wave
 Burkina_Faso,months_food_inadequate,2014,sane,declared,10220,warn: index_levels_match_scheme
 Burkina_Faso,months_food_inadequate,2018-19,absent,absent,,source not declared for wave
 Burkina_Faso,months_food_inadequate,2021-22,absent,absent,,source not declared for wave
+Burkina_Faso,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Burkina_Faso,nutrition,,undeclared,absent,,not declared by this country for any wave
 Burkina_Faso,panel_ids,,sane,declared,3132,3132 entries
 Burkina_Faso,people_last7days,2014,absent,absent,,source not declared for wave
 Burkina_Faso,people_last7days,2018-19,sane,declared,45332,"warn: index_levels_match_scheme,no_constant_columns"
@@ -214,10 +224,10 @@ Burkina_Faso,plot_labor,2014,absent,absent,,source not declared for wave
 Burkina_Faso,plot_labor,2018-19,sane,declared,16987,warn: index_levels_match_scheme
 Burkina_Faso,plot_labor,2021-22,absent,absent,,source not declared for wave
 Burkina_Faso,sample,2014,sane,declared,10411,all checks pass
-Burkina_Faso,sample,2018-19,builds,declared,7010,fail: no_all_null_columns; warn: no_constant_columns
-Burkina_Faso,sample,2021-22,builds,declared,3227,fail: no_all_null_columns; warn: no_constant_columns
+Burkina_Faso,sample,2018-19,sane,declared,7010,warn: no_constant_columns
+Burkina_Faso,sample,2021-22,sane,declared,3227,warn: no_constant_columns
 Burkina_Faso,shocks,2014,sane,declared,11596,all checks pass
-Burkina_Faso,shocks,2018-19,builds,declared,8766,fail: no_all_null_columns; warn: no_constant_columns
+Burkina_Faso,shocks,2018-19,sane,declared,8766,warn: no_constant_columns
 Burkina_Faso,shocks,2021-22,sane,declared,4475,all checks pass
 Burkina_Faso,subjective_well_being,2014,absent,absent,,source not declared for wave
 Burkina_Faso,subjective_well_being,2018-19,sane,declared,6988,warn: index_levels_match_scheme
@@ -230,7 +240,7 @@ Cambodia,community_prices,,undeclared,absent,,not declared by this country for a
 Cambodia,crop_production,,undeclared,absent,,not declared by this country for any wave
 Cambodia,food_acquired,2019-20,sane,declared,38201,warn: index_levels_match_scheme
 Cambodia,food_coping,,undeclared,absent,,not declared by this country for any wave
-Cambodia,food_expenditures,2019-20,sane,declared,38198,all checks pass
+Cambodia,food_expenditures,2019-20,sane,declared,32344,all checks pass
 Cambodia,food_prices,2019-20,sane,declared,35187,all checks pass
 Cambodia,food_quantities,2019-20,sane,declared,35190,all checks pass
 Cambodia,food_security,,undeclared,absent,,not declared by this country for any wave
@@ -242,8 +252,10 @@ Cambodia,interview_date,2019-20,sane,declared,1512,warn: index_levels_match_sche
 Cambodia,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Cambodia,livestock,,undeclared,absent,,not declared by this country for any wave
 Cambodia,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Cambodia,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Cambodia,nutrition,,undeclared,absent,,not declared by this country for any wave
 Cambodia,people_last7days,,undeclared,absent,,not declared by this country for any wave
-Cambodia,plot_features,2019-20,sane,declared,2951,warn: index_levels_match_scheme
+Cambodia,plot_features,2019-20,builds,declared,2951,fail: declared_spellings; warn: index_levels_match_scheme
 Cambodia,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Cambodia,plot_labor,,undeclared,absent,,not declared by this country for any wave
 Cambodia,sample,2019-20,sane,declared,1512,all checks pass
@@ -265,6 +277,8 @@ China,interview_date,,undeclared,absent,,not declared by this country for any wa
 China,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 China,livestock,,undeclared,absent,,not declared by this country for any wave
 China,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+China,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+China,nutrition,,undeclared,absent,,not declared by this country for any wave
 China,people_last7days,,undeclared,absent,,not declared by this country for any wave
 China,plot_features,1995-97,sane,declared,3180,"warn: index_levels_match_scheme,no_constant_columns"
 China,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -278,11 +292,11 @@ CotedIvoire,assets,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,assets,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,assets,1988-89,absent,absent,,source not declared for wave
 CotedIvoire,assets,2018-19,sane,declared,66857,all checks pass
-CotedIvoire,cluster_features,1985-86,builds,declared,100,fail: declared_columns_present; warn: has_household_index
-CotedIvoire,cluster_features,1986-87,builds,declared,100,fail: declared_columns_present; warn: has_household_index
-CotedIvoire,cluster_features,1987-88,builds,declared,100,fail: declared_columns_present; warn: has_household_index
-CotedIvoire,cluster_features,1988-89,builds,declared,100,fail: declared_columns_present; warn: has_household_index
-CotedIvoire,cluster_features,2018-19,builds,declared,1084,fail: declared_columns_present; warn: has_household_index
+CotedIvoire,cluster_features,1985-86,sane,declared,100,"warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,1986-87,sane,declared,100,"warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,1987-88,sane,declared,100,"warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,1988-89,sane,declared,100,"warn: has_household_index,no_constant_columns"
+CotedIvoire,cluster_features,2018-19,sane,declared,1084,warn: has_household_index
 CotedIvoire,community_prices,,undeclared,absent,,not declared by this country for any wave
 CotedIvoire,crop_production,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,crop_production,1986-87,absent,absent,,source not declared for wave
@@ -315,15 +329,15 @@ CotedIvoire,food_security,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,food_security,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,food_security,1988-89,absent,absent,,source not declared for wave
 CotedIvoire,food_security,2018-19,sane,declared,12960,warn: index_levels_match_scheme
-CotedIvoire,household_characteristics,1985-86,dropped,declared,,declared for wave but absent from built t-index
-CotedIvoire,household_characteristics,1986-87,dropped,declared,,declared for wave but absent from built t-index
-CotedIvoire,household_characteristics,1987-88,dropped,declared,,declared for wave but absent from built t-index
-CotedIvoire,household_characteristics,1988-89,dropped,declared,,declared for wave but absent from built t-index
+CotedIvoire,household_characteristics,1985-86,sane,declared,1588,all checks pass
+CotedIvoire,household_characteristics,1986-87,sane,declared,1600,all checks pass
+CotedIvoire,household_characteristics,1987-88,sane,declared,1600,all checks pass
+CotedIvoire,household_characteristics,1988-89,sane,declared,1600,all checks pass
 CotedIvoire,household_characteristics,2018-19,sane,declared,12979,all checks pass
-CotedIvoire,household_roster,1985-86,builds,declared,14398,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-CotedIvoire,household_roster,1986-87,builds,declared,13867,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-CotedIvoire,household_roster,1987-88,builds,declared,11847,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-CotedIvoire,household_roster,1988-89,builds,declared,10560,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,1985-86,sane,declared,14398,"warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,1986-87,sane,declared,13867,"warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,1987-88,sane,declared,11847,"warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,household_roster,1988-89,sane,declared,10560,"warn: index_levels_match_scheme,no_constant_columns"
 CotedIvoire,household_roster,2018-19,sane,declared,61116,warn: index_levels_match_scheme
 CotedIvoire,housing,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,housing,1986-87,absent,absent,,source not declared for wave
@@ -347,6 +361,8 @@ CotedIvoire,livestock,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,livestock,1988-89,absent,absent,,source not declared for wave
 CotedIvoire,livestock,2018-19,sane,declared,4711,all checks pass
 CotedIvoire,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+CotedIvoire,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+CotedIvoire,nutrition,,undeclared,absent,,not declared by this country for any wave
 CotedIvoire,people_last7days,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,people_last7days,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,people_last7days,1987-88,absent,absent,,source not declared for wave
@@ -371,7 +387,7 @@ CotedIvoire,sample,1985-86,sane,declared,1588,all checks pass
 CotedIvoire,sample,1986-87,sane,declared,1600,all checks pass
 CotedIvoire,sample,1987-88,sane,declared,1600,all checks pass
 CotedIvoire,sample,1988-89,sane,declared,1600,all checks pass
-CotedIvoire,sample,2018-19,builds,declared,12992,fail: no_all_null_columns; warn: no_constant_columns
+CotedIvoire,sample,2018-19,sane,declared,12992,all checks pass
 CotedIvoire,shocks,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,shocks,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,shocks,1987-88,absent,absent,,source not declared for wave
@@ -392,11 +408,11 @@ Ethiopia,assets,2013-14,sane,declared,184170,all checks pass
 Ethiopia,assets,2015-16,sane,declared,173390,all checks pass
 Ethiopia,assets,2018-19,sane,declared,37855,all checks pass
 Ethiopia,assets,2021-22,sane,declared,33560,all checks pass
-Ethiopia,cluster_features,2011-12,builds,declared,333,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Ethiopia,cluster_features,2013-14,sane,declared,434,warn: has_household_index
+Ethiopia,cluster_features,2011-12,sane,declared,333,warn: has_household_index
+Ethiopia,cluster_features,2013-14,sane,declared,433,warn: has_household_index
 Ethiopia,cluster_features,2015-16,sane,declared,432,warn: has_household_index
-Ethiopia,cluster_features,2018-19,builds,declared,535,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Ethiopia,cluster_features,2021-22,builds,declared,435,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Ethiopia,cluster_features,2018-19,sane,declared,535,warn: has_household_index
+Ethiopia,cluster_features,2021-22,sane,declared,435,warn: has_household_index
 Ethiopia,community_prices,2011-12,sane,declared,4340,warn: has_household_index
 Ethiopia,community_prices,2013-14,sane,declared,5370,warn: has_household_index
 Ethiopia,community_prices,2015-16,sane,declared,9226,warn: has_household_index
@@ -440,21 +456,21 @@ Ethiopia,food_security,2021-22,sane,declared,4958,warn: index_levels_match_schem
 Ethiopia,household_characteristics,2011-12,sane,declared,3629,all checks pass
 Ethiopia,household_characteristics,2013-14,sane,declared,5232,all checks pass
 Ethiopia,household_characteristics,2015-16,sane,declared,4953,all checks pass
-Ethiopia,household_characteristics,2018-19,dropped,declared,,declared for wave but absent from built t-index
-Ethiopia,household_characteristics,2021-22,dropped,declared,,declared for wave but absent from built t-index
-Ethiopia,household_roster,2011-12,builds,declared,18771,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Ethiopia,household_roster,2013-14,builds,declared,25968,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Ethiopia,household_roster,2015-16,builds,declared,26760,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Ethiopia,household_roster,2018-19,builds,declared,29503,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Ethiopia,household_roster,2021-22,builds,declared,25374,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_characteristics,2018-19,sane,declared,6768,all checks pass
+Ethiopia,household_characteristics,2021-22,sane,declared,4946,all checks pass
+Ethiopia,household_roster,2011-12,sane,declared,18771,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2013-14,sane,declared,25968,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2015-16,sane,declared,26760,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2018-19,sane,declared,29503,"warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,household_roster,2021-22,sane,declared,25374,"warn: index_levels_match_scheme,no_constant_columns"
 Ethiopia,housing,2011-12,sane,declared,3912,warn: index_levels_match_scheme
 Ethiopia,housing,2013-14,sane,declared,5261,warn: index_levels_match_scheme
 Ethiopia,housing,2015-16,sane,declared,4954,warn: index_levels_match_scheme
 Ethiopia,housing,2018-19,sane,declared,6770,warn: index_levels_match_scheme
 Ethiopia,housing,2021-22,sane,declared,4958,warn: index_levels_match_scheme
 Ethiopia,individual_education,2011-12,sane,declared,8008,warn: index_levels_match_scheme
-Ethiopia,individual_education,2013-14,sane,declared,8505,warn: index_levels_match_scheme
-Ethiopia,individual_education,2015-16,sane,declared,12633,"warn: index_levels_match_scheme,no_null_index_levels"
+Ethiopia,individual_education,2013-14,sane,declared,12625,warn: index_levels_match_scheme
+Ethiopia,individual_education,2015-16,sane,declared,12635,warn: index_levels_match_scheme
 Ethiopia,individual_education,2018-19,sane,declared,16027,warn: index_levels_match_scheme
 Ethiopia,individual_education,2021-22,sane,declared,13886,warn: index_levels_match_scheme
 Ethiopia,interview_date,2011-12,absent,absent,,source not declared for wave
@@ -469,18 +485,15 @@ Ethiopia,livestock,2015-16,sane,declared,9239,all checks pass
 Ethiopia,livestock,2018-19,sane,declared,6866,all checks pass
 Ethiopia,livestock,2021-22,sane,declared,4907,all checks pass
 Ethiopia,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
-Ethiopia,nutrition,2011-12,absent,absent,,source not declared for wave
-Ethiopia,nutrition,2013-14,absent,absent,,source not declared for wave
-Ethiopia,nutrition,2015-16,absent,absent,,source not declared for wave
-Ethiopia,nutrition,2018-19,absent,absent,,source not declared for wave
-Ethiopia,nutrition,2021-22,absent,absent,,source not declared for wave
+Ethiopia,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Ethiopia,nutrition,,sane,declared,25647,25647 entries
 Ethiopia,panel_ids,,sane,declared,4954,4954 entries
 Ethiopia,people_last7days,2011-12,sane,declared,18864,warn: index_levels_match_scheme
 Ethiopia,people_last7days,2013-14,sane,declared,23785,warn: index_levels_match_scheme
 Ethiopia,people_last7days,2015-16,sane,declared,23393,warn: index_levels_match_scheme
 Ethiopia,people_last7days,2018-19,sane,declared,29503,warn: index_levels_match_scheme
 Ethiopia,people_last7days,2021-22,sane,declared,22688,warn: index_levels_match_scheme
-Ethiopia,plot_features,2011-12,builds,declared,32025,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Ethiopia,plot_features,2011-12,sane,declared,32025,"warn: index_levels_match_scheme,no_constant_columns"
 Ethiopia,plot_features,2013-14,sane,declared,33147,"warn: index_levels_match_scheme,no_constant_columns"
 Ethiopia,plot_features,2015-16,sane,declared,33305,"warn: index_levels_match_scheme,no_constant_columns"
 Ethiopia,plot_features,2018-19,sane,declared,19339,"warn: index_levels_match_scheme,no_constant_columns"
@@ -549,7 +562,7 @@ EthiopiaRHS,consumption,2004,sane,declared,1368,warn: index_levels_match_scheme
 EthiopiaRHS,consumption,2009,sane,declared,1357,warn: index_levels_match_scheme
 EthiopiaRHS,crop_production,1989,absent,absent,,source not declared for wave
 EthiopiaRHS,crop_production,1994a,sane,declared,3404,warn: index_levels_match_scheme
-EthiopiaRHS,crop_production,1994b,builds,declared,1967,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+EthiopiaRHS,crop_production,1994b,sane,declared,1967,"warn: index_levels_match_scheme,no_constant_columns"
 EthiopiaRHS,crop_production,1995,sane,declared,3350,warn: index_levels_match_scheme
 EthiopiaRHS,crop_production,1997,sane,declared,3021,warn: index_levels_match_scheme
 EthiopiaRHS,crop_production,1999,absent,absent,,source not declared for wave
@@ -564,7 +577,7 @@ EthiopiaRHS,food_acquired,1999,absent,absent,,source not declared for wave
 EthiopiaRHS,food_acquired,2004,absent,absent,,source not declared for wave
 EthiopiaRHS,food_acquired,2009,absent,absent,,source not declared for wave
 EthiopiaRHS,food_coping,,undeclared,absent,,not declared by this country for any wave
-EthiopiaRHS,food_expenditures,1989,sane,declared,2014,warn: no_null_index_levels
+EthiopiaRHS,food_expenditures,1989,sane,declared,1612,warn: no_null_index_levels
 EthiopiaRHS,food_expenditures,1994a,sane,declared,9258,all checks pass
 EthiopiaRHS,food_expenditures,1994b,sane,declared,8582,all checks pass
 EthiopiaRHS,food_expenditures,1995,sane,declared,8270,all checks pass
@@ -634,6 +647,8 @@ EthiopiaRHS,livestock,1999,sane,declared,541,all checks pass
 EthiopiaRHS,livestock,2004,sane,declared,1355,all checks pass
 EthiopiaRHS,livestock,2009,sane,declared,1577,all checks pass
 EthiopiaRHS,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+EthiopiaRHS,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+EthiopiaRHS,nutrition,,undeclared,absent,,not declared by this country for any wave
 EthiopiaRHS,panel_ids,,sane,declared,4708,4708 entries
 EthiopiaRHS,people_last7days,,undeclared,absent,,not declared by this country for any wave
 EthiopiaRHS,plot_features,1989,absent,absent,,source not declared for wave
@@ -666,7 +681,13 @@ GhanaLSS,cluster_features,1998-99,sane,declared,300,"warn: has_household_index,n
 GhanaLSS,cluster_features,2005-06,sane,declared,580,"warn: has_household_index,no_constant_columns"
 GhanaLSS,cluster_features,2012-13,sane,declared,1200,warn: has_household_index
 GhanaLSS,cluster_features,2016-17,sane,declared,1000,"warn: has_household_index,no_constant_columns"
-GhanaLSS,community_prices,,undeclared,absent,,not declared by this country for any wave
+GhanaLSS,community_prices,1987-88,sane,declared,16582,warn: has_household_index
+GhanaLSS,community_prices,1988-89,sane,declared,12642,warn: has_household_index
+GhanaLSS,community_prices,1991-92,sane,declared,58348,warn: has_household_index
+GhanaLSS,community_prices,1998-99,sane,declared,63445,warn: has_household_index
+GhanaLSS,community_prices,2005-06,asked-not-distributed,absent,,"asked-not-distributed: C4 ran on the wave's own price instrument, which has a text layer: 2005-06/Documentation/G5QPrice.pdf (9 pp, 'PRICE QUESTIONNAIRE 2005/2006', cover keyed REGION / E.A. NUMBER / MARKET NUMBER / NAME OF LOCALITY, 'I. FOOD PRICES' with 1ST/2ND/3RD OBSERVATION each KG/LITRE + PRICE for codes 001-089, 'II. NON-FOOD PRICES' with DESCRIPTION + 1ST/2ND/3RD PRICE) -- the SAME instrument GLSS6 fielded, so GLSS5 DID ask. The GSS NADA DDI shipped with the wave (ddi-documentation-english-5.pdf, ID GHA-GSS-GLSS-2005-v2.0, 'v2.0: Edited data, prepared for dissemination for public use', generated 2013-06-10) names the PRICE questionnaire as one of the five instruments ('COMMUNITY and PRICE questionnaires ... PRICE Questionnaire consist of Food and Non food prices of selected items') but its data-file inventory lists only sec0..sec12c and com-sec0..com-sec52 -- no price dataset. C1 (file-level sweep) of the whole 2005-06 tree: 49 parta/partb files, the 14 files inside community/community.zip (com-list, com-sec0..com-sec52) and every file inside the ten aggregates/*.zip (agg/exp/subagg/e/ee/eee/i/ii/iii/inc) -- none is a price file and none carries a price-observation variable. C2: all six sibling waves ship one (PRICE.DAT, G3PRICE.DTA, G4PRICE.DTA, PRICES/price_sec*.dta, g7price.dta); GLSS5 is the sole gap. The WB Microdata Library (searched across ALL collections, 152 GHA rows) holds no raw GLSS5 entry at all -- only the SHIP harmonized extract GHA_2005_GLSS_v01_M_v01_A_SHIP (id 1064) -- while GLSS1-4 raw entries exist (2313/2314/2315/2331); SOURCE.org records the wave came from GSS NADA catalog/5 (CATALOG_ID none). The live GSS NADA listing could not be re-checked from this node (curl rc=60, TLS). Instrument fielded, extract lacks it: acquisition queue (ask GSS for the GLSS5 price file)."
+GhanaLSS,community_prices,2012-13,sane,declared,288243,warn: has_household_index
+GhanaLSS,community_prices,2016-17,sane,declared,220908,warn: has_household_index
 GhanaLSS,crop_production,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,food_acquired,1987-88,sane,declared,71605,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaLSS,food_acquired,1988-89,sane,declared,72649,"warn: index_levels_match_scheme,no_constant_columns"
@@ -742,6 +763,8 @@ GhanaLSS,interview_date,2016-17,sane,declared,14008,warn: index_levels_match_sch
 GhanaLSS,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,livestock,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+GhanaLSS,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+GhanaLSS,nutrition,,sane,declared,29095,29095 entries
 GhanaLSS,panel_ids,,sane,declared,714,714 entries
 GhanaLSS,people_last7days,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,plot_features,1987-88,not-asked,absent,,"not-asked: C4 ran VISUALLY on the scanned form (CCITT-fax pages rendered to PNG): 1987-88/Documentation/questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf p.42-43 = printed pages 30-31, form blocks '9A1'/'9A2', 'SECTION 9. AGRO-PASTORAL ACTIVITIES / PART A. LAND'. Questions 1-29 are all single-answer household totals -- Q3 'How many acres of the land belonging to your household have been farmed during the past 12 months' (one ACRES box), Q4 fallow, Q5 government scheme, Q6 irrigated, Q8 registered, Q7 'Do you or the members of your household have the right to sell all or part of their land' (one code box), Q10-14 sales/gifts, Q15-18 rented/sharecropped out, Q19-26 acquisitions + title, Q27-29 sharecropped in, then '>> PART B'. There is NO farm-number column and no repeated per-farm row anywhere in Part A, and a page-header sweep across pp.25-63 shows Section 9's parts to be A(Land) B(Crops) D(Farm inputs) F(Livestock) J(Hand tools) -- no farm/plot roster part. C1: 1987-88/Data/Y09A.DAT is strictly household-grain (2,644 rows, 2,644 unique HID, max 1 row per HID); none of Y09B..Y09K carries a farm or plot key (they are keyed by crop code, input code, livestock code or tool). C2: the GLSS3+ per-plot roster (S8B.DTA / sec8b.dta / g7sec8b.dta, one row per household-farm with a farm number, area, unit and tenure) has no GLSS1/GLSS2 counterpart. C3 inapplicable: GLSS is not LSMS-ISA."
@@ -767,7 +790,9 @@ GhanaSPS,anthropometry,,undeclared,absent,,not declared by this country for any 
 GhanaSPS,assets,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,cluster_features,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,community_prices,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,crop_production,,undeclared,absent,,"todo: Plot-crop harvest in all 3 waves. 2009-10 S4AV1 (major) + S4AV2 (minor season) wide, up to 5 harvest records/plot-season; 2013-14 04n_harvestquestions.dta 8229x65 (FPrimary,plotid,cropcode); 2017-18 04n_harvestquestions.dta 9317x62 (7391 real rows). Quantity + native unit (~45-code list) present in every wave. WARNING: S4AV2 variable labels wrongly say 'major season'; questionnaire Part A A120-A122 says minor. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
+GhanaSPS,crop_production,2009-10,sane,declared,11795,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaSPS,crop_production,2013-14,sane,declared,6886,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaSPS,crop_production,2017-18,sane,declared,6428,warn: index_levels_match_scheme
 GhanaSPS,food_acquired,2009-10,sane,declared,119847,warn: index_levels_match_scheme
 GhanaSPS,food_acquired,2013-14,sane,declared,139339,warn: index_levels_match_scheme
 GhanaSPS,food_acquired,2017-18,sane,declared,148743,warn: index_levels_match_scheme
@@ -796,12 +821,20 @@ GhanaSPS,individual_education,2013-14,sane,declared,15314,warn: index_levels_mat
 GhanaSPS,individual_education,2017-18,sane,declared,17910,warn: index_levels_match_scheme
 GhanaSPS,interview_date,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,livestock,,undeclared,absent,,"todo: Household-animal roster in all 3 waves. 2009-10 S3AI.dta 4280x28 (hhno,animal_id) 8 labelled species 2142 hh; 2013-14 03ai_animalquestions.dta 14860x44 (FPrimary,animal) 2098 hh -- but 10884 rows are quantity==0 and `animal` is free text with 69 spellings; 2017-18 03ai_animalquestions.dta 4203x44 8 clean labels + _osp free-text file 91x43. HeadCount and Value in all waves; HeadSold 2017-18 only; HeadAcquired never asked. C4 on all three instruments: Value is a HERD TOTAL in every wave ('if you sold all of them'), NOT the per-head price Uganda/Nigeria put in that column. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
+GhanaSPS,livestock,2009-10,sane,declared,4248,warn: no_constant_columns
+GhanaSPS,livestock,2013-14,sane,declared,3963,warn: no_constant_columns
+GhanaSPS,livestock,2017-18,sane,declared,4284,all checks pass
 GhanaSPS,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+GhanaSPS,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+GhanaSPS,nutrition,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,people_last7days,,undeclared,absent,,not declared by this country for any wave
-GhanaSPS,plot_features,,undeclared,absent,,"todo: Plot-level in all 3 waves. 2009-10 S4AII.dta 5698x15 (hhno,plot_no) with producer-computed area_ha 97.5% populated; 2013-14 04h_agsection.dta 4694x228 (FPrimary,plotid) unique; 2017-18 04h_agsection.dta 5366x176 unique. Tenure from S4AIV s4aiv_a45 / 04i_landtenure obtainhow, same 6-7 category vocabulary in all waves. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
+GhanaSPS,plot_features,2009-10,sane,declared,5682,warn: index_levels_match_scheme
+GhanaSPS,plot_features,2013-14,sane,declared,4694,warn: index_levels_match_scheme
+GhanaSPS,plot_features,2017-18,sane,declared,5366,warn: index_levels_match_scheme
 GhanaSPS,plot_inputs,,undeclared,absent,,"todo: Partial in every wave, in different places. Chemicals: 2009-10 S4AVI1/S4AVI2 plot-level quantity+unit+value; 2013-14 04l_chemquestions.dta 2475x132 household-chemical with plot split via UNRESOLVED template string '%pplotnamearray[k]'; 2017-18 04l_chemquestions.dta 4802x164 with clean space-separated plot list. Seed: quantity+unit in 2013-14 (7816/7838) and 2017-18 (8276/10525) 04k_seedquestions, but 2009-10 S4AVIII1/2 records seed VALUE only, no quantity. Organic inputs are per-plot FLAGS with no quantity in all waves. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
-GhanaSPS,plot_labor,,undeclared,absent,,"todo: Plot-stage labour in all 3 waves. 2009-10 S4AIX1-4 (major) / S4AIX5-8 (minor), four questionnaire-named stages per season; 2013-14 04m_aglabourquestions.dta 32851x43 (FPrimary,plotid,stagenum) unique; 2017-18 04m_aglabourquestions.dta 20663x64 (FPrimary,plotid,stageid). Reported person-days by source and sex in every wave. Natural extra index level is `stage`, not `season`. See slurm_logs/ghanasps/FINDINGS_agriculture.org"
+GhanaSPS,plot_labor,2009-10,sane,declared,30864,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaSPS,plot_labor,2013-14,sane,declared,27874,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaSPS,plot_labor,2017-18,sane,declared,31149,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaSPS,sample,2009-10,sane,declared,5009,all checks pass
 GhanaSPS,sample,2013-14,sane,declared,4774,warn: no_constant_columns
 GhanaSPS,sample,2017-18,sane,declared,5669,warn: no_constant_columns
@@ -809,7 +842,7 @@ GhanaSPS,shocks,,undeclared,absent,,not declared by this country for any wave
 GhanaSPS,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Guatemala,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Guatemala,assets,2000,sane,declared,37995,all checks pass
-Guatemala,cluster_features,2000,sane,declared,8,"warn: has_household_index,reasonable_size"
+Guatemala,cluster_features,2000,sane,declared,1065,warn: has_household_index
 Guatemala,community_prices,,undeclared,absent,,not declared by this country for any wave
 Guatemala,crop_production,,undeclared,absent,,not declared by this country for any wave
 Guatemala,food_acquired,2000,sane,declared,215982,warn: index_levels_match_scheme
@@ -821,11 +854,14 @@ Guatemala,food_security,,undeclared,absent,,not declared by this country for any
 Guatemala,household_characteristics,2000,sane,declared,7276,all checks pass
 Guatemala,household_roster,2000,sane,declared,37771,warn: index_levels_match_scheme
 Guatemala,housing,,undeclared,absent,,not declared by this country for any wave
-Guatemala,individual_education,2000,sane,declared,20678,warn: index_levels_match_scheme
+Guatemala,individual_education,2000,sane,declared,29527,warn: index_levels_match_scheme
 Guatemala,interview_date,,undeclared,absent,,not declared by this country for any wave
 Guatemala,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Guatemala,livestock,,undeclared,absent,,not declared by this country for any wave
 Guatemala,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Guatemala,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Guatemala,nutrition,,undeclared,absent,,not declared by this country for any wave
+Guatemala,nutrition,,broken,declared,,AttributeError: 'Country' object has no attribute 'nutrition'
 Guatemala,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Guatemala,plot_features,,undeclared,absent,,not declared by this country for any wave
 Guatemala,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -852,6 +888,8 @@ Guinea-Bissau,interview_date,2018-19,sane,declared,16053,warn: index_levels_matc
 Guinea-Bissau,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Guinea-Bissau,livestock,2018-19,sane,declared,7989,all checks pass
 Guinea-Bissau,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Guinea-Bissau,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Guinea-Bissau,nutrition,,undeclared,absent,,not declared by this country for any wave
 Guinea-Bissau,people_last7days,2018-19,sane,declared,42569,"warn: index_levels_match_scheme,no_constant_columns"
 Guinea-Bissau,plot_features,2018-19,sane,declared,9873,"warn: index_levels_match_scheme,no_constant_columns"
 Guinea-Bissau,plot_inputs,2018-19,sane,declared,5534,warn: index_levels_match_scheme
@@ -875,6 +913,8 @@ Guyana,interview_date,1992,sane,declared,1807,warn: index_levels_match_scheme
 Guyana,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Guyana,livestock,,undeclared,absent,,not declared by this country for any wave
 Guyana,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Guyana,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Guyana,nutrition,,undeclared,absent,,not declared by this country for any wave
 Guyana,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Guyana,plot_features,,undeclared,absent,,not declared by this country for any wave
 Guyana,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -887,7 +927,7 @@ India,assets,1997-98,sane,declared,4371,all checks pass
 India,cluster_features,1997-98,sane,declared,120,warn: has_household_index
 India,community_prices,,undeclared,absent,,not declared by this country for any wave
 India,crop_production,,undeclared,absent,,not declared by this country for any wave
-India,employment,1997-98,sane,declared,2593,warn: index_levels_match_scheme
+India,employment,1997-98,sane,declared,6158,warn: index_levels_match_scheme
 India,food_acquired,,undeclared,absent,,not declared by this country for any wave
 India,food_coping,,undeclared,absent,,not declared by this country for any wave
 India,food_security,,undeclared,absent,,not declared by this country for any wave
@@ -899,6 +939,8 @@ India,interview_date,1997-98,sane,declared,2249,warn: index_levels_match_scheme
 India,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 India,livestock,,undeclared,absent,,not declared by this country for any wave
 India,months_food_inadequate,1997-98,sane,declared,2251,warn: index_levels_match_scheme
+India,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+India,nutrition,,undeclared,absent,,not declared by this country for any wave
 India,people_last7days,,undeclared,absent,,not declared by this country for any wave
 India,plot_features,,undeclared,absent,,not declared by this country for any wave
 India,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -907,7 +949,7 @@ India,sample,1997-98,sane,declared,2251,all checks pass
 India,shocks,,undeclared,absent,,not declared by this country for any wave
 India,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Iraq,anthropometry,,undeclared,absent,,not declared by this country for any wave
-Iraq,assets,2006-07,builds,declared,212047,fail: no_all_null_columns; warn: no_constant_columns
+Iraq,assets,2006-07,sane,declared,212047,warn: no_constant_columns
 Iraq,assets,2012,sane,declared,576680,all checks pass
 Iraq,cluster_features,2006-07,sane,declared,2961,warn: has_household_index
 Iraq,cluster_features,2012,sane,declared,2828,warn: has_household_index
@@ -930,6 +972,8 @@ Iraq,life_satisfaction,2006-07,absent,absent,,source not declared for wave
 Iraq,life_satisfaction,2012,sane,declared,268336,warn: index_levels_match_scheme
 Iraq,livestock,,undeclared,absent,,not declared by this country for any wave
 Iraq,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Iraq,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Iraq,nutrition,,undeclared,absent,,not declared by this country for any wave
 Iraq,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Iraq,plot_features,,undeclared,absent,,not declared by this country for any wave
 Iraq,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -955,6 +999,8 @@ Kazakhstan,interview_date,,undeclared,absent,,not declared by this country for a
 Kazakhstan,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Kazakhstan,livestock,,undeclared,absent,,not declared by this country for any wave
 Kazakhstan,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Kazakhstan,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Kazakhstan,nutrition,,undeclared,absent,,not declared by this country for any wave
 Kazakhstan,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Kazakhstan,plot_features,,undeclared,absent,,not declared by this country for any wave
 Kazakhstan,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -978,8 +1024,10 @@ Kosovo,interview_date,2000,sane,declared,2880,warn: index_levels_match_scheme
 Kosovo,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Kosovo,livestock,,undeclared,absent,,not declared by this country for any wave
 Kosovo,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Kosovo,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Kosovo,nutrition,,undeclared,absent,,not declared by this country for any wave
 Kosovo,people_last7days,,undeclared,absent,,not declared by this country for any wave
-Kosovo,plot_features,2000,sane,declared,6469,"warn: index_levels_match_scheme,no_constant_columns"
+Kosovo,plot_features,2000,builds,declared,6469,"fail: declared_spellings; warn: index_levels_match_scheme,no_constant_columns"
 Kosovo,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Kosovo,plot_labor,,undeclared,absent,,not declared by this country for any wave
 Kosovo,sample,2000,sane,declared,2880,all checks pass
@@ -1001,6 +1049,8 @@ Liberia,interview_date,2018-19,sane,declared,2787,warn: index_levels_match_schem
 Liberia,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Liberia,livestock,,undeclared,absent,,not declared by this country for any wave
 Liberia,months_food_inadequate,2018-19,sane,declared,2974,warn: index_levels_match_scheme
+Liberia,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Liberia,nutrition,,undeclared,absent,,not declared by this country for any wave
 Liberia,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Liberia,plot_features,2018-19,sane,declared,2064,warn: index_levels_match_scheme
 Liberia,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -1013,15 +1063,15 @@ Malawi,anthropometry,2010-11,sane,declared,7788,warn: index_levels_match_scheme
 Malawi,anthropometry,2013-14,sane,declared,2534,warn: index_levels_match_scheme
 Malawi,anthropometry,2016-17,sane,declared,8712,warn: index_levels_match_scheme
 Malawi,anthropometry,2019-20,sane,declared,12004,warn: index_levels_match_scheme
-Malawi,assets,2004-05,builds,declared,214285,fail: no_all_null_columns; warn: no_constant_columns
+Malawi,assets,2004-05,sane,declared,214285,warn: no_constant_columns
 Malawi,assets,2010-11,sane,declared,43473,all checks pass
-Malawi,assets,2013-14,builds,declared,17622,fail: no_all_null_columns; warn: no_constant_columns
+Malawi,assets,2013-14,sane,declared,17622,warn: no_constant_columns
 Malawi,assets,2016-17,sane,declared,42447,all checks pass
 Malawi,assets,2019-20,sane,declared,38470,all checks pass
-Malawi,cluster_features,2004-05,builds,declared,110,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Malawi,cluster_features,2004-05,sane,declared,564,"warn: has_household_index,no_constant_columns"
 Malawi,cluster_features,2010-11,sane,declared,768,warn: has_household_index
 Malawi,cluster_features,2013-14,sane,declared,204,warn: has_household_index
-Malawi,cluster_features,2016-17,builds,declared,880,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Malawi,cluster_features,2016-17,sane,declared,880,warn: has_household_index
 Malawi,cluster_features,2019-20,sane,declared,819,warn: has_household_index
 Malawi,community_prices,2004-05,absent,absent,,source not declared for wave
 Malawi,community_prices,2010-11,sane,declared,39166,"warn: no_null_index_levels,has_household_index"
@@ -1061,7 +1111,7 @@ Malawi,food_quantities,2019-20,sane,declared,269820,all checks pass
 Malawi,food_security,2004-05,absent,absent,,source not declared for wave
 Malawi,food_security,2010-11,absent,absent,,source not declared for wave
 Malawi,food_security,2013-14,sane,declared,4000,warn: index_levels_match_scheme
-Malawi,food_security,2016-17,builds,declared,12446,fail: no_null_index_levels; warn: index_levels_match_scheme
+Malawi,food_security,2016-17,sane,declared,12446,warn: index_levels_match_scheme
 Malawi,food_security,2019-20,sane,declared,11432,warn: index_levels_match_scheme
 Malawi,household_characteristics,2004-05,sane,declared,11276,all checks pass
 Malawi,household_characteristics,2010-11,sane,declared,12262,all checks pass
@@ -1099,6 +1149,8 @@ Malawi,months_food_inadequate,2010-11,sane,declared,12271,warn: index_levels_mat
 Malawi,months_food_inadequate,2013-14,sane,declared,4000,warn: index_levels_match_scheme
 Malawi,months_food_inadequate,2016-17,sane,declared,12447,warn: index_levels_match_scheme
 Malawi,months_food_inadequate,2019-20,sane,declared,11434,warn: index_levels_match_scheme
+Malawi,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Malawi,nutrition,,undeclared,absent,,not declared by this country for any wave
 Malawi,people_last7days,2004-05,absent,absent,,source not declared for wave
 Malawi,people_last7days,2010-11,sane,declared,56218,warn: index_levels_match_scheme
 Malawi,people_last7days,2013-14,sane,declared,20219,warn: index_levels_match_scheme
@@ -1107,11 +1159,11 @@ Malawi,people_last7days,2019-20,sane,declared,65125,warn: index_levels_match_sch
 Malawi,plot_features,2004-05,absent,absent,,source not declared for wave
 Malawi,plot_features,2010-11,sane,declared,18990,"warn: index_levels_match_scheme,no_constant_columns"
 Malawi,plot_features,2013-14,sane,declared,6331,"warn: index_levels_match_scheme,no_constant_columns"
-Malawi,plot_features,2016-17,builds,declared,19759,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Malawi,plot_features,2019-20,builds,declared,23259,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_features,2016-17,sane,declared,19759,"warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_features,2019-20,sane,declared,23259,"warn: index_levels_match_scheme,no_constant_columns"
 Malawi,plot_inputs,2004-05,absent,absent,,source not declared for wave
-Malawi,plot_inputs,2010-11,builds,declared,46627,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
-Malawi,plot_inputs,2013-14,builds,declared,16188,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+Malawi,plot_inputs,2010-11,sane,declared,46627,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
+Malawi,plot_inputs,2013-14,sane,declared,16188,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
 Malawi,plot_inputs,2016-17,sane,declared,52494,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
 Malawi,plot_inputs,2019-20,sane,declared,64875,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
 Malawi,plot_labor,2004-05,absent,absent,,source not declared for wave
@@ -1124,7 +1176,7 @@ Malawi,sample,2010-11,sane,declared,12271,all checks pass
 Malawi,sample,2013-14,sane,declared,4000,all checks pass
 Malawi,sample,2016-17,sane,declared,14955,all checks pass
 Malawi,sample,2019-20,sane,declared,14612,all checks pass
-Malawi,shocks,2004-05,builds,declared,28389,fail: no_all_null_columns; warn: no_constant_columns
+Malawi,shocks,2004-05,sane,declared,28389,warn: no_constant_columns
 Malawi,shocks,2010-11,sane,declared,17422,all checks pass
 Malawi,shocks,2013-14,sane,declared,9952,all checks pass
 Malawi,shocks,2016-17,sane,declared,27904,all checks pass
@@ -1132,7 +1184,7 @@ Malawi,shocks,2019-20,sane,declared,21024,all checks pass
 Malawi,subjective_well_being,2004-05,absent,absent,,source not declared for wave
 Malawi,subjective_well_being,2010-11,sane,declared,12270,warn: index_levels_match_scheme
 Malawi,subjective_well_being,2013-14,absent,absent,,source not declared for wave
-Malawi,subjective_well_being,2016-17,builds,declared,12445,fail: no_null_index_levels; warn: index_levels_match_scheme
+Malawi,subjective_well_being,2016-17,sane,declared,12445,warn: index_levels_match_scheme
 Malawi,subjective_well_being,2019-20,sane,declared,11432,warn: index_levels_match_scheme
 Mali,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Mali,assets,2014-15,absent,absent,,source not declared for wave
@@ -1148,7 +1200,7 @@ Mali,community_prices,2017-18,absent,absent,,source not declared for wave
 Mali,community_prices,2018-19,absent,absent,,source not declared for wave
 Mali,community_prices,2021-22,absent,absent,,source not declared for wave
 Mali,crop_production,2014-15,sane,declared,10341,warn: index_levels_match_scheme
-Mali,crop_production,2017-18,builds,declared,24719,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Mali,crop_production,2017-18,sane,declared,24719,"warn: index_levels_match_scheme,no_constant_columns"
 Mali,crop_production,2018-19,absent,absent,,source not declared for wave
 Mali,crop_production,2021-22,absent,absent,,source not declared for wave
 Mali,food_acquired,2014-15,sane,declared,122085,all checks pass
@@ -1175,32 +1227,34 @@ Mali,food_security,2014-15,absent,absent,,source not declared for wave
 Mali,food_security,2017-18,absent,absent,,source not declared for wave
 Mali,food_security,2018-19,sane,declared,6596,warn: index_levels_match_scheme
 Mali,food_security,2021-22,sane,declared,6137,warn: index_levels_match_scheme
-Mali,household_characteristics,2014-15,sane,declared,3779,all checks pass
+Mali,household_characteristics,2014-15,sane,declared,3781,all checks pass
 Mali,household_characteristics,2017-18,sane,declared,8386,all checks pass
 Mali,household_characteristics,2018-19,sane,declared,6476,warn: no_constant_columns
-Mali,household_characteristics,2021-22,dropped,declared,,declared for wave but absent from built t-index
-Mali,household_roster,2014-15,sane,declared,5149,warn: index_levels_match_scheme
+Mali,household_characteristics,2021-22,sane,declared,6143,all checks pass
+Mali,household_roster,2014-15,sane,declared,37175,warn: index_levels_match_scheme
 Mali,household_roster,2017-18,sane,declared,94071,warn: index_levels_match_scheme
 Mali,household_roster,2018-19,sane,declared,46014,"warn: index_levels_match_scheme,no_constant_columns"
-Mali,household_roster,2021-22,builds,declared,43472,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Mali,household_roster,2021-22,sane,declared,43472,"warn: index_levels_match_scheme,no_constant_columns"
 Mali,housing,2014-15,sane,declared,3804,warn: index_levels_match_scheme
 Mali,housing,2017-18,sane,declared,8390,warn: index_levels_match_scheme
 Mali,housing,2018-19,sane,declared,6602,warn: index_levels_match_scheme
 Mali,housing,2021-22,sane,declared,6143,warn: index_levels_match_scheme
-Mali,individual_education,2014-15,sane,declared,2093,warn: index_levels_match_scheme
+Mali,individual_education,2014-15,sane,declared,4097,warn: index_levels_match_scheme
 Mali,individual_education,2017-18,sane,declared,23825,warn: index_levels_match_scheme
 Mali,individual_education,2018-19,sane,declared,46014,warn: index_levels_match_scheme
 Mali,individual_education,2021-22,sane,declared,43472,warn: index_levels_match_scheme
 Mali,interview_date,2014-15,sane,declared,3804,all checks pass
 Mali,interview_date,2017-18,sane,declared,8390,all checks pass
-Mali,interview_date,2018-19,sane,declared,6602,all checks pass
-Mali,interview_date,2021-22,sane,declared,6143,all checks pass
+Mali,interview_date,2018-19,dropped,declared,,declared for wave but absent from built t-index
+Mali,interview_date,2021-22,dropped,declared,,declared for wave but absent from built t-index
 Mali,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Mali,livestock,2014-15,sane,declared,9939,all checks pass
 Mali,livestock,2017-18,sane,declared,30757,all checks pass
 Mali,livestock,2018-19,absent,absent,,source not declared for wave
 Mali,livestock,2021-22,absent,absent,,source not declared for wave
 Mali,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Mali,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Mali,nutrition,,undeclared,absent,,not declared by this country for any wave
 Mali,panel_ids,,sane,declared,5011,5011 entries
 Mali,people_last7days,2014-15,sane,declared,37175,warn: index_levels_match_scheme
 Mali,people_last7days,2017-18,sane,declared,94071,warn: index_levels_match_scheme
@@ -1218,10 +1272,10 @@ Mali,plot_labor,2014-15,sane,declared,14843,warn: index_levels_match_scheme
 Mali,plot_labor,2017-18,sane,declared,37214,warn: index_levels_match_scheme
 Mali,plot_labor,2018-19,absent,absent,,source not declared for wave
 Mali,plot_labor,2021-22,absent,absent,,source not declared for wave
-Mali,sample,2014-15,builds,declared,3804,fail: no_all_null_columns; warn: no_constant_columns
+Mali,sample,2014-15,sane,declared,3804,warn: no_constant_columns
 Mali,sample,2017-18,sane,declared,8390,all checks pass
-Mali,sample,2018-19,builds,declared,6602,fail: no_all_null_columns; warn: no_constant_columns
-Mali,sample,2021-22,builds,declared,6143,fail: no_all_null_columns; warn: no_constant_columns
+Mali,sample,2018-19,sane,declared,6602,warn: no_constant_columns
+Mali,sample,2021-22,sane,declared,6143,warn: no_constant_columns
 Mali,shocks,2014-15,sane,declared,5837,all checks pass
 Mali,shocks,2017-18,sane,declared,6216,all checks pass
 Mali,shocks,2018-19,sane,declared,9837,warn: no_constant_columns
@@ -1232,9 +1286,9 @@ Mali,subjective_well_being,2018-19,sane,declared,6584,warn: index_levels_match_s
 Mali,subjective_well_being,2021-22,sane,declared,6105,warn: index_levels_match_scheme
 Mali,updated_ids,,sane,declared,4,4 entries
 Nepal,anthropometry,,undeclared,absent,,not declared by this country for any wave
-Nepal,assets,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,assets,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,assets,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
 Nepal,cluster_features,1995-96,absent,absent,,source not declared for wave
 Nepal,cluster_features,2003-04,absent,absent,,source not declared for wave
 Nepal,cluster_features,2010-11,absent,absent,,source not declared for wave
@@ -1270,13 +1324,15 @@ Nepal,interview_date,2010-11,absent,absent,,source not declared for wave
 Nepal,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Nepal,livestock,,undeclared,absent,,not declared by this country for any wave
 Nepal,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Nepal,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Nepal,nutrition,,undeclared,absent,,not declared by this country for any wave
 Nepal,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Nepal,plot_features,,undeclared,absent,,not declared by this country for any wave
 Nepal,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Nepal,plot_labor,,undeclared,absent,,not declared by this country for any wave
-Nepal,sample,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,sample,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,sample,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-reseed/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
 Nepal,shocks,,undeclared,absent,,not declared by this country for any wave
 Nepal,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Niger,anthropometry,,undeclared,absent,,not declared by this country for any wave
@@ -1284,18 +1340,18 @@ Niger,assets,2011-12,sane,declared,19506,warn: low_duplicate_rate
 Niger,assets,2014-15,sane,declared,17070,warn: low_duplicate_rate
 Niger,assets,2018-19,sane,declared,26566,all checks pass
 Niger,assets,2021-22,sane,declared,31139,all checks pass
-Niger,cluster_features,2011-12,builds,declared,270,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Niger,cluster_features,2014-15,builds,declared,270,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Niger,cluster_features,2011-12,sane,declared,270,warn: has_household_index
+Niger,cluster_features,2014-15,sane,declared,270,"warn: has_household_index,no_constant_columns"
 Niger,cluster_features,2018-19,sane,declared,504,warn: has_household_index
 Niger,cluster_features,2021-22,sane,declared,555,warn: has_household_index
 Niger,community_prices,2011-12,sane,declared,8923,warn: has_household_index
 Niger,community_prices,2014-15,sane,declared,6500,warn: has_household_index
 Niger,community_prices,2018-19,absent,absent,,source not declared for wave
 Niger,community_prices,2021-22,absent,absent,,source not declared for wave
-Niger,crop_production,2011-12,builds,declared,8813,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Niger,crop_production,2014-15,builds,declared,8403,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Niger,crop_production,2018-19,builds,declared,13717,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Niger,crop_production,2021-22,builds,declared,10963,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,crop_production,2011-12,sane,declared,8813,"warn: index_levels_match_scheme,no_constant_columns"
+Niger,crop_production,2014-15,sane,declared,8403,"warn: index_levels_match_scheme,no_constant_columns"
+Niger,crop_production,2018-19,sane,declared,13717,"warn: index_levels_match_scheme,no_constant_columns"
+Niger,crop_production,2021-22,sane,declared,10963,"warn: index_levels_match_scheme,no_constant_columns"
 Niger,food_acquired,2011-12,absent,absent,,source not declared for wave
 Niger,food_acquired,2014-15,absent,absent,,source not declared for wave
 Niger,food_acquired,2018-19,sane,declared,107939,all checks pass
@@ -1343,11 +1399,13 @@ Niger,livestock,2014-15,sane,declared,4998,all checks pass
 Niger,livestock,2018-19,sane,declared,9764,all checks pass
 Niger,livestock,2021-22,sane,declared,8834,all checks pass
 Niger,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Niger,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Niger,nutrition,,undeclared,absent,,not declared by this country for any wave
 Niger,panel_ids,,sane,declared,7840,7840 entries
 Niger,people_last7days,2011-12,sane,declared,25125,warn: index_levels_match_scheme
 Niger,people_last7days,2014-15,sane,declared,26369,warn: index_levels_match_scheme
-Niger,people_last7days,2018-19,builds,declared,35148,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Niger,people_last7days,2021-22,builds,declared,38442,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Niger,people_last7days,2018-19,sane,declared,35148,"warn: index_levels_match_scheme,no_constant_columns"
+Niger,people_last7days,2021-22,sane,declared,38442,"warn: index_levels_match_scheme,no_constant_columns"
 Niger,plot_features,2011-12,absent,absent,,source not declared for wave
 Niger,plot_features,2014-15,absent,absent,,source not declared for wave
 Niger,plot_features,2018-19,sane,declared,6684,"warn: index_levels_match_scheme,no_constant_columns"
@@ -1361,12 +1419,12 @@ Niger,plot_labor,2014-15,sane,declared,15803,warn: index_levels_match_scheme
 Niger,plot_labor,2018-19,sane,declared,9457,warn: index_levels_match_scheme
 Niger,plot_labor,2021-22,sane,declared,8006,warn: index_levels_match_scheme
 Niger,sample,2011-12,sane,declared,3968,all checks pass
-Niger,sample,2014-15,builds,declared,3558,fail: no_all_null_columns; warn: no_constant_columns
-Niger,sample,2018-19,builds,declared,6024,fail: no_all_null_columns; warn: no_constant_columns
-Niger,sample,2021-22,builds,declared,6622,fail: no_all_null_columns; warn: no_constant_columns
+Niger,sample,2014-15,sane,declared,3558,warn: no_constant_columns
+Niger,sample,2018-19,sane,declared,6024,warn: no_constant_columns
+Niger,sample,2021-22,sane,declared,6622,warn: no_constant_columns
 Niger,shocks,2011-12,sane,declared,4298,all checks pass
 Niger,shocks,2014-15,sane,declared,3771,all checks pass
-Niger,shocks,2018-19,builds,declared,6551,fail: no_all_null_columns; warn: no_constant_columns
+Niger,shocks,2018-19,sane,declared,6551,warn: no_constant_columns
 Niger,shocks,2021-22,sane,declared,2876,all checks pass
 Niger,subjective_well_being,2011-12,absent,absent,,source not declared for wave
 Niger,subjective_well_being,2014-15,absent,absent,,source not declared for wave
@@ -1383,8 +1441,8 @@ Nigeria,anthropometry,2018Q3,absent,absent,,source not declared for wave
 Nigeria,anthropometry,2019Q1,absent,absent,,source not declared for wave
 Nigeria,anthropometry,2023Q3,absent,absent,,source not declared for wave
 Nigeria,anthropometry,2024Q1,absent,absent,,source not declared for wave
-Nigeria,assets,2010Q3,builds,declared,38947,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,assets,2011Q1,builds,declared,38947,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,assets,2010Q3,sane,declared,38947,warn: no_constant_columns
+Nigeria,assets,2011Q1,sane,declared,38947,warn: no_constant_columns
 Nigeria,assets,2012Q3,sane,declared,161125,all checks pass
 Nigeria,assets,2013Q1,sane,declared,161125,all checks pass
 Nigeria,assets,2015Q3,sane,declared,188229,all checks pass
@@ -1393,26 +1451,26 @@ Nigeria,assets,2018Q3,sane,declared,44358,all checks pass
 Nigeria,assets,2019Q1,sane,declared,44358,all checks pass
 Nigeria,assets,2023Q3,absent,absent,,source not declared for wave
 Nigeria,assets,2024Q1,absent,absent,,source not declared for wave
-Nigeria,cluster_features,2010Q3,builds,declared,411,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Nigeria,cluster_features,2011Q1,builds,declared,411,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Nigeria,cluster_features,2012Q3,sane,declared,410,warn: has_household_index
-Nigeria,cluster_features,2013Q1,sane,declared,410,warn: has_household_index
-Nigeria,cluster_features,2015Q3,builds,declared,402,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Nigeria,cluster_features,2016Q1,builds,declared,402,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Nigeria,cluster_features,2018Q3,builds,declared,405,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
-Nigeria,cluster_features,2019Q1,builds,declared,405,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Nigeria,cluster_features,2010Q3,sane,declared,500,warn: has_household_index
+Nigeria,cluster_features,2011Q1,sane,declared,500,warn: has_household_index
+Nigeria,cluster_features,2012Q3,sane,declared,647,warn: has_household_index
+Nigeria,cluster_features,2013Q1,sane,declared,647,warn: has_household_index
+Nigeria,cluster_features,2015Q3,sane,declared,792,warn: has_household_index
+Nigeria,cluster_features,2016Q1,sane,declared,792,warn: has_household_index
+Nigeria,cluster_features,2018Q3,sane,declared,685,warn: has_household_index
+Nigeria,cluster_features,2019Q1,sane,declared,685,warn: has_household_index
 Nigeria,cluster_features,2023Q3,absent,absent,,source not declared for wave
 Nigeria,cluster_features,2024Q1,absent,absent,,source not declared for wave
 Nigeria,community_prices,2010Q3,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,community_prices,2011Q1,sane,declared,24074,warn: has_household_index
+Nigeria,community_prices,2011Q1,sane,declared,27104,warn: has_household_index
 Nigeria,community_prices,2012Q3,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,community_prices,2013Q1,sane,declared,23943,warn: has_household_index
+Nigeria,community_prices,2013Q1,sane,declared,27079,warn: has_household_index
 Nigeria,community_prices,2015Q3,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,community_prices,2016Q1,sane,declared,31412,warn: has_household_index
+Nigeria,community_prices,2016Q1,sane,declared,33781,warn: has_household_index
 Nigeria,community_prices,2018Q3,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,community_prices,2019Q1,sane,declared,23237,warn: has_household_index
+Nigeria,community_prices,2019Q1,sane,declared,25907,warn: has_household_index
 Nigeria,community_prices,2023Q3,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,community_prices,2024Q1,sane,declared,21873,warn: has_household_index
+Nigeria,community_prices,2024Q1,sane,declared,24184,warn: has_household_index
 Nigeria,crop_production,2010Q3,absent,absent,,source not declared for wave
 Nigeria,crop_production,2011Q1,absent,absent,,source not declared for wave
 Nigeria,crop_production,2012Q3,absent,absent,,source not declared for wave
@@ -1423,14 +1481,14 @@ Nigeria,crop_production,2018Q3,absent,absent,,source not declared for wave
 Nigeria,crop_production,2019Q1,absent,absent,,source not declared for wave
 Nigeria,crop_production,2023Q3,absent,absent,,source not declared for wave
 Nigeria,crop_production,2024Q1,absent,absent,,source not declared for wave
-Nigeria,food_acquired,2010Q3,builds,declared,73237,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2011Q1,builds,declared,71246,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2012Q3,builds,declared,121750,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2013Q1,builds,declared,134097,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2015Q3,builds,declared,147516,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2016Q1,builds,declared,137856,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2018Q3,sane,declared,158470,warn: index_levels_match_scheme
-Nigeria,food_acquired,2019Q1,sane,declared,161484,warn: index_levels_match_scheme
+Nigeria,food_acquired,2010Q3,sane,declared,72236,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2011Q1,sane,declared,69734,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2012Q3,sane,declared,65429,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2013Q1,sane,declared,70649,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2015Q3,sane,declared,77702,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2016Q1,sane,declared,70469,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2018Q3,sane,declared,82865,warn: index_levels_match_scheme
+Nigeria,food_acquired,2019Q1,sane,declared,86641,warn: index_levels_match_scheme
 Nigeria,food_acquired,2023Q3,absent,absent,,source not declared for wave
 Nigeria,food_acquired,2024Q1,absent,absent,,source not declared for wave
 Nigeria,food_coping,2010Q3,sane,declared,43204,warn: index_levels_match_scheme
@@ -1453,24 +1511,24 @@ Nigeria,food_expenditures,2018Q3,sane,declared,64376,all checks pass
 Nigeria,food_expenditures,2019Q1,sane,declared,66732,all checks pass
 Nigeria,food_expenditures,2023Q3,absent,absent,,source not declared for wave
 Nigeria,food_expenditures,2024Q1,absent,absent,,source not declared for wave
-Nigeria,food_prices,2010Q3,sane,declared,61967,all checks pass
-Nigeria,food_prices,2011Q1,sane,declared,59619,all checks pass
-Nigeria,food_prices,2012Q3,sane,declared,675,all checks pass
-Nigeria,food_prices,2013Q1,sane,declared,161,all checks pass
-Nigeria,food_prices,2015Q3,sane,declared,509,all checks pass
-Nigeria,food_prices,2016Q1,sane,declared,426,all checks pass
-Nigeria,food_prices,2018Q3,sane,declared,1106,all checks pass
-Nigeria,food_prices,2019Q1,sane,declared,1044,all checks pass
+Nigeria,food_prices,2010Q3,sane,declared,61596,all checks pass
+Nigeria,food_prices,2011Q1,sane,declared,59682,all checks pass
+Nigeria,food_prices,2012Q3,sane,declared,52706,all checks pass
+Nigeria,food_prices,2013Q1,sane,declared,56915,all checks pass
+Nigeria,food_prices,2015Q3,sane,declared,62474,all checks pass
+Nigeria,food_prices,2016Q1,sane,declared,57132,all checks pass
+Nigeria,food_prices,2018Q3,sane,declared,64376,all checks pass
+Nigeria,food_prices,2019Q1,sane,declared,66732,all checks pass
 Nigeria,food_prices,2023Q3,absent,absent,,source not declared for wave
 Nigeria,food_prices,2024Q1,absent,absent,,source not declared for wave
-Nigeria,food_quantities,2010Q3,sane,declared,73102,all checks pass
-Nigeria,food_quantities,2011Q1,sane,declared,71068,all checks pass
-Nigeria,food_quantities,2012Q3,sane,declared,69607,all checks pass
-Nigeria,food_quantities,2013Q1,sane,declared,76863,all checks pass
-Nigeria,food_quantities,2015Q3,sane,declared,85547,all checks pass
-Nigeria,food_quantities,2016Q1,sane,declared,81150,all checks pass
-Nigeria,food_quantities,2018Q3,sane,declared,95200,all checks pass
-Nigeria,food_quantities,2019Q1,sane,declared,95794,all checks pass
+Nigeria,food_quantities,2010Q3,sane,declared,71733,all checks pass
+Nigeria,food_quantities,2011Q1,sane,declared,69641,all checks pass
+Nigeria,food_quantities,2012Q3,sane,declared,65377,all checks pass
+Nigeria,food_quantities,2013Q1,sane,declared,70627,all checks pass
+Nigeria,food_quantities,2015Q3,sane,declared,77700,all checks pass
+Nigeria,food_quantities,2016Q1,sane,declared,70469,all checks pass
+Nigeria,food_quantities,2018Q3,sane,declared,82865,all checks pass
+Nigeria,food_quantities,2019Q1,sane,declared,86641,all checks pass
 Nigeria,food_quantities,2023Q3,absent,absent,,source not declared for wave
 Nigeria,food_quantities,2024Q1,absent,absent,,source not declared for wave
 Nigeria,food_security,,undeclared,absent,,not declared by this country for any wave
@@ -1484,16 +1542,16 @@ Nigeria,household_characteristics,2018Q3,sane,declared,5051,all checks pass
 Nigeria,household_characteristics,2019Q1,sane,declared,4980,all checks pass
 Nigeria,household_characteristics,2023Q3,sane,declared,4771,all checks pass
 Nigeria,household_characteristics,2024Q1,sane,declared,4716,all checks pass
-Nigeria,household_roster,2010Q3,builds,declared,27588,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,household_roster,2011Q1,builds,declared,28281,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2010Q3,sane,declared,27588,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2011Q1,sane,declared,28281,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,household_roster,2012Q3,sane,declared,29314,warn: index_levels_match_scheme
 Nigeria,household_roster,2013Q1,sane,declared,30234,warn: index_levels_match_scheme
-Nigeria,household_roster,2015Q3,builds,declared,32139,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,household_roster,2016Q1,builds,declared,32827,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,household_roster,2018Q3,builds,declared,27607,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,household_roster,2019Q1,builds,declared,26557,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,household_roster,2023Q3,builds,declared,27421,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,household_roster,2024Q1,builds,declared,25662,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2015Q3,sane,declared,32139,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2016Q1,sane,declared,32827,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2018Q3,sane,declared,27607,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2019Q1,sane,declared,26557,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2023Q3,sane,declared,27421,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,household_roster,2024Q1,sane,declared,25662,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,housing,2010Q3,dropped,declared,,declared for wave but absent from built t-index
 Nigeria,housing,2011Q1,sane,declared,4899,warn: index_levels_match_scheme
 Nigeria,housing,2012Q3,dropped,declared,,declared for wave but absent from built t-index
@@ -1536,16 +1594,17 @@ Nigeria,livestock,2019Q1,absent,absent,,source not declared for wave
 Nigeria,livestock,2023Q3,absent,absent,,source not declared for wave
 Nigeria,livestock,2024Q1,absent,absent,,source not declared for wave
 Nigeria,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
-Nigeria,nonfood_expenditures,2010Q3,builds,declared,4965,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,nonfood_expenditures,2011Q1,builds,declared,4811,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,nonfood_expenditures,2012Q3,builds,declared,4581,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,nonfood_expenditures,2013Q1,builds,declared,4729,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,nonfood_expenditures,2015Q3,builds,declared,4579,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,nonfood_expenditures,2016Q1,builds,declared,4564,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,nonfood_expenditures,2018Q3,builds,declared,5047,fail: no_all_null_columns; warn: no_constant_columns
-Nigeria,nonfood_expenditures,2019Q1,builds,declared,4979,fail: no_all_null_columns; warn: no_constant_columns
+Nigeria,nonfood_expenditures,2010Q3,sane,declared,4965,warn: no_constant_columns
+Nigeria,nonfood_expenditures,2011Q1,sane,declared,4811,warn: no_constant_columns
+Nigeria,nonfood_expenditures,2012Q3,sane,declared,4581,warn: no_constant_columns
+Nigeria,nonfood_expenditures,2013Q1,sane,declared,4729,warn: no_constant_columns
+Nigeria,nonfood_expenditures,2015Q3,sane,declared,4579,warn: no_constant_columns
+Nigeria,nonfood_expenditures,2016Q1,sane,declared,4564,warn: no_constant_columns
+Nigeria,nonfood_expenditures,2018Q3,sane,declared,5047,warn: no_constant_columns
+Nigeria,nonfood_expenditures,2019Q1,sane,declared,4979,warn: no_constant_columns
 Nigeria,nonfood_expenditures,2023Q3,absent,absent,,source not declared for wave
 Nigeria,nonfood_expenditures,2024Q1,absent,absent,,source not declared for wave
+Nigeria,nutrition,,undeclared,absent,,not declared by this country for any wave
 Nigeria,people_last7days,2010Q3,absent,absent,,source not declared for wave
 Nigeria,people_last7days,2011Q1,absent,absent,,source not declared for wave
 Nigeria,people_last7days,2012Q3,absent,absent,,source not declared for wave
@@ -1556,15 +1615,15 @@ Nigeria,people_last7days,2018Q3,absent,absent,,source not declared for wave
 Nigeria,people_last7days,2019Q1,absent,absent,,source not declared for wave
 Nigeria,people_last7days,2023Q3,absent,absent,,source not declared for wave
 Nigeria,people_last7days,2024Q1,absent,absent,,source not declared for wave
-Nigeria,plot_features,2010Q3,builds,declared,6029,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2010Q3,sane,declared,6029,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,plot_features,2011Q1,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,plot_features,2012Q3,builds,declared,5888,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2012Q3,sane,declared,5888,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,plot_features,2013Q1,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,plot_features,2015Q3,builds,declared,5824,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2015Q3,sane,declared,5824,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,plot_features,2016Q1,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,plot_features,2018Q3,builds,declared,11072,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2018Q3,sane,declared,11072,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,plot_features,2019Q1,dropped,declared,,declared for wave but absent from built t-index
-Nigeria,plot_features,2023Q3,builds,declared,9232,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,plot_features,2023Q3,sane,declared,9232,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,plot_features,2024Q1,dropped,declared,,declared for wave but absent from built t-index
 Nigeria,plot_inputs,2010Q3,absent,absent,,source not declared for wave
 Nigeria,plot_inputs,2011Q1,absent,absent,,source not declared for wave
@@ -1609,7 +1668,7 @@ Nigeria,shocks,2024Q1,absent,absent,,source not declared for wave
 Nigeria,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Pakistan,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Pakistan,assets,,undeclared,absent,,not declared by this country for any wave
-Pakistan,cluster_features,1991,sane,declared,301,warn: has_household_index
+Pakistan,cluster_features,1991,sane,declared,300,warn: has_household_index
 Pakistan,community_prices,,undeclared,absent,,not declared by this country for any wave
 Pakistan,crop_production,,undeclared,absent,,not declared by this country for any wave
 Pakistan,food_acquired,,undeclared,absent,,not declared by this country for any wave
@@ -1623,6 +1682,8 @@ Pakistan,interview_date,1991,sane,declared,4956,warn: index_levels_match_scheme
 Pakistan,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Pakistan,livestock,,undeclared,absent,,not declared by this country for any wave
 Pakistan,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Pakistan,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Pakistan,nutrition,,undeclared,absent,,not declared by this country for any wave
 Pakistan,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Pakistan,plot_features,,undeclared,absent,,not declared by this country for any wave
 Pakistan,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -1635,7 +1696,19 @@ Panama,assets,,undeclared,absent,,not declared by this country for any wave
 Panama,cluster_features,,undeclared,absent,,not declared by this country for any wave
 Panama,community_prices,,undeclared,absent,,not declared by this country for any wave
 Panama,crop_production,,undeclared,absent,,not declared by this country for any wave
+Panama,food_acquired,1997,sane,declared,156154,warn: index_levels_match_scheme
+Panama,food_acquired,2003,sane,declared,194866,warn: index_levels_match_scheme
+Panama,food_acquired,2008,sane,declared,220334,warn: index_levels_match_scheme
 Panama,food_coping,,undeclared,absent,,not declared by this country for any wave
+Panama,food_expenditures,1997,sane,declared,133666,all checks pass
+Panama,food_expenditures,2003,sane,declared,171537,all checks pass
+Panama,food_expenditures,2008,sane,declared,196277,all checks pass
+Panama,food_prices,1997,sane,declared,133196,all checks pass
+Panama,food_prices,2003,sane,declared,171536,all checks pass
+Panama,food_prices,2008,sane,declared,196295,all checks pass
+Panama,food_quantities,1997,sane,declared,155637,all checks pass
+Panama,food_quantities,2003,sane,declared,194864,all checks pass
+Panama,food_quantities,2008,sane,declared,220302,all checks pass
 Panama,food_security,,undeclared,absent,,not declared by this country for any wave
 Panama,household_roster,,undeclared,absent,,not declared by this country for any wave
 Panama,housing,,undeclared,absent,,not declared by this country for any wave
@@ -1644,22 +1717,66 @@ Panama,interview_date,,undeclared,absent,,not declared by this country for any w
 Panama,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Panama,livestock,,undeclared,absent,,not declared by this country for any wave
 Panama,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Panama,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Panama,nutrition,,undeclared,absent,,not declared by this country for any wave
+Panama,nutrition,,broken,declared,,AttributeError: 'Country' object has no attribute 'nutrition'
 Panama,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Panama,plot_features,,undeclared,absent,,not declared by this country for any wave
 Panama,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Panama,plot_labor,,undeclared,absent,,not declared by this country for any wave
+Panama,sample,1997,sane,declared,4945,warn: no_constant_columns
+Panama,sample,2003,sane,declared,6363,all checks pass
+Panama,sample,2008,sane,declared,7045,all checks pass
 Panama,shocks,,undeclared,absent,,not declared by this country for any wave
 Panama,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Peru,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Peru,assets,,undeclared,absent,,not declared by this country for any wave
+Peru,cluster_features,1985,absent,absent,,source not declared for wave
+Peru,cluster_features,1990,absent,absent,,source not declared for wave
+Peru,cluster_features,1991,absent,absent,,source not declared for wave
+Peru,cluster_features,1994,sane,declared,364,warn: has_household_index
 Peru,community_prices,,undeclared,absent,,not declared by this country for any wave
 Peru,crop_production,,undeclared,absent,,not declared by this country for any wave
+Peru,food_acquired,1985,absent,absent,,source not declared for wave
+Peru,food_acquired,1990,absent,absent,,source not declared for wave
+Peru,food_acquired,1991,absent,absent,,source not declared for wave
+Peru,food_acquired,1994,absent,absent,,source not declared for wave
 Peru,food_coping,,undeclared,absent,,not declared by this country for any wave
+Peru,food_expenditures,1985,absent,absent,,source not declared for wave
+Peru,food_expenditures,1990,absent,absent,,source not declared for wave
+Peru,food_expenditures,1991,absent,absent,,source not declared for wave
+Peru,food_expenditures,1994,absent,absent,,source not declared for wave
+Peru,food_prices,1985,absent,absent,,source not declared for wave
+Peru,food_prices,1990,absent,absent,,source not declared for wave
+Peru,food_prices,1991,absent,absent,,source not declared for wave
+Peru,food_prices,1994,absent,absent,,source not declared for wave
+Peru,food_quantities,1985,absent,absent,,source not declared for wave
+Peru,food_quantities,1990,absent,absent,,source not declared for wave
+Peru,food_quantities,1991,absent,absent,,source not declared for wave
+Peru,food_quantities,1994,absent,absent,,source not declared for wave
 Peru,food_security,,undeclared,absent,,not declared by this country for any wave
+Peru,household_characteristics,1985,absent,absent,,source not declared for wave
+Peru,household_characteristics,1990,absent,absent,,source not declared for wave
+Peru,household_characteristics,1991,absent,absent,,source not declared for wave
+Peru,household_characteristics,1994,sane,declared,3621,all checks pass
+Peru,household_roster,1985,absent,absent,,source not declared for wave
+Peru,household_roster,1990,absent,absent,,source not declared for wave
+Peru,household_roster,1991,absent,absent,,source not declared for wave
+Peru,household_roster,1994,sane,declared,19285,warn: no_constant_columns
 Peru,housing,,undeclared,absent,,not declared by this country for any wave
+Peru,individual_education,1985,absent,absent,,source not declared for wave
+Peru,individual_education,1990,absent,absent,,source not declared for wave
+Peru,individual_education,1991,absent,absent,,source not declared for wave
+Peru,individual_education,1994,absent,absent,,source not declared for wave
+Peru,interview_date,1985,absent,absent,,source not declared for wave
+Peru,interview_date,1990,absent,absent,,source not declared for wave
+Peru,interview_date,1991,absent,absent,,source not declared for wave
+Peru,interview_date,1994,absent,absent,,source not declared for wave
 Peru,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Peru,livestock,,undeclared,absent,,not declared by this country for any wave
 Peru,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Peru,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Peru,nutrition,,undeclared,absent,,not declared by this country for any wave
 Peru,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Peru,plot_features,,undeclared,absent,,not declared by this country for any wave
 Peru,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -1700,6 +1817,8 @@ Senegal,life_satisfaction,,undeclared,absent,,not declared by this country for a
 Senegal,livestock,2018-19,sane,declared,9404,all checks pass
 Senegal,livestock,2021-22,absent,absent,,source not declared for wave
 Senegal,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Senegal,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Senegal,nutrition,,undeclared,absent,,not declared by this country for any wave
 Senegal,panel_ids,,sane,declared,6127,6127 entries
 Senegal,people_last7days,2018-19,sane,declared,65723,"warn: index_levels_match_scheme,no_constant_columns"
 Senegal,people_last7days,2021-22,absent,absent,,source not declared for wave
@@ -1718,12 +1837,12 @@ Senegal,subjective_well_being,2021-22,sane,declared,7035,warn: index_levels_matc
 Senegal,updated_ids,,sane,declared,2,2 entries
 Serbia,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Serbia,assets,2007,sane,declared,48060,all checks pass
-Serbia,cluster_features,2007,sane,declared,328,warn: has_household_index
+Serbia,cluster_features,2007,sane,declared,510,warn: has_household_index
 Serbia,community_prices,,undeclared,absent,,not declared by this country for any wave
 Serbia,crop_production,,undeclared,absent,,not declared by this country for any wave
 Serbia,food_acquired,2007,sane,declared,200046,warn: index_levels_match_scheme
 Serbia,food_coping,,undeclared,absent,,not declared by this country for any wave
-Serbia,food_expenditures,2007,sane,declared,200046,all checks pass
+Serbia,food_expenditures,2007,sane,declared,168946,all checks pass
 Serbia,food_prices,2007,sane,declared,196279,all checks pass
 Serbia,food_quantities,2007,sane,declared,196279,all checks pass
 Serbia,food_security,,undeclared,absent,,not declared by this country for any wave
@@ -1735,6 +1854,8 @@ Serbia,interview_date,2007,sane,declared,5557,warn: index_levels_match_scheme
 Serbia,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Serbia,livestock,,undeclared,absent,,not declared by this country for any wave
 Serbia,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Serbia,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Serbia,nutrition,,undeclared,absent,,not declared by this country for any wave
 Serbia,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Serbia,plot_features,,undeclared,absent,,not declared by this country for any wave
 Serbia,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -1762,11 +1883,13 @@ Serbia and Montenegro,life_satisfaction,2002,sane,declared,6273,warn: index_leve
 Serbia and Montenegro,life_satisfaction,2003,sane,declared,2521,warn: index_levels_match_scheme
 Serbia and Montenegro,livestock,,undeclared,absent,,not declared by this country for any wave
 Serbia and Montenegro,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Serbia and Montenegro,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Serbia and Montenegro,nutrition,,undeclared,absent,,not declared by this country for any wave
 Serbia and Montenegro,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Serbia and Montenegro,plot_features,,undeclared,absent,,not declared by this country for any wave
 Serbia and Montenegro,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Serbia and Montenegro,plot_labor,,undeclared,absent,,not declared by this country for any wave
-Serbia and Montenegro,sample,2002,builds,declared,6386,fail: no_all_null_columns; warn: no_constant_columns
+Serbia and Montenegro,sample,2002,sane,declared,6386,warn: no_constant_columns
 Serbia and Montenegro,sample,2003,sane,declared,2548,all checks pass
 Serbia and Montenegro,shocks,,undeclared,absent,,not declared by this country for any wave
 Serbia and Montenegro,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
@@ -1786,6 +1909,8 @@ South Africa,interview_date,1993,sane,declared,8809,warn: index_levels_match_sch
 South Africa,life_satisfaction,1993,sane,declared,8724,warn: index_levels_match_scheme
 South Africa,livestock,,undeclared,absent,,not declared by this country for any wave
 South Africa,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+South Africa,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+South Africa,nutrition,,undeclared,absent,,not declared by this country for any wave
 South Africa,people_last7days,,undeclared,absent,,not declared by this country for any wave
 South Africa,plot_features,,undeclared,absent,,not declared by this country for any wave
 South Africa,plot_inputs,,undeclared,absent,,not declared by this country for any wave
@@ -1816,11 +1941,11 @@ Tajikistan,household_roster,1999,sane,declared,14142,warn: index_levels_match_sc
 Tajikistan,household_roster,2003,sane,declared,26141,warn: index_levels_match_scheme
 Tajikistan,household_roster,2007,sane,declared,28957,warn: index_levels_match_scheme
 Tajikistan,household_roster,2009,sane,declared,10069,warn: index_levels_match_scheme
-Tajikistan,housing,1999,builds,declared,1999,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Tajikistan,housing,1999,sane,declared,1999,"warn: index_levels_match_scheme,no_constant_columns"
 Tajikistan,housing,2003,absent,absent,,source not declared for wave
 Tajikistan,housing,2007,sane,declared,4644,warn: index_levels_match_scheme
-Tajikistan,housing,2009,builds,declared,1503,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Tajikistan,individual_education,1999,sane,declared,6958,warn: index_levels_match_scheme
+Tajikistan,housing,2009,sane,declared,1503,"warn: index_levels_match_scheme,no_constant_columns"
+Tajikistan,individual_education,1999,sane,declared,7451,warn: index_levels_match_scheme
 Tajikistan,individual_education,2003,sane,declared,20300,warn: index_levels_match_scheme
 Tajikistan,individual_education,2007,sane,declared,23663,warn: index_levels_match_scheme
 Tajikistan,individual_education,2009,sane,declared,8376,warn: index_levels_match_scheme
@@ -1834,20 +1959,22 @@ Tajikistan,life_satisfaction,2007,sane,declared,9251,warn: index_levels_match_sc
 Tajikistan,life_satisfaction,2009,sane,declared,2984,warn: index_levels_match_scheme
 Tajikistan,livestock,,undeclared,absent,,not declared by this country for any wave
 Tajikistan,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Tajikistan,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Tajikistan,nutrition,,undeclared,absent,,not declared by this country for any wave
 Tajikistan,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Tajikistan,plot_features,1999,absent,absent,,source not declared for wave
 Tajikistan,plot_features,2003,absent,absent,,source not declared for wave
-Tajikistan,plot_features,2007,sane,declared,3974,"warn: index_levels_match_scheme,no_constant_columns"
+Tajikistan,plot_features,2007,builds,declared,3974,"fail: declared_spellings; warn: index_levels_match_scheme,no_constant_columns"
 Tajikistan,plot_features,2009,absent,absent,,source not declared for wave
 Tajikistan,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Tajikistan,plot_labor,,undeclared,absent,,not declared by this country for any wave
-Tajikistan,sample,1999,builds,declared,2000,fail: no_all_null_columns; warn: no_constant_columns
-Tajikistan,sample,2003,builds,declared,4160,fail: no_all_null_columns; warn: no_constant_columns
+Tajikistan,sample,1999,sane,declared,2000,warn: no_constant_columns
+Tajikistan,sample,2003,sane,declared,4160,warn: no_constant_columns
 Tajikistan,sample,2007,sane,declared,4860,all checks pass
 Tajikistan,sample,2009,sane,declared,1503,all checks pass
 Tajikistan,shocks,,undeclared,absent,,not declared by this country for any wave
 Tajikistan,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
-Tanzania,anthropometry,2008-09,builds,declared,14382,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Tanzania,anthropometry,2008-09,sane,declared,14382,"warn: index_levels_match_scheme,no_constant_columns"
 Tanzania,anthropometry,2010-11,sane,declared,17059,warn: index_levels_match_scheme
 Tanzania,anthropometry,2012-13,sane,declared,19790,warn: index_levels_match_scheme
 Tanzania,anthropometry,2014-15,sane,declared,11699,warn: index_levels_match_scheme
@@ -1863,8 +1990,8 @@ Tanzania,cluster_features,2008-09,sane,declared,409,"warn: has_household_index,n
 Tanzania,cluster_features,2010-11,sane,declared,409,"warn: has_household_index,no_constant_columns"
 Tanzania,cluster_features,2012-13,sane,declared,409,warn: has_household_index
 Tanzania,cluster_features,2014-15,sane,declared,498,warn: has_household_index
-Tanzania,cluster_features,2019-20,sane,declared,247,warn: has_household_index
-Tanzania,cluster_features,2020-21,sane,declared,417,warn: has_household_index
+Tanzania,cluster_features,2019-20,sane,declared,147,warn: has_household_index
+Tanzania,cluster_features,2020-21,sane,declared,515,warn: has_household_index
 Tanzania,community_cluster_xwalk,2008-09,absent,absent,,source not declared for wave
 Tanzania,community_cluster_xwalk,2010-11,absent,absent,,source not declared for wave
 Tanzania,community_cluster_xwalk,2012-13,absent,absent,,source not declared for wave
@@ -1942,8 +2069,8 @@ Tanzania,interview_date,2008-09,sane,declared,3263,warn: index_levels_match_sche
 Tanzania,interview_date,2010-11,sane,declared,3923,warn: index_levels_match_scheme
 Tanzania,interview_date,2012-13,sane,declared,5010,warn: index_levels_match_scheme
 Tanzania,interview_date,2014-15,sane,declared,4338,warn: index_levels_match_scheme
-Tanzania,interview_date,2019-20,sane,declared,1184,warn: index_levels_match_scheme
-Tanzania,interview_date,2020-21,sane,declared,4709,warn: index_levels_match_scheme
+Tanzania,interview_date,2019-20,dropped,declared,,declared for wave but absent from built t-index
+Tanzania,interview_date,2020-21,dropped,declared,,declared for wave but absent from built t-index
 Tanzania,life_satisfaction,2008-09,sane,declared,16783,warn: index_levels_match_scheme
 Tanzania,life_satisfaction,2010-11,sane,declared,27522,warn: index_levels_match_scheme
 Tanzania,life_satisfaction,2012-13,sane,declared,34587,warn: index_levels_match_scheme
@@ -1957,6 +2084,8 @@ Tanzania,livestock,2014-15,absent,absent,,source not declared for wave
 Tanzania,livestock,2019-20,sane,declared,1212,all checks pass
 Tanzania,livestock,2020-21,sane,declared,5343,all checks pass
 Tanzania,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Tanzania,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Tanzania,nutrition,,undeclared,absent,,not declared by this country for any wave
 Tanzania,panel_ids,,sane,declared,8129,8129 entries
 Tanzania,people_last7days,2008-09,absent,absent,,source not declared for wave
 Tanzania,people_last7days,2010-11,absent,absent,,source not declared for wave
@@ -1988,12 +2117,12 @@ Tanzania,sample,2012-13,sane,declared,5010,all checks pass
 Tanzania,sample,2014-15,sane,declared,4341,all checks pass
 Tanzania,sample,2019-20,sane,declared,1184,all checks pass
 Tanzania,sample,2020-21,sane,declared,4709,all checks pass
-Tanzania,shocks,2008-09,builds,declared,14165,fail: no_all_null_columns; warn: no_constant_columns
-Tanzania,shocks,2010-11,builds,declared,15843,fail: no_all_null_columns; warn: no_constant_columns
-Tanzania,shocks,2012-13,sane,declared,16825,all checks pass
-Tanzania,shocks,2014-15,builds,declared,7699,fail: no_all_null_columns; warn: no_constant_columns
-Tanzania,shocks,2019-20,builds,declared,864,fail: no_all_null_columns; warn: no_constant_columns
-Tanzania,shocks,2020-21,builds,declared,5067,fail: no_all_null_columns; warn: no_constant_columns
+Tanzania,shocks,2008-09,sane,declared,7391,warn: no_constant_columns
+Tanzania,shocks,2010-11,sane,declared,7455,warn: no_constant_columns
+Tanzania,shocks,2012-13,sane,declared,8247,all checks pass
+Tanzania,shocks,2014-15,sane,declared,6722,warn: no_constant_columns
+Tanzania,shocks,2019-20,sane,declared,864,warn: no_constant_columns
+Tanzania,shocks,2020-21,sane,declared,5067,warn: no_constant_columns
 Tanzania,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Tanzania,updated_ids,,sane,declared,5,5 entries
 Timor-Leste,anthropometry,,undeclared,absent,,not declared by this country for any wave
@@ -2019,9 +2148,11 @@ Timor-Leste,life_satisfaction,2007-08,sane,declared,26386,warn: index_levels_mat
 Timor-Leste,livestock,,undeclared,absent,,not declared by this country for any wave
 Timor-Leste,months_food_inadequate,2001,sane,declared,1798,warn: index_levels_match_scheme
 Timor-Leste,months_food_inadequate,2007-08,sane,declared,3995,warn: index_levels_match_scheme
+Timor-Leste,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
+Timor-Leste,nutrition,,undeclared,absent,,not declared by this country for any wave
 Timor-Leste,people_last7days,,undeclared,absent,,not declared by this country for any wave
 Timor-Leste,plot_features,2001,absent,absent,,source not declared for wave
-Timor-Leste,plot_features,2007-08,sane,declared,6308,"warn: index_levels_match_scheme,no_constant_columns"
+Timor-Leste,plot_features,2007-08,builds,declared,6308,"fail: declared_spellings; warn: index_levels_match_scheme,no_constant_columns"
 Timor-Leste,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Timor-Leste,plot_labor,,undeclared,absent,,not declared by this country for any wave
 Timor-Leste,sample,2001,sane,declared,1800,all checks pass
@@ -2047,9 +2178,11 @@ Togo,interview_date,2018,sane,declared,18493,warn: index_levels_match_scheme
 Togo,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Togo,livestock,2018,sane,declared,6181,all checks pass
 Togo,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
+Togo,nonfood_expenditures,2018,sane,declared,108445,warn: index_levels_match_scheme
+Togo,nutrition,,undeclared,absent,,not declared by this country for any wave
 Togo,people_last7days,2018,sane,declared,25282,"warn: index_levels_match_scheme,no_constant_columns"
 Togo,plot_features,2018,sane,declared,9553,"warn: index_levels_match_scheme,no_constant_columns"
-Togo,plot_inputs,2018,sane,declared,13565,warn: index_levels_match_scheme
+Togo,plot_inputs,2018,sane,declared,13730,warn: index_levels_match_scheme
 Togo,plot_labor,2018,sane,declared,15052,warn: index_levels_match_scheme
 Togo,sample,2018,sane,declared,6171,all checks pass
 Togo,shocks,2018,sane,declared,7230,warn: no_constant_columns
@@ -2060,8 +2193,8 @@ Uganda,anthropometry,2010-11,sane,declared,1688,"warn: index_levels_match_scheme
 Uganda,anthropometry,2011-12,sane,declared,1620,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,anthropometry,2013-14,sane,declared,1750,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,anthropometry,2015-16,sane,declared,1315,"warn: index_levels_match_scheme,no_constant_columns"
-Uganda,anthropometry,2018-19,builds,declared,11222,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Uganda,anthropometry,2019-20,builds,declared,9863,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2018-19,sane,declared,11222,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,anthropometry,2019-20,sane,declared,9863,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,assets,2005-06,sane,declared,22994,warn: low_duplicate_rate
 Uganda,assets,2009-10,sane,declared,16306,all checks pass
 Uganda,assets,2010-11,sane,declared,14394,all checks pass
@@ -2071,22 +2204,22 @@ Uganda,assets,2015-16,sane,declared,15073,all checks pass
 Uganda,assets,2018-19,sane,declared,9227,all checks pass
 Uganda,assets,2019-20,sane,declared,9491,all checks pass
 Uganda,cluster_features,2005-06,sane,declared,322,warn: has_household_index
-Uganda,cluster_features,2009-10,sane,declared,317,warn: has_household_index
-Uganda,cluster_features,2010-11,sane,declared,324,warn: has_household_index
+Uganda,cluster_features,2009-10,sane,declared,656,warn: has_household_index
+Uganda,cluster_features,2010-11,sane,declared,320,warn: has_household_index
 Uganda,cluster_features,2011-12,sane,declared,321,warn: has_household_index
 Uganda,cluster_features,2013-14,sane,declared,706,warn: has_household_index
 Uganda,cluster_features,2015-16,sane,declared,875,warn: has_household_index
-Uganda,cluster_features,2018-19,sane,declared,751,warn: has_household_index
-Uganda,cluster_features,2019-20,builds,declared,793,"fail: no_all_null_columns; warn: has_household_index,no_constant_columns"
+Uganda,cluster_features,2018-19,sane,declared,781,warn: has_household_index
+Uganda,cluster_features,2019-20,sane,declared,824,"warn: has_household_index,no_constant_columns"
 Uganda,community_prices,,undeclared,absent,,not declared by this country for any wave
 Uganda,crop_production,2005-06,absent,absent,,source not declared for wave
-Uganda,crop_production,2009-10,builds,declared,24997,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Uganda,crop_production,2010-11,builds,declared,20442,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Uganda,crop_production,2011-12,sane,declared,19552,warn: index_levels_match_scheme
-Uganda,crop_production,2013-14,sane,declared,17053,warn: index_levels_match_scheme
-Uganda,crop_production,2015-16,sane,declared,18874,warn: index_levels_match_scheme
+Uganda,crop_production,2009-10,sane,declared,25485,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,crop_production,2010-11,sane,declared,20970,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,crop_production,2011-12,sane,declared,20152,warn: index_levels_match_scheme
+Uganda,crop_production,2013-14,sane,declared,17585,warn: index_levels_match_scheme
+Uganda,crop_production,2015-16,sane,declared,19576,warn: index_levels_match_scheme
 Uganda,crop_production,2018-19,sane,declared,14194,warn: index_levels_match_scheme
-Uganda,crop_production,2019-20,sane,declared,15369,warn: index_levels_match_scheme
+Uganda,crop_production,2019-20,sane,declared,15721,warn: index_levels_match_scheme
 Uganda,earnings,2005-06,sane,declared,1467,warn: index_levels_match_scheme
 Uganda,earnings,2009-10,sane,declared,2889,warn: index_levels_match_scheme
 Uganda,earnings,2010-11,sane,declared,2618,warn: index_levels_match_scheme
@@ -2121,14 +2254,14 @@ Uganda,food_acquired,2015-16,sane,declared,50108,warn: index_levels_match_scheme
 Uganda,food_acquired,2018-19,sane,declared,53288,warn: index_levels_match_scheme
 Uganda,food_acquired,2019-20,sane,declared,48144,warn: index_levels_match_scheme
 Uganda,food_coping,,undeclared,absent,,not declared by this country for any wave
-Uganda,food_expenditures,2005-06,sane,declared,40747,all checks pass
-Uganda,food_expenditures,2009-10,sane,declared,38107,all checks pass
-Uganda,food_expenditures,2010-11,sane,declared,35489,all checks pass
-Uganda,food_expenditures,2011-12,sane,declared,38980,all checks pass
-Uganda,food_expenditures,2013-14,sane,declared,50657,all checks pass
-Uganda,food_expenditures,2015-16,sane,declared,50072,all checks pass
-Uganda,food_expenditures,2018-19,sane,declared,53288,all checks pass
-Uganda,food_expenditures,2019-20,sane,declared,48139,all checks pass
+Uganda,food_expenditures,2005-06,sane,declared,29666,all checks pass
+Uganda,food_expenditures,2009-10,sane,declared,26772,all checks pass
+Uganda,food_expenditures,2010-11,sane,declared,25296,all checks pass
+Uganda,food_expenditures,2011-12,sane,declared,26717,all checks pass
+Uganda,food_expenditures,2013-14,sane,declared,34785,all checks pass
+Uganda,food_expenditures,2015-16,sane,declared,34535,all checks pass
+Uganda,food_expenditures,2018-19,sane,declared,36540,all checks pass
+Uganda,food_expenditures,2019-20,sane,declared,32738,all checks pass
 Uganda,food_prices,2005-06,sane,declared,39494,all checks pass
 Uganda,food_prices,2009-10,sane,declared,37485,all checks pass
 Uganda,food_prices,2010-11,sane,declared,34681,all checks pass
@@ -2205,28 +2338,21 @@ Uganda,livestock,2018-19,sane,declared,3760,all checks pass
 Uganda,livestock,2019-20,sane,declared,3986,all checks pass
 Uganda,months_food_inadequate,2005-06,absent,absent,,source not declared for wave
 Uganda,months_food_inadequate,2009-10,sane,declared,2920,warn: index_levels_match_scheme
-Uganda,months_food_inadequate,2010-11,builds,declared,2631,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,months_food_inadequate,2010-11,sane,declared,2631,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,months_food_inadequate,2011-12,sane,declared,2831,warn: index_levels_match_scheme
 Uganda,months_food_inadequate,2013-14,sane,declared,3113,warn: index_levels_match_scheme
 Uganda,months_food_inadequate,2015-16,sane,declared,3301,warn: index_levels_match_scheme
 Uganda,months_food_inadequate,2018-19,absent,absent,,source not declared for wave
 Uganda,months_food_inadequate,2019-20,absent,absent,,source not declared for wave
-Uganda,nonfood_expenditures,2005-06,builds,declared,3122,fail: no_all_null_columns; warn: no_constant_columns
-Uganda,nonfood_expenditures,2009-10,builds,declared,2752,"fail: no_null_index_levels,no_all_null_columns; warn: no_constant_columns,no_float_stringified_index,ids_format_id_canonical"
-Uganda,nonfood_expenditures,2010-11,builds,declared,2639,"fail: no_null_index_levels,no_all_null_columns; warn: no_constant_columns,no_float_stringified_index,ids_format_id_canonical"
-Uganda,nonfood_expenditures,2011-12,builds,declared,2824,fail: no_all_null_columns; warn: no_constant_columns
-Uganda,nonfood_expenditures,2013-14,builds,declared,3115,fail: no_all_null_columns; warn: no_constant_columns
-Uganda,nonfood_expenditures,2015-16,builds,declared,3298,fail: no_all_null_columns; warn: no_constant_columns
-Uganda,nonfood_expenditures,2018-19,builds,declared,3176,fail: no_all_null_columns; warn: no_constant_columns
-Uganda,nonfood_expenditures,2019-20,builds,declared,3066,fail: no_all_null_columns; warn: no_constant_columns
-Uganda,nutrition,2005-06,absent,absent,,source not declared for wave
-Uganda,nutrition,2009-10,absent,absent,,source not declared for wave
-Uganda,nutrition,2010-11,absent,absent,,source not declared for wave
-Uganda,nutrition,2011-12,absent,absent,,source not declared for wave
-Uganda,nutrition,2013-14,absent,absent,,source not declared for wave
-Uganda,nutrition,2015-16,absent,absent,,source not declared for wave
-Uganda,nutrition,2018-19,absent,absent,,source not declared for wave
-Uganda,nutrition,2019-20,absent,absent,,source not declared for wave
+Uganda,nonfood_expenditures,2005-06,sane,declared,3122,warn: no_constant_columns
+Uganda,nonfood_expenditures,2009-10,builds,declared,2752,"fail: no_null_index_levels; warn: no_constant_columns,no_float_stringified_index,ids_format_id_canonical"
+Uganda,nonfood_expenditures,2010-11,builds,declared,2639,"fail: no_null_index_levels; warn: no_constant_columns,no_float_stringified_index,ids_format_id_canonical"
+Uganda,nonfood_expenditures,2011-12,sane,declared,2824,warn: no_constant_columns
+Uganda,nonfood_expenditures,2013-14,sane,declared,3115,warn: no_constant_columns
+Uganda,nonfood_expenditures,2015-16,sane,declared,3298,warn: no_constant_columns
+Uganda,nonfood_expenditures,2018-19,sane,declared,3176,warn: no_constant_columns
+Uganda,nonfood_expenditures,2019-20,sane,declared,3066,warn: no_constant_columns
+Uganda,nutrition,,sane,declared,23801,23801 entries
 Uganda,panel_ids,,sane,declared,9510,9510 entries
 Uganda,people_last7days,2005-06,sane,declared,3105,warn: index_levels_match_scheme
 Uganda,people_last7days,2009-10,sane,declared,2912,warn: index_levels_match_scheme
@@ -2236,22 +2362,22 @@ Uganda,people_last7days,2013-14,sane,declared,3118,warn: index_levels_match_sche
 Uganda,people_last7days,2015-16,absent,absent,,source not declared for wave
 Uganda,people_last7days,2018-19,sane,declared,3181,warn: index_levels_match_scheme
 Uganda,people_last7days,2019-20,sane,declared,3066,warn: index_levels_match_scheme
-Uganda,plot_features,2005-06,builds,declared,5463,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2005-06,sane,declared,5463,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,plot_features,2009-10,sane,declared,5825,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,plot_features,2010-11,sane,declared,4520,"warn: index_levels_match_scheme,no_constant_columns"
-Uganda,plot_features,2011-12,builds,declared,4840,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2011-12,sane,declared,4840,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,plot_features,2013-14,sane,declared,5436,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,plot_features,2015-16,sane,declared,5581,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,plot_features,2018-19,sane,declared,5811,"warn: index_levels_match_scheme,no_constant_columns"
-Uganda,plot_features,2019-20,builds,declared,5365,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Uganda,plot_features,2019-20,sane,declared,5365,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,plot_inputs,2005-06,absent,absent,,source not declared for wave
-Uganda,plot_inputs,2009-10,sane,declared,13763,warn: index_levels_match_scheme
-Uganda,plot_inputs,2010-11,sane,declared,13375,warn: index_levels_match_scheme
-Uganda,plot_inputs,2011-12,sane,declared,12196,warn: index_levels_match_scheme
-Uganda,plot_inputs,2013-14,sane,declared,11721,warn: index_levels_match_scheme
-Uganda,plot_inputs,2015-16,sane,declared,11889,warn: index_levels_match_scheme
-Uganda,plot_inputs,2018-19,sane,declared,10195,warn: index_levels_match_scheme
-Uganda,plot_inputs,2019-20,sane,declared,9880,warn: index_levels_match_scheme
+Uganda,plot_inputs,2009-10,sane,declared,13993,warn: index_levels_match_scheme
+Uganda,plot_inputs,2010-11,sane,declared,13554,warn: index_levels_match_scheme
+Uganda,plot_inputs,2011-12,sane,declared,12353,warn: index_levels_match_scheme
+Uganda,plot_inputs,2013-14,sane,declared,11834,warn: index_levels_match_scheme
+Uganda,plot_inputs,2015-16,sane,declared,11981,warn: index_levels_match_scheme
+Uganda,plot_inputs,2018-19,sane,declared,10367,warn: index_levels_match_scheme
+Uganda,plot_inputs,2019-20,sane,declared,10134,warn: index_levels_match_scheme
 Uganda,plot_labor,2005-06,absent,absent,,source not declared for wave
 Uganda,plot_labor,2009-10,sane,declared,37107,warn: index_levels_match_scheme
 Uganda,plot_labor,2010-11,sane,declared,29956,warn: index_levels_match_scheme
@@ -2268,7 +2394,7 @@ Uganda,sample,2013-14,sane,declared,3119,all checks pass
 Uganda,sample,2015-16,sane,declared,3305,all checks pass
 Uganda,sample,2018-19,sane,declared,3176,all checks pass
 Uganda,sample,2019-20,sane,declared,3098,all checks pass
-Uganda,shocks,2005-06,builds,declared,3644,fail: no_all_null_columns; warn: no_constant_columns
+Uganda,shocks,2005-06,sane,declared,3644,warn: no_constant_columns
 Uganda,shocks,2009-10,sane,declared,2667,all checks pass
 Uganda,shocks,2010-11,sane,declared,1541,all checks pass
 Uganda,shocks,2011-12,sane,declared,1288,all checks pass
