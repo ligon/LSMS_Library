@@ -419,6 +419,34 @@ matching -- =unité= is *not* a key in the table, =unitÃ©= is.  The API
 currently returns 0 mojibake =u= values precisely because the two wrongs
 cancel.
 
+*The same pattern keys =j=, and it is six times larger.*  =harmonize_food='s
+*Original Label* column carries *51 mojibake rows*, and =data_info.yml= maps
+=j= through it (=mappings: ['harmonize_food','Original Label','Preferred Label']=).
+Measured on 2018-19: *63,989 of 214,528 rows* key on a mojibake
+=harmonize_food= entry, against 41,000 for =u=.  Corpus-wide this is an EHCVM
+*cohort* property -- Benin, Burkina Faso, Guinea-Bissau, Niger, Senegal and
+Togo all do it, ~278,777 rows across the six waves that are cached (GH #794).
+
+*There is already a better answer in-repo, and Senegal does not use it.*
+CotedIvoire, Guinea-Bissau and Niger each carry a =_decode_mojibake= helper in
+=<wave>/_/mapping.py= that repairs the *data* instead of the crosswalk:
+
+: return s.encode('latin-1').decode('utf-8')
+
+which is exactly the correct reversal of pandas' latin-1 decode.  Those three
+countries' =harmonize_food= key columns are consequently *clean*.  Niger even
+carries a =_LOST_PREFIX_REPLACEMENTS= dict for the unrecoverable case --
+including =bÅ__uf -> bœuf=, which is *precisely* the damage Senegal's own
+=produitID= label 23 carries (=Viande de b= U+00C5 U+005F U+005F =uf=; the
+UTF-8 continuation byte was replaced with literal underscores upstream of the
+library and no decode recovers it).  Senegal has the same corruption and no
+such dict.
+
+Migrating Senegal to the =_decode_mojibake= hook is the *right* fix and would
+delete this whole section -- but it is a data-affecting change: it must land
+together with a re-key of =categorical_mapping.org=, or all 63,989 + 41,000
+rows stop matching.
+
 *Do not* "clean up" these keys in isolation.  Either leave both halves alone,
 or change the read and the crosswalk in the same commit, and re-verify that
 =Country('Senegal').food_acquired()= still returns 0 mojibake =u= values.

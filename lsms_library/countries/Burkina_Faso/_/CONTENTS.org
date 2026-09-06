@@ -563,9 +563,21 @@ is dropped without an exception.  Were these scripts revived as-is, those
 =_/categorical_mapping.org= =#+NAME: u= and the unit harmonization would fail
 *silently*.
 
-*Burkina Faso is nevertheless immune today*, for the reason recorded above
-under GH #223 Layer 2: =u= is decoded from the *numeric* =s07bq03b= code via
-=mappings: ['ehcvm_units', 'Code', 'Preferred Label']=, so the =.dta= value
-*labels* never enter the key path at all.  Contrast Senegal, which declares a
-bare =u: s07bq03b= and therefore keys on the label text -- see
-=Senegal/_/CONTENTS.org=, where the mojibake is *load-bearing*.
+*=u= is immune; =j= is NOT.*  For the reason recorded above under GH #223
+Layer 2, =u= is decoded from the *numeric* =s07bq03b= code via
+=mappings: ['ehcvm_units', 'Code', 'Preferred Label']=, so value labels never
+enter *that* key path.  But =j= is mapped via
+=mappings: ['harmonize_food', 'Original Label', 'Preferred Label']=, and the
+*Original Label* column of =_/categorical_mapping.org= =#+NAME: harmonize_food=
+carries *46 mojibake rows* -- it is keyed on =Ã=-form strings exactly the way
+Senegal's =u= table is.  Measured on 2018-19: *47,240 of 136,888 rows* key on a
+mojibake =harmonize_food= entry.  So Burkina Faso's =j= *is* load-bearing
+mojibake; the immunity is only on =u=.
+
+This is a whole-cohort pattern, not a Burkina Faso quirk -- see GH #794.
+Benin, Guinea-Bissau, Niger, Senegal and Togo all key =harmonize_food= on the
+same mojibake.  Three of the EHCVM countries (CotedIvoire, Guinea-Bissau,
+Niger) instead repair the data with a =_decode_mojibake= =df_edit= hook in
+=<wave>/_/mapping.py= and keep their crosswalk clean.  *Burkina Faso does
+not have that hook.*  Whichever way this is unified, the read and the
+crosswalk must move in the same commit.
