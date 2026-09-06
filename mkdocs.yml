@@ -66,6 +66,7 @@ nav:
   - Getting Started: getting-started.md
   - User Guide:
       - Country: guide/country.md
+      - Data Methods & Kwargs: guide/data-methods.md
       - Feature: guide/feature.md
       - Caching: guide/caching.md
       - Panel Data: guide/panel-data.md
@@ -76,8 +77,10 @@ nav:
       - Country: api/country.md
       - Wave: api/wave.md
       - Feature: api/feature.md
+      - Transformations: api/transformations.md
       - Coverage: api/coverage.md
   - Releases:
+      - v0.10.2: releases/v0.10.2.md
       - v0.10.1: releases/v0.10.1.md
       - v0.10.0: releases/v0.10.0.md
       - v0.9.1: releases/v0.9.1.md
