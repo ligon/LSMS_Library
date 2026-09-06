@@ -541,7 +541,8 @@ Data Scheme:
     # `j` VOCABULARY: the `harmonize_crop` table in _/categorical_mapping.org,
     # mapped on the DECODED label (codes are not stable: 2017-18 introduces
     # -666 for Other; 2013-14 ships blank codes).  Preferred Label = the
-    # GhanaSPS food_items.org label where the harvested crop IS that food
+    # GhanaSPS harmonize_food label (categorical_mapping.org; GH #783 --
+    # was food_items.org) where the harvested crop IS that food
     # (Maize, Cocoyam, Groundnuts, Onions, Palm Nuts, Pepper (fresh or
     # dried), Tomatoes (fresh) ...) so a crop `j` joins food_acquired.j --
     # Uganda's stated purpose for its table; else Uganda's crop label (Beans,

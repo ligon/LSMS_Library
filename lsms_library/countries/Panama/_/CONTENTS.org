@@ -523,7 +523,42 @@ Precios."  Refusal 1.4%.
 * Files in Panama/_/
 ** TODO panama.py
 Contains code common to different rounds
-** DONE food_items.org
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+The vocabulary now lives in =_/categorical_mapping.org= under =#+name:
+harmonize_food=, moved byte-for-byte; =_/food_items.org= is deleted.  Same
+"Unit #0" migration Tanzania and Ethiopia completed
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).  It had to
+be a MOVE, not a rename in place: =Country.categorical_mapping= opens only
+the global =lsms_library/categorical_mapping/*.org= and the country's own
+=categorical_mapping.org=, and never =food_items.org= under any table name,
+so =labels== (=Country._relabel_j=) raised =LabelUnavailableError= here.
+
+Panama had NO country-level =categorical_mapping.org= before this; GH #783
+created one, and =harmonize_food= is currently its only table.
+
+*Panama's table had no =#+name:= at all*, so it was invisible to every
+name-keyed mechanism.  All three wave scripts reached it via
+=df_from_orgfile(name=None)= = "the first table in the file"; all three now
+pass =name='harmonize_food'= explicitly, as does =_/nutrition.py=, and the
+=_/Makefile= generic rule names =categorical_mapping.org=.
+
+*=_/nutrition.py= is NOT reachable, and was not before this change.*
+=nutrition= is absent from =_/data_scheme.yml=; the Makefile's =var= target
+is =food_acquired.parquet= only; the script reads
+=../var/food_quantities.parquet=, which the Makefile's own comment forbids
+materializing; and its =eep153_tools= import is not an installed dependency,
+so it raises =ModuleNotFoundError= before reaching any of that.  GH #783
+repointed its label read (measured: the same 79 =(Preferred Label, FCT ID)=
+pairs the old raw =pd.read_csv(sep='|')= produced) so the reference is not
+dangling.  It did not revive the script.  Contrast =CONTENTS.org='s "DONE
+nutrition" / "DONE nutrition.py" entries below, which read as though the
+pipeline runs; they describe intent, not a live build.
+
+The regeneration recipe below still writes a standalone =food_items.csv=.
+If it is re-run, fold its output into =categorical_mapping.org=
+=harmonize_food= rather than into a standalone file, or the vocabulary
+becomes invisible again.
+
 *** Final Version
 Cleaned up by a human, keyed to FCT Table
 #+begin_src python :results output raw table
@@ -791,7 +826,7 @@ print(df_to_orgtbl(df))
   4. The existing =units.py= script should be extended to produce the
      final JSON file.
 ** DONE nutrition
-A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
+A food conversion table, with foods keyed to the "Preferred Labels" of =categorical_mapping.org= =harmonize_food= (GH #783; was =food_items.org=).   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
 
 Code to extract the nutrient tables from the aforementioned pdf:
 #+begin_src python

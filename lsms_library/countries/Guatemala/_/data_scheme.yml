@@ -5,7 +5,8 @@ Data Scheme:
     # ENCOVI 2000 Capitulo 12 food instrument, ACTUAL last-15-days recall.
     # Canonical long shape built by 2000/_/food_acquired.py:
     #   i = hogar (household); j = item (food, Preferred Label via
-    #       food_items.org '2000' column); u = 'lbs' (pounds); s in
+    #       categorical_mapping.org harmonize_food '2000' column); u = 'lbs'
+    #       (pounds); s in
     #       {purchased, produced, inkind, other}.
     # Purchased rows: Quantity = p12a06a*p12a06c*cnlib (15-day lbs),
     #   Expenditure = p12a06d ("gasto ult 15 dias").

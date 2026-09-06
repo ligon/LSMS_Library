@@ -272,7 +272,28 @@ identifiers survived into the distributed files.  Flagged, not resolved --
   2026-07-21.
 
 * Files in Guatemala/_/
-** DONE food_items.org
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+The vocabulary now lives in =_/categorical_mapping.org= under =#+name:
+harmonize_food=, moved byte-for-byte; =_/food_items.org= is deleted.  Same
+"Unit #0" migration Tanzania and Ethiopia completed
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).  It had to
+be a MOVE, not a rename in place: =Country.categorical_mapping= opens only
+the global =lsms_library/categorical_mapping/*.org= and the country's own
+=categorical_mapping.org=, and never =food_items.org= under any table name,
+so =labels== (=Country._relabel_j=) raised =LabelUnavailableError= here.
+
+*Guatemala's table had no =#+name:= at all*, so =all_dfs_from_orgfile=
+returned nothing for it and it was invisible to every name-keyed
+mechanism, including the =mappings:= syntax in =data_info.yml=.  Its two
+readers (=_/fct.py=, =2000/_/food_acquired.py=) reached it only via
+=df_from_orgfile(name=None)= = "the first table in the file".  Both now
+pass =name='harmonize_food'= explicitly, and the =_/Makefile=
+prerequisites name =categorical_mapping.org=.
+
+*Do not confuse it with =guatemala.py::harmonized_food_labels=*, which
+names =../../_/food_items.csv= -- a DIFFERENT file that does not exist
+anywhere in the tree.  That function is dead; GH #783 scoped it out and
+left it alone.
 
 CLOSED: [2023-03-16 Thu 11:41]
 Should have columns for each year, with "Preferred Labels" and "Aggregate Labels".   Labels for different years:
@@ -431,7 +452,7 @@ print(df_to_orgtbl(df))
 
 ** DONE Food Conversion
 CLOSED: [2023-03-16 Thu 11:59]
-A food conversion table, with foods keyed to the "Preferred Labels" of food_items.org.   See  prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf; see excel version at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
+A food conversion table, with foods keyed to the "Preferred Labels" of =categorical_mapping.org= =harmonize_food= (GH #783; was =food_items.org=).   See  prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf; see excel version at https://docs.google.com/spreadsheets/d/1qljY2xrxbc37d9tLSyuFa9CnjEsh3Re2ufDQlBHzPEQ/
 
 Code to extract the nutrient tables from the aforementioned pdf:
 #+begin_src python

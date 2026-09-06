@@ -18,7 +18,12 @@ fct.columns.names = fct.columns[0]
 fct = fct.droplevel('Name',axis=1)
 
 #find FCT codes for foods in expenditure survey
-food_items = df_from_orgfile('./food_items.org')
+# GH #783: the vocabulary moved out of the standalone food_items.org into
+# the country's categorical_mapping.org as `harmonize_food` -- the only file
+# Country.categorical_mapping opens, so labels= can now see it too.
+# NB: name= is now REQUIRED -- categorical_mapping.org holds several tables,
+# and df_from_orgfile's name=None means 'the first table in the file'.
+food_items = df_from_orgfile('./categorical_mapping.org', name='harmonize_food')
 food_items['FCT code'] = food_items['FCT code'].astype('Int64').astype(str).replace('<NA>',None)
 food_items = food_items.rename(columns={'FCT code':'Code'}).set_index('Preferred Label')
 

@@ -292,10 +292,12 @@ survey results."
 
 The build fails for two reasons:
 
-1. The Makefile's generic =%.parquet= rule (line 45) depends on
-   =food_items.org= and =panama.py=, neither of which exists.  The
-   =panama.py= reference is a copy-paste error from Panama.  This rule
-   governs any parquet target that does not match a more specific rule.
+1. *SUPERSEDED (see "Known issues" below).*  The Makefile's generic
+   =%.parquet= rule used to depend on =food_items.org= and =panama.py=.
+   The =panama.py= copy-paste was fixed 2026-06-08; the rule now reads
+   =%.parquet: %.py serbia.py= and names no food-label file at all, which
+   is why GH #783's retirement of =food_items.org= needed no Makefile
+   edit here.
 
 2. The country-level =food_acquired.py= depends on
    =var/other_features.parquet= and wave-level =food_acquired.parquet=.
@@ -313,13 +315,15 @@ Makefile pipeline for food and other features is non-functional.
 - =serbia.py= :: Nearly empty---imports deprecated =ligonlibrary= and
   =lsms.tools= but defines no functions.  Contrast with =cambodia.py=
   which at least defines =age_sex_composition()=.
-- No =categorical_mapping.org= :: No label harmonization for any
-  variables.
+- ~~No =categorical_mapping.org=~~ :: *STALE -- false when GH #783 read
+  it; quoted rather than deleted so the correction is on the record.*
+  =_/categorical_mapping.org= exists (=harmonize_education=) and, since
+  GH #783, also carries =harmonize_food=.
 - Anti-pattern usage :: =other_features.py= / =household_characteristics.py=
   still use =dvc.api.open()= and =from ligonlibrary.dataframes import
   from_dta=.  =food_acquired.py= already uses =get_dataframe()=; its
   stray =import pyreadstat= was removed (2026-06-08) when wiring
-  =food_items.org=.
+  the food-label table (now =harmonize_food=).
 
 * Files in Serbia/_/
 ** DONE data_scheme.yml
@@ -327,7 +331,29 @@ Declares =household_roster= with index =(t, v, i, pid)= and columns
 =Sex=, =Age=, =Generation=, =Distance=, =Affinity=.  Does not declare
 =food_acquired=, =household_characteristics=, or =other_features=.
 
-** DONE food_items.org (2026-06-08; FCT column scaffolded)
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+The vocabulary now lives in =_/categorical_mapping.org= under =#+name:
+harmonize_food=, moved byte-for-byte; =_/food_items.org= is deleted.  Same
+"Unit #0" migration Tanzania and Ethiopia completed
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).  It had to
+be a MOVE, not a rename in place: =Country.categorical_mapping= opens only
+the global =lsms_library/categorical_mapping/*.org= and the country's own
+=categorical_mapping.org=, and never =food_items.org= under any table name,
+so =labels== (=Country._relabel_j=) raised =LabelUnavailableError= here.
+
+*The idiosyncrasy that shapes this table, carried across with it*: the
+join key is the numeric =proizvod=, NOT the product text =nsifra=,
+because =nsifra= is stored in a legacy YUSCII transliteration in which
+the pipe character ='|'= encodes the letter "đ" -- and a literal ='|'=
+cannot survive an org-mode pipe-delimited table at all.
+
+One behaviour change worth knowing, in the NEW capability only:
+=Country.categorical_mapping= parses with =to_numeric=True=, so
+=labels='proizvod'= yields =101=, not the zero-padded =0101=.  The wave
+script reads through =df_from_orgfile(..., to_numeric=False)= and is
+unaffected.
+
+The historical description follows.
 Harmonizes the 100 food items of the 2007 diary (=m5_1_diary.dta=) into
 preferred labels.  Columns: =Preferred Label | proizvod | Serbian Label
 | FCT ID=.  =2007/_/food_acquired.py= keys on the numeric =proizvod=
@@ -343,13 +369,14 @@ Not yet wired.  No freely-downloadable, machine-readable Serbian FCT was
 obtained.  Candidate = Serbian Food and Nutrition Database (IMR
 Belgrade, EuroFIR-harmonized); access requires EuroFIR registration, no
 bulk download.  Fallback = EuroFIR Balkan regional FCT.  See the
-=food_items.org= "Food Conversion Table" section for source URLs and the
+=categorical_mapping.org= =harmonize_food= "Food Conversion Table"
+section for source URLs and the
 remaining steps (obtain FCT CSV -> fill =FCT ID= column -> add
 =nutrition.py= cf. Panama/Guatemala).
 
 ** TODO nutrition.py
-Not yet implemented.  Blocked by the missing FCT (above);
-=food_items.org= is now present.
+Not yet implemented.  Blocked by the missing FCT (above); the label
+table is present, in =categorical_mapping.org= as =harmonize_food=.
 
 ** DONE Makefile (2026-06-08)
 The generic =%.parquet= rule's =panama.py= prerequisite (copy-paste from
