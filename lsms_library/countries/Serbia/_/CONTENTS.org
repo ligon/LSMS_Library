@@ -315,7 +315,7 @@ Makefile pipeline for food and other features is non-functional.
 - =serbia.py= :: Nearly empty---imports deprecated =ligonlibrary= and
   =lsms.tools= but defines no functions.  Contrast with =cambodia.py=
   which at least defines =age_sex_composition()=.
-- ~~No =categorical_mapping.org=~~ :: *STALE -- false when GH #783 read
+- STALE, was "No =categorical_mapping.org=" :: *False when GH #783 read
   it; quoted rather than deleted so the correction is on the record.*
   =_/categorical_mapping.org= exists (=harmonize_education=) and, since
   GH #783, also carries =harmonize_food=.

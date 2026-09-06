@@ -124,3 +124,49 @@ nothing about the data those countries return.
   `Serbia/_/CONTENTS.org` "No `categorical_mapping.org`" — **CONTRADICTION
   found in the docs, not introduced by this change**: both files exist and both
   claims were already false. Corrected in place, quoted rather than deleted.
+
+### Phase 3 addendum — a defect SURFACED (not introduced) by switching `labels=` on
+
+`tests/test_ghanalss_nutrition.py::test_food_labels_carry_fct_codes` pinned the
+old file location and had to move with it; two new pins were added to
+`tests/test_food_labels.py` (the table is reachable with all its columns; the
+standalone file stays retired).
+
+**`_relabel_j` renames to the EMPTY STRING for a blank crosswalk cell.**
+`all_dfs_from_orgfile` builds cells with `s.strip()` and nulls nothing, so a
+blank cell arrives as `''`, survives `_relabel_j`'s `.dropna()`
+(`country.py:2634`), and every item whose variant is blank collapses into a
+single `j=''`. Measured on GhanaSPS `labels='FCT Label'`: 94 distinct `j` → 20,
+of which one is `''`, because 81 of 98 rows have a blank `FCT Label`. Confirmed
+by `j_head[0] == ''` on GhanaSPS `FCT Label`, GhanaLSS `2016-17` and GhanaLSS
+`FCT Code`.
+
+Corpus-wide exposure, config-only sweep — **17 columns in 4 countries**:
+
+| country | columns with blank cells |
+|---|---|
+| GhanaLSS | all 7 per-round columns (37–147 of 205) + `FCT Code` (24) |
+| GhanaSPS | `2009-10` 13, `2013-14` 5, `2017-18` 7, `Food Codes` 3, `FCT Label` 81 (of 98) |
+| Mali | `2014-15`, `2018-19`, `2021-22` — 2 each of 327 |
+| Panama | `2003` — 1 of 81 |
+
+**Pre-existing, and provably so**: Mali already resolves `labels=` on
+`development` and carries the same blank cells, so
+`Country('Mali').food_acquired(labels='2014-15')` reproduces it without any of
+this PR's changes. GH #783 does not touch `_relabel_j` or
+`all_dfs_from_orgfile`; it makes four more countries able to *reach* the code
+path that has this bug. Numeric columns are immune — `to_numeric=True` turns
+their blanks into NaN, which `.dropna()` then removes correctly (Guatemala
+`FCT code`: 5 NaN, no `''`).
+
+This is the exact complement of #787 finding 2 ("unmatched `j` passes through
+unrenamed, silently"): unmatched passes through, blank-matched collapses. Both
+are silent. Reported to #787; **deliberately not fixed here** — a fix changes
+returned data for Mali, and for Nigeria/Malawi/Uganda/Ethiopia/Tanzania if
+their tables ever gain a blank, which is squarely against this PR's invariance
+constraint.
+
+**Therefore the headline `labels=` demonstration uses fully-populated columns**
+(GhanaSPS `2017-18` 94→94, Cambodia `Code`, Serbia `proizvod`, Guatemala
+`2000`, Panama `2008`), and the sparse-column results are reported as evidence
+of the defect rather than as successes.

@@ -320,12 +320,12 @@ renders =fi=/=ff= as ligature codepoints; these are written as plain ASCII here.
   and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
 - No =data_scheme.yml= :: Cambodia cannot be loaded via
   =ll.Country('Cambodia')= because there is no data scheme definition.
-- ~~No =categorical_mapping.org=~~ :: *STALE -- this bullet was already
-  false when GH #783 read it, and is quoted here rather than deleted so
-  the correction is on the record.*  =_/categorical_mapping.org= exists
+- STALE, was "No =categorical_mapping.org=" :: *This bullet was already
+  false when GH #783 read it; quoted rather than deleted so the correction
+  is on the record.*  =_/categorical_mapping.org= exists
   (=harmonize_education=, =Roof=, =Floor=) and, since GH #783, also
   carries =harmonize_food=.
-- ~~No =food_items.org=~~ :: *STALE, and superseded twice.*  The file was
+- STALE, was "No =food_items.org=" :: *Superseded twice.*  The file was
   created 2026-06-08 (see "DONE food_items.org" below -- the "Known
   issues" bullet was never updated to match), and GH #783 then retired it
   into =categorical_mapping.org=.

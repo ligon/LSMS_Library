@@ -37,8 +37,11 @@ ORG = textwrap.dedent(
     """
 )
 
-# A bare pipe-table file with no #+name header (e.g. Ethiopia nonfood_items.org,
-# Panama food_items.org) -- the only legitimate name=None use.
+# A bare pipe-table file with no #+name header (e.g. Ethiopia nonfood_items.org)
+# -- the only legitimate name=None use.  The GhanaSPS / Guatemala / Panama
+# food_items.org files used to be the other examples; GH #783 retired all three
+# INTO categorical_mapping.org precisely because an unnamed table is invisible
+# to all_dfs_from_orgfile and therefore to Country.categorical_mapping.
 BARE_ORG = textwrap.dedent(
     """\
     | Original Label | Preferred Label |
