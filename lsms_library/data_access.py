@@ -305,21 +305,35 @@ def _dvc_timeout(default: int = 1800) -> int:
     """Seconds to allow a single ``dvc`` write, overridable per environment.
 
     ``dvc add`` rebuilds its index by READING EVERY ``.dvc`` SIDECAR before it
-    hashes anything, so its floor is set by the repo's sidecar count and the
-    filesystem's metadata latency -- not by the size of the file being added.
+    hashes the file being added, so its cost scales with the repo's sidecar
+    count (~10k here) times the filesystem's per-file metadata latency -- not
+    with the size of the file being added.
 
-    Measured on a Savio compute node against this repo's Lustre checkout:
-    **9,979 sidecars totalling 837 KiB took 632 s to read** -- 63 ms per
-    ~86-byte file, with 8.6 s of CPU against 632 s of wall clock, i.e. almost
-    entirely latency.  The previous hardcoded 600 s was therefore BELOW THE
-    FLOOR: ``dvc add`` could not finish here however long it was left, and the
-    timeout killed it mid-write, orphaning a ``flufl`` lock whose lease is a
-    year long (so nothing would treat it as stale).
+    **On a shared parallel filesystem that latency is highly variable, and no
+    fixed timeout is correct.**  Deliberately not quoting a typical duration:
+    the number depends on what every other tenant of the appliance is doing,
+    so any figure recorded here would be a single draw dressed up as a
+    property of the repo.  Illustrative only, both observed in one session
+    against the same unchanged tree: a full walk took roughly twice as long at
+    one moment as at another an hour later, while repeated samples *within*
+    each moment agreed closely.  The between-moment variation is the one that
+    matters and it is not ours to control.
 
-    The default is raised and the value made configurable, because the right
-    number is a property of the filesystem, not of the library.  Set
-    ``LSMS_DVC_TIMEOUT`` (seconds); a laptop or local SSD wants far less than a
-    networked parallel filesystem.
+    That is the whole argument for making this configurable rather than
+    picking a better constant.  The previous hardcoded 600 s was comfortably
+    sufficient under light load and impossible under heavy load -- and when it
+    expired it killed ``dvc add`` mid-write, orphaning a ``flufl`` lock whose
+    lease is encoded as an mtime a YEAR in the future, so nothing afterwards
+    treats it as stale.  A too-short timeout does not merely fail; it leaves
+    the repo locked.
+
+    Set ``LSMS_DVC_TIMEOUT`` (seconds) to suit the filesystem in front of you:
+    a laptop or local SSD wants far less than a busy networked one.  An
+    invalid value warns and falls back rather than crashing a write.
+
+    If writes are slow enough to be painful, the durable fix is fewer index
+    walks rather than a longer clock -- :func:`push_to_cache_batch` amortises
+    one rebuild over many files.
     """
     raw = os.environ.get("LSMS_DVC_TIMEOUT")
     if raw:
