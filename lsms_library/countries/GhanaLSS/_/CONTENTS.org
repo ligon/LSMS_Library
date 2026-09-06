@@ -1,8 +1,9 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 The Ghana Living Standards Survey (Ghana LSS) is one of two major surveys we have for Ghana, the other being the Ghana Social Panel Survey (GhanaSPS).
 
-* Survey Program
+* Overview
 
 The GLSS is conducted by the Ghana Statistical Service (GSS).  Seven
 rounds span 1987--2017.  Each round is designed as an independent

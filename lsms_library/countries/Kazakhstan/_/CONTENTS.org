@@ -1,4 +1,5 @@
 #+TITLE: Kazakhstan — country notes & known data issues
+#+TODO: TODO WAITING | DONE
 
 * Sampling universe, exclusions and sub-samples
 

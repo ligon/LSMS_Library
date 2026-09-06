@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Overview
 
@@ -337,7 +338,7 @@ individual_education, food_acquired, assets, housing,
 interview_date, shocks, food_expenditures, food_prices,
 food_quantities.)
 
-* Data Quality Notes
+* Known data issues
 
 ** Grain: the three ways Benin's declared indexes go non-unique (GH #323)
 

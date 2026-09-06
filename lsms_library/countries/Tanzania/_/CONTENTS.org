@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Survey design --- read before touching ANY 2008-15 table
 :PROPERTIES:

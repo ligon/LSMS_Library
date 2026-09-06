@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Overview
 
@@ -399,7 +400,7 @@ transcript for every gap: =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=.
 (Per =data_scheme.yml=: sample, cluster_features, household_roster,
 food_acquired, shocks, individual_education, panel_ids, ...)
 
-* Data Quality Notes
+* Known data issues
 
 ** individual_education mixes numeric grade codes with French text
 
