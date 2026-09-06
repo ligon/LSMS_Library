@@ -38,7 +38,7 @@ from typing import Any
 
 import pandas as pd
 
-__all__ = ["population_pyramid", "PALETTE"]
+__all__ = ["population_pyramid", "coordinate_map", "PALETTE"]
 
 #: The chart palette.  Teal/ochre rather than blue/pink: colour distinguishes
 #: the ``by=`` groups, never the sexes, and the pair stays separable under the
@@ -434,3 +434,227 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
         item.set_fontfamily(_FONT_STACK)
     fig.tight_layout()
     return ax
+
+
+# ---------------------------------------------------------------------------
+# Maps
+# ---------------------------------------------------------------------------
+
+#: Basemap for the interactive map: country shapes, borders and place names.
+#: OpenStreetMap because it needs NO API KEY.  CartoDB positron is prettier and
+#: was the first choice, but folium now warns "CartoDB tiles now require an API
+#: key" -- the tile URL is still emitted, so the map renders markers on a BLANK
+#: background and looks merely empty rather than broken.  A basemap that
+#: silently fails is worse than a plainer one that works.
+_DEFAULT_TILES = "OpenStreetMap"
+
+_MISSING_FOLIUM = (
+    "coordinate_map(interactive=True) needs folium, which is not installed.\n"
+    "folium is pure Python (leaflet + jinja2) and renders inline in Jupyter.\n"
+    "Install it with:  pip install folium\n"
+    "Or pass interactive=False for a static matplotlib scatter."
+)
+
+
+def _radius_by_area(values, r_max=14.0, r_floor=2.0):
+    """Marker radii whose AREA is proportional to ``values``.
+
+    Radius-proportional symbols are the classic lie of this chart type: a
+    cluster carrying 197x the weight of another -- the observed range on
+    Uganda 2013-14 -- would be drawn 197x wider and therefore ~38,000x larger
+    by area.  Area is what the eye reads, so radius must go as the square
+    root.  A floor keeps the smallest markers clickable; it is the one place
+    the mapping is deliberately not proportional, so :func:`coordinate_map`
+    says so in the caption rather than leaving the reader to assume otherwise.
+    """
+    import numpy as np
+
+    v = np.asarray(values, dtype=float)
+    top = np.nanmax(v) if v.size else 1.0
+    if not np.isfinite(top) or top <= 0:
+        return np.full(v.shape, r_floor)
+    return np.maximum(r_floor, r_max * np.sqrt(np.clip(v, 0, None) / top))
+
+
+def _cluster_frame(data, wave, size):
+    """Build ``(frame, label, country, dropped)`` for the cluster leading case."""
+    from .country import Country
+
+    country = Country(data) if isinstance(data, str) else data
+    if not isinstance(country, Country):
+        return data, "coordinates", None, 0
+
+    cf = country.cluster_features()
+    if "t" in cf.index.names:
+        waves = list(pd.unique(cf.index.get_level_values("t").dropna()))
+        if wave is None and len(waves) > 1:
+            wave = sorted(waves)[-1]
+            warnings.warn(f"{country.name} has {len(waves)} waves; mapping the "
+                          f"most recent ({wave}). Pass wave= to choose another.",
+                          stacklevel=3)
+        elif wave is None:
+            wave = waves[0] if waves else None
+        if wave is not None:
+            cf = cf.xs(wave, level="t", drop_level=False)
+
+    total = len(cf)
+    df = cf.reset_index()
+    have = df[["Latitude", "Longitude"]].notna().all(axis=1) if \
+        {"Latitude", "Longitude"} <= set(df.columns) else pd.Series(False, index=df.index)
+    dropped = int((~have).sum())
+    df = df[have].copy()
+    if df.empty:
+        raise ValueError(f"{country.name} {wave or ''}: no cluster has coordinates")
+
+    if size is not None and size not in df.columns:
+        try:
+            smp = country.sample().reset_index()
+            if wave is not None and "t" in smp.columns:
+                smp = smp[smp["t"] == wave]
+            if size in smp.columns and "v" in smp.columns and "v" in df.columns:
+                agg = smp.groupby("v")[size].sum()
+                df = df.merge(agg.rename(size), left_on="v", right_index=True,
+                              how="left")
+        except Exception as exc:
+            warnings.warn(f"could not join {size!r} from sample(): {exc}",
+                          stacklevel=3)
+    return df, f"{country.name} {wave or ''}".strip(), country.name, dropped
+
+
+def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude",
+                   label=None, interactive=True, colors=None, tiles=None):
+    """Map point coordinates, optionally sizing each marker by a third variable.
+
+    The leading case is survey clusters sized by the sampling weight they
+    carry::
+
+        coordinate_map('Uganda', wave='2013-14', size='weight')
+
+    Given a ``Country`` (or its name) the cluster coordinates come from
+    ``cluster_features`` and ``size`` is summed from ``sample()`` over each
+    cluster.  Given a DataFrame, ``lat``/``lon``/``size`` name its columns and
+    nothing is joined.
+
+    Parameters
+    ----------
+    size : str, optional
+        Column whose value sets marker AREA (not radius -- see
+        :func:`_radius_by_area`).  ``None`` draws uniform markers.
+    interactive : bool, default True
+        Render a pan/zoom Leaflet map via ``folium``, which displays inline in
+        Jupyter and can be saved as standalone HTML.  ``False`` draws a static
+        matplotlib scatter and needs no extra dependency.
+    label : str, optional
+        Column shown in a marker's tooltip (interactive only).  Defaults to
+        the cluster id ``v`` when present.
+
+    Returns
+    -------
+    ``folium.Map`` when ``interactive``, else a matplotlib ``Axes``.
+
+    Notes
+    -----
+    **Coordinates are cluster fixes, not household locations.**  The published
+    GPS is one point per cluster, stamped onto each of its households; it was
+    never per-household.  Mapping households would draw the same point many
+    times and imply a precision the data does not carry.  Survey coordinates
+    are also commonly offset before publication to protect respondents, so
+    treat position as approximate.
+
+    **Clusters without coordinates are counted and reported**, never dropped
+    silently: Uganda 2013-14 publishes coordinates for 619 of 706 clusters, so
+    a map that said nothing would omit 12% of the sample without a trace.
+    """
+    pal = {**PALETTE, **(colors or {})}
+    df, title, cname, dropped = _cluster_frame(data, wave, size)
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("coordinate_map() takes a Country, a country name, or "
+                        f"a DataFrame; got {type(data).__name__}")
+    for col in (lat, lon):
+        if col not in df.columns:
+            raise KeyError(f"{col!r} is not a column of this table")
+    df = df[df[lat].notna() & df[lon].notna()].copy()
+    if df.empty:
+        raise ValueError("no rows with usable coordinates")
+
+    if size is not None and size in df.columns:
+        vals = pd.to_numeric(df[size], errors="coerce").fillna(0.0)
+        radii = _radius_by_area(vals)
+    else:
+        vals, radii = None, [5.0] * len(df)
+
+    if label is None:
+        label = "v" if "v" in df.columns else None
+
+    note = [f"{len(df):,} points"]
+    if dropped:
+        note.append(f"{dropped} cluster(s) without coordinates, not shown")
+    if vals is not None:
+        note.append(f"marker area ∝ {size}")
+    caption = "; ".join(note)
+
+    if not interactive:
+        plt = _require_pyplot()
+        import numpy as np
+        _, ax = plt.subplots(figsize=(6.4, 6.4), dpi=130)
+        ax.scatter(df[lon], df[lat], s=[3.14 * r * r for r in radii],
+                   facecolor=pal["bar"], edgecolor="white", linewidth=0.4,
+                   alpha=0.75)
+        # One degree of longitude is cos(latitude) degrees of latitude, so an
+        # "equal" aspect is only right on the equator and stretches every other
+        # map east-west.  Uganda sits at ~1 N so the error is invisible there;
+        # Niger at ~17 N is already 4.5% too wide, and it grows with latitude.
+        # This is the plate-carree correction, not a projection: the static
+        # fallback is a scatter of coordinates, and says so.
+        mid_lat = float(pd.to_numeric(df[lat], errors="coerce").mean())
+        ax.set_aspect(1.0 / max(np.cos(np.radians(mid_lat)), 0.05),
+                      adjustable="datalim")
+        ax.set_xlabel("longitude (°E)", fontsize=8.5, color=pal["ink"])
+        ax.set_ylabel("latitude (°N)", fontsize=8.5, color=pal["ink"])
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        for side in ("left", "bottom"):
+            ax.spines[side].set_color(pal["rule"])
+        ax.tick_params(colors=pal["ink"], labelsize=8, color=pal["rule"])
+        ax.set_title(title, loc="left", fontsize=12.5, color=pal["ink"],
+                     pad=14, fontweight="semibold")
+        ax.annotate(caption, xy=(0, 1), xycoords="axes fraction",
+                    xytext=(0, 6), textcoords="offset points",
+                    fontsize=9, color=pal["ink"], alpha=0.75)
+        ax.figure.tight_layout()
+        return ax
+
+    try:
+        import folium
+    except ImportError as exc:  # pragma: no cover - depends on the install
+        raise ImportError(_MISSING_FOLIUM) from exc
+
+    m = folium.Map(
+        location=[float(df[lat].mean()), float(df[lon].mean())],
+        tiles=tiles or _DEFAULT_TILES, zoom_start=6, control_scale=True,
+    )
+    for (_, row), r in zip(df.iterrows(), radii):
+        tip = None
+        if label and label in df.columns:
+            tip = f"{label} {row[label]}"
+            if vals is not None:
+                tip += f" — {size} {float(row[size]):,.2f}"
+        folium.CircleMarker(
+            location=[float(row[lat]), float(row[lon])], radius=float(r),
+            color=pal["bar"], weight=1, fill=True, fill_color=pal["bar"],
+            fill_opacity=0.55, tooltip=tip,
+        ).add_to(m)
+    folium.map.Marker(
+        [float(df[lat].min()), float(df[lon].min())],
+        icon=folium.DivIcon(html=(
+            f'<div style="font:11px/1.4 system-ui,sans-serif;color:{pal["ink"]};'
+            f'background:rgba(255,255,255,.85);padding:4px 7px;border-radius:3px;'
+            f'white-space:nowrap"><b>{title}</b><br>{caption}<br>'
+            f'cluster fixes, positions approximate</div>')),
+    ).add_to(m)
+    try:
+        m.fit_bounds([[float(df[lat].min()), float(df[lon].min())],
+                      [float(df[lat].max()), float(df[lon].max())]])
+    except Exception:
+        pass
+    return m
