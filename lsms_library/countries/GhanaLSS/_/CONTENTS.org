@@ -62,12 +62,118 @@ table cell-for-cell.
 
 The stratification scheme evolved across rounds:
 
-| Rounds      | Strata definition                                     | Count |
-|-------------+-------------------------------------------------------+-------|
+| Rounds       | Strata definition                                    | Count |
+|--------------+------------------------------------------------------+-------|
 | GLSS1--GLSS2 | Ecological zone (Coastal, Forest, Savannah)          |     9 |
-|             | x Urban classification (Urban, Semi-urban, Rural)     |       |
-| GLSS3+      | Region-based (10 administrative regions from GLSS3;   | ~10   |
-|             | possibly finer in later rounds)                       |       |
+|              | x Urban classification (Urban, Semi-urban, Rural)    |       |
+| GLSS3--GLSS6 | Region-based (10 administrative regions from GLSS3)  |   ~10 |
+| GLSS7        | 10 administrative regions x urban/rural              |    20 |
+
+*/Corrected 2026-09-06./*  The GLSS7 row previously read "possibly finer
+in later rounds" with a count of =~10=.  That hedge is now resolved
+against the round's own Main Report, which was acquired for this purpose
+(=2016-17/Documentation/GLSS7 Main Report.pdf=, Appendix, "Sample design
+and implementation"):
+
+#+begin_quote
+The GLSS7 was stratified sample selected in two stages from the sampling
+frame.  Stratification was achieved by classifying all the EAs into the ten
+administrative regions (domains) and further stratified each region into
+urban and rural areas; in total, 20 sampling strata were created.
+#+end_quote
+
+*The =strata= column this library serves for GLSS7 carries only the
+region -- 10 values, the region names -- so it is HALF the design
+stratum.*  The other half is the separate =Rural= column, so the design
+stratum is recoverable as =(strata, Rural)= but is not what =strata=
+alone denotes.  Anything computing design-based standard errors from
+=strata= alone is using 10 strata where the design has 20.
+
+*** GLSS7 sample design, from the Main Report
+
+- Two-stage stratified.  First stage: *1,000 EAs* (PSUs) from the 2010
+  PHC frame, allocated to the 10 regions by stratified systematic PPS;
+  *438 urban and 562 rural*.  Second stage: a full household listing in
+  each selected EA, then *15 households per EA* by equal-probability
+  systematic selection -- a target of *15,000 households* (14,009
+  achieved and served here).
+- *Why the weights range eightfold, and why unweighted counts overstate
+  the young.*  The allocation is driven by a PER-DOMAIN precision
+  target, not by population share:
+
+  #+begin_quote
+  The computation yielded an average sample size of 1,500 households as the
+  minimum number of interviews required for each domain in order to measure
+  the proportion of persons under the poverty line accurately at 5%
+  significance level.  For the ten main domains, the total size became 15,000.
+  #+end_quote
+
+  So every region receives ~1,500 households irrespective of its
+  population, and the small northern regions are heavily over-sampled.
+  Measured on the served data: mean weight runs *0.23 (Upper West) to
+  1.84 (Ashanti)*, and the over-sampled strata are precisely the ones
+  with the largest households and the youngest people -- Northern has
+  mean household size 6.2 and 46.1% under 15, against Greater Accra's
+  3.4 and 33.3%.  The sample is *57.0% rural*; weighted it is *44.0%*.
+  An unweighted GLSS7 pyramid therefore overstates children by
+  construction of the design, not by any defect.
+*** GLSS7 weights: the structure, documented AND verified
+
+The Main Report's "Computation of Weights" gives the formula, and it
+names two DIFFERENT household counts per EA:
+
+- =M_hi=  = number of *2010 Population Census* households in EA /i/ of stratum /h/
+- =M_hi*= = number of households *listed* in EA /i/ of stratum /h/ before fieldwork
+
+First stage is PPS on the CENSUS size; the second stage takes =b= = 15
+households from the LISTED households.  So the expansion factor carries
+a =M_hi* / M_hi= term -- six years of differential EA growth between the
+2010 frame and the 2016-17 listing.  The report is explicit that this is
+not a self-weighting design:
+
+#+begin_quote
+The GLSS7 was not a self-weighting sample design because disproportionately
+larger samples from regions with smaller populations were drawn.
+#+end_quote
+
+*Verified against the weights this library serves* (1,000 clusters):
+
+| claim | source | served data |
+|-------+--------+-------------|
+| weight constant within an EA | PPS + fixed take | within-cluster CV = *0.00e+00*, all 1,000 |
+| EAs wholly urban or wholly rural | 20-strata design | *0 of 1,000* clusters mix |
+| =a11= = 41 urban EAs, Western | report, verbatim | *41* |
+| =a12= = 57 rural EAs, Western | report, verbatim | *57* |
+| 438 urban / 562 rural EAs | report | 439 / 561 -- *one EA differs* |
+
+Sequential variance decomposition of log(cluster weight): region *62.6%*,
++ urban/rural within region *1.6%*, + cluster *35.8%*, + household *0.0%*.
+
+Two things follow that matter for use:
+
+1. *The urban/rural factor is region-specific, not separable.*  The
+   urban-minus-rural log-weight gap runs from *-0.009 (Ashanti)* to
+   *+0.446 (Northern)*; double-centring the 10x2 table leaves an
+   interaction of 11% of its magnitude.  Model it as 20 free cells, not
+   as region x a common urban effect.
+2. *The 36% cluster term is frame drift, not noise.*  Under textbook PPS
+   with a fixed take the weight is constant within stratum; here the
+   within-stratum sd of log weight is *0.483* (up to *54.6x* max/min
+   inside one stratum).  Non-response does not explain it -- the
+   achieved take varies 8-15 (mean 14.01) but correlates with the
+   residual at only *-0.150*, and multiplying weight by the achieved
+   count moves the dispersion 0.4829 -> 0.4764.  What remains implies
+   =M*/M= drift with a log sd of *0.476*: a typical EA's listed
+   household count differs from its 2010 census count by a factor of
+   *~1.61*.  Greater Accra's RURAL stratum is the most dispersed (sd
+   0.836), which is what one expects of EAs that urbanised after 2010.
+
+- The report also carries the *institutional-population exclusion*
+  statement that =population.yml= records as =exclusions: NOT FOUND=
+  (its note names acquiring this report as the concrete next step).
+  =population.yml= is GENERATED -- update
+  =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= and re-run
+  =scripts/promote_population_records.py=; do not hand-edit it.
 
 ** Weights
 
