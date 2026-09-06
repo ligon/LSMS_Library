@@ -4353,7 +4353,9 @@ class Country:
                     "    target column of ``conversion_factors.org`` (e.g.\n"
                     "    ``'PPP-2017'``, ``'FX'``, ``'USD-real-2017'``).  Mutually\n"
                     "    exclusive with ``currency``.  Pre-reform redenomination\n"
-                    "    waves and missing factors yield ``NaN``.  See\n"
+                    "    waves convert on contemporaneous old-currency rows; a\n"
+                    "    country or date absent from the factor table, or a\n"
+                    "    blank cell, yields ``NA`` with a warning.  See\n"
                     "    :func:`lsms_library.conversion.convert`.\n"
                 )
             method.__doc__ = "".join(doc_parts)
