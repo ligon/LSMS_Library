@@ -167,13 +167,18 @@ matrix-coverage: setup
 # attribute-access time, so mkdocstrings cannot see them), and public
 # machinery with no call site (invisible precisely because nothing calls
 # it yet).  --strict makes the kwarg half fatal, which is what CI wants.
-api-audit: setup
+# NOT `: setup`.  These need the library importable, never a reinstall, and
+# `setup` reruns `poetry install` whenever pyproject.toml is newer than
+# .make/setup.stamp -- which on a Savio node writes into a READ-ONLY squashfs
+# venv (.venv -> /local/jobNNN/venv_img) and hangs.  Cost of learning that:
+# one `make api-audit` left running for 12 hours.
+api-audit:
 	$(POETRY) run python scripts/api_surface_audit.py $(if $(STRICT),--strict)
 
 # Regenerate docs/guide/data-methods.md from the live docstrings.  The page
 # is generated so it cannot drift from country.py's doc_parts; commit the
 # result.  tests/test_api_discoverability.py fails when it is stale.
-docs-gen: setup
+docs-gen:
 	$(POETRY) run python scripts/gen_data_method_docs.py
 
 clean:
