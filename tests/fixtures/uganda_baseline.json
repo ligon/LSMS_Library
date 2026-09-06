@@ -1002,7 +1002,7 @@
       "revenue",
       "wagebill"
     ],
-    "content_hash": "1f03ec635b2d8c0b8312b5aecc0406b36e3981eb44c05210d4d5054c6cdd5638",
+    "content_hash": "db49477cdaa1666a966fe163a5d62c48ed895c9eeb7ef4453bae1cc921115421",
     "dtypes": {
       "losses": "float64",
       "materials": "float64",
@@ -1016,7 +1016,7 @@
       "i"
     ],
     "shape": [
-      78040,
+      13935,
       6
     ]
   },

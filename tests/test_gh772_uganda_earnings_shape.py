@@ -152,6 +152,46 @@ class TestEarningsPanel:
         assert len(panel) == sum(len(f) for f in frames.values())
 
 
+class TestEnterpriseIncomePanel:
+    """The same defect, in the sibling table that shares the idiom.
+
+    ``enterprise_income`` had no naming defect, so nothing in the suite ever
+    reported it, but its cross product was larger: 78,040 rows of which
+    64,105 (82.1%) were entirely null, against 13,935 real observations.
+
+    It mattered in normal use because ``income.py`` names this table as a
+    Makefile prerequisite.  Building ``income`` regenerated
+    ``var/enterprise_income.parquet`` through the country script, while a
+    direct ``enterprise_income()`` call on a cache lacking it went through
+    the framework's wave concatenation and returned 13,935 -- the same API
+    call answering two ways depending on cache provenance.
+    """
+
+    def test_no_cross_product_and_no_null_rows(self, tmp_path, monkeypatch):
+        _load_uganda_module()
+        rng = np.random.default_rng(7)
+        ids = [f"hh{k:05d}" for k in range(500)]
+        cols = ["revenue", "wagebill", "materials", "otherexpense",
+                "profits", "losses"]
+        frames = {}
+        for n, t in enumerate(WAVES):
+            hh = sorted(rng.choice(ids, size=60 + 5 * n, replace=False))
+            frames[t] = pd.DataFrame(
+                rng.integers(0, 900, (len(hh), len(cols))).astype(float),
+                index=pd.Index(hh, name="j"),   # wave scripts label it 'j'
+                columns=cols,
+            )
+        sources = {f"../{t}/_/enterprise_income.parquet": f
+                   for t, f in frames.items()}
+        out = _run_script("enterprise_income.py", sources, tmp_path, monkeypatch)
+        panel = out["../var/enterprise_income.parquet"]
+
+        assert list(panel.index.names) == ["t", "i"]
+        assert list(panel.columns) == cols
+        assert len(panel) == sum(len(f) for f in frames.values())
+        assert not panel.isna().all(axis=1).any(), "phantom all-null rows"
+
+
 class TestIncomeAlignment:
     """`income` must not depend on one source padding the other."""
 

@@ -1373,22 +1373,54 @@ country table against the sum of its own wave parquets:
 coverage snapshot digit for digit (1467 / 2889 / 2618 / 2805 / 3119 / 3305 /
 3180 / 3064).
 
-*=enterprise_income= is still dense -- confirmed, not inferred.*  64 105 of
-its 78 040 rows (*82.1 %*) are entirely null.  It has no naming defect, so
-nothing in the test suite reports it.  It wants the same =pd.concat= rewrite.
+=enterprise_income= was dense in exactly the same way -- 64 105 of its 78 040
+rows (*82.1 %*) entirely null -- and *is fixed here too*, by the same
+=pd.concat= rewrite.  It carried no naming defect, so nothing in the suite
+ever reported it.
 
-*=assets= is NOT dense, and the reason is its own puzzle.*  It measures 1.00x
-with zero all-null rows despite =_/assets.py= using the identical =stack()= /
-dict / =stack()= idiom -- because *the served table is not that script's
-output at all*.  =assets.py= writes a column named =assets= indexed
-=(i, t, m)=; =var/assets.parquet= holds a column named =Value= indexed
-=(t, i, j)=, which is exactly the wave parquets concatenated.  The bare
-=!make= tag desugars to ={materialize: make}= (=yaml_utils._construct_make=),
-identical to the =materialize: make= that =earnings= uses and that *did* run
-its script -- so this is not a config difference.  Either =assets.py= is dead
-code or the framework is silently serving a wave concatenation in its place.
-*Recorded as an open question, deliberately not chased here*; it wants its own
-issue, because whichever answer is true is worth knowing corpus-wide.
+** There are TWO builders for a country table, and they can disagree
+
+The =assets= row above (1.00x, despite =_/assets.py= using the identical
+idiom) is not luck.  Chasing it turned up the thing that actually matters,
+and it is bigger than =earnings=:
+
+*A country-level =_/{table}.py= is NOT what =Country(...).{table}()= runs.*
+=country.py='s =load_from_waves= loops the waves calling =run_make_target(...,
+wave=w)= and *concatenates the wave parquets*; the country script is reached
+only through =country_fallback = run_make_target(method_name, wave=None)=,
+which fires *only when no wave produced anything*.  Verified by planting a
+=raise= at the top of =_/earnings.py=: =Country('Uganda').earnings()= returned
+22 447 rows without tripping it.  Under =LSMS_BUILD_BACKEND=make= the same
+call raises the sentinel -- so the backend switch changes *which builder runs*,
+not merely how it is scheduled.
+
+*The Makefile reaches the country scripts by prerequisite, so this is not a
+corner case.*  =income= has no wave-level scripts, so it always falls through
+to make -- and the =income.parquet= target lists =enterprise_income.parquet=
+and =earnings.parquet= as prerequisites.  Building =income= therefore rewrites
+both through their country scripts.  Measured, before the fix in this entry:
+
+| =Country('Uganda').enterprise_income()=, cache without it | *13 935* rows |
+| the same call, after anything built =income=              | *78 040* rows |
+
+*Same API call, two answers, decided by cache provenance.*  That is how
+GH #772 reached the reporter as 129 160 rows: the =var/earnings.parquet= on
+that machine had been written by the Makefile chain, not by the wave
+concatenation.  It is also why =assets= reads clean -- nothing had triggered
+=_/assets.py= recently, so what is served is the wave concatenation
+(=Value=, =(t, i, j)=), not the script's output (=assets=, =(i, t, m)=).
+Those two disagree in *column name and index*, so whichever wrote last wins.
+
+The bare =!make= tag desugars to ={materialize: make}=
+(=yaml_utils._construct_make=), identical to what =earnings= declares, so
+none of this is a config difference between the tables.
+
+*Not fixed here, because the fix is a design decision, not a patch*: which
+builder is authoritative?  Filed as *GH #788*.  Fixing the two Uganda
+scripts (this entry) makes the two builders *agree* for =earnings= and
+=enterprise_income= -- both now deliver 22 447 and 13 935 by either path,
+verified -- but that is convergence by hand, one table at a time, and
+=assets= still disagrees with its own script.
 
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
