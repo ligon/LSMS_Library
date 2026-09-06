@@ -168,6 +168,58 @@ Two things follow that matter for use:
    *~1.61*.  Greater Accra's RURAL stratum is the most dispersed (sd
    0.836), which is what one expects of EAs that urbanised after 2010.
 
+*** The stale-frame problem, and what it costs (NOT discussed in the report)
+
+=M_hi*= is observed only for EAs that were *selected on =M_hi=*, and
+=M_hi= is the 2010 census count.  An EA that grew faster than its
+stratum since 2010 was therefore selected with too low a probability at
+the first stage.  Three consequences, only the first of which the
+weights repair:
+
+1. *Bias: repaired.*  The =M*/M= term in the expansion factor is exactly
+   the Horvitz-Thompson correction for the realised selection
+   probability, so totals and means stay design-unbiased.
+2. *Efficiency: not repaired, and the cost is large.*  Under-selected
+   fast-growing EAs carry correspondingly large weights, and variable
+   weights cost precision.  Kish =deff_w = 1 + CV^2(w)=, measured:
+
+   | weight variation | deff_w | effective n |
+   |------------------+--------+-------------|
+   | all households (total) |  1.835 | 54% of nominal |
+   | *within stratum only*  | *1.409* | *~71%* |
+
+   The between-stratum part is a deliberate trade -- it buys the
+   per-domain poverty precision the allocation was designed for.  The
+   *within*-stratum part is frame drift and buys nothing: roughly *29%
+   of the effective sample* spent on the frame being six years old.
+   Implied growth ratios run x0.56 (p10) to x1.75 (p90), one EA at
+   *x10.2* of its stratum median; the residual is mildly right-skewed
+   (+0.13).
+3. *Coverage: NOT repairable by weighting.*  An EA created after the
+   2010 PHC has =M_hi = 0=, hence first-stage selection probability
+   zero, and cannot enter the sample at all.  No weight fixes a zero
+   probability.  This falls precisely on the newest peri-urban
+   settlement -- the fastest-growing part of the population -- and is a
+   coverage gap, not an efficiency loss.  Consistent with the measured
+   pattern that *Greater Accra's RURAL stratum is the most dispersed*
+   (within-stratum sd 0.836).
+
+Also note the observed =M*/M= distribution is *not* the population
+distribution of EA growth: EAs enter the sample with probability
+proportional to their *2010* size, so the growth we can see is
+size-biased on the stale measure.  If growth is concentrated in EAs that
+were small in 2010, the 0.483 figure understates true dispersion --
+plausible but *unverified here*, since =M= and =M*= are not in the
+served data (only their ratio, up to a stratum constant, via the
+weight).
+
+*The Main Report does not discuss any of this.*  Its only frame
+"update" is =an update of information on identification of the 216
+administrative districts defined after the 2010 PHC= -- district
+identification, not the EA list.  There is no mention of new EAs, frame
+ageing, or the precision cost.  Treat the above as this repository's
+analysis, not as a claim sourced to GSS.
+
 - The report also carries the *institutional-population exclusion*
   statement that =population.yml= records as =exclusions: NOT FOUND=
   (its note names acquiring this report as the concrete next step).
