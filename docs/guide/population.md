@@ -42,15 +42,38 @@ ll.Country('Ethiopia').population['2011-12'].universe_tag
 # 'rural-and-small-town'
 
 df = ll.Country('Ethiopia').household_roster()
-df.attrs['population']['Ethiopia']['2011-12']['exclusions']
+df.attrs['population']['Ethiopia']['2011-12'].exclusions
 # the verbatim exclusion clauses from the ESS sampling appendix
 ```
+
+**`Country(...).population` and `df.attrs['population']` return the same type.**
+Until #603 the property gave you a `PopulationRecord` and `attrs` gave you a
+plain `dict` of the same values, so `rec.universe_tag` worked on one and
+`rec['universe_tag']` on the other. Both spellings now work on both, and an
+optional field that this wave does not have reads as `None` through the
+attribute rather than raising:
+
+```python
+rec = df.attrs['population']['Ethiopia']['2011-12']
+rec.universe_tag == rec['universe_tag']   # True
+rec.documented_as                         # None -- not a KeyError
+dict(rec)                                 # a plain dict, if you want one
+```
+
+`PopulationRecord` is an **immutable `dict` subclass**, which is what lets all
+of that be true at once. It is a mapping, so `json.dumps` and therefore
+`df.to_parquet()` still work on a frame that carries it; it compares **by
+value**, which is what pandas propagates `attrs` on (see the box below); and it
+compares equal to the plain dict an older parquet reads back as, so a frame
+built today and a frame restored from a pre-#603 parquet still agree. It
+refuses mutation because `Country.population` is cached and the same object is
+handed to every reader — build a new record, or take `dict(record)`.
 
 `df.attrs['population']` has the same shape from `Country(...)` and from
 `Feature(...)`:
 
 ```python
-{country: {wave: {...record...}}}
+{country: {wave: PopulationRecord}}
 ```
 
 `df.attrs['population_resolution']` says how the waves were matched: `exact`
@@ -72,6 +95,14 @@ for a frame with no `t` axis or with `t` values that are not wave labels.
 > across explicitly, or give both frames the same record. See `CLAUDE.md`,
 > "Panel ID Transitive Chains and the `attrs` Flag", for the measured table and
 > the bug this hazard already caused.
+>
+> One in-library merge used to be cited here and in `CLAUDE.md` as the example
+> of the *preserving* branch: `Country._join_v_from_sample`. **Re-measured
+> 2026-09-06, it is not** — `attach_population` runs 143 lines *after* the
+> v-join inside the same `_finalize_result`, so the left frame has no
+> population record at merge time and `sample()` does. It is a disagreeing
+> merge; the record arrives afterwards from `attach`. Nothing about the rule
+> changed, only the example.
 
 ## The three fields, and why they are inseparable
 

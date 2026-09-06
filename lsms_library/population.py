@@ -57,9 +57,7 @@ makes two 'nationally representative' surveys represent different populations."
 
 from __future__ import annotations
 
-import dataclasses
 import warnings
-from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping
@@ -129,34 +127,140 @@ class PopulationHeterogeneityWarning(UserWarning):
     """
 
 
-@dataclass(frozen=True)
-class PopulationRecord:
+class PopulationRecord(dict):
     """What one ``(country, wave)`` cell's documentation says it represents.
 
     The three fields that must travel together are the first three, and the
     class refuses to be built without them (see :meth:`from_config`).  Every
     ``*_statement`` / ``exclusions`` / ``notes`` string is a verbatim
     transcription of survey documentation, sic spellings included.
+
+    Why this is a ``dict`` subclass and not a ``@dataclass(frozen=True)``
+    ---------------------------------------------------------------------
+    It used to be a frozen dataclass, and ``attach`` put ``record.to_dict()``
+    -- a plain ``dict`` -- on ``df.attrs``.  So ``Country(...).population[w]``
+    gave you ``rec.universe_tag`` and ``df.attrs['population'][c][w]`` gave you
+    ``rec['universe_tag']``, and neither spelling worked on the other object.
+    @ligon asked for the record itself in ``attrs``.
+
+    Putting a frozen dataclass there does not work, and the reason is measured
+    rather than aesthetic: ``pandas.io.parquet`` serialises ``df.attrs`` with a
+    bare ``json.dumps`` at write time (pandas 3.0.2, ``io/parquet.py:193``), and
+    ``pyarrow.pandas_compat`` does the same and warns.  A dataclass in ``attrs``
+    therefore turns any user's ``df.to_parquet()`` on an API frame into
+    ``TypeError: Object of type PopulationRecord is not JSON serializable``.
+    That is a regression a metadata annotation has no business causing -- the
+    same principle that makes :func:`attach` swallow its own exceptions.
+
+    A ``dict`` subclass satisfies every constraint at once:
+
+    * ``json.dumps`` accepts it (the C encoder tests ``isinstance(o, dict)``),
+      so ``to_parquet`` keeps working;
+    * ``rec['universe_tag']`` keeps working, so no existing caller breaks;
+    * ``rec.universe_tag`` now works on the object in ``attrs`` too;
+    * equality is ``dict`` equality, i.e. **by value** -- which is the
+      load-bearing property, because pandas propagates ``attrs`` only when
+      every input compares equal (``core/generic.py``: ``obj.attrs == attrs``).
+      A record that compared by identity would silently start dropping
+      ``attrs`` on merges that preserve them today.  It also means a record
+      compares equal to the plain dict a pre-existing parquet round-trips back
+      as, so old and new frames still agree.
+
+    What it gives up, and what replaces it: the dataclass's immutability.  The
+    mutating ``dict`` methods are therefore overridden to raise -- this matters
+    because :func:`population_records` is ``lru_cache``d, so a mutated record
+    would poison every later reader -- and ``__hash__`` is restored, which a
+    ``dict`` subclass otherwise loses.  ``__reduce__`` is defined because the
+    default ``dict``-subclass reconstruction path replays items through
+    ``__setitem__``, which the immutability guard rejects; without it,
+    ``copy.deepcopy`` would fail, and pandas deepcopies ``attrs`` on *every*
+    propagation.
+
+    Absent optional fields are dropped from the mapping (as ``to_dict()``
+    always did, so ``attrs`` content is byte-identical to before), but reading
+    one as an *attribute* returns ``None`` rather than raising -- so
+    ``rec.documented_as`` answers the question instead of the caller having to
+    know whether the key is there.
     """
 
-    country: str
-    wave: str
-    universe_tag: str
-    source_type: str
-    confidence: str
-    survey: str | None = None
-    language: str | None = None
-    source_file: str | None = None
-    locator: str | None = None
-    population_statement: str | None = None
-    exclusions: str | None = None
-    translation: str | None = None
-    notes: str | None = None
-    #: The label the source document used, when it differs from the API wave
-    #: label -- Nigeria's post-planting/post-harvest rounds (``2010Q3``,
-    #: ``2011Q1``) both derive from the doc's ``2010-11`` row.
-    documented_as: str | None = None
-    record_source: str | None = None
+    #: Every field a record may carry, in declaration order.  Replaces
+    #: ``dataclasses.fields()``; the two readings must not drift, so there is
+    #: only one.
+    _FIELDS: tuple[str, ...] = (
+        "country", "wave", "universe_tag", "source_type", "confidence",
+        "survey", "language", "source_file", "locator",
+        "population_statement", "exclusions", "translation", "notes",
+        # The label the source document used, when it differs from the API wave
+        # label -- Nigeria's post-planting/post-harvest rounds (``2010Q3``,
+        # ``2011Q1``) both derive from the doc's ``2010-11`` row.
+        "documented_as", "record_source",
+    )
+    #: The five without which a record is not a record.  ``universe_tag`` alone
+    #: is an editorial reading presented as a fact; see the module docstring.
+    _REQUIRED: tuple[str, ...] = (
+        "country", "wave", "universe_tag", "source_type", "confidence",
+    )
+
+    __slots__ = ()
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        data = dict(*args, **kwargs)
+        unknown = sorted(set(data) - set(self._FIELDS))
+        if unknown:
+            raise TypeError(
+                f"PopulationRecord got unexpected field(s) {unknown}; "
+                f"known fields are {list(self._FIELDS)}"
+            )
+        missing = [f for f in self._REQUIRED if data.get(f) is None]
+        if missing:
+            raise TypeError(
+                f"PopulationRecord is missing required field(s) {missing}"
+            )
+        # ``dict.__init__`` is C-level and does not route through the
+        # overridden ``__setitem__``, so this is the one legal write.
+        dict.__init__(self, {k: data[k] for k in self._FIELDS if data.get(k) is not None})
+
+    # -- attribute access, the whole point of the change -------------------
+    def __getattr__(self, name: str) -> Any:
+        if name in self._FIELDS:
+            return self.get(name)
+        raise AttributeError(
+            f"{type(self).__name__!r} object has no attribute {name!r}"
+        )
+
+    def __repr__(self) -> str:
+        inner = ", ".join(f"{k}={self[k]!r}" for k in self._FIELDS if k in self)
+        return f"PopulationRecord({inner})"
+
+    # -- immutability ------------------------------------------------------
+    def _immutable(self, *args: Any, **kwargs: Any):
+        raise TypeError(
+            "PopulationRecord is immutable: it is returned from an lru_cached "
+            "loader and rides on df.attrs, so a mutation would be visible to "
+            "every other reader. Build a new record, or take dict(record)."
+        )
+
+    __setitem__ = _immutable
+    __delitem__ = _immutable
+    update = _immutable
+    setdefault = _immutable
+    pop = _immutable
+    popitem = _immutable
+    clear = _immutable
+    __ior__ = _immutable
+
+    def __hash__(self) -> int:                     # dict sets this to None
+        return hash(tuple(sorted(self.items())))
+
+    def __reduce__(self):
+        """Pickle / deepcopy via ``__init__``, not by replaying ``__setitem__``.
+
+        The default ``dict``-subclass reconstruction assigns items one by one,
+        which the immutability guard above rejects.  pandas deepcopies
+        ``df.attrs`` on every propagation, so getting this wrong would break
+        every operation that preserves ``attrs`` -- loudly, but everywhere.
+        """
+        return (self.__class__, (dict(self),))
 
     @classmethod
     def from_config(cls, country: str, wave: str,
@@ -185,8 +289,7 @@ class PopulationRecord:
                     f"{country}/{wave}: {field}={value!r} is not in the "
                     f"controlled vocabulary {sorted(allowed)}"
                 )
-        known = {f.name for f in dataclasses.fields(cls)}
-        kwargs = {k: v for k, v in block.items() if k in known}
+        kwargs = {k: v for k, v in block.items() if k in cls._FIELDS}
         kwargs.pop("country", None)
         kwargs.pop("wave", None)
         return cls(country=country, wave=wave, **kwargs)
@@ -208,13 +311,15 @@ class PopulationRecord:
         )
 
     def to_dict(self) -> dict[str, Any]:
-        """Plain-dict form -- what goes into ``df.attrs``.
+        """Plain-``dict`` copy.
 
-        ``attrs`` values are stored as plain types throughout this library so
-        that an unknown downstream consumer can serialize a frame's metadata
-        without needing to import us.
+        Kept for callers that want a type with no library dependency at all --
+        and because ``dict(record)`` and ``record.to_dict()`` should not mean
+        different things.  Since v0.10 the record *is* a mapping with exactly
+        this content, so ``attrs`` carries the record itself and this is no
+        longer what :func:`attach` stores.
         """
-        return {k: v for k, v in dataclasses.asdict(self).items() if v is not None}
+        return dict(self)
 
 
 # ---------------------------------------------------------------------------
@@ -504,8 +609,17 @@ def attach(df, country: str) -> None:
     Shape -- identical from ``Country(...)`` and from ``Feature(...)`` so a
     consumer writes one piece of code::
 
-        df.attrs['population'] == {country: {wave: {...record...}}}
+        df.attrs['population'] == {country: {wave: PopulationRecord}}
         df.attrs['population_resolution'] == {country: 'exact'}
+
+    The values are :class:`PopulationRecord` objects, so ``rec.universe_tag``
+    and ``rec['universe_tag']`` both work here and in ``Country.population``.
+    They are ``dict`` subclasses carrying exactly the content the old
+    ``to_dict()`` produced, which is what keeps three things true at once:
+    ``json.dumps`` still accepts ``attrs`` (so ``df.to_parquet()`` works),
+    every existing subscript caller still works, and a record compares equal
+    to the plain dict an older parquet round-trips back as -- and equality is
+    what pandas propagates ``attrs`` on.  See the class docstring.
 
     Never raises.  This runs inside ``Country._finalize_result``, on every read
     of every table; a metadata annotation that can break a data call is worse
@@ -516,7 +630,7 @@ def attach(df, country: str) -> None:
         if not recs:
             return
         existing = dict(df.attrs.get(ATTRS_KEY) or {})
-        existing[country] = {w: r.to_dict() for w, r in sorted(recs.items())}
+        existing[country] = {w: r for w, r in sorted(recs.items())}
         df.attrs[ATTRS_KEY] = existing
         res = dict(df.attrs.get(ATTRS_RESOLUTION_KEY) or {})
         res[country] = how
@@ -556,14 +670,20 @@ def merge_attrs(target, sources: Iterable[Mapping[str, Any]]) -> None:
 
 
 def records_from_attrs(df) -> list[PopulationRecord]:
-    """Rebuild typed records from a frame's ``attrs`` (the inverse of
-    :func:`attach`).  Used by the pooling check and by callers who want the
-    dataclass rather than the dict."""
+    """Typed records from a frame's ``attrs`` (the inverse of :func:`attach`).
+
+    Accepts both shapes deliberately.  Since v0.10 :func:`attach` stores
+    :class:`PopulationRecord` objects, but a frame whose ``attrs`` survived a
+    ``to_parquet`` / ``read_parquet`` round trip carries **plain dicts** --
+    pandas serialises ``attrs`` through ``json`` and reads them back with
+    ``json.loads``, which has no way to know what class they were.  A
+    ``PopulationRecord`` *is* a mapping, so one code path covers both.
+    """
     out: list[PopulationRecord] = []
+    known = set(PopulationRecord._FIELDS)
     for country, waves in (df.attrs.get(ATTRS_KEY) or {}).items():
         for wave, block in waves.items():
-            known = {f.name for f in dataclasses.fields(PopulationRecord)}
-            kwargs = {k: v for k, v in block.items() if k in known}
+            kwargs = {k: v for k, v in dict(block).items() if k in known}
             kwargs["country"] = country
             kwargs["wave"] = wave
             out.append(PopulationRecord(**kwargs))
