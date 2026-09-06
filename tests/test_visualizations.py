@@ -171,3 +171,47 @@ def test_explicit_max_age_still_honoured():
 def test_bad_max_age_string_rejected():
     with pytest.raises(ValueError, match="max_age must be an int or 'auto'"):
         population_pyramid(_tailed_roster(), weights=False, max_age="tall")
+
+
+def test_ghost_draws_a_second_unfilled_series():
+    """`ghost=` overlays a comparison weighting as an outline, not a fill."""
+    r = _roster()
+    ax = population_pyramid(r, weights="w2", ghost=False)
+    filled = [p for p in ax.patches if p.get_facecolor()[3] > 0]
+    outline = [p for p in ax.patches if p.get_facecolor()[3] == 0]
+    assert filled and outline, "expected both a filled and an outlined series"
+    assert len(outline) == len(filled)
+
+
+def test_ghost_is_absent_unless_asked():
+    ax = population_pyramid(_roster(), weights=False)
+    assert not [p for p in ax.patches if p.get_facecolor()[3] == 0]
+
+
+def test_ghost_coincides_when_the_weight_is_constant():
+    """A self-weighting wave must show outline and fill on top of each other.
+
+    GhanaLSS GLSS1-3 are self-weighting -- weight is a genuine constant 1.0 --
+    so `weights=True, ghost=False` should draw two identical series.  If the
+    ghost silently used the wrong column this would diverge.
+    """
+    r = _roster()
+    r = r.assign(const=1.0)
+    ax = population_pyramid(r, weights="const", ghost=False)
+    filled = sorted(abs(p.get_width()) for p in ax.patches
+                    if p.get_facecolor()[3] > 0)
+    outline = sorted(abs(p.get_width()) for p in ax.patches
+                     if p.get_facecolor()[3] == 0)
+    assert filled == pytest.approx(outline)
+
+
+def test_ghost_basis_is_named_in_the_subtitle():
+    ax = population_pyramid(_roster(), weights="w2", ghost=False)
+    assert "outline: unweighted" in _all_text(ax)
+
+
+def test_ghost_rejects_a_bad_spec():
+    with pytest.raises(TypeError, match="ghost= takes"):
+        population_pyramid(_roster(), weights=False, ghost=3.7)
+    with pytest.raises(KeyError, match="ghost="):
+        population_pyramid(_roster(), weights=False, ghost="nope")

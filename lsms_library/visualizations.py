@@ -18,9 +18,14 @@ invites a reader to treat it as national.  The caption is not decoration; it
 is the difference between a chart and a misleading chart.
 
 **The weighting basis is stated, never implied.**  Weights are normalised to
-within-wave mean 1 at API time, so a weighted and an unweighted pyramid have
-the same total and differ only in shape -- which makes the two impossible to
-tell apart by eye.  The subtitle always says which one you are looking at.
+within-wave mean 1 at API time -- but that mean is taken over *households*,
+while a roster is one row per *person*.  The weighted person-total is
+therefore ``sum(size_h * w_h)``, which equals the headcount only when weight
+and household size are uncorrelated, and they are not: GhanaLSS 2016-17 has
+59,864 people but a weighted total of 54,421.5, because larger households
+carry smaller weights.  So weighting moves both the shape *and* the level,
+and neither is announced by the picture.  The subtitle always says which
+basis produced it.
 
 **One wave per pyramid.**  Pooling waves pools universes (see above), so a
 multi-wave frame is not silently concatenated: the most recent wave is drawn
@@ -189,7 +194,8 @@ def _universe(country_name: str | None, wave: str | None) -> str | None:
 
 
 def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
-                       max_age="auto", ax=None, title=None, colors=None):
+                       max_age="auto", ghost=None, ax=None, title=None,
+                       colors=None):
     """Draw an age-sex pyramid for one survey wave.
 
     Parameters
@@ -203,6 +209,13 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
         ``True`` uses the survey's sampling weights, falling back to counts
         with a warning when a country has none.  ``False`` draws counts.  A
         string names a column to weight by.
+    ghost : bool or str, optional
+        Draw a second weighting as a hairline outline over the filled bars,
+        for comparison.  Takes the same values as ``weights``, so the common
+        case is ``weights=True, ghost=False`` -- "weighted, with unweighted
+        ghosted".  The two series differ in level as well as shape (see the
+        module docstring), and both differences are far easier to read as one
+        overlay than as two charts the eye must hold in memory.
     by : str, optional
         Split the pyramid on a category, e.g. ``by='Rural'``.  Looked up on
         the roster, then on ``sample()``.  This is what colour encodes.
@@ -232,6 +245,26 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
     roster, label, cname = _resolve_roster(data, wave)
     wave_used = label.split()[-1] if cname else wave
     df, basis = _attach(roster, cname, weights, by)
+
+    ghost_basis = None
+    if ghost is not None:
+        if ghost is False:
+            df["_g"] = 1.0
+            ghost_basis = "unweighted"
+        elif ghost is True:
+            if "weight" in df.columns and df["weight"].notna().any():
+                df["_g"] = pd.to_numeric(df["weight"], errors="coerce").fillna(0.0)
+                ghost_basis = "weighted"
+            else:
+                df["_g"] = 1.0
+                ghost_basis = "unweighted"
+        elif isinstance(ghost, str):
+            if ghost not in df.columns:
+                raise KeyError(f"ghost={ghost!r} is not a column of this table")
+            df["_g"] = pd.to_numeric(df[ghost], errors="coerce").fillna(0.0)
+            ghost_basis = f"weighted by {ghost}"
+        else:
+            raise TypeError("ghost= takes True, False, a column name, or None")
 
     df = df[df["Sex"].isin(["M", "F"])].copy()
     df["Age"] = pd.to_numeric(df["Age"], errors="coerce")
@@ -289,11 +322,16 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
         if len(groups) < 2:
             groups = groups or [None]
 
-    def totals(sub):
-        t = sub.groupby("_band")["_w"].sum()
-        return np.array([float(t.get(e, 0.0)) for e in edges])
+    def totals(sub, col="_w"):
+        s = sub.groupby("_band")[col].sum()
+        return np.array([float(s.get(e, 0.0)) for e in edges])
 
-    span = max(totals(df[df.Sex == "M"]).max(), totals(df[df.Sex == "F"]).max()) or 1.0
+    span = max(totals(df[df.Sex == "M"]).max(), totals(df[df.Sex == "F"]).max())
+    if ghost is not None:
+        span = max(span,
+                   totals(df[df.Sex == "M"], "_g").max(),
+                   totals(df[df.Sex == "F"], "_g").max())
+    span = span or 1.0
     gutter = span * 0.115          # centre channel that carries the age labels
     h = bin_width * (0.42 if len(groups) > 1 else 0.82)
 
@@ -313,6 +351,21 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
     # Thin the spine labels when the bands are dense -- at bin_width=1 all
     # 60+ of them collide into an unreadable smear.  The top band is always
     # labelled because it is the open-ended one.
+    if ghost is not None:
+        # A hairline outline rather than a second translucent fill: two
+        # alpha-blended fills make a third colour in the overlap and the
+        # reader must decode which layer is which.  An outline is
+        # unambiguous -- where it hugs the bar edge the two agree, where it
+        # stands proud or falls short you read direction and size at once --
+        # and it spends no colour, keeping that channel for `by=`.
+        for sex, sign in (("M", -1), ("F", 1)):
+            vals = totals(df[df.Sex == sex], "_g")
+            ax.barh([e + bin_width / 2 for e in edges],
+                    [sign * v for v in vals], height=bin_width * 0.86,
+                    left=[sign * gutter] * len(edges),
+                    facecolor="none", edgecolor=pal["ink"], linewidth=1.3,
+                    zorder=4)
+
     step = 1 if len(edges) <= 20 else max(1, int(round(5 / bin_width)))
     for k, e in enumerate(edges):
         if e < max_age and k % step:
@@ -351,6 +404,8 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
     ax.set_title(title or label, loc="left", fontsize=12.5, color=pal["ink"],
                  pad=16, fontweight="semibold")
     sub_bits = [f"{n:,} people", basis]
+    if ghost_basis is not None:
+        sub_bits.append(f"outline: {ghost_basis}")
     if bin_width == 1:
         sub_bits.append("single-year bands")
     if oldest > max_age + bin_width:
