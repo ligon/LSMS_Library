@@ -301,6 +301,39 @@ _DVC_LOCK_MARKERS = (
 )
 
 
+def _dvc_timeout(default: int = 1800) -> int:
+    """Seconds to allow a single ``dvc`` write, overridable per environment.
+
+    ``dvc add`` rebuilds its index by READING EVERY ``.dvc`` SIDECAR before it
+    hashes anything, so its floor is set by the repo's sidecar count and the
+    filesystem's metadata latency -- not by the size of the file being added.
+
+    Measured on a Savio compute node against this repo's Lustre checkout:
+    **9,979 sidecars totalling 837 KiB took 632 s to read** -- 63 ms per
+    ~86-byte file, with 8.6 s of CPU against 632 s of wall clock, i.e. almost
+    entirely latency.  The previous hardcoded 600 s was therefore BELOW THE
+    FLOOR: ``dvc add`` could not finish here however long it was left, and the
+    timeout killed it mid-write, orphaning a ``flufl`` lock whose lease is a
+    year long (so nothing would treat it as stale).
+
+    The default is raised and the value made configurable, because the right
+    number is a property of the filesystem, not of the library.  Set
+    ``LSMS_DVC_TIMEOUT`` (seconds); a laptop or local SSD wants far less than a
+    networked parallel filesystem.
+    """
+    raw = os.environ.get("LSMS_DVC_TIMEOUT")
+    if raw:
+        try:
+            v = int(raw)
+            if v > 0:
+                return v
+        except ValueError:
+            pass
+        logger.warning("Ignoring invalid LSMS_DVC_TIMEOUT=%r; using %ds",
+                       raw, default)
+    return default
+
+
 def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
                              base_delay: float = 4.0) -> subprocess.CompletedProcess:
     """Run a ``dvc`` CLI command, retrying only on DVC lock contention.
@@ -1143,7 +1176,7 @@ def push_to_cache(path: str | Path,
         if dvc_add:
             result = _run_dvc_with_lock_retry(
                 [_dvc_cmd(), "add", str(abs_path)],
-                cwd=str(_COUNTRIES_DIR), timeout=600,
+                cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
             )
             if result.returncode != 0:
                 logger.error("dvc add failed: %s", result.stderr.strip())
@@ -1156,7 +1189,7 @@ def push_to_cache(path: str | Path,
         with _s3_writer_credentialpath(remote, _COUNTRIES_DIR / ".dvc"):
             result = _run_dvc_with_lock_retry(
                 push_cmd,
-                cwd=str(_COUNTRIES_DIR), timeout=600,
+                cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
             )
         if result.returncode != 0:
             logger.error("dvc push failed: %s", result.stderr.strip())
@@ -1290,7 +1323,7 @@ def unpushed_blobs(remote: str | None = None,
     if targets:
         cmd += [str(t) for t in targets]
     result = _run_dvc_with_lock_retry(
-        cmd, cwd=str(_COUNTRIES_DIR), timeout=600,
+        cmd, cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
     )
     out = (result.stdout or "").strip()
     if not out:
