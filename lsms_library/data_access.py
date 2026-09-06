@@ -50,6 +50,7 @@ import logging
 import os
 import random
 import re
+import signal
 import subprocess
 import tempfile
 import time
@@ -301,6 +302,169 @@ _DVC_LOCK_MARKERS = (
 )
 
 
+def _dvc_lock_files(dvc_dir: Path) -> set[Path]:
+    """Lock files currently present in ``.dvc/tmp``."""
+    try:
+        return {q for q in (dvc_dir / "tmp").glob("*lock*") if q.is_file()}
+    except OSError:
+        return set()
+
+
+def _any_dvc_process_running() -> bool:
+    """True if any ``dvc`` process is alive, or if we cannot tell.
+
+    Fails safe: "unsure" must mean "do not touch that lock".
+    """
+    try:
+        for entry in Path("/proc").iterdir():
+            if not entry.name.isdigit():
+                continue
+            try:
+                cmdline = (entry / "cmdline").read_bytes()
+            except OSError:
+                continue
+            if b"dvc" in cmdline and b"data_access" not in cmdline:
+                return True
+        return False
+    except OSError:
+        return True
+
+
+def _terminate_dvc(proc: subprocess.Popen, grace: float = 30.0) -> bool:
+    """Stop ``proc`` politely first.  Returns True if SIGKILL was needed.
+
+    ``subprocess.run(timeout=...)`` sends SIGKILL, and that is what orphaned
+    locks here: killed outright, ``dvc`` never runs the cleanup that releases
+    its ``flufl`` lock, and that lock's lease is an mtime a YEAR ahead -- so
+    nothing afterwards treats it as stale and every later write blocks.
+
+    SIGTERM instead, to the whole process group (``dvc`` spawns children), and
+    escalate only if it will not go.
+    """
+    try:
+        pgid = os.getpgid(proc.pid)
+    except OSError:
+        return False
+    try:
+        os.killpg(pgid, signal.SIGTERM)
+    except OSError:
+        pass
+    try:
+        proc.wait(timeout=grace)
+        return False
+    except subprocess.TimeoutExpired:
+        logger.warning("dvc did not exit %.0fs after SIGTERM; sending SIGKILL",
+                       grace)
+        try:
+            os.killpg(pgid, signal.SIGKILL)
+        except OSError:
+            pass
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+        return True
+
+
+def _sweep_orphaned_locks(dvc_dir: Path, before: set[Path]) -> None:
+    """Remove lock files this run created, after a hard kill left them behind.
+
+    Deliberately narrow, and both checks fail safe: only files absent before
+    we started (so a pre-existing lock, or ``rwlock`` -- a normal persistent
+    file -- is never touched), and only when no ``dvc`` process is alive (so a
+    concurrent writer\'s lock is never stolen).
+    """
+    if _any_dvc_process_running():
+        logger.warning("dvc lock(s) may have been orphaned, but another dvc "
+                       "process is running -- leaving them alone")
+        return
+    for q in _dvc_lock_files(dvc_dir) - before:
+        try:
+            q.unlink()
+            logger.warning("removed lock orphaned by our own killed dvc: %s", q)
+        except OSError as exc:
+            logger.warning("could not remove orphaned lock %s: %s", q, exc)
+
+
+def _run_dvc(cmd, *, cwd, timeout) -> subprocess.CompletedProcess:
+    """``subprocess.run`` for dvc, but a timeout does not leave a lock behind.
+
+    The write is NOT made atomic -- no wrapper can make an external process\'s
+    multi-step index update atomic -- but it is now *self-cleaning*: on
+    timeout the child is asked to exit and given the chance to release its
+    lock, and if it must be killed outright, the lock it created is removed.
+    """
+    dvc_dir = Path(cwd) / ".dvc"
+    before = _dvc_lock_files(dvc_dir)
+    proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, text=True,
+                            start_new_session=True)
+    try:
+        out, err = proc.communicate(timeout=timeout)
+        return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+    except subprocess.TimeoutExpired:
+        _terminate_dvc(proc)
+        try:
+            out, err = proc.communicate(timeout=10)
+        except Exception:
+            out, err = "", ""
+        # Sweep on EVERY timeout, not only after SIGKILL.  Measured: dvc does
+        # not release its flufl lock on SIGTERM either -- it exits promptly and
+        # politely and still leaves the lock behind.  Gating the sweep on
+        # "we had to SIGKILL" therefore cleaned up nothing, which a test
+        # forcing a short timeout caught.  Sweeping unconditionally is safe:
+        # if dvc HAD released the lock there is simply nothing new to remove.
+        _sweep_orphaned_locks(dvc_dir, before)
+        raise subprocess.TimeoutExpired(cmd, timeout, output=out, stderr=err)
+
+
+def _dvc_timeout(default: int = 1800) -> int:
+    """Seconds to allow a single ``dvc`` write, overridable per environment.
+
+    ``dvc add`` rebuilds its index by READING EVERY ``.dvc`` SIDECAR before it
+    hashes the file being added, so its cost scales with the repo's sidecar
+    count (~10k here) times the filesystem's per-file metadata latency -- not
+    with the size of the file being added.
+
+    **On a shared parallel filesystem that latency is highly variable, and no
+    fixed timeout is correct.**  Deliberately not quoting a typical duration:
+    the number depends on what every other tenant of the appliance is doing,
+    so any figure recorded here would be a single draw dressed up as a
+    property of the repo.  Illustrative only, both observed in one session
+    against the same unchanged tree: a full walk took roughly twice as long at
+    one moment as at another an hour later, while repeated samples *within*
+    each moment agreed closely.  The between-moment variation is the one that
+    matters and it is not ours to control.
+
+    That is the whole argument for making this configurable rather than
+    picking a better constant.  The previous hardcoded 600 s was comfortably
+    sufficient under light load and impossible under heavy load -- and when it
+    expired it killed ``dvc add`` mid-write, orphaning a ``flufl`` lock whose
+    lease is encoded as an mtime a YEAR in the future, so nothing afterwards
+    treats it as stale.  A too-short timeout does not merely fail; it leaves
+    the repo locked.
+
+    Set ``LSMS_DVC_TIMEOUT`` (seconds) to suit the filesystem in front of you:
+    a laptop or local SSD wants far less than a busy networked one.  An
+    invalid value warns and falls back rather than crashing a write.
+
+    If writes are slow enough to be painful, the durable fix is fewer index
+    walks rather than a longer clock -- :func:`push_to_cache_batch` amortises
+    one rebuild over many files.
+    """
+    raw = os.environ.get("LSMS_DVC_TIMEOUT")
+    if raw:
+        try:
+            v = int(raw)
+            if v > 0:
+                return v
+        except ValueError:
+            pass
+        logger.warning("Ignoring invalid LSMS_DVC_TIMEOUT=%r; using %ds",
+                       raw, default)
+    return default
+
+
 def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
                              base_delay: float = 4.0) -> subprocess.CompletedProcess:
     """Run a ``dvc`` CLI command, retrying only on DVC lock contention.
@@ -315,8 +479,7 @@ def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
     thundering herd of writers waking together.
     """
     sub = cmd[1] if len(cmd) > 1 else "dvc"
-    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
-                            timeout=timeout)
+    result = _run_dvc(cmd, cwd=cwd, timeout=timeout)
     for attempt in range(1, retries + 1):
         if result.returncode == 0:
             return result
@@ -327,8 +490,7 @@ def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
         logger.warning("dvc %s: lock contention (attempt %d/%d); retrying in %.1fs",
                        sub, attempt, retries, delay)
         time.sleep(delay)
-        result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
-                                timeout=timeout)
+        result = _run_dvc(cmd, cwd=cwd, timeout=timeout)
     return result
 
 
@@ -1143,7 +1305,7 @@ def push_to_cache(path: str | Path,
         if dvc_add:
             result = _run_dvc_with_lock_retry(
                 [_dvc_cmd(), "add", str(abs_path)],
-                cwd=str(_COUNTRIES_DIR), timeout=600,
+                cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
             )
             if result.returncode != 0:
                 logger.error("dvc add failed: %s", result.stderr.strip())
@@ -1156,7 +1318,7 @@ def push_to_cache(path: str | Path,
         with _s3_writer_credentialpath(remote, _COUNTRIES_DIR / ".dvc"):
             result = _run_dvc_with_lock_retry(
                 push_cmd,
-                cwd=str(_COUNTRIES_DIR), timeout=600,
+                cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
             )
         if result.returncode != 0:
             logger.error("dvc push failed: %s", result.stderr.strip())
@@ -1290,7 +1452,7 @@ def unpushed_blobs(remote: str | None = None,
     if targets:
         cmd += [str(t) for t in targets]
     result = _run_dvc_with_lock_retry(
-        cmd, cwd=str(_COUNTRIES_DIR), timeout=600,
+        cmd, cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
     )
     out = (result.stdout or "").strip()
     if not out:
