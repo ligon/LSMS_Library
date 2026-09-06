@@ -75,6 +75,38 @@ class UnpriceableRowsWarning(UserWarning):
     """
 
 
+class UnitLabelCollisionWarning(UserWarning):
+    """Two ``u`` spellings that differ only in case got DIFFERENT kg factors.
+
+    ``conversion_to_kgs`` groups by the raw ``u`` label, so ``Calebasse`` and
+    ``calebasse`` are two units; ``_get_kg_factors`` then lower-cases and
+    keeps whichever it merges first.  The winner is deterministic (the
+    inference returns a sorted mapping) but ARBITRARY, and the two factors
+    can differ several-fold.
+
+    Measured over the 19 cached ``food_acquired`` tables (GH #770 review):
+    16 collision groups in 3 countries, and in every one the two factors
+    DIFFER.  Five are INERT -- three ``kg`` and two ``litre``, keys that
+    ``KNOWN_METRIC`` seeds, so neither inferred value is ever used --
+    leaving **11 live groups in 3 countries**: Burkina Faso 7, Malawi 2,
+    Mali 2.  Burkina Faso's ``Calebasse`` 0.35 vs ``calebasse`` 1.432 is
+    4.1x; Mali's ``Unité`` 1.2 vs ``unité`` 0.286 is 4.2x.  Only the live
+    groups warn.
+
+    Panama is NOT in that list, and was the case that surfaced this:
+    ``'Value' -> 0.3489`` and ``'value' -> 2.3405`` was a 6.7x
+    iteration-order accident.  Both spellings are currency-denominated, so
+    GH #770 removes them from the inference and the collision with them --
+    which is why the corpus census above is taken AFTER that fix and still
+    finds 11.
+
+    This warns rather than merging, because merging would CHANGE the served
+    factors for those countries -- a data change, not a diagnostic.  The fix
+    belongs in the country's own unit vocabulary: canonicalise the spelling
+    where the label is minted, exactly as GH #770 did for currency labels.
+    """
+
+
 def _as_float(s):
     """Series -> float64 ndarray with NaN for missing (pd.NA-safe)."""
     return pd.to_numeric(s, errors='coerce').to_numpy(dtype='float64',
@@ -685,15 +717,46 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
 # factor is recoverable per ``(j, t, m)`` from a price source, which is the
 # separate ``source=`` work (Step 2 of #770), not this.
 #
-# Deliberately a hardcoded set, not a detector.  Across the 662 distinct
-# unit labels the corpus holds, only ``value`` qualifies, in GhanaLSS and
-# Panama.  The obvious detector (``Quantity == Expenditure``) tests the
-# SYMPTOM rather than the cause and misses Panama 1997 outright (0.5%
-# there, because 99.1% of those rows carry the undecoded 7.70 sentinel of
-# GH #777) -- recall of 1 of the 2 countries we actually hold.  If a
-# detector is ever founded on the real cause, note that compiled-regex
-# module constants must NOT be used: they land in the hashed import closure
-# and are un-serialisable (GH #780).
+# THE LIBRARY RECOGNISES ONE CANONICAL SENTINEL; COUNTRIES CANONICALISE
+# ONTO IT.  This set is not, and must not become, an enumeration of the
+# corpus's currency-ish labels -- that would be an unbounded blocklist of
+# world currencies running beside a canonical label that already exists.
+# ``'Value'`` IS that label: ``country._RESERVED_U_SENTINELS`` documents it
+# as the marker for LCU-only goods, amounts are in local currency units by
+# default, and ``currency=`` (``lsms_library/currency.py``) is the lever for
+# currency *representation*.  So the NAME of a currency is redundant with
+# the country and the wave and does not belong in a ``u`` label at all.
+#
+# A country whose survey elicits value rather than quantity therefore emits
+# ``u='Value'`` where the label is MINTED -- in its wave script or its
+# ``categorical_mapping.org`` -- and needs no edit here.  Two did exactly
+# that in GH #770: EthiopiaRHS's ``harmonize_unit`` code 30 (was ``Birr``)
+# and Serbia 2007's ``mera == 'dinar'``.  The alternative, adding ``birr``
+# and ``dinar`` here, was proposed and REJECTED.
+#
+# The rename must land where the label is minted, NOT in an API-time
+# categorical mapping: the derived-food dispatch is
+# ``_aggregate_wave_data`` -> ``transform_fn`` -> ``_finalize_result``
+# (``country.py:4155-4161``), so ``conversion_to_kgs`` below sees the RAW
+# ``u`` and an API-time rename would fire after the factor was inferred.
+#
+# Why a set at all, rather than a detector?  The obvious detector
+# (``Quantity == Expenditure``) tests the SYMPTOM rather than the cause, and
+# a survey that elicits value need not follow that convention: Panama 1997
+# is 0.5% (99.1% of those rows carry the undecoded 7.70 sentinel of GH
+# #777) and Serbia's rows carry ``Quantity`` NaN outright.  A sentinel the
+# country declares is checkable; an inferred one is a guess.  If a detector
+# is ever founded on the real cause, note that compiled-regex module
+# constants must NOT be used: they land in the hashed import closure and are
+# un-serialisable (GH #780).
+#
+# (An earlier version of this comment claimed the corpus holds "662 distinct
+# unit labels ... only ``value`` qualifies".  Both halves were false -- the
+# figure is ~1,636 across the four ``u``-bearing tables, and two countries
+# were minting currency labels of their own.  The claim is not corrected
+# here but RETIRED: a count of the corpus rots, whereas "one canonical
+# sentinel, countries canonicalise onto it" is bounded and stays true as
+# countries are added.)
 #
 # Kept in sync with ``lsms_library.country._RESERVED_U_SENTINELS`` (the
 # capital-``V`` spelling of the same concept, GH #361) by
@@ -753,10 +816,15 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     Returns
     -------
     dict[str, float]
-        Mapping of (lowercased) unit label → inferred kg factor.
-        Units already in :data:`KNOWN_METRIC`, units in
-        :data:`_CURRENCY_DENOMINATED_UNITS`, or units that cannot be
-        inferred are absent from the output.
+        Mapping of unit label → inferred kg factor.  Keys are the RAW ``u``
+        label with its case PRESERVED -- the grouping is on the raw label,
+        so ``Calebasse`` and ``calebasse`` come back as two entries with two
+        factors.  (The docstring used to say "(lowercased)", which was
+        false; :func:`_get_kg_factors` is where the lower-casing happens,
+        and it reports the resulting clashes -- see
+        :class:`UnitLabelCollisionWarning`.)  Units already in
+        :data:`KNOWN_METRIC`, units in :data:`_CURRENCY_DENOMINATED_UNITS`,
+        or units that cannot be inferred are absent from the output.
     """
     v = df.copy()
     v = v.replace(0, np.nan)
@@ -984,15 +1052,63 @@ def _get_kg_factors(df, *, volume_as_mass=True):
                 # Inferred factors fill in where known metric doesn't cover.
                 # Currency-denominated labels are already dropped inside
                 # ``conversion_to_kgs``; re-checking here is belt and braces
-                # so a future caller of that function with different
-                # arguments -- or a future inference path -- cannot
-                # reintroduce the key (GH #770).
+                # against a future caller of that function with different
+                # arguments, or a future inference path.
+                #
+                # SCOPE, stated exactly (review NIT 1): this guard is on the
+                # INFERENCE only.  ``factors`` also gets entries from
+                # ``KNOWN_METRIC`` and from the explicit-metric label parser
+                # above, and neither is checked -- a label that both named a
+                # currency and named metric content (``"Value (500g)"``)
+                # would still be given 0.5 by the parser.  No such label
+                # exists in the corpus, so this is a documented gap, not a
+                # live defect; do not read the guard as "the key can never
+                # come back".
+                #
+                # ``inferred`` is keyed on the RAW label, so case variants of
+                # one unit arrive as two entries and the first merged wins.
+                # Report that rather than resolving it silently: see
+                # :class:`UnitLabelCollisionWarning` for why merging would be
+                # a data change.  ``won`` records the label actually used.
+                seeded = frozenset(factors)   # KNOWN_METRIC + label parser
+                won: dict[str, tuple[str, float]] = {}
+                collisions: dict[str, list[tuple[str, float]]] = {}
                 for unit, factor in inferred.items():
                     key = unit.lower()
                     if key in _CURRENCY_DENOMINATED_UNITS:
                         continue
-                    if key not in factors and np.isfinite(factor) and factor > 0:
+                    if not (np.isfinite(factor) and factor > 0):
+                        continue
+                    # Only a key the INFERENCE decides can be a collision:
+                    # if KNOWN_METRIC or the explicit-metric parser already
+                    # seeded it, neither inferred value is used and the
+                    # disagreement is inert (every corpus ``kg`` collision is
+                    # this case).  Reporting those would be noise.
+                    decided_here = key not in seeded
+                    if decided_here and key in won and won[key][1] != factor:
+                        collisions.setdefault(key, [won[key]]).append(
+                            (unit, float(factor)))
+                    if key not in factors:
                         factors[key] = factor
+                    if decided_here:
+                        won.setdefault(key, (unit, float(factor)))
+                if collisions:
+                    detail = '; '.join(
+                        f"{k!r}: " + ', '.join(f"{lbl!r}->{f:.6g}"
+                                               for lbl, f in v)
+                        + f" (using {won[k][0]!r})"
+                        for k, v in sorted(collisions.items()))
+                    warnings.warn(
+                        f"_get_kg_factors: {len(collisions)} unit label(s) "
+                        f"differ only in CASE but were inferred DIFFERENT kg "
+                        f"factors; the lower-cased lookup keeps one "
+                        f"arbitrarily.  {detail}.  Fix this in the country's "
+                        f"unit vocabulary by canonicalising the spelling "
+                        f"where the label is minted -- do not rely on which "
+                        f"one wins here.",
+                        UnitLabelCollisionWarning,
+                        stacklevel=2,
+                    )
             except (ValueError, ZeroDivisionError, KeyError):
                 # Inference is best-effort; numeric / lookup failure means
                 # we proceed with the known-metric factors only.  Programmer

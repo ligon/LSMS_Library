@@ -317,6 +317,56 @@ def test_drop_unpriceable_omits_the_currency_sentence_when_none_present():
     assert '0-as-missing' in msg            # the inf explanation still there
 
 
+def test_case_variant_labels_with_different_factors_warn():
+    """A silent 4x ambiguity becomes a reported one (GH #770 review, A2).
+
+    ``conversion_to_kgs`` groups on the RAW label, so ``Bowl``/``bowl`` are
+    two units; ``_get_kg_factors`` lower-cases and keeps whichever it merges
+    first.  Deterministic, but arbitrary -- and measured corpus-wide it is
+    11 live groups in 3 countries with factors differing up to 4.2x.
+    """
+    from lsms_library.transformations import UnitLabelCollisionWarning
+    rows = []
+    for m in ['A', 'B']:
+        for k in range(6):
+            rows.append(('2020', m, f'h{k}', 'maize', 'kg', 2.0, 10.0))
+            # 'Bowl' trades at 3 kg-equivalents, 'bowl' at 1 -- same lowercase
+            rows.append(('2020', m, f'h{k}', 'maize', 'Bowl', 1.0, 15.0))
+            rows.append(('2020', m, f'h{k}', 'maize', 'bowl', 1.0, 5.0))
+    df = pd.DataFrame(rows, columns=['t', 'm', 'i', 'j', 'u',
+                                     'Quantity', 'Expenditure'])
+    df = df.set_index(['t', 'm', 'i', 'j', 'u'])
+    with pytest.warns(UnitLabelCollisionWarning) as rec:
+        factors = _get_kg_factors(df)
+    msg = str(rec[0].message)
+    assert "'bowl'" in msg and 'CASE' in msg
+    assert 'using' in msg                     # names the winner
+    assert factors['bowl'] in (3.0, 1.0)      # one of them, deterministically
+
+
+def test_no_collision_warning_for_inert_known_metric_keys():
+    """``kg``/``litre`` disagreements are seeded by KNOWN_METRIC -> not noise.
+
+    Five of the corpus's 16 raw collision groups are exactly this; reporting
+    them would bury the 11 that actually decide a served factor.
+    """
+    from lsms_library.transformations import UnitLabelCollisionWarning
+    rows = []
+    for m in ['A', 'B']:
+        for k in range(6):
+            rows.append(('2020', m, f'h{k}', 'maize', 'kg', 2.0, 10.0))
+            rows.append(('2020', m, f'h{k}', 'maize', 'Kg', 1.0, 20.0))
+    df = pd.DataFrame(rows, columns=['t', 'm', 'i', 'j', 'u',
+                                     'Quantity', 'Expenditure'])
+    df = df.set_index(['t', 'm', 'i', 'j', 'u'])
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter('always')
+        factors = _get_kg_factors(df)
+    assert not [w for w in rec
+                if issubclass(w.category, UnitLabelCollisionWarning)]
+    assert factors['kg'] == 1                 # KNOWN_METRIC still wins
+
+
 def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
     """``unitvalue`` CAN price a currency row, so nothing is excluded there.
 
