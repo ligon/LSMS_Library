@@ -1878,6 +1878,74 @@ class Country:
         return sorted(waves)
 
     @property
+    def notes_path(self) -> Path:
+        """Path to this country's ``_/CONTENTS.org``."""
+        return self.file_path / "_" / "CONTENTS.org"
+
+    def notes(self, topic: str | None = None,
+              state: str | None = None) -> str:
+        """This country's ``CONTENTS.org`` -- its recorded idiosyncrasies.
+
+        ``CONTENTS.org`` is where the repository records what is odd about a
+        survey: identifier conventions, design quirks, known defects, and
+        decisions already taken with their reasons.  It was previously
+        reachable only by navigating the filesystem, which meant anyone
+        working through the API could not find it.
+
+        Parameters
+        ----------
+        topic : str, optional
+            Case-insensitive substring matched against headline **text**
+            (body text is not searched).  Returns each matching headline with
+            its whole subtree, since the useful detail is nested -- a
+            country's ``Weights`` and ``Strata`` live under its ``Sampling
+            Design``.  When a parent and a descendant both match, only the
+            parent is returned; it already contains the descendant.
+        state : str, optional
+            TODO keyword to filter on, e.g. ``'WAITING'``.  A closed GitHub
+            issue can still leave a live caveat parked here, so
+            ``notes(state='WAITING')`` is the quick answer to "what is still
+            open for this country?".
+
+        Returns
+        -------
+        str
+            The matching text, or ``''`` when nothing matches.  A country
+            with no ``CONTENTS.org`` warns and returns ``''``, following
+            :meth:`Wave.license`.
+
+        See Also
+        --------
+        note_topics : the headlines available to pass as ``topic``.
+        """
+        from . import notes as _notes
+
+        path = self.notes_path
+        if not path.exists():
+            warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
+            return ""
+        return _notes.extract(path.read_text(), topic=topic, state=state)
+
+    @property
+    def note_topics(self) -> list[tuple[int, str | None, str]]:
+        """``(level, TODO keyword, headline)`` for every heading in the notes.
+
+        The discovery half of :meth:`notes`, and the load-bearing half: the
+        headline vocabulary is largely ad hoc -- counts range from 11 headings
+        to 124 -- so nobody guesses ``'Household Presence / MonthsSpent'``.
+        This is to :meth:`notes` what :attr:`data_scheme` is to the table
+        methods.
+        """
+        from . import notes as _notes
+
+        path = self.notes_path
+        if not path.exists():
+            warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
+            return []
+        return [(h.level, h.keyword, h.text)
+                for h in _notes.parse(path.read_text())]
+
+    @property
     def population(self) -> dict[str, "PopulationRecord"]:
         """``{wave: PopulationRecord}`` -- what each wave's sample REPRESENTS.
 
