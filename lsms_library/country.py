@@ -716,6 +716,21 @@ class Wave:
             return load_yaml(file)
 
     @property
+    def features(self) -> list[str]:
+        """The tables this wave provides -- a synonym for :attr:`data_scheme`.
+
+        Same synonym as :attr:`Country.features`, for the same reason: the
+        library says *feature* nearly everywhere, while the attribute was
+        named after the ``data_scheme.yml`` file it reads.
+
+        The wave-level list is the wave's OWN declarations and need not match
+        its country's -- a table wired for some waves and not others is the
+        normal case, and comparing ``country.features`` with
+        ``wave.features`` is how you see which.
+        """
+        return self.data_scheme
+
+    @property
     def data_scheme(self) -> list[str]:
         # A wave with no ``_/`` directory simply declares no tables
         # (e.g. a partially-wired survey where a wave is auto-discovered
@@ -2007,6 +2022,23 @@ class Country:
                 columns=['source', 'license', 'documentation_path']
             ).rename_axis('t')
         return pd.DataFrame(rows).set_index('t')
+
+    @property
+    def features(self) -> list[str]:
+        """The tables this country provides -- a synonym for :attr:`data_scheme`.
+
+        The library talks about *features* nearly everywhere: :class:`Feature`
+        assembles one across countries, the coverage matrix grades
+        ``(country, feature, wave)`` cells, and the guides are written in those
+        terms.  The attribute that lists them was named instead after the
+        ``data_scheme.yml`` file it happens to read.  Both names now work, so
+        the vocabulary a reader arrives with is the one that answers.
+
+        Deliberately a synonym and not a rename with a deprecation:
+        ``data_scheme`` is used throughout the countries' own scripts and in
+        published notebooks, and the file it is named for is not going away.
+        """
+        return self.data_scheme
 
     @property
     def data_scheme(self) -> list[str]:

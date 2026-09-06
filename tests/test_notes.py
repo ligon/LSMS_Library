@@ -103,3 +103,45 @@ def test_missing_notes_warns_and_returns_empty(monkeypatch, tmp_path):
         assert c.notes() == ""
     with pytest.warns(UserWarning, match="No CONTENTS.org"):
         assert c.note_topics == []
+
+
+def test_features_is_a_synonym_for_data_scheme():
+    """The library says "feature" nearly everywhere; the attribute said
+    "data_scheme" after the file it reads.  Both must answer."""
+    ll = pytest.importorskip("lsms_library")
+    for name in ("Uganda", "South Africa"):
+        c = ll.Country(name)
+        assert c.features == c.data_scheme
+        assert isinstance(c.features, list)
+
+
+def test_wave_features_is_a_synonym_too():
+    """Waves declare their own tables, and answer to the same name."""
+    ll = pytest.importorskip("lsms_library")
+    c = ll.Country("Uganda")
+    w = c[c.waves[0]]
+    assert w.features == w.data_scheme
+    assert isinstance(w.features, list)
+
+
+def test_country_and_wave_feature_lists_may_legitimately_differ():
+    """The comparison the synonym is meant to make easy.
+
+    A country surfaces runtime-derived tables (food_expenditures,
+    household_characteristics, ...) that no wave declares, and a table wired
+    for some waves and not others is normal.  Measured on Uganda 2013-14:
+    country 28, wave 23.
+    """
+    ll = pytest.importorskip("lsms_library")
+    c = ll.Country("Uganda")
+    w = c["2013-14"]
+    only_country = set(c.features) - set(w.features)
+    assert only_country, "expected derived tables to be country-level only"
+    assert "food_expenditures" in only_country
+
+
+def test_features_is_a_synonym_not_a_replacement():
+    """`data_scheme` stays: country scripts and published notebooks use it."""
+    ll = pytest.importorskip("lsms_library")
+    assert isinstance(getattr(type(ll.Country("Uganda")), "data_scheme"), property)
+    assert isinstance(getattr(type(ll.Country("Uganda")), "features"), property)
