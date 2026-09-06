@@ -66,3 +66,34 @@ def test_generated_data_methods_page_is_current():
             "docs/guide/data-methods.md is stale relative to the docstrings in "
             "country.py.  Run `make docs-gen` and commit the result."
         )
+
+
+def test_every_skill_is_named_in_agents_md():
+    """A skill nobody can find is a skill nobody reads.
+
+    `.claude/skills/add-feature/food-acquired/aggregate-labels/` documents the
+    `labels='Aggregate'` contract and appeared NOWHERE in AGENTS.md; an
+    investigation into exactly that contract (GH #787) was carried out without
+    it and had to be corrected afterwards.  At the time only 6 of 15 skills
+    were named by path.  The catalog is hand-maintained, so it is checked.
+    """
+    from api_surface_audit import check_skills, skills  # noqa: E402
+
+    found = skills()
+    assert len(found) >= 10, f"skill discovery looks broken: {found}"
+    missing = check_skills(verbose=False)
+    assert not missing, (
+        "skill(s) absent from AGENTS.md: " + ", ".join(missing) +
+        "\nAdd them to the 'Task-Specific Skills' list."
+    )
+
+
+def test_skill_descriptions_are_available_for_indexing():
+    """Each skill states when to read it; that text is what makes it findable."""
+    from api_surface_audit import skills  # noqa: E402
+
+    undocumented = [rel for rel, desc in skills() if not desc.strip()]
+    assert not undocumented, (
+        "skill(s) with no `description` in frontmatter: "
+        + ", ".join(undocumented)
+    )

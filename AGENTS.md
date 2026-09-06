@@ -22,7 +22,27 @@ The returned DataFrame prepends a `country` index level.
 
 ## Task-Specific Skills (read these on demand)
 
-- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Has sub-skills for `sample`, `food-acquired` (and its nested `food-acquired/units` — decoding/cleaning the unit `u` label: leak audit, decode toolkit, and the silent-failure gotchas), `shocks`, `assets`, `panel-ids`, and `pp-ph` (post-planting/post-harvest countries — Nigeria, Ethiopia; **not GhanaSPS** — no GhanaSPS wave ships two rounds, GH #730).
+> **This list is checked, not trusted. Run `make api-audit` to enumerate every
+> skill on disk with the `description` from its frontmatter — that field states
+> when the skill should be read, which is exactly what you need in order to know
+> it exists.** The audit fails when a skill is missing from this list, because
+> the list is hand-maintained and *had already drifted*: `aggregate-labels`,
+> `add-wave` and `cross-country-features` appeared **nowhere** in this file, and
+> only 6 of 15 skills were named by path. That is not a cosmetic gap — the
+> `labels='Aggregate'` contract is documented in `aggregate-labels`, and an
+> investigation into precisely that contract (GH #787) was carried out without
+> it and had to be corrected afterwards. **Prefer the audit over this prose**;
+> when the two disagree, the audit is right and this list is stale.
+
+- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Sub-skills, each with its own `SKILL.md`:
+  - `add-feature/sample/` — the `sample` table and cluster identity (`v`, weights, strata).
+  - `add-feature/food-acquired/` — the food-acquisition table.
+    - `add-feature/food-acquired/units/` — decoding/cleaning the unit `u` label: leak audit, decode toolkit, and the silent-failure gotchas.
+    - `add-feature/food-acquired/aggregate-labels/` — **the `labels='Aggregate'` API contract**: what happens when a country lacks the column, the `LabelUnavailableError` / Feature-degrade behaviour ("Contract B, loud structured degrade", PR #550), and which food countries actually curate an Aggregate column. **Read before calling or changing `labels=`.** Designing the buckets themselves lives in the parent skill.
+  - `add-feature/shocks/`, `add-feature/assets/`, `add-feature/housing/`, `add-feature/panel-ids/` — those features.
+  - `add-feature/pp-ph/` — post-planting/post-harvest countries (Nigeria, Ethiopia; **not GhanaSPS** — no GhanaSPS wave ships two rounds, GH #730).
+- `.claude/skills/add-wave/SKILL.md` — adding a new survey wave to an existing country.
+- `.claude/skills/cross-country-features/SKILL.md` — assembling, auditing, or fixing a table across countries with `Feature()`.
 - `.claude/skills/multi-round-waves.md` — Tanzania `2008-15/` multi-round folder pattern and `wave_folder_map`.
 - `.claude/skills/tanzania-panel-design.md` — NPS sub-panel split (extended vs. refresh).
 - `.claude/skills/demand-estimation.md` — running CFE demands via the Country API.

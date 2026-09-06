@@ -42,6 +42,9 @@ DOCS = REPO / "docs"
 #: Modules whose public functions should have a discoverable call site.
 MACHINERY_MODULES = ("lsms_library/transformations.py", "lsms_library/local_tools.py")
 
+#: Skill trees that are generated or vendored, not hand-authored here.
+SKILL_EXCLUDE = ("gitnexus", "generated")
+
 #: Directories that are copies of the tree, not the tree.
 EXCLUDE_PARTS = {".claude", ".venv", "worktrees", "__pycache__", "build", "dist"}
 
@@ -111,6 +114,58 @@ def data_method_kwargs() -> list[str]:
     raise SystemExit("FATAL: could not locate the data-method dispatcher in country.py")
 
 
+def skills() -> list[tuple[str, str]]:
+    """``(relative skill path, description)`` for every hand-authored skill.
+
+    The description comes from the SKILL.md frontmatter, which is where a
+    skill states when it should be read -- the very thing a reader needs in
+    order to know it exists.
+    """
+    out = []
+    root = REPO / ".claude" / "skills"
+    for f in sorted(root.rglob("SKILL.md")):
+        rel = f.relative_to(root).parent.as_posix()
+        if any(part in SKILL_EXCLUDE for part in f.parts):
+            continue
+        desc = ""
+        try:
+            text = f.read_text()
+        except OSError:
+            text = ""
+        if text.startswith("---"):
+            fm = text.split("---", 2)[1] if text.count("---") >= 2 else ""
+            for line in fm.splitlines():
+                if line.startswith("description:"):
+                    desc = line.split(":", 1)[1].strip()
+                    break
+        out.append((rel, desc))
+    return out
+
+
+def check_skills(verbose: bool = True) -> list[str]:
+    """Skills that AGENTS.md never mentions -- i.e. undiscoverable by reading it.
+
+    A skill nobody can find is a skill nobody reads.  This is not
+    hypothetical: `add-feature/food-acquired/aggregate-labels` documents the
+    `labels='Aggregate'` contract and appeared nowhere in AGENTS.md, so an
+    investigation into exactly that contract was carried out without it and
+    had to be corrected afterwards.
+    """
+    agents = (REPO / "AGENTS.md")
+    text = agents.read_text() if agents.exists() else ""
+    found = skills()
+    missing = [rel for rel, _ in found if rel not in text]
+    if verbose:
+        print(f"\nskills on disk (excluding {'/'.join(SKILL_EXCLUDE)}): {len(found)}")
+        for rel, desc in found:
+            mark = "MISSING " if rel in missing else "listed  "
+            head = (desc[:78] + "...") if len(desc) > 78 else desc
+            print(f"  {mark} {rel}")
+            if head:
+                print(f"           {head}")
+    return missing
+
+
 def _docs_text() -> str:
     """All prose docs, excluding release notes (historical, not reference)."""
     out = []
@@ -171,23 +226,33 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--kwargs", action="store_true", help="only the kwarg check")
     ap.add_argument("--unused", action="store_true", help="only the call-site report")
+    ap.add_argument("--skills", action="store_true", help="only the skill index")
     ap.add_argument("--strict", action="store_true",
                     help="exit 1 if any kwarg is undocumented")
     args = ap.parse_args()
-    both = not (args.kwargs or args.unused)
+    both = not (args.kwargs or args.unused or args.skills)
 
     missing: list[str] = []
     if both or args.kwargs:
         missing = check_kwargs()
     if both or args.unused:
         check_unused()
+    missing_skills: list[str] = []
+    if both or args.skills:
+        missing_skills = check_skills()
 
+    rc = 0
     if missing:
         print(f"\n{len(missing)} undocumented kwarg(s): {', '.join(missing)}")
         print("Document them in docs/guide/data-methods.md.")
-        if args.strict:
-            return 1
-    return 0
+        rc = 1
+    if missing_skills:
+        print(f"\n{len(missing_skills)} skill(s) not mentioned in AGENTS.md: "
+              f"{', '.join(missing_skills)}")
+        print("Add them to the skills list; a skill nobody can find is a skill "
+              "nobody reads.")
+        rc = 1
+    return rc if args.strict else 0
 
 
 if __name__ == "__main__":
