@@ -189,7 +189,7 @@ def _universe(country_name: str | None, wave: str | None) -> str | None:
 
 
 def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
-                       max_age=80, ax=None, title=None, colors=None):
+                       max_age="auto", ax=None, title=None, colors=None):
     """Draw an age-sex pyramid for one survey wave.
 
     Parameters
@@ -209,8 +209,15 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
     bin_width : int, default 5
         Age-band width in years.  Pass ``1`` to expose age heaping -- LSMS
         ages pile onto multiples of five, which a 5-year band hides.
-    max_age : int, default 80
-        Ages at or above this are collected into a closing band.
+    max_age : int or "auto", default "auto"
+        Age at which the closing ``N+`` band starts.  ``"auto"`` puts it just
+        above the oldest band that would still be **visible** when drawn: a
+        band thinner than about a pixel adds a row of white space and stretches
+        the vertical scale for nobody.  Malawi records ages up to 119 in bands
+        of four people (0.01% of its largest band); drawing to the data maximum
+        would add a dozen empty rows.  The test is geometric, not a tuned
+        percentage, so it travels to any country and adapts to the figure size
+        and dpi it is actually drawn at.  Pass an integer to fix it.
     ax : matplotlib Axes, optional
     title, colors : optional overrides.
 
@@ -232,18 +239,43 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
     if df.empty:
         raise ValueError(f"no usable Age/Sex rows for {label}")
 
+    # Created before the auto rule below, which measures the axes in pixels.
+    if ax is None:
+        _, ax = plt.subplots(figsize=(7.2, 5.6), dpi=130)
+    fig = ax.figure
+
+    raw = (np.floor(df["Age"] / bin_width) * bin_width).astype(int)
+    oldest = int(np.ceil(df["Age"].max()))
+
+    if isinstance(max_age, str):
+        if max_age != "auto":
+            raise ValueError(f"max_age must be an int or 'auto'; got {max_age!r}")
+        # A band earns its own row only if it would render at least ~1.5px
+        # wide.  Half-axis is span*1.12 + gutter(=0.115*span), so the full
+        # axis spans about 2.47*span data units; converting a pixel budget
+        # through that ratio makes the rule independent of the country, the
+        # weighting and the figure size.
+        per = (df.assign(_b=raw).groupby(["_b", "Sex"])["_w"].sum()
+                 .unstack(fill_value=0.0))
+        widest = float(per.to_numpy().max()) if per.size else 0.0
+        try:
+            ax_px = float(ax.get_window_extent().width)
+        except Exception:                     # no renderer yet
+            ax_px = float(fig.get_size_inches()[0] * fig.dpi) * 0.78
+        thresh = 1.5 * (2.47 * widest) / max(ax_px, 1.0)
+        visible = [int(b) for b in per.index if float(per.loc[b].max()) >= thresh]
+        top = (max(visible) + bin_width) if visible else oldest
+        # never collapse the chart to a stub, never exceed the data
+        max_age = int(min(max(top, 6 * bin_width), max(oldest, bin_width)))
+
     edges = list(range(0, max_age + bin_width, bin_width))
-    df["_band"] = np.minimum(np.floor(df["Age"] / bin_width) * bin_width, max_age)
+    df["_band"] = np.minimum(raw, max_age)
 
     groups = [None]
     if by is not None:
         groups = [g for g in pd.unique(df[by].dropna())][:2]
         if len(groups) < 2:
             groups = groups or [None]
-
-    if ax is None:
-        _, ax = plt.subplots(figsize=(7.2, 5.6), dpi=130)
-    fig = ax.figure
 
     def totals(sub):
         t = sub.groupby("_band")["_w"].sum()
@@ -309,6 +341,10 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
     sub_bits = [f"{n:,} people", basis]
     if bin_width == 1:
         sub_bits.append("single-year bands")
+    if oldest > max_age + bin_width:
+        # The closing band holds them, but it can be too thin to see; saying
+        # so is the difference between "nobody older" and "too few to draw".
+        sub_bits.append(f"oldest recorded {oldest}")
     ax.annotate(", ".join(sub_bits), xy=(0, 1), xycoords="axes fraction",
                 xytext=(0, 6), textcoords="offset points",
                 fontsize=9, color=pal["ink"], alpha=0.75)

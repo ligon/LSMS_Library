@@ -103,3 +103,71 @@ def test_country_pyramid_carries_its_universe_caption():
         pytest.skip(f"Uganda unavailable: {exc}")
     caption = " ".join(t.get_text() for t in ax.figure.texts)
     assert "Represents:" in caption
+
+
+def _tailed_roster(tail_age=115, tail_n=1, n=8000, span=30):
+    """A dense age structure plus a few implausibly old people.
+
+    The density matters: the visibility rule is a ratio against the largest
+    band, so a fixture with only a few dozen people per band makes three
+    centenarians a legitimately *visible* 4.5% and the rule correctly keeps
+    them.  Real surveys have a much wider dynamic range -- Uganda's largest
+    band holds ~2,900 people and its 4 centenarians are 0.14% of it -- so the
+    fixture reproduces that ratio rather than a token tail.
+    """
+    rows = [{"i": f"h{k // 4}", "t": "2020", "v": "c0", "pid": str(k),
+             "Sex": "M" if k % 2 else "F", "Age": float(k % span)}
+            for k in range(n)]
+    rows += [{"i": "hz", "t": "2020", "v": "c0", "pid": f"z{k}",
+              "Sex": "F", "Age": float(tail_age)} for k in range(tail_n)]
+    return pd.DataFrame(rows).set_index(["i", "t", "v", "pid"])
+
+
+def _closing_band(ax):
+    bands = [s.get_text() for s in ax.texts if s.get_text().endswith("+")]
+    assert len(bands) == 1, f"expected one closing band, got {bands}"
+    return int(bands[0].rstrip("+"))
+
+
+def _all_text(ax):
+    return " ".join([s.get_text() for s in ax.texts]
+                    + [s.get_text() for s in ax.figure.texts])
+
+
+def test_auto_max_age_ignores_an_invisible_tail():
+    """One centenarian must not stretch the scale by seventeen empty bands."""
+    ax = population_pyramid(_tailed_roster(tail_age=115, tail_n=1),
+                            weights=False)
+    assert _closing_band(ax) < 115, "the closing band was dragged up by the tail"
+
+
+def test_truncation_is_disclosed_not_silent():
+    """Hiding the tail is fine; implying nobody is older is not."""
+    ax = population_pyramid(_tailed_roster(tail_age=115, tail_n=1),
+                            weights=False)
+    assert "oldest recorded 115" in _all_text(ax)
+
+
+def test_auto_max_age_is_geometric_not_a_fixed_number():
+    """A tail that is genuinely visible must be kept, on the same rule.
+
+    Same shape, same oldest age -- only the tail's weight differs.  A rule
+    that returned a fixed number could not tell these apart.
+    """
+    thin = population_pyramid(_tailed_roster(tail_age=115, tail_n=1),
+                              weights=False)
+    dense = population_pyramid(_tailed_roster(tail_age=115, tail_n=400),
+                               weights=False)
+    assert _closing_band(dense) > _closing_band(thin), (
+        f"thin={_closing_band(thin)} dense={_closing_band(dense)}"
+    )
+
+
+def test_explicit_max_age_still_honoured():
+    ax = population_pyramid(_tailed_roster(), weights=False, max_age=60)
+    assert _closing_band(ax) == 60
+
+
+def test_bad_max_age_string_rejected():
+    with pytest.raises(ValueError, match="max_age must be an int or 'auto'"):
+        population_pyramid(_tailed_roster(), weights=False, max_age="tall")
