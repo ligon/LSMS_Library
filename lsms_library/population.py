@@ -315,7 +315,7 @@ class PopulationRecord(dict):
 
         Kept for callers that want a type with no library dependency at all --
         and because ``dict(record)`` and ``record.to_dict()`` should not mean
-        different things.  Since v0.10 the record *is* a mapping with exactly
+        different things.  Since GH #603 the record *is* a mapping with exactly
         this content, so ``attrs`` carries the record itself and this is no
         longer what :func:`attach` stores.
         """
@@ -672,7 +672,7 @@ def merge_attrs(target, sources: Iterable[Mapping[str, Any]]) -> None:
 def records_from_attrs(df) -> list[PopulationRecord]:
     """Typed records from a frame's ``attrs`` (the inverse of :func:`attach`).
 
-    Accepts both shapes deliberately.  Since v0.10 :func:`attach` stores
+    Accepts both shapes deliberately.  Since GH #603 :func:`attach` stores
     :class:`PopulationRecord` objects, but a frame whose ``attrs`` survived a
     ``to_parquet`` / ``read_parquet`` round trip carries **plain dicts** --
     pandas serialises ``attrs`` through ``json`` and reads them back with
