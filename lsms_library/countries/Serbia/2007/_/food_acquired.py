@@ -7,7 +7,8 @@ per (household, product); each row carries up to seven daily triples:
   opstina + popkrug + dom   -> i  (household id; concatenation)
   proizvod                  -> j  (numeric product code 01xx-11xx; harmonized
                                    to a Preferred Label via food_items.org)
-  mera                      -> u  (native unit: kg / gr / litar / komad / dinar)
+  mera                      -> u  (native unit: kg / gr / litar / komad, and
+                                   `dinar` -> the canonical `Value`; see below)
   kol_1 .. kol_7            -> daily Quantity (in unit `mera`)
   din_1 .. din_7            -> daily value in dinars
   izvor_1 .. izvor_7        -> daily acquisition SOURCE (see `s` below)
@@ -31,6 +32,25 @@ We sum kol -> Quantity and din -> Expenditure over the 7 diary days within each
 canonical (t, i, j, u, s) key.  An optional `Price` is the median daily unit
 value (din/kol) over the diary days; it is purely informational -- the derived
 food_prices table is computed at API time by _FOOD_DERIVED.
+
+`u` -- the currency code is canonicalised (GH #770).  `mera == 'dinar'` is not
+a unit of measure: it is the diary's marker for a pure cash outlay, used by the
+prefix-11 "food/drink away from home" items.  It is emitted as the framework's
+canonical currency-denominated sentinel **`Value`**, NOT as the currency's
+name.  The name of the currency is redundant with the country and the wave, and
+`currency=` (lsms_library/currency.py) is the lever for currency
+*representation*; `Value` is what `country._RESERVED_U_SENTINELS` and
+`transformations._CURRENCY_DENOMINATED_UNITS` already recognise.  Spelled
+`dinar`, the label was invisible to both, and
+`transformations.conversion_to_kgs` inferred a kg-per-dinar factor of
+4.209166724149965 for it -- currency served as mass.
+
+Note that Serbia's `Value` rows do NOT follow the GhanaLSS/Panama value-only
+convention of setting `Quantity = Expenditure`: 3,767 of the 3,772 carry
+`Quantity` NaN with the cash amount in `Expenditure` alone (the remaining 5
+carry a stray `kol` punch).  Both shapes exist in the corpus; the label means
+"denominated in local currency", not "Quantity is the expenditure".  No
+quantity is synthesised here -- that would be a data change, not a relabel.
 
 `v` is omitted: script-path waves let _join_v_from_sample add the cluster at
 API time (post-2026-04-10 design).
@@ -57,7 +77,9 @@ hh_cols = ['opstina', 'popkrug', 'dom']
 df['i'] = df[hh_cols].apply(mapping.i, axis=1)
 
 # Native unit (string) and the numeric product code for harmonization.
-df['u'] = df['mera'].astype(str)
+# `dinar` is currency, not a measure -> canonical `Value` sentinel (GH #770).
+U_CANONICAL = {'dinar': 'Value'}
+df['u'] = df['mera'].astype(str).replace(U_CANONICAL)
 df['j'] = df['proizvod'].astype(str).str.strip()
 
 # Melt the seven daily (kol, din, izvor) triples into long form.

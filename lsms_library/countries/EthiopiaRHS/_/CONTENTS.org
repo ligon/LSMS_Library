@@ -534,7 +534,8 @@ files are the R6 slice.
   Code table -- ERHS unit codes are stable across 1994+).  Metric
   codes -> framework-recognized tokens (1->=kg=,
   2->="100 kg"= so the explicit-metric parser yields 100,
-  19->=litre=, 92->=g=; 30->=Birr= currency, no kg factor).  ALL
+  19->=litre=, 92->=g=; *30->=Value=*, the framework's canonical
+  currency-denominated sentinel -- see the GH #770 entry below).  ALL
   other (local volumetric/container) codes -> their unit NAME
   (=Chinet=, =Kunna=, ...).  The =u= index carries the unit label
   ALONE; the framework's price-ratio inference
@@ -1036,3 +1037,78 @@ months-of-inadequate-provisioning question.  None maps cleanly onto
 those families are left unwired for EthiopiaRHS.  (The separate
 =Ethiopia= LSMS-ISA module wires =food_coping= for W1--3 and FIES
 =food_security= for W5.)
+
+* Unit code 30 is CURRENCY, and it is spelled =Value=, not =Birr= (GH #770)
+
+*This entry corrects a claim this file made, and had made wrong, since the
+=harmonize_unit= table was written.*  The paragraph at "Unit harmonization +
+kg conversion" above used to read /"30->=Birr= currency, no kg factor"/.  The
+first half was right.  *The second half was false, both before and after
+PR #784's first pass*, and the adversarial review of that PR measured it.
+
+** What was actually happening
+ERHS ships *no* kg-conversion table.  That is deliberate and is stated two
+paragraphs up: local volumetric/container codes (=Chinet=, =Kunna=, ...) get
+their per-good kg factor from the framework's price-ratio inference,
+=transformations.conversion_to_kgs=, "with NO framework change".  That
+inference does not read the label's *meaning*; it infers a factor for every
+non-metric label that carries an =Expenditure=.  So it swallowed the currency
+label alongside the containers:
+
+: conversion_to_kgs(EthiopiaRHS food_acquired)['Birr'] -> 0.5833333333333334
+
+174 rows across 1994a (142), 1994b (13), 1995 (15) and 1997 (4).  134 of them
+carry =Quantity == Expenditure= (the value-only convention), so
+=food_prices(units='kgvalue')= returned =Expenditure / (Quantity x 0.58333)=
+*= exactly 1.7142857142857142* for 134 of its 154 =u='Birr'= rows -- a
+constant "price" that is nothing but the reciprocal of a fabricated factor.
+It is GhanaLSS's =2.035038= signature (#770) in miniature.
+
+** The fix, and why it is a CONFIG fix
+The library already owns a canonical label for this: =country.py:88-92= --
+/"='Value'= marks LCU-only goods"/ -- and =transformations= excludes it from
+the inference.  Amounts are in local currency units by default and
+=currency== (=lsms_library/currency.py=) is the lever for currency
+*representation*, so *the currency's NAME is redundant with the country and
+the wave and does not belong in a =u= label at all*.  =Birr= was a
+country-local spelling of a label the framework already has.
+
+So =categorical_mapping.org= now maps =| 30 | Value |=.  *No library set
+grew.*  The rejected alternative was to add ='birr'= (and Serbia's ='dinar'=,
+and the next country's) to =transformations._CURRENCY_DENOMINATED_UNITS= --
+an unbounded blocklist of world currencies running beside a canonical
+sentinel that already existed.
+
+*Ordering matters, and it is why the fix is HERE and not in
+=lsms_library/categorical_mapping/u.org=.*  The derived-food dispatch
+(=country.py:4155-4161=) is =_aggregate_wave_data= -> =transform_fn= ->
+=_finalize_result=, so =conversion_to_kgs= sees the *raw* =u=.  A rename
+recorded only in an API-time mapping would fire *after* the factor had
+already been inferred.  =harmonize_unit= is applied at *wave build time*
+(=mappings: ['harmonize_unit','Code','Preferred Label']= in each wave's
+=data_info.yml=), which is upstream of the inference -- verified by the fact
+that the cached =food_acquired.parquet= holds the *label*, never the code.
+
+** What moved, measured
+- =conversion_to_kgs= / =_get_kg_factors= lose exactly one key
+  (='birr'=); *every other factor is byte-identical*.
+- =food_prices()= loses the 154 =u='Birr'= rows; they are not replaced by
+  =u='Value'= rows, because a =Value= row has no kg factor at all and is
+  dropped by =_drop_unpriceable= in the =kg*= modes.  The 1.714 modal
+  artefact is gone.
+- =food_quantities(units='kgs')= carries all 174 rows *natively* as
+  =u='Value'= instead of relabelling them =u='kg'=.  ERHS therefore stops
+  serving 174 rows of currency as mass.
+- Editing =categorical_mapping.org= moves *every* EthiopiaRHS table's
+  =Country._table_cache_hash= -- =_input_hash= globs =_/*.org= country-wide,
+  not per table.  That is correct and wanted: the fabricated factors have to
+  be rebuilt away.
+
+** 1989 is NOT affected, and here is why that needed checking
+1989's unit codes are an in-data-unlabelled scheme that =harmonize_unit= is
+deliberately *not* applied to, so 1989's =u= carries the raw *code* as a
+string.  If code 30 existed there it would sit in the data as ='30'= and this
+fix would miss it.  Measured: 1989's =u= set is
+={'0','1','13','14','15','17','21','3','4','5','6','7','8','9'}= -- *no 30*.
+The currency code is a 1994+ phenomenon.  (Codeunit1.SPS, if decoded, would
+have to be re-checked on this point.)
