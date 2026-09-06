@@ -263,8 +263,20 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
         except Exception:                     # no renderer yet
             ax_px = float(fig.get_size_inches()[0] * fig.dpi) * 0.78
         thresh = 1.5 * (2.47 * widest) / max(ax_px, 1.0)
-        visible = [int(b) for b in per.index if float(per.loc[b].max()) >= thresh]
-        top = (max(visible) + bin_width) if visible else oldest
+        # The test is whether the CLOSING band would be visible -- not whether
+        # the last individual band is.  Those differ, and the difference shows:
+        # closing just above the last visible band leaves a labelled row with
+        # no bar in it (GhanaLSS 2016-17 drew an empty "100+"), which reads as
+        # a rendering fault.  The closing band accumulates everything at or
+        # above its edge, so its total falls monotonically as the edge rises;
+        # take the highest edge that still clears the threshold.
+        cand = sorted((int(b) for b in per.index), reverse=True)
+        top = oldest
+        for e in cand:
+            closing = per.loc[[b for b in per.index if int(b) >= e]].sum()
+            if float(closing.max()) >= thresh:
+                top = e
+                break
         # never collapse the chart to a stub, never exceed the data
         max_age = int(min(max(top, 6 * bin_width), max(oldest, bin_width)))
 
