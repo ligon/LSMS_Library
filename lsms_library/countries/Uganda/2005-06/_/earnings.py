@@ -12,6 +12,6 @@ df = get_dataframe(fn)
 
 earnings = df.groupby('HHID')[earnings1+earnings2].sum().sum(axis=1)
 
-earnings.index.name = 'j'
+earnings.index.name = 'i'  # household id
 
 to_parquet(pd.DataFrame({"Earnings":earnings}), 'earnings.parquet')

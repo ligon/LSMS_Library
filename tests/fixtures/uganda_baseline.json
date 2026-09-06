@@ -8,7 +8,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       1467,
@@ -127,7 +127,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       2889,
@@ -246,7 +246,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       2618,
@@ -365,7 +365,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       2805,
@@ -484,7 +484,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3119,
@@ -603,7 +603,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3305,
@@ -722,7 +722,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3180,
@@ -841,7 +841,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3064,
@@ -978,21 +978,19 @@
   },
   "var/earnings.parquet": {
     "columns": [
-      "earnings",
-      "level_1"
+      "Earnings"
     ],
-    "content_hash": "9b4d9b06382bd9ed3ef5491babbb987de10a5c49dc860e78d83e52ea36d0c3cc",
+    "content_hash": null,
     "dtypes": {
-      "earnings": "float64",
-      "level_1": "str"
+      "Earnings": "float64"
     },
     "index_names": [
       "t",
       "i"
     ],
     "shape": [
-      129160,
-      2
+      22447,
+      1
     ]
   },
   "var/enterprise_income.parquet": {
@@ -1333,7 +1331,7 @@
     "columns": [
       "income"
     ],
-    "content_hash": "56b8f3ccc8a14eea61742cd5b6a0580a4e96c50f29f9a659ee47fd964a92d889",
+    "content_hash": null,
     "dtypes": {
       "income": "float64"
     },
@@ -1341,10 +1339,7 @@
       "t",
       "i"
     ],
-    "shape": [
-      13931,
-      1
-    ]
+    "shape": null
   },
   "var/interview_date.parquet": {
     "columns": [
