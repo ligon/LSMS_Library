@@ -222,15 +222,62 @@ def check_unused(verbose: bool = True) -> list[tuple[str, str, int]]:
     return found
 
 
+#: Suffixes that ``Wave._input_hash`` / ``Country._table_cache_hash`` fold into
+#: a table's cache hash.  Kept in step with ``local_tools._BUILD_INPUT_SUFFIXES``.
+HASHED_SUFFIXES = (".py", ".csv", ".json", ".txt", ".tab", ".tsv", ".org")
+
+
+def check_untracked_inputs(verbose: bool = True) -> list[str]:
+    """Hashed build inputs that git does not track.
+
+    A file under a country's ``_/`` with one of :data:`HASHED_SUFFIXES` is a
+    cache-hash input.  If git does not track it, two clean checkouts of the
+    same commit disagree about cache freshness -- silently, since the file is
+    usually gitignored and so never appears in ``git status``.
+
+    That is not hypothetical (GH #790): a generated ``Uganda/_/fct_usda.csv``
+    existed in one checkout and not another, moving all 28 of Uganda's hashes,
+    and it was found only while debugging something else.  Three more
+    countries generate ``unitlabels.csv`` into their ``_/`` and would do the
+    same the moment anyone runs the generator.
+    """
+    import subprocess
+
+    tracked = set(subprocess.run(
+        ["git", "ls-files", "lsms_library/countries"],
+        cwd=REPO, capture_output=True, text=True).stdout.splitlines())
+    root = REPO / "lsms_library" / "countries"
+    bad = []
+    for pattern in ("*/_/*", "*/*/_/*"):
+        for f in root.glob(pattern):
+            if f.is_file() and f.suffix in HASHED_SUFFIXES:
+                rel = f.relative_to(REPO).as_posix()
+                if rel not in tracked:
+                    bad.append(rel)
+    bad.sort()
+    if verbose:
+        if bad:
+            print(f"\nhashed build inputs NOT tracked by git ({len(bad)}):")
+            for rel in bad:
+                print(f"  {rel}")
+            print("\n  Each makes this checkout's cache hashes differ from a")
+            print("  clean one.  Track it, or stop generating it into `_/`.")
+        else:
+            print("\nhashed build inputs untracked by git: none")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--kwargs", action="store_true", help="only the kwarg check")
     ap.add_argument("--unused", action="store_true", help="only the call-site report")
     ap.add_argument("--skills", action="store_true", help="only the skill index")
+    ap.add_argument("--inputs", action="store_true",
+                    help="only the untracked-build-input check")
     ap.add_argument("--strict", action="store_true",
                     help="exit 1 if any kwarg is undocumented")
     args = ap.parse_args()
-    both = not (args.kwargs or args.unused or args.skills)
+    both = not (args.kwargs or args.unused or args.skills or args.inputs)
 
     missing: list[str] = []
     if both or args.kwargs:
@@ -240,11 +287,17 @@ def main() -> int:
     missing_skills: list[str] = []
     if both or args.skills:
         missing_skills = check_skills()
+    untracked: list[str] = []
+    if both or args.inputs:
+        untracked = check_untracked_inputs()
 
     rc = 0
     if missing:
         print(f"\n{len(missing)} undocumented kwarg(s): {', '.join(missing)}")
         print("Document them in docs/guide/data-methods.md.")
+        rc = 1
+    if untracked:
+        print(f"\n{len(untracked)} hashed build input(s) untracked by git.")
         rc = 1
     if missing_skills:
         print(f"\n{len(missing_skills)} skill(s) not mentioned in AGENTS.md: "
