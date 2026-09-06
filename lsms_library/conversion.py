@@ -1,9 +1,11 @@
 """Convert nominal local-currency monetary values to a comparable basis.
 
 Phase 2 of currency handling.  Phase 1 (:mod:`lsms_library.currency`) tags
-every monetary value with =(currency, t)=; this module turns that tag into a
-conversion by looking up a per-=(Country, Date)= factor and dividing the
-monetary columns.
+every monetary value with its ISO 4217 code and declares *which* columns are
+monetary.  The conversion itself is keyed on =(Country, Date)= -- the country
+and the row's interview date, never the currency label -- and divides those
+columns by the looked-up factor, relabelling the =currency= level to the
+target basis.
 
 The factor table is the pure org-table
 =lsms_library/conversion/conversion_factors.org= (read via
@@ -23,8 +25,9 @@ matched to the *most recent factor at or before its interview date*
 within a ``2018-19`` wave gets the 2019 factor while one interviewed in 2018
 gets 2018 -- per-household, exact, and progressively refinable (drop in monthly
 or daily rows and the as-of join prefers them automatically).  Households with
-no ``interview_date`` (and the 6 countries lacking the table) fall back to the
-wave's nominal date (wave year -> Jan 1), reproducing the historical behaviour.
+no ``interview_date`` (and the countries lacking that table entirely) fall
+back to the wave's nominal date (wave year -> Jan 1), reproducing the
+historical behaviour.
 
 Design: =slurm_logs/DESIGN_currency_conversion_2026-06-17.org=.
 """
