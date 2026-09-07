@@ -18,8 +18,35 @@
 |    . | None            |
 
 * Relation to head
-See https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?file_name=y01a
-#+name: relationship
+
+** GLSS1 fourteen-code list (=relationship_glss1=)
+
+GLSS1's (1987-88) relationship-to-head code list, from that wave's own data
+dictionary: https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?file_name=y01a
+Verified against the raw data for GLSS1 and GLSS2 (=REL= takes codes 1-14;
+code 1 occurs 3,136 / 3,192 times = each wave's household count).  Read by
+=1987-88/_/mapping.py= and =1988-89/_/mapping.py= via
+=code_label_map('relationship_glss1', _dirs)=.  GLSS3 and GLSS4 use a
+different NINE-code list and carry their own wave-level =relationship=
+tables (CONTENTS.org Trap 2).
+
+Renamed from =relationship= on 2026-09-07 (GH #797), for two reasons:
+1. The framework auto-applies any country table named after a served column
+   (=Relationship=), and =relationship= is now the name of the LABEL
+   harmonization table below.  A =| Code | Label |= table under that name was
+   never a mapping (=_build_replace_dict= needs a =Preferred Label= column),
+   but the two would collide by name.
+2. Trap 2's mechanism.  GLSS3 was decoded through this table for its whole
+   life (GH #799) because a wave-first =code_label_map= search found no wave
+   table and fell through to here.  With this table no longer answering to
+   =relationship=, a wave that lacks its own =relationship= CODE table gets
+   ={}= from =code_label_map= (the harmonization table below has no =Code=
+   column, so the lookup raises =KeyError= there and moves on) and ships a
+   100%-null =Relationship= that the Site B null-read guard reports loudly --
+   instead of a silently mis-decoded one.  A fallback that has never been
+   exercised has never been checked (Trap 4); this one can no longer be
+   exercised at all.
+#+name: relationship_glss1
 | Code | Label                 |
 |------+-----------------------|
 |    1 | Head                  |
@@ -36,6 +63,98 @@ See https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?
 |   12 | Servant               |
 |   13 | Tenant                |
 |   14 | Others not related    |
+
+** Label harmonization (=relationship=): one vocabulary for seven waves
+
+Applied AUTOMATICALLY by =Country._apply_categorical_mappings= to the
+=Relationship= column of any table that carries one (here =household_roster=),
+at API time on EVERY read, warm or cold: the column is =.str.strip()=-ed and
+=.replace()=-d through =Original Label -> Preferred Label=.  The cached
+parquets (L2-wave and L2-country) keep the RAW strings.  Since =df9baf91=
+(GH #797) the kinship expansion (=Generation= / =Distance= / =Affinity=)
+runs AFTER this mapping, so it sees the Preferred Label.  The seven waves
+used to serve five vocabularies (32 distinct strings); they now serve one
+(17 labels).
+
+Column order is load-bearing: =_build_replace_dict= keys on the FIRST column
+that is not =Preferred Label=, so the raw label comes first.  The Original
+Label is the SERVED string -- after the wave/country formatter: the country
+formatter =_/ghanalss.py:Relationship= title-cases 2012-13 and 2016-17, and
+2005-06's wave formatter title-cases too -- NOT the =.dta= value label
+(=Child (Son/daughter)= in the file is =Child (Son/Daughter)= here).
+
+Identity rows are deliberately ABSENT: =.replace()= leaves unmatched values
+alone, so a label that is already canonical (Head, Spouse, Child, Grandchild,
+Parent, Sibling, Niece/nephew, Son/daughter in-law, Brother/sister in-law,
+Father/mother in-law, Other relative, Servant, Tenant, Others not related,
+Adopted Child, Parent/Parent-In-Law) needs no row.  Do not add them.
+
+Tuple-preserving BY CONSTRUCTION: every Original Label and its Preferred
+Label resolve to the SAME kinship tuple in =kinship.yml= under the lookup
+=_expand_kinship= uses (=.strip().title()= first, then raw) -- checked
+statically and on all 246,594 rows, 2026-09-07.  Two raw labels share a
+Preferred Label only when their tuples agree; a raw label with a distinct
+tuple keeps a distinct Preferred Label:
+- =Adopted Child= [-1,0,consanguineal] (GLSS5/6) and =Adopted / Foster/ Step
+  Child= [-1,0,step] (GLSS7) are NOT merged.
+- =Parent/Parentlaw= / =Parent/Parent-In-Law= conflate parent and
+  parent-in-law in ONE survey code (GLSS5/6/7).  Same tuple as =Parent=
+  today, but kept as its own label so GH #698 can still rule on it; folding
+  it into =Parent= would pre-empt that ruling for this country.
+- =Other= (GLSS6 code 11, 14 people) is a code DISTINCT from code 10
+  =Non_relative= in that instrument, and GLSS7 dropped it.  Its tuple is
+  [0,0,unrelated] today, so folding it into =Others not related= is
+  tuple-preserving; it is one row to reverse if that tuple is ever
+  revisited (the same shape as the =Parent/Parentlaw= question, decided the
+  other way because the tuple, not the label, is what the ontology owns).
+- =Househelp (Other relative)= (GLSS7 code 9) and =House help (Non-relative)=
+  (code 10) both carry [0,0,servant]; the relative/non-relative annotation
+  is not preserved in the label (the tuple never carried it either).
+
+The canonical vocabulary is GLSS1's fourteen labels -- so 1987-88 and
+1988-89 are served unchanged -- plus three later-instrument categories:
+=Parent/Parent-In-Law=, =Adopted Child=, and =Adopted/Foster/Stepchild=
+(GhanaSPS 2009-10's spelling and an existing =kinship.yml= key, so the two
+Ghana surveys share it; GSPS itself drifts across its three waves).
+=Others not related= resolves in =kinship.yml= only through its RAW key
+(its =.title()= form =Others Not Related= is not a key) -- that entry must
+stay, or this country's non-relatives go null.
+
+Raw code lists, for provenance (value labels read from the .dta, 2026-09-07):
+- GLSS5 (2005-06 =parta/sec1.dta:s1q3=): 1 head, 2 spouse, 3 child,
+  4 grandchild, 5 parent/parentlaw, 6 son/daughterlaw, 7 other relative,
+  8 adopted child, 9 househelp, 10 non_relative
+- GLSS6 (2012-13 =PARTA/SEC1.dta:s1q3=): 1 Head, 2 Spouse,
+  3 Child (Son/daughter), 4 Grandchild, 5 Parent/parentlaw,
+  6 Son/daughterlaw, 7 Other relative, 8 Adopted child, 9 Househelp,
+  10 Non_relative, 11 Other
+- GLSS7 (2016-17 =g7sec1.dta:s1q3=): 1 Head, 2 Spouse (Wife/Husband),
+  3 Child (Son/daughter), 4 Grandchild, 5 Parent/Parent-in-law,
+  6 Son/Daughter-in-law, 7 Other relative, 8 Adopted / Foster/ Step child,
+  9 Househelp (Other relative), 10 House help (Non-relative), 11 Non-relative
+- GLSS1/2: the fourteen-code table above; GLSS3/4: the nine-code wave tables.
+
+Prose stays ABOVE the =#+name:= line (Trap 4: a comment between the name and
+the table steals the name and the build reports success).
+#+name: relationship
+| Original Label               | Preferred Label          |
+|------------------------------+--------------------------|
+| Wife/husband                 | Spouse                   |
+| Spouse (Wife/Husband)        | Spouse                   |
+| Son/daughter                 | Child                    |
+| Child (Son/Daughter)         | Child                    |
+| Father/mother                | Parent                   |
+| Parent/Parentlaw             | Parent/Parent-In-Law     |
+| Son/Daughterlaw              | Son/daughter in-law      |
+| Son/Daughter-In-Law          | Son/daughter in-law      |
+| Other Relative               | Other relative           |
+| Non_Relative                 | Others not related       |
+| Non-Relative                 | Others not related       |
+| Other                        | Others not related       |
+| Househelp                    | Servant                  |
+| House Help (Non-Relative)    | Servant                  |
+| Househelp (Other Relative)   | Servant                  |
+| Adopted / Foster/ Step Child | Adopted/Foster/Stepchild |
 
 * Units (Section 9B, GLSS7 / 2016-17)
 Stata value labels for the =s9bq*c= unit columns, lifted once from the full

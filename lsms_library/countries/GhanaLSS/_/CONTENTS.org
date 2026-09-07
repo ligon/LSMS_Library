@@ -1526,7 +1526,9 @@ historical bugs were partly key-type mismatches.
 
 ** Trap 2: GLSS3's and GLSS4's relationship scheme is NOT GLSS1's
 
-The country-level =relationship= table in =_/categorical_mapping.org= has
+The country-level GLSS1 code table in =_/categorical_mapping.org= (named
+=relationship= until 2026-09-07, =relationship_glss1= since -- see the last
+subsection of this trap) has
 *fourteen* codes and cites *GLSS1*'s data dictionary
 (=catalog/2313/data-dictionary/F184?file_name=y01a=).  It is correct for
 GLSS1 and GLSS2 -- verified against the raw data, where =REL= takes codes 1--14
@@ -1603,6 +1605,95 @@ string-only (codes 2/3/5) and 1,353 semantic (codes 6--9).  0 NA in
 relationship labels" warning.  =Country._table_cache_hash('household_roster')=
 moved (=4f2eddfb...= -> =6a9e8d19...=), so a warm cache rebuilds instead of
 masking the fix.
+
+*** One vocabulary for seven waves: the country =relationship= table now HARMONIZES labels; GLSS1's code table is =relationship_glss1= (2026-09-07, GH #797)
+
+/Landed on =development= on 2026-09-07 (commit fd483b4f); verified cold in
+two private data dirs, the numbers are on GH #797./
+
+*What it was.*  The GH #797 gate found the seven waves serving FIVE
+relationship vocabularies (32 distinct strings) for the same categories:
+GLSS1/2 =Spouse=, GLSS3/4 =Wife/husband=, GLSS7 =Spouse (Wife/Husband)=;
+GLSS1/2 =Child=, GLSS3/4 =Son/daughter=, GLSS6/7 =Child (Son/Daughter)=; and
+so on.  Every string resolved in =kinship.yml= -- the tuples were right, the
+strings were not -- because the corpus had been coping by adding each
+survey's verbiage to the global ontology (nine =kinship.yml= keys were reached
+by GhanaLSS alone, filed under a section header that credits
+Kazakhstan/Tajikistan/South Africa).
+
+*What changed* (three files, all in this country):
+
+1. =_/categorical_mapping.org=: the GLSS1 fourteen-code =| Code | Label |=
+   table is renamed =relationship_glss1=; =1987-88/_/mapping.py= and
+   =1988-89/_/mapping.py= call =code_label_map('relationship_glss1', _dirs)=.
+   Their dicts are identical before/after (measured), and both waves are
+   served unchanged (0 strings differ).
+2. A NEW country-level =#+name: relationship= table, =| Original Label |
+   Preferred Label |= -- raw SERVED label FIRST, because =_build_replace_dict=
+   keys on the first column that is not =Preferred Label= -- 16 rows, mapping
+   every non-canonical string any wave serves onto ONE vocabulary of 17
+   labels: GLSS1's fourteen (Head, Spouse, Child, Grandchild, Parent, Sibling,
+   Niece/nephew, Son/daughter in-law, Brother/sister in-law, Father/mother
+   in-law, Other relative, Servant, Tenant, Others not related) plus three
+   later-instrument categories (=Parent/Parent-In-Law=, =Adopted Child=,
+   =Adopted/Foster/Stepchild=).  Identity rows are deliberately absent
+   (=.replace= leaves unmatched values alone); the table's own header says
+   so.  The Original Label is the served string, i.e. AFTER the title-casing
+   formatters (=_/ghanalss.py:Relationship= for 2012-13/2016-17, the wave
+   formatter for 2005-06), not the =.dta= value label.
+
+*How it works, and two things to know.*  =Country._apply_categorical_mappings=
+auto-applies a country table whose name matches a served column
+(case-insensitive), by =.str.strip()= then =.replace()=, on EVERY read --
+warm or cold -- and since =df9baf91= (GH #797) it runs BEFORE
+=_expand_kinship=, so the kinship lookup sees the Preferred Label.  Hence:
+- the served =Relationship= is rewritten at API time for all seven waves
+  (113,871 of 246,594 rows change string; 0 in GLSS1/2); the L2-wave and
+  L2-country parquets keep the RAW strings (=pd.read_parquet= on
+  =var/household_roster.parquet= still shows =Child (Son/Daughter)=);
+- =_/categorical_mapping.org= is a hashed build input for EVERY GhanaLSS
+  table (=Country._table_cache_hash= folds =_/*.org=), and a wave's
+  =mapping.py= for that wave, so =household_roster=, =food_acquired=,
+  =sample= and =cluster_features= ALL moved hash (measured) -- GhanaLSS
+  rebuilds once, for everyone, on the next read.
+
+*Tuple-preserving by construction.*  Every Original Label and its Preferred
+Label resolve to the SAME kinship tuple under =_expand_kinship='s lookup
+(=.strip().title()= first, then raw); checked statically and on all 246,594
+rows: =Generation=/=Distance=/=Affinity= byte-identical before/after, dtypes
+included; =household_characteristics= byte-identical.  A raw label with a
+distinct tuple keeps a distinct Preferred Label: =Adopted Child=
+[-1,0,consanguineal] vs =Adopted/Foster/Stepchild= [-1,0,step] (GhanaSPS
+2009-10's spelling, so the two Ghana surveys share it); =Parent/Parentlaw= /
+=Parent/Parent-In-Law= (one survey code conflating parent and parent-in-law
+-- GH #698's question) keeps its own label rather than folding into
+=Parent=, so #698 can still rule on it.  =Other= (GLSS6 code 11, 14 people;
+a code DISTINCT from 10 =Non_relative=, dropped in GLSS7) IS folded into
+=Others not related= because its tuple is [0,0,unrelated] today -- one row
+to reverse.  =Others not related= resolves only through its RAW
+=kinship.yml= key (its title form is not a key); that entry must stay.
+
+*Trap 2's mechanism is closed structurally.*  GLSS3 was mis-decoded for its
+whole life (GH #799) because a wave-first =code_label_map('relationship',
+_dirs)= found no wave table and fell through to the country GLSS1 table.
+That fall-through no longer exists: the country table named =relationship=
+has no =Code= column, so =code_label_map= raises =KeyError= there, moves on,
+and returns ={}= -- measured: =code_label_map('relationship', <1987-88
+_dirs>)= is ={}= after the rename -- and such a wave then ships a 100%-null
+=Relationship=, which Site B's per-wave required-column check
+(=NullReadWarning=; =Generation=/=Distance=/=Affinity= are required columns;
+the same check already fires on this country's =sample.strata=) reports.
+A null column is honest; a wrong kinship label is not.  1991-92 and 1998-99 still resolve their own
+wave tables (dicts identical before/after).
+
+*Verified cold* (two private =LSMS_DATA_DIR=s, one worktree, only the three
+files above differing): 246,594 rows before and after; index identical,
+row-aligned on =(i, t, v, pid)= (1988-89 aligns this time because both
+builds pass through =updated_ids=); 0 NA in all four columns; no "Unknown
+relationship labels" warning; warning sets identical; a second,
+separate-process read of the after dir is a warm read (parquet mtime
+unchanged) and returns the same 17 labels.  Per-wave raw -> harmonized
+crosstabs are in the report.
 
 ** Trap 3 (RESOLVED 2026-08-21): GLSS1/GLSS2 cluster region is now MEASURED
 
