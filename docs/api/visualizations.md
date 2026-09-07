@@ -12,11 +12,11 @@ ll.coordinate_map('Uganda', wave='2013-14', size='weight')           # clusters 
 ll.coordinate_map('Uganda', wave='2013-14', size='weight', interactive=False)   # static matplotlib
 ```
 
-`matplotlib` and `folium` are optional: they live in the `viz` dependency
-group (`poetry install --with viz`). The static paths need only
-`matplotlib`; the interactive map (`interactive=True`, the default) needs
-`folium` and renders inline in Jupyter or saves as standalone HTML. A missing
-dependency raises with the install hint rather than failing inside the plot.
+`matplotlib` and `folium` are ordinary dependencies (since v0.11.0); the
+interactive map (`interactive=True`, the default) renders inline in Jupyter or
+saves as standalone HTML, and `interactive=False` draws a static matplotlib
+scatter. `folium` is imported lazily; `matplotlib` is loaded at package import
+anyway (CFEDemands, a core dependency, imports `matplotlib.pyplot`).
 
 ::: lsms_library.visualizations
     options:
