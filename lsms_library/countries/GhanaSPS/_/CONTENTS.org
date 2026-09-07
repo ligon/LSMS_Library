@@ -2046,6 +2046,10 @@ three waves).  The single parent/parent-in-law code is served as =Parent=
 with the same tuple as before; note that GSPS =Parent= therefore means a
 parent OR a parent-in-law (208 / 132 / 165 people).  =Househelp= is
 =Servant= ([0,0,servant]).
+A second column, =Comparable Label= (=labels={'Relationship': 'Comparable'}=),
+is the eight-category common denominator shared with GhanaLSS (the adopted
+code folds into =Child=, child-in-law into =Other relative=) for pooling
+across the two surveys and GLSS's waves.
 
 Cost: the country =_/categorical_mapping.org= is a hashed build input for
 EVERY GhanaSPS table, so this edit rebuilds the country once for everyone.
