@@ -1657,28 +1657,29 @@ warm or cold -- and since =df9baf91= (GH #797) it runs BEFORE
   =sample= and =cluster_features= ALL moved hash (measured) -- GhanaLSS
   rebuilds once, for everyone, on the next read.
 
-*Tuple-preserving by construction.*  Every Original Label and its Preferred
-Label resolve to the SAME kinship tuple under =_expand_kinship='s lookup
-(=.strip().title()= first, then raw); checked statically and on all 246,594
-rows: =Generation=/=Distance=/=Affinity= byte-identical before/after, dtypes
-included; =household_characteristics= byte-identical.  A raw label with a
-distinct tuple keeps a distinct Preferred Label: =Adopted Child=
-[-1,0,consanguineal] vs =Adopted/Foster/Stepchild= [-1,0,step] (GhanaSPS
-2009-10's spelling, so the two Ghana surveys share it).  =Parent/Parentlaw=
-(GLSS5/6) and =Parent/Parent-In-Law= (GLSS7) are ONE survey code that
-conflates parent and parent-in-law; the ontology files both as
-=[1, 0, consanguineal]=, the same tuple as =Parent=, so they are served as
-=Parent= (label-only; decided 2026-09-07 after the split label was found to
-be the one visibly un-harmonized row).  *Caveat, the instrument's not ours:*
-GLSS1-4 =Parent= means a parent; GLSS5-7 =Parent= means a parent OR a
-parent-in-law (2005-06: 466 people, 2012-13: 897, 2016-17: 1,094), exactly
-as GLSS3+'s =Other relative= absorbs siblings, nieces and in-laws that GLSS1/2
-list separately.  If GH #698 ever gives the conflated code a partial-null
-tuple, the split label comes back (two table rows).  =Other= (GLSS6 code 11, 14 people;
-a code DISTINCT from 10 =Non_relative=, dropped in GLSS7) IS folded into
-=Others not related= because its tuple is [0,0,unrelated] today -- one row
-to reverse.  =Others not related= resolves only through its RAW
-=kinship.yml= key (its title form is not a key); that entry must stay.
+*Tuple-preserving by construction, with one stated exception.*  Every
+Original Label and its Preferred Label resolve to the SAME kinship tuple under
+=_expand_kinship='s lookup (=.strip().title()= first, then raw), checked on
+all 246,594 rows -- except the adopted row.  =Adopted Child= (GLSS5/6, 963
+people; was [-1,0,consanguineal]) and =Adopted / Foster/ Step Child= (GLSS7,
+501; was [-1,0,step]) are ONE label, =Adopted/foster/stepchild=, whose tuple
+is [-1, 0, null]: a child of the head, but adoptive / foster / step is not
+determined by the instruments and the ontology has no =adoptive= affinity,
+so Affinity is null (the GH #698 shape; GhanaSPS's three spellings of the
+same code carry the same tuple).  =Parent/Parentlaw= (GLSS5/6) and
+=Parent/Parent-In-Law= (GLSS7) are ONE survey code that conflates parent and
+parent-in-law, filed as [1, 0, consanguineal] like =Parent=, so they are
+served as =Parent= (label-only).  *Caveat, the instrument's not ours:* GLSS1-4
+=Parent= means a parent; GLSS5-7 =Parent= means a parent OR a parent-in-law
+(466 / 897 / 1,094 people), exactly as GLSS3+'s =Other relative= absorbs the
+siblings, nieces and in-laws that GLSS1/2 list separately.  GLSS1/2's own
+=Father/mother in-law= is =Parent-in-law=, =Brother/sister in-law= is
+=Sibling-in-law=, =Son/daughter in-law= is =Child-in-law=, =Others not
+related= is =Non-relative=.  =Other= (GLSS6 code 11, 14 people; a code
+DISTINCT from 10 =Non_relative=, dropped in GLSS7) folds into
+=Non-relative= ([0,0,unrelated] either way).  =Other relative= is
+[null, null, consanguineal] since 3069ef80 (its generation and distance are
+not recorded; it used to sit on Head's cell).
 
 *Trap 2's mechanism is closed structurally.*  GLSS3 was mis-decoded for its
 whole life (GH #799) because a wave-first =code_label_map('relationship',

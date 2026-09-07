@@ -85,44 +85,43 @@ formatter =_/ghanalss.py:Relationship= title-cases 2012-13 and 2016-17, and
 
 Identity rows are deliberately ABSENT: =.replace()= leaves unmatched values
 alone, so a label that is already canonical (Head, Spouse, Child, Grandchild,
-Parent, Sibling, Niece/nephew, Son/daughter in-law, Brother/sister in-law,
-Father/mother in-law, Other relative, Servant, Tenant, Others not related,
-Adopted Child) needs no row.  Do not add them.
+Parent, Sibling, Niece/nephew, Other relative, Servant, Tenant) needs no row.
+Do not add them.
 
-Tuple-preserving BY CONSTRUCTION: every Original Label and its Preferred
-Label resolve to the SAME kinship tuple in =kinship.yml= under the lookup
-=_expand_kinship= uses (=.strip().title()= first, then raw) -- checked
-statically and on all 246,594 rows, 2026-09-07.  Two raw labels share a
-Preferred Label only when their tuples agree; a raw label with a distinct
-tuple keeps a distinct Preferred Label:
-- =Adopted Child= [-1,0,consanguineal] (GLSS5/6) and =Adopted / Foster/ Step
-  Child= [-1,0,step] (GLSS7) are NOT merged.
+The vocabulary is ONE list shared with GhanaSPS (its country table maps onto
+the same labels; decided with @ligon 2026-09-07 -- a Ghana vocabulary, not a
+corpus one, because surveys elsewhere understand relationships differently):
+Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law, Grandchild,
+Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew, Other relative,
+Non-relative, Servant, Tenant.  Every one is a =kinship.yml= key (the lookup
+tries =.title()= first: =Parent-in-law= -> =Parent-In-Law=).
+
+Tuple-preserving BY CONSTRUCTION, with ONE stated exception: every Original
+Label and its Preferred Label resolve to the same kinship tuple under
+=_expand_kinship='s lookup, checked on all 246,594 rows -- except the adopted
+row.  =Adopted Child= (GLSS5/6, 963 people; was [-1,0,consanguineal]) and
+=Adopted / Foster/ Step Child= (GLSS7, 501; was [-1,0,step]) are one label,
+=Adopted/foster/stepchild=, whose tuple is [-1, 0, null]: a child of the
+head, but whether by adoption, fostering or a step relation the instruments
+do not agree and the ontology has no =adoptive= affinity, so Affinity is
+null (the GH #698 shape, same as =Other relative='s Generation/Distance).
+Other decisions the table encodes:
 - =Parent/Parentlaw= (GLSS5/6) and =Parent/Parent-In-Law= (GLSS7) are ONE
-  survey code that conflates parent and parent-in-law; the ontology files
-  both as =[1, 0, consanguineal]=, the same tuple as =Parent=.  They are
-  served as =Parent= (label-only change; tuple unchanged), and the
-  conflation is recorded in CONTENTS.org the same way GLSS3+'s =Other
-  relative= absorbing siblings is: GLSS1-4 =Parent= is a parent; GLSS5-7
-  =Parent= is a parent OR a parent-in-law.  If GH #698 ever gives the
-  conflated code a partial-null tuple, the split label comes back (two rows).
-- =Other= (GLSS6 code 11, 14 people) is a code DISTINCT from code 10
-  =Non_relative= in that instrument, and GLSS7 dropped it.  Its tuple is
-  [0,0,unrelated] today, so folding it into =Others not related= is
-  tuple-preserving; it is one row to reverse if that tuple is ever
-  revisited (the same shape as the =Parent/Parentlaw= question, decided the
-  other way because the tuple, not the label, is what the ontology owns).
+  survey code conflating parent and parent-in-law; served as =Parent= (tuple
+  unchanged); the conflation is recorded in CONTENTS.org like GLSS3+'s =Other
+  relative= absorbing siblings.  GLSS1/2's separate =Father/mother in-law= is
+  =Parent-in-law=.
+- =Other= (GLSS6 code 11, 14 people; distinct from code 10 =Non_relative=)
+  folds into =Non-relative=: tuple [0,0,unrelated] either way.
+- GLSS7's served =Non-Relative= (the country formatter title-cases the raw
+  =Non-relative=) needs its own row: =.replace()= is exact, and a capital R
+  is a different string.
 - =Househelp (Other relative)= (GLSS7 code 9) and =House help (Non-relative)=
-  (code 10) both carry [0,0,servant]; the relative/non-relative annotation
-  is not preserved in the label (the tuple never carried it either).
+  (code 10) both carry [0,0,servant]; the annotation is not preserved.
 
-The canonical vocabulary is GLSS1's fourteen labels -- so 1987-88 and
-1988-89 are served unchanged -- plus three later-instrument categories:
-=Adopted Child= and =Adopted/Foster/Stepchild=
-(GhanaSPS 2009-10's spelling and an existing =kinship.yml= key, so the two
-Ghana surveys share it; GSPS itself drifts across its three waves).
-=Others not related= resolves in =kinship.yml= only through its RAW key
-(its =.title()= form =Others Not Related= is not a key) -- that entry must
-stay, or this country's non-relatives go null.
+=Others not related= (GLSS1's wording) is =Non-relative= as of 2026-09-07;
+GLSS1/2's decode table (=relationship_glss1=) keeps the questionnaire wording
+and this table harmonizes it, so the decode stays verbatim.
 
 Raw code lists, for provenance (value labels read from the .dta, 2026-09-07):
 - GLSS5 (2005-06 =parta/sec1.dta:s1q3=): 1 head, 2 spouse, 3 child,
@@ -147,19 +146,24 @@ the table steals the name and the build reports success).
 | Spouse (Wife/Husband)        | Spouse                   |
 | Son/daughter                 | Child                    |
 | Child (Son/Daughter)         | Child                    |
+| Adopted Child                | Adopted/foster/stepchild |
+| Adopted / Foster/ Step Child | Adopted/foster/stepchild |
+| Son/daughter in-law          | Child-in-law             |
+| Son/Daughterlaw              | Child-in-law             |
+| Son/Daughter-In-Law          | Child-in-law             |
 | Father/mother                | Parent                   |
 | Parent/Parentlaw             | Parent                   |
 | Parent/Parent-In-Law         | Parent                   |
-| Son/Daughterlaw              | Son/daughter in-law      |
-| Son/Daughter-In-Law          | Son/daughter in-law      |
+| Father/mother in-law         | Parent-in-law            |
+| Brother/sister in-law        | Sibling-in-law           |
 | Other Relative               | Other relative           |
-| Non_Relative                 | Others not related       |
-| Non-Relative                 | Others not related       |
-| Other                        | Others not related       |
+| Others not related           | Non-relative             |
+| Non-Relative                 | Non-relative             |
+| Non_Relative                 | Non-relative             |
+| Other                        | Non-relative             |
 | Househelp                    | Servant                  |
 | House Help (Non-Relative)    | Servant                  |
 | Househelp (Other Relative)   | Servant                  |
-| Adopted / Foster/ Step Child | Adopted/Foster/Stepchild |
 
 * Units (Section 9B, GLSS7 / 2016-17)
 Stata value labels for the =s9bq*c= unit columns, lifted once from the full

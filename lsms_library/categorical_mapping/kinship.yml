@@ -705,7 +705,7 @@ unrelated:                                                      [0, 0, unrelated
 #   "Adopted / Foster/ Step Child" -> [-1, 0, step]
 #   "Parent/Parent-In-Law"         -> [1, 0, consanguineal]
 #   "Son/Daughter-in-law"          -> [-1, 0, affinal]
-"Adopted/Foster/Stepchild":      [-1, 0, step]
+"Adopted/Foster/Stepchild":      [-1, 0, null]   # Ghana shared label: adoptive/foster/step undetermined (GH #797, 2026-09-07)
 "Adopted, Foster, Or Stepchild": [-1, 0, step]
 "Adopted, Foster/Stepchild":     [-1, 0, step]
 "Parent Or Parent-In-Law":       [1, 0, consanguineal]

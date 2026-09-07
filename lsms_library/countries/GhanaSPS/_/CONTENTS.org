@@ -2022,3 +2022,33 @@ M200 labels are a copy-paste of the communal ones); =hiredhowpay= (Cash 1,733
 =whoworked= multi-select flags (redundant with which source rows carry
 person-days); 2009-10's A289 / A326 season months (=crop_production= already
 delivers the ending month as =harvest_month=).
+
+* household_roster -- Relationship vocabulary shared with GhanaLSS (GH #797, 2026-09-07)
+
+GSPS's three waves ship the same relationship categories under three
+spellings (=Household Head= / =Head=; =Adopted/Foster/Stepchild= / =Adopted,
+foster, or stepchild= / =Adopted, foster/stepchild=; three spellings of the
+parent/parent-in-law code; two of son/daughter-in-law).  A country-level
+=#+name: relationship= table in =_/categorical_mapping.org= (=| Original Label
+| Preferred Label |=, applied automatically at API time to the served
+=Relationship= column; the parquets keep the raw strings) maps them onto the
+ONE vocabulary GhanaLSS serves -- Head, Spouse, Child,
+Adopted/foster/stepchild, Child-in-law, Grandchild, Parent, Parent-in-law,
+Sibling, Sibling-in-law, Niece/nephew, Other relative, Non-relative, Servant,
+Tenant -- of which GSPS uses ten.  Decided with @ligon 2026-09-07 as a GHANA
+vocabulary, not a corpus one: surveys elsewhere understand relationships
+differently, so the harmonization target is per survey family.
+
+Tuples: every row is tuple-preserving except the adopted/foster/step code,
+whose shared label =Adopted/foster/stepchild= carries [-1, 0, null] (was
+[-1, 0, step]; adoptive / foster / step undetermined -- 617 people across the
+three waves).  The single parent/parent-in-law code is served as =Parent=
+with the same tuple as before; note that GSPS =Parent= therefore means a
+parent OR a parent-in-law (208 / 132 / 165 people).  =Househelp= is
+=Servant= ([0,0,servant]).
+
+Cost: the country =_/categorical_mapping.org= is a hashed build input for
+EVERY GhanaSPS table, so this edit rebuilds the country once for everyone.
+Verified on a warm-then-rebuilt read 2026-09-07: 54,251 rows, ten labels, no
+"Unknown relationship labels" warning; the tuple change is confined to the
+617 adopted rows.
