@@ -1,4 +1,5 @@
 country,feature,wave,tier,coverage,n_rows,detail
+Albania,<wave>,1996,blocked,declared,,"blocked, and NOT MODELLED as a wave (no _/ config): Directory and WB catalog entry (ALB_1996_EWS, Employment and Welfare Survey 1996) both exist; we hold zero data files. Acquisition never completed; source believed unreachable — NOT yet confirmed. [probe https://microdata.worldbank.org/index.php/catalog/2311]"
 Albania,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Albania,assets,2002,sane,declared,20448,all checks pass
 Albania,assets,2003,absent,absent,,source not declared for wave
@@ -87,8 +88,8 @@ Armenia,crop_production,,undeclared,absent,,not declared by this country for any
 Armenia,food_acquired,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_coping,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_security,,undeclared,absent,,not declared by this country for any wave
-Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
-Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
 Armenia,housing,,undeclared,absent,,not declared by this country for any wave
 Armenia,individual_education,,undeclared,absent,,not declared by this country for any wave
 Armenia,interview_date,,undeclared,absent,,not declared by this country for any wave
@@ -693,7 +694,7 @@ GhanaLSS,food_acquired,1987-88,sane,declared,71605,"warn: index_levels_match_sch
 GhanaLSS,food_acquired,1988-89,sane,declared,72649,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaLSS,food_acquired,1991-92,sane,declared,623600,warn: index_levels_match_scheme
 GhanaLSS,food_acquired,1998-99,sane,declared,542105,warn: index_levels_match_scheme
-GhanaLSS,food_acquired,2005-06,sane,declared,1115420,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,2005-06,sane,declared,1115396,warn: index_levels_match_scheme
 GhanaLSS,food_acquired,2012-13,sane,declared,1709094,warn: index_levels_match_scheme
 GhanaLSS,food_acquired,2016-17,sane,declared,1124871,warn: index_levels_match_scheme
 GhanaLSS,food_coping,,undeclared,absent,,not declared by this country for any wave
@@ -715,7 +716,7 @@ GhanaLSS,food_quantities,1987-88,sane,declared,71605,all checks pass
 GhanaLSS,food_quantities,1988-89,sane,declared,72649,all checks pass
 GhanaLSS,food_quantities,1991-92,sane,declared,114141,all checks pass
 GhanaLSS,food_quantities,1998-99,sane,declared,161176,all checks pass
-GhanaLSS,food_quantities,2005-06,sane,declared,259227,all checks pass
+GhanaLSS,food_quantities,2005-06,sane,declared,259202,all checks pass
 GhanaLSS,food_quantities,2012-13,sane,declared,511720,all checks pass
 GhanaLSS,food_quantities,2016-17,sane,declared,420529,all checks pass
 GhanaLSS,food_security,1987-88,absent,absent,,"unsure: C1 could not run: GLSS1 ships fixed-format .DAT with .DCT dictionaries that carry variable NAMES only (no variable labels, no value labels) -- 77/93 dictionaries swept, none food-adequacy shaped. C4 could not run: 1987-88/Documentation/questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf is 78 CCITT-fax page scans with ZERO embedded font objects (pdfminer extracts 0 non-whitespace chars), and no OCR is available here, so the form cannot be searched for a stray food-adequacy item. What IS established: the joint LSMS Basic Information Document 1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf (covers both rounds, full text layer) enumerates every module of the household questionnaire in 2.1 -- sections 0,1A-C,2A-B,3I-II,4,5A-H,6,7,8,9A-K,10A-D,11A-D,12A-B,13A-B,14A-B,15A-C,16A-B,17A-C -- and names no food-security or food-adequacy module; section 12 is 'FOOD EXPENSES AND HOME PRODUCTION' (item-code loops, Y12A/Y12B). Not closed: a single item inside a section cannot be excluded without reading or OCRing the 78-page scan."
@@ -734,7 +735,7 @@ GhanaLSS,household_characteristics,2012-13,sane,declared,16769,all checks pass
 GhanaLSS,household_characteristics,2016-17,sane,declared,13990,all checks pass
 GhanaLSS,household_roster,1987-88,sane,declared,15492,warn: index_levels_match_scheme
 GhanaLSS,household_roster,1988-89,sane,declared,14924,warn: index_levels_match_scheme
-GhanaLSS,household_roster,1991-92,sane,declared,20403,warn: index_levels_match_scheme
+GhanaLSS,household_roster,1991-92,sane,declared,20403,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaLSS,household_roster,1998-99,sane,declared,26411,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaLSS,household_roster,2005-06,sane,declared,37128,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaLSS,household_roster,2012-13,sane,declared,72372,"warn: index_levels_match_scheme,no_constant_columns"
@@ -764,7 +765,7 @@ GhanaLSS,life_satisfaction,,undeclared,absent,,not declared by this country for 
 GhanaLSS,livestock,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
-GhanaLSS,nutrition,,sane,declared,29095,29095 entries
+GhanaLSS,nutrition,,sane,declared,33658,33658 entries
 GhanaLSS,panel_ids,,sane,declared,714,714 entries
 GhanaLSS,people_last7days,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,plot_features,1987-88,not-asked,absent,,"not-asked: C4 ran VISUALLY on the scanned form (CCITT-fax pages rendered to PNG): 1987-88/Documentation/questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf p.42-43 = printed pages 30-31, form blocks '9A1'/'9A2', 'SECTION 9. AGRO-PASTORAL ACTIVITIES / PART A. LAND'. Questions 1-29 are all single-answer household totals -- Q3 'How many acres of the land belonging to your household have been farmed during the past 12 months' (one ACRES box), Q4 fallow, Q5 government scheme, Q6 irrigated, Q8 registered, Q7 'Do you or the members of your household have the right to sell all or part of their land' (one code box), Q10-14 sales/gifts, Q15-18 rented/sharecropped out, Q19-26 acquisitions + title, Q27-29 sharecropped in, then '>> PART B'. There is NO farm-number column and no repeated per-farm row anywhere in Part A, and a page-header sweep across pp.25-63 shows Section 9's parts to be A(Land) B(Crops) D(Farm inputs) F(Livestock) J(Hand tools) -- no farm/plot roster part. C1: 1987-88/Data/Y09A.DAT is strictly household-grain (2,644 rows, 2,644 unique HID, max 1 row per HID); none of Y09B..Y09K carries a farm or plot key (they are keyed by crop code, input code, livestock code or tool). C2: the GLSS3+ per-plot roster (S8B.DTA / sec8b.dta / g7sec8b.dta, one row per household-farm with a farm number, area, unit and tenure) has no GLSS1/GLSS2 counterpart. C3 inapplicable: GLSS is not LSMS-ISA."
@@ -1245,8 +1246,8 @@ Mali,individual_education,2018-19,sane,declared,46014,warn: index_levels_match_s
 Mali,individual_education,2021-22,sane,declared,43472,warn: index_levels_match_scheme
 Mali,interview_date,2014-15,sane,declared,3804,all checks pass
 Mali,interview_date,2017-18,sane,declared,8390,all checks pass
-Mali,interview_date,2018-19,dropped,declared,,declared for wave but absent from built t-index
-Mali,interview_date,2021-22,dropped,declared,,declared for wave but absent from built t-index
+Mali,interview_date,2018-19,sane,declared,6602,all checks pass
+Mali,interview_date,2021-22,sane,declared,6143,all checks pass
 Mali,life_satisfaction,,undeclared,absent,,not declared by this country for any wave
 Mali,livestock,2014-15,sane,declared,9939,all checks pass
 Mali,livestock,2017-18,sane,declared,30757,all checks pass
@@ -1286,9 +1287,9 @@ Mali,subjective_well_being,2018-19,sane,declared,6584,warn: index_levels_match_s
 Mali,subjective_well_being,2021-22,sane,declared,6105,warn: index_levels_match_scheme
 Mali,updated_ids,,sane,declared,4,4 entries
 Nepal,anthropometry,,undeclared,absent,,not declared by this country for any wave
-Nepal,assets,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,assets,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,assets,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,assets,1995-96,blocked,declared,,blocked[nso-redirect]: NSO Nepal hosts the microdata (not the WB); the NSO site has been unreachable/broken and we have not been able to reach a human there. [probe https://microdata.nsonepal.gov.np/; last checked 2026-07-12]
+Nepal,assets,2003-04,blocked,declared,,blocked[nso-redirect]: NSO Nepal hosts the microdata (not the WB); the NSO site has been unreachable/broken and we have not been able to reach a human there. [probe https://microdata.nsonepal.gov.np/; last checked 2026-07-12]
+Nepal,assets,2010-11,blocked,declared,,blocked[nso-redirect]: NSO Nepal hosts the microdata (not the WB); the NSO site has been unreachable/broken and we have not been able to reach a human there. [probe https://microdata.nsonepal.gov.np/; last checked 2026-07-12]
 Nepal,cluster_features,1995-96,absent,absent,,source not declared for wave
 Nepal,cluster_features,2003-04,absent,absent,,source not declared for wave
 Nepal,cluster_features,2010-11,absent,absent,,source not declared for wave
@@ -1330,9 +1331,9 @@ Nepal,people_last7days,,undeclared,absent,,not declared by this country for any 
 Nepal,plot_features,,undeclared,absent,,not declared by this country for any wave
 Nepal,plot_inputs,,undeclared,absent,,not declared by this country for any wave
 Nepal,plot_labor,,undeclared,absent,,not declared by this country for any wave
-Nepal,sample,1995-96,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,sample,2003-04,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
-Nepal,sample,2010-11,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta' neither as a DVC output nor as a Git-tracked file.
+Nepal,sample,1995-96,blocked,declared,,blocked[nso-redirect]: NSO Nepal hosts the microdata (not the WB); the NSO site has been unreachable/broken and we have not been able to reach a human there. [probe https://microdata.nsonepal.gov.np/; last checked 2026-07-12]
+Nepal,sample,2003-04,blocked,declared,,blocked[nso-redirect]: NSO Nepal hosts the microdata (not the WB); the NSO site has been unreachable/broken and we have not been able to reach a human there. [probe https://microdata.nsonepal.gov.np/; last checked 2026-07-12]
+Nepal,sample,2010-11,blocked,declared,,blocked[nso-redirect]: NSO Nepal hosts the microdata (not the WB); the NSO site has been unreachable/broken and we have not been able to reach a human there. [probe https://microdata.nsonepal.gov.np/; last checked 2026-07-12]
 Nepal,shocks,,undeclared,absent,,not declared by this country for any wave
 Nepal,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Niger,anthropometry,,undeclared,absent,,not declared by this country for any wave
