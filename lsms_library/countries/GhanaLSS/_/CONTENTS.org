@@ -1608,8 +1608,8 @@ masking the fix.
 
 *** One vocabulary for seven waves: the country =relationship= table now HARMONIZES labels; GLSS1's code table is =relationship_glss1= (2026-09-07, GH #797)
 
-/Landed on =development= on 2026-09-07 (commit fd483b4f); verified cold in
-two private data dirs, the numbers are on GH #797./
+/Landed on =development= on 2026-09-07 (=1de2f0e8=, then =30d7a8f1=, =9ad8e04f=,
+=4c2a466e=); verified cold in two private data dirs, the numbers are on GH #797./
 
 *What it was.*  The GH #797 gate found the seven waves serving FIVE
 relationship vocabularies (32 distinct strings) for the same categories:
@@ -1629,18 +1629,32 @@ Kazakhstan/Tajikistan/South Africa).
    Their dicts are identical before/after (measured), and both waves are
    served unchanged (0 strings differ).
 2. A NEW country-level =#+name: relationship= table, =| Original Label |
-   Preferred Label |= -- raw SERVED label FIRST, because =_build_replace_dict=
-   keys on the first column that is not =Preferred Label= -- 16 rows, mapping
-   every non-canonical string any wave serves onto ONE vocabulary of 17
-   labels: GLSS1's fourteen (Head, Spouse, Child, Grandchild, Parent, Sibling,
-   Niece/nephew, Son/daughter in-law, Brother/sister in-law, Father/mother
-   in-law, Other relative, Servant, Tenant, Others not related) plus three
-   later-instrument categories (=Parent/Parent-In-Law=, =Adopted Child=,
-   =Adopted/Foster/Stepchild=).  Identity rows are deliberately absent
-   (=.replace= leaves unmatched values alone); the table's own header says
-   so.  The Original Label is the served string, i.e. AFTER the title-casing
-   formatters (=_/ghanalss.py:Relationship= for 2012-13/2016-17, the wave
-   formatter for 2005-06), not the =.dta= value label.
+   Preferred Label | Comparable Label |= -- raw SERVED label FIRST, because
+   =_build_replace_dict= keys on the first column that is neither =Preferred
+   Label= nor the requested variant.  =Preferred= (the default) maps every
+   non-canonical string any wave serves onto ONE vocabulary of 15 labels
+   SHARED WITH GhanaSPS (decided with @ligon 2026-09-07: a Ghana vocabulary,
+   not a corpus one, because surveys elsewhere understand relationships
+   differently): Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law,
+   Grandchild, Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew,
+   Other relative, Non-relative, Servant, Tenant.  The Original Label is the
+   served string, i.e. AFTER the title-casing formatters
+   (=_/ghanalss.py:Relationship= for 2012-13/2016-17, the wave formatter for
+   2005-06), not the =.dta= value label -- which is why GLSS7's =Non-Relative=
+   needs a row of its own.  Identity rows exist only where the two variants
+   differ (Sibling, Niece/nephew, Tenant); =.replace= leaves unmatched values
+   alone, so a label canonical in both variants needs none.
+   =Comparable=, selected with =household_roster(labels={'Relationship':
+   'Comparable'})=, is the eight categories every GLSS form asked (Head,
+   Spouse, Child, Grandchild, Parent, Other relative, Non-relative, Servant)
+   for pooling across waves: GLSS1/2's siblings, nieces and in-laws fold into
+   =Other relative= (where GLSS3+ put them), Tenant into =Non-relative=, the
+   adopted code into =Child=, Parent-in-law into =Parent=; the kinship tuple
+   follows the coarse label.  Residual imbalance no relabelling removes:
+   GLSS3/4's =Parent= excludes parents-in-law (they sit in "relative of head
+   or spouse"); every other wave's includes them.  Measured 2026-09-07:
+   identical row counts under both variants; Generation NA 5.6% (Preferred)
+   vs 6.5% (Comparable).
 
 *How it works, and two things to know.*  =Country._apply_categorical_mappings=
 auto-applies a country table whose name matches a served column
