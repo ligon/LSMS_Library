@@ -1205,6 +1205,16 @@ convention and no passphrase exists in this repository.  Independently,
 permissions gate.  Consequence: wave 3 has *no usable crop price table and no
 usable unit-conversion table*.
 
+*Sidecars RETIRED 2026-09-07 (GH #750).*  The four =.dvc= files dated from
+the 2025-08-08 rearrangement and their blobs were never pushed: absent from
+the S3 remote (the =dvc-remote-reachability= CI sweep failed on exactly these
+four), absent from every local blob cache checked, and not in the public
+Dataverse release.  Even recovered from the machine that ran the
+rearrangement they would be Boxcryptor ciphertext with no key.  Dropped on the
+Togo precedent (=4f8483b4=), so the sweep can be green; the folder is gone
+from git.  If the plaintext ever turns up, add it under NEW sidecars and wire
+a wave-3 crop-price table -- this entry says what the library never had.
+
 ** =04o_cropsalesstoresservices= is NOT crop sales
 
 It is *agricultural services* -- tractor/plough hire and fertiliser/chemical
