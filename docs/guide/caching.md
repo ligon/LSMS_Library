@@ -7,8 +7,8 @@ reads the relevant raw data files, harmonizes them, and writes the result
 as a Parquet file under `data_root()`. Subsequent calls -- in this process
 or a fresh one -- read that Parquet instead of rebuilding from source. There
 is no in-memory memoization: each call re-reads the Parquet and re-runs
-`_finalize_result` (kinship expansion, canonical spellings, categorical
-mappings, dtype coercion, the `v` join, weight normalisation), so repeat
+`_finalize_result` (categorical mappings, kinship expansion, canonical
+spellings, dtype coercion, the `v` join, weight normalisation), so repeat
 calls are much cheaper than the first but not free, and they return a new
 object each time. The raw `.dta` blobs themselves are also cached locally,
 so cold rebuilds (e.g. after editing a wave's `data_info.yml`) don't have
