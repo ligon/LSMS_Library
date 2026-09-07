@@ -519,3 +519,56 @@ def _daemon_probe(_):
     # Module-level so Pool.apply can pickle it.
     from lsms_library import _parallel_waves as pw
     return pw._in_daemonic_process(), pw.build_workers(7, env={})
+
+
+class TestForkUnsafeFallback:
+    """A worker that dies on a fork-unsafe object (fsspec's async loop reached
+    through DVC when a blob must be streamed) does not fail the build: the
+    wave is rebuilt in the parent.  Reproduced on CI's cold cache,
+    2026-09-07 (Mali cluster_features x4)."""
+
+    def test_wave_is_rebuilt_in_the_parent_with_a_warning(self, monkeypatch):
+        import warnings
+        import pandas as pd
+        from lsms_library import _parallel_waves as pw
+        monkeypatch.setattr(pw, "visible_cpus", lambda env=None: 4)
+        monkeypatch.setattr(pw, "memory_worker_cap", lambda env=None: None)
+        monkeypatch.setenv("LSMS_BUILD_WORKERS", "2")
+        payloads = pw.prebuild(_fork_unsafe_in_worker, ["a", "b"], None, country="X", table="t")
+        assert payloads is not None
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            # prebuild already warned; relay must now succeed for BOTH waves
+            for w in ("a", "b"):
+                has, df = pw.relay(payloads[w], country="X", table="t")
+                assert has and isinstance(df, pd.DataFrame) and df["wave"].iloc[0] == w
+        # the payloads carry no error and were built in the parent
+        assert all(p.get("error") is None for p in payloads.values())
+
+    def test_a_different_worker_error_still_raises(self, monkeypatch):
+        import pytest
+        from lsms_library import _parallel_waves as pw
+        monkeypatch.setattr(pw, "visible_cpus", lambda env=None: 4)
+        monkeypatch.setattr(pw, "memory_worker_cap", lambda env=None: None)
+        monkeypatch.setenv("LSMS_BUILD_WORKERS", "2")
+        payloads = pw.prebuild(_value_error_in_worker, ["a", "b"], None, country="X", table="t")
+        with pytest.raises(ValueError, match="genuine"):
+            pw.relay(payloads["a"], country="X", table="t")
+
+
+def _fork_unsafe_in_worker(w):
+    # Module-level so the fork-context pool can run it.  In a worker, mimic
+    # fsspec; in the parent, build normally.
+    import os, pandas as pd
+    from lsms_library import _parallel_waves as pw
+    if pw._IN_WORKER:
+        raise RuntimeError("This class is not fork-safe")
+    return True, pd.DataFrame({"wave": [w], "pid": [os.getpid()]})
+
+
+def _value_error_in_worker(w):
+    import pandas as pd
+    from lsms_library import _parallel_waves as pw
+    if pw._IN_WORKER:
+        raise ValueError("genuine build failure")
+    return True, pd.DataFrame({"wave": [w]})
