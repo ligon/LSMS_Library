@@ -345,3 +345,48 @@ def test_bad_scale_rejected():
 
     with pytest.raises(ValueError, match="scale must be"):
         _radius_by_area([1.0], scale="sqrt")
+
+
+# --- coordinate_map(where=) ------------------------------------------------
+
+def _clusters():
+    return pd.DataFrame({
+        "v": ["c1", "c2", "c3", "c4", "c5"],
+        "Region": ["bafata", "bafata", "oio", "oio", "sab"],
+        "Rural": ["Rural", "Urban", "Rural", "Rural", "Urban"],
+        "Latitude": [12.1, 12.2, 12.0, None, 11.9],
+        "Longitude": [-14.6, -14.7, -15.0, -15.1, -15.6],
+        "weight": [10.0, 20.0, 5.0, 7.0, 40.0],
+    })
+
+
+def test_where_dict_restricts_titles_and_counts_dropped_within_the_selection():
+    from lsms_library.visualizations import coordinate_map
+    ax = coordinate_map(_clusters(), size="weight", interactive=False,
+                        where={"Region": "oio"})
+    assert "Region = oio" in ax.get_title(loc="left")
+    # c3 drawn, c4 has no latitude: one point, one dropped -- both stated.
+    texts = " ".join(t.get_text() for t in ax.texts)
+    assert "1 points" in texts and "1 cluster(s) without coordinates" in texts
+    assert len(ax.collections[0].get_offsets()) == 1
+
+
+def test_where_accepts_a_list_and_a_callable():
+    from lsms_library.visualizations import coordinate_map
+    ax = coordinate_map(_clusters(), interactive=False,
+                        where={"Region": ["bafata", "sab"]})
+    assert len(ax.collections[0].get_offsets()) == 3
+    assert "Region in {bafata, sab}" in ax.get_title(loc="left")
+    ax = coordinate_map(_clusters(), interactive=False,
+                        where=lambda df: df.Rural == "Urban")
+    assert len(ax.collections[0].get_offsets()) == 2
+
+
+def test_where_that_matches_nothing_names_the_values_the_column_holds():
+    from lsms_library.visualizations import coordinate_map
+    with pytest.raises(ValueError, match=r"Region in \['Bafata'\].*bafata, oio, sab"):
+        coordinate_map(_clusters(), interactive=False, where={"Region": "Bafata"})
+    with pytest.raises(KeyError, match="not a column"):
+        coordinate_map(_clusters(), interactive=False, where={"strata": "x"})
+    with pytest.raises(TypeError, match="where= takes"):
+        coordinate_map(_clusters(), interactive=False, where="Region == 'oio'")
