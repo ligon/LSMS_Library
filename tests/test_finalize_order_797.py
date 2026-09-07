@@ -29,8 +29,32 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
+from types import SimpleNamespace
+
+from lsms_library.country import Country as _CountryCls
 from lsms_library.country import _expand_kinship, _load_kinship_map
-from tests.test_label_selection import _fake_country, _stub_finalize
+
+
+# Self-contained twins of tests/test_label_selection.py's fixtures.  Not
+# imported from there: `from tests.test_label_selection import ...` collected
+# locally but failed in CI (`No module named 'tests.tests'` under
+# `poetry run pytest`), which broke the whole unit-tests job on 2026-09-07.
+def _fake_country(cat_maps, name="Fixtureland"):
+    """Minimal stand-in exposing what ``_apply_categorical_mappings`` reads."""
+    fake = SimpleNamespace(name=name, categorical_mapping=cat_maps)
+    fake._apply_categorical_mappings = (
+        _CountryCls._apply_categorical_mappings.__get__(fake))
+    return fake
+
+
+def _stub_finalize(fake):
+    """Bind the real ``_finalize_result`` onto a fake, stubbing only what these
+    tests do not exercise (index augmentation, id_walk, the v-join)."""
+    fake._augment_index_from_related_tables = lambda df, scheme_entry, wave: df
+    fake.data_scheme = []            # no 'sample' -> no v-join re-entry
+    fake._updated_ids_cache = None   # no id_walk
+    fake._finalize_result = _CountryCls._finalize_result.__get__(fake)
+    return fake
 
 # A raw survey wording that kinship.yml does NOT know (asserted below), and the
 # canonical label it should be mapped onto, which kinship.yml DOES know.
