@@ -83,3 +83,22 @@ Each non-ASCII label is tagged:
   ~ligonlibrary~.
 - ~n_coerce_drops~ is computed with ~encoding='latin-1'~, which is what all
   three real call sites pass (~ISO-8859-1~ is an alias).
+
+* Follow-ups (added at the merge with development, 2026-09-07)
+
+- GH #801 (development =1757d4b2=) fixed the six =household_roster=
+  Relationship artefacts at the wave level, citing the per-file records
+  here: the =c1= rosters (Niger / Senegal / Benin / Togo 2018-19
+  =s01_me_*=, cp1252 read as latin-1 -> =_decode_cp1252= in each wave's
+  =mapping.py=), Mali 2018-19 (labels truncated IN THE FILE, zero
+  non-ASCII bytes in that label set -- no reader setting recovers them)
+  and Burkina Faso 2014 =individu= (a literal =?= in the file).  Evidence
+  and the decoder matrix: =slurm_logs/gh797/fix_801/REPORT.org=.
+- GH #805 is the reader-level policy question this sweep sized: pandas
+  =StataReader= decodes every pre-118 file as latin-1 with no per-file
+  override on =get_dataframe='s path, and this sweep's 1,501 =c1=-signature
+  labels (sum of =signatures.c1= over the 3,745 records) are the corpus-wide
+  cost.  A cp1252-first fallback for format < 118 touches only those; the
+  =double= class (1,064 labels; the Senegal =s07b= / Cambodia pattern) is
+  untouched by it and stays load-bearing on the EHCVM crosswalks -- see the
+  Senegal and Burkina Faso =CONTENTS.org= sections.

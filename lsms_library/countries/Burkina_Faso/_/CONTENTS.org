@@ -625,12 +625,41 @@ Note =product= is an =int16= column with a value-label set -- so this is a
 introduces.  2014 is built through the YAML path (a four-file =file:= list in
 =2014/_/data_info.yml=), *not* the legacy script route.
 
+*Not every 2014 file is cp1252* (added at the merge with =development=,
+2026-09-07).  The same wave's roster file =emc2014_p1_individu_27022015.dta=
+is clean Latin-1 except for a literal =?= (0x3F) where the oe ligature of
+Relationship code 6 belongs -- sweep record =nort 62=, no =c1= -- so no
+decoder recovers it, and GH #801 repairs it by whole-value replacement in
+=2014/_/mapping.py::household_roster= (see =** DONE household_roster= above).
+One wave, two files, two defect classes: a cp1252-aware read fixes the
+=conso7jours= labels and does nothing for the roster's =?=.
+
 Two *distinct* failures are therefore mixed in the table above: 0x85/0x9C/0x92
 are *cp1252* bytes read as latin-1 (the C1-control signature), while
 =<00C5><0093>= is the familiar double-encoding.  A single
 =.encode('latin-1').decode('utf-8')= repairs the third and *not* the first
 two, which need =.decode('cp1252')= -- so the existing =_decode_mojibake=
 helper is *necessary but not sufficient* for this country.
+
+*The cp1252 leg now exists in-repo too* (added at the merge with
+=development=, 2026-09-07): GH #801 landed =_decode_cp1252=
+(=value.encode('latin-1').decode('cp1252')=, guarded on a codepoint in
+U+0080-U+009F) in the Benin / Niger / Senegal / Togo 2018-19 =_/mapping.py=,
+applied to the roster's =Relationship= only.  GH #805 proposes moving that
+policy into the reader (cp1252-first for format < 118), which would repair
+the 2014 =conso7jours= labels at the read -- the sweep counts 18 =c1= labels
+in =emc2014_p1_conso7jours_16032015.dta= -- and would NOT touch the 2018-19
+=<00C5><0093>= class (a format-118 file, outside #805's scope, and a
+double-encoding rather than a C1 signature).  Either way the crosswalk moves
+with it: =_/categorical_mapping.org= =#+NAME: harmonize_food= carries three
+keys with a C1 control in them today (rows 296 / 303 / 304: =<008C>ufs=,
+=Viande de b<00C5><0093>uf=, =Viandes de b<009C>ufs fra<00EE>ches=, the
+latter two mapped to =Viande de boeuf=).  Whether those three keys currently
+*match* is itself open -- rows 303 / 304 name exactly the two beef strings the
+table below reports as served unmapped (1,397 + 1,901 rows), and the crosswalk
+file is unchanged since the measurement -- so a reader change here must land
+with a re-key *and* a re-measurement of the leak table, not either alone
+(GH #794).
 
 *Most of the damage is absorbed by the crosswalk; only the uncovered rows
 leak.*  Measured on the raw reads:
@@ -656,7 +685,12 @@ ways and silently understates each.
 Scoped by measurement: the same leak-scan over Benin, Togo, Guinea-Bissau,
 Niger, CotedIvoire, Senegal and Cambodia returns *0* leaking =j= or =u=
 values.  Burkina Faso is the cohort member with *neither* a
-=_decode_mojibake= hook *nor* a =_LOST_PREFIX_REPLACEMENTS= dict.
+=_decode_mojibake= hook *nor* a =_LOST_PREFIX_REPLACEMENTS= dict -- on
+=food_acquired=.  Since GH #801 (merged 2026-09-07) the country has exactly
+one encoding repair, =2014/_/mapping.py::household_roster='s whole-value
+=_RELATIONSHIP_FIX= for the roster's literal =?=, which is neither a decode
+nor on this table; nothing between the =product= value labels and the served
+=j= has changed.
 
 *Caveat on those zeros*: the scan finds *leaked* mojibake and is structurally
 blind to *load-bearing* mojibake -- a country whose crosswalk is keyed on the
@@ -675,5 +709,7 @@ country's count.
   Three of the EHCVM countries (CotedIvoire, Guinea-Bissau,
 Niger) instead repair the data with a =_decode_mojibake= =df_edit= hook in
 =<wave>/_/mapping.py= and keep their crosswalk clean.  *Burkina Faso does
-not have that hook.*  Whichever way this is unified, the read and the
-crosswalk must move in the same commit.
+not have that hook on =food_acquired=* (its one encoding repair, GH #801's
+roster =_RELATIONSHIP_FIX=, is on another file and another table; GH #805 is
+the reader-level alternative -- both above).  Whichever way this is unified,
+the read and the crosswalk must move in the same commit.

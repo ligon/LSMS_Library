@@ -476,6 +476,32 @@ UTF-8 continuation byte was replaced with literal underscores upstream of the
 library and no decode recovers it).  Senegal has the same corruption and no
 such dict.
 
+*Updated at the merge with =development= (2026-09-07; GH #801 / #805).*
+Since GH #801 Senegal *does* carry a decode hook -- but not for this table,
+and not for this defect.  =2018-19/_/mapping.py::_decode_cp1252= (with
+=_fix_relationship=) repairs the *roster* file =s01_me_sen2018.dta=, whose
+value labels are Windows-1252 bytes read as Latin-1 (sweep record: =nort 60,
+c1 3=; =Frere, s<U+009C>ur=), and the =household_roster= hook applies it to
+=Relationship= only -- see the =household_roster 2018-19= section near the
+top of this file.  That is a *different* encoding class from this table's:
+=s07b_me_sen2018.dta= holds UTF-8 bytes read as Latin-1 (sweep record:
+=double 67, nort 2=, no =c1=), which =_decode_cp1252= cannot reverse -- the
+double-encoded pair U+00C3 U+00A9 carries no codepoint in U+0080-U+009F, so
+that helper returns it unchanged.  One wave, two files, two encodings.  The
+sentence above ("Senegal does not use it") therefore still holds for
+=food_acquired=: no decode hook touches =j= or =u=, and the crosswalk is
+still the repair.
+
+*GH #805 does not unwind this section either.*  The reader-level fix it
+proposes (cp1252-first for format < 118) changes only strings carrying a
+codepoint in U+0080-U+009F, because Latin-1 and cp1252 agree on every other
+byte.  The =s07b= value labels carry none (the sweep signature above; =str=
+columns were not probed, per the sweep README), and the crosswalk keys carry
+none (measured on this tree: 0 of 315 =harmonize_food= keys, 0 of 120 =u=
+keys), so under #805 every one of the 63,989 + 41,000 rows keys on the same
+mojibake string it keys on today.  The load-bearing pairing survives #805
+byte-identical and still has to be unwound as one commit.
+
 Migrating Senegal to the =_decode_mojibake= hook is the *right* fix and would
 delete this whole section -- but it is a data-affecting change: it must land
 together with a re-key of =categorical_mapping.org=, or all 63,989 + 41,000
