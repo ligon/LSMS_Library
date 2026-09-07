@@ -34,6 +34,31 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 Senegal has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
 
+* household_roster 2018-19: cp1252 roster labels read as Latin-1 (GH #801)
+
+=s01_me_sen2018.dta= is Stata format 115 with no declared encoding, and its
+value-label bytes are Windows-1252: code 7 of =s01q02= is stored as
+=Fr\xe8re, s\x9cur= (0x9C is the oe ligature in cp1252).  =get_dataframe=
+reads the file through pandas =StataReader=, which decodes every pre-118
+file as Latin-1, so 0x9C came back as the C1 control U+009C and the wave
+served =Frere, S<U+009C>Ur= (2,749 rows -- the =Ur= because the wave's =Relationship= formatter =.title()=-cases the label and =str.title= treats the control byte as a word break).  pyreadstat's default, or
+=encoding='cp1252'=, reads the same file correctly -- the defect is the
+reader's Latin-1 fallback, not the file (bytes and decoder matrix in
+=slurm_logs/gh797/fix_801/REPORT.org=, measured 2026-09-07).
+
+Fix (2026-09-07): =2018-19/_/mapping.py::_decode_cp1252= re-encodes the label as Latin-1 and decodes it
+as cp1252, and =_fix_relationship= re-title-cases the result; the =household_roster= hook applies it to =Relationship=
+only.  Served label is now =Frere, Soeur= with the ligature restored,
+the label the 2021-22 wave and Niger 2018-19 serve; kinship tuple [0, 1, consanguineal] unchanged; 2,749 rows changed,
+nothing else.  The C1-control spellings were deleted from
+=lsms_library/categorical_mapping/kinship.yml= at the same time, so that
+file no longer carries the artefact and a regression would surface as an
+=Unknown relationship labels= warning instead of resolving silently.
+
+Same defect and same fix in Niger 2018-19, Benin 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
+roster files).  See GH #801 and the #797 vocabulary sweep
+(=slurm_logs/gh797/vocab_sweep/REPORT.org= section 2.4).
+
 * Sampling universe, exclusions and sub-samples
 
 Evidence for what each Senegal wave *claims* to cover, kept deliberately

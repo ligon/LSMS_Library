@@ -488,6 +488,26 @@ Sampling design table: cluster, weights, strata, and Rural classification.
 - Strata are available only for 2014 (numeric 1--26); EHCVM waves lack an explicit strata variable.  Region x Milieu could be reconstructed from =cluster_features= if needed.
 - Weighted population sums: 2014 ~2.4M, 2018-19 ~3.1M, 2021-22 ~3.1M.
 
+** DONE household_roster
+*** 2014 wave (EMC): Relationship code 6 ships a literal "?" (GH #801)
+=emc2014_p1_individu_27022015.dta= (Stata format 113, Latin-1 labels)
+stores =B5= code 6 as =Fr\xe8re/s?ur= -- a literal 0x3F where the oe
+ligature belongs; the rest of the label set is clean Latin-1 (=P\xe8re /
+m\xe8re=, =Sans lien de parent\xe9=).  The =?= is in the file, so no
+=encoding= choice recovers it (utf-8 fails; latin-1 and cp1252 both return
+the =?=; measured 2026-09-07): a lossy conversion upstream of the
+published file.
+
+Fix (2026-09-07): =2014/_/mapping.py::household_roster= replaces the whole
+value with =Frere/soeur= (ligature restored).  The EMC 2014 vocabulary
+keeps its =/= (=Petit fils/fille=, =Pere / mere=) rather than the EHCVM
+comma form the 2018-19 / 2021-22 waves serve, and the label resolves
+through the existing =Frere/Soeur= key.  2,599 rows changed; kinship
+tuple [0, 1, consanguineal] unchanged; nothing else touched.
+=Frere/s?ur= and its C1-control / U+FFFD cousins were deleted from
+=lsms_library/categorical_mapping/kinship.yml=.  See GH #801 / #797,
+evidence in =slurm_logs/gh797/fix_801/REPORT.org=.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
