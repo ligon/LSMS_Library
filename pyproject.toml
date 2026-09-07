@@ -1,6 +1,6 @@
 [project]
 name = "LSMS_Library"
-dynamic = []
+dynamic = ["version"]
 description = "Abstraction layer for Living Standards Measurement Survey data"
 authors = [ {name = "Ethan Ligon", email = "ligon@berkeley.edu"}
     ]
@@ -32,7 +32,7 @@ dependencies = ["pandas >=3.0",
              # import by CFEDemands; folium is lazy (interactive maps only).
              "matplotlib (>=3.10.0,<4.0.0)",
              "folium (>=0.19)"]
-version = "0.9.1.post388.dev0+ecfbb42f"
+version = "0.0.0"
 
 [project.scripts]
 lsms-library = "lsms_library.cli:main"
@@ -76,7 +76,7 @@ pyinstrument = ">=4.6,<6.0"
 snakeviz = "^2.2"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 vcs = "git"
 style = "pep440"
 
