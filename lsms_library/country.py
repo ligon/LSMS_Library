@@ -575,6 +575,46 @@ def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
     )
 
 
+class InTreeParquetWarning(UserWarning):
+    """A ``*.parquet`` was found inside the config tree (``countries_root()``).
+
+    GH #803.  The library reads harmonized parquets from ``data_root()`` only;
+    a parquet sitting next to a wave script is an artefact of running that
+    script from a checkout that is not the imported package (``to_parquet``
+    -> ``_resolve_data_path`` redirects only when the *caller's file* is under
+    ``countries_root()``; otherwise the literal relative path is written --
+    the write-side ``.pth`` trap, see CLAUDE.md "Data Access").  Before #803
+    such a file was *preferred* to running the wave script, and being
+    hashless it graded ``legacy`` at the v0.8.0 gate, so the stale frame was
+    concatenated and stamped with a fresh hash.  It is now ignored and
+    reported once per path.
+    """
+
+
+_INTREE_ARTEFACTS_WARNED: set[Path] = set()
+
+
+def _warn_intree_parquet_artefact(path: Path, owner: str, table: str) -> None:
+    """Report -- once per path -- a parquet artefact inside the config tree.
+
+    Pure reporting: it never reads the file and never changes what any
+    build writes (it is in ``_build_registry._EXCLUDED_CALLABLES`` for that
+    reason).  Callers have already established ``path.exists()``.
+    """
+    if path in _INTREE_ARTEFACTS_WARNED:
+        return
+    _INTREE_ARTEFACTS_WARNED.add(path)
+    warnings.warn(
+        f"{owner}/{table}: ignoring in-tree parquet {path} (GH #803). "
+        f"Parquets inside the config tree are never read; this one was "
+        f"written by a script run from a checkout that is not the imported "
+        f"package (the write-side .pth trap -- CLAUDE.md 'Data Access'). "
+        f"Delete it, e.g. `find {countries_root()} -name '*.parquet' -delete`.",
+        InTreeParquetWarning,
+        stacklevel=3,
+    )
+
+
 # Module-level parse cache for data_info.yml, keyed on the file's CONTENT
 # hash (not mtime).  Re-parsing YAML on every wave on every cache-hash
 # computation was ~3.7 ms/wave and dominated the L2 read gate; Wave
@@ -1179,6 +1219,23 @@ class Wave:
             warnings.warn(msg)
         return pd.merge(left, right, on=merge_on, how=how)
 
+    def _script_parquet_candidates(self, request: str) -> list[Path]:
+        """Where a script-path wave parquet may be READ from: under
+        ``data_root()`` only.
+
+        GH #803: the in-tree ``{wave}/_/{table}.parquet`` is deliberately NOT
+        a candidate.  It is only the *name* of the Makefile target (the
+        ``../%/_/<table>.parquet`` pattern rules are written with in-tree
+        names); the script that rule runs writes through ``to_parquet`` ->
+        ``_resolve_data_path`` and lands under ``data_root()``.  A hashless
+        parquet under ``data_root()`` still grades ``legacy`` and is trusted
+        once -- that is the v0.8.0 upgrade path and is unchanged.  Nothing
+        inside ``countries_root()`` is an input.
+        """
+        return [
+            data_root(self.country.name) / self.wave_folder / "_" / f"{request}.parquet",
+        ]
+
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
@@ -1483,19 +1540,31 @@ class Wave:
             logger.info("Attempting to generate using Makefile...")
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
-            # Use in-tree path for Make target, but look for output at data_root too
-            intree_parquet = self.file_path / "_" / f"{request}.parquet"
-            country_name = self.country.name
-            external_parquet = data_root(country_name) / self.wave_folder / "_" / f"{request}.parquet"
+            # GH #803: ``make_target_intree`` is the Makefile target NAME
+            # (the ``../%/_/<table>.parquet`` pattern rules use in-tree
+            # names) -- it is never read.  The only read location is under
+            # data_root() (see _script_parquet_candidates).  A file that
+            # actually exists at the in-tree name is an artefact of the
+            # write-side .pth trap: it is reported, and it makes Make's own
+            # timestamp check lie (the target looks up to date), so Make is
+            # then forced with -B.
+            make_target_intree = self.file_path / "_" / f"{request}.parquet"
+            candidates = self._script_parquet_candidates(request)
+            intree_artefact = make_target_intree.exists()
+            if intree_artefact:
+                _warn_intree_parquet_artefact(make_target_intree, self.name, request)
 
             # Check if the parquet already exists before invoking Make.
             # v0.8.0: skip a candidate whose embedded hash is STALE so a
             # script/source edit forces Make to rebuild it (closes the
             # "stale L2-wave parquet shadows a source-script fix" gap
-            # documented in CLAUDE.md "Cache Behavior").
+            # documented in CLAUDE.md "Cache Behavior").  A hashless
+            # candidate grades ``legacy`` and is trusted: that is the v0.8.0
+            # upgrade path for parquets UNDER data_root, and it is exactly
+            # why an in-tree file must never be a candidate (GH #803).
             expected_wave_hash = self._input_hash(request)
             parquet_fn = None
-            for candidate in [external_parquet, intree_parquet]:
+            for candidate in candidates:
                 if candidate.exists():
                     if cache_freshness(candidate, expected_wave_hash) == "stale":
                         logger.debug(
@@ -1513,7 +1582,7 @@ class Wave:
                     return pd.DataFrame()
 
                 cwd_path = self.file_path.parent / "_"
-                relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
+                relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
                 env = os.environ.copy()
                 env["LSMS_DATA_DIR"] = str(data_root())
                 bin_dir = os.path.dirname(sys.executable)
@@ -1527,6 +1596,11 @@ class Wave:
                 # (e.g. Uganda's food_expenditures, which routes here per
                 # wave for food_acquired).
                 make_cmd = ["make", "-s"]
+                if intree_artefact:
+                    # GH #803: Make stats the target by its in-tree name; an
+                    # artefact newer than the script makes it "up to date" and
+                    # nothing runs.  Force the recipe.
+                    make_cmd.append("-B")
                 jobs_flag = _make_jobs_flag()
                 if jobs_flag:
                     make_cmd.append(jobs_flag)
@@ -1534,7 +1608,7 @@ class Wave:
                 subprocess.run(make_cmd, cwd=cwd_path, check=True, env=env)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
-                for candidate in [external_parquet, intree_parquet]:
+                for candidate in candidates:
                     if candidate.exists():
                         parquet_fn = candidate
                         break
@@ -1650,10 +1724,10 @@ class Wave:
         if df.empty:
             return df
         # if food_acquired data is loaded from a parquet file, we assume its unit and food label are already mapped.
-        # Check both in-tree and data_root locations (wave scripts write to data_root).
-        intree_parquet = self.file_path / "_" / "food_acquired.parquet"
-        external_parquet = data_root(self.country.name) / self.wave_folder / "_" / "food_acquired.parquet"
-        if intree_parquet.exists() or external_parquet.exists():
+        # GH #803: only a data_root parquet counts.  An in-tree file is not
+        # an input -- not even as an existence test that steers behaviour.
+        external_parquet = self._script_parquet_candidates('food_acquired')[0]
+        if external_parquet.exists():
             return df
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
@@ -3252,14 +3326,24 @@ class Country:
                     output_candidates.append(base_path / "_" / f"{method_name}.json")
                 output_candidates.append(self.file_path / "_" / f"{method_name}.json")
             else:
-                # Check data_root (external) first, then in-tree as fallback
+                # GH #803: outputs are READ from data_root() only.  The in-tree
+                # names in ``try_make`` below are Make *targets* for the
+                # ``../%/_/<table>.parquet`` pattern rules; a correctly
+                # redirected script (to_parquet -> _resolve_data_path) never
+                # writes there, so a parquet found in-tree is an artefact of
+                # the write-side .pth trap: reported, never read.
                 if wave is not None:
                     output_candidates.append(data_root(self.name) / wave_folder / "_" / f"{method_name}.parquet")
-                    output_candidates.append(base_path / "var" / f"{method_name}.parquet")
-                    output_candidates.append(base_path / "_" / f"{method_name}.parquet")
                 output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+                intree_names = [
+                    self.file_path / "var" / f"{method_name}.parquet",
+                    self.file_path / "_" / f"{method_name}.parquet",
+                ]
+                if wave is not None:
+                    intree_names = [base_path / "_" / f"{method_name}.parquet"] + intree_names
+                for artefact in intree_names:
+                    if artefact.exists():
+                        _warn_intree_parquet_artefact(artefact, f"{self.name}/{wave or '_'}", method_name)
 
             # deduplicate while preserving order
             unique_candidates: list[Path] = []
@@ -3301,8 +3385,10 @@ class Country:
                 makefile = make_dir / "Makefile"
                 # Build Make targets using data_root() paths (primary) since
                 # Makefiles now default VAR_DIR to data_root().  Fall back to
-                # in-tree paths only if needed.  Use absolute paths directly
-                # as Make handles them fine.
+                # in-tree target NAMES only if needed (the ``../%/_/`` pattern
+                # rules are written with them); the OUTPUT is still looked for
+                # under data_root() only (GH #803).  Use absolute paths
+                # directly as Make handles them fine.
                 make_targets = []
                 if method_name in JSON_CACHE_METHODS:
                     make_targets.append(self.file_path / "_" / f"{method_name}.json")
@@ -3329,7 +3415,7 @@ class Country:
                     except (subprocess.CalledProcessError, FileNotFoundError) as error:
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
-                    # Check all candidate locations (data_root + in-tree)
+                    # Check the data_root candidate locations (GH #803: never in-tree)
                     for candidate in unique_candidates:
                         if candidate.exists():
                             return candidate
