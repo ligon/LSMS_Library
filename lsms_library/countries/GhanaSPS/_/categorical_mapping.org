@@ -989,6 +989,11 @@ Other relative, Non-relative, Servant, Tenant.  Identity rows (Child, Spouse,
 Grandchild, Other relative, Non-relative, Head in wave 3) are deliberately
 absent: =.replace()= leaves unmatched values alone.
 
+A second variant, =Comparable Label= (=household_roster(labels={'Relationship':
+'Comparable'})=), is the eight-category common denominator shared with
+GhanaLSS for pooling across the two surveys and across GLSS waves: the
+adopted code folds into =Child=, child-in-law into =Other relative=.
+
 Tuples: every row is tuple-preserving except the adopted/foster/step code,
 whose shared label carries [-1, 0, null] (adoptive / foster / step
 undetermined; see =kinship.yml=) -- it was [-1, 0, step] before.  GSPS's
@@ -998,15 +1003,15 @@ before) with the conflation recorded in CONTENTS.org.
 Prose stays ABOVE the =#+name:= line (the comment-between-name-and-table
 trap documented for the education table above).
 #+name: relationship
-| Original Label                | Preferred Label          |
-|-------------------------------+--------------------------|
-| Household Head                | Head                     |
-| Adopted/Foster/Stepchild      | Adopted/foster/stepchild |
-| Adopted, foster, or stepchild | Adopted/foster/stepchild |
-| Adopted, foster/stepchild     | Adopted/foster/stepchild |
-| Parent/Parent-in-Law          | Parent                   |
-| Parent or parent-in-law       | Parent                   |
-| Parent/Parent-in-law          | Parent                   |
-| Son/Daughter-in-law           | Child-in-law             |
-| Son or daughter in-law        | Child-in-law             |
-| Househelp                     | Servant                  |
+| Original Label                | Preferred Label          | Comparable Label |
+|-------------------------------+--------------------------+------------------|
+| Household Head                | Head                     | Head             |
+| Adopted/Foster/Stepchild      | Adopted/foster/stepchild | Child            |
+| Adopted, foster, or stepchild | Adopted/foster/stepchild | Child            |
+| Adopted, foster/stepchild     | Adopted/foster/stepchild | Child            |
+| Parent/Parent-in-Law          | Parent                   | Parent           |
+| Parent or parent-in-law       | Parent                   | Parent           |
+| Parent/Parent-in-law          | Parent                   | Parent           |
+| Son/Daughter-in-law           | Child-in-law             | Other relative   |
+| Son or daughter in-law        | Child-in-law             | Other relative   |
+| Househelp                     | Servant                  | Servant          |

@@ -114,3 +114,27 @@ def test_code_label_table_without_preferred_label_changes_nothing():
     pdt.assert_frame_equal(a, b, check_exact=True)
     assert list(a["Relationship"]) == labels             # raw labels untouched
     assert pd.isna(a["Affinity"].iloc[2])                # RAW still unknown
+
+
+def test_comparable_variant_coarsens_the_label_and_the_tuple_follows():
+    """``labels={'Relationship': 'Comparable'}`` selects a second column of
+    the same table (GH #682); under the post-#797 order the SELECTED label
+    feeds kinship, so the coarse view's tuples are the coarse label's."""
+    table = pd.DataFrame({
+        "Original Label":   ["Sibling", "Father/mother in-law", "Tenant"],
+        "Preferred Label":  ["Sibling", "Parent-in-law", "Tenant"],
+        "Comparable Label": ["Other relative", "Parent", "Non-relative"],
+    })
+    fake = _stub_finalize(_fake_country({"Relationship": table}))
+    raw = ["Sibling", "Father/mother in-law", "Tenant"]
+    default = fake._finalize_result(_roster(raw), {}, "household_roster")
+    assert list(default["Relationship"]) == ["Sibling", "Parent-in-law", "Tenant"]
+    assert list(default["Distance"]) == [1, 0, 0]
+    assert list(default["Affinity"]) == ["consanguineal", "affinal", "guest"]
+    coarse = fake._finalize_result(_roster(raw), {}, "household_roster",
+                                   labels={"Relationship": "Comparable"})
+    assert list(coarse["Relationship"]) == ["Other relative", "Parent", "Non-relative"]
+    assert pd.isna(coarse["Generation"].iloc[0]) and pd.isna(coarse["Distance"].iloc[0])
+    assert coarse["Affinity"].iloc[0] == "consanguineal"          # Other relative's cell
+    assert (coarse["Generation"].iloc[1], coarse["Affinity"].iloc[1]) == (1, "consanguineal")
+    assert coarse["Affinity"].iloc[2] == "unrelated"
