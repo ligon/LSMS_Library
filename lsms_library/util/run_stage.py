@@ -49,8 +49,9 @@ def _compute_make_jobs() -> int | None:
         except ValueError:
             jobs = None
     else:
-        cpu_count = os.cpu_count() or 2
-        jobs = max(1, cpu_count // 2)
+        # GH #764: cgroup-visible count, not the physical node.
+        from lsms_library._parallel_waves import visible_cpus
+        jobs = max(1, visible_cpus() // 2)
     if jobs and jobs > 1:
         return jobs
     return None

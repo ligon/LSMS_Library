@@ -59,6 +59,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from . import _parallel_waves
 from .population import attach as attach_population, population_records
 import importlib.util
 import hashlib
@@ -481,7 +482,9 @@ def _make_jobs_flag() -> str | None:
     Determine an appropriate make -j flag based on environment or CPU count.
     Returns the flag string (e.g. '-j4') or None if no parallelism is desired.
 
-    ``LSMS_MAKE_JOBS`` overrides the default (``cpu_count // 2``).  A
+    ``LSMS_MAKE_JOBS`` overrides the default (``visible_cpus() // 2`` -- the
+    cgroup-visible count, GH #764; a parallel wave build sets it per worker,
+    see ``_parallel_waves.worker_make_jobs``).  A
     country-level build fans out to one ``python <table>.py`` per wave, so
     ``-jN`` runs N wave builds -- and thus N concurrent large-blob S3 fetches --
     in parallel.  On a host where concurrent multipart S3 reads occasionally
@@ -495,8 +498,11 @@ def _make_jobs_flag() -> str | None:
         except ValueError:
             jobs = None
     else:
-        cpu_count = os.cpu_count() or 2
-        jobs = max(1, cpu_count // 2)
+        # GH #764: ``os.cpu_count()`` is the physical node (56 on savio4_htc),
+        # not the cgroup the job was given -- a 4-core slice ran ``-j28``.
+        # ``visible_cpus`` is the affinity count, capped by Slurm's own
+        # allocation when set.
+        jobs = max(1, _parallel_waves.visible_cpus() // 2)
 
     if jobs and jobs > 1:
         return f"-j{jobs}"
@@ -3490,8 +3496,13 @@ class Country:
             # parquets; stamped YAML waves self-invalidate per-wave); never runs
             # on a warm hit (the cache read returns before any rebuild descent).
             self._evict_hashless_wave_caches(method_name)
-            results = {}
-            for w in waves:
+
+            def build_wave(w):
+                """Stage 1 -- the expensive, wave-independent part of the
+                walk: the YAML extraction or the ``make``/script run for ONE
+                wave.  Everything content-determining about a wave's build
+                lives here; ``_parallel_waves`` only decides which process
+                runs it (GH #797)."""
                 wave_obj = self[w]
                 wave_has_table = method_name in wave_obj.data_scheme
                 wave_result = None
@@ -3527,6 +3538,40 @@ class Country:
                         wave_result = wave_result[
                             wave_result.index.get_level_values('t') == w
                         ]
+                return wave_has_table, wave_result
+
+            # GH #797: fan stage 1 out over a fork pool, one worker per
+            # distinct make target (waves sharing a folder build serially in
+            # ONE worker -- see ``_parallel_waves.group_waves_by_target``).
+            # ``None`` means "stay serial" (LSMS_BUILD_WORKERS=1, one target,
+            # one visible CPU, or already inside a worker): the loop below
+            # then calls ``build_wave`` inline, in wave order, which is the
+            # pre-#797 code path unchanged.  Either way stage 2 (id_walk,
+            # index augmentation, the grain-audited normalisation, concat)
+            # runs HERE, in the parent, in wave order.
+            # The folder map is resolved through ``self[w]`` (the same lookup
+            # ``grab_data`` uses for its make target), not read off
+            # ``self.wave_folder_map`` -- that attribute is populated as a side
+            # effect of the ``waves`` property and is still ``{}`` when a
+            # caller passed ``waves`` explicitly.  ``getattr`` with the wave
+            # itself as fallback: tests stub ``__getitem__`` with bare
+            # namespaces that carry no ``wave_folder``.
+            prebuilt = _parallel_waves.prebuild(
+                build_wave, waves,
+                {w: getattr(self[w], 'wave_folder', w) for w in waves},
+                country=self.name, table=method_name,
+            )
+            results = {}
+            for w in waves:
+                if prebuilt is not None:
+                    # Replays this wave's captured warnings and ledger entries
+                    # before its post stage, so the parent-side order of
+                    # side effects matches a serial build; re-raises the
+                    # wave's exception (original type) if it failed.
+                    wave_has_table, wave_result = _parallel_waves.relay(
+                        prebuilt[w], country=self.name, table=method_name)
+                else:
+                    wave_has_table, wave_result = build_wave(w)
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (

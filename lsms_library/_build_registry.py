@@ -144,7 +144,44 @@ _EXCLUDED_CALLABLES = frozenset({
     # run_make_target, so without this exclusion re-wording the warning would
     # move every table's fingerprint.
     "lsms_library.country._warn_intree_parquet_artefact",
+    # Wave-parallel dispatch (GH #797): ORCHESTRATION, not transformation.
+    # ``prebuild`` moves a wave's DataFrame from a forked worker to the
+    # parent and ``relay`` replays the worker's warnings / ledger entries;
+    # neither reads or writes a byte of frame content -- the content-
+    # determining code stays in ``load_from_waves``'s ``build_wave`` closure,
+    # which IS hashed through ``_aggregate_wave_data``.  ``visible_cpus`` is
+    # reached from ``_make_jobs_flag`` (GH #764) and decides only how many
+    # cores a build uses.  Excluded for the same reason as the null-read
+    # audit: editing the pool must not cold-rebuild the corpus.  Pinned by
+    # tests/test_parallel_waves.py.
+    "lsms_library._parallel_waves.prebuild",
+    "lsms_library._parallel_waves.relay",
+    "lsms_library._parallel_waves.visible_cpus",
+    "lsms_library._parallel_waves.build_workers",
+    "lsms_library._parallel_waves.worker_make_jobs",
+    "lsms_library._parallel_waves.group_waves_by_target",
 })
+
+
+# Module-level containers that are RUNTIME STATE, not build constants.  The
+# constant walk below folds any ``dict``/``list``/``set`` global a build
+# callable names, on the theory that such a global is a lookup table
+# (``_ADDITIVE_MEASURE_COLUMNS``, ``JSON_CACHE_METHODS``).  The grain ledger
+# is named by ``_aggregate_wave_data`` (it pops/reads the table's key) but is
+# a process-local *log* that fills up as builds run -- folding it makes the
+# fingerprint depend on WHEN in a process it was first memoised.  Measured:
+# filing one grain report and clearing the memo moved
+# ``build_transforms_fingerprint('household_roster')``.  Serial cold builds
+# happened to memoise it empty (wave 1's ``grab_data`` computes a wave hash
+# before any report is filed); the wave-parallel path (GH #797) computes the
+# parent's first fingerprint at the L2-country write, AFTER the relayed
+# reports, so without this exclusion a table whose wave stage files a report
+# (Site 2 / Site 4) would be stamped with a hash no fresh process reproduces
+# -- permanently ``stale``.  Pinned by tests/test_parallel_waves.py.
+# Keyed on the BARE name: the walk resolves a name relative to the
+# referencing function's module, so ``from .country import _GRAIN_LEDGER`` in
+# some other tagged module would otherwise fold it under that module's prefix.
+_EXCLUDED_CONSTANTS = frozenset({"_GRAIN_LEDGER", "_NULL_READ_LEDGER"})
 
 
 def _is_build_callable(obj) -> bool:
@@ -346,6 +383,8 @@ def _closure_parts(fn, seen) -> list:
         if _is_build_callable(obj):
             parts += _closure_parts(obj, seen)
         elif isinstance(obj, _CONST_TYPES):
+            if name in _EXCLUDED_CONSTANTS:
+                continue                # runtime state, not a build input
             parts.append(f"{fn.__module__}.{name}=" + _ser(obj, seen, parts))
     return parts
 
