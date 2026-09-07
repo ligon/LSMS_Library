@@ -27,19 +27,30 @@ household_roster:
         MonthsAway: m1q8
         Relationship:
             - m1q4
+            # m1q4 carries cp1251 value labels that get_dataframe reads as
+            # latin-1, so the keys below are that mojibake, byte-for-byte as
+            # the file yields them (decode with key.encode('latin-1')
+            # .decode('cp1251')).  Code order, verified positionally against
+            # taj03hhq.pdf Module 1 Q4 (GH #800, #797): 1 head, 2 spouse/
+            # partner, 3 son/daughter, 4 son/daughter-in-law, 5 father/mother,
+            # 6 father/mother-in-law (either side), 7 sister/brother,
+            # 8 grandchild, 9 grandparent, 10 niece/nephew, 11 other relative,
+            # 12 not related.  Labels follow the 2007/2009 vocabulary.  Do NOT
+            # copy 1999's 13-code list here: that is what shifted codes 7-10
+            # by one slot (GH #800).
             - mapping:
                 'Ãëàâà äîìîõîçÿéñòâà': head
                 'Ñóïðóã(à)/ïàðòíåð': spouse/partner
                 'Ñûí/äî÷ü': son/daughter
                 'Çÿòü/íåâåñòà': son/daughter-in-law
                 'Îòåö/ìàòü': father/mother
-                'Ðîäèòåëè ìóæà/æåíû': father/mother of husband
-                'Ñåñòðà/áðàò': father/mother of wife
-                'Âíóê(÷êà)': brother/sister
-                'Äåäóøêà(áàáóøêà)': grandchild
-                'Ïëåìÿííèöà/ïëåìÿííèê': grandparent
-                'Äðóãèå ðîäñòâåííèêè': other relatives
-                'Íå ðîäñòâåííèêè': no relation
+                'Ðîäèòåëè ìóæà/æåíû': father/mother-in-law
+                'Ñåñòðà/áðàò': sister/brother
+                'Âíóê(÷êà)': grandchild
+                'Äåäóøêà(áàáóøêà)': grandparent
+                'Ïëåìÿííèöà/ïëåìÿííèê': niece/nephew
+                'Äðóãèå ðîäñòâåííèêè': other relative
+                'Íå ðîäñòâåííèêè': not related
 
 cluster_features:
     file: ../Data/interview.dta

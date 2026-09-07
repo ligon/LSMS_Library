@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Sampling universe, exclusions and sub-samples
 

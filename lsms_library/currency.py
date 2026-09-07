@@ -6,14 +6,46 @@ harmonized tables (``food_expenditures.Expenditure``, ``food_prices.Price``,
 units.  Within a single country they are commensurable; across countries
 (``ll.Feature('food_expenditures')``) they are not -- NGN, UGX, XOF, ... at
 wildly different scales with no label.  This module is the single read-time
-mechanism that attaches an ISO 4217 alpha-3 code, and the join key for the
-planned FX / PPP / CPI conversion layer (NOT built yet).
+mechanism that attaches an ISO 4217 alpha-3 code.
 
 Source of truth: the ``Currency:`` section of ``lsms_library/data_info.yml``.
-Currency is keyed on **(country, wave)**, not country alone -- two in-sample
-redenominations (GhanaLSS GHC->GHS at 2007, Tajikistan TJR->TJS at 2000)
-changed both the scale and the ISO code mid-survey -- and is **not injective**
-with country (the 8 EHCVM/WAEMU countries all share XOF).
+Currency is keyed on **(country, wave)**, not country alone: five countries
+declare per-wave ``overrides`` for a redenomination that changed both the scale
+and the ISO code -- GhanaLSS GHC->GHS at 2007, Tajikistan TJR->TJS at 2000,
+Peru PEI->PEN at 1991, 'Serbia and Montenegro' YUM->CSD at 2003, and Azerbaijan
+AZN/AZM at 2006.  In the first four the change falls *mid-survey* (waves on both
+sides); Azerbaijan ships only its pre-reform 1995 wave.  Currency is also **not
+injective** with country (the 8 EHCVM/WAEMU countries all share XOF).
+
+Relationship to phase 2 (:mod:`lsms_library.conversion`)
+--------------------------------------------------------
+**The conversion layer is built.**  :func:`lsms_library.conversion.convert`
+divides monetary columns by a per-``(Country, Date)`` factor read from
+``lsms_library/conversion/conversion_factors.org``.  It is exposed as the
+``numeraire=`` kwarg on every generated data method (accepted for monetary
+tables, a ``TypeError`` elsewhere) and on ``Feature(...)``; the targets are
+``FX``, ``PPP-2011``, ``PPP-2017``, ``PPP-2021``, ``USD-real-2017`` and
+``LCU-real-2017``.
+
+This module is **not** the join key for it.  ``convert()`` pivots on
+``(country, interview date)`` -- an as-of ``merge_asof`` against the factor
+table -- and never looks a row up by ISO code.  What phase 1 supplies phase 2
+is three narrower things:
+
+1. :func:`_all_monetary_columns` -- *which* columns ``convert()`` scales, since
+   it sees a labelled frame but not the table name;
+2. :data:`CURRENCY_LEVEL` -- the index level / column that ``convert()``
+   *relabels* from the ISO code to the target token (``'PPP-2017'``);
+3. the label itself: ``numeraire=`` forces ``currency='index'`` so that slot
+   exists for step 2 to rename.
+
+What is incomplete is the factor table's **coverage**, not the engine.  As of
+the 2026-06-17 WDI snapshot in ``conversion_factors.org`` it carries 34 of the
+37 configured countries -- ``GhanaSPS``, ``Panama`` and ``Peru`` have no rows --
+and individual cells are blank where WDI has no datum (e.g. Tajikistan 1999
+PPP).  Either case yields ``pd.NA`` and a warning from ``convert()``, never a
+silent fallback.  Re-check against the table itself after regenerating it; do
+not trust this sentence's arithmetic past that vintage.
 
 Design notes
 ------------
@@ -183,8 +215,17 @@ def _redenomination_waves(country: str) -> frozenset[str]:
     """Waves of *country* whose ISO code is a redenomination override.
 
     These are pre-reform waves (e.g. GhanaLSS <= 2005-06 in GHC) whose nominal
-    values are in the historical currency unit; the conversion layer declines
-    to convert them in v1 (see conversion_factors.org).
+    values are in the historical currency unit.  Where the factor table covers
+    the country they **do** convert: ``conversion_factors.org`` carries
+    contemporaneous pre-reform rows tagged with the old ISO code (GhanaLSS GHC
+    1987-2006, Azerbaijan AZM < 2006, Tajikistan TJR 1999; 'Serbia and
+    Montenegro' needs no rescale, YUM/CSD/RSD being 1:1), so ``convert()``
+    reads a factor on the same scale as the data.  Two things still yield
+    ``pd.NA`` with a warning: a blank cell (Tajikistan 1999 PPP, where WDI has
+    no CPI) and a country absent from the table altogether -- which is the case
+    for **Peru**, whose PEI waves this function also returns.
+
+    Currently has no caller in the library or the test suite (2026-09).
     """
     spec = _load_data_info().get("Currency", {}).get(country)
     if isinstance(spec, dict):
