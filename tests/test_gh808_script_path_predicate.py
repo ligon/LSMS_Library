@@ -6,13 +6,13 @@ country-level ``_/{table}.py``; GhanaLSS ``food_acquired`` was covered only by
 the second clause, through the country-level concatenator that #808 retired.
 The table is still script-built -- by seven per-wave ``{wave}/_/food_acquired.py``
 scripts -- so the predicate now also looks for wave-level scripts, resolving
-each wave's folder through ``Country.__getitem__`` (which honours
-``wave_folder_map``) rather than ``file_path / wave``.
+each wave's folder through ``wave_folder_map`` -- a pure path probe that
+never constructs a ``Wave`` (``tests/test_dvc_caching.py`` fakes
+``__getitem__`` to raise on the cache-hit paths this feeds).
 """
 from __future__ import annotations
 
 from pathlib import Path
-from types import SimpleNamespace
 
 from lsms_library.country import Country as _CountryCls
 
@@ -30,9 +30,10 @@ def _fake_country(tmp_path: Path, waves: dict[str, str]):
 
     class _Fake:
         file_path = root
+        wave_folder_map = {w: f for w, f in waves.items() if w != f}
 
         def __getitem__(self, w):          # Country.__getitem__ -> Wave
-            return SimpleNamespace(file_path=root / waves[w])
+            raise AssertionError("the predicate must not build a Wave")
 
     fake = _Fake()
     fake.waves = list(waves)
@@ -65,7 +66,7 @@ def test_wave_level_script_alone_is_script_path(tmp_path):
     assert fake._is_script_path("food_acquired", None, ["2010"]) is False
 
 
-def test_wave_folder_resolved_through_getitem(tmp_path):
+def test_wave_folder_resolved_through_wave_folder_map(tmp_path):
     """A label whose folder is mapped (Tanzania '2008-09' -> '2008-15') must be
     found; ``file_path / label`` does not exist and must not be what is probed."""
     fake, root = _fake_country(tmp_path, {"2008-09": "2008-15", "2010-11": "2008-15"})
