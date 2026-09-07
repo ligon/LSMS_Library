@@ -54,6 +54,12 @@ from typing import Any, Callable
 for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
     os.environ.setdefault(_v, "1")
+# Same reasoning one level up (GH #797, eca580d6): a cold country build now
+# fans its WAVES out over a fork pool by default, sized per process from the
+# cgroup-visible CPU count -- so N scan workers would each open up to N
+# wave workers.  This pool already uses the cores across countries; keep
+# each country's build serial unless the caller says otherwise.
+os.environ.setdefault("LSMS_BUILD_WORKERS", "1")
 
 import pandas as pd
 

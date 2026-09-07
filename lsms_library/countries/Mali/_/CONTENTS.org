@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Overview
 
@@ -399,7 +400,7 @@ transcript for every gap: =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=.
 (Per =data_scheme.yml=: sample, cluster_features, household_roster,
 food_acquired, shocks, individual_education, panel_ids, ...)
 
-* Data Quality Notes
+* Known data issues
 
 ** individual_education mixes numeric grade codes with French text
 
@@ -416,6 +417,41 @@ fix should map the numeric codes to canonical labels via Mali's
 =categorical_mapping.org= (or by adding a per-wave =mapping:= dict
 in each wave's =data_info.yml=); pending that, downstream
 consumers should treat Mali separately.
+
+** household_roster 2018-19: Relationship labels truncated IN THE FILE (GH #801)
+
+=s01_me_mli2018.dta= (Stata format 115) stores four of the ten =s01q02=
+value labels cut at their first non-ASCII character: code 1 =Chef de m=,
+code 4 =p=, code 7 =Fr=, code 9 =Personne non apparent=.  The file bytes
+are =Chef de m\0Conjoint ( e )\0= and =Fr\0Autres Parents ...= -- zero
+non-ASCII bytes survive in that label set -- so this is NOT a
+reader-encoding problem: utf-8, latin-1 and cp1252 all return the same
+truncated strings, and pyreadstat and pandas agree (measured 2026-09-07,
+bytes in =slurm_logs/gh797/fix_801/REPORT.org=).  The same producer-side
+truncation is why the wave's =_MONTH_MAP= carries ='f'=, ='Ao'= and ='d'=
+for Fevrier / Aout / Decembre.  An earlier comment in =kinship.yml=
+attributed the truncation to "a fallback latin-1 encoding ... multi-byte
+UTF-8 sequences"; the bytes say otherwise.
+
+The full labels are fixed by code position in the EHCVM-1 questionnaire
+and identical in every sibling 2018-19 =s01_me_*= file (Benin, Burkina
+Faso, CotedIvoire, Niger, Senegal, Togo): 1 = Chef de menage, 4 = Pere,
+Mere, 7 = Frere, soeur, 9 = Personne non apparentee au CM/Conjoint.  Code
+4 is therefore a parent; the "low-confidence: Pere or Personne" note that
+used to sit on the =P= key in =kinship.yml= is settled by the siblings.
+
+Fix (2026-09-07): =2018-19/_/mapping.py::_RELATIONSHIP_FIX=, applied by
+the =household_roster= hook after =mali.py='s =.title()= formatter has
+run (both the title-cased and the raw file spellings are keys, for
+robustness).  Served labels are now =Chef De Menage=, =Pere, Mere=,
+=Frere, Soeur=, =Personne Non Apparentee Au Cm/Conjoint= (accented, as
+the 2021-22 wave serves them); 9,890 rows changed (6,602 + 966 + 1,105 +
+1,217; 21.5% of the wave), kinship tuples byte-identical before/after,
+nothing else touched.  The seven artefact keys (=Chef de m=, =Fr=, =p=,
+=Personne non apparent= and their =.title()= forms) were deleted from
+=lsms_library/categorical_mapping/kinship.yml=; that file no longer
+carries them, so a regression surfaces as an =Unknown relationship
+labels= warning instead of resolving silently.  See GH #801 / #797.
 
 * cluster_features (GH #323 site 4 / GH #627)
 

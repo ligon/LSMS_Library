@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 Serbia LSMS survey coverage and status.
 
@@ -306,7 +307,7 @@ The DVC-managed =household_roster= pipeline (=dvc.yaml=) may work
 independently since it uses the CLI materializer, but the legacy
 Makefile pipeline for food and other features is non-functional.
 
-* Known issues
+* Known data issues
 - Makefile :: FIXED (2026-06-08).  The generic rule's =panama.py=
   prerequisite (copy-paste error from Panama) now reads =serbia.py=, and
   =food_items.org= now exists.

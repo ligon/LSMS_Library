@@ -78,7 +78,11 @@ Columns:
   household_roster:
     # Kinship decomposition (Kroeber 1909; Romney & D'Andrade 1964).
     # Sex x Generation x Distance x Affinity recovers all conventional
-    # relationship labels without redundancy.
+    # relationship labels without redundancy.  A component the instrument
+    # does not determine is NULL (kinship.yml header, GH #698/#797): an
+    # "other relative" is [null, null, consanguineal], a "relative of head
+    # or spouse" [null, null, null].  Nulls in Generation/Distance are
+    # therefore data, not defects, for those rows.
     Sex:
       type: str
       required: true

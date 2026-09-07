@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 The Ethiopian Rural Household Survey (ERHS) is a longitudinal survey of
 rural households in Ethiopia, distinct from the World Bank ESS /
@@ -7,7 +8,7 @@ data behind a well-known price-risk / welfare literature (Dercon,
 Krishnan, and collaborators).  This declaration tracks the
 library-side enhancement requested in GH #271.
 
-* Survey Program
+* Overview
 
 Run jointly by the Department of Economics, Addis Ababa University
 (AAU); the Centre for the Study of African Economies (CSAE), Oxford;

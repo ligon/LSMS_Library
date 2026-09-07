@@ -1,0 +1,118 @@
+=== COVERAGE ===
+    country    wave   rows  n_v  n_j  n_u extra_levels
+     Malawi 2010-11  39166  768   51   20            -
+     Malawi 2013-14   6511  204   32   16            -
+     Malawi 2019-20  36958  727   51   20            -
+    Nigeria  2011Q1  27104  494  111   11            -
+    Nigeria  2013Q1  27079  496  111   11            -
+    Nigeria  2016Q1  33781  487  116   20            -
+    Nigeria  2019Q1  25907  517  109   21            -
+    Nigeria  2024Q1  24184  507  109   24            -
+   Ethiopia 2011-12   4340  318   23   12            -
+   Ethiopia 2013-14   5370  361   23   14            -
+   Ethiopia 2015-16   9226  331   46   10            -
+   Ethiopia 2018-19  13994  525   46   41            -
+   Ethiopia 2021-22  12327  432   47   39            -
+EthiopiaRHS   1994a    306   18   17    1            -
+EthiopiaRHS   1994b    306   18   17    1            -
+EthiopiaRHS    1995    306   18   17    1            -
+EthiopiaRHS    1997    558   18   41    1            -
+EthiopiaRHS    2004    598   18   38    1            -
+EthiopiaRHS    2009    617   18   42    1            -
+       Mali 2014-15  23646  754   37   14            -
+      Niger 2011-12   8923  240   44    7            -
+      Niger 2014-15   6500  221   45    9            -
+   Tanzania 2019-20   2769   94   42    5            -
+   Tanzania 2020-21  13062  484   42    5            -
+   GhanaLSS 1987-88  16582  165   46   10          obs
+   GhanaLSS 1988-89  12642  112   47   10          obs
+   GhanaLSS 1991-92  58348  256  109   21          obs
+   GhanaLSS 1998-99  63445  253  111   21          obs
+   GhanaLSS 2012-13 288243 1015  136    3          obs
+   GhanaLSS 2016-17 220908  398  532  140          obs
+
+=== RATIO at (t,v,j,u) ===
+    country    wave    join    n      p10      p25      med      p75       p90  within25  logdev1
+     Malawi 2010-11 t,v,j,u 5473 0.500000 0.800000 1.000000 1.000000  1.500000  0.631098 0.069066
+     Malawi 2013-14 t,v,j,u   10 0.278590 0.693649 0.816667 1.625000  2.650000  0.300000 0.300000
+     Malawi 2019-20 t,v,j,u 5470 0.500000 0.771753 1.000000 1.000000  1.333333  0.633638 0.062157
+    Nigeria  2011Q1 t,v,j,u 6314 0.384615 0.747669 1.071429 1.909830  4.500000  0.320082 0.271302
+    Nigeria  2013Q1 t,v,j,u 3314 0.025253 0.334375 0.961538 1.628472  4.375000  0.257996 0.404043
+    Nigeria  2016Q1 t,v,j,u 3429 0.002540 0.009524 0.020000 0.601389  1.000000  0.161855 0.720618
+    Nigeria  2019Q1 t,v,j,u  921 0.625000 0.800000 1.000000 1.083333  1.266667  0.660152 0.017372
+   Ethiopia 2011-12 t,v,j,u  153 0.760000 0.909091 1.000000 1.107143  1.422857  0.751634 0.091503
+   Ethiopia 2013-14 t,v,j,u  381 0.644444 0.833333 1.000000 1.111111  1.428571  0.656168 0.044619
+   Ethiopia 2015-16 t,v,j,u  242 0.510714 0.800000 1.000000 1.191667  1.666667  0.566116 0.123967
+   Ethiopia 2018-19 t,v,j,u 2550 0.714286 0.895412 1.000000 1.266667  2.000000  0.605098 0.073333
+   Ethiopia 2021-22 t,v,j,u 2579 0.675000 0.888889 1.000000 1.183772  1.500000  0.665762 0.051958
+EthiopiaRHS   1994a t,v,j,u  136 0.562149 0.724468 0.978911 1.169416  1.550000  0.514706 0.036765
+EthiopiaRHS   1994b t,v,j,u  115 0.763043 0.928571 1.062500 1.237500  1.614286  0.626087 0.052174
+EthiopiaRHS    1995 t,v,j,u  101 0.660000 0.800000 1.000000 1.120000  1.666667  0.554455 0.089109
+EthiopiaRHS    1997 t,v,j,u  184 0.675647 0.839912 1.000000 1.224490  1.543610  0.570652 0.038043
+       Mali 2014-15 t,v,j,u 6133 0.080071 0.303000 0.857143 1.166667  2.221778  0.343714 0.360672
+   GhanaLSS 2016-17 t,v,j,u 1315 0.387556 0.750000 1.000000 1.396429 12.238462  0.451711 0.240304
+
+=== RATIO at (t,j,u) ===
+    country    wave  join   n      p10      p25      med      p75        p90  within25  logdev1
+     Malawi 2010-11 t,j,u 108 0.152500 0.618750 1.000000 1.500000   3.607143  0.324074 0.287037
+     Malawi 2013-14 t,j,u   3 0.216409 0.370568 0.627500 0.813750   0.925500  0.333333 0.333333
+     Malawi 2019-20 t,j,u  60 0.512750 0.873641 1.000000 1.250000   2.020000  0.583333 0.183333
+    Nigeria  2011Q1 t,j,u  42 0.512745 0.752976 1.000000 1.223958   2.395982  0.476190 0.142857
+    Nigeria  2013Q1 t,j,u  41 0.600000 0.833333 1.075000 1.354167   1.923077  0.487805 0.170732
+    Nigeria  2016Q1 t,j,u 169 0.002489 0.008160 0.051042 0.900000   1.250000  0.218935 0.585799
+    Nigeria  2019Q1 t,j,u  50 0.395714 0.714522 0.941538 1.112981   1.496471  0.520000 0.160000
+   Ethiopia 2011-12 t,j,u  62 0.375102 0.800000 1.000000 1.099983   1.208372  0.677419 0.096774
+   Ethiopia 2013-14 t,j,u  54 0.620000 0.883523 1.078169 1.239740   1.529297  0.592593 0.055556
+   Ethiopia 2015-16 t,j,u 102 0.817577 1.000000 1.250000 2.076434   4.110000  0.470588 0.196078
+   Ethiopia 2018-19 t,j,u 450 0.500000 0.769780 1.000000 1.380542   2.133559  0.446667 0.124444
+   Ethiopia 2021-22 t,j,u 381 0.500000 0.750000 1.000000 1.395000   3.000000  0.419948 0.178478
+EthiopiaRHS   1994a t,j,u  13 0.665978 0.795107 0.949367 1.052632   1.622222  0.538462 0.076923
+EthiopiaRHS   1994b t,j,u  13 0.877714 1.000000 1.048304 1.142857   2.231724  0.769231 0.076923
+EthiopiaRHS    1995 t,j,u  12 0.924159 0.977288 1.003049 1.057555   1.134556  0.833333 0.000000
+EthiopiaRHS    1997 t,j,u  19 0.697317 0.886141 1.032558 1.201662   1.970396  0.526316 0.157895
+       Mali 2014-15 t,j,u 231 0.089143 0.214286 0.666667 1.410714  16.666667  0.168831 0.558442
+   Tanzania 2019-20 t,j,u  22 0.797093 0.970000 1.013889 1.585760   3.000000  0.500000 0.136364
+   Tanzania 2020-21 t,j,u  29 0.494187 0.750000 1.000000 1.037037   2.600000  0.517241 0.103448
+   GhanaLSS 2016-17 t,j,u 461 0.400000 0.714286 1.038462 2.272727 200.000000  0.344902 0.325380
+
+=== NOTES ===
+Malawi:  | cp cells=44129 hh cells=237715 matched(t,v,j,u)=10953 cp_matched_frac=0.248 hh_matched_frac=0.046 | (t,j,u) cp=666 hh=5252 matched=171
+Nigeria:  | cp cells=138055 hh cells=209192 matched(t,v,j,u)=13978 cp_matched_frac=0.101 hh_matched_frac=0.067 | (t,j,u) cp=1891 hh=5349 matched=302
+Ethiopia:  | cp cells=45257 hh cells=77474 matched(t,v,j,u)=5905 cp_matched_frac=0.130 hh_matched_frac=0.076 | (t,j,u) cp=1420 hh=3415 matched=1049
+EthiopiaRHS:  | cp cells=2691 hh cells=5221 matched(t,v,j,u)=536 cp_matched_frac=0.199 hh_matched_frac=0.103 | (t,j,u) cp=172 hh=1987 matched=57
+Mali:  | cp cells=23646 hh cells=122841 matched(t,v,j,u)=6133 cp_matched_frac=0.259 hh_matched_frac=0.050 | (t,j,u) cp=314 hh=1665 matched=231
+Niger:  | cp cells=15423 hh cells=61354 matched(t,v,j,u)=0 cp_matched_frac=0.000 hh_matched_frac=0.000 | (t,j,u) cp=302 hh=892 matched=0
+Tanzania:  | cp cells=15831 hh cells=55761 matched(t,v,j,u)=0 cp_matched_frac=0.000 hh_matched_frac=0.000 | (t,j,u) cp=212 hh=415 matched=51
+GhanaLSS:  | cp cells=208205 hh cells=260023 matched(t,v,j,u)=1315 cp_matched_frac=0.006 hh_matched_frac=0.005 | (t,j,u) cp=3374 hh=2623 matched=461
+
+=== AXES / JOIN ===
+    country  cp_j  j_in_fa  j_share  cp_u  u_in_fa  u_share  cp_v  v_in_sample  v_share  hh_rows_in_priced_cluster
+     Malawi    51       19 0.372549    21       18 0.857143  1416         1416 1.000000                   0.579362
+    Nigeria   139      118 0.848921    30       15 0.500000   870          870 1.000000                   0.957525
+   Ethiopia    47       47 1.000000    60       55 0.916667  1269         1268 0.999212                   0.971483
+EthiopiaRHS    43       32 0.744186     1        1 1.000000    18           18 1.000000                   0.990051
+       Mali    37       37 1.000000    14       14 1.000000   754          749 0.993369                   0.658567
+      Niger    45       35 0.777778    12        5 0.416667   252          252 1.000000                   0.639500
+   Tanzania    42       35 0.833333     5        1 0.200000   578            0 0.000000                   0.000000
+   GhanaLSS   666      170 0.255255   140       49 0.350000  2199         2189 0.995452                   0.585691
+
+=== u='Value' rows per (country, wave) ===
+ country    wave    rows  value_rows  value_share  has_community_price
+GhanaLSS 1987-88   71605       71605     1.000000                 True
+GhanaLSS 1988-89   72649       72649     1.000000                 True
+GhanaLSS 1991-92  623600      336678     0.539894                 True
+GhanaLSS 1998-99  542105      443632     0.818351                 True
+GhanaLSS 2005-06 1115420      966373     0.866376                False
+GhanaLSS 2012-13 1709094     1511187     0.884204                 True
+GhanaLSS 2016-17 1124871       90791     0.080712                 True
+
+=== food_acquired reported Price column ===
+    country                          fa_cols  has_reported_Price  Price_nonnull_frac    rows
+     Malawi Quantity,Expenditure,Quantity_kg               False               0.000  971531
+    Nigeria Quantity,Expenditure,Quantity_kg               False               0.000  595725
+   Ethiopia             Quantity,Expenditure               False               0.000  325920
+EthiopiaRHS             Quantity,Expenditure               False               0.000   54693
+       Mali             Quantity,Expenditure               False               0.000  430271
+      Niger             Quantity,Expenditure               False               0.000  239031
+   Tanzania             Quantity,Expenditure               False               0.000  251613
+   GhanaLSS       Quantity,Expenditure,Price                True               0.168 5259344

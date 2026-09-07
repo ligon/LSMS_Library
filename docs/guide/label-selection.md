@@ -308,3 +308,31 @@ Verification, both ways:
 [#693]: https://github.com/ligon/LSMS_Library/issues/693
 [#694]: https://github.com/ligon/LSMS_Library/issues/694
 [#704]: https://github.com/ligon/LSMS_Library/pull/704
+
+## A worked example: relationship labels across survey waves
+
+Survey instruments change between waves. GhanaLSS's roster used fourteen
+relationship codes in 1987-89, nine in 1991-99 (siblings, nieces and all
+in-laws folded into one "relative of head or spouse" code) and ten to eleven
+from 2005 on (no tenant code; parents-in-law inside the parent code). The
+country's `relationship` table therefore carries **two** label variants:
+
+```python
+import lsms_library as ll
+gh = ll.Country('GhanaLSS')
+gh.household_roster()                                          # Preferred: the 15-label Ghana vocabulary
+gh.household_roster(labels={'Relationship': 'Comparable'})     # the 8 categories every wave asked
+```
+
+`Preferred` keeps every distinction some wave made (`Sibling`, `Niece/nephew`,
+`Parent-in-law`, `Child-in-law`, `Tenant`, `Adopted/foster/stepchild`, ...);
+`Comparable` is the common denominator for pooling waves -- Head, Spouse,
+Child, Grandchild, Parent, Other relative, Non-relative, Servant -- and
+GhanaSPS carries the same two columns, so the two Ghana surveys pool too.
+Because categorical mappings run *before* kinship expansion, the selected
+label is what `Generation` / `Distance` / `Affinity` are derived from: a
+GLSS1 sibling read through `Comparable` is an `Other relative` with null
+generation and distance, exactly as GLSS3+ recorded it. The residual
+imbalance no relabelling removes is stated in `GhanaLSS/_/CONTENTS.org`
+(GLSS3/4's `Parent` excludes parents-in-law; every other wave's includes
+them).

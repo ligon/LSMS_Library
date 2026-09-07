@@ -1,4 +1,5 @@
 #+TITLE: Guyana — country notes & known data issues
+#+TODO: TODO WAITING | DONE
 
 * Household and cluster identity (READ FIRST)
 

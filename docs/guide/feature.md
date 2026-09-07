@@ -61,8 +61,8 @@ Mali) rather than silently dropping information.
 
 ### Harmonization Flows Through
 
-All per-country harmonization (kinship decomposition, canonical spellings,
-categorical mappings, dtype coercion) is applied by each `Country` before
+All per-country harmonization (categorical mappings, kinship decomposition,
+canonical spellings, dtype coercion) is applied by each `Country` before
 concatenation. `Feature` delegates to each country's existing table method.
 
 ### Error Handling
