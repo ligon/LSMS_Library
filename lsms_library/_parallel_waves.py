@@ -433,6 +433,17 @@ def _pin_worker(make_jobs: int) -> None:
         os.environ.setdefault(var, "1")
     os.environ[MAKE_JOBS_ENV] = str(int(make_jobs))
     os.environ[WORKERS_ENV] = "1"
+    # The module-level DVC filesystem (local_tools.DVCFS) was built in the
+    # parent at import; once the parent has streamed through it, its inner
+    # fsspec/s3fs objects are pinned to the parent's pid and a forked child
+    # dies on them ("This class is not fork-safe" -- CI, 2026-09-07).  Give
+    # the child its own.  Callers import DVCFS inside function bodies, so
+    # rebinding the module attribute is what they see.
+    try:
+        from . import local_tools
+        local_tools.DVCFS = local_tools._build_dvcfs()
+    except Exception:  # noqa: BLE001 -- the parent-side fallback still covers it
+        pass
     try:
         import threadpoolctl
         threadpoolctl.threadpool_limits(limits=1)
@@ -539,6 +550,23 @@ def relay(payload: dict, *, country: str, table: str) -> tuple[bool, Any]:
     return payload["has_table"], payload["result"]
 
 
+_FORK_UNSAFE_MARKERS = ("not fork-safe",)
+
+
+def _is_fork_unsafe(payload: dict) -> bool:
+    """A worker died on an object that refuses to run in a forked child --
+    fsspec's ``AsyncFileSystem.loop`` (``RuntimeError: This class is not
+    fork-safe``) reached through DVC's filesystem when a blob is missing from
+    the local cache and ``get_dataframe`` falls back to streaming it.  The
+    parent created that object before forking, so no child can use it; the
+    only correct place to build that wave is the parent."""
+    err = payload.get("error")
+    if not err:
+        return False
+    exc, type_name, text, tb = err
+    return any(m in (text or "") or m in (tb or "") for m in _FORK_UNSAFE_MARKERS)
+
+
 def prebuild(build_one: Callable[[str], tuple[bool, Any]], waves: list[str],
              wave_folder_map: dict[str, str] | None, *, country: str, table: str) -> dict[str, dict] | None:
     """Run the per-wave build stage of ``waves`` in a fork pool.
@@ -577,4 +605,19 @@ def prebuild(build_one: Callable[[str], tuple[bool, Any]], waves: list[str],
                                                  "")}
     finally:
         _GROUP_BUILDER = None
+    # A wave whose worker hit a fork-unsafe object (see _is_fork_unsafe) is
+    # rebuilt HERE, in the parent, through the same capture so relay() sees
+    # an ordinary payload.  Measured 2026-09-07 on CI's cold cache: Mali
+    # cluster_features' four waves all failed this way in workers because the
+    # S3 pull ran inside the child; the parent build succeeds.
+    fallback = [w for w in waves if w in payloads and _is_fork_unsafe(payloads[w])]
+    if fallback:
+        warnings.warn(
+            f"{country}/{table}: {len(fallback)} wave(s) rebuilt serially in the "
+            f"parent after a parallel worker hit a fork-unsafe filesystem object "
+            f"({', '.join(fallback)}); this happens when a source blob is not in "
+            f"the local DVC cache yet -- warm the cache once and the build "
+            f"parallelises fully.", RuntimeWarning, stacklevel=2)
+        for w in fallback:
+            payloads[w] = _build_captured(build_one, w)
     return payloads

@@ -79,6 +79,7 @@ nav:
       - Feature: api/feature.md
       - Transformations: api/transformations.md
       - Coverage: api/coverage.md
+      - Visualizations: api/visualizations.md
   - Releases:
       - v0.11.0: releases/v0.11.0.md
       - v0.10.2: releases/v0.10.2.md
