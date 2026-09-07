@@ -297,7 +297,7 @@ class TestAttrsSurvival:
         and that merge hits the *preserving* branch."  RE-MEASURED 2026-09-06
         on Liberia, Albania and Ethiopia, on the unmodified pre-#603-attrs code
         as well as after: **that is false.**  `attach_population` is called at
-        `country.py:2846` and `_join_v_from_sample` at `country.py:2703` -- 143
+        `country.py:3034` and `_join_v_from_sample` at `country.py:2891` -- 143
         lines EARLIER in the same `_finalize_result` call -- so at merge time
         the left frame has no population record yet while `sample()`, which
         completed its own `_finalize_result`, has one.  Every observation was
