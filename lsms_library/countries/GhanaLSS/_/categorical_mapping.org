@@ -87,7 +87,7 @@ Identity rows are deliberately ABSENT: =.replace()= leaves unmatched values
 alone, so a label that is already canonical (Head, Spouse, Child, Grandchild,
 Parent, Sibling, Niece/nephew, Son/daughter in-law, Brother/sister in-law,
 Father/mother in-law, Other relative, Servant, Tenant, Others not related,
-Adopted Child, Parent/Parent-In-Law) needs no row.  Do not add them.
+Adopted Child) needs no row.  Do not add them.
 
 Tuple-preserving BY CONSTRUCTION: every Original Label and its Preferred
 Label resolve to the SAME kinship tuple in =kinship.yml= under the lookup
@@ -97,10 +97,14 @@ Preferred Label only when their tuples agree; a raw label with a distinct
 tuple keeps a distinct Preferred Label:
 - =Adopted Child= [-1,0,consanguineal] (GLSS5/6) and =Adopted / Foster/ Step
   Child= [-1,0,step] (GLSS7) are NOT merged.
-- =Parent/Parentlaw= / =Parent/Parent-In-Law= conflate parent and
-  parent-in-law in ONE survey code (GLSS5/6/7).  Same tuple as =Parent=
-  today, but kept as its own label so GH #698 can still rule on it; folding
-  it into =Parent= would pre-empt that ruling for this country.
+- =Parent/Parentlaw= (GLSS5/6) and =Parent/Parent-In-Law= (GLSS7) are ONE
+  survey code that conflates parent and parent-in-law; the ontology files
+  both as =[1, 0, consanguineal]=, the same tuple as =Parent=.  They are
+  served as =Parent= (label-only change; tuple unchanged), and the
+  conflation is recorded in CONTENTS.org the same way GLSS3+'s =Other
+  relative= absorbing siblings is: GLSS1-4 =Parent= is a parent; GLSS5-7
+  =Parent= is a parent OR a parent-in-law.  If GH #698 ever gives the
+  conflated code a partial-null tuple, the split label comes back (two rows).
 - =Other= (GLSS6 code 11, 14 people) is a code DISTINCT from code 10
   =Non_relative= in that instrument, and GLSS7 dropped it.  Its tuple is
   [0,0,unrelated] today, so folding it into =Others not related= is
@@ -113,7 +117,7 @@ tuple keeps a distinct Preferred Label:
 
 The canonical vocabulary is GLSS1's fourteen labels -- so 1987-88 and
 1988-89 are served unchanged -- plus three later-instrument categories:
-=Parent/Parent-In-Law=, =Adopted Child=, and =Adopted/Foster/Stepchild=
+=Adopted Child= and =Adopted/Foster/Stepchild=
 (GhanaSPS 2009-10's spelling and an existing =kinship.yml= key, so the two
 Ghana surveys share it; GSPS itself drifts across its three waves).
 =Others not related= resolves in =kinship.yml= only through its RAW key
@@ -144,7 +148,8 @@ the table steals the name and the build reports success).
 | Son/daughter                 | Child                    |
 | Child (Son/Daughter)         | Child                    |
 | Father/mother                | Parent                   |
-| Parent/Parentlaw             | Parent/Parent-In-Law     |
+| Parent/Parentlaw             | Parent                   |
+| Parent/Parent-In-Law         | Parent                   |
 | Son/Daughterlaw              | Son/daughter in-law      |
 | Son/Daughter-In-Law          | Son/daughter in-law      |
 | Other Relative               | Other relative           |
