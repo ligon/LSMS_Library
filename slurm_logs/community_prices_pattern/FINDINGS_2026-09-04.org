@@ -1,0 +1,714 @@
+#+TITLE: =community_prices= as a corpus pattern --- scoping findings
+#+DATE: 2026-09-04
+#+AUTHOR: Sue
+
+* Answer
+
+*Yes, adopt it more widely --- but adopt it as a /second, independent price
+series/, not as a replacement for the derived unit value, and fix the
+cross-country plumbing first.*  Where the two can be compared at all, they
+largely agree: on standardised units (=Kg=, =Litre=, =Gram=) the median ratio
+of the household unit value to the surveyed community price is *exactly 1.00*
+in Malawi, Ethiopia, EthiopiaRHS, Nigeria and GhanaLSS, with 17--35 % of
+matched cells /identical to the last digit/.  So the derived price is not
+systematically wrong and there is no case for changing what =food_prices()=
+prefers by default.  The case for the feature is different and stronger, and
+it rests on four measured facts.  (i) *Seven of the eight countries that
+declare =community_prices= carry no reported household price at all* ---
+=food_acquired.Price= is absent for Malawi, Nigeria, Ethiopia, EthiopiaRHS,
+Mali, Niger and Tanzania, so =food_prices(units='unitprice')= returns an empty
+frame for all of them and the surveyed community price is the /only/ reported
+price the library holds.  (ii) The derived unit value is *undefined exactly
+where it is most needed*: GhanaLSS is 100 %/100 %/54 %/82 %/87 % =u='Value''=
+in 1987-88/1988-89/1991-92/1998-99/2012-13, and a community price exists for
+every one of those waves --- this is GH #562 phase 3b and the #770 fallout in
+one sentence.  (iii) Where the two /disagree/, the disagreement is a *unit-
+basis collision, not a price disagreement*: Nigeria 2016Q1 =u='cl'= gives a
+median ratio of *0.0167* over 1,241 cells (a factor of ~60), and Mali's =Tas=
+/ =Unité= / =Boîte= give 0.22 / 0.11 / 0.35, while their =Kg= rows sit at
+1.00.  The community instrument is the thing that can /fix/ that, because it
+records the unit's size (Tanzania's =CM_SEC_G= literally ships a measured
+weight per local unit).  (iv) The pattern is *cheap to extend and already
+half-built elsewhere*: eight further declared countries hold an item-level,
+cluster- or PSU-keyed, reported price file that nobody has wired.
+
+What it would change, concretely: register =community_prices= in the canonical
+=index_info= (today =Feature('community_prices')= *silently excludes
+GhanaLSS's 660,168 rows --- 67 % of the corpus's community-price data* ---
+whenever GhanaLSS is asked for alongside any other country); wire the eight
+unwired countries; and build the =community -> household= price join as a
+documented transformation, never as a default substitution.
+
+* 0. Provenance of these numbers
+
+- Worktree: =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-inputs=, branch
+  =docs/community-prices-pattern= off =origin/development= @ =9e12753f=.
+- Library code pinned to the *worktree* tree via =sys.path.insert(0, WT)=
+  (=lsms_library.__file__= asserted to contain =wt-gsps-inputs= in every
+  session).  At the time of the run the main checkout's =lsms_library/= was
+  clean and also at =9e12753f=, so code identity was not in question; the pin
+  makes the run reproducible against that SHA regardless.  Re-checked at the
+  end of the session: =git -C <main> status --porcelain -- lsms_library= is
+  still empty and =HEAD= is still =9e12753f=, so no in-flight edit reached the
+  code these numbers were produced with.
+- =LSMS_COUNTRIES_ROOT= = the worktree's =lsms_library/countries= (asserted
+  via =countries_root()=); =LSMS_DATA_DIR= = a *private* scratch root
+  (asserted via =data_root()=) holding a symlink to the shared =dvc-cache=
+  *plus a copy of the shared cache's warm* =var/*.parquet= *for the eight
+  countries*, seeded so the run would not rebuild what was already fresh.
+  Whether a copy was used or ignored was decided by the library's own
+  =Country._table_cache_hash(table, waves)= against the parquet's embedded
+  =lsms_cache_hash=:
+  - *served from the seeded copy* (hash matched =9e12753f=):
+    =community_prices= for EthiopiaRHS / Mali / GhanaLSS; =food_acquired= for
+    Ethiopia / EthiopiaRHS / Mali / GhanaLSS; =sample= for all but Niger.
+  - *rebuilt cold from source* (hash mismatched --- the shared cache was
+    written between 06:12 and 08:55 on 2026-09-04, before several merges
+    landed by 10:19): =community_prices= for Malawi / Nigeria / Ethiopia /
+    Niger / Tanzania; =food_acquired= for Malawi / Nigeria / Niger / Tanzania;
+    =sample= for Niger.
+  Seeding the copies is a departure from a strictly empty data root; it is
+  recorded here because it is the one place the run's inputs were not built
+  from source.
+- =LSMS_MAKE_JOBS=2=.  No =dvc= CLI was invoked; every source read went
+  through =get_dataframe= / =_ensure_dvc_pulled= + the sidecar md5.
+- Every table was *obtained through the Country API* --- never
+  =pd.read_parquet= on a cache file --- so =_finalize_result= ran on all of
+  them (categorical mappings, canonical spellings, weight normalisation, the
+  =v= join), whether the underlying parquet was served or rebuilt.
+
+* 1. Coverage today
+
+** Which countries declare it, and at what grain
+
+Eight countries declare =community_prices=; all eight are =materialize: make=
+(script-path).  Seven use the grain =(t, v, j, u)=; GhanaLSS uses
+=(t, v, j, u, obs)=.
+
+#+CAPTION: Built =community_prices=, cold build on =9e12753f= (rows / clusters / items / units per wave)
+| country     | wave    |    rows |  =v= | =j= | =u= | extra |
+|-------------+---------+---------+------+-----+-----+-------|
+| Malawi      | 2010-11 |  39,166 |  768 |  51 |  20 | ---   |
+| Malawi      | 2013-14 |   6,511 |  204 |  32 |  16 | ---   |
+| Malawi      | 2019-20 |  36,958 |  727 |  51 |  20 | ---   |
+| Nigeria     | 2011Q1  |  27,104 |  494 | 111 |  11 | ---   |
+| Nigeria     | 2013Q1  |  27,079 |  496 | 111 |  11 | ---   |
+| Nigeria     | 2016Q1  |  33,781 |  487 | 116 |  20 | ---   |
+| Nigeria     | 2019Q1  |  25,907 |  517 | 109 |  21 | ---   |
+| Nigeria     | 2024Q1  |  24,184 |  507 | 109 |  24 | ---   |
+| Ethiopia    | 2011-12 |   4,340 |  318 |  23 |  12 | ---   |
+| Ethiopia    | 2013-14 |   5,370 |  361 |  23 |  14 | ---   |
+| Ethiopia    | 2015-16 |   9,226 |  331 |  46 |  10 | ---   |
+| Ethiopia    | 2018-19 |  13,994 |  525 |  46 |  41 | ---   |
+| Ethiopia    | 2021-22 |  12,327 |  432 |  47 |  39 | ---   |
+| EthiopiaRHS | 1994a   |     306 |   18 |  17 |   1 | ---   |
+| EthiopiaRHS | 1994b   |     306 |   18 |  17 |   1 | ---   |
+| EthiopiaRHS | 1995    |     306 |   18 |  17 |   1 | ---   |
+| EthiopiaRHS | 1997    |     558 |   18 |  41 |   1 | ---   |
+| EthiopiaRHS | 2004    |     598 |   18 |  38 |   1 | ---   |
+| EthiopiaRHS | 2009    |     617 |   18 |  42 |   1 | ---   |
+| Mali        | 2014-15 |  23,646 |  754 |  37 |  14 | ---   |
+| Niger       | 2011-12 |   8,923 |  240 |  44 |   7 | ---   |
+| Niger       | 2014-15 |   6,500 |  221 |  45 |   9 | ---   |
+| Tanzania    | 2019-20 |   2,769 |   94 |  42 |   5 | ---   |
+| Tanzania    | 2020-21 |  13,062 |  484 |  42 |   5 | ---   |
+| GhanaLSS    | 1987-88 |  16,582 |  165 |  46 |  10 | =obs= |
+| GhanaLSS    | 1988-89 |  12,642 |  112 |  47 |  10 | =obs= |
+| GhanaLSS    | 1991-92 |  58,348 |  256 | 109 |  21 | =obs= |
+| GhanaLSS    | 1998-99 |  63,445 |  253 | 111 |  21 | =obs= |
+| GhanaLSS    | 2012-13 | 288,243 | 1015 | 136 |   3 | =obs= |
+| GhanaLSS    | 2016-17 | 220,908 |  398 | 532 | 140 | =obs= |
+
+Corpus total: *983,706 rows* over 30 =(country, wave)= cells.  GhanaLSS alone
+is 660,168 of them (67 %).
+
+** Geography: =v= is the survey's own cluster, and it joins --- except in Tanzania
+
+#+CAPTION: =j= / =u= / =v= axis overlap with the household side (API-level labels)
+| country     | =j= labels | in =food_acquired= | =u= labels | in =food_acquired= | distinct =v= | in =sample().v= | hh rows in a priced cluster |
+|-------------+------------+--------------------+------------+--------------------+---------------+-----------------+-----------------------------|
+| Malawi      |         51 |       19 (37 %)    |         21 |        18 (86 %)   |         1,416 |  1,416 (100 %)  |                      57.9 % |
+| Nigeria     |        139 |      118 (85 %)    |         30 |        15 (50 %)   |           870 |    870 (100 %)  |                      95.8 % |
+| Ethiopia    |         47 |      47 (100 %)    |         60 |        55 (92 %)   |         1,269 |  1,268 (99.9 %) |                      97.1 % |
+| EthiopiaRHS |         43 |       32 (74 %)    |          1 |        1 (100 %)   |            18 |     18 (100 %)  |                      99.0 % |
+| Mali        |         37 |      37 (100 %)    |         14 |       14 (100 %)   |           754 |    749 (99.3 %) |                      65.9 % |
+| Niger       |         45 |       35 (78 %)    |         12 |        5 (42 %)    |           252 |    252 (100 %)  |                      64.0 % |
+| Tanzania    |         42 |       35 (83 %)    |          5 |        1 (20 %)    |           578 |      *0 (0 %)*  |                     *0.0 %* |
+| GhanaLSS    |        666 |      170 (26 %)    |        140 |        49 (35 %)   |         2,199 |  2,189 (99.5 %) |                      58.6 % |
+
+The =v= keyspace claim in every country's =data_scheme.yml= ("the SAME keyspace
+as =sample().v=") *holds, measured*, in seven of eight countries.  Tanzania is
+the documented exception and it is exactly as bad as
+=Tanzania/_/CONTENTS.org= says: /"the community =interview__key= has zero
+overlap with the household =interview__key="/ --- 0 of 578 distinct community
+cluster ids intersect =sample().v=, and 0 % of household rows sit in a
+priced cluster.  Nothing here contradicts that file.
+
+The low =j= / =u= overlap shares for Malawi and GhanaLSS are *not* defects:
+both instruments price non-foods (soap, batteries, tools, a =ganyu= day-wage
+in Malawi; toilet rolls and corded phones in GLSS7) that have no
+=food_acquired= counterpart by construction.
+
+** Cells that could plausibly gain one
+
+Two sweeps, both metadata-only (no =.dta= body read, no =dvc= CLI):
+
+1. Every DVC-tracked =.dta= / =.sav= in the corpus whose blob was already in
+   L1: *4,799 of 6,941 scanned* (2,142 skipped because the blob was not
+   locally cached --- see §6), of which *277 files carry at least one variable
+   whose Stata label matches =price|prix|precio|preco|cost|unit value|per kg=*.
+2. A name-directed sweep of every community-/price-named file, with blob warm.
+
+After discarding household-level files, consumption aggregates and derived
+indices, the *unwired, declared-country, cluster-or-PSU-keyed, item-level
+reported price files* are:
+
+#+CAPTION: Unwired community/market price instruments in declared countries (probed, not built)
+| country      | wave(s)                 | file(s)                                   | rows          | geography key                    | observations |
+|--------------+-------------------------+-------------------------------------------+---------------+----------------------------------+--------------|
+| South Africa | 1993                    | =CFPRI01.dta=, =CFPRI03.dta=              | 9,667 / 9,464 | =clustnum= + =foodcode=          | 2 (=cfpri1/2=) |
+| Tajikistan   | 2007                    | =comm_r8.dta=                             | 19,440        | =psuid= "PSU / community ID"     | 3 (SHOP 1/2/3) |
+| Liberia      | 2018-19                 | =Community/comm_sect7_public.dta=         | 3,773         | =ea_unique= "Full EA code"       | 1, + standard-unit equivalent |
+| Guatemala    | 2000                    | =PRECIOS.DTA=                             | 55,205        | =depto/mupio/sector= + =boleta=  | =cotiza= (n) |
+| Panama       | 1997 / 2003 / 2008      | =PRECIOS.DTA= / =E03PR01-02.DTA= / =precios.dta= | 238 / 46,324 / 48,457 | =upm= (PSU)         | 3 |
+| Albania      | 2002                    | =c_price_cl.dta=, =price_list_cl1.dta=    | 24,192 / 27,360 | =quest_num= (needs a key check) | 3 (=c11_q03/04/05=) |
+| CotedIvoire  | 1985-86, 1986-87, 1987-88 | =PRICE85/86/87.DAT= + =.DCT=            | (fixed-width) | cluster (per the =.DCT=)         | per form |
+| Peru         | 1985                    | =PRICER.DTA=                              | 951           | (11 price variables, wide)       | wide |
+
+That is *at least 12 further =(country, wave)= cells* in 8 declared countries,
+against the 30 built today.  Four more countries hold one but have no
+=_/data_scheme.yml= at all (Afghanistan 2016-17/2020 =market_price=, Nicaragua
+1998-99/2001 =PRECIOS=, Kyrgyz Republic 1993/1997 =KPRICE*=, Rwanda 2000-01
+=Comm_Sect*=) --- those are acquisition-and-configuration, not a wiring gap.
+
+*** A pattern /variant/, not an unwired cell: the EHCVM price survey
+
+Mali 2021-22, Niger 2021-22 and Senegal 2021-22 ship =ehcvm_prix_*.dta=
+(175,352 / 105,112 / 118,136 rows).  Its key is =region x milieu x annee x
+mois x semaine x produitID x variete x releve= --- there is *no cluster
+column*, so it cannot join =sample().v=.  Burkina Faso 2014's
+=emc2014_p{1..4}_prix= is finer (=region/province/commune/ctrl= plus a
+sales-point sequence =idseq=) but still not the EA.  These are a genuine
+second shape --- =(t, Region, j, u)= or =(t, market, j, u)= --- and should be
+named as such rather than forced onto the cluster grain.  Niger's
+=data_scheme.yml= already says exactly this and it is right.
+
+*** Where the instrument was checked and is genuinely absent
+
+- *Uganda* --- =GAP_RANKING.org:253= and =INCIDENCE_MAP.org:131= both name
+  "Uganda Community =csec3*=" as an unwired community-price source.  *That is
+  wrong.*  Measured: I read the variable labels of all 299 =CSEC*= data files
+  across Uganda's seven waves; the only price-labelled variables are
+  agricultural / non-agricultural *wages* (2005-06 =c4q20..c4q23=), *land*
+  rental and sale prices (2018-19 / 2019-20 =s2a_q12_*=), a school PTA fee,
+  two drug prices (2005-06 =csec7=), and misuse-of-funds amounts.  C4 on the
+  instrument itself: =Uganda2011-12CommunityQuestionnaire.pdf= contains the
+  string "price" *zero* times; =unps2019_20_comm_questionnaire.pdf= contains
+  it five times, all in "Land rental and sales price".  The UNPS community
+  questionnaire is a services-and-facilities instrument (schools, health
+  centres, roads).  So: *no Uganda wave's community data files carry a
+  food-price module* (C1, all seven waves), and the *instrument* confirms it
+  for 2011-12 and 2019-20 (C4).  The other five waves rest on C1 alone --- by
+  the repo's own rule that is =unsure=, not =not-asked=, and I have written no
+  verdict.
+- *Malawi 2016-17* --- =Malawi/_/data_scheme.yml= says IHS4 "ran a community
+  questionnaire but DROPPED the Module CK price section (no =com_ck= file)".
+  Confirmed from the sidecar tree: 2016-17 ships =com_ca..com_cj= (+ =_16=
+  twins) and *no* =com_ck=; 2010-11 and 2019-20 both do.
+- *Mali 2017-18* --- =Mali/_/data_scheme.yml= says "the 2017-18 EACI wave
+  dropped the community questionnaire".  Confirmed: EACI17 ships
+  =eaci17_s00..s11= only, and =eaci17_s04p1.dta= (the file whose /number/
+  matches 2014-15's price module =EACIS04_p1=) is the *employment* module
+  ("Travail dans un champ ou jardin du ménage dans les 7 derniers jours?").
+  Same section number, different questionnaire.
+- *Nigeria post-planting rounds* --- the price module is =sectc8_harvest*=,
+  i.e. post-harvest only, so =t= is the PH quarter by design.
+- *GhanaLSS 2005-06* --- already adjudicated =asked-not-distributed= with C1;C2;C4
+  evidence in =.coder/coverage/absent_verdicts.csv=.
+
+* 2. Comparability: surveyed community price vs. derived household unit value
+
+** Method
+
+Household side: =Expenditure / Quantity= on =s='purchased'= rows of the
+API-level =food_acquired= (i.e. the =units='unitvalue'= formula, *in native
+=u=*), then the *median within =(t, v, j, u)=*.  Community side: the
+per-native-unit price, reconstructed per country from the stored reported
+columns (§3), then the median within =(t, v, j, u)= (this collapses GhanaLSS's
+=obs=).  Ratio = household unit value / community price.  Deliberately *not*
+routed through =food_prices(units='kgvalue')=: that mode is being edited right
+now for #770, and kg conversion would import exactly the unit-inference
+problem the comparison is meant to test.
+
+** Result
+
+#+CAPTION: Ratio (hh unit value / community price) on matched =(t, v, j, u)= cells
+| country     | wave    |     n | exact tie | within 10 % | within 25 % | median | geo-mean | IQR of log |
+|-------------+---------+-------+-----------+-------------+-------------+--------+----------+------------|
+| Malawi      | 2010-11 | 5,473 |    27.8 % |      42.7 % |      63.1 % |  1.000 |    0.927 |       0.22 |
+| Malawi      | 2013-14 |    10 |    10.0 % |      10.0 % |      30.0 % |  0.817 |    0.705 |       0.82 |
+| Malawi      | 2019-20 | 5,470 |    35.4 % |      45.3 % |      63.4 % |  1.000 |    0.922 |       0.26 |
+| Nigeria     | 2011Q1  | 6,314 |     5.4 % |      15.7 % |      32.0 % |  1.071 |    1.144 |       0.94 |
+| Nigeria     | 2013Q1  | 3,314 |     5.6 % |      13.0 % |      25.8 % |  0.962 |    0.569 |       1.58 |
+| Nigeria     | 2016Q1  | 3,429 |     4.1 % |       8.2 % |      16.2 % | *0.020* |   0.040 |      *4.15* |
+| Nigeria     | 2019Q1  |   921 |    21.0 % |      39.1 % |      66.0 % |  1.000 |    0.927 |       0.30 |
+| Ethiopia    | 2011-12 |   153 |    32.7 % |      49.7 % |      75.2 % |  1.000 |    1.117 |       0.20 |
+| Ethiopia    | 2013-14 |   381 |    21.8 % |      38.1 % |      65.6 % |  1.000 |    0.976 |       0.29 |
+| Ethiopia    | 2015-16 |   242 |    21.5 % |      36.0 % |      56.6 % |  1.000 |    1.200 |       0.40 |
+| Ethiopia    | 2018-19 | 2,550 |    16.7 % |      33.6 % |      60.5 % |  1.000 |    1.353 |       0.35 |
+| Ethiopia    | 2021-22 | 2,579 |    21.4 % |      38.1 % |      66.6 % |  1.000 |    1.001 |       0.29 |
+| EthiopiaRHS | 1994a   |   136 |     8.8 % |      23.5 % |      51.5 % |  0.979 |    0.942 |       0.48 |
+| EthiopiaRHS | 1994b   |   115 |     7.0 % |      33.9 % |      62.6 % |  1.063 |    1.046 |       0.29 |
+| EthiopiaRHS | 1995    |   101 |     7.9 % |      39.6 % |      55.4 % |  1.000 |    0.980 |       0.34 |
+| EthiopiaRHS | 1997    |   184 |     4.9 % |      34.8 % |      57.1 % |  1.000 |    1.064 |       0.38 |
+| Mali        | 2014-15 | 6,133 |     9.4 % |      17.3 % |      34.4 % |  0.857 |    0.625 |       1.35 |
+| GhanaLSS    | 2016-17 | 1,315 |    13.6 % |      24.0 % |      45.2 % |  1.000 |    1.442 |       0.62 |
+| Niger       | ---     |     0 | ---       | ---         | ---         | ---    | ---      | ---        |
+| Tanzania    | ---     |     0 | ---       | ---         | ---         | ---    | ---      | ---        |
+
+*Why GhanaLSS matches only in 2016-17.*  It is not that the pre-2016 waves
+have no physical quantities --- 1991-92 has 286,922 non-=Value= rows and
+1998-99 has 98,473.  Every one of them is =s='produced'=.  Purchased rows with
+a physical unit exist *only* in 2016-17 (882,365 of them), which is exactly
+what =GhanaLSS/_/CONTENTS.org:1034= describes: before 2016-17 the instrument
+elicits the amount *spent* on purchases and a separate module elicits
+*quantities of home-produced food*.  So the household purchase unit value ---
+the thing the community price would be compared with, or replace --- does not
+exist for five of the six priced waves.
+
+Overlap accounting (matched cells / community cells; matched / household
+cells): Malawi 24.8 % / 4.6 %; Nigeria 10.1 % / 6.7 %; Ethiopia 13.0 % / 7.6 %;
+EthiopiaRHS 19.9 % / 10.3 %; Mali 25.9 % / 5.0 %; GhanaLSS 0.6 % / 0.5 %;
+Niger and Tanzania 0 %.
+
+** Reading it
+
+*The agreement is real and it is a distributional statement, not a mean.*  In
+*11 of the 18 =(country, wave)= cells that can be compared at all* the median
+is exactly 1.000, and between 5 % and 35 % of matched cells are *exactly*
+equal.  That is more agreement than a Deaton
+quality/quantity story predicts, and it is partly an artefact of round-number
+prices (a cluster where every household paid 200 MK/kg and the enumerator
+recorded 200 MK/kg produces an exact tie).  It is nonetheless the answer to the
+crux question: *on the cells where both instruments speak, they say the same
+thing.*  There is no measured case for changing the =food_prices()= default.
+
+*The disagreements are unit-basis collisions.*  Split by =u=:
+
+| country / wave       | =u=            |     n | median ratio |
+|----------------------+----------------+-------+--------------|
+| Malawi 2010-11       | Piece          | 2,194 |        1.000 |
+| Malawi 2010-11       | Kilogramme     | 1,805 |        1.000 |
+| Malawi 2010-11       | Gram           |   593 |        1.000 |
+| Malawi 2010-11       | Millilitre     |   311 |        0.700 |
+| Nigeria 2011Q1       | Kg             | 5,339 |        1.080 |
+| Nigeria 2011Q1       | l              |   891 |        1.095 |
+| Nigeria 2011Q1       | =cl=           |    84 |       *0.009* |
+| Nigeria 2016Q1       | =cl=           | 1,241 |       *0.017* |
+| Nigeria 2016Q1       | Kg             |   641 |        1.000 |
+| Nigeria 2019Q1       | Kg             |   561 |        1.000 |
+| Ethiopia 2021-22     | Kg             | 1,957 |        1.000 |
+| Mali 2014-15         | Kg             | 3,470 |        1.000 |
+| Mali 2014-15         | =Tas=          | 1,111 |       *0.217* |
+| Mali 2014-15         | =Unité=        |   532 |       *0.110* |
+| Mali 2014-15         | =Boîte=        |   207 |       *0.350* |
+| GhanaLSS 2016-17     | Kg             |   148 |        1.005 |
+
+Every large deviation is a *container* unit --- =cl=, =Tas= (a heap), =Unité=,
+=Boîte= --- whose /size/ the two instruments do not share, even though the
+=u= label is the same canonical Preferred Label on both sides.  Nigeria
+2016Q1's =cl= alone drags that wave's headline median from ~1 to 0.02.  This
+is a real defect in the current pattern and §3 says what to do about it.
+
+*Two countries cannot be compared at all, for two different reasons.*
+- *Niger: zero overlap because the waves do not overlap.*  =community_prices=
+  covers 2011-12 and 2014-15 (the ECVMA waves); =food_acquired= is declared
+  only for 2018-19 and 2021-22 (=latest.csv=: Niger =food_acquired= 2011-12 and
+  2014-15 are both =absent=, "source not declared for wave").  Niger therefore
+  holds surveyed prices for waves with no consumption data and consumption data
+  for waves with no surveyed prices.  Its =community_prices= is, today,
+  unusable for anything that needs both sides.
+- *Tanzania: zero overlap because the keys do not join* (#113, above).
+
+** Against the existing recorded comparison
+
+=Nigeria/_/CONTENTS.org:44= records: /"Validated against the *independent*
+=community_prices= survey (median survey/community unit-value ratio 0.95 on
+matched =(t, j, u)= cells in 2019Q1; 93 % within 25 %)."/  My =(t, j, u)=
+replication on the same wave gives *median 0.942 over 50 cells, 52.0 % within
+25 %*.  The median reproduces; the "93 % within 25 %" does not, and I could
+not tell from the file which cells or which denominator produced it.  Flagging
+rather than adjudicating --- the discrepancy may be a different item filter, a
+weighting, or a =kgvalue= rather than =unitvalue= basis.
+
+* 3. What the pattern actually is --- and where it is not yet one pattern
+
+** The shape
+
+A =community_prices= row is: a *REPORTED* price, at *cluster* grain, for a
+*named item* in a *named native unit*, with *no imputation and no aggregation
+in core*, joinable to households through =v=.  It contrasts with the derived
+unit value on four axes:
+
+| axis          | =community_prices=                                  | derived =food_prices=                                    |
+|---------------+-----------------------------------------------------+----------------------------------------------------------|
+| provenance    | surveyed --- an enumerator recorded a market price  | computed --- =Expenditure / Quantity= from a household row |
+| grain         | =(t, v, j, u)= --- cluster                          | =(t, v, i, j, u, s)= --- household                       |
+| existence     | exists iff the survey fielded a price questionnaire | exists iff the household reported *both* a value and a quantity |
+| failure modes | few vendors; the market may not be where the household shops | unit heterogeneity; quality/quantity discounts; degenerate rows (=u='Value'= -> 1, #770) |
+
+The library already treats it correctly in one important respect: *no country
+stores a per-unit price.*  Every one stores the reported numerator and (where
+the instrument gives one) the reported denominator, leaving the division to a
+transformation.  That is the same discipline =food_acquired= applies by
+carrying =Quantity= + =Expenditure= rather than a price, and it is the part of
+the pattern most worth propagating.
+
+** But it is not yet ONE pattern --- three column conventions for one concept
+
+#+CAPTION: Per-country recipe for "currency per one native unit =u="
+| country     | source module                                | stored columns                        | per-unit price      | multi-observation handling                      | item scope        |
+|-------------+----------------------------------------------+---------------------------------------+---------------------+--------------------------------------------------+-------------------|
+| Ethiopia    | ESS §10 =sect10b1/b2/a2/b_com=               | =Price=, =Quantity=                   | =Price/Quantity=    | one row per cell                                 | FOOD only         |
+| EthiopiaRHS | =price1234_rev=, =rd6_kgpr_Mkt=, =price2009= | =Price=                               | =Price= (per kg)    | R1--R4 broadcast Woreda -> PA                     | food              |
+| GhanaLSS    | each round's own PRICE questionnaire         | =Price=, =NumberOfUnits=, =Description= | =Price/NumberOfUnits= | *=obs= kept as an index level*                  | food + non-food   |
+| Malawi      | Community Module CK reference prices         | =Price=, =NumberOfUnits=, =Available= | =Price/NumberOfUnits= | one row per cell                               | food + non-food + a day-wage |
+| Mali        | EACI 2014-15 S04 (=rec_type 8=)              | =Price=, =Quantity=                   | =Price/Quantity=    | ONE selected (post-harvest first, then form order) | food            |
+| Niger       | ECVMA CS07                                   | =Price=, =Quantity=                   | =Price/Quantity=    | ONE selected (passage 2 first, then form order)  | food + non-food   |
+| Nigeria     | post-harvest community §C8                   | =Price=                               | =Price=             | one row per cell                                 | food only         |
+| Tanzania    | =CM_SEC_F_ID= (=cm_f061/62/63=)              | =Price=                               | =Price= (pre-divided) | district-capital triple deliberately not folded in | food            |
+
+Three consequences a "pattern" would have to settle:
+
+1. *A consumer cannot write one expression.*  Getting a per-unit price out of
+   =Feature('community_prices')= requires knowing, per country, whether to
+   divide by =Quantity=, by =NumberOfUnits=, or not at all.  A canonical
+   =PricePerUnit= /transformation/ (never a stored column) belongs in
+   =transformations.py=.
+2. *=obs= vs. selection.*  GhanaLSS keeps all vendor observations; Mali and
+   Niger *select one* (documented, deterministic, never averaged); Malawi /
+   Nigeria / Ethiopia / Tanzania have a single row per cell by construction.
+   GhanaLSS's choice is the more honest one --- and it is the one the corpus
+   penalises today (§3.3).  Note that the instruments the /others/ read also
+   carry multiple observations: Tajikistan's =comm_r8= has SHOP 1/2/3,
+   Albania 2002 has three prices, South Africa 1993 has =cfpri1/cfpri2=,
+   Guatemala has =cotiza=.  Adopting the pattern widely means deciding =obs=
+   corpus-wide, not per country.
+3. *=u= is nominally harmonised but not semantically aligned* --- §2's
+   container-unit collisions.  The instruments that record the unit's *size*
+   (GhanaLSS =NumberOfUnits=, Liberia's "Standard Unit Equivalent",
+   Tanzania's =CM_SEC_G= measured weight) are the ones that could close this.
+
+** =Feature('community_prices')= silently drops the largest country
+
+Measured on =9e12753f=:
+
+#+begin_example
+Feature('community_prices')(['Ethiopia','EthiopiaRHS','GhanaLSS','Malawi',
+                             'Mali','Niger','Nigeria','Tanzania'])
+UserWarning: community_prices: excluded 1 country frame(s) ['GhanaLSS'] with a
+divergent index shape from the cross-country assembly (kept modal shape
+['country','t','v','j','u','currency']); stacking heterogeneous index depths
+would collapse the whole result to an unnamed index. Access the excluded data
+via Country(name).community_prices().
+-> (323538, 4), countries kept: Ethiopia EthiopiaRHS Malawi Mali Niger Nigeria Tanzania
+#+end_example
+
+and, symmetrically, =(['GhanaLSS','Malawi'])= -> (660168, 3) with *Malawi*
+excluded.  =community_prices= is in =data_info.yml='s =Feature Vocabulary= but
+has *no =index_info= entry*, so assembly keeps the modal shape and drops the
+rest.  Nothing is silently /collapsed/ --- the warning names the excluded frame
+--- but 67 % of the corpus's community-price rows are absent from the default
+cross-country call.  The fix proposed on PR #762 (register
+=community_prices: (t, v, j, u, obs)= and add it to =fabricate_missing_levels=
+so single-observation countries get =obs = <NA>=) is the right one, and the
+measurement above is the argument for it: the alternative --- dropping =obs=
+--- would =.first()= away two of three surveyed vendors, which is a core
+aggregation the design rules out.
+
+** Also: no reported household price exists to compete with it
+
+| country     | =food_acquired= columns              | reported =Price=? | non-null |
+|-------------+--------------------------------------+-------------------+----------|
+| Malawi      | Quantity, Expenditure, Quantity_kg   | no                |      0 % |
+| Nigeria     | Quantity, Expenditure, Quantity_kg   | no                |      0 % |
+| Ethiopia    | Quantity, Expenditure                | no                |      0 % |
+| EthiopiaRHS | Quantity, Expenditure                | no                |      0 % |
+| Mali        | Quantity, Expenditure                | no                |      0 % |
+| Niger       | Quantity, Expenditure                | no                |      0 % |
+| Tanzania    | Quantity, Expenditure                | no                |      0 % |
+| GhanaLSS    | Quantity, Expenditure, *Price*       | yes               |   16.8 % |
+
+So =food_prices(units='unitprice')= and =units='kgprice'= --- the two modes
+that return a *reported* price --- yield an empty frame for seven of the eight
+countries that have a =community_prices=.  In those countries the community
+survey is not a nicety; it is the only reported price the library holds.
+
+** The #770 tie-in, measured
+
+=u='Value'= rows per =(country, wave)= --- rows where =Quantity= /is/ the
+expenditure, which is the case =conversion_to_kgs= currently infers a kg factor
+for:
+
+| country  | wave    |      rows | =u='Value'= rows |  share | community price for that wave? |
+|----------+---------+-----------+------------------+--------+--------------------------------|
+| GhanaLSS | 1987-88 |    71,605 |           71,605 |  100 % | yes                            |
+| GhanaLSS | 1988-89 |    72,649 |           72,649 |  100 % | yes                            |
+| GhanaLSS | 1991-92 |   623,600 |          336,678 |   54 % | yes                            |
+| GhanaLSS | 1998-99 |   542,105 |          443,632 |   82 % | yes                            |
+| GhanaLSS | 2005-06 | 1,115,420 |          966,373 |   87 % | *no* (asked-not-distributed)   |
+| GhanaLSS | 2012-13 | 1,709,094 |        1,511,187 |   88 % | yes                            |
+| GhanaLSS | 2016-17 | 1,124,871 |           90,791 |    8 % | yes                            |
+
+Of the eight countries with a =community_prices=, *only GhanaLSS carries
+=u='Value'= rows at all* --- the other seven have none, so #770's blast radius
+among these countries is GhanaLSS alone.  (The issue's own blast-radius list
+names 18 countries by scheme; this measures rows, and only for these eight.)
+The point for this scoping is the last column: of the six GLSS waves whose
+derived unit value is largely or wholly degenerate, *five ship a price survey*
+--- and the sixth (2005-06) is the wave already adjudicated
+=asked-not-distributed=, i.e. the instrument was fielded and the extract omits
+it.  The one wave with a mostly-physical =u= axis (2016-17, 8 % =Value=) is
+also the only one whose derived unit value can be compared with the community
+price at all (§2).  That is the strongest single argument in the file for the
+pattern.
+
+Two caveats on this table.  =u='Value'= was matched case-insensitively on the
+exact label; sweeping every distinct =u= in all eight countries for a
+currency-shaped label turns up exactly one more --- *EthiopiaRHS =u='Birr'=*,
+174 rows in total (1.1 % of 1994a, <0.2 % of every other wave), too few to
+matter.  The other six countries have no non-physical unit label at all.
+Second, this measures the eight countries that /have/ a =community_prices=;
+#770's own blast-radius list names 18 countries by scheme and is not
+contradicted here.
+
+* 4. Where else the pattern applies
+
+The generalisable shape is *"a reported, cluster-level, item-level attribute
+carried at its own grain, with no aggregation in core"*.  Three candidates,
+with evidence:
+
+1. *=community_unit_weights= --- a REPORTED local-unit -> weight table.*  This
+   is the best candidate and it bears directly on #770.  Tanzania
+   =CM_SEC_G.dta= / =cm_sec_g.dta= is a =(t, v, j, u, obs)= file carrying
+   =vil_loc_unit= ("LOCAL UNIT"), =vil_loc_weight= ("LOCAL UNIT WEIGHT (KGS)")
+   and =vil_loc_price= for 15 items x 3 observations --- 99 communities /
+   207 priced rows in 2019-20, 488 communities / 3,906 priced rows with a
+   weight in 2020-21 --- over exactly the container units the library cannot
+   convert (=Heap (Fungu)=, =Piece (Idadi)=, =Bucket (sandoline)=, =Tin
+   container (Debe)=, =Cane (Kopo)=).  It is *entirely unused*: Tanzania's
+   feature reads =CM_SEC_F_ID= only.  Liberia's =comm_sect7_public= carries
+   the same idea (=S7_4_quant= / =S7_4_unit=, "Standard Unit Equivalent").
+   A reported, cluster-level unit-size table is precisely what
+   =conversion_to_kgs= currently /infers/ from price ratios.
+2. *=community_wages=.*  Uganda 2005-06 =csec4=/=csec41= carry agricultural
+   and non-agricultural wages per person-day by sex at cluster grain
+   (=c4q20..c4q23=, 312 clusters); Malawi's Module CK prices a =ganyu=
+   day-wage alongside its goods.  Reported, cluster-level, item-like (the
+   "item" is a labour category).  This is the natural home for the wage inputs
+   =median_price_valuation= needs for =plot_labor= valuation, and Uganda ---
+   which has *no* community food-price module --- would gain a
+   =community_prices=-shaped feature from it.
+3. *=community_land_prices=.*  Uganda 2018-19 / 2019-20 =CSEC2A= carries
+   current and five-years-ago *rental* and *sale* prices for 1 ha of
+   agricultural land and 200 m² of residential land, at cluster grain, in
+   every one of ~305 communities.  Same shape; currently unread.
+
+*Not* candidates, and worth saying so: Malawi =com_cd= / Ethiopia =sect4_com=
+carry reported cluster attributes too (bus fares, distances to market), but
+they are *one value per cluster*, not item-level --- they belong in
+=cluster_features=, which already exists for exactly that.  And
+Tanzania_Kegera's =price2004_cl.dta= is a Laspeyres index, i.e. derived: the
+opposite of the pattern.
+
+* 5. Cost
+
+** Anchor: what GhanaLSS phase 3a actually cost
+
+PR #762 (merge =f653104a=), 6 waves, from nothing to a built, tested,
+documented feature:
+
+| commit / scope                        | files | insertions |
+|---------------------------------------+-------+------------|
+| =1a3323eb= feature (config + scripts) |    16 |      1,949 |
+| whole PR (+ CONTENTS, tests, verdicts, audit scripts) | 27 | 3,819 |
+
+Of the 1,949 feature lines, *1,252 (64 %) are the per-wave
+=harmonize_price_item= tables in =categorical_mapping.org=* --- the item
+crosswalk, not the code.  The code is one shared helper (=glss_prices.py=,
+289 lines), six ~30--90-line wave scripts, a 41-line concatenator, a 60-line
+=data_scheme= block and 11 lines of Makefile.
+
+** So the cost of a new country is dominated by the item crosswalk
+
+For the eight unwired countries in §1, the code is close to free (the
+Niger/Mali/Malawi wave-script + country-concatenator template applies
+directly); the work is (a) decoding the wave's price-item code list onto the
+=harmonize_food= Preferred-Label axis, and (b) proving the geography key joins
+=sample().v=.  Rough ordering by expected effort:
+
+| tier                              | countries                                             | why                                                                         |
+|-----------------------------------+-------------------------------------------------------+-----------------------------------------------------------------------------|
+| cheapest (key is an EA/PSU id)    | Liberia 2018-19, Tajikistan 2007, South Africa 1993   | =ea_unique= / =psuid= / =clustnum= are explicit; long-format; small item lists |
+| medium                            | Guatemala 2000, Panama 1997/2003/2008                 | composite geography key; Guatemala's =v= is =depto-mupio-sector-segmento= but =PRECIOS= carries only =sector= -> a coarser join, must be stated |
+| needs a key investigation first   | Albania 2002                                          | =quest_num= is a questionnaire number, not obviously =sample().v=            |
+| needs a parser first              | CotedIvoire 1985--88 =PRICE8x.DAT= + =.DCT=           | fixed-width behind a =.DCT=; see the GhanaLSS =COMM.DAT= silent mis-parse (`null_read_audit`) |
+| a different feature, not this one | Mali/Niger/Senegal 2021-22, Burkina 2014 =*prix*=     | region x milieu (or commune x sales point) grain --- design first             |
+
+** Acquisition, not configuration
+
+- *GhanaLSS 2005-06* --- instrument fielded (=G5QPrice.pdf=), no price dataset
+  distributed.  Already recorded as =asked-not-distributed=; ask GSS.
+- *CotedIvoire 2018-19* --- ships =CIV-EHCVM1-QNR-PRIX-*= questionnaires in
+  =Documentation/= and *no* price data file.  Same category, not yet
+  adjudicated.
+- *Niger 2018-19* --- no community price file of any kind (2021-22 has the
+  region-grain =ehcvm_prix= only).
+- *Niger 2011-12 / 2014-15 =food_acquired=* --- the reverse problem: the
+  prices are wired and the consumption is not.  Wiring =food_acquired= for
+  those two ECVMA waves is what would make Niger's =community_prices= usable.
+
+* 6. What I could NOT measure, and why
+
+1. *31 % of the corpus was not swept for price modules.*  The corpus-wide
+   label sweep read 4,799 of 6,941 DVC-tracked =.dta=/=.sav= sources; *2,142
+   blobs were not in the local L1 cache* and I chose not to pull them (that
+   would be thousands of S3 fetches into the shared cache).  Both sweeps are
+   also *label-based*, so a source that ships no Stata variable labels is a
+   silent miss --- as are fixed-width =.DAT= + =.DCT= pairs (CotedIvoire,
+   GhanaLSS 1980s, Nicaragua 2001), which carry no metadata to sweep at all.
+   (Spot-checked: Uganda's 2009-10 / 2010-11 =CSECTION*= files *do* carry
+   labels, so their zero price hits are a real absence, not a blind spot.)
+   The §1 unwired list is therefore a *lower bound* on all three counts.  A
+   complete sweep is a bounded Slurm job.
+2. *No questionnaire (C4) was read except Uganda's.*  Every "genuinely absent"
+   claim in §1 other than Uganda 2011-12 / 2019-20 rests on the shipped data
+   files (C1) plus the existing =data_scheme.yml= prose, not on the
+   instrument.  By the repo's own rule that is =unsure=, not =not-asked=; I
+   have written no verdicts.
+3. *Niger and Tanzania have no comparability number at all* --- §2.  For
+   Tanzania a region-level fallback comparison is possible and was not
+   attempted (it needs the region crosswalk #113 describes as lossy).
+4. *The "agreement" is not adjusted for anything.*  No weighting, no seasonal
+   alignment (the community price is a point-in-time quote; the household unit
+   value is a recall-period average), no outlier trimming beyond dropping
+   non-positive values.  The exact-tie share is reported precisely so the
+   reader can discount the median.
+5. *I did not test whether the community price improves an estimate.*  The
+   #562 phase-3b question --- does =Quantity = Expenditure / community_price=
+   produce plausible quantities in the =u='Value'= waves --- is the decisive
+   experiment and it is not run here.
+6. *Blessings.* =.coder/coverage/blessed.csv= contains only its header: *no
+   =community_prices= cell has ever been blessed*, in any country.  Nothing in
+   this document is a blessing; I read distributions, not individual numbers
+   against a source.
+
+* 7. Contradictions found (both sides quoted)
+
+1. *=GAP_RANKING.org:253= / =INCIDENCE_MAP.org:131= vs. the Uganda data.*  The
+   docs say: /"Raw sources (data already in-repo, mostly unwired): ... Uganda
+   Community =csec3*=..."/ and /"community price modules exist across LSMS-ISA
+   (Uganda =csec3*=, Malawi =com_cc=, Nigeria =sectc*= Community, Ethiopia
+   ESS)"/.  Measured: no Uganda wave's community data files carry a food-price
+   module (C1, all seven waves; C4 confirms it for 2011-12 and 2019-20 --- see
+   §1 for the scope of that claim).  Its =CSEC3*= files are *school* modules
+   (=CFSchoolFacility=, =CFSchoolWater=, =CFSchoolPayment=, ...).  The
+   2011-12 instrument PDF contains "price" zero times.  Malawi's price module
+   is =com_ck=, not =com_cc= (=com_cc= is a different section).  I have not
+   edited either file; this is the report.
+2. *=Nigeria/_/CONTENTS.org:779= vs. the current build.*  The file says
+   /"124,539 priced rows across 5 waves x 584 clusters x 139 food items x 30
+   units"/.  A cold build on =9e12753f= gives *138,055 rows* over *870 distinct
+   clusters* (487--517 per wave; 2,501 cluster-waves).  The numbers date from
+   =e3b5ed6f= (2026-06-14); =b84b1922= subsequently re-keyed Nigeria's =v= to
+   the composite =cluster_id(state, lga, ea)= for #323.  The prose about the
+   composite key was updated, the counts were not.  Item and unit counts in
+   the file (139 / 30) still match the corpus-wide totals I measure.
+3. *=.coder/coverage/latest.csv= is stale for this feature, three ways.*  Last
+   refreshed =9d2d6ce0=, 2026-09-02, before PR #762 merged.  It reports
+   (a) =GhanaLSS,community_prices,,undeclared,absent= --- but GhanaLSS
+   declares it and builds 660,168 rows; (b) =EthiopiaRHS,community_prices,<all
+   8 waves>,absent= --- but EthiopiaRHS builds 2,691 rows over 6 waves (the
+   grader cannot see a country-level-only script-path table); and (c) Nigeria's
+   five post-planting quarters graded =dropped= ("declared for wave but absent
+   from built t-index"), which is correct-by-design --- the price module is
+   post-harvest only --- not a defect.  I did not regenerate the matrix.
+4. *A claim I checked and could NOT break.*  Tanzania's wave script divides
+   =cm_f063= by =cm_f062= and calls the result "currency per one native =u=",
+   while the sibling file =CM_SEC_G= labels its analogous column "LOCAL UNIT
+   WEIGHT (KGS)" --- which would make the quotient a per-*kg* price wearing a
+   per-=Piece= label.  Measured on =CM_SEC_F_ID.dta=: median =cm_f062= is
+   1.0 for KILOGRAMS, 1.0 for LITRES, 1.0 for PIECES, 370 for GRAMS and 225
+   for MILLILITRES --- i.e. =cm_f062= is the amount *in the stated unit*, and
+   the script is right.  Recorded because the label invites the wrong reading.
+
+* 8. Recommendation
+
+1. *Register the feature canonically.*  Add
+   =community_prices: (t, v, j, u, obs)= to =data_info.yml= =index_info= and
+   add =community_prices= to =fabricate_missing_levels=.  Without it the
+   default cross-country call drops whichever side is in the minority --- today
+   67 % of the data.  (Proposed on PR #762; measured here.)
+2. *Add a =PricePerUnit= transformation*, never a stored column, that knows the
+   three column conventions in §3.  Today a consumer must know per country
+   whether to divide by =Quantity=, =NumberOfUnits=, or nothing.
+3. *Do NOT change what =food_prices()= prefers.*  The measured agreement gives
+   no basis for it, and a silent substitution would be the same disease as a
+   silent pool.  Expose the community price as its own series and let the
+   analyst choose --- exactly the #603 ruling on =Feature()=.
+4. *Build the community -> household join as a documented transformation*, with
+   the geography ladder =v -> District -> Region -> national= that
+   =median_price_valuation= already implements, and use it for #562 phase 3b.
+   The =u='Value'= table in §3 is the demand.
+5. *Wire the cheap tier first*: Liberia 2018-19, Tajikistan 2007, South
+   Africa 1993.  Each is a long-format, EA/PSU-keyed, item-level file; each
+   would take one wave script and one item crosswalk.
+6. *Treat the container-unit collision as a defect with a name.*  Nigeria
+   =cl= and Mali =Tas=/=Unité= are not noise; they say the =u= axis is
+   harmonised in label only.  The instruments that record unit size
+   (GhanaLSS =NumberOfUnits=, Liberia's standard-unit equivalent, Tanzania's
+   =CM_SEC_G=) are the fix, and §4.1 is the feature that would carry it.
+7. *Fix Niger's asymmetry or say why not.*  Prices for 2011-12/2014-15 with no
+   consumption, consumption for 2018-19/2021-22 with no prices, is the one
+   built cell that currently buys nothing.
+8. *Refresh =latest.csv=* so the three artefacts in §7.3 stop misreporting the
+   feature.
+
+* Appendix: reproduction
+
+Scripts and raw outputs are committed *next to this file*:
+
+| file                     | what                                                              |
+|--------------------------+-------------------------------------------------------------------|
+| =extract.py=             | Country-API build of =community_prices= / =food_acquired= / =sample= for the 8 countries |
+| =analyze.py=             | coverage, axis + =v= overlap, ratio at =(t,v,j,u)= and =(t,j,u)=, =u='Value'= counts, hh =Price= column |
+| =analyze2.py=            | ratio detail (exact ties, geo-mean, log IQR) + the per-=u= breakdowns |
+| =scan_all.py=            | corpus-wide price-label sweep over L1-resident sources             |
+| =feature_probe.py=       | the =Feature('community_prices')= exclusion measurement            |
+| =dumplab.py=             | lock-free variable-label probe (sidecar md5 -> L1 blob -> pyreadstat metadata) |
+| =hashcheck.py=           | the seeded-parquet freshness check reported in §0                 |
+| =price_label_sweep.json= | all 277 price-labelled source files found by =scan_all.py=        |
+| =analysis_run.log=       | raw stdout of =analyze.py= --- §1 tables 1--2, §2 ratio tables, §3 =u='Value'= and reported-=Price= tables |
+| =analysis_detail.log=    | raw stdout of =analyze2.py= --- §2 ratio-detail table and the per-=u= breakdowns |
+
+(The scripts write =.csv= alongside these logs; the repo =.gitignore= ignores
+=*.csv= globally, so the logs are the committed record.)
+
+Every session begins with
+
+#+begin_src python
+import sys, os
+sys.path.insert(0, os.environ['WT'])
+import lsms_library
+assert 'wt-gsps-inputs' in lsms_library.__file__, lsms_library.__file__
+from lsms_library.paths import countries_root, data_root
+assert str(countries_root()).startswith(os.environ['WT']), countries_root()
+assert str(data_root()).startswith(os.environ['SCRATCH']), data_root()
+#+end_src
+
+Note for whoever repeats this: =PYTHONPATH= is *not* sufficient when the
+current working directory is the main checkout --- =python -c= puts =''=
+(i.e. cwd) at =sys.path[0]=, ahead of =PYTHONPATH=, so =import lsms_library=
+resolves to the main tree.  =sys.path.insert(0, WT)= is unambiguous.  The
+=.pth= trap in =CLAUDE.md= §scrum-master-hpc addendum 3 is correct as written;
+this is a further case it does not cover.

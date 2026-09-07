@@ -1,8 +1,9 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 The Ghana Living Standards Survey (Ghana LSS) is one of two major surveys we have for Ghana, the other being the Ghana Social Panel Survey (GhanaSPS).
 
-* Survey Program
+* Overview
 
 The GLSS is conducted by the Ghana Statistical Service (GSS).  Seven
 rounds span 1987--2017.  Each round is designed as an independent
@@ -1380,6 +1381,27 @@ Sources originally listed here:
    waves" entry above, which is true of the purchase module only.  Left
    unfixed here (harmonisation is #109's, not #563's); worth ~110,213 kg.
 
+   /Corrected 2026-09-05 (GH #782)./  *Fixed, and the diagnosis above was
+   right about the symptom but wrong about the cause.*  The 63 labels were
+   never a harmonisation gap in =food_label= (since GH #783:
+   =categorical_mapping.org= =#+name: harmonize_food=): they are the *survey's own raw
+   labels*, leaking through =2005-06/_/food_acquired.py='s own-production
+   decode, which matched nothing and passed its input through unchanged (Trap
+   8 below).  =food_label= was not missing them --- they were never supposed
+   to reach it.  With the decode fixed, 2005-06's produced =j= is a Preferred
+   Label like every other wave's, =nutrition= resolves it through the
+   =by_label= fallback, and the wave is no longer empty.  Measured
+   end-to-end, cold, before and after: FCT coverage of GhanaLSS food mass
+   *88.26% -> 94.71%* (1,509,649 -> 1,619,862 kg), i.e. *+110,213 kg* ---
+   which is the "worth ~110,213 kg" this entry predicted, to the kilogram.
+   No change to =nutrition.py= was needed or made.
+
+   Of the unmapped mass that remains, only =Oil (vegetable)= (69,025 kg) and
+   =Sugar Bread= (15,701 kg) are real gaps --- both are item 4 below, still
+   open.  The rest is =Cigarette= / =Tobacco= / =Other Tobacco= / =Chewing
+   Gum=, which are on the food-expenditure axis but have no FCT row, and
+   should not have one.
+
 4. *Three 2016-17 labels are missing from =harmonize_food= entirely*:
    =Oil (vegetable)= (69,025 kg), =Sugar Bread= (15,701 kg) and =Kola Nut=
    (2,888 kg) appear as =j= in the data but in no column of the table.  They
@@ -1533,9 +1555,11 @@ stringifies the Code index via =format_id= (so keys are ='1'=), while wave
 mapping functions variously look up with =int(value)= or =str(value)=.  Both
 historical bugs were partly key-type mismatches.
 
-** Trap 2: GLSS4's relationship scheme is NOT GLSS1's
+** Trap 2: GLSS3's and GLSS4's relationship scheme is NOT GLSS1's
 
-The country-level =relationship= table in =_/categorical_mapping.org= has
+The country-level GLSS1 code table in =_/categorical_mapping.org= (named
+=relationship= until 2026-09-07, =relationship_glss1= since -- see the last
+subsection of this trap) has
 *fourteen* codes and cites *GLSS1*'s data dictionary
 (=catalog/2313/data-dictionary/F184?file_name=y01a=).  It is correct for
 GLSS1 and GLSS2 -- verified against the raw data, where =REL= takes codes 1--14
@@ -1547,15 +1571,182 @@ and code 1 occurs 3,136 / 3,192 times = each wave's household count.
 value labels (=value_labels() == []=), so the GLSS4 list has to come off the
 questionnaire.
 
-1998-99 =Relationship= is therefore *deliberately left unmapped* rather than
-decoded through a table that would silently mis-label it.  A null column is
-honest; a wrong kinship label propagates into
-=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  If you
-add the GLSS4 list, add it as a *wave-level* table in
-=1998-99/_/categorical_mapping.org= and search the wave dir *first*, so it
-cannot fall through to the GLSS1 table.  (The same wave-first discipline is why
-1991-92 keeps its own =region= table: GLSS3 orders the two northern regions
-9=Upper West, 10=Upper East, the reverse of the country-level table.)
+/Superseded 2026-08 (=f5e6b66c=)./  The paragraph that stood here said 1998-99
+=Relationship= was "deliberately left unmapped".  It is now decoded through a
+*wave-level* nine-code =#+name: relationship= table in
+=1998-99/_/categorical_mapping.org=, transcribed from the questionnaire;
+=mapping.py= searches the wave dir *first*, so it cannot fall through to the
+GLSS1 table.  The rule that paragraph stated still stands and is why the table
+is wave-level: a null column is honest; a wrong kinship label propagates into
+=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  (The
+same wave-first discipline is why 1991-92 keeps its own =region= table: GLSS3
+orders the two northern regions 9=Upper West, 10=Upper East, the reverse of the
+country-level table.)
+
+*** GLSS3 uses the nine-code scheme too -- and WAS decoded through GLSS1's, for its whole life (fixed 2026-09-07)
+
+Found while running the GH #797 gate; GH #799.  1991-92's =rel= (=S1.DTA=) takes codes
+1--9 only (DDI: range 1--9, 20,403 valid cases; code 1 occurs 4,550 times
+against 4,552 households -- two households carry no code-1 row).  The GLSS3 household questionnaire this repository ships
+(=Documentation/pdf/G3QPartA.pdf=, Section 1 column 3; identical text in
+=Documentation/GHA_1991_GLSS_Household_Questionnaire_EN.pdf=) prints the *same*
+nine-code list as GLSS4, verbatim:
+
+: Head.....................1     Relative of head or head's spouse.........6
+: Wife/husband.............2     Servant and his/her relative..............7
+: Son/daughter.............3     Tenant and his/her relative...............8
+: Grandchild...............4     Other not related to head or head's spouse.9
+: Father/mother............5
+
+=1991-92/_/mapping.py= resolves =relationship= with
+=_code_label_map('relationship', _dirs)=, wave dir first -- and the wave dir
+had no such table, so the lookup fell through to the country-level GLSS1 table.
+Codes 1--5 happen to agree in meaning between the two schemes; 6--9 do not:
+
+| code | GLSS3 form                        | served until 2026-09-07 | tuple served           |     n |
+|------+-----------------------------------+-------------------------+------------------------+-------|
+|    6 | Relative of head or head's spouse | Sibling                 | [0, 1, consanguineal]  | 1,211 |
+|    7 | Servant and his/her relative      | Niece/nephew            | [-1, 1, consanguineal] |    61 |
+|    8 | Tenant and his/her relative       | Son/daughter in-law     | [-1, 0, affinal]       |     8 |
+|    9 | Other not related                 | Brother/sister in-law   | [0, 1, affinal]        |    73 |
+
+1,353 people (6.6% of the wave) carried a wrong =Relationship= *and* a wrong
+kinship tuple.  Nothing was null, so no guard fired and the cell graded =sane=
+in every coverage snapshot -- the =1998-99/_/categorical_mapping.org= header
+had predicted this exact mis-labelling for GLSS4 ("code 6 ... would become
+Sibling"), and nobody checked GLSS3.  =sane= is not =blessed=.
+
+*The fix* is the 1998-99 fix one wave earlier: a =#+name: relationship= table
+in =1991-92/_/categorical_mapping.org= with the *same labels as 1998-99's*, so
+GLSS3 and GLSS4 (one form) speak one vocabulary.  That choice relabels codes
+2/3/5 as well (=Spouse= -> =Wife/husband=, =Child= -> =Son/daughter=, =Parent=
+-> =Father/mother=; 13,265 rows) with *identical* kinship tuples -- a string
+change, stated here so nobody hunts for it.
+
+*Verified cold* (private =LSMS_DATA_DIR=, =LSMS_NO_CACHE=1=; scripts, logs
+and the before/after crosstab are inline in GH #799): =household_roster=
+has 246,594 rows before and after; the six other waves are unchanged on
+=Relationship= (1988-89 compared as a label multiset: 714 of its 3,192
+household ids differ between the wave and country parquets, and those 714 are
+exactly the keys of =updated_ids['1988-89']= -- the GLSS1/GLSS2 panel re-key,
+applied before the country parquet is written); 1991-92
+has 20,403 rows before and after and *exactly 14,618 change* -- 13,265
+string-only (codes 2/3/5) and 1,353 semantic (codes 6--9).  0 NA in
+=Relationship=/=Generation=/=Distance=/=Affinity= in every wave; no "Unknown
+relationship labels" warning.  =Country._table_cache_hash('household_roster')=
+moved (=4f2eddfb...= -> =6a9e8d19...=), so a warm cache rebuilds instead of
+masking the fix.
+
+*** One vocabulary for seven waves: the country =relationship= table now HARMONIZES labels; GLSS1's code table is =relationship_glss1= (2026-09-07, GH #797)
+
+/Landed on =development= on 2026-09-07 (=1de2f0e8=, then =30d7a8f1=, =9ad8e04f=,
+=4c2a466e=); verified cold in two private data dirs, the numbers are on GH #797./
+
+*What it was.*  The GH #797 gate found the seven waves serving FIVE
+relationship vocabularies (32 distinct strings) for the same categories:
+GLSS1/2 =Spouse=, GLSS3/4 =Wife/husband=, GLSS7 =Spouse (Wife/Husband)=;
+GLSS1/2 =Child=, GLSS3/4 =Son/daughter=, GLSS6/7 =Child (Son/Daughter)=; and
+so on.  Every string resolved in =kinship.yml= -- the tuples were right, the
+strings were not -- because the corpus had been coping by adding each
+survey's verbiage to the global ontology (nine =kinship.yml= keys were reached
+by GhanaLSS alone, filed under a section header that credits
+Kazakhstan/Tajikistan/South Africa).
+
+*What changed* (three files, all in this country):
+
+1. =_/categorical_mapping.org=: the GLSS1 fourteen-code =| Code | Label |=
+   table is renamed =relationship_glss1=; =1987-88/_/mapping.py= and
+   =1988-89/_/mapping.py= call =code_label_map('relationship_glss1', _dirs)=.
+   Their dicts are identical before/after (measured), and both waves are
+   served unchanged (0 strings differ).
+2. A NEW country-level =#+name: relationship= table, =| Original Label |
+   Preferred Label | Comparable Label |= -- raw SERVED label FIRST, because
+   =_build_replace_dict= keys on the first column that is neither =Preferred
+   Label= nor the requested variant.  =Preferred= (the default) maps every
+   non-canonical string any wave serves onto ONE vocabulary of 15 labels
+   SHARED WITH GhanaSPS (decided with @ligon 2026-09-07: a Ghana vocabulary,
+   not a corpus one, because surveys elsewhere understand relationships
+   differently): Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law,
+   Grandchild, Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew,
+   Other relative, Non-relative, Servant, Tenant.  The Original Label is the
+   served string, i.e. AFTER the title-casing formatters
+   (=_/ghanalss.py:Relationship= for 2012-13/2016-17, the wave formatter for
+   2005-06), not the =.dta= value label -- which is why GLSS7's =Non-Relative=
+   needs a row of its own.  Identity rows exist only where the two variants
+   differ (Sibling, Niece/nephew, Tenant); =.replace= leaves unmatched values
+   alone, so a label canonical in both variants needs none.
+   =Comparable=, selected with =household_roster(labels={'Relationship':
+   'Comparable'})=, is the eight categories every GLSS form asked (Head,
+   Spouse, Child, Grandchild, Parent, Other relative, Non-relative, Servant)
+   for pooling across waves: GLSS1/2's siblings, nieces and in-laws fold into
+   =Other relative= (where GLSS3+ put them), Tenant into =Non-relative=, the
+   adopted code into =Child=, Parent-in-law into =Parent=; the kinship tuple
+   follows the coarse label.  Residual imbalance no relabelling removes:
+   GLSS3/4's =Parent= excludes parents-in-law (they sit in "relative of head
+   or spouse"); every other wave's includes them.  Measured 2026-09-07:
+   identical row counts under both variants; Generation NA 5.6% (Preferred)
+   vs 6.5% (Comparable).
+
+*How it works, and two things to know.*  =Country._apply_categorical_mappings=
+auto-applies a country table whose name matches a served column
+(case-insensitive), by =.str.strip()= then =.replace()=, on EVERY read --
+warm or cold -- and since =df9baf91= (GH #797) it runs BEFORE
+=_expand_kinship=, so the kinship lookup sees the Preferred Label.  Hence:
+- the served =Relationship= is rewritten at API time for all seven waves
+  (113,871 of 246,594 rows change string; 0 in GLSS1/2); the L2-wave and
+  L2-country parquets keep the RAW strings (=pd.read_parquet= on
+  =var/household_roster.parquet= still shows =Child (Son/Daughter)=);
+- =_/categorical_mapping.org= is a hashed build input for EVERY GhanaLSS
+  table (=Country._table_cache_hash= folds =_/*.org=), and a wave's
+  =mapping.py= for that wave, so =household_roster=, =food_acquired=,
+  =sample= and =cluster_features= ALL moved hash (measured) -- GhanaLSS
+  rebuilds once, for everyone, on the next read.
+
+*Tuple-preserving by construction, with one stated exception.*  Every
+Original Label and its Preferred Label resolve to the SAME kinship tuple under
+=_expand_kinship='s lookup (=.strip().title()= first, then raw), checked on
+all 246,594 rows -- except the adopted row.  =Adopted Child= (GLSS5/6, 963
+people; was [-1,0,consanguineal]) and =Adopted / Foster/ Step Child= (GLSS7,
+501; was [-1,0,step]) are ONE label, =Adopted/foster/stepchild=, whose tuple
+is [-1, 0, null]: a child of the head, but adoptive / foster / step is not
+determined by the instruments and the ontology has no =adoptive= affinity,
+so Affinity is null (the GH #698 shape; GhanaSPS's three spellings of the
+same code carry the same tuple).  =Parent/Parentlaw= (GLSS5/6) and
+=Parent/Parent-In-Law= (GLSS7) are ONE survey code that conflates parent and
+parent-in-law, filed as [1, 0, consanguineal] like =Parent=, so they are
+served as =Parent= (label-only).  *Caveat, the instrument's not ours:* GLSS1-4
+=Parent= means a parent; GLSS5-7 =Parent= means a parent OR a parent-in-law
+(466 / 897 / 1,094 people), exactly as GLSS3+'s =Other relative= absorbs the
+siblings, nieces and in-laws that GLSS1/2 list separately.  GLSS1/2's own
+=Father/mother in-law= is =Parent-in-law=, =Brother/sister in-law= is
+=Sibling-in-law=, =Son/daughter in-law= is =Child-in-law=, =Others not
+related= is =Non-relative=.  =Other= (GLSS6 code 11, 14 people; a code
+DISTINCT from 10 =Non_relative=, dropped in GLSS7) folds into
+=Non-relative= ([0,0,unrelated] either way).  =Other relative= is
+[null, null, consanguineal] since 3069ef80 (its generation and distance are
+not recorded; it used to sit on Head's cell).
+
+*Trap 2's mechanism is closed structurally.*  GLSS3 was mis-decoded for its
+whole life (GH #799) because a wave-first =code_label_map('relationship',
+_dirs)= found no wave table and fell through to the country GLSS1 table.
+That fall-through no longer exists: the country table named =relationship=
+has no =Code= column, so =code_label_map= raises =KeyError= there, moves on,
+and returns ={}= -- measured: =code_label_map('relationship', <1987-88
+_dirs>)= is ={}= after the rename -- and such a wave then ships a 100%-null
+=Relationship=, which Site B's per-wave required-column check
+(=NullReadWarning=; =Generation=/=Distance=/=Affinity= are required columns;
+the same check already fires on this country's =sample.strata=) reports.
+A null column is honest; a wrong kinship label is not.  1991-92 and 1998-99 still resolve their own
+wave tables (dicts identical before/after).
+
+*Verified cold* (two private =LSMS_DATA_DIR=s, one worktree, only the three
+files above differing): 246,594 rows before and after; index identical,
+row-aligned on =(i, t, v, pid)= (1988-89 aligns this time because both
+builds pass through =updated_ids=); 0 NA in all four columns; no "Unknown
+relationship labels" warning; warning sets identical; a second,
+separate-process read of the after dir is a warm read (parquet mtime
+unchanged) and returns the same 17 labels.  Per-wave raw -> harmonized
+crosstabs are in the report.
 
 ** Trap 3 (RESOLVED 2026-08-21): GLSS1/GLSS2 cluster region is now MEASURED
 
@@ -1792,6 +1983,183 @@ decision with its own before/after.
   documentation; pruning them is a follow-up.  A future wave must bring its
   own wave table: inheriting the country table would hand it the *university*
   =U6=.
+
+** Trap 8: =convert_categoricals=True= turns the CODE you decode on into a LABEL (2026-09-05, GH #782)
+
+The most expensive instance of Trap 1's family so far: *149,047 rows shipped
+the survey's own raw labels as =j= for years*, and every guard we own said the
+build succeeded.
+
+=2005-06/_/food_acquired.py= read =sec8h.dta= (own production) with
+=convert_categoricals=True=, which returns =foodcd= as *decoded label text*
+(='beef'=, ='maize-flour/dough'=), then decoded it against
+=labelsd['Code_8h']=, which is keyed by the *numeric code*.  Match rate:
+*0 of 424,052*.  And =Series.replace()= passes an unmatched value through
+*unchanged*, so instead of an error, or even a NaN, every produced row emitted
+the survey's label as though it were a Preferred Label.
+
+The purchase block was fine and *must not be "fixed"*: =sec9b.dta= is read with
+=convert_categoricals=False=, so =freqcd= stays numeric and matches its
+=Code_9b= map 1,436,956/1,436,956 = *100%*.  The two blocks differ only in that
+one flag.
+
+*Why the file must be read TWICE.*  Both reads are load-bearing, and this is
+not gold-plating:
+- =convert_categoricals=True= is *required* for =s8hq1= (the consumed-own-produce
+  filter is ='yes'=/='no'=, not =1=/=2=) and for =s8hq13= (the native unit as
+  text -- 2005-06 has no =units= table, so nothing else decodes it);
+- =j= must come from a =convert_categoricals=False= read, or it is a label.
+The second read costs 0.3 s; the frames are asserted row-aligned.
+
+*Decode on the CODE axis, not the label axis.*  The label axis is the obvious
+fix and is the wrong one.  =harmonize_food='s =Label_8h= column transcribes the
+survey's own text, and for codes 91/92 it had been transcribed with the
+spelling *corrected* -- =alcoholic beverages= / =non-alcoholic beverages=,
+where the =.dta= says =alchoholic beverages= / =non-alchoholic beverages= (sic).
+A =Label_8h= decode therefore covers only *96.8%*, and is one well-meant typo
+fix away from silently matching nothing again.  =Code_8h= agrees with the data's
+codes for all 63 items; =Code_9b= with =freqcd= for all 164.  The =Label_*=
+columns are *documentation of the source spelling* -- =Label_9b= matches its
+source 164/164 -- so the two 8h cells were corrected to the survey's spelling,
+misspelling and all.  *Do not "fix" them again.*
+
+*=.map()= is necessary but NOT sufficient.*  Swapping =.replace()= for =.map()=
+turns an unmatched code into NaN, which =_drop_nonfood= (=isinstance(x, str)=)
+would then discard *silently* -- the same disease with a different face.  The
+script asserts coverage explicitly (=_assert_decoded=).
+
+*What this cost, and why nothing caught it.*  Every guard the library owns
+checks *shape*.  =_assert_built_required_columns= checks =j= is present; the
+grain audit checks the index is unique; the null-read guard checks a column is
+not all-NaN.  =j= was present, unique and fully populated -- with the wrong
+vocabulary.  CLAUDE.md already names the only check that discriminates: /"a
+plausible-looking distribution therefore proves nothing; the discriminating
+check is a subset assertion against the canonical vocabulary."/  There was
+none on =j=.  There is now: =tests/test_ghanalss_food_label_canonical.py=.
+
+Note the =community_prices= section below says, in its own words, that the
+overlap with =food_acquired().j= /"was checked against the =harmonize_food=
+tables, not a built =food_acquired="/.  That is exactly the gap: the config was
+right and the built table did not match it.
+
+** Trap 9: a duplicate index in =food_acquired= silently REWRITES =Price= table-wide (2026-09-05, GH #782/#323)
+
+*This one is armed and waiting.*  It did not fire in the shipped data, but only
+because =2005-06/_/food_acquired.py= now keeps its index unique on purpose.  Any
+future duplicate in GhanaLSS =food_acquired= re-arms it.
+
+=food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so when its index is
+non-unique =Country._normalize_dataframe_index= does *not* collapse with
+=.first()= -- it SUMs =Quantity= / =Expenditure= and then, at
+=country.py:5522=, re-derives
+
+: df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
+
+The grain audit lists =Price= as =reconciled= on the grounds that it is
+"re-derived from the summed totals", finds the residual lossless, and correctly
+emits *no* =GrainCollapseWarning=.  Nothing here is a bug in core --- for a
+survey where =Expenditure = Quantity x Price=, the reconciliation is exactly
+right.
+
+*GhanaLSS is not such a survey.*  =Expenditure= is structurally =NaN= for
+=s='produced'= (the instrument records a farmgate =Price= and a =Quantity=, and
+never a produced value), and the re-derivation is applied to the *whole frame*,
+not merely to the duplicated groups.  Measured on the delivered table:
+
+| rows with a Price     | block does not fire | block fires |
+|-----------------------+---------------------+-------------|
+| =s='produced'=        |   883,789 (95.2%)   |  44,112 (4.8%) |
+| whole table           |   883,789           |   4,375,274 |
+
+So a single duplicate anywhere in the table would *destroy 839,677 recorded
+farmgate prices* and *fabricate* a =Price= on ~4.33M purchased rows, where
+=u='Value'= makes =Quantity == Expenditure= and the "price" is therefore 1.0 ---
+the "Kwacha per Kwacha" quantity =CLAUDE.md= warns about.  Silently, and with the
+audit correctly reporting nothing, because the audit's premise is that the
+re-derivation is information-preserving.
+
+Fixing 2005-06's decode (Trap 8) *created* 24 such duplicates in 12 groups --- two
+farmgate prices for one harmonised commodity, e.g. =mutton= and =goat= both
+becoming =Goat=.  They are resolved in the wave script (=Quantity= sums, =Price=
+becomes the quantity-weighted mean) rather than left to core, which is what
+=CLAUDE.md= prescribes: core does not aggregate, and a reducer applied
+downstream "only puts a signature on the corpse".
+
+*Corrects the commit message of =b93f9c2c=*, which described core's behaviour as
+=groupby().first()= discarding one price.  That was measured to be wrong: the
+mechanism is the additive re-derivation above, and it is considerably worse than
+=.first()= would have been.
+
+** One food vocabulary, not seven: the cross-wave drift (2026-09-05, GH #782)
+
+Each wave's =harmonize_food= carries its *own* =Preferred Label= column and
+nothing reconciled them.  Seven commodities therefore shipped under two
+spellings depending on the wave -- =Egg=/=Eggs=, =Tea bag=/=Tea bags=,
+=Condiment=/=Condiments= and four =Other X=/=Other Xs=.
+
+*This is invisible to any per-wave check.*  All seven waves are internally
+clean (0 collisions each, measured); the defect exists *only in the assembled
+cross-wave frame*.  Any guard that reads one wave at a time will pass forever.
+That is why the guard reads all seven tables at once, and why it is
+config-only: reading org tables costs milliseconds, so it need not be gated on
+a warm cache.
+
+*The country-level =_/categorical_mapping.org= =#+name: harmonize_food= is the
+authority* (it was =_/food_items.org= =#+name: food_label= until GH #783 moved it),
+and not merely by preference: =_/nutrition.py:187= resolves an unmatched =j=
+through a =by_label= fallback keyed on *that* table's Preferred Label, so a
+wave spelling it differently gets no FCT code and drops out of =nutrition=.
+The table already knew about all seven -- it carries one column per wave
+recording each wave's own label -- so every canonical form was read off it.
+
+Two consequences worth stating plainly:
+- =Condiment= and =Egg= follow the country table *against majority wave usage*
+  (five waves said =Eggs=).  Popularity is not authority here; =by_label= is.
+- =Tea= is emitted by *neither* 2012-13 nor 2016-17, but the country table lists
+  =Tea bags= / =Tea bag= in those columns against Preferred =Tea= (FCT 12_008).
+  A recorded decision, not a guess.
+
+The =Aggregate Label= axis had the *same* six drifts and is user-visible
+through =labels='Aggregate'=; it was fixed in the same pass, along with an
+encoding artefact (2012-13 code 262's Aggregate read =Cooked Rice and Stew=
+followed by two mojibake =Ê= characters, a twin of code 254's clean label).
+
+*Why a rename here is provably safe.*  For the six singular/plural pairs, both
+variants share the collision key, so the measured "0 internal collisions per
+wave" is a proof that no wave holds both -- a rename cannot merge two distinct
+foods.  =Tea= needed checking by hand, because its key differs: 2012-13 carries
+only =Tea bags=, 2016-17 only =Tea bag=, neither has a separate =Tea=.
+
+** =harmonize_price_item= and =harmonize_food= are ONE vocabulary (2026-09-05, GH #782)
+
+A price item flagged =Food: yes= asserts it sits on that wave's
+=harmonize_food= axis -- which is the whole reason =community_prices.j= can
+join =food_acquired.j=.  Nothing enforced it, and a one-sided edit drifts
+silently; renaming the food axis above immediately broke four waves' price
+items.
+
+*Derivation was considered and rejected*, with a reason rather than a shrug:
+the price item =Code= (=ln=, 644 values in 2016-17) is a *different code space*
+from =Code_9b=/=Code_8h=, and the survey ships no crosswalk.  The only link IS
+the Preferred Label string, so "deriving" would mean adding a foreign-key
+column -- exactly as much config as the column it replaces, and one more thing
+to drift.  Derivation is also wrong-shaped: *400 of 2016-17's 643 price items
+are non-foods* (charcoal, refuse disposal, public-toilet fees) that
+=harmonize_food= must never gain.  The =Food= column already carries the
+author's signed statement (=yes= on the axis / =own= a food the axis does not
+name / =no= non-food), so the invariant to enforce is a *subset over
+=Food == 'yes'=*, and the guard asserts exactly that.
+
+That check immediately found a *pre-existing* violation unrelated to the
+rename: 2012-13 price item 103 ='cigarette (555)'= was flagged =Food: yes= with
+Preferred Label =Cigarrette= -- a double-r spelling that appears nowhere on
+2012-13's food axis, nor anywhere else in the corpus (the other three price
+waves spell it =Cigarette=).  2012-13's =harmonize_food= has no separate
+cigarette label at all: source code 163 ='cigarrette, cigar'= resolves to
+=Tobacco=.  The price item is now =Tobacco=, which is what that wave's own axis
+calls the commodity.  Re-flagging it =Food: own= was rejected as a *false
+statement*: =own= means the axis does not name the food, and this axis does.
+
 
 ** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
 

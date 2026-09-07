@@ -97,3 +97,21 @@ def test_skill_descriptions_are_available_for_indexing():
         "skill(s) with no `description` in frontmatter: "
         + ", ".join(undocumented)
     )
+
+
+def test_no_hashed_build_input_is_untracked():
+    """A cache-hash input git does not track makes checkouts disagree.
+
+    GH #790: a generated `Uganda/_/fct_usda.csv` was gitignored by the blanket
+    `*.csv` rule yet hashed via `_BUILD_INPUT_SUFFIXES`, so two clean checkouts
+    of the same commit differed on all 28 of Uganda's cache hashes -- silently,
+    because a gitignored file never shows in `git status`.  Found only while
+    debugging something unrelated.
+    """
+    from api_surface_audit import check_untracked_inputs  # noqa: E402
+
+    bad = check_untracked_inputs(verbose=False)
+    assert not bad, (
+        "hashed build input(s) not tracked by git:\n  " + "\n  ".join(bad) +
+        "\nTrack the file, or stop generating it into a country's `_/`."
+    )

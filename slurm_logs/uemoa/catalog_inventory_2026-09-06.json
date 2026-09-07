@@ -1,0 +1,1884 @@
+[
+ {
+  "idno": "BEN-EHCVM-V2.0",
+  "nation": "Benin",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 au Bénin, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "409"
+   },
+   {
+    "filename": "BEN-EHCVM2-QNR-MEN-EXCEL-VAGUE1.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "417"
+   },
+   {
+    "filename": "BEN-EHCVM2-QNR-MEN-EXCEL-VAGUE2.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "418"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "451"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "452"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "453"
+   }
+  ]
+ },
+ {
+  "idno": "BEN-PHMECV-V1.0",
+  "nation": "Benin",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 au Bénin",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "BEN-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "118"
+   },
+   {
+    "filename": "BEN-EHCVM1-NOMENCLATURE-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "111"
+   },
+   {
+    "filename": "BEN-EHCVM1-NOMENCLATURE-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "112"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "113"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "114"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-FOCUS-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "115"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-FOCUS-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "116"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "119"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "120"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "126"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "125"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "124"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "123"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "122"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "121"
+   },
+   {
+    "filename": "BEN-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "117"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "240"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "241"
+   },
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "242"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "243"
+   }
+  ]
+ },
+ {
+  "idno": "BEN-ERI-ESI-V1.0",
+  "nation": "Benin",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI),BENIN, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "Questionnaire Gouvernance Paix securite.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "288"
+   },
+   {
+    "filename": "nomenclatures des formations.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "287"
+   },
+   {
+    "filename": "Nomenclature NAEMA_NOPEMA.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "286"
+   },
+   {
+    "filename": "nomenclature des metiers et professions.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "285"
+   },
+   {
+    "filename": "Questionnaire menage ERI-ESI-2018_Benin.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "289"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI_2018_Benin.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "290"
+   },
+   {
+    "filename": "Questionnaire volet secteur informel_ERI-ESI_2018_Benin.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "291"
+   },
+   {
+    "filename": "emploi.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "292"
+   },
+   {
+    "filename": "gps.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "293"
+   },
+   {
+    "filename": "individus.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "294"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "295"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "296"
+   },
+   {
+    "filename": "Benin_ERI-ESI_RapportFinal.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "297"
+   },
+   {
+    "filename": "Rapport Synthese - BENIN.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "298"
+   },
+   {
+    "filename": "upi_BJ.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "299"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "399"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "400"
+   }
+  ]
+ },
+ {
+  "idno": "BFA-EHCVM-V2.0",
+  "nation": "Burkina Faso",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 au Burkina Faso, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "410"
+   },
+   {
+    "filename": "BFA-EHCVM2-QNR-MEN-EXCEL-VAGUE1.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "419"
+   },
+   {
+    "filename": "BFA-EHCVM2-QNR-MEN-EXCEL-VAGUE2.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "420"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "433"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "434"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "435"
+   }
+  ]
+ },
+ {
+  "idno": "BFA-PHMECV-V1.0",
+  "nation": "Burkina Faso",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 au Burkina Faso",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "BFA-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "107"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "106"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "105"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "104"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "103"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "102"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "101"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "100"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "99"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "98"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-FOCUS-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "97"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-FOCUS-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "96"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "95"
+   },
+   {
+    "filename": "BFA-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "94"
+   },
+   {
+    "filename": "BFA-EHCVM1-NOMENCLATURE-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "93"
+   },
+   {
+    "filename": "BFA-EHCVM1-NOMENCLATURE-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "92"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "244"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "245"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "246"
+   },
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "247"
+   }
+  ]
+ },
+ {
+  "idno": "BFA-ERI-ESI-V1.0",
+  "nation": "Burkina Faso",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI), BURKINA FASO, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "Rapport Synthese - BURKINA_FASO.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "284"
+   },
+   {
+    "filename": "BurkinaFaso_ERI-ESI_RapportFinal.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "283"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "281"
+   },
+   {
+    "filename": "upi_BF.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "282"
+   },
+   {
+    "filename": "individus.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "279"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "280"
+   },
+   {
+    "filename": "gps.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "278"
+   },
+   {
+    "filename": "Manuel_Nommenclature.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "276"
+   },
+   {
+    "filename": "Module_GPS_ERIESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "275"
+   },
+   {
+    "filename": "Questionnaire volet secteur informel_ERI-ESI 20180314.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "274"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI 20180314.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "273"
+   },
+   {
+    "filename": "Questionnaire menage ERI-ESI 20180314.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "272"
+   },
+   {
+    "filename": "emploi.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "384"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "397"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "398"
+   }
+  ]
+ },
+ {
+  "idno": "CIV-EHCVM-V2.0",
+  "nation": "Cote d'Ivoire",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 en Côte d'Ivoire, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "411"
+   },
+   {
+    "filename": "CIV-EHCVM2-QNR-MEN-EXCEL-VAGUE1.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "421"
+   },
+   {
+    "filename": "CIV-EHCVM2-QNR-MEN-EXCEL-VAGUE2.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "422"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "454"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "455"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "456"
+   }
+  ]
+ },
+ {
+  "idno": "CIV-PHMECV-V1.0",
+  "nation": "Cote d'Ivoire",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 en Côte d'Ivoire",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "CIV-EHCVM1-NOMENCLATURE-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "129"
+   },
+   {
+    "filename": "CIV-EHCVM1-NOMENCLATURE-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "130"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "131"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "132"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-FOCUS-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "133"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-FOCUS-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "134"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "135"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "136"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "137"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "138"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "139"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "140"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "141"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "142"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "143"
+   },
+   {
+    "filename": "CIV-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "144"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "248"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "249"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "250"
+   },
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "251"
+   }
+  ]
+ },
+ {
+  "idno": "CIV-ERI-ESI-V1.0",
+  "nation": "Cote d'Ivoire",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI), COTE D'IVOIRE, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "Module_GPS_ERIESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "300"
+   },
+   {
+    "filename": "Questionnaire m+®nage ERI-ESI 14 ao++t 2017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "301"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI    14 ao++t 2017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "302"
+   },
+   {
+    "filename": "Questionnaire volet secteur   informel_ERI-ESI 14 ao++t 2017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "303"
+   },
+   {
+    "filename": "emploi.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "304"
+   },
+   {
+    "filename": "gps.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "305"
+   },
+   {
+    "filename": "individus.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "306"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "307"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "308"
+   },
+   {
+    "filename": "Cote Ivoire_ERI-ESI_RapportFinal.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "309"
+   },
+   {
+    "filename": "Rapport Synthese - RCI.pdf",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "310"
+   },
+   {
+    "filename": "upi_CI.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "311"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "395"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "396"
+   }
+  ]
+ },
+ {
+  "idno": "GNB-EHCVM-V2.0",
+  "nation": "GUINEE BISSAU",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 en Guinée Bissau, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "412"
+   },
+   {
+    "filename": "GNB-EHCVM2-QNR-MEN-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "423"
+   },
+   {
+    "filename": "GNB-EHCVM2-QNR-MEN-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "424"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "436"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "437"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "438"
+   }
+  ]
+ },
+ {
+  "idno": "GNB-PHMECV-V1.0",
+  "nation": "Guinée Bissau",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 Guinée Bissau",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "GNB-EHCVM1-NOMENCLATURE-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "149"
+   },
+   {
+    "filename": "GNB-EHCVM1-NOMENCLATURE-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "150"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "151"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "152"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-FOCUS-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "153"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-FOCUS-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "154"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "155"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "156"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "157"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "158"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "159"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "160"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "161"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "162"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "163"
+   },
+   {
+    "filename": "GNB-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "164"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "252"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "253"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "254"
+   },
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "255"
+   }
+  ]
+ },
+ {
+  "idno": "GNB-ERI-ESI-V1.0",
+  "nation": "GUINEE BISSAU",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI), GUINEE BISSAU, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "MANUAL DO INQUIRIDOR EMPREGO TRADUZIDO.docx",
+    "dcformat": "Document, Microsoft Word [application/msword]",
+    "resource_id": "312"
+   },
+   {
+    "filename": "MANUAL DO INQUIRIDOR SECTOR INFORMAL TRADUZIDO.docx",
+    "dcformat": "Document, Microsoft Word [application/msword]",
+    "resource_id": "313"
+   },
+   {
+    "filename": "Nomenclature des m+®tiers et professions version portugais.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "314"
+   },
+   {
+    "filename": "Nomenclature NAEMA portugais.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "315"
+   },
+   {
+    "filename": "nomenclatures des formations portugais.xlsx",
+    "dcformat": "Document, Microsoft Word [application/msword]",
+    "resource_id": "316"
+   },
+   {
+    "filename": "Module_GPS_ERIESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "317"
+   },
+   {
+    "filename": "Questionnaire menage ERI-ESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "318"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "319"
+   },
+   {
+    "filename": "Questionnaire volet secteur informel_ERI-ESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "320"
+   },
+   {
+    "filename": "emploi.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "321"
+   },
+   {
+    "filename": "gps.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "322"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "323"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "324"
+   },
+   {
+    "filename": "ponderation.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "325"
+   },
+   {
+    "filename": "individus.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "326"
+   },
+   {
+    "filename": "GuineeBissau_ERI-ESI_RapportFinal_Francais_Montage.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "327"
+   },
+   {
+    "filename": "GuineeBissau_ERI-ESI_RapportFinal_Portugais.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "328"
+   },
+   {
+    "filename": "Rapport Synthese - Guinee Bissau francais.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "329"
+   },
+   {
+    "filename": "Rapport Synthese - Guinee Bissau Portugais.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "330"
+   },
+   {
+    "filename": "upi_GB.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "331"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "393"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "0",
+    "resource_id": "394"
+   }
+  ]
+ },
+ {
+  "idno": "MLI-EHCVM-V2.0",
+  "nation": "Mali",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 au Mali, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "413"
+   },
+   {
+    "filename": "MLI-EHCVM2-QNR-MEN-EXCEL-VAGUE1.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "425"
+   },
+   {
+    "filename": "MLI-EHCVM2-QNR-MEN-EXCEL-VAGUE2.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "426"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "439"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "440"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "441"
+   }
+  ]
+ },
+ {
+  "idno": "MLI-PHMECV-V1.0",
+  "nation": "Mali",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 au Mali",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "MLI-EHCVM1-NOMENCLATURE-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "167"
+   },
+   {
+    "filename": "MLI-EHCVM1-NOMENCLATURE-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "168"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "169"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "170"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-FOCUS-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "171"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-FOCUS-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "172"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "173"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "174"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "175"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "176"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "177"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "178"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "179"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "180"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "181"
+   },
+   {
+    "filename": "MLI-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "182"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "256"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "257"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "258"
+   },
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "259"
+   }
+  ]
+ },
+ {
+  "idno": "MLI-ERI-ESI-V1.0",
+  "nation": "Mali",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI), MALI, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "Nomenclature des metiers et professions.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "332"
+   },
+   {
+    "filename": "Nomenclature NAEMA_NOPEMA.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "333"
+   },
+   {
+    "filename": "nomenclatures des formations.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "334"
+   },
+   {
+    "filename": "Questionnaire menage ERI-ESI 02082017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "335"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI 02082017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "336"
+   },
+   {
+    "filename": "Questionnaire volet secteur informel_ERI-ESI 02082017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "337"
+   },
+   {
+    "filename": "Module_GPS_ERIESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "338"
+   },
+   {
+    "filename": "emploi.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "339"
+   },
+   {
+    "filename": "gps.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "340"
+   },
+   {
+    "filename": "individus.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "341"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "342"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "343"
+   },
+   {
+    "filename": "Mali_ERI-ESI_RapportFinal.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "344"
+   },
+   {
+    "filename": "Rapport Synthese - MALI.pdf",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "345"
+   },
+   {
+    "filename": "upi_ML.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "346"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "391"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "0",
+    "resource_id": "392"
+   }
+  ]
+ },
+ {
+  "idno": "NER-EHCVM-V2.0",
+  "nation": "Niger",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 au Niger, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "414"
+   },
+   {
+    "filename": "NER-EHCVM2-QNR-MEN-EXCEL-VAGUE1.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "427"
+   },
+   {
+    "filename": "NER-EHCVM2-QNR-MEN-EXCEL-VAGUE2.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "428"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "442"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "443"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "444"
+   }
+  ]
+ },
+ {
+  "idno": "NER-PHMECV-V1.0",
+  "nation": "Niger",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 au Niger",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "NER-EHCVM1-NOMENCLATURE-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "185"
+   },
+   {
+    "filename": "NER-EHCVM1-NOMENCLATURE-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "186"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "187"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "188"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-FOCUS-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "189"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-FOCUS-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "190"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "191"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "192"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "193"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "194"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-MEN-REFUGIES-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "195"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-MEN-REFUGIES-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "196"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "197"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "198"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "199"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "200"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "201"
+   },
+   {
+    "filename": "NER-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "202"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "260"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "261"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "262"
+   },
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "263"
+   }
+  ]
+ },
+ {
+  "idno": "NER-ERI-ESI-V1.0",
+  "nation": "Niger",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI), NIGER, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "Module_GPS_ERIESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "347"
+   },
+   {
+    "filename": "Questionnaire menage ERI-ESI.docx",
+    "dcformat": "Document, Microsoft Word [application/msword]",
+    "resource_id": "348"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI.docx",
+    "dcformat": "Document, Microsoft Word [application/msword]",
+    "resource_id": "349"
+   },
+   {
+    "filename": "Questionnaire volet secteur informel_ERI-ESI.doc",
+    "dcformat": "Document, Microsoft Word [application/msword]",
+    "resource_id": "350"
+   },
+   {
+    "filename": "emploi.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "351"
+   },
+   {
+    "filename": "gps.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "352"
+   },
+   {
+    "filename": "individus.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "353"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "354"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "355"
+   },
+   {
+    "filename": "Niger_ERI-ESI_RapportFinal.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "356"
+   },
+   {
+    "filename": "Rapport Synthese - Niger.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "357"
+   },
+   {
+    "filename": "upi_NG.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "358"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "389"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "390"
+   }
+  ]
+ },
+ {
+  "idno": "SEN-EHCVM-V2.0",
+  "nation": "Senegal",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 au Sénégal, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "415"
+   },
+   {
+    "filename": "SEN_EHCVM2_QNR_MEN_EXCEL-VAGUE1.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "429"
+   },
+   {
+    "filename": "SEN_EHCVM2_QNR_MEN_EXCEL-VAGUE2.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "430"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "445"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "446"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "447"
+   }
+  ]
+ },
+ {
+  "idno": "SEN-PHMECV-V1.0",
+  "nation": "Senegal",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 au Sénégal",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "SEN-EHCVM1-NOMENCLATURE-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "205"
+   },
+   {
+    "filename": "SEN-EHCVM1-NOMENCLATURE-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "206"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-COM-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "207"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-COM-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "208"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "209"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "210"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "211"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "212"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "213"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "214"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "215"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "216"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "217"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "218"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "219"
+   },
+   {
+    "filename": "SEN-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "220"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "264"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "265"
+   },
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "266"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "268"
+   }
+  ]
+ },
+ {
+  "idno": "SEN-ERI-ESI-V1.0",
+  "nation": "Senegal",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI), SENEGAL, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "Nomenclature des metiers et professions.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "359"
+   },
+   {
+    "filename": "Nomenclature NAEMA_NOPEMA.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "360"
+   },
+   {
+    "filename": "nomenclatures des formations.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "361"
+   },
+   {
+    "filename": "Module_GPS_ERIESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "362"
+   },
+   {
+    "filename": "Questionnaire menage ERI-ESI 28122016.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "363"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI 28122016.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "364"
+   },
+   {
+    "filename": "Questionnaire volet secteur informel_ERI-ESI 28122016.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "365"
+   },
+   {
+    "filename": "emploi.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "366"
+   },
+   {
+    "filename": "gps.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "367"
+   },
+   {
+    "filename": "individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "368"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "369"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "370"
+   },
+   {
+    "filename": "Rapport Synthese - SENEGAL.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "371"
+   },
+   {
+    "filename": "Senegal_ERI-ESI_RapportFinal.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "372"
+   },
+   {
+    "filename": "upi_SN.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "373"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "387"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "388"
+   }
+  ]
+ },
+ {
+  "idno": "TGO-EHCVM-V2.0",
+  "nation": "Togo",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 2 au Togo, 2021/2022",
+  "year": "2021-2022",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "416"
+   },
+   {
+    "filename": "TGO-EHCVM2-QNR-MEN-EXCEL-VAGUE1.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "431"
+   },
+   {
+    "filename": "TGO-EHCVM2-QNR-MEN-EXCEL-VAGUE2.xlsm",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "432"
+   },
+   {
+    "filename": "Fichiers_Communautaire.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "448"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "449"
+   },
+   {
+    "filename": "Fichiers_Ponderation.rar",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "450"
+   }
+  ]
+ },
+ {
+  "idno": "TGO-PHMECV-V1.0",
+  "nation": "Togo",
+  "title": "Enquête harmonisée sur les conditions de vie des ménages (EHCVM) Edition 1 au Togo",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "Fichiers_Traitement&AnalysePauvrete.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "271"
+   },
+   {
+    "filename": "Fichiers_Menage&Individus.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "269"
+   },
+   {
+    "filename": "Fichiers_Ponderation.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "270"
+   },
+   {
+    "filename": "TGO-EHCVM1-NOMENCLATURE-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "223"
+   },
+   {
+    "filename": "TGO-EHCVM1-NOMENCLATURE-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "224"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-FOCUS-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "225"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-FOCUS-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "226"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-FOCUS-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "227"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-FOCUS-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "228"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "229"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "230"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-MEN-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "231"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-MEN-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "232"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-NSU-CAPI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "233"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-NSU-EXCEL.xlsx",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "234"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-PRIX-CAPI-VAGUE1.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "235"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-PRIX-CAPI-VAGUE2.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "236"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-PRIX-EXCEL-VAGUE1.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "237"
+   },
+   {
+    "filename": "TGO-EHCVM1-QNR-PRIX-EXCEL-VAGUE2.xls",
+    "dcformat": "Document, Microsoft Excel [application/msexcel]",
+    "resource_id": "238"
+   },
+   {
+    "filename": "Fichiers_Communautaire.zip",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "267"
+   }
+  ]
+ },
+ {
+  "idno": "TGO-ERI-ESI-V1.0",
+  "nation": "Togo",
+  "title": "Enquête Régionale Intégrée sur l’Emploi et le Secteur Informel (ERI-ESI), TOGO, 2018",
+  "year": "2018-2018",
+  "resources": [
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Final.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "385"
+   },
+   {
+    "filename": "Module_GPS_ERIESI.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "374"
+   },
+   {
+    "filename": "Questionnaire menage ERI-ESI 19072017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "375"
+   },
+   {
+    "filename": "Questionnaire volet emploi_ERI-ESI 19072017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "376"
+   },
+   {
+    "filename": "Questionnaire volet secteur informel_ERI-ESI 19072017.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "377"
+   },
+   {
+    "filename": "emploi.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "378"
+   },
+   {
+    "filename": "gps.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "379"
+   },
+   {
+    "filename": "individus.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "380"
+   },
+   {
+    "filename": "menage.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "381"
+   },
+   {
+    "filename": "migration.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "382"
+   },
+   {
+    "filename": "upi_TG.dta",
+    "dcformat": "Data, Stata [application/x-stata]",
+    "resource_id": "383"
+   },
+   {
+    "filename": "AFRISTAT_ERI-ESI_Rapport regional Synthese.pdf",
+    "dcformat": "Document, PDF [application/pdf]",
+    "resource_id": "386"
+   }
+  ]
+ }
+]

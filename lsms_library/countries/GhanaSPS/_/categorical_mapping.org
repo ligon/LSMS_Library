@@ -969,6 +969,54 @@ decoded -- some of it is a period and some an area and some neither.
 | Ropes                  | Ropes           |
 | Other                  | Other           |
 
+* Relationship to head (GH #797, 2026-09-07)
+
+Applied AUTOMATICALLY by =Country._apply_categorical_mappings= to the
+=Relationship= column of =household_roster= at API time on EVERY read (the
+cached parquets keep the raw strings); since =df9baf91= the kinship expansion
+runs AFTER it, so =kinship.yml= sees the Preferred Label.  Column order is
+load-bearing (=_build_replace_dict= keys on the FIRST non-Preferred column),
+and the Original Label is the SERVED string.
+
+GSPS's three waves spell the same categories three ways (=Household Head= /
+=Head=; =Adopted/Foster/Stepchild= / =Adopted, foster, or stepchild= /
+=Adopted, foster/stepchild=; =Parent/Parent-in-Law= / =Parent or
+parent-in-law= / =Parent/Parent-in-law=; =Son/Daughter-in-law= / =Son or
+daughter in-law=).  This table maps them onto the ONE vocabulary shared with
+GhanaLSS (decided with @ligon 2026-09-07 -- a Ghana vocabulary, not a corpus
+one): Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law,
+Grandchild, Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew,
+Other relative, Non-relative, Servant, Tenant.  Identity rows (Child, Spouse,
+Grandchild, Other relative, Non-relative, Head in wave 3) are deliberately
+absent: =.replace()= leaves unmatched values alone.
+
+A second variant, =Comparable Label= (=household_roster(labels={'Relationship':
+'Comparable'})=), is the eight-category common denominator shared with
+GhanaLSS for pooling across the two surveys and across GLSS waves: the
+adopted code folds into =Child=, child-in-law into =Other relative=.
+
+Tuples: every row is tuple-preserving except the adopted/foster/step code,
+whose shared label carries [-1, 0, null] (adoptive / foster / step
+undetermined; see =kinship.yml=) -- it was [-1, 0, step] before.  GSPS's
+single parent/parent-in-law code is served as =Parent= (same tuple as
+before) with the conflation recorded in CONTENTS.org.
+
+Prose stays ABOVE the =#+name:= line (the comment-between-name-and-table
+trap documented for the education table above).
+#+name: relationship
+| Original Label                | Preferred Label          | Comparable Label |
+|-------------------------------+--------------------------+------------------|
+| Household Head                | Head                     | Head             |
+| Adopted/Foster/Stepchild      | Adopted/foster/stepchild | Child            |
+| Adopted, foster, or stepchild | Adopted/foster/stepchild | Child            |
+| Adopted, foster/stepchild     | Adopted/foster/stepchild | Child            |
+| Parent/Parent-in-Law          | Parent                   | Parent           |
+| Parent or parent-in-law       | Parent                   | Parent           |
+| Parent/Parent-in-law          | Parent                   | Parent           |
+| Son/Daughter-in-law           | Child-in-law             | Other relative   |
+| Son or daughter in-law        | Child-in-law             | Other relative   |
+| Househelp                     | Servant                  | Servant          |
+
 * harmonize_food (the j axis) -- migrated from food_items.org (GH #783)
 
 Canonical country-level food-item label table for the =j= axis, migrated

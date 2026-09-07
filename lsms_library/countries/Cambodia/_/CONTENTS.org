@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 Cambodia LSMS+ survey coverage and status.
 
@@ -310,26 +311,6 @@ after a curly apostrophe in the source), and the missing period after "in the
 household" -- are *in the source* and are reproduced as printed.  The DDI PDF
 renders =fi=/=ff= as ligature codepoints; these are written as plain ASCII here.
 
-* Known issues
-- Makefile :: FIXED (2026-06-08).  The generic =%.parquet= rule
-  previously referenced =malawi.py= (copy-paste error from Malawi); it
-  now references =cambodia.py=.  (The =food_items.org= prerequisite this
-  bullet mentions is gone: GH #783 retired that file, and Cambodia's
-  Makefile never named it in a rule.)
-- =cambodia.py= :: Uses deprecated =from ligonlibrary.dataframes import from_dta=
-  and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
-- No =data_scheme.yml= :: Cambodia cannot be loaded via
-  =ll.Country('Cambodia')= because there is no data scheme definition.
-- STALE, was "No =categorical_mapping.org=" :: *This bullet was already
-  false when GH #783 read it; quoted rather than deleted so the correction
-  is on the record.*  =_/categorical_mapping.org= exists
-  (=harmonize_education=, =Roof=, =Floor=) and, since GH #783, also
-  carries =harmonize_food=.
-- STALE, was "No =food_items.org=" :: *Superseded twice.*  The file was
-  created 2026-06-08 (see "DONE food_items.org" below -- the "Known
-  issues" bullet was never updated to match), and GH #783 then retired it
-  into =categorical_mapping.org=.
-
 * Files in Cambodia/_/
 ** DONE cambodia.py
 Country-level helper defining =age_sex_composition()=.  Called by
@@ -457,3 +438,22 @@ earnings), NOT shocks; =hh_sec_11/12= are education/health, not assets/credit.
 The only shock-adjacent content is per-member illness/injury in the health
 module (not a household shock-type × coping roster). `shocks` is therefore not
 implementable. Tracked in GitHub issue #352.
+
+- Makefile :: FIXED (2026-06-08).  The generic =%.parquet= rule
+  previously referenced =malawi.py= (copy-paste error from Malawi); it
+  now references =cambodia.py=.  (The =food_items.org= prerequisite this
+  bullet mentions is gone: GH #783 retired that file, and Cambodia's
+  Makefile never named it in a rule.)
+- =cambodia.py= :: Uses deprecated =from ligonlibrary.dataframes import from_dta=
+  and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
+- No =data_scheme.yml= :: Cambodia cannot be loaded via
+  =ll.Country('Cambodia')= because there is no data scheme definition.
+- STALE, was "No =categorical_mapping.org=" :: *This bullet was already
+  false when GH #783 read it; quoted rather than deleted so the correction
+  is on the record.*  =_/categorical_mapping.org= exists
+  (=harmonize_education=, =Roof=, =Floor=) and, since GH #783, also
+  carries =harmonize_food=.
+- STALE, was "No =food_items.org=" :: *Superseded twice.*  The file was
+  created 2026-06-08 (see "DONE food_items.org" above -- the "Known
+  issues" bullet was never updated to match), and GH #783 then retired it
+  into =categorical_mapping.org=.

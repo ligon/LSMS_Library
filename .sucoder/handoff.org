@@ -1,204 +1,97 @@
-#+title: Handoff -- Ghana / Togo / KenyaLPS campaign
-#+date: 2026-09-04
-#+author: Sue (Claude Opus 5, 1M context)
+#+TITLE: Handoff -- 2026-09-06
+#+TODO: TODO WAITING | DONE
 
 * State
-=development= = =6010a05f= (local == origin).  *Board clear: 0 open PRs.*  v0.10.2 released 2026-09-03
-from =master= =38fabb27=; publish workflow SUCCESS, on PyPI (wheel + sdist).
-=master= and =development= trees are BYTE-IDENTICAL -- the 5 "master ahead"
-commits are development->master merge commits only.  Nothing to back-merge.
-Slurm slice job 38425803 (savio4_htc, 4 cores).  =.venv= is a per-job
-squashfs mount: run =bash bin/savio_venv.sh mount= FIRST on any new allocation.
+- Branch :: =development=, HEAD =7b298633=, pushed, nothing local outstanding.
+- CI on development :: =unit-tests= *green*.  =dvc-remote-reachability= *red*,
+  correctly -- see "Decisions waiting on a human" below.
+- Coverage matrix :: 37/37 shards built in
+  =/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/slurm_logs/matrix_full/shards/=.
+  *Not aggregated and not promoted* -- standing instruction is that a full
+  refresh is reviewed before it replaces =.coder/coverage/latest.csv=.
 
-* Merged this session (12 PRs, all reviewed by me before EL's word)
-| PR | what |
-|----+------|
-| #751 | GhanaLSS #692 orphan =rural= table + #695 Birthplace (C4 on the questionnaire) |
-| #752 | GhanaSPS =plot_features= (#732 trap wired) |
-| #754 | weekly =dvc-remote-reachability= CI job |
-| #756 | GhanaLSS #731 =U6= split by wave + #705 urban-cutoff doc |
-| #759 | KenyaLPS SOURCE.org + LICENSE.org per wave (Dataverse, CC0) |
-| #760 | GhanaSPS =livestock= (HerdValue, not ValuePerAnimal) |
-| #761 | GhanaSPS =crop_production= (W1 two-season melt) |
-| #762 | GhanaLSS =community_prices= (#562 3a, 660k rows, 6 waves) |
-| #765 | #727 housing canon: Bamboo + Terrazzo, 8 exact rows re-pointed |
-| #767 | KenyaLPS KLPS-2 tracks .dta originals, not .tab derivatives |
-| #768 | GhanaSPS =plot_labor= (stage as an index level; WageRate + WageUnit) |
-| #769 | GhanaLSS =nutrition= from the FAO WAFCT 2019 |
-| #773 | Togo =nonfood_expenditures= from EHCVM s09; 5 orphan sidecars retired |
-| #774 | vocabulary: admit =nutrition= + =nonfood_expenditures= (the ratchet) |
+* Merged today
+=#786= currency docstrings; =#779= community_prices scoping; =#785= GhanaLSS
+label canonicalisation (collision groups 35 -> 0, nutrition FCT 88.26% ->
+94.71%, closing =#782=).
 
-* Verification of the merged tree -- DONE
-- Full pytest on =853ce496=: *5,045 passed, 2 real failures*, both =Uganda/earnings=
-  (#772, pre-existing).  A third failure --- =test_ghanalss_split_household_food_not_summed_into_one=
-  --- was a FLAKE, not a regression: mtimes show =GhanaLSS/var/food_acquired.parquet=
-  was written at 08:02 and the run ended 08:02:48.  =to_parquet= IS atomic, so
-  this was not a torn read: with 32 xdist workers on a cold cache one worker
-  wrote a country aggregate built from a PARTIAL wave set, and it then carried a
-  valid content hash.  Filed as *#778*; test passes serially (20 passed).
-- Full-corpus matrix on the merged tree: *2,420 cells / 37 countries*, all 37
-  shards rc=0.  Candidate at
-  =coverage-refresh/slurm_logs/matrix_full/latest_candidate.csv= + =matrix_full.html=.
-  *NOT promoted* --- review its 32 dropped / 10 builds / 8 broken first
-  (Nepal + Armenia broken = no microdata, expected).
-- Uganda invariance failures FIXED by restoring the April =fct_usda.csv= (#771).
+* Open PRs -- all four are STALE-RED, not broken
+Every one failed on three =TestPushToCache= tests, which was my regression
+(=59d3ea99= swapped =subprocess.run= for =_run_dvc=/Popen; the mocks patched
+the old target).  Fixed on development in =05743707=.  Two further
+development-level failures were also fixed: =3f526875= (generated
+=data-methods.md= lagged #786's docstring correction) and =121aa5e8= (the S3
+refresh test inherited its precondition from ambient machine state instead of
+arranging it).
 
-* IN FLIGHT (previous round -- superseded, kept for the job ids)
-Jobs on the dedicated clone =/global/scratch/fsa/fc_jevons/ligon/coverage-refresh=
-at =853ce496= (co_carleton / savio3 / savio_lowprio -- free, pre-emptible):
-- *38525387* matrix shard array (37 tasks x 32 cores, =%12=)
-- *38525388* aggregate -> =slurm_logs/matrix_full/latest_candidate.csv= + HTML
-  (a CANDIDATE; review before promoting to =.coder/coverage/latest.csv=)
-- *38525389* full pytest =--no-purge -n 32=
-Scripts live in =slurm_logs/matrix_full/*.sbatch= (main repo, untracked).
-*Each job pins =PYTHONPATH= to the clone and ASSERTS it* -- the squashfs venv's
-=.pth= hardcodes the MAIN checkout, so without that every shard silently
-grades the wrong branch's code.
+- =#784= :: #770 currency-denominated units.  Adversarial review found the set
+  incomplete; fixed in CONFIG (EthiopiaRHS =Birr=, Serbia =dinar= -> =Value=)
+  rather than by growing a library blocklist.
+- =#789= :: six stranded food vocabularies -> =harmonize_food=.  69/69 cells
+  byte-identical, 443 tests.
+- =#795= :: encoding survey; records Senegal's load-bearing mojibake.
+- =#796= :: GLSS7 population record hardened + =PopulationRecord= in
+  =df.attrs=.  Corrects an =AGENTS.md= claim about =_join_v_from_sample=.
 
-Previous run (pre-merge, at =9aea120f=): matrix 2,342 cells / 37 countries in
-19 min, all shards rc=0; pytest 4,986 passed / 4 failed (-> #771, #772).
+*Next action*: re-run CI on all four against current development, then merge.
 
-* Open issues I filed
-| # | what |
-|---+------|
-| #753 | GhanaLSS wave =mapping.py= =_dirs= ignore LSMS_COUNTRIES_ROOT |
-| #757 | a country =categorical_mapping.org= edit is invisible to =Wave._input_hash= |
-| #763 | =get_data_file()= walks the DVC index (1,599 s on a cached PDF) |
-| #764 | =make -j= from =os.cpu_count()= -> -j28 on a 4-core slice |
-| #770 | =conversion_to_kgs= gives =u='Value'= a kg factor: currency served as mass (18 countries declare schemes mentioning Value) |
-| #771 | Uganda/Ethiopia =nutrition.py= rebuild their FCT from the LIVE USDA API when the untracked =fct_usda.csv= is missing -- not reproducible |
-| #772 | =Uganda/earnings= delivers =earnings= vs declared =Earnings= (+ stray =level_1=) |
-| #775 | =Feature()= modal exclusion is ARGUMENT-ORDER dependent |
-| #777 | Panama 1997: 99.1% of =u='Value'= rows carry =Quantity=7.70=, an undecoded sentinel |
-| #778 | =pytest -n= on a cold cache: a partial country aggregate caches as fresh |
+* Also open
+- =ligon/LigonLibrary#2= :: =errors="ignore"= in =_coerce_label= silently
+  deleted non-ASCII characters.  Note I got the DIRECTION wrong first and
+  corrected it in-branch; both attempts are documented in the PR.
 
-*#770 is the one to fix first.*  EL's own session showed the visible symptom:
-=glss.food_prices()= returns a CONSTANT (2.035038 = 1/0.49139, the reciprocal of
-the bogus kg factor) for every item, and =groupby('t').std()= is 0.0 in six of
-seven waves.  Blast radius MEASURED and narrower than first filed: only
-*2 countries* carry =u='Value'= rows (GhanaLSS 3,492,915; Panama 17,821); the
-other 18 that declare schemes mentioning "Value" have none.
+* Issues filed today
+=#783= food-vocabulary consolidation (six countries); =#787= =labels== map;
+=#790= gitignored-yet-hashed build inputs; =#791= UEMOA PHMECV source;
+=#792= 774 warnings, 746 from one unclosed file; =#794= dta encoding.
 
-* GH #750 -- essentially closed
-21 real misses (never the ~1,300 documentation the issue claimed -- that was a
-flat-vs-=files/md5/= layout artefact) -> *4*, all =GhanaSPS/2017-18/Data/Crop_encrypted/=
-Boxcryptor files with no passphrase.  EL's call: retire those 4 sidecars
-(closes #750, turns #754 green) or keep them as a record.
+* Decisions waiting on a human
+** WAITING The four GhanaSPS Boxcryptor sidecars
+=dvc-remote-reachability= fails on exactly these, and will keep failing:
+4 of 9,980 blobs missing, all in
+=GhanaSPS/2017-18/Data/Crop_encrypted/=.  Established today that the
+ciphertext is absent from S3 *and* local, including =FolderKey.bch=, so there
+is nothing to decrypt.  Either recover the originals from whoever ran the
+=dvc add= (git blame the sidecars) or retire the sidecars.  Until then CI is
+red for a real but known reason.  Note =unitcon_W3nonpii.dta.bc= is a unit
+conversion table, relevant to #770.
 
-* A degenerate-column check (EL's idea) -- MEASURED, not yet filed
-EL: /"a check which would have detected both: groupby('t').std() equal to zero"/.
-Measured over *4,909 (country, feature, wave, column) cells* on 35 countries
-(scan: =coverage-refresh/slurm_logs/degenerate/=):
-- =nunique==1= MISSES both (float noise: GhanaLSS Price has nunique=2, std 4e-16
-  -- pandas *displays* 0.0, which is why the eyeball caught it).
-- =CV = std/|mean|= catches #770 cleanly (1e-18..2e-16 vs 18.2 for the healthy
-  wave) but MISSES #777.
-- *mode share* (one value >= 99% of the wave) catches BOTH: 99.8-100% vs 8.9%.
-- Firing rate at >= 0.99: *109 of 4,909 cells (2.2%)*, 13 countries -- a work
-  queue, not a firehose (cf. null_read_audit Site B's 86).
-- ~22 of the 109 are =weight=/=panel_weight= (EthiopiaRHS, GhanaLSS) and are
-  plausibly LEGITIMATE -- GLSS3 is self-weighting by design (#715).  So: WARN.
-- Caveat: at column level it misses #777, because Panama's sentinel is only
-  99% within the =u='Value'= subset (~7% of the whole column).  The conditional
-  case needs a separate, more expensive check.
+** WAITING Promote the coverage-matrix candidate?
+Shards are built; aggregation and promotion both deliberately not done.
 
-* Data-restriction design (discussed with EL, agreed)
-Split the problem: *(A) don't leak* (never push restricted data to the shared
-bucket) is ~90% of the value for ~10% of the work and needs no second bucket;
-*(B) share under a protocol* is a governance system.  *AGREED: build (A), defer
-(B) until a second consumer exists.*  Bucket-level enforcement forces
-file-level granularity -- fine for GPS (geovariables are separate files),
-impossible for "restrict one column".
+** WAITING UEMOA Benin request
+Human-reviewed access; one wave requested, outcome pending.  The
+discriminating test for the per-file-grant hypothesis is recorded in
+=slurm_logs/uemoa/README.org= with today's baseline, so it is one command
+when the grant lands.
 
-*EL's correction, verified*: the corpus's GPS is the WB/DHS *displaced* fix
-(CLAUDE.md:273 says so; the files are the =Pub_*Geovariables*= releases), so the
-14 GPS countries need NO restriction.
+* Traps this session kept re-teaching
+Recorded because each cost real time and all are the same species -- an
+operation that fails *quietly*.
 
-*The audit: nothing needs unwinding after all* (I claimed that, then withdrew
-it on a bad distinction, then re-confirmed it -- the middle step is recorded
-here so the reasoning is not repeated).  23 waves are
-=PROVENANCE_SOURCE: external=:
-| GhanaLSS x6, Rwanda x2 | national NADA instances (=statsghana.gov.gh=, =microdata.statistics.gov.rw=) |
-| KenyaLPS x4 + GhanaSPS 2017-18 | CC0 (Harvard Dataverse) |
-| GhanaSPS 2013-14, KenyaLPS 2003-2005, Rwanda 2000-01, Rwanda 2005-06 | *NO LICENSE.org at all* |
-| EthiopiaRHS x8 | IFPRI/Addis Ababa via Dataverse; no clear term found -- needs reading |
+- =str.replace= silently no-ops when its anchor has moved.  Assert anchors.
+- =grep -c= exits 1 on zero matches, so =|| echo "absent"= reports a present
+  file as missing.
+- =read().split()= splits the three country names containing spaces
+  (=South Africa=, =Serbia and Montenegro=, =Kyrgyz Republic=).  Use
+  =splitlines()=, or =sed -n "${i}p"=.
+- =pgrep -f= / =pkill -f= match the agent's own shell command line.
+- =python -c= puts *cwd* on =sys.path= ahead of =PYTHONPATH=, so a worktree
+  probe silently imports the main checkout.  The mandated assertion catches it.
+- Running only the new test file proves nothing about the old ones.  That is
+  exactly how =TestPushToCache= broke four PRs.
+- savio3 allocates WHOLE NODES (~32 cores).  Ask for one and saturate
+  =$SLURM_CPUS_ON_NODE=; an array of 35 single-core tasks takes ~1,120 cores
+  for work needing 35.
+- =make <target>= that depends on =setup= runs =poetry install= against the
+  READ-ONLY squashfs venv and hangs.  =api-audit= and =docs-gen= no longer do.
 
-I briefly argued the GSS/Rwanda waves were exposed because our cache is gated on
-a *WB* key while their terms name a different authority.  *EL corrected this and
-he is right*: GSS runs the same NADA software as the WB, with the same
-self-service API-key generation -- measured, *112 of the catalog URLs are
-NADA-style*, WB and GSS and Rwanda among them; only the 13 =doi.org= (Dataverse)
-ones differ.  So the population that can obtain GSS data is the same population
-that can obtain WB data, and the six GhanaLSS waves are symmetric with the 63 WB
-boilerplate licences.  Accept both or reject both; we accept both.
-
-*Design consequence*: the permission record's key field is the ACCESS MECHANISM,
-not the authority --
-- =self-service= (NADA registration, or a public licence like CC0) -> discharged
-  by the existing WB-API-key gate;
-- =bespoke-agreement= (Novissi; un-displaced GPS) -> NOT discharged; this is the
-  only category needing (A)'s default-deny.
-=PROVENANCE_SOURCE= still cannot be borrowed for this: it records where we GOT a
-wave, not what we may DO with it (6 GhanaLSS waves are =external= yet fine).
-
-What remains is RECORDING, not moving: 4 waves have no =LICENSE.org=, and
-EthiopiaRHS x8 have no clear term.  Only GhanaSPS 2013-14 is substantively
-unclear, and that is already #140's pre-release vintage question.
-
-* EL decisions outstanding
-0. *The GhanaLSS x6 GSS terms* -- is there a written agreement already (just not
-   recorded)?  And are the 4 =LICENSE.org=-less waves worth chasing terms for, or
-   do they predate the convention?  Both are judgement calls, not facts.
-1. Retire the 4 Boxcryptor sidecars?  (see above)
-2. Promote the full-corpus matrix candidate to =.coder/coverage/latest.csv=
-   after reviewing its =dropped= / =broken= / =builds= cells.
-3. The hardcoded USDA FDC key in =Uganda/_/nutrition.py= and
-   =Ethiopia/_/nutrition.py= (same literal) -- rotate + move to config (#771).
-4. =/tmp/dataverse_token= (EL's, mode 600) -- useless now; delete?
-5. *The new Togo/Novissi data* -- see below.
-
-* The Togo/Novissi consumption data (NOT in the repo, deliberately)
-Zip at =/global/scratch/users/ligon/tmp/231030impact_consumptiondata.zip=
-(password =togoconso2021=); extracted read-only at
-=/global/scratch/users/ligon/tmp/.togo_conso_work/= (mode 700 -- delete when done).
-9,511 respondents x 87 cols, 4 survey weeks, balanced RCT (=nov_t= 4,741/4,770),
-10 food items x 5 questions = 95,110 respondent-item records.
-
-*DO NOT PUSH TO S3.*  The senders wrote /"Please don't share the data further
-without checking with us first"/, and our DVC remote is a shared read cache
-that any WB-API-key holder can read.  A =.dvc= sidecar would also advertise a
-blob that must not be fetchable and would sit in #754 forever.  Bounded
-question to put back to them: /is a credentialed cache, readable only by
-WB-API-key holders, acceptable?/
-
-Two substantive notes if it is ever wired:
-- =c10= is spend on the LAST PURCHASE OCCASION, not over a recall window --
-  =food_acquired.Expenditure= is a per-period flow everywhere else.  Converting
-  needs the inter-purchase interval (=c08a=/=c08b=); that is modelling, not
-  harmonisation, and must be recorded rather than mapped away.
-- It is a phone RCT of Novissi registrants, respondent-level.  Needs its own
-  =population.yml= record tagged =specialized= and its OWN country entry (like
-  =KenyaLPS=), NOT a wave of =Togo/= -- pooling it with EHCVM 2018 is exactly
-  what =PopulationHeterogeneityWarning= exists to catch.
-- The zip is world-readable in a world-traversable dir and uses legacy
-  ZipCrypto (broken).  Recommended =chmod 600= the zip / =700= the dir; EL's
-  files, so not done.
-
-* Next work, ranked
-1. Review + promote the matrix candidate; act on the pytest result.
-2. =plot_inputs= (GhanaSPS) -- brief written
-   (=slurm_logs/ghanasps/BRIEF_plot_inputs_2026-09-02.org=), worktree
-   =wt-gsps-inputs= ready.  EL ruled: real-quantity rows only.
-3. The EHCVM =s09= lift: 11 more (country, wave) cells across 7 countries.
-   *CotedIvoire's is at =Data/Menage/s09?_me_CIV2018.dta=* -- nested dir,
-   UPPERCASE tag, which a glob written for the other seven silently misses.
-4. #770 is the highest-value bug: it corrupts =food_quantities(units='kgs')=
-   corpus-wide and would corrupt #562 phase 3b.
-5. #562 phase 3b (price -> quantity imputation) -- gated on #770.
-
-* Worktrees (all at =/global/scratch/fsa/fc_jevons/ligon/tmp/=)
-=wt-gsps-plot=, =wt-gsps-livestock=, =wt-gsps-crop=, =wt-gsps-labor=,
-=wt-glss-692-695=, =wt-glss-731-705=, =wt-glss-prices=, =wt-glss-fct=,
-=wt-canon-727=, =wt-togo-nonfood= -- ALL MERGED, safe to remove (EL's call).
-=wt-gsps-inputs= is unused and ready for item 2.
-Plus 9 stale ones under =.claude/worktrees/= from earlier sessions.
+* Shipped today besides the PRs
+=Country.notes()= / =note_topics= (CONTENTS.org through the API); all 38
+=CONTENTS.org= declare =#+TODO= and synonym headlines merged;
+=visualizations.py= with =population_pyramid= and =coordinate_map=;
+=Country.features= / =Wave.features=; =make api-audit= (undocumented kwargs,
+uncalled machinery, unindexed skills, untracked hashed inputs);
+=docs/guide/data-methods.md= generated from live docstrings;
+=lectures/glss7_sample_design.org=; GLSS7 Main Report acquired and
+DVC-tracked, with the sample design verified against the served weights.

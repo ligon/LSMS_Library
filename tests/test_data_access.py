@@ -514,7 +514,9 @@ class TestPushToCache:
         monkeypatch.setattr("lsms_library.config.microdata_api_key",
                             lambda: None)
 
-        # Mock subprocess.run to simulate success
+        # Mock the dvc runner to simulate success.  NOT subprocess.run:
+        # `_run_dvc` uses Popen so a timeout can terminate the child
+        # gracefully and clean up the lock it would otherwise orphan.
         mock_result = MagicMock()
         mock_result.returncode = 0
         mock_result.stderr = ""
@@ -524,7 +526,7 @@ class TestPushToCache:
         monkeypatch.setattr(data_access, "_s3_writer_credentialpath",
                             lambda *a, **k: contextlib.nullcontext())
 
-        with patch.object(data_access.subprocess, "run",
+        with patch.object(data_access, "_run_dvc",
                           return_value=mock_result) as mock_run:
             assert data_access.push_to_cache("Foo/2020/Data/bar.dta") is True
 
@@ -556,7 +558,7 @@ class TestPushToCache:
 
         mock_result = MagicMock()
         mock_result.returncode = 0
-        with patch.object(data_access.subprocess, "run",
+        with patch.object(data_access, "_run_dvc",
                           return_value=mock_result) as mock_run:
             assert data_access.push_to_cache(
                 "Foo/2020/Data/bar.dta", dvc_add=False) is True
@@ -589,7 +591,7 @@ class TestPushToCache:
         mock_result = MagicMock()
         mock_result.returncode = 0
         mock_result.stderr = ""
-        with patch.object(data_access.subprocess, "run",
+        with patch.object(data_access, "_run_dvc",
                           return_value=mock_result) as mock_run:
             assert data_access.push_to_cache(
                 "Foo/2020/Data/bar.dta",

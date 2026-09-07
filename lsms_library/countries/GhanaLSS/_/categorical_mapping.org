@@ -18,8 +18,35 @@
 |    . | None            |
 
 * Relation to head
-See https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?file_name=y01a
-#+name: relationship
+
+** GLSS1 fourteen-code list (=relationship_glss1=)
+
+GLSS1's (1987-88) relationship-to-head code list, from that wave's own data
+dictionary: https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?file_name=y01a
+Verified against the raw data for GLSS1 and GLSS2 (=REL= takes codes 1-14;
+code 1 occurs 3,136 / 3,192 times = each wave's household count).  Read by
+=1987-88/_/mapping.py= and =1988-89/_/mapping.py= via
+=code_label_map('relationship_glss1', _dirs)=.  GLSS3 and GLSS4 use a
+different NINE-code list and carry their own wave-level =relationship=
+tables (CONTENTS.org Trap 2).
+
+Renamed from =relationship= on 2026-09-07 (GH #797), for two reasons:
+1. The framework auto-applies any country table named after a served column
+   (=Relationship=), and =relationship= is now the name of the LABEL
+   harmonization table below.  A =| Code | Label |= table under that name was
+   never a mapping (=_build_replace_dict= needs a =Preferred Label= column),
+   but the two would collide by name.
+2. Trap 2's mechanism.  GLSS3 was decoded through this table for its whole
+   life (GH #799) because a wave-first =code_label_map= search found no wave
+   table and fell through to here.  With this table no longer answering to
+   =relationship=, a wave that lacks its own =relationship= CODE table gets
+   ={}= from =code_label_map= (the harmonization table below has no =Code=
+   column, so the lookup raises =KeyError= there and moves on) and ships a
+   100%-null =Relationship= that the Site B null-read guard reports loudly --
+   instead of a silently mis-decoded one.  A fallback that has never been
+   exercised has never been checked (Trap 4); this one can no longer be
+   exercised at all.
+#+name: relationship_glss1
 | Code | Label                 |
 |------+-----------------------|
 |    1 | Head                  |
@@ -36,6 +63,128 @@ See https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?
 |   12 | Servant               |
 |   13 | Tenant                |
 |   14 | Others not related    |
+
+** Label harmonization (=relationship=): one vocabulary for seven waves
+
+Applied AUTOMATICALLY by =Country._apply_categorical_mappings= to the
+=Relationship= column of any table that carries one (here =household_roster=),
+at API time on EVERY read, warm or cold: the column is =.str.strip()=-ed and
+=.replace()=-d through =Original Label -> Preferred Label=.  The cached
+parquets (L2-wave and L2-country) keep the RAW strings.  Since =df9baf91=
+(GH #797) the kinship expansion (=Generation= / =Distance= / =Affinity=)
+runs AFTER this mapping, so it sees the Preferred Label.  The seven waves
+used to serve five vocabularies (32 distinct strings); they now serve one
+(17 labels).
+
+Column order is load-bearing: =_build_replace_dict= keys on the FIRST column
+that is not =Preferred Label=, so the raw label comes first.  The Original
+Label is the SERVED string -- after the wave/country formatter: the country
+formatter =_/ghanalss.py:Relationship= title-cases 2012-13 and 2016-17, and
+2005-06's wave formatter title-cases too -- NOT the =.dta= value label
+(=Child (Son/daughter)= in the file is =Child (Son/Daughter)= here).
+
+Two label variants, one key column.  =Preferred Label= is the default: the
+15-label Ghana vocabulary.  =Comparable Label= is selected with
+=household_roster(labels={'Relationship': 'Comparable'})= (GH #682's
+mechanism): the COMMON DENOMINATOR every GLSS form asked -- Head, Spouse,
+Child, Grandchild, Parent, Other relative, Non-relative, Servant -- for
+pooling across waves.  GLSS1/2's Sibling / Niece/nephew / Sibling-in-law /
+Child-in-law fold into =Other relative= (where GLSS3+ already put them),
+Tenant into =Non-relative= (GLSS5+ has no tenant code), the adopted code
+into =Child= (GLSS1-4 has no adopted code), Parent-in-law into =Parent=
+(GLSS5-7's parent code includes them).  Residual imbalance the coarse view
+cannot remove: GLSS3/4 put parents-in-law under "relative of head or
+spouse", so their =Parent= excludes in-laws while every other wave's
+includes them (14 / 16 people in GLSS1/2; unknowable in GLSS3/4).  Under
+the Comparable variant the kinship tuple follows the coarse label (a GLSS1
+sibling becomes =Other relative=, generation and distance null) -- which is
+the balanced reading, since GLSS3+ never distinguished them.
+
+Identity rows (Original == Preferred) exist ONLY where the Comparable
+column differs (Sibling, Niece/nephew, Tenant): =.replace()= leaves
+unmatched values alone, so a label that is canonical in BOTH variants
+(Head, Spouse, Child, Grandchild, Parent, Other relative, Servant) needs no
+row.  Do not add them.
+
+The vocabulary is ONE list shared with GhanaSPS (its country table maps onto
+the same labels; decided with @ligon 2026-09-07 -- a Ghana vocabulary, not a
+corpus one, because surveys elsewhere understand relationships differently):
+Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law, Grandchild,
+Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew, Other relative,
+Non-relative, Servant, Tenant.  Every one is a =kinship.yml= key (the lookup
+tries =.title()= first: =Parent-in-law= -> =Parent-In-Law=).
+
+Tuple-preserving BY CONSTRUCTION, with ONE stated exception: every Original
+Label and its Preferred Label resolve to the same kinship tuple under
+=_expand_kinship='s lookup, checked on all 246,594 rows -- except the adopted
+row.  =Adopted Child= (GLSS5/6, 963 people; was [-1,0,consanguineal]) and
+=Adopted / Foster/ Step Child= (GLSS7, 501; was [-1,0,step]) are one label,
+=Adopted/foster/stepchild=, whose tuple is [-1, 0, null]: a child of the
+head, but whether by adoption, fostering or a step relation the instruments
+do not agree and the ontology has no =adoptive= affinity, so Affinity is
+null (the GH #698 shape, same as =Other relative='s Generation/Distance).
+Other decisions the table encodes:
+- =Parent/Parentlaw= (GLSS5/6) and =Parent/Parent-In-Law= (GLSS7) are ONE
+  survey code conflating parent and parent-in-law; served as =Parent= (tuple
+  unchanged); the conflation is recorded in CONTENTS.org like GLSS3+'s =Other
+  relative= absorbing siblings.  GLSS1/2's separate =Father/mother in-law= is
+  =Parent-in-law=.
+- =Other= (GLSS6 code 11, 14 people; distinct from code 10 =Non_relative=)
+  folds into =Non-relative=: tuple [0,0,unrelated] either way.
+- GLSS7's served =Non-Relative= (the country formatter title-cases the raw
+  =Non-relative=) needs its own row: =.replace()= is exact, and a capital R
+  is a different string.
+- =Househelp (Other relative)= (GLSS7 code 9) and =House help (Non-relative)=
+  (code 10) both carry [0,0,servant]; the annotation is not preserved.
+
+=Others not related= (GLSS1's wording) is =Non-relative= as of 2026-09-07;
+GLSS1/2's decode table (=relationship_glss1=) keeps the questionnaire wording
+and this table harmonizes it, so the decode stays verbatim.
+
+Raw code lists, for provenance (value labels read from the .dta, 2026-09-07):
+- GLSS5 (2005-06 =parta/sec1.dta:s1q3=): 1 head, 2 spouse, 3 child,
+  4 grandchild, 5 parent/parentlaw, 6 son/daughterlaw, 7 other relative,
+  8 adopted child, 9 househelp, 10 non_relative
+- GLSS6 (2012-13 =PARTA/SEC1.dta:s1q3=): 1 Head, 2 Spouse,
+  3 Child (Son/daughter), 4 Grandchild, 5 Parent/parentlaw,
+  6 Son/daughterlaw, 7 Other relative, 8 Adopted child, 9 Househelp,
+  10 Non_relative, 11 Other
+- GLSS7 (2016-17 =g7sec1.dta:s1q3=): 1 Head, 2 Spouse (Wife/Husband),
+  3 Child (Son/daughter), 4 Grandchild, 5 Parent/Parent-in-law,
+  6 Son/Daughter-in-law, 7 Other relative, 8 Adopted / Foster/ Step child,
+  9 Househelp (Other relative), 10 House help (Non-relative), 11 Non-relative
+- GLSS1/2: the fourteen-code table above; GLSS3/4: the nine-code wave tables.
+
+Prose stays ABOVE the =#+name:= line (Trap 4: a comment between the name and
+the table steals the name and the build reports success).
+#+name: relationship
+| Original Label               | Preferred Label          | Comparable Label |
+|------------------------------+--------------------------+------------------|
+| Wife/husband                 | Spouse                   | Spouse           |
+| Spouse (Wife/Husband)        | Spouse                   | Spouse           |
+| Son/daughter                 | Child                    | Child            |
+| Child (Son/Daughter)         | Child                    | Child            |
+| Adopted Child                | Adopted/foster/stepchild | Child            |
+| Adopted / Foster/ Step Child | Adopted/foster/stepchild | Child            |
+| Son/daughter in-law          | Child-in-law             | Other relative   |
+| Son/Daughterlaw              | Child-in-law             | Other relative   |
+| Son/Daughter-In-Law          | Child-in-law             | Other relative   |
+| Father/mother                | Parent                   | Parent           |
+| Parent/Parentlaw             | Parent                   | Parent           |
+| Parent/Parent-In-Law         | Parent                   | Parent           |
+| Father/mother in-law         | Parent-in-law            | Parent           |
+| Brother/sister in-law        | Sibling-in-law           | Other relative   |
+| Sibling                      | Sibling                  | Other relative   |
+| Niece/nephew                 | Niece/nephew             | Other relative   |
+| Other Relative               | Other relative           | Other relative   |
+| Others not related           | Non-relative             | Non-relative     |
+| Non-Relative                 | Non-relative             | Non-relative     |
+| Non_Relative                 | Non-relative             | Non-relative     |
+| Other                        | Non-relative             | Non-relative     |
+| Tenant                       | Tenant                   | Non-relative     |
+| Househelp                    | Servant                  | Servant          |
+| House Help (Non-Relative)    | Servant                  | Servant          |
+| Househelp (Other Relative)   | Servant                  | Servant          |
 
 * Units (Section 9B, GLSS7 / 2016-17)
 Stata value labels for the =s9bq*c= unit columns, lifted once from the full
@@ -439,7 +588,7 @@ one name and each gets them from the level it asks at: =nutrition= and
 | Cocoyam Leaves                       |                                |                                | Cocoyam Leaves                 | Coffee                         | Cocoyam Leaves               | Cocoyam Leaves               | Cocoyam Leaves                | 04_009   |
 | Coffee                               |                                |                                | Coffee                         |                                | Coffee                       | Coffee                       | Coffee                        | 12_009   |
 | Cola Nut                             |                                |                                |                                |                                | Cola Nut                     | Cola Nut                     |                               | 06_019   |
-| Condiment                            | Condiment                      | Condiment                      |                                |                                | Condiments                   | Condiments                   | Condiments                    | 13_008   |
+| Condiment                            | Condiment                      | Condiment                      |                                |                                | Condiment                    | Condiment                    | Condiment                     | 13_008   |
 | Confectionary (not frozen)           |                                |                                | Confectionary (not frozen)     | Confectionary (not frozen)     |                              |                              |                               |          |
 | Cooked Rice and Stew                 |                                |                                | Cooked Rice and Stew           | Cooked Rice and Stew           | Cooked Rice and Stew         | Cooked Rice and Stew         |                               |          |
 | Corflake                             |                                |                                |                                |                                |                              |                              | Corflake                      | 01_182   |
@@ -451,7 +600,7 @@ one name and each gets them from the level it asks at: =nutrition= and
 | Dawadawa                             |                                |                                | Dawadawa                       | Dawadawa                       |                              | Dawadawa                     | Dawadawa                      | 03_009   |
 | Dove/Pigeon                          | Dove/pigeon                    | Dove/pigeon                    |                                |                                |                              |                              |                               |          |
 | Duck                                 | Duck                           | Duck                           | Duck                           | Duck                           |                              |                              |                               |          |
-| Egg                                  | Egg                            | Egg                            | Eggs                           | Eggs                           | Eggs                         | Eggs                         | Eggs                          | 08_001   |
+| Egg                                  | Egg                            | Egg                            | Egg                            | Egg                            | Egg                          | Egg                          | Egg                           | 08_001   |
 | Eggplant                             | Eggplant                       | Eggplant                       | Eggplant/Cucumber              | Eggplant/Cucumber              | Eggplant                     | Eggplant                     | Eggplant                      | 04_074   |
 | Eggplant Leaf                        |                                |                                |                                |                                |                              |                              | Eggplant Leaf                 | 04_013   |
 | Emotuo                               | Emotuo                         | Emotuo                         |                                |                                |                              |                              |                               |          |
@@ -511,7 +660,7 @@ one name and each gets them from the level it asks at: =nutrition= and
 | Onion                                | Onion                          | Onion                          | Onion                          | Onion                          | Onion                        | Onion                        | Onion                         | 04_018   |
 | Orange                               | Orange                         | Orange                         | Orange                         | Orange                         | Orange                       | Orange                       | Orange                        | 05_016   |
 | Other Alcoholic Beverages            | Other Alcoholic Beverages      | Other Alcoholic Beverages      | Other Alcoholic Beverages      | Other Alcoholic Beverages      | Other Alcoholic Beverages    | Other Alcoholic Beverages    | Other Alcoholic Beverages     | 12_006   |
-| Other Beverages                      | Other Beverages                | Other Beverages                | Other Beverage                 | Other Beverage                 | Other Beverages              | Other Beverages              | Other Beverages               | 12_024   |
+| Other Beverages                      | Other Beverages                | Other Beverages                | Other Beverages                | Other Beverages                | Other Beverages              | Other Beverages              | Other Beverages               | 12_024   |
 | Other Canned Vegetables              |                                |                                | Other Canned Vegetables        |                                |                              |                              |                               |          |
 | Other Cereal                         |                                |                                |                                |                                | Other Cereal                 | Other Cereal                 | Other Cereal                  | 01_182   |
 | Other Condiments & Spices            |                                |                                | Other Condiments & Spices      | Other Condiments & Spices      |                              |                              |                               |          |
@@ -520,9 +669,9 @@ one name and each gets them from the level it asks at: =nutrition= and
 | Other Drinks                         |                                |                                | Other Drink                    | Other Drink                    |                              |                              |                               |          |
 | Other Eggs                           |                                |                                | Other Eggs                     | Other Eggs                     |                              |                              |                               |          |
 | Other Fish                           |                                |                                | Other Fish                     | Other Fish                     | Other Fish                   | Other Fish                   | Other Fish                    | 09_003   |
-| Other Flours                         |                                |                                | Other Flour                    | Other Flour                    | Other Flours                 | Other Flours                 | Other Flours                  | 01_043   |
+| Other Flours                         |                                |                                | Other Flours                   | Other Flours                   | Other Flours                 | Other Flours                 | Other Flours                  | 01_043   |
 | Other Fruits                         | Other Fruits                   | Other Fruits                   | Other Fruits                   | Other Fruits                   | Other Fruits                 | Other Fruits                 | Other Fruits                  | 05_017   |
-| Other Grains                         |                                |                                |                                | Other Grain                    | Other Grain                  | Other Grain                  | Other Grains                  | 01_039   |
+| Other Grains                         |                                |                                |                                | Other Grains                   | Other Grains                 | Other Grains                 | Other Grains                  | 01_039   |
 | Other Leafy Vegetables               | Other Leafy Vegetable          | Other Leafy Vegetable          |                                |                                | Other Leafy Vegetable        | Other Leafy Vegetable        | Other Leafy Vegetable         | 04_131   |
 | Other Meat                           | Other Meat                     | Other Meat                     | Other Meat                     | Other Meat                     | Other Meat                   | Other Meat                   | Other Meat                    | 07_069   |
 | Other Milk Products                  | Milk product                   | Milk product                   | Other Milk Products            | Other Milk Products            | Other Milk Products          | Other Milk Products          | Other Milk Products           | 10_028   |
@@ -538,7 +687,7 @@ one name and each gets them from the level it asks at: =nutrition= and
 | Other Starchy Products               |                                |                                | Other Starchy Products         | Other Starchy Products         |                              |                              |                               |          |
 | Other Tobacco                        |                                |                                | Other Tobacco                  | Other Tobacco                  | Other Tobacco                | Other Tobacco                | Other Tobacco                 |          |
 | Other Tubers                         |                                |                                | Other Tubers                   | Other Tubers                   | Other Tubers                 | Other Tubers                 | Other Tubers                  | 02_015   |
-| Other Vegetables                     | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables             | Other Vegetables             | Other Vegetable               | 04_005   |
+| Other Vegetables                     | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables             | Other Vegetables             | Other Vegetables              | 04_005   |
 | Palm Nut                             | Palm Nut                       | Palm Nut                       | Palm Nut                       | Palm Nut                       | Palm Nut                     | Palm Nut                     | Palm Nut                      | 06_029   |
 | Pawpaw                               | Pawpaw                         | Pawpaw                         | Pawpaw                         | Pawpaw                         | Pawpaw                       | Pawpaw                       | Pawpaw                        | 05_017   |
 | Pepper                               |                                |                                | Pepper                         | Pepper                         | Pepper                       | Pepper                       | Pepper (fresh)                | 04_046   |
@@ -576,7 +725,7 @@ one name and each gets them from the level it asks at: =nutrition= and
 | Sweet Pepper                         |                                |                                |                                |                                |                              |                              | Sweet Pepper                  | 04_047   |
 | Potato/Sweet Potato                  |                                |                                | Sweet Potato                   | Sweet Potato                   | Sweet Potato                 | Sweet Potato                 | Sweet Potato                  | 02_009   |
 | Taro                                 |                                |                                |                                |                                |                              |                              | Taro                          | 02_015   |
-| Tea                                  |                                |                                | Tea                            | Tea                            | Tea                          | Tea bags                     | Tea bag                       | 12_008   |
+| Tea                                  |                                |                                | Tea                            | Tea                            | Tea                          | Tea                          | Tea                           | 12_008   |
 | Tilapia                              |                                |                                |                                |                                |                              |                              | Tilapia                       | 09_041   |
 | Tobacco                              |                                |                                | Tobacco                        | Tobacco                        | Tobacco                      | Tobacco                      | Tobacco                       |          |
 | Tomato (fresh)                       | Tomato (fresh)                 | Tomato (fresh)                 | Tomato                         | Tomato                         | Tomato (fresh)               | Tomato (fresh)               | Tomato (fresh)                | 04_021   |

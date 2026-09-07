@@ -48,6 +48,22 @@ version = "0.0.0"
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
+[tool.poetry.group.viz]
+optional = true
+
+# Charts and maps (`lsms_library.visualizations`).  Optional because the
+# library's data path needs neither: both are imported lazily, and each
+# missing import raises with the pip command to fix it.
+#
+# matplotlib is ALSO listed under `test` below, where it predates this group.
+# Left there deliberately -- removing it would change what `--with test`
+# installs, and the duplication is harmless.  But note the consequence: a
+# plain `poetry install` gets neither, so `population_pyramid()` and
+# `coordinate_map()` are unavailable until `--with viz`.
+[tool.poetry.group.viz.dependencies]
+matplotlib = "^3.10.0"
+folium = ">=0.19"
+
 [tool.poetry.group.test.dependencies]
 pytest = "^8.0.0"
 pytest-xdist = "^3.6.0"

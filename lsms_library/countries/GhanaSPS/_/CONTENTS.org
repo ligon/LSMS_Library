@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 The Ghana Social Panel Survey (GhanaSPS) is one of two major surveys we have for Ghana, the other being the Ghana Living Standards Survey (Ghana LSS).
 We have tried to make it possible to compare food expenditures not only across rounds within one of these surveys, but also across surveys.  The main tool needed for harmonization is a set of consistent food labels.  Those consistent labels are the "Aggregate Labels" found in https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/.
@@ -1230,6 +1231,16 @@ convention and no passphrase exists in this repository.  Independently,
 permissions gate.  Consequence: wave 3 has *no usable crop price table and no
 usable unit-conversion table*.
 
+*Sidecars RETIRED 2026-09-07 (GH #750).*  The four =.dvc= files dated from
+the 2025-08-08 rearrangement and their blobs were never pushed: absent from
+the S3 remote (the =dvc-remote-reachability= CI sweep failed on exactly these
+four), absent from every local blob cache checked, and not in the public
+Dataverse release.  Even recovered from the machine that ran the
+rearrangement they would be Boxcryptor ciphertext with no key.  Dropped on the
+Togo precedent (=4f8483b4=), so the sweep can be green; the folder is gone
+from git.  If the plaintext ever turns up, add it under NEW sidecars and wire
+a wave-3 crop-price table -- this entry says what the library never had.
+
 ** =04o_cropsalesstoresservices= is NOT crop sales
 
 It is *agricultural services* -- tractor/plough hire and fertiliser/chemical
@@ -2047,3 +2058,37 @@ M200 labels are a copy-paste of the communal ones); =hiredhowpay= (Cash 1,733
 =whoworked= multi-select flags (redundant with which source rows carry
 person-days); 2009-10's A289 / A326 season months (=crop_production= already
 delivers the ending month as =harvest_month=).
+
+* household_roster -- Relationship vocabulary shared with GhanaLSS (GH #797, 2026-09-07)
+
+GSPS's three waves ship the same relationship categories under three
+spellings (=Household Head= / =Head=; =Adopted/Foster/Stepchild= / =Adopted,
+foster, or stepchild= / =Adopted, foster/stepchild=; three spellings of the
+parent/parent-in-law code; two of son/daughter-in-law).  A country-level
+=#+name: relationship= table in =_/categorical_mapping.org= (=| Original Label
+| Preferred Label |=, applied automatically at API time to the served
+=Relationship= column; the parquets keep the raw strings) maps them onto the
+ONE vocabulary GhanaLSS serves -- Head, Spouse, Child,
+Adopted/foster/stepchild, Child-in-law, Grandchild, Parent, Parent-in-law,
+Sibling, Sibling-in-law, Niece/nephew, Other relative, Non-relative, Servant,
+Tenant -- of which GSPS uses ten.  Decided with @ligon 2026-09-07 as a GHANA
+vocabulary, not a corpus one: surveys elsewhere understand relationships
+differently, so the harmonization target is per survey family.
+
+Tuples: every row is tuple-preserving except the adopted/foster/step code,
+whose shared label =Adopted/foster/stepchild= carries [-1, 0, null] (was
+[-1, 0, step]; adoptive / foster / step undetermined -- 617 people across the
+three waves).  The single parent/parent-in-law code is served as =Parent=
+with the same tuple as before; note that GSPS =Parent= therefore means a
+parent OR a parent-in-law (208 / 132 / 165 people).  =Househelp= is
+=Servant= ([0,0,servant]).
+A second column, =Comparable Label= (=labels={'Relationship': 'Comparable'}=),
+is the eight-category common denominator shared with GhanaLSS (the adopted
+code folds into =Child=, child-in-law into =Other relative=) for pooling
+across the two surveys and GLSS's waves.
+
+Cost: the country =_/categorical_mapping.org= is a hashed build input for
+EVERY GhanaSPS table, so this edit rebuilds the country once for everyone.
+Verified on a warm-then-rebuilt read 2026-09-07: 54,251 rows, ten labels, no
+"Unknown relationship labels" warning; the tuple change is confined to the
+617 adopted rows.

@@ -114,7 +114,9 @@ numeraire : str, optional
     target column of ``conversion_factors.org`` (e.g.
     ``'PPP-2017'``, ``'FX'``, ``'USD-real-2017'``).  Mutually
     exclusive with ``currency``.  Pre-reform redenomination
-    waves and missing factors yield ``NaN``.  See
+    waves convert on contemporaneous old-currency rows; a
+    country or date absent from the factor table, or a
+    blank cell, yields ``NA`` with a warning.  See
     :func:`lsms_library.conversion.convert`.
 ```
 
@@ -171,7 +173,9 @@ numeraire : str, optional
     target column of ``conversion_factors.org`` (e.g.
     ``'PPP-2017'``, ``'FX'``, ``'USD-real-2017'``).  Mutually
     exclusive with ``currency``.  Pre-reform redenomination
-    waves and missing factors yield ``NaN``.  See
+    waves convert on contemporaneous old-currency rows; a
+    country or date absent from the factor table, or a
+    blank cell, yields ``NA`` with a warning.  See
     :func:`lsms_library.conversion.convert`.
 ```
 

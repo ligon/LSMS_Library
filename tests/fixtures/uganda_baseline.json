@@ -980,7 +980,7 @@
     "columns": [
       "Earnings"
     ],
-    "content_hash": null,
+    "content_hash": "bfc2324ebbf322a519b8b4c6dd14b426a8c08ebb11ec6094d9f9c4b308b70e31",
     "dtypes": {
       "Earnings": "float64"
     },
@@ -1002,7 +1002,7 @@
       "revenue",
       "wagebill"
     ],
-    "content_hash": "1f03ec635b2d8c0b8312b5aecc0406b36e3981eb44c05210d4d5054c6cdd5638",
+    "content_hash": "db49477cdaa1666a966fe163a5d62c48ed895c9eeb7ef4453bae1cc921115421",
     "dtypes": {
       "losses": "float64",
       "materials": "float64",
@@ -1016,7 +1016,7 @@
       "i"
     ],
     "shape": [
-      78040,
+      13935,
       6
     ]
   },
@@ -1331,7 +1331,7 @@
     "columns": [
       "income"
     ],
-    "content_hash": null,
+    "content_hash": "960a7bedafa71fffa5af1fbff54223153764ddf9c54cf5ccba92255082865fbb",
     "dtypes": {
       "income": "float64"
     },
@@ -1339,7 +1339,10 @@
       "t",
       "i"
     ],
-    "shape": null
+    "shape": [
+      14740,
+      1
+    ]
   },
   "var/interview_date.parquet": {
     "columns": [

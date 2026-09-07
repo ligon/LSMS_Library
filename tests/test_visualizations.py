@@ -13,7 +13,17 @@ import pytest
 matplotlib = pytest.importorskip("matplotlib")
 matplotlib.use("Agg")
 
-from lsms_library.visualizations import PALETTE, population_pyramid  # noqa: E402
+from lsms_library.visualizations import (  # noqa: E402
+    PALETTE, coordinate_map, population_pyramid,
+)
+
+
+@pytest.fixture(autouse=True)
+def _close_figures():
+    """Close figures between tests; matplotlib keeps them open otherwise."""
+    yield
+    import matplotlib.pyplot as plt
+    plt.close("all")
 
 
 def _roster(n=400):
@@ -215,3 +225,123 @@ def test_ghost_rejects_a_bad_spec():
         population_pyramid(_roster(), weights=False, ghost=3.7)
     with pytest.raises(KeyError, match="ghost="):
         population_pyramid(_roster(), weights=False, ghost="nope")
+
+
+# --- coordinate_map --------------------------------------------------------
+
+def _geo(n=40, lat0=1.0, lon0=32.0):
+    """Cluster-shaped frame: one row per `v`, with coordinates and a weight."""
+    rows = [{"t": "2020", "v": f"c{k}",
+             "Latitude": lat0 + (k % 8) * 0.25,
+             "Longitude": lon0 + (k // 8) * 0.25,
+             "weight": 1.0 + (k % 5)} for k in range(n)]
+    return pd.DataFrame(rows)
+
+
+def test_static_map_plots_every_point():
+    ax = coordinate_map(_geo(), size="weight", interactive=False)
+    assert len(ax.collections[0].get_offsets()) == 40
+
+
+def test_marker_area_not_radius_is_proportional():
+    """A 4x weight must be a 4x AREA, i.e. a 2x radius -- not a 4x radius.
+
+    Radius-proportional symbols are the classic lie of this chart type: on
+    Uganda 2013-14 the cluster weights span 197x, which as radius would read
+    as ~38,000x by area.
+    """
+    from lsms_library.visualizations import _radius_by_area
+
+    r, n_floored = _radius_by_area([1.0, 4.0], r_max=10.0, r_floor=0.0)
+    assert r[1] == pytest.approx(10.0)
+    assert r[1] / r[0] == pytest.approx(2.0), "radius should go as sqrt(value)"
+    assert n_floored == 0
+
+
+def test_aspect_is_corrected_for_latitude():
+    """`equal` aspect is only right on the equator."""
+    import numpy as np
+
+    eq = coordinate_map(_geo(lat0=0.0), interactive=False)
+    far = coordinate_map(_geo(lat0=45.0), interactive=False)
+    assert eq.get_aspect() == pytest.approx(1.0, abs=0.02)
+    assert far.get_aspect() == pytest.approx(1 / np.cos(np.radians(45.9)), rel=0.05)
+    assert far.get_aspect() > eq.get_aspect()
+
+
+def test_rows_without_coordinates_are_counted_not_silently_dropped():
+    df = _geo(10)
+    df.loc[0:2, "Latitude"] = pd.NA
+    ax = coordinate_map(df, interactive=False)
+    assert len(ax.collections[0].get_offsets()) == 7
+    assert "7 points" in _all_text(ax)
+
+
+def test_missing_coordinate_column_raises():
+    with pytest.raises(KeyError, match="Latitude"):
+        coordinate_map(pd.DataFrame({"x": [1]}), interactive=False)
+
+
+def test_interactive_map_carries_a_basemap_and_markers():
+    """The interactive path is the real map: tiles give shapes and place names."""
+    folium = pytest.importorskip("folium")
+    m = coordinate_map(_geo(), size="weight")
+    html = m.get_root().render()
+    assert "tile.openstreetmap.org" in html, "no basemap tile layer"
+    assert "circlemarker" in html.lower()
+    assert "positions approximate" in html, "provenance caption missing"
+
+
+def test_interactive_without_folium_says_how_to_fix_it(monkeypatch):
+    import builtins
+    real = builtins.__import__
+
+    def no_folium(name, *a, **k):
+        if name == "folium":
+            raise ImportError("no folium")
+        return real(name, *a, **k)
+
+    monkeypatch.setattr(builtins, "__import__", no_folium)
+    with pytest.raises(ImportError, match="pip install folium"):
+        coordinate_map(_geo(), interactive=True)
+
+
+def test_the_size_floor_is_counted_and_disclosed():
+    """The floor breaks the proportionality the caption promises, so say so.
+
+    Measured on Uganda 2013-14: weights span 197x, and within a 14px budget
+    188 of 620 markers (30%) fall below the 2px floor, overstating their area
+    by up to 4x.  A caption reading "area proportional to weight" while that
+    is untrue for a third of the markers is exactly the quiet falsehood this
+    module exists to avoid.
+    """
+    from lsms_library.visualizations import _radius_by_area
+
+    _, n = _radius_by_area([1.0, 400.0], r_max=14.0, r_floor=2.0)
+    assert n == 1, "a 400x span must floor the small marker"
+
+    df = _geo(12)
+    df.loc[:5, "weight"] = 0.01
+    df.loc[6:, "weight"] = 100.0
+    ax = coordinate_map(df, size="weight", interactive=False)
+    assert "at the minimum size" in _all_text(ax)
+
+
+def test_log_scale_says_it_is_log_and_needs_no_floor():
+    from lsms_library.visualizations import _radius_by_area
+
+    _, n = _radius_by_area([1.0, 400.0], r_max=14.0, r_floor=2.0, scale="log")
+    assert n == 0, "log compresses enough that nothing needs flooring"
+
+    df = _geo(10)
+    ax = coordinate_map(df, size="weight", interactive=False, scale="log")
+    txt = _all_text(ax)
+    assert "log(weight)" in txt
+    assert "at the minimum size" not in txt
+
+
+def test_bad_scale_rejected():
+    from lsms_library.visualizations import _radius_by_area
+
+    with pytest.raises(ValueError, match="scale must be"):
+        _radius_by_area([1.0], scale="sqrt")
