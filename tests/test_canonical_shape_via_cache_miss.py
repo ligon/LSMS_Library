@@ -235,21 +235,13 @@ def test_canonical_shape_via_cache_miss(private_data_root, country, feature, ext
 # --------------------------------------------------------------------------
 # Panel consistency for GhanaLSS (PR #243 retains the existing GLSS1↔GLSS2
 # panel via the framework's id_walk).  Currently fails on
-# ``panel_ids_targets_exist`` and ``id_walk_idempotent`` -- those are
-# pre-existing diagnostic FAILs against the cached household_roster
-# (related to how the cache stores pre-id_walk values), not a regression
-# introduced by PR #243.  Marked xfail so the suite stays green while the
-# cache/diagnostic interaction is sorted out separately.
+# ``panel_ids_targets_exist`` and ``id_walk_idempotent`` used to FAIL against
+# the cached household_roster (GhanaLSS GLSS1<->GLSS2 panel, tracked under
+# #109) and this test carried an xfail for it.  As of 2026-09-07 (#713 weights,
+# #548 panel ids, #808 one builder for food_acquired) it passes on a cache
+# built through the framework path, so the marker is gone: a regression here
+# should fail loudly again.
 # --------------------------------------------------------------------------
-@pytest.mark.xfail(
-    reason=(
-        "Two pre-existing diagnostic FAILs (panel_ids_targets_exist, "
-        "id_walk_idempotent) on cached household_roster.parquet for "
-        "GhanaLSS GLSS1↔GLSS2 panel; not introduced by PR #243.  Tracked "
-        "separately under #109."
-    ),
-    strict=False,
-)
 def test_ghanalss_panel_consistency():
     report = check_panel_consistency(ll.Country("GhanaLSS"))
     if not report.ok:
