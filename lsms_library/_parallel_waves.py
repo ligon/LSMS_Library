@@ -281,6 +281,23 @@ def _warn_memory_override(requested: int, granted: int, cap: int, env: dict) -> 
         RuntimeWarning, stacklevel=3)
 
 
+def _in_daemonic_process() -> bool:
+    """True inside a daemonic child (a ``multiprocessing.Pool`` worker, or a
+    pre-3.9 ``ProcessPoolExecutor`` worker).  Such a process may not fork
+    children -- ``multiprocessing`` raises ``AssertionError: daemonic
+    processes are not allowed to have children`` -- so a build running there
+    stays serial.  Measured 2026-09-07: a corpus re-warm driven from a
+    ``Pool(8)`` failed 75 of 127 (country, table) builds on exactly that
+    assertion before this check existed.  ``concurrent.futures``' workers
+    are non-daemonic on 3.9+, so a build inside one of THOSE still fans
+    out (subject to the CPU / memory caps)."""
+    try:
+        import multiprocessing
+        return bool(multiprocessing.current_process().daemon)
+    except Exception:  # noqa: BLE001 -- be conservative: no pool if unsure
+        return True
+
+
 def build_workers(n_targets: int, env: dict | None = None) -> int:
     """How many worker processes a cold build with ``n_targets`` distinct
     build targets should use.
@@ -293,7 +310,8 @@ def build_workers(n_targets: int, env: dict | None = None) -> int:
     Whatever the source, the result never exceeds ``visible_cpus()`` (an
     override cannot oversubscribe the cgroup) nor ``n_targets`` (a worker with
     nothing to build is a wasted fork), is at least 1, and is 1 inside a
-    worker process (no nested pools).
+    worker process (no nested pools) or any daemonic process (which may
+    not fork at all -- see ``_in_daemonic_process``).
 
     The MEMORY guard (:func:`memory_worker_cap`) caps the default at
     ``visible_memory_bytes() // worker_memory_budget()``: a build that fits
@@ -301,7 +319,7 @@ def build_workers(n_targets: int, env: dict | None = None) -> int:
     ``LSMS_BUILD_WORKERS=N`` MAY exceed that cap -- the user asked -- and a
     ``RuntimeWarning`` says so once per process.
     """
-    if _IN_WORKER:
+    if _IN_WORKER or _in_daemonic_process():
         return 1
     env = os.environ if env is None else env
     n_targets = max(0, int(n_targets))

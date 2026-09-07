@@ -473,3 +473,49 @@ def test_parallel_waves_is_not_folded_into_any_build_fingerprint():
         f"{leaked}. Add the callable to _build_registry._EXCLUDED_CALLABLES.")
     for name in ("prebuild", "relay", "visible_cpus"):
         assert f"lsms_library._parallel_waves.{name}" in R._EXCLUDED_CALLABLES
+
+
+class TestDaemonicFallback:
+    """A build inside a daemonic process (a ``multiprocessing.Pool`` worker)
+    must stay serial: such a process cannot fork, and before this check the
+    pool raised ``AssertionError: daemonic processes are not allowed to have
+    children`` for every multi-target country (75 of 127 builds in a corpus
+    re-warm driven from ``Pool(8)``, 2026-09-07)."""
+
+    def test_daemonic_process_gets_one_worker(self, monkeypatch):
+        import multiprocessing
+        from lsms_library import _parallel_waves as pw
+        monkeypatch.setattr(pw, "_IN_WORKER", False)
+        monkeypatch.setattr(pw, "visible_cpus", lambda env=None: 16)
+        monkeypatch.setattr(pw, "memory_worker_cap", lambda env=None: None)
+        proc = multiprocessing.current_process()
+        monkeypatch.setattr(type(proc), "daemon", property(lambda self: True), raising=False)
+        assert pw._in_daemonic_process() is True
+        assert pw.build_workers(7, env={}) == 1
+        assert pw.prebuild(lambda w: (True, None), ["a", "b", "c"], None,
+                           country="X", table="t") is None
+
+    def test_non_daemonic_process_is_unaffected(self, monkeypatch):
+        import multiprocessing
+        from lsms_library import _parallel_waves as pw
+        monkeypatch.setattr(pw, "_IN_WORKER", False)
+        monkeypatch.setattr(pw, "visible_cpus", lambda env=None: 16)
+        monkeypatch.setattr(pw, "memory_worker_cap", lambda env=None: None)
+        proc = multiprocessing.current_process()
+        monkeypatch.setattr(type(proc), "daemon", property(lambda self: False), raising=False)
+        assert pw._in_daemonic_process() is False
+        assert pw.build_workers(7, env={}) == 7
+
+    def test_real_pool_worker_builds_serially(self):
+        """End to end: inside a real ``multiprocessing.Pool`` worker the pool
+        declines (returns None) instead of raising."""
+        import multiprocessing
+        with multiprocessing.get_context("fork").Pool(1) as pool:
+            daemon, workers = pool.apply(_daemon_probe, (0,))
+        assert daemon is True and workers == 1
+
+
+def _daemon_probe(_):
+    # Module-level so Pool.apply can pickle it.
+    from lsms_library import _parallel_waves as pw
+    return pw._in_daemonic_process(), pw.build_workers(7, env={})
