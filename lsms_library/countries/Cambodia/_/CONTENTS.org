@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 Cambodia LSMS+ survey coverage and status.
 
@@ -310,20 +311,6 @@ after a curly apostrophe in the source), and the missing period after "in the
 household" -- are *in the source* and are reproduced as printed.  The DDI PDF
 renders =fi=/=ff= as ligature codepoints; these are written as plain ASCII here.
 
-* Known issues
-- Makefile :: FIXED (2026-06-08).  The generic =%.parquet= rule
-  previously referenced =malawi.py= (copy-paste error from Malawi); it
-  now references =cambodia.py=.  =food_items.org= now exists (see below),
-  so that prerequisite resolves too.
-- =cambodia.py= :: Uses deprecated =from ligonlibrary.dataframes import from_dta=
-  and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
-- No =data_scheme.yml= :: Cambodia cannot be loaded via
-  =ll.Country('Cambodia')= because there is no data scheme definition.
-- No =categorical_mapping.org= :: No food-item label harmonization
-  exists.
-- No =food_items.org= :: Food item labels are not documented or
-  harmonized.
-
 * Files in Cambodia/_/
 ** DONE cambodia.py
 Country-level helper defining =age_sex_composition()=.  Called by
@@ -432,3 +419,16 @@ earnings), NOT shocks; =hh_sec_11/12= are education/health, not assets/credit.
 The only shock-adjacent content is per-member illness/injury in the health
 module (not a household shock-type × coping roster). `shocks` is therefore not
 implementable. Tracked in GitHub issue #352.
+
+- Makefile :: FIXED (2026-06-08).  The generic =%.parquet= rule
+  previously referenced =malawi.py= (copy-paste error from Malawi); it
+  now references =cambodia.py=.  =food_items.org= now exists (see below),
+  so that prerequisite resolves too.
+- =cambodia.py= :: Uses deprecated =from ligonlibrary.dataframes import from_dta=
+  and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
+- No =data_scheme.yml= :: Cambodia cannot be loaded via
+  =ll.Country('Cambodia')= because there is no data scheme definition.
+- No =categorical_mapping.org= :: No food-item label harmonization
+  exists.
+- No =food_items.org= :: Food item labels are not documented or
+  harmonized.

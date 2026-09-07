@@ -1,4 +1,5 @@
 #+TITLE: Côte d'Ivoire (CotedIvoire) — LSMS Library Notes
+#+TODO: TODO WAITING | DONE
 #+DATE: 2026-04-12
 
 * Survey Overview

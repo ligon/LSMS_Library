@@ -35,106 +35,21 @@ from lsms_library.coverage_matrix import (
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = REPO_ROOT / "bench" / "results"
-
-# Presentation only (the model is colour-agnostic).
-TIER_COLOR = {
-    "n/a":      "#e9ecef",
-    # `absent` is the LIVE QUEUE (an un-adjudicated gap), so it must not read as
-    # quietly settled.  The adjudicated tiers below are the settled ones.
-    "absent":   "#f1f3f5",
-    # Adjudicated-and-closed: dimmer than `absent`, because there is no work here.
-    "not-asked":             "#dee2e6",
-    # Adjudicated as an ACQUISITION problem (asked, but not in the shipped
-    # extract) -- a distinct colour, because it routes to a different queue
-    # entirely and should never be mistaken for either config work or a close.
-    "asked-not-distributed": "#c5b3e6",
-    # Data downloaded, zero config -- work not yet STARTED.  Must read as work,
-    # not as a quiet gap.
-    # WANTED but UNOBTAINABLE (the channel is broken).  Deliberately a live,
-    # visible colour: it must never read as "nothing to see here" -- that was
-    # exactly the mistake of grading Nepal `n/a`.
-    "blocked":               "#e8590c",
-    "unconfigured":          "#fd7e14",
-    # A configured country that never declared this feature (#724/#725):
-    # same "work not started" family as `unconfigured`, one shade lighter.
-    "undeclared":            "#ffa94d",
-    "declared": "#cfe2ff",
-    "dropped":  "#f5c2c7",
-    "broken":   "#dc3545",
-    "builds":   "#ffe08a",
-    "sane":     "#a3e635",
-    "blessed":  "#2f9e44",
-}
-TIER_GLYPH = {
-    "n/a": "·", "absent": "–", "declared": "?", "dropped": "✗!",
-    "broken": "✗", "builds": "⚠", "sane": "✓", "blessed": "★",
-    "not-asked": "∅", "asked-not-distributed": "⤓", "unconfigured": "⌀",
-    "blocked": "⛔", "undeclared": "⌀",
-}
-
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+# Presentation (colours, glyphs, families) and the grid/timeline renderers are
+# shared with the docs hook so the site and this readout cannot drift again
+# (they had: the hook knew 8 tiers, the ladder 13 -- GH #797, 2026-09-07).
+from docs_hooks.coverage_matrix import (  # noqa: E402
+    TIER_COLOR, TIER_GLYPH, render_fragment, render_timeline,
+)
 
 # ---------------------------------------------------------------------------
 # Roll-up grid
 # ---------------------------------------------------------------------------
-def _rollup_tier(tiers) -> str:
-    present = set(map(str, tiers))
-    for t in ROLLUP_PRIORITY:
-        if t in present:
-            return t
-    return "n/a"
-
-
-def _grid(df: pd.DataFrame):
-    """Return (text_grid, tier_grid) DataFrames indexed country × feature."""
-    text, tiers = {}, {}
-    for (c, f), g in df.groupby(["country", "feature"], observed=True):
-        counts = g["tier"].astype(str).value_counts()
-        roll = _rollup_tier(g["tier"].tolist())
-        summary = " ".join(
-            f"{TIER_GLYPH.get(t, t)}{int(counts[t])}"
-            for t in ROLLUP_PRIORITY if t in counts and int(counts[t]) > 0
-        )
-        text.setdefault(c, {})[f] = summary
-        tiers.setdefault(c, {})[f] = roll
-    text_df = pd.DataFrame(text).T.sort_index()
-    text_df = text_df.reindex(columns=sorted(text_df.columns)).fillna("")
-    tier_df = pd.DataFrame(tiers).T.reindex(index=text_df.index, columns=text_df.columns)
-    return text_df, tier_df
-
-
 # ---------------------------------------------------------------------------
 # HTML (hand-rolled; no jinja2 / Styler dependency)
 # ---------------------------------------------------------------------------
-def _legend_html() -> str:
-    items = "".join(
-        f'<span style="display:inline-block;padding:2px 8px;margin:2px;'
-        f'border-radius:3px;background:{TIER_COLOR[t]};">{TIER_GLYPH[t]} {_esc(t)}</span>'
-        for t in TIER_ORDER
-    )
-    return f'<div class="legend">{items}</div>'
-
-
-def _grid_table_html(text_df: pd.DataFrame, tier_df: pd.DataFrame) -> str:
-    cols = list(text_df.columns)
-    head = ('<tr><th class="rowhead">country \\ feature</th>'
-            + "".join(f"<th>{_esc(str(c))}</th>" for c in cols) + "</tr>")
-    body = []
-    for country in text_df.index:
-        cells = [f'<th class="rowhead">{_esc(str(country))}</th>']
-        for c in cols:
-            txt = text_df.at[country, c]
-            tier = tier_df.at[country, c]
-            if not txt or pd.isna(tier):
-                cells.append("<td></td>")
-                continue
-            color = TIER_COLOR.get(str(tier), "#fff")
-            cells.append(f'<td style="background:{color}" title="{_esc(str(tier))}">'
-                         f"{_esc(str(txt))}</td>")
-        body.append("<tr>" + "".join(cells) + "</tr>")
-    return (f'<table class="grid"><thead>{head}</thead>'
-            f"<tbody>{''.join(body)}</tbody></table>")
-
-
 def _detail_table_html(df: pd.DataFrame):
     """Per-cell detail — declared cells only (absent / n/a omitted)."""
     keep = df[~df["tier"].astype(str).isin(["absent", "n/a"])].copy()
@@ -168,40 +83,39 @@ def render_html(df: pd.DataFrame, path: Path, *, readiness=True) -> Path:
     """Render a self-contained HTML readout — pure string templating, no deps."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    text_df, tier_df = _grid(df)
-    grid_html = _grid_table_html(text_df, tier_df)
+    rows = df.astype(object).where(df.notna(), "").astype(str).to_dict("records")
+    for r in rows:                      # the renderer reads the CSV's column names
+        r.setdefault("detail", "")
+    fragment = render_fragment(rows)
+    timeline = render_timeline(rows)
     detail_html, n_detail = _detail_table_html(df)
 
     n_cells = len(df)
     counts = df["tier"].astype(str).value_counts().reindex(TIER_ORDER, fill_value=0)
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    summary_row = " · ".join(f"{t}: {int(counts[t])}" for t in TIER_ORDER)
+    summary_row = " · ".join(f"{t}: {int(counts[t])}" for t in TIER_ORDER if int(counts[t]))
     mode = "coverage + readiness" if readiness else "coverage only (no builds)"
 
     html = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <title>LSMS coverage matrix</title>
 <style>
- body {{ font-family: -apple-system, Segoe UI, Roboto, sans-serif; margin: 1.5rem; color:#212529; }}
+ body {{ font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 1.5rem; }}
  h1 {{ font-size: 1.3rem; }} h2 {{ font-size: 1.05rem; margin-top: 1.6rem; }}
- .meta {{ color:#666; font-size: 12px; }}
- .legend span {{ font-size: 12px; }}
- table {{ border-collapse: collapse; font-size: 11px; }}
- td, th {{ border: 1px solid #dee2e6; padding: 2px 6px; }}
- table.grid td {{ text-align: center; white-space: nowrap; }}
- table.grid th {{ position: sticky; top: 0; background: #fff; }}
- th.rowhead {{ text-align: left; background: #f8f9fa; position: sticky; left: 0; }}
+ .meta {{ opacity:.75; font-size: 12px; }}
+ table.detail {{ border-collapse: collapse; font-size: 11px; }}
+ table.detail td, table.detail th {{ border: 1px solid #dee2e6; padding: 2px 6px; }}
  .grid-wrap {{ overflow-x: auto; max-width: 100%; }}
 </style></head><body>
 <h1>LSMS Library — country × feature × wave readiness</h1>
 <p class="meta">Generated {stamp} · mode: {mode} · {n_cells} cells.
  Tier counts — {summary_row}.<br>
  Source: <code>bench/matrix.py</code> · snapshot <code>.coder/coverage/latest.csv</code>.
- Roll-up cells show worst-first glyph counts over a country's waves; see the
- detail table for per-wave tiers.</p>
-{_legend_html()}
-<h2>Roll-up grid</h2>
-<div class="grid-wrap">{grid_html}</div>
+ The same renderer draws the docs site (<code>docs_hooks/coverage_matrix.py</code>).</p>
+<h2>Survey timeline</h2>
+{timeline}
+<h2>Feature matrix</h2>
+{fragment}
 <h2>Per-cell detail ({n_detail} declared cells; absent/n-a omitted)</h2>
 <div class="grid-wrap">{detail_html}</div>
 </body></html>

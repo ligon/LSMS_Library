@@ -66,6 +66,25 @@ def creds_at(tmp_path, monkeypatch):
     return _point
 
 
+def _stub_dvcfs(access_key_id):
+    """Stand in for the module-level ``DVCFS`` singleton.
+
+    Only the config lookup `refresh_s3_credentials` performs is modelled:
+    ``DVCFS.repo.config["remote"]["ligonresearch_s3"]["access_key_id"]``.
+    """
+    remote = {"ligonresearch_s3": {}}
+    if access_key_id:
+        remote["ligonresearch_s3"]["access_key_id"] = access_key_id
+
+    class _Repo:
+        config = {"remote": remote}
+
+    class _FS:
+        repo = _Repo()
+
+    return _FS()
+
+
 class TestExplicitCredentials:
 
     def test_parses_a_well_formed_file(self, creds_at):
@@ -112,9 +131,35 @@ class TestRemoteConfig:
         # credentialpath is retained as the no-credentials-file fallback
         assert "credentialpath" in rc
 
-    def test_refresh_is_a_noop_once_explicit(self, creds_at):
+    def test_refresh_is_a_noop_once_explicit(self, creds_at, monkeypatch):
+        """Already built with explicit credentials -> do not rebuild.
+
+        The precondition must be ARRANGED, not inherited.  `DVCFS` is a
+        module-level singleton built at import time, so on a developer
+        machine that has credentials it already carries an
+        `access_key_id` and this returns False for free -- while on a bare
+        CI runner it does not, the call falls through to the rebuild, and
+        the test fails.  It passed locally and failed in CI for exactly
+        that reason.
+        """
         creds_at()
+        monkeypatch.setattr(local_tools, "DVCFS", _stub_dvcfs("AKIAEXAMPLE"))
         assert local_tools.refresh_s3_credentials() is False
+
+    def test_refresh_rebuilds_when_the_singleton_predates_the_credentials(
+            self, creds_at, monkeypatch):
+        """The branch the docstring exists for, previously untested.
+
+        `local_tools` is imported before `__init__` runs the auto-unlock
+        that writes the credentials, so on a first-ever import the
+        singleton is built without them and must be rebuilt once they
+        appear.
+        """
+        creds_at()
+        monkeypatch.setattr(local_tools, "DVCFS", _stub_dvcfs(None))
+        monkeypatch.setattr(local_tools, "_build_dvcfs", lambda: "REBUILT")
+        assert local_tools.refresh_s3_credentials() is True
+        assert local_tools.DVCFS == "REBUILT"
 
     def test_refresh_declines_when_there_is_nothing_to_apply(self, creds_at):
         creds_at(write=False)

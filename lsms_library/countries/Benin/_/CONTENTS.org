@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Overview
 
@@ -337,7 +338,7 @@ individual_education, food_acquired, assets, housing,
 interview_date, shocks, food_expenditures, food_prices,
 food_quantities.)
 
-* Data Quality Notes
+* Known data issues
 
 ** Grain: the three ways Benin's declared indexes go non-unique (GH #323)
 
@@ -462,6 +463,31 @@ History: prior to the 2026-04-12 cleanup (commit =9d677f25=),
 but every row was =NaN=, breaking the cross-country
 =test_no_fully_null_columns[Benin/shocks]= sanity test.  The fix
 removed the column from both the scheme and the extractor.
+
+** household_roster 2018-19: =Frere, soeur= read with a C1 control byte (GH #801)
+
+=s01_me_ben2018.dta= is Stata format 115 with no declared encoding, and its
+value-label bytes are Windows-1252: code 7 of =s01q02= is stored as
+=Fr\xe8re, s\x9cur= (0x9C is the oe ligature in cp1252).  =get_dataframe=
+reads the file through pandas =StataReader=, which decodes every pre-118
+file as Latin-1, so 0x9C came back as the C1 control U+009C and the wave
+served =Frere, s<U+009C>ur= (895 rows).  pyreadstat's default, or
+=encoding='cp1252'=, reads the same file correctly -- the defect is the
+reader's Latin-1 fallback, not the file (bytes and decoder matrix in
+=slurm_logs/gh797/fix_801/REPORT.org=, measured 2026-09-07).
+
+Fix (2026-09-07): =2018-19/_/mapping.py::_decode_cp1252= re-encodes the label as Latin-1 and decodes it
+as cp1252; the =household_roster= hook applies it to =Relationship=
+only.  Served label is now =Frere, soeur= with the ligature restored,
+the file's own casing (Benin runs no =Relationship= formatter), as CotedIvoire / Burkina Faso 2018-19 serve it; kinship tuple [0, 1, consanguineal] unchanged; 895 rows changed,
+nothing else.  The C1-control spellings were deleted from
+=lsms_library/categorical_mapping/kinship.yml= at the same time, so that
+file no longer carries the artefact and a regression would surface as an
+=Unknown relationship labels= warning instead of resolving silently.
+
+Same defect and same fix in Niger 2018-19, Senegal 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
+roster files).  See GH #801 and the #797 vocabulary sweep
+(=slurm_logs/gh797/vocab_sweep/REPORT.org= section 2.4).
 
 * Household Presence / MonthsSpent
 

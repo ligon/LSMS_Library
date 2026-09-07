@@ -5,11 +5,21 @@ The library tracks data coverage and downstream-readiness as a ragged
 source" through "builds with warnings" to "sanity-clean" — so you can answer two
 questions at a glance:
 
-- **Where is work still needed?** (the red/amber cells)
-- **Which cells are safe to feed into downstream analysis?** (`sane` / `blessed`)
+- **Where is work still needed?** (the red, amber and magenta cells)
+- **Which cells are safe to feed into downstream analysis?** (the greens: `sane` / `blessed`)
 
-The grid below is rendered from the committed snapshot
-(`.coder/coverage/latest.csv`); it reflects the last time the matrix was built.
+Both views below are rendered from the committed snapshot
+(`.coder/coverage/latest.csv`); they reflect the last time the matrix was built.
+
+## Survey timeline
+
+One bar per survey wave, years across, countries down. **Thickness** is how
+many features the library grades for that wave; **colour** is the share of
+those that are `sane`/`blessed`, on one green ramp. An outlined bar is a wave
+we know about with nothing graded yet; a dashed outline is a country whose data
+channel is blocked or unconfigured. Hover a bar for the counts.
+
+<!-- COVERAGE_TIMELINE -->
 
 ## The tier ladder
 
@@ -323,5 +333,13 @@ ll.coverage(refresh="readiness")    # recompute the full cube in-process (heavy)
 See the [Coverage API reference](../api/coverage.md) for details.
 
 ## Status snapshot
+
+Each cell of the grid is a **strip of one segment per wave** (oldest to newest);
+the segment's colour is that wave's tier. Colour carries the state -- there is
+no text in the cells -- so read it with the legend: greens are safe, amber
+builds with a failing check, reds are defects, magenta is work not started,
+blues are acquisition problems, greys are gaps (light = the live `absent`
+queue, blue-grey = adjudicated `not-asked`). Hover a cell for the wave-by-wave
+reading; the table view underneath is the same data as text.
 
 <!-- COVERAGE_MATRIX -->

@@ -1,0 +1,163 @@
+lib: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/__init__.py
+=== Sat Sep  5 08:46:52 PDT 2026 node=n0061.savio3 HEAD=a1130763 ===
+
+############## PHASE before ##############
+countries_root: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries
+data_root     : /global/scratch/fsa/fc_jevons/ligon/tmp/782-verify/data-before
+  _emit_null_read_report(report)
+  _emit_null_read_report(report)
+[before] food_acquired rows=5,259,344  (24s)
+[before] distinct j = 304
+[before] per wave:
+[before]   1987-88: rows=   71,605 distinct_j=  58 lowercase_rows=      0 distinct_lowercase=  0
+[before]   1988-89: rows=   72,649 distinct_j=  58 lowercase_rows=      0 distinct_lowercase=  0
+[before]   1991-92: rows=  623,600 distinct_j= 117 lowercase_rows=      0 distinct_lowercase=  0
+[before]   1998-99: rows=  542,105 distinct_j= 112 lowercase_rows=      0 distinct_lowercase=  0
+[before]   2005-06: rows=1,115,420 distinct_j= 165 lowercase_rows=149,047 distinct_lowercase= 63
+[before]   2012-13: rows=1,709,094 distinct_j= 114 lowercase_rows=      0 distinct_lowercase=  0
+[before]   2016-17: rows=1,124,871 distinct_j= 179 lowercase_rows=      0 distinct_lowercase=  0
+[before] COLLISION GROUPS = 35   rows = 1,468,238 (27.9%)
+[before]    ['Bambara Bean', 'bambara beans']
+[before]    ['Banana', 'bananas']
+[before]    ['Beef', 'beef']
+[before]    ['Carrot', 'carrots']
+[before]    ['Chicken', 'chicken']
+[before]    ['Coconut', 'coconut']
+[before]    ['Cocoyam', 'cocoyam']
+[before]    ['Condiment', 'Condiments']
+[before]    ['Cowpea', 'cowpeas']
+[before]    ['Egg', 'Eggs', 'eggs']
+[before]    ['Goat', 'goat']
+[before]    ['Maize (flour/dough)', 'maize-flour/dough']
+[before]    ['Milk (fresh)', 'milk (fresh)']
+[before]    ['Millet (flour)', 'millet flour']
+[before]    ['Mutton', 'mutton']
+[before]    ['Onion', 'onions']
+[before]    ['Other Beverage', 'Other Beverages']
+[before]    ['Other Domestic Poultry', 'other domestic poultry']
+[before]    ['Other Flour', 'Other Flours', 'other flours']
+[before]    ['Other Fruits', 'other fruits']
+[before]    ['Other Grain', 'Other Grains', 'other grains']
+[before]    ['Other Leafy Vegetable', 'other leafy vegetables']
+[before]    ['Other Nut/Seed', 'other nuts/seeds']
+[before]    ['Other Oils', 'other oil']
+[before]    ['Other Vegetable', 'Other Vegetables', 'other vegetables']
+[before]    ['Palm Nut', 'palm nuts']
+[before]    ['Pawpaw', 'pawpaw']
+[before]    ['Pepper', 'pepper']
+[before]    ['Pineapple', 'pineapples']
+[before]    ['Plantain', 'plantain']
+[before]    ['Pork', 'pork']
+[before]    ['Shea Butter', 'shea butter']
+[before]    ['Snail', 'snail']
+[before]    ['Tea bag', 'Tea bags']
+[before]    ['Yam', 'yam']
+  _emit_null_read_report(report)
+[before] food_expenditures: rows=1,396,544 (23s)
+  _emit_null_read_report(report)
+[before] food_quantities: rows=1,611,047 (35s)
+  _emit_null_read_report(report)
+[before] food_prices: rows=1,505,751 (28s)
+[before] community_prices: rows=660,168 distinct_j=666 rows_with_j_on_food_axis=409,826 (62.1%)  (45s)
+  _emit_null_read_report(report)
+  _emit_null_read_report(report)
+nutrition: dropped 3638216 of 5259344 food_acquired rows whose unit is non-physical ['all', 'none', 'value'] -- see this module's docstring
+[before] NUTRITION coverage: 88.26% of mass (1,509,649/1,710,361)
+[before]    unmapped 'Oil (vegetable)'                  69,025
+[before]    unmapped 'maize-flour/dough'                19,951
+[before]    unmapped 'Sugar Bread'                      15,701
+[before]    unmapped 'pepper'                           11,711
+[before]    unmapped 'okro'                             8,341
+[before]    unmapped 'cassava-tubers'                   7,549
+[before]    unmapped 'groundnuts(roasted or raw)'       6,018
+[before]    unmapped 'maize-cob (fresh)'                5,974
+  _emit_null_read_report(report)
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/feature.py:300: UserWarning: food_acquired: dropping extra index level(s) ['visit'] from GhanaLSS before cross-country concat
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/country.py:5187: GrainCollapseWarning: GhanaLSS/food_acquired: declared index (t, v, i, j, u, s, currency) is NOT UNIQUE. Additionally 13,472 row(s) carry NaN in a declared index level and are DELETED OUTRIGHT by the collapse (groupby dropna). Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN or an index LEVEL IS MISSING -- fix the index (source a real id, or declare the level the survey actually varies over). Do NOT declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323.
+  _emit_grain_report(report)
+[before] Feature(food_acquired)([GhanaLSS]): rows=1,693,477 levels=['country', 't', 'v', 'i', 'j', 'u', 's', 'currency'] (495s)
+--- before rc=0 ---
+
+############## PHASE after ##############
+countries_root: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/countries
+data_root     : /global/scratch/fsa/fc_jevons/ligon/tmp/782-verify/data-after
+  _emit_null_read_report(report)
+  _emit_null_read_report(report)
+[after] food_acquired rows=5,259,320  (195s)
+[after] distinct j = 233
+[after] per wave:
+[after]   1987-88: rows=   71,605 distinct_j=  58 lowercase_rows=      0 distinct_lowercase=  0
+[after]   1988-89: rows=   72,649 distinct_j=  58 lowercase_rows=      0 distinct_lowercase=  0
+[after]   1991-92: rows=  623,600 distinct_j= 117 lowercase_rows=      0 distinct_lowercase=  0
+[after]   1998-99: rows=  542,105 distinct_j= 112 lowercase_rows=      0 distinct_lowercase=  0
+[after]   2005-06: rows=1,115,396 distinct_j= 114 lowercase_rows=      0 distinct_lowercase=  0
+[after]   2012-13: rows=1,709,094 distinct_j= 114 lowercase_rows=      0 distinct_lowercase=  0
+[after]   2016-17: rows=1,124,871 distinct_j= 179 lowercase_rows=      0 distinct_lowercase=  0
+[after] COLLISION GROUPS = 0   rows = 0 (0.0%)
+  _emit_null_read_report(report)
+[after] food_expenditures: rows=1,396,544 (24s)
+  _emit_null_read_report(report)
+[after] food_quantities: rows=1,611,022 (35s)
+  _emit_null_read_report(report)
+[after] food_prices: rows=1,505,751 (29s)
+[after] community_prices: rows=660,168 distinct_j=662 rows_with_j_on_food_axis=409,826 (62.1%)  (51s)
+  _emit_null_read_report(report)
+  _emit_null_read_report(report)
+nutrition: dropped 3638203 of 5259320 food_acquired rows whose unit is non-physical ['all', 'none', 'value'] -- see this module's docstring
+[after] NUTRITION coverage: 94.71% of mass (1,619,862/1,710,361)
+[after]    unmapped 'Oil (vegetable)'                  69,025
+[after]    unmapped 'Sugar Bread'                      15,701
+[after]    unmapped 'Cigarette'                        2,737
+[after]    unmapped 'Chewing Gum'                      2,014
+[after]    unmapped 'Tobacco'                          686
+[after]    unmapped 'Other Tobacco'                    335
+  _emit_null_read_report(report)
+  _emit_null_read_report(report)
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/feature.py:300: UserWarning: food_acquired: dropping extra index level(s) ['visit'] from GhanaLSS before cross-country concat
+  warnings.warn(
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/country.py:5187: GrainCollapseWarning: GhanaLSS/food_acquired: declared index (t, v, i, j, u, s, currency) is NOT UNIQUE. Additionally 13,472 row(s) carry NaN in a declared index level and are DELETED OUTRIGHT by the collapse (groupby dropna). Duplicates on a declared index almost always mean the IDENTIFIER IS BROKEN or an index LEVEL IS MISSING -- fix the index (source a real id, or declare the level the survey actually varies over). Do NOT declare a reducer: the core does not aggregate (SkunkWorks/grain_aggregation_policy.org). Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #323.
+  _emit_grain_report(report)
+[after] Feature(food_acquired)([GhanaLSS]): rows=1,693,452 levels=['country', 't', 'v', 'i', 'j', 'u', 's', 'currency'] (500s)
+--- after rc=0 ---
+
+############## DATA-GATED GUARD ##############
+.........................                                                [100%]
+=============================== warnings summary ===============================
+tests/test_ghanalss_food_label_canonical.py::TestDelivered::test_delivered_j_is_on_the_wave_food_axis
+  /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_ghanalss_food_label_canonical.py::TestDelivered::test_delivered_j_is_on_the_wave_food_axis
+  /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/food_acquired: required declared column 'Price' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+25 passed, 2 warnings in 33.59s
+
+############## EXISTING TESTS ##############
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 64%]
+........................................................................ [ 85%]
+ssss............................................                         [100%]
+=============================== warnings summary ===============================
+tests/test_ghanalss_community_prices.py::test_v_joins_sample_v
+tests/test_ghanalss_nutrition.py::test_grain_is_household_wave
+tests/test_ghanalss_nutrition.py::test_fct_coverage_of_mass
+  /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/sample: required declared column 'strata' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+tests/test_ghanalss_nutrition.py::test_energy_not_absurd
+tests/test_ghanalss_nutrition.py::test_energy_2016_17_measured
+  /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/tests/test_ghanalss_nutrition.py:77: UserWarning: household_characteristics: replaced 84 roster rows with NaN in one of ['t', 'v', 'i'] (typically v) by sentinel 'Mover' -- per-wave: {'1987-88': 9, '1988-89': 1, '1991-92': 74}.  These are usually movers / split-offs whose sample() row lacks a cluster code.  Filter on index.get_level_values('v') == 'Mover' to recover the legacy drop (GH #197, GH #268).
+    hc = c.household_characteristics()
+
+tests/test_ghanalss_nutrition.py::test_fct_coverage_of_mass
+  /global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/null_read_audit.py:375: NullReadWarning: GhanaLSS/food_acquired: required declared column 'Price' is 100% NULL in wave(s) [1987-88, 1988-89] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaLSS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.
+    _emit_null_read_report(report)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+332 passed, 4 skipped, 6 warnings in 222.52s (0:03:42)
+=== DONE Sat Sep  5 09:17:11 PDT 2026 ===

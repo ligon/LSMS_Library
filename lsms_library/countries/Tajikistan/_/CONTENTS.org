@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Sampling universe, exclusions and sub-samples
 
@@ -418,3 +419,125 @@ module: 1999 =SSEC2= (=s2aq*= walls/roof/floor/rooms/tenure/water/toilet),
 only — physical-structure block dropped), 2003 =module6= (structure;
 labels stripped in the repo =.dta=).  Data present in-repo; =housing= is
 simply not yet wired (full for 1999/2007, partial 2009).  Not an absence.
+
+* household_roster -- relationship codes, and the 2003 shift (GH #800, #797)
+
+Per-wave scheme for =Relationship=.  The decode for every wave is the inline
+=mapping:= dict under =household_roster.myvars.Relationship= in that wave's
+=_/data_info.yml=; no wave uses a script or =categorical_mapping.org= for it,
+and =kinship.yml= then turns the served label into
+=Generation=/=Distance=/=Affinity=.
+
+| wave | source file / variable      | codes | value labels in the .dta   | dict keys                  |
+|------+-----------------------------+-------+----------------------------+----------------------------|
+| 1999 | =Data/SSEC1.DTA= / =s1q3=   | 1-14  | none (codes only)          | numeric (=1.0= ... =14.0=) |
+| 2003 | =Data/module1.dta= / =m1q4= | 1-12  | Russian, cp1251            | cp1251-as-latin-1 mojibake |
+| 2007 | =Data/r1m1.dta= / =m1q5=    | 1-12  | English, lower case        | the English labels         |
+| 2009 | =Data/m1.dta= / =M1Q5=      | 1-12  | English, UPPER CASE        | the English labels         |
+
+Code order in each wave's OWN questionnaire, verified positionally with
+pdfminer (digit and label on the same baseline, not the sequential text
+extract -- see the Marital trap below):
+
+- 1999 (=1999/Documentation/HH012007-00.pdf= p. 6, Section 1 col. 3):
+  1 head, 2 spouse, 3 son/daughter, 4 son/daughter-in-law, 5 father/mother,
+  6 father/mother of the head's wife, 7 father/mother of the head's husband,
+  8 brother/sister, 9 grandchild, 10 grandparent, 11 other relative,
+  12 no relation, 13 lodger, 14 other (the dict maps 14 -> lodger and has no 13: GH #804, gated on the 1999 BID codebook).  A 14-code scheme with the two
+  parent-in-law sides SEPARATE.
+- 2003 (=2003/Documentation/taj03hhq.pdf= p. 7, Module 1 Q4): 1 head,
+  2 spouse/partner, 3 son/daughter, 4 son/daughter-in-law, 5 father/mother,
+  6 father/mother-in-law, 7 sister/brother, 8 grandchild, 9 grandparent,
+  10 niece/nephew, 11 other relative, 12 not related.  A 12-code scheme:
+  the parent-in-law sides are MERGED at 6 and niece/nephew is NEW at 10.
+- 2007 (=2007/Documentation/TLSS07HHQE.pdf= p. 5, Module 1 Q5) and 2009
+  (=2009/Documentation/TJ_Pan_09_V11.pdf= p. 4, Module 1 Q4): the same
+  12-code list as 2003, in the same order.
+
+The cp1251 labels in 2003's =module1.dta= decode
+(=key.encode('latin-1').decode('cp1251')=) to, in code order (romanised):
+Glava domokhozyaystva, Suprug(a)/partner, Syn/doch, Zyat/nevesta, Otets/mat,
+Roditeli muzha/zheny, Sestra/brat, Vnuk(chka), Dedushka(babushka),
+Plemyannitsa/plemyannik, Drugie rodstvenniki, Ne rodstvenniki -- the
+questionnaire order exactly.  Code 6 is "parents of husband/wife", i.e. the
+in-laws on EITHER side.
+
+** The 2003 shift (GH #800)
+
+From commit =974253a1= (2025-11-20) until the fix, the 2003 dict was written
+against 1999's TARGET list: it put "father/mother of husband" and
+"father/mother of wife" on the two consecutive keys at codes 6 and 7, and
+every later label moved up one slot.  Code 7 (sister/brother) was served as a
+parent-in-law, 8 (grandchild) as brother/sister, 9 (grandparent) as
+grandchild, 10 (niece/nephew) as grandparent.  4,047 of 26,141 people (15.5%)
+carried the wrong =Relationship= and therefore the wrong
+=Generation=/=Distance=/=Affinity=; the cell graded =sane= because every label
+resolved in =kinship.yml= and no column was null.  The tell was the shares:
+served grandchild 0.07% in 2003 against 14.7% / 15.1% / 17.9% in 1999 / 2007 /
+2009, served sibling 13.4% against about 1% everywhere else.  Found by the
+corpus-wide vocabulary sweep for GH #797 (same defect class as GhanaLSS
+1991-92, GH #799: a sibling wave's code list applied to this wave).
+
+Fix: relabel the VALUE side of the 2003 dict (keys untouched) to the
+2007/2009 vocabulary: 6 father/mother-in-law, 7 sister/brother, 8 grandchild,
+9 grandparent, 10 niece/nephew; and, label-only, 11 other relative (was
+"other relatives") and 12 not related (was "no relation"), so the three
+12-code waves speak one vocabulary.  Every label already resolves in
+=kinship.yml= (it is what 2007/2009 serve); no tuple was added or changed.
+
+Cold verification (private =LSMS_DATA_DIR=; before = the pre-fix wave
+parquet; aligned row-for-row on =(t, i, pid)=, 26,141 matched, 0 unmatched):
+
+| before -> after                                  |      n | change                            |
+|--------------------------------------------------+--------+-----------------------------------|
+| brother/sister -> grandchild                     |  3,495 | (0,1,consang.) -> (-2,0,consang.) |
+| father/mother of wife -> sister/brother          |    312 | (1,0,affinal) -> (0,1,consang.)   |
+| grandparent -> niece/nephew                      |    222 | (2,0,consang.) -> (-1,1,consang.) |
+| grandchild -> grandparent                        |     18 | (-2,0,consang.) -> (2,0,consang.) |
+| other relatives -> other relative                |     51 | label only                        |
+| father/mother of husband -> father/mother-in-law |     15 | label only                        |
+| no relation -> not related                       |      7 | label only                        |
+| unchanged                                        | 22,021 |                                   |
+
+4,047 rows change meaning, 73 change label only; 1999/2007/2009 are unchanged
+in content (0 mismatches, null-aware); 0 NA in
+=Relationship=/=Generation=/=Distance=/=Affinity= for 2003 (the 6 NA in 1999
+are the file's own 6 missing codes); no "Unknown relationship labels"
+warning.  The =household_roster= cache hash moves (=911ef5b5...= ->
+=e9c99990...=; only the 2003 per-wave hash changes), so warm caches rebuild
+rather than mask the fix.  Consumers who filtered on "no relation" or "other
+relatives" for 2003 must use "not related" / "other relative" now.
+
+** Verdicts on the other waves (checked while fixing 2003)
+
+- 2007 and 2009: verified clean.  The .dta value labels are English and the
+  dicts are identity maps; the questionnaires list the same 12 labels in the
+  same order, and the digit column (x = 378 pt in 2007, 306 pt in 2003)
+  pairs with each label's baseline one for one.
+- 1999: DEFECT FOUND, NOT FIXED here.  The questionnaire prints
+  =No relation 12 / Lodger 13 / Other 14=; the data carry code 14 (n = 13)
+  and never 13; the dict maps =14.0: lodger= (tuple =[0, 0, guest]=) where
+  the questionnaire says 14 = Other (=kinship.yml= "Other" = =[0, 0,
+  unrelated]=).  Thirteen people (0.09%).  Left alone because the file ships
+  no value labels, the gap at 13 could be a skipped code or a data-entry
+  recode, and the document that would settle it (the 1999 Basic Information
+  Document, WB catalog 279) is not in the repo.  Needs its own issue.
+- 2003 =Marital= (=m1q5=): verified clean.  The SEQUENTIAL pdfminer text of
+  =taj03hhq.pdf= looks as if codes 3 and 4 were swapped, because it
+  interleaves the relationship and marital columns; positionally,
+  3 = DIVORCED/SEPARATED (y = 374.6) and 4 = LIVING TOGETHER (y = 355.0),
+  which is what the dict says.  Anyone re-checking must align on baselines.
+
+** Encoding note -- the mojibake keys are deliberate
+
+2003's =module1.dta= carries cp1251 value labels; =get_dataframe= yields them
+as latin-1 mojibake and the dict keys are that mojibake, byte-for-byte.
+Value labels are present per FILE in 2003, not per wave: =module1.dta= has
+them (=m1q2= Sex, =m1q4= Relationship) while =m1q5= (Marital) is numeric with
+none, and the housing note above records =module6.dta= as stripped.  1999
+ships codes only in every roster variable.  Reading the file with
+=get_dataframe(..., encoding='cp1251')= does NOT recover the Cyrillic:
+=ligonlibrary.dataframes._coerce_label= re-encodes the already-decoded string
+with =errors='ignore'= and strips it to punctuation, whereas
+=pyreadstat.read_dta(blob, encoding='cp1251')= decodes correctly.  Do not
+"fix" the keys without fixing that reader first.
