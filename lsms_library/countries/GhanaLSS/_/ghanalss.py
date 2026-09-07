@@ -304,6 +304,9 @@ def household_characteristics(fn='',sex='',age='',HHID='HHID',months_spent='mont
     return df
 
 
+# GH #808: the `_%d` (0-first) suffix convention below is RETIRED for
+# food_acquired -- the framework's updated_ids (panel_ids.py, bare-first) is
+# the single source of panel ids there.  Still used by _/household_roster.py.
 def change_id(x,fn=None,id0=None,id1=None,transform_id1=None):
     """Replace instances of id0 with id1.
 
