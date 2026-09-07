@@ -1273,7 +1273,7 @@ return *nothing*.  That is the intended, correct answer, and it is a
 deliberate replacement for a worse one.
 
 *What it returned before, and why that was worse.*  1,505,751 rows over
-seven waves -- of which 1,067,978 (the six waves above) all carried the
+seven waves -- of which 1,066,978 (the six waves above) all carried the
 *same number*, =2.035038=, for every item, household and year.  Within-wave
 =std= was exactly =0.0= in six of seven waves.  =2.035038 = 1/0.49139133=,
 the reciprocal of a fabricated kg-per-cedi factor:
@@ -1305,9 +1305,22 @@ for exactly the same reason.
 *exactly* the =value= key -- 57 -> 56 factors, with every remaining key
 byte-identical (measured).  =unitvalue=, =unitprice= and
 =food_quantities(units='units')= are unchanged (delta 0 rows).
-=food_prices(units='kgprice')= is unchanged *here* (136,387 rows both ways)
+=food_prices(units='kgprice')= is unchanged *here* (136,383 rows both ways)
 only because GhanaLSS's =Value= rows carry a reported =Price= 0.0% of the
 time; Panama's carry one 97.4% of the time and it loses 17,366 rows there.
+
+*Re-derived cold, 2026-09-07* (private =LSMS_DATA_DIR=, no wave parquet
+reused -- GH #803 -- on this branch merged with =development= @ 96e051c5,
+i.e. after GH #785 canonicalised =food_acquired.j=; the cold table is
+5,259,320 rows).  Every figure in this entry reproduces except two: the
+=kgprice= count is *136,383* both ways (was 136,387; #785's relabel
+collapses four more rows on =j=), and the six-wave total above was an
+arithmetic slip -- 1,505,751 - 438,773 = *1,066,978*, not 1,067,978.  The
+all-wave =unitprice= (187,699 -> 187,674) and =food_quantities(units='units')=
+(1,683,305 -> 1,683,280) counts pinned in
+=tests/test_currency_denominated_units.py= moved by -25 each for the same
+reason; this fix still changes neither (delta 0, measured by emptying
+=_CURRENCY_DENOMINATED_UNITS= in-process on the identical frame).
 
 *2016-17 is NOT untouched* -- the intuitive control is false.  It shrinks
 438,773 -> 407,478 (*-7.13%*): that wave has 31,295 grouped =Value= rows of

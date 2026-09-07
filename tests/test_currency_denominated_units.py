@@ -389,7 +389,18 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 # Data-gated: the measured corpus numbers (GH #770 plan, 2026-09-05)
 # ---------------------------------------------------------------------------
 
-#: Measured on `development` @ 30c06c56 with Step 1 applied.
+#: Measured on `development` @ 30c06c56 with Step 1 applied (2026-09-05).
+#: The GhanaLSS all-wave counts in
+#: ``test_ghanalss_unitvalue_and_units_modes_are_unaffected`` were RE-DERIVED
+#: cold on 2026-09-07 after merging `development` @ 96e051c5: #785
+#: canonicalised GhanaLSS ``food_acquired.j`` (5,259,320 rows cold) and every
+#: table pinned here groups on ``j``.  Private ``LSMS_DATA_DIR``, no wave
+#: parquet reused (GH #803).  What moved: ``unitprice`` 187,699 -> 187,674
+#: and ``food_quantities(units='units')`` 1,683,305 -> 1,683,280 (-25 each).
+#: ``kgvalue`` (407,478, one wave), ``unitvalue`` (1,505,752) and both
+#: Panama figures reproduced exactly.  The fix itself still moves none of
+#: the unit* counts (before/after delta 0, measured in-process by emptying
+#: ``_CURRENCY_DENOMINATED_UNITS`` on the identical frame).
 GHANALSS_FOOD_PRICES_ROWS = 407_478
 GHANALSS_FOOD_PRICES_WAVES = ['2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
@@ -430,7 +441,7 @@ def test_ghanalss_food_prices_is_one_wave_and_not_constant():
     """Six of seven waves return EMPTY, and that is the intended outcome.
 
     EL's ruling, recorded: "empty food prices is better than a made up
-    constant."  Before this fix the six empty waves returned 1,067,978 rows
+    constant."  Before this fix the six empty waves returned 1,066,978 rows
     all carrying the single value 2.035038.
     """
     c, _ = _country('GhanaLSS')
@@ -447,8 +458,8 @@ def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     """Only the kg-denominated modes touch the factor map."""
     c, _ = _country('GhanaLSS')
     assert len(c.food_prices(units='unitvalue')) == 1_505_752
-    assert len(c.food_prices(units='unitprice')) == 187_699
-    assert len(c.food_quantities(units='units')) == 1_683_305
+    assert len(c.food_prices(units='unitprice')) == 187_674
+    assert len(c.food_quantities(units='units')) == 1_683_280
 
 
 @pytest.mark.slow
