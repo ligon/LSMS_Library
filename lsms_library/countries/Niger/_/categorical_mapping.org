@@ -37,9 +37,29 @@
 # one clean Preferred Label; 'Kilogramme'/'kilogramme' collapse onto the
 # existing food 'Kg' so crop and food quantities share that unit, and the
 # sack/local units ('Sac de 50 kg', 'Sac de 100 kg', 'Gros sac', 'Sac
-# Moyen', 'Plat Yoruba', 'Tine', 'Tia', 'Cope', 'Planche', 'Gramme') get
+# Moyen', 'Plat Yoruba', 'Tine', 'Cope', 'Planche', 'Gramme') get
 # their own Preferred Labels (kg-conversion factors are NOT stored here —
-# the u table is the label axis only, per the GAP_RANKING steer).  Used by
+# the u table is the label axis only, per the GAP_RANKING steer).
+#
+# TIA == TIYA (2026-09-08).  The Nigerien grain bowl is transliterated two
+# ways across the instruments and USED TO CARRY TWO PREFERRED LABELS, so a
+# community / food price per 'Tia' could never be matched against a crop
+# sale per 'Tiya'.  Both Original Labels now resolve to 'Tiya' (the
+# majority spelling and the food-axis canonical, code 512).  Evidence:
+# NO module carries both spellings -- each of the six unit label sets has
+# exactly one tia-like entry (crop 2011-12 as02eq07b 5='tiya'; crop
+# 2014-15 AS02EQ07B 5='Tiya'; crop 2018-19 s16Cq12b 8='Tia'; crop 2021-22
+# s16cq16b 3='Tiya'; food s07Bq03b 512='Tiya' both EHCVM waves; community
+# CS07 cs07q03/q05 3='tia'), and the 2018-19 EHCVM household survey
+# renders the SAME bowl as 'Tiya' in its food module and 'Tia' in its crop
+# module.  Median prices corroborate (crop sale 375-600 FCFA/bowl vs
+# food/community 500-833).  Cost of the split before the fix: 18,759
+# food_acquired + 4,167 crop_production rows unmatchable in 2018-19, 825 +
+# 3,196 in 2011-12, 112 + 3,307 in 2014-15.
+# STILL SPLIT, deliberately not touched here (no wave-pair needs it):
+# 'Sac (50 Kg)' / 'Sac (100 Kg)' (food axis, codes 138/135) vs
+# 'Sac de 50 kg' / 'Sac de 100 kg' (crop + community axis) are two
+# Preferred Labels for one unit.  Used by
 # the script-path crop_production via tools.get_categorical_mapping('u',
 # 'Original Label', 'Preferred Label').
 
@@ -141,7 +161,7 @@
 | Plat Yoruba           | Plat Yoruba      |      |                  |                       |
 | Sac Moyen             | Sac Moyen        |      |                  |                       |
 | Gros sac              | Gros sac         |      |                  |                       |
-| Tia                   | Tia              |      |                  |                       |
+| Tia                   | Tiya             |      |                  |                       |
 | Tine                  | Tine             |      |                  |                       |
 | Sac de 50 Kg          | Sac de 50 kg     |      |                  |                       |
 | Sac de 50 kg          | Sac de 50 kg     |      |                  |                       |
@@ -180,7 +200,7 @@
 | Sac de 100 kg         | Sac de 100 kg    |      |                  |                       |
 | gros sac              | Gros sac         |      |                  |                       |
 | sac moyen             | Sac Moyen        |      |                  |                       |
-| tia                   | Tia              |      |                  |                       |
+| tia                   | Tiya             |      |                  |                       |
 | produit absent        | Manquant         |      |                  |                       |
 | Produit absent        | Manquant         |      |                  |                       |
 
