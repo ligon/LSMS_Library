@@ -660,3 +660,205 @@ Malawi, whose =ValuePerAnimal= is a reservation price asked whether or not
 anything was sold.  Note that correlation with HeadCount does NOT distinguish
 the two readings; both are near zero.  The sold-nothing conditional plus the
 questionnaire wording are what settle it.
+
+* Prices: what each price table actually measures (five-source sweep, 2026-09-08)
+
+Recorded from the cross-country food-price comparison
+(=slurm_logs/price_sources/PROTOCOL.org=; Mali outputs in
+=slurm_logs/price_sources/Mali/=).  Everything below is measured against the
+=.dta= files and the 2014-15 questionnaires, not inferred.
+
+# ASCII EXCEPTION (same rule as the Sampling-universe section above): the
+# #+begin_quote blocks are VERBATIM questionnaire text, French, with the
+# source's own spellings.  Prose outside the quote blocks is ASCII.
+
+** Which price sources Mali has, and which it does NOT
+
+| source                              | status in Mali                              |
+|-------------------------------------+---------------------------------------------|
+| purchased unit value (Exp/Qty)      | 2014-15, 2018-19, 2021-22                   |
+| reported purchase price             | ABSENT -- no Price column in any wave       |
+| own-consumption valuation           | ABSENT IN THE INSTRUMENT (see below)        |
+| crop sale price (Value/Qty sold)    | 2014-15, 2017-18; unit axis unusable        |
+| community (market) price            | 2014-15 ONLY                                |
+
+*The own-consumption valuation is not merely unwired -- EACI 2014-15 never
+asked it.*  Section 13's column headers all read "Quelles sont la quantite
+totale et la valeur du [PRODUIT] ...", which reads as though value is asked of
+all three acquisition streams.  It is not.  The answer boxes printed beneath
+them are:
+
+: (13.03) achetees                 QUANTITE | UNITE | MONTANT EN FCFA
+: (13.04) propre production        QUANTITE | UNITE
+: (13.05) cadeau / troc            QUANTITE | UNITE
+
+and the data agree exactly: =EACIALI_p1/p2.dta= carry =s13q03c= ("Valeur de
+cette quantite ... achete", populated on 13.7% / 13.9% of rows) and have *no*
+=s13q04c= or =s13q05c= column at all.  So Mali cannot support a farmgate-vs-
+market comparison from the consumption module.  Do not file this as a config
+gap; it is =not-asked=, and the questionnaire is the evidence.
+
+** community_prices reads ONE of the survey's THREE price readings
+
+The community questionnaire's price block (=EACI2014_COM_P2_11082014.pdf=,
+"SECTION 4. RELEVE DES PRIX A LA CONSOMMATION", columns 4.03-4.11) is *three
+readings per product-variety*, each with its own unit, weight and price:
+
+: Releve 1: Unite | Poids (KG) | Prix      -> s04q03 / s04q04 / s04q05
+: Releve 2: Unite | Poids (KG) | Prix      -> s04q06 / s04q07 / s04q08
+: Releve 3: Unite | Poids (KG) | Prix      -> s04q09 / s04q10 / s04q11
+
+=2014-15/_/community_prices.py= reads *only relevé 3*, and its docstring calls
+that "the consolidated unit / quantity / price reading".  The Stata variable
+labels say otherwise -- =s04q09= is "Unite du produit du 3eme releve" -- so the
+docstring's claim is wrong.  Measured over both passages:
+
+| reading   | rows with a positive price |
+|-----------+----------------------------|
+| relevé 1  |                     66,742 |
+| relevé 2  |                     49,081 |
+| relevé 3  |                     40,237 (the only one read) |
+
+*26,745 product-variety rows carry a price in relevé 1 or 2 and nothing in
+relevé 3*, and are lost outright.  This is a COVERAGE loss, not a bias: where
+relevés 1 and 3 share a unit and a weight (n = 31,408), the median
+log(P3/P1) is exactly 0.000 with an IQR of 0.000 -- the readings are the same
+number recorded again.  A fix would take relevé 1 (the best-populated) with the
+others as fallback, or carry an =obs= level as GhanaLSS does.  Reported, not
+fixed: it changes what =community_prices()= serves for every consumer.
+
+** The (t, v, j, u) key collapses the VARIETY axis, and varieties differ
+
+The instrument prices a *variety* (4.04, =s04q02=: "Riz importe vendu en sac",
+"Boite de 220g de marque Aicha", "Cube alimentaire vendu en de", ...), but the
+canonical grain is =(t, v, j, u)=; =community_prices_finalize= keeps ONE row per
+=(t, v, j, u)= (post-harvest passage first, then questionnaire order).  *7,263 of
+32,479 (22.4%) of (v, j, u) groups within a passage carried more than one priced
+variety*, so which price survives is questionnaire order, not a definition.
+
+The damage is concentrated where varieties of very different size share a unit.
+Concentre de tomate prices three varieties under =u = 'Boite'= with medians 600
+(220 g Aicha), 125 (60 g Aicha) and 225 (tas "tasty tom") FCFA; Cube alimentaire
+prices 25 FCFA per "Unite" in one variety and 1,300-1,350 FCFA per "Paquet" in
+another.  These are exactly the items whose household-vs-community gap is
+largest (Piment ratio 0.11, Cube alimentaire 0.16, Concentre de tomate 0.18).
+
+** =community_prices.Quantity= is a WEIGHT IN KG, not a count of units
+
+Column 4.04/4.07/4.10 is headed "Poids (KG)".  So =Quantity= is the lot's weight
+in kilograms and:
+
+: price per one native unit u = Price
+: price per kilogram          = Price / Quantity     (exclude Quantity <= 0)
+
+It is NOT a =NumberOfUnits=; dividing by it does not give a per-unit price, it
+gives a per-kg price.  13.4% of rows have no usable weight (the 999 sentinel or
+zero).  This is a survey-recorded weight, so the per-kg community price does NOT
+depend on the library's inferred kg factors.
+
+** Sized versus unsized native units -- the comparability line
+
+Share of rows sitting at the unit's modal weight, from that same Poids column:
+
+| unit       |     n | modal kg | share at mode |
+|------------+-------+----------+---------------|
+| Sac large  | 1,810 |      100 |         97.0% |
+| Sac moyen  | 1,697 |       50 |         97.2% |
+| Sac petit  |   226 |       25 |         91.2% |
+| Kg         | 7,662 |        1 |         83.5% |
+| Litre      | 1,425 |        1 |         75.3% |
+| Boite      | 1,635 |        1 |         23.9% |
+| Paquet     |   959 |      0.5 |         23.3% |
+| Tas        | 3,739 |        1 |         16.1% |
+| Verre      |   230 |     0.25 |         11.6% |
+| Unite      | 1,986 |        1 |         11.5% |
+| Sachet     | 1,040 |        1 |         11.2% |
+| Gramme     |   638 |       25 |          8.5% |
+
+The first five name a fixed quantity; the rest do not -- a "Tas" is whatever the
+vendor heaps.  *Compare prices across tables only on the sized units.*  On
+=u = 'Kg'= the 2014-15 household unit value and the community price have a
+median log gap of exactly 0.000 over 160 (item x region) cells; pooling the
+unsized units instead turns the cross-item slope from -0.06 (se 0.09, zero) into
++0.15 (se 0.05).  The unit vocabularies themselves agree perfectly -- all 14
+=community_prices= units are =food_acquired= units -- so nothing warns you.
+
+** The library's inferred kg factors contradict the survey's own unit labels
+
+=_get_kg_factors= infers factors from Expenditure/Quantity ratios.  For Mali
+2014-15 it returns Sac moyen -> 26.2 kg, Sac petit -> 5.3 kg, Sac large -> 33.0
+kg and Gramme -> 0.708 kg, where the questionnaire's own unit list states
+"9 = Sac large (100kg), 10 = Sac moyen (50kg), 11 = Sac petit (25kg)" and a
+gramme is 0.001 kg.  Any per-kg quantity or price for Mali built through those
+factors is wrong by a factor of 2-700.  The fix belongs in
+=lsms_library/transformations.py=, which country-scoped work may not touch.
+Until then: use native units, or =u = 'Kg'= where a per-kg number is needed.
+
+** crop_production HAS a =u= column, but its units are unsized
+
+Contrary to the "no =u= level" shorthand (true only of the *index*),
+=crop_production= carries =u= as a column.  It is not commensurable with the
+consumption/community unit axis: question 3A.23 records the quantity sold "en
+UML" on the harvest list
+
+: 1=Kg  2=Charretee  3=Grenier  4=Sac  5=Bassine  6=Panier  7=Calebasse
+: 8=Moude  9=Gerbe  10=Autre
+
+whose "Sac" carries *no size*, unlike the consumption list which sizes its sacks
+(100 / 50 / 25 kg).  Only =Kg=, =Panier=, =Calebasse=, =Moude= and =Autre= appear
+in both vocabularies at all, and =_kg_factor_series= resolves a factor for *only*
+=Kg= (2,300 of 35,060 rows, 6.6%) -- even =Tonne= is unmapped.
+
+The practical consequence: of 35,060 crop rows only 1,346 carry both a positive
+=Value_sold= and a positive =Quantity_sold=, and only 159 of those are in =Kg=
+(78 in 2014-15, 81 in 2017-18), spread over 32 and 52 clusters.  A crop sale
+price exists in Mali but cannot be compared with a consumption price beyond a
+couple of items.  3A.24 asks "Quel a ete le montant tire de la vente de ce
+produit?" -- an amount RECEIVED, so it is a farmgate price when it is usable.
+
+** Cluster-grain household statistics are impossible in 2014-15
+
+Households per grappe: *2014-15 3.85*, 2017-18 8.80, 2018-19 11.98, 2021-22
+11.97.  The EAC-I 2014 design takes 3 households per rural EA and 9 per urban EA.
+So any household-side statistic needing 10 observations per (cluster, item) has
+*zero* qualifying cells in 2014-15 and the geography ladder starts at Region.
+2014-15 is also the only wave with community prices, so every household-vs-market
+price comparison Mali can make is a Region-grain comparison.
+
+Also: 754 grappes appear in =community_prices=, but only *728* of them exist in
+=cluster_features= / =sample= / =food_acquired= -- 612 of 23,646 rows (2.59%) have
+no household-side cluster to join.  Conversely 261 of the 989 household grappes
+have no community price.
+
+** The EHCVM waves DO ship a price file; it is not wired
+
+=2021-22/Data/= carries three unwired files:
+
+| file                       |    rows | grain                                        |
+|----------------------------+---------+----------------------------------------------|
+| =ehcvm_prix_mli2021.dta=   | 175,352 | region x milieu x annee x mois x semaine x produit x variete; columns include =releve=, =poids=, =unite=, =prix=, =typeprix= (IHPC or EHCVM) |
+| =ehcvm_nsu_mli2021.dta=    |   8,713 | produitID x uniteID x tailleID x strate -> =poids= (a non-standard-unit kg table) |
+| =ehcvm_ihpc_mli2021.dta=   |      60 | annee x mois -> national CPI                 |
+
+=2018-19/Data/= ships *no* price file (checked the full 52-file listing).
+
+The =data_scheme.yml= comment is right that =ehcvm_prix= has no =grappe= key and
+so cannot join the =sample().v= keyspace -- but it *does* carry =region= and
+=milieu=, which is the rung at which Mali's price comparisons actually happen
+(see above).  So this is a =todo= verdict candidate for
+=Mali/community_prices/2021-22=, not an absence: the data is there, the config
+is not.  =ehcvm_nsu_mli2021.dta= is separately valuable -- it is a per-region
+unit-weight table that would replace the inferred kg factors for that wave.
+
+** The =data_scheme.yml= comment on 2014-15 =food_acquired= is STALE
+
+It still says the wave "incorrectly maps =Quantity: s13q02=", "continues to emit
+a legacy non-canonical shape" and that runtime output "mixes shapes across
+waves".  All three claims are false as of GH #380: =2014-15/_/data_info.yml=
+grabs the three acquisition streams (=s13q03a/b/c=, =s13q04a/b=, =s13q05a/b=) and
+=2014-15/_/mapping.py::food_acquired= melts them onto the canonical
+=(t, v, i, j, u, s)=; all three food waves return that same shape.  Left
+uncorrected on purpose: *a comment change in =data_scheme.yml= moves every Mali
+table's cache hash* (measured -- all five probed tables changed; the same edit to
+this file moves none), so it is not worth a corpus rebuild on its own.  Correct
+it when that file is next edited for another reason.
