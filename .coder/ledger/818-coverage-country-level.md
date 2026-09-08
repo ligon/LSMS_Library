@@ -104,7 +104,73 @@ per-wave in seven countries and country-level in one.
   the dispatcher prefers the old row.
 - The corpus-wide `latest.csv` is **not** regenerated here (a coordinator
   decision). The rows that would move are inventoried in the Phase-3 note.
+- **Found while inventorying the regrade, not asked for:** Guatemala and Panama
+  ship a `_/nutrition.py` they declare nowhere. The old allowlist built it
+  regardless of `data_scheme`, so `load_feature` raised `AttributeError` and the
+  matrix filed a `broken` cell on the *same* `(country, feature, wave)` key the
+  #724 loop had already filled with `undeclared` -- two contradictory rows on one
+  key, and 2 of the corpus's 8 `broken` cells. The declaration test removes both
+  phantoms. Pinned as a key-uniqueness test, not a tier assertion.
 
 ---
 ### Phase 3 — verification (fill at task end)
-- *(filled at task end)*
+
+- `_is_country_level_only` (new, `coverage_matrix.py:497`) — **OK (anchored on
+  §2/§5)**. Composes the two existing oracles (`_has_country_level_feature`,
+  `wave_available_features` via `avail_by_wave`); no new notion of coverage, and
+  no third place where `absent` is decided (§3 — `_absent_tier` untouched).
+- `grade_feature(country_level=)` (extended, `:541`) — **OK (anchored on §4)**.
+  Reuses the existing `t`-slice loop verbatim; the only new statement is the
+  `covered` seed and its refinement from `t_values`. A bool kwarg, not an `env`
+  key, exactly as §4 requires (the unit-test fake env has three keys).
+- `COUNTRY_LEVEL_ONLY` (narrowed to `frozenset(JSON_CACHE_METHODS)`, `:439`) —
+  **OK (anchored on §2/§5)**. The remaining names are the two `@property` dicts
+  with no wave axis; nothing else is keyed by name.
+- **No REINVENTION**: `is_this_feature_sane`, `_absent_tier`, `load_blessed`,
+  `load_verdicts`, `load_blocked`, `save_snapshot` and the whole #724
+  `undeclared` loop are untouched. The `blocked` path is byte-identical: it is
+  evaluated per wave inside the same loop and never consults `country_level`.
+- **No CONTRADICTION**: a wave outside the built `t` reads `absent`, never
+  `dropped` (§3 — `dropped` presupposes a declaration); a country-level build
+  that raises stays `broken` rather than being quietly downgraded to `absent`
+  (§3 — `n/a`/`absent` must not say "don't look" about a live defect).
+
+**Regrade inventory** (the module docstring's "a regrade is not a fix" rule).
+Cells that move from per-wave `absent` to a graded tier, corpus-wide, from the
+declaration test over all 40 countries (config sweep) + the waves each built
+table's `t` actually names:
+
+| country | feature | waves moving | source of the wave list |
+|---|---|---|---|
+| EthiopiaRHS | `community_prices` | 6 of 8 (1994a, 1994b, 1995, 1997, 2004, 2009) | **measured** — graded in this branch, all 6 `sane`, 2,691 rows |
+| Nigeria | `crop_production`, `anthropometry` | 5 of 10 each (the `Q1` post-harvest rounds) | cached `var/*.parquet` `t` values (read-only peek; not rebuilt) |
+| Nigeria | `livestock`, `plot_inputs` | 5 of 10 each (the `Q3` post-planting rounds) | same |
+| Nigeria | `people_last7days` | 5 of 10 | same |
+| Nigeria | `plot_labor` | 4 of 10 | same |
+| Uganda | `income` | ≤ 8, unmeasured (no cached parquet; not built here) | config only |
+| Guyana | `assets` | 1 of 1 | cached parquet exists, `(t, i, j)` |
+
+The PP/PH split is the reason Nigeria moves only half its cells: each wave dir
+holds two rounds with distinct `t`, and a given table is fielded in one of them
+(`CLAUDE.md` §"A script is a complication"). The other half stays `absent`,
+correctly.
+
+Cells that do **not** move, and why the second half of the test is load-bearing:
+Nepal (`cluster_features`, `food_acquired`, the four food derivations,
+`household_characteristics`, `household_roster`, `individual_education`,
+`interview_date`), Peru (six features) and Uganda `fct` are all declared by no
+wave **and** have no country-level script — genuinely un-written config. They
+stay `absent`, which is the live queue where they belong.
+
+Key changes rather than tier changes: `nutrition` for Uganda / Ethiopia /
+GhanaLSS moves from one `wave=''` row to per-wave rows (8 / 5 / 5). Measured on
+Uganda: 8 × `sane`, "all checks pass", n_rows summing to 23,801 — exactly the
+country total the single row carried. This is the first time nutrition is
+sanity-checked at all: `grade_country_level` never calls
+`is_this_feature_sane`, it returns `sane` for any non-empty result.
+
+**Surprise, and the one thing a reviewer should look at:** the fix is a wider
+regrade than the issue implies — ~77 wave cells across 4 countries plus the 3
+nutrition key changes, not the 8 EthiopiaRHS cells the issue names. Every
+mover was verified to have both halves of the test, and none moves to a
+*worse* tier: the new path can only lift `absent`, never manufacture `dropped`.
