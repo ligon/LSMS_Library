@@ -136,6 +136,76 @@ The design is the issue's "Proposed fix", implemented, not redesigned.
   but it is the same defect class Togo's `RecallWindow` exists to prevent.
 
 ---
-### Phase 3 — verification (fill at task end)
+### Phase 3 — verification
 
-- (filled at task end)
+Anchored on this ledger's own entries; anything not tied to one is out of scope
+and is said so rather than padded.
+
+- `lsms_library/data_info.yml` `Columns.nonfood_expenditures` +
+  `Index Info.index_info.nonfood_expenditures` — **OK (§5 new, §2 Togo row)**.
+  Modelled on `Togo/_/data_scheme.yml:281`, the only existing correct
+  declaration; not a new convention. `required`/`monetary` are the two keys
+  the loader and `test_schema_consistency.py:35` actually act on (§3).
+- `uganda.nonfood_expenditures` — **OK (§5 extend, §3 sparsity/min_count)**.
+  Same reads, same label map, same arithmetic; only the reshape and the
+  zero-handling changed. `sum(min_count=1)` is the convention already in force
+  at `uganda.py:501` (§2), not a new one. Not a REINVENTION of
+  `food_expenditures_from_acquired`: that derives food expenditure from
+  `food_acquired`'s `(t,i,j,u,s)` grain; this reads a non-food module that has
+  no `u` and no `s`. Only the sparsity RULE is shared, and it is cited.
+- The eight `Uganda/*/_/nonfood_expenditures.py` — **OK (§5 reuse)**. `t` is
+  stamped by the wave script, verbatim the `2013-14/_/food_acquired.py:9`
+  pattern (§2). The `round =` name shadows a builtin; that is the sibling's
+  existing spelling and was kept rather than diverged from.
+- `Uganda/2015-16/_/nonfood_expenditures.py` hhid fix-up — **OK (§4 swapped
+  names)**. Re-keyed from `j` to `i` because `i` is now the household. Added
+  the unmapped-id assertion the ledger's §4 warned about (`replace` leaves a
+  miss in place silently); it passes with 0 unmapped.
+- `Uganda/_/nonfood_expenditures.py` — **OK (§5 reuse)**. Now structurally the
+  same file as the sibling `Uganda/_/food_acquired.py` (§2): concat wave
+  parquets → `id_walk` → `to_parquet`. The post-`id_walk` duplicate assertion
+  is the §4 collision landmine, made loud; it passes (0 duplicates).
+- The four `Nigeria/*/_/nonfood_expenditures.py` — **OK (§5 extend, §3 pp-ph)**.
+  `t` stays per-round, so no round is pooled. `m` dropped on the §4 measurement
+  (0 households with >1 zone; 0 `(t,i,j)` duplicates), and the assertion in
+  each script is what keeps that measured rather than assumed.
+- `Nigeria/_/nonfood_expenditures.py` — **OK (§5 extend, §4 aggregate_items)**.
+  `replace(inf, nan)` kept, per §2. The commented-out
+  `aggregate_items.json` rename removed on the §4 finding that its
+  `Aggregated Label` is a FOOD map — i.e. deleting it prevents a future
+  REINVENTION-by-revival, it is not itself one.
+- Both `_/data_scheme.yml` — **OK (§3 dict-declaration rule)**. A bare `!make`
+  is a dict to the schema test, so it would have failed
+  `test_required_columns_present` the moment `Expenditure` became required;
+  they now declare `index: (t, i, j)` + `Expenditure: float`.
+- `tests/test_nonfood_expenditures_schema.py` — **OK (§4 totals invariant)**.
+  Pins the shape, the no-fabricated-zeros rule and the seventeen per-wave
+  totals §4 records. Declarers are DISCOVERED from disk, not listed, so a
+  fourth country meets the contract on arrival.
+- `tests/test_visualizations.py::test_uganda_wide_nonfood_table_raises_citing_gh817`
+  — **CONTRADICTION, resolved (§1)**. It asserted Uganda's table IS wide, i.e.
+  it pinned the bug this task removes. Split rather than deleted: the guard is
+  now exercised on a synthetic wide frame (so it survives any corpus change)
+  and Uganda is asserted long-and-drawing. Neither half is weaker than the
+  original — the original tested one thing, the pair tests two.
+
+**CORRECTION to §6, made during verification.** The first draft of the Uganda
+`CONTENTS.org` and `data_scheme.yml` comments asserted that Uganda's module
+"asks one amount per item over a single window, so there is nothing to
+disambiguate". That is an *unevidenced closing negative* of exactly the kind
+`CLAUDE.md` §"Adjudicating `absent` cells" forbids (the Albania mistake), and
+it is also **false**: the `.dta` variable labels read via
+`pyreadstat.read_dta(..., metadataonly=True)` carry a CAPI fill — `h15cq5`
+= *"How much came from purchases in the past [RECALL]? VALUE"* (2013-14 and
+2011-12, identical) — so the recall period **varies by item**, as in Togo's
+section 9, and this table sums across it. No wave ships a recall variable and
+`nonfood_items.org` has no recall column, so it is a real gap needing the
+questionnaire. Both files now say so; the claim was corrected before the fix
+commit was final. Nigeria's equivalent note was hedged from the start and
+stands.
+
+**Not verified here, stated as such:** the *values* themselves are unchanged by
+construction (the pivot summed the same numbers and every per-wave total
+matches), but no cell of Uganda's or Nigeria's `nonfood_expenditures` has been
+read against its questionnaire. Neither country is `blessed`, and this task
+does not bless one.
