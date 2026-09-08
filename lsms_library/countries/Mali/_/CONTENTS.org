@@ -840,15 +840,43 @@ have no community price.
 | =ehcvm_nsu_mli2021.dta=    |   8,713 | produitID x uniteID x tailleID x strate -> =poids= (a non-standard-unit kg table) |
 | =ehcvm_ihpc_mli2021.dta=   |      60 | annee x mois -> national CPI                 |
 
-=2018-19/Data/= ships *no* price file (checked the full 52-file listing).
+*2018-19 DOES have a cluster-grain market price module, and it is the one that
+matters.*  =2018-19/Data/s05_co_mli2018.dta= is section 5 of the EHCVM community
+questionnaire -- 54,669 rows, *549 grappes, 549 of them in =sample().v=* -- with
 
-The =data_scheme.yml= comment is right that =ehcvm_prix= has no =grappe= key and
-so cannot join the =sample().v= keyspace -- but it *does* carry =region= and
-=milieu=, which is the rung at which Mali's price comparisons actually happen
-(see above).  So this is a =todo= verdict candidate for
-=Mali/community_prices/2021-22=, not an absence: the data is there, the config
-is not.  =ehcvm_nsu_mli2021.dta= is separately valuable -- it is a per-region
-unit-weight table that would replace the inferred kg factors for that wave.
+: Existe   [PRODUIT] existe dans ce marché ?          (1 on every retained row)
+: s05q01   5.01. Code produit                          (varietal: "Riz local Gambiaka", "Riz importé parfumé", ...)
+: s05q02   5.02. Selectionner les unités tailles qui exist pour ce produit sur ce marché?
+: s05q03   5.03. Relevé 1-Prix (en FCFA)               (100% populated)
+: s05q04   5.04. Relevé 2-Prix (en FCFA)               (100% populated)
+
+Note what =s05q02= fixes: its unit vocabulary is *size-resolved* -- "Boite -
+Petit / Moyen / Grand", "Tas - petit / moyen / grand", "Bidon - Petit / Moyen /
+Grand" -- exactly the distinction whose absence makes the 2014-15 unsized units
+uncomparable (see "Sized versus unsized native units" above).  And 2018-19
+averages *11.98 households per grappe*, against 3.85 in 2014-15, so unlike
+2014-15 it can clear a 10-observation household threshold at the CLUSTER rung.
+
+*Wiring =s05_co_mli2018.dta= would give Mali the cluster-grain household-vs-market
+price comparison that 2014-15 is structurally incapable of supporting.*  It is
+the strongest =todo= candidate in this country.  2021-22 has no equivalent: its
+community files stop at =s04_co_mli2021.dta= (no section 5), so for that wave the
+region-grain =ehcvm_prix= above is the only market price.
+
+*The =data_scheme.yml= comment on =community_prices= is half wrong, and the wrong
+half is the important one.*  It says "the EHCVM waves (2018-19, 2021-22) collect
+prices only at the region x milieu IHPC grain (ehcvm_prix), which has no grappe
+key and so cannot join the sample().v cluster keyspace -- deferred."  That is
+true of *2021-22* and false of *2018-19*, which ships =s05_co_mli2018.dta= at
+grappe grain (below).  Its =ehcvm_prix= reasoning is otherwise sound: that file
+carries no =grappe=, though it *does* carry =region= and =milieu=, which is the
+rung at which Mali's 2014-15 price comparisons actually happen.
+
+So both EHCVM waves are =todo= verdict candidates for =community_prices=, not
+absences -- the data is there, the config is not -- and 2018-19 is the stronger
+of the two by a wide margin.  =ehcvm_nsu_mli2021.dta= is separately valuable: a
+per-region unit-weight table that would replace the inferred kg factors for that
+wave.
 
 ** The =data_scheme.yml= comment on 2014-15 =food_acquired= is STALE
 
