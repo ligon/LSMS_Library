@@ -35,7 +35,9 @@ waves = ['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
 
 # Unit handling (GH #347).  ``u`` carries the harmonized unit label
 # ALONE -- the ``harmonize_unit`` Preferred Label for the 1994+ waves
-# (1->kg, 2->"100 kg", 3->Chinet, 19->litre, 30->Birr, ...) and the
+# (1->kg, 2->"100 kg", 3->Chinet, 19->litre, 30->Value -- the
+# currency code, canonicalised onto the framework sentinel rather
+# than spelled 'Birr', GH #770 -- ...) and the
 # raw in-data unit *code* for 1989 (an unlabelled scheme; still a unit
 # token, not a food label).  An EARLIER design appended the food label
 # to non-metric units ("Chinet [Butter]") to coax the framework's
@@ -224,7 +226,9 @@ def food_acquired(df):
     # key was missing in the source -- see `i` above) and rows with
     # no unit (a unit is required to place the quantity on the u axis).
     # ``u`` is the harmonize_unit Preferred Label (e.g. 'kg', 'Chinet',
-    # 'Birr'); the source missing-unit sentinel 0 maps to '' via
+    # and 'Value' for the currency code 30 -- the canonical
+    # currency-denominated sentinel, NOT the currency's name 'Birr',
+    # GH #770); the source missing-unit sentinel 0 maps to '' via
     # harmonize_unit (#347) and is dropped here.  Each row's ``u`` is a
     # clean unit token -- no food label appended (the framework's
     # price-ratio inference recovers per-good factors on its own).

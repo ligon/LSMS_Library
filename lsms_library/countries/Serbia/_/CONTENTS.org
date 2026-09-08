@@ -470,3 +470,61 @@ is an ISA/EHCVM-specific module.  Serbia LSMS 2007 carries no such roster.  Veri
 this round by full variable-label inspection of the source =.dta= files:
 full inspection of all 445 household + 346 individual variables; the lone damage field (=mp20=) sits in the Kosovo-IDP module, not a shocks roster.  Not implementable from current data; revisit only if a coping roster
 is later identified.  Tracked in GitHub issue #352.
+
+
+* =mera == 'dinar'= is CURRENCY, and it is emitted as =Value= (GH #770)
+
+The 7-day diary's =mera= ("measure") column is not purely a measure.  Four of
+its five values are units -- =kg=, =gr=, =litar=, =komad= -- and the fifth,
+*=dinar=*, is the marker for a pure cash outlay.  It is used by the prefix-11
+"food/drink away from home" items (restaurant / work / school), which the
+=food_acquired.py= docstring already described as /"pure cash outlays with no
+physical quantity and no source flag"/.
+
+=2007/_/food_acquired.py= now emits those rows as the framework's canonical
+currency-denominated sentinel *=u='Value'=*, not as the currency's name.
+
+** Why the name of a currency must not be a =u= label
+Amounts are already in local currency units by default, and =currency==
+(=lsms_library/currency.py=) is the lever for currency *representation*, so
+the currency's name is redundant with the country and the wave.  The framework
+recognises exactly one canonical label for this
+(=country._RESERVED_U_SENTINELS=, =transformations._CURRENCY_DENOMINATED_UNITS=).
+Spelled =dinar=, the label was invisible to both, and
+=transformations.conversion_to_kgs= inferred a *kg-per-dinar factor of
+4.209166724149965* -- the #770 defect, live in Serbia.
+
+** What it actually cost, stated precisely and NOT overstated
+Of the 3,772 =dinar= rows, *3,767 carry =Quantity= NaN* (the cash amount is in
+=Expenditure=); only *5* carry a non-null =Quantity=, and those 5 are stray
+=kol= punches on "Food Away (work/school)" lines.  So:
+
+- =food_quantities(units='kgs')=: the 3,767 gave =NaN x 4.209 = NaN= and were
+  already dropped.  Only the *5* were actually served as mass.  Post-fix they
+  carry through natively as =u='Value'=.
+- =food_prices(units='kgvalue')= *and* =(units='kgprice')=: the same *5*
+  rows disappear from each (196,279 -> 196,274; a =Value= row has no kg
+  factor, so =Price= is NaN and =_drop_unpriceable= drops it).  The =unit*=
+  modes are unchanged (delta 0) -- they never used a kg factor.
+- =_drop_unpriceable='s =lost_fraction= goes 1.88% -> *0.0%*: all 3,772
+  rows move into the by-design =currency= bucket, where they are still
+  counted (=attrs['price_rows_dropped']=) but excluded from the loss
+  fraction.  Serbia was below the warning threshold before and is still
+  below it; nothing starts or stops warning here.
+- The factor map loses exactly one key (='dinar'=); every other key is
+  byte-identical.
+
+*Five rows is not why this was worth fixing.*  It was worth fixing because the
+mechanism is identical to GhanaLSS's 3.49M-row instance, and because a
+=u= label the framework cannot recognise defeats every guard built around the
+sentinel.
+
+** Serbia does NOT follow the value-only =Quantity == Expenditure= convention
+GhanaLSS and Panama write =u='Value'= rows with =Quantity= set equal to
+=Expenditure= (the "value-only convention" of the food-acquired skill).
+Serbia's do not: =Quantity= is NaN and the money is in =Expenditure= alone.
+*Both shapes now exist in the corpus under the same label.*  The label means
+"denominated in local currency", not "Quantity is the expenditure" -- and no
+quantity is synthesised here, because that would be a data change rather than
+a relabel.  Anyone building Step 2 of #770 (recovering the =1/price= factor
+from a price source) must handle both shapes.
