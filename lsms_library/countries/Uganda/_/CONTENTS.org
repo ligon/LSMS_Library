@@ -1594,16 +1594,165 @@ price that someone mis-wired.  Only its level is wrong: median =a5aq8= is
 The 2015-16 *food* module is unaffected (its own maize valuation is a normal
 700 UGX/kg), so this is not a currency redenomination.
 
-The cause is *not established* -- it could be UBOS recording the value in
-hundreds of shillings for this wave, or a data-preparation error -- so *no
-correction factor is applied here*.  Inventing a x100 would be a guess
-wearing a decimal point.  What is recorded is the measurement.
+The cause is now *established as a mechanism* but is *not documented by the
+producer* -- see the 2026-09-08 investigation below.  No correction factor is
+applied here; that decision is @ligon's, not an agent's.
+
+*** Mechanism: =a5aq8= / =a5bq8= were DIVIDED BY 100 in this release (2026-09-08, #829)
+
+Investigated against the raw =.dta=, both UNPS questionnaires and the World
+Bank catalog.  Three hypotheses were on the table -- (H1) the value was
+*recorded* in hundreds; (H2) the sale QUANTITY is on a different unit basis
+(quintals) and only looks like a value defect; (H3) the wave script wires the
+wrong variable.  *H2 and H3 are dead.  H1 is right in its arithmetic and wrong
+in its mechanism: nothing asked for hundreds -- a division by exactly 100 was
+applied to the two columns somewhere in data preparation.*
+
+**** The decisive evidence
+
+1. *Storage type.*  =a5aq8= / =a5bq8= are Stata =double= in 2015-16 and
+   =int32= in *every* other wave (2010-11, 2011-12, 2013-14, 2018-19,
+   2019-20).  A currency answer key is not a double.
+
+2. *=a5aq8= x 100 is an exact integer in 100.00% of rows* -- 3 898 season-A
+   and 3 008 season-B sale rows, no exceptions.  And the *roundness ladder*
+   of the reconstructed value reproduces its neighbours':
+
+   | fraction of positive values divisible by | 2013-14 raw | 2015-16 raw | 2015-16 x100 |
+   |------------------------------------------+-------------+-------------+--------------|
+   | 1 (i.e. integral)                        |      1.0000 |      0.9949 |       1.0000 |
+   | 100                                      |      0.9988 |      0.6692 |       0.9949 |
+   | 1 000                                    |      0.9561 |      0.1481 |       0.9510 |
+   | 10 000                                   |      0.6701 |      0.0049 |       0.6690 |
+
+   The raw 2015-16 column is the 2013-14 column shifted *two decades* to the
+   right, not a different quantity.  Its non-integer share (0.51% season A,
+   0.30% season B) is exactly the share of neighbouring waves' values that
+   are NOT multiples of 100 (0.53% / 0.22% in 2011-12, 0.12% / 0.44% in
+   2013-14) -- i.e. precisely the rows a divide-by-100 would leave fractional.
+   The smallest values are =0.02=, =0.09=, =0.15=, =0.52= UShs, which no
+   enumerator typed.
+
+3. *Sold-unit == Kg rows only, where no conversion factor enters at all*:
+
+   | median UGX/kg, u(sold)=Kg | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2019-20 |
+   |---------------------------+---------+---------+---------+---------+---------|
+   | season A                  |     700 |    1000 |    1000 |  *10*   |    1333 |
+   | season B                  |    1000 |    1000 |    1000 |  *10*   |    1300 |
+
+   and per crop, pooling seasons, with the x100 reconstruction beside it:
+
+   | median UGX/kg | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2019-20 | 2015-16 x100 |
+   |---------------+---------+---------+---------+---------+---------+--------------|
+   | Maize         |     300 |     500 |     500 |       5 |     700 |          500 |
+   | Beans         |     700 |    1000 |    1000 |      12 |    1400 |         1200 |
+   | Cassava       |    1000 |    1000 |    1000 |      12 |    1500 |         1200 |
+   | Ground nuts   |     827 |     800 |     900 |       8 |     900 |          800 |
+   | Finger millet |     500 |     700 |     600 |       6 |     800 |          597 |
+   | Coffee        |    1000 |    1000 |     640 |      15 |      -- |         1500 |
+
+**** It is not a mixture
+
+The owner's stated worry was that only *some* rows are mis-scaled.  They are
+not.  Of 2 268 sale rows whose sold unit is Kg, *99.25% imply a price below
+100 UGX/kg* and only *13 rows (0.57%)* reach 130 UGX/kg -- 2013-14's *1st
+percentile*.  The whole distribution moved: the p25 / p50 / p75 ratios of
+2013-14 to 2015-16 are 100.0 / 100.0 / 100.0 exactly (p10 and p90 are 125 and
+120, which is ordinary year-to-year price drift, not a second population).
+Wave totals: =sum(a5aq8)= is 1 369 573 070 UShs over 6 490 sale rows in
+2013-14 against *16 619 683 over 6 906 rows* in 2015-16.
+
+**** H2 (unit basis) is dead
+
+The sold unit =a5?q7c= disagrees with the harvest unit =a5?q6c= on *4.4%* of
+2015-16 sale rows -- LESS than 2013-14's *13.5%*.  And the table above is
+computed on rows where the *sold* unit is literally Kg (code 1), so no
+conversion factor of any kind is in the arithmetic.  A quintal/kg confusion
+also has the wrong sign (it would make the implied price 100x too LARGE).
+
+**** H3 (mis-wired variable) is dead
+
+- The variable *label is byte-identical* across waves: =A5AQ8:What was the
+  value?= in 2013-14 and 2015-16 alike; the World Bank catalog's own variable
+  record (study 3460, file F15, =V320=) carries the same label with
+  =min 0 / max 80000=, i.e. NADA's summary was computed from this same file.
+- Value still scales with quantity: the slope of =log(a5aq8)= on
+  =log(qty_sold x kg-factor)= is *+0.744* in 2015-16 against *+0.713* in
+  2013-14 and *+0.744* in 2011-12.  Shape unchanged; only level moved.
+- *The defect is field-specific.*  Scanning every numeric variable present in
+  both waves across 16 AGSEC files, *=a5aq8= and =a5bq8= are the ONLY two
+  whose median moves by ~100x* (93.6x and 100.0x) and the only two whose
+  Stata type changes int32 -> double.  =a5aq10= ("How much was spent on
+  transport?"), a currency field in the same record, is still =int32= at a
+  normal level (median 1 000 UShs against 3 500 in 2013-14).
+
+**** Nothing documents a rescaling -- which is why nothing is corrected here
+
+- =unps_2015_16_agriculture_qx.pdf= (World Bank catalog 3460, resource
+  46595; *not shipped in this repo* -- the wave's =Documentation/= has only
+  the household questionnaire and the DDI), *page 13*, SECTION 5A CONT'D and
+  *page 21*, SECTION 5B CONT'D, asks:
+
+  #+begin_quote
+  What was the value?          UShs
+  #+end_quote
+
+  =unps_2013_14_agriculture_qx.pdf= pages 13 and 21 carry the *same words and
+  the same "UShs"*.  There is no "in '000", no "in hundreds", no changed
+  answer box, no currency note anywhere in the 2015-16 instrument.
+- The 2015-16 DDI (=ddi-documentation-english_microdata-3460.pdf=) is a
+  study-level overview with no variable-level codebook and no data-processing
+  section ("Data Processing: No content available").
+- No World Bank / UBOS reproduction or harmonisation do-file ships with any
+  Uganda wave in this repo, so there is nothing that rescales the wave.
+- *There is no fixed re-release to acquire.*  This repo's
+  =Uganda/2015-16/Data/AGSEC5A.dta= is *byte-identical* (md5
+  =3117b28c356a480a896701efd7779b47=) to =agriculture/AGSEC5A.dta= inside the
+  World Bank's current live =UGA_2015_UNPS_v02_M_STATA14.zip=.  The defect is
+  in the distributed data as published today.
+
+**** Recommendation
+
+1. *Keep excluding 2015-16 from any =Value_sold=-based number for Uganda*, as
+   the price comparison already does.
+2. =absent_verdicts= is the *wrong instrument*: the cell is declared, builds
+   and returns rows.  It is corrupt, not absent.  If the wave must stop
+   grading =sane= on this column, the honest lever is to null =Value_sold=
+   for 2015-16 in the wave script (recorded here as an option, deliberately
+   not implemented).
+3. *A x100 in =2015-16/_/crop_production.py= is now a measurement, not a
+   guess* -- but it is still a correction the producer does not document, so
+   it is @ligon's call, not an agent's.  It would be a two-line patch:
+   multiply the =Value_sold= column of both seasons by 100 with this entry
+   cited.  Nothing else in the wave needs touching.
+4. Worth reporting upstream to the World Bank LSMS team with the md5 above.
 
 Consequence for any analysis: 2015-16 =Value_sold= (and anything derived
 from it, including a crop sale price) is unusable as a level.  The price
 comparison excluded the wave from its source-4 build; left in, 2015-16
 alone produced a median log gap of 4.66-4.99 against the food module (a
 ratio of 105-146) with *100%* of cells beyond log 1.5.
+
+*** Other AGSEC5 2015-16 oddities noticed in the same pass
+
+- =AGSEC5A='s variable labels say "second season of *2014*" and =AGSEC5B='s
+  say "first season of *2015*" -- so for this wave the A/B files are the
+  2014-B / 2015-A seasons, not "first/second season of one calendar year" as
+  in 2013-14.  The season labelling in =crop_production= (=season= 'A'/'B')
+  is a *visit* label, not a calendar season, in every wave; here the offset
+  is explicit in the source.
+- =A5AQ7D= (season A) is spelled *upper-case* in 2015-16 where 2013-14 uses
+  =a5aq7d=; season B is lower-case =a5bq7d= in both.  =CROP_COLMAPS= already
+  reflects this, but it is a trap for any new column added here.
+- The conversion factors are not clean: 2015-16 =a5aq6d= reaches *860 000*
+  kg/unit and =A5AQ7D= reaches *120 000* (2013-14: 80 000 and 50 000).  These
+  are not part of #829 -- they do not carry the divide-by-100 signature --
+  but they are large enough to distort any kg conversion that uses them
+  unfiltered.
+- The World Bank's =UGA_2015_UNPS_v02_M_CSV.zip= resource is *served
+  truncated* (2 943 685 bytes, central directory pointing past EOF; verified
+  on two independent downloads), so the CSV distribution could not be used as
+  a cross-check.
 
 ** TODO The SOLD unit and SOLD condition are never wired (GH #824)
 
