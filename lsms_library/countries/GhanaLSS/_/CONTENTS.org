@@ -145,7 +145,15 @@ larger samples from regions with smaller populations were drawn.
 | EAs wholly urban or wholly rural | 20-strata design | *0 of 1,000* clusters mix |
 | =a11= = 41 urban EAs, Western | report, verbatim | *41* |
 | =a12= = 57 rural EAs, Western | report, verbatim | *57* |
-| 438 urban / 562 rural EAs | report | 439 / 561 -- *one EA differs* |
+| 438 urban / 562 rural EAs | report /narrative/ (p.285) | 439 / 561 -- matches the report's own *tables* |
+
+*/Corrected 2026-09-06./*  The last row above previously read "439 / 561
+--- *one EA differs*", which put the discrepancy between the report and the
+data.  *It is inside the report.*  The narrative on printed p.285 says the EAs
+"were further divided into 438 urban and 562 rural localities of residence",
+while the same report's Table A1 (printed p.281) and Table A2 (printed p.283)
+both give *439 urban / 561 rural*.  The served data agrees with the tables and
+disagrees only with the prose --- so there is nothing to reconcile on our side.
 
 Sequential variance decomposition of log(cluster weight): region *62.6%*,
 + urban/rural within region *1.6%*, + cluster *35.8%*, + household *0.0%*.
@@ -221,10 +229,26 @@ identification, not the EA list.  There is no mention of new EAs, frame
 ageing, or the precision cost.  Treat the above as this repository's
 analysis, not as a claim sourced to GSS.
 
-- The report also carries the *institutional-population exclusion*
-  statement that =population.yml= records as =exclusions: NOT FOUND=
-  (its note names acquiring this report as the concrete next step).
-  =population.yml= is GENERATED -- update
+- *Done 2026-09-06 (GH #603).*  The report's
+  *institutional-population exclusion* is now in the population record.
+  =population.yml= previously carried =exclusions: NOT FOUND= for
+  2016-17; it now carries, verbatim:
+
+  #+begin_quote
+  The institutional population which represents a very small percentage of 2010
+  Population and Housing Census (PHC), was excluded from the frame.
+  #+end_quote
+
+  (Main Report, "Sampling frame", printed p.285 / PDF p.307.)  Confidence
+  moved =medium= -> =high= at the same time; the *tag stayed
+  =national-claimed=*, because the report claims national
+  representativeness and names what is EXCLUDED but never names whom the
+  survey represents.  GLSS6 earned =national-all-households= on one
+  sentence in the otherwise-shared passage --- "However, the unit of
+  measurement was the population living within individual households." ---
+  and *GLSS7's parallel section omits it*; the string "unit of
+  measurement" occurs nowhere in the 344-page report.  =population.yml=
+  is GENERATED --- update
   =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= and re-run
   =scripts/promote_population_records.py=; do not hand-edit it.
 
@@ -1176,8 +1200,29 @@ imputation (#562), and the nutrition Food Conversion Table (#563).
 ** DONE ghana_lss.py
 Common code across GLSS rounds (=ghanalss.py=); handles the GLSS1--GLSS2 panel
 linkage via the =Waves= dictionary.
-** DONE food_items.org
-Food labels harmonized across all 7 waves (the "Aggregate Labels").
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+Food labels harmonized across all 7 waves.  The vocabulary (205 rows;
+=Preferred Label=, one column per GLSS round, =FCT Code=) now lives in
+=_/categorical_mapping.org= under =#+name: harmonize_food=, moved
+byte-for-byte; =_/food_items.org= and its stale =_/food_items.csv= twin are
+deleted.  This is the migration Tanzania and Ethiopia already completed as
+"Unit #0" (=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).
+
+The move -- not a rename in place -- was the point:
+=Country.categorical_mapping= opens only the global
+=lsms_library/categorical_mapping/*.org= and the country's own
+=categorical_mapping.org=, and *never* =food_items.org= under any table
+name.  So =labels== (=Country._relabel_j=) raised =LabelUnavailableError= for
+GhanaLSS however the table inside that file was named.  It now resolves.
+
+The heading formerly read /the "Aggregate Labels"/.  That was a misnomer:
+this table has never had an =Aggregate Label= column and still does not.
+The seven WAVE-level =harmonize_food= tables do, but they cannot simply be
+unioned into one -- 14 Preferred Labels take two different Aggregate values
+across waves, 9 of this table's labels appear in no wave table at all, and
+one wave value carries mojibake.  Adding a country-level Aggregate column is
+curation gated on the CFE beta-spread test, deliberately out of GH #783's
+scope.
 ** DONE conversion_to_kgs.json -- intentionally NOT used
 The canonicalization fills missing quantities via the inverse market-price
 ladder (=transformations.median_price_valuation=) in native units, which
@@ -1454,7 +1499,8 @@ The FCT is the *FAO/INFOODS West African Food Composition Table 2019*
 =GhanaLSS/_/fct_west_africa.org= (1,028 foods x 20 nutrients, per 100 g
 edible portion as published) by
 =slurm_logs/ghana_audit/build_fct_west_africa.py=.  The label -> code map is
-the =FCT Code= column of =food_items.org= =#+name: food_label=, written by
+the =FCT Code= column of =categorical_mapping.org= =#+name: harmonize_food=
+(GH #783; formerly =food_items.org= =#+name: food_label=), written by
 =slurm_logs/ghana_audit/build_fct_code_column.py=.  See the org file's own
 commentary for the datasheet / energy-unit / edible-portion decisions.
 
@@ -1523,7 +1569,7 @@ Sources originally listed here:
    =nutrition= for those waves describes the own-production basket only: a
    biased subset (rural, staple-heavy), not scaled-down total intake.
 
-3. *2005-06's own-production module was never harmonised.*  =food_label='s
+3. *2005-06's own-production module was never harmonised.*  =harmonize_food='s
    2005-06 column covers 101 of the 102 =s='purchased'= item labels but *0 of
    the 63 =s='produced'= labels* (=cassava-tubers=, =maize-flour/dough=,
    =okro=, =pepper=, ...).  Since 2005-06's only physical quantities are own
@@ -1534,7 +1580,8 @@ Sources originally listed here:
 
    /Corrected 2026-09-05 (GH #782)./  *Fixed, and the diagnosis above was
    right about the symptom but wrong about the cause.*  The 63 labels were
-   never a harmonisation gap in =food_label=: they are the *survey's own raw
+   never a harmonisation gap in =food_label= (since GH #783:
+   =categorical_mapping.org= =#+name: harmonize_food=): they are the *survey's own raw
    labels*, leaking through =2005-06/_/food_acquired.py='s own-production
    decode, which matched nothing and passed its input through unchanged (Trap
    8 below).  =food_label= was not missing them --- they were never supposed
@@ -1552,7 +1599,7 @@ Sources originally listed here:
    Gum=, which are on the food-expenditure axis but have no FCT row, and
    should not have one.
 
-4. *Three 2016-17 labels are missing from =food_label= entirely*:
+4. *Three 2016-17 labels are missing from =harmonize_food= entirely*:
    =Oil (vegetable)= (69,025 kg), =Sugar Bread= (15,701 kg) and =Kola Nut=
    (2,888 kg) appear as =j= in the data but in no column of the table.  They
    are worth *+27.4% of 2016-17 Energy* on their own.  Also #109's.
@@ -1567,9 +1614,17 @@ Sources originally listed here:
    GhanaLSS returns 20 of =nutrient_labels.org='s 21 Preferred Labels.  It is
    omitted, NOT zero-filled -- a zero would assert these foods contain none.
 
-7. =food_items.csv= is a stale artifact: nothing reads it.  GhanaLSS reads
-   =food_items.org= only, via =ghanalss.py::harmonized_food_labels=.  It was
-   NOT regenerated with the new =FCT Code= column.
+7. *Both food-label artifacts are gone as of GH #783 (2026-09-06), and this
+   entry's account of the reader was WRONG.*  It said GhanaLSS read
+   =food_items.org= /via =ghanalss.py::harmonized_food_labels=/.  Measured
+   with =git grep=, that function and its =harmonized_food_labels2= sibling
+   had *zero callers* anywhere in the repo, and would have raised if called
+   (they parsed the =.org= with =pd.read_csv(delimiter='|')=).  The single
+   live reader was =_/nutrition.py:135=.  Both dead functions are deleted;
+   =nutrition.py= now reads =_/categorical_mapping.org= =#+name:
+   harmonize_food=.  =food_items.csv= was indeed stale and unread -- verified
+   again before deletion -- and was never regenerated with the =FCT Code=
+   column, which is one more reason it is now deleted rather than kept.
 
 * Features NOT available in GhanaLSS
 
@@ -2246,7 +2301,8 @@ That is why the guard reads all seven tables at once, and why it is
 config-only: reading org tables costs milliseconds, so it need not be gated on
 a warm cache.
 
-*The country-level =_/food_items.org= =#+name: food_label= is the authority*,
+*The country-level =_/categorical_mapping.org= =#+name: harmonize_food= is the
+authority* (it was =_/food_items.org= =#+name: food_label= until GH #783 moved it),
 and not merely by preference: =_/nutrition.py:187= resolves an unmatched =j=
 through a =by_label= fallback keyed on *that* table's Preferred Label, so a
 wave spelling it differently gets no FCT code and drops out of =nutrition=.

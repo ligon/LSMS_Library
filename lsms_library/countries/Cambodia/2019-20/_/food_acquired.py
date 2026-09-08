@@ -5,7 +5,8 @@ Source: hh_sec_5.dta (CSES 2019-20 food-consumption roster), one row per
 (household, item):
   - HHID                            -> i  (household)
   - food_consumption_roster_1__id   -> j  (food item, 1-64; harmonized to a
-                                           Preferred Label via food_items.org)
+                                           Preferred Label via
+                                           categorical_mapping.org harmonize_food)
   - s05q03                          -> u  (unit: Kg, Piece, ...)
   - s05q04                          -> Quantity  (TOTAL consumed; ONE figure)
   - s05q05                          -> "total spent"   (value PURCHASED)
@@ -49,11 +50,15 @@ df = df.rename({'HHID': 'i',
                 's05q05': 'spent',
                 's05q06': 'obtained'}, axis=1)
 
-# Harmonize the numeric item code (1-64) to a Preferred Label via food_items.org.
+# Harmonize the numeric item code (1-64) to a Preferred Label via the
+# harmonize_food table in categorical_mapping.org.
 # Key on the code, not the categorical text: some raw Stata value labels carry
 # mojibake (e.g. a zero-width space in item 41) that does not round-trip.
 df['j'] = pd.to_numeric(df['j'], errors='coerce').astype('Int64').astype(str)
-food_items = df_from_orgfile('../../_/food_items.org', name='food_label', to_numeric=False)
+# GH #783: the vocabulary moved out of the standalone food_items.org into
+# the country's categorical_mapping.org as `harmonize_food` -- the only file
+# Country.categorical_mapping opens, so labels= can now see it too.
+food_items = df_from_orgfile('../../_/categorical_mapping.org', name='harmonize_food', to_numeric=False)
 food_items = food_items.loc[:, ['Preferred Label', 'Code']]
 food_items['Code'] = food_items['Code'].str.strip()
 food_items = food_items.replace(['', '---'], pd.NA).dropna()

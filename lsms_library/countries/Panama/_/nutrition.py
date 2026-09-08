@@ -1,8 +1,25 @@
 #!/usr/bin/env python
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
+from lsms_library.local_tools import df_from_orgfile
 """
 Create a nutrition DataFrame for households based on food consumption quantities
+
+NOT REACHABLE as of 2026-09-06, for three reasons that all predate GH #783 and
+are NOT fixed by it:
+
+  1. `nutrition` is not registered in _/data_scheme.yml, so
+     Country('Panama').nutrition() does not exist;
+  2. the _/Makefile's `var` target is food_acquired.parquet only, so
+     ../var/nutrition.parquet is never requested;
+  3. line 14 reads ../var/food_quantities.parquet, which the Makefile's own
+     comment forbids materializing (food_quantities is auto-derived at API
+     time by _FOOD_DERIVED), and `eep153_tools` (imported below) is not an
+     installed dependency -- so this module raises ModuleNotFoundError on
+     import before reaching any of the above.
+
+GH #783 repointed its food-label read off the retired food_items.org so the
+reference is not dangling; it did not revive the script.
 """
 
 import pandas as pd
@@ -19,10 +36,13 @@ final_q = q.pivot_table(index = ['j','t'], columns = 'i', values = 'q_sum').fill
 # missing fct information
 
 # find FCT codes for foods
-food_items = pd.read_csv('../_/food_items.org', sep='|', skipinitialspace=True, converters={1:lambda s: s.strip()})
-food_items.columns = [s.strip() for s in food_items.columns]
+# GH #783: was a raw pd.read_csv(sep='|') over the standalone _/food_items.org,
+# which is retired.  The vocabulary is now the `harmonize_food` table in
+# _/categorical_mapping.org; df_from_orgfile nulls '---' cells for us, so the
+# explicit '--- ' filter that the raw parse needed is gone.  Verified to yield
+# the SAME (Preferred Label, FCT ID) pairs the raw parse produced.
+food_items = df_from_orgfile('../_/categorical_mapping.org', name='harmonize_food')
 food_items = food_items[['Preferred Label', 'FCT ID']].dropna()
-food_items = food_items[food_items['FCT ID'] != '--- ']
 food_items['FCT ID'] = food_items['FCT ID'].astype('int').astype('str')
 
 fct = fct.rename(columns = {fct.columns[0]: 'FCT ID'})

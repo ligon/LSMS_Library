@@ -221,3 +221,63 @@ def test_unknown_labels_raise_keyerror(uga):
     """A non-existent label column raises ``KeyError`` listing what's available."""
     with pytest.raises(KeyError, match=r"(?i)food label table|French|not in"):
         uga.food_expenditures(labels="French")
+
+
+# ---------------------------------------------------------------------------
+# GH #783 -- the food vocabulary must live where the API can SEE it.
+#
+# Config-only (no microdata, no cache): these read `_/categorical_mapping.org`
+# and nothing else.  They exist because the failure mode they pin was silent
+# for a long time -- a country curated hundreds of labels in a standalone
+# `_/food_items.org`, `Country.categorical_mapping` never opened that file
+# under ANY table name, and every `labels=` call raised LabelUnavailableError
+# while the vocabulary sat on disk two directories away.
+# ---------------------------------------------------------------------------
+
+#: Countries migrated by GH #783, with the column set each one must keep.
+#: The columns are load-bearing, not decoration: a `Preferred Label`-only
+#: table would move a country from "no table" to "table with nothing to
+#: select", which is the consolidation closing nothing.
+_GH783_MIGRATED = {
+    "GhanaLSS": {"Preferred Label", "1987-88", "1988-89", "1991-92",
+                 "1998-99", "2005-06", "2012-13", "2016-17", "FCT Code"},
+    "GhanaSPS": {"2009-10", "2013-14", "2017-18", "Preferred Label",
+                 "Food Codes", "FCT Label"},
+    "Cambodia": {"Preferred Label", "2019-20", "Code", "FCT ID"},
+    "Serbia": {"Preferred Label", "proizvod", "Serbian Label", "FCT ID"},
+    "Guatemala": {"Preferred Label", "2000", "FCT code"},
+    "Panama": {"Preferred Label", "2008", "2003", "1997", "FCT ID"},
+}
+
+
+@pytest.mark.parametrize("country,expected_cols", sorted(_GH783_MIGRATED.items()))
+def test_gh783_food_vocabulary_is_reachable(country, expected_cols):
+    """`_relabel_j` must find a food-label table, with all its columns intact."""
+    cat = Country(country).categorical_mapping or {}
+    table = cat.get("food_items") or cat.get("harmonize_food")
+    assert table is not None, (
+        f"{country} has no 'food_items'/'harmonize_food' in "
+        f"Country.categorical_mapping, so every labels= call raises "
+        f"LabelUnavailableError. Did the vocabulary get moved back out of "
+        f"_/categorical_mapping.org? (GH #783)"
+    )
+    assert "Preferred Label" in table.columns
+    missing = expected_cols - set(table.columns)
+    assert not missing, (
+        f"{country}/harmonize_food lost column(s) {sorted(missing)}; the whole "
+        f"point of GH #783 was to carry every column across. Got "
+        f"{list(table.columns)}"
+    )
+
+
+@pytest.mark.parametrize("country", sorted(_GH783_MIGRATED))
+def test_gh783_standalone_food_items_org_stays_retired(country):
+    """A re-introduced `_/food_items.org` would be invisible to the API again."""
+    from lsms_library.paths import countries_root
+    stranded = countries_root() / country / "_" / "food_items.org"
+    assert not stranded.exists(), (
+        f"{stranded} is back. Country.categorical_mapping never opens this "
+        f"file under any table name, so anything curated here cannot reach "
+        f"labels=. Put it in _/categorical_mapping.org as `harmonize_food` "
+        f"(GH #783; cf. Tanzania and Ethiopia 'Unit #0')."
+    )

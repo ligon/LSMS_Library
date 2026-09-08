@@ -25,13 +25,13 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
-$(VAR_DIR)/fct.parquet : fct.py food_items.org
+$(VAR_DIR)/fct.parquet : fct.py categorical_mapping.org
 	./fct.py
 
 $(VAR_DIR)/nutrition.parquet : nutrition.py $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/fct.parquet
 	./nutrition.py
 
-%.parquet: %.py food_items.org guatemala.py
+%.parquet: %.py categorical_mapping.org guatemala.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

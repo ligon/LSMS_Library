@@ -80,7 +80,11 @@ EXPECTED_TAGS = {
     "agricultural-households": 1,
 }
 EXPECTED_SOURCE_TYPES = {"local-documentation": 63, "wb-catalog": 41, "not-found": 7}
-EXPECTED_CONFIDENCE = {"high": 84, "medium": 25, "low": 2}
+# 2026-09-06: GhanaLSS 2016-17 moved medium -> high when the GLSS7 Main
+# Report was acquired (84/25 -> 85/24).  These constants MIRROR the tables
+# section 2 of the source document publishes about itself -- move both, or
+# the guard is checking the document against a stale copy of itself.
+EXPECTED_CONFIDENCE = {"high": 85, "medium": 24, "low": 2}
 
 FIELD_KEYS = {
     "Survey": "survey",

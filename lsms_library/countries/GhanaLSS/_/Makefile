@@ -41,13 +41,15 @@ $(VAR_DIR)/community_prices.parquet: community_prices.py glss_prices.py $(commun
 	python community_prices.py
 
 # nutrition: food_quantities (derived from food_acquired) x the West African
-# Food Composition Table.  Depends on the FCT extract and on food_items.org,
-# which carries the label -> FCT Code map.  See nutrition.py's docstring for
-# why it filters non-physical units before deriving kg.  nutrition.py reads
-# food_acquired through Country('GhanaLSS').food_acquired(), i.e. the
-# framework's own build/cache path, so the parquet is NOT a prerequisite
-# here (GH #808: listing it made make run the retired country-level script).
-$(VAR_DIR)/nutrition.parquet: nutrition.py fct_west_africa.org food_items.org
+# Food Composition Table.  Depends on the FCT extract and on
+# categorical_mapping.org, whose harmonize_food table carries the
+# label -> FCT Code map (GH #783; was the standalone food_items.org).  See
+# nutrition.py's docstring for why it filters non-physical units before
+# deriving kg.  nutrition.py reads food_acquired through
+# Country('GhanaLSS').food_acquired(), i.e. the framework's own build/cache
+# path, so the parquet is NOT a prerequisite here (GH #808: listing it made
+# make run the retired country-level script).
+$(VAR_DIR)/nutrition.parquet: nutrition.py fct_west_africa.org categorical_mapping.org
 	python nutrition.py
 
 household_roster = $(shell find $(rounds) -name household_roster.py)
@@ -60,7 +62,7 @@ $(VAR_DIR)/household_roster.parquet: household_roster.py $(household_roster_parq
 	python household_roster.py
 
 
-%.parquet: %.py food_items.org ghanalss.py
+%.parquet: %.py categorical_mapping.org ghanalss.py
 	(cd $(@D) && python ./$(<F))
 
 clean:

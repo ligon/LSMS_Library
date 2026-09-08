@@ -225,7 +225,7 @@ Data Scheme:
   #                     surviving kg rows); purchases were elicited by value.
   #                     A biased subset, not scaled-down total intake.
   #   2005-06           NO ROWS.  Its own-production module's 63 item labels
-  #                     are absent from food_items.org#food_label (the
+  #                     are absent from categorical_mapping.org#harmonize_food (the
   #                     PURCHASE module's 101/102 are present), so none maps
   #                     to an FCT code.  A harmonisation gap, not an absence.
   #   2016-17           The usable wave: purchases and own production both

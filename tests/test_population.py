@@ -292,9 +292,21 @@ class TestAttrsSurvival:
         """The shape of any merge against a frame that never passed through
         `_finalize_result` -- a raw `get_dataframe` result, a lookup table.
 
-        NOT `_join_v_from_sample`: `sample()` goes through `_finalize_result`
-        too, so both sides now carry the same record and that merge hits the
-        *preserving* branch above (measured on Liberia, Ethiopia, Albania).
+        This docstring used to say "NOT `_join_v_from_sample`: sample() goes
+        through _finalize_result too, so both sides now carry the same record
+        and that merge hits the *preserving* branch."  RE-MEASURED 2026-09-06
+        on Liberia, Albania and Ethiopia, on the unmodified pre-#603-attrs code
+        as well as after: **that is false.**  `attach_population` is called at
+        `country.py:3034` and `_join_v_from_sample` at `country.py:2891` -- 143
+        lines EARLIER in the same `_finalize_result` call -- so at merge time
+        the left frame has no population record yet while `sample()`, which
+        completed its own `_finalize_result`, has one.  Every observation was
+        `left_has_pop=False, right_has_pop=True, attrs_equal=False,
+        out_attrs_empty=True`.  It is a *disagreeing* merge, i.e. this very
+        case with the sides swapped.  What keeps `id_converted` alive there is
+        the explicit `result.attrs = dict(df.attrs)`, and what puts the
+        population record on the result is `attach_population` running after.
+        See `TestVJoinIsADisagreeingMerge` below.
         """
         df = _frame_with_record()
         other = pd.DataFrame({"i": ["1", "2"], "x": [1, 2]})
@@ -356,12 +368,163 @@ class TestAttrsSurvival:
         assert back[0].country == "Liberia" and back[0].wave == "2018-19"
         assert back[0].universe_tag == "specialized"
 
-    def test_attrs_values_are_plain_types(self):
-        """So a consumer can serialize a frame's metadata without importing us."""
+    def test_attrs_values_are_json_serializable(self):
+        """A consumer must be able to serialize a frame's metadata.
+
+        Since #603-attrs the values are `PopulationRecord`s rather than plain
+        dicts, and this test is the reason that had to be a `dict` SUBCLASS:
+        `pandas.io.parquet` serialises `df.attrs` with a bare `json.dumps`, so
+        anything else in `attrs` turns a user's `df.to_parquet()` into a
+        `TypeError`.  See `TestRecordsRideOnAttrs::test_to_parquet_still_works`.
+        """
         import json
         df = _frame_with_record()
         json.dumps(df.attrs[P.ATTRS_KEY])
 
+
+
+
+class TestVJoinIsADisagreeingMerge:
+    """`_join_v_from_sample`'s merge does NOT preserve `attrs`, and this pins why.
+
+    The docs (AGENTS.md, docs/guide/population.md, and the sibling test above)
+    used to name it as the live example of the *preserving* branch.  Measured on
+    Liberia, Albania and Ethiopia -- and on the pre-change code, so this is a
+    documentation error and not a regression -- it is the opposite: the left
+    frame has no population record at merge time because `attach_population`
+    runs later in the same `_finalize_result`.  Reproduced here in pure pandas
+    so the pin costs no microdata.
+    """
+
+    def test_the_side_that_has_the_record_is_the_RIGHT_one(self):
+        left = pd.DataFrame({"t": ["2018-19"], "i": ["1"], "Age": [30]})
+        left.attrs["id_converted"] = True           # what the left DOES carry
+        v_lookup = pd.DataFrame({"t": ["2018-19"], "i": ["1"], "v": ["c1"]})
+        P.attach(v_lookup, "Liberia")               # what sample() carries
+        assert P.ATTRS_KEY not in left.attrs
+        assert P.ATTRS_KEY in v_lookup.attrs
+        out = left.merge(v_lookup, on=["t", "i"], how="left")
+        assert not out.attrs, "a disagreeing merge must yield {}"
+
+    def test_both_mitigations_are_what_actually_keeps_it_alive(self):
+        """The explicit copy carries `id_converted`; `attach` re-adds the record."""
+        left = pd.DataFrame({"t": ["2018-19"], "i": ["1"], "Age": [30]})
+        left.attrs["id_converted"] = True
+        v_lookup = pd.DataFrame({"t": ["2018-19"], "i": ["1"], "v": ["c1"]})
+        P.attach(v_lookup, "Liberia")
+        out = left.merge(v_lookup, on=["t", "i"], how="left")
+        out.attrs = dict(left.attrs)                # country.py does exactly this
+        assert out.attrs["id_converted"] is True
+        P.attach(out, "Liberia")                    # ... and then this
+        assert out.attrs[P.ATTRS_KEY]["Liberia"]["2018-19"].universe_tag == "specialized"
+
+
+class TestRecordsRideOnAttrs:
+    """`attrs` carries the record itself -- and every property that depends on.
+
+    @ligon asked for `attrs['population'][c][w].universe_tag` to work.  Making
+    the record a `dict` subclass rather than putting a frozen dataclass in
+    `attrs` is not a stylistic choice: pandas serialises `attrs` with
+    `json.dumps` on the parquet write path, and pandas propagates `attrs` by
+    comparing them for EQUALITY.  Both are pinned below, because both would
+    fail silently or remotely from the change that caused them.
+    """
+
+    def test_both_spellings_work_on_the_object_in_attrs(self):
+        block = _frame_with_record().attrs[P.ATTRS_KEY]["Liberia"]["2018-19"]
+        assert isinstance(block, PopulationRecord)
+        assert block.universe_tag == "specialized" == block["universe_tag"]
+        assert block.source_type and block.confidence
+
+    def test_an_absent_optional_field_reads_as_None_not_KeyError(self):
+        """The complaint that started this: the dict had no `documented_as`."""
+        block = _frame_with_record().attrs[P.ATTRS_KEY]["Liberia"]["2018-19"]
+        assert block.documented_as is None
+        assert "documented_as" not in block          # mapping content unchanged
+        with pytest.raises(KeyError):
+            block["documented_as"]
+
+    def test_the_record_compares_equal_to_the_plain_dict_it_replaced(self):
+        """The load-bearing property.
+
+        pandas propagates `attrs` only when every input compares equal, so a
+        record that compared by identity would silently start dropping `attrs`
+        from merges that preserve them today.  Equality with the *plain dict*
+        additionally means a frame read back from a pre-existing parquet still
+        agrees with a freshly built one.
+        """
+        r = rec()
+        assert r == dict(r) and dict(r) == r
+        assert r == rec() and r is not rec()
+
+    def test_merge_preserves_across_a_record_and_an_equivalent_plain_dict(self):
+        new = _frame_with_record()
+        old = pd.DataFrame({"i": ["1", "2"], "x": [1, 2]})
+        old.attrs = {k: ({c: {w: dict(r) for w, r in ws.items()}
+                          for c, ws in v.items()} if k == P.ATTRS_KEY else v)
+                     for k, v in new.attrs.items()}
+        assert type(old.attrs[P.ATTRS_KEY]["Liberia"]["2018-19"]) is dict
+        assert P.ATTRS_KEY in new.merge(old, on="i").attrs
+
+    def test_records_are_immutable_because_the_loader_is_cached(self):
+        r = population_records("Liberia")["2018-19"]
+        for call in (lambda: r.__setitem__("confidence", "low"),
+                     lambda: r.update({"confidence": "low"}),
+                     lambda: r.pop("confidence"),
+                     lambda: r.clear()):
+            with pytest.raises(TypeError, match="immutable"):
+                call()
+        assert population_records("Liberia")["2018-19"].confidence == r.confidence
+
+    def test_records_are_hashable(self):
+        assert len({rec(), rec()}) == 1
+
+    def test_deepcopy_and_pickle_round_trip(self):
+        """pandas deepcopies `attrs` on EVERY propagation, so this is hot."""
+        import copy
+        import pickle
+        r = rec(notes="x")
+        for clone in (copy.deepcopy(r), pickle.loads(pickle.dumps(r))):
+            assert type(clone) is PopulationRecord and clone == r
+
+    def test_to_parquet_still_works(self, tmp_path):
+        """The regression a dataclass in `attrs` would have caused, pinned.
+
+        pandas 3.0.2 `io/parquet.py` does `json.dumps(df.attrs)`; pyarrow's
+        `pandas_compat` does the same and warns.  A non-JSON value in `attrs`
+        raises `TypeError` on any user's `df.to_parquet()`.
+        """
+        df = _frame_with_record()
+        path = tmp_path / "p.parquet"
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")   # pyarrow's attrs-drop warning is fatal
+            df.to_parquet(path)
+        back = pd.read_parquet(path)
+        blk = back.attrs[P.ATTRS_KEY]["Liberia"]["2018-19"]
+        assert blk == dict(df.attrs[P.ATTRS_KEY]["Liberia"]["2018-19"])
+
+    def test_records_from_attrs_reads_records_AND_round_tripped_dicts(self):
+        """A parquet round trip loses the class -- `json.loads` returns dicts."""
+        df = _frame_with_record()
+        as_dicts = pd.DataFrame({"x": [1]})
+        as_dicts.attrs = {P.ATTRS_KEY: {"Liberia": {
+            "2018-19": dict(df.attrs[P.ATTRS_KEY]["Liberia"]["2018-19"])}}}
+        for frame in (df, as_dicts):
+            out = P.records_from_attrs(frame)
+            assert [type(x) for x in out] == [PopulationRecord]
+            assert out[0].universe_tag == "specialized"
+
+    def test_an_unknown_field_is_rejected_rather_than_silently_kept(self):
+        with pytest.raises(TypeError, match="unexpected field"):
+            PopulationRecord(country="A", wave="1", universe_tag="specialized",
+                             source_type="wb-catalog", confidence="high",
+                             univese_tag="typo")
+
+    def test_country_population_and_attrs_return_the_SAME_type(self):
+        """The asymmetry #603 complained about, pinned shut."""
+        from_property = population_records("Liberia")["2018-19"]
+        from_attrs = _frame_with_record().attrs[P.ATTRS_KEY]["Liberia"]["2018-19"]
+        assert type(from_property) is type(from_attrs) is PopulationRecord
 
 class TestWaveResolution:
 
