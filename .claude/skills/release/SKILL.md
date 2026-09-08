@@ -116,6 +116,17 @@ Verify with `poetry self show plugins` — the plugin should be
 listed. Then `poetry version` should report the dynamic version
 from the latest git tag, not `0.0.0`.
 
+## The placeholder's SECTION matters, not just its value
+
+`poetry-dynamic-versioning` in PEP 621 mode substitutes `[tool.poetry]
+version = "0.0.0"` and requires `[project]` to carry **no** static `version`
+(only `dynamic = ["version"]`). A killed `poetry build`/`poetry lock` leaves
+the plugin's substituted form on disk, which MOVES `version` into `[project]`;
+restoring the value `0.0.0` without moving it back looks fine, passes a
+line-based check, and makes `poetry version -s` resolve `0.0.0` -- exactly
+how v0.11.0's first publish run (34193399219, 2026-09-08) failed at the
+sanity gate. `tests/test_version_placeholder.py` now checks the section.
+
 ## `poetry build` hangs on Linux keyring without a TTY
 
 Poetry 2.x pulls in `keyring` + `SecretStorage` as transitive
