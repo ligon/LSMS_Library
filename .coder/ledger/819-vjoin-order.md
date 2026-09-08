@@ -149,3 +149,37 @@ Repo-wide ones from `STANDING.md §4` apply unchanged. Task-specific:
   stays after the v-join, because that is the step that adds `v`.
 - No REINVENTION: nothing new computes a cluster id, a household-id map, or a
   second walk.
+
+**Blast radius, measured rather than argued** (raw records in
+`slurm_logs/`-style scratch output; the scripts are three short readers over the
+warm cache, no builds):
+
+- *The reorder can only touch a country whose `updated_ids` actually renames an
+  id AND that declares `sample`.* Enumerated: exactly **7** — Burkina Faso,
+  Ethiopia, GhanaLSS, Malawi, Niger, Tanzania, Uganda. For all 7, `household_roster`
+  is **byte-identical** across all 38 waves (rows / `v` NaN share / distinct `v` /
+  duplicate index / distinct `i`), because YAML-path tables are already walked
+  per wave by `_aggregate_wave_data:3606` before `_finalize_result` sees them.
+  The defect bit **script-path country-level tables**, where the whole frame
+  arrives unwalked — `food_acquired` is the instance. `food_acquired` is
+  likewise byte-identical for the other 5; only Ethiopia moves.
+- *The coercion touches every country with a `sample` table.* Swept all 36 that
+  have one, comparing `format_id` against the old `str(int(float(x)))` on
+  `sample()['v']` and asking which spelling `cluster_features.v` actually
+  carries:
+
+  | country | distinct `v` changed | matches `cluster_features` — new / old |
+  |---|---|---|
+  | Ethiopia | 1039 / 1305 | **1039 / 0** |
+  | Liberia | 6 / 32 | **6 / 0** |
+  | GhanaSPS | 97 / 334 | n/a — no `cluster_features` table |
+  | the other 33 | 0 | — |
+
+  **Liberia was a second, unreported instance of #819** and is fixed by the same
+  line: `cluster_features.v` is `'032'`, `'052'`, …, and the old coercion served
+  `'32'`, `'52'`. Its `sample().v` also contains `'102.0'` — a stringified float
+  next to zero-padded strings in the same column — which is a live demonstration
+  that the float-normalising half is still needed and still works (`'102.0'` ->
+  `'102'`, matching `cluster_features`). GhanaSPS declares no `cluster_features`,
+  so its 97 changes are neutral for matching; the served `v` now simply agrees
+  with the `'001'`-style id its own `sample` table holds.
