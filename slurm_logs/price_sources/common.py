@@ -39,6 +39,10 @@ MODEL_COLS = ["country", "t", "pair", "u_basis", "geo_level", "threshold_a",
 
 CLAIM_LO, CLAIM_HI = math.log(1.3), math.log(1.5)
 
+#: Residual degrees of freedom below which a fixed-effects slope is reported as
+#: NaN instead of a number (see _fwl_slope).
+MIN_DOF = 5
+
 
 # ---------------------------------------------------------------------------
 # geography
@@ -195,8 +199,19 @@ def _fwl_slope(y, x, fe_blocks):
     """
     FE = dm.DataMat(pd.concat(fe_blocks, axis=1).astype(float))
     FE.columns = [f"fe{i}" for i in range(FE.shape[1])]
+    # Identification guard (Nigeria, 2026-09-08: 17 cells against 16 geo
+    # effects "fit" with r2 = 1.000000 and se = 9e-15; a cluster-grain pair
+    # where every cell is its own geo is singular outright and raised
+    # LinAlgError).  Effects consume rank; require MIN_DOF residual degrees
+    # of freedom or report NaN -- a number here would be a lie.
+    n_eff = int(np.linalg.matrix_rank(np.asarray(FE, dtype=float)))
+    if len(y) - n_eff - 1 < MIN_DOF:
+        return np.nan, np.nan, np.nan, None
     D = {"y": dm.DataMat(y), "x": dm.DataMat(x), "FE": FE}
-    U, B = fwl_regression(D)
+    try:
+        U, B = fwl_regression(D)
+    except np.linalg.LinAlgError:
+        return np.nan, np.nan, np.nan, None
     y_r, x_r = U["FE"]["y"], U["FE"]["x"]          # residualised on the effects
     beta_fwl = float(np.asarray(B["x"]["y"]).ravel()[0])
     b, V = ols(pd.DataFrame(np.asarray(x_r), index=y_r.index, columns=["x"]),
@@ -248,7 +263,7 @@ def fit_gap_model(gaps):
     # within: item + geo effects, cell midpoint
     bw, sew, rsd, y_r = _fwl_slope(y, mid, [D_item, D_geo])
     out.update(coef_within=bw, se_within=sew, resid_sd=rsd,
-               r2_fe=(float(1 - (y_r ** 2).sum() / tot) if tot > 0 else np.nan))
+               r2_fe=(float(1 - (y_r ** 2).sum() / tot) if (tot > 0 and y_r is not None) else np.nan))
     # between: geo effects only, the item's mean midpoint
     item_mid = pd.DataFrame({"item_mid": mid["mid"].groupby(g["j"]).transform("mean")})
     bb, seb, _, _ = _fwl_slope(y, item_mid, [D_geo])
@@ -342,4 +357,10 @@ if __name__ == "__main__":
     rows = model_rows(g, country="synthetic", t="2020", pair="a_vs_b", u_basis="native",
                       threshold_a=10, threshold_b=1)
     print("model_rows geo_levels:", [r["geo_level"] for r in rows])
+    # under-identified: 12 cells, each its own geo -> NaN slopes, no exception
+    tiny = g.groupby("j", observed=True).head(1).head(12).copy()
+    tiny["geo"] = [f"g{k}" for k in range(len(tiny))]
+    r = fit_gap_model(tiny)
+    assert all(math.isnan(r[k]) for k in ("coef_within", "coef_between", "r2_fe")), r
+    print(f"under-identified case: cells={r['n_cells']} within={r['coef_within']} between={r['coef_between']} (NaN, as it should be)")
     print("self-test done")
