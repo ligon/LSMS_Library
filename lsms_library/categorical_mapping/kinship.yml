@@ -592,12 +592,10 @@ Lodger:                                  [0, 0, guest]
 Father/month-in-Law:                     [1, 0, affinal]   # same typo without numeric prefix
 
 # --- Punctuation / spacing variants (Kazakhstan, Tajikistan, South Africa) ---
-"Adopted / Foster/ Step Child":          [-1, 0, step]
 "Brother/sister in-law":                 [0, 1, affinal]
 "Brother / sister-in-law":              [0, 1, affinal]
 "Brother/Sister in-law":                 [0, 1, affinal]
 "brother /sister-in-law":               [0, 1, affinal]
-"Child (Son/Daughter)":                  [-1, 0, consanguineal]
 "Child / Adopted Child":                 [-1, 0, consanguineal]
 "Child / adopted child":                 [-1, 0, consanguineal]
 "child - adopted child":                 [-1, 0, consanguineal]
@@ -609,24 +607,16 @@ Father/month-in-Law:                     [1, 0, affinal]   # same typo without n
 "Lodger/Lodger's relative":              [0, 0, guest]
 "Servant or servant's relative":         [0, 0, servant]
 "grandfather /mother":                   [2, 0, consanguineal]
-"House Help (Non-Relative)":             [0, 0, servant]
-Househelp:                               [0, 0, servant]
 "Househelp (Other Relative)":            [0, 0, servant]
 "Niece / Nephew":                        [-1, 1, consanguineal]
 "niece - nephew":                        [-1, 1, consanguineal]
-Non_Relative:                            [0, 0, unrelated]
-"Others not related":                    [0, 0, unrelated]
-"Parent/Parent-In-Law":                  [1, 0, consanguineal]
-Parent/Parentlaw:                        [1, 0, consanguineal]
 Partner:                                 [0, 0, affinal]
 "Sister / Brother":                      [0, 1, consanguineal]
 "sister - brother":                      [0, 1, consanguineal]
 "Son / Daugheter-in-law":               [-1, 0, affinal]   # "Daugheter" is a typo in source data
-Son/Daughterlaw:                         [-1, 0, affinal]
 "son-daughter in law":                   [-1, 0, affinal]
 "Spouse / Partner":                      [0, 0, affinal]
 Spouse/Partner:                          [0, 0, affinal]
-"Spouse (Wife/Husband)":                 [0, 0, affinal]
 "spouse -partner":                       [0, 0, affinal]
 
 # --- "of head of household" patterns (Tajikistan) ---
@@ -706,7 +696,3 @@ unrelated:                                                      [0, 0, unrelated
 #   "Parent/Parent-In-Law"         -> [1, 0, consanguineal]
 #   "Son/Daughter-in-law"          -> [-1, 0, affinal]
 "Adopted/Foster/Stepchild":      [-1, 0, null]   # Ghana shared label: adoptive/foster/step undetermined (GH #797, 2026-09-07)
-"Adopted, Foster, Or Stepchild": [-1, 0, step]
-"Adopted, Foster/Stepchild":     [-1, 0, step]
-"Parent Or Parent-In-Law":       [1, 0, consanguineal]
-"Son Or Daughter In-Law":        [-1, 0, affinal]

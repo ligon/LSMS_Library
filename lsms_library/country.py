@@ -3238,15 +3238,21 @@ class Country:
         script in any of ``waves`` (run through run_make_target's wave-script
         fallback -- GhanaLSS ``food_acquired`` since GH #808 is exactly this:
         seven wave scripts, no make flag, no country script).  Wave folders are
-        resolved through ``self[wave].file_path`` so ``wave_folder_map`` is
-        honoured (Tanzania ``2008-15``, Nigeria round dirs); ``file_path / wave``
-        would miss them.  Consumed by ``_assert_built_required_columns``.
+        resolved through ``wave_folder_map`` (Tanzania ``2008-15``, Nigeria
+        round dirs), the same way ``run_make_target`` resolves them, so a
+        mapped label is found where ``file_path / label`` would miss it.
+        Deliberately a pure path probe: it does NOT build ``Wave`` objects
+        (``self[wave]``) -- the cache-hit paths this feeds must not touch a
+        wave, and ``tests/test_dvc_caching.py`` pins that with a
+        ``__getitem__`` that raises.  Consumed by
+        ``_assert_built_required_columns``.
         """
         if materialize_backend == "make":
             return True
         if (self.file_path / "_" / f"{method_name}.py").exists():
             return True
-        return any((self[w].file_path / "_" / f"{method_name}.py").exists()
+        folder_map = getattr(self, "wave_folder_map", None) or {}
+        return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
                    for w in waves)
 
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
@@ -4019,8 +4025,8 @@ class Country:
         # wave-script fallback, and since GH #808 has NO country-level
         # concatenator -- so a country-level ``_/{table}.py`` OR any wave-level
         # ``{wave}/_/{table}.py`` counts as script-path.  Wave folders are
-        # resolved through ``self[wave].file_path`` (honours wave_folder_map:
-        # Tanzania ``2008-15``, Nigeria round dirs), never ``file_path / wave``.
+        # resolved through wave_folder_map (Tanzania ``2008-15``, Nigeria
+        # round dirs), without constructing a Wave.
         is_script_path = self._is_script_path(method_name, materialize_backend, waves)
         self._assert_built_required_columns(result, method_name, scheme_entry,
                                             is_script_path)
