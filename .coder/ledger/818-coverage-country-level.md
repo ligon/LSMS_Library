@@ -163,14 +163,36 @@ wave **and** have no country-level script — genuinely un-written config. They
 stay `absent`, which is the live queue where they belong.
 
 Key changes rather than tier changes: `nutrition` for Uganda / Ethiopia /
-GhanaLSS moves from one `wave=''` row to per-wave rows (8 / 5 / 5). Measured on
-Uganda: 8 × `sane`, "all checks pass", n_rows summing to 23,801 — exactly the
-country total the single row carried. This is the first time nutrition is
+GhanaLSS moves from one `wave=''` row to per-wave rows. Uganda 8 and Ethiopia 5
+are fully covered (`t` names every wave); **GhanaLSS is 5 of 7** — its `t` omits
+1987-88 and 1988-89, so the regrade ADDS two `absent` cells there. That is the
+one place this change grows the live queue rather than shrinking it, and it is
+an adjudication question for `absent_verdicts.csv`, not a config bug: the same
+two waves are where `GhanaLSS/food_acquired`'s `Price` is 100% null (the
+`NullReadWarning` in the test log). Same structure as EthiopiaRHS 1989/1999,
+which the issue anticipated. Measured on Uganda: 8 × `sane`, "all checks pass",
+n_rows summing to 23,801 — exactly the country total the single row carried. This is the first time nutrition is
 sanity-checked at all: `grade_country_level` never calls
 `is_this_feature_sane`, it returns `sane` for any non-empty result.
 
+**Regeneration hazard for whoever refreshes `latest.csv`:** the `wave=''` →
+per-wave move is a KEY change, and `save_snapshot`'s #724 stale-row deletion
+fires only for a country graded WITHOUT a `--features` filter. A scoped
+`--features nutrition` refresh would leave the old `Uganda,nutrition,,sane` row
+sitting beside the 8 new ones. Regenerate per country, unscoped.
+
+**`blocked` path: code unchanged, reachability slightly widened.** In the
+broken-build branch `not covered[w]` is tested BEFORE `_blocked_cell(w)`, so a
+newly-country-level cell now reaches the blocked check where it used to
+short-circuit to `absent`. That is the direction the module demands (a blocked
+source must stay visible), and there are zero live instances: every
+declared-by-no-wave Nepal feature has `_has_country_level_feature = False`.
+
 **Surprise, and the one thing a reviewer should look at:** the fix is a wider
-regrade than the issue implies — ~77 wave cells across 4 countries plus the 3
-nutrition key changes, not the 8 EthiopiaRHS cells the issue names. Every
-mover was verified to have both halves of the test, and none moves to a
-*worse* tier: the new path can only lift `absent`, never manufacture `dropped`.
+regrade than the issue implies — 36 measured wave-cell lifts (6 EthiopiaRHS +
+29 Nigeria + 1 Guyana) plus Uganda `income` (≤ 8, unbuilt), the 3 `nutrition`
+key changes, and 2 phantom `broken` cells removed (corpus `broken` 8 → 6) — not
+the 8 EthiopiaRHS cells the issue names. Every mover was verified to have both
+halves of the test, and no cell moves to a *worse* tier: the new path can only
+lift `absent`, never manufacture `dropped`. The two new GhanaLSS `absent` cells
+above are the sole addition to the queue.
