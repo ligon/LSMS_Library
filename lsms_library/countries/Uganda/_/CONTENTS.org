@@ -1561,7 +1561,11 @@ a null =plot= id (the =hhid-parcel-plot= concatenation propagates NA).
 Unrelated to and unchanged by the =condition= work; =condition= is
 sentinel-filled precisely so it does not add to this.
 
-** TODO 2015-16 =crop_production.Value_sold= is ~100x too small (whole wave)
+** TODO 2015-16 =crop_production.Value_sold= is ~100x too small (whole wave) (#829)
+
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/829][#829]] (bug, silent-corruption)
+- Waves affected :: 2015-16 only, both seasons (AGSEC5A / AGSEC5B)
+- Severity :: Critical for any use of =Value_sold= or the WB harvest-valuation ladder on that wave; grades =sane=
 
 Found 2026-09-08 during the five-source price comparison
 (=slurm_logs/price_sources/=).  *Every* 2015-16 crop sale price implied by
