@@ -52,9 +52,11 @@ def _half(g, p, i_mod, q, hh_of):
     ]
     sale = [
         _sale_block(i_mod, hhid='hhid', cropcode='crop_code', sold_flag='ag_i01',
-                    qty_sold='ag_i02a', value_sold='ag_i03', perennial=False),
+                    qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
+                    perennial=False),
         _sale_block(q, hhid='hhid', cropcode='crop_code', sold_flag='ag_q01',
-                    qty_sold='ag_q02a', value_sold='ag_q03', perennial=True),
+                    qty_sold='ag_q02a', value_sold='ag_q03', unit_sold='ag_q02b',
+                    perennial=True),
     ]
     return harvest, sale
 
