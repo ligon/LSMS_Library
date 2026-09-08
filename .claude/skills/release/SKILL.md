@@ -42,6 +42,14 @@ gh pr list --state merged --limit 400 --json number,headRefName \
   -q '.[].headRefName' | grep -oE '(fix|feat)/[0-9]+' | grep -oE '[0-9]+' | sort -un
 ```
 
+> **Merge the release PR with a MERGE COMMIT, never "Squash and merge".**
+> A squash gives `master` a commit that is not in `development`'s history,
+> so the *next* `development -> master` PR has an ancient merge base and
+> shows as CONFLICTING on every file both sides touched (v0.11.0: #807 was
+> squashed, and the one-line hotfix PR #814 could not be merged; it had to
+> be cherry-picked onto `master` as #815, then `master` merged back into
+> `development` to realign the histories).
+
 Cut a release:
 
 ```sh
