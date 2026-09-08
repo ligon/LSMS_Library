@@ -1,0 +1,104 @@
+#+TITLE: .dta value-label encoding sweep (GH #794)
+
+Measures how every ~.dta~ the corpus holds is decoded, and what
+~ligonlibrary.dataframes._coerce_label~ would do to its value labels.
+
+* Why this exists
+
+A ~UnicodeWarning~ from ~ligonlibrary.dataframes.from_dta~ prompted the
+question "how much of the corpus is affected?".  The answer turned out to
+be the opposite of the intuition: *the files that warn are fine*, and the
+risk sits in the much larger set that is decoded ~latin-1~ *silently*.
+
+~pandas.io.stata.StataReader~ picks its string encoding purely from the
+file's format version (~_set_encoding~, ~pandas/io/stata.py:1126~):
+
+: < 118  ->  latin-1     (silent -- a UnicodeWarning is IMPOSSIBLE here)
+: >= 118 ->  utf-8       (warns, then falls back to latin-1, only if utf-8 fails)
+
+So "files that warn" undercounts "files decoded as latin-1" by essentially
+the whole pre-2015 corpus.  The probe therefore records ~format_version~ and
+~reader._encoding~ per file, not just warn/no-warn.
+
+* Running it
+
+: python build_manifest.py            # declared.json + sidecars -> manifest.tsv
+: sbatch sweep.sbatch                 # 1 savio3 node, xargs -P $SLURM_CPUS_ON_NODE
+: python analyze.py sweep_<jobid>.jsonl
+
+~build_manifest.py~ needs ~declared.json~, produced by
+~enumerate_reads_wt.py~ (a copy of ~../null_read_guard/enumerate_reads.py~
+with its worktree assertion relaxed).  It is not committed -- regenerate it.
+
+*One node, saturated from inside.*  savio3 allocates WHOLE nodes (~32
+cores), so an array of single-core tasks would hold ~1,120 cores for work
+that needs 32.  Same pattern as ~../sample_warnings/~.
+
+*No DVC CLI, no network.*  ~probe_one.py~ resolves each ~.dta.dvc~ sidecar's
+md5 to its L1 blob and reads that directly -- the same bytes
+~get_dataframe~ reads after ~_ensure_dvc_pulled~.  pandas only; the library
+is never imported.
+
+* Scope, stated honestly
+
+5,297 ~.dta~ sidecars exist.  *3,745 were cached and swept; 1,552 were
+uncached and NOT swept* -- deliberately not fetched.  Of those swept, 975
+are declared by some table's config (the rest are files nothing reads).
+
+* Headline results (job 38595301, 3,745 files, 5m11s)
+
+| measure                                          | value                   |
+|--------------------------------------------------+-------------------------|
+| pandas chose latin-1                             | 2,755 (73.6%)           |
+| pandas chose utf-8                               | 990                     |
+| ~UnicodeWarning~ fired                           | *44 -- all format 118*  |
+| ... format < 118 among them                      | *0*                     |
+| files with >= 1 non-ASCII value label            | 589 (30,343 labels)     |
+| labels ~_coerce_label~ would DROP chars from     | 29,279 across 551 files |
+
+The last row is *latent, not realised*: it counts what would be destroyed
+*if* a caller passed ~encoding=~, and corpus-wide only three ~.dta~ reads
+do (Senegal 2018-19, Burkina Faso 2018-19 / 2021-22) -- all three of them
+dead code superseded by the YAML build path.
+
+* The signature classifier
+
+Each non-ASCII label is tagged:
+
+- ~c1~ :: contains U+0080-U+009F -- the cp1252-read-as-latin-1 signature
+  (curly quotes, en dashes, EUR).  Only meaningful when ~_encoding == 'latin-1'~.
+- ~double~ :: a strict latin-1 -> utf-8 round trip *succeeds and changes it*
+  -- genuinely double-encoded at source (the Senegal / Cambodia pattern).
+- ~ge256~ :: a codepoint >= 256 -- a genuine utf-8 decode; such a file
+  cannot have warned.
+- ~nort~ :: no latin-1 -> utf-8 round trip is possible -- the file really is
+  latin-1 and pandas is already right.  This is the bulk (28,803 labels),
+  and it is exactly the set ~_coerce_label~ would damage.
+
+* Caveats
+
+- Value labels only.  ~str~ *columns* are not probed, and ~_coerce_label~
+  does not touch them either -- so a file whose labels are "repaired" still
+  has raw string columns.  That asymmetry is a real gap, in the sweep and in
+  ~ligonlibrary~.
+- ~n_coerce_drops~ is computed with ~encoding='latin-1'~, which is what all
+  three real call sites pass (~ISO-8859-1~ is an alias).
+
+* Follow-ups (added at the merge with development, 2026-09-07)
+
+- GH #801 (development =1757d4b2=) fixed the six =household_roster=
+  Relationship artefacts at the wave level, citing the per-file records
+  here: the =c1= rosters (Niger / Senegal / Benin / Togo 2018-19
+  =s01_me_*=, cp1252 read as latin-1 -> =_decode_cp1252= in each wave's
+  =mapping.py=), Mali 2018-19 (labels truncated IN THE FILE, zero
+  non-ASCII bytes in that label set -- no reader setting recovers them)
+  and Burkina Faso 2014 =individu= (a literal =?= in the file).  Evidence
+  and the decoder matrix: =slurm_logs/gh797/fix_801/REPORT.org=.
+- GH #805 is the reader-level policy question this sweep sized: pandas
+  =StataReader= decodes every pre-118 file as latin-1 with no per-file
+  override on =get_dataframe='s path, and this sweep's 1,501 =c1=-signature
+  labels (sum of =signatures.c1= over the 3,745 records) are the corpus-wide
+  cost.  A cp1252-first fallback for format < 118 touches only those; the
+  =double= class (1,064 labels; the Senegal =s07b= / Cambodia pattern) is
+  untouched by it and stays load-bearing on the EHCVM crosswalks -- see the
+  Senegal and Burkina Faso =CONTENTS.org= sections.
