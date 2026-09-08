@@ -782,8 +782,22 @@ def test_uganda_wide_nonfood_table_raises_citing_gh817():
 @pytest.mark.slow
 def test_nigeria_default_wave_is_the_most_recent_the_measure_holds():
     """Country.waves ends in 2024Q1, which has no food rows; the default must
-    come from the measure's own `t` (as the pyramid reads the roster's)."""
+    come from the measure's own `t` (as the pyramid reads the roster's).
+
+    Runs only against a WARM Nigeria cache.  The credentialed CI data job
+    pre-builds Uganda alone before the full suite, so without this gate the
+    test would cold-build eight rounds of Nigeria ``food_acquired`` on every
+    push to master -- a cost nobody asked this test to incur.  The Uganda
+    tests above need no such gate for the same reason.
+    """
     ll = pytest.importorskip("lsms_library")
+    from lsms_library.paths import data_root
+    var = data_root("Nigeria") / "var"
+    warm = all((var / f"{t}.parquet").exists()
+               for t in ("food_acquired", "household_roster", "sample"))
+    if not warm:
+        pytest.skip("needs a warm Nigeria cache (food_acquired, household_roster, "
+                    "sample); this test never triggers a cold build")
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
