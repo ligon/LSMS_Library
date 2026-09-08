@@ -22,13 +22,16 @@ So **before** `make release`, open a **`development` → `master` merge PR** and
 put closing keywords for every issue resolved since the last release in its body:
 
 ```
-Closes #498, #499, #500, #501, #502, #530, #551
+Closes #498, closes #499, closes #500, closes #501, closes #502
 ```
 
-This is the *only* point those issues auto-close: GitHub fires closing keywords
-only when they reach the default branch, and only via `Closes`/`Fixes`/`Resolves
-#N` (keyword + space) — **not** the `fix(#N):` conventional-commit scope style
-the fix commits use. Omit this and the resolved issues stay open after the merge
+**One keyword per issue.** A comma list after a single keyword closes only
+the FIRST issue: v0.11.0's PR #807 carried `Closes #764, #799, #800, #801,
+#803, #806, #808` and GitHub closed #764 alone; the other six were closed by
+hand (2026-09-08). This is the *only* point those issues auto-close: GitHub
+fires closing keywords only when they reach the default branch, and only via
+`Closes`/`Fixes`/`Resolves #N` (keyword + space) — **not** the `fix(#N):`
+conventional-commit scope style the fix commits use. Omit this and the resolved issues stay open after the merge
 (exactly what happened up to v0.8.0 — a batch had to be closed by hand). Build a
 candidate list, then **verify each is genuinely resolved** (not an umbrella issue
 a PR merely touched) before listing it:
