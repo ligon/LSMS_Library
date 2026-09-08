@@ -185,7 +185,8 @@ def test_energy_2016_17_measured(nutrition):
     * ~15% of 2016-17 expenditure is on u='Value' rows (restaurants, cooked
       meals) that carry real intake and are necessarily dropped;
     * 7.5% of its kilograms map to no FCT row, and the three labels missing
-      from food_items.org#food_label alone are worth +27% of its Energy;
+      from categorical_mapping.org#harmonize_food alone are worth +27% of
+      its Energy;
     * the 30-day recall is an approximation of ~7 visits over about a month;
     * densities are per edible portion but quantities are as acquired.
 
@@ -253,10 +254,19 @@ def test_fct_table_is_well_formed():
 
 
 def test_food_labels_carry_fct_codes():
-    """food_items.org#food_label is the single food-label table and now
-    carries the FCT Code column (no second food-label table was created)."""
-    lab = df_from_orgfile(countries_root() / 'GhanaLSS' / '_' / 'food_items.org',
-                          name='food_label')
+    """categorical_mapping.org#harmonize_food is the single food-label table
+    and carries the FCT Code column (no second food-label table was created).
+
+    GH #783 moved this out of the standalone ``food_items.org``, which
+    ``Country.categorical_mapping`` never opened under any name.  The read is
+    deliberately spelled the same way ``nutrition.py::_load_food_codes`` spells
+    it, so a re-strand would fail here as well as there.
+    """
+    lab = df_from_orgfile(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org',
+                          name='harmonize_food')
     assert 'FCT Code' in lab.columns
     coded = (lab['FCT Code'].astype(str).str.strip() != '').sum()
     assert coded >= 150, f'only {coded} of {len(lab)} labels carry an FCT Code'
+    # The point of the move: the API can now see it.
+    import lsms_library as ll
+    assert 'harmonize_food' in (ll.Country('GhanaLSS').categorical_mapping or {})

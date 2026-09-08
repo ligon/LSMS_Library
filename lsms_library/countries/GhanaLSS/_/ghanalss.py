@@ -145,37 +145,15 @@ def split_by_visit(df, first_visit, last_visit, t, ind = ('j','t','i'), unit_col
         except KeyError:
             return result.reset_index().set_index(ind)
 
-def harmonized_food_labels2(fn='../../_/food_items.org'):
-    # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:int,2:lambda s: s.strip()})
-    food_items.columns = [s.strip() for s in food_items.columns]
-    food_items = food_items[['Code','Preferred Label']].dropna()
-    food_items = food_items.set_index('Code')
-
-    return food_items.to_dict()['Preferred Label']
-
-def harmonized_food_labels(fn='../../_/food_items.org',key=list(Waves.keys()),value='Preferred Label'):
-    # Harmonized food labels
-    food_items = pd.read_csv(fn,delimiter='|',skipinitialspace=True,converters={1:lambda s: s.strip(),2:lambda s: s.strip()})
-    food_items.columns = [s.strip() for s in food_items.columns]
-    food_items = food_items.loc[:,food_items.count()>0]
-    food_items = food_items.drop(columns = ['Food Codes','FCT Label']).apply(lambda x: x.str.strip())
-
-    if type(key) == list :
-        for k in key:
-            if type(k) is not str:  # Assume a series of foods
-                myfoods = set(k.values)
-                for k in food_items.columns:
-                    if len(myfoods.difference(set(food_items[k].values)))==0: # my foods all in key
-                        break
-
-        food_items = food_items[key + [value]].replace('---', pd.NA).dropna(how = 'all')
-    else:
-        food_items = food_items[[key] + [value]].replace('---', pd.NA).dropna(how = 'all')
-        
-    food_items = food_items.set_index(key)
-
-    return food_items.squeeze().str.strip().to_dict()
+# GH #783: harmonized_food_labels() / harmonized_food_labels2() were
+# REMOVED here.  They read the retired standalone ../../_/food_items.org
+# with pd.read_csv(delimiter="|") -- a parse that no longer matches any
+# file we ship -- and had ZERO callers in the repo (measured with
+# `git grep harmonized_food_labels`), so they would have raised if
+# called.  The vocabulary now lives in _/categorical_mapping.org as
+# `harmonize_food`; read it with
+#     df_from_orgfile(fn, name="harmonize_food")
+# (cf. tanzania.harmonized_food_labels, ethiopia.harmonized_food_labels).
 
 def _sum_expenditures_from_file(fn, purchased, away, produced, given, itmcd, HHID,
                                  units=None, itemlabels=None, convert_categoricals=False):

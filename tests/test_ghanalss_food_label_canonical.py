@@ -90,7 +90,7 @@ class TestVocabulary:
         assert not bad, (
             f'{COUNTRY} harmonize_food {axis!r}: {len(bad)} label(s) spelled two '
             f'ways across waves -- {dict(sorted(bad.items()))}.  The country-level '
-            f'_/food_items.org `food_label` table is the authority; use its form '
+            f'_/categorical_mapping.org `harmonize_food` table is the authority; use its form '
             f'in every wave.')
 
     @pytest.mark.parametrize('wave', WAVES)
@@ -133,10 +133,13 @@ class TestVocabulary:
 
     def test_country_table_is_a_usable_authority(self):
         """The country crosswalk must not itself carry two spellings of one food."""
-        t = df_from_orgfile(countries_root() / COUNTRY / '_' / 'food_items.org',
-                            name='food_label')
+        # GH #783 moved the country vocabulary out of the standalone
+        # _/food_items.org (`food_label`) into _/categorical_mapping.org as
+        # `harmonize_food` -- the one file Country.categorical_mapping opens.
+        t = df_from_orgfile(countries_root() / COUNTRY / '_' / 'categorical_mapping.org',
+                            name='harmonize_food')
         bad = _collisions(_values(t, 'Preferred Label'))
-        assert not bad, f'{COUNTRY} _/food_items.org food_label: {bad}'
+        assert not bad, f'{COUNTRY} _/categorical_mapping.org harmonize_food: {bad}'
 
 
 @pytest.fixture(scope='module')

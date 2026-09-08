@@ -6,7 +6,8 @@ per (household, product); each row carries up to seven daily triples:
 
   opstina + popkrug + dom   -> i  (household id; concatenation)
   proizvod                  -> j  (numeric product code 01xx-11xx; harmonized
-                                   to a Preferred Label via food_items.org)
+                                   to a Preferred Label via
+                                   categorical_mapping.org harmonize_food)
   mera                      -> u  (native unit: kg / gr / litar / komad / dinar)
   kol_1 .. kol_7            -> daily Quantity (in unit `mera`)
   din_1 .. din_7            -> daily value in dinars
@@ -81,10 +82,14 @@ L = L[(L['kol'] > 0) | (L['din'] > 0)].copy()
 s_map = {1.0: 'purchased', 2.0: 'produced', 3.0: 'inkind'}
 L['s'] = L['izvor'].map(s_map).fillna('purchased')
 
-# Harmonize the numeric proizvod code to a Preferred Label via food_items.org.
+# Harmonize the numeric proizvod code to a Preferred Label via the
+# harmonize_food table in categorical_mapping.org.
 # Key on the clean numeric code: the textual `nsifra` field uses a legacy YUSCII
 # transliteration ('|' for "đ") that cannot round-trip through an org table.
-food_items = df_from_orgfile('../../_/food_items.org', name='food_label', to_numeric=False)
+# GH #783: the vocabulary moved out of the standalone food_items.org into
+# the country's categorical_mapping.org as `harmonize_food` -- the only file
+# Country.categorical_mapping opens, so labels= can now see it too.
+food_items = df_from_orgfile('../../_/categorical_mapping.org', name='harmonize_food', to_numeric=False)
 food_items = food_items.loc[:, ['Preferred Label', 'proizvod']]
 food_items['proizvod'] = food_items['proizvod'].str.strip()
 food_items = food_items.replace(['', '---'], pd.NA).dropna()

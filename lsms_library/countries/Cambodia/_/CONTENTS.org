@@ -332,7 +332,7 @@ Reads =2019-20/_/household_characteristics.parquet= and writes to
 ** DONE food_acquired.py (canonical 2026-06-20, #108)
 Wave script =2019-20/_/food_acquired.py= emits canonical =(t, i, j, u, s)=
 with =[Quantity, Expenditure]= from =hh_sec_5.dta=: =i=HHID=, =j= harmonized
-via =food_items.org=, =u= the native unit, =s in {purchased, produced}=.
+via =categorical_mapping.org= =harmonize_food= (GH #783; was =food_items.org=), =u= the native unit, =s in {purchased, produced}=.
 hh_sec_5 reports ONE total quantity but splits VALUE (=s05q05= purchased /
 =s05q06= obtained-otherwise), so the quantity is apportioned by value share
 (#108 decision 2026-06-20); =s=produced= lumps own-production + in-kind.
@@ -345,7 +345,26 @@ Derived at API time by =_FOOD_DERIVED= from =food_acquired= -- no per-country
 script.  The legacy =food_prices_quantities_and_expenditures.py= (which also
 wrote stray CSVs to =~/Downloads/=) was RETIRED (#108/#218).
 
-** DONE food_items.org (2026-06-08; FCT column scaffolded)
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+The vocabulary now lives in =_/categorical_mapping.org= under =#+name:
+harmonize_food=, moved byte-for-byte; =_/food_items.org= is deleted.  Same
+"Unit #0" migration Tanzania and Ethiopia completed
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).  It had to
+be a MOVE, not a rename in place: =Country.categorical_mapping= opens only
+the global =lsms_library/categorical_mapping/*.org= and the country's own
+=categorical_mapping.org=, and never =food_items.org= under any table name,
+so =labels== (=Country._relabel_j=) raised =LabelUnavailableError= here.
+
+Cambodia's table WAS named (=#+name: food_label=), so unlike GhanaSPS /
+Guatemala / Panama it was at least reachable by =df_from_orgfile(name=...)=
+-- just not by anything that goes through =categorical_mapping=.
+
+*Idiosyncrasy to preserve*: the =2019-20= column reproduces the source
+Stata value labels' encoding artifacts VERBATIM (=sugarâ​ cane/ palm
+sugar= contains a zero-width space; =cafÃ©= is mojibake) because that
+column is the string join key.  Cleaning it would break the match.
+
+The historical description follows.
 Harmonizes the 64 food codes from =hh_sec_5.dta= (variable
 =food_consumption_roster_1__id=) into preferred labels.  Columns:
 =Preferred Label | 2019-20 | Code | FCT ID=.  =2019-20/_/food_acquired.py=
@@ -358,7 +377,7 @@ remaining steps.
 
 ** TODO nutrition.py -- tracked in #560 (FCT data-gap, split from #108)
 Blocked on obtaining a machine-readable Food Conversion Table (SMILING /
-ASEANFOODS); see #560.  The =food_items.org= harmonization + the =FCT ID=
+ASEANFOODS); see #560.  The =harmonize_food= harmonization + the =FCT ID=
 scaffold are ready; once the FCT CSV is in hand, populate =FCT ID= and add
 =nutrition.py=.  Deliberately split out so it does not block #108.
 
@@ -422,13 +441,19 @@ implementable. Tracked in GitHub issue #352.
 
 - Makefile :: FIXED (2026-06-08).  The generic =%.parquet= rule
   previously referenced =malawi.py= (copy-paste error from Malawi); it
-  now references =cambodia.py=.  =food_items.org= now exists (see below),
-  so that prerequisite resolves too.
+  now references =cambodia.py=.  (The =food_items.org= prerequisite this
+  bullet mentions is gone: GH #783 retired that file, and Cambodia's
+  Makefile never named it in a rule.)
 - =cambodia.py= :: Uses deprecated =from ligonlibrary.dataframes import from_dta=
   and =dvc.api.open()= anti-patterns instead of =get_dataframe()=.
 - No =data_scheme.yml= :: Cambodia cannot be loaded via
   =ll.Country('Cambodia')= because there is no data scheme definition.
-- No =categorical_mapping.org= :: No food-item label harmonization
-  exists.
-- No =food_items.org= :: Food item labels are not documented or
-  harmonized.
+- STALE, was "No =categorical_mapping.org=" :: *This bullet was already
+  false when GH #783 read it; quoted rather than deleted so the correction
+  is on the record.*  =_/categorical_mapping.org= exists
+  (=harmonize_education=, =Roof=, =Floor=) and, since GH #783, also
+  carries =harmonize_food=.
+- STALE, was "No =food_items.org=" :: *Superseded twice.*  The file was
+  created 2026-06-08 (see "DONE food_items.org" above -- the "Known
+  issues" bullet was never updated to match), and GH #783 then retired it
+  into =categorical_mapping.org=.

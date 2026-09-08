@@ -15,7 +15,9 @@ Inputs, all resolved through ``paths.countries_root()`` (GH #753 -- never
 module that is not on any import path):
 
 * ``GhanaLSS/_/fct_west_africa.org``   the FCT, per 100 g edible portion
-* ``GhanaLSS/_/food_items.org``        food labels + their ``FCT Code``
+* ``GhanaLSS/_/categorical_mapping.org``  ``harmonize_food``: food labels +
+                                       their ``FCT Code`` (GH #783; was the
+                                       standalone ``food_items.org``)
 * ``Ethiopia/_/nutrient_labels.org``   the canonical nutrient axis (read-only;
                                        the same cross-country read Ethiopia
                                        itself does on Tanzania's demands.org)
@@ -132,8 +134,11 @@ def _load_fct(root):
 
 def _load_food_codes(root):
     """(wave, native label) -> FCT Code, plus Preferred Label -> FCT Code."""
-    lab = df_from_orgfile(root / 'GhanaLSS' / '_' / 'food_items.org',
-                          name='food_label')
+    # GH #783: the vocabulary now lives in the country's categorical_mapping.org
+    # as `harmonize_food` (Tanzania/Ethiopia "Unit #0" precedent), which is the
+    # ONLY file Country.categorical_mapping opens -- so labels= can see it too.
+    lab = df_from_orgfile(root / 'GhanaLSS' / '_' / 'categorical_mapping.org',
+                          name='harmonize_food')
     lab['Preferred Label'] = lab['Preferred Label'].astype(str).str.strip()
     lab['FCT Code'] = lab['FCT Code'].astype(str).str.strip()
     waves = [c for c in lab.columns if c not in ('Preferred Label', 'FCT Code')]

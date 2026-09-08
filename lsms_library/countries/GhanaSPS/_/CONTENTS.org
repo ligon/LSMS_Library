@@ -8,8 +8,34 @@ We have tried to make it possible to compare food expenditures not only across r
 * Files in GhanaSPS/_/
 ** TODO ghana_sps.py
 Contains code common to different GSPS rounds.
-** TODO food_items.org
-See discussion above for harmonization of food labels across rounds and surveys.  But we should provide code here to usefully extract that information.
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+See discussion above for harmonization of food labels across rounds and surveys.
+
+The vocabulary (98 rows; =2009-10=, =2013-14=, =2017-18=, =Preferred Label=,
+=Food Codes=, =FCT Label=) now lives in =_/categorical_mapping.org= under
+=#+name: harmonize_food=, moved byte-for-byte; =_/food_items.org= is deleted.
+Same "Unit #0" migration Tanzania and Ethiopia completed
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).
+
+*The GhanaSPS idiosyncrasy this fixed: the table had no =#+name:= at all.*
+=all_dfs_from_orgfile= returns nothing for an unnamed table, so those 98
+labels were unreachable by *every* name-keyed mechanism -- not just
+=Country.categorical_mapping= (which never opens =food_items.org= under any
+name) but the =mappings:= syntax in =data_info.yml= too.  The three wave
+=food_acquired.py= scripts could only reach it by passing =name=None=
+positionally, i.e. "the first table in the file", which works only while the
+file holds exactly one table.  Naming it was a prerequisite for the move.
+
+The =encoding='ISO-8859-1'= those reads carried was dropped: the retired file
+was measured to be pure ASCII, so the argument was a no-op.
+
+The old TODO asked for "code here to usefully extract that information".
+=_/ghanasps.py= did carry such code -- =harmonized_food_labels()= and
+=harmonized_food_labels2()= -- but both had *zero callers* (measured with
+=git grep=) and would have raised if called: they parsed the =.org= with
+=pd.read_csv(delimiter='|')=.  They are deleted rather than repointed.  The
+supported extraction is now =df_from_orgfile(fn, name='harmonize_food')=,
+which is what the three wave scripts call.
 
 ** TODO conversion_to_kgs.json
 
@@ -1600,7 +1626,7 @@ unconditional sum would add tubers to leaves.  Following the instrument's
 own example, a record whose part is a different product -- Leaves,
 Branches, Bark, Sap or Stem, except where that IS the crop's principal
 product (leafy / other vegetables, sugarcane, woodlot) -- gets a qualified
-=j=: =Cocoyam Leaves= (88 records; an existing =food_items.org= label, so it
+=j=: =Cocoyam Leaves= (88 records; an existing =harmonize_food= label, so it
 joins =food_acquired.j= like any other crop) or =Crop (part)= for the rest
 (=Cassava (stem/stick)= 49, =Plantain (stem/stick)= 25, =Maize (leaves)= 11,
 and ~30 further labels of 1-7 records).  Roots-tuber / Fruit-Seeds-Nuts /
