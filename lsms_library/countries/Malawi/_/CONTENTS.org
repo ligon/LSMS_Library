@@ -116,6 +116,122 @@ which leaves the returned frame bit-for-bit what it was.
 (there are no multi-row groups) and the repo has already rejected that
 approach.
 
+* crop_production: the SALE has its OWN unit (fixed 2026-09-08)
+
+=CONTENTS.org= documented neither =crop_production= nor
+=community_prices= before this entry; both were described only in
+=data_scheme.yml= comments.  This is the idiosyncrasy that cost the most.
+
+*Module I q7 and Module Q q2 ask the sale quantity in their own unit.*
+The Stata labels are unambiguous, and the code list is the SAME one the
+harvest uses:
+
+: ag_i02a  How much of the harvested[CROP]was sold in total?(QUANTITY)
+: ag_i02b  How much of the harvested[CROP]was sold in total?(UNIT)
+: ag_i03   What was the total value of [CROP] sales?
+: ag_g13b  How much [CROP] did you harvest from this [PLOT] ...? (UNIT)
+:
+: ag_i02b / ag_q02b / ag_g13b value labels, all three identical:
+:   {1 kilogram, 2 50 KG BAG, 3 90 KG BAG, 4 PAIL (SMALL), 5 PAIL (LARGE),
+:    6 NO. 10 PLATE, 7 NO. 12 PLATE, 8 bunch, 9 piece, 10 bale,
+:    11 BASKET (DENGU), 12 OX - CART, 13 OTHER (SPECIFY)}
+
+Until 2026-09-08 the wave scripts read =ag_i02a= / =ag_i03= but *not*
+=ag_i02b=, and =assemble_crop_production= merged the household-crop sale
+onto the plot-crop harvest row on =(i, _crop_code)= alone.  *The two units
+differ for 22.2%* of the 6,269 2010-11 (household, crop) rows carrying
+both -- the commonest single disagreement being harvest =50 kg Bag= /
+sale =Kilogramme= (438 rows).  For those rows =Value_sold /
+Quantity_sold= is a price *per kg* sitting on a row whose declared =u=
+says =50 kg Bag=: a *silent factor-of-50 error* in any per-kg farmgate
+price, with nothing in the table to signal it.
+
+The fix carries the sale unit through =_sale_block= and merges on
+=(i, _crop_code, u)=, so the ratio is a price per the row's declared unit
+by construction.  Harvest rows are unchanged in every wave (33,349 /
+12,602 / 36,003 / 49,425); the sale attaches to fewer of them:
+
+| wave    | sale rows attached before | after | dropped |
+|---------+---------------------------+-------+---------|
+| 2010-11 |                     6,459 | 5,205 |   1,254 |
+| 2013-14 |                     2,204 | 1,772 |     432 |
+| 2016-17 |                     5,981 | 4,455 |   1,526 |
+| 2019-20 |                     8,499 | 6,853 |   1,646 |
+
+Those are *not lost data*: they are sales the survey records in a unit no
+harvest row of that plot-crop uses, so they cannot be expressed at the
+declared =(t, i, plot, crop, u)= grain at all.  What moved: the per-kg
+sale price's *mean* fell 617 -> 268 MWK/kg (2016-17) and 706 -> 169
+(2013-14), while the *medians* moved only 32->40 / 80->90 / 180->200 /
+140->160.  The old mean was carrying a tail of 50x-inflated prices.
+
+*The general lesson, worth more than the instance*: in this survey a
+quantity column and its unit column are a PAIR, and the modules are free
+to differ.  Whenever a wave script reads a =*_qty= column, look for the
+=*b= sibling before assuming the grain's existing =u= describes it.
+
+*Not fixed, and reported*: =ag_i02c= (S/U -- "MAKE SURE TO ASK WHETHER THE
+REPORTED VALUE IS SHELLED OR UNSHELLED") is likewise unread, and
+=ag_g13c= is passed to =_harvest_block= as =condition== but the parameter
+is *accepted and never used*.  A shelled/unshelled mismatch between
+harvest and sale is a second, smaller basis error on legumes and
+groundnut; it needs a =condition= level on the grain, which is a schema
+change and out of scope here.
+
+* community_prices: what Module CK actually asks
+
+Community/Market Module CK, IHS3 Community questionnaire, "SECTION CK:
+PRICES":
+
+#+begin_quote
+PROMPT FOR EACH ITEM ON THE LIST.
+
+Is [ITEM] available for sale in your community or nearby at the present
+time?  YES..1  NO...2 >> NEXT ITEM
+
+What is the price for the item?   MK | NUMBER OF UNITS | UNIT CODES
+#+end_quote
+
+Three things follow, all of them easy to get wrong:
+
+1. The price is a *current local market selling price*, not a farmgate
+   price and not a recalled price -- it is what the item sells for in that
+   community *now*.
+2. *The basis is explicit*: the per-unit price is =Price / NumberOfUnits=.
+   Do not assume =NumberOfUnits= is 1; it is 50 for 2,345 rows, 250 for
+   1,085, 500 for 875.
+3. *The unit is a free field, not pre-printed*, and is often blank.
+   =u= is missing for *38,506 of 82,635* rows and =NumberOfUnits= for
+   38,356; the two are missing together (of the 31,959 rows on the 21 FOOD
+   items, 25,587 have both and 6,338 have neither -- only 34 rows have one
+   without the other).  All 17 non-food items (soap, hoe, bicycle, ganyu
+   wage, the two grinding *services*) are 100% unit-less.  A blank unit is
+   *unknown*, not "one piece": these rows have no usable per-unit price
+   and must be dropped and counted, never filled.
+
+*The 19/51 label overlap with =food_acquired= is not the defect it looks
+like.*  =harmonize_price_item= prices 51 items of which only *21 are
+foods*; 19 of those 21 join =food_acquired.j=.  The two that do not are
+=Beans= (=food_acquired= splits it into =Bean, White= / =Bean, Brown=,
+which share the Aggregate Label =Pulses, Mid-b=) and =Soft Drink
+(Bottle)= (=Soft Drinks (Coca-Cola, Fanta, Sprite, Etc.)=).  The other 32
+are soap, tools, medicines, fertiliser, transport and a day's ganyu wage,
+which have no food counterpart *by design*.
+
+*2013-14 prices almost no food.*  The IHPS price list is the reduced
+subset CK1, CK3, CK4, CK22-CK50: it omits CK5-CK21, i.e. every perishable
+food (rice, bread, beans, cabbage, tomato, banana, milk, eggs, chicken,
+fish, beef, tea, salt, sugar, oil, chips).  32 items survive, of which
+essentially one -- maize grain -- is a food.  Any 2013-14 food-price
+comparison against this table is a single-item comparison; do not read it
+as a wave-level result.
+
+*=v= is sound and the bottom rung is real*: 100% of =community_prices.v=
+is present in both =cluster_features.v= and =sample().v= in all three
+waves (768/768, 204/204, 727/727).  2019-20 has 727 priced EAs against
+819 in =cluster_features= -- the 92 without a community interview are the
+IHPS panel EAs.
+
 * plot_features (GH #167)
 
 Lasting plot-level characteristics.  Schema: =(t, i, plot_id)= index;
