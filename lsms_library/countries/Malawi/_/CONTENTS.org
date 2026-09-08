@@ -165,6 +165,34 @@ sale price's *mean* fell 617 -> 268 MWK/kg (2016-17) and 706 -> 169
 (2013-14), while the *medians* moved only 32->40 / 80->90 / 180->200 /
 140->160.  The old mean was carrying a tail of 50x-inflated prices.
 
+*Residual, measured not assumed*: the defensive collapse at the end of
+=assemble_crop_production= keys on =(t, i, plot, crop)= (=u= is a column at
+wave level), so it fires when a plot-crop was harvested in *two* units, and
+=.first()= skips NA per column -- it could take =u= from one row and
+=Quantity_sold= from another, re-creating the very mislabelling the merge
+removes.  Measured on the raw modules: *32 plot-crops of 135,410 (0.024%)*
+have more than one harvest unit (12+1 in 2010-11 G/P, 2+1 in 2013-14, 0+6 in
+2016-17, 0+10 in 2019-20 -- almost entirely the perennial module P).  Nearly
+a no-op; not provably one.
+
+*This is not a Malawi-only defect.*  It is filed corpus-wide as *GH #824*:
+"Where =u= exists it is the HARVEST unit; the sale is recorded in its own unit
+that the builds ignore (Nigeria 95-97% agreement, Niger 63-99%)".  Malawi's
+77.8% is the worst measured so far.
+
+*A second label defect on the same commodity axis, found while checking
+this*: =harmonize_food= maps the Preferred Label =Groundnut= <-
+*=Boiled groundnuts=* in 2016-17 and 2019-20 -- a *vendor snack* -- while the
+raw nut in those waves has its own labels =Groundnut (Shelled)= /
+=Groundnut Dried (Unshelled)= / =Groundnut Fresh (Unshelled)=.  The Aggregate
+Label admits it: =Groundnut, Vendor/Boiled= against =Groundnut, Whole= for the
+other three.  So =crop_production.crop == 'Groundnut'= joins the raw nut in
+2004-05 / 2010-11 / 2013-14 and a cooked street food in 2016-17 / 2019-20.
+Almost certainly a =difflib= artifact of the =food_items.org= construction
+above -- =Boiled sweet potatoes= *did* get its own =Sweet Potato - Boiled
+(Vendor)= label, =Boiled groundnuts= did not.  NOT fixed: splitting the label
+cold-rebuilds Malawi =food_acquired=.
+
 *The general lesson, worth more than the instance*: in this survey a
 quantity column and its unit column are a PAIR, and the modules are free
 to differ.  Whenever a wave script reads a =*_qty= column, look for the

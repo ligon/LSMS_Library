@@ -1097,6 +1097,17 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
 
+    # RESIDUAL of the sale-unit fix, measured not assumed (2026-09-08).  The
+    # defensive collapse at the end of this function keys on
+    # (t, i, plot, crop) -- u is a COLUMN here -- so it fires when a plot-crop
+    # was harvested in TWO units, and .first() skips NA per column: it could
+    # take u from one row and Quantity_sold from another, re-creating exactly
+    # the mislabelling the (i, _crop_code, u) merge above removes.  Measured
+    # on the raw modules: 32 plot-crops of 135,410 (0.024%) across all four
+    # waves have >1 harvest unit -- 12+1 in 2010-11 G/P, 2+1 in 2013-14, 0+6
+    # in 2016-17, 0+10 in 2019-20, i.e. almost entirely the perennial module.
+    # Nearly a no-op, but NOT provably one; do not upgrade this to "cannot
+    # happen" without re-measuring.
     harv = harv.drop(columns=['_crop_code'])
     harv['t'] = t
 
