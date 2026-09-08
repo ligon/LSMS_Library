@@ -495,8 +495,55 @@ def _radius_by_area(values, r_max=14.0, r_floor=2.0, scale="area"):
     return np.maximum(r_floor, true_r), n_floored
 
 
-def _cluster_frame(data, wave, size):
-    """Build ``(frame, label, country, dropped)`` for the cluster leading case."""
+def _apply_where(df, where):
+    """Restrict ``df`` to the rows ``where`` selects; return ``(df, text)``.
+
+    ``where`` is a ``{column: value}`` / ``{column: [values]}`` dict (all
+    conditions must hold) or a callable ``df -> boolean mask``.  A condition
+    that selects nothing raises with the values the column actually holds --
+    a case or spelling mismatch (Guinea-Bissau spells its regions three ways
+    across two tables, GH #811) should be visible, not an empty map.
+    """
+    if where is None:
+        return df, None
+    if callable(where):
+        mask = pd.Series(where(df), index=df.index).astype(bool)
+        text = getattr(where, "__name__", "filter")
+        if text == "<lambda>":
+            text = "filter"
+    elif isinstance(where, dict):
+        mask = pd.Series(True, index=df.index)
+        parts = []
+        for col, val in where.items():
+            if col not in df.columns:
+                raise KeyError(f"where: {col!r} is not a column of this table; "
+                               f"columns: {', '.join(map(str, df.columns))}")
+            vals = list(val) if isinstance(val, (list, tuple, set)) else [val]
+            hit = df[col].isin(vals)
+            if not hit.any():
+                have = sorted(map(str, pd.unique(df[col].dropna())))[:20]
+                raise ValueError(f"where: {col} in {vals!r} matches no rows; "
+                                 f"{col} holds: {', '.join(have)}")
+            mask &= hit
+            parts.append(f"{col} = {vals[0]}" if len(vals) == 1
+                         else f"{col} in {{{', '.join(map(str, vals))}}}")
+        text = ", ".join(parts)
+    else:
+        raise TypeError("where= takes a {column: value} dict or a callable "
+                        f"df -> mask; got {type(where).__name__}")
+    out = df[mask].copy()
+    if out.empty:
+        raise ValueError(f"where ({text}) selects no rows")
+    return out, text
+
+
+def _cluster_frame(data, wave, size, where=None):
+    """Build ``(frame, label, country, dropped)`` for the cluster leading case.
+
+    ``where`` is applied after the ``size`` join and before the coordinate
+    check, so ``dropped`` counts the selected clusters that lack coordinates,
+    not the whole wave's.
+    """
     from .country import Country
 
     country = Country(data) if isinstance(data, str) else data
@@ -516,14 +563,7 @@ def _cluster_frame(data, wave, size):
         if wave is not None:
             cf = cf.xs(wave, level="t", drop_level=False)
 
-    total = len(cf)
     df = cf.reset_index()
-    have = df[["Latitude", "Longitude"]].notna().all(axis=1) if \
-        {"Latitude", "Longitude"} <= set(df.columns) else pd.Series(False, index=df.index)
-    dropped = int((~have).sum())
-    df = df[have].copy()
-    if df.empty:
-        raise ValueError(f"{country.name} {wave or ''}: no cluster has coordinates")
 
     if size is not None and size not in df.columns:
         try:
@@ -537,12 +577,23 @@ def _cluster_frame(data, wave, size):
         except Exception as exc:
             warnings.warn(f"could not join {size!r} from sample(): {exc}",
                           stacklevel=3)
-    return df, f"{country.name} {wave or ''}".strip(), country.name, dropped
+
+    df, where_text = _apply_where(df, where)
+    have = df[["Latitude", "Longitude"]].notna().all(axis=1) if \
+        {"Latitude", "Longitude"} <= set(df.columns) else pd.Series(False, index=df.index)
+    dropped = int((~have).sum())
+    df = df[have].copy()
+    title = f"{country.name} {wave or ''}".strip()
+    if where_text:
+        title += f" \u00b7 {where_text}"
+    if df.empty:
+        raise ValueError(f"{title}: no selected cluster has coordinates")
+    return df, title, country.name, dropped
 
 
-def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude",
-                   label=None, interactive=True, scale="area", colors=None,
-                   tiles=None):
+def coordinate_map(data, wave=None, *, size=None, where=None, lat="Latitude",
+                   lon="Longitude", label=None, interactive=True, scale="area",
+                   colors=None, tiles=None):
     """Map point coordinates, optionally sizing each marker by a third variable.
 
     The leading case is survey clusters sized by the sampling weight they
@@ -555,8 +606,24 @@ def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude
     cluster.  Given a DataFrame, ``lat``/``lon``/``size`` name its columns and
     nothing is joined.
 
+    Restrict the map with ``where``: one region, one stratum, rural clusters
+    only::
+
+        coordinate_map('Guinea-Bissau', size='weight', where={'Region': 'bafata'})
+        coordinate_map('Uganda', wave='2013-14', size='weight',
+                       where=lambda df: df.Rural == 'Rural')
+
     Parameters
     ----------
+    where : dict or callable, optional
+        ``{column: value}`` or ``{column: [values]}`` -- every condition must
+        hold -- or a callable taking the assembled frame and returning a
+        boolean mask.  For a ``Country`` the frame carries the wave's
+        ``cluster_features`` columns (``Region``, ``Rural``, ...) plus the
+        summed ``size``; for a DataFrame, its own columns.  A condition that
+        matches nothing raises and lists the values the column holds, so a
+        spelling mismatch is loud.  The filter is named in the title, and the
+        no-coordinates count is for the selected clusters only.
     size : str, optional
         Column whose value sets marker AREA (not radius -- see
         :func:`_radius_by_area`).  ``None`` draws uniform markers.
@@ -592,13 +659,18 @@ def coordinate_map(data, wave=None, *, size=None, lat="Latitude", lon="Longitude
     a map that said nothing would omit 12% of the sample without a trace.
     """
     pal = {**PALETTE, **(colors or {})}
-    df, title, cname, dropped = _cluster_frame(data, wave, size)
+    df, title, cname, dropped = _cluster_frame(data, wave, size, where)
     if not isinstance(df, pd.DataFrame):
         raise TypeError("coordinate_map() takes a Country, a country name, or "
                         f"a DataFrame; got {type(data).__name__}")
     for col in (lat, lon):
         if col not in df.columns:
             raise KeyError(f"{col!r} is not a column of this table")
+    if cname is None:  # DataFrame path: _cluster_frame did not see ``where``
+        df, where_text = _apply_where(df, where)
+        if where_text:
+            title += f" \u00b7 {where_text}"
+        dropped = int((df[lat].isna() | df[lon].isna()).sum())
     df = df[df[lat].notna() & df[lon].notna()].copy()
     if df.empty:
         raise ValueError("no rows with usable coordinates")
