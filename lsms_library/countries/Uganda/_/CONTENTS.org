@@ -1679,10 +1679,13 @@ also has the wrong sign (it would make the implied price 100x too LARGE).
 - Value still scales with quantity: the slope of =log(a5aq8)= on
   =log(qty_sold x kg-factor)= is *+0.744* in 2015-16 against *+0.713* in
   2013-14 and *+0.744* in 2011-12.  Shape unchanged; only level moved.
-- *The defect is field-specific.*  Scanning every numeric variable present in
-  both waves across 16 AGSEC files, *=a5aq8= and =a5bq8= are the ONLY two
-  whose median moves by ~100x* (93.6x and 100.0x) and the only two whose
-  Stata type changes int32 -> double.  =a5aq10= ("How much was spent on
+- *The defect is field-specific.*  Of the 432 variables carried by the same
+  name in both waves across 16 AGSEC files, *=a5aq8= and =a5bq8= are the ONLY
+  two whose median moves by ~100x* (93.6x and 100.0x).  38 of those 432
+  change Stata storage type between the waves, and *=a5aq8= / =a5bq8= are the
+  only two that go =int32 -> double=*; the only other two that become
+  =double= (=a5aq6d=, =a5bq7d=) are kg conversion factors that were already
+  =float=, i.e. legitimately fractional.  =a5aq10= ("How much was spent on
   transport?"), a currency field in the same record, is still =int32= at a
   normal level (median 1 000 UShs against 3 500 in 2013-14).
 
