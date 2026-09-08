@@ -567,8 +567,16 @@ catalog records but not held in this repository.  If a universe statement for
 look.
 
 * Issues
-** WAITING Missing food quantities in 2019-20 and 2020-21 (#112)
+** DONE Missing food quantities in 2019-20 and 2020-21 (#112)
+CLOSED: [2026-09-08 Tue]
 :LOGBOOK:
+- State "DONE"       from "WAITING"    [2026-09-08 Tue] \\
+  Resolved: the current build carries the quantities.  Measured on
+  development @ 04547c10: =food_acquired.Quantity= non-null on 97.6% of
+  2019-20 rows and 98.5% of 2020-21 rows (99.8--99.9% in the four earlier
+  rounds); =food_prices()= returns 12,418 / 4,606 rows for the two waves.
+  Found by the five-source price comparison (Tanzania agent); recorded on
+  the closed GitHub issue the same day.
 - Note taken on [2026-09-08 Tue] \\
   *THE PREMISE OF THIS ENTRY NO LONGER HOLDS -- the WB has re-released
   both files and every quantity column is PRESENT.*  Measured directly on
@@ -648,7 +656,11 @@ The =food_expenditures= table (value-based) is unaffected.
 *** Status
 
 Email sent to =lsms@worldbank.org= on 2023-03-24; no resolution
-received.
+received.  Superseded: as of 2026-09-08 the served table has the
+quantities (see the LOGBOOK entry above), so whatever the 2023
+distribution lacked, the current source files and wave scripts
+deliver them.  The description above is kept as the history of the
+gap; it no longer describes the data.
 
 ** TODO Use community-level prices as fallback (#113)
 :LOGBOOK:
