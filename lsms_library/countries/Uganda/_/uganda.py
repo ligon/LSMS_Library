@@ -532,11 +532,33 @@ def food_acquired_to_canonical(df):
 
 def nonfood_expenditures(fn='', purchased=None, away=None, produced=None,
                          given=None, item='item', HHID='HHID'):
-    """Uganda non-food expenditures from a single .dta file.
+    """Uganda non-food expenditures from a single .dta file, LONG.
 
     Aggregates across three or four source columns (purchased, away,
-    produced, given) at the (HHID, item) level and returns a wide
-    matrix (HHID rows x item columns) of total expenditures.
+    produced, given) at the (household, item) level and returns the
+    canonical long frame: index ``(i, j)`` -- ``i`` the household id,
+    ``j`` the ``nonfood_items.org`` Preferred Label -- and one column
+    ``Expenditure``.  The caller (the wave script) stamps ``t`` and sets
+    the ``(t, i, j)`` index, exactly as the sibling ``food_acquired``
+    path does (``Uganda/2013-14/_/food_acquired.py``).
+
+    SPARSITY (GH #817).  A household that did not report an item has NO
+    ROW.  This used to return a wide HHID x item matrix built with
+    ``groupby().sum().unstack().fillna(0)``, which fabricated a 0 for
+    every (household, item) pair the survey never recorded -- making
+    "not reported" and "reported zero" the same number, against the
+    convention ``transformations.food_expenditures_from_acquired``
+    documents for food.  ``sum(min_count=1)`` keeps the two apart (an
+    all-NaN group stays NaN), and only strictly positive expenditures
+    are kept.  Dropping the non-positive rows costs no money: measured
+    across all eight waves there is not one negative value, and the
+    genuine reported zeros (0 in six waves, 76 in 2019-20) sum to zero.
+
+    NOTE ON THE OLD NAMES.  The wide frame carried ``index.name = 'j'``
+    for the HOUSEHOLD and ``columns.name = 'i'`` for the ITEM -- both
+    backwards.  Downstream code compensated (``id_walk`` fell back to
+    the ``j`` level and renamed it ``i``).  The long frame uses the
+    canonical names, so those compensations are gone.
 
     Replaces the prior lsms.tools.get_food_expenditures-based
     implementation with an inline pandas groupby+sum; the upstream
@@ -589,15 +611,33 @@ def nonfood_expenditures(fn='', purchased=None, away=None, produced=None,
     df = df[df['itmcd'].isin(nonfood_items.values())]
 
     # Sum source columns, groupby HHID+itmcd (now label names).
+    # min_count=1 on BOTH sums: a row whose every source column is NaN
+    # stays NaN, and so does a (household, item) group made only of such
+    # rows.  Without it pandas returns 0.0 for an all-NaN group and the
+    # sparsity distinction is lost before it can be used.
     active_sources = list(source_cols.keys())
     df['total'] = df[active_sources].sum(axis=1, min_count=1)
-    wide = df.groupby(['HHID', 'itmcd'])['total'].sum().unstack('itmcd')
-    wide = wide.fillna(0)
+    long = df.groupby(['HHID', 'itmcd'])['total'].sum(min_count=1)
 
-    # Match the old output's index/column names.
-    wide.index.name = 'j'
-    wide.columns.name = 'i'
-    return wide
+    # Keep reported, positive expenditures only (GH #817).  NaN is "not
+    # reported"; 0 is a reported zero, which carries no expenditure and
+    # would otherwise be indistinguishable from the fabricated zeros this
+    # function used to emit.
+    long = long.dropna()
+    long = long[long > 0]
+
+    out = long.rename('Expenditure').reset_index()
+    out = out.rename(columns={'HHID': 'i', 'itmcd': 'j'})
+    out = out.set_index(['i', 'j'])[['Expenditure']]
+
+    # `j` is an index level, so two items sharing a Preferred Label would be
+    # silently pooled by the framework collapse (GH #323, harmonize_seed_crop).
+    # The groupby above already pools them -- deliberately, it is how the label
+    # map is meant to work -- so what must hold here is that the pooling was
+    # complete: one row per (household, label).
+    assert out.index.is_unique, (
+        f'{fn}: non-unique (i, j) in nonfood_expenditures')
+    return out
 
 
 def id_walk(df, updated_ids, hh_index='i'):

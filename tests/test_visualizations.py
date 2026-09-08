@@ -762,21 +762,63 @@ def test_uganda_lorenz_gini_and_zero_count_are_recomputed_not_pinned():
     assert _curve(inc).get_ydata()[1] == 0.0, "the first vertex after the origin sits at zero"
 
 
+def test_a_wide_item_by_household_table_raises_citing_gh817():
+    """A one-column-per-item table must not be summed into a plausible curve.
+
+    This is the guard itself, on a synthetic wide frame, so it keeps working
+    whatever the corpus does.  It used to be exercised through Uganda's real
+    `nonfood_expenditures`, which WAS wide (41-96 item columns, `m` baked into
+    the index).  GH #817 made every declarer long, so Uganda no longer
+    triggers it -- see the test below -- but the guard must stay: the next
+    country to land a pivoted table would otherwise get a correct-looking
+    curve drawn over a broken shape.
+    """
+    from lsms_library.visualizations import _country_measure
+
+    wide = pd.DataFrame(
+        {"Soap": [10.0, 20.0], "Charcoal": [5.0, 7.0]},
+        index=pd.MultiIndex.from_tuples([("h1", "2020"), ("h2", "2020")],
+                                        names=["i", "t"]),
+    )
+
+    class _FakeCountry:
+        name = "Nowhere"
+        data_scheme = ["nonfood_expenditures"]
+
+        @staticmethod
+        def nonfood_expenditures(waves=None):
+            return wide
+
+    with pytest.raises(ValueError) as excinfo:
+        _country_measure(_FakeCountry(), None, "nonfood_expenditures", "person")
+    msg = str(excinfo.value)
+    assert "#817" in msg and "Expenditure" in msg and "columns" in msg
+
+
 @pytest.mark.slow
-def test_uganda_wide_nonfood_table_raises_citing_gh817():
-    """A one-column-per-item table must not be summed into a plausible curve."""
+def test_uganda_nonfood_table_is_long_and_draws_since_gh817():
+    """The other half of #817: Uganda's own table is no longer the wide one.
+
+    `nonfood_expenditures` is now `(t, i, j) x Expenditure` for every declarer,
+    so the chart that used to refuse it draws it.  Asserting this here is what
+    stops a re-pivot from being silently reintroduced -- the guard above would
+    start firing again and only this test would notice.
+    """
     pytest.importorskip("lsms_library")
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            lorenz_curve("Uganda", wave="2013-14", value="nonfood_expenditures")
-    except ValueError as exc:
-        msg = str(exc)
-        assert "#817" in msg and "nonfood_expenditures" in msg and "columns" in msg
+            ax = lorenz_curve("Uganda", wave="2013-14",
+                              value="nonfood_expenditures")
+    except ValueError as exc:                     # pragma: no cover
+        if "#817" in str(exc):
+            pytest.fail(
+                "Uganda.nonfood_expenditures is wide again -- GH #817 fixed "
+                f"it to (t, i, j) x Expenditure.  {exc}")
+        raise
     except Exception as exc:                      # pragma: no cover
         pytest.skip(f"Uganda unavailable: {exc}")
-    else:                                         # pragma: no cover
-        pytest.fail("a wide nonfood_expenditures table must raise (GH #817)")
+    assert "nonfood_expenditures" in _all_text(ax)
 
 
 @pytest.mark.slow

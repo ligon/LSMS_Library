@@ -34,6 +34,13 @@ Index Info:
     # need harmonizing before registration -- tracked separately.
     livestock: (t, i, animal)
     people_last7days: (t, v, i, pid)
+    # GH #817: `nonfood_expenditures` shipped in two shapes -- Togo long
+    # (t, i, j), Uganda/Nigeria a WIDE item-by-household matrix with `m` baked
+    # into the index -- and had no entry here, so nothing checked the cross-
+    # country assembly.  Registered with `v` present, which is what arms
+    # `_join_v_from_sample` (the table is household-grain and must NOT emit v
+    # itself); no `skip_extra` entry is therefore needed below.
+    nonfood_expenditures: (t, v, i, j)
 
   # Features whose reduced-index countries get their MISSING canonical levels
   # FABRICATED as NaN (so all countries share the full canonical shape and are
@@ -529,6 +536,44 @@ Columns:
         in _finalize_result if not stored).  Farmgate price for
         s=produced (survey-reported where available).  Imputed value
         for s=inkind where available.  NaN otherwise.
+  nonfood_expenditures:
+    # GH #817.  The canonical shape is Togo's (PR #773): item-level, long, one
+    # row per (wave, household, item) actually reported.  It is
+    # `food_acquired` minus the unit `u` and the acquisition source `s` --
+    # non-food modules record an amount spent, not a quantity in a unit.
+    #
+    # SPARSITY, and it is the point of the shape.  A household that did not
+    # report an item has NO ROW -- never a fabricated 0.  That is the
+    # convention `transformations.food_expenditures_from_acquired` documents
+    # for food, and the wide item-by-household matrices Uganda and Nigeria used
+    # to serve broke it: their `fillna(0)` made "not asked / not reported" and
+    # "reported zero" the same number.
+    #
+    # `Expenditure` is the amount the household REPORTED, in nominal local
+    # currency, over the recall window the instrument used for that item.  It
+    # is NOT annualised and NOT rescaled to a common window: annualising is a
+    # transformation and belongs to the analyst (same rule as
+    # crop_production.harvest_kg; see Togo/_/data_scheme.yml, "WINDOW
+    # DECISION").  Where a country's modules use more than one window, the
+    # window is carried in `RecallWindow` so the numbers stay interpretable.
+    Expenditure:
+      type: float
+      required: true
+      monetary: true
+      note: |
+        Amount spent on item j by household i in wave t, over that item's
+        recall window, in nominal local currency.  Reported, not annualised.
+        Rows exist only where the household reported the item.
+    RecallWindow:
+      type: str
+      optional: true
+      note: |
+        The recall window `Expenditure` was reported over, verbatim from the
+        instrument (Togo: '7 days', '30 days', '3 months', '6 months',
+        '12 months').  Optional because a survey whose non-food module uses a
+        single window has nothing to disambiguate -- but a country whose
+        modules mix windows and does NOT carry this column is pooling
+        incommensurable numbers.
 
 # Spellings that must never appear in column names.  Key is the rejected
 # spelling; value is the canonical replacement.

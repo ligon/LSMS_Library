@@ -393,4 +393,30 @@ Data Scheme:
     PersonDays: float
     Wage: float
     materialize: make
-  nonfood_expenditures: !make
+  nonfood_expenditures:
+    # Item-level household non-food expenditure, GSEC14B (2005-06) / GSEC15C
+    # (all later waves).  `j` is the `nonfood_items.org` Preferred Label.
+    #
+    # LONG since GH #817.  It used to be declared bare `!make` and delivered a
+    # WIDE item-by-household matrix with `m = 'Uganda'` in the index; with no
+    # `index:` and no columns here, `_assert_built_required_columns`, the
+    # `dfs:` guard and the coverage grader had nothing to check, so every cell
+    # graded `sane` while the table could not be stacked with Togo's.
+    #
+    # Expenditure sums the survey's separate purchased / produced / given
+    # (in-kind) columns, which is what the pre-#817 code did too -- the reshape
+    # changed the SHAPE, not the arithmetic, and every wave's total is
+    # unchanged.  Rows exist only where a household reported the item
+    # (sparsity convention); the old `fillna(0)` is gone.
+    #
+    # NO RecallWindow, and that is a KNOWN GAP rather than a statement about
+    # the survey.  The .dta's own variable labels carry a CAPI fill: "How much
+    # came from purchases in the past [RECALL]? VALUE" (h15cq5, 2013-14 and
+    # 2011-12), so the recall period VARIES BY ITEM, exactly as in Togo's
+    # section 9 -- and this table sums across it.  No wave ships a recall
+    # variable and nonfood_items.org has no recall column, so populating it
+    # needs the questionnaire read per wave.  See _/CONTENTS.org
+    # "nonfood_expenditures".  Do not read the missing column as "one window".
+    index: (t, i, j)
+    Expenditure: float
+    materialize: make
