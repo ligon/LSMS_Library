@@ -80,10 +80,24 @@ Environment variables
 - ``LSMS_BUILD_BACKEND=make`` — force rebuild from source, bypassing
   both the cache and the DVC stage layer.
 - ``LSMS_SKIP_AUTH`` — suppress the import-time authentication attempt.
+- ``LSMS_BUILD_WORKERS`` — worker processes for a cold wave-parallel build
+  (default: the cgroup-visible CPU count, capped at the number of distinct
+  build targets and by the memory guard below; ``1`` = the serial path).
+  Waves that share a make target build serially in one worker; output is
+  byte-identical to serial.  An explicit value may exceed the memory guard
+  (warns once) but never the CPU count.
+- ``LSMS_BUILD_WORKER_MEM_GB`` — GiB reserved per build worker (default
+  ``4``, covering the largest wave script measured at 3.7 GB).  The default
+  worker count is capped at ``visible memory // this``, where visible memory
+  is the smallest of MemAvailable, the cgroup memory limit and Slurm's
+  ``SLURM_MEM_PER_NODE`` / ``SLURM_MEM_PER_CPU`` allocation.
 - ``LSMS_MAKE_JOBS`` — make ``-j`` parallelism for source rebuilds
-  (default ``cpu_count // 2``). A country build runs one wave build per
-  job, i.e. that many concurrent large S3 fetches; set ``LSMS_MAKE_JOBS=1``
-  to serialize them on hosts where concurrent multipart reads are flaky.
+  (default: half the cgroup-visible CPUs -- ``sched_getaffinity`` capped by
+  ``SLURM_CPUS_PER_TASK`` / ``SLURM_CPUS_ON_NODE``, GH #764).  A country
+  build runs one wave build per job, i.e. that many concurrent large S3
+  fetches; set ``LSMS_MAKE_JOBS=1`` to serialize them on hosts where
+  concurrent multipart reads are flaky.  Under ``LSMS_BUILD_WORKERS`` it
+  is a ceiling on each worker's ``-j``.
 - ``LSMS_FETCH_ATTEMPTS`` — retry budget (default ``3``) for a single
   blob's S3 fetch on a transient TLS error before falling back to streaming.
 
@@ -132,6 +146,8 @@ from . import local_tools as tools
 from . import population
 from .population import PopulationRecord, population_records
 from . import transformations
+from . import visualizations
+from .visualizations import population_pyramid, coordinate_map
 from .dvc_permissions import authenticate
 try:
     from dvc.ui import ui as dvc_ui
@@ -220,4 +236,21 @@ elif not SKIP_AUTH and creds_file.exists():
     except (ImportError, OSError):
         # Sync failure is non-fatal --- legacy `dvc.api.open()` callers
         # will surface a clear NoCredentialsError if it matters.
+        pass
+
+if not SKIP_AUTH:
+    # The DVCFS singleton is built when `local_tools` is imported, which is
+    # before either branch above can have written the credentials file.  On a
+    # first-ever import it was therefore built without explicit S3
+    # credentials, leaving it on the `credentialpath` fallback that an
+    # ambient AWS environment silently defeats (see
+    # `local_tools._s3_explicit_credentials`).  Rebuild it once, now that
+    # the file exists.  No-op when the credentials were already present at
+    # import time, which is the common path.
+    try:
+        from .local_tools import refresh_s3_credentials as _refresh_s3
+        _refresh_s3()
+    except (ImportError, OSError, AttributeError):
+        # Best-effort: a failure here leaves the credentialpath fallback,
+        # which is what shipped before.
         pass

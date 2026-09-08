@@ -26,13 +26,19 @@ uga.data_scheme
 
 ### Loading Tables
 
-Every entry in `data_scheme` is callable as a method:
+Almost every entry in `data_scheme` is callable as a method:
 
 ```python
 food_exp = uga.food_expenditures()
 roster   = uga.household_roster()
 shocks   = uga.shocks()
 ```
+
+!!! warning "Two entries are properties, not methods"
+
+    `panel_ids` and `updated_ids` appear in `data_scheme` but are
+    `@property` attributes returning `dict`, not callables. `c.panel_ids()`
+    raises `TypeError: 'dict' object is not callable` -- use `c.panel_ids`.
 
 Each returns a pandas DataFrame with a meaningful MultiIndex.
 
@@ -68,15 +74,35 @@ df = wave.household_roster()
 When you call a table method, the library applies these transformations
 transparently before returning the DataFrame:
 
-1. **Kinship expansion** -- if the wave produces a `Relationship` column, it is
+1. **Categorical mappings** -- column or index names matching a table in the
+   country's `categorical_mapping.org` are mapped automatically.  A table only
+   maps when it has a `Preferred Label` column, and it is keyed on the *first*
+   column that is neither `Preferred Label` nor a requested label variant --
+   so write it `| Original Label | Preferred Label |` (or
+   `| Code | Preferred Label |`), raw label or code **first**.  A
+   `| Code | Label |` table with no `Preferred Label` is documentation, not a
+   mapping, and changes nothing.
+2. **Kinship expansion** -- if the wave produces a `Relationship` column, it is
    decomposed into `Generation`, `Distance`, and `Affinity` using the mapping
-   in `lsms_library/categorical_mapping/kinship.yml`.
-2. **Categorical mappings** -- column or index names matching a table in the
-   country's `categorical_mapping.org` are mapped automatically.
+   in `lsms_library/categorical_mapping/kinship.yml`.  Because step 1 runs
+   first, a country `#+name: Relationship` table with `Preferred Label`
+   canonicalises the raw survey wording *before* the kinship lookup sees it
+   (GH #797; the order was the reverse until then), so one canonical entry in
+   `kinship.yml` -- `Spouse` -- can serve `Spouse (Wife/Husband)`,
+   `Wife/husband`, and any other wording a wave uses.  The mapping **replaces**
+   the raw label in the returned `Relationship` column; the cached parquet
+   keeps the raw string, because mappings are a read-path transform (see
+   [Caching](caching.md)).
+   One consequence of the order: `household_roster(labels={'Relationship': 'X'})`
+   feeds the *selected* label variant into the kinship lookup, not the raw
+   label -- no country curates a multi-label `Relationship` table today, so
+   this has no live instance.
 3. **Canonical spellings** -- variant spellings (e.g. `Male` -> `M`,
    `Féminin` -> `F`) are normalized using the rules in `data_info.yml`.
-4. **Dtype enforcement** -- columns are cast to declared types from
-   `data_scheme.yml`.
+4. **Dtype enforcement** -- columns are cast to declared types. A country's
+   `data_scheme.yml` is applied first, then the canonical
+   `lsms_library/data_info.yml`, which **wins** on conflict (e.g. `Age: float`
+   in Albania's `data_scheme.yml` is overridden to `Int64`).
 
 ## Derived Tables
 
@@ -97,10 +123,8 @@ Countries are organized under `lsms_library/countries/`. To see what's
 available:
 
 ```python
-from pathlib import Path
-import lsms_library
+from lsms_library.paths import countries_root
 
-countries_dir = Path(lsms_library.__file__).parent / 'countries'
-[d.name for d in sorted(countries_dir.iterdir())
+[d.name for d in sorted(countries_root().iterdir())
  if d.is_dir() and not d.name.startswith('.')]
 ```

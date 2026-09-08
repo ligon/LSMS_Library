@@ -9,9 +9,25 @@ https://doi.org/10.7910/DVN/PBFXVK
 #+CATALOG_URL: https://doi.org/10.7910/DVN/PBFXVK
 #+PROVENANCE_SOURCE: external
 #+PROVENANCE_METHOD: manual-override
-#+PROVENANCE_VALIDATION: catalog-only
-#+PROVENANCE_RECORDED: 2026-09-02
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-09-04
 #+PROVENANCE_NOTE: KLPS-2: Harvard Dataverse, not a World Bank dataset (CATALOG_ID 'none'); CC0 1.0.
 
 * Notes (preserved from the original SOURCE.org)
 Kenya Life Panel Survey Round 2 (KLPS-2), Harvard Dataverse dataset doi:10.7910/DVN/PBFXVK version 1.0, published 2021-06-01.  Retrieved via the Dataverse API.  License as declared in the dataset metadata: CC0 1.0.  Validation: the 4 committed files are the Dataverse tab-delimited ingest derivatives (.tab), whose md5 Dataverse does not publish, so content could not be verified against the catalog; downloads are guestbook-gated.
+
+FORMAT CHANGE 2026-09-04 (GH #750).  This wave previously tracked Dataverse's
+TAB-DELIMITED ingest derivatives (KLPS2_*.tab), whose blobs had never been pushed
+and whose md5 Dataverse does not publish -- so their content could not be
+corroborated and this record read `catalog-only`.  The four .tab sidecars are
+retired and the wave now tracks the ORIGINAL Stata files (KLPS2_*.dta), each of
+which md5-matches the checksum Dataverse publishes for the original upload:
+  KLPS2_E-Module_PUBLIC_2021-05.dta      d624420fb541ae269720a1f29b72e0d3
+  KLPS2_I-Module_PUBLIC_2021-05.dta      93a351ec191d4c95f7742067f3c96d2d
+  KLPS2_SampleMaster_PUBLIC_2015-12.dta  b1c8e6ee539e56d04f5d3b57012af07c
+  KLPS2_Status_PUBLIC_2015-12.dta        545b7e587309e0cfad766dd3f2b78540
+That makes KLPS-2 consistent with KLPS-1, KLPS-3 and KLPS-4, which all track the
+originals, and lifts the record to `content-validated`.  Blobs pushed to the S3
+remote the same day.  Obtained by a browser download (the Dataverse guestbook,
+id 63, refuses every API route -- per-file, multi-file, dataset zip and
+gbrecs=true -- even with a valid API token).

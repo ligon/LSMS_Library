@@ -8,7 +8,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       1467,
@@ -127,7 +127,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       2889,
@@ -246,7 +246,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       2618,
@@ -365,7 +365,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       2805,
@@ -484,7 +484,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3119,
@@ -603,7 +603,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3305,
@@ -722,7 +722,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3180,
@@ -841,7 +841,7 @@
       "Earnings": "float64"
     },
     "index_names": [
-      "j"
+      "i"
     ],
     "shape": [
       3064,
@@ -978,21 +978,19 @@
   },
   "var/earnings.parquet": {
     "columns": [
-      "earnings",
-      "level_1"
+      "Earnings"
     ],
-    "content_hash": "9b4d9b06382bd9ed3ef5491babbb987de10a5c49dc860e78d83e52ea36d0c3cc",
+    "content_hash": "bfc2324ebbf322a519b8b4c6dd14b426a8c08ebb11ec6094d9f9c4b308b70e31",
     "dtypes": {
-      "earnings": "float64",
-      "level_1": "str"
+      "Earnings": "float64"
     },
     "index_names": [
       "t",
       "i"
     ],
     "shape": [
-      129160,
-      2
+      22447,
+      1
     ]
   },
   "var/enterprise_income.parquet": {
@@ -1004,7 +1002,7 @@
       "revenue",
       "wagebill"
     ],
-    "content_hash": "1f03ec635b2d8c0b8312b5aecc0406b36e3981eb44c05210d4d5054c6cdd5638",
+    "content_hash": "db49477cdaa1666a966fe163a5d62c48ed895c9eeb7ef4453bae1cc921115421",
     "dtypes": {
       "losses": "float64",
       "materials": "float64",
@@ -1018,7 +1016,7 @@
       "i"
     ],
     "shape": [
-      78040,
+      13935,
       6
     ]
   },
@@ -1333,7 +1331,7 @@
     "columns": [
       "income"
     ],
-    "content_hash": "56b8f3ccc8a14eea61742cd5b6a0580a4e96c50f29f9a659ee47fd964a92d889",
+    "content_hash": "960a7bedafa71fffa5af1fbff54223153764ddf9c54cf5ccba92255082865fbb",
     "dtypes": {
       "income": "float64"
     },
@@ -1342,7 +1340,7 @@
       "i"
     ],
     "shape": [
-      13931,
+      14740,
       1
     ]
   },

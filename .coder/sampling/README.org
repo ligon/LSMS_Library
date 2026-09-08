@@ -1,0 +1,70 @@
+#+title: Sampling design: what we can derive, and what we still have to read
+
+Two generated artifacts and the rule that separates them.
+
+* =fingerprint.csv= -- DERIVED FROM DATA.  A screen, not documentation.
+
+  : python scripts/sampling_fingerprint.py --out .coder/sampling/fingerprint.csv
+
+Per =(country, wave)=, computed from =sample()=: household count, PSU count,
+households per PSU, strata count, weight CV / max-over-median / distinct
+values, panel-weight coverage, rural share.  104 waves across 37 countries
+(2 countries declare no =sample= table; Nepal has no microdata).
+
+What it makes legible: *clustering* (PSU count and take), *stratification*
+and its changes across waves, *panel structure* (a panel-weight coverage
+below 100% is a refreshment or rotation), *self-weighting* (=wt_distinct=
+1), *stratum-level weighting* (=wt_distinct= = =n_strata=), and
+*oversampling* as weight dispersion.
+
+It corroborates against known truth where we have it: =GhanaLSS= shows
+=wt_distinct= 1 in exactly *three* waves, and CLAUDE.md records that GLSS1-3
+are self-weighting by design.
+
+*What it CANNOT see, and must never be read as answering*:
+- the number of *stages*.  Uganda 2005-06 is two-stage nationally and
+  *three-stage* in IDP-camp districts of Northern Uganda -- indistinguishable
+  in the realized sample;
+- *PPS versus equal probability*;
+- any *oversample the published weights already deflate*, which is most of
+  them;
+- a design in a wave whose =strata= column is null, where the derived
+  =n_strata= is 0 and the screen is simply blind.
+
+* =evidence.csv= -- CANDIDATE SENTENCES.  A review queue, not a finding.
+
+  : python scripts/extract_sampling_evidence.py --out .coder/sampling/evidence.csv
+
+1 238 sentences matching design vocabulary, from two sources already in the
+repo: =population.yml= (302 sentences, 83 waves, each already carrying a
+=source_file= + =locator=) and =CONTENTS.org= (936, located only by heading).
+
+The =population.yml= half exists because the 2026-07 population sweep
+transcribed design detail and then deliberately parked it -- a sampling
+design is not a universe statement.  62% of the 112 recorded waves carry
+design vocabulary; Uganda 2005-06's =notes= is the type specimen.
+
+A hit is a *candidate*.  The sentence may describe a different round, may be
+the library's own inference rather than a document's claim, or may be
+contradicted elsewhere.  That is why this is an evidence file for curation
+and not a generated =sampling.yml=.
+
+* The rule
+
+Neither file is a claim about how a survey was drawn.  If a =sampling.yml=
+is ever promoted from these, it must carry =source_type= and =confidence=
+beside every assertion, exactly as =population.yml= does and for exactly the
+same reason: a derived signal and a questionnaire reading are not the same
+kind of fact, and the corpus has already been bitten once by an unevidenced
+"no module here" claim (Albania, see =docs/guide/coverage.md=).
+
+* What is committed, and what is not
+
+=fingerprint.csv= is tracked (force-added past the blanket =*.csv= ignore,
+as =.coder/coverage/*.csv= is) because reproducing it needs a cold
+=sample()= build of 37 countries, i.e. microdata access.
+
+=evidence.csv= is *not* tracked.  It reads only config -- =population.yml=
+and =CONTENTS.org= -- so it regenerates in a couple of seconds on any
+checkout, with no credentials, and committing 475 KB of sentences that are
+already in the repo verbatim would be storing the same text twice.

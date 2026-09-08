@@ -319,8 +319,22 @@ STABLE across the 1994+ waves (only spelling drifts), so a single
 Code column suffices (cf. harmonize_food which needed per-wave
 columns).  Metric codes map to framework-recognized tokens
 (1->kg, 2->"100 kg" so the explicit-metric parser yields 100,
-19->litre, 92->g) and 30->Birr (currency: intentionally no kg
-factor).  ALL OTHER codes map to their local volumetric/container
+19->litre, 92->g).  Code 30 is the CURRENCY code (the source's own
+label is "Birr"), and it maps to the framework's canonical
+currency-denominated sentinel ``Value`` -- NOT to the currency's
+name.  The name of the currency is redundant with the country and
+wave, and ``currency=`` (lsms_library/currency.py) is the lever for
+currency *representation*; a ``u`` label spelled ``Birr`` is a
+country-local spelling of ``Value`` that the framework cannot
+recognise.  ``Value`` is in ``transformations._CURRENCY_DENOMINATED_UNITS``
+and ``country._RESERVED_U_SENTINELS``, so these rows are excluded from
+the price-ratio kg inference (GH #770) and ``protect_u_sentinels``
+keeps any future ``#+name: u`` remap off them on the derived food
+tables (GH #361) -- neither of which a label spelled ``Birr`` got.  Before 2026-09 this cell read ``Birr``, annotated "no kg
+factor" -- and that annotation was FALSE: the same inference that
+recovers Chinet/Kunna factors silently inferred 0.5833 kg per Birr
+and served currency as mass.  ALL OTHER codes map to their local
+volumetric/container
 unit NAME (Chinet, Kunna, ...).  The ``u`` index carries this unit
 label ALONE -- NOT a food label (GH #347).  The framework's
 price-ratio kg inference (transformations.conversion_to_kgs) groups
@@ -365,7 +379,7 @@ distinction) pending Codeunit1.SPS.
 | 27 | Sini |
 | 28 | Gembo |
 | 29 | Bottles |
-| 30 | Birr |
+| 30 | Value |
 | 32 | Melekia |
 | 33 | Bikole |
 | 34 | Guchiye |

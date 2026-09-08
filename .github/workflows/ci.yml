@@ -8,6 +8,14 @@ on:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
 
+# One live run per ref (push) or per PR (pull_request): a new push cancels the
+# run it supersedes instead of queueing beside it.  2026-09-07: fourteen
+# development / PR-branch runs were in flight at once, most of them on heads
+# that had already been replaced, and had to be cancelled by hand.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Fast tests — no data access needed
   unit-tests:

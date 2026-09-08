@@ -26,7 +26,13 @@ dependencies = ["pandas >=3.0",
              "typer (>=0.12.0,<1.0.0)",
              "fooddatacentral (>=1.0.10,<2.0.0)",
              "pint (>=0.25.2,<0.26.0)",
-             "platformdirs (>=4.0.0,<5.0.0)"]
+             "platformdirs (>=4.0.0,<5.0.0)",
+             # Charts and maps (population_pyramid / coordinate_map are
+             # top-level API as of v0.11.0).  matplotlib is already loaded at
+             # import by CFEDemands; folium is lazy (interactive maps only).
+             "matplotlib (>=3.10.0,<4.0.0)",
+             "folium (>=0.19)"]
+version = "0.0.0"
 
 [project.scripts]
 lsms-library = "lsms_library.cli:main"
@@ -43,7 +49,6 @@ include = [
     "lsms_library/countries/.dvc/s3_reader_creds.gpg",
     "lsms_library/countries/.dvc/s3_reader_creds.enc",
 ]
-version = "0.0.0"
 
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }

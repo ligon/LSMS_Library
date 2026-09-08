@@ -59,6 +59,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from . import _parallel_waves
 from .population import attach as attach_population, population_records
 import importlib.util
 import hashlib
@@ -481,7 +482,9 @@ def _make_jobs_flag() -> str | None:
     Determine an appropriate make -j flag based on environment or CPU count.
     Returns the flag string (e.g. '-j4') or None if no parallelism is desired.
 
-    ``LSMS_MAKE_JOBS`` overrides the default (``cpu_count // 2``).  A
+    ``LSMS_MAKE_JOBS`` overrides the default (``visible_cpus() // 2`` -- the
+    cgroup-visible count, GH #764; a parallel wave build sets it per worker,
+    see ``_parallel_waves.worker_make_jobs``).  A
     country-level build fans out to one ``python <table>.py`` per wave, so
     ``-jN`` runs N wave builds -- and thus N concurrent large-blob S3 fetches --
     in parallel.  On a host where concurrent multipart S3 reads occasionally
@@ -495,8 +498,11 @@ def _make_jobs_flag() -> str | None:
         except ValueError:
             jobs = None
     else:
-        cpu_count = os.cpu_count() or 2
-        jobs = max(1, cpu_count // 2)
+        # GH #764: ``os.cpu_count()`` is the physical node (56 on savio4_htc),
+        # not the cgroup the job was given -- a 4-core slice ran ``-j28``.
+        # ``visible_cpus`` is the affinity count, capped by Slurm's own
+        # allocation when set.
+        jobs = max(1, _parallel_waves.visible_cpus() // 2)
 
     if jobs and jobs > 1:
         return f"-j{jobs}"
@@ -572,6 +578,46 @@ def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
         f"  - DVC credentials are missing or misconfigured;\n"
         f"  - the raw .dta source files have not been dvc-pulled.\n\n"
         f"See README.org for supported install and data-access patterns."
+    )
+
+
+class InTreeParquetWarning(UserWarning):
+    """A ``*.parquet`` was found inside the config tree (``countries_root()``).
+
+    GH #803.  The library reads harmonized parquets from ``data_root()`` only;
+    a parquet sitting next to a wave script is an artefact of running that
+    script from a checkout that is not the imported package (``to_parquet``
+    -> ``_resolve_data_path`` redirects only when the *caller's file* is under
+    ``countries_root()``; otherwise the literal relative path is written --
+    the write-side ``.pth`` trap, see CLAUDE.md "Data Access").  Before #803
+    such a file was *preferred* to running the wave script, and being
+    hashless it graded ``legacy`` at the v0.8.0 gate, so the stale frame was
+    concatenated and stamped with a fresh hash.  It is now ignored and
+    reported once per path.
+    """
+
+
+_INTREE_ARTEFACTS_WARNED: set[Path] = set()
+
+
+def _warn_intree_parquet_artefact(path: Path, owner: str, table: str) -> None:
+    """Report -- once per path -- a parquet artefact inside the config tree.
+
+    Pure reporting: it never reads the file and never changes what any
+    build writes (it is in ``_build_registry._EXCLUDED_CALLABLES`` for that
+    reason).  Callers have already established ``path.exists()``.
+    """
+    if path in _INTREE_ARTEFACTS_WARNED:
+        return
+    _INTREE_ARTEFACTS_WARNED.add(path)
+    warnings.warn(
+        f"{owner}/{table}: ignoring in-tree parquet {path} (GH #803). "
+        f"Parquets inside the config tree are never read; this one was "
+        f"written by a script run from a checkout that is not the imported "
+        f"package (the write-side .pth trap -- CLAUDE.md 'Data Access'). "
+        f"Delete it, e.g. `find {countries_root()} -name '*.parquet' -delete`.",
+        InTreeParquetWarning,
+        stacklevel=3,
     )
 
 
@@ -714,6 +760,29 @@ class Wave:
             return {}
         with open(info_path, 'r') as file:
             return load_yaml(file)
+
+    @property
+    def features(self) -> list[str]:
+        """The tables this wave provides -- a synonym for :attr:`data_scheme`.
+
+        Same synonym as :attr:`Country.features`, for the same reason: the
+        library says *feature* nearly everywhere, while the attribute was
+        named after the ``data_scheme.yml`` file it reads.
+
+        The wave-level list is the wave's OWN declarations and need not match
+        its country's -- a table wired for some waves and not others is the
+        normal case, and comparing ``country.features`` with
+        ``wave.features`` is how you see which.
+
+        **A wave does not list the runtime-derived tables, and that is
+        correct.**  ``food_expenditures``, ``food_prices``,
+        ``food_quantities`` and ``household_characteristics`` are built in
+        ``Country.__getattr__`` from ``_aggregate_wave_data(waves, ...)`` --
+        a concatenation ACROSS waves -- so they are country-level by
+        construction rather than something a wave failed to declare.  Uganda:
+        country 28, wave 23, the difference being exactly those.
+        """
+        return self.data_scheme
 
     @property
     def data_scheme(self) -> list[str]:
@@ -1156,6 +1225,23 @@ class Wave:
             warnings.warn(msg)
         return pd.merge(left, right, on=merge_on, how=how)
 
+    def _script_parquet_candidates(self, request: str) -> list[Path]:
+        """Where a script-path wave parquet may be READ from: under
+        ``data_root()`` only.
+
+        GH #803: the in-tree ``{wave}/_/{table}.parquet`` is deliberately NOT
+        a candidate.  It is only the *name* of the Makefile target (the
+        ``../%/_/<table>.parquet`` pattern rules are written with in-tree
+        names); the script that rule runs writes through ``to_parquet`` ->
+        ``_resolve_data_path`` and lands under ``data_root()``.  A hashless
+        parquet under ``data_root()`` still grades ``legacy`` and is trusted
+        once -- that is the v0.8.0 upgrade path and is unchanged.  Nothing
+        inside ``countries_root()`` is an input.
+        """
+        return [
+            data_root(self.country.name) / self.wave_folder / "_" / f"{request}.parquet",
+        ]
+
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
@@ -1460,19 +1546,31 @@ class Wave:
             logger.info("Attempting to generate using Makefile...")
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
-            # Use in-tree path for Make target, but look for output at data_root too
-            intree_parquet = self.file_path / "_" / f"{request}.parquet"
-            country_name = self.country.name
-            external_parquet = data_root(country_name) / self.wave_folder / "_" / f"{request}.parquet"
+            # GH #803: ``make_target_intree`` is the Makefile target NAME
+            # (the ``../%/_/<table>.parquet`` pattern rules use in-tree
+            # names) -- it is never read.  The only read location is under
+            # data_root() (see _script_parquet_candidates).  A file that
+            # actually exists at the in-tree name is an artefact of the
+            # write-side .pth trap: it is reported, and it makes Make's own
+            # timestamp check lie (the target looks up to date), so Make is
+            # then forced with -B.
+            make_target_intree = self.file_path / "_" / f"{request}.parquet"
+            candidates = self._script_parquet_candidates(request)
+            intree_artefact = make_target_intree.exists()
+            if intree_artefact:
+                _warn_intree_parquet_artefact(make_target_intree, self.name, request)
 
             # Check if the parquet already exists before invoking Make.
             # v0.8.0: skip a candidate whose embedded hash is STALE so a
             # script/source edit forces Make to rebuild it (closes the
             # "stale L2-wave parquet shadows a source-script fix" gap
-            # documented in CLAUDE.md "Cache Behavior").
+            # documented in CLAUDE.md "Cache Behavior").  A hashless
+            # candidate grades ``legacy`` and is trusted: that is the v0.8.0
+            # upgrade path for parquets UNDER data_root, and it is exactly
+            # why an in-tree file must never be a candidate (GH #803).
             expected_wave_hash = self._input_hash(request)
             parquet_fn = None
-            for candidate in [external_parquet, intree_parquet]:
+            for candidate in candidates:
                 if candidate.exists():
                     if cache_freshness(candidate, expected_wave_hash) == "stale":
                         logger.debug(
@@ -1490,7 +1588,7 @@ class Wave:
                     return pd.DataFrame()
 
                 cwd_path = self.file_path.parent / "_"
-                relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
+                relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
                 env = os.environ.copy()
                 env["LSMS_DATA_DIR"] = str(data_root())
                 bin_dir = os.path.dirname(sys.executable)
@@ -1504,6 +1602,11 @@ class Wave:
                 # (e.g. Uganda's food_expenditures, which routes here per
                 # wave for food_acquired).
                 make_cmd = ["make", "-s"]
+                if intree_artefact:
+                    # GH #803: Make stats the target by its in-tree name; an
+                    # artefact newer than the script makes it "up to date" and
+                    # nothing runs.  Force the recipe.
+                    make_cmd.append("-B")
                 jobs_flag = _make_jobs_flag()
                 if jobs_flag:
                     make_cmd.append(jobs_flag)
@@ -1511,7 +1614,7 @@ class Wave:
                 subprocess.run(make_cmd, cwd=cwd_path, check=True, env=env)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
-                for candidate in [external_parquet, intree_parquet]:
+                for candidate in candidates:
                     if candidate.exists():
                         parquet_fn = candidate
                         break
@@ -1627,10 +1730,10 @@ class Wave:
         if df.empty:
             return df
         # if food_acquired data is loaded from a parquet file, we assume its unit and food label are already mapped.
-        # Check both in-tree and data_root locations (wave scripts write to data_root).
-        intree_parquet = self.file_path / "_" / "food_acquired.parquet"
-        external_parquet = data_root(self.country.name) / self.wave_folder / "_" / "food_acquired.parquet"
-        if intree_parquet.exists() or external_parquet.exists():
+        # GH #803: only a data_root parquet counts.  An in-tree file is not
+        # an input -- not even as an existence test that steers behaviour.
+        external_parquet = self._script_parquet_candidates('food_acquired')[0]
+        if external_parquet.exists():
             return df
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
@@ -1878,6 +1981,74 @@ class Country:
         return sorted(waves)
 
     @property
+    def notes_path(self) -> Path:
+        """Path to this country's ``_/CONTENTS.org``."""
+        return self.file_path / "_" / "CONTENTS.org"
+
+    def notes(self, topic: str | None = None,
+              state: str | None = None) -> str:
+        """This country's ``CONTENTS.org`` -- its recorded idiosyncrasies.
+
+        ``CONTENTS.org`` is where the repository records what is odd about a
+        survey: identifier conventions, design quirks, known defects, and
+        decisions already taken with their reasons.  It was previously
+        reachable only by navigating the filesystem, which meant anyone
+        working through the API could not find it.
+
+        Parameters
+        ----------
+        topic : str, optional
+            Case-insensitive substring matched against headline **text**
+            (body text is not searched).  Returns each matching headline with
+            its whole subtree, since the useful detail is nested -- a
+            country's ``Weights`` and ``Strata`` live under its ``Sampling
+            Design``.  When a parent and a descendant both match, only the
+            parent is returned; it already contains the descendant.
+        state : str, optional
+            TODO keyword to filter on, e.g. ``'WAITING'``.  A closed GitHub
+            issue can still leave a live caveat parked here, so
+            ``notes(state='WAITING')`` is the quick answer to "what is still
+            open for this country?".
+
+        Returns
+        -------
+        str
+            The matching text, or ``''`` when nothing matches.  A country
+            with no ``CONTENTS.org`` warns and returns ``''``, following
+            :meth:`Wave.license`.
+
+        See Also
+        --------
+        note_topics : the headlines available to pass as ``topic``.
+        """
+        from . import notes as _notes
+
+        path = self.notes_path
+        if not path.exists():
+            warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
+            return ""
+        return _notes.extract(path.read_text(), topic=topic, state=state)
+
+    @property
+    def note_topics(self) -> list[tuple[int, str | None, str]]:
+        """``(level, TODO keyword, headline)`` for every heading in the notes.
+
+        The discovery half of :meth:`notes`, and the load-bearing half: the
+        headline vocabulary is largely ad hoc -- counts range from 11 headings
+        to 124 -- so nobody guesses ``'Household Presence / MonthsSpent'``.
+        This is to :meth:`notes` what :attr:`data_scheme` is to the table
+        methods.
+        """
+        from . import notes as _notes
+
+        path = self.notes_path
+        if not path.exists():
+            warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
+            return []
+        return [(h.level, h.keyword, h.text)
+                for h in _notes.parse(path.read_text())]
+
+    @property
     def population(self) -> dict[str, "PopulationRecord"]:
         """``{wave: PopulationRecord}`` -- what each wave's sample REPRESENTS.
 
@@ -1939,6 +2110,23 @@ class Country:
                 columns=['source', 'license', 'documentation_path']
             ).rename_axis('t')
         return pd.DataFrame(rows).set_index('t')
+
+    @property
+    def features(self) -> list[str]:
+        """The tables this country provides -- a synonym for :attr:`data_scheme`.
+
+        The library talks about *features* nearly everywhere: :class:`Feature`
+        assembles one across countries, the coverage matrix grades
+        ``(country, feature, wave)`` cells, and the guides are written in those
+        terms.  The attribute that lists them was named instead after the
+        ``data_scheme.yml`` file it happens to read.  Both names now work, so
+        the vocabulary a reader arrives with is the one that answers.
+
+        Deliberately a synonym and not a rename with a deprecation:
+        ``data_scheme`` is used throughout the countries' own scripts and in
+        published notebooks, and the file it is named for is not going away.
+        """
+        return self.data_scheme
 
     @property
     def data_scheme(self) -> list[str]:
@@ -2727,10 +2915,6 @@ class Country:
             if "Relation" in df.columns and "Relationship" not in df.columns:
                 df = df.rename(columns={"Relation": "Relationship"})
 
-            # Expand Relationship -> Generation, Distance, Affinity
-            if "Relationship" in df.columns:
-                df = _expand_kinship(df)
-
             # Auto-apply categorical mappings where table name matches
             # a column or index name (issue #49).  For derived food tables,
             # protect the reserved 'kg'/'Value' u-sentinels from a country's
@@ -2740,6 +2924,10 @@ class Country:
                 protect_u_sentinels=method_name in _U_SENTINEL_PROTECTED_METHODS,
                 labels=labels,
             )
+
+            # Expand Relationship -> Generation, Distance, Affinity
+            if "Relationship" in df.columns:
+                df = _expand_kinship(df)
 
             # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
             # level when such a categorical_mapping table exists (GH #180,
@@ -3041,6 +3229,32 @@ class Country:
                 f"{self.name}/_/data_scheme.yml."
             )
 
+    def _is_script_path(self, method_name: str, materialize_backend: str | None,
+                        waves: list[str]) -> bool:
+        """Is ``method_name`` built by a script rather than the YAML path?
+
+        True when the table declares ``materialize: make``, has a country-level
+        ``_/{table}.py`` concatenator, or has a wave-level ``{wave}/_/{table}.py``
+        script in any of ``waves`` (run through run_make_target's wave-script
+        fallback -- GhanaLSS ``food_acquired`` since GH #808 is exactly this:
+        seven wave scripts, no make flag, no country script).  Wave folders are
+        resolved through ``wave_folder_map`` (Tanzania ``2008-15``, Nigeria
+        round dirs), the same way ``run_make_target`` resolves them, so a
+        mapped label is found where ``file_path / label`` would miss it.
+        Deliberately a pure path probe: it does NOT build ``Wave`` objects
+        (``self[wave]``) -- the cache-hit paths this feeds must not touch a
+        wave, and ``tests/test_dvc_caching.py`` pins that with a
+        ``__getitem__`` that raises.  Consumed by
+        ``_assert_built_required_columns``.
+        """
+        if materialize_backend == "make":
+            return True
+        if (self.file_path / "_" / f"{method_name}.py").exists():
+            return True
+        folder_map = getattr(self, "wave_folder_map", None) or {}
+        return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
+                   for w in waves)
+
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
@@ -3144,14 +3358,24 @@ class Country:
                     output_candidates.append(base_path / "_" / f"{method_name}.json")
                 output_candidates.append(self.file_path / "_" / f"{method_name}.json")
             else:
-                # Check data_root (external) first, then in-tree as fallback
+                # GH #803: outputs are READ from data_root() only.  The in-tree
+                # names in ``try_make`` below are Make *targets* for the
+                # ``../%/_/<table>.parquet`` pattern rules; a correctly
+                # redirected script (to_parquet -> _resolve_data_path) never
+                # writes there, so a parquet found in-tree is an artefact of
+                # the write-side .pth trap: reported, never read.
                 if wave is not None:
                     output_candidates.append(data_root(self.name) / wave_folder / "_" / f"{method_name}.parquet")
-                    output_candidates.append(base_path / "var" / f"{method_name}.parquet")
-                    output_candidates.append(base_path / "_" / f"{method_name}.parquet")
                 output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+                intree_names = [
+                    self.file_path / "var" / f"{method_name}.parquet",
+                    self.file_path / "_" / f"{method_name}.parquet",
+                ]
+                if wave is not None:
+                    intree_names = [base_path / "_" / f"{method_name}.parquet"] + intree_names
+                for artefact in intree_names:
+                    if artefact.exists():
+                        _warn_intree_parquet_artefact(artefact, f"{self.name}/{wave or '_'}", method_name)
 
             # deduplicate while preserving order
             unique_candidates: list[Path] = []
@@ -3193,8 +3417,10 @@ class Country:
                 makefile = make_dir / "Makefile"
                 # Build Make targets using data_root() paths (primary) since
                 # Makefiles now default VAR_DIR to data_root().  Fall back to
-                # in-tree paths only if needed.  Use absolute paths directly
-                # as Make handles them fine.
+                # in-tree target NAMES only if needed (the ``../%/_/`` pattern
+                # rules are written with them); the OUTPUT is still looked for
+                # under data_root() only (GH #803).  Use absolute paths
+                # directly as Make handles them fine.
                 make_targets = []
                 if method_name in JSON_CACHE_METHODS:
                     make_targets.append(self.file_path / "_" / f"{method_name}.json")
@@ -3221,7 +3447,7 @@ class Country:
                     except (subprocess.CalledProcessError, FileNotFoundError) as error:
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
-                    # Check all candidate locations (data_root + in-tree)
+                    # Check the data_root candidate locations (GH #803: never in-tree)
                     for candidate in unique_candidates:
                         if candidate.exists():
                             return candidate
@@ -3296,8 +3522,13 @@ class Country:
             # parquets; stamped YAML waves self-invalidate per-wave); never runs
             # on a warm hit (the cache read returns before any rebuild descent).
             self._evict_hashless_wave_caches(method_name)
-            results = {}
-            for w in waves:
+
+            def build_wave(w):
+                """Stage 1 -- the expensive, wave-independent part of the
+                walk: the YAML extraction or the ``make``/script run for ONE
+                wave.  Everything content-determining about a wave's build
+                lives here; ``_parallel_waves`` only decides which process
+                runs it (GH #797)."""
                 wave_obj = self[w]
                 wave_has_table = method_name in wave_obj.data_scheme
                 wave_result = None
@@ -3333,6 +3564,40 @@ class Country:
                         wave_result = wave_result[
                             wave_result.index.get_level_values('t') == w
                         ]
+                return wave_has_table, wave_result
+
+            # GH #797: fan stage 1 out over a fork pool, one worker per
+            # distinct make target (waves sharing a folder build serially in
+            # ONE worker -- see ``_parallel_waves.group_waves_by_target``).
+            # ``None`` means "stay serial" (LSMS_BUILD_WORKERS=1, one target,
+            # one visible CPU, or already inside a worker): the loop below
+            # then calls ``build_wave`` inline, in wave order, which is the
+            # pre-#797 code path unchanged.  Either way stage 2 (id_walk,
+            # index augmentation, the grain-audited normalisation, concat)
+            # runs HERE, in the parent, in wave order.
+            # The folder map is resolved through ``self[w]`` (the same lookup
+            # ``grab_data`` uses for its make target), not read off
+            # ``self.wave_folder_map`` -- that attribute is populated as a side
+            # effect of the ``waves`` property and is still ``{}`` when a
+            # caller passed ``waves`` explicitly.  ``getattr`` with the wave
+            # itself as fallback: tests stub ``__getitem__`` with bare
+            # namespaces that carry no ``wave_folder``.
+            prebuilt = _parallel_waves.prebuild(
+                build_wave, waves,
+                {w: getattr(self[w], 'wave_folder', w) for w in waves},
+                country=self.name, table=method_name,
+            )
+            results = {}
+            for w in waves:
+                if prebuilt is not None:
+                    # Replays this wave's captured warnings and ledger entries
+                    # before its post stage, so the parent-side order of
+                    # side effects matches a serial build; re-raises the
+                    # wave's exception (original type) if it failed.
+                    wave_has_table, wave_result = _parallel_waves.relay(
+                        prebuilt[w], country=self.name, table=method_name)
+                else:
+                    wave_has_table, wave_result = build_wave(w)
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (
@@ -3754,14 +4019,15 @@ class Country:
         # wave parquets can shadow a wave-script fix), fail with an actionable
         # message if a required declared column is missing post-finalize, rather
         # than silently returning wrong data.  ``materialize_backend`` is an
-        # unreliable signal -- GhanaLSS food_acquired is script-built via the
-        # wave-script fallback + a ``_/food_acquired.py`` concatenator yet
-        # declares no ``materialize: make`` -- so we also treat the presence of
-        # a country-level ``_/{table}.py`` concatenator as script-path.
-        is_script_path = (
-            materialize_backend == "make"
-            or (self.file_path / "_" / f"{method_name}.py").exists()
-        )
+        # unreliable signal -- a table can be script-built without declaring
+        # ``materialize: make``: GhanaLSS ``food_acquired`` is built by per-wave
+        # ``{wave}/_/food_acquired.py`` scripts through run_make_target's
+        # wave-script fallback, and since GH #808 has NO country-level
+        # concatenator -- so a country-level ``_/{table}.py`` OR any wave-level
+        # ``{wave}/_/{table}.py`` counts as script-path.  Wave folders are
+        # resolved through wave_folder_map (Tanzania ``2008-15``, Nigeria
+        # round dirs), without constructing a Wave.
+        is_script_path = self._is_script_path(method_name, materialize_backend, waves)
         self._assert_built_required_columns(result, method_name, scheme_entry,
                                             is_script_path)
         return result
@@ -4353,7 +4619,9 @@ class Country:
                     "    target column of ``conversion_factors.org`` (e.g.\n"
                     "    ``'PPP-2017'``, ``'FX'``, ``'USD-real-2017'``).  Mutually\n"
                     "    exclusive with ``currency``.  Pre-reform redenomination\n"
-                    "    waves and missing factors yield ``NaN``.  See\n"
+                    "    waves convert on contemporaneous old-currency rows; a\n"
+                    "    country or date absent from the factor table, or a\n"
+                    "    blank cell, yields ``NA`` with a warning.  See\n"
                     "    :func:`lsms_library.conversion.convert`.\n"
                 )
             method.__doc__ = "".join(doc_parts)

@@ -1,6 +1,7 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
-* Survey Program
+* Overview
 
 The Uganda National Panel Survey (UNPS) is conducted by the Uganda
 Bureau of Statistics (UBOS) with support from the World Bank
@@ -1286,6 +1287,176 @@ Mali, Nigeria and Tanzania.  Adding =condition= cannot and does not change
 the set of countries Feature keeps.
 
 * Known Issues
+** DONE =earnings= shipped a dense phantom panel, and the column was named =earnings= (GH #772)
+
+The country-level =_/earnings.py= built its =(t, i)= panel by stacking each
+wave's frame, collecting the results in a =pd.DataFrame(dict)= and stacking
+again.  That round trip cost three defects at once, of which only the first
+was visible to the test suite:
+
+1. *Wrong column name, plus a residue column.*  The final
+   =pd.DataFrame({'earnings': ...})= named the measure =earnings=, but
+   =data_scheme.yml= declares =Earnings= and =lsms_library/currency.py=
+   registers ={"Earnings"}= as this table's monetary column.  Anything
+   selecting =Earnings= got a =KeyError=.  The stacked column axis was
+   unnamed, so =reset_index()= left it behind as a =level_1= column holding
+   the constant string ='Earnings'=.  This is what
+   =test_declared_columns_present= and =test_feature_is_sane= reported.
+
+2. *A dense (households x waves) cross product.*  Under pandas 3
+   =DataFrame.stack= no longer drops all-null rows (it did under 2.x, via
+   the =dropna=True= default of the legacy implementation).  Aligning the
+   waves as a dict of Series therefore materialised every id in the union
+   against every wave: *129 160 rows = 16 145 ids x 8 waves*, against
+   *22 447* real household-wave observations (the sum of the wave parquet
+   row counts, pinned in =tests/fixtures/uganda_baseline.json=).  *82.6 % of
+   the delivered table -- 106 713 rows -- was fabricated*: a NaN earnings
+   row for every household in every wave it was not surveyed in.
+
+   *This one is dated by two committed artefacts, and it is a regression,
+   not an ancient defect.*  =.coder/coverage/latest.csv= (refreshed
+   [2026-06-26], i.e. under pandas 2.x) grades the eight Uganda =earnings=
+   cells at 1467 / 2889 / 2618 / 2805 / 3119 / 3305 / 3180 / 3064 rows --
+   =len(df[t == wave])= on the built country table, and exactly the wave
+   parquet counts, summing to 22 447.  =uganda_baseline.json=, regenerated
+   under the pandas 3 floor (PR #710, [2026-08-22]), records 129 160.  The
+   naming defect (1) is old; the densification arrived with the floor.  So
+   the row count this fix restores is not an estimate -- it is what the
+   table held before, measured.
+
+   No guard could see it.  It is not a grain collapse (nothing is
+   destroyed -- rows are *manufactured*, as in GH #323 site 4), and it is
+   not a null read: =Earnings= is not 100 % null, whole-table or per-wave
+   =t= slice, so neither =null_read_audit= site fires.  Nor is there a
+   "mostly null" sanity check.  It surfaced only because the *naming* bug
+   sat on top of it.
+
+3. *=.squeeze()= on a length-1 Series returns a scalar*, which
+   =pd.DataFrame(dict)= then broadcasts across every row.  Latent -- no
+   Uganda wave yields one household -- but it is a landmine, not a style
+   point.
+
+Fixed by concatenating the waves under a =t= key
+(=pd.concat(dict, names=['t','i'])=), which is what the shape was always
+meant to be.  The wave scripts' household index was also labelled =j=,
+which in this library means a *good* (see =Index Info= in
+=lsms_library/data_info.yml=); it is now =i=, and =id_walk= no longer has to
+warn that it fell back to a level it was not asked for.
+
+*=income= was propped up by the phantom rows, and the fix had to account for
+that.*  =_/income.py= combined its sources with a plain =+=, which aligns on
+the *intersection*: a household missing from either source became NaN and was
+dropped.  That was nearly invisible while earnings carried a row for every
+=(household, wave)= pair -- =[cols].sum(axis=1)= turns an all-NaN row into
+=0.0=, so the intersection was very nearly the union.  Removing the phantoms
+would have silently dropped the enterprise-only households they had been
+standing in for, so =income.py= now aligns with =.add(..., fill_value=0)=:
+a household absent from one source earned nothing *from that source*, which
+is not the same as having undefined total income.  All-zero totals are still
+dropped, as before.
+
+*Measured on a cold build with real data* [2026-09-06]: =income= goes from
+*13 931* rows (the figure pinned in =uganda_baseline.json=) to *14 740*, i.e.
+*+809*.  Those 809 are exactly the enterprise-only households the intersection
+=+= was discarding.  The fix therefore *widens* coverage; it does not narrow
+it.
+
+*Verified on a cold build with real data* [2026-09-06], comparing each
+country table against the sum of its own wave parquets:
+
+| table               | wave sum | country |  ratio | all-null rows |
+|---------------------+----------+---------+--------+---------------|
+| =earnings=          |   22 447 |  22 447 | 1.00x  |             0 |
+| =enterprise_income= |   13 935 |  78 040 | 5.60x  |        64 105 |
+| =assets=            |  116 808 | 116 808 | 1.00x  |             0 |
+
+=earnings= is fixed, and its per-wave counts reproduce the [2026-06-26]
+coverage snapshot digit for digit (1467 / 2889 / 2618 / 2805 / 3119 / 3305 /
+3180 / 3064).
+
+=enterprise_income= was dense in exactly the same way -- 64 105 of its 78 040
+rows (*82.1 %*) entirely null -- and *is fixed here too*, by the same
+=pd.concat= rewrite.  It carried no naming defect, so nothing in the suite
+ever reported it.
+
+** There are TWO builders for a country table, and they can disagree
+
+The =assets= row above (1.00x, despite =_/assets.py= using the identical
+idiom) is not luck.  Chasing it turned up the thing that actually matters,
+and it is bigger than =earnings=:
+
+*A country-level =_/{table}.py= is NOT what =Country(...).{table}()= runs.*
+=country.py='s =load_from_waves= loops the waves calling =run_make_target(...,
+wave=w)= and *concatenates the wave parquets*; the country script is reached
+only through =country_fallback = run_make_target(method_name, wave=None)=,
+which fires *only when no wave produced anything*.  Verified by planting a
+=raise= at the top of =_/earnings.py=: =Country('Uganda').earnings()= returned
+22 447 rows without tripping it.  Under =LSMS_BUILD_BACKEND=make= the same
+call raises the sentinel -- so the backend switch changes *which builder runs*,
+not merely how it is scheduled.
+
+*The Makefile reaches the country scripts by prerequisite, so this is not a
+corner case.*  =income= has no wave-level scripts, so it always falls through
+to make -- and the =income.parquet= target lists =enterprise_income.parquet=
+and =earnings.parquet= as prerequisites.  Building =income= therefore rewrites
+both through their country scripts.  Measured, before the fix in this entry:
+
+| =Country('Uganda').enterprise_income()=, cache without it | *13 935* rows |
+| the same call, after anything built =income=              | *78 040* rows |
+
+*Same API call, two answers.*  Which builder *runs* is decided by config --
+the Makefile prerequisite graph and which wave-level targets exist -- not by
+cache state.
+
+*What makes the wrong answer PERMANENT is the hash rule, and it is worth
+understanding because the yml config can never detect it.*  =to_parquet=
+called from a country script does not stamp =lsms_cache_hash=.  Measured on
+a live cache right after an =income()= build had rewritten =earnings= through
+its script:
+
+: earnings          lsms_cache_hash=NO     <- written by the country script
+: enterprise_income lsms_cache_hash=yes
+: income            lsms_cache_hash=yes
+: assets            lsms_cache_hash=yes
+: sample            lsms_cache_hash=yes
+: household_roster  lsms_cache_hash=yes
+
+=cache_freshness= grades a hashless parquet =legacy=, and =legacy= means
+*trust once, then stamp* -- its docstring says so explicitly
+("trust-once-then-stamp migration of legacy / *script-written* parquets").
+Measured:
+
+: before API call: stamped = NO  | rows = 22447
+: API returned    : (22447, 1)          <- served as-is, no rebuild
+: after  API call : stamped = yes | rows = 22447
+
+The hash it gets stamped with is computed from the *yml/config inputs*
+(=data_info.yml=, =data_scheme.yml=, =_/Makefile=, the =*.org= build inputs,
+the wave/country modules, the DVC sidecar md5s).  None of those changed --
+only the *builder* did.  So the content-hash mechanism is *structurally
+unable* to notice, and the artifact grades =fresh= from then on.
+=Country._evict_hashless_wave_caches= exists for exactly this hazard but
+globs =*/_/{table}.parquet= -- *wave* parquets only.  There is no
+country-level twin for =var/{table}.parquet=.
+
+That is how GH #772 reached the reporter as 129 160 rows: the
+=var/earnings.parquet= on that machine had been written by the Makefile
+chain, served hashless, and stamped =fresh= on the next read.  It is also why =assets= reads clean -- nothing had triggered
+=_/assets.py= recently, so what is served is the wave concatenation
+(=Value=, =(t, i, j)=), not the script's output (=assets=, =(i, t, m)=).
+Those two disagree in *column name and index*, so whichever wrote last wins.
+
+The bare =!make= tag desugars to ={materialize: make}=
+(=yaml_utils._construct_make=), identical to what =earnings= declares, so
+none of this is a config difference between the tables.
+
+*Not fixed here, because the fix is a design decision, not a patch*: which
+builder is authoritative?  Filed as *GH #788*.  Fixing the two Uganda
+scripts (this entry) makes the two builders *agree* for =earnings= and
+=enterprise_income= -- both now deliver 22 447 and 13 935 by either path,
+verified -- but that is convergence by hand, one table at a time, and
+=assets= still disagrees with its own script.
+
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
 - Note taken on [2026-07-21 Tue] \\

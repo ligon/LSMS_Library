@@ -13,11 +13,11 @@ roster = ll.Feature('household_roster')
 
 # Which countries provide this table?
 roster.countries
-# ['Burkina_Faso', 'China', 'Ethiopia', 'GhanaLSS', 'India', 'Mali', ...]
+# ['Albania', 'Armenia', 'Azerbaijan', 'Benin', 'Burkina_Faso', 'Cambodia', ...]
 
 # What are the guaranteed columns?
 roster.columns
-# ['Sex', 'Age', 'Generation', 'Distance', 'Affinity']
+# ['Sex', 'Age', 'Relationship', 'Generation', 'Distance', 'Affinity']
 ```
 
 ## Loading Data
@@ -61,8 +61,8 @@ Mali) rather than silently dropping information.
 
 ### Harmonization Flows Through
 
-All per-country harmonization (kinship decomposition, canonical spellings,
-categorical mappings, dtype coercion) is applied by each `Country` before
+All per-country harmonization (categorical mappings, kinship decomposition,
+canonical spellings, dtype coercion) is applied by each `Country` before
 concatenation. `Feature` delegates to each country's existing table method.
 
 ### Error Handling
@@ -80,8 +80,8 @@ with warnings.catch_warnings(record=True) as w:
 
 ## Available Tables
 
-Any table declared in a country's `data_scheme.yml` can be used with `Feature`.
-Common ones include:
+Most tables declared in a country's `data_scheme.yml` can be used with
+`Feature`. Common ones include:
 
 | Table                        | Description                         |
 |------------------------------|-------------------------------------|
@@ -91,4 +91,10 @@ Common ones include:
 | `food_expenditures`          | Derived food spending               |
 | `shocks`                     | Household shocks and coping         |
 | `individual_education`       | Educational attainment              |
-| `panel_ids`                  | Cross-wave household ID linkage     |
+
+!!! note "Country-level-only tables are not `Feature` tables"
+
+    `panel_ids` and `updated_ids` appear in `data_scheme` but have no
+    cross-country assembly: `Feature('panel_ids')(['Malawi'])` returns an empty
+    DataFrame rather than raising. They are graded `n/a` in the coverage matrix
+    and are reached per country, as `Country(...).panel_ids`.

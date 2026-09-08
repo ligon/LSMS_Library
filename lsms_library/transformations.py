@@ -75,6 +75,38 @@ class UnpriceableRowsWarning(UserWarning):
     """
 
 
+class UnitLabelCollisionWarning(UserWarning):
+    """Two ``u`` spellings that differ only in case got DIFFERENT kg factors.
+
+    ``conversion_to_kgs`` groups by the raw ``u`` label, so ``Calebasse`` and
+    ``calebasse`` are two units; ``_get_kg_factors`` then lower-cases and
+    keeps whichever it merges first.  The winner is deterministic (the
+    inference returns a sorted mapping) but ARBITRARY, and the two factors
+    can differ several-fold.
+
+    Measured over the 19 cached ``food_acquired`` tables (GH #770 review):
+    16 collision groups in 3 countries, and in every one the two factors
+    DIFFER.  Five are INERT -- three ``kg`` and two ``litre``, keys that
+    ``KNOWN_METRIC`` seeds, so neither inferred value is ever used --
+    leaving **11 live groups in 3 countries**: Burkina Faso 7, Malawi 2,
+    Mali 2.  Burkina Faso's ``Calebasse`` 0.35 vs ``calebasse`` 1.432 is
+    4.1x; Mali's ``Unité`` 1.2 vs ``unité`` 0.286 is 4.2x.  Only the live
+    groups warn.
+
+    Panama is NOT in that list, and was the case that surfaced this:
+    ``'Value' -> 0.3489`` and ``'value' -> 2.3405`` was a 6.7x
+    iteration-order accident.  Both spellings are currency-denominated, so
+    GH #770 removes them from the inference and the collision with them --
+    which is why the corpus census above is taken AFTER that fix and still
+    finds 11.
+
+    This warns rather than merging, because merging would CHANGE the served
+    factors for those countries -- a data change, not a diagnostic.  The fix
+    belongs in the country's own unit vocabulary: canonicalise the spelling
+    where the label is minted, exactly as GH #770 did for currency labels.
+    """
+
+
 def _as_float(s):
     """Series -> float64 ndarray with NaN for missing (pd.NA-safe)."""
     return pd.to_numeric(s, errors='coerce').to_numpy(dtype='float64',
@@ -102,6 +134,26 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     ``zero``
         Zero Expenditure (``*value``) or a zero reported Price (``*price``).
 
+    Currency rows are NOT one of the causes -- they get their own bucket
+    ----------------------------------------------------------------------
+    A currency-denominated unit (:data:`_CURRENCY_DENOMINATED_UNITS`, e.g.
+    ``u='Value'``) has no per-label kg factor *by design* (GH #770), so in
+    the ``kg*`` modes every such row would land in ``nan``.  Counting them
+    as loss destroys the signal this warning exists to carry: measured on
+    GhanaLSS ``kgvalue``, 3,492,915 of the 3,493,339 lost rows are
+    by-design currency and **424** are everything else -- 79.84% reported
+    versus 0.048% real.  A warning pinned at ~79.8% forever cannot report
+    the next defect in its own cell (a new 10,000-row break moves it to
+    80.07%), which is the repo's own GH #323 failure with a warning
+    attached.
+
+    So currency rows in the ``kg*`` modes are excluded from BOTH ``lost``
+    and ``expected`` and tallied separately as ``currency``: they were
+    never expected to produce a kg price.  ``expected_gross`` keeps the
+    unadjusted denominator so nothing is hidden.  The ``unit*`` modes need
+    no adjustment -- a currency row is perfectly priceable there
+    (``Expenditure / Quantity``), so it stays in the denominator.
+
     Parameters
     ----------
     v : DataFrame
@@ -123,30 +175,64 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     dropped = is_inf | is_nan | is_zero
 
     expected = np.asarray(expected, dtype=bool)
-    lost = int((dropped & expected).sum())
-    n_expected = int(expected.sum())
+
+    # Currency-denominated rows have no kg factor BY DESIGN (GH #770), so in
+    # the kg* modes they are not rows that "ought to have produced a price".
+    # Give them their own bucket and take them out of both sides of the
+    # fraction, so what remains is the residual REAL loss -- the only number
+    # a threshold can usefully bite on.  In the unit* modes a currency row is
+    # priceable (Expenditure / Quantity), so nothing is excluded there.
+    if units in ('kgvalue', 'kgprice') and 'u' in (v.index.names or []):
+        by_design = _is_currency_denominated(
+            v.index.get_level_values('u')) & expected
+    else:
+        by_design = np.zeros(len(v), dtype=bool)
+    effective = expected & ~by_design
+
+    lost = int((dropped & effective).sum())
+    n_expected = int(effective.sum())
     tally = {
         'units': units,
         'rows_in': int(len(v)),
+        # Denominator of `lost_fraction`: expected MINUS by-design currency.
         'expected': n_expected,
+        # The unadjusted denominator, so the adjustment is auditable.
+        'expected_gross': int(expected.sum()),
+        # Dropped by design because the unit is currency-denominated; NOT
+        # counted in `dropped_expected` / `lost_fraction`.
+        'currency': int((dropped & by_design).sum()),
+        'currency_expected': int(by_design.sum()),
         'dropped_total': int(dropped.sum()),
         'dropped_expected': lost,
-        'inf': int((is_inf & expected).sum()),
-        'nan': int((is_nan & expected).sum()),
-        'zero': int((is_zero & expected).sum()),
+        'inf': int((is_inf & effective).sum()),
+        'nan': int((is_nan & effective).sum()),
+        'zero': int((is_zero & effective).sum()),
         'lost_fraction': (lost / n_expected) if n_expected else 0.0,
     }
 
     if n_expected and lost / n_expected > threshold:
+        currency_note = (
+            f"  A further {tally['currency']:,} row(s) were dropped because "
+            f"their unit is CURRENCY-DENOMINATED (u='Value': the survey "
+            f"deliberately elicited value, not a physical amount).  Those "
+            f"are BY DESIGN -- the factor is 1/price at (j, t, m) and no "
+            f"per-label constant can represent it (GH #770) -- so they are "
+            f"EXCLUDED from the count and the fraction above, which report "
+            f"the residual real loss."
+            if tally['currency'] else ""
+        )
         warnings.warn(
             f"food_prices(units={units!r}): dropped {lost:,} of {n_expected:,} "
             f"priceable rows ({lost / n_expected:.1%}) because Price was "
             f"inf ({tally['inf']:,}), NaN ({tally['nan']:,}) or zero "
-            f"({tally['zero']:,}).  An inf Price means the survey recorded an "
-            f"Expenditure against a ZERO Quantity -- typically a 0-as-missing "
-            f"sentinel or a quantity variable mapped to the wrong survey "
-            f"question.  These rows are DROPPED, not returned as NaN, so the "
-            f"gap is otherwise invisible.  See GH #591.",
+            f"({tally['zero']:,}).  These rows are DROPPED, not returned as "
+            f"NaN, so the gap is otherwise invisible.  The causes are "
+            f"DIFFERENT and only the first is always a defect: an inf Price "
+            f"means the survey recorded an Expenditure against a ZERO "
+            f"Quantity -- typically a 0-as-missing sentinel or a quantity "
+            f"variable mapped to the wrong survey question (GH #591).  A NaN "
+            f"Price means the quantity was missing OR the unit has no kg "
+            f"factor.{currency_note}  See GH #591, GH #770.",
             UnpriceableRowsWarning,
             stacklevel=3,
         )
@@ -609,6 +695,90 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
     return result
 
 
+# Unit labels denominated in local currency rather than in a physical
+# amount (GH #770).  Matched case-insensitively against the lower-cased
+# ``u`` label.
+#
+# These are EXCLUDED from the price-ratio inference in
+# :func:`conversion_to_kgs` and from the merge in :func:`_get_kg_factors`,
+# so no kg factor is produced for them and ``Quantity_kg`` stays NaN.
+#
+# WHY -- and the name matters.  ``u='Value'`` is NOT a "non-physical" unit:
+# Value = Quantity x Price, so ``Value / Price = Quantity`` and a kg factor
+# for it *does* exist -- it is ``1/price``.  Prices are the units in which
+# value measures quantity.  The defect is one of GRANULARITY, not of
+# existence: :func:`conversion_to_kgs` returns ONE factor per unit label,
+# while ``1/price`` varies over ``(j, t, m)``.  A per-label constant cannot
+# represent it, so the inference must not pretend otherwise.  Calling these
+# labels "non-physical" would teach the next reader the very error this
+# constant fixes.
+#
+# NaN is therefore the honest INTERIM state, not a terminal verdict: the
+# factor is recoverable per ``(j, t, m)`` from a price source, which is the
+# separate ``source=`` work (Step 2 of #770), not this.
+#
+# THE LIBRARY RECOGNISES ONE CANONICAL SENTINEL; COUNTRIES CANONICALISE
+# ONTO IT.  This set is not, and must not become, an enumeration of the
+# corpus's currency-ish labels -- that would be an unbounded blocklist of
+# world currencies running beside a canonical label that already exists.
+# ``'Value'`` IS that label: ``country._RESERVED_U_SENTINELS`` documents it
+# as the marker for LCU-only goods, amounts are in local currency units by
+# default, and ``currency=`` (``lsms_library/currency.py``) is the lever for
+# currency *representation*.  So the NAME of a currency is redundant with
+# the country and the wave and does not belong in a ``u`` label at all.
+#
+# A country whose survey elicits value rather than quantity therefore emits
+# ``u='Value'`` where the label is MINTED -- in its wave script or its
+# ``categorical_mapping.org`` -- and needs no edit here.  Two did exactly
+# that in GH #770: EthiopiaRHS's ``harmonize_unit`` code 30 (was ``Birr``)
+# and Serbia 2007's ``mera == 'dinar'``.  The alternative, adding ``birr``
+# and ``dinar`` here, was proposed and REJECTED.
+#
+# The rename must land where the label is minted, NOT in an API-time
+# categorical mapping: the derived-food dispatch is
+# ``_aggregate_wave_data`` -> ``transform_fn`` -> ``_finalize_result``
+# (``country.py:4155-4161``), so ``conversion_to_kgs`` below sees the RAW
+# ``u`` and an API-time rename would fire after the factor was inferred.
+#
+# Why a set at all, rather than a detector?  The obvious detector
+# (``Quantity == Expenditure``) tests the SYMPTOM rather than the cause, and
+# a survey that elicits value need not follow that convention: Panama 1997
+# is 0.5% (99.1% of those rows carry the undecoded 7.70 sentinel of GH
+# #777) and Serbia's rows carry ``Quantity`` NaN outright.  A sentinel the
+# country declares is checkable; an inferred one is a guess.  If a detector
+# is ever founded on the real cause, note that compiled-regex module
+# constants must NOT be used: they land in the hashed import closure and are
+# un-serialisable (GH #780).
+#
+# (An earlier version of this comment claimed the corpus holds "662 distinct
+# unit labels ... only ``value`` qualifies".  Both halves were false -- the
+# figure is ~1,636 across the four ``u``-bearing tables, and two countries
+# were minting currency labels of their own.  The claim is not corrected
+# here but RETIRED: a count of the corpus rots, whereas "one canonical
+# sentinel, countries canonicalise onto it" is bounded and stays true as
+# countries are added.)
+#
+# Kept in sync with ``lsms_library.country._RESERVED_U_SENTINELS`` (the
+# capital-``V`` spelling of the same concept, GH #361) by
+# ``tests/test_u_sentinel_protection.py``; a plain import would be circular
+# (``country`` imports ``transformations``).
+_CURRENCY_DENOMINATED_UNITS = frozenset({'value'})
+
+
+def _is_currency_denominated(labels):
+    """Boolean ndarray over raw ``u`` labels, matched case-insensitively.
+
+    Accepts a Series, an Index or a plain sequence; always returns a numpy
+    bool array so the caller need not care which it passed (``pd.Index.isin``
+    already returns an ndarray, ``Series.isin`` a Series).
+    """
+    return np.asarray(
+        pd.Index(labels).astype(str).str.lower().isin(
+            _CURRENCY_DENOMINATED_UNITS),
+        dtype=bool,
+    )
+
+
 def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
     """Infer local-unit → kg conversion factors from price ratios.
 
@@ -623,6 +793,11 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     then the median across rows is compared to the unit-wise median to
     back out kg per unit. Used by :func:`_get_kg_factors` as a fallback
     when a survey doesn't ship its own conversion table.
+
+    Labels in :data:`_CURRENCY_DENOMINATED_UNITS` (e.g. ``u='Value'``) are
+    dropped from the whole computation before anything is inferred, so they
+    never appear as a key of the result: their factor is ``1/price`` at
+    ``(j, t, m)`` and a per-label constant cannot represent it (GH #770).
 
     Parameters
     ----------
@@ -641,9 +816,15 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     Returns
     -------
     dict[str, float]
-        Mapping of (lowercased) unit label → inferred kg factor.
-        Units already in :data:`KNOWN_METRIC` or that cannot be inferred
-        are absent from the output.
+        Mapping of unit label → inferred kg factor.  Keys are the RAW ``u``
+        label with its case PRESERVED -- the grouping is on the raw label,
+        so ``Calebasse`` and ``calebasse`` come back as two entries with two
+        factors.  (The docstring used to say "(lowercased)", which was
+        false; :func:`_get_kg_factors` is where the lower-casing happens,
+        and it reports the resulting clashes -- see
+        :class:`UnitLabelCollisionWarning`.)  Units already in
+        :data:`KNOWN_METRIC`, units in :data:`_CURRENCY_DENOMINATED_UNITS`,
+        or units that cannot be inferred are absent from the output.
     """
     v = df.copy()
     v = v.replace(0, np.nan)
@@ -661,6 +842,13 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     v = v.reset_index(unit_col)
     if unit_col != 'u':
         v = v.rename(columns={unit_col: 'u'})
+    # Currency-denominated labels leave the computation ENTIRELY, not just
+    # the ``v_infer`` step below (GH #770).  They must not contribute to the
+    # ``pkg`` price-per-kg baseline either -- a ``Value`` row carrying a
+    # non-null ``Quantity_kg`` would otherwise enter it through the
+    # ``.where(..., Quantity_kg)`` fill and move OTHER units' factors.  The
+    # acceptance criterion is that exactly one key disappears.
+    v = v[~_is_currency_denominated(v['u'])]
     # Vectorize: ``astype(str)`` followed by ``.str.lower()`` handles any
     # underlying dtype (object with NaN, pyarrow string with pd.NA,
     # Categorical from a .dta read), whereas the previous row-by-row
@@ -861,10 +1049,66 @@ def _get_kg_factors(df, *, volume_as_mass=True):
         if group_levels:
             try:
                 inferred = conversion_to_kgs(df, index=group_levels)
-                # Inferred factors fill in where known metric doesn't cover
+                # Inferred factors fill in where known metric doesn't cover.
+                # Currency-denominated labels are already dropped inside
+                # ``conversion_to_kgs``; re-checking here is belt and braces
+                # against a future caller of that function with different
+                # arguments, or a future inference path.
+                #
+                # SCOPE, stated exactly (review NIT 1): this guard is on the
+                # INFERENCE only.  ``factors`` also gets entries from
+                # ``KNOWN_METRIC`` and from the explicit-metric label parser
+                # above, and neither is checked -- a label that both named a
+                # currency and named metric content (``"Value (500g)"``)
+                # would still be given 0.5 by the parser.  No such label
+                # exists in the corpus, so this is a documented gap, not a
+                # live defect; do not read the guard as "the key can never
+                # come back".
+                #
+                # ``inferred`` is keyed on the RAW label, so case variants of
+                # one unit arrive as two entries and the first merged wins.
+                # Report that rather than resolving it silently: see
+                # :class:`UnitLabelCollisionWarning` for why merging would be
+                # a data change.  ``won`` records the label actually used.
+                seeded = frozenset(factors)   # KNOWN_METRIC + label parser
+                won: dict[str, tuple[str, float]] = {}
+                collisions: dict[str, list[tuple[str, float]]] = {}
                 for unit, factor in inferred.items():
-                    if unit.lower() not in factors and np.isfinite(factor) and factor > 0:
-                        factors[unit.lower()] = factor
+                    key = unit.lower()
+                    if key in _CURRENCY_DENOMINATED_UNITS:
+                        continue
+                    if not (np.isfinite(factor) and factor > 0):
+                        continue
+                    # Only a key the INFERENCE decides can be a collision:
+                    # if KNOWN_METRIC or the explicit-metric parser already
+                    # seeded it, neither inferred value is used and the
+                    # disagreement is inert (every corpus ``kg`` collision is
+                    # this case).  Reporting those would be noise.
+                    decided_here = key not in seeded
+                    if decided_here and key in won and won[key][1] != factor:
+                        collisions.setdefault(key, [won[key]]).append(
+                            (unit, float(factor)))
+                    if key not in factors:
+                        factors[key] = factor
+                    if decided_here:
+                        won.setdefault(key, (unit, float(factor)))
+                if collisions:
+                    detail = '; '.join(
+                        f"{k!r}: " + ', '.join(f"{lbl!r}->{f:.6g}"
+                                               for lbl, f in v)
+                        + f" (using {won[k][0]!r})"
+                        for k, v in sorted(collisions.items()))
+                    warnings.warn(
+                        f"_get_kg_factors: {len(collisions)} unit label(s) "
+                        f"differ only in CASE but were inferred DIFFERENT kg "
+                        f"factors; the lower-cased lookup keeps one "
+                        f"arbitrarily.  {detail}.  Fix this in the country's "
+                        f"unit vocabulary by canonicalising the spelling "
+                        f"where the label is minted -- do not rely on which "
+                        f"one wins here.",
+                        UnitLabelCollisionWarning,
+                        stacklevel=2,
+                    )
             except (ValueError, ZeroDivisionError, KeyError):
                 # Inference is best-effort; numeric / lookup failure means
                 # we proceed with the known-metric factors only.  Programmer

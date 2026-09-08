@@ -1,0 +1,219 @@
+#+title: GH #770 -- plan: Value is a currency-denominated quantity, not an unconvertible unit
+#+date: [2026-09-04 Fri]
+#+author: Sue, with EL
+
+* The defect, precisely
+1. =conversion_to_kgs= infers a kg-per-unit factor for EVERY unit label absent
+   from its local =unit_conversion= map (kg/gram/pound variants only).  =Value=
+   is absent, so it gets one.
+2. For a =u='Value'= row =Quantity == Expenditure=, so the price ratio is
+   degenerate and inference returns an arbitrary constant (GhanaLSS 0.49139).
+3. =_get_kg_factors= merges any inferred unit not already in =KNOWN_METRIC=.
+4. =_apply_kg_conversion= sets =Quantity_kg = Quantity x 0.49139= -- currency x
+   constant -- and =food_quantities(units='kgs')= relabels those rows =u='kg'=.
+5. =food_prices(units='kgvalue') = Expenditure / Quantity_kg = 1/0.49139 =
+   *2.035038*, identically, for every item / household / wave.
+
+Measured: GhanaLSS =food_prices()= has =groupby('t').std() == 0.0= in six of
+seven waves; 2016-17 (real units) is the only one with a distribution.
+
+* The diagnosis (EL's, and it is the load-bearing idea)
+=Value= is NOT a non-physical unit.  Value = Quantity x Price, so Value is
+denominated in LCU; and Value / Price = Quantity.  *Prices are the units in
+which value measures quantity.*  The kg factor for =Value= therefore EXISTS and
+equals =1/price=.
+
+The bug is a *granularity error*, not an impossibility: =conversion_to_kgs=
+returns one factor PER UNIT LABEL, but =1/price= varies over =(j, t, m)=.  For a
+genuinely physical unit a per-label constant is approximately right (a bowl is
+about a bowl everywhere); for =Value= it is a category error about WHAT VARIES.
+
+Consequence: NaN is the honest *interim* state, not a terminal verdict.  The
+quantity is recoverable given a price.
+
+* Why the fix is small: the per-row hatch already exists
+=_apply_kg_conversion= honours a per-row =Quantity_kg= column and uses the
+factor map only to fill gaps (GH #378).  *Malawi and Nigeria already ship one.*
+So an externally-derived kg needs NO shape change -- the
+=dict[unit -> factor]= granularity limit does not bind on that path.
+
+And the prices exist.  GhanaLSS =community_prices= (PR #762) is denominated in
+kilograms in exactly the waves that need it:
+| wave    | community-price rows | of which =Kilogram= |
+|---------+----------------------+---------------------|
+| 1987-88 |               16,582 |               9,994 |
+| 1988-89 |               12,642 |               7,520 |
+| 1991-92 |               58,348 |              28,456 |
+| 1998-99 |               63,445 |              31,883 |
+| 2012-13 |              288,243 |             164,564 |
+2005-06 has no price survey at all (=asked-not-distributed=) -> stays NaN.
+
+* The plan
+** Step 1 -- stop the constant
+- Name the concept correctly: =_CURRENCY_DENOMINATED_UNITS = frozenset({'value'})=,
+  documented as /"factor is 1/price at (j, t, m); a per-label constant cannot
+  represent it"/.  *NOT* "non-physical" -- that name would teach the next reader
+  the error we are fixing.
+- Exclude them from inference in =conversion_to_kgs=, and do not merge them in
+  =_get_kg_factors= (belt and braces).
+- Result: no factor -> =Quantity_kg= NaN -> =food_quantities= carries the row
+  through with its native =u= (what its docstring already promises) and
+  =kgvalue= yields NaN instead of a fabricated constant.
+- A *positive-identification* detector, as a WARNING: =Quantity == Expenditure=
+  across ~all of a unit's rows is the signature of a currency-denominated unit.
+  Catches a French =Valeur= without hardcoding it.  Needed only for the future:
+  across *662 distinct unit labels* corpus-wide, only =value= matches any
+  non-physical pattern today (GhanaLSS, Panama).
+
+** Step 2 -- convert properly
+- For =u='Value'= rows, =Quantity_kg = Expenditure / community_price_per_kg=,
+  joined at =(t, v, j)= on kg-denominated community-price rows, written into the
+  existing per-row =Quantity_kg= column.
+- NaN wherever no price exists: 2005-06, unmatched items, and every country with
+  =Value= rows but no price survey (Panama).
+
+** What is validated, and what is NOT
+EL's ruling: if prices are badly measured we get extreme =Quantity_kg=, but that
+is a fact about the PRICE DATA, not a broken mechanism -- so it must not gate
+the mechanism.  What IS validated is that the join is the one we intended:
+- each =Value= row matches EXACTLY ONE =(t, v, j)= price (no fan-out -- the
+  #323 site-4 cartesian lesson);
+- matching is on the harmonised =j= axis, no label collisions;
+- the kg-denominated rows really are kilograms.  *A live counterexample exists*:
+  Tanzania's =cm_f062= is titled "LOCAL UNIT WEIGHT (KGS)" and is per NATIVE
+  unit (found by the #779 scoping).  Labels lie; check values.
+- no cross-wave or cross-cluster leakage.
+Extreme outputs are REPORTED as a diagnostic, never suppressed -- house style
+(the null-read guard reports Niger's honestly-absent coordinates rather than
+adjudicating them).  They surface downstream as implausible kcal in
+=nutrition=, which today is impossible because every such row is 2.035038.
+
+* Blast radius, expected
+- GhanaLSS =food_prices=: constant -> NaN (Step 1), then real prices where a
+  community price matches (Step 2).  ~3.5M rows, 6 of 7 waves.
+- =food_quantities(units='kgs')=: those rows keep =u='Value'= instead of being
+  tagged =kg=, so a "kg" sum stops including currency.
+- Panama: 17,821 rows, Step 1 only (no price survey).
+- 2016-17 and every physical-unit row: *must be unchanged* -- the control.
+- Cache: =food_prices= / =food_quantities= are derived at API time
+  (=_FOOD_DERIVED=), not cached, and none of the affected functions carries
+  =@build_transform=.  Expect NO invalidation -- to be MEASURED before/after,
+  not asserted.
+
+* Review findings (advisor, 2026-09-04) -- folded in before implementation
+
+** RESOLVED (EL, 2026-09-04): API-time, from two parquets
+/"community_prices can be a new parquet, alongside food_acquired.  Then let
+prices and quantities be determined at api-time."/  So: NO build-time
+cross-table dependency, no =Quantity_kg= written into =food_acquired=, and no
+new cache semantics -- =community_prices= is read through the SAME
+=_aggregate_wave_data= path as =food_acquired= (it is already an L2-country
+parquet, warm).
+
+*Measured, and it is the detail the review could not resolve*: the dispatch at
+=country.py:4155-4161= is
+: fa = self._aggregate_wave_data(waves, 'food_acquired')   # PRE-finalize
+: derived = transform_fn(fa, **transform_kwargs)            # transform runs HERE
+: derived = self._finalize_result(derived, ...)             # v joined AFTER
+so the transform receives =food_acquired= *without =v=* -- =_join_v_from_sample=
+runs inside =_finalize_result=, after the transform.  =community_prices= carries
+=v= natively, so only the =food_acquired= side needs resolving: the dispatch
+passes the =i -> v= map from =sample()=.
+
+Shape: =food_prices_from_acquired(fa, *, community_prices=None,
+hh_to_cluster=None, source='auto', units=..., volume_as_mass=...)=, and the
+same for =food_quantities_from_acquired=.  *When the kwargs are =None= --
+29 of 37 countries have no =community_prices= -- behaviour must be
+BYTE-IDENTICAL to today.*  Pin that with a test.
+
+** SUPERSEDED: the build-time-vs-API-time question (kept for the reasoning)
+"Through the existing hatch" names the CONSUMER, not the PRODUCER.  Malawi and
+Nigeria write =Quantity_kg= in their WAVE SCRIPTS at build time, from a
+survey-provided column *in the same file*.  GhanaLSS's would come from a
+DIFFERENT TABLE (=community_prices=), which forces a choice with very different
+costs -- and *"not a big lift" is not established until this is answered*:
+- *Build-time* (in the GhanaLSS =food_acquired= script, reading the
+  =community_prices= parquet): a cross-table build dependency with ordering
+  (community_prices must exist first), and =Country._input_hash= hashes only the
+  table's OWN inputs -- so a change to =community_prices= would leave
+  =food_acquired= graded FRESH.  That is *GH #757 with a new cause*.
+- *API-time* (inside the derived transform): =_FOOD_DERIVED= transforms take ONE
+  dataframe; this needs a second table, so it changes that contract.  Also
+  unresolved: does the transform even SEE =v=?  =_join_v_from_sample= runs in
+  =_finalize_result=; if the derived transform receives PRE-finalize
+  =food_acquired= there is no =v= to join on and the join must go through
+  =sample()= first.
+*Settle this before writing Step 2.*
+
+** DECOUPLE: Step 1 ships as its own PR
+Step 1 is small, safe, and is what the course needs.  Step 2 carries the
+unresolved injection site above plus an unmeasured match rate.  Ship Step 1
+alone the moment the red team clears it; Step 2 is a second PR.
+
+** Step 2 is a =source== argument, not a =Value= special case (EL, 2026-09-04)
+=food_prices(source=...)= selects the price SERIES: =individual= | =community=
+| =auto= (default -- individual where it exists, else community).  The #770 case
+then falls out of the general mechanism: after Step 1 a =Value= row's individual
+price is NaN, so =auto= falls back to community *with no special-casing
+anywhere*.  It also matches an idiom already in the repo --
+=median_price_valuation= walks a geography ladder finest-to-coarsest with a
+national fallback; this is the same shape one level up.
+
+*Open, my recommendation absent further steer:*
+- *Provenance marker: INCLUDE IT.*  If =auto= silently mixes household unit
+  values with cluster prices, one column holds two different quantities,
+  indistinguishable -- this repo's signature failure.  #562's own design doc
+  lists /"add an imputed-vs-reported provenance marker?"/ as an open question.
+  Return the source per row so =groupby= can separate them.
+- *=units== stays exactly as shipped* (documented; pinned by
+  =tests/test_food_prices_units_kwarg.py=).  It already encodes denominator x
+  derivation, so =source= x =units= has meaningless cells (a community price is
+  not "derived from expenditure").  Reject contradictory combinations
+  explicitly rather than silently coercing.
+- *Defaulting to =auto= changes returned data for all 8 community-price
+  countries*, not just GhanaLSS -- wider than #770 itself.  Say so in the PR.
+
+** Step 2 makes =food_prices= a TAUTOLOGY for =Value= rows -- name it
+=food_prices(kgvalue) = Expenditure / Quantity_kg
+                      = Expenditure / (Expenditure / community_price)
+                      = the community price, EXACTLY.=
+Correct, but for those cells =food_prices= stops being a household unit value
+and becomes a cluster price passed through: two series a user believes are
+independent collapse to one number.  That IS a change to what =food_prices=
+prefers, for =Value= rows -- a *deliberate departure* from #779's "do not change
+what food_prices prefers", to be stated in the docs rather than implied.
+
+** A contradiction to resolve BEFORE Step 2's join
+#779 reports =community_prices.j= is on the shared =harmonize_food= axis; #769
+reports GhanaLSS has NO =harmonize_food= table -- its food labels live in
+=food_items.org#food_label=.  Both cannot be right, and if the axes differ the
+join matches NOTHING.  Measure before building.
+
+** Detector fatigue
+The positive-identification warning must NOT fire for units already in
+=_CURRENCY_DENOMINATED_UNITS=, or every GhanaLSS =food_prices()= call warns
+forever -- stacked on the =NullReadWarning= the user already sees.  Warn only
+for unrecognised units, with a minimum-n floor so a 3-row coincidence cannot
+trip it.
+
+** "No cache invalidation" is a HAZARD as well as a feature
+A cached parquet built by a script that CALLS an API-time transform will not
+rebuild when that transform changes.  =nutrition.parquet= is the live case.
+Probably fine -- GhanaLSS's =nutrition.py= pre-filters non-physical units, and
+the corpus scan found Uganda/Ethiopia have no =Value= rows -- but *state that it
+was checked*; do not rely on it.
+
+** Tests: pin the POSITIVE case too
+Assert that a genuinely physical unit in the same synthetic frame STILL gets a
+factor, so the exclusion cannot quietly widen.
+
+* Out of scope (named so it does not creep)
+- The =kg=-in-inferred-output oddity: harmless.  =_get_kg_factors= merges only
+  =if unit.lower() not in factors=, and =kg= is in =KNOWN_METRIC=, so the bogus
+  inferred value is discarded.
+- Panama's =Quantity = 7.70= sentinel (#777) -- separate defect, separate fix.
+- Preferring surveyed unit weights over inferred factors generally (Tanzania's
+  unread =CM_SEC_G=) -- a follow-up the #779 scoping identified.
+- Changing what =food_prices()= prefers for non-=Value= rows: #779 measured the
+  surveyed/derived median ratio at exactly 1.000 in 11 of 18 cells.  Nothing
+  supports a change.

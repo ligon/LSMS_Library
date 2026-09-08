@@ -38,3 +38,14 @@ crop_production_parquet := $(crop_production:.py=.parquet)
 
 ../%/_/crop_production.parquet: $(crop_production)
 	(cd $(@D) && python crop_production.py)
+
+# plot_labor: all three waves are wave scripts (the `source` axis is a melt
+# across column groups, which YAML cannot express), so as with
+# crop_production there is no country-level $(VAR_DIR)/plot_labor.parquet
+# target -- the library's load_from_waves assembles the three waves
+# (data_scheme.yml, plot_labor block).
+plot_labor = $(shell find $(rounds) -name plot_labor.py)
+plot_labor_parquet := $(plot_labor:.py=.parquet)
+
+../%/_/plot_labor.parquet: $(plot_labor)
+	(cd $(@D) && python plot_labor.py)

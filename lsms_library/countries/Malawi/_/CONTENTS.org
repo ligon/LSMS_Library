@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 Brief table of contents and todo list. Malawi has 5 rounds of data, corresponding to IHS2-IHS5 plus IHPS.
 

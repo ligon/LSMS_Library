@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 Brief table of contents and todo list.
 
@@ -487,6 +488,26 @@ Sampling design table: cluster, weights, strata, and Rural classification.
 - Strata are available only for 2014 (numeric 1--26); EHCVM waves lack an explicit strata variable.  Region x Milieu could be reconstructed from =cluster_features= if needed.
 - Weighted population sums: 2014 ~2.4M, 2018-19 ~3.1M, 2021-22 ~3.1M.
 
+** DONE household_roster
+*** 2014 wave (EMC): Relationship code 6 ships a literal "?" (GH #801)
+=emc2014_p1_individu_27022015.dta= (Stata format 113, Latin-1 labels)
+stores =B5= code 6 as =Fr\xe8re/s?ur= -- a literal 0x3F where the oe
+ligature belongs; the rest of the label set is clean Latin-1 (=P\xe8re /
+m\xe8re=, =Sans lien de parent\xe9=).  The =?= is in the file, so no
+=encoding= choice recovers it (utf-8 fails; latin-1 and cp1252 both return
+the =?=; measured 2026-09-07): a lossy conversion upstream of the
+published file.
+
+Fix (2026-09-07): =2014/_/mapping.py::household_roster= replaces the whole
+value with =Frere/soeur= (ligature restored).  The EMC 2014 vocabulary
+keeps its =/= (=Petit fils/fille=, =Pere / mere=) rather than the EHCVM
+comma form the 2018-19 / 2021-22 waves serve, and the label resolves
+through the existing =Frere/Soeur= key.  2,599 rows changed; kinship
+tuple [0, 1, consanguineal] unchanged; nothing else touched.
+=Frere/s?ur= and its C1-control / U+FFFD cousins were deleted from
+=lsms_library/categorical_mapping/kinship.yml=.  See GH #801 / #797,
+evidence in =slurm_logs/gh797/fix_801/REPORT.org=.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
@@ -531,3 +552,164 @@ uses a different instrument and is out of scope.
 - Placeholder rows (no field/parcel number) for non-farming households
   are dropped.  Latitude / Longitude deferred (no decimal-degree parcel
   GPS in EHCVM s16a).
+
+* =2018-19= / =2021-22= =food_acquired.py= are DEAD CODE, and their =encoding== is a trap
+
+Both =Burkina_Faso/2018-19/_/food_acquired.py= and
+=Burkina_Faso/2021-22/_/food_acquired.py= read the =.dta= with
+=encoding='iso-8859-1'=.  Neither script is the builder: both waves declare
+=food_acquired= fully in =<wave>/_/data_info.yml= (the YAML path), and
+=_/data_scheme.yml= does *not* mark the table =materialize: make=.  The wave
+parquet's shape settles it -- canonical =(t, v, i, j, u, s)= with
+=Quantity=/=Expenditure=, not the =['j','i','t']= / =quantity, units, total
+expenses= shape those scripts write.  (The country-level =_/food_acquired.py=
+still expects the *legacy* column names, so it could not consume the current
+wave parquets either.)
+
+*Why this matters beyond tidiness.*  =encoding== activates
+=ligonlibrary.dataframes._coerce_label=, which is
+~str(v).encode(enc, errors="ignore").decode("utf-8", errors="ignore")~.  For a
+*format 118* file -- which =s07b_me_bfa2018.dta= is -- pandas has *already*
+decoded the labels correctly as UTF-8, so the "repair" is not merely
+unnecessary, it is destructive: the =errors="ignore"= on the *decode* leg
+silently deletes any character that encodes into latin-1 but is not a legal
+UTF-8 start byte.  Measured on that file:
+
+: 'Boîte de tomate' -> 'Bote de tomate'   (5,235 rows)
+: 'Boîte de lait'   -> 'Bote de lait'     (  326 rows)
+
+=î= (U+00EE) encodes to the single byte =0xEE=, which is not valid UTF-8, and
+is dropped without an exception.  Were these scripts revived as-is, those
+5,561 rows would stop matching the =Boîte de tomate= / =Boîte de lait= keys in
+=_/categorical_mapping.org= =#+NAME: u= and the unit harmonization would fail
+*silently*.
+
+*=u= is immune; =j= is NOT.*  For the reason recorded above under GH #223
+Layer 2, =u= is decoded from the *numeric* =s07bq03b= code via
+=mappings: ['ehcvm_units', 'Code', 'Preferred Label']=, so value labels never
+enter *that* key path.  But =j= is mapped via
+=mappings: ['harmonize_food', 'Original Label', 'Preferred Label']=, and the
+*Original Label* column of =_/categorical_mapping.org= =#+NAME: harmonize_food=
+carries *46 mojibake rows* -- it is keyed on =Ã=-form strings exactly the way
+Senegal's =u= table is.  Measured on 2018-19: *47,240 of 136,888 rows* key on a
+mojibake =harmonize_food= entry.  So Burkina Faso's =j= *is* load-bearing
+mojibake; the immunity is only on =u=.
+
+** SHIPPING DEFECT: 12,933 rows of =food_acquired.j= carry corrupted labels
+
+Unlike the =Boîte -> Bote= hazard above (latent, in dead code), this one is
+*live in the served table today*.  =Country('Burkina_Faso').food_acquired()=
+returns three =j= values that are mojibake:
+
+| rows  | wave    | =j= as served (non-ASCII as codepoints) | intended                     |
+|-------+---------+-----------------------------------------+------------------------------|
+| 9,635 | 2014    | =Cube (Maggi, Jumbo,<0085>)=            | =Cube (Maggi, Jumbo,…)=      |
+| 1,901 | 2014    | =Viandes de b<009C>ufs fraîches=        | =Viandes de bœufs fraîches=  |
+| 1,397 | 2018-19 | =Viande de b<00C5><0093>uf=             | =Viande de bœuf=             |
+
+*Verified on a fully cold build* (empty =LSMS_DATA_DIR=, only =dvc-cache=
+symlinked in): identical counts, so this is not a stale-cache artifact.
+
+*Root cause, confirmed at the source.*  The 2014 files
+(=emc2014_p{1..4}_conso7jours_16032015.dta=) are Stata *format 113*, so pandas
+forces latin-1 -- but the files are actually *cp1252*.  Decoding their
+=product= value labels as cp1252 recovers every one cleanly:
+
+: <009C> -> oe-ligature   <008C> -> OE-ligature
+: <0085> -> ellipsis      <0092> -> right single quote
+: 'Viandes de b<009C>ufs fra<00EE>ches'  -> 'Viandes de bœufs fraîches'
+: 'Facture d<0092><00E9>lectricit<00E9>' -> 'Facture d’électricité'
+
+Note =product= is an =int16= column with a value-label set -- so this is a
+*value-label* fault, not a string column and not something the wave script
+introduces.  2014 is built through the YAML path (a four-file =file:= list in
+=2014/_/data_info.yml=), *not* the legacy script route.
+
+*Not every 2014 file is cp1252* (added at the merge with =development=,
+2026-09-07).  The same wave's roster file =emc2014_p1_individu_27022015.dta=
+is clean Latin-1 except for a literal =?= (0x3F) where the oe ligature of
+Relationship code 6 belongs -- sweep record =nort 62=, no =c1= -- so no
+decoder recovers it, and GH #801 repairs it by whole-value replacement in
+=2014/_/mapping.py::household_roster= (see =** DONE household_roster= above).
+One wave, two files, two defect classes: a cp1252-aware read fixes the
+=conso7jours= labels and does nothing for the roster's =?=.
+
+Two *distinct* failures are therefore mixed in the table above: 0x85/0x9C/0x92
+are *cp1252* bytes read as latin-1 (the C1-control signature), while
+=<00C5><0093>= is the familiar double-encoding.  A single
+=.encode('latin-1').decode('utf-8')= repairs the third and *not* the first
+two, which need =.decode('cp1252')= -- so the existing =_decode_mojibake=
+helper is *necessary but not sufficient* for this country.
+
+*The cp1252 leg now exists in-repo too* (added at the merge with
+=development=, 2026-09-07): GH #801 landed =_decode_cp1252=
+(=value.encode('latin-1').decode('cp1252')=, guarded on a codepoint in
+U+0080-U+009F) in the Benin / Niger / Senegal / Togo 2018-19 =_/mapping.py=,
+applied to the roster's =Relationship= only.  GH #805 proposes moving that
+policy into the reader (cp1252-first for format < 118), which would repair
+the 2014 =conso7jours= labels at the read -- the sweep counts 18 =c1= labels
+in =emc2014_p1_conso7jours_16032015.dta= -- and would NOT touch the 2018-19
+=<00C5><0093>= class (a format-118 file, outside #805's scope, and a
+double-encoding rather than a C1 signature).  Either way the crosswalk moves
+with it: =_/categorical_mapping.org= =#+NAME: harmonize_food= carries three
+keys with a C1 control in them today (rows 296 / 303 / 304: =<008C>ufs=,
+=Viande de b<00C5><0093>uf=, =Viandes de b<009C>ufs fra<00EE>ches=, the
+latter two mapped to =Viande de boeuf=).  Whether those three keys currently
+*match* is itself open -- rows 303 / 304 name exactly the two beef strings the
+table below reports as served unmapped (1,397 + 1,901 rows), and the crosswalk
+file is unchanged since the measurement -- so a reader change here must land
+with a re-key *and* a re-measurement of the leak table, not either alone
+(GH #794).
+
+*Most of the damage is absorbed by the crosswalk; only the uncovered rows
+leak.*  Measured on the raw reads:
+
+| wave    | rows w/ non-ASCII =j= label | matched a =harmonize_food= key (cancelled) | unmatched (leak) |
+|---------+-----------------------------+--------------------------------------------+------------------|
+| 2018-19 | 48,634                      | 47,240                                     | 1,394            |
+| 2014 (p1) | 54,435                    | 34,133                                     | 20,302           |
+
+so the load-bearing and leaking sets are *disjoint*: the crosswalk cancels the
+covered ones and the rest ship corrupted.
+
+*The cost is category fragmentation in the very axis that exists to
+harmonize.*  Beef is served as *three* separate =j= values:
+
+: 660 rows  'Viande de boeuf'                  (clean ASCII)
+: 1,397     'Viande de b<00C5><0093>uf'        (2018-19)
+: 1,901     'Viandes de b<009C>ufs fraîches'   (2014)
+
+so a beef rollup through =food_expenditures= / =food_quantities= splits three
+ways and silently understates each.
+
+Scoped by measurement: the same leak-scan over Benin, Togo, Guinea-Bissau,
+Niger, CotedIvoire, Senegal and Cambodia returns *0* leaking =j= or =u=
+values.  Burkina Faso is the cohort member with *neither* a
+=_decode_mojibake= hook *nor* a =_LOST_PREFIX_REPLACEMENTS= dict -- on
+=food_acquired=.  Since GH #801 (merged 2026-09-07) the country has exactly
+one encoding repair, =2014/_/mapping.py::household_roster='s whole-value
+=_RELATIONSHIP_FIX= for the roster's literal =?=, which is neither a decode
+nor on this table; nothing between the =product= value labels and the served
+=j= has changed.
+
+*Caveat on those zeros*: the scan finds *leaked* mojibake and is structurally
+blind to *load-bearing* mojibake -- a country whose crosswalk is keyed on the
+damage reads clean.  "0 leaks" is not "nothing wrong"; see the section above.
+
+This is a whole-cohort pattern, not a Burkina Faso quirk -- see GH #794.
+Benin, Guinea-Bissau, Niger, Senegal and Togo all key =harmonize_food= on the
+same mojibake.
+
+*The cohort figure is a LOWER BOUND.*  The census that produced it keyed on
+the =Ã=/=Â= (double-encoding) signature only, so it misses the cp1252-C1
+subclass entirely -- Burkina Faso's 2014 wave contributes *0* to the 278,777
+under that predicate while actually carrying 34,133 crosswalk-matched
+non-ASCII rows.  Widening the predicate to "any non-ASCII" raises every
+country's count.
+  Three of the EHCVM countries (CotedIvoire, Guinea-Bissau,
+Niger) instead repair the data with a =_decode_mojibake= =df_edit= hook in
+=<wave>/_/mapping.py= and keep their crosswalk clean.  *Burkina Faso does
+not have that hook on =food_acquired=* (its one encoding repair, GH #801's
+roster =_RELATIONSHIP_FIX=, is on another file and another table; GH #805 is
+the reader-level alternative -- both above).  Whichever way this is unified,
+the read and the crosswalk must move in the same commit.

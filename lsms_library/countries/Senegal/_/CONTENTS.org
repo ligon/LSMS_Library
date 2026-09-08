@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 Brief table of contents and todo list.
 
@@ -32,6 +33,31 @@ rather than expecting a =MonthsSpent= column in =household_roster()=.
 
 Senegal has no pre-EHCVM waves in the library, so no continuous
 months-of-presence variable is available for any wave.
+
+* household_roster 2018-19: cp1252 roster labels read as Latin-1 (GH #801)
+
+=s01_me_sen2018.dta= is Stata format 115 with no declared encoding, and its
+value-label bytes are Windows-1252: code 7 of =s01q02= is stored as
+=Fr\xe8re, s\x9cur= (0x9C is the oe ligature in cp1252).  =get_dataframe=
+reads the file through pandas =StataReader=, which decodes every pre-118
+file as Latin-1, so 0x9C came back as the C1 control U+009C and the wave
+served =Frere, S<U+009C>Ur= (2,749 rows -- the =Ur= because the wave's =Relationship= formatter =.title()=-cases the label and =str.title= treats the control byte as a word break).  pyreadstat's default, or
+=encoding='cp1252'=, reads the same file correctly -- the defect is the
+reader's Latin-1 fallback, not the file (bytes and decoder matrix in
+=slurm_logs/gh797/fix_801/REPORT.org=, measured 2026-09-07).
+
+Fix (2026-09-07): =2018-19/_/mapping.py::_decode_cp1252= re-encodes the label as Latin-1 and decodes it
+as cp1252, and =_fix_relationship= re-title-cases the result; the =household_roster= hook applies it to =Relationship=
+only.  Served label is now =Frere, Soeur= with the ligature restored,
+the label the 2021-22 wave and Niger 2018-19 serve; kinship tuple [0, 1, consanguineal] unchanged; 2,749 rows changed,
+nothing else.  The C1-control spellings were deleted from
+=lsms_library/categorical_mapping/kinship.yml= at the same time, so that
+file no longer carries the artefact and a regression would surface as an
+=Unknown relationship labels= warning instead of resolving silently.
+
+Same defect and same fix in Niger 2018-19, Benin 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
+roster files).  See GH #801 and the #797 vocabulary sweep
+(=slurm_logs/gh797/vocab_sweep/REPORT.org= section 2.4).
 
 * Sampling universe, exclusions and sub-samples
 
@@ -387,3 +413,119 @@ at the country level concatenates them.
 - Senegal-specific delta :: the 2021-22 instrument relabels =s16aq10=
   code 3 "Fermage" -> "Fermage/colonage", but the integer code is
   unchanged, so it still maps to =rented_in=.
+
+* WARNING: the =u= crosswalk is keyed on MOJIBAKE, and that is load-bearing
+
+=_/categorical_mapping.org= table =#+NAME: u= maps unit labels to preferred
+labels.  Its *Original Label* column does not hold the unit names as a human
+would write them -- it holds them *double-encoded*:
+
+: | unitÃ©                    | Unité   |
+: | BoÃ®te                    | Boîte   |
+: | cuillÃ¨re Ã &nbsp; soupe    | Cuillère à soupe |
+
+On disk those keys are the UTF-8 encoding of =Ã©= (U+00C3 U+00A9), i.e. bytes
+=c3 83 c2 a9=, *not* of =é= (U+00E9).  This is deliberate and it is *correct*,
+because of how the source file is read:
+
+- =Data/s07b_me_sen2018.dta= is Stata *format 115*.  ~pandas.io.stata.StataReader~
+  chooses its string encoding purely from the format version
+  (~_set_encoding~: =< 118 -> latin-1=, =>= 118 -> utf-8=).  Format 115 is
+  therefore decoded as *latin-1, silently -- no ~UnicodeWarning~ is raised*.
+- The file's value labels are actually UTF-8 bytes.  Decoding them as latin-1
+  yields =unitÃ©= for =unité=.  That mojibake is what reaches the =u= index.
+- The =u= crosswalk keys on exactly that string and maps it to the clean
+  =Unité=.  *The crosswalk is the repair.*
+
+*Consequence: "fixing" the encoding would BREAK this table.*  Measured on
+2018-19 (=s07bq03b=, 214,528 rows): 41,000 rows carry a mojibake unit label,
+and every one of them matches a =u= crosswalk key.  Re-decode them correctly
+(e.g. by passing =encoding== through to the reader) and all 41,000 stop
+matching -- =unité= is *not* a key in the table, =unitÃ©= is.  The API
+currently returns 0 mojibake =u= values precisely because the two wrongs
+cancel.
+
+*The same pattern keys =j=, and it is six times larger.*  =harmonize_food='s
+*Original Label* column carries *51 mojibake rows*, and =data_info.yml= maps
+=j= through it (=mappings: ['harmonize_food','Original Label','Preferred Label']=).
+Measured on 2018-19: *63,989 of 214,528 rows* key on a mojibake
+=harmonize_food= entry, against 41,000 for =u=.  Corpus-wide this is an EHCVM
+*cohort* property -- Benin, Burkina Faso, Guinea-Bissau, Niger, Senegal and
+Togo all do it, ~278,777 rows across the six waves that are cached (GH #794).
+
+*The cohort figure is a LOWER BOUND.*  The census that produced it keyed on
+the =Ã=/=Â= (double-encoding) signature only, so it misses the cp1252-C1
+subclass entirely -- Burkina Faso's 2014 wave contributes *0* to the 278,777
+under that predicate while actually carrying 34,133 crosswalk-matched
+non-ASCII rows.  Widening the predicate to "any non-ASCII" raises every
+country's count.
+
+
+*There is already a better answer in-repo, and Senegal does not use it.*
+CotedIvoire, Guinea-Bissau and Niger each carry a =_decode_mojibake= helper in
+=<wave>/_/mapping.py= that repairs the *data* instead of the crosswalk:
+
+: return s.encode('latin-1').decode('utf-8')
+
+which is exactly the correct reversal of pandas' latin-1 decode.  Those three
+countries' =harmonize_food= key columns are consequently *clean*.  Niger even
+carries a =_LOST_PREFIX_REPLACEMENTS= dict for the unrecoverable case --
+including =bÅ__uf -> bœuf=, which is *precisely* the damage Senegal's own
+=produitID= label 23 carries (=Viande de b= U+00C5 U+005F U+005F =uf=; the
+UTF-8 continuation byte was replaced with literal underscores upstream of the
+library and no decode recovers it).  Senegal has the same corruption and no
+such dict.
+
+*Updated at the merge with =development= (2026-09-07; GH #801 / #805).*
+Since GH #801 Senegal *does* carry a decode hook -- but not for this table,
+and not for this defect.  =2018-19/_/mapping.py::_decode_cp1252= (with
+=_fix_relationship=) repairs the *roster* file =s01_me_sen2018.dta=, whose
+value labels are Windows-1252 bytes read as Latin-1 (sweep record: =nort 60,
+c1 3=; =Frere, s<U+009C>ur=), and the =household_roster= hook applies it to
+=Relationship= only -- see the =household_roster 2018-19= section near the
+top of this file.  That is a *different* encoding class from this table's:
+=s07b_me_sen2018.dta= holds UTF-8 bytes read as Latin-1 (sweep record:
+=double 67, nort 2=, no =c1=), which =_decode_cp1252= cannot reverse -- the
+double-encoded pair U+00C3 U+00A9 carries no codepoint in U+0080-U+009F, so
+that helper returns it unchanged.  One wave, two files, two encodings.  The
+sentence above ("Senegal does not use it") therefore still holds for
+=food_acquired=: no decode hook touches =j= or =u=, and the crosswalk is
+still the repair.
+
+*GH #805 does not unwind this section either.*  The reader-level fix it
+proposes (cp1252-first for format < 118) changes only strings carrying a
+codepoint in U+0080-U+009F, because Latin-1 and cp1252 agree on every other
+byte.  The =s07b= value labels carry none (the sweep signature above; =str=
+columns were not probed, per the sweep README), and the crosswalk keys carry
+none (measured on this tree: 0 of 315 =harmonize_food= keys, 0 of 120 =u=
+keys), so under #805 every one of the 63,989 + 41,000 rows keys on the same
+mojibake string it keys on today.  The load-bearing pairing survives #805
+byte-identical and still has to be unwound as one commit.
+
+Migrating Senegal to the =_decode_mojibake= hook is the *right* fix and would
+delete this whole section -- but it is a data-affecting change: it must land
+together with a re-key of =categorical_mapping.org=, or all 63,989 + 41,000
+rows stop matching.
+
+*Do not* "clean up" these keys in isolation.  Either leave both halves alone,
+or change the read and the crosswalk in the same commit, and re-verify that
+=Country('Senegal').food_acquired()= still returns 0 mojibake =u= values.
+
+** =2018-19/_/food_acquired.py= is DEAD CODE -- do not reason from it
+
+That script reads the =.dta= with =encoding='ISO-8859-1'= and would repair the
+mojibake before it ever reached the crosswalk.  It is *not the builder*:
+=2018-19/_/data_info.yml= declares =food_acquired= with a full =file=/=idxvars=/
+=myvars= block (the YAML path), and =_/data_scheme.yml= does *not* mark the
+table =materialize: make=.  The wave parquet's shape confirms it -- canonical
+=(t, v, i, j, u, s)= with =Quantity=/=Expenditure=, which is what the YAML
+route plus ~food_acquired_to_canonical~ emit, not the =['j','i','t']= /
+=quantity, units, total expenses= shape the script writes.
+
+The =encoding== argument in that script is consequently inert today.  It is
+also *not a safe thing to revive*: see the section above, and note that
+=ligonlibrary.dataframes._coerce_label= (which =encoding== activates) is
+lossy -- it does
+~str(v).encode(enc, errors="ignore").decode("utf-8", errors="ignore")~, and the
+=errors="ignore"= on the *decode* silently deletes any character that survived
+the encode but is not a valid UTF-8 start byte.

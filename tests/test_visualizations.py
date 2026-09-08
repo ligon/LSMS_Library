@@ -1,0 +1,392 @@
+"""Tests for lsms_library.visualizations.
+
+The pure-logic paths run on a synthetic roster so they need no microdata; the
+one data-gated test is skipped when Uganda is unavailable.
+"""
+from __future__ import annotations
+
+import warnings
+
+import pandas as pd
+import pytest
+
+matplotlib = pytest.importorskip("matplotlib")
+matplotlib.use("Agg")
+
+from lsms_library.visualizations import (  # noqa: E402
+    PALETTE, coordinate_map, population_pyramid,
+)
+
+
+@pytest.fixture(autouse=True)
+def _close_figures():
+    """Close figures between tests; matplotlib keeps them open otherwise."""
+    yield
+    import matplotlib.pyplot as plt
+    plt.close("all")
+
+
+def _roster(n=400):
+    """A synthetic household_roster with the index the real one carries."""
+    rows = []
+    for k in range(n):
+        rows.append({
+            "i": f"h{k // 4}", "t": "2020", "v": f"c{k // 40}", "pid": str(k),
+            "Sex": "M" if k % 2 else "F",
+            "Age": float(k % 70),
+            "Rural": "Rural" if (k // 4) % 3 else "Urban",
+            "w2": 1.0 + (k % 5),
+        })
+    return pd.DataFrame(rows).set_index(["i", "t", "v", "pid"])
+
+
+def test_returns_axes_and_draws_bars():
+    ax = population_pyramid(_roster(), weights=False)
+    assert ax.__class__.__name__.startswith("Axes")
+    assert ax.patches, "no bars drawn"
+
+
+def test_weighting_changes_the_picture_but_not_the_people():
+    """A weight column must move bar widths without inventing rows."""
+    r = _roster()
+    plain = population_pyramid(r, weights=False)
+    wtd = population_pyramid(r, weights="w2")
+    widths_plain = sorted(abs(p.get_width()) for p in plain.patches)
+    widths_wtd = sorted(abs(p.get_width()) for p in wtd.patches)
+    assert widths_plain != widths_wtd
+    assert sum(widths_wtd) > sum(widths_plain)
+
+
+def test_by_splits_into_two_series_and_legend_omits_redundant_title():
+    """`by='Rural'` with values Rural/Urban must not title the legend 'Rural'."""
+    ax = population_pyramid(_roster(), weights=False, by="Rural")
+    labels = {t.get_text() for t in ax.get_legend().get_texts()}
+    assert labels == {"Rural", "Urban"}
+    title = ax.get_legend().get_title()
+    assert not title.get_text(), "legend title repeats a group value"
+
+
+def test_unknown_by_raises_actionably():
+    with pytest.raises(KeyError, match="neither a roster column nor"):
+        population_pyramid(_roster(), weights=False, by="NotAColumn")
+
+
+def test_single_year_bands_label_one_year_not_a_range():
+    """bin_width=1 must read '30', never '30-30'."""
+    ax = population_pyramid(_roster(), weights=False, bin_width=1, max_age=40)
+    texts = {t.get_text() for t in ax.texts}
+    assert not any("–" in s and s.split("–")[0] == s.split("–")[-1] for s in texts)
+    assert "40+" in texts, "the open-ended top band must always be labelled"
+
+
+def test_missing_weights_warns_rather_than_failing():
+    r = _roster().drop(columns=["w2"])
+    with pytest.warns(UserWarning, match="no sampling weights"):
+        population_pyramid(r, weights=True)
+
+
+def test_rejects_a_non_frame():
+    with pytest.raises(TypeError, match="Country, a country name"):
+        population_pyramid(42)
+
+
+def test_palette_does_not_encode_sex_by_colour():
+    """Design invariant: one ink unconditioned, two only when `by=` is given.
+
+    Colour is reserved for the conditioning variable because the mirrored
+    layout already encodes sex.  If someone adds a per-sex colour, this fails.
+    """
+    ax = population_pyramid(_roster(), weights=False)
+    colours = {p.get_facecolor() for p in ax.patches}
+    assert len(colours) == 1, "unconditioned pyramid must use a single ink"
+
+
+@pytest.mark.slow
+def test_country_pyramid_carries_its_universe_caption():
+    """A real country states what population it represents."""
+    ll = pytest.importorskip("lsms_library")
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            ax = population_pyramid("Uganda", wave="2009-10")
+    except Exception as exc:                      # pragma: no cover
+        pytest.skip(f"Uganda unavailable: {exc}")
+    caption = " ".join(t.get_text() for t in ax.figure.texts)
+    assert "Represents:" in caption
+
+
+def _tailed_roster(tail_age=115, tail_n=1, n=8000, span=30):
+    """A dense age structure plus a few implausibly old people.
+
+    The density matters: the visibility rule is a ratio against the largest
+    band, so a fixture with only a few dozen people per band makes three
+    centenarians a legitimately *visible* 4.5% and the rule correctly keeps
+    them.  Real surveys have a much wider dynamic range -- Uganda's largest
+    band holds ~2,900 people and its 4 centenarians are 0.14% of it -- so the
+    fixture reproduces that ratio rather than a token tail.
+    """
+    rows = [{"i": f"h{k // 4}", "t": "2020", "v": "c0", "pid": str(k),
+             "Sex": "M" if k % 2 else "F", "Age": float(k % span)}
+            for k in range(n)]
+    rows += [{"i": "hz", "t": "2020", "v": "c0", "pid": f"z{k}",
+              "Sex": "F", "Age": float(tail_age)} for k in range(tail_n)]
+    return pd.DataFrame(rows).set_index(["i", "t", "v", "pid"])
+
+
+def _closing_band(ax):
+    bands = [s.get_text() for s in ax.texts if s.get_text().endswith("+")]
+    assert len(bands) == 1, f"expected one closing band, got {bands}"
+    return int(bands[0].rstrip("+"))
+
+
+def _all_text(ax):
+    return " ".join([s.get_text() for s in ax.texts]
+                    + [s.get_text() for s in ax.figure.texts])
+
+
+def test_auto_max_age_ignores_an_invisible_tail():
+    """One centenarian must not stretch the scale by seventeen empty bands."""
+    ax = population_pyramid(_tailed_roster(tail_age=115, tail_n=1),
+                            weights=False)
+    assert _closing_band(ax) < 115, "the closing band was dragged up by the tail"
+
+
+def test_truncation_is_disclosed_not_silent():
+    """Hiding the tail is fine; implying nobody is older is not."""
+    ax = population_pyramid(_tailed_roster(tail_age=115, tail_n=1),
+                            weights=False)
+    assert "oldest recorded 115" in _all_text(ax)
+
+
+def test_auto_max_age_is_geometric_not_a_fixed_number():
+    """A tail that is genuinely visible must be kept, on the same rule.
+
+    Same shape, same oldest age -- only the tail's weight differs.  A rule
+    that returned a fixed number could not tell these apart.
+    """
+    thin = population_pyramid(_tailed_roster(tail_age=115, tail_n=1),
+                              weights=False)
+    dense = population_pyramid(_tailed_roster(tail_age=115, tail_n=400),
+                               weights=False)
+    assert _closing_band(dense) > _closing_band(thin), (
+        f"thin={_closing_band(thin)} dense={_closing_band(dense)}"
+    )
+
+
+def test_explicit_max_age_still_honoured():
+    ax = population_pyramid(_tailed_roster(), weights=False, max_age=60)
+    assert _closing_band(ax) == 60
+
+
+def test_bad_max_age_string_rejected():
+    with pytest.raises(ValueError, match="max_age must be an int or 'auto'"):
+        population_pyramid(_tailed_roster(), weights=False, max_age="tall")
+
+
+def test_ghost_draws_a_second_unfilled_series():
+    """`ghost=` overlays a comparison weighting as an outline, not a fill."""
+    r = _roster()
+    ax = population_pyramid(r, weights="w2", ghost=False)
+    filled = [p for p in ax.patches if p.get_facecolor()[3] > 0]
+    outline = [p for p in ax.patches if p.get_facecolor()[3] == 0]
+    assert filled and outline, "expected both a filled and an outlined series"
+    assert len(outline) == len(filled)
+
+
+def test_ghost_is_absent_unless_asked():
+    ax = population_pyramid(_roster(), weights=False)
+    assert not [p for p in ax.patches if p.get_facecolor()[3] == 0]
+
+
+def test_ghost_coincides_when_the_weight_is_constant():
+    """A self-weighting wave must show outline and fill on top of each other.
+
+    GhanaLSS GLSS1-3 are self-weighting -- weight is a genuine constant 1.0 --
+    so `weights=True, ghost=False` should draw two identical series.  If the
+    ghost silently used the wrong column this would diverge.
+    """
+    r = _roster()
+    r = r.assign(const=1.0)
+    ax = population_pyramid(r, weights="const", ghost=False)
+    filled = sorted(abs(p.get_width()) for p in ax.patches
+                    if p.get_facecolor()[3] > 0)
+    outline = sorted(abs(p.get_width()) for p in ax.patches
+                     if p.get_facecolor()[3] == 0)
+    assert filled == pytest.approx(outline)
+
+
+def test_ghost_basis_is_named_in_the_subtitle():
+    ax = population_pyramid(_roster(), weights="w2", ghost=False)
+    assert "outline: unweighted" in _all_text(ax)
+
+
+def test_ghost_rejects_a_bad_spec():
+    with pytest.raises(TypeError, match="ghost= takes"):
+        population_pyramid(_roster(), weights=False, ghost=3.7)
+    with pytest.raises(KeyError, match="ghost="):
+        population_pyramid(_roster(), weights=False, ghost="nope")
+
+
+# --- coordinate_map --------------------------------------------------------
+
+def _geo(n=40, lat0=1.0, lon0=32.0):
+    """Cluster-shaped frame: one row per `v`, with coordinates and a weight."""
+    rows = [{"t": "2020", "v": f"c{k}",
+             "Latitude": lat0 + (k % 8) * 0.25,
+             "Longitude": lon0 + (k // 8) * 0.25,
+             "weight": 1.0 + (k % 5)} for k in range(n)]
+    return pd.DataFrame(rows)
+
+
+def test_static_map_plots_every_point():
+    ax = coordinate_map(_geo(), size="weight", interactive=False)
+    assert len(ax.collections[0].get_offsets()) == 40
+
+
+def test_marker_area_not_radius_is_proportional():
+    """A 4x weight must be a 4x AREA, i.e. a 2x radius -- not a 4x radius.
+
+    Radius-proportional symbols are the classic lie of this chart type: on
+    Uganda 2013-14 the cluster weights span 197x, which as radius would read
+    as ~38,000x by area.
+    """
+    from lsms_library.visualizations import _radius_by_area
+
+    r, n_floored = _radius_by_area([1.0, 4.0], r_max=10.0, r_floor=0.0)
+    assert r[1] == pytest.approx(10.0)
+    assert r[1] / r[0] == pytest.approx(2.0), "radius should go as sqrt(value)"
+    assert n_floored == 0
+
+
+def test_aspect_is_corrected_for_latitude():
+    """`equal` aspect is only right on the equator."""
+    import numpy as np
+
+    eq = coordinate_map(_geo(lat0=0.0), interactive=False)
+    far = coordinate_map(_geo(lat0=45.0), interactive=False)
+    assert eq.get_aspect() == pytest.approx(1.0, abs=0.02)
+    assert far.get_aspect() == pytest.approx(1 / np.cos(np.radians(45.9)), rel=0.05)
+    assert far.get_aspect() > eq.get_aspect()
+
+
+def test_rows_without_coordinates_are_counted_not_silently_dropped():
+    df = _geo(10)
+    df.loc[0:2, "Latitude"] = pd.NA
+    ax = coordinate_map(df, interactive=False)
+    assert len(ax.collections[0].get_offsets()) == 7
+    assert "7 points" in _all_text(ax)
+
+
+def test_missing_coordinate_column_raises():
+    with pytest.raises(KeyError, match="Latitude"):
+        coordinate_map(pd.DataFrame({"x": [1]}), interactive=False)
+
+
+def test_interactive_map_carries_a_basemap_and_markers():
+    """The interactive path is the real map: tiles give shapes and place names."""
+    folium = pytest.importorskip("folium")
+    m = coordinate_map(_geo(), size="weight")
+    html = m.get_root().render()
+    assert "tile.openstreetmap.org" in html, "no basemap tile layer"
+    assert "circlemarker" in html.lower()
+    assert "positions approximate" in html, "provenance caption missing"
+
+
+def test_interactive_without_folium_says_how_to_fix_it(monkeypatch):
+    import builtins
+    real = builtins.__import__
+
+    def no_folium(name, *a, **k):
+        if name == "folium":
+            raise ImportError("no folium")
+        return real(name, *a, **k)
+
+    monkeypatch.setattr(builtins, "__import__", no_folium)
+    with pytest.raises(ImportError, match="pip install folium"):
+        coordinate_map(_geo(), interactive=True)
+
+
+def test_the_size_floor_is_counted_and_disclosed():
+    """The floor breaks the proportionality the caption promises, so say so.
+
+    Measured on Uganda 2013-14: weights span 197x, and within a 14px budget
+    188 of 620 markers (30%) fall below the 2px floor, overstating their area
+    by up to 4x.  A caption reading "area proportional to weight" while that
+    is untrue for a third of the markers is exactly the quiet falsehood this
+    module exists to avoid.
+    """
+    from lsms_library.visualizations import _radius_by_area
+
+    _, n = _radius_by_area([1.0, 400.0], r_max=14.0, r_floor=2.0)
+    assert n == 1, "a 400x span must floor the small marker"
+
+    df = _geo(12)
+    df.loc[:5, "weight"] = 0.01
+    df.loc[6:, "weight"] = 100.0
+    ax = coordinate_map(df, size="weight", interactive=False)
+    assert "at the minimum size" in _all_text(ax)
+
+
+def test_log_scale_says_it_is_log_and_needs_no_floor():
+    from lsms_library.visualizations import _radius_by_area
+
+    _, n = _radius_by_area([1.0, 400.0], r_max=14.0, r_floor=2.0, scale="log")
+    assert n == 0, "log compresses enough that nothing needs flooring"
+
+    df = _geo(10)
+    ax = coordinate_map(df, size="weight", interactive=False, scale="log")
+    txt = _all_text(ax)
+    assert "log(weight)" in txt
+    assert "at the minimum size" not in txt
+
+
+def test_bad_scale_rejected():
+    from lsms_library.visualizations import _radius_by_area
+
+    with pytest.raises(ValueError, match="scale must be"):
+        _radius_by_area([1.0], scale="sqrt")
+
+
+# --- coordinate_map(where=) ------------------------------------------------
+
+def _clusters():
+    return pd.DataFrame({
+        "v": ["c1", "c2", "c3", "c4", "c5"],
+        "Region": ["bafata", "bafata", "oio", "oio", "sab"],
+        "Rural": ["Rural", "Urban", "Rural", "Rural", "Urban"],
+        "Latitude": [12.1, 12.2, 12.0, None, 11.9],
+        "Longitude": [-14.6, -14.7, -15.0, -15.1, -15.6],
+        "weight": [10.0, 20.0, 5.0, 7.0, 40.0],
+    })
+
+
+def test_where_dict_restricts_titles_and_counts_dropped_within_the_selection():
+    from lsms_library.visualizations import coordinate_map
+    ax = coordinate_map(_clusters(), size="weight", interactive=False,
+                        where={"Region": "oio"})
+    assert "Region = oio" in ax.get_title(loc="left")
+    # c3 drawn, c4 has no latitude: one point, one dropped -- both stated.
+    texts = " ".join(t.get_text() for t in ax.texts)
+    assert "1 points" in texts and "1 cluster(s) without coordinates" in texts
+    assert len(ax.collections[0].get_offsets()) == 1
+
+
+def test_where_accepts_a_list_and_a_callable():
+    from lsms_library.visualizations import coordinate_map
+    ax = coordinate_map(_clusters(), interactive=False,
+                        where={"Region": ["bafata", "sab"]})
+    assert len(ax.collections[0].get_offsets()) == 3
+    assert "Region in {bafata, sab}" in ax.get_title(loc="left")
+    ax = coordinate_map(_clusters(), interactive=False,
+                        where=lambda df: df.Rural == "Urban")
+    assert len(ax.collections[0].get_offsets()) == 2
+
+
+def test_where_that_matches_nothing_names_the_values_the_column_holds():
+    from lsms_library.visualizations import coordinate_map
+    with pytest.raises(ValueError, match=r"Region in \['Bafata'\].*bafata, oio, sab"):
+        coordinate_map(_clusters(), interactive=False, where={"Region": "Bafata"})
+    with pytest.raises(KeyError, match="not a column"):
+        coordinate_map(_clusters(), interactive=False, where={"strata": "x"})
+    with pytest.raises(TypeError, match="where= takes"):
+        coordinate_map(_clusters(), interactive=False, where="Region == 'oio'")

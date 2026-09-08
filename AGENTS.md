@@ -22,7 +22,27 @@ The returned DataFrame prepends a `country` index level.
 
 ## Task-Specific Skills (read these on demand)
 
-- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Has sub-skills for `sample`, `food-acquired` (and its nested `food-acquired/units` — decoding/cleaning the unit `u` label: leak audit, decode toolkit, and the silent-failure gotchas), `shocks`, `assets`, `panel-ids`, and `pp-ph` (post-planting/post-harvest countries — Nigeria, Ethiopia; **not GhanaSPS** — no GhanaSPS wave ships two rounds, GH #730).
+> **This list is checked, not trusted. Run `make api-audit` to enumerate every
+> skill on disk with the `description` from its frontmatter — that field states
+> when the skill should be read, which is exactly what you need in order to know
+> it exists.** The audit fails when a skill is missing from this list, because
+> the list is hand-maintained and *had already drifted*: `aggregate-labels`,
+> `add-wave` and `cross-country-features` appeared **nowhere** in this file, and
+> only 6 of 15 skills were named by path. That is not a cosmetic gap — the
+> `labels='Aggregate'` contract is documented in `aggregate-labels`, and an
+> investigation into precisely that contract (GH #787) was carried out without
+> it and had to be corrected afterwards. **Prefer the audit over this prose**;
+> when the two disagree, the audit is right and this list is stale.
+
+- `.claude/skills/add-feature/SKILL.md` — adding a new table to a country. Sub-skills, each with its own `SKILL.md`:
+  - `add-feature/sample/` — the `sample` table and cluster identity (`v`, weights, strata).
+  - `add-feature/food-acquired/` — the food-acquisition table.
+    - `add-feature/food-acquired/units/` — decoding/cleaning the unit `u` label: leak audit, decode toolkit, and the silent-failure gotchas.
+    - `add-feature/food-acquired/aggregate-labels/` — **the `labels='Aggregate'` API contract**: what happens when a country lacks the column, the `LabelUnavailableError` / Feature-degrade behaviour ("Contract B, loud structured degrade", PR #550), and which food countries actually curate an Aggregate column. **Read before calling or changing `labels=`.** Designing the buckets themselves lives in the parent skill.
+  - `add-feature/shocks/`, `add-feature/assets/`, `add-feature/housing/`, `add-feature/panel-ids/` — those features.
+  - `add-feature/pp-ph/` — post-planting/post-harvest countries (Nigeria, Ethiopia; **not GhanaSPS** — no GhanaSPS wave ships two rounds, GH #730).
+- `.claude/skills/add-wave/SKILL.md` — adding a new survey wave to an existing country.
+- `.claude/skills/cross-country-features/SKILL.md` — assembling, auditing, or fixing a table across countries with `Feature()`.
 - `.claude/skills/multi-round-waves.md` — Tanzania `2008-15/` multi-round folder pattern and `wave_folder_map`.
 - `.claude/skills/tanzania-panel-design.md` — NPS sub-panel split (extended vs. refresh).
 - `.claude/skills/demand-estimation.md` — running CFE demands via the Country API.
@@ -49,7 +69,9 @@ The returned DataFrame prepends a `country` index level.
      import lsms_library; assert 'worktrees' in lsms_library.__file__, lsms_library.__file__
      ```
      For **config**-only edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), `LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries` is the cleaner lever: the live package reads the worktree's config tree (GH #436) and library-code identity stops mattering.  A fresh in-worktree venv is **not** needed for either case.  See the `.pth`-pinned package imports pitfall in the scrum-master-hpc skill.
-  4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's **adopt-or-build recipe** (adopt any importable `/local/job*/venv` already on the node → tar-pipe build only if none → reclaim the stale ones), which gives cross-job persistence without root.  Note: a stable `/local/$USER/<repo>` path is NOT creatable by us (`/local` is `root:root`); a genuinely persistent path needs an HPC-support ticket (README "Admin endgame").  **Opt-in fast path**: `bin/savio_venv.sh` packages the venv as a single squashfs image (`.venv.sqfs`, ~255 MB / one Lustre inode vs ~33k files) and mounts it per job via apptainer's `squashfuse_ll` (`mount`/`umount`/`update` subcommands) — kills the Lustre-MDS load and sidesteps the per-job reaper; see `docs/savio_venv.md` for the model + how to rebuild the image when deps change.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
+
+     **The same trap has a WRITE side (GH #803).**  `to_parquet` -> `_resolve_data_path` redirects a wave script's `foo.parquet` to `data_root()` only when the *script's file* is under the imported package's `countries_root()`.  Run a wave script (directly, or via `make`) from a worktree/checkout that is not the imported package and the parquet lands **in-tree**, next to the script -- gitignored, hashless, invisible to `cache clear`.  Until #803 those files were read in preference to running the script.  `LSMS_COUNTRIES_ROOT=<that checkout>/lsms_library/countries` (or `PYTHONPATH` to the same checkout) makes the redirect fire; `find lsms_library/countries -name '*.parquet'` should always be empty, and `lsms-library cache clear` now says so when it is not.
+  4. *Savio compute nodes only*: `.venv` is typically a symlink to `/local/jobNNN/venv` (node-local SSD) and goes stale whenever you land on a different node.  Recovery recipe lives in `.venv.lustre/README_WHY_THIS_EXISTS.md` at the repo root.  **Do not just grab `.venv.lustre/bin/python`** — every import will round-trip through Lustre.  Follow the README's **adopt-or-build recipe** (adopt any importable `/local/job*/venv` already on the node → tar-pipe build only if none → reclaim the stale ones), which gives cross-job persistence without root.  Note: a stable `/local/$USER/<repo>` path is NOT creatable by us (`/local` is `root:root`); a genuinely persistent path needs an HPC-support ticket (README "Admin endgame").  **Opt-in fast path**: `bin/savio_venv.sh` packages the venv as a single squashfs image (`.venv.sqfs`, ~255 MB / one Lustre inode vs ~33k files) and mounts it per job via apptainer's `squashfuse_ll` (`mount`/`umount`/`update` subcommands) — kills the Lustre-MDS load and sidesteps the per-job reaper; see `SkunkWorks/savio_venv.md` for the model + how to rebuild the image when deps change.  This guidance is Savio-specific; other environments (login nodes, laptops, non-HPC clusters) use a normal in-tree `.venv/` and this paragraph doesn't apply.
 
   5. **Any agent scoped to a country MUST be told to read `countries/{C}/_/CONTENTS.org` first — put it in the prompt.**  That file is where this repo records per-country *idiosyncrasies*: identifier conventions, survey-design oddities, known defects, and decisions already taken with their reasons.  The `add-feature` skill already says "Read existing documentation FIRST … **Start here**", but a dispatched agent only reads what its brief tells it to, so this is the **dispatcher's** responsibility.
      - Read the `LOGBOOK`/`WAITING`/`TODO` entries too, not just the prose: **a CLOSED GitHub issue can still have a live caveat parked there** (Tanzania `#114` is closed; its `CONTENTS.org` entry is still `WAITING`).
@@ -62,6 +84,23 @@ The returned DataFrame prepends a `country` index level.
 - Country root-level symlinks (e.g. `Uganda -> lsms_library/countries/Uganda`) are convenience only; actual config lives under `lsms_library/countries/`.
 - **DVC repository is rooted at `lsms_library/countries/`, NOT the top-level repo.** `.dvc/`, remotes, and credentials all live there. Run `dvc` CLI commands from that directory or they fail with missing-remote errors.
 - **Two Makefiles**: top-level `Makefile` (Poetry setup, pytest, build); `lsms_library/Makefile` (country-specific test/build/materialize/demands). `make -C lsms_library help` for details.
+- **Refreshing the GitNexus index** — always pass all three flags:
+
+  ```bash
+  npx gitnexus analyze --skip-agents-md --skip-skills --embeddings
+  ```
+
+  `--embeddings` builds semantic search (off by default; a plain `analyze`
+  preserves embeddings already present but won't generate them). The other two
+  suppress **injection into tracked files**, which is otherwise a recurring
+  source of dirty-tree churn: without `--skip-agents-md` it rewrites the
+  `<!-- gitnexus -->` block in `AGENTS.md` *and* `CLAUDE.md`; without
+  `--skip-skills` it reinstalls all six `.claude/skills/gitnexus/*/SKILL.md`.
+  Both are tracked, so an unflagged run leaves edits for the next unrelated
+  commit to sweep up. **The stale-index hook's suggested command omits
+  `--skip-skills`** — add it. The block at the bottom of this file and the
+  gitnexus skill files are generated: refresh them by re-running `analyze`,
+  never by hand.
 
 ## Cache Behavior (v0.7.0+)
 
@@ -170,7 +209,7 @@ override.
 >
 > **Never `rm` a DVC lock file.** A lock that looks stale may belong to a live sibling process; deleting it corrupts that writer rather than unblocking you. If a write is genuinely stuck, let the backoff run, then investigate.
 
-**Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. Stale parquets from before this migration may still exist in-tree; they are harmless artifacts.
+**Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. **A `*.parquet` inside `countries_root()` is never read (GH #803)** -- before that fix `Wave.grab_data` and `run_make_target` *preferred* an in-tree `{wave}/_/{table}.parquet` to running the wave script, and because such files are hashless they graded `legacy` at the v0.8.0 gate and were stamped into the L2-country parquet with a fresh hash (109 files, 14 countries, on the main checkout). They get written when a script runs from a checkout that is not the imported package: `_resolve_data_path` redirects only when the *caller's file* is under the package's `countries_root()`, otherwise the literal relative path lands next to the script (the write-side `.pth` trap, scrum-master addendum 3). The library now warns (`InTreeParquetWarning`) and ignores them; delete them (`find lsms_library/countries -name '*.parquet' -delete` -- none are tracked).
 
 **Anti-patterns — do not use:**
 
@@ -214,7 +253,7 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 `tests/test_schema_consistency.py` reads from this file — never hardcode schema rules in tests.
 
-**Kinship decomposition (Kroeber 1909).** `household_roster` uses four columns instead of a single `Relationship` string: `Sex`, `Generation` (0=same, +1=parent, −1=child), `Distance` (0=lineal, 1=sibling line, 2=cousin), and `Affinity`. `_expand_kinship()` in `_finalize_result()` transforms `Relationship` automatically using `lsms_library/categorical_mapping/kinship.yml`. Unrecognized labels emit a warning — add them to the YAML with their `[Generation, Distance, Affinity]` tuple.
+**Kinship decomposition (Kroeber 1909).** `household_roster` uses four columns instead of a single `Relationship` string: `Sex`, `Generation` (0=same, +1=parent, −1=child), `Distance` (0=lineal, 1=sibling line, 2=cousin), and `Affinity`. `_expand_kinship()` in `_finalize_result()` transforms `Relationship` automatically using `lsms_library/categorical_mapping/kinship.yml`. Unrecognized labels emit a warning — add them to the YAML with their `[Generation, Distance, Affinity]` tuple. **A null component is deliberate** (GH #698/#797, 2026-09-07): an "other relative" is `[null, null, consanguineal]` (a blood relative of unrecorded generation and distance — it used to sit on Head's cell), and a "relative of head *or spouse*" is `[null, null, null]` (blood and marriage conflated). The lookup still matches, so no warning fires; do not repair a null by picking a cell the instrument did not.
 
 **Canonical spellings.** Columns in `data_info.yml` can declare a `spellings` inverse dict mapping canonical value → list of accepted variants. `_enforce_canonical_spellings()` replaces variants with canonical forms at API time, on both column values and index levels.
 
@@ -371,9 +410,9 @@ Rules:
 
 **Weights are normalised to within-wave mean 1 at API time.** For each `(country, wave)`, `_normalise_sample_weights()` in `_finalize_result` divides `weight` and `panel_weight` — each by *its own* non-null mean — so both columns come back with mean 1.0 in every wave. **The parquet keeps the raw values**; this is a read-path transform like kinship and spellings, so `pd.read_parquet(cache_path)` still shows expansion weights. A future `weights='expansion'` kwarg on `sample()` therefore stays possible; it is deliberately **not** built.
 
-*Why.* The corpus shipped two incompatible scales with nothing marking which was which: 13 of 93 weighted cells were already normalised (mean 1.0000), 80 were expansion weights summing to a national population (wave means 25.7 → 8,659). **CotedIvoire mixed both across its own waves** (1985–89 LSMS `ALLWAITN` ≈ N households vs. 2018–19 EHCVM population-scaled), so a user summing across waves got numbers three orders of magnitude apart, silently. GhanaLSS avoided the hazard by leaving four waves' weights NULL — a workaround this supersedes (see `GhanaLSS/_/CONTENTS.org`).
+*Why.* The corpus shipped two incompatible scales with nothing marking which was which: 13 of 93 weighted cells were already normalised (mean 1.0000), 80 were expansion weights summing to a national population (wave means 25.7 → 8,659). **CotedIvoire mixed both across its own waves** (1985–89 LSMS `ALLWAITN` ≈ N households vs. 2018–19 EHCVM population-scaled), so a user summing across waves got numbers three orders of magnitude apart, silently. GhanaLSS *used to* avoid the hazard by leaving four waves' weights NULL; **that is no longer true** (GH #713, commit `65b1964c`) and this passage has been corrected. All seven waves now carry a weight and a panel_weight with **zero nulls**. The nuance worth keeping: GLSS1–3 (1987-88, 1988-89, 1991-92) are *self-weighting*, so their weight is a genuine constant 1.0 and weighting is a no-op there **by design, not by omission**; GLSS4 onward carry real variation (298–1,196 distinct values, max 12.7). See `GhanaLSS/_/CONTENTS.org` §Weights for the per-round sources.
 
-*The rule needs no threshold and no configuration*: divide by the wave's own mean. Already-normalised weights are divided by 1.0000 and are unchanged; expansion weights become normalised. Deterministic and idempotent — which matters because `_join_v_from_sample` re-enters `sample()` while finalising every other household-level table. A `(wave, column)` group whose non-null mean is 0, negative or non-finite is **left at its raw scale** with a `WeightNormalisationWarning` rather than emitting `inf`; an all-null column (GhanaLSS GLSS1–4) is skipped silently. **Do not add a "mean > N" heuristic** — it would be a magic threshold where none is needed.
+*The rule needs no threshold and no configuration*: divide by the wave's own mean. Already-normalised weights are divided by 1.0000 and are unchanged; expansion weights become normalised. Deterministic and idempotent — which matters because `_join_v_from_sample` re-enters `sample()` while finalising every other household-level table. A `(wave, column)` group whose non-null mean is 0, negative or non-finite is **left at its raw scale** with a `WeightNormalisationWarning` rather than emitting `inf`; an all-null column is skipped silently (this used to name GhanaLSS GLSS1–4; since GH #713 that country has no all-null weight column, so the branch now has no known live instance in the corpus). **Do not add a "mean > N" heuristic** — it would be a magic threshold where none is needed.
 
 *What it costs, stated plainly.* **Weighted ratios, shares and means are exactly unchanged** — scaling every weight in a wave by one positive constant cancels in `Σwx/Σw`, and that invariance is what makes the change safe. But `sum(weight)` is now a wave's household count, not a population estimate, so **cross-wave pooling no longer reflects relative wave sizes**: each wave contributes in proportion to its sample size, not its population. That is fine for the stated use (we are not estimating population totals) and is already what the corpus did for the 13 normalised cells — but it is a real property, not a rounding detail. It also means a miscoded weight variable can no longer be caught by a cross-wave population jump at API level; check the raw parquet or the wave config instead (the former `test_weighted_population_stable_across_waves` did exactly that, and its CotedIvoire xfail described precisely the mixing this removes).
 - Country caveat: `Country(name).household_roster()` only gets `v` in the index if the country has `sample` in its `data_scheme.yml`.
@@ -411,13 +450,17 @@ That single sentence covers `merge` and `concat` together, and makes single-inpu
 
 **State it as the rule, never as "merge drops".** The per-method framing is wrong in *both* directions, which is what makes it dangerous: "merge always drops" is false, and someone who tests `merge` with matching `attrs`, watches it preserve, and generalises reaches the opposite falsehood. Test the *disagreeing* case or you have not tested anything.
 
-The rule is also what tells you the **mitigation, of which there are two**: copy `attrs` across explicitly after the operation (what this repo does for `id_converted`), *or* make the inputs agree beforehand. Told only "merge drops", you will never reach for the second — and the second is sometimes what is already happening. `Country._join_v_from_sample` is a live example: since both `sample()` and the table being joined pass through `_finalize_result`, both now carry the *same* population record, so that merge lands in the **preserving** row (measured on Liberia, Ethiopia and Albania). It *also* copies `attrs` explicitly, which is what keeps it correct for a country whose two tables cover different waves and therefore disagree. Belt and braces there is deliberate; do not remove either.
+The rule is also what tells you the **mitigation, of which there are two**: copy `attrs` across explicitly after the operation (what this repo does for `id_converted`), *or* make the inputs agree beforehand. Told only "merge drops", you will never reach for the second.
+
+> **`Country._join_v_from_sample` was named here as the live example of the *preserving* row. Re-measured 2026-09-06, that was wrong — and wrong on the unmodified pre-change code too, so it was a documentation error, not a regression.** `attach_population` is called at `country.py:3034` and `_join_v_from_sample` at `country.py:2891` — 143 lines EARLIER in the same `_finalize_result` call — so at merge time the left frame has **no** population record while `sample()`, which completed its own `_finalize_result`, has one. On Liberia, Albania and Ethiopia every observation was `left_has_pop=False`, `right_has_pop=True`, `attrs_equal=False`, output `attrs` empty. It is a **disagreeing** merge. What keeps `id_converted` alive across it is the explicit `result.attrs = dict(df.attrs)`; what puts the population record on the result is `attach_population` running afterwards. Two mitigations, both load-bearing, neither of them "the inputs already agree". `tests/test_population.py::TestVJoinIsADisagreeingMerge` pins it.
+>
+> The general lesson survives the correction and is the reason to keep this paragraph: the second mitigation (*make the inputs agree*) is real, and `tests/test_population.py::TestRecordsRideOnAttrs::test_merge_preserves_across_a_record_and_an_equivalent_plain_dict` is a live instance of it. Do not remove either mitigation anywhere it is already used.
 
 Where a disagreement is **by design**, the drop is guaranteed and an explicit re-attach is load-bearing rather than decorative: cross-country `Feature()` assembly is a `concat` over frames whose population records differ on purpose (one per country), so it lands in the `{}` row on every multi-country call. `tests/test_population.py::TestAttrsSurvival` pins all seven cells — deliberately including the **preserving** ones, so a future pandas that dropped unconditionally goes red instead of silently making the re-attach look redundant.
 
 ## The Population Record — what a sample REPRESENTS (GH #603/#601)
 
-Two "nationally representative" surveys can represent different populations. `countries/{C}/_/population.yml` records, per **wave**, what the survey's own documentation says its sample represents. Read it via `Country(name).population` (a `{wave: PopulationRecord}` dict) or off `df.attrs['population']`, which has the shape `{country: {wave: record}}` from both `Country(...)` and `Feature(...)`. Full guide: `docs/guide/population.md`.
+Two "nationally representative" surveys can represent different populations. `countries/{C}/_/population.yml` records, per **wave**, what the survey's own documentation says its sample represents. Read it via `Country(name).population` (a `{wave: PopulationRecord}` dict) or off `df.attrs['population']`, which has the shape `{country: {wave: record}}` from both `Country(...)` and `Feature(...)`. **Both give the same `PopulationRecord` type** (#603): `rec.universe_tag` and `rec['universe_tag']` work on either, and an unset optional field reads as `None` through the attribute. Full guide: `docs/guide/population.md`.
 
 - **The universe is a property of the `(country, wave)` cell.** Ethiopia ESS W1 was designed for rural areas and small towns (503 urban households); 2018-19 has 3,655. A panel across W1→W5 pools a universe that moved. Every one of those waves grades `sane`.
 - **`Feature()` warns; it never fences.** #603 proposed excluding `specialized` frames by default and @ligon declined: a default that silently drops data is the same disease as one that silently pools it. The warning (`PopulationHeterogeneityWarning`) fires once per `Feature()` call, names the classes, and says nothing was dropped. `Country(...)` calls attach the record and stay silent.
@@ -426,6 +469,7 @@ Two "nationally representative" surveys can represent different populations. `co
 - **`unrecorded` ≠ `not-stated`.** `not-stated` (7 waves) means the sweep looked and found no statement; `unrecorded` is a library-side sentinel meaning nobody has looked. Both surface as UNKNOWN in the warning, never as "different".
 - **The files are GENERATED.** Edit `slurm_logs/POPULATION_STATEMENTS_2026-07-21.org` (the verbatim evidence base for all 111 waves) and re-run `python scripts/promote_population_records.py`. It aborts unless every entry agrees with the document's own summary table and the tag / source / confidence histograms match the counts the document publishes.
 - **Config placement is load-bearing, not taste.** `population.yml` is a *sibling* of `data_scheme.yml`, never a block inside it: `Country._table_cache_hash` hashes `data_scheme.yml` by name, and `_input_hash` / `_table_cache_hash` glob `_/*` only for `_BUILD_INPUT_SUFFIXES = {.py,.csv,.json,.txt,.tab,.tsv}` plus `*.org`. A new `.yml` moves no cache hash; a `Population:` block in `data_scheme.yml` would cold-rebuild the whole corpus. Measured: all 524 `(country, table)` hashes byte-identical before/after.
+- **`PopulationRecord` is an immutable `dict` subclass, and that is not a style choice.** Two measured constraints fix it. (1) `pandas.io.parquet` serialises `df.attrs` with a bare `json.dumps` (`io/parquet.py:193`, pandas 3.0.2) and `pyarrow.pandas_compat` does the same and warns — so a frozen dataclass in `attrs` turns any user's `df.to_parquet()` on an API frame into `TypeError: Object of type PopulationRecord is not JSON serializable`. (2) pandas propagates `attrs` only when every input compares **equal** (`core/generic.py`: `obj.attrs == attrs`), so the record must compare **by value** — and it compares equal to the plain dict a pre-#603 parquet round-trips back as, which is what keeps old and new frames agreeing. A `dict` subclass satisfies both, keeps every `rec['field']` caller working, and adds `rec.field`. It gives up the dataclass's immutability, so the mutating `dict` methods raise (`population_records` is `lru_cache`d — a mutated record would poison every later reader), `__hash__` is restored, and `__reduce__` is defined because the default dict-subclass reconstruction replays items through `__setitem__` and pandas deepcopies `attrs` on every propagation. Measured cost: **0 of 30** probed `build_transforms_fingerprint` / `Country._table_cache_hash` values moved.
 - **Attach point is load-bearing too.** The record is attached in `Country._finalize_result`, which is in `_build_registry._EXCLUDED_CALLABLES` — so it costs no cache invalidation. Attaching from `_aggregate_wave_data`, `Wave.grab_data`, or the generated method would move `build_transforms_fingerprint` for every table.
 
 ## Gotchas with Teeth
@@ -486,6 +530,42 @@ Some countries have configs but no source `.dta` in the repository:
 - `SkunkWorks/dvc_object_management.org` — content-hash cache invalidation (stage layer retired in v0.7.0; hash-based invalidation **implemented in v0.8.0** — see the "Convergence: implemented design" section).
 - `SkunkWorks/dvcfilesystem_runtime_override.org` — how the pip-install scenario works (runtime config override, lazy credential validation, no git ancestor required).
 - `SkunkWorks/cross_country_label_harmonization.org` — design sketch for `Feature(...)(harmonize=...)`.
+
+## Code intelligence: GitNexus is OPTIONAL, and its substitutes are named
+
+The generated block below states GitNexus MCP usage as mandatory — *"MUST run
+impact analysis before editing any symbol"*, *"NEVER edit a function, class, or
+method without first running `gitnexus_impact`"*. **Read that as conditional on
+the tooling actually being available, not as a gate you must clear before
+touching code.** That block is regenerated by `gitnexus analyze` and cannot be
+softened in place, which is why this note sits outside it.
+
+Measured on Savio, 2026-09-05: the `gitnexus` MCP server did not connect (30 s
+timeout, as did `github` and `aristotle`); this mirror has **no `.gitnexus/`
+index**; and `npx gitnexus --version` did not complete within 60 s even though
+`registry.npmjs.org` answers in 0.10 s. So it is **not** a network block — it is
+npm's many-small-files install against Lustre, the same pathology that
+`bin/savio_venv.sh` exists to dodge for `.venv`. Whether a full `analyze` would
+eventually finish here is **untested**; do not assume either way.
+
+**When GitNexus is unavailable, these substitutes are adequate. Use them, and
+say in your report that you did** — a declared substitution is fine, a silent
+skip is not:
+
+| the generated block asks for | substitute when it is unavailable |
+|---|---|
+| `gitnexus_impact` before editing a symbol | `rg -n '\bNAME\b' --type py lsms_library/ lsms_library/countries/*/_/*.py` across call sites; report the blast radius you actually found |
+| `gitnexus_detect_changes` before committing | `git diff --stat` plus the test suite covering the touched area |
+| `gitnexus_query` / `gitnexus_context` for exploration | `rg` / Grep, or an `Explore` subagent |
+| `gitnexus_rename` | rename by hand *after* the call-site sweep above |
+| the `github` MCP server | **the `gh` CLI** — an adequate substitute, and the default here |
+
+Two rules survive unconditionally, because neither depends on GitNexus:
+
+1. **Never blind find-and-replace a symbol.** Sweep the call sites first, with
+   whatever tool is working.
+2. **Report the blast radius you found**, and flag HIGH-risk edits, whether the
+   finding came from GitNexus or from `rg`.
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
