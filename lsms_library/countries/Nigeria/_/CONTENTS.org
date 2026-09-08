@@ -797,10 +797,29 @@ c8aq2_b unit.
 
 ** v -> sample() keyspace
 
-v = format_id(ea), the community questionnaire's EA id.  ALL 584 community
-EAs intersect sample().v (which also joins v = format_id(ea)), so
-community_prices.v joins households via their cluster -- confirmed
-584/584.
+*CORRECTED 2026-09-08.*  This paragraph used to read "v = format_id(ea),
+the community questionnaire's EA id ... confirmed 584/584".  That is stale
+and it contradicted both [[*Cluster (PSU) identifier][Cluster (PSU) identifier]] above and the community_prices
+block in =data_scheme.yml=, which say =v= is the COMPOSITE =cluster_id(state,
+lga, ea)= (GH #323).  The composite key is what is actually built and
+published today.
+
+Re-measured against =cluster_features().v= and =sample().v=, per round:
+
+| t      | cp clusters | in cluster_features | in sample() |
+|--------+-------------+---------------------+-------------|
+| 2011Q1 |         494 |         494 (100%)  | 494 (100%)  |
+| 2013Q1 |         496 |         494 (99.6%) | 494 (99.6%) |
+| 2016Q1 |         487 |         486 (99.8%) | 486 (99.8%) |
+| 2019Q1 |         517 |         517 (100%)  | 517 (100%)  |
+| 2024Q1 |         507 |           0 (0%)    | 507 (100%)  |
+
+So the keyspace claim still holds -- =community_prices.v= joins households
+via their cluster -- but the count is per round, not a single 584, and it is
+not always 100%: three clusters (2 in 2013Q1, 1 in 2016Q1; 87 price rows)
+appear in the community file with no household-side cluster.  The 2024Q1
+zero is NOT a keyspace failure: =sample()= matches 507/507: it is that
+=cluster_features= is not declared for W5 at all (see the gap noted below).
 
 ** Item labels (j) -- the community-price arm of label unification
 
@@ -828,6 +847,85 @@ via _canon_unit.  W3-W5 record the unit per row; W1/W2 carry NO unit column
 fixed C8 unit (_W1W2_PRICE_UNIT).  All 30 units used already exist in `u`
 (no extension needed).
 
+*** The C8 SIZE field is recorded by the survey and NOT read by the build
+
+Found 2026-09-08 while comparing =community_prices= against the household
+unit value.  The post-harvest community form has *three* price columns, not
+two: the W4 questionnaire prints "2. PLEASE USE A QUANTITY OF ONE (1) FOR
+[ITEM] AND THE UNIT OF MEASURE YOU ARE USING" over a pair of sub-columns
+headed *UNIT OF MEASURE* and *SIZE*, then "3. What is the price for the
+item?" in NAIRA (=ph_w4_community_quest.pdf=, C8, p. 13).  The data carry
+the SIZE:
+
+| wave   | unit column | size / quantity column(s)             | read by the build? |
+|--------+-------------+---------------------------------------+--------------------|
+| W1, W2 | *none*      | *none* (unit printed per item on form)  | n/a                |
+| W3     | =c8q2= (size baked into the label, e.g. "Heap Small") | =c8q2b= free text ('250g', '75cl', 'wrap') | =c8q2= only, size stripped by =_canon_unit= |
+| W4     | =c8q2= ("90. HEAP")  | =c8q2c= coded ("0. SMALL", "34. 250 GRAMS") | *NO* |
+| W5     | =c8aq2_b=   | =c8aq2_a= (quantity), =c8aq2_c= (size), =c8aq2_cvn= (kg/l factor) | *NO* |
+
+Two consequences, both measured.
+
+1. *The size axis is discarded.*  =_canon_unit= is documented as returning a
+   "size-agnostic base Preferred Label", so "Heap Small" / "Heap Medium" /
+   "Heap Large" all become =Heap=, and =community_prices_for_wave= then keeps
+   the FIRST of the collapsed duplicates.  W4 raw counts show the axis is
+   real and populated: HEAP 2,144 small / 1,986 medium / 409 large; PIECE
+   1,450 / 2,595 / 557; MUDU 1,385 small / 817 large; also DERICA, TIYA,
+   BOWL, CONGO, WRAP, LOAF, TUBER, BASIN, KOBIOWU.  =food_acquired= keeps
+   the size ("small heap", "medium heap", ...), so the two tables sit on
+   *different unit axes* and only 15 of =food_acquired='s 81 =u= labels
+   intersect =community_prices='s 30.  The 15 that do match include Kg, g,
+   cl, l, Bottle/Can, Basin, Basket, Crate, Sack/Bag, Tuber, Wheelbarrow,
+   Wrap, Sachet, tin, other specify.
+
+2. *The metric rows are not per-unit prices, which contradicts the
+   =data_scheme.yml= contract* ("Price: prevailing price of one unit `u` of
+   item `j`").  Where the size field states an explicit metric quantity --
+   W4 "30. 20 GRAMS", "34. 250 GRAMS", "36. 500 GRAMS", "24. 75 CL", "23. 60
+   CL", "20. 33 CL" -- the reported Naira figure is the price of THAT
+   package, stored against =u= = =g= or =cl= as though it were one gram or
+   one centilitre.  Measured against the household unit value on matched
+   =(t, j, u, geography)= cells (2011Q1-2019Q1, 1,171 matched cells):
+
+   | u  | matched cells | median log gap | median ratio survey/community |
+   |----+---------------+----------------+-------------------------------|
+   | Kg |           596 |          0.000 | *1.000*                         |
+   | l  |           124 |          0.000 | *1.000*                         |
+   | g  |           130 |         -5.244 | 0.0053  (~1/189)              |
+   | cl |           125 |         -3.738 | 0.0238  (~1/42)               |
+
+   Kg and l -- the units for which "quantity one" is unambiguous -- agree
+   *exactly*.  The g and cl ratios are the package sizes the size field
+   records (20-500 g; 33-75 cl).  This supersedes the vaguer note in
+   =.coder/ledger/591-nigeria-prices.md= section 6 ("community_prices =u='g'= rows
+   look mis-scaled ... ratio approximately 1/400"): the cause is now known and it
+   is the unread size column, not an unexplained scale error, and =cl= is
+   affected as well as =g=.
+
+   *Consumers should exclude =u in (g, cl)= from =community_prices= until this
+   is fixed*, or the price is wrong by two orders of magnitude.  Not repaired
+   here: restoring the size axis changes the published =u= vocabulary of a
+   shipped table and makes it wave-heterogeneous (W1/W2 can never carry it --
+   the form prints one unit per item), which is a maintainer design decision,
+   not a mapping fix.  The protocol's per-unit remedy (=Price / NumberOfUnits=)
+   is available for W4/W5 from the coded size and for W5 from =c8aq2_a= /
+   =c8aq2_cvn=; W3's quantity is free text and would need parsing.
+
+*** C8 is POST-HARVEST ONLY -- why community_prices grades =dropped= on every PP round
+
+=.coder/coverage/latest.csv= grades =Nigeria/community_prices= =dropped=
+("declared for wave but absent from built t-index") in 2010Q3, 2012Q3,
+2015Q3, 2018Q3 and 2023Q3, and =sane= in the five PH quarters.  Those cells
+are *correctly empty*, not a silent drop: no =sectc8_planting*= file exists
+in any wave (=find lsms_library/countries/Nigeria -iname '*c8*'= returns only
+the five post-harvest files), and the post-planting community questionnaire
+carries sections C1-C4 only -- section 8 "Food Prices" is in the
+post-harvest community instrument alone.  =t = PH_QUARTER[wave]= is therefore
+correct and complete.  The =dropped= grade is a *grader* artefact: the
+coverage matrix expands a declared table over both of a PP/PH wave's rounds
+and has no way to record "this module is single-round by design".
+
 ** Framework-compatibility shim (the i==v level)
 
 community_prices is cluster-level, but local_tools.map_index() (run on every
@@ -850,3 +948,60 @@ non-food).  W2 94.7% resolve: in addition to the same tobacco drop, a small
 W2-only block of undocumented "other miscellaneous foods" sub-codes
 (191x/192x/193x, ~4% of W2 rows) has no authoritative label in the retained
 documentation and is left unresolved rather than guessed (no faked labels).
+
+* crop_production: two reported price fields the build does not carry
+
+Found 2026-09-08 during the five-source price comparison.  Both are in the
+post-harvest Agriculture module section A3 (=secta3_harvestw{1,2}=), whose
+sale block is the library's source for =Quantity_sold= / =Value_sold=.
+
+** The SALE has its own unit code (=sa3q11b=), and =u= is the HARVEST unit
+
+The A3 form (W1, =GHS_PANEL_AGRICULTURE_POST_HARVEST_FINAL.pdf= p. 13) gives
+q6 "How much did you harvest since the last interview?" a QUANTITY and a
+PROD. UNIT CODE, and gives q11 "How much did you sell to or through this
+[BUYER]?" *its own* QUANTITY and PROD. UNIT CODE.  =_/crop_production.py=
+passes =unit='sa3q6b'= (harvest) and =qty_sold='sa3q11a'=, =value_sold='sa3q12'=,
+but never =sa3q11b= -- and =nigeria.crop_production_for_wave= documents an
+=unit_sold= parameter in its docstring that the code never reads.
+
+So the stored =u= describes =Quantity=, and is applied to =Quantity_sold= by
+assumption.  Measured on the raw files over rows with a positive sale
+(quantity > 0 and value > 0):
+
+| wave   | positive-sale rows | both units recorded | sale unit == harvest unit |
+|--------+--------------------+---------------------+---------------------------|
+| 2011Q1 |              3,610 |               3,548 | 3,438 (*96.9%*)             |
+| 2013Q1 |              3,491 |               3,478 | 3,316 (*95.3%*)             |
+
+The assumption therefore holds for ~96% of rows and *fails for 3-5%*, where
+=Value_sold / Quantity_sold= is filed under the wrong unit (typical
+mismatches: harvested in kg, sold by Tiya / Mudu / Bag; sold from a
+big/large sack but harvested in a medium one).  Anyone computing a crop sale
+price per =u= should know the denominator's unit is inferred, not read.
+
+** =sa3q18= is an unwired farmgate valuation of the WHOLE harvest
+
+A3 q18, verbatim from the same form (p. 14): "If you had sold all [CROP]
+harvested since the last visit, what would be the total value?" (NAIRA).
+This is a *received/sale-side* valuation -- what the household would have
+got, not what it would have cost to buy -- i.e. a farmgate price, and paired
+with q6's quantity and unit it yields a unit valuation for every harvesting
+household, not only the minority that sold.
+
+Coverage measured on the raw files:
+
+| wave   | plot-crop rows | =sa3q18= populated | > 0   |
+|--------+----------------+------------------+-------|
+| 2011Q1 |         13,018 |    9,857 (75.7%) | 9,600 |
+| 2013Q1 |         12,948 |    9,868 (76.2%) | 9,827 |
+
+against only ~3,500 rows per wave with an actual sale.  Nothing in
+=crop_production= carries it.  This is the closest Nigeria has to the
+own-consumption valuation that =food_prices(units='unitprice',
+s='produced')= returns for other countries -- Nigeria's =food_acquired= has
+no =Price= column at all, so =food_prices(units='unitprice')= returns *zero
+rows* and both the "reported purchase price" and "own-consumption
+valuation" sources are empty for this country.  Wiring =sa3q18= (as, say,
+=Value_if_sold=) would give Nigeria a farmgate valuation on ~2.8x more rows
+than its sales data, and is recorded here as a gap rather than guessed at.
