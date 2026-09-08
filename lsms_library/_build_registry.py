@@ -125,6 +125,14 @@ _EXCLUDED_CALLABLES = frozenset({
     # tagged orchestrator _aggregate_wave_data; excluding it keeps the build
     # fingerprint from over-invalidating on read-path edits (kinship/spellings).
     "lsms_library.country.Country._finalize_result",
+    # Two post-build GUARDS reached from _aggregate_wave_data after the parquet
+    # is already written: _assert_built_required_columns raises or returns
+    # None, _is_script_path is a pure path probe deciding whether the former
+    # runs (GH #479, #808).  Neither changes a byte of any parquet, so an
+    # edit to either must not cold-rebuild the corpus -- the #808 predicate
+    # fix would otherwise have moved every table's hash a second time.
+    "lsms_library.country.Country._assert_built_required_columns",
+    "lsms_library.country.Country._is_script_path",
     # The null-content audit (null_read_audit): pure REPORTING.  It measures the
     # frame and warns; it provably returns its input unchanged, so no byte of
     # any parquet depends on it.  `check_read` is called from `get_dataframe`,

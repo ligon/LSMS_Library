@@ -433,17 +433,6 @@ def _pin_worker(make_jobs: int) -> None:
         os.environ.setdefault(var, "1")
     os.environ[MAKE_JOBS_ENV] = str(int(make_jobs))
     os.environ[WORKERS_ENV] = "1"
-    # The module-level DVC filesystem (local_tools.DVCFS) was built in the
-    # parent at import; once the parent has streamed through it, its inner
-    # fsspec/s3fs objects are pinned to the parent's pid and a forked child
-    # dies on them ("This class is not fork-safe" -- CI, 2026-09-07).  Give
-    # the child its own.  Callers import DVCFS inside function bodies, so
-    # rebinding the module attribute is what they see.
-    try:
-        from . import local_tools
-        local_tools.DVCFS = local_tools._build_dvcfs()
-    except Exception:  # noqa: BLE001 -- the parent-side fallback still covers it
-        pass
     try:
         import threadpoolctl
         threadpoolctl.threadpool_limits(limits=1)

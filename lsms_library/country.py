@@ -3229,6 +3229,32 @@ class Country:
                 f"{self.name}/_/data_scheme.yml."
             )
 
+    def _is_script_path(self, method_name: str, materialize_backend: str | None,
+                        waves: list[str]) -> bool:
+        """Is ``method_name`` built by a script rather than the YAML path?
+
+        True when the table declares ``materialize: make``, has a country-level
+        ``_/{table}.py`` concatenator, or has a wave-level ``{wave}/_/{table}.py``
+        script in any of ``waves`` (run through run_make_target's wave-script
+        fallback -- GhanaLSS ``food_acquired`` since GH #808 is exactly this:
+        seven wave scripts, no make flag, no country script).  Wave folders are
+        resolved through ``wave_folder_map`` (Tanzania ``2008-15``, Nigeria
+        round dirs), the same way ``run_make_target`` resolves them, so a
+        mapped label is found where ``file_path / label`` would miss it.
+        Deliberately a pure path probe: it does NOT build ``Wave`` objects
+        (``self[wave]``) -- the cache-hit paths this feeds must not touch a
+        wave, and ``tests/test_dvc_caching.py`` pins that with a
+        ``__getitem__`` that raises.  Consumed by
+        ``_assert_built_required_columns``.
+        """
+        if materialize_backend == "make":
+            return True
+        if (self.file_path / "_" / f"{method_name}.py").exists():
+            return True
+        folder_map = getattr(self, "wave_folder_map", None) or {}
+        return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
+                   for w in waves)
+
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
@@ -3993,14 +4019,15 @@ class Country:
         # wave parquets can shadow a wave-script fix), fail with an actionable
         # message if a required declared column is missing post-finalize, rather
         # than silently returning wrong data.  ``materialize_backend`` is an
-        # unreliable signal -- GhanaLSS food_acquired is script-built via the
-        # wave-script fallback + a ``_/food_acquired.py`` concatenator yet
-        # declares no ``materialize: make`` -- so we also treat the presence of
-        # a country-level ``_/{table}.py`` concatenator as script-path.
-        is_script_path = (
-            materialize_backend == "make"
-            or (self.file_path / "_" / f"{method_name}.py").exists()
-        )
+        # unreliable signal -- a table can be script-built without declaring
+        # ``materialize: make``: GhanaLSS ``food_acquired`` is built by per-wave
+        # ``{wave}/_/food_acquired.py`` scripts through run_make_target's
+        # wave-script fallback, and since GH #808 has NO country-level
+        # concatenator -- so a country-level ``_/{table}.py`` OR any wave-level
+        # ``{wave}/_/{table}.py`` counts as script-path.  Wave folders are
+        # resolved through wave_folder_map (Tanzania ``2008-15``, Nigeria
+        # round dirs), without constructing a Wave.
+        is_script_path = self._is_script_path(method_name, materialize_backend, waves)
         self._assert_built_required_columns(result, method_name, scheme_entry,
                                             is_script_path)
         return result
