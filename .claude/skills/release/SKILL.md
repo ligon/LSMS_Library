@@ -22,13 +22,16 @@ So **before** `make release`, open a **`development` → `master` merge PR** and
 put closing keywords for every issue resolved since the last release in its body:
 
 ```
-Closes #498, #499, #500, #501, #502, #530, #551
+Closes #498, closes #499, closes #500, closes #501, closes #502
 ```
 
-This is the *only* point those issues auto-close: GitHub fires closing keywords
-only when they reach the default branch, and only via `Closes`/`Fixes`/`Resolves
-#N` (keyword + space) — **not** the `fix(#N):` conventional-commit scope style
-the fix commits use. Omit this and the resolved issues stay open after the merge
+**One keyword per issue.** A comma list after a single keyword closes only
+the FIRST issue: v0.11.0's PR #807 carried `Closes #764, #799, #800, #801,
+#803, #806, #808` and GitHub closed #764 alone; the other six were closed by
+hand (2026-09-08). This is the *only* point those issues auto-close: GitHub
+fires closing keywords only when they reach the default branch, and only via
+`Closes`/`Fixes`/`Resolves #N` (keyword + space) — **not** the `fix(#N):`
+conventional-commit scope style the fix commits use. Omit this and the resolved issues stay open after the merge
 (exactly what happened up to v0.8.0 — a batch had to be closed by hand). Build a
 candidate list, then **verify each is genuinely resolved** (not an umbrella issue
 a PR merely touched) before listing it:
@@ -38,6 +41,14 @@ a PR merely touched) before listing it:
 gh pr list --state merged --limit 400 --json number,headRefName \
   -q '.[].headRefName' | grep -oE '(fix|feat)/[0-9]+' | grep -oE '[0-9]+' | sort -un
 ```
+
+> **Merge the release PR with a MERGE COMMIT, never "Squash and merge".**
+> A squash gives `master` a commit that is not in `development`'s history,
+> so the *next* `development -> master` PR has an ancient merge base and
+> shows as CONFLICTING on every file both sides touched (v0.11.0: #807 was
+> squashed, and the one-line hotfix PR #814 could not be merged; it had to
+> be cherry-picked onto `master` as #815, then `master` merged back into
+> `development` to realign the histories).
 
 Cut a release:
 
@@ -112,6 +123,17 @@ python3 -m pip install --user --ignore-installed \
 Verify with `poetry self show plugins` — the plugin should be
 listed. Then `poetry version` should report the dynamic version
 from the latest git tag, not `0.0.0`.
+
+## The placeholder's SECTION matters, not just its value
+
+`poetry-dynamic-versioning` in PEP 621 mode substitutes `[tool.poetry]
+version = "0.0.0"` and requires `[project]` to carry **no** static `version`
+(only `dynamic = ["version"]`). A killed `poetry build`/`poetry lock` leaves
+the plugin's substituted form on disk, which MOVES `version` into `[project]`;
+restoring the value `0.0.0` without moving it back looks fine, passes a
+line-based check, and makes `poetry version -s` resolve `0.0.0` -- exactly
+how v0.11.0's first publish run (34193399219, 2026-09-08) failed at the
+sanity gate. `tests/test_version_placeholder.py` now checks the section.
 
 ## `poetry build` hangs on Linux keyring without a TTY
 

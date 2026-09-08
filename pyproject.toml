@@ -32,7 +32,6 @@ dependencies = ["pandas >=3.0",
              # import by CFEDemands; folium is lazy (interactive maps only).
              "matplotlib (>=3.10.0,<4.0.0)",
              "folium (>=0.19)"]
-version = "0.0.0"
 
 [project.scripts]
 lsms-library = "lsms_library.cli:main"
@@ -41,6 +40,7 @@ lsms-library = "lsms_library.cli:main"
 repository = "https://github.com/ligon/LSMS_Library"
 
 [tool.poetry]
+version = "0.0.0"
 include = [
     "lsms_library/countries/.dvc/config",
     "lsms_library/countries/.dvc/s3_config",
