@@ -10,15 +10,26 @@ declared matrix:
   country-level table once; we slice it on the ``t`` index level and run the
   existing :func:`diagnostics.is_this_feature_sane` per wave.
 
-See `.coder/charter-coverage-matrix.md` and `.coder/ledger/coverage-matrix.md`.
+A table built by a **country-level** ``_/{feature}.py`` and declared by no wave
+is the exception to the first bullet: ``Wave.data_scheme`` has nothing to say
+about it, so its coverage is read off the *built* table's ``t`` level instead
+(:func:`_is_country_level_only`, GH #818).  Only ``panel_ids`` / ``updated_ids``
+-- dicts, no wave axis at all -- are still keyed by name.
+
+See `.coder/charter-coverage-matrix.md`, `.coder/ledger/coverage-matrix.md` and
+`.coder/ledger/818-coverage-country-level.md`.
 
 Tier ladder (worst→best; each derived from existing machinery only):
 
 =====================  ====================================================
 tier                   meaning
 =====================  ====================================================
-n/a                    no per-wave readiness applies: a country-level-only
-                       feature, or a table with no ``t`` axis
+n/a                    no per-wave readiness applies: a feature with no wave
+                       axis at all (``panel_ids`` / ``updated_ids``), or a
+                       built table with no ``t`` index level.  NOT merely
+                       "built by a country-level script" -- such a table
+                       usually DOES carry ``t`` and is graded per wave from it
+                       (GH #818).
 blocked                we WANT it, we KNOW where it is, and we CANNOT get it —
                        the acquisition channel is broken (Nepal: NSO site down;
                        Albania 1996).  A LIVE gap, not a settled one: visible,
@@ -425,15 +436,16 @@ def _env():
     from .paths import countries_root
     return {
         "catalog": catalog, "Country": Country,
-        # `nutrition` joins the JSON-cache methods here: it is declared by no
-        # wave anywhere in the corpus (every country that ships it has a single
-        # country-level `_/nutrition.py` writing `../var/nutrition.parquet`),
-        # so per-wave grading asks a question the feature cannot answer and
-        # returns `absent` for every wave of the countries that DO have it.
-        # Measured 2026-09-04, when #774 put it on the matrix axis: Uganda 8,
-        # GhanaLSS 7, Ethiopia 5 -- 20 `absent` cells for three countries whose
-        # nutrition tables build fine.  Graded country-level it is one row each.
-        "COUNTRY_LEVEL_ONLY": frozenset(JSON_CACHE_METHODS) | {"nutrition"},
+        # The ONLY features with no wave axis at all.  `panel_ids` and
+        # `updated_ids` are `@property` dicts, not DataFrames -- there is no `t`
+        # to slice, so :func:`grade_country_level` is the only thing that can
+        # grade them and a NAME is the right key.
+        #
+        # `nutrition` used to be here too, hand-added by #774.  That was the
+        # wrong key and it is gone (GH #818): "country-level" is a property of
+        # the `(country, feature)` DECLARATION, not of the feature name.  See
+        # :func:`_is_country_level_only`.
+        "COUNTRY_LEVEL_ONLY": frozenset(JSON_CACHE_METHODS),
         "is_this_feature_sane": is_this_feature_sane, "load_feature": load_feature,
         "DERIVED_SOURCE": dict(_DERIVED_SOURCE), "countries_root": countries_root,
     }
@@ -482,6 +494,37 @@ def _has_country_level_feature(country: str, feature: str, countries_root) -> bo
     return (d / f"{feature}.py").exists() or (d / f"{feature}.json").exists()
 
 
+def _is_country_level_only(country: str, feature: str, avail_by_wave: dict,
+                           countries_root) -> bool:
+    """Is this ``(country, feature)`` built ONLY by a country-level script?
+
+    True when the country ships a country-level ``_/{feature}.py`` (or ``.json``)
+    **and** no wave of that country declares the feature.  Both halves matter:
+
+    - the script alone is not enough -- Nigeria ships `_/crop_production.py`
+      *and* per-wave declarations for other tables, and six of its features are
+      country-level while the rest are not;
+    - "declared by no wave" alone is not enough either -- Nepal and Peru declare
+      tables no wave carries and have no country-level script, so their cells are
+      genuinely `absent` (nobody wrote the config) and must stay that way.
+
+    Why a test and not the old name allowlist (GH #818)
+    ---------------------------------------------------
+    Country-level-ness is a property of the ``(country, feature)`` DECLARATION.
+    ``community_prices`` is per-wave in seven countries and country-level in
+    exactly one (EthiopiaRHS), so no set of feature names can express it: the old
+    ``COUNTRY_LEVEL_ONLY`` name list graded all eight EthiopiaRHS waves `absent`
+    ("source not declared for wave") for a table that serves six of them with
+    2,691 rows -- i.e. it put a built, working cell in the *live work queue*.
+    The allowlist could only ever be right for whoever last remembered to edit
+    it; `nutrition` was on it and `community_prices` was not, for no reason
+    beyond which one someone had hit first.
+    """
+    if any(feature in declared for declared in avail_by_wave.values()):
+        return False
+    return _has_country_level_feature(country, feature, countries_root)
+
+
 def _safe_build(co, feature, env):
     """Build a country-level feature, capturing warnings/exceptions.
 
@@ -498,7 +541,7 @@ def _safe_build(co, feature, env):
 
 def grade_feature(country_name, feature, waves, co, env, *,
                   avail_by_wave=None, blessed=frozenset(), verdicts=None,
-                  blocked=None, readiness=True) -> list[dict]:
+                  blocked=None, readiness=True, country_level=False) -> list[dict]:
     """Per-wave cells for one ``(country, feature)``.
 
     Builds the country-level table at most once (``readiness=True``) and grades
@@ -508,6 +551,28 @@ def grade_feature(country_name, feature, waves, co, env, *,
     precomputes it once per country (it is identical across that country's
     features). When ``None`` we compute it here, keeping the function
     self-contained for tests / one-off calls.
+
+    ``country_level`` (GH #818) says this table is built by a country-level
+    script and declared by no wave -- see :func:`_is_country_level_only`, which
+    is what :func:`build_matrix` passes.  Per-wave declaration then carries NO
+    information (there is nothing to declare), so instead of reading `covered`
+    off ``Wave.data_scheme`` we seed it all-True and **refine it from the built
+    table's own ``t`` level**: the waves the country-level build actually serves
+    are the waves it covers.  That is deliberately the only source of the
+    classification -- it is a fact about the delivered table, not about config.
+
+    The seeding is what makes the failure modes come out right:
+
+    - build raises / empty -> the existing `broken` branch fires for every wave,
+      so a country-level build that BREAKS stays visible.  (Under the old name
+      allowlist these features graded `absent` -- the quietest possible reading
+      of a broken build.)
+    - built table has no ``t`` axis -> the existing t-less branch fires
+      unchanged: per-wave `n/a` plus one country-level row.
+    - built table has ``t`` -> waves in ``t`` are graded normally; waves outside
+      it fall back to `absent` with the usual detail, never to `dropped`.
+      `dropped` means "declared for the wave but missing from the build", and a
+      wave that declares nothing cannot have dropped anything.
     """
     if avail_by_wave is None:
         derived_source = env["DERIVED_SOURCE"]
@@ -517,7 +582,9 @@ def grade_feature(country_name, feature, waves, co, env, *,
                 avail_by_wave[w] = wave_available_features(co[w], derived_source)
             except Exception:  # noqa: BLE001 — a broken wave declares nothing
                 avail_by_wave[w] = set()
-    covered: dict[str, bool] = {w: feature in avail_by_wave[w] for w in waves}
+    covered: dict[str, bool] = {
+        w: True if country_level else feature in avail_by_wave[w] for w in waves
+    }
     verdicts = {} if verdicts is None else verdicts
     blocked = {} if blocked is None else blocked
 
@@ -614,6 +681,15 @@ def grade_feature(country_name, feature, waves, co, env, *,
 
     t_values = {str(v) for v in df.index.get_level_values("t").unique()}
     t_level = df.index.get_level_values("t").astype(str)
+
+    # GH #818: for a country-level-only table the built `t` level IS the
+    # coverage statement -- refine the all-True seed with it, BEFORE the loop
+    # below, so a wave the build does not serve reads `absent` (nobody declared
+    # it) rather than `dropped` (declared, then lost).  Nothing else touches
+    # `covered`, so every per-wave-declared feature keeps its config-derived
+    # value byte-for-byte.
+    if country_level:
+        covered = {w: str(w) in t_values for w in waves}
 
     # Columns populated SOMEWHERE in the country frame.  Exempt these from the
     # per-wave ``no_all_null_columns`` check: it is a *country-level* check, and
@@ -787,11 +863,18 @@ def build_matrix(countries=None, features=None, *, readiness=True,
         log(f"  {c}: {len(waves)} waves × {len(sel)} features"
             + ("" if readiness else " (coverage only)"))
         for f in sel:
+            # GH #818: country-level-ness is a DECLARATION test, decided here
+            # (where `avail_by_wave` and `countries_root` already live) and
+            # passed down as a flag.  `grade_feature`'s `env` is a plain dict
+            # that the unit-test fakes build with three keys, so it must not
+            # start reaching into it for `countries_root`.
             rows.extend(grade_feature(c, f, waves, co, env,
                                       avail_by_wave=avail_by_wave,
                                       blessed=blessed, verdicts=verdicts,
                                       blocked=blocked,
-                                      readiness=readiness))
+                                      readiness=readiness,
+                                      country_level=_is_country_level_only(
+                                          c, f, avail_by_wave, countries_root)))
 
         # GH #724: a feature the corpus grades everyone on that THIS country
         # never declares.  One row per (country, feature) with a blank wave --
