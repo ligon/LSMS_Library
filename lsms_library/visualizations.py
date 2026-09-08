@@ -133,14 +133,17 @@ def _resolve_roster(data: Any, wave: str | None) -> tuple[pd.DataFrame, str, str
 
 def _attach(roster: pd.DataFrame, country_name: str | None,
             weights: bool | str, by: str | None,
-            noun: str = "roster") -> tuple[pd.DataFrame, str]:
+            noun: str = "roster",
+            unweighted_text: str = "drawing unweighted counts.") -> tuple[pd.DataFrame, str]:
     """Join ``weight`` / the ``by=`` column from ``sample()`` onto the roster.
 
     ``Rural``, ``strata`` and the weights live on ``sample()`` at ``(i, t)``
     grain, not on the roster -- so conditioning and weighting need the same
     join, which is why they are done together here.  Any frame keyed by
     ``(i, t)`` can use it; ``noun`` is what the error calls that frame
-    ("roster" for the pyramid, "household-frame" for the Lorenz curve).
+    ("roster" for the pyramid, "household-frame" for the Lorenz curve), and
+    ``unweighted_text`` is how the two fallback warnings end -- a Lorenz
+    curve draws no counts, so it says "proceeding unweighted." instead.
     """
     from .country import Country
 
@@ -154,7 +157,7 @@ def _attach(roster: pd.DataFrame, country_name: str | None,
             smp = Country(country_name).sample().reset_index()
         except Exception as exc:
             warnings.warn(f"sample() unavailable for {country_name} ({exc}); "
-                          "drawing unweighted counts.", stacklevel=3)
+                          f"{unweighted_text}", stacklevel=3)
             smp = None
         if smp is not None:
             keys = [k for k in ("i", "t") if k in df.columns and k in smp.columns]
@@ -169,7 +172,7 @@ def _attach(roster: pd.DataFrame, country_name: str | None,
             basis = "weighted by the survey's sampling weights"
         else:
             df["_w"] = 1.0
-            warnings.warn("no sampling weights available; drawing unweighted counts.",
+            warnings.warn(f"no sampling weights available; {unweighted_text}",
                           stacklevel=3)
     elif isinstance(weights, str):
         if weights not in df.columns:
@@ -468,9 +471,10 @@ _MAX_WAVES = 5
 
 #: How far toward white the OLDEST wave of a multi-wave ramp is mixed.  The
 #: design asked for "about 55%"; the dataviz palette validator said no -- at
-#: 0.55 the light end sits at 1.92:1 against a white surface, under its 2:1
-#: floor -- and at 0.45 five steps crowd below the 0.06 lightness gap.  0.50
-#: clears both (light end 2.09:1; every gap >= 0.06 for three and for five).
+#: 0.55 the light end sits at 1.92:1 against the validator's off-white surface
+#: (#fcfcfb; 1.97:1 on pure white), under its 2:1 floor -- and at 0.45 five
+#: steps crowd below the 0.06 lightness gap.  0.50 clears both (light end
+#: 2.09:1 on that surface; every gap >= 0.06 for three and for five).
 _RAMP_CAP = 0.50
 
 
@@ -557,19 +561,27 @@ def _sum_to_households(obj, column=None):
         raise ValueError("the measure needs an 'i' (household) index level to be "
                          f"summed to household grain; it has {names or 'none'}")
     keys = [k for k in ("i", "t") if k in names]
-    out = s.groupby(level=keys, observed=True).sum()
+    # min_count=1: a household whose every row is NaN comes back NaN, to be
+    # counted as "no usable value" -- not as a silent zero.
+    out = s.groupby(level=keys, observed=True).sum(min_count=1)
     return out.rename("_x")
 
 
 def _country_measure(country, waves, value, basis):
     """Household-grain welfare measure for one Country and a list of waves.
 
-    Returns ``(series, names, no_inkind)`` where ``series`` is ``_x`` indexed
+    ``waves=None`` reads every wave (the caller then picks the most recent
+    the measure actually holds -- ``Country.waves`` can list a wave with no
+    food rows, as Nigeria's ``2024Q1``); a list reads only those.
+
+    Returns ``(series, names, sources)`` where ``series`` is ``_x`` indexed
     by ``(i, t)``; ``names`` is a dict of the words the chart uses for the
     measure (``axis`` for the y-label, ``text`` for the subtitle, ``short``
     for the direct label, ``absent`` for the no-record disclosure); and
-    ``no_inkind`` is True when ``basis='total'`` changed nothing because the
-    ``s`` level holds only ``'purchased'``.
+    ``sources`` is the frame of distinct ``(t, s)`` acquisition-source pairs
+    the food table held (``None`` for any other measure), read off the level
+    that is already here rather than by calling the API twice -- the caller
+    uses it to say when ``basis='total'`` had nothing to add.
     """
     if value is None:
         kw = {"waves": waves}
@@ -580,29 +592,28 @@ def _country_measure(country, waves, value, basis):
             raise ValueError(f"{country.name}.food_expenditures() returned no "
                              "'Expenditure' column")
         total = basis == "total"
-        no_inkind = False
-        if total and "s" in fe.index.names:
-            # Read the level that is already here rather than calling the API
-            # twice: if every row is 'purchased', 'total' had nothing to add.
-            held = set(map(str, pd.unique(fe.index.get_level_values("s").dropna())))
-            no_inkind = held <= {"purchased"}
+        sources = None
+        if "s" in fe.index.names and "t" in fe.index.names:
+            sources = (fe.index.to_frame(index=False)[["t", "s"]]
+                       .dropna().astype(str).drop_duplicates())
         names = {
             "axis": "food spending",
             "text": "all recorded food acquisition" if total else "food purchases",
             "short": "spending",
             "absent": "acquisition" if total else "purchase",
         }
-        return _sum_to_households(fe, "Expenditure"), names, no_inkind
+        return _sum_to_households(fe, "Expenditure"), names, sources
 
     if isinstance(value, pd.Series):
         s = value
         if "t" not in s.index.names:
             raise ValueError("a Series passed as value= must carry a 't' index "
                              "level so it can be matched to the wave(s) drawn")
-        s = s[s.index.get_level_values("t").isin(waves)]
+        if waves is not None:
+            s = s[s.index.get_level_values("t").astype(str).isin(waves)]
         name = str(s.name) if s.name is not None else "value"
         names = {"axis": name, "text": name, "short": name, "absent": name}
-        return _sum_to_households(s), names, False
+        return _sum_to_households(s), names, None
 
     if isinstance(value, str):
         method = getattr(country, value, None)
@@ -626,7 +637,7 @@ def _country_measure(country, waves, value, basis):
                 "a Series indexed by (i, t) if you mean to draw it anyway."
             )
         names = {"axis": value, "text": value, "short": value, "absent": value}
-        return _sum_to_households(tbl, "Expenditure"), names, False
+        return _sum_to_households(tbl, "Expenditure"), names, None
 
     raise TypeError("value= takes None, a table name, or a pandas Series indexed by "
                     f"(i, t); got {type(value).__name__}")
@@ -657,8 +668,11 @@ def _household_sizes(country, waves):
 def _select_waves(held, wave, name):
     """Resolve ``wave`` against the waves ``held``; returns ``(waves, is_list)``.
 
-    Same rule as the other two charts: with several waves and no choice, the
-    most recent is drawn and the choice is reported.
+    ``held`` must be the waves the *table itself* carries -- read off its
+    ``t`` level, as ``_resolve_roster`` and ``_cluster_frame`` do -- not
+    ``Country.waves``, which can list a wave the table has no rows for.
+    With several held and no choice, the most recent is drawn and the choice
+    is reported.
     """
     held = [str(h) for h in held]
     if wave is None:
@@ -708,6 +722,9 @@ def _by_groups(df, by):
     else:
         col, pick = by, None
     held = list(pd.unique(df[col].dropna()))
+    if not held:
+        raise ValueError(f"by={col!r} has no non-null value among the households "
+                         "drawn; there is nothing to split on")
     if pick is None:
         if len(held) > 2:
             raise ValueError(
@@ -747,8 +764,9 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
         column, summed over every level but ``(i, t)``) or a household-grain
         frame whose welfare column ``value`` names.
     wave : str or list of str, optional
-        One wave (default: the most recent, with a warning when several are
-        held), or a list of up to five drawn as separate labelled curves in
+        One wave (default: the most recent wave the *measure* holds, with a
+        warning when it holds several -- ``Country.waves`` can list a wave
+        with no food rows), or a list of up to five drawn as separate labelled curves in
         an ordered ramp of one hue -- most recent in the full ink.  A list
         together with ``by`` is an error: colour has one job.
     value : None, str, or pandas.Series, optional
@@ -836,21 +854,41 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
 
     disclose = {}          # measured counts -> subtitle, only when non-zero
     no_inkind = False
+    sample_keys = None     # the wave's sample() households, Country path only
     if country is not None:
         # ---- Country path: measure, size, sample, all at (i, t) ---------
         if size is not None:
             raise TypeError("size= names a column of a household frame; for a "
                             "Country, size comes from household_characteristics")
         cname = country.name
-        waves, is_list = _select_waves(country.waves, wave, cname)
-        measure, names, no_inkind = _country_measure(country, waves, value, basis)
-        if "t" not in measure.index.names:
-            raise ValueError("the measure has no 't' level; cannot place it in a wave")
+        if wave is None:
+            # No wave named: read the whole measure and pick the most recent
+            # wave IT holds.  `Country.waves` is the config's list and can end
+            # in a wave with no food rows (Nigeria's 2024Q1); the pyramid and
+            # the map read their table's own `t` for the same reason.
+            measure, names, sources = _country_measure(country, None, value, basis)
+            if "t" not in measure.index.names:
+                raise ValueError("the measure has no 't' level; cannot place it in a wave")
+            held = list(pd.unique(measure.index.get_level_values("t").dropna().astype(str)))
+            if not held:
+                raise ValueError(f"{cname}: {names['text']} has no rows in any wave")
+            waves, is_list = _select_waves(held, None, cname)
+        else:
+            # A named wave: read only that (0.3 s vs 13 s on warm Uganda).
+            waves, is_list = _select_waves(country.waves, wave, cname)
+            measure, names, sources = _country_measure(country, waves, value, basis)
+            if "t" not in measure.index.names:
+                raise ValueError("the measure has no 't' level; cannot place it in a wave")
         hh = measure.reset_index()
         hh = hh[hh["t"].astype(str).isin(waves)].copy()
         hh["t"] = hh["t"].astype(str)
         if hh.empty:
             raise ValueError(f"{cname}: no {names['text']} rows in wave(s) {waves}")
+        if basis == "total" and sources is not None:
+            # Every source in the drawn wave(s) is 'purchased': 'total' added
+            # nothing, and the subtitle should say so.
+            held_s = set(sources.loc[sources["t"].isin(waves), "s"])
+            no_inkind = held_s <= {"purchased"}
 
         # The interviewed households: the set that defines `zeros`.  Read
         # here only for that set -- `_attach` joins the weights itself, and
@@ -866,8 +904,12 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
             si = smp.reset_index()[["i", "t"]]
             si["t"] = si["t"].astype(str)
             si = si[si["t"].isin(waves)].drop_duplicates()
+            sample_keys = pd.MultiIndex.from_frame(si)
+            # `have` is every household the measure has a row for, usable or
+            # not: a household whose rows are all NaN is "no usable value"
+            # below, not a second time here as "no recorded purchase".
             have = pd.MultiIndex.from_frame(hh[["i", "t"]])
-            absent = pd.MultiIndex.from_frame(si).difference(have)
+            absent = sample_keys.difference(have)
             disclose["zeros"] = len(absent)
             if zeros == "include" and len(absent):
                 add = absent.to_frame(index=False)
@@ -875,6 +917,8 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
                 hh = pd.concat([hh, add], ignore_index=True)
         else:
             disclose["zeros"] = 0
+        disclose["no_value"] = int(hh["_x"].isna().sum())
+        hh = hh[hh["_x"].notna()].copy()
 
         if per == "person":
             sizes = _household_sizes(country, waves)
@@ -901,6 +945,11 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
         cname = None
         long_shape = "j" in frame.index.names
         if long_shape:
+            if per == "person":
+                raise ValueError(
+                    "per='person' needs a household size, and an item-level frame "
+                    "(with a 'j' level) has none; pass per='household', or sum to "
+                    "household grain yourself and pass a frame with a size column")
             col = value if isinstance(value, str) else "Expenditure"
             if col not in frame.columns:
                 raise KeyError(f"{col!r} is not a column of this frame; columns: "
@@ -925,6 +974,14 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
             else:
                 raise TypeError("on a frame, value= names a column (str)")
             hh = frame.reset_index().copy()
+            keys = [k for k in ("i", "t") if k in hh.columns]
+            if "i" in keys:
+                dup = int(hh.duplicated(keys).sum())
+                if dup:
+                    raise ValueError(
+                        f"the household frame has {dup} duplicated {tuple(keys)} key(s); "
+                        "one row per household is required -- sum item rows to "
+                        "household grain first (or pass the item-level frame itself)")
             hh["_x"] = pd.to_numeric(hh[col], errors="coerce")
             size_col = size or "size"
             if per == "person":
@@ -943,6 +1000,7 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
             if isinstance(wave, (list, tuple)):
                 raise ValueError("wave=[...] needs a 't' level or column on the frame")
             waves, is_list = [wave], False
+        disclose["no_value"] = int(hh["_x"].isna().sum())
         hh = hh[hh["_x"].notna()].copy()
         if per == "person":
             bad = hh["size"].isna() | (hh["size"] <= 0)
@@ -957,7 +1015,8 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
 
     # ---- weights and the `by` column, joined from sample() -----------------
     by_col = by[0] if isinstance(by, (list, tuple)) else by
-    df, wbasis = _attach(hh, cname, weights, by_col, noun="household-frame")
+    df, wbasis = _attach(hh, cname, weights, by_col, noun="household-frame",
+                         unweighted_text="proceeding unweighted.")
     noun = "people" if per == "person" else "households"
 
     if per == "person":
@@ -967,7 +1026,15 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
         df["_y"] = df["_x"]
         df["_wy"] = df["_w"]
     unweighted = ~(df["_wy"] > 0)
-    disclose["no_weight"] = int(unweighted.sum())
+    if sample_keys is not None and unweighted.any():
+        # Two different facts: a household the survey did not sample at all,
+        # and one it sampled but shipped with a null weight (Uganda 2009-10,
+        # Nigeria 2012Q3+).  Say which.
+        in_sample = pd.MultiIndex.from_frame(df[["i", "t"]].astype(str)).isin(sample_keys)
+        disclose["not_in_sample"] = int((unweighted & ~in_sample).sum())
+        disclose["no_weight"] = int((unweighted & in_sample).sum())
+    else:
+        disclose["no_weight"] = int(unweighted.sum())
     df = df[~unweighted].copy()
     if df.empty:
         raise ValueError(f"no household left to draw for {label}")
@@ -979,9 +1046,15 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
         disclose["outside"] = n_out
         disclose["by_na"] = int(df[col].isna().sum())
         gnames = {str(g) for g in groups}
-        for gi, g in enumerate(groups):
-            sub = df[df[col] == g]
-            series.append((str(g), pal["bar"] if gi == 0 else pal["alt"], sub))
+        if len(groups) == 1:
+            # One value is no split: draw it as the single series (fill,
+            # direct label, Gini in the subtitle) and say so.
+            disclose["by_one"] = (col, str(groups[0]))
+            series.append((None, pal["bar"], df[df[col] == groups[0]]))
+        else:
+            for gi, g in enumerate(groups):
+                sub = df[df[col] == g]
+                series.append((str(g), pal["bar"] if gi == 0 else pal["alt"], sub))
         legend_title = None if (col in gnames or len(groups) < 2) else col
     elif is_list:
         colours = _ramp(pal["bar"], len(waves))
@@ -1067,9 +1140,13 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
     if k:
         fate = "drawn at zero" if zeros == "include" else "not drawn"
         bits.append(f"{k:,} with no recorded {names['absent']}, {fate}")
+    if disclose.get("no_value", 0):
+        bits.append(f"{disclose['no_value']:,} with no usable value, not drawn")
     m = disclose.get("no_roster", 0)
     if m:
         bits.append(f"{m:,} without a usable roster, not drawn")
+    if disclose.get("not_in_sample", 0):
+        bits.append(f"{disclose['not_in_sample']:,} not in sample(), not drawn")
     if disclose.get("no_weight", 0):
         bits.append(f"{disclose['no_weight']:,} without a sampling weight, not drawn")
     if disclose.get("outside", 0):
@@ -1077,6 +1154,9 @@ def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
                     "not drawn")
     if disclose.get("by_na", 0):
         bits.append(f"{disclose['by_na']:,} with no {by_col} value, not drawn")
+    if disclose.get("by_one"):
+        bcol, bval = disclose["by_one"]
+        bits.append(f"by={bcol} had one value ({bval})")
     if no_inkind:
         bits.append("no in-kind value recorded")
 

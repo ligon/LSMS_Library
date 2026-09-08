@@ -511,6 +511,12 @@ def test_per_person_without_a_size_column_raises():
                  per="household")
 
 
+def test_item_level_frame_with_per_person_raises_early():
+    """A long frame cannot carry a size; say so instead of dying on KeyError."""
+    with pytest.raises(ValueError, match="item-level frame .* has none; pass per='household'"):
+        lorenz_curve(_long(50), weights=False)
+
+
 def test_expenditure_shaped_frame_is_summed_to_household_grain():
     a = lorenz_curve(_long(50), weights=False, per="household")
     b = lorenz_curve(_households(50), value="value", weights=False, per="household")
@@ -613,7 +619,8 @@ def test_subtitle_states_basis_and_weighting_and_the_half_label_matches_the_curv
 
 
 def test_lorenz_missing_weights_warn_rather_than_fail():
-    with pytest.warns(UserWarning, match="no sampling weights"):
+    """Same fallback as the pyramid, but a Lorenz curve draws no 'counts'."""
+    with pytest.warns(UserWarning, match="no sampling weights available; proceeding unweighted"):
         lorenz_curve(_households().drop(columns="weight"), value="value")
 
 
@@ -631,6 +638,68 @@ def test_matplotlib_error_names_its_caller():
     """The shared message is a template now; each chart fills in its own name."""
     assert _MISSING_MPL.format(caller="lorenz_curve").startswith("lorenz_curve() needs")
     assert "population_pyramid" not in _MISSING_MPL
+
+
+def test_nan_values_are_counted_not_silently_dropped():
+    h = _households(30)
+    h.iloc[:5, h.columns.get_loc("value")] = np.nan
+    ax = lorenz_curve(h, value="value", weights=False)
+    text = _all_text(ax)
+    assert "25 households" in text and "5 with no usable value, not drawn" in text
+
+    # An all-NaN household in an item-level frame must stay NaN (min_count=1),
+    # so it lands in the same disclosure rather than becoming a silent zero.
+    long = _long(20)
+    hh0 = long.index.get_level_values("i") == "h0"
+    long.loc[hh0, "Expenditure"] = np.nan
+    ax = lorenz_curve(long, weights=False, per="household")
+    assert "19 households" in _all_text(ax) and "1 with no usable value" in _all_text(ax)
+
+
+def test_duplicate_household_keys_raise_rather_than_double_count():
+    h = _households(30)
+    dup = pd.concat([h, h])
+    with pytest.raises(ValueError, match=r"30 duplicated \('i', 't'\) key"):
+        lorenz_curve(dup, value="value", weights=False)
+
+
+def test_by_with_a_single_value_is_the_single_series_case():
+    h = _households(30).assign(Rural="Rural")
+    ax = lorenz_curve(h, value="value", weights=False, by="Rural")
+    assert len(ax.lines) == 2 and len(_fills(ax)) == 1
+    assert ax.get_legend() is None
+    text = _all_text(ax)
+    assert re.search(r"Gini \d\.\d\d", text) and "by=Rural had one value (Rural)" in text
+    assert any("poorest half" in t.get_text() for t in ax.texts)
+
+
+def test_by_column_with_no_values_raises_actionably():
+    h = _households(30).assign(Rural=pd.NA)
+    with pytest.raises(ValueError, match="has no non-null value"):
+        lorenz_curve(h, value="value", weights=False, by="Rural")
+
+
+def test_per_person_weighting_is_exactly_size_times_weight():
+    """per='person' draws _lorenz(x/size, size*w); per='household' _lorenz(x, w)."""
+    h = _households(80)
+    x, size, w = (h[c].to_numpy(dtype=float) for c in ("value", "size", "weight"))
+    person = lorenz_curve(h, value="value", weights="weight", per="person")
+    F, L, gini = _lorenz(x / size, size * w)
+    assert np.array_equal(_curve(person).get_xdata(), F)
+    assert np.array_equal(_curve(person).get_ydata(), L)
+    assert f"Gini {gini:.2f}" in _all_text(person)
+    household = lorenz_curve(h, value="value", weights="weight", per="household")
+    F, L, gini = _lorenz(x, w)
+    assert np.array_equal(_curve(household).get_xdata(), F)
+    assert np.array_equal(_curve(household).get_ydata(), L)
+    assert f"Gini {gini:.2f}" in _all_text(household)
+
+
+def _gini_of_line(line):
+    """Trapezoid Gini of a drawn polyline -- exact, so two charts can be compared
+    below the two-decimal rounding of the printed number."""
+    F, L = np.asarray(line.get_xdata(), float), np.asarray(line.get_ydata(), float)
+    return 1.0 - float(np.sum(np.diff(F) * (L[1:] + L[:-1])))
 
 
 @pytest.mark.slow
@@ -659,9 +728,11 @@ def test_uganda_lorenz_gini_and_zero_count_are_recomputed_not_pinned():
     size = np.exp(hc["log HSize"]).round()
     size.index = size.index.droplevel("v")
     size = size.reorder_levels(["i", "t"])
-    w = pd.to_numeric(smp["weight"], errors="coerce").dropna()
-    w = w[w.index.get_level_values("t") == "2013-14"]
-    k = len(w.index.difference(x.index))          # in sample, no expenditure row
+    wave = smp[smp.index.get_level_values("t") == "2013-14"]
+    # in sample, no expenditure row -- over ALL sample households of the wave,
+    # null weights included, as the chart counts them
+    k = len(wave.index.difference(x.index))
+    w = pd.to_numeric(wave["weight"], errors="coerce").dropna()
 
     df = pd.concat([x.rename("x"), size.rename("size"), w.rename("w")],
                    axis=1, join="inner")
@@ -678,6 +749,17 @@ def test_uganda_lorenz_gini_and_zero_count_are_recomputed_not_pinned():
     assert "food purchases per person" in text
     assert "weighted by the survey's sampling weights" in text
     assert "Represents:" in " ".join(t.get_text() for t in ax.figure.texts)
+    n_drawn = int(re.search(r"([\d,]+) households", text).group(1).replace(",", ""))
+
+    # zeros='include': the k households join at zero, the curve sags, Gini rises.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        inc = lorenz_curve(c, wave="2013-14", zeros="include")
+    itext = _all_text(inc)
+    assert f"{k:,} with no recorded purchase, drawn at zero" in itext
+    assert f"{n_drawn + k:,} households" in itext
+    assert _gini_of_line(_curve(inc)) > _gini_of_line(_curve(ax))
+    assert _curve(inc).get_ydata()[1] == 0.0, "the first vertex after the origin sits at zero"
 
 
 @pytest.mark.slow
@@ -695,3 +777,22 @@ def test_uganda_wide_nonfood_table_raises_citing_gh817():
         pytest.skip(f"Uganda unavailable: {exc}")
     else:                                         # pragma: no cover
         pytest.fail("a wide nonfood_expenditures table must raise (GH #817)")
+
+
+@pytest.mark.slow
+def test_nigeria_default_wave_is_the_most_recent_the_measure_holds():
+    """Country.waves ends in 2024Q1, which has no food rows; the default must
+    come from the measure's own `t` (as the pyramid reads the roster's)."""
+    ll = pytest.importorskip("lsms_library")
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            c = ll.Country("Nigeria")
+            held = set(map(str, pd.unique(c.food_expenditures().index.get_level_values("t"))))
+            ax = lorenz_curve(c)
+    except Exception as exc:                      # pragma: no cover
+        pytest.skip(f"Nigeria unavailable: {exc}")
+    wave = ax.get_title(loc="left").split()[-1]
+    assert wave in held, (wave, sorted(held))
+    assert wave == max(held)
+    assert wave != "2024Q1" and "2024Q1" in c.waves
