@@ -627,3 +627,189 @@ def test_blocked_source_appears_even_when_not_modelled_as_a_wave(tmp_path, monke
     hit = df[(df["wave"].astype(str) == "1996") & (df["tier"] == "blocked")]
     assert len(hit) == 1, "a blocked, un-modelled wave vanished from the matrix"
     assert "NOT MODELLED as a wave" in hit.iloc[0]["detail"]
+
+
+# ---------------------------------------------------------------------------
+# Country-level-vs-per-wave is a DECLARATION test, not a feature-name allowlist
+# (GH #818).
+#
+# `community_prices` is per-wave in seven countries and country-level in exactly
+# one (EthiopiaRHS), so no set of feature NAMES can express the distinction.
+# Under the old `COUNTRY_LEVEL_ONLY = frozenset(JSON_CACHE_METHODS) |
+# {"nutrition"}` allowlist, EthiopiaRHS's country-level `_/community_prices.py`
+# -- 2,691 rows over six of its eight waves -- graded `absent` ("source not
+# declared for wave") eight times, i.e. a built, working cell sat in the LIVE
+# WORK QUEUE.  `nutrition` avoided that only because someone had hand-added it.
+# ---------------------------------------------------------------------------
+def test_country_level_only_is_graded_per_wave_from_its_t_values():
+    """The built `t` level IS the coverage statement for a country-level table.
+
+    No wave declares `foo` (the country-level script is the only builder), yet
+    the build serves w1 and w3.  Those must be graded; w2 must NOT be.
+    """
+    co = _FakeCountry({"w1": [], "w2": [], "w3": []})
+    df = _df_with_t({"w1": 3, "w3": 5})
+    cells = cov.grade_feature("C", "foo", ["w1", "w2", "w3"], co,
+                              _env(df, _ok_report()), readiness=True,
+                              country_level=True)
+    t = _tiers(cells)
+    assert t[("foo", "w1")] == "sane"
+    assert t[("foo", "w3")] == "sane"
+    # w2 is `absent`, NOT `dropped`.  `dropped` means "declared for the wave but
+    # missing from the build"; a wave that declares nothing cannot have dropped
+    # anything, and grading it `dropped` would invent a defect.
+    assert t[("foo", "w2")] == "absent"
+    assert "not declared" in [c for c in cells if c["wave"] == "w2"][0]["detail"]
+    # n_rows come from the wave slice, not the country total.
+    by_wave = {c["wave"]: c["n_rows"] for c in cells}
+    assert (by_wave["w1"], by_wave["w3"]) == (3, 5)
+
+
+def test_without_the_flag_the_same_table_is_the_818_BUG():
+    """Pin the bug itself, so a regression is a red test and not a silent regrade."""
+    co = _FakeCountry({"w1": [], "w2": [], "w3": []})
+    df = _df_with_t({"w1": 3, "w3": 5})
+    cells = cov.grade_feature("C", "foo", ["w1", "w2", "w3"], co,
+                              _env(df, _ok_report()), readiness=True,
+                              country_level=False)
+    assert set(_tiers(cells).values()) == {"absent"}
+
+
+def test_country_level_build_failure_stays_visible_as_broken():
+    """A country-level build that RAISES must not read as `absent`.
+
+    `absent` says "nobody wrote the config"; a broken build is the opposite
+    claim.  Seeding `covered` all-True is what keeps the existing `broken`
+    branch reachable for this class.
+    """
+    co = _FakeCountry({"w1": [], "w2": []})
+    cells = cov.grade_feature("C", "foo", ["w1", "w2"], co,
+                              _env(RuntimeError("boom"), _ok_report()),
+                              readiness=True, country_level=True)
+    assert set(_tiers(cells).values()) == {"broken"}
+    assert "boom" in cells[0]["detail"]
+
+
+def test_country_level_without_a_t_axis_keeps_the_na_plus_summary_shape():
+    """No `t` to slice -> the pre-existing t-less branch, unchanged."""
+    co = _FakeCountry({"w1": [], "w2": []})
+    df = pd.DataFrame({"x": [1, 2]}, index=pd.Index(["a", "b"], name="i"))
+    cells = cov.grade_feature("C", "foo", ["w1", "w2"], co,
+                              _env(df, _ok_report()), readiness=True,
+                              country_level=True)
+    t = _tiers(cells)
+    assert t[("foo", "w1")] == t[("foo", "w2")] == "n/a"
+    summary = [c for c in cells if c["wave"] == ""]
+    assert len(summary) == 1 and summary[0]["tier"] == "sane"
+
+
+def test_country_level_coverage_only_run_is_declared_not_absent():
+    """The cheap layer cannot know WHICH waves, but it does know it is declared.
+
+    Config alone cannot say which waves a country-level script serves (that is
+    read off the built `t`), so the auth-free layer reports the fact it does
+    have: the country declares the table.  `absent` would repeat the #818 lie in
+    the cheap layer.
+    """
+    co = _FakeCountry({"w1": [], "w2": []})
+    cells = cov.grade_feature("C", "foo", ["w1", "w2"], co, _env(None),
+                              readiness=False, country_level=True)
+    assert set(_tiers(cells).values()) == {"declared"}
+
+
+def test_is_country_level_only_requires_BOTH_halves(monkeypatch):
+    """Script present AND declared by no wave.  Either half alone is wrong."""
+    avail = {"w1": {"bar"}, "w2": {"bar", "baz"}}
+
+    monkeypatch.setattr(cov, "_has_country_level_feature",
+                        lambda c, f, r: f in {"foo", "bar"})
+    root = (lambda: None)
+
+    # both halves -> country-level
+    assert cov._is_country_level_only("C", "foo", avail, root) is True
+    # script exists BUT a wave declares it -> per-wave (Nigeria ships country
+    # scripts for some tables and wave declarations for others)
+    assert cov._is_country_level_only("C", "bar", avail, root) is False
+    # declared by no wave BUT no country script -> genuinely `absent`; nobody
+    # wrote the config (Nepal / Peru / Uganda `fct`).  This half is what keeps
+    # the fix from laundering un-started work into a graded cell.
+    assert cov._is_country_level_only("C", "baz", avail, root) is False
+    assert cov._is_country_level_only("C", "quux", avail, root) is False
+
+
+def test_the_name_list_is_now_ONLY_the_wave_axis_less_features():
+    """`COUNTRY_LEVEL_ONLY` may name only features with no wave axis at all.
+
+    `panel_ids` / `updated_ids` are `@property` dicts, not DataFrames: there is
+    no `t` to slice, so a NAME is the right key for them and only for them.
+    """
+    from lsms_library.country import JSON_CACHE_METHODS
+    assert cov._env()["COUNTRY_LEVEL_ONLY"] == frozenset(JSON_CACHE_METHODS)
+    assert "nutrition" not in cov._env()["COUNTRY_LEVEL_ONLY"]
+
+
+def test_grade_country_level_still_grades_a_json_cache_method():
+    """The path the name list still routes to is unchanged."""
+    env = {"load_feature": lambda _co, _f: {"a": "b", "c": "d"}}
+    cell = cov.grade_country_level("C", "panel_ids", object(), env)
+    assert (cell["tier"], cell["wave"], cell["n_rows"]) == ("sane", "", 2)
+
+    env_broken = {"load_feature": _raise(RuntimeError("nope"))}
+    cell = cov.grade_country_level("C", "panel_ids", object(), env_broken)
+    assert cell["tier"] == "broken"
+
+
+def _raise(exc):
+    def _f(*_a, **_k):
+        raise exc
+    return _f
+
+
+def test_ethiopiarhs_community_prices_is_country_level_and_ethiopia_is_not(monkeypatch):
+    """The real config, over the two countries the issue contrasts (config only).
+
+    EthiopiaRHS builds `community_prices` from a country-level
+    `_/community_prices.py` declared by no wave; Ethiopia's waves each carry
+    their own script.  Same feature NAME, opposite classification -- which is
+    precisely why the name allowlist could not work.
+    """
+    monkeypatch.setenv("LSMS_SKIP_AUTH", "1")
+    from lsms_library.paths import countries_root
+
+    def _avail(country):
+        co = ll.Country(country, preload_panel_ids=False)
+        derived = dict(cov._env()["DERIVED_SOURCE"])
+        return {w: cov.wave_available_features(co[w], derived) for w in co.waves}
+
+    assert cov._is_country_level_only(
+        "EthiopiaRHS", "community_prices", _avail("EthiopiaRHS"), countries_root)
+    assert not cov._is_country_level_only(
+        "Ethiopia", "community_prices", _avail("Ethiopia"), countries_root)
+
+
+def test_a_country_script_for_an_UNDECLARED_feature_emits_no_phantom_broken_row(monkeypatch):
+    """Guatemala and Panama ship `_/nutrition.py` but declare no `nutrition`.
+
+    The old name allowlist made `build_matrix` call `grade_country_level` for
+    any country holding the *script*, regardless of whether the country declares
+    the feature -- so `load_feature` raised
+    ``AttributeError: 'Country' object has no attribute 'nutrition'`` and the
+    matrix filed a `broken` cell.  That is not a broken build; nothing was ever
+    wired.  Worse, the #724 loop had already emitted an `undeclared` row on the
+    SAME ``(country, feature, wave)`` key, so the snapshot carried two rows that
+    contradicted each other and `save_snapshot`'s upsert could not tell them
+    apart.  (2 of the corpus's 8 `broken` cells were this artefact.)
+
+    Asserted as the KEY-UNIQUENESS invariant rather than "the tier is
+    `undeclared`", so the test keeps its meaning if either country later
+    declares the feature for real.
+    """
+    monkeypatch.setenv("LSMS_SKIP_AUTH", "1")
+    df = cov.build_matrix(["Guatemala", "Panama"], ["nutrition"], readiness=True)
+    dup = df.duplicated(subset=["country", "feature", "wave"], keep=False)
+    assert not dup.any(), (
+        "duplicate (country, feature, wave) rows:\n"
+        f"{df[dup][['country', 'feature', 'wave', 'tier', 'detail']]}")
+    assert "broken" not in set(df["tier"].astype(str)), (
+        "a country-level SCRIPT for a feature the country never declares must "
+        "not be built, and so cannot be `broken`")
