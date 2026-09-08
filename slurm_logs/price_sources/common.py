@@ -38,6 +38,8 @@ MODEL_COLS = ["country", "t", "pair", "u_basis", "geo_level", "threshold_a",
               "r2_fe", "resid_sd", "claim_30_50"]
 
 CLAIM_LO, CLAIM_HI = math.log(1.3), math.log(1.5)
+#: Band-edge tolerance for claim_30_50 (log units); see fit_gap_model.
+EDGE_TOL = 1e-9
 
 #: Residual degrees of freedom below which a fixed-effects slope is reported as
 #: NaN instead of a number (see _fwl_slope).
@@ -251,7 +253,13 @@ def fit_gap_model(gaps):
            "coef_between": np.nan, "se_between": np.nan,
            "r2_fe": np.nan, "resid_sd": np.nan, "claim_30_50": None}
     if n:
-        out["claim_30_50"] = bool(CLAIM_LO <= out["median_gap"] <= CLAIM_HI)
+        # Tolerant at the edges: the synthesis found two medians equal to
+        # log 1.3 to ten decimals that graded False and True on a last-bit
+        # difference (Ethiopia pooled 1v4; Tanzania 2019-20 5v4).  A median
+        # within EDGE_TOL of a bound counts as inside; readers should still
+        # treat anything within a rounding tick of 1.30 or 1.50 as "on the
+        # edge", never as a verdict.
+        out["claim_30_50"] = bool(CLAIM_LO - EDGE_TOL <= out["median_gap"] <= CLAIM_HI + EDGE_TOL)
     if n < 8 or g["j"].nunique() < 2:
         return out
     g["j"] = g["j"].astype(str)
@@ -363,4 +371,10 @@ if __name__ == "__main__":
     r = fit_gap_model(tiny)
     assert all(math.isnan(r[k]) for k in ("coef_within", "coef_between", "r2_fe")), r
     print(f"under-identified case: cells={r['n_cells']} within={r['coef_within']} between={r['coef_between']} (NaN, as it should be)")
+    # band edge: a median exactly at log 1.3 (to the last bit) is inside, both ways
+    import pandas as _pd
+    edge = _pd.DataFrame({"gap_log": [CLAIM_LO] * 8 + [CLAIM_LO * (1 - 1e-15)] * 8,
+                          "median_log_a": 1.0, "median_log_b": 1.0, "j": list("abcdefgh") * 2, "geo": ["g"] * 16})
+    assert fit_gap_model(edge)["claim_30_50"] is True
+    print("band-edge case: median == log 1.3 to the last bit -> claim True (tolerant)")
     print("self-test done")
