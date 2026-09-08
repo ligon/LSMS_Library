@@ -30,6 +30,19 @@ basis produced it.
 **One wave per pyramid.**  Pooling waves pools universes (see above), so a
 multi-wave frame is not silently concatenated: the most recent wave is drawn
 and the choice is reported.
+
+**A Lorenz curve is scale-free, so its basis has to be said.**  Cumulative
+shares cancel every unit: currency, deflator, recall period and ``numeraire=``
+all leave the curve exactly where it was.  That is what makes it comparable
+across waves -- and what lets a quiet choice move the answer with nothing in
+the picture to betray it.  Uganda 2013-14, per person, person-weighted: Gini
+0.50 on cash food purchases, 0.34 on all recorded food acquisition, because
+rural households eat what they grow and cash-only counts none of it (ledger
+§4; 0.56 household-weighted, 0.48 on household totals unweighted).  Whether
+the poorest half are people or households, whether the survey weights were
+used, and what became of the households with no recorded purchase each move
+it again.  So ``lorenz_curve`` never prints a Gini without naming the
+measure, the unit, the weighting and the omitted count beside it.
 """
 from __future__ import annotations
 
@@ -38,7 +51,7 @@ from typing import Any
 
 import pandas as pd
 
-__all__ = ["population_pyramid", "coordinate_map", "PALETTE"]
+__all__ = ["population_pyramid", "coordinate_map", "lorenz_curve", "PALETTE"]
 
 #: The chart palette.  Teal/ochre rather than blue/pink: colour distinguishes
 #: the ``by=`` groups, never the sexes, and the pair stays separable under the
@@ -57,19 +70,23 @@ _FONT_STACK = ["Inter", "Source Sans Pro", "Helvetica Neue", "Helvetica",
                "Arial", "DejaVu Sans"]
 
 _MISSING_MPL = (
-    "population_pyramid() needs matplotlib, which is not installed.\n"
-    "matplotlib is declared in this project's `test` dependency group, not "
-    "its main dependencies, so a plain install does not pull it in.\n"
+    "{caller}() needs matplotlib, which is not installed.\n"
+    "matplotlib is an ordinary dependency of lsms_library (since v0.11.0), so "
+    "a normal install carries it; a hand-built or partial environment may not.\n"
     "Install it with:  pip install matplotlib"
 )
 
 
-def _require_pyplot():
-    """Import pyplot lazily, with an error that says what to do about it."""
+def _require_pyplot(caller="population_pyramid"):
+    """Import pyplot lazily, with an error that says what to do about it.
+
+    ``caller`` names the chart in the message so a Lorenz-curve error does not
+    talk about a pyramid.
+    """
     try:
         import matplotlib.pyplot as plt
     except ImportError as exc:  # pragma: no cover - depends on the install
-        raise ImportError(_MISSING_MPL) from exc
+        raise ImportError(_MISSING_MPL.format(caller=caller)) from exc
     return plt
 
 
@@ -115,12 +132,15 @@ def _resolve_roster(data: Any, wave: str | None) -> tuple[pd.DataFrame, str, str
 
 
 def _attach(roster: pd.DataFrame, country_name: str | None,
-            weights: bool | str, by: str | None) -> tuple[pd.DataFrame, str]:
+            weights: bool | str, by: str | None,
+            noun: str = "roster") -> tuple[pd.DataFrame, str]:
     """Join ``weight`` / the ``by=`` column from ``sample()`` onto the roster.
 
     ``Rural``, ``strata`` and the weights live on ``sample()`` at ``(i, t)``
     grain, not on the roster -- so conditioning and weighting need the same
-    join, which is why they are done together here.
+    join, which is why they are done together here.  Any frame keyed by
+    ``(i, t)`` can use it; ``noun`` is what the error calls that frame
+    ("roster" for the pyramid, "household-frame" for the Lorenz curve).
     """
     from .country import Country
 
@@ -161,7 +181,7 @@ def _attach(roster: pd.DataFrame, country_name: str | None,
 
     if by and by not in df.columns:
         raise KeyError(
-            f"by={by!r} is not available; it is neither a roster column nor a "
+            f"by={by!r} is not available; it is neither a {noun} column nor a "
             "column of sample()."
         )
     return df, basis
@@ -437,6 +457,679 @@ def population_pyramid(data, wave=None, *, weights=True, by=None, bin_width=5,
 
 
 # ---------------------------------------------------------------------------
+# Lorenz curves
+# ---------------------------------------------------------------------------
+
+#: Most waves one ``lorenz_curve`` overlay will draw.  The ramp below has to
+#: keep every adjacent pair of steps at least ~0.06 apart in lightness to stay
+#: readable, and with the far end capped at :data:`_RAMP_CAP` that budget is
+#: spent after five steps.
+_MAX_WAVES = 5
+
+#: How far toward white the OLDEST wave of a multi-wave ramp is mixed.  The
+#: design asked for "about 55%"; the dataviz palette validator said no -- at
+#: 0.55 the light end sits at 1.92:1 against a white surface, under its 2:1
+#: floor -- and at 0.45 five steps crowd below the 0.06 lightness gap.  0.50
+#: clears both (light end 2.09:1; every gap >= 0.06 for three and for five).
+_RAMP_CAP = 0.50
+
+
+def _lorenz(x, w):
+    """Lorenz ordinates and Gini coefficient for weighted values.
+
+    Returns ``(F, L, gini)``: ``F`` is the cumulative share of weight and
+    ``L`` the cumulative share of ``x * w``, both taken in ascending order of
+    ``x`` and prefixed with 0, so ``(F, L)`` is exactly the polyline to draw.
+    The Gini is the trapezoid rule on that same polyline,
+    ``1 - sum((F_k - F_{k-1}) * (L_k + L_{k-1}))``.  The rule is *exact* for
+    the polygon drawn, so the number printed and the shape seen are one fact
+    -- there is no approximation between them to explain (ledger §5).
+
+    Tied values are merged (weights summed) before cumulating, so duplicating
+    a row and doubling its weight give identical output.  A zero-weight row
+    is dropped: it cannot move the curve.
+
+    Raises ``ValueError`` on a negative value or weight -- a Lorenz curve is
+    defined for non-negative values, and a negative expenditure is a data
+    defect worth seeing, not clipping -- on a non-finite input, when no weight
+    is positive, and when ``sum(x * w) == 0``: everyone at zero has no shares
+    to distribute.
+    """
+    import numpy as np
+
+    x = pd.to_numeric(pd.Series(x), errors="coerce").to_numpy(dtype=float, na_value=np.nan)
+    w = pd.to_numeric(pd.Series(w), errors="coerce").to_numpy(dtype=float, na_value=np.nan)
+    if x.ndim != 1 or x.shape != w.shape:
+        raise ValueError("x and w must be one-dimensional and the same length; "
+                         f"got {x.shape} and {w.shape}")
+    if not (np.isfinite(x).all() and np.isfinite(w).all()):
+        raise ValueError("x and w must be finite; drop or fill missing rows first")
+    if (x < 0).any():
+        raise ValueError(f"{int((x < 0).sum())} negative value(s): a Lorenz curve "
+                         "is defined for non-negative values only, and a negative "
+                         "expenditure is a data defect worth seeing")
+    if (w < 0).any():
+        raise ValueError(f"{int((w < 0).sum())} negative weight(s)")
+    keep = w > 0
+    x, w = x[keep], w[keep]
+    if w.size == 0:
+        raise ValueError("no row has a positive weight")
+    vals, inv = np.unique(x, return_inverse=True)
+    wsum = np.bincount(inv, weights=w)
+    total = float((vals * wsum).sum())
+    if total <= 0:
+        raise ValueError("every value is zero; there are no shares to distribute")
+    F = np.concatenate([[0.0], np.cumsum(wsum) / wsum.sum()])
+    L = np.concatenate([[0.0], np.cumsum(vals * wsum) / total])
+    gini = 1.0 - float(np.sum(np.diff(F) * (L[1:] + L[:-1])))
+    return F, L, gini
+
+
+def _ramp(base, n, cap=_RAMP_CAP):
+    """``n`` colours of ONE hue, oldest first.
+
+    The last is ``base`` at full ink; each earlier step is mixed toward white
+    by an equal increment, the first reaching ``cap``.  A list of waves is an
+    ordered series, so it takes an ordered ramp: two categorical hues would
+    say "different kinds", and waves are not kinds.
+    """
+    from matplotlib.colors import to_hex, to_rgb
+
+    rgb = to_rgb(base)
+    out = []
+    for k in range(n):
+        f = 0.0 if n == 1 else cap * (n - 1 - k) / (n - 1)
+        out.append(to_hex(tuple(c + (1.0 - c) * f for c in rgb)))
+    return out
+
+
+def _sum_to_households(obj, column=None):
+    """Sum a long table (or Series) to one number per ``(i, t)`` household.
+
+    Every index level but ``i`` and ``t`` is summed away -- ``j``, ``s``,
+    ``u``, ``v`` alike.  Returns a float Series named ``_x`` indexed by
+    ``(i, t)`` (or ``i`` alone when the input has no ``t``).
+    """
+    s = obj if isinstance(obj, pd.Series) else obj[column]
+    s = pd.to_numeric(s, errors="coerce")
+    names = [n for n in s.index.names if n is not None]
+    if "i" not in names:
+        raise ValueError("the measure needs an 'i' (household) index level to be "
+                         f"summed to household grain; it has {names or 'none'}")
+    keys = [k for k in ("i", "t") if k in names]
+    out = s.groupby(level=keys, observed=True).sum()
+    return out.rename("_x")
+
+
+def _country_measure(country, waves, value, basis):
+    """Household-grain welfare measure for one Country and a list of waves.
+
+    Returns ``(series, names, no_inkind)`` where ``series`` is ``_x`` indexed
+    by ``(i, t)``; ``names`` is a dict of the words the chart uses for the
+    measure (``axis`` for the y-label, ``text`` for the subtitle, ``short``
+    for the direct label, ``absent`` for the no-record disclosure); and
+    ``no_inkind`` is True when ``basis='total'`` changed nothing because the
+    ``s`` level holds only ``'purchased'``.
+    """
+    if value is None:
+        kw = {"waves": waves}
+        if basis is not None:
+            kw["basis"] = basis
+        fe = country.food_expenditures(**kw)
+        if not isinstance(fe, pd.DataFrame) or "Expenditure" not in fe.columns:
+            raise ValueError(f"{country.name}.food_expenditures() returned no "
+                             "'Expenditure' column")
+        total = basis == "total"
+        no_inkind = False
+        if total and "s" in fe.index.names:
+            # Read the level that is already here rather than calling the API
+            # twice: if every row is 'purchased', 'total' had nothing to add.
+            held = set(map(str, pd.unique(fe.index.get_level_values("s").dropna())))
+            no_inkind = held <= {"purchased"}
+        names = {
+            "axis": "food spending",
+            "text": "all recorded food acquisition" if total else "food purchases",
+            "short": "spending",
+            "absent": "acquisition" if total else "purchase",
+        }
+        return _sum_to_households(fe, "Expenditure"), names, no_inkind
+
+    if isinstance(value, pd.Series):
+        s = value
+        if "t" not in s.index.names:
+            raise ValueError("a Series passed as value= must carry a 't' index "
+                             "level so it can be matched to the wave(s) drawn")
+        s = s[s.index.get_level_values("t").isin(waves)]
+        name = str(s.name) if s.name is not None else "value"
+        names = {"axis": name, "text": name, "short": name, "absent": name}
+        return _sum_to_households(s), names, False
+
+    if isinstance(value, str):
+        method = getattr(country, value, None)
+        if not callable(method):
+            raise KeyError(f"{value!r} is not a table of {country.name}; "
+                           f"tables: {', '.join(country.data_scheme)}")
+        tbl = method(waves=waves)
+        if not isinstance(tbl, pd.DataFrame):
+            raise ValueError(f"{country.name}.{value}() did not return a DataFrame")
+        if "Expenditure" not in tbl.columns:
+            # A wide item-by-household matrix would sum to a perfectly
+            # plausible curve -- which is exactly why it must not: the shape
+            # is a defect in the table (GH #817), and a chart that summed it
+            # would hide that defect behind a correct-looking picture.
+            raise ValueError(
+                f"{country.name}.{value}() has no 'Expenditure' column ({len(tbl.columns)} "
+                "columns); lorenz_curve(value=) takes a long expenditure table, one "
+                "'Expenditure' per (household, item) row.  A wide one-column-per-item "
+                "table is a defect in that table, not a shape for the chart to "
+                "accommodate -- see GH #817.  Sum it yourself and pass the result as "
+                "a Series indexed by (i, t) if you mean to draw it anyway."
+            )
+        names = {"axis": value, "text": value, "short": value, "absent": value}
+        return _sum_to_households(tbl, "Expenditure"), names, False
+
+    raise TypeError("value= takes None, a table name, or a pandas Series indexed by "
+                    f"(i, t); got {type(value).__name__}")
+
+
+def _household_sizes(country, waves):
+    """``size`` per ``(i, t)`` from ``household_characteristics``.
+
+    ``exp(log HSize)`` rounded to an integer.  The resident filter is that
+    table's decision (ledger §3), so a household whose every member failed
+    it has ``log HSize = -inf`` and comes back as size 0 -- the caller counts
+    and drops those rather than dividing by zero.
+    """
+    import numpy as np
+
+    hc = country.household_characteristics(waves=waves)
+    if not isinstance(hc, pd.DataFrame) or "log HSize" not in hc.columns:
+        raise ValueError(f"{country.name}.household_characteristics() has no "
+                         "'log HSize' column, so household size is unavailable")
+    ls = pd.to_numeric(hc["log HSize"], errors="coerce")
+    size = np.exp(ls.to_numpy(dtype=float, na_value=np.nan))
+    size = np.where(np.isfinite(size), np.round(size), np.nan)
+    out = hc.reset_index()[["i", "t"]].copy()
+    out["size"] = size
+    return out.drop_duplicates(["i", "t"])
+
+
+def _select_waves(held, wave, name):
+    """Resolve ``wave`` against the waves ``held``; returns ``(waves, is_list)``.
+
+    Same rule as the other two charts: with several waves and no choice, the
+    most recent is drawn and the choice is reported.
+    """
+    held = [str(h) for h in held]
+    if wave is None:
+        if len(held) > 1:
+            pick = sorted(held)[-1]
+            warnings.warn(
+                f"{name} covers {len(held)} waves and their sampled populations "
+                f"may differ; drawing the most recent ({pick}). Pass wave= to "
+                "choose another, or a list of waves for an overlay.",
+                stacklevel=3,
+            )
+            return [pick], False
+        return (held[:1] or [None]), False
+    if isinstance(wave, (list, tuple)):
+        chosen = [str(w) for w in wave]
+        if not chosen:
+            raise ValueError("wave= list is empty")
+        if len(chosen) > _MAX_WAVES:
+            raise ValueError(f"wave= lists {len(chosen)} waves; at most {_MAX_WAVES} "
+                             "can share one chart and still be told apart")
+        if len(set(chosen)) != len(chosen):
+            raise ValueError(f"wave= repeats a wave: {chosen}")
+        missing = [w for w in chosen if w not in held]
+        if missing:
+            raise ValueError(f"{name} has no wave {missing}; held: {held}")
+        return chosen, True
+    wave = str(wave)
+    if wave not in held:
+        raise ValueError(f"{name} has no wave {wave!r}; held: {held}")
+    return [wave], False
+
+
+def _by_groups(df, by):
+    """Resolve ``by`` (a column, or ``(column, [a, b])``) to at most two groups.
+
+    Returns ``(column, groups, n_outside)``.  More than two values in the
+    column is an error naming them -- the pyramid's ``groups[:2]`` silently
+    discards the rest, and Uganda's ``Region`` has four -- so picking two of
+    many is done explicitly through the tuple form.
+    """
+    if isinstance(by, (list, tuple)):
+        if len(by) != 2 or not isinstance(by[0], str):
+            raise TypeError("by= takes a column name or a (column, [value, value]) tuple")
+        col, pick = by[0], [v for v in by[1]]
+        if len(pick) != 2:
+            raise ValueError(f"by=({col!r}, ...) must pick exactly two values; got {pick}")
+    else:
+        col, pick = by, None
+    held = list(pd.unique(df[col].dropna()))
+    if pick is None:
+        if len(held) > 2:
+            raise ValueError(
+                f"by={col!r} holds {len(held)} values ({', '.join(map(str, held))}); "
+                "colour can separate two.  Pass by=(column, [value, value]) to "
+                "pick which two to draw."
+            )
+        groups = held
+    else:
+        absent = [p for p in pick if p not in held]
+        if absent:
+            raise ValueError(f"by={col!r} has no value {absent}; it holds: "
+                             f"{', '.join(map(str, held))}")
+        groups = pick
+    n_outside = int((df[col].notna() & ~df[col].isin(groups)).sum())
+    return col, groups, n_outside
+
+
+def lorenz_curve(data, wave=None, *, value=None, per="person", weights=True,
+                 basis=None, by=None, zeros=None, size=None, ax=None,
+                 title=None, colors=None):
+    """Draw the Lorenz curve of household spending for one survey wave.
+
+    The cumulative share of spending held by the poorest fraction of the
+    population, on the unit square, against the equality diagonal; the Gini
+    coefficient -- twice the area between them -- is printed on the chart.
+    The curve is scale-free (see the module docstring), so every *other*
+    choice that moves it is stated in the subtitle: whose spending, per
+    person or per household, weighted how, and what became of households
+    with nothing recorded.
+
+    Parameters
+    ----------
+    data : Country, str, or DataFrame
+        A country, its name, or a frame.  A frame is either an
+        expenditure-shaped table (a ``j`` index level and an ``Expenditure``
+        column, summed over every level but ``(i, t)``) or a household-grain
+        frame whose welfare column ``value`` names.
+    wave : str or list of str, optional
+        One wave (default: the most recent, with a warning when several are
+        held), or a list of up to five drawn as separate labelled curves in
+        an ordered ramp of one hue -- most recent in the full ink.  A list
+        together with ``by`` is an error: colour has one job.
+    value : None, str, or pandas.Series, optional
+        The measure.  ``None`` is ``food_expenditures``.  A string names
+        another table of the country, which must carry an ``Expenditure``
+        column (long shape, summed to household grain); a table without one
+        raises, citing GH #817, rather than summing a wide matrix into a
+        plausible-looking curve.  A Series indexed by ``(i, t)`` is a
+        user-computed measure -- "food plus non-food" is two API calls and an
+        add, not a kwarg.  On the frame path a string names the welfare
+        column.
+    per : {'person', 'household'}, default 'person'
+        ``'person'`` divides spending by household size and weights each
+        household by ``size * weight`` -- the literature's standard, in which
+        each person counts once.  ``'household'`` uses household totals
+        weighted by ``weight``.  Size is ``exp(log HSize)`` from
+        ``household_characteristics`` for a Country (resident-filtered, as
+        that table decides), or the ``size`` column of a frame.
+    weights : bool or str, default True
+        Same contract as :func:`population_pyramid`: the survey's weights
+        from ``sample()``, falling back to unweighted with a warning; ``False``
+        for unweighted; a column name.
+    basis : {'purchased', 'total'}, optional
+        Passed through to ``food_expenditures``: ``None`` follows its default
+        (cash purchases only); ``'total'`` is all recorded acquisition value.
+        Meaningful only for the food measure; anywhere else it is an error.
+    by : str or (str, [value, value]), optional
+        Split into two curves on a column of the frame or of ``sample()``
+        (``Rural``, ``strata``, ``Region`` ...); colour encodes it.  A column
+        with more than two values raises and names them; the tuple form picks
+        two of many.
+    zeros : {'drop', 'include'}, optional
+        What to do with households in the wave's ``sample()`` that have no
+        row in the measure.  They are *absent*, not zero, because
+        ``food_expenditures`` drops zero rows (ledger §4) -- on Uganda 2013-14
+        the 30 such households are true cash zeros with own-production rows.
+        ``None`` resolves to ``'drop'``: omit them and say how many.
+        ``'include'`` draws them at zero.  Frame path: not accepted -- there
+        is no sample frame to compare against.
+    size : str, optional
+        Frame path only: the household-size column (default ``'size'``).
+    ax : matplotlib Axes, optional
+    title, colors : optional overrides.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+
+    Notes
+    -----
+    Counts in the subtitle are of households actually drawn (and, per
+    person, the *headcount* ``sum(size)`` -- never the weighted person total,
+    which is not a count).  With several curves the counts are totals over
+    all of them; each curve's Gini sits in its legend entry.  Every
+    disclosure ("30 with no recorded purchase, not drawn", "2 without a
+    usable roster, not drawn", "no in-kind value recorded") is a measured
+    count that appears only when it is non-zero.
+    """
+    import textwrap
+
+    import numpy as np
+    from matplotlib.ticker import PercentFormatter
+
+    from .country import Country
+
+    plt = _require_pyplot("lorenz_curve")
+    pal = {**PALETTE, **(colors or {})}
+
+    if per not in ("person", "household"):
+        raise ValueError(f"per must be 'person' or 'household'; got {per!r}")
+    if zeros not in (None, "drop", "include"):
+        raise ValueError(f"zeros must be None, 'drop' or 'include'; got {zeros!r}")
+    if by is not None and isinstance(wave, (list, tuple)):
+        raise ValueError("wave=[...] and by= cannot be combined: colour encodes "
+                         "either the wave or the group, not both")
+    if basis is not None and value is not None:
+        raise TypeError("basis= applies only to the food_expenditures measure; "
+                        f"it has no meaning for value={value!r}")
+
+    country = None
+    if isinstance(data, str):
+        country = Country(data)
+    elif isinstance(data, Country):
+        country = data
+
+    disclose = {}          # measured counts -> subtitle, only when non-zero
+    no_inkind = False
+    if country is not None:
+        # ---- Country path: measure, size, sample, all at (i, t) ---------
+        if size is not None:
+            raise TypeError("size= names a column of a household frame; for a "
+                            "Country, size comes from household_characteristics")
+        cname = country.name
+        waves, is_list = _select_waves(country.waves, wave, cname)
+        measure, names, no_inkind = _country_measure(country, waves, value, basis)
+        if "t" not in measure.index.names:
+            raise ValueError("the measure has no 't' level; cannot place it in a wave")
+        hh = measure.reset_index()
+        hh = hh[hh["t"].astype(str).isin(waves)].copy()
+        hh["t"] = hh["t"].astype(str)
+        if hh.empty:
+            raise ValueError(f"{cname}: no {names['text']} rows in wave(s) {waves}")
+
+        # The interviewed households: the set that defines `zeros`.  Read
+        # here only for that set -- `_attach` joins the weights itself, and
+        # handing it a frame that already carries `weight` would make its
+        # merge suffix both copies and fall back to unweighted.
+        try:
+            smp = country.sample()
+        except Exception as exc:
+            warnings.warn(f"sample() unavailable for {cname} ({exc}); cannot tell "
+                          "which households have no recorded value.", stacklevel=2)
+            smp = None
+        if smp is not None and {"i", "t"} <= set(smp.index.names):
+            si = smp.reset_index()[["i", "t"]]
+            si["t"] = si["t"].astype(str)
+            si = si[si["t"].isin(waves)].drop_duplicates()
+            have = pd.MultiIndex.from_frame(hh[["i", "t"]])
+            absent = pd.MultiIndex.from_frame(si).difference(have)
+            disclose["zeros"] = len(absent)
+            if zeros == "include" and len(absent):
+                add = absent.to_frame(index=False)
+                add["_x"] = 0.0
+                hh = pd.concat([hh, add], ignore_index=True)
+        else:
+            disclose["zeros"] = 0
+
+        if per == "person":
+            sizes = _household_sizes(country, waves)
+            sizes["t"] = sizes["t"].astype(str)
+            hh = hh.merge(sizes, on=["i", "t"], how="left")
+            bad = hh["size"].isna() | (hh["size"] <= 0)
+            disclose["no_roster"] = int(bad.sum())
+            hh = hh[~bad].copy()
+        hh = hh.set_index(["i", "t"])
+        label_single = f"{cname} {waves[0]}"
+        label = cname if is_list else label_single
+    else:
+        # ---- Frame path ------------------------------------------------
+        frame = data
+        if not isinstance(frame, pd.DataFrame):
+            raise TypeError("lorenz_curve() takes a Country, a country name, or a "
+                            f"DataFrame; got {type(data).__name__}")
+        if zeros is not None:
+            raise TypeError("zeros= needs a Country: on a frame there is no "
+                            "sample() to say which households are missing")
+        if basis is not None:
+            raise TypeError("basis= needs a Country: it is passed to "
+                            "food_expenditures(), which a frame has already been")
+        cname = None
+        long_shape = "j" in frame.index.names
+        if long_shape:
+            col = value if isinstance(value, str) else "Expenditure"
+            if col not in frame.columns:
+                raise KeyError(f"{col!r} is not a column of this frame; columns: "
+                               f"{', '.join(map(str, frame.columns))}")
+            hh = _sum_to_households(frame, col).reset_index()
+            if size is not None:
+                raise TypeError("size= names a column of a household-grain frame; "
+                                "this frame is item-level (it has a 'j' level)")
+        else:
+            if value is None:
+                if "Expenditure" not in frame.columns:
+                    raise ValueError(
+                        "pass value= naming the welfare column of this household "
+                        f"frame; it has no 'Expenditure' column (columns: "
+                        f"{', '.join(map(str, frame.columns))})")
+                col = "Expenditure"
+            elif isinstance(value, str):
+                col = value
+                if col not in frame.columns:
+                    raise KeyError(f"value={col!r} is not a column of this frame; "
+                                   f"columns: {', '.join(map(str, frame.columns))}")
+            else:
+                raise TypeError("on a frame, value= names a column (str)")
+            hh = frame.reset_index().copy()
+            hh["_x"] = pd.to_numeric(hh[col], errors="coerce")
+            size_col = size or "size"
+            if per == "person":
+                if size_col not in hh.columns:
+                    raise ValueError(
+                        f"per='person' needs a household-size column ({size_col!r}) "
+                        "on the frame; pass size= to name it, or per='household'")
+                hh["size"] = pd.to_numeric(hh[size_col], errors="coerce")
+        word = "spending" if col == "Expenditure" else str(col)
+        names = {"axis": word, "text": word, "short": word, "absent": word}
+        if "t" in hh.columns:
+            waves, is_list = _select_waves(pd.unique(hh["t"].dropna()), wave, "frame")
+            hh["t"] = hh["t"].astype(str)
+            hh = hh[hh["t"].isin([str(w) for w in waves])].copy()
+        else:
+            if isinstance(wave, (list, tuple)):
+                raise ValueError("wave=[...] needs a 't' level or column on the frame")
+            waves, is_list = [wave], False
+        hh = hh[hh["_x"].notna()].copy()
+        if per == "person":
+            bad = hh["size"].isna() | (hh["size"] <= 0)
+            disclose["no_roster"] = int(bad.sum())
+            hh = hh[~bad].copy()
+        if hh.empty:
+            raise ValueError("no household has a usable value")
+        keys = [k for k in ("i", "t") if k in hh.columns]
+        if keys:
+            hh = hh.set_index(keys)
+        label = str(waves[0]) if (waves[0] is not None and not is_list) else "households"
+
+    # ---- weights and the `by` column, joined from sample() -----------------
+    by_col = by[0] if isinstance(by, (list, tuple)) else by
+    df, wbasis = _attach(hh, cname, weights, by_col, noun="household-frame")
+    noun = "people" if per == "person" else "households"
+
+    if per == "person":
+        df["_y"] = df["_x"] / df["size"]
+        df["_wy"] = df["_w"] * df["size"]
+    else:
+        df["_y"] = df["_x"]
+        df["_wy"] = df["_w"]
+    unweighted = ~(df["_wy"] > 0)
+    disclose["no_weight"] = int(unweighted.sum())
+    df = df[~unweighted].copy()
+    if df.empty:
+        raise ValueError(f"no household left to draw for {label}")
+
+    # ---- series ------------------------------------------------------------
+    series = []
+    if by is not None:
+        col, groups, n_out = _by_groups(df, by)
+        disclose["outside"] = n_out
+        disclose["by_na"] = int(df[col].isna().sum())
+        gnames = {str(g) for g in groups}
+        for gi, g in enumerate(groups):
+            sub = df[df[col] == g]
+            series.append((str(g), pal["bar"] if gi == 0 else pal["alt"], sub))
+        legend_title = None if (col in gnames or len(groups) < 2) else col
+    elif is_list:
+        colours = _ramp(pal["bar"], len(waves))
+        order = sorted(waves)
+        for wv, colour in zip(order, colours):
+            # `_attach` hands back a flat frame: `t` is a column here.
+            series.append((wv, colour, df[df["t"].astype(str) == wv]))
+        legend_title = None
+    else:
+        series.append((None, pal["bar"], df))
+        legend_title = None
+
+    curves = []
+    n_hh = 0
+    n_people = 0.0
+    for lab, colour, sub in series:
+        if sub.empty:
+            raise ValueError(f"no household to draw for {lab!r}")
+        F, L, gini = _lorenz(sub["_y"], sub["_wy"])
+        curves.append((lab, colour, F, L, gini))
+        n_hh += len(sub)
+        if per == "person":
+            n_people += float(sub["size"].sum())
+
+    # ---- draw --------------------------------------------------------------
+    if ax is None:
+        _, ax = plt.subplots(figsize=(5.8, 5.8), dpi=130)
+    fig = ax.figure
+
+    # The diagonal: a solid hairline in the rule colour, unlabelled.  Dashing
+    # reads as a projection or a threshold, and a legend entry for the line
+    # of equality names nothing the reader does not already know.
+    ax.plot([0, 1], [0, 1], color=pal["rule"], lw=0.9, zorder=1)
+    one = len(curves) == 1
+    for lab, colour, F, L, gini in curves:
+        ax.plot(F, L, color=colour, lw=1.8, zorder=3, solid_joinstyle="round",
+                label=(None if lab is None else f"{lab}, Gini {gini:.2f}"))
+        if one:
+            # The shaded gap IS half the Gini: the number printed and the
+            # shape seen are the same fact.  With two or more curves the
+            # fills would overlap into a third colour, so none is drawn.
+            ax.fill_between(F, F, L, color=colour, alpha=0.12, linewidth=0, zorder=2)
+            l50 = float(np.interp(0.5, F, L))
+            ax.scatter([0.5], [l50], s=16, color=colour, zorder=4)
+            # Below and to the right of the dot: the curve is convex and
+            # rising, so that side is always clear of it.  When the curve
+            # sits too low for the text to fit beneath, put it in the gap
+            # above instead.
+            txt = f"the poorest half of {noun}:\n{l50:.0%} of {names['short']}"
+            below = l50 >= 0.12
+            ax.annotate(txt, xy=(0.5, l50), xytext=(8, -9 if below else 8),
+                        textcoords="offset points", ha="left",
+                        va="top" if below else "bottom", fontsize=8.6,
+                        color=pal["ink"], linespacing=1.25, zorder=5)
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect("equal")
+    ticks = [0, 0.25, 0.5, 0.75, 1.0]
+    ax.set_xticks(ticks)
+    ax.set_yticks(ticks)
+    ax.xaxis.set_major_formatter(PercentFormatter(xmax=1.0, decimals=0))
+    ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0, decimals=0))
+    ax.set_xlabel(f"share of {noun}, poorest first", fontsize=8.5, color=pal["ink"])
+    ax.set_ylabel(f"share of {names['axis']}", fontsize=8.5, color=pal["ink"])
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color(pal["rule"])
+    ax.tick_params(colors=pal["ink"], labelsize=8, length=3, color=pal["rule"])
+    ax.grid(False)
+
+    # ---- subtitle: every bit is a measured count or a stated basis ----------
+    bits = []
+    if one:
+        bits.append(f"Gini {curves[0][4]:.2f}")
+    bits.append(f"{n_hh:,} households")
+    if per == "person":
+        bits.append(f"{int(round(n_people)):,} people")
+    bits.append(f"{names['text']} per {per}")
+    bits.append(wbasis)
+    k = disclose.get("zeros", 0)
+    if k:
+        fate = "drawn at zero" if zeros == "include" else "not drawn"
+        bits.append(f"{k:,} with no recorded {names['absent']}, {fate}")
+    m = disclose.get("no_roster", 0)
+    if m:
+        bits.append(f"{m:,} without a usable roster, not drawn")
+    if disclose.get("no_weight", 0):
+        bits.append(f"{disclose['no_weight']:,} without a sampling weight, not drawn")
+    if disclose.get("outside", 0):
+        bits.append(f"{disclose['outside']:,} outside the two {by_col} values picked, "
+                    "not drawn")
+    if disclose.get("by_na", 0):
+        bits.append(f"{disclose['by_na']:,} with no {by_col} value, not drawn")
+    if no_inkind:
+        bits.append("no in-kind value recorded")
+
+    # Six comma-joined bits do not fit one line of a 5.8-inch square, so wrap
+    # to the axes' measured width and make room above with the title pad.
+    # Lines are packed a whole bit at a time: "30 with no recorded purchase,
+    # / not drawn" split across a line break reads as two statements.
+    fig.tight_layout()
+    try:
+        ax_pt = float(ax.get_window_extent().width) * 72.0 / fig.dpi
+    except Exception:                         # no renderer yet
+        ax_pt = fig.get_size_inches()[0] * 72.0 * 0.78
+    width = max(40, int(ax_pt / (9 * 0.52)))
+    lines = []
+    for bit in bits:
+        if lines and len(lines[-1]) + 2 + len(bit) <= width:
+            lines[-1] += ", " + bit
+        else:
+            lines.extend(textwrap.wrap(bit, width=width, break_long_words=False))
+    lines = [ln + "," for ln in lines[:-1]] + lines[-1:]
+    ax.annotate("\n".join(lines), xy=(0, 1), xycoords="axes fraction",
+                xytext=(0, 6), textcoords="offset points", ha="left", va="bottom",
+                fontsize=9, color=pal["ink"], alpha=0.75, linespacing=1.2)
+    ax.set_title(title or label, loc="left", fontsize=12.5, color=pal["ink"],
+                 pad=16 + 10.8 * (len(lines) - 1), fontweight="semibold")
+
+    # One universe line per distinct caption; waves sharing a tag share a line.
+    captions = {}
+    for wv in waves:
+        cap = _universe(cname, wv)
+        if cap:
+            captions.setdefault(cap, []).append(str(wv))
+    if captions:
+        if len(captions) == 1:
+            text = next(iter(captions))
+        else:
+            text = "\n".join(f"{', '.join(ws)}: {cap}" for cap, ws in captions.items())
+        fig.text(0.005, -0.005, text, fontsize=7.8, color=pal["ink"], alpha=0.7,
+                 ha="left", va="top")
+
+    if len(curves) > 1 or (by is not None and curves[0][0] is not None):
+        leg = ax.legend(title=legend_title, frameon=False, fontsize=8.5,
+                        loc="upper left", title_fontsize=8.5)
+        if leg.get_title() is not None:
+            leg.get_title().set_color(pal["ink"])
+
+    for item in ([ax.title] + ax.get_xticklabels() + ax.get_yticklabels()):
+        item.set_fontfamily(_FONT_STACK)
+    fig.tight_layout()
+    return ax
+
+
+# ---------------------------------------------------------------------------
 # Maps
 # ---------------------------------------------------------------------------
 
@@ -697,7 +1390,7 @@ def coordinate_map(data, wave=None, *, size=None, where=None, lat="Latitude",
     caption = "; ".join(note)
 
     if not interactive:
-        plt = _require_pyplot()
+        plt = _require_pyplot("coordinate_map")
         import numpy as np
         _, ax = plt.subplots(figsize=(6.4, 6.4), dpi=130)
         ax.scatter(df[lon], df[lat], s=[3.14 * r * r for r in radii],

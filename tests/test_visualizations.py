@@ -390,3 +390,308 @@ def test_where_that_matches_nothing_names_the_values_the_column_holds():
         coordinate_map(_clusters(), interactive=False, where={"strata": "x"})
     with pytest.raises(TypeError, match="where= takes"):
         coordinate_map(_clusters(), interactive=False, where="Region == 'oio'")
+
+
+# --- lorenz_curve ----------------------------------------------------------
+
+import re  # noqa: E402
+
+import numpy as np  # noqa: E402
+from matplotlib.collections import PolyCollection  # noqa: E402
+
+from lsms_library.visualizations import _MISSING_MPL, _lorenz, lorenz_curve  # noqa: E402
+
+
+def _households(n=300, t="2020", seed=0):
+    """A household-grain frame with the columns the frame path reads."""
+    rng = np.random.default_rng(seed)
+    return pd.DataFrame({
+        "i": [f"h{k}" for k in range(n)], "t": t,
+        "value": np.round(rng.lognormal(3, 0.8, n), 2),
+        "size": rng.integers(1, 9, n).astype(float),
+        "weight": rng.uniform(0.5, 2.0, n),
+        "Rural": np.where(np.arange(n) % 3 == 0, "Urban", "Rural"),
+        "Region": np.array(["N", "S", "E", "W"])[np.arange(n) % 4],
+    }).set_index(["i", "t"])
+
+
+def _long(n=50, t="2020"):
+    """The same households as expenditure-shaped rows: (i, t, v, j, s) x Expenditure."""
+    h = _households(n, t).reset_index()
+    rows = [{"i": r.i, "t": r.t, "v": "c0", "j": f"item{j}", "s": "purchased",
+             "Expenditure": r.value / 3}
+            for _, r in h.iterrows() for j in range(3)]
+    return pd.DataFrame(rows).set_index(["i", "t", "v", "j", "s"])
+
+
+def _fills(ax):
+    return [c for c in ax.collections if isinstance(c, PolyCollection)]
+
+
+def _curve(ax, k=0):
+    """The k-th drawn curve; ``ax.lines[0]`` is always the diagonal."""
+    return ax.lines[1 + k]
+
+
+def test_lorenz_equal_values_lie_on_the_diagonal():
+    F, L, gini = _lorenz([3.0] * 5, [1.0] * 5)
+    assert gini == pytest.approx(0.0)
+    assert np.allclose(F, L)
+    assert F[0] == 0 and F[-1] == pytest.approx(1.0) and L[-1] == pytest.approx(1.0)
+
+
+def test_lorenz_one_household_with_everything():
+    """Gini is 1 - w_that / sum(w): the trapezoid rule gives it exactly."""
+    F, L, gini = _lorenz([0, 0, 0, 5.0], [1, 1, 1, 3.0])
+    assert gini == pytest.approx(1 - 3 / 6)
+    assert np.allclose(L[:-1], 0) and L[-1] == pytest.approx(1.0)
+
+
+def test_lorenz_duplicate_row_equals_doubled_weight():
+    a = _lorenz([1, 2, 2, 3], [1, 1, 1, 1])
+    b = _lorenz([1, 2, 3], [1, 2, 1])
+    assert np.array_equal(a[0], b[0]) and np.array_equal(a[1], b[1])
+    assert a[2] == pytest.approx(b[2])
+
+
+def test_lorenz_rejects_negative_and_all_zero():
+    with pytest.raises(ValueError, match="negative value"):
+        _lorenz([1.0, -1.0], [1.0, 1.0])
+    with pytest.raises(ValueError, match="every value is zero"):
+        _lorenz([0.0, 0.0], [1.0, 1.0])
+    with pytest.raises(ValueError, match="negative weight"):
+        _lorenz([1.0, 1.0], [1.0, -1.0])
+
+
+def test_lorenz_takes_nullable_floats_and_drops_zero_weights():
+    """sample() weights are pandas Float64; a zero weight cannot move the curve."""
+    w = pd.Series([1.0, 0.0, 1.0], dtype="Float64")
+    F, L, gini = _lorenz(pd.Series([1.0, 100.0, 3.0]), w)
+    assert len(F) == 3            # 0 + two positive-weight households
+    assert gini == pytest.approx(_lorenz([1.0, 3.0], [1.0, 1.0])[2])
+
+
+def test_household_frame_draws_curve_diagonal_and_fill():
+    ax = lorenz_curve(_households(), value="value", weights="weight")
+    assert ax.__class__.__name__.startswith("Axes")
+    assert len(ax.lines) == 2, "one curve plus the diagonal, nothing else"
+    assert len(_fills(ax)) == 1, "the single-series gap is shaded"
+    assert ax.get_xlim() == (0.0, 1.0) and ax.get_ylim() == (0.0, 1.0)
+    assert ax.get_xlabel() == "share of people, poorest first"
+    assert ax.get_ylabel() == "share of value"
+    assert ax.get_legend() is None, "a lone series needs no legend"
+
+
+def test_two_series_draw_no_fill():
+    """Overlapping translucent fills make a third colour; two curves get none."""
+    ax = lorenz_curve(_households(), value="value", weights="weight", by="Rural")
+    assert len(ax.lines) == 3
+    assert not _fills(ax)
+
+
+def test_per_person_and_per_household_differ_unless_sizes_are_one():
+    h = _households()
+    person = lorenz_curve(h, value="value", weights="weight", per="person")
+    household = lorenz_curve(h, value="value", weights="weight", per="household")
+    assert not np.array_equal(_curve(person).get_ydata(), _curve(household).get_ydata())
+    assert person.get_xlabel().startswith("share of people")
+    assert household.get_xlabel().startswith("share of households")
+
+    ones = h.assign(size=1.0)
+    a = lorenz_curve(ones, value="value", weights="weight", per="person")
+    b = lorenz_curve(ones, value="value", weights="weight", per="household")
+    assert np.allclose(_curve(a).get_ydata(), _curve(b).get_ydata())
+
+
+def test_per_person_without_a_size_column_raises():
+    with pytest.raises(ValueError, match="needs a household-size column"):
+        lorenz_curve(_households().drop(columns="size"), value="value", weights=False)
+    # per='household' needs no size at all
+    lorenz_curve(_households().drop(columns="size"), value="value", weights=False,
+                 per="household")
+
+
+def test_expenditure_shaped_frame_is_summed_to_household_grain():
+    a = lorenz_curve(_long(50), weights=False, per="household")
+    b = lorenz_curve(_households(50), value="value", weights=False, per="household")
+    assert np.allclose(_curve(a).get_xdata(), _curve(b).get_xdata())
+    assert np.allclose(_curve(a).get_ydata(), _curve(b).get_ydata())
+    assert a.get_ylabel() == "share of spending"
+
+
+def test_household_frame_without_expenditure_asks_for_value():
+    with pytest.raises(ValueError, match="pass value="):
+        lorenz_curve(_households(), weights=False)
+
+
+def test_by_draws_bar_and_alt_with_gini_in_each_legend_entry():
+    ax = lorenz_curve(_households(), value="value", weights="weight", by="Rural")
+    assert [_curve(ax, k).get_color() for k in range(2)] == [PALETTE["bar"], PALETTE["alt"]]
+    labels = [t.get_text() for t in ax.get_legend().get_texts()]
+    assert all(re.search(r", Gini \d\.\d\d$", s) for s in labels), labels
+    assert {s.split(",")[0] for s in labels} == {"Rural", "Urban"}
+    assert not ax.get_legend().get_title().get_text(), "legend title repeats a value"
+    assert "Gini" not in _all_text(ax), "with a legend, the Gini lives there, not in the subtitle"
+
+
+def test_by_with_three_or_more_values_raises_naming_them():
+    with pytest.raises(ValueError, match=r"holds 4 values \(N, S, E, W\)"):
+        lorenz_curve(_households(), value="value", weights=False, by="Region")
+
+
+def test_by_tuple_picks_two_titles_the_legend_and_counts_the_rest():
+    ax = lorenz_curve(_households(), value="value", weights=False, by=("Region", ["N", "S"]))
+    labels = [t.get_text().split(",")[0] for t in ax.get_legend().get_texts()]
+    assert labels == ["N", "S"]
+    assert ax.get_legend().get_title().get_text() == "Region"
+    assert "150 outside the two Region values picked, not drawn" in _all_text(ax)
+    with pytest.raises(ValueError, match="has no value"):
+        lorenz_curve(_households(), value="value", weights=False, by=("Region", ["N", "Z"]))
+
+
+def test_wave_list_is_an_ordered_ramp_darkening_toward_the_most_recent():
+    from matplotlib.colors import to_rgb
+
+    multi = pd.concat([_households(100, "2010"), _households(100, "2015", seed=1),
+                       _households(100, "2020", seed=2)])
+    ax = lorenz_curve(multi, wave=["2010", "2015", "2020"], value="value", weights="weight")
+    assert len(ax.lines) == 4 and not _fills(ax)
+    light = [sum(to_rgb(_curve(ax, k).get_color())) for k in range(3)]
+    assert light[0] > light[1] > light[2], "earlier waves must be lighter"
+    assert to_rgb(_curve(ax, 2).get_color()) == pytest.approx(to_rgb(PALETTE["bar"]))
+    labels = [t.get_text() for t in ax.get_legend().get_texts()]
+    assert [s.split(",")[0] for s in labels] == ["2010", "2015", "2020"]
+    assert all("Gini" in s for s in labels)
+    assert ax.get_title(loc="left") == "households"
+
+
+def test_wave_list_with_by_and_too_many_waves_raise():
+    multi = pd.concat([_households(20, str(y)) for y in range(2000, 2006)])
+    with pytest.raises(ValueError, match="cannot be combined"):
+        lorenz_curve(multi, wave=["2000", "2001"], value="value", weights=False, by="Rural")
+    with pytest.raises(ValueError, match="at most 5"):
+        lorenz_curve(multi, wave=[str(y) for y in range(2000, 2006)], value="value",
+                     weights=False)
+    with pytest.raises(ValueError, match="has no wave"):
+        lorenz_curve(multi, wave=["2000", "2099"], value="value", weights=False)
+
+
+def test_multi_wave_frame_defaults_to_the_most_recent_with_a_warning():
+    multi = pd.concat([_households(50, "2010"), _households(50, "2020")])
+    with pytest.warns(UserWarning, match="drawing the most recent"):
+        ax = lorenz_curve(multi, value="value", weights=False)
+    assert ax.get_title(loc="left") == "2020"
+
+
+def test_frame_path_rejects_zeros_and_basis():
+    with pytest.raises(TypeError, match="zeros= needs a Country"):
+        lorenz_curve(_households(), value="value", weights=False, zeros="include")
+    with pytest.raises(TypeError, match="basis= needs a Country"):
+        # value=None (the frame carries Expenditure) so the frame check is reached
+        lorenz_curve(_households().rename(columns={"value": "Expenditure"}),
+                     weights=False, basis="total")
+    with pytest.raises(TypeError, match="basis= applies only"):
+        # checked before the frame/Country split: basis has no meaning off food
+        lorenz_curve(_households(), value="value", weights=False, basis="purchased")
+
+
+def test_subtitle_states_basis_and_weighting_and_the_half_label_matches_the_curve():
+    ax = lorenz_curve(_households(), value="value", weights="weight")
+    text = _all_text(ax)
+    assert "value per person" in text and "weighted by weight" in text
+    assert re.search(r"Gini \d\.\d\d", text)
+    assert "300 households" in text
+    F, L = _curve(ax).get_xdata(), _curve(ax).get_ydata()
+    half = float(np.interp(0.5, F, L))
+    label = next(t.get_text() for t in ax.texts if "poorest half" in t.get_text())
+    assert f"{half:.0%} of value" in label
+    assert "poorest half of people" in label
+
+    unweighted = lorenz_curve(_households(), value="value", weights=False, per="household")
+    assert "unweighted" in _all_text(unweighted)
+    assert "poorest half of households" in _all_text(unweighted)
+
+
+def test_lorenz_missing_weights_warn_rather_than_fail():
+    with pytest.warns(UserWarning, match="no sampling weights"):
+        lorenz_curve(_households().drop(columns="weight"), value="value")
+
+
+def test_lorenz_unknown_by_names_the_frame_not_a_roster():
+    with pytest.raises(KeyError, match="neither a household-frame column nor"):
+        lorenz_curve(_households(), value="value", weights=False, by="NotAColumn")
+
+
+def test_lorenz_rejects_a_non_frame():
+    with pytest.raises(TypeError, match="Country, a country name"):
+        lorenz_curve(42)
+
+
+def test_matplotlib_error_names_its_caller():
+    """The shared message is a template now; each chart fills in its own name."""
+    assert _MISSING_MPL.format(caller="lorenz_curve").startswith("lorenz_curve() needs")
+    assert "population_pyramid" not in _MISSING_MPL
+
+
+@pytest.mark.slow
+def test_uganda_lorenz_gini_and_zero_count_are_recomputed_not_pinned():
+    """Uganda 2013-14 defaults, checked against an independent computation.
+
+    The Gini is recomputed from ``food_expenditures``,
+    ``household_characteristics`` and ``sample`` with the mean-absolute-
+    difference formula -- a different formula from the trapezoid rule the
+    chart uses, on the same data -- and the no-purchase count from the two
+    household sets.  A pinned 0.50 would test the cache, not the wiring.
+    """
+    ll = pytest.importorskip("lsms_library")
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            c = ll.Country("Uganda")
+            fe = c.food_expenditures(waves=["2013-14"])
+            hc = c.household_characteristics(waves=["2013-14"])
+            smp = c.sample()
+            ax = lorenz_curve(c, wave="2013-14")
+    except Exception as exc:                      # pragma: no cover
+        pytest.skip(f"Uganda unavailable: {exc}")
+
+    x = fe["Expenditure"].groupby(level=["i", "t"]).sum()
+    size = np.exp(hc["log HSize"]).round()
+    size.index = size.index.droplevel("v")
+    size = size.reorder_levels(["i", "t"])
+    w = pd.to_numeric(smp["weight"], errors="coerce").dropna()
+    w = w[w.index.get_level_values("t") == "2013-14"]
+    k = len(w.index.difference(x.index))          # in sample, no expenditure row
+
+    df = pd.concat([x.rename("x"), size.rename("size"), w.rename("w")],
+                   axis=1, join="inner")
+    df = df[(df["size"] > 0) & (df["w"] > 0)]
+    y = (df["x"] / df["size"]).to_numpy(dtype=float)
+    ww = (df["w"] * df["size"]).to_numpy(dtype=float)
+    W, mu = ww.sum(), (ww * y).sum() / ww.sum()
+    gini = (ww[:, None] * ww[None, :] * np.abs(y[:, None] - y[None, :])).sum() / (2 * W ** 2 * mu)
+
+    text = _all_text(ax)
+    printed = float(re.search(r"Gini (\d\.\d\d)", text).group(1))
+    assert printed == pytest.approx(gini, abs=0.01)
+    assert f"{k:,} with no recorded purchase, not drawn" in text
+    assert "food purchases per person" in text
+    assert "weighted by the survey's sampling weights" in text
+    assert "Represents:" in " ".join(t.get_text() for t in ax.figure.texts)
+
+
+@pytest.mark.slow
+def test_uganda_wide_nonfood_table_raises_citing_gh817():
+    """A one-column-per-item table must not be summed into a plausible curve."""
+    pytest.importorskip("lsms_library")
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            lorenz_curve("Uganda", wave="2013-14", value="nonfood_expenditures")
+    except ValueError as exc:
+        msg = str(exc)
+        assert "#817" in msg and "nonfood_expenditures" in msg and "columns" in msg
+    except Exception as exc:                      # pragma: no cover
+        pytest.skip(f"Uganda unavailable: {exc}")
+    else:                                         # pragma: no cover
+        pytest.fail("a wide nonfood_expenditures table must raise (GH #817)")

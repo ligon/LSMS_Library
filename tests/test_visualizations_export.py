@@ -8,6 +8,7 @@ def test_top_level_names_are_the_module_functions():
     import lsms_library as ll
     assert ll.coordinate_map is ll.visualizations.coordinate_map
     assert ll.population_pyramid is ll.visualizations.population_pyramid
+    assert ll.lorenz_curve is ll.visualizations.lorenz_curve
 
 
 def test_importing_the_package_does_not_import_folium():

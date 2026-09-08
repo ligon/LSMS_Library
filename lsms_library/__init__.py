@@ -147,7 +147,7 @@ from . import population
 from .population import PopulationRecord, population_records
 from . import transformations
 from . import visualizations
-from .visualizations import population_pyramid, coordinate_map
+from .visualizations import population_pyramid, coordinate_map, lorenz_curve
 from .dvc_permissions import authenticate
 try:
     from dvc.ui import ui as dvc_ui
