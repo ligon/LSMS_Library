@@ -1295,6 +1295,43 @@ as =legacy= -- is the structural fix for the class.
 
 *** Unit handling
 
+*/Corrected 2026-09-08 (price-sources sweep)./  Everything below the next
+three paragraphs describes a script that no longer exists, and the GH #808
+note above said the =unit_labels.org= =.replace()= "had already moved into
+the wave scripts".  *That sentence was false for five of the seven waves, and
+it is what hid the defect.*  The replace moved into *2016-17's* wave script
+and NOWHERE ELSE.
+
+*What actually happened.*  The country-level =_/food_acquired.py= applied
+=df1['u'].astype('string').replace(ulabelsd['u']['Preferred Label'])= up to
+=c345d317=.  GH #109 Phase 2 (=6de0ce37=, "wire GhanaLSS food_acquired
+end-to-end") rewrote that script as a concatenator and dropped the line.
+From then until 2026-09-08, =food_acquired.u= shipped the *raw survey
+spellings* in four waves -- =american tin=, =bowl=, =litre=, =Maxi bag=,
+=Fingers=, =Margarine tin= -- off the =_/unit_labels.org= Preferred-Label
+axis that =community_prices=, =unit_labels.org= itself and every consumer of
+=u= share.  Measured on the delivered table: *93,577 rows in 1991-92, 33,153
+in 1998-99, 149,023 in 2005-06 and 197,907 in 2012-13 -- 473,660 in all, and
+100% of the produced rows in the last two.*  1987-88 and 1988-89 are
+=u='Value'= only and unaffected; 2016-17 was always canonical.
+
+*Restored* by =359e52af= (branch =fix/prices-ghanalss=): each of the four
+wave scripts now does what 2016-17's does, resolving =unit_labels.org=
+through =countries_root()= (Trap 6 / GH #753, never a package-relative path)
+and *asserting the index is still unique afterwards*.  The assert is not
+decoration -- see Trap 9: =food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=,
+so one collision makes core SUM Quantity/Expenditure and re-derive =Price=
+on the WHOLE frame.  The edit was gated on measuring that first: *0 rows in
+duplicate groups* on =(i, t, j, u, s, visit)= across all 5,259,320 rows under
+this exact map.  Verified cold (private =LSMS_DATA_DIR=): shape and all 14
+=(t, s)= row counts identical, index unique, produced-row =Price= coverage
+unchanged, off-axis labels 9/9/30/41 -> 0.  *The one label that remains
+outside the Preferred-Label set is =Kg=, in every wave including 2016-17*:
+the parquet holds =Kilogram= and the global =categorical_mapping/u.org=
+relabels it at API time (its only scope).
+
+/Historical, and describing a deleted script -- kept for the record:/
+
 The =u= (unit) index level on =food_acquired= is canonical at
 parquet-write time via the country-level
 =_/food_acquired.py= script.  At line 22 it reads
@@ -3093,6 +3130,36 @@ market does not sell); 2016-17 31,458 of 252,366 (12.5%).
   =unit{a,b,c}= / =unito{a,b,c}=.  The unit codes carry the file's OWN value
   labels: the =unit_9b= list, except code 72 = "Service" (=unit_9b= says
   Visit) and an extra 75 = "Visit".  Decode from the price file's labels.
+  *=quantity{a,b,c}= is NOT always a count of =unit{a,b,c}= (2026-09-08).*
+  The form is =PRICE / QTY / UOM= per observation with QTY entered by the
+  enumerator, and for CONTAINER units the enumerator often entered the
+  container's *content weight in grams* instead of a count.  Decisive case:
+  =Millet=, =u='Bowl'=, clusters 70735 / 70789 / 70791 -- =Price = 4.00=,
+  =NumberOfUnits = 4000=, against a =food_acquired= unit value for
+  Millet/Bowl in Northern of *exactly 4.00 GHS*.  =Price= is the price of one
+  bowl; the 4000 is the bowl's weight.  So the column contract's
+  "=NumberOfUnits= = the quantity, in =u=, that =Price= refers to" is *false
+  for these rows*, and =Price / NumberOfUnits= returns ~1/1000 of the true
+  per-unit price (a log gap of +8.3, a ratio of 4,050).  Affects *5,351 of
+  220,908 rows (2.4%)*; top units Yard 1,729, Piece 801, Inches 304, Single
+  294, Watts 262, Feet 254, Capsule 240.  Nothing is wrong in
+  =community_prices= -- it stores the reported fields, which is its contract
+  -- so the handling belongs in the consumer.  The constant-free screen used
+  by =slurm_logs/price_sources/GhanaLSS/analysis.py= is: keep an observation
+  when =u= is a metric mass/volume unit (QTY is then unambiguously a quantity
+  of =u=) or when =NumberOfUnits == 1= (the two readings coincide).  It is
+  not lossless -- a genuine crate of 24 eggs goes with it -- and recovering
+  those rows by reading =Price= as the per-unit price needs a row-by-row
+  judgement (QTY = 2 on a Bowl is ambiguous).
+  *A weaker form of the same disease affects BOTH instruments in this wave*:
+  metric-prefix miscoding.  Beer at =u='Liter'= priced 0.0080 GHS/L in the
+  price file against 15.15 GHS/L in =food_acquired= (Eastern); Chicken
+  (thigh) at =u='Gram'= carrying a =food_acquired= unit value of 5.00 GHS
+  *per gram* (Ashanti); Oil (palm) at =u='Milliliter'= priced 5.33 GHS per ml
+  in the price file against 0.0125 in =food_acquired= (cluster 70014).  37%
+  of matched 2016-17 unit-value-vs-community-price cells have a log gap above
+  =log 1.5= as a result.  Not fixable in config; it is enumerator error in
+  the source.
   ALL 398 price =clust= values are in =g7sec0.dta='s 1,000 EAs, but the price
   file's =region=/=district= contradict the household cover for 11
   (clust, region) pairs -- clusters 70002 and 70909 hold a second EA's rows
@@ -3158,6 +3225,73 @@ drug bases) -- reported, not added (=unit_labels.org= is not in this task's
 ownership).  While there: =unit_labels.org= maps "Margarin tin" to
 =Margarin tin= and "margarin tin" to =Margarine Tin= -- two Preferred Labels
 for one spelling pair.
+
+** What =food_acquired.Price= on produced rows MEASURES (2026-09-08)
+
+Section 8H's price column -- =s8hq14= (1991-92, 2005-06), =s8hq10= (1998-99,
+2012-13), =s8hq{i}p= (2016-17), all of which land in
+=food_acquired.Price= on =s='produced'= rows -- is worded identically across
+GLSS3--GLSS7:
+
+#+begin_quote
+For how much could you sell one unit of......now?
+#+end_quote
+(GLSS3, =1991-92/Documentation/pdf/G3QPartB.pdf=, Section 8H col. 14; col. 13
+is =ENTER UNIT THAT THE RESPONDENT CHOOSES / SEE LIST OF UNIT CODES=.)
+
+#+begin_quote
+For how much would you sell one unit of ..............now?
+USE MOST OCCURING UNIT OF MEASURE
+#+end_quote
+(GLSS6, =2012-13/Documentation/QUESTIONNAIRES/GLSS6 Part B Questionnaire.pdf=;
+GLSS7, =2016-17/Documentation/GLSS7_MODULE B _14_10_16.docx=, Section 8H Q9.)
+
+It is therefore a *seller-side* valuation by wording.  *Measured, it is not
+one.*  In 2016-17 -- the only wave where GhanaLSS also has a purchase unit
+value, because every earlier wave elicits purchases by VALUE -- the median
+log gap between the household's purchase unit value and its own-consumption
+valuation, over *322 matched (item, unit, geography) cells*, is *exactly
+0.0000*, and *31.7% of cells agree to the last digit*.  Households answer
+with the local retail price they know.  *Anyone valuing own-consumption in
+GhanaLSS at =food_acquired.Price= and calling it a producer or farmgate price
+is mis-labelling a purchase price.*
+
+Two further properties of that column, both measured on 2012-13
+=s='produced'=, =u='Kg'=: it is *very coarse* -- essentially three values,
+0.5, 1.0 and 2.0 GHS/kg, respondents rounding to coin denominations -- and it
+is *not* on the same lot size as =community_prices=, which weighs a retail
+portion: 0.11 kg for pepper and 2.85 kg for yam, so the surveyed per-kg price
+of a perishable is a small-portion price and a staple's is a bulk price.  The
+market/own-valuation ratio in that wave consequently runs from 0.59 (yam) to
+12.0 (pepper) *by lot size and perishability, not by price level*.
+
+The unit is also the one *the respondent chooses*, which is why the =u= axes
+of the two instruments barely meet before 2016-17: shared units cover 7.0% of
+1991-92's produced rows, 3.5% of 1998-99's and 11.2% of 2012-13's, against
+91.5% in 2016-17.  The price survey weighs (BID §2.3 /"Weighing scales were
+used to determine the exact weight of food items"/; the GLSS3 price form's
+column is =KG=); Section 8H does not.  *That is a property of the two
+instruments, not a mapping defect, and no crosswalk table fixes it.*
+
+Full analysis, with the cell / gap / model CSVs:
+=slurm_logs/price_sources/GhanaLSS/REPORT.org=.
+
+** The price-item =j= axis is CLEAN -- the "166 of 662" is not a defect
+
+Recorded because an external inventory
+(=slurm_logs/price_sources/inventory.json=, and §4 of
+=.coder/ledger/price-sources-comparison.md=) lists GhanaLSS's "166/662" among
+cross-country *label-axis defects*.  Measured per wave against the *BUILT*
+=food_acquired= (Trap 8's lesson -- the config was right there too, and the
+built table was not), restricting the price list by its own =Food= flag:
+*every =Food: yes= price label is in =food_acquired.j=, in every wave* --
+20/20, 20/20, 60/60, 59/59, 82/82, 132/132.  The pooled 166/662 is the union
+of six waves' price lists measured against the union of the food axis, and
+662 includes *400 non-foods in 2016-17 alone* (charcoal, refuse disposal,
+public-toilet fees) which =harmonize_food= must never gain, plus 17
+=Food: own= labels which by definition are not on the wave's axis.  What
+actually limits the item axis is what households PRODUCE: priced-and-produced
+=j= per wave is 19, 19, 28, 30, 39, 44.
 
 ** 2005-06: asked, not distributed
 
