@@ -1196,6 +1196,58 @@ Second, starting in the 1991--92 wave, rather than eliciting expenditures over a
 
 NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for expenditures "since my last visit", but only for one visit, while subsequent rounds elicit this information across several visits.
 
+*** RETIRED: the country-level =_/food_acquired.py= concatenator (2026-09-07, GH #808)
+
+=GhanaLSS/_/food_acquired.py= is deleted and =food_acquired= has ONE
+builder: the wave scripts (=<wave>/_/food_acquired.py=, run per wave through
+the Makefile's =../%/_/food_acquired.parquet= pattern rule), concatenated by
+the framework's =load_from_waves=, with the GLSS1<->GLSS2 panel ids applied
+at read time by =_finalize_result= -> =id_walk= from =updated_ids= (built by
+=_/panel_ids.py=, GH #548).
+
+*Why.*  The retired script re-keyed households with =ghanalss.change_id=,
+which suffixes a non-injective PANELC link by =enumerate= -- =101332_0= /
+=101332_1= -- while =panel_ids.py= uses the bare-first convention =101332=
+/ =101332_1= that =tests/test_panel_id_collisions.py= pins and that the
+1987-88 -> 1988-89 link needs.  Two builders, two id conventions for the
+same split household.  The script was reachable only through the Makefile:
+=$(VAR_DIR)/nutrition.parquet= (GH #563) listed
+=$(VAR_DIR)/food_acquired.parquet= as a prerequisite, so
+=Country('GhanaLSS').nutrition()= (=nutrition: !make=) rebuilt
+=var/food_acquired.parquet= through the retired script -- and because that
+parquet was written hashless, the L2 read graded it =legacy=, trusted it,
+re-stamped it with the current hash and served =101332_0= as fresh forever
+(the GH #803 shape, one tier up).  Demonstrated cold on =development= @
+96e051c5: =nutrition()= in an empty =LSMS_DATA_DIR= ran the wave scripts
+(12:57-12:58), wrote =var= at 12:59:10 with =101332_0=, and the API served
+=101332_0= from then on; the shared cache carried the same signature after
+a make-driven rebuild.  =nutrition.py= never read that parquet -- it calls
+=Country('GhanaLSS').food_acquired()= -- so the prerequisite was the whole
+link, and it is removed together with the rule and the =var= list entry.
+
+*The "Unit handling" paragraph below is older still.*  The
+=unit_labels.org= =.replace()= it attributes to the country-level script had
+already moved into the wave scripts (2016-17's reads =../../_/unit_labels.org=
+directly); the script retired here only concatenated and re-keyed ids.
+
+*The GH #479 required-column guard still covers this table.*
+=Country._aggregate_wave_data= used to recognise =food_acquired= as
+script-path only through the presence of the country-level script it has
+just retired; =Country._is_script_path= now also counts a wave-level
+=<wave>/_/<table>.py= (resolved through =wave_folder_map=), so
+=_assert_built_required_columns= keeps firing on a build that lacks
+=Quantity= / =Expenditure= / =Price=.  That edit sits in a fingerprinted
+orchestrator and moves every L2 cache hash once (measured 4/4 -- the same
+one-time rebuild the 0.11.0 =load_from_waves= split already imposes on
+anyone upgrading from 0.10.0; checked against the =v0.10.0= tag).
+
+*Same class, NOT changed here.*  =_/household_roster.py= is a second
+country-level concatenator on =change_id=; =household_roster= is YAML-path
+in every wave, so that script is reachable only via =make all= /
+=$(VAR_DIR)/household_roster.parquet=, never from the API.  GH #808 option
+(3) -- never trust a hashless country-level parquet written by a make recipe
+as =legacy= -- is the structural fix for the class.
+
 *** Unit handling
 
 The =u= (unit) index level on =food_acquired= is canonical at

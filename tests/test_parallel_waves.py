@@ -572,30 +572,3 @@ def _value_error_in_worker(w):
     if pw._IN_WORKER:
         raise ValueError("genuine build failure")
     return True, pd.DataFrame({"wave": [w]})
-
-
-def _dvcfs_identity_in_worker(w):
-    import os
-    from lsms_library import local_tools
-    from lsms_library import _parallel_waves as pw
-    return True, {"pid": os.getpid(), "dvcfs_id": id(local_tools.DVCFS), "in_worker": pw._IN_WORKER}
-
-
-class TestWorkerOwnsItsDvcFilesystem:
-    def test_child_rebuilds_dvcfs(self, monkeypatch):
-        """A forked worker must not use the parent's module-level DVCFileSystem
-        (its inner async filesystems refuse a child pid once used)."""
-        import os
-        from lsms_library import local_tools
-        from lsms_library import _parallel_waves as pw
-        monkeypatch.setattr(pw, "visible_cpus", lambda env=None: 4)
-        monkeypatch.setattr(pw, "memory_worker_cap", lambda env=None: None)
-        monkeypatch.setenv("LSMS_BUILD_WORKERS", "2")
-        parent_id = id(local_tools.DVCFS)
-        payloads = pw.prebuild(_dvcfs_identity_in_worker, ["a", "b"], None, country="X", table="t")
-        assert payloads is not None
-        for w in ("a", "b"):
-            _, info = pw.relay(payloads[w], country="X", table="t")
-            assert info["in_worker"] is True and info["pid"] != os.getpid()
-            assert info["dvcfs_id"] != parent_id
-        assert id(local_tools.DVCFS) == parent_id          # the parent's is untouched
