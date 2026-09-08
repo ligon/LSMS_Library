@@ -1561,9 +1561,11 @@ a null =plot= id (the =hhid-parcel-plot= concatenation propagates NA).
 Unrelated to and unchanged by the =condition= work; =condition= is
 sentinel-filled precisely so it does not add to this.
 
-** TODO 2015-16 =crop_production.Value_sold= is ~100x too small (whole wave) (#829)
+** WAITING 2015-16 =crop_production.Value_sold= was ~100x too small (whole wave) (#829)
 
 - GitHub :: [[https://github.com/ligon/LSMS_Library/issues/829][#829]] (bug, silent-corruption)
+- Status :: *CORRECTED by x100 in the wave script* (=2015-16/_/crop_production.py=, 2026-09-08) --
+  measured, NOT documented by the producer; *revert if the World Bank re-releases the wave*
 - Waves affected :: 2015-16 only, both seasons (AGSEC5A / AGSEC5B)
 - Severity :: Critical for any use of =Value_sold= or the WB harvest-valuation ladder on that wave; grades =sane=
 
@@ -1594,9 +1596,10 @@ price that someone mis-wired.  Only its level is wrong: median =a5aq8= is
 The 2015-16 *food* module is unaffected (its own maize valuation is a normal
 700 UGX/kg), so this is not a currency redenomination.
 
-The cause is now *established as a mechanism* but is *not documented by the
-producer* -- see the 2026-09-08 investigation below.  No correction factor is
-applied here; that decision is @ligon's, not an agent's.
+The cause is *established as a mechanism* and is *not documented by the
+producer* -- see the 2026-09-08 investigation below.  On @ligon's decision the
+x100 IS now applied, in =2015-16/_/crop_production.py=, as a measured
+correction with the evidence cited in the script.
 
 *** Mechanism: =a5aq8= / =a5bq8= were DIVIDED BY 100 in this release (2026-09-08, #829)
 
@@ -1716,18 +1719,21 @@ also has the wrong sign (it would make the implied price 100x too LARGE).
 
 **** Recommendation
 
-1. *Keep excluding 2015-16 from any =Value_sold=-based number for Uganda*, as
-   the price comparison already does.
-2. =absent_verdicts= is the *wrong instrument*: the cell is declared, builds
-   and returns rows.  It is corrupt, not absent.  If the wave must stop
-   grading =sane= on this column, the honest lever is to null =Value_sold=
-   for 2015-16 in the wave script (recorded here as an option, deliberately
-   not implemented).
-3. *A x100 in =2015-16/_/crop_production.py= is now a measurement, not a
-   guess* -- but it is still a correction the producer does not document, so
-   it is @ligon's call, not an agent's.  It would be a two-line patch:
-   multiply the =Value_sold= column of both seasons by 100 with this entry
-   cited.  Nothing else in the wave needs touching.
+1. Superseded by item 3: 2015-16 =Value_sold= no longer needs excluding from
+   Uganda numbers.  Any result computed *before* 2026-09-08 was built on the
+   uncorrected column and must be rerun.
+2. =absent_verdicts= was the *wrong instrument* and remains so: the cell is
+   declared, builds and returns rows -- it was corrupt, not absent.  Moot
+   since item 3, but worth keeping: the nulling option considered here is
+   *not* what was done.
+3. *DONE (2026-09-08, @ligon's decision).*  =2015-16/_/crop_production.py=
+   multiplies =a5aq8= / =a5bq8= by 100 before they become =Value_sold=,
+   carrying the three decisive numbers and the questionnaire pages in a
+   comment.  Verified cold: row counts unchanged in every wave (2015-16
+   19 576; corpus 133 683), =Quantity= and =Quantity_sold= byte-identical,
+   no other wave's =Value_sold= sum moved, and 2015-16's per-crop median
+   UGX/kg now sits with 2013-14 and 2019-20.  *Revert this if the World Bank
+   re-releases the wave at the proper scale* -- the md5 above is the check.
 4. Worth reporting upstream to the World Bank LSMS team with the md5 above.
 
 Consequence for any analysis: 2015-16 =Value_sold= (and anything derived
