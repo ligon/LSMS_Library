@@ -507,4 +507,28 @@ Data Scheme:
     Price: float
     materialize: make
 
-  nonfood_expenditures: !make
+  nonfood_expenditures:
+    # Item-level household non-food expenditure from the post-planting
+    # (sect8a-e) and post-harvest (sect11a-e) modules.  `j` is the per-round
+    # `nonfood_items.json` label; `t` is the ROUND (2010Q3, 2011Q1, ...), never
+    # the wave directory -- Nigeria is post-planting / post-harvest and the two
+    # rounds in a wave dir are distinct observations
+    # (.claude/skills/add-feature/pp-ph/SKILL.md).
+    #
+    # LONG since GH #817.  It used to be declared bare `!make` and delivered a
+    # WIDE 96-column item-by-household matrix with the zone `m` in the index;
+    # with no `index:` and no columns here, `_assert_built_required_columns`,
+    # the `dfs:` guard and the coverage grader had nothing to check.  The
+    # reshape changed the SHAPE, not the arithmetic: every round's total is
+    # unchanged.  `m` is gone -- a region level is added on demand by
+    # `_add_market_index()` when the caller passes `market=`.
+    #
+    # NO RecallWindow, and that is a KNOWN GAP rather than a statement about
+    # the survey: sect8a-e and sect11a-e are different recall windows (the
+    # instrument asks over 7 days for one sub-module and longer for the
+    # others), and this table pools them.  Togo carries `RecallWindow` for
+    # exactly this reason.  Populating it here needs the instrument read
+    # sub-module by sub-module; see GH #817's follow-up note.
+    index: (t, i, j)
+    Expenditure: float
+    materialize: make

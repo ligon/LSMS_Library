@@ -850,3 +850,71 @@ non-food).  W2 94.7% resolve: in addition to the same tobacco drop, a small
 W2-only block of undocumented "other miscellaneous foods" sub-codes
 (191x/192x/193x, ~4% of W2 rows) has no authoritative label in the retained
 documentation and is left unresolved rather than guessed (no faked labels).
+
+* nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
+
+Item-level household non-food expenditure from the post-planting (=sect8*=) and
+post-harvest (=sect11*=) modules.  =t= is the *round* (=2010Q3=, =2011Q1=, ...),
+never the wave directory -- the standard Nigeria PP/PH rule.  =j= is the
+per-round =nonfood_items.json= label.
+
+** It used to ship WIDE, with the zone baked in
+
+Before GH #817 each wave script ended
+=set_index(['j','t','m','i'])['value'].unstack('i')= and the country script
+re-pivoted with =.T.groupby('i').sum().T=, delivering a 96-column
+item-by-household matrix with =m= (the zone) in the index.  =m= must not be
+baked into a cached parquet -- it is added on demand by =_add_market_index()=
+when the caller passes =market==.  Dropping it is safe and was measured: *no
+household carries more than one zone in any round*, and =(t, i, j)= has zero
+duplicates once =m= is removed (the wave scripts now assert exactly this).  The
+reshape moved no money -- all eight round totals are byte-identical.
+
+** =hhid= and =item_cd= were mapped to the WRONG canonical names
+
+The =vars= dict mapped ='hhid': 'j'= and ='item_cd': 'i'= -- household to =j=,
+item to =i=, both backwards -- and the rest of each script compensated
+(=x['j'] = x['j'].astype(int).astype(str)= was casting the *household*).  Fixed
+in #817.  *Check which level an older script or notebook thought was which.*
+
+** =aggregate_items.json= is a FOOD map.  Do not wire it to this table.
+
+=Nigeria/_/aggregate_items.json= has one key, =Aggregated Label=, and its
+values are food items (=Eggs=, =Apples=, =Avocado pear=, ...).  It is consumed
+by =food_quantities.py= and =unitvalues.py=.  A commented-out
+=x.rename(columns=lbl['Aggregated Label'])= sat in the nonfood country script
+for years looking like scaffolding for a non-food aggregation; it was pointing
+at the wrong file entirely and has been removed rather than revived.
+
+** WAITING Recall windows are POOLED, and no column records it
+
+=sect8a..e= and =sect11a..e= are separate sub-modules asking over *different
+recall windows* -- the wave scripts' own comments say "past 7 days" for
+=s11aq2= and "past month" for the other four, and the =s8q*= series is
+undocumented in those comments.  This table sums them into one =Expenditure=
+with no =RecallWindow=, so a Nigeria non-food total is a sum of
+incommensurable windows.
+
+Togo carries =RecallWindow= for exactly this reason, and the canonical schema
+in =lsms_library/data_info.yml= declares it =optional: true= so Nigeria can
+adopt it without a migration.  Doing so needs the instrument read sub-module by
+sub-module -- not a guess from the comments, which are visibly copy-pasted.
+*Out of scope for #817, which was about the table's shape.*  Recorded here so
+the next person does not read the absence of the column as evidence the windows
+agree.
+
+** =demands.org= describes the PRE-canonical shape and does not run
+
+=_/demands.org= is a literate analysis note (it tangles to =/tmp/demands.py=;
+no Makefile target builds it).  Its header table declares "Expenditures |
+indexed by j,t,m | columns i" -- the old backwards convention where =j= was the
+household and =i= the item -- and its estimation block does
+
+: x = pd.concat([pd.read_parquet('food_expenditures.parquet'),
+:                pd.read_parquet('nonfood_expenditures.parquet')], axis=1)
+
+which is a bare relative path.  That was *already* dead before GH #817: since
+GH #803 no =*.parquet= exists inside =countries_root()=, so the read fails
+before the shape can matter.  Left as-is -- it is a note about a method, not a
+build step -- but *do not take its index convention as current*.  The canonical
+grain is =(t, i, j)= with a single =Expenditure= column.

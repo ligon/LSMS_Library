@@ -1628,3 +1628,81 @@ urban/rural) while 2011-12 onward uses 10--15 sub-regions.
 These are genuinely different stratification schemes.  For
 pooled analysis across waves, analysts may need to aggregate
 the finer sub-regions back to the 4-region level.
+
+* nonfood_expenditures (GSEC14B / GSEC15C) -- long since GH #817
+
+Item-level household non-food expenditure: =GSEC14B.dta= in 2005-06,
+=GSEC15C.dta= (case varies by wave) in every later wave.  =Expenditure= sums
+the survey's separate /purchased/, /produced/ and /given/ (in-kind) columns;
+=j= is the =nonfood_items.org= *Preferred Label*.  There is no =away= column
+in any Uganda wave, so the helper's =away== argument is always =None=.
+
+** It used to ship WIDE, and the pivot was ours, not the survey's
+
+Before GH #817 =uganda.nonfood_expenditures()= returned an
+item-by-household matrix and =_/nonfood_expenditures.py= re-pivoted the eight
+wave parquets into one 41--62-column frame with =x['m'] = 'Uganda'= stamped
+into the index.  Nothing in the instrument asks for that shape.  Three
+consequences, all now gone:
+
+- the =fillna(0)= at both levels *fabricated an expenditure of 0* for every
+  (household, item) pair the survey never recorded -- ~72--80% of the cells --
+  so "not reported" and "reported zero" were the same number;
+- =m= was baked into a cached parquet, which =_add_market_index()= is supposed
+  to add on demand;
+- the frame could not be stacked with Togo's long =nonfood_expenditures=, and
+  =labels==, =currency== and the coverage grader's =j= checks all no-op'd on it.
+
+The reshape moved *no money*: every wave's total is byte-identical before and
+after (2005-06 258,235,592 ... 2019-20 757,048,418; the eight are pinned in
+=tests/test_nonfood_expenditures_schema.py=).
+
+** The =i= / =j= names in the old helper were BACKWARDS
+
+=uganda.nonfood_expenditures()= returned a frame whose =index.name= was ='j'=
+but held HOUSEHOLDS, and whose =columns.name= was ='i'= but held ITEMS.  Every
+consumer compensated: =uganda.id_walk= fell through its ='i'= branch to the
+='j'= level and renamed it, and =2015-16/_/nonfood_expenditures.py='s hhid
+fix-up (=gsec15c='s =hhid= is the wrong variable; the real one comes from
+=gsec1.dta=) was keyed on ='j'=.  Both now use the canonical names.  *If you
+are reading an old script or notebook against this table, check which level it
+thought was which.*
+
+** WAITING No =RecallWindow=, and the window is ITEM-SPECIFIC -- a real gap
+
+*Do not read the absent column as "Uganda uses one window".*  An earlier draft
+of this section said exactly that and it is *false*.  The evidence is in the
+=.dta='s own variable labels (=pyreadstat.read_dta(..., metadataonly=True)=,
+2013-14 =GSEC15C.dta=, verbatim):
+
+: h15cq2  In the past [RECALL] did household purchase any [ITEM]?
+: h15cq5  How much came from purchases in the past [RECALL]? VALUE
+: h15cq7  How much came from own-production in the past [RECALL]? VALUE
+: h15cq9  How much came from gifts\in-kind sources in the past [RECALL]? VALUE
+
+=[RECALL]= is a *CAPI fill*, exactly like =[ITEM]= beside it: the recall period
+*varies by item* and the label is the un-substituted template.  2011-12 carries
+the identical labels.  So Uganda's non-food module is the same shape as Togo's
+section 9 -- amounts reported over item-specific windows -- and this table sums
+them.
+
+The window is *not in the shipped extract*: no wave's file carries a recall
+variable (2013-14 ships =HHID itmcd h15cq2..h15cq10 wgt_X= and nothing else),
+and =nonfood_items.org= has only =Code / Preferred Label / Aggregate Label=.
+2018-19 / 2019-20 dropped the placeholder from the labels entirely (=CEC05.
+Value purchased=), so those waves say even less.
+
+Recovering it means reading the questionnaire item list per wave and adding a
+recall column to =nonfood_items.org=.  =RecallWindow= is declared
+=optional: true= in =lsms_library/data_info.yml= precisely so that can be done
+later without a migration.  *Out of scope for GH #817, which was about shape.*
+Same gap, same class, as Nigeria's =sect8= / =sect11= pooling.
+
+** =labels='Aggregate'= silently does nothing on this table
+
+=nonfood_items.org= has an =Aggregate Label= column (41 distinct labels over 62
+Preferred Labels), but the =labels== machinery resolves against
+=food_items= / =harmonize_food=.  Measured 2026-09-08:
+=nonfood_expenditures(labels='Aggregate')= returns the *identical* 61 =j=
+values as the plain call -- a silent no-op, not an error.  Extending =labels==
+to non-food tables is a core change and was deliberately left out of #817.
