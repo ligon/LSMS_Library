@@ -1368,6 +1368,97 @@ recall at the first ask (the "last visit" it refers back to is the intake
 visit, which need not be five days earlier), with telescoping, or with item
 mentions attriting as the household tires of the module -- and these have
 different implications for whether visit 2 should be weighted like the rest.
+***** The literature: Scott and Amenuvegbe (1990), commissioned FOR the GLSS
+
+There is a controlled experiment on exactly this question, run in Ghana
+*because of* this survey, and it anticipates the mechanism:
+
+#+begin_quote
+Scott, Chris and Ben Amenuvegbe (1990).  /Effect of Recall Duration on
+Reporting of Household Expenditures: An Experimental Study in Ghana./
+Social Dimensions of Adjustment in Sub-Saharan Africa Working Paper No. 6.
+Washington, D.C.: World Bank.  World Bank report no. 8905.
+http://documents.worldbank.org/curated/en/598051468774854613
+#+end_quote
+
+The same experiment appears again as, almost certainly, its published version:
+
+#+begin_quote
+Scott, Chris and Ben Amenuvegbe (1991).  "Recall Loss and Recall Duration: An
+Experimental Study in Ghana."  /Inter-Stat/ 4(1): 31--55.
+#+end_quote
+
+/Probable, not verified./  Same authors, same experiment, same headline result;
+the working paper closes by saying "the authors plan a fuller analysis of this
+effect for later publication", and the journal version runs 25 pages against the
+working paper's 19.  The experiment was funded by a UK Overseas Development
+Administration grant and =Inter-Stat= was an ODA-linked statistics bulletin, so
+it is the natural outlet -- but that last link is unconfirmed and a serials
+catalogue would settle it.  *Both are in circulation as the citable form*: the
+UN /Household Sample Surveys/ handbook cites the 1990 working paper, Beegle et
+al. (2012) cite the 1991 /Inter-Stat/ version.
+
+A sample-size difference between the two citations is NOT evidence of revision:
+the working paper reports both numbers -- 144 households selected, 135
+surviving absence and refusal "for analysis".  Beegle quotes the former, the
+executive summary the latter.
+
+(Neither is to be confused with Scott and Amenuvegbe /1991/ in the /Journal of
+Official Statistics/ 7(3): 367--373, the self-weighting sampling paper cited at
+the top of this file.  Three papers, two years, same two authors.)
+
+*Why it exists*, in the authors' words: the GLSS design "called for a 2-week
+recall period for each household, a period chosen essentially for logistic
+motives rather than in response to any evidence of recall efficiency", and the
+Social Dimensions of Adjustment project was about to propagate that design
+across Africa.  It is a standalone experiment -- 135 households, each
+interviewed *11 times* at varying intervals, ODA-funded, sponsored by the Ghana
+Statistical Service -- NOT an experiment embedded in the GLSS itself.
+
+*What they found*, over 13 frequently purchased items:
+
+- reported daily expenditure falls consistently as the recall period lengthens
+  from 1 day to 1 week, then *little or no further fall* from 1 to 2 weeks; a
+  1-year recall was erratic.  The curve is steep early and flat later;
+- after re-weighting away weekly/monthly purchase cycles, with start-up bias
+  eliminated and recall bounded, the loss averages *2.9% for every day added*;
+- the decline is *larger for items purchased more frequently*;
+- so a weekly recall underestimates frequent purchases by *~20%* -- and that is
+  in what they call "an abnormally well controlled field situation".
+
+*Their mechanism, which is the part that matters here.*  They favour the
+reading that the 1-day figure is the most accurate and that this is recall
+lapse rather than a boundary artefact.  Their hypothesis is that beyond a
+threshold recall length respondents *switch from factual to normative
+reporting* -- "what I usually buy" rather than "what I bought" -- and normative
+reporting overlooks exceptional (typically high) purchases, biasing downward.
+
+*This is what our own measurement observes directly.*  On GLSS4, within
+household and across ask number, reported spend is essentially invariant to the
+realised interval: doubling the gap from 5 to 10 days changes reported spend by
++1.2% where proportionality predicts +100% (elasticity 0.018; item counts
+identical at 18.8).  That is normative reporting, measured -- a household
+reporting "what I buy between visits", not "what I bought in N days".  Their
+"larger decline for frequently purchased items" likewise matches the first-ask
+excess being mostly extensive-margin here (1.42x more items, GLSS3 rural).
+
+*The consequence for aggregation.*  If the reported amount does not scale with
+the elapsed interval, then dividing by measured days does not normalise -- it
+injects fieldwork tempo into the estimate.  Bin GLSS4 households by measured
+exposure and total spend is flat while the implied daily rate spans 2.7x,
+entirely from the denominator.  The defensible quantity is the per-ask amount
+at the *nominal protocol* interval, not the realised one.
+
+*The question is not settled in the literature.*  The UN /Household Sample
+Surveys in Developing and Transition Countries/ (ch. 24) cites this study and
+immediately notes the dispute: Mahalanobis and Sen (1954) on the Indian
+National Sample Survey found a one-MONTH reference period less biased than a
+one-week one for certain foods -- the opposite sign -- and Deaton (1997) holds
+that nobody has separated recall decay from boundary telescoping.  Our GLSS3
+contrast is evidence on precisely that open question: at *identical* interval
+lengths the first ask still carries 24-40% more, and the step is 1.84x for the
+unaided rural stratum against 1.17x for the diary-assisted urban one.
+
 Worth noting that GLSS5, whose own-production module starts at the 3rd visit
 rather than the 2nd, shows the weakest first-ask step (1.02x, against 1.67x
 for GLSS7 produced), which is the kind of contrast that could separate those
