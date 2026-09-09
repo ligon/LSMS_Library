@@ -173,6 +173,28 @@ Data Scheme:
     Value_sold: float
     harvest_month: int
     intercropped: bool
+    # SURVEY-REPORTED kilograms per ONE unit of the row's `u` -- UNPS
+    # question 6d, "Record the conversion factor into kg", asked beside
+    # every harvest record.  A RATE, not a weight: the row's kilograms are
+    # Quantity * KgFactor.  Reported 0 is read as "not recorded" and stored
+    # NaN (0 kg per unit is not a weight).
+    #
+    # Why it earns a column when the library can already infer kg from the
+    # unit label: it is INDEPENDENT of that label, so it survives a wave
+    # whose unit column the extract dropped.  2018-19 season A is exactly
+    # that wave -- no unit code at all, u='Unknown' on all 7 153 rows (GH
+    # #842) -- and 6d is populated on 7 123 of them, which is the only kg
+    # basis that cell has.  It is also non-circular, unlike the
+    # Expenditure/Quantity ratio inference in `_get_kg_factors`.
+    #
+    # `optional` because it is wired for 2018-19 ONLY.  The other six waves
+    # ship a 6d column too, but their kilograms already resolve through the
+    # unit label, so wiring them MOVES numbers and needs its own
+    # before/after; until then KgFactor is legitimately all-NaN in those
+    # waves and the all-null sanity check must not fire.
+    KgFactor:
+      type: float
+      optional: true
     materialize: make
   plot_inputs:
     # Item-level agricultural-input module (GAP 2 parity build).  One row
