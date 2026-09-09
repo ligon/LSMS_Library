@@ -6,6 +6,13 @@ Single Index:
   pid: individual id
   plot_id: plot id
   int_t: interview date
+  # `visit` -- recall occasion.  An INTEGER ordinal of the enumerator call the
+  # observation was collected at, for the surveys that revisit a household
+  # several times within one wave (GhanaLSS food_acquired; EHCVM
+  # interview_date).  A single-recall wave is `visit = 1`.  Type contract and
+  # the reason it is declared but NOT coerced: see `Columns > food_acquired >
+  # visit` below.
+  visit: recall occasion
   # `u` -- unit.  CANONICAL MISSING-UNIT SENTINEL: `Unknown` (GH #842/#847).
   #
   # A survey that records an amount and no unit must put `Unknown` on `u`, NOT
@@ -312,6 +319,20 @@ Columns:
     # an ordinal `visit` index (local_tools.melt_visit_intervals) into
     # Interview start / Interview end.  None required: a country emits
     # whichever columns its source records (start-only -> Interview start).
+    visit:
+      type: int
+      note: |
+        INDEX level, not a column -- see the identical entry under
+        `food_acquired` for the contract and for why it is declared but
+        deliberately not coerced.  Measured 2026-09-09, all ten countries
+        that carry this level warm (Albania, Benin, Burkina_Faso,
+        CotedIvoire, Guinea-Bissau, Malawi, Niger, Senegal, Togo, and
+        GhanaLSS on `food_acquired`) already ship it as int64, so the
+        declaration is a statement of what is already true.  Note
+        `interview_date` is in `fabricate_missing_levels` above: a
+        single-visit country's rows get `visit = NaN` during Feature()
+        assembly, so anything that ever does enforce this must use the
+        NULLABLE integer type and must not read NaN as a violation.
     Int_t:
       type: datetime
     Interview start:
@@ -591,6 +612,54 @@ Columns:
     # not a column.  Canonical values: purchased, produced, inkind,
     # other.  Enforced in code (lsms_library.transformations.S_VALUES);
     # data_info.yml has no schema for index-level value enumerations.
+    visit:
+      type: int
+      note: |
+        INDEX level, not a column -- declared here for the same reason
+        `crop_production.condition` is (see above): this file is where a
+        cross-country level contract is written down, even where the
+        machinery that would enforce it does not yet reach index levels.
+        It is NOT `required`, because only a repeated-recall country has
+        the level at all (GhanaLSS and Nepal today).
+
+        CONTRACT: an INTEGER recall occasion, homogeneous across every
+        wave of a country.  A single-recall wave gets `visit = 1` --
+        the convention `build_transforms.add_visit_level` exists to
+        stamp.  A wave that renumbers onto the survey's own calendar
+        visits starts at 2 where visit 1 is an intake call that collects
+        no consumption (every multi-visit GLSS round), so `visit == 1`
+        reads unambiguously as "asked once".
+
+        WHY THE TYPE IS PART OF THE CONTRACT, not housekeeping.  Until
+        2026-09-09 GhanaLSS shipped this level as int in five waves, the
+        string '2'..'7' in 1998-99, and the English sentence
+        'since last visit' in 1988-89.  The country-level concat produced
+        an object level of mixed int/str, and on it
+        `food_acquired().xs(2, level='visit')` returned 752,970 rows while
+        SILENTLY OMITTING 1998-99's 104,351 -- a 12.2% undercount of
+        visit-2 rows, no exception, no warning.
+
+        NOTHING COULD SEE IT.  `_enforce_canonical_dtypes` iterates
+        `df.columns` only, so no index level is dtype-policed anywhere;
+        and a scan of the warm caches is structurally blind, because
+        pyarrow launders a mixed object level to `str` on write (measured
+        2026-09-09: 193 warm L2-country parquets, 543 index levels, zero
+        mixed -- while the cold build of one of them was mixed int/str).
+        The mixed level exists only on the BUILD path, which is the same
+        cache-hides-the-bug shape as GH #323.  So any future enforcement
+        belongs where the wave frames are concatenated, and must be a
+        loud check.
+
+        DO NOT enforce it by extending `_enforce_canonical_dtypes` to
+        index levels.  Its int path is
+        `pd.to_numeric(errors='coerce').round().astype(Int64)`: applied
+        here it would have turned 'since last visit' into <NA> on a
+        DECLARED INDEX LEVEL -- a deferred silent deletion, exactly as
+        the `u` sentinel note at the top of this file describes -- and
+        the 72,649 rows of that wave would then have been dropped by the
+        first `groupby` (the derived tables, which sum `visit` away)
+        with nothing reported.  A silent coercion would have hidden this
+        defect, not caught it.
     Quantity:
       type: float
       required: true

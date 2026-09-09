@@ -1,5 +1,8 @@
-"""``visit`` on GhanaLSS ``food_acquired`` is the CALENDAR VISIT, not the source
-question number.
+"""``visit`` on GhanaLSS ``food_acquired`` is an INTEGER CALENDAR VISIT.
+
+Two defects, one level.  The second was found because the first was fixed.
+
+**The calendar visit, not the source question number.**
 
 GLSS numbers its two food modules from different origins.  Section 8H opens
 with two screeners (``s8hq1`` "HH consume any home produce", ``s8hq2`` "No. of
@@ -17,6 +20,26 @@ derived tables (``food_expenditures`` &c.) group by index level *name* and sum
 ``visit`` away, so every downstream number was right while the level itself was
 wrong.  That is exactly the shape of defect this module exists to pin.
 
+**One integer type across all seven waves.**  Also fixed 2026-09-09.  The level
+carried a different PYTHON TYPE per wave -- int in five waves, the strings
+``'2'``..``'7'`` in 1998-99, and the English sentence ``'since last visit'`` in
+1988-89.  The country-level concat therefore produced an object level of mixed
+int/str, on which ``food_acquired().xs(2, level='visit')`` returned 752,970 rows
+and SILENTLY OMITTED 1998-99's 104,351 -- a 12.2% undercount of visit-2 rows,
+with no exception and no warning.  Both 1980s waves are single-recall and now
+carry the library's convention for that, ``visit = 1`` (cf.
+``build_transforms.add_visit_level``); it is unambiguous because every
+multi-visit round numbers from 2, visit 1 being an intake call that collects no
+consumption.
+
+Nothing in the framework polices this: ``_enforce_canonical_dtypes`` iterates
+``df.columns`` only, so no index level is dtype-checked anywhere.  And a scan of
+the warm caches cannot find it either -- pyarrow launders a mixed object level to
+``str`` on write, so the mixed level exists only on the cold BUILD path (measured
+2026-09-09: 193 warm L2-country parquets, 543 index levels, zero mixed).  Hence
+this module, and hence the STATIC tier below, which reads the scripts rather than
+the delivered table.
+
 Two tiers, following ``test_ghanalss_food_label_canonical``:
 
 * **Static** (``TestScripts``) -- reads the wave scripts as text.  No cache, no
@@ -26,8 +49,11 @@ Two tiers, following ``test_ghanalss_food_label_canonical``:
   skipped when the GhanaLSS cache is cold.
 """
 import re
+from importlib.resources import files
 
+import numpy as np
 import pytest
+import yaml
 
 from lsms_library.paths import countries_root
 
@@ -48,6 +74,18 @@ EXPECTED = {
     '2012-13': {'purchased': set(range(2, 8)),  'produced': set(range(2, 8))},
     '2016-17': {'purchased': set(range(2, 8)),  'produced': set(range(2, 8))},
 }
+
+# The two 1980s rounds ask the module ONCE ("since my last visit"), so they get
+# the library's single-recall convention, `visit = 1` -- an INTEGER, like every
+# other wave.  Held separately from EXPECTED because the multi-visit assertions
+# (no visit 1; both modules on one axis) are about renumbered waves and would
+# read backwards here.
+SINGLE_RECALL = {
+    '1987-88': {'purchased': {1}, 'produced': {1}},
+    '1988-89': {'purchased': {1}, 'produced': {1}},
+}
+
+ALL_WAVES = {**SINGLE_RECALL, **EXPECTED}
 
 # The exact expressions that wrote a bare question number into `visit`.  Each is
 # the pre-fix line from that wave's script.
@@ -106,10 +144,53 @@ class TestScripts:
             f'documented in the script.  Quote the source variable label, so '
             f'the next reader can check it against the .dta rather than trust it.')
 
+    @pytest.mark.parametrize('wave', sorted(SINGLE_RECALL))
+    def test_single_recall_waves_write_the_integer_one(self, wave):
+        """`VISIT = 1`, not a sentence, not '1'.
+
+        1988-89 wrote ``VISIT = 'since last visit'`` until 2026-09-09.  That is
+        a description of the recall WINDOW, which is prose about the instrument
+        and belongs in CONTENTS.org; an index level holds a value.
+        """
+        src = _script(wave)
+        m = re.search(r'^VISIT\s*=\s*(.+?)\s*(?:#.*)?$', src, re.MULTILINE)
+        assert m, (f'{COUNTRY} {wave}/_/food_acquired.py no longer defines a '
+                   f'module-level VISIT constant; if the stamp moved, move this '
+                   f'assertion with it rather than deleting it.')
+        assert m.group(1) == '1', (
+            f'{COUNTRY} {wave}: VISIT = {m.group(1)}, not the integer 1.  A '
+            f'single-recall wave takes `visit = 1` -- the convention '
+            f'build_transforms.add_visit_level exists to stamp -- so that one '
+            f'integer type spans every wave of the country.  A string here '
+            f'(worst, an English sentence, which no coercion recovers) makes '
+            f'the country-level concat a mixed object level, on which a slice '
+            f'or a join silently returns a subset.')
+
+    def test_no_wave_stringifies_visit(self):
+        """`visit` is never cast to str on its way into the index.
+
+        1998-99 finished with ``.astype(int).astype(str)``, which made it the
+        one multi-visit wave delivering '2'..'7' against everyone else's 2..7.
+        The ``.astype(int)`` is fine and stays -- the melt can leave the column
+        object-typed; it is the trailing ``.astype(str)`` that is the bug.
+        """
+        offenders = {}
+        for wave in sorted(ALL_WAVES):
+            src = _script(wave)
+            hits = re.findall(r"^.*\bvisit\b.*\.astype\(\s*(?:str|'str'|\"str\"|"
+                              r"pd\.StringDtype\(\))\s*\).*$", src, re.MULTILINE)
+            hits = [h.strip() for h in hits if not h.strip().startswith('#')]
+            if hits:
+                offenders[wave] = hits
+        assert not offenders, (
+            f'{COUNTRY}: `visit` is cast to str in {offenders}.  It is an '
+            f'integer recall occasion in every wave; a per-wave type is a '
+            f'silent-slice hazard, not a formatting choice.')
+
 
 @pytest.fixture(scope='module')
-def visits_by_wave_and_source():
-    """{wave: {s: set(visit)}} from the delivered table, or skip if cold."""
+def delivered():
+    """The built ``food_acquired``, or skip if it cannot be built here."""
     try:
         import lsms_library as ll
         fa = ll.Country(COUNTRY).food_acquired()
@@ -117,18 +198,50 @@ def visits_by_wave_and_source():
         pytest.skip(f'{COUNTRY} food_acquired not buildable here: {e}')
     if 'visit' not in (fa.index.names or []):
         pytest.skip(f'{COUNTRY} food_acquired has no `visit` level here')
-    t = fa.index.get_level_values('t').astype(str)
-    s = fa.index.get_level_values('s').astype(str)
-    # `visit` is int in most waves and str in 1998-99 (a separate, pre-existing
-    # inconsistency); compare on the integer value, which is what it means.
-    v = fa.index.get_level_values('visit')
+    return fa
+
+
+@pytest.fixture(scope='module')
+def visit_types(delivered):
+    """The distinct PYTHON types on the `visit` level, per wave.
+
+    Kept separate from ``visits_by_wave_and_source`` on purpose: that fixture
+    now insists on integers, so it would *raise* rather than report, and the
+    type table is the thing worth naming in a failure message.
+    """
+    t = delivered.index.get_level_values('t').astype(str)
+    v = delivered.index.get_level_values('visit')
+    out = {}
+    for wave, visit in zip(t, v):
+        out.setdefault(wave, set()).add(type(visit).__name__)
+    return out
+
+
+@pytest.fixture(scope='module')
+def visits_by_wave_and_source(delivered):
+    """{wave: {s: set(visit)}} from the delivered table.
+
+    Until 2026-09-09 this did ``try: int(visit) except: continue``, which
+    SILENTLY SKIPPED 1988-89 -- the one wave whose value ('since last visit')
+    no coercion recovers, and therefore the one wave most in need of covering.
+    A fixture that drops what it cannot parse tests only the rows that were
+    already fine.  It now insists on an integer and says which wave broke it.
+    """
+    t = delivered.index.get_level_values('t').astype(str)
+    s = delivered.index.get_level_values('s').astype(str)
+    v = delivered.index.get_level_values('visit')
     out = {}
     for wave, src, visit in zip(t, s, v):
-        try:
-            visit = int(visit)
-        except (TypeError, ValueError):
-            continue
-        out.setdefault(wave, {}).setdefault(src, set()).add(visit)
+        if isinstance(visit, bool) or not isinstance(visit, (int, np.integer)):
+            raise AssertionError(
+                f'{COUNTRY} {wave}: `visit` is {visit!r} ({type(visit).__name__}), '
+                f'not an integer.  A level whose Python type differs by wave '
+                f'makes the country-level concat an object level of mixed type: '
+                f'`xs(2, level="visit")` then silently omits the string waves '
+                f'and `xs("2", ...)` silently omits the int ones.  Single-recall '
+                f'waves get the integer 1 (build_transforms.add_visit_level); '
+                f'renumbered waves get the calendar visit.')
+        out.setdefault(wave, {}).setdefault(src, set()).add(int(visit))
     return out
 
 
@@ -168,7 +281,10 @@ class TestDelivered:
     def test_no_visit_one(self, visits_by_wave_and_source):
         """Visit 1 is intake: roster + diary training, no consumption.
 
-        A `visit == 1` row means an off-by-one crept back in.
+        A `visit == 1` row in a RENUMBERED wave means an off-by-one crept back
+        in.  The two 1980s waves are excluded: they ask the module once and are
+        *supposed* to be 1 (see ``test_visit_one_means_single_recall``, which is
+        the other half of this and the reason 1 is a safe value to give them).
         """
         offenders = {w: sorted(s for s, vs in by.items() if 1 in vs)
                      for w, by in visits_by_wave_and_source.items()
@@ -177,3 +293,135 @@ class TestDelivered:
             f'{COUNTRY}: consumption recorded at visit 1 in {offenders}.  The '
             f'first visit collects the roster and trains the diary keeper; the '
             f'consumption modules start at the 2nd visit.')
+
+
+@pytest.mark.slow
+class TestVisitTypeDelivered:
+    """One integer type, all seven waves.  Skipped when the cache is cold."""
+
+    def test_level_is_one_integer_type(self, visit_types):
+        """The whole point: no wave may differ from the others in TYPE.
+
+        Reported per wave rather than as a single dtype, because the failure
+        this pins is precisely a per-wave difference -- and because the
+        aggregate dtype LIES on a warm read: pyarrow coerces a mixed object
+        level to `str` on write, so the L2-country parquet comes back
+        homogeneously stringy no matter what the build produced.
+        """
+        seen = {w: sorted(ts) for w, ts in sorted(visit_types.items())}
+        bad = {w: ts for w, ts in seen.items()
+               if ts != ['int'] and ts != ['int64']}
+        assert not bad, (
+            f'{COUNTRY} food_acquired `visit` is not integer in {bad} '
+            f'(all waves: {seen}).  Mixed types on one index level: '
+            f'`xs(2, level="visit")` silently omits the string waves, '
+            f'`xs("2", ...)` silently omits the int ones, and a merge on an '
+            f'Int64 key matches zero rows for the string side with no error.')
+
+    @pytest.mark.parametrize('wave', sorted(ALL_WAVES))
+    def test_every_wave_is_covered(self, wave, visits_by_wave_and_source):
+        """Every wave must actually reach the assertions.
+
+        The old fixture skipped a row it could not ``int()``, so 1988-89 -- the
+        only broken wave -- contributed nothing and the suite passed green on a
+        table it had not looked at.  This makes the absence of a wave a failure
+        rather than a silence.
+        """
+        assert wave in visits_by_wave_and_source, (
+            f'{COUNTRY} {wave} contributed no rows to the delivered table.  If '
+            f'that is genuinely expected, say why here; do not let a wave drop '
+            f'out of the fixture unremarked.')
+
+    @pytest.mark.parametrize('wave', sorted(SINGLE_RECALL))
+    def test_single_recall_waves_deliver_exactly_visit_one(
+            self, wave, visits_by_wave_and_source):
+        """The 1980s waves, which the old fixture never reached.
+
+        ``TestDelivered.test_visits_match_the_questionnaire`` covers the five
+        renumbered waves; this is the same assertion for the two that ask the
+        module once, on both `s` sides.
+        """
+        got = visits_by_wave_and_source[wave]
+        for source, expected in SINGLE_RECALL[wave].items():
+            assert got.get(source) == expected, (
+                f'{COUNTRY} {wave} s={source!r}: delivered visits '
+                f'{sorted(got.get(source, []))} != {sorted(expected)}.  A '
+                f'single-recall wave carries the integer 1 and nothing else.')
+
+    def test_visit_one_means_single_recall(self, visits_by_wave_and_source):
+        """`visit == 1` identifies the single-recall waves, and only those.
+
+        This is what makes 1 a safe value to stamp on 1987-88 / 1988-89 rather
+        than an ambiguity: every renumbered wave starts at 2 because visit 1 is
+        an intake call collecting no consumption, so the two readings of 1
+        cannot collide.  Verified against the data, not assumed.
+        """
+        with_one = {w for w, by in visits_by_wave_and_source.items()
+                    if any(1 in vs for vs in by.values())}
+        assert with_one == set(SINGLE_RECALL), (
+            f'{COUNTRY}: `visit == 1` appears in {sorted(with_one)}, but the '
+            f'single-recall waves are {sorted(SINGLE_RECALL)}.  If a renumbered '
+            f'wave has grown a visit 1, the convention no longer distinguishes '
+            f'"asked once" from "first calendar visit" and the stamp on the '
+            f'1980s waves must be reconsidered -- not silently kept.')
+
+
+class TestCanonicalDeclaration:
+    """Config-only.  `visit` has a written type contract; nothing coerces it."""
+
+    @staticmethod
+    def _canonical():
+        with open(files('lsms_library') / 'data_info.yml', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+
+    @pytest.mark.parametrize('table', ['food_acquired', 'interview_date'])
+    def test_visit_declares_int(self, table):
+        entry = ((self._canonical().get('Columns') or {})
+                 .get(table, {}).get('visit'))
+        assert isinstance(entry, dict) and entry.get('type') == 'int', (
+            f'data_info.yml declares no `Columns.{table}.visit: type: int`.  '
+            f'`visit` is an index level and index levels are unpoliced, so this '
+            f'declaration is where the contract lives -- the same role '
+            f'`crop_production.condition` plays for its vocabulary.')
+
+    @pytest.mark.parametrize('table', ['food_acquired', 'interview_date'])
+    def test_visit_is_not_required(self, table):
+        """It is a level, not a column; `required` would be read as a column."""
+        entry = ((self._canonical().get('Columns') or {})
+                 .get(table, {}).get('visit')) or {}
+        assert not entry.get('required'), (
+            f'data_info.yml marks {table}.visit `required`.  '
+            f'`test_schema_consistency` reads `required` as "every country '
+            f'declaring this table must have this COLUMN", and `visit` is an '
+            f'index level that only repeated-recall countries carry at all.')
+
+    def test_dtype_enforcement_still_skips_index_levels(self):
+        """Pins the decision, so a later change to it is deliberate.
+
+        Declaring the type does NOT make it coerced, and that is on purpose:
+        `_enforce_canonical_dtypes`'s int path is
+        `pd.to_numeric(errors='coerce')`, which on an index level converts an
+        unparseable value to <NA> -- a row that is served and then deleted by
+        the first `groupby`, counted nowhere.  Applied to the 2026-09-09 defect
+        it would have silently dropped all 72,649 of 1988-89's rows instead of
+        surfacing them.  If index-level enforcement is ever added it must be a
+        loud CHECK on the build path, not a coercion on the read path.
+        """
+        import pandas as pd
+
+        from lsms_library.country import _enforce_canonical_dtypes
+
+        df = pd.DataFrame(
+            {'Quantity': [1.0, 2.0]},
+            index=pd.MultiIndex.from_tuples(
+                [('1988-89', 'since last visit'), ('1998-99', '2')],
+                names=['t', 'visit']))
+        _enforce_canonical_dtypes(df, 'food_acquired')
+        got = list(df.index.get_level_values('visit'))
+        assert got == ['since last visit', '2'], (
+            f'_enforce_canonical_dtypes now rewrites the `visit` index level '
+            f'({got}).  That is a real design change, not a fix: on this input '
+            f'a numeric coercion yields <NA> on a DECLARED INDEX LEVEL, which '
+            f'is served and then deleted by the first groupby with nothing '
+            f'reported.  Read data_info.yml `Columns > food_acquired > visit` '
+            f'before keeping it.')

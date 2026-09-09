@@ -118,10 +118,17 @@ pur_long['t'] = t
 prod_long['t'] = t
 fa = pd.concat([pur_long[cols], prod_long[cols]], ignore_index=True)
 
-# Make every index level a clean string (units decode to strings; visit
-# is an int that must not stringify with a `.0` suffix).
+# `u` decodes to strings.  `visit` stays an INTEGER: it is a count, and until
+# 2026-09-09 this script finished the cast with `.astype(str)`, which made this
+# the one multi-visit wave whose `visit` level arrived as '2'..'7' while every
+# other wave's arrived as 2..7.  Measured on the mixed level that produced:
+# `food_acquired().xs(2, level='visit')` returned 752,970 rows and silently
+# omitted this wave's 104,351 (a 12.2% undercount of visit-2 rows), and a left
+# merge on an Int64 `visit` key left all 542,105 of this wave's rows unmatched
+# with no error.  The `.astype(int)` is kept -- the melt can leave the column
+# object-typed -- and the trailing `.astype(str)` is the bug.
 fa['u'] = fa['u'].astype(str)
-fa['visit'] = fa['visit'].astype(int).astype(str)
+fa['visit'] = fa['visit'].astype(int)
 
 fa = fa.set_index(['t', 'i', 'j', 'u', 's', 'visit']).sort_index()
 
