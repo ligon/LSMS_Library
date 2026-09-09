@@ -2772,6 +2772,209 @@ def dependency_ratio(household_roster, *, working_age=(15, 64),
     return ratio.to_frame('Dependency_ratio').sort_index()
 
 
+# WFP standard reduced-Coping-Strategies-Index weights, keyed on our
+# canonical ``food_coping`` Strategy labels.  Malawi, Burkina Faso and Mali
+# field exactly this five-item battery (see e.g.
+# ``Malawi/_/data_scheme.yml:162-164``: "a=LessPreferred, b=LimitPortion,
+# c=ReduceMeals, d=RestrictAdults, e=BorrowFood").  EPAR's own Malawi rename
+# (``Malawi IHS/Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:4520-4524``) maps
+# hh_h02a..e -> strategy1..5 in EXACTLY that order, each rename line's own
+# comment naming its severity weight (1/1/1/3/2); ``:4525`` sums them
+# (``rcsi = strategy1 + strategy2 + strategy3 + 3*strategy4 +
+# 2*strategy5``), and ``:4519`` cites the coefficients' own source: "Weights
+# from The Coping Strategies Index: Field Methods Manual (2008)" -- so the
+# weights below are that manual's, read through EPAR's Malawi renaming, not
+# an unsourced positional list.
+_RCSI_WFP_WEIGHTS = {
+    'LessPreferred': 1,
+    'BorrowFood': 2,
+    'LimitPortion': 1,
+    'RestrictAdults': 3,
+    'ReduceMeals': 1,
+}
+
+
+def rcsi(food_coping, *, weights=None):
+    """Reduced Coping Strategies Index (WFP rCSI; WB/EPAR ``rcsi``).
+
+    MECHANICAL reduction over the ``food_coping`` item table: a weighted sum
+    of day-counts across the coping strategies, ``Σ weight[Strategy] ×
+    Days``, one score per household-wave.
+
+    Parameters
+    ----------
+    food_coping : pd.DataFrame
+        ``food_coping`` item feature, grain ``(t, i, Strategy)``, with an
+        integer ``Days`` column (0-7, days in the past 7 the strategy was
+        used).
+    weights : dict[str, float], optional
+        Strategy label -> weight.  Defaults to :data:`_RCSI_WFP_WEIGHTS`,
+        the standard five-strategy WFP formula (``LessPreferred +
+        LimitPortion + ReduceMeals + 3×RestrictAdults + 2×BorrowFood``).
+
+        **The strategy set is a property of the questionnaire, not a
+        universal constant** -- do not treat the five-term formula as the
+        definition.  Ethiopia and Tanzania field an 8-item battery (the
+        standard five plus ``LimitVariety`` / ``NoFood`` /
+        ``WholeDay``/``WholeDayWithout``: ``Ethiopia/_/ethiopia.py:785-794``,
+        ``Tanzania/_/data_scheme.yml:95-98``); Nigeria fields 9
+        (``Nigeria/_/nigeria.py`` ``FOOD_COPING_ITEMS``, adding
+        ``SleepHungry`` / ``WholeDayNoFood``).  EPAR's OWN Tanzania rCSI is
+        an eight-term variant with different weights on the extra items
+        (``Tanzania NPS/Tanzania NPS Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2617``,
+        ``hh_h02a + hh_h02b + hh_h02c + hh_h02d + 3*hh_h02e + hh_h02f*2 +
+        hh_h02g*4 + hh_h02h*4``) -- proof that a wider battery does not
+        collapse to the five-term formula by just ignoring the extra
+        columns.  The check is symmetric: a ``Strategy`` label present in
+        ``food_coping`` but absent from ``weights`` raises
+        :class:`ValueError` naming it (never silently scored on just the
+        terms it recognises), and a ``weights`` key that names a label
+        ``food_coping`` never carries ALSO raises (never silently scored on
+        fewer terms than the formula claims -- a country fielding only 4 of
+        the 5 standard strategies is equally "not the standard five").  Pass
+        an explicit ``weights`` dict naming every label present, and no
+        others, for Ethiopia, Tanzania and Nigeria.
+
+    Returns
+    -------
+    pd.DataFrame
+        One float ``rCSI`` column indexed by ``(t, i)``.
+
+    Notes
+    -----
+    **Missing strategy rows are NEVER filled with zero.** A household using
+    a strategy zero days is a valid, STORED response (``Days=0``);
+    ``food_coping`` is sparse only where a strategy question went
+    unanswered or its response was out-of-domain and dropped.  Evidence:
+
+    - Ethiopia's own wave-builder docstring
+      (``Ethiopia/_/ethiopia.py:814-815``): "Rows with a missing Days value
+      are dropped (the strategy was not answered for that household)."
+    - Nigeria's (``Nigeria/_/nigeria.py:985-987``): "Rows where the day
+      count is missing are dropped; a household with all-missing items
+      contributes no rows."
+    - Malawi's audited row counts (``Malawi/_/CONTENTS.org:24-35``): rows
+      are *exactly* 5x each wave's Module-H household count in 2010-11
+      (12,271 x 5 = 61,355) and short by a handful in the other three
+      waves (6 / 3 / 13 rows) -- the out-of-range day-counts ``malawi.py``
+      coerces to NaN and drops (``Malawi/_/malawi.py:1204,1212``), never
+      zero-filled.
+
+    So a household present for some weighted strategies and absent for
+    another had that strategy UNANSWERED, not zero, and is excluded from
+    the score entirely -- never scored on a truncated sum.  Any ``(t, i)``
+    missing so much as one of the strategies named in ``weights`` is
+    dropped, not imputed.
+    """
+    df = food_coping
+    names = list(df.index.names or [])
+    if 'Strategy' not in names:
+        raise ValueError("food_coping must have a 'Strategy' index level")
+    if 'Days' not in df.columns:
+        raise ValueError("food_coping must have a 'Days' column")
+    group_by = [n for n in ['t', 'i'] if n in names]
+    if not group_by:
+        raise ValueError("food_coping must have 't' and/or 'i' index levels")
+
+    w = dict(_RCSI_WFP_WEIGHTS) if weights is None else dict(weights)
+
+    strategy = df.index.get_level_values('Strategy').astype(str)
+    present = sorted(set(strategy))
+    unknown = sorted(set(present) - set(w))
+    if unknown:
+        raise ValueError(
+            f"rcsi: unrecognised Strategy label(s) {unknown} in food_coping "
+            "-- the five-term WFP formula is not universal (Ethiopia/"
+            "Tanzania field an 8-item battery, Nigeria 9; EPAR's own "
+            "Tanzania rCSI is an eight-term variant with different "
+            "weights). Pass weights= naming every Strategy label present."
+        )
+    # Symmetric with the check above: a weight naming a Strategy this table
+    # never carries is exactly as wrong as an unrecognised Strategy -- the
+    # strategy set (and therefore the term count) is a property of the
+    # questionnaire, not a default to fall back on for a narrower battery.
+    missing = sorted(set(w) - set(present))
+    if missing:
+        raise ValueError(
+            f"rcsi: weights name Strategy label(s) {missing} that food_coping "
+            "does not carry at all -- pass a weights= dict matching exactly "
+            "the Strategy labels present, not a superset."
+        )
+
+    used = list(w)
+
+    days = pd.to_numeric(df['Days'], errors='coerce')
+    s = pd.Series(days.to_numpy(), index=df.index)
+    wide = s.unstack('Strategy')
+    if list(wide.index.names) != group_by:
+        # The canonical grain is (t, i, Strategy), but Country.food_coping()
+        # arrives with the joined cluster level ``v`` as well, so this branch
+        # fires on every real-country call.  ``v`` is one-to-one with
+        # (t, i) (measured on Malawi, red-team 2026-09-09), so ``first()``
+        # is lossless there; it would not be if a country ever served two
+        # rows per (t, i, Strategy), which the canonical schema forbids.
+        wide = wide.groupby(level=group_by).first()
+    wide = wide.reindex(columns=used)
+
+    # Missing strategy rows mean "not answered" / dropped-invalid (see
+    # Notes above) -- exclude the household from the score entirely rather
+    # than imputing a zero.
+    complete = wide.dropna(how='any')
+    weight_vec = pd.Series({k: w[k] for k in used}, dtype=float)
+    score = complete[used].mul(weight_vec, axis=1).sum(axis=1)
+    return score.to_frame('rCSI').sort_index()
+
+
+def rcsi_phase(rcsi, *, cutoffs=(3, 18, 42)):
+    """WFP rCSI severity phase, in partitioning closed intervals.
+
+    Parameters
+    ----------
+    rcsi : pd.Series or pd.DataFrame
+        rCSI score(s) -- e.g. the ``rCSI`` column returned by
+        :func:`rcsi` (the frame's single column is used if a DataFrame is
+        passed).
+    cutoffs : (int, int, int), default (3, 18, 42)
+        Three ascending cut points splitting the non-negative score line
+        into four phases: ``[0, c1]``, ``(c1, c2]``, ``(c2, c3]``,
+        ``(c3, inf)``.
+
+    Returns
+    -------
+    pd.Series
+        Ordered categorical (``'Phase 1'`` .. ``'Phase 4'``), same index as
+        ``rcsi``.
+
+    Notes
+    -----
+    Deliberately closed-interval and PARTITIONING -- every real number
+    (hence every integer score) lands in exactly one phase.  This avoids a
+    real defect in EPAR's own cutoffs
+    (``Malawi IHS/Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:4530-4531``):
+    phase 2 there is ``rcsi <= 18`` and phase 3 is
+    ``rcsi > 19 & rcsi <= 42`` -- an ``rcsi`` of exactly 19 satisfies
+    neither test and falls in NO phase, even though the phase-3 LABEL one
+    line later (``:4535``) claims the range is "(19 - 42)", i.e. the label
+    and the test contradict each other.  Here ``cutoffs=(3, 18, 42)``
+    default gives ``[0, 3]``, ``(3, 18]``, ``(18, 42]``, ``(42, inf)`` --
+    19 lands in the third phase (``(18, 42]``), matching the LABEL EPAR
+    intended rather than the gap its test actually produced.
+    """
+    c1, c2, c3 = cutoffs
+    if isinstance(rcsi, pd.DataFrame):
+        values = rcsi.iloc[:, 0]
+    else:
+        values = rcsi
+    values = pd.to_numeric(values, errors='coerce')
+
+    labels = ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4']
+    bins = [-np.inf, c1, c2, c3, np.inf]
+    phase = pd.cut(values, bins=bins, labels=labels, ordered=True,
+                   right=True)
+    phase.name = 'rCSI_phase'
+    return phase
+
+
 def farm_size(plot_features, *, area_col='Area'):
     """Total cultivated/owned plot area per household (WB ``farm_size``).
 
