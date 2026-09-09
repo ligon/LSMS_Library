@@ -29,6 +29,7 @@ from pandas.testing import assert_frame_equal
 from lsms_library.transformations import (
     KG_FACTOR_DISAGREEMENT_TOLERANCE,
     KG_FACTOR_LAYERS,
+    KG_FACTOR_MAX,
     SURVEY_MEDIAN_MIN_REPORTS,
     U_UNKNOWN,
     _kg_factor_series,
@@ -43,6 +44,10 @@ _DATA_INFO = Path(__file__).resolve().parent.parent / "lsms_library" / "data_inf
 # Expenditure column the price-ratio branch never fires either.
 KNOWN_UNIT = "kg"
 UNKNOWN_UNITS = ("sack", "basket", "drum")
+# 'pound' is in KNOWN_METRIC (0.453592) and is NOT the kilogram unit, so the
+# reported and inferred layers can both have a value on the same row without
+# tripping the "a Kg row must weigh 1" rule.
+POUND, POUND_KG = "pound", 0.453592
 
 
 def _frame(rows, *, with_kgfactor=True):
@@ -102,7 +107,8 @@ def test_all_nan_kgfactor_column_changes_nothing():
 def test_only_the_inferred_layer_acts_without_reports():
     f = harvest_kg_factors(_frame(BASE_ROWS, with_kgfactor=False))
     assert f.attrs["kg_factor_sources"] == {
-        "reported": 0, "survey_median": 0, "inferred": 2, "none": 2}
+        "reported": 0, "survey_median": 0, "inferred": 2, "none": 2,
+        "reported_implausible": 0}
 
 
 def test_returned_frame_carries_only_harvest_kg():
@@ -124,18 +130,20 @@ def test_reported_factor_wins_and_converts_an_unknown_unit():
         # A unit the library cannot resolve, but the survey weighed it.
         ("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A", 2.0, 100.0),
         # A unit the library CAN resolve; the survey's number still wins.
-        ("2019-20", "h1", "h1-1-1", "Beans", KNOWN_UNIT, "dried", "A", 5.0, 3.0),
+        # Not the KILOGRAM unit -- a Kg row reporting 3.0 is a mis-key and the
+        # plausibility screen rejects it (see the screen tests below).
+        ("2019-20", "h1", "h1-1-1", "Beans", POUND, "dried", "A", 5.0, 0.5),
         # No report -> the inferred layer.
         ("2019-20", "h2", "h2-1-1", "Maize", KNOWN_UNIT, "dried", "A", 7.0, np.nan),
     ]
     df = _frame(rows)
     f = harvest_kg_factors(df)
     assert list(f["KgFactorSource"]) == ["reported", "reported", "inferred"]
-    assert list(f["kg_per_unit"]) == [100.0, 3.0, 1.0]
+    assert list(f["kg_per_unit"]) == [100.0, 0.5, 1.0]
 
     res = harvest_kg(df)
     assert res.loc[("2019-20", "h1", "h1-1-1", "Maize"), "Harvest_kg"] == 200.0
-    assert res.loc[("2019-20", "h1", "h1-1-1", "Beans"), "Harvest_kg"] == 15.0
+    assert res.loc[("2019-20", "h1", "h1-1-1", "Beans"), "Harvest_kg"] == 2.5
     assert res.loc[("2019-20", "h2", "h2-1-1", "Maize"), "Harvest_kg"] == 7.0
 
 
@@ -225,6 +233,92 @@ def test_survey_median_ignores_unusable_reports():
 
 
 # ---------------------------------------------------------------------------
+# The plausibility screen on the reported layer
+# ---------------------------------------------------------------------------
+#
+# Uganda's first wired wave: 86 rows with a reported factor > 200 contributed
+# 46.97M of a 57.9M kg national total.  The top ones are mis-keys -- a
+# Sorghum row with quantity 147 and factor 147 000, a u='Kg' row claiming
+# 260 000, and 2 017 / 2 018 from the adjacent year column.
+
+
+def test_kilogram_unit_must_weigh_one():
+    rows = [
+        # a Kg row whose factor is not 1 -> rejected, falls to inferred (1.0)
+        ("2019-20", "h1", "h1-1-1", "SimSim", KNOWN_UNIT, "dried", "A",
+         2.0, 260_000.0),
+        # 1% slack is allowed
+        ("2019-20", "h2", "h2-1-1", "Maize", KNOWN_UNIT, "dried", "A",
+         2.0, 1.005),
+    ]
+    f = harvest_kg_factors(_frame(rows))
+    assert list(f["KgFactorSource"]) == ["inferred", "reported"]
+    assert list(f["kg_reported_rejected"]) == [True, False]
+    assert f["kg_per_unit"].iloc[0] == 1.0          # NOT clipped, NOT rescaled
+    assert f["kg_per_unit"].iloc[1] == 1.005
+
+
+def test_factor_above_the_cap_is_rejected():
+    rows = [
+        ("2019-20", "h1", "h1-1-1", "Sorghum", "sack", "dried", "A",
+         147.0, 147_000.0),
+        ("2019-20", "h2", "h2-1-1", "Maize", "sack", "dried", "A",
+         1.0, KG_FACTOR_MAX),          # exactly at the cap: kept
+    ]
+    f = harvest_kg_factors(_frame(rows))
+    assert list(f["KgFactorSource"]) == ["none", "reported"]
+    assert f.attrs["kg_factor_sources"]["reported_implausible"] == 1
+    # the 147 000 row contributes NOTHING rather than 21.6 million kg
+    assert len(harvest_kg(_frame(rows))) == 1
+
+
+def test_calendar_year_on_a_non_kg_unit_is_rejected():
+    rows = [
+        ("2019-20", "h1", "h1-1-1", "Beans", "sack", "dried", "A", 1.0, 2_017.0),
+        ("2019-20", "h2", "h2-1-1", "Soybean", "sack", "dried", "A", 1.0, 2_018.0),
+    ]
+    f = harvest_kg_factors(_frame(rows))
+    assert list(f["kg_reported_rejected"]) == [True, True]
+    assert set(f["KgFactorSource"]) == {"none"}
+
+
+def test_a_rejected_report_does_not_enter_a_median():
+    """Falls through 'exactly as if unreported' -- including out of the pool."""
+    rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", "sack", "dried", "A",
+             1.0, 147_000.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
+    rows.append(("2019-20", "g0", "g0-1-1", "Maize", "sack", "dried", "A",
+                 1.0, np.nan))
+    f = harvest_kg_factors(_frame(rows))
+    assert f["kg_survey_median"].isna().all()
+    assert set(f["KgFactorSource"]) == {"none"}
+
+
+def test_the_screen_count_rides_beside_a_partition_that_still_sums():
+    rows = [
+        ("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A", 1.0, 100.0),
+        ("2019-20", "h2", "h2-1-1", "Maize", "sack", "dried", "A", 1.0, 9_999.0),
+        ("2019-20", "h3", "h3-1-1", "Maize", KNOWN_UNIT, "dried", "A", 1.0, np.nan),
+        ("2019-20", "h4", "h4-1-1", "Maize", "basket", "dried", "A", 1.0, np.nan),
+    ]
+    df = _frame(rows)
+    counts = harvest_kg_factors(df).attrs["kg_factor_sources"]
+    assert counts["reported_implausible"] == 1
+    # the four SERVING layers still partition the frame ...
+    assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
+    # ... and the rejected row is served by one of them, not lost
+    assert counts == {"reported": 1, "survey_median": 0, "inferred": 1,
+                      "none": 2, "reported_implausible": 1}
+
+
+def test_screen_is_inert_without_a_kgfactor_column():
+    df = _frame(BASE_ROWS, with_kgfactor=False)
+    f = harvest_kg_factors(df)
+    assert f.attrs["kg_factor_sources"]["reported_implausible"] == 0
+    assert not f["kg_reported_rejected"].any()
+    assert_frame_equal(harvest_kg(df), _legacy_harvest_kg(df))
+
+
+# ---------------------------------------------------------------------------
 # The missing-unit sentinel is NOT a unit
 # ---------------------------------------------------------------------------
 
@@ -279,8 +373,8 @@ def test_sentinel_rows_are_excluded_from_the_disagreement_audit():
     rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", U_UNKNOWN, "dried",
              "A", 1.0, 100.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
     # one genuine unit, whose report is 100% off the inferred 1.0
-    rows.append(("2019-20", "g0", "g0-1-1", "Maize", KNOWN_UNIT, "dried", "A",
-                 1.0, 2.0))
+    rows.append(("2019-20", "g0", "g0-1-1", "Maize", POUND, "dried", "A",
+                 1.0, 1.0))
     d = harvest_kg_factors(_frame(rows)).attrs["kg_factor_disagreement"]
     assert d["reported_vs_survey_median"] == {"both": 0, "disagree": 0,
                                               "share": None}
@@ -303,10 +397,13 @@ def test_provenance_counts_sum_to_the_input_row_count():
     ]
     df = _frame(rows)
     counts = harvest_kg_factors(df).attrs["kg_factor_sources"]
-    assert set(counts) == set(KG_FACTOR_LAYERS)
-    assert sum(counts.values()) == len(df)
-    assert counts == {"reported": 2, "survey_median": 0,
-                      "inferred": 1, "none": 1}
+    # The four SERVING layers partition the frame; `reported_implausible` is a
+    # screen count that rides alongside and is deliberately outside it.
+    assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible"}
+    assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
+    assert counts == {"reported": 2, "survey_median": 0, "inferred": 1,
+                      "none": 1, "reported_implausible": 0}
+    assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # Two rows survive the sum: the zero-Quantity row drops despite being
     # counted `reported`, and the `none` row has no factor to apply.
     assert len(harvest_kg(df)) == 2
@@ -322,14 +419,14 @@ def test_harvest_kg_republishes_the_tallies_after_the_groupby():
 def test_disagreement_reported_vs_inferred():
     """Both layers have a factor; how often do they differ by >10%?"""
     rows = [
-        # 5% off the inferred 1.0 -> inside the band
-        ("2019-20", "h1", "h1-1-1", "Maize", KNOWN_UNIT, "dried", "A", 1.0, 1.05),
-        # 100% off -> outside it
-        ("2019-20", "h2", "h2-1-1", "Maize", KNOWN_UNIT, "dried", "A", 1.0, 2.0),
+        # ~3.5% off the inferred 0.4536 -> inside the band
+        ("2019-20", "h1", "h1-1-1", "Maize", POUND, "dried", "A", 1.0, 0.47),
+        # ~55% off -> outside it
+        ("2019-20", "h2", "h2-1-1", "Maize", POUND, "dried", "A", 1.0, 1.0),
         # reported only: no inferred factor, so it is not in the denominator
         ("2019-20", "h3", "h3-1-1", "Maize", "sack", "dried", "A", 1.0, 9.0),
         # inferred only: likewise
-        ("2019-20", "h4", "h4-1-1", "Maize", KNOWN_UNIT, "dried", "A", 1.0, np.nan),
+        ("2019-20", "h4", "h4-1-1", "Maize", POUND, "dried", "A", 1.0, np.nan),
     ]
     d = harvest_kg_factors(_frame(rows)).attrs["kg_factor_disagreement"]
     assert d["tolerance"] == KG_FACTOR_DISAGREEMENT_TOLERANCE
@@ -338,10 +435,12 @@ def test_disagreement_reported_vs_inferred():
 
 def test_disagreement_reported_vs_survey_median():
     rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", "sack", "dried", "A",
-             1.0, 100.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
-    # one outlier report in the same group: median stays 100, this row is 300
+             1.0, 50.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
+    # one outlier report in the same group: median stays 50, this row is 150.
+    # Both sit UNDER KG_FACTOR_MAX -- an outlier the screen would reject is a
+    # different test (a rejected report never reaches the audit).
     rows.append(("2019-20", "z", "z-1-1", "Maize", "sack", "dried", "A",
-                 1.0, 300.0))
+                 1.0, 150.0))
     d = harvest_kg_factors(_frame(rows)).attrs["kg_factor_disagreement"]
     pair = d["reported_vs_survey_median"]
     assert pair["both"] == SURVEY_MEDIAN_MIN_REPORTS + 1
@@ -358,15 +457,16 @@ def test_disagreement_is_empty_when_nothing_is_reported():
 
 def test_companion_exposes_every_layer_for_auditing():
     """A maintainer must be able to see what each layer OFFERED, per unit."""
-    rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", KNOWN_UNIT, "dried",
+    rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", POUND, "dried",
              "A", 1.0, 2.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
     f = harvest_kg_factors(_frame(rows))
     assert list(f.columns) == ["kg_per_unit", "KgFactorSource", "kg_reported",
-                               "kg_survey_median", "kg_inferred"]
+                               "kg_reported_rejected", "kg_survey_median",
+                               "kg_inferred"]
     by_unit = f.groupby(f.index.get_level_values("u"))[
         ["kg_reported", "kg_inferred"]].median()
-    assert by_unit.loc[KNOWN_UNIT, "kg_reported"] == 2.0
-    assert by_unit.loc[KNOWN_UNIT, "kg_inferred"] == 1.0
+    assert by_unit.loc[POUND, "kg_reported"] == 2.0
+    assert by_unit.loc[POUND, "kg_inferred"] == POUND_KG
 
 
 def test_u_as_a_column_is_accepted():
@@ -417,4 +517,5 @@ def test_uganda_harvest_kg_unchanged_before_the_wiring_lands():
     assert len(res) == 23_766
     assert res["Harvest_kg"].sum() == pytest.approx(4_963_468.795000811, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 0, "survey_median": 0, "inferred": 28_147, "none": 105_536}
+        "reported": 0, "survey_median": 0, "inferred": 28_147,
+        "none": 105_536, "reported_implausible": 0}

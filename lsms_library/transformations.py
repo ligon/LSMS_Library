@@ -1665,6 +1665,85 @@ def _kg_factor_series(df, *, volume_as_mass=True):
     return out
 
 
+#: Largest kg-per-unit a REPORTED ``KgFactor`` may claim before it is read as
+#: a data-entry error rather than a container.  Derived from the corpus's own
+#: unit tables, not guessed: the heaviest container any of them NAMES is
+#: Uganda's ``Sack (120 kgs)`` (``Uganda/_/categorical_mapping.org:278``),
+#: with Niger's ``Sac de 100 kg`` and Malawi's 90 kg bag below it.  (Two
+#: larger-looking greps are false positives: Uganda's ``0.125kg`` is
+#: margarine, a food item, and Niger's ``2687`` is prose about 2.687 kg.)
+#: 120 x 2 headroom, rounded -> 250, which leaves room for a country to ship
+#: a heavier container than any yet seen while still rejecting the observed
+#: errors by two orders of magnitude (Uganda's worst reported factor is
+#: 260 000, and its 99.9th percentile is 2 018 -- a year, not a weight).
+KG_FACTOR_MAX = 250.0
+
+#: A reported factor on the kilogram unit must be 1: a "kg" that weighs
+#: something other than a kilogram is a mis-keyed field, not a unit.  Allowed
+#: within 1% so a rounded 0.999/1.001 survives.
+KG_UNIT_TOLERANCE = 0.01
+
+#: Reported factors falling in this INCLUSIVE band, integral, on a non-kg
+#: unit are read as the adjacent YEAR column having been keyed into the
+#: factor field -- the signature behind Uganda's Beans 2 017 and Soybean
+#: 2 018.  Currently SUBSUMED by :data:`KG_FACTOR_MAX` (every year exceeds
+#: 250), so it rejects nothing the cap would not; it is kept because it
+#: documents the signature and stays correct if the cap is ever raised.
+_KG_FACTOR_YEAR_BAND = (1990, 2030)
+
+#: The kilogram unit's accepted spellings, READ OFF the module's own metric
+#: table rather than hardcoded: the ``KNOWN_METRIC`` keys whose factor is
+#: exactly 1, minus the fluid units (a litre is also 1 under
+#: ``volume_as_mass`` but is not the kilogram unit).  Matching is on the
+#: lower-cased label, exactly as :func:`_kg_factor_series` matches.
+_KG_UNIT_KEYS = frozenset(
+    k for k, v in KNOWN_METRIC.items() if v == 1) - frozenset(_FLUID_UNITS)
+
+
+def _screen_reported_factors(df, reported):
+    """Reject REPORTED factors that are data-entry errors, not weights.
+
+    Uganda's first wired wave made the need concrete: 86 rows with a reported
+    factor above 200 contributed 46.97M of a 57.9M kg national total, and the
+    top ones are recognisable mis-keys -- a Sorghum row with quantity 147 and
+    factor 147 000 (the quantity re-keyed, x1000), a ``u='Kg'`` row claiming
+    260 000, and factors of 2 017 / 2 018 (the adjacent year column).
+
+    Three rules, each counted under ``reported_implausible``:
+
+    1. the row's unit IS the kilogram (:data:`_KG_UNIT_KEYS`) and the factor
+       is not within :data:`KG_UNIT_TOLERANCE` of 1;
+    2. the factor exceeds :data:`KG_FACTOR_MAX`;
+    3. the factor is an integral calendar year in
+       :data:`_KG_FACTOR_YEAR_BAND` on a non-kg unit.
+
+    A rejected value is NEVER clipped or rescaled -- inventing a weight is
+    the failure this whole design exists to avoid.  The row falls through to
+    ``survey_median`` / ``inferred`` / ``none`` exactly as if it had never
+    reported, and its rejected value enters no median.
+
+    Returns ``(screened, rejected_mask)``.
+    """
+    rep = _valid_factor(reported)
+    have = ~np.isnan(rep)
+
+    u = _level_or_column(df, 'u')
+    if u is None:
+        is_kg = np.zeros(len(rep), dtype=bool)
+    else:
+        text = pd.Series(u).astype(str).str.strip().str.lower().to_numpy()
+        is_kg = np.isin(text, sorted(_KG_UNIT_KEYS))
+
+    lo, hi = _KG_FACTOR_YEAR_BAND
+    kg_not_one = have & is_kg & (np.abs(rep - 1.0) > KG_UNIT_TOLERANCE)
+    too_heavy = have & (rep > KG_FACTOR_MAX)
+    year_like = (have & ~is_kg & (rep == np.round(rep))
+                 & (rep >= lo) & (rep <= hi))
+
+    rejected = kg_not_one | too_heavy | year_like
+    return np.where(rejected, np.nan, rep), rejected
+
+
 #: The canonical ``u`` value meaning "NO UNIT WAS RECORDED".  Uganda mints it
 #: wherever a wave ships no harvest-unit label (``uganda.py:1386``, ``:1859``;
 #: ``Uganda/_/data_scheme.yml`` documents it for ``crop_production.u``).
@@ -1832,9 +1911,15 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
 
     ``reported``
         The row's own ``KgFactor`` column -- what the instrument wrote down
-        (UNPS ``a5?q6d``, "conversion factor into kg"), where it is finite
-        and > 0.  ``KgFactor`` is REPORTED, never constructed: see the
-        canonical schema note in ``lsms_library/data_info.yml``.
+        (UNPS ``a5?q6d``, "conversion factor into kg"), where it is finite,
+        > 0 and PLAUSIBLE (:func:`_screen_reported_factors`: a kilogram unit
+        must weigh 1, nothing may exceed :data:`KG_FACTOR_MAX`, and an
+        integral calendar year on a non-kg unit is the adjacent-column
+        signature).  A rejected value is never clipped or rescaled -- the row
+        falls through to the layers below exactly as if it had not reported,
+        and the rejection is counted under ``reported_implausible``.
+        ``KgFactor`` is REPORTED, never constructed: see the canonical schema
+        note in ``lsms_library/data_info.yml``.
     ``survey_median``
         The median reported ``KgFactor`` of the same ``(u, condition)``
         within the same country-wave, where at least *min_reports* rows
@@ -1877,15 +1962,22 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``KgFactorSource``
             one of :data:`KG_FACTOR_LAYERS`.
         ``kg_reported`` / ``kg_survey_median`` / ``kg_inferred``
-            what each layer offered for that row, whether or not it won --
+            what each layer offered for that row, whether or not it won.
+            ``kg_reported`` is POST-screen, so a rejected report reads NaN
+            here and ``kg_reported_rejected`` is True; the raw value is
+            untouched in the input frame's own ``KgFactor`` column --
             which is what makes the disagreement auditable per unit
             (``groupby('u')`` on this frame).
 
         Two tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
-            ``{layer: n_rows}`` over the INPUT rows, summing to
-            ``len(crop_production)``.  POOLED: on a cross-country
+            ``{layer: n_rows}`` over the INPUT rows.  The four layers of
+            :data:`KG_FACTOR_LAYERS` partition the frame and sum to
+            ``len(crop_production)``; the extra ``reported_implausible`` key
+            counts rows whose report the screen REJECTED and is deliberately
+            outside that partition, since such a row is still served by one
+            of the four.  POOLED: on a cross-country
             :class:`~lsms_library.feature.Feature` frame these counts run over
             every country at once, so ``reported: 40000`` says nothing about
             WHICH country reported.  Read it as a total, never as coverage;
@@ -1918,9 +2010,10 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     inferred_arr = inferred.to_numpy(dtype='float64', na_value=np.nan)
 
     if 'KgFactor' in df.columns:
-        reported = _valid_factor(df['KgFactor'])
+        reported, rejected = _screen_reported_factors(df, df['KgFactor'])
     else:
         reported = np.full(len(df), np.nan)
+        rejected = np.zeros(len(df), dtype=bool)
 
     sentinel = _unit_sentinel_mask(df)
     if np.isnan(reported).all():
@@ -1947,11 +2040,17 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         {'kg_per_unit': resolved,
          'KgFactorSource': source,
          'kg_reported': reported,
+         'kg_reported_rejected': rejected,
          'kg_survey_median': survey_median,
          'kg_inferred': inferred_arr},
         index=df.index)
 
     counts = {layer: int((source == layer).sum()) for layer in KG_FACTOR_LAYERS}
+    # NOT a fifth layer, and deliberately not part of the partition: a
+    # rejected row is still SERVED by one of the four (usually `none` or
+    # `inferred`), so counting it here as well would double-count it.  The
+    # four layers sum to len(df); this rides alongside as a screen count.
+    counts['reported_implausible'] = int(rejected.sum())
     out.attrs['kg_factor_sources'] = counts
     # A row with no unit recorded is excluded from the audit as well: there
     # is nothing for its reported factor to be compared against, since no

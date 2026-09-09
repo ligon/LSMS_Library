@@ -223,6 +223,49 @@ Cited, not paraphrased.
    Deliberately not added — the refinement asked for disclosure, and a
    warning nobody reads is how GH #323 survived its first fix.
 
+## §7 The plausibility screen (added after the first wired run)
+
+Uganda's wiring landed (`f7f0e535`) and the first real run showed layer (a)
+was trusting mis-keys: the national total went 4.96M -> 57.9M kg, with 86
+rows above factor 200 contributing 46.97M of it. The top rows are not
+weights — Sorghum `u=Unknown` qty 147 / factor 147 000 (the quantity re-keyed
+x1000), `u=Kg` factor 260 000, Beans 2 017 and Soybean 2 018 (the adjacent
+year column). Reported KgFactor quantiles: p50 15, p90 100, p99 150,
+p99.9 2 018, max 260 000.
+
+`_screen_reported_factors` rejects three signatures — a kilogram unit not
+weighing 1 (±1%), anything above `KG_FACTOR_MAX`, and an integral calendar
+year on a non-kg unit. **Nothing is clipped or rescaled**: a rejected row
+falls through to survey_median / inferred / none exactly as if it had never
+reported, its value enters no median, and the rejection is counted.
+
+- **`KG_FACTOR_MAX = 250` is DERIVED, unlike `SURVEY_MEDIAN_MIN_REPORTS`.**
+  The heaviest container any corpus unit table NAMES is Uganda's
+  `Sack (120 kgs)` (`Uganda/_/categorical_mapping.org:278`), above Niger's
+  `Sac de 100 kg` and Malawi's 90 kg bag. 120 x 2 headroom -> 250. Two
+  larger-looking greps are false positives and were checked, not assumed:
+  Uganda's `0.125kg` is margarine (a food item, not a harvest unit) and
+  Niger's `2687` is prose about 2.687 kg.
+- **Rule (iii) is currently SUBSUMED by rule (ii)** — every calendar year
+  exceeds 250, so it rejects nothing the cap does not. Kept because it
+  documents the signature and stays correct if the cap is raised. Said in
+  the constant's comment rather than left for a reader to discover.
+- **`reported_implausible` is NOT a fifth layer.** A rejected row is still
+  served by one of the four, so counting it in the partition would
+  double-count it. The four layers sum to `len(df)`; the screen count rides
+  alongside in the same dict. Both halves are pinned by tests.
+
+### Measured on Uganda, wired config + this worktree's code
+
+2018-19 lands at **5.90M kg** (the screen removes 47.09M kg across 99 rows);
+every other wave is unchanged at 0.60-0.94M. The residual gap is COVERAGE,
+not scale: 2018-19 converts 14 107 input rows against 3 674-6 003 elsewhere,
+and on **Kg-unit rows alone** — the cross-wave-comparable slice — it is
+157.1 kg per row against 155.8-309.1 in the other six waves. The disagreement
+audit is no longer empty: reported vs survey_median 2 820/6 975 = 40.4%,
+reported vs inferred 102/1 896 = 5.4%. The first number is large and is the
+next thing worth a look.
+
 ---
 ### Phase 3 — verification (fill at task end)
 
