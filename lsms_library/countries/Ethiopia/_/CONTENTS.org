@@ -276,9 +276,11 @@ See https://www.fao.org/3/X6877E/X6877E00.htm
   for Ethiopia. The =fct_tools.py= module exists and can pull nutrients from
   USDA FoodData Central, but a complete FCT keyed to Ethiopia's food item
   labels has not been built.
-- What exists :: =conversion_to_kgs.json= is complete, built from
-  wave-specific =Food_CF_Wave{1..5}.dta= files (present for all five waves
-  2011-12 through 2021-22). This handles unit-to-kilogram conversion.
+- What exists :: =conversion_to_kgs.json= is complete, but built only from
+  =Food_CF_Wave1..4.dta= (2011-12 through 2018-19, see =:153-156= above);
+  =food_cf_wave5.dta= (2021-22) is held (sidecar + cached blob) but never
+  read, so the json was not regenerated to include Wave 5. This handles
+  unit-to-kilogram conversion.
   =fct_tools.py= provides helper functions for pulling nutrient data from
   USDA FoodData Central. =nutrition.py= and a =!make= entry in
   =data_scheme.yml= indicate the pipeline skeleton exists.
@@ -377,6 +379,13 @@ Since only one weight is provided per wave, both =weight= and
 =panel_weight= in the =sample= table contain the same values. The
 BID documents (available under "Related Materials" in each catalog
 entry) describe the weight construction methodology.
+
+*Note (2026-09-09).*  EPAR (Evans School, UW, TR#335) rescales survey
+weights to World Bank rural/urban population totals per wave, and
+weights its median-price ladders with that raked weight, so EPAR's
+published price/value LEVELS are not comparable to ours (within-wave
+mean-one) -- only ratios and shares are.  See
+=slurm_logs/2026-09-09_epar_curation/EPAR_PROJECT.org=.
 
 *** Household counts
 
@@ -1035,9 +1044,22 @@ one phantom cluster -- W2 gained a spurious 434th EA
 Area is GPS square-metres / 10000 -> hectares where present
 (=AreaUnit= = 'hectares').  Where only a farmer estimate in a
 non-metric local unit (Timad, Kert, Boy, Senga, Tilm, Medeb, Rope,
-Ermija) exists, we cannot convert -- the local-unit->hectare factors
-are NOT in the repo -- so =Area= is NaN and =AreaUnit= carries the
-native unit name.  GPS area covers ~80-97% of fields per wave.
+Ermija) exists, we cannot convert -- =Area= is NaN and =AreaUnit=
+carries the native unit name.  GPS area covers ~80-97% of fields per
+wave.
+
+*Correction (2026-09-09).*  This section used to say the local-unit
+factors "are NOT in the repo".  That is wrong: =ET_local_area_unit_conversion.dta=
+has DVC sidecars in 2011-12, 2013-14, 2015-16 and 2018-19 -- three
+distinct blobs across those four sidecars (2015-16 and 2018-19 share one
+md5) -- and all three are already in the local DVC cache.  A repo-wide
+grep of =*.py=, =*.yml=, =*.org= and every =Makefile= finds zero
+references to the file: it is held, not wired.  There is no 2021-22
+sidecar because the World Bank did not ship the file for W5; EPAR's
+do-file says so outright (=EPAR_UW_Ethiopia_ESS_W5.do:324=): "Note that
+this file does not exist in the WB W5 download. EPAR borrowed the land
+unit conversion factor file from previous ESS waves." GH #TBD
+(2026-09-09 EPAR survey) to wire it into =plot_features.Area=.
 
 ** W1 missing soil; wave-keyed Tenure
 
@@ -1363,6 +1385,30 @@ enumerator exception to §11's own exclusion, not a sample -- so per-item
 sale prices for Banana, Potato, Coffee, Mango and the like rest on one to
 three observations and should not be trusted.  Wiring §12 as a second
 sale source is the fix; it is a feature addition, not a config tweak.
+
+** Crop-side WB conversion factors: held, unwired (2026-09-09)
+
+=Ethiopia/_/data_scheme.yml:120= says outright "NO unit->kg conversion"
+for =crop_production=, and that is presently true, but not because the
+factors are unavailable.  =Crop_CF_Wave2.dta=, =Crop_CF_Wave3.dta= and
+=Crop_CF_Wave4.dta= (2013-14/2015-16/2018-19) and =crop_cf_wave5.dta=
+(2021-22) all have DVC sidecars and are unread by any script here.
+
+Wave 5's file has a known duplicate row that a loader must handle
+deliberately: crop 74, unit 62, with two factors, 4.34 and 6.125.
+EPAR's do-file resolves it by keeping 4.34 and dropping 6.125
+(=EPAR_UW_Ethiopia_ESS_W5.do:349=): "W5 raw data file Crop_CF_Wave5.dta
+has duplicate observations for crop_code=74, unit_cd=62. Based on W3
+data, we have chosen to retain cf=4.34 (and drop cf=6.125) for
+continuity."
+
+Also relevant to any future §12 wiring (see previous section) and to GH
+#820: ESS4 and ESS5 folded the §12 tree/fruit/root module into §11.
+EPAR's W4 do-file reads perennial crop values out of §11, not §12
+(=EPAR_UW_Ethiopia_ESS_W4.do:759=): "Section 11 includes perm crops."
+So GH #820's "§12 is unwired and bigger" finding is bounded to W1-W3;
+W4/W5 need checking against §11 instead, not against a §12 that no
+longer carries the tree-crop module.
 
 ** _/food_acquired.py lacks the id_walk that _/crop_production.py has
 

@@ -656,6 +656,10 @@ For items that have such unit conversions already done, they were scaled by the 
     (dedicated food conversion table)
   - =2019-20/Data/Cross_Sectional/caloric_conversionfactor.dta= (caloric
     conversion factors)
+  - =2019-20/Data/Cross_Sectional/ihs_seasonalcropconversion_factor_2020.dta=
+    and =ihs_treeconversion_factor_2020.dta= (crop-side conversion
+    factors, 2026-09-09: held, unwired; only the food file is read,
+    =2019-20/_/food_acquired.py:17=)
   - =2010-11/Documentation/Malawi_IHS3_Food_Item_Conversion_Factors.pdf=
     (methodology documentation)
 - What is needed to fix ::
@@ -926,6 +930,13 @@ For 2016-17 and 2019-20, the cross-sectional file provides =hh_wgt= for
 all CS households; the panel file provides both =hh_wgt= and the
 wave-specific =panelweight_YYYY=. Cross-sectional households have
 =panel_weight= = NaN since they are not tracked longitudinally.
+
+*Note (2026-09-09).*  EPAR (Evans School, UW, TR#335) rescales survey
+weights to World Bank rural/urban population totals per wave, and
+weights its median-price ladders with that raked weight, so EPAR's
+published price/value LEVELS are not comparable to ours (within-wave
+mean-one) -- only ratios and shares are.  See
+=slurm_logs/2026-09-09_epar_curation/EPAR_PROJECT.org=.
 
 ** Urban/Rural
 The =reside= column appears in all cover page files but with varying

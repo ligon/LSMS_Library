@@ -523,6 +523,14 @@ this distinction shows up in practice.
 1995-97 or EthiopiaRHS elsewhere in the library).  The 2020-21 case is
 silence, not denial.
 
+*Note (2026-09-09).*  This country has no separate "weight variables"
+heading, so the note goes here, beside the weights discussion above.
+EPAR (Evans School, UW, TR#335) rescales survey weights to World Bank
+rural/urban population totals per wave, and weights its median-price
+ladders with that raked weight, so EPAR's published price/value LEVELS
+are not comparable to ours (within-wave mean-one) -- only ratios and
+shares are.  See =slurm_logs/2026-09-09_epar_curation/EPAR_PROJECT.org=.
+
 ** Not boilerplate
 
 The Tanzania universe sentence is *not* the World Bank NADA template text.

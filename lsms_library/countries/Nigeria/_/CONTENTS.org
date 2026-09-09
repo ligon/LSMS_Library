@@ -194,6 +194,13 @@ The large NaN count in =panel_weight= for waves 4--5 reflects the
 refreshment sample: new panel households receive cross-sectional
 weights but not longitudinal panel weights.
 
+*Note (2026-09-09).*  EPAR (Evans School, UW, TR#335) rescales survey
+weights to World Bank rural/urban population totals per wave, and
+weights its median-price ladders with that raked weight, so EPAR's
+published price/value LEVELS are not comparable to ours (within-wave
+mean-one) -- only ratios and shares are.  See
+=slurm_logs/2026-09-09_epar_curation/EPAR_PROJECT.org=.
+
 ** BID references
 
 - Wave 5: =ghs_panel_wave_5_basic_information_document_v1.pdf=

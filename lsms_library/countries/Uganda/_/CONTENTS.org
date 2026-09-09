@@ -297,6 +297,13 @@ For cross-sectional analysis within a single wave, use =weight=.
 For longitudinal/panel analysis across waves, use =panel_weight=
 (and restrict to households where it is non-null and positive).
 
+*Note (2026-09-09).*  EPAR (Evans School, UW, TR#335) rescales survey
+weights to World Bank rural/urban population totals per wave, and
+weights its median-price ladders with that raked weight, so EPAR's
+published price/value LEVELS are not comparable to ours (within-wave
+mean-one) -- only ratios and shares are.  See
+=slurm_logs/2026-09-09_epar_curation/EPAR_PROJECT.org=.
+
 ** Sampling universe, exclusions and sub-samples
 
 Evidence gathered 2026-07-21 under GH #601.  Every quote below was
