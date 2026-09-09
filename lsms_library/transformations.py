@@ -1610,11 +1610,14 @@ def legacy_locality(country):
 # slurm_logs/2026-09-09_epar_curation/{EPAR_PROJECT,LEARNINGS}.org.  Its
 # median-price ladders (crop sale price, livestock, own-consumed food) select
 # the finest geographic cell with >= 10 observations exactly as
-# ``median_price_valuation`` does; the one construction delta is that EPAR's
-# medians are weighted (by population-raked survey weights) and ours are not.
-# EPAR winsorises at the 1st/99th percentile and rakes weights to WB
-# population totals; neither is reproduced here, by design (count, never
-# clip; within-wave mean-one weights).
+# ``median_price_valuation`` does; the one construction delta was that EPAR's
+# medians are weighted (by population-raked survey weights) and ours were not.
+# ``median_price_valuation(weight_col=...)`` now opts in to a weighted median
+# -- a strict generalisation (equal weights reproduce the unweighted median
+# exactly), the default stays unweighted, and we still do not RAKE the
+# weights.
+# EPAR also winsorises at the 1st/99th percentile; that is not reproduced
+# here, by design (count, never clip; within-wave mean-one weights).
 
 
 # Plot-level index names emitted by the various countries' item features.
@@ -2772,6 +2775,209 @@ def dependency_ratio(household_roster, *, working_age=(15, 64),
     return ratio.to_frame('Dependency_ratio').sort_index()
 
 
+# WFP standard reduced-Coping-Strategies-Index weights, keyed on our
+# canonical ``food_coping`` Strategy labels.  Malawi, Burkina Faso and Mali
+# field exactly this five-item battery (see e.g.
+# ``Malawi/_/data_scheme.yml:162-164``: "a=LessPreferred, b=LimitPortion,
+# c=ReduceMeals, d=RestrictAdults, e=BorrowFood").  EPAR's own Malawi rename
+# (``Malawi IHS/Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:4520-4524``) maps
+# hh_h02a..e -> strategy1..5 in EXACTLY that order, each rename line's own
+# comment naming its severity weight (1/1/1/3/2); ``:4525`` sums them
+# (``rcsi = strategy1 + strategy2 + strategy3 + 3*strategy4 +
+# 2*strategy5``), and ``:4519`` cites the coefficients' own source: "Weights
+# from The Coping Strategies Index: Field Methods Manual (2008)" -- so the
+# weights below are that manual's, read through EPAR's Malawi renaming, not
+# an unsourced positional list.
+_RCSI_WFP_WEIGHTS = {
+    'LessPreferred': 1,
+    'BorrowFood': 2,
+    'LimitPortion': 1,
+    'RestrictAdults': 3,
+    'ReduceMeals': 1,
+}
+
+
+def rcsi(food_coping, *, weights=None):
+    """Reduced Coping Strategies Index (WFP rCSI; WB/EPAR ``rcsi``).
+
+    MECHANICAL reduction over the ``food_coping`` item table: a weighted sum
+    of day-counts across the coping strategies, ``Σ weight[Strategy] ×
+    Days``, one score per household-wave.
+
+    Parameters
+    ----------
+    food_coping : pd.DataFrame
+        ``food_coping`` item feature, grain ``(t, i, Strategy)``, with an
+        integer ``Days`` column (0-7, days in the past 7 the strategy was
+        used).
+    weights : dict[str, float], optional
+        Strategy label -> weight.  Defaults to :data:`_RCSI_WFP_WEIGHTS`,
+        the standard five-strategy WFP formula (``LessPreferred +
+        LimitPortion + ReduceMeals + 3×RestrictAdults + 2×BorrowFood``).
+
+        **The strategy set is a property of the questionnaire, not a
+        universal constant** -- do not treat the five-term formula as the
+        definition.  Ethiopia and Tanzania field an 8-item battery (the
+        standard five plus ``LimitVariety`` / ``NoFood`` /
+        ``WholeDay``/``WholeDayWithout``: ``Ethiopia/_/ethiopia.py:785-794``,
+        ``Tanzania/_/data_scheme.yml:95-98``); Nigeria fields 9
+        (``Nigeria/_/nigeria.py`` ``FOOD_COPING_ITEMS``, adding
+        ``SleepHungry`` / ``WholeDayNoFood``).  EPAR's OWN Tanzania rCSI is
+        an eight-term variant with different weights on the extra items
+        (``Tanzania NPS/Tanzania NPS Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2617``,
+        ``hh_h02a + hh_h02b + hh_h02c + hh_h02d + 3*hh_h02e + hh_h02f*2 +
+        hh_h02g*4 + hh_h02h*4``) -- proof that a wider battery does not
+        collapse to the five-term formula by just ignoring the extra
+        columns.  The check is symmetric: a ``Strategy`` label present in
+        ``food_coping`` but absent from ``weights`` raises
+        :class:`ValueError` naming it (never silently scored on just the
+        terms it recognises), and a ``weights`` key that names a label
+        ``food_coping`` never carries ALSO raises (never silently scored on
+        fewer terms than the formula claims -- a country fielding only 4 of
+        the 5 standard strategies is equally "not the standard five").  Pass
+        an explicit ``weights`` dict naming every label present, and no
+        others, for Ethiopia, Tanzania and Nigeria.
+
+    Returns
+    -------
+    pd.DataFrame
+        One float ``rCSI`` column indexed by ``(t, i)``.
+
+    Notes
+    -----
+    **Missing strategy rows are NEVER filled with zero.** A household using
+    a strategy zero days is a valid, STORED response (``Days=0``);
+    ``food_coping`` is sparse only where a strategy question went
+    unanswered or its response was out-of-domain and dropped.  Evidence:
+
+    - Ethiopia's own wave-builder docstring
+      (``Ethiopia/_/ethiopia.py:814-815``): "Rows with a missing Days value
+      are dropped (the strategy was not answered for that household)."
+    - Nigeria's (``Nigeria/_/nigeria.py:985-987``): "Rows where the day
+      count is missing are dropped; a household with all-missing items
+      contributes no rows."
+    - Malawi's audited row counts (``Malawi/_/CONTENTS.org:24-35``): rows
+      are *exactly* 5x each wave's Module-H household count in 2010-11
+      (12,271 x 5 = 61,355) and short by a handful in the other three
+      waves (6 / 3 / 13 rows) -- the out-of-range day-counts ``malawi.py``
+      coerces to NaN and drops (``Malawi/_/malawi.py:1204,1212``), never
+      zero-filled.
+
+    So a household present for some weighted strategies and absent for
+    another had that strategy UNANSWERED, not zero, and is excluded from
+    the score entirely -- never scored on a truncated sum.  Any ``(t, i)``
+    missing so much as one of the strategies named in ``weights`` is
+    dropped, not imputed.
+    """
+    df = food_coping
+    names = list(df.index.names or [])
+    if 'Strategy' not in names:
+        raise ValueError("food_coping must have a 'Strategy' index level")
+    if 'Days' not in df.columns:
+        raise ValueError("food_coping must have a 'Days' column")
+    group_by = [n for n in ['t', 'i'] if n in names]
+    if not group_by:
+        raise ValueError("food_coping must have 't' and/or 'i' index levels")
+
+    w = dict(_RCSI_WFP_WEIGHTS) if weights is None else dict(weights)
+
+    strategy = df.index.get_level_values('Strategy').astype(str)
+    present = sorted(set(strategy))
+    unknown = sorted(set(present) - set(w))
+    if unknown:
+        raise ValueError(
+            f"rcsi: unrecognised Strategy label(s) {unknown} in food_coping "
+            "-- the five-term WFP formula is not universal (Ethiopia/"
+            "Tanzania field an 8-item battery, Nigeria 9; EPAR's own "
+            "Tanzania rCSI is an eight-term variant with different "
+            "weights). Pass weights= naming every Strategy label present."
+        )
+    # Symmetric with the check above: a weight naming a Strategy this table
+    # never carries is exactly as wrong as an unrecognised Strategy -- the
+    # strategy set (and therefore the term count) is a property of the
+    # questionnaire, not a default to fall back on for a narrower battery.
+    missing = sorted(set(w) - set(present))
+    if missing:
+        raise ValueError(
+            f"rcsi: weights name Strategy label(s) {missing} that food_coping "
+            "does not carry at all -- pass a weights= dict matching exactly "
+            "the Strategy labels present, not a superset."
+        )
+
+    used = list(w)
+
+    days = pd.to_numeric(df['Days'], errors='coerce')
+    s = pd.Series(days.to_numpy(), index=df.index)
+    wide = s.unstack('Strategy')
+    if list(wide.index.names) != group_by:
+        # The canonical grain is (t, i, Strategy), but Country.food_coping()
+        # arrives with the joined cluster level ``v`` as well, so this branch
+        # fires on every real-country call.  ``v`` is one-to-one with
+        # (t, i) (measured on Malawi, red-team 2026-09-09), so ``first()``
+        # is lossless there; it would not be if a country ever served two
+        # rows per (t, i, Strategy), which the canonical schema forbids.
+        wide = wide.groupby(level=group_by).first()
+    wide = wide.reindex(columns=used)
+
+    # Missing strategy rows mean "not answered" / dropped-invalid (see
+    # Notes above) -- exclude the household from the score entirely rather
+    # than imputing a zero.
+    complete = wide.dropna(how='any')
+    weight_vec = pd.Series({k: w[k] for k in used}, dtype=float)
+    score = complete[used].mul(weight_vec, axis=1).sum(axis=1)
+    return score.to_frame('rCSI').sort_index()
+
+
+def rcsi_phase(rcsi, *, cutoffs=(3, 18, 42)):
+    """WFP rCSI severity phase, in partitioning closed intervals.
+
+    Parameters
+    ----------
+    rcsi : pd.Series or pd.DataFrame
+        rCSI score(s) -- e.g. the ``rCSI`` column returned by
+        :func:`rcsi` (the frame's single column is used if a DataFrame is
+        passed).
+    cutoffs : (int, int, int), default (3, 18, 42)
+        Three ascending cut points splitting the non-negative score line
+        into four phases: ``[0, c1]``, ``(c1, c2]``, ``(c2, c3]``,
+        ``(c3, inf)``.
+
+    Returns
+    -------
+    pd.Series
+        Ordered categorical (``'Phase 1'`` .. ``'Phase 4'``), same index as
+        ``rcsi``.
+
+    Notes
+    -----
+    Deliberately closed-interval and PARTITIONING -- every real number
+    (hence every integer score) lands in exactly one phase.  This avoids a
+    real defect in EPAR's own cutoffs
+    (``Malawi IHS/Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:4530-4531``):
+    phase 2 there is ``rcsi <= 18`` and phase 3 is
+    ``rcsi > 19 & rcsi <= 42`` -- an ``rcsi`` of exactly 19 satisfies
+    neither test and falls in NO phase, even though the phase-3 LABEL one
+    line later (``:4535``) claims the range is "(19 - 42)", i.e. the label
+    and the test contradict each other.  Here ``cutoffs=(3, 18, 42)``
+    default gives ``[0, 3]``, ``(3, 18]``, ``(18, 42]``, ``(42, inf)`` --
+    19 lands in the third phase (``(18, 42]``), matching the LABEL EPAR
+    intended rather than the gap its test actually produced.
+    """
+    c1, c2, c3 = cutoffs
+    if isinstance(rcsi, pd.DataFrame):
+        values = rcsi.iloc[:, 0]
+    else:
+        values = rcsi
+    values = pd.to_numeric(values, errors='coerce')
+
+    labels = ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4']
+    bins = [-np.inf, c1, c2, c3, np.inf]
+    phase = pd.cut(values, bins=bins, labels=labels, ordered=True,
+                   right=True)
+    phase.name = 'rCSI_phase'
+    return phase
+
+
 def farm_size(plot_features, *, area_col='Area'):
     """Total cultivated/owned plot area per household (WB ``farm_size``).
 
@@ -2855,6 +3061,82 @@ def nb_plots(plot_features):
 # ===========================================================================
 
 
+def _weighted_median(values, weights, keys):
+    """Per-group weighted median of ``values``, weighted by ``weights``.
+
+    Sort a group's values ascending; let ``W`` be its total weight and ``C``
+    the running cumulative weight.  The weighted median is the value at the
+    first row where ``C >= W/2`` -- EXCEPT where ``C == W/2`` exactly at that
+    row (compared with a relative tolerance), in which case it is the mean of
+    that value and the next row's.
+
+    That tie rule is what makes ``weight_col`` a strict GENERALISATION of the
+    unweighted path: under equal positive weights the exception fires exactly
+    when the group has an even count (the half-total lands squarely on the
+    lower central row) and returns the average of the two central values,
+    while an odd count reaches ``W/2`` strictly inside the middle row and
+    returns it.  So equal weights reproduce ``Series.median()`` exactly, in
+    BOTH parities.  Dropping the exception would give the *lower* weighted
+    median, which agrees with ``Series.median()`` only for odd counts.
+
+    A row takes part only if its value is non-missing AND its weight is
+    non-missing and strictly positive; a group with no such row gets NaN.
+    ``keys`` is a list of Series aligned to ``values.index``, already
+    stringified by the caller (so there are no NA group labels).
+    """
+    usable = (values.notna() & weights.notna() & (weights > 0)).astype(bool)
+    out = pd.Series(np.nan, index=values.index, dtype='float64')
+    if not usable.any():
+        return out
+
+    kcols = [f'_k{n}' for n in range(len(keys))]
+    # Built from numpy arrays on a fresh RangeIndex: ``values.index`` may
+    # carry duplicate labels (item rows repeat a household), and a
+    # DataFrame assembled from Series would try to align on it.
+    sub = pd.DataFrame({
+        '_v': values[usable].to_numpy(dtype='float64'),
+        '_w': weights[usable].to_numpy(dtype='float64'),
+    })
+    for col, key in zip(kcols, keys):
+        sub[col] = np.asarray(key[usable])
+    sub = sub.sort_values(kcols + ['_v'], kind='stable')
+
+    by = sub.groupby(kcols, sort=False, dropna=False)
+    cum = by['_w'].cumsum()
+    total = by['_w'].transform('sum')
+    half = 0.5 * total
+    # ``cumsum`` accumulates sequentially and ``sum`` pairwise, so at the
+    # exact tie the equal-weights case produces they can differ by an ulp.
+    # Both comparisons carry the same relative slack, so a tie is recognised
+    # as a tie rather than skipped or split.
+    reached = cum >= half * (1 - 1e-12)
+    tie = np.isclose(cum.to_numpy(), half.to_numpy(), rtol=1e-12, atol=0.0)
+
+    # The next row within the group (NaN at the group's last row).  An exact
+    # tie cannot occur there -- C == W/2 == W would need W == 0, and every
+    # participating weight is strictly positive -- so the mask only guards
+    # against reading across a group boundary.
+    nxt = sub['_v'].shift(-1).where(by.cumcount(ascending=False) != 0)
+    stat = pd.Series(
+        np.where(tie & nxt.notna().to_numpy(),
+                 (sub['_v'].to_numpy() + nxt.to_numpy()) / 2.0,
+                 sub['_v'].to_numpy()),
+        index=sub.index)
+
+    # Weights are strictly positive, so ``cum`` strictly increases within a
+    # group and ``reached`` is monotone: the FIRST True is the median row.
+    # ``groupby().first()`` skips NaN, so it returns exactly that row's stat.
+    sub['_m'] = stat.where(reached)
+    per_group = sub.groupby(kcols, sort=False, dropna=False)['_m'].first()
+
+    if len(kcols) == 1:
+        lookup = pd.Index(np.asarray(keys[0]))
+    else:
+        lookup = pd.MultiIndex.from_arrays([np.asarray(k) for k in keys])
+    return pd.Series(per_group.reindex(lookup).to_numpy(dtype='float64'),
+                     index=values.index)
+
+
 def median_price_valuation(item_df, geo_levels, *,
                            value_col='Value_sold',
                            qty_col='Quantity_sold',
@@ -2862,6 +3144,7 @@ def median_price_valuation(item_df, geo_levels, *,
                            quantity_col='Quantity',
                            item_keys=('j',),
                            threshold=10,
+                           weight_col=None,
                            volume_as_mass=True,
                            price_col='_unit_price',
                            out_col='Value'):
@@ -2882,14 +3165,16 @@ def median_price_valuation(item_df, geo_levels, *,
         ``replace crop_price_temp = . if ==0``), but still *receive* an
         imputed price in step 3.
     2.  *Median ladder*.  For each ``(geo_cell, *item_keys)`` group, count the
-        non-missing observed prices ``n``.  Walking ``geo_levels`` from finest
+        usable observed prices ``n``.  Walking ``geo_levels`` from finest
         to coarsest, then a final national level, the imputed price for a row
         is the **median observed price of the finest cell whose count ≥
         threshold**.  This is exactly the WB cascade: EA → admin_4 → admin_3 →
         admin_2 → admin_1 → national, where the cell's median is *adopted only
         if it has ≥10 priced observations* and no finer cell already qualified.
         The national median is the unconditional fallback (the WB
-        ``replace ... if ten_obs_n==0``).
+        ``replace ... if ten_obs_n==0``).  With ``weight_col`` the cell
+        statistic becomes a **weighted** median (see that parameter); the
+        ladder, the threshold and the fallback are unchanged.
     3.  *Valuation*.  ``out_col = imputed_price × quantity_col`` for every row
         (the WB ``harvest_value = crop_price * harvest_kg``).
 
@@ -2946,6 +3231,39 @@ def median_price_valuation(item_df, geo_levels, *,
     threshold : int, default 10
         Minimum count of priced observations for a cell's median to be
         adopted (the WB ``ten_obs`` ≥ 10).
+    weight_col : str, optional
+        When given (an index level or a column of ``item_df``), every cell
+        median becomes a **weighted median**.  Sort the cell's observed prices
+        ascending; let ``W`` be the total weight and ``C`` the cumulative
+        weight.  The cell's price is the one at the first row where
+        ``C >= W/2``, EXCEPT where ``C == W/2`` exactly at that row (to within
+        a relative tolerance), in which case it is the mean of that price and
+        the next row's.  ``None`` (the default) runs the unweighted path
+        unchanged.
+
+        The weight is per *row* -- the household weight repeated on each of its
+        item rows, as EPAR's ``[aw=weight]`` is.  A quantity-weighted median
+        (EPAR Nigeria ``W4.do:696``, ``gen weight=qty*weight_pop_rururb``) is
+        had by passing a column you derived that way.
+
+        *Observation counting is unaffected*: ``n`` stays a COUNT OF ROWS, not
+        a sum of weights, so ``threshold`` means the same thing on both paths.
+
+        *Null and non-positive weights.*  A priced row whose weight is missing
+        or ``<= 0`` takes no part in the weighted median AND is not counted
+        toward ``threshold`` -- a row counts for a cell exactly when it can
+        speak for it.  It still *receives* an imputed price, precisely as a
+        row with a missing price does.  A warning names how many rows this is.
+
+        *Relation to the unweighted path.*  ``weight_col`` is a strict
+        GENERALISATION of it: under equal (or all-equal positive) weights the
+        weighted median reproduces ``Series.median()`` EXACTLY, for BOTH odd
+        and even cell counts.  The exact-tie exception above is what buys
+        that -- with equal weights it fires precisely on an even count and
+        averages the two central prices, exactly as the unweighted path does;
+        an odd count reaches ``W/2`` strictly inside the middle row and
+        returns it.  Pinned in both parities by
+        ``tests/test_median_price_valuation.py``.  See :func:`_weighted_median`.
     volume_as_mass : bool, default True
         Forwarded to the kg conversion of ``qty_col`` when ``kg_qty`` is None.
     price_col : str, default '_unit_price'
@@ -2965,6 +3283,26 @@ def median_price_valuation(item_df, geo_levels, *,
 
     Notes
     -----
+    Prior art (convergence, and the deltas).  Three teams reached the same
+    selection rule independently -- the WB panel's ``valuation_median_crops``,
+    EPAR (Evans School, UW) Technical Report #335 in both its crop and
+    livestock ladders and again in its consumption repo, and this function:
+    *the median price of the finest geographic cell with >= threshold
+    observations*.  EPAR iterates broad-to-narrow with an unconditional
+    overwrite, which selects the same cell.  The verified deltas:
+      - EPAR's medians are WEIGHTED, by its population-raked
+        ``weight_pop_rururb`` (Uganda ``W5.do:482-483``, Malawi
+        ``W1.do:504-505``, Nigeria ``W4.do:695-696``); ours is unweighted
+        unless ``weight_col`` is passed.  We do not rake weights.
+      - EPAR GATES its national rung on the same threshold; ours is an
+        unconditional fallback, so no row is left unvalued.
+      - EPAR's LIVESTOCK ladder is the opposite idiom: narrow-to-broad fill
+        with a preference for the household's OWN observed price, ending
+        unconditional.  "EPAR's ladder" is ambiguous -- say which.
+      - EPAR's CONSUMPTION repo gates at ``obs > 10``, i.e. N >= 11, where its
+        Ag repo gates ``obs > 9``, i.e. N >= 10 (our default).
+    See ``slurm_logs/2026-09-09_epar_curation/LEARNINGS.org`` L5.
+
     Divergence from WB: their ladder is keyed on survey ``admin_1..admin_4``
     codes; we accept whatever geography the caller supplies from our
     ``cluster_features`` / ``sample`` (``v``, ``District``, ``Region``), which
@@ -3012,6 +3350,37 @@ def median_price_valuation(item_df, geo_levels, *,
 
     item_key_series = [_series(k).astype(str) for k in item_keys]
 
+    # Optional survey weight (EPAR's ``[aw=weight]``).  A priced row whose
+    # weight is missing or non-positive cannot speak for its cell, so it is
+    # excluded from BOTH the weighted median and the observation count --
+    # the same bargain the unweighted path strikes with an unpriced row,
+    # which is likewise pooled nowhere yet still valued in step 3.
+    weight = None
+    usable = price.notna()
+    if weight_col is not None:
+        weight = pd.to_numeric(_series(weight_col), errors='coerce')
+        # ``.astype(bool)`` so a nullable Int64/Float64 weight cannot turn
+        # the count below into a nullable Int64 sum.
+        usable = (price.notna() & weight.notna() & (weight > 0)).astype(bool)
+        n_dropped = int((price.notna() & ~usable).sum())
+        if n_dropped:
+            warnings.warn(
+                f"median_price_valuation(weight_col={weight_col!r}): "
+                f"{n_dropped:,} of {int(price.notna().sum()):,} priced rows "
+                f"have a missing or non-positive weight.  They take no part "
+                f"in the weighted medians and are NOT counted toward "
+                f"threshold={threshold}; they are still valued at whichever "
+                f"ladder price their cell ends up with.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+    def _cell_median(keys):
+        """Cell statistic: the plain median, or the weighted median."""
+        if weight is None:
+            return price.groupby(keys).transform('median')
+        return _weighted_median(price, weight, keys)
+
     # Step 2: median ladder.  Start with everyone unassigned; for each geo
     # level finest→coarsest (then national), fill any still-unassigned row
     # whose cell clears the threshold with that cell's median observed price.
@@ -3020,16 +3389,17 @@ def median_price_valuation(item_df, geo_levels, *,
     for level in ladder:
         keys = ([] if level is None else [_series(level).astype(str)]) \
             + item_key_series
-        grouped = price.groupby(keys)
-        cell_median = grouped.transform('median')
-        cell_count = price.notna().groupby(keys).transform('sum')
+        cell_median = _cell_median(keys)
+        # A COUNT OF ROWS, never a sum of weights -- so ``threshold`` means
+        # the same thing on the weighted and unweighted paths.
+        cell_count = usable.groupby(keys).transform('sum')
         qualifies = cell_count >= threshold
         take = imputed.isna() & qualifies & cell_median.notna()
         imputed = imputed.where(~take, cell_median)
     # National median is the unconditional fallback (WB ten_obs_n==0 branch):
     # any row still unassigned after the threshold cascade gets the national
     # median regardless of count, mirroring the final WB ``replace``.
-    nat_median = price.groupby(item_key_series).transform('median')
+    nat_median = _cell_median(item_key_series)
     imputed = imputed.where(imputed.notna(), nat_median)
 
     # Step 3: value every row at its imputed price.

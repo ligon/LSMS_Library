@@ -2102,11 +2102,121 @@ Cross-country: the same defect is recorded for Nigeria (95-97% agreement)
 and Niger (63-99%) in =.coder/ledger/price-sources-comparison.md= -- it is
 GH #824, not a Uganda quirk.
 
-** TODO 2009-10 harvest quantities carry an unstripped 99999 sentinel
+** DONE 2009-10 harvest quantities carried an unstripped 99999 sentinel (#861)
 
-2009-10's =Quantity= sums to 3.18e8 native units, ~300x every other wave,
-because =99999= is used as a missing-value sentinel and never removed.
-Any analysis touching 2009-10 =crop_production= quantities must filter it.
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/861][#861]] (bug, cleanup)
+- Status :: *FIXED 2026-09-09*, =uganda.py= =CROP_COLMAPS['2009-10']= /
+  =crop_production_for_wave=
+
+2009-10's post-harvest module (=a5aq6a= season A, =a5bq6a= season B) uses
+=99999= as a missing-value sentinel for "no information reported on this
+harvest row", never stripped.  EPAR names the same column and applies the
+same unconditional rule to its coalesced A/B column
+(=EPAR_UW_Uganda_UNPS_W1.do:558=: =replace quantity_harv=. if
+quantity_harv==99999=; EPAR's earlier conditional recode at =:483= --
+=A5aq11==.=-gated -- is a narrower rule that this fix does NOT adopt alone,
+per the issue).
+
+*Mechanism.*  Each 2009-10 season-A/B condition dict in =CROP_COLMAPS= now
+declares =qty_sentinel: 99999=; =crop_production_for_wave= masks any
+=Quantity= exactly equal to that value to NaN (EXACT VALUE, never a range --
+99998 and 100000 survive unchanged) immediately after reading the quantity
+column.  No other wave declares =qty_sentinel= (measured: none of 2010-11
+through 2019-20 shows this signature; guarded by
+=tests/test_uganda_99999.py::test_qty_sentinel_is_2009_10_only=).
+
+A nulled sentinel row then goes through the function's PRE-EXISTING "drop a
+row when NO measure (Quantity/Quantity_sold/Value_sold) is reported at all"
+filter -- unchanged.  3,077 of the wave's 3,097 sentinel rows carry no
+Quantity_sold or Value_sold either, so they are DROPPED by that filter, same
+as this wave's other 907 genuinely-blank crop rows (unrelated to this fix).
+*Corrected 2026-09-09* per the red-team report
+(=slurm_logs/2026-09-09_epar_curation/REDTEAM_P1_uganda99999.org=, item 2):
+an earlier version of this fix instead tracked a PRE-mask "was anything
+reported" flag (=_qty_reported=) and OR'd it into the filter, so that
+sentinel-only rows survived with =Quantity= NaN at the wave-parquet layer.
+That flag has been REMOVED.  It was inert at the delivered table --
+=Country._finalize_result='s =dropna(how='all')= (=country.py:3014=, "the
+universal safety-net ... drop any row where every non-index column is
+NaN") deletes those same rows on every API read regardless, since a
+sentinel row with =Quantity= nulled and no other measure has ALL of
+=Quantity=, =Quantity_sold=, =Value_sold=, =harvest_month= (2009-10 declares
+=month: None=), =KgFactor= (unwired this wave) and =intercropped= (NaN this
+wave, AGSEC4A not joinable) null -- so keeping the row alive at the wave
+layer only produced a misleading "rows unchanged" claim below, one layer
+before the framework deleted it anyway, invisible at =logger.info=.
+
+*Measured, cold, isolated =LSMS_DATA_DIR= (2026-09-09, corrected):*
+
+| | before | after (wave parquet) |
+|---------------------------+----------------+--------------|
+| rows (both seasons), RAW  | 25,485         | 25,485 (unfiltered quantity count, unchanged) |
+| rows delivered by =crop_production_for_wave= | 25,485 | *22,408* |
+| households                | 2,330          | *2,323* |
+| season A rows (raw)        | 13,244         | 13,244       |
+| season B rows (raw)        | 12,241         | 12,241       |
+| =Quantity==99999= count, A | 1,400          | 0            |
+| =Quantity==99999= count, B | 1,697          | 0            |
+| =Quantity==99999= total    | 3,097          | 0            |
+| =Quantity= sum (native units) | 310,664,565.84 | 967,662.84 |
+
+The 3,077 dropped rows = 3,097 sentinel rows minus 20 that survive: those 20
+share a de-dup index tuple (the pre-existing
+=groupby(...).sum(min_count=1)=) with a REAL row reporting =Quantity=0=, so
+=sum(min_count=1)= folds the (now-NaN) sentinel into the real 0 and the
+merged row reads =Quantity=0.0=, not NaN -- pre-fix the sentinel was instead
+ADDED onto that real 0, so this fix repairs that case too.  All 20 are
+=u='Unknown'=/=unknown_condition=.  7 households leave =crop_production=
+entirely because every row they contributed was a now-dropped sentinel row:
+=1021001910=, =1051000103=, =1133001911=, =3093000202=, =3103000808=,
+=3203002401=, =4163000708=.
+
+*Off-by-one on "all sentinel rows are blank Unknown rows".*  Raw sentinel
+counts are 1,411 (season A) / 1,758 (season B) = 3,169; 72 have no crop
+label and are already dropped by the pre-existing =j.notna()= filter,
+leaving the 3,097 this section measures.  Of those 3,097, *3,096* have a
+null raw unit AND condition code (hence =u='Unknown'=,
+=condition='unknown_condition='=) -- but ONE season-B row (HHID
+=4163000709=, parcel 1, plot 3, crop code 150 = Sorghum) carries REAL codes
+(unit 22 = Plastic Basin (15 lts), condition 45 = dried_grain): an
+otherwise fully-populated harvest record whose quantity happens to be
+99999.  It is dropped exactly like the other 3,076 -- it still has no
+Quantity_sold / Value_sold -- confirming the filter is value-blind, not "the
+Unknown rows happen to go".  (=4163000709= is NOT one of the 7 households
+above; that household has other, non-sentinel rows and stays in the
+table -- only this one plot-crop-season record is removed.)
+
+=Quantity_sold=, =Value_sold= and =KgFactor= were checked for the same
+sentinel (and for the sibling sentinels 9999 / 999999) in 2009-10: *none
+carry it* -- =KgFactor= is unwired for this wave regardless (0 non-null,
+matches the pre-existing "wired for 2018-19 only" note above), so nothing
+else was stripped.
+
+Sanity vs. neighbouring waves' =Quantity= sums (same isolated cold build):
+2010-11 = 708,149.50; 2011-12 = 1,128,560.35.  2009-10's corrected
+967,662.84 now sits in the SAME order of magnitude as both, where the
+pre-fix 310.7M did not.  (Ratio before/after on the sum: *321x*, consistent
+with the "~300x" estimate this TODO carried; the sum is identical whether
+or not the dropped rows are counted, since they carry NaN / no Quantity.)
+
+*Cache blast radius (measured, red-team item 6): all 28 Uganda tables, not
+just =crop_production=.*  =uganda.py= is a country-level module referenced
+in every Uganda table's cache-hash fingerprint
+(=Country._table_cache_hash=), so editing it moves =build_transforms_
+fingerprint= for all 28 tables in =data_scheme.yml= -- confirmed 28/28
+MOVED, 0/28 unchanged, against a countries-root control that isolates the
+change to this file.  The post-merge re-warm this fix needs (GH #861's "A
+Uganda re-warm") is therefore a FULL =lsms-library cache clear --country
+Uganda= followed by a full rebuild, not a =crop_production=-only refresh.
+
+Tests: =tests/test_uganda_99999.py= -- fixture-level (exact-value strip;
+a sentinel-only row is DROPPED by the no-measure filter, same as any other
+all-blank row; a sentinel row that ALSO reports a sale survives with
+=Quantity= NaN; no-op when =qty_sentinel= is undeclared) and a data-gated
+test that reads the real 2009-10 modules directly (bypassing the
+Country() cache, so it is immune to shared-cache staleness) and re-checks
+the 0-count / row-count / household-count / sum invariants above, plus
+that the fully-populated sentinel row is gone.
 
 ** TODO Uganda is the ONE country pytest deletes the cache of, and two tests rely on the cache
 
