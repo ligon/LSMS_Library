@@ -13,10 +13,17 @@ the identical unconditional rule to the coalesced A/B column
 The fix is declared per-condition as ``qty_sentinel`` in
 ``uganda.CROP_COLMAPS['2009-10']`` and applied in
 ``uganda.crop_production_for_wave`` as an EXACT-VALUE strip (never a range:
-99998 / 100000 are real quantities and must survive) that turns the sentinel
-into NaN WITHOUT dropping the row -- ``_qty_reported`` tracks whether the
-source column carried *anything* before the strip so the pre-existing
-"no measure reported" filter does not newly delete a sentinel-only row.
+99998 / 100000 are real quantities and must survive).  A nulled sentinel
+row then goes through the SAME pre-existing "no measure reported" filter as
+every other wave-season: a row with no Quantity, Quantity_sold or Value_sold
+at all is dropped, sentinel or not.  (An earlier version of this fix kept
+sentinel-only rows alive with a ``_qty_reported`` pre-mask flag; removed
+per the GH #861 red-team, ``slurm_logs/2026-09-09_epar_curation/
+REDTEAM_P1_uganda99999.org`` item 2 -- ``Country._finalize_result``'s
+``dropna(how='all')`` deleted those rows at the API on every read
+regardless, so the flag was inert at the delivered table and produced a
+misleading "rows unchanged" claim.  The delivered 2009-10
+``crop_production`` goes 25,485 -> 22,408 rows / 2,330 -> 2,323 households.)
 
 Two test families:
 
@@ -143,9 +150,11 @@ def test_qty_sentinel_is_2009_10_only(uganda_module):
 # fixture-level: exact-value strip, never a range; row survives with NaN
 # ---------------------------------------------------------------------------
 
-def _synthetic_frame(uganda_module, qty_values):
+def _synthetic_frame(uganda_module, qty_values, qty_sold_values=None, value_sold_values=None):
     """A minimal AGSEC5A-shaped frame with N rows, one crop/unit/condition
-    code repeated, varying only the harvest-quantity column ``a5aq6a``.
+    code repeated, varying the harvest-quantity column ``a5aq6a`` (and,
+    optionally, ``a5aq7a`` / ``a5aq8`` -- default NaN, i.e. no other
+    reported measure).
     """
     crop_map = uganda_module._crop_label_map()
     unit_map = uganda_module._harvest_unit_map()
@@ -154,6 +163,10 @@ def _synthetic_frame(uganda_module, qty_values):
     unit_code = next(iter(unit_map))
     condition_code = next(iter(condition_map))
     n = len(qty_values)
+    if qty_sold_values is None:
+        qty_sold_values = [np.nan] * n
+    if value_sold_values is None:
+        value_sold_values = [np.nan] * n
     return pd.DataFrame({
         "HHID": [f"100000{i:04d}" for i in range(n)],
         "a5aq1": [1] * n,           # parcel
@@ -162,18 +175,23 @@ def _synthetic_frame(uganda_module, qty_values):
         "a5aq6a": qty_values,       # quantity
         "a5aq6c": [unit_code] * n,  # unit code
         "a5aq6b": [condition_code] * n,  # condition code
-        "a5aq7a": [np.nan] * n,     # quantity sold -- deliberately empty,
-        "a5aq8":  [np.nan] * n,     # value sold    -- so these rows have
-                                     # NO OTHER reported measure, the exact
-                                     # case that would previously have been
-                                     # dropped once Quantity turned NaN.
+        "a5aq7a": qty_sold_values,  # quantity sold
+        "a5aq8":  value_sold_values,  # value sold
     })
 
 
 def test_qty_sentinel_exact_value_only(uganda_module, in_2009_10_wave_dir):
     """99999 -> NaN; 99998 and 100000 (near-sentinel real quantities) survive
-    UNCHANGED. Exact-value match, never a range (GH #861)."""
-    df5a = _synthetic_frame(uganda_module, [99999, 99998, 100000, 5.0])
+    UNCHANGED. Exact-value match, never a range (GH #861).
+
+    The 99999 row is given a reported sale so it survives the "no measure
+    reported" filter and its Quantity can be inspected directly here;
+    ``test_qty_sentinel_only_row_is_dropped`` covers the (much more common,
+    3,077-of-3,097 in the real wave) case where a sentinel row has no other
+    measure and is dropped instead.
+    """
+    df5a = _synthetic_frame(uganda_module, [99999, 99998, 100000, 5.0],
+                             qty_sold_values=[12.0, np.nan, np.nan, np.nan])
     colmap = {
         "A": {
             "hhid": "HHID", "parcel": "a5aq1", "plot": "a5aq3", "crop": "a5aq5",
@@ -197,11 +215,18 @@ def test_qty_sentinel_exact_value_only(uganda_module, in_2009_10_wave_dir):
     assert qty_by_hhid.loc["1000000003"] == 5.0, "ordinary quantities untouched"
 
 
-def test_qty_sentinel_row_is_not_dropped(uganda_module, in_2009_10_wave_dir):
-    """A sentinel-only row (no Quantity_sold / Value_sold either) must STAY,
-    with Quantity NaN -- it must not be deleted by the pre-existing 'no
-    measure reported' filter now that Quantity itself turns NaN. All 3,097
-    of 2009-10's real sentinel rows are exactly this shape (measured)."""
+def test_qty_sentinel_only_row_is_dropped(uganda_module, in_2009_10_wave_dir):
+    """A sentinel-only row (no Quantity_sold / Value_sold either) is REMOVED
+    by the pre-existing 'no measure reported' filter, exactly like any other
+    all-blank crop row (2009-10 already drops 907 of these unrelated to the
+    sentinel). GH #861 red-team (REDTEAM_P1_uganda99999.org, item 2): an
+    earlier version of this fix kept such rows alive at the wave-parquet
+    layer via a `_qty_reported` flag, but `Country._finalize_result`'s
+    `dropna(how='all')` (country.py:3014) deletes them at the API on every
+    read regardless, making that machinery inert -- removed. 3,077 of
+    2009-10's 3,097 real sentinel rows are exactly this shape (measured);
+    the delivered 2009-10 crop_production therefore goes 25,485 -> 22,408
+    rows / 2,330 -> 2,323 households."""
     df5a = _synthetic_frame(uganda_module, [99999])
     colmap = {
         "A": {
@@ -219,11 +244,40 @@ def test_qty_sentinel_row_is_not_dropped(uganda_module, in_2009_10_wave_dir):
         warnings.simplefilter("ignore")
         out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap)
 
-    assert len(out) == 1, (
-        "the sentinel-only row was dropped instead of surviving with NaN "
-        "Quantity -- GH #861 explicitly forbids dropping rows"
+    assert len(out) == 0, (
+        "a sentinel-only row (no other reported measure) must be dropped by "
+        "the 'no measure reported' filter, same as any other all-blank row"
     )
-    assert pd.isna(out["Quantity"].iloc[0])
+
+
+def test_qty_sentinel_row_with_a_sale_survives(uganda_module, in_2009_10_wave_dir):
+    """A sentinel row that ALSO reports a sale (Quantity_sold / Value_sold
+    non-null) survives, with Quantity NaN -- the filter only drops rows with
+    NO measure at all; this one has one. 20 of 2009-10's real sentinel rows
+    additionally collide, via the pre-existing de-dup groupby, with a real
+    Quantity==0 row and read Quantity==0.0 rather than NaN (measured,
+    GH #861 red-team item 3) -- a distinct case from this one, which has no
+    de-dup partner."""
+    df5a = _synthetic_frame(uganda_module, [99999], qty_sold_values=[12.0])
+    colmap = {
+        "A": {
+            "hhid": "HHID", "parcel": "a5aq1", "plot": "a5aq3", "crop": "a5aq5",
+            "conditions": [{
+                "qty": "a5aq6a", "unit": "a5aq6c", "condition": "a5aq6b",
+                "qty_sold": "a5aq7a", "value_sold": "a5aq8", "month": None,
+                "qty_sentinel": SENTINEL,
+            }],
+        },
+        "B": None,
+        "intercrop": None,
+    }
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        out = uganda_module.crop_production_for_wave("2009-10", df5a, None, None, colmap)
+
+    assert len(out) == 1, "a row with a reported sale must survive"
+    assert pd.isna(out["Quantity"].iloc[0]), "Quantity itself is still nulled"
+    assert out["Quantity_sold"].iloc[0] == 12.0, "the sale measure is untouched"
 
 
 def test_qty_sentinel_absent_is_a_no_op(uganda_module, in_2009_10_wave_dir):
@@ -287,14 +341,35 @@ def test_2009_10_no_99999_quantity_sentinel_remains(uganda_module, in_2009_10_wa
     assert (df["Quantity"] == SENTINEL).sum() == 0, (
         "a 99999 sentinel survived the strip"
     )
-    # Measured 2026-09-09, cold, isolated LSMS_DATA_DIR (GH #861): rows
-    # unchanged at 25,485 (season A 13,244 / season B 12,241); pre-fix
-    # Quantity sum was 310,664,565.84 (~300x every other wave); post-fix
-    # 967,662.84, now the same order of magnitude as 2010-11 (708,149.50)
-    # and 2011-12 (1,128,560.35).
-    assert len(df) == 25485, f"row count changed: {len(df)} (expected 25485 -- rows must not be dropped)"
+    # Measured 2026-09-09, cold, isolated LSMS_DATA_DIR (GH #861, corrected
+    # per the red-team, REDTEAM_P1_uganda99999.org): the wave-level frame
+    # (this is what crop_production_for_wave itself returns -- the layer
+    # this test builds) drops the 3,077 sentinel-only rows via the
+    # pre-existing "no measure reported" filter, same as this wave's other
+    # 907 genuinely-blank rows.  Rows go 25,485 -> 22,408 (season A 13,244 /
+    # season B 12,241 raw, before the filter); households 2,330 -> 2,323.
+    # Pre-fix Quantity sum was 310,664,565.84 (~300x every other wave);
+    # post-fix 967,662.84, now the same order of magnitude as 2010-11
+    # (708,149.50) and 2011-12 (1,128,560.35).
+    assert len(df) == 22408, (
+        f"row count changed: {len(df)} (expected 22,408 -- 25,485 raw minus "
+        f"the 3,077 sentinel-only rows the 'no measure reported' filter drops)"
+    )
+    hh = df.index.get_level_values('i')
+    assert hh.nunique() == 2323, f"household count changed: {hh.nunique()} (expected 2,323)"
     total = df["Quantity"].sum()
     assert 0 < total < 5_000_000, (
         f"Quantity sum {total} is not in the corrected order of magnitude "
         f"(expected ~9.7e5, well under the pre-fix 3.1e8)"
+    )
+    # The one sentinel row that was otherwise fully populated (unit=Plastic
+    # Basin (15 lts), condition=dried_grain, HHID 4163000709, season B) is
+    # dropped too -- it still had no Quantity_sold / Value_sold, so the
+    # filter is genuinely value-blind, not merely "the Unknown/unknown_
+    # condition rows happen to go".
+    idx = df.reset_index()
+    still_present = ((idx['i'] == '4163000709') & (idx['plot'] == '4163000709-1-3')).sum()
+    assert still_present == 0, (
+        "the fully-populated sentinel row (Plastic Basin/dried_grain) "
+        "should have been dropped along with the blank ones"
     )

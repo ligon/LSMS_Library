@@ -1321,13 +1321,6 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
             # stays wave-scoped -- only 2009-10 sets it (measured: no other
             # wave's Quantity carries this value as a sentinel).
             qty_sentinel = cond.get('qty_sentinel')
-            # `qty_reported` records whether *something* numeric was present
-            # in the source column BEFORE the sentinel strip.  All 3,097
-            # 2009-10 sentinel rows carry no Quantity_sold / Value_sold
-            # either (measured), so without this flag the "no measure
-            # reported" filter below would delete them once Quantity turns
-            # NaN -- the row stays; only the value is nulled (GH #861).
-            qty_reported = qty.notna()
             if qty_sentinel is not None:
                 qty = qty.where(qty != qty_sentinel, np.nan)
 
@@ -1389,7 +1382,6 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                 'Value_sold':    vsold.values,
                 'harvest_month': hm.values,
                 'KgFactor':      kgf.values,
-                '_qty_reported': qty_reported.values,
             })
             # intercropped flag (plot-level) joined from AGSEC4A.  The
             # perennial_lookup / planting_lookup hooks exist for future
@@ -1410,14 +1402,18 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     # rows / land-status placeholders with nothing reported).
     df = df[df['j'].notna()]
     # Keep rows even when Quantity is NaN but a sale was reported; drop
-    # only when ALL reported measures are missing.  `_qty_reported` is
-    # Quantity's notna() taken BEFORE any qty_sentinel strip (GH #861) --
-    # without it, a sentinel-only row (all 3,097 2009-10 rows: no
-    # Quantity_sold, no Value_sold) would newly fail this filter and be
-    # DELETED once its Quantity turns NaN, which the fix must not do.
+    # only when ALL reported measures are missing.  A 2009-10 qty_sentinel
+    # row that carries no Quantity_sold / Value_sold either (3,077 of
+    # 3,097, measured -- GH #861 red-team) is therefore dropped HERE, by
+    # the same filter and for the same reason as this wave's other 907
+    # genuinely-blank rows: the survey recorded no measure of any kind.
+    # (An earlier version of this fix tracked a pre-mask `_qty_reported`
+    # flag to keep those rows with Quantity NaN.  Dropped: the framework's
+    # `Country._finalize_result` dropna(how='all') deletes them anyway on
+    # every read, so the flag was inert at the delivered table and only
+    # produced a misleading "rows unchanged" claim in CONTENTS.org.)
     measure_cols = ['Quantity', 'Quantity_sold', 'Value_sold']
-    df = df[df[measure_cols].notna().any(axis=1) | df['_qty_reported']]
-    df = df.drop(columns=['_qty_reported'])
+    df = df[df[measure_cols].notna().any(axis=1)]
 
     df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce').astype('Float64')
     df['Quantity_sold'] = pd.to_numeric(df['Quantity_sold'], errors='coerce').astype('Float64')
