@@ -524,8 +524,11 @@ half; this section is Niger's country half.
 *THE COUNTS ARE NOT WHAT THE ISSUE SAID, AND THE REASON IS WORTH
 KNOWING.*  #842 measured 441 NaN-=u= rows in =crop_production= by
 reading the delivered table.  That is only the rows that SURVIVED.
-Measured in the wave parquets instead, 5,663 rows carried a NaN =u=;
-the difference is whether the wave's index happens to be unique.
+Measured in the wave parquets instead, 5,663 rows carried a NaN =u=
+(2011-12 3,150; 2014-15 1,079; 2018-19 443; 2021-22 991 -- a further
+34 already carried the =Manquant= label, 11 + 23 in the two ECVMA
+waves); the difference is whether the wave's index happens to be
+unique.
 2018-19's =(t, i, plot, crop, u)= index IS unique, so no collapse runs
 and its 441 nulls were served.  The other three waves' indexes are
 non-unique -- deliberately so, one (plot, crop) can carry several
