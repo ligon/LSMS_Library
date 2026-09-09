@@ -1,0 +1,463 @@
+#+title: Niger -- five sources of food prices, compared
+#+author: Claude Fable 5.1 (Niger analyst), cores 21-23
+#+date: 2026-09-08
+
+Protocol: =slurm_logs/price_sources/PROTOCOL.org=.  Ledger:
+=.coder/ledger/price-sources-comparison.md=.  Shared code:
+=slurm_logs/price_sources/common.py= (used unmodified).  Worktree
+=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-niger=, branch
+=fix/prices-niger=, cut from =development= @ 1dced810.
+
+* 0. SCOPE DEVIATIONS (read first)
+
+1. *=unit_value_vs_community_price= is EMPTY for Niger, structurally.*
+   Source 1 exists only in the two EHCVM waves; source 5 only in the two
+   ECVMA waves.  The protocol forbids pooling waves, and rightly.  The
+   pairs Niger can run are:
+   - =community_price_vs_crop_sale_price= in 2011-12 and 2014-15;
+   - =unit_value_vs_crop_sale_price= in 2018-19 and 2021-22.
+   Both are market-side vs farmgate, so Niger still speaks to the
+   central question -- twice, with a different market-side source each
+   time.  =reported_purchase_price_vs_unit_value=,
+   =unit_value_vs_own_consumption_valuation= and
+   =own_consumption_valuation_vs_crop_sale_price= are all empty (no
+   source 2 or 3).
+2. *The brief and the ledger say Niger's =crop_production= has no =u=
+   level.  It does* -- =index: (t, i, plot, crop, u)=, 12-16 distinct
+   units per wave.  Native-unit matching is therefore possible in every
+   wave and is the primary basis here.  (The ledger's §4 list of "no =u=
+   level" countries -- Nigeria, Mali, Tanzania -- should not have
+   included Niger; the brief's country block did.)
+3. *The 35/45 community-price label overlap is not a defect.*  Of the 10
+   CS07 items that do not join =food_acquired.j=, *8 are not food*
+   (=alumettes=, =bois de chauffe=, =petrole lampant=, =transport
+   urbain=, =essence ordinaire=, =savon de menage=, =electricite=,
+   =produits pharmaceutiques=); =tourteaux d'arachide= is groundnut
+   cake (feed); only =yodo (foye youto)=, a local leaf, is a food the
+   EHCVM 178-item list does not carry.  The CS07 instrument prices 45
+   items of which 37 are food.  Nothing to fix.
+4. *No FWL slope is identified for Niger*, on any pair, wave, basis or
+   rung -- =coef_within=, =coef_between=, =r2_fe= and =resid_sd= are NaN
+   in all 25 =models.csv= rows.  This is a property of the data, not a
+   failure: see section 4.
+5. *Two bases are reported*, =native= (the shared =u= label; primary)
+   and =kg_def= (per kg using DEFINITIONAL factors only).  The library's
+   =_kg_factor_series= is deliberately not used -- see section 3.
+6. *I wrote outside my output directory twice, both self-healing, both
+   disclosed*: (a) ONE early probe run (=probe_kg.py=) used the SHARED data root
+   (=LSMS_DATA_DIR= unset) after the =u=-table edit, so Niger's shared
+   L2 parquets were rebuilt under this worktree's hash.  Restored by
+   rebuilding under =LSMS_COUNTRIES_ROOT=<main checkout>= (section 7);
+   the content-hash gate would have caught it regardless.  (b) I briefly
+   wrote scratch files to the shared agent scratchpad before noticing all
+   eight agents share it; moved to a private subdirectory.  No file in
+   the stop-list was touched.
+7. *Source 4's cell statistic is =common.cell_medians= on row-level
+   =Value_sold / Quantity_sold=, not
+   =transformations.median_price_valuation(...)._unit_price= as the
+   protocol names.*  Two reasons: =median_price_valuation= converts the
+   sold quantity to kilograms through =_kg_factor_series= -- the inferred
+   factors this analysis deliberately avoids (deviation 5) -- and it
+   imposes a single threshold of 10, where the protocol wants per-source
+   thresholds recorded in =models.csv=.  The ladder, the median and the
+   finest-cell-that-clears rule are identical; only the denominator and
+   the threshold differ.
+
+* 1. Sources present, and the idiosyncrasies that shape them
+
+| # | source                     | Niger | n rows (priced) | waves |
+|---+----------------------------+-------+-----------------+-------|
+| 1 | =unit_value=               | present | 198,372 | 2018-19, 2021-22 |
+| 2 | =reported_purchase_price=  | ABSENT  | 0 | -- |
+| 3 | =own_consumption_valuation=| ABSENT  | 0 | -- |
+| 4 | =crop_sale_price=          | present | 5,679 (after the sold-unit restriction below) | all four |
+| 5 | =community_price=          | present | 15,279 | 2011-12, 2014-15 |
+
+** Idiosyncrasies NAMED (=Niger/_/CONTENTS.org=, verified, and three added by me)
+
+1. *EHCVM identifiers* (CONTENTS "Sampling Design"): =v= is =grappe=,
+   =i= is =(grappe, menage)=, no =vague= level -- each grappe is visited
+   in exactly one vague.  Confirmed: =cluster_features= has 504 / 555
+   distinct =v= in 2018-19 / 2021-22 and =sample= the same.
+2. *2014-15 ships no geovariables* (CONTENTS "Cluster coordinates"):
+   =Latitude= is non-null for 270 / 0 / 493 / 555 clusters across the
+   four waves -- 2014-15 is honestly zero, as documented.  *This costs
+   nothing here*: the ladder is =v -> District -> Region -> national=,
+   and =District= and =Region= are 270/270 non-null in that wave.  See
+   section 7 for the geography columns used per wave.
+3. *2011-12 GPS lives in =NER_EA_Offsets.dta=, not the geovars file*
+   (CONTENTS, "THE TRAP").  Not exercised -- coordinates are not on the
+   ladder -- but confirmed present (270/270).
+4. *2014-15 is a whole-wave panel of 2011-12* (CONTENTS "Oversamples",
+   fact 2).  This bites in a way CONTENTS does not record: the API's
+   =i= is the =id_walk=-ed id, so a join from a raw 2014-15 file to
+   =crop_production= matches only *38 of 434 households* until the raw
+   ids are walked through =c.updated_ids= (100% after).  Added to
+   CONTENTS.org.
+5. *2018-19 has two encoding defects* (CONTENTS, GH #801 and "Unit
+   handling").  Both already repaired upstream; the =u= and =j= labels
+   I read are clean.
+6. *The declared universe changes across the four waves* (CONTENTS
+   "Pooling caution"): 2011-12/2014-15 exclude certain Arlit strata and
+   collective housing; 2018-19 states institutional exclusions only (and
+   that sentence is NADA boilerplate); 2021-22 states nothing.  The
+   protocol keeps waves as separate rows, so nothing here pools them --
+   but the 2011-12/2014-15 pair and the 2018-19/2021-22 pair are *not*
+   the same population, and the cross-era comparison in section 3 must be
+   read with that caveat.
+
+*** Three idiosyncrasies I found that CONTENTS.org did not record (now added)
+
+7. *=food_acquired= has no =Price= column in any wave.*  Sources 2 and 3
+   do not exist.  =food_prices(units='unitprice')= returns an EMPTY
+   =(0, 1)= frame -- it does *not* raise.  18,177 =s='produced'= rows
+   exist across the EHCVM waves but carry no valuation.
+8. *Sources 1 and 5 never share a wave.*  =food_acquired= is EHCVM-only,
+   =community_prices= ECVMA-only.  See section 0 (SCOPE DEVIATIONS).
+9. *=crop_production.u= is the HARVEST unit, but =Value_sold /
+   Quantity_sold= is a price per SOLD unit*, recorded in a separate
+   column no wave carries (=as02eq12b=, =AS02EQ12B=, =s16cq16b=,
+   =s16dq05b=).  See data problem D2.
+
+** Provenance (=Documentation/SOURCE.org=, all four waves)
+
+All four waves are World Bank =lsms= catalog entries, all four resolved
+(=PROVENANCE_SOURCE: worldbank=, none =unknown=):
+
+| wave | catalog id | idno | title |
+|------+------------+------+-------|
+| 2011-12 | 2050 | =NER_2011_ECVMA_v01_M= | National Survey on Household Living Conditions and Agriculture 2011 |
+| 2014-15 | 2676 | =NER_2014_ECVMA-II_v02_M= | ... 2014, Wave 2 Panel Data |
+| 2018-19 | 4296 | =NER_2018_EHCVM_v02_M= | Enquete Harmonisee sur les Conditions de Vie des Menages 2018-2019 |
+| 2021-22 | 6276 | =NER_2021_EHCVM-2_v01_M= | ... 2021-2022 |
+
+2011-12 is the only =content-validated= entry (=PROVENANCE_METHOD:
+manual-override=; its =Data/NER_2011_ECVMA_v01_M_Stata8/= directory *is*
+the WB idno).  The other three are =source-url= / =doi-lookup=.  The
+ECVMA -> EHCVM break in the idno is the same break that splits this
+country's price sources in two (SCOPE DEVIATION 1): 2050 / 2676 are the
+national ECVMA instrument, with a community price questionnaire and no
+food-acquisition module; 4296 / 6276 are the WAEMU-harmonised EHCVM,
+with the reverse.
+
+** The questionnaires (quoted)
+
+*Source 5 is a CONSUMER price, and its =Quantity= is a WEIGHT.*
+=Niger/2011-12/Documentation/ECVMA_Quest_COM_P2_V10_ENG.pdf=, p. 2, the
+whole section header and its unit code list, verbatim:
+
+#+begin_quote
+SECTION 7. CONSUMER PRICES
+UNIT CODES
+1 = Kilogram  2 = Gram  3 = Tia  4 =Tongolo  5 = 50KG sack  6 = 100 KG sack  7 = Unit
+#+end_quote
+
+and the column group "Releve des prix", whose three readings are each a
+triple *Prix / Poids / Unite* (7.03-7.05, 7.06-7.08, 7.09-7.11).  The
+raw Stata labels say the same: =cs07q03= "prix du produit du 1er
+releve", =cs07q04= "*poids* du produit du 1er releve", =cs07q05= "unite
+du produit du 1er releve".
+
+So (a) source 5 is explicitly a *consumer / market-side* price, not a
+farmgate one -- it is the downstream side of every pair it appears in;
+and (b) the per-unit basis is =Price / Quantity=, Niger's analogue of
+the =NumberOfUnits= column the protocol names.  2014-15 asks the same
+questions with one shared unit column (=cs07q03=) and a different, finer
+unit list (=petit sac / sac moyen / gros sac / sachet / tas / autre=
+replace the explicit 50/100 kg sacks -- so 2014-15's sacks have no
+stated weight).
+
+*Source 4* is the rainy-season harvest module, "SECTION 2E. RAINY SEASON
+PRODUCTION BY TYPE OF CROP" (=ECVMA_Quest_AGR_P2_V10_eng.pdf=, table of
+contents p. 2), whose sale block records quantity sold, its unit, and
+the sale value (=as02eq12a=, =as02eq12b=, =as02eq13=).  It is a
+*farmgate receipt*, so it is the upstream side of every pair.
+
+*2018-19 / 2021-22 questionnaires ship as =.xls=* and =xlrd= is not in
+this venv, so the EHCVM instruments were read through their Stata value
+labels and column labels instead (quoted in section 6, D4).  2021-22
+ships no questionnaire at all -- =Documentation/= contains only
+=SOURCE.org= (this matches CONTENTS.org's 2021-22 gap entry).
+
+** PRE-CHECK (i): unit vocabulary across tables
+
+Full table in =precheck_units.csv=; =analysis.log= has the raw lists.
+After the =Tia -> Tiya= fix (section 2 of the commit, and D1 below):
+
+| wave | side A | u in A | u in B (crop) | intersection | A rows in it | B rows in it |
+|------+--------+--------+---------------+--------------+--------------+--------------|
+| 2011-12 | community_price | 7 | 8 | 5 (=Kg=, =Sac de 100 kg=, =Sac de 50 kg=, =Tiya=, =Unite=) | 3,450 / 8,811 | 1,130 / 1,294 |
+| 2014-15 | community_price | 9 | 9 | 3 (=Kg=, =Tiya=, =Unite=) | 1,552 / 6,468 | 236 / 552 |
+| 2018-19 | unit_value | 39 | 7 | 3 (=Kg=, =Tiya=, =Unite=) | 29,237 / 85,741 | 1,545 / 3,226 |
+| 2021-22 | unit_value | 34 | 6 | 3 (=Kg=, =Panier=, =Tiya=) | 17,754 / 112,631 | 755 / 1,423 |
+
+*The vocabularies are genuinely disjoint apart from a small metric core.*
+=community_prices= is 66% =Gramme= (10,216 of 15,423 rows) and
+=food_acquired= has no =Gramme= at all; =crop_production= is 39% =Botte=
+and 35% =Tiya=.  The one mismatch that was a *defect* rather than a real
+difference of measurement was =Tia= vs =Tiya= -- fixed (D1).
+
+** PRE-CHECK (ii): is the bottom rung real?
+
+Every =v= in every source is present in both =cluster_features= and
+=sample=, in every wave -- 0 orphans, 0 rows dropped by =attach_geo=:
+
+| source | wave | n_v | in cluster_features | in sample |
+|--------+------+-----+---------------------+-----------|
+| unit_value | 2018-19 / 2021-22 | 504 / 555 | 504 / 555 | 504 / 555 |
+| community_price | 2011-12 / 2014-15 | 240 / 221 | 240 / 221 | 240 / 221 |
+| crop_sale_price | 2011-12 / 2014-15 / 2018-19 / 2021-22 | 121 / 115 / 338 / 298 | same | same |
+
+The community questionnaire reached 240 of 270 clusters in 2011-12 and
+221 of 270 in 2014-15; priced crop sales occur in 121 / 115 / 338 / 298.
+The bottom rung is real, but source 4 is thin enough that few
+cluster-level cells clear their observation threshold (section 4).
+
+* 2. Independence test for source 2
+
+*Not present.*  =food_acquired= carries only =Quantity= and
+=Expenditure= in all four waves, so =food_prices(units='unitprice')=
+returns a =(0, 1)= frame.  There is no reported price to test for
+independence from =Exp/Qty=, and no own-consumption valuation either.
+Recorded as a data gap (D3), not as a result.
+
+* 3. Levels: median ratios per wave
+
+Market-side over farmgate; =ratio = exp(median gap_log)=.  From
+=models.csv= (=geo_level = 'all'=).
+
+| wave | pair | basis | cells | items | median gap | *ratio* | IQR | share abs>log1.5 | in 30-50%? |
+|------+------+-------+-------+-------+------------+-------+-----+------------------+-----------|
+| 2011-12 | community vs crop sale | native | 24 | 4 | +0.223 | *1.25* | 0.300 | 0.29 | no |
+| 2014-15 | community vs crop sale | native | 2 | 2 | -1.969 | 0.14 | 2.73 | 1.00 | no (unusable) |
+| 2018-19 | unit value vs crop sale | native | 30 | 6 | +0.063 | *1.06* | 0.533 | 0.23 | no |
+| 2021-22 | unit value vs crop sale | native | 23 | 3 | +0.182 | *1.20* | 0.409 | 0.35 | no |
+| 2011-12 | community vs crop sale | kg_def | 4 | 3 | +0.609 | *1.84* | 0.351 | 0.75 | no |
+| 2014-15 | community vs crop sale | kg_def | 7 | 3 | +0.431 | *1.54* | 0.506 | 0.57 | no |
+| 2018-19 | unit value vs crop sale | kg_def | 1 | 1 | +0.365 | *1.44* | 0 | 0 | *yes* |
+| 2021-22 | unit value vs crop sale | kg_def | 1 | 1 | +0.517 | *1.68* | 0 | 1.00 | no |
+
+*What these mean, one sentence each.*  The native-basis ratio is how much
+more a buyer pays for one *bowl (Tiya) or kilogram* of a food in a
+cluster/district than a farmer received for a bowl or kilogram of the same
+crop sold there: 6% to 25%.  The kg_def ratio is the same comparison after
+converting both sides to kilograms using only exact, name-derived factors:
+44% to 84%.  The IQR is the spread of that gap across cells -- 0.30 to
+0.53 in logs, i.e. the middle half of cells spans a factor of ~1.4-1.7,
+which is as large as the gap itself.  =share_abs_gap_gt_log1p5= is the
+fraction of cells where the two sources disagree by more than 50% in
+either direction: a quarter to a third of them, so the *median* is doing
+real work and individual cells should not be trusted.
+
+*The two bases disagree systematically, and the reason is economic, not
+technical.*  =gaps.csv= shows the native matches are almost entirely one
+unit -- =Tiya= carries 22 of 24 cells in 2011-12, 29 of 30 in 2018-19 and
+22 of 23 in 2021-22 -- while the kg_def matches are dominated by
+=Sac de 50/100 kg= on the crop side against =Gramme=/=Kg= on the market
+side.  A native-unit match compares *the same container on both sides*; a
+per-kg match compares a *wholesale sack sold at the farm* with a *retail
+gram or kilo bought at the market*, so it contains a bulk-breaking margin
+on top of the marketing margin.  That is why the per-kg gap (1.44-1.84) is
+roughly double the native gap (1.06-1.25).  Anyone quoting a single Niger
+"marketing margin" must say which basis they mean.
+
+*The gap widens up the geography ladder*, which is what a spatial
+arbitrage story predicts.  From =gaps_by_rung.csv=, 2011-12 community vs
+crop sale, native basis: =v= 1.20 (21 cells) -> =District= 1.27 (10) ->
+=Region= 1.43 (9) -> =national= 1.67 (5).  The 2018-19 pair does the same
+more weakly (=District= 1.06 -> =Region= 1.12 -> =national= 1.21).  Two
+prices compared within a cluster differ least; the further apart the
+market and the farm can be, the larger the wedge.
+
+*2014-15 is unusable* and should be read as missing, not as a negative
+ratio.  It has two matched cells, one of which (=District= =Dogondoutchi=,
+=Niebe/Haricots secs=, =Tiya=) is corrupted by the gram-weight defect D5:
+a community row records =Price=600= for =Quantity=2687= on unit =Tiya=,
+i.e. 0.22 FCFA per bowl.  Dropping the 111 corrupted rows corpus-wide
+moves that wave's median gap from -1.969 to -0.515 and leaves 2011-12
+*exactly unchanged* at +0.223 -- so the defect is confined and the other
+three waves are unaffected.
+
+*Which source is noisier* (median =sd_log_price= over cells with n>=5, from
+=cells.csv=): =unit_value= 0.84 / 0.82 (2018-19 / 2021-22),
+=community_price= 0.22 / 0.47 (2011-12 / 2014-15), =crop_sale_price= 0.30
+/ 0.38 / 0.30 / 0.30.  *The household unit value is by far the noisiest
+source* -- roughly 2.7x the crop-sale dispersion -- which matters for the
+=within= specification's known bias (protocol §3), had it been identified.
+
+*Currency*: XOF (CFA franc) in every wave.  =food_prices(currency='column')=
+returns =XOF= for both EHCVM waves; the ECVMA waves have no currency column
+in the API, and CS07 states its prices are "en FCFA" (=s05q03= label,
+and the AGR sale value question), so XOF is asserted from the instrument.
+No redenomination in the period; within-wave and cross-wave level
+comparisons are on one currency.
+
+* 4. Logs: the model table, read out
+
+*Every one of the 25 =models.csv= rows reports NaN for =coef_within=,
+=se_within=, =coef_between=, =se_between=, =r2_fe= and =resid_sd=.*  This
+is =common.fit_gap_model='s =MIN_DOF = 5= guard (commit 58088820) firing,
+and it is firing correctly: Niger's matched cells never leave five
+residual degrees of freedom after the item and geography effects.
+
+The arithmetic is in =gaps_by_rung.csv='s =resid_dof= column
+(=n_cells - n_items - n_geos - 1=), which is *negative or zero in 22 of
+its 23 rows*.  The worst-case examples: 2011-12 at =v=, 21 cells over 2
+items and 21 geographies (dof -3); 2018-19 at =District=, 26 cells over 2
+items and 24 geographies (dof -1).  The single best rung is 2011-12 at
+=Region= -- 9 cells, 2 items, 5 geographies, dof +1 -- still four short.
+
+*The cause is structural and worth stating for Phase 2.*  Source 4 yields
+only 1,281 / 497 / 3,005 / 896 priced rows per wave after the sold-unit
+restriction, spread over 35 crops, 6-9 units and 115-338 clusters.  A cell
+must clear 5 observations for a household-side source, so the cells that
+survive are few and land in *different* geographies -- the geography
+effect then has almost one level per observation.  Niger cannot identify
+a Bland-Altman slope without either a coarser geography (which the
+protocol's ladder deliberately avoids) or many more sale observations.
+
+*So for Niger, read the medians and the by-item table, as the protocol
+says.*  A prior run of this script against the pre-58088820 =common.py=
+"fitted" these designs and returned =r2_fe = 1.000000=,
+=resid_sd ~ 1e-15= and =coef_within = -7.6 (se 6e-13)= -- saturated
+nonsense.  Those numbers appear nowhere in the delivered outputs; every
+number in this report was produced against the current =common.py=.
+Niger contributes *no evidence either way* on constant-markup versus
+additive-cost.
+
+* 5. The claim: is the farmgate-to-market gap 30-50%?
+
+*Which farmgate, which market.*  Niger has no source 3, so the farmgate
+side is always source 4, the crop *sale receipt* -- a price actually
+received, not a valuation.  The market side is source 5 (a surveyed
+CONSUMER price, quoted in section 1) in the ECVMA waves and source 1 (the
+household purchase unit value) in the EHCVM waves.  The two market-side
+sources are not interchangeable: source 5 is one enumerator observation
+per cluster and item, source 1 is a median over many households' purchases.
+
+*Answer: it depends on the basis, and neither answer is comfortably inside
+the band.*
+
+- On the *native-unit* basis -- like container against like container --
+  the gap is *6% to 25%*, i.e. *below* the 30-50% claim in all three
+  usable waves.  =claim_30_50= is False for every native row.
+- On the *per-kg* basis it is *44% to 84%*, i.e. at or *above* the top of
+  the band.  Only one row (2018-19 kg_def, +0.365, a single cell) lands
+  inside it.
+
+The honest reading is that the 30-50% figure sits *between* Niger's two
+measurements, and the gap between them is the bulk-breaking margin
+(section 3), not measurement error.
+
+** Gap BY ITEM (native basis; =gaps_by_item.csv=)
+
+| pair | wave | item | cells | median gap | ratio | in 30-50%? |
+|------+------+------+-------+------------+-------+-----------|
+| community vs crop sale | 2011-12 | Mil | 1 | 0.000 | 1.00 | no |
+| | | *Niebe/Haricots secs* | *21* | *+0.223* | *1.25* | no |
+| | | Sorgho | 1 | +0.511 | 1.67 | no |
+| | | Oignon frais | 1 | +0.916 | 2.50 | no |
+| community vs crop sale | 2014-15 | Niebe/Haricots secs | 1 | -4.700 | 0.01 | corrupt (D5) |
+| | | Mil | 1 | +0.762 | 2.14 | no |
+| unit value vs crop sale | 2018-19 | Gombo frais | 1 | -0.525 | 0.59 | no |
+| | | Sesame | 1 | -0.326 | 0.72 | no |
+| | | *Niebe/Haricots secs* | *24* | *+0.012* | *1.01* | no |
+| | | Sorgho | 1 | +0.223 | 1.25 | no |
+| | | *Tomate fraiche* | 1 | *+0.365* | *1.44* | *yes* |
+| | | Mil | 2 | +0.471 | 1.60 | no |
+| unit value vs crop sale | 2021-22 | *Niebe/Haricots secs* | *21* | *+0.089* | *1.09* | no |
+| | | Sorgho | 1 | +0.470 | 1.60 | no |
+| | | Mil | 1 | +0.963 | 2.62 | no |
+
+*Read this table before believing any pooled number for Niger.*  One item,
+*Niebe (cowpea)*, supplies 21 of 24, 24 of 30 and 21 of 23 of the cells in
+the three usable waves, so every pooled median above is very nearly the
+Niebe median.  Niebe's gap is the *smallest* of any item in every wave
+(+0.01 to +0.22), and the grains are consistently larger (Mil +0.47 to
++0.96, Sorgho +0.22 to +0.51).  The direction is the opposite of the usual
+perishables-carry-higher-margins story: here the *storable staple grains*
+carry the larger wedge and the pulse the smaller one.  Only one item-wave
+cell (=Tomate fraiche= 2018-19, 1 cell) lands in 30-50%.
+
+*Two items come out negative* (2018-19 =Gombo frais= 0.59, =Sesame= 0.72
+-- the market price BELOW the farm sale price), each on a single cell.
+Both are one-cell readings and neither should be treated as a finding;
+they are what a cell built on 5-10 observations of a thin sale block
+looks like.
+
+*Sources 3 and 4 cannot be compared to each other* here (the Uganda
+centrepiece), because Niger has no source 3.
+
+* 6. Data problems
+
+| id | table | wave(s) | symptom | count | evidence | proposed fix | status |
+|----+-------+---------+---------+-------+----------+--------------+--------|
+| D1 | =_/categorical_mapping.org= (=u=) | all | =Tia= and =Tiya= carried TWO Preferred Labels for one unit, so no price per bowl could ever be matched across tables | 18,759 food_acquired + 4,167 crop rows (2018-19); 825 + 3,196 (2011-12); 112 + 3,307 (2014-15) | six instrument label sets each carry exactly ONE tia-like entry (=as02eq07b= 5='tiya', =AS02EQ07B= 5='Tiya', =s16Cq12b= 8='Tia', =s16cq16b= 3='Tiya', =s07Bq03b= 512='Tiya', =cs07q03/q05= 3='tia'); 2018-19's own food and crop modules disagree with each other | both Original Labels -> =Tiya= | *fixed in worktree* (4732a5eb) |
+| D2 | =crop_production= | all four | =u= is the HARVEST unit; =Value_sold/Quantity_sold= is a price per SOLD unit recorded in a column the feature does not carry | share of priced rows whose sold unit == harvest unit: 98.8% / 89.4% / 93.1% / 63.0% | =as02eq12b=, =AS02EQ12B=, =s16cq16b=, =s16dq05b=; =analysis.py::_sold_unit_map= | carry the sold unit as a column, or index sale rows on it | *reported* -- adding a column to =data_scheme.yml= is out of scope; source 4 restricted to agreeing rows here (5,679 of 6,501 priced rows kept) |
+| D3 | =food_acquired= | all four | no =Price= column, so sources 2 and 3 do not exist; 18,177 =produced= rows carry no valuation | 0 of 239,031 rows | =food_prices(units='unitprice')= returns =(0, 1)= | check whether the ECVMA/EHCVM instruments ask a purchase price or an own-consumption value that is not wired | *reported* |
+| D4 | =community_prices= | 2018-19 | =2018-19/Data/s05_co_ner2018.dta= is an unwired *cluster-grain* community price file, contradicting =data_scheme.yml= and =_/community_prices.py= ("ships no community price file at all") | 42,247 rows, 504 grappes (every cluster), 55 products, 74 unit-sizes | column labels: =Existe= "[PRODUIT] existe dans ce marche ?", =s05q01= "5.01.Code produit" (label set =produitID= -- *the same set as the household food module* =s07b_me_ner2018.s07bq01=), =s05q02= "5.02.Selectionner les unites tailles ...", =s05q03/q04= "Releve 1/2 - Prix (en FCFA)" | wire it: a =todo= verdict for =Niger/community_prices/2018-19= (data present, config missing).  Needs a unit crosswalk first -- =releveID= is size-qualified (=Tas, petit/moyen/grand=) where =food_acquired.u= is not | *reported* -- a new wave of a script-path feature is beyond "obvious blocker" |
+| D5 | =community_prices= | 2011-12, 2014-15 | CS07 =Quantity= ("poids") is sometimes a gram weight entered against a container unit code, so =Price/Quantity= collapses | 111 of 15,423 rows (0.72%): =Unite= 68, =Tiya= 23, =Tas= 10, =Sachet= 4, =Tongolo= 3, =Autre= 3 | =Price=600, Quantity=2687, u=Tiya= at =v=64= is 0.22 FCFA per bowl; it drives the whole 2014-15 Dogondoutchi cell | drop container-unit rows with =Quantity > 100= at build time, or keep the raw variety code so the basis is recoverable | *reported*; sensitivity measured (section 3): 2014-15 median gap -1.969 -> -0.515, 2011-12 unchanged |
+| D6 | =lsms_library/transformations.py= (=KNOWN_METRIC=) | -- | =gramme= is not a known metric token (=gram=, =gramm=, =g= are), so =_kg_factor_series= gives no kg factor to Niger's most common community-price unit | 10,216 of 15,423 community rows (66%) and 5 crop rows | =KNOWN_METRIC= keys are =cl, g, gram, gramm, kg, kilogram, kilogramme, l, lbs, liter, litre, ml, pound= | add =gramme= (and its plural) to =KNOWN_METRIC= | *reported, STOPPED* -- =transformations.py= is on the brief's stop-list |
+| D7 | =crop_production=, =food_acquired= | 2018-19, 2021-22 | a NULL =u= on a declared index level; such rows are deleted outright by the framework's NaN-key =groupby= collapse (CLAUDE.md "Grain Collapse" §3b) and by this analysis | =crop_production= 441 rows (2018-19); =food_acquired= 12 rows (2021-22) | =getattr(c,n)().reset_index().u.isna().sum()= | map the unlabelled unit code, or set the =Manquant= sentinel as =plot_inputs= already does | *reported* |
+| D8 | =community_prices= | 2011-12, 2014-15 | the priced item is really (product, *variety*) -- =cs07q02= has 90 variety labels ("mais blanc vendu en sac de 100 kg" vs "mais blanc vendu au tia") -- but variety is dropped and one row per =(t,v,j,u)= is kept arbitrarily | 90 variety codes collapsed onto 45 products | =cs07q02= / =cs07q02l= in both raw files | carry the variety, or state the selection rule in the docstring | *reported* |
+| D9 | =food_acquired= | 2018-19, 2021-22 | cross-wave label drift on the =j= axis leaves near-duplicate items (=Chou= / =Choux=, =Attieke= / =Attieke=, =Aubergine,= / =Aubergine, Courge/Courgette=, =Sucre (poudre ou morceaux)= / =Sucre poudre= / =Sucre morceaux=), and one item is the undecoded code =166= | 178 =j= labels of which ~8 are drift pairs; =166= is 468 rows | =food_acquired().j.unique()= | extend =harmonize_food= | *reported* -- harmless within a wave, which is the only grain this analysis uses |
+
+* 7. Reproduce
+
+*Code-intelligence substitute declared* (CLAUDE.md "GitNexus is
+OPTIONAL"): the =gitnexus= MCP server did not connect this session, so the
+blast radius of the D1 edit was swept with =rg= rather than
+=gitnexus_impact=.  =rg -n '\bTia\b'= over =lsms_library/= (=*.py=,
+=*.yml=), excluding =Tiya=, returns exactly ONE hit outside the =u= table
+itself: a prose comment at =Niger/_/data_scheme.yml:405=.  No code reads
+the =Tia= Preferred Label.  That comment is deliberately NOT edited --
+=data_scheme.yml= is hashed by name by =Country._table_cache_hash=, so
+touching it would cold-rebuild every Niger table for no gain.
+
+
+Geography used, per wave: the ladder is =v -> District -> Region ->
+national= for *all four waves*, taken from =cluster_features= via
+=common.attach_geo= on =(t, v)=.  =District= and =Region= are 100%
+non-null in every wave (270 / 270 / 504 / 555 clusters).  =Latitude= /
+=Longitude= are *not used* -- they are not on the ladder -- so 2014-15's
+documented absence of geovariables costs this analysis nothing.
+
+#+begin_src sh
+WT=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-niger
+export PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra:$WT
+export LSMS_BUILD_WORKERS=1
+export LSMS_COUNTRIES_ROOT=$WT/lsms_library/countries
+export LSMS_DATA_DIR=/global/scratch/fsa/fc_jevons/ligon/tmp/lsms_data_prices_niger
+mkdir -p "$LSMS_DATA_DIR"
+ln -sfn /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache "$LSMS_DATA_DIR/dvc-cache"
+PY=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+cd /tmp && taskset -c 21-23 $PY \
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/Niger/analysis.py
+#+end_src
+
+Restoring the shared L2 cache after the worktree fix (see SCOPE
+DEVIATION 6) -- rebuild Niger's two script-path tables against the MAIN
+checkout's config tree and the default data root:
+
+#+begin_src sh
+export PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra:$WT
+export LSMS_COUNTRIES_ROOT=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries
+unset LSMS_DATA_DIR
+taskset -c 21-23 $PY -c "import lsms_library as ll; c=ll.Country('Niger'); \
+  [print(n, getattr(c,n)().shape) for n in ('community_prices','crop_production','food_acquired')]"
+#+end_src
+
+** Files
+
+- =analysis.py= -- the script (=__main__=-guarded)
+- =analysis.log= -- its full output, including both pre-checks
+- =cells.csv= (105,728 rows), =gaps.csv= (79), =models.csv= (25) -- the
+  protocol schemas, written by =common.write_outputs=
+- =gaps_by_item.csv=, =gaps_by_rung.csv=, =precheck_units.csv= --
+  supplementary, NOT part of the protocol schemas
+
+** Commits on =fix/prices-niger= (not pushed)
+
+- =4732a5eb= =fix(Niger/u): Tia and Tiya are one unit -- unify onto Tiya=
+  (+ the Prices section in =Niger/_/CONTENTS.org=).  Every number in this
+  report was produced *after* this commit.

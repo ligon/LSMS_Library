@@ -70,6 +70,44 @@ obvious blockers in-worktree. Pooling: logs across countries, levels within
 country-wave (PPP-2017 for one descriptive table).
 
 ---
-### Phase 3 — verification (fill at task end)
-- `common.py` helpers — <verdict>
-- per-country `analysis.py` — <verdict>
+### Phase 3 — verification (filled 2026-09-08)
+Eight country analyses under `PROTOCOL.org`, a pooled synthesis (`SYNTHESIS.org`),
+an independent red-team of the synthesis (verdict PRESENT-WITH-CORRECTIONS: every
+CSV number reproduced to the digit from the country files; six framing
+overstatements corrected in the revision, §8 of the synthesis lists them), and
+the coordinator's own probes. Reproductions: pooled rows = Σ country rows
+(38,214, row-identical); 124/124 threshold-regime groups reconciled; every §2–§5
+statistic recomputed from `gaps.csv`.
+
+- `common.cell_medians`, `match_gaps` (per-side thresholds), `model_rows` — OK
+  (§5 "new"): the pairing and the ladder are what every country used; the
+  thresholds are recorded per row.
+- `common.fit_gap_model` — OK (§2 Metrics_Miscellany `fwl_regression` /
+  `dummies` / `ols` reused, not reinvented; §4 Bland–Altman regressor). Two
+  guards added mid-run from field failures: `MIN_DOF` (Nigeria: r² = 1 on 17
+  cells / 16 effects; LinAlgError on a singular design) and a band-edge
+  tolerance (two medians equal to log 1.3 to ten decimals). Known limitation
+  stated in code and protocol: `within` is uninterpretable with a thin
+  measurement side; `between` is primary.
+- Sources 1–5 — OK (§5 reuse): built from `food_prices(units=)`,
+  `community_prices()`, `crop_production` + `median_price_valuation` /
+  row-level `Value_sold/Quantity_sold`; nothing read `food_acquired` or the
+  roster directly. Corpus facts established: source 2 exists nowhere
+  (Uganda's `Price` is `Exp/Qty` in the raw files); source 3 is not-asked in
+  Ethiopia, Tanzania, Mali and unwired in Nigeria.
+- §4 claims corrected by the agents (recorded in place): GhanaLSS 166/662 and
+  Malawi 19/51 label gaps were union artefacts; Niger's `crop_production`
+  has `u`; the crop sale unit ≠ harvest unit (#824).
+- CONTRADICTIONs found and fixed in the corpus, not the analysis: #817, #818,
+  #819, #829 landed; #820–#828, #830–#846 filed (DATA_PROBLEMS.csv, 69
+  defects / 19 patterns; PHASE3_ISSUES.org).
+- Result, as it survives the red-team: the two market sources are one price
+  (median gap 0 in 11/16 country-waves; six of six instrument pairs
+  independent, Nigeria 2019Q1 partly by construction); the farmgate margin is
+  basis-dependent (native = margin proper, per-kg adds bulk-breaking); on the
+  native sized same-good set, community/sale 1.31 (167 cells, in the 30–50%
+  band) and purchase/sale 1.54 (253, above); "processed" pairs at 2.58 are
+  mostly label folds (#833), not a measured processing wedge; no additive
+  per-unit cost is identified either way; own-consumption valuations sit at
+  the midpoint between farmgate and market (Uganda) and at the purchase price
+  (GhanaLSS 2016-17), against instruments asking for farmgate.

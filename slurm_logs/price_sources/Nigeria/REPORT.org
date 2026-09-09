@@ -1,0 +1,451 @@
+#+title: Nigeria -- five sources of food prices
+#+author: Claude Fable 5.1 (country agent, cores 15-17)
+#+date: 2026-09-08
+
+Protocol: =slurm_logs/price_sources/PROTOCOL.org=.  Ledgers:
+=.coder/ledger/price-sources-comparison.md=, =.coder/ledger/591-nigeria-prices.md=.
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-nigeria= (branch
+=fix/prices-nigeria=, cut from =1dced810=).  All analysis reads are against the
+shared warm cache, read-only.
+
+* 1. Sources present, and the idiosyncrasies that shape them
+
+| # | source                      | Nigeria | rows | rounds |
+|---+-----------------------------+---------+------+--------|
+| 1 | =unit_value=                  | present | 481,613 | 8 (2010Q3-2019Q1) |
+| 2 | =reported_purchase_price=     | *ABSENT* | 0 | -- |
+| 3 | =own_consumption_valuation=   | *ABSENT* | 0 | -- |
+| 4 | =crop_sale_price=             | present, thin | 6,939 | 2 (2011Q1, 2013Q1) |
+| 5 | =community_price=             | present | 138,055 | 5 (2011Q1..2024Q1) |
+
+*Sources 2 and 3 are absent, not merely thin.*  Nigeria's =food_acquired=
+carries no =Price= column at all (index =(i,t,v,j,u,s)=, columns =Quantity=,
+=Expenditure=, =Quantity_kg=), so =food_prices(units='unitprice')= returns
+*zero rows*.  There is nothing to run an independence test on (section 2).
+
+** Post-planting / post-harvest: rounds are never pooled
+
+Every Nigeria wave directory holds two rounds and =Country.waves= ARE the
+round labels (=['2010Q3','2011Q1','2012Q3','2013Q1','2015Q3','2016Q1',
+'2018Q3','2019Q1','2023Q3','2024Q1']=).  =t= is a cell key everywhere in
+=analysis.py= and every model row is fitted within one =t=.  The three
+price-bearing modules sit in *different* rounds, which is why the sources
+overlap so little:
+
+- =food_acquired= (consumption) -- *both* rounds, W1-W4 only.
+- =community_prices= (C8) -- *post-harvest only*, W1-W5.
+- =crop_production= (A3 harvest) -- *post-harvest only*, W1-W5.
+
+So sources 1 and 5 can be compared in 2011Q1 / 2013Q1 / 2016Q1 / 2019Q1
+only, and source 4 only in 2011Q1 / 2013Q1 (below).
+
+** Idiosyncrasies NAMED from =Nigeria/_/CONTENTS.org= (852 lines, read in full)
+
+1. *=ea= alone is not the cluster id* (GH #323).  =v= is the composite
+   =state/lga/ea= built from raw CODES, published identically by =sample=,
+   =cluster_features= and =community_prices=.  A label-built key matches the
+   household side 0% of the time in W2.  Moved households (=ea == 0=) get
+   singleton =v = moved-{hhid}= rather than a NaN that =groupby= would drop.
+2. *The questionnaire was renumbered after wave 1* (GH #591).  From W2 on
+   =q5a= is consumption out of PURCHASES, not own production; the pre-#591
+   build labelled purchases as own production, leaving the purchased row with
+   ~0 quantity and the expenditure still on it, so =Price = E/0 = inf= and
+   =food_prices= kept 161-1,106 rows per wave out of 120k-160k.  Fixed; my
+   source 1 has 52k-67k rows per round, which is the post-fix world.
+3. *W4 reference-period asymmetry.*  In 2018Q3/2019Q1 the purchased row is
+   the most recent purchase within *30 days* (q9a/q10) while produced and
+   in-kind are 7-day consumption.  Pairing q10 with q9a is what makes the
+   unit value a price; the cost is that =Quantity= summed across =s= is not a
+   7-day total for W4.  Irrelevant to a price comparison, stated because it
+   bounds what else these rows can be used for.
+4. *=u= is stored as raw codes and decoded at API time* against
+   =categorical_mapping.org= =#+name:u=; the wave scripts' =.replace(unitcodes)=
+   is a no-op (float codes, string-keyed map).  All my unit work is on the
+   *API-side* labels, which is the only place the vocabulary is comparable.
+5. *=community_prices= was designed as the independent yardstick* -- it is the
+   surveyed community price, not the WB's household-median imputation.  Ledger
+   591 used it to adjudicate which purchased quantity pairs with the
+   expenditure.  My section 3 is, in effect, that validation run at full scale.
+6. *W1/W2 price items are resolved by NAME* onto =harmonize_food= (the
+   community questionnaire has its own disjoint code scheme); W3-W5 resolve by
+   Code.  118 of 139 community items match a =food_acquired= label.
+7. *Universe caveats that bear on two of my four rounds.*  W3 (2016Q1) carries
+   a *conflict-area oversample* (+5 households per conflict EA) and W4
+   (2019Q1) *excludes rural Borno by design* with inaccessible EAs replaced.
+   Unweighted cell medians in those rounds are over/under-weighted in opposite
+   directions; my cells are unweighted medians, so this is a caveat on the
+   levels, not on the within-cell gaps.
+8. *W5 BID footnote 1*: "The Community Questionnaire does not collect
+   information from communities in the sociological sense.  The data cannot be
+   used to represent communities in Nigeria."  Source 5 is the sampled
+   households' shared price environment, not a community estimate.
+
+** Questionnaire wording (quoted, as the protocol requires)
+
+*Source 5 -- what basis?*  There is no =NumberOfUnits= column in Nigeria's
+=community_prices=, and none is needed: the form asks for the price of ONE
+unit.  W4 post-harvest community questionnaire (=ph_w4_community_quest.pdf=,
+section C8, p. 13), verbatim:
+
+#+begin_quote
+1. Is [ITEM] available for sale in your community or nearby at the present
+time?  YES...1  NO.....2(-> NEXT ITEM)
+2. PLEASE USE A QUANTITY OF ONE (1) FOR [ITEM] AND THE UNIT OF MEASURE YOU
+ARE USING.   [sub-columns: UNIT OF MEASURE | SIZE]
+3. What is the price for the item?   [NAIRA]
+#+end_quote
+
+W1 (=GHS_PANEL_COMMUNITY_POST_HARVEST_FINAL.pdf=, C8, p. 14) is the same
+question with the unit *printed per item* instead of asked -- "1. Is [ITEM]
+available for sale in your community or nearby at the present time? / 2. What
+is the price for the item?" over a printed "Unit of measure" column, with
+group headers stating the basis ("Grains and Flours (1 KG/1 PIECE)", "STARCHY
+ROOTS, TUBERS & PLANTAIN (1 MEDIUM PIECE/1KG)", "OIL AND FATS (1 LITRE/1
+MEDIUM CONTAINER)").  So source 5 is a per-unit price by construction -- *and
+the SIZE column in W3-W5 is not read by the build*, which is problem N-02.
+
+*Source 4 -- is it a farmgate price?*  Yes.  W1 Agriculture post-harvest
+questionnaire (=GHS_PANEL_AGRICULTURE_POST_HARVEST_FINAL.pdf=, section A3,
+p. 13), verbatim column heads: q9 "Did you sell any unprocessed crop since the
+harvest?", q10 "To whom did you mainly sell the harvest of [CROP]?", q11 "How
+much did you sell to or through this [BUYER]?" [QUANTITY + PROD. UNIT CODE],
+q12 "What was the value of sales to or through this [BUYER]?" [NAIRA].  A
+first-buyer sale of unprocessed crop: farmgate.
+
+*The own-consumption valuation Nigeria asks and the library does not carry.*
+Same form, p. 14, q18, verbatim: "If you had sold all [CROP] harvested since
+the last visit, what would be the total value?" [NAIRA].  That is a
+*received-side* ("what would you have got") valuation -- a farmgate
+valuation, not a market one -- and it is populated on *9,857 of 13,018*
+(75.7%) plot-crop rows in W1 and *9,868 of 12,948* (76.2%) in W2, against only
+~3,500 rows per wave with an actual sale.  =crop_production= does not carry
+it.  This is problem N-07 and it is the single most valuable thing a future
+pass could wire for Nigeria.
+
+* 2. Independence test for source 2
+
+*Not present.*  =food_acquired= has no =Price= column, so
+=food_prices(units='unitprice')= returns 0 rows for every wave.  The test
+("share of rows with abs(log(S2/S1)) > 1e-6") is undefined and was not run.
+Nigeria's unit value is =Expenditure / Quantity= with both sides describing
+the same transaction (GH #591), which is the honest construction; there is
+simply no second, survey-reported price to compare it with.
+
+* 3. Levels: median ratio per pair and wave
+
+Native units, =finest_only=, thresholds per side (10 for a household sample,
+1 for the community measurement, 5 for the thin crop-sale source).
+
+*Both unit bases are shown, because for the 1-vs-5 pair they differ by two
+orders of magnitude and only the right-hand pair of columns is a result.*
+=native= admits every exactly-matching unit including =g= and =cl=, whose
+community price is not a per-unit price (problem N-02);
+=native_ex_misscaled= drops those two.
+
+|                                      |        | =native= |          | =native_ex_misscaled= |          |
+| pair                                 | t      |    cells | md ratio |                 cells | md ratio |
+|--------------------------------------+--------+----------+----------+-----------------------+----------|
+| =unit_value_vs_community_price=        | 2011Q1 |      349 |    1.021 |                   346 |    1.027 |
+|                                      | 2013Q1 |      234 |    0.924 |                   177 |    1.053 |
+|                                      | 2016Q1 |      319 | /0.029/  |                   124 |  *1.000* |
+|                                      | 2019Q1 |      108 |    0.945 |                   108 |    0.945 |
+| =unit_value_vs_crop_sale_price=        | 2011Q1 |       72 |    1.596 |                    72 |    1.596 |
+|                                      | 2013Q1 |       19 |    1.705 |                    19 |    1.705 |
+| =community_price_vs_crop_sale_price=   | 2011Q1 |       53 |    1.750 |                    53 |    1.750 |
+|                                      | 2013Q1 |       17 |    2.000 |                    17 |    2.000 |
+
+The =/0.029/= is the artefact, not a price: it is superseded by the 1.000
+beside it.  The farmgate pairs are unaffected (crop sales are never recorded
+in =g= or =cl=), which is why their two columns are identical.
+
+The 2016Q1 outlier is *not* a price fact.  Broken out by native unit, pooled
+over all four rounds of the 1-vs-5 pair:
+
+| u               | cells | median log gap | median ratio |
+|-----------------+-------+----------------+--------------|
+| =Kg=              |   596 |         0.000  |   *1.000*    |
+| =l=               |   124 |         0.000  |   *1.000*    |
+| =Tuber=           |    28 |        -0.222  |    0.801     |
+| =Sack/Bag=        |     3 |        -0.712  |    0.491     |
+| =g=               |   130 |        -5.244  |  *0.0053*    |
+| =cl=              |   125 |        -3.738  |  *0.0238*    |
+
+*The two market-side sources agree exactly where the unit is unambiguous.*
+On kilogrammes (596 cells) and litres (124 cells) the household purchased
+unit value and the surveyed community price have a median ratio of *1.000*.
+That is a strong mutual validation of both sources and it independently
+corroborates ledger 591's smaller check (median ratio 0.95 on 2019Q1).
+
+The =g= and =cl= rows are the unread SIZE field (problem N-02): 1/189 and
+1/42 are package sizes (20-500 g; 33-75 cl), not prices.  Excluding them,
+2016Q1's median gap moves from *-3.555 to 0.000* and its IQR from 4.910 to
+0.274.  Every conclusion below uses the =native_ex_misscaled= basis.
+
+* 4. Logs: the model table, read out in words
+
+=models.csv= carries, per =(t, pair, u_basis, threshold, geo_level)=: the
+median gap, its IQR, the share of cells beyond a factor 1.5, the two FWL
+slopes with HC3 standard errors, =r2_fe= and =resid_sd=.  Pooled rows
+(=geo_level = 'all'=), =native_ex_misscaled=:
+
+| pair | t | cells | items | geos | median gap | =coef_between= (se) | =coef_within= (se) | =r2_fe= |
+|------+---+-------+-------+------+------------+-------------------+------------------+-------|
+| 1 vs 5 | 2011Q1 | 346 | 39 | 139 |  0.027 | *-0.119* (0.065) | -0.898 (0.145) | 0.76 |
+| 1 vs 5 | 2013Q1 | 177 | 32 |  58 |  0.051 | *-0.163* (0.092) | -1.002 (0.119) | 0.76 |
+| 1 vs 5 | 2016Q1 | 124 | 37 |  40 |  0.000 | *-0.095* (0.068) | -0.074 (0.152) | 0.92 |
+| 1 vs 5 | 2019Q1 | 108 | 22 |  40 | -0.057 | *+0.001* (0.036) | -0.216 (0.208) | 0.42 |
+| 1 vs 4 | 2011Q1 |  72 | 19 |  28 |  0.468 | +0.165 (0.126) | -1.034 (0.240) | 0.76 |
+| 1 vs 4 | 2013Q1 |  19 | 14 |   9 |  0.533 | -0.345 (0.394) | +0.096 (0.090) | *1.00* |
+| 5 vs 4 | 2011Q1 |  53 | 15 |  46 |  0.560 | +0.889 (0.080) | -3.762 (0.199) | *1.00* |
+| 5 vs 4 | 2013Q1 |  17 | 11 |  16 |  0.693 | *-2.000* (9e-15) | +0.109 (0.060) | *1.00* |
+
+In words, one sentence each:
+
+- *=median gap= is the typical log difference between the two sources* in a
+  matched cell; =exp= of it is the ratio in section 3.
+- *=coef_between= is the primary test.*  A constant proportional markup (or an
+  iceberg transport cost) predicts 0; an additive per-unit cost predicts a
+  strong negative.  For *1 vs 5* it is -0.12, -0.16, -0.10 and +0.00 -- small,
+  within about two standard errors of zero, with no consistent sign across
+  rounds.  Read: *no additive-cost signature between the two market-side
+  sources*, which is what you would expect of two measurements of the same
+  price rather than of two points in a supply chain.
+- *=coef_within= for 1 vs 5 is -0.90 to -1.00 and must not be read as a
+  result.*  It is the protocol's own documented thin-=b= pathology: source 5
+  is a *measurement* with one surveyed price per cell, so the Bland-Altman
+  midpoint no longer cancels the shared noise, and the protocol's synthetic
+  with a two-observation =b= produced *-1.27* under a pure markup while
+  =between= stayed at -0.002.  My -0.90/-1.00 sits squarely in that regime.
+  Cited as confirmation the diagnostic works, not as an economic finding.
+- *The farmgate pairs' regressions are NOT IDENTIFIED and I do not interpret
+  them.*  The designs are saturated: 5 vs 4 in 2013Q1 has 17 cells and *16*
+  geography effects (=r2_fe= = 1.000000, =coef_between= = -2.000 with a
+  standard error of 9e-15 -- an arithmetic artefact of a rank-deficient
+  design, not a slope); 5 vs 4 in 2011Q1 has 53 cells and 46 geos; 1 vs 4 in
+  2013Q1 has 19 cells against 14 items + 9 geos.  Only 1 vs 4 in 2011Q1 (72
+  cells, 19 items, 28 geos) has residual degrees of freedom, and there
+  =coef_between= = +0.165 (se 0.126) is indistinguishable from zero.  *For the
+  farmgate pairs, read the median and the by-item table, not the slopes.*
+- *=r2_fe= is the share of gap variance item and geography effects explain on
+  their own*; at 0.42-0.92 for the identified 1-vs-5 rows, most of the gap is
+  "which item and where", not a price-level relationship.
+- *=share_abs_gap_gt_log1p5= and =claim_30_50=* are in =models.csv=.
+  =claim_30_50= is =True= on 8 of the 139 model rows -- 1 of them pooled --
+  and which ones depends on the threshold and the rung, not on the round.
+  See section 5, where this is the main finding rather than a footnote.
+
+*Standard errors are HC1/HC3 and unclustered.*  It matters here: cells within a
+District share households, so the 1-vs-5 standard errors are optimistic.  It
+does not change the reading, because the coefficients are near zero anyway.
+
+*Threshold sensitivity.*  The GHS-Panel draws 10 households per EA, so a
+=(t, j, u, v)= cell with >= 10 purchasers of the same item in the same unit is
+structurally almost unattainable; with =threshold_a = 10= the 1-vs-5 pair
+matches at =District= for 204/234/254/99 of its cells and reaches =v= only
+132/22/16/0 times.  Re-running at =threshold_a = 5= (rows present in
+=models.csv=) multiplies the cells 4-7x and moves the 2019Q1 median gap from
+-0.057 to 0.000 -- i.e. it does not change the answer, it sharpens it.  The
+5-vs-4 pair *does* reach cluster grain (43 of 53 cells at =v= in 2011Q1),
+because a community measurement is usable at =n = 1=.
+
+* 5. The claim: is the farmgate-to-market gap 30-50%?
+
+*For Nigeria, no -- it is larger, and it is strongly item-heterogeneous.*
+
+Which farmgate, which market?  Nigeria has *no* source 3, so the farmgate is
+*source 4*, the crop sale price (=Value_sold / Quantity_sold=, a first-buyer
+sale of unprocessed crop).  The market is available *twice over* -- source 1
+(what households paid) and source 5 (what the community market charged) --
+and section 3 showed those two agree at a ratio of 1.000 on Kg and l.  That
+agreement is what makes the farmgate comparison trustworthy: two independent
+market measures give the same answer.
+
+First, the single most comparable slice -- =u = 'Kg'= cells only, *pooled
+over both rounds and all geography rungs* (so this is an orientation number,
+not the per-round result; those follow):
+
+| comparison                       | Kg cells | median ratio | implied margin |
+|----------------------------------+----------+--------------+----------------|
+| market (source 1) / farmgate (4) |       89 |        1.630 |          *+63%* |
+| market (source 5) / farmgate (4) |       66 |        2.000 |         *+100%* |
+
+Both sit *above* the 30-50% band ([log 1.3, log 1.5] = [0.262, 0.405]).
+
+** But the answer moves with the geography rung, and that is the real finding
+
+The two numbers above are pooled over rungs.  Broken out, the farmgate gap is
+*not one number* -- it is systematically larger the finer the geography:
+
+| pair | t | thresholds | =v= (cluster) | =District= | =Region= | pooled |
+|------+---+------------+-------------+----------+--------+--------|
+| 5 vs 4 | 2011Q1 | (1,5) | 2.33 (43 cells) | 1.26 (8) | 1.34 (2) | 1.75 (53) |
+| 5 vs 4 | 2011Q1 | (1,3) | 1.75 (115)      | 1.25 (1) | 0.21 (1) | 1.67 (118) |
+| 5 vs 4 | 2013Q1 | (1,5) | 2.18 (11)       | 1.25 (5) | 2.50 (1) | 2.00 (17) |
+| 5 vs 4 | 2013Q1 | (1,3) | *1.45* (44)       | 2.08 (2) | 2.50 (3) | *1.45* (51) |
+| 1 vs 4 | 2011Q1 | (10,5) | --               | 1.60 (63) | 1.54 (9) | 1.60 (72) |
+| 1 vs 4 | 2011Q1 | (5,3)  | 2.60 (13)        | *1.43* (58) | 1.67 (5) | 1.52 (78) |
+| 1 vs 4 | 2013Q1 | (10,5) | --               | 1.21 (7)  | 2.98 (6) | 1.70 (19) |
+| 1 vs 4 | 2013Q1 | (5,3)  | 2.86 (1)         | 1.67 (19) | 1.46 (6) | 1.60 (30) |
+
+Bold marks a cell inside the 30-50% band *and* resting on at least 10 matched
+cells; the =Region= / =national= entries with 1-3 cells are noise and are not
+bolded whatever they say.  Read plainly:
+
+- *At =District= grain the gap is 1.21-1.67* -- i.e. right at or just above the
+  claimed band, and three District cells fall inside it.
+- *At cluster (=v=) grain it is 1.45-2.60* -- mostly well above.
+- *Pooled, 7 of the 8 settings exceed 1.5* and one (5 vs 4, 2013Q1, thresholds
+  (1,3), 51 cells) lands at 1.455, inside the band.
+
+Why the rung matters is not mysterious and it is not an artefact of the
+statistics: a =v=-grain pair compares a farm's own sale price with the market
+price *in that same cluster*, which is the transport-and-margin wedge the
+claim is about; a =District=-grain pair compares two medians each already
+pooled across clusters, which averages away the within-district dispersion in
+both, and the more heterogeneous side (the thin crop-sale source) is pulled
+further toward the district middle.  The cluster-grain number is the one that
+answers the question as posed; the district-grain number is the one with
+enough observations to be stable.  *Nigeria cannot adjudicate between them* --
+the farmgate source has 17 to 118 matched cells.
+
+** So: does the claim hold for Nigeria?
+
+*The honest answer is "the central estimate is above the band, but Nigeria's
+farmgate data are too thin to reject 30-50% cleanly."*  Specifically:
+
+1. The best-populated cluster-grain estimate (5 vs 4, 2011Q1, 115 cells at
+   =v=) gives *+75%* -- clearly above.
+2. The best-populated single setting overall (5 vs 4, 2013Q1, (1,3), 51 cells)
+   gives *+45.5%* -- inside the band.
+3. Every District-grain estimate is 1.21-1.67, straddling the band's top.
+
+What is *not* ambiguous, and is the durable result, is the *item*
+heterogeneity below: whatever the pooled number, it is a mixture of cereals
+near or below +30% and perishable / processed goods at +100% to +1000%.  A
+single 30-50% figure is the wrong shape of answer for Nigeria regardless of
+where the pooled median lands.
+
+** By item -- where the protocol says "critically evaluate" lives
+
+*Both item tables pool 2011Q1 and 2013Q1* (=native_ex_misscaled=, all rungs).
+That departs from the protocol's "one wave at a time" and is done only here,
+because per round the farmgate pairs have 17-72 cells spread over 11-19 items
+and a per-round item table would be all singletons.  The pooling is across two
+adjacent post-harvest rounds of the same panel, in the same currency (NGN),
+and the two rounds' pooled medians (1.60 / 1.70 and 1.75 / 2.00) are close, so
+it is not mixing regimes.
+
+=unit_value_vs_crop_sale_price= (native, ex mis-scaled units):
+
+| item | cells | median log gap | ratio | in 30-50%? |
+|------+-------+----------------+-------+------------|
+| Yam--roots                      | 19 |  0.489 | 1.630 | no (above) |
+| Rice--local                     | 11 |  0.993 | 2.698 | no (above) |
+| Guinea corn/sorghum             | 10 |  0.288 | 1.333 | *YES*      |
+| Maize                           | 10 |  0.171 | 1.187 | no (below) |
+| Fresh Pepper                    |  5 |  0.533 | 1.705 | no (above) |
+| Millet                          |  5 |  0.082 | 1.086 | no (below) |
+| Groundnuts (unshelled)          |  4 |  1.037 | 3.295 | no (above) |
+| Okra--fresh                     |  3 |  1.139 | 3.125 | no (above) |
+| Tomatoes                        |  3 |  0.734 | 2.083 | no (above) |
+| Plantains                       |  3 |  0.489 | 1.631 | no (above) |
+| (11 more items with 1-2 cells)  |    |        |       |            |
+| *totals*                        | 21 items | | | *1 in band, 14 above, 6 below* |
+
+=community_price_vs_crop_sale_price=:
+
+| item | cells | median log gap | ratio | in 30-50%? |
+|------+-------+----------------+-------+------------|
+| Maize               | 18 | 0.476 | 1.616 | no (above) |
+| Rice--local         | 12 | 1.120 | 3.065 | no (above) |
+| Guinea corn/sorghum |  8 | 0.237 | 1.268 | no (below) |
+| Millet              |  7 | 0.223 | 1.250 | no (below) |
+| Soya beans          |  4 | 0.378 | 1.472 | *YES*      |
+| Bananas             |  3 | 0.223 | 1.250 | no (below) |
+| Bambara nut         |  3 | 0.973 | 2.646 | no (above) |
+| Tomatoes            |  3 | 0.357 | 1.429 | *YES*      |
+| Kola nut            |  3 | 2.420 | 11.25 | no (above) |
+| (6 more with 1-2 cells) | | | | |
+| *totals*            | 15 items | | | *2 in band, 7 above, 6 below* |
+
+*The reading.*  The 30-50% band is not a bad summary so much as a bad
+*single* summary: 1 of 21 and 2 of 15 items fall inside it, and the misses go
+in *both* directions.  This is the finding that survives the threshold and
+rung sensitivity above -- the pooled median moves between 1.45 and 2.00
+depending on how the cells are selected, but the item ordering does not.  The pattern is legible and it is the one the protocol
+anticipated -- *cereals sit at or below the band, everything else sits far
+above it*.  Guinea corn/sorghum (+33%, +27%), Millet (+9%, +25%) and Maize
+(+19% / +62%) are bulk storable grains with dense trading networks; Rice--local
+(+170%, +207%), Groundnuts unshelled (+230%), Okra--fresh (+213%),
+Kola nut (+1025%) and Tomatoes (+108%) are either perishable, bulky-per-naira,
+or processed between the farm gate and the plate (local rice is *milled*
+between q11 and the consumer -- part of that gap is a processing margin, not a
+marketing margin, and it should not be read as transport).
+
+This is exactly why the protocol asks for the item table: a between-item slope
+fitted across these items would be reading a mixture of an additive handling
+cost and genuinely item-heterogeneous margins, and for Nigeria it cannot
+separate them because the farmgate designs are saturated (section 4).  The
+per-item rows are the input Phase 2 needs to test the slope *within* item
+classes (grains vs. perishables vs. processed).
+
+*Two caveats on the size of these numbers, both of which cut the same way.*
+(i) Community prices and crop harvests are both post-harvest, when producer
+prices are seasonally *low*, while purchases in source 1 span both rounds --
+if anything this *understates* the annual average margin.  (ii) Source 4's
+unit is the *harvest* unit applied to the *sale* quantity by assumption
+(problem N-03), correct on ~96% of rows; the ~4% filed under a wrong unit
+add noise but no systematic direction.
+
+*Sources 3 and 4 cannot be compared to each other for Nigeria* (the Uganda
+centrepiece), because source 3 does not exist here.  =sa3q18= would supply the
+missing half -- see problem N-07.
+
+** Items to treat with suspicion
+
+In the 1-vs-5 pair, Onions (ratio 3.97, 20 cells) and Garden eggs/egg plant
+(7.07, 17 cells) are far outside the otherwise tight distribution (the other
+30 items are between 0.74 and 1.59).  Both are typically sold by heap or
+basket; I read them as residual size-variant confounds surviving into the
+=Kg=/=Tuber= cells rather than as price facts, and do not interpret them.
+
+* 6. Data problems
+
+| id | table | wave(s) | symptom | count | evidence | proposed fix | status |
+|----+-------+---------+---------+-------+----------+--------------+--------|
+| N-01 | =food_acquired= | all | No =Price= column at all, so =food_prices(units='unitprice')= returns zero rows: sources 2 and 3 do not exist for Nigeria in the API | 0 of 595,725 rows | =c.food_prices(units='unitprice').shape == (0,1)= | none available from the consumption module (the GHS asks no own-consumption value there); see N-07 for the agriculture-side substitute | *reported* |
+| N-02 | =community_prices= | 2016Q1, 2019Q1, 2024Q1 | The C8 *SIZE* field (=c8q2b= W3 free text, =c8q2c= W4 coded, =c8aq2_a/_c/_cvn= W5) is recorded by the survey and never read.  Two effects: the size axis is discarded (=_canon_unit= is size-agnostic, "Heap Small/Medium/Large" -> =Heap=), so =community_prices= and =food_acquired= sit on different unit axes; and metric rows are not per-unit prices, contradicting =data_scheme.yml='s own "price of one unit =u=" | axis: only 15 of 81 =food_acquired= =u= labels intersect the 30 in =community_prices=; W4 raw HEAP 2,144/1,986/409 small/medium/large, PIECE 1,450/2,595/557, MUDU 1,385/817.  scale: on 1,171 matched cells the ratio is 1.000 on =Kg= (596) and =l= (124) but 1/189 on =g= (130) and 1/42 on =cl= (125) | read the size column: divide =Price= by the coded metric quantity (W4/W5) exactly as the protocol's =NumberOfUnits= rule prescribes, and emit size-qualified =u= labels matching =food_acquired='s.  *Not done here*: it changes a shipped table's =u= vocabulary and makes it wave-heterogeneous (W1/W2 print one unit per item and can never carry a size), which is a maintainer design call, not a mapping fix; and W3's quantity is free text (183 distinct values incl. =wrap=, =.=) so a W3-safe fix needs parsing.  Meanwhile: *exclude =u in (g, cl)=* | *reported* (documented in =CONTENTS.org=, commit =0178127e=) |
+| N-03 | =crop_production= | 2011Q1, 2013Q1 | The sale has its own unit code =sa3q11b= on the questionnaire; the build reads only the harvest unit =sa3q6b= and applies it to =Quantity_sold=.  =nigeria.crop_production_for_wave='s docstring even documents an =unit_sold= parameter the code never reads | sale unit == harvest unit on 3,438/3,548 (*96.9%*) W1 and 3,316/3,478 (*95.3%*) W2 positive-sale rows; so 3-5% are filed under the wrong =u= | read =sa3q11b= and either store it or restrict =Quantity_sold= to rows where it matches | *reported* |
+| N-04 | =crop_production= | all | The item index level is named =crop=, not =j=, unlike Uganda/Ethiopia/Tanzania | 5 of 5 rounds | =c.crop_production().index.names == ['i','t','v','plot','crop']= | rename to =j= (the labels are already =harmonize_food= Preferred Labels, so they join =food_acquired.j= and =community_prices.j= directly); aliased in =analysis.py= | *reported* |
+| N-05 | =crop_production= | 2016Q1, 2019Q1, 2024Q1 | =Quantity_sold= / =Value_sold= are 100% NaN because W3-W5 record sales at hh-crop grain (=secta3ii=) with no plot linkage, and the build declines to attribute them to a plot | 0 non-null of 11,829 / 15,054 / 10,432 rows, vs 3,573 / 3,445 in W1 / W2 | =c.crop_production().groupby('t')['Value_sold'].count()= | for a *price* the plot linkage is unnecessary -- an hh-crop sale price is exactly as good.  Wire =secta3ii= at =(t,i,crop)= as a separate frame or accept a null =plot=.  This is a =todo=-class gap (data present, config missing), not an absence, and it costs source 4 *three of its five rounds* | *reported* |
+| N-06 | =common.py= (shared) | n/a | =fit_gap_model='s BETWEEN spec raises =LinAlgError("Singular matrix")= instead of returning NaN when the geo dummies span the item-mean regressor (every item in one geo).  Aborted the run before =analysis.py= wrapped it | 1 subset hit it: =unit_value_vs_crop_sale_price=, 2011Q1, thresholds (5,3), =geo_level='v'=, 13 cells | traceback at =common.py:202= via =metrics_miscellany.estimators.ols= | in =common.py=, catch the singularity and return NaN coefficients (it is collinearity, a normal outcome for a thin source at cluster grain, not an error).  *Not forked*: =analysis.py= wraps =model_rows= and keeps the descriptive half of the row | *reported to the coordinator* |
+| N-07 | =crop_production= | 2011Q1, 2013Q1 (and later waves, unchecked) | A3 q18 "If you had sold all [CROP] harvested since the last visit, what would be the total value?" -- a *farmgate valuation of the whole harvest* -- is populated and not carried by any table | 9,857/13,018 (*75.7%*) W1 and 9,868/12,948 (*76.2%*) W2 plot-crop rows, vs ~3,500 rows/wave with an actual sale (*2.8x more*) | =sa3q18= in =secta3_harvestw1.dta= / =secta3_harvestw2.dta=; wording quoted from =GHS_PANEL_AGRICULTURE_POST_HARVEST_FINAL.pdf= p. 14 | wire as e.g. =Value_if_sold=; with =sa3q6a= / =sa3q6b= it gives a farmgate unit valuation for every harvester.  It is the nearest thing Nigeria has to source 3 | *reported* |
+| N-08 | =cluster_features= | 2023Q3, 2024Q1 | Not declared for W5 at all, while =sample= *is* (5,067 rows) and =community_prices= *is* (24,184 rows in 2024Q1) | 0 of 10 rounds have W5; 24,184 of 138,055 community-price rows (all of 2024Q1, 507 clusters) get no geography | =.coder/coverage/latest.csv= "Nigeria,cluster_features,2024Q1,absent"; =analysis.py= geo-join report | declare W5 =cluster_features=.  2024Q1 is consequently unusable in every pair (it also has no =food_acquired=) | *reported* |
+| N-09 | =community_prices= | 2013Q1, 2016Q1 | A few community clusters have no household-side cluster | 3 clusters, 87 price rows (2 clusters / 48 rows in 2013Q1; 1 / 39 in 2016Q1) | pre-check (ii) in =REPORT.org= section 1 and =CONTENTS.org= | counted and carried, never dropped silently; below the noise floor of any cell median | *reported* |
+| N-10 | coverage matrix | all PP rounds | =community_prices= grades =dropped= in 2010Q3/2012Q3/2015Q3/2018Q3/2023Q3, and =crop_production= grades =absent= in all *ten* rounds while returning 62,844 rows | 5 =dropped= cells; 10 =absent= cells vs a table that builds | =.coder/coverage/latest.csv=; =find lsms_library/countries/Nigeria -iname '*c8*'= returns only the five post-harvest files | *the =dropped= cells are correctly empty* -- C8 is post-harvest only and the PP community questionnaire stops at C4, so =t = PH_QUARTER[wave]= is complete.  The grade is a grader artefact: the matrix expands a declared table over both rounds of a PP/PH wave and cannot record "single-round by design".  The =crop_production= =absent= x10 is the same class as the EthiopiaRHS contradiction in the shared ledger | *reported* |
+
+*The two most consequential*: N-02 (it silently makes two of the five
+matched units wrong by ~190x and ~42x, and it costs the size-bearing units
+entirely) and N-07 (Nigeria has an own-consumption valuation on 76% of harvest
+rows and the library does not expose it, which is why source 3 reads "absent").
+
+* 7. Reproduce
+
+#+begin_src sh
+WT=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-nigeria
+export PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra:$WT
+export LSMS_BUILD_WORKERS=1
+cd /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/Nigeria
+taskset -c 15-17 \
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python \
+  analysis.py > run1.log 2>&1
+#+end_src
+
+Reads the shared warm cache read-only (no =LSMS_NO_CACHE=, no =cache clear=,
+no =make=, no =dvc=).  Writes =cells.csv= (439,710 rows), =gaps.csv= (1,171),
+=models.csv= (139) and =run1.log= in this directory.  The questionnaire PDFs
+are fetched with =lsms_library.data_access.get_data_file('Nigeria/<wave>/
+Documentation/<file>')=; text extracted with =pdfminer.six= (no =pdftotext= on
+this node).
+
+Documentation commit on =fix/prices-nigeria= (not pushed): =0178127e=.
