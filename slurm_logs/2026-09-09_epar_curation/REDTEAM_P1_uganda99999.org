@@ -1,0 +1,406 @@
+#+TITLE: Red-team: fix/uganda-2009-10-99999 (2f2dbff3, GH #861)
+#+DATE: 2026-09-09
+#+AUTHOR: red-team agent (read-only)
+
+* Verdict summary
+
+| # | item                                              | verdict |
+|---+---------------------------------------------------+---------|
+| 1 | exact-value strip                                 | PASS    |
+| 2 | =_qty_reported= / "no measure reported" filter     | CONCERN |
+| 3 | the counts (25,485 / 1,400 / 1,697 / sums)        | PASS    |
+| 4 | scope: only 2009-10 carries 99999                 | PASS    |
+| 5 | sentinel rows are =Unknown= / =unknown_condition=  | PASS (off by one) |
+| 6 | cache-hash blast radius                           | CONCERN |
+| 7 | tests                                             | PASS (with a blind spot) |
+| 8 | pandas 3.0 rules on the diff                      | PASS    |
+
+*Headline*: the strip itself is correct, exactly scoped and exactly measured --
+every number in the commit message and =CONTENTS.org= reproduces, and *every
+requirement GH #861 actually states is met* (quoted in item 2).  But the
+*second half* of the fix -- the =_qty_reported= machinery whose whole purpose is
+"the row stays; only the value is nulled" -- *does not survive to the API*.
+=Country._finalize_result='s =dropna(how='all')= (=country.py:3014=) deletes all
+3,077 of those rows on every read, so the delivered 2009-10 table goes 25,485 ->
+*22,408* rows and 2,330 -> *2,323* households.  That is not a violation of #861
+(which never asks for the rows to survive) -- it makes the machinery inert and
+=CONTENTS.org='s "25,485 (unchanged)" row misleading about what a user gets.
+CONCERN, not FAIL, on the strength of the issue text.
+
+* Environment
+
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-uganda-99999=, commit
+=2f2dbff3=.  Asserted in every run:
+
+: lsms_library.__file__          -> <worktree>/lsms_library/__init__.py
+: lsms_library.paths.countries_root() -> <worktree>/lsms_library/countries
+: LSMS_DATA_DIR                  -> <worktree>/.data   (implementer's isolated cache)
+
+Gotcha worth recording: =PYTHONPATH= only wins from a *neutral* cwd.  Run from
+the main mirror's repo root, =sys.path[0]= = cwd = the mirror and =import
+lsms_library= silently resolves to the *main checkout* even with =PYTHONPATH=
+set (the =.pth= is not the culprit -- cwd is).  All runs below use =cd /tmp=.
+
+Post-run hygiene: =find lsms_library/countries -name '*.parquet'= -> *empty*
+(GH #803).  =find ~/.local/share/lsms_library -newermt '2026-09-09 14:30'= ->
+*0 files*; the shared cache was never touched.  No repo file was edited; this
+=.org= is the only write.
+
+"Before" was reproduced from the *actual pre-fix module*
+(=git show 2f2dbff3^:.../uganda.py= loaded as a second module), not by popping
+=qty_sentinel= -- so the filter change is checked empirically, not just
+algebraically.
+
+* Item 1 -- exact-value strip :: PASS
+
+Raw dtype of the 2009-10 quantity columns under the wave script's own
+=convert_categoricals=False= read: =a5aq6a= *float64*, =a5bq6a= *float64*.  So
+an object-dtype column never actually arises here; tested anyway.
+
+=crop_production_for_wave= called on synthetic AGSEC5A frames:
+
+| source dtype | input                                          | Quantity out                                   |
+|--------------+------------------------------------------------+------------------------------------------------|
+| float64      | 99999, 99998, 100000, 99999.5, -99999, 5       | *NaN*, 99998, 100000, 99999.5, -99999, 5       |
+| int64        | 99999, 99998, 100000, 1, 2, 5                  | *NaN*, 99998, 100000, 1, 2, 5                  |
+| Float64      | 99999, 99998, 100000, 99999.5, -99999, 5       | *NaN*, 99998, 100000, 99999.5, -99999, 5       |
+| object (str) | '99999','99998','100000','99999.0','abc','5'   | *NaN*, 99998, 100000, *NaN*, (row dropped), 5  |
+
+Notes: =pd.to_numeric= runs *before* the mask, so the string ='99999.0'= is also
+stripped -- correct, it is numerically the sentinel.  ='abc'= -> NaN -> the row
+has no measure at all and is dropped by the pre-existing filter (unchanged
+behaviour).  Two negative controls also pass:
+
+- =99999= placed in =qty_sold= (=a5aq7a=) *survives* -> =[99999.0, 3.0]=.  The
+  strip is quantity-only, as declared.
+- With =qty_sentinel= *undeclared*, 99999 passes through untouched.
+
+* Item 2 -- the =_qty_reported= pre-mask :: CONCERN
+
+** First: what GH #861 actually requires
+
+Read directly (=gh issue view 861=), because the FAIL/CONCERN label turns on it.
+The issue's "What it must NOT do" section says, in full:
+
+- "Never strip a large quantity that is merely near 99999 (99998, 100000) --
+  target the literal sentinel value, not a range."
+- "Never zero out or impute the stripped rows; *they become missing*, as both of
+  EPAR's rules do."
+- "Do NOT adopt EPAR's =A5aq11=-conditional form alone (=:483=) and stop there."
+
+*Nowhere does #861 ask that the rows survive.*  "Do not drop rows" is the
+commit message's own framing, not the issue's.  The issue's checklist -- exact-
+value strip, per-season counts in =CONTENTS.org=, a test that the strip is
+exact-value not a range, close the TODO with before/after, "A Uganda re-warm" --
+is *satisfied in full* by this commit.  So the finding below is a CONCERN about a
+mechanism that does nothing and a documented claim that is wrong, not a failure
+to fix the issue.
+
+** The mechanics are exactly right, and provably a no-op elsewhere
+
+Let =q0= be the quantity column before the mask.  Post-fix the filter is
+
+: (Q.notna() | qsold.notna() | vsold.notna()) | q0.notna()
+
+and since =Q.notna() = q0.notna() & ~sentinel=, this reduces *identically* to the
+pre-fix filter =q0.notna() | qsold.notna() | vsold.notna()=.  Confirmed
+empirically against the real pre-fix module on all seven waves -- rows, household
+counts, Quantity sums and the *entire index* are byte-identical in the six waves
+that declare no sentinel:
+
+| wave    | rows          | hh          | Quantity sum                | index identical |
+|---------+---------------+-------------+-----------------------------+-----------------|
+| 2009-10 | 25,485 -> 25,485 | 2,330 -> 2,330 | 310,664,565.84 -> 967,662.84 | yes             |
+| 2010-11 | 20,970 -> 20,970 | 2,128 -> 2,128 | 708,149.50 (unchanged)      | yes             |
+| 2011-12 | 20,152 -> 20,152 | 2,240 -> 2,240 | 1,128,560.35 (unchanged)    | yes             |
+| 2013-14 | 17,585 -> 17,585 | 2,373 -> 2,373 | 1,098,713.45 (unchanged)    | yes             |
+| 2015-16 | 19,576 -> 19,576 | 2,530 -> 2,530 | 1,050,367.35 (unchanged)    | yes             |
+| 2018-19 | 14,194 -> 14,194 | 2,536 -> 2,536 | 1,180,031.67 (unchanged)    | yes             |
+| 2019-20 | 15,721 -> 15,721 | 2,425 -> 2,425 | 1,175,600.80 (unchanged)    | yes             |
+
+** But the rows it saves are deleted one layer up
+
+=Country._finalize_result= (=lsms_library/country.py:3014=) runs
+
+: df = df.dropna(how='all')
+
+described in its own comment as "the universal safety-net ... drop any row where
+every non-index column is NaN".  A 2009-10 sentinel row has *all six* data
+columns NaN: =Quantity= (just nulled), =Quantity_sold=, =Value_sold=,
+=harvest_month= (2009-10 declares =month: None=), =KgFactor= (unwired for this
+wave), =intercropped= (NaN for 2009-10 -- AGSEC4A is not joinable, per the
+colmap's own comment).  So:
+
+| layer                                       | 2009-10 rows | all-3-measures-null | households |
+|---------------------------------------------+--------------+---------------------+------------|
+| wave parquet / =crop_production_for_wave=    | 25,485       | 3,077               | 2,330      |
+| L2-country =var/crop_production.parquet=     | 25,485       | 3,077               | 2,330      |
+| =ll.Country('Uganda').crop_production()=     | *22,408*     | *0*                 | *2,323*    |
+
+Attributed directly, not by subtraction -- re-running the warm build with
+=logging.getLogger('lsms_library').setLevel(INFO)= prints the block's own line:
+
+: INFO lsms_library.country: Uganda/crop_production: dropna(how='all') removed
+:   3077 of 133683 rows (2.3%) -- every dropped row had NO non-index data at all
+
+Corpus-wide: the country parquet is 133,683 rows, the API returns *130,606* --
+the difference is exactly the 3,077.  The arithmetic closes with no residual
+(25,485 - 3,077 = 22,408 delivered for 2009-10), which also proves *no other*
+step -- the =v=-join, =id_walk=, the index normalisation -- drops a 2009-10 row.
+That is what licenses the pre-fix comparison: the pre-fix parquet has *0*
+all-null rows, so a pre-fix API read returned all 25,485 rows and 2,330
+households.  *Seven households* (=1021001910=,
+=1051000103=, =1133001911=, =3093000202=, =3103000808=, =3203002401=,
+=4163000708=) appear in 2009-10 =crop_production= *only* through sentinel rows and
+are therefore absent from the delivered table post-fix, where pre-fix they were
+present (carrying a fake 99999 harvest).  The API =Quantity= null count for
+2009-10 is *9* -- the pre-fix number -- because every newly-nulled row was
+deleted.
+
+Consequences to state plainly:
+
+1. The commit message's "the row stays; only the value is nulled (GH #861)" and
+   =CONTENTS.org='s "rows (both seasons) 25,485 (unchanged)" are true of the
+   *parquet*, and false of what a user gets.  If #861 means "do not drop rows"
+   at the API, *the issue is not fixed*.
+2. =_qty_reported= is therefore *dead weight at the delivered layer*: deleting
+   the whole mechanism would produce an identical API result.  Two cases, and
+   they exhaust the possibilities: a de-dup group made *only* of sentinel rows
+   is absent without the mechanism and all-NaN-then-deleted with it; a group
+   mixing a sentinel row with a real one is unaffected either way, because
+   =sum(min_count=1)= and =first()= skip NaN exactly as if the row were absent.
+   (Reasoned, not run.)  The added complexity buys a difference only for someone
+   reading the raw parquet.
+3. The =dropna(how='all')= deletion is =logger.info=, not a warning -- invisible
+   in a normal session.  This is the exact failure mode that comment itself
+   warns about ("a *value* corruption upstream turns into a silent *deletion*").
+
+Two ways out, both cheap, neither taken: (a) accept the deletion and say so --
+then drop =_qty_reported= and correct the row-count claim; (b) if the rows must
+survive, they need a non-null column (the row *is* a reported crop-on-plot
+record), or a documented exemption from =dropna(how='all')=.
+
+** The consistency argument, both sides, with numbers
+
+/For keeping them/ (the fix's position): #861 says do not drop rows; a nulled
+value is not a licence to delete a record; and =dropna(how='all')= is a
+framework-level safety net whose deletions the library elsewhere treats as a
+defect to be surfaced.
+
+/For dropping them/ (the original filter's intent): the filter exists to delete
+rows with *no reported measure*, and a sentinel row IS one.  The evidence says
+these are blank rows: their raw unit code and condition code are NULL on 3,168
+of 3,169 raw sentinel rows, and =Quantity_sold= / =Value_sold= / =KgFactor= are
+null on *all* of them.  They carry nothing but a crop label.
+
+And the delivered parquet is now internally inconsistent about them:
+
+| wave    | rows kept with ALL 3 measures null | rows *deleted* by the filter (crop label, no measure at all) |
+|---------+------------------------------------+--------------------------------------------------------------|
+| 2009-10 | *3,077*                            | 907                                                          |
+| 2010-11 | 0                                  | 2,235                                                        |
+| 2011-12 | 0                                  | 2,466                                                        |
+| 2013-14 | 0                                  | 3,535                                                        |
+| 2015-16 | 0                                  | 0                                                            |
+| 2018-19 | 0                                  | 0                                                            |
+| 2019-20 | 0                                  | 10,475                                                       |
+
+So *inside 2009-10*, a row whose quantity cell is blank is deleted (907 of them)
+while a row whose quantity cell says "99999 = no information reported" is kept,
+though the survey means the same thing by both.  And 2009-10 becomes the only
+wave in the parquet carrying an all-measures-null row class.  Nothing in
+=CONTENTS.org= records either asymmetry.  (At the API the asymmetry vanishes --
+because =dropna(how='all')= deletes the kept class too.)
+
+** Downstream counts
+
+Measured at the wave-frame layer (where the rows still exist), pre vs post:
+
+- =harvest_kg_factors= =KgFactorSource= counts: ={'none': 21490, 'inferred': 3995}=
+  *identical* pre and post.  Sentinel rows were =none=-layer before (u='Unknown',
+  no factor resolvable) and are =none=-layer after.
+- =harvest_kg=: 3,496 rows, 730,583.56 kg -- *identical* pre and post.
+- Household count 2,330 -> 2,330; index identical.
+
+At the API layer the 3,077 rows never arrive, so the =none= layer would instead
+fall by 3,077 and 7 households disappear.
+
+=is_this_feature_sane(Country('Uganda').crop_production(), ...)= -> =ok=True=
+(only the pre-existing =index_levels_match_scheme= warn about the joined =v=).
+=null_read_reports= for the table: 2 pre-existing entries (=harvest_month=,
+=intercropped= all-null in 2009-10/2010-11), unchanged by this work.  No sanity
+check reacts to all-measure-null rows, so the coverage grade is unaffected
+either way.
+
+* Item 3 -- the counts :: PASS
+
+Reproduced from the isolated =.data= and from a direct pre-fix/post-fix build:
+
+| quantity                       | measured        | claimed         |
+|--------------------------------+-----------------+-----------------|
+| rows, both seasons             | 25,485 -> 25,485 | 25,485 -> 25,485 |
+| season A rows                  | 13,244          | 13,244          |
+| season B rows                  | 12,241          | 12,241          |
+| =Quantity==99999=, season A     | 1,400 -> 0       | 1,400 -> 0       |
+| =Quantity==99999=, season B     | 1,697 -> 0       | 1,697 -> 0       |
+| =Quantity= sum                  | 310,664,565.84 -> 967,662.84 | same |
+| 2010-11 sum                    | 708,149.50      | 708,149.50      |
+| 2011-12 sum                    | 1,128,560.35    | 1,128,560.35    |
+
+The sum delta is *exactly* 309,696,903.00 = 3,097 x 99,999 -- i.e. precisely
+3,097 sentinel values were removed and nothing else moved.  Ratio 321x.
+
+Two details the commit does not state, both benign and worth recording:
+
+- The *raw* sentinel counts are 1,411 (season A) and 1,758 (season B) = 3,169.
+  72 of those rows carry no crop label and are already dropped by the
+  pre-existing =j.notna()= filter, leaving the 3,097 the commit reports.  The
+  commit's numbers are built-frame counts and are correct as such.
+- 20 rows go 99999 -> *0.0*, not to NaN.  These are de-dup groups (the
+  =groupby(...).sum(min_count=1)= at =uganda.py:1446=) where a sentinel row shares
+  an index tuple with a real row whose Quantity is 0.  Pre-fix the sentinel was
+  *added onto a real record*; the fix repairs that too.  All 20 are
+  =u='Unknown'= / =unknown_condition=.  No row with a real non-zero quantity
+  changed value.
+
+* Item 4 -- scope :: PASS
+
+Swept every wave x season x condition slot (9 quantity slots across 7 waves) for
+999 / 9999 / 99999 / 999999 in =qty=, =qty_sold=, =value_sold= and =kg_factor=:
+
+- =99999= occurs *only* in 2009-10 =a5aq6a= (1,411) and =a5bq6a= (1,758), where it
+  is also the column *maximum*.
+- Every other wave's quantity maximum is far below it (2010-11 5,415 / 10,800;
+  2011-12 20,000 / 50,000; 2013-14 50,007 / 180,000; 2015-16 40,000 / 90,000;
+  2018-19 360,000 / 7,200; 2019-20 45,000 / 4,000 / 70,100).
+- Zero occurrences of 999, 9999, 99999 or 999999 in any =qty_sold= or
+  =value_sold= in any wave, and none in 2018-19's =kg_factor= (=a5aq6d= /
+  =a5bq6d=).
+
+So =qty_sentinel= is correctly scoped, and
+=test_qty_sentinel_is_2009_10_only= guards the config side.
+
+* Item 5 -- =Unknown= is a property of the sentinel rows, not of the wave :: PASS (off by one)
+
+=CONTENTS.org='s "2009-10 ... no value labels at all; matched by code
+distribution" refers to *Stata* value labels.  The library decodes the numeric
+codes through =categorical_mapping.org=, so labels resolve fine and 2009-10 is
+*not* a wave of unlabelled rows:
+
+- non-sentinel 2009-10 rows: u = Plastic Basin (15 lts) 4,510; Sack (100 kgs)
+  3,314; Kg 2,808; Unknown 2,562; Bunch (Medium) 1,580; ... (40+ labels);
+  condition = fresh 7,593; dried_grain 6,499; unknown_condition 2,811; ...
+- sentinel rows: u = *Unknown 3,096* + 1; condition = *unknown_condition 3,096* + 1.
+- raw codes on sentinel rows: unit code notna *0 of 1,411* (season A) and
+  *1 of 1,758* (season B); condition code likewise.
+
+So the =Unknown= is caused by a NULL raw code on the sentinel rows themselves,
+which corroborates the "these are blank rows" reading in item 2.
+
+*Off by one*: one season-B sentinel row carries unit code 22 and condition code
+45 -- =u='Plastic Basin (15 lts)'=, =condition='dried_grain'= -- i.e. an otherwise
+fully-populated harvest record whose quantity is 99999.  The commit /
+=CONTENTS.org= claim about =Quantity_sold= / =Value_sold= / =KgFactor= (0 / 0 / 0
+non-null on sentinel rows) is *exactly true*; the implied "all of them are blank
+Unknown rows" is true of 3,096 of 3,097.
+
+* Item 6 -- cache blast radius :: CONCERN (bigger than implied)
+
+=Country('Uganda')._table_cache_hash(table, waves)= computed for all 28 tables in
+=data_scheme=, worktree vs. a countries-root identical in every respect except a
+pre-fix =uganda.py=:
+
+: MOVED: 28 / 28.  UNCHANGED: 0.
+
+anthropometry, assets, cluster_features, crop_production, earnings,
+enterprise_income, fct, food_acquired, food_expenditures, food_prices,
+food_quantities, household_characteristics, household_roster, housing, income,
+individual_education, interview_date, livestock, months_food_inadequate,
+nonfood_expenditures, nutrition, panel_ids, people_last7days, plot_features,
+plot_inputs, plot_labor, sample, shocks.
+
+Control: the same symlinked countries root with the *post-fix* =uganda.py=
+reproduces the real worktree's hashes on *0 of 28* differing tables, so the move
+is attributable to =uganda.py= alone and not to the harness.  This is the
+documented behaviour (=CLAUDE.md=: the country module is in every table's
+fingerprint) -- but it means *the post-merge re-warm is the whole of Uganda*,
+not =crop_production=.  Neither the commit message nor =CONTENTS.org= says so.
+
+(A direct worktree-vs-main-checkout comparison would have been confounded: the
+branch parent =1c234604= is *not* an ancestor of the mirror's HEAD =8fbc4e21=,
+and the two differ in =lsms_library/transformations.py= -- a pure comment block,
+but not worth relying on.  Hence the isolated countries-root control.)
+
+* Item 7 -- tests :: PASS, with a blind spot
+
+: tests/test_uganda_99999.py         6 passed in 4.80s
+: tests/test_uganda_crop_condition.py 13 passed in 11.37s
+
+Run with =--no-purge= (=conftest.py= purges *Uganda's* cache at session start in
+default mode -- without the flag it would have wiped the isolated =.data= the
+rest of this audit depends on) and =LSMS_DATA_DIR= pointed at the isolated cache.
+Afterwards: 0 files newer than 14:30 anywhere under =~/.local/share/lsms_library=,
+and no in-tree parquet.  So nothing shared was written.
+
+The data-gated test *does* run here: =_aws_creds_available()= finds
+=<worktree>/lsms_library/countries/.dvc/s3_creds=.  It genuinely bypasses
+=Country()= -- it calls =crop_production_for_wave= on frames read straight from
+=get_dataframe= -- so it is immune to a stale L2 parquet, as claimed.  (It still
+uses the L1 content-addressed blob cache, which is correct and not a staleness
+risk.)
+
+*Blind spot*: every assertion in the file is at the wave-script layer -- the one
+layer where the fix works.  =assert len(df) == 25485= is satisfied by the frame
+=crop_production_for_wave= returns, and cannot see that
+=ll.Country('Uganda').crop_production()= delivers 22,408 rows for that wave.  The
+test file's own docstring says it "deliberately avoids the warm cache to not need
+[xfail] treatment" -- understandable, but it is also why the item-2 defect ships
+green.  A single assertion on the API frame would have caught it.
+
+Minor: =_aws_creds_available()= builds the creds path as
+=Path(__file__).parent.parent / "lsms_library" / "countries" / ".dvc"= rather than
+via =countries_root()=.  It is the acknowledged house pattern, but it is the
+pattern =CLAUDE.md= (GH #436) tells you not to write.
+
+* Item 8 -- pandas 3.0 :: PASS
+
+- =qty.where(qty != qty_sentinel, np.nan)= -- =qty= is float64 out of
+  =pd.to_numeric=; =np.nan= in a numeric float column is explicitly allowed.
+  =NaN != 99999= is True, so existing NaNs are preserved.  =.where= returns a new
+  object.
+- No =inplace==; no chained assignment (=df[mask]['col']= form absent); no
+  =fillna(method=...)=; no positional =series[0]=.
+- =df = df[... | df['_qty_reported']]= is boolean-mask row selection on a numpy
+  bool column (from =.notna()=), so the =|= cannot meet =pd.NA=.
+- =df.drop(columns=['_qty_reported'])= is non-inplace and unconditional; the
+  early return (=if not pieces:=) precedes any reference to the column, so an
+  empty build raises no =KeyError=.
+
+* Recommendation
+
+*Mergeable as "closes #861"* -- every requirement the issue states is met, and
+the strip is correct, exactly scoped and exactly measured.  Three corrections
+should land with it:
+
+1. *Item 2.*  Either delete the =_qty_reported= mechanism (it changes nothing a
+   user sees) and say plainly that the sentinel rows are dropped at the API, or
+   keep it and make it real (the rows need a non-null column, or an exemption
+   from =_finalize_result='s =dropna(how='all')=).  Either way =CONTENTS.org='s
+   "rows (both seasons) 25,485 -> 25,485 (unchanged)" must be corrected: the
+   delivered 2009-10 table goes 25,485 -> *22,408* rows and 2,330 -> *2,323*
+   households, and 7 named households leave =crop_production= entirely.
+   If the mechanism is kept, add one assertion at the
+   =ll.Country('Uganda').crop_production()= layer -- the current tests all sit at
+   the wave layer, which is why this shipped green.
+2. *Item 6.*  Say that the re-warm is *all 28 Uganda tables*, not
+   =crop_production=.  (#861 does ask for "A Uganda re-warm"; the commit and
+   =CONTENTS.org= do not size it.)
+3. *Item 5.*  Record the one sentinel row that is a fully-populated harvest
+   record (=u='Plastic Basin (15 lts)'=, =condition='dried_grain'=), so the
+   "all 3,097 are blank Unknown rows" reading is not carried forward.
+
+Worth one line in =CONTENTS.org= too: 20 index tuples read =Quantity= *0.0*
+rather than NaN after the strip, because a sentinel row shared a de-dup group
+with a real row reporting 0.  That is the pre-existing =sum(min_count=1)=
+semantics, not an imputation -- but those 20 rows are non-null, so unlike the
+other 3,077 they *do* reach the API.

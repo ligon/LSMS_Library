@@ -132,7 +132,7 @@ it does not.  One dated note at the top of GAP 5.
 
 * Phase 1 -- additive code, low risk
 
-** TODO =median_price_valuation(weight_col=None)=                    :code:L5:
+** DONE =median_price_valuation(weight_col=None)=                    :code:L5:
 :PROPERTIES:
 :Effort: 2:00
 :END:
@@ -142,7 +142,7 @@ convergence note (WB, EPAR Ag, EPAR consumption, ours: finest cell with
 unconditional national rung).  Tests: weighted == unweighted under equal
 weights; a hand case.  Model: Opus in a worktree; Sonnet red-team.
 
-** TODO =rcsi(food_coping)= transform                                :code:L8:
+** DONE =rcsi(food_coping)= transform                                :code:L8:
 :PROPERTIES:
 :Effort: 1:30
 :END:
@@ -158,7 +158,7 @@ Same shape as =harvest_kg='s factor screen: count, name the rows, never
 clip.  Query-time diagnostic in =transformations.py= or a null-read-style
 warning; decide which after reading =null_read_audit.py=.  Model: Opus.
 
-** TODO Uganda 2009-10 =99999= sentinel                             :code:N12:
+** DONE Uganda 2009-10 =99999= sentinel                             :code:N12:
 :PROPERTIES:
 :Effort: 1:00
 :END:
