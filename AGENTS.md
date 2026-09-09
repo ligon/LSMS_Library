@@ -61,6 +61,7 @@ The returned DataFrame prepends a `country` index level.
      | invocation (cwd = worktree) | `PYTHONPATH` | imports |
      |---|---|---|
      | `python -c "import lsms_library"` | unset | worktree ✓ (cwd is `sys.path[0]`) |
+     | `python -c "import lsms_library"` **from the main checkout's cwd** | `=<worktree>` | **main checkout ✗** — `sys.path[0]` is `''` (cwd) and beats `PYTHONPATH`; `cd` into the worktree first (red-team, 2026-09-09) |
      | `python bench/scan.py` | unset | **main checkout ✗ — the trap** |
      | `python bench/scan.py` | `=<worktree>` | worktree ✓ |
 

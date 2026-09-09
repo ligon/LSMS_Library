@@ -110,14 +110,14 @@ returns anything*.  That is Uganda D5, and it is unfiled.
 The four verdict levels are not interchangeable and the reports do not all
 reach the same one:
 
-| country  | verdict on source 3 | evidence level |
-|----------+---------------------+----------------|
-| Ethiopia | *not-asked*         | C4 -- ESS §5A Q5 asks own-production QUANTITY and UNIT only; Q4 is the sole monetary field and is attached to Q3, purchases.  §11 Q10a / §12 Q10a likewise (Ethiopia §1) |
-| Tanzania | *not-asked*         | C4 -- NPS Section J qq.2-6 quoted verbatim; q5 asks the quantity from own production and never its value (Tanzania §1) |
-| Mali     | *not-asked*         | C4 -- the answer boxes under (13.04)/(13.05) are QUANTITE + UNITE with no MONTANT, and =EACIALI= has no =s13q04c=/=s13q05c= column (Mali §1) |
+| country  | verdict on source 3 | evidence level                                                                                                                                                                                        |
+|----------+---------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Ethiopia | *not-asked*         | C4 -- ESS §5A Q5 asks own-production QUANTITY and UNIT only; Q4 is the sole monetary field and is attached to Q3, purchases.  §11 Q10a / §12 Q10a likewise (Ethiopia §1)                              |
+| Tanzania | *not-asked*         | C4 -- NPS Section J qq.2-6 quoted verbatim; q5 asks the quantity from own production and never its value (Tanzania §1)                                                                                |
+| Mali     | *not-asked*         | C4 -- the answer boxes under (13.04)/(13.05) are QUANTITE + UNITE with no MONTANT, and =EACIALI= has no =s13q04c=/=s13q05c= column (Mali §1)                                                          |
 | Nigeria  | *asked, unwired*    | A3 q18 "If you had sold all [CROP] harvested since the last visit, what would be the total value?", populated on *75.7% / 76.2%* of plot-crop rows in W1/W2 -- and carried by no table (Nigeria N-07) |
-| Malawi   | absent              | the =Price= column does not exist; the instrument was *not* quoted.  Do NOT record a closing =not-asked= for Malawi on this evidence |
-| Niger    | absent              | same -- Niger D3 explicitly asks that someone "check whether the instruments ask ... a value that is not wired" |
+| Malawi   | absent              | the =Price= column does not exist; the instrument was *not* quoted.  Do NOT record a closing =not-asked= for Malawi on this evidence                                                                  |
+| Niger    | absent              | same -- Niger D3 explicitly asks that someone "check whether the instruments ask ... a value that is not wired"                                                                                       |
 
 Uganda's and GhanaLSS's source 3 both exist and both are seller-side by
 wording -- Uganda "the amount of money that he/she would normally sell the
