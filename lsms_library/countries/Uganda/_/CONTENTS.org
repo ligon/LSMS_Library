@@ -1122,6 +1122,56 @@ spread on 5B is wide (Sack (100 kgs): 688 rows at 100, 122 at 80, 117 at 120,
 =2018= appears as a factor (a year leaking into the field), a =Kg= row at
 260 000, and zeros.
 
+*What the screened 6d outliers are (measured 2026-09-09, against the
+hypothesis that they are total harvests in kg written into the factor box).*
+=harvest_kg_factors= rejects 79 of the 14 149 reported 2018-19 factors as
+implausible (> 250 kg/unit; 57 in 5A, 22 in 5B).  Of the 79: 12 have
+=KgFactor == Quantity= (the kg total written in both boxes; 11 of 12 plausible
+as a total); 20 have =KgFactor / Quantity= within 5% of a modal container
+weight {10, 12, 15, 20, 50, 90, 100, 120} — but non-screened rows hit that test
+15.2% of the time by chance, so only ~8 of the 20 are excess; 13 are calendar
+years; 34 fit nothing, and they include the largest values (Sorghum 147 000 on
+qty 147, Sim Sim 260 000 on a Kg row of qty 67 — neither a factor nor a
+plausible total).  Read as totals, the defensible rows (=== Quantity= or
+container ratio, and at or below the crop's p95 plot harvest in other waves)
+are *19 rows, 9 440 kg = 0.16%* of the wave's kg; the loosest reading (every
+screened row at or below p95) is 38 rows, 17 680 kg = 0.30%.
+
+*The mechanism is confined to the tail.*  The same confusion would be
+invisible below the screen (a 120 kg total on qty 2 looks like a 120 kg/unit
+factor), so it was sized where the unit is known: on 5B rows with a
+weight-bearing label and qty > 1 (4 532), 6d is within 10% of the label weight
+on 70.0%; among the other 30.0%, the share with =6d / qty= within 0.5–1.5x the
+label weight is 15.4% — *exactly the shuffled-Quantity control* (15.4%, sd
+0.7%).  Those "neither" rows are a different plausible per-unit weight (median
+0.83, p10–p90 0.4–1.4 of nominal — the sack as weighed, not as labelled), not
+totals.  On 5A (unit unknown, qty > 1, sub-threshold; 6 151 rows) 75.1% of
+factors are themselves a modal container weight; among the rest, =6d / qty= is
+a modal weight 18.7% vs 15.9% under shuffling — an excess of ~42 rows, 0.68% of
+5A.  So 6d is a per-unit factor for the body of both sections, and the
+total-in-the-factor-box reading explains roughly 20–40 of the 79 screened rows
+and almost nothing else.
+
+*Decision: no =reported_total= layer in core.*  A rule that reads an outlier
+as a total needs a container weight to check against, and 5A has no unit; the
+generic container test fires at 15% by chance; the kilograms at stake are
+0.16–0.30% of the wave.  The screened rows keep their raw =KgFactor= on
+=crop_production= (verified: all 57 5A =none= rows still carry 6d), so an
+analyst who wants the total reading can apply it.  The one narrow rule that
+needs no heuristic — =KgFactor == Quantity and > KG_FACTOR_MAX=, read as
+=kg = Quantity= (12 rows, 6 720 kg) — is *not* adopted either; it is recorded
+here in case the count grows when the other six waves' factors are wired
+(#849).
+
+*The 5.90M kg for 2018-19 against 0.6–0.94M in every other wave is coverage,
+not scale*: 99.4% of 2018-19 rows resolve to kg (the reported factor is on
+every row) versus 15.7–29.8% elsewhere, where kg exists only where the unit
+label or the price-ratio inference supplies a factor.  Per row on Kg-unit
+rows the wave is in line with the others (157 vs 156–309 kg/row); the
+as-product reading of 5A sits at 1.5x the other waves' Kg-row crop medians
+with 72% of rows within 0.2–5x, versus 0.375x / 64% under an as-total
+reading.  Wiring the other waves' 6d (#849) is what closes the coverage gap.
+
 *** The 5B second slot IS a condition slot, not a season slot — the old note was wrong
 
 =CROP_COLMAPS= reads slot 1 only.  The Known-Issues note used to say 2018-19
