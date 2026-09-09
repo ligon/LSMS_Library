@@ -1237,9 +1237,137 @@ Data on expenditures is somewhat unusual, in two different ways.
 
 First, for waves before 2016--17, the survey instrument elicits the amount spent in purchasing different items, but does /not/ elicit quantities purchased.  (A separate price survey was conducted, and could presumably be used to obtain quantities.)  A separate module elicits quantities of home produced food consumed, as well as the hypothetical price at which home produced goods could be sold.
 
-Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits (about a dozen in all) are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  In =food_acquired= we sum over these visits (but it might be interesting to examine patterns at the visit level).
+Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  The number of visits, their spacing and the recall length each differ by wave -- seven visits five days apart in GLSS4, GLSS6 and GLSS7, eleven in GLSS5 -- so they are tabulated per wave below rather than summarised here.  In =food_acquired= we keep the =visit= level and sum over it in the derived tables (patterns at the visit level are worth examining, and are now sliceable across =s=; see below).
 
 NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for expenditures "since my last visit", but only for one visit, while subsequent rounds elicit this information across several visits.
+
+*** The repeated-visit design, wave by wave (2026-09-09)
+
+The paragraph above said "about a dozen" visits.  That is right for GLSS3 and
+GLSS5 and wrong for GLSS4, GLSS6 and GLSS7, which field *seven*.  The count,
+the spacing and the recall length all move across waves, so they are set out
+here per wave rather than described once.
+
+Every wave from 1998--99 on carries the mapping in its own Stata variable
+labels, so none of this is inferred:
+
+| wave             | visits | 9B (purchases)   | 8H (own produce) | consumption occasions |
+|------------------+--------+------------------+------------------+-----------------------|
+| 1987-88, 1988-89 | 1      | single recall    | single recall    | 1                     |
+| 1991-92 (GLSS3)  | ?      | q2..q10          | q3..q12          | 9 / 10, *unverified*  |
+| 1998-99 (GLSS4)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+| 2005-06 (GLSS5)  | 11     | q1..q10 -> 2..11 | q4..q12 -> 3..11 | 10 / 9                |
+| 2012-13 (GLSS6)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+| 2016-17 (GLSS7)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+
+*The source question number is not the visit number*, and the two modules
+number from different origins.  Section 8H opens with two screeners --
+=s8hq1= "HH consume any home produce", =s8hq2= "No. of months eat home
+produce" -- so its per-visit columns start at q3.  Section 9B has no screener
+and starts at q1.  Both are asked at the same visits.  Read straight off the
+labels: GLSS4's =s9bq1= is "2nd visit amount spent" and its =s8hq3= is "2nd
+visit units consumed"; GLSS7's =s8hq3q= is "Quantity of own produced food
+consumed at 2nd visit" and =s8hq8p= is "Selling price for one unit now-7th
+visit".
+
+Until 2026-09-09 all five multi-visit wave scripts wrote *the question
+number* into =visit=.  A purchase and the own-production consumed at the same
+visit therefore sat two apart, =visit= was not sliceable across =s=, and the
+extreme values (1, 2 purchased-only; 7, 8 produced-only) read as structural
+missingness rather than as a labelling offset.  The scripts now emit the
+CALENDAR VISIT, which is what the labels state.  Note there is deliberately
+no row at =visit= 1: the first visit collects the roster and trains the
+diary keeper, not consumption.
+
+GLSS5 is why =visit= is the calendar number and not a per-module 1..N
+ordinal.  There, purchases run from the 2nd visit but own production only
+from the 3rd (=s8hq3= is "number of units consumed", a total, not a visit), so
+counting from 1 within each module would leave the two misaligned by one.
+
+**** A first-ask effect, now that the levels line up
+
+Delivered row counts per =(visit, s)=, measured 2026-09-09 on a rebuild of
+each wave.  The FIRST ask carries markedly more rows than the ones after it;
+thereafter counts are flat or drift gently down:
+
+| wave    | s         | first ask    | later visits       |
+|---------+-----------+--------------+--------------------|
+| 1998-99 | purchased | 84,253 (v2)  | 73,701 -> 70,124   |
+| 1998-99 | produced  | 20,098 (v2)  | 17,212 -> 14,733   |
+| 2005-06 | purchased | 125,368 (v2) | 98,996 -> 86,462   |
+| 2005-06 | produced  | 18,166 (v3)  | 17,765 -> 15,590   |
+| 2012-13 | purchased | 292,364 (v2) | 246,777 -> 234,035 |
+| 2012-13 | produced  | 39,498 (v2)  | 33,680 -> 30,171   |
+| 2016-17 | purchased | 169,086 (v2) | ~160,000, flat     |
+| 2016-17 | produced  | 39,899 (v2)  | 23,871 -> 21,376   |
+
+Deliberately not adjudicated here.  It is consistent with a longer implicit
+recall at the first ask (the "last visit" it refers back to is the intake
+visit, which need not be five days earlier), with telescoping, or with item
+mentions attriting as the household tires of the module -- and these have
+different implications for whether visit 2 should be weighted like the rest.
+Worth noting that GLSS5, whose own-production module starts at the 3rd visit
+rather than the 2nd, shows the weakest first-ask step (1.02x, against 1.67x
+for GLSS7 produced), which is the kind of contrast that could separate those
+explanations.
+
+**** GLSS7's recall period: six five-day recalls, diary-supported
+
+From the GLSS7 Main Report, "Survey Period and Team Composition" /
+"Interviewer Workload" (=2016-17/Documentation/GLSS7 Main Report.pdf=):
+
+#+begin_quote
+An interviewer visited each household in the EA assigned to him/her every
+sixth day i.e. after every five days.  In other words, the interviewer
+visited each of the 15 selected household seven (7) times in order to
+complete the cycle. ...  A cycle in both rural and urban areas lasted 35
+days. ...  A diary of daily consumption and expenditure was used to support
+the interviews.  During the first visit, a literate person already identified
+in each household was trained to record all subsequent expenditures made by
+the household and submit the diary to the interviewer on his next visit for
+entry into the appropriate sections.  Where a household had no literate
+member, the interviewer made daily visits to the household and recorded all
+expenditures in the diary meant for the household.
+#+end_quote
+
+So GLSS7 food acquisition is *six five-day recalls* -- 30 days of coverage
+inside a 35-day cycle -- and the elicitation is diary-assisted, not pure
+recall.  The diary is not a separate dataset: the Report has its contents entered
+"into the appropriate sections", i.e. into 9B/8H, and no separate diary file
+ships in =2016-17/Data/=.
+
+The consequence for =food_expenditures= is worth stating because nothing in
+the schema records it: summing =visit= away yields a *30-day* figure for
+GLSS7, a different window for GLSS5, and a single "since my last visit" for
+the 1980s waves.  There is no recall-period metadata slot for a wave-constant
+window (the canonical =RecallWindow= column, GH #817, is per-row and is used
+only by Togo's =nonfood_expenditures=), so the window is not recoverable from
+the API.  Tracked separately; deliberately not addressed here.
+
+**** =GLSS7 Final Manual.docx= is stale where it describes the visit schedule
+
+Use the Main Report, not the Manual, for the field protocol.  The Manual is
+the ex-ante training document and its schedule was carried over from GLSS5
+without being updated.  It contradicts the Report, the data, and itself:
+
+- 3.7 says "the total interviewing workload will be spread over *eleven*
+  visits to a particular household", and its Table 2 "Days of Visit"
+  schedules eleven visit-days three days apart (batch 1: days 1, 4, 7, ...,
+  31) over a "33-day cycle".
+- 3.6 "Date of Next Visit", in the same document, says the next visit "should
+  be exactly *five (5) days* apart for all households", which Table 2 does not
+  implement.
+- The Manual's own section-by-visit table runs to the *7th* visit only (1st:
+  sections 1, 2, 5, 6A, 7; 2nd: 3, 8H, 9A, 9B; 3rd: 4, 6B, 8H, 9B; 4th: 8A-G,
+  8H, 9B; 5th: 9C, 10, 8H, 9B; 6th: 11, 8H, 9B; 7th: 12, 13, 8H, 9B) -- seven,
+  not eleven, and consistent with the CAPI passage that has sections 1--7
+  submitted at the end of the third visit.
+- The data agree with the Report: GLSS7's visit-bearing columns stop at the
+  7th visit in both modules.
+
+The eleven-visit schedule is *GLSS5's*, and the data say so: GLSS5's =s9bq10=
+is labelled "amount spent by eleventh visit".  So the Manual describes the
+previous round's fieldwork.
 
 *** RETIRED: the country-level =_/food_acquired.py= concatenator (2026-09-07, GH #808)
 
