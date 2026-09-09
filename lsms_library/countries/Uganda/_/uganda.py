@@ -1310,6 +1310,19 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
             if not qcol:
                 continue
             qty = pd.to_numeric(_require(df5, qcol, ws, 'quantity'), errors='coerce')
+            # SURVEY-REPORTED missing-value sentinel on the harvest quantity
+            # (UNPS q6a).  2009-10's a5aq6a/a5bq6a use `99999` for "no
+            # information reported" -- an EXACT-VALUE strip, never a range
+            # (99998 / 100000 are real quantities and must survive).  EPAR's
+            # own pipeline (EPAR_UW_Uganda_UNPS_W1.do:558,
+            # `replace quantity_harv=. if quantity_harv==99999`) applies the
+            # same unconditional rule to the coalesced A/B column; GH #861.
+            # Declared per-condition via `qty_sentinel` in CROP_COLMAPS so it
+            # stays wave-scoped -- only 2009-10 sets it (measured: no other
+            # wave's Quantity carries this value as a sentinel).
+            qty_sentinel = cond.get('qty_sentinel')
+            if qty_sentinel is not None:
+                qty = qty.where(qty != qty_sentinel, np.nan)
 
             # reported native unit
             if cond.get('unit'):
@@ -1389,7 +1402,16 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     # rows / land-status placeholders with nothing reported).
     df = df[df['j'].notna()]
     # Keep rows even when Quantity is NaN but a sale was reported; drop
-    # only when ALL reported measures are missing.
+    # only when ALL reported measures are missing.  A 2009-10 qty_sentinel
+    # row that carries no Quantity_sold / Value_sold either (3,077 of
+    # 3,097, measured -- GH #861 red-team) is therefore dropped HERE, by
+    # the same filter and for the same reason as this wave's other 907
+    # genuinely-blank rows: the survey recorded no measure of any kind.
+    # (An earlier version of this fix tracked a pre-mask `_qty_reported`
+    # flag to keep those rows with Quantity NaN.  Dropped: the framework's
+    # `Country._finalize_result` dropna(how='all') deletes them anyway on
+    # every read, so the flag was inert at the delivered table and only
+    # produced a misleading "rows unchanged" claim in CONTENTS.org.)
     measure_cols = ['Quantity', 'Quantity_sold', 'Value_sold']
     df = df[df[measure_cols].notna().any(axis=1)]
 
@@ -1519,14 +1541,19 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
 # CONTENTS.org "Known Issues".
 CROP_COLMAPS = {
     '2009-10': {
+        # `qty_sentinel: 99999` -- GH #861.  a5aq6a/a5bq6a use 99999 as a
+        # missing-value sentinel for "no information reported on this
+        # harvest row" (measured: 1400 rows season A, 1697 season B, none
+        # of them in Quantity_sold, Value_sold or KgFactor).  Exact-value
+        # strip only; see crop_production_for_wave's qty_sentinel handling.
         'A': {'hhid': 'HHID', 'parcel': 'a5aq1', 'plot': 'a5aq3', 'crop': 'a5aq5',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
-                              'month': None}]},
+                              'month': None, 'qty_sentinel': 99999}]},
         'B': {'hhid': 'HHID', 'parcel': 'a5bq1', 'plot': 'a5bq3', 'crop': 'a5bq5',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
-                              'month': None}]},
+                              'month': None, 'qty_sentinel': 99999}]},
         # 2009-10 AGSEC4A uses a non-standard column layout (a4aq1/a4aq2/
         # a4aq4, no parcel/plot/cropID in the form the join needs), so the
         # intercrop flag is not cleanly joinable -> intercropped is NaN
