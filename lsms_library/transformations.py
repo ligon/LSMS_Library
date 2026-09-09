@@ -1712,8 +1712,7 @@ def _valid_factor(values):
     reported factor, nor toward a group's median, nor toward the ``N`` that
     licenses that median.
     """
-    arr = pd.to_numeric(pd.Series(values), errors='coerce').to_numpy(
-        dtype='float64', na_value=np.nan)
+    arr = _as_float(pd.Series(values))
     return np.where(np.isfinite(arr) & (arr > 0), arr, np.nan)
 
 

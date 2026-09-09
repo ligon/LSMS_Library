@@ -195,4 +195,49 @@ Cited, not paraphrased.
 ---
 ### Phase 3 — verification (fill at task end)
 
-- (pending)
+Anchored on this ledger only; anything not tied to an entry is out of scope.
+
+- `Columns.crop_production.KgFactor` (`data_info.yml`) — **OK (anchored on
+  §2/§3)**. Copies the `RecallWindow` `optional: true` + `note:` shape; the
+  note says "reported, never constructed", which is what keeps the five
+  configs quoted in §3 ("REPORTED values only") true.
+- `harvest_kg_factors` — **OK (anchored on §5)**. Layer (c) is
+  `_kg_factor_series` called verbatim, so the shared factors are not forked;
+  layers (a)/(b) are new for the reason §2's last block gives (food's exact
+  values come from conversion TABLES, which have no gaps to take a median
+  of). Not a reinvention of `conversion_to_kgs` — that infers from PRICE
+  RATIOS across units, never from reported factors.
+- `_survey_median_factors` — **OK (anchored on §4)**. `dropna=False` per the
+  §4 invariant; `count` counts USABLE reports because `_valid_factor` runs
+  first; the fine→coarse fallback is `(u, condition)` → `u`, both inside the
+  country-wave.
+- `_valid_factor` — **was REINVENTION, now OK (§2)**. First cut inlined
+  `pd.to_numeric(...).to_numpy(dtype='float64', na_value=np.nan)`, which is
+  exactly `_as_float` (`transformations.py:111`, listed in §2 as *reuse*).
+  Corrected to call `_as_float`; the finite/`> 0` filter on top is the new
+  part.
+- `_disagreement` — **OK (§5)**. Denominator is rows where BOTH layers have a
+  usable factor; the gap is relative to the *reported* factor, because the
+  question is how wrong the library is where the survey answered.
+- `_level_or_column` — **OK (§4)**. Index-level-or-column access, the same
+  ambiguity `_with_u_in_index` already handles for `u`; kept separate because
+  that function *promotes* and this one only *reads*.
+- `harvest_kg` — **OK (anchored on §4)**. Returned frame still carries only
+  `Harvest_kg` (test pins it, protecting `yield_kg:1820`); tallies re-stashed
+  after the groupby per the §2 `food_prices` idiom. The no-`KgFactor` path is
+  bit-identical, proved twice: structurally against the old algorithm in
+  `tests/test_crop_kg_factor.py`, and on Uganda's warm build — 23 766 rows,
+  sum 4 963 468.795000811, `hash_pandas_object` digest `dfec6823…` before and
+  after.
+- **No cache hash moved** (§3, "data_info.yml is read-path"):
+  `Country(c)._table_cache_hash('crop_production', c.waves)` byte-identical
+  for Uganda / Ethiopia / Malawi between the main checkout at 28f9243f and
+  this worktree. Records in
+  `/global/scratch/fsa/fc_jevons/ligon/tmp/kgfactor_scratch/`.
+- **Nothing in the stop-list was touched.** `git diff --name-only` against
+  28f9243f: `.coder/ledger/crop-production-kgfactor.md`,
+  `lsms_library/data_info.yml`, `lsms_library/transformations.py`,
+  `tests/test_crop_kg_factor.py`. No country config or script, no
+  `country.py` / `feature.py` / `local_tools.py` / `build_transforms.py`, no
+  change to `food_acquired`'s `Quantity_kg` convention, no test weakened,
+  no `pyproject.toml`.
