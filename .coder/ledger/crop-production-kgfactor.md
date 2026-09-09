@@ -177,16 +177,32 @@ Cited, not paraphrased.
      Uganda, but it is an assumption no code checks);
    - `Quantity_kg` handling (`866-872`) is a no-op for crops — the column is
      absent — so that branch needs no change.
-2. **Layer (b) over the `u='Unknown'` sentinel.** Implemented as specified
-   (no sentinel exclusion), but flagged: `Unknown` is not a unit, it is the
-   absence of one, and a median over it mixes 80 kg sacks with 5 kg baskets.
-   It is inert until a country wires `KgFactor`; on Uganda 2018-19 season A —
-   the motivating cell — the reported factor is 100% populated, so every row
-   there is served by layer (a) and (b) never fires. Whether layer (b) should
-   refuse the sentinel (and any other `u` a country declares as "no label")
-   is a design question for the wiring branch, not something to decide
-   silently here. `harvest_kg_factors` makes it auditable: group its output
-   by `u` and look.
+2. **RESOLVED — layer (b) now REFUSES the missing-unit sentinel.** `Unknown`
+   is not a unit, it is the absence of one, so a median over such rows mixes
+   80 kg sacks with 5 kg baskets and filling other such rows with it would
+   fabricate weights. Excluded from BOTH the median pool and the fill
+   targets, and from the disagreement audit; a unit-less row gets kilograms
+   from its own reported `KgFactor` (layer a) or from nothing.
+
+   **The sentinel constant is declared in `transformations.py`, and two
+   premises behind that instruction did not hold on this tree — reported, not
+   worked around** (CLAUDE.md: a finding that contradicts documentation is a
+   result to quote). Checked at 28f9243f:
+   - `data_info.yml` *does* carry an `Unknown` sentinel, but it belongs to
+     the EDUCATION vocabulary (`Columns.household_roster.Education`,
+     lines 296/321) — there is **no** machine-readable declaration of the `u`
+     sentinel anywhere.
+   - There is **no `niger.py:U_NA`**; `rg U_NA --include='*.py'` is empty
+     across the repo. Niger's missing-unit sentinel is the literal string
+     `Manquant` (`niger.py:602`, `_COMMUNITY_MISSING_UNITS` at `:1183`) and
+     has **not** been relabelled onto `Unknown`.
+
+   So `U_UNKNOWN = 'Unknown'` plus `_U_SENTINELS = {'unknown', 'manquant'}`
+   live in `transformations.py`. `Manquant` is included deliberately rather
+   than assumed away: leaving it out would leave a known hole in the guard
+   for Niger the moment that country wires `KgFactor`. Both should be deleted
+   in favour of a single canonical declaration when GH #847 lands — that is
+   the unification this entry is asking for.
 3. **`SURVEY_MEDIAN_MIN_REPORTS = 5` is DECLARED, not measured.** The
    `Quantity_kg` antecedent needed no such threshold — a conversion table has
    no gaps, so there was never a median to license. N is this design's new

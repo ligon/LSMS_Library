@@ -1665,6 +1665,49 @@ def _kg_factor_series(df, *, volume_as_mass=True):
     return out
 
 
+#: The canonical ``u`` value meaning "NO UNIT WAS RECORDED".  Uganda mints it
+#: wherever a wave ships no harvest-unit label (``uganda.py:1386``, ``:1859``;
+#: ``Uganda/_/data_scheme.yml`` documents it for ``crop_production.u``).
+#:
+#: It is NOT a unit, and the ``survey_median`` layer must never treat it as
+#: one: a median of reported factors taken across "no unit recorded" rows is a
+#: number about nothing, and using it to fill OTHER such rows fabricates
+#: weights -- the exact opposite of what the sentinel is for.
+#:
+#: DECLARED HERE BECAUSE NOTHING DECLARES IT MACHINE-READABLY.  Checked at
+#: 28f9243f: ``data_info.yml`` has an ``Unknown`` sentinel, but it belongs to
+#: the EDUCATION vocabulary (``Columns.household_roster.Education``), not to
+#: ``u``; and there is no ``niger.py:U_NA`` in the tree (``rg U_NA`` is
+#: empty).  Niger's missing-unit sentinel is the literal string ``Manquant``
+#: (``niger.py:602``, ``_COMMUNITY_MISSING_UNITS`` at ``:1183``) and has NOT
+#: been relabelled onto ``Unknown``, so it is listed below rather than
+#: assumed away.  When GH #847 lands a single canonical declaration, delete
+#: both of these and read it from there.
+U_UNKNOWN = 'Unknown'
+
+#: Every live spelling of "no unit recorded", lower-cased.  A NaN ``u`` counts
+#: too, and is handled separately in :func:`_unit_sentinel_mask`.
+_U_SENTINELS = frozenset({U_UNKNOWN.lower(), 'manquant'})
+
+
+def _unit_sentinel_mask(df):
+    """Boolean mask: rows whose ``u`` records NO unit at all.
+
+    True for a NaN ``u`` and for any spelling in :data:`_U_SENTINELS`.  These
+    rows are excluded from the ``survey_median`` layer on both sides -- they
+    neither contribute to a median nor receive one -- and from the
+    disagreement audit, where a reported factor on such a row has nothing to
+    be compared against.
+    """
+    u = _level_or_column(df, 'u')
+    if u is None:
+        return np.zeros(len(df), dtype=bool)
+    col = pd.Series(u)
+    missing = col.isna().to_numpy()
+    text = col.astype(str).str.strip().str.lower().to_numpy()
+    return missing | np.isin(text, sorted(_U_SENTINELS))
+
+
 #: Minimum number of REPORTED ``KgFactor`` values a group must carry before
 #: :func:`harvest_kg` will use their MEDIAN to fill that group's unreported
 #: rows (layer *survey_median*).  Five is a starting value, not a measured
@@ -1716,7 +1759,7 @@ def _valid_factor(values):
     return np.where(np.isfinite(arr) & (arr > 0), arr, np.nan)
 
 
-def _survey_median_factors(df, reported, *, min_reports):
+def _survey_median_factors(df, reported, *, min_reports, sentinel=None):
     """Median of REPORTED factors for a row's own ``(u, condition)`` group.
 
     The survey's own weights filling the survey's own gaps.  For each row,
@@ -1738,7 +1781,16 @@ def _survey_median_factors(df, reported, *, min_reports):
     * The median of a group INCLUDES a reporting row itself.  That is
       deliberate: it is also the reference the disagreement audit compares
       that row's own report against.
+    * Rows flagged by *sentinel* (see :func:`_unit_sentinel_mask`) are
+      excluded from BOTH SIDES: their reports do not enter any median, and
+      they receive none.  ``u='Unknown'`` is the absence of a unit, not a
+      unit, so a "group" of such rows pools containers of unrelated sizes.
+      Such a row therefore gets kilograms from its OWN reported ``KgFactor``
+      or from nothing at all.
     """
+    if sentinel is None:
+        sentinel = np.zeros(len(df), dtype=bool)
+    reported = np.where(sentinel, np.nan, reported)
     keys = {}
     for name in ('country', 't', 'u', 'condition'):
         col = _level_or_column(df, name)
@@ -1762,7 +1814,7 @@ def _survey_median_factors(df, reported, *, min_reports):
         n = g.transform('count').astype('float64').to_numpy()
         cand = np.where(n >= min_reports, med, np.nan)
         out = np.where(np.isnan(out), cand, out)
-    return _valid_factor(out)
+    return _valid_factor(np.where(sentinel, np.nan, out))
 
 
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
@@ -1870,6 +1922,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     else:
         reported = np.full(len(df), np.nan)
 
+    sentinel = _unit_sentinel_mask(df)
     if np.isnan(reported).all():
         # Nothing reported -> nothing to take a median of.  Skipping the
         # groupby is not just an optimisation: it keeps the no-KgFactor path
@@ -1877,7 +1930,8 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         survey_median = np.full(len(df), np.nan)
     else:
         survey_median = _survey_median_factors(df, reported,
-                                               min_reports=min_reports)
+                                               min_reports=min_reports,
+                                               sentinel=sentinel)
 
     rep_ok = ~np.isnan(reported)
     med_ok = ~np.isnan(survey_median)
@@ -1899,9 +1953,13 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
 
     counts = {layer: int((source == layer).sum()) for layer in KG_FACTOR_LAYERS}
     out.attrs['kg_factor_sources'] = counts
+    # A row with no unit recorded is excluded from the audit as well: there
+    # is nothing for its reported factor to be compared against, since no
+    # per-unit factor -- inferred or median -- can exist for a non-unit.
+    audited = np.where(sentinel, np.nan, reported)
     out.attrs['kg_factor_disagreement'] = {
-        'reported_vs_survey_median': _disagreement(reported, survey_median),
-        'reported_vs_inferred': _disagreement(reported, inferred_arr),
+        'reported_vs_survey_median': _disagreement(audited, survey_median),
+        'reported_vs_inferred': _disagreement(audited, inferred_arr),
         'tolerance': KG_FACTOR_DISAGREEMENT_TOLERANCE,
     }
     return out
@@ -2015,14 +2073,14 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     all, so its 7 153 rows sit at ``u='Unknown'`` and no unit table can ever
     convert them.
 
-    One caveat on the ``survey_median`` layer, stated because it is not
-    visible from its output: it groups on ``u``, and ``'Unknown'`` is a
-    LABEL like any other.  Where a country uses such a sentinel, that
-    "group" pools containers of genuinely different sizes and its median is
-    not a weight.  The layer still earns its place -- it is the only thing
-    that carries a reported factor across to a sibling row that lacks one --
-    but audit it per unit with :func:`harvest_kg_factors` before trusting a
-    sentinel group, rather than reading the row count as coverage.
+    The ``survey_median`` layer REFUSES the missing-unit sentinel, on both
+    sides.  ``u='Unknown'`` (:data:`U_UNKNOWN`) is the absence of a unit, not
+    a unit, so a "group" of such rows pools containers of unrelated sizes: a
+    median over them is a number about nothing, and filling other such rows
+    with it would fabricate weights.  A row with no unit recorded therefore
+    gets kilograms from its OWN reported ``KgFactor`` or from nothing at all
+    -- which is why wiring ``KgFactor`` is the only thing that can ever
+    convert Uganda's 2018-19 season-A rows.
     """
     df = crop_production.copy()
     if 'Quantity' not in df.columns:

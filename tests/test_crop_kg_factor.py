@@ -30,6 +30,7 @@ from lsms_library.transformations import (
     KG_FACTOR_DISAGREEMENT_TOLERANCE,
     KG_FACTOR_LAYERS,
     SURVEY_MEDIAN_MIN_REPORTS,
+    U_UNKNOWN,
     _kg_factor_series,
     harvest_kg,
     harvest_kg_factors,
@@ -221,6 +222,70 @@ def test_survey_median_ignores_unusable_reports():
                  1.0, np.nan))
     f = harvest_kg_factors(_frame(rows))
     assert f["KgFactorSource"].iloc[-1] == "none"
+
+
+# ---------------------------------------------------------------------------
+# The missing-unit sentinel is NOT a unit
+# ---------------------------------------------------------------------------
+
+def test_survey_median_refuses_the_missing_unit_sentinel():
+    """``u='Unknown'`` means no unit was recorded, so there is no group.
+
+    Reported rows still convert through layer (a) -- that is the whole point
+    of ``KgFactor`` for Uganda's 2018-19 season A, which ships the factor and
+    no unit code at all -- but their factors must not pool into a median, and
+    the unreported rows must not receive one.  Otherwise the sentinel would
+    manufacture weights out of containers of unrelated sizes.
+    """
+    reported = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", U_UNKNOWN, "dried",
+                 "A", 2.0, 100.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
+    gaps = [("2019-20", f"g{k}", f"g{k}-1-1", "Maize", U_UNKNOWN, "dried",
+             "A", 2.0, np.nan) for k in range(2)]
+    f = harvest_kg_factors(_frame(reported + gaps))
+
+    n = SURVEY_MEDIAN_MIN_REPORTS
+    assert list(f["KgFactorSource"]) == ["reported"] * n + ["none"] * 2
+    # No survey_median value is computed for the sentinel AT ALL -- not on
+    # the rows that reported, and not on the rows that did not.
+    assert f["kg_survey_median"].isna().all()
+    assert f.attrs["kg_factor_sources"]["survey_median"] == 0
+    # ... and layer (a) still converts the rows that reported.
+    assert (f["kg_per_unit"].iloc[:n] == 100.0).all()
+    assert f["kg_per_unit"].iloc[n:].isna().all()
+
+
+def test_sentinel_rows_do_not_feed_a_real_unit_group():
+    """A sentinel row's report must not leak into another unit's median."""
+    rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", U_UNKNOWN, "dried",
+             "A", 1.0, 100.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
+    rows.append(("2019-20", "g0", "g0-1-1", "Maize", "sack", "dried", "A",
+                 1.0, np.nan))
+    f = harvest_kg_factors(_frame(rows))
+    assert f["KgFactorSource"].iloc[-1] == "none"
+
+
+def test_nan_unit_is_treated_as_the_sentinel():
+    rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", np.nan, "dried", "A",
+             1.0, 100.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
+    rows.append(("2019-20", "g0", "g0-1-1", "Maize", np.nan, "dried", "A",
+                 1.0, np.nan))
+    f = harvest_kg_factors(_frame(rows))
+    assert f["kg_survey_median"].isna().all()
+    assert f["KgFactorSource"].iloc[-1] == "none"
+
+
+def test_sentinel_rows_are_excluded_from_the_disagreement_audit():
+    """A reported factor on a unit-less row has nothing to disagree with."""
+    rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", U_UNKNOWN, "dried",
+             "A", 1.0, 100.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
+    # one genuine unit, whose report is 100% off the inferred 1.0
+    rows.append(("2019-20", "g0", "g0-1-1", "Maize", KNOWN_UNIT, "dried", "A",
+                 1.0, 2.0))
+    d = harvest_kg_factors(_frame(rows)).attrs["kg_factor_disagreement"]
+    assert d["reported_vs_survey_median"] == {"both": 0, "disagree": 0,
+                                              "share": None}
+    # only the real unit is in the denominator
+    assert d["reported_vs_inferred"] == {"both": 1, "disagree": 1, "share": 1.0}
 
 
 # ---------------------------------------------------------------------------
