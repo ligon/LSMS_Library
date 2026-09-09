@@ -1058,7 +1058,7 @@ references to the file: it is held, not wired.  There is no 2021-22
 sidecar because the World Bank did not ship the file for W5; EPAR's
 do-file says so outright (=EPAR_UW_Ethiopia_ESS_W5.do:324=): "Note that
 this file does not exist in the WB W5 download. EPAR borrowed the land
-unit conversion factor file from previous ESS waves." GH #TBD
+unit conversion factor file from previous ESS waves." GH #853
 (2026-09-09 EPAR survey) to wire it into =plot_features.Area=.
 
 ** W1 missing soil; wave-keyed Tenure
@@ -1392,15 +1392,22 @@ sale source is the fix; it is a feature addition, not a config tweak.
 for =crop_production=, and that is presently true, but not because the
 factors are unavailable.  =Crop_CF_Wave2.dta=, =Crop_CF_Wave3.dta= and
 =Crop_CF_Wave4.dta= (2013-14/2015-16/2018-19) and =crop_cf_wave5.dta=
-(2021-22) all have DVC sidecars and are unread by any script here.
+(2021-22) all have DVC sidecars and are unread by any script here.  GH #852 is the wiring issue.
 
 Wave 5's file has a known duplicate row that a loader must handle
 deliberately: crop 74, unit 62, with two factors, 4.34 and 6.125.
-EPAR's do-file resolves it by keeping 4.34 and dropping 6.125
-(=EPAR_UW_Ethiopia_ESS_W5.do:349=): "W5 raw data file Crop_CF_Wave5.dta
-has duplicate observations for crop_code=74, unit_cd=62. Based on W3
-data, we have chosen to retain cf=4.34 (and drop cf=6.125) for
-continuity."
+EPAR's do-file resolves it by keeping 4.34 and dropping 6.125.  The
+block that documents the choice (=EPAR_UW_Ethiopia_ESS_W5.do:345-353=,
+"W5 raw data file Crop_CF_Wave5.dta has duplicate observations for
+crop_code=74, unit_cd=62. Based on W3 data, we have chosen to retain
+cf=4.34 (and drop cf=6.125) for continuity.") is commented out and its
+output is read nowhere; the drop that actually runs is at =:800-802=,
+after a reshape by region: =drop if crop_code==74 & unit==62 &
+conversion>5 //8 observations deleted=.  Note also that our
+=Crop_CF_Wave4.dta.dvc= (2018-19) and =crop_cf_wave5.dta.dvc= (2021-22)
+carry the same md5 (=299c2700...=): one blob under two names, which is
+consistent with EPAR's remark that the WB shipped no new factor file
+for W5.
 
 Also relevant to any future §12 wiring (see previous section) and to GH
 #820: ESS4 and ESS5 folded the §12 tree/fruit/root module into §11.

@@ -33,7 +33,7 @@ corpus re-warm and a regrade after that item, not before.
 
 * Phase 0 -- documentation and issue hygiene (today)
 
-** TODO Correct the two Ethiopia =CONTENTS.org= statements     :docs:L1:N1:N3:
+** DONE Correct the two Ethiopia =CONTENTS.org= statements     :docs:L1:N1:N3:
 :PROPERTIES:
 :Effort: 0:30
 :END:
@@ -45,7 +45,7 @@ corpus re-warm and a regrade after that item, not before.
   =Food_CF_Wave1-4=; =food_cf_wave5= is held and unused.  Say so once.
 - Model: Sonnet, or do it by hand.  Verify: =git diff=; no build.
 
-** TODO Correct =Malawi/_/CONTENTS.org:653-660= source list           :docs:L1:N4:
+** DONE Correct =Malawi/_/CONTENTS.org:653-660= source list           :docs:L1:N4:
 :PROPERTIES:
 :Effort: 0:15
 :END:
@@ -53,7 +53,7 @@ Add =ihs_seasonalcropconversion_factor_2020.dta= and
 =ihs_treeconversion_factor_2020.dta= to the DVC source inventory, marked
 unwired.
 
-** TODO Weight-raking note in five =CONTENTS.org= files              :docs:S4:
+** DONE Weight-raking note in five =CONTENTS.org= files              :docs:S4:
 :PROPERTIES:
 :Effort: 0:30
 :END:
@@ -61,33 +61,41 @@ One line under each country's weights section (Ethiopia, Malawi,
 Nigeria, Tanzania, Uganda): EPAR's published levels are population-raked
 and not comparable to ours at the level, only as ratios.  Model: Sonnet.
 
-** TODO File the new issues                                         :issues:
+** DONE File the new issues                                         :issues:
 :PROPERTIES:
 :Effort: 1:30
+:END:
+:LOGBOOK:
+- State "DONE" from "TODO" [2026-09-09] \\
+  Filed as #852 Ethiopia Crop_CF, #853 Ethiopia area units, #854 Malawi IHS5
+  crop CFs, #855 Malawi ag_r07, #856 Malawi free-text, #857 Tanzania Quantity
+  screen, #858 Tanzania plot_inputs join, #859 Nigeria KgFactor, #860 Nigeria
+  area factors, #861 Uganda 99999, #862 plot_cultivation schema, #863
+  transforms umbrella.  Drafts, review changelog and FILED.tsv in issues/.
 :END:
 One issue each, body drawn from =LEARNINGS.org= section 3 with the
 red-team's line citations.  Model: Sonnet drafts, I review before =gh
 issue create=.
-- [ ] Ethiopia: wire =Crop_CF_Wave{2..5}= into =harvest_kg= (L1, N2); note
+- [X] Ethiopia: wire =Crop_CF_Wave{2..5}= into =harvest_kg= (L1, N2); note
   the duplicate row in Wave 5 (=W5.do:349=).
-- [ ] Ethiopia: wire =ET_local_area_unit_conversion= for plot areas (L1, N1).
-- [ ] Malawi: wire the two IHS5 crop-side conversion files (L1, N4);
+- [X] Ethiopia: wire =ET_local_area_unit_conversion= for plot areas (L1, N1).
+- [X] Malawi: wire the two IHS5 crop-side conversion files (L1, N4);
   =_harvest_block='s dead =condition= parameter (N5) as a sub-bullet.
-- [ ] Malawi: =_livestock_block= never reads =ag_r07= in 2010-11/2013-14 (N6).
-- [ ] Malawi: harvest-side free-text unit/crop recovery, row-count cost
+- [X] Malawi: =_livestock_block= never reads =ag_r07= in 2010-11/2013-14 (N6).
+- [X] Malawi: harvest-side free-text unit/crop recovery, row-count cost
   to be measured first (N7).
-- [ ] Tanzania: report-only plausibility count on
+- [X] Tanzania: report-only plausibility count on
   =crop_production.Quantity= (L10, N9); cite the 7.5M kg rows.
-- [ ] Tanzania: check our =plot_inputs= join against EPAR's 80/10,607
+- [X] Tanzania: check our =plot_inputs= join against EPAR's 80/10,607
   unmatched (N10).
-- [ ] Nigeria: per-row crop conversion factor as =KgFactor= (L11, N11;
+- [X] Nigeria: per-row crop conversion factor as =KgFactor= (L11, N11;
   sibling of #849).
-- [ ] Nigeria: zone-specific heaps/ridges/stands area factors (L11).
-- [ ] Uganda: strip the 2009-10 =A5aq6a == 99999= sentinel (N12;
+- [X] Nigeria: zone-specific heaps/ridges/stands area factors (L11).
+- [X] Uganda: strip the 2009-10 =A5aq6a == 99999= sentinel (N12;
   promote the =CONTENTS.org:2098-2102= TODO to an issue).
-- [ ] Cross-country: =dm_gender= / =plot_cultivation= schema proposal
+- [X] Cross-country: =dm_gender= / =plot_cultivation= schema proposal
   under #167 and #439 (L4) -- see Phase 3 for the body.
-- [ ] Transforms: =livestock_income=, =rcsi=, HDDS/FCS, fertiliser rate,
+- [X] Transforms: =livestock_income=, =rcsi=, HDDS/FCS, fertiliser rate,
   gross crop revenue, Shannon diversity (L8) -- one umbrella issue.
 
 ** TODO Comment on existing issues with what the survey adds         :issues:
@@ -110,7 +118,7 @@ issue create=.
 - [ ] #438: the consumption-by-source repo covers the EHCVM tier and
   ships a crop-category crosswalk to screen against #833.
 
-** TODO Refresh =GAP_RANKING.org= GAP 5                             :docs:
+** DONE Refresh =GAP_RANKING.org= GAP 5                             :docs:
 :PROPERTIES:
 :Effort: 0:10
 :END:
