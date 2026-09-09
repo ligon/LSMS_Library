@@ -147,6 +147,15 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.null_read_audit.check_declared_columns",
     "lsms_library.null_read_audit.audit_read",
     "lsms_library.null_read_audit.audit_declared_columns",
+    # The quantity plausibility audit (quantity_audit, GH #857): the same
+    # argument, one column further in.  It measures a built table against its
+    # own distribution and warns; it returns its input unchanged, so no byte of
+    # any parquet depends on it.  Reached only from the already-excluded
+    # `_finalize_result`, so measurement showed no hash moves either way -- the
+    # entries are here so that a FUTURE call site (a wave script, `grab_data`)
+    # cannot silently cold-rebuild the corpus by re-wording a warning.
+    "lsms_library.quantity_audit.check_quantities",
+    "lsms_library.quantity_audit.audit_quantities",
     # GH #803: pure reporting of an in-tree parquet artefact.  Never reads the
     # file, never changes what a build writes; reached from grab_data and
     # run_make_target, so without this exclusion re-wording the warning would
@@ -189,7 +198,8 @@ _EXCLUDED_CALLABLES = frozenset({
 # Keyed on the BARE name: the walk resolves a name relative to the
 # referencing function's module, so ``from .country import _GRAIN_LEDGER`` in
 # some other tagged module would otherwise fold it under that module's prefix.
-_EXCLUDED_CONSTANTS = frozenset({"_GRAIN_LEDGER", "_NULL_READ_LEDGER"})
+_EXCLUDED_CONSTANTS = frozenset(
+    {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER"})
 
 
 def _is_build_callable(obj) -> bool:

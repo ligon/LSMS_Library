@@ -347,6 +347,19 @@ Site R's invalidation is unavoidable for *any* edit to `get_dataframe`: `df_data
 
 > **Known granularity mismatch, not fixed here.** Niger's `CONTENTS.org` records that 2014-15's missing coordinates are *correct* ("genuinely ships no geovariables/offsets file of any kind … honestly absent — not mis-addressed"). The guard still reports it, and should — the point is visibility, not adjudication. But `optional:` is **country**-grain while the absence is **wave**-grain, so there is no way to record that judgement today. Do **not** reach for `optional: true` to silence one wave. This is what gates turning `LSMS_READ_STRICT=1` on in CI.
 
+## Site Q: Present, Non-Null and Impossible (`quantity_audit.py`, GH #857)
+
+Every guard above stops one question short. The shape guards ask whether a declared column is **present**; `_audit_index_collapse` asks whether the index is **unique**; Sites R and B ask whether it holds **anything at all**. None asks whether what it holds is **possible** — Tanzania's `crop_production` 2020-21 reports one household harvesting 7,500,000 kg of coconuts from a single plot, and Benin 2018-19 reports 12,500,000 kg of cotton, both present, non-null, correctly typed, uniquely indexed and graded `sane`. **Site Q** (in `Country._finalize_result`, beside Site B) reports a value more than 100× the 90th percentile of its comparison cell — the finest of `(t,u,j)` → `(t,u)` → `(t)` holding ≥ 30 rows, with the reference floored at **one native unit** because a p90 below one unit describes a junk unit label rather than a scale. It **counts and NAMES** — household, plot, crop, unit, wave, value, reference, ratio — and **never clips, drops or NaNs**: `check_quantities` returns its input frame unchanged, by contract, exactly as `_screen_reported_factors` does for the reported `KgFactor`. **Deliberately no allowlist**, same reasoning as `_grain_strict`. The derivation of every number below — why p90 and not p99, why `K=100` is a *stated tolerance* rather than a discovered boundary (the ratio distribution has no gap), and what the screen cannot see (a *repeated* sentinel saturates its own cell and becomes its own p90) — is in `lsms_library/quantity_audit.py`'s docstring and `.coder/ledger/857-crop-quantity-screen.md`; the re-runnable sweep is `slurm_logs/gh857_quantity_screen/`.
+
+| | measured |
+|---|---|
+| rule | `Quantity > 100 × max(p90(cell), 1.0)`, cell ≥ 30 rows, ladder `(t,u,j)`→`(t,u)`→`(t)`, never pooling across `t` |
+| corpus firing | **151 of 626,687 rows (0.024%)** across all 15 warm `crop_production` countries; only the country being read warns |
+| cost | 83 ms of a 2,157 ms Uganda warm read (4%), 9 ms of 643 ms on Tanzania — measured by a spy inside the read, not by differencing |
+| lever | `LSMS_QUANTITY_STRICT=1` → `QuantityImplausibleError`. **Its own lever, not `LSMS_READ_STRICT`**: a destroyed row, an empty column and an impossible value are three concerns and ratchet separately |
+| accessor | `quantity_reports(country=, table=)`, twin of `null_read_reports()`; each report carries every offender, not just the dozen the warning prints |
+| scope | `crop_production.Quantity` only (`_SCREENED_COLUMNS` is the extension point); 30,876 rows corpus-wide get no reference at all and are never judged |
+
 ## Coverage Matrix (v0.9.0+)
 
 `make matrix` grades every `(country, feature, wave)` cell on a tier ladder — `absent` / `dropped` / `broken` / `builds` / `sane` / `blessed` — and commits a snapshot to `.coder/coverage/latest.csv`. `ll.coverage()` reads it back. See `docs/guide/coverage.md`.
