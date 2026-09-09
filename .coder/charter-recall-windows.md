@@ -1,9 +1,9 @@
 # Workshop Charter — Phase I: surface what aggregation needs; defer which aggregation
 
 > Phase-1 artifact of the `workshop-problem` skill. §2 is the oracle phases 2–6
-> loop against. **Rewritten 2026-09-09** after four adversarial reviews largely
-> refuted the first draft; the superseded design is `SkunkWorks/recall_windows.org`
-> and the reviews' findings are recorded in §6.
+> loop against. **SIGNED OFF 2026-09-09 by @ligon; Phase I closed.**  Rewritten 2026-09-09 after four adversarial reviews
+> largely refuted the first draft, which was then dropped (its premises and their
+> refutations are recorded in §0; the reviews' findings in §6).
 
 ## Context (why)
 
@@ -81,38 +81,70 @@ visible as gaps. Decide nothing about how to aggregate.
 
 ## §2 Definition of done — the loop oracle
 
-- [ ] **2.1** All 67 cells resolve to a record with an explicit rung, including
+- [x] **2.1** All 67 cells resolve to a record with an explicit rung, including
       `not-recorded`. *Decided by:* a test enumerating the table against the
       `sane` `food_acquired` cells of `.coder/coverage/latest.csv`.
-- [ ] **2.2** `df.attrs['recall']` is present and correctly keyed for a
+- [x] **2.2** `df.attrs['recall']` is present and correctly keyed for a
       `Country(...)` call and survives a `Feature(...)` assembly. *Decided by:*
       tests on both paths, including the `attrs`-disagreement case that #603
       pinned.
-- [ ] **2.3** The record distinguishes **measured** from **declared** ask counts
+- [x] **2.3** The record distinguishes **measured** from **declared** ask counts
       in a field, not a comment. GhanaLSS 1991-92 / 1998-99 read theirs from
       data; every other cell is declared. *Decided by:* a test asserting the
       field's vocabulary and that no cell is silently one or the other.
-- [ ] **2.4** `n_items` is computed from the delivered `j` level per
+- [x] **2.4** `n_items` is computed from the delivered `j` level per
       `(country, wave)` and carried in the record, labelled as *delivered
       distinct items* — not instrument list length. *Decided by:* a test that it
       matches `groupby('t').j.nunique()` on a built table.
-- [ ] **2.5** The nine within-wave-variation cells report their axis rather than
-      a number. *Decided by:* a test asserting numeric fields are null wherever
+- [x] **2.5** The within-wave-variation cells report their axis rather than a
+      number.  Five of them, not the nine first counted: Guatemala and Panama
+      were reclassified once the promoter refused a cell carrying both an axis
+      and a value — their instruments mix periods but their builds resolve it,
+      so the DELIVERED window is single-valued. *Decided by:* a test asserting numeric fields are null wherever
       `within_wave_variation` is set.
-- [ ] **2.6** **No returned number changes** for any country except Burkina Faso
+- [x] **2.6** **No returned number changes** for any country except Burkina Faso
       2014, whose change is the point (see 2.7). *Decided by:* before/after
       comparison across the built food tables.
-- [ ] **2.7** Burkina Faso 2014's four 7-day passages are no longer summed into
+- [x] **2.7** Burkina Faso 2014's four 7-day passages are no longer summed into
       one unmarked figure; `visit` is on the index and the ask count is
       observable. *Decided by:* a test that the wave's `food_acquired` carries
       `visit ∈ {1..4}` and that per-passage sums are recoverable.
-- [ ] **2.8** GhanaLSS's `visit` level is a single dtype across all seven waves,
+- [x] **2.8** GhanaLSS's `visit` level is a single dtype across all seven waves,
       with no collision between "intake" and "the single recall". *Decided by:* a
       test on the delivered level's dtype and value set.
-- [ ] **2.9** No cache hash moves for any `(country, table)` not otherwise
+- [x] **2.9** No cache hash moves for any `(country, table)` not otherwise
       touched. *Decided by:* the `_table_cache_hash` probe used for
       `population.yml`.
-- [ ] **2.10** Reviewed and accepted by **@ligon**.  ← judgement call
+- [x] **2.10** Reviewed and accepted by **@ligon** — signed off 2026-09-09.
+
+## Phase I closed
+
+All ten criteria met.  Verified rather than asserted, in the cases where that
+mattered: no cache hash moved (8/8 probes byte-identical for the record layer,
+27/30 for the Burkina Faso fix with only its own three moving); the GhanaLSS
+`visit` normalisation conserved the table bit-for-bit (5,317,365 rows, index
+identical, three measure deltas exactly 0.0); the record attaches on a real
+325,920-row build with the population record undisturbed.
+
+Two findings during implementation were larger than the criteria that surfaced
+them, and both are recorded where a future reader will meet them rather than
+only here:
+
+- **Burkina Faso 2014's rows were being DELETED, not summed** — 460,438 of them,
+  82.5% of the wave, on a NaN `u` key.  Delivered expenditure went 80,286,096 ->
+  342,110,515 CFA.  This is the cell `CLAUDE.md` §3b already named as the
+  corpus's worst such loss; both the red-team and Sue diagnosed a summation
+  instead, because `_ADDITIVE_MEASURE_COLUMNS` made that story plausible.  The
+  documentation was right and the diagnosis was wrong.
+- **The mixed-type `visit` level was a cold-build-only symptom.**  A warm read
+  came back uniformly string, because pyarrow launders a mixed object level on
+  the parquet write — so the same call returned differently typed data depending
+  on cache warmth, and a sweep of 193 warm parquets found zero mixed levels.
+  GH #323's signature: the bug hiding behind the cache it poisons.
+
+Phase II remains unstarted and gated on the ask-order bias (§6).  Follow-up
+filed as GH #864 (`food_prices` misattributes Burkina Faso's now-visible
+unpriceable share).
 
 ## §3 Constraints & assumptions
 
@@ -130,7 +162,6 @@ visible as gaps. Decide nothing about how to aggregate.
 
 - **Evidence base:** `.coder/coverage/food_recall.csv` + `.org` (committed
   `889967056`)
-- **Superseded design:** `SkunkWorks/recall_windows.org`
 - **Prior-art ledger:** `.coder/ledger/ghanalss-visit-offset.md`
 - **Issue:** GH #851
 - **Literature:** `GhanaLSS/_/CONTENTS.org` §"The literature" — Scott and
