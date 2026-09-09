@@ -586,11 +586,44 @@ no harvest measured); they are filled too, because 2018-19 was already
 serving 379 of exactly that kind and the table's contents should not
 depend on which wave's index happens to be unique.
 
+** The fill does NOT trade a deletion for a =.first()= destruction
+
+The obvious worry about filling a NaN index key is that the rows stop
+being deleted and start COLLIDING, so =groupby().first()= destroys
+them instead -- the same loss with a different name.  *Measured, that
+does not happen here.*  Running each wave script with the fill
+neutralised and auditing the identical collapse
+(=country._audit_index_collapse=) gives, before and after:
+
+| wave    | dropped | destroyed | conflicting groups | nan_key_rows before | after |
+|---------+---------+-----------+--------------------+---------------------+-------|
+| 2011-12 |      30 |        19 |                 19 |               3,150 |     0 |
+| 2014-15 |      46 |        45 |                 45 |               1,079 |     0 |
+| 2018-19 |       0 |         0 |                  0 |                 443 |     0 |
+| 2021-22 |   1,010 |       897 |                740 |                 991 |     0 |
+
+=dropped= / =destroyed= / =conflicting groups= are BYTE-IDENTICAL
+before and after; only =nan_key_rows= moves, 5,663 -> 0.  A
+(plot, crop) never had two no-unit lines, so the sentinel introduces no
+new collision.  The 897 destroyed rows in 2021-22 are a PRE-EXISTING
+grain defect on that wave's =(t, i, plot, crop, u)= key, unrelated to
+#842 and still open under =LSMS_GRAIN_STRICT=1= (see the grain-conflicts
+section above).
+
+Where the other 777 filled rows go: of the 5,697 sentinel rows in the
+wave parquets, 4,920 are served.  The difference is =_finalize_result='s
+=dropna(how='all')= removing rows that carry NO measurement at all --
+729 of them in 2014-15, where a plot-crop line with no quantity also has
+no =harvest_month= and no =intercropped=.  That is correct: an entirely
+empty row is not a harvest record.
+
 ** =community_prices= is the one table that still DROPS instead of filling
 
 Measured on the raw CS07 grids: 795 price-bearing observations in
 2011-12 (218 in passage 1, 577 in passage 2) and 0 in 2014-15 carry a
-usable price with no unit value at all.  =community_prices.Price= is
+usable price with no unit value at all -- and *0 of the 795 carry a
+usable =Quantity= either*, so there is no weight to fall back on.
+=community_prices.Price= is
 defined as the price for =Quantity= units of =u=, so such a row has no
 basis to be a price OF anything -- unlike a crop line, where the
 reported harvest Quantity is still a fact worth serving with an
@@ -598,6 +631,11 @@ reported harvest Quantity is still a fact worth serving with an
 them, and the drop is now COUNTED in the code comment rather than
 being invisible.  Revisiting it is a data decision about what a
 community price is, not a sentinel decision.
+
+The asymmetry with =crop_production= is therefore not arbitrary: a
+crop line keeps a REPORTED harvest quantity that stays meaningful with
+an unknown unit, while these 795 rows have neither a unit nor a
+weight.
 
 One conflation is recorded here because it is real and lives only in
 this table: in the CS07 unit list the missing-unit marker and the

@@ -114,4 +114,51 @@ the corpus-canonical spelling.
   ledger's scope is Niger only.
 
 ---
-### Phase 3 — verification (fill at task end)
+### Phase 3 — verification
+
+Anchored on the ledger entries above; anything not tied to one is out of scope
+and is named as such.
+
+- `niger.U_NA = 'Unknown'` — **OK (§5, §3)**: reuses the sentinel `data_info.yml`
+  already defines and `uganda.py:1386` already writes onto this level. Not a new
+  vocabulary.
+- `niger.fill_missing_u` — **OK (§2, §5)**: extends `_finish_plot_inputs`'s
+  existing fill into one helper for four call sites; no reducer, no row added or
+  removed by the helper itself (pinned by
+  `TestRelabelMechanism::test_fill_helper_fills_column_and_index_alike`).
+- `_finish_crop_production` fill — **OK (§4)**: runs after the no-crop drop, so
+  it never resurrects a row the script itself dropped.
+- `_finish_plot_inputs` fill — **OK (§2)**: same rows, new spelling (75, byte-for-byte
+  the same row count before and after).
+- `_COMMUNITY_MISSING_UNITS = {U_NA}` — **OK (§4)**: the invariant "keys on the
+  Preferred Label, so it must move with the label" was written down before the
+  edit and was honoured; pinned by `test_no_manquant_preferred_label_survives`.
+- `Niger/_/categorical_mapping.org` `Manquant -> Unknown` — **OK (§4, §5)**: the
+  chosen mechanism, and §4's two disqualifications are now *executable* tests
+  (`test_spellings_route_would_close_an_open_vocabulary`,
+  `test_global_u_org_cannot_override_a_country_row`) rather than prose, so a
+  future reader does not have to re-derive them.
+- `data_info.yml` comment — **OK (§5)**: docs-only; the parsed YAML is proved
+  identical to the pre-change file, and 9 of 9 non-Niger cache hashes are
+  unchanged.
+- EHCVM `mapping.py` wrappers — **OK (§2)**: `transformations.py` was NOT edited
+  (out of scope); the fill is applied in the wave hook, after the canonical
+  reshape has already dropped every measurement-free row.
+- **Not a REINVENTION**: no existing helper filled a `u` index level generically;
+  `uganda.py` does it inline for its own table, and copying that inline form into
+  four Niger call sites is the drift §5 chose against.
+
+**One ledger claim was WRONG and is corrected here.** §1 restated the defect as
+"441 + 12 rows". Measured, `crop_production` carries **5,663** NaN-`u` rows in
+its wave parquets; 441 is only the fraction that survived, because 2018-19's
+index is unique so no collapse ran, while the other three waves' collapses
+deleted theirs. The visible count was decided by an accident of index
+uniqueness. §6's first open question is unchanged and was answered
+empirically: 0 of the 795 dropped CS07 observations carry a usable `Quantity`,
+so the two meanings do not in fact collide on any live row today.
+
+**The §6 worry that did NOT materialise**, measured rather than assumed: filling
+a NaN key could have traded a silent deletion for a silent `.first()`
+destruction. `_audit_index_collapse` gives byte-identical `dropped` /
+`destroyed` / `conflicting_groups` before and after on all four waves; only
+`nan_key_rows` moves (5,663 -> 0).
