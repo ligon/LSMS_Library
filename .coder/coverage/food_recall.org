@@ -24,6 +24,7 @@ is the journal.
 | =recall_days=           | the length of ONE ask.  Blank unless determinate                 |
 | =n_visits=              | how many times the food module is ASKED (see below)              |
 | =total_exposure_days=   | =recall_days x n_visits=, only where both are known               |
+| =n_items_delivered=     | distinct =j= delivered in that wave -- the LIST-LENGTH axis       |
 | =basis=                 | the evidence rung (see below)                                    |
 | =evidence=              | =path:line=, or a Documentation path + page                      |
 | =within_wave_variation= | the axis the window varies on inside one wave, if any            |
@@ -60,6 +61,39 @@ days apart" is an analogy to GLSS7 rather than a sourced quote.
 =questionnaire= to =variable-label= (its verbatim is a Stata label, not an
 instrument quote); Panama 1997/2003/2008 from =questionnaire= to
 =config-comment= (evidence is a wave-script structural comment).
+
+* =n_items_delivered= -- the axis that may matter more than recall
+
+Computed, not recorded: =groupby('t').j.nunique()= on the delivered table.  54
+of 67 cells; the other 13 (Benin, Cambodia, CotedIvoire, EthiopiaRHS,
+Guinea-Bissau, Panama, Togo) need a cold build.
+
+Beegle et al. (2012) find that *item-list length costs ~21% of reported food
+consumption against recall length's ~7%* -- collapsing 58 items into 11
+categories moved the number three times as far as going from a 7-day to a
+14-day recall.  The corpus's list lengths move at least that much, and they move
+*within* a country across its own panel:
+
+| country      | delivered distinct items, by wave                     |
+|--------------+-------------------------------------------------------|
+| Ethiopia     | 25, 26, 55, 73, 74                                    |
+| GhanaLSS     | 58, 58, 117, 112, 114, 114, *179*                     |
+| Burkina Faso | 55, 130, 152                                          |
+| Uganda       | 61, 63, 70, 71, 77, 77, *117*, 116                    |
+| Nigeria      | 90, 90, 96, 104, 116, 116, 110, 110                   |
+
+Ethiopia's list roughly triples across its own five ESS waves.  On Beegle's
+evidence that alone could move measured food consumption by more than any recall
+difference in this table -- *and it would read as growth*.  Every one of those
+cells grades =sane=.
+
+*Two caveats before anyone leans on the number.*  (1) =j= is the HARMONISED
+Preferred Label, so the count reflects this library's =harmonize_food=
+vocabulary as much as the instrument; Ethiopia's 26 -> 55 in one step could be
+the ESS adding items or us harmonising later waves more finely, and separating
+those is real work nobody has done.  (2) It is *delivered* distinct items -- the
+union over households of what was actually reported -- which approximates the
+printed list from below, never above.
 
 * The rules that make it worth trusting
 

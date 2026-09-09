@@ -1,68 +1,68 @@
-country,wave,recall_verbatim,recall_days,n_visits,total_exposure_days,basis,evidence,within_wave_variation,notes
-Benin,2018-19,,,,,not-recorded,,,
-Burkina_Faso,2014,consommation des 7 derniers jours (per passage),7,4,28,config-comment,lsms_library/build_transforms.py:557; lsms_library/countries/Burkina_Faso/_/CONTENTS.org:35,,non-food module ran in only 3 of 4 passages (21d)
-Burkina_Faso,2018-19,,,,,not-recorded,,,
-Burkina_Faso,2021-22,seven days before the survey and thirty days before the survey,,1,,config-comment,lsms_library/countries/Burkina_Faso/2021-22/_/food_acquired.py:10,two-periods,Quantity and Expenditure may sit on different windows; unconfirmed
-Cambodia,2019-20,,,,,not-recorded,,,
-CotedIvoire,2018-19,,,,,not-recorded,,,
-Ethiopia,2011-12,Over the past one week (7 days),7,1,7,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
-Ethiopia,2013-14,Over the past one week (7 days),7,1,7,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
-Ethiopia,2015-16,Over the past one week (7 days),7,1,7,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
-Ethiopia,2018-19,Over the past one week (7 days),7,1,7,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
-Ethiopia,2021-22,Over the past one week (7 days),7,1,7,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
-EthiopiaRHS,1989,,,,,not-recorded,,,
-EthiopiaRHS,1994a,,,,,not-recorded,,,
-EthiopiaRHS,1994b,,,,,not-recorded,,,
-EthiopiaRHS,1995,,,,,not-recorded,,,
-EthiopiaRHS,1997,,,,,not-recorded,,,
-GhanaLSS,1987-88,since my last visit,,1,,config-comment,"lsms_library/countries/GhanaLSS/1987-88/_/food_acquired.py:21,33; _/CONTENTS.org:1242",,"one visit only, so the window has no determinate length"
-GhanaLSS,1988-89,amount spent since last visit,,1,,variable-label,"lsms_library/countries/GhanaLSS/1988-89/_/food_acquired.py:26,91 (CFOODBLV label)",,"one visit only, so the window has no determinate length"
-GhanaLSS,1991-92,8 interviewer visits at 2-day intervals to each rural household and 11 interviewer visits at 3-day intervals to each urban household,,7 rural / 10 urban,,questionnaire,lsms_library/countries/GhanaLSS/_/CONTENTS.org:1294-1307 (1991-92/Documentation/pdf/G3Intman.pdf s1.9),stratum,rural 2d x 7 = 14d; urban 3d x 10 = 30d; urban diary-assisted
-GhanaLSS,1998-99,seven visits five days apart,5,6,30,config-comment,"lsms_library/countries/GhanaLSS/_/CONTENTS.org:1240,1260",,"spacing asserted in CONTENTS, not cited to GLSS4 own manual"
-GhanaLSS,2005-06,,,10 purchased / 9 produced,,not-recorded,lsms_library/countries/GhanaLSS/_/CONTENTS.org:1261 (ask counts only),by-s,spacing UNESTABLISHED (design O3); 11 interviewer visits
-GhanaLSS,2012-13,seven visits five days apart,5,6,30,config-comment,"lsms_library/countries/GhanaLSS/_/CONTENTS.org:1240,1262",,"spacing asserted in CONTENTS, not cited to GLSS6 own manual"
-GhanaLSS,2016-17,every sixth day i.e. after every five days ... seven (7) times,5,6,30,questionnaire,lsms_library/countries/GhanaLSS/_/CONTENTS.org:1479-1492 (2016-17/Documentation/GLSS7 Main Report.pdf),,"diary-assisted; 35-day cycle, 30 days of coverage"
-GhanaSPS,2009-10,,,,,not-recorded,,,"README.org ""since last visit"" refers to GLSS, not GhanaSPS"
-GhanaSPS,2013-14,,,,,not-recorded,,,"README.org ""since last visit"" refers to GLSS, not GhanaSPS"
-GhanaSPS,2017-18,,,,,not-recorded,,,"README.org ""since last visit"" refers to GLSS, not GhanaSPS"
-Guatemala,2000,gasto ult 15 dias / cantidad compro: LAST 15 DAYS (actual),15,1,15,variable-label,"lsms_library/countries/Guatemala/_/CONTENTS.org:573,577,595; 2000/_/food_acquired.py:18",by-column,"instrument also has usual-month and months-per-year vars, deliberately unused; rung corrected: verbatim is a Stata variable label, not an instrument quote"
-Guinea-Bissau,2018-19,,,,,not-recorded,,,
-Malawi,2004-05,,,,,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
-Malawi,2010-11,,,,,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
-Malawi,2013-14,,,,,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
-Malawi,2016-17,,,,,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
-Malawi,2019-20,,,,,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
-Mali,2014-15,A consomme le produit au cours des 7 derniers jours,7,1,7,variable-label,lsms_library/countries/Mali/2014-15/_/mapping.py:9 (s13q02 label),,
-Mali,2018-19,,,,,not-recorded,,,
-Mali,2021-22,,,,,not-recorded,,,
-Niger,2018-19,,,,,not-recorded,,,
-Niger,2021-22,,,,,not-recorded,,,
-Nigeria,2010Q3,total 7-day consumption of each item,7,1,7,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
-Nigeria,2011Q1,total 7-day consumption of each item,7,1,7,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
-Nigeria,2012Q3,total 7-day consumption of each item,7,1,7,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
-Nigeria,2013Q1,total 7-day consumption of each item,7,1,7,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
-Nigeria,2015Q3,total 7-day consumption of each item,7,1,7,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
-Nigeria,2016Q1,total 7-day consumption of each item,7,1,7,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
-Nigeria,2018Q3,7-day consumption (produced/inkind); MOST RECENT purchase within 30 days (purchase block),,1,,config-comment,lsms_library/countries/Nigeria/_/data_scheme.yml:65-70,by-s,Quantity summed across s is not a 7-day total for W4
-Nigeria,2019Q1,7-day consumption (produced/inkind); MOST RECENT purchase within 30 days (purchase block),,1,,config-comment,lsms_library/countries/Nigeria/_/data_scheme.yml:65-70,by-s,Quantity summed across s is not a 7-day total for W4
-Panama,1997,last 15 days,15,1,15,config-comment,lsms_library/countries/Panama/1997/_/food_acquired.py:12,by-column,"overlapping MONTHLY variable deliberately dropped to avoid double-count; rung corrected: evidence is a wave-script comment, not an instrument quote"
-Panama,2003,last 15 days,15,1,15,config-comment,lsms_library/countries/Panama/2003/_/food_acquired.py:12,by-column,"overlapping MONTHLY variable deliberately dropped to avoid double-count; rung corrected: evidence is a wave-script comment, not an instrument quote"
-Panama,2008,last 15 days,15,1,15,config-comment,lsms_library/countries/Panama/2008/_/food_acquired.py:12,by-column,"overlapping MONTHLY variable deliberately dropped to avoid double-count; rung corrected: evidence is a wave-script comment, not an instrument quote"
-Senegal,2018-19,,,,,not-recorded,,,
-Senegal,2021-22,,,,,not-recorded,,,
-Serbia,2007,LSMS 7-day food-consumption diary (days 1-7 summed),7,1,7,config-comment,"lsms_library/countries/Serbia/2007/_/food_acquired.py:4,32; Serbia/_/data_scheme.yml:38",,"DIARY, not recall: elicitation mode differs from every other cell here"
-Tanzania,2008-09,consumed at home during the last week,7,1,7,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
-Tanzania,2010-11,consumed at home during the last week,7,1,7,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
-Tanzania,2012-13,consumed at home during the last week,7,1,7,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
-Tanzania,2014-15,consumed at home during the last week,7,1,7,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
-Tanzania,2019-20,consumed at home during the last week,7,1,7,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
-Tanzania,2020-21,consumed at home during the last week,7,1,7,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
-Togo,2018,total quantity of [XX] consumed in the past 7 days,7,1,7,questionnaire,lsms_library/countries/Togo/2018/_/food_expenditures.py:15,,
-Uganda,2005-06,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
-Uganda,2009-10,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
-Uganda,2010-11,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
-Uganda,2011-12,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
-Uganda,2013-14,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
-Uganda,2015-16,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
-Uganda,2018-19,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
-Uganda,2019-20,,,,,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+country,wave,recall_verbatim,recall_days,n_visits,total_exposure_days,n_items_delivered,basis,evidence,within_wave_variation,notes
+Benin,2018-19,,,,,,not-recorded,,,
+Burkina_Faso,2014,consommation des 7 derniers jours (per passage),7,4,28,55,config-comment,lsms_library/build_transforms.py:557; lsms_library/countries/Burkina_Faso/_/CONTENTS.org:35,,non-food module ran in only 3 of 4 passages (21d)
+Burkina_Faso,2018-19,,,,,130,not-recorded,,,
+Burkina_Faso,2021-22,seven days before the survey and thirty days before the survey,,1,,152,config-comment,lsms_library/countries/Burkina_Faso/2021-22/_/food_acquired.py:10,two-periods,Quantity and Expenditure may sit on different windows; unconfirmed
+Cambodia,2019-20,,,,,,not-recorded,,,
+CotedIvoire,2018-19,,,,,,not-recorded,,,
+Ethiopia,2011-12,Over the past one week (7 days),7,1,7,25,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
+Ethiopia,2013-14,Over the past one week (7 days),7,1,7,26,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
+Ethiopia,2015-16,Over the past one week (7 days),7,1,7,55,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
+Ethiopia,2018-19,Over the past one week (7 days),7,1,7,73,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
+Ethiopia,2021-22,Over the past one week (7 days),7,1,7,74,questionnaire,"lsms_library/countries/Ethiopia/_/CONTENTS.org:1314,1318",,ESS SECTION 5A: FOOD LAST 7 DAYS
+EthiopiaRHS,1989,,,,,,not-recorded,,,
+EthiopiaRHS,1994a,,,,,,not-recorded,,,
+EthiopiaRHS,1994b,,,,,,not-recorded,,,
+EthiopiaRHS,1995,,,,,,not-recorded,,,
+EthiopiaRHS,1997,,,,,,not-recorded,,,
+GhanaLSS,1987-88,since my last visit,,1,,58,config-comment,"lsms_library/countries/GhanaLSS/1987-88/_/food_acquired.py:21,33; _/CONTENTS.org:1242",,"one visit only, so the window has no determinate length"
+GhanaLSS,1988-89,amount spent since last visit,,1,,58,variable-label,"lsms_library/countries/GhanaLSS/1988-89/_/food_acquired.py:26,91 (CFOODBLV label)",,"one visit only, so the window has no determinate length"
+GhanaLSS,1991-92,8 interviewer visits at 2-day intervals to each rural household and 11 interviewer visits at 3-day intervals to each urban household,,7 rural / 10 urban,,117,questionnaire,lsms_library/countries/GhanaLSS/_/CONTENTS.org:1294-1307 (1991-92/Documentation/pdf/G3Intman.pdf s1.9),stratum,rural 2d x 7 = 14d; urban 3d x 10 = 30d; urban diary-assisted
+GhanaLSS,1998-99,seven visits five days apart,5,6,30,112,config-comment,"lsms_library/countries/GhanaLSS/_/CONTENTS.org:1240,1260",,"spacing asserted in CONTENTS, not cited to GLSS4 own manual"
+GhanaLSS,2005-06,,,10 purchased / 9 produced,,114,not-recorded,lsms_library/countries/GhanaLSS/_/CONTENTS.org:1261 (ask counts only),by-s,spacing UNESTABLISHED (design O3); 11 interviewer visits
+GhanaLSS,2012-13,seven visits five days apart,5,6,30,114,config-comment,"lsms_library/countries/GhanaLSS/_/CONTENTS.org:1240,1262",,"spacing asserted in CONTENTS, not cited to GLSS6 own manual"
+GhanaLSS,2016-17,every sixth day i.e. after every five days ... seven (7) times,5,6,30,179,questionnaire,lsms_library/countries/GhanaLSS/_/CONTENTS.org:1479-1492 (2016-17/Documentation/GLSS7 Main Report.pdf),,"diary-assisted; 35-day cycle, 30 days of coverage"
+GhanaSPS,2009-10,,,,,85,not-recorded,,,"README.org ""since last visit"" refers to GLSS, not GhanaSPS"
+GhanaSPS,2013-14,,,,,90,not-recorded,,,"README.org ""since last visit"" refers to GLSS, not GhanaSPS"
+GhanaSPS,2017-18,,,,,93,not-recorded,,,"README.org ""since last visit"" refers to GLSS, not GhanaSPS"
+Guatemala,2000,gasto ult 15 dias / cantidad compro: LAST 15 DAYS (actual),15,1,15,96,variable-label,"lsms_library/countries/Guatemala/_/CONTENTS.org:573,577,595; 2000/_/food_acquired.py:18",by-column,"instrument also has usual-month and months-per-year vars, deliberately unused; rung corrected: verbatim is a Stata variable label, not an instrument quote"
+Guinea-Bissau,2018-19,,,,,,not-recorded,,,
+Malawi,2004-05,,,,,115,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
+Malawi,2010-11,,,,,116,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
+Malawi,2013-14,,,,,116,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
+Malawi,2016-17,,,,,132,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
+Malawi,2019-20,,,,,133,not-recorded,,,"data_scheme ""last 7 days"" belongs to food_coping (rCSI), not consumption"
+Mali,2014-15,A consomme le produit au cours des 7 derniers jours,7,1,7,122,variable-label,lsms_library/countries/Mali/2014-15/_/mapping.py:9 (s13q02 label),,
+Mali,2018-19,,,,,138,not-recorded,,,
+Mali,2021-22,,,,,145,not-recorded,,,
+Niger,2018-19,,,,,135,not-recorded,,,
+Niger,2021-22,,,,,154,not-recorded,,,
+Nigeria,2010Q3,total 7-day consumption of each item,7,1,7,90,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
+Nigeria,2011Q1,total 7-day consumption of each item,7,1,7,90,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
+Nigeria,2012Q3,total 7-day consumption of each item,7,1,7,96,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
+Nigeria,2013Q1,total 7-day consumption of each item,7,1,7,104,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
+Nigeria,2015Q3,total 7-day consumption of each item,7,1,7,116,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
+Nigeria,2016Q1,total 7-day consumption of each item,7,1,7,116,config-comment,lsms_library/countries/Nigeria/_/CONTENTS.org:8,,
+Nigeria,2018Q3,7-day consumption (produced/inkind); MOST RECENT purchase within 30 days (purchase block),,1,,110,config-comment,lsms_library/countries/Nigeria/_/data_scheme.yml:65-70,by-s,Quantity summed across s is not a 7-day total for W4
+Nigeria,2019Q1,7-day consumption (produced/inkind); MOST RECENT purchase within 30 days (purchase block),,1,,110,config-comment,lsms_library/countries/Nigeria/_/data_scheme.yml:65-70,by-s,Quantity summed across s is not a 7-day total for W4
+Panama,1997,last 15 days,15,1,15,,config-comment,lsms_library/countries/Panama/1997/_/food_acquired.py:12,by-column,"overlapping MONTHLY variable deliberately dropped to avoid double-count; rung corrected: evidence is a wave-script comment, not an instrument quote"
+Panama,2003,last 15 days,15,1,15,,config-comment,lsms_library/countries/Panama/2003/_/food_acquired.py:12,by-column,"overlapping MONTHLY variable deliberately dropped to avoid double-count; rung corrected: evidence is a wave-script comment, not an instrument quote"
+Panama,2008,last 15 days,15,1,15,,config-comment,lsms_library/countries/Panama/2008/_/food_acquired.py:12,by-column,"overlapping MONTHLY variable deliberately dropped to avoid double-count; rung corrected: evidence is a wave-script comment, not an instrument quote"
+Senegal,2018-19,,,,,139,not-recorded,,,
+Senegal,2021-22,,,,,172,not-recorded,,,
+Serbia,2007,LSMS 7-day food-consumption diary (days 1-7 summed),7,1,7,100,config-comment,"lsms_library/countries/Serbia/2007/_/food_acquired.py:4,32; Serbia/_/data_scheme.yml:38",,"DIARY, not recall: elicitation mode differs from every other cell here"
+Tanzania,2008-09,consumed at home during the last week,7,1,7,59,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
+Tanzania,2010-11,consumed at home during the last week,7,1,7,59,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
+Tanzania,2012-13,consumed at home during the last week,7,1,7,59,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
+Tanzania,2014-15,consumed at home during the last week,7,1,7,60,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
+Tanzania,2019-20,consumed at home during the last week,7,1,7,59,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
+Tanzania,2020-21,consumed at home during the last week,7,1,7,57,config-comment,lsms_library/countries/Tanzania/_/food_prices_quantities_and_expenditures.py:18; _/demands.org:844,,"informal aside, never asserted against the instrument"
+Togo,2018,total quantity of [XX] consumed in the past 7 days,7,1,7,,questionnaire,lsms_library/countries/Togo/2018/_/food_expenditures.py:15,,
+Uganda,2005-06,,,,,61,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+Uganda,2009-10,,,,,63,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+Uganda,2010-11,,,,,70,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+Uganda,2011-12,,,,,71,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+Uganda,2013-14,,,,,77,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+Uganda,2015-16,,,,,77,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+Uganda,2018-19,,,,,117,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
+Uganda,2019-20,,,,,116,not-recorded,,,"CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B food module"
