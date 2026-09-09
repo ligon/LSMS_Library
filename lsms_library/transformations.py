@@ -2907,8 +2907,12 @@ def rcsi(food_coping, *, weights=None):
     s = pd.Series(days.to_numpy(), index=df.index)
     wide = s.unstack('Strategy')
     if list(wide.index.names) != group_by:
-        # food_coping's canonical grain is exactly (t, i, Strategy), so this
-        # branch is not expected to fire in practice; kept defensive.
+        # The canonical grain is (t, i, Strategy), but Country.food_coping()
+        # arrives with the joined cluster level ``v`` as well, so this branch
+        # fires on every real-country call.  ``v`` is one-to-one with
+        # (t, i) (measured on Malawi, red-team 2026-09-09), so ``first()``
+        # is lossless there; it would not be if a country ever served two
+        # rows per (t, i, Strategy), which the canonical schema forbids.
         wide = wide.groupby(level=group_by).first()
     wide = wide.reindex(columns=used)
 
