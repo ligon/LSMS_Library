@@ -1,0 +1,226 @@
+#+TITLE: Recall windows: measure the interval where the survey recorded it, declare it where it did not
+#+AUTHOR: Sue
+#+DATE: [2026-09-09]
+
+* Status
+
+DESIGN, not implemented.  Written for GH #851 after the GhanaLSS visit-offset
+work (commits =e55299142=, =87c1c252d=).  Awaiting red-team.
+
+* The problem
+
+=food_expenditures= returns a number whose reference period is nowhere
+recorded, and the period is not constant:
+
+- across *waves*: GhanaLSS 2016-17 is six 5-day recalls = 30 days; 1991-92 urban
+  is ten 3-day recalls = 30 days but 1991-92 *rural* is seven 2-day = 14 days;
+- across *countries*: a 7-day-recall country's figure is a seventh of a 30-day
+  one, with nothing marking either;
+- across *food and non-food*: Togo's non-food module alone splits into 7-day,
+  30-day, 3-month, 6-month and 12-month sub-modules;
+- within a *single wave and table*: GLSS3's window depends on the household's
+  stratum, and GLSS5's differs between =s='purchased'= (ten asks) and
+  =s='produced'= (nine).
+
+Everything downstream silently mixes them.
+
+* The governing principle
+
+From @ligon, 2026-09-09, and it is already how =visit= behaves:
+
+#+begin_quote
+Preserve all detail in =food_acquired=; aggregate (at least by default) in
+derived tables.
+#+end_quote
+
+=visit= is kept on =food_acquired= (D1) and summed away by =food_expenditures= /
+=food_quantities= / =food_prices=, and summed (not =first()=-ed) by =Feature()=
+via =_ADDITIVE_MEASURE_COLUMNS=.  The recall window should follow the same rule:
+carry the finest thing the survey recorded, aggregate downstream.
+
+* The key insight (@ligon)
+
+Do not build a table of recall rules.  *Record each visit and its date*, then
+read the interval off the data row by row.  The window stops being a fact we
+assert about a wave and becomes a measurement: how many days elapsed, and how
+many visits happened, for this household.
+
+Corollaries:
+- GLSS3's urban/rural split needs no stratum lookup.  A rural household's dates
+  say the gaps were 2 days and there were 8 of them.
+- A missed visit stops being a confound.  We do not care *why* a gap was 10
+  days instead of 5, only that it was.
+
+* Two regimes, and the partition is checkable
+
+| regime | when                            | window comes from        | example                        |
+|--------+---------------------------------+--------------------------+--------------------------------|
+| *R1*   | repeated visits, dates published | MEASURED from the dates  | GhanaLSS 1991-92, 1998-99      |
+| *R2*   | single visit, stated recall      | DECLARED, from the instrument | Togo nonfood (7/30/90/180/365 days) |
+
+The test is mechanical: does the table have more than one visit per household?
+
+*R1 and R2 do not compete; they partition.*  Togo's =RecallWindow= column stays
+exactly right for Togo.  It is regime two, and its window genuinely is a
+property of the question ("DEPENSES DES 7 DERNIERS JOURS"), not of the
+fieldwork -- there is no interval to measure.
+
+** The awkward third case: protocol known, dates not published
+
+| wave    | cover file    | rows      | per-visit dates?                       |
+|---------+---------------+-----------+----------------------------------------|
+| 1991-92 | =S0B.DTA=     | 1/HH      | YES -- =vd/vm/vy 1..11=, wide          |
+| 1998-99 | =SEC0B.DTA=   | ~6/HH     | YES -- long, =visitcd= + =s0day/month/year= |
+| 2005-06 | =sec0.dta=    | 1/HH      | no -- one =ddate/mdate/ydate=          |
+| 2012-13 | =SEC0.dta=    | 1/HH      | no -- one =ddate/mdate/ydate=          |
+| 2016-17 | =g7sec0.dta=  | 1/HH      | no -- one =ddate/mdate/ydate=          |
+
+Measured 2026-09-09.  The two OLDEST waves publish per-visit dates; the three
+newest do not.  So R1 applies where we least need it, and the current wave --
+the one that started this -- cannot be measured from its published extract even
+though its protocol is documented ("every sixth day i.e. after every five days
+... seven (7) times", GLSS7 Main Report).
+
+*This is why measurement cannot simply replace declaration.*  The design is
+=measured WHERE AVAILABLE, declared otherwise, and the provenance recorded=.
+
+* Proposal
+
+** P1.  Per-visit dates land on =interview_date=, keyed by calendar visit
+
+The canonical index is *already* =(t, v, i, visit)= (=data_info.yml:21=), and
+=local_tools.melt_visit_intervals= already melts per-visit timestamps onto a
+=visit= level -- built for EHCVM.  No new machinery; wire GhanaLSS 1991-92
+(wide) and 1998-99 (long) through it.
+
+** P2.  =visit= is the join key, and it must be the SAME clock
+
+Today's renumbering made =food_acquired.visit= the calendar visit.
+=interview_date.visit= must agree.  *This is not free* -- see O1.
+
+** P3.  Exposure is DERIVED at API time, not stored
+
+Rather than stamping a window column on 5.3M rows:
+
+: days(i, k) = date(i, visit k) - date(i, visit k-1)
+: exposure(i, s) = sum of days(i, k) over the visits k present for that (i, s)
+: rate = sum(Expenditure) / exposure          # ratio of sums
+
+One source of truth (the dates), no duplication, no cache-hash cost if the join
+lives in =_finalize_result= (already in =_build_registry._EXCLUDED_CALLABLES=,
+which is how the population record costs nothing).
+
+*The estimator is a ratio of sums, NOT a mean of ratios.*  With unequal gaps
+=mean(expenditure_k / days_k)= treats a 10-day observation as one data point
+equal to a 5-day one.  Only =sum(expenditure) / sum(days)= is the household's
+daily rate over its actual exposure.  They coincide only under equal spacing,
+which real fieldwork does not deliver.
+
+** P4.  =RecallWindow= extends to R2 tables, with a machine-readable length
+
+Keep the instrument's verbatim string (provenance), and add a canonical
+vocabulary =window label -> days= in =data_info.yml=.  This is exactly the =u=
+pattern: raw label -> Preferred Label -> kg factor.  Today the conversion dict
+lives in a *comment* in =Togo/_/data_scheme.yml=, so nothing can use it.
+
+** P5.  =recall.yml=, a =population.yml= sibling, records PROVENANCE not value
+
+Per (wave, table): the regime, and where the window came from --
+=measured-from-dates= / =declared-from-instrument= / =declared-from-protocol= /
+=not-recorded= -- with =source_file=, =locator=, =confidence=.  A =.yml= sibling
+moves no cache hash (measured for =population.yml=).
+
+Its job is *not* to carry the number.  It is to make "nobody has looked"
+distinguishable from "there is no window", which is the failure that let the
+Albania unevidenced-absence claim ship.  GLSS7 becomes a visible
+=declared-from-protocol= rather than a silent assumption.
+
+** P6.  Warn, never fence
+
+Pooling rows with different windows is the same disease as pooling different
+populations, and #603 settled the policy: warn, name the classes, drop nothing.
+=PopulationHeterogeneityWarning= is the model.  The warning must also fire in
+=Feature()=, where =visit= is dropped and summed across countries.
+
+** P7.  The API is a kwarg, in the existing idiom
+
+: food_expenditures(period=None)      # today's behaviour, unchanged
+: food_expenditures(period='day')     # sum / exposure
+: food_expenditures(period='annual')  # x 365.25
+
+alongside =units==, =labels==, =basis==, =currency==.  =period=None= stays the
+default, so nothing moves for existing callers.  Without a consumer the
+machine-readable length is documentation, which is precisely how
+=RecallWindow='s conversion dict ended up unusable.
+
+* Open problems.  These are the design's weak points, stated so they get attacked
+
+** O1.  GLSS4's =visitcd= origin is inconsistent -- BLOCKING
+
+Measured on =SEC0B.DTA=, per household =(min, max)= of =visitcd=:
+
+| (2, 7) | 4,052 households |
+| (1, 6) | 1,879            |
+| (1, 5) | 23               |
+| (2, 6) | 17               |
+| (1, 7) | 14               |
+| (3, 7) | 12               |
+
+Both main groups have six visits, but ~68% are numbered 2..7 (calendar) and
+~31% are numbered 1..6 (an ordinal of recorded visits).  So =visitcd= is *not*
+a drop-in join key for =food_acquired.visit=.  A normalisation rule is needed
+and none is yet justified.  "max == 7 implies calendar" is a guess, not a rule.
+
+** O2.  Corrupt date sequences
+
+GLSS4 measured gaps include negative values: -360 (x17, almost certainly a
+98->99 year typo), then a scatter of -329, -238, -207, -179, -171, -148...
+Roughly 1-2% of sequences.  A measured-interval implementation needs a
+plausibility screen AND a defined fallback for households whose dates are
+unusable.  Naive differencing will produce negative exposures.
+
+** O3.  GLSS5's interval is unknown
+
+GLSS5 fields eleven visits (its =s9bq10= is "amount spent by eleventh visit"),
+but the spacing is not established.  The tempting inference -- 3 days, from the
+GLSS7 Manual's Table 2 -- is from boilerplate that has already been shown to
+descend from GLSS3-urban.  *Do not put that number in a config file without
+GLSS5's own manual.*
+
+** O4.  Exposure is per =(i, s)=, not per =i=
+
+GLSS5 asks purchases at ten visits and own production at nine.  A single
+household exposure would be wrong for one of them.
+
+** O5.  The denominator must come from the VISIT table, not the food rows
+
+If a household has no =food_acquired= row at visit 5 for item j, that is "bought
+none", not "not visited".  Counting exposure from food rows would shrink the
+denominator for households that bought little, inflating their rate.  Exposure
+must be counted from =interview_date= (visits that happened), independently of
+whether any item was recorded.
+
+** O6.  Does R1 even help the waves we care about?
+
+GLSS5/6/7 -- the three largest and most used GhanaLSS waves -- are R2 by
+publication accident.  If the answer for them is a declared protocol anyway, is
+the R1 machinery worth building for two old waves plus EHCVM?  *Counter*: GLSS3
+is the only place we can VALIDATE a declared protocol against measured dates
+(median gap exactly 3.0 urban / 2.0 rural), which is direct evidence about how
+far protocol declarations can be trusted elsewhere.  That may be the strongest
+argument for R1 and it should be tested, not assumed.
+
+** O7.  Is a GLSS7 CAPI paradata / tracking file hiding somewhere?
+
+Not yet checked.  =g7sec0.dta= is one row per household, but GLSS7 was CAPI and
+the manual describes a per-visit "summary of the survey result" page.  If those
+timestamps were published in some other file, GLSS7 moves from R2 to R1 and O6
+mostly dissolves.  *Check before building the fallback.*
+
+* What this does NOT propose
+
+- Annualising anything by default.  Reported values stay reported; =period== is
+  opt-in.
+- Removing =RecallWindow=.  It is right for R2.
+- A per-wave table of recall rules.  That is the thing this design exists to
+  avoid.

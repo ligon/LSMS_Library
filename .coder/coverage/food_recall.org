@@ -109,14 +109,23 @@ printed list from below, never above.
    is 2 days x 7 asks rural and 3 x 10 urban; filling either would be the error
    the row exists to flag.
 
-* Within-wave variation -- 9 cells, 5 countries, only 2 of them GhanaLSS
+* Within-wave variation -- 5 cells, 3 countries, only 2 of them GhanaLSS
 
 | axis           | cells                                                  |
 |----------------+--------------------------------------------------------|
-| =by-column=    | Guatemala 2000, Panama 1997/2003/2008                  |
 | =by-s=         | GhanaLSS 2005-06, Nigeria 2018Q3 + 2019Q1              |
 | =stratum=      | GhanaLSS 1991-92 (urban 3-day/10 asks, rural 2-day/7)  |
 | =two-periods=  | Burkina Faso 2021-22 (7 days AND 30 days, unmarked)    |
+
+*The axis means the DELIVERED table mixes windows, not that the instrument
+offered several.*  Guatemala 2000 and Panama 1997/2003/2008 were initially
+tagged =by-column= and were wrong: their instruments do mix an actual 15-day
+recall with usual-month estimates, but both maintainers RESOLVED it -- Panama's
+wave script says "We use ONLY s11a10a so the non-purchased quantity shares the
+15-day recall basis of purchased s11a6a" -- so the shipped window is
+single-valued at 15 days.  Reclassified 2026-09-09, with the source-level
+variation moved to =notes=.  The promotion script refuses a cell that carries
+both an axis and a number, which is how the error surfaced.
 
 Nigeria W4's own config states it: the purchase block records the most recent
 purchase within 30 days while produced/in-kind are 7-day consumption, so
