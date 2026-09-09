@@ -1538,6 +1538,113 @@ evidence settles is that the text is NOT GLSS7's, not which earlier round it
 came from.  /Corrected 2026-09-09: this passage previously attributed the
 schedule to GLSS5 specifically, which is more than the documents support./
 
+**** =visit= is an INTEGER in all seven waves (fixed 2026-09-09)
+
+The wave-by-wave fix above got the visit NUMBERS right and left the TYPE
+wrong.  Measured on the delivered 5,317,365-row table immediately after it:
+
+| wave    |    rows | Python type | values                |
+|---------+---------+-------------+-----------------------|
+| 1987-88 |  71,605 | =int=       | 1                     |
+| 1988-89 |  72,649 | =str=       | ='since last visit'=  |
+| 1991-92 | 681,645 | =int=       | 2..11                 |
+| 1998-99 | 542,105 | =str=       | ='2'=..='7'=          |
+| 2005-06 | 1,115,396 | =int=     | 2..11                 |
+| 2012-13 | 1,709,094 | =int=     | 2..7                  |
+| 2016-17 | 1,124,871 | =int=     | 2..7                  |
+
+Three different types on one index level.  Sources: 1988-89's script set
+=VISIT = 'since last visit'= (the recall WINDOW written into the level as if
+it were a value), and 1998-99 finished a cast with =.astype(int).astype(str)=.
+
+***** What it cost, measured
+
+#+begin_src python
+fa = Country('GhanaLSS').food_acquired()
+fa.xs(2, level='visit')      # 752,970 rows  <- 1998-99's 104,351 SILENTLY MISSING
+fa.xs('2', level='visit')    # 104,351 rows  <- and now everyone else is missing
+fa.xs(1, level='visit')      #  71,605 rows  <- 1988-89's 72,649 SILENTLY MISSING
+fa.xs('1', level='visit')    # KeyError
+#+end_src
+
+=xs(2)= is a 12.2% undercount of visit-2 rows with no exception and no
+warning; =xs('1')= is a hard failure.  *Whether you got a silent partial
+answer or a crash depended only on how you happened to spell the key* -- and
+neither told you a wave was missing.  A left merge on an =Int64= =visit= key
+left *614,754 rows (11.56% of the table)* unmatched and silently null:
+542,105 from 1998-99 and 72,649 from 1988-89.
+
+***** Why nothing caught it, which is the part worth keeping
+
+Two independent blindnesses, and they compose:
+
+1. *No index level is dtype-policed anywhere.*  =_enforce_canonical_dtypes=
+   iterates =df.columns= only, and =visit= appeared nowhere under =Columns:=
+   in =lsms_library/data_info.yml= -- only in =index_info=.
+2. *The warm cache launders the evidence.*  pyarrow coerces a mixed object
+   level to =str= on write, so the L2-country parquet came back
+   homogeneously stringy.  Swept 2026-09-09: *193 warm L2-country parquets,
+   543 index levels, ZERO mixed* -- while the cold build of one of them was
+   mixed int/str.  Any scan of =var/= is structurally unable to see this
+   class of defect.  Same shape as GH #323 ("the bug hid behind the cache the
+   bug poisoned").
+
+It also means the delivered type *depended on cache warmth*: cold, =visit=
+came back =object= with real ints for five waves; warm, everything was =str=.
+The same call returned differently typed data on the same machine.
+
+***** The fix, and why =1= is safe for the 1980s waves
+
+Both single-recall waves now carry the INTEGER =1= -- the convention
+=build_transforms.add_visit_level= exists to stamp -- and 1998-99 keeps
+=.astype(int)= without the trailing =.astype(str)=.  No wave-2..11 script
+changed.
+
+The =1= is unambiguous, and this was CHECKED rather than reasoned: every
+renumbered wave starts at 2 (visit 1 is intake -- roster and diary training,
+no consumption), so after the fix =visit == 1= occurs in exactly 144,254 rows,
+all of them 1987-88 (71,605) and 1988-89 (72,649), on both =s= sides.
+=tests/test_ghanalss_visit_alignment.py::test_visit_one_means_single_recall=
+pins that, so if a renumbered wave ever grows a visit 1 the convention is
+reconsidered rather than silently kept.
+
+The recall WINDOW 1988-89 used ("since my last visit") is prose about the
+instrument.  It belongs here, and it is here; it was never an index value.
+
+***** Conservation
+
+Row-for-row identical.  Normalising the pre-fix table's =visit= to int
+(='since last visit'= -> 1) the two tables have the SAME index and
+element-wise identical measures: 5,317,365 rows before and after, per-wave
+counts unchanged, ΣQuantity 15,646,965,351.442991, ΣExpenditure
+15,644,337,364.882200, ΣPrice 1,284,034,769.823569, delta exactly 0.0 on all
+three.  Index still unique.  Warm and cold now agree at =int64=.
+
+***** =visit= now has a written contract, but is deliberately NOT coerced
+
+=lsms_library/data_info.yml= gains =Columns > food_acquired > visit= and
+=Columns > interview_date > visit= (=type: int=, not =required=), plus a
+=Single Index= gloss.  This is the same device =crop_production.condition=
+already uses: an index level declared under =Columns:= because that file is
+where a cross-country level contract is written down, even where enforcement
+does not reach index levels.  It is inert today -- nothing reads it but the
+tests -- and it moves no cache hash (the canonical =data_info.yml= is not a
+=_table_cache_hash= input; only per-wave =data_info.yml= are).
+
+Extending =_enforce_canonical_dtypes= to index levels was considered and
+REJECTED.  Its int path is =pd.to_numeric(errors='coerce')=: on an index
+level that turns an unparseable value into =<NA>=, which this file's own
+=u=-sentinel note calls a deferred silent deletion -- served, then dropped by
+the first =groupby=, counted nowhere.  Applied to THIS defect it would have
+deleted all 72,649 of 1988-89's rows in the derived tables (which sum =visit=
+away) and reported nothing.  A silent coercion would have hidden the bug, not
+caught it.  Blast radius was measured anyway and is narrow -- exactly one
+existing (table, index-level) collision corpus-wide, =crop_production.condition=
+for Uganda -- so the objection is the failure MODE, not the width.  If
+index-level enforcement is ever built it must be a loud CHECK on the BUILD
+path (where the wave frames are concatenated), because that is the only place
+the mixed level exists.
+
 *** RETIRED: the country-level =_/food_acquired.py= concatenator (2026-09-07, GH #808)
 
 =GhanaLSS/_/food_acquired.py= is deleted and =food_acquired= has ONE

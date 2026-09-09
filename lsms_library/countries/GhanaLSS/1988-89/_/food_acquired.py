@@ -16,7 +16,9 @@ Output:
              sample(), but this wave declares no sample, so v is unavailable;
              nothing to join).  visit is KEPT as its own index level (design
              doc D1): this 1980s wave has a single, degenerate "since my last
-             visit" recall, but it is present.
+             visit" recall, but it is present, and it is written as the
+             INTEGER 1 -- the library's single-recall convention (cf.
+             build_transforms.add_visit_level).  See VISIT below.
   - columns: [Quantity, Expenditure]
   - i = household id (built via the wave's canonical mapping.i() helper so the
         keys match sample/roster), j = harmonized food item, u = 'Value',
@@ -38,7 +40,27 @@ from lsms_library.local_tools import (df_from_orgfile, format_id, get_dataframe,
 
 t = '1988-89'
 # Single, degenerate recall window for this 1980s wave (design doc D3).
-VISIT = 'since last visit'
+#
+# INTEGER 1, not the English sentence 'since last visit' this script wrote
+# until 2026-09-09.  `visit` is an index LEVEL, and a level whose Python type
+# differs by wave is a silent-failure surface, not a labelling choice.  The
+# country-level concat produced an object level of mixed int/str; measured on
+# it, a left merge on an Int64 `visit` key left 614,754 rows (11.56% of the
+# table) unmatched with no error -- 72,649 of them this wave, 542,105 of them
+# 1998-99 -- and `.xs()` was worse for being inconsistent: `xs(2)` returned
+# 752,970 rows while silently dropping 1998-99's 104,351, whereas `xs('1')`
+# raised KeyError.  Silent partial or hard failure, depending only on how the
+# caller happened to spell the key.  No numeric coercion recovers a sentence.
+#
+# 1 is the library convention for a single-recall wave (see
+# build_transforms.add_visit_level, whose whole job is stamping `visit = 1` on
+# waves that ask the module once).  It is unambiguous here: every multi-visit
+# GLSS round numbers its consumption visits from 2, because visit 1 is intake
+# (roster + diary training) and collects no consumption -- so `visit == 1`
+# identifies exactly the two single-recall 1980s waves.  The recall WINDOW this
+# wave used ("since my last visit") is prose about the instrument and belongs in
+# CONTENTS.org, which carries it; it is not an index value.
+VISIT = 1
 
 # ----------------------------------------------------------------------------
 # Food-item harmonization: Code_12A / Code_12B -> canonical Preferred Label.
