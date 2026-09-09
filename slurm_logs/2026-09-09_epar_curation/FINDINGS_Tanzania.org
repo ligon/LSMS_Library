@@ -1,0 +1,632 @@
+#+title: EPAR x LSMS_Library -- Tanzania (NPS)
+#+date: 2026-09-09
+
+Author: country agent (Tanzania), 2026-09-09.  EPAR clone commit
+=abfbdc9301242527b7543606aad1ad6eed2e6530= (LSMS-Agricultural-Indicators-Code,
+=reference/epar/NOTES.md=) and =0e9ccf2981e7cb8448605925a5111d2835bf1e31=
+(Household-Consumption-Data).  Every claim below carries a =path:line=
+(=grep -n=-verified against the actual clone, relative to the reference
+clone root or the repo root), and one read-only warm-parquet check is used
+where noted -- no numeric parity run against EPAR's own =.dta= files was
+attempted per the brief.  Stance followed throughout: EPAR is a point of
+comparison, never a reference answer.
+
+* Idiosyncrasies cross-referenced before opening any EPAR file
+
+Read in full before touching EPAR material:
+=lsms_library/countries/Tanzania/_/CONTENTS.org= (1,833 lines, incl.
+LOGBOOK/WAITING/TODO), =.claude/skills/tanzania-panel-design.md=,
+=.claude/skills/multi-round-waves.md=.  The idiosyncrasies carried into the
+EPAR read, and where each surfaced below:
+
+1. *UPHI back-casting / split-off many-to-many* (=CONTENTS.org:4-84=, GH #114)
+   -- a 2008-15 =r_hhid= can carry up to 11 =UPHI= values; our two 2008-15
+   tables key inconsistently (=food_acquired= on =r_hhid=, =shocks= on
+   =UPHI=) and this is *unresolved*, not a bug.  Relevant because EPAR's
+   2008-15 wave scripts (W1-W4) are single-round and never see this --
+   EPAR's coverage here is structurally different from ours (see Coverage).
+2. *Extended vs. Refresh sub-panel split* (=CONTENTS.org:339-482=, panel
+   design note =CONTENTS.org:1007-1038=, =.claude/skills/tanzania-panel-design.md=)
+   -- 2019-20 (NPS-SDD) follows the Extended Panel only; 2020-21 (NPS Y5)
+   follows the Refresh Panel *plus* a 545-household urban booster (Mbeya,
+   Arusha, Mwanza, Tanga, Dodoma).  Zero household overlap between the two
+   by design.  This is exactly EPAR's own W5/SDD split -- see Coverage §1.
+3. *2008-15 multi-round folder* (=.claude/skills/multi-round-waves.md=) --
+   one folder, four rounds via =wave_folder_map=; EPAR instead ships one
+   =.do= file per round (W1-W4), so the "folder problem" does not exist on
+   their side, but the *files-per-round* structure means EPAR duplicates
+   ~5,000 lines of near-identical code four times (drift risk they carry
+   that we do not).
+4. *#835 -- =new_harmonize_units= integer-floor truncation*
+   (=CONTENTS.org:1420-1448=) -- =astype(np.int64)= floors the reported
+   quantity before the unit factor multiplies it; 852 rows lose their unit
+   value outright and ~4,500 rows are inflated up to 1.9x.  Checked whether
+   EPAR's own unit handling for crop/food quantities has an analogous
+   floor -- see Construction decisions, Unit handling.
+5. *#113 -- community-price <-> household link* (=CONTENTS.org:665-975=) --
+   =community_prices.v= (=interview__key=) shares nothing with
+   =sample().v=; the =community_cluster_xwalk= feature resolves 51/99
+   (2019-20) and 458/488 (2020-21) communities to a real cluster via
+   admin-code + interview-date matching.  Confirmed below that EPAR's own
+   =.do= files never touch the community module at all (grep, zero hits).
+6. *Three unlogged =food_acquired= idiosyncrasies from the price study*
+   (=CONTENTS.org:1450-1512=, added 2026-09-08 per
+   =slurm_logs/price_sources/Tanzania/REPORT.org:189-196=): (a) the stale
+   #112 premise (quantities are present, not missing, in the current WB
+   release); (b) the #835 int64 truncation; (c) =Tanzania/_/food_acquired.py=
+   reads its =food_labels= build table out of =CONTENTS.org=, which the
+   cache hash deliberately excludes as documentation (#836).
+7. *#846 -- not-asked capability verdict* (open_issues.tsv:6) -- NPS Section
+   J asks a quantity for own-production/gifts (q5/q6) but never a price;
+   =food_prices(units='unitprice')= returns 0 rows for Tanzania.  Checked
+   whether EPAR's separate consumption-by-source project treats this the
+   same way -- it does not: it *imputes* a value via median unit price
+   (see Ranked learnings #1 and Contradictions).
+
+No finding below contradicts =CONTENTS.org=; several extend it (new EPAR
+material it does not mention) and are noted as such.
+
+* Coverage (their waves vs ours; what they build for this scope)
+
+| library wave | EPAR file                                     | readme? | maps to |
+|---------------+------------------------------------------------+---------+---------|
+| 2008-09       | =Tanzania NPS Wave 1/EPAR_UW_Tanzania_NPS_W1.do= (4,554 lines) | *no*    | round 1 of our =2008-15/= |
+| 2010-11       | =...Wave 2/EPAR_UW_Tanzania_NPS_W2.do= (5,015)  | *no*    | round 2 |
+| 2012-13       | =...Wave 3/EPAR_UW_Tanzania_NPS_W3.do= (5,450)  | *no*    | round 3 |
+| 2014-15       | =...Wave 4/EPAR_UW_Tanzania_NPS_W4.do= (5,053)  | *no*    | round 4 |
+| 2019-20       | =...SDD/EPAR_UW_Tanzania_NPS_SDD.do= (5,264)    | *yes* (164 lines) | Extended Panel only |
+| 2020-21       | =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do= (4,917)  | *yes* (164 lines) | Refresh Panel + 545-HH urban booster |
+
+*Finding 1 -- only W5 and SDD carry a top-level =readme.md=.*  W1-W4 have
+only generic sub-folder =README.md= files ("Save unzipped raw .dta files in
+this folder", =...Wave 1/Raw DTA Files/README.md:1=) -- no per-wave
+Table-of-Contents / Known-Issues document at all for the four 2008-15
+rounds.  This is the inverse of the Uganda case the brief warns about: for
+Tanzania there is no "No issues in this section" text to distrust for
+W1-W4, because there is no Known-Issues section to read in the first
+place.
+
+*Finding 2 -- the W5/SDD readmes' "Known Issues" section is empty.*  Both
+readmes end with (=...Wave 5/readme.md:163-164=, byte-identical in
+=...SDD/readme.md:163-164=):
+#+begin_quote
+## Known Issues and Changes from Previous Surveys
+* TBD
+#+end_quote
+So for the two waves that DO have a readme, the one section the brief's
+reading recipe is built around is a stub.  Every caveat found below (labor
+omission, hardcoded outlier removal, disabled area-clamp code, tree-crop
+allocation uncertainty, harvest-completion formula, land-rent unit mix)
+lives only in =.do= comments, never surfaced to a reader of the readme.
+This is a stronger form of the brief's Uganda caution: "no issues in this
+section" implied *some* review; here there is no section to trust or
+distrust.
+
+*Finding 3 -- EPAR's W5/SDD split matches our panel-design finding exactly,
+with corroborating numbers.*  =...SDD/readme.md:6= (VERBATIM): "the sample
+here (1,184 households) is smaller than the full sample for Wave 3 (2,165
+households) and necessarily smaller than the Wave 4 sample... a total of
+2,172 households."  Our own =community_prices= diagnosis independently
+measured the SDD household count at *1,184* (=CONTENTS.org:403=,
+=slurm_logs/price_sources/Tanzania/REPORT.org:172=) -- an exact match from
+two unrelated sources.  =...Wave 5/readme.md:5=: "begins a new longitudinal
+sample with the 'refresh panel'" -- matches =CONTENTS.org:1007-1024=
+verbatim in substance.
+
+*Finding 4 -- the SDD readme's own header records a naming/identity churn
+EPAR had internally.*  =...SDD/readme.md:1= (VERBATIM): "_IMPORTANT NOTE:
+Prior to the <SHA> update on 9/XX/24, this do file and folder were labeled
+as Tanzania Wave 5_" -- i.e., EPAR itself once conflated the SDD extended-
+panel supplement with Wave 5 proper, the same Extended/Refresh confusion
+our own =CONTENTS.org:339-420= exists specifically to prevent.  The =<SHA>=
+/ =9/XX/24= placeholders were never filled in -- the correction notice is
+itself a template that was not completed.
+
+*Finding 5 -- FISH INCOME exists in W1 but not W5, undocumented as a
+coverage change in the readme.*  =...Wave 1/EPAR_UW_Tanzania_NPS_W1.do:1434=
+has a live =FISH INCOME= section (=SEC_E2.dta=-adjacent; fishing expenses);
+=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:1568-1571= reads:
+#+begin_quote
+********************************************************************************
+*FISH INCOME -
+********************************************************************************
+*NOT IN WAVE 5
+#+end_quote
+This is a genuine survey-instrument change (the module was dropped), but it
+appears nowhere in either readme's Known Issues (both TBD) -- a reader
+comparing only the readmes would not learn that fish income becomes
+unavailable after 2014-15.
+
+*Finding 6 -- the SDD =.do= is a mechanically-adapted copy of the W5/W4
+script, and it shows.*  =ren sdd_hhid sdd_hhid= (a no-op identity rename)
+appears *48 times* in =...SDD/EPAR_UW_Tanzania_NPS_SDD.do= (grep -c). This
+is the signature of a global find-replace of =y5_hhid -> sdd_hhid= (and,
+separately, =hhid -> sdd_hhid=) applied to a copy of the W5 script, where
+lines that already said =ren y5_hhid hhid= became a harmless but telling
+=ren sdd_hhid sdd_hhid=.  Consistent with this, the SDD "HOUSEHOLD IDS"
+section builds the household id from =sdd_hhid= only
+(=...SDD/EPAR_UW_Tanzania_NPS_SDD.do:200-215=); a targeted grep for
+=y4_hhid=/=panel.key=/=panel_key=/=npssdd= in the SDD =.do= turns up only
+two later, unrelated =collapse ... by(y4_hhid ...)= calls
+(=:1233=, =:2141=) that presuppose =y4_hhid= is already a column on the raw
+files -- the SDD =.do= never itself merges in a panel-key crosswalk file.
+The readme's claim that "the sample here can be used to assemble a panel
+with the previous survey waves" (=...SDD/readme.md:6=) therefore rests on
+a column the WB distribution ships pre-attached, not on a linkage step
+EPAR's own code performs -- worth knowing if anyone tries to reconstruct
+EPAR's panel linkage logic rather than trusting the readme's claim.
+
+* KNOWN ISSUES register (three-cell table)
+
+** Cell 1 -- EPAR found it AND we did
+
+| # | issue | EPAR evidence | our evidence |
+|---+-------+----------------+---------------|
+| 1 | Plot-area GPS outliers are implausibly large and need a fix | =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:254-255= (disabled >10,000-acre null check; enabled =meas/10000 if >=1000= rescale) | =tanzania.py:1046-1054=, clamp >2500 acres -> =pd.NA=, citing "the 2020-21 GPS column has a 28710-acre data-entry outlier" |
+| 2 | Extended vs. Refresh sub-panels have zero household overlap by design | =...SDD/readme.md:6= (SDD "can be used to assemble a panel"); =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:5= ("begins a new longitudinal sample") | =CONTENTS.org:1007-1038=, panel design note; =.claude/skills/tanzania-panel-design.md:14-17= |
+| 3 | Section 4A's quantity/value variable numbering needed independent verification against the instrument | =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:538= ("Numbering in the dta files differs from the instrument -- summary stats suggest that quantities and values are in Q27 and Q28"), resolved by EPAR as =kg_harvest = ag4a_27= (=:539=) | =lsms_library/countries/Tanzania/2020-21/_/crop_production.py:26= independently maps =qty='ag4a_27'= for the identical module -- an independent cross-check landing on the same variable |
+
+Note on row 1: *both sides found the same defect (implausible GPS acreage)
+and chose different remedies* -- EPAR rescales (divide by 10,000, treating
+it as a decimal-point error) starting at 1,000 acres, citing "a
+discontinuity between 85.52 and 10432" as evidence it is a *unit* error;
+we null out above 2,500 acres, citing a specific 28,710-acre outlier as
+evidence it is a *data-entry* error.  Neither remedy is validated against
+the other -- see Ranked learnings #4.
+
+** Cell 2 -- EPAR found it AND we did not (candidate new issues -- raw variable, wave, what EPAR did)
+
+| # | EPAR finding | raw variable / wave | what EPAR did |
+|---+--------------+----------------------+-----------------|
+| 1 | Land-rental time unit is inconsistently coded across households: "69/172 have years instead of months as their rental units; another 114 appear to have given the rental price per month" | =ag3b_34_1=/=ag3b_34_2= (rental duration + unit), 2020-21 | Rescaled everything to an annual basis via =n_seas=-weighted arithmetic (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:776-782=); no equivalent land-rental-value feature exists in our schema to check this against |
+| 2 | The incomplete-harvest adjustment reuses the same variable (=ag4a_27=) as both the harvest quantity (=:539=) and, three lines later, an implied percent-not-yet-harvested divisor (=kg_harvest/(1-(ag4a_27/100))=, =:544=) -- for =ag4a_27>100= the denominator goes negative | =ag4a_27=, =ag4a_25= (harvest-completion flag), 2020-21, "only 3 obs are not finished with harvest" (=:542=) | Applied the rescale anyway to the 3 affected observations; we do not replicate any completion-adjustment for =crop_production= -- our own 2020-21 script (=crop_production.py:26=) takes =ag4a_27= as reported =Quantity= with no such rescale, so this specific defect (if it is one) does not propagate to us |
+| 3 | 80 of 10,607 plots (=~0.75%=) carry recorded input expenses but never appear in the crop/plot roster built from =ag_sec_3/4= | merge of =Tanzania_NPS_W5_input_quantities.dta= against the plot-decision-maker/planted-area roster, 2020-21 (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2473=, comment "80 not matched, 10,527 matched") | Kept the matched 10,527 (=keep(1 3)=), silently drops the 80; we have not checked whether an analogous roster mismatch exists between our own =plot_inputs= and =plot_features=/=crop_production= tables for 2020-21 (not investigated this pass) |
+
+Citations verified by direct =grep -n= against the clone; see inline
+references above.  None of rows 1-3 have a corresponding entry in
+=CONTENTS.org= or =open_issues.tsv=.  Row 1 is a genuine data-quality
+finding with no feature of ours to check it against; row 2 is EPAR-only
+(confirmed not to propagate to us); row 3 is an open question for a later
+pass (flagged, not resolved here).
+
+*EPAR pipeline observation, not a Cell-2 data finding* (kept separate
+per the brief's Cell-2 definition -- this is about EPAR's own code
+correctness, not a survey/data problem): two inline comments in the
+household dietary-diversity-score recode describe edits that the actual
+=recode= ranges do not reflect -- "Added packaged fish (901)" sits next to
+a FISH range (=808/810=) that item 901 is not in, and "removed 401 hone[y]"
+sits next to a LEGUMES range (=401 501/504=) that still contains 401.
+Identical in both waves: =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2546-2548=
+and =...SDD/EPAR_UW_Tanzania_NPS_SDD.do:2835-2837=.  We do not build an
+HDDS/FCS/rCSI construction at all (see Construction decisions), so this
+cannot propagate to us either way; recorded because it is a concrete,
+citable EPAR code defect a future reader of their HDDS numbers should
+know about.
+
+** Cell 3 -- We found it AND EPAR did not
+
+| # | our finding | EPAR exposure |
+|---+-------------+-----------------|
+| 1 | =crop_production= (2020-21) carries unscreened raw-quantity outliers up to *7,500,000 kg* (Coconuts, one plot) and several others in the hundred-thousands (Timber 4,000,000 kg; Other Fruits 2,400,000 kg) -- verified on the warm cache, =~/.local/share/lsms_library/Tanzania/2020-21/_/crop_production.parquet= (11,125 rows; =df['Quantity'].describe()= max =7.5e6=, mean 2,218 but std 85,733).  =tanzania.py:1163= (=crop_production_for_wave=) has no clamp/clip/winsorize call anywhere in its body (grepped for those keywords -- zero hits) | EPAR hand-deletes exactly *one* comparably implausible observation elsewhere in the identical instrument ("1 very strange outlier, 800000 kg cabbage", =hhid=="0015-001-001"=, =plot_id==4=, =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:578-579=) but that specific household id does not appear in our own reconstructed panel ids (checked: absent from the =i= index level of our parquet), so we cannot tell from this alone whether EPAR's final released numbers still contain comparably-sized outliers in *other* rows the way ours plainly do. Not a numeric-parity claim -- a plausibility-screen gap on our side, exposed by EPAR's own manual fix elsewhere in the same file. |
+| 2 | #835 =new_harmonize_units= int64 floor: 852 rows lose their unit value, ~4,500 inflated up to 1.9x (=CONTENTS.org:1420-1448=) | EPAR's crop-quantity path (=ag_sec_5a/7a= "quantity sold") is reported natively in KG per the instrument's own "CONVERT LOCAL UNITS INTO KILOGRAMS" instruction (questionnaire text quoted in =slurm_logs/price_sources/Tanzania/REPORT.org:120-131=) -- EPAR's crop-sales pipeline never floors a fractional quantity the way our =food_acquired= unit harmonizer does, so their numbers are not exposed to the #835 defect; it is specific to our own food (not crop) unit-conversion path |
+| 3 | #114 / UPHI back-casting many-to-many (up to 11 UPHIs per round-1 =r_hhid=) | Not applicable to EPAR -- W1-W4 each process only their own round-specific =r_hhid=/=y*_hhid= independently; the ambiguity is an artefact of our =wave_folder_map= pooling four rounds into =2008-15/=, which EPAR's one-file-per-round structure never does |
+| 4 | #113 / community-price <-> household =v= mismatch (=interview__key= vs. =clusterid=/=y5_cluster=, 0% raw overlap, =CONTENTS.org:729-742=); #840 (open_issues.tsv:11) -- =community_prices= itself drops the variety axis, ~90% of Tanzania rows | Confirmed by direct grep: =cm_sec=/="community"= (case-insensitive) match *zero* lines in either =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do= or =...SDD/EPAR_UW_Tanzania_NPS_SDD.do=.  EPAR never attempts a community-price join in either reviewed wave, so it never meets the #113 obstacle (or the #840 variety-collapse problem) at all -- not because it solved it, but because it never builds the corresponding table. |
+| 5 | =cluster_features= geography is a household attribute projected onto a tracking-panel cluster; GH #323 Site 2 cut contested cells 2,106 -> 385 but 2,687 rows are still destroyed by the collapse (=CONTENTS.org:1753-1775=); residual tracked at #837 (open_issues.tsv:14, "up to 1,304 rows a wave" in Ethiopia/Tanzania/Uganda) | EPAR reads region/district/ward/ea directly off each household's own cover page for its price-ladder geography (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:178-190=) and never aggregates it to a *cluster* attribute at all -- it stays at household grain throughout, so EPAR's own numbers are not exposed to the collapse defect, but neither does EPAR produce a cluster-level geography table the way our =cluster_features= does |
+| 6 | #846 -- Section J qq.2-6 asks a quantity for own-production/gifts but never a price; not-asked, not asked-not-distributed (=slurm_logs/price_sources/Tanzania/REPORT.org:79-108=, verdict row cited at =REPORT.org:518=) | EPAR's *separate* Household-Consumption-Data project builds an own-consumption *value* anyway, via the identical median-price ladder (region/district/ward/ea, >=10 obs) applied to the =food_purch_value/food_purch_qty= unit price -- see Ranked learnings #1 and Contradictions. EPAR's own published =food_consumption_value_by_source.dta= would show a populated own-production value with no visible caveat that it is imputed from purchase prices, not measured. |
+
+* Construction decisions by feature area
+
+** Household IDs / weights -- =reported= + =aggregated=
+
+- EPAR renames the wave's native id/geo columns onto a common vocabulary
+  per wave (=y5_crossweight -> weight=, comment "sdd = y5" marking the
+  cross-wave rename convention; =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:186-190=).
+  =reported=.
+- Weight *rescaling to external population totals* -- EPAR computes
+  =weight_pop_tot=, =weight_pop_rur=, =weight_pop_urb=, then
+  =weight_pop_rururb= by rescaling the survey weight so that
+  =total hh_members [pweight=...]= matches WB population indicators
+  (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:213-236=).  =imputed/aggregated=
+  -- this is a genuinely different design from ours: our =sample()=
+  normalises =weight=/=panel_weight= to within-wave mean 1 (CLAUDE.md,
+  "Weights are normalised to within-wave mean 1 at API time"), which
+  preserves ratios/shares/means but abandons any claim to a population
+  total; EPAR's calibration preserves the population-total claim but ties
+  every wave's weight to an external WB indicator that can itself be
+  revised. Neither choice is "wrong"; they answer different questions
+  (population totals vs. cross-wave-size-invariant ratios).
+
+** Plot areas -- =reported= + =imputed=
+
+- GPS-measured area preferred, farmer-estimated area as fallback --
+  *matches our own priority order* (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:264-265=,
+  =gen field_size = area_meas_hectares= then
+  =replace field_size = area_est_hectares if field_size==.=; ours:
+  =tanzania.py:1053=, "area_gps.where(area_gps.notna(), area_est)").
+  =reported=, same choice both sides.
+- Implausible-GPS-acreage handling *differs* -- see Cell 1 row 1 for the
+  side-by-side comparison and citations.
+- SDD (2019-20) carries *no* clamp or rescale code at all
+  (=...SDD/EPAR_UW_Tanzania_NPS_SDD.do:264-280=) -- consistent with our
+  own finding that the extreme-value defect is specific to the 2020-21
+  GPS column, not general to the NPS instrument.
+
+** Crop values / price-per-kg methodology ("ALL PLOTS") -- =reported= + =imputed= + =aggregated=
+
+- *Sales price is a genuine reported unit value*: =price_kg =
+  value_sold/quantity_sold= from the crop-sales module, no unit ambiguity
+  because "CONVERT LOCAL UNITS INTO KILOGRAMS" is printed in the
+  instrument (questionnaire quote reproduced in
+  =slurm_logs/price_sources/Tanzania/REPORT.org:120-131=).  =reported=.
+- *Unsold-harvest valuation is a five-rung median-price ladder*: computed
+  per (region, district, ward, ea, hhid) weighted median of
+  =price_kg=, with the FINEST rung carrying >=10 observations winning
+  (=obs_`i'_kg >9=, loop =foreach i in country region district ward ea=
+  applied in that coarse-to-fine order so the last, finest, qualifying
+  assignment wins) -- =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:387-414=.
+  =imputed=.  This is methodologically very close to our own
+  =median_price_valuation= (CLAUDE.md crib: "WB EA -> admin -> national
+  median ladder, >=10 obs"), a genuine convergence on the same threshold
+  and the same ladder shape, independently arrived at -- see Ranked
+  learnings #3.
+- *A third fallback layer we do not have*: where even the country median
+  is unavailable, EPAR falls back to the survey's own direct valuation
+  question (=replace value_harvest = ag4a_28 if value_harvest==.=,
+  =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:574-575=).  =reported= (this
+  layer), stacked under two =imputed= layers above it.
+- *Crop value is capped/overridden by observed sales*:
+  =replace value_harvest_imputed = value_sold if value_sold>value_harvest_imputed...=
+  (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:1088=, "155 changes here, suggests
+  big gap between farmer estimated valuation and sales price"), and crop
+  *losses* are separately capped so a household cannot report losing more
+  value than it produced (=replace value_lost = value_crop_production if
+  value_lost > value_crop_production=, =:1136=).  Both =imputed=.  We do
+  not construct an analogous =value_crop_production= at all -- our
+  =crop_production= table is REPORTED-only (Quantity, Quantity_sold,
+  Value_sold, optional =KgFactor=); we never impute a value for the
+  unsold portion of harvest, and we found no plausibility screen on the
+  raw =Quantity= column either (Cell 3 row 1).
+- *Tree-crop / intercrop area allocation* is a long chain of heuristics
+  with EPAR's own admitted uncertainty in the comments ("some are
+  implausibly huge... I tried estimating stand densities based on the
+  estimated crop areas, but the ranges are huge",
+  =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:512-514=).  =imputed=, and openly
+  fragile by EPAR's own account. We do not attempt an equivalent
+  area-splitting construction; =plot_features.Area= is the whole-plot
+  GPS/farmer-estimate area, with no intercrop apportionment.
+- *Crop-code aggregation*: beans and cowpeas are merged into one code 931
+  ("Beans-Cowpeas") in (at least) three places
+  (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:386,1072,1130=). =aggregated=.
+  Our =crop_production= keeps the survey's native crop codes (via
+  =harmonize_crop=) and does not merge categories at the item level.
+
+** Crop expenses -- =reported= + =imputed=
+
+- Hired labor cost: =wages= summed directly from the wage columns
+  (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:656-659=). =reported=.
+- Family labor DAYS are reported (=labor_family=, FARM LABOR section
+  below) but *never assigned an implicit wage*: the comment at
+  =:651= states plainly that this is a "substantial" omission because
+  family labor was ~90% of all plot labor days in the prior wave.  This
+  matches our own design -- our =plot_labor= carries =PersonDays=/=Wage=
+  per =source= (family/hired), and family-labor =Wage= is not populated
+  either (we do not impute a shadow wage), so both sides leave the same
+  gap, for what appear to be independent reasons (EPAR: no data to base
+  an implicit cost on; us: design philosophy against imputing values into
+  a REPORTED item table).
+- Fertilizer nutrient decomposition (N/P/K per kg from fertilizer type)
+  uses a hardcoded composition table (DAP 18-46-0, urea 46-0-0, NPK
+  treated at 0.17 for each of N/P/K -- =n_kg=/=p_kg=/=k_kg= all reuse the
+  same =0.17= coefficient for =npk_fert=,
+  =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:706-708=, citing a
+  frontiersin.org source at =:704=).  =imputed=.  Corresponds to our own
+  =nitrogen_kg= transform (=transformations.py=); the specific
+  coefficients were not cross-checked line-for-line against ours in this
+  pass (see What I did not read).
+- Land rent: EPAR imputes an *implicit* rental value for owned land from
+  the household's own observed rent-paying plots plus in-kind share, then
+  must reconcile an inconsistently-coded rental-duration variable (Cell 2
+  row 1) (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:733-782=). =imputed=.  We
+  have no analogous rent-imputation transform; =plot_features.Tenure=
+  records the survey's reported tenure category only.
+
+** TLU (Tropical Livestock Units) -- =aggregated=
+
+Hardcoded species-coefficient table, =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:989-992=:
+
+| species group (lvstckid)      | EPAR coefficient | our =_TLU_FACTORS= (=transformations.py:2601-2611=) |
+|--------------------------------+-------------------+--------------------------------------------------------|
+| cattle-type (1-6)              |              0.50 | cattle 0.70                                            |
+| small ruminants / lvstckid 9 (7,8,9) |        0.10 / 0.20 | sheep 0.10 / goats 0.10 (lvstckid 9 separately coded 0.20) |
+| poultry (10-13)                |              0.01 | chicken 0.01 / other poultry 0.01 / rabbits 0.01       |
+| other (14, "dog, donkey, other") |            0.30 | donkeys 0.50 (no matching "other" bucket)              |
+
+*Internal inconsistency worth flagging on EPAR's own side, not ours*:
+EPAR's own species grouping puts =lvstckid= 9 together with the small
+ruminants for the "owned" breakdown (=gen smallrum=inlist(lvstckid,7,8,9)=,
+=:1003=) yet assigns it the *pig* coefficient 0.2, distinct from 7/8's 0.1
+(=tlu_coefficient=0.2 if (lvstckid==9)=, =:990=) -- i.e. EPAR's own two
+groupings of species 9 (the "smallrum" bucket vs. the TLU-coefficient
+bucket) disagree with each other, one line apart.  We did not have the
+NPS livestock codebook on hand to name species 9 with confidence in this
+pass, so the table above is deliberately by-code, not by-species-name.
+Small-ruminant, and poultry coefficients otherwise match ours exactly;
+*cattle diverges materially* (0.50 vs. 0.70, a 40% relative difference in
+the single most numerous category on most Tanzanian smallholdings) and
+the "other" bucket is not comparable one-for-one.  Neither figure is
+independently validated in this pass against a primary FAO/ILCA source --
+recorded as a disagreement, not adjudicated.
+
+** Livestock income / products -- =reported= + =imputed=
+
+Same five-rung median-price ladder (ea/ward/district/region/country,
+>=10-observation threshold) applied to milk/eggs/honey/skins unit prices
+(=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:1266-1301=), with a special-cased
+"if a household didn't sell milk, borrow the *cow*-milk country median
+even for other species" rule (=:1319-1321=, =price_cowmilk= applied to
+=livestock_code==2=).  =imputed=.  Live-animal sale price
+(=price_per_animal = income_live_sales/number_sold=, =:1354=) is
+=reported=.  We do not construct any equivalent aggregate valuation for
+livestock products; our =livestock= table carries HeadCount/HeadSold/Value
+as reported, with no median-price fill-in for unsold production.
+
+** Farm size / land size -- =reported= + =aggregated=
+
+Four distinct land-size denominators are constructed side by side
+(=farm_area= = cultivated only; =farm_size_agland= = cultivated + fallow;
+=land_size= = all held minus rented-out; =land_size_total= = all held incl.
+rented-out and rented-in), each a different =aggregated= sum over plot
+areas under a different inclusion rule
+(=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:1769-1873=).  Matches our own
+=farm_size= transform's stated intent to expose multiple denominators
+rather than pick one; the exact inclusion rules were not cross-checked
+line-for-line in this pass.
+
+** Farm labor -- =reported=
+
+=labor_hired=/=labor_family=/=labor_total= as day-counts, split by
+main/short season (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:1898-1920=).
+=reported=.  =wage_paid_aglabor = tot_aglabor_wage/labor_hired= is a
+derived *ratio*, not a stored valuation (=aggregated=, harmless in the
+sense our own crib flags -- "every aggregate, index, ratio... lives in
+code" -- EPAR does the same thing here, just inside the =.do= rather than
+at query time).
+
+** Fertilizer / improved seed use ("PLOT MANAGERS", "RATE OF FERTILIZER
+APPLICATION") -- =reported= + =aggregated=
+
+Household-level use indicators (=use_inorg_fert=, =use_org_fert=,
+=use_pest=, =use_imprv_seed=) are simple any-plot maximum booleans
+(=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2119-2136=). =aggregated=.  Rates
+per gender-of-manager are computed by reshaping wide on
+=dm_gender2 in {male, female, mixed}= then summing kg quantities per
+group (=:2483-2497=).  =aggregated=.  Nutrient kg totals as above.  The
+same section drops 80 unmatched plots on a merge (Cell 2 row 3).
+
+** Household diet diversity / food security -- entirely absent from our schema
+
+Three distinct indices are built from three different modules, none of
+which we construct at all:
+- *HDDS* (household dietary diversity score): 12 food groups from 7-day
+  consumption (=hh_sec_j1.dta=), household consumes a group if any member
+  does (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2538-2560=). =aggregated=
+  (count of food groups).  Contains the comment/code mismatch noted under
+  Cell 2 ("EPAR pipeline observation").
+- *FCS* (Food Consumption Score, WFP standard weights 2/3/1/4/1/4/0.5/0.5
+  by food group) from a *different* consumption-frequency module
+  (=hh_sec_j3.dta=, =:2569-2589=). =aggregated=.
+- *rCSI* (reduced Coping Strategies Index) from a food-security-behavior
+  module (=hh_sec_h.dta=, =:2599-2612=), a weighted sum of five coping
+  behaviors mapped to IPC phase bins. =aggregated=.
+None of HDDS/FCS/rCSI has an equivalent in our =data_info.yml= schema;
+=food_acquired= carries the raw acquisition rows these are built from, but
+we do not derive any diversity/security index from them (see Ranked
+learnings #2).
+
+** Unit handling -- three different strategies for the same class of problem
+
+Three distinct EPAR-side responses to "the unit reported for a quantity
+doesn't match the unit needed to price it" were found in this pass, and
+none of them matches our own #835 floor:
+1. *Floor before scale* -- not found in EPAR's crop path (crop quantities
+   are reported natively in kg per the instrument; Cell 3 row 2). This is
+   our own =new_harmonize_units= behaviour (=astype(np.int64)= before the
+   unit-factor multiply, CONTENTS.org:1420-1448), not EPAR's.
+2. *Typo-correction rescale* -- fertilizer/pesticide quantities reported
+   as an implausibly small number in what looks like the wrong unit are
+   divided by 1,000 and re-flagged to the smaller unit code
+   (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:672-675=, "Assuming instances of
+   very small amounts are typos").  =imputed=.
+3. *Silent drop-to-missing on unit mismatch* -- the Household-Consumption-
+   Data project's own-production/gift valuation requires an EXACT match
+   between the household's own purchase unit and its production/gift unit
+   at *every* rung of the median-price ladder:
+   =gen food_`f'_value=food_`f'_qty*price_unit if food_`f'_unit==food_purch_unit=
+   (=Household-Consumption-Data/Tanzania_W5_Food Consumption by source.do:341=),
+   repeated with the identical =food_`f'_unit==food_purch_unit= guard at
+   every ladder rung (=:348,354,360,366,372=).  A household that bought
+   maize in "kg" but received a gift of maize in "tins" gets no imputed
+   value at any rung, for that observation -- permanently, silently, with
+   no count of how many rows this affects anywhere in the script.
+   =imputed= (or rather, its silent failure mode).  This is a third
+   strategy distinct from both a floor and a typo-rescale, found only in
+   the separate consumption project, not in the main Ag-indicators =.do=.
+
+* Ranked learnings
+
+1. **Own-consumption valuation via a median-price ladder (Household-
+   Consumption-Data project) is directly relevant to #846/#113, and we
+   should read it before finalizing the not-asked verdict.**  EPAR's
+   *separate* consumption-by-source project (=Household-Consumption-Data/Tanzania_W5_Food Consumption by source.do:278-372=)
+   imputes an own-production/gift consumption *value* from the household's
+   own purchase-based unit price, falling back through the identical
+   ea/ward/district/region/country >=10-obs ladder used everywhere else in
+   EPAR's pipeline (subject to the unit-mismatch silent failure noted
+   under Unit handling #3).  This does not contradict a =not-asked=
+   verdict for the raw *price* field (Section J genuinely asks no price
+   question for q5/q6 -- =slurm_logs/price_sources/Tanzania/REPORT.org:79-108=)
+   -- EPAR needed to impute precisely because nothing was asked.  What it
+   shows is that a *comparable, query-time-only* median-price valuation is
+   already plausible for Tanzania own-consumption using machinery we
+   already have (=median_price_valuation=), if the maintainer ever wants
+   a value estimate rather than leaving =food_expenditures(basis='total')='s
+   own-production component valueless.  Touches: nothing forced --
+   =median_price_valuation= already exists; this is a "the demand exists,
+   the machinery exists, nobody has wired the two together for Tanzania's
+   own-production leg" observation.  Risk: LOW to read/decide, MEDIUM if
+   implemented, because it is squarely an =imputed= construction that must
+   never be baked into a parquet, and doing it wrong (e.g., picking the
+   wrong obs-count threshold, or inheriting EPAR's unit-mismatch silent
+   drop) would misrepresent Tanzania relative to countries where a real
+   own-consumption price exists.
+2. **HDDS / FCS / rCSI are constructions we do not have, built from modules
+   (=hh_sec_j1=, =hh_sec_j3=, =hh_sec_h=) that overlap =food_acquired='s
+   source files.**  If dietary-diversity or food-security indicators are
+   ever wanted cross-country, EPAR's exact group mapping
+   (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2538-2560=) is a usable starting
+   point *after* fixing the comment/code mismatch we found (Cell 2, EPAR
+   pipeline observation) -- do not copy the =recode= ranges verbatim
+   without re-deriving them from the item codes.  Touches: a new transform
+   in =transformations.py=, no change to any item table.  Risk: MEDIUM --
+   requires deciding what our own equivalent food-group taxonomy is (we
+   have =harmonize_food=/=food_items.org=, not a 12-group HDDS mapping),
+   and the module (=hh_sec_h= for rCSI) does not exist in our
+   =data_info.yml= schema for Tanzania at all.
+3. **The 5-rung geographic median-price ladder EPAR uses (ea, ward,
+   district, region, country, all >=10 obs) is a closer match to our own
+   =median_price_valuation= (crib: "WB EA -> admin -> national ladder,
+   >=10 obs") than either side seems to have noticed, and it recurs
+   identically across crop valuation (=:387-414=), livestock products
+   (=:1266-1301=) and own-consumption (=Household-Consumption-Data/...do:287-329=).**
+   Worth a short cross-check that our threshold and rung order are the
+   same as EPAR's (both use >=10, both go finest-available-with-enough-
+   obs), since two independent teams converging on the same threshold
+   three times over is modest evidence the threshold is reasonable, not
+   merely a magic number on either side.  Touches: documentation only (a
+   one-line note in =transformations.py= or the ledger citing this
+   convergence). Risk: NONE -- read-only cross-check, no code change
+   implied.
+4. **EPAR's disabled/enabled area-clamp choice (rescale vs. null, at 1,000
+   vs. 2,500 acres) supplies an independent diagnosis worth testing against
+   our own outliers before treating our clamp threshold as final.**  EPAR
+   believes some outliers are *unit* errors, not *decimal-position*
+   errors ("reported in units other than acres",
+   =...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:254=) -- a different theory from
+   our own framing.  If our own plot-area outliers were re-examined,
+   EPAR's "wrong unit" theory is a testable alternative hypothesis before
+   deciding 2,500 acres is the last word.  Touches:
+   =tanzania.py:1046-1054= only if the re-examination finds the
+   alternative theory correct. Risk: LOW to check, MEDIUM to change (would
+   alter =plot_features.Area= for an unknown number of rows).
+5. **A plausibility screen on raw =crop_production.Quantity= is worth
+   considering, and EPAR's own single hand-fix elsewhere in the identical
+   instrument is the precedent, not a model to copy.**  Cell 3 row 1
+   found unscreened Tanzania 2020-21 quantities up to 7.5M kg with no
+   clamp anywhere in =crop_production_for_wave= (=tanzania.py:1163=).
+   EPAR's approach -- a single hardcoded per-household string match
+   (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:578-579=) -- is exactly the kind
+   of un-auditable, non-general fix our own "no winsorization anywhere,
+   count never clip" discipline (CLAUDE.md, harvest_kg/#818/#842/#829)
+   already rejects.  The learning is the *gap*, not EPAR's remedy: a
+   =crop_production= plausibility *count* (report, don't clip, exactly as
+   =harvest_kg='s =KgFactor= screen already does for a different column)
+   would give visibility here without importing EPAR's ad hoc deletion
+   pattern.  Touches: a new count-only screen alongside
+   =crop_production_for_wave= or a query-time diagnostic in
+   =transformations.py=; never a silent drop in the parquet.  Risk: LOW
+   to add as a report-only count; MEDIUM if anyone is tempted to make it
+   a clip.
+
+* Contradictions with our CONTENTS.org / issues
+
+No EPAR finding in this pass contradicts a claim in
+=lsms_library/countries/Tanzania/_/CONTENTS.org=.  Two near-misses worth
+recording explicitly because they could be mistaken for contradictions:
+
+1. *Not a contradiction*: EPAR's Household-Consumption-Data project
+   successfully reads =hh_j05_2=/=hh_j06_2= from Tanzania W5's
+   =hh_sec_j1.dta= (=Household-Consumption-Data/Tanzania_W5_Food Consumption by source.do:264-266=)
+   without incident.  This *could* look like it contradicts the original
+   (2023) #112 claim that those columns were MISSING from the WB release
+   -- it does not, because =CONTENTS.org:591-620= already recorded, on
+   2026-09-08, that the WB re-released the file and the premise of #112
+   "no longer holds."  EPAR's script (dated August 2024, per its own
+   header at =Household-Consumption-Data/Tanzania_W5_Food Consumption by source.do:12=)
+   sits chronologically *between* the original 2023 #112 report and our
+   2026-09-08 re-measurement, and is independent corroboration that the
+   columns were already present by mid-2024 -- tightening, not
+   contradicting, our own timeline.
+2. *Not a contradiction, but worth flagging for #839*: open_issues.tsv:12
+   references "Tanzania CONTENTS.org (#112)" as a config comment the data
+   contradict.  Read together with =CONTENTS.org='s own 2026-09-08
+   LOGBOOK note (which already says the same thing, quoted in Idiosyncrasy
+   #6 above), #839 appears to be tracking the *formal* correction of the
+   =Severity= line and =Description= table in the #112 entry (still
+   phrased in the present tense as if the columns were missing,
+   =CONTENTS.org:622-655=) rather than reporting a new contradiction --
+   the LOGBOOK note already flags this ("read at face value, sends the
+   next reader looking for a gap that is not there," =CONTENTS.org:611-616=).
+   Recorded here rather than treated as resolved, since #839 is still
+   open.
+
+* Waves EPAR covers that we don't, and vice versa
+
+| direction | wave(s) | note |
+|-----------+---------+------|
+| EPAR has, we don't as a *separate* wave-script structure | 2008-09/2010-11/2012-13/2014-15 as four independent =.do= files | We fold all four into one =2008-15/= folder via =wave_folder_map=; EPAR never faces the UPHI back-cast ambiguity because each of its four scripts only ever sees its own round. |
+| We have, EPAR effectively skips at the =readme= level | W1-W4 Known-Issues documentation | No top-level readme exists for these four EPAR waves at all (Coverage Finding 1). |
+| Both have | 2019-20 (SDD/Extended), 2020-21 (W5/Refresh+booster) | 1:1 wave correspondence, same panel-design split on both sides. |
+| EPAR-only (separate repo, not LSMS-Agricultural-Indicators-Code) | Household-Consumption-Data covers Tanzania W1-W5 (not SDD) | Own-production/purchase/gift consumption valuation; we have no such standalone product, though our =food_expenditures(basis=...)= covers similar ground without the median-ladder valuation of unpriced legs. |
+
+* What I did not read (so the synthesis knows the gaps)
+
+- *Full text of W1-W4 =.do= files* beyond section banners and the specific
+  sections cross-referenced above (PLOT AREAS, ALL PLOTS, CROP EXPENSES,
+  TLU, GROSS CROP REVENUE, FARM SIZE, FARM LABOR were read in W5 in full
+  detail and spot-checked once each in W1; the equivalent sections in W2,
+  W3 and W4 were NOT individually diffed against W5 or W1 -- only the
+  section banner list was checked).
+- *=_Summary_statistics/EPAR_UW_335_master_list_indicators.xlsx=* and
+  =EPAR_UW_335_SUMMARY_STATISTICS.do= -- not opened at all (binary
+  spreadsheet + a shared cross-country do-file, out of per-country scope).
+- *=Batching/=* folder -- not opened.
+- *=Nonstandard Unit Conversion Factors/=* -- Tanzania is not listed among
+  the countries the brief names for this (Uganda, Malawi); confirmed
+  Tanzania has no such folder under its EPAR directory but did not
+  exhaustively grep for a differently-named equivalent.
+- *Full W1 =Resources/= documents* -- =NPS_Enumerator_Manual_English_2008.pdf=,
+  =TZNPS_Agriculture_Qx_English_Year_1.pdf=, =TZNPS_Household_Qx_English_Year_1.pdf=,
+  =BID_final.pdf=/=BID_finalhighlight.pdf=, the 2008-09 national report,
+  =NPS_LSMS_sampledesign.pdf=, =TZNPS_Geovariables_Y1.pdf=,
+  =TZNPS_Community_Qx_English_Year_1.pdf= were identified but not read
+  beyond the file listing.  =Productivity measures_03302011.docx= and
+  =System variables_03242011.docx= were text-extracted and skimmed (both
+  are 2011-era variable-to-questionnaire-code crosswalks -- worksheets
+  mapping candidate productivity/input-use indicators to their AG-section
+  question codes, evidently precursors to the ALL PLOTS / CROP EXPENSES /
+  PLOT MANAGERS sections of the final =.do= files).
+  =LSMS_Data_Dictionary_04232011_ABP.xlsx= (binary) was not opened.
+- *Household-Consumption-Data* -- only the Tanzania W5 script was read in
+  any depth (household ids/weights, consumption/median-ladder valuation,
+  unit-handling sections); W1-W4 scripts in that project were located but
+  not opened.
+- *358_Estimating-Crop-Yields* -- not opened for Tanzania at all in this
+  pass, despite it being the single cheapest remaining high-value read
+  (420 KB, Tanzania is one of its two countries, and it is literally a
+  construction-decision sensitivity study). Flagged for a follow-up pass.
+- *Numeric parity* -- per the brief, no attempt was made to build or
+  compare actual =.dta= values between EPAR's =Final DTA Files= and our
+  own parquets, beyond the single read-only warm-parquet lookup in Cell 3
+  row 1 (column list + a =describe()=/sort on our own already-cached
+  =crop_production= table -- no EPAR =.dta= was opened for comparison).
+- *Nitrogen/phosphorus/potassium coefficient cross-check* -- EPAR's
+  fertilizer composition assumptions (=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:704-716=)
+  were not checked line-for-line against our own =nitrogen_kg= transform's
+  constants in =transformations.py=.
+- *Farm-size denominator cross-check* -- the four EPAR land-size variables
+  (=farm_area=, =farm_size_agland=, =land_size=, =land_size_total=) were
+  read but not checked line-for-line against our =farm_size= transform's
+  exact inclusion rules.
+- *=plot_inputs= vs. EPAR's "80 not matched" roster mismatch* (Cell 2 row
+  3) -- not checked against our own =plot_inputs=/=plot_features= merge
+  for 2020-21.

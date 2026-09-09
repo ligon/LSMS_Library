@@ -1,0 +1,774 @@
+#+title: EPAR x LSMS_Library -- indicator taxonomy, project shape, and the 358 yield study
+#+date: 2026-09-09
+#+author: EPAR taxonomy survey agent (Sue the Coder session)
+
+Stance per BRIEF.md: every EPAR construction below is a claim to reconcile,
+never a reference answer. Classification tags (=reported=/=imputed=/
+=aggregated=) follow BRIEF.md's definitions.
+
+* Project profile
+
+- *What it is*: EPAR (Evans School Policy Analysis & Research, U. Washington)
+  "Agricultural Development Data Curation" project, Technical Report #335.
+  Three separate GitHub repos read here, per
+  =reference/epar/NOTES.md= (cite the commit hash with every claim):
+  - =LSMS-Agricultural-Indicators-Code= @ =abfbdc93= (2026-05-21, tag =v1.5=,
+    592M) -- the TR#335 code proper: one do-file + readme per
+    country-wave, for Ethiopia ESS, Malawi IHS/IHPS, Nigeria GHS, Tanzania
+    NPS, Uganda UNPS.
+  - =Household-Consumption-Data= @ =0e9ccf29= (2026-06-10, 766M) -- a
+    sibling product (16 countries incl. six EHCVM), out of scope for this
+    taxonomy pass (see companion =FINDINGS_consumption_by_source.org= in
+    this directory, written by another agent in this batch).
+  - =358_Estimating-Crop-Yields= @ =bd742b4d= (2017-12-06, 420K) -- a
+    standalone 2017 sensitivity study, Ethiopia + Tanzania only, DOI
+    10.5281/zenodo.1093718. Distinct authorship subset (Biscaye, Chen,
+    Coomes, Merfeld) and distinct purpose: comparing construction
+    *decisions*, not shipping one canonical indicator set.
+  - Also on disk but NOT surveyed here per the acquisition allowlist:
+    =dissemination/EPAR_UW_335_AgDev_Indicator_Estimates.xlsx= (fetched this
+    session, see below).
+  - Licence: BSD 3-Clause (U. Washington, 2017) on both the main code repo
+    and the 358 study. Citation strings in =CITATION= files (both quoted in
+    NOTES.md).
+- *Who*: project leads C. Leigh Anderson and Didier Alia; ~35 named
+  contributors over "over a decade" (=LSMS-Agricultural-Indicators-Code/README.md=).
+- *Vintage*: main code repo actively maintained through 2026-05 (v1.5); the
+  358 study is frozen at 2017-12 and never touched again -- it predates even
+  Wave 4/5 of most instruments and only ever covered 2 of the 5 countries.
+- *How it differs in kind from the WB LSMS-ISA_Ag panel*
+  (=slurm_logs/2026-06-13_wb_incidence_map/=): the WB panel is ONE
+  already-harmonised cross-country table, built and maintained by the WB
+  LSMS team itself, silently patching known survey-release defects (see
+  the #829 case below). EPAR is a *per-country-wave* pipeline of ~120
+  do-file sections each writing its own intermediate =.dta=, run and
+  reviewed independently per wave (readme "CODING STATUS" per section), then
+  collapsed to 3 final tables and a published summary-statistics workbook
+  that is explicitly allowed to lag the code (README.md: "do files ... may
+  not reflect the estimates published in the excel spreadsheet"). EPAR is
+  closer in *shape* to our own per-wave build (one script per wave, one
+  readme/CONTENTS.org-like doc per wave) than the WB panel is -- but EPAR
+  bakes every aggregation into an intermediate =.dta= file, where our design
+  keeps item-level parquets and pushes aggregation into
+  =transformations.py= (CLAUDE.md "Derived Tables"). That single
+  data-vs-code placement of the aggregation step is the central axis on
+  which to read every finding below.
+
+* Indicator inventory
+
+=_Summary_statistics/EPAR_UW_335_master_list_indicators.xlsx=, sheet
+=MASTER_LIST_INDICATORS=, 6,285 rows x 12 columns (read with
+=pandas.read_excel=, openpyxl engine).
+
+- *201 unique indicators* (=indicatorname=); the 6,285 rows are every
+  disaggregation combination (gender x farm-size x currency x
+  sub-population) of those 201 -- e.g. =w_total_income_1ppp= alone spawns 9
+  rows just from {all/fhh/mhh} x {no-farm/0-1ha/1-2ha}.
+- *By grain* (=levelofindicator=, unique indicator names):
+  | grain | # indicators | # disaggregated rows |
+  |---+---+---|
+  | Household | 138 | 4,881 |
+  | Population (national/state/zone, mean+SE only) | 32 | 1,068 |
+  | Individual | 30 | 312 |
+  | Household-Plot | 2 | 24 |
+- *By theme* (=indicatorcategory=, unique indicator names): Crop Production
+  58, Income 46, Livestock Production 34, Agricultural Activity 18,
+  Adoption 15, Inclusion 12, General Household 10, Gender Equality 8.
+- *Weight column* (=weight=): Household-Weight (4,147 rows), Area-Weight
+  (1,616), Quantity-Weight (384), Individual-Weight (93), Labor-Weight
+  (24), Livestock-Weight (21) -- i.e. EPAR already treats "which weight"
+  as part of an indicator's identity, one weight type per row-level unit,
+  not a single survey weight reused everywhere.
+- *Currency*: 1,019 Local-Currency rows, 1,016 Consumption-PPP, 1,013
+  GDP-PPP (3,237 non-monetary rows have no currency conversion).
+- *Farm-size disaggregation*: bins are 0 ha / (0,1] / (1,2] / (2,4] / >4 ha,
+  plus combined (0,2] and (0,4] variants -- =EPAR_UW_Tanzania_NPS_W3.do:4284-4293=
+  (=Tanzania NPS Wave 3='s own do-file, not the summary-stats do-file; the
+  same variable names recur in ~20 other country/wave do-files per
+  =grep -l=, but the block was not verified byte-identical across them).
+  This is the "2/4 ha smallholder threshold" the brief anticipated: it is a
+  *reporting bin*, not a sample-inclusion filter -- all rural households are
+  kept and cross-tabbed by which bin they fall in.
+- *Gender disaggregation* (=genderdisaggregation= distinct values, 22
+  total): dominated by {All/Female-headed/Male-headed} households (~3,000
+  rows) and {Female/Male/Mixed} *plot managers* (~1,600 rows) -- i.e. most
+  gender-disaggregated ag indicators split by the plot decision-maker's
+  gender, not the household head's, a distinct construct (see
+  =PLOT-CROP DECISION MAKERS= below).
+
+* EPAR construction methodology (=_Summary_statistics/EPAR_UW_335_SUMMARY_STATISTICS.do=)
+
+- Rural-only by default: "The summary statistics are outputted only for the
+  sub_population of households ... in rural areas ... modify the condition
+  =if rural==1="
+  (=EPAR_UW_335_SUMMARY_STATISTICS.do:21-24=). *aggregated/reported* --
+  filter, not an imputation.
+- Weights: =[aw=weight]= for tabstat means, =svy: mean= (survey-design,
+  strata + PSU) for standard errors, one =[aw=...]= per weight TYPE listed
+  above (=EPAR_UW_335_SUMMARY_STATISTICS.do:303,315,339,371=). *reported*
+  weight application, standard survey-stats practice; matches our own
+  weighted-ratio invariance design (CLAUDE.md "sample() and Cluster
+  Identity") in spirit though not in the actual weight values (ours are
+  wave-mean-normalised at API time; EPAR's are raw survey weights,
+  re-scaled to WB population totals per wave --
+  =EPAR_UW_Tanzania_NPS_W3.do:87-89=).
+- *Winsorization is NOT in the summary-stats do-file* -- correcting one
+  BRIEF assumption. It is computed per country-wave, inside each
+  =EPAR_UW_{C}_W{N}.do=, before the final =HOUSEHOLD VARIABLES=/
+  =PLOT VARIABLES= merges (readme.md:358, 370). Thresholds:
+  =global wins_lower_thres 1= / =global wins_upper_thres 99=
+  (=EPAR_UW_Tanzania_NPS_W3.do:82-83=), applied per-variable with =winsor2=,
+  sometimes top-only, sometimes top+bottom, sometimes on the ratio AND its
+  numerator/denominator separately (=EPAR_UW_Tanzania_NPS_W3.do:4475-4870=;
+  full policy statement in the fetched estimates workbook's "General
+  Construction Decisions" sheet, row "Outliers and Winsorizing" -- see
+  below). Tag: *imputed* (values are REPLACED, not merely flagged) --
+  exactly the construction CLAUDE.md's "No winsorization anywhere" rule
+  forbids us from storing, and the recent =harvest_kg= plausibility screen
+  (commit =0d3a4241=, "screen implausible reported factors; count, never
+  clip") is our repo's explicit rejection of this EPAR pattern for the one
+  place we came closest to needing it.
+- *Priority crops*: a fixed 12-crop list -- "maize, rice, wheat, sorghum,
+  pearl millet (or just millet), cowpea, groundnut, common bean, yam,
+  sweet potato, cassava, banana" (=EPAR_UW_Tanzania_NPS_W3.do:94-113=,
+  Tanzania's =topcropname_area= global; Uganda's own list is set in its
+  own do-file header, referenced from readme.md:31-34). Drives which crops
+  get their own monocrop/input/yield tables. *reported* selection (a
+  curation choice, not a data transform) -- our =crop_production= carries
+  every crop the survey asked about, so we have no analogous restriction to
+  reconcile against; this is a place EPAR narrows and we don't.
+- Gender-of-plot-decision-maker (=dm_gender=): built from up to 3 named
+  decision-makers per plot, coded male-only/female-only/mixed, with an
+  explicit household-head fallback when no decision-maker is recorded
+  (=EPAR_UW_Tanzania_NPS_W3.do:264-273=, and again per-season at
+  =:409-411=). Tag: *aggregated* (collapses 1-3 individual roster entries
+  to one plot-season categorical). This construct underlies ~1,600 of the
+  6,285 master-list rows (all the "Female/Male/Mixed plot managers" rows)
+  and we have NO equivalent transform -- see Ranked Learnings #1.
+- Smallholder / farm-size bins: see Indicator inventory above --
+  =farm_size_0_0= / =_0_1= / =_1_2= / =_2_4= / =_4_more=
+  (=EPAR_UW_Tanzania_NPS_W3.do:4284-4288=), built from summed plot area
+  (their =farm_size_agland=). *aggregated* over item-level plot rows --
+  directly analogous to our =farm_size= transform in
+  =transformations.py=, no data-layer gap, a query-time bucketing we could
+  trivially reproduce with =pd.cut= if ever needed.
+
+* Section x ours incidence table (Uganda UNPS Wave 5 readme.md, one column)
+
+Every =### SECTION= from
+=Uganda UNPS/Uganda UNPS Wave 5/readme.md= (49 sections read in full,
+lines 10-380), mapped to our vocabulary
+(=lsms_library/data_info.yml= "Feature Vocabulary": =anthropometry,
+assets, cluster_features, community_prices, crop_production,
+food_acquired, food_coping, food_security, household_roster, housing,
+individual_education, interview_date, life_satisfaction, livestock,
+months_food_inadequate, nonfood_expenditures, nutrition,
+people_last7days, plot_features, plot_inputs, plot_labor, sample, shocks,
+subjective_well_being=) and Feature()/transformations.py.
+Legend: *BOTH* = we hold an equivalent item feature; *OURS-ONLY* =
+transform/feature exists on our side, EPAR builds nothing comparable;
+*THEIRS-ONLY(item)* = the underlying survey item exists but we have wired
+no feature for it; *THEIRS-ONLY(agg)* = an aggregate/index we could
+reconstruct from features we already have, via a NEW transformations.py
+fn; *NEITHER* = out of scope on both sides, or "nothing generated this
+wave" per the readme itself; *OUT-OF-SCOPE* = config/reporting, not data
+(GLOBALS, winsorization thresholds, priority-crop lists, SUMMARY
+STATISTICS section).
+
+| EPAR section (readme.md line) | ours |
+|---+---|
+| GLOBALS (10) | OUT-OF-SCOPE |
+| Winsorization Thresholds (28) | OUT-OF-SCOPE (we forbid this construction) |
+| Globals of Priority Crops (31) | OUT-OF-SCOPE |
+| HOUSEHOLD IDS (36) | BOTH -- =sample=/=household_roster= keys |
+| INDIVIDUAL IDS (42) | BOTH -- =household_roster= |
+| HOUSEHOLD SIZE (48) | BOTH -- =household_characteristics= (derived, runtime) |
+| PLOT AREAS (54) | BOTH, different construction -- ours =plot_features.Area= is =required=/reported (data_info.yml:232-234); EPAR's is *imputed* from parcel share (readme:55, "Plot area size = Parcel area size x (planted share)") |
+| PLOT-CROP DECISION MAKERS (60) | THEIRS-ONLY(agg) -- new transform candidate, see Learnings #1 |
+| FORMALIZED LAND RIGHTS (66) | BOTH, partial -- our =plot_features.Tenure= records ownership FORM (owned/leased/sharecropped/...) but not a "has a certificate" boolean; EPAR's binary is transform-able from ours only if Tenure's spellings distinguish titled sub-forms, which they currently don't (data_info.yml:248-256) |
+| ALL PLOTS (73) | BOTH -- =crop_production= (Quantity/u/condition/Quantity_sold/Value_sold) vs EPAR's median-CF-ladder valuation; see Learnings #2. Site of the #829 defect (readme:96) |
+| GROSS CROP REVENUE (98) | THEIRS-ONLY(agg), transform-able -- sums ALL PLOTS values to hh-crop/hh grain; no =transformations.py= fn yet computes "gross value of crop production" |
+| CROP EXPENSES (107) | BOTH (items) -- =plot_inputs=+=plot_labor=; EPAR's hh-level cost rollup is aggregated, transform-able |
+| MONOCROPPED PLOTS (120) | THEIRS-ONLY(item) -- monocrop/intercrop flag not carried in =crop_production= today (Uganda's =condition= axis is physical state, not stand type) |
+| TLU (127) | BOTH -- =livestock= + a =tlu= transform is in our documented transform list (BRIEF.md) |
+| LIVESTOCK INCOME (136) | BOTH, partial -- =livestock= carries HeadCount/HeadSold/(Value); EPAR's fodder/water/vaccine EXPENSE side and milk/egg PRODUCT quantities are THEIRS-ONLY(item), our =livestock= schema has no such columns (data_info.yml:356-400ff) |
+| FISH INCOME (149) | NEITHER this wave ("no fish income data ... nothing generated", readme:150); THEIRS-ONLY(item) in principle, we have no fish module anywhere |
+| SELF-EMPLOYMENT INCOME (152) | THEIRS-ONLY(item) -- no income/business-activity feature in our vocabulary at all (OUT-OF-SCOPE by design: CLAUDE.md's item list has no "income") |
+| OFF-FARM HOURS (158) | BOTH -- =people_last7days= (work hours) |
+| NON-AG/AG WAGE INCOME (164) | BOTH, partial -- =plot_labor.Wage= covers hired-labor payment on the farm; off-farm WAGE-JOB earnings are THEIRS-ONLY(item), no module |
+| OTHER INCOME (171) | OUT-OF-SCOPE (no income vocabulary) |
+| LAND RENTAL INCOME (177) | OUT-OF-SCOPE (income), though the underlying rented-in/rented-out flag lives in =plot_features.Tenure= (BOTH at the item level, THEIRS-ONLY for the income conversion) |
+| LAND SIZE (183) | BOTH -- =plot_features.Area= + our =farm_size= transform |
+| FARM LABOR (196) | BOTH -- =plot_labor= + our =total_labor_days=/=_family_=/=_hired_= transforms, an almost exact match |
+| VACCINE USAGE (205) | THEIRS-ONLY(item) -- no vaccine column anywhere in =livestock= |
+| ANIMAL HEALTH-DISEASES (210) | NEITHER this wave ("no animal health data ... nothing generated", readme:211); THEIRS-ONLY(item) in principle |
+| LIVESTOCK WATER/FEED/HOUSING (215) | THEIRS-ONLY(item) |
+| USE OF INORGANIC FERTILIZER (221) | BOTH -- =plot_inputs= + =nitrogen_kg= transform. NOTE: readme:222 flags Uganda's own known issue -- N/P/K reported as broad categories, no brand/guaranteed-analysis, so EPAR cannot do a nutrient-content adjustment either; worth checking whether our =nitrogen_kg= for Uganda already degrades the same way (candidate for the three-cell register, not resolved here -- see "What I did not read") |
+| USE OF IMPROVED SEED (228) | BOTH -- =plot_inputs= + =seed_kg= |
+| PLOT MANAGER (236) | THEIRS-ONLY(agg) -- combines fertilizer/seed use BY the decision-maker-gender construct above; blocked on the same gap as PLOT-CROP DECISION MAKERS |
+| REACHED BY AG EXTENSION (244) | THEIRS-ONLY(item) -- no extension-contact module |
+| MOBILE PHONE OWNERSHIP (250) | THEIRS-ONLY(item) or transform-able IF =assets= carries a "Mobile Phone" item row (not verified this pass -- see gaps) |
+| MILK PRODUCTIVITY (256) | THEIRS-ONLY(item) -- =livestock= has no milk-yield column; EPAR's own known issue: "not comparable across waves" (readme:260) |
+| EGG PRODUCTIVITY (262) | THEIRS-ONLY(item), same caveat (readme:266) |
+| CROP PRODUCTION COSTS/HA (268) | THEIRS-ONLY(agg), transform-able from =plot_inputs=+=plot_labor=+=plot_features=; EPAR's own known issue: Uganda W5 has no area-harvested, cost/ha-planted only (readme:272) |
+| RATE OF FERTILIZER APPLICATION (274) | THEIRS-ONLY(agg), transform-able -- =nitrogen_kg= / Area, a one-line addition to an existing transform |
+| WOMEN'S DIET QUALITY (280) | NEITHER this wave ("no women's diet data", readme:281) |
+| HOUSEHOLD DIET DIVERSITY SCORE / FCS (283) | BOTH^a per the WB incidence map's Area-18 precedent -- transform-able over =food_acquired=, aggregated on EPAR's side (=egen rowtotal=-style) |
+| WOMEN'S CONTROL OVER INCOME (290) | THEIRS-ONLY(item) -- no individual income-control question wired |
+| WOMEN'S PARTICIPATION IN AG DECISIONS (296) | THEIRS-ONLY(item) |
+| WOMEN'S OWNERSHIP OF ASSETS (302) | THEIRS-ONLY(item) or transform-able IF =assets= records an individual owner (not verified) |
+| AGRICULTURAL WAGES (308) | BOTH -- =plot_labor.Wage=, close to a direct match |
+| CROP YIELDS (314) | BOTH -- =harvest_kg=/=yield_kg=; see the 358-study section below for the deep comparison |
+| SHANNON DIVERSITY INDEX (322) | THEIRS-ONLY(agg), transform-able over =crop_production= (no diversity-index fn in our transform list yet) |
+| CONSUMPTION (329) | BOTH, partial -- =food_expenditures= covers food; EPAR's total consumption (incl. non-food, spatially/temporally deflated) needs =nonfood_expenditures= (Nigeria/Uganda only) plus a deflator we don't apply |
+| FOOD SECURITY (336) | BOTH, partial -- same gap as CONSUMPTION (per-adult-equivalent daily food consumption) |
+| FOOD PROVISION (342) | BOTH -- =months_food_inadequate= is the SAME months-count construct, direct match (our experience-scale features, =food_security=/=food_coping=, are a separate OURS-ONLY delta -- see Learnings #4) |
+| HOUSEHOLD ASSETS (348) | BOTH^a -- =assets= (items) vs EPAR's summed current value; our =asset_index= (PCA) transform is the parity move already anticipated by the WB incidence map (Area 13) |
+| DISTANCE TO AGRO DEALERS (354) | NEITHER this wave ("no data ... nothing generated", readme:355); THEIRS-ONLY(item) in principle |
+| HOUSEHOLD/INDIVIDUAL/PLOT VARIABLES (357,363,369) | see "Final datasets" below |
+| SUMMARY STATISTICS (375) | OUT-OF-SCOPE (their reporting layer) |
+
+Per-country exception noted from the readmes themselves (not inferred): this
+wave's readme states "nothing generated" for FISH INCOME, ANIMAL
+HEALTH-DISEASES, WOMEN'S DIET QUALITY, and DISTANCE TO AGRO DEALERS
+(readme.md:150,211,281,355) -- these are Uganda-W5-specific data absences,
+not missing code; other countries/waves may build these sections (not
+checked this pass -- see "What I did not read").
+
+* Final datasets and grains
+
+Confirmed from readme.md OUTPUT lines (357-373) and the do-file's own
+section banners/merge chains
+(=Uganda UNPS Wave 5/EPAR_UW_Uganda_UNPS_W5.do=):
+
+- =Uganda_NPS_W5_household_variables.dta= (household grain, key =hhid=).
+  Built at =EPAR_UW_Uganda_UNPS_W5.do:3742-3827+= by a long chain of
+  =merge 1:1 hhid using ...= statements (~16 merges shown at lines
+  3748-3817 alone, two of them inside a per-priority-crop loop so they
+  expand further at runtime) pulling in EVERY section's own already-collapsed
+  intermediate =.dta= (e.g. =..._hh_crop_production.dta=,
+  =..._crop_losses.dta=, =..._hh_cost_inputs.dta=,
+  =..._livestock_sales.dta=, =..._TLU.dta=, ...). Each of those
+  intermediates is itself the product of an earlier
+  =collapse (sum/max) ... by(hhid ...)= inside its own section.
+- =Uganda_NPS_W5_individual_variables.dta= (individual grain, key
+  =pid=-equivalent), saved at =EPAR_UW_Uganda_UNPS_W5.do:4874=, merging the
+  WOMEN'S-* sections and off-farm-hours-by-person pieces.
+- =Uganda_NPS_W5_field_plot_variables.dta= (plot grain, key =plot_id=),
+  saved at =EPAR_UW_Uganda_UNPS_W5.do:5112=, built from the =AGSEC4A=/
+  =AGSEC4B= plot-crop-season detail (season append at
+  =EPAR_UW_Uganda_UNPS_W5.do:594-596=) plus plot-level cost/labor/area
+  merges.
+- *EPAR collapses to household level for MOST indicators* -- of 201 unique
+  indicators, 138 (69%) are Household-grain, only 2 are Household-Plot and
+  30 Individual (Indicator inventory, above). The household-grain file is
+  itself the union of ~30 already-aggregated intermediate =.dta= files, so
+  the aggregation is baked into the DATA LAYER at every step, not deferred
+  to query time. This is the single structural point where our
+  "aggregation in code, not data" rule (CLAUDE.md "Derived Tables",
+  =_ROSTER_DERIVED=/=_FOOD_DERIVED=) diverges from EPAR's design: we would
+  ship =crop_production=/=plot_inputs=/=plot_labor=/=livestock= at their
+  item grain and let a =transformations.py= fn reconstruct
+  =household_variables.dta='s columns on demand, never persisting the
+  collapsed frame. Neither approach is wrong for EPAR's stated goal
+  (a fixed, citable set of summary statistics); it is wrong for OUR goal
+  (re-derivable, auditable item data) if we ever imported an EPAR
+  intermediate =.dta= directly instead of reconstructing the same number
+  from our own items.
+
+* Estimates spreadsheet structure
+
+Fetched per BRIEF.md allowlist into
+=reference/epar/dissemination/EPAR_UW_335_AgDev_Indicator_Estimates.xlsx=
+this session; recorded in =reference/epar/NOTES.md= (2026-09-09,
+7,768,323 bytes, SHA256
+=b23c1ea5ca2400f0634da91a9b59c7ba43b92a4b3801e64701b4fb1ad66421ea=).
+Structure only (no value analysis, per the brief -- a numeric parity run is
+a later, separate dispatch):
+
+- 4 sheets: =Cover Sheet=, =Estimates by Instrument=, =Summ. of Indicator
+  Construction=, =General Construction Decisions=.
+- =Estimates by Instrument=: 47,927 data rows x 26 columns. Columns =
+  the =MASTER_LIST_INDICATORS= metadata columns (=Geography, Survey,
+  Instrument, Year, indicatorcategory, indicatorname, units,
+  commoditydisaggregation, genderdisaggregation, hhfarmsizedisaggregation,
+  ruraltotalpopulation, subpopulationforestimate, currencyconversion,
+  levelofindicator, weight, variableName=) PLUS the estimate itself
+  (=mean, semean_strata, sd, p25, p50, p75, min, max, N, NOver30=).
+  *27 distinct =Instrument= values* (5 Geography x {5,4,5,6,7} waves per
+  country = 27, matching the README's wave enumeration exactly).
+  *150 distinct =indicatorname=* in the published estimates vs *201* in the
+  master list -- 51 master-list indicators have never been (or are not
+  currently) published in this workbook. Worth a follow-up diff before any
+  numeric parity run (which indicators are the gap, and why).
+- =Summ. of Indicator Construction=: 170 rows x 21 columns, one row per
+  indicator STEM (e.g. =total_income_=), giving in prose: numerator,
+  denominator, units, level, gender/farm-size/crop disaggregation, and a
+  "Winsorizing Decision" column (not read in detail this pass).
+- =General Construction Decisions=: 12 rows x 2 columns
+  (=Topic, Decision=), free-text policy statements. Two read in full this
+  pass: "General data cleaning" (illogical values fixed only when they
+  broke a merge or produced an impossible value -- e.g. swapped
+  animals-sold/value-received columns) and "Outliers and Winsorizing"
+  (full policy: 1st/99th-percentile winsorizing, sometimes bottom+top,
+  numerator/denominator winsorized separately from the ratio, proportions
+  never winsorized, never winsorized by sub-population). This sheet is the
+  authoritative EPAR-side statement of the winsorizing design summarized
+  above from the do-files.
+
+* 358 study: yield construction decisions vs harvest_kg/yield_kg
+
+=358_Estimating-Crop-Yields= covers Ethiopia ESS W2/W3 and Tanzania NPS
+W1/W2/W3 only (no Uganda, no Malawi, no Nigeria -- confirmed via
+=README.md= and =ls=). Read closely:
+=EPAR_UW_358_Tanzania TNPS 2012-13 LSMS-ISA_W3.do= (1,133 lines).
+
+| decision | 358 study (file:line) | our =harvest_kg=/=yield_kg= (=transformations.py:2088-2330=) | exposed as kwarg? |
+|---+---+---+---|
+| Self-reported vs GPS plot area | GPS primary (=ag2a_09=), farmer-estimate FALLBACK only when GPS is 0/missing (=...W3.do:89-93=; "2,064 changes" out of a 3,761-plot section) | =plot_features.Area= is whatever the country wave wired (reported, =required: true=, data_info.yml:232-234) -- no dual-source ladder anywhere; the choice is fixed per country, not compared | NOT exposed. We have no GPS-vs-self-report axis at all because we store one =Area= value, sourced once per country's build script |
+| Area planted vs area harvested | NOT compared in Tanzania (the instrument has no separate "area harvested"); the study's only area-axis variation is WHICH SEASON's area to use when a crop spans both LRS and SRS -- "only the largest area planted used" (=...W3.do:571= comment) | =yield_kg= divides by =plot_features.Area= once, no season-max logic, no planted-vs-harvested distinction (Uganda W5 has the identical instrument limitation -- readme.md:320, "we cannot compute ... area harvested") | NOT exposed |
+| Crop-cut vs self-reported harvest quantity | NOT compared -- =kg_harvest= is taken directly from the survey's OWN already-converted-to-kg field (=ag4a_28=, gated on =ag4a_25==1=, "unit is kg"; =...W3.do:188-190=). No independent unit-conversion layer exists in this study at all -- it trusts whatever the WB/NBS team already did | =harvest_kg= LAYERS its own conversion: reported =KgFactor= -> within-wave =(u,condition)= survey median (=min_reports= floor) -> library-inferred unit table -> none, never trusting a pre-converted field (=transformations.py:2088-2170=) | EXPOSED (=min_reports=, =volume_as_mass=, =carry_native=) -- this axis is where WE are richer than the 358 study, not the reverse. Neither corpus has crop-cut data to compare against either way |
+| Intercropped area allocation | Categorical "how much of the field" (1/4, 1/2, 3/4, or full for pure stand) mapped to =percent_field=, RESCALED if a plot's crop shares sum >1, times =field_area_cultivated= (=...W3.do:143-176=) | =crop_production= carries no per-crop AREA SHARE of a shared plot at all -- =harvest_kg= sums =Quantity x factor= per plot-crop directly; nothing splits plot area across intercropped crops | NOT exposed -- genuine gap, see Learnings #3 |
+| Outlier trimming | Winsorize top+bottom 1% (=winsor2 ..., cuts(1 99)=, =...W3.do:486,685=) run SIDE BY SIDE against MAD (values >2 SD above the median replaced by the median, upper tail only; =...W3.do:503-508=) as two competing sensitivity results in one output table (=...W3.do:565-571=) | NONE, by design (CLAUDE.md "No winsorization anywhere"); the closest analogue, =harvest_kg='s implausible-KgFactor screen (commit =0d3a4241=), COUNTS outliers and never clips them | Deliberately NOT exposed -- this is the sharpest philosophical divergence in the whole comparison: the 358 study's entire thesis is that outlier TREATMENT changes yield estimates materially, which is itself an argument for never baking one choice into a stored column |
+
+* LSMS+ individual / gender-disaggregation crosswalk (GH #439)
+
+Follow-up dispatch. Read in full:
+=slurm_logs/DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org= and
+=gh issue view 439= (issue body + the one locked-scope comment,
+2026-06-14). Design recap: the owner-expansion convention is grain
+=(t, i, j, pid)= -- one row per (household, item-type =j=, owner =pid=);
+Sex joined from =household_roster= on =pid=, never baked in; no
+aggregates stored (CLAUDE.md-style discipline). Candidate features:
+=individual_assets= (flagship, =(t,i,j,pid)=), =financial_inclusion=
+(=(t,i,pid)=), =decision_making= (=(t,i,pid,domain)=),
+=people_last7days= extended with time-use. Cambodia-first, cross-country
+extension to Ethiopia/Malawi/Tanzania explicitly deferred pending a
+"data-access audit" the doc could not run (no WB API key in that
+scoping session). This dispatch supplies exactly that audit for three of
+the five EPAR countries, using EPAR's own code as the source-variable
+map -- EPAR already identifies and reads every relevant raw module.
+
+** EPAR constructs carrying an individual/gender-of-decision-maker axis
+
+| Construct (file:line) | Raw variables read | Rule: ties / missing / non-hh ids | Output grain | Tag |
+|---+---+---+---|
+| *PLOT-CROP DECISION MAKERS*, Uganda W5 =EPAR_UW_Uganda_UNPS_W5.do:411-443= | =a3aq3_3= (fallback =a3bq3_3=, then =a3aq3_4a=, =a3bq3_4a=) = pid1 (:413-416=); =a3aq3_4b= (fallback =a3bq3_4b=) = pid2 (:417-418=) (AGSEC3A/3B, up to 2 named decision-makers per plot-season) | Reshape long over the 2 id slots (:420=), drop blank id/plot (:421=), merge to roster for Sex (:423=), **save the pre-collapse row-per-(plot,season,role,pid) frame as its own file, =Uganda_NPS_W5_dm_ids.dta= (:424=)**, then =collapse (mean) female= by (hhid,parcel,plot,season) (:433=): mean strictly between 0/1 -> =dm_gender=3= "mixed" (:435=); mean missing (no id matched, or both ids blank) -> fallback to household head's sex via =fhh= (:438-439=); a named id that fails to match the roster is silently absorbed into the missing-then-head-fallback path (no separate "non-household person" flag) | =(hhid, parcel_id, plot_id, season)= -> =dm_gender= categorical (pre-collapse =dm_ids.dta= is =(hhid,parcel,plot,season,role,pid)+Sex=) | *aggregated* (2 roster ids -> 1 plot-season category) |
+| *PLOT-CROP DECISION MAKERS*, Tanzania W3 -- TWO EPAR implementations, different rules | =ag3a_08_1/_2/_3= (fallback =ag3b_08_1/_2/_3=), main-code file =EPAR_UW_Tanzania_NPS_W3.do:248-253= (AG_SEC_3A/3B, up to 3 named decision-makers) | Main-code file: reshape long (:255=), =drop if personid==.= (:256=), merge to roster for Sex (:258=), **save pre-collapse =Tanzania_NPS_W3_plot_dm_ids.dta= (:261=)**, then =collapse (mean) female= by (hhid,plot,season,cultivated) (:263=): =dm_gender=female+1=, cast to 3 "mixed" if not exactly 1 or 2 (:264-265=); missing -> head's sex via =fhh= (:272-273=, =fhh= itself =gen fhh=(relhead==1 & gender==2)= at :177-180=). *The standalone 2017 =358_Estimating-Crop-Yields= study uses a DIFFERENT, explicit categorical rule on the same raw variables* (=dm1_female=/=dm2_female=/=dm3_female= compared directly, all-male=1 / all-female=2 / else=3, =EPAR_UW_358_Tanzania TNPS 2012-13 LSMS-ISA_W3.do:133-135=) -- EPAR's own two products disagree on the tie-breaking mechanics for the identical construct | =(hhid, plot_id, season)= -> =dm_gender= (pre-collapse =plot_dm_ids.dta= is =(hhid,plot,season,role,pid)+Sex=) | *aggregated* |
+| *PLOT DECISION-MAKERS*, Ethiopia W4 =EPAR_UW_Ethiopia_ESS_W4.do:493-535= | =s3q13= (pid1, falls back to the last 2 digits of =holder_id= if blank, :498-501=), =s3q15_1= (pid2, :502=), =s3q15_2= (pid3, :503=) (=sect3_pp_W4.dta=, up to 3 named decision-makers per plot); =recode personid* (999=.)= (:506=) treats 999 as the missing-id sentinel | Reshape long over 3 id slots (=j(pidno)=, :510=), =drop if personid==.= (an unmatched/blank/999-sentinel id is dropped from the long roster BEFORE the mean, not flagged, :512=), merge to roster for Sex, **save pre-collapse =Ethiopia_ESS_W4_dm_ids.dta= (:515=)**, then =collapse (mean) female= by (hhid,parcel,plot,holder) (:520=): fractional mean -> =dm_gender=3= mixed (:522=); fully missing (none of 3 ids matched) -> head's sex via =fhh= (:529-530=). A separate =dm1_gender= (pidno==1 only, "gender of plot holder") is also kept, NOT mixed-aware | =(hhid, holder_id, parcel_id, plot_id)= -> =dm_gender=, =dm1_gender= (pre-collapse =dm_ids.dta= is =(hhid,parcel,plot,holder,role=pidno,pid=personid)+Sex=) | *aggregated* |
+| *PLOT MANAGER / "Individual Engagement in Economic Activities"*, Ethiopia W4 =EPAR_UW_Ethiopia_ESS_W4.do:540-567= | Same =s3q13=/=s3q15_1=/=s3q15_2=, cultivated fields only (=s3q03==1=, :546=) | For EACH of the 3 id slots (=j=1,2,3=): keep (hhid,parcel,plot,id), drop blank/0, =field_managed=1=, =collapse (sum)= by (hhid, plot_manager_j) (:552=) -- this ALREADY drops =plot_id= per role-slot, before any appending; the 3 role-tempfiles are then APPENDED (stacked) and =collapse(sum) field_managed, by(hhid, plot_manager)= (:562=), dropping the role-slot identity too, leaving only a household-person field-count | =(hhid, personid)= with =farm_manager=1= flag | *aggregated* -- the =dm_ids.dta=-style files above (not this one) are the constructs closest to #439's target grain; this one destroys the plot link one step earlier than they do |
+| *female-headed household* (=fhh=), all three | Uganda: household roster head-sex (readme "Weights and Gender of Head"); Tanzania =:177-180= (=relhead==1 & gender==2=); Ethiopia (via =sect1_hh_W4.dta= head flag, feeding =Ethiopia_ESS_W4_weights.dta=) | Boolean, no ties possible (one head per household by construction) | =(hhid)= -> =fhh= bool | *aggregated* (roster collapse to 1 bit), but source is a single reported roster field (relationship-to-head + sex), so also *reported* at its own grain |
+| *WOMEN'S CONTROL OVER INCOME*, Uganda W5 =EPAR_UW_Uganda_UNPS_W5.do:2978-3082= | 8 income domains, each with up to 2 named "controller" ids, appended from AGSEC5A/5B (crop harvest =a5aq6a_2/_3/_4=, =a5bq6a_2/_3/_4=; crop sales =a5aq11f/g/h=, =a5bq11f/g/h=), AGSEC8A/8B/8C (livestock sales =a8aq6a/b=; milk sales =a8bq10a/b=; egg/other-livestock sales =a8cq6a/b=), and =gsec12_1.dta= (business, vars not read this pass) | Per-domain =replace type_decision=/=controller_income1/2= overwrite pattern (not a reshape-long), 2 controller slots stacked via preserve/restore into one =(hhid,type_decision,controller_income)= frame, then =collapse (max) control_*, by(hhid, controller_income=pid)= (:3066=) -- collapses the domain axis to 6 booleans. **Self-flagged, in-code, NOT in the readme, status unresolved by static reading**: a comment reads "NEED TO FIX THE ISSUE BETWEEN CONTROL_ANNUALHARVEST AND CONTROL_ANNUAL SALES SINCE THEY COME FROM THE SAME DATASET THEY ARE BEING WRITTEN ON TOP OF THE OTHER... Preserve tempfile append might do it" (:3018-3019=) -- but the =control_annualsales= block immediately above is already wrapped in exactly that =preserve=(:3003=)/=tempfile sales=/=restore=(:3016=)/=append using sales=(:3017=) pattern, so this may be a live defect or a stale comment left after an already-applied fix -- undetermined without running the code | =(hhid, pid)= -> =control_cropincome/_livestockincome/_farmincome/_businessincome/_nonfarmincome/_all_income= | *aggregated*, two collapse layers (domain -> 2-slot dedup -> person) |
+| *WOMEN'S PARTICIPATION IN AG DECISION MAKING*, Uganda W5 =EPAR_UW_Uganda_UNPS_W5.do:3093-3171= | =a3aq3_3=/=a3bq3_3=/=a3aq3_4a=/=a3bq3_4a= (planting input, AGSEC3A/3B), =a5aq6a_2/_3/_4=+=a5bq6a_2/_3/_4= (harvest control), =a6aq3b/c=, =a6bq3b/c=, =a6cq3b/c= (livestock ownership, AGSEC6A/6B/6C) | 3 domains {planting_input, harvest, livestockowners} stacked via the same 2-slot preserve/restore pattern; **=bysort hhid decision_maker: egen nb_decision_participation=count(decision_maker)= then =drop if nb_decision_participation==1=** (:3154-3155=) -- a DOCUMENTED threshold, not an unexplained artifact: the section's own header comment states the rule as designed, "Code as 1 if a woman is listed as one of the decision-makers for at least 2 plots, crops, or livestock activities" (:3088=), i.e. participation requires appearing as a named decision-maker in >=2 activities, and the same comment flags the consequence itself ("Indicator may be biased downward if some women would participate... but are not listed among the first two"); then =collapse (max) make_decision_*, by(hhid, decision_maker=pid)= (:3163=) | =(hhid, pid)= -> =make_decision_crop/_livestock/_ag= | *aggregated*; the >=2-activity floor is a documented construction choice (not a bug) that mechanically undercounts single-instance participation -- worth reproducing as an explicit, named threshold if we ever build this transform, not silently (see Ranked Learnings) |
+| *WOMEN'S OWNERSHIP OF ASSETS*, Uganda W5 =EPAR_UW_Uganda_UNPS_W5.do:3174-3274= | Land: =a2aq24b= (owner), =a2aq27a/b= (right to sell/use), AGSEC2A (:3189=). Livestock: =a6aq3b/c=, =a6bq3b/c= (poultry AGSEC6C explicitly NOT included here, unlike the decision-making section above, :3207=). Household assets: =h14q3A=/=h14q3B= (=gsec14=, PID stored as a different string format needing =substr=/=destring=, :3216-3219=) | =type_asset= in {landowners, livestockowners, household_assets}, up to 2 (or 2, differently-typed) owner slots per domain stacked via 4 preserve/restore blocks, then =collapse (max) own_asset, by(hhid, pid)= (:3270=) -- destroys the =type_asset= axis exactly as Ethiopia's version does | =(hhid, pid)= -> one =own_asset= bool | *aggregated* -- pre-collapse intermediate (post-append, pre-:3270=) is =(hhid, type_asset, pid)=, the same one-step-short-of-#439's-grain pattern as Ethiopia's asset-ownership construct |
+| *WOMEN'S OWNERSHIP OF ASSETS*, Ethiopia W4 =EPAR_UW_Ethiopia_ESS_W4.do:3497-3600= | Land: =s2q07_1/_2= (who can SELL), =s2q09_1/_2= (who can BEQUEATH/use as COLLATERAL), =sect2_pp_W4.dta=, up to 2 named owners per right-question. Livestock: =ls_s8_1q04_1/_2= (=sect8_1_ls_W4.dta=, poultry excluded, =ls_code= 10/11/12). Other assets: =s11q02_1..s11q02_12= (=sect11_hh_W4.dta=, 12 owner slots, "productive" assets only -- blankets/mattresses/watches/sofas/handcarts/jewelry explicitly excluded, :3560=) | Each right-question/owner-slot reshaped long to one row per named owner, blank/0 dropped (no tie logic needed -- multiple named owners each get their own row); the 3 asset-domain files APPENDED then =duplicates drop= (:3591=, "if a hh member appears at least once, she/he owns/controls") THEN =collapse (max) own_asset, by(hhid, asset_owner)= (:3586=) -- this is the step that destroys the =type_asset= (item) axis | =(hhid, asset_owner=individual_id)= -> one =own_asset= bool (any type); =women_asset = own_asset & mem_gender==2= (:3598=) | *aggregated* -- but EPAR's own intermediate (=Ethiopia_ESS_W4_women_{land,livestock,otherasset}_owner.dta=, pre-append, pre-collapse) is LITERALLY =(hhid, asset_owner, type_asset)= -- our =(t,i,j,pid)= target grain, one row short of being it |
+| *WOMEN'S PARTICIPATION IN AG DECISION MAKING*, Ethiopia W4 =EPAR_UW_Ethiopia_ESS_W4.do:3790-3856= | =ls_s8_1q05_1/_2= (livestock management, =sect8_1_ls_W4.dta=) appended with 3 more domain files not shown in full (=women_planting_input=, =women_control_harvest=, =women_sales_annualcrop= -- named at :3814-3816= but their source variables sit earlier in the do-file, not read this pass) giving =type_decision= in= {planting_input, harvest, sales_annualcrop, sales_permcrop, manage_livestock} | Reshape long per domain file (one row per named decision-maker, sentinel =99==missing person dropped, :3799=), append domains, =bysort hhid decision_maker: egen nb_decision_participation=count=, then =drop if nb_decision_participation==1= (:3818-3819=, the same documented >=2-activity floor as Uganda's equivalent construct above, ported without re-stating the rationale in Ethiopia's own comments), =collapse (max) make_decision_*, by(hhid, decision_maker)= (:3830=) -- collapses the 5-domain =type_decision= axis down to 2 booleans (=make_decision_crop=, =make_decision_livestock=) | =(hhid, individual_id)= -> =make_decision_crop/livestock/ag=, =women_decision_crop/livestock/ag= | *aggregated* -- pre-append intermediate is =(hhid, decision_maker, type_decision)=, i.e. =(t,i,pid,domain)=, EXACTLY #439's =decision_making= candidate grain, at FINER domain resolution (5 domains) than #439 sketched (4: asset/income/plot/enterprise) |
+| *WOMEN'S CONTROL OVER INCOME*, Ethiopia W4 =EPAR_UW_Ethiopia_ESS_W4.do:3860-3997= | =ls_sec_8_1q03_a/_b= (livestock-sale income control), =s12bq06_1/_2= (business income control, =sect12b_hh_W4.dta=; business ownership itself is =s12bq03_1/_2=, :2324=) | Same reshape-long-per-domain, append, dedupe-per-person pattern as above; final =control_cropincome/_livestockincome/_farmincome/_businessincome/_nonfarmincome/_all_income= are OR-combinations of the domain flags (:3948-3961=), i.e. a second, coarser collapse on top of the domain collapse | =(hhid, individual_id)= -> 6 income-control booleans | *aggregated*, two collapse layers deep |
+| *WOMEN'S DIET QUALITY*, Ethiopia W4 =EPAR_UW_Ethiopia_ESS_W4.do= (readme.md:260-265) | N/A | "Cannot be constructed in Ethiopia W4" (readme's own Known Issue) -- no individual-level diet-recall module exists in this wave at all | N/A | N/A -- confirms ESS4 lacks a genuine LSMS+ individual-diet battery even though it is the wave most likely to carry LSMS+ content (see below) |
+| *INDIVIDUAL VARIABLES final dataset*, Ethiopia W4 (readme.md:350-355) | Merges =control_income.dta=, =make_ag_decision.dta=, =women_asset.dta= 1:1 on =(hhid, personid)= (=EPAR_UW_Ethiopia_ESS_W4.do:5603-5605=) | N/A (pure merge) | =(hhid, personid)= | *aggregated* -- the final individual-grain table is the union of three ALREADY-COLLAPSED person-booleans, none of which retain the item/domain axis that produced them |
+
+** Is any of the three ISA-panel waves actually an LSMS+ pilot instrument?
+
+Not established either way from the instrument itself this pass --
+softened from an earlier draft of this section, which over-claimed on
+EPAR's absence of code. What is established is narrower and still
+useful: *EPAR's OWN CODE builds no such module* for any of the three
+ISA waves read, and one piece of readme-stated evidence points toward
+(not proves) a genuine instrument gap in Ethiopia specifically.
+
+Corrected finding: Uganda W5 (2015-16) is NOT thinner than Ethiopia W4
+here, as an earlier pass of this section wrongly stated -- it carries
+its OWN independently-coded WOMEN'S CONTROL OVER INCOME, WOMEN'S
+PARTICIPATION IN AG DECISION MAKING, and WOMEN'S OWNERSHIP OF ASSETS
+sections (readme.md:290-306; do-file :2959-3274=, table above), built
+from ORDINARY ISA crop/livestock/land sections (AGSEC3, 5, 6, 2, plus
+=gsec12_1=/=gsec14=) -- the same "ordinary module, individual question
+bolted on" pattern as Ethiopia, not a thinner version of it. Tanzania
+W3 (2012-13) is the outlier: no "Women's..." section of any kind exists
+in its do-file (confirmed by the absence of any such banner in the
+earlier full-file grep), so Tanzania's ISA panel, AT LEAST AS EPAR HAS
+CODED IT, carries only the plot decision-maker construct and nothing
+on asset ownership, income control, or ag decision-making.
+
+Two pieces of evidence bear on whether Ethiopia ESS4 carries anything
+closer to genuine LSMS+ breadth than Uganda/Tanzania do:
+
+- The rights battery Ethiopia's code reads is a thin 2-right subset
+  (sell, bequeath/collateral -- =s2q07=/=s2q09=, above) of the LSMS+
+  design's full 5-right battery (sell, bequeath, collateral, rent-out,
+  improve) that #439's schema sketch anticipated (=DESIGN...org=
+  "Design: respondent/owner axis convention" point 3) -- but this shows
+  only that EPAR's CODE reads no more than 2 rights, not that the
+  instrument asks no more.
+- Ethiopia W4's own readme states outright: "Women's Diet Quality:
+  ...Cannot be constructed in Ethiopia W4" (readme.md:260-265) -- this
+  IS instrument-level evidence (a stated absence, not a code gap), and
+  it points toward ESS4 lacking the individual dietary-recall module
+  that a genuine LSMS+ battery would include.
+- A read-only corroborating check: =ls lsms_library/countries/Ethiopia/2018-19/Data/*.dvc=
+  lists all 68 section files EPAR's do-file reads from; none is named
+  in a way suggestive of a dedicated individual-asset/ownership or
+  financial-inclusion module distinct from the ordinary =sect2_pp=
+  (land), =sect8_1_ls= (livestock), =sect11_hh= (assets), =sect12a/b=
+  (non-farm business) sections EPAR already reads from. This is
+  corroborating, not conclusive -- section labels alone (=sect10a-d_hh=,
+  =sect13_hh=, =sect15a/b_hh=) do not reveal their content without the
+  questionnaire, which was not read this pass.
+
+Net: #439's own audit conclusion ("needs a data-access audit... wire
+only what exists") is corroborated, not settled. Cambodia remains the
+only CONFIRMED full LSMS+ instrument in either corpus. Ethiopia and
+Uganda both carry a partial, EPAR-authored proxy for two of the four
+LSMS+ module families (asset rights, ag decision-making / income
+control) built from ordinary ISA sections -- Ethiopia's proxy is
+somewhat thinner on rights (2 of 5), Uganda's is somewhat wider on
+income domains (8 vs Ethiopia's ~4) -- and Tanzania (this wave) carries
+neither. Whether any instrument among the three ASKS more than EPAR's
+code reads is unresolved and would need the questionnaire PDFs, not
+the do-files.
+
+** Crosswalk onto the #439 design
+
+- *Exactly the owner-expansion axis, one collapse-step short*: EPAR's
+  own PRE-final intermediates are the closest thing to #439's target
+  grain in either corpus, before EPAR's own code destroys them. The
+  single strongest piece of evidence is that EPAR SAVES this
+  intermediate as its own file, unprompted, in all THREE countries
+  read this pass: =Uganda_NPS_W5_dm_ids.dta= (:424=),
+  =Tanzania_NPS_W3_plot_dm_ids.dta= (:261=), and
+  =Ethiopia_ESS_W4_dm_ids.dta= (:515=) are each
+  =(hhid, plot/parcel, season/holder, role, pid) + Sex= -- i.e. #439's
+  owner-expansion axis applied to the PLOT-decision-maker construct,
+  built and persisted before EPAR's own =collapse (mean) female=
+  destroys the role/plot detail down to one =dm_gender= category. None
+  of the three is currently in #439's candidate list (#439 sketched
+  item-type =j= for assets and =domain= for decisions, not a plot/role
+  dimension) -- worth adding as a fifth candidate,
+  =plot_decision_makers (t,i,plot,pid,role)=, since EPAR demonstrably
+  has the raw material AND has already written the exact intermediate
+  file in three countries, not just Cambodia.
+  - =Ethiopia_ESS_W4_women_{land,livestock,otherasset}_owner.dta=
+    (pre-append, pre-=collapse(max)=, =:3521=/=:3548=/=:3572=) and
+    Uganda's equivalent pre-=collapse(:3270=)= append chain
+    (=:3189-3269=) are each =(hhid, asset_owner=pid, type_asset)= --
+    literally #439's =individual_assets (t,i,j,pid)= grain with =j= in
+    {land,livestock,otherasset/household_assets}, missing only the
+    Sole/Documented/TenureSecure/Right{*} boolean columns #439 designed
+    (Ethiopia asks only 2 of the 5 rights; Uganda's raw vars checked
+    this pass show ownership only, no rights question at all).
+  - The per-domain decision tempfiles feeding WOMEN'S PARTICIPATION IN
+    AG DECISION MAKING (Ethiopia: =women_planting_input=,
+    =_control_harvest=, =_sales_annualcrop=, =_sales_permcrop=,
+    =_manage_livestock=, =:3814-3816=; Uganda: the pre-=:3163=
+    collapse= append of {planting_input, harvest, livestockowners},
+    =:3093-3153=) are each =(hhid, decision_maker=pid, type_decision)=
+    -- #439's =decision_making (t,i,pid,domain)= grain, Ethiopia's at
+    5-domain and Uganda's at 3-domain (plus 8 income domains in
+    Uganda's separate WOMEN'S CONTROL OVER INCOME construct) resolution.
+  - By contrast, the 3 role-slot tempfiles feeding Ethiopia's PLOT
+    MANAGER section (=:552=) are NOT this close: =plot_id= is already
+    dropped per-role BEFORE the role-slots are appended (corrected from
+    an earlier draft of this section, which claimed otherwise) -- the
+    =dm_ids.dta= files above are the right citation for "closest to
+    #439's grain," not this construct.
+- *A household/person-level collapse of it that WOULD become a
+  =transformations.py= fn in our design, never a stored table*: every
+  final EPAR output in the table above (=dm_gender=, =own_asset=,
+  =make_decision_*=, =control_*income=, =fhh=) -- these are exactly the
+  "gender asset gaps, ownership rates... -> transformations" class
+  #439's point 7 already anticipates. None of them should be stored;
+  if we build =individual_assets=/=decision_making=/
+  =plot_decision_makers= at the row-per-(item-or-domain,pid) grain,
+  every one of these EPAR outputs becomes a one-line
+  =groupby(...).any()=/=.mean()= over our item rows, computed at query
+  time, with the mixed/tie rule (fractional share, not first-match) as
+  a documented =transformations.py= choice we can adopt or improve on
+  (EPAR's "mean of female across named decision-makers, cast to
+  mixed/male/female, head-gender fallback on total absence" is a clean,
+  reusable rule with no data-layer commitment required to reproduce
+  it).
+- *Needs a survey module neither corpus carries*: the FULL LSMS+
+  battery -- Documented ownership, Economic ownership, TenureSecure,
+  the other 3 rights (rent-out, improve, plus a genuine sole-vs-joint
+  flag distinct from the decision-maker mixed/tie category), individual
+  dietary recall (WOMEN'S DIET QUALITY), and =financial_inclusion=
+  (accounts/mobile money/borrowing/saving) -- is NOT present in Uganda
+  UNPS, Tanzania NPS, or Ethiopia ESS as read this pass. Confirms #439's
+  own conclusion that only Cambodia 2019-20 is a self-contained LSMS+
+  source; the ISA panels can at best supply the two thinner EPAR-built
+  proxies above (asset rights subset, ag-decision/income-control) as a
+  design REFERENCE, not as source data for the missing modules.
+
+** Which item features would need a person/role level added
+
+None of our five ag item features carry a person/role axis today
+(checked against their =data_info.yml= schema entries and Feature
+Vocabulary list, this session's earlier read):
+
+| Feature | Current grain | What EPAR's construct needs added |
+|---+---+---|
+| =plot_features= | =(t, v, i, plot_id)=, =Area=/=AreaUnit=/=Tenure=/=TenureSystem= (data_info.yml:227-280) | A =(role, pid)= sub-axis to host =dm_gender='s 3 raw ingredients (up to 2-3 named decision-makers per plot) -- OR a new sibling table =plot_decision_makers (t,i,plot,pid,role)= (recommended, per the crosswalk above, to avoid widening an already-dense table) |
+| =plot_inputs=, =plot_labor= | =(t, i, plot, input)= / =(t, i, plot, source, season)=, no =Columns:= schema entry found in data_info.yml (checked this session) | Would need to JOIN =plot_decision_makers= on plot, not carry the person axis themselves -- fertilizer/seed-use-by-manager-gender (EPAR's PLOT MANAGER section) is then a transform, not a stored column |
+| =crop_production= | =(t, i, plot, j, u, condition, season)= | Same -- joins =plot_decision_makers= via plot, no direct change needed |
+| =livestock= | =(t, i, animal)= (data_info.yml:356+) | Needs a person/owner axis ONLY if we want Ethiopia's livestock-ownership-by-individual (=ls_s8_1q04_1/_2=) or livestock-management-decision (=ls_s8_1q05_1/_2=) constructs; today =livestock= has no =pid= level at all, so this is a genuine new-dimension add, not a sibling-table join |
+| =assets= | =(t, i, j)= (data_info.yml, Single Index / index_info) | This is the DIRECT collision with #439's flagship =individual_assets=: our existing =assets= is household-item grain with NO owner level; #439 wants =(t,i,j,pid)=. Either add =pid= to =assets= (risk: changes an existing table's grain/meaning for every country that already populates it) or build =individual_assets= as a genuinely NEW, separate feature as #439 already proposes -- this pass's evidence favors the NEW-feature route, precisely to avoid retrofitting a grain change onto a table other countries already rely on at household grain |
+
+** Are the raw decision-maker ids already read (and dropped) by our wave scripts?
+
+No -- checked by grepping the exact EPAR variable names against
+=lsms_library/countries/{Uganda,Tanzania,Ethiopia}/=:
+
+- Uganda: =a3aq3_3=, =a3aq3_4a=, =a3aq3_4b=, =a3bq3_3=, =a3bq3_4a=,
+  =a3bq3_4b= -- *zero* matches anywhere under
+  =lsms_library/countries/Uganda/=.
+- Tanzania: =ag3a_08_1=, =ag3a_08_2=, =ag3a_08_3= -- *zero* matches
+  (only =ag2a_09=, the unrelated GPS-area variable, is read, by
+  =Tanzania/2019-20/_/plot_features.py:23= and
+  =Tanzania/2020-21/_/plot_features.py:24=).
+- Ethiopia: =s3q13=, =s3q15_1=, =s3q15_2= -- *zero* matches anywhere
+  under =lsms_library/countries/Ethiopia/=.
+
+So these ids are not read-and-discarded; they were never selected at
+all. The wiring cost is nonetheless LOW, because the FILES that carry
+them are already open in our pipeline for other columns:
+=Uganda/2015-16/_/plot_labor.py= and =plot_inputs.py= (and the 2018-19
+equivalents) already call =get_dataframe= on =AGSEC3A.dta=/
+=AGSEC3B.dta= (confirmed via =.dvc= sidecars present in both wave
+=Data/= dirs); =Ethiopia/2018-19/_/plot_inputs.py:28=,
+=plot_labor.py:21=, and =plot_features.py:20= already open
+=sect3_pp_w4.dta= (the exact file carrying =s3q13=/=s3q15_1=/
+=s3q15_2=); =Tanzania/2019-20/_/plot_inputs.py=, =plot_labor.py=, and
+=plot_features.py=, plus =2020-21/_/plot_labor.py=, already open
+=AG_SEC_3A= (the exact file carrying =ag3a_08_1/_2/_3=, per the earlier
+=grep -rln=). Adding the decision-maker columns to any of these is
+"read 2-3 more columns from a file already opened," not a new
+DVC pull or a new source file.
+
+** Ranked learnings (this follow-up)
+
+1. *Build =plot_decision_makers (t, i, plot, pid, role)= as a new,
+   fifth candidate feature for #439*, ahead of the deferred
+   cross-country audit -- EPAR has already done the file-identification
+   work in THREE countries (not just Cambodia), and the wiring cost is
+   low per the previous section (columns already in an open file).
+   Risk: medium -- the mixed/tie/head-fallback rule needs a documented
+   =transformations.py= decision (adopt EPAR's mean-of-female rule, or
+   design our own), and =role= (1st/2nd/3rd named decision-maker)
+   should probably NOT be semantically load-bearing (EPAR's own
+   =dm1_gender= "plot holder" vs =dm_gender= "any decision-maker"
+   distinction shows role position carries some meaning that a flat
+   =(plot,pid)= set would lose) -- keep =role= as an explicit column
+   precisely to preserve that.
+2. *=individual_assets= should be a NEW feature, not a =pid= retrofit
+   onto =assets=.* =assets= is currently =(t,i,j)= household-item
+   grain and is already populated for other countries; #439's
+   =(t,i,j,pid)= owner-expansion grain is a different table, not a
+   finer version of the same one. This pass's Ethiopia evidence
+   (=women_{land,livestock,otherasset}_owner.dta=, one collapse-step
+   from the target grain) is exactly the kind of real construction
+   #439 asked the deferred audit to find -- it validates the design
+   without needing Cambodia data access at all.
+3. *EPAR's OWN CODE for Ethiopia ESS4 builds no fuller LSMS+ battery
+   than Uganda's* -- Ethiopia's code reads only 2 of 5 rights and the
+   readme states diet quality "cannot be constructed" there; whether
+   the ESS4 INSTRUMENT itself asks more than EPAR's do-file reads is
+   still open (see "Is any wave LSMS+ pilot" above -- not established
+   either way without the questionnaire PDF). The #439 cross-country
+   extension should budget for building =individual_assets=/
+   =decision_making= against Ethiopia AND Uganda at REDUCED scope
+   (fewer/thinner columns than Cambodia will support), and should not
+   assume feature parity across countries once Cambodia validates the
+   convention, but should also not assume the ISA panels' ceiling is
+   fixed at what EPAR's code happens to read.
+4. *EPAR's own two products disagree on the tie/missing rule -- pick
+   and document ours, don't inherit either silently.* The 2017
+   =358_Estimating-Crop-Yields= study uses an explicit categorical rule
+   (all-male=1 / all-female=2 / else=mixed,
+   =EPAR_UW_358_Tanzania TNPS 2012-13 LSMS-ISA_W3.do:133-135=); the
+   current =335= main-code pipeline uses "mean share of named
+   decision-makers who are female -> mixed if fractional; totally
+   missing -> head's sex" in all three countries checked
+   (=EPAR_UW_Tanzania_NPS_W3.do:263-265=,
+   =EPAR_UW_Uganda_UNPS_W5.do:433-439=,
+   =EPAR_UW_Ethiopia_ESS_W4.do:520-530=). The two rules are NOT
+   guaranteed to agree in general (a categorical "all-male XOR
+   all-female else mixed" test and a "mean share female" test partition
+   the same raw ids differently whenever a plot has more than 2 named
+   decision-makers with an uneven split), though this pass did not
+   construct a minimal disagreeing example from real data. Whichever
+   rule we pick for a
+   =transformations.py= implementation, cite it as a documented,
+   independent construction choice (#439 point 7's discipline), not as
+   "the" EPAR rule -- there isn't one.
+5. *The raw decision-maker/owner ids are unwired, not hidden* -- every
+   one of the 12 raw plot-decision-maker variable names checked
+   (Uganda x6, Tanzania x3, Ethiopia x3) is absent from our country
+   scripts entirely, confirmed by direct grep, while the files carrying
+   them are already open in the plot pipeline for unrelated columns
+   (=AGSEC3A/3B= for Uganda's =plot_labor.py=/=plot_inputs.py=;
+   =AG_SEC_3A= for Tanzania's =plot_inputs.py=/=plot_labor.py=/
+   =plot_features.py=; =sect3_pp_w4.dta= for Ethiopia's
+   =plot_inputs.py=/=plot_labor.py=/=plot_features.py=). Checked
+   further for Uganda's asset/income-control source files specifically:
+   =AGSEC2A= and =AGSEC6A= are ALREADY opened (by
+   =plot_features.py=/=livestock.py=), and =gsec14= is ALREADY opened
+   (by =assets.py=) -- so 3 of Uganda's ~6 WOMEN'S-section source files
+   need zero new file opens either. =AGSEC8A/B/C= (livestock income
+   control) and =gsec12_1= (business) are genuinely NEW opens for
+   Uganda. This converts #439's deferred "data-access audit" from a
+   blocker into a scoped, mostly-low-risk column-add task for
+   Uganda/Tanzania/Ethiopia's plot-decision-maker construct and at
+   least half of Uganda's asset/decision constructs; Ethiopia's
+   =sect8_1_ls_W4=/=sect11_hh_W4=/=sect12b_hh_W4= and Uganda's
+   =AGSEC8*=/=gsec12_1= remain unchecked-or-confirmed-new opens.
+
+* Ranked learnings
+
+1. *Build a plot/season decision-maker-gender transform.* EPAR's =dm_gender=
+   (male-only/female-only/mixed from up to 3 named plot decision-makers,
+   household-head fallback -- =EPAR_UW_Tanzania_NPS_W3.do:264-273=,
+   Uganda readme.md:60-64) underlies ~1,600 of 6,285 master-list rows (all
+   "plot manager" gender-disaggregated indicators) and gates the =PLOT
+   MANAGER= section's fertilizer/seed-use-by-gender cut. We have the raw
+   ingredients (=household_roster= for individual sex, =plot_features= for
+   plot-level linkage) but no transform. Touches: a new
+   =transformations.py= fn joining plot decision-maker person-ids (wherever
+   our per-country wave scripts carry them -- NOT VERIFIED this pass,
+   would need a country-by-country check of whether the 1st/2nd/3rd
+   decision-maker roster link is even wired into =plot_features= or
+   =plot_labor= today). Risk: medium -- if the decision-maker person-id
+   isn't already flowing into any of our tables, this is a new item-level
+   wiring job per country, not just a transform.
+
+2. *Reconcile the median-price-valuation ladder against EPAR's Uganda
+   conversion-factor table.* Our =median_price_valuation=
+   (=transformations.py:2847-2884=, WB-parity, =threshold=10=, UNWEIGHTED
+   median) and EPAR's =Master_Conversionfactor_table.do= (region-then-
+   national median CF ladder across ALL 7 Uganda waves,
+   =[weight=weight]=-WEIGHTED median, readme.md:76-87, do-file lines
+   238-294) are independently-built solutions to almost the identical
+   problem (crop harvested-but-not-sold needs an imputed price/factor from
+   a geography ladder with a minimum-observations floor -- EPAR's is 9,
+   ours is 10). The one real construction delta is WEIGHTED vs UNWEIGHTED
+   median, which can matter when strata sampling rates differ. Touches:
+   =transformations.py:2847= (=median_price_valuation=) -- add an optional
+   =weight_col= kwarg computing a weighted median (no core-collapse
+   change, pure valuation-methodology parity). Risk: low -- purely
+   additive kwarg, doesn't change default behavior.
+
+3. *Consider an =AreaShare= column (or a documented absence of one) for
+   intercropped plots.* EPAR imputes a per-crop share of plot area from a
+   categorical question (1/4, 1/2, 3/4, full) then rescales if shares
+   exceed 1 (=EPAR_UW_Tanzania_NPS_W3.do:143-176=) -- an =imputed=
+   construction we must NOT copy verbatim into a stored column, but the
+   underlying REPORTED categorical (which fraction of the plot did this
+   crop occupy) may exist in raw survey files we already read for
+   =crop_production= and simply aren't carrying. Touches: per-country
+   =crop_production= wave scripts, if the source variable exists (NOT
+   VERIFIED -- would need one country's raw crop-section codebook check).
+   Risk: medium-high -- easy to get wrong if the "rescale when shares
+   exceed 1" step gets ported as an imputation into our item layer instead
+   of staying a =transformations.py= concern.
+
+4. *FOOD PROVISION is a clean BOTH, not a place we lead -- correcting my
+   own first read.* EPAR's FOOD PROVISION (readme.md:342-346, "number of
+   months where the household experienced any food insecurity") is a
+   months-count, and so is our =months_food_inadequate= -- the SAME
+   construct, direct match, no gap either way. Where we actually lead is
+   the experience-scale features EPAR explicitly does not build:
+   =food_security= (FIES) and =food_coping= (rCSI) -- per
+   =INCIDENCE_MAP.org= Area 18's crib (not BRIEF.md, corrected from my
+   first pass) and confirmed independently here: Uganda W5's own readme
+   states "The Reduced Coping Strategies Index (rCSI) was NOT calculated
+   for the Uganda field survey" (readme.md:284) -- EPAR states the
+   absence itself, so rCSI is OURS-ONLY with EPAR's own documentation as
+   the evidence, not an inference. Recorded so a later synthesis doesn't
+   conflate the months-count (BOTH) with the two scales EPAR lacks
+   (OURS-ONLY).
+
+5. *The #829 sold-value defect is the sharpest evidence FOR our
+   never-trust-a-pre-converted-field stance in =harvest_kg=.* EPAR's own
+   readme flags "Sold values are inaccurate in W5" under =ALL PLOTS=
+   (readme.md:96) but =GROSS CROP REVENUE=, which consumes that same
+   =sold_value=, says "No issues in this section" (readme.md:105) --
+   BRIEF.md's own cautionary worked example, independently confirmed by
+   reading both readme sections. Our forensics
+   (=slurm_logs/price_sources/PAPERS_uganda_2015-16_value_sold.org=,
+   =lsms_library/countries/Uganda/_/CONTENTS.org:1851-2045=, GH #829)
+   traced the ROOT CAUSE (an int32->double storage change divided
+   =a5aq8=/=a5bq8= by exactly 100 in the 2015-16 release) that EPAR's
+   readme never names, and additionally established that the WB's OWN
+   harmonised panel (=LSMS-ISA_Ag=) silently multiplies by 100 for this
+   one wave while EPAR's published estimates do not correct at all. This is
+   the three-cell register's clearest case-1-and-case-3 hybrid: EPAR found
+   *a* symptom and we found *the mechanism*, cross-checked against a THIRD
+   party's independent fix. No new action -- already closed on our side.
+
+* Contradictions with our CONTENTS.org / issues
+
+- *=GAP_RANKING.org= GAP 5 is stale, not our =CONTENTS.org= -- but the
+  brief named this the WB-analogue file to mirror, so it belongs here.*
+  =slurm_logs/2026-06-13_wb_incidence_map/GAP_RANKING.org= (2026-06-13)
+  states "we have NO anthropometry feature anywhere" and ranks building
+  one as GAP 5. =lsms_library/data_info.yml:710= lists =anthropometry= in
+  the "Feature Vocabulary" TODAY, and BRIEF.md's own crib (this task's
+  brief, 2026-09-09) lists =anthropometry (t, i, pid)= as an existing item
+  feature. The WB incidence-map/gap-ranking pair is therefore ~3 months
+  stale on this one point: GAP 5 has evidently been executed since
+  2026-06-13 and nothing in that directory records it. Not re-verified
+  against actual per-country anthropometry data this pass (out of scope
+  for a taxonomy pass) -- flagged so the WB-side synthesis doesn't inherit
+  the stale "NO anthropometry feature" claim, and so whoever closed GAP 5
+  updates =GAP_RANKING.org= or its ledger.
+- No contradiction found between an EPAR claim and our =CONTENTS.org=
+  specifically (the #829 case is the only overlap checked in depth; it
+  CONFIRMS, not contradicts, our existing =CONTENTS.org= entry). Several
+  incidence-table cells were mapped from the readme's own prose without
+  checking the corresponding do-file section, so a subtler contradiction
+  could still be sitting unread in e.g. =MOBILE PHONE OWNERSHIP= or
+  =WOMEN'S OWNERSHIP OF ASSETS= against our =assets= schema.
+
+* What I did not read
+
+- All non-Uganda, non-Tanzania-W3 wave readmes/do-files (Ethiopia x5,
+  Malawi x4, Nigeria x5, Tanzania x5 other waves, Uganda x6 other waves) --
+  per the brief's reading recipe, only ONE canonical wave readme
+  (Uganda W5) was read section-by-section; the incidence table is
+  explicitly a single cross-country column, with only the readme's own
+  "nothing generated" caveats carried forward as per-wave exceptions. A
+  genuine cross-wave/cross-country diff of readmes (BRIEF.md's suggested
+  =diff= step) was NOT run.
+- The full Uganda W5 do-file body for any section beyond ALL PLOTS /
+  HOUSEHOLD VARIABLES / PLOT VARIABLES / INDIVIDUAL VARIABLES -- the
+  incidence table's =BOTH=/=THEIRS-ONLY= calls for sections like MOBILE
+  PHONE OWNERSHIP, WOMEN'S OWNERSHIP OF ASSETS, and FORMALIZED LAND RIGHTS
+  are based on the readme's DESCRIPTION prose plus our =data_info.yml=
+  schema, not a line-by-line read of those sections' Stata code. Any of
+  these could turn out to be a closer or worse match on inspection.
+- Whether our =assets= table (present in Feature Vocabulary, no
+  =Columns:= entry found in =data_info.yml=) records an owning individual
+  or a "Mobile Phone" item row for any country -- flagged as unresolved in
+  3 places above (MOBILE PHONE OWNERSHIP, WOMEN'S OWNERSHIP OF ASSETS,
+  HOUSEHOLD ASSETS).
+- Whether our per-country =plot_features=/=plot_labor=/=crop_production=
+  wave scripts already carry a plot decision-maker person-id anywhere
+  (needed to size Learning #1's risk).
+- The Ethiopia and Tanzania W1/W2 358-study do-files beyond their section
+  banners -- only Tanzania W3 was read closely, per the brief's
+  instruction; the other 4 files were only banner-grepped, so any
+  wave-specific construction-decision variant among them (e.g. does
+  Ethiopia's ESS instrument distinguish planted vs harvested area, unlike
+  Tanzania?) is unchecked.
+- =Household-Consumption-Data= (766M, six EHCVM countries + GhanaSPS/
+  Kenya/India/Sierra Leone) -- explicitly another agent's scope this
+  batch (=FINDINGS_consumption_by_source.org=, already present in this
+  directory); not opened here beyond confirming its existence and commit
+  hash in NOTES.md.
+- =Summ. of Indicator Construction= sheet's "Winsorizing Decision" column
+  (per-indicator detail) and =Cover Sheet= (45 rows, appears to be a
+  title/TOC page, not inspected).
+- No numeric values were read or compared anywhere in the estimates
+  workbook, per the brief -- structure only.
+- =AgQuery=/=AgQuery-Refresh=/=375-AgQuery=/=50x30_AQP=/
+  =NSSO-India-Agricultural-Indicators-Code= -- noted as not-cloned in
+  NOTES.md, not surveyed.

@@ -1,0 +1,1013 @@
+#+title: RED-TEAM B -- verification of FINDINGS_{Ethiopia,Tanzania,consumption_by_source,taxonomy}.org
+#+date: 2026-09-09
+#+author: red-team verifier (batch B)
+
+Scope: the four files named above.  Every verdict below carries the =path:line=
+I actually opened.  Reference clones under
+=/global/scratch/fsa/fc_jevons/ligon/reference/epar/= (=EPAR/= below); our code
+under the repo root.  Read-only throughout; no =dvc= CLI, no downloads, no
+=Country()= build (one warm =pd.read_parquet=, permitted by the brief).
+
+* Provenance of what I verified
+
+- =FINDINGS_taxonomy.org= was *483 lines* when I opened it (Read, section list
+  ending =* What I did not read= at :440-483).  I snapshotted all four files
+  immediately after; the taxonomy snapshot came back at *701 lines* -- the
+  =* LSMS+ individual / gender-disaggregation crosswalk (GH #439)= section had
+  landed at :334-551 in the interim.  By the time I finished it was *774
+  lines*.  *I did not verify that section*, per instruction.  Its insertion shifted =* Ranked learnings= 334 -> 552 and
+  =* Contradictions= 416 -> 634; I confirmed the shifted text is
+  byte-equivalent to what I read, and *all taxonomy line citations below refer
+  to the 483-line version I read*.
+- The other three snapshots matched the versions I read (Ethiopia 379,
+  Tanzania 632, consumption 292).
+
+* Verdict counts
+
+Counting rule: a claim whose *substance* holds but whose cited path/line is
+wrong is *CORRECTED*, not WRONG -- including rows whose prose below reads
+"WRONG citation, substance CONFIRMED".  *WRONG* is reserved for a claim whose
+substance fails.  *MISPLACED* is a register row whose content is right but
+whose three-cell placement is not.  Counts are re-tallied from the per-file
+tables below.
+
+| file | CONFIRMED | CORRECTED | OVERSTATED | WRONG | MISPLACED | UNVERIFIABLE |
+|------+-----------+-----------+------------+-------+-----------+--------------|
+| Ethiopia | 20 | 15 | 2 | 4 | 3 | 1 |
+| Tanzania | 32 | 14 | 2 | 0 | 0 | 0 |
+| consumption_by_source | 16 | 13 | 2 | 1 | 2 | 0 |
+| taxonomy | 29 | 7 | 3 | 4 | 0 | 0 |
+| *total* | *97* | *49* | *9* | *9* | *5* | *1* |
+
+Tag verdicts (task item 4) are counted separately in =* Tag checks= below:
+*10 wrong tags by row across 4 files*, covering 7 distinct constructions, of
+which 5 are the brief's missing fourth tag and 2 are cross-file contradictions.
+
+The two UNVERIFIABLEs I opened this pass have since been closed (Tanzania's
+HC unit-mismatch guard; the Uganda/Nigeria =crop_category2= diff); the one
+remaining is a scoping ambiguity, not a gap.
+
+* FINDINGS_Ethiopia.org
+
+** Ranked learnings
+
+*** L1 -- "apply median_price_valuation to Ethiopia food_acquired produced/gift rows"
+Underlying facts: *CONFIRMED*.
+- =transformations.py:2847= is =median_price_valuation=; the fn runs 2847-3029
+  (the file cites "2847" and, elsewhere, "2847-3030"; 3030 is the blank line
+  after =return out= at :3029 -- immaterial).
+- The docstring passage the file quotes ("Why a ladder of medians rather than
+  each household's own price? ... at a common local market price ... regardless
+  of how much each happened to sell") is *verbatim* at
+  =transformations.py:2885-2891=.  *CONFIRMED*.
+- "the ESS instrument asks no own-consumption value (CONTENTS.org:1311-1339)":
+  *CONFIRMED* -- =Ethiopia/_/CONTENTS.org:1311= is the heading "The ESS asks NO
+  value of own-consumption.  Sources 2 and 3 do not exist."
+- Risk statement ("our cluster_features.Region/District are documented as
+  broken/unharmonized, CONTENTS.org:1418-1430"): *CONFIRMED*, opened and read.
+  :1418 is the heading "cluster_features District is not a district, and Region
+  is not harmonized"; :1420-1423 gives "=District= is a bare 1-2 digit code: 37
+  distinct values, of which *30 occur in more than one Region*"; :1424-1430
+  gives "=Region= carries 21 distinct strings for 11 regions" and states that
+  the =categorical_mapping.org= harmonization "is true of =sample().strata= and
+  NOT of =cluster_features.Region=".  Exactly as the finding paraphrases it.
+
+*** L2 -- "wire Crop_CF_Wave{2,3,4,5}.dta into harvest_kg"
+*CONFIRMED, and stronger than stated.*
+- Sidecars present exactly as claimed:
+  =Ethiopia/2013-14/Data/Crop_CF_Wave2.dta.dvc=, =2015-16/.../Crop_CF_Wave3=,
+  =2018-19/.../Crop_CF_Wave4=, =2021-22/Data/crop_cf_wave5.dta.dvc=.  There is
+  *no* Crop_CF for 2011-12 (W1), which the file correctly says ("W2/W3/W4/W5").
+- Unread: I widened the extractor's grep from =--include=*.py= to
+  ={*.py,*.yml,*.org,*.json,Makefile}= across =lsms_library/countries/Ethiopia=
+  -- *zero* hits for =crop_cf= / =Crop_CF= / =crop conversion=.  *CONFIRMED*,
+  including that =Ethiopia/_/CONTENTS.org= never mentions the file at all.
+- I also resolved each sidecar's md5 against the L1 blob cache
+  (=~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}=, filesystem stat
+  only): =Crop_CF_Wave3= and =crop_cf_wave5= blobs are *PRESENT locally*.  So
+  the wiring job needs no acquisition at all.
+- Risk clause (W5 duplicate crop_code=74 unit_cd=62, 4.34 vs 6.125, "for
+  continuity"): *CONFIRMED verbatim* at
+  =EPAR/LSMS-Agricultural-Indicators-Code/Ethiopia ESS/Ethiopia ESS Wave 5/EPAR_UW_Ethiopia_ESS_W5.do:349=.
+  *Material omission*: the whole de-duplication block is *commented out*
+  (=/*= at :345, =*/= at :353), so EPAR's W5 does NOT apply the fix it
+  documents.  The defect is real and EPAR's remedy is dead code -- which
+  strengthens the warning, and should be stated.
+
+*** L3 -- "the >=10-obs finest-cell-first ladder is validated by independent convergence"
+*OVERSTATED, and one leg is wrong.*
+- Crop-price ladder gate: *CONFIRMED* as =obs_`i'_price>9= / =obs_`i'_pkg>9=
+  (i.e. N>=10) -- but at =W3.do:1240-1241=, NOT at the lines the file cites
+  (see the citation table below).  Livestock: =obs_`i' > 9= at =W3.do:2521=.
+  *CONFIRMED*, N>=10 both.
+- Food-consumption ladder: the gate is =obs_ea>10= (N>=*11*), at
+  =EPAR/Household-Consumption-Data/EthiopiaW5_Food Consumption by source.do:430=
+  and identically at :436,442,449,455,461,467.  This is *not* the same
+  threshold.  So "three separate EPAR constructions ... all independently
+  arrived at ... the same '>=10 observations' threshold" is *OVERSTATED*: two
+  of the three use >9, the third uses >10.
+- Also unstated and material: *every EPAR median in both projects is
+  WEIGHTED* (=[aw=weight_pop_rururb]= at =W3.do:1041,1048,1063,1070=;
+  =[aw=weight]= at =EthiopiaW5_...do:345,355,...,407=).  Ours is unweighted
+  (=transformations.py:3013=, =grouped.transform('median')=).  A docstring note
+  claiming "independent convergence" without this caveat would be misleading.
+
+*** L4 -- "investigate the ESS4->ESS5 weight discontinuity"
+*CONFIRMED* on both legs.  =EPAR/.../Ethiopia ESS Wave 5/readme.md:47= reads
+verbatim "- **Known Issues:** Note that the household weights differ
+substantially between wave 4 and wave 5."  =Ethiopia/_/CONTENTS.org:865-883=
+carries the ESPS-5 catalog quote and the "if a longitudinal weight ships ...
+then =panel_weight= for that wave is wrong" sentence, verbatim.
+
+*** L5 -- "do NOT adopt EPAR's winsorization or population-rescaled weighting"
+*CONFIRMED on substance, CORRECTED on the line.*  In =W3.do= the banner is
+:103-105 and the two globals are at *:106-107* (=global wins_lower_thres 1= /
+=global wins_upper_thres 99=), so the file's ":104-106" covers the banner plus
+only the first of the two globals.  Population rescaling:
+=EthiopiaW5_Food Consumption by source.do:65-68= not re-opened, but the
+identical construction is *CONFIRMED* in the Ag repo at
+=Tanzania NPS Wave 5/EPAR_UW_Tanzania_NPS_W5.do:213-236= and
+=EPAR_UW_Tanzania_NPS_W3.do:87-91=.  One caveat for the synthesis:
+EPAR's winsorization writes a NEW =w_*= column and *keeps the raw one*
+(=W3.do (Tanzania):4485-4491=, =_pctile= + =gen w_`v'=`v'=), so "values are
+REPLACED" is only true of the =w_= series.
+
+** Contradictions section
+
+*** C1 -- "CONTENTS.org says the local-unit area factors are NOT in the repo; they are"
+*CONFIRMED, and I can strengthen it.*
+- The quoted sentence is verbatim at =Ethiopia/_/CONTENTS.org:1036-1039= (the
+  file cites 1037-1039; the sentence begins mid-line 1036).  CORRECTED by one
+  line, substance exact.
+- =ET_local_area_unit_conversion.dta.dvc= exists in
+  =2011-12/=, =2013-14/=, =2015-16/=, =2018-19/= and *not* =2021-22/= --
+  *CONFIRMED exactly as claimed (four of five waves)*.
+- Widened grep (=*.py,*.yml,*.org,*.json,Makefile=): zero references.
+  *CONFIRMED unwired.*
+- New: the *blobs are locally cached* (md5 =ad8ca021...= for 2011-12,
+  =f556b66e...= for 2015-16 -- both present under =dvc-cache/=).  So
+  "would need a new download" is doubly false.
+- Corroboration EPAR supplies and the file missed:
+  =EPAR_UW_Ethiopia_ESS_W5.do:324= states "this file does not exist in the WB
+  W5 download.  EPAR borrowed the land unit conversion factor file from
+  previous ESS waves" -- which explains why our 2021-22 has no sidecar.
+
+*** C2 -- "conversion_to_kgs.json built from Food_CF_Wave1-4 only"
+*CONFIRMED on substance; one supporting fact CORRECTED.*
+- =CONTENTS.org:153-156= lists exactly four =unitfiles= (Wave1..Wave4) --
+  *CONFIRMED verbatim*.
+- =CONTENTS.org:279-281= says "built from wave-specific =Food_CF_Wave{1..5}.dta=
+  files (present for all five waves 2011-12 through 2021-22)" --
+  *CONFIRMED verbatim*.  The contradiction between :153-156 and :279-281 is
+  real.
+- All five =Food_CF= sidecars exist (=Food_CF_Wave1..4=, =food_cf_wave5=), and
+  the =food_cf_wave5= blob is locally cached.  *CONFIRMED*.
+- *CORRECTED*: "git log ... shows exactly one commit (9dddd806)" is an artifact
+  of omitting =--follow=.  =git log --oneline --follow= on the json returns
+  *five* commits (9dddd806 "Great rearrangement", b9ebf564 "Create nutrition df
+  for Ethiopia", fdf48cbd, a0aa1f94, 7c43b450).  The file was *moved* by
+  9dddd806, not created by it.  The conclusion ("never regenerated to include
+  Wave 5") is not disturbed -- the build script is the evidence, not the log --
+  but the stated evidence is wrong.
+
+** KNOWN-ISSUES register (Ethiopia) -- cell placement and evidence
+
+| row | verdict | evidence |
+|-----+---------+----------|
+| 1a | *CONFIRMED* | W1 =README.md:41= verbatim ("Urban households are oversampled ... 40 households that got surveyed in PP and Livestock, but not PH"); reused *verbatim* at W4 =readme.md:41= and W5 =readme.md:41= (checked). =open_issues.tsv:82= is #660 "bug: Ethiopia — 120 / 40 households appear in the agriculture files but not the cover page" -- *CONFIRMED*, and =gh issue view 660= agrees. |
+| 1b | *CONFIRMED* | W1 =README.md:65= verbatim ("Strata ID are not consistent across waves due to sampling.  Strata ID cannot be used as a way to identify the same geographic location across waves."). |
+| 1c | *CONFIRMED* | =W3.do:1032= carries the comment "hhid is not unique so merged with other variables" on the =merge m:1 ea hhid kebele woreda rural zone region= -- the file cites ":1029"; *CORRECTED to :1032*. |
+| 2a | *MISPLACED CELL* | The construction is *CONFIRMED* (see C3 below), but our side is documented at =CONTENTS.org:1311-1339= and the file says so.  Per BRIEF.md cell 2 = "candidate new issue"; this is a *design difference we already record*, i.e. cell 1. |
+| 2b | *legitimate cell 2* | See C1.  This is the one register row that is a genuine new finding: we hold the file, we document a *wrong reason* for not using it. |
+| 2c | *legitimate cell 2* | Crop_CF appears *nowhere* in =Ethiopia/_/CONTENTS.org= (grep, zero hits) and nowhere in our config.  Genuine. |
+| 2d | *WRONG on the line, OVERSTATED on the substance* | See C4 below. |
+| 2e | *MISPLACED CELL* | Construction *CONFIRMED* (=W3.do:2515-2524=; the file's ":2508-2525" spans it).  But =CONTENTS.org:1277= is the heading "livestock: =SalesValue=, NOT a herd value and NOT a per-animal price" -- we documented the absence deliberately.  Cell 1, not 2. |
+| 2f | *MISPLACED CELL* | Both sides *CONFIRMED* (W5 =readme.md:47=; =CONTENTS.org:865-883=).  The row's own text says our file "raises exactly this" -- that is cell 1 by the brief's definition. |
+| 3a | *WRONG* | See C5, the most consequential error in this file. |
+| 3b | see C2 | |
+| 3c | *CONFIRMED* | =CONTENTS.org:1367= heading "_/food_acquired.py lacks the id_walk that _/crop_production.py has"; :1369 records the #819 fix on =development= 2026-09-08.  =gh issue view 819= -> CLOSED, title matches. |
+
+Spot-checks run for the register: =open_issues.tsv:82= (#660) *CONFIRMED*;
+=gh issue view= for #660, #820, #819, #837 all *CONFIRMED* (open/open/closed/open,
+titles matching the file's paraphrases).
+
+** C3 -- the Household-Consumption Ethiopia ladder: an internal contradiction in this file, one half WRONG
+
+The file makes two incompatible statements about the SAME do-file:
+- Cell 2a: "derives a per-kg =price_unit= from the household's OWN purchase rows
+  ..., then imputes it onto produced/gift rows ... via a geography ladder".
+- Construction #3 (:191-193): "The household's own transactions are *not*
+  preferred here (contrast with Cell 2d's crop-value ladder in the SAME
+  author's other do-file family) -- worth noting as an *internal EPAR
+  inconsistency*."
+
+*The second is WRONG.*  =EPAR/Household-Consumption-Data/EthiopiaW5_Food
+Consumption by source.do:335= is =gen price_unit = food_purch_value/food_purch_qty=
+-- a *row-level, household-own* price, never collapsed.  :423 is
+=gen food_`f'_value = food_`f'_qty*price_unit if food_`f'_unit==food_purch_unit=,
+executed *before* the first ladder rung at :429-430, and every subsequent rung
+fires only =if food_`f'_value==.=.  The household's own price is the FIRST rung,
+exactly as =FINDINGS_consumption_by_source.org= #3 and
+=FINDINGS_Tanzania.org= Unit-handling #3 report for their countries.  The
+claimed "internal EPAR inconsistency" does not exist.
+
+Ladder rungs and range: EA -> kebele -> subcity -> woreda -> zone -> region ->
+country, one merge/replace pair each, :429-467.  *CONFIRMED exactly.*  Gate
+=obs_*>10= (N>=11) at all seven rungs.  Medians are =[aw=weight]=-weighted
+(:345,355,365,376,387,397,407) -- unstated in the file.
+
+** C4 -- "Household price/unit is preferred" (Cell 2d): WRONG line, OVERSTATED reading
+
+Claimed: =EPAR_UW_Ethiopia_ESS_W3.do:1063-1066=, "=price_unit_hh= ... overrides
+the geography ladder wherever it exists, and the ladder is the fallback only."
+
+Actual: :1063 is =collapse (median) price_kg_`i'=price_kg [aw=weight_pop_rururb]=
+inside the per-kg median loop.  The comment "* Household price/unit is
+preferred" is at *:1244*, and the block runs :1244-1248.  Reading the code:
+
+: 1239  foreach i in country region zone woreda kebele ea {
+: 1240      replace price_unit = price_unit_`i' if obs_`i'_price>9
+: 1241      replace price_kg   = price_kg_`i'   if obs_`i'_pkg>9
+: 1242  }
+: 1244  * Household price/unit is preferred
+: 1245  ren price_unit_hhid price_unit_hh
+: 1247  replace price_unit_hh = price_unit if price_unit==.
+: 1253  gen value_harvest = qty_harv*price_unit if unit>1        <- LADDER price
+: 1262  gen value_harvest_hh = qty_harv*price_unit_hh            <- HH-price variant
+: 1265  replace value_harvest = value_harvest_hh if value_harvest==.
+
+So EPAR ships *two* variables.  The primary =value_harvest= is *ladder-first*,
+with the hh variant used only to fill what the ladder could not.  The hh-price
+preference applies to the separate =value_harvest_hh= series.  Verdict:
+*WRONG citation, OVERSTATED claim.*  This matters because the file uses 2d to
+frame our =median_price_valuation= docstring as "explicitly REJECTING" a
+design EPAR does not in fact adopt for its headline variable.  (Tanzania's W5
+do-file has the *identical* two-variable structure at :565-573 -- see the
+cross-file section.)
+
+** C5 -- "section 12 tree crops appended W1-W3, dropped W4/W5, readme says None": WRONG
+
+The file's Cell 3a and Construction #2 assert a "W3->W4 regression": EPAR
+appends =sect12_ph_w{1,2,3}= into GROSS CROP REVENUE in W1-W3 and drops it in
+W4/W5 "with no readme update anywhere marking the change or its consequence",
+and calls this "exactly the brief's cautionary pattern".
+
+What I found:
+- W3 append: *CONFIRMED verbatim* at =W3.do:1296-1315= (=sect12_ph_w3= loaded
+  at :1296 with =gen permcrop=1= at :1301; =sect11_ph_w3= at :1305 with
+  =gen permcrop=0= at :1314; =append using `treecrops'= at :1315).
+- W4: =W4.do:1019-1033= reads =sect11_ph_W4= only.  *CONFIRMED.*
+- *But the reason is an instrument change, not an omission.*  =W4.do:759=,
+  directly under the "Crop Values" banner, reads: =* Section 11 includes perm
+  crops=.  =W4.do:3687= and =W5.do:4081= read "no section on perm crops, trees
+  and roots include in previous section" -- which is why the §12 women's-
+  decision block is commented out.
+- Corroborating (not decisive -- our =Data/= tree records what we downloaded,
+  not what the WB catalog holds; EPAR's own W4:759 / W4:3687 / W5:4081 comments
+  are the primary evidence and suffice alone):
+  =lsms_library/countries/Ethiopia/*/Data/= holds
+  =sect12_ph_w1/w2/w3.dta.dvc= and *no =sect12_ph= file at all for 2018-19 or
+  2021-22* (the =sect12*_hh_w4/w5= sidecars are household-module files).  The
+  ESS4/ESS5 instrument dropped the separate post-harvest §12 module.
+
+So EPAR did not silently drop anything, and "Known Issues: None" at W4
+=readme.md:108= / W5 =readme.md:114= is *correct*.  Verdict: *WRONG*.  (This
+also bounds our own #820: =CONTENTS.org:1341-1365= measures the §11/§12 gap on
+*2015-16* -- correctly -- and #820 is a W1-W3 issue, not a five-wave one.
+=gh issue view 820= confirms the title says "the §12 tree/fruit/root module ...
+is unwired" without a wave qualifier; the synthesis should add one.)
+
+Minor: the file's own Cell 3a row contains an unedited editing artifact --
+"57 crop codes in wired §11 vs 59 in unwired... wait, see below".
+
+** Ethiopia citation table (line-level)
+
+| claim in file | cited | actual | verdict |
+|---+---+---+---|
+| GPS area preferred, >10 m^2 | W3.do:840 | :845-846 | CORRECTED |
+| ET_local_area file lookup | W3.do:892 | :892 | CONFIRMED |
+| zone median gate >=10 | W3.do:896 | :896 (=obs_zone>=10=) | CONFIRMED |
+| region then country medians | W3.do:897-899 / 899-901 | :898 region (gated), :900 country (ungated) | CORRECTED |
+| "Crop Values" ladder section | W3.do:997-1067 | :996-1073 | CORRECTED |
+| §12 appended to §11 for price medians | W3.do:999-1023 | :999-1017 (and =permcrop=0= is NOT set on §11 here -- only in the later GROSS CROP REVENUE block) | CORRECTED |
+| ladder loop | W3.do:1039-1046 | :1038-1045 | CORRECTED |
+| country fallback | W3.do:1048-1052 | :1047-1051 | CORRECTED |
+| per-kg ladder | W3.do:1055-1073 | :1060-1072; the >9 *gate* is at :1240-1241, not here | CORRECTED |
+| "Household price/unit is preferred" | W3.do:1063-1066 | :1244-1248 | WRONG (see C4) |
+| §12 appended in GROSS CROP REVENUE | W3.do:1296-1315 | :1296-1315 | CONFIRMED |
+| "replace value_harvest = sales_value if sales_value>value_harvest" | W3.do:1319 | :1326 | CORRECTED |
+| W4 revenue from §11 only | W4.do:1019-1035 | :1019-1033 | CONFIRMED |
+| W4 perm-crop comment | W4.do:3689 / 3705 | :3689 (inside a =/* ... */= block opened at :3687) | CORRECTED |
+| TLU coefficients | W3.do:2422-2428 | :2423-2429 (values exactly as listed) | CORRECTED |
+| number_today overridden by the direct question | W3.do:2447 | :2459, and the replace is *unconditional*, not "wherever matched"; the identity is at :2451, not ":2436-2440" (renames) | CORRECTED |
+| livestock value_today ladder | W3.do:2508-2525 | :2515-2524; ladder is FINE->coarse (=foreach i in kebele woreda zone region country=, :2519) with =obs_`i' > 9=, first qualifying wins | CONFIRMED |
+| Crop_CF W5 duplicate note | W5.do:349 | :349 verbatim (block commented out) | CONFIRMED |
+| W1 panel-key merges | W1.do:217,330,442,508 | all four exact, comment verbatim | CONFIRMED |
+| same-wave =gen hhid_panel = hhid= | W1 6006/6120/6359; W2 6244/6341/6574; W3 5705/5810/6049; W4 5578/5675/5907; W5 6028/6124/6358 | all 15 exact | CONFIRMED |
+| hhid_panel_key.dta = 2 cols, 3,776 rows, labels "Unique HH ID in wave 1/2" | -- | pyreadstat metadata: 3776 x 2, labels exact | CONFIRMED |
+| Gross Crop Revenue "None" | readme 114/114/108/113 (W2-W5) | 114/114/108/*114* | CORRECTED |
+| ETH 2015-16 crop_production.py reads §9/§4/§11 only | :20-38 | :22-38, =sect9_ph_w3=, =sect4_pp_w3=, =sect11_ph_w3= | CONFIRMED |
+| W1 do-file length | 7,527 lines | *6,390* | WRONG |
+| readme lengths W1-W5 | 396/366/345/366/372 | exact | CONFIRMED |
+
+*UNVERIFIABLE*: "W5 near-identical ... no =sect12= reference anywhere in it"
+for the GROSS CROP REVENUE section -- I confirmed =W5.do:1190-1215= reads §11
+only, but the claim as phrased ("no sect12 reference anywhere") is false of the
+file as a whole (:4083, :4108) though true of the revenue section.  Read as
+scoped to the section it is CONFIRMED; read literally it is wrong.
+
+* FINDINGS_Tanzania.org
+
+This is the strongest of the four files on citation accuracy.  Its EPAR
+citations are mostly exact; the drift is concentrated in the crop-expenses /
+diet-index block.
+
+** Ranked learnings
+
+*** L1 -- own-consumption valuation ladder is relevant to #846
+*CONFIRMED.*  =Tanzania_W5_Food Consumption by source.do= carries the same
+household-own-price-first construction; the =#846= framing ("EPAR needed to
+impute precisely because nothing was asked") is sound.  =gh issue view 846=:
+OPEN, "Tanzania: record a not-asked capability for food price and
+own-consumption value (Section J qq.2-6 is the C4 evidence)" -- *CONFIRMED*,
+and =open_issues.tsv:6= is that issue.  Note the ladder gate here is =>10=
+(N>=11), not the =>9= of the Ag repo; the file's "=>=10 obs=" phrasing is a
+half-step off in one direction and the Ethiopia file's is off in the other.
+
+*** L2 -- HDDS/FCS/rCSI as constructions we lack
+*CONFIRMED*, with the group-mapping caveat *CONFIRMED verbatim*:
+=EPAR_UW_Tanzania_NPS_W5.do:2546= "(808/810 = 7 "FISH") /// * AM Added packaged
+fish (901)" -- and 901 is inside group 9 (=901/903 = 9 "MILK AND MILK
+PRODUCTS"=, :2548).  :2547 "(401 501/504 = 8 "LEGUMES..." ) /// * AM: removed
+401 hone" -- and 401 is still in the range.  A real, citable EPAR defect.
+*CORRECTED* line ranges: FCS is built from =hh_sec_j3.dta= read at :2573 and
+runs to :2610 (file says ":2569-2589"); rCSI reads =hh_sec_h.dta= at :2614
+(file says ":2599-2612").
+
+*** L3 -- the 5-rung ladder convergence
+*CONFIRMED on the mechanism, CORRECTED on the line, and the file's own two
+descriptions disagree.*  Actual code:
+
+: 401  foreach i in region district ward ea hhid {           <- medians computed
+: 403      collapse (median) val_kg_`i'=price_kg ... [aw=weight], by(`i' crop_code)
+: 409  collapse (median) val_kg_country = price_kg ... [aw=weight], by(crop_code)
+: 566  foreach i in country region district ward ea {        <- ladder APPLIED
+: 567      replace val_kg = val_kg_`i' if obs_`i'_kg >9
+: 570  ren val_kg_*hhid val_kg_hhid
+: 571  replace val_kg_hhid = val_kg if val_kg_hhid==.
+: 572  gen value_harvest    = val_kg     * kg_harvest
+: 573  gen value_harvest_hh = val_kg_hhid * kg_harvest
+
+The file says "per (region, district, ward, ea, hhid)" at :262 and
+"ea, ward, district, region, country" at :496.  Reconciled: *six* median tables
+are computed -- four geographies plus =hhid= in the loop at :401, plus country
+at :409; *five* rungs are applied
+(country->region->district->ward->ea, coarse-to-fine, last qualifying wins);
+=hhid= is not a rung -- it feeds a parallel =value_harvest_hh= series, exactly
+as Ethiopia W3 does.  Gate =>9= (N>=10): *CONFIRMED*.  Medians are
+=[aw=weight]=-*weighted* (weight = =weight_pop_rururb=, :398-399) -- the file
+says "weighted median" at :262, correct, but the ladder cited range
+":387-414" covers only the median computation, not the gate at :565-568.
+
+*** L4 -- the area-clamp comparison
+*CONFIRMED, both sides, verbatim.*
+- EPAR: =EPAR_UW_Tanzania_NPS_W5.do:254= (commented-out =replace
+  area_acres_meas = . if area_acres_meas > 10000 //there's a discontinuity
+  between 85.52 and 10432 indicating that several areas are being reported in
+  units other than acres=) and :255 (live =area_acres_meas/10000 if >=1000=).
+- Ours: =Tanzania/_/tanzania.py:1046-1051=, comment cites "the 2020-21 GPS
+  column has a 28710-acre outlier" and GH #167; clamp at :1050-1051.  The
+  preference order quote "area_gps.where(area_gps.notna(), area_est)" is
+  *verbatim at :1053*.  One nuance the file omits: our clamp also nulls
+  =<= 0= and applies to the farmer estimate as well as the GPS column.
+- SDD carries no clamp: *CONFIRMED* by reading =...SDD/...do:264-280=.
+
+*** L5 -- plausibility screen on raw crop_production.Quantity
+*CONFIRMED exactly*, including every number, from the warm parquet
+=~/.local/share/lsms_library/Tanzania/2020-21/_/crop_production.parquet=:
+11,125 rows; =Quantity= max 7,500,000 (Coconuts, i=9640-001-99, plot 1); mean
+2,218.41; std 85,732.98; Timber 4,000,000; Other Fruits 2,400,000.
+=tanzania.py:1163= is =def crop_production_for_wave= and its body contains no
+clip/clamp/winsorize.  *CONFIRMED.*  EPAR's hand-fix at
+=W5.do:578-579= is *verbatim* ("1 very strange outlier, 800000 kg cabbage",
+=hhid=="0015-001-001"=, =plot_id==4=), and I re-ran the file's own check:
+=0015-001-001= is *not* in our parquet's =i= level (2,708 distinct ids).
+*CONFIRMED.*
+
+** Coverage findings
+
+| finding | verdict | evidence |
+|---+---+---|
+| do-file line counts 4,554/5,015/5,450/5,053/5,264/4,917 | *CONFIRMED* (all six exact) | =wc -l= |
+| W1-W4 have no top-level readme; only W5/SDD do | *CONFIRMED* | =ls= of each wave dir |
+| W5/SDD "Known Issues ... * TBD" | *CONFIRMED verbatim* | both =readme.md:163-164=, both files 164 lines |
+| SDD readme:6 "1,184 households ... Wave 3 (2,165) ... total of 2,172" | *CONFIRMED verbatim* | =...SDD/readme.md:6= |
+| our own 1,184 at =CONTENTS.org:403= | *CONFIRMED* | the figure and the cross-reference are at :401-403 |
+| "=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:5= ('begins a new longitudinal sample')" | *CORRECTED* | that text is =...Wave 5/readme.md:5=, not the =.do= |
+| SDD readme:1 "<SHA> ... 9/XX/24" placeholders never filled | *CONFIRMED verbatim* | |
+| FISH INCOME W1:1434 live, W5:1568-1571 "*NOT IN WAVE 5" | *CONFIRMED verbatim* | *but* =W5.do:62= already flags "**Not available in W5" in the do-file's own TOC banner, so it is documented in code even though the readmes are TBD -- worth stating |
+| =ren sdd_hhid sdd_hhid= appears 48 times | *CONFIRMED* (=grep -c= = 48) | |
+| community module: zero hits in W5 and SDD | *CONFIRMED* (=grep -ci 'cm_sec\|community'= = 0 in both) | |
+
+** KNOWN-ISSUES register (Tanzania)
+
+*Cell 1 rows 1-3: CONFIRMED.*  Row 3's cross-check is exact --
+=W5.do:538= verbatim ("Numbering in the dta files differs from the instrument
+-- summary stats suggest that quantities and values are in Q27 and Q28 for
+section 4a"), :539 =gen kg_harvest = ag4a_27=, and our
+=Tanzania/2020-21/_/crop_production.py:26= is =qty='ag4a_27'=.  *CONFIRMED.*
+
+*Cell 2 rows 1-3: all three are LEGITIMATE cell-2 rows.*  I grepped
+=Tanzania/_/CONTENTS.org= (1,833 lines) for =ag3b_34=, =rent=, =rental=,
+=ag4a_25=, =ag4a_27=, =plot_inputs=, "not matched" -- *zero hits for every
+one*; and =open_issues.tsv= likewise.  Nothing on our side records any of the
+three.  Their EPAR evidence:
+- Row 1: =W5.do:775-777= verbatim ("69/172 have years instead of months as
+  their rental units; another 114 appear to have given the rental price per
+  month.  I adjust to one year here."); the =n_seas= arithmetic at :779-782;
+  the raw variables =ag3b_34_1=/=ag3b_34_2= at :756-757.  *CONFIRMED.*
+- Row 2 (the =ag4a_27= double use): *CONFIRMED VERBATIM* and it is a real EPAR
+  bug.  =W5.do:539= =gen kg_harvest = ag4a_27= (a kilogram quantity); :544
+  =replace kg_harvest = kg_harvest/(1-(ag4a_27/100)) if ag4a_25==2= (the same
+  variable as a percent).  The "only 3 obs" comment is at :542.  Since
+  =ag4a_27= is a kg quantity, =ag4a_27/100 > 1= for virtually every affected
+  row and the denominator goes negative -- as the file says.
+- Row 3: =W5.do:2473= verbatim ("MGM 5.18.2024: 80 not matched, 10,527
+  matched").  *CONFIRMED*; 80/(80+10,527) = 0.754%, matching the file's ~0.75%.
+
+*Cell 3 rows 1-6: CONFIRMED.*  Row 5 cites =CONTENTS.org:1753-1775= --
+:1753 is the heading "Measured effect (cold build, isolated LSMS_DATA_DIR,
+L2 rebuilt)".  *CONFIRMED.*  =open_issues.tsv:11= = #840,
+=:12= = #839, =:14= = #837 -- all three *CONFIRMED exactly*, and
+=gh issue view= agrees on all three titles, including #837's "up to 1,304 rows
+a wave".
+
+** Tanzania citation table (drift)
+
+| claim | cited | actual | verdict |
+|---+---+---+---|
+| family-labor omission comment | W5.do:651 | :650 | CORRECTED |
+| hired wages summed | W5.do:656-659 | :656-661 region; the =wages= rename is at :669 | CORRECTED |
+| "Assuming instances of very small amounts are typos" | W5.do:672-675 | *:687* | CORRECTED |
+| NPK 0.17 for n/p/k | W5.do:706-708 | *:725-727* | CORRECTED |
+| frontiersin.org source | W5.do:704 | *:720* | CORRECTED |
+| TLU coefficient table | W5.do:989-992 | :991-995 (values as listed) | CORRECTED |
+| =tlu_coefficient=0.2 if lvstckid==9= | W5.do:990 | :993 | CORRECTED |
+| =gen smallrum=inlist(lvstckid,7,8,9)= | W5.do:1003 | :1000 | CORRECTED |
+| our =_TLU_FACTORS= | transformations.py:2601-2611 | :2601-2612; cattle 0.70, donkeys 0.50, pigs 0.20, sheep/goats 0.10, chicken/other poultry/rabbits 0.01, horses 0.80, bees 0.0 | CONFIRMED |
+| tree-crop "implausibly huge ... ranges are huge" | W5.do:512-514 | :510-511 | CORRECTED |
+| crop-code 931 merge | W5.do:386,1072,1130 | :386 exact (=recode crop_code (31 32=931)=) | CONFIRMED |
+| value_harvest capped by sales, "155 changes here" | W5.do:1088 | :1088 verbatim | CONFIRMED |
+| value_lost capped | W5.do:1136 | :1136 verbatim | CONFIRMED |
+| survey's own valuation fallback =ag4a_28= | W5.do:574-575 | :574-575 verbatim | CONFIRMED |
+| cow-milk median borrowed for code 2 | W5.do:1319-1321 | :1319-1321 verbatim | CONFIRMED |
+| =price_per_animal = income_live_sales/number_sold= | W5.do:1354 | :1354 is =ren lf02_26 income_live_sales= | CORRECTED |
+| HDDS recode | W5.do:2538-2560 | :2540-2560 (section from :2537) | CONFIRMED |
+| the two mismatched comments | W5.do:2546-2548 | :2546-2547 | CORRECTED |
+| unit-mismatch guard in HC project | Tanzania_W5_...do:341, repeated :348,354,360,366,372 | *all six lines exact*: :341 =gen food_`f'_value=food_`f'_qty*price_unit if food_`f'_unit==food_purch_unit=, then the same guard on the ea/ward/district/region/country rungs at :348,354,360,366,372 (gate =obs_*>10=, N>=11) | CONFIRMED |
+
+*OVERSTATED (x2)*: (a) Unit-handling #3 calls the household-own-price rung a
+"silent drop-to-missing on unit mismatch ... its silent failure mode" -- the
+guard is real, but the same guard is the *first* rung of the ladder, so
+framing it purely as a failure mode understates what it is; (b) the TLU table's
+"lvstckid 9 ... the *pig* coefficient 0.2" is an inference, not read from a
+codebook -- our own =_TLU_FACTORS['pigs'] = 0.20= corroborates it, and the file
+is right to flag that it did not have the codebook.
+
+*The one Tanzania claim I grade WRONG* is the coverage citation
+"=...Wave 5/EPAR_UW_Tanzania_NPS_W5.do:5=" for the refresh-panel sentence; it
+is =readme.md:5=.  Low consequence.
+
+* FINDINGS_consumption_by_source.org
+
+** Ranked learnings
+
+*** L1 -- offer the ladder as an opt-in transform, reusing median_price_valuation
+*CONFIRMED.*  =gh issue view 585= -> OPEN, title *exactly* "food_expenditures
+(basis='total'): impute own-production / in-kind value at purchase prices".
+=gh issue view 575= -> OPEN, "food_expenditures is purchased-value-only
+library-wide — decide: by design, or add total-acquisition-value?".
+=median_price_valuation= exists at =transformations.py:2847-3029= with
+=threshold=10= and =cell_count >= threshold= (:3015) -- i.e. N>=10, matching the
+Ag repo's =>9= and *not* the HC repo's =>10= (N>=11).  Our national fallback is
+at :3018-3022, *not* at the ":2986-2989" the file cites -- *CORRECTED*.
+
+*** L2 -- do NOT import "at or near the purchase price" as settling farmgate-vs-market
+*Substance CONFIRMED; two of the three SYNTHESIS citations are WRONG.*
+- "median gap 0.0000, ratio 1.000, on 1,666 pooled Uganda+GhanaLSS cells
+  (=SYNTHESIS.org:666-676=)": *CONFIRMED exactly* -- :675 is the pooled row
+  "*both countries, all waves* | | *1,666* | *0.0000* | *1.000* | *40.3%*".
+- "the interviewer manual explicitly instructs farmgate valuation
+  (=SYNTHESIS.org:739-742=)": *CORRECTED*.  The manual quote is at
+  *:732-736* ("column 9 'should be valued at farm gate/producer price ...'").
+  :738-746 is the Deaton & Zaidi paragraph -- which the file separately and
+  *correctly* cites as ":738-746".
+- "own-consumption valuation ~23% above the crop sale price
+  (=SYNTHESIS.org:723-728=)": *WRONG citation.*  :722-728 says the opposite
+  kind of thing -- it *withdraws* the "nearer the purchase price" reading and
+  gives the categorical decomposition.  The 23% claim is at *:750-753*: "in
+  Uganda, own-consumption is valued about 23% above what a sale actually
+  fetched (3 vs 4 = 1.234 on the 223-cell transitive set)".  *The substance is
+  CONFIRMED at the corrected line*, but SYNTHESIS adds a caveat the finding
+  drops: ":754 *That 23% is Uganda-only*: GhanaLSS has no source 4, so no
+  comparable number exists for it".
+
+*** The "0.585" figure (asked for explicitly)
+It appears in *none of the four findings files* (grep, zero hits).  What
+SYNTHESIS.org actually says: 0.585 is the *median of the per-cell position* of
+the own-consumption valuation on a 0 = crop-sale-price, 1 = purchase-price
+scale (=SYNTHESIS.org:713=), reported alongside a mean of *0.502* (:714) and a
+ratio-of-medians of *0.448* (:715).  :707-709 records that "the first draft
+reported 0.585 and read it as 'between, nearer the purchase price'", and
+:722-725 states: "*The defensible reading is that the valuation is
+indistinguishable from the midpoint of the sale and purchase prices, with a
+large mass at each end; "nearer the purchase price" rests on one of three
+statistics and is withdrawn.*"  So 0.585 is a *superseded* statistic and must
+not be quoted as a live finding.
+
+*** L3 -- crop_category1/2 crosswalk as a reference for EHCVM Aggregate Labels
+*CONFIRMED* on the issue references: =gh issue view 833= -> OPEN, title
+verbatim "harmonize_* folds raw and processed into one `j` in 5 countries:
+Malawi groundnut 5.0x, Uganda maize 3.33x are milling"; =gh issue view 438= ->
+OPEN, "Extend the WB-parity item-feature stack to non-ISA countries".  The
+"character-for-character identical between Uganda and Nigeria" claim for the
+=crop_category2= block is *CONFIRMED on substance, CORRECTED on the lines*:
+both files carry exactly 35 =crop_category2== assignment lines and a =diff= of
+the two sets is *empty* after whitespace normalization -- but the block is at
+=UgandaW4...do:888-922= and =NigeriaW4...do:972-1006=, not at the cited
+":882-908" / ":958-987" (those ranges start inside the GID_1 shapefile recode,
+which is genuinely country-specific).
+
+*** L4 -- our away/home fold is finer than EPAR's
+*CONFIRMED.*  EPAR: =UgandaW4...do:758-770= -- reads =gsec15b= a second time,
+=keep if h15bq3a==1= (:760), =ren h15bq7 food_purch_value= / =ren h15bq6
+food_purch_qty= (:762-763), =collapse (sum) ... by(hhid)= (:766) with no
+=item_code=, =gen crop_category1="Meals away from home"= (:767).  Ours:
+=Uganda/_/uganda.py:391= uses =quantity_away=/=value_away=; the reshape rule at
+:452-453 folds home+away into =s='purchased'= per row (so per item); the
+docstring documents the drop at :429-432 and :469-472.  *CONFIRMED*, including
+the file's cited line numbers.
+
+*** L5 -- the same-household same-item rung as a separable idea
+*CONFIRMED.*  =UgandaW4...do:693= is verbatim
+=gen food_`f'_value=food_`f'_qty*price_unit if food_`f'_unit_new==food_purch_unit_new=,
+and the first ladder rung is at :700.  *CONFIRMED exactly.*
+
+** KNOWN-ISSUES table (consumption)
+
+| # | verdict | evidence |
+|---+---------+----------|
+| 1 | *CONFIRMED substance, WRONG citation* | =price_unit=food_purch_value/food_purch_qty= is verbatim at =UgandaW4...do:604=.  "SYNTHESIS.org:41-45 'Structural fact 1: source 2 does not exist anywhere in the corpus'" is *WRONG* -- :39-48 is about =gaps.csv= carrying =u= but no =u_basis=.  The heading is at *SYNTHESIS.org:80*, and its content (:82-91, "A reported purchase price independent of Expenditure/Quantity is not available in any of the eight countries") supports the claim exactly.  README.md's "reported food prices in the surveys" is at *:33*, not :29 (:29 is the =### Consumption= heading). |
+| 2 | *MISPLACED CELL* | Construction *CONFIRMED*.  But the row's own "evidence (ours)" is GH #585 -- an open ticket asking for exactly this.  By the brief's definition that is cell 1 (we found it too), not cell 2 (candidate new issue).  Same for row 7 / #851. |
+| 3 | *CONFIRMED* | see L5. |
+| 4 | *CONFIRMED, with an omission* | =UgandaW4...do:797-804= (=_pctile `v' [aw=weight] if `v'!=0, p($wins_upper_thres)= then =gen w_`v'=`v'= then =replace=).  The file says "top-1% clip replaced with the p99 value" -- accurate for the =w_= series, but *the raw column survives alongside it*, which the file's own metadata read proves (8 raw + 8 winsorized value columns).  Worth stating so nobody thinks EPAR destroys the raw number. |
+| 5 | *CONFIRMED, line CORRECTED* | =*Average PP and PH= is at =NigeriaW4...do:888=, the =collapse (mean)= at :896.  The file cites ":886-895". |
+| 6 | *CONFIRMED* | see L4. |
+| 7 | *CONFIRMED substance, WRONG citation* | =gh issue view 851= -> OPEN, title matches verbatim.  The =recall_period= gen is at *=Append all surveys_SSA.do:41-43=* (7 / 20 Sierra Leone / 30 Ghana SPS), not ":31-35".  The file's key point stands and I confirmed it: the per-country x52 (=UgandaW4...do:778-781=) and x12 (=GhanaW1...do:432=) multiplications happen *before* the append, so =recall_period= is post-hoc metadata that gates nothing. |
+| 8 | *CONFIRMED* | metadata read reproduced below. |
+
+** Structural / metadata claims
+
+- Final-product metadata: I re-ran the pyreadstat metadata-only read of
+  =Final Data/Uganda_UNPS_W4_food_consumption_value_by_source.dta=.
+  *39,032 rows x 41 columns*, no =item_code=, grain =(hhid, crop_category1)=,
+  columns exactly as the file lists (identity/demographic block, adm1/adm2/adm3
+  /GID_1, weight, rural, interview date parts, crop_category1/2, conv_lcu_ppp,
+  eight =food_{consu,purch,prod,gift}_value_{lcu,ppp}= and eight =w_= twins).
+  *CONFIRMED exactly.*
+- "16 country series" in the append: *CONFIRMED* -- =Append all
+  surveys_SSA.do:15= lists 44 country-waves spanning 16 countries.
+- Uganda W1,W2,W3,W4,W5,W7,W8 (no W6); Ethiopia W3,W4,W5; Malawi W1-W4;
+  Tanzania W1-W5 (no SDD): *CONFIRMED* from :15.
+- *WRONG*: "=Final Data/readme.md= is one blank line."  It is a 126-byte,
+  one-line sentence: "This folder contains the final processed datasets at the
+  country level; they can be appended to be analyzed as a single unit."  The
+  larger point (no KNOWN ISSUES section anywhere in this repo) is unaffected
+  and *CONFIRMED* -- but the stated evidence is false.
+- *OVERSTATED*: "README.md:1-40, verbatim methodology, *five bullets* under
+  'Consumption'".  There are *ten* bullets (:32-41).  Also worth recording:
+  =README.md:34= says "*mean* purchase price" in its first clause and "*median*
+  purchase price" in its second, and says "more than 10 observations" -- which
+  matches the code's =>10=, unlike the Ag repo's =>9=.
+
+** Ladder rung counts -- all three understated by one
+
+| country | file says | actual (do-file lines) | verdict |
+|---+---+---+---|
+| Uganda | "5-rung EA->parish->county->district->region->national" (six names) | *6 live rungs*: ea :700, parish :707, county :719, district :725, region :731, country :737.  A =scounty= rung exists but is *commented out* (:709-713). | CORRECTED |
+| Nigeria | "4-rung EA->LGA->state->zone->national" (five names) | *5 rungs*: :468 ea, :474 lga, :480 state, :486 zone, :492 country (PP block; PH identical at :806-830) | CORRECTED |
+| Senegal | "3-rung grappe->department->region->national" (four names) | *4 rungs*: :446 grappe, :452 department, :458 region, :464 country | CORRECTED |
+
+In each case the *names* the file lists are right and the *count* is one low --
+consistent with counting the geographic rungs and dropping the national one.
+
+** Other citations
+
+- =UgandaW4...do:928-930= PPP =0.000991261=: *CONFIRMED verbatim*.
+- Nigeria source columns ":676-689": *CONFIRMED as a range*; one detail
+  *CORRECTED* -- the file says "=s10bq9a/b= purchase", but the purchase *value*
+  is =s10bq10= (:681); =s10bq9a/b= are quantity and unit.
+- Senegal source columns ":392-399": *CONFIRMED* (=s07bq07a/b= purchase qty/unit
+  at :395-396, =s07bq08= value at :397, =s07bq04= production :398, =s07bq05=
+  gift :399).
+- "Senegal/_/CONTENTS.org is 531 lines" and "=Senegal/_/data_scheme.yml:66=
+  declares food_acquired": *CONFIRMED* (=wc -l= = 531; :66 is =  food_acquired:=).
+- Unstated but material: *every HC median is =[aw=weight]=-weighted*
+  (=UgandaW4...do:618= and the six sibling collapses).  The file never says so,
+  and L1 proposes reusing our *unweighted* =median_price_valuation= as
+  equivalent machinery.
+
+* FINDINGS_taxonomy.org
+
+(Verified against the 483-line version; the GH #439 section at :334-551 of the
+current file is out of scope.)
+
+** Indicator inventory -- recomputed from the workbooks
+
+I re-derived every number with =.venv/bin/python= + openpyxl.
+
+| claim | recomputed | verdict |
+|---+---+---|
+| MASTER_LIST_INDICATORS 6,285 x 12 | 6285 x 12 | CONFIRMED |
+| 201 unique =indicatorname= | 201 raw; *201* after =.strip().lower()= | CONFIRMED (robust to normalization) |
+| Household 138/4,881; Population 32/1,068; Individual 30/312; Household-Plot 2/24 | exact, all eight numbers | CONFIRMED |
+| themes 58/46/34/18/15/12/10/8 | exact | CONFIRMED |
+| weights 4,147/1,616/384/93/24/21 | exact | CONFIRMED |
+| currency 1,019/1,016/1,013, 3,237 non-monetary | exact | CONFIRMED |
+| "genderdisaggregation distinct values, 22 total" | 21 non-null + 1,068 NaN = 22 with NaN | CONFIRMED (as stated, if NaN counts) |
+| "~3,000 rows" head-gender / "~1,600" plot-manager | 3,031 / 1,569 | CONFIRMED |
+| farm-size bins 0 / (0,1] / (1,2] / (2,4] / >4 plus (0,2] and (0,4] | exact: ='0 ha','0<ha<=1','0<ha<=2','0<ha<=4','1<ha<=2','2<ha<=4','>4 ha','All'= | CONFIRMED |
+| =W3.do:4284-4293= farm-size bins | :4284-4288 gens, :4289-4293 labels | CONFIRMED |
+| Estimates workbook: 4 sheets | exact names | CONFIRMED |
+| =Estimates by Instrument= 47,927 x 26, columns as listed | 47,927 data rows x 26; column list exact | CONFIRMED |
+| 27 distinct Instrument, = 5+4+5+6+7 | 27; Ethiopia 5, Malawi 4, Nigeria 5, Tanzania 6 (incl. SDD), Uganda 7 | CONFIRMED |
+| *"150 distinct indicatorname published vs 201 in the master list -- 51 never published"* | 150 / 201 / *51*, and *0* published-not-in-master; identical after normalization | *CONFIRMED* (the gap is real, not a whitespace artifact) |
+| =Summ. of Indicator Construction= 170 x 21 | raw sheet 171 x 21 (= 170 data rows), but only *166* are non-empty | CONFIRMED-with-caveat |
+| =General Construction Decisions= 12 x 2 | raw 12 x 2 = *11* data rows | CORRECTED |
+| =Cover Sheet= 45 rows | raw 45 x 3 | CONFIRMED |
+
+** Section x ours incidence table
+
+I checked *every* section-header line number against
+=Uganda UNPS/Uganda UNPS Wave 5/readme.md= (=grep -n '^###'=).  *All 49 are
+exact* -- 10, 28, 31, 36, 42, 48, 54, 60, 66, 73, 98, 107, 120, 127, 136, 149,
+152, 158, 164, 171, 177, 183, 196, 205, 210, 215, 221, 228, 236, 244, 250, 256,
+262, 268, 274, 280, 283, 290, 296, 302, 308, 314, 322, 329, 336, 342, 348, 354,
+357/363/369, 375.  *CONFIRMED.*  The four "nothing generated" caveats at
+:150, :211, :281, :355 are *verbatim*.  :260/:266 ("not comparable across
+waves") and :272 ("does not report hectares of area harvested") *verbatim*.
+
+*CORRECTED*: the =USE OF INORGANIC FERTILIZER= row says "readme:222 flags
+Uganda's own *known issue*".  :222 is the *DESCRIPTION* line; that section's
+=- **KNOWN ISSUES:**= line (:226) says "No issues in this section."  The N/P/K
+content is genuinely at :222; calling it a known issue is not.
+
+** Estimates / methodology section
+
+| claim | verdict | evidence |
+|---+---+---|
+| rural-only default, ="if rural==1"= | *CONFIRMED verbatim* | =EPAR_UW_335_SUMMARY_STATISTICS.do:21-23= |
+| =[aw=weight]= per weight type at :303,315,339,371 | *CONFIRMED, all four exact* | :303 =[aw=weight]=, :315 =svy, subpop=, :339 =[aw=w_labor_weight]=, :371 =[aw=w_land_weight]= |
+| =svy: mean= with strata + PSU | *CONFIRMED* | =svyset clusterid [pweight=...], strata(strataid)= at :306,341,373 |
+| "Winsorization is NOT in the summary-stats do-file" | *CONFIRMED* | =grep -ci winsor= = 0 |
+| winsor thresholds =W3.do:82-83= | *CORRECTED* | :82-83 is the banner; the globals are at :84-85 |
+| population rescaling =W3.do:87-89= | *CONFIRMED* | :87-91 |
+| *"applied per-variable with =winsor2=" (=W3.do:4475-4870=)* | *WRONG on the mechanism* | =grep -c winsor2 EPAR_UW_Tanzania_NPS_W3.do= = *0*.  The Ag repo winsorizes by hand: =_pctile `v' [aw=weight], p($wins_upper_thres)= then =gen w_`v'=`v'= then =replace w_`v' = r(r1) if ...= (:4485-4491).  =winsor2= *is* used -- but only in the 358 study (:486, :685, :512).  Two further omissions: the winsorization is *weighted*, and it writes a new =w_= column rather than replacing the original, so the tag "*imputed* (values are REPLACED, not merely flagged)" is *OVERSTATED*.  The range 4475-4870 and the "top-only / top+bottom / ratio-and-its-parts" description are *CONFIRMED* (:4475, :4529, :4577). |
+| *"Priority crops: a fixed 12-crop list"* (=W3.do:94-113=) | *CORRECTED/OVERSTATED* | The *comment* at :96-97 names 12; the operative global at :113 has *14* (adds cotton, sunflower, pigeon pea).  The summary-stats file's own =topcropname_area= (:17) lists 32. |
+| =dm_gender= from up to 3 decision-makers, hh-head fallback (=W3.do:264-273=) | *CONFIRMED* | :264-265 build male/female/mixed, :272-273 are the fhh fallback with the comment "This decision varies a lot by country"; the "up to 3" is corroborated by Uganda =readme.md:61= ("By using 1st, 2nd, and 3rd Plot Decision-makers").  Per-season variant at :409-411 *CONFIRMED*. |
+
+*Tag misapplications* (not WRONG claims, but the brief's three tags do not
+cover a *filter*): "Rural-only by default ... *aggregated/reported*" and
+"Priority crops ... *reported* selection" are both sample/reporting filters,
+which is neither reported, imputed, nor aggregated.  Flag for the synthesis:
+the taxonomy needs a fourth tag or an explicit "not a data transform" marker.
+
+** Learning #2 -- the median-price-ladder vs Master_Conversionfactor_table comparison
+
+*This is the most consequential taxonomy error.*  The claim:
+
+#+begin_quote
+Our =median_price_valuation= (=transformations.py:2847-2884=, WB-parity,
+=threshold=10=, UNWEIGHTED median) and EPAR's =Master_Conversionfactor_table.do=
+(region-then-national median CF ladder across ALL 7 Uganda waves,
+=[weight=weight]=-WEIGHTED median, readme.md:76-87, do-file lines 238-294) are
+independently-built solutions to almost the identical problem ... with a
+minimum-observations floor -- EPAR's is 9, ours is 10.  The one real
+construction delta is WEIGHTED vs UNWEIGHTED median.
+#+end_quote
+
+Findings, in order of consequence:
+1. *"EPAR's [floor] is 9" is WRONG for the cited file.*
+   =Uganda UNPS/Nonstandard Unit Conversion Factors/Master_Conversionfactor_table.do=
+   has *no minimum-observation floor at all*.  It computes =gen nobs=1= (:238)
+   and carries =(sum) nobs= through each collapse (:248, :260, :272, :287), but
+   never gates on it -- and =grep -rn 'nobs' --include='*.do'= across the entire
+   =Uganda UNPS/= tree returns *zero* hits outside this file.  Nothing consumes
+   the count.
+2. *Where a floor does exist, it is >9, i.e. N>=10 -- the SAME as ours.*  The
+   "9" comes from EPAR's prose, not its code:
+   =Uganda UNPS Wave 5/readme.md:85= says "with at least 9 observations
+   available"; the code says =obs_`i'_kg >9= (Tanzania =W5.do:567=) /
+   =obs_`i'_price>9= (Ethiopia =W3.do:1240=).  So EPAR's readme is off by one
+   from EPAR's own code, and the finding inherited the readme's number.
+   *There is no threshold delta between us and EPAR's Ag-repo ladder.*
+3. *The two things compared are different quantities.*  Ours is a *price*
+   ladder (currency per kg); EPAR's =Master_Conversionfactor_table.do= is a
+   *conversion-factor* ladder (kg per local unit).  Our nearest analogue to the
+   latter is =harvest_kg='s survey-median layer, whose floor is
+   =SURVEY_MEDIAN_MIN_REPORTS = 5= (=transformations.py:1799=), not 10.  The
+   proposed "add an optional =weight_col= kwarg to =median_price_valuation=" is
+   therefore aimed at the wrong function for the stated comparison.
+4. *The weighted/unweighted delta is REAL and CONFIRMED*, and is broader than
+   the file says: =[weight=weight]= at :248,260,272,287 in the CF table, and
+   =[aw=...]= on *every* median in both EPAR projects; ours is
+   =grouped.transform('median')= at =transformations.py:3013=, with no weight
+   parameter anywhere in the signature (:2847-2856).
+5. *"across ALL 7 Uganda waves" is OVERSTATED*: the harvest CF table appends
+   waves 2-7 onto wave 1 (:233-235) and uses all of them, but the *sold* CF
+   table is restricted to waves 3-5 (=keep if wave=="wave 3" | "wave 4" |
+   "wave 5"=, :271 and :286).
+6. *"readme.md:76-87" is ambiguous and, read in context, wrong.*  The
+   Nonstandard-Unit-Conversion-Factors folder's own =readme.md= is a *single
+   line* (0 newlines).  The cited content is at =Uganda UNPS Wave 5/readme.md:
+   76-87=, a different file.  *CORRECTED.*
+
+** Learning #4 -- FOOD PROVISION / rCSI
+
+- "EPAR's FOOD PROVISION (readme.md:342-346) is a months-count, and so is our
+  =months_food_inadequate=": *CONFIRMED* (section header at :342).
+- "Uganda W5's own readme states 'The Reduced Coping Strategies Index (rCSI)
+  was NOT calculated for the Uganda field survey' (readme.md:284)":
+  *CONFIRMED verbatim*, including the line -- the full sentence adds "as the
+  available data did not allow for a consistent construction of the indicator."
+- *OVERSTATED / partly WRONG*: "the experience-scale features EPAR *explicitly
+  does not build*: =food_security= (FIES) and =food_coping= (rCSI)".  EPAR
+  *does* build rCSI -- for Tanzania W5, from =hh_sec_h.dta= read at
+  =EPAR_UW_Tanzania_NPS_W5.do:2614= (and =FINDINGS_Tanzania.org= says so, at
+  its Construction section).  The Uganda readme sentence is a *wave-specific
+  data absence*, not a project-wide design choice.  rCSI is therefore *not*
+  OURS-ONLY; FIES may still be, but that was not checked.  This is a direct
+  cross-file contradiction between the taxonomy and Tanzania files.
+
+** Learning #5 -- the #829 case
+*CONFIRMED, both readme lines verbatim.*
+=Uganda UNPS Wave 5/readme.md:96= "- **KNOWN ISSUES:** Sold values are
+inaccurate in W5, on average much lower than they should be for the country.
+Because of this, sold values are added to empty variables"; =:105=
+"- **KNOWN ISSUES:** No issues in this section." under =### GROSS CROP REVENUE=
+(:98), whose DESCRIPTION (:99) says it "uses the same price per kilogram
+methodology used in the All Plots section".  =gh issue view 829= -> CLOSED,
+title matches ("Value_sold is ~100x too small ... a scale defect in
+a5aq8/a5bq8").
+
+** 358-study comparison table
+| row | verdict | evidence |
+|---+---+---|
+| GPS primary, farmer-estimate fallback, "2,064 changes" of 3,761 | *CONFIRMED verbatim* | =EPAR_UW_358_Tanzania TNPS 2012-13 LSMS-ISA_W3.do:89-93= (=*3,761 generated= :90, =*2,064 changes= :92) |
+| "only the largest area planted used" (:571) | *CONFIRMED verbatim* | inside the =esttab= note at :571 |
+| =kg_harvest = ag4a_28 if ag4a_25==1= (:188-190) | *CONFIRMED on the code, WRONG on the gloss* | the file glosses =ag4a_25==1= as "unit is kg"; the code's own comment at :188 is "Only those that have completed harvest (just 46 plot-crops haven't completed)".  =ag4a_25= is the *harvest-completion* flag -- consistent with the main W5 do-file's =if ag4a_25==2= incomplete-harvest adjustment. |
+| intercrop share 1/4,1/2,3/4,full, rescaled if >1 (:143-176) | *CONFIRMED* | :158-161 the categorical map, :166-167 the rescale, :176 x =field_area_cultivated= |
+| winsor2 cuts(1 99) at :486,685; MAD 2 SD above median, upper only, at :503-508; both reported side by side at :565-571 | *CONFIRMED, all exact* | note :512 is =winsor2 kg_hectare*, cuts(0 99)= -- top-only for the yields |
+| 358 covers Ethiopia W2/W3 + Tanzania W1/W2/W3 | *CONFIRMED* | =ls= of the clone (5 do-files) |
+| Tanzania W3 358 file = 1,133 lines | *CONFIRMED* | =wc -l= |
+| =transformations.py:2088-2330= for harvest_kg/yield_kg | *CONFIRMED as a range* | =harvest_kg= at :2089; =SURVEY_MEDIAN_MIN_REPORTS= at :1799 |
+
+** Contradictions section
+- "=GAP_RANKING.org= GAP 5 is stale": *CONFIRMED, both sides verbatim*.
+  =slurm_logs/2026-06-13_wb_incidence_map/GAP_RANKING.org:154= reads "Why: a
+  NEW feature — we have NO =anthropometry= feature anywhere", and :38/:152 rank
+  it as GAP 5; =lsms_library/data_info.yml:710= is =  - anthropometry= under
+  =Feature Vocabulary:= (:709).  The contradiction is real.
+- =data_info.yml:232-234= for =plot_features.Area= required: *CORRECTED* --
+  the =Area:= block is at :233-236 with =required: true= at :235 (:232 is a
+  comment).  Substance *CONFIRMED*.
+- =data_info.yml:248-256= for Tenure spellings: *CONFIRMED substantively* --
+  the =spellings:= list (:252-258+) is owned/leased/rented_in/rented_out/
+  sharecropped_in/sharecropped_out with no titled sub-form, so EPAR's
+  "has a certificate" binary is indeed not derivable from ours.
+
+* Tag checks (reported / imputed / aggregated), 10 per file
+
+BRIEF.md defines three tags: =reported= (carried from the instrument as
+asked), =imputed= (filled or replaced by a rule), =aggregated= (summed /
+collapsed / indexed to a coarser grain).  *Two whole classes of EPAR
+construction fall outside all three*, and every file trips over at least one:
+
+- *A filter / selection* (rural-only, priority-crop list, sub-population).  It
+  removes rows; it neither fills, replaces, nor collapses.
+- *A scalar rescale of an already-reported value* (x52 annualization, PPP
+  conversion, population-calibrated weights, unit-factor multiplication).  It
+  changes no row's provenance and creates no new information.
+- A borderline third: *a ratio of two reported values* (=price_unit =
+  value/qty=).  Nothing is imputed and nothing is aggregated, yet the number is
+  not what the instrument asked either.
+
+Recommendation for the synthesis: add a fourth tag (=derived= or =rescaled=)
+or mark these explicitly "not a data transform".  The mislabels below are
+mostly *consequences of the missing tag*, not carelessness -- except where two
+files tag the SAME construction differently, which is a real inconsistency.
+
+** FINDINGS_Ethiopia.org
+
+| # | construction | file's tag | verdict |
+|---+---+---+---|
+| 1 | harvest quantity =qty_harv = ph_s9q04_a= (W3.do:1073-1078) | reported | *OK* |
+| 2 | farmer-estimate fallback =kg_est = ph_s9q05= | "imputed in the narrow sense of substituting one reported field for another" | *OK, and well hedged* -- substituting a second reported field is not a rule-based fill; the hedge is the right call |
+| 3 | crop-value median ladder (W3.do:1038-1051) | imputed | *OK* |
+| 4 | GROSS CROP REVENUE =collapse (sum) ... by(hhid crop_code)= + the sales-value substitution | aggregated + imputed | *OK on aggregated*; the substitution (:1326) picks the larger of two numbers, one of which is itself ladder-imputed, so "imputed" is defensible by inheritance |
+| 5 | food-consumption-by-source ladder | imputed | *OK* |
+| 6 | *TLU* (W3.do:2423-2429 coefficients x =number_today=) | *reported* | *WRONG TAG.*  The headcount is reported; =tlu = number x hardcoded coefficient=, collapsed to household (=collapse (sum) tlu_today ... by(hhid)=, :2525), is *aggregated* with an external coefficient table.  =FINDINGS_Tanzania.org= tags the *identical* construction =aggregated= -- a direct cross-file inconsistency |
+| 7 | plot area: GPS reported + 3-layer fallback (W3.do:889-900) | reported + imputed | *OK* |
+| 8 | winsorization (W3.do:106-107 globals) | untagged ("we do none") | *gap* -- taxonomy tags it =imputed=; Ethiopia leaves it untagged, so a merged synthesis inherits no tag from here |
+| 9 | *population re-weighting* =weight_pop_rururb= | *imputed* | *WRONG TAG* -- a scalar rescale of a reported weight to an external WDI total.  Nothing is filled or replaced by a rule about missing data.  Needs the fourth tag |
+| 10 | livestock =value_today = number_today x imputed price= | imputed / aggregated (partially) | *OK* |
+
+** FINDINGS_Tanzania.org
+
+| # | construction | file's tag | verdict |
+|---+---+---+---|
+| 1 | id/geo renames (W5.do:186-190) | reported | *OK* |
+| 2 | *weight rescaling to WB population totals* (W5.do:213-236) | *imputed/aggregated* | *WRONG TAG*, same objection as Ethiopia #9.  The file's own prose is right ("a genuinely different design"); the tag is not |
+| 3 | GPS-preferred plot area (W5.do:264-265) | reported | *OK* |
+| 4 | *=price_kg = value_sold/quantity_sold=* (W5.do:391) | *reported* | *INCONSISTENT.*  The identical construct in the consumption project (=price_unit = food_purch_value/food_purch_qty=) is tagged *imputed* there.  Neither is right under the brief; the two files must not ship contradicting tags for the same formula |
+| 5 | 5-rung median ladder (W5.do:566-567) | imputed | *OK* |
+| 6 | =ag4a_28= direct-valuation fallback (W5.do:574) | reported | *OK* |
+| 7 | =value_harvest= capped by observed sales (W5.do:1088) | imputed | *defensible* -- a replacement rule, applied to a ladder-imputed base |
+| 8 | tree-crop / intercrop area allocation (W5.do:510-516) | imputed | *OK* |
+| 9 | beans+cowpeas -> code 931 (W5.do:386) | aggregated | *OK* |
+| 10 | TLU coefficients (W5.do:991-995) | aggregated | *OK* -- and this is the tag Ethiopia should have used |
+| 11 | HDDS / FCS / rCSI | aggregated | *OK* |
+| 12 | =wage_paid_aglabor = tot_wage/labor_hired= | aggregated ("harmless") | *borderline* -- a ratio, not a collapse; the file flags its own unease, correctly |
+
+** FINDINGS_consumption_by_source.org
+
+| # | construction | file's tag | verdict |
+|---+---+---+---|
+| 1 | item/source extraction (UgandaW4:290-300 etc.) | reported | *OK* |
+| 2 | unit harmonization; volume->mass factors (UgandaW4:315-448, 590-596) | reported, with imputed only where a factor is applied | *OK*, and the imputed/reported split is drawn in the right place |
+| 3 | *purchase price =food_purch_value/food_purch_qty=* (UgandaW4:604) | *imputed*, "mislabeled as reported by the README" | *WRONG TAG.*  A ratio of two reported values is neither imputed nor reported.  The substantive point -- EPAR's README calls it a "reported food price" when no price column is read -- is *correct and important*; only the tag is wrong.  See also Tanzania #4 |
+| 4 | own-production / gift ladder (UgandaW4:693-737) | imputed | *OK* |
+| 5 | food-away fold, =collapse (sum) by(hhid)= (UgandaW4:766) | aggregated | *OK* |
+| 6 | *annualization x52 / x12* (UgandaW4:778-781; GhanaW1:432) | *aggregated* | *WRONG TAG.*  Multiplying every row by a constant changes no grain and collapses nothing.  Needs the fourth tag |
+| 7 | Nigeria PP/PH =collapse (mean)= (NigeriaW4:896) | aggregated | *OK* |
+| 8 | winsorization (UgandaW4:797-804) | imputed | *OK*, with the correction that the raw column survives beside the =w_= column |
+| 9 | =crop_category1= / =crop_category2= folds | aggregated | *OK* |
+| 10 | *PPP conversion, a per-country scalar* (UgandaW4:928-930) | *imputed* | *WRONG TAG.*  A deflator, not a fill rule.  Fourth tag again |
+
+** FINDINGS_taxonomy.org
+
+| # | construction | file's tag | verdict |
+|---+---+---+---|
+| 1 | *rural-only sub-population* (SUMMARY_STATISTICS.do:21-23) | *"aggregated/reported -- filter, not an imputation"* | *WRONG TAG*, and the file half-knows it (the parenthetical says "filter").  A filter is none of the three |
+| 2 | =[aw=weight]= / =svy: mean= application (:303,315,339,371) | "reported weight application" | *NOT A DATA TAG* -- this is an estimator choice, not a transform of the item data |
+| 3 | winsorization (Tanzania W3.do:4485-4491) | imputed ("values are REPLACED, not merely flagged") | *tag OK, gloss OVERSTATED* -- values are replaced *in a new =w_= column*; the original survives |
+| 4 | *priority-crop list* (W3.do:94-113) | *"reported selection (a curation choice, not a data transform)"* | *WRONG TAG*, again self-aware.  Same fourth-tag gap as #1 |
+| 5 | =dm_gender= from up to 3 decision-makers (W3.do:264-273) | aggregated | *OK* -- collapses 1-3 roster rows to one plot-season categorical |
+| 6 | farm-size bins (W3.do:4284-4288) | "aggregated over item-level plot rows" | *OK* -- the underlying =farm_size_agland= is a plot-row sum, so the tag attaches to the right step |
+| 7 | EPAR's PLOT AREAS = parcel area x planted share (Uganda readme:55) | imputed | *OK* |
+| 8 | 358: GPS primary / farmer-estimate fallback (:89-93) | *untagged* | *gap* -- the comparison table carries no tag column at all; by the brief every construction should have one |
+| 9 | 358: intercrop share 1/4,1/2,3/4 then rescale (:143-176) | imputed (in Learning #3) | *OK* |
+| 10 | 358: winsor2 / MAD side by side (:486,503-508) | imputed by implication | *OK* -- and the file's point that the study reports both as a sensitivity is the strongest anti-winsorization argument in the whole batch |
+
+*Summary of tag findings*: 7 outright wrong tags (ETH 6 and 9; TZA 2 and 4;
+CONS 3, 6 and 10; TAX 1, 2 and 4 -- 10 by row, 7 distinct constructions), of
+which *5 are the missing fourth tag* and *2 are genuine cross-file
+contradictions* (TLU: Ethiopia =reported= vs Tanzania =aggregated=; the
+value/quantity ratio: Tanzania =reported= vs consumption =imputed=).  Both
+contradictions must be resolved before the synthesis, because both
+constructions appear in more than one file.
+
+* Register spot-checks
+
+Beyond the per-file tables above, these are the register rows I checked
+independently against our own record, prioritising every cell-2 row.
+
+| row | I checked | result |
+|---+---+---|
+| ETH 2a (own-consumption value) | =Ethiopia/_/CONTENTS.org:1311-1339= | *we DID record it* -> cell 1, not 2 |
+| ETH 2b (local area conversion) | sidecars in 4 waves + widened grep + L1 blob stat | *genuine cell 2*, and our recorded reason is wrong |
+| ETH 2c (Crop_CF) | grep of CONTENTS.org (0 hits) + widened config grep (0 hits) | *genuine cell 2* |
+| ETH 2d (hh-own price) | =transformations.py:2885-2891= | *we DID address it* -> cell 1; and the EPAR side is misread (C4) |
+| ETH 2e (herd value) | =CONTENTS.org:1277-1302= | *we DID record it* -> cell 1 |
+| ETH 2f (W4->W5 weights) | =CONTENTS.org:865-883= | *we DID record it* -> cell 1 (the row says so itself) |
+| ETH 1a | =open_issues.tsv:82= + =gh issue view 660= | *CONFIRMED* |
+| TZA 2.1 (land-rent time unit) | grep =CONTENTS.org= for =ag3b_34=/=rent=/=rental=; grep =open_issues.tsv= | *0 hits both* -> genuine cell 2 |
+| TZA 2.2 (=ag4a_27= double use) | grep =CONTENTS.org= for =ag4a_25=/=ag4a_27=/"complet" | *0 relevant hits* -> genuine cell 2; EPAR code confirmed verbatim |
+| TZA 2.3 ("80 not matched") | grep =CONTENTS.org= for =plot_inputs=/"not matched" | *0 hits* -> genuine cell 2 |
+| TZA 3.1 (7.5M kg outlier) | warm parquet + =tanzania.py:1163= | *CONFIRMED*, every number exact |
+| TZA 3.4 (#113/#840) | =open_issues.tsv:11=, =gh issue view 840= | *CONFIRMED* |
+| TZA 3.5 (#837) | =open_issues.tsv:14=, =gh issue view 837= | *CONFIRMED* |
+| TZA 3.6 (#846) | =open_issues.tsv:6=, =gh issue view 846= | *CONFIRMED* |
+| CONS 2 (#585) | =gh issue view 585= | title verbatim; *but this makes the row cell 1, not 2* |
+| CONS 7 (#851) | =gh issue view 851= | title verbatim; *same -- cell 1, not 2* |
+
+*Pattern worth naming for the synthesis*: eight of the eleven cell-2 rows
+across Ethiopia and consumption are *design differences we have already
+recorded* (in =CONTENTS.org=, a docstring, or an open issue), not candidate new
+issues.  Only ETH 2b, ETH 2c and the three Tanzania rows survive the test.
+
+* Cross-file reconciliation
+
+** The EPAR median-price ladder -- the correct facts
+
+Both EPAR projects use the same *shape* (per-item, per-geography weighted
+median of an observed unit price, finest qualifying cell wins) but they are
+*two different constructions with different gates*.  Authoritative reading:
+
+| | LSMS-Agricultural-Indicators-Code | Household-Consumption-Data |
+|---+---+---|
+| what is priced | crop sale price per kg (=value_sold/quantity_sold=) | purchase unit value (=food_purch_value/food_purch_qty=) |
+| rungs, Ethiopia | country, region, zone, woreda, kebele, ea (=W3.do:1239=), applied coarse->fine so the finest qualifying wins | ea, kebele, subcity, woreda, zone, region, country (=EthiopiaW5_...do:429-467=), applied fine->coarse, first qualifying wins |
+| rungs, Tanzania | country, region, district, ward, ea (=Tanzania W5.do:566=) | ea, ward, district, region, country |
+| rungs, Uganda (HC) | -- | ea, parish, county, district, region, country = *6* (a =scounty= rung is commented out) |
+| rungs, Nigeria / Senegal (HC) | -- | ea/lga/state/zone/country = *5*; grappe/department/region/country = *4* |
+| *gate* | =obs > 9= i.e. *N >= 10* (=Ethiopia W3.do:1240-1241=; =Tanzania W5.do:567=; =Ethiopia W3.do:2521= for livestock) | =obs > 10= i.e. *N >= 11* (=EthiopiaW5_...do:430,436,442,449,455,461,467=; =UgandaW4...do:700,707,719,725,731,737=) |
+| *weighting* | *WEIGHTED*, =[aw=weight_pop_rururb]= | *WEIGHTED*, =[aw=weight]= |
+| household's own price | a *separate* =value_harvest_hh= series; the headline =value_harvest= is ladder-first (Ethiopia :1253-1265; Tanzania :565-573) | the *first rung* of the headline value (=:423= Ethiopia, =:693= Uganda), before any geographic median |
+| EPAR prose | Uganda W5 =readme.md:85= says "at least 9 observations" -- one off from its own =>9= code | HC =README.md:34= says "more than 10 observations", matching its code, but calls the statistic a "mean" in one clause and a "median" in the next |
+
+Ours, for comparison: =median_price_valuation=
+(=transformations.py:2847-3029=), =threshold=10= with =cell_count >= threshold=
+(*N >= 10*), *UNWEIGHTED* (=grouped.transform('median')=, :3013), applied
+finest->coarsest filling only unassigned rows (:3009-3017) with an
+unconditional national fallback (:3018-3022), and no household-own-price rung
+by explicit design (:2885-2891).  The separate conversion-factor analogue is
+=harvest_kg='s survey-median layer with =SURVEY_MEDIAN_MIN_REPORTS = 5=
+(:1799).
+
+*Net*: the threshold matches EPAR's Ag repo exactly (N>=10) and differs from
+the consumption repo by one (N>=11).  The *real, unanimous* delta is
+weighted-vs-unweighted, which only the taxonomy file names and which no file
+names for the consumption repo.
+
+** Other cross-file conflicts
+
+1. *The household-own-price rung.*  =FINDINGS_Ethiopia.org:191-193= says EPAR's
+   consumption project does *not* prefer the household's own price and calls
+   this an internal EPAR inconsistency.  =FINDINGS_consumption_by_source.org=
+   #3/L5 and =FINDINGS_Tanzania.org= Unit-handling #3 say it *does*.  *The
+   consumption and Tanzania files are right* (=EthiopiaW5_...do:423= vs the
+   ladder at :429-467).  Ethiopia's paragraph should be struck.
+2. *rCSI.*  Taxonomy L4 says EPAR "explicitly does not build" rCSI; Tanzania's
+   Construction section shows EPAR building it for Tanzania W5
+   (=hh_sec_h.dta=, =W5.do:2614+=).  *Tanzania is right*; the Uganda readme
+   sentence is wave-specific.
+3. *Winsorization mechanism.*  Taxonomy says =winsor2= in the Ag repo's wave
+   do-files; there are *zero* =winsor2= calls there (hand-rolled =_pctile= +
+   =replace= into a new =w_= column).  =winsor2= belongs to the 358 study only.
+   The consumption file describes the same hand-rolled pattern correctly
+   without naming a command.
+4. *Threshold notation.*  Ethiopia says both ">9" (crops) and "obs > 10"
+   (consumption); Tanzania says ">=10" for both; consumption says ">10"
+   throughout; taxonomy says "EPAR's is 9".  Resolved by the table above.
+5. *The 2/4-ha bins and the priority-crop list* appear only in the taxonomy
+   file and are confirmed there, except that the crop list is 14, not 12.
+
+* Duplicates (for the synthesis to merge)
+
+1. *The geographic median-price ladder* -- ETH L2/L3, TZA L1/L3, CONS L1/L5,
+   TAX L2.  Four files, one construction.  Merge into a single entry using the
+   reconciliation table above; do NOT carry the "convergent >=10 threshold"
+   framing without the weighted/unweighted caveat, and do not carry TAX's
+   "EPAR's floor is 9".
+2. *Own-consumption / own-production valuation as an opt-in transform* --
+   ETH L1, TZA L1, CONS L1 (+ CONS L5's narrower own-price rung).  Same
+   proposal, three countries, one ticket (#585, with #575 adjacent).  ETH L1
+   and CONS L1 differ only in which country motivates it.
+3. *"Do not adopt EPAR's winsorization"* -- ETH L5, TAX methodology section +
+   358 row, CONS KNOWN ISSUES #4.  Merge; keep the corrected mechanism
+   (hand-rolled weighted =_pctile=, new =w_= column, raw preserved) and the
+   358 study's side-by-side winsorize-vs-MAD table as the sharpest argument.
+4. *Population-rescaled weights as a third weighting convention* -- ETH
+   Construction #7, TZA "Household IDs / weights", TAX methodology.  Merge.
+5. *The 358 study is the highest-value unread source* -- claimed as an unread
+   gap by both ETH and TZA; *the taxonomy file already read the Tanzania W3
+   file*.  Merge and mark partly discharged (Ethiopia W2/W3 and Tanzania W1/W2
+   remain unread).
+6. *The =_Summary_statistics/= workbook* -- listed as unread by ETH and TZA;
+   *the taxonomy file read it*.  Same treatment.
+7. *TLU coefficient comparison* -- ETH Construction #4 flags it as unchecked;
+   TZA does the comparison against =_TLU_FACTORS=.  Merge, and note the
+   Ethiopia coefficients (0.5 cattle-group, 0.7 for codes 13-15, 0.6, 0.3)
+   are on a *different code scheme* from Tanzania's and were never compared to
+   ours.
+8. *The #829 cautionary case* -- BRIEF, TAX L5, and the Uganda findings file
+   (out of my scope).  One entry.
+9. *EPAR has no per-wave Known-Issues doc where it matters* -- CONS
+   ("no per-wave readme anywhere in Household-Consumption-Data") and TZA
+   (Findings 1-2, "no readme for W1-W4; TBD for W5/SDD").  Same observation
+   about two different EPAR repos; merge as one structural point.
+
+* What I did not verify
+
+- The GH #439 section appended to =FINDINGS_taxonomy.org= (:334-551 of the
+  701-line version), per instruction.
+- Ethiopia W1/W2 and Tanzania W1/W2 358-study files; Malawi, Nigeria and the
+  remaining Uganda waves entirely (out of my four files' scope).
+- Any numeric parity against EPAR's =Final DTA files= beyond the two
+  metadata-only reads (=hhid_panel_key.dta=,
+  =Uganda_UNPS_W4_food_consumption_value_by_source.dta=) and the one warm
+  parquet read the brief permits.
+- Ethiopia Construction #6 (crop expenses / farm labor) and #7's
+  =EthiopiaW5_...do:65-68= population globals -- the identical construction was
+  confirmed in the Tanzania do-files instead.

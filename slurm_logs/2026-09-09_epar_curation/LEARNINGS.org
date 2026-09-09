@@ -1,0 +1,384 @@
+#+title: What we can learn from EPAR -- ranked, verified
+#+author: Sue (Claude Fable 5.1), for Ethan Ligon
+#+date: 2026-09-09
+
+* How to read this
+
+Every item below survived a red-team pass (=REDTEAM_A.org=, =REDTEAM_B.org=,
+=REDTEAM_C_439.org=) that opened the cited lines.  Where the extractors
+were corrected, the corrected reading is what appears here; the original
+findings files keep the uncorrected text and should be read with the
+red-team tables beside them.  The ranking is by leverage for this library:
+what it unblocks, how many countries it touches, and how cheap it is
+relative to what we already have.  "Cheap" means the raw material is on
+disk and the target function exists; it never means the design decision
+is free.
+
+The register discipline mattered.  The extractors placed 36 rows in
+"EPAR found it and we did not"; the verifiers moved 16 of them back to
+"both found it" because the row's own evidence cited our =CONTENTS.org=
+or an open issue (=REDTEAM_A.org= section 0: Uganda 2 of 2, Malawi 3 of
+11, Nigeria 3 of 7, conversion factors 0 of 2; =REDTEAM_B.org= register
+spot-checks: Ethiopia and consumption 8 of 11, Tanzania 0 of 3).  What
+survives as genuinely new is listed in section 3.  Uganda contributes
+nothing new; that is a compliment to =Uganda/_/CONTENTS.org=, not a gap
+in the survey.
+
+Three things EPAR does that we should not import are recorded once, in
+section 4, so nobody rediscovers them and proposes them as fixes.
+
+* 1. Ranked learnings
+
+** L1. Two conversion-factor sources are already in our DVC tree, unread
+
+Ethiopia and Malawi both ship WB conversion files that EPAR reads
+throughout and we never open.
+
+- Ethiopia :: =Crop_CF_Wave{2,3,4}.dta= and =crop_cf_wave5.dta= (crop by
+  unit by region) have sidecars in four waves; no Ethiopia script reads
+  them, and =Ethiopia/_/data_scheme.yml:120= says outright "NO unit->kg
+  conversion" for =crop_production=.  =ET_local_area_unit_conversion.dta=
+  has sidecars in 2011-12 through 2018-19, two of the four blobs already
+  in the local cache, and zero references anywhere; =Ethiopia/_/CONTENTS.org:1036-1039=
+  says these area factors "are NOT in the repo".  That sentence is wrong,
+  and it is the one register row in Ethiopia that is a genuine new
+  finding: we hold the file and document a wrong reason for not using it.
+  EPAR's W5 do-file (=EPAR_UW_Ethiopia_ESS_W5.do:324=) explains the
+  missing 2021-22 sidecar: the WB did not ship the file for W5 and EPAR
+  borrowed the earlier waves'.
+- Malawi :: =ihs_seasonalcropconversion_factor_2020.dta= and
+  =ihs_treeconversion_factor_2020.dta= sit under
+  =Malawi/2019-20/Data/Cross_Sectional/= with sidecars; only the food
+  file (=ihs_foodconversion_factor_2020.dta=,
+  =2019-20/_/food_acquired.py:17=) is wired.  =Malawi/_/CONTENTS.org:653-660=
+  lists the DVC sources and omits both crop files.  EPAR borrows the
+  IHS5 files for every earlier Malawi wave
+  (=Malawi IHS/Nonstandard Unit Conversion Factors/README.md=).
+
+/Touches/: =harvest_kg= gains a layer ("WB-shipped factor") whose rank
+relative to =reported= and =survey_median= is a decision, not a default;
+Ethiopia's do-file records a duplicate row in =Crop_CF_Wave5= (crop 74,
+unit 62, factors 4.34 and 6.125) that EPAR resolved by hand
+(=EPAR_UW_Ethiopia_ESS_W5.do:349=), so the loader must de-duplicate
+deliberately rather than average.  /Risk/: medium; real scoped work,
+two countries, two loaders (the fallback ladders differ).
+
+** L2. The food-side kg inference has no item axis, and it is live
+
+=conversion_to_kgs= (=transformations.py:782=) groups by =['t','m','i']=
+then =['t','m','i','u']= and returns a factor keyed on =u= alone; a
+"bunch" of bananas and a "bunch" of groundnuts get one pooled factor.
+The crop-side ladder, =median_price_valuation=, carries
+=item_keys=('j',)= (=transformations.py:2853=).  The same library
+disagrees with itself.  GH #850 already names =_get_kg_factors= and
+"needs j in the baseline group", so this is not a new issue; what the
+survey adds is the measurement that the gap is in production today for
+every country whose price-ratio inference fires, that
+=Ethiopia/_/conversion_to_kgs.json= was built with =groupby('unit_cd')=
+alone, and (red-team A's own observation, unmeasured) that step 2 takes
+the median of =Expenditure= rather than =Expenditure/Quantity=, so the
+inferred factor is kilograms per transaction row, equal to kilograms per
+unit only where =Quantity == 1=.
+
+/Touches/: =transformations.py:782,1051=; every cached =food_quantities=
+and =food_prices=.  /Risk/: high, because the output moves corpus-wide;
+that is also why it ranks second.
+
+** L3. Per-row layer provenance on the food side, matching the crop side
+
+=harvest_kg_factors= discloses which layer served each row
+(=KgFactorSource=, =transformations.py:1899=).  The food side returns a
+bare number.  EPAR's Malawi factor table ships a =source= string with
+every factor (=EPAR_UW_conversionfactors.do:482,486=, six values).
+/Touches/: the return shape of =_get_kg_factors= / =conversion_to_kgs=,
+a public signature.  /Risk/: medium; it pairs naturally with L2.
+
+** L4. The plot decision-maker grain is built, saved, then thrown away
+
+EPAR's Uganda, Tanzania and Ethiopia do-files each construct a
+person-grain intermediate, =Uganda_NPS_W5_dm_ids.dta= with columns
+=(hhid, parcel_id, plot_id, season, id_no, pid, formal_land_rights,
+personid, female, age, hh_head)= (=EPAR_UW_Uganda_UNPS_W5.do:413-424=),
+and its Tanzania (=W3.do:261=) and Ethiopia (=W4.do:515=, without a role
+slot) twins, then =collapse (mean) female= to one plot-season
+categorical (=W5.do:433-439=: male-only, female-only, anything
+fractional is mixed, head's sex where nothing matched).  Roughly 1,569
+of the 6,285 master-list rows hang off that categorical.
+
+This is the LSMS+ axis of GH #439 worked from the ISA side.  Verified:
+all twenty-one raw decision-maker variables (=a3aq3_3=, =a3aq3_4a/b=,
+=ag3a_08_1/2/3= and their =ag3a_08b_*= spelling in 2019-20, =s3q13=,
+=s3q15_1= and =s3q15_2= in Ethiopia) are zero-hit across the repo, and
+the files carrying them are already opened by our wave scripts for other
+columns (Uganda =plot_labor.py:25-26=, =plot_inputs.py:22-23=; Ethiopia
+=plot_inputs.py:28=, =plot_labor.py:21=, =plot_features.py:20=; plus
+=sect8_1_ls_w4= and =sect2_pp_w4= for the asset side).  Column-adds,
+not new acquisitions, for Uganda 2015-16, Ethiopia 2018-19 and Tanzania
+2019-20/2020-21.  Not cheap for Tanzania 2012-13, which lives in our
+=2008-15/= tree with no =AG_SEC_*= files at all.
+
+The design cost is real and the extractor understated it.  The proposed
+=(t, i, plot, pid, role)= grain omits =season=, by which both Uganda
+(=:433=) and Tanzania (=:263=) collapse; under our index rule that is a
+missing level, and =_normalize_dataframe_index= would =first()= away the
+second season.  And the repo has already reserved the table: "who farmed
+it this season" is what =data_info.yml:227-231= assigns to a future
+=plot_cultivation=, with a filing procedure in
+=slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org:54-57= that says do
+not retrofit =plot_features=.  Ethiopia's =holder_id= is not a problem:
+=ethiopia.py:747,1000= already fold it into =plot_id=.  The tie rule
+needs a documented decision; the 2017 358 study and the 335 pipeline
+partition identically (red-team C checked all 27 combinations) and
+differ only in whether an all-missing plot falls back to the head's sex.
+
+The same do-files build women's asset-ownership constructs from
+=sect11_hh_w4= (Ethiopia, =(hhid, asset_cd)= by twelve owner slots,
+=W4.do:3497-3600=) and Uganda's =AGSEC2A=/=AGSEC6A=/=gsec14=
+(=W5.do:3174-3274=), and Tanzania W3 has the full set of women's
+sections too (=W3.do:2930,3049,3241,3387=), contrary to the extractor's
+first reading.  EPAR drops the item code before saving, so the claim
+"one collapse from =individual_assets (t,i,j,pid)=" is two collapses;
+the upside is that the raw file is item-grain by owner slot, finer than
+anything EPAR kept.  #439's flagship feature is constructible from data
+we already hold, without Cambodia.
+
+/Touches/: a =plot_cultivation=-family schema proposal under #167/#439,
+one column-add per wave script in three countries, one transform for
+=dm_gender=.  /Risk/: medium on design, low on wiring.
+
+** L5. The median-price ladder: three teams, one design, one real delta
+
+EPAR's crop-price ladder, its livestock-price ladder and its
+consumption-by-source ladder, the WB panel's =valuation_median_crops=,
+and our =median_price_valuation= all select the finest geographic cell
+with at least ten observations (EPAR's Ag repo gates =obs > 9=; the
+consumption repo =obs > 10=, so eleven; the Uganda readme's "at least 9"
+is a prose slip).  The loop direction in EPAR's Stata is an
+implementation detail; the selection is ours.  The differences that are
+real, stated once (=REDTEAM_A.org= "Cross-file reconciliation"):
+
+1. EPAR's medians are weighted, by the population-raked
+   =weight_pop_rururb=, and Nigeria's are quantity-weighted on top
+   (=W4.do:696,731=); ours is unweighted.
+2. EPAR's national rung is gated by the same threshold; ours is an
+   unconditional fallback (=transformations.py:3018-3022=).
+3. EPAR's livestock ladder fills narrow-to-broad, prefers the
+   household's own observed price, and ends unconditional
+   (=Malawi W1.do:3339-3343=), the opposite idiom.
+4. The consumption repo's first rung is the household's own purchase
+   price for the same item (=EthiopiaW5_...do:423=, =UgandaW4_...do:693=),
+   undisclosed in its README; the Ag repo keeps that as a parallel
+   =value_harvest_hh= series instead.
+
+/Learning/: a =weight_col= kwarg on =median_price_valuation= is additive
+and closes the only construction delta; a docstring line recording the
+convergence is worth having.  Do not write "EPAR's ladder" without saying
+which of the two.  /Risk/: low.
+
+** L6. Own-production valuation as an opt-in transform, with its bias stated
+
+Three extractors (Ethiopia, Tanzania, consumption) independently arrived
+at the same proposal: value =food_acquired='s =produced= and =inkind= rows
+through =median_price_valuation=, as =food_expenditures(basis='total',
+valuation='median_price')= or similar, never stored.  GH #585 already asks
+for it, so this is corroboration, not discovery.  Two things the survey
+adds.  First, EPAR's ladder is built entirely from the purchase side
+(=food_purch_value/food_purch_qty=), and our own price study measured the
+consequence: in Uganda, own-consumption valued at the purchase price sits
+about 23 percent above what a sale actually fetched
+(=slurm_logs/price_sources/SYNTHESIS.org:750-753=; Uganda only, and the
+farmgate instruction is at =:732-736=).  Any such kwarg must say which
+side of the farmgate-market gap it lands on.  Second, the same-household
+same-item rung (learning L5, item 4) is cheaper and less objectionable
+than the spatial ladder and could be offered first, as =valuation='own_price'=.
+
+For Tanzania this bears on #846: the instrument asks no price for
+own-consumption, and EPAR imputes one because nothing was asked.  The
+=not-asked= verdict stands; the imputation is a separate, analyst-facing
+choice.  /Risk/: low as an opt-in, medium if it ever became the default.
+
+** L7. The SOLD-unit conversion, independently confirmed as buildable
+
+EPAR keys sale and harvest conversions separately everywhere it converts
+at all: Uganda has a distinct =UG_Conv_fact_sold_table= (waves 3-5 only,
+=Master_Conversionfactor_table.do:271,286=) merged on
+=(crop_code, sold_unit_code, region)= (=W5.do:474-498=).  This is GH #824,
+which Malawi closed on 2026-09-08 and Uganda and Nigeria have not.  Do
+not copy EPAR's 2018-19 wiring: it feeds the condition column as the unit
+for season A (=W7.do:520-523=), and red-team A showed that all twenty of
+Uganda's condition codes are also valid unit codes in EPAR's table, so
+the merge fabricates plausible kilograms rather than missing ones.
+/Risk/: medium; the fix must re-derive the 2018-19 column choice from our
+own =CONTENTS.org:1009-1027=.
+
+** L8. Small transforms we lack and can write from stored items
+
+- =livestock_income= :: EPAR imputes it from =number_sold= and
+  =number_slaughtered= times a laddered price (=Malawi W1.do:3339-3346,5959=).
+  We have no such function.  Caveat: our =livestock.Value= is a reported
+  hypothetical ("if sold today"), not a transaction price; a port would
+  silently change what the number means.
+- =rcsi= :: =rcsi = s1 + s2 + s3 + 3*s4 + 2*s5= (=Malawi W1.do:4525=), from
+  =food_coping= counts we already store.  EPAR builds it for Tanzania W5
+  (=W5.do:2614=) and not for Uganda W5 (a wave-specific absence, per its
+  readme).  Note EPAR's phase cutoffs leave
+  =rcsi == 19= in no phase (=:4531,4535=).
+- HDDS / FCS :: food-group counts over diet recall; EPAR's group mapping
+  (=Tanzania W5.do:2538-2560=) is a starting point to re-derive, not copy.
+- =dm_gender= :: see L4.
+- Fertilizer application rate, gross crop revenue, Shannon crop
+  diversity :: one-line reductions over items we hold.
+
+** L9. Malawi's shelled/unshelled ratio is a technique our =condition= axis lacks
+
+EPAR computes a per-crop shelled-to-unshelled ratio once and uses it to
+fill a missing condition's factor from the other's
+(=EPAR_UW_conversionfactors.do:381-390=), then hardcodes which crops the
+ratio applies to (=:442-444=).  Nothing in =harvest_kg_factors= infers
+across conditions.  A principled version (its own N threshold, no crop
+allowlist) could be a fifth layer.  Related: =malawi.py:915='s
+=_harvest_block(condition=None)= accepts the parameter and never uses it
+anywhere in the module, while EPAR keys every Malawi factor merge on
+=(region, crop, unit, condition)= (=W1.do:1326=).  /Risk/: medium-high.
+
+** L10. Plausibility counts where we have none
+
+Tanzania 2020-21 =crop_production= carries raw quantities up to
+7,500,000 kg with no screen in =crop_production_for_wave=
+(=tanzania.py:1163=; numbers verified against the warm parquet).  The
+learning is the gap, not EPAR's remedy, which is a hand-coded
+single-household deletion (=Tanzania W5.do:578-579=).  A report-only
+count, as =harvest_kg='s factor screen already does, fits the house
+rule.  Also worth a look: EPAR's theory that implausible GPS areas are
+unit errors rather than decimal errors (=W5.do:254=) against our
+2,500-acre clamp at =tanzania.py:1046-1054=.
+
+** L11. Nigeria specifics
+
+- The per-row crop conversion factor (=sa3iiq1_conv= and siblings) is
+  preferred by EPAR over any table (=W4.do:982=); we carry none for
+  Nigeria =crop_production=.  Sibling of #849; a natural =KgFactor= column.
+- EPAR tried #844's idea (=sa3q18= as direct harvest valuation) in W2 and
+  commented it out for the ladder without a reason (=W2.do:644-645=).
+  Compare before wiring #844.
+- Zone-specific heaps/ridges/stands area factors exist in EPAR from the
+  BID, with a ~23x internal disagreement against its "observed"
+  alternative (=W4.do:361-397=); our =CONTENTS.org:731-743= records the
+  problem and carries no factors.
+- EPAR's W5 readme states GPS coordinates are unavailable, corroborating
+  #841 as a source gap.
+
+** L12. TLU tables: a provenance question, not a coefficient swap
+
+EPAR's cattle coefficient is 0.5 in Malawi and Nigeria (=W1.do:1514-1518=,
+=W4.do:1851-1856=); ours is 0.70 (=transformations.py:2601-2612=).  Ours
+cites Jahnke 1982 and the FAO/ILCA 250 kg bovine; EPAR's cites nothing in
+either do-file or readme.  #737 is the open audit; what it produces is a
+sourcing decision.
+
+* 2. Where EPAR corroborates a decision we already took
+
+- Condition-blind collapse :: every EPAR wave sums across harvest
+  condition (=Master_Conversionfactor_table.do:248=); an independent
+  codebase falling into the trap #323/#637 fixed.
+- Kg-unit factors must equal one :: 6 of 128 kg-unit region medians in
+  EPAR's own Uganda table deviate from 1 by more than 1 percent, two with
+  N of at least 10; our =_screen_reported_factors= would reject them.
+- The 2015-16 Uganda defect (#829) :: EPAR flags it and consumes it; the
+  WB corrects it silently; we guard it.  The only visible behaviour is
+  the written one.
+- Reported per-row factors :: EPAR does read =a5?q6d= (the master table
+  is built from it, =Master_Conversionfactor_table.do:84-91=) but pools
+  it into medians; we keep the row.  The Uganda findings file says the
+  opposite and is wrong on that line.
+- #820, confirmed and bounded :: the section 12 tree-crop module exists
+  as a separate file only in W1-W3; ESS4/5 folded it into section 11
+  (=Ethiopia W4.do:759=; no =sect12_ph= sidecar for 2018-19 or 2021-22).
+  The issue's 2015-16 measurement stands; the fix is a W1-W3 wiring job,
+  and the later waves need a check that section 11 now carries the tree
+  crops.  EPAR dropped nothing; its extractor's claim that it had was
+  wrong.
+- =months_food_inadequate= :: the same months-count as EPAR's FOOD
+  PROVISION; a clean match, while FIES stays ours only.
+
+* 3. Genuinely new rows (candidate issues)
+
+Surviving the register check, with the verifier's confirmation:
+
+1. Ethiopia: =ET_local_area_unit_conversion.dta= held and unwired, with a
+   wrong reason recorded in =CONTENTS.org:1036-1039= (L1).
+2. Ethiopia: =Crop_CF_Wave{2..5}= held and unwired (L1).
+3. Ethiopia: =conversion_to_kgs.json= built from =Food_CF_Wave1-4= while
+   =CONTENTS.org:279-281= claims five-wave coverage; =food_cf_wave5= is
+   in the cache.
+4. Malawi: the two crop-side IHS5 conversion files, held and unwired,
+   absent from the =CONTENTS.org= source list (L1).
+5. Malawi: the shelled/unshelled gap itself is known
+   (=CONTENTS.org:201-207=, "a schema change, out of scope"); the new
+   fact is that =_harvest_block='s =condition= parameter is dead
+   module-wide (L9).
+6. Malawi: =_livestock_block= never reads =ag_r07= ("one year ago"
+   headcount) in 2010-11/2013-14 (=malawi.py:1734=; EPAR =W1.do:1529=).
+7. Malawi: no free-text "other (specify)" unit or crop recovery on the
+   harvest side; =_clean_freetext_unit= is called only from
+   =food_acquired.py= (row-count cost unmeasured).
+8. Tanzania: land-rental duration inconsistently coded in the source
+   (years, months, or monthly price; =W5.do:775-782=); no feature of ours
+   to check it against.
+9. Tanzania: raw =crop_production.Quantity= unscreened (L10).
+10. Tanzania: EPAR's =plot_inputs= merge leaves 80 of 10,607 unmatched
+    (=W5.do:2473=); worth checking our own join.
+11. Nigeria: per-row crop factor unwired (L11); zone area factors
+    absent (L11).
+12. Uganda: the 2009-10 =99999= harvest sentinel is already in our TODO
+    (=CONTENTS.org:2098-2102=); EPAR names the column and value
+    (=W1.do:558=).  Not new, but now actionable.
+
+EPAR-side defects we found and they have not (for a note to EPAR, if
+wanted): the Malawi =price_kg= geographic rungs are built from
+=price_unit= in all four waves (=W1.do:975=, =W2:806=, =W3:1163=,
+=W4:1054=) and consumed against a kilogram quantity at =W1.do:1356=; the
+Uganda 2018-19 season-A unit merge on condition codes (L7); Tanzania
+=ag4a_27= used as both a kilogram quantity and a percent
+(=W5.do:539,544=); Malawi W1 =labor_total = labor_family= silently
+excludes hired days (=W1.do:3978=; W2-W4 set it missing); five of
+fifteen Uganda call sites overwrite the regional factor with the
+national one for rows that have a region (=W1.do:562,684=, =W7.do:556=,
+=W8.do:730,764=); the =rcsi == 19= phase gap.
+
+* 4. Not to import, recorded once
+
+- Winsorisation :: 1st/99th percentile into a new =w_= column, raw
+  preserved (hand-rolled =_pctile= plus =replace=; =winsor2= appears only
+  in the 358 study).  The 358 study's own side-by-side of winsorising
+  against a MAD rule is the sharpest argument for never storing one
+  choice.  We count and never clip.
+- Population-raked weights :: every EPAR wave rescales to WB rural and
+  urban totals, and that raked weight is what weights every EPAR median.
+  Ratios agree with ours; levels do not.  A one-line note in each
+  country's =CONTENTS.org= under weights is enough.
+- Household-level intermediates :: EPAR persists roughly thirty
+  collapsed =.dta= files per wave and merges them.  Reconstruct from our
+  items; never import one.
+- The brief's three tags were one short :: filters (rural-only, priority
+  crops), scalar rescales, and value/quantity ratios fit none of
+  reported / imputed / aggregated.  A future pass should add =selected=
+  or =derived=.
+
+* 5. Proposed next steps (for @ligon to choose)
+
+1. File L1 as two issues (Ethiopia, Malawi) and correct the two
+   =CONTENTS.org= sentences.
+2. Fold L2's measurement into #850 rather than open a new issue.
+3. Open the =plot_cultivation= / decision-maker schema proposal under
+   #167 and #439 with L4's grain (including =season=) and the three
+   countries' column-adds.
+4. Add =weight_col= to =median_price_valuation= (L5) and the docstring
+   convergence note.
+5. A numeric parity run against EPAR's estimates workbook and final
+   =.dta= files, conditioned on rural households and on EPAR's raked
+   weights only for ratios.  The workbook and join keys are on disk; 51
+   of its 201 master-list indicators are unpublished, so diff the
+   indicator lists first.
+6. Point =CLAUDE.md='s references and the =transformations.py:1599=
+   parity header at this directory alongside the WB one.

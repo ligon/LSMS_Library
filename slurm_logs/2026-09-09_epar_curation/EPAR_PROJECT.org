@@ -1,0 +1,208 @@
+#+title: The EPAR Agricultural Development Data Curation project, as a point of comparison
+#+author: Sue (Claude Fable 5.1), for Ethan Ligon
+#+date: 2026-09-09
+
+* Purpose and stance
+
+This note documents a second open-source harmonisation effort over the
+LSMS-ISA surveys, alongside the World Bank's own =LSMS-ISA_Ag= panel that
+=slurm_logs/2026-06-13_wb_incidence_map/= already covers.  The stance is the
+same for both: neither is canonical.  Each is a useful point of comparison,
+built by careful people from the same raw files we read, and each therefore
+tells us something when its numbers or its construction decisions differ
+from ours.  What follows is a description of the EPAR project, a statement
+of how it differs in kind from the WB panel and from this library, and a
+pointer to the ranked learnings in =LEARNINGS.org=.  The survey behind it
+was read-only: eight extractors and three verifiers over the EPAR code, our
+=CONTENTS.org= files and our open issues; no data was built.
+
+The one thing to hold on to while reading: EPAR's product is a fixed,
+citable set of household-level summary statistics, and everything about
+its design follows from that goal.  Ours is re-derivable item-level data
+with the aggregation in code.  Neither is wrong for its purpose.  The
+places where EPAR is useful to us are almost never "adopt their number";
+they are "they already found the survey defect", "they already wrote the
+conversion table", or "they already worked the construction decision we
+have been deferring".
+
+* What EPAR is
+
+- Project :: Evans School Policy Analysis & Research Group (EPAR),
+  University of Washington.  "Agricultural Development Data Curation",
+  EPAR Technical Report #335.  Project leads C. Leigh Anderson and Didier
+  Alia; some thirty-five named contributors over "over a decade" of work.
+  Page: https://epar.evans.uw.edu/agricultural-development-data-curation/
+- Licence :: BSD 3-Clause (University of Washington, 2017).  No barrier to
+  reading, quoting, or adapting.
+- Citation :: University of Washington, EPAR (2025), /Living Standards
+  Measurement Study - Integrated Surveys on Agriculture: Processed Datasets
+  for Ethiopia ESS, Malawi IHS/IHPS, Nigeria GHS, Tanzania NPS, and Uganda
+  NPS from 2009-2022/.  The 2017 yield study carries its own DOI,
+  10.5281/zenodo.1093718.
+- Repositories :: cloned read-only under
+  =/global/scratch/fsa/fc_jevons/ligon/reference/epar/=; commit hashes,
+  dates and licences are in =NOTES.md= there.  Shallow clones, so the hash
+  is the only vintage marker.
+  - =LSMS-Agricultural-Indicators-Code= (v1.5, 2026-05-21): the TR#335
+    pipeline.  One Stata do-file of roughly 300 KB per country-wave, a
+    ~30 KB =readme.md= per wave, per-country nonstandard-unit conversion
+    tables (Uganda, Malawi), panel keys (Malawi, Ethiopia), a master
+    indicator list and a summary-statistics do-file.
+  - =Household-Consumption-Data= (2026-06-10): a sibling product valuing
+    household food consumption by source (purchases, own production, gifts)
+    for sixteen countries, including six EHCVM countries, GhanaSPS, Kenya,
+    India and Sierra Leone.  Fourteen of the sixteen are countries we hold.
+  - =358_Estimating-Crop-Yields= (2017, frozen): a sensitivity study of
+    yield construction decisions for Ethiopia ESS W2-W3 and Tanzania NPS
+    W1-W3.
+  - Not cloned: =LSMS-Data-Dissemination= (about 3 GB of final =.dta= per
+    wave).  Its published estimates workbook,
+    =EPAR_UW_335_AgDev_Indicator_Estimates.xlsx=, was fetched on its own
+    and is recorded in =NOTES.md=.  Also noted but not surveyed: the
+    AgQuery / AgQuery+ Shiny front ends and an NSSO-India indicator repo.
+
+* Coverage
+
+EPAR's TR#335 covers the five anglophone LSMS-ISA countries.  Against our
+waves the match is close: EPAR holds every ISA wave we hold and none of
+the two pre-ISA waves.
+
+| Country  | EPAR waves                                         | Ours, beyond EPAR |
+|----------+----------------------------------------------------+-------------------|
+| Ethiopia | ESS W1-W5 (2011-12 ... 2021-22)                    | none              |
+| Malawi   | IHS/IHPS W1-W4 (2010-11, 2013, 2016, 2018-19)      | 2004-05 (IHS2)    |
+| Nigeria  | GHS-Panel W1-W5 (2010-11 ... 2023-24)              | none (we split each wave into its post-planting and post-harvest rounds) |
+| Tanzania | NPS W1-W5 plus the 2019-20 SDD extended panel      | none              |
+| Uganda   | UNPS W1-W5, W7, W8 (2009-10 ... 2019-20)           | 2005-06           |
+
+The consumption-by-source repository reaches further: Benin, Burkina Faso,
+Cote d'Ivoire, Guinea-Bissau, Senegal and Togo (EHCVM), GhanaSPS 2009-10,
+Mali, Niger, and India, all of which we hold, plus Kenya and Sierra Leone,
+which we do not.  That overlap is the same EHCVM set GH #438 names as the
+first tier for extending our agricultural stack.
+
+* What it produces
+
+The unit of output is the indicator.  The master list
+(=_Summary_statistics/EPAR_UW_335_master_list_indicators.xlsx=) enumerates
+201 distinct indicators, expanded to 6,285 rows once every disaggregation
+is counted: by sex of household head, by sex of the plot decision-maker
+(male, female, or mixed), by farm-size bin (0, 0-1, 1-2, 2-4, over 4 ha),
+by currency (local, consumption-PPP, GDP-PPP), and by weight type.  By
+grain, 138 indicators are household-level, 32 are population-level means,
+30 are individual-level, and 2 are household-plot.  By theme: crop
+production 58, income 46, livestock 34, agricultural activity 18, adoption
+15, inclusion 12, general household 10, gender equality 8.  (Every count
+in this section was recomputed from the workbooks by the verifier.)
+
+Each wave's do-file writes three final datasets, at household, individual
+and plot grain, each assembled by a long chain of one-to-one merges over
+some thirty already-collapsed intermediate files.  The published workbook
+(47,927 rows over 27 country-wave instruments) reports mean, design-based
+standard error, quartiles and N for rural households only, and is
+permitted by the README to lag the code.  Only 150 of the 201 master-list
+indicators appear in it, and nothing published is absent from the master
+list.
+
+Two of the disaggregations deserve a sentence each, because we have no
+counterpart.  1,569 of the 6,285 rows are keyed on the sex of the
+/plot decision-maker/, a plot-season categorical built from up to three
+named household members with a head-of-household fallback.  And the
+farm-size bins are a reporting cut, not a sample restriction: every rural
+household is kept and tabulated by bin.
+
+* How it is built
+
+The shape of the pipeline is closer to ours than the WB panel is.  There
+is one script per wave and one prose document per wave, and the prose is
+organised as a fixed sequence of about fifty =### SECTION= headings, each
+ending in a =KNOWN ISSUES= line.  Those readmes are the most directly
+useful artefact in the repository for us: they are a second, independent
+=CONTENTS.org=, written by people who read the same questionnaires.
+
+The construction decisions that recur in every country, with the tag we
+gave each one (reported / imputed / aggregated):
+
+- Plot area :: imputed.  Parcel area times the plot's share of area
+  planted within the parcel (Uganda), or GPS with a self-report fallback
+  where the GPS value is zero or missing (Tanzania, Ethiopia).  Our
+  =plot_features.Area= is whatever the wave reports, once.
+- Harvest and sales in kilograms :: imputed.  Region-level median
+  conversion factors, pooled across all seven Uganda waves, with a national
+  fallback; a distinct table for the /sold/ unit.  Malawi borrows the
+  IHS5 2019-20 conversion files for every earlier wave and interpolates
+  shelled from unshelled by a per-crop ratio.  Nigeria and Ethiopia use
+  the per-row or per-wave factors the WB ships.  EPAR reads Uganda's
+  survey-reported per-row factor (=a5?q6d=) only to pool it into those
+  medians; our =harvest_kg= keeps the row's own value first.
+- Valuation of unsold harvest, livestock products and own-consumed food ::
+  imputed.  The same finest-cell-first median-price ladder every time
+  (enumeration area, then successive admin levels, then national), gated
+  on ten or more observations.  This is the ladder our
+  =median_price_valuation= already reproduces from the WB panel; three
+  teams have now built it independently with the same threshold.
+- Weights :: imputed.  Survey weights are rescaled to World Bank
+  population totals per wave (rural and urban separately).  Ours are
+  normalised to within-wave mean one at read time; the two agree on every
+  weighted ratio and disagree on every level.
+- Outliers :: imputed.  Winsorisation at the 1st and 99th percentiles,
+  variable by variable, sometimes on a ratio and on its numerator and
+  denominator separately, never on proportions, never within a
+  sub-population.  We winsorise nothing and count instead.
+- Priority crops :: a curated list (the do-file comment names twelve, the
+  operative global fourteen: maize, rice, wheat, sorghum, millet, cowpea,
+  groundnut, common bean, yam, sweet potato, cassava, banana, cotton,
+  sunflower, pigeon pea) gets its own monocrop, input and yield tables.
+  We carry every crop the survey asked about.
+- Aggregation :: everything is collapsed to household grain inside the
+  script and persisted.  This is the single structural axis on which EPAR
+  and this library differ, and it is a difference of goal, not of care.
+
+* Three products, one raw source
+
+| | WB =LSMS-ISA_Ag= | EPAR TR#335 | LSMS_Library |
+|---+---+---+---|
+| Built by | WB LSMS team | EPAR, UW | this repo |
+| Countries | 7 ISA | 5 ISA (+16 in the consumption repo) | 40, of which 7 ISA |
+| Unit of output | one cross-country panel, four grains | per-wave indicator sets, three grains, plus a summary workbook | item-level tables per country, aggregation in code |
+| Where aggregation lives | in the data | in the data | in =transformations.py= |
+| Outlier policy | "deliberately refrained" from extensive correction | winsorise 1/99 | count, never clip |
+| Weights | survey weights | raked to WB population | within-wave mean one |
+| Unit conversion | WB factors | pooled regional medians, WB factors, interpolation | reported factor, then survey median, then inferred |
+| Documented per-wave defects | supplementary tables (sparse) | =KNOWN ISSUES= per section per wave | =CONTENTS.org= per country |
+| Silent corrections of source defects | yes (Uganda 2015-16 x100) | no (defect flagged in one section, consumed in the next) | fixed with a guard that asserts the defect is present |
+
+The last row is the cautionary tale this survey was briefed with.  The
+Uganda 2015-16 sale values are divided by one hundred in the distributed
+release (GH #829).  The WB panel multiplies them back silently.  EPAR's
+readme says "Sold values are inaccurate in W5" under =ALL PLOTS= and "No
+issues in this section" under =GROSS CROP REVENUE=, which consumes them;
+the published estimates carry the defect.  We fixed it with a guard.
+Three defensible teams, three different behaviours on one defect, and the
+only one visible from outside is the one written down.  "No issues in
+this section" is not clearance, on their side or ours.
+
+* What this survey produced
+
+- =BRIEF.md= :: the shared brief (stance, sources, reading recipe, our-side
+  crib, the reported/imputed/aggregated tag, the three-cell register).
+- =FINDINGS_{Uganda,Malawi,Nigeria,Tanzania,Ethiopia}.org= :: per-country
+  extracts.  Each reads our =CONTENTS.org= first, then EPAR's readmes and
+  do-file sections, and places every EPAR known issue in one of three
+  cells: found by both, found by EPAR only, found by us only.
+- =FINDINGS_conversion_factors.org= :: EPAR's kg-per-unit tables and
+  interpolation rules against our =harvest_kg= layers and =u= tables.
+- =FINDINGS_consumption_by_source.org= :: the consumption-by-source
+  repository against our =s= axis and =food_expenditures(basis=)=.
+- =FINDINGS_taxonomy.org= :: the indicator inventory, a section-by-section
+  incidence table against our feature vocabulary, the final dataset
+  grains, the estimates workbook, the 358 yield study, and a mapping of
+  EPAR's gender constructs onto the GH #439 LSMS+ design.
+- =REDTEAM_A.org=, =REDTEAM_B.org=, =REDTEAM_C_439.org= :: verification of every cited line
+  behind the ranked learnings and new-issue candidates.
+- =LEARNINGS.org= :: the ranked, verified learnings, with what each would
+  touch and its risk.
+
+Not done here, by design: a numeric parity run against EPAR's final
+=.dta= files or the estimates workbook.  The join keys and the workbook
+are on disk; that is a separate dispatch.
