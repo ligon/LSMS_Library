@@ -531,6 +531,35 @@ Some countries have configs but no source `.dta` in the repository:
 - `SkunkWorks/dvcfilesystem_runtime_override.org` — how the pip-install scenario works (runtime config override, lazy credential validation, no git ancestor required).
 - `SkunkWorks/cross_country_label_harmonization.org` — design sketch for `Feature(...)(harmonize=...)`.
 
+### Other harmonisations of the same raw files (points of comparison, never canonical)
+
+Two other teams build from the LSMS-ISA files we read. Neither is a reference
+answer; each is a useful cross-check, and each has silently or visibly
+mishandled a source defect the other did not (Uganda 2015-16 `a5aq8` ÷100,
+GH #829: the WB panel corrects it without saying so, EPAR flags it in one
+section and consumes it in the next, we guard it). When their numbers or
+construction decisions differ from ours, the finding is the disagreement
+plus the evidence on each side.
+
+- **World Bank `LSMS-ISA_Ag`** (Bentze & Wollburg 2025; 7 ISA countries, one
+  cross-country panel at four grains) — `slurm_logs/2026-06-13_wb_incidence_map/`
+  (incidence map, gap ranking) and `slurm_logs/2026-06-14_parity_loop/HANDOFF.org`
+  (the June 2026 loop that built our item-level ag stack and the parity
+  transforms in `transformations.py`). Reference copy at
+  `/global/scratch/fsa/fc_jevons/ligon/reference/lsms-isa-harmonised/` (`NOTES.md`
+  has join keys and the `%tm` sentinel hazards).
+- **EPAR Agricultural Development Data Curation** (Evans School, UW, Technical
+  Report #335; 5 ISA countries as per-wave indicator sets, plus a 16-country
+  consumption-by-source repo) — `slurm_logs/2026-09-09_epar_curation/EPAR_PROJECT.org`
+  (profile and the three-way WB/EPAR/us table), `LEARNINGS.org` (ranked,
+  red-teamed learnings) and `WORKPLAN.org` (the phased plan to act on them).
+  Reference clones at `/global/scratch/fsa/fc_jevons/ligon/reference/epar/`
+  (BSD-3; `NOTES.md` has hashes). EPAR's per-wave `readme.md` files are a
+  second, independent `CONTENTS.org` with a `KNOWN ISSUES` line per section —
+  read them when touching a country they cover, and remember "No issues in
+  this section" is not clearance for a section whose inputs come from one
+  that has an issue.
+
 ## Code intelligence: GitNexus is OPTIONAL, and its substitutes are named
 
 The generated block below states GitNexus MCP usage as mandatory — *"MUST run

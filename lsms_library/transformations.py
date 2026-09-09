@@ -1604,6 +1604,17 @@ def legacy_locality(country):
 #
 # Parity context: slurm_logs/2026-06-13_wb_incidence_map/GAP_RANKING.org
 # (GAPs 1-4 item layer; GAPs 6-8 + below-the-line transforms).
+#
+# A second point of comparison, with the same non-canonical stance, is the
+# EPAR (Evans School, UW) LSMS-ISA indicator curation, Technical Report #335:
+# slurm_logs/2026-09-09_epar_curation/{EPAR_PROJECT,LEARNINGS}.org.  Its
+# median-price ladders (crop sale price, livestock, own-consumed food) select
+# the finest geographic cell with >= 10 observations exactly as
+# ``median_price_valuation`` does; the one construction delta is that EPAR's
+# medians are weighted (by population-raked survey weights) and ours are not.
+# EPAR winsorises at the 1st/99th percentile and rakes weights to WB
+# population totals; neither is reproduced here, by design (count, never
+# clip; within-wave mean-one weights).
 
 
 # Plot-level index names emitted by the various countries' item features.
