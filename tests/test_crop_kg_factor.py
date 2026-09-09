@@ -498,24 +498,26 @@ def test_kgfactor_is_declared_optional_in_the_canonical_schema():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.requires_s3
-def test_uganda_harvest_kg_unchanged_before_the_wiring_lands():
-    """Uganda carries no ``KgFactor`` yet, so today only the inferred layer acts.
+def test_uganda_harvest_kg_baseline():
+    """Pin Uganda's harvest_kg totals on the warm build.
 
-    Measured on the warm build, 2026-09-09, on the pre-change tree AND
-    reproduced after it.  The Uganda wiring branch (`a5?q6d` -> ``KgFactor``)
-    will move these numbers DELIBERATELY -- when it does, update them here in
-    the same PR rather than loosening the assertion.
+    Re-measured 2026-09-09 after two deliberate moves: the 2018-19 ``KgFactor``
+    wiring (#842/#849; the reported layer now serves 14,050 rows and the
+    plausibility screen rejects 99) and the 2009-10 ``99999`` sentinel strip
+    (#861; 3,077 sentinel-only rows leave, 133,683 -> 130,606).  The previous
+    version of this test pinned the pre-wiring numbers and asked to be updated
+    in the wiring PR; it was not, and failed on development for a day.  When a
+    future change moves these numbers deliberately, update them here in the
+    same PR rather than loosening the assertion.
     """
     import lsms_library as ll
 
     cp = ll.Country("Uganda").crop_production()
-    assert "KgFactor" not in cp.columns, (
-        "Uganda now carries KgFactor -- this baseline is superseded; re-measure "
-        "it in the wiring PR")
+    assert "KgFactor" in cp.columns
     res = harvest_kg(cp)
-    assert len(cp) == 133_683
-    assert len(res) == 23_766
-    assert res["Harvest_kg"].sum() == pytest.approx(4_963_468.795000811, rel=1e-9)
+    assert len(cp) == 130_606
+    assert len(res) == 36_095
+    assert res["Harvest_kg"].sum() == pytest.approx(10_868_272.24500081, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 0, "survey_median": 0, "inferred": 28_147,
-        "none": 105_536, "reported_implausible": 0}
+        "reported": 14_050, "survey_median": 57, "inferred": 28_147,
+        "none": 88_352, "reported_implausible": 99}
