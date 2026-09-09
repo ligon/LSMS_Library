@@ -6,6 +6,37 @@ Single Index:
   pid: individual id
   plot_id: plot id
   int_t: interview date
+  # `u` -- unit.  CANONICAL MISSING-UNIT SENTINEL: `Unknown` (GH #842/#847).
+  #
+  # A survey that records an amount and no unit must put `Unknown` on `u`, NOT
+  # a null.  `u` is a DECLARED index level in every table that has it
+  # (food_acquired, food_prices, food_quantities, crop_production, plot_inputs,
+  # community_prices), and a NaN on a declared index level is a DEFERRED SILENT
+  # DELETION: the row is served, so no build-time guard fires, and it then
+  # vanishes in whichever `groupby` runs first -- `_finalize_result`'s canonical
+  # de-dup, `Feature()` assembly, or the consumer's own aggregation -- because
+  # pandas `groupby(dropna=True)` drops NaN keys.  The loss is counted nowhere
+  # and is attributed to the consumer's code.  See CLAUDE.md "Grain Collapse"
+  # §3b, and the identical argument for `crop_production.condition`'s
+  # `unknown_condition` under `Columns:` below.
+  #
+  # `Unknown` is the spelling already in force: it is the non-ordinal sentinel
+  # for `individual_education.Educational Attainment` (see below), and Uganda's
+  # `crop_production` already writes it onto this very level.  Niger's four
+  # `u` tables joined it in #842 (its `_/categorical_mapping.org` maps
+  # `Manquant`/`manquant`/`produit absent` onto it, at build AND read time).
+  #
+  # CONSUMER RULE: `u == 'Unknown'` is NOT a unit.  Exclude it before any
+  # per-unit price, quantity or conversion, and REPORT how many rows you
+  # excluded.  Keeping it silently yields a price per nothing; dropping it
+  # silently is the bug the sentinel exists to make visible.
+  #
+  # NOT declared as a `spellings:` block under `Columns:`, deliberately:
+  # `diagnostics._check_declared_spellings` reads a `spellings` block as a
+  # CLOSED vocabulary and fails every value outside it, and the `u` vocabulary
+  # is deliberately open (cross-country unit harmonization is GH #223).
+  # Measured 2026-09-09: declaring it that way grades `fail` on every real unit
+  # in every food/crop country.
   u: unit
   m: region
   s: acquisition source       # values: purchased, produced, inkind, other (food_acquired)

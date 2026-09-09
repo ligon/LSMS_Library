@@ -26,6 +26,29 @@
 # SCOPE = food_acquired's existing units only (Unit #0 foundation); crop /
 # community-price units extend this table later.
 #
+# THE MISSING-UNIT SENTINEL IS `Unknown` (GH #842 / #847, 2026-09-09).  Every
+# raw spelling that means "no unit was recorded" -- `Manquant`, `manquant`, and
+# the CS07 community-price marker `produit absent` / `Produit absent` -- maps
+# onto the single Preferred Label `Unknown`.  It used to be the French
+# `Manquant`; `Unknown` is the CORPUS-canonical sentinel (`data_info.yml`
+# defines it for individual_education; Uganda's crop_production already writes
+# it onto this same `u` index level), and Niger now agrees with it.
+#
+# This table is the relabel mechanism, and it is the ONLY one available: it is
+# read at BUILD time by local_tools.get_categorical_mapping (so every Niger
+# script emits `Unknown` directly) and at READ time by
+# Country._apply_categorical_mappings (so a pre-#842 parquet still holding
+# `Manquant` is relabelled on the way out).  The two alternatives were measured
+# and both fail -- a `spellings:` block on `u` in the canonical data_info.yml is
+# read as a CLOSED vocabulary by diagnostics._check_declared_spellings and would
+# fail every real unit corpus-wide, and a row in the global
+# categorical_mapping/u.org cannot win because _row_union_categorical keeps the
+# COUNTRY row on a key collision.  See niger.py `U_NA` for the full argument.
+#
+# DO NOT re-add a `Manquant` Preferred Label.  niger.py's
+# `_COMMUNITY_MISSING_UNITS` keys on the label produced here, so the two must
+# move together or Niger silently stops dropping CS07's product-absent rows.
+#
 # CROP-HARVEST EXTENSION (GAP 1 crop_production, 2026-06-14).  The
 # agriculture harvest/sold modules report quantities in their own local
 # unit lists, distinct from the food-consumption units above and varying
@@ -175,8 +198,8 @@
 | Autre (préciser)      | Autre            |      |                  |                       |
 | Autres                | Autre            |      |                  |                       |
 | botte                 | Botte            |      |                  |                       |
-| Manquant              | Manquant         |      |                  |                       |
-| manquant              | Manquant         |      |                  |                       |
+| Manquant              | Unknown          |      |                  |                       |
+| manquant              | Unknown          |      |                  |                       |
 | sac de 5 kg           | Sac de 5 kg      |      |                  |                       |
 | sac de 10 kg          | Sac de 10 kg     |      |                  |                       |
 | sac de 25 kg          | Sac (25 Kg)      |      |                  |                       |
@@ -201,8 +224,8 @@
 | gros sac              | Gros sac         |      |                  |                       |
 | sac moyen             | Sac Moyen        |      |                  |                       |
 | tia                   | Tiya             |      |                  |                       |
-| produit absent        | Manquant         |      |                  |                       |
-| Produit absent        | Manquant         |      |                  |                       |
+| produit absent        | Unknown          |      |                  |                       |
+| Produit absent        | Unknown          |      |                  |                       |
 
 #+NAME: Region
 | Original Label                 | Preferred Label                |
