@@ -2102,11 +2102,66 @@ Cross-country: the same defect is recorded for Nigeria (95-97% agreement)
 and Niger (63-99%) in =.coder/ledger/price-sources-comparison.md= -- it is
 GH #824, not a Uganda quirk.
 
-** TODO 2009-10 harvest quantities carry an unstripped 99999 sentinel
+** DONE 2009-10 harvest quantities carried an unstripped 99999 sentinel (#861)
 
-2009-10's =Quantity= sums to 3.18e8 native units, ~300x every other wave,
-because =99999= is used as a missing-value sentinel and never removed.
-Any analysis touching 2009-10 =crop_production= quantities must filter it.
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/861][#861]] (bug, cleanup)
+- Status :: *FIXED 2026-09-09*, =uganda.py= =CROP_COLMAPS['2009-10']= /
+  =crop_production_for_wave=
+
+2009-10's post-harvest module (=a5aq6a= season A, =a5bq6a= season B) uses
+=99999= as a missing-value sentinel for "no information reported on this
+harvest row", never stripped.  EPAR names the same column and applies the
+same unconditional rule to its coalesced A/B column
+(=EPAR_UW_Uganda_UNPS_W1.do:558=: =replace quantity_harv=. if
+quantity_harv==99999=; EPAR's earlier conditional recode at =:483= --
+=A5aq11==.=-gated -- is a narrower rule that this fix does NOT adopt alone,
+per the issue).
+
+*Mechanism.*  Each 2009-10 season-A/B condition dict in =CROP_COLMAPS= now
+declares =qty_sentinel: 99999=; =crop_production_for_wave= masks any
+=Quantity= exactly equal to that value to NaN (EXACT VALUE, never a range --
+99998 and 100000 survive unchanged) immediately after reading the quantity
+column.  A second, easily-missed piece: the function's "drop a row when NO
+measure (Quantity/Quantity_sold/Value_sold) is reported" filter runs AFTER
+this mask, and every one of the 3,097 sentinel rows carries no
+Quantity_sold or Value_sold either -- so without tracking the PRE-mask
+"was anything reported" state (=_qty_reported=), the fix would have
+silently deleted all 3,097 rows instead of keeping them with =Quantity=
+NaN.  =_qty_reported= is computed before the mask and OR'd into that
+filter, then dropped before the frame is returned.  No other wave declares
+=qty_sentinel= (measured: none of 2010-11 through 2019-20 shows this
+signature; guarded by =tests/test_uganda_99999.py::test_qty_sentinel_is_2009_10_only=).
+
+*Measured, cold, isolated =LSMS_DATA_DIR= (2026-09-09):*
+
+| | before | after |
+|---------------------------+----------------+--------------|
+| rows (both seasons)       | 25,485         | 25,485 (unchanged) |
+| season A rows              | 13,244         | 13,244       |
+| season B rows              | 12,241         | 12,241       |
+| =Quantity==99999= count, A | 1,400          | 0            |
+| =Quantity==99999= count, B | 1,697          | 0            |
+| =Quantity==99999= total    | 3,097          | 0            |
+| =Quantity= sum (native units) | 310,664,565.84 | 967,662.84 |
+
+Ratio before/after: *321x*, consistent with the "~300x" estimate this TODO
+carried.  =Quantity_sold=, =Value_sold= and =KgFactor= were checked for the
+same sentinel (and for the sibling sentinels 9999 / 999999) in 2009-10:
+*none carry it* -- =KgFactor= is unwired for this wave regardless (0
+non-null, matches the pre-existing "wired for 2018-19 only" note above), so
+nothing else was stripped.
+
+Sanity vs. neighbouring waves' =Quantity= sums (same isolated cold build):
+2010-11 = 708,149.50; 2011-12 = 1,128,560.35.  2009-10's corrected
+967,662.84 now sits in the SAME order of magnitude as both, where the
+pre-fix 310.7M did not.
+
+Tests: =tests/test_uganda_99999.py= -- fixture-level (exact-value strip;
+sentinel-only row survives with NaN, not dropped; no-op when
+=qty_sentinel= is undeclared) and a data-gated test that reads the real
+2009-10 modules directly (bypassing the Country() cache, so it is immune
+to shared-cache staleness) and re-checks the 0-count / row-count / sum
+invariants above.
 
 ** TODO Uganda is the ONE country pytest deletes the cache of, and two tests rely on the cache
 

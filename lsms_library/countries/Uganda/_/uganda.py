@@ -1310,6 +1310,26 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
             if not qcol:
                 continue
             qty = pd.to_numeric(_require(df5, qcol, ws, 'quantity'), errors='coerce')
+            # SURVEY-REPORTED missing-value sentinel on the harvest quantity
+            # (UNPS q6a).  2009-10's a5aq6a/a5bq6a use `99999` for "no
+            # information reported" -- an EXACT-VALUE strip, never a range
+            # (99998 / 100000 are real quantities and must survive).  EPAR's
+            # own pipeline (EPAR_UW_Uganda_UNPS_W1.do:558,
+            # `replace quantity_harv=. if quantity_harv==99999`) applies the
+            # same unconditional rule to the coalesced A/B column; GH #861.
+            # Declared per-condition via `qty_sentinel` in CROP_COLMAPS so it
+            # stays wave-scoped -- only 2009-10 sets it (measured: no other
+            # wave's Quantity carries this value as a sentinel).
+            qty_sentinel = cond.get('qty_sentinel')
+            # `qty_reported` records whether *something* numeric was present
+            # in the source column BEFORE the sentinel strip.  All 3,097
+            # 2009-10 sentinel rows carry no Quantity_sold / Value_sold
+            # either (measured), so without this flag the "no measure
+            # reported" filter below would delete them once Quantity turns
+            # NaN -- the row stays; only the value is nulled (GH #861).
+            qty_reported = qty.notna()
+            if qty_sentinel is not None:
+                qty = qty.where(qty != qty_sentinel, np.nan)
 
             # reported native unit
             if cond.get('unit'):
@@ -1369,6 +1389,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                 'Value_sold':    vsold.values,
                 'harvest_month': hm.values,
                 'KgFactor':      kgf.values,
+                '_qty_reported': qty_reported.values,
             })
             # intercropped flag (plot-level) joined from AGSEC4A.  The
             # perennial_lookup / planting_lookup hooks exist for future
@@ -1389,9 +1410,14 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     # rows / land-status placeholders with nothing reported).
     df = df[df['j'].notna()]
     # Keep rows even when Quantity is NaN but a sale was reported; drop
-    # only when ALL reported measures are missing.
+    # only when ALL reported measures are missing.  `_qty_reported` is
+    # Quantity's notna() taken BEFORE any qty_sentinel strip (GH #861) --
+    # without it, a sentinel-only row (all 3,097 2009-10 rows: no
+    # Quantity_sold, no Value_sold) would newly fail this filter and be
+    # DELETED once its Quantity turns NaN, which the fix must not do.
     measure_cols = ['Quantity', 'Quantity_sold', 'Value_sold']
-    df = df[df[measure_cols].notna().any(axis=1)]
+    df = df[df[measure_cols].notna().any(axis=1) | df['_qty_reported']]
+    df = df.drop(columns=['_qty_reported'])
 
     df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce').astype('Float64')
     df['Quantity_sold'] = pd.to_numeric(df['Quantity_sold'], errors='coerce').astype('Float64')
@@ -1519,14 +1545,19 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
 # CONTENTS.org "Known Issues".
 CROP_COLMAPS = {
     '2009-10': {
+        # `qty_sentinel: 99999` -- GH #861.  a5aq6a/a5bq6a use 99999 as a
+        # missing-value sentinel for "no information reported on this
+        # harvest row" (measured: 1400 rows season A, 1697 season B, none
+        # of them in Quantity_sold, Value_sold or KgFactor).  Exact-value
+        # strip only; see crop_production_for_wave's qty_sentinel handling.
         'A': {'hhid': 'HHID', 'parcel': 'a5aq1', 'plot': 'a5aq3', 'crop': 'a5aq5',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
                               'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
-                              'month': None}]},
+                              'month': None, 'qty_sentinel': 99999}]},
         'B': {'hhid': 'HHID', 'parcel': 'a5bq1', 'plot': 'a5bq3', 'crop': 'a5bq5',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
                               'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
-                              'month': None}]},
+                              'month': None, 'qty_sentinel': 99999}]},
         # 2009-10 AGSEC4A uses a non-standard column layout (a4aq1/a4aq2/
         # a4aq4, no parcel/plot/cropID in the form the join needs), so the
         # intercrop flag is not cleanly joinable -> intercropped is NaN
