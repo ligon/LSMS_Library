@@ -29,6 +29,7 @@ from lsms_library import _build_registry as R
 from lsms_library.quantity_audit import (
     QUANTITY_MIN_CELL,
     QUANTITY_OUTLIER_K,
+    QUANTITY_REFERENCE_FLOOR,
     QUANTITY_REFERENCE_QUANTILE,
     QuantityImplausibleError,
     QuantityImplausibleWarning,
@@ -228,6 +229,63 @@ def test_p90_survives_the_second_outlier_where_p99_does_not():
     assert 4_000_000.0 / cell.quantile(0.99) < QUANTITY_OUTLIER_K
 
 
+def test_group_quantile_matches_pandas():
+    """The hand-rolled group quantile IS ``Series.quantile``'s arithmetic.
+
+    ``_group_stats`` exists only because the pandas spelling cost 196 ms on
+    Uganda on the read path.  A faster statistic that is a DIFFERENT statistic
+    would silently move every threshold in the module, so this pins the two
+    together on random data with ragged groups, ties, NaN and infinities --
+    except that non-finite values are excluded here BY DESIGN (an infinity is
+    not a measurement and may not define the scale others are judged against),
+    so the pandas side is asked the same question about the finite rows.
+    """
+    from lsms_library.quantity_audit import _group_stats
+
+    rng = np.random.default_rng(0)
+    n = 4000
+    codes = rng.integers(0, 40, n).astype(np.int64)
+    values = rng.lognormal(3, 2, n)
+    values[rng.integers(0, n, 200)] = np.nan
+    values[rng.integers(0, n, 5)] = np.inf
+    values[rng.integers(0, n, 50)] = 0.0
+
+    stat, size = _group_stats(values, codes, QUANTITY_REFERENCE_QUANTILE)
+
+    finite = pd.Series(values).where(np.isfinite(values))
+    grouped = finite.groupby(codes)
+    want_stat = grouped.transform("quantile", QUANTITY_REFERENCE_QUANTILE)
+    want_size = grouped.transform("count")
+    assert np.allclose(stat, want_stat.to_numpy(dtype="float64"),
+                       equal_nan=True)
+    assert np.array_equal(size, want_size.to_numpy(dtype="int64"))
+
+
+def test_a_non_finite_value_does_not_define_the_scale():
+    """An infinity in the cell must not become the reference other rows are
+    judged against -- it is not a measurement."""
+    from lsms_library.quantity_audit import _group_stats
+
+    values = np.array([1.0, 2.0, 3.0, np.inf, np.nan])
+    codes = np.zeros(5, dtype=np.int64)
+    stat, size = _group_stats(values, codes, 0.90)
+    assert size[0] == 3 and np.isfinite(stat[0])
+
+
+def test_the_reference_floor_lifts_a_sub_unit_cell():
+    """A p90 below one native unit is not a reference (see
+    :data:`QUANTITY_REFERENCE_FLOOR`).  Uganda 2010-11 pooled every crop
+    sharing ``u='Others specify'`` into a cell with p90 = 0.6 and named eight
+    ordinary harvests at 66x to 500x it; the floor removed four of the eight
+    and divided the rest by their true size rather than by 0.6."""
+    df = _cell(n=60, base=0.02, extras=[_outlier(80.0)])   # p90 well below 1
+    reports = _audit(df)
+    assert reports == [], "80 units against a floor of 1.0 is 80x, under K"
+    report = _audit(_cell(n=60, base=0.02, extras=[_outlier(150.0)]))[0]
+    assert report["offenders"][0]["reference"] == QUANTITY_REFERENCE_FLOOR
+    assert report["offenders"][0]["ratio"] == 150.0
+
+
 def test_the_ladder_falls_back_but_never_pools_across_waves():
     """A crop too thin to judge on its own borrows the wave's UNIT cell, not
     another wave's -- ``_survey_median_factors``' rule: a thin module does not
@@ -341,22 +399,85 @@ def test_a_broken_audit_never_breaks_a_read(monkeypatch):
 # Cache -- a reworded warning must not cold-rebuild the corpus
 # ---------------------------------------------------------------------------
 
-def test_the_audit_module_is_not_folded_into_any_build_fingerprint():
-    """Asserted structurally (no source of ``quantity_audit`` in any
-    fingerprint part) rather than by comparing two hex digests, so the test
-    still means something after any legitimate hash change elsewhere.
+#: A string that appears in ``quantity_audit``'s SOURCE and nowhere else in
+#: the library, so "did the fingerprint walk reach this module" can be answered
+#: by searching the fingerprint parts rather than by trusting a name.
+_SOURCE_TOKEN = "QUANTITY_REFERENCE_FLOOR"
 
-    Measured when this landed: 0 of 12 probed ``Country._table_cache_hash``
-    values and 0 of 5 ``build_transforms_fingerprint`` values moved.
+_EXCLUDED_ENTRY_POINTS = (
+    "lsms_library.quantity_audit.check_quantities",
+    "lsms_library.quantity_audit.audit_quantities",
+)
+
+
+def _a_future_build_callable(df):
+    """Stands in for a call site the exclusion actually has to defend against.
+
+    A MODULE-LEVEL function referencing a MODULE-LEVEL name, because that is
+    what ``_closure_parts`` can resolve: it walks ``co_names`` (globals) and
+    does ``getattr(module, name)``.  A closure variable is invisible to it, so
+    a nested definition would make the probe below vacuous in a second, subtler
+    way than the test it replaces.
     """
+    return check_quantities(df, country="X", table="crop_production")
+
+
+def test_every_public_entry_point_is_declared_excluded():
+    """The names, asserted directly.  ``check_quantities`` is the Site-Q hook
+    and ``audit_quantities`` is its public measurement half; both are pure
+    reporting and both must be excluded, so that a FUTURE call site on the
+    build path (a wave script, ``grab_data``) cannot cold-rebuild the corpus
+    when someone re-words a warning."""
+    for name in _EXCLUDED_ENTRY_POINTS:
+        assert name in R._EXCLUDED_CALLABLES, f"{name} not excluded"
+    assert "_QUANTITY_LEDGER" in R._EXCLUDED_CONSTANTS
+
+
+def test_the_module_source_is_absent_from_every_shipped_fingerprint():
+    """No part of any real build fingerprint contains this module's source."""
     seen, parts = set(), []
     for _qn, (fn, _tables) in R._BUILD_TRANSFORMS.items():
         parts += R._closure_parts(fn, seen)
-    leaked = [p.split("=")[0] for p in parts if "quantity_audit" in p]
-    assert not leaked, (
-        "quantity_audit source leaked into the build fingerprint: "
-        f"{leaked}. Add the callable to _build_registry._EXCLUDED_CALLABLES "
-        "or every table in every country rebuilds on a docstring edit.")
+    assert parts, "the walk produced nothing -- the probe itself is broken"
+    leaked = [p.split("=")[0] for p in parts
+              if "quantity_audit" in p or _SOURCE_TOKEN in p]
+    assert not leaked, f"quantity_audit source in the fingerprint: {leaked}"
+
+
+def test_the_exclusion_is_what_keeps_it_out__and_this_test_can_fail(monkeypatch):
+    """The previous version of this test was VACUOUS and shipped anyway.
+
+    It walked the real ``_BUILD_TRANSFORMS``, whose only route to this module
+    is through ``Country._finalize_result`` -- itself excluded -- so the walk
+    stopped one step early and the assertion held whether or not the
+    ``quantity_audit`` entries were present.  Removing them in-process changed
+    nothing: ``leaked=[] n_parts=90`` both ways (red team, 2026-09-09).  A test
+    that cannot fail is not a guard, and its failure message promised a repair
+    it could never demand.
+
+    This version exercises the mechanism the exclusion actually protects: a
+    build-path callable that reaches ``check_quantities`` DIRECTLY, which is
+    what a future wave-script call site would be.  With the exclusion in force
+    the module's source stays out of the fingerprint; with it removed the same
+    walk drags the source in -- so the assertion has a failing branch, and the
+    test demonstrates both.
+    """
+    def walk():
+        return R._closure_parts(_a_future_build_callable, set())
+
+    with_exclusion = walk()
+    assert not [p for p in with_exclusion if _SOURCE_TOKEN in p], (
+        "the exclusion is not suppressing the module on a direct call site")
+
+    monkeypatch.setattr(
+        R, "_EXCLUDED_CALLABLES",
+        R._EXCLUDED_CALLABLES - set(_EXCLUDED_ENTRY_POINTS))
+    without_exclusion = walk()
+    assert [p for p in without_exclusion if _SOURCE_TOKEN in p], (
+        "with the exclusions REMOVED the walk still does not reach "
+        "quantity_audit -- so this test is vacuous again and the exclusion "
+        "entries are not doing what the comment in _build_registry says")
+    assert len(without_exclusion) > len(with_exclusion)
 
 
 def test_site_q_host_is_excluded_so_site_q_costs_no_invalidation():

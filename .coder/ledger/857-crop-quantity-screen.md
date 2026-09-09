@@ -108,11 +108,16 @@ Why (a):
 
 Cost of choosing (a), stated plainly:
 - **Every reader of `crop_production` now pays for the audit and sees the
-  warning**, including one who does not care. Measured (best of three, warm
-  parquets): 43 ms on Tanzania (14,126 rows), 257 ms on Uganda (133,683 rows —
-  the corpus's largest `crop_production`). Same order as Site B's own 196 ms on
-  the largest built table (`CLAUDE.md`). An earlier draft of this line guessed
-  4 ms and 22 ms; it was wrong and is corrected rather than deleted.
+  warning**, including one who does not care. Measured by a spy *inside* the
+  read (best of five, warm cache): **83 ms of a 2,157 ms Uganda read (4%)**,
+  65 ms of 1,391 ms on Malawi, 9 ms of 643 ms on Tanzania. Two earlier readings
+  of this line were wrong and are corrected rather than deleted: a first draft
+  *guessed* 4 ms / 22 ms; the shipped d27b7f89 measured the audit in isolation
+  at 43 ms / 257 ms and did not quote the read-path delta at all, which the red
+  team rightly called out (it differenced two whole reads and got +411 ms on a
+  machine that had a concurrent re-warm running — the spy is the number that
+  survives load). The implementation was then rewritten (`_group_stats`,
+  `_axis`) from 196 ms to 65 ms on the same Uganda parquet.
 - **A country with genuinely fat-tailed harvests will warn, and there is no
   allowlist** — by design, and it is a real cost, not a rounding one. The
   measured corpus-wide count (§Phase 3) is what makes it a work queue rather
@@ -131,15 +136,18 @@ outlier as well.
 
 ## §6 Open questions for the human
 
-- **Uganda's `99999` harvest sentinel (GH #861) is mostly INVISIBLE to this
-  screen, and that is the correct behaviour to argue about.** Measured: Uganda's
-  `crop_production` holds **3,097** rows with `Quantity == 99999`, of which
-  **9** fire. The sentinel saturates most `(t, u, j)` cells it appears in, so in
-  those cells 99999 *is* the 90th percentile and the rows are not distributional
-  outliers by any honest reading; the nine that fire leaked into 2009-10 Millet /
-  `u='Unknown'`, whose p90 is 2.8. A *repeated* sentinel is a different defect
-  from a *lone* extreme; #861 owns it, and this country's count moves when it
-  lands.
+- **A repeated sentinel is mostly INVISIBLE to this screen, and the corpus now
+  supplies both outcomes.** Uganda's 3,097 `Quantity == 99999` rows: **seven**
+  fired, across **two** cells (2009-10 Millet / `u='Unknown'`, p90 2.8, and
+  Sorghum / `Plastic Basin (15 lts)`, p90 12) — the two the sentinel did not
+  saturate. An earlier draft of this ledger, the module docstring and AGENTS.md
+  all said "nine, in one cell"; two of those nine were genuine Sugarcane rows
+  (red team, 2026-09-09). GH #861 has since landed and dropped the rows at
+  source, so Uganda now fires 25 and none is a sentinel. Niger is the same
+  signature unfixed: eleven `999999` rows in 2011-12 that DO fire, because
+  eleven rows cannot saturate a wave. Whether this screen sees a sentinel is an
+  accident of how often it was keyed — which is why stripping one is a separate
+  job with a separate issue.
 - **Malawi's `50 kg Bag` rows of 2015 / 2016 / 2018 / 2019** are the
   year-keyed-into-a-quantity-field signature that `_KG_FACTOR_YEAR_BAND`
   documents for factors (`transformations.py:1708`). Observed, recorded, **not**
@@ -150,6 +158,18 @@ outlier as well.
   Its cell has 37 rows and a genuinely fat tail; any less robust reference
   statistic hides it (§Phase 3). If a future revision loosens `K` past ~170 it
   stops firing — pin it.
+- **The floor is a floor, not a cure.** `max(p90, 1.0)` removes a firing whose
+  reference was *absurd* (0.6 of an unnamed unit); it does not remove one whose
+  reference is merely *thin*. Four Uganda 2010-11 rows still fire at 105×–300×
+  a reference of one unit, and the real defect there is that the `(t,u)` rung
+  pools every crop sharing a junk unit label. Excluding the `U_UNKNOWN` /
+  "Others specify" family from the `(t,u)` rung is the obvious next lever and
+  is deliberately NOT taken here — it needs its own measurement.
+- **Nothing reports how many rows went unjudged** (red team CONCERN C):
+  30,876 corpus-wide have no reference at any rung, 12,891 of them Nigeria's
+  (20.5% of that country's table). A country whose crop table is entirely thin
+  reports exactly like a clean one. An `n_unjudged` field in each report would
+  fix it; out of scope for this pass, and worth a line in the follow-up.
 - **Should `food_acquired.Quantity` be screened too?** Deliberately out of scope:
   unmeasured, and 5.26 M rows on GhanaLSS alone. The `_SCREENED_COLUMNS` mapping
   is the extension point.
@@ -196,22 +216,55 @@ cell being the finest of `(country, t, u, j)` → `(country, t, u)` →
   smooth and is recorded so the choice is re-checkable: K=50 → 94 rows, K=100 →
   49, K=150 → 34, K=300 → 21 (four countries, 293,868 rows).
 
-**Measured firing counts** — every country whose `crop_production` L2-country
-parquet was warm under the configured `data_root()`; `pd.read_parquet` only, no
-rebuild, no `Country()` call:
+**Measured firing counts** — **every** country holding a warm L2-country
+`crop_production` parquet, via `pd.read_parquet` only; no rebuild, no
+`Country()` call. The first version of `measure_firing.py` iterated a hardcoded
+five-name list while its own README claimed it globbed `data_root()`, and five
+countries were published as the corpus; it globs now (red team CONCERN 2A).
 
-| country | rows | fired at K=100 | audit cost | the rows |
-|---|---|---|---|---|
-| Tanzania | 14,126 | 14 (2 waves) | 43 ms | **all four rows #857 names**: Coconuts 7,500,000 (`9640-001-99`, plot 1, kg, 2020-21, ×11,029); Timber 4,000,000 (`2010-001`, plot 6, kg, 2020-21, ×173.3); Other Fruits 2,400,000 (`9640-001-99`, plot 1, kg, ×3,189); Ripe Bananas 1,505,400 (`2677-001`, plot 1, kg, ×1,004). Plus Leafy Greens 800,000 in 2019-20 (×944) |
-| Uganda | 133,683 | 36 (7 waves) | 257 ms | Sugarcane 360,000 (2018-19, `1083000903`, `u='Unknown'`, ×3,000); Tea 180,000 (2013-14, `H42707-04-01`, kg, ×600); Sugarcane 90,000 (2015-16, `H36701-04-01`, ×300); nine `99999` sentinel rows in 2009-10 (§6) |
-| Malawi | 131,379 | 16 (2 waves) | 225 ms | the `50 kg Bag` / `Pail (Large)` family — Beans 48,000 bags (2019-20, `104071840057`, ×8,000) and the year-shaped 2015/2016 rows (§6) |
-| Nigeria | 62,844 | 9 (3 waves) | 118 ms | Yam--roots 600,000 kg (2013Q1, `100043`, ×200); Cassava--roots 60,000 `Stalk` (2016Q1, `120100`, ×600) |
-| Ethiopia | 85,519 | 10 (3 waves) | 165 ms | Maize 50,000 kg (2015-16, `04040501902092`, ×494) — one household supplies three of the five 2015-16 rows |
-| **total** | **427,551** | **85** | | **0.0199% of rows** |
+| country | rows | fired | audit ms | | country | rows | fired | audit ms |
+|---|---|---|---|---|---|---|---|---|
+| Benin | 9,056 | 2 | 5 | | Mali | 35,060 | 18 | 20 |
+| Burkina_Faso | 15,593 | 1 | 6 | | Niger | 47,077 | 28 | 19 |
+| CotedIvoire | 22,223 | 16 | 9 | | Nigeria | 62,844 | 9 | 35 |
+| Ethiopia | 85,519 | 10 | 44 | | Senegal | 8,428 | 1 | 5 |
+| EthiopiaRHS | 17,523 | 2 | 2 | | Tanzania | 14,126 | 14 | 10 |
+| GhanaSPS | 25,109 | 7 | 10 | | Togo | 11,565 | 1 | 5 |
+| Guinea-Bissau | 10,579 | 1 | 4 | | Uganda | 130,606 | 25 | 77 |
+| Malawi | 131,379 | 16 | 61 | | **TOTAL** | **626,687** | **151** | |
 
-Uganda's parquets were cleared and rebuilt by a concurrent workstream twice
-while this was measured; the table above is the reading taken after the final
-rebuild, against `data_root()` rather than the legacy `~/.local/share` root.
+**151 of 626,687 rows = 0.0241%.** The headline rows:
+
+- **All four rows #857 names still fire** — Tanzania 2020-21 Coconuts 7,500,000
+  (`9640-001-99`, plot 1, kg, ×11,029), Timber 4,000,000 (`2010-001`, plot 6,
+  ×173.3 — still the binding constraint on `K` from above), Other Fruits
+  2,400,000 (×3,189), Ripe Bananas 1,505,400 (×1,004).
+- **Two larger rows in countries nobody had looked at**: Benin 2018-19 Coton
+  **12,500,000 kg** (`i=220065`, plot 1_2, ×1,785.7) and CotedIvoire 2018-19
+  Cocoa **1,500,000** (`i=600009`, ×750).
+- **Niger 2011-12 ships eleven rows of exactly `999999`** (`u='Unknown'`; Mil,
+  Sorgho, Niébé, Riz Paddy; ×14,285.7 on the `t` rung) — a second, unfixed
+  sentinel family, 11 of Niger's 28 firings and the corpus's largest ratio.
+  Recorded in `slurm_logs/gh857_quantity_screen/README.org` for filing.
+
+**Uganda, before and after the two changes that hit it:**
+
+| Uganda `crop_production` | rows | fired |
+|---|---|---|
+| d27b7f89, pre-#861 | 133,683 | 36 |
+| post-#861 (sentinel rows dropped at source), no floor | 130,606 | 29 |
+| post-#861, **with** `QUANTITY_REFERENCE_FLOOR` (shipped) | 130,606 | **25** |
+
+The floor removed 4 of the 8 sub-unit-reference firings the red team found;
+the surviving four (Rice 300, Ground Nuts 150, Sugarcane 150, Pumpkins 105,
+all 2010-11 `u='Others specify'` against a reference of one unit) are a
+UNIT-LABEL defect rather than a quantity defect and are left visible. Corpus
+effect of the floor alone: 155 → 151.
+
+**Sensitivity, re-measured on all fifteen** (`sensitivity_2026-09-09.txt`):
+K=30 → 417, K=50 → 261, K=100 → 151, K=150 → 90, K=300 → 49. Ratio
+distribution over the 595,811 rows that have a reference: p90 = 1.0,
+p99 = 3.6, p99.9 = 21.0, p99.99 = 233.7, max = 14,285.7 — still **no gap**.
 
 **Anchored verdicts.**
 

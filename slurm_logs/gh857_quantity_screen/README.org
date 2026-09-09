@@ -1,38 +1,73 @@
 #+title: GH #857 -- the quantity plausibility screen: raw records
 #+date: 2026-09-09
 
-Everything here exists so the threshold in =lsms_library/quantity_audit.py= is
+Everything here exists so the rule in =lsms_library/quantity_audit.py= is
 *re-checkable rather than merely asserted*, the same way
-=slurm_logs/null_read_guard/= backs =_NULL_FRACTION_TRIGGER=.  All four scripts
-are read-only: they take every country from its warm L2-country
-=crop_production= parquet under =data_root()=, name and skip any country whose
-parquet is absent, and never call =Country()= or build anything.  Each prints
-the =lsms_library.__file__= it imported, so a worktree/main mix-up is visible
-rather than silent (CLAUDE.md, scrum-master addendum 3).
+=slurm_logs/null_read_guard/= backs =_NULL_FRACTION_TRIGGER=.
+
+Both scripts are read-only and **glob** =data_root()= for every country holding
+a warm L2-country =crop_production= parquet -- no hardcoded country list.  The
+first version of =measure_firing.py= had one, and five countries were published
+as though they were the corpus while this README already claimed a glob (red
+team, 2026-09-09).  Neither script calls =Country()= or builds anything, and
+each prints the =lsms_library.__file__= it imported so a worktree/main mix-up is
+visible rather than silent (CLAUDE.md, scrum-master addendum 3).
 
 | file | what it is |
 |------+------------|
-| =measure_firing.py= | the corpus firing count, per country and wave. |
-| =firing_2026-09-09.txt= | its output on the day the screen landed: *85 rows of 427,551 (0.0199%)* over five countries. |
-| =sensitivity_sweep.py= | the K / quantile / min-cell sweep the rule was chosen from.  Prints the full ratio ranking so the (absent) gap can be looked for again. |
-| =sensitivity_2026-09-09.txt= | its output.  *Four countries, 293,868 rows* -- Uganda's parquet was absent at that moment (below), and the K choice was made on these four. |
-| =hash_probe.py=, =hash_before.json=, =hash_after.json= | the cache-invalidation measurement: 12 =Country._table_cache_hash= values and 5 =build_transforms_fingerprint= values, before and after the change.  *Byte-identical* -- Site Q costs no rebuild. |
+| =measure_firing.py= | the corpus firing count, per country and per wave, with the audit's own cost. |
+| =firing_2026-09-09.txt= | its output: *151 rows of 626,687 (0.0241%)* over fifteen warm countries. |
+| =sensitivity_sweep.py= | the K / quantile / floor sweep the rule was chosen from.  It calls the library's OWN =_cell_reference= and sweeps by monkeypatching the module constants, so it cannot drift from the rule it justifies. |
+| =sensitivity_2026-09-09.txt= | its output. |
+| =hash_probe.py=, =hash_before.json=, =hash_after.json= | the cache-invalidation measurement: 12 =Country._table_cache_hash= values and 5 =build_transforms_fingerprint= values.  =before= is the development tip =5bec5e79= (extracted read-only with =git archive=, so it has no Site Q); =after= is this branch.  *Byte-identical* -- Site Q costs no rebuild.  The comparison is against the tip rather than the old merge-base on purpose: #861 legitimately moved Uganda's three hashes, and a stale baseline would have credited that to Site Q. |
 
-* Why two different row totals
+Reproducing the exact numbers: the shared cache was being re-warmed by a
+concurrent workstream throughout, so Uganda's parquet appeared and disappeared
+several times.  The committed outputs were taken against a stable snapshot
+(=LSMS_DATA_DIR= pointed at a copy of every warm =*/var/crop_production.parquet=,
+Uganda taken post-#861).  Point =LSMS_DATA_DIR= at any such snapshot to repeat
+them.
 
-The firing count is five countries (427,551 rows, 85 fired); the sensitivity
-sweep is four (293,868 rows, 49 fired at the shipped K).  Uganda's
-=crop_production= parquets were being cleared and rebuilt by a concurrent
-workstream throughout, so the two readings caught it in different states.  The
-five-country reading is the one quoted in =quantity_audit.py='s docstring and
-in CLAUDE.md; the four-country sweep is what the threshold was *chosen* on.
-Re-run either after an Uganda re-warm and both will agree at five.
+* Findings for filing (not fixed here)
+
+** Niger 2011-12 ships a =999999= harvest sentinel -- eleven rows, unfixed
+
+Exactly *11* rows of =Quantity == 999999=, all in 2011-12, all =u='Unknown'=:
+Mil, Sorgho, Niébé/Haricots secs and Riz Paddy, households =13317= and =20607=.
+They fire at *x14,285.7* on the =t= rung -- the largest ratio in the corpus --
+and are 11 of Niger's 28 firings.
+
+This is the same class as Uganda's =99999= (GH #861, now fixed at source), and
+the contrast is the interesting part: Uganda keyed the sentinel 3,097 times, so
+it *became the 90th percentile* of most cells it appeared in and only seven
+rows ever fired; Niger keyed it eleven times, so it cannot saturate anything and
+every one fires.  *Whether a distributional screen sees a sentinel is an
+accident of how often it was keyed.*  Stripping it is a source-side job with its
+own issue, exactly as #861 was.
+
+** Two harvests larger than the one GH #857 was filed about
+
+- *Benin 2018-19 Coton 12,500,000 kg* -- =i=220065=, plot =1_2=, =u='Kg'=,
+  x1,785.7 its cell's p90 of 7,000.
+- *CotedIvoire 2018-19 Cocoa 1,500,000* -- =i=600009=, plot =1_1=,
+  =u='Kilogramme'=, x750 its cell's p90 of 2,000.
+
+Neither country was in the five the first measurement looked at.
+
+** Four Uganda 2010-11 rows still fire against a reference of one unit
+
+=u='Others specify'= pools every crop under one junk label; its p90 was 0.6,
+which =QUANTITY_REFERENCE_FLOOR= lifts to 1.0.  That removed four of the eight
+firings the red team found; Rice 300, Ground Nuts 150, Sugarcane 150 and
+Pumpkins 105 remain.  The defect there is the *unit label*, not the quantity,
+and the next lever (excluding the unknown-unit family from the =(t,u)= rung)
+is deliberately not pulled here.
 
 * The one thing worth re-reading before touching =QUANTITY_OUTLIER_K=
 
-The ratio distribution has *no discontinuity*: p90 = 1.0, p99 = 3.7,
-p99.9 = 20, p99.99 = 174, max 11,029, smoothly.  100 is an argued tolerance,
-not a measured boundary, and this sweep is what makes that statement checkable
-rather than a hedge.  Tanzania's 4,000,000 kg Timber row sits at 173.3x and is
-the binding constraint from above -- loosen K past ~170 and the row GH #857
-names stops firing.
+The ratio distribution has *no discontinuity*: over the 595,811 rows that have
+a reference, p90 = 1.0, p99 = 3.6, p99.9 = 21.0, p99.99 = 233.7, max = 14,285.7.
+100 is an argued tolerance, not a measured boundary, and this sweep is what
+makes that statement checkable rather than a hedge.  Tanzania's 4,000,000 kg
+Timber row sits at x173.3 and is the binding constraint from above -- loosen K
+past ~170 and the row GH #857 names stops firing.
