@@ -320,7 +320,7 @@ def test_crop_colmap_columns_resolve_in_source():
                         bad.append(f"{wave}/{season} {key}={name!r}")
             for n, cond in enumerate(cm["conditions"]):
                 for key in ("qty", "unit", "condition", "qty_sold",
-                            "value_sold", "month"):
+                            "value_sold", "month", "kg_factor"):
                     name = cond.get(key)
                     if name is not None:
                         checked += 1
