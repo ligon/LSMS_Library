@@ -98,24 +98,29 @@ issue create=.
 - [X] Transforms: =livestock_income=, =rcsi=, HDDS/FCS, fertiliser rate,
   gross crop revenue, Shannon diversity (L8) -- one umbrella issue.
 
-** TODO Comment on existing issues with what the survey adds         :issues:
+** DONE Comment on existing issues with what the survey adds         :issues:
 :PROPERTIES:
 :Effort: 0:45
 :END:
-- [ ] #850: the L2 measurement (no =j= at any step of =conversion_to_kgs=;
+:LOGBOOK:
+- State "DONE" from "TODO" [2026-09-09] \\
+  Posted on #850 #820 #824 #844 #846 #585 #737 #439 #438 after an Opus review
+  (issues/REVIEW_COMMENTS.md); drafts kept as issues/COMMENT_*.md.
+:END:
+- [X] #850: the L2 measurement (no =j= at any step of =conversion_to_kgs=;
   the =Expenditure= median vs =Expenditure/Quantity= observation).
-- [ ] #820: bounded to W1-W3; ESS4/5 folded section 12 into 11
+- [X] #820: bounded to W1-W3; ESS4/5 folded section 12 into 11
   (=W4.do:759=); check that section 11 carries tree crops in W4/W5.
-- [ ] #824: EPAR's sold-unit tables as a template, with the 2018-19
+- [X] #824: EPAR's sold-unit tables as a template, with the 2018-19
   condition-as-unit trap (L7).
-- [ ] #844: EPAR tried =sa3q18= in W2 and abandoned it (=W2.do:644-645=);
+- [X] #844: EPAR tried =sa3q18= in W2 and abandoned it (=W2.do:644-645=);
   compare before wiring.
-- [ ] #846: EPAR imputes because nothing was asked; verdict stands.
-- [ ] #585 / #575: EPAR corroborates the ladder; the purchase-side bias
+- [X] #846: EPAR imputes because nothing was asked; verdict stands.
+- [X] #585 / #575: EPAR corroborates the ladder; the purchase-side bias
   (=SYNTHESIS.org:750-753=) must be disclosed by any =valuation=== kwarg.
-- [ ] #737: EPAR's TLU coefficients are unsourced; ours cite Jahnke 1982.
-- [ ] #439: L4's finding and the =season= / =plot_cultivation= caveats.
-- [ ] #438: the consumption-by-source repo covers the EHCVM tier and
+- [X] #737: EPAR's TLU coefficients are unsourced; ours cite Jahnke 1982.
+- [X] #439: L4's finding and the =season= / =plot_cultivation= caveats.
+- [X] #438: the consumption-by-source repo covers the EHCVM tier and
   ships a crop-category crosswalk to screen against #833.
 
 ** DONE Refresh =GAP_RANKING.org= GAP 5                             :docs:
