@@ -59,6 +59,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 import importlib.util
@@ -3079,6 +3080,23 @@ class Country:
             check_declared_columns(
                 df, _required_scheme_columns(scheme_entry),
                 country=self.name, table=str(method_name or "?"))
+
+            # SITE Q of the content audit (GH #857).  Site B asks whether a
+            # declared column holds ANYTHING; this asks whether what it holds
+            # is POSSIBLE.  Tanzania 2020-21 reports 7,500,000 kg of coconuts
+            # from one plot: present, non-null, correctly typed, uniquely
+            # indexed, and graded `sane`.  It COUNTS AND NAMES the rows and
+            # changes not one value -- see lsms_library/quantity_audit.py for
+            # the rule and for why clipping is the wrong repair.
+            #
+            # Here for the same two reasons as SITE B: `_finalize_result` runs
+            # on EVERY read, warm cache included, so the finding needs no
+            # stamp-and-replay (unlike GH #323, the evidence is IN the
+            # parquet); and it is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # this costs no cache invalidation.  MEASURED, not assumed: 0 of 12
+            # probed table hashes and 0 of 5 build fingerprints moved.
+            check_quantities(
+                df, country=self.name, table=str(method_name or "?"))
 
         return df
 

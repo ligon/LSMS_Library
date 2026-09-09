@@ -1,0 +1,116 @@
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-quantity-screen/lsms_library/__init__.py
+  Uganda: no warm parquet at /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Uganda/var/crop_production.parquet -- skipped
+
+293,868 rows over 4 countries: ['Ethiopia', 'Malawi', 'Nigeria', 'Tanzania']
+
+q=0.9 min_n=30 K=10: 609 rows {'Ethiopia': 232, 'Malawi': 198, 'Nigeria': 94, 'Tanzania': 85}
+q=0.9 min_n=30 K=30: 165 rows {'Ethiopia': 63, 'Malawi': 46, 'Nigeria': 23, 'Tanzania': 33}
+q=0.9 min_n=30 K=50: 94 rows {'Ethiopia': 26, 'Malawi': 27, 'Nigeria': 19, 'Tanzania': 22}
+q=0.9 min_n=30 K=100: 49 rows {'Ethiopia': 10, 'Malawi': 16, 'Nigeria': 9, 'Tanzania': 14}
+q=0.9 min_n=30 K=150: 34 rows {'Ethiopia': 4, 'Malawi': 11, 'Nigeria': 7, 'Tanzania': 12}
+q=0.9 min_n=30 K=200: 25 rows {'Ethiopia': 3, 'Malawi': 9, 'Nigeria': 3, 'Tanzania': 10}
+q=0.9 min_n=30 K=300: 21 rows {'Ethiopia': 1, 'Malawi': 9, 'Nigeria': 3, 'Tanzania': 8}
+q=0.9 min_n=30 K=500: 18 rows {'Malawi': 8, 'Nigeria': 2, 'Tanzania': 8}
+
+q=0.95 min_n=30 K=10: 308 rows {'Ethiopia': 117, 'Malawi': 98, 'Nigeria': 46, 'Tanzania': 47}
+q=0.95 min_n=30 K=30: 94 rows {'Ethiopia': 27, 'Malawi': 30, 'Nigeria': 15, 'Tanzania': 22}
+q=0.95 min_n=30 K=50: 55 rows {'Ethiopia': 12, 'Malawi': 20, 'Nigeria': 7, 'Tanzania': 16}
+q=0.95 min_n=30 K=100: 27 rows {'Ethiopia': 6, 'Malawi': 9, 'Nigeria': 2, 'Tanzania': 10}
+q=0.95 min_n=30 K=150: 22 rows {'Ethiopia': 4, 'Malawi': 9, 'Nigeria': 1, 'Tanzania': 8}
+q=0.95 min_n=30 K=200: 20 rows {'Ethiopia': 2, 'Malawi': 9, 'Nigeria': 1, 'Tanzania': 8}
+q=0.95 min_n=30 K=300: 17 rows {'Ethiopia': 1, 'Malawi': 8, 'Nigeria': 1, 'Tanzania': 7}
+q=0.95 min_n=30 K=500: 12 rows {'Malawi': 7, 'Tanzania': 5}
+
+q=0.99 min_n=30 K=10: 71 rows {'Ethiopia': 19, 'Malawi': 31, 'Nigeria': 9, 'Tanzania': 12}
+q=0.99 min_n=30 K=30: 25 rows {'Ethiopia': 4, 'Malawi': 13, 'Nigeria': 2, 'Tanzania': 6}
+q=0.99 min_n=30 K=50: 18 rows {'Ethiopia': 2, 'Malawi': 9, 'Nigeria': 1, 'Tanzania': 6}
+q=0.99 min_n=30 K=100: 15 rows {'Ethiopia': 1, 'Malawi': 9, 'Nigeria': 1, 'Tanzania': 4}
+q=0.99 min_n=30 K=150: 11 rows {'Malawi': 8, 'Tanzania': 3}
+q=0.99 min_n=30 K=200: 8 rows {'Malawi': 7, 'Tanzania': 1}
+q=0.99 min_n=30 K=300: 5 rows {'Malawi': 5}
+q=0.99 min_n=30 K=500: 5 rows {'Malawi': 5}
+
+--- the ratio ranking under the SHIPPED rule (q=0.90, min_n=30) ---
+ country       t                  i                      plot                        j                                  u  Quantity     ref  rung        ratio
+Tanzania 2020-21        9640-001-99                         1                 Coconuts                                 kg 7500000.0   680.0 t,u,j 11029.411765
+  Malawi 2019-20       104071840057                  RG02_R01                    Beans                       Pail (Large)   48000.0     6.0 t,u,j  8000.000000
+  Malawi 2019-20       209104470060                  RG02_R01                    Maize                          50 kg Bag   56000.0    15.0 t,u,j  3733.333333
+  Malawi 2019-20       210664640215                  RG01_R01                    Maize                          50 kg Bag   50000.0    15.0 t,u,j  3333.333333
+Tanzania 2020-21        9640-001-99                         1             Other Fruits                                 kg 2400000.0   752.5 t,u,j  3189.368771
+  Malawi 2019-20     203030650050_1                  RG02_R01                Groundnut                          50 kg Bag   42000.0    15.0 t,u,j  2800.000000
+  Malawi 2019-20       301054940005                  RG02_R01                    Maize                          50 kg Bag   27000.0    15.0 t,u,j  1800.000000
+Tanzania 2020-21        9169-001-99                         1                   Pulses                                 kg  640000.0   400.0 t,u,j  1600.000000
+ Nigeria  2011Q1              80138                         1                    Maize                                NaN    1800.0     1.2 t,u,j  1500.000000
+Tanzania 2020-21           2677-001                         1             Ripe Bananas                                 kg 1505400.0  1500.0 t,u,j  1003.600000
+Tanzania 2019-20     01020030030174                         4             Leafy Greens                                 kg  800000.0   847.0   t,u   944.510035
+  Malawi 2019-20       202042710069                  RG03_R01                     Rice                          50 kg Bag   15000.0    16.0 t,u,j   937.500000
+  Malawi 2019-20     207053720025_1                  RG02_R01                Groundnut                       Pail (Large)   48000.0    60.0 t,u,j   800.000000
+Tanzania 2020-21           3740-001                         1             Other Fruits                                 kg  591300.0   752.5 t,u,j   785.780731
+Tanzania 2020-21           3740-001                         2             Other Fruits                                 kg  525600.0   752.5 t,u,j   698.471761
+  Malawi 2019-20       303026010024                  RG09_R01                    Maize                          50 kg Bag   10000.0    15.0 t,u,j   666.666667
+ Nigeria  2016Q1             120100                         2           Cassava--roots                              Stalk   60000.0   100.0   t,u   600.000000
+Tanzania 2020-21           3740-001                         2            Cassava Fresh                                 kg  475000.0   885.0 t,u,j   536.723164
+Ethiopia 2015-16     04040501902092      0404050190209208_1_6                    Maize                                 Kg   50000.0   101.2 t,u,j   494.071146
+ Nigeria  2011Q1              20045                         2                    Maize                                NaN     500.0     1.2 t,u,j   416.666667
+  Malawi 2016-17 cs-17-203043150235                  RG01_R01                   Nkwani                          50 kg Bag    2015.0     5.0 t,u,j   403.000000
+Ethiopia 2018-19 010701088802004022  01070108880200402201_1_3                    Maize Tasa/Tanika/Shember/Selemon Medium   10010.0    40.0 t,u,j   250.250000
+Tanzania 2020-21        4499-001-03                         1             Other Fruits                                 kg  172500.0   752.5 t,u,j   229.235880
+Tanzania 2020-21           2886-001                         2             Ripe Bananas                                 kg  316800.0  1500.0 t,u,j   211.200000
+Ethiopia 2018-19 010701088802004034  01070108880200403401_1_2                    Maize Tasa/Tanika/Shember/Selemon Medium    8190.0    40.0 t,u,j   204.750000
+ Nigeria  2013Q1             100043                         1               Yam--roots                                 Kg  600000.0  3000.0 t,u,j   200.000000
+Ethiopia 2015-16     04040501902092     0404050190209208_1_10                     Teff                                 Kg   50000.0   250.0 t,u,j   200.000000
+ Nigeria  2016Q1             260040                         1               Yam--roots                           Sack/Bag    3500.0    20.0   t,u   175.000000
+Tanzania 2020-21           2010-001                         6                   Timber                                 kg 4000000.0 23088.0 t,u,j   173.250173
+Tanzania 2020-21        2714-001-04                         1             Other Fruits                                 kg  126501.0   752.5 t,u,j   168.107641
+  Malawi 2016-17 cs-17-202012800516                  RG03_R01                   Nkwani                    Other (Specify)    2016.0    12.0   t,u   168.000000
+ Nigeria  2011Q1             150062                         1                    Maize                                NaN     200.0     1.2 t,u,j   166.666667
+ Nigeria  2011Q1              80138                         4                    Maize                                NaN     200.0     1.2 t,u,j   166.666667
+  Malawi 2019-20       107343700385                  RG02_R01                  Cabbage                    Other (Specify)    2300.0    15.0   t,u   153.333333
+Tanzania 2020-21        9461-001-99                         1 Millet & Sorghum (grain)                                 kg  120000.0   800.0 t,u,j   150.000000
+Ethiopia 2015-16     03071001703056      0307100170305601_9_1                  Berbere                            Quintal     600.0     4.0 t,u,j   150.000000
+Ethiopia 2013-14     04050803103115      0405080310311502_1_1                    Maize                                 Kg   30000.0   200.0 t,u,j   150.000000
+Ethiopia 2018-19 010701088802004010  01070108880200401001_4_1                     Teff Madaberia/Nuse/Shera/Cheret Medium     854.0     6.0 t,u,j   142.333333
+  Malawi 2019-20       105082070021                  RG04_R01                    Maize                          50 kg Bag    2019.0    15.0 t,u,j   134.600000
+  Malawi 2019-20       303115510106                  RG02_R01                    Maize                          50 kg Bag    2018.0    15.0 t,u,j   134.533333
+  Malawi 2019-20       101034140053                  RG01_R01                Groundnut                          50 kg Bag    2016.0    15.0 t,u,j   134.400000
+  Malawi 2016-17       105053100003                  RG01_R01                    Maize                          50 kg Bag    2016.0    15.0 t,u,j   134.400000
+ Nigeria  2013Q1             120066                         1               Yam--roots                                 Kg  400000.0  3000.0 t,u,j   133.333333
+Ethiopia 2015-16     06040500203050      0604050020305001_2_5       Other pulse or nut                                 Kg   15000.0   120.0   t,u   125.000000
+Ethiopia 2015-16     04040501902092     0404050190209208_1_12                   Barley                                 Kg   25000.0   200.0 t,u,j   125.000000
+Ethiopia 2013-14     04130600204005      0413060020400501_2_1                   Barley                            Quintal     750.0     6.0 t,u,j   125.000000
+ Nigeria  2016Q1              70124                         1                   Cowpea                       Paint rubber    4200.0    36.0   t,u   116.666667
+  Malawi 2016-17 cs-17-312017840208                  RG01_R01     Pigeon Pea (Nandolo)                    Other (Specify)     500.0     4.7 t,u,j   106.382979
+Tanzania 2020-21           2886-001                         2             Other Fruits                                 kg   77644.0   752.5 t,u,j   103.181395
+  Malawi 2013-14       307086650051                       R01                   Nkwani                              Bunch    2500.0    25.0 t,u,j   100.000000
+ Nigeria  2016Q1             320167                         1           Cassava--roots                              Basin    5000.0    50.0 t,u,j   100.000000
+  Malawi 2019-20       301024890093                  RG02_R02               Sugar Cane                    Other (Specify)    1500.0    15.0   t,u   100.000000
+ Nigeria  2013Q1              90085                         1           Cassava--roots                              Basin    3000.0    30.0 t,u,j   100.000000
+Ethiopia 2021-22 060105088801701011  06010508880170101101_2_1                  Sorghum                                 Kg   19000.0   200.0 t,u,j    95.000000
+  Malawi 2019-20       103011510007                  TG01_T02                   Banana                              Bunch    3000.0    31.6 t,u,j    94.936709
+ Nigeria  2019Q1              99040                         4                    Cocoa                           Sack/Bag     845.0     9.0 t,u,j    93.888889
+Tanzania 2020-21           5034-001                         1             Ripe Bananas                                 kg  140000.0  1500.0 t,u,j    93.333333
+Ethiopia 2018-19 010701088802004022  01070108880200402201_1_2                  Sorghum Madaberia/Nuse/Shera/Cheret Medium     610.0     7.4 t,u,j    82.432432
+  Malawi 2016-17 cs-17-210765050014                  RG04_R01               Sugar Cane                              Piece   20000.0   250.0   t,u    80.000000
+  Malawi 2010-11       207054950261                        R2                    Maize                          50 kg Bag    1500.0    19.0 t,u,j    78.947368
+Ethiopia 2013-14     03100101106159      0310010110615901_2_1                     Teff                            Quintal     375.0     5.0 t,u,j    75.000000
+Ethiopia 2021-22 071901088803902045 07190108880390204501_1_10                   Godere Madaberia/Nuse/Shera/Cheret Medium     150.0     2.0 t,u,j    75.000000
+  Malawi 2019-20       307056230157                  TG02_T01                      Tea                         Kilogramme    7000.0   100.0   t,u    70.000000
+Tanzania 2020-21           6245-001                         1            Yams/Cocoyams                                 kg   40000.0   588.0 t,u,j    68.027211
+Tanzania 2020-21           6099-001                         1             Other Fruits                                 kg   50972.0   752.5 t,u,j    67.736877
+Tanzania 2020-21           2677-001                         1             Other Fruits                                 kg   50625.0   752.5 t,u,j    67.275748
+ Nigeria  2013Q1             120066                         1           Cassava--roots                                 Kg  200000.0  3000.0 t,u,j    66.666667
+ Nigeria  2011Q1              20028                         1      Guinea corn/sorghum                           Sack/Bag    2700.0    40.8 t,u,j    66.176471
+Ethiopia 2018-19 010701088802004034  01070108880200403401_1_2                  Sorghum Madaberia/Nuse/Shera/Cheret Medium     488.0     7.4 t,u,j    65.945946
+ Nigeria  2016Q1              40088                         1               Yam--roots                               Heap    2600.0    40.0 t,u,j    65.000000
+
+ratio quantiles -- look for a gap; there is none:
+count     277277.000000
+mean           0.678165
+std           29.677707
+min            0.000000
+90%            1.000000
+99%            3.703704
+99.9%         20.000000
+99.99%       173.726826
+max        11029.411765
+Name: ratio, dtype: float64

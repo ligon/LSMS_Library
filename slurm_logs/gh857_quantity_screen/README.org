@@ -1,0 +1,38 @@
+#+title: GH #857 -- the quantity plausibility screen: raw records
+#+date: 2026-09-09
+
+Everything here exists so the threshold in =lsms_library/quantity_audit.py= is
+*re-checkable rather than merely asserted*, the same way
+=slurm_logs/null_read_guard/= backs =_NULL_FRACTION_TRIGGER=.  All four scripts
+are read-only: they take every country from its warm L2-country
+=crop_production= parquet under =data_root()=, name and skip any country whose
+parquet is absent, and never call =Country()= or build anything.  Each prints
+the =lsms_library.__file__= it imported, so a worktree/main mix-up is visible
+rather than silent (CLAUDE.md, scrum-master addendum 3).
+
+| file | what it is |
+|------+------------|
+| =measure_firing.py= | the corpus firing count, per country and wave. |
+| =firing_2026-09-09.txt= | its output on the day the screen landed: *85 rows of 427,551 (0.0199%)* over five countries. |
+| =sensitivity_sweep.py= | the K / quantile / min-cell sweep the rule was chosen from.  Prints the full ratio ranking so the (absent) gap can be looked for again. |
+| =sensitivity_2026-09-09.txt= | its output.  *Four countries, 293,868 rows* -- Uganda's parquet was absent at that moment (below), and the K choice was made on these four. |
+| =hash_probe.py=, =hash_before.json=, =hash_after.json= | the cache-invalidation measurement: 12 =Country._table_cache_hash= values and 5 =build_transforms_fingerprint= values, before and after the change.  *Byte-identical* -- Site Q costs no rebuild. |
+
+* Why two different row totals
+
+The firing count is five countries (427,551 rows, 85 fired); the sensitivity
+sweep is four (293,868 rows, 49 fired at the shipped K).  Uganda's
+=crop_production= parquets were being cleared and rebuilt by a concurrent
+workstream throughout, so the two readings caught it in different states.  The
+five-country reading is the one quoted in =quantity_audit.py='s docstring and
+in CLAUDE.md; the four-country sweep is what the threshold was *chosen* on.
+Re-run either after an Uganda re-warm and both will agree at five.
+
+* The one thing worth re-reading before touching =QUANTITY_OUTLIER_K=
+
+The ratio distribution has *no discontinuity*: p90 = 1.0, p99 = 3.7,
+p99.9 = 20, p99.99 = 174, max 11,029, smoothly.  100 is an argued tolerance,
+not a measured boundary, and this sweep is what makes that statement checkable
+rather than a hedge.  Tanzania's 4,000,000 kg Timber row sits at 173.3x and is
+the binding constraint from above -- loosen K past ~170 and the row GH #857
+names stops firing.
