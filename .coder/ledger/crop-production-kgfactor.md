@@ -187,7 +187,22 @@ Cited, not paraphrased.
    is a design question for the wiring branch, not something to decide
    silently here. `harvest_kg_factors` makes it auditable: group its output
    by `u` and look.
-3. Should `KgFactor` disagreement above the 10% band be a WARNING (the
+3. **`SURVEY_MEDIAN_MIN_REPORTS = 5` is DECLARED, not measured.** The
+   `Quantity_kg` antecedent needed no such threshold — a conversion table has
+   no gaps, so there was never a median to license. N is this design's new
+   tunable, and no country carries `KgFactor` yet, so there is nothing in the
+   corpus to measure it against. The wiring branch is where it gets a
+   measured value (Uganda's per-`(u, condition)` report counts are the
+   obvious evidence base). Until then it is a `min_reports=` kwarg and a
+   documented constant, deliberately not a tuned number pretending otherwise.
+4. **The provenance counts POOL across countries.** `attrs` carries
+   `{layer: n}` over all input rows, so on a `Feature('crop_production')`
+   frame spanning several countries the tally is a total, not coverage. The
+   per-row `harvest_kg_factors` frame answers the per-country question with
+   one `groupby('country')`; noted in that docstring. Whether the `attrs`
+   tally should itself be broken out per country is a question for the first
+   multi-country consumer, not something to guess at now.
+5. Should `KgFactor` disagreement above the 10% band be a WARNING (the
    `UnpriceableRowsWarning` precedent) rather than only an `attrs` entry?
    Deliberately not added — the refinement asked for disclosure, and a
    warning nobody reads is how GH #323 survived its first fix.

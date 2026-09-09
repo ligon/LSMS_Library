@@ -1809,7 +1809,9 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors` (1 litre = 1 kg for fluids).
     min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
-        ``N`` for the ``survey_median`` layer.
+        ``N`` for the ``survey_median`` layer.  One number is applied to
+        every group, but the groups are per country-wave, so a thin module
+        does not borrow a thick one's licence.
 
     Returns
     -------
@@ -1831,7 +1833,12 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
 
         ``kg_factor_sources``
             ``{layer: n_rows}`` over the INPUT rows, summing to
-            ``len(crop_production)``.
+            ``len(crop_production)``.  POOLED: on a cross-country
+            :class:`~lsms_library.feature.Feature` frame these counts run over
+            every country at once, so ``reported: 40000`` says nothing about
+            WHICH country reported.  Read it as a total, never as coverage;
+            the per-row frame answers the real question with one
+            ``groupby('country')``.
         ``kg_factor_disagreement``
             For ``reported_vs_survey_median`` and ``reported_vs_inferred``:
             ``{'both': n, 'disagree': k, 'share': k/n or None}``, where
