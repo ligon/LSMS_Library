@@ -68,8 +68,9 @@ visible as gaps. Decide nothing about how to aggregate.
   dtype.
 
 **Out of scope / non-goals:**
-- `period=`, scaling, annualisation — *any* transformation. Deferred to Phase II
-  and gated on the ask-order bias, which is measured but not adjudicated.
+- `period=`, scaling, annualisation — *any* transformation. Deferred to Phase II,
+  whose gates are **coverage and a missing-data contract** (§6), not a research
+  question.
 - A per-column or per-row window carrier (`recall_days:` on `Columns:`,
   extending `RecallWindow`). The right grain, and a Phase II decision.
 - The date-measurement pipeline: `melt_visit_intervals` wiring, exposure joins,
@@ -142,9 +143,9 @@ only here:
   on cache warmth, and a sweep of 193 warm parquets found zero mixed levels.
   GH #323's signature: the bug hiding behind the cache it poisons.
 
-Phase II remains unstarted and gated on the ask-order bias (§6).  Follow-up
-filed as GH #864 (`food_prices` misattributes Burkina Faso's now-visible
-unpriceable share).
+Phase II remains unstarted.  Its gates are coverage and a missing-data contract
+(§6) — both decisions, neither research.  Follow-up filed as GH #864
+(`food_prices` misattributes Burkina Faso's now-visible unpriceable share).
 
 ## §3 Constraints & assumptions
 
@@ -177,9 +178,40 @@ unpriceable share).
 
 ## §6 Open questions & risks
 
-- **The ask-order bias is measured but not adjudicated.** The first ask carries
-  1.84× (unaided) / 1.17× (diary-assisted) at *identical* interval lengths. It
-  gates Phase II's `period=`; it does not affect Phase I, which scales nothing.
+- **The ask-order bias does NOT gate Phase II.**  Recorded here because an
+  earlier draft of this charter said it did, and @ligon corrected it
+  (2026-09-09): *"I don't see how the ask-order bias is relevant to our narrow
+  issue.  It's another general issue."*  He is right.  `period=` divides a total
+  by a known exposure, and that arithmetic is correct GIVEN the total.  Whether
+  the total estimates true consumption is a measurement question — ask-order
+  bias, recall decay, list length, diary vs recall — and every one of those is a
+  general property of how these surveys elicit consumption.  Withholding a
+  correct conversion because its input carries measurement error is not a
+  coherent policy: by that standard `food_expenditures` could not be reported
+  either, since it carries the identical error.  The same mistake as importing
+  the list-length problem into scope, made twice in one session.
+
+  What survives is a DOCUMENTATION note, not a hold: a single-ask 7-day survey
+  is *entirely* first-ask, whereas GhanaLSS's 30 days is one first-ask premium
+  spread over six asks (1.84× unaided / 1.17× diary-assisted, measured at
+  identical interval lengths).  The premium therefore enters the two at
+  different weights and dividing by days does not equalise it.  Say so beside
+  `period=`; do not withhold it.  Note the illusion of comparability already
+  exists — callers compare `food_expenditures` totals across countries today
+  without knowing the windows differ at all.
+
+- **Phase II's actual gates, both decisions rather than research:**
+  1. *Coverage.*  `total_exposure_days` is known for **28 of 67 cells**.
+     `period=` is undefined for the other 39 — 33 `not-recorded`, 5 varying
+     within the wave, and GLSS5 whose spacing is unestablished.  What share is
+     enough to ship on is a judgement.
+  2. *A missing-data contract.*  The red-team argued **Contract B** — a typed
+     raise from `Country(...)`, structured degrade plus one aggregated warning
+     from `Feature(...)`, by analogy with `LabelUnavailableError` — and against
+     NaN, which propagates into `sum()` as `0.0`.  GH #828 is the live
+     precedent for why silent-empty is the wrong answer.
+  3. *`food_prices` must REJECT `period=`.*  A price is not a flow, and someone
+     will add it for symmetry unless it is refused explicitly.
 - **`n_items` from delivered `j` is a proxy** for instrument list length —
   households report only what they consumed, so the wave-level union
   approximates the printed list but does not equal it. Label it as delivered.
