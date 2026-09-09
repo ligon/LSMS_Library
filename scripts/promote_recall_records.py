@@ -198,7 +198,13 @@ def main() -> int:
 #: Countries whose delivered `food_acquired` carries a `visit` index level, so
 #: the ask count is observable rather than merely claimed.  Kept explicit rather
 #: than probed, so promotion needs no warm cache and no build.
-_VISIT_LEVEL_COUNTRIES = {"GhanaLSS"}
+_VISIT_LEVEL_COUNTRIES = {
+    "GhanaLSS",
+    # 2014 EMC carries `visit` 1..4 since the four-passage fix (#851);
+    # its other waves get a constant `visit = 1` from add_visit_level,
+    # which the `asks > 1` guard correctly leaves as `declared`.
+    "Burkina_Faso",
+}
 
 
 if __name__ == "__main__":
