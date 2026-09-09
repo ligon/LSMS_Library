@@ -1,0 +1,444 @@
+country,j,item_class,farmgate_form,n_gap_cells,pairs
+Ethiopia,Butter/ghee,animal products,processed,94,unit_value_vs_community_price
+Ethiopia,Cheese,animal products,processed,26,unit_value_vs_community_price
+Ethiopia,Eggs,animal products,same_good,270,unit_value_vs_community_price
+Ethiopia,Milk,animal products,same_good,385,unit_value_vs_community_price
+Ethiopia,Avocado,fresh produce,same_good,4,unit_value_vs_crop_sale_price
+Ethiopia,Banana,fresh produce,same_good,675,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Beetroot,fresh produce,same_good,1,unit_value_vs_crop_sale_price
+Ethiopia,Berbere,fresh produce,processed,1141,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Carrot,fresh produce,same_good,2,unit_value_vs_crop_sale_price
+Ethiopia,Chat/Kat,fresh produce,same_good,303,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Fenugreek,fresh produce,same_good,1,unit_value_vs_crop_sale_price
+Ethiopia,Garlic,fresh produce,same_good,4,unit_value_vs_crop_sale_price
+Ethiopia,Hops (gesho),fresh produce,same_good,3,unit_value_vs_crop_sale_price
+Ethiopia,Kariya,fresh produce,same_good,754,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Leafy Greens,fresh produce,same_good,511,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Mango,fresh produce,same_good,29,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Onion,fresh produce,same_good,2658,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Orange,fresh produce,same_good,97,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Other fruit,fresh produce,same_good,13,unit_value_vs_community_price
+Ethiopia,Other vegetable,fresh produce,same_good,12,unit_value_vs_community_price
+Ethiopia,Papaya,fresh produce,same_good,4,unit_value_vs_crop_sale_price
+Ethiopia,Tomato,fresh produce,same_good,1220,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Beer,processed & beverages,n_a,46,unit_value_vs_community_price
+Ethiopia,Coffee,processed & beverages,processed,1389,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Oils,processed & beverages,processed,1780,unit_value_vs_community_price
+Ethiopia,Salt,processed & beverages,processed,2337,unit_value_vs_community_price
+Ethiopia,Soda,processed & beverages,n_a,192,unit_value_vs_community_price
+Ethiopia,Sugar,processed & beverages,processed,2033,unit_value_vs_community_price
+Ethiopia,Tea,processed & beverages,processed,519,unit_value_vs_community_price
+Ethiopia,Chick Pea,pulses & oilseeds,same_good,382,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Field Pea,pulses & oilseeds,same_good,401,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Ground nuts,pulses & oilseeds,same_good,59,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Haricot Beans,pulses & oilseeds,same_good,170,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Horsebeans,pulses & oilseeds,same_good,624,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Lentils,pulses & oilseeds,same_good,737,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Linseed,pulses & oilseeds,same_good,75,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Niger Seed,pulses & oilseeds,same_good,53,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Other pulse or nut,pulses & oilseeds,same_good,16,unit_value_vs_community_price
+Ethiopia,Other seed,pulses & oilseeds,same_good,4,unit_value_vs_community_price
+Ethiopia,Sesame,pulses & oilseeds,same_good,4,unit_value_vs_crop_sale_price
+Ethiopia,Boye/Yam,roots & tubers,same_good,3,unit_value_vs_community_price
+Ethiopia,Bula,roots & tubers,processed,17,unit_value_vs_community_price
+Ethiopia,Cassava,roots & tubers,same_good,4,unit_value_vs_community_price
+Ethiopia,Godere,roots & tubers,same_good,11,unit_value_vs_community_price
+Ethiopia,Kocho,roots & tubers,processed,58,unit_value_vs_community_price
+Ethiopia,Other tuber or stem,roots & tubers,same_good,7,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Potato,roots & tubers,same_good,1436,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Sweet potato,roots & tubers,same_good,25,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Barley,staple grains & flours,processed,165,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Maize,staple grains & flours,same_good,765,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Millet,staple grains & flours,same_good,64,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Other cereal,staple grains & flours,same_good,8,unit_value_vs_community_price
+Ethiopia,Rice,staple grains & flours,same_good,3,unit_value_vs_crop_sale_price
+Ethiopia,Sorghum,staple grains & flours,same_good,391,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Teff,staple grains & flours,same_good,1096,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Ethiopia,Vetch,staple grains & flours,same_good,1,unit_value_vs_crop_sale_price
+Ethiopia,Wheat,staple grains & flours,processed,697,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+GhanaLSS,Beef,animal products,same_good,9,unit_value_vs_community_price
+GhanaLSS,Beef (leg),animal products,same_good,5,unit_value_vs_community_price
+GhanaLSS,Chicken,animal products,same_good,15,community_price_vs_own_consumption_valuation
+GhanaLSS,Chicken (broiler),animal products,same_good,9,unit_value_vs_community_price
+GhanaLSS,Chicken (live),animal products,same_good,17,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Chicken (thigh),animal products,same_good,6,unit_value_vs_community_price
+GhanaLSS,Chicken (wing),animal products,same_good,7,unit_value_vs_community_price
+GhanaLSS,Egg,animal products,same_good,47,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Fish (canned),animal products,processed,5,unit_value_vs_community_price
+GhanaLSS,Fish (dried),animal products,processed,1,unit_value_vs_community_price
+GhanaLSS,Fish (fresh and frozen),animal products,same_good,1,community_price_vs_own_consumption_valuation
+GhanaLSS,Fish (salted),animal products,processed,3,unit_value_vs_community_price
+GhanaLSS,"Fish (smoked, river)",animal products,processed,2,unit_value_vs_community_price
+GhanaLSS,Goat,animal products,same_good,28,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Guineafowl,animal products,same_good,7,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Herring (smoked),animal products,processed,2,unit_value_vs_community_price
+GhanaLSS,Honey,animal products,same_good,3,unit_value_vs_community_price
+GhanaLSS,Ice Cream,animal products,processed,8,unit_value_vs_community_price
+GhanaLSS,Mackerel (processed),animal products,processed,5,unit_value_vs_community_price
+GhanaLSS,Margarine,animal products,processed,3,unit_value_vs_community_price
+GhanaLSS,Milk (evaporated),animal products,processed,2,unit_value_vs_community_price
+GhanaLSS,Milk (fresh),animal products,same_good,4,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Milk (powdered),animal products,processed,8,unit_value_vs_community_price
+GhanaLSS,"Milk (tinned, condensed)",animal products,processed,1,unit_value_vs_community_price
+GhanaLSS,Other Fish,animal products,same_good,16,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Other Meat,animal products,same_good,17,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Other Milk Products,animal products,processed,9,unit_value_vs_community_price
+GhanaLSS,Pork,animal products,same_good,7,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Pork (feet),animal products,same_good,1,unit_value_vs_community_price
+GhanaLSS,Sausage (beef),animal products,processed,2,unit_value_vs_community_price
+GhanaLSS,Tuna (processed),animal products,processed,1,unit_value_vs_community_price
+GhanaLSS,Yoghurt,animal products,processed,10,unit_value_vs_community_price
+GhanaLSS,Apple,fresh produce,same_good,2,unit_value_vs_community_price
+GhanaLSS,Avocado,fresh produce,same_good,9,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Banana,fresh produce,same_good,12,community_price_vs_own_consumption_valuation;unit_value_vs_own_consumption_valuation
+GhanaLSS,Carrot,fresh produce,same_good,1,unit_value_vs_community_price
+GhanaLSS,Cocoyam Leaves,fresh produce,same_good,1,unit_value_vs_community_price
+GhanaLSS,Dawadawa,fresh produce,same_good,4,unit_value_vs_own_consumption_valuation
+GhanaLSS,Eggplant,fresh produce,same_good,7,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Eggplant/Cucumber,fresh produce,same_good,1,community_price_vs_own_consumption_valuation
+GhanaLSS,Garlic,fresh produce,same_good,3,unit_value_vs_community_price
+GhanaLSS,Mango,fresh produce,same_good,9,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Okra,fresh produce,same_good,35,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Onion,fresh produce,same_good,11,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Orange,fresh produce,same_good,12,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Other Fruits,fresh produce,same_good,2,unit_value_vs_own_consumption_valuation
+GhanaLSS,Other Vegetables,fresh produce,same_good,13,unit_value_vs_own_consumption_valuation
+GhanaLSS,Pawpaw,fresh produce,same_good,7,unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Pepper,fresh produce,same_good,12,community_price_vs_own_consumption_valuation
+GhanaLSS,"Pepper (dried, red)",fresh produce,processed,2,unit_value_vs_community_price
+GhanaLSS,Pepper (fresh),fresh produce,same_good,23,unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Pepper (powder),fresh produce,processed,6,unit_value_vs_community_price
+GhanaLSS,Pineapple,fresh produce,same_good,8,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Tomato,fresh produce,same_good,1,community_price_vs_own_consumption_valuation
+GhanaLSS,Tomato (fresh),fresh produce,same_good,15,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Tomato (paste),fresh produce,processed,13,unit_value_vs_community_price
+GhanaLSS,Watermelon,fresh produce,same_good,4,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Akpeteshie,processed & beverages,n_a,11,unit_value_vs_community_price
+GhanaLSS,Beer,processed & beverages,n_a,15,unit_value_vs_community_price
+GhanaLSS,Bitters,processed & beverages,n_a,6,unit_value_vs_community_price
+GhanaLSS,Chewing Gum,processed & beverages,n_a,21,unit_value_vs_community_price
+GhanaLSS,Chocolate,processed & beverages,processed,1,unit_value_vs_community_price
+GhanaLSS,Cigarette,processed & beverages,n_a,10,unit_value_vs_community_price
+GhanaLSS,Cocoa (milk powder beverages),processed & beverages,processed,10,unit_value_vs_community_price
+GhanaLSS,Cocoa Powder,processed & beverages,processed,1,unit_value_vs_community_price
+GhanaLSS,Coffee,processed & beverages,processed,1,unit_value_vs_community_price
+GhanaLSS,Condiment,processed & beverages,processed,14,unit_value_vs_community_price
+GhanaLSS,Gin,processed & beverages,n_a,5,unit_value_vs_community_price
+GhanaLSS,Juice,processed & beverages,n_a,7,unit_value_vs_community_price
+GhanaLSS,Malt Drinks (bottle),processed & beverages,n_a,4,unit_value_vs_community_price
+GhanaLSS,Malt Drinks (canned),processed & beverages,n_a,7,unit_value_vs_community_price
+GhanaLSS,Oil (coconut),processed & beverages,processed,7,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Oil (groundnut),processed & beverages,processed,7,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Oil (palm kernel),processed & beverages,processed,18,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Oil (palm),processed & beverages,processed,35,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Oil (vegetable),processed & beverages,processed,25,unit_value_vs_community_price
+GhanaLSS,Other Beverages,processed & beverages,n_a,1,community_price_vs_own_consumption_valuation
+GhanaLSS,Other Oils,processed & beverages,processed,1,unit_value_vs_own_consumption_valuation
+GhanaLSS,Salt,processed & beverages,processed,6,unit_value_vs_community_price
+GhanaLSS,Soft Drinks,processed & beverages,n_a,8,unit_value_vs_community_price
+GhanaLSS,Sugar (cubed),processed & beverages,processed,1,unit_value_vs_community_price
+GhanaLSS,Sugar (granulated),processed & beverages,processed,3,unit_value_vs_community_price
+GhanaLSS,Tea,processed & beverages,processed,16,unit_value_vs_community_price
+GhanaLSS,Water,processed & beverages,n_a,15,unit_value_vs_community_price
+GhanaLSS,Whisky,processed & beverages,n_a,1,unit_value_vs_community_price
+GhanaLSS,Wine,processed & beverages,n_a,3,unit_value_vs_community_price
+GhanaLSS,Coconut (fresh),pulses & oilseeds,same_good,13,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Cowpea,pulses & oilseeds,same_good,17,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Groundnut,pulses & oilseeds,same_good,15,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Kola Nut,pulses & oilseeds,same_good,1,unit_value_vs_community_price
+GhanaLSS,Palm Nut,pulses & oilseeds,same_good,28,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Shea Butter,pulses & oilseeds,processed,14,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Snail,pulses & oilseeds,same_good,3,unit_value_vs_own_consumption_valuation
+GhanaLSS,Cassava,roots & tubers,same_good,2,community_price_vs_own_consumption_valuation
+GhanaLSS,Cassava (dough),roots & tubers,processed,17,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Cassava (dried),roots & tubers,processed,3,unit_value_vs_community_price
+GhanaLSS,Cassava (flour),roots & tubers,processed,1,community_price_vs_own_consumption_valuation
+GhanaLSS,Cassava (fresh),roots & tubers,same_good,42,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,"Cassava (yellow, flour)",roots & tubers,processed,14,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Cocoyam,roots & tubers,same_good,15,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Plantain,roots & tubers,same_good,36,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Yam,roots & tubers,same_good,15,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Biscuit,staple grains & flours,n_a,4,unit_value_vs_community_price
+GhanaLSS,Bread,staple grains & flours,n_a,10,unit_value_vs_community_price
+GhanaLSS,Cerelac (Baby food),staple grains & flours,n_a,8,unit_value_vs_community_price
+GhanaLSS,Corflake,staple grains & flours,n_a,1,unit_value_vs_community_price
+GhanaLSS,Guinea corn/sorghum,staple grains & flours,same_good,4,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Instant Noodle,staple grains & flours,n_a,2,unit_value_vs_community_price
+GhanaLSS,Kapla,staple grains & flours,n_a,7,unit_value_vs_community_price
+GhanaLSS,Macaroni,staple grains & flours,n_a,2,unit_value_vs_community_price
+GhanaLSS,Maize (cob),staple grains & flours,same_good,1,community_price_vs_own_consumption_valuation
+GhanaLSS,Maize (flour/dough),staple grains & flours,processed,24,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Maize (grain),staple grains & flours,same_good,2,unit_value_vs_community_price
+GhanaLSS,Millet,staple grains & flours,same_good,5,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Millet (flour),staple grains & flours,processed,4,unit_value_vs_own_consumption_valuation
+GhanaLSS,Rice (imported),staple grains & flours,processed,10,unit_value_vs_community_price
+GhanaLSS,Rice (local),staple grains & flours,same_good,25,community_price_vs_own_consumption_valuation;unit_value_vs_community_price;unit_value_vs_own_consumption_valuation
+GhanaLSS,Spaghetti,staple grains & flours,n_a,2,unit_value_vs_community_price
+GhanaLSS,Sugar Bread,staple grains & flours,n_a,2,unit_value_vs_community_price
+GhanaLSS,Wheat Flour,staple grains & flours,processed,1,unit_value_vs_community_price
+GhanaLSS,White Oats,staple grains & flours,n_a,1,unit_value_vs_community_price
+Malawi,Beef,animal products,same_good,50,unit_value_vs_community_price
+Malawi,Chicken,animal products,same_good,27,unit_value_vs_community_price
+Malawi,Eggs,animal products,same_good,196,unit_value_vs_community_price
+Malawi,Fresh Milk,animal products,same_good,54,unit_value_vs_community_price
+Malawi,Sun Dried Fish,animal products,processed,7,unit_value_vs_community_price
+Malawi,Banana,fresh produce,same_good,27,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Malawi,Cabbage,fresh produce,same_good,64,unit_value_vs_community_price
+Malawi,Nkwani,fresh produce,same_good,1,unit_value_vs_crop_sale_price
+Malawi,Onion,fresh produce,same_good,1,unit_value_vs_crop_sale_price
+Malawi,Papaya,fresh produce,same_good,2,unit_value_vs_crop_sale_price
+Malawi,Tomato,fresh produce,same_good,306,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Malawi,Cooking Oil,processed & beverages,processed,445,unit_value_vs_community_price
+Malawi,Salt,processed & beverages,processed,225,unit_value_vs_community_price
+Malawi,Sugar,processed & beverages,processed,790,unit_value_vs_community_price
+Malawi,Tea,processed & beverages,processed,274,unit_value_vs_community_price
+Malawi,Beans,pulses & oilseeds,same_good,276,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Malawi,Ground Bean,pulses & oilseeds,same_good,1,unit_value_vs_crop_sale_price
+Malawi,Groundnut,pulses & oilseeds,processed,8,unit_value_vs_crop_sale_price
+Malawi,Pigeon Pea (Nandolo),pulses & oilseeds,same_good,65,unit_value_vs_crop_sale_price
+Malawi,Cassava Tubers,roots & tubers,same_good,1,unit_value_vs_crop_sale_price
+Malawi,Irish Potato,roots & tubers,same_good,6,unit_value_vs_crop_sale_price
+Malawi,Bread,staple grains & flours,n_a,77,unit_value_vs_community_price
+Malawi,Chips (Vendor),staple grains & flours,n_a,31,unit_value_vs_community_price
+Malawi,Finger Millet,staple grains & flours,same_good,3,unit_value_vs_crop_sale_price
+Malawi,Maize Grain (Not As Ufa),staple grains & flours,same_good,98,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Malawi,Maize Ufa Mgaiwa (Normal Flour),staple grains & flours,processed,66,unit_value_vs_community_price
+Malawi,"Mandazi, Doughnut (Vendor)",staple grains & flours,n_a,122,unit_value_vs_community_price
+Malawi,Pearl Millet,staple grains & flours,same_good,1,unit_value_vs_crop_sale_price
+Malawi,Rice,staple grains & flours,processed,425,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Malawi,Sorghum,staple grains & flours,same_good,6,unit_value_vs_crop_sale_price
+Mali,Lait caillé,animal products,processed,17,unit_value_vs_community_price
+Mali,Lait frais,animal products,same_good,16,unit_value_vs_community_price
+Mali,Viande de bœuf,animal products,same_good,64,unit_value_vs_community_price
+Mali,Viande de mouton,animal products,same_good,18,unit_value_vs_community_price
+Mali,Viande de poulet,animal products,same_good,15,unit_value_vs_community_price
+Mali,Concentré de tomate,fresh produce,processed,36,unit_value_vs_community_price
+Mali,Feuilles d'oseille,fresh produce,same_good,14,unit_value_vs_community_price
+Mali,Feuilles de baobab,fresh produce,same_good,12,unit_value_vs_community_price
+Mali,Gombo,fresh produce,same_good,75,unit_value_vs_community_price
+Mali,Oignon,fresh produce,same_good,86,unit_value_vs_community_price
+Mali,Piment,fresh produce,same_good,42,unit_value_vs_community_price
+Mali,Tomate fraîche,fresh produce,same_good,35,unit_value_vs_community_price
+Mali,Tomate séchée,fresh produce,processed,18,unit_value_vs_community_price
+Mali,Boissons gazeuses,processed & beverages,n_a,18,unit_value_vs_community_price
+Mali,Cube alimentaire,processed & beverages,processed,60,unit_value_vs_community_price
+Mali,Huile de coton,processed & beverages,processed,16,unit_value_vs_community_price
+Mali,Huile de palme,processed & beverages,processed,30,unit_value_vs_community_price
+Mali,Sel,processed & beverages,processed,117,unit_value_vs_community_price
+Mali,Sucre,processed & beverages,processed,56,unit_value_vs_community_price
+Mali,Arachide,pulses & oilseeds,same_good,29,unit_value_vs_community_price
+Mali,Beurre de karité,pulses & oilseeds,processed,20,unit_value_vs_community_price
+Mali,Haricots secs,pulses & oilseeds,same_good,18,unit_value_vs_community_price
+Mali,Pâte d'arachide,pulses & oilseeds,processed,66,unit_value_vs_community_price
+Mali,Igname,roots & tubers,same_good,19,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Mali,Patate douce,roots & tubers,same_good,2,unit_value_vs_crop_sale_price
+Mali,Plantain,roots & tubers,same_good,15,unit_value_vs_community_price
+Mali,Blé,staple grains & flours,same_good,2,unit_value_vs_community_price
+Mali,Farine de blé,staple grains & flours,processed,14,unit_value_vs_community_price
+Mali,Farine de maïs,staple grains & flours,processed,4,unit_value_vs_community_price
+Mali,Farine de mil,staple grains & flours,processed,6,unit_value_vs_community_price
+Mali,Fonio,staple grains & flours,same_good,12,unit_value_vs_community_price
+Mali,Maïs,staple grains & flours,same_good,12,unit_value_vs_community_price
+Mali,Mil,staple grains & flours,same_good,17,unit_value_vs_community_price
+Mali,Pain,staple grains & flours,n_a,10,unit_value_vs_community_price
+Mali,Pâtes alimentaires,staple grains & flours,n_a,29,unit_value_vs_community_price
+Mali,Riz,staple grains & flours,same_good,35,unit_value_vs_community_price
+Mali,Sorgho,staple grains & flours,same_good,21,unit_value_vs_community_price
+Niger,Gombo frais,fresh produce,same_good,1,unit_value_vs_crop_sale_price
+Niger,Oignon frais,fresh produce,same_good,1,community_price_vs_crop_sale_price
+Niger,Tomate fraîche,fresh produce,same_good,1,unit_value_vs_crop_sale_price
+Niger,Niébé/Haricots secs,pulses & oilseeds,same_good,67,community_price_vs_crop_sale_price;unit_value_vs_crop_sale_price
+Niger,Sésame,pulses & oilseeds,same_good,1,unit_value_vs_crop_sale_price
+Niger,Mil,staple grains & flours,same_good,5,community_price_vs_crop_sale_price;unit_value_vs_crop_sale_price
+Niger,Sorgho,staple grains & flours,same_good,3,community_price_vs_crop_sale_price;unit_value_vs_crop_sale_price
+Nigeria,Baby milk powder,animal products,processed,1,unit_value_vs_community_price
+Nigeria,Beef,animal products,same_good,116,unit_value_vs_community_price
+Nigeria,Butter/Margarine,animal products,processed,3,unit_value_vs_community_price
+Nigeria,Cheese (wara),animal products,processed,1,unit_value_vs_community_price
+Nigeria,Chicken,animal products,same_good,22,unit_value_vs_community_price
+Nigeria,Duck,animal products,same_good,1,unit_value_vs_community_price
+Nigeria,Fish--dried,animal products,processed,15,unit_value_vs_community_price
+Nigeria,Fish--fresh,animal products,same_good,34,unit_value_vs_community_price
+Nigeria,Fish--frozen,animal products,same_good,31,unit_value_vs_community_price
+Nigeria,Fish--smoked,animal products,processed,10,unit_value_vs_community_price
+Nigeria,Fresh milk,animal products,same_good,19,unit_value_vs_community_price
+Nigeria,Goat,animal products,same_good,40,unit_value_vs_community_price
+Nigeria,Honey,animal products,same_good,3,unit_value_vs_community_price
+Nigeria,Milk powder,animal products,processed,9,unit_value_vs_community_price
+Nigeria,Milk tinned (unsweetened),animal products,processed,12,unit_value_vs_community_price
+Nigeria,Mutton,animal products,same_good,16,unit_value_vs_community_price
+Nigeria,Other domestic poultry,animal products,same_good,1,unit_value_vs_community_price
+Nigeria,Other meat (excl. poultry),animal products,same_good,2,unit_value_vs_community_price
+Nigeria,Other milk products,animal products,processed,1,unit_value_vs_community_price
+Nigeria,Pork,animal products,same_good,6,unit_value_vs_community_price
+Nigeria,"Seafood (lobster, crab, prawns, etc)",animal products,same_good,3,unit_value_vs_community_price
+Nigeria,Wild game meat,animal products,same_good,5,unit_value_vs_community_price
+Nigeria,Bananas,fresh produce,same_good,4,community_price_vs_crop_sale_price;unit_value_vs_crop_sale_price
+Nigeria,Dry Pepper,fresh produce,processed,5,unit_value_vs_community_price
+Nigeria,Fresh Pepper,fresh produce,same_good,31,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Garden eggs/egg plant,fresh produce,same_good,17,unit_value_vs_community_price
+Nigeria,Ground Pepper,fresh produce,processed,1,unit_value_vs_community_price
+Nigeria,"Leaves (Cocoyam, Spinach, etc.)",fresh produce,same_good,2,unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Okra--dried,fresh produce,processed,15,unit_value_vs_community_price
+Nigeria,Okra--fresh,fresh produce,same_good,39,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Onions,fresh produce,same_good,25,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Orange/tangerine,fresh produce,same_good,1,unit_value_vs_crop_sale_price
+Nigeria,Other vegetables (fresh or canned),fresh produce,same_good,7,unit_value_vs_community_price
+Nigeria,Tomato puree (canned),fresh produce,processed,12,unit_value_vs_community_price
+Nigeria,Tomatoes,fresh produce,same_good,60,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Unground Ogbono,fresh produce,processed,1,unit_value_vs_community_price
+Nigeria,Watermelon,fresh produce,same_good,1,unit_value_vs_community_price
+Nigeria,Beer (local and imported),processed & beverages,n_a,7,unit_value_vs_community_price
+Nigeria,Bottled water,processed & beverages,n_a,2,unit_value_vs_community_price
+Nigeria,Chocolate drinks (including Milo),processed & beverages,processed,6,unit_value_vs_community_price
+Nigeria,Coffee,processed & beverages,processed,1,unit_value_vs_community_price
+Nigeria,"Condiments (salt, spices, pepper, etc)",processed & beverages,processed,10,unit_value_vs_community_price
+Nigeria,Fruit juice canned/Pack,processed & beverages,n_a,1,unit_value_vs_community_price
+Nigeria,Gin,processed & beverages,n_a,1,unit_value_vs_community_price
+Nigeria,Groundnut oil,processed & beverages,processed,29,unit_value_vs_community_price
+Nigeria,Malt drinks,processed & beverages,n_a,26,unit_value_vs_community_price
+Nigeria,Other alcoholic beverages,processed & beverages,n_a,1,unit_value_vs_community_price
+Nigeria,Other non--alcoholic drinks,processed & beverages,n_a,1,unit_value_vs_community_price
+Nigeria,Other oils and fats,processed & beverages,processed,3,unit_value_vs_community_price
+Nigeria,Palm oil,processed & beverages,processed,71,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Palm wine,processed & beverages,n_a,4,unit_value_vs_community_price
+Nigeria,Pito,processed & beverages,n_a,3,unit_value_vs_community_price
+Nigeria,Sachet water,processed & beverages,n_a,33,unit_value_vs_community_price
+Nigeria,Salt,processed & beverages,processed,10,unit_value_vs_community_price
+Nigeria,"Soft drinks (Coca Cola, spirit, etc)",processed & beverages,n_a,47,unit_value_vs_community_price
+Nigeria,Sugar,processed & beverages,processed,10,unit_value_vs_community_price
+Nigeria,Tea,processed & beverages,processed,9,unit_value_vs_community_price
+Nigeria,Bambara nut,pulses & oilseeds,same_good,3,community_price_vs_crop_sale_price
+Nigeria,Brown beans,pulses & oilseeds,same_good,10,unit_value_vs_community_price
+Nigeria,Cashew nut,pulses & oilseeds,same_good,1,community_price_vs_crop_sale_price
+Nigeria,Groundnuts (shelled),pulses & oilseeds,same_good,7,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Groundnuts (unshelled),pulses & oilseeds,same_good,4,unit_value_vs_crop_sale_price
+Nigeria,Kola nut,pulses & oilseeds,same_good,3,community_price_vs_crop_sale_price
+Nigeria,Snails,pulses & oilseeds,same_good,3,unit_value_vs_community_price
+Nigeria,Soya beans,pulses & oilseeds,same_good,8,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Cassava flour,roots & tubers,processed,12,unit_value_vs_community_price
+Nigeria,Cassava--roots,roots & tubers,same_good,2,unit_value_vs_crop_sale_price
+Nigeria,Cocoyam,roots & tubers,same_good,2,unit_value_vs_crop_sale_price
+Nigeria,Gari--white,roots & tubers,processed,4,unit_value_vs_community_price
+Nigeria,Gari--yellow,roots & tubers,processed,18,unit_value_vs_community_price
+Nigeria,Plantains,roots & tubers,same_good,3,unit_value_vs_crop_sale_price
+Nigeria,Potatoes,roots & tubers,same_good,2,unit_value_vs_crop_sale_price
+Nigeria,Sweet potatoes,roots & tubers,same_good,2,unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Yam flour,roots & tubers,processed,9,unit_value_vs_community_price
+Nigeria,Yam--roots,roots & tubers,same_good,48,unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Biscuits,staple grains & flours,n_a,3,unit_value_vs_community_price
+Nigeria,Bread,staple grains & flours,n_a,1,unit_value_vs_community_price
+Nigeria,Cake,staple grains & flours,n_a,1,unit_value_vs_community_price
+Nigeria,Guinea corn/sorghum,staple grains & flours,same_good,35,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Maize,staple grains & flours,same_good,46,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Maize flour,staple grains & flours,processed,5,unit_value_vs_community_price
+Nigeria,Meat Pie/Sausage Roll,staple grains & flours,n_a,1,unit_value_vs_community_price
+Nigeria,Millet,staple grains & flours,same_good,25,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Other grains and flour,staple grains & flours,same_good,3,unit_value_vs_community_price
+Nigeria,Rice--imported,staple grains & flours,processed,17,unit_value_vs_community_price
+Nigeria,Rice--local,staple grains & flours,processed,38,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Nigeria,Wheat flour,staple grains & flours,processed,8,unit_value_vs_community_price
+Tanzania,Beef,animal products,same_good,14,unit_value_vs_community_price
+Tanzania,Chicken,animal products,same_good,4,unit_value_vs_community_price
+Tanzania,Eggs,animal products,same_good,2,unit_value_vs_community_price
+Tanzania,Fish (fresh),animal products,same_good,5,unit_value_vs_community_price
+Tanzania,Goat Meat,animal products,same_good,4,unit_value_vs_community_price
+Tanzania,Milk (dry or canned),animal products,processed,2,unit_value_vs_community_price
+Tanzania,Milk (fresh),animal products,same_good,2,unit_value_vs_community_price
+Tanzania,Citrus Fruits,fresh produce,same_good,15,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Leafy Greens,fresh produce,same_good,17,unit_value_vs_community_price
+Tanzania,Other Fruits,fresh produce,same_good,12,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Ripe Bananas,fresh produce,same_good,14,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Vegetables (fresh),fresh produce,same_good,28,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Cooking Oil,processed & beverages,processed,27,unit_value_vs_community_price
+Tanzania,Local Brews,processed & beverages,n_a,2,unit_value_vs_community_price
+Tanzania,Salt,processed & beverages,processed,14,unit_value_vs_community_price
+Tanzania,Sugar,processed & beverages,processed,18,unit_value_vs_community_price
+Tanzania,Tea (dry),processed & beverages,processed,22,unit_value_vs_community_price
+Tanzania,Coconuts,pulses & oilseeds,same_good,17,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Groundnuts,pulses & oilseeds,processed,12,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Pulses,pulses & oilseeds,same_good,52,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Cassava Dry/Flour,roots & tubers,processed,6,unit_value_vs_community_price
+Tanzania,Cassava Fresh,roots & tubers,same_good,14,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Irish Potatoes,roots & tubers,same_good,16,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Plantains,roots & tubers,same_good,4,unit_value_vs_community_price
+Tanzania,Sugarcane,roots & tubers,same_good,2,unit_value_vs_crop_sale_price
+Tanzania,Sweet Potatoes,roots & tubers,same_good,13,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,Yams/Cocoyams,roots & tubers,same_good,3,unit_value_vs_community_price
+Tanzania,Bread,staple grains & flours,n_a,7,unit_value_vs_community_price
+Tanzania,"Buns, Cakes And Biscuits",staple grains & flours,n_a,11,unit_value_vs_community_price
+Tanzania,Maize (flour),staple grains & flours,processed,32,unit_value_vs_community_price
+Tanzania,Maize (grain),staple grains & flours,same_good,16,community_price_vs_crop_sale_price;unit_value_vs_community_price;unit_value_vs_crop_sale_price
+Tanzania,"Maize (green, cob)",staple grains & flours,same_good,4,unit_value_vs_community_price
+Tanzania,Millet & Sorghum (flour),staple grains & flours,processed,4,unit_value_vs_community_price
+Tanzania,Millet & Sorghum (grain),staple grains & flours,same_good,4,community_price_vs_crop_sale_price
+Tanzania,Rice (husked),staple grains & flours,processed,39,unit_value_vs_community_price
+Tanzania,Rice (paddy),staple grains & flours,same_good,4,community_price_vs_crop_sale_price
+Uganda,Beef,animal products,same_good,103,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,"Butter, etc.",animal products,processed,28,reported_purchase_price_vs_unit_value
+Uganda,Chicken,animal products,same_good,32,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Eggs,animal products,same_good,69,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Fish (dried),animal products,processed,152,reported_purchase_price_vs_unit_value
+Uganda,Fish (fresh),animal products,same_good,159,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Ghee,animal products,processed,47,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Goat,animal products,same_good,30,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Ice Cream,animal products,processed,2,reported_purchase_price_vs_unit_value
+Uganda,Milk (fresh),animal products,same_good,173,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Other Meat,animal products,same_good,9,reported_purchase_price_vs_unit_value
+Uganda,Pork,animal products,same_good,23,reported_purchase_price_vs_unit_value
+Uganda,Yogurt,animal products,processed,2,reported_purchase_price_vs_unit_value
+Uganda,Cabbages,fresh produce,same_good,147,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Dodo,fresh produce,same_good,106,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Garlic,fresh produce,same_good,6,reported_purchase_price_vs_unit_value
+Uganda,Ginger,fresh produce,same_good,7,reported_purchase_price_vs_unit_value
+Uganda,Jackfruit,fresh produce,same_good,8,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Mangos,fresh produce,same_good,74,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Onions,fresh produce,same_good,370,reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Oranges,fresh produce,same_good,49,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Other Fruits,fresh produce,same_good,135,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Other Veg.,fresh produce,same_good,302,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Passion Fruits,fresh produce,same_good,59,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Sweet Bananas,fresh produce,same_good,153,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Tomatoes,fresh produce,same_good,294,reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Beer,processed & beverages,n_a,24,reported_purchase_price_vs_unit_value
+Uganda,Bongo,processed & beverages,n_a,4,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Cigarettes,processed & beverages,n_a,30,reported_purchase_price_vs_unit_value
+Uganda,Coffee,processed & beverages,processed,38,reported_purchase_price_vs_unit_value
+Uganda,Cooking Oil,processed & beverages,processed,332,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Jam/Marmalade,processed & beverages,processed,14,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Other Alcohol,processed & beverages,n_a,131,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Other Drinks,processed & beverages,n_a,7,reported_purchase_price_vs_unit_value
+Uganda,Other Juice,processed & beverages,n_a,5,reported_purchase_price_vs_unit_value
+Uganda,Other Spices,processed & beverages,processed,3,reported_purchase_price_vs_unit_value
+Uganda,Other Tobacco,processed & beverages,n_a,36,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Salt,processed & beverages,processed,438,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Soda,processed & beverages,n_a,91,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Sugar,processed & beverages,processed,132,reported_purchase_price_vs_unit_value
+Uganda,Tea,processed & beverages,processed,191,reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Waragi,processed & beverages,n_a,22,reported_purchase_price_vs_unit_value
+Uganda,Water,processed & beverages,n_a,9,reported_purchase_price_vs_unit_value
+Uganda,Beans,pulses & oilseeds,same_good,382,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Ground Nuts,pulses & oilseeds,processed,316,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Peas,pulses & oilseeds,same_good,56,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Sim Sim,pulses & oilseeds,processed,94,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Soybean,pulses & oilseeds,same_good,7,own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Cassava,roots & tubers,processed,212,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Cassava (flour),roots & tubers,processed,104,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Irish Potatoes,roots & tubers,same_good,97,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Matoke,roots & tubers,same_good,388,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Sugarcane,roots & tubers,same_good,17,own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Sweet Potatoes,roots & tubers,same_good,203,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Yam,roots & tubers,same_good,14,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Biscuits,staple grains & flours,n_a,10,reported_purchase_price_vs_unit_value
+Uganda,Bread,staple grains & flours,n_a,91,reported_purchase_price_vs_unit_value
+Uganda,Cake,staple grains & flours,n_a,5,reported_purchase_price_vs_unit_value
+Uganda,Chapati,staple grains & flours,n_a,70,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Donut,staple grains & flours,n_a,11,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Kabalagala,staple grains & flours,n_a,15,reported_purchase_price_vs_unit_value;unit_value_vs_own_consumption_valuation
+Uganda,Macaroni/Spaghetti,staple grains & flours,n_a,5,reported_purchase_price_vs_unit_value
+Uganda,Maize,staple grains & flours,processed,409,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Millet,staple grains & flours,processed,120,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Rice,staple grains & flours,processed,99,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Samosa,staple grains & flours,n_a,4,reported_purchase_price_vs_unit_value
+Uganda,Sorghum,staple grains & flours,same_good,129,own_consumption_valuation_vs_crop_sale_price;own_consumption_valuation_vs_crop_sale_price_soldunit;reported_purchase_price_vs_unit_value;unit_value_vs_crop_sale_price;unit_value_vs_crop_sale_price_soldunit;unit_value_vs_own_consumption_valuation
+Uganda,Wheat (flour),staple grains & flours,processed,3,reported_purchase_price_vs_unit_value

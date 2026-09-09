@@ -1,0 +1,135 @@
+pair,u,j,n_cells,median_gap,ratio,in_30_50
+community_price_vs_crop_sale_price,50 kg Bag,Maize Grain (Not As Ufa),14,0.18942142542437956,1.2085501589427077,False
+community_price_vs_crop_sale_price,50 kg Bag,Rice,6,0.1324625426645829,1.1416362526362478,False
+community_price_vs_crop_sale_price,50 kg Bag,Beans,1,0.5108256237659905,1.6666666666666663,False
+community_price_vs_crop_sale_price,90 kg Bag,Maize Grain (Not As Ufa),1,-0.6931471805599463,0.4999999999999995,False
+community_price_vs_crop_sale_price,Basket (Dengu),Tomato,1,-1.9691701568727593,0.13957263155977068,False
+community_price_vs_crop_sale_price,Bunch,Banana,6,-1.415740120033986,0.2427458858536618,False
+community_price_vs_crop_sale_price,Kilogramme,Beans,5,0.485507815781701,1.6250000000000002,False
+community_price_vs_crop_sale_price,Kilogramme,Maize Grain (Not As Ufa),4,0.32482074603256494,1.383782575230905,True
+community_price_vs_crop_sale_price,Kilogramme,Rice,2,1.0074515102711323,2.7386127875258306,False
+community_price_vs_crop_sale_price,Kilogramme,Banana,1,2.1264747961993695,8.38525491562421,False
+community_price_vs_crop_sale_price,Ox-Cart,Maize Grain (Not As Ufa),1,-2.2335922215070934,0.10714285714285723,False
+community_price_vs_crop_sale_price,Pail (Large),Maize Grain (Not As Ufa),17,0.1823215567939549,1.2000000000000004,False
+community_price_vs_crop_sale_price,Pail (Large),Rice,3,0.9808292530117262,2.6666666666666665,False
+community_price_vs_crop_sale_price,Pail (Large),Beans,2,-0.9825593637228698,0.3743517694003678,False
+community_price_vs_crop_sale_price,Pail (Large),Tomato,2,-0.9962150823451035,0.36927447293799803,False
+community_price_vs_crop_sale_price,Pail (Small),Beans,1,-0.4054651081081637,0.6666666666666671,False
+community_price_vs_crop_sale_price,kg,Maize Grain (Not As Ufa),39,0.2876820724517808,1.3333333333333333,True
+community_price_vs_crop_sale_price,kg,Rice,30,1.0517545407399145,2.8626693844593274,False
+community_price_vs_crop_sale_price,kg,Beans,9,0.49041462650586354,1.6329931618554527,False
+community_price_vs_crop_sale_price,kg,Banana,3,0.5493061443340546,1.7320508075688767,False
+community_price_vs_crop_sale_price,kg,Tomato,1,0.2231435513142106,1.250000000000001,False
+unit_value_vs_community_price,Bunch,Banana,3,-0.5815754049028401,0.5590169943749476,False
+unit_value_vs_community_price,Bunch,Cabbage,2,-0.8369882167858358,0.4330127018922193,False
+unit_value_vs_community_price,Cup,Beans,1,0.0,1.0,False
+unit_value_vs_community_price,Cup,Rice,1,-0.15415067982725805,0.8571428571428573,False
+unit_value_vs_community_price,Gram,Tea,126,0.0,1.0,False
+unit_value_vs_community_price,Gram,Cooking Oil,3,-0.2694982503663435,0.7637626158259733,False
+unit_value_vs_community_price,Gram,Rice,3,-0.287682072451781,0.7499999999999999,False
+unit_value_vs_community_price,Gram,Fresh Milk,2,0.8147947851111419,2.2587121034324382,False
+unit_value_vs_community_price,Gram,Salt,2,1.6047271404837302,4.976501531666156,False
+unit_value_vs_community_price,Gram,Beans,1,0.0,1.0,False
+unit_value_vs_community_price,Gram,Beef,1,0.0,1.0,False
+unit_value_vs_community_price,Gram,Sugar,1,-0.22314355131420993,0.7999999999999998,False
+unit_value_vs_community_price,Heap,Tomato,294,0.0,1.0,False
+unit_value_vs_community_price,Heap,Chips (Vendor),5,0.0,1.0,False
+unit_value_vs_community_price,Heap,Salt,5,0.0,1.0,False
+unit_value_vs_community_price,Heap,Sun Dried Fish,3,0.0,1.0,False
+unit_value_vs_community_price,Heap,Cabbage,1,-0.4054651081081646,0.6666666666666665,False
+unit_value_vs_community_price,Kilogramme,Sugar,358,-0.03334568724933629,0.9672041516493515,False
+unit_value_vs_community_price,Kilogramme,Rice,159,0.0,1.0,False
+unit_value_vs_community_price,Kilogramme,Beans,106,-0.07451778958024402,0.9281909617845141,False
+unit_value_vs_community_price,Kilogramme,Salt,73,0.1823215567939549,1.2000000000000004,False
+unit_value_vs_community_price,Kilogramme,Maize Ufa Mgaiwa (Normal Flour),31,-0.46449473037551137,0.6284525629725016,False
+unit_value_vs_community_price,Kilogramme,Beef,22,0.0,1.0,False
+unit_value_vs_community_price,Kilogramme,Chicken,9,0.11157177565710441,1.1180339887498942,False
+unit_value_vs_community_price,Kilogramme,Cooking Oil,4,-0.09054997604833703,0.9134286832042174,False
+unit_value_vs_community_price,Kilogramme,Maize Grain (Not As Ufa),4,0.045580389198488724,1.0466351393921056,False
+unit_value_vs_community_price,Kilogramme,Chips (Vendor),2,0.33953087103829827,1.4042886435368398,True
+unit_value_vs_community_price,Kilogramme,Tea,2,1.9805066048041235,7.246413123128596,False
+unit_value_vs_community_price,Kilogramme,Tomato,2,0.9829564081810811,2.6723451177837876,False
+unit_value_vs_community_price,Kilogramme,Bread,1,0.0,1.0,False
+unit_value_vs_community_price,Kilogramme,Fresh Milk,1,1.2321436812926323,3.4285714285714284,False
+unit_value_vs_community_price,Kilogramme,Sun Dried Fish,1,-1.74665633528498,0.17435595774162704,False
+unit_value_vs_community_price,Litre,Cooking Oil,143,-0.11778303565638382,0.8888888888888886,False
+unit_value_vs_community_price,Litre,Fresh Milk,21,0.3606590287633207,1.4342743312012722,True
+unit_value_vs_community_price,Litre,Tea,1,-2.14385797760132,0.11720180773462387,False
+unit_value_vs_community_price,Millilitre,Fresh Milk,12,0.0,1.0,False
+unit_value_vs_community_price,Millilitre,Cooking Oil,10,-0.601986402162968,0.5477225575051662,False
+unit_value_vs_community_price,Millilitre,Tea,1,1.3155445799830408,3.726779962499649,False
+unit_value_vs_community_price,No 10 Plate,Chips (Vendor),6,-0.21886718433847507,0.8034284189446517,False
+unit_value_vs_community_price,No 10 Plate,Beans,4,0.020410997260127406,1.0206207261596574,False
+unit_value_vs_community_price,No 10 Plate,Rice,3,-0.1823215567939549,0.8333333333333331,False
+unit_value_vs_community_price,No 10 Plate,Salt,2,0.3465735902799729,1.4142135623730954,True
+unit_value_vs_community_price,No 10 Plate,Maize Grain (Not As Ufa),1,-2.6304807900021334,0.07204381596421115,False
+unit_value_vs_community_price,No 10 Plate,Sugar,1,0.0,1.0,False
+unit_value_vs_community_price,No 10 Plate,Tea,1,0.09116077839697745,1.0954451150103324,False
+unit_value_vs_community_price,No 12 Plate,Chips (Vendor),14,0.0,1.0,False
+unit_value_vs_community_price,No 12 Plate,Beans,6,0.007042719241674433,1.0070675775111722,False
+unit_value_vs_community_price,No 12 Plate,Salt,6,0.0,1.0,False
+unit_value_vs_community_price,No 12 Plate,Maize Grain (Not As Ufa),1,-2.9957322735539904,0.05000000000000003,False
+unit_value_vs_community_price,No 12 Plate,Maize Ufa Mgaiwa (Normal Flour),1,-0.05889151782819191,0.9428090415820632,False
+unit_value_vs_community_price,No 12 Plate,Rice,1,0.0,1.0,False
+unit_value_vs_community_price,Pail (Large),Maize Ufa Mgaiwa (Normal Flour),1,0.8472978603872034,2.333333333333333,False
+unit_value_vs_community_price,Pail (Small),Maize Ufa Mgaiwa (Normal Flour),1,0.0,1.0,False
+unit_value_vs_community_price,Pail (Small),Rice,1,0.43152310867767074,1.539600717839001,False
+unit_value_vs_community_price,Piece,Eggs,196,0.0,1.0,False
+unit_value_vs_community_price,Piece,"Mandazi, Doughnut (Vendor)",122,0.0,1.0,False
+unit_value_vs_community_price,Piece,Bread,75,0.0,1.0,False
+unit_value_vs_community_price,Piece,Cabbage,61,-0.2876820724517808,0.7500000000000001,False
+unit_value_vs_community_price,Piece,Banana,10,-0.1438410362258905,0.8660254037844386,False
+unit_value_vs_community_price,Piece,Chicken,9,-0.05715841383994835,0.9444444444444446,False
+unit_value_vs_community_price,Piece,Tomato,3,-1.242453324894,0.2886751345948129,False
+unit_value_vs_community_price,Piece,Beef,2,0.0374495912720989,1.0381596634548074,False
+unit_value_vs_community_price,Piece,Chips (Vendor),2,0.49152821409320846,1.6348126556655491,False
+unit_value_vs_community_price,Piece,Fresh Milk,2,1.7563845786596302,5.791460926441346,False
+unit_value_vs_community_price,Piece,Sun Dried Fish,2,-0.6373612927313927,0.5286856317202822,False
+unit_value_vs_community_price,Piece,Cooking Oil,1,-0.2027325540540823,0.8164965809277259,False
+unit_value_vs_community_price,Piece,Salt,1,-1.007451510271133,0.3651483716701105,False
+unit_value_vs_community_price,Piece,Sugar,1,-0.06899287148695166,0.9333333333333331,False
+unit_value_vs_community_price,Piece,Tea,1,0.0,1.0,False
+unit_value_vs_community_price,Satchet/Tube,Cooking Oil,28,-0.026340128914456695,0.9740037464252966,False
+unit_value_vs_community_price,Satchet/Tube,Sugar,6,-0.2027325540540823,0.8164965809277259,False
+unit_value_vs_community_price,Satchet/Tube,Tea,3,0.0,1.0,False
+unit_value_vs_community_price,Satchet/Tube,Salt,2,0.0,1.0,False
+unit_value_vs_community_price,kg,Sugar,423,-0.03588339918483818,0.9647527778854401,False
+unit_value_vs_community_price,kg,Cooking Oil,256,-0.1823215567939549,0.8333333333333331,False
+unit_value_vs_community_price,kg,Rice,180,0.0,1.0,False
+unit_value_vs_community_price,kg,Tea,139,0.0,1.0,False
+unit_value_vs_community_price,kg,Salt,134,0.404351520520819,1.4983305483318303,True
+unit_value_vs_community_price,kg,Beans,123,-0.05715841383994835,0.9444444444444446,False
+unit_value_vs_community_price,kg,Maize Ufa Mgaiwa (Normal Flour),32,-0.518825794439211,0.5952190473142761,False
+unit_value_vs_community_price,kg,Beef,25,0.0,1.0,False
+unit_value_vs_community_price,kg,Fresh Milk,16,0.0,1.0,False
+unit_value_vs_community_price,kg,Chicken,9,0.06043235109689604,1.0622957319984971,False
+unit_value_vs_community_price,kg,Maize Grain (Not As Ufa),5,0.1823215567939549,1.2000000000000004,False
+unit_value_vs_community_price,kg,Chips (Vendor),2,0.2290726829685381,1.2574334296829346,False
+unit_value_vs_community_price,kg,Tomato,2,0.9829564081810811,2.6723451177837876,False
+unit_value_vs_community_price,kg,Bread,1,0.0,1.0,False
+unit_value_vs_community_price,kg,Sun Dried Fish,1,-1.4067053583800178,0.2449489742783179,False
+unit_value_vs_crop_sale_price,Bunch,Banana,4,-1.4483501700476984,0.23495760859964543,False
+unit_value_vs_crop_sale_price,Kilogramme,Pigeon Pea (Nandolo),27,0.4700036292457357,1.6,False
+unit_value_vs_crop_sale_price,Kilogramme,Beans,7,0.2231435513142097,1.25,False
+unit_value_vs_crop_sale_price,Kilogramme,Maize Grain (Not As Ufa),4,0.35426650494666134,1.4251349413858996,True
+unit_value_vs_crop_sale_price,Kilogramme,Rice,3,1.0986122886681096,2.9999999999999996,False
+unit_value_vs_crop_sale_price,Kilogramme,Sorghum,2,0.4768978211882935,1.611068818546308,False
+unit_value_vs_crop_sale_price,Kilogramme,Groundnut,1,1.136352616650957,3.1153846153846163,False
+unit_value_vs_crop_sale_price,Kilogramme,Irish Potato,1,0.22091637613951942,1.2472191289246468,False
+unit_value_vs_crop_sale_price,Pail (Large),Irish Potato,1,-0.1823215567939549,0.8333333333333331,False
+unit_value_vs_crop_sale_price,Pail (Small),Groundnut,1,-1.5749414766906247,0.20701966780270625,False
+unit_value_vs_crop_sale_price,Piece,Papaya,2,0.11778303565638337,1.125,False
+unit_value_vs_crop_sale_price,kg,Pigeon Pea (Nandolo),38,0.5108256237659909,1.6666666666666672,False
+unit_value_vs_crop_sale_price,kg,Rice,33,1.124258935861885,3.0779350562554626,False
+unit_value_vs_crop_sale_price,kg,Beans,10,0.4209339590376855,1.5233836693631324,False
+unit_value_vs_crop_sale_price,kg,Maize Grain (Not As Ufa),7,0.3101549283038394,1.3636363636363635,True
+unit_value_vs_crop_sale_price,kg,Groundnut,6,1.6082831759700265,4.994229649937634,False
+unit_value_vs_crop_sale_price,kg,Irish Potato,4,0.6177509361547522,1.8547518919707042,False
+unit_value_vs_crop_sale_price,kg,Sorghum,4,0.44288919047763287,1.557199772218203,False
+unit_value_vs_crop_sale_price,kg,Finger Millet,3,1.0647107369924282,2.9,False
+unit_value_vs_crop_sale_price,kg,Cassava Tubers,1,1.1897730670650866,3.286335345030995,False
+unit_value_vs_crop_sale_price,kg,Ground Bean,1,0.0,1.0,False
+unit_value_vs_crop_sale_price,kg,Nkwani,1,0.7135581778200737,2.0412414523193165,False
+unit_value_vs_crop_sale_price,kg,Onion,1,1.0986122886681091,2.9999999999999982,False
+unit_value_vs_crop_sale_price,kg,Pearl Millet,1,0.4700036292457348,1.5999999999999988,False
+unit_value_vs_crop_sale_price,kg,Tomato,1,0.6286086594223743,1.8750000000000002,False

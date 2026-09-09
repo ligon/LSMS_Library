@@ -1,0 +1,24 @@
+country,t,pair,u_basis,geo_level,n_cells,n_items,n_geos,median_gap,ratio,iqr_gap,resid_dof,items
+Niger,2011-12,community_price_vs_crop_sale_price,native,v,21,2,21,0.1823215567939549,1.2000000000000004,0.21309321546070858,-3,Mil;Niébé/Haricots secs
+Niger,2011-12,community_price_vs_crop_sale_price,native,District,10,2,7,0.23722898979755813,1.2677313820927751,0.14695308728140044,0,Mil;Niébé/Haricots secs
+Niger,2011-12,community_price_vs_crop_sale_price,native,Region,9,2,5,0.35667494393873245,1.4285714285714286,0.14458122881110747,1,Mil;Niébé/Haricots secs
+Niger,2011-12,community_price_vs_crop_sale_price,native,national,5,4,1,0.5108256237659905,1.6666666666666663,0.15985961870815224,-1,Mil;Niébé/Haricots secs;Oignon frais;Sorgho
+Niger,2014-15,community_price_vs_crop_sale_price,native,District,1,1,1,-4.700129002695883,0.009094103862107057,0.0,-2,Niébé/Haricots secs
+Niger,2014-15,community_price_vs_crop_sale_price,native,Region,1,1,1,-7.608498536163711,0.0004962163503287431,0.0,-2,Niébé/Haricots secs
+Niger,2014-15,community_price_vs_crop_sale_price,native,national,2,2,1,0.7514711612545026,2.1201167570646593,0.010668890792394414,-2,Mil;Niébé/Haricots secs
+Niger,2018-19,unit_value_vs_crop_sale_price,native,District,26,2,24,0.06282860707022664,1.064844316803016,0.4654971388633169,-1,Mil;Niébé/Haricots secs
+Niger,2018-19,unit_value_vs_crop_sale_price,native,Region,10,4,7,0.11157177565710485,1.118033988749895,0.27488820492942345,-2,Mil;Niébé/Haricots secs;Sorgho;Tomate fraîche
+Niger,2018-19,unit_value_vs_crop_sale_price,native,national,6,6,1,0.18864711557073388,1.2076147288491197,0.6192009239025014,-2,Gombo frais;Mil;Niébé/Haricots secs;Sorgho;Sésame;Tomate fraîche
+Niger,2021-22,unit_value_vs_crop_sale_price,native,District,21,2,20,0.0886670076414573,1.0927167294163056,0.36624439495488303,-2,Mil;Niébé/Haricots secs
+Niger,2021-22,unit_value_vs_crop_sale_price,native,Region,8,2,6,-0.11908072655115731,0.8877361339928485,0.2904195421529674,-1,Mil;Niébé/Haricots secs
+Niger,2021-22,unit_value_vs_crop_sale_price,native,national,4,3,1,0.3921539794784614,1.4801656089845707,0.2621683258766214,-1,Mil;Niébé/Haricots secs;Sorgho
+Niger,2011-12,community_price_vs_crop_sale_price,kg_def,District,2,1,2,0.6094134931073194,1.8393522895641767,0.04128658815346942,-2,Niébé/Haricots secs
+Niger,2011-12,community_price_vs_crop_sale_price,kg_def,Region,4,2,4,0.4752704755365511,1.608449184812693,0.5540839136432381,-3,Niébé/Haricots secs;Oignon frais
+Niger,2011-12,community_price_vs_crop_sale_price,kg_def,national,3,3,1,0.48390631190835354,1.6223996390056998,0.7023909895911693,-2,Mil;Niébé/Haricots secs;Oignon frais
+Niger,2014-15,community_price_vs_crop_sale_price,kg_def,v,4,1,4,0.4731298680948006,1.6050098090080522,0.36512596173147416,-2,Oignon frais
+Niger,2014-15,community_price_vs_crop_sale_price,kg_def,District,4,3,3,0.32428378037930106,1.3830397309751952,0.4611899545735849,-3,Maïs en grain;Niébé/Haricots secs;Oignon frais
+Niger,2014-15,community_price_vs_crop_sale_price,kg_def,Region,5,3,4,0.3537376525409366,1.4243814546028757,0.19562782830154024,-3,Maïs en grain;Niébé/Haricots secs;Oignon frais
+Niger,2014-15,community_price_vs_crop_sale_price,kg_def,national,3,3,1,0.6201032877140165,1.8591200561904961,0.4536993855970457,-2,Maïs en grain;Niébé/Haricots secs;Oignon frais
+Niger,2018-19,unit_value_vs_crop_sale_price,kg_def,Region,1,1,1,0.36535229643320477,1.441021585499865,0.0,-2,Tomate fraîche
+Niger,2018-19,unit_value_vs_crop_sale_price,kg_def,national,1,1,1,0.4769240720903092,1.611111111111111,0.0,-2,Tomate fraîche
+Niger,2021-22,unit_value_vs_crop_sale_price,kg_def,national,1,1,1,0.517036883765269,1.677050983124842,0.0,-2,Niébé/Haricots secs
