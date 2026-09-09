@@ -150,7 +150,7 @@ WFP weights 1,1,1,3,2 over the five stored strategy counts; phases as a
 separate helper with closed intervals (avoid EPAR's =rcsi == 19= gap).
 Countries: those with =food_coping= (Malawi first).  Model: Sonnet.
 
-** TODO Report-only plausibility count on =crop_production.Quantity=  :code:L10:
+** DONE Report-only plausibility count on =crop_production.Quantity=  :code:L10:
 :PROPERTIES:
 :Effort: 2:00
 :END:
