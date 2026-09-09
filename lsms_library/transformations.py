@@ -1610,11 +1610,14 @@ def legacy_locality(country):
 # slurm_logs/2026-09-09_epar_curation/{EPAR_PROJECT,LEARNINGS}.org.  Its
 # median-price ladders (crop sale price, livestock, own-consumed food) select
 # the finest geographic cell with >= 10 observations exactly as
-# ``median_price_valuation`` does; the one construction delta is that EPAR's
-# medians are weighted (by population-raked survey weights) and ours are not.
-# EPAR winsorises at the 1st/99th percentile and rakes weights to WB
-# population totals; neither is reproduced here, by design (count, never
-# clip; within-wave mean-one weights).
+# ``median_price_valuation`` does; the one construction delta was that EPAR's
+# medians are weighted (by population-raked survey weights) and ours were not.
+# ``median_price_valuation(weight_col=...)`` now opts in to a weighted median
+# -- a strict generalisation (equal weights reproduce the unweighted median
+# exactly), the default stays unweighted, and we still do not RAKE the
+# weights.
+# EPAR also winsorises at the 1st/99th percentile; that is not reproduced
+# here, by design (count, never clip; within-wave mean-one weights).
 
 
 # Plot-level index names emitted by the various countries' item features.
@@ -3058,6 +3061,82 @@ def nb_plots(plot_features):
 # ===========================================================================
 
 
+def _weighted_median(values, weights, keys):
+    """Per-group weighted median of ``values``, weighted by ``weights``.
+
+    Sort a group's values ascending; let ``W`` be its total weight and ``C``
+    the running cumulative weight.  The weighted median is the value at the
+    first row where ``C >= W/2`` -- EXCEPT where ``C == W/2`` exactly at that
+    row (compared with a relative tolerance), in which case it is the mean of
+    that value and the next row's.
+
+    That tie rule is what makes ``weight_col`` a strict GENERALISATION of the
+    unweighted path: under equal positive weights the exception fires exactly
+    when the group has an even count (the half-total lands squarely on the
+    lower central row) and returns the average of the two central values,
+    while an odd count reaches ``W/2`` strictly inside the middle row and
+    returns it.  So equal weights reproduce ``Series.median()`` exactly, in
+    BOTH parities.  Dropping the exception would give the *lower* weighted
+    median, which agrees with ``Series.median()`` only for odd counts.
+
+    A row takes part only if its value is non-missing AND its weight is
+    non-missing and strictly positive; a group with no such row gets NaN.
+    ``keys`` is a list of Series aligned to ``values.index``, already
+    stringified by the caller (so there are no NA group labels).
+    """
+    usable = (values.notna() & weights.notna() & (weights > 0)).astype(bool)
+    out = pd.Series(np.nan, index=values.index, dtype='float64')
+    if not usable.any():
+        return out
+
+    kcols = [f'_k{n}' for n in range(len(keys))]
+    # Built from numpy arrays on a fresh RangeIndex: ``values.index`` may
+    # carry duplicate labels (item rows repeat a household), and a
+    # DataFrame assembled from Series would try to align on it.
+    sub = pd.DataFrame({
+        '_v': values[usable].to_numpy(dtype='float64'),
+        '_w': weights[usable].to_numpy(dtype='float64'),
+    })
+    for col, key in zip(kcols, keys):
+        sub[col] = np.asarray(key[usable])
+    sub = sub.sort_values(kcols + ['_v'], kind='stable')
+
+    by = sub.groupby(kcols, sort=False, dropna=False)
+    cum = by['_w'].cumsum()
+    total = by['_w'].transform('sum')
+    half = 0.5 * total
+    # ``cumsum`` accumulates sequentially and ``sum`` pairwise, so at the
+    # exact tie the equal-weights case produces they can differ by an ulp.
+    # Both comparisons carry the same relative slack, so a tie is recognised
+    # as a tie rather than skipped or split.
+    reached = cum >= half * (1 - 1e-12)
+    tie = np.isclose(cum.to_numpy(), half.to_numpy(), rtol=1e-12, atol=0.0)
+
+    # The next row within the group (NaN at the group's last row).  An exact
+    # tie cannot occur there -- C == W/2 == W would need W == 0, and every
+    # participating weight is strictly positive -- so the mask only guards
+    # against reading across a group boundary.
+    nxt = sub['_v'].shift(-1).where(by.cumcount(ascending=False) != 0)
+    stat = pd.Series(
+        np.where(tie & nxt.notna().to_numpy(),
+                 (sub['_v'].to_numpy() + nxt.to_numpy()) / 2.0,
+                 sub['_v'].to_numpy()),
+        index=sub.index)
+
+    # Weights are strictly positive, so ``cum`` strictly increases within a
+    # group and ``reached`` is monotone: the FIRST True is the median row.
+    # ``groupby().first()`` skips NaN, so it returns exactly that row's stat.
+    sub['_m'] = stat.where(reached)
+    per_group = sub.groupby(kcols, sort=False, dropna=False)['_m'].first()
+
+    if len(kcols) == 1:
+        lookup = pd.Index(np.asarray(keys[0]))
+    else:
+        lookup = pd.MultiIndex.from_arrays([np.asarray(k) for k in keys])
+    return pd.Series(per_group.reindex(lookup).to_numpy(dtype='float64'),
+                     index=values.index)
+
+
 def median_price_valuation(item_df, geo_levels, *,
                            value_col='Value_sold',
                            qty_col='Quantity_sold',
@@ -3065,6 +3144,7 @@ def median_price_valuation(item_df, geo_levels, *,
                            quantity_col='Quantity',
                            item_keys=('j',),
                            threshold=10,
+                           weight_col=None,
                            volume_as_mass=True,
                            price_col='_unit_price',
                            out_col='Value'):
@@ -3085,14 +3165,16 @@ def median_price_valuation(item_df, geo_levels, *,
         ``replace crop_price_temp = . if ==0``), but still *receive* an
         imputed price in step 3.
     2.  *Median ladder*.  For each ``(geo_cell, *item_keys)`` group, count the
-        non-missing observed prices ``n``.  Walking ``geo_levels`` from finest
+        usable observed prices ``n``.  Walking ``geo_levels`` from finest
         to coarsest, then a final national level, the imputed price for a row
         is the **median observed price of the finest cell whose count ≥
         threshold**.  This is exactly the WB cascade: EA → admin_4 → admin_3 →
         admin_2 → admin_1 → national, where the cell's median is *adopted only
         if it has ≥10 priced observations* and no finer cell already qualified.
         The national median is the unconditional fallback (the WB
-        ``replace ... if ten_obs_n==0``).
+        ``replace ... if ten_obs_n==0``).  With ``weight_col`` the cell
+        statistic becomes a **weighted** median (see that parameter); the
+        ladder, the threshold and the fallback are unchanged.
     3.  *Valuation*.  ``out_col = imputed_price × quantity_col`` for every row
         (the WB ``harvest_value = crop_price * harvest_kg``).
 
@@ -3149,6 +3231,39 @@ def median_price_valuation(item_df, geo_levels, *,
     threshold : int, default 10
         Minimum count of priced observations for a cell's median to be
         adopted (the WB ``ten_obs`` ≥ 10).
+    weight_col : str, optional
+        When given (an index level or a column of ``item_df``), every cell
+        median becomes a **weighted median**.  Sort the cell's observed prices
+        ascending; let ``W`` be the total weight and ``C`` the cumulative
+        weight.  The cell's price is the one at the first row where
+        ``C >= W/2``, EXCEPT where ``C == W/2`` exactly at that row (to within
+        a relative tolerance), in which case it is the mean of that price and
+        the next row's.  ``None`` (the default) runs the unweighted path
+        unchanged.
+
+        The weight is per *row* -- the household weight repeated on each of its
+        item rows, as EPAR's ``[aw=weight]`` is.  A quantity-weighted median
+        (EPAR Nigeria ``W4.do:696``, ``gen weight=qty*weight_pop_rururb``) is
+        had by passing a column you derived that way.
+
+        *Observation counting is unaffected*: ``n`` stays a COUNT OF ROWS, not
+        a sum of weights, so ``threshold`` means the same thing on both paths.
+
+        *Null and non-positive weights.*  A priced row whose weight is missing
+        or ``<= 0`` takes no part in the weighted median AND is not counted
+        toward ``threshold`` -- a row counts for a cell exactly when it can
+        speak for it.  It still *receives* an imputed price, precisely as a
+        row with a missing price does.  A warning names how many rows this is.
+
+        *Relation to the unweighted path.*  ``weight_col`` is a strict
+        GENERALISATION of it: under equal (or all-equal positive) weights the
+        weighted median reproduces ``Series.median()`` EXACTLY, for BOTH odd
+        and even cell counts.  The exact-tie exception above is what buys
+        that -- with equal weights it fires precisely on an even count and
+        averages the two central prices, exactly as the unweighted path does;
+        an odd count reaches ``W/2`` strictly inside the middle row and
+        returns it.  Pinned in both parities by
+        ``tests/test_median_price_valuation.py``.  See :func:`_weighted_median`.
     volume_as_mass : bool, default True
         Forwarded to the kg conversion of ``qty_col`` when ``kg_qty`` is None.
     price_col : str, default '_unit_price'
@@ -3168,6 +3283,26 @@ def median_price_valuation(item_df, geo_levels, *,
 
     Notes
     -----
+    Prior art (convergence, and the deltas).  Three teams reached the same
+    selection rule independently -- the WB panel's ``valuation_median_crops``,
+    EPAR (Evans School, UW) Technical Report #335 in both its crop and
+    livestock ladders and again in its consumption repo, and this function:
+    *the median price of the finest geographic cell with >= threshold
+    observations*.  EPAR iterates broad-to-narrow with an unconditional
+    overwrite, which selects the same cell.  The verified deltas:
+      - EPAR's medians are WEIGHTED, by its population-raked
+        ``weight_pop_rururb`` (Uganda ``W5.do:482-483``, Malawi
+        ``W1.do:504-505``, Nigeria ``W4.do:695-696``); ours is unweighted
+        unless ``weight_col`` is passed.  We do not rake weights.
+      - EPAR GATES its national rung on the same threshold; ours is an
+        unconditional fallback, so no row is left unvalued.
+      - EPAR's LIVESTOCK ladder is the opposite idiom: narrow-to-broad fill
+        with a preference for the household's OWN observed price, ending
+        unconditional.  "EPAR's ladder" is ambiguous -- say which.
+      - EPAR's CONSUMPTION repo gates at ``obs > 10``, i.e. N >= 11, where its
+        Ag repo gates ``obs > 9``, i.e. N >= 10 (our default).
+    See ``slurm_logs/2026-09-09_epar_curation/LEARNINGS.org`` L5.
+
     Divergence from WB: their ladder is keyed on survey ``admin_1..admin_4``
     codes; we accept whatever geography the caller supplies from our
     ``cluster_features`` / ``sample`` (``v``, ``District``, ``Region``), which
@@ -3215,6 +3350,37 @@ def median_price_valuation(item_df, geo_levels, *,
 
     item_key_series = [_series(k).astype(str) for k in item_keys]
 
+    # Optional survey weight (EPAR's ``[aw=weight]``).  A priced row whose
+    # weight is missing or non-positive cannot speak for its cell, so it is
+    # excluded from BOTH the weighted median and the observation count --
+    # the same bargain the unweighted path strikes with an unpriced row,
+    # which is likewise pooled nowhere yet still valued in step 3.
+    weight = None
+    usable = price.notna()
+    if weight_col is not None:
+        weight = pd.to_numeric(_series(weight_col), errors='coerce')
+        # ``.astype(bool)`` so a nullable Int64/Float64 weight cannot turn
+        # the count below into a nullable Int64 sum.
+        usable = (price.notna() & weight.notna() & (weight > 0)).astype(bool)
+        n_dropped = int((price.notna() & ~usable).sum())
+        if n_dropped:
+            warnings.warn(
+                f"median_price_valuation(weight_col={weight_col!r}): "
+                f"{n_dropped:,} of {int(price.notna().sum()):,} priced rows "
+                f"have a missing or non-positive weight.  They take no part "
+                f"in the weighted medians and are NOT counted toward "
+                f"threshold={threshold}; they are still valued at whichever "
+                f"ladder price their cell ends up with.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+    def _cell_median(keys):
+        """Cell statistic: the plain median, or the weighted median."""
+        if weight is None:
+            return price.groupby(keys).transform('median')
+        return _weighted_median(price, weight, keys)
+
     # Step 2: median ladder.  Start with everyone unassigned; for each geo
     # level finest→coarsest (then national), fill any still-unassigned row
     # whose cell clears the threshold with that cell's median observed price.
@@ -3223,16 +3389,17 @@ def median_price_valuation(item_df, geo_levels, *,
     for level in ladder:
         keys = ([] if level is None else [_series(level).astype(str)]) \
             + item_key_series
-        grouped = price.groupby(keys)
-        cell_median = grouped.transform('median')
-        cell_count = price.notna().groupby(keys).transform('sum')
+        cell_median = _cell_median(keys)
+        # A COUNT OF ROWS, never a sum of weights -- so ``threshold`` means
+        # the same thing on the weighted and unweighted paths.
+        cell_count = usable.groupby(keys).transform('sum')
         qualifies = cell_count >= threshold
         take = imputed.isna() & qualifies & cell_median.notna()
         imputed = imputed.where(~take, cell_median)
     # National median is the unconditional fallback (WB ten_obs_n==0 branch):
     # any row still unassigned after the threshold cascade gets the national
     # median regardless of count, mirroring the final WB ``replace``.
-    nat_median = price.groupby(item_key_series).transform('median')
+    nat_median = _cell_median(item_key_series)
     imputed = imputed.where(imputed.notna(), nat_median)
 
     # Step 3: value every row at its imputed price.
