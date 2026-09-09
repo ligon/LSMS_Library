@@ -75,7 +75,7 @@ def _assert_decoded(codes, j, column):
 
 
 # ================================ PURCHASES (s9b) ==============================
-# Value-only.  Visits 1..10 each carry a recorded value in s9bq{visit}.
+# Value-only.  s9bq1..s9bq10 carry the values for the 2nd..11th visits.
 df = get_dataframe('../Data/partb/sec9b.dta', convert_categoricals=False)
 
 # i exactly as sample()/roster() build it: mapping.i() over the *pre-composed*
@@ -85,7 +85,10 @@ df['j'] = df['freqcd'].astype('int64').map(labelsd['Code_9b'])
 _assert_decoded(df['freqcd'], df['j'], 'Code_9b')
 df = df[_drop_nonfood(df['j'])]          # drop non-food Section-9B block (j == '')
 
-pur_visit_cols = {f's9bq{v}': f'Expenditure_v{v}' for v in range(1, 11)}
+# Source question numbers are NOT visit numbers.  This wave's own Stata
+# variable labels give the mapping:
+#   s9bq1 'amount spent by second visit' .. s9bq10 '.. by eleventh visit'
+pur_visit_cols = {f's9bq{v}': f'Expenditure_v{v + 1}' for v in range(1, 11)}
 x = df.rename(columns=pur_visit_cols)[['i', 'j'] + list(pur_visit_cols.values())]
 x = x.replace({r'': pd.NA, 0: np.nan})
 # Several distinct freqcd codes harmonize to one j (e.g. 'Other Cereal'); sum
@@ -100,7 +103,8 @@ x['Price'] = np.nan
 x = x.reset_index()
 
 # ================================ PRODUCED (s8h) ==============================
-# Real quantity (visits 4..12) in a native unit (s8hq13), with a farmgate Price
+# Real quantity (s8hq4..s8hq12 = the 3rd..11th visits) in a native unit
+# (s8hq13), with a farmgate Price
 # (s8hq14).  Expenditure left NaN -- no produced value is recorded.
 #
 # The file is read TWICE, and both reads are load-bearing (GH #782).  The
@@ -125,7 +129,10 @@ prod = prod[_drop_nonfood(prod['j'])]
 prod['u'] = prod['s8hq13'].astype(str)
 prod['Price'] = prod['s8hq14']
 
-pro_visit_cols = {f's8hq{v}': f'Quantity_v{v}' for v in range(4, 13)}
+#   s8hq4 'quantity .. consumed at 3rd visit' .. s8hq12 '.. at 11th visit'.
+#   NOTE the asymmetry: purchases start at the 2nd visit, own production at
+#   the 3rd -- s8hq3 is 'number of units consumed', a total, not a visit.
+pro_visit_cols = {f's8hq{v}': f'Quantity_v{v - 1}' for v in range(4, 13)}
 keep = ['i', 'j', 'u', 'Price'] + list(pro_visit_cols.values())
 y = prod.rename(columns=pro_visit_cols)[keep]
 y = y.replace({r'': pd.NA, 0: np.nan})

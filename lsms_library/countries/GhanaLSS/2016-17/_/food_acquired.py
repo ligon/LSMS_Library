@@ -10,16 +10,26 @@ decisions D1/D5/D6):
             are STACKED into rows, not kept as wide produced_/purchased_ columns)
   visit   : KEPT as a country-local index level (D1 override -- do NOT fold into t)
 
-Sources:
-  - Purchases : g7sec9b.dta, Section 9B.  Visits 1-6.  Per visit i:
-        s9bq{i}a = amount spent  -> Expenditure
-        s9bq{i}b = quantity      -> Quantity
-        s9bq{i}c = unit code     -> u (decoded via Stata value labels + unit_label)
+Field design (GLSS7 Main Report, "Interviewer Workload"): the interviewer
+visited each household "every sixth day i.e. after every five days ... seven (7)
+times in order to complete the cycle", within a 35-day cycle, supported by a
+household diary.  Visit 1 is intake (sections 1, 2, 5, 6A, 7 + diary training);
+9B and 8H are asked at the 2nd..7th visits -- SIX five-day recalls.  `visit`
+holds the CALENDAR VISIT (2..7), not the source question number; there are
+deliberately no visit-1 rows, because visit 1 collected no consumption.  See
+_stack_visits for why calendar and not a per-module ordinal.
+
+Sources (the question numbers below are stems, NOT visits):
+  - Purchases : g7sec9b.dta, Section 9B.  q1..q6 -> visits 2..7.
+        s9bq{n}a = amount spent  -> Expenditure
+        s9bq{n}b = quantity      -> Quantity
+        s9bq{n}c = unit code     -> u (decoded via Stata value labels + unit_label)
     -> s='purchased'.  No reported Price.
-  - Production: g7sec8h.dta, Section 8H.  Visits 3-8.  Per visit i:
-        s8hq{i}q = quantity      -> Quantity
-        s8hq{i}u = unit code     -> u (label is code-prefixed "N. Label"; stripped)
-        s8hq{i}p = selling price -> Price (farmgate)
+  - Production: g7sec8h.dta, Section 8H.  q3..q8 -> visits 2..7
+        (q1/q2 are screeners: "consume any own produce?" / "how many months?").
+        s8hq{n}q = quantity      -> Quantity
+        s8hq{n}u = unit code     -> u (label is code-prefixed "N. Label"; stripped)
+        s8hq{n}p = selling price -> Price (farmgate)
     -> s='produced'.  No produced expenditure column -> Expenditure = NaN.
 
 Unit decode (D-units / GH #348, #453, #384):
@@ -109,13 +119,28 @@ def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
 
     Stacks each visit into rows; emits columns Quantity/u (+ optional
     Expenditure, Price) with i (household), j (harmonized item), visit.
+
+    `visits` is an explicit {source question number -> CALENDAR VISIT} map, NOT
+    a range: the two modules number their questions from different origins (9B
+    q1..q6, 8H q3..q8 -- 8H q1/q2 are the screeners "consume any own produce?"
+    / "how many months?"), and both are asked at the same six calendar visits,
+    the 2nd..7th.  Writing the question number into `visit` -- what this script
+    did before -- put a purchase and the own-production consumed at the same
+    visit two apart, so `visit` was not sliceable across `s`.
+
+    Calendar visit, not a per-module 1..6 ordinal, because a per-module ordinal
+    does not generalise: in GLSS5 (2005-06) 9B runs from the 2nd visit but 8H's
+    first visit-specific column is the 3rd, so position-in-module would leave
+    the two modules misaligned by one.  The calendar number is also what every
+    wave's own Stata variable labels state, so the map is checkable against the
+    source rather than inferred.
     """
     df_num = df_num.copy()
     i = pd.Series([hh_id(c, n) for c, n in zip(df_num['clust'], df_num['nh'])])
     j = df_num[item_col].apply(lambda x: label_map.get(format_id(x), ''))
 
     frames = []
-    for v in visits:
+    for v, calendar_visit in sorted(visits.items()):
         if unit_decoder is not None:
             u_vals = df_num[unit_stem.format(v=v)].apply(unit_decoder).values
         else:
@@ -129,7 +154,7 @@ def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
         part = pd.DataFrame(cols)
         part['i'] = i.values
         part['j'] = j.values
-        part['visit'] = v
+        part['visit'] = calendar_visit
         frames.append(part)
     out = pd.concat(frames, ignore_index=True)
     # Treat 0 as missing for amounts (matches the legacy script's convention).
@@ -151,7 +176,9 @@ purch_labels = get_categorical_mapping(
 # lacks value labels, but units are now decoded from numeric s9bq*c codes via
 # the unit_9b org table (decode_unit_code_9b).  See #453 / #384.
 num9b = get_dataframe('../Data/g7sec9b_small.dta', convert_categoricals=False)
-fe = _stack_visits(num9b, None, range(1, 7),
+# 9B q1..q6 are asked at the 2nd..7th visits ("amount spent by second visit"
+# .. "by seventh visit" in the GLSS4/5/6 labels for the same stems).
+fe = _stack_visits(num9b, None, {n: n + 1 for n in range(1, 7)},
                    qty_stem='s9bq{v}b', unit_stem='s9bq{v}c',
                    label_map=purch_labels, item_col='freqcd',
                    exp_stem='s9bq{v}a', unit_decoder=decode_unit_code_9b)
@@ -167,7 +194,10 @@ prod_labels = get_categorical_mapping(
 
 num8h = get_dataframe('../Data/g7sec8h.dta', convert_categoricals=False)
 cat8h = get_dataframe('../Data/g7sec8h.dta', convert_categoricals=True)
-hp = _stack_visits(num8h, cat8h, range(3, 9),
+# 8H q3..q8 are the same six visits: this wave's own Stata labels read
+# "Quantity of own produced food consumed at 2nd visit" (s8hq3) through
+# "...now-7th visit" (s8hq8).  q1/q2 are screeners, not visits.
+hp = _stack_visits(num8h, cat8h, {n: n - 1 for n in range(3, 9)},
                    qty_stem='s8hq{v}q', unit_stem='s8hq{v}u',
                    label_map=prod_labels, item_col='foodcd',
                    price_stem='s8hq{v}p')
