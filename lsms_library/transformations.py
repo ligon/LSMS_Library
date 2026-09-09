@@ -1665,15 +1665,354 @@ def _kg_factor_series(df, *, volume_as_mass=True):
     return out
 
 
-def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False):
+#: The canonical ``u`` value meaning "NO UNIT WAS RECORDED".  Uganda mints it
+#: wherever a wave ships no harvest-unit label (``uganda.py:1386``, ``:1859``;
+#: ``Uganda/_/data_scheme.yml`` documents it for ``crop_production.u``).
+#:
+#: It is NOT a unit, and the ``survey_median`` layer must never treat it as
+#: one: a median of reported factors taken across "no unit recorded" rows is a
+#: number about nothing, and using it to fill OTHER such rows fabricates
+#: weights -- the exact opposite of what the sentinel is for.
+#:
+#: DECLARED HERE BECAUSE NOTHING DECLARES IT MACHINE-READABLY.  Checked at
+#: 28f9243f: ``data_info.yml`` has an ``Unknown`` sentinel, but it belongs to
+#: the EDUCATION vocabulary (``Columns.household_roster.Education``), not to
+#: ``u``; and there is no ``niger.py:U_NA`` in the tree (``rg U_NA`` is
+#: empty).  Niger's missing-unit sentinel is the literal string ``Manquant``
+#: (``niger.py:602``, ``_COMMUNITY_MISSING_UNITS`` at ``:1183``) and has NOT
+#: been relabelled onto ``Unknown``, so it is listed below rather than
+#: assumed away.  When GH #847 lands a single canonical declaration, delete
+#: both of these and read it from there.
+U_UNKNOWN = 'Unknown'
+
+#: Every live spelling of "no unit recorded", lower-cased.  A NaN ``u`` counts
+#: too, and is handled separately in :func:`_unit_sentinel_mask`.
+_U_SENTINELS = frozenset({U_UNKNOWN.lower(), 'manquant'})
+
+
+def _unit_sentinel_mask(df):
+    """Boolean mask: rows whose ``u`` records NO unit at all.
+
+    True for a NaN ``u`` and for any spelling in :data:`_U_SENTINELS`.  These
+    rows are excluded from the ``survey_median`` layer on both sides -- they
+    neither contribute to a median nor receive one -- and from the
+    disagreement audit, where a reported factor on such a row has nothing to
+    be compared against.
+    """
+    u = _level_or_column(df, 'u')
+    if u is None:
+        return np.zeros(len(df), dtype=bool)
+    col = pd.Series(u)
+    missing = col.isna().to_numpy()
+    text = col.astype(str).str.strip().str.lower().to_numpy()
+    return missing | np.isin(text, sorted(_U_SENTINELS))
+
+
+#: Minimum number of REPORTED ``KgFactor`` values a group must carry before
+#: :func:`harvest_kg` will use their MEDIAN to fill that group's unreported
+#: rows (layer *survey_median*).  Five is a starting value, not a measured
+#: one -- it is low enough that a unit a wave asks about at all will usually
+#: clear it, and high enough that one enumerator's keystroke does not become
+#: a whole unit's weight.  Exposed as a ``min_reports=`` kwarg on
+#: :func:`harvest_kg` / :func:`harvest_kg_factors` so callers (and tests) can
+#: move it without monkeypatching, and so a country whose module is thin can
+#: be examined at a lower N without changing the default for everyone.
+SURVEY_MEDIAN_MIN_REPORTS = 5
+
+#: Relative gap above which two layers' factors for the SAME row are reported
+#: as DISAGREEING by :func:`harvest_kg_factors`.  Measured against the
+#: *reported* factor (the survey's own number is the reference, not the
+#: library's inference).
+KG_FACTOR_DISAGREEMENT_TOLERANCE = 0.10
+
+#: The layers :func:`harvest_kg_factors` resolves a row's factor through, in
+#: precedence order.  ``none`` is a layer, not a failure: a row it serves
+#: contributes nothing to ``Harvest_kg`` and is COUNTED rather than silently
+#: absent.
+KG_FACTOR_LAYERS = ('reported', 'survey_median', 'inferred', 'none')
+
+
+def _level_or_column(df, name):
+    """Return index level or column *name* as an ndarray, or ``None``.
+
+    ``crop_production`` carries ``u`` as an index level in some countries and
+    as a column in others (see :func:`_with_u_in_index`), and ``condition``
+    is an index level where it exists at all.  Grouping code must not care
+    which.
+    """
+    if name in (df.index.names or []):
+        return df.index.get_level_values(name).to_numpy()
+    if name in df.columns:
+        return df[name].to_numpy()
+    return None
+
+
+def _valid_factor(values):
+    """Float ndarray with NaN wherever the factor is unusable.
+
+    A kg factor must be finite and strictly positive.  Zero, negative and
+    infinite reports are DISCARDED, not clipped: they count neither as a
+    reported factor, nor toward a group's median, nor toward the ``N`` that
+    licenses that median.
+    """
+    arr = _as_float(pd.Series(values))
+    return np.where(np.isfinite(arr) & (arr > 0), arr, np.nan)
+
+
+def _survey_median_factors(df, reported, *, min_reports, sentinel=None):
+    """Median of REPORTED factors for a row's own ``(u, condition)`` group.
+
+    The survey's own weights filling the survey's own gaps.  For each row,
+    take the median of the *reported* ``KgFactor`` of every row sharing its
+    unit and condition within the same country-wave, provided at least
+    *min_reports* of them reported one; where that group is too thin, fall
+    back to the same country-wave's ``u`` alone.  Returns NaN where neither
+    group clears the bar.
+
+    Grouping notes
+    --------------
+    * ``groupby(..., dropna=False)``.  The default ``dropna=True`` DELETES
+      rows whose group key is NA (CLAUDE.md, "Grain Collapse" §3b), and both
+      ``u`` and ``condition`` can be NA in a raw frame.  A row with an NA key
+      must fall through to the inferred layer, not vanish.
+    * ``count`` counts non-NaN, and *reported* has already had its invalid
+      values NaN-ed by :func:`_valid_factor`, so ``N`` is the number of
+      USABLE reports -- which is what licenses the median.
+    * The median of a group INCLUDES a reporting row itself.  That is
+      deliberate: it is also the reference the disagreement audit compares
+      that row's own report against.
+    * Rows flagged by *sentinel* (see :func:`_unit_sentinel_mask`) are
+      excluded from BOTH SIDES: their reports do not enter any median, and
+      they receive none.  ``u='Unknown'`` is the absence of a unit, not a
+      unit, so a "group" of such rows pools containers of unrelated sizes.
+      Such a row therefore gets kilograms from its OWN reported ``KgFactor``
+      or from nothing at all.
+    """
+    if sentinel is None:
+        sentinel = np.zeros(len(df), dtype=bool)
+    reported = np.where(sentinel, np.nan, reported)
+    keys = {}
+    for name in ('country', 't', 'u', 'condition'):
+        col = _level_or_column(df, name)
+        if col is not None:
+            keys[name] = pd.Series(col).astype(object)
+
+    wave = [k for k in ('country', 't') if k in keys]
+    fine = wave + [k for k in ('u', 'condition') if k in keys]
+    coarse = wave + [k for k in ('u',) if k in keys]
+
+    rep = pd.Series(reported, index=pd.RangeIndex(len(df)))
+    out = np.full(len(df), np.nan)
+    seen = []
+    for group in (fine, coarse):
+        if not group or group in seen:
+            continue
+        seen.append(list(group))
+        by = [keys[k].set_axis(rep.index) for k in group]
+        g = rep.groupby(by, dropna=False)
+        med = g.transform('median').astype('float64').to_numpy()
+        n = g.transform('count').astype('float64').to_numpy()
+        cand = np.where(n >= min_reports, med, np.nan)
+        out = np.where(np.isnan(out), cand, out)
+    return _valid_factor(np.where(sentinel, np.nan, out))
+
+
+def harvest_kg_factors(crop_production, *, volume_as_mass=True,
+                       min_reports=SURVEY_MEDIAN_MIN_REPORTS):
+    """Per-row kg-per-unit factor for ``crop_production``, and its PROVENANCE.
+
+    The factor half of :func:`harvest_kg`, exposed on its own so the layers
+    can be AUDITED -- most usefully, the survey's own reported weights
+    against the library's inferred ones for the same unit.  Every row of
+    *crop_production* gets a row here, in the same order and on the same
+    index.
+
+    Layers, in precedence order (``KgFactorSource`` records which one served
+    each row)
+
+    ``reported``
+        The row's own ``KgFactor`` column -- what the instrument wrote down
+        (UNPS ``a5?q6d``, "conversion factor into kg"), where it is finite
+        and > 0.  ``KgFactor`` is REPORTED, never constructed: see the
+        canonical schema note in ``lsms_library/data_info.yml``.
+    ``survey_median``
+        The median reported ``KgFactor`` of the same ``(u, condition)``
+        within the same country-wave, where at least *min_reports* rows
+        report one; falling back to ``u`` alone.  The survey's own weights
+        filling the survey's own gaps -- see :func:`_survey_median_factors`.
+    ``inferred``
+        The shared unit→kg machinery, unchanged: :func:`_kg_factor_series`
+        → :func:`_get_kg_factors` (hand-coded metric tokens, the
+        explicit-metric label parser, then price-ratio inference).  This is
+        the ONLY layer that acts on a frame with no ``KgFactor`` column, so
+        such a frame gets exactly the factors it got before this function
+        existed.
+    ``none``
+        No layer produced a usable factor.  Counted, not hidden: these rows
+        contribute nothing to ``Harvest_kg``.
+
+    Parameters
+    ----------
+    crop_production : pd.DataFrame
+        The ``crop_production`` item feature.  Needs ``Quantity`` only for
+        the price-ratio branch of the inferred layer; needs ``u`` as an
+        index level or a column.  ``KgFactor``, ``condition`` and
+        ``country`` are all optional.
+    volume_as_mass : bool, default True
+        Forwarded to :func:`_get_kg_factors` (1 litre = 1 kg for fluids).
+    min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
+        ``N`` for the ``survey_median`` layer.  One number is applied to
+        every group, but the groups are per country-wave, so a thin module
+        does not borrow a thick one's licence.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed like *crop_production*, with
+
+        ``kg_per_unit``
+            the resolved factor (NaN for ``none`` rows).  Deliberately NOT
+            called ``KgFactor``: that name is reserved for the survey's own
+            reported number, and this column is CONSTRUCTED.
+        ``KgFactorSource``
+            one of :data:`KG_FACTOR_LAYERS`.
+        ``kg_reported`` / ``kg_survey_median`` / ``kg_inferred``
+            what each layer offered for that row, whether or not it won --
+            which is what makes the disagreement auditable per unit
+            (``groupby('u')`` on this frame).
+
+        Two tallies ride on ``.attrs``:
+
+        ``kg_factor_sources``
+            ``{layer: n_rows}`` over the INPUT rows, summing to
+            ``len(crop_production)``.  POOLED: on a cross-country
+            :class:`~lsms_library.feature.Feature` frame these counts run over
+            every country at once, so ``reported: 40000`` says nothing about
+            WHICH country reported.  Read it as a total, never as coverage;
+            the per-row frame answers the real question with one
+            ``groupby('country')``.
+        ``kg_factor_disagreement``
+            For ``reported_vs_survey_median`` and ``reported_vs_inferred``:
+            ``{'both': n, 'disagree': k, 'share': k/n or None}``, where
+            ``both`` counts rows for which BOTH layers produced a usable
+            factor and ``disagree`` counts those differing from the
+            *reported* factor by more than
+            :data:`KG_FACTOR_DISAGREEMENT_TOLERANCE` in relative terms.
+            This is the audit hook: a large ``reported_vs_inferred`` share
+            means the library's factor table and the instrument disagree
+            about what a unit weighs, and the instrument is the one that was
+            there.
+
+    Notes
+    -----
+    Only the reported and survey-median layers are validity-filtered
+    (finite, > 0).  The inferred layer is used exactly as
+    :func:`_kg_factor_series` returns it, so that a frame with no
+    ``KgFactor`` column reproduces the previous behaviour bit for bit rather
+    than merely closely.  ``_get_kg_factors`` already refuses non-finite and
+    non-positive values at every point where it can mint one, so the
+    asymmetry is a guarantee about identity, not a hole.
+    """
+    df = crop_production
+    inferred = _kg_factor_series(df, volume_as_mass=volume_as_mass)
+    inferred_arr = inferred.to_numpy(dtype='float64', na_value=np.nan)
+
+    if 'KgFactor' in df.columns:
+        reported = _valid_factor(df['KgFactor'])
+    else:
+        reported = np.full(len(df), np.nan)
+
+    sentinel = _unit_sentinel_mask(df)
+    if np.isnan(reported).all():
+        # Nothing reported -> nothing to take a median of.  Skipping the
+        # groupby is not just an optimisation: it keeps the no-KgFactor path
+        # free of any pandas operation that could perturb the result.
+        survey_median = np.full(len(df), np.nan)
+    else:
+        survey_median = _survey_median_factors(df, reported,
+                                               min_reports=min_reports,
+                                               sentinel=sentinel)
+
+    rep_ok = ~np.isnan(reported)
+    med_ok = ~np.isnan(survey_median)
+    inf_ok = ~np.isnan(inferred_arr)
+
+    resolved = np.where(rep_ok, reported,
+                        np.where(med_ok, survey_median, inferred_arr))
+    source = np.where(rep_ok, 'reported',
+                      np.where(med_ok, 'survey_median',
+                               np.where(inf_ok, 'inferred', 'none')))
+
+    out = pd.DataFrame(
+        {'kg_per_unit': resolved,
+         'KgFactorSource': source,
+         'kg_reported': reported,
+         'kg_survey_median': survey_median,
+         'kg_inferred': inferred_arr},
+        index=df.index)
+
+    counts = {layer: int((source == layer).sum()) for layer in KG_FACTOR_LAYERS}
+    out.attrs['kg_factor_sources'] = counts
+    # A row with no unit recorded is excluded from the audit as well: there
+    # is nothing for its reported factor to be compared against, since no
+    # per-unit factor -- inferred or median -- can exist for a non-unit.
+    audited = np.where(sentinel, np.nan, reported)
+    out.attrs['kg_factor_disagreement'] = {
+        'reported_vs_survey_median': _disagreement(audited, survey_median),
+        'reported_vs_inferred': _disagreement(audited, inferred_arr),
+        'tolerance': KG_FACTOR_DISAGREEMENT_TOLERANCE,
+    }
+    return out
+
+
+def _disagreement(reference, other,
+                  tolerance=KG_FACTOR_DISAGREEMENT_TOLERANCE):
+    """How often two layers that BOTH have a factor for a row disagree.
+
+    ``both`` is the denominator -- rows where both layers produced a usable
+    (finite, > 0) factor; a row only one layer can serve says nothing about
+    agreement.  The gap is relative to *reference* (the reported factor),
+    because the question being asked is "how wrong is the library's number
+    where the survey told us the answer", not the symmetric one.
+    """
+    ref = _valid_factor(reference)
+    oth = _valid_factor(other)
+    both = ~np.isnan(ref) & ~np.isnan(oth)
+    n = int(both.sum())
+    if not n:
+        return {'both': 0, 'disagree': 0, 'share': None}
+    gap = np.abs(oth[both] - ref[both]) / ref[both]
+    k = int((gap > tolerance).sum())
+    return {'both': n, 'disagree': k, 'share': k / n}
+
+
+def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
+               min_reports=SURVEY_MEDIAN_MIN_REPORTS):
     """Total harvested kilograms per (t, i, plot, j) from ``crop_production``.
 
     MECHANICAL reduction (GAP 1 → WB ``Plotcrop``/``Plot`` ``harvest_kg``).
     For each reported harvest row, convert the native-unit ``Quantity`` to
-    kilograms using the shared unit→kg machinery (:func:`_get_kg_factors`,
-    via :func:`_kg_factor_series` — the same factors
-    :func:`food_quantities_from_acquired` applies to ``food_acquired``),
-    then sum within each plot-crop.
+    kilograms, then sum within each plot-crop.
+
+    Each row's kg-per-unit factor is built by a LAYERED procedure, in
+    precedence order: the row's own **reported** ``KgFactor`` (what the
+    instrument wrote down, e.g. UNPS ``a5?q6d``); the **median of reported**
+    factors for the same ``(u, condition)`` in the same country-wave, where
+    at least ``min_reports`` rows report one; the library's **inferred**
+    factor from the shared unit→kg machinery (:func:`_get_kg_factors` via
+    :func:`_kg_factor_series` — the same factors
+    :func:`food_quantities_from_acquired` applies to ``food_acquired``); and
+    otherwise **none**, in which case the row contributes nothing.  The
+    survey's own number wins wherever it exists, on the same principle by
+    which ``food_acquired``'s exact per-row ``Quantity_kg`` already beats an
+    inferred factor.
+
+    Which layer served each row is DISCLOSED, not assumed: the counts ride
+    on ``result.attrs['kg_factor_sources']`` and the per-row provenance is
+    available from :func:`harvest_kg_factors`, which also reports how often
+    the survey's factor and the library's inferred one DISAGREE.  A frame
+    with no ``KgFactor`` column can only reach the inferred layer, so it
+    gets exactly the result it got before the column existed.
 
     Parameters
     ----------
@@ -1685,6 +2024,10 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False):
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors`; treat ``1 litre = 1 kg`` for
         fluid units (juice/beer harvest rows) when True.
+    min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
+        How many rows of a ``(u, condition)`` group must carry a reported
+        ``KgFactor`` before their median is used to fill that group's
+        unreported rows.  Inert on a frame with no ``KgFactor`` column.
     carry_native : bool, default False
         When False (default, matching the WB construct), rows whose ``u``
         has no known kg factor contribute NOTHING to the sum — ``Harvest_kg``
@@ -1700,6 +2043,14 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False):
         One ``Harvest_kg`` column indexed by ``(t, i, plot, j)`` (whichever
         of those levels are present), summed over native units and season.
 
+        ``result.attrs['kg_factor_sources']`` is ``{layer: n_rows}`` over the
+        INPUT rows and sums to ``len(crop_production)``.  It counts rows by
+        the layer that gave them a FACTOR, not by whether they contributed:
+        a ``reported`` row whose ``Quantity`` is 0 or NaN is counted
+        ``reported`` and still drops out of the sum below.
+        ``result.attrs['kg_factor_disagreement']`` carries the layer-pair
+        audit described in :func:`harvest_kg_factors`.
+
     Notes
     -----
     Divergence from WB: the WB Uganda code applies survey-provided
@@ -1707,18 +2058,38 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False):
     "Basket (Unspecified)", regional "Heap"/"Bunch" sizes).  Our shared
     factor map only resolves units that *name* their metric content (e.g.
     "Basket (10 kg)", "Nice cup (60g)") plus the hand-coded metric tokens,
-    so on Uganda it converts ~21% of crop rows.  ``Harvest_kg`` is therefore
-    a *lower bound* on the WB figure for plots dominated by non-metric
-    containers; magnitudes agree on metric-reported plots.  Extending
-    coverage is a per-country ``u``-table (``harvest_units``) job, not a
-    change to this transform.
+    so on Uganda it converts ~21% of crop rows *through that layer alone*
+    (28 147 of 133 683, measured 2026-09-09).  ``Harvest_kg`` is therefore a
+    *lower bound* on the WB figure for plots dominated by non-metric
+    containers; magnitudes agree on metric-reported plots.
+
+    Closing that gap is a per-country CONFIG job in two forms, neither of
+    them a change to this transform: extend the country's ``u``-table
+    (``harvest_units``), or wire the instrument's own conversion factor into
+    the optional ``KgFactor`` column, which the ``reported`` and
+    ``survey_median`` layers above then consume.  The second reaches rows the
+    first cannot -- Uganda's 2018-19 season-A harvest side ships a
+    100%-populated ``a5aq6d`` conversion factor and NO harvest-unit code at
+    all, so its 7 153 rows sit at ``u='Unknown'`` and no unit table can ever
+    convert them.
+
+    The ``survey_median`` layer REFUSES the missing-unit sentinel, on both
+    sides.  ``u='Unknown'`` (:data:`U_UNKNOWN`) is the absence of a unit, not
+    a unit, so a "group" of such rows pools containers of unrelated sizes: a
+    median over them is a number about nothing, and filling other such rows
+    with it would fabricate weights.  A row with no unit recorded therefore
+    gets kilograms from its OWN reported ``KgFactor`` or from nothing at all
+    -- which is why wiring ``KgFactor`` is the only thing that can ever
+    convert Uganda's 2018-19 season-A rows.
     """
     df = crop_production.copy()
     if 'Quantity' not in df.columns:
         raise ValueError("crop_production must have a 'Quantity' column")
 
     qty = pd.to_numeric(df['Quantity'], errors='coerce')
-    kg_per_unit = _kg_factor_series(df, volume_as_mass=volume_as_mass)
+    factors = harvest_kg_factors(df, volume_as_mass=volume_as_mass,
+                                 min_reports=min_reports)
+    kg_per_unit = factors['kg_per_unit']
     kg = qty * kg_per_unit
     if carry_native:
         kg = kg.where(kg.notna(), qty)
@@ -1733,6 +2104,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False):
     # cross-country callers see one schema regardless of source naming.
     if plot_level == 'plot_id':
         res.index = res.index.rename({'plot_id': 'plot'})
+    # ``groupby`` drops ``attrs``, so the tallies are re-stashed here -- the
+    # same idiom ``food_prices`` uses for ``price_rows_dropped``.
+    res.attrs['kg_factor_sources'] = factors.attrs['kg_factor_sources']
+    res.attrs['kg_factor_disagreement'] = factors.attrs[
+        'kg_factor_disagreement']
     return res
 
 
