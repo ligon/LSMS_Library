@@ -1366,6 +1366,8 @@ sale source is the fix; it is a feature addition, not a config tweak.
 
 ** _/food_acquired.py lacks the id_walk that _/crop_production.py has
 
+- Fixed :: GH #819, on =development= (merge of =fix/vjoin-leading-zeros-idwalk-order=, 2026-09-08): =_finalize_result= now walks =i= before the =v= join and coerces =v= with =format_id=, so 2013-14 / 2015-16 =food_acquired= serve =v= on 100% of rows (433 / 432 clusters) with no change to the wave script.  The description below is the history of the defect.
+
 =_/crop_production.py= calls =local_tools.id_walk(p, updated_ids)= and
 says why: "keeping the =_join_v_from_sample= join aligned".
 =_/food_acquired.py= does not -- it has only a local =change_id=-based
