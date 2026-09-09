@@ -4,18 +4,19 @@ There was no test of this transform before ``weight_col`` was added, so the
 first test here is the *default-path pin*: hand-computed ladder prices on a
 synthetic frame, which is what proves the unweighted behaviour did not move.
 
-The weighted path is the **lower weighted median** -- the smallest observed
-price whose cumulative weight (over the cell's prices sorted ascending)
-reaches half the cell's total weight.  Two properties are pinned:
+The weighted path is a **weighted median**: sort the cell's prices ascending,
+let ``W`` be the total weight and ``C`` the cumulative weight, and take the
+price at the first row where ``C >= W/2`` -- except where ``C == W/2`` exactly
+at that row, where it is the mean of that price and the next row's.
 
-* under equal positive weights it reproduces the unweighted median EXACTLY
-  for cells with an ODD count, and
-* for an EVEN count it returns the lower of the two central prices, where the
-  unweighted path averages them.  That divergence is the definition's, not an
-  accident, so it is pinned rather than worked around.
+The property that rule exists for, and the one these tests are mostly about:
+``weight_col`` is a strict GENERALISATION of the default path.  Under equal
+(or all-equal positive) weights the weighted median reproduces
+``Series.median()`` EXACTLY, for BOTH odd and even cell counts -- the exact-tie
+exception fires precisely on an even count and averages the two central prices.
 
-All weights in these tests are small integers, so the cumulative sums are
-exact and the tie at the half-total is a genuine tie.
+Weights here are small integers or exact binary fractions, so the cumulative
+sums are exact and the tie at the half-total is a genuine tie.
 """
 
 import numpy as np
@@ -88,7 +89,7 @@ def test_weight_col_none_is_the_default_path():
 # ---------------------------------------------------------------------------
 
 def test_equal_weights_reproduce_unweighted_exactly_odd_cells():
-    """Both adopted cells have an odd count, so the two paths agree exactly."""
+    """Odd-count cells: the half-total falls strictly inside the middle row."""
     rows = ([{'v': 'A', 'j': 'maize', 'price': p, 'weight': 1.0}
              for p in (1, 2, 3, 4, 5)]
             + [{'v': 'B', 'j': 'maize', 'price': p, 'weight': 1.0}
@@ -114,8 +115,11 @@ def test_equal_weights_but_different_positive_constant():
     pd.testing.assert_frame_equal(plain, wtd)
 
 
-def test_even_cell_lower_median_vs_averaged_median():
-    """The one documented divergence under equal weights."""
+def test_equal_weights_reproduce_unweighted_exactly_even_cells():
+    """Even-count cells: the exact-tie exception averages the two central
+    prices, exactly as ``Series.median()`` does.  Without it the weighted
+    path would return the LOWER central price and ``weight_col`` would not be
+    a generalisation of the default."""
     rows = [{'v': 'A', 'j': 'maize', 'price': p, 'weight': 1.0}
             for p in (1, 2, 3, 4)]
     df = _frame(rows)
@@ -123,8 +127,22 @@ def test_even_cell_lower_median_vs_averaged_median():
     plain = median_price_valuation(df, ['v'], kg_qty=kg, threshold=3)
     wtd = median_price_valuation(df, ['v'], kg_qty=kg, threshold=3,
                                  weight_col='weight')
-    assert set(_prices(plain)) == {2.5}   # (2+3)/2
-    assert set(_prices(wtd)) == {2.0}     # the LOWER of the two central prices
+    pd.testing.assert_frame_equal(plain, wtd)
+    assert set(_prices(wtd)) == {2.5}     # (2+3)/2, NOT the lower 2.0
+
+
+@pytest.mark.parametrize('n', list(range(1, 13)))
+@pytest.mark.parametrize('w', [1.0, 0.5, 7.0, 1e6])
+def test_equal_weights_reproduce_unweighted_at_every_parity(n, w):
+    """The generalisation property, swept over both parities and scales."""
+    rows = [{'v': 'A', 'j': 'maize', 'price': float(p) * 1.5, 'weight': w}
+            for p in range(1, n + 1)]
+    df = _frame(rows)
+    kg = _kg(df)
+    plain = median_price_valuation(df, ['v'], kg_qty=kg, threshold=1)
+    wtd = median_price_valuation(df, ['v'], kg_qty=kg, threshold=1,
+                                 weight_col='weight')
+    pd.testing.assert_frame_equal(plain, wtd)
 
 
 # ---------------------------------------------------------------------------
@@ -132,12 +150,16 @@ def test_even_cell_lower_median_vs_averaged_median():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize('prices, weights, expected_wtd, expected_plain', [
-    # total 14, half 7; cum 1,2,3,4,14 -> first to reach 7 is the price 5.
+    # total 14, half 7; cum 1,2,3,4,14 -> first to reach 7 is the price 5,
+    # and 4 != 7 so no tie.
     ((1, 2, 3, 4, 5), (1, 1, 1, 1, 10), 5.0, 3.0),
     # total 7, half 3.5; cum 5 -> the very first price already reaches it.
     ((10, 20, 30), (5, 1, 1), 10.0, 20.0),
-    # total 8, half 4; cum 1,2,3,9 -> the price 40.
+    # total 8, half 4; cum 1,2,3,9 -> the price 40; 3 != 4 so no tie.
     ((10, 20, 30, 40), (1, 1, 1, 6), 40.0, 25.0),
+    # EXACT TIE on unequal weights: total 10, half 5; cum 3,5,10 -> the tie
+    # lands on the price 20, so the answer is (20+30)/2 = 25.
+    ((10, 20, 30), (3, 2, 5), 25.0, 20.0),
 ])
 def test_hand_computed_weighted_median(prices, weights, expected_wtd,
                                        expected_plain):
@@ -250,12 +272,13 @@ def test_threshold_counts_rows_not_summed_weight():
     with pytest.warns(UserWarning, match=r"2 of 9 priced rows"):
         out = median_price_valuation(df, ['v', 'Region'], kg_qty=_kg(df),
                                      threshold=4, weight_col='weight')
-    # B qualifies at the v rung: equal weights, even count -> lower of the
-    # two central prices, 200.
+    # B qualifies at the v rung: equal weights, even count -> the exact-tie
+    # exception averages the two central prices, (200+300)/2 = 250, which is
+    # what Series.median() gives too.
     # A falls through to Region R1, whose pool is
     #   1,2,3 at weight 100 and 100,200,300,400 at weight 1: total 304,
-    #   half 152, cum 100,200 -> the price 2.
-    assert _prices(out).tolist() == [2, 2, 2, 2, 2, 200, 200, 200, 200]
+    #   half 152, cum 100,200 -> the price 2 (200 != 152, so no tie).
+    assert _prices(out).tolist() == [2, 2, 2, 2, 2, 250, 250, 250, 250]
 
 
 def test_national_fallback_is_unconditional_on_both_paths():
@@ -271,6 +294,7 @@ def test_national_fallback_is_unconditional_on_both_paths():
                                  weight_col='weight')
     assert set(_prices(plain)) == {2.0}          # median of 1,2,3
     assert set(_prices(wtd)) == {3.0}            # total 12, half 6; cum 1,2,12
+    # (cum 2 != 6, so no tie; the weighted answer is the price 3 itself)
 
 
 def test_unpriced_rows_take_no_part_but_are_valued():

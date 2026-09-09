@@ -1613,7 +1613,9 @@ def legacy_locality(country):
 # ``median_price_valuation`` does; the one construction delta was that EPAR's
 # medians are weighted (by population-raked survey weights) and ours were not.
 # ``median_price_valuation(weight_col=...)`` now opts in to a weighted median
-# -- the default stays unweighted, and we still do not RAKE the weights.
+# -- a strict generalisation (equal weights reproduce the unweighted median
+# exactly), the default stays unweighted, and we still do not RAKE the
+# weights.
 # EPAR also winsorises at the 1st/99th percentile; that is not reproduced
 # here, by design (count, never clip; within-wave mean-one weights).
 
@@ -2856,25 +2858,28 @@ def nb_plots(plot_features):
 # ===========================================================================
 
 
-def _lower_weighted_median(values, weights, keys):
-    """Per-group LOWER weighted median of ``values``, weighted by ``weights``.
+def _weighted_median(values, weights, keys):
+    """Per-group weighted median of ``values``, weighted by ``weights``.
 
-    The **lower weighted median** of a group is the *smallest* value whose
-    cumulative weight -- accumulated over the group's values sorted
-    ascending -- reaches half the group's total weight.  It is always an
-    observed value, never an average of two.
+    Sort a group's values ascending; let ``W`` be its total weight and ``C``
+    the running cumulative weight.  The weighted median is the value at the
+    first row where ``C >= W/2`` -- EXCEPT where ``C == W/2`` exactly at that
+    row (compared with a relative tolerance), in which case it is the mean of
+    that value and the next row's.
+
+    That tie rule is what makes ``weight_col`` a strict GENERALISATION of the
+    unweighted path: under equal positive weights the exception fires exactly
+    when the group has an even count (the half-total lands squarely on the
+    lower central row) and returns the average of the two central values,
+    while an odd count reaches ``W/2`` strictly inside the middle row and
+    returns it.  So equal weights reproduce ``Series.median()`` exactly, in
+    BOTH parities.  Dropping the exception would give the *lower* weighted
+    median, which agrees with ``Series.median()`` only for odd counts.
 
     A row takes part only if its value is non-missing AND its weight is
     non-missing and strictly positive; a group with no such row gets NaN.
     ``keys`` is a list of Series aligned to ``values.index``, already
     stringified by the caller (so there are no NA group labels).
-
-    Under equal positive weights this returns the ordinary median when the
-    group has an ODD number of usable rows, and the lower of the two central
-    values when it has an even number -- where ``Series.median()`` averages
-    them.  That is the one behavioural difference between the weighted and
-    unweighted paths of :func:`median_price_valuation`, and it is the
-    definition's, not an implementation accident.
     """
     usable = (values.notna() & weights.notna() & (weights > 0)).astype(bool)
     out = pd.Series(np.nan, index=values.index, dtype='float64')
@@ -2893,19 +2898,32 @@ def _lower_weighted_median(values, weights, keys):
         sub[col] = np.asarray(key[usable])
     sub = sub.sort_values(kcols + ['_v'], kind='stable')
 
-    grouped = sub.groupby(kcols, sort=False, dropna=False)['_w']
-    cum = grouped.cumsum()
-    total = grouped.transform('sum')
-    # ``cumsum`` accumulates sequentially and ``sum`` pairwise, so at an
-    # exact tie (the equal-weights case, where the half-total falls exactly
-    # on a cumulative sum) the two can disagree by an ulp and the >= would
-    # skip a rung.  The relative slack restores the equal-weights property
-    # without moving any genuine crossing: survey weights never tie exactly.
-    reached = cum >= 0.5 * total * (1 - 1e-12)
+    by = sub.groupby(kcols, sort=False, dropna=False)
+    cum = by['_w'].cumsum()
+    total = by['_w'].transform('sum')
+    half = 0.5 * total
+    # ``cumsum`` accumulates sequentially and ``sum`` pairwise, so at the
+    # exact tie the equal-weights case produces they can differ by an ulp.
+    # Both comparisons carry the same relative slack, so a tie is recognised
+    # as a tie rather than skipped or split.
+    reached = cum >= half * (1 - 1e-12)
+    tie = np.isclose(cum.to_numpy(), half.to_numpy(), rtol=1e-12, atol=0.0)
+
+    # The next row within the group (NaN at the group's last row).  An exact
+    # tie cannot occur there -- C == W/2 == W would need W == 0, and every
+    # participating weight is strictly positive -- so the mask only guards
+    # against reading across a group boundary.
+    nxt = sub['_v'].shift(-1).where(by.cumcount(ascending=False) != 0)
+    stat = pd.Series(
+        np.where(tie & nxt.notna().to_numpy(),
+                 (sub['_v'].to_numpy() + nxt.to_numpy()) / 2.0,
+                 sub['_v'].to_numpy()),
+        index=sub.index)
+
     # Weights are strictly positive, so ``cum`` strictly increases within a
-    # group and ``reached`` is monotone: the FIRST True is the lower
-    # weighted median.  ``groupby().first()`` skips NaN, so it returns it.
-    sub['_m'] = sub['_v'].where(reached)
+    # group and ``reached`` is monotone: the FIRST True is the median row.
+    # ``groupby().first()`` skips NaN, so it returns exactly that row's stat.
+    sub['_m'] = stat.where(reached)
     per_group = sub.groupby(kcols, sort=False, dropna=False)['_m'].first()
 
     if len(kcols) == 1:
@@ -3012,13 +3030,15 @@ def median_price_valuation(item_df, geo_levels, *,
         adopted (the WB ``ten_obs`` ≥ 10).
     weight_col : str, optional
         When given (an index level or a column of ``item_df``), every cell
-        median becomes the **lower weighted median**: the smallest observed
-        price whose cumulative weight, accumulated over the cell's prices
-        sorted ascending, reaches half the cell's total weight.  It is always
-        an observed price, never an average of two.  ``None`` (the default)
-        runs the unweighted path unchanged.
+        median becomes a **weighted median**.  Sort the cell's observed prices
+        ascending; let ``W`` be the total weight and ``C`` the cumulative
+        weight.  The cell's price is the one at the first row where
+        ``C >= W/2``, EXCEPT where ``C == W/2`` exactly at that row (to within
+        a relative tolerance), in which case it is the mean of that price and
+        the next row's.  ``None`` (the default) runs the unweighted path
+        unchanged.
 
-        The weight is per *row* — the household weight repeated on each of its
+        The weight is per *row* -- the household weight repeated on each of its
         item rows, as EPAR's ``[aw=weight]`` is.  A quantity-weighted median
         (EPAR Nigeria ``W4.do:696``, ``gen weight=qty*weight_pop_rururb``) is
         had by passing a column you derived that way.
@@ -3028,17 +3048,19 @@ def median_price_valuation(item_df, geo_levels, *,
 
         *Null and non-positive weights.*  A priced row whose weight is missing
         or ``<= 0`` takes no part in the weighted median AND is not counted
-        toward ``threshold`` — a row counts for a cell exactly when it can
+        toward ``threshold`` -- a row counts for a cell exactly when it can
         speak for it.  It still *receives* an imputed price, precisely as a
         row with a missing price does.  A warning names how many rows this is.
 
-        *Relation to the unweighted path.*  Under equal positive weights the
-        weighted median reproduces the unweighted one exactly for cells with
-        an ODD count, and returns the lower of the two central prices for an
-        even count, where ``Series.median()`` averages them.  That is the
-        definition (Stata's ``collapse (median) [aw=]`` may average at an
-        exact tie; unverified here — check ``[R] summarize`` before asserting
-        it).  The tie rule is one line in :func:`_lower_weighted_median`.
+        *Relation to the unweighted path.*  ``weight_col`` is a strict
+        GENERALISATION of it: under equal (or all-equal positive) weights the
+        weighted median reproduces ``Series.median()`` EXACTLY, for BOTH odd
+        and even cell counts.  The exact-tie exception above is what buys
+        that -- with equal weights it fires precisely on an even count and
+        averages the two central prices, exactly as the unweighted path does;
+        an odd count reaches ``W/2`` strictly inside the middle row and
+        returns it.  Pinned in both parities by
+        ``tests/test_median_price_valuation.py``.  See :func:`_weighted_median`.
     volume_as_mass : bool, default True
         Forwarded to the kg conversion of ``qty_col`` when ``kg_qty`` is None.
     price_col : str, default '_unit_price'
@@ -3151,10 +3173,10 @@ def median_price_valuation(item_df, geo_levels, *,
             )
 
     def _cell_median(keys):
-        """Cell statistic: plain median, or the lower weighted median."""
+        """Cell statistic: the plain median, or the weighted median."""
         if weight is None:
             return price.groupby(keys).transform('median')
-        return _lower_weighted_median(price, weight, keys)
+        return _weighted_median(price, weight, keys)
 
     # Step 2: median ladder.  Start with everyone unassigned; for each geo
     # level finest→coarsest (then national), fill any still-unassigned row

@@ -21,7 +21,7 @@ LEARNINGS.org` L5).
 | symbol | path:line | what it does | tested? | reuse / extend / new |
 |--------|-----------|--------------|---------|----------------------|
 | `median_price_valuation` | `lsms_library/transformations.py:2918` | the WB `valuation_median_crops` ladder | **no** (none before this PR) | extend |
-| `_lower_weighted_median` | `lsms_library/transformations.py:2857` | per-group lower weighted median | yes (new file) | new |
+| `_weighted_median` | `lsms_library/transformations.py:2859` | per-group weighted median, interpolating at an exact tie | yes (new file) | new |
 | `_kg_factor_series` / `_get_kg_factors` | `transformations.py:1657` ff. | unit -> kg | yes | untouched (bypassed via `kg_qty=` in tests) |
 | any weighted median/quantile helper | — | **none exists** — `rg 'weighted_median\|weighted_quantile\|wquantile'` over `lsms_library/` + `tests/` returns 0 | — | so `new` is not reinvention |
 | `_normalise_sample_weights` | `country.py` (see `CLAUDE.md` §sample) | divides `weight`/`panel_weight` by the wave's own mean | yes | consumer-side context only |
@@ -63,32 +63,39 @@ LEARNINGS.org` L5).
 
 | quantity | decision | reason |
 |----------|----------|--------|
-| lower weighted median | **new** (`_lower_weighted_median`) | nothing in the library computes a weighted quantile; numpy/pandas have no grouped weighted median |
+| weighted median | **new** (`_weighted_median`) | nothing in the library computes a weighted quantile; numpy/pandas have no grouped weighted median |
 | observation count | reuse | same `groupby(...).transform('sum')` over a boolean, widened from `price.notna()` to `usable` |
 | ladder / threshold / national fallback | reuse, untouched | the delta with EPAR is the statistic, not the selection |
 | weight resolution (level or column) | reuse | the function's existing `_series()` closure |
 
 ## §6 Open questions for the human
-- **The tie rule.** The brief specifies the *lower* weighted median (smallest
-  value whose cumulative weight *reaches* half the total), which is what is
-  implemented. It reproduces the unweighted median exactly for ODD-count cells
-  and returns the lower of the two central prices for EVEN-count cells, where
-  `Series.median()` averages them. EPAR runs Stata `collapse (median) [aw=]`,
-  which *may* average at an exact tie — unverified here (needs `[R] summarize`
-  Methods and formulas). Who cares: GhanaLSS GLSS1-3 weights are a genuine
-  constant 1.0 (`CLAUDE.md` §Weights), so there `weight_col='weight'` is an
-  all-equal-weights call and an even-count cell would differ from the
-  unweighted call by the lower-vs-averaged choice. The rule is isolated to one
-  line (`reached = cum >= 0.5 * total * (1 - 1e-12)`) plus the `.first()` that
-  follows it, so flipping to tie-averaging is a local change.
+- **The tie rule — SETTLED, 2026-09-09.** The first implementation took the
+  *lower* weighted median (smallest value whose cumulative weight reaches half
+  the total), which agrees with `Series.median()` only for ODD-count cells.
+  @ligon's coordinator ruled: `weight_col` must be a strict **generalisation**
+  of the default path, so the interpolating rule is now implemented — the value
+  at the first row where `C >= W/2`, except where `C == W/2` exactly at that
+  row, where it is the mean of that value and the next row's. Under equal
+  weights that is the average of the two middles for even `n` and the middle
+  value for odd `n`, i.e. `Series.median()` exactly in both parities. Why it
+  mattered concretely: GhanaLSS GLSS1-3 weights are a genuine constant 1.0
+  (`CLAUDE.md` §Weights), so `weight_col='weight'` there is an all-equal-weights
+  call, and under the lower rule an even-count cell would silently differ from
+  the unweighted call. Pinned by `test_equal_weights_reproduce_unweighted_
+  exactly_{odd,even}_cells` and a 12x4 parity sweep. Whether Stata's
+  `collapse (median) [aw=]` does the same at an exact tie is still unverified
+  (`[R] summarize` Methods and formulas) — but it no longer gates anything,
+  since the rule is now fixed by our own generalisation requirement.
 - Should a future `valuation='median_price'` kwarg on `food_expenditures`
   (GH #585, LEARNINGS L6) default to weighted? Out of scope here.
 
 ---
 ### Phase 3 — verification
-- `_lower_weighted_median` — **OK (anchored on §2, §4, §5)**: no existing
+- `_weighted_median` — **OK (anchored on §2, §4, §5)**: no existing
   weighted-quantile machinery to duplicate (§2 row 4); duplicate-index and
-  NA-key hazards handled per §4.
+  NA-key hazards handled per §4; the equal-weights identity with
+  `Series.median()` verified by brute force over n=1..40 x 30 trials x 4 weight
+  scales (0 mismatches) as well as by the committed tests.
 - `median_price_valuation(weight_col=...)` — **OK (anchored on §3, §4)**: the
   ladder/threshold/fallback semantics of §3 are literally unchanged; the
   default path is pinned by test and by fingerprint.
