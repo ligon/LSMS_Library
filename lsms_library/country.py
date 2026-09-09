@@ -2329,15 +2329,26 @@ class Country:
         # when the caller does df.to_parquet().  Enforce a uniform string dtype
         # here so Feature('housing')([...]) concatenation is always clean.
         # Fixes GH #142.
+        # The coercion is `format_id` -- the SAME rule `df_data_grabber`
+        # applies to every `idxvars` entry, and therefore to
+        # `cluster_features.v`, which is the column this joined `v` has to
+        # compare equal to.  `sample` declares `v` as a *column*, so
+        # `format_id` never ran on it at grab time (CLAUDE.md "Gotchas with
+        # Teeth": auto-applied to idxvars, NOT to myvars) and this is the only
+        # place the two sides are reconciled.
+        #
+        # It replaces `str(int(float(x)))`, which normalised a float but also
+        # rewrote a string id that was already canonical: Ethiopia's
+        # zero-padded 15-digit EA id '010101088801601' came back
+        # '10101088801601' and matched no cluster (GH #819; raw match against
+        # cluster_features was 9-46% by wave).  `format_id` strips a trailing
+        # decimal only when the whole string is numeric ('1013.0' -> '1013')
+        # and preserves leading zeros -- see its docstring and GH #222.
+        # Behaviour change worth naming: it does not catch OverflowError, so a
+        # non-finite v now raises instead of passing through as 'inf'.
+        # NaN / '' / '.' return None, which `astype(StringDtype)` renders pd.NA.
         if 'v' in flat.columns:
-            def _v_to_str(x):
-                if pd.isna(x) or x == '':
-                    return pd.NA
-                try:
-                    return str(int(float(x)))
-                except (ValueError, OverflowError):
-                    return str(x).strip()
-            flat['v'] = flat['v'].map(_v_to_str).astype(pd.StringDtype())
+            flat['v'] = flat['v'].map(format_id).astype(pd.StringDtype())
 
         # Insert v after t in the index
         new_idx = []
@@ -2871,6 +2882,31 @@ class Country:
             df = _normalize_dataframe_index(df, scheme_entry, None, method_name,
                                             country=self.name)
 
+            # Re-key `i` through `updated_ids` BEFORE the v-join below.
+            # `sample()` is finalised through this same method, so the `i` it
+            # returns is already walked; joining a pre-walk `i` against it
+            # matches only the households `updated_ids` never re-keyed.  For
+            # Ethiopia ESS that is precisely the urban refreshment cohort, so
+            # 2013-14 / 2015-16 came back 68.5% / 66.6% `v = NaN` and the
+            # survivors were silently urban-only (GH #819).  Nothing else in
+            # the pipeline reads `i` between here and the old position, and
+            # `id_walk` is index-level-order agnostic, so this is a pure move.
+            #
+            # The flag is still set exactly once -- by `id_walk` itself, after
+            # its per-wave concat -- and `_join_v_from_sample` carries it over
+            # its merge with the explicit `result.attrs = dict(df.attrs)`,
+            # which that merge needs because it *disagrees* on `attrs`
+            # (tests/test_population.py::TestVJoinIsADisagreeingMerge).
+            # The `reorder_levels` block stays after the v-join: it is the join
+            # that adds the `v` level it has to place.
+            if (
+                'i' in df.index.names
+                and not df.attrs.get('id_converted')
+                and method_name not in ['panel_ids', 'updated_ids']
+                and self._updated_ids_cache is not None
+            ):
+                df = id_walk(df, self.updated_ids)
+
             # Join v from sample() for household-level tables that lack it.
             # Skip if v is already in the index OR already present as a
             # column (a legacy script may have written v alongside other
@@ -2902,14 +2938,6 @@ class Country:
                         warnings.warn(
                             f"Could not reorder index levels for {method_name}: {exc}"
                         )
-
-            if (
-                'i' in df.index.names
-                and not df.attrs.get('id_converted')
-                and method_name not in ['panel_ids', 'updated_ids']
-                and self._updated_ids_cache is not None
-            ):
-                df = id_walk(df, self.updated_ids)
 
             # Normalise "Relation" -> "Relationship" so kinship expansion fires
             if "Relation" in df.columns and "Relationship" not in df.columns:
