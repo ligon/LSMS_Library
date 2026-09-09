@@ -36,7 +36,7 @@ tests.
 | `_harvest_unit_map()` | `countries/Uganda/_/uganda.py` (via `_harmonized_codes('harvest_units')`) | `{Code: Preferred Label}` from `categorical_mapping.org` `#+name: harvest_units` (46 codes) | indirectly | **reuse** |
 | `_harvest_condition_map()` | same, `harvest_conditions` (20 codes) | the rival vocabulary the value-range test discriminates against | yes | **reuse as the discriminator** |
 | `transformations.harvest_kg` | `lsms_library/transformations.py:1668` | `Quantity` × unit→kg factor, summed to `(t,i,plot,j)`; reads the unit LABEL only, via `_kg_factor_series` (`:1646`) | yes | **reuse unchanged** — it is the downstream that the fix unlocks |
-| `_get_kg_factors` | `lsms_library/transformations.py:1004` | unit→kg factors; **prefers a per-row `Quantity_kg` where present** (`:1137`) — the Nigeria/Malawi `food_acquired` precedent | yes | **NOT reused** — see §6 |
+| `_get_kg_factors` | `lsms_library/transformations.py:1004` | unit→kg factors; **prefers a per-row `Quantity_kg` where present** (`:1137`) — the Nigeria/Malawi `food_acquired` precedent | yes | **the PRECEDENT `KgFactor` follows** — see §6 |
 | `tests/test_uganda_crop_condition.py` | `tests/` | the existing `crop_production` regression module: `crop_production` fixture, `_aws_creds_available()` gate, `_source_path()` | — | **extend** (add unit tests here, don't start a new module) |
 
 ## §3 Definitions & conventions in force
@@ -87,7 +87,7 @@ tests.
 | 2018-19 season-A harvest unit | **no change** (`unit: None` stands) | measured: the file ships no unit column at all — a survey fact, now with numbers behind it instead of an assertion |
 | unit→label mapping | **reuse** `_harvest_unit_map()` | already the single source of truth |
 | kg conversion | **reuse** `harvest_kg` unchanged | the fix reaches it through `u`; no transform edit |
-| survey-reported kg factor (`a5?q6d`) | **new — DEFERRED, see §6** | no canonical home exists and `harvest_kg` cannot consume one |
+| survey-reported kg factor (`a5?q6d`) | **extend** (country-config half only) — `kg_factor` colmap key → `KgFactor` column | resolved by owner decision, see §6.1; the CORE half (canonical `data_info.yml` entry + teaching `harvest_kg` to prefer it) is another agent's branch and is NOT touched here |
 
 **Blast radius (rg floor).** `CROP_COLMAPS` is referenced only by
 `countries/Uganda/_/uganda.py`, the seven `Uganda/{wave}/_/crop_production.py`
@@ -101,20 +101,31 @@ before/after and two new tests).
 
 ## §6 Open questions for the human
 
-1. **The survey-reported kg factor `a5?q6d` has no home, and this is the one
-   place the fix stops short.** Both 2018-19 files carry "6d. Conversion factor
-   into kg?" populated on 7,123/7,153 (5A) and 7,026/7,041 (5B) rows, so 5A's
-   harvest weight is recoverable as `Quantity × a5aq6d` even though its unit
-   label is not. But `lsms_library/data_info.yml` declares no `Quantity_kg`
-   column for `crop_production`, and `harvest_kg` → `_kg_factor_series` reads
-   the unit LABEL only — it never consults a per-row factor. The precedent is
-   `food_acquired`, where Nigeria/Malawi ship `Quantity_kg` and
-   `_get_kg_factors` prefers it (`transformations.py:1137`). Doing the same for
-   `crop_production` needs a `transformations.py` change, which is out of this
-   task's scope. **Recommendation: do it, as its own issue** — it is the only
-   route to a kg figure for 2018-19 season A. **Caveat that must not be lost:**
-   the raw factor needs a sanity filter first (`2018` appears as a factor —
-   a year leak; a Kg row at 260,000; zeros; implied max 2.16e7 kg).
+1. **RESOLVED by owner decision — the kg factor now has a home.** *Raised as a
+   STOP (no canonical column existed, and `harvest_kg` → `_kg_factor_series`
+   reads the unit LABEL only, never a per-row factor); resolved in-session:*
+   `crop_production` gains an optional `KgFactor` column — survey-reported
+   kilograms per ONE unit of the row's `u`, NaN where the instrument records
+   none — and `transformations.harvest_kg` will prefer `Quantity × KgFactor`
+   where it is finite and > 0, mirroring how `_get_kg_factors` prefers a
+   per-row `Quantity_kg` on `food_acquired` (`transformations.py:1137`).
+
+   **The work is split across two branches and this is a MERGE-ORDER
+   dependency.** This branch ships the *country* half only: the `kg_factor`
+   colmap key, the `KgFactor` column out of `crop_production_for_wave`, and
+   the `optional: true` declaration in `Uganda/_/data_scheme.yml`. The *core*
+   half — the canonical `lsms_library/data_info.yml` entry and the
+   `harvest_kg` preference — is another agent's `feat/crop-production-kgfactor`,
+   and no file it owns is touched here. **Until it lands, `KgFactor` is
+   carried but not consumed**, so every kg figure verified on this branch is
+   still on the unit-label basis. Measured: `tests/test_schema_consistency.py`
+   passes 267/267 with `KgFactor` declared in the country scheme and absent
+   from the canonical one, so the branches are order-independent for CI.
+
+   **Caveat that must not be lost:** the raw factor needs a sanity filter
+   before anyone multiplies by it (`2018` appears as a factor — a year leak;
+   a Kg row at 260,000; zeros, which the wave builder already stores NaN;
+   implied max 2.16e7 kg).
 2. **The factor does NOT pin 5A's missing unit** — measured, so do not propose
    reconstructing it that way. Factor 20 is consistent with Tin (Debe) (20 lts),
    Basket (20 kg) and "Others specify"; factor 10 with Basket (10 kg) and
@@ -134,5 +145,23 @@ before/after and two new tests).
   evidence satisfies the §3 "vocabulary, never the label" rule.
 - `CROP_COLMAPS['2018-19']['A']['unit']` left `None` — **OK (anchored on §3)**:
   the `None` claim is now measured rather than asserted.
-- No `lsms_library/*.py` edit — **OK (anchored on §5, §6)**: the kg-factor route
-  that would have required one is deferred with its counts recorded.
+- `kg_factor` colmap key + `KgFactor` column in `crop_production_for_wave` —
+  **OK (anchored on §2, §5, §6.1)**. Not REINVENTION: the per-row-factor
+  *concept* is `_get_kg_factors`' existing `Quantity_kg` preference, and this
+  is the same pattern applied to a table that lacked it, by owner decision —
+  the consuming code is deliberately NOT duplicated here (it is the core
+  branch's). Not CONTRADICTION: `KgFactor` is a new column, so no §3
+  definition changes; the row-count invariant in §4 was measured and held
+  (119,489 non-2018-19 rows `assert_frame_equal`-identical, `check_exact=True`,
+  and 2018-19 season A identical too).
+- `KgFactor: {type: float, optional: true}` in `Uganda/_/data_scheme.yml` —
+  **OK (anchored on §3, §4)**: `optional` is required because the column is
+  wired for one wave and is legitimately all-NaN in the other six, which is
+  exactly what Site B of the null-read audit fires on.
+- **No `lsms_library/*.py` edit** — **OK (anchored on §5, §6.1)**: the half of
+  the design that needs one is on another branch, by instruction.
+- Deliberately NOT done, both with evidence recorded in `CONTENTS.org`:
+  wiring 5B's `_2` slot (adds ~1,435 rows, breaking the §4 row-count
+  invariant this task is verified against), and wiring `KgFactor` for the
+  other six waves (would move kilograms that already resolve via the unit
+  label). Neither is an oversight; both are §4 consequences.

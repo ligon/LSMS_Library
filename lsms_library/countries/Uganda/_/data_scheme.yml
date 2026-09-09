@@ -138,8 +138,13 @@ Data Scheme:
     #            for food crops (Maize, Beans, Rice, ...) so a crop j
     #            joins food_acquired(labels='Aggregate').j.
     #   u      — reported native harvest unit ('harvest_units' table);
-    #            'Unknown' where a wave records no harvest unit label
-    #            (e.g. 2018-19 harvest side).
+    #            'Unknown' where a wave-season records no harvest unit
+    #            column.  Since GH #842 that is 2018-19 season A ONLY
+    #            (7 153 rows): AGSEC5A ships two columns both titled
+    #            "6c. Condition / state" and no unit at all, while season
+    #            B's unit (a5bq6b) IS wired and serves 30 distinct labels.
+    #            Season A's kilograms are still recoverable through
+    #            KgFactor below.
     #   condition — physical state of the crop when the Quantity was
     #            measured ('harvest_conditions' table): green / fresh /
     #            dry-at-harvest / dried, crossed with the form (on the
