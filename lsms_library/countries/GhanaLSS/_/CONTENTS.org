@@ -1249,12 +1249,14 @@ the spacing and the recall length all move across waves, so they are set out
 here per wave rather than described once.
 
 Every wave from 1998--99 on carries the mapping in its own Stata variable
-labels, so none of this is inferred:
+labels, so none of this is inferred.  GLSS3 has no variable labels at all; its
+row below comes from the questionnaire and the interviewer's manual instead,
+corroborated by the visit dates the survey itself recorded (see below):
 
 | wave             | visits | 9B (purchases)   | 8H (own produce) | consumption occasions |
 |------------------+--------+------------------+------------------+-----------------------|
 | 1987-88, 1988-89 | 1      | single recall    | single recall    | 1                     |
-| 1991-92 (GLSS3)  | ?      | q2..q10          | q3..q12          | 9 / 10, *unverified*  |
+| 1991-92 (GLSS3)  | 8 / 11 | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 7 rural / 10 urban    |
 | 1998-99 (GLSS4)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
 | 2005-06 (GLSS5)  | 11     | q1..q10 -> 2..11 | q4..q12 -> 3..11 | 10 / 9                |
 | 2012-13 (GLSS6)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
@@ -1284,6 +1286,66 @@ ordinal.  There, purchases run from the 2nd visit but own production only
 from the 3rd (=s8hq3= is "number of units consumed", a total, not a visit), so
 counting from 1 within each module would leave the two misaligned by one.
 
+**** GLSS3 is stratified: 8 rural visits, 11 urban -- and two recall windows
+
+The one wave whose recall window is not constant within the wave.
+=1991-92/Documentation/pdf/G3Intman.pdf= section 1.9:
+
+#+begin_quote
+There will be 8 interviewer visits at 2-day intervals to each rural household
+and 11 interviewer visits at 3-day intervals to each urban household in a
+cycle.  Thus a workload for the 16 days in a rural cluster is 10 households,
+while a workload for the 33 days in an urban cluster is 15 households.
+#+end_quote
+
+Both modules are asked at every visit after the first (p.42: "Part H is to be
+administered on every visit except the first"), and p.43 states the count
+directly -- responses are solicited at all visits except the first, "in other
+words for urban it will be 10 times and 7 times for rural areas".  So:
+
+- *urban*: 10 asks x 3 days = *30 days* of coverage;
+- *rural*:  7 asks x 2 days = *14 days*.
+
+The survey's own visit-date page (=S0B.DTA=, =vd/vm/vy 1..11=) corroborates
+both: urban records 11 dates with a median gap of 3.0 days at every step and a
+30-day span; rural records 8, gap 2.0, span 14 days, with visits 9--11 empty.
+=S9B= positive counts follow exactly -- q1..q7 populated for everyone, q8..q10
+urban-only.
+
+*The consequence is a live defect, not a curiosity.*  Summing =visit= away in
+=food_expenditures= returns a 30-day figure for an urban household and a
+14-day figure for a rural one, so an unadjusted urban/rural comparison is off
+by ~2.14x.  GSS itself rescaled by stratum: the median ratio of published
+=POV_GH.expfoodc= to the raw 9B sum is 11.4 urban against 21.7 rural, close to
+the design factors 365/30 = 12.2 and 365/14 = 26.1.  Recorded in GH #851; the
+library does not yet carry the window, so the caller cannot make this
+adjustment from the API.
+
+The diary was *urban only* (p.6): "A dairy of daily consumption and expenditure
+will be used to support the urban interviews."  Rural expenditure in GLSS3 is
+unaided 2-day recall; urban is diary-assisted 3-day.  Elicitation mode differs
+by stratum too.
+
+***** =s9bq1= was never read: 16.2% of GLSS3 food purchases were missing
+
+The wave script took =s9bq2..s9bq10=, starting at the second stem, so the
+FIRST ask -- q1, "How much was spent on ... since my first visit?"
+(=G3QPartB.pdf= p.20) -- was dropped from every GLSS3 number this library has
+served.  It is the largest column in the module: 58,132 positive values,
+C12,428,840, *16.22%* of the C76,609,939 recorded across all ten stems.  Fixed
+2026-09-09; the rebuilt table's Expenditure now totals the full C76,609,939.
+
+***** Produced rows are padded, and a row count there is not an observation count
+
+Pre-existing, NOT fixed: =Price= comes from =s8hq14=, one column per
+=(i, j, u)=, so =wide_to_long= replicates it across all ten visit rows and the
+closing =dropna(how='all')= keeps rows whose only content is that price.
+Measured: 28,678--28,710 produced rows at every visit, but =Quantity= is
+non-null in 13,810 at visit 2 falling to 598 / 519 / 493 at visits 9--11.
+206,498 produced rows carry a price and no quantity, and a rural household
+visited eight times has price rows at visits it was never asked.  Count
+=Quantity.notna()=, not rows.
+
 **** A first-ask effect, now that the levels line up
 
 Delivered row counts per =(visit, s)=, measured 2026-09-09 on a rebuild of
@@ -1310,6 +1372,15 @@ Worth noting that GLSS5, whose own-production module starts at the 3rd visit
 rather than the 2nd, shows the weakest first-ask step (1.02x, against 1.67x
 for GLSS7 produced), which is the kind of contrast that could separate those
 explanations.
+
+GLSS3 supplies one discriminating measurement.  There the first interval is
+the SAME length as every other -- the =S0B.DTA= visit dates give a median gap
+of exactly 3.0 days (urban) / 2.0 days (rural) at every step, including
+visit 1 -> 2 -- and the first ask still carries 24--40% more positive records.
+So for GLSS3 the longer-implicit-recall explanation is excluded, leaving
+telescoping or module fatigue.  One caveat before generalising: the urban
+diary keeper is trained AT visit 1, so the first interval's diary coverage may
+be atypical of the rest.
 
 **** GLSS7's recall period: six five-day recalls, diary-supported
 
@@ -1365,9 +1436,16 @@ without being updated.  It contradicts the Report, the data, and itself:
 - The data agree with the Report: GLSS7's visit-bearing columns stop at the
   7th visit in both modules.
 
-The eleven-visit schedule is *GLSS5's*, and the data say so: GLSS5's =s9bq10=
-is labelled "amount spent by eleventh visit".  So the Manual describes the
-previous round's fieldwork.
+That eleven-visit schedule is inherited boilerplate, and its lineage runs back
+at least to GLSS3: =1991-92/Documentation/pdf/G3Intman.pdf= section 1.9 gives the
+URBAN schedule as "11 interviewer visits at 3-day intervals to each urban
+household", "33 days in an urban cluster", "Batch 1 Days
+1,4,7,10,13,16,19,22,25,28,31" -- word for word the GLSS7 Manual's Table 2.
+GLSS5 also fields eleven visits (its =s9bq10= is labelled "amount spent by
+eleventh visit"), so it may have passed through that round too; what the
+evidence settles is that the text is NOT GLSS7's, not which earlier round it
+came from.  /Corrected 2026-09-09: this passage previously attributed the
+schedule to GLSS5 specifically, which is more than the documents support./
 
 *** RETIRED: the country-level =_/food_acquired.py= concatenator (2026-09-07, GH #808)
 

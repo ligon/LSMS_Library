@@ -36,8 +36,13 @@ COUNTRY = 'GhanaLSS'
 # Per wave: the calendar visits each module is fielded at, read off that wave's
 # own Stata variable labels (see GhanaLSS/_/CONTENTS.org, "The repeated-visit
 # design, wave by wave").  1991-92 is deliberately absent: its source carries no
-# variable labels, so its offsets are unverified and its script is unchanged.
+# labels").  1991-92 has no variable labels; its mapping comes from the
+# questionnaire (G3QPartB.pdf: eleven date boxes 1st..11th, 9B q1 = "since my
+# FIRST visit") and the interviewer's manual, corroborated by the visit dates
+# the survey recorded in S0B.DTA.  Its 8 rural / 11 urban split shows as
+# purchased rows thinning after visit 8, not as a shorter visit range.
 EXPECTED = {
+    '1991-92': {'purchased': set(range(2, 12)), 'produced': set(range(2, 12))},
     '1998-99': {'purchased': set(range(2, 8)),  'produced': set(range(2, 8))},
     '2005-06': {'purchased': set(range(2, 12)), 'produced': set(range(3, 12))},
     '2012-13': {'purchased': set(range(2, 8)),  'produced': set(range(2, 8))},
@@ -47,6 +52,11 @@ EXPECTED = {
 # The exact expressions that wrote a bare question number into `visit`.  Each is
 # the pre-fix line from that wave's script.
 IDENTITY_PATTERNS = {
+    '1991-92': [r'f"Purchased_v\{i\}":\(f"s9bq\{i\}"',
+                r'f"Produced_v\{i\}":\(f"s8hq\{i\}"',
+                # the stem range that dropped s9bq1 -- 16.2% of the wave's
+                # recorded food purchase expenditure
+                r'for i in range\(2,\s*11\)'],
     '1998-99': [r"\{f's9bq\{v\}':\s*v\s+for v in range",
                 r"\{f's8hq\{v\}':\s*v\s+for v in range"],
     '2005-06': [r"\{f's9bq\{v\}':\s*f'Expenditure_v\{v\}'",
@@ -82,7 +92,15 @@ class TestScripts:
     def test_mapping_is_documented_in_the_script(self, wave):
         """The offset must carry its evidence, not just be correct."""
         src = _script(wave).lower()
-        evidence = r'2nd visit|second visit|2\.\.7|2-7|2\.\.11'
+        # Each wave must quote the source that fixes ITS mapping -- a Stata
+        # variable label for 1998-99 onward, the questionnaire for 1991-92.
+        evidence = {
+            '1991-92': r'first visit|2nd\.\.11th',
+            '1998-99': r'2nd visit|2\.\.7',
+            '2005-06': r'second visit|2\.\.11|3rd visit',
+            '2012-13': r'2nd visit|2\.\.7',
+            '2016-17': r'2nd visit|2\.\.7',
+        }[wave]
         assert 'visit' in src and re.search(evidence, src), (
             f'{COUNTRY} {wave}: the question-number -> visit mapping is not '
             f'documented in the script.  Quote the source variable label, so '
