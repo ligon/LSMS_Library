@@ -15,7 +15,11 @@ post-harvest (passage 2) before post-planting (passage 1), then questionnaire
 order — mirroring the Mali EACI community_prices reference (no averaging:
 a mean across observations / passages is a transformation).  Rows with no
 usable price, or a missing-marker unit ('produit absent' / 'manquant' ->
-'Manquant'), are dropped.
+'Unknown' since GH #842), are dropped.  Measured: 795 price-bearing
+observations in this wave (218 passage 1, 577 passage 2) carry no unit value
+at all, and none of them carries a usable Quantity either -- neither a unit
+nor a weight, so no basis to be a price OF anything.  See
+niger.py::_finish_community_prices.
 
 CLUSTER-level feature (no household i): `v` is declared in the index, NOT
 framework-joined.  Index = (t, v, j, u).

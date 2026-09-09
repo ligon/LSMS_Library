@@ -13,7 +13,9 @@ One REPORTED price is selected per (t, v, j, u) (this single-passage wave has
 no post-harvest/post-planting split, so the questionnaire row order breaks
 ties), mirroring the Mali EACI reference — NOT averaged (a mean is a
 transformation).  Rows with no usable price, or a missing-marker unit
-('produit absent'/'manquant' -> 'Manquant'), are dropped.
+('produit absent'/'manquant' -> 'Unknown' since GH #842), are dropped.  This
+wave has NO price-bearing observation with a missing unit (measured: 0 of
+13,840); the 795 that do are all in 2011-12.
 
 This is a CLUSTER-level feature (no household i): `v` is declared in the index
 and is NOT framework-joined.  Index = (t, v, j, u).
