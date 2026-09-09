@@ -511,6 +511,50 @@ Columns:
         dried_grain: []
         other_condition: []
         unknown_condition: []
+    KgFactor:
+      type: float
+      optional: true
+      note: |
+        Kilograms per ONE unit of this row's `u`, AS THE INSTRUMENT REPORTS
+        IT -- e.g. UNPS `a5?q6d`, "conversion factor into kg", asked
+        alongside the harvest quantity and unit.  `Quantity * KgFactor` is
+        that row's harvest in kilograms.  NaN where the survey does not
+        record it; optional because most countries never ask.
+
+        REPORTED, NEVER CONSTRUCTED.  Only a number the survey (or a
+        survey-supplied conversion table) actually wrote down belongs in
+        this column.  Nothing inferred goes here -- not a median over
+        sibling rows, not a factor from the library's unit tables.  That
+        keeps the served table what every crop_production config already
+        promises it is ("REPORTED values only -- no harvest_kg / yield /
+        main_crop", said independently by Uganda, Mali, Niger, Tanzania and
+        Togo), and it keeps the inference revisable without a rebuild:
+        construction happens at read time in
+        `transformations.harvest_kg`, which layers reported -> median of
+        reported for the same (u, condition) in the same country-wave ->
+        the library's inferred factor, and discloses which layer served
+        each row.
+
+        A FACTOR HERE, A PRODUCT IN `food_acquired`.  The antecedent is
+        `food_acquired.Quantity_kg` (Nigeria `s10bq2_cvn`, Malawi
+        `cfactor`), which carries the exact per-row kilogram AMOUNT and is
+        preferred over the inferred factor by the same rule -- see
+        `transformations.conversion_to_kgs` and
+        `food_quantities_from_acquired`.  The two are one design with one
+        difference of carrier, and the difference is forced by the grain.
+        Food rows are SUMMED across units within an acquisition source, so
+        food needs the summable product.  Crop rows sit at
+        (t, i, plot, j, u, condition, season) and are never summed across
+        `u` or `condition`, so the factor is the natural carrier: it
+        identifies the container (a 100 kg sack is not a 120 kg sack), it
+        can be audited against the library's inferred factors for the same
+        `u`, and the product is one multiplication away.
+
+        CONSUMERS MUST NEVER TREAT THIS AS A QUANTITY.  It is kg per unit,
+        not kg.  Summing it, averaging it across rows of different `u`, or
+        reading it as a harvest is a category error; the only sanctioned
+        use is `Quantity * KgFactor` on the SAME row, which is what
+        `harvest_kg` does.
   food_acquired:
     # Acquisition source 's' is an INDEX level (see Index Info above),
     # not a column.  Canonical values: purchased, produced, inkind,
