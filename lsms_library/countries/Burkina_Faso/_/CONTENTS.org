@@ -130,6 +130,11 @@ sub-samples.  This matters when reading the =food_acquired= notes elsewhere in
 this file (only passage 1 records quantities): that is a module-coverage fact,
 not a sampling fact.
 
+They ARE, however, four independent recall occasions, and =food_acquired=
+carries them on a =visit= level for exactly that reason -- see the section
+"2014 EMC =food_acquired=: FOUR PASSAGES, and 82.5% of them used to be
+deleted" at the end of this file.
+
 ** 2018-19 -- EHCVM-1 (Enquête Harmonisée sur les Conditions de Vie des Ménages)
 
 Sources, both in-repo.  PRIMARY (French):
@@ -457,7 +462,17 @@ Makefile works for current files in the folder.
 Converted from Python scripts to YAML =data_info.yml= entries for all three waves (2014, 2018-19, 2021-22).
 
 *** 2014 wave (EMC)
-The 2014 survey has 4 passages (=emc2014_p{1..4}_conso7jours_*.dta=).  Only passage 1 records food quantities (=qachat=), units (=uachat=), and auto-consumption quantities (=qautocons=).  Passages 2--4 record only monetary values: purchase expenditure (=achat=), auto-consumption value (=autocons=), and gifts (=cadeau=).  All 4 passages are included; =Quantity=, =Produced=, and =u= are NaN for passages 2--4.
+The 2014 survey has 4 passages (=emc2014_p{1..4}_conso7jours_*.dta=).  Only passage 1 records food quantities (=qachat=), units (=uachat=), and auto-consumption quantities (=qautocons=).  Passages 2--4 record only monetary values: purchase expenditure (=achat=), auto-consumption value (=autocons=), and gifts (=cadeau=).  All 4 passages are included; =Quantity= and =Produced= are NaN for passages 2--4.
+
+CORRECTION (2026-09-09).  This entry used to end "... and =u= are NaN for
+passages 2--4", and *"all 4 passages are included" was the intent, not the
+behaviour*: a NaN on the declared =u= index level is deleted by
+=groupby(dropna=True)=, so 460,438 of 557,822 rows -- every passage-2/3/4 row
+-- were silently thrown away, and the served wave was passage 1 alone.  =u=
+now carries the =Unknown= sentinel, and the four passages carry =visit= 1..4
+so their independent 7-day recalls are not summed into one figure.  Full
+write-up, with before/after numbers, in the section "2014 EMC =food_acquired=:
+FOUR PASSAGES, and 82.5% of them used to be deleted" at the end of this file.
 
 Variable names differ from EHCVM waves: cluster is =zd= (not =grappe=), food item is =product= (not =s07bq01=), etc.
 
@@ -713,3 +728,173 @@ not have that hook on =food_acquired=* (its one encoding repair, GH #801's
 roster =_RELATIONSHIP_FIX=, is on another file and another table; GH #805 is
 the reader-level alternative -- both above).  Whichever way this is unified,
 the read and the crosswalk must move in the same commit.
+
+* 2014 EMC =food_acquired=: FOUR PASSAGES, and 82.5% of them used to be deleted
+
+*Read this before touching =2014/_/data_info.yml= or =2014/_/mapping.py=.*
+GH #851; =.coder/charter-recall-windows.md= §2.7.  Fixed 2026-09-09; the
+measurements below are from cold builds (empty =LSMS_DATA_DIR=, only
+=dvc-cache= symlinked in) before and after.
+
+** The idiosyncrasy
+
+The EMC 2014 is a *continuous* survey.  =Report.pdf= p. 20, quoted verbatim
+under "Sub-samples / oversamples" above: « Le dispositif de l'EMC a prévu la
+reconduite de l'ensemble des ménages enquêtés au premier passage aux trois
+passages suivants ».  The 7-day food module is *re-asked at every passage*, so
+the wave delivers *4 x 7 = 28 days* of exposure in four INDEPENDENT recalls.
+A passage-3 row is a different measurement of the same (household, item), not
+a second transaction inside one 7-day window.
+
+*The passage number is in the FILENAME and in no source column.*  Measured on
+all four =emc2014_p{1..4}_conso7jours_16032015.dta=: none carries a passage /
+vague / round variable.  The only per-passage marks are *suffixed* copies of
+household attributes (=hhweight1= / =hhsize1= in p1, =hhweight2= in p2, ...),
+which is not a variable you can key on.  So =visit= must be *stamped per file*.
+
+*Passage 1 is the only one with a quantity grid.*  p1 fields =qachat= /
+=uachat= / =qautocons=; p2-p4 record money only (=achat=, =autocons=,
+=cadeau=).  Row and CFA totals as extracted:
+
+| passage | source rows | canonical rows |  Quantity | Expenditure (CFA) |
+|---------+-------------+----------------+-----------+-------------------|
+|       1 |     171,236 |        152,589 | 4,208,738 |        93,383,167 |
+|       2 |     166,913 |        139,834 |         0 |        82,473,394 |
+|       3 |     164,366 |        136,948 |         0 |        93,328,730 |
+|       4 |     168,463 |        128,451 |         0 |        72,925,224 |
+|   total |     671,978 |        557,822 | 4,208,738 |       342,110,515 |
+
+** What was wrong -- TWO mechanisms, and only one of them was the visible one
+
+1. *No =visit= level.*  All four files were declared under one
+   =(t, v, i, j, u, s)= index.  =food_acquired= is in
+   =feature._ADDITIVE_MEASURE_COLUMNS=, so four passages landing on one tuple
+   are *SUMMED* into a single figure served as a 7-day number.
+2. *=u= arrived NaN for every p2-p4 row* (no =uachat= column exists in those
+   files), and for 55,205 p1 rows whose =uachat= is blank.  =u= is a DECLARED
+   index level and pandas =groupby(dropna=True)= *deletes* a row with a NaN
+   key, so =_normalize_dataframe_index= threw those rows away *before* the sum
+   could happen.
+
+*Mechanism 2 is why mechanism 1 was invisible.*  The passages were not being
+summed -- they were being *deleted*.  Measured on the pre-fix build:
+
+: 557,822 canonical rows extracted -> 460,438 DELETED (82.5%) -> 97,361 served
+: CFA 342,110,515 extracted        -> CFA  80,286,096 served  (76.5% lost)
+
+so =Country('Burkina_Faso').food_acquired()= at =t='2014'= was *passage 1's
+unit-bearing rows and nothing else*, presented as the wave.  This is the worst
+instance in the corpus of the NaN-index-key class (CLAUDE.md "Grain Collapse"
+§3b names this exact cell; =.coder/ledger/323-framework.md= §7 D2 deferred the
+framework-level change).  The cell nonetheless graded =sane= throughout.
+
+*The prior review's framing -- "132,860 index groups hold >1 row, group sizes
+2/3/4 tracking the passage count" -- reproduces exactly but does NOT mean the
+passages were summed.*  Those groups are an artefact of grouping with
+=dropna=False=: they pool p2/p3/p4 (plus p1's unit-less rows) on a shared NaN
+=u=.  The real collapse runs with =dropna=True= and never reaches them.  Among
+the rows that DID survive, only 22 groups were multi-row, all inside passage 1.
+
+** The fix
+
+- =2014/_/data_info.yml= stamps =visit= per file through the framework's
+  per-file override block, using the only constant-stamp spelling config has:
+  an always-present column (=zd=) mapped through =visit_p{n}= in
+  =2014/_/mapping.py=, four functions that ignore their argument and return
+  the passage number.  =zd= carries no information here.  =visit= is declared
+  as a *myvar*, not an idxvar, because =df_data_grabber= runs =format_id= over
+  every idxvar and would serve the passage number as a *string*.
+- =2014/_/mapping.py::food_acquired= reshapes each passage separately and
+  re-stamps =visit= onto the index as an =int= with
+  =build_transforms.add_visit_level= -- which was written for this wave (its
+  docstring names it) and until now had zero production callers.  It RAISES if
+  the frame reaches it with no =visit= column, so a future config edit cannot
+  silently re-merge two recall occasions.
+- The same hook fills a missing =u= with the corpus-canonical =Unknown=
+  sentinel (GH #842; the Niger pattern, =Niger/_/niger.py::fill_missing_u=).
+  *Without this the =visit= fix would be cosmetic* -- p2-p4 never reach the
+  index at all.
+- =2018-19= and =2021-22= ask the module once, so their =mapping.py= appends
+  =add_visit_level(..., visit=1)=: one index shape across the three waves, no
+  number changed.  EHCVM's =vague= is a *sample split*, not a repeated
+  measure, and is dropped upstream by =food_acquired_to_canonical= -- reusing
+  it as =visit= would falsely imply a second recall.
+- =_/data_scheme.yml= declares =index: (t, v, i, j, u, s, visit)=.
+
+*Why config and not a =materialize: make= script.*  A script is the repo's
+usual answer to per-file constants, and =add_visit_level= is script-shaped.
+It was rejected here for three reasons: the section above records that 2014 is
+built through the YAML path and its =j= is keyed on *load-bearing mojibake* in
+=harmonize_food=, so a script would have to re-implement that crosswalk and
+would drift from the open GH #794 / #805 fix; script-path L2-wave parquets are
+written hashless and cannot self-invalidate; and the alternative core edit (a
+constant primitive in =Country.column_mapping=) sits in
+=build_transforms_fingerprint= for *every table in every country* and would
+cold-rebuild the corpus.
+
+** After
+
+|                             |     before |       after |
+|-----------------------------+------------+-------------|
+| wave frame rows             |    557,822 |     557,822 |
+| delivered =t='2014'= rows   |     97,361 |     557,692 |
+| delivered Expenditure (CFA) | 80,286,096 | 342,110,515 |
+| delivered Quantity          |  4,108,613 |   4,208,738 |
+| rows deleted on a NaN key   |    460,438 |           0 |
+| =GrainCollapseWarning=      |        yes |        none |
+
+Per-passage Expenditure is now readable off the delivered table and sums to
+the wave total: 93,383,167 + 82,473,394 + 93,328,730 + 72,925,224 =
+342,110,515.  The 130-row gap between 557,822 and 557,692 is the framework's
+*additive* de-dup of 129 genuine within-passage duplicate groups (128 of size
+2, one of size 3) -- lossless, which the unchanged totals prove.  2018-19 and
+2021-22 are unchanged to the last digit.  Pinned by
+=tests/test_burkina_faso_2014_passages.py= (12 tests; all 12 fail against the
+pre-fix config).
+
+** Consequences you will meet
+
+- *=Country= keeps the detail; =Feature= still sums it.*
+  =Feature('food_acquired')= drops =visit= (it is not in the canonical
+  =index_info=) and SUMS the additive columns, warning as it goes -- exactly
+  what it does for GhanaLSS's repeated visits (GH #501).  The 28-day total is
+  what crosses the country boundary; the four 7-day figures stay visible at
+  the =Country= level.  Same for the derived tables: =food_expenditures= /
+  =food_quantities= sum over =visit=, =food_prices= takes the median.
+- *=food_expenditures= at =t='2014'= is a 28-day figure* while every other
+  Burkina Faso wave is 7-day.  Nothing in the API says so yet; that is what
+  GH #851 is about.
+- *=food_prices()= now warns that it dropped 64.8% of priceable rows* (449,842
+  of 693,987, up from 845 of 244,812).  *This is NOT the GH #591 defect the
+  warning's text guesses at* ("a 0-as-missing sentinel or a quantity variable
+  mapped to the wrong survey question").  It is the module-coverage fact above:
+  three of the four passages record expenditure and no quantity, so
+  =food_acquired_to_canonical= gives them =Quantity = 0= and no unit value
+  exists.  Those rows were previously deleted before =food_prices= ever saw
+  them, so the loss is newly *visible*, not newly *incurred*.
+- *=u == 'Unknown'= is not a unit* -- 460,331 of the 557,692 served 2014 rows.
+  Exclude it before any per-unit price or kg conversion, and report how many
+  rows you excluded.
+
+** Still not wired (measured, not inferred)
+
+- *Non-food, and its exposure differs from food's.*  =emc2014_p{2,3,4}_-
+  conso7nonalimjours_*.dta= exist; there is *no p1 file*.  Confirmed by
+  listing =2014/Data/= and reading all three: p2 47,880 rows / 10,577
+  households, p3 47,540 / 10,160, p4 45,870 / 10,093.  So in one wave *food
+  gets 4 asks (28 days) and non-food 3 (21 days)* -- the note in
+  =.coder/coverage/food_recall.csv= is confirmed.  Burkina Faso declares no
+  =nonfood_expenditures= table, so none of it is read today.
+- *A 3-month recall module exists for all four passages*
+  (=emc2014_p{1..4}_conso3mois_*.dta=; p1 is 192,728 rows / 10,799
+  households).  Also unwired.
+- *Passage 4 ships two dated versions of each file* (=..._10032015.dta= and
+  =..._16032015.dta=), for =conso7jours=, =conso7nonalimjours= and
+  =conso3mois= alike.  =data_info.yml= uses =16032015=, the later one, which
+  is also the one whose column set matches p2/p3.  The =10032015= food file
+  has 167,324 rows against 168,463; they are not interchangeable.
+- *p1's =autocons= / =cadeau= (auto-consumption VALUE and gift value) and
+  p2-p4's =autocons= / =cadeau= are not read.*  Only =achat= reaches
+  =Expenditure=.  So the served figure is *purchases*, plus p1's
+  own-production QUANTITY via =qautocons=; the value of own production and of
+  gifts in p2-p4 is on the floor.  Sizing this is open work.
