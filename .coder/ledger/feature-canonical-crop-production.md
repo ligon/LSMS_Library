@@ -178,11 +178,39 @@ excluded, −131,548); after, **14 / 608,570**.
 **Assembled index**: `['country','t','v','i','plot','j','u','condition','season','currency']`
 — named, canonical order, `is_unique == True` in every run.
 
-**Zero rows lost or collapsed.** `grain_reports()` is EMPTY after every
-assembly (0 before, 0 after), on both the 6- and 7-level Malawi runs. Adding a
-constant level or promoting a column can only refine an index, so
-`_collapse_duplicate_index` is structurally unreachable from this path; pinned
-by `test_no_collapse_and_no_row_loss_on_a_duplicate_prone_frame`.
+**Zero rows lost or collapsed by THIS branch.** No Feature-side collapse
+warning fires in either run, and every kept country's Feature row count equals
+its `Country()` row count.
+
+> **Correction (red-team, 2026-09-10).** This paragraph used to say
+> "`grain_reports()` is EMPTY after every assembly (0 before, 0 after)". That is
+> **false as written** and is exactly the sentence a later agent would quote as
+> evidence the corpus is clean. `grain_reports()` is **8**, on base and on branch
+> alike — all eight are pre-existing **Site-1 country-build** reports replayed
+> from parquet metadata, nothing to do with this branch: Ethiopia 2013-14 (2 rows
+> destroyed), 2015-16 (2), 2018-19 (7), 2021-22 (17); Guinea-Bissau 2018-19 (11
+> destroyed + 1,596 deleted on a NaN key); Niger 2011-12 (19), 2014-15 (45),
+> 2021-22 (897). The substantive claim — that the **Feature-side**
+> `_collapse_duplicate_index` never fires on this corpus — holds. My own probe
+> read a per-call delta rather than the absolute ledger, which is why it read 0.
+
+**Promotion CAN collide, and is now guarded (red-team item 3).** Branch 3
+(fabricating a constant) is structurally safe — a constant distinguishes nothing.
+**Branch 2 is not**: a promoted column holding BOTH a null (filled with the
+sentinel) and the LITERAL sentinel maps two otherwise-identical rows onto one
+index tuple. The original docstring claimed neither branch could collide, and
+`__call__` never checked `is_unique` after the concat, so a real collision would
+have shipped a silently non-unique cross-country index — the one failure mode
+with no guard behind it. No corpus country is in that state (Mali / Nigeria /
+Tanzania carry **0** literal `'Unknown'` in `u`), but that is a fact about the
+DATA, not a property of the code. `_align_to_canonical_levels` now routes a
+non-unique post-`set_index` frame through `_collapse_duplicate_index` — the SAME
+audited collapse the core uses — so the collapse files a grain report, warns
+`GrainCollapseWarning` when destructive, and raises `GrainCollapseError` under
+`LSMS_GRAIN_STRICT`. Never a silent `first()`, never a silent pass-through.
+Pinned by `TestPromotionCollision` (4 tests, incl. the strict-mode raise); the
+old `test_no_collapse_…` covered only the REFINING case (`u=['Kg','Bag']`) and is
+renamed to say so.
 
 **Nulls filled on promotion** (the `u` column → `u` level, sentinel `Unknown`):
 Mali 1,910; Nigeria 13,138; Tanzania 2,395. Each was a NaN that would have been
@@ -225,6 +253,25 @@ in kept-country set, per-country row count AND index names (e.g. `food_acquired`
 modal for all of them, which the #498 reorder guarantees whenever a country has
 all canonical levels.
 
+**`food_acquired`, the one feature the red-team could not finish, is
+identical.** Re-run base-vs-branch on the red-team's own COPIED warm parquets
+(`<worktree>/.rt_data`, 386 files), base = `development` @ `a00a8310` (v0.11.1,
+which this branch has now merged), warm-presence-filtered so nothing outside the
+copy was asked for:
+
+| | base | branch |
+|---|---|---|
+| countries kept | 19 | 19 (identical set) |
+| rows | 7,461,217 | 7,461,217 |
+| index names | `[country,t,v,i,j,u,s,currency]` | identical |
+
+Per-country counts equal element-for-element (GhanaLSS 1,693,452; Malawi 971,531;
+Nigeria 595,725; Panama 571,354; …). With the red-team's 21 completed features
+plus 12 unregistered ones, that is **every** measured feature identical
+base-to-branch except `crop_production` itself. (Note: the generated per-country
+methods REJECT `assume_cache_fresh=`; `trust_cache=True` on `Feature`/`Country`
+is the working lever, as the red-team found.)
+
 **Process defect to disclose: 65 parquets were written into the SHARED cache.**
 The scratch `LSMS_DATA_DIR` was a tree of SYMLINKS into
 `/global/scratch/.../cache/lsms_library`, so a build that fired wrote *through*
@@ -232,13 +279,23 @@ the symlink. The `Feature('crop_production')` measurements wrote nothing
 (checked immediately: `find -newer` empty); the **full fast test tier**, run with
 that same `LSMS_DATA_DIR`, cold-built 65 missing `var/` and `{wave}/_/` parquets
 between 00:54 and 00:59 (Malawi/Nigeria `food_acquired`, several `sample`,
-`household_roster`, `cluster_features`, `housing`, …). They are ordinary rebuilds
-from **unmodified country configs** — this branch touches only the global
-`lsms_library/data_info.yml` and `feature.py`, neither of which is an input to
-`Wave._input_hash` / `Country._table_cache_hash` (0 of 26 probed, above) and
-neither of which affects *stored* parquet content (spellings/dtype/kinship are
-read-path). `crop_production` parquets were NOT among them, so every number in
-this ledger is unaffected. The cache is warmer, not wrong; nothing was deleted.
+`household_roster`, `cluster_features`, `housing`, …). **No `crop_production` parquet is among the 65** — confirmed
+independently by the red-team over the full list — so every number in this ledger
+is unaffected.
+
+> **Correction (red-team item 8).** This used to assert they were "ordinary
+> rebuilds from *unmodified* country configs". Only part of that is established.
+> 25 of the 65 are country-level (`var/`) and therefore checkable by reading the
+> embedded `lsms_cache_hash` and recomputing `Country(c)._table_cache_hash(t,
+> c.waves)` live: **21 match, 4 do not** — `Malawi/household_roster`,
+> `Malawi/food_acquired`, `Togo/nonfood_expenditures`, `Benin/cluster_features`,
+> none of which reproduces under `development`, `wt-854-malawi` or
+> `wt-824-uganda` either. Most consistent with a build inside a pytest fixture
+> that overrode `LSMS_COUNTRIES_ROOT` to a temporary modified config tree (such
+> fixtures exist and were running). The remaining 40 are wave-level, written
+> hashless by design, and not checkable. **Impact is bounded**: a hash that
+> matches nothing is a STALE hash, so the next reader's `cache_freshness` check
+> rebuilds rather than serving it — wasteful, not wrong. Nothing was deleted.
 The later cross-feature sweep was re-run with a warm-only presence filter and
 wrote **0** files. **Lesson for the next agent: a symlink farm is not a
 read-only data root** — either verify every needed parquet exists first, or copy.

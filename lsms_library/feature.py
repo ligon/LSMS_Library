@@ -161,10 +161,25 @@ def _align_to_canonical_levels(
     3. **absent entirely** -- fabricated as a constant sentinel level.
 
     Never ``pd.NA``: every value written here is the declared string sentinel,
-    because a null on a declared index level is deleted by the next
-    ``groupby``.  Adding a constant (or promoting a column) can only REFINE an
-    index, so this can never make the index non-unique and can never reach
-    ``_collapse_duplicate_index``.
+    because a null on a declared index level is deleted by the next ``groupby``.
+
+    **Branch 3 cannot make the index non-unique; BRANCH 2 CAN.**  An earlier
+    version of this docstring claimed neither could, and that was wrong in the
+    dangerous direction.  Adding a *constant* level distinguishes nothing, so it
+    refines nothing and collides with nothing -- branch 3 is structurally safe.
+    Promotion is not: a column holding BOTH a null (filled with the sentinel)
+    and the LITERAL sentinel value maps two otherwise-identical rows onto one
+    index tuple.  No corpus country is in that state today -- Mali, Nigeria and
+    Tanzania's ``u`` columns carry 0 literal ``'Unknown'`` values -- but that is
+    a fact about the data, not a property of the code, and it can change with
+    any wave.
+
+    So the collision is GUARDED rather than assumed away: a non-unique index
+    after ``set_index`` is routed through :func:`_collapse_duplicate_index`, the
+    same audited collapse the core uses, which files a grain report and raises
+    ``GrainCollapseError`` under ``LSMS_GRAIN_STRICT`` when the colliding rows
+    disagree.  Never a silent ``first()``, and never a silent pass-through of a
+    non-unique index into ``pd.concat``.
 
     Reporting.  With ``report`` supplied, what happened is recorded there and
     :meth:`Feature.__call__` emits ONE aggregated warning per call and puts the
@@ -205,6 +220,29 @@ def _align_to_canonical_levels(
             fabricated.append(lvl)
     out = flat.set_index(names + todo)
     out.attrs = dict(df.attrs)  # single-input ops keep attrs; be explicit anyway
+    if promoted and not out.index.is_unique:
+        # A promoted column held a null AND the literal sentinel on rows that are
+        # otherwise identical -- the one way this function can collide.  Route it
+        # through the SAME audited collapse the core uses so a destructive
+        # collapse is reported (and fatal under LSMS_GRAIN_STRICT) rather than
+        # shipping a silently non-unique Feature index.  `attrs` are re-attached
+        # because `groupby().agg()` is not a single-input op.
+        collapsed = _collapse_duplicate_index(out, table_name, country)
+        collapsed.attrs = dict(out.attrs)
+        n_lost = len(out) - len(collapsed)
+        if report is not None:
+            report.setdefault("promotion_collisions", {})[country] = {
+                lvl: sentinels[lvl] for lvl, _ in promoted}
+        else:
+            warnings.warn(
+                f"{table_name}: promoting {[lvl for lvl, _ in promoted]} for "
+                f"{country} made the index NON-UNIQUE -- the column holds both "
+                f"nulls (filled with the sentinel) and the literal sentinel "
+                f"value, so {n_lost} row(s) collided onto an existing key. "
+                f"Collapsed through the audited core collapse; any destructive "
+                f"loss is reported separately as a GrainCollapseWarning."
+            )
+        out = collapsed
     if report is not None:
         if promoted:
             report.setdefault("promoted", {})[country] = {
@@ -951,11 +989,22 @@ class Feature:
                     bits.append(
                         f"added constant sentinel level(s) for countries whose "
                         f"instrument does not record them: {fabricated}")
+                collisions = record.get('promotion_collisions', {})
+                if collisions:
+                    bits.append(
+                        f"PROMOTION COLLIDED for {sorted(collisions)}: the "
+                        f"promoted column held both nulls and the literal "
+                        f"sentinel {collisions}, so rows collapsed onto an "
+                        f"existing key -- this country contributes FEWER rows "
+                        f"than Country(name).{self.table_name}() returns; the "
+                        f"collapse was audited (see any GrainCollapseWarning)")
+                tail = (". See df.attrs['canonical_alignment']."
+                        if collisions else
+                        ". No rows were added, removed or collapsed; see "
+                        "df.attrs['canonical_alignment'].")
                 warnings.warn(
                     f"{self.table_name}: aligned country frames to the canonical "
-                    f"index declared in data_info.yml -- " + "; ".join(bits) +
-                    ". No rows were added, removed or collapsed; see "
-                    f"df.attrs['canonical_alignment']."
+                    f"index declared in data_info.yml -- " + "; ".join(bits) + tail
                 )
 
         # GH #603/#601 -- SURFACE, then WARN.  Never fence: every country that

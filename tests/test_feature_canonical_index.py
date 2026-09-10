@@ -266,9 +266,15 @@ class TestHarmonizeCountryFrame:
         assert list(out.index.names) == CANONICAL
         assert out.index.get_level_values("plot").tolist() == ["p1"]
 
-    def test_no_collapse_and_no_row_loss_on_a_duplicate_prone_frame(self):
-        """Adding a constant level (or promoting a column) can only REFINE an
-        index, so nothing here can reach `_collapse_duplicate_index`."""
+    def test_promotion_of_DISTINCT_values_refines_and_loses_nothing(self):
+        """The REFINING case: two non-null, distinct `u` values on rows that are
+        otherwise identical.  Promotion separates them, so nothing collapses.
+
+        This is deliberately labelled as only half the story -- see the
+        collision tests below.  An earlier version of this test was the ONLY
+        coverage of promotion and asserted `is_unique`, which read as proof that
+        promotion cannot collide.  It cannot collide *here*; it can collide when
+        a null and the LITERAL sentinel share a row key."""
         from lsms_library.country import grain_reports
         before = len(grain_reports())
         df = _frame(["t", "v", "i", "plot", "j"],
@@ -283,6 +289,84 @@ class TestHarmonizeCountryFrame:
                 sentinels=_missing_level_sentinels("crop_production"))
         assert len(out) == 2 and out.index.is_unique
         assert len(grain_reports()) == before
+
+    def test_fabrication_alone_can_never_collide(self):
+        """Branch 3 IS structurally safe: a constant level distinguishes
+        nothing, so it cannot map two distinct keys onto one."""
+        df = _frame(["t", "v", "i", "plot", "j", "u"],
+                    [("2012", "c1", "h1", "p1", "Maize", "Kg"),
+                     ("2012", "c1", "h1", "p1", "Maize", "Bag")])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = _harmonize_country_frame(
+                df, CANONICAL, "X", "crop_production", False,
+                aliases={}, sentinels=_missing_level_sentinels("crop_production"))
+        assert len(out) == 2 and out.index.is_unique
+
+
+def _collision_frame():
+    """Two rows identical but for `u`: one NULL, one the LITERAL sentinel.
+
+    Filling the null with `'Unknown'` maps them onto the same index tuple.  No
+    corpus country is in this state today (Mali / Nigeria / Tanzania carry 0
+    literal `'Unknown'` in `u`), which is a fact about the data and not a
+    property of the code -- a new wave could ship one tomorrow."""
+    return _frame(["t", "v", "i", "plot", "j"],
+                  [("2012", "c1", "h1", "p1", "Maize"),
+                   ("2012", "c1", "h1", "p1", "Maize")],
+                  Quantity=[1.0, 2.0], u=["Unknown", None])
+
+
+class TestPromotionCollision:
+    """The one way `_align_to_canonical_levels` can make an index non-unique.
+
+    The docstring used to claim it could not, and `Feature.__call__` never
+    checked `is_unique` after the concat -- so a real collision would have
+    shipped a silently non-unique cross-country index.  It is now routed through
+    the SAME audited collapse the core uses (GH #323)."""
+
+    def test_collision_is_collapsed_and_a_grain_report_is_filed(self):
+        from lsms_library.country import GrainCollapseWarning, grain_reports
+        before = len(grain_reports("Nigeria", "crop_production"))
+        with pytest.warns(GrainCollapseWarning):
+            out = _align_to_canonical_levels(
+                _collision_frame(), CANONICAL,
+                _missing_level_sentinels("crop_production"),
+                "Nigeria", "crop_production")
+        assert out.index.is_unique, "the collision was not resolved"
+        assert len(out) == 1
+        after = grain_reports("Nigeria", "crop_production")
+        assert len(after) > before, "no grain report was filed for the collapse"
+        assert after[-1]["site"] == "Feature._harmonize_country_frame"
+
+    def test_collision_is_fatal_under_grain_strict(self, monkeypatch):
+        from lsms_library.country import GrainCollapseError
+        monkeypatch.setenv("LSMS_GRAIN_STRICT", "1")
+        with pytest.raises(GrainCollapseError):
+            _align_to_canonical_levels(
+                _collision_frame(), CANONICAL,
+                _missing_level_sentinels("crop_production"),
+                "Nigeria", "crop_production")
+
+    def test_collision_is_never_a_silent_pass_through(self):
+        """Whatever else happens, the frame handed to `pd.concat` is unique."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = _harmonize_country_frame(
+                _collision_frame(), CANONICAL, "Nigeria", "crop_production",
+                False, aliases=_level_aliases("crop_production"),
+                sentinels=_missing_level_sentinels("crop_production"))
+        assert out.index.is_unique
+
+    def test_collision_is_recorded_in_the_aggregated_report(self):
+        report: dict = {}
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            _align_to_canonical_levels(
+                _collision_frame(), CANONICAL,
+                _missing_level_sentinels("crop_production"),
+                "Nigeria", "crop_production", report=report)
+        assert report["promotion_collisions"]["Nigeria"] == {"u": "Unknown"}
 
     def test_unregistered_feature_is_untouched(self):
         """No index_info entry -> canonical_levels is [] -> nothing happens."""
