@@ -133,26 +133,50 @@ column). `harvest_kg` total 9 315 175 → 22 111 818; layers
 `none` 51 027 → 31 200, `reported_implausible` 0 → 11.
 All 24 Nigeria `_table_cache_hash` values move (worktree vs. main config tree).
 
-**Operational note — verify a Nigeria `crop_production` change after a
-`cache clear`, not merely after an edit.** Observed here: the edits moved all
-24 hashes, and the very next read still served the OLD frame (no `KgFactor`
-column at all); the rebuild only happened after
-`lsms-library cache clear --country Nigeria`.
+**Operational note — a warm Nigeria cache does NOT pick this up (GH #866).**
+Observed here: the edits moved all 24 hashes, and the very next read still
+served the OLD frame (no `KgFactor` column); only
+`lsms-library cache clear --country Nigeria` produced the rebuild.
 
-Mechanism, probed afterwards rather than assumed. The gate itself is sound —
-with a hash stored, a one-line change to `nigeria.py` produced
-`v0.8.0 cache STALE: crop_production … rebuilding from source` on the next read
-(debug log, 2026-09-09), and the parquet came back re-stamped with the new
-hash. The one miss is therefore the **`legacy` branch**, exactly as
-`CLAUDE.md` §"Automatic content-hash staleness" limitation (b) describes:
-`crop_production` is a script-path table whose parquet is written by
-`_/crop_production.py` via `to_parquet`, i.e. **hashless**, so the first read
-after a fresh build grades `legacy` → *trust once and stamp with the CURRENT
-hash* (`country.py:3826-3833`). A config edit that lands between that build and
-that first read is silently blessed. One read, one edit — and the window
-closes, which is why it is easy to hit once and impossible to reproduce twice.
+**The mechanism is a defect in the REBUILD DESCENT, not the read gate**, and an
+earlier version of this note got it wrong (it blamed the `legacy`
+trust-once-and-stamp path). Diagnosed by the red team, filed as **GH #866**:
 
-A caveat on the probe, stated so it is not over-read: a comment-only edit
-yields identical data whether it rebuilds or not, so the *first* re-probe was
-inconclusive by construction. The decisive one compared the stored hash against
-`_table_cache_hash` directly and read the `STALE` log line.
+1. The gate works — the read grades `stale` and logs
+   `v0.8.0 cache STALE: crop_production …; rebuilding from source`.
+2. The rebuild reaches `run_make_target`, which tries `try_make` FIRST
+   (`country.py:3538`): `make -s $(VAR_DIR)/crop_production.parquet` in
+   `Nigeria/_`.
+3. Nigeria's `_/Makefile` has **no rule for that target**. GNU make, handed a
+   rule-less target that *exists as a file*, calls it up to date and **exits
+   0** (it errors only when the file is absent — which is why `cache clear`
+   works).
+4. `try_make` reads exit 0 as a successful rebuild and returns the stale file.
+   `try_script`, the only path that runs `_/crop_production.py`, is never
+   reached.
+5. `country.py:3865` then writes that stale content back **with the new hash**,
+   so every later read grades `fresh`. The bug erases its own evidence.
+
+It fires on **every** hash move — there is no one-shot window, and no
+self-healing. `LSMS_NO_CACHE=1` does **not** escape it (measured: bypasses the
+read gate, lands in the same `try_make` exit-0).
+`_evict_hashless_wave_caches` (GH #479) does not cover it either: it globs
+`<wave>/_/{table}.parquet`, and the country-level `var/{table}.parquet` never
+matches. Distinct from #788 / #809, which describe the `legacy` path — the
+red team's reproduction stamped a *bogus* hash, so the parquet graded `stale`,
+`legacy` was never entered, and the bug fired regardless.
+
+`KgFactor` being `optional: true` (right for the data — W1–W3 have no source
+column) is also what removed the last tripwire:
+`_assert_built_required_columns` would have raised on a stale frame missing a
+*required* declared column.
+
+Corpus exposure measured by the red team: 20 country-level script-path tables
+across 13 countries have no country-target rule at all; five of them are
+Nigeria's (`crop_production`, `plot_inputs`, `livestock`, `plot_labor`,
+`people_last7days`). The remaining 75 are exposed to the weaker form — their
+rules' prerequisites never include `_/{country}.py` or `_/data_scheme.yml`,
+both of which ARE in the hash.
+
+**So: the post-merge Nigeria re-warm must run
+`lsms-library cache clear --country Nigeria` first.**

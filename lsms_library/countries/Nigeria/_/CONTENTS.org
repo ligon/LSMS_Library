@@ -1062,13 +1062,17 @@ does not distinguish them.  Only the *neighbouring question* does.
   [[*crop_production: two reported price fields the build does not carry][price-fields section]] above).  =secta3ii= is not read by this build at all.
 
 GH #859 quoted EPAR's W4 =.do= (:575--592) as evidence of "FOUR columns".  It
-is four columns *for EPAR's purpose*, which is different: EPAR is
-=append=-ing the three section files into one long frame in order to BUILD a
-crop/unit/condition/size conversion TABLE, so every block's factor is a
-legitimate input to that table.  We are not building a table --- we are
-carrying the number that sits on the row --- so only the paired column
+is four columns *for EPAR's purpose*, which is different: EPAR runs a *lockstep
+coalesce* --- =replace unit=... if unit==.=, then =size=, =condition= and
+=conv_fact= for each block in turn --- to BUILD a crop/unit/condition/size
+conversion TABLE that it then merges back on those four keys (:980).  Every
+block's factor is a legitimate input to *that* table because EPAR keeps
+unit+size+condition *bound to* each factor.  We are not building a table --- we
+are carrying the number that sits on the row --- so only the paired column
 qualifies.  Recorded because the two readings look identical until you notice
-the =append=.
+what the coalesce is for.  (It is a coalesce, not an =append=: the three
+sections are appended earlier, at :567--569, but the four =*_conv= columns are
+merged column-wise onto the same row.)
 
 ** What was actually wired, and what moved
 
@@ -1110,6 +1114,14 @@ all-null guard must not read a survey fact as a wiring gap.
 rows: Nigeria's kilograms had been resolvable for 19% of rows and are now
 resolvable for 50%.
 
+*This is coverage, not revaluation, and the decomposition says so exactly.*
+All *12 796 643* kg of the increase come from the *19 827 rows that previously
+had no factor at all*.  Rows whose factor changed: *0*.  Rows that lost a
+factor: *0*.  Not one pre-existing number moved.  By unit the delta is
+Sack/Bag 8 846 327 (67%), Tuber 2 422 330, Wheelbarrow 396 706, Bunch 349 345,
+then a long tail --- a 100 kg grain sack, a ~3 kg yam tuber and a 25 kg
+palm-oil bunch are all face-plausible.
+
 ** What the plausibility screen rejected: 11 rows, and NOT a sentinel
 
 *Nigeria's own =*_conv= columns contain no 999 / 9999-style sentinel.*  Across
@@ -1129,10 +1141,21 @@ asks for a container weight: 0.7 kg of shelled groundnut per kg unshelled, 0.36
 of grain per kg of what was weighed.  They are *not* clipped, rescaled or
 stripped here --- the schema stores what the instrument wrote down, and
 =harvest_kg='s screen already refuses them at read time and counts them under
-=reported_implausible=.  For context, 171 of the 182 =u='Kg'= rows that carry a
-factor report exactly 1.0, and on those 171 rows the survey's factor and the
-library's inferred factor agree *perfectly* (=reported_vs_inferred=: 171 both,
-0 disagree).
+=reported_implausible=.  (EPAR applies the identical rule --- =replace
+conv_fact=1 if unit==1 //kg=, W4 =.do=:597 --- so the screen matches the
+reference implementation.)
+
+*There is NO independent cross-check on the kilograms this adds, and the
+=reported_vs_inferred= audit must not be read as one.*  It reports "171 both, 0
+disagree", but all 171 of those rows are =u='Kg'= at ratio exactly 1.0: a
+tautology on the kilogram, not a corroboration.  The library's inferred layer
+returns NaN for *every* Nigerian container unit (Sack/Bag, Tuber, Wheelbarrow,
+Bunch, Basket, Basin, Heap, Tiya, Mudu, Congo, Paint rubber, Piece, Bundle,
+Stalk, Bowl), so the overlap the canonical =data_info.yml= note advertises
+("it can be audited against the library's inferred factors for the same =u=")
+does not exist for this country.  The 12.8M kg below rests on the survey's own
+number and on nothing else --- which is what =data_info.yml= demands, and is
+exactly why it should be stated rather than dressed as agreement.
 
 ** Caveat: the =survey_median= layer now medians ACROSS the survey's Size axis
 
@@ -1146,6 +1169,16 @@ is size-*specific* (the source ships a =Size= column beside every unit ---
 =sa3iq6_4=, =sa3iq9c=, =sa3iiiq13d=, =sa3iiiq23c= --- and this build reads
 none of them).  The audit shows exactly that: =reported_vs_survey_median= has
 19 658 comparable rows and *40.9% disagree* beyond 10%.
+
+The concrete form of it: across the 13 901 rows at =u='Sack/Bag'= the reported
+factor takes *eight distinct container weights*, spanning 9 to 100 kg ---
+
+| kg per sack | 100.0 | 50.0 | 18.0 | 70.0 | 25.0 |  9.0 | 36.0 | 35.0 | 17.5 |
+| rows        |  8786 | 2305 |  780 |  722 |  455 |  387 |  349 |  109 |    8 |
+
+--- because the raw label =130. SACK/BAG= carries a separate Size code
+(=12. 100 KG=, =11. 50 KG=, =10. 25 KG=, ...) that =_canon_unit= discards.  A
+median over that collapsed =u= is a median across four sack sizes.
 
 Two readings, and the file does not adjudicate: either a within-=u= median is
 too coarse for Nigeria, or 40.9% is simply what "a sack" means when sacks come
@@ -1161,11 +1194,48 @@ litres per unit.  =harvest_kg='s default =volume_as_mass=True= reads 1 l = 1 kg,
 so the two conventions coincide; a caller passing =volume_as_mass=False= should
 know the reported factor does not switch with it.
 
-** Cache
+** Cache --- you MUST =cache clear= to see this change (GH #866)
 
 =nigeria.py= and =data_scheme.yml= are both hashed into *every* Nigeria table's
 =lsms_cache_hash=, so all 24 Nigeria tables' hashes moved.  Only
 =crop_production='s content changes; the other 23 rebuild identically.
+
+*A warm Nigeria cache will NOT pick this up, and will silently re-bless itself
+instead.*  Observed here, then diagnosed by the red team and filed as *GH
+#866*.  The mechanism is a framework defect in the rebuild descent, not the
+read gate:
+
+1. The hash moves, and the gate works --- the read grades =stale= and logs
+   =v0.8.0 cache STALE: crop_production ...; rebuilding from source=.
+2. The rebuild descends to =run_make_target=, which tries =try_make= FIRST:
+   =make -s $(VAR_DIR)/crop_production.parquet= in =Nigeria/_=.
+3. *Nigeria's =_/Makefile= has no rule for that target.*  GNU make, handed a
+   rule-less target that EXISTS as a file, calls it up to date and *exits 0*.
+   (It errors --- =No rule to make target= --- only when the file is absent,
+   which is why deleting the parquet does work.)
+4. =try_make= reads exit 0 as a successful rebuild, finds the stale file, and
+   returns it.  =try_script= --- the only thing that would actually run
+   =_/crop_production.py= --- is never reached.
+5. The stale frame is then written back with the NEW hash, so every later read
+   grades =fresh=.  The bug erases its own evidence.
+
+Consequences, all measured: it fires on *every* hash move, not once;
+=LSMS_NO_CACHE=1= does *not* escape it (it bypasses the read gate and lands in
+the same =try_make= exit-0); and =_evict_hashless_wave_caches= (GH #479) does
+not cover it, because that globs =<wave>/_/{table}.parquet= and the
+country-level =var/{table}.parquet= never matches.  It is distinct from #788 /
+#809, which are about the =legacy= trust-once path --- here the parquet grades
+=stale=, and the bug fires anyway.
+
+The only escape is physically removing the =var/= parquet:
+
+: lsms-library cache clear --country Nigeria
+
+Nigeria has *five* tables with no country-target Makefile rule and therefore
+fully exposed --- =crop_production=, =plot_inputs=, =livestock=, =plot_labor=,
+=people_last7days= --- and the other 19 are exposed to the weaker form of the
+same failure, since no rule lists =_/nigeria.py= or =_/data_scheme.yml= as a
+prerequisite even though both are in the cache hash.
 
 * nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
 
