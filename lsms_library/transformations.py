@@ -5,6 +5,7 @@ A collection of mappings to transform dataframes.
 """
 import re
 import warnings
+from collections.abc import Mapping
 
 import pandas as pd
 import numpy as np
@@ -3046,6 +3047,947 @@ def nb_plots(plot_features):
         raise ValueError("plot_features must have 't' and/or 'i' levels")
     count = df.groupby(group_by).size()
     return count.to_frame('Nb_plots').sort_index()
+
+
+# ---------------------------------------------------------------------------
+# GH #863 -- the remaining EPAR-parity transforms (WORKPLAN.org Phase 2).
+#
+# PLACEMENT NOTE: three of the six below (``livestock_income``, ``hdds``,
+# ``fcs``) are METHODOLOGY transforms and by classification belong under the
+# "Phase 2 -- METHODOLOGY transforms" banner further down.  They sit here, in
+# one contiguous block, purely for concurrent-edit hygiene (the harvest_kg
+# family and ``median_price_valuation`` were being edited in parallel when
+# this landed).  Each docstring carries its own MECHANICAL / METHODOLOGY
+# classification -- read that, not the position in the file.
+# ---------------------------------------------------------------------------
+
+# Crop-identity level names emitted by the various countries' crop features.
+# ``j`` is the canonical (Uganda, Niger, Togo) name; ``crop`` is Malawi's.
+# The two vocabularies are the same axis (both the harmonize_crop ->
+# harmonize_food Preferred Label), which is why ``data_info.yml``'s
+# ``index_info`` does not yet register the plot-level ag features: "their
+# per-country index NAMES diverge (plot vs plot_id, crop vs j)".  Twin of
+# :data:`_PLOT_LEVELS`.
+_CROP_LEVELS = ('j', 'crop')
+
+
+def _resolve_crop_level(names):
+    """Return whichever of :data:`_CROP_LEVELS` is present in ``names``.
+
+    Twin of :func:`_resolve_plot_level`: lets a transform group by the crop
+    grain regardless of whether the country's feature names its crop level
+    ``j`` (Uganda) or ``crop`` (Malawi).  Returns ``None`` when neither is
+    present.
+    """
+    for name in _CROP_LEVELS:
+        if name in (names or []):
+            return name
+    return None
+
+
+def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
+    """Reported crop SALE revenue per household (EPAR ``value_crop_sales``).
+
+    MECHANICAL reduction.  Sums ``crop_production.Value_sold`` -- the sale
+    value the household actually REPORTED -- to the ``(t, i)`` grain, or to
+    ``(t, i, crop)`` with ``by='j'``.
+
+    Parameters
+    ----------
+    crop_production : pd.DataFrame
+        ``crop_production`` item feature carrying a reported sale-value
+        column.  Grain varies by country: ``(t, i, plot, j, u, condition,
+        season)`` in Uganda, ``(t, i, plot, crop, u)`` in Malawi.
+    by : {None, 'j', 'crop'}, optional
+        ``None`` (default) reduces all the way to ``(t, i)``.  Any of
+        ``'j'`` / ``'crop'`` keeps the crop level, whichever name this
+        country uses for it (resolved via :func:`_resolve_crop_level`, so
+        ``by='j'`` works on Malawi's ``crop`` level too) -- the output level
+        keeps the table's own name.
+    value_col : str, default 'Value_sold'
+        Reported sale-value column to sum.
+
+    Returns
+    -------
+    pd.DataFrame
+        One ``Gross_crop_revenue`` column, in nominal local currency,
+        indexed by ``(t, i)`` (or ``(t, i, <crop level>)``).
+
+    Notes
+    -----
+    **This is NOT EPAR's "gross value of crop production", and the two must
+    not be compared as if they were.**  EPAR's construct
+    (``Uganda UNPS Wave 5/EPAR_UW_Uganda_UNPS_W5.do``, GROSS CROP REVENUE
+    section) values the *entire* harvest -- including the share never sold,
+    which for a smallholder panel is most of it -- at a median unit price
+    imputed from observed sales on a geographic ladder.  That is a
+    METHODOLOGY transform, and the library already has it:
+    :func:`median_price_valuation`, whose ladder (finest geographic cell
+    with >= 10 priced observations, then a national fallback) is the same
+    one EPAR and the WB both use.  Compose the two -- value the harvest with
+    ``median_price_valuation``, then sum -- to get their quantity.  This
+    function deliberately reports only what the instrument wrote down.
+
+    **No de-duplication, by design (count, never clip).**  Where a country
+    attaches a household-crop sale total to more than one physical row, a
+    plain sum double-counts it.  Measured on the warm corpus, 2026-09-09:
+    Uganda has 895 of 45,592 non-zero sale rows that are exact repeats of an
+    earlier row within ``(t, i, crop)`` on BOTH ``Quantity_sold`` and
+    ``Value_sold`` (1.9% of summed value); Malawi has 14 of 18,285.  Those
+    are not obviously stamping -- two plots of one crop sold in equal
+    quantity for equal money is a perfectly ordinary fact -- so nothing is
+    dropped here.  An analyst who suspects stamping in a particular country
+    should audit that country's sale module rather than have this function
+    silently choose for them.  Malawi's own ``data_scheme.yml`` documents
+    the shape that would produce it: its sale is a HOUSEHOLD-crop question
+    "attached to single-plot crops only".
+
+    A household present in ``crop_production`` that reported no sale at all
+    is ABSENT from the output, never 0 -- ``sum(min_count=1)``, the same
+    never-zero-fill rule as :func:`rcsi`.  Reindex against ``sample()`` if
+    you want the non-sellers as explicit zeros.
+    """
+    df = crop_production
+    if value_col not in df.columns:
+        raise ValueError(
+            f"crop_production must have a {value_col!r} column")
+    names = list(df.index.names or [])
+    group_by = [n for n in ['t', 'i'] if n in names]
+    if not group_by:
+        raise ValueError("crop_production must have 't' and/or 'i' levels")
+
+    if by is not None:
+        if by not in _CROP_LEVELS:
+            raise ValueError(
+                f"gross_crop_revenue by= must be one of {_CROP_LEVELS} or "
+                f"None, got {by!r}")
+        crop_level = _resolve_crop_level(names)
+        if crop_level is None:
+            raise ValueError(
+                "crop_production has no crop level to group by (looked for "
+                f"{_CROP_LEVELS})")
+        group_by = group_by + [crop_level]
+
+    value = pd.to_numeric(df[value_col], errors='coerce')
+    out = pd.DataFrame({'Gross_crop_revenue': value})
+    return (out.groupby(group_by, dropna=False)['Gross_crop_revenue']
+               .sum(min_count=1)
+               .dropna()
+               .to_frame('Gross_crop_revenue')
+               .sort_index())
+
+
+def livestock_income(livestock, *, price='reported',
+                     price_col='ValuePerAnimal',
+                     sales_value_col='SalesValue',
+                     head_col='HeadSold'):
+    """Value of livestock SOLD ALIVE (one term of EPAR ``livestock_income``).
+
+    METHODOLOGY transform.  ``HeadSold x price`` per ``(t, i, animal)``,
+    where the price basis is chosen EXPLICITLY by the caller -- because the
+    library's per-head value column is not one price concept but two, and
+    which one a row carries depends on the country and the wave.
+
+    Parameters
+    ----------
+    livestock : pd.DataFrame
+        ``livestock`` item feature, grain ``(t, i, animal)``, with a
+        ``HeadSold`` column.
+    price : {'reported', 'sales_value'} or pd.Series, default 'reported'
+        The valuation basis.
+
+        - ``'reported'`` -- multiply ``HeadSold`` by ``price_col``
+          (``ValuePerAnimal``) AS THE COUNTRY CARRIES IT.  **Read the
+          instrument note below before using this**: in most countries that
+          is a reservation price, not a transaction price.
+        - ``'sales_value'`` -- do not value anything; return the country's
+          own reported ``SalesValue`` (gross value of animals sold in the
+          recall window).  Where this column exists it is a REPORTED
+          number and should be preferred to any construction, exactly as
+          ``crop_production.KgFactor`` and ``food_acquired.Quantity_kg`` are
+          preferred over inferred factors.  Raises if the country has no
+          such column.
+        - a ``pd.Series`` -- a caller-supplied per-animal price, indexed by
+          ``(t, animal)`` or by ``animal`` alone (e.g. the output of a
+          :func:`median_price_valuation`-style ladder over sale
+          transactions, which is what EPAR does:
+          ``Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:3320-3346`` walks
+          ea -> ta -> district -> region -> country, adopting each cell's
+          weighted median ``price_per_animal`` at N >= 10).  Every
+          ``(t, animal)`` with ``HeadSold > 0`` must be priced or a
+          ``ValueError`` names the gaps -- no silent partial valuation.
+    price_col, sales_value_col, head_col : str
+        Column names, overridable for a country that spells them
+        differently.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed by ``(t, i, animal)`` with
+
+        - ``Livestock_sales_value`` -- value of the head sold, nominal local
+          currency.  ADDITIVE over ``animal``: ``groupby(['t','i']).sum()``
+          gives the household total.
+        - ``ValuationSource`` -- per-row provenance, one of
+          ``'reported_per_head'`` / ``'reported_sales_value'`` /
+          ``'supplied_price'``.
+
+        Rows whose ``HeadSold`` or price is missing are DROPPED, not zeroed
+        (the never-zero-fill rule).  ``HeadSold == 0`` with a price is a
+        genuine zero and is KEPT.
+
+    Notes
+    -----
+    **What this is a term OF, not a replacement for.**  EPAR's
+    ``livestock_income`` (``EPAR_UW_Malawi_IHS_W1.do:5959``) is
+
+        ``value_slaughtered + value_lvstck_sold - value_livestock_purchases
+        + (milk + eggs + other products + manure sales)
+        - (hired labour + fodder + vaccine costs)``
+
+    i.e. a NET income.  This function computes **only** the
+    ``value_lvstck_sold`` term (``:3345``).  The other six are not
+    computable from our ``livestock`` schema and saying so is the point:
+
+    - *slaughtered* -- no head-slaughtered count in any country's
+      ``livestock``;
+    - *purchases* -- ``HeadAcquired`` is a head count with no purchase
+      value attached;
+    - *products* (milk, eggs, manure) and *expenses* (fodder, water,
+      vaccines, hired labour) -- no such columns anywhere in the schema.
+      ``FINDINGS_taxonomy.org`` (LIVESTOCK INCOME row) records both as
+      THEIRS-ONLY at the item layer.  GhanaSPS's ``data_scheme.yml:406-414``
+      notes it holds per-species expense and revenue questions that are
+      deliberately unwired because they have no canonical home.
+
+    So the returned number is a GROSS SALES VALUE.  Do not label it
+    "livestock income" in published output without the six missing terms.
+
+    **The price column is two different questions.**  Per
+    ``lsms_library/data_info.yml`` (``Columns: livestock: ValuePerAnimal``),
+    both variants are per head, but they are not the same economics:
+
+    - RESERVATION price -- "if you would sell one of the [ANIMAL] today,
+      how much would you receive?", reported whether or not anything was
+      sold.  **Nigeria** (``s11iq3`` W1-W4, ``s11iq7`` W5 --
+      ``Nigeria/_/data_scheme.yml:337-343``), **Malawi** (``ag_r04`` --
+      ``Malawi/_/CONTENTS.org:336-344``), **Uganda 2009-10 / 2010-11**
+      (``a6aq6``).
+    - REALISED average -- "what was, on average, the value of each sold?",
+      defined only where the household sold.  **Uganda 2011-12 onward**
+      (``a6aq14b`` / ``s6aq14b``), which dropped the sell-today question;
+      its non-null rate falls from ~96% to ~21% at that wave and every
+      non-null row from then on is conditional on a sale.
+
+    A reservation price is a *willingness-to-accept*, systematically
+    unequal to the price a household actually got.  Valuing sales with it
+    is a modelling choice, which is why ``price=`` has no silent default
+    that hides which one you used.
+
+    **Two countries report the sale value directly and should not be
+    constructed at all**: **Ethiopia** (``ls_s8aq60``, "total value of sales
+    of [LIVESTOCK] in the last 12 months", ``Ethiopia/_/data_scheme.yml:
+    196-206``) and **Mali** (``s4aq24`` / ``s8b1q14``, "valeur brute des
+    ventes") carry ``SalesValue`` and no per-head price.  Use
+    ``price='sales_value'`` there.  **GhanaSPS has no REPORTED price basis
+    at all**: its value question is a HERD total (``HerdValue``, "current
+    value of these animals if you sold all of them"), and its revenue
+    questions bundle animals with products, so neither ``ValuePerAnimal``
+    nor ``SalesValue`` is declared -- deliberately
+    (``GhanaSPS/_/data_scheme.yml:406-414``).  It DOES declare ``HeadSold``
+    (``:465``, ``optional: true``), so the only basis that works there is a
+    caller-supplied ``price=`` Series; neither ``'reported'`` nor
+    ``'sales_value'`` will resolve.
+    """
+    df = livestock
+    if head_col not in df.columns:
+        raise ValueError(
+            f"livestock must have a {head_col!r} column -- livestock_income "
+            "values head SOLD, and a roster without it carries no sale flow "
+            "at all. Fourteen countries declare HeadSold (grep "
+            "'^    HeadSold:' over countries/*/_/data_scheme.yml for the "
+            "current list); on GhanaSPS it is declared `optional: true`, so "
+            "it can be present and all-null in a wave.")
+    names = list(df.index.names or [])
+    if 'animal' in names:
+        animal = pd.Series(
+            df.index.get_level_values('animal').astype(str), index=df.index)
+    elif 'animal' in df.columns:
+        animal = df['animal'].astype(str)
+    else:
+        raise ValueError("livestock must have an 'animal' level or column")
+
+    head = pd.to_numeric(df[head_col], errors='coerce')
+
+    if isinstance(price, pd.Series):
+        source = 'supplied_price'
+        wave = (pd.Series(df.index.get_level_values('t'), index=df.index)
+                if 't' in names else None)
+        pnames = list(price.index.names or [])
+        if wave is not None and len(pnames) == 2 and set(pnames) == {'t', 'animal'}:
+            key = pd.MultiIndex.from_arrays(
+                [wave.to_numpy(), animal.to_numpy()], names=['t', 'animal'])
+            lookup = price.reorder_levels(['t', 'animal'])
+            unit = pd.Series(lookup.reindex(key).to_numpy(), index=df.index)
+        elif len(pnames) <= 1:
+            unit = animal.map(price).astype(float)
+        else:
+            raise ValueError(
+                "livestock_income price= Series must be indexed by "
+                f"('t', 'animal') or by 'animal' alone, got {pnames!r}")
+        unit = pd.to_numeric(unit, errors='coerce')
+        # Symmetric with rcsi's unrecognised-label check: a sale we cannot
+        # price is a hole in the aggregate, never a silent omission.
+        gaps = unit.isna() & head.notna() & (head > 0)
+        if gaps.any():
+            missing = sorted(set(
+                zip(wave[gaps] if wave is not None else ['?'] * int(gaps.sum()),
+                    animal[gaps])))[:10]
+            raise ValueError(
+                f"livestock_income: {int(gaps.sum())} row(s) with "
+                f"{head_col} > 0 have no supplied price; first missing keys "
+                f"{missing}. Supply a price for every (t, animal) that sold, "
+                "or filter the frame first -- a partial valuation would "
+                "under-report the aggregate silently.")
+        value = head * unit
+    elif price == 'sales_value':
+        source = 'reported_sales_value'
+        if sales_value_col not in df.columns:
+            raise ValueError(
+                f"livestock has no {sales_value_col!r} column -- "
+                "price='sales_value' returns the country's OWN reported sale "
+                "total and cannot be synthesised. Ethiopia and Mali carry it; "
+                "Uganda, Malawi and Nigeria carry ValuePerAnimal instead "
+                "(use price='reported'); GhanaSPS carries neither.")
+        value = pd.to_numeric(df[sales_value_col], errors='coerce')
+    elif price == 'reported':
+        source = 'reported_per_head'
+        if price_col not in df.columns:
+            raise ValueError(
+                f"livestock has no {price_col!r} column -- price='reported' "
+                "needs a per-head value. Ethiopia and Mali report SalesValue "
+                "instead (use price='sales_value'); GhanaSPS reports only a "
+                "herd total and supports neither.")
+        unit = pd.to_numeric(df[price_col], errors='coerce')
+        value = head * unit
+    else:
+        raise ValueError(
+            "livestock_income price= must be 'reported', 'sales_value', or a "
+            f"pd.Series of per-animal prices, got {price!r}")
+
+    out = pd.DataFrame({'Livestock_sales_value': value})
+    out = out.dropna(subset=['Livestock_sales_value'])
+    out['ValuationSource'] = source
+    return out.sort_index()
+
+
+# The twelve FAO household dietary-diversity food groups, in the order of
+# Table 1 of *Guidelines for Measuring Household and Individual Dietary
+# Diversity* (Kennedy, Ballard & Dop, FAO 2011).  These are GROUP NAMES
+# only -- the library ships NO item->group mapping, because which of a
+# country's `j` labels belong in which group is a per-country curation over
+# that country's own `food_items` / `harmonize_food` table, not a constant.
+HDDS_GROUPS = (
+    'Cereals',
+    'White roots and tubers',
+    'Vegetables',
+    'Fruits',
+    'Meat',
+    'Eggs',
+    'Fish and other seafood',
+    'Legumes, nuts and seeds',
+    'Milk and milk products',
+    'Oils and fats',
+    'Sweets',
+    'Spices, condiments and beverages',
+)
+
+# WFP standard Food Consumption Score weights (WFP VAM, *Food Consumption
+# Analysis: Calculation and Use of the Food Consumption Score in Food
+# Security Analysis*, Technical Guidance Sheet, 2008), eight groups.
+# Condiments are a ninth group carrying weight 0 in that sheet and are
+# deliberately NOT included here: a country whose mapping needs them passes
+# ``weights={**FCS_WFP_WEIGHTS, 'Condiments': 0.0}`` explicitly, so the
+# decision to score a ninth group is visible in the call.
+FCS_WFP_WEIGHTS = {
+    'Main staples': 2.0,     # cereals AND tubers -- one group in the FCS
+    'Pulses': 3.0,
+    'Vegetables': 1.0,
+    'Fruit': 1.0,
+    'Meat and fish': 4.0,
+    'Milk': 4.0,
+    'Sugar': 0.5,
+    'Oil': 0.5,
+}
+
+
+def _resolve_food_groups(groups, canonical, present, *, what):
+    """Validate a ``{group: [j, ...]}`` mapping and invert it to ``{j: group}``.
+
+    Shared by :func:`hdds` and :func:`fcs`.  Three checks, all raising:
+
+    1.  The mapping's key set must equal ``canonical`` EXACTLY.  An empty
+        list is the way to say "this survey fields nothing in this group" --
+        explicitly, which is the point.  (Same symmetric rule as
+        :func:`rcsi`: a formula that claims 12 groups and silently scores 9
+        is not the formula.)
+    2.  **No ``j`` may appear in two groups.**  The mapping is a PARTITION.
+        This is not a hypothetical: EPAR's own Tanzania HDDS ``recode``
+        (``Tanzania NPS Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2538-2560``)
+        assigns itemcode ``704`` to both FRUITS and SWEETS and itemcode
+        ``1003`` to both OILS AND FATS and SPICES/CONDIMENTS/BEVERAGES.
+        Stata's ``recode`` takes the FIRST matching rule, so 704 silently
+        became FRUITS and 1003 silently became OILS -- the second assignment
+        never fired, and nothing in the code says so.  A ``dict`` keyed the
+        other way round (``{j: group}``) could not even express the defect,
+        because Python would dedupe the key; that is why the mapping is
+        taken group-first.
+    3.  Every ``j`` present in the table must be mapped.  An unmapped item
+        would silently deflate the score.  (The converse is NOT checked: a
+        mapping may name items a particular slice does not contain -- a
+        single-wave or single-region frame legitimately lacks most of a
+        175-item vocabulary.)
+    """
+    if not isinstance(groups, Mapping):
+        raise TypeError(
+            f"{what}: groups= must be a mapping {{group: [j, ...]}}, got "
+            f"{type(groups).__name__}")
+    canonical = list(canonical)
+    keys = set(groups)
+    unknown = sorted(keys - set(canonical))
+    missing = sorted(set(canonical) - keys)
+    if unknown or missing:
+        raise ValueError(
+            f"{what}: groups= must name exactly the {len(canonical)} "
+            f"groups {canonical}. "
+            + (f"Unrecognised: {unknown}. " if unknown else '')
+            + (f"Not named: {missing} -- pass an empty list for a group this "
+               "survey does not field, rather than omitting it."
+               if missing else ''))
+
+    seen = {}
+    duplicated = {}
+    for group, items in groups.items():
+        if isinstance(items, str):
+            raise TypeError(
+                f"{what}: groups[{group!r}] must be a sequence of j labels, "
+                "not a bare string")
+        for item in items:
+            item = str(item)
+            if item in seen and seen[item] != group:
+                duplicated.setdefault(item, [seen[item]]).append(group)
+            else:
+                seen[item] = group
+    if duplicated:
+        pairs = {k: v for k, v in sorted(duplicated.items())}
+        raise ValueError(
+            f"{what}: groups= is not a partition -- item(s) {pairs} appear in "
+            "more than one food group. EPAR's own Tanzania mapping has "
+            "exactly this defect (itemcodes 704 and 1003, W5.do:2538-2560), "
+            "and Stata's `recode` silently kept the first assignment. Decide "
+            "which group each item belongs to.")
+
+    unmapped = sorted(set(map(str, present)) - set(seen))
+    if unmapped:
+        shown = unmapped[:15]
+        raise ValueError(
+            f"{what}: {len(unmapped)} food item(s) present in the table are "
+            f"not mapped to any group, e.g. {shown}. An unmapped item is "
+            "silently excluded from the score, so the mapping must cover the "
+            "table's whole j vocabulary (filter the frame first if you mean "
+            "to exclude them).")
+    return seen
+
+
+def _consumed_mask(df, *, what):
+    """Boolean: this ``food_acquired`` row records a positive acquisition.
+
+    ``Quantity > 0`` OR ``Expenditure > 0``.  Both are checked because a
+    country can record an expenditure with no quantity (a purchase in an
+    unrecorded unit) and vice versa (own production).  Measured on the warm
+    Malawi ``food_acquired`` (971,531 rows, 2026-09-09): 971,165 rows have
+    ``Quantity > 0``, 302 have exactly 0 and 64 are null -- so the mask is
+    "essentially every row", and it exists to catch the 366 that are not.
+    """
+    cols = [c for c in ('Quantity', 'Expenditure') if c in df.columns]
+    if not cols:
+        raise ValueError(
+            f"{what}: food_acquired must carry 'Quantity' and/or "
+            "'Expenditure' to establish that an item was acquired at all")
+    mask = pd.Series(False, index=df.index)
+    for col in cols:
+        mask = mask | (pd.to_numeric(df[col], errors='coerce') > 0)
+    return mask
+
+
+def hdds(food_acquired, *, groups):
+    """Household Dietary Diversity Score (FAO HDDS; EPAR ``number_foodgroup``).
+
+    METHODOLOGY transform.  Counts how many of the twelve FAO food groups
+    (:data:`HDDS_GROUPS`) the household acquired ANY of during the food
+    module's recall window.
+
+    Parameters
+    ----------
+    food_acquired : pd.DataFrame
+        ``food_acquired`` item feature, grain ``(t, v, i, j, u, s)``, with
+        ``Quantity`` and/or ``Expenditure``.  Rows are counted across ALL
+        acquisition sources ``s`` -- purchased, produced, in-kind and other
+        are all consumption.
+    groups : Mapping[str, Sequence[str]]
+        **Required.**  ``{group name: [j label, ...]}`` covering exactly the
+        twelve :data:`HDDS_GROUPS` and every ``j`` present in the frame.
+        The ``j`` labels are whatever the frame carries -- so if you called
+        ``food_acquired(labels='Aggregate')`` they are the country's
+        Aggregate labels, and if you did not they are its fine
+        ``Preferred Label`` items (Uganda: 175 of them).  See the
+        ``labels=`` contract in
+        ``.claude/skills/add-feature/food-acquired/aggregate-labels/``.
+
+    Returns
+    -------
+    pd.DataFrame
+        One integer ``HDDS`` column (0-12) indexed by ``(t, i)``.
+
+    Notes
+    -----
+    **The library ships no default mapping, deliberately.**  Which of a
+    country's ``j`` labels is a "vegetable" is a curation over that
+    country's own ``food_items`` / ``harmonize_food`` table, and
+    ``LEARNINGS.org`` L8 is explicit that EPAR's group mapping is "a
+    starting point to re-derive, not copy".  A shipped default would be
+    silently wrong for 15 of the 16 food countries.  What IS shipped is the
+    group vocabulary and the partition check.
+
+    **Divergences from the FAO construct, both real:**
+
+    1.  *Recall window.*  FAO's HDDS (Kennedy, Ballard & Dop 2011) is a
+        **24-hour** recall.  LSMS food modules are typically **7-day**, so
+        an HDDS computed here is systematically HIGHER than the FAO number
+        and is not comparable to a published FAO HDDS.  EPAR's own variable
+        label says so out loud -- "number of food groups individual consumed
+        last week" (``W5.do``, HOUSEHOLD'S DIET DIVERSITY SCORE).  The
+        window is the country's, not this function's; check the country's
+        food module before quoting the score.
+    2.  *Acquisition vs. consumption.*  ``food_acquired`` records what
+        entered the household.  Where the country's module is a consumption
+        recall (Malawi's ``hh_mod_g1``, "consumed in the past 7 days",
+        split by source) the two coincide; where it is a pure purchase
+        module, food eaten from own stores registers no row and the score is
+        a lower bound.  This function cannot tell the difference -- the
+        analyst must.
+
+    A household with rows but no positive acquisition scores 0; a household
+    with no rows at all is absent from the output (never zero-filled).
+    """
+    df = food_acquired
+    names = list(df.index.names or [])
+    if 'j' in names:
+        item = pd.Series(df.index.get_level_values('j').astype(str),
+                         index=df.index)
+    elif 'j' in df.columns:
+        item = df['j'].astype(str)
+    else:
+        raise ValueError("hdds: food_acquired must have a 'j' level or column")
+    group_by = [n for n in ['t', 'i'] if n in names]
+    if not group_by:
+        raise ValueError("hdds: food_acquired must have 't' and/or 'i' levels")
+
+    mapping = _resolve_food_groups(groups, HDDS_GROUPS, set(item),
+                                   what='hdds')
+    consumed = _consumed_mask(df, what='hdds')
+
+    work = pd.DataFrame({'_group': item.map(mapping),
+                         '_any': consumed}).reset_index()
+    per_group = work.groupby(group_by + ['_group'], dropna=False)['_any'].any()
+    score = per_group.groupby(group_by).sum().astype('int64')
+    return score.to_frame('HDDS').sort_index()
+
+
+def fcs(food_acquired, *, groups, days, weights=None, cap=7):
+    """WFP Food Consumption Score (EPAR ``fcs``).
+
+    METHODOLOGY transform.  ``Sigma_g weight[g] x min(days consumed in group
+    g, 7)`` per household, over the eight WFP food groups.
+
+    Parameters
+    ----------
+    food_acquired : pd.DataFrame
+        ``food_acquired`` item feature (see :func:`hdds`).
+    groups : Mapping[str, Sequence[str]]
+        **Required.**  ``{group: [j label, ...]}`` naming exactly the keys of
+        ``weights`` (default: the eight :data:`FCS_WFP_WEIGHTS` groups) and
+        covering every ``j`` in the frame.  Same partition rules as
+        :func:`hdds`.
+    days : str
+        **Required, and there is deliberately no default.**  Name of the
+        column giving the number of days in the past 7 that the item was
+        consumed.
+
+        **No country's ``food_acquired`` carries such a column today.**  The
+        canonical schema (``lsms_library/data_info.yml``, ``Columns:
+        food_acquired``) declares ``Quantity`` / ``Expenditure`` /
+        ``Price`` and nothing else, and the only ``Days`` column anywhere in
+        the corpus belongs to ``food_coping``.  So ``fcs`` is UNUSABLE on a
+        shipped table until a consumption-frequency column is wired, and
+        that is the honest state of it -- an FCS is a frequency score, and
+        deriving frequency from an acquisition amount would be inventing
+        data.  Where the source has the question (Tanzania's
+        ``hh_sec_j3.hh_j08``, which EPAR reads at ``W5.do:2574``, is
+        currently unwired on our side), wire it as a column and pass its
+        name here.
+    weights : Mapping[str, float], optional
+        Group -> weight.  Defaults to :data:`FCS_WFP_WEIGHTS`.
+    cap : int, default 7
+        Per-group day cap.  A group's item-days are summed, then capped:
+        eating rice on 5 days and maize on 4 is 7 staple-days, not 9.
+
+    Returns
+    -------
+    pd.DataFrame
+        One float ``FCS`` column indexed by ``(t, i)``.
+
+    Notes
+    -----
+    Follows WFP's Technical Guidance Sheet (2008): sum the days within each
+    group, cap the group total at 7, weight, sum.  **EPAR's Tanzania
+    implementation diverges from that** and the divergence is worth naming:
+    rather than summing cereals and tubers and capping, it blends them
+    (``W5.do:2579-2582``) as ``7`` if either is 7, else their sum if either
+    is 0, else ``(max + min(sum, 7)) / 2`` -- an averaging rule with no
+    citation in the sheet.  It also leaves its item-group 2 unweighted, so
+    that group contributes nothing to the score at all.  Neither behaviour
+    is reproduced here.
+
+    The score is NOT thresholded into WFP's poor / borderline / acceptable
+    bands (21 / 35) by this function -- the same separation as
+    :func:`rcsi` / :func:`rcsi_phase`, so an analyst can apply the
+    oil-and-sugar-adjusted cutoffs (28 / 42) where the country's diet
+    warrants them without recomputing the score.
+
+    Unlike :func:`rcsi`, a group with no rows for a household scores 0 days
+    rather than dropping the household: in a 7-day frequency recall, "no
+    row" is the instrument's own zero.  That is only true if the country's
+    module really is a consumption recall over the whole item list -- see
+    :func:`hdds`'s divergence note 2.
+    """
+    df = food_acquired
+    names = list(df.index.names or [])
+    w = dict(FCS_WFP_WEIGHTS) if weights is None else dict(weights)
+    if not w:
+        raise ValueError("fcs: weights= is empty")
+    if days is None or days not in df.columns:
+        raise ValueError(
+            f"fcs: food_acquired has no {days!r} column. The FCS is a "
+            "CONSUMPTION-FREQUENCY score and no country's food_acquired "
+            "currently carries a days-consumed column (the canonical schema "
+            "declares Quantity/Expenditure/Price only; the corpus's only "
+            "Days column is food_coping's). Wire the source question -- e.g. "
+            "Tanzania hh_sec_j3.hh_j08 -- and pass its name as days=; do not "
+            "substitute a quantity.")
+    if 'j' in names:
+        item = pd.Series(df.index.get_level_values('j').astype(str),
+                         index=df.index)
+    elif 'j' in df.columns:
+        item = df['j'].astype(str)
+    else:
+        raise ValueError("fcs: food_acquired must have a 'j' level or column")
+    group_by = [n for n in ['t', 'i'] if n in names]
+    if not group_by:
+        raise ValueError("fcs: food_acquired must have 't' and/or 'i' levels")
+
+    mapping = _resolve_food_groups(groups, list(w), set(item), what='fcs')
+
+    work = pd.DataFrame({
+        '_group': item.map(mapping),
+        '_days': pd.to_numeric(df[days], errors='coerce'),
+    }).reset_index()
+    work = work.dropna(subset=['_days'])
+    per_group = (work.groupby(group_by + ['_group'], dropna=False)['_days']
+                     .sum(min_count=1)
+                     .clip(upper=cap))
+    weight_vec = pd.Series(
+        per_group.index.get_level_values('_group').map(w).to_numpy(),
+        index=per_group.index, dtype=float)
+    contrib = per_group * weight_vec
+    score = contrib.groupby(group_by).sum(min_count=1).dropna()
+    return score.to_frame('FCS').sort_index()
+
+
+def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
+                    area_col='Area', volume_as_mass=True, on='plot'):
+    """Fertilizer applied per unit plot area (EPAR "rate of fertilizer
+    application").
+
+    MECHANICAL reduction.  Divides a per-plot fertilizer mass by that plot's
+    area, on the same land grain -- the same grain-bridge shape as
+    :func:`yield_kg`.
+
+    Parameters
+    ----------
+    plot_inputs : pd.DataFrame
+        ``plot_inputs`` item feature (see :func:`nitrogen_kg`): an
+        ``input`` level, a ``Quantity`` and a unit ``u``.
+    plot_features : pd.DataFrame
+        ``plot_features`` item feature, grain ``(t, i, plot_id, ...)``,
+        carrying ``Area`` -- **hectares, per the canonical schema**
+        ("plot area in hectares (canonical unit)",
+        ``lsms_library/data_info.yml``, ``Columns: plot_features: Area``).
+        So the returned rate is kg/ha wherever the country honours that.
+    nutrient : {'N', 'product'}, default 'N'
+        - ``'N'``: numerator is :func:`nitrogen_kg` -- kilograms of
+          NITROGEN, i.e. product kg times the nutrient share of
+          :data:`_NITROGEN_CONTENT`.  Output column
+          ``Nitrogen_kg_per_ha``.
+        - ``'product'``: numerator is raw fertilizer PRODUCT kg -- the same
+          rows, same unit conversion, N-share forced to 1.0.  Output column
+          ``Fertilizer_kg_per_ha``.  Note this covers the INORGANIC
+          vocabulary only: ``_NITROGEN_CONTENT``'s keys are the nutrient
+          classes (nitrate / phosphate / potash / mixed) and the product
+          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) -- manure and
+          other organic inputs carry no key and contribute nothing to
+          either basis.
+    area_col : str, default 'Area'
+        Plot-area column in ``plot_features``.
+    volume_as_mass : bool, default True
+        Forwarded to the unit->kg conversion.
+    on : {'plot', 'parcel'}, default 'plot'
+        Land grain to join the two features on.
+
+        - ``'plot'`` (default): join the literal plot key.  Measured on the
+          warm Malawi corpus (2026-09-09), ``plot_inputs`` and
+          ``plot_features`` share the plot vocabulary exactly -- 66,298 of
+          ``plot_inputs``'s 66,368 distinct ``(t, i, plot)`` keys match a
+          ``plot_features`` row, 99.9%.
+        - ``'parcel'``: reconcile the two plot vocabularies to their common
+          parcel key first, exactly as :func:`yield_kg` does.  Needed where
+          the features use different plot spellings (Uganda:
+          ``{hhid}-{parcel}-{plot}`` on the ag modules vs.
+          ``{parcel}_{suffix}`` on ``plot_features``).
+
+    Returns
+    -------
+    pd.DataFrame
+        One column -- ``Nitrogen_kg_per_ha`` or ``Fertilizer_kg_per_ha``,
+        named for the numerator so the basis cannot be lost -- indexed by
+        ``(t, i, plot)`` (or ``(t, i, parcel)`` for ``on='parcel'``).
+
+    Notes
+    -----
+    Divergences from EPAR's rate, both in the denominator and the
+    numerator, and neither is a bug on either side:
+
+    - *Denominator.*  EPAR's is hectares **planted**, itself imputed as
+      parcel area times a reported planted share ("Plot area size = Parcel
+      area size x (planted share)", its readme).  Ours is the plot area the
+      instrument reported and the country converted to hectares
+      (``plot_features.Area``, ``required``).  A plot only partly planted
+      therefore gets a LOWER rate here than in EPAR's table.
+    - *Numerator.*  EPAR's rate is over fertilizer PRODUCT; the WB
+      harmonised panel's ``nitrogen_kg`` is over the nutrient.  Hence
+      ``nutrient=``, with no default that hides which one you got.
+    - Inherits :func:`nitrogen_kg`'s unit-conversion coverage caveat (only
+      metric-named ``u`` rows convert) and its class-nominal N shares, so
+      on a country recording nutrient class rather than product the rate is
+      a nominal, not a measured, nitrogen figure.
+
+    Plots with fertilizer but zero or missing area are dropped (an infinite
+    rate is not a rate).
+    """
+    if nutrient not in {'N', 'product'}:
+        raise ValueError(
+            f"fertilizer_rate nutrient= must be 'N' or 'product', got "
+            f"{nutrient!r}")
+    if on not in {'plot', 'parcel'}:
+        raise ValueError(
+            f"fertilizer_rate on= must be 'plot' or 'parcel', got {on!r}")
+
+    if nutrient == 'N':
+        num = nitrogen_kg(plot_inputs, volume_as_mass=volume_as_mass)
+        num_col, out_col = 'Nitrogen_kg', 'Nitrogen_kg_per_ha'
+    else:
+        # Same rows, same conversion, nutrient share forced to one: this is
+        # a REUSE of nitrogen_kg's machinery, not a second implementation of
+        # the unit conversion.
+        num = nitrogen_kg(plot_inputs,
+                          nitrogen_content={k: 1.0 for k in _NITROGEN_CONTENT},
+                          volume_as_mass=volume_as_mass)
+        num = num.rename(columns={'Nitrogen_kg': 'Fertilizer_kg'})
+        num_col, out_col = 'Fertilizer_kg', 'Fertilizer_kg_per_ha'
+
+    num = num.reset_index()
+    if 'plot' not in num.columns:
+        raise ValueError(
+            "fertilizer_rate: the fertilizer numerator has no 'plot' level "
+            "to join area on")
+
+    pf = plot_features.reset_index()
+    plot_key = 'plot' if 'plot' in pf.columns else (
+        'plot_id' if 'plot_id' in pf.columns else None)
+    if plot_key is None:
+        raise ValueError(
+            "plot_features must carry a 'plot' or 'plot_id' level")
+    if area_col not in pf.columns:
+        raise ValueError(f"plot_features must have a {area_col!r} column")
+
+    base = [k for k in ['t', 'i'] if k in num.columns and k in pf.columns]
+
+    if on == 'parcel':
+        num['_land'] = [
+            _parcel_from_crop_plot(p, i)
+            for p, i in zip(num['plot'],
+                            num['i'] if 'i' in num.columns
+                            else [''] * len(num))
+        ]
+        pf['_land'] = pf[plot_key].map(_parcel_from_feature_plot)
+    else:
+        num['_land'] = num['plot'].astype(str)
+        pf['_land'] = pf[plot_key].astype(str)
+
+    keys = base + ['_land']
+    fert = num.groupby(keys, dropna=False)[num_col].sum().reset_index()
+
+    pf['_Area'] = pd.to_numeric(pf[area_col], errors='coerce')
+    pf = pf[pf['_Area'] > 0]
+    area = pf.groupby(keys, dropna=False)['_Area'].sum().reset_index()
+
+    merged = fert.merge(area, on=keys, how='inner')
+    with np.errstate(divide='ignore', invalid='ignore'):
+        merged[out_col] = merged[num_col] / merged['_Area']
+    merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=[out_col])
+    land_name = 'parcel' if on == 'parcel' else 'plot'
+    out = merged.rename(columns={'_land': land_name})
+    return out.set_index(base + [land_name])[[out_col]].sort_index()
+
+
+def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
+    """Shannon crop-diversity index per household (EPAR ``sdi``).
+
+    METHODOLOGY transform.  ``H = -Sigma_c p_c ln p_c`` over the crops a
+    household grew, where ``p_c`` is crop ``c``'s share of whatever
+    ``weight`` says the shares are shares OF.
+
+    Parameters
+    ----------
+    crop_production : pd.DataFrame
+        ``crop_production`` item feature, with a crop level named ``j`` or
+        ``crop`` (resolved by :func:`_resolve_crop_level`).
+    weight : {'count', 'value', 'area'}, default 'count'
+        What the shares are taken over.
+
+        - ``'count'`` -- **the only basis available in every country.**
+          ``p_c`` is crop ``c``'s share of the household's crop
+          OCCURRENCES, an occurrence being one distinct combination of the
+          land and season levels the table carries: ``(plot, season)`` in
+          Uganda, ``(plot,)`` in Malawi, falling back to raw rows only if
+          the table has neither.  De-duplicating to that grain is
+          load-bearing, not tidiness: ``crop_production`` carries one row
+          per ``(u, condition)`` as well, so counting raw rows would score
+          a maize crop reported in two conditions as twice the maize.
+        - ``'value'`` -- ``p_c`` is crop ``c``'s share of the household's
+          reported ``Value_sold``.  **Covers SOLD output only**, so a
+          household that sold one crop and ate three scores ``H = 0``:
+          maximally specialised on the sales margin, which is a real fact
+          about the household but is NOT its cropping diversity.  Use it as
+          a marketing-concentration measure, not as a substitute for the
+          area basis.
+        - ``'area'`` -- raises :class:`NotImplementedError`.  See below.
+
+    value_col : str, default 'Value_sold'
+        Column used when ``weight='value'``.
+
+    Returns
+    -------
+    pd.DataFrame
+        One float ``Crop_diversity`` column indexed by ``(t, i)``,
+        non-negative, in NATS (natural log).  A household growing one crop
+        scores exactly 0.
+
+    Raises
+    ------
+    NotImplementedError
+        For ``weight='area'``.  The area basis needs per-crop area PLANTED,
+        and ``crop_production`` carries no such column in any country -- no
+        ``AreaShare``, no ``Area_planted`` (``LEARNINGS.org`` L8 and the
+        taxonomy's item-gap list record this).  ``plot_features.Area`` is
+        the whole plot's area, not crop ``c``'s share of it, and splitting
+        it evenly across the plot's crops would MANUFACTURE the shares the
+        index is made of -- on an intercropped plot the even split is the
+        maximum-diversity answer by construction.  The fix is a column
+        (per-crop planted area or share), not a transform.
+
+    Notes
+    -----
+    **Sign.**  EPAR's ``sdi`` is ``Sigma p ln p`` -- it never negates
+    (``Uganda UNPS Wave 5/EPAR_UW_Uganda_UNPS_W5.do:3603,3617``), so its
+    published index is NON-POSITIVE and equals ``-H``.  Ours is the
+    conventional Shannon ``H >= 0``.  Compare as ``sdi == -Crop_diversity``,
+    or a reader will think one of the two is broken.
+
+    **Basis.**  EPAR weights by area PLANTED (``area_plan``), dropping rows
+    with zero planted area -- which, its own comment notes, silently
+    excludes permanent/tree crops unless they are a plot's only crop.  It
+    also takes the shares over plot-crop ROWS rather than over crops, so a
+    crop on three plots contributes three terms.  Neither choice is
+    reproduced here; ``'count'`` de-duplicates to the crop within a land
+    unit and ``'area'`` is refused outright rather than approximated.
+    """
+    if weight not in {'count', 'value', 'area'}:
+        raise ValueError(
+            "crop_diversity weight= must be 'count', 'value' or 'area', got "
+            f"{weight!r}")
+    df = crop_production
+    names = list(df.index.names or [])
+    crop_level = _resolve_crop_level(names)
+    if crop_level is None:
+        raise ValueError(
+            f"crop_production has no crop level (looked for {_CROP_LEVELS})")
+    group_by = [n for n in ['t', 'i'] if n in names]
+    if not group_by:
+        raise ValueError("crop_production must have 't' and/or 'i' levels")
+
+    if weight == 'area':
+        raise NotImplementedError(
+            "crop_diversity(weight='area') needs a per-crop planted AREA and "
+            "crop_production carries none in any country -- there is no "
+            "AreaShare / Area_planted column in the canonical schema. "
+            "plot_features.Area is the whole plot's area, and splitting it "
+            "evenly across a plot's crops would manufacture the very shares "
+            "the index measures. Use weight='count' (available everywhere), "
+            "or wire a planted-area column first.")
+
+    flat = df.reset_index()
+    if weight == 'value':
+        if value_col not in flat.columns:
+            raise ValueError(
+                f"crop_production must have a {value_col!r} column for "
+                "weight='value'")
+        flat['_w'] = pd.to_numeric(flat[value_col], errors='coerce')
+        flat = flat[flat['_w'] > 0]
+        share_of = flat.groupby(group_by + [crop_level],
+                               dropna=False)['_w'].sum(min_count=1)
+    else:
+        plot_level = _resolve_plot_level(names)
+        occurrence = [n for n in [plot_level, 'season']
+                      if n is not None and n in flat.columns]
+        if occurrence:
+            dedup = flat.drop_duplicates(
+                subset=group_by + [crop_level] + occurrence)
+        else:
+            dedup = flat
+        share_of = dedup.groupby(group_by + [crop_level],
+                                 dropna=False).size().astype(float)
+
+    share_of = share_of.dropna()
+    share_of = share_of[share_of > 0]
+    total = share_of.groupby(group_by).sum()
+    p = share_of / total.reindex(share_of.index.droplevel(crop_level)).to_numpy()
+    with np.errstate(divide='ignore', invalid='ignore'):
+        term = p * np.log(p)
+    h = -term.groupby(group_by).sum(min_count=1).dropna()
+    # -0.0 for the single-crop case reads badly; normalise it away.
+    h = h + 0.0
+    return h.to_frame('Crop_diversity').sort_index()
 
 
 # ===========================================================================
