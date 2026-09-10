@@ -1,0 +1,770 @@
+#+TITLE: Red team, pass 2 -- feat/852-ethiopia-shipped-factors (GH #852, #853)
+#+DATE: 2026-09-10
+#+AUTHOR: red-team agent (read-only)
+
+* Provenance of every number below
+
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-852-ethiopia= at
+=c4ec406a= (on =b7fb901f=).  Every invocation carried
+=PYTHONPATH=<worktree>=, =LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries=,
+=LSMS_DATA_DIR=<worktree>/.data=, interpreter
+=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python=.
+Identity asserted at the top of every run:
+
+: lib:   /global/scratch/.../wt-852-ethiopia/lsms_library/__init__.py
+: croot: /global/scratch/.../wt-852-ethiopia/lsms_library/countries
+: droot: /global/scratch/.../wt-852-ethiopia/.data
+: pandas 3.0.2
+
+READ-ONLY on the repo: no edits, no commits, no =dvc= CLI.  This =.org= is the
+only file written outside the scratchpad and the implementer's isolated
+=.data=.
+
+*I did not trust the implementer's cache.*  I snapshotted their
+=.data/Ethiopia/var/{plot_features,crop_production}.parquet=, deleted those
+plus every =Ethiopia/*/_/{plot_features,crop_production}.parquet= (GH #866),
+and rebuilt both tables cold.  *My cold rebuild reproduced theirs exactly*
+(=DataFrame.equals= True on both).  All figures below are from my rebuild.
+
+In-tree artefact check after every build:
+=find lsms_library/countries -name '*.parquet' -o -name '*.dta'= -> *empty*.
+
+Substituted tooling (declared per =CLAUDE.md= section "GitNexus is OPTIONAL"):
+the =gitnexus= MCP server did not connect, so the symbol sweep for item 1's
+generality was =rg= + directed reads across every country module.
+
+* Verdict summary
+
+| # | item                                   | verdict  |
+|---+----------------------------------------+----------|
+| 1 | the =AreaUnit= bug fix                 | *PASS*   |
+| 2 | #853 area counts / join keys / EPAR    | *PASS* with two *CONCERN*s |
+| 3 | #852 loader (codes, units, region, dedup) | *PASS* |
+| 4 | movement in =harvest_kg=               | *PASS* on the numbers, *FAIL* on the corroboration claim |
+| 5 | =crop_production= unchanged            | *PASS*   |
+| 6 | the =region=True= path                 | *CONCERN* -- unusable end-to-end today |
+| 7 | tests / pandas 3.0 / ASCII / stale cache | *PASS* |
+
+Nothing found here blocks the merge of the *code*.  Item 4 asks for a
+docstring/ledger correction and item 6 for an honest statement of reach;
+item 2's ceiling is a design question worth an issue.
+
+* 1. The =AreaUnit= bug fix -- PASS
+
+** The pre-fix defect is real, and is exactly as described
+
+Base tree, =git show development:lsms_library/countries/Ethiopia/_/ethiopia.py=:
+
+: 671:    area_unit_map = _harmonize_wave_keyed('harmonize_area_unit')
+: 708:    native_unit = _map_int_codes(field[c['area_unit']], area_unit_map) \
+
+=_harmonize_wave_keyed= (base =:551=) returns ={(wave, code): label}=;
+=_map_int_codes= (base =:588=) does
+=pd.to_numeric(series).astype('Int64').map(code_map)=, i.e. it looks up a
+*bare* int.  Every lookup misses.  The sibling at base =:680= (=acquire_map=)
+slices correctly through a =lambda ... .get((t, int(code)))=, which is what
+makes the asymmetry a slip rather than a design.
+
+** Measured, pre vs post
+
+Pre-fix = the shared cache's Ethiopia =plot_features.parquet= (Sep 7 17:00,
+built before this branch; read raw with =pd.read_parquet=, so no library
+write path was entered and the shared cache was not touched).  Post-fix = my
+cold isolated rebuild.  Both 132,694 x 9.
+
+| AreaUnit      | PRE (shared) | POST (mine) |
+|---------------+--------------+-------------|
+| hectares      |      122,967 |     122,967 |
+| Timad         |            0 |       3,832 |
+| Square Meters |            0 |       1,891 |
+| Boy           |            0 |       1,484 |
+| Other         |            0 |       1,098 |
+| Senga         |            0 |         286 |
+| Hectare       |            0 |         216 |
+| Kert          |            0 |         216 |
+| Tilm          |            0 |         130 |
+| Ermija        |            0 |          28 |
+| Rope          |            0 |           3 |
+| Medeb         |            0 |           2 |
+| =<NA>=        |    *9,727*   |       *541* |
+
+*The claim is exact*: =<NA>= on all 9,727 non-GPS fields pre-fix, and the
+9,727 is precisely =122,967 + 9,727 = 132,694=, i.e. every row without a GPS
+area.  =hectares= is byte-stable at 122,967 across the fix, so nothing that
+had a label lost one.
+
+*Residual, not in the ledger*: 541 rows still =<NA>= post-fix (2011-12 268,
+2013-14 73, 2015-16 197, 2018-19 1, 2021-22 2).  These are fields with no GPS
+area whose farmer-estimate unit code is itself missing or outside
+=harmonize_area_unit=.  4.1% of the affected population; benign, but the
+ledger says "the native unit name" without qualification.  Worth one clause.
+
+** Is the fix general?  Yes -- swept, and there is no second instance
+
+=_harmonize_wave_keyed= call sites in =ethiopia.py= at HEAD -- *4, all correct*:
+
+| # | file:line | consumption | verdict |
+|---+-----------+-------------+---------|
+| 1 | =Ethiopia/_/ethiopia.py:702= (=local_area_unit_factors=) | tuple lambda =.get((t, int(x)))= at =:721= | CORRECT |
+| 2 | =:885= (=acquire_map=) | tuple lambda at =:895= | CORRECT |
+| 3 | =:886= (=area_unit_map=) | *sliced to bare at =:933=*, then =_map_int_codes= at =:935= | CORRECT -- this is the fix |
+| 4 | =:2041= (=_eth_species_label_map=) | sliced at =:2042=, bare =.map= at =:2112=, guarded by =assert species_map= at =:2097= | CORRECT |
+
+=_map_int_codes= call sites -- *3, every map proved bare-keyed*: =:898=
+=soil_map= <- =_harmonize_code_label('harmonize_soil')= (org header
+=| Code | Preferred Label |=, =categorical_mapping.org:163=); =:935= the
+slice above; =:2741= =industry_map= <- =_harmonize_code_label('harmonize_industry')=
+(=org:844=).  Nothing UNPROVEN.  The converse hazard (a *wave-keyed* table
+loaded through the *bare* =_harmonize_code_label=, which would silently
+collapse waves) was checked too: all four bare-loaded tables have no =Wave=
+column.
+
+Repo-wide, exactly *three* functions build a tuple-keyed label dict from an
+org table with a =Wave= column: Ethiopia =:551=, Nigeria
+=Nigeria/_/nigeria.py:1030= (consumed by a tuple =.get= at =:1223=), Uganda
+=Uganda/_/uganda.py:754= (3-tuple =(t, '2A'|'2B', code)=, consumed by a
+matching tuple =.get= at =:954=).  *Both are correct*, and their key /values/
+were checked too, not just their shapes -- Nigeria's =wave_folder_map=
+(=nigeria.py:23-31=) emits exactly the hyphenated wave labels the org table
+uses; Uganda builds =f'2{letter}'= for =letter in ('A','B')=, matching the
+org =File= column.  A =| Wave |= header appears in only two other
+=categorical_mapping.org= files (Nigeria =:659=, Uganda =:617=); a
+complementary grep for a =Wave= column in any non-first position across all
+=categorical_mapping.org= returned zero.
+
+*No new issue is warranted on shape grounds.*  One hardening note, not a
+defect: Ethiopia's =_eth_species_label_map= guards with =assert species_map=;
+the Nigeria and Uganda tenure paths have no equivalent, so a future org edit
+(a renamed wave label, a wave added without rows) would reintroduce the same
+*silent* all-null column there.  A one-line =assert= in each is cheap.
+
+* 2. #853 -- area counts, join keys, EPAR -- PASS, with two CONCERNs
+
+** The counts reproduce exactly, twice
+
+From my cold rebuild of =plot_features=, and independently from a
+from-scratch re-implementation of the join straight off the raw =sect3_pp_w*.dta=
+files (I re-derived the target mask, the merge and the ceiling myself rather
+than calling =_convert_local_area_units=):
+
+| wave    | fields gaining an Area | Area NaN before -> after |
+|---------+------------------------+--------------------------|
+| 2011-12 |                  *964* | 5,933 -> 4,969           |
+| 2013-14 |                *1,152* | 2,485 -> 1,333           |
+| 2015-16 |                  *135* | 1,072 ->   937           |
+| 2018-19 |                   *19* |    99 ->    80           |
+| 2021-22 |                    *0* |   138 ->   138           |
+| *total* |                *2,270* | *9,727 -> 7,457*         |
+
+Converted rows by unit: Timad 2,025 / Boy 113 / Senga 100 / Kert 32 = 2,270.
+*0 GPS-measured areas were overridden* -- structurally guaranteed, the target
+mask is =area_ha.isna() & (est > 0) & native_unit.notna()=, and confirmed:
+=hectares= count is identical pre and post (122,967).  *W5 raises rather than
+borrowing* -- =local_area_unit_factors(['2021-22'])= raises =ValueError=, and
+=_convert_local_area_units= short-circuits on
+=if t not in LOCAL_AREA_UNIT_WAVES=, so W5's 135 local-unit targets keep
+=Area= NaN.  Verified.
+
+*3 refused, in 2011-12 only*, ceiling 9.9142 ha:
+
+| region | zone | woreda | AreaUnit | est | SqmPerUnit | would-be ha |
+|--------+------+--------+----------+-----+------------+-------------|
+|      1 |    5 |      2 | Timad    | 100 |   1801.468 |      18.015 |
+|      3 |    6 |      2 | Timad    |  75 |   1826.953 |      13.702 |
+|      3 |    6 |      6 | Timad    | 125 |   2246.641 |      28.083 |
+
+All three are large *farmer estimates* (75-125 Timad) against ordinary
+factors, so the refusal is screening the estimate column, not the WB table --
+which is what the docstring says it is for.  Nothing was clipped.
+
+The factor table itself: 259 rows per wave x 4 waves = 1,036, index unique,
+206 woredas x {Timad 198, Boy 33, Senga 18, Kert 10}, 9 regions
+{1,3,4,5,6,7,12,13,15}.  No row is dropped by the =>0= / =dropna= filters
+(259 raw -> 259 kept in each wave).  Median sqm per unit: Timad 1,488
+(0.149 ha), Kert 2,483, Senga 1,106, Boy 155.  A timad in the 0.15-0.25 ha
+range is the standard figure; these are plausible.
+
+** Join keys -- PASS, and EPAR's mis-key claim is confirmed
+
+The loader keys on the raw =(region, zone, woreda)= =Int64= triple from
+=saq01/saq02/saq03=, plus the decoded =AreaUnit=.  Both sides of the
+=AreaUnit= key come from the *same* =harmonize_area_unit= slice, so the label
+axis agrees by construction, not by coincidence -- and the merge is asserted
+non-fanning (=assert len(merged) == len(probe)=).
+
+EPAR claim, verified against
+=.../reference/epar/.../Ethiopia ESS/Ethiopia ESS Wave 5/EPAR_UW_Ethiopia_ESS_W5.do=:
+
+- Master helper =W5.do:194-225= pads *region only* (=:198=
+  =replace region = "0" + region if length(region) == 1=); =saq02= =:205= and
+  =saq03= =:218= are =tostring=-ed with *no* zero-pad, while the sibling
+  =saq04= =:231= and =saq05= =:244= *are* padded -- so the omission is
+  specific to zone/woreda.
+- Conversion-file block =W5.do:325-341= pads *all three*: =:330=
+  =replace zone = "0" + zone if length(zone) == 1=, =:336= the same for
+  =woreda=.
+- So for region=1, zone=1, woreda=1 the master key is ="011"= / ="0111"= and
+  the conversion key is ="0101"= / ="010101"=.  *The implementer's ="011"= vs
+  ="0101"= is exactly right.*  Stata raises nothing: both sides are strings.
+- =W5.do:694-696=: =merge m:1 region zone woreda local_unit ... keep(1 3)= /
+  =*13,312 not matched from master= / =*1,566 matched=.  =W5.do:703= carries
+  =// 19 changes=.  *"1,566 matched" and "19 field sizes" are EPAR's own
+  verbatim comments.*
+- *Nit, worth a word in the ledger*: "of 14,878" is *derived*
+  (13,312 + 1,566), not an EPAR figure.  It is arithmetically right and I can
+  independently corroborate the denominator -- my own read of
+  =sect3_pp_w5.dta= is *exactly 14,878 rows* -- but the ledger presents it as
+  one of "EPAR's own inline counts".  It is one count plus a subtraction.
+
+Two further EPAR corrections that touch text on this branch:
+
+- =CROP_CF_DUPLICATE_RULE='s docstring says EPAR keeps 4.34 "for continuity"
+  with W3, citing =W5.do:800-802= *and* the commented-out block at =:345-353=.
+  The "continuity with W3" rationale appears *only in the dead code*
+  (=:349=).  The *live* comment (=:801=, MGM 4.1.2024) justifies 4.34 by
+  reference to *W5*: "W5 uses the 4.34 conversion factor rather than 6.125".
+  The live predicate also differs (=conversion>5= post-reshape, 8 obs, not
+  =mean_cf_nat==6.125=).  The branch reaches the same *answer* by the same
+  *threshold* (=drop_above: 5.0=); only the attributed reason is off.
+- =CROP_CF_REGION_COLUMNS='s comment says =:766-773= expands 99 into 5/13/15.
+  Correct, but the block is =:767-773=, and EPAR's own labels read
+  *13 = HARARI, 15 = DIRE DAWA* (the reverse of the docstring's ordering when
+  read as a mapping).  The =mean_cf99= variable label the branch transcribes
+  ("SOMALIE, DIRE DAWA, & HARAR") is the file's, so the =.dta= quote is fine.
+- =W4.do:744= is the *crop* dedup (=drop if crop_code==74 & unit==62 &
+  conversion>5=), *not* an area merge, and W4's area merge (=W4.do:647=)
+  carries no match counts at all.  *The branch never cites W4.do:744* (grep:
+  the only W4.do citation in the tree is =CONTENTS.org:1599=, =W4.do:759=,
+  unrelated), so this is a brief-side reference, not a branch defect.
+
+** CONCERN 1 -- the plausibility ceiling is wave-inconsistent by a factor of 43
+
+The ceiling is "the largest field this wave actually measured by GPS".
+Measured, per wave:
+
+| wave    | GPS max = ceiling | GPS p99 | GPS p999 | GPS median |
+|---------+-------------------+---------+----------+------------|
+| 2011-12 |          *9.91* ha |   0.936 |    4.405 |     0.0478 |
+| 2013-14 |        *126.41* ha |   1.253 |    7.374 |     0.0455 |
+| 2015-16 |        *425.71* ha |   1.104 |    4.599 |     0.0403 |
+| 2018-19 |         *19.81* ha |   1.023 |    2.852 |     0.0330 |
+| 2021-22 |          *4.93* ha |   1.007 |    2.486 |     0.0315 |
+
+The five ceilings span 4.9 ha to 425.7 ha because each is set by a *single*
+GPS outlier -- and every wave's p99 is ~1 ha, so the ceiling is 5x to 425x
+the 99th percentile depending on which wave you are in.  Consequence,
+measured: the three rows refused in 2011-12 (13.7 / 18.0 / 28.1 ha) would all
+have been *accepted* in 2013-14 or 2015-16; conversely 2013-14 serves a
+33.22 ha converted field and 2015-16 a 12.14 ha one, both above 2011-12's
+ceiling.  Converted rows exceeding 9.9142 ha (the 2011-12 ceiling) by wave:
+2011-12 *0*, 2013-14 *3*, 2015-16 *1*, 2018-19 *0*.
+
+The docstring's defence -- "the ceiling is the wave's own data rather than a
+magic constant, and it is deliberately generous" -- is true but incomplete:
+it is not merely generous, it is *non-comparable across waves*, so "refused"
+does not mean the same thing in 2011-12 as in 2015-16.  =count, never clip=
+is respected either way and no number is wrong; this is about the *screen*,
+not the data.  A wave-invariant reference (e.g. the wave's GPS p999, which is
+2.5-7.4 ha across all five and would flag 38/3/3/2 rows) would make the
+counts comparable.  *Suggest an issue; do not block on it.*
+
+** CONCERN 2 -- converted areas sit systematically far above the GPS distribution
+
+| wave    | n conv | conv median | conv p90 | conv max | GPS median | ratio of medians |
+|---------+--------+-------------+----------+----------+------------+------------------|
+| 2011-12 |    964 |      0.2363 |    1.163 |    9.135 |     0.0478 |            *4.9x* |
+| 2013-14 |  1,152 |      0.1827 |    0.498 |   33.224 |     0.0455 |            *4.0x* |
+| 2015-16 |    135 |      0.2500 |    0.945 |   12.144 |     0.0403 |            *6.2x* |
+| 2018-19 |     19 |      0.9007 |    3.090 |    8.112 |     0.0330 |           *27.3x* |
+
+*The brief asked for the within-REGION comparison, so here it is* -- the
+national ratio could have been pure composition (converted rows concentrated
+in large-field regions).  Ratio of medians (converted / GPS) computed inside
+each =saq01= region, regions with >= 20 GPS fields, largest cells first:
+
+| wave    | region | n conv | conv median | GPS median | *within-region ratio* |
+|---------+--------+--------+-------------+------------+-----------------------|
+| 2011-12 |      3 |    431 |      0.2691 |     0.1101 |                 *2.4x* |
+| 2011-12 |      1 |    177 |      0.2215 |     0.0543 |                 *4.1x* |
+| 2011-12 |      4 |    167 |      0.1422 |     0.0596 |                 *2.4x* |
+| 2011-12 |      7 |     90 |      0.2026 |     0.0221 |                 *9.2x* |
+| 2013-14 |      3 |    483 |      0.1768 |     0.0665 |                 *2.7x* |
+| 2013-14 |      4 |    256 |      0.2226 |     0.0676 |                 *3.3x* |
+| 2013-14 |      1 |    214 |      0.2215 |     0.0672 |                 *3.3x* |
+| 2015-16 |      4 |     57 |      0.2394 |     0.0574 |                 *4.2x* |
+| 2015-16 |      7 |     25 |      0.3039 |     0.0217 |                *14.0x* |
+| 2018-19 |      1 |     17 |      0.9176 |     0.0523 |                *17.6x* |
+
+National ratios for contrast: 4.9x / 4.0x / 6.2x / 27.3x.  *Composition
+explains only part of it.*  2018-19's headline 27.3x falls to *17.6x* once
+you stay inside region 1 (which holds 17 of that wave's 19 converted rows),
+and 2011-12's 4.9x resolves into a 2.4x-9.2x spread -- so the effect is
+smaller than the national figure suggests but is *present in every large
+cell and in every wave*, never below 2.4x.  It is not an artefact of
+comparing Oromia estimates against SNNP measurements.
+
+Rows above the wave's own GPS p999: 38 / 3 / 3 / 2.  A selection story is
+available and plausible (a field the enumerator could not walk is a field
+that is large or remote), and the ledger's stated scope is deliberately not
+to adjudicate.  But 2018-19's 19 rows have a *median* of 0.90 ha against a
+GPS median of 0.033 ha, and the sample includes a 33-Timad estimate
+(8.11 ha) and three 8-to-14-Timad estimates in a single woreda -- i.e. the
+19 rows are not a random tail, they are concentrated.  These are the *only*
+19 rows the WB table serves in that wave.  *Worth a sentence in
+=CONTENTS.org= flagging the 2018-19 cell as thin and unrepresentative*, so a
+downstream user of =yield_kg= on W4 does not take 19 outsized fields as
+typical.
+
+* 3. #852 loader -- PASS
+
+** Crop codes: 100%, verified independently
+
+For each of the four shipped files I mapped =crop_code= through
+=_eth_crop_label_map()= directly: *zero unmapped codes in all four waves*.
+Reproduced.
+
+** Units: the ceiling on =shipped_matched=
+
+The pinned per-wave shares (69/82/81/77 %) are the fraction of each wave's
+section-9 harvest *rows* whose =u= the table covers.  The branch's own test
+=test_the_unit_label_match_rate_is_pinned= runs and passes on the real files
+(20/20 in =test_ethiopia_shipped_factors.py=).  My independent raw-code join
+gives a closely related figure (share of section-9 rows whose
+=(crop_code, unit_cd)= pair appears in the table at all): 66.1 / 76.5 / 69.2 /
+64.4 %.  Lower than the unit-only share, as it must be, since it also
+requires the *pair* to exist.  Consistent.
+
+** =mean_cf_nat= is a column the FILE carries -- transcription, PASS
+
+=Crop_CF_Wave4.dta= columns:
+=[crop_code, unit_cd, mean_cf_nat, mean_cf1, mean_cf2, mean_cf3, mean_cf4,
+mean_cf6, mean_cf7, mean_cf12, mean_cf99, note]=.  =mean_cf_nat= is a shipped
+column, read and served verbatim; the loader computes nothing.  I checked the
+obvious alternative reading (that it might be a trivially recomputable
+aggregate we are laundering): it is *not* the unweighted mean of the region
+columns -- equal within 1e-6 on only 686 of 1,175 rows, max deviation 3.24.
+The actual structure is visible in the file: a region cell with no
+observations is *back-filled with the national value* by the WB (e.g. row 3:
+nat 0.831, regions 0.755 / 0.831 / 0.820 / 0.890 / 0.831 / 0.813 / 0.831 /
+0.830).  So =mean_cf_nat= is upstream of the region columns, not derived from
+them.  *Serving it is transcription.  The "core never aggregates" argument
+holds.*
+
+A useful corollary the ledger does not draw: because empty region cells carry
+the national value, =region=True= degrades gracefully -- a row landing on a
+region the WB had no data for gets the national factor anyway, rather than
+nothing.
+
+** The crop-74 / unit-62 duplicate -- PASS
+
+Raw, measured per file:
+
+| wave    | file               | raw rows | crop74/unit62 rows | mean_cf_nat values | raw dup keys |
+|---------+--------------------+----------+--------------------+--------------------+--------------|
+| 2013-14 | Crop_CF_Wave2.dta  |      612 |                  0 | --                 | none         |
+| 2015-16 | Crop_CF_Wave3.dta  |    1,174 |                  1 | 4.34               | none         |
+| 2018-19 | Crop_CF_Wave4.dta  |    1,175 |                *2* | *6.125, 4.34*      | *(74, 62)*   |
+| 2021-22 | crop_cf_wave5.dta  |    1,175 |                *2* | *6.125, 4.34*      | *(74, 62)*   |
+
+Exactly one duplicated key, in exactly the two waves claimed, resolved to
+4.34 by =drop_above: 5.0=.  W3 does carry 4.34 as its single value, so the
+"continuity" answer is right even though the *live* EPAR comment gives a
+different reason (see item 2).  The post-rule =raise= on any *further*
+duplicate is present and would fire.
+
+** W4 / W5 are one blob -- PASS
+
+=Crop_CF_Wave4.dta= and =crop_cf_wave5.dta= read back identical: both
+(1175, 12), =DataFrame.equals= True.  Served under both =t= values, 1,165
+national keys each.  The docstring's framing ("the factor table the WB
+published WITH that wave, not a borrow we performed") is a defensible line
+and is stated in the code, so a reader cannot be misled.
+
+** The KALE / SPINACH decode collision -- PASS, inspected
+
+The warning fires and is loud:
+
+: DROPPED 10 key(s) (20 rows of 4106) that DISAGREE on ['t','j','u'] after
+: decoding -- distinct WB crop codes that harmonize_crop folds onto one
+: Preferred Label (KALE 56 and SPINACH 69 -> 'Leafy Greens' ...)
+
+*How far apart are the two factors?*  Measured -- KALE (56) vs SPINACH (69),
+=mean_cf_nat=, on every unit where both codes appear:
+
+| wave           | unit        | KALE (56) | SPINACH (69) | ratio |
+|----------------+-------------+-----------+--------------+-------|
+| 2013-14        | Esir        |     0.870 |         1.59 | 1.83x |
+| 2015-16, 2018-19, 2021-22 | Esir Large  |     1.920 |         2.35 | 1.22x |
+| 2015-16, 2018-19, 2021-22 | Esir Medium |     0.870 |         1.59 | 1.83x |
+| 2015-16, 2018-19, 2021-22 | Esir Small  |     0.510 |         0.82 | 1.61x |
+
+(=Kg= and =Quintal= agree exactly, 1.00x, and are therefore not in the
+dropped set -- the =drop_duplicates= on the full row removes them first.  So
+only the genuinely disagreeing Esir keys are dropped, which is the correct
+behaviour.)  The disagreements are 1.22x-1.83x: real, not rounding, but not
+the 5x that would make dropping obviously the only option.  A reader can now
+judge the call rather than take it on trust -- and the argument that decides
+it is not the size of the gap but that =crop_production.j= is *also* 'Leafy
+Greens', so there is no information left to choose on.
+
+The 10 keys are all =('*', 'Leafy Greens', 'Esir*')=: 2013-14 =Esir=;
+2015-16 =Esir Large/Medium/Small=; 2018-19 and 2021-22 likewise -- 1 + 3 + 3
++ 3 = 10.  Both crop codes are dropped; neither is picked, neither averaged.
+The design argument is sound: =crop_production='s =j= is *also* 'Leafy
+Greens', so the information that would resolve the choice is destroyed by the
+same decode.  These rows fall through to the other layers.  Cost: 20 of 4,106
+national rows (0.5%).
+
+Under =region=True= the same collision drops 80 keys / 160 rows of 32,848
+(the 10 keys x 8 region columns).  Consistent.
+
+Loader output: national 4,086 rows, index =(t, j, u)=, *unique*; per wave
+591 / 1,165 / 1,165 / 1,165.  Region 32,688 rows, index =(t, j, u, region)=,
+*unique*, regions {1,2,3,4,6,7,12,*99*}.
+
+** Hand spot check -- the decode does not shift a factor
+
+2018-19, unit =Madaberia/Nuse/Shera/Cheret Medium=, national column, by crop:
+Haricot Beans 95.00, Sesame 75.50, Onion 73.57, Teff 71.713, Wheat 71.344,
+Maize 70.346, Vetch 69.556, Field Pea 69.220, Chick Pea 67.932, Godere 67.460.
+=crop_conversion_factors(waves='2018-19').loc[('2018-19','Teff',
+'Madaberia/Nuse/Shera/Cheret Medium'),'KgFactor']= = *71.71299743652344*,
+identical to the raw file value.  Round-trip clean.
+
+Decode *reuse* is by construction, not by coincidence: =_crop_cf_table= uses
+=_eth_crop_label_map()= (=:1298=) and =_clean_unit_label= (=:1299=), the same
+two functions =crop_production_for_wave= uses at =:1500= / =:1526=.
+
+* 4. Movement -- PASS on the numbers, FAIL on the corroboration claim
+
+** The numbers reproduce exactly
+
+=Country('Ethiopia').crop_production()= = 85,519 x 7, no =KgFactor= column.
+
+| =kg_factor_sources=  | before |    after |
+|----------------------+--------+----------|
+| reported             |      0 |        0 |
+| shipped              |      0 | *62,164* |
+| shipped_matched      |      0 | *62,164* |
+| survey_median        |      0 |        0 |
+| inferred             | 26,546 |  *7,766* |
+| none                 | 58,973 | *15,589* |
+| shipped_implausible  |      0 |        0 |
+| rows returned        | 22,672 | *66,049* |
+| sum Harvest_kg       | 1,905,711.5 | *12,680,616.3* |
+
+By wave, sum =Harvest_kg= (before -> after): 2011-12 653,661.0 ->
+*653,661.0 (bit-identical -- W1 ships no factor file and is untouched)*;
+2013-14 625,076.0 -> 3,612,044.1; 2015-16 331,120.4 -> 3,920,357.0;
+2018-19 103,685.4 -> 2,657,402.1; 2021-22 192,168.7 -> 1,837,152.1.
+Layer counts sum to 85,519.  All reproduced.
+
+** FAIL: the shipped-vs-inferred agreement is a TAUTOLOGY
+
+Reproduced: 18,780 rows carry both a shipped and an inferred factor; median
+ratio *1.000000*; *0.0000%* outside [0.5, 2].  Then I asked what those rows
+*are*:
+
+: overlap u value_counts:
+:   Kg      18,677
+:   Gram       103
+: non-kg-ish overlap rows: 0
+
+*100% of the overlap is metric.*  The library infers 1.0 for =Kg= and 0.001
+for =Gram=; the WB table ships 1.0 and 0.001.  The ratio is 1.0000 because
+both sides are quoting the definition of a kilogram.  This is precisely the
+Nigeria pattern the brief anticipated.
+
+That makes the following claim in
+=tests/test_ethiopia_shipped_factors.py::test_shipped_and_inferred_agree_where_both_exist=
+false as written:
+
+: """The corroboration that the join is keyed right, not merely non-empty.
+: ... A mis-keyed join would show as a wild ratio, not as an empty result."""
+
+A join mis-keyed on =j= would *not* show as a wild ratio here.  It would
+leave =Kg= and =Gram= at 1.0 and 0.001 (crop-independent), and would corrupt
+only the local-container units -- of which *this check contains zero rows*.
+The test is a valid regression pin on the metric units; it is *not* evidence
+about the key, and the ledger repeats the claim ("this is the check that the
+keys are right rather than merely non-empty").  *Ask for the docstring and
+the ledger line to be corrected.  The code needs no change.*
+
+** What DOES corroborate the key, and how far it reaches
+
+Newly served = shipped AND no inferred factor = *43,384 rows, 10,774,904.8 kg*
+(85% of the after-total).  Top units by newly-served kg:
+
+| u                                  | rows |        kg | factor median | min    | max     |
+|------------------------------------+------+-----------+---------------+--------+---------|
+| Quintal                            | 13,924 | 6,883,007 |     *100.000* | 100.000 | 100.000 |
+| Madaberia/Nuse/Shera/Cheret Medium |  6,647 | 1,731,800 |        67.129 |  10.349 |  95.000 |
+| Madaberia/Nuse/Shera/Cheret Large  |  2,230 |   782,260 |       106.446 |  22.778 | 123.333 |
+| Madaberia/Nuse/Shera/Cheret Small  |  2,676 |   208,628 |        36.053 |   3.657 |  48.375 |
+| Joniya/Kasha Medium                |    923 |   198,893 |        67.129 |  10.349 |  95.000 |
+| Kunna                              |  2,124 |   175,035 |        10.617 |   1.102 |  59.167 |
+| Joniya/Kasha Large                 |    252 |   102,542 |       106.446 |  22.778 | 123.333 |
+| Kerchat/Kemba                      |    674 |    93,487 |        17.085 |   2.130 |  34.040 |
+| Box/Casa                           |     31 |    72,451 |        48.481 |  41.972 |  59.167 |
+| Bunch Medium                       |    518 |    67,095 |        17.500 |  17.500 |  17.500 |
+
+*Here is a real, independent check the ledger missed*: =Quintal= is 13,924 of
+the newly-served rows and *64% of the newly-served kilograms*, and its shipped
+factor is *exactly 100.0 with zero variance across every crop and wave*.  A
+quintal *is* 100 kg.  The library does not infer it (all 13,924 have
+=kg_inferred= NaN), so this is a genuine external agreement, not a
+definitional one.  It validates the *unit* decode on the largest single block
+of newly-served mass.
+
+*What still has no check*: the ~29,000 local-container rows (~3.9M kg), where
+the factor varies with the crop by an order of magnitude (Madaberia Medium
+runs 10.35 to 95.00 across crops).  A =j= mis-key would be invisible.  The
+mitigating structural argument is strong and I verified it -- the loader
+decodes =j= and =u= through the *same two functions* =crop_production_for_wave=
+uses (=_eth_crop_label_map= at =:1298= vs =:1500=; =_clean_unit_label= at
+=:1299= vs =:1526=), so a =j= mis-key would require the shared map to be
+wrong, which would equally corrupt =crop_production.j= itself.  *That
+argument, not the ratio test, is what should be in the docstring.*
+
+Sanity on magnitudes: shipped-row =Harvest_kg= median 100 kg, p75 208 kg,
+max 123,800 kg (Coffee, 1,238 quintals -- already flagged upstream by
+=QuantityImplausibleWarning=, a pre-existing =crop_production= issue not
+created here).  Metric factors: =Kg= 1.0 (18,677 rows, zero variance),
+=Gram= 0.001 (103), =Quintal= 100.0 (13,924).  Clean.
+
+* 5. =crop_production= content unchanged -- PASS
+
+Shared-cache =crop_production.parquet= (Sep 7, pre-branch) vs my cold
+post-fix rebuild:
+
+: cp shared(pre) (85519, 7)   mine(post) (85519, 7)
+: cp DataFrame.equals: True
+: cp cols equal: True   index equal: True
+
+and the two embedded =lsms_cache_hash= values *differ* (=b4a6fec9...= vs
+=f340bcb4...=) -- the country module is in every table's fingerprint.
+
+*I checked the hash-movement claim across the whole country, not just this
+table.*  For each of the 25 tables in Ethiopia's =data_scheme=, I compared
+=Country('Ethiopia')._table_cache_hash(table, waves)= at HEAD against the
+=lsms_cache_hash= embedded in the shared cache's pre-branch =var/*.parquet=
+(read-only, =pq.read_schema=): *20 of 20 tables that have a shared parquet
+MOVED; 0 unchanged.*  The remaining 5 have no =var/= parquet in the shared
+cache, so there is nothing to compare -- the ledger's "25/25" is therefore
+verified on 20 and asserted on 5.  *Content stable, hash moved:
+exactly the claimed shape.*  =plot_features= is the only table whose content
+moves.
+
+My rebuild also equals the implementer's own snapshot for *both* tables
+(=DataFrame.equals= True), so the build is deterministic.
+
+* 6. The =region=True= path -- CONCERN (unusable end-to-end today)
+
+The loader returns a well-formed table: 32,688 rows, index
+=(t, j, u, region)=, unique, regions {1,2,3,4,6,7,12,99}, 4,728 / 9,320 /
+9,320 / 9,320 per wave.
+
+But *the brief's question -- "report =shipped_matched=" -- has no answer,
+because the call raises*:
+
+: >>> harvest_kg(cp, shipped_factors=eth.crop_conversion_factors(region=True))
+: ValueError: shipped_factors is ambiguous on the join keys ['t','j','u']:
+:   4086 duplicated key(s) ... ['region'] could not be joined on because
+:   crop_production carries no such level, which is what left the remaining
+:   keys ambiguous -- collapse that axis in the loader. ...
+
+This is the *correct* failure -- loud, specific, names the cause and the fix,
+and refuses to average.  =_shipped_factor_lookup= behaves exactly as designed.
+But it means:
+
+1. =region=True= has *no reachable consumer in the repo today*.  It is an API
+   surface whose only end-to-end use requires a =crop_production= schema
+   change (the open question the ledger files as section 6 Q1).
+2. *No test exercises it end-to-end.*
+   =test_region_table_is_keyed_on_t_j_u_region_and_is_unique= checks the
+   table's shape only.  A test asserting the =ValueError= would at least pin
+   the contract.
+3. Region *99* is in the returned keys and is *not* a =saq01= code.  Since
+   =SHIPPED_FACTOR_JOIN_LEVELS= matches =region= exactly, a future caller who
+   *does* resolve a numeric region will silently get *no* shipped factor for
+   Somali (5), Harari (13) and Dire Dawa (15) -- the three regions pooled into
+   99 -- whereas the national default serves them fine.  The docstring says
+   "we serve it as shipped and leave the expansion to a caller", which is a
+   defensible position, but the *asymmetry* (region=True is strictly worse
+   than the default for those three regions) is not stated anywhere.
+
+The ledger's motivating measurement -- the share of servable rows landing on
+a =(j,u)= whose factor actually varies by region -- *directionally
+reproduces* but the exact figures do not.  Mine, measured on the raw
+=(crop_code, unit_cd)= join against the shipped region columns:
+
+| wave    | ledger | mine (raw-code basis) |
+|---------+--------+-----------------------|
+| 2013-14 | 10.2 % |               *10.5 %* |
+| 2015-16 | 45.6 % |               *44.4 %* |
+| 2018-19 | 38.3 % |               *47.4 %* |
+| 2021-22 | 28.7 % |               *36.3 %* |
+
+The first two agree within ~1.2 pp; 2018-19 and 2021-22 differ by 9 and 8 pp.
+The two measurements use different denominators (mine: rows whose raw pair is
+in the table; theirs: presumably rows whose *decoded* key survives to the
+served table, which drops the collision keys and any undecodable unit), so
+this is a definitional gap rather than a contradiction.  *The qualitative
+claim -- "material, not negligible" -- holds on either measure.*  The ledger
+should state which denominator it used.
+
+* 7. Tests, pandas 3.0, ASCII, and the stale-cache question -- PASS
+
+** The four suites
+
+: pytest tests/test_ethiopia_shipped_factors.py tests/test_shipped_factors.py \
+:        tests/test_crop_kg_factor.py tests/test_schema_consistency.py -q
+: 359 passed, 27 warnings in 29.13s
+
+=test_ethiopia_shipped_factors.py= alone: *20 passed*, 0 skipped -- the
+=requires_s3= data-gated tests really ran (they read source =.dta= files and
+the built tables, not stubs).  =test_crop_kg_factor.py::test_uganda_harvest_kg_baseline=
+ran and passed, so the =yield_kg= signature change did not disturb the Uganda
+baseline.
+
+** The stale-cache question -- the tests do NOT silently pass
+
+I staged the adversarial case directly: copied the isolated =.data= to
+scratch, overwrote =Ethiopia/var/plot_features.parquet= *and* every
+=Ethiopia/*/_/plot_features.parquet= with the *pre-fix* shared-cache
+versions, and ran the suite against that data root.
+
+: 20 passed, 16 warnings in 19.08s
+
+and the staged parquet afterwards reads *Area NaN = 7,457* -- i.e. *the
+v0.8.0 content hash detected the stale parquet and rebuilt it*.
+
+*That first staging had a flaw and I re-ran it.*  =cp= sets mtime to now, and
+I copied the =var/= parquet before the wave parquets, leaving the waves
+NEWER -- which is exactly the condition that forces =make= to rebuild, so the
+result proved nothing about the realistic case.  I re-staged adversarially:
+pre-fix parquets in place, then =touch=-ed the wave parquets, then =touch=-ed
+=var/plot_features.parquet= one second later, so *every parquet is newer than
+every script and =var/= is the newest file of all* -- the exact mtime
+ordering the shared cache actually has (waves 17:00:07-08, var 17:00:09) and
+the one under which =make= should report the target up to date.  Result:
+
+: 20 passed, 16 warnings in 17.75s
+: after pytest: Area NaN = 7457 => REBUILT
+
+*The rebuild fires under both stagings.*  So the tests do not silently pass
+on stale data.
+
+*On GH #866's scope, having now read the issue rather than guessed.*  #866
+has two forms.  The *rule-less* form (=try_make= exits 0 on a country target
+with no Makefile rule, so =try_script= is never reached) covers 20 tables in
+13 countries, and Ethiopia contributes exactly one of them -- =panel_ids=,
+not =plot_features=.  =Ethiopia/_/Makefile:64= does carry a real rule
+(=$(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)=),
+so this cell is *outside* the rule-less class by construction.  The issue
+then says the other 75 tables face a *weaker* form -- "a config-only change
+... that moves the hash without touching a prerequisite is mtime-skipped by
+make ... not safety".  My second staging is precisely that scenario, and
+*empirically it did not bite either*: the rebuild ran.  I did not chase down
+which mechanism saved it (the STALE branch's eviction, or the wave scripts
+being prerequisites and themselves edited by this branch).  So: *this cell is
+out of #866's rule-less class by inspection, and out of its mtime-skip class
+by measurement -- but the second is an observation on one cell, not a
+refutation of the issue.*  The dispatcher's instruction to =rm= the =var/=
+parquet before a rebuild you rely on remains the right hygiene, and I
+followed it for every measured build in this report.
+
+A test pinning post-fix numbers therefore neither silently passes nor
+spuriously fails.  *PASS.*
+
+(Had the hash *not* moved, the failure mode would still have been a clean
+=assert null_by_wave == {...}= failure, not a silent pass -- the assertions
+are exact equality on counts, not tolerances.)
+
+** pandas 3.0
+
+Running under pandas *3.0.2*.  Grep of every added line for the banned forms
+-- =inplace=True=, =fillna(method=...)=, =np.isnan=, =series[0]= positional --
+returns *zero* (the three =.append(= hits are =list.append= on a =pieces=
+list, not =DataFrame.append=).  New code uses =Int64= / =string= / =boolean=
+extension dtypes, =pd.NA=, =.fillna(False)= on boolean masks before
+=&=-combining, and =np.isfinite= on a numeric column.  Clean.
+
+** ASCII
+
+No explicit ASCII rule found in =AGENTS.md=, =CLAUDE.md= or
+=.coder/ledger/STANDING.md=.  The branch adds *3* non-ASCII lines to
+=ethiopia.py= (110 -> 113): two em-dashes in the =plot_features_for_wave=
+colmap docstring and one =§= in the =crop_conversion_factors= Notes.  Both
+characters are already pervasive in the file and in =transformations.py=
+(132 lines).  =tests/test_ethiopia_shipped_factors.py= is *0* non-ASCII.
+Consistent with the surrounding style; not a blocker.  If a strict-ASCII
+ratchet is wanted, it is a repo-wide job, not this branch's.
+
+** Other observations from the runs
+
+- The 3-row *refusal warning does fire* on a cold build, but *only inside the
+  wave-script subprocess*:
+
+  : Ethiopia/2011-12/_/plot_features.py:44: UserWarning: Ethiopia 2011-12
+  : plot_features: 3 of 967 local-unit area conversion(s) exceed the wave's
+  : largest GPS-measured field (9.91 ha) and are REFUSED ...
+
+  It is *not* caught by a caller's =warnings.catch_warnings= (0 captured
+  in-process) and it *never fires on a warm read*.  Contrast
+  =GrainCollapseWarning= / =NullReadWarning=, which =CLAUDE.md= stamps into
+  the parquet metadata and *replays on every warm read* precisely because
+  "the signal survives the cache -- this is the load-bearing part".  The
+  refusal count here is a build-log-only artefact with no programmatic
+  accessor (no =area_reports()= twin of =grain_reports()=).  *Not a defect
+  introduced by this branch* -- it inherits the framework's script-path
+  behaviour -- but the "read this as a work queue" instruction in the warning
+  text is aspirational: after the first build nobody will ever see it again.
+  Worth an issue.
+- Pre-existing and unrelated, but present in every =plot_features= build:
+  =NullReadWarning: Ethiopia/plot_features: required declared column
+  'SoilType' is 100% NULL in wave(s) [2011-12]=.  Not caused here.
+- Ledger section 4 says "=sect9_ph= carries =saq01= on 100% of rows in all
+  five waves".  Measured: 2011-12 / 2013-14 / 2018-19 / 2021-22 are 100%;
+  *2015-16 is 99.99670%* (one row).  Immaterial to the argument, but the
+  claim is stated as an exact invariant.
+
+* What I would ask the implementer to change before merge
+
+Only text.  No code change is required by anything above.
+
+1. *[item 4, the important one]* Correct
+   =test_shipped_and_inferred_agree_where_both_exist='s docstring and the
+   matching ledger sentence.  The 18,780-row overlap is *100% =Kg= and
+   =Gram=*; median 1.0000 is a definitional identity, not evidence about the
+   key.  Replace with the two things that *are* evidence: (a) =Quintal= =
+   100.0 exactly on 13,924 newly-served rows / 64% of newly-served kg, which
+   the library does *not* infer; (b) =j= and =u= are decoded by the *same two
+   functions* the =crop_production= build uses (=ethiopia.py:1298-1299= vs
+   =:1500=/=:1526=), so a =j= mis-key would corrupt =crop_production.j= too.
+2. *[item 6]* State that =region=True= cannot be passed to =harvest_kg= today
+   (it raises), and that region 99 makes it strictly worse than the national
+   default for regions 5 / 13 / 15.  Consider a test pinning the =ValueError=.
+3. *[item 2]* In =CROP_CF_DUPLICATE_RULE='s docstring, attribute "continuity
+   with W3" to the *commented-out* =W5.do:349=; the live =:801= gives a
+   different reason.  In the ledger, mark "14,878" as derived
+   (13,312 + 1,566), and say which denominator the region-varying percentages
+   use.
+4. *[item 1]* Add one clause noting the 541 rows whose =AreaUnit= is still
+   =<NA>= after the fix (missing / unmapped unit code, 4.1% of non-GPS
+   fields).
+
+Worth filing separately, not blocking:
+
+- The wave-inconsistent plausibility ceiling (item 2, CONCERN 1): 9.9 / 126.4
+  / 425.7 / 19.8 / 4.9 ha across waves, each set by one GPS outlier, against
+  a p99 of ~1 ha in every wave.
+- The 2018-19 conversion cell is 19 rows with a median 27x the wave's GPS
+  median nationally and *17.6x within its own region* (item 2, CONCERN 2);
+  every large converted cell in every wave sits 2.4x-17.6x above the
+  within-region GPS median.
+- The refusal warning is build-log-only and has no =*_reports()= accessor
+  (item 7).
+- Optional hardening: an =assert map= guard on Nigeria's and Uganda's
+  wave-keyed tenure maps, mirroring Ethiopia's =_eth_species_label_map=
+  (item 1).

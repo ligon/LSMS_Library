@@ -76,6 +76,20 @@ class UnpriceableRowsWarning(UserWarning):
     """
 
 
+class ValuationLadderWarning(UserWarning):
+    """The own-production valuation ladder ran on fewer geographic rungs than
+    the canonical ``v`` -> ``District`` -> ``Region`` -> national one.
+
+    Emitted by the ``Country.food_expenditures(valuation=...)`` path when the
+    country's ``cluster_features`` does not carry one of the coarser rungs (or
+    the frame carries no ``v`` at all), naming which rungs were available.  A
+    shorter ladder is not an error -- ``median_price_valuation``'s national
+    fallback is unconditional, so every row still gets a price -- but it means
+    the imputed price is drawn from a coarser market than the caller may
+    assume, so it is said out loud rather than inferred from silence.
+    """
+
+
 class ShippedFactorWarning(UserWarning):
     """A ``shipped_factors`` table did not join the way its author meant.
 
@@ -1692,7 +1706,444 @@ def _apply_kg_conversion(df, factors):
     return v
 
 
-def food_expenditures_from_acquired(df, basis='purchased'):
+# ---------------------------------------------------------------------------
+# Own-production / in-kind valuation (GH #585).  OPT-IN, read-time, never
+# stored.  See ``food_acquired_valued`` for the method and its bias.
+# ---------------------------------------------------------------------------
+
+#: Rungs :func:`food_acquired_valued` knows how to run, in the order EPAR's
+#: consumption repo runs them (own price first, then the spatial ladder).
+VALUATION_RUNGS = ('own_price', 'median_price')
+
+#: Values ``ValuationSource`` can take.  The four partition the input rows.
+VALUATION_SOURCES = ('reported', 'own_price', 'median_price', 'none')
+
+#: The geographic ladder the ``Country`` path asks for, finest -> coarsest.
+#: ``v`` rides on ``food_acquired``'s own index; the rest come from
+#: ``cluster_features``.  A national rung is always appended by
+#: :func:`median_price_valuation` itself.
+VALUATION_GEO_LEVELS = ('v', 'District', 'Region')
+
+
+def _normalize_valuation_arg(valuation):
+    """Validate ``valuation=`` and return it as a tuple of rung names."""
+    if valuation is None:
+        return ()
+    rungs = (valuation,) if isinstance(valuation, str) else tuple(valuation)
+    if not rungs:
+        raise ValueError(
+            "valuation= must be a rung name, a non-empty sequence of them, "
+            "or None; got an empty sequence.  Pass None for no valuation."
+        )
+    unknown = [r for r in rungs if r not in VALUATION_RUNGS]
+    if unknown:
+        raise ValueError(
+            f"valuation= rung(s) {unknown} unknown; must be drawn from "
+            f"{list(VALUATION_RUNGS)}."
+        )
+    if len(set(rungs)) != len(rungs):
+        raise ValueError(f"valuation= names a rung twice: {list(rungs)}.")
+    return rungs
+
+
+def _level_or_column(df, name):
+    """``name`` as a numpy array aligned positionally to ``df``'s rows."""
+    if name in (df.index.names or []):
+        return np.asarray(df.index.get_level_values(name))
+    if name in df.columns:
+        return df[name].to_numpy()
+    return None
+
+
+def _geo_key_tokens(values):
+    """String group keys in which every MISSING value is UNIQUE.
+
+    ``median_price_valuation`` stringifies its group keys, so a null cluster id
+    would otherwise collapse to the literal ``'nan'`` and -- at ``threshold``
+    rows or more -- qualify as a geographic cell that does not exist (Uganda
+    carries 328 such ``food_acquired`` rows, 0.09%).  Giving each null its own
+    token caps its cell count at 1, so it can never clear any
+    ``threshold >= 2``; the row still receives the national price, exactly as a
+    row with no observed price does.
+    """
+    arr = pd.Series(values)
+    out = arr.astype('object').where(arr.notna())
+    missing = out.isna().to_numpy()
+    out = out.astype(str).to_numpy(dtype=object)
+    if missing.any():
+        out[missing] = [f'__nogeo_{k}__' for k in np.flatnonzero(missing)]
+    return out.astype(str)
+
+
+def food_acquired_valued(df, valuation, *, geo=None, threshold=10,
+                         value_col='Expenditure', quantity_col='Quantity'):
+    """Value ``food_acquired``'s unvalued non-purchased rows, with PROVENANCE.
+
+    METHODOLOGY transform (GH #585).  The item-grain half of
+    ``food_expenditures(basis='total', valuation=...)``, exposed on its own so
+    the imputation can be AUDITED row by row -- which rung served each row, and
+    at what unit price.  Every row of *df* gets a row here, on the same index
+    and in the same order.
+
+    **This is opt-in and it is never the default, for a measured reason.**
+    Every rung below prices own-consumption at a PURCHASE transaction, and a
+    purchase sits above the farm gate by the marketing margin.  Our five-source
+    price study measured the gap: in Uganda, own-consumption valued at the
+    purchase price sits about **23% above what a sale actually fetched**
+    (``slurm_logs/price_sources/SYNTHESIS.org:750-753``; the transitive
+    223-cell set, ratio 1.234).  That number is **Uganda-only** -- GhanaLSS
+    ships no sale-price source, so no comparable figure exists for it.  The
+    UNPS interviewer manual is explicit that column 9 "should be valued at farm
+    gate/producer price ... excludes any cost transport and marketing services"
+    (``SYNTHESIS.org:732-736``), so a consumption aggregate built this way
+    carries part of a margin the instrument intended to exclude.  Deaton &
+    Zaidi (2002, *Guidelines for Constructing Consumption Aggregates*, LSMS
+    WP 135) treat the producer/market choice as the two defensible readings and
+    warn that the market one inflates the aggregate relative to purchases.
+    Choose it deliberately; do not reach for it because ``basis='total'``
+    looked incomplete.
+
+    Rungs, in precedence order (``ValuationSource`` records which one served)
+
+    ``reported``
+        The row already carries a non-zero ``value_col``.  Never re-valued --
+        including a value the survey itself imputed for ``s='inkind'``
+        (``lsms_library/data_info.yml:602``).  Zero counts as missing, exactly
+        as :func:`food_expenditures_from_acquired`'s own ``replace(0, nan)``
+        does, so a zero-valued produced row IS a candidate.
+    ``own_price``
+        **The same household's own purchase unit value for the same
+        ``(t, j, u)``**: the sum of that household's purchased ``value_col``
+        over the sum of its purchased ``quantity_col``, in that wave, for that
+        item, in that unit.  No cross-household information whatever.  This is
+        EPAR's consumption repo's FIRST rung (``EthiopiaW5_...do:423``,
+        ``UgandaW4_...do:693``), conditional there too on the consumed unit
+        matching the purchased one.  Note that EPAR's *Ag* repo does the
+        opposite -- it keeps the household's own price as a parallel
+        ``value_harvest_hh`` series rather than a rung -- so "EPAR's ladder" is
+        ambiguous and this docstring says which (``LEARNINGS.org`` L5 item 4).
+    ``median_price``
+        The geographic median-price ladder, run by :func:`median_price_valuation`
+        on a price pool built **only from ``s == 'purchased'`` rows**
+        (``value_col / quantity_col``).  The ladder walks *geo* finest ->
+        coarsest and takes the median of the finest cell with at least
+        *threshold* priced observations, with an unconditional national
+        fallback.  Cells are ``(geo, t, j, u)``: ``t`` is in the item key
+        because ``median_price_valuation`` has no wave axis of its own, and
+        without it the national rung would pool currency across a decade.
+    ``none``
+        No rung produced a price.  Counted, never hidden.  Also covers a
+        ``purchased`` row with no recorded outlay, which is a data defect
+        rather than an unvalued acquisition and is deliberately not a
+        candidate.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        ``food_acquired``, canonical index ``(t, v, i, j, u, s)``
+        (``data_info.yml:51``); ``v`` optional.  Needs ``s`` as an index level
+        or column -- without an acquisition source there is nothing to value.
+    valuation : str or sequence of str
+        Rungs to run, IN THE ORDER GIVEN; each fills only rows still unvalued.
+        A scalar means **exactly that rung** -- ``'median_price'`` runs the
+        spatial ladder alone, it does NOT quietly run ``'own_price'`` first.
+        The composed form ``('own_price', 'median_price')`` is EPAR's
+        consumption-repo ordering and is what you want if you want theirs.
+    geo : pd.DataFrame, optional
+        Coarser geographic rungs, indexed by ``(t, v)`` -- i.e.
+        ``cluster_features``' own grain -- with columns ordered **finest ->
+        coarsest** (e.g. ``[['District', 'Region']]``).  The ``v`` level of
+        *df*'s own index, when present, is prepended as the finest rung.  With
+        ``geo=None`` the ladder is ``v`` (if present) then national.
+    threshold : int, default 10
+        Minimum priced observations for a geographic cell's median to be
+        adopted; forwarded to :func:`median_price_valuation` (the WB / EPAR-Ag
+        gate of >= 10).
+    value_col, quantity_col : str
+        Column names on *df*.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed like *df*, with
+
+        ``Expenditure`` (i.e. *value_col*)
+            the reported value where there was one, the imputed value
+            otherwise, NaN where no rung could serve.
+        ``ValuationSource``
+            one of :data:`VALUATION_SOURCES`.
+        ``valuation_price``
+            the unit price the winning rung used, per the row's own ``u``
+            (NaN for ``reported`` and ``none``).  Deliberately NOT called
+            ``Price``: that name is the survey's own reported unit price, and
+            this one is CONSTRUCTED.
+
+        Two records ride on ``.attrs``:
+
+        ``valuation_sources``
+            ``{source: n_rows}`` over the INPUT rows.  The four
+            :data:`VALUATION_SOURCES` partition the frame and sum to
+            ``len(df)``.  The extra ``candidates`` key counts the rows that
+            were ELIGIBLE for valuation (non-purchased, no reported value) and
+            is deliberately outside that partition, since such a row is still
+            served by one of the four.  POOLED on a cross-country
+            :class:`~lsms_library.feature.Feature` frame -- read it as a total,
+            never as coverage.
+        ``valuation``
+            the tuple of rungs actually run, and ``valuation_geo_levels`` the
+            ladder they ran on.
+
+    Notes
+    -----
+    **The price basis is the row's NATIVE unit, not kilograms.**  ``u`` is an
+    item key, so a produced row is valued at the purchase price of the very
+    label it was reported in and unit alignment is exact by construction.  A
+    kg-normalised basis would pool more finely-split labels (Malawi carries
+    ``Kilogramme``, ``Kilogram``, ``Kg`` and ``kg`` as four labels in one wave)
+    but would inherit the open kg-inference defect of GH #850, and it buys
+    nothing measurable: national-rung coverage at ``threshold=10`` is 94.2%
+    (Malawi) / 76.5% (Uganda) on the native key, and lower-casing ``u`` moves
+    it 0.00pp in both.  A ``u='Value'`` row prices at 1 currency-unit per
+    currency-unit, which is the right answer for it.
+
+    **Read that 94.2% as COVERAGE, not as accuracy, and read the
+    value-weighted complement beside it.**  ``median_price_valuation``'s
+    national rung is an *unconditional* fallback, so ``threshold`` gates the
+    geographic cells and gates nothing at the top of the ladder.  Measured on
+    Malawi (red-team, 2026-09-09), by share of the imputed MONEY rather than of
+    the rows: **6.48% of the imputed value is priced off fewer than ten
+    purchase observations nationwide, and 2.85% off exactly one.**  The 5.8% of
+    candidate rows below the gate are not a random 5.8% of the money.  The
+    concrete case: a single 2016-17 purchase sets "Small Animal - Rabbit, Mice,
+    Etc." (``u='Whole'``) at 100,000 MWK, which is then applied to 195 rows and
+    contributes 2.12% of Malawi's entire delta.  The median pool is 533
+    observations, so the bulk is well supported -- but a thin ``(t, j, u)``
+    cell is thin for every household in it, so this tail is *systematic* rather
+    than an outlier.  It is COUNTED here, never clipped; ``valuation_price`` is
+    returned per row so a caller can gate on it.
+
+    Whether the national rung should carry a gate of its own is a **follow-up,
+    deliberately not decided here**.  @ligon has ruled on the parallel
+    food-side inference (GH #850) that a thin baseline is a floor of 5 with a
+    dispersion-gated exception at 3-4; adopting the same rule at this rung is
+    the obvious candidate, and it would change returned numbers, so it belongs
+    in its own change.
+
+    Nothing here is cached.  ``food_expenditures`` is derived at read time
+    (``Country._FOOD_DERIVED``) and this runs inside that derivation, so no
+    parquet ever holds an imputed value.
+    """
+    rungs = _normalize_valuation_arg(valuation)
+    if not rungs:
+        raise ValueError("food_acquired_valued: valuation= is required; "
+                         "pass a rung name or a sequence of them.")
+
+    df = _normalize_columns(df)
+    for col in (value_col, quantity_col):
+        if col not in df.columns:
+            raise ValueError(f"food_acquired must have a {col!r} column to "
+                             f"value own-production rows")
+
+    s = _level_or_column(df, 's')
+    if s is None:
+        raise ValueError(
+            "food_acquired has no 's' (acquisition source) level, so there is "
+            "no own-production row to value.  Call with valuation=None."
+        )
+    s = pd.Series(s).astype(str).to_numpy()
+
+    n = len(df)
+    value = pd.to_numeric(df[value_col], errors='coerce').to_numpy(
+        dtype='float64', na_value=np.nan)
+    value = np.where(value == 0, np.nan, value)
+    qty = pd.to_numeric(df[quantity_col], errors='coerce').to_numpy(
+        dtype='float64', na_value=np.nan)
+
+    purchased = (s == 'purchased')
+    reported = ~np.isnan(value)
+    # A candidate is a NON-purchased acquisition carrying no value.  A
+    # purchased row with no recorded outlay is a defect, not an unvalued
+    # acquisition, and is deliberately excluded (see the ``none`` rung).
+    candidate = (~purchased) & (~reported)
+
+    # The purchase-side price pool: rows that are a purchase AND carry both a
+    # positive value and a positive quantity.
+    pool = purchased & (~np.isnan(value)) & (qty > 0)
+
+    t = pd.Series(_level_or_column(df, 't')).astype(str).to_numpy()
+    j = pd.Series(_level_or_column(df, 'j')).astype(str).to_numpy()
+    u_raw = _level_or_column(df, 'u')
+    if u_raw is None:
+        raise ValueError("food_acquired has no 'u' level; the purchase price "
+                         "the valuation uses is per unit, so 'u' is required.")
+    u = pd.Series(u_raw).astype(str).to_numpy()
+
+    price = np.full(n, np.nan)
+    source = np.where(reported, 'reported', 'none').astype(object)
+
+    geo_levels_used = ()
+    # IN THE ORDER GIVEN -- each rung fills only rows still unvalued, so the
+    # order is the precedence.  `('own_price', 'median_price')` is EPAR's
+    # consumption-repo ordering; the reverse is a different construct, not a
+    # spelling of the same one.
+    for rung in rungs:
+        if rung == 'own_price':
+            offered = _own_price_rung(t, df, j, u, value, qty, pool)
+        else:
+            offered, geo_levels_used = _median_price_rung(
+                df, t, j, u, value, qty, pool, geo=geo, threshold=threshold)
+        take = candidate & np.isnan(price) & (~np.isnan(offered)) & (qty > 0)
+        price = np.where(take, offered, price)
+        source = np.where(take, rung, source)
+
+    valued = np.where(np.isnan(price), value, price * qty)
+
+    out = pd.DataFrame({value_col: valued,
+                        'ValuationSource': source.astype(str),
+                        'valuation_price': price},
+                       index=df.index)
+    counts = {src: int((out['ValuationSource'].to_numpy() == src).sum())
+              for src in VALUATION_SOURCES}
+    # NOT a fifth source and deliberately not part of the partition: a
+    # candidate row is still SERVED by one of the four.
+    counts['candidates'] = int(candidate.sum())
+    out.attrs['valuation_sources'] = counts
+    out.attrs['valuation'] = rungs
+    out.attrs['valuation_geo_levels'] = list(geo_levels_used)
+    return out
+
+
+def _own_price_rung(t, df, j, u, value, qty, pool):
+    """Unit price from the SAME household's purchases of the same (t, j, u).
+
+    ``sum(value) / sum(quantity)`` over that household's pooled purchase rows,
+    so a household that bought an item twice contributes one quantity-weighted
+    price rather than two.  Returns NaN where the household made no usable
+    purchase of that item in that unit in that wave -- no cross-household
+    information is ever consulted.
+
+    ``i`` is resolved as an index level OR a column, like every other key, and
+    its absence RAISES.  It used to be looked up on ``df.index`` alone, so a
+    frame carrying ``i`` as a column got an all-NaN offer and ``own_price: 0``
+    with no signal at all -- while a missing ``u`` or ``s`` raised.  Only the
+    household axis degraded quietly, which is the one place a silent zero is
+    indistinguishable from an honest "no household ever bought what it grew".
+    """
+    i = _level_or_column(df, 'i')
+    if i is None:
+        raise ValueError(
+            "food_acquired has no 'i' (household) level or column, so the "
+            "own_price rung -- which is defined as the SAME household's "
+            "purchase price -- has no household to look up.  Use "
+            "valuation='median_price' on a frame with no household axis."
+        )
+    i = pd.Series(i).astype(str).to_numpy()
+    keys = ['_t', '_i', '_j', '_u']
+    work = pd.DataFrame({'_t': t, '_i': i, '_j': j, '_u': u,
+                         '_v': value, '_q': qty})
+    agg = work[pool].groupby(keys, sort=False, dropna=False)[['_v', '_q']].sum()
+    with np.errstate(divide='ignore', invalid='ignore'):
+        p = agg['_v'] / agg['_q']
+    p = p.replace([np.inf, -np.inf], np.nan)
+    p = p.where(p > 0)
+    lookup = pd.MultiIndex.from_frame(work[keys])
+    return p.reindex(lookup).to_numpy(dtype='float64')
+
+
+def _median_price_rung(df, t, j, u, value, qty, pool, *, geo, threshold):
+    """The geography median-price ladder, via :func:`median_price_valuation`.
+
+    Builds the frame that function wants on a fresh ``RangeIndex`` (``df``'s
+    own index may carry duplicate labels, which its internal ``reindex`` would
+    refuse) and maps the imputed price back positionally.  The price pool is
+    masked to *pool* -- purchased rows only -- so no already-imputed in-kind
+    value can become a "price" and feed itself back in.
+    """
+    n = len(df)
+    work = pd.DataFrame({
+        '_pool_value': np.where(pool, value, np.nan),
+        '_pool_qty': np.where(pool, qty, np.nan),
+        '_qty': qty,
+        '_t': t, '_j': j, '_u': u,
+    })
+
+    ladder = []
+    v = _level_or_column(df, 'v')
+    if v is not None:
+        work['_g_v'] = _geo_key_tokens(v)
+        ladder.append('_g_v')
+        used = ['v']
+    else:
+        used = []
+    if geo is not None and len(geo.columns):
+        gnames = list(geo.index.names or [])
+        if not {'t', 'v'} <= set(gnames):
+            raise ValueError(
+                "geo= must be indexed by (t, v) -- cluster_features' own "
+                f"grain; got index names {gnames}."
+            )
+        if v is None:
+            raise ValueError(
+                "geo= was supplied but food_acquired carries no 'v' level, so "
+                "the coarser rungs cannot be joined to it."
+            )
+        g = geo.reorder_levels(['t', 'v'] + [x for x in gnames
+                                             if x not in ('t', 'v')])
+        if g.index.nlevels > 2:
+            g = g.groupby(level=['t', 'v']).first()
+        g = g[~g.index.duplicated()]
+        target = pd.MultiIndex.from_arrays(
+            [pd.Series(t).to_numpy(),
+             pd.Series(v).astype('object').to_numpy()], names=['t', 'v'])
+        joined = g.reindex(target)
+        # A rung that RESOLVES TO NOTHING was not available, whatever
+        # ``cluster_features`` had a column for.  Without this count the
+        # ladder can silently degrade to ``v`` -> national while
+        # ``attrs['valuation_geo_levels']`` still advertises the full one.
+        # Two causes, and the warning cannot tell them apart, so it names
+        # both: (a) the cluster is absent from the geo frame -- watch for a
+        # ``v`` dtype/spelling mismatch, a live hazard here since
+        # ``format_id`` is applied to idxvars but not myvars (CLAUDE.md,
+        # Gotchas); (b) the cluster IS present and the column is simply null
+        # for it.  Measured 2026-09-09: Malawi 100% on both rungs; Uganda
+        # 99.73% of ``(t, v)`` present but ``District`` null for 27.8% of
+        # 2010-11 and 33.0% of 2011-12 clusters -- i.e. cause (b), a real gap
+        # in the country's own cluster_features, not a join bug.
+        has_v = pd.Series(v).notna().to_numpy()
+        for k, col in enumerate(geo.columns):
+            vals = joined[col].to_numpy()
+            missed = int((has_v & pd.isna(vals)).sum())
+            if missed:
+                warnings.warn(
+                    f"food_acquired valuation: the {str(col)!r} rung resolved "
+                    f"to nothing for {missed:,} of {int(has_v.sum()):,} rows "
+                    f"that DO carry a cluster id -- either those clusters are "
+                    f"absent from the geo frame (check that the 'v' labels on "
+                    f"both sides are the same dtype and spelling) or "
+                    f"cluster_features carries a null {str(col)!r} for them.  "
+                    f"Those rows fall through to the next rung, so the ladder "
+                    f"is effectively shorter for them than "
+                    f"attrs['valuation_geo_levels'] says.",
+                    ValuationLadderWarning, stacklevel=3)
+            work[f'_g{k}'] = _geo_key_tokens(vals)
+            ladder.append(f'_g{k}')
+            used.append(str(col))
+
+    res = median_price_valuation(
+        work, ladder,
+        value_col='_pool_value',
+        kg_qty=work['_pool_qty'],
+        quantity_col='_qty',
+        item_keys=('_t', '_j', '_u'),
+        threshold=threshold,
+        price_col='_vp', out_col='_vv',
+    )
+    return res['_vp'].to_numpy(dtype='float64'), used
+
+
+def food_expenditures_from_acquired(df, basis='purchased', *,
+                                    valuation=None, geo=None,
+                                    threshold=10):
     """Derive food expenditures from food_acquired.
 
     Returns a DataFrame of expenditure per household × item × period ×
@@ -1718,9 +2169,35 @@ def food_expenditures_from_acquired(df, basis='purchased'):
         - ``'total'``: **all recorded acquisition value** — sum
           ``Expenditure`` across every ``s``.  Where the source recorded a
           produced/in-kind value it is included; where it did not, ``'total'``
-          equals ``'purchased'`` for that country (no value is fabricated).
-          *Imputing* own-production value at purchase prices for purchased-
-          only-source countries is a tracked follow-up, NOT done here.
+          equals ``'purchased'`` for that country -- unless ``valuation=``
+          is passed, which is the ONLY way this function ever fabricates a
+          value.
+    valuation : str or sequence of str, optional
+        **Opt-in** own-production / in-kind valuation (GH #585).  ``None``
+        (the default) is today's behaviour exactly: no value is fabricated.
+        Otherwise the rungs named are run, in the order given, over the
+        non-purchased rows that carry no value -- see
+        :func:`food_acquired_valued` for the rungs, the provenance, and
+        **the measured purchase-side bias, which you should read before using
+        this**: every rung prices own-consumption at a purchase transaction,
+        and in Uganda own-consumption so valued sits about 23% above what a
+        sale actually fetched (``slurm_logs/price_sources/SYNTHESIS.org:750-753``,
+        Uganda-only), while the interviewer manual asks for the farm-gate
+        price (``:732-736``).  Requires ``basis='total'``; under
+        ``basis='purchased'`` there is no non-purchased row left in the output
+        to value, so it raises rather than silently doing nothing.
+
+        A scalar names EXACTLY that rung: ``'median_price'`` runs the spatial
+        ladder alone and does not quietly run ``'own_price'`` first.  Pass
+        ``('own_price', 'median_price')`` for EPAR's consumption-repo
+        ordering.
+    geo : pd.DataFrame, optional
+        Coarser geographic rungs for the ``'median_price'`` ladder, indexed by
+        ``(t, v)`` with columns ordered finest -> coarsest.  See
+        :func:`food_acquired_valued`.
+    threshold : int, default 10
+        Minimum priced observations for a geographic cell's median to be
+        adopted.  Forwarded to :func:`median_price_valuation`.
 
     Notes
     -----
@@ -1732,6 +2209,33 @@ def food_expenditures_from_acquired(df, basis='purchased'):
 
     When the input has no ``s`` level (pre-canonical waves) the two bases
     coincide — there is no source split to filter on.
+
+    With ``valuation=``, the returned frame carries the per-source tallies on
+    ``.attrs['valuation_sources']`` (plus ``'valuation'`` and
+    ``'valuation_geo_levels'``), mirroring ``harvest_kg``'s
+    ``attrs['kg_factor_sources']``.  The per-row ``ValuationSource`` column is
+    NOT on this frame: the output is summed over ``u``, and one ``(t, i, j, s)``
+    cell can mix rungs, so a per-row label has nowhere unique to land.  Call
+    :func:`food_acquired_valued` directly for the item-grain frame that carries
+    it.
+
+    A :class:`~lsms_library.feature.Feature` call forwards ``valuation=`` (it
+    forwards by signature) and its VALUES are exact -- Malawi sums to the same
+    426,562,493.98 either way.  Its ``attrs`` depend on how many countries were
+    asked for, and the boundary is worth stating precisely because a reader who
+    tests the general claim on one country would see it contradicted:
+
+    - **one country** -- a ``concat`` of a single frame, nothing to disagree
+      with, so the tallies COME THROUGH;
+    - **more than one** -- the frames' ``attrs`` disagree by construction, one
+      record per country, which lands in the ``{}`` row of the propagation rule
+      (``CLAUDE.md``, "Panel ID Transitive Chains"), so
+      ``attrs['valuation_sources']`` is ABSENT.
+
+    Pooling the tallies across countries is deliberately NOT built: a pooled
+    ``median_price: 280623`` would say nothing about WHICH country was imputed,
+    the same objection ``harvest_kg``'s docstring makes about its own pooled
+    counts.  Ask per country, or group the item-grain frame.
     """
     valid_basis = {'purchased', 'total'}
     if basis not in valid_basis:
@@ -1740,9 +2244,28 @@ def food_expenditures_from_acquired(df, basis='purchased'):
             f"got {basis!r}"
         )
 
+    rungs = _normalize_valuation_arg(valuation)
+    if rungs and basis != 'total':
+        raise ValueError(
+            f"food_expenditures valuation={valuation!r} requires "
+            f"basis='total'; got basis={basis!r}.  Valuing own-production "
+            "rows is pointless under basis='purchased', which drops them."
+        )
+
     df = _normalize_columns(df)
     if 'Expenditure' not in df.columns:
         raise ValueError("food_acquired must have an 'Expenditure' column")
+
+    valuation_attrs = {}
+    if rungs:
+        # Everything above this line is untouched by the valuation and
+        # everything below runs identically on the valued frame, so
+        # ``valuation=None`` takes the original code path verbatim.
+        valued = food_acquired_valued(df, rungs, geo=geo, threshold=threshold)
+        valuation_attrs = {k: valued.attrs[k] for k in
+                           ('valuation_sources', 'valuation',
+                            'valuation_geo_levels')}
+        df = df.assign(Expenditure=valued['Expenditure'].to_numpy())
 
     idx_names = list(df.index.names)
 
@@ -1770,6 +2293,7 @@ def food_expenditures_from_acquired(df, basis='purchased'):
     # part (C-2) NaN-``v`` regression.
     group_by = [n for n in ['t', 'i', 'j', 's'] if n in idx_names]
     x = x.groupby(group_by).sum()
+    x.attrs.update(valuation_attrs)
     return x
 
 
@@ -3196,7 +3720,8 @@ def _parcel_from_feature_plot(plot_id):
 
 
 def yield_kg(crop_production, plot_features, *, area_col='Area',
-             volume_as_mass=True, on='parcel'):
+             volume_as_mass=True, on='parcel',
+             min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
     """Harvested kilograms per unit plot area (WB ``yield_kg``).
 
     MECHANICAL reduction (GAP 1).  Sums :func:`harvest_kg` and plot area to a
@@ -3214,6 +3739,17 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         Name of the area column in ``plot_features``.
     volume_as_mass : bool, default True
         Forwarded to :func:`harvest_kg`.
+    min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
+        Forwarded to :func:`harvest_kg`.
+    shipped_factors : pd.DataFrame, optional
+        Forwarded to :func:`harvest_kg` -- an externally shipped
+        kg-per-unit table (see :func:`harvest_kg_factors`).  **Without it a
+        caller asking for yields gets no ``shipped`` layer**, because
+        ``yield_kg`` calls ``harvest_kg`` internally; that gap was the one
+        concrete cost of the explicit-loader design and this kwarg closes
+        it (`.coder/ledger/harvest-kg-shipped-factors.md` section 6 Q1/Q3)::
+
+            yield_kg(cp, pf, shipped_factors=ethiopia.crop_conversion_factors())
     on : {'parcel', 'plot'}, default 'parcel'
         Land grain to join on.
 
@@ -3248,7 +3784,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     if on not in {'parcel', 'plot'}:
         raise ValueError(f"yield_kg on= must be 'parcel' or 'plot', got {on!r}")
 
-    hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass).reset_index()
+    hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass,
+                    min_reports=min_reports,
+                    shipped_factors=shipped_factors).reset_index()
     if 'plot' not in hk.columns:
         raise ValueError("harvest_kg must yield a 'plot' level to join area")
 

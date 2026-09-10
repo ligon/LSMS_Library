@@ -177,7 +177,7 @@ loaders, no registry (decision recorded in the ledger).  =shipped_matched=
 count + =ShippedFactorWarning= on a zero match; =u= required among keys.
 
 
-** TODO Ethiopia: WB conversion files into =harvest_kg= and plot areas   :code:L1:
+** DONE Ethiopia: WB conversion files into =harvest_kg= and plot areas   :code:L1:
 :PROPERTIES:
 :Effort: 6:00
 :END:
@@ -191,7 +191,7 @@ count + =ShippedFactorWarning= on a zero match; =u= required among keys.
 - Ethiopia re-warm; regrade Ethiopia cells.  Model: Opus, worktree;
   Opus red-team; prior-art ledger.
 
-** TODO Malawi: IHS5 crop-side conversion files                     :code:L1:L9:
+** WAITING Malawi: IHS5 crop-side conversion files                     :code:L1:L9:
 :PROPERTIES:
 :Effort: 5:00
 :END:
@@ -201,7 +201,12 @@ live or remove it.  Do NOT port EPAR's crop allowlist for the
 shelled/unshelled ratio; the ratio layer itself (L9) waits for Phase 3's
 =condition= decision on Malawi.
 
-** TODO Sold-unit conversion for Uganda and Nigeria (#824)          :code:L7:
+** TODO Sold-unit conversion for Uganda and Nigeria (#824)
+:LOGBOOK:
+- Note taken on [2026-09-10] \\
+  Uganda half merged 42e1c19e and re-warmed; disagreement is a flag, not an
+  identification (red-team).  Nigeria and Niger halves remain.
+:END:          :code:L7:
 :PROPERTIES:
 :Effort: 5:00
 :END:
@@ -217,11 +222,12 @@ and let =harvest_kg= consumers decide.
 =sa3iq6_conv= / =sa3iiq1_conv= / =sa3iiiq13_conv= per wave into the optional
 canonical column; =harvest_kg= already prefers it.  Nigeria re-warm.
 
-** WAITING Food-side kg inference: item axis and provenance (#850)
+** TODO Food-side kg inference: item axis and provenance (#850)
 :LOGBOOK:
 - State "WAITING" from "TODO" [2026-09-09] \\
-  Design doc merged (slurm_logs/gh850_design/DESIGN.org, a73437fd).  Blocked on
-  @ligon's D5 (baseline floor) and D7 (let the vocabulary fix reach harvest_kg).
+  Design doc merged (slurm_logs/gh850_design/DESIGN.org, a73437fd).  @ligon
+  ruled: D5 floor 5 with a dispersion-gated 3-4 exception; D7 let the
+  vocabulary fix reach harvest_kg in its own commit.  Implementation dispatched.
   Finding: NO re-warm needed -- transformations.py is outside every build
   fingerprint; cost is a regrade.
 :END:     :code:L2:L3:
@@ -236,7 +242,7 @@ provenance like =KgFactorSource=.  Measure the movement in
 re-warm and regrade.  Model: Opus with a design doc first; Opus red-team;
 @ligon signs off on the measured movement.
 
-** TODO Transforms: =livestock_income=, HDDS/FCS, small reductions   :code:L8:
+** DONE Transforms: =livestock_income=, HDDS/FCS, small reductions   :code:L8:
 :PROPERTIES:
 :Effort: 4:00
 :END:
@@ -245,7 +251,7 @@ hypothetical, not a transaction price; EPAR's construct needs sold and
 slaughtered head counts and a price ladder.  HDDS/FCS need our own
 food-group taxonomy over =harmonize_food=, not EPAR's =recode= ranges.
 
-** TODO Own-production valuation kwarg (#585)                       :code:L6:
+** DONE Own-production valuation kwarg (#585)                       :code:L6:
 :PROPERTIES:
 :Effort: 4:00
 :END:

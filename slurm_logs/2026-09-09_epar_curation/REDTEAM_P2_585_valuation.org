@@ -1,0 +1,684 @@
+#+TITLE: Red-team -- feat/585-own-production-valuation (32ab655d)
+#+DATE: 2026-09-09
+#+AUTHOR: red-team agent (read-only)
+
+* Scope and method
+
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-585-valuation= at
+=32ab655d=; base (merge-base with =development=) =9e4c0867=.  Every
+invocation ran =PYTHONPATH=<worktree>= with
+=/global/.../mirrors/LSMS_Library/.venv/bin/python= and asserted
+=lsms_library.__file__= under the worktree.  No edits, no commits, no =dvc=;
+the only file written is this one.  Warm shared cache, read only.
+
+*Setup guard.*  =development= has moved past the branch base:
+=617fecb9..9e4c0867= is 10 commits (harvest_kg shipped layer, Nigeria
+KgFactor).  Checked before item 1: none of those commits touches
+=food_expenditures_from_acquired= (their =transformations.py= hunks all start
+at line 1733+, i.e. inside harvest_kg territory) and none touches
+=country.py=.  The main checkout is therefore a valid reference for item 1;
+for the cache-fingerprint probe (item 8) I used a =git archive= extraction of
+=9e4c0867= instead, so that comparison is exact.
+
+*GitNexus substitution (declared, per CLAUDE.md).*  The =gitnexus= MCP server
+did not connect (CONNECTION_CLOSED).  Blast radius was established with =rg= /
+=grep= over =lsms_library/= and by reading =country.py= around the generated
+=__getattr__= method; reported inline where relevant.
+
+*Verdict summary*
+
+| # | subject                                 | verdict            |
+|---+-----------------------------------------+--------------------|
+| 1 | default path byte-identical             | PASS               |
+| 2 | API contract (scalar / raises / order)  | PASS + 2 notes     |
+| 3 | own_price scoping and repeat purchases  | PASS + 1 CONCERN   |
+| 4 | median ladder, =t= in key, degradation  | PASS               |
+| 5 | provenance / attrs survival             | PASS + 2 CONCERNs  |
+| 6 | the numbers, and the magnitude          | PASS + 1 CONCERN   |
+| 7 | the bias statement's citations          | PASS               |
+| 8 | tests / pandas 3 / ASCII / fingerprints | PASS               |
+
+Nothing found is a merge blocker.  The CONCERNs are: (a) an inaccurate
+documentation claim about =Feature()= attrs, (b) an inaccurate justification
+comment for the =country.py= re-attach, (c) =_own_price_rung= sees =i= only as
+an index level and degrades *silently* when it is a column, and (d) the
+unconditional national rung prices 6.5% of Malawi's delta off fewer than ten
+purchase observations, 2.9% off exactly one.
+
+* 1. Default path byte-identical -- PASS
+
+=food_expenditures()= and =food_expenditures(basis='total')= on warm Uganda
+and Malawi, branch vs. the main checkout, pickled and compared with
+=assert_frame_equal(check_dtype=True, check_index_type='equiv',
+check_column_type=True, check_names=True, check_exact=True)=:
+
+| cell                     | shape       | frame        | attrs equal |
+|--------------------------+-------------+--------------+-------------|
+| Uganda, default          | (247049, 1) | IDENTICAL    | True        |
+| Uganda, =basis='total'=  | (355479, 1) | IDENTICAL    | True        |
+| Malawi, default          | (681980, 1) | IDENTICAL    | True        |
+| Malawi, =basis='total'=  | (681980, 1) | IDENTICAL    | True        |
+
+Index =['i','t','v','j','s']=, dtype =Float64=, index order identical.  The
+attrs key set on the default path is
+=['country','id_converted','population','population_resolution']= on both
+sides -- *no* =valuation*= key leaks onto a call that did not ask.  Malawi's
+=total= equalling =purchased= exactly (681,980 rows both) independently
+corroborates the ledger's claim that its produced/in-kind rows carry no
+=Expenditure= at all.
+
+Structurally, the transform's early-return discipline is real: everything
+above =df = _normalize_columns(df)= is untouched, the valuation block is
+guarded by =if rungs:=, and =rungs= is =()= for =valuation=None=.
+
+* 2. The API contract -- PASS (two notes)
+
+** Scalar =median_price= does NOT run =own_price= first -- CONFIRMED
+
+Synthetic frame: household =A= holds a produced =X/kg= row and one purchase of
+=X/kg= at unit price 10; eleven other households buy the same =(t,j,u)= at 20,
+so the pooled median is 20 and A's own price is 10.  Measured:
+
+| =valuation=                   | price served | =ValuationSource= |
+|-------------------------------+--------------+-------------------|
+| =('own_price','median_price')= | 10.0        | own_price         |
+| =('median_price','own_price')= | 20.0        | median_price      |
+| ='median_price'=               | 20.0        | median_price      |
+| ='own_price'=                  | 10.0        | own_price         |
+
+So the tuple order *is* the precedence, and a scalar runs exactly the rung
+named.  Row 2 vs. row 1 is the discriminating pair: the two orders give
+different fills, and the first rung wins.
+
+*Is the docstring unmistakable?*  Yes, in both places a caller would look, and
+in imperative voice: =food_acquired_valued= -- "A scalar means **exactly that
+rung** -- ='median_price'= runs the spatial ladder alone, it does NOT quietly
+run ='own_price'= first"; and =food_expenditures_from_acquired= repeats it
+verbatim in its own =valuation= entry.  Both then name
+=('own_price','median_price')= as EPAR's consumption-repo ordering.  This is
+the deliberate departure from the issue brief's plain reading; the ledger §6
+already flags it for @ligon and I have not relitigated it.  The docstring
+does what a red-team can ask of it: the departure cannot be discovered by
+surprise.
+
+** Early raises -- CONFIRMED, all under 0.1 s
+
+Through =Country=, i.e. before any data is touched:
+
+| call                                                  | result                                    |
+|-------------------------------------------------------+-------------------------------------------|
+| =food_expenditures(valuation='own_price')= (default basis) | ValueError "requires an explicit basis='total'" |
+| =food_expenditures(basis='purchased', valuation=...)= | same ValueError                           |
+| =food_prices/food_quantities/food_acquired/household_roster(valuation=...)= | TypeError "only 'food_expenditures' accepts it" |
+| =valuation='bogus'=                                   | ValueError, lists =['own_price','median_price']= |
+| =valuation=()=                                        | ValueError "non-empty sequence ... Pass None" |
+| =valuation=('own_price','own_price')=                 | ValueError "names a rung twice"           |
+
+The transform raises the same way when called directly.  Elapsed time 0.0-0.1 s
+in every case -- the validation genuinely precedes the derive, so the broad
+=except (FileNotFoundError, KeyError, ValueError, RuntimeError)= cannot swallow
+it.  The =raise= re-widening (=units is not None or map_labels or valuation is
+not None=) is correct and its comment states the right reason.
+
+** Note 2a -- =threshold= is not reachable from the =Country= API
+
+=food_acquired_valued= and =food_expenditures_from_acquired= both take
+=threshold=10=, but the generated =Country.__getattr__= method has no
+=threshold= parameter and passes none, so the =Country= path is pinned at 10.
+That is the documented WB/EPAR-Ag gate and is the right default; recording it
+only so nobody reads the transform docstring and expects
+=food_expenditures(threshold=25)= to work.  Same for =geo=, which =Country=
+computes itself.
+
+** Note 2b -- on the =Feature()= path a user error degrades to a warning
+
+=Feature('food_expenditures')(['Malawi'], valuation='own_price')= (no =basis=)
+returns an empty =(0,0)= frame plus =UserWarning: Failed to load
+food_expenditures for Malawi: ValueError: ... requires an explicit
+basis='total'=.  The =Country= call raises.  This is =feature.py='s
+pre-existing broad per-country catch (=feature.py:626=), not something this
+branch introduced -- =basis= alone behaves identically -- so it is a note, not
+a finding against this diff.
+
+* 3. =own_price= scoping -- PASS (one CONCERN)
+
+** No leakage -- CONFIRMED on a constructed frame
+
+Six rows, =valuation='own_price'= only:
+
+| row                                           | expected  | measured                     |
+|-----------------------------------------------+-----------+------------------------------|
+| A purchased Y/kg, 2 @ 100 total (p=50)        | reported  | reported                     |
+| A produced Y/kg                               | 50        | own_price, price 50.0        |
+| *B* produced Y/kg (B never bought Y)          | *nothing* | none, price NaN              |
+| A produced Y/*piece* (different =u=)          | nothing   | none, price NaN              |
+| A produced Y/kg in *2021* (different =t=)     | nothing   | none, price NaN              |
+| A produced *Z*/kg (different =j=)             | nothing   | none, price NaN              |
+
+So the rung is keyed on exactly =(t, i, j, u)= and consults no other
+household, unit, wave or item.  The code confirms it: =_own_price_rung= groups
+=work[pool]= on =['_t','_i','_j','_u']= and reindexes onto the same four keys.
+
+** Repeat purchases at different prices -- quantity-weighted, and documented so
+
+Household A buys =X/kg= twice: 1 unit for 10 (p=10) and 3 units for 90 (p=30).
+
+- sum/sum = (10+90)/(1+3) = *25*
+- mean of the two prices = 20
+- unweighted median of the two prices = 20
+
+*Measured own price = 25.0.*  The docstring says "the sum of that household's
+purchased =value_col= over the sum of its purchased =quantity_col=" and
+"a household that bought an item twice contributes one quantity-weighted price
+rather than two" -- which is what it does.  =tests/test_own_production_-
+valuation.py::test_own_price_pools_a_households_repeat_purchases= pins it.
+Statement and behaviour agree; no drift.
+
+** CONCERN 3a -- =i= as a COLUMN silently disables the rung
+
+=_own_price_rung= resolves the household axis with
+=_level_or_column(pd.DataFrame(index=index), 'i')= -- it is handed =df.index=,
+not =df=, so it can only ever see =i= as an *index level*.  If =i= is a column
+it returns =None= and the rung returns an all-NaN offer:
+
+: rows where i is an index level -> own_price serves 1 row
+: same frame with i reset to a column -> own_price serves 0 rows, NO warning
+
+This is inconsistent with the function's own treatment of the other keys:
+missing =u= raises ("the purchase price the valuation uses is per unit"),
+missing =s= raises, and missing =j= or =t= raises (unhelpfully, with pandas'
+"All arrays must be of the same length").  Only =i= degrades silently, and the
+in-function comment ("No household axis: there is no 'same household' to look
+up") reads as if the frame genuinely lacked households.
+
+*No live impact*: =food_acquired= carries =i= in the index for both audited
+countries (=['i','t','v','j','u','s']=), and the =Country= path always hands
+the transform a finalized frame.  But =food_acquired_valued= is exposed as a
+public analyst-callable transform whose docstring invites row-by-row auditing,
+and a user who did =fa.reset_index('i')= first would get =own_price: 0= with
+no signal.  Suggested minimal fix: pass =df= rather than =df.index= to
+=_own_price_rung= (=_level_or_column= then finds the column), or warn.
+
+* 4. The median-price ladder -- PASS
+
+** =t= is inside the item key -- CONFIRMED empirically
+
+Constructed two waves, 12 purchases at 10 in =2000= and 12 at 1000 in =2020=,
+one produced row in each, one cluster, =valuation='median_price'=:
+
+: produced row in t=2000 -> price 10.0 ; produced row in t=2020 -> price 1000.0
+
+Pooling would have given both rows the same number (~505, or 10/1000 mixed).
+Each wave got its own.  =item_keys=('_t','_j','_u')= in =_median_price_rung=;
+=median_price_valuation= has no wave axis of its own, so this is load-bearing
+and correctly placed.
+
+** The ladder selects the finest cell clearing =threshold= -- CONFIRMED
+
+Constructed =v1= (12 purchases @ 5), =v2= (3 @ 7), =v3= (20 @ 100), with
+=v1,v2 -> District D1=, =v3 -> D2=, =v4 -> D3=, all in =Region R1=:
+
+| produced row in | qualifying rung                       | price |
+|-----------------+---------------------------------------+-------|
+| v1              | own cluster (12 obs >= 10)            |   5.0 |
+| v2              | cluster too small (3) -> District D1 (15 obs) | 5.0 |
+| v4              | no cluster, no district obs -> Region R1 (35 obs) | 100.0 |
+
+=v4='s 100.0 is arithmetically right: R1's 35 prices are {5x12, 7x3, 100x20},
+whose median is the 18th value, 100.  =attrs['valuation_geo_levels']= reported
+=['v','District','Region']= and no warning fired on the complete join.
+
+** Null geographic keys never form a cell -- CONFIRMED
+
+15 purchases at 999 with =v=NaN= and 15 at 1 with =v='v9'=; the produced row
+also has =v=NaN=.  If null collapsed to the literal ='nan'= it would have
+formed a 15-observation cluster and priced at 999.  *Measured price 500.0* --
+the national median of all 30.  =_geo_key_tokens= gives every null its own
+=__nogeo_<k>__= token, so its cell count is 1 and can never clear any
+=threshold >= 2=.
+
+** The "ladder actually ran" shares -- REPRODUCED
+
+Uganda, one =ValuationLadderWarning= per degraded rung (two total; Malawi
+zero):
+
+| rung     | resolved to nothing | of rows with a cluster id | hit rate | ledger |
+|----------+---------------------+---------------------------+----------+--------|
+| District |              27,970 |                   355,243 |  92.13%  | 92.0%  |
+| Region   |               6,546 |                   355,243 |  98.16%  | 98.1%  |
+
+And the attributed cause reproduces exactly.  =Uganda.cluster_features()=,
+share of clusters with a null =District= by wave:
+
+: 2005-06 0.0  2009-10 2.1  2010-11 27.8  2011-12 33.0  2013-14 0.0
+: 2015-16 0.0  2018-19 0.0  2019-20 0.0
+
+27.8 / 33.0 -- the ledger's figures to the decimal.  Null =Region=: 5.0% and
+7.8% in the same two waves.  The two measurements are on different
+denominators (the warning counts *rows*, the ledger's 27.8/33.0 are
+*clusters*) and they reconcile: the two affected waves are roughly a quarter
+of Uganda's =food_acquired= rows, so a ~30% cluster gap in them is a ~8%
+corpus-wide row gap.  Not a discrepancy.
+
+=Country._valuation_geo= itself emitted no warning for either country -- both
+=cluster_features= carry =District= and =Region= -- which is the correct
+behaviour, since the *degradation* here is per-row nulls, caught by the
+second, row-level warning inside =_median_price_rung=.  Having both warnings
+is what makes the coverage visible; a column-presence check alone would have
+said "full ladder" and been wrong for 27,970 Uganda rows.
+
+* 5. Provenance -- PASS (two CONCERNs)
+
+** The partition holds, through every post-step
+
+Malawi, =valuation=('own_price','median_price')=:
+
+: {'reported': 682014, 'own_price': 2933, 'median_price': 280623,
+:  'none': 5961, 'candidates': 288704}
+
+=reported + own_price + median_price + none = 971,531 = len(food_acquired)=
+exactly; =candidates= is deliberately outside the partition and equals
+=own_price + median_price + (candidates left unvalued)= = 2,933 + 280,623 +
+5,148.  The =s x ValuationSource= crosstab shows no purchased row was ever
+valued and no produced/in-kind row was graded =reported= (Malawi records none),
+which is the invariant the price pool depends on.
+
+Decomposition of the two "unserved" tallies, both benign and both matching the
+ledger:
+
+- 5,148 candidates unvalued: *all 5,148* have =Quantity > 0= and *all 5,148*
+  have no purchase observation anywhere in their =(t, j, u)= -- so the
+  unconditional national rung had literally nothing to offer.  Not a
+  quantity-gate artefact.
+- 813 purchased rows graded =none= = 170 null =Expenditure= + 643 zero.
+  Ledger: "170 null + 643 zero".  Exact.
+
+** attrs survive every post-step on the =Country= path -- CONFIRMED
+
+| call                                       | valuation attrs present | partition sums |
+|--------------------------------------------+-------------------------+----------------|
+| plain                                      | all three               | yes            |
+| =market='Region'= (index becomes =...,m,...=) | all three            | yes            |
+| =labels='Aggregate'= (935,635 rows)        | all three               | yes            |
+| =numeraire='PPP-2017'= (adds =currency= level) | all three           | yes            |
+
+Sums identical across all three (426,562,493.981662), so the post-steps move
+labels and index levels without moving value.  =attrs= also survived
+=_finalize_result= -- provable from the code path, since =_val_attrs= is
+captured *after* =_finalize_result= and the final frame has non-empty
+valuation attrs, so the capture cannot have been empty.
+
+** =Feature()= -- values exact; attrs present for ONE country, absent for TWO
+
+: Feature(['Malawi'])          -> attrs ['valuation','valuation_geo_levels',
+:                                        'valuation_sources'] PRESENT
+:                                 sum 426,562,493.981662 == Country sum
+: Feature(['Malawi','Uganda']) -> attrs [] (only population*)
+
+The values are exactly right on both, and the ledger's cross-check figure
+(426,562,493.98 via both routes) reproduces to the cent.
+
+*CONCERN 5a (documentation).*  The =food_expenditures_from_acquired= docstring
+states this flatly: "=Feature= assembles by =concat= over frames whose =attrs=
+disagree by construction -- one record per country -- ... so
+=attrs['valuation_sources']= is absent there."  Measured, that is true only
+for a *multi-country* call.  A single-country =Feature()= is a =concat= of one
+frame, nothing to disagree with, and the tallies come through.  This matters
+because a reader who tests the documented claim on one country will see it
+contradicted and may conclude the whole paragraph is stale.  One clause --
+"absent on any call spanning more than one country" -- fixes it.  (The ledger
+has the same flat wording.)
+
+*CONCERN 5b (an inaccurate justification comment, of exactly the kind
+CLAUDE.md corrects for =_join_v_from_sample= -- and it names that very
+method).*  =country.py= re-attaches by
+hand with the comment: "both =_join_v_from_sample= (inside =_finalize_result=)
+and =_add_market_index= are DISAGREEING merges -- so the valuation tallies are
+carried across by hand".  Measured on Malawi, applying the post-steps to a
+frame that already carries the attrs:
+
+: after _add_market_index(column='Region') WITHOUT any outer re-attach -> attrs PRESENT
+: after _relabel_j('Preferred', reaggregate=True)  WITHOUT re-attach   -> attrs PRESENT
+
+Because both methods *already* re-attach internally -- =country.py:2547=
+(=result.attrs = dict(df.attrs)=, with the standing comment "Kept
+deliberately, though =set_index= PRESERVES attrs on the pinned ...") and
+=country.py:2899=.  =convert= likewise preserved them (and added
+=conversion=).  So the new re-attach is *defensive, not load-bearing*: nothing
+in the current pipeline would drop the tallies without it.
+
+The comment's other named culprit does not apply either: on this path =v= is
+already an index level of the derived frame (=['i','t','v','j','s']=), and
+=_join_v_from_sample= skips when =v= is already present -- so it is not a
+merge here at all, disagreeing or otherwise.
+
+Keeping the re-attach is right -- it costs nothing and it survives a future
+post-step that forgets -- but the *reason given is not the reason it works*, and CLAUDE.md's
+own correction history ("that was wrong -- and wrong on the unmodified
+pre-change code too, so it was a documentation error, not a regression") is
+precisely about this failure mode.  Suggested wording: "the post-steps
+currently re-attach =attrs= themselves (=country.py:2547=, =:2899=); this
+re-attach is belt-and-braces so a future post-step that forgets cannot drop
+the tallies silently."
+
+* 6. The numbers -- PASS on magnitude; CONCERN on thin-pool fragility
+
+** Reproduction -- exact
+
+*Uganda*: 17 candidates (0.005% of 355,571 rows), =own_price= 3,
+=median_price= 12, 2 candidates unvalued, 19 =none= overall, +0.5498% on total
+=Expenditure= (ledger +0.55).  Per wave: 2005-06 +0.019, 2009-10 0, 2010-11 0,
+2011-12 +4.266, 2013-14 +0.050, 2015-16 +0.010, 2018-19 0, 2019-20 +0.007 --
+the ledger's table to three digits.  The 2011-12 spike is the single
+"Restaurant (soda)" =u='---'= in-kind row (household =210930004091101=,
+=Quantity=4500=, own price 1,500, +6,750,000 UGX) and it is *97.96%* of
+Uganda's entire delta.  The ledger names it, does not smooth it, and I agree
+with the "count, never clip" call -- but a reader should know that Uganda's
+headline +0.55% is one row.
+
+*Malawi*: 288,704 candidates (29.7% of 971,531), =own_price= 2,933,
+=median_price= 280,623, 5,148 unvalued, 5,961 =none=.  Per-wave delta:
+
+| wave    | old Sigma Exp | new Sigma Exp | delta %  | ledger |
+|---------+---------------+---------------+----------+--------|
+| 2004-05 |     6,303,869 |    12,710,637 | +101.632 | +101.6 |
+| 2010-11 |    21,781,134 |    35,565,334 |  +63.285 |  +63.3 |
+| 2013-14 |    22,121,911 |    34,814,481 |  +57.376 |  +57.4 |
+| 2016-17 |   106,578,336 |   160,187,096 |  +50.300 |  +50.3 |
+| 2019-20 |   124,308,436 |   183,284,946 |  +47.444 |  +47.4 |
+| *all*   |   281,093,686 |   426,562,494 | *+51.751* | +51.8 |
+
+** Is +51.8% plausible?  Three independent checks say yes, and one says it is
+   if anything CONSERVATIVE.
+
+*Check A -- the own-production share it implies, against the price study.*
++51.751% uplift means non-purchased food is 34.10% of the *valued* total
+(produced 23.79 + in-kind 10.31).  Reference points:
+
+- =slurm_logs/price_sources/home_production_shares.csv=, *Uganda* (where the
+  survey reports its own values, so nothing is imputed): =agg_produced=
+  0.296-0.661 plus =agg_inkind= 0.034-0.086 across eight waves.  Measured
+  independently here on the same corpus: Uganda's non-purchased share of
+  valued expenditure is *42.36%* (produced 34.34 + in-kind 8.02).
+- Same file, *GhanaLSS*: =agg_produced= 0.135-0.306 across seven rounds.
+
+Malawi's imputed 34.10% therefore sits *inside* the observed cross-country
+band and *below* Uganda's directly-reported 42.36% -- for a country that is,
+if anything, more subsistence-agricultural than Uganda.  Note the file has *no
+Malawi row*, and that is not an omission: Malawi reports no own-production
+value at all, which is the whole reason this kwarg exists.  So the check is a
+peer comparison, not a self-comparison, and it is the strongest one available.
+
+The wave profile is also the right shape: the uplift falls monotonically
+2004-05 -> 2019-20 (+101.6 -> +47.4), i.e. the own-production share shrinks as
+the country urbanises and monetises.  A unit or key defect would not be
+monotone in time.
+
+*Check B -- is a native-=u= basis inflating it?  No: measured factor 1.0198.*
+For every imputed row I recomputed the value it would have taken at its own
+=(t, j, u)= cell's *mean* purchase unit value (=Sigma purchased Expenditure /
+Sigma purchased Quantity= in that exact cell), which is unit-consistent by
+construction:
+
+: rows with a same-cell purchase pool : 283,556 / 283,556 (100.00%)
+: Sigma imputed delta                 : 145,469,000
+: Sigma at the cell MEAN unit value   : 142,648,000
+: ratio                               : 1.0198
+
+So the ladder's median-of-medians choice puts Malawi's own-production 2.0%
+above what the *same physical quantities* would cost at the *same cells'* own
+average purchase unit value.  There is no unit mismatch: =u= is an item key,
+so a produced "Pail (Large)" is priced at the purchase price of a "Pail
+(Large)".  The distribution of =imputed_price / cell_mean_unit_value= is
+centred on 1 (median 0.982; p25 0.804, p75 1.203).
+
+*Check B, per wave -- because Check B is corpus-wide and 2004-05 is only 4.4%
+of the delta, a wave-specific inflation could hide inside a 1.0198.*  It does
+not:
+
+| wave    | Sigma imputed / Sigma at cell mean unit value | median(imputed qty / cell median purchased qty) |
+|---------+-----------------------------------------------+-------------------------------------------------|
+| 2004-05 |                                        1.0331 |                                           1.222 |
+| 2010-11 |                                        1.2259 |                                           1.000 |
+| 2013-14 |                                        1.0511 |                                           1.000 |
+| 2016-17 |                                        1.0041 |                                           1.000 |
+| 2019-20 |                                        0.9873 |                                           1.000 |
+
+100% of imputed rows have a same-cell purchase pool in every wave.  *2004-05 --
+the +101.6% wave -- prices at 1.033x its own cells' mean purchase unit value*,
+so its uplift is a quantity/composition fact about that survey, not a price or
+unit artefact; its imputed quantities run 22% above the median purchase in the
+same cell, which is what own production of a staple looks like.  The one wave
+worth a second glance is *2010-11 at 1.2259* -- 23% above the mean-unit-value
+basis, the largest gap in the corpus and driven by right-skewed purchase price
+distributions where the ladder's median sits above a thin cell's mean.  It is
+still far from the sort of factor a unit mismatch produces (10x, 1000x), and
+2010-11's uplift (+63.3%) is mid-range rather than extreme, so it does not
+change the verdict.
+
+*Check C -- a physical (kg) cross-check, independent of price entirely.*
+Malawi's =food_acquired= ships =Quantity_kg= for 43.2% of rows.  On those:
+
+| share of ...        | non-purchased |
+|---------------------+---------------|
+| physical kilograms  |        43.66% |
+| valued expenditure  |        35.57% |
+| ratio               |         0.815 |
+
+Own-production is a *larger* share of the physical food than of the money --
+which is what you expect (own production is maize flour and beans; purchases
+skew to processed and animal foods), and which means the valuation is
+*conservative* relative to a naive kg-weighted imputation, not inflated.
+
+Two caveats on Check C, stated because they look like contradictions and are
+not.  (i) The per-wave line for 2004-05 reads "kg 50.5% / value 81.8%",
+apparently the opposite sign -- but 2004-05's =Quantity_kg= coverage is
+*0.0-0.2%* of rows, so that line is computed on a few hundred rows and means
+nothing.  The waves with real kg coverage (2013-14 25.6/16.7, 2016-17
+48.0/38.1, 2019-20 37.2/32.8, 2010-11 48.6/45.2) all show the conservative
+direction.  (ii) A naive corpus-wide =Sigma Quantity= comparison gives
+=q_imp/q_pur = 0.217= against =v_imp/v_pur = 0.529=, an apparent 2.4x gap --
+that statistic is meaningless, because it adds Grams to Kilogrammes to Pieces
+across cells.  Check B is the same comparison done *within* cells, and it is
+1.02.
+
+*The ten items driving Malawi's delta* are exactly the ones subsistence
+agriculture would predict, which is itself corroboration:
+
+| item                            | % of total delta |
+|---------------------------------+------------------|
+| Maize Ufa Refined (Fine Flour)  |            18.51 |
+| Maize Ufa Mgaiwa (Normal Flour) |            14.42 |
+| Chicken                         |             6.01 |
+| Green Maize                     |             4.44 |
+| Thobwa                          |             3.83 |
+| Bean, Brown                     |             3.09 |
+| Nkwani                          |             2.95 |
+| Pumpkin                         |             2.62 |
+| Cassava Flour                   |             2.51 |
+| Soyabean Flour                  |             2.49 |
+
+Maize flour alone is a third of it.  No =u='Value'= candidate exists in either
+country (0 rows), so the "1 Kwacha per Kwacha" degenerate case never fires
+here.
+
+*Verdict on item 6's magnitude: the +51.8% is real and is not a unit
+artefact.*  It is what you get when a country that reports no own-production
+value is given one at its own purchase prices, and it lands where Uganda's
+directly-reported share already sits.
+
+** CONCERN 6a -- the unconditional national rung prices a long thin tail
+
+=median_price_valuation='s national rung is an *unconditional* fallback, so
+=threshold=10= gates the geographic cells but gates *nothing* at the top of
+the ladder.  For each =median_price= row I counted the purchase observations
+in its own =(t, j, u)= *nationally* -- i.e. the deepest pool the ladder could
+possibly have drawn on:
+
+| national pool at the row's (t,j,u) | rows              | share of Malawi's total delta |
+|------------------------------------+-------------------+-------------------------------|
+| = 0                                | 0                 |                         0.00% |
+| = 1 (a single transaction)         | 1,932 (0.69%)     |                     *2.85%*   |
+| < 3                                | 4,079 (1.45%)     |                         4.18% |
+| < 10 (below the stated gate)       | 11,652 (4.15%)    |                     *6.48%*   |
+
+Median pool size is 533, so the bulk is well supported -- but 6.5% of the
+imputed money is priced off fewer than ten transactions nationwide, and 2.9%
+off exactly one.  The concrete cases are the ones you would expect:
+
+- 2016-17 "Small Animal - Rabbit, Mice, Etc." / =u='Whole'=: a *single*
+  purchase sets the price at 100,000 MWK, which is then applied to 195 rows
+  and contributes *2.12% of the entire Malawi delta* -- including one in-kind
+  row of 14 units valued at 1,400,000 MWK, the largest single imputation in
+  the corpus.
+- 2016-17 "Groundnut (Shelled)" / =u='Grams'=: one observation gives 800 MWK
+  *per gram* (800,000/kg); a 500-gram produced row is valued at 400,000 MWK.
+- 2019-20 "Bottled/Canned Beer" / =u='Kilogramme'=: pool of 2, 900 units,
+  795,000 MWK.
+
+This is the Malawi twin of Uganda's =u='---'= "Restaurant (soda)" row that the
+ledger names -- and unlike Uganda's, it is *systematic* rather than a single
+outlier, because a thin =(t,j,u)= cell is thin for every household in it.  I
+agree with "count, never clip", so I am *not* asking for a magic outlier
+screen.
+
+*In fairness to the implementer, the row-share version of this is ALREADY in
+the docstring, and it is exactly right.*  "national-rung coverage at
+=threshold=10= is 94.2% (Malawi) / 76.5% (Uganda) on the native key" -- I
+reproduced Malawi's 94.2% to the decimal on its stated denominator (share of
+*candidate* rows whose =(t,j,u)= has >= 10 national purchase observations:
+measured 94.2%).  My 6.48% is not a missing measurement, it is the
+*value-weighted complement* of that same fact: the 5.8% of candidates below
+the gate are not a random 5.8% of the money, they are 6.5% of it, and 2.9% of
+it rests on single transactions.  The ask is therefore narrow -- add the
+value-weighted figure beside the coverage figure -- because the docstring
+presents 94.2% as evidence that the native-=u= basis "buys nothing
+measurable" (a *coverage* argument, which it supports), and a reader can
+easily carry that reassurance over to *accuracy*, where the thin tail is
+slightly worse than the row share suggests.  Everything needed is already
+returned: =valuation_price= per row and the =attrs= tallies.  Documentation
+ask, not a code one.
+
+* 7. The bias statement's citations -- PASS
+
+=SYNTHESIS.org= lines, verified verbatim with =grep -n=:
+
+- *:732* "*This is not what the instrument asked for.*  The UNPS interviewer
+  manual is" ... running to *:736* "(T6aeQ5).  If it had been followed, 3 vs 4
+  would be 1.00.  It is 1.23."  The intervening lines carry the quoted farm
+  gate language, including "excludes any cost transport and marketing
+  services" -- which the docstring quotes accurately.
+- *:750* "and holds under either reading of *why*: **in Uganda, own-consumption
+  is valued" ... *:751* "about 23% above what a sale actually fetched (3 vs 4 =
+  1.234 on the 223-cell" ... *:753*.
+
+So both citations point at the sentences the docstring says they do, and the
+=1.234= / 223-cell figures are quoted correctly.
+
+*Uganda-only: confirmed, and the source is emphatic about it.*  The paragraph
+immediately after :753 reads "*That 23% is Uganda-only*: GhanaLSS has no
+source 4, so no comparable number exists for it, and an earlier draft wrongly
+wrote 'in Uganda or GhanaLSS'."  The docstring reproduces the restriction
+("That number is **Uganda-only** -- GhanaLSS ships no sale-price source, so no
+comparable figure exists for it") -- i.e. it repeats the *correction*, not the
+retracted draft.  The Deaton & Zaidi (2002) LSMS WP 135 attribution likewise
+matches :738-747, including that document's own care that the farmgate ask is
+"a fact about the instruments, not a claim about what Deaton and Zaidi
+caused".  Nothing laundered, nothing over-generalised.
+
+* 8. Tests, pandas 3.0, ASCII, cache fingerprints -- PASS
+
+** Tests
+
+: pytest tests/test_own_production_valuation.py tests/test_median_price_valuation.py \
+:        tests/test_rcsi.py tests/test_food_expenditures_basis.py -q -p no:randomly
+: 134 passed, 2 warnings in 51.12s
+
+=tests/test_own_production_valuation.py= collects *45* tests, as the ledger
+says.  The two warnings are pre-existing =ligonlibrary= categorical-mapping
+RuntimeWarnings from the warm-Uganda fixture, unrelated.  I did *not* re-chase
+the ten =test_label_selection.py= failures the ledger documents as
+environmental (a spawned-subprocess DVC config error, reproduced by the ledger
+against a clean base checkout).
+
+** pandas 3.0 on the diff
+
+No =inplace==, no =fillna(method==, no =.ix[=, no positional =series[0]=.  The
+=np.isnan= calls (=transformations.py=, five sites) are on arrays materialised
+as =float64= via =to_numpy(dtype='float64', na_value=np.nan)= or returned
+=.to_numpy(dtype='float64')= from the two rung helpers, so none can meet
+=pd.NA= -- verified against Uganda/Malawi, whose =Expenditure= is nullable
+=Float64= and passes through the coercion cleanly.  =.append(= matches are
+Python list appends.  =replace([np.inf,-np.inf], np.nan)= and =.where(p > 0)=
+are used rather than chained assignment.  The one place a silent CoW failure
+could hide -- =df.assign(Expenditure=valued['Expenditure'].to_numpy())=, a
+*positional* write -- is safe because =_normalize_columns= provably does not
+reorder rows (checked: =T._normalize_columns(D).index.equals(D.index)= is
+True; the function only renames columns and optionally promotes a unit column
+to the index) and =food_acquired_valued= builds its output with
+=index=df.index= from arrays taken in row order.
+
+** ASCII
+
+Added lines in =lsms_library/transformations.py= and =lsms_library/country.py=:
+*0* non-ASCII characters.  =tests/test_own_production_valuation.py=: one, an
+em dash in the module docstring's first line.  The ledger =.md= uses
+=§ — → ≥ Δ Σ=, consistent with the other ledgers in =.coder/ledger/=.  (For
+context, the two library files already contain 132 and 39 pre-existing
+non-ASCII lines, so the new code is *stricter* than its surroundings.)
+
+** Cache fingerprints -- 0 of 18 moved
+
+Recipe from =.coder/ledger/harvest-kg-shipped-factors.md= (including its
+correction that the real signature is =c._table_cache_hash(table, c.waves)=).
+Base tree extracted with =git archive 9e4c0867= into the scratchpad -- an
+exact base, not the moved =development= tip -- and probed under its own
+=PYTHONPATH=:
+
+- =build_transforms_fingerprint(t)= for =food_acquired=, =food_expenditures=,
+  =food_prices=, =food_quantities=, =crop_production=, =household_roster=,
+  =sample=, =cluster_features=, =housing=, plus
+  =build_transforms_fingerprint(None)= -- 10 probes;
+- =Country(c)._table_cache_hash(t, c.waves)= for =Uganda= and =Malawi= x
+  =food_acquired=, =household_roster=, =sample=, =cluster_features= -- 8 probes.
+
+: probes: 18   moved: 0   []
+
+Consistent with the mechanism: =transformations.py= carries no
+=@build_transform()= on the touched functions, and the =country.py= edits are
+inside the generated =__getattr__= method and =_valuation_geo=, both read-path.
+And nothing is cached on this path at all -- =food_expenditures= is derived at
+read time from =_FOOD_DERIVED=, so no imputed value can reach a parquet.
+
+* Recommendation
+
+*Mergeable.*  The default path is byte-identical, the opt-in is genuinely
+opt-in, the API contract is what the docstring says it is, the provenance
+partitions and survives, the headline numbers reproduce to three digits, and
+the +51.8% Malawi jump survives three independent plausibility checks --
+including one (kg share vs value share) that says the imputation is
+conservative rather than inflated.
+
+Before merge, three small documentation edits and one small code fix, none
+blocking:
+
+1. *CONCERN 3a (code, ~1 line)*: =_own_price_rung= should be handed =df=, not
+   =df.index=, so =i= as a column is found instead of silently disabling the
+   rung -- or it should warn.  No live country is affected; the transform is
+   public and the failure is silent, which is the combination the repo treats
+   as the real hazard.
+2. *CONCERN 5a (doc)*: the =Feature()= sentence should say the tallies are
+   absent on a call spanning *more than one* country; a single-country
+   =Feature()= preserves them (measured).
+3. *CONCERN 5b (doc)*: the =country.py= re-attach comment attributes the need
+   to =_add_market_index= being a disagreeing merge, but that method already
+   re-attaches internally (=country.py:2547=), as does =_relabel_j=
+   (=:2899=) -- measured, both preserve without the outer re-attach.  Keep the
+   re-attach; state it as belt-and-braces.
+4. *CONCERN 6a (doc)*: beside the docstring's existing and correct
+   "national-rung coverage ... 94.2% (Malawi) / 76.5% (Uganda)" (reproduced
+   here to the decimal), add its value-weighted complement: 6.48% of Malawi's
+   imputed value, and 2.85% from single transactions, comes from a =(t,j,u)=
+   below the =threshold=10= gate that the unconditional national rung does not
+   apply.  The coverage figure is offered as evidence about *coverage* and is
+   sound there; the risk is a reader carrying it over to *accuracy*.

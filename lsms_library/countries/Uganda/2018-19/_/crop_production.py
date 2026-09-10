@@ -30,6 +30,15 @@ despite having no unit: its kilograms are Quantity * KgFactor.
 
 The harvest CONDITION is an index level in its own right (GH #323/#637).
 See uganda.CROP_COLMAPS for the per-wave column map.
+
+The SOLD unit and SOLD condition ARE both present in this wave, in BOTH
+visits, and are carried as Unit_sold / Condition_sold (GH #824).  AGSEC5A has
+no HARVEST unit but s5aq07c_1 IS a unit -- 84.8% unit-only codes, 0.0%
+condition-only, the full 40-label harvest_units set, and the questionnaire
+agrees -- so a farmgate price for this wave-season is reachable.  The
+condition-as-unit trap that EPAR_UW_Uganda_UNPS_W7.do:520-523 falls into on
+the harvest side does NOT recur here; the columns were re-derived from the
+value ranges, not copied.
 """
 import sys
 sys.path.append('../../_/')
