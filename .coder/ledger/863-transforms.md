@@ -341,10 +341,12 @@ whole column is empty or identically zero.
 > vocabulary and is measured: it fires on 1-3 labels per country, every one
 > of them a genuine fertilizer input contributing zero. It never affects a
 > nutrient share, so a stem missing from it costs a warning, never a number.
-> **Separately filed** as its own issue per the red team's item 4: the
+> **Separately filed as GH #867** per the red team's item 4: the
 > `_NITROGEN_CONTENT` table has no entry for `NPS` (Ethiopia, 5,264 rows),
-> `D Compound` (Malawi, 726) or any organic input — those are content
-> decisions, not matching bugs.
+> `D Compound` (Malawi, 726), any organic input, or Guinea-Bissau's
+> Portuguese vocabulary — those are content decisions (what nutrient share
+> to assert), not matching bugs, and each needs a citation the way the
+> existing urea/DAP/NPK entries have one.
 
 ### C. `fertilizer_rate` silent emptiness on Uganda
 
