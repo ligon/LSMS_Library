@@ -326,29 +326,77 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
 
 
 @pytest.mark.requires_s3
-def test_shipped_and_inferred_agree_where_both_exist(ethiopia):
-    """The corroboration that the join is keyed right, not merely non-empty.
+def test_quintal_is_exactly_100kg_on_every_newly_served_row(ethiopia):
+    """The one EXTERNAL agreement the shipped table can be checked against.
 
-    On the 18,780 rows carrying both a WB factor and a library-inferred one
-    (the metric units), the two agree EXACTLY -- median ratio 1.0000, nothing
-    outside [0.5, 2].  A mis-keyed join would show as a wild ratio, not as an
-    empty result.
+    An earlier version of this test compared the shipped factor to the
+    library's INFERRED one on the 18,780 rows carrying both, found a median
+    ratio of 1.0000, and called that evidence the join was keyed right.  It
+    is not: the red-team measured that overlap and it is **100% metric** --
+    ``Kg`` 18,677 and ``Gram`` 103.  Both sides are quoting the definition of
+    a kilogram, so the ratio is 1.0000 by construction, and a ``j`` mis-key
+    would leave it at 1.0000 too (``Kg`` is crop-independent).  That test
+    pinned a tautology.
+
+    ``Quintal`` is the real check.  It is 13,924 of the 43,384 NEWLY-SERVED
+    rows (~64% of the newly-served kilograms), the library infers **no**
+    factor for it, and the WB table says exactly 100.0 for every crop in
+    every wave -- which is what a quintal is.  External, not definitional.
+
+    WHAT STILL HAS NO NUMERICAL CHECK, stated so nobody thinks it does: the
+    ~29,000 local-container rows (Madaberia / Joniya / Kunna / Kerchat...),
+    whose factor varies with the crop by an order of magnitude.  Their
+    warrant is STRUCTURAL -- the loader decodes ``j`` and ``u`` through the
+    SAME ``_eth_crop_label_map`` / ``_clean_unit_label`` that
+    ``crop_production_for_wave`` uses, so a ``j`` mis-key would have to be a
+    fault in a shared map, which would equally corrupt ``crop_production.j``
+    itself.  That argument, not a ratio, is the reason to believe the join.
     """
     import lsms_library as ll
     from lsms_library.transformations import harvest_kg_factors
 
     cp = ll.Country("Ethiopia").crop_production()
     fa = harvest_kg_factors(cp, shipped_factors=_load(ethiopia))
-    both = fa["kg_shipped"].notna() & fa["kg_inferred"].notna()
-    assert int(both.sum()) == 18_780
-    ratio = (fa.loc[both, "kg_shipped"] / fa.loc[both, "kg_inferred"]).astype(float)
-    assert float(ratio.median()) == pytest.approx(1.0, abs=1e-6)
-    assert float(((ratio < 0.5) | (ratio > 2)).mean()) == 0.0
+    newly = fa["kg_shipped"].notna() & fa["kg_inferred"].isna()
+    assert int(newly.sum()) == 43_384
+    u = fa.index.get_level_values("u")
+    quintal = newly & (u == "Quintal")
+    assert int(quintal.sum()) == 13_924
+    assert set(fa.loc[quintal, "kg_shipped"].astype(float)) == {100.0}
+    # And the overlap really is metric-only, so the old claim stays dead.
+    overlap = fa["kg_shipped"].notna() & fa["kg_inferred"].notna()
+    assert set(pd.Series(u[overlap]).unique()) == {"Kg", "Gram"}
+
+
+@pytest.mark.requires_s3
+def test_region_true_cannot_be_passed_to_harvest_kg_today(ethiopia):
+    """``region=True`` has no reachable consumer -- pin the loud refusal.
+
+    ``crop_production`` carries no ``region`` level, so
+    ``_shipped_factor_lookup`` drops that key, finds the remaining
+    ``(t, j, u)`` ambiguous, and REFUSES rather than averaging.  That is the
+    correct behaviour and the docstring says so; this pins it, because
+    "offered" would otherwise read as "usable".
+    """
+    import lsms_library as ll
+
+    cp = ll.Country("Ethiopia").crop_production()
+    assert "region" not in (cp.index.names or [])
+    assert "region" not in cp.columns
+    with pytest.raises(ValueError, match="ambiguous on the join keys"):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            harvest_kg(cp, shipped_factors=_load(ethiopia, region=True))
 
 
 @pytest.mark.requires_s3
 def test_plot_features_area_is_filled_from_the_woreda_table(ethiopia):
-    """GH #853: 2,270 fields gain an Area; GPS rows are untouched; W5 gains none."""
+    """GH #853: 2,273 fields gain an Area; GPS rows are untouched; W5 gains none.
+
+    EVERY row the woreda table can convert is SERVED.  Implausibility is
+    counted (26 / 3 / 2 / 2 = 33 rows above 5x their own region's GPS p99)
+    and reported to the build log; no row is refused and no value is clipped.
+    """
     import lsms_library as ll
 
     pf = ll.Country("Ethiopia").plot_features()
@@ -356,13 +404,13 @@ def test_plot_features_area_is_filled_from_the_woreda_table(ethiopia):
     t = pf.index.get_level_values("t")
     null_by_wave = {w: int(pf.loc[t == w, "Area"].isna().sum())
                     for w in sorted(set(t))}
-    assert null_by_wave == {"2011-12": 4_969, "2013-14": 1_333,
+    assert null_by_wave == {"2011-12": 4_966, "2013-14": 1_333,
                             "2015-16": 937, "2018-19": 80, "2021-22": 138}
     # A converted row keeps the NATIVE unit name -- 'hectares' still means
     # exactly "this came from the GPS measurement" (data_info.yml: AreaUnit is
     # "original survey unit before conversion to hectares").
     converted = pf[pf["Area"].notna() & (pf["AreaUnit"] != "hectares")]
-    assert len(converted) == 2_270
+    assert len(converted) == 2_273
     assert set(converted["AreaUnit"]) == {"Timad", "Boy", "Senga", "Kert"}
     # 2021-22 has no shipped table and we do not borrow one.
     w5 = pf.loc[t == "2021-22"]
@@ -382,7 +430,11 @@ def test_area_unit_carries_the_native_label_on_unconverted_rows(ethiopia):
 
     pf = ll.Country("Ethiopia").plot_features()
     unconverted = pf[pf["Area"].isna()]
-    assert len(unconverted) == 7_457
-    assert float(unconverted["AreaUnit"].notna().mean()) > 0.9
+    assert len(unconverted) == 7_454
+    # 541 residual <NA>: fields with no GPS area whose farmer-estimate unit
+    # CODE is itself missing or outside harmonize_area_unit (2011-12 268,
+    # 2013-14 73, 2015-16 197, 2018-19 1, 2021-22 2).  4.1% of the affected
+    # population -- the fix reaches the label, not a missing code.
+    assert int(unconverted["AreaUnit"].isna().sum()) == 541
     assert {"Timad", "Other", "Square Meters", "Hectare"} <= set(
         unconverted["AreaUnit"].dropna())

@@ -1067,14 +1067,14 @@ measurement whose only area is a farmer estimate in a local unit.  GPS
 stays preferred and is never overridden: *0* previously-non-null =Area=
 values changed.
 
-| wave    | fields gaining Area | Area NaN before -> after | conversions refused |
-|---------+---------------------+--------------------------+---------------------|
-| 2011-12 |                 964 |            5,933 -> 4,969 |                   3 |
-| 2013-14 |               1,152 |            2,485 -> 1,333 |                   0 |
-| 2015-16 |                 135 |            1,072 ->   937 |                   0 |
-| 2018-19 |                  19 |               99 ->    80 |                   0 |
-| 2021-22 |                   0 |              138 ->   138 |                   0 |
-| TOTAL   |               2,270 |            9,727 -> 7,457 |                   3 |
+| wave    | fields gaining Area | Area NaN before -> after | implausible (counted, SERVED) |
+|---------+---------------------+--------------------------+-------------------------------|
+| 2011-12 |                 967 |            5,933 -> 4,966 |                            26 |
+| 2013-14 |               1,152 |            2,485 -> 1,333 |                             3 |
+| 2015-16 |                 135 |            1,072 ->   937 |                             2 |
+| 2018-19 |                  19 |               99 ->    80 |                             2 |
+| 2021-22 |                   0 |              138 ->   138 |                             0 |
+| TOTAL   |               2,273 |            9,727 -> 7,454 |                            33 |
 
 *2021-22 gains nothing and that is the decision, not an oversight.*  The
 WB shipped no file for ESPS-5; EPAR borrows an earlier wave's
@@ -1085,13 +1085,42 @@ serving another wave's numbers.  If we ever borrow, it is a documented
 decision here and a warning at build time -- 135 W5 fields are what it
 would buy.
 
-*Implausibility is counted, never clipped.*  A converted area larger than
-the LARGEST FIELD THAT WAVE ACTUALLY MEASURED BY GPS is REFUSED (=Area=
-stays NaN) and counted -- 3 rows in 2011-12 against a 9.91 ha ceiling, 0
-elsewhere.  Nothing is capped: a capped area is a number nobody reported.
-The ceiling is the wave's own data rather than a magic constant, and it
-is deliberately generous; note the ceiling is itself soft in waves whose
-largest GPS field is implausible (2015-16's is 425.7 ha).
+*Implausibility is SERVED and COUNTED.  Nothing is refused and nothing is
+clipped.*  Every row the woreda table can convert is converted and kept,
+exactly as the survey's estimate times the World Bank's factor.  The count
+-- 33 rows, 1.5% of 2,273 -- is reported to the build log against a single
+corpus-consistent reference: *5x the 99th percentile of GPS-measured field
+area in the row's own region and wave*.
+
+An earlier version of this code REFUSED such rows (left =Area= NaN) against
+the wave's own GPS *maximum*.  Both halves of that were wrong.  The maximum
+is set by a single GPS outlier and ran 4.93 / 9.91 / 19.81 / 126.41 /
+425.71 ha across the five waves against a p99 of ~1 ha in every one, so the
+same converted 18 ha field was refused in 2011-12 and would have been served
+in 2013-14 -- a 43x swing in what "refused" meant.  And *a refusal is a clip
+by another name*: NaN-ing a row on the strength of a screen deletes the
+survey's own answer.  The within-region GPS p99 is by contrast stable --
+0.60 to 3.07 ha over all four convertible waves x nine regions -- so a
+flagged row means the same thing everywhere.  K = 5 flags 26/3/2/2; K = 10
+would flag 3 and say nothing.
+
+*CAVEAT ON THE FACTORS THEMSELVES, measured and NOT adjudicated.*  Converted
+areas sit systematically above the GPS distribution even after conditioning
+on region: the ratio of the converted median to the GPS median runs *2.4x to
+17.6x in every large (wave, region) cell, never below 2.4x* -- e.g. 2011-12
+region 3 2.4x, region 7 9.2x; 2013-14 region 3 2.7x; 2015-16 region 7 14.0x;
+2018-19 region 1 17.6x.  National ratios (4.9x / 4.0x / 6.2x / 27.3x) overstate
+it, so composition explains part but not most.  A selection story is available
+(a field the enumerator could not walk is large or remote) and so is a
+factor-inflation story; nothing in this repo separates them.  *Treat a
+converted =Area= as a coarser measurement than a GPS one, not as its equal.*
+
+*2018-19's cell is thin and unrepresentative -- do not read it as typical.*
+Its 19 converted fields are ALL the WB table serves in that wave; they have a
+median of 0.90 ha against a wave GPS median of 0.033 ha, 17 of the 19 sit in
+region 1, and the set includes a 33-Timad estimate (8.11 ha) and three
+8-to-14-Timad estimates in one woreda.  Anyone running =yield_kg= on W4
+should know that.
 
 *Coverage is intrinsically partial and the rest is NOT a gap to fill.*
 The table has 259 rows: 206 woredas x 4 local units (Timad 198, Boy 33,
@@ -1104,12 +1133,15 @@ survey's own data, a different and later layer, and it is NOT done here.
 *Join on the RAW integer triple =(saq01, saq02, saq03)= x local unit --
 and note EPAR's own join is mis-keyed.*  EPAR pads and concatenates
 region/zone/woreda into hierarchical strings on both sides, but the two
-paddings DISAGREE: their general helper leaves =saq02=/=saq03= unpadded
-(=W5.do:195-225=; zone 1 of region 1 becomes ="011"=) while the
-conversion-file block pads them to two characters (=:325-341=;
-="0101"=).  Their merge matched 1,566 of 14,878 rows and changed 19 field
-sizes -- their own inline counts at =:694-703=.  The raw integer triple
-is the same hierarchy without the collision risk.
+paddings DISAGREE: their general helper pads the REGION only (=W5.do:198=)
+and leaves =saq02=/=saq03= unpadded, so zone 1 of region 1 becomes ="011"=,
+while the conversion-file block pads all three (=:330= zone, =:336= woreda)
+giving ="0101"=.  Both sides are strings, so Stata raises nothing.  Their
+merge reports ==13,312 not matched== and ==1,566 matched== (=:695-696=) and
+==// 19 changes== (=:703=); the denominator 14,878 is DERIVED (13,312 +
+1,566) and does equal =sect3_pp_w5.dta='s row count, but EPAR never writes
+it.  The raw integer triple is the same hierarchy without the collision
+risk.
 
 *A converted row keeps its NATIVE =AreaUnit=.*  =Area= non-null vs null
 is the record of whether the woreda table could serve the row, and
@@ -1140,8 +1172,21 @@ rows carry ='hectares'= -- so the "Silent All-Null Read" guard, which
 fires on a whole column or a whole =t= slice, could not see it either.
 Fixed by slicing the map to the wave.  After the fix the non-GPS fields
 carry =Timad= (3,832 overall), =Square Meters= (1,891), =Boy= (1,484),
-=Other= (1,098), =Senga=, =Hectare=, =Kert=, =Tilm=, =Ermija=, =Rope=,
-=Medeb=.
+=Other= (1,098), =Senga= (286), =Hectare= (216), =Kert= (216), =Tilm= (130),
+=Ermija= (28), =Rope= (3), =Medeb= (2).
+
+*Residual: 541 rows are still =<NA>=* (2011-12 268, 2013-14 73, 2015-16 197,
+2018-19 1, 2021-22 2) -- 4.1% of the non-GPS population.  These are fields
+whose farmer-estimate unit CODE is itself missing or outside
+=harmonize_area_unit=; the fix reaches the label, not a code the survey never
+recorded.  So "AreaUnit carries the native unit name" is true of 93.0% of
+non-GPS fields, not of all of them.
+
+The sweep that established the fix is general (red-team, 2026-09-10): all 4
+=_harmonize_wave_keyed= call sites in =ethiopia.py= and all 3 =_map_int_codes=
+call sites are now correct, and the only two other repo-wide tuple-keyed
+label builders (=Nigeria/_/nigeria.py:1030=, =Uganda/_/uganda.py:754=) are
+consumed by matching tuple =.get=s.  No second instance exists.
 
 *Separate, unwired, and named so it is not confused with the above*: of
 the 7,457 fields still without an =Area=, *1,891 report =Square Meters=
@@ -1512,10 +1557,28 @@ Measured cold on the isolated build (85,519 crop rows):
 =reported_vs_shipped= is =={both: 0}== and always will be here: the ESS
 asks no per-row conversion factor, so =crop_production= carries no
 =KgFactor= column at all (see "The ESS asks NO value of own-consumption"
-above for the food-side analogue).  The corroboration that the join is
-keyed RIGHT rather than merely non-empty is *shipped vs inferred*: on the
-18,780 rows where both exist (the metric units) the median ratio is
-*1.0000* and *0.0%* lie outside [0.5, 2], in every wave.
+above for the food-side analogue).
+
+*What DOES corroborate the join, and what does not.*  An earlier version of
+this section offered shipped-vs-inferred agreement (18,780 rows, median ratio
+1.0000) as evidence the join was keyed right.  *It is not.*  That overlap is
+100% metric -- =Kg= 18,677 and =Gram= 103 -- so both sides are quoting the
+definition of a kilogram, and a =j= mis-key would leave the ratio at 1.0000
+too, because =Kg= is crop-independent.  It was a tautology.
+
+The real external check is *=Quintal== = 100.0*: 13,924 of the 43,384
+NEWLY-served rows (~64% of the newly-served kilograms), a factor the library
+infers for nothing, and the WB table gives exactly 100.0 for every crop in
+every wave -- which is what a quintal is.
+
+*The ~29,000 local-container rows have no numerical check at all*, and their
+factors vary with the crop by an order of magnitude (=Madaberia ... Medium=
+runs 10.35 to 95.00 across crops).  Their warrant is STRUCTURAL: the loader
+decodes =j= and =u= through the SAME =_eth_crop_label_map= /
+=_clean_unit_label= that =crop_production_for_wave= uses, so a =j= mis-key
+would have to be a fault in a shared map -- which would equally corrupt
+=crop_production.j= itself.  That argument, not a ratio, is the reason to
+believe the join.
 
 Match rates.  Crop codes: *100%* of the WB codes decode through
 =harmonize_crop= in all four waves.  Units: the table covers 69.3% /
@@ -1531,9 +1594,16 @@ would change =crop_production='s stored content, so it was NOT done here.
 =transformations._shipped_factor_lookup= REFUSES an ambiguous table
 rather than averaging or =first()=-ing:
   1. The WB's own duplicate, crop 74 x unit 62 at 4.34 and 6.125 in the
-     W4/W5 blob.  *Keep 4.34*, drop 6.125, for continuity with W3 -- the
-     same answer EPAR reaches.  A duplicate the rule does NOT cover
-     raises, so a future one is loud.
+     W4/W5 blob.  *Keep 4.34*, drop 6.125 -- the same answer by the same
+     >5 threshold as EPAR's LIVE code (=W5.do:800-802=).  Attribute the
+     REASON carefully: the live comment (=:801=) justifies 4.34 by
+     reference to W5 itself ("W5 uses the 4.34 conversion factor rather
+     than 6.125"); the *continuity-with-W3* rationale is in a
+     COMMENTED-OUT block (=:349=) whose output is read nowhere.  Our own
+     ground for the same choice is that W3 carries 4.34 as its SINGLE
+     value for that key (measured) -- the continuity argument on our
+     evidence, not on EPAR's dead code.  A duplicate the rule does NOT
+     cover raises, so a future one is loud.
   2. A collision OUR OWN decode creates: crop codes *56 (KALE)* and *69
      (SPINACH)* carry different factors and =harmonize_crop= folds both
      onto ='Leafy Greens'=, on the Esir units.  Those 10 keys (20 rows)
@@ -1546,9 +1616,17 @@ approximation.*  The file is WIDE -- one factor column per region PLUS
 =mean_cf_nat=, the WB's own national figure, so serving it is
 transcription and no aggregate is computed (core never aggregates; a
 median across regions would invent a number the WB did not publish).
-=region=True= returns the =(t, j, u, region)= form for a caller who has
-resolved a lower-case numeric =region= onto =crop_production=.  Why not
-by default, with numbers:
+=region=True= returns the =(t, j, u, region)= form -- but *it cannot be
+passed to =harvest_kg= today: the call RAISES*.  =crop_production= has no
+=region= level, so =_shipped_factor_lookup= drops that key, finds the
+remaining =(t, j, u)= ambiguous over 4,086 keys, and refuses rather than
+averaging eight regions.  That is the correct failure and it is now pinned by
+test.  The kwarg is for a caller who resolves a numeric =region= onto the
+frame first; there is no such caller in this repo.  Note also that
+=region=True= is *strictly worse than the national default for regions 5, 13
+and 15*: the file pools them into a =99= cell that no crop row can match, so
+those three regions get NO shipped factor under region keying and a perfectly
+good one under the default.  Why national is the default, with numbers:
   - =crop_production= carries NO region level.  99.6% of its rows CAN be
     given a Region *string* via =v= -> =cluster_features.Region= (100% /
     100% / 100% / 97.3% / 100% by wave), but that column is 21 spellings
@@ -1558,8 +1636,12 @@ by default, with numbers:
     in this repo.
   - Of the rows the table can serve, the share landing on a =(j, u)=
     whose factor actually VARIES by region is 10.2% (2013-14), 45.6%
-    (2015-16), 38.3% (2018-19), 28.7% (2021-22).  Material, not
-    negligible.
+    (2015-16), 38.3% (2018-19), 28.7% (2021-22).  Denominator: §9 harvest
+    rows whose DECODED =(j, u)= key survives into the served national table
+    (so the dropped collision keys and undecodable units are excluded).  A
+    raw =(crop_code, unit_cd)= basis gives 10.5 / 44.4 / 47.4 / 36.3% --
+    higher in the last two waves, same qualitative answer.  Material, not
+    negligible on either measure.
   - The clean fix is UPSTREAM: =sect9_ph= carries =saq01= on 100% of rows
     in every wave, so a wave-script change could emit a native =region=
     level.  That is a =crop_production= schema change and was

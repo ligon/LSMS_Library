@@ -76,12 +76,24 @@ analyst-callable transforms (`CLAUDE.md` §"Derived Tables"), so no
 
 ## §4 Invariants & assumptions
 
+- **A `region=True` table CANNOT be passed to `harvest_kg` today — the call
+  RAISES** (`ValueError: shipped_factors is ambiguous on the join keys
+  ['t','j','u'] ... 4086 duplicated key(s)`). That is the correct refusal and
+  is now pinned by test; "offered" in an earlier draft of this ledger
+  overstated its reach. Region **99** additionally makes the region path
+  *strictly worse than the national default* for regions 5 / 13 / 15: the file
+  pools them into a cell no `saq01`-coded crop row can match, so those three
+  regions get no shipped factor under region keying and a good one under the
+  default.
 - **`crop_production` carries NO `region` level**, and the framework will not
   give it one: `_join_v_from_sample` joins `v`, and `cluster_features.Region`
   is an un-harmonised STRING (21 spellings for 11 regions;
   `CONTENTS.org` §"cluster_features District is not a district"), while the WB
   table keys on the numeric `saq01` code. Measured: 99.6% of crop rows can be
   given a Region *string* via `v`; there is no name->code table in the repo.
+  The region-varying shares quoted in §Phase 3 use the **decoded-and-served**
+  denominator (rows whose `(j, u)` survives into the national table); a raw
+  `(crop_code, unit_cd)` denominator gives 10.5 / 44.4 / 47.4 / 36.3%.
 - **`sect9_ph` carries `saq01` on 100% of rows in all five waves** — so the
   clean fix is upstream (emit a native `region` level), which is a
   `crop_production` schema change and out of scope here.
@@ -98,6 +110,10 @@ analyst-callable transforms (`CLAUDE.md` §"Derived Tables"), so no
   the CF file has the clean form (`CONTENTS.org` §"The unit axis ... two small
   blemishes"). Repairing `_clean_unit_label` would change `crop_production`'s
   stored content, which Task A must not.
+- **541 rows keep `AreaUnit` `<NA>` even after the fix** (2011-12 268,
+  2013-14 73, 2015-16 197, 2018-19 1, 2021-22 2) — fields whose farmer-estimate
+  unit CODE is missing or outside `harmonize_area_unit`. 4.1% of the non-GPS
+  population; the fix reaches the label, not a code the survey never recorded.
 - **`_harmonize_wave_keyed` returns TUPLE keys and `_map_int_codes` maps BARE
   codes.** `plot_features_for_wave` passed the tuple-keyed
   `harmonize_area_unit` dict straight to `_map_int_codes`, so every lookup
@@ -127,7 +143,8 @@ analyst-callable transforms (`CLAUDE.md` §"Derived Tables"), so no
 | local-unit code -> `AreaUnit` | **reuse** `_harmonize_wave_keyed('harmonize_area_unit')`, sliced to the wave | the join is ON that label, so "consistent by construction" beats "consistent by coincidence" (the file's own labels do agree) |
 | the national factor | **reuse the file's `mean_cf_nat`** | it is the WB's own published national figure — transcription, not an aggregate. A median across region columns would be an aggregation core forbids |
 | region expansion of the pooled `99` cell | **not implemented** | the variable label says "SOMALIE, DIRE DAWA, & HARAR"; EPAR expands it to codes 5/13/15 (`W5.do:766-773`). We serve what the file says and leave the expansion to a caller |
-| the crop-74 / unit-62 duplicate | **new, targeted rule** (keep 4.34, drop > 5.0), then **assert** the remainder is unique | EPAR reaches the same answer from W3 continuity (`W5.do:800-802`). A general "keep min" would silently absorb a *future* duplicate; the assert makes a new one loud |
+| the crop-74 / unit-62 duplicate | **new, targeted rule** (keep 4.34, drop > 5.0), then **assert** the remainder is unique | EPAR's LIVE code reaches the same answer by the same >5 threshold (`W5.do:800-802`), though its live reason (`:801`) is "W5 uses 4.34", not the W3-continuity reason that appears only in the dead block at `:349`; our own ground is that W3 carries 4.34 as its single value. A general "keep min" would silently absorb a *future* duplicate; the assert makes a new one loud |
+| the plausibility screen on a converted area | **rewritten 2026-09-10: SERVE and COUNT** (`PLOT_AREA_IMPLAUSIBLE_MULTIPLE` = 5 x the within-region GPS p99) | the first version REFUSED against the wave's GPS *maximum*, which (a) ran 4.93–425.71 ha by wave against a ~1 ha p99, so "refused" meant a 43x-different thing per wave, and (b) **a refusal is a clip by another name** — house rule is count, never act. The within-region p99 is 0.60–3.07 ha corpus-wide, so a flag is comparable |
 | the `Leafy Greens` decode collision | **new: DROP the key, warn, never pick** | KALE 56 and SPINACH 69 carry different factors and `harmonize_crop` folds them onto one label; `crop_production` no longer records which crop the row was, so there is nothing to choose on |
 | filling the holes in either table | **refused** | EPAR's `fillin` + per-`(unit, region)` mean, and its weighted zone/region/national area medians, are imputation. Out of scope and named as such in both issues |
 | metric self-conversions (`Hectare`, `Square Meters`) in `plot_features` | **not implemented** | they need no external table and are a separate defect; 2,107 rows corpus-wide. Recorded in `CONTENTS.org`, not wired, so #853's "newly converted" count stays attributable to the WB table |
@@ -198,12 +215,22 @@ analyst-callable transforms (`CLAUDE.md` §"Derived Tables"), so no
 
   `reported_vs_shipped` is `{both: 0}` and always will be for Ethiopia: the
   ESS asks no per-row conversion factor, so `crop_production` has no
-  `KgFactor` column. The available corroboration is **shipped vs inferred**:
-  on the 18,780 rows where both exist (the metric units) the median ratio is
-  **1.0000** and **0.0%** fall outside `[0.5, 2]` — per wave 9,151 / 3,826 /
-  2,576 / 3,227 rows, median ratio 1.000 in each. A mis-keyed join shows as a
-  wild ratio, not as an empty result, so this is the check that the keys are
-  right rather than merely non-empty.
+  `KgFactor` column.
+
+  **CORRECTED 2026-09-10 (red-team item 4).** This ledger previously offered
+  shipped-vs-inferred agreement (18,780 rows, median ratio 1.0000, 0% outside
+  [0.5, 2]) as "the check that the keys are right". **It is a tautology.**
+  That overlap is 100% metric — `Kg` 18,677, `Gram` 103 — so both sides quote
+  the definition of a kilogram, and a `j` mis-key would leave the ratio at
+  1.0000 because `Kg` is crop-independent. The real external check is
+  **`Quintal` = 100.0 exactly**, on 13,924 of the 43,384 NEWLY-served rows
+  (~64% of newly-served kg), a factor the library infers for nothing.
+  The ~29,000 local-container rows have **no numerical check** and their
+  factors vary with the crop by an order of magnitude (`Madaberia ... Medium`
+  10.35–95.00); their warrant is **structural** — the loader decodes `j` and
+  `u` through the same `_eth_crop_label_map` / `_clean_unit_label` the
+  `crop_production` build uses, so a `j` mis-key would be a fault in a shared
+  map and would corrupt `crop_production.j` too.
 
   Unit-label match rate (share of each wave's §9 harvest ROWS whose `u` the
   table covers — the ceiling on `shipped_matched`): 69.3% / 82.5% / 82.0% /
@@ -213,17 +240,53 @@ analyst-callable transforms (`CLAUDE.md` §"Derived Tables"), so no
   15,589 still-unserved rows), `Chinet` / `Chinet Medium`, and the mojibake
   `Zorba/Akara Ï¿½ *` forms.
 
-- **#853, measured cold**: fields gaining an `Area`, by wave — 2011-12 **964**,
-  2013-14 **1,152**, 2015-16 **135**, 2018-19 **19**, 2021-22 **0** (no shipped
-  table; not borrowed) = **2,270**. `Area` NaN falls 9,727 -> 7,457
-  (5,933->4,969 / 2,485->1,333 / 1,072->937 / 99->80 / 138->138).
-  **0** previously-non-null `Area` values changed — GPS is never overridden.
-  Implausibility (converted area above the wave's own largest GPS-measured
-  field): **3 refused in 2011-12** (ceiling 9.91 ha), 0 elsewhere; nothing
-  clipped. Of the 7,457 still NaN, 1,891 are `Square Meters` and 216
-  `Hectare` — metric, convertible with no table at all (§5, §6 Q3) — and
-  1,098 are `Other`.
+- **#853, measured cold (re-measured 2026-09-10 after the red-team)**: fields
+  gaining an `Area`, by wave — 2011-12 **967**, 2013-14 **1,152**, 2015-16
+  **135**, 2018-19 **19**, 2021-22 **0** (no shipped table; not borrowed) =
+  **2,273**. `Area` NaN falls 9,727 -> 7,454 (5,933->4,966 / 2,485->1,333 /
+  1,072->937 / 99->80 / 138->138). **0** previously-non-null `Area` values
+  changed — GPS is never overridden. Implausible and **SERVED**: **33** rows
+  (26/3/2/2/0) above `PLOT_AREA_IMPLAUSIBLE_MULTIPLE` (5) x the within-region
+  GPS p99. Of the 7,454 still NaN, 1,891 are `Square Meters` and 216
+  `Hectare` — metric, convertible with no table at all (§5, §6 Q3) — 1,098
+  are `Other`, and **541 carry no `AreaUnit` at all** (§4).
 - **Tests**: `tests/test_ethiopia_shipped_factors.py` **20 passed** (new);
   `tests/test_shipped_factors.py` + `tests/test_crop_kg_factor.py` **72
   passed**, including `test_uganda_harvest_kg_baseline`, which RAN and is
   unchanged (130,606 in / 36,095 out, sum `10 868 272.24500081`).
+
+---
+### Red-team round (2026-09-10) — what changed
+
+`slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_852_ethiopia.org` graded the
+branch PASS on every number (it rebuilt both tables cold in an isolated root
+and reproduced them exactly, `DataFrame.equals` True) with one FAIL on a
+*claim* and two CONCERNs. All five coordinator items were taken here:
+
+1. **The plausibility screen now SERVES and COUNTS** (§5, above). One code
+   change; the counts move 964 -> 967 in 2011-12 and 2,270 -> 2,273 overall,
+   because the 3 formerly-refused rows are now in the data where they belong.
+   Recorded alongside it, from the red-team's within-region measurement: the
+   converted/GPS median ratio is **2.4x–17.6x in every large (wave, region)
+   cell**, and 2018-19's 19-row cell has a median 17.6x its own region's GPS
+   median — a caveat on the WB factors themselves, deliberately not
+   adjudicated.
+2. **The shipped-vs-inferred test was a tautology** and is replaced by the
+   `Quintal` = 100.0 check (§Phase 3, corrected).
+3. **`region=True` raises today** — stated in the loader docstring, this
+   ledger and `CONTENTS.org`, and pinned by a new test; region 99's asymmetry
+   named.
+4. **EPAR attributions corrected**: the live `:801` reason, `:198` vs
+   `:330`/`:336` for the mis-key, and "14,878" marked derived.
+5. **The 541 residual `AreaUnit` `<NA>` rows** are now in §4 and
+   `CONTENTS.org`.
+
+Not taken here, and worth filing separately (the red-team's own list): the
+refusal/flag count is build-log-only with no `*_reports()` accessor (unlike
+`grain_reports()`, it does not survive the cache); an `assert map` guard on
+Nigeria's and Uganda's wave-keyed tenure maps mirroring Ethiopia's
+`_eth_species_label_map`. Two of the red-team's smaller corrections are
+recorded rather than acted on: `sect9_ph` carries `saq01` on 100% of rows in
+four waves and **99.9967%** (one row short) in 2015-16, and the hash-movement
+claim is verified on the 20 Ethiopia tables that have a shared-cache parquet
+and asserted on the 5 that do not.

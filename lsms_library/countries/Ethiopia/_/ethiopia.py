@@ -666,10 +666,14 @@ def local_area_unit_factors(waves=None):
     pads and concatenates ``region``/``zone``/``woreda`` into hierarchical
     strings on both sides (`W5.do:325-341` for the conversion file, `:195-225`
     for everything else) -- and the two paddings DISAGREE: the general helper
-    leaves ``saq02``/``saq03`` unpadded (zone 1 in region 1 becomes ``"011"``)
-    while the conversion-file block pads them to two characters
-    (``"0101"``).  Their own merge therefore matched 1,566 of 14,878 rows and
-    changed 19 field sizes (`W5.do:694-703`, EPAR's own inline counts).  The
+    pads the REGION only (`W5.do:198`) and leaves ``saq02``/``saq03``
+    unpadded, so zone 1 in region 1 becomes ``"011"``; the conversion-file
+    block pads all three (`:330` for zone, `:336` for woreda), giving
+    ``"0101"``.  Both sides are strings, so Stata raises nothing.  Their merge
+    reports ``13,312 not matched`` and ``1,566 matched`` (`:695-696`) and
+    ``// 19 changes`` (`:703`) -- EPAR's verbatim inline counts; the
+    denominator 14,878 is DERIVED (13,312 + 1,566) and happens to equal the
+    row count of ``sect3_pp_w5.dta``, but EPAR never writes it.  The
     raw ``(region, zone, woreda)`` integer triple is the same hierarchy
     without the collision risk, and is what this loader and
     :func:`plot_features_for_wave` use.
@@ -738,22 +742,55 @@ def local_area_unit_factors(waves=None):
     return out.set_index(idx)[['SqmPerUnit', 'Source']].sort_index()
 
 
+#: Implausibility reference for a CONVERTED plot area, and the multiple of it
+#: above which the row is COUNTED (never refused, never clipped).
+#:
+#: The reference is the 99th percentile of GPS-MEASURED field area **within
+#: the row's own region and wave**.  That number is stable across the corpus
+#: -- 0.60 to 3.07 ha over all four convertible waves x nine regions -- so
+#: "flagged" means the same thing in 2011-12 as in 2015-16.
+#:
+#: It replaces an earlier per-wave *maximum* GPS area, which was a screen that
+#: REFUSED (left `Area` NaN).  Two things were wrong with that, and the second
+#: is the house rule.  (a) The max is set by a single GPS outlier and ran
+#: 4.93 / 9.91 / 19.81 / 126.41 / 425.71 ha by wave against a p99 of ~1 ha in
+#: every wave, so the same converted 18 ha field was refused in 2011-12 and
+#: served in 2013-14 -- a 43x swing in what the word meant.  (b) **A refusal
+#: is a clip by another name**: NaN-ing a row on the strength of a screen
+#: deletes the survey's own answer.  `transformations._screen_reported_factors`
+#: counts and serves; so does the `QuantityImplausibleWarning` path
+#: ("NOTHING HAS BEEN CHANGED"); so does this.
+#:
+#: K = 5 measured 2026-09-10: it flags 26 / 3 / 2 / 2 = 33 of 2,273 converted
+#: rows (1.5%), a work queue.  K = 10 flags 3 and says nothing; K = 2 would
+#: flag the ordinary right tail (the converted p90 is ~1.2x the reference).
+PLOT_AREA_IMPLAUSIBLE_MULTIPLE = 5.0
+
+
 def _convert_local_area_units(t, field, colmap, area_ha, native_unit):
     """Fill ``Area`` from the WB woreda table where no GPS area exists.
 
-    Returns ``(area_ha, n_converted, n_rejected)``.  GPS stays preferred: a
+    Returns ``(area_ha, n_converted, n_implausible)``.  GPS stays preferred: a
     row that already carries a GPS-measured area is never touched, per GH
     #853 ("Never override a GPS-measured Area with a local-unit
     conversion").
 
-    IMPLAUSIBILITY IS COUNTED, NEVER CLIPPED -- the rule
-    :func:`transformations._screen_reported_factors` follows for reported kg
-    factors, and GH #853's own "What it must NOT do".  A converted area
-    larger than the LARGEST FIELD THIS WAVE ACTUALLY MEASURED BY GPS is
-    refused (``Area`` stays NaN) and counted; it is never served at a capped
-    value, because a capped area is a number no one reported.  The ceiling is
-    the wave's own data rather than a magic constant, and it is deliberately
-    generous -- it screens the arithmetic blow-ups, not the merely large.
+    EVERY row the table can convert IS CONVERTED AND SERVED.  Implausibility
+    is **counted and reported, never acted on** -- no row is refused, no
+    value is clipped -- against
+    :data:`PLOT_AREA_IMPLAUSIBLE_MULTIPLE` x the 99th percentile of
+    GPS-measured field area in the row's own region and wave.  The count goes
+    to the build log; the rows stay in the data, exactly as the survey
+    reported them times the factor the World Bank published.
+
+    CAVEAT ON THE FACTORS THEMSELVES, measured 2026-09-10 and not adjudicated
+    here: converted areas sit systematically ABOVE the GPS distribution even
+    after conditioning on region -- the ratio of the converted median to the
+    GPS median runs 2.4x to 17.6x in every large (wave, region) cell, never
+    below 2.4x.  A selection story is available (a field the enumerator could
+    not walk is a field that is large or remote) and so is a factor-inflation
+    story, and nothing in this repo separates them.  Treat a converted `Area`
+    as a coarser measurement than a GPS one, not as its equal.
     """
     c = colmap
     est_col = c.get('area_est')
@@ -774,9 +811,10 @@ def _convert_local_area_units(t, field, colmap, area_ha, native_unit):
     if not target.any():
         return area_ha, 0, 0
 
+    region = pd.to_numeric(field[geo['region']], errors='coerce').astype('Int64')
     factors = local_area_unit_factors([t]).reset_index()
     probe = pd.DataFrame({
-        'region': pd.to_numeric(field[geo['region']], errors='coerce').astype('Int64'),
+        'region': region,
         'zone': pd.to_numeric(field[geo['zone']], errors='coerce').astype('Int64'),
         'woreda': pd.to_numeric(field[geo['woreda']], errors='coerce').astype('Int64'),
         'AreaUnit': native_unit.astype('string').values,
@@ -791,30 +829,37 @@ def _convert_local_area_units(t, field, colmap, area_ha, native_unit):
         'local area-unit merge fanned rows out -- the factor table is not '
         'unique on (region, zone, woreda, AreaUnit)')
     converted = merged['_est'] * merged['SqmPerUnit'] / 10000.0
-
-    gps_ha = pd.to_numeric(field[c['area_gps']], errors='coerce') / 10000.0
-    ceiling = gps_ha[gps_ha > 0].max()
-    bad = (converted > ceiling).fillna(False) if pd.notna(ceiling) \
-        else pd.Series(False, index=converted.index)
-    n_rejected = int(bad.sum())
-    ok = converted.notna() & ~bad
+    served = converted.notna()
 
     out = area_ha.copy()
-    pos = merged.loc[ok, '_pos'].to_numpy()
-    out.iloc[pos] = converted[ok].to_numpy()
-    n_converted = int(ok.sum())
+    pos = merged.loc[served, '_pos'].to_numpy()
+    out.iloc[pos] = converted[served].to_numpy()
+    n_converted = int(served.sum())
 
-    if n_rejected:
+    # The count, taken AFTER serving.  Nothing below changes `out`.
+    gps_ha = pd.to_numeric(field[c['area_gps']], errors='coerce') / 10000.0
+    gps_ha = gps_ha.where(gps_ha > 0)
+    ref = merged['region'].map(gps_ha.groupby(region).quantile(0.99))
+    flagged = (converted > PLOT_AREA_IMPLAUSIBLE_MULTIPLE * ref).fillna(False)
+    n_implausible = int((flagged & served).sum())
+
+    if n_implausible:
+        worst = (converted[flagged & served] / ref[flagged & served]).max()
         warnings.warn(
-            f"Ethiopia {t} plot_features: {n_rejected} of "
-            f"{int(converted.notna().sum())} local-unit area conversion(s) "
-            f"exceed the wave's largest GPS-measured field ({ceiling:.2f} ha) "
-            "and are REFUSED -- Area stays NaN for those fields.  Nothing was "
-            "clipped: a capped area is a number nobody reported.  Read this "
-            "as a work queue on the farmer-estimate column and the woreda "
-            "factor, not as a nuisance (GH #853).",
+            f"Ethiopia {t} plot_features: {n_implausible} of {n_converted} "
+            "local-unit area conversion(s) exceed "
+            f"{PLOT_AREA_IMPLAUSIBLE_MULTIPLE:g}x the 99th percentile of "
+            "GPS-measured field area in their own region (worst "
+            f"{worst:.1f}x).  NOTHING HAS BEEN CHANGED -- every one of them is "
+            "SERVED exactly as the survey's estimate times the World Bank's "
+            "factor, because refusing a row on the strength of a screen "
+            "deletes the survey's own answer.  Read this as a work queue on "
+            "the farmer-estimate column and the woreda factor (GH #853), and "
+            "note that converted areas run 2.4x-17.6x above the within-region "
+            "GPS median generally -- these are the tail of that, not a "
+            "separate defect.",
             UserWarning, stacklevel=3)
-    return out, n_converted, n_rejected
+    return out, n_converted, n_implausible
 
 
 def plot_features_for_wave(t, sect2, sect3, colmap):
@@ -948,7 +993,7 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
     # which makes `Area` non-null vs null the record of whether the woreda
     # table could serve the row.  'hectares' therefore continues to mean
     # exactly "this area came from the GPS measurement".
-    area_ha, _n_conv, _n_rej = _convert_local_area_units(
+    area_ha, _n_conv, _n_implausible = _convert_local_area_units(
         t, field, c, area_ha, native_unit)
 
     # Irrigated: 1=Yes, 2=No.
