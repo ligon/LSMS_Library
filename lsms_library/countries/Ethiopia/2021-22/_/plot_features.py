@@ -25,6 +25,9 @@ colmap = dict(
     field_id   = 'field_id',
     area_gps   = 's3q08',
     area_unit  = 's3q02b',
+    area_est   = 's3q02a',   # farmer-estimate area VALUE (GH #853;
+                             # W5 ships no WB woreda table -> no
+                             # conversion, and we do not borrow one)
     acquire    = 's2q05',
     soil_type  = 's2q16',
     irrigated  = 's3q17',
