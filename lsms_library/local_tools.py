@@ -178,20 +178,24 @@ def _s3_explicit_credentials() -> dict[str, str]:
 
 
 def _build_dvcfs() -> DVCFileSystem:
-    return DVCFileSystem(
-        os.fspath(_COUNTRIES_DIR),
-        config={
-            "remote": {
-                "ligonresearch_s3": {
-                    # Kept as the fallback for the case where the creds
-                    # file does not exist yet; see _s3_explicit_credentials.
-                    "credentialpath": str(_s3_creds_path()),
-                    **_s3_explicit_credentials(),
-                },
+    config: dict[str, Any] = {"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}}
+    # The remote override carries credentials but no ``url``; DVC validates
+    # each config level on its own, so the stanza is only legal when the
+    # countries root's ``.dvc/config`` supplies the url it completes.  A
+    # countries root with no ``.dvc/config`` (an ``LSMS_COUNTRIES_ROOT``
+    # pointing at a bare config tree, as the override tests construct) must
+    # get no remote stanza at all, or ``import lsms_library`` raises
+    # ``ConfigError: expected 'url'`` before anything runs.
+    if (_COUNTRIES_DIR / ".dvc" / "config").exists():
+        config["remote"] = {
+            "ligonresearch_s3": {
+                # Kept as the fallback for the case where the creds
+                # file does not exist yet; see _s3_explicit_credentials.
+                "credentialpath": str(_s3_creds_path()),
+                **_s3_explicit_credentials(),
             },
-            "cache": {"dir": os.fspath(_DVC_CACHE_DIR)},
-        },
-    )
+        }
+    return DVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
 
 
 DVCFS = _build_dvcfs()
