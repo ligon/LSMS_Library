@@ -944,11 +944,35 @@ def _normalize_columns(df):
 
     return df
 
+# Unit labels that STATE their own metric content, mapped to kilograms per
+# one such unit.  Matched against the lower-cased ``u`` label, exactly.
+#
+# THESE ARE READ, NEVER INFERRED.  A label in here never reaches the
+# price-ratio inference, so every spelling missing from this dict is a label
+# whose kilograms the library invents when the questionnaire already stated
+# them.  That is not hypothetical: before GH #850 the corpus's ``Millilitre``
+# rows were served at 0.743 kg in Malawi and 0.266 kg in GhanaLSS against a
+# true 0.001, ``Grams`` at 0.706 kg, and Mali's ``Gramme`` at 0.708 kg --
+# 708x -- because the plural, the French spelling and the ``milli`` prefix
+# were all absent (measured in ``slurm_logs/gh850_design/DESIGN.org``,
+# "Ground truth A").
+#
+# The plural / French / abbreviated spellings below were added in GH #850 and
+# are NOT a general licence to grow this dict by guessing: each one is a label
+# a country in the corpus actually mints.  A spelling nobody uses costs a line
+# here and buys nothing; a spelling somebody uses and is missing costs an
+# invented weight.
 KNOWN_METRIC = {
     'kg': 1, 'kilogram': 1, 'kilogramme': 1,
+    'kgs': 1, 'kilograms': 1, 'kilogrammes': 1, 'kilo': 1, 'kilos': 1,
     'g': 1/1000, 'gram': 1/1000, 'gramm': 1/1000,
-    'l': 1, 'litre': 1, 'liter': 1,
+    'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
+    'gm': 1/1000, 'gms': 1/1000,
+    'milligram': 1e-6,
+    'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
     'ml': 1/1000, 'cl': 1/100,
+    'millilitre': 1/1000, 'milliliter': 1/1000,
+    'millilitres': 1/1000, 'milliliters': 1/1000, 'mili liter': 1/1000,
     'pound': 0.453592, 'lbs': 0.453592,
 }
 
@@ -956,7 +980,15 @@ KNOWN_METRIC = {
 # ``1 litre = 1 kg`` assumption (specific-gravity-1 approximation).
 # Stripped from the factor map when ``volume_as_mass=False`` is requested
 # at the public API.
-_FLUID_UNITS = ('l', 'litre', 'liter', 'ml', 'cl')
+#
+# EVERY volume spelling added to ``KNOWN_METRIC`` must be added here too, or
+# ``volume_as_mass=False`` silently keeps asserting 1 L = 1 kg for the new
+# spelling while declining it for the old one.  ``tests/test_volume_as_mass_kwarg.py``
+# pins the correspondence.
+_FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
+                'ml', 'cl',
+                'millilitre', 'milliliter', 'millilitres', 'milliliters',
+                'mili liter')
 
 # Explicit-metric pattern triples: (regex, scale, is_volume).
 # ``regex`` matches the numeric prefix; ``scale`` converts to kg (or kg-
@@ -968,10 +1000,26 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'ml', 'cl')
 # specific (``l``).  Decimal numbers (``0.5 kg``) are accepted.  Word
 # boundaries on the unit token prevent ``20gallon`` from matching the
 # ``g`` pattern.
+#
+# THE WORD BOUNDARY IS WHERE THIS WENT WRONG (GH #850).  ``\b`` after a
+# literal ``kg`` or ``l`` does not merely permit the plural -- it FORBIDS it,
+# so every one of Uganda's own container labels spelled with the plural
+# declined to match and was sent to the price-ratio inference instead:
+#
+#   ``Sack (50 kgs)``       -> None, and served as 4.4 kg
+#   ``Tin (Debe) (20 lts)`` -> None, and served as 3.3 kg
+#   ``Cup/Mug(0.5lt)``      -> None, and served as 1.0 kg
+#
+# while ``Basket (10 kg)`` and ``Bottle(750ml)`` matched all along.  The
+# repair is to spell the plural / abbreviated tokens INSIDE the alternation
+# rather than to relax the boundary: ``\b`` is what stops ``20gallon``
+# matching the ``g`` pattern, and dropping it would trade one silent error
+# for another.  Longest alternative first within each group, so ``ltr`` is
+# preferred to ``lt`` and ``kilogramme`` to ``kg``.
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kg|kilogram|kilogramme)\b',
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:gram|gramme|grams|grammes|gr|g)\b',
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
@@ -979,7 +1027,7 @@ _EXPLICIT_METRIC_PATTERNS = (
                 re.IGNORECASE), 1/1000, True),
     (re.compile(r'(\d+(?:\.\d+)?)\s*cl\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|l)\b',
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
 
@@ -1009,6 +1057,22 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     True
     >>> _parse_explicit_metric('2 lbs sack')
     0.907184
+
+    The plural / abbreviated spellings Uganda's own container labels use
+    (GH #850); each of these returned ``None`` before that fix.
+
+    >>> _parse_explicit_metric('Sack (50 kgs)')
+    50.0
+    >>> _parse_explicit_metric('Tin (Debe) (20 lts)')
+    20.0
+    >>> _parse_explicit_metric('Cup/Mug(0.5lt)')
+    0.5
+    >>> _parse_explicit_metric('Jerrican (5 ltrs)')
+    5.0
+    >>> _parse_explicit_metric('Tin (Debe) (20 lts)', volume_as_mass=False) is None
+    True
+    >>> _parse_explicit_metric('20gallon drum') is None
+    True
     """
     if not isinstance(s, str):
         return None

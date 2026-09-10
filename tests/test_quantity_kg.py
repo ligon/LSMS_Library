@@ -96,10 +96,21 @@ def test_conversion_to_kgs_unchanged_without_quantity_kg():
 
 
 def test_malawi_food_quantities_kg_total_preserved():
-    """Malawi migration acceptance pin (GH #378): the kg total is preserved to
-    ~0.001% after moving Malawi off build-time conversion onto Quantity_kg.
-    Baseline 8.796e6 kg captured 2026-06-07 (pre-migration).  Skips when the
-    Malawi food data isn't available."""
+    """Malawi's kg total, re-pinned deliberately.
+
+    The original pin (8.796e6 kg, captured 2026-06-07) was the GH #378
+    migration acceptance test: the total must not move when Malawi came off
+    build-time conversion onto ``Quantity_kg``.  That property is not what
+    this number pins any more.
+
+    2026-09-09, GH #850 defect (c): 2.907e6.  Malawi mints 16,912 rows of
+    ``Millilitre`` and 1,217 of ``Grams``, neither spelling was in
+    ``KNOWN_METRIC``, and the price-ratio inference was serving them at 0.743
+    kg and 0.706 kg against a true 0.001.  Reading the label instead removes
+    ~5.9e6 fictitious kilograms.  The move is a REPAIR, and the size of it is
+    the argument for the repair.
+
+    Skips when the Malawi food data isn't available."""
     import warnings as _w
     import lsms_library as ll
     try:
@@ -110,4 +121,4 @@ def test_malawi_food_quantities_kg_total_preserved():
         import pytest
         pytest.skip('Malawi food data unavailable')
     total = float(fq.xs('kg', level='u')['Quantity'].sum())
-    assert abs(total - 8.7968e6) / 8.7968e6 < 0.005, f"kg total drifted: {total}"
+    assert abs(total - 2.9074e6) / 2.9074e6 < 0.005, f"kg total drifted: {total}"

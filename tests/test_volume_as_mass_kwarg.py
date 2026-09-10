@@ -28,13 +28,25 @@ from lsms_library.transformations import (
 # ----- KNOWN_METRIC backward-compat snapshot --------------------------------
 
 def test_known_metric_unchanged():
-    """Snapshot the pre-#231 factor table.  If a future PR adds entries,
-    update this snapshot consciously rather than as a silent side effect."""
+    """Snapshot the factor table.  If a future PR adds entries, update this
+    snapshot consciously rather than as a silent side effect.
+
+    Updated 2026-09-09 for GH #850: the eighteen plural / French / abbreviated
+    spellings below are labels the corpus actually mints and the library was
+    inferring a weight for.  ``Millilitre`` was served at 0.743 kg in Malawi,
+    ``Grams`` at 0.706, Mali's ``Gramme`` at 0.708 -- against a true 0.001.
+    """
     expected = {
         'kg': 1, 'kilogram': 1, 'kilogramme': 1,
+        'kgs': 1, 'kilograms': 1, 'kilogrammes': 1, 'kilo': 1, 'kilos': 1,
         'g': 1/1000, 'gram': 1/1000, 'gramm': 1/1000,
-        'l': 1, 'litre': 1, 'liter': 1,
+        'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
+        'gm': 1/1000, 'gms': 1/1000,
+        'milligram': 1e-6,
+        'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
         'ml': 1/1000, 'cl': 1/100,
+        'millilitre': 1/1000, 'milliliter': 1/1000,
+        'millilitres': 1/1000, 'milliliters': 1/1000, 'mili liter': 1/1000,
         'pound': 0.453592, 'lbs': 0.453592,
     }
     assert KNOWN_METRIC == expected
@@ -72,9 +84,51 @@ def test_parse_explicit_metric_matches_volume_when_enabled(label, expected):
 
 @pytest.mark.parametrize("label", [
     '1L Carton', '1 litre', '500 ml Bottle', '25 cl glass',
+    # GH #850: the ``lt`` family is VOLUME and must be gated with the rest.
+    'Tin (Debe) (20 lts)', 'Cup/Mug(0.5lt)', 'Jerrican (5 ltrs)',
+    'Bottle (1.5ltr)',
 ])
 def test_parse_explicit_metric_skips_volume_when_disabled(label):
     assert _parse_explicit_metric(label, volume_as_mass=False) is None
+
+
+# ----- GH #850: the spellings the word boundary used to forbid --------------
+
+@pytest.mark.parametrize("label, expected", [
+    # Uganda's own container labels, every one of which returned None before
+    # GH #850 and was served an INFERRED weight instead of its stated one.
+    ('Sack (50 kgs)',        50.0),
+    ('Sack (100 kgs)',      100.0),
+    ('Tin (Debe) (20 lts)',  20.0),
+    ('Cup/Mug(0.5lt)',        0.5),
+    ('Glass(0.25lt)',        0.25),
+    ('Jerrican (5 ltrs)',     5.0),
+    ('Bottle (1.5ltr)',       1.5),
+    ('Plastic Basin (15 lts)', 15.0),
+    ('500 gms packet',        0.5),
+])
+def test_parse_explicit_metric_plural_spellings(label, expected):
+    assert _parse_explicit_metric(label) == expected
+
+
+@pytest.mark.parametrize("label", [
+    # The word boundary is load-bearing and stays: widening the alternation
+    # must not let a non-metric token through.
+    '20gallon drum', '5 gourds', '3 litters', '2 kegs',
+])
+def test_parse_explicit_metric_still_refuses_non_metric(label):
+    assert _parse_explicit_metric(label) is None
+
+
+@pytest.mark.parametrize("label, expected", [
+    ('Millilitre', 1/1000), ('Milliliter', 1/1000), ('Mili Liter', 1/1000),
+    ('Grams', 1/1000), ('Gramme', 1/1000), ('Litres', 1.0), ('Liters', 1.0),
+    ('KGS', 1.0), ('Kilos', 1.0),
+])
+def test_bare_metric_spellings_are_seeded(label, expected):
+    """A label that IS a metric unit is read, never inferred (GH #850)."""
+    factors = _get_kg_factors(_df_with_us([label]))
+    assert factors[label.lower()] == expected
 
 
 @pytest.mark.parametrize("label", [
