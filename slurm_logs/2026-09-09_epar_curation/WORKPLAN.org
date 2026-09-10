@@ -217,11 +217,12 @@ and let =harvest_kg= consumers decide.
 =sa3iq6_conv= / =sa3iiq1_conv= / =sa3iiiq13_conv= per wave into the optional
 canonical column; =harvest_kg= already prefers it.  Nigeria re-warm.
 
-** WAITING Food-side kg inference: item axis and provenance (#850)
+** TODO Food-side kg inference: item axis and provenance (#850)
 :LOGBOOK:
 - State "WAITING" from "TODO" [2026-09-09] \\
-  Design doc merged (slurm_logs/gh850_design/DESIGN.org, a73437fd).  Blocked on
-  @ligon's D5 (baseline floor) and D7 (let the vocabulary fix reach harvest_kg).
+  Design doc merged (slurm_logs/gh850_design/DESIGN.org, a73437fd).  @ligon
+  ruled: D5 floor 5 with a dispersion-gated 3-4 exception; D7 let the
+  vocabulary fix reach harvest_kg in its own commit.  Implementation dispatched.
   Finding: NO re-warm needed -- transformations.py is outside every build
   fingerprint; cost is a regrade.
 :END:     :code:L2:L3:
@@ -236,7 +237,7 @@ provenance like =KgFactorSource=.  Measure the movement in
 re-warm and regrade.  Model: Opus with a design doc first; Opus red-team;
 @ligon signs off on the measured movement.
 
-** TODO Transforms: =livestock_income=, HDDS/FCS, small reductions   :code:L8:
+** DONE Transforms: =livestock_income=, HDDS/FCS, small reductions   :code:L8:
 :PROPERTIES:
 :Effort: 4:00
 :END:
@@ -245,7 +246,7 @@ hypothetical, not a transaction price; EPAR's construct needs sold and
 slaughtered head counts and a price ladder.  HDDS/FCS need our own
 food-group taxonomy over =harmonize_food=, not EPAR's =recode= ranges.
 
-** TODO Own-production valuation kwarg (#585)                       :code:L6:
+** DONE Own-production valuation kwarg (#585)                       :code:L6:
 :PROPERTIES:
 :Effort: 4:00
 :END:
