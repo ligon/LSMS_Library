@@ -1,0 +1,482 @@
+#+TITLE: Red team -- feat/863-transforms (61053864), Phase 2 EPAR-parity transforms
+#+DATE: 2026-09-09
+#+AUTHOR: red-team pass, read-only
+
+* Method and compliance
+
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-863-transforms=, branch
+=feat/863-transforms= at =61053864=.  Every invocation ran
+=PYTHONPATH=<worktree>= with =lsms_library.__file__= asserted inside the
+worktree (the =.pth= write/read trap, CLAUDE.md scrum-master addendum 3).
+All =Country= objects constructed =assume_cache_fresh=True=.
+
+*READ-ONLY honoured, and checked rather than asserted*: no edits, no commits,
+no =dvc=.  =find $(data_root) -newermt '-100 minutes' -type f= returns *0
+files* after every warm read in this pass.  Scratch artefacts (a baseline
+package tree symlinked to the worktree with =development='s
+=transformations.py= substituted, for the fingerprint probe) live only under
+the session scratchpad.
+
+GitNexus MCP did not connect (=CONNECTION_CLOSED=) and this mirror has no
+=.gitnexus/= index; per CLAUDE.md the declared substitutes were used --
+=git diff=/=rg=/=grep= for blast radius, hunk-range arithmetic for conflict
+analysis.  Declared, not skipped.
+
+* Summary of verdicts
+
+| # | item              | verdict                                             |
+|---+-------------------+-----------------------------------------------------|
+| 1 | =gross_crop_revenue= | *PASS* on the double-count attack; *CONCERN* on Malawi (under-count) |
+| 2 | =livestock_income=   | *PASS* on behaviour, *FAIL* on the NAME (rename)   |
+| 3 | =hdds= / =fcs=       | *PASS* (one undocumented asymmetry, minor)         |
+| 4 | =fertilizer_rate=    | *CONCERN* -- two silent-emptiness defects          |
+| 5 | =crop_diversity=     | *CONCERN* -- a docstring sentence is false         |
+| 6 | placement/conflicts  | *PASS*                                             |
+| 7 | tests / hygiene      | *PASS* (40/40 fingerprints unmoved)                |
+
+* 1. =gross_crop_revenue= -- PASS
+
+*The attack.*  If =Value_sold= were a household-crop total STAMPED onto every
+=(u, condition)= row, the plain =sum(min_count=1)= would double-count.
+
+*Ruling, from Uganda's own documentation.*  =Uganda/_/CONTENTS.org= §"Harvest
+condition on =crop_production= (GH #323 / #637)" (lines 950-996): question 6
+is compound -- /how much, in what unit, in what condition/ -- and "a household
+that took some of a crop off a plot fresh and the rest after drying it answers
+TWICE.  Both answers are separate source rows (2009-16) or separate parallel
+column slots (2018-20)."  The sale questions ride the SAME slot: CONTENTS.org
+line ~1198 enumerates slot 2's columns as =s5bq06a_2= / =s5bq06b_2= /
+=s5bq06c_2= / =s5bq06d_2= / *=s5bq07a_2= / =s5bq08_2=* -- i.e. each condition
+record carries its own quantity-sold and value-sold.  So =Value_sold= sits on
+the condition grain as a DISTINCT fact per row, not as a repeated total.
+Summing across =u=/=condition=/=season= is correct.
+
+*Measured warm (Uganda, =crop_production=, 130,606 rows, index unique):*
+
+| quantity                                                          |          value |
+|-------------------------------------------------------------------+----------------|
+| non-zero sale rows                                                 |         45,592 |
+| exact repeats within =(t,i,j)= on Quantity_sold AND Value_sold     |  895 (1.9%)    |
+| ... their summed value                                             |  198,824,150   |
+| groups at the finest key =(t,i,plot,j,season)=                      |         44,598 |
+| ... with >1 non-zero sale row                                       |            963 |
+| ... of those, ALL rows share ONE Value_sold (the stamping shape)    |         *37*   |
+| ... of those, rows DIFFER                                           |            926 |
+
+The implementer's 895/45,592 reproduces exactly.  The decisive number is the
+new one: at the finest key the stamping shape appears in *37 groups*, 926
+carry genuinely differing values.  Not a stamped total.
+
+=sum(Gross_crop_revenue) = 10,709,007,434.04=, byte-equal to
+=sum(Value_sold)= and to the figure CONTENTS.org:1220 pins.  =by='j'= sums
+back to the household total; on Malawi =by='j'= correctly returns a level
+named =crop=.  Never-zero-fill verified (an all-NaN household is absent).
+
+*Sharpening on the slot-2 citation.*  The =s5bq07a_2= / =s5bq08_2= columns
+prove the INSTRUMENT asks 7a/8 once per harvest record; CONTENTS.org also
+records that slot 2 is *not yet wired* (=CROP_COLMAPS= reads slot 1 only,
+"Still not wired: it ADDS ~1 435 rows").  So the wired 2018-20 waves carry
+one condition record per plot-crop-season; the multi-condition exposure is
+the 2009-16 LONG format.  The 37-vs-926 measurement is load-bearing either
+way, and it is measured over the wired data.
+
+** Sub-finding (CONCERN): on MALAWI the risk runs the OTHER way -- under-count
+
+Malawi's =data_scheme.yml= says the sale is a household-crop question
+"attached to single-plot crops only".  =gross_crop_revenue='s docstring cites
+that same sentence as "the shape that would produce" stamping -- *the wrong
+direction*.  Measured warm:
+
+| Malawi =(t,i,crop)= groups | count  | with any non-null Value_sold |
+|----------------------------+--------+------------------------------|
+| grown on ONE plot          | 87,440 | 23,206 (*26.5%*)             |
+| grown on MORE than one     | 19,311 |    514 (*2.7%*)              |
+
+A crop grown on two or more plots almost never carries a sale row at all, by
+instrument design.  So Malawi's =Gross_crop_revenue= is a *systematic lower
+bound*, not a double count, and the docstring says the opposite about the
+very sentence it quotes.  Fix the framing; it changes what a Malawi user
+should conclude from the number.
+
+*Carry-over caveat, not this branch's defect*: CONTENTS.org §"WAITING 2015-16
+=crop_production.Value_sold= was ~100x too small (#829)" -- fixed upstream,
+but anyone quoting a LEVEL from this transform should read that entry.
+
+* 2. =livestock_income= -- PASS on behaviour, FAIL on the name
+
+** Rename verdict: RENAME, and =livestock_sales_value= is the right name
+
+The implementer's self-criticism is correct and understated.  The function
+computes exactly one of EPAR's seven terms (=value_lvstck_sold=,
+=EPAR_UW_Malawi_IHS_W1.do:3345=), a GROSS SALES VALUE; EPAR's
+=livestock_income= (=:5959=) is a NET income over seven terms.  Six are not
+computable from our schema.  A name that promises "income" and delivers a
+gross flow is exactly the class of error the repo's own coverage doctrine
+(=sane= != =blessed=) exists to prevent.
+
+*Recommend =livestock_sales_value=.*  It already matches the output column
+=Livestock_sales_value=, so the call site and the column agree, and it is
+unambiguous about gross-vs-net.  The one alternative worth naming is
+=value_livestock_sold= (EPAR-literal, easiest to diff against their table);
+it is worse here because it breaks the repo's =noun_phrase= transform naming
+and does not match the column.  =livestock_sales_value= wins.
+
+** Behaviour checks (hand cases, all pass)
+
+- =price='sales_value'= *does NOT multiply by HeadSold*.  Hand frame with
+  =HeadSold=(2,0,nan,3)=, =SalesValue=(190,0,nan,400)= returns 190 / 0 / 400
+  verbatim.  No double.
+- =price='reported'= multiplies: =2 x 100 = 200=, =3 x 120 = 360=.
+- Supplied Series keyed =(t,animal)= joins per wave (Cattle 110 in t1 ->
+  220; 130 in t2 -> 390); keyed by =animal= alone broadcasts (222 / 333).
+  A Series with any other index raises naming the accepted shapes.
+- The gap check bites: a Series missing Cattle raises
+  ="2 row(s) with HeadSold > 0 have no supplied price; first missing keys
+  [('2011-12','Cattle'), ('2013-14','Cattle')]"=.
+- =ValuationSource= is set per row and is one of the three documented values;
+  warm Malawi returns 36,118 rows, all =reported_per_head=.
+- =HeadSold == 0= beside a real price is KEPT as a genuine 0; a NaN price or
+  NaN head is DROPPED.
+- GhanaSPS shape (=HerdValue= only): both =price='reported'= and
+  =price='sales_value'= raise, each naming which countries carry which
+  column.  Clear.
+
+** Per-country claims: verified against the sources, not taken on trust
+
+| claim in the docstring                                  | source checked                               | verdict |
+|---------------------------------------------------------+----------------------------------------------+---------|
+| =ValuePerAnimal= is TWO questions (reservation/realised) | =data_info.yml= =Columns: livestock=, ~:419-445 | true    |
+| Nigeria =s11iq3=, Malawi =ag_r04=, Uganda 09-10/10-11 =a6aq6= reservation | same block, verbatim        | true    |
+| Uganda 2011-12+ =a6aq14b=/=s6aq14b= realised, ~96%->~21% | same block, verbatim                         | true    |
+| Malawi =ag_r04= "if you sold one today"                  | =Malawi/_/data_scheme.yml= livestock comment | true    |
+| Ethiopia =ls_s8aq60= =SalesValue=, a FLOW valuing HeadSold | =Ethiopia/_/data_scheme.yml:190-212=       | true    |
+| Ethiopia + Mali are the SalesValue countries             | =grep '^    SalesValue:' countries/*= -> exactly those two | true |
+| 14 countries declare =HeadSold=                          | =grep -l '^    HeadSold:'= -> 14 files       | true    |
+| GhanaSPS: HerdValue only, HeadSold optional, both bases refused | =GhanaSPS/_/data_scheme.yml:405-470=  | true    |
+
+*The brief's =CONTENTS.org= ask, closed.*  =Malawi/_/CONTENTS.org= §livestock
+(~:336-344) states =ag_r04= verbatim -- "REPORTED per-head current value ...
+'if you sold one today, how much would you receive?'" -- confirming the
+RESERVATION reading.  (Note that file names the column =Value=, while
+=data_scheme.yml= declares =ValuePerAnimal=: a doc drift in CONTENTS.org, not
+a defect in this branch.)  =Uganda/_/CONTENTS.org= has *no* ValuePerAnimal
+entry (grep returns nothing); the Uganda claim rests on
+=Uganda/_/data_scheme.yml:286-296=, which states both variants and both
+question ids verbatim.  Both docstring claims hold.
+
+** Two CONCERNs (neither blocking)
+
+0. *Index order is inconsistent with the other five transforms.*  Warm Malawi
+   =livestock_income= returns =['i','t','animal']= -- it preserves the input
+   frame's order -- while =gross_crop_revenue= (and the rest, which build an
+   explicit =['t','i']= group list) return =['t','i',...]=.
+   =test_malawi_warm_livestock_income= does not assert index names, so
+   nothing pins it.  Cosmetic, but it will surprise anyone doing
+   =.reindex()= or =.join()= across two of these outputs.
+
+1. =head_col= is required on the =price='sales_value'= path even though it is
+   never used there.  Ethiopia and Mali both declare =HeadSold=, so nothing
+   breaks today -- but a future SalesValue-only country gets a =ValueError=
+   about a column the chosen basis does not need.
+2. GhanaSPS with an all-null =HeadSold= (it is =optional: true=) and a
+   supplied price returns an *empty* =(0,2)= frame with no signal.  The gap
+   check cannot fire because =head > 0= is never true.  Same family as the
+   =fertilizer_rate= emptiness below.
+
+* 3. =hdds= / =fcs= -- PASS
+
+** Constants
+
+=HDDS_GROUPS= (12) matches FAO 2011 Table 1 exactly, in order: Cereals;
+White roots and tubers; Vegetables; Fruits; Meat; Eggs; Fish and other
+seafood; Legumes, nuts and seeds; Milk and milk products; Oils and fats;
+Sweets; Spices, condiments and beverages.  *No deviation.*
+
+=FCS_WFP_WEIGHTS= (8) matches WFP VAM 2008: Main staples 2, Pulses 3,
+Vegetables 1, Fruit 1, Meat and fish 4, Milk 4, Sugar 0.5, Oil 0.5.  *No
+deviation.*  The ninth group (Condiments, weight 0) is deliberately omitted
+and the comment says how to add it -- correct, since a zero-weight group
+changes nothing but its absence would otherwise trip the symmetric key check.
+
+** Validation
+
+All five refusals fire, each naming names: an item in two groups (the EPAR
+704/1003 defect, quoted in the message); an unknown group key; a missing
+group key (with "pass an empty list" guidance); an unmapped =j= present in
+the frame; a bare string instead of a list.
+
+** What =hdds= counts -- STATED
+
+Groups with at least one row where =Quantity > 0= *OR* =Expenditure > 0=
+(=_consumed_mask=, an OR over whichever of the two columns exist).  Not
+"any row"; not quantity alone.
+
+** Hand case (3 households, verified)
+
+| HH | rows                                                  | HDDS | expected | FCS  | expected |
+|----+-------------------------------------------------------+------+----------+------+----------|
+| A  | Maize q10 d5; Beef q1 d2; Milk q0 e0 d0                |    2 | 2        | 18.0 | 2*5+4*2  |
+| B  | Maize q0 e300 d7; Rice q2 e200 d4 (same group)         |    1 | 1        | 14.0 | 2*min(11,7) |
+| C  | Milk q=NaN e=NaN d3                                    |    0 | 0        | 12.0 | 4*3      |
+
+A's Milk row (0 quantity, 0 expenditure) correctly does NOT count; B's
+expenditure-only row does; B's two staples cap at 7 group-days, not 11.
+
+=days== is keyword-only with *no default* (=fcs(food_acquired, *, groups,
+days, weights=None, cap=7)=) and the missing-column error names the reason
+(no country's =food_acquired= carries a days column; Tanzania
+=hh_sec_j3.hh_j08= is the unwired source).  Corroborated: =grep 'Days'= over
+the 40 =data_scheme.yml= finds it only under =food_coping=.
+
+** Docstring divergences -- both present and correct
+
+24-hour FAO recall vs. the LSMS 7-day window (so our HDDS is systematically
+higher and not comparable to a published FAO number), and acquisition vs.
+consumption (a pure purchase module makes the score a lower bound).  =fcs=
+points at =hdds='s note 2 for the second.  Both stated plainly.
+
+** One undocumented asymmetry (minor CONCERN)
+
+=hdds= gates on the acquisition mask; =fcs= ignores it entirely and scores on
+=days= alone.  Household C above therefore scores =HDDS 0= and =FCS 12= from
+the same rows.  Each is defensible on its own terms (an FCS *is* a frequency
+score) but the two functions are documented as siblings and the difference is
+not stated in either docstring.
+
+* 4. =fertilizer_rate= -- CONCERN (arithmetic right, two silent-emptiness defects)
+
+** Arithmetic and the Area edge cases -- correct, and the brief's expectation was wrong
+
+Hand case: three plots, 100 / 50 / 25 kg Urea, areas 2.0 ha / NaN / 0.0 ha.
+
+- =nutrient='product'= -> p1 = 100/2 = *50.0 kg/ha*.
+- =nutrient='N'= -> p1 = 100 x 0.46 / 2 = *23.0 kg N/ha*.
+- p2 (Area NaN) and p3 (Area 0) are *ABSENT* from the output -- not NaN, not
+  inf, not 0.  =pf = pf[pf['_Area'] > 0]= drops both before the merge (NaN
+  fails =>0=), and the docstring says so ("Plots with fertilizer but zero or
+  missing area are dropped").  The brief anticipated NaN; the implementation
+  drops.  Dropping is the house rule (never-zero-fill, and an infinite rate
+  is not a rate), so this is a *documentation-matches-behaviour PASS*, but
+  callers who expect a NaN placeholder will not get one.
+
+** Malawi key match -- reproduced
+
+=plot_inputs= carries 66,368 distinct =(t,i,plot)= keys; *66,298 match a
+=plot_features= row (99.9%)*.  The implementer's number is exact.
+
+** DEFECT A -- =fertilizer_rate(Malawi)= returns 331 rows, ALL EXACTLY 0.0
+
+Measured warm:
+
+#+begin_example
+fertilizer_rate(Malawi plot_inputs, plot_features)  ->  331 rows
+  Nitrogen_kg_per_ha:  mean 0.0  std 0.0  min 0.0  max 0.0
+nitrogen_kg(Malawi plot_inputs)                     ->  331 rows, 331 zeros, 0 positive
+#+end_example
+
+*Root cause* (pre-existing in =nitrogen_kg=, GAP 2, NOT introduced here).
+=nitrogen_kg= matches the =input= label by exact lower-cased equality against
+=_NITROGEN_CONTENT='s keys.  Malawi's canonical labels and their fate:
+
+| Malawi =input= label     |   rows | key in =_NITROGEN_CONTENT=? |
+|--------------------------+--------+-----------------------------|
+| NPK Fertilizer           | 26,775 | no (key is ='npk'=)         |
+| Urea Fertilizer          | 24,125 | no (key is ='urea'=)        |
+| Organic Fertilizer       | 11,075 | no                          |
+| CAN Fertilizer           |  2,037 | no (key is ='can'=)         |
+| D Compound Fertilizer    |    726 | no                          |
+| DAP Fertilizer           |    273 | no (key is ='dap'=)         |
+| *Other Fertilizer*       |    403 | *yes -- N share 0.0*        |
+
+So the ONLY label that resolves is the one whose nominal N content is zero.
+53,936 real fertilizer rows contribute nothing; 331 survive and are
+identically 0.  =nutrient='product'= is hit the same way (the override
+=({k: 1.0 for k in _NITROGEN_CONTENT})= reuses the same key set), so its
+"median 137 kg/ha" is a statistic over =Other Fertilizer= alone.
+
+*Why this is a red-team finding and not merely an inherited bug*: the branch
+ships =test_malawi_warm_fertilizer_rate=, which asserts =len(out) > 0=,
+=isfinite(...)= and =>= 0= -- *all three pass on a column of 331 zeros*.
+That is precisely the "right shape, no content" failure CLAUDE.md devotes a
+whole section to (=null_read_audit=, Site B).  The =_NITROGEN_CONTENT=
+comment also advertises the product vocabulary as covering "Tanzania /
+Ethiopia / Malawi / Nigeria", and =fertilizer_rate='s docstring repeats the
+product list -- both read as coverage claims that Malawi does not honour.
+
+*Recommend*: (a) warn (or refuse) when the numerator resolves to an
+identically-zero column, or when the share of fertilizer-labelled rows that
+match =_NITROGEN_CONTENT= falls below some floor; (b) strengthen the warm
+test to assert a positive value, not merely a finite one; (c) file the
+=_NITROGEN_CONTENT= key gap as its own issue (it is =nitrogen_kg='s, and it
+also silently affects the already-shipped =nitrogen_kg=).
+
+** DEFECT B -- =on='plot'= default returns an EMPTY frame on Uganda, silently
+
+#+begin_example
+fertilizer_rate(Uganda plot_inputs, plot_features)                 ->  (0, 1)   -- empty, no warning
+fertilizer_rate(Uganda plot_inputs, plot_features, on='parcel')    ->  (509, 1), median 2.47 kg N/ha
+#+end_example
+
+Uganda's ag-module plot key is ={hhid}-{parcel}-{plot}= while
+=plot_features.plot_id= is ={parcel}_{suffix}= -- exactly the divergence the
+docstring names as the reason =on='parcel'= exists.  But the DEFAULT is
+='plot'=, and the inner merge simply returns nothing.  Note that the sibling
+transform this one is modelled on, =yield_kg=, defaults to =on='parcel'=.
+The two defaults disagree, and the failure mode is a silent empty result on
+one of the corpus's two flagship ag countries.  There is no Uganda warm test
+for =fertilizer_rate= (the warm tests cover Malawi only), so nothing catches
+it.
+
+*Recommend*: raise (or warn) on an empty merge naming the two key
+vocabularies, and either default to ='parcel'= as =yield_kg= does or
+auto-select by measured match rate.
+
+* 5. =crop_diversity= -- CONCERN (behaviour right and pinned; one docstring sentence is false)
+
+** What counts as one crop -- MEASURED
+
+An "occurrence" is one distinct =(t, i, crop, <plot level>, season)= tuple:
+the =(u, condition)= rows are de-duplicated away, but *plots and seasons are
+NOT*.  Hand case -- one household, maize on p1 (season A, in two conditions),
+p1 season B, p2 season A, p2 season B; beans on p1 season A:
+
+| basis                                  | shares    |        H |
+|----------------------------------------+-----------+----------|
+| implementation (occurrences)           | 4/5, 1/5  | *0.50040* |
+| distinct crops per (t,i)               | 1/2, 1/2  |  0.69315 |
+
+The implementation returns *0.500402*, i.e. the occurrence basis.  This is
+documented in the Parameters block ("share of the household's crop
+OCCURRENCES ... =(plot, season)= in Uganda, =(plot,)= in Malawi") and pinned
+by =test_crop_diversity_count_separates_plots_and_seasons= and
+=test_crop_diversity_count_dedups_the_u_and_condition_rows=.
+
+** The false sentence
+
+The Notes say of EPAR: "It also takes the shares over plot-crop ROWS rather
+than over crops, so a crop on three plots contributes three terms.  *Neither
+choice is reproduced here*".  The second half of that is *not true*: a crop
+on three plots contributes three terms here too (three occurrences).  What
+IS de-duplicated is only =u=/=condition= *within* a land-season unit.  The
+Parameters block is right and the Notes sentence contradicts it; a reader who
+reads the Notes will believe the index is over distinct crops and will
+misread every number.  *Fix the sentence, not the code.*
+
+** Undocumented comparability caveat
+
+The occurrence key includes =season= where the country has that level
+(Uganda) and does not where it doesn't (Malawi).  A Uganda household growing
+an asymmetric crop mix across two seasons therefore gets a different H from
+an otherwise identical Malawi household.  The count basis is *not
+cross-country comparable*, and =Feature('crop_production')= users will not
+be told.
+
+** Everything else checks out
+
+- =weight='value'= uses =Value_sold= and covers sold crops only; the
+  docstring says so at length ("a household that sold one crop and ate three
+  scores H = 0 ... NOT its cropping diversity").  Hand case matches
+  (45/75, 30/75 -> 0.67301).
+- =weight='area'= raises =NotImplementedError= naming the missing column.
+- Sign: warm Uganda 16,555 households, H in [0, 2.6581]; warm Malawi 36,329,
+  H in [0, 2.6593]; *no negative values*.  A single-crop household scores
+  exactly =0.0= (the =h + 0.0= normalisation kills the =-0.0=).
+- The docstring states EPAR's =sdi= is un-negated and equals =-H=, with the
+  =.do= line references.  Correct.
+
+* 6. Placement and conflict analysis -- PASS
+
+=git diff development...HEAD -- lsms_library/transformations.py= is *exactly
+two hunks*:
+
+: @@ -5,6 +5,7 @@     +from collections.abc import Mapping
+: @@ -3048,6 +3049,947 @@ def nb_plots(plot_features):
+
+A raw =diff= of =development='s file against HEAD's confirms only =7a8= (the
+import) and =3048a3050,3990= (the block).  *Nothing else in the file moved.*
+The block sits after =nb_plots= (=:3021=) and before the "Phase 2 --
+METHODOLOGY transforms" banner (=:3993=), one contiguous region, with a
+placement note at its head explaining why the three METHODOLOGY functions sit
+above the banner.  As briefed.
+
+Live branches that touch =transformations.py= vs. =development=:
+
+| branch                            | hunk line ranges (theirs) | overlaps 3049-3990? |
+|-----------------------------------+---------------------------+---------------------|
+| =feat/585-own-production-valuation= | 75, 1144, 1170, 1184, 1192, 1222 | no          |
+| =feat/harvest-kg-shipped-factors=   | 1736 - 2495               | no                  |
+| =fix/770-currency-denominated-units= | 75 - 861                 | no                  |
+
+The only shared neighbourhood is the top-of-file import, and the nearest
+other hunk to line 8 starts at line 75 -- far outside a 3-line context.
+*No textual conflict with any of the three.*
+
+* 7. Tests and hygiene -- PASS
+
+- =pytest tests/test_863_transforms.py tests/test_rcsi.py
+  tests/test_crop_kg_factor.py= -> *101 passed, 1 skipped* (39.9 s).
+  The skip is =test_uganda_warm_crop_production_revenue_and_diversity=:
+  =Uganda/var/crop_production.parquet= is absent from =data_root()= here, so
+  the branch's headline Uganda evidence is NOT exercised by the suite in this
+  environment.  It was verified by hand instead (§1 above), and the totals
+  match =CONTENTS.org= to the cent.  *The gate is over-strict, not the data
+  absent*: =_warm= requires the L2-*country* parquet, but
+  =Country('Uganda').crop_production()= served 130,606 rows in seconds from
+  the L2-*wave* parquets with zero cache writes.  Do not file "Uganda not
+  warm" -- widen the gate.
+- *Pandas 3.0*: no =inplace==, no =fillna(method=)=, no =np.isnan=, no
+  =series[0]=, no =DataFrame.append= anywhere in the diff (the three
+  =.append(= hits are =list.append=).  Uses =sum(min_count=1)=,
+  =.clip(upper=)=, =pd.to_numeric(errors='coerce')= throughout.  Ran green
+  on pandas 3.0.2.
+- *ASCII / em dashes*: =0= non-ASCII characters added to
+  =lsms_library/transformations.py=; =0= em dashes, en dashes or smart quotes
+  in the new block (=-- = throughout, as the house style wants).  *One*
+  non-ASCII character in the whole diff outside the ledger =.md=: a =§= in a
+  test docstring ("see CLAUDE.md §\"Cache Behavior\"",
+  =tests/test_863_transforms.py=, the =_warm= helper).  Cosmetic; flag it if
+  the ASCII rule is strict.
+- *Fingerprint probe* (recipe from =.coder/ledger/harvest-kg-shipped-factors.md=,
+  with the corrected =_table_cache_hash(table, waves)= signature).  Baseline
+  = =development='s =transformations.py= substituted into an otherwise
+  identical package tree; both sides run with the SAME config tree and cache.
+
+  | probe                                                  | values | moved |
+  |--------------------------------------------------------+--------+-------|
+  | =build_transforms_fingerprint= x 10 tables              |     10 |     0 |
+  | =Country._table_cache_hash(t, waves)= x 5 countries x 6 |     30 |     0 |
+  | *total*                                                 | *40*   | *0*   |
+
+  Zero error strings among the 40 (the failure mode the shipped-factors
+  ledger warns about).  *No cache invalidation.*  Expected -- none of the six
+  functions carries a =@build_transform= tag and nothing on a build path
+  calls them -- but measured, not assumed.
+
+* Recommended actions before merge
+
+1. *Rename* =livestock_income= -> =livestock_sales_value= (see §2).  Update
+   the =tests/test_863_transforms.py= references and the ledger §6 entry.
+2. *Fix the false sentence* in =crop_diversity='s Notes (§5), and add the
+   cross-country comparability caveat about the =season= level.
+3. *=fertilizer_rate=*: warn or refuse on an empty merge (Uganda default) and
+   on an identically-zero numerator (Malawi); strengthen
+   =test_malawi_warm_fertilizer_rate= to assert a positive value; consider
+   aligning the =on== default with =yield_kg='s ='parcel'=.
+4. *File separately* (pre-existing, affects the already-shipped
+   =nitrogen_kg=): =_NITROGEN_CONTENT= keys do not match Malawi's canonical
+   =input= labels, so 53,936 fertilizer rows resolve to nothing.
+5. Optional: document the =hdds=/=fcs= inclusion-rule asymmetry; relax the
+   =head_col= requirement on the =price='sales_value'= path.
+
+*Ranking.*  *Blocking*: 3 (a default that silently returns an empty frame on
+a flagship country, while the sibling =yield_kg= defaults the other way, plus
+a warm test that passes on a column of zeros -- both change shipped
+behaviour), and 1 (the name is what the issue will be searched by, and it
+must land before anything depends on it).  *Should land with it*: 2 and the
+Malawi under-count framing in §1 -- one-line text fixes, but each currently
+tells the reader something false.  *Non-blocking*: 4 (pre-existing, its own
+issue) and 5.
+
+None of these is a correctness failure in the arithmetic; the text ones are
+failures of what the code TELLS a reader it is doing, which in this repo's
+doctrine is the same severity.
