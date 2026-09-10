@@ -81,6 +81,7 @@ nav:
       - Coverage: api/coverage.md
       - Visualizations: api/visualizations.md
   - Releases:
+      - v0.11.1: releases/v0.11.1.md
       - v0.11.0: releases/v0.11.0.md
       - v0.10.2: releases/v0.10.2.md
       - v0.10.1: releases/v0.10.1.md

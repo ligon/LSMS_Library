@@ -177,7 +177,7 @@ loaders, no registry (decision recorded in the ledger).  =shipped_matched=
 count + =ShippedFactorWarning= on a zero match; =u= required among keys.
 
 
-** TODO Ethiopia: WB conversion files into =harvest_kg= and plot areas   :code:L1:
+** DONE Ethiopia: WB conversion files into =harvest_kg= and plot areas   :code:L1:
 :PROPERTIES:
 :Effort: 6:00
 :END:
@@ -191,7 +191,7 @@ count + =ShippedFactorWarning= on a zero match; =u= required among keys.
 - Ethiopia re-warm; regrade Ethiopia cells.  Model: Opus, worktree;
   Opus red-team; prior-art ledger.
 
-** TODO Malawi: IHS5 crop-side conversion files                     :code:L1:L9:
+** WAITING Malawi: IHS5 crop-side conversion files                     :code:L1:L9:
 :PROPERTIES:
 :Effort: 5:00
 :END:
@@ -201,7 +201,12 @@ live or remove it.  Do NOT port EPAR's crop allowlist for the
 shelled/unshelled ratio; the ratio layer itself (L9) waits for Phase 3's
 =condition= decision on Malawi.
 
-** TODO Sold-unit conversion for Uganda and Nigeria (#824)          :code:L7:
+** TODO Sold-unit conversion for Uganda and Nigeria (#824)
+:LOGBOOK:
+- Note taken on [2026-09-10] \\
+  Uganda half merged 42e1c19e and re-warmed; disagreement is a flag, not an
+  identification (red-team).  Nigeria and Niger halves remain.
+:END:          :code:L7:
 :PROPERTIES:
 :Effort: 5:00
 :END:

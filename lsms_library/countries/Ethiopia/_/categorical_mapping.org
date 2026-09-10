@@ -174,12 +174,25 @@ non-cultivation sentinel, mapped to 'other'.
 ** harmonize_area_unit (WAVE-KEYED)
 
 The sect3 field-area unit (=pp_s3q02_c= W1-W3, =s3q02b= W4-W5).
-Only used to label rows where Area is NaN (i.e. the survey recorded
-a farmer estimate in a non-metric local unit but no GPS measurement,
-so we cannot convert to hectares -- local-unit->ha factors are not
-in the repo).  Where GPS sq-m IS present, AreaUnit is forced to
-'hectares' in code regardless of this table.  Code 7 means 'Other'
-in W1 but 'Tilm' in W2-W5, hence wave-keyed.
+Labels every row whose Area did NOT come from a GPS measurement --
+i.e. the survey recorded a farmer estimate in a non-metric local
+unit.  Where GPS sq-m IS present, AreaUnit is forced to 'hectares' in
+code regardless of this table.  Code 7 means 'Other' in W1 but 'Tilm'
+in W2-W5, hence wave-keyed.
+
+Corrected 2026-09-09.  This note used to say local-unit -> ha factors
+"are not in the repo"; that was wrong.  ET_local_area_unit_conversion.dta
+ships in four of five waves and is now wired (GH #853), so a row whose
+label is Timad / Boy / Senga / Kert may well carry a CONVERTED hectare
+Area -- the label is the ORIGINAL unit, per data_info.yml, not a
+statement that the row is unconvertible.
+
+NOTE FOR CALLERS: this table is WAVE-KEYED, so _harmonize_wave_keyed
+returns {(wave, code): label}.  Slice it to the wave before handing it
+to _map_int_codes, which maps a BARE code -- passing the tuple-keyed
+dict makes every lookup miss SILENTLY and leaves the column all-<NA>.
+That is exactly what plot_features_for_wave did until 2026-09-09; see
+Ethiopia/_/CONTENTS.org.
 
 #+name: harmonize_area_unit
 | Wave    | Code | Preferred Label |

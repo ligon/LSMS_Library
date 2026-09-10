@@ -1,0 +1,532 @@
+#+TITLE: Red team -- feat/824-uganda-sold-unit (66c1ff6a), Uganda half of GH #824
+#+DATE: 2026-09-10
+#+AUTHOR: red-team agent (read-only)
+
+* Scope and method
+
+Branch =feat/824-uganda-sold-unit= at =66c1ff6a=, worktree
+=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-824-uganda=.  READ-ONLY on the
+repo: no edit, no commit, no =dvc= CLI, no touch of the shared cache.
+
+Levers asserted on every invocation:
+
+#+begin_example
+PYTHONPATH=<worktree>
+LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries
+LSMS_DATA_DIR=<worktree>/.data
+python=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+
+lsms_library.__file__          -> <worktree>/lsms_library/__init__.py        OK
+lsms_library.paths.countries_root() -> <worktree>/lsms_library/countries     OK
+lsms_library.paths.data_root() -> <worktree>/.data                           OK
+pandas 3.0.2
+#+end_example
+
+=find lsms_library/countries -name '*.parquet'= in the worktree is EMPTY
+after both builds and the test run; =git status --short= is clean.  (The
+=*.dta= workspace copies under =Uganda/*/Data/= are pre-existing, gitignored,
+and the library refuses them with =UserWarning: Refusing workspace copy of
+DVC-tracked file= and falls through to the DVC cache -- not this branch's
+doing and not a leak.)
+
+*The "before" build.*  The repo is read-only, so =development= could not be
+checked out.  Instead the countries tree was symlink-copied
+(=cp -rs=) to scratch and the nine changed config files replaced with
+=git show development:<path>= output; that copy was used as
+=LSMS_COUNTRIES_ROOT= with a separate =LSMS_DATA_DIR= (its own =dvc-cache=
+symlink to the shared read-only L1).  Both builds are genuinely cold.
+Caveat: the "before" build used the BRANCH's =lsms_library/data_info.yml=
+(it lives in the package, not the config tree); the two new column
+declarations there are inert for a frame that has neither column.
+
+--------------------------------------------------------------------
+
+* VERDICT SUMMARY
+
+| # | item                                   | verdict          |
+|---+----------------------------------------+------------------|
+| 1 | column choice per wave and season      | *PASS*           |
+| 2 | canonicalisation / spellings           | *PASS* (1 note)  |
+| 3 | byte-identity of everything pre-existing | *PASS*         |
+| 4 | the 11-group collapse                  | *CONCERN*        |
+| 5 | the measurements + which unit to trust | *CONCERN* (headline) |
+| 6 | tests / pandas 3.0 / ASCII             | *PASS* (ASCII minor) |
+| 7 | reduce_to_agreed's cold-build-only warning | *CONCERN* (confirmed; file it) |
+| + | three shipped numbers do not reproduce | *CONCERN-minor*  |
+
+--------------------------------------------------------------------
+
+* Item 1 -- column choice per wave and season: *PASS*
+
+All 14 =(wave, season)= source files opened directly (=pyreadstat= metadata +
+=get_dataframe(convert_categoricals=False)=) and scored against
+=harvest_units= (46 codes) / =harvest_conditions= (20 codes).  Discriminators:
+35 UNIT-ONLY codes, 9 CONDITION-ONLY codes, 11 shared.
+
+| wave/file      | 7b in-cond / cond-only | 7c in-unit / unit-only / cond-only | branch's choice |
+|----------------+------------------------+------------------------------------+-----------------|
+| 2009-10 5A     | 98.0 / 56.8            | 97.9 / *69.2* / 0.2                | 7b=cond 7c=unit |
+| 2009-10 5B     | 98.3 / 58.8            | 97.9 / *65.3* / 0.2                | ditto           |
+| 2010-11 5A     | 98.4 / 56.1            | 99.0 / *78.3* / 0.0                | ditto           |
+| 2010-11 5B     | 98.8 / 55.2            | 98.4 / *70.1* / 0.2                | ditto           |
+| 2011-12 5A     | NO 7b COLUMN           | 99.9 / *79.5* / 0.0                | cond=None       |
+| 2011-12 5B     | NO 7b COLUMN           | 99.7 / *78.0* / 0.1                | cond=None       |
+| 2013-14 5A     | 100 / 62.5             | 97.4 / *76.1* / 2.5                | 7b=cond 7c=unit |
+| 2013-14 5B     | 100 / 64.8             | 100 / *80.5* / 0.0                 | ditto           |
+| 2015-16 5A     | 100 / 66.1             | 99.9 / *82.2* / 0.1                | ditto           |
+| 2015-16 5B     | 100 / 67.1             | 100 / *85.2* / 0.0                 | ditto           |
+| 2018-19 5A     | 100 / 60.6             | 100 / *84.8* / 0.0                 | ditto           |
+| 2018-19 5B     | 100 / 58.4             | 100 / *87.0* / 0.0                 | ditto           |
+| 2019-20 5A     | 100 / 53.1             | 100 / *84.3* / 0.0                 | ditto           |
+| 2019-20 5B     | 100 / 55.7             | 100 / *84.6* / 0.0                 | ditto           |
+
+Every figure reproduces the ledger's / CONTENTS.org's table *to the decimal*.
+7b is the condition and 7c the unit in every wave and season; no cell is
+ambiguous.
+
+** 2013-14: both statements verified separately
+
+- HARVEST pair IS swapped.  =a5aq6b= is TITLED "Unit of quantity for the
+  crop harvested" but scores 100% in-condition / 53.5% condition-only ->
+  it is the CONDITION.  =a5aq6c= is TITLED "A5AQ6C: Condition/state of the
+  harvested crop" but scores 100% in-unit / 73.8% unit-only -> it is the
+  UNIT.  The colmap writes =unit: 'a5aq6c', condition: 'a5aq6b'= -- i.e. it
+  follows the VALUES, correctly.
+- SOLD pair is NOT swapped.  =a5aq7b= "Condition/state of the harvested
+  crop" is 100% in-condition / 62.5% condition-only; =a5aq7c= "unit of
+  quantity" is 97.4% in-unit / 76.1% unit-only.  Labels and values agree.
+
+  Sub-finding: the 2.5% condition-only share on 2013-14 =a5aq7c= is *81 rows*
+  where 7c simply REPEATS the 7b condition value (45->45 x64, 42->42 x7,
+  35->35 x6, ...).  It is NOT a row-level 7b/7c swap -- on those rows
+  =a5aq7b= is a condition-only code in 80 of 81 cases and a unit-only code
+  in ZERO.  The branch maps them to NA (not in the unit map), which is
+  right; they are an enumerator keying error, not recoverable data.
+
+** 2018-19 season A: reproduced exactly
+
+=s5aq07c_1=, label ='7c. Unit'=, value-label set of 40 entries, n=2 734,
+19 distinct, range 1-92, *84.8% unit-only, 0.0% condition-only*.  Its sibling
+=s5aq07b_1= (='7b.Condition / state'=) is 100% in-condition / 60.6%
+condition-only / 0.0% unit-only.  The harvest side of that file has no unit
+column at all (=s5aq06b_1= ABSENT; =a5aq6b= is 100% in-condition), which is
+#842.  The EPAR condition-as-unit trap does not recur here.
+
+** 2010-11 season A cap: reproduced exactly, and NOT documented upstream
+
+=a5aq7c= n=2 115, 18 distinct, max 20.0, against 3 662 for the same file's
+7b and 3 266 / 52 distinct / range 0-500 for 2010-11 5B.  Among the 3 657
+rows with a positive sold quantity:
+
+: P(sold-unit null | harvest code >= 21) = 0.973   (n = 1 540)
+: P(sold-unit null | harvest code <  21) = 0.026   (n = 2 117)
+
+Codes present on the harvest side but never on the sold side, by frequency:
+22 Plastic Basin (15 lts) x524, 68 Bunch (Medium) x444, 69 x188, 67 x158.
+Exactly the ledger's claim.
+
+*Documented reason: NONE FOUND.*  =UNPS_2010-11_Agriculture_Questionnaire.pdf=
+prints the full "7a Qty | 7b Condition-state code | 7c Unit code" block with
+the standard unit-code list and no cap; =UNPS_2010-11_Basic-Info-2014.pdf=
+(the BID, 69 414 chars extracted) contains no mention of topcoding,
+truncation or recoding of that variable.  The branch's framing (a shipped
+extract defect, worth reporting upstream) is therefore correct and evidenced.
+
+** 2011-12: no 7b column, and the instrument asks it -- C4 satisfied
+
+Confirmed absent from BOTH =AGSEC5A.dta= and =AGSEC5B.dta= (the sale block
+ships =a5?q7a=, =a5?q7c=, =A5?Q7D= only).  Text extracted from
+=Uganda2011-12AgricultureQuestionnaire.pdf= page 13 (5A) and page 21 (5B)
+both contain the header run ='Qty  Condition/' ... '7a' '7b' '7c'=.  So
+=asked-not-distributed= is the right verdict, and =condition_sold: None= with
+that reason written at the site is the right encoding.
+
+** 2019-20 slot 2 and the _11 / _21 slots -- and one gap the branch names but #647 does not
+
+Measured non-null counts and Stata labels:
+
+| column        | n     | label                                                      |
+|---------------+-------+------------------------------------------------------------|
+| s5aq06b_2     | 1 380 | 6b. Unit of harvest (2018, *full* harvest, condition2)     |
+| s5aq07c_2     |   572 | 7c. Unit of crop sold (2018, *full* harvest, condition2)   |
+| s5aq06a_11    |    97 | 6a. Qty of harvest (2018, *PART* harvest, condition1)      |
+| s5aq07c_11    |    24 | 7c. Unit of crop sold (2018, *PART* harvest, condition1)   |
+| s5aq06a_21    |     3 | 6a. Qty of harvest (2018, *PART* harvest, condition2)      |
+| s5aq07c_21    |     0 | 7c. Unit of crop sold (2018, *PART* harvest, condition2)   |
+
+- Slot =_2= is a full-harvest SECOND-CONDITION slot, it is *wired* on both
+  sides (the colmap's second =conditions= dict), and =s5aq07c_2= is
+  sold-side.  Correct.
+- =_11= / =_21= are the PART-HARVEST repeat page and carry BOTH sides
+  (06a/06b harvest and 07a/07b/07c sold).  The branch reads neither side, so
+  the two stay consistent -- which is the right call, and it is exactly the
+  scope of *GH #647* (still OPEN; #647 asks for a documented decision, not
+  for the columns).  Cross-reference is correct.
+- *NEW, and not covered by #647*: =2018-19 AGSEC5B= has a =_2= slot that is a
+  FULL-harvest condition-2 slot (=s5bq06a_2= n=1 436, =s5bq06b_2= n=1 432,
+  =s5bq07a_2= n=1 435, =s5bq07b_2= n=577, =s5bq07c_2= n=574) and the colmap
+  reads NEITHER side.  So 2019-20 season A wires its condition-2 slot while
+  2018-19 season B silently drops 1 436 harvest records.  The branch's
+  =uganda.py= comment names the sold half of this ("2018-19 AGSEC5B's =_2=
+  sold slot (574-577 non-null)"), which is honest, but #647's body
+  explicitly says "Not checked: whether =agsec5b.dta= has the same
+  part-harvest slots, and whether other UNPS waves do".  *This is 14x larger
+  than #647's 100 rows and belongs in #647 or its own issue.*  Pre-existing,
+  not introduced here.
+
+--------------------------------------------------------------------
+
+* Item 2 -- canonicalisation: *PASS*, with one note
+
+Measured on the built table:
+
+| check                                                     | result |
+|-----------------------------------------------------------+--------|
+| =Unit_sold= values not in the =harvest_units= map          | *0*    |
+| =Unit_sold= values never seen on =u=                       | *0*    |
+| =Condition_sold= values not in the =harvest_conditions= map| *0*    |
+| =Condition_sold= values never seen on =condition=          | *0*    |
+| =Condition_sold= values outside its declared =spellings=   | *0*    |
+| =data_info.yml=: =condition.spellings is Condition_sold.spellings= | *True* (same Python object -- a real YAML anchor/alias, 21 tokens, cannot drift) |
+| dtypes                                                     | =string= / =string= |
+
+Code path: both go through the *same* =unit_map= / =condition_map= objects
+that =u= and =condition= use, in the same function, on the same row.  No new
+vocabulary is introduced anywhere; =Unit_sold= correctly declares no
+=spellings= block (neither does =u= -- =u='s sentinel note lives in the
+=Columns= preamble).  =tests/test_declared_spellings.py= passes.
+
+*Sentinel: deliberately NOT the same as =u=.*  An unmapped code becomes *NA*,
+not ='Unknown'=.  The task asked whether this is consistent; the answer is
+that it is a deliberate, documented asymmetry, and the reasoning holds --
+=data_info.yml='s "must put =Unknown=, NOT a null" rule is explicitly scoped
+to DECLARED INDEX LEVELS (a null index key is deleted by
+=groupby(dropna=True)=), and these two are ordinary columns with no such
+hazard.
+
+Note (not a defect): the NA therefore conflates "no sold unit recorded" with
+"a code was recorded but it is outside the 46-code scheme".  Measured, that
+second class is *282 rows, 0.62% of the 45 275 sale rows* (worst: 2013-14 A
+83, 2009-10 A 69, 2010-11 B 51).  =u= conflates the same two cases in the
+other direction (both become ='Unknown'=), so neither column distinguishes
+them; nobody can currently tell the two apart on either.  Worth a sentence in
+CONTENTS.org, not a change.
+
+--------------------------------------------------------------------
+
+* Item 3 -- byte-identity of everything pre-existing: *PASS*
+
+Two independent cold builds, isolated =LSMS_DATA_DIR= each, compared row by
+row:
+
+#+begin_example
+shapes                    after (130606, 8)   before (130606, 6)
+index names               ['i','t','v','plot','j','u','condition','season']  identical
+index.equals(other)       True
+row ORDER identical       True
+
+column          dtype           Series.equals   sum(after)          sum(before)
+Quantity        Float64         True            7,309,085.96        7,309,085.96
+Quantity_sold   Float64         True            18,134,251.40       18,134,251.40
+Value_sold      Float64         True            10,709,007,434.04   10,709,007,434.04
+harvest_month   Int64           True            556,025             556,025
+intercropped    boolean         True            30,629              30,629
+KgFactor        Float64         True            958,552.32          958,552.32
+#+end_example
+
+All four ledger totals reproduce to the cent.  =u=='Unknown'= counts per
+=(t, season)= are elementwise identical (2009-10 A 1879 / B 706; 2010-11
+69/61; 2011-12 391/320; 2013-14 8/375; 2018-19 A 7153; 2019-20 141/133), as
+are the =condition= value counts.  Nothing pre-existing moved.
+
+=tests/test_crop_kg_factor.py= (the Uganda =KgFactor= baseline) passes
+unmoved -- see item 6.
+
+--------------------------------------------------------------------
+
+* Item 4 -- the 11-group collapse: *CONCERN* (blanking is the least-bad LOCAL answer; a level IS missing)
+
+Reproduced exactly: *11 conflicted groups of 130 606* -- 2009-10 6
+=Unit_sold=; 2011-12 1 =Unit_sold=; 2013-14 2 =Unit_sold= + 1
+=Condition_sold=; 2015-16 1 =Condition_sold=.  Scale context, measured on the
+pre-collapse frames: *433 groups already carry more than one source row* (445
+rows collapsed away); 422 of them AGREE on both labels and 11 do not.
+
+The 11 groups, with the pre-collapse payload (abridged):
+
+| group (t, i, plot, j, u, condition, season)                      | row 1                           | row 2 |
+|------------------------------------------------------------------+---------------------------------+-------|
+| 2009-10 1083003309 -1-2 Pawpaw Sack(100) fresh B                 | Q 24, sold NA, Sack (unspec.)   | Q 24, sold 23 @1 380 000, Sack(100) |
+| 2009-10 2033000804 -1-1 Maize Sack(100) dried_grain B            | Q 4.5, sold NA, Kg              | Q 4.5, sold 4.5 @135 000, Sack(100) |
+| 2009-10 3033003303 -2-1 Sweet Bananas Bunch(Big) fresh B         | Q 10, sold 8 @16 000, Bunch(Med)| Q 8, sold 8 @40 000, Bunch(Big) |
+| 2009-10 4113000903 -2-1 Matoke Bunch(Small) fresh B              | Q 82, sold 42 @90 000, Bunch(Med)| Q 24, sold 24 @24 000, Bunch(Small) |
+| 2009-10 4153000403 -2-1 Maize Sack(100) dried_grain B            | Q 6, sold NA, Kg                | Q 6, sold 5 @100 000, Sack(100) |
+| 2009-10 4173001707 -1-1 Matoke Bunch(Small) fresh A              | Q 50, sold 12 @6 000, Bunch(Med)| Q 24, sold 24 @24 000, Bunch(Small) |
+| 2011-12 1053000802 -1-3 Sweet Bananas Bunch(Small) fresh A       | Q 140, sold 120 @120 000, Bunch(Med), month 6 | Q 150, sold 120 @300 000, Bunch(Small), month 6 |
+| 2013-14 H25209-04-01 -1-2 Sweet Potatoes Sack(100) fresh A       | Q 1.5, sold 1.5 @144 000, Sack(100), *month 6* | Q 4, sold 2 @80 000, Tin(Debe), *month 9* |
+| 2013-14 H42603-04-01 -3-4 Banana Beer Bunch(Small) fresh A       | Q 25, sold 25 @50 000, Piece(Small) | Q 22, sold 22 @44 000, Bunch(Small) |
+| 2013-14 H06105-04-01 -1-2 Cassava Sack(100) dried A              | Q 35, sold 18 @810 000, cond_sold *fresh*, *month 6* | Q 6, sold 6 @120 000, cond_sold *dried*, *month 5* |
+| 2015-16 H3600301 -1-1 Maize PlasticBasin fresh-green A           | Q 3, sold 2 @144, cond_sold *dried_grain* | Q 1, sold 0.5 @25, cond_sold *green_with_shell* |
+
+*Verdict.*  These are NOT duplicate copies of one record and they are NOT one
+crop sold twice off one harvest line.  Each pair carries a *different*
+=Quantity=, a *different* =Quantity_sold=, a *different* =Value_sold=, and in
+three cases a *different* =harvest_month= (6 vs 9, 6 vs 5).  They are two
+genuinely distinct harvest+sale records that happen to share
+=(t, i, plot, j, u, condition, season)=.  By the CLAUDE.md rule, *a level is
+missing* -- a within-(plot, crop, unit, condition) record ordinal -- and the
+right long-run fix is that level, not a reducer.
+
+But that is a *PRE-EXISTING* defect, not one this branch creates: on
+=development= the same 433 groups already have their =Quantity= and
+=Quantity_sold= SUMMED and their =harvest_month= silently =first()=-ed
+(H25209 already reports month 6 for a pair whose second record says 9).  The
+branch changes none of that; it adds a label column and refuses to stamp a
+label on a sum taken across two different units.  Given that the collapse
+happens anyway, =reduce_to_agreed(on_conflict='na')= is the correct local
+choice -- =first()= would have asserted "Sack (100 kgs)" over a
+=Quantity_sold= of 3.5 that is 1.5 sacks plus 2 debes.
+
+So: *blanking is right, and it is not the fix.*  The branch should say so;
+the =uganda.py= comment does ("Such a group is a PRE-EXISTING defect in the
+summed =Quantity_sold= that this column makes visible for the first time"),
+which is accurate and to its credit.  What is missing is a filed follow-up
+for the missing level -- 433 groups is the real number, not 11.
+
+--------------------------------------------------------------------
+
+* Item 5 -- the measurements, and *which unit to trust*: *CONCERN* (headline)
+
+** Reproduction
+
+| quantity                                  | ledger / shipped config | reproduced |
+|-------------------------------------------+-------------------------+------------|
+| =Unit_sold= non-null, share of sale rows  | 93.9%                   | *93.9%* OK |
+| coverage by wave-season (13 of 14 cells)  | see CONTENTS.org        | *exact* OK |
+| coverage 2009-10 season A                 | 95.1%                   | *96.8%* -- does NOT reproduce |
+| =Unit_sold == u= share                    | 96.0%                   | *96.06%* OK |
+| ...on how many rows                       | 40 183                  | *40 083* -- does NOT reproduce |
+| largest disagreement cell size            | 169 rows                | *162* (sale rows: 163) -- does NOT reproduce |
+| 43 distinct sold units, top-10 shares     | Kg 27.8 / Sack(100) 25.1 / ... | *exact* OK |
+| priced rows / NA Unit_sold / u Unknown    | 45 519 / 2 734 / 3 297  | *exact* OK |
+| affected priced rows                      | 1 571                   | *1 571* OK |
+| 2018-19 A: u Unknown 7 153, Unit_sold 2 734 | yes                   | *exact* OK |
+| magnitude: n / median / p90 / >=100x      | 1 057 / 4.0x / 100 / 26.7% | see below |
+
+The three misses were re-checked on the pre-=_finalize_result= L2-wave
+parquets (=.data/Uganda/{wave}/_/crop_production.parquet=) in case the ledger
+measured before the null-plot row deletion: *identical there* (40 083 /
+96.06% / 162 / 96.8%).  They are simply unreproduced.  The discrepancies are
+small (0.25% on the row count, 1.7pp on one coverage cell) and do NOT change
+any conclusion, but *two of them are shipped as prose in
+=lsms_library/data_info.yml= ("the 40,183 sale rows that know both") and in
+=Uganda/_/data_scheme.yml= ("4.0% of the 40 183 sale rows ... 169 rows")*, so
+they are canonical-schema claims that a reader cannot reproduce.  No test
+pins them (=tests/test_uganda_sold_unit.py= mentions 40 183 only in its
+module docstring).  *Fix the numbers or drop them.*
+
+The magnitude figures are reproducible only under a *litres-as-weight*
+reading of the label text:
+
+| nominal-weight parser                       | n     | median | p75 | p90 | max     | >=2x  | >=100x |
+|---------------------------------------------+-------+--------+-----+-----+---------+-------+--------|
+| kg-bearing labels only (Kg, Sack (N kgs), Gram, Tonne) | 564   | *50x*  | 100 | 120 | 100 000 | 70.6% | 47.5%  |
+| + treat "(15 lts)" / "(20 lts)" as weights   | 1 064 | *6.0x* | 100 | 100 | 100 000 | 73.3% | 26.8%  |
+
+The ledger's "1 057 / median 4.0 / 26.7% >= 100x" is the second family
+(n 1 064 vs 1 057, >=100x 26.8% vs 26.7%; the median 6.0 vs 4.0 still does not
+land).  The kg-only reading is the more defensible one -- 15 litres of maize
+is not 15 kilograms -- and it makes the error LARGER, not smaller.  Either
+way the qualitative claim stands.
+
+** The plausibility test the task asked for -- and it goes the OTHER way
+
+*Largest cell: =u = 'Sack (100 kgs)'= with =Unit_sold = 'Kg'=, 162 priced rows.*
+=Value_sold / Quantity_sold= on those rows:
+
+: count 162   10% 500   25% 1,000   median 34,167   75% 83,750   90% 159,000   max 1,000,000
+
+Benchmarks from rows where the two labels AGREE, same crops:
+
+| crop        | this cell's median | both labels =Kg= | both labels =Sack (100 kgs)= |
+|-------------+--------------------+------------------+------------------------------|
+| Beans       |             80 000 |            1 000 |                      100 000 |
+| Maize       |             35 000 |              500 |                       50 000 |
+| Coffee      |             24 388 |            1 116 |                      100 000 |
+| Ground Nuts |             53 571 |            1 667 |                       70 000 |
+| Rice        |            150 000 |            1 700 |                      112 500 |
+
+*The sale on the median row of that cell is priced like a SACK, not like a
+kilogram.*  A consumer who follows the shipped rule ("a price per ONE
+=Unit_sold= -- NEVER per =u=") would read 34 167 UShs/kg for maize whose real
+farmgate price is ~500 UShs/kg -- a ~70x error, in the OPPOSITE direction from
+the one the branch is fixing.  The cell is bimodal: its p10/p25 (500 / 1 000)
+do look genuinely per-kg, so roughly a quarter to a third of it is real.
+
+*Generalised, two independent ways, over ALL disagreeing rows:*
+
+1. /Price test./  For each disagreeing priced row, is =Value_sold/Quantity_sold=
+   closer (in log) to the =(crop, u)= or the =(crop, Unit_sold)= median
+   unit-value, benchmarks built from AGREEING rows with n>=20?  931 rows
+   testable of 1 571:
+
+   : closer to Unit_sold's benchmark : 414 (44.5%)
+   : closer to u's        benchmark : 517 (*55.5%*)
+
+   Bias caveat: the benchmarks are built from AGREEING rows, and the
+   disagreeing rows could be a selected subset.  Test 2 below does not share
+   that weakness, and the two land within 0.4 percentage points of each
+   other -- which is why the result is trustworthy.
+
+2. /Reported-kg-factor test, wholly independent of price./  =a5?q7d= is the
+   household's OWN "conversion factor into KG of quantity/unit SOLD", shipped
+   2011-12 onward -- 13 742 rows with both labels and a positive factor.  On
+   agreeing rows it behaves perfectly (median 100.0 for Sack (100 kgs), 120.0
+   for Sack (120 kgs), 50.0 for Sack (50 kgs), 20.0 for Tin (Debe) (20 lts),
+   15.0 for Plastic Basin (15 lts)) -- so it is a good instrument.  On the 453
+   testable disagreeing rows:
+
+   : closer to Unit_sold : 200 (44.2%)
+   : closer to u         : 253 (*55.8%*)
+
+   Cell detail: =u=Sack(100)= vs =Unit_sold=Tin (Debe) (20 lts)= (n=61):
+   median reported factor *100.0* -- only 16.4% closer to the Unit_sold
+   reading.  =u=Sack(120)= vs =Tin (Debe)= (n=15): median *120.0*, 6.7%.
+   Counter-examples exist in the other direction (=Sack(100)= vs =Sack(50)=,
+   n=14, 85.7% favour =Unit_sold=; =Plastic Basin= vs =Tin (Debe)=, n=13,
+   76.9%), which is the point: it is genuinely mixed.
+
+   Caveat stated: =q7d= could be an enumerator copy of the harvest factor
+   =q6d= and so not fully independent of =u=.  The price test does not share
+   that weakness, and the two agree to within 0.4 percentage points.
+
+** What this means, precisely
+
+- The *column* is correct and the *wiring* is correct.  =Unit_sold= is the
+  survey's reported answer to "in what unit was it sold", it is read from the
+  right variable in every wave, and carrying it is strictly more information
+  than not carrying it.  On the *96.1% of rows where the two labels agree*
+  nothing changes and everything is fine.
+- The *consumer rule as written is not supported by the data.*
+  =data_info.yml= says, in capitals, "=Value_sold / Quantity_sold= is a price
+  per ONE =Unit_sold= -- NEVER per =u=", and =data_scheme.yml= repeats it.
+  On the 3.9% of rows where the two disagree -- exactly the rows the rule
+  exists to govern -- =Unit_sold= is the better denominator *less than half
+  the time* (44.2-44.5%, by two independent measures).
+- The honest rule is: *agreement -> either label is fine; disagreement -> the
+  ROW is suspect and neither label should be used to form a price without
+  further evidence* (the reported =q7d=, where it exists, is that evidence).
+  The disagreement is a data-quality FLAG, not an identification of which
+  unit is right.
+
+*This does not block merge* -- the code is right, the column is right, and
+the branch's own CONTENTS.org already resists the "aggregate medians barely
+move" complacency.  But the =data_info.yml= note and the =data_scheme.yml=
+comment instruct a behaviour measured to be wrong on the majority of the rows
+they govern, and canonical-schema prose is the worst place for that.  Soften
+before or immediately after merge.
+
+--------------------------------------------------------------------
+
+* Item 6 -- tests, pandas 3.0, ASCII: *PASS* (ASCII minor)
+
+#+begin_example
+tests/test_uganda_sold_unit.py tests/test_uganda_crop_condition.py
+tests/test_uganda_99999.py tests/test_crop_kg_factor.py
+tests/test_schema_consistency.py tests/test_declared_spellings.py
+-> 359 passed, 61 warnings in 36.31s
+#+end_example
+
+(Warnings are all pre-existing corpus signals -- Malawi =cluster_features=
+=GrainCollapseWarning=, Malawi/Uganda =NullReadWarning=, Uganda
+=QuantityImplausibleWarning=.  None is new.)
+
+- *pandas 3.0*: no =inplace=True=, no =np.nan=, no =fillna(method=...)=, no
+  =np.isnan=, no =is_categorical_dtype= in any ADDED line.  The new code uses
+  =pd.NA=, =.astype('string')=, =df.groupby(level=...)=, all 3.0-clean.
+  (=_to_int_code= does call the deprecated =pd.api.types.is_categorical_dtype=,
+  but that line is pre-existing and untouched.)
+- *ASCII*: added lines are pure ASCII in all seven wave scripts, both YAML
+  files, CONTENTS.org and the test file.  *6 added lines in =uganda.py= carry
+  U+2014 em-dashes*, all inside the =crop_production_for_wave= docstring,
+  matching ~66 pre-existing non-ASCII lines in that same file.  Consistent
+  with the file, inconsistent with a strict ASCII rule.  The ledger
+  (=.coder/ledger/824-uganda-sold-unit.md=, 54 non-ASCII lines) is a markdown
+  doc.  Minor.
+
+--------------------------------------------------------------------
+
+* Item 7 -- =reduce_to_agreed='s warning is cold-build-only: *CONCERN* (confirmed; deserves an issue)
+
+Read =lsms_library/build_transforms.py::reduce_to_agreed= (and
+=collapse_to_cluster_grain=) against
+=lsms_library/country.py::_audit_index_collapse= / =_record_grain_report= /
+=grain_reports=.
+
+- On conflict, =reduce_to_agreed= does exactly one thing: =warnings.warn(...,
+  GrainConflictWarning, stacklevel=2)= then =reduced.mask(conflicts)=.  It
+  calls *no* =_record_grain_report=; =build_transforms.py= does not import
+  anything from =country.py='s grain machinery (grep: zero hits).
+- Site 1 / Site 2 stamp their audit into the parquet as
+  =lsms_grain_audit= schema metadata and REPLAY it on the warm read.
+  =reduce_to_agreed= has no such stamp.  Verified on disk:
+
+  : .data/Uganda/{wave}/_/crop_production.parquet -> lsms_* metadata: {}   (x7)
+  : .data/Uganda/var/crop_production.parquet      -> {'lsms_cache_hash': 'c1859109...'}   (no lsms_grain_audit)
+
+- End-to-end confirmation on the now-warm cache:
+
+  : warm read rows 130606, GrainConflict/GrainCollapse warnings: *0*
+  : country.grain_reports(country='Uganda', table='crop_production'): *0*
+
+So the 11 conflicted groups are announced once, on the cold build, and are
+invisible forever after -- the exact GH #323 lesson ("the bug hid behind the
+cache the bug poisoned") in a site that #323 did not cover.  It is a property
+of =reduce_to_agreed=, so it equally affects every =collapse_to_cluster_grain=
+call site (Uganda's own =cluster_features= hook at =uganda.py:226=, and every
+other country that adopted it).
+
+*Yes, it deserves its own issue*: "reduce_to_agreed / collapse_to_cluster_grain
+file no grain report and stamp no parquet metadata, so their conflict warning
+does not survive the cache (GH #323 Site 1/2 do)".  The fix has a template --
+route them through =_record_grain_report= and the =lsms_grain_audit= stamp.
+Related, and worth putting in the issue: under =LSMS_GRAIN_STRICT=1= these 11
+groups make the Uganda =crop_production= build FATAL, which is correct
+behaviour and is currently untested (no test builds Uganda =crop_production=
+with the lever set).
+
+--------------------------------------------------------------------
+
+* Recommendations, in priority order
+
+1. *Soften the consumer rule* in =lsms_library/data_info.yml= =Unit_sold.note=
+   and in =Uganda/_/data_scheme.yml=: where =Unit_sold != u= the row is
+   suspect and neither label is a trustworthy denominator (measured: 44.2%
+   and 44.5% by two independent tests).  Keep the column, keep the
+   "=u= is not the sale's unit" point, drop "NEVER per =u=".  (Item 5)
+2. *Fix or drop the three unreproducible numbers* now shipped in
+   =data_info.yml=, =data_scheme.yml= and =CONTENTS.org*: 40 183 -> 40 083,
+   169 -> 162, 2009-10 A 95.1% -> 96.8%.  State which nominal-weight reading
+   the magnitude figures use.  (Item 5)
+3. *File the =reduce_to_agreed= cache-survival issue.*  (Item 7)
+4. *File / fold into #647* the 2018-19 AGSEC5B =_2= slot: 1 436 unread
+   harvest records and 1 435 unread sale records, 14x #647's part-harvest
+   rows, and asymmetric with 2019-20 season A which DOES wire its
+   condition-2 slot.  (Item 1)
+5. *File the missing-level follow-up* for =crop_production='s 433 duplicated
+   groups (445 rows summed across genuinely distinct records, with
+   =harvest_month= silently =first()=-ed).  Pre-existing; #824 only made 11
+   of them visible.  (Item 4)
+6. Optional: record in CONTENTS.org that 282 sale rows (0.62%) carry a
+   sold-unit code that is outside the 46-code scheme and become NA,
+   indistinguishable from "no code recorded".  (Item 2)
+
+* Provenance
+
+All measurement scripts and raw logs:
+=/tmp/claude-43292/-global-scratch-fsa-fc-jevons-ligon-mirrors-LSMS-Library/a07c02b3-6e60-467e-9dd3-2ac9f9ebfcf8/scratchpad/rt/=
+(=headers.py=, =cmp.py=, =conflicts2.py=, =meas.py=, =decide.py=, =q7d.py=,
+=misc.py=, =unmapped.py=, =swap.py=, =final.py=, =warm.py=, =bid.py=;
+=before.pkl= / =after.pkl= / =prefull.pkl=; =build_before.log=,
+=build_after.log=, =pytest.log=).  Session-scoped -- copy out anything that
+needs to persist.

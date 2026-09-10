@@ -11,6 +11,11 @@ See uganda.CROP_COLMAPS for the per-wave column map.
 
 GH #829: this wave ships `a5aq8` / `a5bq8` divided by 100; they are
 multiplied back to shillings below.  See the block above the build call.
+
+The SOLD unit (a5?q7c) and SOLD condition (a5?q7b) are carried as
+Unit_sold / Condition_sold (GH #824): Value_sold / Quantity_sold is a price
+per Unit_sold, never per u.  (Value_sold itself carries this wave's x100
+fix, #829.)
 """
 import sys
 sys.path.append('../../_/')

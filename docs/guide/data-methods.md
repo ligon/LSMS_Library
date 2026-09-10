@@ -33,6 +33,7 @@ methods that do accept it, rather than being silently ignored.
 | `currency=` | monetary tables | attach the ISO 4217 code as `'index'` or `'column'` |
 | `numeraire=` | monetary tables | convert monetary columns to a common numeraire |
 | `basis=` | `food_expenditures` | `'purchased'` or `'total'` |
+| `valuation=` | `food_expenditures` (with `basis='total'`) | value produced / in-kind rows: `'own_price'`, `'median_price'`, or a tuple applied in order; off by default |
 | `age_cuts=` | `household_characteristics` | age-bracket boundaries |
 
 `currency=` and `numeraire=` are mutually exclusive. Available numeraires come
@@ -122,7 +123,7 @@ numeraire : str, optional
 
 ## `food_expenditures()`
 
-Documents: basis.
+Documents: basis, valuation.
 
 ```
 Return food_expenditures as a DataFrame, aggregated across *waves*.
