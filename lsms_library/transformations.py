@@ -2844,6 +2844,53 @@ def total_hired_labor_days(plot_labor):
 #   Urea 46% N; CAN (calcium ammonium nitrate) 26%; SA / sulphate of ammonia
 #   21%; DAP (di-ammonium phosphate) 18%; NPK 17-17-17 ≈ 17%; TSP/SSP/MOP
 #   carry no nitrogen.
+class NutrientCoverageWarning(UserWarning):
+    """A fertilizer input label resolved to NO nitrogen share.
+
+    :func:`nitrogen_kg` keys its nutrient share off the ``plot_inputs.input``
+    label, and a label the map does not recognise contributes NOTHING to the
+    total -- silently, and with the right shape: the frame comes back
+    non-empty, finite and non-negative, so every naive assertion passes.
+    That is the "right shape, no content" failure CLAUDE.md devotes a section
+    to (``null_read_audit``), and it happened: before the label
+    normalisation landed, Malawi's four canonical fertilizer labels (``NPK
+    Fertilizer``, ``Urea Fertilizer``, ``CAN Fertilizer``, ``DAP
+    Fertilizer`` -- 53,210 rows) matched none of the map's keys, the ONLY
+    label that did match was ``Other Fertilizer`` at a nominal share of 0.0,
+    and ``nitrogen_kg(Malawi)`` returned 331 rows of exactly 0.0.
+
+    Fires for an unmatched label that *names itself* a fertilizer input --
+    the corpus's own vocabulary, :data:`_FERTILIZER_LABEL_HINTS`
+    (fertilizer / fertiliser / manure / compost, plus the Portuguese
+    ``adubo`` and French ``engrais``) -- and NOT for ``Seed`` / ``Pesticide``
+    / ``Herbicide``, which are correctly outside a nitrogen map and are the
+    bulk of the rows (Malawi ``Seed`` alone is 112,296).  A warning nobody
+    reads is how the original defect survived, so the firehose form is
+    deliberately not used.  Escalates to a louder message when the whole
+    returned column is empty or identically zero.
+
+    The full per-label tally always rides on
+    ``result.attrs['nitrogen_input_match']`` whether or not this warns --
+    that is the coverage check, and it is the twin of
+    ``attrs['kg_factor_sources']['shipped_matched']`` in
+    :func:`harvest_kg_factors`: a JOIN diagnostic, so "did my labels key
+    correctly?" has an answer that does not depend on a warning firing.
+    """
+
+
+class PlotGrainMismatchWarning(UserWarning):
+    """Two plot-level features share no land key, so the join produced nothing.
+
+    The corpus runs two plot vocabularies (see :data:`_PLOT_LEVELS` and
+    :func:`_parcel_from_crop_plot`), and a transform that joins across them
+    on the wrong grain returns an EMPTY frame rather than an error.
+    Measured: ``fertilizer_rate(Uganda, on='plot')`` returned ``(0, 1)``
+    silently, because the ag modules key plots ``{hhid}-{parcel}-{plot}``
+    while ``plot_features`` keys them ``{parcel}_{suffix}``; the same call
+    with ``on='parcel'`` returns 509 rows.
+    """
+
+
 _NITROGEN_CONTENT = {
     # nutrient-class vocabulary (Uganda)
     'nitrate fertilizer': 0.46,
@@ -2862,6 +2909,114 @@ _NITROGEN_CONTENT = {
     'mop': 0.0,
     'other fertilizer': 0.0,
 }
+
+
+# Word stems that mark an input label as a FERTILIZER in the corpus's own
+# vocabularies -- English (``NPK Fertilizer``, ``Organic Fertilizer``,
+# ``Manure``, ``Compost``), Portuguese (Guinea-Bissau's ``Adubos organicos``
+# / ``Adubos inorganicos - ureia``) and French.  Used ONLY to decide whether
+# an unmatched label is worth warning about; it never affects a nutrient
+# share, so a stem missing from this tuple costs a warning, never a number.
+_FERTILIZER_LABEL_HINTS = ('fertilizer', 'fertiliser', 'manure', 'compost',
+                           'adubo', 'engrais')
+
+
+def _normalise_input_label(label):
+    """Candidate lookup keys for a ``plot_inputs.input`` label, best first.
+
+    ``_NITROGEN_CONTENT`` mixes two naming conventions -- bare product names
+    (``urea``, ``npk``, ``dap``) and class names that carry the word
+    (``phosphate fertilizer``, ``other fertilizer``) -- because the countries
+    do.  Malawi writes ``Urea Fertilizer`` where Benin writes ``Urea``, and
+    Senegal writes ``Phosphate`` where the map's key is ``phosphate
+    fertilizer``.  Matching on exact lower-cased equality alone therefore
+    misses in BOTH directions, and the failure is silent (an unmatched label
+    contributes 0 to a nitrogen total).
+
+    So three candidates are tried in order: the normalised label itself,
+    then with a trailing ``' fertilizer'`` / ``' fertiliser'`` REMOVED, then
+    with ``' fertilizer'`` ADDED.  Exactness is preserved -- no substring or
+    fuzzy matching -- so ``Organic Fertilizer`` still resolves to nothing
+    (``organic`` is not a key, and asserting a nominal N share for manure
+    would be inventing a number), and ``D Compound Fertilizer`` and
+    Ethiopia's ``NPS`` likewise stay unmatched and get named in the warning.
+
+    Measured over the 11 warm ``plot_inputs`` tables (2026-09-09): the strip
+    rule is what Malawi needs (53,210 rows across NPK / Urea / CAN / DAP
+    Fertilizer, previously all unmatched); the add rule recovers the bare
+    ``Phosphate`` label in six EHCVM countries (349 rows, nominal share 0.0,
+    so it moves no number -- it moves them out of the unmatched tally, which
+    is what makes the tally readable).
+    """
+    base = ' '.join(str(label).lower().split())
+    out = [base]
+    for suffix in (' fertilizer', ' fertiliser'):
+        if base.endswith(suffix):
+            out.append(base[:-len(suffix)])
+    if not base.endswith(' fertilizer'):
+        out.append(base + ' fertilizer')
+    return out
+
+
+def _nitrogen_shares(labels, content):
+    """Map input labels to nutrient shares, and tally what did not match.
+
+    Returns ``(share_series, tally)``.  ``tally`` mirrors
+    ``harvest_kg_factors``'s ``shipped_matched``: a JOIN diagnostic, taken
+    before anything else can hide it.
+    """
+    resolved = {}
+    for label in pd.unique(pd.Series(labels).astype(str)):
+        for key in _normalise_input_label(label):
+            if key in content:
+                resolved[label] = float(content[key])
+                break
+    share = pd.Series(labels).astype(str).map(resolved).astype(float)
+    counts = pd.Series(labels).astype(str).value_counts()
+    unmatched = {str(k): int(v) for k, v in counts.items()
+                 if str(k) not in resolved}
+    tally = {
+        'matched_rows': int(sum(v for k, v in counts.items()
+                                if str(k) in resolved)),
+        'unmatched_rows': int(sum(unmatched.values())),
+        'matched_labels': sorted(resolved),
+        'unmatched_labels': dict(sorted(unmatched.items(),
+                                        key=lambda kv: -kv[1])),
+    }
+    return share, tally
+
+
+def _warn_nitrogen_coverage(tally, total_mass, n_rows):
+    """Emit :class:`NutrientCoverageWarning` where coverage failed."""
+    suspicious = {k: v for k, v in tally['unmatched_labels'].items()
+                  if any(h in k.lower() for h in _FERTILIZER_LABEL_HINTS)}
+    zero_mass = (n_rows == 0) or not (total_mass > 0)
+    if not suspicious and not zero_mass:
+        return
+    named = ', '.join(f"{k!r} ({v:,} rows)" for k, v in
+                      list(suspicious.items())[:8]) or 'none'
+    if zero_mass:
+        warnings.warn(
+            "nitrogen_kg resolved a nitrogen share for "
+            f"{tally['matched_rows']:,} row(s) but the result is "
+            f"{'empty' if n_rows == 0 else 'identically zero'} -- every "
+            "fertilizer label either went unmatched or carries a nominal "
+            f"share of 0. Unmatched fertilizer-shaped labels: {named}. "
+            "This has the right SHAPE and no content: len() > 0, finite and "
+            ">= 0 all pass on a column of zeros. Check "
+            "attrs['nitrogen_input_match'] and pass nitrogen_content= with "
+            "this country's own labels.",
+            NutrientCoverageWarning, stacklevel=3)
+    else:
+        warnings.warn(
+            f"nitrogen_kg: fertilizer-shaped input label(s) resolved to NO "
+            f"nitrogen share and contribute nothing to the total: {named}. "
+            "That may be correct (organic manure and compost carry no "
+            "nominal share in _NITROGEN_CONTENT, deliberately -- asserting "
+            "one would invent a number) but it is not visible in the "
+            "returned frame. Full tally on "
+            "attrs['nitrogen_input_match'].",
+            NutrientCoverageWarning, stacklevel=3)
 
 
 def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
@@ -2888,10 +3043,30 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     pd.DataFrame
         One ``Nitrogen_kg`` column indexed by ``(t, i, plot)``.  Plots with
         fertilizer input but no convertible-unit row sum to 0; plots with no
-        fertilizer at all are absent.
+        fertilizer at all are absent.  ``attrs['nitrogen_input_match']``
+        carries the label-join tally -- ``matched_rows`` /
+        ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
+        (label -> row count, descending).
 
     Notes
     -----
+    **Label matching is normalised, and what it cannot resolve is LOUD**
+    (2026-09-09).  The share is keyed off the ``input`` label through
+    :func:`_normalise_input_label`, which tries the normalised label, then
+    the label with a trailing ``' fertilizer'`` removed, then with one
+    added -- because the corpus writes the same product three ways
+    (``Urea`` in Benin, ``Urea Fertilizer`` in Malawi, ``Phosphate`` where
+    the key is ``phosphate fertilizer``).  Exact-equality matching alone
+    silently zeroed **53,210 Malawi rows** (``NPK`` / ``Urea`` / ``CAN`` /
+    ``DAP Fertilizer``), leaving ``Other Fertilizer`` at a nominal 0.0 as
+    the only match and returning 331 plots of exactly ``0.0`` -- a frame
+    that is non-empty, finite and non-negative, so nothing caught it.
+    A label that still resolves to nothing and *names itself* a fertilizer
+    input now raises :class:`NutrientCoverageWarning`; the full tally rides
+    on ``attrs`` either way.  Matching stays EXACT after normalisation: no
+    substring or fuzzy match, so ``Organic Fertilizer``, ``D Compound
+    Fertilizer`` and Ethiopia's ``NPS`` stay unmatched and get named rather
+    than being assigned an invented nominal share.
     Divergence from WB: the WB code keys N-share off the *product* a survey
     records (urea 0.46, DAP 0.18, NPK 0.17, …).  The UNPS questionnaire (and
     therefore our ``plot_inputs.input``) records only nutrient *class*, so we
@@ -2908,12 +3083,17 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
 
     # ``input`` is an index level in the canonical grain.
     if 'input' in (df.index.names or []):
-        inp = df.index.get_level_values('input').astype(str).str.lower()
+        inp = df.index.get_level_values('input').astype(str)
     elif 'input' in df.columns:
-        inp = df['input'].astype(str).str.lower()
+        inp = df['input'].astype(str)
     else:
         raise ValueError("plot_inputs must have an 'input' level or column")
-    n_share = pd.Series(inp, index=df.index).map(content).astype(float)
+    # Labels are passed through VERBATIM (not pre-lowered) so the tally and
+    # the warning name them as the country writes them; the normalisation
+    # lives in _normalise_input_label, where the three candidate spellings
+    # are documented together.
+    n_share, _match_tally = _nitrogen_shares(inp, content)
+    n_share.index = df.index
 
     # Resolve a kg quantity.  Uganda keeps the unit in a *column* ``u``; the
     # shared factor machinery wants ``u`` in the index, so temporarily
@@ -2940,6 +3120,12 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     res = out.groupby(group_by).sum()
     if plot_level == 'plot_id':
         res.index = res.index.rename({'plot_id': 'plot'})
+    # A JOIN diagnostic, always present, taken before any reduction can hide
+    # it -- the twin of harvest_kg_factors' `shipped_matched`.
+    res.attrs['nitrogen_input_match'] = _match_tally
+    _warn_nitrogen_coverage(_match_tally,
+                            float(res['Nitrogen_kg'].sum()) if len(res) else 0.0,
+                            len(res))
     return res
 
 
@@ -3449,7 +3635,7 @@ def nb_plots(plot_features):
 # ---------------------------------------------------------------------------
 # GH #863 -- the remaining EPAR-parity transforms (WORKPLAN.org Phase 2).
 #
-# PLACEMENT NOTE: three of the six below (``livestock_income``, ``hdds``,
+# PLACEMENT NOTE: three of the six below (``livestock_sales_value``, ``hdds``,
 # ``fcs``) are METHODOLOGY transforms and by classification belong under the
 # "Phase 2 -- METHODOLOGY transforms" banner further down.  They sit here, in
 # one contiguous block, purely for concurrent-edit hygiene (the harvest_kg
@@ -3526,18 +3712,31 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
     function deliberately reports only what the instrument wrote down.
 
     **No de-duplication, by design (count, never clip).**  Where a country
-    attaches a household-crop sale total to more than one physical row, a
-    plain sum double-counts it.  Measured on the warm corpus, 2026-09-09:
-    Uganda has 895 of 45,592 non-zero sale rows that are exact repeats of an
-    earlier row within ``(t, i, crop)`` on BOTH ``Quantity_sold`` and
-    ``Value_sold`` (1.9% of summed value); Malawi has 14 of 18,285.  Those
-    are not obviously stamping -- two plots of one crop sold in equal
-    quantity for equal money is a perfectly ordinary fact -- so nothing is
-    dropped here.  An analyst who suspects stamping in a particular country
-    should audit that country's sale module rather than have this function
-    silently choose for them.  Malawi's own ``data_scheme.yml`` documents
-    the shape that would produce it: its sale is a HOUSEHOLD-crop question
-    "attached to single-plot crops only".
+    attached a household-crop sale total to more than one physical row, a
+    plain sum would double-count it.  It does not: measured on the warm
+    corpus (2026-09-09), at Uganda's finest key ``(t, i, plot, j, season)``
+    only 963 of 44,598 groups hold more than one non-zero sale row, and in
+    just **37** of those do all rows share ONE ``Value_sold`` -- the
+    stamping shape.  926 carry genuinely differing values, which is what
+    the instrument implies: UNPS question 6 is compound (how much, in what
+    unit, in what condition) and the sale questions ride the SAME record, so
+    each condition row carries its own quantity-sold and value-sold
+    (``Uganda/_/CONTENTS.org`` §"Harvest condition", and the slot-2 column
+    list ``s5bq07a_2`` / ``s5bq08_2``).  Summing across ``u`` / ``condition``
+    / ``season`` is therefore correct, and 895 exact ``(t, i, crop)``
+    repeats out of 45,592 rows (1.9% of value) are ordinary coincidence --
+    two plots of one crop sold in equal quantity for equal money.
+
+    **On Malawi the risk runs the OTHER way: this is a systematic LOWER
+    BOUND, not a double count.**  Its sale is a HOUSEHOLD-crop question that
+    ``data_scheme.yml`` records as "attached to single-plot crops only", and
+    the consequence is measurable: of 87,440 ``(t, i, crop)`` groups grown
+    on ONE plot, 23,206 (**26.5%**) carry a sale row, against 514 of 19,311
+    (**2.7%**) for crops grown on more than one plot.  A crop spread over
+    two or more plots is almost never credited with a sale at all, by
+    instrument design -- so Malawi's ``Gross_crop_revenue`` UNDER-states
+    sales, and the shortfall is concentrated in exactly the households
+    farming the most land.  Do not read a Malawi total as complete.
 
     A household present in ``crop_production`` that reported no sale at all
     is ABSENT from the output, never 0 -- ``sum(min_count=1)``, the same
@@ -3574,11 +3773,18 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
                .sort_index())
 
 
-def livestock_income(livestock, *, price='reported',
+def livestock_sales_value(livestock, *, price='reported',
                      price_col='ValuePerAnimal',
-                     sales_value_col='SalesValue',
-                     head_col='HeadSold'):
-    """Value of livestock SOLD ALIVE (one term of EPAR ``livestock_income``).
+                      sales_value_col='SalesValue',
+                      head_col='HeadSold'):
+    """Value of livestock SOLD ALIVE (one term of EPAR's ``livestock_income``).
+
+    **Named for what it returns, not for EPAR's construct.**  EPAR's
+    ``livestock_income`` is a NET income over seven terms; this is the
+    single ``value_lvstck_sold`` term, a GROSS SALES VALUE, and the function
+    name matches its output column ``Livestock_sales_value`` so the call
+    site and the column cannot drift apart.  See the Notes for the six terms
+    that are missing and why none of them is computable here.
 
     METHODOLOGY transform.  ``HeadSold x price`` per ``(t, i, animal)``,
     where the price basis is chosen EXPLICITLY by the caller -- because the
@@ -3699,8 +3905,9 @@ def livestock_income(livestock, *, price='reported',
     df = livestock
     if head_col not in df.columns:
         raise ValueError(
-            f"livestock must have a {head_col!r} column -- livestock_income "
-            "values head SOLD, and a roster without it carries no sale flow "
+            f"livestock must have a {head_col!r} column -- "
+            "livestock_sales_value values head SOLD, and a roster without "
+            "it carries no sale flow "
             "at all. Fourteen countries declare HeadSold (grep "
             "'^    HeadSold:' over countries/*/_/data_scheme.yml for the "
             "current list); on GhanaSPS it is declared `optional: true`, so "
@@ -3721,7 +3928,9 @@ def livestock_income(livestock, *, price='reported',
         wave = (pd.Series(df.index.get_level_values('t'), index=df.index)
                 if 't' in names else None)
         pnames = list(price.index.names or [])
-        if wave is not None and len(pnames) == 2 and set(pnames) == {'t', 'animal'}:
+        keyed_by_wave = (wave is not None and len(pnames) == 2
+                         and set(pnames) == {'t', 'animal'})
+        if keyed_by_wave:
             key = pd.MultiIndex.from_arrays(
                 [wave.to_numpy(), animal.to_numpy()], names=['t', 'animal'])
             lookup = price.reorder_levels(['t', 'animal'])
@@ -3730,7 +3939,7 @@ def livestock_income(livestock, *, price='reported',
             unit = animal.map(price).astype(float)
         else:
             raise ValueError(
-                "livestock_income price= Series must be indexed by "
+                "livestock_sales_value price= Series must be indexed by "
                 f"('t', 'animal') or by 'animal' alone, got {pnames!r}")
         unit = pd.to_numeric(unit, errors='coerce')
         # Symmetric with rcsi's unrecognised-label check: a sale we cannot
@@ -3741,7 +3950,7 @@ def livestock_income(livestock, *, price='reported',
                 zip(wave[gaps] if wave is not None else ['?'] * int(gaps.sum()),
                     animal[gaps])))[:10]
             raise ValueError(
-                f"livestock_income: {int(gaps.sum())} row(s) with "
+                f"livestock_sales_value: {int(gaps.sum())} row(s) with "
                 f"{head_col} > 0 have no supplied price; first missing keys "
                 f"{missing}. Supply a price for every (t, animal) that sold, "
                 "or filter the frame first -- a partial valuation would "
@@ -3769,12 +3978,23 @@ def livestock_income(livestock, *, price='reported',
         value = head * unit
     else:
         raise ValueError(
-            "livestock_income price= must be 'reported', 'sales_value', or a "
-            f"pd.Series of per-animal prices, got {price!r}")
+            "livestock_sales_value price= must be 'reported', "
+            f"'sales_value', or a pd.Series of per-animal prices, got "
+            f"{price!r}")
 
     out = pd.DataFrame({'Livestock_sales_value': value})
     out = out.dropna(subset=['Livestock_sales_value'])
     out['ValuationSource'] = source
+    # Canonical (t, i, animal) level order, like every other transform in
+    # this block.  The input frame's own order is NOT preserved: warm Malawi
+    # arrives as (i, t, animal), and returning that would make a .join() or
+    # .reindex() against gross_crop_revenue / crop_diversity -- which build
+    # an explicit ['t', 'i'] group list -- silently misalign.
+    names = list(out.index.names or [])
+    canonical = [n for n in ('t', 'i', 'animal') if n in names]
+    if canonical and canonical != names[:len(canonical)]:
+        out = out.reorder_levels(canonical + [n for n in names
+                                              if n not in canonical])
     return out.sort_index()
 
 
@@ -4112,7 +4332,7 @@ def fcs(food_acquired, *, groups, days, weights=None, cap=7):
 
 
 def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
-                    area_col='Area', volume_as_mass=True, on='plot'):
+                    area_col='Area', volume_as_mass=True, on='parcel'):
     """Fertilizer applied per unit plot area (EPAR "rate of fertilizer
     application").
 
@@ -4148,19 +4368,29 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         Plot-area column in ``plot_features``.
     volume_as_mass : bool, default True
         Forwarded to the unit->kg conversion.
-    on : {'plot', 'parcel'}, default 'plot'
-        Land grain to join the two features on.
+    on : {'parcel', 'plot'}, default 'parcel'
+        Land grain to join the two features on.  **The default matches
+        :func:`yield_kg`'s**, and that agreement is deliberate: the two
+        transforms bridge the same two plot vocabularies, and a pair of
+        sibling functions that default differently is a trap.  It was one --
+        with ``on='plot'`` as the default, ``fertilizer_rate(Uganda)``
+        returned an EMPTY frame and said nothing (see
+        :class:`PlotGrainMismatchWarning`).
 
-        - ``'plot'`` (default): join the literal plot key.  Measured on the
-          warm Malawi corpus (2026-09-09), ``plot_inputs`` and
-          ``plot_features`` share the plot vocabulary exactly -- 66,298 of
-          ``plot_inputs``'s 66,368 distinct ``(t, i, plot)`` keys match a
-          ``plot_features`` row, 99.9%.
-        - ``'parcel'``: reconcile the two plot vocabularies to their common
-          parcel key first, exactly as :func:`yield_kg` does.  Needed where
-          the features use different plot spellings (Uganda:
-          ``{hhid}-{parcel}-{plot}`` on the ag modules vs.
-          ``{parcel}_{suffix}`` on ``plot_features``).
+        - ``'parcel'`` (default): reconcile the two plot vocabularies to
+          their common parcel key first, exactly as :func:`yield_kg` does
+          (``_parcel_from_crop_plot`` / ``_parcel_from_feature_plot``, both
+          no-ops on a vocabulary that carries no ``{hhid}-`` prefix or
+          ``_suffix``).  Uganda needs it: ``{hhid}-{parcel}-{plot}`` on the
+          ag modules vs. ``{parcel}_{suffix}`` on ``plot_features``, which
+          share no literal key at all -- 0 rows on ``'plot'``, 509 on
+          ``'parcel'``.  Measured no-op on Malawi, whose two features
+          already share the literal key (66,298 of 66,368 distinct
+          ``(t, i, plot)`` keys match, 99.9%, identically under either
+          setting).
+        - ``'plot'``: join the literal plot key verbatim.  Use where the two
+          features are known to share a vocabulary and the parcel
+          extraction would be wrong.
 
     Returns
     -------
@@ -4249,6 +4479,21 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     area = pf.groupby(keys, dropna=False)['_Area'].sum().reset_index()
 
     merged = fert.merge(area, on=keys, how='inner')
+    if len(merged) == 0 and len(fert) and len(area):
+        # Silent emptiness is the failure this guard exists for: both sides
+        # have rows, the inner merge matched none, and the result is a
+        # correctly-shaped frame with nothing in it.
+        warnings.warn(
+            f"fertilizer_rate(on={on!r}): the {len(fert):,} fertilizer land "
+            f"key(s) and the {len(area):,} area land key(s) have NO value in "
+            "common, so the result is empty. The two features use different "
+            "plot vocabularies -- e.g. Uganda's ag modules key plots "
+            "'{hhid}-{parcel}-{plot}' while plot_features keys them "
+            f"'{{parcel}}_{{suffix}}'. Examples -- fertilizer: "
+            f"{sorted(map(str, fert['_land'].unique()))[:3]}; area: "
+            f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
+            f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
+            PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged[out_col] = merged[num_col] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=[out_col])
@@ -4323,11 +4568,32 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
 
     **Basis.**  EPAR weights by area PLANTED (``area_plan``), dropping rows
     with zero planted area -- which, its own comment notes, silently
-    excludes permanent/tree crops unless they are a plot's only crop.  It
-    also takes the shares over plot-crop ROWS rather than over crops, so a
-    crop on three plots contributes three terms.  Neither choice is
-    reproduced here; ``'count'`` de-duplicates to the crop within a land
-    unit and ``'area'`` is refused outright rather than approximated.
+    excludes permanent/tree crops unless they are a plot's only crop.  That
+    weight is refused here rather than approximated (see ``weight='area'``
+    above).
+
+    **What one "occurrence" is, stated exactly, because it is easy to
+    misread.**  The ``'count'`` basis takes shares over distinct
+    ``(t, i, crop, <plot level>, season)`` tuples -- so a crop grown on
+    three plots DOES contribute three terms, exactly as in EPAR's plot-crop
+    row basis.  What is de-duplicated away is only the ``u`` / ``condition``
+    multiplicity WITHIN one land-season unit (a maize harvest reported in
+    two conditions is one occurrence, not two).  It is NOT an index over
+    distinct crops: a household growing maize on four land-season units and
+    beans on one scores ``H = 0.5004``, not ``ln 2 = 0.6931``.  Pinned by
+    ``tests/test_863_transforms.py::
+    test_crop_diversity_count_separates_plots_and_seasons``.
+
+    **Not comparable across countries on the ``'count'`` basis.**  The
+    occurrence key uses whichever of the land and season levels the
+    country's ``crop_production`` carries -- ``(plot, season)`` for Uganda,
+    ``(plot,)`` for Malawi, which has no ``season`` level at all.  A Uganda
+    household with an asymmetric crop mix across its two seasons therefore
+    scores differently from an otherwise identical Malawi household, purely
+    because one instrument records a season and the other does not.  On a
+    cross-country :class:`~lsms_library.feature.Feature` frame, compare
+    within a country, or use ``weight='value'`` (whose shares have no land
+    or season key) and accept its sold-only bias.
     """
     if weight not in {'count', 'value', 'area'}:
         raise ValueError(
@@ -4378,7 +4644,8 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     share_of = share_of.dropna()
     share_of = share_of[share_of > 0]
     total = share_of.groupby(group_by).sum()
-    p = share_of / total.reindex(share_of.index.droplevel(crop_level)).to_numpy()
+    denom = total.reindex(share_of.index.droplevel(crop_level)).to_numpy()
+    p = share_of / denom
     with np.errstate(divide='ignore', invalid='ignore'):
         term = p * np.log(p)
     h = -term.groupby(group_by).sum(min_count=1).dropna()

@@ -27,12 +27,15 @@ import pytest
 from lsms_library.transformations import (
     FCS_WFP_WEIGHTS,
     HDDS_GROUPS,
+    NutrientCoverageWarning,
+    PlotGrainMismatchWarning,
     crop_diversity,
     fcs,
     fertilizer_rate,
     gross_crop_revenue,
     hdds,
-    livestock_income,
+    livestock_sales_value,
+    nitrogen_kg,
 )
 
 
@@ -124,15 +127,15 @@ def test_gross_crop_revenue_rejects_a_bad_by():
 
 
 # ===========================================================================
-# livestock_income
+# livestock_sales_value
 # ===========================================================================
 
-def test_livestock_income_reported_per_head_basis():
+def test_livestock_sales_value_reported_per_head_basis():
     ls = _livestock([
         ('2019-20', 'hh1', 'Cattle', 3.0, 2.0, 150000.0),
         ('2019-20', 'hh1', 'Goats', 8.0, 4.0, 20000.0),
     ])
-    out = livestock_income(ls)
+    out = livestock_sales_value(ls)
     assert out.loc[('2019-20', 'hh1', 'Cattle'),
                    'Livestock_sales_value'] == 300000.0
     assert out.loc[('2019-20', 'hh1', 'Goats'),
@@ -143,34 +146,34 @@ def test_livestock_income_reported_per_head_basis():
     assert total.loc[('2019-20', 'hh1')] == 380000.0
 
 
-def test_livestock_income_keeps_a_genuine_zero_and_drops_a_missing_price():
+def test_livestock_sales_value_keeps_a_genuine_zero_and_drops_a_missing_price():
     ls = _livestock([
         ('2019-20', 'hh1', 'Cattle', 3.0, 0.0, 150000.0),   # sold nothing
         ('2019-20', 'hh1', 'Goats', 8.0, 4.0, np.nan),      # price unknown
     ])
-    out = livestock_income(ls)
+    out = livestock_sales_value(ls)
     assert out.loc[('2019-20', 'hh1', 'Cattle'),
                    'Livestock_sales_value'] == 0.0
     assert ('2019-20', 'hh1', 'Goats') not in out.index
 
 
-def test_livestock_income_sales_value_basis_is_reported_not_constructed():
+def test_livestock_sales_value_sales_value_basis_is_reported_not_constructed():
     ls = _livestock(
         [('2019-20', 'hh1', 'Cattle', 3.0, 2.0, 275000.0)],
         cols=('HeadCount', 'HeadSold', 'SalesValue'))
-    out = livestock_income(ls, price='sales_value')
+    out = livestock_sales_value(ls, price='sales_value')
     assert out.loc[('2019-20', 'hh1', 'Cattle'),
                    'Livestock_sales_value'] == 275000.0
     assert set(out['ValuationSource']) == {'reported_sales_value'}
 
 
-def test_livestock_income_sales_value_absent_raises():
+def test_livestock_sales_value_sales_value_absent_raises():
     ls = _livestock([('2019-20', 'hh1', 'Cattle', 3.0, 2.0, 150000.0)])
     with pytest.raises(ValueError, match='SalesValue'):
-        livestock_income(ls, price='sales_value')
+        livestock_sales_value(ls, price='sales_value')
 
 
-def test_livestock_income_supplied_price_series_by_t_and_animal():
+def test_livestock_sales_value_supplied_price_series_by_t_and_animal():
     ls = _livestock([
         ('2019-20', 'hh1', 'Cattle', 3.0, 2.0, np.nan),
         ('2019-20', 'hh2', 'Cattle', 1.0, 1.0, np.nan),
@@ -179,7 +182,7 @@ def test_livestock_income_supplied_price_series_by_t_and_animal():
         [100.0],
         index=pd.MultiIndex.from_tuples([('2019-20', 'Cattle')],
                                         names=['t', 'animal']))
-    out = livestock_income(ls, price=price)
+    out = livestock_sales_value(ls, price=price)
     assert out.loc[('2019-20', 'hh1', 'Cattle'),
                    'Livestock_sales_value'] == 200.0
     assert out.loc[('2019-20', 'hh2', 'Cattle'),
@@ -187,32 +190,32 @@ def test_livestock_income_supplied_price_series_by_t_and_animal():
     assert set(out['ValuationSource']) == {'supplied_price'}
 
 
-def test_livestock_income_supplied_price_by_animal_alone():
+def test_livestock_sales_value_supplied_price_by_animal_alone():
     ls = _livestock([('2019-20', 'hh1', 'Goats', 8.0, 4.0, np.nan)])
-    out = livestock_income(ls, price=pd.Series({'Goats': 25.0}))
+    out = livestock_sales_value(ls, price=pd.Series({'Goats': 25.0}))
     assert out.loc[('2019-20', 'hh1', 'Goats'),
                    'Livestock_sales_value'] == 100.0
 
 
-def test_livestock_income_unpriced_sale_raises_rather_than_under_reporting():
+def test_livestock_sales_value_unpriced_sale_raises_rather_than_under_reporting():
     ls = _livestock([
         ('2019-20', 'hh1', 'Cattle', 3.0, 2.0, np.nan),
         ('2019-20', 'hh1', 'Camels', 1.0, 1.0, np.nan),
     ])
     with pytest.raises(ValueError, match='no supplied price'):
-        livestock_income(ls, price=pd.Series({'Cattle': 100.0}))
+        livestock_sales_value(ls, price=pd.Series({'Cattle': 100.0}))
 
 
-def test_livestock_income_missing_head_sold_raises():
+def test_livestock_sales_value_missing_head_sold_raises():
     ls = _livestock([('2019-20', 'hh1', 'Cattle', 3.0, 2.0, 1.0)])
     with pytest.raises(ValueError, match='HeadSold'):
-        livestock_income(ls.drop(columns=['HeadSold']))
+        livestock_sales_value(ls.drop(columns=['HeadSold']))
 
 
-def test_livestock_income_bad_price_basis_raises():
+def test_livestock_sales_value_bad_price_basis_raises():
     ls = _livestock([('2019-20', 'hh1', 'Cattle', 3.0, 2.0, 1.0)])
     with pytest.raises(ValueError, match='price='):
-        livestock_income(ls, price='median')
+        livestock_sales_value(ls, price='median')
 
 
 # ===========================================================================
@@ -569,23 +572,31 @@ def test_crop_diversity_resolves_malawis_crop_level():
 def _warm(country, table):
     """Load a country table THAT IS ALREADY WARM, or skip.
 
-    TWO gates, because existence is not freshness.  The L2-country parquet
-    must exist (a missing one is a clean skip, like missing credentials),
-    AND the Country is constructed with ``assume_cache_fresh=True`` so a
-    present-but-stale hash serves from the parquet instead of rebuilding.
-    Existence alone is NOT enough: a stale-hash parquet rebuilds and WRITES
-    to a cache other agents share, and takes minutes.  ``assume_cache_fresh``
-    still runs ``_finalize_result`` (kinship, spellings, the v-join), which
-    is exactly the smoke-test contract -- see CLAUDE.md §"Cache Behavior".
+    Warm means EITHER cache tier: the L2-country parquet
+    (``{C}/var/{table}.parquet``) or the per-wave L2-wave parquets
+    (``{C}/{wave}/_/{table}.parquet``).  Gating on the country tier ALONE
+    was over-strict and cost a real test -- Uganda served 130,606
+    ``crop_production`` rows from its wave parquets in seconds, with zero
+    cache writes, while the country parquet was absent and the smoke test
+    skipped.
+
+    The Country is built with ``assume_cache_fresh=True`` so a
+    present-but-stale hash serves from the parquet instead of rebuilding:
+    existence is not freshness, and a stale-hash rebuild would take minutes
+    and WRITE to a cache other agents share.  ``assume_cache_fresh`` still
+    runs ``_finalize_result`` (kinship, spellings, the v-join), which is
+    exactly the smoke-test contract -- see CLAUDE.md, "Cache Behavior".
     """
     try:
         import lsms_library as ll
         from lsms_library.local_tools import data_root
     except Exception as exc:                      # pragma: no cover
         pytest.skip(f"lsms_library unavailable: {exc}")
-    parquet = data_root() / country / 'var' / f'{table}.parquet'
-    if not parquet.exists():
-        pytest.skip(f"{country} {table} is not warm here ({parquet})")
+    root = data_root() / country
+    warm = (root / 'var' / f'{table}.parquet').exists() or any(
+        root.glob(f'*/_/{table}.parquet'))
+    if not warm:
+        pytest.skip(f"{country} {table} is not warm here ({root})")
     try:
         df = getattr(ll.Country(country, assume_cache_fresh=True), table)()
     except Exception as exc:
@@ -595,12 +606,16 @@ def _warm(country, table):
     return df
 
 
-def test_malawi_warm_livestock_income():
+def test_malawi_warm_livestock_sales_value():
     ls = _warm('Malawi', 'livestock')
     if 'ValuePerAnimal' not in ls.columns or 'HeadSold' not in ls.columns:
         pytest.skip('Malawi livestock lacks the sale columns here')
-    out = livestock_income(ls)
+    out = livestock_sales_value(ls)
     assert list(out.columns) == ['Livestock_sales_value', 'ValuationSource']
+    # Canonical (t, i, animal) order even though warm Malawi arrives as
+    # (i, t, animal) -- otherwise a .join() against the other transforms in
+    # this block silently misaligns.
+    assert list(out.index.names) == ['t', 'i', 'animal']
     assert set(out['ValuationSource']) == {'reported_per_head'}
     assert (out['Livestock_sales_value'] >= 0).all()
     assert len(out) <= len(ls)
@@ -631,13 +646,108 @@ def test_malawi_warm_food_acquired_hdds_scores_in_range():
 
 
 def test_malawi_warm_fertilizer_rate():
+    """len>0 / finite / >=0 all PASSED on a column of 331 exact zeros before
+    the label normalisation landed -- 'right shape, no content'.  Assert
+    content."""
     pi = _warm('Malawi', 'plot_inputs')
     pf = _warm('Malawi', 'plot_features')
     out = fertilizer_rate(pi, pf)
     assert list(out.columns) == ['Nitrogen_kg_per_ha']
-    assert len(out) > 0
+    assert len(out) > 1000
     assert np.isfinite(out['Nitrogen_kg_per_ha']).all()
     assert (out['Nitrogen_kg_per_ha'] >= 0).all()
+    assert (out['Nitrogen_kg_per_ha'] > 0).sum() > 0.5 * len(out)
+    assert out['Nitrogen_kg_per_ha'].sum() > 0
+
+
+def test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels():
+    """Malawi writes 'Urea Fertilizer' where _NITROGEN_CONTENT's key is
+    'urea'.  Exact-equality matching resolved ONLY 'Other Fertilizer'
+    (nominal share 0.0), so 53,210 real fertilizer rows contributed nothing
+    and the whole column was zero.  Measured after the fix: 331 -> 33,113
+    plots, 0 -> 835,012 kg N."""
+    pi = _warm('Malawi', 'plot_inputs')
+    out = nitrogen_kg(pi)
+    tally = out.attrs['nitrogen_input_match']
+    assert {'Urea Fertilizer', 'NPK Fertilizer', 'CAN Fertilizer',
+            'DAP Fertilizer'} <= set(tally['matched_labels'])
+    assert tally['matched_rows'] > 50_000
+    assert out['Nitrogen_kg'].sum() > 0
+    # Organic stays UNMATCHED on purpose -- a nominal N share for manure
+    # would be an invented number -- and is named in the tally instead.
+    assert 'Organic Fertilizer' in tally['unmatched_labels']
+
+
+def test_nitrogen_kg_warns_when_every_fertilizer_label_is_unmatched():
+    pi = _plot_inputs([
+        ('2019-20', 'hh1', 'p1', 'Adubos inorganicos - ureia', 'Maize',
+         'kg', 100.0),
+    ])
+    with pytest.warns(NutrientCoverageWarning, match='right SHAPE'):
+        out = nitrogen_kg(pi)
+    assert len(out) == 0
+    assert 'Adubos inorganicos - ureia' in (
+        out.attrs['nitrogen_input_match']['unmatched_labels'])
+
+
+def test_nitrogen_kg_normalises_the_trailing_fertilizer_word():
+    """'Urea Fertilizer' (Malawi) and 'Urea' (Benin) are the same product;
+    'Phosphate' (Senegal) and 'phosphate fertilizer' (the key) likewise."""
+    pi = _plot_inputs([
+        ('2019-20', 'hh1', 'p1', 'Urea Fertilizer', 'Maize', 'kg', 100.0),
+        ('2019-20', 'hh2', 'p1', 'Urea', 'Maize', 'kg', 100.0),
+        ('2019-20', 'hh3', 'p1', 'Phosphate', 'Maize', 'kg', 100.0),
+    ])
+    out = nitrogen_kg(pi)
+    assert out.loc[('2019-20', 'hh1', 'p1'),
+                   'Nitrogen_kg'] == pytest.approx(46.0)
+    assert out.loc[('2019-20', 'hh2', 'p1'),
+                   'Nitrogen_kg'] == pytest.approx(46.0)
+    # Phosphate resolves, to a nominal share of ZERO -- matched, not missing.
+    assert out.loc[('2019-20', 'hh3', 'p1'), 'Nitrogen_kg'] == 0.0
+    assert out.attrs['nitrogen_input_match']['unmatched_rows'] == 0
+
+
+def test_nitrogen_kg_does_not_fuzzy_match_an_unknown_fertilizer():
+    """'D Compound Fertilizer' and 'Organic Fertilizer' must stay unmatched:
+    inventing a nominal N share for them would be worse than reporting the
+    gap."""
+    pi = _plot_inputs([
+        ('2019-20', 'hh1', 'p1', 'Urea Fertilizer', 'Maize', 'kg', 100.0),
+        ('2019-20', 'hh1', 'p1', 'D Compound Fertilizer', 'Maize', 'kg',
+         50.0),
+        ('2019-20', 'hh1', 'p1', 'Organic Fertilizer', 'Maize', 'kg', 900.0),
+    ])
+    with pytest.warns(NutrientCoverageWarning, match='contribute nothing'):
+        out = nitrogen_kg(pi)
+    assert out.loc[('2019-20', 'hh1', 'p1'),
+                   'Nitrogen_kg'] == pytest.approx(46.0)
+    unmatched = out.attrs['nitrogen_input_match']['unmatched_labels']
+    assert set(unmatched) == {'D Compound Fertilizer', 'Organic Fertilizer'}
+
+
+def test_fertilizer_rate_warns_on_an_empty_grain_join():
+    """The Uganda default trap: ag modules key '{hhid}-{parcel}-{plot}',
+    plot_features keys '{parcel}_{suffix}'; a literal join matches nothing
+    and used to return an empty frame in silence."""
+    pi = _plot_inputs([
+        ('2019-20', 'hh1', 'hh1-1-2', 'Urea', 'Maize', 'kg', 100.0),
+    ])
+    pf = _plot_features([('2019-20', 'hh1', 'ZZ_A', 2.0)])
+    with pytest.warns(PlotGrainMismatchWarning, match='NO value in common'):
+        out = fertilizer_rate(pi, pf, on='plot')
+    assert len(out) == 0
+
+
+def test_fertilizer_rate_parcel_default_bridges_the_two_vocabularies():
+    pi = _plot_inputs([
+        ('2019-20', 'hh1', 'hh1-1-2', 'Urea', 'Maize', 'kg', 100.0),
+    ])
+    pf = _plot_features([('2019-20', 'hh1', '1_A', 2.0)])
+    out = fertilizer_rate(pi, pf)           # default on='parcel'
+    assert list(out.index.names) == ['t', 'i', 'parcel']
+    assert out.loc[('2019-20', 'hh1', '1'),
+                   'Nitrogen_kg_per_ha'] == pytest.approx(23.0)
 
 
 def test_uganda_warm_crop_production_revenue_and_diversity():

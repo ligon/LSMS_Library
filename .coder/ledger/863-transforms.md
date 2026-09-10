@@ -14,7 +14,7 @@ and the `CONTENTS.org` of Uganda / Malawi / Ethiopia / Nigeria / GhanaSPS, in
 place of `gitnexus_query` / `gitnexus_impact`.
 
 **Blast radius of the six new symbols** (`gross_crop_revenue`,
-`livestock_income`, `hdds`, `fcs`, `fertilizer_rate`, `crop_diversity`, plus
+`livestock_sales_value`, `hdds`, `fcs`, `fertilizer_rate`, `crop_diversity`, plus
 `_CROP_LEVELS` / `_resolve_crop_level` / `_resolve_food_groups` /
 `_consumed_mask` / `HDDS_GROUPS` / `FCS_WFP_WEIGHTS`): **none**. `rg -n` for
 each name across `lsms_library/` (package and `countries/*/_/*.py`) before the
@@ -33,7 +33,7 @@ GH #863 / WORKPLAN.org Phase 2 asks for six analyst-callable transforms in
 (plain functions over an already-loaded item feature, NOT registered in
 `_FOOD_DERIVED` / `_ROSTER_DERIVED`, NOT auto-surfaced as `Country` features):
 `gross_crop_revenue` and `fertilizer_rate` (MECHANICAL reductions over
-`crop_production` / `plot_inputs`+`plot_features`), `livestock_income`, `hdds`,
+`crop_production` / `plot_inputs`+`plot_features`), `livestock_sales_value`, `hdds`,
 `fcs` and `crop_diversity` (METHODOLOGY — each encodes a specific analytic
 choice: a price basis, a food-group taxonomy, an entropy weight). Each
 docstring must name the EPAR/WB analogue and state the divergence rather than
@@ -48,10 +48,10 @@ force a match, per the section banner at `transformations.py:1578-1620`.
 | `yield_kg` | `transformations.py:2256` | the grain-bridge pattern: reduce both features to a common land key, `merge(how='inner')`, divide, drop non-finite | corpus sanity | **reuse the pattern** (`on='plot'`/`'parcel'`, `_parcel_from_crop_plot` / `_parcel_from_feature_plot`) for `fertilizer_rate` |
 | `median_price_valuation` | `transformations.py:3140` | the geographic median-price ladder (finest cell with N≥10 → national) | `tests/test_median_price_weight_col.py` | **reuse by reference**: `gross_crop_revenue`'s docstring points at it for EPAR's *valued-harvest* construct rather than reimplementing a ladder; `livestock_income(price=<Series>)` is the seam a caller feeds it through |
 | `rcsi` | `transformations.py:2800` | never-zero-fill rule, symmetric vocabulary check, `ValueError` naming the offending labels | `tests/test_rcsi.py` | **reuse the discipline**: `_resolve_food_groups` raises on an unrecognised group, a missing group, and an unmapped `j`, all naming names |
-| `tlu` | `transformations.py:2629` | animal level-or-column resolution, species→factor map | corpus sanity | **reuse the shape** for `livestock_income`'s `animal` handling |
+| `tlu` | `transformations.py:2629` | animal level-or-column resolution, species→factor map | corpus sanity | **reuse the shape** for `livestock_sales_value`'s `animal` handling |
 | `farm_size` / `nb_plots` | `transformations.py:2981` / `:3020` | the `(t,i)`-grain reduction house pattern | — | pattern reused; the new block is inserted immediately after `nb_plots` per the task brief |
 
-**Reuse-search result:** no prior `gross_crop_revenue`, `livestock_income`,
+**Reuse-search result:** no prior `gross_crop_revenue`, `livestock_sales_value`,
 `hdds`, `fcs`, `fertilizer_rate`, `crop_diversity`, Shannon/entropy,
 `HDDS`/`FCS`/food-group symbol anywhere in `lsms_library/` (`rg -i
 'shannon|diversity_index|\bhdds\b|\bfcs\b|food_group|fertilizer_rate|
@@ -92,7 +92,7 @@ and say so in code.
   an `AreaShare` / `Area_planted`. Recorded independently in
   `slurm_logs/2026-09-09_epar_curation/LEARNINGS.org` L8 and
   `FINDINGS_taxonomy.org` (SHANNON DIVERSITY INDEX row, "THEIRS-ONLY(agg)").
-- **EPAR's `livestock_income`** (`Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:5959`,
+- **EPAR's `livestock_sales_value`** (`Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:5959`,
   read directly): `value_slaughtered + value_lvstck_sold -
   value_livestock_purchases + (milk + eggs + other + manure) - (hired labour +
   fodder + vaccines)`. Its `value_lvstck_sold` is built at `:3320-3346` from a
@@ -185,7 +185,7 @@ and say so in code.
 | quantity | decision | reason |
 |----------|----------|--------|
 | sale revenue per household | **new** (`gross_crop_revenue`) | no prior symbol; a plain `sum(min_count=1)` over a reported column — the *valued-harvest* alternative is `median_price_valuation`, reused by reference in the docstring rather than reimplemented |
-| value of livestock sold | **new** (`livestock_income`), with `price=` as an explicit seam | no prior symbol; the price ladder itself is NOT rebuilt — a caller feeds `median_price_valuation`'s output in as a Series |
+| value of livestock sold | **new** (`livestock_sales_value`), with `price=` as an explicit seam | no prior symbol; the price ladder itself is NOT rebuilt — a caller feeds `median_price_valuation`'s output in as a Series |
 | kg of fertilizer / N per plot | **reuse** `nitrogen_kg` for both bases | `nutrient='product'` passes `{k: 1.0}` shares to the same function; a second unit-conversion path would be a REINVENTION of `_kg_factor_series` |
 | plot ↔ plot_features grain bridge | **reuse** `yield_kg`'s `on='plot'`/`'parcel'` machinery verbatim | measured: Malawi matches 66,298 of 66,368 `(t,i,plot)` keys literally (99.9%), so `'plot'` is the right default and `'parcel'` covers Uganda's two vocabularies |
 | crop-level name resolution | **new** (`_resolve_crop_level`), modelled on `_resolve_plot_level` | the `j`/`crop` divergence is documented in `data_info.yml` and had no helper |
@@ -205,9 +205,11 @@ lacks most of a 175-item vocabulary, unlike rcsi's five-item battery.
 
 ## §6 Open questions for the human
 
-- **`livestock_income` is named for a construct it does not compute**, and the
-  name comes from the issue. It returns EPAR's `value_lvstck_sold` term only:
-  a GROSS SALES VALUE. Slaughtered head, purchase values, livestock products
+- ~~**`livestock_income` is named for a construct it does not compute**~~
+  **CLOSED by the red-team pass, 2026-09-09: renamed to
+  `livestock_sales_value`**, which matches its output column
+  `Livestock_sales_value` and is unambiguous about gross-vs-net. It returns
+  EPAR's `value_lvstck_sold` term only: a GROSS SALES VALUE. Slaughtered head, purchase values, livestock products
   (milk/eggs/manure) and expenses (fodder/water/vaccines/hired labour) are all
   absent from our `livestock` schema — `FINDINGS_taxonomy.org` (LIVESTOCK
   INCOME row) files them as THEIRS-ONLY at the item layer, and GhanaSPS's
@@ -232,7 +234,7 @@ lacks most of a 175-item vocabulary, unlike rcsi's five-item battery.
   construct (valued harvest) is delegated to the existing tested
   `median_price_valuation` rather than duplicated, and the no-de-dup decision
   is anchored on the measurement in §4, not on taste.
-- `livestock_income` — OK (anchored on §3): the two-instrument reading of
+- `livestock_sales_value` — OK (anchored on §3): the two-instrument reading of
   `ValuePerAnimal`, the `SalesValue` alternative and GhanaSPS's exclusion are
   all quoted from `data_info.yml` / the countries' own `data_scheme.yml`, not
   inferred. No REINVENTION: the price ladder is a caller-supplied Series.
@@ -247,3 +249,148 @@ lacks most of a 175-item vocabulary, unlike rcsi's five-item battery.
   against EPAR's un-negated `sdi`.
 - `_CROP_LEVELS` / `_resolve_crop_level` — OK (anchored on §2): twin of the
   existing `_PLOT_LEVELS` / `_resolve_plot_level`, same shape, different axis.
+
+
+---
+## Addendum — red-team corrections (2026-09-09, after `61053864`)
+
+Red-team report: `slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_863_transforms.org`.
+`development` merged in first (the harvest_kg shipped-factor family and the
+#850 design landed; the red team's own conflict analysis confirmed no hunk
+overlap with this block, and the merge was clean).
+
+### A. `livestock_income` -> `livestock_sales_value` (§6 open question, closed)
+
+Renamed; the output column already was `Livestock_sales_value`, so the call
+site and the column now agree, and "income" no longer promises a net figure
+the schema cannot produce. The output index is also reordered to the
+canonical `(t, i, animal)`: warm Malawi arrives as `(i, t, animal)` and the
+function used to preserve it, so a `.join()` or `.reindex()` against
+`gross_crop_revenue` / `crop_diversity` (which build an explicit `['t','i']`
+group list) would silently misalign. Pinned by an index-name assertion in the
+warm test.
+
+### B. `_NITROGEN_CONTENT` label mismatch — a REAL BUG in the shipped `nitrogen_kg`
+
+Not introduced by this branch, and the more serious of the two findings.
+`nitrogen_kg` keyed its nutrient share off `input.lower()` by **exact
+equality**, and Malawi writes `Urea Fertilizer` where the map's key is
+`urea`. Measured on the warm corpus:
+
+| Malawi `input` label | rows | old fate |
+|---|---|---|
+| NPK Fertilizer | 26,775 | unmatched |
+| Urea Fertilizer | 24,125 | unmatched |
+| CAN Fertilizer | 2,037 | unmatched |
+| DAP Fertilizer | 273 | unmatched |
+| **Other Fertilizer** | 403 | **matched, nominal share 0.0** |
+
+So the ONLY label that resolved carried zero nitrogen: `nitrogen_kg(Malawi)`
+returned **331 plots of exactly 0.0**, and `fertilizer_rate` inherited it.
+The branch's own warm test asserted `len(out) > 0`, `isfinite` and `>= 0` —
+**all three pass on a column of zeros**. That is CLAUDE.md's "right shape, no
+content" (`null_read_audit`), reproduced in a new transform.
+
+*Fix, in `nitrogen_kg` (the shared machinery), not in `fertilizer_rate`:*
+`_normalise_input_label` tries three candidates in order — the normalised
+label, the label with a trailing `' fertilizer'`/`' fertiliser'` REMOVED, and
+the label with `' fertilizer'` ADDED (the map mixes both conventions because
+the countries do: bare `urea`/`npk`/`dap` beside `phosphate fertilizer`/
+`other fertilizer`). Matching stays **exact after normalisation** — no
+substring, no fuzzy — so `Organic Fertilizer`, `D Compound Fertilizer` and
+Ethiopia's `NPS` stay unmatched rather than being assigned an invented
+nominal share.
+
+*Movement, measured over all 11 warm `plot_inputs` tables (old rule vs new,
+same frames):*
+
+| country | plots old -> new | kg N old -> new |
+|---|---|---|
+| **Malawi** | **331 -> 33,113** | **0 -> 835,012** |
+| Benin | 1,798 -> 1,804 | 322,993 -> 322,993 |
+| Burkina Faso | 2,426 -> 2,451 | 255,358 -> 255,358 |
+| CotedIvoire | 1,638 -> 1,655 | 444,388 -> 444,388 |
+| Niger | 1,360 -> 1,370 | 52,093 -> 52,093 |
+| Senegal | 882 -> 908 | 78,412 -> 78,412 |
+| Ethiopia / Mali / Tanzania / Togo | unchanged | unchanged |
+| Guinea-Bissau | 0 -> 0 | 0 -> 0 |
+
+**Malawi is the only country whose numbers move.** The five EHCVM countries
+gain a handful of plot rows and **zero** kilograms: those are the bare
+`Phosphate` label (349 rows corpus-wide) resolving to `phosphate fertilizer`,
+whose nominal share is 0.0 — it moves them out of the unmatched tally, which
+is what makes the tally readable, and moves no number. Guinea-Bissau still
+returns nothing (its labels are Portuguese: `Adubos inorgânicos - ureia`,
+190 rows of real urea, unmatched) and now WARNS instead of returning silence.
+
+*Loudness*, two tiers, mirroring `harvest_kg_factors`'s `shipped_matched`:
+`attrs['nitrogen_input_match']` always carries the join tally
+(`matched_rows` / `unmatched_rows` / `matched_labels` / `unmatched_labels`),
+and `NutrientCoverageWarning` fires when an unmatched label *names itself* a
+fertilizer input (`_FERTILIZER_LABEL_HINTS`: fertilizer / fertiliser /
+manure / compost / adubo / engrais), escalating to a louder message when the
+whole column is empty or identically zero.
+
+> **Deliberate deviation from "warn naming every label that got no N share".**
+> Warning on *all* unmatched labels is a firehose that would bury the signal:
+> `Seed` alone is 112,296 rows on Malawi and 108,713 on Ethiopia, and
+> `Pesticide`/`Herbicide`/`Fungicide` are correctly outside a nitrogen map.
+> CLAUDE.md's null-read section is explicit that "a warning nobody reads is
+> exactly how #323 survived its first fix", and the per-column form there was
+> rejected for the same 884-of-887 reason. The hint list is the corpus's own
+> vocabulary and is measured: it fires on 1-3 labels per country, every one
+> of them a genuine fertilizer input contributing zero. It never affects a
+> nutrient share, so a stem missing from it costs a warning, never a number.
+> **Separately filed** as its own issue per the red team's item 4: the
+> `_NITROGEN_CONTENT` table has no entry for `NPS` (Ethiopia, 5,264 rows),
+> `D Compound` (Malawi, 726) or any organic input — those are content
+> decisions, not matching bugs.
+
+### C. `fertilizer_rate` silent emptiness on Uganda
+
+`on='plot'` was the default while the sibling `yield_kg` defaults to
+`on='parcel'`, and Uganda's two plot vocabularies share no literal key:
+`fertilizer_rate(Uganda)` returned `(0, 1)` in silence, `on='parcel'` returns
+509 rows. **Default changed to `'parcel'`** (the disagreement between two
+sibling functions was itself the trap) and a zero-row inner merge now raises
+`PlotGrainMismatchWarning` naming both key vocabularies with examples.
+`'parcel'` is a measured **no-op on Malawi** — its two features already share
+the literal key, and both parcel helpers are documented no-ops on a
+vocabulary with no `{hhid}-` prefix or `_suffix`.
+
+### D. Two docstring statements that were false
+
+- `gross_crop_revenue` cited Malawi's "attached to single-plot crops only" as
+  a *stamping* (double-count) risk. It is the opposite — a systematic
+  **lower bound**: 26.5% of single-plot `(t, i, crop)` groups carry a sale
+  row against 2.7% of multi-plot ones, so the shortfall concentrates in the
+  households farming the most land. Reframed, with the numbers. The Uganda
+  paragraph now also carries the red team's decisive measurement (only 37 of
+  963 multi-row groups at the finest key show the stamping shape) and the
+  instrument citation (`s5bq07a_2`/`s5bq08_2` ride the same harvest record).
+- `crop_diversity`'s Notes claimed EPAR's plot-crop row basis was "not
+  reproduced here". **False**: a crop on three plots contributes three terms
+  here too. Only the `u`/`condition` multiplicity *within* a land-season unit
+  is de-duplicated. Sentence removed and replaced with the basis as
+  implemented (with the worked 0.5004-vs-ln2 case that the existing test
+  pins), plus the previously undocumented caveat that the `'count'` basis is
+  **not cross-country comparable** — the occurrence key includes `season`
+  where the country has that level (Uganda) and cannot where it does not
+  (Malawi).
+
+### E. Warm-gate over-strictness
+
+`_warm` required the L2-**country** parquet, so the Uganda smoke test skipped
+even though `Country('Uganda').crop_production()` served 130,606 rows from
+the L2-**wave** parquets with zero cache writes. The gate now accepts either
+tier. `assume_cache_fresh=True` is retained — existence is not freshness, and
+a stale-hash rebuild would write to a cache other agents share.
+
+### F. Re-verification
+
+`build_transforms_fingerprint` x 10 tables + `Country._table_cache_hash(t,
+waves)` x 5 countries x 6 tables = **42 values, 0 moved, 0 error strings**,
+against the merged `development` baseline (`git stash` of this diff).
+`nitrogen_kg` is an analyst transform with no `@build_transform` tag and no
+in-corpus caller (`rg 'nitrogen_kg'` outside `transformations.py` finds only
+prose in country docstrings), so changing it invalidates nothing.
