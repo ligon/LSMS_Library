@@ -1,0 +1,65 @@
+#+title: Handoff 2026-09-10 -- EPAR survey, Phases 0-2, v0.11.1
+#+author: Sue (Claude Fable 5.1)
+
+* State at time of writing
+- *v0.11.1 released* 2026-09-10: PR #870 merged development -> master
+  with a merge commit (=814980f8=), tag =v0.11.1= on that commit,
+  GitHub Release from =docs/releases/v0.11.1.md=, publish workflow run
+  =34460512546= succeeded (the =release= event fired this time), PyPI
+  latest = 0.11.1.  =development= realigned to =master= and pushed.
+- Node: job 38661109 (savio3, 64 cores), =.venv= mounted from =.venv.sqfs=
+  at =/local/job38661109/venv_img=.  The allocation is NOT auto-cancelled:
+  =sucoder release= / =scancel= when done.
+- Data root is =/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=
+  (config.yml =data_dir=), not =~/.local/share=.  Uganda, Nigeria and
+  Ethiopia were cleared and re-warmed after their config changes (#866
+  makes the clear mandatory).  An isolated gate root is at
+  =/global/scratch/fsa/fc_jevons/ligon/tmp/gate_v0.11.1/data= (dvc-cache
+  symlinked to the shared L1); safe to delete.
+
+* What landed (all on development, now in master)
+- EPAR survey: =slurm_logs/2026-09-09_epar_curation/= (EPAR_PROJECT,
+  LEARNINGS, WORKPLAN, 8 FINDINGS, 13 REDTEAM files, issues/ drafts).
+  Reference clones at =/global/scratch/fsa/fc_jevons/ligon/reference/epar/=
+  (NOTES.md has hashes).
+- Phase 0: five CONTENTS.org corrections; issues #852-#863 filed; nine
+  comments posted.  Phase 1: rcsi, weight_col, Site Q (#857), Uganda
+  99999 (#861).  Phase 2 wave A/B: shipped_factors layer, Nigeria
+  KgFactor (#859), #863 transforms + nitrogen_kg fix, #585 valuation,
+  Ethiopia #852/#853 (+ AreaUnit fix), Uganda #824 half, #850 design.
+- Gate-found fix: =local_tools._build_dvcfs= no longer injects a url-less
+  remote override when the countries root has no =.dvc/config=
+  (=735aab33=); =valuation= documented for the discoverability test.
+- Issues filed on the way: #865 Niger 999999 sentinel, #866 try_make
+  rebuild bug (framework, 20 tables / 13 countries), #867 nitrogen
+  content, #868 reduce_to_agreed disclosure, #869 Malawi cassava.
+
+* Held for 0.11.2 (complete on branches, not merged)
+| branch | worktree | state |
+|---+---+---|
+| =feat/854-malawi-shipped-factors= (=91fab645=) | =tmp/wt-854-malawi= | red-teamed; merge held on the Feature fix (adding =condition= makes Feature exclude Malawi) |
+| =fix/feature-canonical-index-crop-production= (=75935507=) | =tmp/wt-feature-canonical= | red-team RUNNING at handoff; Feature('crop_production') 8 -> 14 countries; closes #775, part of #569 |
+| =feat/850-food-kg-item-axis= (=2720fdf7=) | =tmp/wt-850-impl= | red-teamed; =baseline_max_spread= built, default None -- @ligon to choose X (recommendation 10); Niger's -56% is NOT a correction without it |
+Merge order: Feature fix -> Malawi (then clear + re-warm Malawi, 26
+hashes) -> #850 with the chosen default (no re-warm; run =make matrix=).
+
+* Decisions pending with @ligon
+- #850 dispersion gate default X (table in the #850 agent report and
+  =.coder/ledger/850-food-kg-item-axis.md= §8).  Recommendation: 10.
+- KG_FACTOR_MAX per-unit cap (ox-cart 800; a floor) -- Malawi ledger §7.
+- Whether to send EPAR the defects found (WORKPLAN Phase 4).
+
+* Process notes
+- Every implementer got an Opus red-team before merge; red-teams
+  overturned or corrected something in nearly every branch (the
+  =_qty_reported= pre-mask, the "nine sentinel rows fire", the Ethiopia
+  =:349= citation, the #824 consumer rule, the Malawi Feature exclusion,
+  the 5-of-15-countries firing count).  Keep doing it.
+- =commit -a= swept two pre-existing modified files into an unrelated
+  commit (=6d66b7a9=); recorded and repaired in =8b03b799=.  Stage by path.
+- The first cold gate at =-n 24= produced 17 spurious failures from
+  fork/thread exhaustion (=BlockingIOError [Errno 11]=); =-n 16= with
+  =LSMS_BUILD_WORKERS=2= was clean.
+- =python -c= from the main checkout's cwd imports the main checkout even
+  with =PYTHONPATH=<worktree>= (=''= wins); always =cd= into the worktree.
+  Recorded in AGENTS.md's scrum-master addendum.
