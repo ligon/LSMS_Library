@@ -198,7 +198,30 @@ Data Scheme:
     # sums Quantity WITHIN each unit and heterogeneous units survive as
     # distinct rows (SkunkWorks/grain_aggregation_policy.org).  Was a column
     # (a bug: a plot-crop measured in two units collapsed via .first()).
-    index: (t, i, plot, crop, u)
+    #
+    # condition (GH #854) is Module G question 13c, "(S/U)": the physical
+    # state of the crop when the reported harvest Quantity was measured.
+    # Values, from the `harmonize_crop_condition` table in
+    # categorical_mapping.org: `shelled` / `unshelled` /
+    # `shell_not_applicable` (the survey's own answer 3 -- this crop has no
+    # shell), plus `unknown_condition` for a NULL or off-scheme code and for
+    # every perennial Module P row, which asks no such question.  Malawi's
+    # instrument asks ONLY the shelling FORM and never the dryness, so these
+    # are bare form tokens and NOT Uganda's `dried_grain` /
+    # `dried_with_shell` -- see lsms_library/data_info.yml
+    # (Columns > crop_production > condition).
+    #
+    # The four wave scripts have passed `condition='ag_g13c'` into
+    # `_harvest_block` since GAP 1 and the parameter DISCARDED it; #854 wired
+    # it.  It splits a (t, i, plot, crop, u) key on only 7 of 112,691 Module-G
+    # rows (all 2010-11) -- which is not why it is a level.  It is a level
+    # because a shelled and an unshelled kilogram are not the same kilogram:
+    # Quantities in different conditions must not be summed without a
+    # shelling conversion, and the IHS5 conversion tables wired by the same
+    # issue (malawi.crop_conversion_factors) key their kg factors ON this
+    # axis, so without it their shelled and unshelled factors are ambiguous
+    # and `harvest_kg(shipped_factors=...)` refuses the table outright.
+    index: (t, i, plot, crop, u, condition)
     Quantity: float
     Quantity_sold: float
     Value_sold: float

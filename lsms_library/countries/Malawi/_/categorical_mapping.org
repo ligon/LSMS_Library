@@ -641,6 +641,36 @@
 |   12 | Ox-Cart         |
 |   13 | Other (Specify) |
 
+# harmonize_crop_condition: Module G question 13c, "(S/U)" -- the physical
+# state of the crop at the moment the reported harvest quantity was measured.
+# The Stata value labels are identical in every wave that asks it (2010-11,
+# 2013-14, 2016-17, 2019-20, both halves of the two split waves):
+#   1 'S: SHELLED'  2 'U: UNSHELLED'  3 'NOT APPLICABLE'
+# (2013-14 spells 1/2 without the 'S:'/'U:' prefix; the codes are the same.)
+#
+# THIS IS A FORM AXIS WITH NO DRYNESS AXIS.  Uganda's `harvest_conditions`
+# crosses a dryness family (green / fresh / dry-at-harvest / dried) with a
+# form (with shell / in cob / in pods / grain); Malawi asks ONLY the form,
+# and never asks the dryness.  So the Preferred Labels are the BARE FORM
+# tokens `shelled` / `unshelled`, NOT `dried_grain` / `dried_with_shell` --
+# writing those would assert a dryness the instrument never recorded.  See
+# lsms_library/data_info.yml (Columns > crop_production > condition), which
+# declares the cross-country vocabulary and the rule that a country asking
+# something Uganda does not extends the list rather than force-fitting.
+#
+# Code 3 is the survey's own "this crop has no shell to speak of" (maize
+# eaten green, cassava, vegetables), an ANSWER, not a missing value; it is
+# `shell_not_applicable`.  It is deliberately NOT `unknown_condition`, which
+# is the sentinel malawi.py mints for a NULL or off-scheme code (2013-14 has
+# one row coded 5; the 2016-17 panel has 15 / 10 / 4.5) and for the
+# perennial Module P, which asks no condition question at all.
+#+name: harmonize_crop_condition
+| Code | Preferred Label      |
+|------+----------------------|
+|    1 | shelled              |
+|    2 | unshelled            |
+|    3 | shell_not_applicable |
+
 # harmonize_input: agricultural-input identity for the plot_inputs feature
 # (GAP 2).  Codes 1-6 are the Module D inorganic-fertilizer type codes
 # (ag_d39a / slot-2 type); codes 7-11 are the Module D agrochemical type
