@@ -2651,7 +2651,8 @@ def _parcel_from_feature_plot(plot_id):
 
 
 def yield_kg(crop_production, plot_features, *, area_col='Area',
-             volume_as_mass=True, on='parcel'):
+             volume_as_mass=True, on='parcel',
+             min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
     """Harvested kilograms per unit plot area (WB ``yield_kg``).
 
     MECHANICAL reduction (GAP 1).  Sums :func:`harvest_kg` and plot area to a
@@ -2669,6 +2670,17 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         Name of the area column in ``plot_features``.
     volume_as_mass : bool, default True
         Forwarded to :func:`harvest_kg`.
+    min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
+        Forwarded to :func:`harvest_kg`.
+    shipped_factors : pd.DataFrame, optional
+        Forwarded to :func:`harvest_kg` -- an externally shipped
+        kg-per-unit table (see :func:`harvest_kg_factors`).  **Without it a
+        caller asking for yields gets no ``shipped`` layer**, because
+        ``yield_kg`` calls ``harvest_kg`` internally; that gap was the one
+        concrete cost of the explicit-loader design and this kwarg closes
+        it (`.coder/ledger/harvest-kg-shipped-factors.md` section 6 Q1/Q3)::
+
+            yield_kg(cp, pf, shipped_factors=ethiopia.crop_conversion_factors())
     on : {'parcel', 'plot'}, default 'parcel'
         Land grain to join on.
 
@@ -2703,7 +2715,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     if on not in {'parcel', 'plot'}:
         raise ValueError(f"yield_kg on= must be 'parcel' or 'plot', got {on!r}")
 
-    hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass).reset_index()
+    hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass,
+                    min_reports=min_reports,
+                    shipped_factors=shipped_factors).reset_index()
     if 'plot' not in hk.columns:
         raise ValueError("harvest_kg must yield a 'plot' level to join area")
 

@@ -1392,7 +1392,103 @@ sale source is the fix; it is a feature addition, not a config tweak.
 for =crop_production=, and that is presently true, but not because the
 factors are unavailable.  =Crop_CF_Wave2.dta=, =Crop_CF_Wave3.dta= and
 =Crop_CF_Wave4.dta= (2013-14/2015-16/2018-19) and =crop_cf_wave5.dta=
-(2021-22) all have DVC sidecars and are unread by any script here.  GH #852 is the wiring issue.
+(2021-22) all have DVC sidecars and are unread by any script here.
+
+*Wired 2026-09-09 (GH #852).*  =ethiopia.crop_conversion_factors()= reads
+all four files and returns the canonical shipped-factor table for
+=transformations.harvest_kg(cp, shipped_factors=...)=.  It is
+ANALYST-CALLABLE and NEVER stored: =crop_production='s parquet is
+byte-identical with and without it (verified by rebuilding it after the
+=ethiopia.py= edit and comparing frames).  The =data_scheme.yml:120=
+comment still says "NO unit->kg conversion" of the STORED table, and that
+remains true; it now points at the loader.
+
+Measured cold on the isolated build (85,519 crop rows):
+
+| layer               |  before |     after |
+|---------------------+---------+-----------|
+| shipped_matched     |       0 |    62,164 |
+| shipped (post-rank) |       0 |    62,164 |
+| inferred            |  26,546 |     7,766 |
+| none                |  58,973 |    15,589 |
+| shipped_implausible |       0 |         0 |
+| rows returned       |  22,672 |    66,049 |
+
+=Harvest_kg= per wave, before -> after: 2011-12 653,661 -> *653,661
+(unchanged -- W1 ships no factor file and must never be given one)*;
+2013-14 625,076 -> 3,612,044; 2015-16 331,120 -> 3,920,357; 2018-19
+103,685 -> 2,657,402; 2021-22 192,169 -> 1,837,152.  Total 1,905,712 ->
+12,680,616.
+
+=reported_vs_shipped= is =={both: 0}== and always will be here: the ESS
+asks no per-row conversion factor, so =crop_production= carries no
+=KgFactor= column at all (see "The ESS asks NO value of own-consumption"
+above for the food-side analogue).  The corroboration that the join is
+keyed RIGHT rather than merely non-empty is *shipped vs inferred*: on the
+18,780 rows where both exist (the metric units) the median ratio is
+*1.0000* and *0.0%* lie outside [0.5, 2], in every wave.
+
+Match rates.  Crop codes: *100%* of the WB codes decode through
+=harmonize_crop= in all four waves.  Units: the table covers 69.3% /
+82.5% / 82.0% / 77.6% of each wave's §9 harvest ROWS -- that share is the
+CEILING on =shipped_matched=, and it is pinned by test because a
+vocabulary mismatch matches nothing SILENTLY.  The units §9 uses and the
+table lacks are =Other (Specify)= (5,498 of the 15,589 still-unserved
+rows), =Chinet= / =Chinet Medium=, and the mojibake =Zorba/Akara � *=
+forms recorded under "The unit axis" below -- repairing that mojibake
+would change =crop_production='s stored content, so it was NOT done here.
+
+*Two ambiguities, both resolved in the LOADER by stated rule*, because
+=transformations._shipped_factor_lookup= REFUSES an ambiguous table
+rather than averaging or =first()=-ing:
+  1. The WB's own duplicate, crop 74 x unit 62 at 4.34 and 6.125 in the
+     W4/W5 blob.  *Keep 4.34*, drop 6.125, for continuity with W3 -- the
+     same answer EPAR reaches.  A duplicate the rule does NOT cover
+     raises, so a future one is loud.
+  2. A collision OUR OWN decode creates: crop codes *56 (KALE)* and *69
+     (SPINACH)* carry different factors and =harmonize_crop= folds both
+     onto ='Leafy Greens'=, on the Esir units.  Those 10 keys (20 rows)
+     are *DROPPED with a warning*, not picked between: =crop_production=
+     no longer records which crop the row was, so there is nothing to
+     choose on.  They fall through to =harvest_kg='s other layers.
+
+*Region: the table is served NATIONAL by default, and that is a real
+approximation.*  The file is WIDE -- one factor column per region PLUS
+=mean_cf_nat=, the WB's own national figure, so serving it is
+transcription and no aggregate is computed (core never aggregates; a
+median across regions would invent a number the WB did not publish).
+=region=True= returns the =(t, j, u, region)= form for a caller who has
+resolved a lower-case numeric =region= onto =crop_production=.  Why not
+by default, with numbers:
+  - =crop_production= carries NO region level.  99.6% of its rows CAN be
+    given a Region *string* via =v= -> =cluster_features.Region= (100% /
+    100% / 100% / 97.3% / 100% by wave), but that column is 21 spellings
+    for 11 regions and is not harmonized cross-wave (see
+    "cluster_features District is not a district" below), while the WB
+    table keys on the NUMERIC =saq01= code.  No name->code table exists
+    in this repo.
+  - Of the rows the table can serve, the share landing on a =(j, u)=
+    whose factor actually VARIES by region is 10.2% (2013-14), 45.6%
+    (2015-16), 38.3% (2018-19), 28.7% (2021-22).  Material, not
+    negligible.
+  - The clean fix is UPSTREAM: =sect9_ph= carries =saq01= on 100% of rows
+    in every wave, so a wave-script change could emit a native =region=
+    level.  That is a =crop_production= schema change and was
+    deliberately not taken inside a read-time-layer issue.  Recorded in
+    =.coder/ledger/852-ethiopia-shipped-factors.md= §6 Q1.
+
+The region columns are named by the file's own Stata variable labels:
+=mean_cf1= TIGRAY, =2= AFAR, =3= AMHARA, =4= OROMIYA, =6= BENISHANGUL
+GUMUZ, =7= SNNP, =12= GAMBELLA, =99= "SOMALIE, DIRE DAWA, & HARAR".
+=99= is a POOLED cell, not a survey region code; EPAR expands it into
+codes 5/13/15 and we do not -- we serve what the file says.
+
+*NOT EPAR's product.*  EPAR reshapes the file, synthesises unit 52 from
+51/53, =fillin=s the crop x unit x region grid and fills the holes from a
+per-(unit, region) mean across crops -- their own comment calls that "a
+rough estimate ... when the crop code is unknown".  Everything after the
+=fillin= is imputation; this loader reads the RAW table rows only.
+
 
 Wave 5's file has a known duplicate row that a loader must handle
 deliberately: crop 74, unit 62, with two factors, 4.34 and 6.125.

@@ -947,6 +947,271 @@ def _greg_month(series):
     return n.map(_ETH_MONTH_TO_GREG).astype('Int64')
 
 
+# ---------------------------------------------------------------------------
+# WB-shipped crop conversion factors (GH #852)
+# ---------------------------------------------------------------------------
+#
+# Four ESS waves ship a World Bank crop x unit x region kg-conversion table.
+# It is ANALYST-CALLABLE and is NEVER stored: `crop_production.KgFactor` is
+# reserved for a per-row REPORTED factor (`lsms_library/data_info.yml`,
+# Columns.crop_production.KgFactor), and a table lookup baked into a parquet
+# would hide both the de-duplication rule below and the region decision.
+# Hand the result to `transformations.harvest_kg(cp, shipped_factors=...)`,
+# which serves it as the `shipped` layer (below `reported`, above
+# `survey_median`).
+
+#: The WB crop-conversion file shipped in each wave directory.  2011-12 (W1)
+#: has NO such file and must never be given a fabricated one.
+#:
+#: 2018-19's `Crop_CF_Wave4.dta` and 2021-22's `crop_cf_wave5.dta` are ONE
+#: BYTE-IDENTICAL BLOB under two names (md5 `299c2700...` on both sidecars) --
+#: the World Bank shipped no new factor file for ESPS-5, which is also why
+#: EPAR's W5 do-file reaches for an earlier wave's land-unit file
+#: (`EPAR_UW_Ethiopia_ESS_W5.do:324`).  The loader reads the file that ships
+#: in each wave's own directory, so the same numbers are served under BOTH
+#: `t` values.  That is deliberate: it is the factor table the WB published
+#: WITH that wave, not a borrow we performed.
+CROP_CF_FILES = {
+    '2013-14': 'Crop_CF_Wave2.dta',
+    '2015-16': 'Crop_CF_Wave3.dta',
+    '2018-19': 'Crop_CF_Wave4.dta',
+    '2021-22': 'crop_cf_wave5.dta',
+}
+
+#: The table is WIDE: one factor column per region, plus a NATIONAL column.
+#: Region codes are read off the Stata variable labels, which name them
+#: outright (measured on `Crop_CF_Wave4.dta`):
+#:   mean_cf1 TIGRAY, mean_cf2 AFAR, mean_cf3 AMHARA, mean_cf4 OROMIYA,
+#:   mean_cf6 BENISHANGUL GUMUZ, mean_cf7 SNNP, mean_cf12 GAMBELLA,
+#:   mean_cf99 "SOMALIE, DIRE DAWA, & HARAR".
+#: `99` is a POOLED cell, not a region code in the survey's `saq01` scheme.
+#: EPAR expands it into codes 5 / 13 / 15 (`W5.do:766-773`); we serve it as
+#: shipped and leave the expansion to a caller who wants it, so that what we
+#: return is what the file says.
+CROP_CF_REGION_COLUMNS = {
+    1: 'mean_cf1', 2: 'mean_cf2', 3: 'mean_cf3', 4: 'mean_cf4',
+    6: 'mean_cf6', 7: 'mean_cf7', 12: 'mean_cf12', 99: 'mean_cf99',
+}
+
+#: The national column.  It is the WB's OWN national figure, shipped in the
+#: file -- serving it is transcription, not an aggregate we computed.
+CROP_CF_NATIONAL_COLUMN = 'mean_cf_nat'
+
+#: The ONE duplicated key in the shipped tables, and the rule that resolves
+#: it.  `Crop_CF_Wave4.dta` / `crop_cf_wave5.dta` carry crop_code 74 ("ENSET
+#: ESIR MEDIUM") x unit_cd 62 TWICE, at 4.34 and 6.125.  We keep **4.34** and
+#: drop 6.125, for continuity with Wave 3 -- the same resolution EPAR reaches
+#: (`EPAR_UW_Ethiopia_ESS_W5.do:800-802`, and the commented-out block at
+#: `:345-353` that states the reason: "Based on W3 data, we have chosen to
+#: retain cf=4.34 (and drop cf=6.125) for continuity").
+#:
+#: This MUST be done here.  `transformations._shipped_factor_lookup` REFUSES
+#: an ambiguous table rather than averaging two factors or letting a
+#: `groupby().first()` pick one -- de-duplication is the loader's deliberate
+#: act (GH #852 "What it must NOT do"; `CLAUDE.md` Grain Collapse).
+CROP_CF_DUPLICATE_RULE = {'crop_code': 74, 'unit_cd': 62, 'drop_above': 5.0}
+
+
+def _crop_cf_table(t):
+    """Read ONE wave's WB crop-conversion file, decoded to canonical labels.
+
+    Returns a long frame with columns ``t``, ``j`` (crop Preferred Label),
+    ``u`` (canonical unit label), ``region`` (Int64 code) and ``KgFactor``,
+    plus a ``national`` flag row set.  Codes are decoded through the SAME
+    tables the wave's `crop_production` script uses -- `harmonize_crop` for
+    the crop code (`_eth_crop_label_map`) and `_clean_unit_label` on the
+    file's own Stata value labels for the unit -- so `j` and `u` speak the
+    frame's vocabulary rather than the WB's codes.  A vocabulary mismatch
+    here does not raise; it silently matches nothing (see
+    `transformations._shipped_factor_lookup`), which is why
+    :func:`crop_conversion_factors` reports the match rate.
+    """
+    fn = CROP_CF_FILES[t]
+    path = f'Ethiopia/{t}/Data/{fn}'
+    raw = get_dataframe(path, convert_categoricals=False)
+    lab = get_dataframe(path, convert_categoricals=True)
+
+    df = pd.DataFrame({
+        'crop_code': pd.to_numeric(raw['crop_code'], errors='coerce').astype('Int64'),
+        'unit_cd': pd.to_numeric(raw['unit_cd'], errors='coerce').astype('Int64'),
+    })
+    # The DELIBERATE de-duplication (see CROP_CF_DUPLICATE_RULE).
+    r = CROP_CF_DUPLICATE_RULE
+    nat = pd.to_numeric(raw[CROP_CF_NATIONAL_COLUMN], errors='coerce')
+    drop = ((df['crop_code'] == r['crop_code'])
+            & (df['unit_cd'] == r['unit_cd'])
+            & (nat > r['drop_above'])).fillna(False)
+    keep = ~drop.to_numpy()
+    raw = raw[keep]
+    lab = lab[keep]
+    df = df[keep]
+    # A duplicate the stated rule does NOT cover is a NEW defect, not
+    # something to absorb quietly.
+    still = df.duplicated(subset=['crop_code', 'unit_cd'], keep=False)
+    if still.any():
+        raise ValueError(
+            f"Ethiopia {t} {fn}: {int(still.sum())} row(s) remain duplicated on "
+            f"(crop_code, unit_cd) after the stated de-duplication rule "
+            f"{r}: e.g. {df[still].head().to_dict('records')}.  Resolve the new "
+            "duplicate with a stated rule here -- harvest_kg's shipped layer "
+            "refuses an ambiguous table rather than picking one.")
+
+    df['j'] = df['crop_code'].map(_eth_crop_label_map()).astype('string')
+    df['u'] = _clean_unit_label(lab['unit_cd']).values
+    df['t'] = t
+
+    wave_no = int(''.join(ch for ch in fn if ch.isdigit()))
+    df['Source'] = f'WB Crop_CF Wave {wave_no}'
+
+    pieces = []
+    national = df.copy()
+    national['region'] = pd.NA
+    national['KgFactor'] = pd.to_numeric(
+        raw[CROP_CF_NATIONAL_COLUMN], errors='coerce').values
+    national['_national'] = True
+    pieces.append(national)
+    for code, col in CROP_CF_REGION_COLUMNS.items():
+        if col not in raw.columns:
+            continue
+        piece = df.copy()
+        piece['region'] = code
+        piece['KgFactor'] = pd.to_numeric(raw[col], errors='coerce').values
+        piece['_national'] = False
+        pieces.append(piece)
+    out = pd.concat(pieces, ignore_index=True)
+    out['region'] = out['region'].astype('Int64')
+    return out
+
+
+def crop_conversion_factors(waves=None, region=False):
+    """The WB's shipped crop x unit kg factors, ready for ``harvest_kg``.
+
+    ANALYST-CALLABLE, never stored.  Pass the result straight through::
+
+        import ethiopia
+        from lsms_library.transformations import harvest_kg
+        cp = Country('Ethiopia').crop_production()
+        hk = harvest_kg(cp, shipped_factors=ethiopia.crop_conversion_factors())
+
+    Parameters
+    ----------
+    waves : str or iterable of str, optional
+        Wave ids to load.  Default: every wave that SHIPS a file, i.e.
+        :data:`CROP_CF_FILES` (2013-14, 2015-16, 2018-19, 2021-22).
+        **2011-12 has no such file and never gets one** -- naming it raises,
+        because a factor invented for W1 is exactly the fabrication GH #852
+        forbids.
+    region : bool, default False
+        ``False`` (default) returns the table keyed ``(t, j, u)`` carrying
+        the file's OWN national column (:data:`CROP_CF_NATIONAL_COLUMN`).
+        ``True`` returns it keyed ``(t, j, u, region)`` from the per-region
+        columns (:data:`CROP_CF_REGION_COLUMNS`), for a caller who has
+        resolved a lower-case ``region`` level onto ``crop_production``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed by ``(t, j, u)`` -- plus ``region`` when ``region=True`` --
+        with columns ``KgFactor`` (kg per ONE unit of ``u``, the same meaning
+        the canonical ``crop_production.KgFactor`` carries) and ``Source``.
+        The index is unique, which is what
+        ``transformations._shipped_factor_lookup`` requires.
+
+    Notes
+    -----
+    **Why national is the default.**  The shipped table is WIDE -- one factor
+    column per region PLUS ``mean_cf_nat``, the World Bank's own national
+    figure.  Serving that column is transcription; no aggregate is computed
+    and none would be acceptable (``CLAUDE.md`` -- core never aggregates, and
+    a median over regions would invent a factor the WB did not publish).
+    Region keying is offered but is not the default because
+    ``crop_production`` carries NO region level today: the framework joins
+    only ``v`` (``_join_v_from_sample``), and ``cluster_features.Region`` is
+    an un-harmonised STRING (21 spellings for 11 regions cross-wave; see
+    ``Ethiopia/_/CONTENTS.org``), not the numeric ``saq01`` code this table
+    keys on.  Measured cost of the national default (2026-09-09): of the §9
+    harvest rows the table can serve at all, the share landing on a
+    ``(j, u)`` whose factor actually VARIES by region is 10.2% (2013-14),
+    45.6% (2015-16), 38.3% (2018-19), 28.7% (2021-22) -- material, not
+    negligible.  The clean fix is upstream: ``sect9_ph`` carries ``saq01`` on
+    100% of rows in every wave, so a wave-script change could emit a native
+    ``region`` level.  That is a `crop_production` schema change and is
+    deliberately NOT done here (GH #852 is a read-time layer).
+
+    **NOT EPAR's product.**  EPAR reshapes this file, synthesises unit 52
+    from 51/53, ``fillin``s the crop x unit x region grid and then fills the
+    holes from a per-``(unit, region)`` mean across crops
+    (``EPAR_UW_Ethiopia_ESS_W5.do:776-797``, whose own comment calls that
+    last step "a rough estimate ... when the crop code is unknown").  We read
+    the RAW table rows only.  Everything EPAR adds after ``fillin`` is
+    imputation, and this loader must not launder it into a "shipped" factor.
+    """
+    if waves is None:
+        waves = list(CROP_CF_FILES)
+    elif isinstance(waves, str):
+        waves = [waves]
+    else:
+        waves = list(waves)
+
+    missing = [w for w in waves if w not in CROP_CF_FILES]
+    if missing:
+        raise ValueError(
+            f"Ethiopia ships no WB crop-conversion file for wave(s) {missing}; "
+            f"the file exists only for {sorted(CROP_CF_FILES)}.  2011-12 (ESS1) "
+            "has no Crop_CF sidecar at all and must NOT be given another wave's "
+            "factors -- that wave stays on harvest_kg's other layers (GH #852).")
+
+    frames = [_crop_cf_table(t) for t in waves]
+    out = pd.concat(frames, ignore_index=True)
+
+    out = out[out['_national']] if not region else out[~out['_national']]
+    out = out.drop(columns=['_national', 'crop_code', 'unit_cd'])
+
+    # A factor must be finite and > 0 to be a factor; and a row with no crop
+    # label or no unit label has no key.  Dropping these is not a judgement
+    # call -- an unusable value cannot serve a row either way.
+    out['KgFactor'] = pd.to_numeric(out['KgFactor'], errors='coerce')
+    out = out[np.isfinite(out['KgFactor']) & (out['KgFactor'] > 0)]
+    out = out.dropna(subset=['j', 'u'])
+
+    idx = ['t', 'j', 'u'] + (['region'] if region else [])
+    if not region:
+        out = out.drop(columns=['region'])
+    # Two distinct WB codes can decode to the same canonical (j, u) -- an
+    # EXACT repeat is lossless and dropped; a genuine disagreement is a real
+    # ambiguity and is raised, never reduced.
+    out = out.drop_duplicates(subset=idx + ['KgFactor', 'Source'])
+    dup = out.duplicated(subset=idx, keep=False)
+    if dup.any():
+        # A DECODE collision, not a WB defect: two distinct WB crop codes
+        # carry different factors and our own `harmonize_crop` folds them
+        # onto one Preferred Label.  Measured 2026-09-09, the whole set is
+        # KALE (56) and SPINACH (69) -> 'Leafy Greens' on the Esir units:
+        # 2 rows in 2013-14 and 6 in each of 2015-16 / 2018-19 / 2021-22.
+        # We DROP those keys rather than pick or average, and say so.  The
+        # information that would resolve them is destroyed by the same
+        # decode -- a `crop_production` row reading 'Leafy Greens' no longer
+        # records whether it was kale or spinach -- so there is nothing to
+        # choose on.  Averaging would be the grain collapse `CLAUDE.md`
+        # forbids; picking one would be a `groupby().first()` with a nicer
+        # name.  The rows simply fall through to harvest_kg's other layers.
+        lost = out.loc[dup, idx].drop_duplicates()
+        warnings.warn(
+            f"Ethiopia crop_conversion_factors: DROPPED {len(lost)} key(s) "
+            f"({int(dup.sum())} rows of {len(out)}) that DISAGREE on "
+            f"{idx} after decoding -- distinct WB crop codes that "
+            "harmonize_crop folds onto one Preferred Label (KALE 56 and "
+            "SPINACH 69 -> 'Leafy Greens' is the whole known set).  Neither "
+            "factor is served: crop_production no longer records which crop "
+            "the row was, so there is nothing to choose on, and this loader "
+            "never averages two factors.  Keys: "
+            f"{sorted(map(tuple, lost.to_numpy()))[:6]}",
+            UserWarning, stacklevel=2)
+        out = out[~dup]
+    return out.set_index(idx)[['KgFactor', 'Source']].sort_index()
+
+
+
 def crop_production_for_wave(t, harvest, planting, sale, colmap,
                              intercrop=None, unit_labels=None,
                              sale_unit_labels=None):
