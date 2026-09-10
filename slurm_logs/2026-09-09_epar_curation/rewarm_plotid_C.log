@@ -1,0 +1,95 @@
+Benin      assets                       OK   rows=     38191    15.0s
+Benin      cluster_features             OK   rows=       670     0.4s
+Benin      crop_production              OK   rows=      9056     6.8s
+Benin      food_acquired                OK   rows=    189236    41.7s
+Benin      food_expenditures            OK   rows=    150779     0.9s
+Benin      food_prices                  OK   rows=    149062     2.6s
+Benin      food_quantities              OK   rows=    186362     2.6s
+Benin      food_security                OK   rows=      8011     0.7s
+Benin      household_characteristics    OK   rows=      7991    30.3s
+Benin      household_roster             OK   rows=     42343     0.2s
+Benin      housing                      OK   rows=      8012     0.8s
+Benin      individual_education         OK   rows=     42343     2.2s
+Benin      interview_date               OK   rows=     24035     1.0s
+Benin      livestock                    OK   rows=      7334     5.3s
+Benin      people_last7days             OK   rows=     35042     7.1s
+Benin      plot_features                OK   rows=      7588     5.0s
+Benin      plot_inputs                  OK   rows=     10605     5.5s
+Benin      plot_labor                   OK   rows=     10738     5.1s
+Benin      sample                       OK   rows=      8012     0.1s
+Benin      shocks                       OK   rows=     12305    24.8s
+Benin      subjective_well_being        OK   rows=      7953     0.6s
+CotedIvoire assets                       OK   rows=     66857    23.3s
+CotedIvoire cluster_features             OK   rows=      1484     1.0s
+CotedIvoire crop_production              OK   rows=     22216     0.3s
+CotedIvoire food_acquired                OK   rows=    296241    14.4s
+CotedIvoire food_expenditures            OK   rows=    215620     1.4s
+CotedIvoire food_prices                  OK   rows=    213872     4.2s
+CotedIvoire food_quantities              OK   rows=    294493     4.6s
+CotedIvoire food_security                OK   rows=     12960     1.6s
+CotedIvoire household_characteristics    OK   rows=     19367    43.6s
+CotedIvoire household_roster             OK   rows=    111788     0.7s
+CotedIvoire housing                      OK   rows=     12992     1.4s
+CotedIvoire individual_education         OK   rows=     79677     4.0s
+CotedIvoire interview_date               OK   rows=     38973     1.4s
+CotedIvoire livestock                    OK   rows=      4711     4.9s
+CotedIvoire people_last7days             OK   rows=     60617     6.9s
+CotedIvoire plot_features                OK   rows=     14417     5.1s
+CotedIvoire plot_inputs                  OK   rows=     11250     5.1s
+CotedIvoire plot_labor                   OK   rows=     22264     4.8s
+CotedIvoire sample                       OK   rows=     19380     0.1s
+CotedIvoire shocks                       OK   rows=     13778    38.5s
+CotedIvoire subjective_well_being        OK   rows=     12912     1.3s
+Guinea-Bissau assets                       OK   rows=     30125     7.4s
+Guinea-Bissau cluster_features             OK   rows=       450     0.3s
+Guinea-Bissau crop_production              OK   rows=     10579     0.2s
+Guinea-Bissau food_acquired                OK   rows=    127219     5.7s
+Guinea-Bissau food_expenditures            OK   rows=     90795     0.5s
+Guinea-Bissau food_prices                  OK   rows=     89773     1.8s
+Guinea-Bissau food_quantities              OK   rows=    126197     1.6s
+Guinea-Bissau food_security                OK   rows=      5350     0.5s
+Guinea-Bissau household_characteristics    OK   rows=      5348    25.5s
+Guinea-Bissau household_roster             OK   rows=     42839     0.2s
+Guinea-Bissau housing                      OK   rows=      5351     0.6s
+Guinea-Bissau individual_education         OK   rows=     42839     2.0s
+Guinea-Bissau interview_date               OK   rows=     16053     0.5s
+Guinea-Bissau livestock                    OK   rows=      7989     5.4s
+Guinea-Bissau people_last7days             OK   rows=     42569    11.0s
+Guinea-Bissau plot_features                OK   rows=      9873     5.4s
+Guinea-Bissau plot_inputs                  OK   rows=      5534     5.2s
+Guinea-Bissau plot_labor                   OK   rows=     15516     6.1s
+Guinea-Bissau sample                       OK   rows=      5351     0.1s
+Guinea-Bissau shocks                       OK   rows=      9487    15.6s
+Guinea-Bissau subjective_well_being        OK   rows=      5334     0.5s
+EthiopiaRHS anthropometry                OK   rows=     36433     2.2s
+EthiopiaRHS assets                       OK   rows=       488     0.7s
+EthiopiaRHS cluster_features             OK   rows=       126     1.2s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:84: UserWarning: Refusing workspace copy of DVC-tracked file ../1994a/Data/price1234_rev.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  p1 = get_dataframe('../1994a/Data/price1234_rev.tab', convert_categoricals=False)
+  1994a: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1994b: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1995: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1997: dropped 1019/1577 rows (unmapped item code or non-positive price)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:101: UserWarning: Refusing workspace copy of DVC-tracked file ../2004/Data/rd6_kgpr_Mkt.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  rd6 = get_dataframe('../2004/Data/rd6_kgpr_Mkt.tab', convert_categoricals=False)
+  2004: dropped 12/624 rows (unmapped item code or non-positive price)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:106: UserWarning: Refusing workspace copy of DVC-tracked file ../2009/Data/price2009.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  p9 = get_dataframe('../2009/Data/price2009.tab', convert_categoricals=False)
+  2009: dropped 67/709 rows (unmapped item code or non-positive price)
+community_prices: 2691 rows, 6 waves, 43 items
+EthiopiaRHS community_prices             OK   rows=      2691     4.8s
+EthiopiaRHS consumption                  OK   rows=      2725     0.9s
+EthiopiaRHS crop_production              OK   rows=     17523     0.2s
+EthiopiaRHS food_acquired                OK   rows=     54693    10.5s
+EthiopiaRHS food_expenditures            OK   rows=     37259     0.4s
+EthiopiaRHS food_prices                  OK   rows=     35625     0.9s
+EthiopiaRHS food_quantities              OK   rows=     54445     1.0s
+EthiopiaRHS hhsize                       OK   rows=      1358     0.7s
+EthiopiaRHS household_characteristics    OK   rows=      7718     2.9s
+EthiopiaRHS household_roster             OK   rows=     51574     0.3s
+EthiopiaRHS income                       OK   rows=       252     1.1s
+EthiopiaRHS livestock                    OK   rows=      3473     1.4s
+EthiopiaRHS panel_ids                    OK   rows=      4708     0.0s
+EthiopiaRHS plot_features                OK   rows=      5299     1.1s
+EthiopiaRHS sample                       OK   rows=     10453     0.1s
+REWARM DONE
