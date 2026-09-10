@@ -1438,7 +1438,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
             piece = pd.DataFrame({
                 't':             t,
                 'i':             hh.values,
-                'plot':          plot_id.values,
+                'plot_id':          plot_id.values,
                 'j':             j.values,
                 'u':             u.values,
                 'condition':     condition.values,
@@ -1507,7 +1507,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     df['condition'] = df['condition'].astype('object').where(
         df['condition'].notna(), _CONDITION_UNKNOWN)
 
-    df = df.set_index(['t', 'i', 'plot', 'j', 'u', 'condition', 'season'])
+    df = df.set_index(['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season'])
     # Collapse exact-duplicate index tuples (same plot/crop/unit/condition/
     # season reported twice) by summing the reported quantities — this is NOT
     # an aggregation across distinct items, just de-duplication of repeated
@@ -2061,7 +2061,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
             piece = pd.DataFrame({
                 't': t,
                 'i': hh.values,
-                'plot': plot_id.values,
+                'plot_id': plot_id.values,
                 'input': input_label.values,
                 'season': season,
                 'Quantity': qty.values,
@@ -2119,7 +2119,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         piece = pd.DataFrame({
             't': t,
             'i': hh.values,
-            'plot': plot_id.values,
+            'plot_id': plot_id.values,
             'input': seed_label,
             # AGSEC4A is the FIRST-season plot-crop roster (AGSEC4B, the
             # second-season roster, is not read) -> every seed row is season A.
@@ -2159,7 +2159,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # level non-null so it is a valid index level.
     df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
 
-    df = df.set_index(['t', 'i', 'plot', 'input', 'j', 'season'])
+    df = df.set_index(['t', 'i', 'plot_id', 'input', 'j', 'season'])
     # Collapse only EXACT-duplicate (t,i,plot,input,j,season) tuples — the same
     # input identity reported twice WITHIN one plot-season (e.g. a seed row
     # repeated in AGSEC4A).  This is de-duplication of the index grain, NOT
@@ -3009,7 +3009,7 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
             piece = pd.DataFrame({
                 't': t,
                 'i': hh.values,
-                'plot': plot_id.values,
+                'plot_id': plot_id.values,
                 'source': source,
                 'season': season,
                 'PersonDays': days.values,
@@ -3027,7 +3027,7 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
         return pd.DataFrame(
             columns=['PersonDays', 'Wage'],
             index=pd.MultiIndex.from_arrays(
-                [[]] * 5, names=['t', 'i', 'plot', 'source', 'season']))
+                [[]] * 5, names=['t', 'i', 'plot_id', 'source', 'season']))
 
     out = pd.concat(pieces, ignore_index=True)
     out['PersonDays'] = out['PersonDays'].astype('Float64')
@@ -3035,6 +3035,6 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
     # Collapse exact-duplicate (plot, source, season) keys that can arise when
     # a wave repeats a plot row; keep the max reported days / wage so the index
     # is unique without summing distinct reported observations.
-    out = (out.groupby(['t', 'i', 'plot', 'source', 'season'], dropna=False)
+    out = (out.groupby(['t', 'i', 'plot_id', 'source', 'season'], dropna=False)
               .agg({'PersonDays': 'max', 'Wage': 'max'}))
     return out

@@ -38,7 +38,7 @@ from lsms_library.feature import (
     _select_kept_shape,
 )
 
-CANONICAL = ["t", "v", "i", "plot", "j", "u", "condition", "season"]
+CANONICAL = ["t", "v", "i", "plot_id", "j", "u", "condition", "season"]
 
 
 # ---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ class TestDeclarations:
         assert "crop_production" not in _no_v_join_tables()
 
     def test_level_aliases(self):
-        assert _level_aliases("crop_production") == {"plot_id": "plot", "crop": "j"}
+        assert _level_aliases("crop_production") == {"plot": "plot_id", "crop": "j"}
 
     def test_missing_level_sentinels_are_non_null_strings(self):
         sentinels = _missing_level_sentinels("crop_production")
@@ -104,19 +104,20 @@ def _frame(names, tuples, **cols):
 
 
 class TestRenameIndexLevels:
-    def test_plot_id_and_crop_are_renamed(self):
-        df = _frame(["i", "t", "v", "plot_id", "crop", "u"],
+    def test_plot_and_crop_are_renamed(self):
+        """`plot_id` is canonical (@ligon 2026-09-10); `plot` is the alias."""
+        df = _frame(["i", "t", "v", "plot", "crop", "u"],
                     [("h1", "2011", "c1", "p1", "Maize", "kg")])
         out = _rename_index_levels(df, _level_aliases("crop_production"),
                                    "X", "crop_production")
-        assert list(out.index.names) == ["i", "t", "v", "plot", "j", "u"]
+        assert list(out.index.names) == ["i", "t", "v", "plot_id", "j", "u"]
         assert len(out) == 1
 
     def test_noop_when_no_aliased_level_present(self):
-        df = _frame(["t", "i", "plot", "j"], [("2011", "h1", "p1", "Maize")])
+        df = _frame(["t", "i", "plot_id", "j"], [("2011", "h1", "p1", "Maize")])
         out = _rename_index_levels(df, _level_aliases("crop_production"),
                                    "X", "crop_production")
-        assert list(out.index.names) == ["t", "i", "plot", "j"]
+        assert list(out.index.names) == ["t", "i", "plot_id", "j"]
 
     def test_clash_is_refused_and_warned(self):
         """A frame carrying BOTH `crop` and `j` means something by the
@@ -133,14 +134,14 @@ class TestRenameIndexLevels:
 
 class TestAlignToCanonicalLevels:
     def test_fabricates_absent_level_as_the_declared_sentinel(self):
-        df = _frame(["t", "v", "i", "plot", "j", "u"],
+        df = _frame(["t", "v", "i", "plot_id", "j", "u"],
                     [("2011", "c1", "h1", "p1", "Maize", "kg"),
                      ("2011", "c1", "h2", "p1", "Rice", "kg")])
         with pytest.warns(UserWarning, match="does not record"):
             out = _align_to_canonical_levels(
                 df, CANONICAL, _missing_level_sentinels("crop_production"),
                 "Ethiopia", "crop_production")
-        assert list(out.index.names) == ["t", "v", "i", "plot", "j", "u",
+        assert list(out.index.names) == ["t", "v", "i", "plot_id", "j", "u",
                                          "condition", "season"]
         assert len(out) == len(df)
         assert out.index.is_unique
@@ -148,7 +149,7 @@ class TestAlignToCanonicalLevels:
         assert set(out.index.get_level_values("season")) == {"unknown_season"}
 
     def test_fabricated_level_is_never_null(self):
-        df = _frame(["t", "v", "i", "plot", "j", "u"],
+        df = _frame(["t", "v", "i", "plot_id", "j", "u"],
                     [("2011", "c1", "h1", "p1", "Maize", "kg")])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -162,7 +163,7 @@ class TestAlignToCanonicalLevels:
         """Mali / Nigeria / Tanzania report a real harvest unit in a `u`
         COLUMN.  Fabricating `u='Unknown'` over it would be a lie; promotion
         is lossless."""
-        df = _frame(["t", "v", "i", "plot", "j"],
+        df = _frame(["t", "v", "i", "plot_id", "j"],
                     [("2012", "c1", "h1", "p1", "Maize"),
                      ("2012", "c1", "h2", "p1", "Rice")],
                     Quantity=[1.0, 2.0], u=["Kg", None])
@@ -175,7 +176,7 @@ class TestAlignToCanonicalLevels:
         assert len(out) == 2 and out.index.is_unique
 
     def test_promotion_fills_nulls_with_the_sentinel_not_NA(self):
-        df = _frame(["t", "v", "i", "plot", "j"],
+        df = _frame(["t", "v", "i", "plot_id", "j"],
                     [("2012", "c1", "h1", "p1", "Maize")],
                     Quantity=[1.0], u=[pd.NA])
         with warnings.catch_warnings():
@@ -188,7 +189,7 @@ class TestAlignToCanonicalLevels:
     def test_promotion_handles_a_categorical_column(self):
         """`get_dataframe` returns pandas categoricals from Stata/SPSS; a
         `fillna` on a categorical whose categories lack the sentinel raises."""
-        df = _frame(["t", "v", "i", "plot", "j"],
+        df = _frame(["t", "v", "i", "plot_id", "j"],
                     [("2012", "c1", "h1", "p1", "Maize"),
                      ("2012", "c1", "h2", "p1", "Rice")],
                     Quantity=[1.0, 2.0],
@@ -208,7 +209,7 @@ class TestAlignToCanonicalLevels:
         assert out is df
 
     def test_report_suppresses_the_per_country_warning(self):
-        df = _frame(["t", "v", "i", "plot", "j", "u"],
+        df = _frame(["t", "v", "i", "plot_id", "j", "u"],
                     [("2011", "c1", "h1", "p1", "Maize", "kg")])
         report: dict = {}
         with warnings.catch_warnings():
@@ -252,19 +253,19 @@ class TestHarmonizeCountryFrame:
         assert len(out) == 1
 
     def test_alias_runs_before_alignment(self):
-        """Aligning first would see `plot` as missing on a country that spells
-        it `plot_id` -- there is no `plot` sentinel, so the level would simply
-        not be produced and the frame would still be excluded."""
-        df = _frame(["t", "v", "i", "plot_id", "j", "u"],
+        """Aligning first would see `plot_id` as missing on a country that
+        spells it `plot` -- there is no `plot_id` sentinel, so the level would
+        simply not be produced and the frame would still be excluded."""
+        df = _frame(["t", "v", "i", "plot", "j", "u"],
                     [("2011", "c1", "h1", "p1", "Maize", "kg")])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             out = _harmonize_country_frame(
-                df, CANONICAL, "Ethiopia", "crop_production", False,
+                df, CANONICAL, "Uganda", "crop_production", False,
                 aliases=_level_aliases("crop_production"),
                 sentinels=_missing_level_sentinels("crop_production"))
         assert list(out.index.names) == CANONICAL
-        assert out.index.get_level_values("plot").tolist() == ["p1"]
+        assert out.index.get_level_values("plot_id").tolist() == ["p1"]
 
     def test_promotion_of_DISTINCT_values_refines_and_loses_nothing(self):
         """The REFINING case: two non-null, distinct `u` values on rows that are
@@ -311,7 +312,7 @@ def _collision_frame():
     corpus country is in this state today (Mali / Nigeria / Tanzania carry 0
     literal `'Unknown'` in `u`), which is a fact about the data and not a
     property of the code -- a new wave could ship one tomorrow."""
-    return _frame(["t", "v", "i", "plot", "j"],
+    return _frame(["t", "v", "i", "plot_id", "j"],
                   [("2012", "c1", "h1", "p1", "Maize"),
                    ("2012", "c1", "h1", "p1", "Maize")],
                   Quantity=[1.0, 2.0], u=["Unknown", None])

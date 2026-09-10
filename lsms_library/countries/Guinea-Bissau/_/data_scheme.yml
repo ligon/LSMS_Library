@@ -161,7 +161,7 @@ Data Scheme:
     # plot_id.  intercropped from s16cq07 ('Associação de culturas' / 'Pura').
     # harvest_month / perennial are not recorded by s16c, so harvest_month is
     # NaN and a perennial flag is omitted entirely.
-    index: (t, i, plot, crop, u)
+    index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -183,7 +183,7 @@ Data Scheme:
     # GRAIN NOTE: EHCVM records inputs at the HOUSEHOLD x input grain, NOT
     # plot x input (no parcel-level input question); the WB plot-level
     # seed_kg / nitrogen_kg fabricates a plot split, which the reported-only
-    # rule forbids.  So `plot` is NOT in the index; the feature keeps the
+    # rule forbids.  So `plot_id` is NOT in the index; the feature keeps the
     # GAP-2 name `plot_inputs`.
     #
     # LABEL NOTE: Guinea-Bissau has NEITHER harmonize_input NOR
@@ -210,7 +210,7 @@ Data Scheme:
     # (a median-wage valuation).  ALL of those are TRANSFORMATIONS over these
     # rows, never columns here.  Single EHCVM wave: 2018-19 (script-path).
     #
-    # GRAIN (t, i, plot, source):
+    # GRAIN (t, i, plot_id, source):
     #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's
     #             plot key and plot_features' plot_id.
     #   source -- 'family' / 'hired'.  EHCVM s16a records family vs non-family
@@ -230,7 +230,7 @@ Data Scheme:
     # No categorical tables are needed (pure numeric grids).  v is NOT baked
     # in (household-linked); the framework joins it from sample().
     # units: PersonDays in days; Wage in CFA francs.
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make

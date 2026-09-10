@@ -76,14 +76,14 @@ pieces = []
 # ---------------- post-planting (PP) roster: s2b -------------------------
 pp = get_dataframe('../Data/EACIMAINOUVRE_p1.dta').copy()
 pp['i'] = _hhid(pp)
-pp['plot'] = _plot(pp, 's2bq01', 's2bq02')
+pp['plot_id'] = _plot(pp, 's2bq01', 's2bq02')
 
 # family: sum man/woman/child person-days
 fam_days = (_prod(pp, 's2bq05a', 's2bq05b')
             .add(_prod(pp, 's2bq05d', 's2bq05e'), fill_value=0)
             .add(_prod(pp, 's2bq05g', 's2bq05h'), fill_value=0))
 pieces.append(pd.DataFrame({
-    't': WAVE, 'i': pp['i'], 'plot': pp['plot'], 'source': 'family',
+    't': WAVE, 'i': pp['i'], 'plot_id': pp['plot_id'], 'source': 'family',
     'PersonDays': fam_days, 'Wage': pd.NA,
 }))
 
@@ -95,7 +95,7 @@ hir_wage = (_num(pp, 's2bq07c')
             .add(_num(pp, 's2bq07f'), fill_value=0)
             .add(_num(pp, 's2bq07i'), fill_value=0))
 pieces.append(pd.DataFrame({
-    't': WAVE, 'i': pp['i'], 'plot': pp['plot'], 'source': 'hired',
+    't': WAVE, 'i': pp['i'], 'plot_id': pp['plot_id'], 'source': 'hired',
     'PersonDays': hir_days, 'Wage': hir_wage,
 }))
 
@@ -104,14 +104,14 @@ oth_days = (_prod(pp, 's2bq09a', 's2bq09b')
             .add(_prod(pp, 's2bq09d', 's2bq09e'), fill_value=0)
             .add(_prod(pp, 's2bq09g', 's2bq09h'), fill_value=0))
 pieces.append(pd.DataFrame({
-    't': WAVE, 'i': pp['i'], 'plot': pp['plot'], 'source': 'other',
+    't': WAVE, 'i': pp['i'], 'plot_id': pp['plot_id'], 'source': 'other',
     'PersonDays': oth_days, 'Wage': pd.NA,
 }))
 
 # ---------------- post-harvest (PH) roster: s2f --------------------------
 ph = get_dataframe('../Data/EACIS2F_p2.dta').copy()
 ph['i'] = _hhid(ph)
-ph['plot'] = _plot(ph, 's2fq01', 's2fq02')
+ph['plot_id'] = _plot(ph, 's2fq01', 's2fq02')
 
 # family: two activity blocks (q04, q10)
 ph_fam = (_prod(ph, 's2fq04a', 's2fq04b')
@@ -121,7 +121,7 @@ ph_fam = (_prod(ph, 's2fq04a', 's2fq04b')
           .add(_prod(ph, 's2fq10c', 's2fq10d'), fill_value=0)
           .add(_prod(ph, 's2fq10e', 's2fq10f'), fill_value=0))
 pieces.append(pd.DataFrame({
-    't': WAVE, 'i': ph['i'], 'plot': ph['plot'], 'source': 'family',
+    't': WAVE, 'i': ph['i'], 'plot_id': ph['plot_id'], 'source': 'family',
     'PersonDays': ph_fam, 'Wage': pd.NA,
 }))
 
@@ -138,7 +138,7 @@ ph_hir_wage = (_num(ph, 's2fq06c').add(_num(ph, 's2fq06f'), fill_value=0)
                .add(_num(ph, 's2fq12f'), fill_value=0)
                .add(_num(ph, 's2fq12i'), fill_value=0))
 pieces.append(pd.DataFrame({
-    't': WAVE, 'i': ph['i'], 'plot': ph['plot'], 'source': 'hired',
+    't': WAVE, 'i': ph['i'], 'plot_id': ph['plot_id'], 'source': 'hired',
     'PersonDays': ph_hir, 'Wage': ph_hir_wage,
 }))
 
@@ -150,7 +150,7 @@ ph_oth = (_prod(ph, 's2fq08a', 's2fq08b')
           .add(_prod(ph, 's2fq14d', 's2fq14e'), fill_value=0)
           .add(_prod(ph, 's2fq14g', 's2fq14h'), fill_value=0))
 pieces.append(pd.DataFrame({
-    't': WAVE, 'i': ph['i'], 'plot': ph['plot'], 'source': 'other',
+    't': WAVE, 'i': ph['i'], 'plot_id': ph['plot_id'], 'source': 'other',
     'PersonDays': ph_oth, 'Wage': pd.NA,
 }))
 

@@ -164,7 +164,7 @@ def test_kilograms_are_not_summed_with_litres(plot_inputs):
     """
     flat = plot_inputs.reset_index()
     rows = flat[(flat['t'] == '2009-10')
-                & (flat['plot'] == '1063000910-1-1')
+                & (flat['plot_id'] == '1063000910-1-1')
                 & (flat['input'] == 'Insecticide')]
     if rows.empty:                                             # pragma: no cover
         # NOT a skip: if the build succeeded at all, this insecticide pair is
@@ -197,10 +197,10 @@ def test_2013_14_nan_plot_seed_row_survives(plot_inputs):
     Fails pre-fix: the row is not in the output at all.
     """
     flat = plot_inputs.reset_index()
-    row = flat[(flat['t'] == '2013-14') & flat['plot'].isna()
+    row = flat[(flat['t'] == '2013-14') & flat['plot_id'].isna()
                & (flat['input'] == 'Seed') & (flat['j'] == 'Cassava')]
     assert len(row) == 1, (
-        f'expected exactly one 2013-14 NaN-`plot` Seed/Cassava row (household '
+        f'expected exactly one 2013-14 NaN-`plot_id` Seed/Cassava row (household '
         f'2113000606, Quantity 3.0, "Sack (100 kgs)"); got {len(row)}.  '
         f'Pre-fix it was deleted by `groupby(dropna=True)` inside the de-dup '
         f'collapse (GH #637).'
@@ -233,7 +233,7 @@ def test_no_row_merges_two_seasons_of_the_same_input(plot_inputs):
     merged rows).
     """
     flat = plot_inputs.reset_index()
-    key = ['t', 'i', 'plot', 'input', 'j']
+    key = ['t', 'i', 'plot_id', 'input', 'j']
     both = flat[flat.duplicated(key, keep=False)]
     if both.empty:                                             # pragma: no cover
         pytest.fail('no plot-input appears in both seasons -- the fixture '

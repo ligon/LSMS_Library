@@ -447,3 +447,26 @@ The invariant is pinned by =tests/test_guinea_bissau_cluster_features.py=.
 Latitude/Longitude are NaN for 11 of the 450 grappes -- the 5 grappes absent
 from =grappe_gps_gnb2018.dta= altogether, plus 6 that are present but null.
 A geo-coverage gap in the released file, independent of the projection above.
+
+* 2026-09-10 -- the plot axis is now spelled =plot_id=, not =plot=
+
+@ligon's decision: =plot_id= is the canonical plot-axis level name EVERYWHERE.
+This country declared =plot= on crop_production, plot_labor; those =index:= tuples in
+=_/data_scheme.yml=, and the index name the wave script / country module
+writes, are now =plot_id=.  =plot_features= already said =plot_id= and is
+unchanged.
+
+- *Values are untouched.*  This is a level NAME change only: the same plot key
+  strings, the same rows, the same columns.  A warm frame read before and
+  after differs only by =rename_axis({'plot': 'plot_id'})= -- verified by
+  comparing the API frame against the pre-change one.
+- *The caches for this whole country are invalidated.*
+  =Country._table_cache_hash= hashes =_/data_scheme.yml= and the country
+  module as WHOLE FILES, so every table's hash moved, not just the renamed
+  ones.  A re-warm is required; see the bill in
+  =.coder/ledger/crop-production-plot-id.md=.
+- *A shared axis NAME is still not a shared VOCABULARY.*  Uganda's ag modules
+  key plots ={hhid}-{parcel}-{plot}= while =plot_features= keys them
+  ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
+  need =on='parcel'= to bridge them.  Renaming the level changed nothing
+  about that.

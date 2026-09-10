@@ -57,7 +57,7 @@ df = assemble_crop_production(WAVE, harvest, sale)
 # the uniqueness that matters is on the full declared grain, not on the
 # 4-level index.  (t, i, plot, crop) is legitimately non-unique now: one
 # plot-crop can be reported shelled AND unshelled.
-_GRAIN = ['t', 'i', 'plot', 'crop', 'u', 'condition']
+_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
 assert not df.reset_index().duplicated(_GRAIN).any(), \
     f"Non-unique (t,i,plot,crop,u,condition) in crop_production {WAVE}"
 assert len(df) > 0, f"crop_production {WAVE} produced no rows"

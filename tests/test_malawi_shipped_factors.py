@@ -399,7 +399,7 @@ class TestAgainstCropProduction:
 
     def test_the_declared_grain_is_unique(self, cp):
         f = cp.reset_index()
-        keys = [k for k in ['t', 'i', 'plot', 'crop', 'u', 'condition']
+        keys = [k for k in ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
                 if k in f.columns]
         assert not f.duplicated(keys).any()
 
@@ -550,7 +550,7 @@ class TestSaleSuppressionIsCounted:
         harv = _pd.DataFrame({
             't': ['2010-11'] * 2,
             'i': ['h1'] * 2,
-            'plot': ['R1'] * 2,
+            'plot_id': ['R1'] * 2,
             'crop': ['Maize'] * 2,
             '_crop_code': _pd.array([1, 1], dtype='Int64'),
             'u': _pd.array(['50 kg Bag'] * 2, dtype='string'),
@@ -581,7 +581,7 @@ class TestSaleSuppressionIsCounted:
         """The gate must not fire on the ordinary case."""
         import pandas as _pd
         harv = _pd.DataFrame({
-            't': ['2010-11'], 'i': ['h1'], 'plot': ['R1'], 'crop': ['Maize'],
+            't': ['2010-11'], 'i': ['h1'], 'plot_id': ['R1'], 'crop': ['Maize'],
             '_crop_code': _pd.array([1], dtype='Int64'),
             'u': _pd.array(['50 kg Bag'], dtype='string'),
             'condition': _pd.array(['shelled'], dtype='string'),

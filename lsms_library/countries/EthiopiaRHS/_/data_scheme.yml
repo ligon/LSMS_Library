@@ -115,7 +115,7 @@ Data Scheme:
   # crop_production (#438, Tier-2): item-level HH x crop production.  The
   # ERHS area_output_* files are WIDE HH x crop AGGREGATES -- already summed
   # across plots, so there is NO plot dimension; this is the documented ERHS
-  # reduced-grain variant ((t,i,j), not the canonical (t,i,plot,j)).  Per-
+  # reduced-grain variant ((t,i,j), not the canonical (t,i,plot_id,j)).  Per-
   # wave data_info extracts each round's {stub}_kg (production, kg) and
   # {stub}_ha (area, hectares) myvars; the `crop_production` df_edit hook in
   # _/ethiopiarhs.py melts them to long (i, j), maps the 9 crop stubs to

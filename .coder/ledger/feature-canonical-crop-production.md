@@ -130,6 +130,15 @@ sentinel. Plus a deterministic kept-shape rule that prefers the canonical shape.
 - **`plot_features` is registered on `plot_id`; `crop_production` is canonicalized
   on `plot`.** A cross-feature join now needs a rename in one direction. Aligning
   the two is a #569 follow-up.
+
+  > **RESOLVED 2026-09-10 (@ligon).** `plot_id` is the canonical name EVERYWHERE.
+  > `crop_production` is now registered `(t, v, i, plot_id, j, u, condition,
+  > season)` and `level_aliases` reads `plot: plot_id` (the direction is
+  > reversed from what this ledger describes above). Every `transformations.py`
+  > plot-grain transform emits `plot_id`. See
+  > `.coder/ledger/crop-production-plot-id.md`. The rename does NOT make the two
+  > features' plot VOCABULARIES joinable -- that is still
+  > `_parcel_from_crop_plot` / the `on=` kwarg.
 - **Malawi `feat/854`'s `condition` values** (`shelled`, `unshelled`,
   `shell_not_applicable`) are outside the `condition` spellings list in
   `data_info.yml:525-545`. Not this task's change, but that branch should either
