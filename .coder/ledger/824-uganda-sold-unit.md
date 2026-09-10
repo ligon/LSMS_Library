@@ -132,7 +132,7 @@ exists); a unit-label kg parser in library code (nothing here converts); a
 
 | wave | A | B | | wave | A | B |
 |---|---|---|---|---|---|---|
-| 2009-10 | 95.1% | 97.5% | | 2015-16 | 98.9% | 99.1% |
+| 2009-10 | 96.8% | 97.5% | | 2015-16 | 98.9% | 99.1% |
 | 2010-11 | **57.2%** | 97.9% | | 2018-19 | 93.0% | 91.9% |
 | 2011-12 | 99.8% | 99.7% | | 2019-20 | 96.4% | 95.3% |
 | 2013-14 | 94.1% | 99.1% | | **all** | **93.9%** | |
@@ -141,10 +141,15 @@ exists); a unit-label kg parser in library code (nothing here converts); a
 in the extract; asked on the questionnaire).  2010-11 season A's 57.2% is the
 capped column, and its nullity is not random.
 
-**Agreement** — `Unit_sold == u`, rows where both are known (`u != 'Unknown'`):
-**96.0%** panel-wide (40,183 rows), by wave-season 92.0–98.0%; i.e. **4.0%
-disagree**, close to the 2.0–10.4% CONTENTS.org recorded from the raw files.
-Nigeria's 95–97% in #824 was Nigeria; Uganda's number is 96.0%.
+**Agreement** — `Unit_sold == u`, rows with a positive `Quantity_sold` that
+know both (`u != 'Unknown'`, `Unit_sold` non-null): **96.06%** panel-wide
+(**40,083** rows), by wave-season 92.0–98.0%; i.e. **3.9% disagree**.  (The
+looser "any row carrying both labels" definition gives 40,183 / 95.98%; the
+sale-row restriction is the one to quote and the one now shipped.  The
+2026-09-09 version of this ledger shipped 40,183 and a 2009-10 season-A
+coverage of 95.1%; both were transcription errors, caught by the red-team and
+corrected here from a fresh isolated build.)  Nigeria's 95–97% in #824 was
+Nigeria; Uganda's number is 96.1%.
 2018-19 season A is excluded by construction (`u == 'Unknown'` on all 7,153
 rows) and reported separately: its `Unit_sold` is non-null on 2,734 rows, so a
 farmgate price for that wave-season is now reachable where it was not.
@@ -176,17 +181,51 @@ priced rows):
 **1 of 10** moves by more than 10% (Sugarcane, 9.1% — nothing does).  **That
 aggregate stability is the wrong place to look, and stating it alone would be
 misleading.**  The medians barely move because only 3.5% of priced rows are
-affected; on those rows the error is severe.  Of the 1,571 affected priced
-rows, 1,057 carry a nominal weight in BOTH unit labels, and for those the
-implied per-kg price was off by a factor with **median 4.0, p75 40, p90 100,
-max 240** — **73.1% off by ≥ 2×, 26.7% by ≥ 100×**.  The biggest single cell is
-`u = Sack (100 kgs)` with `Unit_sold = Kg` (169 rows, a 100× error), which is
-Malawi's factor-of-50 pathology in Ugandan clothing.
+affected (1,571 of 45,519); the per-row gap is large.
+
+**Magnitude, and the parser it assumes.**  Fold factor `max(r, 1/r)` where
+`r = kg(u)/kg(Unit_sold)`, weights read out of the label text
+("Sack (100 kgs)" → 100) — documentation-only; the served table converts
+nothing:
+
+| nominal-weight reading | n | median fold | p90 | ≥ 2× | ≥ 100× |
+|---|---|---|---|---|---|
+| **kg-bearing labels only** (Kg, Sack (N kgs), Gram) | **565** | **50×** | 120 | 70.6% | **47.4%** |
+| + "(15 lts)" / "(20 lts)" read as kilograms | 1,057 | 6.0× | 100 | 73.1% | 26.2% |
+
+**Quote the kg-only row**: 15 litres of maize is not 15 kilograms, and it
+makes the gap LARGER, not smaller.  The 2026-09-09 version quoted "median
+4.0× / 26.7% ≥ 100×", which was the litres-as-kg family *and* the median of
+the signed ratio rather than the fold error; corrected.  Largest single cell:
+`u = Sack (100 kgs)` with `Unit_sold = Kg`, **162 priced rows** (169 counts
+non-priced rows too), a 100× gap.
+
+**WHICH label is right — measured, and it is not `Unit_sold` (red-team, item
+5).**  On that same largest cell the median `Value_sold / Quantity_sold` is
+**34,167 UShs**, which is a SACK price, not a kilogram price (agreeing-row
+benchmarks: maize 500 UShs/kg vs 50,000 UShs/sack).  Generalised over all
+disagreeing rows by two tests sharing no instrument, `Unit_sold` is the
+CLOSER denominator on only **40.5%** (price test, n=1,021, benchmarks from
+agreeing rows with n≥20) and **42.7%** (the household's own reported sold-kg
+factor `a5?q7d` against each label's empirical weight, n=468) — the red-team's
+own filters gave 44.5% / 44.2%, the same conclusion.  So **the column is
+right and the original consumer rule was wrong**: "a price per ONE
+`Unit_sold` — NEVER per `u`" instructed a behaviour that is wrong on the
+majority of exactly the rows it governed.  Replaced everywhere with: where
+the two disagree the row is a data-quality FLAG, not an identification;
+treat it as ambiguous, exclude or resolve it with a reported factor, and
+report how many were excluded.
 
 **Grain conflicts** (rows sharing the whole declared index but reporting
 different sold labels; blanked and warned, nothing dropped): 11 of 130,606 —
 2009-10 6 `Unit_sold`; 2011-12 1 `Unit_sold`; 2013-14 2 `Unit_sold` + 1
-`Condition_sold`; 2015-16 1 `Condition_sold`.
+`Condition_sold`; 2015-16 1 `Condition_sold`.  **They are 11 of 433**: 433
+index groups already carry more than one source row (445 rows collapsed
+away), 422 agreeing and 11 not, and the 11 are genuinely DISTINCT records
+(different `Quantity`, `Quantity_sold`, `Value_sold`; three with different
+`harvest_month`).  A level is missing, and it is pre-existing — `development`
+already sums those 433.  Most likely candidate: the unread condition-2 slots,
+GH #848.  Written up in CONTENTS.org as an open grain question.
 
 ---
 ### Phase 3 — verification

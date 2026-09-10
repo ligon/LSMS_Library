@@ -6,12 +6,19 @@ carries its OWN unit code (q7c) and its OWN condition code (q7b), distinct
 from the harvest unit (q6c) and harvest condition (q6b) that the table keys
 on.  ``CROP_COLMAPS`` wired neither, so ``Value_sold / Quantity_sold`` was a
 price denominated in a unit the row did not carry while ``u`` advertised the
-harvest unit.  Measured on the built table (2026-09-09, isolated
-``LSMS_DATA_DIR``): the two units differ on 4.0% of the 40,183 sale rows that
-know both, and on the 1,057 of those that carry a nominal weight in BOTH unit
-labels the implied per-kg price was off by a median factor of 4 -- >= 100x on
-26.7% of them.  Same pathology Malawi closed in ``85947ff5``; different
+harvest unit.  Measured on the built table (2026-09-10, isolated
+``LSMS_DATA_DIR``): the two units differ on 3.9% of the 40,083 rows with a
+positive ``Quantity_sold`` that know both units, and on the 565 disagreeing
+priced rows whose two labels both name a weight in KILOGRAMS the two readings
+differ by a median factor of 50 -- >= 100x on 47.4% of them.  Same pathology Malawi closed in ``85947ff5``; different
 shape, because Uganda's sale is on the harvest row and needs no merge.
+
+The consumer rule is NOT "always divide by Unit_sold".  Where the two unit
+reports disagree the row is a data-quality FLAG: measured, ``Unit_sold`` is
+the closer denominator on only 40.5% of the disagreeing priced rows (price
+test) and 42.7% under the household's own reported sold-kg factor, so those
+rows are AMBIGUOUS and neither label may be used to form a price without
+further evidence.  See ``lsms_library/data_info.yml`` and CONTENTS.org.
 
 Uganda is a SCRIPT-PATH table, so these tests deliberately avoid the warm
 ``Country()`` cache: the fixture-level family builds synthetic frames and the
@@ -565,3 +572,98 @@ def test_built_wave_carries_a_populated_sold_unit(uganda_module, wave, filename,
             f"{wave} season A: Unit_sold never differs from u, which would mean "
             f"the colmap is reading the harvest unit twice"
         )
+
+
+# ---------------------------------------------------------------------------
+# data-gated: the shipped COUNTS, pinned
+# ---------------------------------------------------------------------------
+
+#: Panel figures shipped as prose in lsms_library/data_info.yml,
+#: Uganda/_/data_scheme.yml, Uganda/_/CONTENTS.org and the ledger.  Measured
+#: 2026-09-10 on a cold build in an isolated LSMS_DATA_DIR.  The 2026-09-09
+#: version of those files shipped 40,183 / 169 / 95.1%, which did not
+#: reproduce (the first counted non-sale rows, the second counted non-priced
+#: rows, the third was a transcription error).  Pinned here so canonical
+#: prose cannot drift from the table again.
+SALE_ROWS_KNOWING_BOTH = 40_083         # Quantity_sold > 0, u != Unknown, Unit_sold notna
+AGREEMENT_SHARE = 0.9606                # Unit_sold == u on those rows
+LARGEST_DISAGREEMENT_CELL = 162         # PRICED rows, u='Sack (100 kgs)' Unit_sold='Kg'
+W2009_10_A_COVERAGE = 0.968             # Unit_sold non-null / sale rows
+
+
+@pytest.fixture(scope="module")
+def built_table():
+    """The whole built table, from the isolated build.
+
+    Unlike the per-wave tests above this one goes through ``Country()``, so
+    it is the only test here that can see the cache.  It skips (rather than
+    fails) without S3 credentials, per the house pattern.
+    """
+    try:
+        import lsms_library as ll
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            df = ll.Country("Uganda", preload_panel_ids=False,
+                            verbose=False).crop_production()
+    except Exception as exc:
+        if _aws_creds_available():
+            raise
+        pytest.skip(f"Uganda crop_production unavailable (no S3 creds): {exc!r}")
+    if df is None or df.empty:
+        pytest.skip("Uganda crop_production built empty")
+    return df.reset_index()
+
+
+def test_shipped_counts_reproduce(built_table):
+    """Every number this branch put into canonical prose, re-derived here.
+
+    The definitions are load-bearing and are stated in the constants above:
+    a "sale row" is ``Quantity_sold > 0``; "knows both" additionally requires
+    ``u != 'Unknown'`` and a non-null ``Unit_sold``; the largest-cell count is
+    over PRICED rows (``Value_sold > 0`` as well).
+    """
+    d = built_table
+    sale = d[d["Quantity_sold"].fillna(0) > 0]
+    both = sale[(sale["Unit_sold"].notna()) & (sale["u"] != "Unknown")]
+    assert len(both) == SALE_ROWS_KNOWING_BOTH, (
+        f"rows knowing both units moved: {len(both)} vs "
+        f"{SALE_ROWS_KNOWING_BOTH}; update every place the number is quoted "
+        f"(data_info.yml, Uganda/_/data_scheme.yml, CONTENTS.org, the ledger)"
+    )
+    agree = (both["Unit_sold"] == both["u"]).mean()
+    assert abs(agree - AGREEMENT_SHARE) < 0.0005, f"agreement share {agree:.4f}"
+
+    a = sale[(sale["t"] == "2009-10") & (sale["season"] == "A")]
+    cov = a["Unit_sold"].notna().mean()
+    assert abs(cov - W2009_10_A_COVERAGE) < 0.001, (
+        f"2009-10 season A coverage {cov:.3f}"
+    )
+
+    priced = d[(d["Quantity_sold"].fillna(0) > 0) & (d["Value_sold"].fillna(0) > 0)]
+    cell = priced[(priced["u"] == "Sack (100 kgs)")
+                  & (priced["Unit_sold"] == "Kg")]
+    assert len(cell) == LARGEST_DISAGREEMENT_CELL, (
+        f"largest disagreement cell {len(cell)} vs {LARGEST_DISAGREEMENT_CELL}"
+    )
+
+
+def test_the_largest_disagreement_cell_is_priced_like_a_sack(built_table):
+    """The measurement that overturned the original consumer rule.
+
+    On the 162 priced rows where the harvest unit says `Sack (100 kgs)` and
+    the sold unit says `Kg`, the median `Value_sold / Quantity_sold` is a
+    SACK price (~34,000 UShs), not a kilogram price (~500-1,700 for these
+    crops).  Dividing by `Unit_sold` there overstates by ~70x -- which is
+    why `data_info.yml` no longer says "NEVER per u" and instead calls a
+    disagreeing row ambiguous.  If this assertion ever flips, the canonical
+    consumer rule has to be revisited, not the test.
+    """
+    d = built_table
+    priced = d[(d["Quantity_sold"].fillna(0) > 0) & (d["Value_sold"].fillna(0) > 0)].copy()
+    priced["p"] = priced["Value_sold"] / priced["Quantity_sold"]
+    cell = priced[(priced["u"] == "Sack (100 kgs)") & (priced["Unit_sold"] == "Kg")]
+    agreeing_kg = priced[(priced["u"] == "Kg") & (priced["Unit_sold"] == "Kg")]
+    assert cell["p"].median() > 10 * agreeing_kg["p"].median(), (
+        "the disagreement cell is no longer priced like a container; the "
+        "consumer rule in data_info.yml assumes it is"
+    )

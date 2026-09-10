@@ -616,19 +616,51 @@ Columns:
         it overwrite `u` would relabel the harvest.  It is a per-row
         attribute of the sale, so it is a column.
 
-        THE CONSUMER RULE, AND IT IS THE POINT OF THE COLUMN:
-        `Value_sold / Quantity_sold` is a price per ONE `Unit_sold` --
-        NEVER per `u`.  A farmgate price per kilogram is
-        `Value_sold / (Quantity_sold * kg-per-Unit_sold)`, converted through
-        the SAME unit machinery `u` uses.  Where `Unit_sold` is NA the
-        survey did not record a unit for that sale and the ratio has no
-        denominator you can name; that is not licence to substitute `u`.
+        THE CONSUMER RULE, IN TWO PARTS, AND THE SECOND PART IS THE ONE
+        THAT BITES.
+
+        (1) WHERE `Unit_sold` AND `u` AGREE -- the large majority of rows --
+        `Value_sold / Quantity_sold` is a price per that unit, and a
+        farmgate price per kilogram is
+        `Value_sold / (Quantity_sold * kg-per-unit)`, converted through the
+        SAME unit machinery `u` uses.  Nothing is ambiguous here.
+
+        (2) WHERE THEY DISAGREE, THE ROW IS A FLAG, NOT AN IDENTIFICATION.
+        `Unit_sold` is what the household answered to "in what unit was it
+        sold", and it is the only honest label for `Quantity_sold` AS
+        REPORTED -- but a row whose two unit reports contradict each other
+        is a row whose unit reporting is unreliable, and the disagreement
+        does not say WHICH of the two answers is the sound one.  Measured on
+        Uganda (GH #824 red-team, 2026-09-10), by two tests that share no
+        instrument: `Unit_sold` is the CLOSER denominator on only 40.5% of
+        the disagreeing priced rows under a price test (n=1,021, benchmarked
+        on agreeing rows) and 42.7% under the household's OWN reported
+        sold-kg factor (UNPS q7d, n=468) -- i.e. `u` is closer more often
+        than `Unit_sold` is.  The single largest cell makes it concrete:
+        Uganda rows with `u = 'Sack (100 kgs)'` and `Unit_sold = 'Kg'` have
+        a median `Value_sold / Quantity_sold` of 34,167 UShs (n=162), which
+        is a SACK price -- taking it as a kilogram price overstates maize by
+        ~70x, an error in the opposite direction from the one this column
+        exists to prevent.
+
+        SO: a consumer forming a per-unit or per-kg price must treat
+        `Unit_sold != u` rows as AMBIGUOUS -- exclude them, or resolve them
+        with further evidence (a reported per-row sold kg factor, where the
+        survey has one) -- and must REPORT how many were excluded.  An
+        earlier version of this note said "a price per ONE `Unit_sold` --
+        NEVER per `u`"; that instruction was measured to be wrong on the
+        majority of exactly the rows it governed, and canonical-schema prose
+        is the worst place for such a rule.  Where `Unit_sold` is NA the
+        survey recorded no unit for that sale and the ratio has no
+        denominator you can name; that is not licence to substitute `u`
+        either.
 
         HOW OFTEN IT MATTERS is a per-country fact and must be measured, not
         assumed: sold and harvest unit agree on 95-97% of Nigeria's sale
-        rows, 63-99% of Niger's by wave, and 96.0% of Uganda's (measured
-        2026-09-09 over the 40,183 sale rows that know both; GH #824).
-        Tanzania records every sale in kilograms and needs no such column.
+        rows, 63-99% of Niger's by wave, and 96.1% of Uganda's (measured
+        2026-09-10 over the 40,083 rows with a positive `Quantity_sold` that
+        know both units; GH #824).  Tanzania records every sale in kilograms
+        and needs no such column.
 
         NA-BEARING, NEVER SENTINEL-FILLED.  `u` carries the string
         `Unknown` because it is a declared INDEX level and a null index key

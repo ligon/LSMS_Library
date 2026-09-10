@@ -1217,7 +1217,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                 condition     — reported harvest CONDITION/state code column
                                 (UNPS q6c; None only if the wave has none)
                 qty_sold      — reported quantity sold column (or None)
-                unit_sold     — reported unit OF THE SALE (UNPS q7c, "Unit
+                unit_sold     -- reported unit OF THE SALE (UNPS q7c, "Unit
                                 Code" on the sale block; or None).  A
                                 SECOND unit, distinct from `unit` above:
                                 UNPS asks question 7 as a compound
@@ -1227,15 +1227,21 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                                 the harvest unit q6c.  Emitted as
                                 ``Unit_sold``, mapped through the SAME
                                 `harvest_units` table as `u`.
-                condition_sold — reported CONDITION of the sold quantity
+                condition_sold -- reported CONDITION of the sold quantity
                                 (UNPS q7b; or None).  Emitted as
                                 ``Condition_sold`` on the same 20-code
                                 `harvest_conditions` vocabulary as the
                                 harvest `condition` index level.
-                value_sold    — reported sale value column (or None).
+                value_sold    -- reported sale value column (or None).
                                 NOTE: `Value_sold / Quantity_sold` is a
-                                price per ONE ``Unit_sold`` — never per
-                                ``u``.
+                                price per ONE ``Unit_sold`` AS REPORTED.
+                                Where ``Unit_sold`` and ``u`` DISAGREE the
+                                two reports contradict each other and the
+                                row is a data-quality FLAG, not an
+                                identification of which unit is right --
+                                ``Unit_sold`` is the closer denominator on
+                                only ~40-45% of those rows (GH #824
+                                red-team).  See data_info.yml.
                 month         — harvest-end month code column (or None)
                 kg_factor     — SURVEY-REPORTED kilograms per one unit of
                                 the row's ``u`` (UNPS q6d, "Conversion
@@ -1263,12 +1269,12 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     pd.DataFrame indexed by ``(t, i, plot, j, u, condition, season)`` with columns
         ``Quantity`` (Float64), ``Quantity_sold`` (Float64),
         ``Value_sold`` (Float64), ``Unit_sold`` (string, the unit the SALE
-        was reported in — GH #824), ``Condition_sold`` (string),
+        was reported in -- GH #824), ``Condition_sold`` (string),
         ``harvest_month`` (Int64 1-12), ``intercropped`` (boolean) and
         ``KgFactor`` (Float64, NaN where the wave declares no ``kg_factor``
         column or the household reported none).
 
-        ``Unit_sold`` / ``Condition_sold`` are NA — never a sentinel —
+        ``Unit_sold`` / ``Condition_sold`` are NA -- never a sentinel --
         where the wave records no such column, where the household reported
         no sale, or where the reported code is outside the labelled scheme.
         The ``'Unknown'`` / ``'unknown_condition'`` sentinels exist ONLY
