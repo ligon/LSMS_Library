@@ -28,6 +28,7 @@ from lsms_library.transformations import (
     FOOD_KG_MIN_BASELINE_TIGHT,
     FOOD_KG_MIN_REPORTS,
     FOOD_KG_TIGHT_TOLERANCE,
+    FOOD_KG_WAVE_SPREAD_REPORT,
     KNOWN_METRIC,
     SURVEY_MEDIAN_MIN_REPORTS,
     _get_kg_factors,
@@ -465,3 +466,111 @@ def test_range_labels_are_read_as_one_endpoint_not_a_midpoint(
 @pytest.mark.parametrize("spelling", ['kgs', 'grams', 'litres', 'millilitre'])
 def test_new_metric_keys_are_in_known_metric(spelling):
     assert spelling in KNOWN_METRIC
+
+
+# ---------------------------------------------------------------------------
+# GH #850 red team (2026-09-10): the per-wave floor, D6 disclosure, and the
+# dispersion gate that is prepared but not armed
+# ---------------------------------------------------------------------------
+
+def _waves(n_waves, rows_per_wave, *, baseline=10):
+    """*n_waves* waves, each with a fat kg baseline and *rows_per_wave* Bunch
+    rows.  A Bunch is truly 2 kg in every wave."""
+    rows = []
+    for w in range(n_waves):
+        rows += [(f'T{w}', f'h{k}', 'A', 'kg', 2.0, 200.0)
+                 for k in range(baseline)]
+        rows += [(f'T{w}', f'z{k}', 'A', 'Bunch', 1.0, 200.0)
+                 for k in range(rows_per_wave)]
+    return frame(rows)
+
+
+def test_min_reports_gates_the_wave_not_the_pooled_support():
+    """One report per wave in five waves must NOT clear a floor that four
+    reports in a single wave does not.
+
+    Until the GH #850 red team measured it, ``min_reports`` screened
+    ``support`` summed over waves, so it did -- while the docstring said the
+    floor was "the number of step-2 rows behind a ``(t, item, u)`` estimate"
+    and the crop side's ``_survey_median_factors`` gates per wave.  The floor
+    now means what it says.
+    """
+    n = FOOD_KG_MIN_REPORTS
+    spread = conversion_to_kgs(_waves(n, 1), index=['t', 'i'], item_col='j')
+    assert ('A', 'Bunch') not in spread, 'n waves x 1 row must not clear the floor'
+    one = conversion_to_kgs(_waves(1, n), index=['t', 'i'], item_col='j')
+    assert one[('A', 'Bunch')] == pytest.approx(2.0)
+    short = conversion_to_kgs(_waves(1, n - 1), index=['t', 'i'], item_col='j')
+    assert ('A', 'Bunch') not in short
+
+
+def test_detail_frame_discloses_how_many_waves_and_how_far_apart():
+    """D6.  The delivered factor is a median ACROSS waves; a consumer is
+    entitled to know across how many and whether they agreed.
+
+    The red team's case: a `Tin` whose per-wave truth is 1, 2 and 3 kg is
+    served 2.0 in all three waves -- every row in the first is 2x over and
+    every row in the third 0.67x under -- and nothing used to say so.
+    """
+    rows = []
+    for wave, truth in (('T1', 1.0), ('T2', 2.0), ('T3', 3.0)):
+        rows += [(wave, f'h{k}', 'Maize', 'kg', 2.0, 200.0) for k in range(8)]
+        rows += [(wave, f'z{k}', 'Maize', 'Tin', 1.0, 100.0 * truth)
+                 for k in range(8)]
+    df = frame(rows)
+    detail = conversion_to_kgs(df, index=['t', 'i'], item_col='j', _detail=True)
+    tin = detail.loc[('Maize', 'Tin')]
+    assert tin['kg_per_unit'] == pytest.approx(2.0)
+    assert tin['n_waves'] == 3
+    assert tin['wave_spread'] == pytest.approx(3.0)
+
+    f = food_kg_factors(df)
+    ws = f.attrs['kg_factor_wave_spread']
+    assert ws['threshold'] == FOOD_KG_WAVE_SPREAD_REPORT
+    assert ws['rows_over_threshold'] == 24        # every Tin row
+    assert ws['rows_single_wave'] == 0
+    assert ws['rows_served_by_item_rung'] == 24
+    # the per-row columns carry the same facts
+    tins = f[f.index.get_level_values('u') == 'Tin']
+    assert set(tins['kg_item_n_waves']) == {3.0}
+    assert set(tins['kg_item_wave_spread'].round(6)) == {3.0}
+
+
+def test_a_single_wave_factor_is_counted_as_such():
+    """A cell estimated in ONE of the waves it serves is the Niger case
+    (``(Mil, Tiya)``: 2018-19 has no kg-known millet row at all, so 4,886 rows
+    are served a factor measured on a wave they are not in)."""
+    rows = []
+    for wave in ('T1', 'T2'):
+        rows += [(wave, f'z{k}', 'A', 'Bunch', 1.0, 200.0) for k in range(8)]
+    rows += [('T1', f'h{k}', 'A', 'kg', 2.0, 200.0) for k in range(10)]
+    f = food_kg_factors(frame(rows))
+    ws = f.attrs['kg_factor_wave_spread']
+    assert ws['rows_single_wave'] == 16          # both waves' Bunch rows
+    assert ws['rows_over_threshold'] == 0        # one wave cannot disagree
+
+
+def test_baseline_max_spread_is_off_by_default_and_refuses_when_armed():
+    """The strict rung has no dispersion gate: a 5-report baseline whose
+    reports differ by 125x is admitted without comment, while a 4-report
+    baseline differing by 26% is refused.  ``baseline_max_spread`` is the
+    prepared lever, defaulting to None so that nothing changes until @ligon
+    picks a value."""
+    prices = [100.0, 100.0, 100.0, 100.0, 12500.0]      # max/min = 125
+    rows = [('T1', f'h{k}', 'A', 'kg', 1.0, p) for k, p in enumerate(prices)]
+    rows += [('T1', f'z{k}', 'A', 'Bunch', 1.0, 200.0) for k in range(10)]
+    df = frame(rows)
+    assert ('A', 'Bunch') in conversion_to_kgs(df, index=['t', 'i'],
+                                               item_col='j')
+    for cand in (3, 5, 10, 30):
+        armed = conversion_to_kgs(df, index=['t', 'i'], item_col='j',
+                                  baseline_max_spread=cand)
+        assert ('A', 'Bunch') not in armed, cand
+    loose = conversion_to_kgs(df, index=['t', 'i'], item_col='j',
+                              baseline_max_spread=1000)
+    assert ('A', 'Bunch') in loose
+    # and it reaches the per-row ladder, which then falls to `unit`
+    f = food_kg_factors(df, baseline_max_spread=5)
+    bunches = f[f.index.get_level_values('u') == 'Bunch']
+    assert 'item_unit' not in set(bunches['KgFactorSource'])
+    assert sum(f.attrs['kg_factor_sources'].values()) == len(df)

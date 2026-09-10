@@ -115,6 +115,12 @@ def test_malawi_food_quantities_kg_total_preserved():
     factor per ``(item, unit)`` rather than per unit label.  Malawi's
     ``Piece`` was one number for 133 food items.
 
+    2026-09-10, GH #850 red team: 2.585e6.  ``min_reports`` now gates the
+    PER-WAVE ``(t, j, u)`` estimate rather than the support summed over waves,
+    so a wave that cannot support an estimate contributes none instead of
+    lending its row count to waves that can.  Malawi +1.2%; Nigeria -3.1% and
+    EthiopiaRHS -2.7% move the other way; the rest are under 0.5%.
+
     Skips when the Malawi food data isn't available."""
     import warnings as _w
     import lsms_library as ll
@@ -126,4 +132,4 @@ def test_malawi_food_quantities_kg_total_preserved():
         import pytest
         pytest.skip('Malawi food data unavailable')
     total = float(fq.xs('kg', level='u')['Quantity'].sum())
-    assert abs(total - 2.5545e6) / 2.5545e6 < 0.005, f"kg total drifted: {total}"
+    assert abs(total - 2.5855e6) / 2.5855e6 < 0.005, f"kg total drifted: {total}"

@@ -841,15 +841,28 @@ FOOD_KG_MIN_BASELINE = 5
 #: -- max/min of the per-report price per kilogram within the ``(t, j)`` cell
 #: at or below :data:`FOOD_KG_TIGHT_TOLERANCE` (GH #850, D5).
 #:
-#: WHY max/min AND NOT AN IQR.  At N = 3 or 4 an interquartile range is an
-#: interpolation over two gaps -- it is the range wearing a robust name -- and
-#: the corpus says so: swept over the same cells, an ``IQR/median`` gate admits
-#: 21 of Uganda's 28 in-band cells at a tolerance of 1.10 and 26 at 2.00 -- a
-#: statistic that barely moves across a two-fold change in tolerance is not
-#: discriminating -- and the cells it admits include ones whose three reports
-#: differ by 25x.  ``max/min`` is scale-free,
-#: defined identically at N = 3 and N = 400, and reads as exactly the sentence
-#: the exception is for: "the reports lie within 25% of each other".
+#: WHY max/min AND NOT AN IQR.  Because at N = 3 or 4 an interquartile range
+#: DISCARDS THE EXTREMES, and the extremes are the whole question.  With three
+#: reports the interpolated quartiles sit between the points; the statistic is
+#: driven by the middle of a sample too small to have a middle, and a single
+#: wild report -- the exact failure the floor exists to catch -- barely moves
+#: it.  ``max/min`` reads the whole spread, is scale-free, is defined
+#: identically at N = 3 and at N = 400, and states the sentence the exception
+#: is for: "the reports lie within 25% of each other".
+#:
+#: AN EARLIER VERSION OF THIS PARAGRAPH ARGUED THE POINT WITH A NUMBER, AND
+#: THE NUMBER WAS A SCALE ERROR.  It said an ``IQR/median`` gate "admits 21 of
+#: Uganda's 28 in-band cells at a tolerance of 1.10 and 26 at 2.00 -- a
+#: statistic that barely moves ... is not discriminating".  Those counts
+#: reproduce, but 1.10 and 2.00 are not the same tolerance for the two
+#: statistics: ``max/min <= 1.25`` means the reports lie within about +/-12%,
+#: while ``IQR/median <= 1.10`` means the interquartile range is 110% OF THE
+#: MEDIAN -- an enormously looser gate.  Swept at its own scale the IQR gate
+#: discriminates perfectly well: at ``IQR/median <= 0.10`` Uganda admits 2
+#: cells whose ``max/min`` p90 is 1.32.  The comparison was between
+#: incommensurable scales and a reviewer could falsify it in ten minutes.
+#: The choice stands on the ground stated above; the evidence for it does not,
+#: and is retired rather than repaired (GH #850 red team, 2026-09-10).
 #:
 #: WHAT IT BUYS, MEASURED.  Little, and that is the point.  The in-band cells
 #: are few (10 to 33 per country, of 253 to 831), and taken UNCONDITIONALLY
@@ -862,6 +875,25 @@ FOOD_KG_MIN_BASELINE = 5
 #: giving up.
 FOOD_KG_MIN_BASELINE_TIGHT = 3
 FOOD_KG_TIGHT_TOLERANCE = 1.25
+
+#: Cross-wave spread above which a delivered ``(item, unit)`` factor is
+#: REPORTED as thin evidence (GH #850, D6, 2026-09-10).  A reporting
+#: threshold, never a screen: no row is refused for exceeding it.
+#:
+#: The delivered factor has no ``t`` axis -- it is the median of the per-wave
+#: estimates, because a container's weight should not move between waves.
+#: That is a defensible design and an UNVERIFIED assumption on any particular
+#: cell, and the corpus is not reassuring about it: for cells estimated in
+#: three or more waves the median max/min across waves is 2.2 (Uganda), 2.5
+#: (Malawi) and 3.1 (Nigeria).  Two is the natural place to report from --
+#: below it the pooling is doing what it claims (averaging noise), above it
+#: the waves are describing different objects and the median is a compromise
+#: between them.
+#:
+#: Niger makes the case concrete: ``(Mil, Tiya)`` is estimated in ONE of the
+#: two waves it serves, because 2018-19 has no kg-known millet row at all, and
+#: 4,886 rows are served a factor measured on a wave they are not in.
+FOOD_KG_WAVE_SPREAD_REPORT = 2.0
 
 #: The eight-key map that decides which rows may ANCHOR the price-per-kg
 #: baseline.  Deliberately NOT :data:`KNOWN_METRIC`: no litre, ml or cl, so a
@@ -945,6 +977,7 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
                       min_baseline=FOOD_KG_MIN_BASELINE,
                       min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
                       tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
+                      baseline_max_spread=None,
                       _detail=False):
     """Infer local-unit -> kg conversion factors from price ratios.
 
@@ -1007,6 +1040,33 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
     before #850 -- it is the FALLBACK rung, and gating a fallback would
     leave rows with nothing.
 
+    *min_reports* is applied PER WAVE, to each ``(t, item, u)`` estimate, and
+    a wave that cannot clear it contributes nothing to the cross-wave median.
+    It was applied to the support SUMMED over waves until the GH #850 red team
+    measured it (2026-09-10), which meant one report per wave in five waves
+    cleared a floor that four reports in a single wave did not.  The crop
+    side's :func:`_survey_median_factors` gates per wave; so does this now.
+
+    A THIRD gate exists and is OFF by default: *baseline_max_spread* refuses a
+    ``(t, item)`` baseline whose own reports disagree by more than the given
+    factor, measured as ``p90/p10`` where the cell has 10 or more reports and
+    ``max/min`` below that.  The strict rung is otherwise ungated, and
+    measured on the corpus it admits cells whose reports differ by up to 9e7x
+    (median max/min 7.5 in Uganda, 178 in Malawi, 500 in Ethiopia).  Left off
+    pending a measured default; see the sweep in
+    ``.coder/ledger/850-food-kg-item-axis-impl.md``.
+
+    WHAT THE ITEM ARM IS AND IS NOT.  It is exactly as good as the item's own
+    kg-labelled rows.  Where those are sound it is right (Niger's cowpea comes
+    back at 1.11 kg per tiya against an answer key of 1.17); where they are
+    not, it is wrong AND LOCALISED, whereas the u-pooled factor it replaces
+    was wrong everywhere and diluted.  Niger's millet is the worked example:
+    nine ``Kg`` rows in one wave price millet at 2,286 FCFA/kg against a
+    retail 250-450, and the item arm hands the resulting 0.33 kg/tiya to all
+    10,107 of that item's tiya rows.  Removing a dilution is not the same
+    thing as removing an error, and a movement is not a correction until
+    something outside the estimate says so.
+
     Parameters
     ----------
     df : pandas.DataFrame
@@ -1036,6 +1096,11 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
         accepted when the max/min of its per-report price per kilogram is at
         or below *tight_tolerance*.  See :data:`FOOD_KG_TIGHT_TOLERANCE` for
         why the spread is a range and not an IQR.
+    baseline_max_spread : float or None, default None
+        When given, a ``(t, item)`` baseline whose reports disagree by more
+        than this factor is REFUSED however many of them there are --
+        ``p90/p10`` at N >= 10, ``max/min`` below it.  Off by default; the
+        tight rung is unaffected (its own tolerance is stricter).
 
     Returns
     -------
@@ -1053,9 +1118,10 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
 
         With ``_detail=True`` the item arm returns the underlying frame
         instead -- indexed ``(item, unit)`` with columns ``kg_per_unit``,
-        ``support`` and ``baseline_tight``.  Private: it exists so
-        :func:`food_kg_factors` can report WHICH rung and WHICH baseline
-        served a row without estimating twice.
+        ``support``, ``n_waves``, ``wave_spread`` and ``baseline_tight``.
+        Private: it exists so :func:`food_kg_factors` can report WHICH rung,
+        WHICH baseline and HOW MANY WAVES served a row without estimating
+        twice.
     """
     v = _kg_inference_frame(df, quantity, unit_col)
     v_infer = (v[v['Quantity_kg'].isna()] if 'Quantity_kg' in v.columns else v)
@@ -1098,6 +1164,29 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
     base.index.names = base_keys
     spread = base['hi'] / base['lo']
     strict = base['n'] >= min_baseline
+    if baseline_max_spread is not None:
+        # OFF BY DEFAULT and measured before it is proposed (GH #850 red team,
+        # 2026-09-10).  The strict rung has no dispersion gate at all, so a
+        # 4-report cell whose reports differ by 26% is refused while a
+        # 5-report cell whose reports differ by nine million times is admitted
+        # without comment -- and the ungated rung governs 35-98% of rows while
+        # the tolerance the design argued over governs 0-0.7.
+        #
+        # The statistic switches with N for the reason the tight gate does
+        # not: with 10 or more reports a robust interdecile spread is
+        # available and a single wild report should not condemn the cell,
+        # while below 10 there are not enough points for a decile and the
+        # extremes are the question.  Quantiles are computed ONLY when the
+        # gate is on, so the default path pays nothing.
+        lo10 = gb.quantile(0.10)
+        hi90 = gb.quantile(0.90)
+        lo10.index.names = hi90.index.names = base_keys
+        wide = pd.Series(np.where(base['n'] >= 10, hi90 / lo10, spread),
+                         index=base.index)
+        strict = strict & (wide <= baseline_max_spread)
+    # The tight rung is NOT re-gated: ``tight_tolerance`` (1.25) is stricter
+    # than any *baseline_max_spread* worth proposing, so the extra condition
+    # would be a no-op wearing a second name.
     tight = ((base['n'] >= min_baseline_tight) & (base['n'] < min_baseline)
              & (spread <= tight_tolerance))
     pkg = base['median'].where(strict | tight)
@@ -1114,21 +1203,41 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
     est = (po / ref).replace([np.inf, -np.inf], np.nan)
     keep = est.notna().to_numpy()
     est, n = est[keep], n[keep]
+
+    # *min_reports* gates the PER-WAVE estimate, which is what its docstring
+    # has always said and what the crop side's ``_survey_median_factors``
+    # does.  Until the GH #850 red team measured it, the screen was applied to
+    # the support SUMMED over waves -- so one report per wave in five waves
+    # cleared a floor that four reports in a single wave did not.  Filtering
+    # here, before the cross-wave median, means a wave that cannot support an
+    # estimate contributes none, rather than lending its row count to waves
+    # that can.
+    qualifies = (n >= min_reports).to_numpy()
+    est, n = est[qualifies], n[qualifies]
     was_tight = (tight.reindex(est.index.droplevel('u'))
                  == True).to_numpy(dtype=bool)  # noqa: E712
 
     ju = [item_col, 'u']
-    detail = pd.DataFrame({'kg_per_unit': est.groupby(ju).median(),
-                           'support': n.groupby(ju).sum()})
-    strict_est, strict_n = est[~was_tight], n[~was_tight]
+    grp = est.groupby(ju)
+    # D6 disclosure.  The delivered factor is a median ACROSS WAVES, and
+    # nothing used to say across how many or how far apart -- so a cell
+    # estimated in one of the two waves it serves, and a cell whose two
+    # estimates differ threefold, were indistinguishable from a cell measured
+    # the same way twice.  ``support`` answers "how many reports"; these two
+    # answer "did the waves agree", which is the other half of the same
+    # question and the half ``baseline_tight`` set the precedent for.
+    detail = pd.DataFrame({'kg_per_unit': grp.median(),
+                           'support': n.groupby(ju).sum(),
+                           'n_waves': grp.size(),
+                           'wave_spread': grp.max() / grp.min()})
+    strict_est = est[~was_tight]
     if len(strict_est):
-        strict_ok = ((strict_n.groupby(ju).sum() >= min_reports)
-                     & (_valid_factor(strict_est.groupby(ju).median()) > 0))
-        strict_keys = strict_ok.index[strict_ok.to_numpy()]
+        strict_med = strict_est.groupby(ju).median()
+        strict_ok = _valid_factor(strict_med) > 0
+        strict_keys = strict_med.index[strict_ok]
     else:
         strict_keys = detail.index[:0]
-    detail = detail[(detail['support'] >= min_reports)
-                    & np.isfinite(detail['kg_per_unit'])
+    detail = detail[np.isfinite(detail['kg_per_unit'])
                     & (detail['kg_per_unit'] > 0)]
     # A factor whose evidence includes NO strict baseline exists ONLY because
     # of the dispersion-gated exception, which is the question a consumer is
@@ -1500,7 +1609,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
-                    tight_tolerance=FOOD_KG_TIGHT_TOLERANCE):
+                    tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
+                    baseline_max_spread=None):
     """Per-ROW kg-per-unit for a ``food_acquired`` frame, with provenance.
 
     The food twin of :func:`harvest_kg_factors`, and deliberately the same
@@ -1573,6 +1683,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
 
     kg_item = np.full(len(df), np.nan)
     kg_tight = np.zeros(len(df), dtype=bool)
+    kg_waves = np.full(len(df), np.nan)
+    kg_wave_spread = np.full(len(df), np.nan)
     kg_unit = np.full(len(df), np.nan)
     have_price = ('Expenditure' in df.columns and 'Quantity' in df.columns)
     if have_price:
@@ -1597,7 +1709,9 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                         df, index=group_levels, item_col=item_col,
                         min_reports=min_reports, min_baseline=min_baseline,
                         min_baseline_tight=min_baseline_tight,
-                        tight_tolerance=tight_tolerance, _detail=True)
+                        tight_tolerance=tight_tolerance,
+                        baseline_max_spread=baseline_max_spread,
+                        _detail=True)
                 except (ValueError, ZeroDivisionError, KeyError):
                     detail = None
                 if detail is not None and len(detail):
@@ -1623,6 +1737,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                     kg_item = _valid_factor(hit['kg_per_unit'])
                     kg_tight = (hit['baseline_tight'] == True).to_numpy(  # noqa: E712
                         dtype=bool)
+                    kg_waves = _as_float(hit['n_waves'])
+                    kg_wave_spread = _as_float(hit['wave_spread'])
 
     kg_survey = np.full(len(df), np.nan)
     from_survey = np.zeros(len(df), dtype=bool)
@@ -1650,10 +1766,26 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                         'kg_survey': kg_survey,
                         'kg_metric': kg_metric,
                         'kg_item_unit': kg_item,
+                        'kg_item_n_waves': kg_waves,
+                        'kg_item_wave_spread': kg_wave_spread,
                         'kg_unit': kg_unit},
                        index=df.index)
     out.attrs['kg_factor_sources'] = {
         layer: int((source == layer).sum()) for layer in FOOD_KG_FACTOR_LAYERS}
+    # D6's missing half.  The delivered factor is a median ACROSS WAVES, so a
+    # row can be served by a cell estimated in one of the waves it covers, or
+    # by one whose per-wave estimates disagree threefold -- and until the
+    # GH #850 red team asked, nothing in the output said which.  Counted over
+    # the rows the item rungs actually SERVE, because a spread on a cell that
+    # lost the rank is not a fact about any delivered number.
+    served_item = np.isin(source, ('item_unit', 'item_unit_tight'))
+    wide = served_item & (kg_wave_spread > FOOD_KG_WAVE_SPREAD_REPORT)
+    out.attrs['kg_factor_wave_spread'] = {
+        'threshold': FOOD_KG_WAVE_SPREAD_REPORT,
+        'rows_served_by_item_rung': int(served_item.sum()),
+        'rows_over_threshold': int(wide.sum()),
+        'rows_single_wave': int((served_item & (kg_waves == 1)).sum()),
+    }
     return out
 
 
@@ -2405,6 +2537,8 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     # (they partition ``df``), not over the returned ones -- the returned
     # frame is a sum over units and sources and has no per-layer identity.
     out.attrs['kg_factor_sources'] = dict(kgf.attrs['kg_factor_sources'])
+    out.attrs['kg_factor_wave_spread'] = dict(
+        kgf.attrs['kg_factor_wave_spread'])
     return out
 
 
@@ -2574,6 +2708,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
     # never consults the ladder has no ladder to report.
     if kgf is not None:
         v.attrs['kg_factor_sources'] = dict(kgf.attrs['kg_factor_sources'])
+        v.attrs['kg_factor_wave_spread'] = dict(
+            kgf.attrs['kg_factor_wave_spread'])
     return v
 
 

@@ -299,6 +299,17 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
 
     Measured 2026-09-09 on a cold isolated build.  Update these numbers in the
     same PR as any deliberate change; do not loosen the assertions.
+
+    2026-09-10, GH #850 defect (c): the ``before`` split moves by ONE row,
+    26,546 -> 26,547 ``inferred`` and 58,973 -> 58,972 ``none``.  That branch
+    taught ``_parse_explicit_metric`` the plural / abbreviated metric
+    spellings (``50 kgs``, ``20 lts``), which ``_kg_factor_series`` reads, so
+    a single Ethiopian crop row carrying such a label stopped falling through
+    to ``none``.  Uganda moves 58,831 rows the same way and Niger 5; every
+    other country is 0.  The same one row moves in the ``after`` split (7,766
+    -> 7,767 ``inferred``, 15,589 -> 15,588 ``none``): the shipped layer
+    outranks ``inferred`` but does not cover this row, so nothing shields it.
+    ``shipped`` and ``shipped_matched`` are unchanged at 62,164.
     """
     import lsms_library as ll
 
@@ -312,9 +323,9 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     after = harvest_kg(cp, shipped_factors=_load(ethiopia))
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["inferred"] == 26_546 and b["none"] == 58_973
+    assert b["inferred"] == 26_547 and b["none"] == 58_972
     assert a["shipped"] == 62_164 and a["shipped_matched"] == 62_164
-    assert a["inferred"] == 7_766 and a["none"] == 15_589
+    assert a["inferred"] == 7_767 and a["none"] == 15_588
     assert a["shipped_implausible"] == 0
     assert sum(a[k] for k in ("reported", "shipped", "survey_median",
                               "inferred", "none")) == len(cp)
