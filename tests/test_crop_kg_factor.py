@@ -107,8 +107,8 @@ def test_all_nan_kgfactor_column_changes_nothing():
 def test_only_the_inferred_layer_acts_without_reports():
     f = harvest_kg_factors(_frame(BASE_ROWS, with_kgfactor=False))
     assert f.attrs["kg_factor_sources"] == {
-        "reported": 0, "survey_median": 0, "inferred": 2, "none": 2,
-        "reported_implausible": 0}
+        "reported": 0, "shipped": 0, "survey_median": 0, "inferred": 2,
+        "none": 2, "reported_implausible": 0, "shipped_implausible": 0}
 
 
 def test_returned_frame_carries_only_harvest_kg():
@@ -306,8 +306,9 @@ def test_the_screen_count_rides_beside_a_partition_that_still_sums():
     # the four SERVING layers still partition the frame ...
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # ... and the rejected row is served by one of them, not lost
-    assert counts == {"reported": 1, "survey_median": 0, "inferred": 1,
-                      "none": 2, "reported_implausible": 1}
+    assert counts == {"reported": 1, "shipped": 0, "survey_median": 0,
+                      "inferred": 1, "none": 2, "reported_implausible": 1,
+                      "shipped_implausible": 0}
 
 
 def test_screen_is_inert_without_a_kgfactor_column():
@@ -399,10 +400,12 @@ def test_provenance_counts_sum_to_the_input_row_count():
     counts = harvest_kg_factors(df).attrs["kg_factor_sources"]
     # The four SERVING layers partition the frame; `reported_implausible` is a
     # screen count that rides alongside and is deliberately outside it.
-    assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible"}
+    assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible",
+                                                   "shipped_implausible"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
-    assert counts == {"reported": 2, "survey_median": 0, "inferred": 1,
-                      "none": 1, "reported_implausible": 0}
+    assert counts == {"reported": 2, "shipped": 0, "survey_median": 0,
+                      "inferred": 1, "none": 1, "reported_implausible": 0,
+                      "shipped_implausible": 0}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # Two rows survive the sum: the zero-Quantity row drops despite being
     # counted `reported`, and the `none` row has no factor to apply.
@@ -451,7 +454,8 @@ def test_disagreement_reported_vs_survey_median():
 def test_disagreement_is_empty_when_nothing_is_reported():
     d = harvest_kg_factors(_frame(BASE_ROWS, with_kgfactor=False)).attrs[
         "kg_factor_disagreement"]
-    for pair in ("reported_vs_survey_median", "reported_vs_inferred"):
+    for pair in ("reported_vs_shipped", "reported_vs_survey_median",
+                 "reported_vs_inferred"):
         assert d[pair] == {"both": 0, "disagree": 0, "share": None}
 
 
@@ -461,8 +465,9 @@ def test_companion_exposes_every_layer_for_auditing():
              "A", 1.0, 2.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
     f = harvest_kg_factors(_frame(rows))
     assert list(f.columns) == ["kg_per_unit", "KgFactorSource", "kg_reported",
-                               "kg_reported_rejected", "kg_survey_median",
-                               "kg_inferred"]
+                               "kg_reported_rejected", "kg_shipped",
+                               "kg_shipped_rejected", "kg_shipped_source",
+                               "kg_survey_median", "kg_inferred"]
     by_unit = f.groupby(f.index.get_level_values("u"))[
         ["kg_reported", "kg_inferred"]].median()
     assert by_unit.loc[POUND, "kg_reported"] == 2.0
@@ -509,6 +514,12 @@ def test_uganda_harvest_kg_baseline():
     in the wiring PR; it was not, and failed on development for a day.  When a
     future change moves these numbers deliberately, update them here in the
     same PR rather than loosening the assertion.
+
+    2026-09-09, the shipped-factor layer: the counts dict below gained
+    ``shipped`` and ``shipped_implausible``, both 0, because ``shipped``
+    joined ``KG_FACTOR_LAYERS`` and those counts partition the frame -- so
+    every key is present on every call.  NO NUMBER MOVED; this call passes
+    no ``shipped_factors`` table and Uganda has none to pass.
     """
     import lsms_library as ll
 
@@ -519,5 +530,6 @@ def test_uganda_harvest_kg_baseline():
     assert len(res) == 36_095
     assert res["Harvest_kg"].sum() == pytest.approx(10_868_272.24500081, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 14_050, "survey_median": 57, "inferred": 28_147,
-        "none": 88_352, "reported_implausible": 99}
+        "reported": 14_050, "shipped": 0, "survey_median": 57,
+        "inferred": 28_147, "none": 88_352, "reported_implausible": 99,
+        "shipped_implausible": 0}

@@ -1736,6 +1736,13 @@ def _screen_reported_factors(df, reported):
     ``survey_median`` / ``inferred`` / ``none`` exactly as if it had never
     reported, and its rejected value enters no median.
 
+    ALSO SCREENS THE ``shipped`` LAYER, by design and not by accident: the
+    same three rules, one implementation.  Note which frame the unit comes
+    from -- ``df``, the row being served, never the factor table -- so a
+    shipped factor is judged against the unit it is being APPLIED to.  A
+    shipped 300 on a ``Kg`` row is exactly as wrong as a reported one.  Its
+    rejections are counted separately, under ``shipped_implausible``.
+
     Returns ``(screened, rejected_mask)``.
     """
     rep = _valid_factor(reported)
@@ -1822,7 +1829,20 @@ KG_FACTOR_DISAGREEMENT_TOLERANCE = 0.10
 #: precedence order.  ``none`` is a layer, not a failure: a row it serves
 #: contributes nothing to ``Harvest_kg`` and is COUNTED rather than silently
 #: absent.
-KG_FACTOR_LAYERS = ('reported', 'survey_median', 'inferred', 'none')
+#:
+#: ``shipped`` sits BELOW ``reported`` and ABOVE ``survey_median``: an
+#: externally shipped conversion table (the World Bank's Ethiopia
+#: ``Crop_CF_Wave{2..5}``, Malawi's IHS5 files -- GH #852, #854) is evidence
+#: about what a container weighs, but it is not THIS row's enumerator writing
+#: down what THIS harvest weighed, so it never displaces a plausible reported
+#: factor; and it is externally sourced rather than a pooling of the survey's
+#: own reports, so it outranks ``survey_median``.
+#:
+#: The counts over these layers PARTITION the frame and sum to ``len(df)``, so
+#: every key is present on every call -- ``shipped: 0`` when no table is
+#: passed.
+KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'inferred',
+                    'none')
 
 
 def _level_or_column(df, name):
@@ -1910,8 +1930,155 @@ def _survey_median_factors(df, reported, *, min_reports, sentinel=None):
     return _valid_factor(np.where(sentinel, np.nan, out))
 
 
+#: Index levels (or columns) a ``shipped_factors`` table may be keyed on.  The
+#: join uses the ones present in BOTH the factor table and the
+#: ``crop_production`` frame; the loader decides which levels its table can
+#: honestly key on, and this transform joins on the overlap.
+#:
+#: ``country`` is in the set for a reason worth stating: a cross-country
+#: :class:`~lsms_library.feature.Feature` frame carries a ``country`` level,
+#: and a table loaded for ONE country would otherwise be applied to every
+#: country's rows.  Keying on ``country`` lets a loader fence its own table;
+#: it costs nothing when the level is absent.
+#:
+#: ``region`` is spelled in LOWER CASE and matched exactly.
+#: ``cluster_features`` ships ``Region``, so a caller resolving region onto
+#: ``crop_production`` must rename it -- accepting both spellings silently
+#: would hide a mis-keyed join, which is the failure mode this whole layer is
+#: most exposed to.
+SHIPPED_FACTOR_JOIN_LEVELS = ('country', 't', 'j', 'u', 'condition', 'region')
+
+#: Private stand-in for a NA join key.  ``astype(str)`` would render NaN as the
+#: literal ``'nan'`` and let it collide with a genuine ``'nan'`` label; this
+#: string cannot occur in survey text.
+_KEY_NA = '\x00<NA>'
+
+
+def _normalise_join_key(values):
+    """Stripped, lower-cased join key with NA on :data:`_KEY_NA`.
+
+    Applied identically to BOTH sides of the shipped-factor join, and BEFORE
+    the duplicate check -- so a collision the normalisation itself creates
+    (a table carrying both ``'Kg'`` and ``'kg'``) is REFUSED rather than
+    silently resolved.
+    """
+    col = pd.Series(np.asarray(values, dtype=object))
+    missing = col.isna().to_numpy()
+    text = col.astype(str).str.strip().str.lower().to_numpy()
+    return np.where(missing, _KEY_NA, text)
+
+
+def _shipped_table_key(shipped_factors, name):
+    """Read join key *name* off a shipped-factor table's index or columns."""
+    if name in (shipped_factors.index.names or []):
+        return shipped_factors.index.get_level_values(name).to_numpy()
+    return shipped_factors[name].to_numpy()
+
+
+def _shipped_factor_lookup(df, shipped_factors):
+    """Each row's EXTERNALLY SHIPPED kg-per-unit factor, and its ``Source``.
+
+    *shipped_factors* is a table the CALLER loaded -- nothing here discovers
+    it (see :func:`harvest_kg_factors`).  Canonical shape: a ``KgFactor``
+    column (kg per ONE unit of the row's ``u``, the same meaning the canonical
+    ``crop_production.KgFactor`` carries) and an optional ``Source`` string
+    column, keyed -- as index levels or as columns -- on some subset of
+    :data:`SHIPPED_FACTOR_JOIN_LEVELS`.
+
+    The join is on the keys present in BOTH the table and *df*.  A key the
+    table declares but *df* does not carry is DROPPED from the join, which is
+    the condition-aware behaviour: where the table carries ``condition`` and
+    the crop row has one, they join on it; where either lacks it, they join
+    ignoring it.  Dropping a key can of course make the remaining ones
+    ambiguous, and that is exactly when the duplicate refusal below fires --
+    which is the intended outcome, since collapsing a region- or
+    condition-keyed table onto a coarser grain is a decision for the loader.
+
+    REFUSES an ambiguous table.  Two rows sharing a join key are two different
+    answers to the same question; averaging them, or letting a
+    ``groupby().first()`` pick one, is the grain collapse ``CLAUDE.md``
+    forbids and the failure GH #852 names outright (Ethiopia's
+    ``Crop_CF_Wave5`` ships crop 74 / unit 62 twice, at 4.34 and 6.125, and
+    the right answer -- keep 4.34 -- comes from W3 data, not from a rule this
+    transform could apply).  De-duplication is the loader's deliberate act.
+
+    Returns ``(values, source)``: a float ndarray and an object ndarray, both
+    aligned POSITIONALLY to *df* (``crop_production`` indexes repeat, so an
+    index-aligned merge would be wrong as well as slow).  ``source`` is
+    ``pd.NA`` wherever no usable factor was found (pandas 3.0 renders that as
+    NaN when the array becomes a column, so read it with ``pd.isna``).
+    """
+    sf = shipped_factors
+    if not isinstance(sf, pd.DataFrame):
+        raise ValueError(
+            "shipped_factors must be a DataFrame with a 'KgFactor' column; "
+            f"got {type(sf).__name__}")
+    if 'KgFactor' not in sf.columns:
+        raise ValueError(
+            "shipped_factors must carry a 'KgFactor' column (kg per ONE unit "
+            f"of the row's u); got columns {list(sf.columns)}")
+
+    index_names = [n for n in (sf.index.names or []) if n is not None]
+    table_keys = tuple(k for k in SHIPPED_FACTOR_JOIN_LEVELS
+                       if k in index_names or k in sf.columns)
+    if not table_keys:
+        raise ValueError(
+            "shipped_factors is keyed on none of "
+            f"{list(SHIPPED_FACTOR_JOIN_LEVELS)}: it carries index levels "
+            f"{index_names} and columns {list(sf.columns)}.  Key the table on "
+            "the levels it should join on -- at minimum the unit 'u'.")
+
+    keys = tuple(k for k in table_keys if _level_or_column(df, k) is not None)
+    dropped = tuple(k for k in table_keys if k not in keys)
+    if not keys:
+        raise ValueError(
+            f"shipped_factors is keyed on {list(table_keys)}, none of which "
+            "crop_production carries as an index level or a column, so there "
+            "is nothing to join on.  Resolve the missing level onto "
+            "crop_production first (e.g. join cluster_features and rename its "
+            "'Region' to 'region') -- this transform never re-enters sample() "
+            "or cluster_features() itself.")
+
+    table_cols = [_normalise_join_key(_shipped_table_key(sf, k)) for k in keys]
+    table_tuples = list(zip(*table_cols))
+    duplicated = pd.MultiIndex.from_arrays(table_cols).duplicated(keep=False)
+    if duplicated.any():
+        examples = sorted({table_tuples[i] for i in np.flatnonzero(duplicated)})
+        because = ''
+        if dropped:
+            because = (f"  {list(dropped)} could not be joined on because "
+                       "crop_production carries no such level, which is what "
+                       "left the remaining keys ambiguous -- collapse that "
+                       "axis in the loader.")
+        raise ValueError(
+            f"shipped_factors is ambiguous on the join keys {list(keys)}: "
+            f"{len(examples)} duplicated key(s), e.g. {examples[:5]}."
+            f"{because}  De-duplicate the table in the LOADER, with a stated "
+            "rule; this transform refuses to average two factors that "
+            "disagree, or to take the first of them.")
+
+    values = _valid_factor(sf['KgFactor'])
+    if 'Source' in sf.columns:
+        sources = sf['Source'].astype(object).to_numpy()
+    else:
+        sources = np.full(len(sf), pd.NA, dtype=object)
+    factor_of = dict(zip(table_tuples, values))
+    source_of = dict(zip(table_tuples, sources))
+
+    row_cols = [_normalise_join_key(_level_or_column(df, k)) for k in keys]
+    out = np.full(len(df), np.nan)
+    out_source = np.full(len(df), pd.NA, dtype=object)
+    for pos, key in enumerate(zip(*row_cols)):
+        value = factor_of.get(key, np.nan)
+        if not np.isnan(value):
+            out[pos] = value
+            out_source[pos] = source_of[key]
+    return out, out_source
+
+
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
-                       min_reports=SURVEY_MEDIAN_MIN_REPORTS):
+                       min_reports=SURVEY_MEDIAN_MIN_REPORTS,
+                       shipped_factors=None):
     """Per-row kg-per-unit factor for ``crop_production``, and its PROVENANCE.
 
     The factor half of :func:`harvest_kg`, exposed on its own so the layers
@@ -1934,6 +2101,17 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         and the rejection is counted under ``reported_implausible``.
         ``KgFactor`` is REPORTED, never constructed: see the canonical schema
         note in ``lsms_library/data_info.yml``.
+    ``shipped``
+        A factor looked up in *shipped_factors* -- an EXTERNALLY SHIPPED
+        conversion table the caller passed in (the World Bank's Ethiopia
+        ``Crop_CF_Wave{2..5}``, Malawi's IHS5 crop files: GH #852, #854).
+        Screened by the SAME :func:`_screen_reported_factors`, with its
+        rejections counted under ``shipped_implausible``; a rejected shipped
+        factor is likewise never clipped, and the row falls through.
+        Ranked below ``reported`` because a table is not this row's
+        enumerator, and above ``survey_median`` because it is external
+        evidence rather than a pooling of the survey's own reports.  See
+        *shipped_factors* below for the table's shape and the join.
     ``survey_median``
         The median reported ``KgFactor`` of the same ``(u, condition)``
         within the same country-wave, where at least *min_reports* rows
@@ -1963,6 +2141,41 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``N`` for the ``survey_median`` layer.  One number is applied to
         every group, but the groups are per country-wave, so a thin module
         does not borrow a thick one's licence.
+    shipped_factors : pd.DataFrame, optional
+        An externally shipped kg-per-unit table.  ``KgFactor`` column (kg per
+        ONE unit of the row's ``u``) plus an optional ``Source`` string,
+        keyed -- as index levels or as columns -- on some subset of
+        :data:`SHIPPED_FACTOR_JOIN_LEVELS`
+        ``('country', 't', 'j', 'u', 'condition', 'region')``.  The loader
+        decides which levels its table can honestly key on; the join uses
+        those present in BOTH the table and *crop_production*.
+
+        NOTHING AUTO-DISCOVERS A COUNTRY'S TABLE, and the result is never
+        stored.  The intended call shape, once the loaders of GH #852 / #854
+        exist, is explicit::
+
+            harvest_kg(cp, shipped_factors=ethiopia.crop_conversion_factors(...))
+
+        A ``shipped_factors='auto'`` registry is a live design question for
+        @ligon; the options and the trade-off are written up in
+        ``.coder/ledger/harvest-kg-shipped-factors.md`` §6.
+
+        ``region`` must be resolved by the CALLER onto *crop_production* (join
+        ``cluster_features`` and rename its ``Region`` to ``region``); this
+        function never re-enters ``sample()`` or ``cluster_features()``.  Note
+        also that ``crop_production.j`` is the DECODED crop label, not the WB
+        crop code -- a table read straight from ``Crop_CF_Wave4.dta`` carries
+        ``74``, which matches no ``j``, and the ``shipped: 0`` count is the
+        only tell.  Decode in the loader.
+
+        An AMBIGUOUS table (two rows sharing a join key) raises ``ValueError``
+        naming the duplicates: de-duplicating is the loader's deliberate act,
+        never an average taken here.
+
+        This is NOT Malawi's shelled/unshelled ratio interpolation (EPAR's
+        ``EPAR_UW_conversionfactors.do:381-390``): inferring one condition's
+        factor from the other's is a later, separate layer with its own N
+        threshold (LEARNINGS L9, GH #854).  This layer only looks a factor up.
 
     Returns
     -------
@@ -1975,30 +2188,43 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             reported number, and this column is CONSTRUCTED.
         ``KgFactorSource``
             one of :data:`KG_FACTOR_LAYERS`.
-        ``kg_reported`` / ``kg_survey_median`` / ``kg_inferred``
+        ``kg_reported`` / ``kg_shipped`` / ``kg_survey_median`` /
+        ``kg_inferred``
             what each layer offered for that row, whether or not it won.
-            ``kg_reported`` is POST-screen, so a rejected report reads NaN
-            here and ``kg_reported_rejected`` is True; the raw value is
-            untouched in the input frame's own ``KgFactor`` column --
-            which is what makes the disagreement auditable per unit
-            (``groupby('u')`` on this frame).
+            ``kg_reported`` and ``kg_shipped`` are POST-screen, so a rejected
+            value reads NaN here and ``kg_reported_rejected`` /
+            ``kg_shipped_rejected`` is True; the raw value is untouched in the
+            input frame's own ``KgFactor`` column (and in the caller's own
+            factor table) -- which is what makes the disagreement auditable
+            per unit (``groupby('u')`` on this frame).
+        ``kg_shipped_source``
+            the shipped table's own ``Source`` string for the row, where it
+            has one -- Malawi's IHS5 ladder stamps a provenance string on
+            every factor and it is worth carrying through.  MISSING wherever
+            no usable shipped factor was found, including where the screen
+            rejected it -- read it with ``pd.isna``, since pandas 3.0
+            normalises both ``None`` and ``pd.NA`` to NaN in an object
+            column.
 
         Two tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
             ``{layer: n_rows}`` over the INPUT rows.  The four layers of
             :data:`KG_FACTOR_LAYERS` partition the frame and sum to
-            ``len(crop_production)``; the extra ``reported_implausible`` key
-            counts rows whose report the screen REJECTED and is deliberately
+            ``len(crop_production)`` -- ``shipped`` included, and therefore
+            present as ``0`` when no table is passed.  The extra
+            ``reported_implausible`` / ``shipped_implausible`` keys count rows
+            whose offered factor the screen REJECTED and are deliberately
             outside that partition, since such a row is still served by one
-            of the four.  POOLED: on a cross-country
+            of the five.  POOLED: on a cross-country
             :class:`~lsms_library.feature.Feature` frame these counts run over
             every country at once, so ``reported: 40000`` says nothing about
             WHICH country reported.  Read it as a total, never as coverage;
             the per-row frame answers the real question with one
             ``groupby('country')``.
         ``kg_factor_disagreement``
-            For ``reported_vs_survey_median`` and ``reported_vs_inferred``:
+            For ``reported_vs_shipped``, ``reported_vs_survey_median`` and
+            ``reported_vs_inferred``:
             ``{'both': n, 'disagree': k, 'share': k/n or None}``, where
             ``both`` counts rows for which BOTH layers produced a usable
             factor and ``disagree`` counts those differing from the
@@ -2007,7 +2233,10 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             This is the audit hook: a large ``reported_vs_inferred`` share
             means the library's factor table and the instrument disagree
             about what a unit weighs, and the instrument is the one that was
-            there.
+            there.  ``reported_vs_shipped`` asks the same question of an
+            externally shipped table, which is precisely the audit GH #852
+            wants: does the World Bank's conversion table agree with what the
+            enumerator wrote down?
 
     Notes
     -----
@@ -2030,6 +2259,24 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         rejected = np.zeros(len(df), dtype=bool)
 
     sentinel = _unit_sentinel_mask(df)
+
+    if shipped_factors is None:
+        shipped = np.full(len(df), np.nan)
+        shipped_rejected = np.zeros(len(df), dtype=bool)
+        shipped_source = np.full(len(df), pd.NA, dtype=object)
+    else:
+        offered, shipped_source = _shipped_factor_lookup(df, shipped_factors)
+        # The missing-unit sentinel excludes this layer too, and BEFORE the
+        # screen.  A shipped table is a kg-PER-UNIT table, so a row that
+        # recorded no unit has nothing for it to be per; serving one would
+        # fabricate a weight, which is the failure U_UNKNOWN exists to
+        # prevent.  Excluding first also keeps `shipped_implausible` a count
+        # of rows that would OTHERWISE have been served.
+        offered = np.where(sentinel, np.nan, offered)
+        shipped_source = np.where(sentinel, pd.NA, shipped_source)
+        shipped, shipped_rejected = _screen_reported_factors(df, offered)
+        shipped_source = np.where(np.isnan(shipped), pd.NA, shipped_source)
+
     if np.isnan(reported).all():
         # Nothing reported -> nothing to take a median of.  Skipping the
         # groupby is not just an optimisation: it keeps the no-KgFactor path
@@ -2041,36 +2288,49 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
                                                sentinel=sentinel)
 
     rep_ok = ~np.isnan(reported)
+    shp_ok = ~np.isnan(shipped)
     med_ok = ~np.isnan(survey_median)
     inf_ok = ~np.isnan(inferred_arr)
 
-    resolved = np.where(rep_ok, reported,
-                        np.where(med_ok, survey_median, inferred_arr))
-    source = np.where(rep_ok, 'reported',
-                      np.where(med_ok, 'survey_median',
-                               np.where(inf_ok, 'inferred', 'none')))
+    resolved = np.where(
+        rep_ok, reported,
+        np.where(shp_ok, shipped,
+                 np.where(med_ok, survey_median, inferred_arr)))
+    source = np.where(
+        rep_ok, 'reported',
+        np.where(shp_ok, 'shipped',
+                 np.where(med_ok, 'survey_median',
+                          np.where(inf_ok, 'inferred', 'none'))))
 
     out = pd.DataFrame(
         {'kg_per_unit': resolved,
          'KgFactorSource': source,
          'kg_reported': reported,
          'kg_reported_rejected': rejected,
+         'kg_shipped': shipped,
+         'kg_shipped_rejected': shipped_rejected,
+         'kg_shipped_source': shipped_source,
          'kg_survey_median': survey_median,
          'kg_inferred': inferred_arr},
         index=df.index)
 
     counts = {layer: int((source == layer).sum()) for layer in KG_FACTOR_LAYERS}
-    # NOT a fifth layer, and deliberately not part of the partition: a
-    # rejected row is still SERVED by one of the four (usually `none` or
-    # `inferred`), so counting it here as well would double-count it.  The
-    # four layers sum to len(df); this rides alongside as a screen count.
+    # NOT layers, and deliberately not part of the partition: a rejected row
+    # is still SERVED by one of the five (usually `none` or `inferred`), so
+    # counting it there as well would double-count it.  The five layers sum
+    # to len(df); these two ride alongside as screen counts, and both are
+    # present on every call -- `shipped_implausible` is 0 when no table was
+    # passed, exactly as `reported_implausible` is 0 without a KgFactor
+    # column.
     counts['reported_implausible'] = int(rejected.sum())
+    counts['shipped_implausible'] = int(shipped_rejected.sum())
     out.attrs['kg_factor_sources'] = counts
     # A row with no unit recorded is excluded from the audit as well: there
     # is nothing for its reported factor to be compared against, since no
     # per-unit factor -- inferred or median -- can exist for a non-unit.
     audited = np.where(sentinel, np.nan, reported)
     out.attrs['kg_factor_disagreement'] = {
+        'reported_vs_shipped': _disagreement(audited, shipped),
         'reported_vs_survey_median': _disagreement(audited, survey_median),
         'reported_vs_inferred': _disagreement(audited, inferred_arr),
         'tolerance': KG_FACTOR_DISAGREEMENT_TOLERANCE,
@@ -2100,7 +2360,7 @@ def _disagreement(reference, other,
 
 
 def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
-               min_reports=SURVEY_MEDIAN_MIN_REPORTS):
+               min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
     """Total harvested kilograms per (t, i, plot, j) from ``crop_production``.
 
     MECHANICAL reduction (GAP 1 → WB ``Plotcrop``/``Plot`` ``harvest_kg``).
@@ -2109,7 +2369,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
 
     Each row's kg-per-unit factor is built by a LAYERED procedure, in
     precedence order: the row's own **reported** ``KgFactor`` (what the
-    instrument wrote down, e.g. UNPS ``a5?q6d``); the **median of reported**
+    instrument wrote down, e.g. UNPS ``a5?q6d``); a **shipped** factor from
+    an externally supplied conversion table, when the caller passes one as
+    *shipped_factors*; the **median of reported**
     factors for the same ``(u, condition)`` in the same country-wave, where
     at least ``min_reports`` rows report one; the library's **inferred**
     factor from the shared unit→kg machinery (:func:`_get_kg_factors` via
@@ -2141,6 +2403,14 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         How many rows of a ``(u, condition)`` group must carry a reported
         ``KgFactor`` before their median is used to fill that group's
         unreported rows.  Inert on a frame with no ``KgFactor`` column.
+    shipped_factors : pd.DataFrame, optional
+        An externally shipped kg-per-unit table, forwarded verbatim to
+        :func:`harvest_kg_factors` -- see there for its shape, the join keys,
+        the ambiguity refusal, and why nothing auto-discovers it.  Omitted
+        (the default), this whole layer is inert and the result is bit for
+        bit what it was before the layer existed.
+
+            harvest_kg(cp, shipped_factors=ethiopia.crop_conversion_factors(...))
     carry_native : bool, default False
         When False (default, matching the WB construct), rows whose ``u``
         has no known kg factor contribute NOTHING to the sum — ``Harvest_kg``
@@ -2176,11 +2446,17 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     *lower bound* on the WB figure for plots dominated by non-metric
     containers; magnitudes agree on metric-reported plots.
 
-    Closing that gap is a per-country CONFIG job in two forms, neither of
-    them a change to this transform: extend the country's ``u``-table
-    (``harvest_units``), or wire the instrument's own conversion factor into
+    Closing that gap is a per-country job in three forms, none of them a
+    change to this transform: extend the country's ``u``-table
+    (``harvest_units``); wire the instrument's own conversion factor into
     the optional ``KgFactor`` column, which the ``reported`` and
-    ``survey_median`` layers above then consume.  The second reaches rows the
+    ``survey_median`` layers above then consume; or -- where the survey ships
+    a conversion TABLE rather than a per-row factor -- load that table and
+    pass it as *shipped_factors*.  The third is the one Ethiopia and Malawi
+    need (GH #852, #854): their tables are keyed on crop x unit x region, so
+    they can never be a per-row column, and the de-duplication and region
+    resolution they require are decisions that belong at the call site rather
+    than baked into a parquet.  The second reaches rows the
     first cannot -- Uganda's 2018-19 season-A harvest side ships a
     100%-populated ``a5aq6d`` conversion factor and NO harvest-unit code at
     all, so its 7 153 rows sit at ``u='Unknown'`` and no unit table can ever
@@ -2201,7 +2477,8 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
 
     qty = pd.to_numeric(df['Quantity'], errors='coerce')
     factors = harvest_kg_factors(df, volume_as_mass=volume_as_mass,
-                                 min_reports=min_reports)
+                                 min_reports=min_reports,
+                                 shipped_factors=shipped_factors)
     kg_per_unit = factors['kg_per_unit']
     kg = qty * kg_per_unit
     if carry_native:
