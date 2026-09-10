@@ -1,0 +1,965 @@
+#+title: GH #850 -- the food-side kg inference has no item axis (design, not code)
+#+author: Sue (Claude Opus 5), for Ethan Ligon
+#+date: 2026-09-09
+#+options: toc:2 num:t ^:nil
+
+# Prose is ASCII.  A handful of non-ASCII characters survive inside table
+# CELLS -- French item and unit labels read verbatim from the corpus
+# (=Boite de tomate=, =Unite=, =Mais en grain=).  Transliterating those would
+# make the tables disagree with the data.
+
+* Summary
+
+The cheapest way to see what is wrong with =transformations.conversion_to_kgs=
+is to ask it what a kilogram weighs.  On the nine countries measured here it
+answers between 0.87 kg and 2.0 kg, and the deviation is not noise: it is the
+median =Quantity= on the rows it looked at.  Step 2 of the chain takes the
+median of =Expenditure= where the docstring promises a per-unit price, so the
+number it returns is kilograms per transaction ROW, not kilograms per unit.
+That is defect (b), and it is arithmetic, not judgement.
+
+Defect (a) is the one the issue names.  No step of the chain carries =j=, so
+the result is one factor per unit label for the whole country.  Malawi's
+=Piece= is shared by 133 food items; estimated separately, the 72 the data can
+support run from 1 g to 1.8 kg, and the library serves 0.50 kg to all 133.
+GhanaLSS's =Heap= carries 125 items over a factor of 15,000.
+
+Measuring those two turned up a third, which nobody has filed.  =KNOWN_METRIC=
+does not contain =Millilitre=, =Grams= or =Litres=, and
+=_parse_explicit_metric='s= regexes do not match the =lts=, =ltrs=, =lt= or
+=kgs= spellings, so labels that state their own kilograms fall through to the
+price-ratio inference and get invented ones.  The library currently believes a
+Malawian millilitre weighs 743 grams, a Malian gramme weighs 708 grams, and a
+Ugandan =Sack (50 kgs)= weighs 4.4 kg.  Call it defect (c).  It has no design question in it, it is
+half a day's work, and it should land first, because fixing it shrinks the
+inference set and enlarges the kg baseline that (a) and (b) are estimated
+against.
+
+Two things make this cheaper to land than the workplan assumed.  Nothing in
+=transformations.py= is in any table's build fingerprint, and no derived food
+table is ever written to a parquet, so *there is no re-warm for any of the
+three*: the cost is a coverage regrade.  And =.coder/coverage/blessed.csv= is
+empty, so no human blessing is invalidated.
+
+One caveat, stated here rather than buried: defect (c) changes =harvest_kg='s
+inferred layer on 47.7% of Uganda's =crop_production= rows, which is the one
+place this recommendation crosses a line the brief drew.  See D7.
+
+Recommendation: land (c), then (C) = (a) + (b) together, with (D)'s per-row
+provenance in the same PR.  Section 4 lists the decisions and the number that
+decides each.
+
+* 1. What the code does today
+
+** The chain, with its keys
+
+=food_quantities(units='kgs')= and =food_prices(units='kgvalue')= are derived
+at runtime from =food_acquired= (=country.py:4449-4471=); neither is ever
+written to a parquet.  Both call =_get_kg_factors= (=transformations.py:1004=),
+which builds one =dict[str, float]= in three layers:
+
+1. =KNOWN_METRIC= (=transformations.py:924=), thirteen hand-coded tokens.
+2. =_parse_explicit_metric= (=:964=) over every =u= label in the frame, for
+   labels that name their own content ("50 kg Bag" -> 50.0).
+3. the price-ratio inference, =conversion_to_kgs= (=:782=), for whatever is
+   left.  Gated on =Expenditure= and =Quantity= both being columns (=:1045=),
+   which is why =crop_production= never reaches it.
+
+Layer 3 is the one at issue.  Reading its body (=:829-878=), with the group
+keys as they are AT RUNTIME rather than as the signature's default suggests:
+
+1. =pkg = v['Expenditure'].divide(v['Kgs'])=, then =.groupby(index).median()=
+   (=:870-871=).  =index= is =group_levels = [n for n in ['t','m','i'] if n in
+   idx_names]= (=:1048=).  =food_acquired= arrives indexed =(i, t, v, j, u, s)=
+   in every country measured, and =m= is minted by =_add_market_index= inside
+   =_finalize_result=, which runs AFTER the derived transform.  So the
+   effective key is *=['t','i']=*: a per-HOUSEHOLD median price per kilogram,
+   pooled across every item that household bought in a kg-known unit.
+2. =po = v_infer['Expenditure'].groupby(index + ['u']).median()= (=:873=), key
+   *=['t','i','u']=*, over rows with no survey-supplied =Quantity_kg=.
+3. =kgper = (po / pkg).dropna()=, then =.groupby('u').median()= (=:874-875=),
+   returned as =dict[str, float]=.  Final key *=u= alone*.
+
+=_get_kg_factors= never widens any of it, and =_apply_kg_conversion= (=:1121=)
+looks each row's factor up by =u.lower()= and nothing else.
+
+** Defect (a): there is no item axis at any step
+
+Not at the baseline, not at step 2, not in the result.  A "bunch" of bananas
+and a "bunch" of groundnuts get one number.  The module's own comment at =:710=
+states the general form of the problem ("=conversion_to_kgs= returns ONE factor
+per unit label, while =1/price= varies over =(j, t, m)=") in the course of
+explaining why =u='Value'= is excluded, and then the code does exactly that for
+every other unit.
+
+The crop side of the same library disagrees: =median_price_valuation= carries
+=item_keys=('j',)= (=:3145=), and =harvest_kg_factors=' =survey_median= layer
+groups =(country, t, u, condition)= before falling back to =(country, t, u)=
+(=_survey_median_factors=, =:1855=).
+
+The gap is also LOAD-BEARING somewhere it should not be.
+=EthiopiaRHS/_/ethiopiarhs.py:48-50= says, in a comment justifying the GH #347
+fix, that "the framework's price-ratio inference ... already groups by item
+=i= within each unit"; =EthiopiaRHS/_/CONTENTS.org:543-544= and
+=EthiopiaRHS/_/categorical_mapping.org:340-341= repeat the claim.  It is false.
+=i= is the household id.  EthiopiaRHS stripped the food label off its unit
+tokens on the strength of a property this function does not have, and the fix
+proposed here would retroactively make that decision correct.
+
+** Defect (b): step 2 medians Expenditure, not Expenditure/Quantity
+
+The docstring says "expenditure is divided by quantity to get a per-unit price"
+(=:791-793=).  Step 1 does divide, by =Kgs=.  Step 2 does not divide at all.
+So =kgper= is kilograms per transaction row, and equals kilograms per unit only
+where =Quantity == 1=.  Section 2(i) measures how often that holds: between 4.6%
+and 40.5% of the rows, by country.
+
+The self-test is the clean way to see it.  The inference mints a factor for
+=u='kg'= as readily as for anything else (=_get_kg_factors= then discards it,
+because =KNOWN_METRIC= seeded the key first), and the right answer is 1.0 by
+definition.  Section 2(iii) reports what it actually returns.
+
+** Defect (c): the metric vocabulary, found while measuring
+
+Three spellings in wide use are missing from =KNOWN_METRIC=: =Millilitre= /
+=Milliliter= / =Mili Liter=, =Grams=, =Litres=.  And =_parse_explicit_metric='s=
+regexes end their unit tokens with =\b= after =l= and =kg=, so every label
+whose metric content is spelled =lts=, =ltrs=, =lt= or =kgs= declines to match.
+Verified directly:
+
+: _parse_explicit_metric('Sack (100 kgs)')      -> None
+: _parse_explicit_metric('Tin (Debe) (20 lts)') -> None
+: _parse_explicit_metric('Cup/Mug(0.5lt)')      -> None
+: _parse_explicit_metric('Basket (10 kg)')      -> 10.0     # matches
+: _parse_explicit_metric('Bottle(750ml)')       -> 0.75     # matches
+
+Those are Uganda's own container labels.  =Uganda/_/conversion_to_kgs.json=
+already holds the right answers for all of them, which brings us to the one
+thing here that is merely dead.
+
+** What is dead, and what a document says about it
+
+=Uganda/_/CONTENTS.org:810-813= says the json is "a kg-per-unit factor lookup
+consumed by =food_quantities= derivation".  That is no longer true.
+=uganda.food_acquired= joins it on =u= alone (=uganda.py:404-410=) into a
+column named =Kgs=, and =uganda.food_acquired_to_canonical= then drops it: its
+docstring lists =Kgs= among the columns that "are ignored" (=uganda.py:440-441=),
+and the canonical frame it emits carries =[Quantity, Expenditure, Price]= only.
+Confirmed on the warm build: =Country('Uganda').food_acquired()= has no =Kgs=
+and no =Quantity_kg= column.  So the u-only table is live for anyone reading a
+wave parquet directly and dead for the API, and 100% of Uganda's API
+kilograms come from =_get_kg_factors=.
+
+Two consequences.  The json is not a fix target, and =CONTENTS.org:810= needs a
+correction.  But its CONTENT is a check: it is a hand-curated answer key for
+exactly the labels defect (c) mishandles.
+
+** What is NOT wrong
+
+Worth saying, so the fix does not wander.  The =Quantity_kg= precedence rule is
+right and stays (=:867-868=, =:1136-1141=): a survey-supplied per-row kilogram
+beats any inference, and those rows are excluded from step 2 while still
+anchoring the baseline.  The =u='Value'= exclusion is right and stays (GH #770).
+The carry rule for unconvertible units in =food_quantities(units='kgs')= is
+right and stays.  And =crop_production= does not reach the price-ratio
+inference at all, so nothing in (a) or (b) can move =harvest_kg=.  Defect (c)
+is different: it edits =KNOWN_METRIC= / =_parse_explicit_metric=, which
+=_kg_factor_series= (=:1660=) does reach.  Section 2 measures how far.
+
+* 2. Measurements
+
+** How they were made
+
+Warm =food_acquired= for nine countries, read through the public
+=Country(...).food_acquired()= with =LSMS_DATA_DIR= pointed at a scratch root
+holding copies of the L2-country parquets and a symlink to the shared DVC blob
+cache.  Nothing was written to =~/.local/share/lsms_library=; verified after
+the fact with =find ... -newer=, zero files (including zero new blobs).
+
+Two fidelity checks, because a measurement of the wrong frame is worse than no
+measurement.  First, the derived dispatch hands =transform_fn= the output of
+=_aggregate_wave_data(waves, 'food_acquired')= rather than the public reader
+(=country.py:4470=); on Malawi, Ethiopia, Niger, Tanzania and Nigeria the two
+frames have identical length and an identical =u= vocabulary (symmetric
+difference 0), so the public reader is a faithful stand-in.  Second, the
+prototype re-implements the live chain as =infer_old= and compares its output
+key by key against =conversion_to_kgs= itself; the agreement column below is
+that check.
+
+All prototypes run IN MEMORY on frames read from the cache.  No library code
+was edited.  Scripts: =measure.py=, =metric_scoreboard.py=,
+=mali_groundtruth.py=, =two_more.py=, =probe_hash_reach.py=, all in this
+directory, all re-runnable.
+
+** (i) How big is defect (b)?  The Quantity distribution on the step-2 rows
+
+=step2= counts the rows the inference looks at (no survey =Quantity_kg=, an
+=Expenditure= to take a median of).  =infer now= is the subset whose unit label
+the price-ratio inference must actually decide; =(c) removes= is how many of
+those a fixed metric vocabulary would take off its plate.
+
+| country | rows | step2 | infer now | (c) removes | infer after (c) | share now | Q==1 | Q med | Q p90 | Q mean |
+|---------+------+-------+-----------+-------------+-----------------+-----------+------+-------+-------+--------|
+| Uganda | 355,571 | 355,537 | 199,964 | 33,394 | 166,570 | 0.562 | 0.341 | 2 | 8 | 4.25 |
+| Malawi | 971,531 | 389,626 | 218,059 | 16,349 | 201,710 | 0.224 | 0.288 | 2 | 10 | 5 |
+| Nigeria | 595,725 | 353,689 | 138,086 | 0 | 138,086 | 0.232 | 0.318 | 2 | 10 | 4.72 |
+| Ethiopia | 325,920 | 264,091 | 92,797 | 12,371 | 80,426 | 0.285 | 0.418 | 2 | 10 | 6.98 |
+| Tanzania | 251,613 | 196,293 | 2,198 | 0 | 2,198 | 0.00874 | 0.046 | 5 | 15 | 8.37 |
+| Niger | 239,031 | 199,131 | 179,596 | 0 | 179,596 | 0.751 | 0.339 | 2 | 8 | 4.19 |
+| Mali | 430,271 | 344,825 | 248,896 | 1,570 | 247,326 | 0.578 | 0.246 | 3 | 10 | 34.9 |
+| EthiopiaRHS | 54,519 | 37,679 | 28,727 | 0 | 28,727 | 0.527 | 0.274 | 2 | 12 | 5.38 |
+| GhanaLSS | 1,766,405 | 882,361 | 844,335 | 1,715 | 842,620 | 0.478 | 0.401 | 2 | 6 | 3.44 |
+
+Between 4.6% and 41.8% of the rows carry =Quantity == 1=, which is the only
+case in which the current step 2 returns kilograms per UNIT.  Everywhere else
+it returns kilograms per transaction, inflated by roughly the row's quantity.
+The median is 2 or 3 in every country but Tanzania, where it is 5.
+
+Tanzania is the informative outlier in the other direction: 0.9% of its rows
+reach the inference at all, because its =u= vocabulary has exactly two labels.
+Niger's is 75%.  So "how much does this matter" has no single answer, and the
+per-country column is the answer.
+
+** (ii) How big is defect (a)?  Items sharing a unit
+
+Four highest-volume inferred units per country, from
+=measure_ii_units.csv= (all of them are in the CSV).  =pooled now= is what the
+library serves today for every item at once; =per-j min/med/max= are the same
+unit estimated separately per item, at =min_reports = 5= and
+=min_baseline = 5=.
+
+| country | u | rows | distinct j | j w/ factor | pooled now | pooled fixed | per-j min | per-j med | per-j max | max/min |
+|---------+---+------+------------+-------------+------------+--------------+-----------+-----------+-----------+---------|
+| Uganda | Heap (Small) | 21,685 | 44 | 16 | 0.333 | 0.197 | 0.1 | 0.323 | 1.12 | 11.2 |
+| Uganda | Heap (Medium) | 19,282 | 49 | 15 | 0.577 | 0.375 | 0.2 | 0.5 | 1.83 | 9.17 |
+| Uganda | Heap (unspecified) | 16,018 | 37 | 15 | 0.651 | 0.28 | 0.05 | 0.417 | 1.25 | 25 |
+| Uganda | Piece (Medium) | 15,527 | 61 | 23 | 0.486 | 0.167 | 0.04 | 0.286 | 0.909 | 22.7 |
+| Malawi | Piece | 62,096 | 133 | 72 | 0.5 | 0.104 | 0.001 | 0.152 | 1.83 | 1.83e+03 |
+| Malawi | Heap | 38,760 | 90 | 49 | 0.637 | 0.279 | 0.01 | 0.211 | 1.9 | 190 |
+| Malawi | Satchet/Tube | 12,884 | 40 | 14 | 0.237 | 0.131 | 0.001 | 0.0615 | 51.6 | 5.16e+04 |
+| Malawi | No. 10 plate | 9,872 | 59 | 28 | 0.267 | 0.125 | 0.0114 | 0.125 | 1 | 88 |
+| Nigeria | mudu | 17,178 | 98 | 88 | 1.25 | 0.45 | 0.0024 | 0.328 | 2.42 | 1.01e+03 |
+| Nigeria | milk cup | 15,373 | 74 | 42 | 0.296 | 0.107 | 0.0289 | 0.141 | 0.948 | 32.8 |
+| Nigeria | small heap | 13,138 | 53 | 29 | 0.149 | 0.1 | 0.00758 | 0.275 | 3.48 | 459 |
+| Nigeria | olodo | 12,528 | 87 | 75 | 0.6 | 0.125 | 0.024 | 0.35 | 3.78 | 157 |
+| Ethiopia | Piece/Number Medium | 9,559 | 52 | 36 | 1.03 | 0.154 | 0.0086 | 0.212 | 7.95 | 925 |
+| Ethiopia | Medeb Small | 9,176 | 52 | 29 | 0.333 | 0.239 | 0.0167 | 0.333 | 1 | 60 |
+| Ethiopia | Medeb Medium | 8,699 | 50 | 26 | 0.465 | 0.333 | 0.1 | 0.5 | 1 | 10 |
+| Ethiopia | Piece/Number Small | 5,847 | 55 | 33 | 0.8 | 0.125 | 0.0158 | 0.15 | 5.23 | 331 |
+| Tanzania | piece | 2,198 | 29 | 15 | 0.849 | 0.17 | 0.0056 | 0.126 | 5.58 | 997 |
+| Niger | Sachet | 80,417 | 96 | 16 | 0.194 | 0.0875 | 0.0161 | 0.174 | 0.9 | 56 |
+| Niger | Unité | 29,668 | 68 | 16 | 0.267 | 0.0427 | 0.0125 | 0.111 | 2 | 160 |
+| Niger | Tas | 21,586 | 65 | 17 | 0.5 | 0.3 | 0.0625 | 0.225 | 0.625 | 10 |
+| Niger | Tiya | 20,026 | 63 | 18 | 2.08 | 1.25 | 0.264 | 1.98 | 11.2 | 42.6 |
+| Mali | Tas | 73,192 | 144 | 95 | 0.539 | 0.214 | 0.0385 | 0.271 | 1.75 | 45.5 |
+| Mali | Sachet | 58,330 | 121 | 49 | 0.28 | 0.115 | 0.00278 | 0.229 | 1.7 | 612 |
+| Mali | Unité | 50,172 | 143 | 71 | 0.376 | 0.0667 | 0.00833 | 0.167 | 2 | 240 |
+| Mali | Paquet | 12,980 | 67 | 18 | 1 | 0.261 | 0.05 | 0.896 | 26 | 520 |
+| EthiopiaRHS | Medeb | 4,929 | 65 | 12 | 0.333 | 0.213 | 0.0156 | 0.195 | 1 | 64 |
+| EthiopiaRHS | Sini | 4,555 | 40 | 16 | 0.526 | 0.143 | 0.0476 | 0.0965 | 0.333 | 7 |
+| EthiopiaRHS | Birchiko | 3,965 | 52 | 18 | 1 | 0.182 | 0.0952 | 0.237 | 0.792 | 8.31 |
+| EthiopiaRHS | Tassa | 2,518 | 55 | 22 | 0.743 | 0.318 | 0.0885 | 0.57 | 1.27 | 14.4 |
+| GhanaLSS | Heap | 280,242 | 125 | 65 | 0.227 | 0.139 | 0.0002 | 0.15 | 3 | 1.5e+04 |
+| GhanaLSS | Single | 152,168 | 140 | 69 | 0.231 | 0.0907 | 0.00025 | 0.1 | 7.06 | 2.82e+04 |
+| GhanaLSS | Satchet | 70,102 | 107 | 52 | 0.208 | 0.0726 | 0.000417 | 0.0867 | 1.58 | 3.79e+03 |
+| GhanaLSS | Piece | 48,226 | 128 | 67 | 0.204 | 0.0756 | 0.00025 | 0.0753 | 1.11 | 4.44e+03 |
+
+Malawi's =Piece= is the one to look at: 133 food items, and where the data
+support a per-item estimate at all the answers run from a gram to a couple of
+kilograms.  =max/min= is the honest headline for this table and it is between
+11 and 50,000.  The pooled number is not a compromise between those; it is the
+median of a distribution nobody would summarise with a median.
+
+** (iii) What the correction moves
+
+Prototype: baseline at =(t, j)= over rows whose kilograms are already known,
+step 2 at =(t, j, u)= on =Expenditure / Quantity=, factor keyed =(j, u)= with
+the =u=-keyed factor as the fallback rung, on top of the (c) vocabulary.
+=rows compared= are the rows whose kilograms the factor actually decides:
+unit not seeded, and no survey =Quantity_kg= to take precedence.
+
+| country | units | inferred now | inferred after (c) | rows compared | >10% | >2x | >10x | median new/old |
+|---------+-------+--------------+--------------------+---------------+------+-----+------+----------------|
+| Uganda | 128 | 67 | 40 | 173,021 | 0.983 | 0.535 | 0.0479 | 0.436 |
+| Malawi | 636 | 558 | 553 | 297,197 | 0.962 | 0.69 | 0.11 | 0.44 |
+| Nigeria | 81 | 77 | 77 | 178,224 | 0.945 | 0.487 | 0.057 | 0.747 |
+| Ethiopia | 75 | 72 | 70 | 104,631 | 0.903 | 0.577 | 0.139 | 0.417 |
+| Tanzania | 2 | 1 | 1 | 3,594 | 1 | 0.929 | 0.87 | 0.0589 |
+| Niger | 46 | 41 | 41 | 216,569 | 0.987 | 0.741 | 0.0109 | 0.452 |
+| Mali | 41 | 35 | 34 | 298,546 | 0.93 | 0.697 | 0.0943 | 0.404 |
+| EthiopiaRHS | 105 | 101 | 101 | 39,731 | 0.97 | 0.621 | 0.103 | 0.428 |
+| GhanaLSS | 60 | 55 | 54 | 1,436,196 | 0.894 | 0.466 | 0.159 | 0.734 |
+
+Every country moves on nearly every affected row, and the direction is down:
+the median new/old factor is 0.06 to 0.75, because dividing by =Quantity= at
+step 2 is the dominant term and quantities are mostly above 1.
+
+The self-test, which is the closest thing to a free grade:
+
+| country | kg now | kg fix (b) | kg fix (c) med j | n items | within 10% | reimpl keys | agree |
+|---------+--------+------------+------------------+---------+------------+-------------+-------|
+| Uganda | 1.33 | 1 | 1 | 53 | 0.962 | 128 | 128 |
+| Malawi | 2 | 0.44 | 0.948 | 64 | 0.469 | 426 | 426 |
+| Nigeria | 1.2 | 1 | 0.901 | 102 | 0.51 | 71 | 71 |
+| Ethiopia | 1.18 | 1 | 1 | 70 | 0.757 | 71 | 71 |
+| Tanzania | 0.865 | 1 | 1 | 59 | 1 | 2 | 2 |
+| Niger | 2 | 1 | 1 | 42 | 1 | 41 | 41 |
+| Mali | 1.82 | 1 | 1 | 140 | 1 | 39 | 39 |
+| EthiopiaRHS | 1 | 1 | 1 | 33 | 1 | 75 | 75 |
+| GhanaLSS | 1.27 | 1 | 0.695 | 38 | 0.211 | 47 | 47 |
+
+=kg now= is what the live chain infers for the kilogram, where the answer is
+1.0.  Read =kg fix (b)= with care: in a country whose kg-known rows ARE its kg
+rows, 1.000 is an identity rather than a confirmation.  What is not an identity
+is the first column.  Malawi is the country whose baseline genuinely mixes in
+non-kg rows through its =cfactor= column, and there fix (b) alone returns 0.44,
+which is evidence FOR the item axis: the household baseline is pooling items.
+=agree= is the plumbing check: the prototype's re-implementation of the live
+chain reproduces =conversion_to_kgs= on every key, in every country.
+
+=kg fix (c) med j= is worth one more sentence, because it is the method's own
+ceiling.  Estimated per item, the kilogram comes back at 1.00 in five countries
+and at 0.70 in GhanaLSS, with only 21% of GhanaLSS's items within 10%.
+GhanaLSS has no survey =Quantity_kg=, so its baseline is built from =kg=, =g=
+and =pound= rows alone -- which means 0.70 is measuring how well the
+inference's central assumption holds (one price per kilogram across all units
+of one item) among units where we KNOW the conversion.  Where that assumption
+is weak, no amount of regrouping rescues the inference, and the honest answer
+for such a country is a curated factor table rather than a better estimate.
+
+And the delivered tables:
+
+| country | fq kg rows now | fq kg rows new | fq total kg now | fq total kg new | fp rows now | fp rows new | total kg % |
+|---------+----------------+----------------+-----------------+-----------------+-------------+-------------+------------|
+| Uganda | 349,057 | 349,057 | 1.458e+06 | 1.248e+06 | 349,023 | 349,023 | -14.38 |
+| Malawi | 970,477 | 970,581 | 8.79e+06 | 2.55e+06 | 681,579 | 681,613 | -70.99 |
+| Nigeria | 595,042 | 595,042 | 1.657e+06 | 1.572e+06 | 481,613 | 481,613 | -5.106 |
+| Ethiopia | 325,425 | 325,511 | 4.127e+06 | 7.406e+05 | 263,635 | 263,686 | -82.05 |
+| Tanzania | 250,899 | 250,899 | 7.992e+05 | 7.789e+05 | 195,579 | 195,579 | -2.551 |
+| Niger | 238,241 | 238,234 | 5.019e+05 | 2.202e+05 | 198,370 | 198,370 | -56.13 |
+| Mali | 414,417 | 414,417 | 1.603e+07 | 1.458e+07 | 330,693 | 330,693 | -9.033 |
+| EthiopiaRHS | 51,922 | 51,922 | 3.202e+05 | 2.232e+05 | 35,469 | 35,469 | -30.3 |
+| GhanaLSS | 483,096 | 483,223 | 2.04e+06 | 2.362e+06 | 342,283 | 342,391 | 15.81 |
+
+Row counts barely move, which is the point: the carry rule means an
+unconvertible row is kept with its native unit either way.  The kilograms move
+a great deal.  Ethiopia's total falls by 82% and GhanaLSS's rises by 16%; the
+corpus does not move in one direction, which is what you would expect if the
+old number were noise rather than a bias.
+
+** The two floors, swept
+
+Rows of the =(j, u)= rung as a share of the rows needing an inference.  Down a
+block is the step-2 floor; across is the baseline floor.
+
+| country | step2_floor | 3 | 5 | 10 | 20 |
+|---------+-------------+---+---+----+----|
+| Ethiopia | 3 | 0.99 | 0.977 | 0.976 | 0.945 |
+| Ethiopia | 5 | 0.982 | 0.969 | 0.968 | 0.937 |
+| Ethiopia | 10 | 0.966 | 0.954 | 0.953 | 0.92 |
+| Ethiopia | 20 | 0.936 | 0.923 | 0.922 | 0.891 |
+| EthiopiaRHS | 3 | 0.719 | 0.677 | 0.672 | 0.585 |
+| EthiopiaRHS | 5 | 0.71 | 0.669 | 0.666 | 0.578 |
+| EthiopiaRHS | 10 | 0.697 | 0.655 | 0.651 | 0.565 |
+| EthiopiaRHS | 20 | 0.671 | 0.633 | 0.63 | 0.542 |
+| GhanaLSS | 3 | 0.805 | 0.784 | 0.72 | 0.68 |
+| GhanaLSS | 5 | 0.804 | 0.784 | 0.719 | 0.679 |
+| GhanaLSS | 10 | 0.803 | 0.782 | 0.719 | 0.679 |
+| GhanaLSS | 20 | 0.801 | 0.781 | 0.717 | 0.677 |
+| Malawi | 3 | 0.934 | 0.883 | 0.839 | 0.729 |
+| Malawi | 5 | 0.931 | 0.88 | 0.835 | 0.724 |
+| Malawi | 10 | 0.919 | 0.846 | 0.802 | 0.66 |
+| Malawi | 20 | 0.907 | 0.822 | 0.778 | 0.632 |
+| Mali | 3 | 0.698 | 0.683 | 0.644 | 0.602 |
+| Mali | 5 | 0.697 | 0.681 | 0.643 | 0.601 |
+| Mali | 10 | 0.694 | 0.679 | 0.641 | 0.599 |
+| Mali | 20 | 0.685 | 0.671 | 0.631 | 0.59 |
+| Niger | 3 | 0.345 | 0.335 | 0.255 | 0.197 |
+| Niger | 5 | 0.345 | 0.335 | 0.254 | 0.197 |
+| Niger | 10 | 0.344 | 0.335 | 0.254 | 0.197 |
+| Niger | 20 | 0.343 | 0.334 | 0.253 | 0.196 |
+| Nigeria | 3 | 0.973 | 0.959 | 0.898 | 0.831 |
+| Nigeria | 5 | 0.968 | 0.955 | 0.893 | 0.826 |
+| Nigeria | 10 | 0.958 | 0.945 | 0.884 | 0.814 |
+| Nigeria | 20 | 0.94 | 0.926 | 0.862 | 0.794 |
+| Tanzania | 3 | 0.992 | 0.992 | 0.992 | 0.991 |
+| Tanzania | 5 | 0.988 | 0.988 | 0.988 | 0.988 |
+| Tanzania | 10 | 0.977 | 0.977 | 0.977 | 0.977 |
+| Tanzania | 20 | 0.948 | 0.948 | 0.948 | 0.948 |
+| Uganda | 3 | 0.54 | 0.442 | 0.338 | 0.206 |
+| Uganda | 5 | 0.54 | 0.441 | 0.337 | 0.206 |
+| Uganda | 10 | 0.534 | 0.438 | 0.33 | 0.204 |
+| Uganda | 20 | 0.529 | 0.435 | 0.329 | 0.197 |
+
+The step-2 floor is nearly free: within any block, moving it from 3 to 20 costs
+one or two percent.  The baseline floor is what binds -- Uganda 54% to 21%,
+Niger 34% to 20%, Malawi 93% to 73%.  That is the parameter worth arguing
+about, and it is the one the current code does not have.
+
+** Top-10 expenditure items, latest wave
+
+Country-level median price per kilogram, restricted to the latest wave.  A
+median pooled over all of a country's waves mixes currencies -- GhanaLSS spans
+the 2007 cedi redenomination -- so an all-wave version of this table reports
+five-figure percentage "changes" that are an artefact of the pooling and not of
+the fix.  =baseline N= is the number of kg-known rows behind that item's
+=(t, j)= reference; a zero there means the item's price comes entirely from the
+fallback =u= rung.
+
+| country | t | j | exp share | baseline N | price/kg now | price/kg new | % change |
+|---------+---+---+-----------+------------+--------------+--------------+----------|
+| Uganda | 2019-20 | Matoke (bunch) | 0.09841 | 0 | 2,000 | 3,200 | 60 |
+| Uganda | 2019-20 | Beef | 0.06463 | 1,013 | 1e+04 | 1e+04 | 0 |
+| Uganda | 2019-20 | Beans (dry) | 0.05867 | 887 | 3,000 | 3,000 | 0 |
+| Uganda | 2019-20 | Restaurant (food) | 0.0553 | 0 |  |  |  |
+| Uganda | 2019-20 | Maize (flour) | 0.05443 | 1,392 | 2,000 | 2,000 | 0 |
+| Uganda | 2019-20 | Sweet Potatoes (fresh) | 0.04741 | 0 | 3,000 | 5,067 | 68.89 |
+| Uganda | 2019-20 | Cassava (fresh) | 0.037 | 0 | 3,000 | 2,000 | -33.33 |
+| Uganda | 2019-20 | Milk (fresh) | 0.03575 | 0 | 1,000 | 1,200 | 20 |
+| Uganda | 2019-20 | Rice | 0.03485 | 1,032 | 3,400 | 3,500 | 2.941 |
+| Uganda | 2019-20 | Cassava (dry) | 0.02812 | 422 | 1,000 | 1,000 | 0 |
+| Malawi | 2019-20 | Maize Ufa Mgaiwa (Normal Flour) | 0.09991 | 4,736 | 312.5 | 312.5 | 0 |
+| Malawi | 2019-20 | Maize Ufa Refined (Fine Flour) | 0.06969 | 3,379 | 358.8 | 358.8 | 0 |
+| Malawi | 2019-20 | Tomato | 0.04983 | 12,020 | 347.2 | 347.2 | 0 |
+| Malawi | 2019-20 | Cooking Oil | 0.04908 | 6,047 | 1,111 | 1,111 | 0 |
+| Malawi | 2019-20 | Sugar | 0.04877 | 4,103 | 887.3 | 900 | 1.427 |
+| Malawi | 2019-20 | Rice | 0.04731 | 4,032 | 600 | 700 | 16.67 |
+| Malawi | 2019-20 | Chicken | 0.03062 | 633 | 3,500 | 2,381 | -31.97 |
+| Malawi | 2019-20 | Goat | 0.02964 | 1,914 | 2,000 | 2,000 | 0 |
+| Malawi | 2019-20 | Eggs | 0.0285 | 5,113 | 1,613 | 1,613 | 0 |
+| Malawi | 2019-20 | Bread | 0.02838 | 3,408 | 750 | 750 | 0 |
+| Nigeria | 2019Q1 | Rice--imported | 0.1301 | 1,371 | 382.2 | 382.2 | 0 |
+| Nigeria | 2019Q1 | Rice--local | 0.09985 | 1,569 | 279.7 | 279.7 | 0 |
+| Nigeria | 2019Q1 | Beef | 0.07344 | 2,158 | 1,200 | 1,200 | 0 |
+| Nigeria | 2019Q1 | Palm oil | 0.05327 | 3,219 | 533.3 | 533.3 | 0 |
+| Nigeria | 2019Q1 | Yam--roots | 0.04478 | 1,429 | 101.5 | 101.5 | 0 |
+| Nigeria | 2019Q1 | White beans | 0.04167 | 1,989 | 370.4 | 370.4 | 0 |
+| Nigeria | 2019Q1 | Bread | 0.03864 | 3,130 | 347.8 | 347.8 | 0 |
+| Nigeria | 2019Q1 | Groundnut oil | 0.03537 | 2,213 | 560 | 560 | 0 |
+| Nigeria | 2019Q1 | Chicken | 0.02853 | 417 | 1,300 | 1,300 | 0 |
+| Nigeria | 2019Q1 | Tomatoes | 0.02332 | 3,228 | 202 | 202 | 0 |
+| Ethiopia | 2021-22 | Oils | 0.08069 | 166 | 98.18 | 200 | 103.7 |
+| Ethiopia | 2021-22 | Goat & mutton meat | 0.07799 | 533 | 450 | 440 | -2.222 |
+| Ethiopia | 2021-22 | Beef | 0.07455 | 882 | 500 | 500 | 0 |
+| Ethiopia | 2021-22 | Teff | 0.07035 | 1,828 | 50 | 50 | 0 |
+| Ethiopia | 2021-22 | Chat/Kat | 0.04882 | 30 | 30 | 450 | 1,400 |
+| Ethiopia | 2021-22 | Rice | 0.04332 | 2,302 | 50 | 50 | 0 |
+| Ethiopia | 2021-22 | Coffee | 0.04305 | 1,875 | 280 | 340 | 21.43 |
+| Ethiopia | 2021-22 | Berbere | 0.04259 | 2,785 | 250 | 280 | 12 |
+| Ethiopia | 2021-22 | Onion | 0.04189 | 3,686 | 45 | 45 | 0 |
+| Ethiopia | 2021-22 | Maize | 0.03179 | 1,130 | 27 | 28 | 3.704 |
+| Tanzania | 2020-21 | Rice (husked) | 0.1295 | 252 | 1,500 | 1,500 | 0 |
+| Tanzania | 2020-21 | Maize (flour) | 0.1092 | 217 | 1,000 | 1,000 | 0 |
+| Tanzania | 2020-21 | Fish (fresh) | 0.07879 | 169 | 5,000 | 5,000 | 0 |
+| Tanzania | 2020-21 | Beef | 0.06938 | 127 | 7,000 | 7,000 | 0 |
+| Tanzania | 2020-21 | Cooking Oil | 0.06519 | 325 | 5,000 | 5,000 | 0 |
+| Tanzania | 2020-21 | Vegetables (fresh) | 0.062 | 334 | 1,250 | 1,257 | 0.5346 |
+| Tanzania | 2020-21 | Sugar | 0.05297 | 292 | 2,800 | 2,800 | 0 |
+| Tanzania | 2020-21 | Pulses | 0.04798 | 205 | 2,400 | 2,400 | 0 |
+| Tanzania | 2020-21 | Coconuts | 0.03013 | 83 | 1,176 | 1,250 | 6.25 |
+| Tanzania | 2020-21 | Bread | 0.02995 | 103 | 2,400 | 2,500 | 4.167 |
+| Niger | 2021-22 | Riz importé non parfumé | 0.1976 | 3,110 | 500 | 500 | 0 |
+| Niger | 2021-22 | Mil | 0.1546 | 9 | 359.8 | 2,286 | 535.2 |
+| Niger | 2021-22 | Maïs en grain | 0.1092 | 12 | 359.8 | 2,840 | 689.3 |
+| Niger | 2021-22 | Huile de palme raffinée | 0.06489 | 0 | 516.7 | 1,125 | 117.7 |
+| Niger | 2021-22 | Pâtes alimentaires | 0.04841 | 347 | 420 | 600 | 42.86 |
+| Niger | 2021-22 | Sorgho | 0.03276 | 1 | 287.9 | 480 | 66.74 |
+| Niger | 2021-22 | Niébé/Haricots secs | 0.02201 | 16 | 500 | 675 | 35 |
+| Niger | 2021-22 | Viande de bœuf | 0.02048 | 0 | 400 | 955.4 | 138.9 |
+| Niger | 2021-22 | Lait en poudre | 0.01914 | 208 | 2,583 | 4,000 | 54.84 |
+| Niger | 2021-22 | Sucre poudre | 0.01905 | 1,490 | 172.2 | 600 | 248.4 |
+| Mali | 2021-22 | Riz local Gambiaka | 0.175 | 1,641 | 1,250 | 1,211 | -3.111 |
+| Mali | 2021-22 | Mil | 0.1042 | 1,137 | 500 | 500 | 0 |
+| Mali | 2021-22 | Riz brisé importé | 0.08017 | 813 | 1,158 | 1,111 | -4.04 |
+| Mali | 2021-22 | Sucre poudre | 0.04771 | 4,926 | 300 | 333.3 | 11.11 |
+| Mali | 2021-22 | Riz importé parfumé | 0.03954 | 425 | 1,287 | 1,222 | -5.016 |
+| Mali | 2021-22 | Viande de bœuf | 0.03377 | 1,270 | 618.2 | 1,148 | 85.64 |
+| Mali | 2021-22 | Lait en poudre | 0.02922 | 2,562 | 2,000 | 2,000 | 0 |
+| Mali | 2021-22 | Huile d'arachide | 0.02486 | 0 | 300 | 618.9 | 106.3 |
+| Mali | 2021-22 | Riz local fumé | 0.02296 | 407 | 450 | 450 | 0 |
+| Mali | 2021-22 | Thé | 0.0209 | 0 | 79.37 | 192.6 | 142.7 |
+| EthiopiaRHS | 1997 | Teff (white) | 0.1317 | 77 | 1.68 | 1.8 | 7.143 |
+| EthiopiaRHS | 1997 | Barley | 0.101 | 94 | 1.345 | 1.499 | 11.41 |
+| EthiopiaRHS | 1997 | Maize | 0.0858 | 128 | 0.7649 | 1.344 | 75.7 |
+| EthiopiaRHS | 1997 | Wheat | 0.07792 | 144 | 1.345 | 2 | 48.68 |
+| EthiopiaRHS | 1997 | Beef | 0.07365 | 39 | 12 | 12 | 0 |
+| EthiopiaRHS | 1997 | Coffee | 0.06014 | 373 | 2.5 | 12 | 380 |
+| EthiopiaRHS | 1997 | Horse Beans | 0.04472 | 65 | 1.345 | 2 | 48.68 |
+| EthiopiaRHS | 1997 | Cooking Oil | 0.04016 | 17 | 8 | 9 | 12.5 |
+| EthiopiaRHS | 1997 | Sorghum | 0.03657 | 24 | 1.345 | 1.5 | 11.51 |
+| EthiopiaRHS | 1997 | Berbere | 0.03196 | 108 | 0.9884 | 10 | 911.8 |
+| GhanaLSS | 2016-17 | Rice (imported) | 0.07158 | 2,925 | 6.124 | 5.6 | -8.556 |
+| GhanaLSS | 2016-17 | Herring (smoked) | 0.04471 | 359 | 11.43 | 1,600 | 1.39e+04 |
+| GhanaLSS | 2016-17 | Salmon (smoked) | 0.04319 | 548 | 17.34 | 2,500 | 1.432e+04 |
+| GhanaLSS | 2016-17 | Tomato (fresh) | 0.0386 | 712 | 4.409 | 6.667 | 51.2 |
+| GhanaLSS | 2016-17 | Bread | 0.03481 | 0 | 5.512 | 11.02 | 100 |
+| GhanaLSS | 2016-17 | Fish (smoked, river) | 0.03336 | 303 | 22.05 | 88.18 | 300 |
+| GhanaLSS | 2016-17 | Fish (smoked, sea) | 0.03196 | 246 | 21.86 | 1,333 | 5,999 |
+| GhanaLSS | 2016-17 | Yam | 0.03166 | 95 | 7.349 | 3 | -59.18 |
+| GhanaLSS | 2016-17 | Beef | 0.02851 | 6,197 | 22.05 | 19.84 | -10 |
+| GhanaLSS | 2016-17 | Rice (local) | 0.02845 | 37 | 8.267 | 7.6 | -8.072 |
+
+The largest moves sit on the thinnest baselines, which is the argument for D5
+and for the provenance column: a factor estimated off a handful of rows should
+be visible as such.
+
+** Ground truth A: labels that state their own kilograms
+
+Neither the self-test nor the corpus comparison has an external referent.  This
+does.  These are the labels whose kilograms follow from the label, either
+because the token is metric (=Millilitre=) or because the label names its
+content in a spelling the parser misses (=Tin (Debe) (20 lts)=).  =x_truth=
+columns are the ratio to the right answer.
+
+ 
+
+| country | class | u | truth_kg | n_rows | n_items | served_now | fix_b | fix_c_median_j | served_now_x_truth | fix_b_x_truth | fix_c_median_j_x_truth |
+|---------+-------+---+----------+--------+---------+------------+-------+----------------+--------------------+---------------+------------------------|
+| Uganda | B: unparsed content | Bottle (1.5ltr) | 1.5 | 151 | 3 | 1.4 | 0.875 |  | 0.933 | 0.583 |  |
+| Uganda | B: unparsed content | Bottle (1ltr) | 1 | 169 | 6 | 1.01 | 0.556 |  | 1.01 | 0.556 |  |
+| Uganda | B: unparsed content | Bottle (2ltr) | 2 | 26 | 4 | 1.33 | 1.14 | 0.025 | 0.667 | 0.571 | 0.012 |
+| Uganda | B: unparsed content | Cup/Mug(0.5lt) | 0.5 | 22,250 | 50 | 1 | 0.25 | 0.339 | 2 | 0.5 | 0.677 |
+| Uganda | B: unparsed content | Glass(0.25lt) | 0.25 | 3,399 | 35 | 0.5 | 0.25 | 0.225 | 2 | 1 | 0.899 |
+| Uganda | B: unparsed content | Gourd (1-5lts) | 5 | 198 | 17 | 1.35 | 0.625 | 2 | 0.27 | 0.125 | 0.4 |
+| Uganda | B: unparsed content | Jerrican (1 lt) | 1 | 247 | 8 | 1.06 | 1.32 | 1.82 | 1.06 | 1.32 | 1.82 |
+| Uganda | B: unparsed content | Jerrican (10 lts) | 10 | 29 | 6 | 3.71 | 2.76 |  | 0.371 | 0.276 |  |
+| Uganda | B: unparsed content | Jerrican (2 lts) | 2 | 112 | 7 | 1.33 | 1.67 | 3.18 | 0.667 | 0.833 | 1.59 |
+| Uganda | B: unparsed content | Jerrican (20 lts) | 20 | 54 | 6 | 3.33 | 2.5 | 8.75 | 0.167 | 0.125 | 0.438 |
+| Uganda | B: unparsed content | Jerrican (3 lts) | 3 | 123 | 9 | 1.33 | 4.12 |  | 0.444 | 1.37 |  |
+| Uganda | B: unparsed content | Jerrican (5 lts) | 5 | 58 | 12 | 1.82 | 2 | 4 | 0.364 | 0.4 | 0.8 |
+| Uganda | B: unparsed content | Jug (1 lt) | 1 | 190 | 9 | 1 | 0.345 | 1.61 | 1 | 0.345 | 1.61 |
+| Uganda | B: unparsed content | Jug (1.5 lts) | 1.5 | 89 | 5 | 0.958 | 0.317 | 1.82 | 0.639 | 0.211 | 1.21 |
+| Uganda | B: unparsed content | Jug (2 lts) | 2 | 628 | 19 | 1.33 | 0.35 | 1.25 | 0.667 | 0.175 | 0.625 |
+| Uganda | B: unparsed content | Jug (2.5ltrs) | 2.5 | 94 | 10 | 1.5 | 0.5 | 1.94 | 0.6 | 0.2 | 0.775 |
+| Uganda | B: unparsed content | Plastic Basin (15 lts) | 15 | 3,935 | 30 | 2.5 | 2.12 | 6.88 | 0.167 | 0.141 | 0.458 |
+| Uganda | B: unparsed content | Plastic Basin (5 ltrs) | 5 | 827 | 25 | 1.67 | 0.956 | 2 | 0.333 | 0.191 | 0.4 |
+| Uganda | B: unparsed content | Sack (50 kgs) | 50 | 62 | 12 | 4.38 | 7.97 | 40.5 | 0.088 | 0.159 | 0.809 |
+| Uganda | B: unparsed content | Tin (5 lts) | 5 | 184 | 20 | 1.62 | 1.14 | 1.83 | 0.325 | 0.229 | 0.365 |
+| Uganda | B: unparsed content | Tin (Debe) (20 lts) | 20 | 510 | 17 | 3.33 | 2.5 | 10 | 0.167 | 0.125 | 0.5 |
+| Malawi | A: bare metric spelling | Grams | 0.001 | 1,217 | 53 | 0.706 | 0.0032 | 0.00119 | 706 | 3.2 | 1.19 |
+| Malawi | A: bare metric spelling | Millilitre | 0.001 | 16,912 | 69 | 0.743 | 0.00214 | 0.000986 | 743 | 2.14 | 0.986 |
+| Ethiopia | A: bare metric spelling | Litres | 1 | 12,113 | 37 | 1.83 | 2 | 0.917 | 1.83 | 2 | 0.917 |
+| Ethiopia | A: bare metric spelling | Mili Liter | 0.001 | 2,275 | 21 | 1.06 | 0.00214 | 0.00102 | 1.06e+03 | 2.14 | 1.02 |
+| GhanaLSS | A: bare metric spelling | Milliliter | 0.001 | 1,718 | 63 | 0.266 | 0.00114 | 0.00194 | 266 | 1.14 | 1.94 |
+| Mali | A: bare metric spelling | Gramme | 0.001 | 2,120 | 98 | 0.708 | 0.0625 | 0.166 | 708 | 62.5 | 166 |
+
+A Malawian millilitre currently weighs 743 grams.  A Malian gramme weighs 708
+grams.  Uganda's =Sack (50 kgs)= is served as 4.4 kg and its =Tin (Debe)
+(20 lts)= as 3.3 kg.  None of these needs an inference at all, and that is
+defect (c) in one table.
+
+Two things worth noticing beyond the headline.  First, (a) and (b) do improve
+the container labels substantially even without (c) -- =Sack (50 kgs)= goes
+from 0.088x of truth to 0.81x, =Tin (Debe) (20 lts)= from 0.167x to 0.50x --
+which is corroboration that the corrected inference is measuring something
+real.  Second, they do not arrive, which is why (c) reads the label instead.
+
+** Ground truth B: Mali against its own questionnaire
+
+=Mali/_/CONTENTS.org:786-794= records the contradiction and quotes the
+questionnaire's unit list ("9 = Sac large (100kg), 10 = Sac moyen (50kg),
+11 = Sac petit (25kg)").  Those four are the only kg factors in the corpus with
+an external answer.
+
+ 
+
+| u | truth_kg | n_rows | Q_median | live | old | fix_b_only | fix_c_pooled_u | fix_c_per_j_median | fix_c_n_items | live_err | old_err | fix_b_only_err | fix_c_pooled_u_err | fix_c_per_j_median_err |
+|---+----------+--------+----------+------+-----+------------+----------------+--------------------+---------------+----------+---------+----------------+--------------------+------------------------|
+| Sac large | 100 | 136 | 2 | 33 | 33 | 20.5 | 20.5 | 53.1 | 4 | 0.33 | 0.33 | 0.205 | 0.205 | 0.531 |
+| Sac moyen | 50 | 208 | 1 | 26.2 | 26.2 | 10.5 | 10.5 | 35.3 | 4 | 0.525 | 0.525 | 0.211 | 0.211 | 0.706 |
+| Sac petit | 25 | 240 | 1 | 5.3 | 5.3 | 4.05 | 4.05 | 8.15 | 4 | 0.212 | 0.212 | 0.162 | 0.162 | 0.326 |
+| Gramme | 0.001 | 2,120 | 10 | 0.708 | 0.708 | 0.0625 | 0.0625 | 0.166 | 44 | 708 | 708 | 62.5 | 62.5 | 166 |
+
+Every one of the four moves toward the questionnaire and none of them arrives:
+the sacks go from 0.21x-0.52x of truth to 0.33x-0.71x, and =Gramme= from 708x
+to 166x.  Mali's own advice, use native units, survives this change.  (The
+=n_rows= are small for the sacks -- 136 to 240 -- so the residual is as likely
+to be Mali's =u= vocabulary as the inference's arithmetic; GH #838 is open on
+=Sac moyen=.)
+
+** D6: does a =(j, u)= factor need a =t= axis?
+
+For =(j, u)= cells estimated in three or more waves, the ratio of the largest
+per-wave estimate to the smallest.
+
+| country | cells_ju_with_3plus_waves | waves | max_over_min_p25 | max_over_min_median | max_over_min_p75 | share_within_2x | share_within_10x |
+|---------+---------------------------+-------+------------------+---------------------+------------------+-----------------+------------------|
+| Uganda | 356 | 8 | 1.57 | 2.2 | 3.33 | 0.461 | 0.93 |
+| Malawi | 264 | 5 | 1.43 | 2.47 | 6.07 | 0.413 | 0.818 |
+| Nigeria | 375 | 8 | 1.66 | 3.11 | 9.39 | 0.357 | 0.755 |
+| Ethiopia | 508 | 5 | 1.25 | 1.6 | 2.51 | 0.663 | 0.961 |
+| Tanzania | 68 | 6 | 1 | 1 | 1 | 0.941 | 0.985 |
+| Niger | 0 | 2 |  |  |  |  |  |
+| Mali | 55 | 3 | 1 | 1.35 | 2.19 | 0.727 | 0.927 |
+| EthiopiaRHS | 161 | 5 | 1.25 | 1.67 | 2.53 | 0.634 | 0.975 |
+| GhanaLSS | 0 | 5 |  |  |  |  |  |
+
+Roughly half the cells sit within a factor of two across waves and 75% to 99%
+within a factor of ten.  A container's weight should not move between waves, so
+most of this is estimation noise, and pooling over =t= is a variance reduction
+rather than a loss.  Niger has two waves and GhanaLSS's cells do not span three,
+so neither reports.
+
+** D7: how far does defect (c) reach into =crop_production=?
+
+| country | crop_rows | labels_seeded_now | labels_seeded_by_c | rows_moved_by_c | share_rows_moved |
+|---------+-----------+-------------------+--------------------+-----------------+------------------|
+| Uganda | 130,606 | 13 | 13 | 62,321 | 0.477 |
+| Malawi | 131,379 | 3 | 0 | 0 | 0 |
+| Nigeria | 62,844 | 4 | 0 | 0 | 0 |
+| Ethiopia | 85,519 | 2 | 1 | 1 | 1.17e-05 |
+| Tanzania | 14,126 | 1 | 0 | 0 | 0 |
+| Niger | 46,341 | 3 | 1 | 5 | 0.000108 |
+| Mali | 35,060 | 1 | 0 | 0 | 0 |
+| EthiopiaRHS | 17,523 | 1 | 0 | 0 | 0 |
+
+Uganda is the whole story: 62,321 of its 130,606 crop rows carry a label that
+(c) would newly resolve (=Jerrican (5 lts)=, =Cup/Mug(0.5lt)=, and the rest of
+the same family).  Today the =inferred= layer returns NaN for those rows, so
+they are served by the survey's own =KgFactor= where one exists and by =none=
+where it does not; after (c) they would be served by =metric=.  That is an
+improvement and a cache invalidation at the same time, which is the argument
+for shipping (c) as its own commit.  Every other country is 0, 1 or 5 rows.
+GhanaLSS has no =crop_production=.
+
+* 3. Options
+
+Defect (c) is a prerequisite rather than an option: it has no design content,
+it is the only part with an external answer key, and it changes the input to
+everything below.  Treat it as step 0 and measure (a) and (b) on top of it,
+which is what section 2 does.
+
+** (A) Item axis only
+
+Baseline at =(t, j)=, step 2 at =(t, j, u)=, factor keyed =(j, u)=, with the
+=u=-keyed factor as a fallback rung where the =(j, u)= cell is thin.
+
+Appending =j= to the EXISTING =index= is not the same thing and would not work:
+=(t, i, j)= asks one household to have bought item =j= both in kilograms and in
+bunches within one wave.  The precedent for dropping =i= is on the crop side:
+=_survey_median_factors= groups =(country, t, u, condition)= then
+=(country, t, u)= and never carries the household (=:1893-1907=).
+
+Two floors, and they gate different things.  =min_reports= is the count of
+inference rows behind the =(t, j, u)= estimate, the direct twin of
+=SURVEY_MEDIAN_MIN_REPORTS = 5=, whose own comment says five is "a starting
+value, not a measured one" (=:1806-1813=).  =min_baseline= is the count of
+kg-known rows behind the =(t, j)= price-per-kg reference.  The second one is
+the one that bites; see the floor sweep.
+
+One detail worth naming rather than burying: what the fallback rung IS.  The
+prototype uses the fix-(b) =u=-keyed factor, which keeps the household baseline
+=(t, i)= for that rung, so a row with no =(j, u)= cell gets today's key with
+today's baseline and tomorrow's arithmetic.  The alternative is a =u= rung
+built as the median ACROSS items of the =(j, u)= estimates, on the =(t, j)=
+baseline.  That is unmeasured here.  The stakes are the fifth to half of
+affected rows the fallback serves, which is why (D)'s provenance column matters
+either way.
+
+Fixing (a) alone leaves the returned factors in kilograms per row, so it does
+not stand on its own.
+
+** (B) Per-unit price only
+
+One division at =:873=: =v_infer[price].divide(v_infer[quantity], axis=0)=
+before the groupby.  Three lines, no signature change, no new keys.  It makes
+the kg self-test come out right and rescales every inferred factor by roughly
+the reciprocal of its unit's median quantity.  It leaves the item axis missing,
+so Malawi's 133 =Piece= items still share one number, merely a better-scaled
+one.
+
+** (C) Both
+
+(A) and (B) together, on top of (c).  This is what section 2(iii) measures.
+
+** (D) C plus per-row provenance
+
+The food twin of =harvest_kg_factors=: a function returning, per row of
+=food_acquired=, the factor and which rung produced it, from a layer tuple in
+the shape of =KG_FACTOR_LAYERS= -- say =('survey_kg', 'metric', 'item_unit',
+'unit', 'none')=.  The counts ride in =attrs= exactly as
+=attrs['kg_factor_sources']= does now (=:2062-2066=), and the layers partition
+the frame.
+
+This is not decoration.  Between a fifth and a half of the affected rows are
+served by the fallback =u= rung rather than by their own =(j, u)= cell, and a
+consumer currently cannot tell which.  It is also what makes the change
+auditable after it lands: the same disagreement audit
+=harvest_kg_factors= runs between the survey's reported factor and the
+library's inferred one becomes available on the food side, wherever a country
+ships a factor.
+
+** Recommendation
+
+*(c), then (C), with (D) in the same PR.*
+
+The reasoning is that (b) alone is unarguable but small in the places that
+matter, (a) alone is unusable, and the provenance column is what turns a
+corpus-wide numerical change from an act of faith into something a reviewer can
+check per row.  (D) costs one new public function and no change to any existing
+return type, which is what keeps the crop side out of it.
+
+*** What it touches
+
+- =conversion_to_kgs= (=:782=): the =Expenditure/Quantity= division at step 2;
+  an =item_col== parameter defaulting to =None= (today's keys, today's shape)
+  and taking ='j'=; =min_reports= / =min_baseline=; =groupby(..., dropna=False)=
+  on the new keys, per =CLAUDE.md= "Grain Collapse" section 3b.
+- A new =food_kg_factors(food_acquired, ...)= returning a per-row frame with
+  =kg_per_unit= and =KgFactorSource=, mirroring =harvest_kg_factors=' shape.
+- =_apply_kg_conversion= (=:1121=): accept a per-row Series as well as a dict.
+- =food_quantities_from_acquired= (=:1228=) and =food_prices_from_acquired=
+  (=:1334=, both the ='kgvalue'= branch at =:1431= and the ='kgprice'= branch
+  at =:1442=): call the per-row entry point.
+- =KNOWN_METRIC= (=:924=) and =_EXPLICIT_METRIC_PATTERNS= (=:948=): defect (c).
+  The new =lts= / =ltrs= / =ltr= / =lt= patterns are VOLUME and must carry
+  =is_volume=True=, so =volume_as_mass=False= declines them exactly as it
+  declines today's =ml= / =cl= / =l= (=:955-961=).  =kgs= and =gms= are mass.
+  The prototype treats all of them as mass unconditionally, which is fine for
+  a measurement and wrong as a specification.
+- =_get_kg_factors= (=:1004=) keeps its =dict[str, float]= return, because
+  =_kg_factor_series= (=:1660=) and therefore =harvest_kg= depend on it.
+- Documentation: =Uganda/_/CONTENTS.org:810=, =EthiopiaRHS/_/CONTENTS.org:543=,
+  =EthiopiaRHS/_/categorical_mapping.org:340= and =ethiopiarhs.py:48= all state
+  something about this function that is not true.
+- =Mali/_/CONTENTS.org:786-794= records the contradiction with Mali's own
+  questionnaire and should be updated with the after numbers, not deleted:
+  section 2 shows the fix moves Mali in the right direction and does not
+  arrive.
+
+*** Cache cost: measured, and it is zero
+
+=probe_hash_reach.py= walks =_build_registry._closure_parts=, the same graph
+=build_transforms_fingerprint= walks.  The result is stronger than expected:
+*not one callable in =transformations.py= appears in the closure of any table*,
+=None=-scoped included.  Not =conversion_to_kgs=, not =_get_kg_factors=, not
+the three =*_from_acquired= transforms -- and not =KNOWN_METRIC=,
+=_EXPLICIT_METRIC_PATTERNS=, =_kg_factor_series= or =harvest_kg= either.  The
+derived transforms are reached through =Country.__getattr__= rather than
+through the tagged =_aggregate_wave_data= orchestrator, and nothing they
+produce is written to a parquet: there is no =var/food_quantities.parquet=
+anywhere under =data_root()=, and the =crop_production= parquets carry
+=[Quantity, Quantity_sold, Value_sold, planting_month, harvest_month,
+intercropped, perennial]= and no =Harvest_kg=.  =rg= confirms no wave script
+imports any of these symbols, so =framework_imports_fingerprint= is unaffected
+too.
+
+So: *no re-warm, for any of the three defects.*  The WORKPLAN's "then a full
+re-warm and regrade" (=WORKPLAN.org:219-220=) is half wrong, and the half that
+survives is the regrade.
+
+*** Re-warm and regrade plan
+
+1. Nothing to re-warm.  =lsms-library cache clear= is not needed and should not
+   be run.
+2. =make matrix= and commit the =.coder/coverage/latest.csv= snapshot: the
+   =food_quantities= / =food_prices= grades are a cold build and can move.
+3. =.coder/coverage/blessed.csv= currently holds a header and nothing else, so
+   no blessing is invalidated.  If it gains a food row before this lands, that
+   row is invalidated and must be re-blessed against the new numbers.
+4. Defect (c) DOES move =harvest_kg='s =inferred= layer through
+   =_kg_factor_series=, on 47.7% of Uganda's crop rows.  It does NOT invalidate
+   a cache: =harvest_kg= is a transformation applied to =crop_production= at
+   analysis time, not a stored column, and =transformations.py= is outside
+   every build fingerprint (measured above).  So the cost is a before/after on
+   =harvest_kg_factors=' layer counts, not a rebuild.  Keep (c) in its own
+   commit anyway -- it changes a different feature's output, and a reviewer
+   should be able to see that change on its own.
+
+*** What it must NOT do
+
+- *Never store an inferred factor.*  No new json, no new column on
+  =food_acquired=, nothing written to a parquet.  A factor is a function of the
+  frame it was inferred from, and the three existing =conversion_to_kgs.json=
+  files are the anti-pattern, not the model.  (Uganda's is a curated answer key
+  and is a different thing; it still must not be READ by the framework.)
+- *Never change =food_acquired= itself.*  It is registered, cached and hashed;
+  the defect is downstream of it.
+- *Never reorder or rename =harvest_kg='s ladder*, and never change what
+  =KG_FACTOR_LAYERS= means.  The food-side layer tuple is a sibling, not a
+  replacement.
+- *Never let =_get_kg_factors= change its return type*, for the same reason.
+- *No allowlist of known-bad units.*  Same argument as =_grain_strict= and the
+  null-read guard: a registry of exceptions is the disease with paperwork.
+
+* 4. Decisions for @ligon
+
+Each with the number that decides it.
+
+** D1.  Land defect (c) -- the metric vocabulary -- at all?
+
+/The number/: the ground-truth table in section 2.  The library currently
+serves =Millilitre= at 0.74 kg in Malawi and 0.27 kg in GhanaLSS, against a
+true 0.001; =Grams= at 0.71 kg against 0.001; Uganda's =Sack (100 kgs)= and
+=Tin (Debe) (20 lts)= are estimated rather than read.  Fixing it also removes
+between 0 and 33,394 rows per country from the inference set and adds them to
+the kg baseline.
+
+There is no argument on the other side that I can see, which is why it is D1
+rather than a section of its own.  The only question is packaging: see D7.
+
+** D2.  Land (b) -- divide by Quantity at step 2?
+
+/The number/: the kg self-test.  The current chain returns a factor for the
+kilogram of 0.87 to 2.0 depending on the country, where the answer is 1.0 by
+definition, and the deviation tracks the median =Quantity= on the rows it
+looked at (2 to 5, with only 4.6% to 40.5% of rows at =Quantity == 1=).
+
+/Read the self-test honestly/: where a country's only kg-known rows ARE its kg
+rows, fix (b) returning exactly 1.000 is an identity, not independent
+confirmation.  What is NOT an identity is the current code's answer, which
+should have been 1.0 under the same construction and is not.  Malawi is the
+country where the baseline genuinely mixes in non-kg rows through its
+=cfactor= column, and there fix (b) alone returns 0.44 -- which is evidence
+for (a), not against (b): the household baseline is pooling other items.
+
+** D3.  Land (a) -- the item axis?
+
+/The number/: Malawi's =Piece=.  133 food items share it; the 72 with enough
+data to estimate range from 1 g to 1.8 kg, a factor of 1,833; the library
+serves 0.50 kg to all of them.  GhanaLSS's =Heap= (280,242 rows, 125 items)
+spans a factor of 15,000.  Corpus-wide, the corrected factor differs from the current one by
+more than 10% on 89% to 100% of the affected rows and by more than 2x on 47% to
+93%, and the total kilograms in =food_quantities(units='kgs')= move by the
+percentages in the third (iii) table.
+
+** D4.  =min_reports= for the =(t, j, u)= rung.
+
+/The number/: the floor sweep.  Coverage is almost flat in this floor -- moving
+it from 3 to 20 costs a few percent of inference rows in every country.  So
+this parameter is nearly free and 5 (matching =SURVEY_MEDIAN_MIN_REPORTS=) is
+defensible on consistency grounds alone.
+
+** D5.  =min_baseline= for the =(t, j)= price-per-kg reference.
+
+/The number/: also the floor sweep, and the =baseline N= column of the
+top-expenditure table.  This is the floor that binds: it decides whether one
+household's single kilogram purchase gets to set an item's price nationally,
+and the largest price movements in section 2 sit on the thinnest baselines.
+The crop side's precedent gates exactly this quantity (=_survey_median_factors=
+counts the REPORTS behind the reference, =:1901-1907=), and the food side
+currently gates nothing at all.
+
+** D6.  Does the =(j, u)= factor carry a =t= axis?
+
+/The number/: the D6 table.  For =(j, u)= cells estimated in three or more
+waves, how far apart the per-wave estimates are.  A container's weight should
+not move between waves; a large spread means the estimate is noise and pooling
+over =t= is the right answer, a small one means we are throwing away real
+variation by pooling.
+
+** D7.  Defect (c) touches =harvest_kg=, which the brief said not to touch.
+
+/The number/: 62,321 of Uganda's 130,606 =crop_production= rows -- 47.7% --
+carry a label (c) would newly resolve.  Every other country is 0, 1 or 5 rows.
+
+*This is the one place the recommendation contradicts a stated constraint*, so
+it is a decision rather than a detail.  (a) and (b) provably cannot reach
+=harvest_kg=: =crop_production= has no =Expenditure= column, so it never enters
+the price-ratio branch (=:1045=).  (c) is different, because it edits
+=KNOWN_METRIC= and =_EXPLICIT_METRIC_PATTERNS=, which =_kg_factor_series=
+(=:1660=) reads.
+
+The argument for doing it anyway: today those 62,321 rows get NO inferred
+factor at all, so they are served by the survey's own =KgFactor= where one
+exists and by the =none= layer where it does not.  Reading "5 lts" off a label
+that says "5 lts" is not a change of method, it is the method finally applying.
+And it costs no rebuild.  The argument against is simply that it is not what
+this issue is for.  @ligon decides; a separate commit is the mitigation either
+way.
+
+** D8.  Per-row provenance -- option (D)?
+
+/The number/: the share of affected rows served by the fallback =u= rung rather
+than by their own =(j, u)= cell, which is 1 - the floor sweep's coverage: about
+a fifth in most countries and about half in Niger.  A consumer today cannot
+tell those rows apart from the well-estimated ones, and after this change the
+difference between the two is larger than it was before.
+
+** D9.  What to say about Mali?
+
+/The number/: the Mali ground-truth table.  Against the questionnaire's own
+unit list, the current factors are 0.21x to 0.52x of truth on the three sacks
+and 708x on =Gramme=; after (c) + (C) they are 0.33x to 0.71x and 166x.  Every
+one of the four moves the right way and none of them arrives.  So the fix is an
+improvement and =Mali/_/CONTENTS.org:786-794='s advice ("use native units, or
+=u = 'Kg'=") still stands afterwards.  Whether that is stated in the code, in
+Mali's =CONTENTS.org=, or in the issue is a call for @ligon.
+
+** D10.  Correct the three EthiopiaRHS documents in this PR?
+
+/The number/: one false claim, in three places (=ethiopiarhs.py:48-50=,
+=CONTENTS.org:543-544=, =categorical_mapping.org:340-341=), plus
+=Uganda/_/CONTENTS.org:810-813=.  Cheap either way; the argument for doing it
+here is that the claim is about THIS function and would become true.
+
+* 5. Test plan
+
+Unit tests on synthetic frames, so they state the property rather than pin a
+corpus number.
+
+1. *The kilogram weighs a kilogram.*  A frame whose only unit is =kg=: the
+   inference's own factor for it must be 1.0 exactly.  Today it is
+   =1 / median(Quantity)=.  This is the regression test for (b) and it is one
+   assertion.
+2. *A quantity of two is not a kilogram of two.*  Two frames identical except
+   that every =Quantity= is doubled and every =Expenditure= doubled with it:
+   the inferred factors must be IDENTICAL.  Today they double.
+3. *Two items, one unit.*  A frame with items A and B both sold by =bunch=,
+   where A's bunch is 10x B's: the fix must return two factors in a 10:1 ratio,
+   and the =u=-pooled fallback must return one number between them.
+4. *The thin cell falls back, and says so.*  A =(j, u)= cell with =min_reports
+   - 1= rows must be served by the =u= rung, with =KgFactorSource == 'unit'=.
+   A =(t, j)= baseline with =min_baseline - 1= kg rows must not produce a
+   =(j, u)= factor at all.
+5. *NA keys survive.*  A row with NA =j= must reach the =u= rung rather than be
+   deleted by =groupby=; assert the row count out equals the row count in.
+   (=CLAUDE.md= "Grain Collapse" section 3b.)
+6. *The layers partition the frame.*  =sum(counts.values()) == len(df)=, the
+   invariant =harvest_kg_factors= already documents (=:1988-1991=).
+7. *Metric spellings are seeded, never inferred* (defect c).  Parametrised over
+   =Millilitre=, =Grams=, =Litres=, =Sack (100 kgs)=, =Tin (Debe) (20 lts)=,
+   =Cup/Mug(0.5lt)=: each must come back from =_get_kg_factors= at its stated
+   value, and must NOT appear as a key of =conversion_to_kgs='s output.
+   Uganda's =conversion_to_kgs.json= is the answer key; a test that reads it
+   and asserts agreement on the labels the parser now handles is worth having
+   even though the framework must not read the file at runtime.
+8. *The crop side does not move except where (c) says it does.*  Pin
+   =_get_kg_factors='s return TYPE (=dict[str, float]=), and pin
+   =harvest_kg_factors=' layer counts on the Uganda fixture in
+   =tests/test_crop_kg_factor.py=, with the (c)-affected labels enumerated in
+   the test's own docstring rather than discovered later.
+9. *No cache hash moves*, for all three commits.  Extend
+   =tests/test_build_transform_hash.py=: assert that no callable or constant of
+   =lsms_library.transformations= appears in =build_transforms_fingerprint='s
+   closure for any table -- including =KNOWN_METRIC= and
+   =_EXPLICIT_METRIC_PATTERNS=, which is what makes (c) free as well.  This is the
+   assertion form of =probe_hash_reach.py= and it protects the "no re-warm"
+   claim from a future refactor that quietly moves a derived transform onto the
+   build path.
+10. *=units='kgprice'= uses the same factors.*  The =:1442= branch maps
+    =u -> factor= independently of =:1431=; a test with a per-item factor must
+    show both branches agreeing on the same row.
+
+Integration, on the corpus rather than a fixture, run once before merge and
+recorded in the PR:
+
+11. Re-run =measure.py= against the branch and check the movement matches this
+    document's tables.  The prototype and the implementation are independent
+    code paths, so agreement is evidence; disagreement is a bug in one of them
+    and worth finding before merge.
+12. =make matrix= diff, reported as a table of grade changes.
+
+* Appendix: the files
+
+| file | what it produced |
+|------+------------------|
+| =measure.py= | (i), (ii), (iii), the floor sweep |
+| =metric_scoreboard.py= | the defect-(c) answer key |
+| =mali_groundtruth.py= | Mali versus its own questionnaire |
+| =two_more.py= | the =t=-axis spread (D6) and the crop reach of (c) (D7) |
+| =probe_hash_reach.py= | which build fingerprints reach this code (none) |
+| =tables.py= | renders the CSVs as the Org tables above |
+| =warm_uganda.py= | builds Uganda =food_acquired= into the scratch root |
+
+Ledger: =.coder/ledger/850-food-kg-item-axis.md=.

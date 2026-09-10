@@ -1,0 +1,7 @@
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-850-design/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/tmp/wt-850-design/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{996.0, 997.0, 998.0, 999.0}
+rows 355571 idx ['i', 't', 'v', 'j', 'u', 's'] cols ['Quantity', 'Expenditure', 'Price'] 22s

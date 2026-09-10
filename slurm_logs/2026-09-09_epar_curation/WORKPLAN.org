@@ -168,6 +168,15 @@ Model: Sonnet, worktree, =LSMS_COUNTRIES_ROOT= lever.
 
 * Phase 2 -- wiring and the one corpus-wide change
 
+** DONE Shared =shipped_factors= layer in =harvest_kg= (prerequisite for #852/#854)
+:PROPERTIES:
+:Effort: 4:00
+:END:
+Merged 675fc34a after red-team (REDTEAM_P2_shipped_factors.org).  Explicit
+loaders, no registry (decision recorded in the ledger).  =shipped_matched=
+count + =ShippedFactorWarning= on a zero match; =u= required among keys.
+
+
 ** TODO Ethiopia: WB conversion files into =harvest_kg= and plot areas   :code:L1:
 :PROPERTIES:
 :Effort: 6:00
@@ -201,14 +210,21 @@ Malawi's 2026-09-08 fix is the in-repo precedent.  Uganda: re-derive the
 EPAR's W7 wiring.  Nigeria: hh-crop grain per #843; carry =Unit_sold=
 and let =harvest_kg= consumers decide.
 
-** TODO Nigeria per-row =KgFactor= (#849 sibling)                   :code:L11:
+** DONE Nigeria per-row =KgFactor= (#849 sibling)                   :code:L11:
 :PROPERTIES:
 :Effort: 3:00
 :END:
 =sa3iq6_conv= / =sa3iiq1_conv= / =sa3iiiq13_conv= per wave into the optional
 canonical column; =harvest_kg= already prefers it.  Nigeria re-warm.
 
-** TODO Food-side kg inference: item axis and provenance (#850)     :code:L2:L3:
+** WAITING Food-side kg inference: item axis and provenance (#850)
+:LOGBOOK:
+- State "WAITING" from "TODO" [2026-09-09] \\
+  Design doc merged (slurm_logs/gh850_design/DESIGN.org, a73437fd).  Blocked on
+  @ligon's D5 (baseline floor) and D7 (let the vocabulary fix reach harvest_kg).
+  Finding: NO re-warm needed -- transformations.py is outside every build
+  fingerprint; cost is a regrade.
+:END:     :code:L2:L3:
 :PROPERTIES:
 :Effort: 8:00
 :END:
