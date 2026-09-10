@@ -552,19 +552,31 @@ Columns:
         that row's harvest in kilograms.  NaN where the survey does not
         record it; optional because most countries never ask.
 
-        REPORTED, NEVER CONSTRUCTED.  Only a number the survey (or a
-        survey-supplied conversion table) actually wrote down belongs in
-        this column.  Nothing inferred goes here -- not a median over
-        sibling rows, not a factor from the library's unit tables.  That
-        keeps the served table what every crop_production config already
-        promises it is ("REPORTED values only -- no harvest_kg / yield /
-        main_crop", said independently by Uganda, Mali, Niger, Tanzania and
-        Togo), and it keeps the inference revisable without a rebuild:
-        construction happens at read time in
-        `transformations.harvest_kg`, which layers reported -> median of
-        reported for the same (u, condition) in the same country-wave ->
-        the library's inferred factor, and discloses which layer served
-        each row.
+        REPORTED, NEVER CONSTRUCTED.  Only a number the instrument wrote
+        down ON THIS ROW belongs in this column.  Nothing inferred goes here
+        -- not a median over sibling rows, not a factor from the library's
+        unit tables.  That keeps the served table what every crop_production
+        config already promises it is ("REPORTED values only -- no
+        harvest_kg / yield / main_crop", said independently by Uganda, Mali,
+        Niger, Tanzania and Togo), and it keeps the inference revisable
+        without a rebuild: construction happens at read time in
+        `transformations.harvest_kg`, which layers reported -> a shipped
+        conversion table -> median of reported for the same (u, condition)
+        in the same country-wave -> the library's inferred factor, and
+        discloses which layer served each row.
+
+        NOR A SHIPPED CONVERSION TABLE.  A survey-supplied table -- the WB's
+        Ethiopia `Crop_CF_Wave{2..5}`, Malawi's IHS5 crop files -- is keyed
+        on crop x unit x region, not on the row, so writing it here would
+        bake a de-duplication rule and a region join into a parquet where
+        neither can be seen or audited (GH #852's duplicate: crop 74, unit
+        62, 4.34 vs 6.125).  Such a table is applied AT READ TIME instead,
+        by `harvest_kg(shipped_factors=...)`, as its own `shipped` layer --
+        which also keeps the `reported_vs_shipped` disagreement audit
+        possible, since the two numbers stay distinct.  An earlier version
+        of this note read "the survey (or a survey-supplied conversion
+        table)", which pointed a loader author at this column; it does not
+        any more.
 
         A FACTOR HERE, A PRODUCT IN `food_acquired`.  The antecedent is
         `food_acquired.Quantity_kg` (Nigeria `s10bq2_cvn`, Malawi

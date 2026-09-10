@@ -75,6 +75,28 @@ class UnpriceableRowsWarning(UserWarning):
     """
 
 
+class ShippedFactorWarning(UserWarning):
+    """A ``shipped_factors`` table did not join the way its author meant.
+
+    Two situations, both of which used to be SILENT and both of which look
+    exactly like a working table from the counts alone:
+
+    * the table matched **zero** rows -- almost always a vocabulary mismatch
+      on a key (``j`` as a raw WB crop code against a decoded label, a numeric
+      ``74.0`` against ``'74'``, ``t`` as an int against ``'2019-20'``);
+    * the table is keyed on a level *crop_production* does not carry, so that
+      level is DROPPED and the factor is applied across it -- a one-region
+      table going national, a one-condition table serving every condition.
+      The multi-row form of this already raised (the surviving keys become
+      ambiguous); the single-row form did not, so the more careless loader
+      got the weaker signal.  This makes both loud.
+
+    Its own class so it can be filtered or promoted to an error
+    (``warnings.simplefilter('error', ShippedFactorWarning)``) independently
+    of the library's other warnings.
+    """
+
+
 class UnitLabelCollisionWarning(UserWarning):
     """Two ``u`` spellings that differ only in case got DIFFERENT kg factors.
 
@@ -1733,8 +1755,8 @@ def _screen_reported_factors(df, reported):
 
     A rejected value is NEVER clipped or rescaled -- inventing a weight is
     the failure this whole design exists to avoid.  The row falls through to
-    ``survey_median`` / ``inferred`` / ``none`` exactly as if it had never
-    reported, and its rejected value enters no median.
+    ``shipped`` / ``survey_median`` / ``inferred`` / ``none`` exactly as if it
+    had never reported, and its rejected value enters no median.
 
     ALSO SCREENS THE ``shipped`` LAYER, by design and not by accident: the
     same three rules, one implementation.  Note which frame the unit comes
@@ -1989,10 +2011,22 @@ def _shipped_factor_lookup(df, shipped_factors):
     table declares but *df* does not carry is DROPPED from the join, which is
     the condition-aware behaviour: where the table carries ``condition`` and
     the crop row has one, they join on it; where either lacks it, they join
-    ignoring it.  Dropping a key can of course make the remaining ones
-    ambiguous, and that is exactly when the duplicate refusal below fires --
-    which is the intended outcome, since collapsing a region- or
+    ignoring it.  A dropped key is now ANNOUNCED
+    (:class:`ShippedFactorWarning`) rather than applied in silence: a
+    one-region table going national and a one-condition table serving every
+    condition are exactly the cases that used to pass unremarked while their
+    multi-row equivalents raised.  Dropping a key can of course make the
+    remaining ones ambiguous, and that is when the duplicate refusal below
+    fires instead -- the intended outcome, since collapsing a region- or
     condition-keyed table onto a coarser grain is a decision for the loader.
+
+    ``u`` is REQUIRED among the table's keys.  A kg-per-unit factor that does
+    not say which unit is not a factor: a ``j``-only table would hand a crop's
+    single number to a sack, a basket and a tin alike.
+
+    A table with no ``country`` key applied to a pooled
+    :class:`~lsms_library.feature.Feature` frame is applied to EVERY country's
+    rows (that is the dropped-key rule again, and it now warns).
 
     REFUSES an ambiguous table.  Two rows sharing a join key are two different
     answers to the same question; averaging them, or letting a
@@ -2010,13 +2044,24 @@ def _shipped_factor_lookup(df, shipped_factors):
     repeated rows will trip this -- ``drop_duplicates()`` in the loader is the
     expected answer, and writing it is the act of noticing.
 
-    SILENT ZERO-MATCH is this layer's dominant failure mode, and there is no
-    warning for it (yet).  Keys are compared as stripped, lower-cased text, so
-    any vocabulary mismatch simply matches nothing: ``j`` as a WB crop code
-    ``74`` against a decoded ``'Enset'``; a numeric ``74.0`` against ``'74'``;
-    a ``region`` code ``1`` against ``1.0``; ``t`` as an int against
-    ``'2019-20'``.  The ``shipped`` count in
-    ``attrs['kg_factor_sources']`` is the only tell -- check it is not 0.
+    A SILENT ZERO-MATCH is this layer's dominant failure mode.  Keys are
+    compared as stripped, lower-cased text, so any vocabulary or type
+    mismatch simply matches nothing: ``j`` as a WB crop code ``74`` against a
+    decoded ``'Enset'``; a numeric ``74.0`` against ``'74'``; a ``region``
+    code ``1`` against ``1.0``; ``t`` as an int against ``'2019-20'``.  A
+    non-empty table that matches zero rows now raises a
+    :class:`ShippedFactorWarning`, and the count to read is
+    ``attrs['kg_factor_sources']['shipped_matched']`` -- rows the table
+    supplied a finite factor for, taken BEFORE the sentinel, the screen and
+    the rank.  Do NOT read ``counts['shipped']`` as the tell: it is post-rank
+    and is legitimately 0 when a perfectly-keyed table is outranked on every
+    row by ``reported``.
+
+    A NA key is not a wildcard.  NaN is normalised to a private sentinel on
+    both sides, so it matches NaN and only NaN -- deliberately unlike
+    ``pd.merge``'s null-matching, which ``CLAUDE.md`` flags as a hazard: here
+    it is explicit and symmetric ("condition not applicable" on both sides),
+    not incidental.
 
     Returns ``(values, source)``: a float ndarray and an object ndarray, both
     aligned POSITIONALLY to *df* (``crop_production`` indexes repeat, so an
@@ -2043,6 +2088,16 @@ def _shipped_factor_lookup(df, shipped_factors):
             f"{list(SHIPPED_FACTOR_JOIN_LEVELS)}: it carries index levels "
             f"{index_names} and columns {list(sf.columns)}.  Key the table on "
             "the levels it should join on -- at minimum the unit 'u'.")
+    if 'u' not in table_keys:
+        # ENFORCED, not merely asked for.  A kg-PER-UNIT factor that does not
+        # say which unit is not a factor; a `j`-only table would hand a crop's
+        # single number to a sack, a basket and a tin alike.  The message
+        # above claims this rule, so the code has to have it.
+        raise ValueError(
+            f"shipped_factors is keyed on {list(table_keys)} but not on 'u'. "
+            "A kg-per-unit factor with no unit is not a factor -- it would be "
+            "applied to every container the crop was ever measured in.  Key "
+            "the table on 'u' (plus whatever else it can honestly key on).")
 
     keys = tuple(k for k in table_keys if _level_or_column(df, k) is not None)
     dropped = tuple(k for k in table_keys if k not in keys)
@@ -2081,6 +2136,17 @@ def _shipped_factor_lookup(df, shipped_factors):
     factor_of = dict(zip(table_tuples, values))
     source_of = dict(zip(table_tuples, sources))
 
+    if dropped:
+        warnings.warn(
+            f"shipped_factors is keyed on {list(dropped)}, which "
+            "crop_production does not carry, so that level was DROPPED from "
+            f"the join and the table was applied across it (joining on "
+            f"{list(keys)} alone).  A one-region table therefore goes "
+            "national, and a one-condition table serves every condition.  "
+            "Resolve the level onto crop_production first, or reduce the "
+            "table to the coarser grain deliberately.",
+            ShippedFactorWarning, stacklevel=3)
+
     row_cols = [_normalise_join_key(_level_or_column(df, k)) for k in keys]
     out = np.full(len(df), np.nan)
     out_source = np.full(len(df), pd.NA, dtype=object)
@@ -2089,7 +2155,25 @@ def _shipped_factor_lookup(df, shipped_factors):
         if not np.isnan(value):
             out[pos] = value
             out_source[pos] = source_of[key]
-    return out, out_source
+
+    matched = int(np.isfinite(out).sum())
+    if len(sf) and not matched:
+        if not np.isfinite(values).any():
+            # Not a keying problem: the table's own values are unusable.  A
+            # `.dta` whose conversion column read back as TEXT lands here, and
+            # so does one that is all zero / negative.  Saying "check your
+            # keys" would send the loader author to the wrong end of the file.
+            reason = (f"none of its {len(sf)} row(s) carries a usable "
+                      "KgFactor (finite and > 0) -- check that the column "
+                      "parsed as numeric")
+        else:
+            reason = ("check that the table's keys use the same labels as "
+                      "the frame (j decoded, u canonical).  Joined on "
+                      f"{list(keys)}; the table offers {len(sf)} row(s)")
+        warnings.warn(
+            f"shipped_factors matched 0 of {len(df)} rows; {reason}.",
+            ShippedFactorWarning, stacklevel=3)
+    return out, out_source, matched
 
 
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
@@ -2174,7 +2258,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
 
         A ``shipped_factors='auto'`` registry is a live design question for
         @ligon; the options and the trade-off are written up in
-        ``.coder/ledger/harvest-kg-shipped-factors.md`` §6.
+        ``.coder/ledger/harvest-kg-shipped-factors.md``, section 6.
 
         ``region`` must be resolved by the CALLER onto *crop_production* (join
         ``cluster_features`` and rename its ``Region`` to ``region``); this
@@ -2225,14 +2309,18 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         Two tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
-            ``{layer: n_rows}`` over the INPUT rows.  The four layers of
+            ``{layer: n_rows}`` over the INPUT rows.  The five layers of
             :data:`KG_FACTOR_LAYERS` partition the frame and sum to
             ``len(crop_production)`` -- ``shipped`` included, and therefore
-            present as ``0`` when no table is passed.  The extra
-            ``reported_implausible`` / ``shipped_implausible`` keys count rows
-            whose offered factor the screen REJECTED and are deliberately
-            outside that partition, since such a row is still served by one
-            of the five.  POOLED: on a cross-country
+            present as ``0`` when no table is passed.  Three further keys ride
+            OUTSIDE that partition, since a row they count is still served by
+            one of the five: ``reported_implausible`` and
+            ``shipped_implausible`` count rows whose offered factor the screen
+            REJECTED, and ``shipped_matched`` counts rows the shipped table
+            supplied a finite factor for at all -- a JOIN diagnostic taken
+            before the sentinel, the screen and the rank, and the right number
+            to check when a table looks like it did nothing.  POOLED: on a
+            cross-country
             :class:`~lsms_library.feature.Feature` frame these counts run over
             every country at once, so ``reported: 40000`` says nothing about
             WHICH country reported.  Read it as a total, never as coverage;
@@ -2280,14 +2368,18 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         shipped = np.full(len(df), np.nan)
         shipped_rejected = np.zeros(len(df), dtype=bool)
         shipped_source = np.full(len(df), pd.NA, dtype=object)
+        shipped_matched = 0
     else:
-        offered, shipped_source = _shipped_factor_lookup(df, shipped_factors)
+        offered, shipped_source, shipped_matched = _shipped_factor_lookup(
+            df, shipped_factors)
         # The missing-unit sentinel excludes this layer too, and BEFORE the
         # screen.  A shipped table is a kg-PER-UNIT table, so a row that
         # recorded no unit has nothing for it to be per; serving one would
         # fabricate a weight, which is the failure U_UNKNOWN exists to
-        # prevent.  Excluding first also keeps `shipped_implausible` a count
-        # of rows that would OTHERWISE have been served.
+        # prevent.  Excluding first keeps a sentinel row out of
+        # `shipped_implausible`, which counts rows where the shipped layer
+        # OFFERED an implausible factor -- not rows that would otherwise have
+        # been served, since `reported` may outrank the offer anyway.
         offered = np.where(sentinel, np.nan, offered)
         shipped_source = np.where(sentinel, pd.NA, shipped_source)
         shipped, shipped_rejected = _screen_reported_factors(df, offered)
@@ -2340,6 +2432,13 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     # column.
     counts['reported_implausible'] = int(rejected.sum())
     counts['shipped_implausible'] = int(shipped_rejected.sum())
+    # A JOIN diagnostic, taken BEFORE the sentinel, the screen and the rank --
+    # so it answers "did my table key correctly?", which none of the other
+    # counts can.  `shipped` is post-rank and reads 0 for a perfectly-keyed
+    # table whose rows `reported` happens to win; `shipped_implausible` reads
+    # 0 for a table that matched nothing at all.  Only this one separates a
+    # mis-keyed table from a table that was simply outranked.
+    counts['shipped_matched'] = shipped_matched
     out.attrs['kg_factor_sources'] = counts
     # A row with no unit recorded is excluded from the audit as well: there
     # is nothing for its reported factor to be compared against, since no
@@ -2423,8 +2522,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         An externally shipped kg-per-unit table, forwarded verbatim to
         :func:`harvest_kg_factors` -- see there for its shape, the join keys,
         the ambiguity refusal, and why nothing auto-discovers it.  Omitted
-        (the default), this whole layer is inert and the result is bit for
-        bit what it was before the layer existed::
+        (the default), this whole layer is inert: every ``Harvest_kg`` value
+        is bit for bit what it was before the layer existed.  (The counts dict
+        gains three zero-valued keys and :func:`harvest_kg_factors` gains
+        three columns -- forced by the partition invariant, and no number
+        moves.)  Example::
 
             harvest_kg(
                 cp,

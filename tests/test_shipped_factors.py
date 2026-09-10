@@ -19,6 +19,8 @@ Three properties carry the design and each is pinned below:
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -29,6 +31,8 @@ from lsms_library.transformations import (
     SHIPPED_FACTOR_JOIN_LEVELS,
     SURVEY_MEDIAN_MIN_REPORTS,
     U_UNKNOWN,
+    ShippedFactorWarning,
+    _shipped_factor_lookup,
     harvest_kg,
     harvest_kg_factors,
 )
@@ -207,7 +211,10 @@ def test_a_condition_keyed_table_on_a_frame_without_condition():
 
     agreeing = _table([("Maize", "sack", "shelled", 100.0)],
                       ["j", "u", "condition"])
-    f = harvest_kg_factors(df, shipped_factors=agreeing)
+    # ... and it ANNOUNCES the dropped axis rather than going condition-blind
+    # in silence, which is what the multi-row case has always done by raising.
+    with pytest.warns(ShippedFactorWarning, match="condition"):
+        f = harvest_kg_factors(df, shipped_factors=agreeing)
     assert f["kg_per_unit"].iloc[0] == 100.0
 
     disagreeing = _table([("Maize", "sack", "shelled", 100.0),
@@ -339,14 +346,29 @@ def test_a_non_dataframe_raises():
         harvest_kg_factors(_cp(rows), shipped_factors={"sack": 100.0})
 
 
-def test_a_table_keyed_only_on_a_level_the_frame_lacks_raises():
-    """No overlap at all -> nothing to join on, said out loud."""
+def test_a_table_keyed_only_on_a_level_the_frame_lacks():
+    """Two guards, and the ORDER is worth pinning.
+
+    A ``region``-only table trips the mandatory-``u`` rule first, because
+    that rule is about the table alone and does not depend on the frame.  The
+    "nothing to join on" guard below it is therefore unreachable through
+    ``harvest_kg_factors`` -- a frame with no ``u`` raises even earlier, in
+    ``_kg_factor_series`` -- so it is exercised directly, as the
+    defence-in-depth it is.
+    """
     columns = ["t", "i", "plot", "j", "u", "condition", "season", "Quantity"]
     df = _frame([("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A",
                   1.0)], columns=columns)
-    table = _table([("Amhara", 100.0)], ["region"])
+    with pytest.raises(ValueError, match="not on 'u'"):
+        harvest_kg_factors(df, shipped_factors=_table([("Amhara", 100.0)],
+                                                      ["region"]))
+
+    no_u = df.reset_index("u").drop(columns="u")
+    with pytest.raises(ValueError, match="expected a 'u' unit"):
+        harvest_kg_factors(no_u, shipped_factors=_table(
+            [("Maize", "sack", 100.0)], ["j", "u"]))
     with pytest.raises(ValueError, match="nothing to join on"):
-        harvest_kg_factors(df, shipped_factors=table)
+        _shipped_factor_lookup(no_u, _table([("sack", 100.0)], ["u"]))
 
 
 # ---------------------------------------------------------------------------
@@ -376,6 +398,9 @@ def test_an_implausible_shipped_factor_is_counted_not_applied():
     assert counts["shipped"] == 0
     assert counts["shipped_implausible"] == 3
     assert counts["reported_implausible"] == 0
+    # the table DID key correctly -- all three rows matched; they were
+    # rejected by the screen, which is a different fact and a different count
+    assert counts["shipped_matched"] == 3
 
 
 def test_an_unusable_shipped_value_is_discarded():
@@ -385,7 +410,9 @@ def test_an_unusable_shipped_value_is_discarded():
     table = _table([("c0", "sack", 0.0), ("c1", "sack", -3.0),
                     ("c2", "sack", np.inf), ("c3", "sack", np.nan)],
                    ["j", "u"])
-    f = harvest_kg_factors(_cp(rows), shipped_factors=table)
+    # ... and the zero-match warning says WHY: the values, not the keys.
+    with pytest.warns(ShippedFactorWarning, match="usable"):
+        f = harvest_kg_factors(_cp(rows), shipped_factors=table)
     assert set(f["KgFactorSource"]) == {"none"}
     assert f.attrs["kg_factor_sources"]["shipped"] == 0
     # discarded, not REJECTED -- the screen never saw a usable number
@@ -412,10 +439,12 @@ def test_the_sentinel_refuses_the_shipped_layer_too():
     # excluded BEFORE the screen, so it is not counted as implausible either
     assert f.attrs["kg_factor_sources"]["shipped_implausible"] == 0
 
-    # a j-only table (no unit axis at all) cannot reach them either
+    # a j-only table cannot reach them either -- it is refused outright,
+    # since a kg-per-unit factor with no unit is not a factor (see
+    # test_a_table_not_keyed_on_u_is_refused).
     jonly = _table([("Maize", 100.0)], ["j"])
-    g = harvest_kg_factors(_cp(rows), shipped_factors=jonly)
-    assert list(g["KgFactorSource"]) == ["none", "none", "shipped"]
+    with pytest.raises(ValueError, match="not on 'u'"):
+        harvest_kg_factors(_cp(rows), shipped_factors=jonly)
 
 
 def test_a_shipped_factor_does_not_enter_a_survey_median():
@@ -447,11 +476,12 @@ def test_the_counts_dict_gains_both_keys_and_still_partitions():
     counts = harvest_kg_factors(df, shipped_factors=table).attrs[
         "kg_factor_sources"]
     assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible",
-                                                   "shipped_implausible"}
+                                                   "shipped_implausible",
+                                                   "shipped_matched"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     assert counts == {"reported": 0, "shipped": 1, "survey_median": 0,
                       "inferred": 1, "none": 2, "reported_implausible": 0,
-                      "shipped_implausible": 1}
+                      "shipped_implausible": 1, "shipped_matched": 2}
 
 
 def test_the_source_column_rides_through():
@@ -529,12 +559,91 @@ def test_passing_no_table_is_inert():
     assert (f["kg_shipped_source"].isna()).all()
     counts = f.attrs["kg_factor_sources"]
     assert counts["shipped"] == 0 and counts["shipped_implausible"] == 0
+    assert counts["shipped_matched"] == 0
     assert f.attrs["kg_factor_disagreement"]["reported_vs_shipped"] == {
         "both": 0, "disagree": 0, "share": None}
 
 
 def test_an_empty_table_serves_nothing_and_does_not_raise():
+    """An EMPTY table is not a mis-keyed one, so it does not warn."""
     rows = [("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A", 1.0)]
     table = _table([], ["j", "u"])
-    f = harvest_kg_factors(_cp(rows), shipped_factors=table)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", ShippedFactorWarning)
+        f = harvest_kg_factors(_cp(rows), shipped_factors=table)
     assert f.attrs["kg_factor_sources"]["shipped"] == 0
+    assert f.attrs["kg_factor_sources"]["shipped_matched"] == 0
+
+
+# ---------------------------------------------------------------------------
+# The mis-keyed table: this layer's dominant failure mode, now loud
+# ---------------------------------------------------------------------------
+
+def test_a_non_empty_table_matching_nothing_warns_once():
+    """The Ethiopia trap: raw WB crop codes against decoded `j` labels."""
+    rows = [("2019-20", "h1", "h1-1-1", "Enset", "gemel", "dried", "A", 1.0),
+            ("2019-20", "h2", "h2-1-1", "Maize", "sack", "dried", "A", 1.0)]
+    table = _table([(74, "gemel", 4.34)], ["j", "u"])
+    with pytest.warns(ShippedFactorWarning) as record:
+        f = harvest_kg_factors(_cp(rows), shipped_factors=table)
+    assert len(record) == 1
+    assert "matched 0 of 2 rows" in str(record[0].message)
+    assert f.attrs["kg_factor_sources"]["shipped_matched"] == 0
+
+
+def test_shipped_matched_is_the_tell_not_the_shipped_count():
+    """A perfectly-keyed table outranked on every row still reads shipped: 0.
+
+    This is why `counts['shipped']` cannot be the mis-keying tell, and why
+    `shipped_matched` is taken before the sentinel, the screen and the rank.
+    """
+    rows = [("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A", 1.0,
+             90.0)]
+    table = _table([("Maize", "sack", 100.0)], ["j", "u"])
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", ShippedFactorWarning)
+        f = harvest_kg_factors(_cp_with_reports(rows), shipped_factors=table)
+    counts = f.attrs["kg_factor_sources"]
+    assert counts["shipped"] == 0          # outranked by `reported`
+    assert counts["shipped_matched"] == 1  # but the table keyed just fine
+
+
+def test_a_sentinel_only_table_matched_but_served_nothing():
+    """Distinguishable from a mis-keyed table, which was the point."""
+    rows = [("2019-20", "h1", "h1-1-1", "Maize", U_UNKNOWN, "dried", "A",
+             1.0)]
+    table = _table([("Maize", U_UNKNOWN, 100.0)], ["j", "u"])
+    f = harvest_kg_factors(_cp(rows), shipped_factors=table)
+    counts = f.attrs["kg_factor_sources"]
+    assert counts["shipped"] == 0 and counts["shipped_implausible"] == 0
+    assert counts["shipped_matched"] == 1
+
+
+def test_a_table_not_keyed_on_u_is_refused():
+    """The error message claimed this rule; now the code has it."""
+    rows = [("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A", 1.0)]
+    table = _table([("Maize", 50.0)], ["j"])
+    with pytest.raises(ValueError, match="not on 'u'"):
+        harvest_kg_factors(_cp(rows), shipped_factors=table)
+
+
+def test_a_dropped_region_key_warns_instead_of_going_national_in_silence():
+    """The asymmetry the red-team found: one region used to be silent."""
+    rows = [("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A", 1.0)]
+    table = _table([("Maize", "sack", "Amhara", 100.0)],
+                   ["j", "u", "region"])
+    with pytest.warns(ShippedFactorWarning, match="region"):
+        f = harvest_kg_factors(_cp(rows), shipped_factors=table)
+    # it still JOINS -- the Ethiopia region case needs this until
+    # cluster_features carries region
+    assert f["kg_per_unit"].iloc[0] == 100.0
+    assert f.attrs["kg_factor_sources"]["shipped_matched"] == 1
+
+
+def test_a_correctly_keyed_table_warns_about_nothing():
+    rows = [("2019-20", "h1", "h1-1-1", "Maize", "sack", "dried", "A", 1.0)]
+    table = _table([("Maize", "sack", 100.0)], ["j", "u"])
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", ShippedFactorWarning)
+        f = harvest_kg_factors(_cp(rows), shipped_factors=table)
+    assert f["kg_per_unit"].iloc[0] == 100.0

@@ -243,14 +243,104 @@ this mechanism).
   those too.  Deliberate: a factor table is a small curated artefact, and a
   loader that has not looked at its own duplicates has not looked at its
   table.  A raw WB file with repeated rows will trip it —
-  `drop_duplicates()` in the loader is the expected answer, and writing it is
-  the act of noticing.  **Loader authors need to be told this**, or they will
-  read the `ValueError` as a bug.
+  `drop_duplicates()` in the loader is the expected answer.
 - **The `j`-vocabulary trap generalises to every key.**  Keys are compared as
   stripped, lower-cased text, so any type or vocabulary mismatch silently
   matches nothing: a WB crop code `74` against a decoded `'Enset'`, `74.0`
   against `'74'`, a `region` code `1` against `1.0`, `t` as an int against
-  `'2019-20'`.  `attrs['kg_factor_sources']['shipped']` is the only tell.
-  **Follow-up worth taking in the Ethiopia loader PR** (deliberately not done
-  here, scope): warn when a non-empty `shipped_factors` matches zero rows.
-  That is this layer's dominant failure mode and it is currently silent.
+  `'2019-20'`.
+
+## §7 Red-team round (2026-09-09) — what changed
+
+`slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_shipped_factors.org` graded
+the branch **mergeable** with three CONCERNs on join semantics and a
+docstring FAIL.  All were taken on this branch rather than deferred, at the
+coordinator's direction.  What moved:
+
+1. **`shipped_matched`, and a warning on a zero match.**  The red-team's
+   headline finding was that the layer can serve 0 rows with **no signal**,
+   *and* that the docstring's proposed tell was wrong in the false-alarm
+   direction — `counts['shipped']` is **post-rank** and reads 0 for a
+   perfectly-keyed table that `reported` outranks on every row (probe
+   `[P1g]`).  `shipped_matched` is therefore taken **pre-sentinel,
+   pre-screen, pre-rank**: rows the table supplied a finite factor for.  It
+   is the one count that separates *mis-keyed* from *outranked* from
+   *sentinel-excluded* (which previously shared one signature — all `none`,
+   all counts 0).  A non-empty table matching nothing now raises
+   `ShippedFactorWarning`.  **The message distinguishes two causes**: a
+   keying mismatch, versus a table whose `KgFactor` column carries no usable
+   value at all — the red-team's `[E]` case, a `.dta` conversion column read
+   back as text, which would otherwise have been sent to the wrong end of the
+   file.
+2. **`u` is enforced, not merely requested.**  The "nothing joinable" error
+   already claimed "at minimum the unit `'u'`" and nothing checked it (probe
+   `[P1a]`: a `j`-only table served 50 kg/unit to a `basket`).  Rule chosen
+   over text-softening, per the coordinator: *a kg-per-unit factor without a
+   unit is not a factor.*  Note the resulting **guard order**, pinned by test:
+   the `u` rule fires before "nothing to join on", and a frame with no `u` at
+   all raises even earlier in `_kg_factor_series` — so the "nothing to join
+   on" branch is unreachable through `harvest_kg_factors` and is exercised
+   directly as the defence-in-depth it is.
+3. **A dropped key level now WARNS instead of going national in silence.**
+   The asymmetry the red-team named: a *multi*-region table raises (the
+   surviving keys are ambiguous) while a *single*-region table applied
+   silently — so the more careless loader got the weaker signal.  It warns
+   and still **joins**; it does not raise, because the Ethiopia region case
+   legitimately needs this until `cluster_features` carries `region`.
+4. **Docstring accuracy**: "four layers" → five (two sites), the
+   `_screen_reported_factors` fall-through list gained `shipped`, `§` →
+   "section" (the one non-ASCII character in the diff), the sentinel comment
+   no longer overstates what `shipped_implausible` counts, and `harvest_kg`'s
+   "bit for bit" is narrowed to the `Harvest_kg` values (the counts dict and
+   the companion frame do gain keys/columns).
+5. **`data_info.yml` KgFactor note tightened.**  The red-team's item 9 read
+   the old parenthetical — "the survey (or a survey-supplied conversion
+   table)" — plainly and concluded it **licenses** baking Ethiopia's
+   `Crop_CF` into the stored column: a table lookup is transcription, not
+   inference, so the note's prohibition did not reach it.  §6 Q2 is therefore
+   **closed, not deferred**: the note now says a shipped table is applied at
+   read time through `harvest_kg(shipped_factors=...)` and never written to
+   the column, and says why (the de-dup rule and the region join would become
+   invisible in a parquet, and `reported_vs_shipped` would be impossible
+   because the shipped value would have *become* the reported one).
+
+**Ledger correction the red-team earned.**  §4 credited the sentinel with
+preventing "a table with no `u` key at all [fabricating] weights for
+unit-less rows".  On the Tanzania shape (no `u` anywhere) that protection is
+actually a **pre-existing** guard in `_kg_factor_series`, not the sentinel;
+and on a `u`-bearing frame the case is now refused outright by rule 2 above.
+The sentinel's real job is narrower and still load-bearing: a row whose `u`
+*is* the recorded-nothing sentinel.
+
+**Not taken here, by direction** (red-team items 6 and the `<=0` note):
+`yield_kg(..., shipped_factors=, min_reports=)` pass-through stays for the
+Ethiopia PR — it is two lines and wants a real table to test against; and a
+shipped `0`/`-3` is discarded by `_valid_factor` before the screen, so it is
+not counted `shipped_implausible`.  That is exactly what the `reported` layer
+does, so changing it would mean changing `reported` too.
+
+---
+### Phase 3 — re-verified after the red-team round
+
+- Tests: `tests/test_shipped_factors.py` **37** + `tests/test_crop_kg_factor.py`
+  **35** = **72 passed**.  `test_uganda_harvest_kg_baseline` **RAN** (14 s,
+  rebuilding L2-country from the wave parquets — the shared `Uganda/var/` was
+  cleared by a concurrent agent, which is why the red-team had to deselect
+  it) and every number is unchanged: 130 606 / 36 095 /
+  `10 868 272.24500081` / `reported 14 050, survey_median 57, inferred
+  28 147, none 88 352, reported_implausible 99`.  The counts dict now also
+  carries `shipped: 0`, `shipped_implausible: 0`, `shipped_matched: 0`.
+- Adjacent: `test_schema_consistency` + `test_api_discoverability` +
+  `test_build_transform_hash` + `test_median_price_valuation` — **364 passed**
+  (these read `data_info.yml`, so they cover the note edit).
+- Cache: base `9e4c0867` vs final head, `build_transforms_fingerprint` for 9
+  tables + `build_transforms_fingerprint(None)` +
+  `Country('Uganda')._table_cache_hash(t, c.waves)` for 4 — **0 of 14 moved**.
+- **Does `lsms_library/data_info.yml` enter any cache hash?  NO — measured.**
+  A perturbed copy of the file (one appended comment) under an otherwise
+  identical package tree moved **0 of 14**.  The reason is that
+  `Wave._input_hash` hashes the **wave's** `data_info.yml`
+  (`country.py:859`, `wave_dir / "data_info.yml"`), never the canonical
+  cross-country schema file; and `_BUILD_INPUT_SUFFIXES` (`country.py:646`)
+  does not include `.yml` at all.  So the note edit is free, and it ships in
+  the same commit.
