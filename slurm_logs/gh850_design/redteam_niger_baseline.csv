@@ -1,0 +1,2 @@
+item,n,median,max_over_min,p90_over_p10,gate_statistic,refused_at_3,refused_at_5,refused_at_10,refused_at_30
+Mil,9,2285.714285714286,125.0,25.17543859649124,125.0,True,True,True,True

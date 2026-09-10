@@ -1,0 +1,1162 @@
+country,u,kg_per_unit
+Uganda,kg,1.0
+Uganda,kilogram,1.0
+Uganda,kilogramme,1.0
+Uganda,kgs,1.0
+Uganda,kilograms,1.0
+Uganda,kilogrammes,1.0
+Uganda,kilo,1.0
+Uganda,kilos,1.0
+Uganda,g,0.001
+Uganda,gram,0.001
+Uganda,gramm,0.001
+Uganda,grams,0.001
+Uganda,gramme,0.001
+Uganda,grammes,0.001
+Uganda,gm,0.001
+Uganda,gms,0.001
+Uganda,milligram,1e-06
+Uganda,l,1.0
+Uganda,litre,1.0
+Uganda,liter,1.0
+Uganda,litres,1.0
+Uganda,liters,1.0
+Uganda,ml,0.001
+Uganda,cl,0.01
+Uganda,millilitre,0.001
+Uganda,milliliter,0.001
+Uganda,millilitres,0.001
+Uganda,milliliters,0.001
+Uganda,mili liter,0.001
+Uganda,pound,0.453592
+Uganda,lbs,0.453592
+Uganda,bottle(500ml),0.5
+Uganda,bottle(300ml),0.3
+Uganda,packet (500 g),0.5
+Uganda,packet (100 g),0.1
+Uganda,packet(125g),0.125
+Uganda,loaf (1kg),1.0
+Uganda,loaf (500g),0.5
+Uganda,kimbo/cowboy/blueband tin (0.5kg),0.5
+Uganda,cup/mug(0.5lt),0.5
+Uganda,buns (50 g),0.05
+Uganda,glass(0.25lt),0.25
+Uganda,bottle(250ml),0.25
+Uganda,kimbo/cowboy/blueband tin (1kg),1.0
+Uganda,packet (250 g),0.25
+Uganda,jerrican (5 lts),5.0
+Uganda,basket (5 kg),5.0
+Uganda,ladle(100g),0.1
+Uganda,gourd (1-5lts),5.0
+Uganda,buns (100 g),0.1
+Uganda,packet (1 kg),1.0
+Uganda,bottle(750ml),0.75
+Uganda,tin (debe) (20 lts),20.0
+Uganda,buns (200 g),0.2
+Uganda,kimbo/cowboy/blueband tin (2kg),2.0
+Uganda,fish cut piece (1 - 2 kg),2.0
+Uganda,jerrican (2 lts),2.0
+Uganda,fish cut piece (up to 1kg),1.0
+Uganda,plastic basin (15 lts),15.0
+Uganda,bottle(350ml),0.35000000000000003
+Uganda,sack (100 kgs),100.0
+Uganda,bottle(150ml),0.15
+Uganda,jerrican (1 lt),1.0
+Uganda,basket (10 kg),10.0
+Uganda,basket (2 kg),2.0
+Uganda,tin (5 lts),5.0
+Uganda,jerrican (3 lts),3.0
+Uganda,fish cut piece(above 2  kg),2.0
+Uganda,basket (20 kg),20.0
+Uganda,sack (50 kgs),50.0
+Uganda,jerrican (20 lts),20.0
+Uganda,jug (2 lts),2.0
+Uganda,tot (50 ml),0.05
+Uganda,jug (1 lt),1.0
+Uganda,jerrican (10 lts),10.0
+Uganda,gourd (above 10 lts),10.0
+Uganda,jug (1.5 lts),1.5
+Uganda,gourd (5-10lts),10.0
+Uganda,packet (2 kg),2.0
+Uganda,sack (120 kgs),120.0
+Uganda,nice cup (50g) - small,0.05
+Uganda,nice cup (100g) - large,0.1
+Uganda,nice cup (60g) - medium,0.06
+Uganda,jerrican (500 ml),0.5
+Uganda,nomi tin (500g),0.5
+Uganda,nido tin (400g),0.4
+Uganda,nomi tin (1kg),1.0
+Uganda,plastic basin (5 ltrs),5.0
+Uganda,plastic plate (60g) - large,0.06
+Uganda,plastic plate (30g) - small,0.03
+Uganda,metallic tumbler (50g) - small,0.05
+Uganda,glass (125ml),0.125
+Uganda,metallic tumbler (100g) - big,0.1
+Uganda,sadolin tin (3ltrs),3.0
+Uganda,metallic plate (80g) - small,0.08
+Uganda,metallic plate (100g) - large,0.1
+Uganda,plastic bowl (40g),0.04
+Uganda,jug (2.5ltrs),2.5
+Uganda,plastic tumbler (50g) - big,0.05
+Uganda,glass (500ml),0.5
+Uganda,sacket (10g),0.01
+Uganda,bottle (1ltr),1.0
+Uganda,sacket (15g),0.015
+Uganda,bottle (2ltr),2.0
+Uganda,sacket (25g),0.025
+Uganda,bottle (1.5ltr),1.5
+Uganda,sacket (20g),0.02
+Uganda,nomi tin (250g),0.25
+Uganda,sack (80 kgs),80.0
+Uganda,sacket (100g),0.1
+Uganda,sacket (50g),0.05
+Uganda,sacket (30g),0.03
+Uganda,sacket (150g),0.15
+Uganda,bottle (350g),0.35000000000000003
+Uganda,bottle (500g),0.5
+Uganda,plastic tumbler (30g) - small,0.03
+Uganda,---,0.06458333333333333
+Uganda,akendo (big),0.125
+Uganda,akendo (medium),0.08571428571428572
+Uganda,akendo (small),0.0625
+Uganda,bunch (big),2.5
+Uganda,bunch (medium),2.5
+Uganda,bunch (small),1.3888888888888888
+Uganda,bundle (big),0.17857142857142858
+Uganda,bundle (medium),0.15
+Uganda,bundle (small),0.11666666666666667
+Uganda,bundle (unspecified),0.12903225806451613
+Uganda,cluster (big),0.8108108108108109
+Uganda,cluster (medium),0.5194902548725637
+Uganda,cluster (small),0.2916666666666667
+Uganda,cluster (unspecified),0.26666666666666666
+Uganda,container (big),1.1428571428571428
+Uganda,container (medium),1.037037037037037
+Uganda,container (small),0.5357142857142857
+Uganda,container (smallest),0.47631048387096775
+Uganda,crate,6.541666666666666
+Uganda,fish whole  (large),2.0
+Uganda,fish whole (large),0.6438953488372093
+Uganda,fish whole (medium),1.1666666666666667
+Uganda,fish whole (small),0.6666666666666666
+Uganda,heap (big),0.5882352941176471
+Uganda,heap (medium),0.375
+Uganda,heap (small),0.19736842105263158
+Uganda,heap (unspecified),0.28
+Uganda,number of units (general),0.13953488372093023
+Uganda,others specify,0.2613871635610766
+Uganda,piece (big),0.3
+Uganda,piece (medium),0.16666666666666666
+Uganda,piece (small),0.1
+Uganda,sack (unspecified),3.5555555555555554
+Uganda,table spoon,0.125
+Uganda,tea spoon,0.06666666666666667
+Uganda,tobacco leaf (number),0.06538461538461537
+Uganda,tot (unspecified),0.19230769230769232
+Uganda,tot (sachet),0.2155887230514096
+Uganda,tray of 30 eggs,2.5
+Malawi,kg,1.0
+Malawi,kilogram,1.0
+Malawi,kilogramme,1.0
+Malawi,kgs,1.0
+Malawi,kilograms,1.0
+Malawi,kilogrammes,1.0
+Malawi,kilo,1.0
+Malawi,kilos,1.0
+Malawi,g,0.001
+Malawi,gram,0.001
+Malawi,gramm,0.001
+Malawi,grams,0.001
+Malawi,gramme,0.001
+Malawi,grammes,0.001
+Malawi,gm,0.001
+Malawi,gms,0.001
+Malawi,milligram,1e-06
+Malawi,l,1.0
+Malawi,litre,1.0
+Malawi,liter,1.0
+Malawi,litres,1.0
+Malawi,liters,1.0
+Malawi,ml,0.001
+Malawi,cl,0.01
+Malawi,millilitre,0.001
+Malawi,milliliter,0.001
+Malawi,millilitres,0.001
+Malawi,milliliters,0.001
+Malawi,mili liter,0.001
+Malawi,pound,0.453592
+Malawi,lbs,0.453592
+Malawi,50kg bag,50.0
+Malawi,90 kg bag,90.0
+Malawi,50 kg bag,50.0
+Malawi,satchet/tube (25g),0.025
+Malawi,bucket 5 litre,5.0
+Malawi,5 litre container0,5.0
+Malawi,satchet/tube (50g),0.05
+Malawi,5 litres as a container for chisoso,5.0
+Malawi,loaf (300g),0.3
+Malawi,satchet (20 gram),0.02
+Malawi,loaf (700g),0.7000000000000001
+Malawi,packet (150g),0.15
+Malawi,loaf (600g),0.6
+Malawi,bottleof300ml,0.3
+Malawi,tin 100g,0.1
+Malawi,satchet/tube (100g),0.1
+Malawi,packet (500g),0.5
+Malawi,satchet (250 gram),0.25
+Malawi,packet (250g),0.25
+Malawi,packet 150 gram,0.15
+Malawi,tin 1kg,1.0
+Malawi,tin 250g,0.25
+Malawi,packet (25g),0.025
+Malawi,packet (400g),0.4
+Malawi,satchet (500 gram),0.5
+Malawi,container250g,0.25
+Malawi,packet 750 gram,0.75
+Malawi,tin 500g,0.5
+Malawi,satchet (5 gram),0.005
+Malawi,packet50g,0.05
+Malawi,packet 250 gram,0.25
+Malawi,packet 100 gram,0.1
+Malawi,1packet20g,0.02
+Malawi,tin (250g),0.25
+Malawi,packet 200 gram,0.2
+Malawi,tin400g,0.4
+Malawi,packet 300 gram,0.3
+Malawi,bottles250g,0.25
+Malawi,packet(250ml),0.25
+Malawi,packet (1kg),1.0
+Malawi,satchet (150 gram),0.15
+Malawi,(400g)packets,0.4
+Malawi,satchet (25 gram),0.025
+Malawi,tin (40 gram),0.04
+Malawi,packet 40 gram,0.04
+Malawi,packet 500 gram,0.5
+Malawi,tin (500g),0.5
+Malawi,satchet (120 gram),0.12
+Malawi,packet (500ml),0.5
+Malawi,tin (400 gram),0.4
+Malawi,packet 200gram,0.2
+Malawi,tin (600 gram),0.6
+Malawi,halfof250grams,0.25
+Malawi,tin (400g),0.4
+Malawi,pail (16l),16.0
+Malawi,5l bucket,5.0
+Malawi,5 litre bucket(chigoba),5.0
+Malawi,50 gram,0.05
+Malawi,packet of 17 grams,0.017
+Malawi,2grams,0.002
+Malawi,90 gram,0.09
+Malawi,100 gram,0.1
+Malawi,300grams,0.3
+Malawi,200 gram,0.2
+Malawi,500 gram,0.5
+Malawi,50 kg,50.0
+Malawi,10l bucket,10.0
+Malawi,20 litre pail,20.0
+Malawi,70 gram,0.07
+Malawi,125g packet,0.125
+Malawi,packet of 125 grams,0.125
+Malawi,3litre bucket,3.0
+Malawi,10 units,0.2600472813238771
+Malawi,10satchet,0.09473684210526317
+Malawi,12 bottles,0.42
+Malawi,12pieces,0.11666666666666667
+Malawi,12a,0.31578947368421056
+Malawi,12b,0.195
+Malawi,16a,0.38278503669232145
+Malawi,16b,0.46749999999999997
+Malawi,1mlambe,0.11538461538461538
+Malawi,1ndasi,0.1463588880362403
+Malawi,1plate,1.7231999999999998
+Malawi,1plate khofi,0.22248306997742667
+Malawi,1sachet,0.28598388952819337
+Malawi,2 packets,0.028749999999999998
+Malawi,2 packets of crisps,0.1453846153846154
+Malawi,2 plates ndiwo,0.0743362831858407
+Malawi,23 dozen,1.6
+Malawi,24 days,0.8400000000000001
+Malawi,2packets,0.3942857142857143
+Malawi,2plates of nsima.,2.003960396039604
+Malawi,2sachet,0.0590909090909091
+Malawi,3 cups of tea,0.25333333333333335
+Malawi,4 bottles,0.251
+Malawi,4 meals at 150,1.6162162162162161
+Malawi,4 plate,0.625
+Malawi,40 packet,0.21906693711967548
+Malawi,4sachets,0.03151515151515152
+Malawi,500mgtin,4.565217391304348
+Malawi,5sachets,0.02
+Malawi,6 pack,5.538461538461538
+Malawi,6packs,1.4
+Malawi,7 plates meal,1.9055555555555554
+Malawi,7buns,0.1477142857142857
+Malawi,acres,0.71417004048583
+Malawi,amediumpall,5.0
+Malawi,b,0.0556838905775076
+Malawi,badin small,1.371539582458508
+Malawi,bags,0.8333333333333334
+Malawi,bakery donas,0.3669653656360254
+Malawi,bale,0.18674698795180725
+Malawi,banches,0.066666669315762
+Malawi,bar,1.04
+Malawi,basin,0.1451127819548872
+Malawi,basin (small),0.96
+Malawi,basket,1.0774774774774776
+Malawi,basket shelled,0.7692307692307693
+Malawi,basket unshelled,1.1153225806451612
+Malawi,batches,0.08500000089406967
+Malawi,big packet,0.6607142857142857
+Malawi,botles,1.437500026077032
+Malawi,bottle,0.5
+Malawi,bottle (small),0.413591755582433
+Malawi,bottle (very small),2.921348314606742
+Malawi,bottle s,0.4017826020717621
+Malawi,bottles,0.44000000000000006
+Malawi,bottles of pure water,0.49840974069968375
+Malawi,bottls,0.4317617804348402
+Malawi,botttle,0.08759124252727446
+Malawi,bowl,2.4
+Malawi,box,1.1733333333333333
+Malawi,box small,3.779657116260655
+Malawi,brunch,0.08333333540293902
+Malawi,bucket,2.0
+Malawi,bunch,0.06666666666666667
+Malawi,bunch (large),0.16666666666666669
+Malawi,bunch (medium),0.14285714285714285
+Malawi,bunch (small),0.09547314578005114
+Malawi,bundle,0.1215
+Malawi,buns,0.1852700296735905
+Malawi,buntch,0.4400243421777575
+Malawi,cans,0.2857142857142857
+Malawi,carlsberg beer,0.78
+Malawi,carton,3.9912508851193365
+Malawi,carton small,3.4698973076160136
+Malawi,chicken,4.676923076923077
+Malawi,chigiba,6.637714285714286
+Malawi,chikang'a,0.25
+Malawi,chocolate bar,0.5572609208972845
+Malawi,clate,9.8
+Malawi,clove,0.12333333492279053
+Malawi,cluster,0.5138095238095238
+Malawi,coffee,0.2190096540627514
+Malawi,container small,0.1574857131775273
+Malawi,containersmall,0.9183673469387754
+Malawi,crate,14.285714285714286
+Malawi,crete,5.32
+Malawi,cubes,0.1
+Malawi,cup,0.25
+Malawi,cup of tea & two score,0.5185185185185186
+Malawi,custard,0.6569435655464595
+Malawi,dish of nsima and beef,0.9516129032258065
+Malawi,dozen,1.1285377358490565
+Malawi,drum head,0.3046526867627785
+Malawi,fresh beans (heaps),0.15554932735426008
+Malawi,full bottle,0.23809523809523808
+Malawi,glass,1.33333338631524
+Malawi,half full palm,0.1026
+Malawi,half liter,0.6899999976158142
+Malawi,half litr,0.24242424242424243
+Malawi,half loaf,0.5635091744957692
+Malawi,half packet,0.6669399016936343
+Malawi,halflitre,0.4529411764705883
+Malawi,halflittle,1.4666666666666668
+Malawi,hall fruit,0.15000000596046448
+Malawi,handful,0.34795032646268087
+Malawi,head,0.45000000000000007
+Malawi,heads,0.125
+Malawi,heap,0.27906976744186046
+Malawi,heap (large),0.28
+Malawi,"heap (large, special)",0.36250000000000004
+Malawi,heap (medium),0.25
+Malawi,"heap (medium, special)",0.4045979020979021
+Malawi,heap (small),0.2
+Malawi,"heap (small, special)",0.3199110122358176
+Malawi,heap's,0.23999999463558197
+Malawi,heap(mediun),0.7330714285714285
+Malawi,heap(small),0.4442857142857143
+Malawi,heaplarge,0.3393939393939394
+Malawi,heard,0.49354221829949985
+Malawi,insmallpape,0.09618750000000001
+Malawi,jar,1.5
+Malawi,jiggies,0.18666666666666668
+Malawi,juicebox,0.30984555984555984
+Malawi,jumbo,0.6976744186046513
+Malawi,k100packetp,0.2
+Malawi,k100tube,0.18181818181818182
+Malawi,k20 packet,0.12919999999999998
+Malawi,k40 packet,0.3092
+Malawi,k5 packet,0.03155956362478102
+Malawi,k50,0.07142857142857142
+Malawi,k50packet,0.1607712765957447
+Malawi,kamba packet,0.09438987344326713
+Malawi,kampango big,1.74
+Malawi,kg packet,2.8079999685287476
+Malawi,khofi,0.17431578947368417
+Malawi,khofi plate,0.23529850746268655
+Malawi,kipsmedium,3.78
+Malawi,kkilogram,0.3240000009536743
+Malawi,krate,28.679497319504474
+Malawi,lajaandonga,0.3787781350482315
+Malawi,large packet,0.638913532672761
+Malawi,largetubbe,0.4
+Malawi,lichero,1.6834782608695655
+Malawi,lipoko,0.3643835616438357
+Malawi,litre container,2.3026315789473686
+Malawi,loaf,0.75
+Malawi,loaves,0.75
+Malawi,lunch box,0.8147783251231526
+Malawi,mango,0.34285714285714286
+Malawi,mbale,0.30999999999999994
+Malawi,meal,1.1464285714285714
+Malawi,meals,1.0095498024614262
+Malawi,meals at work,1.4285714285714286
+Malawi,meals eaten at restaurant,4.729288975864319
+Malawi,medium bottle,0.3321669035503692
+Malawi,medium packet,0.08333333333333333
+Malawi,medium sachet,0.20257235184995745
+Malawi,medium tin,1.9708306966393785
+Malawi,medium tins,0.4525714281464917
+Malawi,mediumbottle,1.1016393442622952
+Malawi,mediumtin,2.1690140845070425
+Malawi,mice,0.13883333333333334
+Malawi,miligram,0.013037037037037038
+Malawi,mililitres (500),1.629032258064516
+Malawi,milltre,0.0006122448979591836
+Malawi,milters,0.0010200000107288359
+Malawi,mitanda,0.42338709677419356
+Malawi,mkoko,1.4000000000000001
+Malawi,mlamba,0.6285714285714286
+Malawi,mulingo,0.9950467289719627
+Malawi,n/a,0.5708571497235979
+Malawi,n0. 24 plate,1.141304347826087
+Malawi,ndowa,4.75
+Malawi,no 10 plate,0.3157894736842105
+Malawi,no 12 plate,0.2450000023841858
+Malawi,no. 10 plate,0.24342105263157893
+Malawi,no. 12 plate,0.198
+Malawi,no. 24 plate,0.8152173913043479
+Malawi,no.10 plate (flat),0.23333333333333334
+Malawi,no.10 plate (heaped),0.2777777777777778
+Malawi,no.12 plate,0.36809815950920244
+Malawi,no.24 plate,1.08
+Malawi,no10plate,0.084
+Malawi,nsiam and beef,1.4285714285714286
+Malawi,nsima and meat,1.5
+Malawi,nsima and ndiwo,1.5450643776824036
+Malawi,nsima plate,1.0271951219512196
+Malawi,nsima plate (phazi),0.21818181818181817
+Malawi,nsima with chicken,0.4943895978810499
+Malawi,one cup,0.3125
+Malawi,one piece,0.375
+Malawi,one plate,0.6208304969366917
+Malawi,onelittle,2.7441818181818176
+Malawi,other,0.09090909090909091
+Malawi,other (specify),0.4639175257731959
+Malawi,otherbucket,1.375
+Malawi,ox-cart (unshelled),0.5343379446640316
+Malawi,oxcart,1.1666666666666667
+Malawi,pack,0.8181818181818181
+Malawi,packerts,0.17694914800935488
+Malawi,packet,1.0080000102519988
+Malawi,packet (large),1.0335276279575172
+Malawi,packet (small),0.15000000596046448
+Malawi,packet kamba,0.07028571379428
+Malawi,packet large,2.9144323826793874
+Malawi,packet mdium,0.1351648351374835
+Malawi,packet medium,0.2460000067949295
+Malawi,packet unspecified,0.15725000016391277
+Malawi,packet(small),0.36
+Malawi,packets,3.095669934640523
+Malawi,packeys,0.04
+Malawi,packket,0.0875
+Malawi,pail,2.0
+Malawi,pail (large),4.47
+Malawi,pail (medium),3.5714285714285716
+Malawi,pail (small),1.8377192982456139
+Malawi,pail (unspecified),6.900000125169754
+Malawi,pail large,2.4929378531073447
+Malawi,pail small,1.4642857142857144
+Malawi,pail(small),0.8772696245733789
+Malawi,pani,0.5559999942779541
+Malawi,paper bag,0.24084705882352941
+Malawi,piece,0.10357142857142858
+Malawi,piece (large),0.176
+Malawi,piece (medium),0.10997732426303855
+Malawi,piece (small),0.075
+Malawi,piece medium,0.10553846153846155
+Malawi,piece(medium),0.04761904761904762
+Malawi,pieces,0.3160673515981735
+Malawi,pieces of chicken,0.2226122448979592
+Malawi,pinch,0.013333333333333336
+Malawi,plastic,0.38725490196078427
+Malawi,plastic container,0.734823296267753
+Malawi,plate,0.7000000000000001
+Malawi,plate (small),0.30800000000000005
+Malawi,plate mushroom,0.4493695070691632
+Malawi,plate of chicken and chips,1.5672963400236128
+Malawi,plate of nsima,0.7499999999999999
+Malawi,plate of nsima with beef,1.7011494252873565
+Malawi,plate rice,1.2394957983193278
+Malawi,pocket,0.11599999666213989
+Malawi,polythene bag,0.32056359737766527
+Malawi,polythene bag (small),0.35294117647058826
+Malawi,pot,2.2537932460845083
+Malawi,poto,0.6666666666666666
+Malawi,pqcket,3.106060606060606
+Malawi,puffs,1.4259055118110238
+Malawi,quarter,0.25168539580484933
+Malawi,quarter kg,5.04
+Malawi,quarterpaper,0.06330207305034552
+Malawi,quoter bottle,0.7149846923283812
+Malawi,quoter litre bottle,0.5185185185185185
+Malawi,raider,0.09530149878006275
+Malawi,rice meal,1.5
+Malawi,sachet,0.20823529411764707
+Malawi,sachets / packet,0.08333333333333333
+Malawi,sachetubelarge,0.11320754716981132
+Malawi,sachetubesmall,0.275
+Malawi,sachey,0.15000000596046448
+Malawi,satchet,0.12999999523162842
+Malawi,satchet (large),0.32653061224489793
+Malawi,satchet (medium),0.19868835257082898
+Malawi,satchet (small),0.20916666666666667
+Malawi,satchet/tube,0.13075000047683716
+Malawi,satchet/tube (large),0.19712415932610222
+Malawi,satchet/tube (medium),0.1591936728395062
+Malawi,satchet/tube (small),0.12
+Malawi,satchet/tube/packet,0.14814814814814814
+Malawi,satchetofraja,0.14
+Malawi,satchettube,0.525
+Malawi,saxhet,0.6169665809768637
+Malawi,saxhwt,0.25
+Malawi,scones,0.35
+Malawi,scud,0.38603362054650125
+Malawi,serving,0.45000001788139343
+Malawi,servong,0.6959999799728394
+Malawi,seventeabag,0.019200000000000002
+Malawi,slice,3.1799999999999997
+Malawi,small,0.215
+Malawi,small bottle,0.8000000317891439
+Malawi,small box tea bags,0.618989835898067
+Malawi,small container,1.0499047545168487
+Malawi,small heap,0.22570883320269797
+Malawi,small jumbo,0.7885304659498208
+Malawi,small khofi plate,0.1207133058984911
+Malawi,small packet,0.12036097242603096
+Malawi,small packet gold tea,0.14449696195408576
+Malawi,small packets,0.1979999989271164
+Malawi,small packets first choice,0.22319999635219573
+Malawi,small packs,0.25714286110491497
+Malawi,small pieces,0.10098360655737705
+Malawi,small sachet,0.07863951249956726
+Malawi,small sarchet,0.0724610152243198
+Malawi,small tiin,0.9516438928418689
+Malawi,small tin,1.550058019778131
+Malawi,small tina,0.3999999950329462
+Malawi,small.bottle,0.4128813453551614
+Malawi,smallcatton,0.3945445689235266
+Malawi,smallpaper,0.1
+Malawi,smalpackets,0.2
+Malawi,soya pieces,0.28594771241830064
+Malawi,soyabeanpieces,0.2701298701298701
+Malawi,spoon,0.42
+Malawi,sqchet,0.08372093023255814
+Malawi,standard bread,1.3333333333333333
+Malawi,table spoon,0.20000000794728595
+Malawi,tablespoon,0.0375
+Malawi,takeaway box,1.3333333184321718
+Malawi,tea & buns,1.4943396226415095
+Malawi,tea and bread,0.7111111111111112
+Malawi,tea and snacks,0.36937500536441803
+Malawi,tea bag,0.02459679230988122
+Malawi,tea bags,0.016464285714285716
+Malawi,teabag,0.028571428571428574
+Malawi,teabags,0.005
+Malawi,teaspoon,0.048
+Malawi,three full bottles,0.17513880997570686
+Malawi,thungwa of khwanya,0.25
+Malawi,times,1.1320754597623306
+Malawi,tin,1.2
+Malawi,tin (small),1.1425939050318923
+Malawi,tin100,1.0775862068965518
+Malawi,tina,0.4116766467065868
+Malawi,tina (heaped),0.35019455252918286
+Malawi,tina (large),0.14285714285714285
+Malawi,tina (small),0.2801513128615932
+Malawi,tina falt,0.21599999070167542
+Malawi,tina flat,0.3428571479661124
+Malawi,tina for chips,0.2561240323489191
+Malawi,tina heaped,0.592682932502524
+Malawi,tina plate,0.5695010634526764
+Malawi,tina(flat),1.01125
+Malawi,tina(small),0.34137205387205394
+Malawi,tindrinks,1.0937735849056605
+Malawi,tins,1.9708306966393785
+Malawi,tonec,0.895384641794058
+Malawi,toti,0.08333333333333333
+Malawi,tray,3.2941176470588234
+Malawi,trip,2.4
+Malawi,tub,0.15662500013907749
+Malawi,tube,0.26666666666666666
+Malawi,tube (large),0.2956062424969988
+Malawi,tube (medium),0.21909090909090911
+Malawi,tube /sachet,0.2
+Malawi,two bananas,0.04736842204329048
+Malawi,two plates of nsima and beef,1.5
+Malawi,two tubes,0.1261
+Malawi,twopiece,0.1320754716981132
+Malawi,unit,1.1290344197380446
+Malawi,velmot,2.6399999856948853
+Malawi,veremoti,1.3
+Malawi,veremut,1.9359999895095827
+Malawi,veta,1.7793438831272426
+Malawi,vetor,3.7700397164191117
+Malawi,whole,3.9141537592961235
+Malawi,whole cabbage,0.2264516129032258
+Malawi,whole chicken,4.0249999999999995
+Malawi,whole duck,3.125
+Malawi,whole loaf of bread,0.7058823529411765
+Malawi,whole rabbit,4.870689655172414
+Malawi,wrapped in paper,0.14012738853503184
+Nigeria,kg,1.0
+Nigeria,kilogram,1.0
+Nigeria,kilogramme,1.0
+Nigeria,kgs,1.0
+Nigeria,kilograms,1.0
+Nigeria,kilogrammes,1.0
+Nigeria,kilo,1.0
+Nigeria,kilos,1.0
+Nigeria,g,0.001
+Nigeria,gram,0.001
+Nigeria,gramm,0.001
+Nigeria,grams,0.001
+Nigeria,gramme,0.001
+Nigeria,grammes,0.001
+Nigeria,gm,0.001
+Nigeria,gms,0.001
+Nigeria,milligram,1e-06
+Nigeria,l,1.0
+Nigeria,litre,1.0
+Nigeria,liter,1.0
+Nigeria,litres,1.0
+Nigeria,liters,1.0
+Nigeria,ml,0.001
+Nigeria,cl,0.01
+Nigeria,millilitre,0.001
+Nigeria,milliliter,0.001
+Nigeria,millilitres,0.001
+Nigeria,milliliters,0.001
+Nigeria,mili liter,0.001
+Nigeria,pound,0.453592
+Nigeria,lbs,0.453592
+Nigeria,65.0,0.0052
+Nigeria,basin,5.262295186004452
+Nigeria,basin big/large,6.175
+Nigeria,basin medium,2.8000000000000003
+Nigeria,basket,1.724799990653992
+Nigeria,basket big,0.6666666666666667
+Nigeria,bottle/can,2.5874999819013027
+Nigeria,metric cup,0.21299999621179333
+Nigeria,none,0.08571428571428572
+Nigeria,packet,0.796000003814696
+Nigeria,sachet,0.10387256056291899
+Nigeria,sack/bag,24.418333185215758
+Nigeria,shot,0.13772590132098975
+Nigeria,slice,0.20823528627732768
+Nigeria,spoon,0.01495373975574486
+Nigeria,table spoon,0.027967876500571993
+Nigeria,tea spoon,0.06666666666666667
+Nigeria,tuber,0.9535284871523351
+Nigeria,wheelbarrow,2.154904639469448
+Nigeria,whole animal,4.455000042915348
+Nigeria,wrap,0.08284313576535873
+Nigeria,yam tuber big/large,1.0785671641791046
+Nigeria,bin/basket,0.44999999999999996
+Nigeria,cigarette cup,0.12000000327825569
+Nigeria,congo,0.8400000062584877
+Nigeria,kobiowu,0.64
+Nigeria,large bowl,0.49193548387096775
+Nigeria,large bunch,0.23809523809523808
+Nigeria,large congo,0.4
+Nigeria,large derica,0.32
+Nigeria,large heap,0.19480519480519481
+Nigeria,large kobiowu,1.4410110307546204
+Nigeria,large mudu,0.40625
+Nigeria,large packet/sachet,0.1094017094017094
+Nigeria,large piece,0.2673186750428327
+Nigeria,large stalk,0.9571428571428571
+Nigeria,large tiya,0.5769230769230769
+Nigeria,medium bowl,0.2631578947368421
+Nigeria,medium bunch,0.1535897435897436
+Nigeria,medium derica,0.1826086956521739
+Nigeria,medium heap,0.14814814814814814
+Nigeria,medium kobiowu,0.946113782051282
+Nigeria,medium packet/sachet,0.03999999970197676
+Nigeria,medium piece,0.15
+Nigeria,medium stalk,0.7522580680924078
+Nigeria,medium tiya,0.4916666666666667
+Nigeria,milk cup,0.10703677510608203
+Nigeria,mudu,0.44999999999999996
+Nigeria,olodo,0.12500000372529038
+Nigeria,other specify,0.1
+Nigeria,other specify (151),0.08
+Nigeria,other specify (152),2.0
+Nigeria,paint rubber,0.6555059523809523
+Nigeria,piece,0.09701636244159477
+Nigeria,small bowl,0.15492307692307694
+Nigeria,small bunch,0.100000000372529
+Nigeria,small congo,0.2960833333333333
+Nigeria,small derica,0.07092555331991951
+Nigeria,small heap,0.1
+Nigeria,small kobiowu,0.652545486954735
+Nigeria,small mudu,0.2843910256410256
+Nigeria,small packet/sachet,0.029999999999999995
+Nigeria,small piece,0.06875
+Nigeria,small stalk,0.7085253456221199
+Nigeria,small tiya,0.31339285714285714
+Nigeria,tin,1.60000002384186
+Nigeria,very large derica,0.25
+Ethiopia,kg,1.0
+Ethiopia,kilogram,1.0
+Ethiopia,kilogramme,1.0
+Ethiopia,kgs,1.0
+Ethiopia,kilograms,1.0
+Ethiopia,kilogrammes,1.0
+Ethiopia,kilo,1.0
+Ethiopia,kilos,1.0
+Ethiopia,g,0.001
+Ethiopia,gram,0.001
+Ethiopia,gramm,0.001
+Ethiopia,grams,0.001
+Ethiopia,gramme,0.001
+Ethiopia,grammes,0.001
+Ethiopia,gm,0.001
+Ethiopia,gms,0.001
+Ethiopia,milligram,1e-06
+Ethiopia,l,1.0
+Ethiopia,litre,1.0
+Ethiopia,liter,1.0
+Ethiopia,litres,1.0
+Ethiopia,liters,1.0
+Ethiopia,ml,0.001
+Ethiopia,cl,0.01
+Ethiopia,millilitre,0.001
+Ethiopia,milliliter,0.001
+Ethiopia,millilitres,0.001
+Ethiopia,milliliters,0.001
+Ethiopia,mili liter,0.001
+Ethiopia,pound,0.453592
+Ethiopia,lbs,0.453592
+Ethiopia,araba,0.75
+Ethiopia,birchiko large,0.6
+Ethiopia,birchiko medium,0.3409090909090909
+Ethiopia,birchiko small,0.2037037037037037
+Ethiopia,box,0.8275862068965517
+Ethiopia,box/casa,12.842105263157894
+Ethiopia,bunch large,0.625
+Ethiopia,bunch medium,0.45
+Ethiopia,bunch small,0.5454545454545454
+Ethiopia,chinet small,4.285714285714286
+Ethiopia,cm,0.375
+Ethiopia,cubic centimeter,0.0010294117647058824
+Ethiopia,cup,0.21428571428571427
+Ethiopia,esir large,0.3448275862068966
+Ethiopia,esir medium,0.3125
+Ethiopia,esir small,0.26751635768811344
+Ethiopia,festal large,0.9307359307359307
+Ethiopia,festal medium,0.8035714285714286
+Ethiopia,festal small,0.6
+Ethiopia,jenbe,1.9049999999999998
+Ethiopia,jog,0.6666666666666666
+Ethiopia,joniya/kasha small,1.5
+Ethiopia,kerchat/kemba large,0.8214285714285714
+Ethiopia,kerchat/kemba medium,2.066666666666667
+Ethiopia,kerchat/kemba small,1.145104895104895
+Ethiopia,kubaya/cup large,0.5
+Ethiopia,kubaya/cup medium,0.4166666666666667
+Ethiopia,kubaya/cup small,0.35
+Ethiopia,kunna/mishe/kefer/enkib large,2.5714285714285716
+Ethiopia,kunna/mishe/kefer/enkib medium,1.5
+Ethiopia,kunna/mishe/kefer/enkib small,1.5692307692307694
+Ethiopia,madaberia/nuse/shera/cheret medium,0.4166666666666667
+Ethiopia,madaberia/nuse/shera/cheret small,24.0
+Ethiopia,medeb large,0.4
+Ethiopia,medeb medium,0.3333333333333333
+Ethiopia,medeb small,0.2391304347826087
+Ethiopia,melekia,0.17857142857142858
+Ethiopia,melekiya,0.1867732558139535
+Ethiopia,number,0.1466666666666667
+Ethiopia,other (specify),0.4166666666666667
+Ethiopia,other(specify),0.6666666666666666
+Ethiopia,pack,0.2727272727272727
+Ethiopia,pair,0.1893939393939394
+Ethiopia,piece/number large,0.2
+Ethiopia,piece/number medium,0.15384615384615385
+Ethiopia,piece/number small,0.125
+Ethiopia,quintal,1.0238780207134637
+Ethiopia,roll,1.5151515151515151
+Ethiopia,sahin large,0.6180555555555556
+Ethiopia,sahin medium,0.6666666666666666
+Ethiopia,sahin small,0.6521739130434783
+Ethiopia,shekim,3.3333333333333335
+Ethiopia,shekim large,0.26276595744680853
+Ethiopia,shekim medium,0.75
+Ethiopia,shekim small,0.8779279279279278
+Ethiopia,sini large,0.17857142857142858
+Ethiopia,sini small,0.16
+Ethiopia,tasa/tanika/shember/selemon large,0.7
+Ethiopia,tasa/tanika/shember/selemon medium,0.5313725490196078
+Ethiopia,tasa/tanika/shember/selemon small,0.5
+Ethiopia,tuba,0.7083333333333334
+Ethiopia,whole animal (poultary),9.23076923076923
+Ethiopia,whole animal (sheep),46.0
+Ethiopia,zorba/akara large,1.8518518518518519
+Ethiopia,zorba/akara medium,2.0
+Ethiopia,zorba/akara small,1.3245614035087718
+Tanzania,kg,1.0
+Tanzania,kilogram,1.0
+Tanzania,kilogramme,1.0
+Tanzania,kgs,1.0
+Tanzania,kilograms,1.0
+Tanzania,kilogrammes,1.0
+Tanzania,kilo,1.0
+Tanzania,kilos,1.0
+Tanzania,g,0.001
+Tanzania,gram,0.001
+Tanzania,gramm,0.001
+Tanzania,grams,0.001
+Tanzania,gramme,0.001
+Tanzania,grammes,0.001
+Tanzania,gm,0.001
+Tanzania,gms,0.001
+Tanzania,milligram,1e-06
+Tanzania,l,1.0
+Tanzania,litre,1.0
+Tanzania,liter,1.0
+Tanzania,litres,1.0
+Tanzania,liters,1.0
+Tanzania,ml,0.001
+Tanzania,cl,0.01
+Tanzania,millilitre,0.001
+Tanzania,milliliter,0.001
+Tanzania,millilitres,0.001
+Tanzania,milliliters,0.001
+Tanzania,mili liter,0.001
+Tanzania,pound,0.453592
+Tanzania,lbs,0.453592
+Tanzania,piece,0.16982446311858077
+Niger,kg,1.0
+Niger,kilogram,1.0
+Niger,kilogramme,1.0
+Niger,kgs,1.0
+Niger,kilograms,1.0
+Niger,kilogrammes,1.0
+Niger,kilo,1.0
+Niger,kilos,1.0
+Niger,g,0.001
+Niger,gram,0.001
+Niger,gramm,0.001
+Niger,grams,0.001
+Niger,gramme,0.001
+Niger,grammes,0.001
+Niger,gm,0.001
+Niger,gms,0.001
+Niger,milligram,1e-06
+Niger,l,1.0
+Niger,litre,1.0
+Niger,liter,1.0
+Niger,litres,1.0
+Niger,liters,1.0
+Niger,ml,0.001
+Niger,cl,0.01
+Niger,millilitre,0.001
+Niger,milliliter,0.001
+Niger,millilitres,0.001
+Niger,milliliters,0.001
+Niger,mili liter,0.001
+Niger,pound,0.453592
+Niger,lbs,0.453592
+Niger,sac (25 kg),25.0
+Niger,sac (100 kg),100.0
+Niger,sac (50 kg),50.0
+Niger,alvéole,2.3625
+Niger,avec os au kg,1.3083056478405317
+Niger,avec os au tas,0.499221183800623
+Niger,bidon,0.7142857142857143
+Niger,boule,0.5942028985507246
+Niger,bouquet,0.05
+Niger,bouteille,0.4444444444444444
+Niger,boîte,0.375
+Niger,boîte de nescafé,1.2
+Niger,boîte de tomate,0.3333333333333333
+Niger,calebasse,0.3268065268065268
+Niger,cannette,0.4126682151020437
+Niger,carton,3.0775862068965516
+Niger,cristal (kantou),0.6217105263157896
+Niger,cueillère,0.025
+Niger,feuille,0.6666666666666666
+Niger,gobelet,0.0071428571428571435
+Niger,gousse,0.06868131868131869
+Niger,louche,0.03333333333333333
+Niger,morceau,0.05
+Niger,moudou,0.8531746031746033
+Niger,panier,0.9761156505342553
+Niger,paquet,0.31654835847382434
+Niger,plaquette,0.2556818181818182
+Niger,pot,0.43956043956043955
+Niger,pot-tarzan,0.03333333333333333
+Niger,sachet,0.0875
+Niger,sans os au kg,1.6108108108108108
+Niger,sans os au tas,1.9375
+Niger,seau,1.275
+Niger,tas,0.30000000000000004
+Niger,tasse,0.7692307692307693
+Niger,tiya,1.25
+Niger,tongolo,0.6666666666666666
+Niger,unité,0.04266342503510323
+Niger,waygouizé,0.358974358974359
+Mali,kg,1.0
+Mali,kilogram,1.0
+Mali,kilogramme,1.0
+Mali,kgs,1.0
+Mali,kilograms,1.0
+Mali,kilogrammes,1.0
+Mali,kilo,1.0
+Mali,kilos,1.0
+Mali,g,0.001
+Mali,gram,0.001
+Mali,gramm,0.001
+Mali,grams,0.001
+Mali,gramme,0.001
+Mali,grammes,0.001
+Mali,gm,0.001
+Mali,gms,0.001
+Mali,milligram,1e-06
+Mali,l,1.0
+Mali,litre,1.0
+Mali,liter,1.0
+Mali,litres,1.0
+Mali,liters,1.0
+Mali,ml,0.001
+Mali,cl,0.01
+Mali,millilitre,0.001
+Mali,milliliter,0.001
+Mali,millilitres,0.001
+Mali,milliliters,0.001
+Mali,mili liter,0.001
+Mali,pound,0.453592
+Mali,lbs,0.453592
+Mali,seau (5 kg),5.0
+Mali,seau (10 kg),10.0
+Mali,seau (25 kg),25.0
+Mali,sac (25 kg),25.0
+Mali,alvéole,3.6363636363636362
+Mali,autre,0.2857142857142857
+Mali,barre,0.09861111111111111
+Mali,bidon,0.6
+Mali,boite,0.7
+Mali,boule,0.03333333333333333
+Mali,bouteille,0.5
+Mali,boîte,0.8798530762167126
+Mali,calebasse,0.13559754851889683
+Mali,cannette,0.5714285714285714
+Mali,carcasse,8.026315789473685
+Mali,carton,3.676913803496082
+Mali,centilitre,0.25
+Mali,cuillere,0.04000000000000001
+Mali,gigot,3.68
+Mali,gobelet,0.2916666666666667
+Mali,gousse,0.05555555555555555
+Mali,louche,0.048809523809523817
+Mali,morceau,0.19607843137254902
+Mali,moude,0.9883720930232558
+Mali,paani,0.16666666666666666
+Mali,panier,0.8333333333333334
+Mali,paquet,0.2608695652173913
+Mali,piece,1.6136363636363638
+Mali,pot,0.3333333333333333
+Mali,sac large,20.526315789473685
+Mali,sac moyen,10.545454545454545
+Mali,sac petit,4.05
+Mali,sachet,0.11538461538461539
+Mali,tas,0.21428571428571427
+Mali,tranche,0.034482758620689655
+Mali,unité,0.06666666666666667
+Mali,verre,0.06666666666666667
+EthiopiaRHS,kg,1.0
+EthiopiaRHS,kilogram,1.0
+EthiopiaRHS,kilogramme,1.0
+EthiopiaRHS,kgs,1.0
+EthiopiaRHS,kilograms,1.0
+EthiopiaRHS,kilogrammes,1.0
+EthiopiaRHS,kilo,1.0
+EthiopiaRHS,kilos,1.0
+EthiopiaRHS,g,0.001
+EthiopiaRHS,gram,0.001
+EthiopiaRHS,gramm,0.001
+EthiopiaRHS,grams,0.001
+EthiopiaRHS,gramme,0.001
+EthiopiaRHS,grammes,0.001
+EthiopiaRHS,gm,0.001
+EthiopiaRHS,gms,0.001
+EthiopiaRHS,milligram,1e-06
+EthiopiaRHS,l,1.0
+EthiopiaRHS,litre,1.0
+EthiopiaRHS,liter,1.0
+EthiopiaRHS,litres,1.0
+EthiopiaRHS,liters,1.0
+EthiopiaRHS,ml,0.001
+EthiopiaRHS,cl,0.01
+EthiopiaRHS,millilitre,0.001
+EthiopiaRHS,milliliter,0.001
+EthiopiaRHS,millilitres,0.001
+EthiopiaRHS,milliliters,0.001
+EthiopiaRHS,mili liter,0.001
+EthiopiaRHS,pound,0.453592
+EthiopiaRHS,lbs,0.453592
+EthiopiaRHS,100 kg,100.0
+EthiopiaRHS,31.0,0.2777777777777778
+EthiopiaRHS,83.0,0.4
+EthiopiaRHS,95.0,0.3076923076923077
+EthiopiaRHS,akara,2.2222222222222223
+EthiopiaRHS,bags,15.609756097560977
+EthiopiaRHS,baldi,0.02222222222222222
+EthiopiaRHS,bars,0.7793522267206479
+EthiopiaRHS,bekolo,0.020833333333333332
+EthiopiaRHS,bere'lei,0.1736111111111111
+EthiopiaRHS,big mada,0.3333333333333333
+EthiopiaRHS,bikole,0.09999999999999999
+EthiopiaRHS,bilkat,0.3666666666666667
+EthiopiaRHS,birchiko,0.18181818181818182
+EthiopiaRHS,bobo,0.41
+EthiopiaRHS,bottles,0.5833333333333334
+EthiopiaRHS,bunch,0.9785714285714286
+EthiopiaRHS,bundels,0.25
+EthiopiaRHS,butile/shigute,0.41428571428571426
+EthiopiaRHS,butille,0.030188679245283016
+EthiopiaRHS,chika,0.4157706093189964
+EthiopiaRHS,chinet,0.5714285714285714
+EthiopiaRHS,dawla,0.05
+EthiopiaRHS,dirib,0.25
+EthiopiaRHS,efigne,0.05
+EthiopiaRHS,enkib,0.6354166666666666
+EthiopiaRHS,ensira,2.5
+EthiopiaRHS,esir,0.25
+EthiopiaRHS,festal,1.4
+EthiopiaRHS,gan,0.4605263157894737
+EthiopiaRHS,gebete/buchu,0.029166666666666667
+EthiopiaRHS,gembo,0.2662162162162162
+EthiopiaRHS,guchiye,2.275
+EthiopiaRHS,gurzigne,4.0
+EthiopiaRHS,jemb,1.875
+EthiopiaRHS,kelemeshash,0.16666666666666666
+EthiopiaRHS,kerchat,3.6923076923076925
+EthiopiaRHS,kidan,1.25
+EthiopiaRHS,kil,0.4945054945054945
+EthiopiaRHS,kubaya,0.2625
+EthiopiaRHS,kuch'belu,0.4
+EthiopiaRHS,kunna,1.6666666666666667
+EthiopiaRHS,kurbet,2.1
+EthiopiaRHS,leaves,0.2222222222222222
+EthiopiaRHS,lemba,0.125
+EthiopiaRHS,lotterey,0.75
+EthiopiaRHS,madaberia,0.19047619047619047
+EthiopiaRHS,mankorko,1.0
+EthiopiaRHS,medeb,0.2127659574468085
+EthiopiaRHS,melekia,0.225
+EthiopiaRHS,mesferia,0.125
+EthiopiaRHS,mika,0.42857142857142855
+EthiopiaRHS,minilik,0.21694862155388472
+EthiopiaRHS,number,0.07943661971830987
+EthiopiaRHS,packets,0.2857142857142857
+EthiopiaRHS,pieces,0.08452380952380953
+EthiopiaRHS,safa,16.666666666666668
+EthiopiaRHS,sahen,0.30196078431372547
+EthiopiaRHS,sefied,15.606060606060606
+EthiopiaRHS,shekim,0.8192307692307693
+EthiopiaRHS,shirimir,0.5
+EthiopiaRHS,silicha,8.903985507246377
+EthiopiaRHS,sini,0.14285714285714285
+EthiopiaRHS,small kunna,0.375
+EthiopiaRHS,small ma,7.0098972211648265
+EthiopiaRHS,small tomato can,0.13574660633484165
+EthiopiaRHS,spoon,0.012333333333333333
+EthiopiaRHS,tassa,0.3181818181818182
+EthiopiaRHS,temene,0.09523809523809523
+EthiopiaRHS,wesla,0.1111111111111111
+EthiopiaRHS,woket,0.10833333333333334
+EthiopiaRHS,zurba,1.0555555555555556
+GhanaLSS,kg,1.0
+GhanaLSS,kilogram,1.0
+GhanaLSS,kilogramme,1.0
+GhanaLSS,kgs,1.0
+GhanaLSS,kilograms,1.0
+GhanaLSS,kilogrammes,1.0
+GhanaLSS,kilo,1.0
+GhanaLSS,kilos,1.0
+GhanaLSS,g,0.001
+GhanaLSS,gram,0.001
+GhanaLSS,gramm,0.001
+GhanaLSS,grams,0.001
+GhanaLSS,gramme,0.001
+GhanaLSS,grammes,0.001
+GhanaLSS,gm,0.001
+GhanaLSS,gms,0.001
+GhanaLSS,milligram,1e-06
+GhanaLSS,l,1.0
+GhanaLSS,litre,1.0
+GhanaLSS,liter,1.0
+GhanaLSS,litres,1.0
+GhanaLSS,liters,1.0
+GhanaLSS,ml,0.001
+GhanaLSS,cl,0.01
+GhanaLSS,millilitre,0.001
+GhanaLSS,milliliter,0.001
+GhanaLSS,millilitres,0.001
+GhanaLSS,milliliters,0.001
+GhanaLSS,mili liter,0.001
+GhanaLSS,pound,0.453592
+GhanaLSS,lbs,0.453592
+GhanaLSS,tot (25ml),0.025
+GhanaLSS,american tin,0.453592
+GhanaLSS,ball,0.09071839999999999
+GhanaLSS,bar,0.05
+GhanaLSS,barrel,0.02749042424242424
+GhanaLSS,basket,0.5
+GhanaLSS,beer bottle,0.37799333333333335
+GhanaLSS,blister/strip,0.2256581436221479
+GhanaLSS,bowl,0.453592
+GhanaLSS,box,0.8164655999999999
+GhanaLSS,bucket,0.9090909090909091
+GhanaLSS,bunch,0.3685435
+GhanaLSS,bundle,0.09071839999999999
+GhanaLSS,coil,0.18636363636363634
+GhanaLSS,crate,1.1842105263157894
+GhanaLSS,dozen,0.5783297999999999
+GhanaLSS,fanta bottle,0.2
+GhanaLSS,finger,0.045359199999999995
+GhanaLSS,heap,0.13886593204775022
+GhanaLSS,hours,0.680388
+GhanaLSS,loaf,0.18143679999999998
+GhanaLSS,log,0.08502272748573088
+GhanaLSS,margarin tin,0.22000000000000003
+GhanaLSS,maxi bag,0.226796
+GhanaLSS,mini bag,0.25
+GhanaLSS,minute,0.5
+GhanaLSS,other unit,0.13312811987846854
+GhanaLSS,packet,0.226796
+GhanaLSS,pair,0.034375
+GhanaLSS,piece,0.07559866666666666
+GhanaLSS,plate,0.1814368
+GhanaLSS,pot,0.226796
+GhanaLSS,roll,0.27222222222222225
+GhanaLSS,satchet,0.07257472
+GhanaLSS,set,0.09071839999999999
+GhanaLSS,single,0.09071839999999999
+GhanaLSS,stick,0.113398
+GhanaLSS,tin,0.2
+GhanaLSS,tonne,0.3514368
+GhanaLSS,tuber,0.33263413333333336
+GhanaLSS,visit,0.0726796
+GhanaLSS,yard,0.23224932673539622

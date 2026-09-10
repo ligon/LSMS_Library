@@ -155,3 +155,116 @@ pd.NA-safe coercion. New: `_seeded_kg_factors` (split out of
    items of the `(j, u)` estimates, on the `(t, j)` baseline) is unmeasured;
    DESIGN.org names it. It serves a fifth to a half of inferred rows, which is
    why (D) exists.
+
+---
+
+## §8 Red-team round (2026-09-10) -- what changed
+
+`slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_850_impl.org` reproduced every
+number in §2-§6 and returned four actionable items plus one disclosure. All
+four are landed; the disclosure is in `AGENTS.md` and in the docstrings.
+
+### (1) The IQR paragraph was a scale error -- retired, not repaired
+
+`max/min <= 1.25` means the reports lie within about +/-12%; `IQR/median <=
+1.10` means the interquartile range is 110% *of the median*. They are not the
+same tolerance, so "the IQR gate admits 21 cells at 1.10 and 26 at 2.00, and
+is therefore not discriminating" compared incommensurable scales. Swept at its
+own scale the IQR gate discriminates fine: at `IQR/median <= 0.10` Uganda
+admits 2 cells whose `max/min` p90 is 1.32. **The choice of `max/min` stands
+on the other ground the same docstring gave, and only that one**: at N = 3-4
+an IQR *discards the extremes*, and the extremes are the whole question --
+a single wild report barely moves an interpolated quartile. Rewritten to say
+so, with the retired argument recorded rather than deleted.
+
+### (2) `min_reports` now gates the PER-WAVE estimate
+
+It screened `support` summed over waves while its docstring named the
+`(t, j, u)` estimate, so one report per wave in five waves cleared a floor
+that four reports in a single wave did not -- a divergence from
+`_survey_median_factors`, the pattern §5 says was reused. Fixed at the source
+(the filter runs before the cross-wave median, so a wave that cannot support
+an estimate contributes none rather than lending its row count to waves that
+can), and pinned by `test_min_reports_gates_the_wave_not_the_pooled_support`.
+
+Coverage cost, measured -- `item_unit` rows, pooled gate -> per-wave gate:
+
+| | Uganda | Malawi | Nigeria | Ethiopia | Tanzania | Niger | Mali | ERHS | GhanaLSS |
+|---|---|---|---|---|---|---|---|---|---|
+| before | 73,452 | 253,427 | 166,253 | 99,577 | 3,540 | 75,571 | 208,347 | 26,003 | 935,384 |
+| after | 73,315 | 252,380 | 165,866 | 98,391 | 3,532 | 75,563 | 208,291 | 25,837 | 935,384 |
+| kg total % | -0.00 | **+1.21** | **-3.08** | -0.49 | -0.04 | -0.02 | -0.00 | **-2.68** | 0.00 |
+
+The rows lost fall to the `unit` rung, not to `none`. GhanaLSS is unmoved
+because every one of its cells is single-wave.
+
+### (3) D6: the delivered factor's wave provenance is now reported
+
+The factor is a cross-wave median and nothing said across how many waves or
+how far apart -- so a cell estimated in one of the two waves it serves, and a
+cell whose estimates differ threefold, were indistinguishable from a cell
+measured twice the same way. Added: `n_waves` and `wave_spread` on the
+`_detail` frame, `kg_item_n_waves` / `kg_item_wave_spread` per row, and
+`attrs['kg_factor_wave_spread']` on `food_kg_factors` and both derived tables.
+`FOOD_KG_WAVE_SPREAD_REPORT = 2.0` is a REPORTING threshold; no row is refused.
+
+| | Uganda | Malawi | Nigeria | Ethiopia | Tanzania | Niger | Mali | ERHS | GhanaLSS |
+|---|---|---|---|---|---|---|---|---|---|
+| rows served by an item rung | 74,033 | 253,253 | 165,866 | 98,391 | 3,532 | 75,593 | 208,291 | 26,086 | 941,364 |
+| ... whose waves disagree > 2x | **27,480** | **60,500** | **30,512** | 13,961 | 20 | 699 | **46,980** | 4,571 | 0 |
+| ... estimated in ONE wave | 19,180 | 127,964 | 42,362 | 9,988 | 124 | 39,500 | 122,659 | 3,975 | **941,364** |
+
+### (4) `baseline_max_spread` -- PREPARED, NOT APPLIED
+
+The finding behind it is bigger than D5's tolerance: `min_baseline` is an
+ABSOLUTE floor with no dispersion check, so nine reports clear it and then
+govern 10,107 rows (Niger millet) with no relation between the counts and no
+warning when they disagree by 7.6x. Measured over the cells the strict rung
+admits, `max/min` of their own per-report price per kg: median **7.5**
+(Uganda), **178** (Malawi), **125** (Nigeria), **500** (Ethiopia), **1,019**
+(GhanaLSS), max 9.0e7. A 4-report cell differing by 26% is refused; a 5-report
+cell differing by nine million times is admitted in silence.
+
+`conversion_to_kgs(baseline_max_spread=X)` refuses a `(t, j)` baseline whose
+reports disagree by more than `X` -- `p90/p10` at N >= 10, `max/min` below it
+(with 10+ reports a robust interdecile spread exists and one wild report
+should not condemn the cell; below 10 there is no decile and the extremes are
+the question). **Default `None`. @ligon chooses.** Rows moved off the item
+rung, and the kg total against this branch:
+
+| country | X=3 | X=5 | X=10 | X=30 |
+|---|---|---|---|---|
+| Uganda | 29,495 / -1.9% | 15,645 / -1.0% | 13,571 / -0.5% | 1,075 / -0.1% |
+| Malawi | 183,222 / -9.4% | 95,954 / -1.7% | 26,784 / -0.1% | 5,662 / +0.1% |
+| Nigeria | 110,145 / -3.9% | 71,718 / +0.8% | 40,103 / +1.4% | 14,947 / +1.8% |
+| Ethiopia | 39,109 / +10.4% | 23,966 / +9.7% | 11,857 / +3.6% | 386 / -0.1% |
+| Tanzania | 285 / -0.1% | 115 / -0.1% | 0 / 0.0% | 0 / 0.0% |
+| Niger | 59,689 / **+19.6%** | 30,368 / **+18.7%** | 18,550 / **+14.8%** | 13,482 / **+16.7%** |
+| Mali | 193,565 / -15.8% | 122,222 / -11.4% | 82,437 / -11.5% | 41,011 / -9.5% |
+| EthiopiaRHS | 3,338 / -0.6% | 17 / +0.2% | 0 / 0.0% | 0 / 0.0% |
+| GhanaLSS | 714,061 / -11.2% | 667,247 / -11.2% | 430,967 / +2.5% | 336,420 / +1.9% |
+
+**Niger's millet baseline is refused at every candidate** (N = 9, max/min =
+125.0, p90/p10 = 25.2), and Niger's kg total moves +14.8% to +19.6% -- toward
+the answer key, since the tiya factor it removes is 8x too small. That is the
+single strongest argument for arming the gate, and the reason it is a decision
+and not a default: at X = 3 the same gate costs Mali 15.8% and GhanaLSS 11.2%
+of their kilograms, and neither of those movements has been adjudicated.
+
+### The disclosure that is not a code change
+
+**Niger's -56.1% is not signed off as a correction.** The defect is 13 rows of
+Niger `u='Kg'` data (millet at 2,286 FCFA/kg, maize at 2,840, against a retail
+250-450); the branch is what makes it visible and localised. Recorded in
+`AGENTS.md`, in `conversion_to_kgs`'s docstring ("removing a dilution is not
+the same thing as removing an error"), and it wants its own Niger issue plus a
+line in `Niger/_/CONTENTS.org`, which are follow-ups this branch does not make.
+
+Also from the red team, and NOT acted on here (recorded so the next reader has
+the numbers): §7.3's framing of the harvest movement as the volume assumption
+is an overstatement -- 83% of the +1.78e7 kg rests on labels that state
+KILOGRAMS (`Sack (100 kgs)` and friends, 30,217 rows), and for the volume rows
+Uganda's own reported `KgFactor` and its curated `conversion_to_kgs.json`
+independently agree that a 20-litre debe of beans is 20 kg. And §7.1's cost is
+now measured: Uganda leaves 62% of its `metric`-served rows (112,701 of
+182,550) outside the eight-key baseline vocabulary.
