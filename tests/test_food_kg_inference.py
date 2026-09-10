@@ -28,6 +28,7 @@ from lsms_library.transformations import (
     FOOD_KG_MIN_BASELINE_TIGHT,
     FOOD_KG_MIN_REPORTS,
     FOOD_KG_TIGHT_TOLERANCE,
+    FOOD_KG_BASELINE_MAX_SPREAD,
     FOOD_KG_WAVE_SPREAD_REPORT,
     KNOWN_METRIC,
     SURVEY_MEDIAN_MIN_REPORTS,
@@ -550,27 +551,110 @@ def test_a_single_wave_factor_is_counted_as_such():
     assert ws['rows_over_threshold'] == 0        # one wave cannot disagree
 
 
-def test_baseline_max_spread_is_off_by_default_and_refuses_when_armed():
-    """The strict rung has no dispersion gate: a 5-report baseline whose
-    reports differ by 125x is admitted without comment, while a 4-report
-    baseline differing by 26% is refused.  ``baseline_max_spread`` is the
-    prepared lever, defaulting to None so that nothing changes until @ligon
-    picks a value."""
+def test_baseline_max_spread_refuses_an_incoherent_baseline_by_default():
+    """A five-report baseline whose reports differ by 125x used to set an
+    item's kilograms in silence; at the armed default it is refused.
+
+    ``FOOD_KG_MIN_BASELINE`` is an ABSOLUTE floor and was the only gate on the
+    strict rung, so a four-report baseline differing by 26% was refused by the
+    tight exception while this one was admitted.  @ligon armed the gate at 10
+    on 2026-09-10 after the 3/5/10/30 sweep.
+    """
     prices = [100.0, 100.0, 100.0, 100.0, 12500.0]      # max/min = 125
     rows = [('T1', f'h{k}', 'A', 'kg', 1.0, p) for k, p in enumerate(prices)]
     rows += [('T1', f'z{k}', 'A', 'Bunch', 1.0, 200.0) for k in range(10)]
     df = frame(rows)
-    assert ('A', 'Bunch') in conversion_to_kgs(df, index=['t', 'i'],
-                                               item_col='j')
+    assert FOOD_KG_BASELINE_MAX_SPREAD == 10.0
+    assert ('A', 'Bunch') not in conversion_to_kgs(df, index=['t', 'i'],
+                                                   item_col='j')
     for cand in (3, 5, 10, 30):
-        armed = conversion_to_kgs(df, index=['t', 'i'], item_col='j',
-                                  baseline_max_spread=cand)
-        assert ('A', 'Bunch') not in armed, cand
-    loose = conversion_to_kgs(df, index=['t', 'i'], item_col='j',
-                              baseline_max_spread=1000)
-    assert ('A', 'Bunch') in loose
-    # and it reaches the per-row ladder, which then falls to `unit`
-    f = food_kg_factors(df, baseline_max_spread=5)
-    bunches = f[f.index.get_level_values('u') == 'Bunch']
-    assert 'item_unit' not in set(bunches['KgFactorSource'])
+        assert ('A', 'Bunch') not in conversion_to_kgs(
+            df, index=['t', 'i'], item_col='j', baseline_max_spread=cand), cand
+    # None restores the ungated rung -- the pre-decision behaviour
+    assert ('A', 'Bunch') in conversion_to_kgs(df, index=['t', 'i'],
+                                               item_col='j',
+                                               baseline_max_spread=None)
+
+
+def test_a_coherent_baseline_is_untouched_by_the_gate():
+    """The gate must refuse incoherence, not thin evidence: a baseline whose
+    reports agree passes at every candidate and at the default."""
+    rows = [('T1', f'h{k}', 'A', 'kg', 1.0, 100.0) for k in range(10)]
+    rows += [('T1', f'z{k}', 'A', 'Bunch', 1.0, 200.0) for k in range(10)]
+    df = frame(rows)
+    for spread in (None, 3, 5, 10, 30):
+        got = conversion_to_kgs(df, index=['t', 'i'], item_col='j',
+                                baseline_max_spread=spread)
+        assert got[('A', 'Bunch')] == pytest.approx(2.0), spread
+
+
+def test_the_gate_uses_p90_over_p10_once_there_are_ten_reports():
+    """Below ten reports the extremes ARE the evidence and ``max/min`` reads
+    them; at ten or more a robust interdecile spread exists and one wild
+    report must not condemn the cell.  Same single outlier, two verdicts."""
+    # 19 agreeing reports + 1 wild one: max/min = 125, p90/p10 = 1.0.  (One
+    # outlier in exactly ten still moves an interpolated p90 -- 13.4 -- and is
+    # refused; the decile only becomes robust once the tail has room.)
+    prices = [100.0] * 19 + [12500.0]
+    rows = [('T1', f'h{k}', 'A', 'kg', 1.0, p) for k, p in enumerate(prices)]
+    rows += [('T1', f'z{k}', 'A', 'Bunch', 1.0, 200.0) for k in range(10)]
+    assert ('A', 'Bunch') in conversion_to_kgs(frame(rows), index=['t', 'i'],
+                                               item_col='j')
+    # the same outlier in a cell of 5 is judged on max/min and refused
+    prices = [100.0] * 4 + [12500.0]
+    rows = [('T1', f'h{k}', 'A', 'kg', 1.0, p) for k, p in enumerate(prices)]
+    rows += [('T1', f'z{k}', 'A', 'Bunch', 1.0, 200.0) for k in range(10)]
+    assert ('A', 'Bunch') not in conversion_to_kgs(frame(rows),
+                                                   index=['t', 'i'],
+                                                   item_col='j')
+
+
+def test_a_refused_row_is_tagged_counted_and_falls_to_the_unit_rung():
+    """A refused row is not dropped: it takes the u-pooled ``unit`` factor --
+    the one the library gave every row before GH #850 -- or ``none``, and it
+    says so.  The gate's counts are NOT a layer and ride alongside the
+    partition, as ``reported_implausible`` does on the crop side."""
+    rows = []
+    # item A: incoherent baseline (refused); item B: coherent (kept).  Both
+    # sell by the Bunch, and B's households also buy A's Bunch so the u rung
+    # has something to fall back to.
+    for k in range(10):
+        rows += [('T1', f'h{k}', 'B', 'kg', 1.0, 100.0),
+                 ('T1', f'h{k}', 'B', 'Bunch', 1.0, 200.0),
+                 ('T1', f'h{k}', 'A', 'Bunch', 1.0, 200.0)]
+    rows += [('T1', f'h{k}', 'A', 'kg', 1.0, p)
+             for k, p in enumerate([100.0, 100.0, 100.0, 100.0, 12500.0])]
+    df = frame(rows)
+    f = food_kg_factors(df)
+    gate = f.attrs['kg_factor_baseline_gate']
+    assert gate['baseline_max_spread'] == FOOD_KG_BASELINE_MAX_SPREAD
+    assert gate['rows_refused'] > 0
+    # the invariant a reader will check
+    assert gate['rows_refused'] == (gate['refused_to_unit']
+                                    + gate['refused_to_none'])
     assert sum(f.attrs['kg_factor_sources'].values()) == len(df)
+
+    a_bunch = f[(f.index.get_level_values('j') == 'A')
+                & (f.index.get_level_values('u') == 'Bunch')]
+    assert a_bunch['baseline_refused_spread'].all()
+    assert set(a_bunch['KgFactorSource']) <= {'unit', 'none'}
+    b_bunch = f[(f.index.get_level_values('j') == 'B')
+                & (f.index.get_level_values('u') == 'Bunch')]
+    assert not b_bunch['baseline_refused_spread'].any()
+    assert set(b_bunch['KgFactorSource']) == {'item_unit'}
+
+    off = food_kg_factors(df, baseline_max_spread=None)
+    assert off.attrs['kg_factor_baseline_gate']['rows_refused'] == 0
+    assert not off['baseline_refused_spread'].any()
+
+
+def test_the_gate_never_costs_a_row_that_a_higher_rung_serves():
+    """A seeded metric label or a survey kilogram outranks the item rung, so
+    the gate cost those rows nothing and must not count them."""
+    rows = [('T1', f'h{k}', 'A', 'kg', 1.0, p)
+            for k, p in enumerate([100.0, 100.0, 100.0, 100.0, 12500.0])]
+    rows += [('T1', f'z{k}', 'A', 'Bunch', 1.0, 200.0) for k in range(10)]
+    f = food_kg_factors(frame(rows))
+    kg_rows = f[f.index.get_level_values('u') == 'kg']
+    assert set(kg_rows['KgFactorSource']) == {'metric'}
+    assert not kg_rows['baseline_refused_spread'].any()

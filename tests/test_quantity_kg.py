@@ -121,6 +121,11 @@ def test_malawi_food_quantities_kg_total_preserved():
     lending its row count to waves that can.  Malawi +1.2%; Nigeria -3.1% and
     EthiopiaRHS -2.7% move the other way; the rest are under 0.5%.
 
+    2026-09-10, @ligon arms the baseline dispersion gate at
+    ``FOOD_KG_BASELINE_MAX_SPREAD = 10``: 2.583e6.  Malawi barely moves
+    (-0.11%) because its refused cells are small ones; Niger +14.8% and Mali
+    -11.5% are where the gate bites.
+
     Skips when the Malawi food data isn't available."""
     import warnings as _w
     import lsms_library as ll
@@ -132,4 +137,4 @@ def test_malawi_food_quantities_kg_total_preserved():
         import pytest
         pytest.skip('Malawi food data unavailable')
     total = float(fq.xs('kg', level='u')['Quantity'].sum())
-    assert abs(total - 2.5855e6) / 2.5855e6 < 0.005, f"kg total drifted: {total}"
+    assert abs(total - 2.5827e6) / 2.5827e6 < 0.005, f"kg total drifted: {total}"

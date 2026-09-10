@@ -268,3 +268,67 @@ Uganda's own reported `KgFactor` and its curated `conversion_to_kgs.json`
 independently agree that a 20-litre debe of beans is 20 kg. And §7.1's cost is
 now measured: Uganda leaves 62% of its `metric`-served rows (112,701 of
 182,550) outside the eight-key baseline vocabulary.
+
+### §8.5 DECISION -- the dispersion gate is armed at 10 (@ligon, 2026-09-10)
+
+`FOOD_KG_BASELINE_MAX_SPREAD = 10.0`, applied to the `(t, j)` price-per-kg
+baseline as `p90/p10` where the cell has 10 or more reports and `max/min`
+below that. The 3-4 report exception at `max/min <= 1.25` stays exactly as it
+was and is NOT re-gated (its own tolerance is far stricter, so the extra
+condition would be a no-op wearing a second name).
+
+**What the ruling weighed.** Every candidate in the sweep refuses Niger's
+nine-report millet baseline (max/min 125.0) and moves Niger 14.8-19.6% toward
+its answer key. The tight end is expensive elsewhere and nothing has
+adjudicated those movements: at X = 3 Mali loses 15.8% and GhanaLSS 11.2% of
+their kilograms. 10 refuses the incoherent cells while leaving Tanzania and
+EthiopiaRHS untouched entirely and the rest inside +/-3.6% of the ungated
+branch, except Mali (-11.5%) and Niger (+14.8%).
+
+**Delivered movement, base `1b07c3e9` -> branch with the gate armed** (total
+kg in `food_quantities(units='kgs')`; the middle column is the same branch
+with the gate off, so the last column isolates the gate):
+
+| country | base | ungated | gate=10 | base -> gate | gate vs ungated |
+|---|---|---|---|---|---|
+| Malawi | 8.790e6 | 2.585e6 | 2.583e6 | **-70.6%** | -0.11% |
+| Ethiopia | 4.127e6 | 7.212e5 | 7.470e5 | **-81.9%** | +3.58% |
+| Niger | 5.019e5 | 2.203e5 | 2.528e5 | **-49.6%** | **+14.77%** |
+| EthiopiaRHS | 3.202e5 | 2.168e5 | 2.168e5 | **-32.3%** | 0.00% |
+| Mali | 1.603e7 | 1.458e7 | 1.291e7 | **-19.5%** | **-11.49%** |
+| Uganda | 1.458e6 | 1.248e6 | 1.242e6 | -14.8% | -0.45% |
+| Nigeria | 1.657e6 | 1.524e6 | 1.545e6 | -6.8% | +1.39% |
+| Tanzania | 7.992e5 | 7.785e5 | 7.785e5 | -2.6% | -0.00% |
+| GhanaLSS | 2.040e6 | 2.359e6 | 2.419e6 | **+18.6%** | +2.53% |
+
+**Refusal provenance.** A refused row is not dropped: it takes the u-pooled
+`unit` factor -- the one the library gave every row before #850 -- or `none`,
+and carries `baseline_refused_spread=True`.
+`attrs['kg_factor_baseline_gate']` counts them; it is a diagnostic beside the
+partition, not a sixth layer (counting it as one would double-count, since the
+row is already counted under the rung that serves it). Measured, and in every
+country all refused rows land on `unit`, none on `none`:
+
+| | Uganda | Malawi | Nigeria | Ethiopia | Tanzania | Niger | Mali | ERHS | GhanaLSS |
+|---|---|---|---|---|---|---|---|---|---|
+| `item_unit` | 59,744 | 225,580 | 125,763 | 86,534 | 3,532 | 57,013 | 125,854 | 25,837 | 504,417 |
+| `item_unit_tight` | 718 | 889 | 0 | 0 | 0 | 30 | 0 | 249 | 5,980 |
+| `unit` | 112,559 | 70,726 | 52,461 | 18,103 | 62 | 159,526 | 172,692 | 13,645 | 925,799 |
+| **rows refused** | 13,571 | 26,784 | 40,103 | 11,857 | **0** | 18,550 | 82,437 | **0** | 430,967 |
+
+`sum(kg_factor_sources) == len(df)` and
+`rows_refused == refused_to_unit + refused_to_none` in all nine.
+
+**Niger's millet, the case the gate was armed for.** With the gate off,
+`(Mil, Tiya)` is served 0.328 kg; with it on, that cell no longer exists and
+its rows fall to the `unit` rung. `(Niebe/Haricots secs, Tiya)` -- the cell
+whose kg rows are sound -- is untouched at 1.111 against an answer key of
+1.167, which is the discrimination the gate is supposed to have.
+
+**`harvest_kg` (D7) is unmoved by the gate**, as it must be: `crop_production`
+has no `Expenditure` column and never enters the price-ratio branch. Uganda's
+numbers stay at 78,532 harvest rows / 2.868e7 kg / `inferred` 86,978 /
+`none` 29,521 -- the vocabulary commit's movement and nothing more.
+
+**Cache: 0 of 13 fingerprints moved** against the merge point. `make matrix`
+remains the only post-merge cost.

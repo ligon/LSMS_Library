@@ -895,6 +895,51 @@ FOOD_KG_TIGHT_TOLERANCE = 1.25
 #: 4,886 rows are served a factor measured on a wave they are not in.
 FOOD_KG_WAVE_SPREAD_REPORT = 2.0
 
+#: Maximum dispersion a ``(t, j)`` price-per-kg baseline may carry and still
+#: set an item's kilograms -- ``p90/p10`` where the cell has 10 or more
+#: reports, ``max/min`` below that (GH #850 red team; @ligon, 2026-09-10).
+#:
+#: WHAT IT FIXES.  ``FOOD_KG_MIN_BASELINE`` is an ABSOLUTE floor and was the
+#: only gate on the strict rung, so a cell cleared it on five reports and then
+#: governed every row of that item in every unit, with no relation between the
+#: two counts and no check that the reports agreed.  Measured over the cells
+#: the ungated rung admitted, the max/min of their own per-report price per
+#: kilogram had a MEDIAN of 7.5 (Uganda), 178 (Malawi), 125 (Nigeria), 500
+#: (Ethiopia) and 1,019 (GhanaLSS), running to 9e7.  A four-report baseline
+#: whose reports differed by 26% was refused by the tight exception while a
+#: five-report baseline differing by nine million times was admitted in
+#: silence -- and the ungated rung governs 35-98% of rows against the tight
+#: exception's 0-0.7.
+#:
+#: THE WORKED CASE.  Niger's ``(2021-22, Mil)`` baseline is nine ``Kg`` rows
+#: pricing millet at 2,286 FCFA/kg against a 250-450 retail, with max/min
+#: 125.0; it used to hand a 0.33 kg tiya to all 10,107 of that item's tiya
+#: rows, where a tiya is about 2.5 kg.  It is refused here.
+#:
+#: WHY THE STATISTIC SWITCHES WITH N.  With ten or more reports a robust
+#: interdecile spread exists and one wild report should not condemn the cell;
+#: below ten there is no decile to take and the extremes ARE the evidence.
+#: The 3-4 report exception (:data:`FOOD_KG_TIGHT_TOLERANCE`) is not re-gated:
+#: its own tolerance is far stricter, so the extra condition would be a no-op
+#: wearing a second name.
+#:
+#: WHY 10 AND NOT 3.  Swept over 3 / 5 / 10 / 30 (the table is in
+#: ``.coder/ledger/850-food-kg-item-axis-impl.md`` 8): every candidate refuses
+#: Niger's millet and moves Niger 14.8-19.6% toward its answer key, but the
+#: tight end is expensive elsewhere -- at 3 it costs Mali 15.8% and GhanaLSS
+#: 11.2% of their kilograms, movements nothing has adjudicated. At 10 the
+#: corpus is within +/-3.6% except Ethiopia, Tanzania and EthiopiaRHS are
+#: untouched, and the refusal is confined to cells that are genuinely
+#: incoherent.  @ligon's ruling, 2026-09-10.
+#:
+#: A REFUSED ROW IS NOT DROPPED.  It falls to the u-pooled ``unit`` rung --
+#: the factor the library served every row before #850 -- or to ``none`` where
+#: even that has no factor, and it is TAGGED: see
+#: ``food_kg_factors``'s ``baseline_refused_spread`` column and
+#: ``attrs['kg_factor_baseline_gate']``.  Pass ``baseline_max_spread=None`` to
+#: restore the ungated rung.
+FOOD_KG_BASELINE_MAX_SPREAD = 10.0
+
 #: The eight-key map that decides which rows may ANCHOR the price-per-kg
 #: baseline.  Deliberately NOT :data:`KNOWN_METRIC`: no litre, ml or cl, so a
 #: volume row can enter the baseline only through a survey-supplied
@@ -977,7 +1022,7 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
                       min_baseline=FOOD_KG_MIN_BASELINE,
                       min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
                       tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
-                      baseline_max_spread=None,
+                      baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD,
                       _detail=False):
     """Infer local-unit -> kg conversion factors from price ratios.
 
@@ -1610,7 +1655,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                     min_baseline=FOOD_KG_MIN_BASELINE,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
                     tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
-                    baseline_max_spread=None):
+                    baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD):
     """Per-ROW kg-per-unit for a ``food_acquired`` frame, with provenance.
 
     The food twin of :func:`harvest_kg_factors`, and deliberately the same
@@ -1644,8 +1689,14 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
     -------
     pandas.DataFrame
         Indexed like *df*, with columns ``kg_per_unit``, ``KgFactorSource``,
-        ``kg_survey``, ``kg_metric``, ``kg_item_unit`` and ``kg_unit``.
-        ``attrs['kg_factor_sources']`` maps each layer to its row count.
+        ``kg_survey``, ``kg_metric``, ``kg_item_unit``, ``kg_item_n_waves``,
+        ``kg_item_wave_spread``, ``baseline_refused_spread`` and ``kg_unit``.
+        ``attrs['kg_factor_sources']`` maps each layer to its row count;
+        ``attrs['kg_factor_wave_spread']`` reports how far the pooled waves
+        disagreed; ``attrs['kg_factor_baseline_gate']`` reports how many rows
+        the dispersion gate cost their own ``(item, unit)`` factor and where
+        they landed instead (``rows_refused == refused_to_unit +
+        refused_to_none``).  Only the first partitions the frame.
 
     Notes
     -----
@@ -1685,6 +1736,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
     kg_tight = np.zeros(len(df), dtype=bool)
     kg_waves = np.full(len(df), np.nan)
     kg_wave_spread = np.full(len(df), np.nan)
+    refused = np.zeros(len(df), dtype=bool)
     kg_unit = np.full(len(df), np.nan)
     have_price = ('Expenditure' in df.columns and 'Quantity' in df.columns)
     if have_price:
@@ -1739,6 +1791,36 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                         dtype=bool)
                     kg_waves = _as_float(hit['n_waves'])
                     kg_wave_spread = _as_float(hit['wave_spread'])
+                    if baseline_max_spread is not None:
+                        # Which rows the GATE cost their item factor, as
+                        # opposed to which rows never had one.  The honest
+                        # answer is a counterfactual -- "would this row have
+                        # been served by its own (j, u) cell with the gate
+                        # off?" -- so the ungated map is estimated once more
+                        # and differenced.  A cell surviving on some OTHER
+                        # wave's baseline is therefore NOT counted: the gate
+                        # did not cost that row anything.
+                        try:
+                            ungated = conversion_to_kgs(
+                                df, index=group_levels, item_col=item_col,
+                                min_reports=min_reports,
+                                min_baseline=min_baseline,
+                                min_baseline_tight=min_baseline_tight,
+                                tight_tolerance=tight_tolerance,
+                                baseline_max_spread=None, _detail=True)
+                        except (ValueError, ZeroDivisionError, KeyError):
+                            ungated = None
+                        if ungated is not None and len(ungated):
+                            uref = ungated.copy()
+                            uref.index = pd.MultiIndex.from_arrays(
+                                [_normalise_join_key(
+                                    uref.index.get_level_values(item_col)),
+                                 _normalise_join_key(
+                                     uref.index.get_level_values('u'))])
+                            uref = uref[~uref.index.duplicated()]
+                            would_have = _valid_factor(
+                                uref.reindex(key)['kg_per_unit'])
+                            refused = np.isnan(kg_item) & ~np.isnan(would_have)
 
     kg_survey = np.full(len(df), np.nan)
     from_survey = np.zeros(len(df), dtype=bool)
@@ -1768,6 +1850,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                         'kg_item_unit': kg_item,
                         'kg_item_n_waves': kg_waves,
                         'kg_item_wave_spread': kg_wave_spread,
+                        'baseline_refused_spread': refused,
                         'kg_unit': kg_unit},
                        index=df.index)
     out.attrs['kg_factor_sources'] = {
@@ -1785,6 +1868,26 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
         'rows_served_by_item_rung': int(served_item.sum()),
         'rows_over_threshold': int(wide.sum()),
         'rows_single_wave': int((served_item & (kg_waves == 1)).sum()),
+    }
+    # The dispersion gate's own ledger.  ``rows_refused`` is a COUNTERFACTUAL
+    # count -- rows the gate cost their own ``(item, unit)`` factor -- and is
+    # NOT a layer: those rows are served by the ladder like any others, by the
+    # u-pooled ``unit`` rung (the factor the library gave every row before
+    # GH #850) or by ``none`` where even that has none.  Counting them as a
+    # sixth layer would double-count them and break the partition; they ride
+    # alongside, exactly as ``reported_implausible`` does on the crop side.
+    # Only rows the item rung could actually have SERVED: a seeded metric
+    # label or a survey kilogram outranks it either way, so the gate cost
+    # those rows nothing.  With this restriction the three counts satisfy
+    # ``rows_refused == refused_to_unit + refused_to_none``, which is the
+    # invariant a reader will check.
+    refused = refused & np.isnan(kg_survey) & np.isnan(kg_metric)
+    out['baseline_refused_spread'] = refused
+    out.attrs['kg_factor_baseline_gate'] = {
+        'baseline_max_spread': baseline_max_spread,
+        'rows_refused': int(refused.sum()),
+        'refused_to_unit': int((refused & (source == 'unit')).sum()),
+        'refused_to_none': int((refused & (source == 'none')).sum()),
     }
     return out
 
@@ -2539,6 +2642,8 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     out.attrs['kg_factor_sources'] = dict(kgf.attrs['kg_factor_sources'])
     out.attrs['kg_factor_wave_spread'] = dict(
         kgf.attrs['kg_factor_wave_spread'])
+    out.attrs['kg_factor_baseline_gate'] = dict(
+        kgf.attrs['kg_factor_baseline_gate'])
     return out
 
 
@@ -2710,6 +2815,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
         v.attrs['kg_factor_sources'] = dict(kgf.attrs['kg_factor_sources'])
         v.attrs['kg_factor_wave_spread'] = dict(
             kgf.attrs['kg_factor_wave_spread'])
+        v.attrs['kg_factor_baseline_gate'] = dict(
+            kgf.attrs['kg_factor_baseline_gate'])
     return v
 
 
