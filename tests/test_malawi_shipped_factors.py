@@ -53,8 +53,12 @@ MALAWI_ = countries_root() / 'Malawi' / '_'
 # Row counts of the two shipped files, and the match rates they produce.
 # Measured cold 2026-09-09 against the v04 release.
 SEASONAL_ROWS, TREE_ROWS = 857, 153
+# Keyed on `crop` (by_variety=False): the varieties must be reduced.
 SEASONAL_KEYS, TREE_KEYS = 291, 84
 SEASONAL_AMBIGUOUS, TREE_AMBIGUOUS = 23, 8
+# Keyed on `crop_variety` (the default): no reduction is needed at all, so the
+# key count is just the unit-matched row count and NOTHING is refused.
+SEASONAL_VARIETY_KEYS, TREE_VARIETY_KEYS = 703, 110
 SEASONAL_UNIT_MATCHED, TREE_UNIT_MATCHED = 703, 110
 # Unit codes the conversion files carry that the harvest module never asks.
 SEASONAL_UNIT_MISSES = ['14', '31A', '31B', '31C', '98']
@@ -261,16 +265,85 @@ class TestMatchRates:
             'North', 'Central', 'Southern'}
 
 
-class TestVarietyCollapse:
-    """The file's crop key is FINER than ours; collapsing it is a reduction."""
+class TestVarietyKey:
+    """The file's crop key is FINER than ours -- so we key on the variety.
 
-    def test_the_disagreeing_keys_are_dropped_and_counted(self, shipped):
+    Keying on the collapsed `crop` forces a reduction and refuses 31 keys
+    (6,890 served rows on Groundnut, Rice and Citrus).  Keying on
+    `crop_variety` -- what EPAR does with `crop_code_long` -- needs no
+    reduction at all.
+    """
+
+    def test_the_default_is_the_variety_key_and_refuses_nothing(self, shipped):
+        assert shipped.attrs['keyed_on'] == 'crop_variety'
+        assert 'crop_variety' in shipped.index.names
+        assert 'crop' not in shipped.index.names
         d = shipped.attrs['loader']
+        assert d['seasonal']['keys_kept'] == SEASONAL_VARIETY_KEYS
+        assert d['tree']['keys_kept'] == TREE_VARIETY_KEYS
+        assert d['seasonal']['keys_dropped_ambiguous'] == []
+        assert d['tree']['keys_dropped_ambiguous'] == []
+        assert len(shipped) == SEASONAL_VARIETY_KEYS + TREE_VARIETY_KEYS
+
+    def test_the_collapsed_key_still_works_and_still_refuses(self, malawi_mod):
+        """`by_variety=False` is the path for a pre-#854 frame."""
+        old = malawi_mod.crop_conversion_factors(by_variety=False)
+        assert old.attrs['keyed_on'] == 'crop'
+        d = old.attrs['loader']
         assert d['seasonal']['keys_kept'] == SEASONAL_KEYS
         assert d['tree']['keys_kept'] == TREE_KEYS
         assert len(d['seasonal']['keys_dropped_ambiguous']) == SEASONAL_AMBIGUOUS
         assert len(d['tree']['keys_dropped_ambiguous']) == TREE_AMBIGUOUS
-        assert len(shipped) == SEASONAL_KEYS + TREE_KEYS
+        assert len(old) == SEASONAL_KEYS + TREE_KEYS
+
+    def test_the_variety_key_never_contradicts_the_collapsed_one(
+            self, malawi_mod, cp, shipped):
+        """Where both can serve a row they must return the SAME factor.
+
+        This is what makes the switch safe: it fills cells the collapsed key
+        had to leave empty and moves no number the collapsed key produced.
+        Measured 2026-09-10: 81,886 rows in common, identical on every one.
+        """
+        old = malawi_mod.crop_conversion_factors(by_variety=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            cpr = malawi_mod.with_region(cp)
+            fv = harvest_kg_factors(cpr, shipped_factors=shipped)
+            fc = harvest_kg_factors(cpr, shipped_factors=old)
+        both = np.isfinite(fv['kg_shipped']) & np.isfinite(fc['kg_shipped'])
+        assert both.sum() > 50_000
+        assert (fv.loc[both, 'kg_shipped'].to_numpy()
+                == fc.loc[both, 'kg_shipped'].to_numpy()).all()
+        gained = int((np.isfinite(fv['kg_shipped'])
+                      & ~np.isfinite(fc['kg_shipped'])).sum())
+        assert gained > 1_000, (
+            f'the variety key gained only {gained} rows; it was adopted '
+            'because it gains ~9,200 (all 31 refused keys)')
+
+    def test_the_withdrawals_are_corrections_not_losses(self, malawi_mod, cp,
+                                                        shipped):
+        """The collapsed rule cannot tell "all agree" from "only one is here".
+
+        The file carries ONE tobacco variety (Burley), so `nunique == 1` kept
+        the key and handed Burley's factor to flue-cured, NNDF, SDF and
+        oriental tobacco.  The variety key withdraws exactly those.
+        """
+        old = malawi_mod.crop_conversion_factors(by_variety=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            cpr = malawi_mod.with_region(cp)
+            fv = harvest_kg_factors(cpr, shipped_factors=shipped)
+            fc = harvest_kg_factors(cpr, shipped_factors=old)
+        lost = (~np.isfinite(fv['kg_shipped'])
+                & np.isfinite(fc['kg_shipped'])).to_numpy()
+        assert 0 < lost.sum() < 1_000
+        crops = set(fc.index.get_level_values('crop')[lost])
+        assert 'Tobacco' in crops, (
+            f'expected the tobacco over-reach among the withdrawals; got {crops}')
+        # The file really does carry only Burley.
+        varieties = set(shipped.index.get_level_values('crop_variety'))
+        tob = {v for v in varieties if str(v).startswith('Tobacco')}
+        assert tob == {'Tobacco Burley'}, tob
 
     def test_nothing_is_averaged(self, malawi_mod):
         """The rule is agreement-or-drop, on a hand-built conflict."""
@@ -391,10 +464,11 @@ class TestAgainstCropProduction:
         not fail this for the wrong reason.
         """
         flat = shipped.reset_index()
-        n = flat.groupby(['crop', 'u', 'region'])['KgFactor'].nunique()
-        blind = (flat.set_index(['crop', 'u', 'region']).loc[n[n == 1].index]
-                 .reset_index().drop_duplicates(['crop', 'u', 'region'])
-                 .set_index(['crop', 'u', 'region'])[['KgFactor', 'Source']])
+        K = ['crop_variety', 'u', 'region']
+        n = flat.groupby(K)['KgFactor'].nunique()
+        blind = (flat.set_index(K).loc[n[n == 1].index]
+                 .reset_index().drop_duplicates(K)
+                 .set_index(K)[['KgFactor', 'Source']])
         assert (n > 1).sum() > 0, (
             'if no key disagreed across conditions the axis would be inert '
             'and this whole measurement would be moot')
@@ -409,16 +483,37 @@ class TestAgainstCropProduction:
             ).attrs['kg_factor_sources']['shipped_matched']
         assert full_matched > 2 * blind_matched, (
             f'condition-keyed match {full_matched:,} vs condition-blind '
-            f'{blind_matched:,}; measured 86,657 vs 36,915 (2.35x) on '
-            '2026-09-09, and the level is justified by that ratio')
+            f'{blind_matched:,}; the level is justified by that ratio '
+            '(86,657 vs 36,915 on the collapsed crop key, 2026-09-09)')
+
+    def test_crop_variety_is_a_column_not_a_level(self, cp):
+        """A function of the crop code splits no key, so it is not a level.
+
+        Putting it in the grain would only widen the index -- and widen the
+        index-shape divergence that already costs Malawi its place in
+        `Feature('crop_production')` (see the class below).
+        """
+        assert 'crop_variety' in cp.columns
+        assert 'crop_variety' not in cp.index.names
+        assert not pd.isna(cp['crop_variety']).any()
 
     def test_the_kilogram_unit_is_a_no_op(self, malawi_mod, cp, shipped):
         """A shipped 'KILOGRAM' factor must be 1, or the screen rejects it."""
         kg = shipped[shipped.index.get_level_values('u') == 'Kilogramme']
         assert len(kg) and (kg['KgFactor'] == 1.0).all()
 
-    def test_harvest_kg_rises_and_nothing_is_clipped(self, malawi_mod, cp,
-                                                     shipped):
+    def test_harvest_kg_rises_overall_and_nothing_is_clipped(
+            self, malawi_mod, cp, shipped):
+        """Overall, not per wave -- and the exception is the point.
+
+        The shipped layer outranks `inferred` and reaches units the inferred
+        parser cannot, so the corpus total must rise.  It does NOT rise in
+        every wave: 2010-11 falls ~0.14% because the variety key WITHDRAWS the
+        tobacco rows the collapsed key was serving Burley's factor to, and the
+        parser cannot read "Bale", so those rows now get nothing rather than a
+        borrowed number.  A per-wave monotone assertion would be asserting the
+        bug.
+        """
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             base = harvest_kg(cp)
@@ -426,9 +521,9 @@ class TestAgainstCropProduction:
                               shipped_factors=shipped)
         b = base.reset_index().groupby('t')['Harvest_kg'].sum()
         s = ship.reset_index().groupby('t')['Harvest_kg'].sum()
-        assert (s >= b).all(), (
-            'the shipped layer outranks `inferred` and covers units the '
-            'inferred machinery cannot, so no wave should lose kilograms')
+        assert float(s.sum()) > float(b.sum())
+        # and no wave may move by an implausible amount in either direction
+        assert ((s / b > 0.95) & (s / b < 1.5)).all(), (s / b).to_dict()
         # The ox-cart factors (388-682 kg) exceed KG_FACTOR_MAX and are
         # REJECTED, not clipped -- counted, and the rows fall through.
         with warnings.catch_warnings():
@@ -441,3 +536,98 @@ class TestAgainstCropProduction:
         assert pd.isna(rejected['kg_shipped']).all(), (
             'a rejected shipped factor must read NaN here, never a clipped '
             'value')
+
+
+class TestSaleSuppressionIsCounted:
+    """"Attach nothing and COUNT IT" has to be code, not prose.
+
+    A number that lives only in `CONTENTS.org` is frozen at the day it was
+    measured and will not move when the data does (GH #854 red-team item 6).
+    """
+
+    def test_the_tally_rides_on_attrs(self, malawi_mod):
+        import pandas as _pd
+        harv = _pd.DataFrame({
+            't': ['2010-11'] * 2,
+            'i': ['h1'] * 2,
+            'plot': ['R1'] * 2,
+            'crop': ['Maize'] * 2,
+            '_crop_code': _pd.array([1, 1], dtype='Int64'),
+            'u': _pd.array(['50 kg Bag'] * 2, dtype='string'),
+            'condition': _pd.array(['shelled', 'unshelled'], dtype='string'),
+            'crop_variety': _pd.array(['Maize Local'] * 2, dtype='string'),
+            'Quantity': _pd.array([10.0, 4.0], dtype='Float64'),
+            'planting_month': _pd.array([11, 11], dtype='Int64'),
+            'harvest_month': _pd.array([6, 6], dtype='Int64'),
+            'intercropped': _pd.array([False, False], dtype='boolean'),
+            'perennial': _pd.array([False, False], dtype='boolean'),
+        })
+        sale = _pd.DataFrame({
+            'i': ['h1'],
+            '_crop_code': _pd.array([1], dtype='Int64'),
+            'u': _pd.array(['50 kg Bag'], dtype='string'),
+            'Quantity_sold': _pd.array([1.5], dtype='Float64'),
+            'Value_sold': _pd.array([2500.0], dtype='Float64'),
+        })
+        with pytest.warns(malawi_mod.SaleAttachmentWarning, match='2,500 MWK'):
+            out = malawi_mod.assemble_crop_production('2010-11', [harv], [sale])
+        tally = out.attrs['sale_suppressed']
+        assert tally == {'wave': '2010-11', 'sales': 1, 'rows': 2,
+                         'value': 2500.0}
+        # and the sale really is on neither row -- not on one of them
+        assert pd.isna(out['Value_sold']).all()
+
+    def test_a_single_condition_plot_crop_still_gets_its_sale(self, malawi_mod):
+        """The gate must not fire on the ordinary case."""
+        import pandas as _pd
+        harv = _pd.DataFrame({
+            't': ['2010-11'], 'i': ['h1'], 'plot': ['R1'], 'crop': ['Maize'],
+            '_crop_code': _pd.array([1], dtype='Int64'),
+            'u': _pd.array(['50 kg Bag'], dtype='string'),
+            'condition': _pd.array(['shelled'], dtype='string'),
+            'crop_variety': _pd.array(['Maize Local'], dtype='string'),
+            'Quantity': _pd.array([10.0], dtype='Float64'),
+            'planting_month': _pd.array([11], dtype='Int64'),
+            'harvest_month': _pd.array([6], dtype='Int64'),
+            'intercropped': _pd.array([False], dtype='boolean'),
+            'perennial': _pd.array([False], dtype='boolean'),
+        })
+        sale = _pd.DataFrame({
+            'i': ['h1'], '_crop_code': _pd.array([1], dtype='Int64'),
+            'u': _pd.array(['50 kg Bag'], dtype='string'),
+            'Quantity_sold': _pd.array([1.5], dtype='Float64'),
+            'Value_sold': _pd.array([2500.0], dtype='Float64'),
+        })
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
+            out = malawi_mod.assemble_crop_production('2010-11', [harv], [sale])
+        assert out['Value_sold'].iloc[0] == 2500.0
+        assert out.attrs['sale_suppressed']['sales'] == 0
+
+
+class TestFeatureExclusionIsRecordedNotAccidental:
+    """`condition` costs Malawi its place in `Feature('crop_production')`.
+
+    That is a FRAMEWORK defect (`crop_production` is not in `index_info`, so
+    `Feature` falls through to the modal-index-shape filter), fixed separately
+    on `fix/feature-canonical-index-crop-production` -- GH #775 / #569.  The
+    level is kept ON PURPOSE: without it the shipped table is refused outright,
+    and Uganda already carries `condition` and is already excluded, so the rule
+    has to be fixed for Uganda regardless.
+
+    This test does not assert the exclusion (that would pin the defect); it
+    asserts the consequence is WRITTEN DOWN, so the next person auditing
+    `Feature('crop_production')` does not read Malawi's absence as a build
+    failure.
+    """
+
+    def test_contents_and_ledger_name_it(self):
+        contents = (MALAWI_ / 'CONTENTS.org').read_text()
+        assert "Feature('crop_production')" in contents
+        assert '131,548' in contents
+        assert 'fix/feature-canonical-index-crop-production' in contents
+        ledger = (countries_root().parent.parent / '.coder' / 'ledger'
+                  / '854-malawi-shipped-factors.md')
+        if ledger.exists():
+            text = ledger.read_text()
+            assert 'modal' in text and '131,548' in text

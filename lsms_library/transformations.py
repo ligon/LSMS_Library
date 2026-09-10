@@ -2505,8 +2505,15 @@ def _survey_median_factors(df, reported, *, min_reports, sentinel=None):
 #: frame still drops the key, warns, and then almost always refuses as
 #: ambiguous.  Without it, Malawi's table (GH #854) could not be joined at
 #: all without renaming a served index level at the call site.
-SHIPPED_FACTOR_JOIN_LEVELS = ('country', 't', 'j', 'crop', 'u', 'condition',
-                              'region')
+#: ``crop_variety`` is the crop at its NATIVE, un-collapsed grain, and it is
+#: here because a shipped table is often keyed FINER than the served crop
+#: label.  Malawi's IHS5 files key on 'MAIZE HYBRID' / 'RICE FAYA' where
+#: ``crop_production.crop`` says 'Maize' / 'Rice', and the varieties disagree
+#: by up to 1.69x; EPAR keys the same merge on ``crop_code_long`` and says so
+#: in capitals.  A table keyed on it joins a frame that carries it and is
+#: refused as ambiguous on one that does not -- which is the right failure.
+SHIPPED_FACTOR_JOIN_LEVELS = ('country', 't', 'j', 'crop', 'crop_variety',
+                              'u', 'condition', 'region')
 
 #: Private stand-in for a NA join key.  ``astype(str)`` would render NaN as the
 #: literal ``'nan'`` and let it collide with a genuine ``'nan'`` label; this
@@ -2784,13 +2791,14 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ONE unit of the row's ``u``) plus an optional ``Source`` string,
         keyed -- as index levels or as columns -- on some subset of
         :data:`SHIPPED_FACTOR_JOIN_LEVELS`
-        ``('country', 't', 'j', 'crop', 'u', 'condition', 'region')``.  The
-        loader decides which levels its table can honestly key on; the join
-        uses those present in BOTH the table and *crop_production*.  ``j``
-        and ``crop`` are both there because the corpus spells the crop level
-        both ways (Uganda/Ethiopia/Tanzania ``j``; Malawi and nine others
-        ``crop``); key the table on whichever name its own country's frame
-        carries.
+        ``('country', 't', 'j', 'crop', 'crop_variety', 'u', 'condition',
+        'region')``.  The loader decides which levels its table can honestly
+        key on; the join uses those present in BOTH the table and
+        *crop_production*.  ``j`` and ``crop`` are both there because the
+        corpus spells the crop level both ways (Uganda/Ethiopia/Tanzania
+        ``j``; Malawi and nine others ``crop``); key the table on whichever
+        name its own country's frame carries.  ``crop_variety`` is the
+        un-collapsed crop, for a table keyed finer than the served label.
 
         NOTHING AUTO-DISCOVERS A COUNTRY'S TABLE, and the result is never
         stored.  The intended call shape, once the loaders of GH #852 / #854

@@ -259,18 +259,124 @@ median 1.0658, range 0.24-1.25. So the library's "a 50 kg bag holds 50 kg"
 under-states the survey's own measurement by ~2% on average and by up to 32%,
 and over-states it by up to 4x on the light tail.
 
+## §6b Red-team round (2026-09-10) — what moved
+
+`slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_854_malawi.org` graded the
+numbers PASS with one FAIL (Feature exclusion, not this branch's to fix) and
+four CONCERNs. Taken here:
+
+### The join now keys on the VARIETY, not the collapsed crop (item 2)
+
+The refusal rule was correct *given the coarse key*, and the red-team measured
+what the coarse key costs: **6,890 served rows**, all on Groundnut, Rice and
+Citrus, with the sole dissenter usually the `OTHER … (SPECIFY)` catch-all —
+and, in four cells, a real split (unshelled paddy in a 50 kg bag: `RICE LOCAL`
+29.04 vs eight improved varieties at 49.00, 1.69×). EPAR keys the same merge
+on `crop_code_long` and says so in capitals.
+
+`crop_production` now carries `crop_variety` (a **column**, never a level — it
+is a function of the crop code and splits no key), decoded through a new
+`harmonize_crop_variety` table, and `crop_conversion_factors(by_variety=True)`
+is the default.
+
+| join key | `shipped_matched` | `shipped` | refused keys |
+|---|---|---|---|
+| `crop` (`by_variety=False`) | 86,657 | 82,018 | 31 |
+| `crop_variety` (default) | **95,906** | **91,267** | **0** |
+
+- +9,249 matched rows; every one of the 31 refused keys resolves; the table
+  needs **no de-duplication at all** (813 rows, zero duplicate keys).
+- **Identical on all 81,886 rows both keys can serve** — so it moves no number
+  the collapsed key already produced.
+- It **withdraws 132 rows**, and that is a correction: agreement-or-drop
+  cannot distinguish "every variety agrees" from "only one variety is in the
+  file", so the collapsed key was serving Tobacco *Burley's* factor to
+  flue-cured / NNDF / SDF / oriental tobacco (118 rows) and one Citrus figure
+  to all three citrus species (5). The file has no factor for those.
+- **The label is not a usable key; the code is.** 12 of 48 seasonal codes are
+  spelled differently across waves (2016-17's colons, 2010-11's `RISE LOCAL`
+  typo and three truncations); a label join loses 13,769 rows to that drift.
+  All 12 are spelling, none is a change of meaning — checked code by code.
+  Perennial labels are stable (0 of 23).
+- Revised `Harvest_kg` vs the no-shipped baseline: 2010-11 **−0.14%**,
+  2013-14 +6.03%, 2016-17 +3.24%, 2019-20 +2.78%; rows out 60,057 → 68,376.
+  2010-11 goes negative because of the tobacco withdrawal — those rows now get
+  nothing rather than a borrowed factor, and the inferred parser cannot read
+  "Bale".
+
+`SHIPPED_FACTOR_JOIN_LEVELS` gains `'crop_variety'`. Second extension to that
+tuple in this PR, and the same justification: a shipped table keyed finer than
+the served label is the normal case, not Malawi's quirk (Ethiopia's
+`Crop_CF_Wave*` will meet it too).
+
+### The sale suppression is counted in code (item 6)
+
+`assemble_crop_production` emits a `SaleAttachmentWarning` naming the sales,
+the candidate rows and the MWK, and stashes the same tally on
+`df.attrs['sale_suppressed']`. Fires exactly once on the current build:
+2010-11, 1 sale, 2,500 MWK, 2 candidate rows. The red-team's point stands and
+is now met — the old number lived only in prose and would not have moved when
+the data did.
+
+### Items 4 and 5
+
+The per-unit cap proposal (`ox-cart: 800` + a floor) is in §7 with the rows it
+moves; the cassava drop is filed as **GH #869** and cited in `CONTENTS.org`
+with the full +2,990 / +385 / +206 decomposition.
+
+### The `Feature('crop_production')` exclusion (item 1b) — recorded, not fixed
+
+Adding `condition` moves Malawi out of the 8-country modal index shape, so
+`Feature.__call__`'s modal-shape filter drops it: **131,548 rows, 81% of the
+assembly**, with a named `UserWarning`. Re-measured on this branch —
+`Feature('crop_production')(['Malawi','Togo','Benin'])` returns 20,619 rows
+and keeps only Benin and Togo. **The level is kept on purpose**: without it
+the shipped table is refused outright, and Uganda already carries `condition`
+and is already excluded, so the rule needs fixing for Uganda regardless. The
+fix is `index_info` + `fabricate_missing_levels` (the `interview_date` /
+`visit` mechanism, GH #506) on branch
+`fix/feature-canonical-index-crop-production`; this branch's merge is held
+until it lands. GH #775 / #569.
+
+### Latent nit taken
+
+`_collapse_varieties` now `dropna(subset=['KgFactor'])` before the groupby:
+`nunique()` skips NaN, so a key holding one NaN and one real factor would have
+read `nunique == 1` and `drop_duplicates` could have kept the NaN row. Both
+shipped files have zero NaN in `conversion`, so it could not fire today.
+
 ## §7 Open questions for the human
 
-1. **`KG_FACTOR_MAX = 250` rejects 12 shipped rows that are probably right,
-   costing 4,639 served rows.** All are ox-carts (Maize 388-682, Sugar Cane
-   610-631, Sweet Potato 365, Irish Potato 358). An ox-cart of maize really
-   does weigh several hundred kilograms, so this is the screen catching a
-   physically plausible container. The cap was NOT touched (it is a
-   cross-country constant tuned on Uganda's mis-keys, and #854 says "count,
-   never clip"). Options for @ligon: raise the cap; make it per-unit; or leave
-   it and accept that ox-cart harvests fall through to `inferred`/`none`.
+1. **A PER-UNIT cap, plus a floor — the concrete proposal, NOT implemented
+   here.** `KG_FACTOR_MAX = 250` rejects 12 shipped factors that are probably
+   right, and they cost **4,639 rows** that land in `none`, *not* `inferred`
+   (the label parser cannot read "Ox-Cart" either, so a rejected shipped
+   ox-cart factor leaves the row with no weight at all).
+   - **Keep 250 as the default; add `_KG_FACTOR_MAX_BY_UNIT` for
+     bulk-transport containers** — `ox-cart: 800`, `cart: 800`,
+     `wheelbarrow: 200` — matched on the same stripped-lower-cased unit text
+     `_KG_UNIT_KEYS` already uses. One lookup inside
+     `_screen_reported_factors`, which already reads the row's unit from `df`.
+     Moves 4,639 rows (Maize 4,452, Sweet Potato 132, Sugar Cane 45, Irish
+     Potato 10) from `none` to `shipped`. Do **not** raise the global cap: it
+     exists to catch a quantity or a calendar year keyed into the factor
+     field, and those live on kg / bag / tin units.
+   - **Add a FLOOR.** The screen has a ceiling and none, and the live instance
+     is in this table: Citrus / Ox-Cart = **18.9 kg**. A 19 kg cartload of
+     oranges is as wrong as 682 is high and passes unremarked. (The variety
+     key withdraws that particular row, but the missing floor is general.)
+   - **The one factor not to defend**: Maize / unshelled / Central = 682.00,
+     15.4 bag-equivalents against its siblings' 8.4–8.8. `ox-cart: 800` admits
+     it; flagging it in `CONTENTS.org` beats picking a cap to exclude one row.
+   - **Gate**: whoever changes the cap must first measure **Uganda's** reported
+     (250, 1000] band — Uganda is the country the cap was tuned on and the
+     red-team pass could not build it. Nigeria was measured: 0 of 19,678
+     non-null reported `KgFactor` rows exceed 250.
+   - The check that these are measurements needs no outside number: each
+     ox-cart factor over the SAME crop/condition/region's 50 kg Bag factor is
+     8.4–9.4 bags for maize and 6.5 for the potatoes. Only 682.00 falls out.
 2. **Cassava is missing from 2016-17 and 2019-20 `crop_production` entirely
-   — a pre-existing defect this task found and did NOT fix.** Those waves'
+   — a pre-existing defect this task found and did NOT fix; now GH #869.** Those waves'
    perennial module codes Cassava as `100` (not `1`), so `_crop_codes`'
    `+1000` yields `1100`, which `harmonize_crop` does not carry, and the rows
    are dropped as "no crop identity". Measured: **2,990 rows** (982 + 90 in

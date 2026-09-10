@@ -223,6 +223,18 @@ Data Scheme:
     # and `harvest_kg(shipped_factors=...)` refuses the table outright.
     index: (t, i, plot, crop, u, condition)
     Quantity: float
+    # crop_variety (GH #854) is the crop at its NATIVE grain -- the Module G/P
+    # value label for the same code `crop` was collapsed from ('Maize Hybrid',
+    # 'Rice Faya', 'Groundnut CG7'; `harmonize_crop_variety` in
+    # categorical_mapping.org).  A COLUMN, not a level: it is functionally
+    # determined by the crop code, so it splits no key.  It exists because the
+    # shipped IHS5 conversion tables key their kg factors on the variety and
+    # the varieties genuinely differ -- unshelled paddy in a 50 kg bag is
+    # 29.04 kg for RICE LOCAL against 49.00 for eight improved varieties.
+    # Joining on the collapsed `crop` refused 31 ambiguous keys carrying 6,890
+    # served rows; keying on this resolves all 31 and agrees with the
+    # collapsed key on every one of the 66,768 rows both can serve.
+    crop_variety: str
     Quantity_sold: float
     Value_sold: float
     planting_month: int

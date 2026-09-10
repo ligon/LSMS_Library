@@ -20,8 +20,20 @@ import pandas as pd
 import numpy as np
 import re
 import sys
+import warnings
 sys.path.append('../../../_/')
 from lsms_library.local_tools import conversion_table_matching_global, format_id, melt_visit_intervals
+
+
+class SaleAttachmentWarning(UserWarning):
+    """A reported household-crop sale that could not be placed on a harvest row.
+
+    Raised by :func:`assemble_crop_production` when a plot-crop is reported in
+    more than one ``condition`` within the same unit: the sale module gives one
+    household-crop-unit total and does not say which state it refers to, so
+    attaching it to both rows would double-count it.  The sale is dropped and
+    the warning names how many and how much -- see GH #854.
+    """
 
 
 def _extract_kg_conversion(series):
@@ -929,6 +941,9 @@ _CONDITION_UNKNOWN = 'unknown_condition'
 
 _CONDITION_TABLE = 'harmonize_crop_condition'
 
+#: Code -> un-collapsed crop VARIETY label; see `categorical_mapping.org`.
+_VARIETY_TABLE = 'harmonize_crop_variety'
+
 
 def _crop_conditions(series):
     """Map a raw ag_g13c (S/U) code Series to the canonical ``condition``.
@@ -981,6 +996,14 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
     plot = df[plotkey].apply(format_id).astype('string')
 
+    # The crop at its NATIVE grain, un-collapsed (GH #854 red-team item 2).
+    # `harmonize_crop` maps codes 1-4 all to 'Maize' and 17-26 all to 'Rice';
+    # the shipped IHS5 conversion tables key their kg factors on the VARIETY,
+    # and the varieties genuinely differ.  Carried as a COLUMN, never an index
+    # level: it is functionally determined by the crop code, so putting it in
+    # the grain would split no key and only widen the index.
+    crop_variety = _map_codes(crop_code_int, _malawi_code_map(_VARIETY_TABLE))
+
     u = (pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
          if unit is not None and unit in df.columns
          else pd.Series(pd.NA, index=df.index, dtype='string'))
@@ -1025,6 +1048,7 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
         'Quantity':       quantity.values,
         'u':              u.values,
         'condition':      crop_condition.values,
+        'crop_variety':   crop_variety.values,
         'planting_month': planting_month.values,
         'harvest_month':  harvest_month.values,
         'intercropped':   intercropped.values,
@@ -1125,6 +1149,10 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     harv = harv.groupby(['i', 'plot', 'crop', 'u', 'condition', '_crop_code'],
                         as_index=False, dropna=False).agg({
         'Quantity':       'sum',
+        # EXACT, not a reduction: `crop_variety` is a function of
+        # `_crop_code`, which is in the key, so every row in a group carries
+        # the same value.
+        'crop_variety':   'first',
         'planting_month': 'first',
         'harvest_month':  'first',
         'intercropped':   'first',
@@ -1172,12 +1200,46 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         harv = harv.merge(nrows, on=['i', '_crop_code', 'u'], how='left')
         harv = harv.merge(sale, on=['i', '_crop_code', 'u'], how='left')
         single = (harv['_nplots'] == 1) & (harv['_nrows'] == 1)
+
+        # "Attach nothing and COUNT IT" -- and the counting has to be code,
+        # not a number frozen in CONTENTS.org that will not move when the data
+        # does (GH #854 red-team item 6).  What is reported is the sales the
+        # NEW `_nrows` clause suppresses that the old single-plot gate would
+        # have attached: those are exactly the household-crop-unit totals that
+        # a condition-split plot-crop would have DOUBLE-counted.
+        suppressed = (harv['_nplots'] == 1) & (harv['_nrows'] > 1) \
+            & harv['Value_sold'].notna()
+        n_rows = int(suppressed.sum())
+        if n_rows:
+            hit = harv.loc[suppressed]
+            # One sale is stamped on each of the `_nrows` rows, so the sale
+            # COUNT is the number of distinct (i, crop, u) totals, not rows.
+            sales = hit.drop_duplicates(['i', '_crop_code', 'u'])
+            amount = float(pd.to_numeric(sales['Value_sold'],
+                                         errors='coerce').sum())
+            tally = {'wave': t, 'sales': int(len(sales)), 'rows': n_rows,
+                     'value': amount}
+            warnings.warn(
+                f"Malawi/crop_production {t}: {len(sales)} household-crop "
+                f"sale(s) totalling {amount:,.0f} MWK were NOT attached to "
+                f"any harvest row, because the plot-crop is reported in more "
+                f"than one `condition` in the same unit ({n_rows} candidate "
+                f"rows).  The sale module records its own quantity and unit "
+                f"but its shelled/unshelled column (ag_i02c) is unwired, so "
+                f"there is nothing to say which harvest row the total belongs "
+                f"to; attaching it to both would double-count it.  Wiring "
+                f"ag_i02c is what lets these attach again.  GH #854.",
+                SaleAttachmentWarning, stacklevel=2)
+        else:
+            tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
+
         harv['Quantity_sold'] = harv['Quantity_sold'].where(single, pd.NA)
         harv['Value_sold'] = harv['Value_sold'].where(single, pd.NA)
         harv = harv.drop(columns=['_nplots', '_nrows'])
     else:
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
+        tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
 
     # The 2026-09-08 RESIDUAL is CLOSED by GH #854.  It read: the defensive
     # collapse at the end of this function keys on (t, i, plot, crop) -- u is
@@ -1208,6 +1270,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     if harv.duplicated(_grain).any():
         harv = harv.groupby(_grain, as_index=False, dropna=False).agg({
             'Quantity':       'sum',
+            'crop_variety':   'first',
             'Quantity_sold':  'first',
             'Value_sold':     'first',
             'planting_month': 'first',
@@ -1217,6 +1280,10 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         })
 
     out = harv.set_index(['t', 'i', 'plot', 'crop'])
+    # Readable by a test without parsing a warning message.  It does NOT
+    # survive to_parquet (attrs are not written), which is why the warning
+    # above exists as well -- the warning is what a build log sees.
+    out.attrs['sale_suppressed'] = tally
     return out
 
 # --- IHS5 crop-side conversion factor tables (GH #854) -------------------
@@ -1363,6 +1430,12 @@ def _collapse_varieties(df, keys, *, source):
     varieties whose factors differ in the last bit are a disagreement, which
     is the conservative direction.
     """
+    # `nunique()` SKIPS NaN, so a key holding one NaN factor and one real one
+    # would read nunique == 1 and `drop_duplicates` could keep the NaN row.
+    # Neither shipped file has a NaN `conversion`, so this cannot fire today
+    # -- it is here so the function stays correct if it is ever pointed at
+    # another table (red-team latent nit, 2026-09-10).
+    df = df.dropna(subset=['KgFactor'])
     g = df.groupby(keys, dropna=False)['KgFactor']
     nunique = g.nunique()
     ok = nunique[nunique == 1].index
@@ -1377,7 +1450,8 @@ def _collapse_varieties(df, keys, *, source):
     return kept
 
 
-def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
+def crop_conversion_factors(*, by_variety=True, seasonal=True, tree=True,
+                            waves=None):
     """Malawi's two SHIPPED IHS5 crop conversion tables, canonicalised.
 
     VINTAGE: both files are **2019-20 (IHS5) artefacts** -- the v04 release of
@@ -1405,13 +1479,35 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
       and fences the join to that wave.  Pass a longer list to fence it to a
       chosen subset.
 
+    KEYED ON THE VARIETY BY DEFAULT (``by_variety=True``).  The files' crop
+    key is a VARIETY -- 'MAIZE HYBRID', 'RICE FAYA', 'GROUNDNUT CG7' -- and
+    ``crop_production.crop`` is the collapsed Preferred Label, so the two
+    grains differ.  Keying on ``crop_variety`` (the un-collapsed column
+    ``_harvest_block`` writes) is both what EPAR does -- "merge m:1 region
+    crop_code_long unit condition ... //NOTE THAT WE MERGE ON CROP_CODE_LONG
+    INTENTIONALLY" -- and measurably better here: it needs no de-duplication
+    at all (813 rows, zero duplicate keys), it serves 6,890 rows the collapsed
+    key had to refuse, and on the 66,768 rows both keys can serve it returns
+    an IDENTICAL factor on every one.
+
+    ``by_variety=False`` returns the collapsed ``crop``-keyed table instead,
+    for a frame built before ``crop_variety` existed.  That path must reduce
+    the varieties, and its rule is agreement-or-drop (see
+    :func:`_collapse_varieties`): 23 seasonal and 8 tree keys are refused,
+    which is 6,890 served rows on Groundnut, Rice and Citrus -- not noise.  It
+    also cannot tell "every variety agrees" from "only one variety is in the
+    file", so it hands Tobacco Burley's factor to flue-cured, NNDF, SDF and
+    oriental tobacco (95 rows); the variety key withdraws those, correctly.
+
     Returns
     -------
     pd.DataFrame
         Columns ``KgFactor`` (kg per ONE unit of the row's ``u``, the same
         meaning ``crop_production.KgFactor`` carries) and ``Source``
         (``'IHS5 seasonal'`` or ``'IHS5 tree'``), indexed on
-        ``(crop, u, condition, region)`` -- plus ``t`` when *waves* is given.
+        ``(crop_variety, u, condition, region)`` -- or on
+        ``(crop, u, condition, region)`` when ``by_variety=False`` -- plus
+        ``t`` when *waves* is given.
         Every one of those is in
         :data:`~lsms_library.transformations.SHIPPED_FACTOR_JOIN_LEVELS`, so
         the frame is ready for
@@ -1450,9 +1546,14 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
     from lsms_library.local_tools import get_dataframe
 
     cmap = _malawi_code_map('harmonize_crop')
+    vmap = _malawi_code_map(_VARIETY_TABLE)
     umap = _malawi_code_map('harmonize_crop_unit')
     diag = {}
     pieces = []
+    # The crop key this table is built on.  `crop_variety` needs no
+    # de-duplication (the files are unique at that grain); `crop` does, and
+    # `_collapse_varieties` is the stated rule for it.
+    cropkey = 'crop_variety' if by_variety else 'crop'
 
     def _units(codes):
         """The file's string unit_code -> our `u` Preferred Label.
@@ -1471,9 +1572,11 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
     if seasonal:
         raw = get_dataframe(_ihs5_cf_path(
             'ihs_seasonalcropconversion_factor_2020.dta'))
+        code = raw['crop_code'].map(_IHS5_SEASONAL_CROPS)
         d = pd.DataFrame({
-            'crop': raw['crop_code'].map(_IHS5_SEASONAL_CROPS).map(
-                lambda c: cmap.get(c) if pd.notna(c) else None),
+            'crop': code.map(lambda c: cmap.get(c) if pd.notna(c) else None),
+            'crop_variety': code.map(
+                lambda c: vmap.get(c) if pd.notna(c) else None),
             'u': _units(raw['unit_code']),
             'condition': raw['condition'].map(_IHS5_CONDITIONS),
             'region': raw['region'].map(_IHS5_REGIONS),
@@ -1481,8 +1584,8 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
         })
         diag['seasonal'] = _match_rates(raw, d, 'crop_code', 'unit_code',
                                         'condition')
-        d = d.dropna(subset=['crop', 'u', 'condition', 'region'])
-        keys = ['crop', 'u', 'condition', 'region']
+        d = d.dropna(subset=[cropkey, 'u', 'condition', 'region'])
+        keys = [cropkey, 'u', 'condition', 'region']
         d = _collapse_varieties(d, keys, source='IHS5 seasonal')
         diag['seasonal']['keys_kept'] = int(len(d))
         diag['seasonal']['keys_dropped_ambiguous'] = d.attrs['dropped_ambiguous']
@@ -1491,9 +1594,11 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
 
     if tree:
         raw = get_dataframe(_ihs5_cf_path('ihs_treeconversion_factor_2020.dta'))
+        code = raw['crop_code'].map(_IHS5_TREE_CROPS)
         d = pd.DataFrame({
-            'crop': raw['crop_code'].map(_IHS5_TREE_CROPS).map(
-                lambda c: cmap.get(c) if pd.notna(c) else None),
+            'crop': code.map(lambda c: cmap.get(c) if pd.notna(c) else None),
+            'crop_variety': code.map(
+                lambda c: vmap.get(c) if pd.notna(c) else None),
             'u': _units(raw['unit_code']),
             # See Notes: a real value, never NA -- it must meet the
             # `unknown_condition` every perennial harvest row carries.
@@ -1502,8 +1607,8 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
             'KgFactor': pd.to_numeric(raw['conversion'], errors='coerce'),
         })
         diag['tree'] = _match_rates(raw, d, 'crop_code', 'unit_code', None)
-        d = d.dropna(subset=['crop', 'u', 'region'])
-        keys = ['crop', 'u', 'condition', 'region']
+        d = d.dropna(subset=[cropkey, 'u', 'region'])
+        keys = [cropkey, 'u', 'condition', 'region']
         d = _collapse_varieties(d, keys, source='IHS5 tree')
         diag['tree']['keys_kept'] = int(len(d))
         diag['tree']['keys_dropped_ambiguous'] = d.attrs['dropped_ambiguous']
@@ -1523,12 +1628,12 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
     # `_shipped_factor_lookup` exists to disbelieve.  Check it here, where the
     # message can name the file, rather than letting the transform raise about
     # a table the caller did not build.
-    dup = out.duplicated(['crop', 'u', 'condition', 'region'], keep=False)
+    dup = out.duplicated([cropkey, 'u', 'condition', 'region'], keep=False)
     if dup.any():
         raise ValueError(
             "The IHS5 seasonal and tree conversion tables collide on "
-            f"{int(dup.sum())} (crop, u, condition, region) key(s): "
-            f"{out.loc[dup, ['crop', 'u', 'condition', 'region']].head().to_dict('records')}. "
+            f"{int(dup.sum())} ({cropkey}, u, condition, region) key(s): "
+            f"{out.loc[dup, [cropkey, 'u', 'condition', 'region']].head().to_dict('records')}. "
             "That is new -- the two files were disjoint on the shipped v04 "
             "release.  Resolve it here, in the loader, with a stated rule; do "
             "not let harvest_kg pick one.")
@@ -1536,12 +1641,13 @@ def crop_conversion_factors(*, seasonal=True, tree=True, waves=None):
     if waves is not None:
         waves = [waves] if isinstance(waves, str) else list(waves)
         out = pd.concat([out.assign(t=w) for w in waves], ignore_index=True)
-        idx = ['t', 'crop', 'u', 'condition', 'region']
+        idx = ['t', cropkey, 'u', 'condition', 'region']
     else:
-        idx = ['crop', 'u', 'condition', 'region']
+        idx = [cropkey, 'u', 'condition', 'region']
 
     out = out.set_index(idx)[['KgFactor', 'Source']]
     out.attrs['loader'] = diag
+    out.attrs['keyed_on'] = cropkey
     out.attrs['vintage'] = '2019-20 (IHS5 v04 release, catalog 3818)'
     return out
 
@@ -1551,6 +1657,7 @@ def _match_rates(raw, mapped, cropcol, unitcol, condcol):
     n = len(raw)
     out = {'rows': n,
            'crop_matched': int(mapped['crop'].notna().sum()),
+           'variety_matched': int(mapped['crop_variety'].notna().sum()),
            'unit_matched': int(mapped['u'].notna().sum()),
            'region_matched': int(mapped['region'].notna().sum()),
            'crop_unmatched_labels': sorted(
