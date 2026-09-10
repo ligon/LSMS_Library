@@ -110,6 +110,11 @@ def test_malawi_food_quantities_kg_total_preserved():
     ~5.9e6 fictitious kilograms.  The move is a REPAIR, and the size of it is
     the argument for the repair.
 
+    2026-09-09, GH #850 (a) + (b): 2.555e6.  Dividing by ``Quantity`` at step
+    2 (the per-unit price the docstring always promised) and estimating a
+    factor per ``(item, unit)`` rather than per unit label.  Malawi's
+    ``Piece`` was one number for 133 food items.
+
     Skips when the Malawi food data isn't available."""
     import warnings as _w
     import lsms_library as ll
@@ -121,4 +126,4 @@ def test_malawi_food_quantities_kg_total_preserved():
         import pytest
         pytest.skip('Malawi food data unavailable')
     total = float(fq.xs('kg', level='u')['Quantity'].sum())
-    assert abs(total - 2.9074e6) / 2.9074e6 < 0.005, f"kg total drifted: {total}"
+    assert abs(total - 2.5545e6) / 2.5545e6 < 0.005, f"kg total drifted: {total}"
