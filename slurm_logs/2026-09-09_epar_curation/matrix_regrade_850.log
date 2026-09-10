@@ -1,0 +1,168 @@
+[matrix] building (full) ...
+  Albania: 6 waves × 11 features
+  Armenia: 1 waves × 2 features
+DVC unavailable for household_roster: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.. Falling back to manual aggregation.
+DVC unavailable for household_roster: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.. Falling back to manual aggregation.
+  Azerbaijan: 1 waves × 7 features
+  Benin: 1 waves × 21 features
+  Burkina_Faso: 3 waves × 23 features
+  Cambodia: 1 waves × 12 features
+  China: 1 waves × 6 features
+  CotedIvoire: 5 waves × 21 features
+  Ethiopia: 5 waves × 24 features
+  EthiopiaRHS: 8 waves × 17 features
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:84: UserWarning: Refusing workspace copy of DVC-tracked file ../1994a/Data/price1234_rev.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  p1 = get_dataframe('../1994a/Data/price1234_rev.tab', convert_categoricals=False)
+  1994a: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1994b: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1995: dropped 1271/1577 rows (unmapped item code or non-positive price)
+  1997: dropped 1019/1577 rows (unmapped item code or non-positive price)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:101: UserWarning: Refusing workspace copy of DVC-tracked file ../2004/Data/rd6_kgpr_Mkt.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  rd6 = get_dataframe('../2004/Data/rd6_kgpr_Mkt.tab', convert_categoricals=False)
+  2004: dropped 12/624 rows (unmapped item code or non-positive price)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/EthiopiaRHS/_/community_prices.py:106: UserWarning: Refusing workspace copy of DVC-tracked file ../2009/Data/price2009.tab (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  p9 = get_dataframe('../2009/Data/price2009.tab', convert_categoricals=False)
+  2009: dropped 67/709 rows (unmapped item code or non-positive price)
+community_prices: 2691 rows, 6 waves, 43 items
+  GhanaLSS: 7 waves × 15 features
+  GhanaSPS: 3 waves × 13 features
+  Guatemala: 1 waves × 11 features
+  Guinea-Bissau: 1 waves × 21 features
+  Guyana: 1 waves × 8 features
+  India: 1 waves × 10 features
+  Iraq: 2 waves × 10 features
+  Kazakhstan: 1 waves × 8 features
+  Kosovo: 1 waves × 9 features
+  Liberia: 1 waves × 10 features
+  Malawi: 5 waves × 25 features
+  Mali: 4 waves × 23 features
+  Nepal: 3 waves × 11 features
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/cluster_features.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/cluster_features.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/cluster_features.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_expenditures.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_expenditures.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_expenditures.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_expenditures.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_prices.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_prices.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_prices.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_prices.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_acquired.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_acquired.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_quantities.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/food_quantities.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/food_quantities.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_quantities.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_roster.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/household_roster.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/household_characteristics.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_characteristics.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_characteristics.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/household_characteristics.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/household_roster.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/household_roster.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/household_roster.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/individual_education.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/individual_education.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/individual_education.parquet still missing after running fallbacks.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/interview_date.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/var/interview_date.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nepal/_/interview_date.parquet'.  Stop.
+Data file /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/interview_date.parquet still missing after running fallbacks.
+  Niger: 4 waves × 22 features
+  Nigeria: 10 waves × 23 features
+  Pakistan: 1 waves × 6 features
+  Panama: 3 waves × 5 features
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+  Peru: 4 waves × 9 features
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1985 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1990 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+no _/ directory for wave /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Peru/1991 -- this wave declares no tables. If this wave is expected to be wired, check for a partial checkout or a failed dvc pull (GH #329).
+  Senegal: 2 waves × 21 features
+  Serbia: 1 waves × 12 features
+  Serbia and Montenegro: 2 waves × 5 features
+  South Africa: 1 waves × 9 features
+  Tajikistan: 4 waves × 10 features
+  Tanzania: 6 waves × 24 features
+  Timor-Leste: 2 waves × 9 features
+  Togo: 1 waves × 22 features
+  Uganda: 8 waves × 27 features
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{996.0, 997.0, 998.0, 999.0}
+2005-06
+2005-06
+2009-10
+2010-11
+2011-12
+2013-14
+2015-16
+2018-19
+2019-20
+2009-10
+2010-11
+2011-12
+2013-14
+2015-16
+2018-19
+2019-20
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+[matrix] snapshot -> /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.coder/coverage/latest.csv (2421 cells)
+[matrix] html     -> /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/bench/results/2026-09-10/matrix.html
+[matrix] tiers: n/a=0, not-asked=6, asked-not-distributed=1, blocked=7, unconfigured=0, undeclared=478, absent=428, declared=0, dropped=38, broken=2, builds=10, sane=1451, blessed=0

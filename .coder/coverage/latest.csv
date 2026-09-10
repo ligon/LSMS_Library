@@ -138,7 +138,7 @@ Benin,crop_production,2018-19,sane,declared,9056,"warn: index_levels_match_schem
 Benin,food_acquired,2018-19,sane,declared,189236,all checks pass
 Benin,food_coping,,undeclared,absent,,not declared by this country for any wave
 Benin,food_expenditures,2018-19,sane,declared,150779,all checks pass
-Benin,food_prices,2018-19,sane,declared,149063,all checks pass
+Benin,food_prices,2018-19,sane,declared,149062,all checks pass
 Benin,food_quantities,2018-19,sane,declared,186362,all checks pass
 Benin,food_security,2018-19,sane,declared,8011,warn: index_levels_match_scheme
 Benin,household_characteristics,2018-19,sane,declared,7991,all checks pass
@@ -441,7 +441,7 @@ Ethiopia,food_expenditures,2018-19,sane,declared,84871,all checks pass
 Ethiopia,food_expenditures,2021-22,sane,declared,74718,all checks pass
 Ethiopia,food_prices,2011-12,sane,declared,18905,all checks pass
 Ethiopia,food_prices,2013-14,sane,declared,32298,all checks pass
-Ethiopia,food_prices,2015-16,sane,declared,52843,all checks pass
+Ethiopia,food_prices,2015-16,sane,declared,52849,all checks pass
 Ethiopia,food_prices,2018-19,sane,declared,84871,all checks pass
 Ethiopia,food_prices,2021-22,sane,declared,74718,all checks pass
 Ethiopia,food_quantities,2011-12,sane,declared,30812,all checks pass
@@ -1089,10 +1089,10 @@ Malawi,community_prices,2013-14,sane,declared,6511,"warn: no_null_index_levels,h
 Malawi,community_prices,2016-17,absent,absent,,source not declared for wave
 Malawi,community_prices,2019-20,sane,declared,36958,"warn: no_null_index_levels,has_household_index"
 Malawi,crop_production,2004-05,absent,absent,,source not declared for wave
-Malawi,crop_production,2010-11,sane,declared,33349,warn: index_levels_match_scheme
-Malawi,crop_production,2013-14,sane,declared,12602,warn: index_levels_match_scheme
-Malawi,crop_production,2016-17,sane,declared,36003,warn: index_levels_match_scheme
-Malawi,crop_production,2019-20,sane,declared,49425,warn: index_levels_match_scheme
+Malawi,crop_production,2010-11,sane,declared,33420,warn: index_levels_match_scheme
+Malawi,crop_production,2013-14,sane,declared,12616,warn: index_levels_match_scheme
+Malawi,crop_production,2016-17,sane,declared,36048,warn: index_levels_match_scheme
+Malawi,crop_production,2019-20,sane,declared,49464,warn: index_levels_match_scheme
 Malawi,food_acquired,2004-05,sane,declared,176193,warn: index_levels_match_scheme
 Malawi,food_acquired,2010-11,sane,declared,198354,warn: index_levels_match_scheme
 Malawi,food_acquired,2013-14,sane,declared,81680,warn: index_levels_match_scheme
@@ -2222,7 +2222,7 @@ Uganda,cluster_features,2018-19,sane,declared,781,warn: has_household_index
 Uganda,cluster_features,2019-20,sane,declared,824,"warn: has_household_index,no_constant_columns"
 Uganda,community_prices,,undeclared,absent,,not declared by this country for any wave
 Uganda,crop_production,2005-06,absent,absent,,source not declared for wave
-Uganda,crop_production,2009-10,sane,declared,25485,"warn: index_levels_match_scheme,no_constant_columns"
+Uganda,crop_production,2009-10,sane,declared,22408,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,crop_production,2010-11,sane,declared,20970,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,crop_production,2011-12,sane,declared,20152,"warn: index_levels_match_scheme,no_constant_columns"
 Uganda,crop_production,2013-14,sane,declared,17585,"warn: index_levels_match_scheme,no_constant_columns"
