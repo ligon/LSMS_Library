@@ -1,0 +1,19 @@
+--- Uganda
+    inference now 199,964 -> after (c) 166,570; Q==1 34.1%; kg self-test old=1.333; >2x 53.5% of 173,021
+--- Malawi
+    inference now 218,059 -> after (c) 201,710; Q==1 28.8%; kg self-test old=2.000; >2x 69.0% of 297,197
+--- Nigeria
+    inference now 138,086 -> after (c) 138,086; Q==1 31.8%; kg self-test old=1.200; >2x 48.7% of 178,224
+--- Ethiopia
+    inference now 92,797 -> after (c) 80,426; Q==1 41.8%; kg self-test old=1.176; >2x 57.7% of 104,631
+--- Tanzania
+    inference now 2,198 -> after (c) 2,198; Q==1 4.6%; kg self-test old=0.865; >2x 92.9% of 3,594
+--- Niger
+    inference now 179,596 -> after (c) 179,596; Q==1 33.9%; kg self-test old=2.000; >2x 74.1% of 216,569
+--- Mali
+    inference now 248,896 -> after (c) 247,326; Q==1 24.6%; kg self-test old=1.818; >2x 69.7% of 298,546
+--- EthiopiaRHS
+    inference now 28,727 -> after (c) 28,727; Q==1 27.4%; kg self-test old=1.000; >2x 62.1% of 39,731
+--- GhanaLSS
+    inference now 844,335 -> after (c) 842,620; Q==1 40.1%; kg self-test old=1.273; >2x 46.6% of 1,436,196
+wrote csvs to /global/scratch/fsa/fc_jevons/ligon/tmp/wt-850-design/slurm_logs/gh850_design
