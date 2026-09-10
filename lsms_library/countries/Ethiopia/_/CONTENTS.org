@@ -1058,8 +1058,97 @@ references to the file: it is held, not wired.  There is no 2021-22
 sidecar because the World Bank did not ship the file for W5; EPAR's
 do-file says so outright (=EPAR_UW_Ethiopia_ESS_W5.do:324=): "Note that
 this file does not exist in the WB W5 download. EPAR borrowed the land
-unit conversion factor file from previous ESS waves." GH #853
-(2026-09-09 EPAR survey) to wire it into =plot_features.Area=.
+unit conversion factor file from previous ESS waves." Wired by GH #853 --
+see the next paragraph.
+
+*Wired 2026-09-09 (GH #853).*  =ethiopia.local_area_unit_factors()= reads
+the table and =plot_features_for_wave= applies it to fields with NO GPS
+measurement whose only area is a farmer estimate in a local unit.  GPS
+stays preferred and is never overridden: *0* previously-non-null =Area=
+values changed.
+
+| wave    | fields gaining Area | Area NaN before -> after | conversions refused |
+|---------+---------------------+--------------------------+---------------------|
+| 2011-12 |                 964 |            5,933 -> 4,969 |                   3 |
+| 2013-14 |               1,152 |            2,485 -> 1,333 |                   0 |
+| 2015-16 |                 135 |            1,072 ->   937 |                   0 |
+| 2018-19 |                  19 |               99 ->    80 |                   0 |
+| 2021-22 |                   0 |              138 ->   138 |                   0 |
+| TOTAL   |               2,270 |            9,727 -> 7,457 |                   3 |
+
+*2021-22 gains nothing and that is the decision, not an oversight.*  The
+WB shipped no file for ESPS-5; EPAR borrows an earlier wave's
+(=W5.do:324=) and we do NOT.  Borrowing would mint a 2021-22 =Area= out
+of a 2018-19 woreda table with nothing in the returned data saying so.
+=local_area_unit_factors('2021-22')= RAISES rather than silently
+serving another wave's numbers.  If we ever borrow, it is a documented
+decision here and a warning at build time -- 135 W5 fields are what it
+would buy.
+
+*Implausibility is counted, never clipped.*  A converted area larger than
+the LARGEST FIELD THAT WAVE ACTUALLY MEASURED BY GPS is REFUSED (=Area=
+stays NaN) and counted -- 3 rows in 2011-12 against a 9.91 ha ceiling, 0
+elsewhere.  Nothing is capped: a capped area is a number nobody reported.
+The ceiling is the wave's own data rather than a magic constant, and it
+is deliberately generous; note the ceiling is itself soft in waves whose
+largest GPS field is implausible (2015-16's is 425.7 ha).
+
+*Coverage is intrinsically partial and the rest is NOT a gap to fill.*
+The table has 259 rows: 206 woredas x 4 local units (Timad 198, Boy 33,
+Senga 18, Kert 10) in 9 regions.  It says nothing about Tilm, Medeb,
+Rope, Ermija or "Other", nor about the woredas it omits.  EPAR fills
+those holes from its own weighted zone / region / national medians of
+=GPS area / reported area= (=W5.do:657-711=); that is imputation from the
+survey's own data, a different and later layer, and it is NOT done here.
+
+*Join on the RAW integer triple =(saq01, saq02, saq03)= x local unit --
+and note EPAR's own join is mis-keyed.*  EPAR pads and concatenates
+region/zone/woreda into hierarchical strings on both sides, but the two
+paddings DISAGREE: their general helper leaves =saq02=/=saq03= unpadded
+(=W5.do:195-225=; zone 1 of region 1 becomes ="011"=) while the
+conversion-file block pads them to two characters (=:325-341=;
+="0101"=).  Their merge matched 1,566 of 14,878 rows and changed 19 field
+sizes -- their own inline counts at =:694-703=.  The raw integer triple
+is the same hierarchy without the collision risk.
+
+*A converted row keeps its NATIVE =AreaUnit=.*  =Area= non-null vs null
+is the record of whether the woreda table could serve the row, and
+='hectares'= continues to mean exactly "this area came from the GPS
+measurement".  That is what the canonical schema asks for
+(=lsms_library/data_info.yml= =plot_features.AreaUnit=: "original survey
+unit before conversion to hectares").
+
+*** =AreaUnit= was <NA> on every non-GPS field until 2026-09-09 (a real defect)
+
+Found while wiring GH #853, whose join is ON that label, and it
+CONTRADICTS what the paragraph above used to claim.  The section said
+"=AreaUnit= carries the native unit name"; measured on the pre-fix build,
+=AreaUnit= was ={'hectares': 122967, <NA>: 9727}= -- i.e. *100% of the
+9,727 non-GPS fields carried nothing at all*, in every wave, since the
+feature landed.
+
+Cause: =harmonize_area_unit= is WAVE-KEYED, so =_harmonize_wave_keyed=
+returns ={(wave, code): label}=, and =plot_features_for_wave= passed that
+tuple-keyed dict straight to =_map_int_codes=, which maps a BARE integer
+code.  Every lookup missed.  The sibling =harmonize_acquire= use two
+lines above slices correctly via a lambda; only the area-unit line did
+not.
+
+Why nothing caught it: the column was still PRESENT (the shape guards
+check presence), and it was 93% populated country-wide because the GPS
+rows carry ='hectares'= -- so the "Silent All-Null Read" guard, which
+fires on a whole column or a whole =t= slice, could not see it either.
+Fixed by slicing the map to the wave.  After the fix the non-GPS fields
+carry =Timad= (3,832 overall), =Square Meters= (1,891), =Boy= (1,484),
+=Other= (1,098), =Senga=, =Hectare=, =Kert=, =Tilm=, =Ermija=, =Rope=,
+=Medeb=.
+
+*Separate, unwired, and named so it is not confused with the above*: of
+the 7,457 fields still without an =Area=, *1,891 report =Square Meters=
+and 216 report =Hectare=* -- METRIC units needing no conversion table at
+all (EPAR does convert them, =W5.do:701-702=).  Deliberately not wired
+here, so #853's "newly converted" count stays attributable to the WB
+woreda table.  See =.coder/ledger/852-ethiopia-shipped-factors.md= §6 Q3.
 
 ** W1 missing soil; wave-keyed Tenure
 
@@ -1488,7 +1577,6 @@ codes 5/13/15 and we do not -- we serve what the file says.
 per-(unit, region) mean across crops -- their own comment calls that "a
 rough estimate ... when the crop code is unknown".  Everything after the
 =fillin= is imputation; this loader reads the RAW table rows only.
-
 
 Wave 5's file has a known duplicate row that a loader must handle
 deliberately: crop 74, unit 62, with two factors, 4.34 and 6.125.

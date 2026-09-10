@@ -30,6 +30,7 @@ colmap = dict(
     field_id   = 'field_id',
     area_gps   = 'pp_s3q05_a',
     area_unit  = 'pp_s3q02_c',
+    area_est   = 'pp_s3q02_a',   # farmer-estimate area VALUE (GH #853)
     acquire    = 'pp_s2q03',
     soil_type  = 'pp_s2q14',
     irrigated  = 'pp_s3q12',

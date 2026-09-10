@@ -84,6 +84,14 @@ Data Scheme:
     # Latitude/Longitude deferred: source GPS 100% '**CONFIDENTIAL**'.
     # TenureSystem always NaN: ESS has no land-tenure-regime analogue.
     index: (t, i, plot_id)
+    # Area is GPS square-metres -> hectares wherever the survey measured a
+    # field.  Where it did not, the farmer's estimate in a LOCAL unit is
+    # converted through the WB's shipped woreda x local-unit table
+    # (ET_local_area_unit_conversion.dta; GH #853) -- 2,270 fields, and
+    # never overriding a GPS measurement.  A converted row keeps its NATIVE
+    # AreaUnit, so 'hectares' means exactly "GPS-measured" and a non-null
+    # Area on a native unit means "the woreda table served this row".
+    # 2021-22 ships no such table and we do NOT borrow an earlier wave's.
     Area: float
     AreaUnit: str
     Tenure: str

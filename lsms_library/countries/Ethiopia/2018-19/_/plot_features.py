@@ -27,6 +27,7 @@ colmap = dict(
     field_id   = 'field_id',
     area_gps   = 's3q08',    # GPS-measured field area, square metres
     area_unit  = 's3q02b',   # farmer-estimate area unit code
+    area_est   = 's3q02a',   # farmer-estimate area VALUE (GH #853)
     acquire    = 's2q05',    # how acquired -> Tenure
     soil_type  = 's2q16',
     irrigated  = 's3q17',    # 1 Yes / 2 No

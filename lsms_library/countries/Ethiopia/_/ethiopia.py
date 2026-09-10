@@ -618,6 +618,205 @@ def _yesno_bool_col(df, col, yes, no):
     return out
 
 
+# ---------------------------------------------------------------------------
+# WB-shipped local AREA-unit conversion (GH #853)
+# ---------------------------------------------------------------------------
+
+#: The WB local-area-unit conversion file, shipped in four of five wave
+#: directories under this one name.  **2021-22 has no sidecar because the
+#: World Bank shipped no such file for ESPS-5** -- EPAR's do-file says so
+#: outright (`EPAR_UW_Ethiopia_ESS_W5.do:324`: "this file does not exist in
+#: the WB W5 download.  EPAR borrowed the land unit conversion factor file
+#: from previous ESS waves").  **We do NOT borrow.**  Borrowing would mint a
+#: 2021-22 `Area` out of a 2018-19 woreda table with nothing in the returned
+#: data saying so; GH #853 "What it must NOT do" forbids exactly that.  W5's
+#: local-unit plots keep `Area` NaN and `AreaUnit` = the native unit name.
+#:
+#: The four sidecars carry three distinct md5s but the SAME 259 rows: the
+#: differences are Stata storage types (`local_unit`/`conversion` int8+float64
+#: in W1/W2, float32 in W3/W4), not content.  Measured 2026-09-09.
+LOCAL_AREA_UNIT_FILE = 'ET_local_area_unit_conversion.dta'
+LOCAL_AREA_UNIT_WAVES = ('2011-12', '2013-14', '2015-16', '2018-19')
+
+
+def local_area_unit_factors(waves=None):
+    """Square metres per LOCAL AREA UNIT, by woreda (WB shipped table).
+
+    ANALYST-CALLABLE, and also the table
+    :func:`plot_features_for_wave` consumes to fill ``Area`` for a field
+    reported only as a farmer estimate in a local unit.
+
+    Parameters
+    ----------
+    waves : str or iterable of str, optional
+        Default: every wave that SHIPS the file
+        (:data:`LOCAL_AREA_UNIT_WAVES`).  Naming 2021-22 raises -- see
+        :data:`LOCAL_AREA_UNIT_FILE` for why we do not borrow.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed by ``(t, region, zone, woreda, AreaUnit)`` -- the first three
+        being the survey's own numeric ``saq01`` / ``saq02`` / ``saq03``
+        codes -- with columns ``SqmPerUnit`` (float) and ``Source``.
+
+    Notes
+    -----
+    **Join on the raw integer hierarchy, not on EPAR's string keys.**  EPAR
+    pads and concatenates ``region``/``zone``/``woreda`` into hierarchical
+    strings on both sides (`W5.do:325-341` for the conversion file, `:195-225`
+    for everything else) -- and the two paddings DISAGREE: the general helper
+    leaves ``saq02``/``saq03`` unpadded (zone 1 in region 1 becomes ``"011"``)
+    while the conversion-file block pads them to two characters
+    (``"0101"``).  Their own merge therefore matched 1,566 of 14,878 rows and
+    changed 19 field sizes (`W5.do:694-703`, EPAR's own inline counts).  The
+    raw ``(region, zone, woreda)`` integer triple is the same hierarchy
+    without the collision risk, and is what this loader and
+    :func:`plot_features_for_wave` use.
+
+    **Coverage is intrinsically partial.**  The table has 259 rows covering
+    206 woredas x 4 local units (Timad 198, Boy 33, Senga 18, Kert 10) in 9
+    regions.  It says nothing about Tilm, Medeb, Rope, Ermija or "Other", and
+    nothing about the woredas it omits.  A field in an uncovered
+    (woreda, unit) cell keeps ``Area`` NaN -- that is the correct answer, not
+    a gap to be filled by a median.  EPAR fills those holes from its own
+    weighted zone / region / national medians of ``GPS area / reported
+    area`` (`W5.do:657-711`); that is imputation from the survey's own data,
+    a different and later layer, and it is deliberately NOT done here.
+    """
+    if waves is None:
+        waves = list(LOCAL_AREA_UNIT_WAVES)
+    elif isinstance(waves, str):
+        waves = [waves]
+    else:
+        waves = list(waves)
+    missing = [w for w in waves if w not in LOCAL_AREA_UNIT_WAVES]
+    if missing:
+        raise ValueError(
+            f"Ethiopia ships no {LOCAL_AREA_UNIT_FILE} for wave(s) {missing}; "
+            f"the file exists only for {list(LOCAL_AREA_UNIT_WAVES)}.  The "
+            "World Bank shipped none for 2021-22 (ESPS-5).  Borrowing an "
+            "earlier wave's woreda table into that wave is a documented "
+            "decision, not a default -- GH #853.")
+
+    unit_map = _harmonize_wave_keyed('harmonize_area_unit')
+    pieces = []
+    for t in waves:
+        raw = get_dataframe(f'Ethiopia/{t}/Data/{LOCAL_AREA_UNIT_FILE}',
+                            convert_categoricals=False)
+        df = pd.DataFrame({
+            't': t,
+            'region': pd.to_numeric(raw['region'], errors='coerce').astype('Int64'),
+            'zone': pd.to_numeric(raw['zone'], errors='coerce').astype('Int64'),
+            'woreda': pd.to_numeric(raw['woreda'], errors='coerce').astype('Int64'),
+            'SqmPerUnit': pd.to_numeric(raw['conversion'], errors='coerce'),
+        })
+        # Decode the local-unit code through the SAME wave-keyed table
+        # plot_features uses for AreaUnit, so the two sides speak one
+        # vocabulary by construction rather than by coincidence.  (The
+        # file's own Stata value labels agree -- Timad / Boy / Senga / Kert
+        # -- but agreeing is not the same as being the same table.)
+        code = pd.to_numeric(raw['local_unit'], errors='coerce').astype('Int64')
+        df['AreaUnit'] = code.map(
+            lambda x: unit_map.get((t, int(x))) if pd.notna(x) else pd.NA
+        ).astype('string').values
+        df['Source'] = f'WB ET_local_area_unit_conversion ({t})'
+        pieces.append(df)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out = out[np.isfinite(out['SqmPerUnit']) & (out['SqmPerUnit'] > 0)]
+    idx = ['t', 'region', 'zone', 'woreda', 'AreaUnit']
+    out = out.dropna(subset=idx)
+    dup = out.duplicated(subset=idx, keep=False)
+    if dup.any():
+        raise ValueError(
+            f"Ethiopia local_area_unit_factors: {int(dup.sum())} row(s) are "
+            f"duplicated on {idx}: e.g. "
+            f"{out[dup].head().to_dict('records')}.  A woreda cannot have two "
+            "sizes for one local unit; resolve it here with a stated rule "
+            "rather than letting a merge fan the plot rows out.")
+    return out.set_index(idx)[['SqmPerUnit', 'Source']].sort_index()
+
+
+def _convert_local_area_units(t, field, colmap, area_ha, native_unit):
+    """Fill ``Area`` from the WB woreda table where no GPS area exists.
+
+    Returns ``(area_ha, n_converted, n_rejected)``.  GPS stays preferred: a
+    row that already carries a GPS-measured area is never touched, per GH
+    #853 ("Never override a GPS-measured Area with a local-unit
+    conversion").
+
+    IMPLAUSIBILITY IS COUNTED, NEVER CLIPPED -- the rule
+    :func:`transformations._screen_reported_factors` follows for reported kg
+    factors, and GH #853's own "What it must NOT do".  A converted area
+    larger than the LARGEST FIELD THIS WAVE ACTUALLY MEASURED BY GPS is
+    refused (``Area`` stays NaN) and counted; it is never served at a capped
+    value, because a capped area is a number no one reported.  The ceiling is
+    the wave's own data rather than a magic constant, and it is deliberately
+    generous -- it screens the arithmetic blow-ups, not the merely large.
+    """
+    c = colmap
+    est_col = c.get('area_est')
+    if not est_col or est_col not in field.columns:
+        return area_ha, 0, 0
+    if t not in LOCAL_AREA_UNIT_WAVES:
+        # 2021-22: the WB shipped no table and we do not borrow one.
+        return area_ha, 0, 0
+
+    geo = {k: c.get(k, d) for k, d in
+           (('region', 'saq01'), ('zone', 'saq02'), ('woreda', 'saq03'))}
+    if any(v not in field.columns for v in geo.values()):
+        return area_ha, 0, 0
+
+    est = pd.to_numeric(field[est_col], errors='coerce')
+    target = area_ha.isna().to_numpy() & (est > 0).fillna(False).to_numpy() \
+        & native_unit.notna().to_numpy()
+    if not target.any():
+        return area_ha, 0, 0
+
+    factors = local_area_unit_factors([t]).reset_index()
+    probe = pd.DataFrame({
+        'region': pd.to_numeric(field[geo['region']], errors='coerce').astype('Int64'),
+        'zone': pd.to_numeric(field[geo['zone']], errors='coerce').astype('Int64'),
+        'woreda': pd.to_numeric(field[geo['woreda']], errors='coerce').astype('Int64'),
+        'AreaUnit': native_unit.astype('string').values,
+        '_est': est.values,
+        '_pos': np.arange(len(field)),
+    })[target]
+    merged = probe.merge(factors[['region', 'zone', 'woreda', 'AreaUnit',
+                                  'SqmPerUnit']],
+                         on=['region', 'zone', 'woreda', 'AreaUnit'],
+                         how='left')
+    assert len(merged) == len(probe), (
+        'local area-unit merge fanned rows out -- the factor table is not '
+        'unique on (region, zone, woreda, AreaUnit)')
+    converted = merged['_est'] * merged['SqmPerUnit'] / 10000.0
+
+    gps_ha = pd.to_numeric(field[c['area_gps']], errors='coerce') / 10000.0
+    ceiling = gps_ha[gps_ha > 0].max()
+    bad = (converted > ceiling).fillna(False) if pd.notna(ceiling) \
+        else pd.Series(False, index=converted.index)
+    n_rejected = int(bad.sum())
+    ok = converted.notna() & ~bad
+
+    out = area_ha.copy()
+    pos = merged.loc[ok, '_pos'].to_numpy()
+    out.iloc[pos] = converted[ok].to_numpy()
+    n_converted = int(ok.sum())
+
+    if n_rejected:
+        warnings.warn(
+            f"Ethiopia {t} plot_features: {n_rejected} of "
+            f"{int(converted.notna().sum())} local-unit area conversion(s) "
+            f"exceed the wave's largest GPS-measured field ({ceiling:.2f} ha) "
+            "and are REFUSED -- Area stays NaN for those fields.  Nothing was "
+            "clipped: a capped area is a number nobody reported.  Read this "
+            "as a work queue on the farmer-estimate column and the woreda "
+            "factor, not as a nuisance (GH #853).",
+            UserWarning, stacklevel=3)
+    return out, n_converted, n_rejected
+
+
 def plot_features_for_wave(t, sect2, sect3, colmap):
     """Build canonical ``plot_features`` for one Ethiopia ESS wave.
 
@@ -655,6 +854,15 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
                           for ``erosion`` (default 1 / 2; W1-W3 flip to
                           2 / 1).
 
+        Optional keys for the GH #853 local-area-unit conversion (skipped
+        entirely when ``area_est`` is absent):
+            area_est    — sect3 farmer-estimate AREA VALUE column
+                          (``pp_s3q02_a`` W1-W3, ``s3q02a`` W4-W5), the
+                          quantity whose unit ``area_unit`` names.
+            region / zone / woreda — the geography columns the WB woreda
+                          factor table keys on (default ``saq01`` /
+                          ``saq02`` / ``saq03``).
+
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
@@ -665,6 +873,13 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
         (nullable bool, reported erosion-control structure), ``Certificate``
         (nullable bool, parcel has a land-use certificate).  GPS
         Latitude / Longitude are NOT emitted (source 100% redacted).
+
+    ``Area`` is the GPS-measured field area in hectares wherever the survey
+    measured one -- GPS is ALWAYS preferred.  Where it did not and the
+    farmer's estimate is in a local unit the WB's woreda table covers, the
+    estimate is converted (GH #853; see :func:`_convert_local_area_units`).
+    Where neither is available ``Area`` stays NaN and ``AreaUnit`` carries
+    the native unit name.
     """
     c = colmap
     acquire_map = _harmonize_wave_keyed('harmonize_acquire')
@@ -705,12 +920,36 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
 
     # AreaUnit: 'hectares' where GPS area is present; otherwise the
     # native farmer-estimate unit name (Area stays NaN there).
-    native_unit = _map_int_codes(field[c['area_unit']], area_unit_map) \
+    # `harmonize_area_unit` is WAVE-KEYED, so `_harmonize_wave_keyed` hands
+    # back {(wave, code): label} -- slice it to THIS wave before mapping bare
+    # codes through it.  Until 2026-09-09 this line passed the tuple-keyed
+    # dict straight to `_map_int_codes`, which maps a bare int, so EVERY
+    # lookup missed and `AreaUnit` was <NA> on 100% of the 9,727 non-GPS
+    # fields -- silently, because the column was still "present".  That
+    # contradicted `Ethiopia/_/CONTENTS.org` ("AreaUnit carries the native
+    # unit name"), which had never actually been true.  Found while wiring
+    # GH #853, whose conversion joins ON this label.  Compare the sibling
+    # `harmonize_acquire` use above, which slices correctly via a lambda.
+    _wave_area_units = {code: lab for (wave, code), lab in area_unit_map.items()
+                        if wave == t}
+    native_unit = _map_int_codes(field[c['area_unit']], _wave_area_units) \
         if c.get('area_unit') and c['area_unit'] in field.columns \
         else pd.Series(pd.NA, index=field.index, dtype='string')
     area_unit = pd.Series(pd.NA, index=field.index, dtype='string')
     area_unit = area_unit.where(area_ha.isna(), PLOT_AREA_UNIT_HA)
     area_unit = area_unit.where(area_ha.notna(), native_unit)
+
+    # GH #853: fill Area for fields with NO GPS measurement whose only area
+    # is a farmer estimate in a local unit, using the WB's shipped
+    # woreda x local-unit table.  Deliberately AFTER `area_unit` is fixed:
+    # `AreaUnit` keeps the NATIVE unit name on a converted row, which is what
+    # the canonical schema asks for ("original survey unit before conversion
+    # to hectares", lsms_library/data_info.yml plot_features.AreaUnit) and
+    # which makes `Area` non-null vs null the record of whether the woreda
+    # table could serve the row.  'hectares' therefore continues to mean
+    # exactly "this area came from the GPS measurement".
+    area_ha, _n_conv, _n_rej = _convert_local_area_units(
+        t, field, c, area_ha, native_unit)
 
     # Irrigated: 1=Yes, 2=No.
     irr = pd.to_numeric(field[c['irrigated']], errors='coerce').astype('Int64')

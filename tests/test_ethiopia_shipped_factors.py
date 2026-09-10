@@ -7,20 +7,23 @@ Two loaders in ``lsms_library/countries/Ethiopia/_/ethiopia.py``:
   to ``transformations.harvest_kg(cp, shipped_factors=...)``.  It is
   ANALYST-CALLABLE and never stored -- ``crop_production``'s parquet is
   byte-identical with and without it.
-(GH #853's area-unit loader lands in the companion commit and adds its own
-tests to this file.)
+* :func:`ethiopia.local_area_unit_factors` reads
+  ``ET_local_area_unit_conversion.dta`` (woreda x local unit -> square metres)
+  and is consumed by ``plot_features_for_wave`` to fill ``Area`` for a field
+  reported only as a farmer estimate in a local unit.
 
-Three properties carry the loader and are pinned below:
+Four properties carry both loaders and are pinned below:
 
 * the two AMBIGUITIES are resolved HERE, by stated rule, because
   ``_shipped_factor_lookup`` refuses an ambiguous table: the WB's own crop-74
   / unit-62 duplicate (keep 4.34) and the decode collision our own
   ``harmonize_crop`` creates (KALE 56 + SPINACH 69 -> 'Leafy Greens', dropped);
 * a wave with NO shipped file is REFUSED, never given another wave's numbers
-  -- 2011-12 has no ``Crop_CF`` sidecar at all;
+  -- 2011-12 for the crop table, 2021-22 for the area table;
 * codes are decoded through the SAME tables the wave scripts use, so ``j`` and
   ``u`` speak the frame's vocabulary; the match rate is measured, not assumed
   (a mismatch matches nothing, silently);
+* an implausible converted area is COUNTED and REFUSED, never clipped.
 """
 from __future__ import annotations
 
@@ -73,6 +76,9 @@ def test_wave_file_maps_name_the_waves_that_actually_ship_a_file(ethiopia):
     assert set(ethiopia.CROP_CF_FILES) == {"2013-14", "2015-16", "2018-19",
                                            "2021-22"}
     assert "2011-12" not in ethiopia.CROP_CF_FILES
+    assert ethiopia.LOCAL_AREA_UNIT_WAVES == ("2011-12", "2013-14", "2015-16",
+                                              "2018-19")
+    assert "2021-22" not in ethiopia.LOCAL_AREA_UNIT_WAVES
 
 
 def test_w4_and_w5_are_two_names_for_one_blob(ethiopia):
@@ -103,6 +109,12 @@ def test_the_duplicate_rule_is_the_wave5_row_and_keeps_434(ethiopia):
 def test_no_crop_file_for_2011_12_raises(ethiopia):
     with pytest.raises(ValueError, match="no WB crop-conversion file"):
         ethiopia.crop_conversion_factors("2011-12")
+
+
+def test_no_area_file_for_2021_22_raises(ethiopia):
+    """The default is NOT to borrow -- EPAR does; a borrow would be a decision."""
+    with pytest.raises(ValueError, match="ships no ET_local_area_unit"):
+        ethiopia.local_area_unit_factors("2021-22")
 
 
 def test_region_columns_cover_the_files_wide_layout(ethiopia):
@@ -208,6 +220,34 @@ def test_the_unit_label_match_rate_is_pinned(ethiopia):
 
 
 # ---------------------------------------------------------------------------
+# The area-unit loader
+# ---------------------------------------------------------------------------
+
+@pytest.mark.requires_s3
+def test_area_factor_table_is_keyed_on_the_raw_geography_triple(ethiopia):
+    """EPAR's padded string keys disagree across their own two sides; ours don't."""
+    df = ethiopia.local_area_unit_factors()
+    assert list(df.index.names) == ["t", "region", "zone", "woreda", "AreaUnit"]
+    assert df.index.is_unique
+    assert list(df.columns) == ["SqmPerUnit", "Source"]
+    assert (df["SqmPerUnit"] > 0).all()
+    # The four sidecars carry the SAME 259 rows; only Stata storage differs.
+    per_wave = df.groupby(level="t").size()
+    assert per_wave.nunique() == 1, per_wave.to_dict()
+    assert set(df.index.get_level_values("AreaUnit")) == {
+        "Timad", "Boy", "Senga", "Kert"}
+
+
+@pytest.mark.requires_s3
+def test_area_unit_labels_join_the_plot_features_vocabulary(ethiopia):
+    """The factor table's AreaUnit must be the label plot_features emits."""
+    unit_map = ethiopia._harmonize_wave_keyed("harmonize_area_unit")
+    labels = {v for k, v in unit_map.items()}
+    df = ethiopia.local_area_unit_factors()
+    assert set(df.index.get_level_values("AreaUnit")) <= labels
+
+
+# ---------------------------------------------------------------------------
 # yield_kg pass-through
 # ---------------------------------------------------------------------------
 
@@ -304,3 +344,45 @@ def test_shipped_and_inferred_agree_where_both_exist(ethiopia):
     ratio = (fa.loc[both, "kg_shipped"] / fa.loc[both, "kg_inferred"]).astype(float)
     assert float(ratio.median()) == pytest.approx(1.0, abs=1e-6)
     assert float(((ratio < 0.5) | (ratio > 2)).mean()) == 0.0
+
+
+@pytest.mark.requires_s3
+def test_plot_features_area_is_filled_from_the_woreda_table(ethiopia):
+    """GH #853: 2,270 fields gain an Area; GPS rows are untouched; W5 gains none."""
+    import lsms_library as ll
+
+    pf = ll.Country("Ethiopia").plot_features()
+    assert len(pf) == 132_694
+    t = pf.index.get_level_values("t")
+    null_by_wave = {w: int(pf.loc[t == w, "Area"].isna().sum())
+                    for w in sorted(set(t))}
+    assert null_by_wave == {"2011-12": 4_969, "2013-14": 1_333,
+                            "2015-16": 937, "2018-19": 80, "2021-22": 138}
+    # A converted row keeps the NATIVE unit name -- 'hectares' still means
+    # exactly "this came from the GPS measurement" (data_info.yml: AreaUnit is
+    # "original survey unit before conversion to hectares").
+    converted = pf[pf["Area"].notna() & (pf["AreaUnit"] != "hectares")]
+    assert len(converted) == 2_270
+    assert set(converted["AreaUnit"]) == {"Timad", "Boy", "Senga", "Kert"}
+    # 2021-22 has no shipped table and we do not borrow one.
+    w5 = pf.loc[t == "2021-22"]
+    assert not (w5["Area"].notna() & (w5["AreaUnit"] != "hectares")).any()
+
+
+@pytest.mark.requires_s3
+def test_area_unit_carries_the_native_label_on_unconverted_rows(ethiopia):
+    """Pre-2026-09-09 this column was <NA> on 100% of non-GPS fields.
+
+    ``harmonize_area_unit`` is wave-keyed, so ``_harmonize_wave_keyed`` returns
+    ``{(wave, code): label}``; ``plot_features_for_wave`` passed that straight
+    to ``_map_int_codes``, which maps a BARE code, so every lookup missed.
+    ``Ethiopia/_/CONTENTS.org`` claimed the opposite and had never been right.
+    """
+    import lsms_library as ll
+
+    pf = ll.Country("Ethiopia").plot_features()
+    unconverted = pf[pf["Area"].isna()]
+    assert len(unconverted) == 7_457
+    assert float(unconverted["AreaUnit"].notna().mean()) > 0.9
+    assert {"Timad", "Other", "Square Meters", "Hectare"} <= set(
+        unconverted["AreaUnit"].dropna())
