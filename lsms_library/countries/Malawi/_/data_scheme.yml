@@ -179,7 +179,7 @@ Data Scheme:
     AnyInadequate: bool
     materialize: make
   crop_production:
-    # Item-level (t, i, plot, crop) harvest feature for the four IHS3+
+    # Item-level (t, i, plot_id, crop) harvest feature for the four IHS3+
     # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 1.  Reported
     # values only -- harvest Quantity + native unit, household-crop sale
     # (Quantity_sold / Value_sold, attached to single-plot crops only),
@@ -213,7 +213,7 @@ Data Scheme:
     #
     # The four wave scripts have passed `condition='ag_g13c'` into
     # `_harvest_block` since GAP 1 and the parameter DISCARDED it; #854 wired
-    # it.  It splits a (t, i, plot, crop, u) key on only 7 of 112,691 Module-G
+    # it.  It splits a (t, i, plot_id, crop, u) key on only 7 of 112,691 Module-G
     # rows (all 2010-11) -- which is not why it is a level.  It is a level
     # because a shelled and an unshelled kilogram are not the same kilogram:
     # Quantities in different conditions must not be summed without a
@@ -221,7 +221,7 @@ Data Scheme:
     # issue (malawi.crop_conversion_factors) key their kg factors ON this
     # axis, so without it their shelled and unshelled factors are ambiguous
     # and `harvest_kg(shipped_factors=...)` refuses the table outright.
-    index: (t, i, plot, crop, u, condition)
+    index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     # crop_variety (GH #854) is the crop at its NATIVE grain -- the Module G/P
     # value label for the same code `crop` was collapsed from ('Maize Hybrid',
@@ -243,7 +243,7 @@ Data Scheme:
     perennial: bool
     materialize: make
   plot_inputs:
-    # Item-level (t, i, plot, input, crop, u) agricultural-input feature
+    # Item-level (t, i, plot_id, input, crop, u) agricultural-input feature
     # for the four IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20);
     # GAP 2.  One reported row per input applied to a plot.  Sources:
     # Module D (ag_mod_d) -- inorganic fertilizer in two slots (type +
@@ -267,7 +267,7 @@ Data Scheme:
     # inorganic/organic/pesticide any-flags) are transformations, NOT
     # stored columns.  2004-05 (IHS2) deferred: household-level aggregated
     # ag file, no plot-input roster.  See _/malawi.py:assemble_plot_inputs.
-    index: (t, i, plot, input, crop, u)
+    index: (t, i, plot_id, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
@@ -336,7 +336,7 @@ Data Scheme:
     Sex: str
     materialize: make
   plot_labor:
-    # Item-level (t, i, plot, source) plot-labor feature for the four
+    # Item-level (t, i, plot_id, source) plot-labor feature for the four
     # IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 3 (plot
     # grain).  One REPORTED row per labor source applied to a plot, with
     # source in {family, hired, other} on the harmonize_labor_source
@@ -358,7 +358,7 @@ Data Scheme:
     # The WB total_labor_days (sum ACROSS sources), the per-source HH-level
     # rollups, and hired_labor_value (median-wage valuation) are ALL
     # transformations, NEVER stored columns here.  Plot grain aligns with
-    # crop_production / plot_inputs (join on (t, i, plot)).  Variable layout
+    # crop_production / plot_inputs (join on (t, i, plot_id)).  Variable layout
     # differs by questionnaire generation: IHS3/IHPS-2013 (2010-11, 2013-14)
     # use the ag_d47{a,c,e}/d48 hired layout + ag_d4{2,3,4}{b/c,f/g,j/k,n/o}
     # family slots; IHS4/IHS5 (2016-17, 2019-20) use ag_d47{a1,a2,a3}/d48
@@ -367,7 +367,7 @@ Data Scheme:
     # those halves carry no `other` rows (reported, not faked).  2004-05
     # (IHS2) is DEFERRED (household-level aggregated ag file, no plot-labor
     # roster).  See _/malawi.py:_plot_labor_block / assemble_plot_labor.
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make

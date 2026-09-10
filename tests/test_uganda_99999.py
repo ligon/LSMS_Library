@@ -368,7 +368,7 @@ def test_2009_10_no_99999_quantity_sentinel_remains(uganda_module, in_2009_10_wa
     # filter is genuinely value-blind, not merely "the Unknown/unknown_
     # condition rows happen to go".
     idx = df.reset_index()
-    still_present = ((idx['i'] == '4163000709') & (idx['plot'] == '4163000709-1-3')).sum()
+    still_present = ((idx['i'] == '4163000709') & (idx['plot_id'] == '4163000709-1-3')).sum()
     assert still_present == 0, (
         "the fully-populated sentinel row (Plastic Basin/dried_grain) "
         "should have been dropped along with the blank ones"

@@ -39,7 +39,7 @@ plot = field.astype(str) + '_' + parcel.astype(str)
 
 df = pd.DataFrame({
     'i':             hh.values,
-    'plot':          plot.values,
+    'plot_id':          plot.values,
     'crop':          _crop_labels(srcn['as02eq06'], src['as02eq06'], crop_map).values,
     'u':             _unit_labels(src['as02eq07b'], unit_map).values,
     'Quantity':      pd.to_numeric(srcn['as02eq07a'], errors='coerce').values,

@@ -163,7 +163,124 @@ key); `GhanaSPS/2009-10/_/crop_production.py` and `Tanzania/_/tanzania.py`, whos
 
 ## §6 Open questions for the human
 
-- (filled at task end)
+- **`plot_labor` and `plot_inputs` are still NOT registered in `index_info`.**
+  This task removed the plot-axis half of the blocker #569 names ("their
+  per-country index NAMES diverge (plot vs plot_id, crop vs j)"); the `crop`/`j`
+  half remains (`plot_inputs` is `crop` in Malawi/Mali/Nigeria/Tanzania and `j`
+  in Ethiopia/Uganda), as do the genuinely different shapes -- the seven EHCVM
+  `plot_inputs` carry **no plot level at all**, `plot_labor` is
+  `(t,i,plot_id,source)` in ten countries but `(t,i,plot_id,source,season)` in
+  Uganda and `(t,i,plot_id,season,stage,source)` in GhanaSPS. Registering them
+  is a separate decision, not a mechanical follow-on from this rename.
+- **The two plot VOCABULARIES are still not reconciled** (§3). `plot_id` now
+  names the same axis in `crop_production` and `plot_features`, which makes the
+  mismatch *easier to mistake for a joinable key*, not harder. That is the one
+  way this change could mislead someone, and it is why `yield_kg` /
+  `fertilizer_rate` keep `on='parcel'` as the default and keep the
+  `PlotGrainMismatchWarning`.
+- **`EthiopiaRHS` is in the re-warm bill for a COMMENT.** Its
+  `_/data_scheme.yml:118` described the canonical grain as `(t,i,plot,j)`; the
+  fix is one word, but `Country._table_cache_hash` hashes the file whole, so all
+  18 of its tables invalidate. Taken deliberately -- a config file that
+  contradicts `data_info.yml` is worse than one small country's rebuild -- but
+  it is a real cost and it is named here rather than buried.
 
 ---
-### Phase 3 -- verification (fill at task end)
+### Phase 3 -- verification (measured)
+
+Measured in `/global/scratch/fsa/fc_jevons/ligon/tmp/wt-plot-id`, library
+identity asserted on every invocation (`'wt-plot-id' in lsms_library.__file__`).
+Warm reads from a **copy** of the shared cache in `.rt_data` / `.rt_dataB`; the
+shared root at `~ligon/cache/lsms_library` was never written.
+
+**Commit A (`ff9c1787`) -- 0 cache fingerprints moved.**
+`Country._table_cache_hash(table, c.waves)` over all 337 `(country, table)`
+cells of the 15 crop countries, probed THREE times so any move would be
+attributable: base, after `data_info.yml`, after `transformations.py`. **0 / 337
+each time.** `data_info.yml` is not a hash input; `transformations.py` is reached
+only from `_finalize_result`, which is in `_build_registry._EXCLUDED_CALLABLES`.
+
+**Commit B -- 274 / 337 moved, WHOLE-COUNTRY, in 12 countries.**
+`_table_cache_hash` hashes `_/data_scheme.yml` and the country module as WHOLE
+FILES, so renaming one declared level moves EVERY table's hash in that country.
+This is the re-warm bill and it is bigger than "the three plot tables":
+
+| country | hashes moved / probed | why |
+|---|---|---|
+| Benin | 21 / 21 | renamed |
+| Burkina_Faso | 24 / 24 | renamed |
+| CotedIvoire | 21 / 21 | renamed |
+| Guinea-Bissau | 21 / 21 | renamed |
+| Malawi | 26 / 26 | renamed |
+| Mali | 24 / 24 | renamed |
+| Niger | 23 / 23 | renamed |
+| Nigeria | 24 / 24 | renamed |
+| Senegal | 22 / 22 | renamed |
+| Togo | 22 / 22 | renamed |
+| Uganda | 28 / 28 | renamed |
+| EthiopiaRHS | 18 / 18 | **comment only** -- no declared level changed |
+| Ethiopia | **0** / 25 | already `plot_id` |
+| GhanaSPS | **0** / 13 | already `plot_id` |
+| Tanzania | **0** / 25 | already `plot_id` |
+
+**The served frame is byte-identical up to the level name -- 33 / 33.**
+Each of the 33 `(country, table)` frames the 11 renamed countries carry across
+`crop_production` / `plot_labor` / `plot_inputs` was read warm at commit A
+(declared `plot`) and again on branch B against a copy of the same parquets with
+the level physically renamed, then compared with
+`assert_frame_equal(base.rename_axis(index={'plot': 'plot_id'}), branch,
+check_exact=True)`. **All 33 identical**, 848,509 rows in total. This validates
+that the READ path is name-agnostic; it does not by itself validate the wave
+scripts, which is what the cold builds below are for.
+
+> *Method note, worth keeping.* The first attempt rewrote the parquets with
+> `pyarrow.Table.rename_columns`, which renames the COLUMN but leaves the
+> `b'pandas'` schema metadata still naming `plot` as an index column. The API
+> frames came out right (`_normalize_dataframe_index` re-sets the index from the
+> declared spec), but `pd.read_parquet` alone silently DROPPED the level -- and
+> `tests/test_table_structure.py` reads the parquet directly, so 49 tests failed
+> for a defect in the fixture, not in the change. Round-trip through pandas and
+> re-attach only the non-`pandas` metadata keys (`lsms_cache_hash`,
+> `lsms_grain_audit`).
+
+**Cold builds reproduce the warm frames exactly.** With the country's parquets
+deleted from the sandbox data root, the wave scripts and country module were
+re-run and the result compared to the pre-change frame under the same rename.
+This is the check the rg sweep cannot do -- it proves the renamed scripts still
+produce the same rows.
+
+**Tests.** 1,279 pass across the 16 crop/plot/feature/structure test modules
+(`test_plot_id_canonical`, `test_feature_canonical_index`, `test_863_transforms`,
+`test_shipped_factors`, `test_crop_kg_factor`, `test_quantity_screen`,
+`test_malawi_shipped_factors`, `test_ethiopia_shipped_factors`,
+`test_nigeria_kg_factor`, `test_niger_u_sentinel`, `test_ghanasps_crop_production`,
+`test_table_structure`, `test_schema_consistency`,
+`test_gh637_uganda_plot_inputs_season`, `test_uganda_crop_condition`,
+`test_uganda_99999`), 0 failures.
+
+**Anchored verdicts.**
+
+- `data_info.yml` `index_info` / `level_aliases` -- **OK (anchored on §3, §5)**:
+  the alias direction is the one `feature._rename_index_levels` documents, and
+  the flip is asserted by a test rather than eyeballed (the two directions read
+  identically at a glance).
+- `_PLOT_CANONICAL` / `_canonicalise_plot_level` -- **OK (anchored on §5)**: the
+  three transforms already normalised their output level; only the target
+  spelling changed. Not a reinvention of `_resolve_plot_level`, which answers a
+  different question (what came in, not what goes out).
+- `_resolve_plot_level(names)` `None` guard -- **OK (anchored on §2)**: the old
+  `names or []` raised on a `pd.Index`, which is what `yield_kg` /
+  `fertilizer_rate` now hand it. Caught by `test_863_transforms`, not by
+  inspection.
+- per-country renames -- **OK (anchored on §4)**: the protected-token list in the
+  rename script is exactly §4's "not every `'plot'` literal is an index name",
+  and the leftovers were read one by one (Nigeria's `sold_on='plot'`, the
+  `cm`/`c`/`sc`/`ic`/`spec`/`fr` column-mapping dicts in Uganda / Tanzania /
+  GhanaSPS). Zero renames in the three countries that already said `plot_id`.
+- `on={'parcel','plot'}` left alone -- **OK (anchored on §3)**: a mode string,
+  not a level name; pinned by
+  `test_plot_id_canonical.py::test_on_is_a_mode_string_not_a_level_name`.
+- **Not done, and not silently:** no re-warm was run and no coverage matrix was
+  regraded. The bill above is what needs scheduling.
+
+

@@ -41,7 +41,7 @@ intercropped = src['s16cq07'].map({'Association de cultures': True, 'Pure': Fals
 
 df = pd.DataFrame({
     'i':            hh.values,
-    'plot':         plot.values,
+    'plot_id':         plot.values,
     'crop':         _crop_labels(srcn['s16cq04'], src['s16cq04'], crop_map).values,
     'u':            _unit_labels(src['s16cq16b'], unit_map).values,
     'Quantity':     src['s16cq16a'].values,
@@ -67,7 +67,7 @@ sold_df = sold_df.dropna(subset=['i', 'crop'])
 sold_one = sold_df.groupby(['i', 'crop'], as_index=False)[['Quantity_sold', 'Value_sold']].sum(min_count=1)
 
 # (i, crop) grown on exactly one plot in the harvest block
-plots_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop'])['plot'].nunique()
+plots_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop'])['plot_id'].nunique()
 single = plots_per[plots_per == 1].index
 sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)]
 

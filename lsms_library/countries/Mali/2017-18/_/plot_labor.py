@@ -85,12 +85,12 @@ pieces = []
 # ---------------- post-planting (PP) roster: s11e ------------------------
 pp = get_dataframe('../Data/eaci17_s11ep1.dta').copy()
 pp['i'] = _hhid(pp)
-pp['plot'] = _plot(pp, 's11eq01', 's11eq02')
+pp['plot_id'] = _plot(pp, 's11eq01', 's11eq02')
 
 fam = _sumcols(_prod(pp, 's11eq05a1', 's11eq05a2'),
                _prod(pp, 's11eq05b1', 's11eq05b2'),
                _prod(pp, 's11eq05c1', 's11eq05c2'))
-pieces.append(pd.DataFrame({'t': WAVE, 'i': pp['i'], 'plot': pp['plot'],
+pieces.append(pd.DataFrame({'t': WAVE, 'i': pp['i'], 'plot_id': pp['plot_id'],
                             'source': 'family', 'PersonDays': fam, 'Wage': pd.NA}))
 
 hir = _sumcols(_prod(pp, 's11eq07a1', 's11eq07a2'),
@@ -98,19 +98,19 @@ hir = _sumcols(_prod(pp, 's11eq07a1', 's11eq07a2'),
                _prod(pp, 's11eq07c1', 's11eq07c2'))
 hir_wage = _sumcols(_num(pp, 's11eq07a3'), _num(pp, 's11eq07b3'),
                     _num(pp, 's11eq07c3'))
-pieces.append(pd.DataFrame({'t': WAVE, 'i': pp['i'], 'plot': pp['plot'],
+pieces.append(pd.DataFrame({'t': WAVE, 'i': pp['i'], 'plot_id': pp['plot_id'],
                             'source': 'hired', 'PersonDays': hir, 'Wage': hir_wage}))
 
 oth = _sumcols(_prod(pp, 's11eq09a1', 's11eq09a2'),
                _prod(pp, 's11eq09b1', 's11eq09b2'),
                _prod(pp, 's11eq09c1', 's11eq09c2'))
-pieces.append(pd.DataFrame({'t': WAVE, 'i': pp['i'], 'plot': pp['plot'],
+pieces.append(pd.DataFrame({'t': WAVE, 'i': pp['i'], 'plot_id': pp['plot_id'],
                             'source': 'other', 'PersonDays': oth, 'Wage': pd.NA}))
 
 # ---------------- post-harvest (PH) roster: s7e --------------------------
 ph = get_dataframe('../Data/eaci17_s7ep2.dta').copy()
 ph['i'] = _hhid(ph)
-ph['plot'] = _plot(ph, 's7eq01', 's7eq02')
+ph['plot_id'] = _plot(ph, 's7eq01', 's7eq02')
 
 ph_fam = _sumcols(_prod(ph, 's7eq05a1', 's7eq05a2'),
                   _prod(ph, 's7eq05b1', 's7eq05b2'),
@@ -118,7 +118,7 @@ ph_fam = _sumcols(_prod(ph, 's7eq05a1', 's7eq05a2'),
                   _prod(ph, 's7eq11a1', 's7eq11a2'),
                   _prod(ph, 's7eq11b1', 's7eq11b2'),
                   _prod(ph, 's7eq11c1', 's7eq11c2'))
-pieces.append(pd.DataFrame({'t': WAVE, 'i': ph['i'], 'plot': ph['plot'],
+pieces.append(pd.DataFrame({'t': WAVE, 'i': ph['i'], 'plot_id': ph['plot_id'],
                             'source': 'family', 'PersonDays': ph_fam, 'Wage': pd.NA}))
 
 ph_hir = _sumcols(_prod(ph, 's7eq07a1', 's7eq07a2'),
@@ -130,7 +130,7 @@ ph_hir = _sumcols(_prod(ph, 's7eq07a1', 's7eq07a2'),
 ph_hir_wage = _sumcols(_num(ph, 's7eq07a3'), _num(ph, 's7eq07b3'),
                        _num(ph, 's7eq07c3'), _num(ph, 's7eq13a3'),
                        _num(ph, 's7eq13b3'), _num(ph, 's7eq13c3'))
-pieces.append(pd.DataFrame({'t': WAVE, 'i': ph['i'], 'plot': ph['plot'],
+pieces.append(pd.DataFrame({'t': WAVE, 'i': ph['i'], 'plot_id': ph['plot_id'],
                             'source': 'hired', 'PersonDays': ph_hir, 'Wage': ph_hir_wage}))
 
 ph_oth = _sumcols(_prod(ph, 's7eq09a1', 's7eq09a2'),
@@ -139,7 +139,7 @@ ph_oth = _sumcols(_prod(ph, 's7eq09a1', 's7eq09a2'),
                   _prod(ph, 's7eq15a1', 's7eq15a2'),
                   _prod(ph, 's7eq15b1', 's7eq15b2'),
                   _prod(ph, 's7eq15c1', 's7eq15c2'))
-pieces.append(pd.DataFrame({'t': WAVE, 'i': ph['i'], 'plot': ph['plot'],
+pieces.append(pd.DataFrame({'t': WAVE, 'i': ph['i'], 'plot_id': ph['plot_id'],
                             'source': 'other', 'PersonDays': ph_oth, 'Wage': pd.NA}))
 
 df = pd.concat(pieces, ignore_index=True)

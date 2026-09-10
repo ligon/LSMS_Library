@@ -164,7 +164,7 @@ Data Scheme:
     # units.  planting_month / perennial omitted (not recorded by EHCVM
     # s16c); harvest_month all-NaN here (only 2014-15 ECVMA recorded it) but
     # carried for cross-wave schema parity; intercropped from s16cq07.
-    index: (t, i, plot, crop, u)
+    index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -180,7 +180,7 @@ Data Scheme:
     # (2018/Data1/s16b_me_tgo2018.dta).  REPORTED values only; seed_kg /
     # nitrogen_kg / fertilizer totals are transformations, never columns.
     # GRAIN NOTE: EHCVM records inputs at the HOUSEHOLD x input grain, NOT
-    # plot x input (no parcel-level input question), so `plot` is NOT in the
+    # plot x input (no parcel-level input question), so `plot_id` is NOT in the
     # index; the feature keeps the GAP-2 name `plot_inputs`.  input ->
     # harmonize_input, crop -> harmonize_seed_crop (both copied from Niger
     # into Togo/_/categorical_mapping.org — the EHCVM s16b labels are
@@ -200,13 +200,13 @@ Data Scheme:
     # agriculture-parcel module (2018/Data1/s16a_me_tgo2018.dta — the same
     # file plot_features reads, so plot ids align).  REPORTED values only;
     # total_labor_days / hired_labor_value are transformations, never
-    # columns.  GRAIN (t, i, plot, source): source is 'family' / 'hired'
+    # columns.  GRAIN (t, i, plot_id, source): source is 'family' / 'hired'
     # (EHCVM s16a records family vs non-family only — no free/exchange
     # 'other').  PersonDays = within-source sum over the member / gender-
     # category / phase strata (NOT a cross-source rollup); EHCVM hired
     # person-days = Σ(#workers × days).  Wage = cash paid to hired labor
     # (CFA francs); NaN for family.  plot = "{s16aq02}_{s16aq03}".
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make

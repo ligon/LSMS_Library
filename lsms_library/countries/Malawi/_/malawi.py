@@ -1042,7 +1042,7 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     out = pd.DataFrame({
         't':              t,
         'i':              df['hhid'].astype('string').values,
-        'plot':           plot.values,
+        'plot_id':           plot.values,
         'crop':           crop_label.values,
         '_crop_code':     crop_code_int.values,
         'Quantity':       quantity.values,
@@ -1146,7 +1146,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # conditions are NOT commensurable".
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
-    harv = harv.groupby(['i', 'plot', 'crop', 'u', 'condition', '_crop_code'],
+    harv = harv.groupby(['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code'],
                         as_index=False, dropna=False).agg({
         'Quantity':       'sum',
         # EXACT, not a reduction: `crop_variety` is a function of
@@ -1181,7 +1181,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         # unrecorded matches a harvest row whose unit is likewise
         # unrecorded (pd.merge matches null keys), which is the honest
         # pairing.
-        nplots = (harv.groupby(['i', '_crop_code'])['plot']
+        nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
                   .nunique().rename('_nplots').reset_index())
         # GH #854: the single-plot gate alone stopped being sufficient the
         # moment `condition` joined the harvest key.  Before it did, a
@@ -1266,7 +1266,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # `u`), so the check is on columns rather than on index levels; keeping
     # them out of the index also keeps the ~8.5k rows whose `u` is NULL,
     # which a set_index + groupby would delete on a NaN key (GH #323 3b).
-    _grain = ['t', 'i', 'plot', 'crop', 'u', 'condition']
+    _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
     if harv.duplicated(_grain).any():
         harv = harv.groupby(_grain, as_index=False, dropna=False).agg({
             'Quantity':       'sum',
@@ -1279,7 +1279,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
             'perennial':      'first',
         })
 
-    out = harv.set_index(['t', 'i', 'plot', 'crop'])
+    out = harv.set_index(['t', 'i', 'plot_id', 'crop'])
     # Readable by a test without parsing a warning message.  It does NOT
     # survive to_parquet (attrs are not written), which is why the warning
     # above exists as well -- the warning is what a build log sees.
@@ -2033,7 +2033,7 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
             u = pd.Series(pd.NA, index=df.index, dtype='string')
         piece = pd.DataFrame({
             'i':           df['hhid'].astype('string').values,
-            'plot':        df['plotkey'].astype('string').values,
+            'plot_id':        df['plotkey'].astype('string').values,
             '_input_code': code.values,
             'crop':        pd.array([pd.NA] * len(df), dtype='string'),
             'Quantity':    q.values,
@@ -2042,7 +2042,7 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
         })
         pieces.append(piece[keep.values])
     if not pieces:
-        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+        return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
                                      'Quantity', 'u', 'Improved'])
     return pd.concat(pieces, ignore_index=True)
 
@@ -2052,12 +2052,12 @@ def _organic_block(df, *, hhid, plotkey, flag, t):
     (ag_d36 == 1/Yes).  Presence is the reported item; Quantity / u are NA
     (Module D records no organic-fertilizer quantity)."""
     if flag is None or flag not in df.columns:
-        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+        return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
                                      'Quantity', 'u', 'Improved'])
     used = _int_codes(df[flag]) == 1
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
-        'plot':        df['plotkey'].astype('string').values,
+        'plot_id':        df['plotkey'].astype('string').values,
         '_input_code': _MWI_INPUT_ORGANIC,
         'crop':        pd.array([pd.NA] * len(df), dtype='string'),
         'Quantity':    pd.array([pd.NA] * len(df), dtype='Float64'),
@@ -2098,7 +2098,7 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
             u = pd.Series(pd.NA, index=df.index, dtype='string')
         piece = pd.DataFrame({
             'i':           df['hhid'].astype('string').values,
-            'plot':        df['plotkey'].astype('string').values,
+            'plot_id':        df['plotkey'].astype('string').values,
             '_input_code': code.values,
             'crop':        pd.array([pd.NA] * len(df), dtype='string'),
             'Quantity':    q.values,
@@ -2107,7 +2107,7 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
         })
         pieces.append(piece[keep.values])
     if not pieces:
-        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+        return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
                                      'Quantity', 'u', 'Improved'])
     return pd.concat(pieces, ignore_index=True)
 
@@ -2137,7 +2137,7 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
         imp = pd.Series(pd.NA, index=df.index, dtype='boolean')
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
-        'plot':        df['plotkey'].astype('string').values,
+        'plot_id':        df['plotkey'].astype('string').values,
         '_input_code': _MWI_INPUT_SEED,
         'crop':        crop_label.values,
         'Quantity':    q.values,
@@ -2233,7 +2233,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
             # Count plots per (i, crop) among seed rows; attach only when a
             # crop's seed is on exactly one plot (unambiguous).
             seed_rows = df[seed]
-            nplots = (seed_rows.groupby(['i', 'crop'])['plot']
+            nplots = (seed_rows.groupby(['i', 'crop'])['plot_id']
                       .nunique().rename('_nplots').reset_index())
             attach = sp.merge(nplots, on=['i', 'crop'], how='inner')
             attach = attach[attach['_nplots'] == 1][
@@ -2263,7 +2263,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # NaN) are not silently dropped.
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
-    grp = df.groupby(['t', 'i', 'plot', 'input', 'crop', 'u'],
+    grp = df.groupby(['t', 'i', 'plot_id', 'input', 'crop', 'u'],
                      as_index=False, dropna=False).agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
@@ -2278,7 +2278,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # index to keep it unique; both are NaN for the inputs that don't carry
     # them (fertilizer/pesticide have NaN crop; organic-fertilizer rows have
     # NaN u as well).  dropna=False above keeps those NaN-keyed rows.
-    grp = grp.set_index(['t', 'i', 'plot', 'input', 'crop', 'u'])
+    grp = grp.set_index(['t', 'i', 'plot_id', 'input', 'crop', 'u'])
     return grp
 
 
@@ -2714,7 +2714,7 @@ def _plot_labor_block(df, *, hhid, plotkey, t, hired_suffix,
     """
     work = pd.DataFrame({
         'i':    df[hhid].astype('string').values,
-        'plot': df[plotkey].astype('string').values,
+        'plot_id': df[plotkey].astype('string').values,
     }, index=df.index)
 
     rows = []
@@ -2778,12 +2778,12 @@ def assemble_plot_labor(t, pieces):
     """
     cat = pd.concat(pieces, ignore_index=True)
     cat['t'] = t
-    grp = cat.groupby(['t', 'i', 'plot', 'source'], as_index=False,
+    grp = cat.groupby(['t', 'i', 'plot_id', 'source'], as_index=False,
                       dropna=False).agg({
         'PersonDays': 'sum',
         'Wage':       'first',
     })
-    out = grp.set_index(['t', 'i', 'plot', 'source'])
+    out = grp.set_index(['t', 'i', 'plot_id', 'source'])
     assert out.index.is_unique, f"Non-unique (t,i,plot,source) in plot_labor {t}"
     return out
 

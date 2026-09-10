@@ -169,7 +169,7 @@ Data Scheme:
     # in several units.  Quantity_sold / Value_sold are at plot-crop grain
     # (s16cq16a / s16cq17).  harvest_month is NA (the EHCVM s16c module has
     # no planting/harvest-date question); intercropped from s16cq07.
-    index: (t, i, plot, crop, u)
+    index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -189,7 +189,7 @@ Data Scheme:
     # totals are transformations, never columns.  EHCVM 2018-19 only.
     #
     # GRAIN (t, i, input, crop, u): Senegal (like Niger) records inputs at
-    # the HOUSEHOLD x input grain, NOT plot x input, so `plot` is NOT in the
+    # the HOUSEHOLD x input grain, NOT plot x input, so `plot_id` is NOT in the
     # index (the feature keeps the GAP-2 name).  input -> harmonize_input;
     # u -> the u table; crop -> harmonize_seed_crop on the seed label (both
     # copied from Niger, with the Senegal-specific 'Semences d'arachide' ->
@@ -215,7 +215,7 @@ Data Scheme:
     # all TRANSFORMATIONS over these rows, never columns here.  EHCVM 2018-19
     # only.
     #
-    # GRAIN (t, i, plot, source):
+    # GRAIN (t, i, plot_id, source):
     #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's
     #             plot key and plot_features' plot_id.
     #   source -- 'family' / 'hired' (EHCVM s16a has no 'other' source).
@@ -227,7 +227,7 @@ Data Scheme:
     #   sum of strata, NOT a cross-source rollup).  Wage -- cash PAID to hired
     #   labor (CFA francs); NaN for family.  v auto-joins from sample().
     #   units: PersonDays in days; Wage in CFA francs.
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make

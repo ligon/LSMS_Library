@@ -374,7 +374,7 @@ def test_fresh_and_dry_no_longer_collide(crop_production):
     anything."""
     f = crop_production.reset_index()
     sel = f[(f["t"] == "2011-12") & (f["i"] == "1033000506")
-            & (f["plot"] == "1033000506-1-6") & (f["j"] == "Coffee")]
+            & (f["plot_id"] == "1033000506-1-6") & (f["j"] == "Coffee")]
     # Deliberately NOT `pytest.skip` on empty: this is the PR's single most
     # important regression test, and a skip-on-empty escape hatch would let an
     # id remapping silently disarm it rather than fail it.
@@ -398,7 +398,7 @@ def test_condition_actually_separates_records(crop_production):
     groups carry more than one condition.  A level that never varies would
     pass every test above while fixing nothing."""
     f = crop_production.reset_index()
-    keys = [k for k in ["t", "i", "plot", "j", "u", "season"] if k in f.columns]
+    keys = [k for k in ["t", "i", "plot_id", "j", "u", "season"] if k in f.columns]
     n_split = int((f.groupby(keys, dropna=False)[LEVEL].nunique() > 1).sum())
     assert n_split > 1000, (
         f"only {n_split} plot-crop-unit-season groups carry >1 condition; "

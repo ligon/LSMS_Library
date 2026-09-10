@@ -199,3 +199,32 @@ def test_on_is_a_mode_string_not_a_level_name():
     with pytest.raises(ValueError, match="must be 'parcel' or 'plot'"):
         yield_kg(_crop_production("plot_id"), _plot_features("plot_id"),
                  on="plot_id")
+
+
+# ---------------------------------------------------------------------------
+# The corpus-wide config invariant (commit B)
+# ---------------------------------------------------------------------------
+
+def test_no_country_declares_a_plot_level_any_more():
+    """Every `index:` in every country's `data_scheme.yml` spells the plot
+    axis `plot_id`.
+
+    This is the invariant the per-country rename bought, and it is the one a
+    future wave or country can silently break -- copying a sibling country's
+    script is how `plot` spread in the first place.  Reading the YAML as TEXT
+    (rather than through `Country`) keeps it a pure config check with no data
+    and no cache.
+    """
+    import re
+    from lsms_library.paths import countries_root
+
+    offenders = []
+    for ds in sorted(countries_root().glob("*/_/data_scheme.yml")):
+        for k, line in enumerate(ds.read_text().split("\n"), 1):
+            m = re.match(r"^\s*index:\s*\((.*)\)\s*$", line)
+            if m and "plot" in [x.strip() for x in m.group(1).split(",")]:
+                offenders.append(f"{ds.parts[-3]}/_/data_scheme.yml:{k}: {line.strip()}")
+    assert not offenders, (
+        "these declared indexes still spell the plot axis `plot`; the "
+        "canonical name is `plot_id` (@ligon, 2026-09-10):\n  "
+        + "\n  ".join(offenders))

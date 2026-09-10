@@ -5483,7 +5483,7 @@ def median_price_valuation(item_df, geo_levels, *,
         ``item_df``'s index with two added columns: ``price_col`` (the imputed
         ladder median unit price) and ``out_col`` (``price × quantity_col``).
         One row per input row — the caller groups to whatever HH/plot grain
-        the target WB column lives at (e.g. ``.groupby(['t','i','plot']).sum()``
+        the target WB column lives at (e.g. ``.groupby(['t','i','plot_id']).sum()``
         for ``harvest_value_LCU``).  Rows whose ``quantity_col`` is missing get
         a missing ``out_col``.
 

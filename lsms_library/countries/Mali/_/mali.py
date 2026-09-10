@@ -371,9 +371,9 @@ def crop_production_finalize(df):
 
     # plot may be NA (perennial); fill index with <NA> string so the level is
     # not silently dropped, but keep it as a real pandas NA-able string.
-    df['plot'] = df['plot'].astype('string')
+    df['plot_id'] = df['plot_id'].astype('string')
 
-    keys = ['t', 'i', 'plot', 'crop']
+    keys = ['t', 'i', 'plot_id', 'crop']
     # Aggregate any exact (t,i,plot,crop) duplicates: sum reported amounts,
     # first non-null for flags/dates/unit.  Use dropna=False so perennial
     # rows with plot=<NA> are not discarded by groupby.  min_count=1 on the
@@ -475,10 +475,10 @@ def plot_inputs_finalize(df):
 
     # plot / crop may be NA; carry as NA-able strings so the index level is
     # not silently dropped.
-    df['plot'] = df['plot'].astype('string')
+    df['plot_id'] = df['plot_id'].astype('string')
     df['crop'] = df['crop'].astype('string')
 
-    keys = ['t', 'i', 'plot', 'input', 'crop']
+    keys = ['t', 'i', 'plot_id', 'input', 'crop']
     # Collapse any exact (t,i,plot,input,crop) duplicates: sum reported
     # amounts (min_count=1 keeps an all-NA group NA, not a spurious 0),
     # first/any for flags.  dropna=False so plot/crop NA rows survive.
@@ -675,9 +675,9 @@ def plot_labor_finalize(df):
                    | df['Wage'].fillna(0).gt(0))
     df = df[has_content]
 
-    df['plot'] = df['plot'].astype('string')
+    df['plot_id'] = df['plot_id'].astype('string')
 
-    keys = ['t', 'i', 'plot', 'source']
+    keys = ['t', 'i', 'plot_id', 'source']
     g = df.groupby(keys, dropna=False, as_index=True)
     out = pd.DataFrame({
         'PersonDays': g['PersonDays'].sum(min_count=1),

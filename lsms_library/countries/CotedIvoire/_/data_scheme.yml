@@ -179,7 +179,7 @@ Data Scheme:
     # plot_features' plot_id; u is in the index (one (plot, crop) can be
     # reported in several units).  harvest_month is all-NA (not recorded in
     # 2018-19); carried for cross-wave schema parity.
-    index: (t, i, plot, crop, u)
+    index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -200,7 +200,7 @@ Data Scheme:
     #
     # GRAIN NOTE: EHCVM records inputs at HOUSEHOLD x input grain, NOT plot x
     # input (the WB plot split is a fabricated allocation; reported-only rule
-    # forbids it), so `plot` is NOT in the index.  input -> harmonize_input;
+    # forbids it), so `plot_id` is NOT in the index.  input -> harmonize_input;
     # u -> the u table; crop (seed rows) via harmonize_seed_crop on the seed
     # label.  Both harmonize_input and harmonize_seed_crop are EHCVM-standard
     # string tables cloned from Niger into categorical_mapping.org (every
@@ -221,7 +221,7 @@ Data Scheme:
     # total_hired_labor_days / hired_labor_value; all those sums / valuations
     # are TRANSFORMATIONS over these rows, never columns here.
     #
-    # GRAIN (t, i, plot, source): source in {family, hired}.  EHCVM s16a
+    # GRAIN (t, i, plot_id, source): source in {family, hired}.  EHCVM s16a
     # records family (member-day grids s16aq33b_/35b_/37b_) vs non-family /
     # hired (s16aq39/41/43 {a=#workers, b=days, c=wage}) only -- no free /
     # exchange 'other' labor.  PersonDays is the within-source sum of the day
@@ -230,7 +230,7 @@ Data Scheme:
     # hired labor (CFA francs), NaN for family.  plot = "{field_no}_
     # {parcel_no}" aligns with crop_production / plot_features.  v auto-joins
     # from sample().  Same i / path quirks as plot_features.
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make

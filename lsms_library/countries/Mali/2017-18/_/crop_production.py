@@ -57,7 +57,7 @@ s7f['i'] = _hhid(s7f)
 seasonal = pd.DataFrame({
     't': WAVE,
     'i': s7f['i'],
-    'plot': _plot(s7f, 's7fq01', 's7fq02'),
+    'plot_id': _plot(s7f, 's7fq01', 's7fq02'),
     'crop': s7f['s7fq03'],
     'u': s7f['s7fq13c'],
     'Quantity': s7f['s7fq13a'],
@@ -85,8 +85,8 @@ sold = sold.groupby(['i', 'crop'], as_index=False).agg(
     {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
 
 # (i, crop) -> number of distinct plots in the harvest roster
-nplots = (seasonal.dropna(subset=['plot'])
-          .groupby(['i', 'crop'])['plot'].nunique().rename('nplots'))
+nplots = (seasonal.dropna(subset=['plot_id'])
+          .groupby(['i', 'crop'])['plot_id'].nunique().rename('nplots'))
 seasonal = seasonal.merge(nplots, on=['i', 'crop'], how='left')
 seasonal = seasonal.drop(columns=['Quantity_sold', 'Value_sold']).merge(
     sold, on=['i', 'crop'], how='left')
@@ -100,13 +100,13 @@ s11c = get_dataframe('../Data/eaci17_s11cp1.dta').copy()
 s11c['i'] = _hhid(s11c)
 cult = pd.DataFrame({
     'i': s11c['i'],
-    'plot': _plot(s11c, 's11cq01', 's11cq02'),
+    'plot_id': _plot(s11c, 's11cq01', 's11cq02'),
     'crop': s11c['s11cq03'],
     'planting_month': s11c['s11cq14b'],
-}).dropna(subset=['plot', 'crop']).drop_duplicates(
-    subset=['i', 'plot', 'crop'], keep='first')
+}).dropna(subset=['plot_id', 'crop']).drop_duplicates(
+    subset=['i', 'plot_id', 'crop'], keep='first')
 seasonal = seasonal.drop(columns=['planting_month']).merge(
-    cult, on=['i', 'plot', 'crop'], how='left')
+    cult, on=['i', 'plot_id', 'crop'], how='left')
 
 # --- perennial trees (s11f): no field grid -> plot = <NA>, perennial=True ---
 # Like 2014-15, s11f is a FIXED tree roster (every HH gets a row per species,
@@ -123,7 +123,7 @@ s11f['i'] = _hhid(s11f)
 perennial = pd.DataFrame({
     't': WAVE,
     'i': s11f['i'],
-    'plot': pd.NA,
+    'plot_id': pd.NA,
     'crop': s11f['s11fq01'],
     # s11fq11a = harvested quantity (numeric); s11fq11b = its unit.
     # (s11fq10 is a free-text "months producing" field, NOT a quantity.)

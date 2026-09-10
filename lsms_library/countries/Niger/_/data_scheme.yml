@@ -182,7 +182,7 @@ Data Scheme:
     # harvest_month is recorded only in 2014-15 (AS02EQ06A); intercropped
     # only in the EHCVM waves (s16cq07).  Both are present in >=1 wave so
     # they are carried (NaN in the waves that lack them).
-    index: (t, i, plot, crop, u)
+    index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -205,7 +205,7 @@ Data Scheme:
     # (ECVMA additionally x crop), NOT plot x input — no wave reports
     # inputs at the parcel level.  The WB .do code that emits plot-level
     # seed_kg / nitrogen_kg fabricates a plot split (plot_area /
-    # total_land_area); the reported-only rule forbids that, so `plot` is
+    # total_land_area); the reported-only rule forbids that, so `plot_id` is
     # NOT in the index.  The feature keeps the GAP-2 name `plot_inputs`.
     #
     # All four waves have a household input roster (script-path):
@@ -285,7 +285,7 @@ Data Scheme:
     #   total_hired_labor_days  = Σ PersonDays where source=='hired'
     #   hired_labor_value       = median-wage valuation over the hired rows
     #
-    # GRAIN (t, i, plot, source):
+    # GRAIN (t, i, plot_id, source):
     #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's
     #             plot key and plot_features' plot_id (100% on the EHCVM
     #             waves; ~78-92% on the ECVMA waves -- labor is reported on
@@ -317,7 +317,7 @@ Data Scheme:
     #   2021-22 s16a_me_ner2021  (same s16a labor-grid scheme)
     # v is NOT baked in (household-linked); the framework joins it from
     # sample().  units: PersonDays in days; Wage in CFA francs.
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make

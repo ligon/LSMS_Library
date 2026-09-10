@@ -188,7 +188,7 @@ Data Scheme:
     # 2-digit menage) reconciling 100% with sample().  harvest_month NA
     # (no planting/harvest-date question in s16c); intercropped from
     # s16cq07.
-    index: (t, i, plot, crop, u)
+    index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -208,7 +208,7 @@ Data Scheme:
     # the seed's crop on the shared harmonize_food labels.  REPORTED values
     # only.  Source s16b (2018-19) records inputs at the HOUSEHOLD x input
     # grain, NOT plot x input (no parcel-level input data); the GAP-2 name
-    # `plot_inputs` is kept but `plot` is NOT in the index.  input ->
+    # `plot_inputs` is kept but `plot_id` is NOT in the index.  input ->
     # harmonize_input; u -> the u table; the EHCVM roster has no crop
     # column so seed crop is resolved from the seed label via
     # harmonize_seed_crop.  Non-crop-specific rows carry the sentinel
@@ -252,7 +252,7 @@ Data Scheme:
     # Item-level plot labor (GAP 3; EHCVM parity loop 2026-06-15, cloned
     # self-contained from Niger).  One row per REPORTED labor SOURCE on a
     # plot (the WB total_*_labor_days / hired_labor_value sums are
-    # transformations, never columns).  GRAIN (t, i, plot, source):
+    # transformations, never columns).  GRAIN (t, i, plot_id, source):
     # plot = "{field_no}_{parcel_no}" aligned with crop_production /
     # plot_features; source 'family' / 'hired' (EHCVM s16a records family
     # vs non-family only — no free/exchange 'other').  PersonDays is the
@@ -261,7 +261,7 @@ Data Scheme:
     # labor (NaN for family).  i via burkina_faso.ehcvm_i (100% reconcile);
     # v joins from sample().  2018-19 only (s16a family grids s16aq33/35/37b
     # + hired grids s16aq39/41/43{a,b,c}).
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make
