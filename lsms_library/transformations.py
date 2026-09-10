@@ -816,65 +816,159 @@ def _is_currency_denominated(labels):
     )
 
 
-def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=['t','m','i'], unit_col = 'u'):
-    """Infer local-unit → kg conversion factors from price ratios.
+#: Floor on the number of step-2 reports behind a ``(t, j, u)`` estimate
+#: (GH #850, D4).  Set equal to :data:`SURVEY_MEDIAN_MIN_REPORTS` on purpose:
+#: it is the same quantity on the food side that the crop side's
+#: ``survey_median`` layer already gates, and the floor sweep in
+#: ``slurm_logs/gh850_design/DESIGN.org`` shows coverage is nearly flat in it
+#: (moving it from 3 to 20 costs one or two percent of inference rows in every
+#: country), so consistency decides what the data does not.
+#:
+#: Spelled as a literal rather than as ``= SURVEY_MEDIAN_MIN_REPORTS`` only
+#: because that constant is defined further down the module;
+#: ``tests/test_food_kg_inference.py`` pins the two equal so the tie cannot rot.
+FOOD_KG_MIN_REPORTS = 5
 
-    For each unit that does not appear in :data:`KNOWN_METRIC`, this
-    function computes a factor by assuming the *price per kilogram*
-    should be roughly constant across units for the same item/market.
-    That is: if a "bunch" of item j trades at roughly 2× the unit value
-    of a kg of item j, the inferred factor is 2 kg per bunch.
+#: Floor on the number of kg-known rows behind a ``(t, j)`` price-per-kg
+#: baseline (GH #850, D5).  THIS is the floor that binds -- it decides whether
+#: one household's single kilogram purchase gets to set an item's price
+#: nationally, and the largest price movements measured for #850 sat on the
+#: thinnest baselines.  The food side gated nothing at all before #850.
+FOOD_KG_MIN_BASELINE = 5
 
-    The mechanics: expenditure is divided by quantity to get a per-unit
-    price, grouped to the ``index`` level (default ``('t','m','i')``),
-    then the median across rows is compared to the unit-wise median to
-    back out kg per unit. Used by :func:`_get_kg_factors` as a fallback
-    when a survey doesn't ship its own conversion table.
+#: A baseline of :data:`FOOD_KG_MIN_BASELINE_TIGHT` to
+#: :data:`FOOD_KG_MIN_BASELINE` - 1 reports is accepted WHEN THE REPORTS AGREE
+#: -- max/min of the per-report price per kilogram within the ``(t, j)`` cell
+#: at or below :data:`FOOD_KG_TIGHT_TOLERANCE` (GH #850, D5).
+#:
+#: WHY max/min AND NOT AN IQR.  Because at N = 3 or 4 an interquartile range
+#: DISCARDS THE EXTREMES, and the extremes are the whole question.  With three
+#: reports the interpolated quartiles sit between the points; the statistic is
+#: driven by the middle of a sample too small to have a middle, and a single
+#: wild report -- the exact failure the floor exists to catch -- barely moves
+#: it.  ``max/min`` reads the whole spread, is scale-free, is defined
+#: identically at N = 3 and at N = 400, and states the sentence the exception
+#: is for: "the reports lie within 25% of each other".
+#:
+#: AN EARLIER VERSION OF THIS PARAGRAPH ARGUED THE POINT WITH A NUMBER, AND
+#: THE NUMBER WAS A SCALE ERROR.  It said an ``IQR/median`` gate "admits 21 of
+#: Uganda's 28 in-band cells at a tolerance of 1.10 and 26 at 2.00 -- a
+#: statistic that barely moves ... is not discriminating".  Those counts
+#: reproduce, but 1.10 and 2.00 are not the same tolerance for the two
+#: statistics: ``max/min <= 1.25`` means the reports lie within about +/-12%,
+#: while ``IQR/median <= 1.10`` means the interquartile range is 110% OF THE
+#: MEDIAN -- an enormously looser gate.  Swept at its own scale the IQR gate
+#: discriminates perfectly well: at ``IQR/median <= 0.10`` Uganda admits 2
+#: cells whose ``max/min`` p90 is 1.32.  The comparison was between
+#: incommensurable scales and a reviewer could falsify it in ten minutes.
+#: The choice stands on the ground stated above; the evidence for it does not,
+#: and is retired rather than repaired (GH #850 red team, 2026-09-10).
+#:
+#: WHAT IT BUYS, MEASURED.  Little, and that is the point.  The in-band cells
+#: are few (10 to 33 per country, of 253 to 831), and taken UNCONDITIONALLY
+#: they would lift Uganda's inference coverage by 9.5 points -- but their
+#: spreads run 1.2x to 25x, so nearly all of that would come from baselines
+#: whose own reports disagree by an order of magnitude.  At 1.25 the exception
+#: admits 0 to 3 cells per country and 0 to +0.7 points of coverage, and the
+#: admitted cells' median spread is 1.00 to 1.25.  It is a narrow, principled
+#: admission, not a coverage lever; a tolerance of 2.00 would be the floor
+#: giving up.
+FOOD_KG_MIN_BASELINE_TIGHT = 3
+FOOD_KG_TIGHT_TOLERANCE = 1.25
 
-    Labels in :data:`_CURRENCY_DENOMINATED_UNITS` (e.g. ``u='Value'``) are
-    dropped from the whole computation before anything is inferred, so they
-    never appear as a key of the result: their factor is ``1/price`` at
-    ``(j, t, m)`` and a per-label constant cannot represent it (GH #770).
+#: Cross-wave spread above which a delivered ``(item, unit)`` factor is
+#: REPORTED as thin evidence (GH #850, D6, 2026-09-10).  A reporting
+#: threshold, never a screen: no row is refused for exceeding it.
+#:
+#: The delivered factor has no ``t`` axis -- it is the median of the per-wave
+#: estimates, because a container's weight should not move between waves.
+#: That is a defensible design and an UNVERIFIED assumption on any particular
+#: cell, and the corpus is not reassuring about it: for cells estimated in
+#: three or more waves the median max/min across waves is 2.2 (Uganda), 2.5
+#: (Malawi) and 3.1 (Nigeria).  Two is the natural place to report from --
+#: below it the pooling is doing what it claims (averaging noise), above it
+#: the waves are describing different objects and the median is a compromise
+#: between them.
+#:
+#: Niger makes the case concrete: ``(Mil, Tiya)`` is estimated in ONE of the
+#: two waves it serves, because 2018-19 has no kg-known millet row at all, and
+#: 4,886 rows are served a factor measured on a wave they are not in.
+FOOD_KG_WAVE_SPREAD_REPORT = 2.0
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Food-acquired frame with ``Expenditure`` and ``Quantity``
-        columns and ``u`` (or ``unit_col``) in the index.
-    price : list[str]
-        Column(s) interpreted as expenditure for the ratio calculation.
-    quantity : str
-        Column interpreted as quantity.
-    index : list[str]
-        Groupby levels for the per-item/period median step.
-    unit_col : str
-        Name of the unit index level; renamed to ``u`` if different.
+#: Maximum dispersion a ``(t, j)`` price-per-kg baseline may carry and still
+#: set an item's kilograms -- ``p90/p10`` where the cell has 10 or more
+#: reports, ``max/min`` below that (GH #850 red team; @ligon, 2026-09-10).
+#:
+#: WHAT IT FIXES.  ``FOOD_KG_MIN_BASELINE`` is an ABSOLUTE floor and was the
+#: only gate on the strict rung, so a cell cleared it on five reports and then
+#: governed every row of that item in every unit, with no relation between the
+#: two counts and no check that the reports agreed.  Measured over the cells
+#: the ungated rung admitted, the max/min of their own per-report price per
+#: kilogram had a MEDIAN of 7.5 (Uganda), 178 (Malawi), 125 (Nigeria), 500
+#: (Ethiopia) and 1,019 (GhanaLSS), running to 9e7.  A four-report baseline
+#: whose reports differed by 26% was refused by the tight exception while a
+#: five-report baseline differing by nine million times was admitted in
+#: silence -- and the ungated rung governs 35-98% of rows against the tight
+#: exception's 0-0.7.
+#:
+#: THE WORKED CASE.  Niger's ``(2021-22, Mil)`` baseline is nine ``Kg`` rows
+#: pricing millet at 2,286 FCFA/kg against a 250-450 retail, with max/min
+#: 125.0; it used to hand a 0.33 kg tiya to all 10,107 of that item's tiya
+#: rows, where a tiya is about 2.5 kg.  It is refused here.
+#:
+#: WHY THE STATISTIC SWITCHES WITH N.  With ten or more reports a robust
+#: interdecile spread exists and one wild report should not condemn the cell;
+#: below ten there is no decile to take and the extremes ARE the evidence.
+#: The 3-4 report exception (:data:`FOOD_KG_TIGHT_TOLERANCE`) is not re-gated:
+#: its own tolerance is far stricter, so the extra condition would be a no-op
+#: wearing a second name.
+#:
+#: WHY 10 AND NOT 3.  Swept over 3 / 5 / 10 / 30 (the table is in
+#: ``.coder/ledger/850-food-kg-item-axis-impl.md`` 8): every candidate refuses
+#: Niger's millet and moves Niger 14.8-19.6% toward its answer key, but the
+#: tight end is expensive elsewhere -- at 3 it costs Mali 15.8% and GhanaLSS
+#: 11.2% of their kilograms, movements nothing has adjudicated. At 10 the
+#: corpus is within +/-3.6% except Ethiopia, Tanzania and EthiopiaRHS are
+#: untouched, and the refusal is confined to cells that are genuinely
+#: incoherent.  @ligon's ruling, 2026-09-10.
+#:
+#: A REFUSED ROW IS NOT DROPPED.  It falls to the u-pooled ``unit`` rung --
+#: the factor the library served every row before #850 -- or to ``none`` where
+#: even that has no factor, and it is TAGGED: see
+#: ``food_kg_factors``'s ``baseline_refused_spread`` column and
+#: ``attrs['kg_factor_baseline_gate']``.  Pass ``baseline_max_spread=None`` to
+#: restore the ungated rung.
+FOOD_KG_BASELINE_MAX_SPREAD = 10.0
 
-    Returns
-    -------
-    dict[str, float]
-        Mapping of unit label → inferred kg factor.  Keys are the RAW ``u``
-        label with its case PRESERVED -- the grouping is on the raw label,
-        so ``Calebasse`` and ``calebasse`` come back as two entries with two
-        factors.  (The docstring used to say "(lowercased)", which was
-        false; :func:`_get_kg_factors` is where the lower-casing happens,
-        and it reports the resulting clashes -- see
-        :class:`UnitLabelCollisionWarning`.)  Units already in
-        :data:`KNOWN_METRIC`, units in :data:`_CURRENCY_DENOMINATED_UNITS`,
-        or units that cannot be inferred are absent from the output.
+#: The eight-key map that decides which rows may ANCHOR the price-per-kg
+#: baseline.  Deliberately NOT :data:`KNOWN_METRIC`: no litre, ml or cl, so a
+#: volume row can enter the baseline only through a survey-supplied
+#: ``Quantity_kg``, and the ``1 L = 1 kg`` approximation never propagates into
+#: OTHER units' factors through the reference price.
+#:
+#: It was a local literal inside :func:`conversion_to_kgs` until GH #850 named
+#: it.  Naming it is the whole change: widening it to the metric spellings
+#: #850 added to :data:`KNOWN_METRIC` (``Grams``, ``Gramme``, ``Millilitre``)
+#: would enlarge the baseline and move every inferred factor, which is a
+#: measured step nobody has taken -- so it is a stated follow-up, not a
+#: side effect.
+_BASELINE_UNIT_CONVERSION = {
+    'kg': 1, 'kilogram': 1, 'gram': 1 / 1000, 'g': 1 / 1000,
+    'pound': 0.453592, 'lbs': 0.453592, 'kilogramme': 1, 'gramm': 1 / 1000,
+}
+
+
+def _kg_inference_frame(df, quantity, unit_col):
+    """Shared preparation for both arms of :func:`conversion_to_kgs`.
+
+    Returns a copy of *df* with zeros NaN-ed, currency-denominated labels
+    dropped (GH #770), ``u`` restored to the index under its canonical name,
+    and a ``Kgs`` column holding each row's KNOWN kilograms -- from
+    :data:`_BASELINE_UNIT_CONVERSION` where the label is metric, else from a
+    survey-supplied ``Quantity_kg``.
     """
     v = df.copy()
     v = v.replace(0, np.nan)
-    unit_conversion = {
-        'kg': 1,
-        'kilogram': 1,
-        'gram': 1 / 1000,
-        'g': 1 / 1000,
-        'pound': 0.453592,
-        'lbs': 0.453592,
-        'kilogramme': 1,
-        'gramm': 1 / 1000
-    }
     #convert the value type in index level 'u' to be string
     v = v.reset_index(unit_col)
     if unit_col != 'u':
@@ -893,7 +987,8 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     # earlier ``astype(str)`` (pandas 2.x AttributeError: 'float' object
     # has no attribute 'lower').  Unknown units map to NaN, matching the
     # original ``unit_conversion.get(..., np.nan)`` semantics.
-    factors = v['u'].astype(str).str.lower().map(unit_conversion).astype(float)
+    factors = v['u'].astype(str).str.lower().map(
+        _BASELINE_UNIT_CONVERSION).astype(float)
     v['Kgs'] = v[quantity] * factors
     # Rows with an exact per-row Quantity_kg (e.g. Malawi cfactor units, GH
     # #378) serve as kg *references* for the price-per-kg baseline -- exactly
@@ -903,16 +998,306 @@ def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity', index=
     # units identical before/after the Quantity_kg migration.
     if 'Quantity_kg' in v.columns:
         v['Kgs'] = v['Kgs'].where(v['Kgs'].notna(), v['Quantity_kg'])
-    v = v.set_index('u', append=True)
-    pkg = v[price].divide(v['Kgs'], axis=0)
-    pkg = pkg.groupby(index).median().median(axis=1)
+    return v.set_index('u', append=True)
+
+
+#: Levels of ``conversion_to_kgs``'s ``index`` that survive into the ITEM
+#: arm's baseline group.  The household level ``i`` is deliberately dropped
+#: (the item replaces it), and so is the market level ``m`` -- a market axis
+#: would re-thin the very cell the floors exist to protect, and ``m`` is not
+#: present at derive time anyway (it is minted by ``_add_market_index``
+#: inside ``_finalize_result``, after the derived transform has run).
+_WAVE_LEVELS = ('country', 't')
+
+
+def _level_series(df, name):
+    """Index level *name* as an object Series on ``df``'s own index."""
+    return pd.Series(df.index.get_level_values(name), index=df.index,
+                     dtype=object)
+
+
+def conversion_to_kgs(df, price = ['Expenditure'], quantity = 'Quantity',
+                      index=['t','m','i'], unit_col = 'u', *, item_col=None,
+                      min_reports=FOOD_KG_MIN_REPORTS,
+                      min_baseline=FOOD_KG_MIN_BASELINE,
+                      min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
+                      tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
+                      baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD,
+                      _detail=False):
+    """Infer local-unit -> kg conversion factors from price ratios.
+
+    For each unit that does not appear in :data:`KNOWN_METRIC`, this
+    function computes a factor by assuming the *price per kilogram*
+    should be roughly constant across units for the same item/market.
+    That is: if a "bunch" of item j trades at roughly 2x the unit value
+    of a kg of item j, the inferred factor is 2 kg per bunch.
+
+    The mechanics, in three steps:
+
+    1. **the baseline** -- each row's price per kilogram
+       (``price / Kgs``) is medianed over a group, giving a reference
+       price for a kilogram;
+    2. **step 2** -- each row's price per UNIT (``price / quantity``) is
+       medianed over the same group plus ``u``, over rows whose kilograms
+       are not already known;
+    3. **the factor** -- their ratio, medianed over the remaining axes.
+
+    Two things about that chain were wrong before GH #850, and both are
+    fixed here.
+
+    **Step 2 used to median ``price`` itself**, not ``price / quantity``,
+    while this docstring described the result as a per-unit price.  The
+    factor it returned was therefore kilograms per transaction ROW, equal to
+    kilograms per unit only where ``Quantity == 1`` -- between 4.6% and 41.8%
+    of the corpus's rows.  The self-test is the cheap way to see it: asked
+    what a kilogram weighs, the old chain answered between 0.87 and 2.0
+    depending on the country, and the deviation tracked the median quantity
+    on the rows it looked at.
+
+    **No step carried the ITEM**, so one factor per unit label served a whole
+    country: Malawi's ``Piece`` is shared by 133 food items, and the 72 the
+    data can estimate separately run from 1 g to 1.8 kg.  Pass
+    ``item_col='j'`` for the item-keyed estimate; the default ``None``
+    reproduces the old keys (and the old return type), with the corrected
+    arithmetic.
+
+    Labels in :data:`_CURRENCY_DENOMINATED_UNITS` (e.g. ``u='Value'``) are
+    dropped from the whole computation before anything is inferred, so they
+    never appear as a key of the result: their factor is ``1/price`` at
+    ``(j, t, m)`` and a per-label constant cannot represent it (GH #770).
+
+    The item arm's grouping, and why it is not ``index + ['j']``
+    ------------------------------------------------------------
+    The baseline is keyed ``(t, item)`` -- the WAVE levels of *index* plus
+    the item, with the household level dropped.  Appending ``j`` to *index*
+    instead would ask one household to have bought item ``j`` both in
+    kilograms and in bunches within one wave, which is precisely why the
+    household key fails as an item key.  The precedent for dropping the
+    household is on the crop side: :func:`_survey_median_factors` groups
+    ``(country, t, u, condition)`` and never carries ``i``.
+
+    Two floors gate the item arm, and they gate different things:
+    *min_reports* is the number of step-2 rows behind a ``(t, item, u)``
+    estimate (the twin of :data:`SURVEY_MEDIAN_MIN_REPORTS`), and
+    *min_baseline* is the number of kg-known rows behind the ``(t, item)``
+    price-per-kg reference.  The second is the one that binds.  Neither
+    applies to the ``item_col=None`` arm, which is ungated exactly as it was
+    before #850 -- it is the FALLBACK rung, and gating a fallback would
+    leave rows with nothing.
+
+    *min_reports* is applied PER WAVE, to each ``(t, item, u)`` estimate, and
+    a wave that cannot clear it contributes nothing to the cross-wave median.
+    It was applied to the support SUMMED over waves until the GH #850 red team
+    measured it (2026-09-10), which meant one report per wave in five waves
+    cleared a floor that four reports in a single wave did not.  The crop
+    side's :func:`_survey_median_factors` gates per wave; so does this now.
+
+    A THIRD gate exists and is OFF by default: *baseline_max_spread* refuses a
+    ``(t, item)`` baseline whose own reports disagree by more than the given
+    factor, measured as ``p90/p10`` where the cell has 10 or more reports and
+    ``max/min`` below that.  The strict rung is otherwise ungated, and
+    measured on the corpus it admits cells whose reports differ by up to 9e7x
+    (median max/min 7.5 in Uganda, 178 in Malawi, 500 in Ethiopia).  Left off
+    pending a measured default; see the sweep in
+    ``.coder/ledger/850-food-kg-item-axis-impl.md``.
+
+    WHAT THE ITEM ARM IS AND IS NOT.  It is exactly as good as the item's own
+    kg-labelled rows.  Where those are sound it is right (Niger's cowpea comes
+    back at 1.11 kg per tiya against an answer key of 1.17); where they are
+    not, it is wrong AND LOCALISED, whereas the u-pooled factor it replaces
+    was wrong everywhere and diluted.  Niger's millet is the worked example:
+    nine ``Kg`` rows in one wave price millet at 2,286 FCFA/kg against a
+    retail 250-450, and the item arm hands the resulting 0.33 kg/tiya to all
+    10,107 of that item's tiya rows.  Removing a dilution is not the same
+    thing as removing an error, and a movement is not a correction until
+    something outside the estimate says so.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Food-acquired frame with ``Expenditure`` and ``Quantity``
+        columns and ``u`` (or ``unit_col``) in the index.
+    price : list[str]
+        Column(s) interpreted as expenditure for the ratio calculation.
+    quantity : str
+        Column interpreted as quantity.
+    index : list[str]
+        Groupby levels for the per-item/period median step.  At derive time
+        this is ``['t', 'i']`` -- ``m`` is minted by ``_add_market_index``
+        inside ``_finalize_result``, which runs AFTER the derived transform.
+    unit_col : str
+        Name of the unit index level; renamed to ``u`` if different.
+    item_col : str or None, default None
+        Index level naming the item.  ``None`` keeps the pre-#850 keys and
+        the ``dict[str, float]`` return.  ``'j'`` keys the result on
+        ``(item, unit)``.
+    min_reports : int, default :data:`FOOD_KG_MIN_REPORTS`
+        Floor on the step-2 support behind a ``(t, item, u)`` estimate.
+    min_baseline : int, default :data:`FOOD_KG_MIN_BASELINE`
+        Floor on the kg-known rows behind a ``(t, item)`` baseline.
+    min_baseline_tight, tight_tolerance
+        The dispersion-gated exception to *min_baseline*: a baseline with
+        between *min_baseline_tight* and ``min_baseline - 1`` reports is
+        accepted when the max/min of its per-report price per kilogram is at
+        or below *tight_tolerance*.  See :data:`FOOD_KG_TIGHT_TOLERANCE` for
+        why the spread is a range and not an IQR.
+    baseline_max_spread : float or None, default None
+        When given, a ``(t, item)`` baseline whose reports disagree by more
+        than this factor is REFUSED however many of them there are --
+        ``p90/p10`` at N >= 10, ``max/min`` below it.  Off by default; the
+        tight rung is unaffected (its own tolerance is stricter).
+
+    Returns
+    -------
+    dict[str, float] or dict[tuple[str, str], float]
+        Mapping of unit label -> inferred kg factor when ``item_col is
+        None``; of ``(item, unit)`` -> factor when it is given.  Keys are the
+        RAW ``u`` label with its case PRESERVED -- the grouping is on the raw
+        label, so ``Calebasse`` and ``calebasse`` come back as two entries
+        with two factors.  (The docstring used to say "(lowercased)", which
+        was false; :func:`_get_kg_factors` is where the lower-casing happens,
+        and it reports the resulting clashes -- see
+        :class:`UnitLabelCollisionWarning`.)  Units already in
+        :data:`KNOWN_METRIC`, units in :data:`_CURRENCY_DENOMINATED_UNITS`,
+        or units that cannot be inferred are absent from the output.
+
+        With ``_detail=True`` the item arm returns the underlying frame
+        instead -- indexed ``(item, unit)`` with columns ``kg_per_unit``,
+        ``support``, ``n_waves``, ``wave_spread`` and ``baseline_tight``.
+        Private: it exists so :func:`food_kg_factors` can report WHICH rung,
+        WHICH baseline and HOW MANY WAVES served a row without estimating
+        twice.
+    """
+    v = _kg_inference_frame(df, quantity, unit_col)
     v_infer = (v[v['Quantity_kg'].isna()] if 'Quantity_kg' in v.columns else v)
-    po = v_infer[price].groupby(index + ['u']).median().median(axis=1)
-    kgper = (po / pkg).dropna()
-    kgper = kgper.groupby('u').median()
-    #convert to dict
-    kgper = kgper.to_dict()
-    return kgper
+
+    if item_col is None:
+        pkg = v[price].divide(v['Kgs'], axis=0)
+        pkg = pkg.groupby(index).median().median(axis=1)
+        # GH #850 defect (b): the per-unit price the docstring promises.
+        # ``price`` may name several columns, so divide before the groupby
+        # and keep the existing "median across price columns" reduction.
+        po = (v_infer[price].divide(v_infer[quantity], axis=0)
+              .groupby(index + ['u']).median().median(axis=1))
+        kgper = (po / pkg).dropna()
+        kgper = kgper.groupby('u').median()
+        #convert to dict
+        return kgper.to_dict()
+
+    # --- the item arm ------------------------------------------------------
+    if item_col not in (v.index.names or []):
+        raise KeyError(
+            f"conversion_to_kgs(item_col={item_col!r}): no such index level; "
+            f"have {list(v.index.names)}")
+
+    wave = [n for n in index if n in _WAVE_LEVELS]
+    base_keys = wave + [item_col]
+
+    # ``median(axis=1)`` BEFORE the groupby rather than after it: the item arm
+    # needs the per-ROW price per kilogram (for the dispersion gate), and with
+    # the single ``price`` column every caller uses the two orders agree.
+    ppk = v[price].divide(v['Kgs'], axis=0).median(axis=1).replace(
+        [np.inf, -np.inf], np.nan)
+    # ``dropna=False`` -- pandas would otherwise DELETE an NA-keyed group
+    # (CLAUDE.md, "Grain Collapse" 3b) and under-report the support behind
+    # the cells that remain.  NA keys are dropped from the DELIVERED map
+    # below instead, so such a row falls to the unit rung rather than being
+    # served a factor pooled over "no item".
+    gb = ppk.groupby([_level_series(v, k) for k in base_keys], dropna=False)
+    base = pd.DataFrame({'median': gb.median(), 'n': gb.count(),
+                         'hi': gb.max(), 'lo': gb.min()})
+    base.index.names = base_keys
+    spread = base['hi'] / base['lo']
+    strict = base['n'] >= min_baseline
+    if baseline_max_spread is not None:
+        # OFF BY DEFAULT and measured before it is proposed (GH #850 red team,
+        # 2026-09-10).  The strict rung has no dispersion gate at all, so a
+        # 4-report cell whose reports differ by 26% is refused while a
+        # 5-report cell whose reports differ by nine million times is admitted
+        # without comment -- and the ungated rung governs 35-98% of rows while
+        # the tolerance the design argued over governs 0-0.7.
+        #
+        # The statistic switches with N for the reason the tight gate does
+        # not: with 10 or more reports a robust interdecile spread is
+        # available and a single wild report should not condemn the cell,
+        # while below 10 there are not enough points for a decile and the
+        # extremes are the question.  Quantiles are computed ONLY when the
+        # gate is on, so the default path pays nothing.
+        lo10 = gb.quantile(0.10)
+        hi90 = gb.quantile(0.90)
+        lo10.index.names = hi90.index.names = base_keys
+        wide = pd.Series(np.where(base['n'] >= 10, hi90 / lo10, spread),
+                         index=base.index)
+        strict = strict & (wide <= baseline_max_spread)
+    # The tight rung is NOT re-gated: ``tight_tolerance`` (1.25) is stricter
+    # than any *baseline_max_spread* worth proposing, so the extra condition
+    # would be a no-op wearing a second name.
+    tight = ((base['n'] >= min_baseline_tight) & (base['n'] < min_baseline)
+             & (spread <= tight_tolerance))
+    pkg = base['median'].where(strict | tight)
+
+    up = v_infer[price].divide(v_infer[quantity], axis=0).median(
+        axis=1).replace([np.inf, -np.inf], np.nan)
+    g = up.groupby([_level_series(v_infer, k) for k in base_keys + ['u']],
+                   dropna=False)
+    po, n = g.median(), g.count()
+    po.index.names = n.index.names = base_keys + ['u']
+    # Explicit positional alignment rather than pandas's leading-level
+    # broadcast, so the estimator does not depend on that behaviour.
+    ref = pkg.reindex(po.index.droplevel('u')).to_numpy()
+    est = (po / ref).replace([np.inf, -np.inf], np.nan)
+    keep = est.notna().to_numpy()
+    est, n = est[keep], n[keep]
+
+    # *min_reports* gates the PER-WAVE estimate, which is what its docstring
+    # has always said and what the crop side's ``_survey_median_factors``
+    # does.  Until the GH #850 red team measured it, the screen was applied to
+    # the support SUMMED over waves -- so one report per wave in five waves
+    # cleared a floor that four reports in a single wave did not.  Filtering
+    # here, before the cross-wave median, means a wave that cannot support an
+    # estimate contributes none, rather than lending its row count to waves
+    # that can.
+    qualifies = (n >= min_reports).to_numpy()
+    est, n = est[qualifies], n[qualifies]
+    was_tight = (tight.reindex(est.index.droplevel('u'))
+                 == True).to_numpy(dtype=bool)  # noqa: E712
+
+    ju = [item_col, 'u']
+    grp = est.groupby(ju)
+    # D6 disclosure.  The delivered factor is a median ACROSS WAVES, and
+    # nothing used to say across how many or how far apart -- so a cell
+    # estimated in one of the two waves it serves, and a cell whose two
+    # estimates differ threefold, were indistinguishable from a cell measured
+    # the same way twice.  ``support`` answers "how many reports"; these two
+    # answer "did the waves agree", which is the other half of the same
+    # question and the half ``baseline_tight`` set the precedent for.
+    detail = pd.DataFrame({'kg_per_unit': grp.median(),
+                           'support': n.groupby(ju).sum(),
+                           'n_waves': grp.size(),
+                           'wave_spread': grp.max() / grp.min()})
+    strict_est = est[~was_tight]
+    if len(strict_est):
+        strict_med = strict_est.groupby(ju).median()
+        strict_ok = _valid_factor(strict_med) > 0
+        strict_keys = strict_med.index[strict_ok]
+    else:
+        strict_keys = detail.index[:0]
+    detail = detail[np.isfinite(detail['kg_per_unit'])
+                    & (detail['kg_per_unit'] > 0)]
+    # A factor whose evidence includes NO strict baseline exists ONLY because
+    # of the dispersion-gated exception, which is the question a consumer is
+    # actually asking ("would this row have fallen to the unit rung?").  The
+    # looser reading -- "some contributing baseline was tight" -- was measured
+    # too and flags 1.5x to 2.5x as many cells for a weaker claim.
+    detail['baseline_tight'] = ~detail.index.isin(strict_keys)
+    # An NA item or an NA unit is not an item or a unit: drop those keys so
+    # the rows they came from fall to the coarser rung.
+    ok = pd.notna(detail.index.get_level_values(item_col)) & pd.notna(
+        detail.index.get_level_values('u'))
+    detail = detail[ok]
+    if _detail:
+        return detail
+    return detail['kg_per_unit'].to_dict()
 
 
 # ---------------------------------------------------------------------------
@@ -958,11 +1343,35 @@ def _normalize_columns(df):
 
     return df
 
+# Unit labels that STATE their own metric content, mapped to kilograms per
+# one such unit.  Matched against the lower-cased ``u`` label, exactly.
+#
+# THESE ARE READ, NEVER INFERRED.  A label in here never reaches the
+# price-ratio inference, so every spelling missing from this dict is a label
+# whose kilograms the library invents when the questionnaire already stated
+# them.  That is not hypothetical: before GH #850 the corpus's ``Millilitre``
+# rows were served at 0.743 kg in Malawi and 0.266 kg in GhanaLSS against a
+# true 0.001, ``Grams`` at 0.706 kg, and Mali's ``Gramme`` at 0.708 kg --
+# 708x -- because the plural, the French spelling and the ``milli`` prefix
+# were all absent (measured in ``slurm_logs/gh850_design/DESIGN.org``,
+# "Ground truth A").
+#
+# The plural / French / abbreviated spellings below were added in GH #850 and
+# are NOT a general licence to grow this dict by guessing: each one is a label
+# a country in the corpus actually mints.  A spelling nobody uses costs a line
+# here and buys nothing; a spelling somebody uses and is missing costs an
+# invented weight.
 KNOWN_METRIC = {
     'kg': 1, 'kilogram': 1, 'kilogramme': 1,
+    'kgs': 1, 'kilograms': 1, 'kilogrammes': 1, 'kilo': 1, 'kilos': 1,
     'g': 1/1000, 'gram': 1/1000, 'gramm': 1/1000,
-    'l': 1, 'litre': 1, 'liter': 1,
+    'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
+    'gm': 1/1000, 'gms': 1/1000,
+    'milligram': 1e-6,
+    'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
     'ml': 1/1000, 'cl': 1/100,
+    'millilitre': 1/1000, 'milliliter': 1/1000,
+    'millilitres': 1/1000, 'milliliters': 1/1000, 'mili liter': 1/1000,
     'pound': 0.453592, 'lbs': 0.453592,
 }
 
@@ -970,7 +1379,15 @@ KNOWN_METRIC = {
 # ``1 litre = 1 kg`` assumption (specific-gravity-1 approximation).
 # Stripped from the factor map when ``volume_as_mass=False`` is requested
 # at the public API.
-_FLUID_UNITS = ('l', 'litre', 'liter', 'ml', 'cl')
+#
+# EVERY volume spelling added to ``KNOWN_METRIC`` must be added here too, or
+# ``volume_as_mass=False`` silently keeps asserting 1 L = 1 kg for the new
+# spelling while declining it for the old one.  ``tests/test_volume_as_mass_kwarg.py``
+# pins the correspondence.
+_FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
+                'ml', 'cl',
+                'millilitre', 'milliliter', 'millilitres', 'milliliters',
+                'mili liter')
 
 # Explicit-metric pattern triples: (regex, scale, is_volume).
 # ``regex`` matches the numeric prefix; ``scale`` converts to kg (or kg-
@@ -982,10 +1399,26 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'ml', 'cl')
 # specific (``l``).  Decimal numbers (``0.5 kg``) are accepted.  Word
 # boundaries on the unit token prevent ``20gallon`` from matching the
 # ``g`` pattern.
+#
+# THE WORD BOUNDARY IS WHERE THIS WENT WRONG (GH #850).  ``\b`` after a
+# literal ``kg`` or ``l`` does not merely permit the plural -- it FORBIDS it,
+# so every one of Uganda's own container labels spelled with the plural
+# declined to match and was sent to the price-ratio inference instead:
+#
+#   ``Sack (50 kgs)``       -> None, and served as 4.4 kg
+#   ``Tin (Debe) (20 lts)`` -> None, and served as 3.3 kg
+#   ``Cup/Mug(0.5lt)``      -> None, and served as 1.0 kg
+#
+# while ``Basket (10 kg)`` and ``Bottle(750ml)`` matched all along.  The
+# repair is to spell the plural / abbreviated tokens INSIDE the alternation
+# rather than to relax the boundary: ``\b`` is what stops ``20gallon``
+# matching the ``g`` pattern, and dropping it would trade one silent error
+# for another.  Longest alternative first within each group, so ``ltr`` is
+# preferred to ``lt`` and ``kilogramme`` to ``kg``.
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kg|kilogram|kilogramme)\b',
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:gram|gramme|grams|grammes|gr|g)\b',
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
@@ -993,7 +1426,7 @@ _EXPLICIT_METRIC_PATTERNS = (
                 re.IGNORECASE), 1/1000, True),
     (re.compile(r'(\d+(?:\.\d+)?)\s*cl\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|l)\b',
+    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
 
@@ -1023,6 +1456,22 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     True
     >>> _parse_explicit_metric('2 lbs sack')
     0.907184
+
+    The plural / abbreviated spellings Uganda's own container labels use
+    (GH #850); each of these returned ``None`` before that fix.
+
+    >>> _parse_explicit_metric('Sack (50 kgs)')
+    50.0
+    >>> _parse_explicit_metric('Tin (Debe) (20 lts)')
+    20.0
+    >>> _parse_explicit_metric('Cup/Mug(0.5lt)')
+    0.5
+    >>> _parse_explicit_metric('Jerrican (5 ltrs)')
+    5.0
+    >>> _parse_explicit_metric('Tin (Debe) (20 lts)', volume_as_mass=False) is None
+    True
+    >>> _parse_explicit_metric('20gallon drum') is None
+    True
     """
     if not isinstance(s, str):
         return None
@@ -1036,6 +1485,40 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
             except (ValueError, IndexError):
                 return None
     return None
+
+
+def _seeded_kg_factors(df, *, volume_as_mass=True):
+    """The kg factors that are READ rather than inferred.
+
+    :data:`KNOWN_METRIC` plus whatever :func:`_parse_explicit_metric` can
+    take off the frame's own ``u`` labels.  Split out of
+    :func:`_get_kg_factors` for GH #850 so :func:`food_kg_factors` can seed
+    the same way without also running the u-keyed price-ratio inference.
+
+    Keys are lower-cased, matching the lookup in
+    :func:`_apply_kg_conversion`.  ``KNOWN_METRIC`` wins over the parser --
+    those are exact-match tokens that should not be re-derived from a
+    substring.
+    """
+    factors = dict(KNOWN_METRIC)
+    if not volume_as_mass:
+        for u in _FLUID_UNITS:
+            factors.pop(u, None)
+
+    if 'u' in (df.index.names or []):
+        labels = df.index.get_level_values('u').dropna().unique()
+    elif 'u' in df.columns:
+        labels = df['u'].dropna().unique()
+    else:
+        labels = ()
+    for u in labels:
+        key = str(u).lower()
+        if key in factors:
+            continue
+        kg = _parse_explicit_metric(str(u), volume_as_mass=volume_as_mass)
+        if kg is not None and np.isfinite(kg) and kg > 0:
+            factors[key] = kg
+    return factors
 
 
 def _get_kg_factors(df, *, volume_as_mass=True):
@@ -1058,25 +1541,7 @@ def _get_kg_factors(df, *, volume_as_mass=True):
         recovers the actual specific gravity per (item, region, time)
         when enough kg-reporting households share the cell.
     """
-    factors = dict(KNOWN_METRIC)
-    if not volume_as_mass:
-        for u in _FLUID_UNITS:
-            factors.pop(u, None)
-
-    # Explicit-metric parser: derive factors from labels that name their
-    # own metric content (e.g. '50 kg Bag', '500 g Packet', '1L Carton').
-    # Lower-case the keys so they match the lower-cased lookup in
-    # ``_apply_kg_conversion``.  Don't override factors already in
-    # ``KNOWN_METRIC`` -- those are exact-match tokens that shouldn't
-    # be re-derived via the parser.
-    if 'u' in df.index.names:
-        for u in df.index.get_level_values('u').dropna().unique():
-            key = str(u).lower()
-            if key in factors:
-                continue
-            kg = _parse_explicit_metric(str(u), volume_as_mass=volume_as_mass)
-            if kg is not None and np.isfinite(kg) and kg > 0:
-                factors[key] = kg
+    factors = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
 
     # Infer additional factors from price ratios where possible
     if 'Expenditure' in df.columns and 'Quantity' in df.columns:
@@ -1155,6 +1620,278 @@ def _get_kg_factors(df, *, volume_as_mass=True):
     return factors
 
 
+#: The layers :func:`food_kg_factors` resolves a row's kilograms through, in
+#: precedence order.  ``none`` is a layer, not a failure: a row it serves
+#: carries its NATIVE quantity into ``food_quantities(units='kgs')`` and is
+#: COUNTED rather than silently absent.
+#:
+#: A SIBLING OF :data:`KG_FACTOR_LAYERS`, NOT A REPLACEMENT.  The crop
+#: ladder's layers mean what they have always meant and must not be reordered,
+#: renamed or merged with these; the two tuples answer the same question about
+#: two different tables, and a row's provenance is only interpretable against
+#: the ladder that produced it.
+#:
+#: - ``survey_kg``  -- the survey supplied this row's kilograms outright
+#:   (``Quantity_kg``, GH #378).  It beats every inference, and always has.
+#: - ``metric``     -- the LABEL states the kilograms: :data:`KNOWN_METRIC`,
+#:   or :func:`_parse_explicit_metric` reading "50 kg Bag" off the label.
+#: - ``item_unit``  -- the price-ratio inference for this row's OWN
+#:   ``(item, unit)`` cell.
+#: - ``item_unit_tight`` -- the same, but the cell exists only because of the
+#:   dispersion-gated baseline exception (:data:`FOOD_KG_TIGHT_TOLERANCE`).
+#:   Separated because it is thinner evidence and a consumer is entitled to
+#:   drop it without dropping the rung.
+#: - ``unit``       -- the fallback: the u-keyed inference, pooled over every
+#:   item sharing the label.  This is what the library served for EVERY row
+#:   before GH #850, and between a fifth and a half of the inferred rows still
+#:   land here, which is the argument for reporting it.
+#: - ``none``       -- no factor.
+FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit',
+                         'item_unit_tight', 'unit', 'none')
+
+
+def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
+                    min_reports=FOOD_KG_MIN_REPORTS,
+                    min_baseline=FOOD_KG_MIN_BASELINE,
+                    min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
+                    tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
+                    baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD):
+    """Per-ROW kg-per-unit for a ``food_acquired`` frame, with provenance.
+
+    The food twin of :func:`harvest_kg_factors`, and deliberately the same
+    shape: one row per input row, a resolved ``kg_per_unit``, a
+    ``KgFactorSource`` drawn from :data:`FOOD_KG_FACTOR_LAYERS`, the
+    per-layer candidates beside it, and counts in
+    ``attrs['kg_factor_sources']`` that PARTITION the frame.
+
+    Why per-row at all (GH #850): once the inference carries an item axis, a
+    factor is no longer a property of the unit label, so there is no dict to
+    return.  And the ladder is now worth reporting -- a row served by its own
+    ``(j, u)`` cell and a row served by the u-pooled fallback were
+    indistinguishable before, and after this change they differ by more than
+    they did before it.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        ``food_acquired``-shaped, with ``u`` in the index and ``Quantity`` /
+        ``Expenditure`` columns.  Without ``Expenditure`` there is nothing to
+        take a price ratio of, and only the ``survey_kg`` / ``metric`` layers
+        can serve a row.
+    item_col : str, default ``'j'``
+        The item level.  Absent from the frame -> the item rungs serve
+        nothing and every inferred row falls to ``unit``; the layers still
+        partition.
+    volume_as_mass, min_reports, min_baseline, min_baseline_tight, tight_tolerance
+        Passed through; see :func:`conversion_to_kgs`.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Indexed like *df*, with columns ``kg_per_unit``, ``KgFactorSource``,
+        ``kg_survey``, ``kg_metric``, ``kg_item_unit``, ``kg_item_n_waves``,
+        ``kg_item_wave_spread``, ``baseline_refused_spread`` and ``kg_unit``.
+        ``attrs['kg_factor_sources']`` maps each layer to its row count;
+        ``attrs['kg_factor_wave_spread']`` reports how far the pooled waves
+        disagreed; ``attrs['kg_factor_baseline_gate']`` reports how many rows
+        the dispersion gate cost their own ``(item, unit)`` factor and where
+        they landed instead (``rows_refused == refused_to_unit +
+        refused_to_none``).  Only the first partitions the frame.
+
+    Notes
+    -----
+    WHAT THIS DOES NOT FIX, stated where a user will meet it.  The only
+    external answer key the corpus has for a food unit is Mali's own
+    questionnaire, and against it the corrected inference is BETTER and still
+    WRONG: for a stated 100 / 50 / 25 kg sack it serves a median 50.0 / 34.4 /
+    14.1 kg per row (0.50x / 0.69x / 0.56x of truth, up from 0.33x / 0.52x /
+    0.21x).  ``Gramme`` is now exact, but only because GH #850 taught the
+    label parser to READ it -- no inference was involved.  Mali's
+    ``CONTENTS.org`` advice ("use native units, or ``u = 'Kg'``") therefore
+    survives this change.  A price-ratio inference cannot be argued into
+    being a conversion table; where a country ships one, use it (the crop
+    side's ``shipped`` layer, GH #852/#854).
+
+    ``kg_per_unit`` on a ``survey_kg`` row is the factor IMPLIED by the
+    survey's own kilograms, ``Quantity_kg / Quantity``, so that
+    ``Quantity * kg_per_unit`` reproduces the delivered kilograms on every
+    row rather than on all but those.  Where that quotient cannot be formed
+    (a missing or zero ``Quantity``) the row keeps the ladder's factor and
+    still reports ``survey_kg``: the kilograms DO come from the survey, and
+    the factor column is there for the price-per-kg conversion, which would
+    otherwise lose a row it can serve.
+    """
+    idx_names = list(df.index.names or [])
+    seeded = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
+
+    if 'u' in idx_names:
+        units = df.index.get_level_values('u').astype(str).str.lower()
+    elif 'u' in df.columns:
+        units = df['u'].astype(str).str.lower()
+    else:
+        raise ValueError("food_kg_factors: expected a 'u' unit level or column")
+    kg_metric = _valid_factor(pd.Series(np.asarray(units)).map(seeded))
+
+    kg_item = np.full(len(df), np.nan)
+    kg_tight = np.zeros(len(df), dtype=bool)
+    kg_waves = np.full(len(df), np.nan)
+    kg_wave_spread = np.full(len(df), np.nan)
+    refused = np.zeros(len(df), dtype=bool)
+    kg_unit = np.full(len(df), np.nan)
+    have_price = ('Expenditure' in df.columns and 'Quantity' in df.columns)
+    if have_price:
+        group_levels = [n for n in ('t', 'm', 'i') if n in idx_names]
+        if group_levels:
+            try:
+                per_u = conversion_to_kgs(df, index=group_levels)
+            except (ValueError, ZeroDivisionError, KeyError):
+                per_u = {}
+            # The u rung is keyed on the RAW label, exactly as
+            # ``_get_kg_factors`` consumes it; lower-case here so a case
+            # variant does not silently miss.
+            lowered = {}
+            for lbl, f in per_u.items():
+                if np.isfinite(f) and f > 0:
+                    lowered.setdefault(str(lbl).lower(), float(f))
+            kg_unit = _valid_factor(pd.Series(np.asarray(units)).map(lowered))
+
+            if item_col in idx_names or item_col in df.columns:
+                try:
+                    detail = conversion_to_kgs(
+                        df, index=group_levels, item_col=item_col,
+                        min_reports=min_reports, min_baseline=min_baseline,
+                        min_baseline_tight=min_baseline_tight,
+                        tight_tolerance=tight_tolerance,
+                        baseline_max_spread=baseline_max_spread,
+                        _detail=True)
+                except (ValueError, ZeroDivisionError, KeyError):
+                    detail = None
+                if detail is not None and len(detail):
+                    items = (df.index.get_level_values(item_col)
+                             if item_col in idx_names else df[item_col])
+                    raw_u = (df.index.get_level_values('u')
+                             if 'u' in idx_names else df['u'])
+                    key = pd.MultiIndex.from_arrays(
+                        [_normalise_join_key(items),
+                         _normalise_join_key(raw_u)])
+                    ref = detail.copy()
+                    ref.index = pd.MultiIndex.from_arrays(
+                        [_normalise_join_key(
+                            ref.index.get_level_values(item_col)),
+                         _normalise_join_key(ref.index.get_level_values('u'))])
+                    # Two raw labels differing only in case normalise onto one
+                    # key; keep the first, exactly as the lower-cased lookup
+                    # in ``_get_kg_factors`` does (which already reports the
+                    # clash -- see :class:`UnitLabelCollisionWarning`; a
+                    # second warning here would be the same news twice).
+                    ref = ref[~ref.index.duplicated()]
+                    hit = ref.reindex(key)
+                    kg_item = _valid_factor(hit['kg_per_unit'])
+                    kg_tight = (hit['baseline_tight'] == True).to_numpy(  # noqa: E712
+                        dtype=bool)
+                    kg_waves = _as_float(hit['n_waves'])
+                    kg_wave_spread = _as_float(hit['wave_spread'])
+                    if baseline_max_spread is not None:
+                        # Which rows the GATE cost their item factor, as
+                        # opposed to which rows never had one.  The honest
+                        # answer is a counterfactual -- "would this row have
+                        # been served by its own (j, u) cell with the gate
+                        # off?" -- so the ungated map is estimated once more
+                        # and differenced.  A cell surviving on some OTHER
+                        # wave's baseline is therefore NOT counted: the gate
+                        # did not cost that row anything.
+                        try:
+                            ungated = conversion_to_kgs(
+                                df, index=group_levels, item_col=item_col,
+                                min_reports=min_reports,
+                                min_baseline=min_baseline,
+                                min_baseline_tight=min_baseline_tight,
+                                tight_tolerance=tight_tolerance,
+                                baseline_max_spread=None, _detail=True)
+                        except (ValueError, ZeroDivisionError, KeyError):
+                            ungated = None
+                        if ungated is not None and len(ungated):
+                            uref = ungated.copy()
+                            uref.index = pd.MultiIndex.from_arrays(
+                                [_normalise_join_key(
+                                    uref.index.get_level_values(item_col)),
+                                 _normalise_join_key(
+                                     uref.index.get_level_values('u'))])
+                            uref = uref[~uref.index.duplicated()]
+                            would_have = _valid_factor(
+                                uref.reindex(key)['kg_per_unit'])
+                            refused = np.isnan(kg_item) & ~np.isnan(would_have)
+
+    kg_survey = np.full(len(df), np.nan)
+    from_survey = np.zeros(len(df), dtype=bool)
+    if 'Quantity_kg' in df.columns:
+        qkg = _as_float(df['Quantity_kg'])
+        from_survey = np.isfinite(qkg)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            kg_survey = _valid_factor(qkg / _as_float(df['Quantity']))
+
+    item_ok = ~np.isnan(kg_item)
+    resolved = np.where(
+        ~np.isnan(kg_survey), kg_survey,
+        np.where(~np.isnan(kg_metric), kg_metric,
+                 np.where(item_ok, kg_item, kg_unit)))
+    source = np.where(
+        from_survey, 'survey_kg',
+        np.where(~np.isnan(kg_metric), 'metric',
+                 np.where(item_ok & ~kg_tight, 'item_unit',
+                          np.where(item_ok, 'item_unit_tight',
+                                   np.where(~np.isnan(kg_unit), 'unit',
+                                            'none')))))
+
+    out = pd.DataFrame({'kg_per_unit': resolved,
+                        'KgFactorSource': source,
+                        'kg_survey': kg_survey,
+                        'kg_metric': kg_metric,
+                        'kg_item_unit': kg_item,
+                        'kg_item_n_waves': kg_waves,
+                        'kg_item_wave_spread': kg_wave_spread,
+                        'baseline_refused_spread': refused,
+                        'kg_unit': kg_unit},
+                       index=df.index)
+    out.attrs['kg_factor_sources'] = {
+        layer: int((source == layer).sum()) for layer in FOOD_KG_FACTOR_LAYERS}
+    # D6's missing half.  The delivered factor is a median ACROSS WAVES, so a
+    # row can be served by a cell estimated in one of the waves it covers, or
+    # by one whose per-wave estimates disagree threefold -- and until the
+    # GH #850 red team asked, nothing in the output said which.  Counted over
+    # the rows the item rungs actually SERVE, because a spread on a cell that
+    # lost the rank is not a fact about any delivered number.
+    served_item = np.isin(source, ('item_unit', 'item_unit_tight'))
+    wide = served_item & (kg_wave_spread > FOOD_KG_WAVE_SPREAD_REPORT)
+    out.attrs['kg_factor_wave_spread'] = {
+        'threshold': FOOD_KG_WAVE_SPREAD_REPORT,
+        'rows_served_by_item_rung': int(served_item.sum()),
+        'rows_over_threshold': int(wide.sum()),
+        'rows_single_wave': int((served_item & (kg_waves == 1)).sum()),
+    }
+    # The dispersion gate's own ledger.  ``rows_refused`` is a COUNTERFACTUAL
+    # count -- rows the gate cost their own ``(item, unit)`` factor -- and is
+    # NOT a layer: those rows are served by the ladder like any others, by the
+    # u-pooled ``unit`` rung (the factor the library gave every row before
+    # GH #850) or by ``none`` where even that has none.  Counting them as a
+    # sixth layer would double-count them and break the partition; they ride
+    # alongside, exactly as ``reported_implausible`` does on the crop side.
+    # Only rows the item rung could actually have SERVED: a seeded metric
+    # label or a survey kilogram outranks it either way, so the gate cost
+    # those rows nothing.  With this restriction the three counts satisfy
+    # ``rows_refused == refused_to_unit + refused_to_none``, which is the
+    # invariant a reader will check.
+    refused = refused & np.isnan(kg_survey) & np.isnan(kg_metric)
+    out['baseline_refused_spread'] = refused
+    out.attrs['kg_factor_baseline_gate'] = {
+        'baseline_max_spread': baseline_max_spread,
+        'rows_refused': int(refused.sum()),
+        'refused_to_unit': int((refused & (source == 'unit')).sum()),
+        'refused_to_none': int((refused & (source == 'none')).sum()),
+    }
+    return out
+
+
 def _apply_kg_conversion(df, factors):
     """Convert Quantity to kg using the factors dict.
     Returns a copy with a 'Quantity_kg' column added.
@@ -1163,14 +1900,37 @@ def _apply_kg_conversion(df, factors):
     ``s10bq2_cvn``, GH #378 / DESIGN_per_row_kg_quantity) takes precedence
     where it is present and non-null; the unit→factor map only fills the
     rows that lack it.  Carried as a summable quantity (not a factor) because
-    the canonical index has no size level -- see the design doc."""
+    the canonical index has no size level -- see the design doc.
+
+    *factors* is either the ``{unit: kg}`` dict this function has always
+    taken, or -- since GH #850 -- a PER-ROW Series of kg-per-unit, which is
+    what a factor with an item axis has to be.  A Series is consumed
+    POSITIONALLY (``to_numpy``), not by label: the canonical food index is
+    not unique (a household buys the same item in the same unit from two
+    sources in one wave), so label alignment would fan the frame out.  The
+    caller must pass a Series built from THIS frame --
+    :func:`food_kg_factors` returns one."""
     v = df.copy()
     if 'u' in v.index.names:
         units = v.index.get_level_values('u').astype(str).str.lower()
     else:
         return v
 
-    factor_kg = v['Quantity'] * units.map(factors)
+    if isinstance(factors, pd.Series):
+        if len(factors) != len(v):
+            raise ValueError(
+                f"_apply_kg_conversion: per-row factors have {len(factors)} "
+                f"rows but the frame has {len(v)}; a Series is applied "
+                f"positionally and must be built from this frame")
+        per_unit = _as_float(factors)
+    else:
+        per_unit = pd.to_numeric(pd.Series(units.map(factors)),
+                                 errors='coerce').to_numpy(dtype='float64',
+                                                           na_value=np.nan)
+    # Arithmetic on ndarrays, not on Series: the canonical food index is not
+    # unique, and two Series sharing a non-unique index align rather than
+    # multiply row by row.
+    factor_kg = pd.Series(_as_float(v['Quantity']) * per_unit, index=v.index)
     if 'Quantity_kg' in v.columns:
         # Precomputed exact kg wins; fall back to the factor estimate only
         # where the survey didn't supply one.
@@ -1847,8 +2607,8 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
         return q
 
     # units == 'kgs': carry rule
-    factors = _get_kg_factors(df, volume_as_mass=volume_as_mass)
-    v = _apply_kg_conversion(df, factors)
+    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+    v = _apply_kg_conversion(df, kgf['kg_per_unit'])
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
     # otherwise carry native Quantity with native u.  Subsumes the
@@ -1875,6 +2635,15 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     # `v` omitted; see `food_expenditures_from_acquired` for rationale.
     group_by = [n for n in ['t', 'i', 'j', 'u', 's'] if n in out.index.names]
     out = out.groupby(group_by).sum()
+    # Stamped AFTER the aggregation: ``out`` is a fresh frame, so anything
+    # attached upstream is gone by here.  The counts are over the INPUT rows
+    # (they partition ``df``), not over the returned ones -- the returned
+    # frame is a sum over units and sources and has no per-layer identity.
+    out.attrs['kg_factor_sources'] = dict(kgf.attrs['kg_factor_sources'])
+    out.attrs['kg_factor_wave_spread'] = dict(
+        kgf.attrs['kg_factor_wave_spread'])
+    out.attrs['kg_factor_baseline_gate'] = dict(
+        kgf.attrs['kg_factor_baseline_gate'])
     return out
 
 
@@ -1974,9 +2743,10 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
             empty['Price'] = np.array([], dtype='float64')
             return empty[['Price']]
 
+    kgf = None
     if units == 'kgvalue':
-        factors = _get_kg_factors(df, volume_as_mass=volume_as_mass)
-        v = _apply_kg_conversion(df, factors)
+        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+        v = _apply_kg_conversion(df, kgf['kg_per_unit'])
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
     elif units == 'unitvalue':
@@ -1986,12 +2756,19 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
         v = df.copy()
         # Price column already populated.
     elif units == 'kgprice':
-        factors = _get_kg_factors(df, volume_as_mass=volume_as_mass)
         if 'u' in df.index.names:
-            u_lower = df.index.get_level_values('u').astype(str).str.lower()
-            kg_per_unit = pd.Series(u_lower.map(factors).values, index=df.index)
+            # The SAME per-row factor the 'kgvalue' branch converts with
+            # (GH #850): before that, this branch mapped ``u -> factor``
+            # through an independent dict, so the two branches could
+            # disagree on a row.
+            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+            kg_per_unit = pd.Series(_as_float(kgf['kg_per_unit']),
+                                    index=df.index)
             with np.errstate(divide='ignore', invalid='ignore'):
-                v = df.assign(Price=df['Price'] / kg_per_unit)
+                v = df.assign(
+                    Price=pd.Series(_as_float(df['Price'])
+                                    / _as_float(kg_per_unit),
+                                    index=df.index))
         else:
             # No u index → can't convert; emit NaN
             v = df.assign(Price=np.nan)
@@ -2030,6 +2807,16 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
         # caller can audit the loss without parsing the warning text.
         if tally is not None:
             v.attrs['price_rows_dropped'] = tally
+    # Same reasoning as in ``food_quantities_from_acquired``: stamped last,
+    # counted over the INPUT rows.  Absent on the modes that use no factor
+    # ('unitvalue', 'unitprice') rather than present and zero -- a mode that
+    # never consults the ladder has no ladder to report.
+    if kgf is not None:
+        v.attrs['kg_factor_sources'] = dict(kgf.attrs['kg_factor_sources'])
+        v.attrs['kg_factor_wave_spread'] = dict(
+            kgf.attrs['kg_factor_wave_spread'])
+        v.attrs['kg_factor_baseline_gate'] = dict(
+            kgf.attrs['kg_factor_baseline_gate'])
     return v
 
 

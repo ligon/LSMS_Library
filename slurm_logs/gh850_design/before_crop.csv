@@ -1,0 +1,9 @@
+country,crop_rows,harvest_rows,harvest_kg_total,layer_reported,layer_shipped,layer_survey_median,layer_inferred,layer_none,layer_reported_implausible,layer_shipped_implausible,layer_shipped_matched,dis_reported_vs_shipped_both,dis_reported_vs_shipped_share,dis_reported_vs_survey_median_both,dis_reported_vs_survey_median_share,dis_reported_vs_inferred_both,dis_reported_vs_inferred_share
+Uganda,130606,36095,10868272.24500081,14050,0,57,28147,88352,99,0,0,0,,6975,0.4043010752688172,1896,0.05379746835443038
+Malawi,131379,60056,36035981.74998998,0,0,0,90013,41366,0,0,0,0,,0,,0,
+Nigeria,62844,19007,22111817.805087462,19667,0,342,11635,31200,11,0,0,0,,19658,0.40863770475124633,171,0.0
+Ethiopia,85519,22672,1905711.49962,0,0,0,26546,58973,0,0,0,0,,0,,0,
+Tanzania,14126,11372,26597421.7,0,0,0,11731,2395,0,0,0,0,,0,,0,
+Niger,46341,3794,2239966.5,0,0,0,5066,41275,0,0,0,0,,0,,0,
+Mali,35060,2175,1763220.75,0,0,0,2300,32760,0,0,0,0,,0,,0,
+EthiopiaRHS,17523,14390,5614233.3521618005,0,0,0,17523,0,0,0,0,0,,0,,0,

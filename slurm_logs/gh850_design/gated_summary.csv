@@ -1,0 +1,10 @@
+country,fa_rows,n_factors,fq_rows,fq_kg_rows,fq_kg_total,fq_native_total,fp_rows,fp_kg_rows,fp_kgprice_rows,kg_factor_sources
+Uganda,355571,156,349057,349057,1242402.7733372827,0.0,349081,0,325838,"{'survey_kg': 0, 'metric': 182550, 'item_unit': 59744, 'item_unit_tight': 718, 'unit': 112559, 'none': 0}"
+Malawi,971531,464,971028,970478,2582664.7233336736,1209.75,681613,919,0,"{'survey_kg': 419998, 'metric': 253347, 'item_unit': 225580, 'item_unit_tight': 889, 'unit': 70726, 'none': 991}"
+Nigeria,595725,98,595053,595042,1544689.5392154013,36.95,481613,0,0,"{'survey_kg': 166585, 'metric': 250905, 'item_unit': 125763, 'item_unit_tight': 0, 'unit': 52461, 'none': 11}"
+Ethiopia,325920,97,325435,325431,747006.1065104057,6.0,263641,0,0,"{'survey_kg': 0, 'metric': 221148, 'item_unit': 86534, 'item_unit_tight': 0, 'unit': 18103, 'none': 135}"
+Tanzania,251613,32,250899,250899,778514.5273103232,0.0,195579,0,0,"{'survey_kg': 0, 'metric': 248019, 'item_unit': 3532, 'item_unit_tight': 0, 'unit': 62, 'none': 0}"
+Niger,239031,70,238272,238234,252794.78919871384,103.0,198370,0,0,"{'survey_kg': 0, 'metric': 22419, 'item_unit': 57013, 'item_unit_tight': 30, 'unit': 159526, 'none': 43}"
+Mali,430271,68,414417,414417,12909083.62274452,0.0,342194,0,0,"{'survey_kg': 0, 'metric': 130191, 'item_unit': 125854, 'item_unit_tight': 0, 'unit': 172692, 'none': 1534}"
+EthiopiaRHS,54693,103,54445,51922,216819.75519112736,16520.200000086727,35625,0,0,"{'survey_kg': 0, 'metric': 12430, 'item_unit': 25837, 'item_unit_tight': 249, 'unit': 13645, 'none': 2532}"
+GhanaLSS,5259320,73,1611029,483096,2418800.8893710957,15627853054.732216,407478,0,152224,"{'survey_kg': 0, 'metric': 85963, 'item_unit': 504417, 'item_unit_tight': 5980, 'unit': 925799, 'none': 3737161}"
