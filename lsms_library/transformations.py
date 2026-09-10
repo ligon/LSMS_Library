@@ -2139,7 +2139,7 @@ def legacy_locality(country):
 #     import lsms_library as ll
 #     from lsms_library.transformations import harvest_kg, yield_kg
 #     cp = ll.Country('Uganda').crop_production()
-#     hk = harvest_kg(cp)                       # (t,i,plot,j) -> Harvest_kg
+#     hk = harvest_kg(cp)                    # (t,i,plot_id,j) -> Harvest_kg
 #     pf = ll.Country('Uganda').plot_features()
 #     y  = yield_kg(cp, pf)                      # ... -> Yield_kg per ha
 #
@@ -2168,20 +2168,47 @@ def legacy_locality(country):
 
 
 # Plot-level index names emitted by the various countries' item features.
-# ``plot`` is the canonical (Uganda) name; ``plot_id`` is the Tanzania /
-# Ethiopia / Malawi name.  The transforms accept either.
-_PLOT_LEVELS = ('plot', 'plot_id')
+# ``plot_id`` is the CANONICAL name (@ligon, 2026-09-10): it is what
+# ``plot_features`` declares in all 23 countries that have it, what Ethiopia /
+# GhanaSPS / Tanzania already declare on ``crop_production``, and what
+# ``lsms_library/data_info.yml``'s ``index_info`` registers.  ``plot`` was
+# Uganda's spelling and is retained as an accepted ALIAS -- countries are
+# renamed to ``plot_id`` per-country, so both spellings live in the corpus until
+# that lands.  The transforms accept either and EMIT the canonical one.
+#
+# Preference order: first entry wins when (impossibly) both are present.
+_PLOT_LEVELS = ('plot_id', 'plot')
+
+#: The canonical plot-axis level name -- what every transform in this module
+#: puts on its output index regardless of which spelling it was handed.
+_PLOT_CANONICAL = _PLOT_LEVELS[0]
+
+
+def _canonicalise_plot_level(res, plot_level):
+    """Rename ``plot_level`` on ``res``'s index to :data:`_PLOT_CANONICAL`.
+
+    One schema out, whatever spelling came in.  A no-op when the level is
+    already canonical or absent.
+    """
+    if plot_level and plot_level != _PLOT_CANONICAL:
+        res.index = res.index.rename({plot_level: _PLOT_CANONICAL})
+    return res
 
 
 def _resolve_plot_level(names):
     """Return whichever of :data:`_PLOT_LEVELS` is present in ``names``.
 
     Lets a transform group by the plot grain regardless of whether the
-    country's feature names its plot level ``plot`` (Uganda) or ``plot_id``
-    (Tanzania, Ethiopia, …).  Returns ``None`` when neither is present.
+    country's feature names its plot level ``plot_id`` (canonical; Tanzania,
+    Ethiopia, GhanaSPS, every ``plot_features``) or the legacy ``plot``
+    (Uganda's spelling).  Returns ``None`` when neither is present.
     """
+    # NB: `names` may be a `pd.Index` (a frame's `.columns`), whose truth value
+    # is ambiguous -- so test for None explicitly rather than with `or []`.
+    if names is None:
+        return None
     for name in _PLOT_LEVELS:
-        if name in (names or []):
+        if name in names:
             return name
     return None
 
@@ -3031,7 +3058,7 @@ def _disagreement(reference, other,
 
 def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
                min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
-    """Total harvested kilograms per (t, i, plot, j) from ``crop_production``.
+    """Total harvested kilograms per (t, i, plot_id, j) from ``crop_production``.
 
     MECHANICAL reduction (GAP 1 → WB ``Plotcrop``/``Plot`` ``harvest_kg``).
     For each reported harvest row, convert the native-unit ``Quantity`` to
@@ -3063,7 +3090,7 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     ----------
     crop_production : pd.DataFrame
         The ``crop_production`` item feature, indexed by
-        ``(t, i, plot, j, u, season)`` (``v`` may also be present — it is
+        ``(t, i, plot_id, j, u, season)`` (``v`` may also be present — it is
         ignored for the reduction and dropped from the output grain) with a
         reported ``Quantity`` column in native unit ``u``.
     volume_as_mass : bool, default True
@@ -3098,7 +3125,7 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     Returns
     -------
     pd.DataFrame
-        One ``Harvest_kg`` column indexed by ``(t, i, plot, j)`` (whichever
+        One ``Harvest_kg`` column indexed by ``(t, i, plot_id, j)`` (whichever
         of those levels are present), summed over native units and season.
 
         ``result.attrs['kg_factor_sources']`` is ``{layer: n_rows}`` over the
@@ -3165,10 +3192,10 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     group_by = [n for n in ['t', 'i', plot_level, 'j']
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
-    # Normalise the plot level name to 'plot' so downstream (yield_kg) and
-    # cross-country callers see one schema regardless of source naming.
-    if plot_level == 'plot_id':
-        res.index = res.index.rename({'plot_id': 'plot'})
+    # Normalise the plot level name to the canonical 'plot_id' so downstream
+    # (yield_kg) and cross-country callers see one schema regardless of source
+    # naming.
+    res = _canonicalise_plot_level(res, plot_level)
     # ``groupby`` drops ``attrs``, so the tallies are re-stashed here -- the
     # same idiom ``food_prices`` uses for ``price_rows_dropped``.
     res.attrs['kg_factor_sources'] = factors.attrs['kg_factor_sources']
@@ -3180,7 +3207,7 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
 def _parcel_from_crop_plot(plot, i):
     """Extract the parcel token from a ``crop_production`` plot id.
 
-    Uganda's ``crop_production.plot`` is ``{hhid}-{parcel}-{plot}`` (e.g.
+    Uganda's ``crop_production.plot_id`` is ``{hhid}-{parcel}-{plot}`` (e.g.
     ``'1021000108-1-2'``).  Strip the leading ``{hhid}-`` and return the
     first remaining ``-``-delimited token (the parcel).  Returns the plot id
     unchanged when it doesn't carry the ``{hhid}-`` prefix (other countries'
@@ -3240,7 +3267,7 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         Land grain to join on.
 
         - ``'parcel'`` (default): reconcile the two plot vocabularies to
-          their common *parcel* key — ``crop_production.plot`` is
+          their common *parcel* key — ``crop_production.plot_id`` is
           ``{hhid}-{parcel}-{plot}`` while ``plot_features.plot_id`` is
           ``{parcel}_{suffix}``, and both encode the same parcel.  Harvest
           is summed over the parcel's crops and plots, area over the
@@ -3255,7 +3282,7 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     -------
     pd.DataFrame
         One ``Yield_kg`` column indexed by ``(t, i, parcel)`` (or
-        ``(t, i, plot)`` for ``on='plot'``) — kilograms per area-unit (the
+        ``(t, i, plot_id)`` for ``on='plot'``) — kilograms per area-unit (the
         area unit is whatever ``plot_features.AreaUnit`` records; Uganda
         stores hectare-equivalent areas, so ``Yield_kg`` is kg/ha).
 
@@ -3273,14 +3300,16 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass,
                     min_reports=min_reports,
                     shipped_factors=shipped_factors).reset_index()
-    if 'plot' not in hk.columns:
-        raise ValueError("harvest_kg must yield a 'plot' level to join area")
+    hk_key = _resolve_plot_level(hk.columns)
+    if hk_key is None:
+        raise ValueError(
+            "harvest_kg must yield a 'plot_id' level to join area")
 
     pf = plot_features.reset_index()
-    plot_key = 'plot' if 'plot' in pf.columns else (
-        'plot_id' if 'plot_id' in pf.columns else None)
+    plot_key = _resolve_plot_level(pf.columns)
     if plot_key is None:
-        raise ValueError("plot_features must carry a 'plot' or 'plot_id' level")
+        raise ValueError(
+            "plot_features must carry a 'plot_id' (or legacy 'plot') level")
     if area_col not in pf.columns:
         raise ValueError(f"plot_features must have a {area_col!r} column")
 
@@ -3289,12 +3318,12 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     if on == 'parcel':
         hk['_land'] = [
             _parcel_from_crop_plot(p, i)
-            for p, i in zip(hk['plot'],
+            for p, i in zip(hk[hk_key],
                             hk['i'] if 'i' in hk.columns else [''] * len(hk))
         ]
         pf['_land'] = pf[plot_key].map(_parcel_from_feature_plot)
     else:
-        hk['_land'] = hk['plot'].astype(str)
+        hk['_land'] = hk[hk_key].astype(str)
         pf['_land'] = pf[plot_key].astype(str)
 
     keys = base + ['_land']
@@ -3308,8 +3337,11 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     with np.errstate(divide='ignore', invalid='ignore'):
         merged['Yield_kg'] = merged['Harvest_kg'] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=['Yield_kg'])
-    out = merged.rename(columns={'_land': 'parcel' if on == 'parcel' else 'plot'})
-    idx = base + ['parcel' if on == 'parcel' else 'plot']
+    # `on=` is a MODE string, not a level name: the emitted level is the
+    # canonical `plot_id` (or `parcel`).
+    land_level = 'parcel' if on == 'parcel' else _PLOT_CANONICAL
+    out = merged.rename(columns={'_land': land_level})
+    idx = base + [land_level]
     return out.set_index(idx)[['Yield_kg']].sort_index()
 
 
@@ -3319,7 +3351,7 @@ def _labor_days_by_source(plot_labor, source=None, *,
 
     Shared backend for :func:`total_labor_days`,
     :func:`total_family_labor_days`, :func:`total_hired_labor_days`.  Reduces
-    ``plot_labor`` (grain ``(t, i, plot, source, season)``) to the household
+    ``plot_labor`` (grain ``(t, i, plot_id, source, season)``) to the household
     grain ``(t, i)`` by summing ``PersonDays`` across every plot, season, and
     (when ``source`` is None) labor source.
     """
@@ -3345,7 +3377,7 @@ def total_labor_days(plot_labor):
     Parameters
     ----------
     plot_labor : pd.DataFrame
-        ``plot_labor`` item feature, grain ``(t, i, plot, source, season)``,
+        ``plot_labor`` item feature, grain ``(t, i, plot_id, source, season)``,
         with a reported ``PersonDays`` column.
 
     Returns
@@ -3597,7 +3629,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     Parameters
     ----------
     plot_inputs : pd.DataFrame
-        ``plot_inputs`` item feature, grain ``(t, i, plot, input, j)``, with
+        ``plot_inputs`` item feature, grain ``(t, i, plot_id, input, j)``, with
         a reported ``Quantity`` column and a ``u`` column (Uganda stores the
         input unit as a *column* ``u``, not an index level).
     nitrogen_content : dict[str, float], optional
@@ -3609,7 +3641,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     Returns
     -------
     pd.DataFrame
-        One ``Nitrogen_kg`` column indexed by ``(t, i, plot)``.  Plots with
+        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  Plots with
         fertilizer input but no convertible-unit row sum to 0; plots with no
         fertilizer at all are absent.  ``attrs['nitrogen_input_match']``
         carries the label-join tally -- ``matched_rows`` /
@@ -3686,8 +3718,7 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     group_by = [n for n in ['t', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
-    if plot_level == 'plot_id':
-        res.index = res.index.rename({'plot_id': 'plot'})
+    res = _canonicalise_plot_level(res, plot_level)
     # A JOIN diagnostic, always present, taken before any reduction can hide
     # it -- the twin of harvest_kg_factors' `shipped_matched`.
     res.attrs['nitrogen_input_match'] = _match_tally
@@ -3718,7 +3749,7 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
     Returns
     -------
     pd.DataFrame
-        One ``Seed_kg`` column indexed by ``(t, i, plot)``.
+        One ``Seed_kg`` column indexed by ``(t, i, plot_id)``.
 
     Notes
     -----
@@ -3755,8 +3786,7 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True):
     group_by = [n for n in ['t', 'i', plot_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
-    if plot_level == 'plot_id':
-        res.index = res.index.rename({'plot_id': 'plot'})
+    res = _canonicalise_plot_level(res, plot_level)
     return res
 
 
@@ -4247,8 +4277,8 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
     ----------
     crop_production : pd.DataFrame
         ``crop_production`` item feature carrying a reported sale-value
-        column.  Grain varies by country: ``(t, i, plot, j, u, condition,
-        season)`` in Uganda, ``(t, i, plot, crop, u)`` in Malawi.
+        column.  Grain varies by country: ``(t, i, plot_id, j, u, condition,
+        season)`` in Uganda, ``(t, i, plot_id, crop, u)`` in Malawi.
     by : {None, 'j', 'crop'}, optional
         ``None`` (default) reduces all the way to ``(t, i)``.  Any of
         ``'j'`` / ``'crop'`` keeps the crop level, whichever name this
@@ -4282,7 +4312,7 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
     **No de-duplication, by design (count, never clip).**  Where a country
     attached a household-crop sale total to more than one physical row, a
     plain sum would double-count it.  It does not: measured on the warm
-    corpus (2026-09-09), at Uganda's finest key ``(t, i, plot, j, season)``
+    corpus (2026-09-09), at Uganda's finest key ``(t, i, plot_id, j, season)``
     only 963 of 44,598 groups hold more than one non-zero sale row, and in
     just **37** of those do all rows share ONE ``Value_sold`` -- the
     stamping shape.  926 carry genuinely differing values, which is what
@@ -4954,7 +4984,7 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
           share no literal key at all -- 0 rows on ``'plot'``, 509 on
           ``'parcel'``.  Measured no-op on Malawi, whose two features
           already share the literal key (66,298 of 66,368 distinct
-          ``(t, i, plot)`` keys match, 99.9%, identically under either
+          ``(t, i, plot_id)`` keys match, 99.9%, identically under either
           setting).
         - ``'plot'``: join the literal plot key verbatim.  Use where the two
           features are known to share a vocabulary and the parcel
@@ -4965,7 +4995,7 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     pd.DataFrame
         One column -- ``Nitrogen_kg_per_ha`` or ``Fertilizer_kg_per_ha``,
         named for the numerator so the basis cannot be lost -- indexed by
-        ``(t, i, plot)`` (or ``(t, i, parcel)`` for ``on='parcel'``).
+        ``(t, i, plot_id)`` (or ``(t, i, parcel)`` for ``on='parcel'``).
 
     Notes
     -----
@@ -5011,17 +5041,17 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         num_col, out_col = 'Fertilizer_kg', 'Fertilizer_kg_per_ha'
 
     num = num.reset_index()
-    if 'plot' not in num.columns:
+    num_key = _resolve_plot_level(num.columns)
+    if num_key is None:
         raise ValueError(
-            "fertilizer_rate: the fertilizer numerator has no 'plot' level "
+            "fertilizer_rate: the fertilizer numerator has no 'plot_id' level "
             "to join area on")
 
     pf = plot_features.reset_index()
-    plot_key = 'plot' if 'plot' in pf.columns else (
-        'plot_id' if 'plot_id' in pf.columns else None)
+    plot_key = _resolve_plot_level(pf.columns)
     if plot_key is None:
         raise ValueError(
-            "plot_features must carry a 'plot' or 'plot_id' level")
+            "plot_features must carry a 'plot_id' (or legacy 'plot') level")
     if area_col not in pf.columns:
         raise ValueError(f"plot_features must have a {area_col!r} column")
 
@@ -5030,13 +5060,13 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     if on == 'parcel':
         num['_land'] = [
             _parcel_from_crop_plot(p, i)
-            for p, i in zip(num['plot'],
+            for p, i in zip(num[num_key],
                             num['i'] if 'i' in num.columns
                             else [''] * len(num))
         ]
         pf['_land'] = pf[plot_key].map(_parcel_from_feature_plot)
     else:
-        num['_land'] = num['plot'].astype(str)
+        num['_land'] = num[num_key].astype(str)
         pf['_land'] = pf[plot_key].astype(str)
 
     keys = base + ['_land']
@@ -5065,7 +5095,9 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     with np.errstate(divide='ignore', invalid='ignore'):
         merged[out_col] = merged[num_col] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=[out_col])
-    land_name = 'parcel' if on == 'parcel' else 'plot'
+    # `on=` is a MODE string, not a level name: the emitted level is the
+    # canonical `plot_id` (or `parcel`).
+    land_name = 'parcel' if on == 'parcel' else _PLOT_CANONICAL
     out = merged.rename(columns={'_land': land_name})
     return out.set_index(base + [land_name])[[out_col]].sort_index()
 

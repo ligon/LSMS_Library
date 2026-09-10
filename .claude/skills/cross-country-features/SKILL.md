@@ -36,12 +36,21 @@ then fail (GH #325/#326).
 
 **Registration alone is not enough** — it needs the per-country level *names* to be
 consistent. Heterogeneity blocks it (and naive registration can make it worse):
-- Different names for the same level (`crop`↔`j`, `plot`↔`plot_id`) → **declare them in
+- Different names for the same level (`crop`→`j`, `plot`→`plot_id`) → **declare them in
   `Index Info › level_aliases`** (GH #569, landed for `crop_production`). This used to
   say "harmonize the per-country index names first", i.e. curate ~14 country configs;
   it is now a two-line config entry applied at assembly by `_rename_index_levels`.
   The `Country()` path keeps its native names, which is why
   `transformations._CROP_LEVELS` / `_PLOT_LEVELS` still exist.
+  **The plot axis is `plot_id`** (@ligon, 2026-09-10) — the spelling all 23
+  `plot_features` countries already declare — so `crop_production` is registered
+  `(t, v, i, plot_id, j, u, condition, season)` and `plot` is the alias, not the
+  target. Every `transformations.py` plot-grain transform (`harvest_kg`,
+  `nitrogen_kg`, `seed_kg`, `yield_kg`, `fertilizer_rate`) EMITS `plot_id`
+  whichever spelling it was handed. A shared axis NAME is not a shared
+  VOCABULARY: `crop_production` keys Uganda's plots `{hhid}-{parcel}-{plot}`
+  while `plot_features` keys them `{parcel}_{suffix}` — see
+  `transformations._parcel_from_crop_plot` and the `on=` kwarg.
 - A level only *some* countries carry (`condition`, `season`) → **declare a sentinel in
   `Index Info › missing_level_sentinels`**. `_align_to_canonical_levels` then, per
   country, promotes the level from a COLUMN if one exists (null-filled with the
@@ -59,7 +68,7 @@ consistent. Heterogeneity blocks it (and naive registration can make it worse):
   `Country()` frame of that table.
 - **EthiopiaRHS** ships COARSE household-level versions of item-level tables (assets,
   livestock, crop_production); its divergent index breaks the concat — treat it as a
-  separate table. It is still excluded from `crop_production` (no `plot`), by design.
+  separate table. It is still excluded from `crop_production` (no `plot_id`), by design.
 
 `_harmonize_country_frame` reorders each country's index to canonical order by NAME
 (GH #498) — even with no extra level to drop — so positionally-mislabelled indices

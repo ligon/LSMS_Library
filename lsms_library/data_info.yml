@@ -62,7 +62,10 @@ Index Info:
     # (reduced to (t,v,i) -- handled as a reduced-index country).  The other
     # two plot-level ag features (plot_labor/plot_inputs) are still NOT here:
     # their per-country index NAMES diverge (plot vs plot_id, crop vs j) and
-    # need harmonizing before registration -- GH #569.  crop_production is
+    # need harmonizing before registration -- GH #569.  The plot axis half of
+    # that divergence is settled: `plot_id` is the canonical spelling
+    # EVERYWHERE (@ligon, 2026-09-10) -- it is what all 23 `plot_features`
+    # countries already declare -- and `plot` is the alias.  crop_production is
     # registered below; the name divergence is now handled DECLARATIVELY by
     # `level_aliases`, so the same treatment generalises to the other two.
     livestock: (t, i, animal)
@@ -75,8 +78,9 @@ Index Info:
     # itself); no `skip_extra` entry is therefore needed below.
     nonfood_expenditures: (t, v, i, j)
     # GH #569/#775.  The canonical crop grain is the one the `KgFactor` note
-    # under `Columns:` already states -- "(t, i, plot, j, u, condition, season)
-    # and are never summed across `u` or `condition`" -- plus `v`, which every
+    # under `Columns:` already states -- "(t, i, plot_id, j, u, condition,
+    # season) and are never summed across `u` or `condition`" -- plus `v`, which
+    # every
     # frame carries because `_join_v_from_sample` adds it at API time (the same
     # reason food_acquired is registered `(t, v, i, j, u, s)` while every
     # country declares `(t, i, j, u, s)`).  KEEPING `v` HERE IS LOAD-BEARING:
@@ -84,11 +88,17 @@ Index Info:
     # `v`, so registering without it would silently strip `v` from every
     # `Country(...).crop_production()` frame in the corpus.
     #
-    # Registration alone would have kept nothing extra: only Uganda declares the
-    # full shape.  What makes it work is `level_aliases` (plot_id -> plot, crop
+    # Registration alone would have kept nothing extra: no country declares the
+    # full shape.  What makes it work is `level_aliases` (plot -> plot_id, crop
     # -> j) and `missing_level_sentinels` below -- see `feature.py`'s
     # `_align_to_canonical_levels`.
-    crop_production: (t, v, i, plot, j, u, condition, season)
+    #
+    # The plot axis is `plot_id`, not `plot` (@ligon, 2026-09-10).  `plot_id` is
+    # what `plot_features` declares in all 23 countries that have it, and what
+    # Ethiopia / GhanaSPS / Tanzania already declare on crop_production; `plot`
+    # was Uganda's spelling and is now an ALIAS.  See
+    # `.coder/ledger/crop-production-plot-id.md`.
+    crop_production: (t, v, i, plot_id, j, u, condition, season)
 
   # Per-feature canonical level-name ALIASES: `<the name a country emits>:
   # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
@@ -99,10 +109,15 @@ Index Info:
   # re-interpretation: only add a pair when the two names denote the SAME axis
   # with the SAME vocabulary.  crop/j are both the harmonize_crop ->
   # harmonize_food Preferred Label (the fact `transformations._CROP_LEVELS`
-  # already encodes); plot/plot_id are both the within-household plot key.
+  # already encodes); plot/plot_id are both the within-household plot key,
+  # `plot_id` being the canonical spelling (see the `crop_production` entry
+  # above).  A rename does NOT make two plot VOCABULARIES joinable: Uganda's
+  # `crop_production` keys plots `{hhid}-{parcel}-{plot}` while its
+  # `plot_features` keys them `{parcel}_{suffix}`, which is exactly what
+  # `transformations._parcel_from_crop_plot` exists for.
   level_aliases:
     crop_production:
-      plot_id: plot
+      plot: plot_id
       crop: j
 
   # Per-feature SENTINEL for a canonical index level a country does not carry.
@@ -689,7 +704,7 @@ Columns:
         difference of carrier, and the difference is forced by the grain.
         Food rows are SUMMED across units within an acquisition source, so
         food needs the summable product.  Crop rows sit at
-        (t, i, plot, j, u, condition, season) and are never summed across
+        (t, i, plot_id, j, u, condition, season) and are never summed across
         `u` or `condition`, so the factor is the natural carrier: it
         identifies the container (a 100 kg sack is not a 120 kg sack), it
         can be audited against the library's inferred factors for the same

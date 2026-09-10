@@ -72,11 +72,19 @@ def _frame(rows, *, with_kgfactor=True):
 
 
 def _legacy_harvest_kg(df):
-    """The pre-change algorithm, spelled out: Quantity x inferred factor."""
+    """The pre-change algorithm, spelled out: Quantity x inferred factor.
+
+    The frames here are keyed with the legacy ``plot`` spelling (Uganda's);
+    ``harvest_kg`` emits the canonical ``plot_id`` whichever it was handed
+    (@ligon, 2026-09-10), so the reference implementation renames to match.
+    That is a level NAME, not a value -- ``assert_frame_equal`` still compares
+    every key and every kilogram.
+    """
     qty = pd.to_numeric(df["Quantity"], errors="coerce")
     kg = qty * _kg_factor_series(df)
     out = pd.DataFrame({"Harvest_kg": kg}).replace(0, np.nan).dropna()
-    return out.groupby(["t", "i", "plot", "j"]).sum()
+    res = out.groupby(["t", "i", "plot", "j"]).sum()
+    return res.rename_axis(index={"plot": "plot_id"})
 
 
 # ---------------------------------------------------------------------------
