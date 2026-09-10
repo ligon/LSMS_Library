@@ -8,6 +8,12 @@ whose labels decode to Kg/Sack/Bunch); the harvest CONDITION is a5aq6b,
 now an index level in its own right (GH #323/#637) so fresh and dry
 records for one plot-crop no longer collide and get summed.
 See uganda.CROP_COLMAPS for the per-wave column map.
+
+The SOLD unit (a5?q7c) and SOLD condition (a5?q7b) are carried as
+Unit_sold / Condition_sold (GH #824): Value_sold / Quantity_sold is a price
+per Unit_sold, never per u.  KNOWN DEFECT: AGSEC5A's a5aq7c is CAPPED AT
+CODE 20 in the shipped extract, so Unit_sold is NA on most season-A sales
+and its non-nullity is not random -- see Uganda/_/CONTENTS.org.
 """
 import sys
 sys.path.append('../../_/')

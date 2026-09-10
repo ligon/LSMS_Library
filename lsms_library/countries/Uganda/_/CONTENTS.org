@@ -1019,6 +1019,40 @@ the Stata metadata on 2026-07-21:
 | 2019-20 | agsec5a | s5aq06c_2 | s5aq06b_2 | slot 2                                                   |
 | 2019-20 | agsec5b | s5bq06c_1 | s5bq06b_1 | slot 1 (slot 2 not wired; see Known Issues)              |
 
+*The SALE has its own unit and its own condition* (GH #824, wired
+2026-09-09).  UNPS question 7 is compound -- "how much of the harvest was
+SOLD, in what CONDITION and in what UNIT" -- and it is asked ON THE SAME
+SOURCE ROW, so no merge is needed (contrast Malawi, whose sale module is a
+separate file at household-crop grain: commit =85947ff5=).  Identified by the
+SAME rule as 6b/6c -- the value-label vocabulary and the value range, never
+the variable label.  Verified per wave against the Stata metadata and the
+questionnaires on 2026-09-09:
+
+| wave    | file    | sold condition | sold unit  | non-null (unit / cond) | note                                                              |
+|---------+---------+----------------+------------+------------------------+-------------------------------------------------------------------|
+| 2009-10 | AGSEC5A | a5aq7b         | a5aq7c     | 3 508 / 3 486          | no value labels; matched by code distribution (69.2% unit-only)     |
+| 2009-10 | AGSEC5B | a5bq7b         | a5bq7c     | 3 582 / 3 533          | ditto (65.3% unit-only)                                             |
+| 2010-11 | AGSEC5A | a5aq7b         | a5aq7c     | *2 115* / 3 662        | *unit column CAPPED AT CODE 20* -- see below                        |
+| 2010-11 | AGSEC5B | a5bq7b         | a5bq7c     | 3 266 / 3 276          | ditto, uncapped (range 0-500)                                       |
+| 2011-12 | AGSEC5A | *(none)*       | a5aq7c     | 3 612 / --             | *no 7b column ships*; the form asks it -- =asked-not-distributed=   |
+| 2011-12 | AGSEC5B | *(none)*       | a5bq7c     | 3 210 / --             | ditto                                                               |
+| 2013-14 | AGSEC5A | a5aq7b         | a5aq7c     | 3 188 / 3 270          | *the 6b/6c swap does NOT extend here* -- 7b/7c are labelled right   |
+| 2013-14 | AGSEC5B | a5bq7b         | a5bq7c     | 3 155 / 3 173          | variable + value labels agree                                       |
+| 2015-16 | AGSEC5A | a5aq7b         | a5aq7c     | 3 862 / 3 891          | (=A5AQ7D=, the sold kg factor, is upper-case in this file only)      |
+| 2015-16 | AGSEC5B | a5bq7b         | a5bq7c     | 2 977 / 3 001          | 7b carries no value labels; values are 100% in-scheme               |
+| 2018-19 | AGSEC5A | s5aq07b_1      | s5aq07c_1  | 2 734 / 2 934          | *a sold unit EXISTS although the harvest side has none* (#842)      |
+| 2018-19 | AGSEC5B | s5bq07b_1      | s5bq07c_1  | 2 331 / 2 530          | =_2= slot not wired (mirrors the unwired harvest =_2= slot)          |
+| 2019-20 | agsec5a | s5aq07b_1/_2   | s5aq07c_1/_2 | 2 759+572 / 2 884+573 | slots 1 and 2; =_11= / =_21= "part harvest" slots not wired         |
+| 2019-20 | agsec5b | s5bq07b_1      | s5bq07c_1  | 2 584 / 2 705          | slot 2 not wired (mirrors the unwired harvest slot 2)               |
+
+*7b is the condition and 7c the unit in every wave and every season.*  The
+discriminating statistics are the share of values that are codes occurring
+ONLY in =harvest_units= (35 codes) and ONLY in =harvest_conditions= (9
+codes).  Sold-unit columns score 65.3-87.0% unit-only and 0.0-2.5%
+condition-only; sold-condition columns score 98.0-100% inside the condition
+scheme, 53.1-67.1% condition-only and 0.0-1.2% unit-only.  There is no wave
+where the two are ambiguous.
+
 A comment previously in =uganda.py= claimed "the WB .do's A5aq6b/A5aq6c
 unit/condition rename is inverted for these actual UNPS files".  That is
 *true of exactly one file* — 2013-14 AGSEC5A, where =a5aq6b= is titled
@@ -2057,50 +2091,229 @@ ratio of 105-146) with *100%* of cells beyond log 1.5.
   on two independent downloads), so the CSV distribution could not be used as
   a cross-check.
 
-** TODO The SOLD unit and SOLD condition are never wired (GH #824)
+** DONE The SOLD unit and SOLD condition are now wired (GH #824)
 
-Found 2026-09-08, same pass.  AGSEC5A/5B ask question 7 as a compound
-question -- *how much was sold, in what condition, and in what unit* -- so
-the quantity sold has its OWN unit (=a5?q7c=) and its OWN condition
-(=a5?q7b=), distinct from the harvest unit (=a5?q6c=) and harvest condition
-(=a5?q6b=) that =crop_production= keys on.  =CROP_COLMAPS= wires neither.
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/824][#824]] (Uganda half)
+- Status :: *FIXED 2026-09-09*, =uganda.py= =CROP_COLMAPS= +
+  =crop_production_for_wave=; declared in =_/data_scheme.yml= and in the
+  canonical =lsms_library/data_info.yml=.
 
-=crop_production.Quantity_sold= and =Value_sold= are therefore denominated
-in a unit the table does not carry, while the row's =u= advertises the
-*harvest* unit.  Measured share of sale rows where the two disagree:
+AGSEC5A/5B ask question 7 as a compound question -- *how much was sold, in
+what condition, and in what unit* -- so the quantity sold has its OWN unit
+(=a5?q7c=) and its OWN condition (=a5?q7b=), distinct from the harvest unit
+(=a5?q6c=) and harvest condition (=a5?q6b=) that =crop_production= keys on.
+=CROP_COLMAPS= wired neither, so =Quantity_sold= / =Value_sold= were
+denominated in a unit the table did not carry while the row's =u= advertised
+the *harvest* unit.
+
+They are now carried as the *=Unit_sold*= and *=Condition_sold*= columns,
+canonicalised through the SAME =harvest_units= / =harvest_conditions= org
+tables that =u= and =condition= use.  Per-wave source columns and the
+identification evidence are in the table under "Which source column is the
+unit and which is the condition" above.
+
+*The sale is on the harvest ROW, so Uganda needs no merge.*  This is the one
+structural difference from Malawi's half of #824 (=85947ff5=), whose sale
+module is a separate file at household-crop grain and had to be joined onto
+the harvest row -- Malawi's honest fix was to join on =u=, which makes
+=Value_sold/Quantity_sold= a price per =u= *by construction* and is why
+Malawi declares no =Unit_sold=.  Both shapes are correct; the canonical
+=data_info.yml= note documents both so a future country picks the right one.
+
+*** NA, never a sentinel -- and that is deliberate
+
+=u= carries =Unknown= and =condition= carries =unknown_condition= because
+they are declared INDEX levels and a null index key is deleted outright by
+=groupby(dropna=True)=.  =Unit_sold= and =Condition_sold= are ordinary
+COLUMNS with no such hazard, so they are NA-bearing -- and NA says something
+a category cannot: *this row records no sale*, or records one whose unit the
+survey did not capture.  Both are =optional: true=, for two independent
+reasons: 2011-12 ships no 7b column at all, and a row with no sale has no
+sold unit.
+
+*** Nothing moved except the two new columns (cold, isolated =LSMS_DATA_DIR=)
+
+| quantity                    | before             | after         |
+|-----------------------------+--------------------+---------------|
+| rows, whole table           | 130 606            | *identical*   |
+| rows per =(t, season)=      | --                 | *identical*   |
+| index tuples                | --                 | *identical*   |
+| =sum(Quantity)=             | 7 309 085.96       | *identical*   |
+| =sum(Quantity_sold)=        | 18 134 251.40      | *identical*   |
+| =sum(Value_sold)=           | 10 709 007 434.04  | *identical*   |
+| =sum(KgFactor)=             | 958 552.32         | *identical*   |
+| =u='Unknown'= per =(t,season)= | --              | *identical*   |
+| every pre-existing column   | --                 | *equal, elementwise* |
+
+*** Coverage: =Unit_sold= non-null as a share of sale rows (=Quantity_sold > 0=)
 
 | wave    | season A | season B |
 |---------+----------+----------|
-| 2009-10 |     7.6% |     6.3% |
-| 2010-11 |     5.9% |     4.9% |
-| 2011-12 |     2.0% |     2.8% |
-| 2013-14 |    10.4% |     2.5% |
-| 2015-16 |     3.4% |     2.6% |
-| 2018-19 |       -- |     4.4% |
+| 2009-10 |    95.1% |    97.5% |
+| 2010-11 |  *57.2%* |    97.9% |
+| 2011-12 |    99.8% |    99.7% |
+| 2013-14 |    94.1% |    99.1% |
+| 2015-16 |    98.9% |    99.1% |
+| 2018-19 |    93.0% |    91.9% |
+| 2019-20 |    96.4% |    95.3% |
+| *panel* | *93.9%*  |          |
 
-The 2019-20 variable label removes all doubt: =s5aq07c_1= is titled
-"7c. Unit of crop sold" and carries the full 40-label =harvest_units=
-vocabulary, beside =s5aq06b_1= "6b. Unit" for the harvest.
+=Condition_sold= is 98.1-100% on every cell *except 2011-12, which is 0%* --
+that wave ships no 7b column.  The questionnaire asks it
+(=Uganda2011-12AgricultureQuestionnaire.pdf= prints "7a Qty | 7b
+Condition/State Code | 7c Unit Code" on p.13 for 5A and p.21 for 5B), so this
+is =asked-not-distributed=, not =not-asked=, and =CROP_COLMAPS= says so with
+an explicit =condition_sold: None=.
 
-Two further consequences worth stating:
+*** KNOWN DEFECT: 2010-11 AGSEC5A's sold-unit column is capped at code 20
 
-1. *2018-19 season A is recoverable.*  It has no harvest unit column at all
-   (=u='Unknown'= on every row, see the item above), but it DOES have
-   =s5aq07c_1=, populated on 93.1% of its 2 937 sale rows.  A sale price
-   for that wave-season exists in the data and is currently unreachable
-   through =crop_production=.
-2. *A non-circular kg basis exists and is unused.*  =a5?q7d= ("Record
-   conversion factor into KG of quantity/unit sold") is a household-reported
-   kg factor for the SOLD unit -- 2 343 non-null rows in 2013-14, 2 664 in
-   2015-16.  The library's =_get_kg_factors= instead infers factors from
-   =Expenditure/Quantity= ratios, which is circular against source 1; this
-   column is not.
+=a5aq7c= carries no value above 20 -- 2 115 non-null with 18 distinct codes,
+against 3 662 non-null for the same file's 7b and 3 266 / 52 distinct for
+2010-11 AGSEC5B's =a5bq7c= (range 0-500).  Among the 3 657 rows with a
+positive sold quantity, *P(sold unit null | harvest unit code >= 21) = 0.973*
+versus *P(null | harvest code < 21) = 0.026*, and the codes missing entirely
+are exactly the common high ones -- 22 Plastic Basin (15 lts), 68 Bunch
+(Medium), 69, 67.  So =Unit_sold= is legitimately NA on most of that cell's
+sales *and its non-nullity is not random*: a consumer must never read the NA
+as "sold in the harvest unit".  Pinned by
+=tests/test_uganda_sold_unit.py::test_2010_11_season_a_sold_unit_is_capped_at_code_20=.
+Worth reporting upstream to the World Bank alongside the 2015-16 x100 defect.
 
-Wiring either MOVES rows between =u= values, so both are separate changes
-with their own before/after, in the same class as the two items above.
-Cross-country: the same defect is recorded for Nigeria (95-97% agreement)
-and Niger (63-99%) in =.coder/ledger/price-sources-comparison.md= -- it is
-GH #824, not a Uganda quirk.
+*** 2018-19 season A is now reachable
+
+That wave-season has *no harvest unit column at all* (=u='Unknown'= on all
+7 153 rows, GH #842), but it *does* have =s5aq07c_1=, titled "7c. Unit",
+carrying the full 40-label =harvest_units= value-label set: 2 734 non-null,
+19 distinct, range 1-92, *84.8% unit-only codes and 0.0% condition-only*.
+Its sibling =s5aq07b_1= is the mirror image (100% inside the condition
+scheme, 60.6% condition-only, 0.0% unit-only), and the questionnaire agrees
+with both (p.14/17 for 5A, p.25 for 5B, all printing "7a Qty | 7b
+Condition/State Code | 7c Unit Code").  Three independent sources concur, so
+*the condition-as-unit trap does not recur on the sold side*.
+
+That trap is real on the harvest side and is worth naming, because a
+=Unit_sold= wiring copied from EPAR would inherit it:
+=EPAR_UW_Uganda_UNPS_W7.do:520-523= does =gen unit_code_harv=a5aq6c=, and
+=a5aq6c= in this file is a *condition* column -- all 20 condition codes also
+occur as =unit_code= values in EPAR's own =UG_Conv_fact_harvest_table.dta=,
+so the merge at =W7.do:579= *succeeds on a condition code* and returns a
+kilogram figure instead of a missing one.  The columns here were re-derived
+from the survey's own value ranges, not copied.  (EPAR's sold-unit
+conversion table is also *waves 3-5 only* --
+=Master_Conversionfactor_table.do:271,286= both =keep if wave=="wave 3" |
+"wave 4" | "wave 5"= immediately before the sold collapses, with no such
+filter on the harvest collapses at =:248,260= -- so nothing taken from it may
+be extended to waves 1-2.)
+
+*** Agreement, and what the disagreement costs
+
+=Unit_sold == u= on *96.0%* of the 40 183 sale rows that know both (=u !=
+'Unknown'=); by wave-season 92.0-98.0%, i.e. *2.0-8.0% disagree*.  (The
+"95-97% agree" figure in #824 was *Nigeria's*; this is Uganda's.)  2018-19
+season A is excluded from that count by construction -- =u= is =Unknown= on
+all of it.
+
+*Aggregate medians barely move, and quoting only that would be misleading.*
+Median =Value_sold/Quantity_sold= per (crop, unit) for the ten
+highest-=Value_sold= crops, dominant sold unit each, =Unknown= / NA excluded
+(2 734 priced rows have NA =Unit_sold=, 3 297 have =u='Unknown'=, of 45 519
+priced rows):
+
+| crop        | dominant sold unit     | n(U_sold) | med UGX/U_sold | n(u) | med UGX/u | ratio |
+|-------------+------------------------+-----------+----------------+------+-----------+-------|
+| Matoke      | Bunch (Medium)         |     4 130 |          6 000 | 4 182 |     5 333 | 0.889 |
+| Coffee      | Kg                     |     1 915 |          1 200 | 1 717 |     1 120 | 0.934 |
+| Maize       | Sack (100 kgs)         |     3 175 |         50 000 | 3 106 |    50 000 | 1.000 |
+| Beans       | Kg                     |     2 934 |          1 000 | 2 722 |     1 000 | 1.000 |
+| Sugarcane   | Bundle (Unspecified)   |        76 |          2 750 |   111 |     3 000 | 1.091 |
+| Cassava     | Sack (100 kgs)         |     1 071 |         40 000 | 1 025 |    40 000 | 1.000 |
+| Rice        | Sack (100 kgs)         |       258 |        120 000 |   245 |   110 000 | 0.917 |
+| Ground Nuts | Sack (100 kgs)         |       820 |         70 000 |   822 |    70 000 | 1.000 |
+| Tomatoes    | Plastic Basin (15 lts) |       226 |         10 628 |   239 |    10 000 | 0.941 |
+| Soybean     | Kg                     |       803 |          1 200 |   731 |     1 200 | 1.000 |
+
+*1 of 10* moves by more than 10% (Sugarcane, 9.1% -- so in fact none does).
+The medians are stable because only *3.5% of priced rows* are affected.  *On
+those rows the error is severe.*  Of the 1 571 affected priced rows, 1 057
+carry a nominal weight in BOTH unit labels ("Sack (100 kgs)" -> 100; a
+documentation-only reading, the served table converts nothing), and for those
+the implied per-kg price was off by a factor with *median 4.0, p75 40, p90
+100, max 240* -- *73.1% off by >= 2x and 26.7% by >= 100x*.  The largest
+single cell is =u='Sack (100 kgs)'= with =Unit_sold='Kg'= (169 rows, a 100x
+error).  That is Malawi's factor-of-50 pathology in Ugandan clothing.
+
+*** Top sold units, whole panel (43 distinct)
+
+Kg 27.8%, Sack (100 kgs) 25.1%, Bunch (Medium) 11.2%, Plastic Basin (15 lts)
+10.8%, Tin (Debe) (20 lts) 6.1%, Sack (120 kgs) 5.2%, Bunch (Big) 3.5%, Bunch
+(Small) 3.0%, Sack (50 kgs) 1.9%, Sack (unspecified) 0.9%.  Top sold
+conditions: dried_grain 42.1%, fresh 33.5%, fresh_in_pods 7.2%,
+dried_in_pods 5.1%, dried 3.8%, dried_with_shell 3.7%.
+
+*** Codes the scheme does not know become NA, and are few
+
+Sold-unit codes outside =harvest_units=, per wave-season: 2009-10 72 / 74;
+2010-11 22 / 52; 2011-12 2 / 10; 2013-14 83 / 1; 2015-16 4 / 0; 2018-19 0 / 0;
+2019-20 0 / 1.  Only 26 of those 321 rows carry a code the FILE labels but
+=harvest_units= does not -- 2011-12 5B's =Yard=, =Bottle(750 ml)=, =Loaf
+(500g)=, =Packet (500g)=, =packet (100g)=, =Ream=, =Gourd (1-5 lts)=, =Gourd
+(5-10 lts)=, and one =Nomi Tin (0.25 kg)= each in 2013-14 5B and 2019-20 5B.
+*Deliberately NOT added to =harvest_units=*: that table also serves the
+HARVEST unit, so extending it would move =u= and needs its own before/after.
+
+*** De-duplication: a disagreeing sold label is blanked, never guessed
+
+The de-duplication block at the end of =crop_production_for_wave= SUMS
+=Quantity_sold= across rows that share the whole declared index.  A sum taken
+across two *different* sold units is in no unit, so the label columns are
+collapsed by =build_transforms.reduce_to_agreed(on_conflict='na')= -- the
+same "lossless or loud" reducer Uganda's =cluster_features= hook uses: the
+agreed value is kept, a conflicted cell is set NA with a
+=GrainConflictWarning=, and =LSMS_GRAIN_STRICT=1= escalates to a raise.
+*Nothing is dropped*; only the label is withheld.  Corpus-wide this is *11 of
+130 606 groups* -- 2009-10 6 =Unit_sold=; 2011-12 1; 2013-14 2 =Unit_sold= +
+1 =Condition_sold=; 2015-16 1 =Condition_sold=.  Those groups are a
+pre-existing defect in the summed =Quantity_sold= that this column makes
+visible for the first time.
+
+Two properties of that reducer worth knowing before you rely on it.  *Under
+=LSMS_GRAIN_STRICT=1= these 11 groups make the Uganda build FATAL* -- that is
+the ratchet working as designed, not a regression; nothing in =tests/= builds
+Uganda =crop_production= with the lever set (checked 2026-09-09).  And *the
+=GrainConflictWarning= is a COLD-BUILD signal only*: =reduce_to_agreed= files
+no grain report and nothing stamps it into the wave parquet, so a warm read
+says nothing about the 11 groups.  That is the GH #323 "the signal must
+survive the cache" lesson, and it is a property of =reduce_to_agreed= itself
+-- Uganda's =cluster_features= hook has the same gap -- not of this change.
+
+*** Still not wired, deliberately
+
+1. *The SOLD kg factor* =a5?q7d= / =A5?Q7D= ("Record conversion factor into
+   KG of quantity/unit sold") -- a household-reported kg rate for the SOLD
+   unit, shipped from 2011-12 on (2 343 non-null in 2013-14, 2 664 in
+   2015-16).  It is *non-circular*, unlike the =Expenditure/Quantity= ratio
+   inference in =transformations._get_kg_factors=, and it is the one thing
+   that would give 2018-19 season A a per-kg farmgate price without going
+   through a unit label.  Natural name =KgFactor_sold=; wiring it ADDS a
+   column and needs its own before/after, exactly as =kg_factor= did (#849).
+2. *2018-19 AGSEC5B's =_2= sold slot* (=s5bq07{a,b,c}_2=, 574-577 non-null)
+   and *2019-20 AGSEC5A's =_11= / =_21= "part harvest" slots*
+   (=s5aq07{a,b,c}_{11,21}= -- the sale block of the questionnaire's separate
+   partially-harvested repeat page, first seen on the 2018-19 form at
+   stream/page 17).  =CROP_COLMAPS= reads neither on the harvest side either,
+   so the two sides stay consistent; wiring them ADDS rows.
+3. *A per-kg conversion of the sale.*  =crop_production= serves REPORTED
+   values only.  Converting =Quantity_sold= to kilograms is a transformation
+   and belongs beside =transformations.harvest_kg=.  Note for whoever writes
+   it: =harvest_kg_factors= resolved BOTH unit labels to kg on only 26 of the
+   1 617 rows where the sold and harvest units differ, so its coverage on
+   crop units is a live limitation, separate from this change.
+
+*** Cache consequence
+
+=uganda.py= is folded into *every* Uganda table's input hash, so all of
+Uganda's cached parquets invalidate: *a full Uganda re-warm is required after
+merge*, not just =crop_production=.
 
 ** DONE 2009-10 harvest quantities carried an unstripped 99999 sentinel (#861)
 

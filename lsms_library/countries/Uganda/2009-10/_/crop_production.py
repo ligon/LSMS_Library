@@ -8,6 +8,12 @@ whose labels decode to Kg/Sack/Bunch); the harvest CONDITION is a5aq6b,
 now an index level in its own right (GH #323/#637) so fresh and dry
 records for one plot-crop no longer collide and get summed.
 See uganda.CROP_COLMAPS for the per-wave column map.
+
+The SOLD unit (a5?q7c) and SOLD condition (a5?q7b) are carried as
+Unit_sold / Condition_sold (GH #824): Value_sold / Quantity_sold is a price
+per Unit_sold, never per u.  Neither column carries value labels this wave;
+both were identified by code distribution against harvest_units /
+harvest_conditions.
 """
 import sys
 sys.path.append('../../_/')

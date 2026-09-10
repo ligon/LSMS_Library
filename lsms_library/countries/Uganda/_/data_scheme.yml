@@ -176,6 +176,40 @@ Data Scheme:
     Quantity: float
     Quantity_sold: float
     Value_sold: float
+    # THE SALE HAS ITS OWN UNIT AND ITS OWN CONDITION (GH #824).  UNPS
+    # question 7 is compound -- "how much of the harvest was SOLD, in what
+    # CONDITION and in what UNIT" -- so Quantity_sold is denominated in
+    # `Unit_sold` (q7c) and NOT in the row's `u`, which is the HARVEST unit
+    # (q6c).  Measured on the built table (2026-09-09, isolated
+    # LSMS_DATA_DIR): they disagree on 4.0% of the 40 183 sale rows that know
+    # both -- 2.0-8.0% by wave-season -- and on the 1 057 affected priced rows
+    # whose two unit labels both carry a nominal weight, the implied per-kg
+    # price was off by a factor with median 4.0 and >= 100x on 26.7% of them
+    # (the biggest cell is u='Sack (100 kgs)' with Unit_sold='Kg', 169 rows,
+    # a 100x error).  Aggregate medians barely move -- only 1 of the 10
+    # highest-value crops shifts by >10% -- because the affected rows are a
+    # small minority; the per-row error is the point.  Same 'harvest_units'
+    # vocabulary as `u`; same 'harvest_conditions' vocabulary as the
+    # `condition` index level.
+    #
+    # NA-bearing, never sentinel-filled -- unlike `u` and `condition`, which
+    # are INDEX levels and must carry 'Unknown' / 'unknown_condition'
+    # because a null index key is deleted outright by groupby(dropna=True).
+    # These are plain columns, so NA is safe AND more informative: it says
+    # "no sold unit recorded on this row", which is a different fact from
+    # any unit.
+    #
+    # `optional` for both, for two independent reasons: 2011-12 ships no 7b
+    # column at all (asked on the questionnaire, dropped from the extract),
+    # so Condition_sold is legitimately 100% null in that wave; and a row
+    # with no sale has no sold unit, so neither column is ever fully
+    # populated.  The null-content guard must not fire on either.
+    Unit_sold:
+      type: str
+      optional: true
+    Condition_sold:
+      type: str
+      optional: true
     harvest_month: int
     intercropped: bool
     # SURVEY-REPORTED kilograms per ONE unit of the row's `u` -- UNPS

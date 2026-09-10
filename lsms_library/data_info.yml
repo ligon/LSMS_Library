@@ -520,7 +520,7 @@ Columns:
         outside the source's labelled scheme -- it is a real value, never
         NA, because a null index key is silently dropped by the duplicate
         collapse in a country's build script.
-      spellings:
+      spellings: &crop_condition_vocabulary
         green_with_shell_and_stalk: []
         green_with_shell: []
         green_in_cob: []
@@ -598,6 +598,74 @@ Columns:
         reading it as a harvest is a category error; the only sanctioned
         use is `Quantity * KgFactor` on the SAME row, which is what
         `harvest_kg` does.
+    Unit_sold:
+      type: str
+      optional: true
+      note: |
+        The unit the SALE was reported in, AS THE INSTRUMENT ASKED IT --
+        e.g. UNPS q7c, "Unit Code" on the sale block, asked beside the sold
+        quantity.  A SECOND unit, distinct from the row's `u`, which is the
+        HARVEST unit.
+
+        WHY IT IS A COLUMN AND NOT THE INDEX LEVEL `u`.  A harvest module
+        that asks "how much did you harvest, in what unit" and then "how
+        much of it did you sell, in what unit" has recorded ONE plot-crop
+        record with TWO units.  The harvest quantity is in `u`; the sold
+        quantity is in `Unit_sold`.  Making the sold unit a second index
+        level would split every row in two and duplicate the harvest; making
+        it overwrite `u` would relabel the harvest.  It is a per-row
+        attribute of the sale, so it is a column.
+
+        THE CONSUMER RULE, AND IT IS THE POINT OF THE COLUMN:
+        `Value_sold / Quantity_sold` is a price per ONE `Unit_sold` --
+        NEVER per `u`.  A farmgate price per kilogram is
+        `Value_sold / (Quantity_sold * kg-per-Unit_sold)`, converted through
+        the SAME unit machinery `u` uses.  Where `Unit_sold` is NA the
+        survey did not record a unit for that sale and the ratio has no
+        denominator you can name; that is not licence to substitute `u`.
+
+        HOW OFTEN IT MATTERS is a per-country fact and must be measured, not
+        assumed: sold and harvest unit agree on 95-97% of Nigeria's sale
+        rows, 63-99% of Niger's by wave, and 96.0% of Uganda's (measured
+        2026-09-09 over the 40,183 sale rows that know both; GH #824).
+        Tanzania records every sale in kilograms and needs no such column.
+
+        NA-BEARING, NEVER SENTINEL-FILLED.  `u` carries the string
+        `Unknown` because it is a declared INDEX level and a null index key
+        is deleted outright by `groupby(dropna=True)` (see the `u` note at
+        the top of this file).  `Unit_sold` is a column, has no such hazard,
+        and NA says something a category cannot: this row records no sale,
+        or records one whose unit the survey did not capture.
+
+        A COUNTRY MAY LEGITIMATELY NOT DECLARE IT.  Where the sale module
+        is a SEPARATE file at a coarser grain, the honest fix is to attach
+        the sale only to the harvest row measured in the SAME unit, so the
+        ratio is a price per `u` BY CONSTRUCTION -- which is what Malawi
+        does (`malawi._sale_block` / `assemble_crop_production`, commit
+        85947ff5, merging on `(i, _crop_code, u)`).  Both shapes are
+        correct; what is not correct is dividing by a quantity whose unit
+        the table never states.  `optional: true` because of exactly this:
+        the column exists where the instrument asks a second unit on the
+        same row (Uganda), and is absent where it does not.
+    Condition_sold:
+      type: str
+      optional: true
+      note: |
+        Physical state of the crop AT THE MOMENT OF SALE -- UNPS q7b,
+        "Condition/State Code", asked beside the sold quantity and the sold
+        unit.  Same vocabulary as the harvest `condition` above (the
+        `spellings` block is a YAML alias of it, so the two cannot drift),
+        and the same warning applies with more force: a quantity sold DRY
+        and a quantity sold FRESH are not commensurable, and neither are
+        their prices.
+
+        It is a separate answer from `condition`, not a copy: a household
+        may harvest green and sell dried.  NA where the wave records no
+        sold-condition column (Uganda 2011-12 ships none, though the
+        questionnaire asks it) or the household reported no sale --
+        NA-bearing for the same reason `Unit_sold` is, and unlike the
+        `condition` INDEX level, which must carry `unknown_condition`.
+      spellings: *crop_condition_vocabulary
   food_acquired:
     # Acquisition source 's' is an INDEX level (see Index Info above),
     # not a column.  Canonical values: purchased, produced, inkind,
