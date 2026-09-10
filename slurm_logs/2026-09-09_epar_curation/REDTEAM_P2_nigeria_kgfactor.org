@@ -1,0 +1,552 @@
+#+TITLE: Red team — feat/859-nigeria-kgfactor (a287a0a7)
+#+DATE: 2026-09-09
+#+AUTHOR: red-team agent (read-only on the repo)
+
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-nigeria-kgfactor=, commit
+=a287a0a7=.  Every invocation ran with =PYTHONPATH=<worktree>=,
+=LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries=, interpreter
+=/global/scratch/.../mirrors/LSMS_Library/.venv/bin/python=.  Identity asserted
+at the top of the session:
+
+: pkg   /global/scratch/.../wt-nigeria-kgfactor/lsms_library/__init__.py
+: croot /global/scratch/.../wt-nigeria-kgfactor/lsms_library/countries
+: pandas 3.0.2
+
+Two data roots were used.  The implementer's =<worktree>/.data= was READ only
+(and re-verified intact at the end: =crop_production.parquet= still carries
+=KgFactor= and hash =7a08dec2...=).  All destructive probing ran against a
+=cp -a= copy in the session scratchpad.  =~/.local/share/lsms_library= was
+never touched.  =find lsms_library/countries -name '*.parquet'= = *0* after
+every build; =git status --short= in the worktree is empty.
+
+GitNexus was unavailable (=CONNECTION_CLOSED=, no =.gitnexus/= index), so the
+=CLAUDE.md=-sanctioned substitute was used: =rg=/=grep= call-site sweeps for
+blast radius.  Declared, not skipped.
+
+* ITEM 5 — the cache trap :: *FAIL* (framework bug; the ledger's diagnosis is wrong)
+
+** What the ledger claims
+
+=.coder/ledger/859-nigeria-kgfactor.md= (and the =CONTENTS.org= §Cache entry by
+implication) attributes the observed miss to the *=legacy= branch*:
+=crop_production='s parquet is script-written and hashless, so the first read
+graded =legacy= -> trust-once-and-stamp, and "one read, one edit — and the
+window closes, which is why it is easy to hit once and impossible to reproduce
+twice."
+
+** What actually happens
+
+That is not the mechanism, and the real one is *strictly worse*: it is not a
+one-shot window, it fires on *every* hash move, and it never self-heals.
+
+The chain, verified end to end:
+
+1. =Country._table_cache_hash= moves (config edit).  The gate works: the read
+   at =country.py:3804= grades =stale= and logs
+   =v0.8.0 cache STALE: crop_production ...; rebuilding from source=.
+2. The rebuild descends =load_from_waves= -> (no wave declares
+   =crop_production=) -> =country_fallback = run_make_target('crop_production',
+   wave=None)= (=country.py:3691=).
+3. =run_make_target= tries =try_make= FIRST (=country.py:3538=), running
+   =make -s <data_root>/Nigeria/var/crop_production.parquet= in
+   =Nigeria/_=.  *Nigeria's =_/Makefile= has no rule for that target.*  GNU
+   make, given a rule-less target that EXISTS as a file, reports it up to date
+   and *exits 0*.  Measured directly:
+
+   : $ make -s -n "<...>/Nigeria/var/crop_production.parquet"   # exists
+   : exit=0
+   : $ make -s -n "/tmp/nonexistent_xyz/crop_production.parquet"
+   : make: *** No rule to make target ... Stop.
+   : exit=2
+
+4. =try_make= therefore logs =Makefile executed successfully ...=, finds the
+   (stale) file in =unique_candidates=, and returns it.  *=try_script= — the
+   only thing that would actually run =_/crop_production.py= — is never
+   reached.*
+5. The stale frame is read back and returned, then written at
+   =country.py:3865= with =cache_hash=self._table_cache_hash(...)= — i.e. the
+   *stale content is stamped with the NEW, correct hash*.  Every subsequent
+   read grades =fresh=.  The bug has erased its own evidence.
+
+** Reproduction (isolated =LSMS_DATA_DIR=, scratch copy)
+
+Simulated an "old-code" parquet by dropping =KgFactor= from the warm parquet
+and stamping a bogus hash, then reading through the public API:
+
+: DEBUG lsms_library.country v0.8.0 cache STALE: crop_production at <...>; rebuilding from source
+: INFO  lsms_library.country Makefile executed successfully for Nigeria/ALL. Rechecking for crop_production...
+: RESULT cols: ['Quantity','u','Quantity_sold','Value_sold','planting_month','harvest_month','intercropped','perennial']
+: rows 62844
+
+No =KgFactor=.  Post-read, the parquet's stored hash was
+=7a08dec2523b146d390f3de649edc73a5ed25c49d40d5353c03b40ede50b4141= — *equal to
+the freshly-computed expected hash*.  Blessed.
+
+Counterfactual, same copy, =rm var/crop_production.parquet= first:
+
+: make: *** No rule to make target '<...>/Nigeria/var/crop_production.parquet'.  Stop.
+: INFO  lsms_library.country Python fallback executed for _.crop_production.
+: RESULT cols: [... , 'KgFactor']   rows 62844
+
+So the implementer's *observation* is right and their *remedy* (=cache clear=)
+is right.  Their *mechanism* is wrong, and their reassurance ("impossible to
+reproduce twice") is the dangerous part.  Their own "decisive probe" — STALE
+logged, parquet re-stamped — is this bug being misread as the gate working.
+The =legacy= branch they describe is real but requires an out-of-framework
+script run; it is not what happened here.
+
+** =_evict_hashless_wave_caches= (GH #479) does NOT cover this
+
+=country.py:3219=: =country_root.glob(f"*/_/{method_name}.parquet")= with
+=if p.parent.parent.name in ("_","var"): continue=.  That pattern matches
+=<wave>/_/x.parquet= only.  The *country-level* =var/x.parquet= has no =_/=
+component and never matches.  GH #479 closed the wave-level hole; the
+country-level hole is untouched and, as far as I can find, undocumented —
+=CLAUDE.md= §"Cache Behavior" override #1 describes the *soft* =LSMS_NO_CACHE=
+case for *L2-wave* script parquets only.
+
+** =LSMS_NO_CACHE=1= does not help either (measured)
+
+Same simulated-old parquet, read with =LSMS_NO_CACHE=1=: returns the stale
+frame, still no =KgFactor=, 62 844 rows.  It bypasses the read gate but lands
+in the same =try_make= exit-0.  *The only escape is physically removing the
+=var/= parquet* (=lsms-library cache clear --country Nigeria=).
+
+** Why it slipped every guard
+
+=_assert_built_required_columns= would have raised on a missing *required*
+declared column.  =KgFactor= is =optional: true= (correctly — W1–W3 have no
+source column), so the stale frame passed silently.  The =optional= flag that
+is right for the data is also what removes the last tripwire.
+
+** Already-filed neighbours — and why this is NOT one of them
+
+=gh issue list= turns up two open issues on the country-level parquet:
+
+- *#788* "A country script's output is laundered into looking framework-fresh:
+  hashless =var/{table}.parquet= is trusted once and re-stamped" — and it
+  already records that "=Country._evict_hashless_wave_caches= ... globs
+  =*/_/{method_name}.parquet= — *wave* parquets only.  There is no
+  country-level counterpart for =var/{method_name}.parquet=."
+- *#809* "Hashless country-level parquet written by a make recipe is trusted as
+  legacy (#808 option 3)".
+
+Both describe the =legacy= trust-once-and-re-stamp path — i.e. *the mechanism
+the ledger names*.  *Neither covers the bug measured here.*  The distinction is
+sharp and was tested: my reproduction stamped a *bogus* hash, so the parquet
+graded *=stale=*, not =legacy=; the =legacy= branch was never entered; and the
+bug fired anyway.  It is a defect of the *rebuild descent*, not of the read
+gate.  Fixing #788/#809 (stamp make output, or refuse to trust a young hashless
+file) would leave this untouched: a correctly-stamped-but-stale country parquet
+would still be "rebuilt" by a =make= that does nothing and re-stamped fresh.
+
+So: *file a new issue*, cross-referencing #788, #809, #803 and #479.
+
+** Blast radius (measured, not inferred)
+
+95 country-level script-path tables in the corpus (=materialize: make= plus a
+country-level =_/{table}.py=).  Probed each by asking =make= for its *real*
+=$(VAR_DIR)/{table}.parquet= target under a nonexistent =LSMS_DATA_ROOT=, and
+counting only a literal =No rule to make target '<that exact path>'=:
+
+*20 tables across 13 countries have no country-target rule at all* and are
+exposed the moment a =var/= parquet exists:
+
+| Benin | plot_features (no Makefile) |
+| Burkina_Faso | panel_ids, plot_features |
+| Ethiopia | panel_ids |
+| Guinea-Bissau | plot_features (no Makefile) |
+| Guyana | assets (no Makefile) |
+| Malawi | plot_features |
+| Mali | plot_features |
+| Niger | plot_features |
+| *Nigeria* | *crop_production*, plot_inputs, livestock, plot_labor, people_last7days |
+| Senegal | plot_features |
+| Tajikistan | interview_date, life_satisfaction, plot_features (no Makefile) |
+| Tanzania | community_cluster_xwalk |
+| Togo | plot_features |
+
+(An earlier regex-only count in drafting said 17/12; it was wrong in both
+directions — a loose pattern matched wave-level rules.  The table above is the
+=make=-probe result and supersedes it.)
+
+The remaining 75 are exposed to a weaker form of the same failure rather than
+being safe.  Their rules' prerequisites are the script plus wave parquets —
+e.g. Nigeria =$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)=
+— and never include =_/{country}.py= or =_/data_scheme.yml=, both of which ARE
+in the cache hash.  A country-module edit therefore moves every hash while
+leaving every make prerequisite older than the target: =make= exits 0 having
+done nothing, and =try_make= reads it as a successful rebuild.  *This branch is
+exactly that case for Nigeria's other 23 tables* — it edits =nigeria.py= and
+=data_scheme.yml= and touches no Makefile prerequisite anywhere.  (Reasoned
+from the Makefile prerequisite lists, not separately measured.)
+
+** Consequences (all three required before merge)
+
+1. *File a NEW framework issue* against =run_make_target=/=try_make=
+   (cross-referencing #788 / #809 / #803 / #479, none of which covers it): a =make= that
+   exits 0 without producing the target must not be read as a successful
+   rebuild.  Minimal fixes: (a) in the STALE / =LSMS_NO_CACHE= descent, unlink
+   the country-level =var/{table}.parquet= before =run_make_target= — the
+   country-level twin of =_evict_hashless_wave_caches=; or (b) record the
+   target's mtime before =make= and fall through to =try_script= if it did not
+   change.
+2. *The post-merge Nigeria re-warm MUST run
+   =lsms-library cache clear --country Nigeria= first.*  Not =LSMS_NO_CACHE=1=
+   — measured above not to work.  And note all *24* Nigeria hashes move
+   (item 6), so every Nigeria table in a warm cache will be re-stamped on its
+   next read whether or not it rebuilt; for the other 23 the content is
+   identical, so it is harmless this time, but it is the same mechanism.
+3. *Correct the ledger and the =CONTENTS.org= §Cache paragraph* before merge.
+   As written they teach the wrong model and would send the next reader
+   looking for a one-shot =legacy= window that does not exist.
+
+* ITEM 1 — "W1–W3 carry no =*_conv=" and the three unwired columns :: *PASS*
+
+Metadata-only =pyreadstat.read_dta(..., metadataonly=True)= over all ten
+harvest section files (paths resolved through =data_access.get_data_file=).
+Row counts reproduce the =CONTENTS.org= table exactly.
+
+| file | rows | columns containing 'conv' |
+|---+---+---|
+| W1 secta3_harvestw1 | 13 018 | *(none)* |
+| W2 secta3_harvestw2 | 12 948 | *(none)* |
+| W3 secta3i_harvestw3 | 11 956 | *(none)* |
+| W3 secta3ii_harvestw3 | 8 544 | *(none)* |
+| W4 secta3i_harvestw4 | 14 197 | sa3iq6_conv, sa3iq6d_conv |
+| W4 secta3ii_harvestw4 | 8 839 | sa3iiq1_conv |
+| W4 secta3iii_harvestw4 | 1 062 | sa3iiiq13_conv |
+| W5 secta3i_harvestw5 | 10 071 | sa3iq9_conv, sa3iq15_conv |
+| W5 secta3ii_harvestw5 | 7 184 | sa3iiq1_conv |
+| W5 secta3iii_harvestw5 | 483 | sa3iiiq23_conv |
+
+The inventory claim is exactly right: *zero* =conv=-containing columns in any
+W1/W2/W3 harvest file.  =optional: true= is therefore recording a survey fact,
+not hiding a wiring gap.
+
+The stated reason for the three unwired columns is *correct*, and the Stata
+labels prove it (the =conv= label is identical on all of them — only the
+neighbouring question distinguishes):
+
+| column | its block's question label |
+|---+---|
+| sa3iq6i / sa3iq6ii (*wired*) | "How much [CROP] in total did HH harvest from [PLOT]? (Quantity / Unit)" |
+| sa3iq6d1 / sa3iq6d2 (*not wired*) | "How much *more* [CROP] does HH *expect* to harvest from [PLOT]? (Quantity / Unit)" |
+| sa3iq9a / sa3iq9b (*wired*) | "How much [CROP] in total did HH harvest from [PLOT]? (Quantity / Unit)" |
+| sa3iq15a / sa3iq15b (*not wired*) | "How much *more* [CROP] does HH *expect* to harvest from [PLOT]? (Quantity / Unit)" |
+
+And =secta3ii= really is never read: =grep secta3ii lsms_library/countries/Nigeria/_/crop_production.py=
+returns *comment lines only*; the actual =get_dataframe= calls are =secta3i=
+and =secta3iii= exclusively.  Same for =sa3iq6d= / =sa3iq15= (comments only).
+
+*What GH #859 actually asked for* (read =gh issue view 859 --json body,comments=;
+one comment, @ligon, pointing at companion #860).  The issue's evidence section
+does list *four* columns — =sa3iq6_conv= (:575), =sa3iiq1_conv= (:580),
+=sa3iiiq13_conv= (:585) and =sa3iq6d_conv= (:592) — "each paired with its
+section's own unit / size / condition columns", and its "What a fix would
+touch" asks to "read that wave's =*_conv= column(s) ... *per section*".  On a
+literal reading the branch wires 2 of 4 and under-delivers.
+
+*It does not.*  The issue's own "What it must NOT do" list settles it:
+- "Never construct a =KgFactor= for a wave or section that has no =*_conv=
+  column of its own" — =secta3ii= is not a section of this table at all, so
+  =sa3iiq1_conv= has no row to sit on.  Excluding it is compliance, not
+  omission.
+- "Never average the sections' =*_conv= columns together; each section ... is
+  wired independently ... *and a row belongs to exactly one*."  That last
+  clause is *false for =sa3iq6d_conv=*: it lives on the SAME =secta3i= row as
+  =sa3iq6_conv=, describing a different (expected-future) quantity in a
+  different container.  Wiring it could only mean coalescing two factors onto
+  one row — precisely what the sentence forbids.  The issue text is internally
+  inconsistent here and the implementer resolved it the right way.
+
+So item 1's PASS covers the issue's intent as well as its letter; the
+=CONTENTS.org= rebuttal of the "FOUR columns" reading is correct, and is in
+fact supported by the issue's own constraints.
+
+*Nit on the =CONTENTS.org= wording.*  It says EPAR is "=append=-ing the three
+section files".  Read at
+=EPAR_UW_Nigeria_GHS_W4.do:575-597=, EPAR is doing a *lockstep coalesce on the
+same row* — =replace unit=... if unit==.= / =replace size=...= /
+=replace condition=...= / =replace conv_fact=... if conv_fact==.= for each
+block in turn — then merging on =cropcode unit condition size= (:980).  The
+*substance* of the =CONTENTS.org= argument survives intact and is in fact
+strengthened (EPAR keeps unit+size+condition *bound to* each factor, which is
+precisely what this build cannot do), but "append" is the wrong verb.  Worth a
+one-word fix.
+
+* ITEM 2 — pairing and verbatim carriage :: *PASS* (25 486 / 25 486 exact)
+
+*Adjacency in the =.dta=.*  Every wired =*_conv= sits inside the same question
+block as the quantity/unit the build reads, separated only by that block's own
+Size and Condition columns:
+
+| section | qty (pos) | unit (pos) | size (pos) | condition (pos) | conv (pos) |
+|---+---+---+---+---+---|
+| W4 secta3i | sa3iq6i (16) | sa3iq6ii (17) | sa3iq6_4 (18) | sa3iq6_2 (19) | *sa3iq6_conv (20)* |
+| W4 secta3iii | sa3iiiq13a (17) | sa3iiiq13c (18) | sa3iiiq13d (20) | sa3iiiq13b (21) | *sa3iiiq13_conv (22)* |
+| W5 secta3i | sa3iq9a (20) | sa3iq9b (21) | sa3iq9c (23) | sa3iq9d (24) | *sa3iq9_conv (25)* |
+| W5 secta3iii | sa3iiiq23a (19) | sa3iiiq23b (20) | sa3iiiq23c (22) | sa3iiiq23d (24) | *sa3iiiq23_conv (23)* |
+
+The unwired ones sit at positions 29 (W4, after sa3iq6d2/d4/d2a) and 40 (W5,
+after sa3iq15b_os/c/d) — a different block by construction.
+
+*Verbatim carriage.*  Replicated the build's row selection from raw
+(=format_id= on hhid/plotid, =cropcode -> _crop_labels=, the =i/crop= notna
+filter, the =(i,plot,crop)= dedup) and outer-joined against the built frame:
+
+| section | built | replicated | joined "both" | left_only | right_only | =KgFactor= identical | =Quantity= identical |
+|---+---+---+---+---+---+---+---|
+| W4 secta3i | 14 001 | 14 001 | 14 001 | 0 | 0 | *14 001/14 001* | 14 001/14 001 |
+| W4 secta3iii | 1 053 | 1 053 | 1 053 | 0 | 0 | *1 053/1 053* | 1 053/1 053 |
+| W5 secta3i | 9 949 | 9 949 | 9 949 | 0 | 0 | *9 949/9 949* | 9 949/9 949 |
+| W5 secta3iii | 483 | 483 | 483 | 0 | 0 | *483/483* | 483/483 |
+
+Bit-exact, not rounded: the float32 source values arrive as
+=5.139999866485596=, =21.885000228881836=, =2.9549999237060547=,
+=1.6150000095367432=, =0.08639999479055405=.  No coalescing across sections —
+each frame's =KgFactor= comes from its own =*_conv= and from nowhere else.
+The raw range is 0.0864–186.13 across all four wired columns, with *zero*
+non-positive values, so the =.where(kgf > 0)= guard is confirmed a no-op
+exactly as the code comment claims.
+
+*CONCERN (pre-existing, NOT introduced here).*  The build's
+=drop_duplicates(['t','i','plot','crop'], keep='first')= (untouched by this
+diff — verified) drops 181 W4 + 108 W5 secta3i rows.  *87 of those duplicate
+=(i,plot,crop)= groups (177 rows) carry a DIFFERENT =u= or a DIFFERENT
+=KgFactor= between their members* — the survey recorded the same plot-crop in
+two containers and the build keeps one arbitrarily (sorted by =i,plot,crop=,
+so effectively source order).  This was already lossy for =Quantity=/=u=; the
+new column does not worsen it, but it does make the arbitrary choice *drive
+=Harvest_kg=* now.  Flagging, not blocking.
+
+* ITEM 3 — the 11 screened rows :: *PASS*, and the raw evidence STRENGTHENS the reading
+
+The question posed was whether =u= is really "Kg" or a size-qualified code the
+build canonicalises.  *It is really Kg.*  The raw unit label on all 11 rows is
+literally =1. KILOGRAMS (KG)=, and it is the *only* raw label =_canon_unit=
+maps to =Kg= in any of the four wired sections.  Nothing is lost by
+canonicalisation here.
+
+But the *Condition* column — which the build reads on no wave — is the same on
+every one of the 11:
+
+| t | crop | u_raw | size_raw | *cond_raw* | conv | n |
+|---+---+---+---+---+---+---|
+| 2019Q1 | Groundnuts (unshelled) | 1. KILOGRAMS (KG) | (none) | *1. UNSHELLED (on the cob, inside the pod/shell)* | 0.70 | 3 |
+| 2024Q1 | Groundnuts (unshelled) | 1. KILOGRAMS (KG) | (none) | *1. UNSHELLED* | 0.70 | 1 |
+| 2024Q1 | Maize | 1. KILOGRAMS (KG) | (none) | *1. UNSHELLED (on the cob...)* | 0.36 | 7 |
+
+11 rows, 4 groundnut + 7 maize — matching the =CONTENTS.org= table exactly.
+The "processing ratio" reading is therefore *corroborated by a field the
+=CONTENTS.org= entry does not cite*: 0.70 kg shelled groundnut per kg
+unshelled, 0.36 kg grain per kg of maize on the cob.  These are shelling
+ratios, and the enumerator keyed them into a field the questionnaire asks as a
+container weight.
+
+Corroboration from EPAR: =EPAR_UW_Nigeria_GHS_W4.do:597= is
+=replace conv_fact=1 if unit==1 //kg= — EPAR applies *the same rule* as
+=_screen_reported_factors= rule 1.  The screen is doing what the reference
+implementation does.
+
+Two further rows in W4 =secta3i= report =conv = 0.36= on unit =80. PIECE=
+(cropcode 2060).  Those are NOT screened (unit is not Kg, value < 250, not
+year-like) and correctly so — noted only because a reader scanning for "0.36"
+will find 13 rows, not 11.
+
+Sentinel check, as claimed: across all wired columns, =n<=0 = 0=, =n>250 = 0=,
+=n integral in [1990,2030] = 0=.  Screen rules 2 and 3 are structurally unable
+to fire on Nigeria; every rejection is rule 1.  Confirmed.
+
+* ITEM 4 — before/after :: *PASS on every number*, with two CONCERNs on reading
+
+Reproduced cold in the isolated copy (build ran =Python fallback executed for
+_.crop_production=; in-tree parquet count 0 after).
+
+** Rows and coverage — exact
+
+| t | rows | KgFactor non-null |
+|---+---+---|
+| 2011Q1 | 12 752 | 0 |
+| 2013Q1 | 12 777 | 0 |
+| 2016Q1 | 11 829 | 0 |
+| 2019Q1 | 15 054 | *11 393* |
+| 2024Q1 | 10 432 | *8 285* |
+| total | *62 844* | *19 678* |
+
+** =harvest_kg= — exact
+
+"Before" computed as =harvest_kg(df.drop(columns='KgFactor'))=, which is
+equivalent by construction (=KgFactor= feeds only the =reported= layer, and
+=survey_median= medians reported factors, so both vanish with the column).
+
+| quantity | before | after | claimed |
+|---+---+---+---|
+| total Harvest_kg | 9 315 175 | *22 111 818* | 9 315 175 -> 22 111 818 ✓ |
+| plot-crop rows with kg | 6 723 | 19 007 | 6 723 -> 19 007 ✓ |
+| layer =reported= | 0 | 19 667 | ✓ |
+| layer =survey_median= | 0 | 342 | ✓ |
+| layer =inferred= | 11 817 | 11 635 | ✓ |
+| layer =none= | 51 027 | 31 200 | ✓ |
+| =reported_implausible= | 0 | 11 | ✓ |
+
+=kg_factor_disagreement= from =harvest_kg_factors=:
+=reported_vs_survey_median {both: 19658, disagree: 8033, share: 0.4086}= and
+=reported_vs_inferred {both: 171, disagree: 0, share: 0.0}=.  Both match
+=CONTENTS.org= (19 658 / 40.9%; 171 both, 0 disagree) exactly.
+
+** Is the 2.4x plausible?  Yes — and it is NOT a revaluation
+
+Decomposition of the 12 796 643 kg increase:
+
+| source of the delta | kg | rows |
+|---+---+---|
+| rows that previously had *no factor at all* | *12 796 643* | 19 827 |
+| rows whose factor *changed* | *0* | 0 |
+| rows that *lost* a factor | — | 0 |
+
+*Every* kilogram of the increase comes from rows that contributed zero before.
+Not a single pre-existing row's number moved.  That is the strongest possible
+form of "this is coverage, not revaluation", and it is a better defence of the
+2.4x than the =CONTENTS.org= narrative gives.
+
+Top 10 =(u, crop)= by delta:
+
+| u | crop | delta kg | n | median reported factor |
+|---+---+---+---+---|
+| Tuber | Yam--roots | 2 421 287 | 1 627 | 2.95 |
+| Sack/Bag | Maize | 2 418 827 | 5 576 | 100 |
+| Sack/Bag | Rice--local | 1 487 120 | 1 622 | 100 |
+| Sack/Bag | Guinea corn/sorghum | 1 228 385 | 3 963 | 100 |
+| Sack/Bag | Cassava--roots | 984 725 | 1 695 | 50 |
+| Sack/Bag | Millet | 773 355 | 2 288 | 100 |
+| Sack/Bag | Groundnuts (unshelled) | 615 965 | 1 539 | 70 |
+| Bunch | Palm oil | 347 299 | 280 | 25 |
+| Wheelbarrow | Cassava--roots | 347 173 | 239 | 99.3 |
+| Sack/Bag | Soya beans | 336 255 | 755 | 100 |
+
+By unit: Sack/Bag 8 846 327 (67%), Tuber 2 422 330, Wheelbarrow 396 706, Bunch
+349 345, then a long tail.  A 100 kg Nigerian grain sack, a ~3 kg yam tuber, a
+25 kg palm-oil bunch and a ~54–99 kg wheelbarrow of cassava are all
+face-plausible.  Nothing in the top 10 is anomalous.
+
+** CONCERN 4a — the reported-vs-inferred audit is degenerate for Nigeria
+
+The comparison the canonical =data_info.yml= note advertises ("it can be
+audited against the library's inferred factors for the same =u=") has *171
+rows of overlap in the whole country*, all of them =u='Kg'=, all ratio exactly
+1.0, IQR [1.0, 1.0], share outside [0.5, 2] = 0.0000.  The library's inferred
+layer produces *NaN for every Nigerian container unit* (Sack/Bag, Tuber,
+Wheelbarrow, Bunch, Basket, Basin, Heap, Tiya, Mudu, Congo, Paint rubber,
+Piece, Bundle, Stalk, Bowl).  So the "171 both, 0 disagree" line in
+=CONTENTS.org= is *true but carries no information* — it is a tautology on the
+kilogram.  There is no independent check anywhere in the corpus on the 12.8M kg
+this branch adds.  That is not an argument against merging (the reported number
+is the survey's own and is what =data_info.yml= demands), but the =CONTENTS.org=
+entry currently reads as if the agreement were evidence.  It should say
+instead: *no cross-check exists.*
+
+** CONCERN 4b — "Sack/Bag" is multimodal, which quantifies the size caveat
+
+The =CONTENTS.org= size-collapse caveat is right and understated.  Reported
+factors on =u='Sack/Bag'= (13 901 rows):
+
+: 100.0  8786    50.0  2305    18.0  780    70.0  722    25.0  455
+:   9.0   387    36.0   349    35.0  109    17.5    8
+
+Eight distinct container weights inside one canonical =u=, spanning 9–100 kg.
+The raw rows show why: =130. SACK/BAG= carries a separate Size code
+(=12. 100 KG=, =11. 50 KG=, =10. 25 KG=) that =_canon_unit= discards.  The
+=survey_median= layer medians over that collapsed =u= — so its 342 rows get a
+number assembled across four sack sizes.  342 rows is small enough not to
+matter numerically here, but the caveat's 40.9% disagreement figure is the
+correct measurement of a real defect, and it is a defect of the *shipped =u=
+vocabulary*, not of this branch.  Deferring it is defensible; recording it as
+the =CONTENTS.org= entry does is the right call.
+
+Related: 8 365 Sack/Bag rows still receive no factor.  Checked — those are the
+W1–W3 rows, and =survey_median= is per country-wave with no reports in those
+waves, so the layer correctly declines to serve them.  Behaviour is right.
+
+* ITEM 6 — hashes :: *PASS*
+
+Computed =Country._table_cache_hash(t, waves)= for all Nigeria tables under two
+=LSMS_COUNTRIES_ROOT= trees: the worktree, and a scratchpad copy with
+=nigeria.py=, =data_scheme.yml= and =crop_production.py= reverted to
+=development=.
+
+: tables total 24
+: MOVED 24  [anthropometry, assets, cluster_features, community_prices,
+:            crop_production, food_acquired, food_coping, food_expenditures,
+:            food_prices, food_quantities, household_characteristics,
+:            household_roster, housing, individual_education, interview_date,
+:            livestock, nonfood_expenditures, panel_ids, people_last7days,
+:            plot_features, plot_inputs, plot_labor, sample, shocks]
+: UNCHANGED 0
+
+Confirms the =CONTENTS.org= §Cache claim (=nigeria.py= + =data_scheme.yml= are
+in every table's fingerprint).
+
+Content confinement is sound by call graph rather than by parquet diff (only
+=crop_production= and =sample= exist in the warm cache).  =rg
+crop_production_for_wave= over the tree: Nigeria's function has exactly *one*
+production caller, =Nigeria/_/crop_production.py= (5 call sites), plus the new
+test file.  The same-named Uganda/Ethiopia/Tanzania functions are separate
+per-country modules and are untouched.  The =data_scheme.yml= change is
+confined to the =crop_production:= block.  So only =crop_production='s content
+changes; the other 23 rebuild identically.
+
+*Read this together with item 5*: all 24 tables now grade =stale=, and for the
+five Nigeria tables with no Makefile rule the "rebuild" will be a make-exit-0
+that re-stamps old content.  Harmless for the 23 whose content is unchanged —
+but it is the same mechanism, and it means a warm Nigeria cache silently
+re-blesses itself on the next read of every table.
+
+* ITEM 7 — tests, pandas 3.0, declaration shape :: *PASS*
+
+: $ pytest tests/test_nigeria_kg_factor.py tests/test_crop_kg_factor.py -q
+: 45 passed, 19 warnings in 19.57s
+
+No skips (the =built= fixture's =pytest.skip= guards did not fire — Nigeria
+=crop_production= built from the warm isolated cache).  The Uganda
+=harvest_kg= baseline in =test_crop_kg_factor.py= is unmoved, consistent with
+=transformations.py= being untouched.
+
+*Pandas 3.0.* Scanned the added lines of the diff for =inplace=True=,
+=fillna(method=...)=, =np.isnan=, =.append(=, =series[0]=, chained
+=df[...][...]=: *none*.  The three =np.nan= uses are all on a float64 column
+(=piece['KgFactor']=, =out['KgFactor']=) — sanctioned by =CLAUDE.md=
+("=np.nan= is still fine for numeric floats").  =.where(kgf > 0, np.nan)= and
+=pd.to_numeric(..., errors='coerce').astype('float64')= are both 3.0-clean.
+
+*Declaration shape.*  Byte-identical to Uganda's post-#849 declaration
+(=Uganda/_/data_scheme.yml:200-202=) and to the canonical
+=lsms_library/data_info.yml:545-547=:
+
+: KgFactor:
+:   type: float
+:   optional: true
+
+The nested-mapping form among scalar siblings (=perennial: bool=) is exactly
+what Uganda already ships, and =_required_scheme_columns= handles it (proved by
+the passing =test_data_scheme_declares_kgfactor_optional_float= and by the
+=optional= exemption actually working at Site B — no =NullReadWarning= fired
+for =KgFactor= in the cold build, while five *other* Nigeria columns did warn).
+
+* Verdict summary
+
+| item | verdict |
+|---+---|
+| 1. W1–W3 have no =*_conv=; three columns correctly unwired | *PASS* (one wording nit: EPAR coalesces, does not =append=) |
+| 2. Pairing + verbatim carriage | *PASS* — 25 486/25 486 bit-exact |
+| 3. The 11 screened rows | *PASS* — raw =u= really is =KILOGRAMS=; Condition=UNSHELLED corroborates the processing-ratio reading |
+| 4. Before/after numbers | *PASS* on every figure; CONCERN 4a (no real cross-check exists) and 4b (Sack/Bag is 8 sizes) |
+| 5. The cache trap | *FAIL* — real framework bug, ledger's mechanism wrong, =LSMS_NO_CACHE= does not help, 20 tables / 13 countries corpus-wide exposed (measured) |
+| 6. All 24 hashes move; content confined | *PASS* |
+| 7. Tests / pandas 3.0 / declaration | *PASS* — 45 passed |
+
+*Blocking before merge*: (a) correct the ledger + =CONTENTS.org= §Cache
+mechanism; (b) file the =try_make= framework issue; (c) make the post-merge
+Nigeria re-warm =cache clear --country Nigeria= first.
+Nothing in the data wiring blocks: items 1–4, 6 and 7 all hold up under
+adversarial checking, and item 2's result is as clean as such a check can be.
