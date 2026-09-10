@@ -243,11 +243,53 @@ scripts, which is what the cold builds below are for.
 > re-attach only the non-`pandas` metadata keys (`lsms_cache_hash`,
 > `lsms_grain_audit`).
 
-**Cold builds reproduce the warm frames exactly.** With the country's parquets
-deleted from the sandbox data root, the wave scripts and country module were
-re-run and the result compared to the pre-change frame under the same rename.
-This is the check the rg sweep cannot do -- it proves the renamed scripts still
-produce the same rows.
+**Cold builds reproduce the warm frames exactly -- 6 countries, 14 tables.**
+With the country's parquets deleted from the sandbox data root, the wave scripts
+and country module were re-run and the result compared to the pre-change frame
+under the same rename. This is the check an `rg` sweep cannot do: it proves the
+renamed scripts still produce the same rows.
+
+| country | tables rebuilt cold | verdict |
+|---|---|---|
+| Benin | crop_production, plot_labor | identical |
+| Mali | crop_production, plot_inputs, plot_labor | identical |
+| Niger | crop_production, plot_labor | identical |
+| Nigeria | crop_production, plot_inputs, plot_labor | identical |
+| Malawi | crop_production, plot_inputs, plot_labor | identical (see below) |
+| Uganda | crop_production, plot_inputs, plot_labor | identical |
+
+That covers every country whose **country module** was edited (`malawi.py` 18
+renames, `nigeria.py` 34, `mali.py` 9, `niger.py` 9, `uganda.py` 8) plus one
+pure-wave-script EHCVM country; the five remaining EHCVM countries
+(Burkina_Faso, CotedIvoire, Guinea-Bissau, Senegal, Togo) run the same
+wave-script shape as Benin and were verified warm only.
+
+> **One transient `COLD DIFF`, run down rather than waved off.**
+> `Malawi/crop_production` reported "index level [5] are different" -- level 5 is
+> `u` -- with **the same 131,548 rows**. Comparing the BUILT PARQUETS directly
+> (`.rt_data` original renamed vs `.rt_dataB` cold-rebuilt) gives
+> `assert_frame_equal(..., check_exact=True)` **identical**, as it does for
+> `Uganda/crop_production` (130,606) and `Nigeria/plot_inputs` (96,620); and
+> re-reading the cold-built parquet through the API compares identical to the
+> pre-change frame too. So the difference lived in the FRESHLY BUILT in-memory
+> frame's `u` level dtype, not in the data, and it disappears on the parquet
+> round-trip that every real consumer goes through. It is not a property of this
+> rename -- `plot_id` is level 3, and it compared equal.
+
+**The merge -> re-warm hazard window, measured.** Between merging commit B and
+re-warming, the shared cache holds parquets whose level is `plot` while the
+config says `plot_id`. Measured on Benin against exactly that state:
+
+| read | result |
+|---|---|
+| `Country('Benin').crop_production()` (ordinary) | **self-heals.** Hash mismatch -> rebuild descent -> scripts re-run -> 9,056 rows, `plot_id` in the index, byte-identical to the pre-change frame; the parquet is rewritten with `plot_id`. |
+| `Country('Benin', assume_cache_fresh=True).crop_production()` | **7,571 rows, `plot_id` NOT in the index and `plot` left as a COLUMN** -- the declared level is absent from the stale parquet, so `_normalize_dataframe_index` drops it and collapses 1,485 rows away. It is **LOUD**: `GrainCollapseWarning` fires, which is #323's guard doing precisely its job. |
+
+So the hazard is confined to readers that bypass the hash --
+`assume_cache_fresh=True` / the deprecated `trust_cache=True`, and the
+`LSMS_NO_CACHE` soft cases -- and it announces itself. `tests/test_863_transforms.py`'s
+`_warm()` helper is one such reader, so **CI run against a stale cache will see
+it**. The fix is the re-warm, not a code change.
 
 **Tests.** 1,279 pass across the 16 crop/plot/feature/structure test modules
 (`test_plot_id_canonical`, `test_feature_canonical_index`, `test_863_transforms`,

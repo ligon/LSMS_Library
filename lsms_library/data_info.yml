@@ -88,7 +88,7 @@ Index Info:
     # `v`, so registering without it would silently strip `v` from every
     # `Country(...).crop_production()` frame in the corpus.
     #
-    # Registration alone would have kept nothing extra: no country declares the
+    # Registration alone would have kept nothing extra: only Uganda declares the
     # full shape.  What makes it work is `level_aliases` (plot -> plot_id, crop
     # -> j) and `missing_level_sentinels` below -- see `feature.py`'s
     # `_align_to_canonical_levels`.
