@@ -1,5 +1,12 @@
 # Prior-Art Ledger — 585-own-production-valuation (WORKPLAN Phase 2, L6)
 
+**Red-team:** `slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_585_valuation.org`
+(2026-09-09, commit `32ab655d`) — all eight items PASS, the Malawi +51.8%
+independently corroborated three ways (own-production share vs. the price
+study's cross-country band; a within-cell mean-unit-value recomputation at
+1.0198; a kg cross-check showing the valuation is if anything conservative).
+Its four CONCERNs are addressed in §7 and Phase 3 below.
+
 **Search tier used:** ripgrep + git floor. The `gitnexus` MCP server did not
 connect this session (CONNECTION_CLOSED); per `CLAUDE.md` "Code intelligence:
 GitNexus is OPTIONAL", the substitute for `gitnexus_impact` was an `rg` sweep of
@@ -205,15 +212,34 @@ simply **null** there — `District` for 27.8% of 2010-11 clusters and 33.0% of
 the rung and the row count, and the warning text names BOTH causes because it
 cannot distinguish them.
 
-**The provenance does not survive `Feature()`, and that is stated, not
-patched.**  `Feature('food_expenditures')(..., valuation=...)` forwards the
-kwarg by signature and the VALUES are exact (Malawi via `Feature` and via
-`Country` both sum to 426,562,493.98); but `Feature` concatenates frames whose
-`attrs` disagree by construction, so `valuation_sources` lands in the `{}` row
-of the propagation rule and is absent.  Pooling the counts across countries is
+**The provenance survives a ONE-country `Feature()` and not a multi-country
+one**, and the boundary is stated rather than the general claim (red-team
+CONCERN 5a: the flat wording was contradicted by the single-country case).
+`Feature('food_expenditures')(..., valuation=...)` forwards the kwarg by
+signature and the VALUES are exact either way (Malawi via `Feature` and via
+`Country` both sum to 426,562,493.98).  One country is a `concat` of one frame
+— nothing to disagree with, tallies come through.  Two or more disagree by
+construction and land in the `{}` row of the propagation rule, so
+`valuation_sources` is absent.  Pooling the counts across countries is
 deliberately not built — a pooled `median_price: 280623` would say nothing
 about which country was imputed, the same objection `harvest_kg`'s docstring
 makes about its own pooled counts.
+
+**The thin tail at the top of the ladder, value-weighted** (red-team CONCERN
+6a).  `median_price_valuation`'s national rung is *unconditional*, so
+`threshold=10` gates the geographic cells and gates nothing above them.  The
+docstring's 94.2% is a ROW-coverage figure and is correct; the money is
+distributed slightly worse.  Measured on Malawi: **6.48% of the imputed value
+is priced off fewer than ten national purchase observations, 2.85% off exactly
+one** (median pool 533).  The concrete case: one 2016-17 purchase sets "Small
+Animal - Rabbit, Mice, Etc." (`u='Whole'`) at 100,000 MWK, applied to 195 rows,
+**2.12% of Malawi's entire delta**.  Unlike Uganda's single `u='---'` row this
+is *systematic* — a thin `(t, j, u)` cell is thin for every household in it.
+Counted, never clipped; `valuation_price` is returned per row so a caller can
+gate on it.  **Follow-up, not this PR**: @ligon has ruled on the parallel
+food-side inference (GH #850) that a thin baseline is a floor of 5 with a
+dispersion-gated exception at 3–4; adopting that gate at this rung would change
+returned numbers and belongs in its own change.
 
 **Malawi is the case the kwarg exists for**: every one of its 288,704
 produced/in-kind rows arrives with a null `Expenditure` (stock
@@ -232,7 +258,15 @@ precisely why EPAR's consumption repo needs a spatial ladder behind it.
   cannot become a "price" and feed itself back into its own median); zero
   treated as missing exactly as the existing `replace(0, np.nan)` does
   (`test_a_zero_value_is_a_candidate_not_a_report`).
-- `_own_price_rung` — **OK (anchored on §5)**: no existing per-`(t,i,j,u)`
+- `_own_price_rung` — **OK (anchored on §5)**; red-team CONCERN 3a fixed: it
+  was handed `df.index`, so `i` as a COLUMN returned an all-NaN offer and
+  `own_price: 0` with no signal, while a missing `u` or `s` raised.  It now
+  takes `df` and resolves `i` as a level OR a column like every other key, and
+  its absence RAISES (two tests; the `median_price` rung, which needs no
+  household axis, still runs on such a frame).  No live impact — `food_acquired`
+  carries `i` in the index for every audited country — but
+  `food_acquired_valued` is public and invites exactly the `reset_index('i')`
+  that hit it.: no existing per-`(t,i,j,u)`
   household unit value; `rg 'own_price|unit_value'` over `lsms_library/` finds
   only `food_prices_from_acquired(units='unitvalue')`, whose output grain is
   wrong for the job (§5).  Pools a household's repeat purchases into ONE
@@ -262,7 +296,18 @@ precisely why EPAR's consumption repo needs a spatial ladder behind it.
 - Nothing cached — **OK (anchored on §1)**: `food_expenditures` is derived at
   read time (`Country._FOOD_DERIVED`); no parquet is written on this path, so
   no imputed value can be stored.  Corroborated by the unmoved hashes above.
-- Test suite — **OK**: `tests/test_own_production_valuation.py` (45) plus
+- `country.py` re-attach comment — **CONTRADICTION found and fixed** (red-team
+  CONCERN 5b, the same failure mode `CLAUDE.md` corrects for
+  `_join_v_from_sample`).  The comment blamed `_add_market_index` and
+  `_join_v_from_sample` as disagreeing merges.  Measured: `_add_market_index`
+  (`country.py:2547`) and `_relabel_j` (`:2899`) already re-attach `attrs`
+  internally, `convert` preserves them, and on this path `v` is already an
+  index level so `_join_v_from_sample` skips rather than merging.  The
+  re-attach is therefore **defensive, not load-bearing** — kept, because the
+  governing rule is that `attrs` survive only when every input agrees, so a
+  future post-step growing a second input would drop them silently.  Comment
+  restated to say that, and to say the merges below do NOT drop attrs today.
+- Test suite — **OK**: `tests/test_own_production_valuation.py` (49) plus
   `test_food_expenditures_basis`, `test_median_price_valuation`,
   `test_food_labels`, `test_table_structure`, `test_currency`,
   `test_conversion`, `test_uganda_tables`, `test_sample`, `test_u_code_leak`,

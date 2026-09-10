@@ -159,6 +159,28 @@ class TestOwnPriceRung:
         # (10 + 90) / (1 + 3) = 25, not mean(10, 30) = 20.
         assert out['valuation_price'].iloc[-1] == pytest.approx(25.0)
 
+    def test_i_as_a_column_still_works(self):
+        """``i`` resolves as a level OR a column, like every other key.
+
+        It used to be looked up on ``df.index`` alone, so a frame with ``i``
+        reset to a column got ``own_price: 0`` and NO warning -- while a
+        missing ``u`` or ``s`` raised.  A silent zero here is indistinguishable
+        from an honest "no household bought what it grew".
+        """
+        df = _corpus().reset_index('i')
+        out = food_acquired_valued(df, 'own_price')
+        assert out.attrs['valuation_sources']['own_price'] == 2
+
+    def test_no_household_axis_raises(self):
+        df = _fa([('20', 'v1', 'maize', 'kg', 'purchased', 1.0, 10.0),
+                  ('20', 'v1', 'maize', 'kg', 'produced', 1.0, np.nan)],
+                 names=('t', 'v', 'j', 'u', 's'))
+        with pytest.raises(ValueError, match="no 'i'"):
+            food_acquired_valued(df, 'own_price')
+        # ...but the spatial ladder needs no household axis and still runs.
+        out = food_acquired_valued(df, 'median_price', threshold=1)
+        assert out['ValuationSource'].iloc[-1] == 'median_price'
+
     def test_a_different_unit_is_a_different_price(self):
         df = _fa([
             ('20', 'v1', 'h1', 'maize', 'kg', 'purchased', 2.0, 20.0),
@@ -489,6 +511,18 @@ class TestCountryApi:
             out = c.food_expenditures(basis='total', valuation='own_price',
                                       labels='Aggregate')
         assert 'valuation_sources' in out.attrs
+
+    def test_single_country_feature_keeps_the_tallies(self):
+        """One country is a concat of one frame -- nothing to disagree with."""
+        ll = pytest.importorskip('lsms_library')
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                one = ll.Feature('food_expenditures')(
+                    ['Uganda'], basis='total', valuation='own_price')
+        except Exception as exc:                      # pragma: no cover
+            pytest.skip(f'Feature unavailable: {exc!r}')
+        assert 'valuation_sources' in one.attrs
 
     def test_valuation_rejected_on_another_table(self):
         ll = pytest.importorskip('lsms_library')

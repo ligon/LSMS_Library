@@ -4570,12 +4570,22 @@ class Country:
                         # through to the legacy aggregation path.
                         _assert_label_targets_present(derived, map_labels,
                                                       country=self.name, table=name)
-                        # ``attrs`` propagate only when every input AGREES
-                        # (CLAUDE.md, "Panel ID Transitive Chains"), and both
-                        # _join_v_from_sample (inside _finalize_result) and
-                        # _add_market_index are DISAGREEING merges -- so the
-                        # valuation tallies are carried across by hand, the
-                        # same explicit re-attach harvest_kg does.
+                        # BELT-AND-BRACES, and the reason matters because a
+                        # wrong one is exactly the failure CLAUDE.md corrects
+                        # for _join_v_from_sample.  Measured 2026-09-09: the
+                        # post-steps below already re-attach `attrs`
+                        # themselves (_add_market_index at country.py:2547,
+                        # _relabel_j at :2899, and `convert` likewise), and on
+                        # THIS path `v` is already an index level so
+                        # _join_v_from_sample skips rather than merging -- so
+                        # nothing in the current pipeline would drop the
+                        # tallies without this line.  It is kept anyway: the
+                        # governing rule is that `attrs` survive only when
+                        # every input AGREES (CLAUDE.md, "Panel ID Transitive
+                        # Chains"), so a future post-step that grows a second,
+                        # disagreeing input would drop them SILENTLY.  Do not
+                        # read this as "the merges below drop attrs"; they do
+                        # not, today.
                         _val_attrs = {k: v for k, v in derived.attrs.items()
                                       if k.startswith('valuation')}
                         reagg = name in {'food_expenditures', 'food_quantities'}

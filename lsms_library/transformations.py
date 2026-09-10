@@ -1381,6 +1381,29 @@ def food_acquired_valued(df, valuation, *, geo=None, threshold=10,
     it 0.00pp in both.  A ``u='Value'`` row prices at 1 currency-unit per
     currency-unit, which is the right answer for it.
 
+    **Read that 94.2% as COVERAGE, not as accuracy, and read the
+    value-weighted complement beside it.**  ``median_price_valuation``'s
+    national rung is an *unconditional* fallback, so ``threshold`` gates the
+    geographic cells and gates nothing at the top of the ladder.  Measured on
+    Malawi (red-team, 2026-09-09), by share of the imputed MONEY rather than of
+    the rows: **6.48% of the imputed value is priced off fewer than ten
+    purchase observations nationwide, and 2.85% off exactly one.**  The 5.8% of
+    candidate rows below the gate are not a random 5.8% of the money.  The
+    concrete case: a single 2016-17 purchase sets "Small Animal - Rabbit, Mice,
+    Etc." (``u='Whole'``) at 100,000 MWK, which is then applied to 195 rows and
+    contributes 2.12% of Malawi's entire delta.  The median pool is 533
+    observations, so the bulk is well supported -- but a thin ``(t, j, u)``
+    cell is thin for every household in it, so this tail is *systematic* rather
+    than an outlier.  It is COUNTED here, never clipped; ``valuation_price`` is
+    returned per row so a caller can gate on it.
+
+    Whether the national rung should carry a gate of its own is a **follow-up,
+    deliberately not decided here**.  @ligon has ruled on the parallel
+    food-side inference (GH #850) that a thin baseline is a floor of 5 with a
+    dispersion-gated exception at 3-4; adopting the same rule at this rung is
+    the obvious candidate, and it would change returned numbers, so it belongs
+    in its own change.
+
     Nothing here is cached.  ``food_expenditures`` is derived at read time
     (``Country._FOOD_DERIVED``) and this runs inside that derivation, so no
     parquet ever holds an imputed value.
@@ -1440,7 +1463,7 @@ def food_acquired_valued(df, valuation, *, geo=None, threshold=10,
     # spelling of the same one.
     for rung in rungs:
         if rung == 'own_price':
-            offered = _own_price_rung(t, df.index, j, u, value, qty, pool)
+            offered = _own_price_rung(t, df, j, u, value, qty, pool)
         else:
             offered, geo_levels_used = _median_price_rung(
                 df, t, j, u, value, qty, pool, geo=geo, threshold=threshold)
@@ -1465,7 +1488,7 @@ def food_acquired_valued(df, valuation, *, geo=None, threshold=10,
     return out
 
 
-def _own_price_rung(t, index, j, u, value, qty, pool):
+def _own_price_rung(t, df, j, u, value, qty, pool):
     """Unit price from the SAME household's purchases of the same (t, j, u).
 
     ``sum(value) / sum(quantity)`` over that household's pooled purchase rows,
@@ -1473,11 +1496,22 @@ def _own_price_rung(t, index, j, u, value, qty, pool):
     price rather than two.  Returns NaN where the household made no usable
     purchase of that item in that unit in that wave -- no cross-household
     information is ever consulted.
+
+    ``i`` is resolved as an index level OR a column, like every other key, and
+    its absence RAISES.  It used to be looked up on ``df.index`` alone, so a
+    frame carrying ``i`` as a column got an all-NaN offer and ``own_price: 0``
+    with no signal at all -- while a missing ``u`` or ``s`` raised.  Only the
+    household axis degraded quietly, which is the one place a silent zero is
+    indistinguishable from an honest "no household ever bought what it grew".
     """
-    i = _level_or_column(pd.DataFrame(index=index), 'i')
+    i = _level_or_column(df, 'i')
     if i is None:
-        # No household axis: there is no "same household" to look up.
-        return np.full(len(t), np.nan)
+        raise ValueError(
+            "food_acquired has no 'i' (household) level or column, so the "
+            "own_price rung -- which is defined as the SAME household's "
+            "purchase price -- has no household to look up.  Use "
+            "valuation='median_price' on a frame with no household axis."
+        )
     i = pd.Series(i).astype(str).to_numpy()
     keys = ['_t', '_i', '_j', '_u']
     work = pd.DataFrame({'_t': t, '_i': i, '_j': j, '_u': u,
@@ -1660,17 +1694,23 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
     :func:`food_acquired_valued` directly for the item-grain frame that carries
     it.
 
-    Those tallies reach the caller on the ``Country`` path only.  A
-    cross-country :class:`~lsms_library.feature.Feature` call forwards
-    ``valuation=`` (it forwards by signature) and the VALUES are correct, but
-    ``Feature`` assembles by ``concat`` over frames whose ``attrs`` disagree by
-    construction -- one record per country -- which lands in the ``{}`` row of
-    the propagation rule (``CLAUDE.md``, "Panel ID Transitive Chains"), so
-    ``attrs['valuation_sources']`` is absent there.  Pooling the tallies across
-    countries is deliberately NOT built: pooled counts would say nothing about
-    WHICH country was imputed, which is the same objection ``harvest_kg``'s
-    docstring makes about its own pooled counts.  Ask per country, or group the
-    item-grain frame.
+    A :class:`~lsms_library.feature.Feature` call forwards ``valuation=`` (it
+    forwards by signature) and its VALUES are exact -- Malawi sums to the same
+    426,562,493.98 either way.  Its ``attrs`` depend on how many countries were
+    asked for, and the boundary is worth stating precisely because a reader who
+    tests the general claim on one country would see it contradicted:
+
+    - **one country** -- a ``concat`` of a single frame, nothing to disagree
+      with, so the tallies COME THROUGH;
+    - **more than one** -- the frames' ``attrs`` disagree by construction, one
+      record per country, which lands in the ``{}`` row of the propagation rule
+      (``CLAUDE.md``, "Panel ID Transitive Chains"), so
+      ``attrs['valuation_sources']`` is ABSENT.
+
+    Pooling the tallies across countries is deliberately NOT built: a pooled
+    ``median_price: 280623`` would say nothing about WHICH country was imputed,
+    the same objection ``harvest_kg``'s docstring makes about its own pooled
+    counts.  Ask per country, or group the item-grain frame.
     """
     valid_basis = {'purchased', 'total'}
     if basis not in valid_basis:
