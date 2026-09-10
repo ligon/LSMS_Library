@@ -176,6 +176,54 @@ Data Scheme:
     Quantity: float
     Quantity_sold: float
     Value_sold: float
+    # THE SALE HAS ITS OWN UNIT AND ITS OWN CONDITION (GH #824).  UNPS
+    # question 7 is compound -- "how much of the harvest was SOLD, in what
+    # CONDITION and in what UNIT" -- so Quantity_sold is denominated in
+    # `Unit_sold` (q7c) and NOT in the row's `u`, which is the HARVEST unit
+    # (q6c).  Measured on the built table (2026-09-10, isolated
+    # LSMS_DATA_DIR): they disagree on 3.9% of the 40 083 rows with a
+    # positive Quantity_sold that know both units -- 2.0-8.0% by wave-season.
+    #
+    # WHERE THEY DISAGREE THE ROW IS A FLAG, NOT AN IDENTIFICATION, and this
+    # is the part that bites.  Unit_sold is the honest label for
+    # Quantity_sold AS REPORTED, but a row whose two unit reports contradict
+    # each other does not tell you which report is sound: Unit_sold is the
+    # CLOSER denominator on only 40.5% of the disagreeing priced rows under a
+    # price test (n=1 021) and 42.7% under the household's own reported
+    # sold-kg factor q7d (n=468) -- so `u` is closer MORE often.  The largest
+    # cell is u='Sack (100 kgs)' with Unit_sold='Kg' (162 priced rows), whose
+    # median Value_sold/Quantity_sold is 34 167 UShs -- a SACK price; read as
+    # a kilogram price it overstates maize by ~70x, an error in the OPPOSITE
+    # direction from the one this column exists to prevent.  A consumer
+    # forming a per-unit or per-kg price must treat these rows as AMBIGUOUS
+    # (exclude them, or resolve them with a reported per-row sold kg factor)
+    # and report how many were excluded.
+    #
+    # Not carrying the column was still worse: it stamped the harvest unit on
+    # a sale reported in something else with no signal at all.  On the 565
+    # disagreeing priced rows whose two labels both name a weight in
+    # kilograms, the two readings differ by a median factor of 50 and by
+    # >= 100x on 47.4% of them.  Same 'harvest_units' vocabulary as `u`; same
+    # 'harvest_conditions' vocabulary as the `condition` index level.
+    #
+    # NA-bearing, never sentinel-filled -- unlike `u` and `condition`, which
+    # are INDEX levels and must carry 'Unknown' / 'unknown_condition'
+    # because a null index key is deleted outright by groupby(dropna=True).
+    # These are plain columns, so NA is safe AND more informative: it says
+    # "no sold unit recorded on this row", which is a different fact from
+    # any unit.
+    #
+    # `optional` for both, for two independent reasons: 2011-12 ships no 7b
+    # column at all (asked on the questionnaire, dropped from the extract),
+    # so Condition_sold is legitimately 100% null in that wave; and a row
+    # with no sale has no sold unit, so neither column is ever fully
+    # populated.  The null-content guard must not fire on either.
+    Unit_sold:
+      type: str
+      optional: true
+    Condition_sold:
+      type: str
+      optional: true
     harvest_month: int
     intercropped: bool
     # SURVEY-REPORTED kilograms per ONE unit of the row's `u` -- UNPS

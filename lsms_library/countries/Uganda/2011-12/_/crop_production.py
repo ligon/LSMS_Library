@@ -8,6 +8,12 @@ whose labels decode to Kg/Sack/Bunch); the harvest CONDITION is a5aq6b,
 now an index level in its own right (GH #323/#637) so fresh and dry
 records for one plot-crop no longer collide and get summed.
 See uganda.CROP_COLMAPS for the per-wave column map.
+
+The SOLD unit (a5?q7c) is carried as Unit_sold (GH #824): Value_sold /
+Quantity_sold is a price per Unit_sold, never per u.  This wave ships NO 7b
+column, so Condition_sold is all-NA -- the questionnaire asks it (p.13 / p.21
+both print '7a Qty | 7b Condition/State Code | 7c Unit Code'), so this is
+asked-not-distributed and CROP_COLMAPS declares condition_sold: None.
 """
 import sys
 sys.path.append('../../_/')
