@@ -2493,7 +2493,27 @@ def _survey_median_factors(df, reported, *, min_reports, sentinel=None):
 #: ``crop_production`` must rename it -- accepting both spellings silently
 #: would hide a mis-keyed join, which is the failure mode this whole layer is
 #: most exposed to.
-SHIPPED_FACTOR_JOIN_LEVELS = ('country', 't', 'j', 'u', 'condition', 'region')
+#:
+#: ``crop`` sits beside ``j`` because the corpus genuinely spells the crop
+#: level BOTH ways and neither is going away soon: Uganda, Ethiopia and
+#: Tanzania declare ``j`` in ``crop_production``'s index; Malawi, Nigeria,
+#: Niger, Mali, Togo, Benin, Senegal, Burkina Faso, Guinea-Bissau and
+#: CotedIvoire declare ``crop`` (measured 2026-09-09).  This is NOT the
+#: ``Region``/``region`` laxity the note above refuses -- that would accept
+#: two spellings of ONE level on one frame; this accepts two level names that
+#: exist on DIFFERENT frames, and a table keyed on the wrong one for its
+#: frame still drops the key, warns, and then almost always refuses as
+#: ambiguous.  Without it, Malawi's table (GH #854) could not be joined at
+#: all without renaming a served index level at the call site.
+#: ``crop_variety`` is the crop at its NATIVE, un-collapsed grain, and it is
+#: here because a shipped table is often keyed FINER than the served crop
+#: label.  Malawi's IHS5 files key on 'MAIZE HYBRID' / 'RICE FAYA' where
+#: ``crop_production.crop`` says 'Maize' / 'Rice', and the varieties disagree
+#: by up to 1.69x; EPAR keys the same merge on ``crop_code_long`` and says so
+#: in capitals.  A table keyed on it joins a frame that carries it and is
+#: refused as ambiguous on one that does not -- which is the right failure.
+SHIPPED_FACTOR_JOIN_LEVELS = ('country', 't', 'j', 'crop', 'crop_variety',
+                              'u', 'condition', 'region')
 
 #: Private stand-in for a NA join key.  ``astype(str)`` would render NaN as the
 #: literal ``'nan'`` and let it collide with a genuine ``'nan'`` label; this
@@ -2771,9 +2791,14 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ONE unit of the row's ``u``) plus an optional ``Source`` string,
         keyed -- as index levels or as columns -- on some subset of
         :data:`SHIPPED_FACTOR_JOIN_LEVELS`
-        ``('country', 't', 'j', 'u', 'condition', 'region')``.  The loader
-        decides which levels its table can honestly key on; the join uses
-        those present in BOTH the table and *crop_production*.
+        ``('country', 't', 'j', 'crop', 'crop_variety', 'u', 'condition',
+        'region')``.  The loader decides which levels its table can honestly
+        key on; the join uses those present in BOTH the table and
+        *crop_production*.  ``j`` and ``crop`` are both there because the
+        corpus spells the crop level both ways (Uganda/Ethiopia/Tanzania
+        ``j``; Malawi and nine others ``crop``); key the table on whichever
+        name its own country's frame carries.  ``crop_variety`` is the
+        un-collapsed crop, for a table keyed finer than the served label.
 
         NOTHING AUTO-DISCOVERS A COUNTRY'S TABLE, and the result is never
         stored.  The intended call shape, once the loaders of GH #852 / #854
@@ -2788,10 +2813,15 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``region`` must be resolved by the CALLER onto *crop_production* (join
         ``cluster_features`` and rename its ``Region`` to ``region``); this
         function never re-enters ``sample()`` or ``cluster_features()``.  Note
-        also that ``crop_production.j`` is the DECODED crop label, not the WB
-        crop code -- a table read straight from ``Crop_CF_Wave4.dta`` carries
-        ``74``, which matches no ``j``, and the ``shipped: 0`` count is the
-        only tell.  Decode in the loader.
+        also that ``crop_production``'s crop level (``j`` or ``crop``) is the
+        DECODED crop label, not the WB crop code -- a table read straight from
+        ``Crop_CF_Wave4.dta`` carries ``74``, which matches no ``j``, and the
+        ``shipped_matched: 0`` count is the only tell.  Decode in the loader.
+        Malawi's IHS5 tables need one further step: their crop key is a
+        VARIETY (``'MAIZE HYBRID'``, ``'RICE FAYA'``) and the served ``crop``
+        is the aggregate Preferred Label, so the loader must collapse the
+        varieties -- and refuse the keys whose varieties disagree
+        (``malawi.crop_conversion_factors``).
 
         An AMBIGUOUS table (two rows sharing a join key) raises ``ValueError``
         naming the duplicates: de-duplicating is the loader's deliberate act,

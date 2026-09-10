@@ -573,7 +573,23 @@ Columns:
         asks only a coarse dry/fresh distinction uses the bare family
         tokens; a country asking something Uganda does not should extend
         this list rather than force-fit a foreign category, per the
-        `Tenure` / `TenureSystem` precedent above.  `unknown_condition` is
+        `Tenure` / `TenureSystem` precedent above.
+
+        MALAWI IS THE FIRST EXTENSION, and it extends the FORM axis, not
+        the dryness one (GH #854).  IHS3-IHS5 Module G question 13c asks
+        only "(S/U)" -- shelled, unshelled, or not applicable -- and never
+        asks the dryness at all.  So its values are the BARE FORM tokens
+        `shelled` / `unshelled` / `shell_not_applicable`, added below.
+        They are NOT spelled `dried_grain` / `dried_with_shell`: those
+        assert a dryness family the instrument never recorded, and the
+        whole point of this level is that it says what was actually
+        measured.  `shell_not_applicable` is the survey's OWN answer (code
+        3, "this crop has no shell to speak of"), which is why it is a
+        value and not the missing-data sentinel below.  Read the cross as
+        partial rather than complete: a country may pin the dryness family,
+        the form, or -- as Uganda does -- both.
+
+        `unknown_condition` is
         the sentinel for a record whose condition code is missing or
         outside the source's labelled scheme -- it is a real value, never
         NA, because a null index key is silently dropped by the duplicate
@@ -598,6 +614,10 @@ Columns:
         dried_in_cob: []
         dried_in_pods: []
         dried_grain: []
+        # Bare FORM tokens -- dryness not asked (Malawi IHS3-IHS5 ag_g13c).
+        shelled: []
+        unshelled: []
+        shell_not_applicable: []
         other_condition: []
         unknown_condition: []
     season:

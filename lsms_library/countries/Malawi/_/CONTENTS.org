@@ -198,13 +198,450 @@ quantity column and its unit column are a PAIR, and the modules are free
 to differ.  Whenever a wave script reads a =*_qty= column, look for the
 =*b= sibling before assuming the grain's existing =u= describes it.
 
-*Not fixed, and reported*: =ag_i02c= (S/U -- "MAKE SURE TO ASK WHETHER THE
-REPORTED VALUE IS SHELLED OR UNSHELLED") is likewise unread, and
-=ag_g13c= is passed to =_harvest_block= as =condition== but the parameter
-is *accepted and never used*.  A shelled/unshelled mismatch between
-harvest and sale is a second, smaller basis error on legumes and
-groundnut; it needs a =condition= level on the grain, which is a schema
-change and out of scope here.
+*Half fixed 2026-09-09 (GH #854); the rest still reported.*  =ag_g13c= was
+"passed to =_harvest_block= as =condition== but the parameter is *accepted
+and never used*"; it is now *read*, and =condition= is an index level of
+=crop_production= -- see "crop_production: the harvest CONDITION" below for
+the schema change, its vocabulary and its measurements.  The schema change
+this entry called out of scope was taken.
+
+=ag_i02c= (S/U -- "MAKE SURE TO ASK WHETHER THE REPORTED VALUE IS SHELLED OR
+UNSHELLED") is *still unread*, so the shelled/unshelled mismatch between
+harvest and sale is *still* a basis error on legumes and groundnut.  What
+#854 did about it is *defensive, not corrective*: because a plot-crop can
+now carry a shelled AND an unshelled row in the same =u=, the sale merge
+would have stamped the same =Quantity_sold= / =Value_sold= on both, so the
+gate in =assemble_crop_production= now also requires exactly one harvest row
+per =(i, _crop_code, u)=.  It attaches nothing rather than double-counting.
+Measured cost: *one* suppressed sale (2010-11 =303041430013=, Maize, 50 kg
+Bag: 1.5 bags / 2,500 MWK).  Wiring =ag_i02c= would let those attach again,
+correctly, and is the natural follow-up.
+
+* crop_production: the harvest CONDITION, and the two SHIPPED IHS5 conversion tables (GH #854, 2026-09-09)
+
+Two things that read as separate items are one: Malawi's IHS5 v04 release
+ships two crop-side conversion tables whose kg factors are keyed ON the
+shelled/unshelled axis, and Malawi's own =ag_g13c= (that same axis) was being
+thrown away.  Wiring either without the other is pointless -- without
+=condition= the seasonal table is *ambiguous* and the transform refuses it
+outright.
+
+** The dead parameter, and the rule that settled it
+
+All four wave scripts have passed =condition='ag_g13c'= into
+=_harvest_block= since GAP 1.  The parameter was accepted and never read.
+=grep -nw condition _/malawi.py= returned the signature line and nothing
+else.
+
+The tempting test is "does it split a key?".  Measured cold over all
+*112,691* Module-G harvest rows in all four waves, =condition= splits a
+=(t, i, plot, crop, u)= key on *7* of them -- all in 2010-11.  On that number
+alone, deleting the parameter would have won.
+
+*The rule applied instead*: a level is added when the instrument asks it AND
+a downstream consumer needs to key on it -- not only when it splits a key.
+The keying measurement is decisive:
+
+| shipped table joined onto                        | =shipped_matched= |
+|--------------------------------------------------+-------------------|
+| =crop_production= WITH =condition=               |            86,657 |
+| the same frame with =condition= stripped         | *refused*         |
+| a condition-BLIND table (only the 261 of 316 =(crop,u,region)= keys whose conditions agree) |            36,915 |
+
+The refusal is a real =ValueError=: "shipped_factors is ambiguous on the join
+keys ['crop','u','region']: 55 duplicated key(s)".  Shelled and unshelled are
+two different answers to one question, and =_shipped_factor_lookup= will not
+average them or take the first.  So the honest "without =condition=" answer
+is *no join at all* until a loader throws the distinction away, and the best
+such a loader could manage is *43%* of the matches.  =condition= more than
+doubles the shipped layer's reach (2.35x).
+
+The third reason is the one =lsms_library/data_info.yml= states: 240 kg of
+shelled and 100 kg of unshelled groundnut off one plot are two facts, not one
+340 kg fact.  Corpus-wide the axis is well populated:
+
+| condition              |  rows | 2010-11 | 2013-14 | 2016-17 | 2019-20 |
+|------------------------+-------+---------+---------+---------+---------|
+| =shelled=              | 68147 |   16194 |    5946 |   19548 |   26459 |
+| =unknown_condition=    | 26333 |    7127 |    3183 |    6399 |    9624 |
+| =shell_not_applicable= | 19168 |    4765 |    1459 |    4933 |    8011 |
+| =unshelled=            | 17900 |    5334 |    2028 |    5168 |    5370 |
+
+** The vocabulary: a bare FORM axis, and why Uganda's tokens are wrong here
+
+=ag_g13c='s Stata value labels are identical in every wave that asks it:
+=1 'S: SHELLED'=, =2 'U: UNSHELLED'=, =3 'NOT APPLICABLE'= (2013-14 drops the
+=S:= / =U:= prefixes; the codes are the same).  *Module G asks no dryness
+question at all.*
+
+Uganda's =harvest_conditions= crosses a DRYNESS family (green / fresh /
+dry-at-harvest / dried) with a FORM (with shell / in cob / in pods / grain).
+Borrowing =dried_grain= for Malawi's SHELLED would assert a dryness the
+instrument never recorded -- and the whole point of the level is to say what
+was measured.  So Malawi extends the *form* axis with bare tokens, which is
+exactly what =data_info.yml= tells a country to do ("a country asking
+something Uganda does not should extend this list rather than force-fit a
+foreign category").  New table =harmonize_crop_condition= in
+=categorical_mapping.org=; new tokens =shelled= / =unshelled= /
+=shell_not_applicable= in =data_info.yml=.
+
+=shell_not_applicable= is *not* =unknown_condition=, and the difference is
+not pedantry: the first is the survey's own answer (code 3 -- this crop has
+no shell to speak of), the second is the sentinel =malawi.py= mints for a
+NULL or off-scheme code and for every perennial Module-P row, which asks no
+condition question.  The off-scheme codes are real: 2013-14 has one =5=, and
+the 2016-17 panel has =15=, =10= and a *non-integral* =4.5=.  That 4.5 is why
+=_crop_conditions= maps element-wise instead of going through
+=.astype('Int64')= like every other Malawi code map -- pandas 3.0 raises
+=TypeError: cannot safely cast non-equivalent float64 to int64= on it.
+
+** What the build change moved
+
+| wave    | rows before | after | Quantity before | after     | =Value_sold= n before | after |
+|---------+-------------+-------+-----------------+-----------+-----------------------+-------|
+| 2010-11 |      33,349 | 33,420 |       970,155.8 |  970,155.8 |                 6,104 | 6,104 |
+| 2013-14 |      12,602 | 12,616 |       257,839.0 |  257,839.0 |                 1,999 | 1,999 |
+| 2016-17 |      36,003 | 36,048 |       842,684.4 |  842,774.4 |                 6,807 | 6,807 |
+| 2019-20 |      49,425 | 49,464 |     1,206,369.9 | 1,206,369.9 |                8,911 | 8,914 |
+
+*The =Value_sold= column is NOT the "sale rows attached" of the 2026-09-08
+=#824= table above, and the two must not be read as a regression.*  That
+table counts rows with a *positive* =Quantity_sold=; this one counts rows
+with a *non-null* =Value_sold= (which equals non-null =Quantity_sold=
+exactly, in every wave, before and after).  Measured on the same two builds,
+the =#824= quantity is 5,205 / 1,774 / 4,456 / 6,857 before and 5,205 /
+1,774 / 4,456 / 6,859 after -- i.e. it reproduces =#824='s published 5,205 /
+1,772 / 4,455 / 6,853 to within 0 / 2 / 1 / 4 rows of drift accumulated since
+that entry, and this change moves only 2019-20, by +2.
+
++169 rows, decomposed exactly, and *only 7 of them are the condition split*:
+
+- *7* rows -- 2010-11 plot-crops reported both shelled and unshelled in the
+  same unit, which used to be SUMMED into one incommensurable number.
+- *162* rows -- previously DESTROYED by the old defensive collapse.  It keyed
+  on =(t, i, plot, crop)= with =u= a column, so a plot-crop harvested in two
+  units collapsed with =u='first'=.  *That is the residual this file recorded
+  on 2026-09-08 as "nearly a no-op, but NOT provably one"; it is now closed*,
+  because the collapse keys on the full declared grain
+  =(t, i, plot, crop, u, condition)=.
+- *40 of those 162* are 2016-17 perennial rows with a NULL =plot= -- homestead
+  trees (Mango, Papaya, Guava, Masuku) with no numbered garden/plot -- which
+  the old =groupby(level=...)= was deleting on a NaN key, =dropna=True= being
+  the default.  They are the whole of the +90.0 Quantity move.  They are now
+  served, with a NULL =plot= in the index, exactly as the ~8.5k rows with a
+  NULL =u= always have been.
+
+** The two shipped files: raw grain, and three things that are not what they look like
+
+: ihs_seasonalcropconversion_factor_2020.dta   857 x 7
+:   region x crop_code x unit_name x unit_code x condition x conversion x collectionround
+:   3 regions, 41 crop_code values, 15 unit_code values, 3 conditions;
+:   ZERO nulls anywhere; ZERO duplicate rows on (region, crop_code, unit_code, condition).
+: ihs_treeconversion_factor_2020.dta           153 x 6
+:   the same, with NO condition column (a tree crop has nothing to shell);
+:   3 regions, 14 crop_code values, 9 unit_code values;
+:   ZERO nulls; ZERO duplicate rows on (region, crop_code, unit_code).
+
+1. *=crop_code= is not a code, it is a VARIETY LABEL, and it is FINER than
+   our =crop=.*  ='MAIZE LOCAL'= / ='MAIZE COMPOSITE/OPV'= / ='MAIZE HYBRID'= /
+   ='MAIZE HYBRID RECYCLED'= are the Module-G value labels for codes 1-4, and
+   =harmonize_crop= maps all four to ='Maize'=.  Ten rice varieties collapse
+   to ='Rice'=, six groundnuts to ='Groundnut'=.  *So we key on the variety,
+   not on the collapsed label* -- see "Why the join keys on the variety"
+   below.  =crop_conversion_factors(by_variety=False)= still returns the
+   collapsed table, reduced by =_collapse_varieties= with a stated rule (a key
+   survives only when every variety under it agrees; where they disagree it is
+   DROPPED, never averaged, modal or first), for a frame built before
+   =crop_variety= existed.
+2. *=unit_code= is a STRING and its namespace is WIDER than the harvest
+   module's.*  The harvest asks =ag_g13b= / =ag_p09b= on codes 1-13; the
+   files add ='14'= (PAIL MEDIUM), ='31A'/'31B'/'31C'= (BUNDLE small/medium/
+   large), ='98'= (HEAP) and ='8A'/'8B'/'8C'= (BUNCH small/medium/large).  No
+   harvest row can carry those, so 154 seasonal and 43 tree rows are dropped
+   and counted.  Folding =8A/8B/8C= onto code 8 ='Bunch'= would be the same
+   disagreeing collapse in a different costume: three sizes, three weights,
+   one label.
+3. *=region= matters and cannot be collapsed.*  259 of 315 seasonal
+   (crop, unit, condition) triples and 53 of 56 tree (crop, unit) pairs carry
+   more than one distinct regional factor.  So the table is region-keyed and
+   the CALLER resolves =region= onto =crop_production= --
+   =malawi.with_region()= joins =cluster_features.Region= through =v=.
+   *The file spells the south ='South'= and =cluster_features.Region= spells
+   it ='Southern'= (the =region= table in =categorical_mapping.org=)*; the
+   loader translates.  Untranslated it matches nothing, silently, for a third
+   of the country.
+
+Match rates, pinned by test:
+
+| file     | rows | crop | variety | unit | condition | region | keys kept | refused |
+|----------+------+------+---------+------+-----------+--------+-----------+---------|
+| seasonal |  857 | 857  |     857 |  703 |       857 |    857 |       703 |       0 |
+| tree     |  153 | 153  |     153 |  110 | (no column) |  153 |       110 |       0 |
+
+Keyed on the VARIETY the table needs *no de-duplication at all* -- 813 rows,
+zero duplicate keys -- so the "keys kept" column is simply the unit-matched
+row count.  Under =by_variety=False= the same files reduce to 291 + 84 keys
+with 23 + 8 refused.
+
+*NO =t= LEVEL, deliberately.*  Both files are 2019-20 (IHS5 v04, catalog
+3818) artefacts and are served to every wave, which is an EXTRAPOLATION and
+is stated in the docstring rather than hidden.  Supporting it: the units are
+physical containers, not instruments; the file's own =collectionround= says
+each factor was collected in 2016, in 2019, or in both, so it is not a
+single-year snapshot; and EPAR does the same and says why ("We borrow this
+survey's conversion factor files for the remaining Waves in the absence of
+having similar files for earlier versions of the survey").  Qualifying it:
+nothing measured here shows that a 2019 pail weighed what a 2010 pail
+weighed.  =crop_conversion_factors(waves=['2019-20'])= adds a =t= level and
+fences the join for a caller who wants it fenced.
+
+*EPAR's interpolation ladder is NOT ported* -- the shelled/unshelled ratio,
+the regional and national means, the tuber and cowpea borrows.  Those are
+IMPUTED values wearing a =source= tag.  Only the two raw tables are
+=reported=, and only they are here.
+
+** What it buys: harvest_kg before and after (2026-09-09 figures, COLLAPSED key)
+
+*Superseded by the variety key, 2026-09-10 -- the table immediately below is
+the =by_variety=False= path, kept because the two are worth comparing.  The
+live numbers are in "Why the join keys on the VARIETY" above.*
+
+=harvest_kg(cp)= vs
+=harvest_kg(malawi.with_region(cp), shipped_factors=malawi.crop_conversion_factors())=:
+
+| layer                 |  before |  after |
+|-----------------------+---------+--------|
+| =reported=            |       0 |      0 |
+| =shipped=             |       0 | 82,018 |
+| =survey_median=       |       0 |      0 |
+| =inferred=            |  90,075 | 24,250 |
+| =none=                |  41,473 | 25,280 |
+| =shipped_implausible= |       0 |  4,639 |
+| =shipped_matched=     |       0 | 86,657 |
+
+| wave    | Harvest_kg before | after        | change |
+|---------+-------------------+--------------+--------|
+| 2010-11 |       8,509,405.2 |  8,689,757.2 |  +2.1% |
+| 2013-14 |       2,336,456.0 |  2,554,344.0 |  +9.3% |
+| 2016-17 |       6,501,016.7 |  6,880,919.6 |  +5.8% |
+| 2019-20 |      18,529,157.8 | 20,053,977.8 |  +8.2% |
+
+Output rows 60,057 -> 67,054.  The shipped layer serves *16,193 rows the
+inferred machinery could not*: the library's label parser only reaches
+=Kilogramme= / =50 kg Bag= / =90 kg Bag= here, while the files cover pails,
+ox-carts, baskets, bunches, pieces and bales.
+
+*Agreement where both layers have a factor* (65,825 rows): median
+shipped/inferred ratio *1.0200*, share outside [0.5, 2] *7.28%*.  By unit:
+
+| u            | rows | median ratio |     min |    max |
+|--------------+------+--------------+---------+--------|
+| =Kilogramme= | 9475 |       1.0000 |  1.0000 | 1.0000 |
+| =50 kg Bag=  | 55764 |      1.0200 |  0.2600 | 1.3200 |
+| =90 kg Bag=  |  586 |       1.0658 |  0.2371 | 1.2488 |
+
+The =Kilogramme= row being exactly 1.0000 on all 9,475 rows is the sanity
+check that the join is not mis-keyed.  The other two say the library's "a
+50 kg bag holds 50 kg" understates the survey's own measurement by ~2% on
+average, by up to 32% at one end, and overstates it by up to 4x at the other.
+
+** Why the join keys on the VARIETY (2026-09-10, red-team item 2)
+
+The first cut of the loader keyed on our collapsed =crop=, reduced the file's
+varieties with an agreement-or-drop rule, and refused 23 + 8 keys.  The
+red-team pass measured what that costs and the answer was not noise: *6,890
+served rows*, entirely on Groundnut, Rice and Citrus -- the country's
+second-biggest crop among them.  And in 19 of the 23 seasonal refusals the
+SOLE dissenter is the catch-all ="OTHER GROUNDNUT (SPECIFY)"= / ="OTHER RICE
+(SPECIFY)"=; the named varieties agree exactly.  The remaining 4 are a real
+and economically meaningful split -- unshelled paddy in a 50 kg bag is *29.04
+kg* for =RICE LOCAL= against *49.00* for eight improved varieties in Central
+(1.69x).  The 8 tree refusals are not varieties at all: =harmonize_crop= maps
+ORANGE, LEMON and NAARTJE all to ='Citrus'= and the file weighs them
+differently (Southern 50 kg Bag: 38.0 / 52.0 / 55.0).  That refusal is a
+symptom of *our* harmonisation being coarse, not of the file being ambiguous.
+
+EPAR reached the same conclusion first and shouted it:
+
+: merge m:1 region crop_code_long unit condition using "...MWI_IHS_cf.dta"
+:   //NOTE THAT WE MERGE ON CROP_CODE_LONG INTENTIONALLY
+:   -- Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:1327
+
+So =crop_production= now carries *=crop_variety=*, a COLUMN (never a level --
+it is a function of the crop code and splits no key), decoded through the new
+=harmonize_crop_variety= table, and the loader keys on it by default.
+Measured on the built table:
+
+| join key                                | =shipped_matched= | =shipped= served | refused keys |
+|-----------------------------------------+-------------------+------------------+--------------|
+| =crop= (collapsed, =by_variety=False=)  |            86,657 |           82,018 |           31 |
+| =crop_variety= (default)                |        *95,906*   |        *91,267*  |        *0*   |
+
+- *+9,249 matched rows*, and *all 31 refused keys resolve* -- the variety key
+  needs no de-duplication at all (813 rows, zero duplicate keys).
+- *Identical on every one of the 81,886 rows both keys can serve.*  Not
+  "close": byte-identical.  So this moves no number that the collapsed key
+  was already producing; it only fills cells the collapsed key had to leave
+  empty.
+- It *withdraws 132 rows*, and that is a correction, not a loss.  The
+  agreement-or-drop rule cannot tell "every variety agrees" from "only one
+  variety is in the file", so the collapsed key was handing *Tobacco Burley's*
+  factor to flue-cured, NNDF, SDF and oriental tobacco (118 rows), and the
+  file's single Citrus/Ox-Cart figure to all three citrus species (5 rows).
+  The file has no factor for those varieties, and inventing one is what this
+  layer exists not to do.
+
+*The label is NOT a usable key; the code is.*  Measured over all four waves'
+own Stata value labels, 12 of 48 seasonal codes are spelled differently in
+different waves -- 2016-17 writes ='MAIZE: LOCAL'= and ='GROUNDNUT: CG7'= with
+a colon, and 2010-11 ships the typo ='RISE LOCAL'= for all nine rices plus the
+truncations ='TOBACCOSDF'=, ='GROUND BEAN(NZAMA'= and ='GROUNDNUT MANIPINTA'=.
+A join on the raw label loses 13,769 rows to that drift.  Every one of the 12
+differences is a SPELLING difference, checked code by code; none is a change
+of meaning, which is why one canonical label per code is correct.  The
+perennial half is stable across every wave (0 of 23 differ).
+
+*What this cost the wave totals.*  =Harvest_kg= against the no-shipped
+baseline, with the variety key:
+
+| wave    | before        | after         | change |
+|---------+---------------+---------------+--------|
+| 2010-11 |  8,509,405.2  |  8,497,721.8  | -0.14% |
+| 2013-14 |  2,336,456.0  |  2,477,271.5  | +6.03% |
+| 2016-17 |  6,501,016.7  |  6,711,370.0  | +3.24% |
+| 2019-20 | 18,529,157.8  | 19,044,354.8  | +2.78% |
+
+2010-11 goes slightly NEGATIVE, and that is the withdrawal above doing its
+job: those Tobacco Bale rows used to get Burley's factor from the collapsed
+key and the inferred parser cannot read "Bale", so they now get nothing rather
+than a borrowed number.  Output rows 60,057 -> 68,376.  Agreement with the
+library's inferred factor over the larger served set: median ratio *1.0000*,
+*13.03%* outside [0.5, 2].
+
+** The sale suppression is COUNTED IN CODE, not in prose (red-team item 6)
+
+The 2026-09-09 entry said the gate "attaches nothing and counts it", and
+nothing counted it -- the number lived only in this file, frozen at the day it
+was measured.  =assemble_crop_production= now emits a
+=SaleAttachmentWarning= naming the sales, the rows and the MWK, and puts the
+same tally on =df.attrs['sale_suppressed']= (which a test reads; it does not
+survive =to_parquet=, which is why the warning exists as well).  On the
+current build it fires exactly once:
+
+: Malawi/crop_production 2010-11: 1 household-crop sale(s) totalling 2,500 MWK
+: were NOT attached to any harvest row, because the plot-crop is reported in
+: more than one `condition` in the same unit (2 candidate rows). ...
+
+Two candidate rows, one sale: the old gate would have stamped 2,500 MWK on
+*both* the shelled and the unshelled row and booked 5,000.  Wiring =ag_i02c=
+(the sale module's own S/U) is what would let it attach again, correctly.
+
+** =Feature('crop_production')= EXCLUDES Malawi until the framework fix lands (2026-09-10)
+
+*Stated here because the level was kept on purpose, and because the next
+person to audit =Feature('crop_production')= will otherwise read Malawi's
+absence as a build failure.*
+
+=crop_production= is deliberately not registered in =lsms_library/data_info.yml='s
+=index_info= (the plot-level ag features' index NAMES diverge -- =plot= vs
+=plot_id=, =crop= vs =j= -- and that comment defers the harmonisation).  So
+=Feature.__call__= falls through to the modal-index-shape filter, which DROPS
+any frame whose =index.names= tuple is not the modal one, with a named
+=UserWarning=.  Adding =condition= moved Malawi from the 8-country modal shape
+=(t,i,plot,crop,u)= into a shape of its own, so:
+
+: Feature('crop_production')(['Malawi','Togo','Benin'])
+:   -> (20619, 4)  countries kept: Benin, Togo
+:   UserWarning: crop_production: excluded 1 country frame(s) ['Malawi'] with a
+:   divergent index shape ... (kept modal shape [...,'plot','crop','u',...])
+
+Malawi's *131,548 rows* -- 81% of that assembly, and the largest single frame
+in the modal group -- are gone from every =Feature('crop_production')= call.
+The degrade is LOUD, which is the library's stated contract, so this is not a
+silent-corruption defect; it is a real functional regression with a known
+cause and a known fix.
+
+*It is NOT fixed by removing the level*, and the level must not be removed:
+=condition= is what makes the shipped table joinable at all (see the table
+above -- without it the transform refuses outright), and Uganda already
+carries =condition= and is already excluded by the same rule, so the rule
+would have to be fixed for Uganda regardless.  The fix is to register
+=crop_production= in =index_info= with a canonical shape and let
+=fabricate_missing_levels= give the =condition=-less countries a NaN
+=condition= so they are KEPT -- the mechanism =interview_date= already uses
+for =visit= (GH #506).  That is in hand on branch
+=fix/feature-canonical-index-crop-production=; this branch's merge is held
+until it lands.  GH #775 / #569.
+
+** =KG_FACTOR_MAX= rejects 12 shipped rows that are probably right
+
+=shipped_implausible = 4,639= is one thing: *ox-carts*.  Twelve shipped
+factors exceed the cross-country cap of 250 kg/unit -- Maize 388.4-682.0,
+Sugar Cane 610.0-631.4, Sweet Potato 365.4, Irish Potato 358.0 -- and an
+ox-cart of maize really does weigh several hundred kilograms.  This is the
+screen catching a physically plausible container, not a mis-key.  *The cap
+was NOT touched* (it is a cross-country constant tuned on Uganda's data-entry
+errors, and #854 says count-never-clip), so those rows fall through to
+=none= -- *not* =inferred=: the library's label parser cannot read "Ox-Cart"
+either, so a rejected shipped ox-cart factor leaves the row with NO harvest
+weight at all.
+
+*The proposal for @ligon, with the rows it moves* (also in
+=.coder/ledger/854-malawi-shipped-factors.md= §7; NOT implemented here):
+
+1. *Keep =KG_FACTOR_MAX = 250= as the default and add a per-unit override* --
+   a small =_KG_FACTOR_MAX_BY_UNIT= table for bulk-transport containers,
+   =ox-cart: 800= (and =cart: 800=, =wheelbarrow: 200=), matched on the same
+   stripped-lower-cased unit text =_KG_UNIT_KEYS= already uses.  The screen
+   already reads the row's unit from =df=, so it is one lookup inside
+   =_screen_reported_factors=.  *Rows moved: 4,639* (Maize 4,452, Sweet Potato
+   132, Sugar Cane 45, Irish Potato 10) from =none= to =shipped=.  Do NOT
+   raise the global cap: it exists to catch a quantity or a calendar year
+   keyed into the factor field, and those live on kg / bag / tin units.
+2. *Add a FLOOR.*  The screen has a ceiling and no floor, and the live
+   instance is in this very table: *Citrus / Ox-Cart = 18.9 kg*.  A cartload
+   of oranges weighing 19 kg is exactly as wrong as 682 is high, and it passes
+   unremarked today.  (Under the variety key this particular row is withdrawn
+   anyway -- the file gives ORANGE, LEMON and NAARTJE different weights and we
+   no longer collapse them -- but the *absence of a floor* is general.)
+3. *The one factor not to defend*: Maize / unshelled / Central = *682.00*, at
+   15.4 bag-equivalents against its own siblings' 8.4-8.8.  An =ox-cart: 800=
+   admits it; that is a deliberate choice to flag it here rather than screen
+   it out with a number picked to exclude one row.
+4. *Whoever changes the cap must first measure Uganda's reported (250, 1000]
+   band.*  Uganda is the country the cap was tuned on, and the red-team pass
+   could not build it.  Nigeria was measured: *zero* of its 19,678 non-null
+   reported =KgFactor= rows are above 250, so a per-unit override changes
+   nothing there.
+
+The internal check that says these are measurements and not mis-keys needs no
+outside number: divide each ox-cart factor by the SAME
+crop/condition/region's 50 kg Bag factor and you get *8.4 to 9.4 bags per
+cartload* for maize, 6.5 for the potatoes -- which is what a two-ox cart
+carries.  Only the 682.00 (15.4 bags) falls outside.
+
+** Found while doing this, NOT fixed: Cassava is missing from 2016-17 and 2019-20 (GH #869)
+
+=crop_production= has 1,650 Cassava rows in 2010-11 and 387 in 2013-14, and
+*zero* in 2016-17 and 2019-20.  The reason is a code-namespace break: those
+two waves' perennial module codes Cassava as *100*, not 1, so =_crop_codes='
+=+1000= offset yields *1100*, which =harmonize_crop= does not carry, and the
+rows are dropped as "no crop identity".  Measured: *2,990 rows* (982 + 90 in
+2016-17, 1,557 + 361 in 2019-20).  The same mechanism drops *385* rows coded
+=1021= (those waves number "OTHER (SPECIFY)" 21, not 18) and *206* coded
+=2800= / =2900= / =3000= (fodder / fertiliser / fuel-wood trees, perennial
+codes 1800/1900/2000).
+
+*Filed as GH #869.*  It is five lines in =harmonize_crop= --
+=1100 -> Cassava=, =1021 -> Other=, =2800/2900/3000 -> Fodder / Fertiliser /
+Fuel Wood Trees= -- but it ADDS *3,581 rows* (2,990 + 385 + 206) to a served
+table and needs its own before/after, so it was not folded into #854.  It also
+caps what the tree conversion table can reach: Cassava is that file's largest
+crop, 12 of its 153 rows, and none of those 12 factors can be applied to a
+2016-17 or 2019-20 row that does not exist.  Confirmed by the red-team pass on
+a cold build of BOTH trees (base and branch): zero Cassava rows in those two
+waves either side, so this branch neither caused it nor changed it.  *Do not
+assume Malawi grew no cassava after 2013.*
 
 * community_prices: what Module CK actually asks
 
@@ -658,8 +1095,12 @@ For items that have such unit conversions already done, they were scaled by the 
     conversion factors)
   - =2019-20/Data/Cross_Sectional/ihs_seasonalcropconversion_factor_2020.dta=
     and =ihs_treeconversion_factor_2020.dta= (crop-side conversion
-    factors, 2026-09-09: held, unwired; only the food file is read,
-    =2019-20/_/food_acquired.py:17=)
+    factors).  *WIRED 2026-09-09 (GH #854)* by
+    =malawi.crop_conversion_factors()=, as a =harvest_kg(shipped_factors=...)=
+    table -- read at API time, never stored.  See "crop_production: the
+    harvest CONDITION" below.  (The FOOD file is still the only one read at
+    BUILD time, =2019-20/_/food_acquired.py:17=; these two are crop-side and
+    do not touch =food_acquired=.)
   - =2010-11/Documentation/Malawi_IHS3_Food_Item_Conversion_Factors.pdf=
     (methodology documentation)
 - What is needed to fix ::
