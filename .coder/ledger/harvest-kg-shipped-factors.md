@@ -203,26 +203,54 @@ this mechanism).
    table to test it with.
 
 ---
-### Phase 3 — verification (filled at task end)
+### Phase 3 — verification (measured)
 
-- `_shipped_factor_lookup` — **OK (anchored on §2, §4, §5)**: no existing
-  external-table join to duplicate (§2, row 10); duplicate keys refused rather
-  than reduced (§4); keys normalised before the duplicate check so a casefold
-  collision raises; NA keys carried on a private sentinel rather than through
-  `pd.merge`'s null-matching (§4).
+- `_shipped_factor_lookup` (`lsms_library/transformations.py:1978`) —
+  **OK (anchored on §2, §4, §5)**: no existing external-table join to
+  duplicate (§2, row 10); duplicate keys refused rather than reduced (§4);
+  keys normalised before the duplicate check so a casefold collision raises;
+  NA keys carried on a private sentinel rather than through `pd.merge`'s
+  null-matching (§4).
 - `harvest_kg_factors(shipped_factors=…)` — **OK (anchored on §4)**: the
-  `None` path takes the prior expressions; pinned by the legacy-comparison
-  tests and by the Uganda baseline, whose every number is unchanged (two
-  zero-valued keys added to the expected counts dict, as §4 requires).
-- Screen reuse — **OK (anchored on §5)**: `_screen_reported_factors` is called,
-  not copied; `shipped_implausible` counts its rejections on the shipped
-  layer and rides outside the partition exactly as `reported_implausible`
-  does.
+  `None` path takes the prior expressions.  Pinned by the legacy-comparison
+  tests and by `test_uganda_harvest_kg_baseline`, which **ran** (not skipped
+  — S3 credentials are auto-unlocked here) with every number unchanged:
+  130 606 rows in, 36 095 out, sum `10 868 272.24500081`, `reported 14 050 /
+  survey_median 57 / inferred 28 147 / none 88 352 / reported_implausible 99`.
+  Two zero-valued keys added to the expected counts dict, as §4 requires.
+- Screen reuse — **OK (anchored on §5)**: `_screen_reported_factors` is
+  called, not copied.
 - Layer rank — **OK (anchored on §1, §3)**: `reported` > `shipped` >
-  `survey_median` > `inferred` > `none`, the rank #852 proposes, on the stated
-  ground that an externally shipped table beats the library's own pooling of
-  the survey but never beats the row's own instrument number.
-- Cache impact — **OK (anchored on §1)**: `transformations.py` carries no
-  `@build_transform()` (they live in `build_transforms.py`, re-exported at
-  `transformations.py:18`), so no fingerprint can move.  Measured anyway —
-  see the commit message for the count.
+  `survey_median` > `inferred` > `none`.
+- Cache impact — **OK (anchored on §1)**: measured base `9e4c0867` vs the
+  code commit, `build_transforms_fingerprint` for 9 tables +
+  `Country('Uganda')._table_cache_hash` for 4 — **0 of 13 values moved**.
+  *Recipe correction for the next agent*: `.coder/ledger/median-price-weight-col.md`
+  writes `_table_cache_hash(table)`; the real signature needs the wave list,
+  `c._table_cache_hash(table, c.waves)`.
+- Tests — 31 new in `tests/test_shipped_factors.py`, 35 in
+  `tests/test_crop_kg_factor.py`, 66 passed.
+
+### Found while building (belongs in §4; recorded here so it is dated)
+
+- **pandas 3.0.2 normalises BOTH `None` and `pd.NA` to NaN** when an object
+  ndarray becomes a DataFrame column.  Measured directly; not in `CLAUDE.md`'s
+  Pandas-3.0 list.  Consequence: `kg_shipped_source` must be read with
+  `pd.isna`, never `is None` — the first version of its test asserted
+  `is None` and failed.
+- **The duplicate refusal is STRICTER than the core grain-collapse rule.**
+  Core stays silent on a *lossless* de-dup (identical rows); this refuses
+  those too.  Deliberate: a factor table is a small curated artefact, and a
+  loader that has not looked at its own duplicates has not looked at its
+  table.  A raw WB file with repeated rows will trip it —
+  `drop_duplicates()` in the loader is the expected answer, and writing it is
+  the act of noticing.  **Loader authors need to be told this**, or they will
+  read the `ValueError` as a bug.
+- **The `j`-vocabulary trap generalises to every key.**  Keys are compared as
+  stripped, lower-cased text, so any type or vocabulary mismatch silently
+  matches nothing: a WB crop code `74` against a decoded `'Enset'`, `74.0`
+  against `'74'`, a `region` code `1` against `1.0`, `t` as an int against
+  `'2019-20'`.  `attrs['kg_factor_sources']['shipped']` is the only tell.
+  **Follow-up worth taking in the Ethiopia loader PR** (deliberately not done
+  here, scope): warn when a non-empty `shipped_factors` matches zero rows.
+  That is this layer's dominant failure mode and it is currently silent.

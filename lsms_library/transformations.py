@@ -2002,6 +2002,22 @@ def _shipped_factor_lookup(df, shipped_factors):
     the right answer -- keep 4.34 -- comes from W3 data, not from a rule this
     transform could apply).  De-duplication is the loader's deliberate act.
 
+    STRICTER than the core's grain-collapse rule, deliberately: it refuses
+    IDENTICAL duplicate rows too, not only disagreeing ones.  Core stays
+    silent on a lossless de-dup because it is reducing data it was handed; a
+    factor table is a small curated artefact, and a loader that has not looked
+    at its own duplicates has not looked at its table.  A raw WB file with
+    repeated rows will trip this -- ``drop_duplicates()`` in the loader is the
+    expected answer, and writing it is the act of noticing.
+
+    SILENT ZERO-MATCH is this layer's dominant failure mode, and there is no
+    warning for it (yet).  Keys are compared as stripped, lower-cased text, so
+    any vocabulary mismatch simply matches nothing: ``j`` as a WB crop code
+    ``74`` against a decoded ``'Enset'``; a numeric ``74.0`` against ``'74'``;
+    a ``region`` code ``1`` against ``1.0``; ``t`` as an int against
+    ``'2019-20'``.  The ``shipped`` count in
+    ``attrs['kg_factor_sources']`` is the only tell -- check it is not 0.
+
     Returns ``(values, source)``: a float ndarray and an object ndarray, both
     aligned POSITIONALLY to *df* (``crop_production`` indexes repeat, so an
     index-aligned merge would be wrong as well as slow).  ``source`` is
@@ -2408,9 +2424,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         :func:`harvest_kg_factors` -- see there for its shape, the join keys,
         the ambiguity refusal, and why nothing auto-discovers it.  Omitted
         (the default), this whole layer is inert and the result is bit for
-        bit what it was before the layer existed.
+        bit what it was before the layer existed::
 
-            harvest_kg(cp, shipped_factors=ethiopia.crop_conversion_factors(...))
+            harvest_kg(
+                cp,
+                shipped_factors=ethiopia.crop_conversion_factors(...))
     carry_native : bool, default False
         When False (default, matching the WB construct), rows whose ``u``
         has no known kg factor contribute NOTHING to the sum — ``Harvest_kg``
