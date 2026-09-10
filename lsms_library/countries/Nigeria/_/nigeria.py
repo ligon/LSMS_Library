@@ -327,6 +327,9 @@ def crop_production_for_wave(t, frames, crop_labels):
             dec       : decoded-label DataFrame (for crop/unit label decode)
             hhid, plot, crop                 column names (plot may be None)
             qty, unit                        harvest qty / unit columns
+            kg_factor                        SURVEY-REPORTED "Kg/L conversion
+                                             factor" column asked BESIDE
+                                             `qty`/`unit` (optional; GH #859)
             qty_sold, unit_sold, value_sold  reported sale columns (optional)
             plant_m, plant_y                 planting/harvest-start month/yr
             harv_m, harv_y                   harvest-end month/yr (optional)
@@ -371,6 +374,25 @@ def crop_production_for_wave(t, frames, crop_labels):
         else:
             piece['u'] = pd.Series(pd.NA, index=df.index, dtype='string').values
 
+        # SURVEY-REPORTED kilograms per ONE unit of THIS row's `u` -- the
+        # GHS-Panel "Kg/L conversion factor" column (`*_conv`), asked beside
+        # the harvest quantity and its unit.  A RATE, never a weight; it is
+        # taken positionally off the SAME row as `qty`/`unit`, so no join and
+        # no averaging can enter.  REPORTED, NEVER CONSTRUCTED -- see the
+        # canonical note at lsms_library/data_info.yml `crop_production.
+        # KgFactor`.  Only a `*_conv` asked beside THIS frame's own
+        # quantity/unit pair may be named here (GH #859): the expected-future
+        # harvest blocks carry their own unit columns and their own factor,
+        # and secta3ii's factor is hh-crop grain -- see _/CONTENTS.org.
+        # A non-positive value is read as "not recorded" (0 kg per unit is
+        # not a weight); measured no-op on every Nigeria wave -- all four
+        # wired columns report positive-or-null only.
+        if fr.get('kg_factor') in df.columns:
+            kgf = pd.to_numeric(df[fr['kg_factor']], errors='coerce')
+            piece['KgFactor'] = kgf.where(kgf > 0, np.nan).astype('float64').values
+        else:
+            piece['KgFactor'] = np.nan
+
         # Reported sale at plot-crop grain (W1/W2); hh-crop sales merged
         # separately below.
         if fr.get('sold_on') == 'plot':
@@ -402,6 +424,12 @@ def crop_production_for_wave(t, frames, crop_labels):
                 'planting_month', 'harvest_month', 'intercropped', 'perennial']:
         if col not in out.columns:
             out[col] = pd.NA
+    # KgFactor is float, not object: a wave with no `*_conv` column anywhere
+    # must still deliver a FLOAT all-NaN column, or the country-level concat
+    # of (all-NaN waves + float waves) degrades the dtype to object.
+    if 'KgFactor' not in out.columns:
+        out['KgFactor'] = np.nan
+    out['KgFactor'] = pd.to_numeric(out['KgFactor'], errors='coerce').astype('float64')
 
     # Drop rows with no crop label resolved (free-text junk codes) and no
     # household.  Keep rows with a crop even if Quantity is NaN (the
@@ -415,7 +443,8 @@ def crop_production_for_wave(t, frames, crop_labels):
 
     out = out.set_index(['t', 'i', 'plot', 'crop']).sort_index()
     out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold',
-               'planting_month', 'harvest_month', 'intercropped', 'perennial']]
+               'planting_month', 'harvest_month', 'intercropped', 'perennial',
+               'KgFactor']]
     return out
 
 
