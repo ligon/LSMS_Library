@@ -22,6 +22,7 @@ match and the framework's _join_v_from_sample() finds them.  `v` is NOT
 emitted -- the framework joins it at API time.
 """
 from lsms_library.local_tools import to_parquet, get_dataframe, df_from_orgfile, format_id
+from lsms_library.paths import countries_root
 import numpy as np
 import pandas as pd
 
@@ -118,5 +119,33 @@ fa['u'] = fa['u'].astype(str)
 fa['visit'] = fa['visit'].astype(int).astype(str)
 
 fa = fa.set_index(['t', 'i', 'j', 'u', 's', 'visit']).sort_index()
+
+# --- canonical `u`: the country's `_/unit_labels.org` Preferred-Label axis ----
+# RESTORED 2026-09-08.  The country-level `_/food_acquired.py` applied
+# `df1['u'].replace(ulabelsd['u']['Preferred Label'])` until c345d317; GH #109
+# Phase 2 (6de0ce37) rewrote that script without it and only 2016-17's wave
+# script re-implemented it, so this wave has shipped the raw survey spellings
+# ('american tin', 'bowl', 'litre', 'Maxi bag') as `u` ever since -- off the
+# axis `community_prices` and every other consumer of `u` share.
+#
+# Two disciplines this country's CONTENTS.org requires:
+#   * resolve the table through countries_root(), never a package-relative
+#     path, so LSMS_COUNTRIES_ROOT is honoured (Trap 6 / GH #753);
+#   * ASSERT the index stays unique.  `food_acquired` is in
+#     `_ADDITIVE_MEASURE_COLUMNS`, so a duplicate makes core SUM
+#     Quantity/Expenditure and re-derive `Price = Expenditure/Quantity` on the
+#     WHOLE frame -- destroying every recorded farmgate price (Trap 9).
+#     Measured before this landed: 0 rows in duplicate groups on the delivered
+#     5,259,320-row table under this exact map.
+_ul = df_from_orgfile(countries_root() / 'GhanaLSS' / '_' / 'unit_labels.org',
+                      name='unit_label').dropna()
+_umap = dict(zip(_ul['u'].astype(str).str.strip(),
+                 _ul['Preferred Label'].astype(str).str.strip()))
+assert _umap, 'unit_labels.org: unit_label decoded to an EMPTY dict'
+fa = fa.rename(index=lambda x: _umap.get(x, x), level='u')
+assert not fa.index.duplicated().any(), (
+    'unit canonicalisation collided on (t, i, j, u, s, visit) -- two raw unit '
+    'spellings share a Preferred Label for one (household, item, visit); '
+    'resolve it here, not in core (CONTENTS.org Trap 9)')
 
 to_parquet(fa, 'food_acquired.parquet')

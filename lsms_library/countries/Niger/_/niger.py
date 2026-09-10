@@ -449,6 +449,76 @@ def _unit_labels(unit_series, unit_map):
     return u.map(lambda x: unit_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
 
 
+# ---------------------------------------------------------------------------
+# The `u` (unit) sentinel — GH #842 / #847
+# ---------------------------------------------------------------------------
+#
+# `Unknown` is the sentinel every Niger table puts on the `u` index level when
+# the enumerator recorded an amount and NO unit.  It is the CORPUS-canonical
+# spelling, not a Niger invention: `data_info.yml` already defines `Unknown` as
+# "the non-ordinal sentinel for don't-know / refused / unmappable"
+# (individual_education), and Uganda's crop_production already writes it onto
+# this very index level (uganda.py, `df['u'].where(df['u'].notna(), 'Unknown')`).
+#
+# WHY A SENTINEL AND NOT NaN — the same argument as CROP_NA below, and it is
+# the whole of GH #842.  `u` is a DECLARED index level in four Niger tables
+# (food_acquired, crop_production, plot_inputs, community_prices).  A NaN there
+# is a DEFERRED silent deletion: the row is served, so no build-time guard
+# fires, and it then vanishes in whichever `groupby` runs first — the
+# framework's canonical de-dup (`_finalize_result`), `Feature()` assembly, or
+# the user's own aggregation — because pandas `groupby(dropna=True)` drops NaN
+# keys.  The loss is attributed to the consumer's code and counted nowhere.
+# `Unknown` survives all three and says, in the table, that the unit is
+# missing.
+#
+# WHY THE FRENCH `Manquant` WAS RETIRED.  Niger used to write the survey's own
+# missing-marker label; the `u` table mapped `Manquant`/`manquant`/`produit
+# absent` onto a `Manquant` Preferred Label.  That table is read on BOTH paths
+# — at build time by `local_tools.get_categorical_mapping` (country file only)
+# and at read time by `Country._apply_categorical_mappings` (global + country)
+# — so it cannot yield `Manquant` in the parquet and `Unknown` at the API.  The
+# two candidate read-path relabels were measured and both fail:
+#   * a `spellings:` block on `u` in the canonical `data_info.yml` is read by
+#     `diagnostics._check_declared_spellings` as a CLOSED vocabulary, and the
+#     `u` vocabulary is deliberately open (GH #223) — every real unit in every
+#     food/crop country would grade `fail`;
+#   * a row in the global `categorical_mapping/u.org` cannot win, because
+#     `_row_union_categorical` keeps the COUNTRY row on a key collision.
+# So the country `u` table now maps every missing-marker spelling straight onto
+# `Unknown`, Niger writes `Unknown` at build time (as Uganda does), and a
+# pre-#842 parquet still holding `Manquant` is relabelled on read by the same
+# table.  ONE spelling, both paths, no second source of truth.
+#
+# CONSUMER RULE: `u == 'Unknown'` is not a unit.  Exclude it before any
+# per-unit comparison, aggregation or unit conversion — and report how many
+# rows you excluded.  Silently keeping it makes a price per nothing; silently
+# dropping it is the bug this sentinel exists to make visible.
+U_NA = 'Unknown'
+
+
+def fill_missing_u(df):
+    """Return *df* with every missing ``u`` replaced by the :data:`U_NA`
+    sentinel, whether ``u`` is a column or an index level.
+
+    One helper for all four Niger tables that declare ``u`` in their index, so
+    the sentinel cannot drift between them (it already had: `crop_production`
+    left the unit NaN while `plot_inputs` filled it).  Rows are never added or
+    removed — only the value of an already-present ``u`` changes.
+    """
+    if 'u' in getattr(df, 'columns', ()):
+        df = df.copy()
+        df['u'] = df['u'].astype('string').fillna(U_NA)
+        return df
+    names = list(df.index.names or [])
+    if 'u' in names:
+        flat = df.reset_index()
+        flat['u'] = flat['u'].astype('string').fillna(U_NA)
+        out = flat.set_index(names)
+        out.attrs = dict(df.attrs)
+        return out
+    return df
+
+
 def _crop_maps():
     crop_map = tools.get_categorical_mapping(
         tablename='harmonize_food', idxvars='Original Label',
@@ -480,6 +550,15 @@ def _finish_crop_production(df, t):
     # crop grown / reported on the line).  These carry no harvest data
     # (crop, Quantity, unit all NA) and are not item-level harvest records.
     df = df[df['crop'].notna()]
+    # A KEPT plot-crop line whose harvest unit was never recorded gets the
+    # `Unknown` sentinel rather than a NaN index key (GH #842 -- see U_NA).
+    # 2018-19 is the wave that has them: 441 rows of 13,717, of which 64
+    # report a Quantity with no unit and 377 are plot-crop lines carrying only
+    # `intercropped` (planted and reported, no harvest measured).  The fill
+    # runs AFTER the no-crop drop, so it never resurrects a dropped row; every
+    # row it touches was already being served, with a NaN key that the next
+    # groupby would have deleted.
+    df = fill_missing_u(df)
     keep = ['t', 'i', 'plot', 'crop', 'u', 'Quantity',
             'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
     df = df[[c for c in keep if c in df.columns]]
@@ -597,9 +676,11 @@ def _finish_plot_inputs(df, t):
         df['crop'] = pd.NA
     df['crop'] = df['crop'].astype('string').fillna(CROP_NA)
     # A reported input may lack a recorded unit (e.g. a count of bags); fill
-    # with the existing 'Manquant' (=missing) `u` Preferred Label so the `u`
-    # index level is non-null and survives the canonical de-dup collapse.
-    df['u'] = df['u'].astype('string').fillna('Manquant')
+    # with the `Unknown` sentinel so the `u` index level is non-null and
+    # survives the canonical de-dup collapse.  This is the fill the other
+    # three `u` tables now share (GH #842); it used to write the French
+    # `Manquant`, which is the spelling that was retired -- see U_NA.
+    df = fill_missing_u(df)
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
             'Quantity', 'Purchased', 'Quantity_purchased']
@@ -1180,7 +1261,17 @@ def _item_labels(item_series, item_map):
 _COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)
 # Unit Preferred Labels that mark the product as absent / missing in the
 # cluster — these rows carry no surveyed price and are dropped.
-_COMMUNITY_MISSING_UNITS = {'Manquant'}
+#
+# This set keys on the Preferred Label the `u` table produces, so it MOVED with
+# the `Manquant` -> `Unknown` retirement (GH #842): leaving it spelled
+# `Manquant` would have silently stopped dropping CS07's 'produit absent' rows.
+#
+# NOTE, recorded because the two meanings are genuinely conflated HERE and only
+# here: in the CS07 unit list the missing-unit marker and the product-absent
+# marker are the same kind of answer ('manquant' / 'produit absent'), and both
+# now resolve to `Unknown`.  Everywhere else in Niger `Unknown` means only
+# "amount reported, unit not recorded".  See CONTENTS.org "The `u` sentinel".
+_COMMUNITY_MISSING_UNITS = {U_NA}
 
 
 def _community_price_triples(df, item_map, unit_map, triples, passage=1):
@@ -1251,6 +1342,17 @@ def _finish_community_prices(df, t):
     if 'passage' not in df.columns:
         df['passage'] = 1
     # Every index level must be non-null (the framework drops NaN-key rows).
+    #
+    # DELIBERATELY A DROP, NOT A `fill_missing_u` (GH #842).  Measured on the
+    # raw CS07 grids: 795 price-bearing observations in 2011-12 (218 in
+    # passage 1, 577 in passage 2) and 0 in 2014-15 carry a usable price with
+    # NO unit column value at all.  `community_prices.Price` is defined as the
+    # price for `Quantity` units of `u`, so such a row has no basis to be a
+    # price OF anything -- unlike a crop line, where the reported harvest
+    # Quantity is still a fact worth serving with an `Unknown` unit.  The
+    # served row count is therefore unchanged by #842 (15,423), and the drop
+    # is now counted here instead of being invisible.  Revisiting it is a
+    # data decision, not a sentinel decision.
     df = df[df['v'].notna() & df['j'].notna() & df['u'].notna()]
     # Select one observation per (t, v, j, u): post-harvest (passage 2) before
     # post-planting (passage 1), then questionnaire order (stable sort).

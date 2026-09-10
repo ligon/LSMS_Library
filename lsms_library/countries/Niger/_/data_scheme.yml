@@ -222,8 +222,10 @@ Data Scheme:
     # silently dropped by the framework's canonical NaN-key de-dup collapse
     # (_finalize_result groupby().first()), losing every non-seed row.  `u`
     # is in the index because one (input, crop) can be reported in several
-    # units; a missing unit is filled with the 'Manquant' u label for the
-    # same non-null reason.
+    # units; a missing unit is filled with the 'Unknown' u sentinel for the
+    # same non-null reason (GH #842 -- 'Unknown' is the corpus-canonical
+    # missing-unit label, shared by every Niger table with a `u` level; it
+    # used to be the French 'Manquant').
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool

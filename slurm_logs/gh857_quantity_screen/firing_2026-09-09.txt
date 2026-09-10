@@ -1,0 +1,146 @@
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-quantity-screen/lsms_library/__init__.py
+data_root: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-quantity-screen/.qsnap
+15 warm crop_production parquet(s)
+
+Benin: rows=9,056 fired=2 reports=1 audit=5 ms (best of 5)
+   2018-19: 2/9,056
+      Coton 12,500,000 u=Kg i=220065 plot=1_2 x1785.7 ref=7,000 rung=t,u,j
+      Autre crop 12,000 u=Sac (100 Kg) i=220047 plot=1_4 x120.0 ref=100 rung=t,u,j
+Burkina_Faso: rows=15,593 fired=1 reports=1 audit=6 ms (best of 5)
+   2018-19: 1/15,593
+      Sésame 1,240 u=Sac gros i=3880132 plot=1_3 x145.0 ref=8.55 rung=t,u,j
+CotedIvoire: rows=22,223 fired=16 reports=1 audit=9 ms (best of 5)
+   2018-19: 16/22,223
+      Cocoa 1,500,000 u=Kilogramme i=600009 plot=1_1 x750.0 ref=2,000 rung=t,u,j
+      Cashew 3,100 u=Autres i=520007 plot=1_4 x553.6 ref=5.6 rung=t,u,j
+      Cashew 1,500,000 u=Kilogramme i=173004 plot=1_1 x500.0 ref=3,000 rung=t,u,j
+Ethiopia: rows=85,519 fired=10 reports=3 audit=44 ms (best of 5)
+   2013-14: 2/26,159
+      Maize 30,000 u=Kg i=04050803103115 plot=0405080310311502_1_1 x150.0 ref=200 rung=t,u,j
+      Barley 750 u=Quintal i=04130600204005 plot=0413060020400501_2_1 x125.0 ref=6 rung=t,u,j
+   2015-16: 5/25,920
+      Maize 50,000 u=Kg i=04040501902092 plot=0404050190209208_1_6 x494.1 ref=101.2 rung=t,u,j
+      Teff 50,000 u=Kg i=04040501902092 plot=0404050190209208_1_10 x200.0 ref=250 rung=t,u,j
+      Berbere 600 u=Quintal i=03071001703056 plot=0307100170305601_9_1 x150.0 ref=4 rung=t,u,j
+   2018-19: 3/14,092
+      Maize 10,010 u=Tasa/Tanika/Shember/Selemon Medium i=010701088802004022 plot=01070108880200402201_1_3 x250.2 ref=40 rung=t,u,j
+      Maize 8,190 u=Tasa/Tanika/Shember/Selemon Medium i=010701088802004034 plot=01070108880200403401_1_2 x204.8 ref=40 rung=t,u,j
+      Teff 854 u=Madaberia/Nuse/Shera/Cheret Medium i=010701088802004010 plot=01070108880200401001_4_1 x142.3 ref=6 rung=t,u,j
+EthiopiaRHS: rows=17,523 fired=2 reports=1 audit=2 ms (best of 5)
+   1997: 2/3,021
+      Chat 68,288 u=Kg i=8_27 plot=None x357.9 ref=190.8 rung=t,u,j
+      Chat 29,433 u=Kg i=8_87 plot=None x154.3 ref=190.8 rung=t,u,j
+GhanaSPS: rows=25,109 fired=7 reports=3 audit=10 ms (best of 5)
+   2009-10: 1/11,795
+      Coconut 9,000 u=Piece i=101006036 plot=1 x128.6 ref=70 rung=t
+   2013-14: 5/6,886
+      Yam 40,000 u=Calabash i=108279019 plot=1 x414.5 ref=96.5 rung=t,u,j
+      Palm Nuts 1,000,000 u=Single i=101015049 plot=3 x201.2 ref=4,970 rung=t,u
+      Maize 3,600 u=Maxi bag i=106232057 plot=1 x180.0 ref=20 rung=t,u,j
+   2017-18: 1/6,428
+      Yam 3,500 u=Groups of 100 pieces i=208274026 plot=1 x107.7 ref=32.5 rung=t,u,j
+Guinea-Bissau: rows=10,579 fired=1 reports=1 audit=4 ms (best of 5)
+   2018-19: 1/10,579
+      Noix de cajou 2,000 u=Outra i=1112216010 plot=1_1 x289.9 ref=6.9 rung=t,u,j
+Malawi: rows=131,379 fired=16 reports=2 audit=61 ms (best of 5)
+   2016-17: 4/36,003
+      Nkwani 2,015 u=50 kg Bag i=cs-17-203043150235 plot=RG01_R01 x403.0 ref=5 rung=t,u,j
+      Nkwani 2,016 u=Other (Specify) i=cs-17-202012800516 plot=RG03_R01 x168.0 ref=12 rung=t,u
+      Maize 2,016 u=50 kg Bag i=105053100003 plot=RG01_R01 x134.4 ref=15 rung=t,u,j
+   2019-20: 12/49,425
+      Beans 48,000 u=Pail (Large) i=104071840057 plot=RG02_R01 x8000.0 ref=6 rung=t,u,j
+      Maize 56,000 u=50 kg Bag i=209104470060 plot=RG02_R01 x3733.3 ref=15 rung=t,u,j
+      Maize 50,000 u=50 kg Bag i=210664640215 plot=RG01_R01 x3333.3 ref=15 rung=t,u,j
+Mali: rows=35,060 fired=18 reports=2 audit=20 ms (best of 5)
+   2014-15: 2/10,341
+      Calebasse 1,728 u=Calebasse i=527009 plot=2_2 x137.1 ref=12.6 rung=t,u
+      Arachide 2,000 u=Sac i=83006 plot=1_1 x133.3 ref=15 rung=t,u,j
+   2017-18: 16/24,719
+      Coton 16,000 u=Autre i=370004 plot=1_1 x1600.0 ref=10 rung=t,u,j
+      Coton 13,500 u=Autre i=370006 plot=1_1 x1350.0 ref=10 rung=t,u,j
+      Coton 6,000 u=Autre i=359002 plot=3_1 x600.0 ref=10 rung=t,u,j
+Niger: rows=47,077 fired=28 reports=3 audit=19 ms (best of 5)
+   2011-12: 11/11,953
+      Mil 999,999 u=Unknown i=13317 plot=1_1 x14285.7 ref=70 rung=t
+      Niébé/Haricots secs 999,999 u=Unknown i=13317 plot=1_1 x14285.7 ref=70 rung=t
+      Sorgho 999,999 u=Unknown i=13317 plot=1_1 x14285.7 ref=70 rung=t
+   2014-15: 16/9,482
+      Sorgho 9,999 u=Unknown i=10505 plot=1_1 x131.9 ref=75.8 rung=t
+      Sésame 9,999 u=Unknown i=10511 plot=3_1 x131.9 ref=75.8 rung=t
+      Sorgho 9,999 u=Unknown i=10517 plot=1_1 x131.9 ref=75.8 rung=t
+   2018-19: 1/13,719
+      Autre crop 3,700 u=Autre i=E_39006 plot=2_4 x123.3 ref=30 rung=t,u
+Nigeria: rows=62,844 fired=9 reports=3 audit=35 ms (best of 5)
+   2011Q1: 4/12,752
+      Maize 1,800 u=nan i=80138 plot=1 x1500.0 ref=1.2 rung=t,u,j
+      Maize 500 u=nan i=20045 plot=2 x416.7 ref=1.2 rung=t,u,j
+      Maize 200 u=nan i=150062 plot=1 x166.7 ref=1.2 rung=t,u,j
+   2013Q1: 2/12,777
+      Yam--roots 600,000 u=Kg i=100043 plot=1 x200.0 ref=3,000 rung=t,u,j
+      Yam--roots 400,000 u=Kg i=120066 plot=1 x133.3 ref=3,000 rung=t,u,j
+   2016Q1: 3/11,829
+      Cassava--roots 60,000 u=Stalk i=120100 plot=2 x600.0 ref=100 rung=t,u
+      Yam--roots 3,500 u=Sack/Bag i=260040 plot=1 x175.0 ref=20 rung=t,u
+      Cowpea 4,200 u=Paint rubber i=70124 plot=1 x116.7 ref=36 rung=t,u
+Senegal: rows=8,428 fired=1 reports=1 audit=5 ms (best of 5)
+   2018-19: 1/8,428
+      Mil 300,000 u=Kilogramme i=233004 plot=1_1 x155.4 ref=1,930 rung=t,u,j
+Tanzania: rows=14,126 fired=14 reports=2 audit=10 ms (best of 5)
+   2019-20: 1/3,001
+      Leafy Greens 800,000 u=kg i=01020030030174 plot=4 x944.5 ref=847 rung=t,u
+   2020-21: 13/11,125
+      Coconuts 7,500,000 u=kg i=9640-001-99 plot=1 x11029.4 ref=680 rung=t,u,j
+      Other Fruits 2,400,000 u=kg i=9640-001-99 plot=1 x3189.4 ref=752.5 rung=t,u,j
+      Pulses 640,000 u=kg i=9169-001-99 plot=1 x1600.0 ref=400 rung=t,u,j
+Togo: rows=11,565 fired=1 reports=1 audit=5 ms (best of 5)
+   2018: 1/11,565
+      Autre crop 16,100 u=Unité i=133007 plot=1_2 x107.3 ref=150 rung=t
+Uganda: rows=130,606 fired=25 reports=7 audit=77 ms (best of 5)
+   2009-10: 2/22,408
+      Sugarcane 50,000 u=Kg i=2043001209 plot=2043001209-6-1 x142.9 ref=350 rung=t,u
+      Sugarcane 36,000 u=Kg i=2041000606 plot=2041000606-1-1 x102.9 ref=350 rung=t,u
+   2010-11: 4/20,970
+      Rice 300 u=Others specify i=214300020804 plot=214300020804-22-1 x300.0 ref=1 rung=t,u
+      Ground Nuts 150 u=Others specify i=108300060803 plot=108300060803-1-4 x150.0 ref=1 rung=t,u
+      Sugarcane 150 u=Others specify i=2043001209 plot=2043001209-3-1 x150.0 ref=1 rung=t,u
+   2011-12: 3/20,152
+      Maize 3,333 u=Sack (100 kgs) i=4063001001 plot=4063001001-2-3 x370.3 ref=9 rung=t,u,j
+      Rice 1,920 u=Sack (80 kgs) i=2033000804 plot=2033000804-2-2 x225.9 ref=8.5 rung=t,u
+      Maize 1,100 u=Sack (100 kgs) i=2053003006 plot=2053003006-3-4 x122.2 ref=9 rung=t,u,j
+   2013-14: 5/17,585
+      Tea 180,000 u=Kg i=H42707-04-01 plot=H42707-04-01-1-1 x600.0 ref=300 rung=t,u
+      Onions 50,007 u=Heap (Medium) i=4013000509 plot=H25209-04-01-2-5 x500.1 ref=100 rung=t,u
+      Onions 5,150 u=Basket (20 kg) i=1063000710 plot=H05710-04-01-1-2 x425.6 ref=12.1 rung=t,u
+   2015-16: 3/19,576
+      Sugarcane 90,000 u=Kg i=H36701-04-01 plot=H3670101-5-5 x300.0 ref=300 rung=t,u
+      Sugarcane 40,000 u=Kg i=2033001806 plot=H1180601-2-3 x133.3 ref=300 rung=t,u
+      Pineapple 10,800 u=Piece (Big) i=402300160905 plot=H2560905-2-3 x108.0 ref=100 rung=t
+   2018-19: 4/14,194
+      Sugarcane 360,000 u=Unknown i=1083000903 plot=acea3bfd05804e8c9aab357dfacfd8af-4-1 x3000.0 ref=120 rung=t,u
+      Sugarcane 20,000 u=Unknown i=2043001212 plot=0d1503da1c134a0e912f2b7115137d57-1-1 x166.7 ref=120 rung=t,u
+      Pineapple 20,000 u=Unknown i=H2560906 plot=df9e286e37fe42e9bee1e63cebcf1cdc-1-1 x166.7 ref=120 rung=t,u
+   2019-20: 4/15,721
+      Sugarcane 70,100 u=Kg i=1083000910 plot=62c9c056aa8541a29dee118a5da4a55b-1-7 x194.7 ref=360 rung=t,u
+      Maize 1,200 u=Sack (100 kgs) i=H38108-04-01 plot=28e152a2974244b19c05b3ce649c4ad5-1-1 x150.0 ref=8 rung=t,u,j
+      Sugarcane 45,000 u=Kg i=2143000206 plot=ce4a674264b849928dfc560ed4b7ddd4-1-1 x125.0 ref=360 rung=t,u
+
+| country | rows | fired | audit ms |
+|---------|------|-------|----------|
+| Benin | 9,056 | 2 | 5 |
+| Burkina_Faso | 15,593 | 1 | 6 |
+| CotedIvoire | 22,223 | 16 | 9 |
+| Ethiopia | 85,519 | 10 | 44 |
+| EthiopiaRHS | 17,523 | 2 | 2 |
+| GhanaSPS | 25,109 | 7 | 10 |
+| Guinea-Bissau | 10,579 | 1 | 4 |
+| Malawi | 131,379 | 16 | 61 |
+| Mali | 35,060 | 18 | 20 |
+| Niger | 47,077 | 28 | 19 |
+| Nigeria | 62,844 | 9 | 35 |
+| Senegal | 8,428 | 1 | 5 |
+| Tanzania | 14,126 | 14 | 10 |
+| Togo | 11,565 | 1 | 5 |
+| Uganda | 130,606 | 25 | 77 |
+| **TOTAL** | **626,687** | **151** | |
+
+151 of 626,687 rows = 0.0241%

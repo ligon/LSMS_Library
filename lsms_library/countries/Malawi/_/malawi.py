@@ -978,16 +978,36 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
 
 
 def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
-                perennial=False):
-    """Reshape one sale module (I or Q) to (i, _crop_code) reported sale.
+                unit_sold=None, perennial=False):
+    """Reshape one sale module (I or Q) to (i, _crop_code, u) reported sale.
 
-    Returns a DataFrame with columns [i, _crop_code, Quantity_sold,
-    Value_sold] at the household-crop grain (no plot).  Summed within
-    (i, _crop_code) because a household may report several sale rows for
+    Returns a DataFrame with columns [i, _crop_code, u, Quantity_sold,
+    Value_sold] at the household-crop-unit grain (no plot).  Summed within
+    (i, _crop_code, u) because a household may report several sale rows for
     the same crop -- this is the REPORTED total the household sold of that
-    crop, not a derived aggregate over plots.
+    crop IN THAT UNIT, not a derived aggregate over plots.
+
+    ``unit_sold`` is the sale module's OWN unit column (Module I ag_i02b,
+    Module Q ag_q02b).  The sale quantity is asked in its own unit, on the
+    same code list as the harvest unit (verified from the Stata value
+    labels: ag_i02b / ag_q02b / ag_g13b all carry
+    {1 kilogram, 2 50 KG BAG, 3 90 KG BAG, 4 PAIL (SMALL), ... 13 OTHER}),
+    and it DIFFERS from the harvest unit for 22.2% of 2010-11 sale rows.
+    Carrying it is what lets ``assemble_crop_production`` attach a sale only
+    to the harvest row measured in the SAME unit, so that
+    ``Value_sold / Quantity_sold`` is a price per the row's declared ``u``.
+    Before this was read, a sale in kilogrammes was routinely stamped on a
+    row whose ``u`` said ``50 kg Bag`` -- a silent factor-of-50 error in any
+    per-kg price.
     """
+    unit_map = _malawi_code_map('harmonize_crop_unit')
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
+
+    if unit_sold is not None and unit_sold in df.columns:
+        u = pd.to_numeric(df[unit_sold], errors='coerce').astype('Int64').map(unit_map)
+        u = u.astype('string').where(u.notna(), pd.NA)
+    else:
+        u = pd.Series(pd.NA, index=df.index, dtype='string')
 
     qs = (pd.to_numeric(df[qty_sold], errors='coerce').astype('Float64')
           if qty_sold is not None and qty_sold in df.columns
@@ -999,11 +1019,13 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     out = pd.DataFrame({
         'i':            df['hhid'].astype('string').values,
         '_crop_code':   crop_code_int.values,
+        'u':            u.values,
         'Quantity_sold': qs.values,
         'Value_sold':   vs.values,
     })
     out = out[out['_crop_code'].notna()]
-    grp = out.groupby(['i', '_crop_code'], as_index=False).agg(
+    grp = out.groupby(['i', '_crop_code', 'u'], as_index=False,
+                      dropna=False).agg(
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     return grp
 
@@ -1043,15 +1065,30 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
 
     if sale_pieces:
         sale = pd.concat(sale_pieces, ignore_index=True)
-        sale = sale.groupby(['i', '_crop_code'], as_index=False).agg(
+        sale['u'] = sale['u'].astype('string')
+        sale = sale.groupby(['i', '_crop_code', 'u'], as_index=False,
+                            dropna=False).agg(
             {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
         # Attach sale ONLY where the (i, crop) is grown on exactly one
         # plot, so the household-crop reported figure unambiguously
         # belongs to that single plot-crop.  Multi-plot crops keep NaN.
+        # AND only to the harvest row measured in the SAME unit `u` as the
+        # sale: the sale quantity is asked in its own unit (ag_i02b /
+        # ag_q02b) and differs from the harvest unit for 22.2% of 2010-11
+        # sale rows, so the old (i, _crop_code) merge stamped a
+        # kilogramme-basis sale onto a `50 kg Bag` row -- Value_sold /
+        # Quantity_sold then read as a price per 50 kg Bag when it was a
+        # price per kg.  Merging on `u` too makes the ratio a price per the
+        # row's declared unit BY CONSTRUCTION.  It cannot multiply rows:
+        # harv is unique on (i, plot, crop, u) and, under the single-plot
+        # gate, sale is unique on (i, _crop_code, u).  A sale whose unit is
+        # unrecorded matches a harvest row whose unit is likewise
+        # unrecorded (pd.merge matches null keys), which is the honest
+        # pairing.
         nplots = (harv.groupby(['i', '_crop_code'])['plot']
                   .nunique().rename('_nplots').reset_index())
         harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
-        harv = harv.merge(sale, on=['i', '_crop_code'], how='left')
+        harv = harv.merge(sale, on=['i', '_crop_code', 'u'], how='left')
         single = harv['_nplots'] == 1
         harv['Quantity_sold'] = harv['Quantity_sold'].where(single, pd.NA)
         harv['Value_sold'] = harv['Value_sold'].where(single, pd.NA)
@@ -1060,6 +1097,17 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
 
+    # RESIDUAL of the sale-unit fix, measured not assumed (2026-09-08).  The
+    # defensive collapse at the end of this function keys on
+    # (t, i, plot, crop) -- u is a COLUMN here -- so it fires when a plot-crop
+    # was harvested in TWO units, and .first() skips NA per column: it could
+    # take u from one row and Quantity_sold from another, re-creating exactly
+    # the mislabelling the (i, _crop_code, u) merge above removes.  Measured
+    # on the raw modules: 32 plot-crops of 135,410 (0.024%) across all four
+    # waves have >1 harvest unit -- 12+1 in 2010-11 G/P, 2+1 in 2013-14, 0+6
+    # in 2016-17, 0+10 in 2019-20, i.e. almost entirely the perennial module.
+    # Nearly a no-op, but NOT provably one; do not upgrade this to "cannot
+    # happen" without re-measuring.
     harv = harv.drop(columns=['_crop_code'])
     harv['t'] = t
 

@@ -252,6 +252,28 @@ Data Scheme:
     harvest_month: str
     intercropped: bool
     perennial: bool
+    # SURVEY-REPORTED kilograms per ONE unit of this row's `u` -- the
+    # GHS-Panel "Kg/L conversion factor" (`*_conv`), asked beside the
+    # harvest quantity and its unit.  A RATE, not a weight: the row's
+    # kilograms are Quantity * KgFactor.  Taken positionally off the same
+    # source row -- no join, no median, no unit-table lookup (REPORTED,
+    # NEVER CONSTRUCTED; see lsms_library/data_info.yml).
+    #
+    # `optional` because only W4 (2019Q1) and W5 (2024Q1) ship the column:
+    # W1/W2 (secta3_harvestw{1,2}) and W3 (secta3i/secta3ii_harvestw3) carry
+    # NO `*_conv` variable in any harvest file, verified from the .dta
+    # metadata, so KgFactor is legitimately all-NaN in those three waves and
+    # the all-null guard must not fire.
+    #
+    # Wired per section to the `*_conv` that pairs with the quantity/unit
+    # this table stores: W4 sa3iq6_conv / sa3iiiq13_conv, W5 sa3iq9_conv /
+    # sa3iiiq23_conv.  The other `*_conv` columns are NOT wired and must not
+    # be: sa3iq6d_conv (W4) / sa3iq15_conv (W5) belong to the "expect to
+    # harvest MORE" block with its own unit columns, and sa3iiq1_conv
+    # (secta3ii) is hh-crop grain with no plot linkage.  See _/CONTENTS.org.
+    KgFactor:
+      type: float
+      optional: true
     materialize: make
 
   plot_inputs:
@@ -507,4 +529,28 @@ Data Scheme:
     Price: float
     materialize: make
 
-  nonfood_expenditures: !make
+  nonfood_expenditures:
+    # Item-level household non-food expenditure from the post-planting
+    # (sect8a-e) and post-harvest (sect11a-e) modules.  `j` is the per-round
+    # `nonfood_items.json` label; `t` is the ROUND (2010Q3, 2011Q1, ...), never
+    # the wave directory -- Nigeria is post-planting / post-harvest and the two
+    # rounds in a wave dir are distinct observations
+    # (.claude/skills/add-feature/pp-ph/SKILL.md).
+    #
+    # LONG since GH #817.  It used to be declared bare `!make` and delivered a
+    # WIDE 96-column item-by-household matrix with the zone `m` in the index;
+    # with no `index:` and no columns here, `_assert_built_required_columns`,
+    # the `dfs:` guard and the coverage grader had nothing to check.  The
+    # reshape changed the SHAPE, not the arithmetic: every round's total is
+    # unchanged.  `m` is gone -- a region level is added on demand by
+    # `_add_market_index()` when the caller passes `market=`.
+    #
+    # NO RecallWindow, and that is a KNOWN GAP rather than a statement about
+    # the survey: sect8a-e and sect11a-e are different recall windows (the
+    # instrument asks over 7 days for one sub-module and longer for the
+    # others), and this table pools them.  Togo carries `RecallWindow` for
+    # exactly this reason.  Populating it here needs the instrument read
+    # sub-module by sub-module; see GH #817's follow-up note.
+    index: (t, i, j)
+    Expenditure: float
+    materialize: make

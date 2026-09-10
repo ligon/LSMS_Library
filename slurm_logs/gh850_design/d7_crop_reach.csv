@@ -1,0 +1,9 @@
+country,crop_rows,labels_seeded_now,labels_seeded_by_c,rows_moved_by_c,share_rows_moved,examples
+Uganda,130606,13,13,62321,0.47716797084360596,Cup/Mug(0.5lt); Jerrican (10 lts); Jerrican (2 lts); Jerrican (20 lts); Jerrican (3 lts); Jerrican (5 lts)
+Malawi,131379,3,0,0,0.0,
+Nigeria,62844,4,0,0,0.0,
+Ethiopia,85519,2,1,1,1.1693307919877455e-05,Litres
+Tanzania,14126,1,0,0,0.0,
+Niger,46341,3,1,5,0.00010789581580026326,Gramme
+Mali,35060,1,0,0,0.0,
+EthiopiaRHS,17523,1,0,0,0.0,

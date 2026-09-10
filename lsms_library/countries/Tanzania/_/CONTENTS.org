@@ -523,6 +523,14 @@ this distinction shows up in practice.
 1995-97 or EthiopiaRHS elsewhere in the library).  The 2020-21 case is
 silence, not denial.
 
+*Note (2026-09-09).*  This country has no separate "weight variables"
+heading, so the note goes here, beside the weights discussion above.
+EPAR (Evans School, UW, TR#335) rescales survey weights to World Bank
+rural/urban population totals per wave, and weights its median-price
+ladders with that raked weight, so EPAR's published price/value LEVELS
+are not comparable to ours (within-wave mean-one) -- only ratios and
+shares are.  See =slurm_logs/2026-09-09_epar_curation/EPAR_PROJECT.org=.
+
 ** Not boilerplate
 
 The Tanzania universe sentence is *not* the World Bank NADA template text.
@@ -567,8 +575,47 @@ catalog records but not held in this repository.  If a universe statement for
 look.
 
 * Issues
-** WAITING Missing food quantities in 2019-20 and 2020-21 (#112)
+** DONE Missing food quantities in 2019-20 and 2020-21 (#112)
+CLOSED: [2026-09-08 Tue]
 :LOGBOOK:
+- State "DONE"       from "WAITING"    [2026-09-08 Tue] \\
+  Resolved: the current build carries the quantities.  Measured on
+  development @ 04547c10: =food_acquired.Quantity= non-null on 97.6% of
+  2019-20 rows and 98.5% of 2020-21 rows (99.8--99.9% in the four earlier
+  rounds); =food_prices()= returns 12,418 / 4,606 rows for the two waves.
+  Found by the five-source price comparison (Tanzania agent); recorded on
+  the closed GitHub issue the same day.
+- Note taken on [2026-09-08 Tue] \\
+  *THE PREMISE OF THIS ENTRY NO LONGER HOLDS -- the WB has re-released
+  both files and every quantity column is PRESENT.*  Measured directly on
+  the shipped =.dta= (five-source price study, =slurm_logs/price_sources/
+  Tanzania/=), =get_dataframe= over
+  =2019-20/Data/HH_SEC_J1.dta= (71,040 x 13) and
+  =2020-21/Data/hh_sec_j1.dta= (25,140 x 14):
+
+  | column   | meaning                    | 2019-20 non-null | 2020-21 non-null |
+  |----------+----------------------------+------------------+------------------|
+  | hh_j02_2 | quantity consumed, total   |           16,064 |            5,861 |
+  | hh_j03_2 | quantity PURCHASED         |           12,825 |            4,699 |
+  | hh_j04   | value purchased            |           12,825 |            4,699 |
+  | hh_j05_2 | quantity from own prod.    |            1,969 |              819 |
+  | hh_j06_2 | quantity received in kind  |            1,385 |              384 |
+
+  The table in the Description below marks =hh_j03_2=, =hh_j05_2= and
+  =hh_j06_2= MISSING; all three are present.  This is corroborated
+  structurally: =tanzania.food_acquired= does
+  =df.loc[:, list(myvars.values())]=, which would raise =KeyError= if any
+  declared column were absent, and both wave builds succeed.  Downstream,
+  =food_acquired= carries a non-null =Quantity= on 97.0% (2019-20) and
+  98.1% (2020-21) of purchased rows, and =food_prices(units='unitvalue')=
+  returns 12,418 / 4,606 usable unit values for those waves.
+
+  So the "Critical --- blocks =food_prices=" severity line is now FALSE
+  and this entry, read at face value, sends the next reader looking for a
+  gap that is not there.  Not closing it here: whether #112 is resolved
+  (and whether the #113 community-price fallback is still wanted for its
+  own sake) is a maintainer call.  Recording the measurement so the
+  judgement is made on data rather than on a three-year-old note.
 - Note taken on [2026-04-01 Tue] \\
   Documented as GitHub issue #112.
 - Note taken on [2023-03-24 Fri 05:28] \\
@@ -578,6 +625,7 @@ look.
 - GitHub :: [[https://github.com/ligon/LSMS_Library/issues/112][#112]]
 - Waves affected :: 2019-20 (NPS-SDD), 2020-21 (NPS Y5)
 - Severity :: Critical --- blocks =food_prices= and =food_quantities= pipelines for these waves
+  (*superseded 2026-09-08 -- see the LOGBOOK note above; the columns are present*)
 
 *** Description
 
@@ -616,7 +664,11 @@ The =food_expenditures= table (value-based) is unaffected.
 *** Status
 
 Email sent to =lsms@worldbank.org= on 2023-03-24; no resolution
-received.
+received.  Superseded: as of 2026-09-08 the served table has the
+quantities (see the LOGBOOK entry above), so whatever the 2023
+distribution lacked, the current source files and wave scripts
+deliver them.  The description above is kept as the history of the
+gap; it no longer describes the data.
 
 ** TODO Use community-level prices as fallback (#113)
 :LOGBOOK:
@@ -1372,6 +1424,76 @@ absorbs the kg conversion); the load is commented out at
 =tanzania.py= ~lines 417-422.
 
 For the cross-country canonical-=u= roadmap, see GH #223.
+
+*** =new_harmonize_units= TRUNCATES every quantity to an integer (2026-09-08)
+
+Found during the five-source price study (=slurm_logs/price_sources/Tanzania/=).
+=tanzania.new_harmonize_units= scales each quantity by its unit factor with
+
+: df[pair['quant'][i]] = df[pair['quant'][i]].astype(np.int64) * df[pair['unit'][i]]
+
+The =astype(np.int64)= is a *floor*, applied to the quantity as REPORTED, before
+the unit factor multiplies it.  The cast is not incidental --- it is what makes
+the =Piece: 'p'= trick work (=int(3) * 'p' == 'ppp'=, later counted back to 3) ---
+so this is not a one-line fix.  Two distinct consequences, both measured on the
+source =.dta= (purchased rows with a positive reported quantity):
+
+| wave    |       n | non-integer q | q<1 -> 0 -> NaN (row LOSES its unit value) | q>1 non-integer (unit value INFLATED) |
+|---------+---------+---------------+--------------------------------------------+---------------------------------------|
+| 2008-15 | 317,331 | 4,450 (1.40%) |                                371 (0.12%) |                                 4,079 |
+| 2019-20 |  12,825 |   732 (5.71%) |                                393 (3.06%) |                                   339 |
+| 2020-21 |   4,699 |   251 (5.34%) |                                 88 (1.87%) |                                   163 |
+
+The inflation is not small where it bites: the median inflated row is a
+quantity of the form =N.5= floored to =N=, i.e. a unit value overstated by
+*1.5x* (p90 1.50, max 1.90).  The recent waves are the worst affected because
+their enumerators recorded fractional KILOGRAMS (0.25, 0.5, 1.5) where the
+2008-15 rounds more often switched to GRAMS, which the cast leaves alone.
+So ~1.4% of all purchased rows corpus-wide carry a ~50% overstated unit value,
+and 852 rows are dropped outright.  This is *reported, not fixed*: it changes
+=food_acquired.Quantity= library-wide and the =Piece= sentinel depends on the
+cast.  It also explains the residual 97.0% / 98.1% (not 100%) non-null
+=Quantity= on purchased rows in the two recent waves.
+
+*** The (u) axis on =food_acquired= is MIXED CASE, and it will not join =community_prices=
+
+=food_acquired.u= is =\{'Kg', 'piece'\}= --- capitalised for the kilogram,
+lowercase for the piece.  That is not an oversight: =new_harmonize_units=
+writes both sentinels lowercase, the global =categorical_mapping/u.org= maps
+=kg -> Kg=, and Tanzania's own =u= table *deliberately declines* to register
+=piece -> Piece= (the comment above the table says registering it "would
+rewrite the live (u) axis value and regress food_acquired").
+
+The cost is a cross-table join that silently fails: =community_prices.u= is
+=\{'Gram', 'Kg', 'Litre', 'Millilitre', 'Piece'\}= --- title-cased, from the
+community questionnaire's own unit code list --- so =food_acquired= 'piece'
+and =community_prices= 'Piece' are THE SAME UNIT under two spellings and do
+not match on a native-unit key.  Any consumer comparing the two tables at
+=(t, v, j, u)= must case-fold =u= itself.  Recorded rather than fixed, because
+the fix that looks obvious (registering the sentinel) is the one the config
+already rules out.
+
+*** =CONTENTS.org= is a BUILD INPUT here --- and the cache hash cannot see it
+
+=Tanzania/_/food_acquired.py= line 34 reads its item-label table out of *this
+file*:
+
+: fl = df_from_orgfile('CONTENTS.org','food_labels')
+
+Tanzania is the *only* country in the corpus that does this (checked across
+every =countries/*/_/*.py= and =countries/*/*/_/*.py=); everywhere else such a
+table lives in =food_items.org= or =categorical_mapping.org=.  But
+=country.py= defines =_ORG_HASH_SKIP = \{"CONTENTS.org"\}= --- CONTENTS.org is
+excluded from =Wave._input_hash= / =Country._table_cache_hash= *as
+documentation*.
+
+So editing the =food_labels= table below changes what =food_acquired= builds
+and does *not* invalidate the L2 cache: the stale parquet keeps being served.
+The exclusion is right for prose (this note, for instance, is cache-neutral by
+design) and wrong for a build table that happens to live in the same file.
+Either move =food_labels= to =food_items.org= (which IS hashed) or clear the
+cache by hand after touching it.  Reported, not fixed --- the move changes
+=food_acquired='s build inputs and forces a corpus rebuild of the table.
 
 *** Test...
 #+begin_src python :results output

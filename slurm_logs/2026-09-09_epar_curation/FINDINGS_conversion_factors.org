@@ -1,0 +1,376 @@
+#+title: EPAR x LSMS_Library -- nonstandard unit conversion factors (kg per native unit)
+#+date: 2026-09-09
+
+Scope: kg-per-native-unit construction, both sides. EPAR clone commit
+=abfbdc9301242527b7543606aad1ad6eed2e6530= (v1.5, 2026-05-21), per
+=reference/epar/NOTES.md=. All EPAR paths below are relative to
+=LSMS-Agricultural-Indicators-Code/=. Read-only; no library edits, no
+builds, no dvc.
+
+* Coverage (their waves vs ours; what they build for this scope)
+
+EPAR ships a dedicated, standalone "Nonstandard Unit Conversion Factors"
+folder for exactly two countries: Uganda UNPS (7 waves pooled into one
+master table) and Malawi IHS (multi-source, multi-wave). For Nigeria GHS,
+Ethiopia ESS and Tanzania NPS there is no such folder; conversion-factor
+logic (where it exists at all) is inlined in each wave's ~300 KB do-file.
+
+| country  | EPAR builds a KG conversion factor table? | EPAR builds an AREA conversion table? | our KgFactor / condition axis |
+|----------+--------------------------------------------+-----------------------------------------+---------------------------------|
+| Uganda   | yes -- =Uganda UNPS/.../Master_Conversionfactor_table.do=, harvest AND sold, region + national fallback | not examined (out of scope) | =KgFactor= reported-only, 2018-19 only (#849 open for the rest) |
+| Malawi   | yes -- =Malawi IHS/.../EPAR_UW_conversionfactors.do=, 6-layer fallback with per-row =source= provenance | not examined | none -- =crop_production= has no =KgFactor=, no =condition= (CLAUDE.md/data_scheme.yml confirms) |
+| Ethiopia | yes, but NOT EPAR's own construction -- a WB-distributed raw file (=Crop_CF_WaveN.dta=) EPAR merges in per wave, with its own region/national/generic-unit fallback ladder built AROUND the WB file | yes -- =ET_local_area_unit_conversion.dta= merge, separate axis | none for crop (=crop_production= data_scheme.yml: "NO unit->kg conversion" verbatim); food side DOES have one -- see contradiction below |
+| Nigeria  | no crop-weight/kg conversion found in W1/W3 do-files | yes -- a hardcoded zone x area-unit -> hectare table straight from the Wave 2 Basic Information Document | none |
+| Tanzania | no crop-weight/kg conversion found in W1/W3; explicitly declined ("Seed rates would also be doable if we have conversions for the nonstandard units") | not examined | none |
+
+Our waves for these five: Ethiopia 2011-12/2013-14/2015-16/2018-19/2021-22;
+Malawi 2004-05/2010-11/2013-14/2016-17/2019-20; Nigeria (PP/PH rounds
+2010Q3...2023Q3); Tanzania 2008-09...2020-21; Uganda 2005-06...2019-20 (8
+waves, per the brief's own crib -- EPAR's Uganda covers "Wave 1-7" i.e. 7,
+not all 8 of ours; wave-label alignment not verified here).
+
+* KNOWN ISSUES register (three-cell table; every row has evidence both sides)
+
+| # | issue | EPAR found? | we found? | evidence |
+|---+-------+-------------+-----------+----------|
+| 1 | Reported kg factors on units labelled "Kg" are sometimes NOT 1 | EPAR: no correction, takes the region median at face value (crop 620/region 3 factor=120, nobs=10; crop 741/region2 factor=13, nobs=14 -- =UG_Conv_fact_harvest_table.dta=, computed below) | We: yes, and REJECT it -- =_screen_reported_factors= (=transformations.py:1701-1738=) treats any kg-unit factor >1% off 1 as a data-entry error and discards it, never clips | Cell 3 (we found, EPAR did not distinguish real container-size drift from mis-key) |
+| 2 | Malawi crop-side (harvest) kg conversion is UNBUILT despite source files already being pulled | EPAR: built a full region x crop x unit x condition table with a 6-layer fallback (=EPAR_UW_conversionfactors.do:390-493=) from files we ALREADY HOLD in DVC | We: =Malawi/_/CONTENTS.org:653-655= flags "No conversion_to_kgs.json file has been generated ... Despite the conversion factor data being available in wave-specific .dta files" -- but that same list (lines 653-660) omits =ihs_treeconversion_factor_2020.dta= and =ihs_seasonalcropconversion_factor_2020.dta=, which ARE in DVC (=.dvc= sidecars confirmed, see below) | Cell 1 -- both found the gap, but our own inventory of what's already acquired is itself incomplete |
+| 3 | Ethiopia crop-side kg conversion is UNBUILT | EPAR built one (WB's =Crop_CF_WaveN.dta= + region/national/generic fallback, =EPAR_UW_Ethiopia_ESS_W3.do:948-990=) from files we ALREADY HOLD in DVC (=Crop_CF_Wave{2,3,4}.dta.dvc=, =crop_cf_wave5.dta.dvc=) | We: =Ethiopia/_/data_scheme.yml:113-134= states verbatim "NO unit->kg conversion" for =crop_production= | Cell 2 -- candidate new issue, not filed |
+| 4 | Ethiopia's FOOD-side =conversion_to_kgs.json= pools kg factor by unit label ONLY, discarding the item axis | not applicable (EPAR's own crop tables key on crop_code + unit + region + condition) | We: built =conversion_to_kgs.json= 2023-03-03 via =df.groupby('unit_cd')['mean_cf_nat'].median()= -- no crop/item key at all (=Ethiopia/_/CONTENTS.org:145-169=); the runtime =_get_kg_factors=/=conversion_to_kgs= price-ratio path has the SAME limitation (=index=['t','m','i']=, no =j=, =transformations.py:782,1051=) | Cell 3, and directly the general form of #850 ("Generalise _get_kg_factors ... needs j in the baseline group"), which was filed for the CROP side only -- the FOOD side has the identical gap already in production |
+| 5 | Harvest unit != sold unit (crop_production carries one =u=) | EPAR: harvest and sold are two separate reshape-long tables with two separate unit/condition/conv_fact triples from the very first line of the Uganda do-file (=Master_Conversionfactor_table.do:77-102=, the wave-3 =harvsold= reshape) | We: filed as #824, open, unfixed | Cell 1 -- both found it; #824 is the tracked instance |
+| 6 | Sold-side pooling window differs from harvest-side | EPAR: the SOLD table pools medians over waves 3-5 ONLY ("keep if wave=="wave 3" | wave=="wave 4" | wave=="wave 5"", =Master_Conversionfactor_table.do:267,283=) while the HARVEST table pools all 7 waves -- undocumented in the one-paragraph readme | not filed; no equivalent construction exists on our side to compare against | Cell 2 -- candidate note (methodology asymmetry, not a bug on our side since we don't have this construction) |
+| 7 | =Sac moyen=/=Gramme=-class inference wrong by 2x-700x (Mali; adjacent finding, not Uganda/Malawi/Ethiopia, but same machinery) | not applicable (Mali not in EPAR's per-country CF folders) | We: filed as #838, open | Cell 3 |
+
+* Construction decisions by feature area (each tagged reported/imputed/aggregated, with .do:line)
+
+** Uganda (=Uganda UNPS/Nonstandard Unit Conversion Factors/=)
+
+- *Grain*: (crop_code, unit_code, region) for the regional table; (crop_code,
+  unit_code) for the national fallback. =condition= is tracked through the
+  per-wave extraction (=conditionharv=/=conditionsold=) but the =by()= clause
+  of every final =collapse= has it COMMENTED OUT
+  (=Master_Conversionfactor_table.do:248,260,272,287=: "/*condition_harv*/"),
+  so the shipped table pools fresh, dry and shelled reports of the same
+  crop/unit/region into one factor. *aggregated* (median), condition
+  dropped.
+- *Pooling scope*: appends all 7 waves (2009-2019+) into one panel BEFORE
+  collapsing (lines 234-237), so one national/regional factor is used for
+  every year. Weighted by the wave's own sample weight
+  (=[weight=weight]=, line 248) -- a design choice with no analogue in our
+  unweighted =_survey_median_factors=.
+- *Fallback ladder*: reported per-row =conv_fact= (source: instrument, wave
+  1-7 raw AGSEC5A/5B, =A5?q6d=/=a5?q6c=) -> regional median -> national
+  median (region-blind). Two levels, both *imputed* medians over *reported*
+  values -- no unit-label parsing, no price-ratio inference anywhere in this
+  file.
+- *Harvest vs sold*: two independent tables/unit columns from the moment the
+  raw files are read (=unitharv=/=conv_factharv= vs
+  =unitsold=/=conv_factsold=, first appearing wave 3, line 77-102). This
+  IS our #824 concern, already solved on their side by construction.
+- *Screening*: none observed beyond one hardcoded drop of a sentinel value
+  (=drop if conv_fact==18888 | conv_fact==.=, line 101) and forcing
+  =s_conv_factor_sold=1 if sold_unit_code==1= (i.e. Kg forced to 1 post
+  hoc, line 276) -- narrower than our =_screen_reported_factors= (which
+  also catches >250 kg and year-like integers) and applied only to the
+  SOLD table, not harvest.
+- *Provenance disclosure*: none. The final =.dta= tables carry only
+  (crop, unit, [region], factor, nobs) -- no column says which layer
+  (reported vs regional-median vs national-median) produced a given row's
+  factor. *This is the single largest disclosure gap relative to our
+  design* (our =KgFactorSource= column, =transformations.py:1899=).
+- *Measured spread* ("high uncertainty", quantified from
+  =UG_Conv_fact_harvest_table.dta=, 2181 rows, 544 crop x unit cells with
+  >=2 regions): median (IQR / median) across those cells = *0.228* (23%);
+  the worst cells run 10-70x median-scale IQR (e.g. crop 510/unit 87:
+  median 3.5, IQR 250.25, i.e. region medians spanning 2 to 1000).
+  Overall factor range 0-1500 across 2089 populated rows.
+  =reported= tag: the pre-collapse rows; =imputed= tag: every shipped
+  cell (median of >=1 reports).
+
+** Malawi (=Malawi IHS/Nonstandard Unit Conversion Factors/=)
+
+- *Sources* (=README.md=): (1) IHS5 2019-20's own released conversion
+  files, borrowed for ALL earlier waves in the absence of a wave-specific
+  file -- =ihs_seasonalcropconversion_factor_2020.dta= (857 rows: region x
+  crop_code x unit x condition x collectionround) and
+  =ihs_treeconversion_factor_2020.dta= (153 rows, no condition axis --
+  trees have none); (2) a PDF scrape of the IHS3 (2010-11) food-conversion
+  document (=Malawi_IHS3_Food_Item_Conversion_Factors.pdf=, hand-keyed
+  triples =cf1/cf2/cf3= per crop x unit x condition,
+  =EPAR_UW_conversionfactors.do:29-101=, three parallel columns whose
+  meaning -- three raw values? three region estimates? -- is not
+  documented in-file); (3) =caloric_conversionfactor.dta= (142 items,
+  cal/100g + edible%) -- a FOOD/nutrition table, not a kg-conversion
+  table, kept in the same folder but semantically distinct from (1)/(2).
+- *Grain*: region x crop_code_long x unit_code x condition. Crop condition
+  IS an axis here (unlike Uganda) -- =condition_label 1 SHELLED 2 UNSHELLED
+  3 N/A= (line 331).
+- *Shelled/unshelled interpolation* (our =condition= axis, exactly): a
+  per-crop ratio =shell_unshelled= is computed once
+  (=collapse (mean) shell_unshelled, by(crop_code)=, line 389, saved
+  standalone as =MWI_IHS_shell_unshelled.dta=, 8 crops) and then used
+  BIDIRECTIONALLY to fill a missing condition from the other:
+  =conversion2 = conversion1/shell_unshelled if conversion2==.= /
+  =conversion1 = conversion2*shell_unshelled if conversion1==.= (lines
+  401-405, repeated 424-430). *imputed*, ratio applied at national grain
+  (not region), a genuinely different axis-filling technique from
+  anything in our code (we have no cross-condition ratio anywhere).
+- *Fallback ladder, in the order the do-file applies them* (each step
+  stamps a =source= string that survives to the final =Malawi_IHS_cf.dta=):
+  1. reported region x crop x unit x condition value, =source= blank
+     (=food_cf= / =IHS 2020= at ingestion, lines 286, 318);
+  2. shell/unshelled ratio of the SAME region's other condition
+     (=source = "Shelled/unshelled ratio"=, line 402/405);
+  3. regional mean across... itself? -- =bys region crop_code unit_code:
+     egen mean_conv=mean(conversion)= then filled where missing
+     (=source = "Regional mean"=, line 413);
+  4. national mean, region-blind (=source = "National mean"=, line 420);
+  5. shell/unshelled ratio AGAIN (second pass, line 424-430, for whatever
+     the regional/national mean still left empty);
+  6. crop-family borrowing: tuber crops (sweet potato/Irish
+     potato/cassava, ids 28/29/49) get the MEAN of the other tubers'
+     factor for that region+unit (=source = "mean of tuber crops"=, line
+     482); cowpea (36) factors are copied onto two OTHER crop codes
+     (46, 35) verbatim, no ratio (=source = "cowpea conversions"=, line
+     486);
+  7. anything still missing is dropped (=drop if conversion==.=, line
+     490).
+  Six *imputed* layers plus the *reported* base -- the deepest fallback
+  chain either side of this comparison, and the ONLY one on either side
+  that names crop-family substitution (tubers, cowpea) as a defined step.
+- *A "more conservative" merge rule*, food-conversion file only: when both
+  the PDF-scrape food_cf value and the IHS-2020 =cf= value exist and
+  disagree, EPAR keeps whichever is SMALLER
+  (=replace conversion=cf if (conversion==. | cf<conversion) & _merge==3=,
+  line 244) -- an explicit, documented preference for the lower estimate
+  with no stated justification beyond the inline comment "taking the
+  more conservative conversion factor between files". *imputed*, and a
+  tie-break rule with no analogue (and, we'd argue, no obvious
+  justification) in our design.
+- *Harvest vs sold*: not constructed in this folder at all -- Malawi's
+  conversion tables only ever key on the HARVEST unit; no sold-unit
+  variable appears anywhere in =EPAR_UW_conversionfactors.do=.
+
+** Ethiopia (grep sweep, W1 and W3 do-files; not EPAR's own folder -- ESS has none)
+
+=EPAR_UW_Ethiopia_ESS_W3.do:143-146,948-990=. The crop conversion factor
+file is NOT EPAR's construction from raw survey rows (unlike Uganda/
+Malawi) -- it is a WB-DISTRIBUTED raw file per wave, =Crop_CF_WaveN.dta=
+(present for W2-W5 in our DVC tree: =Crop_CF_Wave2.dta.dvc=,
+=Crop_CF_Wave3.dta.dvc=, =Crop_CF_Wave4.dta.dvc=, =crop_cf_wave5.dta.dvc=;
+no sidecar found for W1 2011-12, matching the do-file's own
+=capture confirm file= / "not present" fallback warning, line 990/1034).
+EPAR reshapes it long over region (with the three atypical regions
+Somalie/Harari/Dire Dawa each hard-assigned the SAME =mean_cf99= column,
+line 956-960 -- a likely shortcut bug, not investigated further), fills
+missing crop x unit x region cells from a national mean (=nat_cf=), then
+missing units from a crop-BLIND generic-unit mean (=collapse (mean)
+gen_conversion=conversion, by(unit region)=, line 974 -- explicit comment
+"this isn't perfect but it's a rough estimate... when the crop code is
+unknown"), forces kg-unit to 1 and a specific unit (code 3) to 100
+post-merge (lines 1054-1055), and drops one hand-identified implausible
+row (=drop if crop_code==74 & unit==62 & conversion>5=, line 985) --
+*this last step is a manual analogue of our =_screen_reported_factors=*,
+but ad hoc (one crop x unit pair, not a general rule) rather than a
+declared threshold. Layers: reported (WB file) -> region mean ->
+national mean -> generic-unit mean (crop-blind) -> hardcoded overrides;
+all *imputed* except the WB file's own base numbers, whose provenance
+(survey-reported vs WB desk estimate) is not stated in the do-file.
+AREA conversion (local plot units -> hectares) is a SEPARATE file
+(=ET_local_area_unit_conversion.dta=, present in DVC for 2013-14/
+2015-16/2018-19/2011-12) and a separate axis from crop weight -- not
+followed further, out of scope.
+
+** Nigeria (grep sweep, W1 and W3 do-files)
+
+No crop-weight/nonstandard-unit-to-kg conversion construction found in
+either wave's do-file. The only "conversion" machinery under that keyword
+is AREA: a hardcoded zone x area-unit -> hectare lookup taken verbatim
+from the "LSMS-ISA Nigeria Wave 2 Basic Information Document"
+(=EPAR_UW_Nigeria_GHS_W1.do:309-357=, =W3.do:241-293=; heaps/ridges/stands
+each get a zone-specific hectare factor, e.g. =conversion = area_size *
+0.00012 if area_unit==1 & zone==1=). *reported* (survey area unit) fed
+through an *imputed* (externally sourced, not data-derived) constant
+table. Consistent with #824's own finding that Nigeria's crop_production
+ignores the sold-unit variable =sa3q11b= entirely -- there is no sold-side
+OR harvest-side kg-conversion machinery to ignore it with.
+
+** Tanzania (grep sweep, W1 and W3 do-files)
+
+No crop-weight/nonstandard-unit-to-kg conversion construction found. The
+only conversion machinery under the keyword is currency PPP/USD/TSH
+(=ccf_loc=/=ccf_usd=/=ccf_1ppp=/=ccf_2ppp=, e.g. =W3.do:5016-5024=). Two
+lines in both W1 and W3 (=W1.do:831=, =W3.do:869,1360=) explicitly note
+an indicator EPAR did NOT build because the conversion factor doesn't
+exist: "Seed rates would also be doable if we have conversions for the
+nonstandard units". *Declined*, not imputed -- EPAR's own stated
+practice here is closer to our "none" layer than to inference.
+
+* Ranked learnings (what we could take, why, what it would touch, and the risk)
+
+1. *Carry per-row layer provenance the way Malawi's =source= column does
+   (we already do this for crop harvest, not for food).* Malawi's
+   =Malawi_IHS_cf.dta= ships a =source= string alongside every factor
+   (=EPAR_UW_conversionfactors.do:482,486=, six distinct values). Our
+   =harvest_kg_factors= already does exactly this
+   (=KgFactorSource=, =transformations.py:1899=) for crop_production, but
+   the FOOD side (=food_quantities_from_acquired= /
+   =_get_kg_factors=/=conversion_to_kgs=) returns only the resolved
+   number, with no equivalent of "which layer served this row".
+   *Touches*: =transformations.py= (=_get_kg_factors=, =conversion_to_kgs=
+   return shape) -- a real API change, not additive-only, since callers
+   read a plain dict today. *Risk*: medium (widens two public function
+   signatures used across every country's food derivation); high value,
+   because #850 already wants a parallel generalisation for crop and the
+   two could land together.
+
+2. *Add the item axis (=j=) to the food-side price-ratio inference
+   baseline.* GH #850 asks for =j= in the CROP baseline group as a new
+   feature; measured here (Design decisions §Ethiopia, finding 4 in the
+   register) the FOOD side has the identical gap TODAY, in production,
+   in both the static =Ethiopia/_/conversion_to_kgs.json=
+   (=groupby('unit_cd')= only) and the live =conversion_to_kgs=
+   (=index=['t','m','i']=, =transformations.py:782=, no =j=). A "bunch"
+   of two different food items gets one pooled factor. *Touches*:
+   =transformations.py:782,1051= (default =index=), plus every country's
+   cached food_quantities/food_prices output would move. *Risk*: high --
+   #850's own §2 already names exactly why (maize and coffee prices per
+   kg differ by orders of magnitude; the food analogue is bananas vs.
+   groundnuts in a "Cup"). This is arguably the single highest-leverage
+   item on this list because it is not hypothetical -- it is live and
+   silently wrong for every country whose food price-ratio inference
+   fires.
+
+3. *Do NOT adopt EPAR's "kg unit need not equal 1" tolerance.* Measured
+   directly against our own screen: of Uganda's 128 kg-unit region-medians
+   in =UG_Conv_fact_harvest_table.dta=, 6 deviate from 1 by more than 1%,
+   two backed by nobs>=10 (crop 620/region 3: factor 120, n=10; crop
+   741/region 2: factor 13, n=14) -- i.e. EPAR's own pooled data would
+   fail our =_screen_reported_factors= kg-unit check
+   (=transformations.py:1706-1708=) at a rate our design treats as a
+   data-entry-error signature. This is evidence FOR keeping our stricter
+   rule, not a learning to import -- listed here because the brief asks
+   for evidence on both sides and this is a case where EPAR's own
+   pooled table corroborates the LIBRARY's existing design decision
+   rather than suggesting a change. *Touches*: nothing (no action). *Risk*: none.
+
+4. *The Malawi shelled/unshelled cross-condition ratio is a genuinely new
+   technique our =condition= axis does not have.* We carry =condition= as
+   an index level on =crop_production= (Uganda/Mali/Niger/Tanzania/Togo
+   per =data_info.yml=) but nothing today INFERS one condition's factor
+   from the other's via a per-crop ratio the way
+   =EPAR_UW_conversionfactors.do:381-390= does (=shell_unshelled=,
+   computed once as a per-crop mean and cached to its own file). This
+   could become a fifth layer in =harvest_kg_factors= ("ratio from the
+   SAME row's other reported condition") for countries that report both
+   conditions for the same crop/unit/wave. *Touches*: a new function in
+   =transformations.py=, a new entry in =KG_FACTOR_LAYERS=, and the
+   =min_reports=-gated computation of the ratio itself (needs its own
+   N threshold, undecided). *Risk*: medium-high -- it is a real
+   construction decision (which crops the ratio applies to, at what
+   grain) EPAR encodes as a hardcoded crop-id allowlist
+   (=shunsh_na= at line 442-444), which is exactly the kind of "magic
+   list" this repo's CLAUDE.md warns against (cf. the GPS-aggregation
+   "no exception" precedent) -- would need a principled, not copied,
+   version.
+
+5. *Malawi's crop-side (harvest) EPAR source files are ALREADY in our DVC
+   cache, unused.* =ihs_treeconversion_factor_2020.dta= and
+   =ihs_seasonalcropconversion_factor_2020.dta= sit under
+   =Malawi/2019-20/Data/Cross_Sectional/= with =.dvc= sidecars (confirmed
+   by directory listing) but no =.py= in the Malawi tree reads either
+   (grep across =lsms_library/countries/Malawi/= finds only
+   =ihs_foodconversion_factor_2020.dta= wired, in
+   =2019-20/_/food_acquired.py:17=, for the FOOD side). Building Malawi's
+   =harvest_kg= support could start from acquisition-complete raw
+   material -- no WB download needed. *Touches*: a new
+   =Malawi/_/crop_production.py= (or an addition to the existing script)
+   plus =data_scheme.yml= (add =condition=, optionally =KgFactor= if a
+   per-row factor is findable in the raw harvest files, which these
+   region-level tables are NOT -- they're already-aggregated factors,
+   so they'd feed the =inferred= layer, not =reported=). *Risk*: medium;
+   this is real, scoped work, not a design question, and
+   =Malawi/_/CONTENTS.org= already half-flags it (see contradiction
+   below) but with an incomplete source inventory.
+
+6. *Ethiopia's crop-side WB =Crop_CF_WaveN.dta= files are likewise
+   already in DVC and unused* (=Crop_CF_Wave{2,3,4}.dta.dvc=,
+   =crop_cf_wave5.dta.dvc=), while =Ethiopia/_/data_scheme.yml:120=
+   states outright "NO unit->kg conversion" for =crop_production=. Same
+   shape as learning 5, one country over. *Touches*/*Risk*: same as 5.
+   Filed together they would be two new =data-gap= issues, not one --
+   the fallback ladders EPAR uses (region -> national -> generic-unit)
+   differ enough between the two countries' source material that a
+   single generic loader is unlikely to serve both.
+
+* Contradictions with our CONTENTS.org / issues (quote both)
+
+- *Malawi/_/CONTENTS.org's "Source data available in DVC" list is itself
+  incomplete.* It states (lines 653-660):
+  #+begin_quote
+  - Source data available in DVC ::
+    - =2016-17/Data/Cross_Sectional/com_cf1.dta=, =com_cf2.dta= (community
+      conversion factors)
+    - =2019-20/Data/Cross_Sectional/ihs_foodconversion_factor_2020.dta=
+      (dedicated food conversion table)
+    - =2019-20/Data/Cross_Sectional/caloric_conversionfactor.dta= (caloric
+      conversion factors)
+    - =2010-11/Documentation/Malawi_IHS3_Food_Item_Conversion_Factors.pdf=
+      (methodology documentation)
+  #+end_quote
+  Measured directly against the filesystem, TWO more conversion files
+  with =.dvc= sidecars exist in the SAME directory and are not listed:
+  =ihs_treeconversion_factor_2020.dta.dvc= and
+  =ihs_seasonalcropconversion_factor_2020.dta.dvc= -- precisely the CROP
+  (harvest-side) files, as opposed to the FOOD (consumption-side) file
+  that IS listed. Per the brief's rule this is reported and quoted, not
+  assumed stale: CONTENTS.org is not wrong that the gap exists (it names
+  the gap accurately in the very next bullet, "No conversion_to_kgs.json
+  file has been generated"), but its inventory of what is available to
+  close that gap undercounts by exactly the files that matter most
+  (crop, not food).
+
+- *Ethiopia/_/data_scheme.yml's "NO unit->kg conversion" claim is accurate
+  for =crop_production= today, but is stated with no cross-reference to
+  the fact that a per-wave WB conversion file already sits in our DVC
+  cache* (=Crop_CF_Wave{2..5}.dta.dvc=). Not a false claim -- a true
+  claim that reads, without the DVC listing alongside it, as "the source
+  material isn't there" rather than "the source material is there and
+  unused." Recorded here so the distinction isn't lost a second time.
+
+- *No contradiction found* between EPAR's Uganda readme's one-line
+  "high uncertainty" framing and our own design: the 0.228 median
+  IQR/median ratio measured directly from their own shipped table (see
+  Uganda section above) is consistent with, not contradicting, their
+  readme's caveat. Recorded as a non-finding because the brief asks for
+  quantification, not because it disagrees with anything.
+
+* What I did not read (so the synthesis knows the gaps)
+
+- EPAR's =Household-Consumption-Data= repo (separate clone, 16 countries)
+  -- out of scope for this pass (crop/food KG conversion, not consumption
+  valuation by source).
+- EPAR's =358_Estimating-Crop-Yields= 2017 sensitivity study -- not opened;
+  the brief lists it as a source but this pass's scope (nonstandard unit
+  conversion specifically) is better served by the per-wave do-files,
+  which were read instead.
+- Nigeria, Ethiopia, Tanzania: only ONE early wave (W1) and ONE mid wave
+  (W3) do-file were grep-swept per country, per the brief's "brief, one
+  paragraph each" instruction -- not all 4-5 waves per country. A wave-by-
+  wave sweep could surface a conversion-factor file introduced later
+  (e.g. Ethiopia's own construction might change wave to wave beyond the
+  =Crop_CF_WaveN.dta= source-swap already documented).
+- Uganda's =UG_Conv_fact_*_table.dta= condition axis: the tables carry no
+  =condition= column at all (confirmed by the dtype dump: 4-5 columns,
+  no condition) because it is dropped at collapse time -- this was
+  established by reading the do-file's commented =by()= clause, not by
+  independently re-deriving the pre-collapse panel (the wave-level
+  AGSEC5A/5B raw files were not read).
+- The =_Summary_statistics/EPAR_UW_335_master_list_indicators.xlsx= and
+  =EPAR_UW_335_SUMMARY_STATISTICS.do= were not opened; they may state
+  which countries' final indicator tables actually consume the
+  conversion factors built here (vs. tables built but never joined
+  downstream) -- a question this pass did not answer.
+- No numeric parity run was attempted (per the brief's rule) -- every
+  factor comparison above is against EPAR's own shipped =.dta= tables
+  read directly with pandas, not against a rebuilt library table.

@@ -1,0 +1,183 @@
+#+title: Red-team: feat/median-price-weight-col (P1, weight_col on median_price_valuation)
+#+author: Sue (Claude Sonnet 5), red-team pass
+#+date: 2026-09-09
+
+Branch: =feat/median-price-weight-col= (=e0a80b4d= ledger, =c5f1f3ba= feat,
+=0d8b5792= fix), worktree
+=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-weighted-median=. Read-only: no
+edits, commits, or =dvc= run. All checks below ran with
+=PYTHONPATH=<worktree>= via the project's own venv, with an explicit
+=lsms_library.__file__= assertion before every substantive check.
+
+** Environment note, worth recording (not a defect in the branch)
+
+=cd <worktree> && PYTHONPATH=<worktree> python -c "import lsms_library"=
+imports the *worktree* correctly. Dropping the =cd= (i.e. running from the
+harness's default cwd, the main checkout) silently imports the *main
+checkout* instead, even though the worktree sits earlier in =sys.path= via
+=PYTHONPATH= than the =.pth=-injected main-repo path. Cause: =python -c=
+sets =sys.path[0] = ''= (cwd), and cwd resolved to the main checkout
+(=/global/scratch/.../LSMS_Library=), which itself has a top-level
+=lsms_library/__init__.py= -- so the empty-string cwd entry wins over the
+=PYTHONPATH= entry that comes after it. This is the same failure family
+CLAUDE.md's scrum-master-hpc addendum documents for script invocation
+(=sys.path[0]= = script dir, not cwd) but manifests here even for a bare
+=-c= command, via the cwd route rather than the script-dir route. Verified
+with =sys.path= dumps and =importlib.util.find_spec=; confirmed fixed by
+=cd <worktree>= before every invocation. All checks below were re-run
+after adding the =cd= and pass the =assert 'wt-weighted-median' in
+lsms_library.__file__= gate.
+
+** 1. =_weighted_median= adversarial numeric checks -- PASS
+
+Independent reference implementation (=searchsorted=-free hand loop,
+written fresh, not derived from the PR's code) agreed with
+=_weighted_median= on 3000 random trials (n in [1,15), integer prices,
+weight in {1,2,3,5,7,10}): *0 mismatches*.
+
+Targeted adversarial cases, all via =median_price_valuation(..., weight_col='weight')=:
+
+| case | input | result | verdict |
+|---+---+---+---|
+| duplicate values straddling the tie boundary | prices (10,10,20), weights (3,2,5); total 10, half 5, cum 3,5,10 | 15.0 (averages the tied row's value 10 with the NEXT row's 20, even though two rows already share the value 10) | matches spec exactly -- the rule as documented is mechanical on cumulative weight, not on value equality. Flagged as a genuine (but *documented and intended*) departure from a naive "weighted median" reader's intuition: a human expecting the tie to resolve to the repeated value 10 gets 15 instead. Already exercised by the PR's own =test_hand_computed_weighted_median= last case with the same structure (unequal weights, tie, distinct next value) -- not a new hole, but worth flagging in review since it is the least intuitive corner of the contract. |
+| single row | price 7, weight 1 | 7.0, no crash (guarded via =nxt.notna()=) | PASS |
+| weight scale 1e-9 and 1e9, equal weights, n=4 | prices 1..4 | 2.5 both scales (matches =Series.median()=) | PASS -- scale-invariant, no numerical blow-up |
+| boundary reached only at the group's LAST row, no tie | prices (1,2,3), weights (1,1,10); half 6, cum 1,2,12 | 3.0, no crash | PASS -- confirms the code comment's claim that an exact tie cannot land on a group's last row (would need =W == W/2=, i.e. =W=0=, impossible with strictly positive weights) is not just asserted but empirically unreachable and safely guarded either way |
+| NaN price mixed in | prices (1, NaN, 3, 4), weight 1 each | 3.0 for all 4 rows, including the NaN-priced row (it is pooled nowhere but still valued) | PASS |
+| unsorted input, even and odd count | (40,10,30,20) and (20,40,10), weight 1 each | 25.0 and 20.0 -- both match =Series.median()= of the sorted values | PASS -- confirms internal sort, not caller order, drives the result |
+| integer vs float dtype prices | (1,2,3) as Python int vs as float | both give 2.0 | PASS -- cast to float64 internally |
+
+All 66 tests in =tests/test_median_price_valuation.py= pass (task
+description said "65 expected"; actual collected count is 66 -- a minor,
+harmless discrepancy between the task brief and the file, not a branch
+defect; every one of the 66 passes).
+
+** 2. Null / non-positive weight rule -- PASS
+
+- 10 priced rows, 3 with weight in ={NaN, 0.0}=, =threshold=10=: usable
+  count is 7, so the cell does NOT clear the threshold at its own level or
+  at the next-coarser (identical-population) level, and correctly falls
+  through to the national rung. Verified by constructing a =v=-discriminated
+  case where the excluded rows would have to change the outcome if
+  wrongly counted, and confirming the excluded-count effect is real, not
+  a wash.
+- All-zero-weight cell (=threshold=1=): every rung, including the
+  unconditional national fallback, has 0 usable rows, so the whole cell's
+  =_unit_price= (and downstream =Value=) comes back =NaN=. This is the
+  correct degenerate limit of the SAME behaviour the unweighted path
+  already has when every price is missing (no priced rows -> national
+  median is NaN too) -- not a new failure mode, just =weight_col='s analog
+  of it. Not separately pinned by a test in the PR; noted as a CONCERN
+  below (minor).
+- Warning fires exactly ONCE per call, confirmed by counting
+  =warnings.catch_warnings(record=True)= entries across a 3-geo-level
+  ladder (=v=, =Region=, national) that all draw on the same excluded
+  rows -- 1 warning, not 3. Matches the code: =weight=/=usable=/the
+  warning are computed once, before the =for level in ladder= loop.
+
+** 3. Default path unchanged -- PASS, byte-identical
+
+- Synthetic frame: the PR's own
+  =test_default_path_hand_computed_ladder= /
+  =test_weight_col_none_is_the_default_path= pass (2/2, re-run standalone).
+- Real warm table: built
+  =Country('Uganda').crop_production().join(cluster_features()[['District','Region']])=
+  then =median_price_valuation(df, ['v','District','Region'],
+  value_col='Value_sold', qty_col='Quantity_sold')= (the exact call shape
+  named in =slurm_logs/price_sources/PROTOCOL.org= row 4 / "Geography
+  ladder" section) on BOTH checkouts:
+  - branch (worktree, =PYTHONPATH=<worktree>=): 133,683 rows,
+    =_unit_price= summary mean 909.69, median 1000.0, max 6000.0.
+  - main (=PYTHONPATH=/global/scratch/.../LSMS_Library= i.e. =development=):
+    identical summary.
+  - =pandas.testing.assert_frame_equal(branch_out, main_out)= on the full
+    133,683 x 2 (=_unit_price=, =Value=) frames: *passes, byte-identical*.
+
+** 4. Prior-art / EPAR citations in the docstring and module comment -- PASS
+
+All three weight-source citations resolve exactly, verified by =grep -n=
+against the actual files under
+=/global/scratch/fsa/fc_jevons/ligon/reference/epar/LSMS-Agricultural-Indicators-Code=:
+
+| citation in diff | file | line(s) | content |
+|---+---+---+---|
+| =Uganda W5.do:482-483= | =Uganda UNPS/Uganda UNPS Wave 5/EPAR_UW_Uganda_UNPS_W5.do= | 482-483 | =merge ... keepusing(weight_pop_rururb)= / =ren weight_pop_rururb weight= -- exact |
+| =Malawi W1.do:504-505= | =Malawi IHS/Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do= | 504-505 | =ren weight weight_sample= / =ren weight_pop_rururb weight= -- exact |
+| =Nigeria W4.do:695-696= | =Nigeria GHS/Nigeria GHS Wave 4/EPAR_UW_Nigeria_GHS_W4.do= | 695-696 | =merge ... keepusing(weight_pop_rururb)= / =gen weight=qty*weight_pop_rururb= -- exact |
+
+The docstring's Notes-section claims (consumption repo gates =obs > 10=
+i.e. N>=11 vs. Ag repo =obs > 9= i.e. N>=10; livestock ladder is the
+opposite narrow-to-broad, own-price-preferring, unconditional idiom) match
+=slurm_logs/2026-09-09_epar_curation/LEARNINGS.org= L5 and
+=REDTEAM_A.org= "Cross-file reconciliation" verbatim (both files already
+independently verified those facts against the same three =.do= files with
+line-level citations -- re-checked here, still correct).
+
+The amended module comment at =transformations.py:~1613= (originally
+"EPAR's medians are weighted ... and ours are not") now reads: unweighted
+by default, =weight_col=... opts in, and "we still do not RAKE the
+weights." This is accurate post-change: the weighted path here uses
+whatever weight column the caller passes (e.g. a =sample()=-sourced,
+within-wave-mean-1 weight per CLAUDE.md), never a population-raked one --
+so the "we do not rake" claim survives the change correctly.
+
+** 5. Pandas 3.0 rules / ASCII / em dashes on the diff -- PASS
+
+- =git diff development...HEAD= for =transformations.py= and the new test
+  file: no =inplace=True=, no =fillna(method=...)=, no =np.isnan=, no
+  =series[0]=-style positional access. Uses =.notna()=/=.isna()=,
+  =.astype(bool)=, vectorized =np.where=/=np.isclose=, =.iloc=-free
+  positional access via numpy arrays -- consistent with the pandas-3.0
+  targets in CLAUDE.md.
+- No non-ASCII characters and no em dashes (U+2014) on any ADDED line
+  (=git diff ... | grep '^+' | grep -P '[^\x00-\x7F]'= and the U+2014-only
+  variant both returned zero matches). The handful of non-ASCII characters
+  in the diff (=->=, U+2265, U+00D7) are all pre-existing CONTEXT lines
+  from the original docstring, not lines this PR added.
+
+** 6. Test suites -- PASS (with the pre-existing xfail confirmed pre-existing)
+
+- =tests/test_median_price_valuation.py=: 66 collected (task brief said
+  65 -- see note in section 1), 66 passed.
+- =tests/test_crop_kg_factor.py=: 34 passed, 1 failed --
+  =test_uganda_harvest_kg_unchanged_before_the_wiring_lands=, which fails
+  because Uganda's =crop_production= now DOES carry a =KgFactor= column
+  (the test's own docstring says this baseline is meant to be superseded
+  "when the Uganda wiring branch lands" and should be re-measured then,
+  not loosened). Re-ran the identical test on =development= (main
+  checkout, same warm cache, =PYTHONPATH=/global/scratch/.../LSMS_Library=):
+  *same failure, same assertion*, confirming this is pre-existing and
+  unrelated to =feat/median-price-weight-col=.
+
+** 7. Cache-hash / fingerprint probe -- PASS, reproduces the ledger's claim
+
+=median_price_valuation= and =_weighted_median= are not decorated with
+=@build_transform= and do not appear anywhere in =build_transforms.py= or
+=_build_registry.py='s =_BUILD_TRANSFORMS= registry (grep, zero hits), so
+they cannot be reachable from any table's closure walk. Verified directly
+rather than just trusting the registry-membership argument: computed
+=build_transforms_fingerprint(table)= for =None= (global) plus 10
+representative tables (=crop_production=, =food_expenditures=,
+=food_prices=, =food_quantities=, =cluster_features=, =plot_features=,
+=livestock=, =community_prices=, =household_roster=, =sample=) on the
+branch and on =development=: *all 11 hashes byte-identical* between the
+two checkouts. Matches the ledger's own reported "0 of 13 values moved"
+(different table sample, same conclusion).
+
+** Overall verdict
+
+No FAIL found. Two CONCERNs, both minor and neither blocking:
+
+1. The all-zero-weight-cell degenerate case (every rung including the
+   national fallback returns NaN) is correct by construction and
+   analogous to existing unweighted-all-missing-price behaviour, but is
+   not exercised by a test in this PR. Suggest a one-line regression test
+   if =weight_col= graduates toward wider use.
+2. The task brief's "65 expected" test count is off by one against the
+   actual 66 collected in =tests/test_median_price_valuation.py= -- purely
+   a brief/artifact discrepancy, not a code issue; flagging so it isn't
+   mistaken for a missing/duplicated test later.
+
+The duplicate-value-at-the-tie-boundary behaviour (case 1 in section 1)
+is intentional per the ledger's own tie rule and already has test
+coverage of the same shape; noted for visibility, not as a defect.

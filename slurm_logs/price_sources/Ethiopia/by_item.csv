@@ -1,0 +1,587 @@
+pair,u,j,n_cells,median_gap,ratio,in_30_50
+community_price_vs_crop_sale_price,Esir Large,Leafy Greens,2,-0.9214455536748389,0.39794337659738216,False
+community_price_vs_crop_sale_price,Esir Large,Chat/Kat,1,0.5982963485141575,1.8190171877724985,False
+community_price_vs_crop_sale_price,Esir Medium,Chat/Kat,2,0.05889151782819124,1.0606601717798207,False
+community_price_vs_crop_sale_price,Esir Medium,Leafy Greens,1,-1.9560115027140728,0.14142135623730953,False
+community_price_vs_crop_sale_price,Esir Small,Leafy Greens,2,-0.4144528741795789,0.6607016687761782,False
+community_price_vs_crop_sale_price,Kg,Maize,7,0.14782512105047885,1.159310139695155,False
+community_price_vs_crop_sale_price,Kg,Niger Seed,7,0.1251631429540061,1.1333333333333335,False
+community_price_vs_crop_sale_price,Kg,Teff,7,0.1823215567939549,1.2000000000000004,False
+community_price_vs_crop_sale_price,Kg,Sorghum,6,0.17684117428222634,1.1934415288662543,False
+community_price_vs_crop_sale_price,Kg,Barley,5,0.4139573939613641,1.512792671408302,False
+community_price_vs_crop_sale_price,Kg,Wheat,5,0.11332868530700324,1.12,False
+community_price_vs_crop_sale_price,Kg,Coffee,4,1.1252666247692062,3.08103822051862,False
+community_price_vs_crop_sale_price,Kg,Field Pea,4,0.31114155032279744,1.3649824212144113,True
+community_price_vs_crop_sale_price,Kg,Horsebeans,4,0.43654379248806363,1.5473500033154066,False
+community_price_vs_crop_sale_price,Kg,Lentils,4,0.5052308770809621,1.657368124606576,False
+community_price_vs_crop_sale_price,Kg,Linseed,4,0.10578989077832546,1.111588297016879,False
+community_price_vs_crop_sale_price,Kg,Millet,4,0.12553372685713216,1.1337534062548669,False
+community_price_vs_crop_sale_price,Kg,Chat/Kat,3,-0.25541281188299525,0.7745966692414834,False
+community_price_vs_crop_sale_price,Kg,Ground nuts,3,0.15415067982725805,1.1666666666666663,False
+community_price_vs_crop_sale_price,Kg,Haricot Beans,3,0.13353139262452252,1.1428571428571428,False
+community_price_vs_crop_sale_price,Kg,Banana,2,-3.1073040492110957,0.0447213595499958,False
+community_price_vs_crop_sale_price,Kg,Chick Pea,2,0.03784991161384221,1.0385753430830198,False
+community_price_vs_crop_sale_price,Kg,Kariya,1,0.5596157879354231,1.7500000000000007,False
+community_price_vs_crop_sale_price,Kg,Mango,1,1.203972804325936,3.333333333333333,False
+community_price_vs_crop_sale_price,Tasa/Tanika/Shember/Selemon Medium,Coffee,1,0.2876820724517808,1.3333333333333333,True
+community_price_vs_crop_sale_price,Zorba/Akara Large,Chat/Kat,3,0.3101549283038394,1.3636363636363635,True
+community_price_vs_crop_sale_price,Zorba/Akara Medium,Chat/Kat,2,1.004345880271493,2.7301208627090667,False
+community_price_vs_crop_sale_price,Zorba/Akara Small,Chat/Kat,2,0.4054651081081646,1.5000000000000002,False
+community_price_vs_crop_sale_price,kg,Maize,14,0.2231435513142097,1.25,False
+community_price_vs_crop_sale_price,kg,Barley,9,0.3877763194920214,1.473700109429511,True
+community_price_vs_crop_sale_price,kg,Horsebeans,9,0.4187232050239551,1.5200195627778583,False
+community_price_vs_crop_sale_price,kg,Niger Seed,9,0.13353134512707276,1.1428570885743443,False
+community_price_vs_crop_sale_price,kg,Sorghum,9,0.21688783837914904,1.2422047666238083,False
+community_price_vs_crop_sale_price,kg,Teff,9,0.07910873894565196,1.082322006225586,False
+community_price_vs_crop_sale_price,kg,Chat/Kat,7,0.18715734064252976,1.20581699414569,False
+community_price_vs_crop_sale_price,kg,Field Pea,7,0.27409070515488,1.3153341044116413,True
+community_price_vs_crop_sale_price,kg,Wheat,7,0.11332868530700324,1.12,False
+community_price_vs_crop_sale_price,kg,Linseed,6,0.38615109676910153,1.4713069637490273,True
+community_price_vs_crop_sale_price,kg,Millet,6,0.11323084533130268,1.1198904245877306,False
+community_price_vs_crop_sale_price,kg,Haricot Beans,5,0.21589120821276886,1.2409673645990855,False
+community_price_vs_crop_sale_price,kg,Lentils,5,0.3498761594170592,1.4188918213221156,True
+community_price_vs_crop_sale_price,kg,Coffee,4,0.9195776256911752,2.508230753939472,False
+community_price_vs_crop_sale_price,kg,Ground nuts,4,0.26236426446749084,1.2999999999999996,False
+community_price_vs_crop_sale_price,kg,Banana,3,0.2558948726858197,1.291616936582646,False
+community_price_vs_crop_sale_price,kg,Chick Pea,3,0.07569982322768443,1.0786387432600124,False
+community_price_vs_crop_sale_price,kg,Onion,3,0.9684615792936611,2.633889311037568,False
+community_price_vs_crop_sale_price,kg,Potato,3,1.1463049800765805,3.146544857112369,False
+community_price_vs_crop_sale_price,kg,Berbere,2,1.6163776701257433,5.034819468051121,False
+community_price_vs_crop_sale_price,kg,Kariya,2,0.11786074712185446,1.1250874287957209,False
+community_price_vs_crop_sale_price,kg,Leafy Greens,2,0.5394048400357134,1.7149858674597747,False
+community_price_vs_crop_sale_price,kg,Sweet potato,2,1.3811843731656195,3.979612183295633,False
+community_price_vs_crop_sale_price,kg,Tomato,2,0.6222162042981036,1.8630523746565215,False
+community_price_vs_crop_sale_price,kg,Mango,1,2.2284034240423747,9.285029983520507,False
+community_price_vs_crop_sale_price,kg,Orange,1,2.453983422905094,11.634600067138667,False
+community_price_vs_crop_sale_price,kg,Other tuber or stem,1,0.38860799526153933,1.4749262599112063,True
+unit_value_vs_community_price,Birchiko Large,Barley,2,2.819621976759315,16.77050983124842,False
+unit_value_vs_community_price,Birchiko Large,Berbere,2,1.0043458802714929,2.7301208627090663,False
+unit_value_vs_community_price,Birchiko Large,Chick Pea,2,-0.005025167926751006,0.9949874371066196,False
+unit_value_vs_community_price,Birchiko Large,Coffee,2,-0.019610356576640786,0.98058067569092,False
+unit_value_vs_community_price,Birchiko Large,Field Pea,2,0.02010681227815403,1.0203103158759357,False
+unit_value_vs_community_price,Birchiko Large,Horsebeans,2,0.23500181462286762,1.2649110640673515,False
+unit_value_vs_community_price,Birchiko Large,Maize,2,-0.7750129161758517,0.4606978305063438,False
+unit_value_vs_community_price,Birchiko Large,Salt,2,-0.5249110622493389,0.5916079783099616,False
+unit_value_vs_community_price,Birchiko Large,Tea,2,-0.07707533991362903,0.9258200997725515,False
+unit_value_vs_community_price,Birchiko Large,Beer,1,-0.06453852113757108,0.9375000000000001,False
+unit_value_vs_community_price,Birchiko Large,Lentils,1,0.3465735902799727,1.4142135623730951,True
+unit_value_vs_community_price,Birchiko Large,Linseed,1,0.13285158286650267,1.1420804814403214,False
+unit_value_vs_community_price,Birchiko Large,Soda,1,0.0,1.0,False
+unit_value_vs_community_price,Birchiko Large,Sorghum,1,-0.9932517730102834,0.37037037037037035,False
+unit_value_vs_community_price,Birchiko Large,Sugar,1,-0.09531017980432521,0.9090909090909087,False
+unit_value_vs_community_price,Birchiko Large,Teff,1,-0.07707533991362903,0.9258200997725515,False
+unit_value_vs_community_price,Birchiko Medium,Salt,5,0.0,1.0,False
+unit_value_vs_community_price,Birchiko Medium,Tea,4,0.11157177565710485,1.118033988749895,False
+unit_value_vs_community_price,Birchiko Medium,Barley,2,-0.1540465348559542,0.8572321289096398,False
+unit_value_vs_community_price,Birchiko Medium,Butter/ghee,2,-0.286907762598136,0.7505809572816812,False
+unit_value_vs_community_price,Birchiko Medium,Coffee,2,1.6570103440448831,5.243610795028082,False
+unit_value_vs_community_price,Birchiko Medium,Field Pea,2,-0.7294325269773632,0.48218253804964767,False
+unit_value_vs_community_price,Birchiko Medium,Haricot Beans,2,-0.03848052056806406,0.9622504486493764,False
+unit_value_vs_community_price,Birchiko Medium,Horsebeans,2,-0.7177571987632583,0.48784516965759456,False
+unit_value_vs_community_price,Birchiko Medium,Maize,2,-0.44859822613061495,0.6385225888560105,False
+unit_value_vs_community_price,Birchiko Medium,Milk,2,0.30099320108148375,1.351200154807034,True
+unit_value_vs_community_price,Birchiko Medium,Soda,2,0.047655089902162384,1.0488088481701514,False
+unit_value_vs_community_price,Birchiko Medium,Beer,1,-0.06062462181643502,0.9411764705882352,False
+unit_value_vs_community_price,Birchiko Medium,Berbere,1,-0.356674943938732,0.7000000000000003,False
+unit_value_vs_community_price,Birchiko Medium,Chick Pea,1,-0.13353139262452252,0.8750000000000001,False
+unit_value_vs_community_price,Birchiko Medium,Lentils,1,-0.9162907318741551,0.39999999999999997,False
+unit_value_vs_community_price,Birchiko Medium,Niger Seed,1,-1.6277870511022967,0.1963636363636364,False
+unit_value_vs_community_price,Birchiko Medium,Sugar,1,-0.8634182033257032,0.4217180976033086,False
+unit_value_vs_community_price,Birchiko Medium,Wheat,1,-0.45814536593707733,0.632455532033676,False
+unit_value_vs_community_price,Birchiko Small,Tea,12,0.0,1.0,False
+unit_value_vs_community_price,Birchiko Small,Coffee,4,1.406705358380018,4.0824829046386295,False
+unit_value_vs_community_price,Birchiko Small,Butter/ghee,2,0.7996682793876704,2.2248027931270298,False
+unit_value_vs_community_price,Birchiko Small,Linseed,2,-0.0821260167430089,0.9211558703193815,False
+unit_value_vs_community_price,Birchiko Small,Milk,2,0.09432355778536716,1.0989152509857711,False
+unit_value_vs_community_price,Birchiko Small,Salt,2,-0.6931471805599453,0.5,False
+unit_value_vs_community_price,Birchiko Small,Berbere,1,-0.693147180559945,0.5000000000000002,False
+unit_value_vs_community_price,Birchiko Small,Field Pea,1,0.6931471805599452,1.9999999999999998,False
+unit_value_vs_community_price,Birchiko Small,Ground nuts,1,0.8109302162163288,2.25,False
+unit_value_vs_community_price,Birchiko Small,Haricot Beans,1,0.0,1.0,False
+unit_value_vs_community_price,Birchiko Small,Oils,1,0.0,1.0,False
+unit_value_vs_community_price,Birchiko Small,Soda,1,0.5108256237659909,1.6666666666666672,False
+unit_value_vs_community_price,Cubic Centimeter,Milk,3,0.024097551579060017,1.0243902439024386,False
+unit_value_vs_community_price,Cup,Coffee,1,-0.6931471805599453,0.5,False
+unit_value_vs_community_price,Cup,Milk,1,0.8472978603872034,2.333333333333333,False
+unit_value_vs_community_price,Cup,Salt,1,0.0,1.0,False
+unit_value_vs_community_price,Esir Large,Leafy Greens,5,0.0,1.0,False
+unit_value_vs_community_price,Esir Large,Chat/Kat,2,0.10652109882772498,1.1124013965635147,False
+unit_value_vs_community_price,Esir Large,Cheese,2,-0.18942142542437912,0.8274377299117183,False
+unit_value_vs_community_price,Esir Large,Kocho,2,-0.6555500279170361,0.5191564335105264,False
+unit_value_vs_community_price,Esir Medium,Leafy Greens,48,0.0,1.0,False
+unit_value_vs_community_price,Esir Medium,Chat/Kat,6,-0.5493061443340546,0.577350269189626,False
+unit_value_vs_community_price,Esir Medium,Cheese,3,0.028579206919974176,1.028991510855053,False
+unit_value_vs_community_price,Esir Medium,Kocho,3,2.207274913189721,9.090909090909093,False
+unit_value_vs_community_price,Esir Medium,Bula,2,-0.48132271546314453,0.6179654585112234,False
+unit_value_vs_community_price,Esir Medium,Butter/ghee,1,-0.1823215567939549,0.8333333333333331,False
+unit_value_vs_community_price,Esir Medium,Onion,1,0.0,1.0,False
+unit_value_vs_community_price,Esir Small,Leafy Greens,12,0.0,1.0,False
+unit_value_vs_community_price,Esir Small,Chat/Kat,4,-0.48913585133917037,0.6131560232687129,False
+unit_value_vs_community_price,Esir Small,Cheese,3,-0.4054651081081637,0.6666666666666671,False
+unit_value_vs_community_price,Esir Small,Bula,2,0.6931471805599456,2.0000000000000004,False
+unit_value_vs_community_price,Esir Small,Butter/ghee,2,-1.1512925464970227,0.31622776601683794,False
+unit_value_vs_community_price,Esir Small,Kocho,2,1.5992324138040366,4.949232003839765,False
+unit_value_vs_community_price,Festal Medium,Chat/Kat,1,-1.3862943611198904,0.25000000000000006,False
+unit_value_vs_community_price,Festal Small,Chat/Kat,7,-0.182321556793954,0.8333333333333338,False
+unit_value_vs_community_price,Festal Small,Kariya,2,0.033382848156130684,1.0339463079143412,False
+unit_value_vs_community_price,Festal Small,Ground nuts,1,0.693147180559945,1.9999999999999993,False
+unit_value_vs_community_price,Festal Small,Salt,1,-0.5108256237659909,0.5999999999999999,False
+unit_value_vs_community_price,Gram,Salt,152,0.0,1.0,False
+unit_value_vs_community_price,Gram,Coffee,86,0.0,1.0,False
+unit_value_vs_community_price,Gram,Tea,85,0.0,1.0,False
+unit_value_vs_community_price,Gram,Onion,50,0.0,1.0,False
+unit_value_vs_community_price,Gram,Sugar,44,0.0,1.0,False
+unit_value_vs_community_price,Gram,Horsebeans,27,0.03922071315328157,1.0400000000000003,False
+unit_value_vs_community_price,Gram,Lentils,24,0.2867679549180058,1.332115066859172,True
+unit_value_vs_community_price,Gram,Chat/Kat,22,0.0,1.0,False
+unit_value_vs_community_price,Gram,Field Pea,22,0.1911260298354447,1.2106120157004399,False
+unit_value_vs_community_price,Gram,Potato,19,0.0,1.0,False
+unit_value_vs_community_price,Gram,Chick Pea,13,0.30748469974796055,1.3599999999999999,True
+unit_value_vs_community_price,Gram,Haricot Beans,10,0.19109625458121338,1.210575969956535,False
+unit_value_vs_community_price,Gram,Wheat,10,0.16988677539977903,1.1851706532498396,False
+unit_value_vs_community_price,Gram,Maize,9,0.0,1.0,False
+unit_value_vs_community_price,Gram,Sorghum,9,0.2374955853783871,1.2680693987317884,False
+unit_value_vs_community_price,Gram,Teff,9,0.00019291984240421556,1.0001929384526338,False
+unit_value_vs_community_price,Gram,Butter/ghee,8,-0.03974027303379524,0.9610390144878351,False
+unit_value_vs_community_price,Gram,Banana,7,0.0,1.0,False
+unit_value_vs_community_price,Gram,Barley,7,0.4054651081081637,1.499999999999999,True
+unit_value_vs_community_price,Gram,Berbere,7,0.0,1.0,False
+unit_value_vs_community_price,Gram,Linseed,7,0.14149956227369964,1.1520000000000001,False
+unit_value_vs_community_price,Gram,Tomato,6,0.02439508208471608,1.02469507659596,False
+unit_value_vs_community_price,Gram,Niger Seed,5,0.051293294387551036,1.052631578947369,False
+unit_value_vs_community_price,Gram,Kariya,4,0.0,1.0,False
+unit_value_vs_community_price,Gram,Leafy Greens,4,0.22793372883457352,1.2560020859521719,False
+unit_value_vs_community_price,Gram,Milk,4,-0.02569456212193799,0.9746327339046479,False
+unit_value_vs_community_price,Gram,Bula,3,-0.18232155679395445,0.8333333333333335,False
+unit_value_vs_community_price,Gram,Cheese,3,0.5207269374140808,1.683250823060347,False
+unit_value_vs_community_price,Gram,Ground nuts,3,-0.06899287148695121,0.9333333333333336,False
+unit_value_vs_community_price,Gram,Kocho,3,0.35794333376471776,1.4303845636750985,True
+unit_value_vs_community_price,Gram,Oils,3,0.0,1.0,False
+unit_value_vs_community_price,Gram,Orange,3,0.9555114450274362,2.5999999999999996,False
+unit_value_vs_community_price,Gram,Eggs,2,-1.5905979724918116,0.20380370627970723,False
+unit_value_vs_community_price,Gram,Millet,2,-0.05034037227510613,0.9509057074726248,False
+unit_value_vs_community_price,Gram,Other vegetable,2,0.3352800129651934,1.3983318814643506,True
+unit_value_vs_community_price,Gram,Soda,2,0.33947372164954825,1.4042083915924297,True
+unit_value_vs_community_price,Gram,Godere,1,0.0,1.0,False
+unit_value_vs_community_price,Gram,Mango,1,0.5452270504833234,1.7250000000000005,False
+unit_value_vs_community_price,Gram,Other cereal,1,-0.5990498571808303,0.549333333333333,False
+unit_value_vs_community_price,Gram,Other fruit,1,1.0200499661650069,2.7733333333333317,False
+unit_value_vs_community_price,Gram,Other pulse or nut,1,1.0296194171811588,2.8000000000000016,False
+unit_value_vs_community_price,Gram,Other seed,1,0.05448818528406951,1.0559999999999998,False
+unit_value_vs_community_price,Gram,Sweet potato,1,-0.27980789396771133,0.7559289460184545,False
+unit_value_vs_community_price,Jog,Barley,2,0.0254936460850248,1.0258213882678564,False
+unit_value_vs_community_price,Jog,Chick Pea,2,0.44201073565268456,1.5558324432211956,False
+unit_value_vs_community_price,Jog,Field Pea,2,-0.48475769822371095,0.6158463993640148,False
+unit_value_vs_community_price,Jog,Haricot Beans,2,0.2549125617162036,1.290348790056394,False
+unit_value_vs_community_price,Jog,Horsebeans,2,0.5037609089138744,1.6549336359710285,False
+unit_value_vs_community_price,Jog,Maize,2,0.18007226779403007,1.1973038865060068,False
+unit_value_vs_community_price,Jog,Teff,2,0.1663529846345151,1.1809898994453742,False
+unit_value_vs_community_price,Jog,Wheat,2,0.2980164146782742,1.347183901288377,True
+unit_value_vs_community_price,Jog,Lentils,1,-0.11778303565638337,0.888888888888889,False
+unit_value_vs_community_price,Jog,Milk,1,-0.7985076962177717,0.44999999999999996,False
+unit_value_vs_community_price,Jog,Sorghum,1,0.40198077345011773,1.4947825928876748,True
+unit_value_vs_community_price,Kerchat/Kemba Medium,Potato,2,2.0304701136930228,7.61766668655171,False
+unit_value_vs_community_price,Kerchat/Kemba Small,Potato,1,0.1823215567939549,1.2000000000000004,False
+unit_value_vs_community_price,Kg,Onion,1034,0.0,1.0,False
+unit_value_vs_community_price,Kg,Sugar,748,0.0,1.0,False
+unit_value_vs_community_price,Kg,Potato,519,0.0,1.0,False
+unit_value_vs_community_price,Kg,Tomato,475,0.0,1.0,False
+unit_value_vs_community_price,Kg,Teff,448,0.0,1.0,False
+unit_value_vs_community_price,Kg,Salt,408,0.07303410570029034,1.07576722608364,False
+unit_value_vs_community_price,Kg,Berbere,286,0.08219192805364406,1.0856641592438554,False
+unit_value_vs_community_price,Kg,Wheat,267,0.08701137698962969,1.0909090909090908,False
+unit_value_vs_community_price,Kg,Banana,252,0.0,1.0,False
+unit_value_vs_community_price,Kg,Lentils,250,0.0,1.0,False
+unit_value_vs_community_price,Kg,Maize,248,0.0,1.0,False
+unit_value_vs_community_price,Kg,Coffee,187,0.0,1.0,False
+unit_value_vs_community_price,Kg,Horsebeans,156,0.104176240586759,1.1097960287843454,False
+unit_value_vs_community_price,Kg,Sorghum,125,0.0,1.0,False
+unit_value_vs_community_price,Kg,Chick Pea,111,0.19415601444095776,1.2142857142857146,False
+unit_value_vs_community_price,Kg,Field Pea,97,0.10536051565782634,1.1111111111111112,False
+unit_value_vs_community_price,Kg,Kariya,58,0.0,1.0,False
+unit_value_vs_community_price,Kg,Orange,33,-0.11778303565638337,0.888888888888889,False
+unit_value_vs_community_price,Kg,Barley,31,0.10536051565782634,1.1111111111111112,False
+unit_value_vs_community_price,Kg,Haricot Beans,26,0.0,1.0,False
+unit_value_vs_community_price,Kg,Butter/ghee,14,-0.05615598412116096,0.9453916583016412,False
+unit_value_vs_community_price,Kg,Millet,13,0.009195145889174139,1.0092375511175677,False
+unit_value_vs_community_price,Kg,Linseed,8,0.04739949144118283,1.0485408084994203,False
+unit_value_vs_community_price,Kg,Ground nuts,7,-0.03922071315328157,0.9615384615384612,False
+unit_value_vs_community_price,Kg,Chat/Kat,6,-0.693147180559945,0.5000000000000002,False
+unit_value_vs_community_price,Kg,Kocho,6,0.0,1.0,False
+unit_value_vs_community_price,Kg,Mango,6,-0.20273255405408208,0.8164965809277261,False
+unit_value_vs_community_price,Kg,Other vegetable,6,1.4774551395168676,4.381780460041328,False
+unit_value_vs_community_price,Kg,Cheese,5,0.10536051565782678,1.1111111111111116,False
+unit_value_vs_community_price,Kg,Leafy Greens,5,0.1823215567939549,1.2000000000000004,False
+unit_value_vs_community_price,Kg,Niger Seed,5,-0.23101772979827961,0.793725393319377,False
+unit_value_vs_community_price,Kg,Oils,5,-0.02857920691997462,0.9718253158075497,False
+unit_value_vs_community_price,Kg,Other fruit,5,0.0019569496605682524,1.0019588657362393,False
+unit_value_vs_community_price,Kg,Tea,5,-0.7451476286308392,0.4746642207381755,False
+unit_value_vs_community_price,Kg,Bula,4,-0.20273255405408186,0.8164965809277263,False
+unit_value_vs_community_price,Kg,Eggs,4,1.3407139719214016,3.821771168817466,False
+unit_value_vs_community_price,Kg,Sweet potato,4,0.45814536593707766,1.58113883008419,False
+unit_value_vs_community_price,Kg,Milk,3,0.24116205681688774,1.2727272727272723,False
+unit_value_vs_community_price,Kg,Other cereal,3,0.1451820098444978,1.1562499999999998,False
+unit_value_vs_community_price,Kg,Other pulse or nut,2,-0.5519875892837338,0.5758042099887954,False
+unit_value_vs_community_price,Kg,Cassava,1,-0.2876820724517808,0.7500000000000001,False
+unit_value_vs_community_price,Kg,Godere,1,1.0986122886681096,2.9999999999999996,False
+unit_value_vs_community_price,Kg,Other seed,1,-0.3695931556787433,0.691015409150993,False
+unit_value_vs_community_price,Kg,Other tuber or stem,1,-0.1115717756571053,0.8944271909999155,False
+unit_value_vs_community_price,Kg,Soda,1,1.0124766781978831,2.7524094128159016,False
+unit_value_vs_community_price,Kubaya/Cup Large,Milk,3,-0.2027325540540823,0.8164965809277259,False
+unit_value_vs_community_price,Kubaya/Cup Large,Haricot Beans,2,-0.5225459095529343,0.5930088775323161,False
+unit_value_vs_community_price,Kubaya/Cup Large,Maize,2,-0.44279469038200836,0.6422390514071824,False
+unit_value_vs_community_price,Kubaya/Cup Large,Salt,2,-0.11157177565710485,0.8944271909999159,False
+unit_value_vs_community_price,Kubaya/Cup Large,Sorghum,2,0.04385980429275316,1.0448358631171384,False
+unit_value_vs_community_price,Kubaya/Cup Large,Chick Pea,1,0.15415067982725805,1.1666666666666663,False
+unit_value_vs_community_price,Kubaya/Cup Large,Field Pea,1,-0.32331358246252595,0.7237468644557461,False
+unit_value_vs_community_price,Kubaya/Cup Large,Ground nuts,1,-1.0215369487544805,0.3600411499115478,False
+unit_value_vs_community_price,Kubaya/Cup Large,Horsebeans,1,-0.4054651081081646,0.6666666666666665,False
+unit_value_vs_community_price,Kubaya/Cup Large,Teff,1,-0.26584859912553815,0.7665551758398329,False
+unit_value_vs_community_price,Kubaya/Cup Large,Wheat,1,0.2231435513142097,1.25,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Milk,6,-0.2938933324510593,0.74535599249993,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Salt,6,0.0,1.0,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Coffee,3,0.28123442845891455,1.324764129949177,True
+unit_value_vs_community_price,Kubaya/Cup Medium,Horsebeans,3,0.4054651081081646,1.5000000000000002,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Maize,3,0.09531017980432477,1.0999999999999999,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Barley,2,-0.2244853983014894,0.798927242309477,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Berbere,2,-0.8613832988705519,0.42257712736425823,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Chick Pea,2,1.2027410247417971,3.329229929149788,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Field Pea,2,0.4927498398711503,1.6368110053170164,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Ground nuts,2,-1.4624912462085708,0.23165843705765377,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Haricot Beans,2,0.3111986997115478,1.3650604313545334,True
+unit_value_vs_community_price,Kubaya/Cup Medium,Linseed,2,-0.16624407589831214,0.8468395158473867,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Sorghum,2,0.052623108440162936,1.0540323143656756,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Tea,2,1.0184409636305203,2.768874620972692,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Wheat,2,-0.43853500936043677,0.644980619863884,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Butter/ghee,1,-0.21681799253743073,0.8050764858994129,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Cheese,1,-1.4978661367769952,0.22360679774997905,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Lentils,1,-1.0498221244986783,0.3499999999999998,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Millet,1,-0.8243293127936913,0.43852900965351443,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Niger Seed,1,0.0,1.0,False
+unit_value_vs_community_price,Kubaya/Cup Medium,Sugar,1,0.40546510810816416,1.4999999999999996,True
+unit_value_vs_community_price,Kubaya/Cup Medium,Teff,1,0.5389965007326871,1.7142857142857144,False
+unit_value_vs_community_price,Kubaya/Cup Small,Salt,6,0.25541281188299525,1.2909944487358056,False
+unit_value_vs_community_price,Kubaya/Cup Small,Horsebeans,3,0.00398408482458823,1.0039920318408904,False
+unit_value_vs_community_price,Kubaya/Cup Small,Berbere,2,-0.19646414466605333,0.821630790613492,False
+unit_value_vs_community_price,Kubaya/Cup Small,Butter/ghee,2,0.1592024526887823,1.1725753136771673,False
+unit_value_vs_community_price,Kubaya/Cup Small,Chick Pea,2,-0.784932645479308,0.4561504245441779,False
+unit_value_vs_community_price,Kubaya/Cup Small,Coffee,2,1.0797421246766858,2.943920288775948,False
+unit_value_vs_community_price,Kubaya/Cup Small,Ground nuts,2,0.061715019482881606,1.0636591793889978,False
+unit_value_vs_community_price,Kubaya/Cup Small,Haricot Beans,2,0.5756462732485115,1.778279410038923,False
+unit_value_vs_community_price,Kubaya/Cup Small,Linseed,2,-0.27970374899640715,0.7560076763164567,False
+unit_value_vs_community_price,Kubaya/Cup Small,Maize,2,-0.2644475735369636,0.7676298919328179,False
+unit_value_vs_community_price,Kubaya/Cup Small,Milk,2,0.42839542204100756,1.5347928519163987,False
+unit_value_vs_community_price,Kubaya/Cup Small,Tea,2,0.9729550745276566,2.6457513110645903,False
+unit_value_vs_community_price,Kubaya/Cup Small,Wheat,2,0.17579937910336152,1.1921988546536195,False
+unit_value_vs_community_price,Kubaya/Cup Small,Barley,1,0.0,1.0,False
+unit_value_vs_community_price,Kubaya/Cup Small,Field Pea,1,-0.18466303074614565,0.831384387633061,False
+unit_value_vs_community_price,Kubaya/Cup Small,Niger Seed,1,-0.9457109818856217,0.3884033249820898,False
+unit_value_vs_community_price,Kubaya/Cup Small,Oils,1,-0.13353139262452274,0.8749999999999999,False
+unit_value_vs_community_price,Kubaya/Cup Small,Sorghum,1,0.16425203348601802,1.1785113019775793,False
+unit_value_vs_community_price,Kubaya/Cup Small,Teff,1,-0.05725669339438033,0.944351629426243,False
+unit_value_vs_community_price,Kunna/Mishe/Kefer/Enkib Medium,Maize,1,0.030771658666753687,1.03125,False
+unit_value_vs_community_price,Liter,Oils,116,0.0,1.0,False
+unit_value_vs_community_price,Liter,Milk,32,-0.020410997260127628,0.9797958971132712,False
+unit_value_vs_community_price,Liter,Soda,2,3.198464827608073,24.49489742783178,False
+unit_value_vs_community_price,Liter,Beer,1,6.396929655216146,600.0,False
+unit_value_vs_community_price,Liter,Butter/ghee,1,-0.6505682763897918,0.521749194749951,False
+unit_value_vs_community_price,Liter,Cheese,1,0.47855636319720496,1.6137430609197567,False
+unit_value_vs_community_price,Liter,Eggs,1,1.9740810260220096,7.2,False
+unit_value_vs_community_price,Liter,Tea,1,3.6888794541139363,40.0,False
+unit_value_vs_community_price,Litres,Oils,612,0.0,1.0,False
+unit_value_vs_community_price,Litres,Milk,79,0.0,1.0,False
+unit_value_vs_community_price,Litres,Soda,4,6.0503560649361745,424.26406871192887,False
+unit_value_vs_community_price,Litres,Beer,2,-0.6213563163209332,0.5372153093502535,False
+unit_value_vs_community_price,Litres,Butter/ghee,1,0.2231435513142097,1.25,False
+unit_value_vs_community_price,Litres,Coffee,1,-1.700598690831078,0.18257418583505533,False
+unit_value_vs_community_price,Litres,Tea,1,-1.2079568891505243,0.29880715233359845,False
+unit_value_vs_community_price,Medeb Large,Kariya,6,0.0,1.0,False
+unit_value_vs_community_price,Medeb Large,Leafy Greens,3,0.6931471805599456,2.0000000000000004,False
+unit_value_vs_community_price,Medeb Large,Tomato,3,0.693147180559945,1.9999999999999993,False
+unit_value_vs_community_price,Medeb Large,Berbere,2,-0.3465735902799725,0.7071067811865477,False
+unit_value_vs_community_price,Medeb Large,Godere,2,-0.17328679513998635,0.8408964152537145,False
+unit_value_vs_community_price,Medeb Large,Kocho,2,2.1081129907402865,8.232691452898607,False
+unit_value_vs_community_price,Medeb Large,Potato,2,0.0,1.0,False
+unit_value_vs_community_price,Medeb Large,Sweet potato,2,0.3465735902799727,1.4142135623730951,True
+unit_value_vs_community_price,Medeb Large,Banana,1,0.693147180559945,1.9999999999999993,False
+unit_value_vs_community_price,Medeb Large,Maize,1,1.791759469228055,6.0,False
+unit_value_vs_community_price,Medeb Large,Onion,1,-1.6094379124341,0.20000000000000007,False
+unit_value_vs_community_price,Medeb Medium,Potato,16,0.0,1.0,False
+unit_value_vs_community_price,Medeb Medium,Kariya,10,0.0,1.0,False
+unit_value_vs_community_price,Medeb Medium,Tomato,9,0.0,1.0,False
+unit_value_vs_community_price,Medeb Medium,Onion,6,0.0,1.0,False
+unit_value_vs_community_price,Medeb Medium,Berbere,5,0.693147180559945,1.9999999999999993,False
+unit_value_vs_community_price,Medeb Medium,Leafy Greens,5,0.0,1.0,False
+unit_value_vs_community_price,Medeb Medium,Banana,4,2.220446049250313e-16,1.0000000000000002,False
+unit_value_vs_community_price,Medeb Medium,Sweet potato,3,-0.6118877158110578,0.5423261445466404,False
+unit_value_vs_community_price,Medeb Medium,Godere,2,0.0,1.0,False
+unit_value_vs_community_price,Medeb Medium,Kocho,2,-0.13118213223374564,0.8770580193070291,False
+unit_value_vs_community_price,Medeb Medium,Maize,1,-0.47000362924573524,0.6250000000000002,False
+unit_value_vs_community_price,Medeb Medium,Orange,1,0.6931471805599454,2.0,False
+unit_value_vs_community_price,Medeb Small,Kariya,43,0.0,1.0,False
+unit_value_vs_community_price,Medeb Small,Leafy Greens,5,0.0,1.0,False
+unit_value_vs_community_price,Medeb Small,Onion,4,-0.3465735902799728,0.7071067811865474,False
+unit_value_vs_community_price,Medeb Small,Berbere,3,-0.3465735902799727,0.7071067811865475,False
+unit_value_vs_community_price,Medeb Small,Sweet potato,3,0.0,1.0,False
+unit_value_vs_community_price,Medeb Small,Banana,2,-1.0012402502718536,0.3674234614174768,False
+unit_value_vs_community_price,Medeb Small,Kocho,2,0.2746530721670273,1.3160740129524922,True
+unit_value_vs_community_price,Medeb Small,Potato,2,-0.17328679513998646,0.8408964152537144,False
+unit_value_vs_community_price,Medeb Small,Tomato,2,-3.3306690738754696e-16,0.9999999999999997,False
+unit_value_vs_community_price,Medeb Small,Godere,1,1.3862943611198906,4.0,False
+unit_value_vs_community_price,Medeb Small,Orange,1,0.693147180559945,1.9999999999999993,False
+unit_value_vs_community_price,Medeb Small,Other tuber or stem,1,0.0,1.0,False
+unit_value_vs_community_price,Medeb Small,Other vegetable,1,0.0,1.0,False
+unit_value_vs_community_price,Melekiya,Coffee,2,-2.1242476210246797,0.11952286093343935,False
+unit_value_vs_community_price,Melekiya,Ground nuts,1,-0.916290731874155,0.4,False
+unit_value_vs_community_price,Melekiya,Oils,1,1.0986122886681098,3.0000000000000004,False
+unit_value_vs_community_price,Melekiya,Salt,1,-0.5108256237659905,0.6000000000000001,False
+unit_value_vs_community_price,Mili Liter,Soda,25,0.047655089902162384,1.0488088481701514,False
+unit_value_vs_community_price,Mili Liter,Oils,9,0.0,1.0,False
+unit_value_vs_community_price,Mili Liter,Beer,4,0.08697665356171891,1.0908712114635712,False
+unit_value_vs_community_price,Mili Liter,Milk,3,0.26236426446749084,1.2999999999999996,False
+unit_value_vs_community_price,Mili Liter,Tea,1,2.2335922215070942,9.333333333333334,False
+unit_value_vs_community_price,Number,Banana,3,-0.13118213223374553,0.8770580193070292,False
+unit_value_vs_community_price,Number,Eggs,3,0.0,1.0,False
+unit_value_vs_community_price,Pack,Kocho,1,-1.7429693050586228,0.17500000000000004,False
+unit_value_vs_community_price,Piece/Number Large,Eggs,6,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Large,Banana,2,-0.09116077839697723,0.9128709291752769,False
+unit_value_vs_community_price,Piece/Number Large,Leafy Greens,2,-0.5674899664194923,0.5669467095138409,False
+unit_value_vs_community_price,Piece/Number Large,Orange,2,-0.19962692405444282,0.8190362588127201,False
+unit_value_vs_community_price,Piece/Number Large,Soda,2,-0.09116077839697723,0.9128709291752769,False
+unit_value_vs_community_price,Piece/Number Large,Beer,1,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Large,Mango,1,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Large,Tea,1,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Medium,Eggs,40,0.026340128914456473,1.026690096080341,False
+unit_value_vs_community_price,Piece/Number Medium,Banana,5,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Medium,Beer,4,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Medium,Leafy Greens,3,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Medium,Orange,3,0.916290731874155,2.5,False
+unit_value_vs_community_price,Piece/Number Medium,Soda,2,-0.14782512105047885,0.8625819491779428,False
+unit_value_vs_community_price,Piece/Number Medium,Tea,2,-0.45814536593707766,0.6324555320336758,False
+unit_value_vs_community_price,Piece/Number Medium,Tomato,2,0.4742799962214703,1.6068568378893036,False
+unit_value_vs_community_price,Piece/Number Medium,Kariya,1,0.6931471805599453,2.0,False
+unit_value_vs_community_price,Piece/Number Medium,Mango,1,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Small,Eggs,19,0.10536051565782611,1.111111111111111,False
+unit_value_vs_community_price,Piece/Number Small,Banana,7,0.5737012264187709,1.7748239349298849,False
+unit_value_vs_community_price,Piece/Number Small,Beer,3,-0.1115717756571053,0.8944271909999155,False
+unit_value_vs_community_price,Piece/Number Small,Leafy Greens,3,-0.40546510810816416,0.6666666666666669,False
+unit_value_vs_community_price,Piece/Number Small,Orange,3,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Small,Soda,3,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Small,Kariya,2,1.3174794730065846,3.73399786373087,False
+unit_value_vs_community_price,Piece/Number Small,Mango,1,0.0,1.0,False
+unit_value_vs_community_price,Piece/Number Small,Onion,1,0.09116077839697767,1.0954451150103326,False
+unit_value_vs_community_price,Piece/Number Small,Tea,1,-2.0794415416798357,0.12500000000000003,False
+unit_value_vs_community_price,Roll,Chat/Kat,2,2.983073369561846,19.7484176581315,False
+unit_value_vs_community_price,Roll,Kocho,1,-0.2876820724517808,0.7500000000000001,False
+unit_value_vs_community_price,Sahin Large,Coffee,2,1.0428264008395574,2.8372248270095275,False
+unit_value_vs_community_price,Sahin Large,Potato,1,7.89655270164304,2688.0000000000005,False
+unit_value_vs_community_price,Sahin Large,Teff,1,-0.14842000511827314,0.8620689655172415,False
+unit_value_vs_community_price,Sahin Medium,Maize,3,0.0,1.0,False
+unit_value_vs_community_price,Sahin Medium,Barley,2,-0.18362194764398332,0.832250378576479,False
+unit_value_vs_community_price,Sahin Medium,Berbere,2,-0.28491465737138166,0.7520784359312794,False
+unit_value_vs_community_price,Sahin Medium,Horsebeans,2,0.04853900361023933,1.049736314527929,False
+unit_value_vs_community_price,Sahin Medium,Onion,2,0.018069523307936652,1.0182337649086284,False
+unit_value_vs_community_price,Sahin Medium,Potato,2,0.45814536593707733,1.5811388300841893,False
+unit_value_vs_community_price,Sahin Medium,Sorghum,2,-0.13660308073844862,0.8723163966066804,False
+unit_value_vs_community_price,Sahin Medium,Teff,2,0.04129211939192645,1.0421564952059255,False
+unit_value_vs_community_price,Sahin Medium,Tomato,2,-0.6608779199911601,0.5163977794943221,False
+unit_value_vs_community_price,Sahin Medium,Wheat,2,0.05268025782891317,1.0540925533894598,False
+unit_value_vs_community_price,Sahin Medium,Cheese,1,-0.2876820724517808,0.7500000000000001,False
+unit_value_vs_community_price,Sahin Medium,Chick Pea,1,0.0,1.0,False
+unit_value_vs_community_price,Sahin Small,Berbere,2,0.968970989703068,2.635231383473649,False
+unit_value_vs_community_price,Sahin Small,Coffee,2,1.3831595546130928,3.9874804074753767,False
+unit_value_vs_community_price,Sahin Small,Barley,1,-0.260197537391071,0.770899289327545,False
+unit_value_vs_community_price,Sahin Small,Horsebeans,1,0.14609201706223596,1.1573026747436725,False
+unit_value_vs_community_price,Sahin Small,Kariya,1,-0.6019864021629684,0.5477225575051659,False
+unit_value_vs_community_price,Sahin Small,Maize,1,0.5877866649021191,1.8,False
+unit_value_vs_community_price,Sahin Small,Sorghum,1,0.2231435513142097,1.25,False
+unit_value_vs_community_price,Sahin Small,Teff,1,0.1977368465388598,1.2186416618514238,False
+unit_value_vs_community_price,Sahin Small,Wheat,1,0.04445176257083361,1.0454545454545452,False
+unit_value_vs_community_price,Shekim,Kocho,1,-0.1823215567939549,0.8333333333333331,False
+unit_value_vs_community_price,Sini Large,Coffee,6,0.5108256237659905,1.6666666666666663,False
+unit_value_vs_community_price,Sini Large,Salt,5,0.0,1.0,False
+unit_value_vs_community_price,Sini Large,Tea,5,0.0,1.0,False
+unit_value_vs_community_price,Sini Large,Butter/ghee,2,-0.14495462381323598,0.8650615454144217,False
+unit_value_vs_community_price,Sini Large,Ground nuts,2,-0.3465735902799725,0.7071067811865477,False
+unit_value_vs_community_price,Sini Large,Linseed,2,-0.3921539794784612,0.6756000774035172,False
+unit_value_vs_community_price,Sini Large,Milk,1,-0.2231435513142097,0.8,False
+unit_value_vs_community_price,Sini Large,Oils,1,0.0,1.0,False
+unit_value_vs_community_price,Sini Small,Coffee,17,0.2876820724517808,1.3333333333333333,True
+unit_value_vs_community_price,Sini Small,Salt,5,0.0,1.0,False
+unit_value_vs_community_price,Sini Small,Tea,4,0.029445758914095954,1.029883571953559,False
+unit_value_vs_community_price,Sini Small,Butter/ghee,3,0.693147180559945,1.9999999999999993,False
+unit_value_vs_community_price,Sini Small,Berbere,2,0.09116077839697723,1.0954451150103321,False
+unit_value_vs_community_price,Sini Small,Ground nuts,2,-0.6212266624470001,0.537284965911771,False
+unit_value_vs_community_price,Sini Small,Linseed,2,-0.3465735902799726,0.7071067811865476,False
+unit_value_vs_community_price,Sini Small,Kariya,1,0.6931471805599456,2.0000000000000004,False
+unit_value_vs_community_price,Sini Small,Niger Seed,1,-0.5493061443340546,0.577350269189626,False
+unit_value_vs_community_price,Sini Small,Oils,1,-0.33647223662121295,0.7142857142857143,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Horsebeans,3,0.538796460722017,1.7139428228502838,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Chick Pea,2,0.5563467080108806,1.7442884509737353,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Field Pea,2,0.19242291045271442,1.212183053462653,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Haricot Beans,2,0.8190085596770371,2.268249887969856,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Maize,2,4.180822730869763,65.41965384796391,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Sorghum,2,0.2654850949292291,1.3040634169199123,True
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Teff,2,0.29686070021096667,1.3456278407175906,True
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Wheat,2,3.768076503534576,43.29670363266175,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Barley,1,-0.1251631429540061,0.8823529411764705,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Berbere,1,-1.1717035437571504,0.30983866769659335,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Coffee,1,-0.08004270767353638,0.9230769230769231,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Lentils,1,0.009719244824063722,1.0097666300759076,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Onion,1,0.8165772195257079,2.2627416997969516,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Potato,1,0.8188043947003982,2.267786838055363,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Large,Salt,1,-0.18232155679395445,0.8333333333333335,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Field Pea,5,0.0,1.0,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Maize,5,0.020202707317519497,1.0204081632653061,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Berbere,4,1.055106600173295,2.8722813232690148,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Salt,4,-0.1438410362258904,0.8660254037844387,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Teff,4,0.028237671231125416,1.028640133537936,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Wheat,4,-0.0861927598589769,0.9174173729316799,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Barley,3,0.3101549283038394,1.3636363636363635,True
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Chick Pea,3,0.10536051565782634,1.1111111111111112,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Haricot Beans,2,-0.23654264789157176,0.7893522173763263,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Horsebeans,2,-0.13721842285088037,0.8717797887081346,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Millet,2,-0.03936142561419809,0.961403170614055,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Sorghum,2,0.17952153222679934,1.1966446702145157,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Coffee,1,-3.688879454113936,0.025000000000000012,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Lentils,1,-0.4462871026284194,0.64,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Linseed,1,0.0,1.0,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Milk,1,0.0,1.0,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Medium,Sugar,1,0.2593968967075839,1.2961481396815722,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Berbere,3,0.35667494393873245,1.4285714285714286,True
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Chick Pea,3,0.4889921504397474,1.6306719195138268,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Salt,3,0.0,1.0,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Barley,2,3.2197542796931495,25.02197101948487,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Field Pea,2,3.470579806909096,32.1553809529042,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Ground nuts,2,-0.9090383887727145,0.40291148201269006,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Haricot Beans,2,0.6931471805599453,2.0,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Horsebeans,2,3.086770966734881,21.906227710402348,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Maize,2,1.4547843802597558,4.283559745979854,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Teff,2,3.7746128291998096,43.58063190078094,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Wheat,2,2.346303093654173,10.446877121006752,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Kariya,1,-0.06453852113757108,0.9375000000000001,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Lentils,1,-0.2814708124525023,0.7546729424061791,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Niger Seed,1,0.18232155679395445,1.1999999999999997,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Sorghum,1,-0.0012167570753507384,0.9987839828733964,False
+unit_value_vs_community_price,Tasa/Tanika/Shember/Selemon Small,Tea,1,-0.6931471805599454,0.49999999999999994,False
+unit_value_vs_community_price,Zorba/Akara Large,Chat/Kat,3,0.0,1.0,False
+unit_value_vs_community_price,Zorba/Akara Medium,Chat/Kat,8,0.18154724694030944,1.199071187816245,False
+unit_value_vs_community_price,Zorba/Akara Small,Chat/Kat,6,0.0,1.0,False
+unit_value_vs_community_price,kg,Salt,1733,0.2107211126626547,1.2345680016629696,False
+unit_value_vs_community_price,kg,Onion,1552,0.0,1.0,False
+unit_value_vs_community_price,kg,Sugar,1237,0.0,1.0,False
+unit_value_vs_community_price,kg,Coffee,1051,0.0,1.0,False
+unit_value_vs_community_price,kg,Oils,1030,0.0,1.0,False
+unit_value_vs_community_price,kg,Potato,865,0.0,1.0,False
+unit_value_vs_community_price,kg,Berbere,812,0.0,1.0,False
+unit_value_vs_community_price,kg,Tomato,717,0.0,1.0,False
+unit_value_vs_community_price,kg,Kariya,619,-0.6931471954611061,0.4999999925494196,False
+unit_value_vs_community_price,kg,Teff,574,0.0,1.0,False
+unit_value_vs_community_price,kg,Maize,441,0.004434644565315615,1.0044444921529951,False
+unit_value_vs_community_price,kg,Lentils,438,0.04431303813891718,1.0453095254257756,False
+unit_value_vs_community_price,kg,Leafy Greens,402,0.0,1.0,False
+unit_value_vs_community_price,kg,Horsebeans,392,0.13353139262452274,1.142857142857143,False
+unit_value_vs_community_price,kg,Tea,390,0.2400269873876577,1.2712834584779755,False
+unit_value_vs_community_price,kg,Banana,382,0.0,1.0,False
+unit_value_vs_community_price,kg,Wheat,368,0.08519649296434006,1.088931012960941,False
+unit_value_vs_community_price,kg,Milk,242,-4.749745019516638e-08,0.9999999525025509,False
+unit_value_vs_community_price,kg,Field Pea,238,0.17093712248835957,1.1864161477812236,False
+unit_value_vs_community_price,kg,Chick Pea,226,0.246860054182801,1.2799999696016326,False
+unit_value_vs_community_price,kg,Sorghum,213,0.0,1.0,False
+unit_value_vs_community_price,kg,Chat/Kat,196,-0.22546374109246092,0.798145999825243,False
+unit_value_vs_community_price,kg,Eggs,195,0.0,1.0,False
+unit_value_vs_community_price,kg,Soda,147,4.7497449973121775e-08,1.000000047497451,False
+unit_value_vs_community_price,kg,Haricot Beans,97,0.09798039784173751,1.1029411648693388,False
+unit_value_vs_community_price,kg,Barley,81,0.14927369222928766,1.1609906998624615,False
+unit_value_vs_community_price,kg,Butter/ghee,55,0.0,1.0,False
+unit_value_vs_community_price,kg,Orange,49,-0.13353139262452274,0.8749999999999999,False
+unit_value_vs_community_price,kg,Kocho,33,0.0,1.0,False
+unit_value_vs_community_price,kg,Beer,29,0.09531018756534593,1.100000008537123,False
+unit_value_vs_community_price,kg,Linseed,28,-4.7497449973121775e-08,0.9999999525025511,False
+unit_value_vs_community_price,kg,Millet,26,0.050370784900765964,1.0516609640992378,False
+unit_value_vs_community_price,kg,Ground nuts,21,0.2484613592985001,1.2820512820512826,False
+unit_value_vs_community_price,kg,Mango,13,0.0,1.0,False
+unit_value_vs_community_price,kg,Other pulse or nut,13,0.05129324689010062,1.0526315289500539,False
+unit_value_vs_community_price,kg,Niger Seed,10,0.08806531108641402,1.0920594432878075,False
+unit_value_vs_community_price,kg,Sweet potato,8,-0.5084978256185815,0.6013983057437954,False
+unit_value_vs_community_price,kg,Cheese,7,0.19682624841543994,1.2175324741297933,False
+unit_value_vs_community_price,kg,Other fruit,7,0.0019569496605682524,1.0019588657362393,False
+unit_value_vs_community_price,kg,Bula,6,-0.16627917047616125,0.8468097968935622,False
+unit_value_vs_community_price,kg,Godere,4,0.19430399763076966,1.21446542145555,False
+unit_value_vs_community_price,kg,Other cereal,4,0.06487470938109863,1.0670253277452035,False
+unit_value_vs_community_price,kg,Boye/Yam,3,0.2181560323912175,1.243781122621949,False
+unit_value_vs_community_price,kg,Cassava,3,-0.16262709125115649,0.8499080674815065,False
+unit_value_vs_community_price,kg,Other tuber or stem,3,0.12783335660872375,1.136363619430499,False
+unit_value_vs_community_price,kg,Other vegetable,3,0.0,1.0,False
+unit_value_vs_community_price,kg,Other seed,2,0.7653974110469857,2.1498485784833945,False
+unit_value_vs_crop_sale_price,Esir Large,Leafy Greens,2,-0.8495250355618935,0.42761798705987913,False
+unit_value_vs_crop_sale_price,Esir Large,Chat/Kat,1,0.24162140457542503,1.273312031440749,False
+unit_value_vs_crop_sale_price,Esir Medium,Chat/Kat,2,-0.14384103622589062,0.8660254037844385,False
+unit_value_vs_crop_sale_price,Esir Medium,Leafy Greens,1,-2.302585092994046,0.09999999999999998,False
+unit_value_vs_crop_sale_price,Esir Small,Leafy Greens,2,-0.4600332633780676,0.6312626472295964,False
+unit_value_vs_crop_sale_price,Kg,Teff,13,0.2657031657330058,1.3043478260869565,True
+unit_value_vs_crop_sale_price,Kg,Maize,6,0.11157177565710485,1.118033988749895,False
+unit_value_vs_crop_sale_price,Kg,Wheat,6,0.1762053146164192,1.1926829087480768,False
+unit_value_vs_crop_sale_price,Kg,Barley,5,0.6061358035703157,1.8333333333333337,False
+unit_value_vs_crop_sale_price,Kg,Haricot Beans,5,0.13353139262452252,1.1428571428571428,False
+unit_value_vs_crop_sale_price,Kg,Niger Seed,5,0.35667494393873245,1.4285714285714286,True
+unit_value_vs_crop_sale_price,Kg,Sorghum,5,0.15074150456776225,1.162696067610304,False
+unit_value_vs_crop_sale_price,Kg,Field Pea,4,0.41208772148317463,1.5099668870541498,False
+unit_value_vs_crop_sale_price,Kg,Horsebeans,4,0.5906729856353978,1.8052028823013972,False
+unit_value_vs_crop_sale_price,Kg,Lentils,4,0.7241980814247719,2.0630760174539726,False
+unit_value_vs_crop_sale_price,Kg,Millet,4,0.09041148916518826,1.0946246172151084,False
+unit_value_vs_crop_sale_price,Kg,Chick Pea,3,0.4700036292457357,1.6,False
+unit_value_vs_crop_sale_price,Kg,Coffee,3,1.856297990365626,6.3999999999999995,False
+unit_value_vs_crop_sale_price,Kg,Ground nuts,3,0.528207619984161,1.6958899036877277,False
+unit_value_vs_crop_sale_price,Kg,Linseed,3,0.08004270767353638,1.0833333333333333,False
+unit_value_vs_crop_sale_price,Kg,Banana,2,0.5948865335325435,1.8128252384140608,False
+unit_value_vs_crop_sale_price,Kg,Chat/Kat,2,-0.26970241534298234,0.7636066981663598,False
+unit_value_vs_crop_sale_price,Kg,Papaya,2,1.3843374114593223,3.9921798556678274,False
+unit_value_vs_crop_sale_price,Kg,Sesame,2,0.4879591919312378,1.628988372746652,False
+unit_value_vs_crop_sale_price,Kg,Avocado,1,1.7635885922613586,5.833333333333333,False
+unit_value_vs_crop_sale_price,Kg,Hops (gesho),1,0.4904146265058631,1.632993161855452,False
+unit_value_vs_crop_sale_price,Kg,Kariya,1,0.40546510810816416,1.4999999999999996,True
+unit_value_vs_crop_sale_price,Kg,Mango,1,1.203972804325936,3.333333333333333,False
+unit_value_vs_crop_sale_price,Tasa/Tanika/Shember/Selemon Large,Teff,1,-0.7135581778200728,0.48989794855663565,False
+unit_value_vs_crop_sale_price,Tasa/Tanika/Shember/Selemon Medium,Coffee,1,-1.3540251005511048,0.2581988897471612,False
+unit_value_vs_crop_sale_price,Tasa/Tanika/Shember/Selemon Medium,Garlic,1,0.5007752879124894,1.6500000000000001,False
+unit_value_vs_crop_sale_price,Zorba/Akara Large,Chat/Kat,3,1.5141277326297757,4.545454545454547,False
+unit_value_vs_crop_sale_price,Zorba/Akara Medium,Chat/Kat,2,-0.65582724316178,0.5190125353790498,False
+unit_value_vs_crop_sale_price,Zorba/Akara Small,Chat/Kat,2,0.4581453659370778,1.58113883008419,False
+unit_value_vs_crop_sale_price,kg,Teff,17,0.2876820724517808,1.3333333333333333,True
+unit_value_vs_crop_sale_price,kg,Wheat,15,0.19652129405480379,1.2171612389003694,False
+unit_value_vs_crop_sale_price,kg,Maize,11,0.370468922198147,1.4484136487558028,True
+unit_value_vs_crop_sale_price,kg,Barley,9,0.6215967587396085,1.8618986725025253,False
+unit_value_vs_crop_sale_price,kg,Field Pea,9,0.4337502838523619,1.5430334996209196,False
+unit_value_vs_crop_sale_price,kg,Horsebeans,9,0.5798184952529422,1.7857142857142858,False
+unit_value_vs_crop_sale_price,kg,Sorghum,9,0.15074150456776225,1.162696067610304,False
+unit_value_vs_crop_sale_price,kg,Chat/Kat,8,-0.9730359021050945,0.3779339242911224,False
+unit_value_vs_crop_sale_price,kg,Haricot Beans,7,0.35667494393873267,1.428571428571429,True
+unit_value_vs_crop_sale_price,kg,Linseed,7,0.4531206505131262,1.5732139841387982,False
+unit_value_vs_crop_sale_price,kg,Niger Seed,7,0.6161860919263664,1.851851763893612,False
+unit_value_vs_crop_sale_price,kg,Coffee,6,1.5994361295274313,4.950240342921451,False
+unit_value_vs_crop_sale_price,kg,Millet,6,0.1580046714144675,1.171171665723154,False
+unit_value_vs_crop_sale_price,kg,Chick Pea,5,0.49712608917448353,1.643989794968248,False
+unit_value_vs_crop_sale_price,kg,Lentils,5,0.6709212755258038,1.9560385412338819,False
+unit_value_vs_crop_sale_price,kg,Ground nuts,4,0.4398090456318986,1.5524107505924016,False
+unit_value_vs_crop_sale_price,kg,Avocado,3,0.8595594770137522,2.3621198963644283,False
+unit_value_vs_crop_sale_price,kg,Banana,3,1.269676662029392,3.5597013896333296,False
+unit_value_vs_crop_sale_price,kg,Garlic,3,0.2726441647592326,1.3134327959870948,True
+unit_value_vs_crop_sale_price,kg,Mango,3,1.6136042018437506,5.02087490229495,False
+unit_value_vs_crop_sale_price,kg,Onion,3,1.056052674249314,2.8750000000000004,False
+unit_value_vs_crop_sale_price,kg,Potato,3,1.1463049800765805,3.146544857112369,False
+unit_value_vs_crop_sale_price,kg,Rice,3,1.3097964272516789,3.705419313032011,False
+unit_value_vs_crop_sale_price,kg,Berbere,2,1.8993052529929457,6.681251050304124,False
+unit_value_vs_crop_sale_price,kg,Carrot,2,1.3260824253773367,3.766259844670095,False
+unit_value_vs_crop_sale_price,kg,Hops (gesho),2,1.0464072222581347,2.8474026340188456,False
+unit_value_vs_crop_sale_price,kg,Kariya,2,-0.5342745281534973,0.5860943308850585,False
+unit_value_vs_crop_sale_price,kg,Leafy Greens,2,0.9786733145255315,2.6609236903464644,False
+unit_value_vs_crop_sale_price,kg,Papaya,2,1.8941964632258566,6.647204984452795,False
+unit_value_vs_crop_sale_price,kg,Sesame,2,0.24898343006187473,1.2827207782897883,False
+unit_value_vs_crop_sale_price,kg,Sweet potato,2,1.3238081438491505,3.757704042314445,False
+unit_value_vs_crop_sale_price,kg,Tomato,2,0.6197224448366074,1.858412158366326,False
+unit_value_vs_crop_sale_price,kg,Beetroot,1,1.017615178888901,2.766589070375521,False
+unit_value_vs_crop_sale_price,kg,Fenugreek,1,1.371315963233303,3.9405328813310376,False
+unit_value_vs_crop_sale_price,kg,Orange,1,2.4539833754076446,11.63459951452485,False
+unit_value_vs_crop_sale_price,kg,Other tuber or stem,1,0.8209805371686691,2.272727238860998,False
+unit_value_vs_crop_sale_price,kg,Vetch,1,0.23548159500277865,1.26551808918595,False

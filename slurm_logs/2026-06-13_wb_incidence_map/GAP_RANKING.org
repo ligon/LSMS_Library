@@ -151,6 +151,11 @@ thin their target is, and which roster section the raw counts sit in).
 
 * GAP 5 — Anthropometry  [THEIRS-ONLY × 5: ETH, MWI, NGA, TZA, UGA]
 
+*Update (2026-09-09)*: =anthropometry= now exists as a feature
+(=lsms_library/data_info.yml:710=), built in the 2026-06-14 parity loop
+and merged as PR #434 (=slurm_logs/2026-06-14_parity_loop/HANDOFF.org=).
+The "we have NO =anthropometry= feature" text below is historical.
+
 Why: a NEW feature — we have NO =anthropometry= feature anywhere. (Our
 =nutrition= is nutrient *intake*, a different thing — see note.) Their
 weight/height/z-scores cover 5 of 7 (Mali/Niger have none either side).

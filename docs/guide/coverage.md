@@ -30,7 +30,7 @@ re-implements the sanity checks.
 
 | Tier | Meaning |
 |------|---------|
-| `n/a` | No per-wave readiness applies (a country-level-only feature like `panel_ids`, or a table with no `t` axis). |
+| `n/a` | No per-wave readiness applies — a feature with **no wave axis at all** (`panel_ids`, `updated_ids`), or a built table with no `t` index level. Note this is *not* the same as "built by a country-level script"; see [below](#country-level-tables-are-still-graded-per-wave). |
 | `absent` | The feature applies to the country, but its source is **not declared for this wave**. An expected gap, not a defect. |
 | `declared` | Source present for the wave; readiness not assessed (a coverage-only run). |
 | `dropped` | Source **declared** for the wave but the wave is **missing/empty** in the built table — a silent-drop hazard. |
@@ -40,6 +40,54 @@ re-implements the sanity checks.
 | `blessed` | `sane` **and** listed in the git-tracked blessing file `.coder/coverage/blessed.csv`. |
 | `not-asked` | Adjudicated: the survey instrument genuinely never asked. Closed. |
 | `asked-not-distributed` | Adjudicated: the instrument **did** ask, but the shipped extract does not carry the variables. An *acquisition* problem. |
+
+### Country-level tables are still graded per wave
+
+Most tables are declared per wave, so `Wave.data_scheme` answers "is this
+feature covered for this wave?" directly. Some are not: a country may build a
+table from a single **country-level** `countries/{C}/_/{feature}.py`
+(`materialize: make` in the country `data_scheme.yml`), declared in **no**
+wave's `data_info.yml` at all. `Wave.data_scheme` then has nothing to say about
+it, and asking it anyway returns "not declared" for every wave.
+
+Such a table is not `n/a` and it is certainly not `absent` — it usually carries
+a `t` index level naming exactly the waves it serves. So the grader reads
+coverage off the **built table's own `t` values**:
+
+- a wave present in `t` is graded normally (`sane` / `builds` / `blessed`);
+- a wave absent from `t` is `absent` — the country-level script does not serve
+  it, and nothing declared it either;
+- a wave absent from `t` is **never** `dropped`. `dropped` means "declared for
+  this wave, then missing from the build", and a wave that declares nothing
+  cannot have dropped anything;
+- if the country-level build *raises*, every wave is `broken`, not `absent`;
+- a country that ships a `_/{feature}.py` but declares the feature **nowhere**
+  is `undeclared`, not `broken` — nothing was wired, so nothing is built.
+  (Guatemala and Panama both carry a `_/nutrition.py` they never declare. The
+  old allowlist built it anyway, filed the resulting `AttributeError` as
+  `broken`, and left two rows on one `(country, feature, wave)` key.)
+
+A `--no-readiness` (coverage-only) run has no built table to read, so it reports
+these cells `declared`: config knows the country declares the feature, and
+cannot know which waves it serves.
+
+!!! note "Why this is a test and not a list of feature names (GH #818)"
+    Country-level-ness is a property of the `(country, feature)` **declaration**,
+    not of the feature name. `community_prices` is per-wave in seven countries
+    and country-level in exactly one — EthiopiaRHS, whose
+    `_/community_prices.py` serves six of its eight waves with 2,691 rows. Under
+    the hand-maintained name allowlist that preceded this, all eight of those
+    waves graded `absent` ("source not declared for wave"): a built, working
+    cell parked in the **live work queue**, which is how the bug surfaced (a
+    reader inventorying price sources skipped the country). The allowlist was
+    only ever right for whoever last remembered to edit it. The test is
+    `_has_country_level_feature()` **and** "declared by no wave" — both halves,
+    since a country script alone does not make a feature country-level (Nigeria
+    has both kinds), and "declared by no wave" alone is just an
+    un-written-config `absent` (Nepal, Peru).
+
+    Only `panel_ids` and `updated_ids` are still keyed by name: they return
+    dicts, not DataFrames, so there is no `t` to slice and no wave axis to grade.
 
 ## Adjudicating an `absent` cell
 

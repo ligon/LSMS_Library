@@ -1,0 +1,333 @@
+#+title: Workplan: acting on the EPAR learnings
+#+author: Sue (Claude Fable 5.1), for Ethan Ligon
+#+date: 2026-09-09
+#+columns: %40ITEM %8Effort(Est){:} %10TODO %12TAGS
+
+* How this is organised
+
+Four phases, ordered by risk and by what unblocks what.  Phase 0 is
+documentation and issue hygiene and can run today on this node; Phase 1
+is low-risk additive code; Phase 2 is the substantive wiring and the one
+corpus-wide change; Phase 3 is the schema proposal that unblocks GH #439;
+Phase 4 is the numeric parity run and the upstream note to EPAR.  Each
+item names the learning it acts on (=LEARNINGS.org= L1-L12, section 3
+row numbers as N1-N12), what it touches, how to verify, and the
+delegation model.  Effort is a rough estimate in agent-hours of
+wall-clock, not a promise.
+
+Delegation defaults (per @ligon, 2026-09-09): Sonnet or Haiku for search
+and extraction, Opus for intermediate work and red-team, Fable in a pinch.
+Every country-scoped agent reads =countries/{C}/_/CONTENTS.org= first and
+names the idiosyncrasies it cross-referenced; every code change is
+verified with =PYTHONPATH= set to the worktree and the
+=assert 'worktrees' in lsms_library.__file__= guard.  Prior-art ledger
+(=.coder/ledger/=) for every Phase 2 and 3 item.
+
+Cache note: an edit to =transformations.py= moves
+=build_transforms_fingerprint= only for =@build_transform=-tagged
+callables; the parity transforms and =median_price_valuation= are
+analyst-callable and outside the fingerprint.  =conversion_to_kgs= and
+=_get_kg_factors= (Phase 2, L2/L3) ARE on the food build path and will
+cold-rebuild every country's =food_quantities= / =food_prices=; plan a
+corpus re-warm and a regrade after that item, not before.
+
+* Phase 0 -- documentation and issue hygiene (today)
+
+** DONE Correct the two Ethiopia =CONTENTS.org= statements     :docs:L1:N1:N3:
+:PROPERTIES:
+:Effort: 0:30
+:END:
+- =Ethiopia/_/CONTENTS.org:1036-1039=: the local area-unit factors ARE
+  in the repo (sidecars 2011-12 .. 2018-19, two blobs cached); replace
+  "not in the repo" with the true state and EPAR's explanation for the
+  missing 2021-22 file (=EPAR_UW_Ethiopia_ESS_W5.do:324=).
+- =:153-156= vs =:279-281=: =conversion_to_kgs.json= was built from
+  =Food_CF_Wave1-4=; =food_cf_wave5= is held and unused.  Say so once.
+- Model: Sonnet, or do it by hand.  Verify: =git diff=; no build.
+
+** DONE Correct =Malawi/_/CONTENTS.org:653-660= source list           :docs:L1:N4:
+:PROPERTIES:
+:Effort: 0:15
+:END:
+Add =ihs_seasonalcropconversion_factor_2020.dta= and
+=ihs_treeconversion_factor_2020.dta= to the DVC source inventory, marked
+unwired.
+
+** DONE Weight-raking note in five =CONTENTS.org= files              :docs:S4:
+:PROPERTIES:
+:Effort: 0:30
+:END:
+One line under each country's weights section (Ethiopia, Malawi,
+Nigeria, Tanzania, Uganda): EPAR's published levels are population-raked
+and not comparable to ours at the level, only as ratios.  Model: Sonnet.
+
+** DONE File the new issues                                         :issues:
+:PROPERTIES:
+:Effort: 1:30
+:END:
+:LOGBOOK:
+- State "DONE" from "TODO" [2026-09-09] \\
+  Filed as #852 Ethiopia Crop_CF, #853 Ethiopia area units, #854 Malawi IHS5
+  crop CFs, #855 Malawi ag_r07, #856 Malawi free-text, #857 Tanzania Quantity
+  screen, #858 Tanzania plot_inputs join, #859 Nigeria KgFactor, #860 Nigeria
+  area factors, #861 Uganda 99999, #862 plot_cultivation schema, #863
+  transforms umbrella.  Drafts, review changelog and FILED.tsv in issues/.
+:END:
+One issue each, body drawn from =LEARNINGS.org= section 3 with the
+red-team's line citations.  Model: Sonnet drafts, I review before =gh
+issue create=.
+- [X] Ethiopia: wire =Crop_CF_Wave{2..5}= into =harvest_kg= (L1, N2); note
+  the duplicate row in Wave 5 (=W5.do:349=).
+- [X] Ethiopia: wire =ET_local_area_unit_conversion= for plot areas (L1, N1).
+- [X] Malawi: wire the two IHS5 crop-side conversion files (L1, N4);
+  =_harvest_block='s dead =condition= parameter (N5) as a sub-bullet.
+- [X] Malawi: =_livestock_block= never reads =ag_r07= in 2010-11/2013-14 (N6).
+- [X] Malawi: harvest-side free-text unit/crop recovery, row-count cost
+  to be measured first (N7).
+- [X] Tanzania: report-only plausibility count on
+  =crop_production.Quantity= (L10, N9); cite the 7.5M kg rows.
+- [X] Tanzania: check our =plot_inputs= join against EPAR's 80/10,607
+  unmatched (N10).
+- [X] Nigeria: per-row crop conversion factor as =KgFactor= (L11, N11;
+  sibling of #849).
+- [X] Nigeria: zone-specific heaps/ridges/stands area factors (L11).
+- [X] Uganda: strip the 2009-10 =A5aq6a == 99999= sentinel (N12;
+  promote the =CONTENTS.org:2098-2102= TODO to an issue).
+- [X] Cross-country: =dm_gender= / =plot_cultivation= schema proposal
+  under #167 and #439 (L4) -- see Phase 3 for the body.
+- [X] Transforms: =livestock_income=, =rcsi=, HDDS/FCS, fertiliser rate,
+  gross crop revenue, Shannon diversity (L8) -- one umbrella issue.
+
+** DONE Comment on existing issues with what the survey adds         :issues:
+:PROPERTIES:
+:Effort: 0:45
+:END:
+:LOGBOOK:
+- State "DONE" from "TODO" [2026-09-09] \\
+  Posted on #850 #820 #824 #844 #846 #585 #737 #439 #438 after an Opus review
+  (issues/REVIEW_COMMENTS.md); drafts kept as issues/COMMENT_*.md.
+:END:
+- [X] #850: the L2 measurement (no =j= at any step of =conversion_to_kgs=;
+  the =Expenditure= median vs =Expenditure/Quantity= observation).
+- [X] #820: bounded to W1-W3; ESS4/5 folded section 12 into 11
+  (=W4.do:759=); check that section 11 carries tree crops in W4/W5.
+- [X] #824: EPAR's sold-unit tables as a template, with the 2018-19
+  condition-as-unit trap (L7).
+- [X] #844: EPAR tried =sa3q18= in W2 and abandoned it (=W2.do:644-645=);
+  compare before wiring.
+- [X] #846: EPAR imputes because nothing was asked; verdict stands.
+- [X] #585 / #575: EPAR corroborates the ladder; the purchase-side bias
+  (=SYNTHESIS.org:750-753=) must be disclosed by any =valuation=== kwarg.
+- [X] #737: EPAR's TLU coefficients are unsourced; ours cite Jahnke 1982.
+- [X] #439: L4's finding and the =season= / =plot_cultivation= caveats.
+- [X] #438: the consumption-by-source repo covers the EHCVM tier and
+  ships a crop-category crosswalk to screen against #833.
+
+** DONE Refresh =GAP_RANKING.org= GAP 5                             :docs:
+:PROPERTIES:
+:Effort: 0:10
+:END:
+=anthropometry= exists (=data_info.yml:710=); the June document still says
+it does not.  One dated note at the top of GAP 5.
+
+* Phase 1 -- additive code, low risk
+
+** DONE =median_price_valuation(weight_col=None)=                    :code:L5:
+:PROPERTIES:
+:Effort: 2:00
+:END:
+Weighted median when given; default unchanged.  Docstring gains the
+convergence note (WB, EPAR Ag, EPAR consumption, ours: finest cell with
+>= 10) and the statement of the real deltas (weighting; gated vs
+unconditional national rung).  Tests: weighted == unweighted under equal
+weights; a hand case.  Model: Opus in a worktree; Sonnet red-team.
+
+** DONE =rcsi(food_coping)= transform                                :code:L8:
+:PROPERTIES:
+:Effort: 1:30
+:END:
+WFP weights 1,1,1,3,2 over the five stored strategy counts; phases as a
+separate helper with closed intervals (avoid EPAR's =rcsi == 19= gap).
+Countries: those with =food_coping= (Malawi first).  Model: Sonnet.
+
+** DONE Report-only plausibility count on =crop_production.Quantity=  :code:L10:
+:PROPERTIES:
+:Effort: 2:00
+:END:
+Same shape as =harvest_kg='s factor screen: count, name the rows, never
+clip.  Query-time diagnostic in =transformations.py= or a null-read-style
+warning; decide which after reading =null_read_audit.py=.  Model: Opus.
+
+** DONE Uganda 2009-10 =99999= sentinel                             :code:N12:
+:PROPERTIES:
+:Effort: 1:00
+:END:
+Wave-level =drop:= / =derived:= rule or colmap change; test that no
+legitimate quantity near 99999 is touched.  Uganda re-warm after.
+Model: Sonnet, worktree, =LSMS_COUNTRIES_ROOT= lever.
+
+* Phase 2 -- wiring and the one corpus-wide change
+
+** DONE Shared =shipped_factors= layer in =harvest_kg= (prerequisite for #852/#854)
+:PROPERTIES:
+:Effort: 4:00
+:END:
+Merged 675fc34a after red-team (REDTEAM_P2_shipped_factors.org).  Explicit
+loaders, no registry (decision recorded in the ledger).  =shipped_matched=
+count + =ShippedFactorWarning= on a zero match; =u= required among keys.
+
+
+** DONE Ethiopia: WB conversion files into =harvest_kg= and plot areas   :code:L1:
+:PROPERTIES:
+:Effort: 6:00
+:END:
+- Loader for =Crop_CF_Wave{2..5}= (crop x unit x region), de-duplicating
+  the Wave-5 (74, 62) row deliberately; decide the layer's rank relative
+  to =reported= and =survey_median= (proposal: after =reported=, before
+  =survey_median=, since it is externally sourced; record the decision in
+  the ledger and the =harvest_kg= docstring).
+- =ET_local_area_unit_conversion= into =plot_features.Area= where the
+  wave reports local units.
+- Ethiopia re-warm; regrade Ethiopia cells.  Model: Opus, worktree;
+  Opus red-team; prior-art ledger.
+
+** WAITING Malawi: IHS5 crop-side conversion files                     :code:L1:L9:
+:PROPERTIES:
+:Effort: 5:00
+:END:
+Same shape as Ethiopia with a different fallback ladder (region ->
+national -> generic unit).  Make =_harvest_block='s =condition= parameter
+live or remove it.  Do NOT port EPAR's crop allowlist for the
+shelled/unshelled ratio; the ratio layer itself (L9) waits for Phase 3's
+=condition= decision on Malawi.
+
+** TODO Sold-unit conversion for Uganda and Nigeria (#824)
+:LOGBOOK:
+- Note taken on [2026-09-10] \\
+  Uganda half merged 42e1c19e and re-warmed; disagreement is a flag, not an
+  identification (red-team).  Nigeria and Niger halves remain.
+:END:          :code:L7:
+:PROPERTIES:
+:Effort: 5:00
+:END:
+Malawi's 2026-09-08 fix is the in-repo precedent.  Uganda: re-derive the
+2018-19 sold-unit column from =CONTENTS.org:1009-1027=, never from
+EPAR's W7 wiring.  Nigeria: hh-crop grain per #843; carry =Unit_sold=
+and let =harvest_kg= consumers decide.
+
+** DONE Nigeria per-row =KgFactor= (#849 sibling)                   :code:L11:
+:PROPERTIES:
+:Effort: 3:00
+:END:
+=sa3iq6_conv= / =sa3iiq1_conv= / =sa3iiiq13_conv= per wave into the optional
+canonical column; =harvest_kg= already prefers it.  Nigeria re-warm.
+
+** TODO Food-side kg inference: item axis and provenance (#850)
+:LOGBOOK:
+- State "WAITING" from "TODO" [2026-09-09] \\
+  Design doc merged (slurm_logs/gh850_design/DESIGN.org, a73437fd).  @ligon
+  ruled: D5 floor 5 with a dispersion-gated 3-4 exception; D7 let the
+  vocabulary fix reach harvest_kg in its own commit.  Implementation dispatched.
+  Finding: NO re-warm needed -- transformations.py is outside every build
+  fingerprint; cost is a regrade.
+:END:     :code:L2:L3:
+:PROPERTIES:
+:Effort: 8:00
+:END:
+The corpus-wide one.  Add =j= to the baseline group of =conversion_to_kgs=
+/ =_get_kg_factors=; resolve the =Expenditure=-median observation
+(measure the per-row =Quantity= distribution first); return per-row layer
+provenance like =KgFactorSource=.  Measure the movement in
+=food_quantities= / =food_prices= per country before landing; then a full
+re-warm and regrade.  Model: Opus with a design doc first; Opus red-team;
+@ligon signs off on the measured movement.
+
+** DONE Transforms: =livestock_income=, HDDS/FCS, small reductions   :code:L8:
+:PROPERTIES:
+:Effort: 4:00
+:END:
+=livestock_income= needs a design note: our =livestock.Value= is a reported
+hypothetical, not a transaction price; EPAR's construct needs sold and
+slaughtered head counts and a price ladder.  HDDS/FCS need our own
+food-group taxonomy over =harmonize_food=, not EPAR's =recode= ranges.
+
+** DONE Own-production valuation kwarg (#585)                       :code:L6:
+:PROPERTIES:
+:Effort: 4:00
+:END:
+=food_expenditures(basis='total', valuation='own_price'|'median_price')=,
+opt-in, never default, docstring states the purchase-side bias with the
+Uganda number.  Reuses =median_price_valuation= with =geo_levels= from
+=cluster_features=; Ethiopia degrades to coarser rungs than EPAR's and
+must say so.
+
+* Phase 3 -- schema: the plot decision-maker grain (#439, #167)
+
+** TODO Schema proposal: =plot_cultivation= with the person/role axis   :design:L4:
+:PROPERTIES:
+:Effort: 4:00
+:END:
+Under #167's reserved name and #439's owner-expansion convention.  Grain
+=(t, i, plot, season, pid, role)= -- =season= is not optional (Uganda
+=:433=, Tanzania =:263=).  Roles: decision-maker slots 1-3 (and Uganda's
+two), with the head-of-household fallback as a documented transform
+rule, not a stored row.  Reconcile with =crop_production='s existing
+=season= level and with Ethiopia's =holder_id= already folded into
+=plot_id=.  Model: Opus writes the proposal against
+=DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org= and
+=DESIGN_erhs_plot_features_2026-05-20.org=; @ligon decides.
+
+** TODO Column-adds in the three countries                           :code:L4:
+:PROPERTIES:
+:Effort: 6:00
+:END:
+Uganda 2015-16 (=AGSEC3A/B=: =a3aq3_3=, =a3aq3_4a/b=), Ethiopia 2018-19
+(=sect3_pp_w4=: =s3q13=, =s3q15_1/2=), Tanzania 2019-20/2020-21
+(=ag3a_08b_*=; 2020-21's file is lowercase).  Files already open in our
+wave scripts.  Then the other waves of each.  Tanzania 2012-13 is a new
+acquisition, not a column-add.  Model: one Sonnet per country in
+worktrees, Opus red-team.
+
+** TODO =dm_gender= transform and =individual_assets= feature         :code:L4:
+:PROPERTIES:
+:Effort: 6:00
+:END:
+=dm_gender= as a =transformations.py= reduction over the new table.
+=individual_assets (t, i, j, pid)= as a NEW feature from Ethiopia
+=sect11_hh_w4= (item by owner slot) and Uganda =AGSEC2A/6A=, =gsec14=;
+not a retrofit of =assets=.  This is #439's flagship, built from ISA
+data we hold.
+
+* Phase 4 -- parity run and upstream
+
+** TODO Numeric parity against EPAR's estimates workbook              :audit:
+:PROPERTIES:
+:Effort: 8:00
+:END:
+Diff the 150 published indicators against the 201-item master list
+first.  Then, for the indicators we can reconstruct (farm size, plot
+counts, labor days, TLU, harvest kg, yields), compare rural-only,
+ratios and shares only (levels differ by the raking), with EPAR's
+winsorised =w_= columns set aside in favour of their raw twins where the
+final =.dta= carries both.  Read-only; the workbook and join keys are on
+disk.  Same conditioning caveat as the WB panel: their sample is the
+ag-household subsample.  Model: Opus with a Sonnet per country.
+
+** TODO Shelled/unshelled cross-condition layer                      :code:L9:
+:PROPERTIES:
+:Effort: 4:00
+:END:
+After Malawi has a =condition= level.  A principled per-crop ratio with
+its own N threshold and no crop allowlist, as a fifth =harvest_kg= layer.
+
+** TODO Note to EPAR                                                 :upstream:
+:PROPERTIES:
+:Effort: 1:00
+:END:
+@ligon's call whether and how.  Content: Uganda 2015-16 sold values in
+the published estimates (the #829 mechanism, which their readme does
+not name); Malawi =price_kg= rungs built from =price_unit= in all four
+waves; Tanzania =ag4a_27= used as kg and as percent; Uganda 2018-19
+season-A unit merge on condition codes; =rcsi == 19= phase gap.  Their
+repos have issues enabled and nearly unused (one closed issue on the
+code repo, answered in five days), so a GitHub issue is a live channel.

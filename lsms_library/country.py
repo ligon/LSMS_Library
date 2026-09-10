@@ -59,6 +59,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 import importlib.util
@@ -2329,15 +2330,26 @@ class Country:
         # when the caller does df.to_parquet().  Enforce a uniform string dtype
         # here so Feature('housing')([...]) concatenation is always clean.
         # Fixes GH #142.
+        # The coercion is `format_id` -- the SAME rule `df_data_grabber`
+        # applies to every `idxvars` entry, and therefore to
+        # `cluster_features.v`, which is the column this joined `v` has to
+        # compare equal to.  `sample` declares `v` as a *column*, so
+        # `format_id` never ran on it at grab time (CLAUDE.md "Gotchas with
+        # Teeth": auto-applied to idxvars, NOT to myvars) and this is the only
+        # place the two sides are reconciled.
+        #
+        # It replaces `str(int(float(x)))`, which normalised a float but also
+        # rewrote a string id that was already canonical: Ethiopia's
+        # zero-padded 15-digit EA id '010101088801601' came back
+        # '10101088801601' and matched no cluster (GH #819; raw match against
+        # cluster_features was 9-46% by wave).  `format_id` strips a trailing
+        # decimal only when the whole string is numeric ('1013.0' -> '1013')
+        # and preserves leading zeros -- see its docstring and GH #222.
+        # Behaviour change worth naming: it does not catch OverflowError, so a
+        # non-finite v now raises instead of passing through as 'inf'.
+        # NaN / '' / '.' return None, which `astype(StringDtype)` renders pd.NA.
         if 'v' in flat.columns:
-            def _v_to_str(x):
-                if pd.isna(x) or x == '':
-                    return pd.NA
-                try:
-                    return str(int(float(x)))
-                except (ValueError, OverflowError):
-                    return str(x).strip()
-            flat['v'] = flat['v'].map(_v_to_str).astype(pd.StringDtype())
+            flat['v'] = flat['v'].map(format_id).astype(pd.StringDtype())
 
         # Insert v after t in the index
         new_idx = []
@@ -2359,6 +2371,58 @@ class Country:
         # bug, before id_walk itself was made safe.
         result.attrs = dict(df.attrs)
         return result
+
+    def _valuation_geo(self, waves=None):
+        """Coarser geographic rungs for ``food_expenditures(valuation=...)``.
+
+        The finest rung, ``v``, rides on ``food_acquired``'s own index and
+        needs no lookup.  This assembles whatever coarser rungs of
+        :data:`~lsms_library.transformations.VALUATION_GEO_LEVELS` this
+        country's ``cluster_features`` actually carries, ordered finest ->
+        coarsest, indexed on ``(t, v)``.
+
+        **Degrade loudly.**  A country with no ``District`` column gets a
+        shorter ladder, which is not an error -- the national fallback in
+        ``median_price_valuation`` is unconditional, so every row is still
+        priced -- but it means the imputed price comes from a coarser market
+        than the caller may assume.  Ethiopia is the case in point: it degrades
+        to fewer rungs than EPAR's own admin cascade.  So the rungs available
+        and the rungs missing are BOTH named in a
+        :class:`~lsms_library.transformations.ValuationLadderWarning`, rather
+        than left to be inferred from silence.
+        """
+        from .transformations import (VALUATION_GEO_LEVELS,
+                                      ValuationLadderWarning)
+        coarse = [c for c in VALUATION_GEO_LEVELS if c != 'v']
+        geo = None
+        have, missing = [], list(coarse)
+        try:
+            cf = self.cluster_features(waves=waves)
+        except Exception as exc:                      # noqa: BLE001
+            warnings.warn(
+                f"{self.name}/food_expenditures(valuation=...): "
+                f"cluster_features is unavailable ({exc!r}), so the price "
+                f"ladder runs on 'v' and the national rung only; "
+                f"{coarse} are not available.",
+                ValuationLadderWarning, stacklevel=2)
+            return None
+        if isinstance(cf, pd.DataFrame) and not cf.empty:
+            have = [c for c in coarse if c in cf.columns]
+            missing = [c for c in coarse if c not in cf.columns]
+            if have:
+                geo = cf[have]
+        if missing:
+            warnings.warn(
+                f"{self.name}/food_expenditures(valuation=...): geographic "
+                f"price ladder degraded.  Rungs available: "
+                f"{['v'] + have + ['national']}; not available in "
+                f"cluster_features: {missing}.  Every row is still priced "
+                f"(the national rung is an unconditional fallback), but the "
+                f"imputed price is drawn from a coarser market than the full "
+                f"{list(VALUATION_GEO_LEVELS) + ['national']} ladder would "
+                f"give.",
+                ValuationLadderWarning, stacklevel=2)
+        return geo
 
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
         """Join a market identifier ``m`` onto *df*, preferring the HH-level
@@ -2871,6 +2935,31 @@ class Country:
             df = _normalize_dataframe_index(df, scheme_entry, None, method_name,
                                             country=self.name)
 
+            # Re-key `i` through `updated_ids` BEFORE the v-join below.
+            # `sample()` is finalised through this same method, so the `i` it
+            # returns is already walked; joining a pre-walk `i` against it
+            # matches only the households `updated_ids` never re-keyed.  For
+            # Ethiopia ESS that is precisely the urban refreshment cohort, so
+            # 2013-14 / 2015-16 came back 68.5% / 66.6% `v = NaN` and the
+            # survivors were silently urban-only (GH #819).  Nothing else in
+            # the pipeline reads `i` between here and the old position, and
+            # `id_walk` is index-level-order agnostic, so this is a pure move.
+            #
+            # The flag is still set exactly once -- by `id_walk` itself, after
+            # its per-wave concat -- and `_join_v_from_sample` carries it over
+            # its merge with the explicit `result.attrs = dict(df.attrs)`,
+            # which that merge needs because it *disagrees* on `attrs`
+            # (tests/test_population.py::TestVJoinIsADisagreeingMerge).
+            # The `reorder_levels` block stays after the v-join: it is the join
+            # that adds the `v` level it has to place.
+            if (
+                'i' in df.index.names
+                and not df.attrs.get('id_converted')
+                and method_name not in ['panel_ids', 'updated_ids']
+                and self._updated_ids_cache is not None
+            ):
+                df = id_walk(df, self.updated_ids)
+
             # Join v from sample() for household-level tables that lack it.
             # Skip if v is already in the index OR already present as a
             # column (a legacy script may have written v alongside other
@@ -2902,14 +2991,6 @@ class Country:
                         warnings.warn(
                             f"Could not reorder index levels for {method_name}: {exc}"
                         )
-
-            if (
-                'i' in df.index.names
-                and not df.attrs.get('id_converted')
-                and method_name not in ['panel_ids', 'updated_ids']
-                and self._updated_ids_cache is not None
-            ):
-                df = id_walk(df, self.updated_ids)
 
             # Normalise "Relation" -> "Relationship" so kinship expansion fires
             if "Relation" in df.columns and "Relationship" not in df.columns:
@@ -3051,6 +3132,23 @@ class Country:
             check_declared_columns(
                 df, _required_scheme_columns(scheme_entry),
                 country=self.name, table=str(method_name or "?"))
+
+            # SITE Q of the content audit (GH #857).  Site B asks whether a
+            # declared column holds ANYTHING; this asks whether what it holds
+            # is POSSIBLE.  Tanzania 2020-21 reports 7,500,000 kg of coconuts
+            # from one plot: present, non-null, correctly typed, uniquely
+            # indexed, and graded `sane`.  It COUNTS AND NAMES the rows and
+            # changes not one value -- see lsms_library/quantity_audit.py for
+            # the rule and for why clipping is the wrong repair.
+            #
+            # Here for the same two reasons as SITE B: `_finalize_result` runs
+            # on EVERY read, warm cache included, so the finding needs no
+            # stamp-and-replay (unlike GH #323, the evidence is IN the
+            # parquet); and it is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # this costs no cache invalidation.  MEASURED, not assumed: 0 of 12
+            # probed table hashes and 0 of 5 build fingerprints moved.
+            check_quantities(
+                df, country=self.name, table=str(method_name or "?"))
 
         return df
 
@@ -4331,7 +4429,7 @@ class Country:
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
                        units=None, volume_as_mass=True, currency=None, numeraire=None,
-                       basis=None):
+                       basis=None, valuation=None):
                 # `labels` has two faces; see _split_labels_arg.  `j_labels` is
                 # the historical scalar (food's fine->coarse rename of the `j`
                 # level); `map_labels` is the {target: variant} selection
@@ -4361,6 +4459,25 @@ class Country:
                         raise ValueError(
                             f"food_expenditures() basis= must be 'purchased' or "
                             f"'total'; got {basis!r}"
+                        )
+                if valuation is not None:
+                    if name != 'food_expenditures':
+                        raise TypeError(
+                            f"{name}() got an unexpected keyword argument "
+                            "'valuation'; only 'food_expenditures' accepts it."
+                        )
+                    # Validated EARLY for the same reason basis= is: the
+                    # derive path's broad except would otherwise swallow the
+                    # transform's ValueError and surface a confusing "could
+                    # not materialize" (#575).
+                    from .transformations import _normalize_valuation_arg
+                    _normalize_valuation_arg(valuation)
+                    if basis != 'total':
+                        raise ValueError(
+                            f"food_expenditures() valuation={valuation!r} "
+                            "requires an explicit basis='total'; the default "
+                            "basis='purchased' drops the very rows valuation= "
+                            "exists to value, so it would silently do nothing."
                         )
                 if (volume_as_mass is not True
                         and name not in {'food_prices', 'food_quantities'}):
@@ -4417,6 +4534,9 @@ class Country:
                         transform_kwargs['volume_as_mass'] = volume_as_mass
                     if name == 'food_expenditures' and basis is not None:
                         transform_kwargs['basis'] = basis
+                    if name == 'food_expenditures' and valuation is not None:
+                        transform_kwargs['valuation'] = valuation
+                        transform_kwargs['geo'] = self._valuation_geo(waves)
                     derived = None
                     try:
                         fa = self._aggregate_wave_data(waves, 'food_acquired')
@@ -4427,14 +4547,18 @@ class Country:
                                                             currency=currency,
                                                             labels=map_labels)
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if units is not None or map_labels:
+                        if units is not None or map_labels or valuation is not None:
                             # Caller explicitly asked for canonical units= /
-                            # labels= behaviour; the legacy fall-through path
-                            # can't honour either, so surface the failure rather
-                            # than silently returning un-units-aware or
-                            # un-relabelled data.  (Without this, a bad labels=
-                            # dict raised by _apply_categorical_mappings would be
-                            # swallowed here and degrade to the legacy path.)
+                            # labels= / valuation= behaviour; the legacy
+                            # fall-through path can't honour any of them, so
+                            # surface the failure rather than silently returning
+                            # un-units-aware, un-relabelled or UNVALUED data.
+                            # (Without this, a bad labels= dict raised by
+                            # _apply_categorical_mappings would be swallowed
+                            # here and degrade to the legacy path -- and a
+                            # valuation= that could not run would come back
+                            # looking exactly like one that ran and changed
+                            # nothing, which is the worse failure of the two.)
                             raise
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
@@ -4446,6 +4570,24 @@ class Country:
                         # through to the legacy aggregation path.
                         _assert_label_targets_present(derived, map_labels,
                                                       country=self.name, table=name)
+                        # BELT-AND-BRACES, and the reason matters because a
+                        # wrong one is exactly the failure CLAUDE.md corrects
+                        # for _join_v_from_sample.  Measured 2026-09-09: the
+                        # post-steps below already re-attach `attrs`
+                        # themselves (_add_market_index at country.py:2547,
+                        # _relabel_j at :2899, and `convert` likewise), and on
+                        # THIS path `v` is already an index level so
+                        # _join_v_from_sample skips rather than merging -- so
+                        # nothing in the current pipeline would drop the
+                        # tallies without this line.  It is kept anyway: the
+                        # governing rule is that `attrs` survive only when
+                        # every input AGREES (CLAUDE.md, "Panel ID Transitive
+                        # Chains"), so a future post-step that grows a second,
+                        # disagreeing input would drop them SILENTLY.  Do not
+                        # read this as "the merges below drop attrs"; they do
+                        # not, today.
+                        _val_attrs = {k: v for k, v in derived.attrs.items()
+                                      if k.startswith('valuation')}
                         reagg = name in {'food_expenditures', 'food_quantities'}
                         derived = self._relabel_j(derived, j_labels, reaggregate=reagg)
                         if market is not None:
@@ -4453,6 +4595,8 @@ class Country:
                         if numeraire is not None:
                             from .conversion import convert as _convert
                             derived = _convert(derived, to=numeraire, country=self.name)
+                        if _val_attrs:
+                            derived.attrs.update(_val_attrs)
                         return derived
 
                 # Derive household_characteristics from household_roster

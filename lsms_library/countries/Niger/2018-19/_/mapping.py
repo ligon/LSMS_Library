@@ -4,6 +4,12 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as _food_acquired_canonical
 
+# The country module holds the shared `u` sentinel (GH #842).
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.append(str(_Path(__file__).resolve().parents[2] / '_'))
+from niger import fill_missing_u as _fill_missing_u  # noqa: E402
+
 
 # Pre-decode byte fixups.  The export pipeline upstream of pyreadstat
 # replaced the second byte of certain UTF-8 codepoints with literal
@@ -146,13 +152,25 @@ def food_acquired(df):
     """``food_acquired`` post-processor: canonical reshape + mojibake fix.
 
     Wraps ``transformations.food_acquired_to_canonical`` (the Phase 3
-    s-axis reshape) and then sweeps mojibake out of every string
-    column / index level.  See ``_decode_mojibake`` for the encoding
-    rationale.
+    s-axis reshape), sweeps mojibake out of every string column / index
+    level, then fills a missing ``u``.  See ``_decode_mojibake`` for the
+    encoding rationale.
+
+    The reshape drops every row left with no measurement, so the rows that
+    reach the fill are exactly the rows the table serves; ``fill_missing_u``
+    changes a value, never a row count.  A row that reported an amount with no
+    unit gets the ``Unknown`` sentinel instead of a NaN on the declared ``u``
+    index level, which the next ``groupby`` would delete silently (GH #842 --
+    the rationale is in ``niger.py`` at ``U_NA``).
+
+    This wave serves 0 NaN-``u`` rows today (the 12 #842 counted are in
+    2021-22); the fill is here so the two EHCVM waves cannot drift apart.
     """
     df = _food_acquired_canonical(df)
     df = _decode_mojibake_in_df(df)
-    return df
+    # Fill a missing unit with the `Unknown` sentinel, AFTER the mojibake
+    # sweep so the two never fight over the same value.
+    return _fill_missing_u(df)
 
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
                'AteLess', 'RanOut', 'Hungry', 'WholeDay']

@@ -6,6 +6,37 @@ Single Index:
   pid: individual id
   plot_id: plot id
   int_t: interview date
+  # `u` -- unit.  CANONICAL MISSING-UNIT SENTINEL: `Unknown` (GH #842/#847).
+  #
+  # A survey that records an amount and no unit must put `Unknown` on `u`, NOT
+  # a null.  `u` is a DECLARED index level in every table that has it
+  # (food_acquired, food_prices, food_quantities, crop_production, plot_inputs,
+  # community_prices), and a NaN on a declared index level is a DEFERRED SILENT
+  # DELETION: the row is served, so no build-time guard fires, and it then
+  # vanishes in whichever `groupby` runs first -- `_finalize_result`'s canonical
+  # de-dup, `Feature()` assembly, or the consumer's own aggregation -- because
+  # pandas `groupby(dropna=True)` drops NaN keys.  The loss is counted nowhere
+  # and is attributed to the consumer's code.  See CLAUDE.md "Grain Collapse"
+  # §3b, and the identical argument for `crop_production.condition`'s
+  # `unknown_condition` under `Columns:` below.
+  #
+  # `Unknown` is the spelling already in force: it is the non-ordinal sentinel
+  # for `individual_education.Educational Attainment` (see below), and Uganda's
+  # `crop_production` already writes it onto this very level.  Niger's four
+  # `u` tables joined it in #842 (its `_/categorical_mapping.org` maps
+  # `Manquant`/`manquant`/`produit absent` onto it, at build AND read time).
+  #
+  # CONSUMER RULE: `u == 'Unknown'` is NOT a unit.  Exclude it before any
+  # per-unit price, quantity or conversion, and REPORT how many rows you
+  # excluded.  Keeping it silently yields a price per nothing; dropping it
+  # silently is the bug the sentinel exists to make visible.
+  #
+  # NOT declared as a `spellings:` block under `Columns:`, deliberately:
+  # `diagnostics._check_declared_spellings` reads a `spellings` block as a
+  # CLOSED vocabulary and fails every value outside it, and the `u` vocabulary
+  # is deliberately open (cross-country unit harmonization is GH #223).
+  # Measured 2026-09-09: declaring it that way grades `fail` on every real unit
+  # in every food/crop country.
   u: unit
   m: region
   s: acquisition source       # values: purchased, produced, inkind, other (food_acquired)
@@ -34,6 +65,13 @@ Index Info:
     # need harmonizing before registration -- tracked separately.
     livestock: (t, i, animal)
     people_last7days: (t, v, i, pid)
+    # GH #817: `nonfood_expenditures` shipped in two shapes -- Togo long
+    # (t, i, j), Uganda/Nigeria a WIDE item-by-household matrix with `m` baked
+    # into the index -- and had no entry here, so nothing checked the cross-
+    # country assembly.  Registered with `v` present, which is what arms
+    # `_join_v_from_sample` (the table is household-grain and must NOT emit v
+    # itself); no `skip_extra` entry is therefore needed below.
+    nonfood_expenditures: (t, v, i, j)
 
   # Features whose reduced-index countries get their MISSING canonical levels
   # FABRICATED as NaN (so all countries share the full canonical shape and are
@@ -482,7 +520,7 @@ Columns:
         outside the source's labelled scheme -- it is a real value, never
         NA, because a null index key is silently dropped by the duplicate
         collapse in a country's build script.
-      spellings:
+      spellings: &crop_condition_vocabulary
         green_with_shell_and_stalk: []
         green_with_shell: []
         green_in_cob: []
@@ -504,6 +542,162 @@ Columns:
         dried_grain: []
         other_condition: []
         unknown_condition: []
+    KgFactor:
+      type: float
+      optional: true
+      note: |
+        Kilograms per ONE unit of this row's `u`, AS THE INSTRUMENT REPORTS
+        IT -- e.g. UNPS `a5?q6d`, "conversion factor into kg", asked
+        alongside the harvest quantity and unit.  `Quantity * KgFactor` is
+        that row's harvest in kilograms.  NaN where the survey does not
+        record it; optional because most countries never ask.
+
+        REPORTED, NEVER CONSTRUCTED.  Only a number the instrument wrote
+        down ON THIS ROW belongs in this column.  Nothing inferred goes here
+        -- not a median over sibling rows, not a factor from the library's
+        unit tables.  That keeps the served table what every crop_production
+        config already promises it is ("REPORTED values only -- no
+        harvest_kg / yield / main_crop", said independently by Uganda, Mali,
+        Niger, Tanzania and Togo), and it keeps the inference revisable
+        without a rebuild: construction happens at read time in
+        `transformations.harvest_kg`, which layers reported -> a shipped
+        conversion table -> median of reported for the same (u, condition)
+        in the same country-wave -> the library's inferred factor, and
+        discloses which layer served each row.
+
+        NOR A SHIPPED CONVERSION TABLE.  A survey-supplied table -- the WB's
+        Ethiopia `Crop_CF_Wave{2..5}`, Malawi's IHS5 crop files -- is keyed
+        on crop x unit x region, not on the row, so writing it here would
+        bake a de-duplication rule and a region join into a parquet where
+        neither can be seen or audited (GH #852's duplicate: crop 74, unit
+        62, 4.34 vs 6.125).  Such a table is applied AT READ TIME instead,
+        by `harvest_kg(shipped_factors=...)`, as its own `shipped` layer --
+        which also keeps the `reported_vs_shipped` disagreement audit
+        possible, since the two numbers stay distinct.  An earlier version
+        of this note read "the survey (or a survey-supplied conversion
+        table)", which pointed a loader author at this column; it does not
+        any more.
+
+        A FACTOR HERE, A PRODUCT IN `food_acquired`.  The antecedent is
+        `food_acquired.Quantity_kg` (Nigeria `s10bq2_cvn`, Malawi
+        `cfactor`), which carries the exact per-row kilogram AMOUNT and is
+        preferred over the inferred factor by the same rule -- see
+        `transformations.conversion_to_kgs` and
+        `food_quantities_from_acquired`.  The two are one design with one
+        difference of carrier, and the difference is forced by the grain.
+        Food rows are SUMMED across units within an acquisition source, so
+        food needs the summable product.  Crop rows sit at
+        (t, i, plot, j, u, condition, season) and are never summed across
+        `u` or `condition`, so the factor is the natural carrier: it
+        identifies the container (a 100 kg sack is not a 120 kg sack), it
+        can be audited against the library's inferred factors for the same
+        `u`, and the product is one multiplication away.
+
+        CONSUMERS MUST NEVER TREAT THIS AS A QUANTITY.  It is kg per unit,
+        not kg.  Summing it, averaging it across rows of different `u`, or
+        reading it as a harvest is a category error; the only sanctioned
+        use is `Quantity * KgFactor` on the SAME row, which is what
+        `harvest_kg` does.
+    Unit_sold:
+      type: str
+      optional: true
+      note: |
+        The unit the SALE was reported in, AS THE INSTRUMENT ASKED IT --
+        e.g. UNPS q7c, "Unit Code" on the sale block, asked beside the sold
+        quantity.  A SECOND unit, distinct from the row's `u`, which is the
+        HARVEST unit.
+
+        WHY IT IS A COLUMN AND NOT THE INDEX LEVEL `u`.  A harvest module
+        that asks "how much did you harvest, in what unit" and then "how
+        much of it did you sell, in what unit" has recorded ONE plot-crop
+        record with TWO units.  The harvest quantity is in `u`; the sold
+        quantity is in `Unit_sold`.  Making the sold unit a second index
+        level would split every row in two and duplicate the harvest; making
+        it overwrite `u` would relabel the harvest.  It is a per-row
+        attribute of the sale, so it is a column.
+
+        THE CONSUMER RULE, IN TWO PARTS, AND THE SECOND PART IS THE ONE
+        THAT BITES.
+
+        (1) WHERE `Unit_sold` AND `u` AGREE -- the large majority of rows --
+        `Value_sold / Quantity_sold` is a price per that unit, and a
+        farmgate price per kilogram is
+        `Value_sold / (Quantity_sold * kg-per-unit)`, converted through the
+        SAME unit machinery `u` uses.  Nothing is ambiguous here.
+
+        (2) WHERE THEY DISAGREE, THE ROW IS A FLAG, NOT AN IDENTIFICATION.
+        `Unit_sold` is what the household answered to "in what unit was it
+        sold", and it is the only honest label for `Quantity_sold` AS
+        REPORTED -- but a row whose two unit reports contradict each other
+        is a row whose unit reporting is unreliable, and the disagreement
+        does not say WHICH of the two answers is the sound one.  Measured on
+        Uganda (GH #824 red-team, 2026-09-10), by two tests that share no
+        instrument: `Unit_sold` is the CLOSER denominator on only 40.5% of
+        the disagreeing priced rows under a price test (n=1,021, benchmarked
+        on agreeing rows) and 42.7% under the household's OWN reported
+        sold-kg factor (UNPS q7d, n=468) -- i.e. `u` is closer more often
+        than `Unit_sold` is.  The single largest cell makes it concrete:
+        Uganda rows with `u = 'Sack (100 kgs)'` and `Unit_sold = 'Kg'` have
+        a median `Value_sold / Quantity_sold` of 34,167 UShs (n=162), which
+        is a SACK price -- taking it as a kilogram price overstates maize by
+        ~70x, an error in the opposite direction from the one this column
+        exists to prevent.
+
+        SO: a consumer forming a per-unit or per-kg price must treat
+        `Unit_sold != u` rows as AMBIGUOUS -- exclude them, or resolve them
+        with further evidence (a reported per-row sold kg factor, where the
+        survey has one) -- and must REPORT how many were excluded.  An
+        earlier version of this note said "a price per ONE `Unit_sold` --
+        NEVER per `u`"; that instruction was measured to be wrong on the
+        majority of exactly the rows it governed, and canonical-schema prose
+        is the worst place for such a rule.  Where `Unit_sold` is NA the
+        survey recorded no unit for that sale and the ratio has no
+        denominator you can name; that is not licence to substitute `u`
+        either.
+
+        HOW OFTEN IT MATTERS is a per-country fact and must be measured, not
+        assumed: sold and harvest unit agree on 95-97% of Nigeria's sale
+        rows, 63-99% of Niger's by wave, and 96.1% of Uganda's (measured
+        2026-09-10 over the 40,083 rows with a positive `Quantity_sold` that
+        know both units; GH #824).  Tanzania records every sale in kilograms
+        and needs no such column.
+
+        NA-BEARING, NEVER SENTINEL-FILLED.  `u` carries the string
+        `Unknown` because it is a declared INDEX level and a null index key
+        is deleted outright by `groupby(dropna=True)` (see the `u` note at
+        the top of this file).  `Unit_sold` is a column, has no such hazard,
+        and NA says something a category cannot: this row records no sale,
+        or records one whose unit the survey did not capture.
+
+        A COUNTRY MAY LEGITIMATELY NOT DECLARE IT.  Where the sale module
+        is a SEPARATE file at a coarser grain, the honest fix is to attach
+        the sale only to the harvest row measured in the SAME unit, so the
+        ratio is a price per `u` BY CONSTRUCTION -- which is what Malawi
+        does (`malawi._sale_block` / `assemble_crop_production`, commit
+        85947ff5, merging on `(i, _crop_code, u)`).  Both shapes are
+        correct; what is not correct is dividing by a quantity whose unit
+        the table never states.  `optional: true` because of exactly this:
+        the column exists where the instrument asks a second unit on the
+        same row (Uganda), and is absent where it does not.
+    Condition_sold:
+      type: str
+      optional: true
+      note: |
+        Physical state of the crop AT THE MOMENT OF SALE -- UNPS q7b,
+        "Condition/State Code", asked beside the sold quantity and the sold
+        unit.  Same vocabulary as the harvest `condition` above (the
+        `spellings` block is a YAML alias of it, so the two cannot drift),
+        and the same warning applies with more force: a quantity sold DRY
+        and a quantity sold FRESH are not commensurable, and neither are
+        their prices.
+
+        It is a separate answer from `condition`, not a copy: a household
+        may harvest green and sell dried.  NA where the wave records no
+        sold-condition column (Uganda 2011-12 ships none, though the
+        questionnaire asks it) or the household reported no sale --
+        NA-bearing for the same reason `Unit_sold` is, and unlike the
+        `condition` INDEX level, which must carry `unknown_condition`.
+      spellings: *crop_condition_vocabulary
   food_acquired:
     # Acquisition source 's' is an INDEX level (see Index Info above),
     # not a column.  Canonical values: purchased, produced, inkind,
@@ -529,6 +723,44 @@ Columns:
         in _finalize_result if not stored).  Farmgate price for
         s=produced (survey-reported where available).  Imputed value
         for s=inkind where available.  NaN otherwise.
+  nonfood_expenditures:
+    # GH #817.  The canonical shape is Togo's (PR #773): item-level, long, one
+    # row per (wave, household, item) actually reported.  It is
+    # `food_acquired` minus the unit `u` and the acquisition source `s` --
+    # non-food modules record an amount spent, not a quantity in a unit.
+    #
+    # SPARSITY, and it is the point of the shape.  A household that did not
+    # report an item has NO ROW -- never a fabricated 0.  That is the
+    # convention `transformations.food_expenditures_from_acquired` documents
+    # for food, and the wide item-by-household matrices Uganda and Nigeria used
+    # to serve broke it: their `fillna(0)` made "not asked / not reported" and
+    # "reported zero" the same number.
+    #
+    # `Expenditure` is the amount the household REPORTED, in nominal local
+    # currency, over the recall window the instrument used for that item.  It
+    # is NOT annualised and NOT rescaled to a common window: annualising is a
+    # transformation and belongs to the analyst (same rule as
+    # crop_production.harvest_kg; see Togo/_/data_scheme.yml, "WINDOW
+    # DECISION").  Where a country's modules use more than one window, the
+    # window is carried in `RecallWindow` so the numbers stay interpretable.
+    Expenditure:
+      type: float
+      required: true
+      monetary: true
+      note: |
+        Amount spent on item j by household i in wave t, over that item's
+        recall window, in nominal local currency.  Reported, not annualised.
+        Rows exist only where the household reported the item.
+    RecallWindow:
+      type: str
+      optional: true
+      note: |
+        The recall window `Expenditure` was reported over, verbatim from the
+        instrument (Togo: '7 days', '30 days', '3 months', '6 months',
+        '12 months').  Optional because a survey whose non-food module uses a
+        single window has nothing to disambiguate -- but a country whose
+        modules mix windows and does NOT carry this column is pooling
+        incommensurable numbers.
 
 # Spellings that must never appear in column names.  Key is the rejected
 # spelling; value is the canonical replacement.

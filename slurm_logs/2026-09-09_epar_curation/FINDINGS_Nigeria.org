@@ -1,0 +1,185 @@
+#+title: EPAR x LSMS_Library -- Nigeria (GHS-Panel)
+#+date: 2026-09-09
+
+Provenance: EPAR clone =LSMS-Agricultural-Indicators-Code=, HEAD
+=abfbdc9301242527b7543606aad1ad6eed2e6530= (tag v1.5), per
+=reference/epar/NOTES.md=.  Paths below are relative to
+=reference/epar/LSMS-Agricultural-Indicators-Code/Nigeria GHS/= unless marked
+=lsms_library/=.  CONTENTS.org read in full (1,074 lines, one WAITING entry
+at line 1043).
+
+* Idiosyncrasies cross-referenced from CONTENTS.org (read before opening EPAR)
+
+- =v= is the composite =(state, lga, ea)= key, NOT bare =ea= (GH #323):
+  =ea= alone is a serial number unique only within an LGA (411 distinct vs
+  500 real clusters in W1).  CONTENTS.org:119-142.
+- The =Moved= sentinel (=ea==0= from W2 on): tracked households that left
+  their original EA get per-household singleton =v= values, never pooled.
+  CONTENTS.org:144-152.
+- PP/PH rounds are separate =t= (2010Q3/2011Q1, ... 2023Q3/2024Q1); the
+  post-planting cover page =secta_plantingw{N}.dta= is the sample frame.
+  CONTENTS.org:107-111.
+- =food_acquired= acquisition-source renumbering after W1 (GH #591): q5a
+  means "own production" in W1 but "consumption from purchases" from W2 on.
+  CONTENTS.org:6-73.
+- =s10bq2_cvn= per-row Kg/L conversion factor (99.6% coverage in W3/W4
+  =food_acquired=) flagged as "future enhancement (not yet wired)".
+  CONTENTS.org:93-95.
+- #843: =crop_production= has no sale price in W3-W5 because the sale/value
+  question (=secta3ii=) is hh-crop grain, not plot-crop grain, and our build
+  is plot-grain.  =crop_production.py:15-17= states this explicitly.
+- #844: =sa3q18=/=sa3iiq1= farmgate whole-harvest valuation is asked but no
+  table carries it.  CONTENTS.org:983-1007.
+- #841: =cluster_features= undeclared for W5 -- =community_prices= 2024Q1
+  matches =sample().v= 507/507 but =cluster_features= 0/507; this is a
+  wiring gap, not a keyspace failure.  CONTENTS.org:807-822.
+- #824: sale unit (=sa3q11b=) differs from harvest unit (=u=) in 3-5% of
+  positive-sale rows; the build assumes they're equal and never reads
+  =sa3q11b=.  CONTENTS.org:958-981.
+- Universe/exclusions: W3 conflict-area oversample (+5 HH/EA); W4 excludes
+  rural Borno by design; W5 8 EAs unvisited in Zamfara/Katsina/Kebbi/Sokoto.
+  CONTENTS.org:356-568.
+- W5 ships three weights; =wt_wave5= is NOT a general wave weight (it's the
+  W4-W5 longitudinal weight for the combined sample) -- a stated correction
+  to an earlier version of this same file.  CONTENTS.org:592-629.
+- =community_prices= never reads the C8 SIZE field: =g=/=cl= rows are
+  package prices at ~1/189 and ~1/42 the true per-unit price (#834).
+  CONTENTS.org:850-913.
+- Plot-area nonstandard units (heaps/ridges/stands/W5 sq-ft/football-field)
+  have NO in-repo conversion factor; =Area= is NaN for those rows unless GPS
+  is present.  CONTENTS.org:731-743.
+
+* Coverage (their waves vs ours; what they build for this scope)
+
+| Wave (ours) | GHS-Panel | EPAR readme? | EPAR do-file | Rounds combined by EPAR? |
+|-------------+-----------+---------------+---------------+----------------------------|
+| 2010-11     | W1        | no (stub only)| W1.do (5,727 lines) | yes, into one wave-level table |
+| 2012-13     | W2        | no (stub only)| W2.do (5,858 lines) | yes |
+| 2015-16     | W3        | yes (mislabeled "Wave 4", see contradictions) | W3.do (5,879 lines) | yes |
+| 2018-19     | W4        | yes           | W4.do (7,601 lines) | yes |
+| 2023-24     | W5        | yes           | W5.do (7,271 lines) | yes |
+
+We hold all five EPAR-covered waves; EPAR holds no Nigeria wave we lack.
+Only W3, W4, W5 ship a =readme.md=; W1/W2 have only placeholder
+=Final DTA files/README.md= / =Raw DTA files/README.md= stubs ("Final .dta
+files will be saved here") with no Known-Issues section, so those two waves'
+caveats had to be read out of the =.do= file bodies directly rather than a
+readme.
+
+EPAR builds ~40 wide, mostly household-level indicator tables per wave
+(TLU, gross crop revenue, crop expenses, monocropped-plot file, livestock
+income, fish income, self-employment income, wage/off-farm income, farm
+size, farm labor, vaccine usage, disease incidence, plot-manager input-use
+rates, ag-extension contact, mobile/financial-services ownership,
+milk/egg productivity, per-hectare costs, fertilizer application rates,
+women's decision-making/asset/diet indicators, HDDS, poverty indices,
+consumption aggregates, household assets) plus a shared summary-statistics
+pipeline. We build item-level tables at survey grain (=crop_production=,
+=plot_inputs=, =plot_labor=, =livestock=, =plot_features=, =community_prices=,
+=food_acquired=, ...) and derive ratios/indices/valuations at query time via
+=transformations.py=. None of EPAR's ~40 output tables is a 1:1 target for
+one of ours; the comparison below is at the level of individual
+constructions inside sections that map to our features.
+
+* KNOWN ISSUES register (three-cell table)
+
+** Cell 1 -- EPAR found it AND we did
+
+| # | Issue | EPAR evidence | Our evidence |
+|---+-------+----------------+---------------|
+| #843/#824 | Sale unit vs harvest unit / hh-crop grain price question | W1/W2 read =sa3q11b= directly as the sale's OWN unit (=ren sa3q11b unit1=, =EPAR_UW_Nigeria_GHS_W1.do:481-482=); W3-W5 read the hh-crop-grain =secta3ii= sale block (=sa3iiq1c= unit / =sa3iiq1d= size / =sa3iiq1b= condition, distinct from the plot-crop harvest unit) -- =EPAR_UW_Nigeria_GHS_W4.do:685-694=. EPAR therefore already treats sale-unit and harvest-unit as potentially different fields, exactly the axis #824 flags us for collapsing. | =crop_production.py:15-17= ("sold/value live in secta3ii at hh-crop grain -- no plot linkage, so NOT attributed to a plot here"); CONTENTS.org:958-981 documents the 95-97% agreement / 3-5% mismatch we accept. |
+| #844 | =sa3q18=/=sa3iiq1= whole-harvest farmgate valuation | W2 =EPAR_UW_Nigeria_GHS_W2.do:645= literally does =ren sa3q18 value_harvest= and builds a full median-price/val-per-kg pipeline from it (lines 644-679) -- but the entire block is inside a Stata =/* ... */= comment and is NOT live code; the live code (lines 686-707) instead uses the geographic median-price ladder built from sale transactions. W1 never references =sa3q18= at all (checked, zero hits). So EPAR independently found and then ABANDONED this exact field for this exact purpose. | #844 ("Nigeria asks a farmgate valuation of the whole harvest ... that no table carries") -- open, unwired on our side too. |
+| GPS vs self-report plot area | EPAR prefers GPS (=area_meas_sqm!=.=) and falls back to farmer-estimated area for standard units (plots/acres/hectares/sqm), =EPAR_UW_Nigeria_GHS_W4.do:395-397=. | CONTENTS.org:731-743: "Preference: GPS measurement ... Where GPS is missing, fall back to the farmer estimate ONLY for convertible units." Same preference order, same convertible-unit carve-out. |
+| PP cover page as sample frame | =EPAR_UW_Nigeria_GHS_W4.do:216= uses =secta_plantingw4.dta= for =hhid/zone/state/lga/ea/weight/rural=, i.e. the planting cover page, not the harvest one. | CONTENTS.org:109-111: "The library uses the post-planting cover page ... as the sample frame because it comes first." |
+| Improved-seed flag | =EPAR_UW_Nigeria_GHS_W4.do:2783= (=gen use_imprv_seed=s11fq3b==1=) reads the same raw variable =s11fq3b=. | =data_scheme.yml:290-292= documents =Improved= sourced from =s11fq3b=/=s11fq7=+certified for W4/W5, item-level. |
+
+** Cell 2 -- EPAR found it (or built a construction) AND we did not (candidate new issues)
+
+| Candidate | Raw variable / wave | What EPAR did | Why it's new for us |
+|-----------+----------------------+----------------+----------------------|
+| Per-row crop conversion factor NOT wired for =crop_production= | =sa3iq6_conv= (W4 annual), =sa3iiq1_conv= (hh-crop sale), =sa3iiiq13_conv= (perennial), =sa3iq6d_conv= (still-to-harvest) | EPAR PREFERS the survey's own per-row conversion factor over its computed crop x unit x size x condition median table: =replace conv_fact=sa3iiq1_conv if conv_fact==.= etc., =EPAR_UW_Nigeria_GHS_W4.do:576-586=. Built into a pooled central conversion-factor file (=EPAR_UW_Nigeria_GHS_W4.do:566-568=, appending =secta3i=+=secta3ii=+=secta3iii=). | Our =crop_production.py= carries no =KgFactor= column for Nigeria at all (crib: "optional survey-reported KgFactor ... Uganda 2018-19 only so far, GH #849"). This is a sibling gap to #849, on a different table and a richer source (three separate per-row cvn fields, not one). |
+| Zone-specific nonstandard-unit-to-hectare conversion factors (heaps/ridges/stands) | =EPAR_UW_Nigeria_GHS_W4.do:373-397=, sourced from the Wave 2 BID's own table (commented lines 358-375) | EPAR imputes a hectare value for heaps/ridges/stands via a 6-zone x 3-unit factor table taken from the BID, e.g. Zone 1 heaps x0.00012. EPAR's own comment also records an "observed from the data" alternative factor set that differs by up to ~23x from the BID table for the same cell (Zone 1 heaps: BID 0.00012 vs observed 0.00281, lines 361-368) but the code uses the BID values, not the observed ones. | CONTENTS.org:731-743 explicitly leaves these units unconverted (Area = NaN unless GPS present). We have zero factor for this; EPAR has two candidate factor sets and picked one without flagging the ~23x internal disagreement in its own readme. |
+| Weight rescaling to external (WB) rural/urban population totals | =EPAR_UW_Nigeria_GHS_W4.do:292-303= (=weight_pop_rur=weight*${pop_rur}/el(temp,1,1)=, similarly for urban, summed to =weight_pop_rururb=) | EPAR calibrates the raw survey weight so weighted household-member totals match external World Bank rural/urban population counts for the survey year, and uses this rescaled weight everywhere downstream (crop prices, wages, etc.), not the raw =wt_wave4=. | Our =_normalise_sample_weights= divides by the WITHIN-WAVE mean only (mean-1 normalisation); we never rake to an external population total. This is a genuinely different (and more aggressive) imputation on the weight column, not something we do anywhere in the corpus per CLAUDE.md's Sample-()-and-Cluster-Identity section. |
+| TLU coefficients differ from library's =_TLU_FACTORS= for cattle-equivalent species | =EPAR_UW_Nigeria_GHS_W4.do:1850-1854=: cattle-group codes -> 0.5, code 108 -> 0.3, codes 110/111 -> 0.1, code 112 -> 0.2, poultry codes 113-121 -> 0.01, code 122 -> 0.7 | Nigeria-specific numeric-code TLU table, apparently NOT cross-checked against =_TLU_FACTORS= (cattle 0.70 in =lsms_library/transformations.py:2602=). Same species (cattle), different coefficient (0.5 vs 0.70), same shape of disagreement as the already-flagged #737 (EthiopiaRHS 0.83 vs our 0.70). | We have no Nigeria-specific TLU override and no cross-check that EPAR's per-country TLU tables agree with our single cross-country =_TLU_FACTORS= map; this is a second, independently-discovered instance of the #737 pattern. |
+| Weekly-recall income extrapolated to a season/year via a fixed weeks/month multiplier | =EPAR_UW_Nigeria_GHS_W4.do:1948-1950=: =gen earnings_rawmilk = earnings_weekrawmilk*4.35*months_producedmilk= (and the analogous processed-milk line) | A 7-day recall earnings figure is extrapolated to a season total by multiplying by 4.35 (average weeks/month) and by months-producing, with no record of the recall window on the output column. | Directly the general problem #851 already opened at the framework level ("Nothing records a table's recall window ..."); this is a concrete Nigeria livestock-income instance EPAR itself performs the extrapolation for, which #851 doesn't currently cite. |
+| GPS coordinate dedup key drops =state= | =EPAR_UW_Nigeria_GHS_W4.do:322= (=duplicates drop lga ea latitude longitude, force //ea+lga necessary to uniquely identify ea=) | EPAR's own comment asserts =(lga, ea)= (no =state=) is sufficient to uniquely identify an EA for GPS purposes. | CONTENTS.org:119-142 (GH #323) establishes that bare =ea= collides across LGAs AND STATES and that the library's =v= must be the full =(state, lga, ea)= composite. Whether Nigeria's =lga= codes themselves collide across =state= (making EPAR's =(lga,ea)= key also insufficient) is NOT independently verified here -- the raw =.dta=/=nga_householdgeovars_y4.dta= is not materialized on disk in this checkout (only a =.dvc= stub) and downloading it is out of scope for a read-only pass. Recorded as an open question, not a confirmed bug, on either side. |
+| PP+PH combined by simple mean for HDDS | =EPAR_UW_Nigeria_GHS_W4.do:3810-3861=: appends =sect7b_planting= and =sect10b_harvest= food-consumption-yes/no rows, computes a 12-food-group diversity score per round, then =collapse (mean) adiet_yes, by(hhid)= across PP and PH | EPAR produces ONE wave-level HDDS number per household by averaging the PP-round and PH-round scores. | We have no diet-diversity / HDDS feature for Nigeria at all, and our design (PP/PH as separate =t=) would need an explicit cross-round aggregation decision if one were added -- currently undecided, not merely unwired. |
+
+** Cell 3 -- We found it AND EPAR did not (or does not expose the same finding)
+
+| Our finding | Citation | Is EPAR's corresponding number exposed to this same failure? |
+|--------------+----------+-----------------------------------------------------------------|
+| #841: =cluster_features= undeclared for W5 -- 24,184 =community_prices= rows have no geography | CONTENTS.org:807-822; open_issues.tsv:10 | EPAR's own W5 readme independently states "GPS Coordinates: **Not available for Nigeria GHS W5**" (=Nigeria GHS Wave 5/readme.md:48-49=) -- i.e. EPAR corroborates from the SOURCE side that W5 lacks the household/EA geography that earlier waves had (contrast with W4's readme, which has a live "GPS Coordinates ... Simplified EA lat/lon" section, =Nigeria GHS Wave 4/readme.md:47-48=). This strengthens #841's characterization: the absence is a genuine source-side gap for W5 (matching our finding), not merely something we forgot to wire -- EPAR hits the identical wall and simply drops the GPS section for that wave. |
+| #834: =community_prices= C8 SIZE field unread, =g=/=cl= rows off by 1/189 / 1/42 | CONTENTS.org:850-913; open_issues.tsv:17 | EPAR's community-price module is not built into any of the five wave do-files at all (no =sectc8= reference found in any =.do=) -- EPAR does not carry a =community_prices=-equivalent feature for Nigeria, so this defect is entirely ours; EPAR exposes no numbers here to check. |
+| #591: food acquisition-source renumbering after W1 | CONTENTS.org:6-73 | EPAR's food-consumption use (=sect7b=/=sect10b=, HDDS section) only reads the yes/no "did household consume this item" flag (=s7bq1=/=s10bq1=), never the acquisition-source quantity/value breakdown (=q3a/q4/q5a/q6a/q7a=) that #591 is about. EPAR's HDDS numbers are therefore not exposed to the #591 defect at all -- it simply never touches that part of the module. |
+| #843 grain mismatch (secta3ii is hh-crop, our build is plot-crop) | =crop_production.py:15-17=; open_issues.tsv:9 | Partially found by EPAR too (see Cell 1), but EPAR's numbers ARE exposed to a related, EPAR-specific consequence we did not have to accept: because EPAR imputes plot-crop-level =value_harvest= from an hh-crop-level median price and then reconciles it against hh-crop-level =value_crop_sales= (=EPAR_UW_Nigeria_GHS_W4.do:988-998=, "In a few cases, sales value reported exceeds the estimated value of crop harvest"), a plot-level users of EPAR's =all_plots.dta= =value_harvest= column is looking at a number produced at a coarser grain than the row it's attached to. We avoid this entirely by leaving the column NaN rather than allocating an hh-level valuation down to individual plots. |
+
+* Construction decisions by feature area (each tagged reported/imputed/aggregated, with .do:line)
+
+** PLOT AREAS
+- =reported=: farmer-reported area + unit (=s11aq4aa=/=s11aq4b= in W4), GPS-measured plot area in m^2 (=s11aq4c=). =EPAR_UW_Nigeria_GHS_W4.do:339-347=.
+- =imputed=: standard-unit-to-hectare conversion (plots x0.0667, acres x0.404686, sqm x0.0001) -- =EPAR_UW_Nigeria_GHS_W4.do:388-390=; zone-specific heaps/ridges/stands factors from the BID table -- =EPAR_UW_Nigeria_GHS_W4.do:391-397=.
+- =reported= (preferred over imputed): GPS measurement overwrites the farmer estimate when present -- =EPAR_UW_Nigeria_GHS_W4.do:399=.
+
+** ALL PLOTS / crop values (the key price question)
+- =reported=: hh-crop sale quantity/unit/size/condition/value from =secta3ii= (=sa3iiq5a/1c/1d/1b/6=, W4) or plot-crop sale (=sa3q11a/11b/12=, W1/W2). =EPAR_UW_Nigeria_GHS_W4.do:685-694=; =EPAR_UW_Nigeria_GHS_W1.do:479-482=.
+- =imputed=: geographic median-price ladder (household -> EA -> LGA -> state -> zone -> country, N>=10 observations at each level before it's trusted) built from the sale transactions above, then applied to the FULL harvest quantity (sold or not) to produce =value_harvest= -- =EPAR_UW_Nigeria_GHS_W4.do:695-706=, W1 equivalent =EPAR_UW_Nigeria_GHS_W1.do:653-712=.
+- =imputed=, then abandoned: =sa3q18=-as-direct-valuation, commented out in W2 -- =EPAR_UW_Nigeria_GHS_W2.do:644-679= (live code instead at lines 686-707).
+- =imputed=: per-row survey conversion factor (=sa3iiq1_conv= etc.) preferred over a computed crop x unit x size x condition median factor table, itself partly literature-sourced (e.g. sugarcane, pickup-truck-load constants attributed to "Kormawa and Ogundapo") -- =EPAR_UW_Nigeria_GHS_W4.do:576-649=.
+
+** GROSS CROP REVENUE
+- =aggregated=: =value_crop_sales= = sum of hh-crop =sales_value= over the wave (=EPAR_UW_Nigeria_GHS_W4.do:982-985=).
+- =aggregated= + =imputed= reconciliation: =value_crop_production= = imputed =value_harvest= from ALL PLOTS, OVERRIDDEN by =value_crop_sales= where reported sales exceed the imputed harvest value (=EPAR_UW_Nigeria_GHS_W4.do:988=).
+
+** CROP EXPENSES / FARM LABOR
+- =reported=: hired and non-hired labor counts/days/wage by gender, separately for the planting (=sect11c1b=) and harvest (=secta2b=) rounds, tagged =season='pp'|'ph'=. =EPAR_UW_Nigeria_GHS_W4.do:1043-1075=.
+- =aggregated=: hired person-days and wage summed ACROSS pp+ph into one wave-level number per household x gender (child labor dropped from the wage calc: "Not keeping track of hired labor for some reason", =EPAR_UW_Nigeria_GHS_W4.do:1096=). =EPAR_UW_Nigeria_GHS_W4.do:1090-1108=.
+- =imputed=: median agricultural wage by geography (same ladder pattern as crop prices), used to value UNPAID/non-hired labor. =EPAR_UW_Nigeria_GHS_W4.do:1113 ff.=
+
+** TLU
+- =reported=: livestock head counts by species code, split "at start of season" vs "as of today" (=s11iq6=/=s11iq2a=). =EPAR_UW_Nigeria_GHS_W4.do:1866-1879=.
+- =imputed=/=reported-as-fixed-constant=: species-code -> TLU coefficient map (cattle-group 0.5, code 108 0.3, 110/111 0.1, 112 0.2, poultry 0.01, 122 0.7). =EPAR_UW_Nigeria_GHS_W4.do:1850-1854=.
+- =aggregated=: summed to household level (=collapse (sum) tlu_* nb_*, by (hhid)=, =EPAR_UW_Nigeria_GHS_W4.do:1893=).
+
+** LIVESTOCK INCOME
+- =reported=: weekly milk-sale earnings/quantity (=s11k2q10-14=). =EPAR_UW_Nigeria_GHS_W4.do:1948-1951=.
+- =imputed=: extrapolated to season total via =earnings_week * 4.35 (wks/month) * months_producing= with no recall-window column retained on output. =EPAR_UW_Nigeria_GHS_W4.do:1948,1950=.
+
+** Fertilizer / improved seed (PLOT MANAGERS)
+- =reported=: item-level fertilizer/pesticide/herbicide kg and improved-seed flag (=s11fq3b=). =EPAR_UW_Nigeria_GHS_W4.do:2783=.
+- =aggregated=: collapsed with =max()= from plot x crop grain up to household x manager grain as a binary "uses X" indicator, discarding the plot-level detail in the delivered table. =EPAR_UW_Nigeria_GHS_W4.do:2799-2809, 2843-2849=.
+
+** HOUSEHOLD IDS / WEIGHTS
+- =reported=: post-planting cover page household id/weight/rural flag (=secta_plantingw4.dta=, =wt_wave4=). =EPAR_UW_Nigeria_GHS_W4.do:216-221=.
+- =imputed=: weight RESCALED (raked) to match external World Bank rural/urban population totals for the survey year -- =weight_pop_rururb=, not the raw survey weight, used in every downstream median-price/wage ladder. =EPAR_UW_Nigeria_GHS_W4.do:292-303=.
+
+** Diet Diversity (HDDS)
+- =reported=: 7-day y/n consumption per food item, both PP and PH rounds (=s7bq1=/=s10bq1=). =EPAR_UW_Nigeria_GHS_W4.do:3813-3821=.
+- =aggregated=: item -> 12-food-group max(); food-group count -> per-round HDDS; PP-round and PH-round HDDS AVERAGED into one wave-level number. =EPAR_UW_Nigeria_GHS_W4.do:3838-3849=.
+
+** Individual roster (combining PP and PH into one wave)
+- =reported=, then =aggregated= by preference order: age/sex read from BOTH the planting and harvest person rosters, reshaped wide by round, then =age = age_plan; replace age = age_harv if age==.= (planting preferred, harvest fills gaps) -- one row per person per WAVE. =EPAR_UW_Nigeria_GHS_W4.do:243-249=. This is the general pattern behind "how EPAR combines the post-planting and post-harvest visits into one wave": round-tag, reshape wide, prefer one round and backfill from the other (household ids, roster, labor-days-summed, HDDS-averaged -- the reconciliation RULE differs by table, but every feature ends up with exactly one row per household/person per wave, never two).
+
+* Ranked learnings (what we could take, why, what it would touch, and the risk)
+
+1. *Wire the per-row crop conversion factor* (=sa3iq6_conv=/=sa3iiq1_conv=/=sa3iiiq13_conv=/=sa3iq6d_conv=) as an optional =KgFactor= column on Nigeria =crop_production=, mirroring the Uganda =KgFactor= precedent (#849) and our own =harvest_kg= layering (reported -> survey median -> library-inferred -> none, CLAUDE.md). Why: EPAR measured this is worth preferring over a computed median table; we currently have zero factor for Nigeria crop_production and rely entirely on =harvest_kg='s inferred layers. Touches: =_/crop_production.py= (add a per-row cvn read per wave/file), =data_scheme.yml= (optional column), =transformations.py: harvest_kg= (extra layer). Risk: LOW -- purely additive, optional column, same shape as #849's ask; the two should probably be worked together (candidate: generalize #850's own ask, "Generalise _get_kg_factors ... to infer crop factors from sale prices," to also prefer this reported factor first).
+2. *Adopt the geographic median-price ladder to value the UNSOLD portion of the harvest* (EA -> LGA -> state -> zone -> country, N>=10), mirroring our own =median_price_valuation= transform which already implements exactly this ladder shape for other purposes. Why: this is the answer to "how does EPAR get a price when W3-W5 lack a plot-level sale price" (#843's key question) -- they don't try to attribute the hh-crop sale to a plot; they build a price INDEX from all hh-crop sales at increasingly coarse geography and apply it to plot-crop harvest quantity. Touches: a NEW transformation (not a stored column, per the design philosophy) that would take =crop_production= (plot-crop harvest qty + hh-crop sale qty/value) and produce an imputed =Value_harvest= at query time -- exactly analogous to our existing =food_prices(units='unitprice', s='produced')= for food. Risk: MEDIUM -- must stay a transformation, never a cached column (per "no aggregation in core" and "never store an imputed construction"); must document the grain bridge (hh-crop price applied to plot-crop quantity) as loudly as #843 already does, or it repairs the SYMPTOM of #843 while reintroducing the exact grain-mismatch EPAR itself waffled on (Cell 3's finding that EPAR's own =value_harvest= mixes grains silently).
+3. *Do NOT copy the =sa3q18=-as-direct-valuation idea without EPAR's own caution in mind.* EPAR tried exactly what #844 proposes (rename =sa3q18=/=secta3ii= farmgate valuation straight to a value column) in W2 and then commented it out in favor of the price ladder, without leaving a reason in the code. Why this matters as a learning: before wiring #844, either (a) empirically compare =sa3q18=-derived unit values against the price-ladder values EPAR ended up trusting, to see the same discrepancy EPAR silently reacted to, or (b) accept #844's own field as a `Value_if_sold` alongside — not instead of — a ladder-based `Value_harvest`, since CONTENTS.org already frames it as "give Nigeria a farmgate valuation... recorded here as a gap rather than guessed at," i.e. exactly the caution EPAR skipped. Touches: #844 investigation itself. Risk: LOW to do the comparison, MEDIUM if #844 is closed by blindly wiring =sa3q18= as-is.
+4. *Cross-check every country's TLU coefficient table against =_TLU_FACTORS=* as a standing audit, not a one-off. Nigeria (cattle 0.5 vs our 0.70) is now a SECOND independently-found instance of the #737 pattern (EthiopiaRHS 0.83 vs 0.70). Touches: a small audit script over EPAR's per-country TLU =gen tlu=...= blocks vs =_TLU_FACTORS=; likely surfaces more countries. Risk: LOW (read-only audit); the fix itself (if any) is a documentation/decision question, not automatically "match EPAR's number."
+5. *Weight-raking to external population totals is a real, different design a user might expect and not get from us.* Not proposed as something to adopt (our within-wave mean-1 normalisation is a deliberate, documented design choice, CLAUDE.md "Weights are normalised to within-wave mean 1 at API time"), but worth a one-line CONTENTS.org note under Weight variables that EPAR's Nigeria numbers are population-raked and therefore not directly comparable to ours at the level (only at the level of ratios/shares, where both are invariant to the rescaling). Touches: CONTENTS.org documentation only. Risk: NONE (doc-only).
+
+* Contradictions with our CONTENTS.org / issues
+
+- *None found that overturn a CONTENTS.org claim.* Every direct comparison above (PP-cover-page sample frame, GPS-preferred plot area, W5 lacking geography, Improved-seed source variable) CORROBORATES what CONTENTS.org already says; no EPAR evidence contradicts a specific CONTENTS.org line in this scope.
+- One EPAR-internal inconsistency worth recording precisely because our brief's cautionary example (Uganda "No issues in this section") is exactly this shape: the Nigeria =Nigeria GHS Wave 3= directory's =readme.md= is titled "# Nigeria GHS/LSMS-ISA Wave 4 (2018-2019)" (=Nigeria GHS Wave 3/readme.md:1=) and its "Prerequisites" line points to catalog id 3557 in the link text but the URL underneath is catalog 2734 (=Nigeria GHS Wave 3/readme.md:5=) -- i.e. EPAR's own Wave-3 readme is a stale copy of the Wave-4 readme with only the download URL half-corrected. This does not contradict anything in our CONTENTS.org (we correctly identify catalog 2734 as W3, CONTENTS.org:356-357), but it is a concrete instance of the brief's rule "a section that looks clean may be inheriting an issue from elsewhere" applied to EPAR's DOCUMENTATION rather than its DATA: do not trust a wave's own readme banner to say which wave it is.
+
+* What I did not read (so the synthesis knows the gaps)
+
+- EPAR's W1 and W2 do-files were read via targeted =sed=/=grep= dives (sections mapped to our features + KNOWN ISSUES equivalents), not end to end; their combined 11,585 lines were not fully read line-by-line.
+- CROP EXPENSES (non-labor cost categories: fertilizer/seed/pesticide expense allocation across implicit/explicit), MONOCROPPED PLOTS, Shannon Diversity Index, Poverty Indices, Consumption/food-security aggregate sections, and the entire =Used to Compute Summary Statistics= block (winsorization mechanics, gender-productivity-gap regression) were located by banner/grep but not read section-by-section.
+- =_Summary_statistics/EPAR_UW_335_master_list_indicators.xlsx= and =EPAR_UW_335_SUMMARY_STATISTICS.do= were not opened.
+- =Household-Consumption-Data= and =358_Estimating-Crop-Yields= (Ethiopia/Tanzania-only per its own scope) were not surveyed for Nigeria -- the former's country list in the brief does not name Nigeria/GhanaSPS as included for Nigeria specifically (GhanaSPS is listed, Nigeria is not); not independently confirmed by opening the directory.
+- The =dissemination/EPAR_UW_335_AgDev_Indicator_Estimates.xlsx= fetched by a separate taxonomy-pass agent (per NOTES.md addendum) was not opened by this pass.
+- The claim that EPAR's GPS dedup key =(lga, ea)= (dropping =state=) is actually insufficient for Nigeria was NOT verified empirically: the raw =.dta=/=nga_householdgeovars_y4.dta= is not materialized in this checkout (only a =.dvc= stub), and downloading it is out of scope for a read-only, no-download pass. Recorded as an open question in Cell 2, not a confirmed finding.
+- Community questionnaire (=sectc8=) is absent from every Nigeria EPAR do-file (confirmed by grep, zero hits) -- not investigated further since EPAR simply does not build a comparable feature.
+- Numeric parity against EPAR's final =.dta= outputs was explicitly out of scope for this pass (per the brief) and was not attempted.

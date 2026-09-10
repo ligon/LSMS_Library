@@ -1,0 +1,515 @@
+#+TITLE: Red-team -- feat/harvest-kg-shipped-factors (6ddcc3c0, db7a260e, e71593a8)
+#+DATE: 2026-09-09
+#+AUTHOR: red-team agent (read-only)
+
+* Method and provenance
+
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-shipped-factors=, branch
+=feat/harvest-kg-shipped-factors= (HEAD e71593a8).  Merge-base with
+=development= is =9e4c0867=, which IS =development='s tip, so the branch is
+three commits ahead and nothing on =development= is missing from it.
+
+Every invocation: =cd $WT && PYTHONPATH=$WT
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python=,
+with =assert lsms_library.__file__.startswith(WT)= INSIDE each probe script
+(not a separate =-c=), per CLAUDE.md scrum-master addendum 3.  Confirmed
+=LSMS_NO_CACHE= / =LSMS_BUILD_BACKEND= / =LSMS_COUNTRIES_ROOT= all unset;
+=~/.config/lsms_library/config.yml= sets only =data_dir=
+(=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=) and no
+=countries_dir=.  No writes to the repo other than this file; no =dvc=
+invocation; no rebuild (see item 7).
+
+GitNexus MCP did not connect (CONNECTION_CLOSED) and this mirror has no
+=.gitnexus/= index.  Declared substitution per CLAUDE.md: impact assessed with
+=rg= / =git diff= over =lsms_library/= and =tests/=.  Blast radius found:
+=harvest_kg_factors= is called only from =harvest_kg= (:2497) and the tests;
+=harvest_kg= is called from =yield_kg= (:2604) and the tests.  Nothing in
+=country.py=, no =data_scheme.yml=, no wave script.  Confirms the ledger's
+sweep.
+
+All 39 probes are in the session scratchpad (=probe.py= .. =probe4.py=);
+every input below was actually run, and the printed output is quoted.
+
+One context file was NOT opened:
+=slurm_logs/2026-09-09_epar_curation/FINDINGS_conversion_factors.org=.  The
+Ethiopia (crop x unit x region, Wave-5 duplicate) and Malawi (crop x unit x
+condition x region, with =source=) shapes used below are taken from the
+brief's own summary of that file, not cross-checked against it.
+
+* Item 1 -- join semantics : CONCERN
+
+Core mechanics are right.  Four sub-findings, one of which contradicts the
+function's own error message.
+
+** 1.1 Keys present in only one side -- as documented (PASS)
+
+A key the table declares that =crop_production= lacks is DROPPED from the
+join; a key the frame carries that the table lacks is ignored.  Verified on
+all three frame shapes named in the brief.
+
+** 1.2 A =condition=-keyed table on a frame WITHOUT =condition= -- silently applied (documented)
+
+Ethiopia shape =(t,i,plot_id,j,u)=, table keyed =(j,u,condition)= with ONE
+condition per =(j,u)=:
+
+: [P1d] -> (['shipped'], [50.0], {... 'shipped': 1 ...})
+
+The =shelled= factor is served to a frame that never said the harvest was
+shelled.  Silent.  This IS documented (=_shipped_factor_lookup= docstring:
+"where either lacks it, they join ignoring it"), and the *two*-condition case
+is loud:
+
+: [P1e] RAISED ValueError: shipped_factors is ambiguous on the join keys
+:   ['j', 'u']: 1 duplicated key(s), e.g. [('maize', 'basket')].
+:   ['condition'] could not be joined on because crop_production carries no
+:   such level, which is what left the remaining keys ambiguous ...
+
+So the refusal fires exactly when the dropped axis actually disagrees.  That
+is a good design and the hint naming =['condition']= is excellent.  Recorded
+here because a loader that filters its table to one condition before passing
+it gets a national, condition-blind application with no signal at all.
+
+** 1.3 A =region=-keyed table on a frame WITHOUT =region= -- the same, and this is the dangerous one (CONCERN)
+
+: [P1c] -> (['shipped', 'shipped'], [50.0, 50.0],
+:          {'reported': 0, 'shipped': 2, ...})
+
+A table loaded for ONE region (Ethiopia's =Crop_CF= is crop x unit x region;
+Malawi's IHS5 adds condition) applied to a frame the caller forgot to resolve
+=region= onto goes NATIONAL, silently, at full precedence.  The caller is not
+warned.  The docstring tells the caller to resolve =region= first and warns
+that =cluster_features= spells it =Region=; nothing checks that they did.
+The failure is asymmetric with 1.2: a multi-region table raises (duplicates),
+a single-region table does not -- so the loader that is most careless (pulls
+one region) is the one that gets no protection.
+
+Suggestion (do not implement here): when =dropped= is non-empty AND any row
+matched, emit a warning naming the dropped keys.  It costs nothing on the
+correct path and converts the silent case into the loud one.
+
+** 1.4 A table keyed on =j= alone -- accepted, contradicting the function's own error text (CONCERN)
+
+=_shipped_factor_lookup='s "nothing joinable" error says the loader must key
+"at minimum the unit 'u'".  Nothing enforces it:
+
+: [P1a] -> (['shipped', 'inferred', 'none'], [50.0, 1.0, nan],
+:          {... 'shipped': 1, 'shipped_implausible': 1 ...})
+
+=('Maize', 50.0)= is served to the =basket= row at 50 kg/unit.  Two mitigations
+happen to fire on the other two rows -- the screen rejects it on the =Kg= row,
+the sentinel excludes it on the =Unknown= row -- but neither is the =u= key,
+and a =sack= row would have taken 50 kg as happily as the basket.  Either
+enforce =u in table_keys= or drop the "at minimum the unit 'u'" clause from
+the message; as it stands the message states a rule the code does not have.
+
+Note the Tanzania shape =(t,i,plot_id,j)= (no =u= at all) is NOT a hazard here:
+=harvest_kg_factors= already raises upstream, in =_kg_factor_series= --
+
+: [P1b] RAISED ValueError: expected a 'u' unit level or column
+
+-- so ledger §4's worry ("a table with no =u= key at all would fabricate
+weights for unit-less rows") is covered by a PRE-EXISTING guard, not by the
+sentinel.  Worth correcting in the ledger, since the sentinel is credited with
+protection it does not provide on that path.
+
+** 1.5 Silent zero-match, and the stated tell is not a tell (CONCERN -- the headline finding)
+
+Raw crop code vs decoded label, exactly the trap the ledger names:
+
+: [P1f] -> (['none'],
+:          {'reported': 0, 'shipped': 0, ..., 'shipped_implausible': 0},
+:          reported_vs_shipped {'both': 0, 'disagree': 0, 'share': None},
+:          kg_shipped.notna() = 0)
+
+Zero rows served, zero signal.  The layer CAN serve 0 rows with no signal --
+which is the CONCERN the brief asked about, and it is confirmed.
+
+Worse, the docstring's proposed tell is unreliable in the false-alarm
+direction.  =_shipped_factor_lookup= says "The =shipped= count in
+=attrs['kg_factor_sources']= is the only tell -- check it is not 0."  But that
+count is POST-rank:
+
+: [P1g] perfectly keyed table, frame fully covered by `reported`
+:   -> counts = {'reported': 1, 'shipped': 0, ...}, kg_shipped = [50.0]
+
+=shipped: 0= with a perfectly-matching table.  A loader author following the
+docstring's instruction would conclude their table is mis-keyed when it is
+not.  The honest tells are =factors['kg_shipped'].notna().sum()= (rows the
+table matched, post-screen) and
+=attrs['kg_factor_disagreement']['reported_vs_shipped']['both']=.
+
+Two adjacent silent-nothing cases found while probing:
+
+- a table whose =KgFactor= column is TEXT (a plain =.dta= read) coerces to NaN
+  and serves nothing, counted nowhere:
+  : [E] table KgFactor='fifty' -> src ['none']
+- a table row with NaN in a key column is not a wildcard -- it matches only
+  frame rows that are also NaN there:
+  : [P4b] table (Maize, basket, NaN-condition) vs frame condition='dried'
+  :   -> src 'none'
+
+Recommendation, matching the ledger's own "found while building" note: add a
+=shipped_matched= count taken from =offered= BEFORE the sentinel and the
+screen, and warn when a non-empty =shipped_factors= matches zero rows.  That
+one count would make 1.5, and the two cases above, self-reporting.
+
+** 1.6 Multi-country table on a single-country frame -- loud (PASS)
+
+: [P1h] RAISED ValueError: ... ['country'] could not be joined on because
+:   crop_production carries no such level ...
+
+Correct and well-explained.  Loaders must filter to one country before
+passing a table to a =Country()= frame; a =Feature()= frame is served by 1.7.
+
+* Item 2 -- rank : PASS
+
+All four layers live on one row (reported 55, shipped 50, survey_median 60,
+inferred NaN for =basket=):
+
+: [P2] {'src': 'reported', 'kpu': 55.0, 'rep': 55.0, 'shp': 50.0,
+:       'med': 60.0, 'inf': nan}
+
+Same row with the report removed, on a =gram= unit so all three lower layers
+are live (shipped 0.02, median 60.0, inferred 0.001):
+
+: [P2b] {'src': 'shipped', 'kpu': 0.02, 'rep': nan, 'shp': 0.02,
+:        'med': 60.0, 'inf': 0.001}
+
+reported > shipped > survey_median > inferred, and
+=KG_FACTOR_LAYERS = ('reported','shipped','survey_median','inferred','none')=.
+The =np.where= ladder in =harvest_kg_factors= gates on =shp_ok= between
+=rep_ok= and =med_ok= for both =resolved= and =source=; they cannot drift apart
+because they are written from the same masks.
+
+Partition invariant holds on every probe frame, e.g.
+: [P11] sum over KG_FACTOR_LAYERS = 10 = len(df)
+
+* Item 3 -- the screen : PASS (one deviation from the brief's expectation, and it is the right one)
+
+| shipped value | unit  | outcome                                | counted under          |
+|---------------+-------+----------------------------------------+------------------------|
+| 300.0         | gram  | rejected, falls to =survey_median=     | =shipped_implausible=  |
+| 7.0           | Kg    | rejected, falls to =inferred= (1.0)    | =shipped_implausible=  |
+| 2018.0        | basket| rejected, falls to =none=              | =shipped_implausible=  |
+| 0.0 / -3.0    | basket| discarded, falls to =none=             | *nothing*              |
+
+: [P3a] {'src': 'survey_median', 'kpu': 0.02, 'shp': nan, 'rej': True,
+:        'srcstr': <NA>, ... 'shipped_implausible': 7}
+: [P3b] {'src': 'inferred', 'kpu': 1.0, 'rej': True, 'shipped_implausible': 1}
+: [P3d] {'src': 'none', 'shipped_implausible': 1}
+: [P3c] {'src': 'none', 'rej': False, 'shipped_implausible': 0}
+
+Rejected rows DO fall through -- they are not stranded at =none=.  Nothing is
+clipped.  =kg_shipped= reads NaN, =kg_shipped_rejected= True,
+=kg_shipped_source= is =<NA>= (=pd.isna= True) -- the docstring's warning about
+reading it with =pd.isna= is correct and necessary.
+
+*The <=0 deviation is defensible and should stay.*  A shipped 0 or -3 is
+NaN-ed by =_valid_factor= before the screen ever sees it, so it is not counted
+as =shipped_implausible=.  This is EXACTLY what the =reported= layer does
+(=_screen_reported_factors= opens with =rep = _valid_factor(reported)= and
+=have = ~np.isnan(rep)=), so the layers agree.  The brief's expectation that
+=<= 0= be counted would require changing =reported= too.  Flagged, not
+faulted.
+
+*One real docstring/comment inaccuracy here.*  The code comment at the
+sentinel says excluding first "keeps =shipped_implausible= a count of rows
+that would OTHERWISE have been served."  It is not:
+
+: [B] one row, reported 7.0 (served), shipped table 9999.0
+:   -> served by 'reported', shipped_implausible = 1
+
+A row that =reported= wins outright still counts as =shipped_implausible=.
+The count is "rows where the shipped layer OFFERED an implausible factor",
+which is what the =Returns= docstring says and is the useful reading; the
+inline comment overstates it.  =[P3a]= shows the same at scale
+(=shipped_implausible: 7= on a 7-row frame of which 6 were served by
+=reported=).
+
+** =reported_vs_shipped= hand case (PASS)
+
+Two rows both reporting 100.0; table offers 50.0 on =basket= (100% gap) and
+105.0 on =sack= (5% gap, inside the 0.10 tolerance):
+
+: [P3e] {'reported_vs_shipped': {'both': 2, 'disagree': 1, 'share': 0.5}, ...}
+
+Exactly the GH #852 audit question, answered.
+
+* Item 4 -- ambiguity : PASS
+
+- two rows, same key, different values -> raises, naming the keys (=[P1e]=, =[P1h]=)
+- two rows, same key, IDENTICAL values -> ALSO raises (stricter than core's
+  grain rule, deliberately):
+  : [P4e] RAISED ValueError: ... 1 duplicated key(s), e.g. [('maize','basket')]
+- same key at different =t= -> no raise, and each wave gets its own factor:
+  : [P4a] -> [50.0, 40.0]
+- NaN in a key column -> normalised to the private =_KEY_NA= sentinel on BOTH
+  sides.  It matches NaN-for-NaN:
+  : [P4c] frame condition=NaN, table condition=NaN -> src 'shipped', 50.0
+  and two table rows NaN in the same key position are refused as duplicates,
+  with the sentinel visible in the message:
+  : [P4d] RAISED ... e.g. [('maize', 'basket', '\x00<NA>')]
+
+The NaN-matches-NaN behaviour is defensible ("condition not applicable" on
+both sides) but is NOT stated in any docstring.  Worth one sentence, because
+=pd.merge='s null-matching is called out as a hazard in CLAUDE.md and a reader
+who knows that rule will assume this join avoided it entirely; it did not, it
+made it explicit and deterministic instead.
+
+Also verified: a table keyed as plain COLUMNS rather than index levels works
+(=[F]=), and extra non-join columns (=note=, =crop_code=) are ignored (=[G]=).
+A raw =Crop_CF= file left with a =crop_code= column and a decoded =j= column
+therefore joins on =j= and silently ignores =crop_code= -- correct, but it is
+another way a mis-keyed table looks like a working one.
+
+* Item 5 -- the two deviations
+
+** 5(a) =country= as a join key : PASS
+
+Feature-shaped frame with a =country= level, table keyed =(country,j,u)= for
+Ethiopia only:
+
+: [P5a] -> src ['shipped', 'none'], kpu [50.0, nan]
+
+Ethiopia's row is served, Malawi's is not.  The fence works.
+
+The same pooled frame with a table that has NO =country= key:
+
+: [P5b] -> src ['shipped', 'shipped'], kpu [50.0, 50.0]
+
+applied to every country.  This is the general dropped-key rule of 1.2/1.3 and
+is documented by inversion in the =SHIPPED_FACTOR_JOIN_LEVELS= comment ("a
+table loaded for ONE country would otherwise be applied to every country's
+rows").  It is stated as the REASON for the key, never as the behaviour when
+the key is absent.  Given =Feature()= assembly is the intended cross-country
+path, one explicit sentence -- "a table without =country= applied to a pooled
+frame is applied to every country" -- is worth adding.
+
+** 5(b) missing-unit sentinel : PASS, with the count question answered "nowhere"
+
+Table deliberately keyed on the sentinels:
+
+: [P5c] table {(Maize,Unknown):50, (Maize,Manquant):50, (Maize,basket):50}
+:   -> src ['none', 'none', 'shipped'], kg_shipped [nan, nan, 50.0]
+:      counts {'shipped': 1, 'shipped_implausible': 0, 'none': 2, ...}
+
+Both =Unknown= and =Manquant= are excluded, before the screen, so
+=shipped_implausible= stays 0.  Correct and as designed.
+
+*They are counted nowhere separately.*  A sentinel row lands in whatever layer
+does serve it (=none= here), and there is no =shipped_sentinel_excluded= key.
+This exactly mirrors =survey_median='s treatment, so it is consistent rather
+than novel -- but it means a loader that keyed its whole table on =u='Unknown'=
+(Uganda 2018-19 season-A is 7,153 such rows) sees the identical signature as a
+mis-keyed table: everything =none=, every count 0.  A =shipped_matched= count
+taken pre-sentinel (item 1.5) would separate the two.
+
+* Item 6 -- =yield_kg= : PASS (confirmed; not implemented, as instructed)
+
+: yield_kg sig: (crop_production, plot_features, *, area_col='Area',
+:                volume_as_mass=True, on='parcel')
+: call line: ['hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass).reset_index()']
+: has **kwargs: False
+
+Confirmed: no =**kwargs=, no pass-through, so an analyst asking for yields
+gets no shipped layer -- the concrete cost the ledger §6 names.  The fix is
+TWO lines, not one: add =shipped_factors=None= to the signature
+(=transformations.py:2551-2552=) and forward it at =:2604=.
+
+Adjacent, pre-existing, NOT this PR's doing: =min_reports= is not forwarded
+either, so =yield_kg= silently pins the survey-median layer at the default
+while =harvest_kg= exposes it.  If the Ethiopia PR adds =shipped_factors= to
+=yield_kg=, add =min_reports= in the same edit.
+
+* Item 7 -- tests and the cache probe : PASS (with one honest deselection)
+
+** Tests
+
+: pytest tests/test_shipped_factors.py tests/test_crop_kg_factor.py \
+:        tests/test_median_price_valuation.py tests/test_rcsi.py -q
+: 148 passed, 1 deselected in 9.04s
+
+The deselection is =test_crop_kg_factor.py::test_uganda_harvest_kg_baseline=,
+and the reason matters: **Uganda's L2-country cache is EMPTY.**
+
+: data_root()/Uganda/var/crop_production.parquet -> exists False
+: ls -la .../Uganda/var/  ->  empty, mtime 2026-09-09 22:50
+
+The directory was cleared TODAY (Malawi and Niger too), presumably by a
+concurrent agent.  That test is =@pytest.mark.requires_s3= and S3 credentials
+ARE live here, so it would not have skipped -- it would have run a full COLD
+rebuild of Uganda =crop_production= (a script-path table, 8 waves) into a
+cache other agents are using.  The brief said no rebuilds, so it was
+deselected rather than run.
+
+*Consequence for the ledger*: its Phase-3 claim that
+=test_uganda_harvest_kg_baseline= "**ran** ... with every number unchanged
+(130,606 / 36,095 / sum 10,868,272.24500081 / reported 14,050 /
+survey_median 57 / inferred 28,147 / none 88,352 / reported_implausible 99)"
+is NOT reproducible in this session.  I neither confirm nor contradict it; I
+record that it could not be re-run without a rebuild.  Someone should re-run
+it on a warm Uganda cache before merge, since it is the only empirical pin on
+"the default path did not move".  The structural pins
+(=test_frame_without_kgfactor_reproduces_the_old_algorithm=,
+=test_screen_is_inert_without_a_kgfactor_column=, both comparing against
+=_legacy_harvest_kg=) DID run and pass.
+
+** Cache / fingerprint probe, corrected signature
+
+Two package trees under the scratchpad, identical except that =base/= carries
+=git show $(git merge-base development HEAD):lsms_library/transformations.py=.
+Same probe under each =PYTHONPATH=, using the CORRECTED call
+=c._table_cache_hash(table, c.waves)= (the ledger's own recipe correction; the
+older =median-price-weight-col.md= recipe writes =_table_cache_hash(table)=,
+which is the wrong arity):
+
+- =build_transforms_fingerprint(t)= for 9 tables (crop_production,
+  food_acquired, household_roster, cluster_features, sample, plot_features,
+  housing, assets, shocks) + =build_transforms_fingerprint(None)=
+- =Country('Uganda')._table_cache_hash(t, c.waves)= for 4 tables
+
+: diff base.json head.json -> IDENTICAL: 0 of 14 values moved
+
+Confirms the ledger's 0/13 with one extra probe.  Expected, and the reason is
+sound: =transformations.py= carries no =@build_transform()= tag on any symbol
+this diff touches, and =harvest_kg= is analyst-callable rather than a build
+route.  No cold rebuild is triggered by merging this.
+
+** Performance (not asked, worth one line)
+
+=_shipped_factor_lookup= resolves rows in a Python =for= loop over =len(df)=.
+Measured: 0.53 s for 200,000 rows, all matching.  Fine for Uganda (130k) and
+fine for a pooled =Feature()= frame; not a concern.
+
+* Item 8 -- pandas 3.0, ASCII, docstring accuracy
+
+** pandas 3.0 : PASS
+
+No =inplace==, no =fillna(method=)=, no chained assignment, no =series[0]=, no
+=.append()= on a frame in the added lines.  The three =np.isnan= uses in the added lines are all
+on float ndarrays produced by =_valid_factor= / =np.where=, never on =pd.NA=,
+so the =pd.isna= rule does not apply to them.  =groupby= is untouched by this
+diff.  The ledger's own discovery -- pandas 3.0.2 normalises both =None= and
+=pd.NA= to NaN in an object column, so =kg_shipped_source= must be read with
+=pd.isna= -- is correct and is now documented in the =Returns= section; probe
+=[C]= reproduces it (=<NA>=, =pd.isna= True).
+
+** ASCII : CONCERN (one character)
+
+: git diff development...HEAD -- lsms_library/transformations.py | grep '^+' | grep -P '[^\x00-\x7F]'
+: +        ``.coder/ledger/harvest-kg-shipped-factors.md`` §6.
+
+One =U+00A7= in a =harvest_kg_factors= docstring (=transformations.py:2177=; the other two =§= in the file, at :510 and :1888, are pre-existing and outside this diff).
+=tests/= is clean.  The ledger =.md= carries em-dashes and =§= throughout,
+which is prose and not code; only the =.py= line is a rule violation.
+One-character fix: "section 6".
+
+** Docstring accuracy : FAIL -- three claims do not match the code
+
+1. *=transformations.py:2228=* -- "The **four** layers of
+   :data:=KG_FACTOR_LAYERS= partition the frame and sum to
+   =len(crop_production)= -- =shipped= included".  There are FIVE.  The
+   sentence corrects itself two clauses later and the neighbouring lines
+   (:2235, :2335, :2336) were all updated to "five", so this is a missed
+   occurrence, not a considered choice.
+
+2. *=transformations.py:1735=* (=_screen_reported_factors=, unchanged context
+   in the diff) -- "The row falls through to =survey_median= / =inferred= /
+   =none= exactly as if it had never reported."  It now falls through to
+   =shipped= FIRST:
+   : [A] reported 9999.0 (rejected), table offers 50.0
+   :   -> src 'shipped', kpu 50.0, reported_implausible 1
+   The function's own newly-added paragraph documents that it screens the
+   shipped layer, so this stale sentence sits four lines above its own
+   correction.
+
+3. *=transformations.py= =_shipped_factor_lookup= docstring* -- "The =shipped=
+   count in =attrs['kg_factor_sources']= is the only tell -- check it is not
+   0."  Disproved by =[P1g]= (item 1.5): the count is post-rank and reads 0 on
+   a perfectly-keyed table whose rows =reported= wins.  This is the one worth
+   fixing properly rather than editing, because it is the instruction a loader
+   author will actually follow.
+
+Two smaller overstatements, listed for completeness, neither worth blocking:
+
+- the sentinel comment's "=shipped_implausible= a count of rows that would
+  OTHERWISE have been served" (item 3, probe =[B]=);
+- =harvest_kg='s "Omitted (the default), this whole layer is inert and the
+  result is bit for bit what it was before the layer existed" -- the
+  =Harvest_kg= values are, but =.attrs['kg_factor_sources']= gains two
+  zero-valued keys and =harvest_kg_factors= gains three columns.  That is
+  intended and forced by the partition invariant; "bit for bit" just
+  overreaches.
+
+Everything else in the new docstrings checks out against the code: the rank
+rationale, the screen reuse and its referent (=df='s =u=, not the table's),
+the ambiguity refusal and its strictness, the =region= lower-case rule
+(=SHIPPED_FACTOR_JOIN_LEVELS= contains only =region=, so a table carrying
+=Region= alone raises "keyed on none of"), the sentinel exclusion ordering,
+=Source= carry-through (=[P9]= -> ='IHS5 ladder'=), the =pd.isna= warning, and
+the =attrs= republication after =harvest_kg='s =groupby= (=[P9]= ->
+=['kg_factor_disagreement', 'kg_factor_sources']= both present on the result).
+
+* Item 9 -- does =data_info.yml:555-557= license storing a shipped factor in =KgFactor=?
+
+Read plainly, yes -- and the ledger's decision to keep it out is a design
+preference, not something the note compels.  The note's operative sentences
+are "REPORTED, NEVER CONSTRUCTED.  Only a number the survey (or a
+survey-supplied conversion table) actually wrote down belongs in this column.
+Nothing inferred goes here -- not a median over sibling rows, not a factor
+from the library's unit tables."  The parenthetical is not decorative: it
+names a second admissible SOURCE, and Ethiopia's =Crop_CF_Wave{2..5}= is
+precisely "a survey-supplied conversion table" -- shipped by the WB alongside
+the instrument.  What the note forbids is INFERENCE (a median, a library unit
+table), and a lookup in the survey's own conversion table is not inference; it
+is transcription with a join.  The "construction happens at read time" clause
+that follows is subordinate to that -- it explains where the forbidden
+inference lives, not that lookups are banned from the column.  So a future
+Ethiopia loader could read line 555-557 as licence to bake =Crop_CF= into the
+stored column and would not be misreading it.  The ledger's contrary argument
+is a good one on the merits -- the de-duplication decision (crop 74 / unit 62,
+4.34 vs 6.125) and the region join would become invisible inside a parquet,
+and the =reported_vs_shipped= audit would be impossible because the shipped
+value would have BECOME the reported one -- but those are auditability
+arguments, not a reading of the text.  That is exactly why §6 Q2 asks for the
+note to be tightened, and the tightening is worth doing BEFORE #852 lands,
+since the note as written points a loader author the other way.
+
+* Verdicts
+
+| # | item                                      | verdict                       |
+|---+-------------------------------------------+-------------------------------|
+| 1 | join semantics                            | CONCERN (1.3, 1.4, 1.5)       |
+| 2 | rank                                      | PASS                          |
+| 3 | the screen + =reported_vs_shipped=        | PASS (=<=0= deviation is right)|
+| 4 | ambiguity / NaN keys                      | PASS                          |
+| 5 | =country= key; sentinel exclusion         | PASS (counted nowhere: note)  |
+| 6 | =yield_kg= pass-through                   | PASS -- confirmed absent, 2 lines |
+| 7 | tests (148 passed) + cache probe (0/14)   | PASS (baseline deselected)    |
+| 8 | pandas 3.0 / ASCII / docstrings           | pandas PASS; ASCII CONCERN; docstrings FAIL |
+| 9 | =data_info.yml:555-557= reading           | licenses it; tighten before #852 |
+
+* Blocking vs non-blocking
+
+*No finding blocks the merge.*  The layer is correct where it fires, the rank is right, the
+screen is genuinely reused rather than copied, the ambiguity refusal is the
+best part of the design, and the default path is provably inert (0 of 14 cache
+values moved; the legacy-comparison tests pass).
+
+*Worth taking in the same PR (four one-line docstring fixes):*
+1. =:2228= "four" -> "five".
+2. =:1735= add =shipped= to the fall-through list.
+3. =:2177= =§6= -> "section 6" (ASCII).
+4. Correct or delete the "=shipped= count is the only tell" instruction -- as
+   written it will send a loader author looking for a bug that is not there.
+
+*Take in the Ethiopia loader PR (#852), not here:*
+5. =shipped_matched= (pre-sentinel, pre-screen) + a warn-on-zero-match.  This
+   is the single change that closes items 1.3, 1.4, 1.5 and 5(b) at once, and
+   the ledger already identifies it as the dominant failure mode.
+6. =yield_kg(..., shipped_factors=, min_reports=)= pass-through.
+7. Either enforce =u= among the join keys or stop claiming it in the error
+   message.
+8. Re-run =test_uganda_harvest_kg_baseline= on a warm cache.
+9. Tighten =data_info.yml:555-557= (§6 Q2) so the loader is not pointed at the
+   stored column.

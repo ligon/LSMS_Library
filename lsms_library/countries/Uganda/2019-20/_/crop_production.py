@@ -17,6 +17,11 @@ records are absent from the table entirely.  Adding them ADDS mass and so
 is deliberately left to a separate change; see Uganda/_/CONTENTS.org.
 
 Crop module lives under Data/Agric/.  See uganda.CROP_COLMAPS['2019-20'].
+
+The SOLD unit (s5?q07c_1/_2) and SOLD condition (s5?q07b_1/_2) are carried
+as Unit_sold / Condition_sold (GH #824), one pair per wired slot.  Season A's
+_11 / _21 'part harvest' slots are NOT read, on the sold side or the harvest
+side, so the two stay consistent.
 """
 import sys
 sys.path.append('../../_/')

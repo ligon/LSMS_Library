@@ -1,0 +1,28 @@
+ country                   class                      u  truth_kg  n_rows  n_items  served_now    fix_b  fix_c_median_j  served_now_x_truth  fix_b_x_truth  fix_c_median_j_x_truth
+  Uganda     B: unparsed content        Bottle (1.5ltr)     1.500     151        3    1.400000 0.875000             NaN               0.933          0.583                     NaN
+  Uganda     B: unparsed content          Bottle (1ltr)     1.000     169        6    1.011364 0.555556             NaN               1.011          0.556                     NaN
+  Uganda     B: unparsed content          Bottle (2ltr)     2.000      26        4    1.333333 1.142857        0.025000               0.667          0.571                   0.012
+  Uganda     B: unparsed content         Cup/Mug(0.5lt)     0.500   22250       50    1.000000 0.250000        0.338542               2.000          0.500                   0.677
+  Uganda     B: unparsed content          Glass(0.25lt)     0.250    3399       35    0.500000 0.250000        0.224747               2.000          1.000                   0.899
+  Uganda     B: unparsed content         Gourd (1-5lts)     5.000     198       17    1.350000 0.625000        2.000000               0.270          0.125                   0.400
+  Uganda     B: unparsed content        Jerrican (1 lt)     1.000     247        8    1.060606 1.315789        1.818182               1.061          1.316                   1.818
+  Uganda     B: unparsed content      Jerrican (10 lts)    10.000      29        6    3.714286 2.761905             NaN               0.371          0.276                     NaN
+  Uganda     B: unparsed content       Jerrican (2 lts)     2.000     112        7    1.333333 1.666667        3.181818               0.667          0.833                   1.591
+  Uganda     B: unparsed content      Jerrican (20 lts)    20.000      54        6    3.333333 2.500000        8.750000               0.167          0.125                   0.438
+  Uganda     B: unparsed content       Jerrican (3 lts)     3.000     123        9    1.333333 4.117647             NaN               0.444          1.373                     NaN
+  Uganda     B: unparsed content       Jerrican (5 lts)     5.000      58       12    1.821429 2.000000        4.000000               0.364          0.400                   0.800
+  Uganda     B: unparsed content             Jug (1 lt)     1.000     190        9    1.000000 0.344828        1.612216               1.000          0.345                   1.612
+  Uganda     B: unparsed content          Jug (1.5 lts)     1.500      89        5    0.958333 0.316667        1.818182               0.639          0.211                   1.212
+  Uganda     B: unparsed content            Jug (2 lts)     2.000     628       19    1.333333 0.350000        1.250000               0.667          0.175                   0.625
+  Uganda     B: unparsed content          Jug (2.5ltrs)     2.500      94       10    1.500000 0.500000        1.937500               0.600          0.200                   0.775
+  Uganda     B: unparsed content Plastic Basin (15 lts)    15.000    3935       30    2.500000 2.116305        6.875000               0.167          0.141                   0.458
+  Uganda     B: unparsed content Plastic Basin (5 ltrs)     5.000     827       25    1.666667 0.956190        2.000000               0.333          0.191                   0.400
+  Uganda     B: unparsed content          Sack (50 kgs)    50.000      62       12    4.375000 7.970588       40.468750               0.088          0.159                   0.809
+  Uganda     B: unparsed content            Tin (5 lts)     5.000     184       20    1.625000 1.142857        1.825893               0.325          0.229                   0.365
+  Uganda     B: unparsed content    Tin (Debe) (20 lts)    20.000     510       17    3.333333 2.500000       10.000000               0.167          0.125                   0.500
+  Malawi A: bare metric spelling                  Grams     0.001    1217       53    0.705676 0.003200        0.001193             705.676          3.200                   1.193
+  Malawi A: bare metric spelling             Millilitre     0.001   16912       69    0.742515 0.002138        0.000986             742.515          2.138                   0.986
+Ethiopia A: bare metric spelling                 Litres     1.000   12113       37    1.833333 2.000000        0.916667               1.833          2.000                   0.917
+Ethiopia A: bare metric spelling             Mili Liter     0.001    2275       21    1.064583 0.002143        0.001017            1064.583          2.143                   1.017
+GhanaLSS A: bare metric spelling             Milliliter     0.001    1718       63    0.265631 0.001135        0.001937             265.631          1.135                   1.938
+    Mali A: bare metric spelling                 Gramme     0.001    2120       98    0.708333 0.062500        0.166209             708.333         62.500                 166.209

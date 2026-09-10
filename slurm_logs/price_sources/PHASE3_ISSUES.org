@@ -1,0 +1,113 @@
+#+TITLE: Phase 3 -- cross-country patterns filed as GitHub issues
+#+DATE: 2026-09-08
+
+Filed from =DATA_PROBLEMS.csv= (69 rows, 20 patterns) after checking every count
+and evidence string against the =<Country>/REPORT.org= row it came from.  One
+issue per PATTERN, not per country row.  Already filed earlier today and NOT
+duplicated: #817-#831.
+
+* Filed (15)
+
+| pattern | issue | countries | title |
+|---------+-------+-----------+-------|
+| P08-unit-vocab | https://github.com/ligon/LSMS_Library/issues/832 | GhanaLSS, Niger, Malawi, Tanzania, Mali, Ethiopia, Uganda | The =u= axis is split by spelling in 7 countries: one unit under two labels (GhanaLSS 473,660 rows; Niger 26,000+) |
+| P09-label-fold | https://github.com/ligon/LSMS_Library/issues/833 | Malawi, Uganda, Tanzania, Niger, Ethiopia | =harmonize_*= folds raw and processed into one =j= in 5 countries: Malawi groundnut 5.0x, Uganda maize 3.33x are milling |
+| P02-price-basis (Nigeria C8 SIZE only) | https://github.com/ligon/LSMS_Library/issues/834 | Nigeria (Tanzania listed as a sibling) | Nigeria community_prices never reads the C8 SIZE field: g and cl rows are package prices (1/189, 1/42), size axis lost |
+| P07-cluster-grain (the part #819 does not cover) | https://github.com/ligon/LSMS_Library/issues/837 | Ethiopia, Tanzania, Uganda | GH #323 site 2 residual: the (t,v) cluster key is still non-unique in Ethiopia, Tanzania, Uganda (up to 1,304 rows a wave) |
+| P19-quantity-truncation | https://github.com/ligon/LSMS_Library/issues/835 | Tanzania | tanzania.new_harmonize_units floors quantities with astype(int64) before the unit factor: 852 rows lost, 4,581 inflated |
+| P20-cache-hash-hole | https://github.com/ligon/LSMS_Library/issues/836 | Tanzania | Tanzania/_/food_acquired.py reads a build table out of CONTENTS.org, which the cache hash deliberately skips |
+| P14-kg-factors | https://github.com/ligon/LSMS_Library/issues/838 | Mali, Niger | _get_kg_factors contradicts the survey's own unit labels (Mali Sac moyen 26.2 vs 50 kg), and KNOWN_METRIC lacks =gramme= |
+| P16-false-config-claim | https://github.com/ligon/LSMS_Library/issues/839 | Mali, Tanzania | A config comment the data contradict: Mali data_scheme.yml (3 false claims since #380) and Tanzania CONTENTS.org (#112) |
+| P03-variety-collapse | https://github.com/ligon/LSMS_Library/issues/840 | Mali, Tanzania, Niger | community_prices drops the variety axis, keeping one (t,v,j,u) row arbitrarily (Mali 22.4%, Tanzania ~90%, Niger 90->45) |
+| P18-missing-wave-config | https://github.com/ligon/LSMS_Library/issues/841 | Nigeria | Nigeria cluster_features undeclared for W5 while sample and community_prices ship it: 24,184 price rows have no geography |
+| P13-null-unit | https://github.com/ligon/LSMS_Library/issues/842 | Niger, Uganda | A NULL =u= is served on a declared index level (Niger 453 rows), dropped by any downstream groupby; Uganda ships u='Unknown' (*title + body corrected after filing -- see below*) |
+| P06-unwired-module (N-05) | https://github.com/ligon/LSMS_Library/issues/843 | Nigeria | Nigeria crop_production has no sale price in W3-W5 (0 of 37,315 rows): secta3ii is hh-crop grain, the build needs a plot |
+| P06-unwired-module (N-07) | https://github.com/ligon/LSMS_Library/issues/844 | Nigeria | Nigeria asks a farmgate valuation of the whole harvest (sa3q18, 76% of rows) that no table carries |
+| P05-price-absent (Uganda D5) | https://github.com/ligon/LSMS_Library/issues/845 | Uganda | food_prices(units='unitprice') docs: for Uganda the stored Price IS Exp/Qty, not an elicited price (94.4-99.9% of rows) |
+| P10-coverage-grading (Tanzania D6) | https://github.com/ligon/LSMS_Library/issues/846 | Tanzania | Tanzania: record a not-asked capability for food price and own-consumption value (Section J qq.2-6 is the C4 evidence) |
+
+* Not filed, with the reason
+
+| pattern | reason | countries |
+|---------+--------+-----------|
+| P04-crop-vs-j | *Covered by the open #569*, whose fix step 1 is literally "=crop -> j=" (it also covers =plot= vs =plot_id= and Uganda's extra =season=).  Filing would duplicate.  New evidence this sweep adds, for whoever picks #569 up: the split is Malawi / Nigeria / Mali / Niger (=crop=) against Uganda / Ethiopia / Tanzania (=j=) -- #569 sampled only four countries. | Malawi, Nigeria, Mali, Niger |
+| P07 -- Tanzania =community_prices.v= | *Not a defect.*  The brief asked for "Tanzania's community_prices.v needing a crosswalk".  It is not a =DATA_PROBLEMS.csv= row, and the crosswalk *already exists as a library feature*: =community_cluster_xwalk= is declared at =Tanzania/_/data_scheme.yml:392= with wave scripts in =2019-20/_/= and =2020-21/_/= and a country-level concat, landed under GH #113 and documented in =Tanzania/_/CONTENTS.org= §864.  =community_prices.v= holding a Survey-Solutions =interview__key= is the documented, deliberate design (CONTENTS.org §716 "Why the community-price <-> household link cannot be made cleanly"), and the report resolved 51/99 and 458/488 communities through the shipped crosswalk. | Tanzania |
+| P15-orphan-cluster | Reports call it *correct survey behaviour* -- price forms exist for clusters the household file does not carry (GhanaLSS 1,478 rows, Mali 612, Nigeria 87).  Counted and carried, never dropped silently.  Mali M5 alone ("investigate whether the community and household frames used different grappe numbering") could become an issue if someone wants the 26 grappes chased; not filed on the reports' own verdict. | GhanaLSS, Mali, Nigeria |
+| P12-analysis-code | Fixed upstream by the coordinator during the sweep (=MIN_DOF = 5= plus a =LinAlgError= catch in =common.py=); all outputs regenerated against it. | Ethiopia, Nigeria, GhanaLSS |
+| P01-sale-unit | Filed as #824 (Malawi fixed =6c2afa99=; Uganda / Nigeria / Niger open). | -- |
+| P11-scale-defect | Filed as #829 (+ #830 for the grader half). | Uganda |
+| P10 -- the grader half | Filed as #818 (landed).  Only Tanzania D6, the verdict/capability half, was uncovered -- filed above as #846. | Nigeria, GhanaLSS |
+| P02 -- GhanaLSS D6 | Not a defect: =NumberOfUnits= null for the entire 2012-13 *non-food* block (=u='Other Unit'=, free-text basis) is by design; foods unaffected (Kg 8.0% null, Liter 0.4%). | GhanaLSS |
+| P02 -- Tanzania D7 | Folded into #834 as a listed sibling instance rather than filed separately, per the brief's scoping of P02 to the Nigeria C8 instance. | Tanzania |
+| P05/P06 -- Nigeria N-07 | The brief listed Nigeria's =sa3q18= under both P05 and P06.  They are *the same row* (N-07, filed under P06 in the CSV); filed once, as #844. | Nigeria |
+
+* Needs coordinator (core redesign, not a fix)
+
+None of the filed issues requires a core redesign to *land*, but two carry a
+design decision inside them and are flagged in their bodies rather than as
+separate drafts:
+
+- *#840 (P03, variety collapse)* -- both candidate fixes are policy.  Adding
+  =variety= to the index is a schema change that fans out every consumer joining
+  on =(t, v, j, u)=; selecting on a stated rule is a reducer, which Tanzania's own
+  code comment rejects citing GH #323 D1 ("fix the index; do not declare a
+  reducer").  A maintainer must choose; GhanaLSS's =obs= level is a third shape.
+- *#839 (P16)* carries a framework smell worth its own decision: a *comment* appended
+  to =Mali/_/data_scheme.yml= moves all five probed Mali table cache hashes, while
+  the same edit to =CONTENTS.org= moves none, because =Country._table_cache_hash=
+  hashes the file bytes by name.  There is therefore no way to correct a false
+  comment without paying a corpus rebuild -- a standing incentive to leave false
+  claims in place.  Hashing the parsed YAML would remove it.
+
+* Evidence discrepancies found while checking
+
+*Two.*  The first is a contradiction and forced an edit to an issue I had already
+filed; the second is a paraphrase.
+
+** 1. Niger's NULL =u= rows are SERVED, not deleted (#842 corrected)
+
+=Niger/REPORT.org= D7 says the 441 =crop_production= and 12 =food_acquired= rows
+with a NULL =u= are "deleted outright by the framework's NaN-key =groupby=
+collapse".  *The row's own evidence refutes its symptom*: the count comes from
+=getattr(c,n)().reset_index().u.isna().sum()=, a probe of the *delivered* API
+table, which would return 0 if the collapse had removed them.  Re-verified against
+the live API on the warm cache:
+
+#+begin_src
+crop_production rows 41896 u isna 441
+food_acquired   rows 239031 u isna 12
+#+end_src
+
+So the rows are served with a NaN on a declared index level, and the deletion is a
+*downstream hazard* -- pandas' =dropna=True= default in any consumer =groupby=,
+=Feature()= assembly, or =_normalize_dataframe_index= if the index ever goes
+non-unique -- not something that has already happened.  #842 was filed with the
+report's wording, then corrected in place (title and body, with the correction
+recorded in the issue itself).  The counts are unchanged.
+
+** 2. A paraphrased docstring in Uganda D5
+
+=Uganda/REPORT.org= D5 quotes =transformations.py:1368-1372= as documenting =unitprice= as "the survey's
+own price question".  The literal docstring says: /"reported =Price= (currency /
+native u).  NaN where the survey did not record a unit price.  This mode reflects
+the canonical =food_acquired.Price= column -- market price for =s='purchased'=,
+farmgate for =s='produced'=, imputed for =s='inkind'="/.  The paraphrase is fair
+and the substance stands, but #845 quotes the literal text and says so.
+
+Every other count and file:line reference in the 15 issues was reproduced from the
+report table and, where it named library code, checked against the source:
+=country.py:640= (=_ORG_HASH_SKIP = {"CONTENTS.org"}=), =Tanzania/_/food_acquired.py:34=
+(=df_from_orgfile('CONTENTS.org','food_labels')=), =malawi.py:915= (=_harvest_block(...,
+condition=None, ...)=), =transformations.py:1004= (=def _get_kg_factors=),
+=KNOWN_METRIC= (has =kilogramme=, lacks =gramme=), =uganda.py:400=
+(=warnings.warn("Dropping some unknown unit codes!")=), =tanzania.py
+new_harmonize_units= (=.astype(np.int64) * df[pair['unit'][i]]=), and
+=Tanzania/_/categorical_mapping.org:595-600= (the comment forbidding the
+=piece= -> =Piece= fold), and =GrainConflictWarning= (real -- =build_transforms.py:390=,
+raised at :508; it is a *different* class from the =GrainCollapseWarning= CLAUDE.md
+names, and #837 quotes it correctly).  Two figures quoted in the issues come from a
+country report's *analysis* section rather than its Data-problems table and were
+located there: Nigeria's "-3.555 -> 0.000, IQR 4.910 -> 0.274" (=Nigeria/REPORT.org:181=)
+and GhanaLSS's 3.5-11.2% comparable-share (=GhanaLSS/REPORT.org:137-139=).  Where the report was richer than the CSV, the report's
+number was used (Niger D1's third wave 112 + 3,307; Ethiopia D6's conflicting-tuple
+counts; Tanzania D2's max factor 1.900).

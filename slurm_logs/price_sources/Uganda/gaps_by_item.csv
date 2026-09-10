@@ -1,0 +1,181 @@
+pair,j,n_cells,median_gap,ratio,in_30_50
+own_consumption_valuation_vs_crop_sale_price,Matoke,64,0.0,1.0,False
+own_consumption_valuation_vs_crop_sale_price,Beans,40,0.1742652699702707,1.1903712936996393,False
+own_consumption_valuation_vs_crop_sale_price,Maize,27,0.9162907318741551,2.5,False
+own_consumption_valuation_vs_crop_sale_price,Sweet Bananas,17,-0.33647223662121206,0.7142857142857149,False
+own_consumption_valuation_vs_crop_sale_price,Sweet Potatoes,15,0.0,1.0,False
+own_consumption_valuation_vs_crop_sale_price,Cassava,13,0.0,1.0,False
+own_consumption_valuation_vs_crop_sale_price,Ground Nuts,12,0.4722052955177962,1.6035265467502864,False
+own_consumption_valuation_vs_crop_sale_price,Sorghum,12,0.36071617815207135,1.4343563014448535,True
+own_consumption_valuation_vs_crop_sale_price,Millet,11,0.35667494393873245,1.4285714285714286,True
+own_consumption_valuation_vs_crop_sale_price,Irish Potatoes,6,-0.2350018146228674,0.7905694150420951,False
+own_consumption_valuation_vs_crop_sale_price,Rice,5,0.16864593573712927,1.1837009585126117,False
+own_consumption_valuation_vs_crop_sale_price,Cabbages,2,-0.09310582522671762,0.9110970781394264,False
+own_consumption_valuation_vs_crop_sale_price,Dodo,1,-1.6094379124341005,0.19999999999999998,False
+own_consumption_valuation_vs_crop_sale_price,Sim Sim,1,0.3285040669720374,1.3888888888888906,True
+own_consumption_valuation_vs_crop_sale_price_soldunit,Matoke,68,0.0,1.0,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Beans,46,0.1742652699702707,1.1903712936996393,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Maize,36,0.9162907318741551,2.5,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Sweet Bananas,21,-0.33647223662121206,0.7142857142857149,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Ground Nuts,16,0.5198603854199586,1.6817928305074283,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Sweet Potatoes,16,0.0,1.0,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Millet,14,0.271547442167388,1.3119931141769534,True
+own_consumption_valuation_vs_crop_sale_price_soldunit,Sorghum,14,0.44594782489471996,1.5619699684601285,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Cassava,12,0.08560174303525692,1.0893723917595213,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Irish Potatoes,7,-0.13353139262452274,0.8749999999999999,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Rice,6,0.1823215567939549,1.2000000000000004,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Cabbages,2,0.024395082084716524,1.0246950765959604,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Sim Sim,2,0.30809306971190953,1.3608276348795447,True
+own_consumption_valuation_vs_crop_sale_price_soldunit,Dodo,1,-1.6094379124341005,0.19999999999999998,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Soybean,1,0.2231435513142097,1.25,False
+own_consumption_valuation_vs_crop_sale_price_soldunit,Sugarcane,1,0.5108256237659905,1.6666666666666663,False
+reported_purchase_price_vs_unit_value,Salt,437,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Onions,342,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Cooking Oil,331,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Tomatoes,245,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Ground Nuts,187,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Tea,182,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Veg.,174,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Fish (fresh),157,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Fish (dried),152,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Maize,144,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Beans,137,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Sugar,132,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Alcohol,129,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Cabbages,120,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Matoke,119,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Milk (fresh),114,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Beef,102,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Bread,91,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Soda,90,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Cassava,87,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Sweet Potatoes,73,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Sweet Bananas,72,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Chapati,68,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Fruits,63,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Rice,61,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Cassava (flour),58,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Sim Sim,58,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Irish Potatoes,52,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Sorghum,44,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Dodo,43,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Eggs,42,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Passion Fruits,42,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Coffee,38,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Ghee,37,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Mangos,37,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Millet,34,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Peas,33,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Oranges,32,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Cigarettes,30,0.0,1.0,False
+reported_purchase_price_vs_unit_value,"Butter, etc.",28,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Tobacco,28,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Beer,24,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Goat,24,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Pork,23,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Waragi,22,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Chicken,13,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Kabalagala,13,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Sugarcane,11,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Biscuits,10,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Donut,10,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Jam/Marmalade,10,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Meat,9,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Water,9,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Ginger,7,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Drinks,7,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Yam,7,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Garlic,6,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Cake,5,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Macaroni/Spaghetti,5,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Juice,5,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Samosa,4,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Jackfruit,3,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Other Spices,3,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Wheat (flour),3,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Bongo,2,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Ice Cream,2,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Soybean,2,0.0,1.0,False
+reported_purchase_price_vs_unit_value,Yogurt,2,0.0,1.0,False
+unit_value_vs_crop_sale_price,Maize,42,1.203972804325936,3.333333333333333,False
+unit_value_vs_crop_sale_price,Matoke,34,0.3151827845361357,1.3705097960612398,True
+unit_value_vs_crop_sale_price,Beans,22,0.41159840473913256,1.509228215710232,False
+unit_value_vs_crop_sale_price,Millet,11,0.5594074979928143,1.7496355305594125,False
+unit_value_vs_crop_sale_price,Ground Nuts,10,0.729692808104466,2.074443257628262,False
+unit_value_vs_crop_sale_price,Cassava,9,0.0,1.0,False
+unit_value_vs_crop_sale_price,Sorghum,9,0.458145365937078,1.5811388300841904,False
+unit_value_vs_crop_sale_price,Rice,7,0.633515470146536,1.8842228790639823,False
+unit_value_vs_crop_sale_price,Sweet Bananas,7,-1.0074515102711317,0.365148371670111,False
+unit_value_vs_crop_sale_price,Cabbages,5,0.0,1.0,False
+unit_value_vs_crop_sale_price,Sweet Potatoes,5,0.0,1.0,False
+unit_value_vs_crop_sale_price,Sim Sim,3,0.3285040669720374,1.3888888888888906,True
+unit_value_vs_crop_sale_price,Tea,3,2.436116478167988,11.42857134342194,False
+unit_value_vs_crop_sale_price,Irish Potatoes,2,0.0019705557323699274,1.0019724985532532,False
+unit_value_vs_crop_sale_price,Tomatoes,2,1.1339401836539809,3.107878016963649,False
+unit_value_vs_crop_sale_price,Dodo,1,-0.6931471805599454,0.49999999999999994,False
+unit_value_vs_crop_sale_price,Onions,1,0.5533852381847861,1.7391304347826078,False
+unit_value_vs_crop_sale_price,Soybean,1,0.4700036292457357,1.6,False
+unit_value_vs_crop_sale_price_soldunit,Maize,51,1.09861228866811,3.000000000000001,False
+unit_value_vs_crop_sale_price_soldunit,Matoke,42,0.2412702240108966,1.272864947510915,False
+unit_value_vs_crop_sale_price_soldunit,Beans,27,0.4177317013701005,1.5185132047305934,False
+unit_value_vs_crop_sale_price_soldunit,Ground Nuts,14,0.729692808104466,2.074443257628262,False
+unit_value_vs_crop_sale_price_soldunit,Millet,14,0.5406755962411229,1.7171665816776458,False
+unit_value_vs_crop_sale_price_soldunit,Sorghum,12,0.48448549485153425,1.6233395773754948,False
+unit_value_vs_crop_sale_price_soldunit,Rice,9,0.5306282510621703,1.6999999999999997,False
+unit_value_vs_crop_sale_price_soldunit,Sweet Bananas,9,-0.6931471805599463,0.4999999999999995,False
+unit_value_vs_crop_sale_price_soldunit,Cassava,8,0.3973088012791459,1.4878152983881663,True
+unit_value_vs_crop_sale_price_soldunit,Sweet Potatoes,6,-0.055785887828552205,0.945741609003176,False
+unit_value_vs_crop_sale_price_soldunit,Cabbages,5,0.0,1.0,False
+unit_value_vs_crop_sale_price_soldunit,Sim Sim,4,0.36698458754010055,1.4433756729740648,True
+unit_value_vs_crop_sale_price_soldunit,Tea,4,2.414931174779506,11.189000245642436,False
+unit_value_vs_crop_sale_price_soldunit,Irish Potatoes,2,0.10136627702704182,1.1066819197003224,False
+unit_value_vs_crop_sale_price_soldunit,Soybean,2,0.4904146265058631,1.632993161855452,False
+unit_value_vs_crop_sale_price_soldunit,Tomatoes,2,1.1339401836539809,3.107878016963649,False
+unit_value_vs_crop_sale_price_soldunit,Dodo,1,-0.6931471805599454,0.49999999999999994,False
+unit_value_vs_crop_sale_price_soldunit,Onions,1,0.5533852381847861,1.7391304347826078,False
+unit_value_vs_crop_sale_price_soldunit,Sugarcane,1,0.5108256237659905,1.6666666666666663,False
+unit_value_vs_own_consumption_valuation,Other Veg.,128,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Beans,110,0.16119339906893204,1.1749121737630333,False
+unit_value_vs_own_consumption_valuation,Maize,109,0.17611029679467638,1.1925695879998883,False
+unit_value_vs_own_consumption_valuation,Sweet Potatoes,88,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Cassava,83,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Ground Nuts,77,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Other Fruits,72,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Matoke,61,0.2231435513142106,1.250000000000001,False
+unit_value_vs_own_consumption_valuation,Dodo,59,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Milk (fresh),59,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Cassava (flour),46,0.12460077594185837,1.132696163231415,False
+unit_value_vs_own_consumption_valuation,Tomatoes,45,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Sorghum,38,0.047655089902162384,1.0488088481701514,False
+unit_value_vs_own_consumption_valuation,Mangos,37,0.3465735902799718,1.4142135623730938,True
+unit_value_vs_own_consumption_valuation,Millet,36,0.15415067982725805,1.1666666666666663,False
+unit_value_vs_own_consumption_valuation,Irish Potatoes,28,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Eggs,27,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Sweet Bananas,27,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Onions,26,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Sim Sim,26,0.044867121952886446,1.0458888750036919,False
+unit_value_vs_own_consumption_valuation,Peas,23,0.22314353641304852,1.2499999813735485,False
+unit_value_vs_own_consumption_valuation,Chicken,19,0.11778303565638382,1.1250000000000004,False
+unit_value_vs_own_consumption_valuation,Oranges,17,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Passion Fruits,17,0.6931471805599445,1.9999999999999984,False
+unit_value_vs_own_consumption_valuation,Cabbages,13,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Rice,11,0.16271120021731278,1.1766968108291027,False
+unit_value_vs_own_consumption_valuation,Ghee,10,0.1123460817854589,1.118900024564242,False
+unit_value_vs_own_consumption_valuation,Other Tobacco,8,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Yam,7,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Goat,6,0.03449643574347583,1.0350983390135313,False
+unit_value_vs_own_consumption_valuation,Jackfruit,5,-0.4054651081081646,0.6666666666666665,False
+unit_value_vs_own_consumption_valuation,Jam/Marmalade,4,0.601986402162968,1.8257418583505536,False
+unit_value_vs_own_consumption_valuation,Sugarcane,4,0.2624555311246697,1.3001186520687387,True
+unit_value_vs_own_consumption_valuation,Bongo,2,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Chapati,2,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Fish (fresh),2,0.3465735902799727,1.4142135623730951,True
+unit_value_vs_own_consumption_valuation,Kabalagala,2,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Other Alcohol,2,-0.09116077839697745,0.9128709291752767,False
+unit_value_vs_own_consumption_valuation,Tea,2,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Beef,1,0.05268025782891428,1.054092553389461,False
+unit_value_vs_own_consumption_valuation,Cooking Oil,1,-0.3465735902799718,0.7071067811865481,False
+unit_value_vs_own_consumption_valuation,Donut,1,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Salt,1,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Soda,1,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,Soybean,1,0.2876820724517808,1.3333333333333333,True

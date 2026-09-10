@@ -8,6 +8,12 @@ whose labels decode to Kg/Sack/Bunch); the harvest CONDITION is a5aq6b,
 now an index level in its own right (GH #323/#637) so fresh and dry
 records for one plot-crop no longer collide and get summed.
 See uganda.CROP_COLMAPS for the per-wave column map.
+
+The SOLD unit (a5?q7c) and SOLD condition (a5?q7b) are carried as
+Unit_sold / Condition_sold (GH #824).  The AGSEC5A variable-label swap is
+confined to the HARVEST pair 6b/6c: 7b is labelled AND valued as the
+condition and 7c as the unit in this file, so the swap must not be
+generalised.
 """
 import sys
 sys.path.append('../../_/')

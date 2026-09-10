@@ -1,0 +1,12 @@
+852	NEW_01_ethiopia_crop_cf_harvest_kg.md	Ethiopia: wire Crop_CF_Wave{2..5} (WB crop x unit x region conversion factors) into harvest_kg
+853	NEW_02_ethiopia_local_area_unit_conversion.md	Ethiopia: ET_local_area_unit_conversion.dta is held in DVC and never opened; local-unit plots get Area NaN
+854	NEW_03_malawi_ihs5_crop_conversion_files.md	Malawi: wire the two IHS5 crop-side conversion files; decide what _harvest_block's condition parameter is for
+855	NEW_04_malawi_ag_r07_livestock.md	Malawi: _livestock_block never reads ag_r07 ("owned exactly 12 months ago"), which is present in all four waves
+856	NEW_05_malawi_harvest_freetext_recovery.md	Malawi: no free-text unit/crop recovery on the harvest side, and the unmapped-crop drop is not counted
+857	NEW_06_tanzania_quantity_plausibility.md	Tanzania: report-only plausibility count on crop_production.Quantity (no screen exists today)
+858	NEW_07_tanzania_plot_inputs_join_check.md	Tanzania: check plot_inputs against plot_features/crop_production for the 2020-21 roster mismatch EPAR reports
+859	NEW_08_nigeria_per_row_kgfactor.md	Nigeria: carry the per-row crop conversion factor (sa3iq6_conv and its siblings) as KgFactor
+860	NEW_09_nigeria_zone_area_factors.md	Nigeria: no factors for heaps/ridges/stands areas; EPAR's two grids disagree by a median of 4.9x
+861	NEW_10_uganda_2009_10_99999_sentinel.md	Uganda: strip the 2009-10 99999 harvest-quantity sentinel
+862	NEW_11_plot_cultivation_decision_maker_schema.md	Schema proposal: plot_cultivation, a per-season plot decision-maker table (#167's reserved name, #439's convention)
+863	NEW_12_transforms_umbrella.md	Transforms umbrella: livestock_income, rcsi, HDDS/FCS, fertiliser rate, gross crop revenue, crop diversity
