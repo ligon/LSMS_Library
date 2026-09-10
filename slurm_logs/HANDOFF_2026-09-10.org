@@ -34,18 +34,19 @@
   rebuild bug (framework, 20 tables / 13 countries), #867 nitrogen
   content, #868 reduce_to_agreed disclosure, #869 Malawi cassava.
 
-* Held for 0.11.2 (complete on branches, not merged)
-| branch | worktree | state |
+* 0.11.2 line (all merged on development after the v0.11.1 cut, pushed)
+| merge | what | cache |
 |---+---+---|
-| =feat/854-malawi-shipped-factors= (=91fab645=) | =tmp/wt-854-malawi= | red-teamed; merge held on the Feature fix (adding =condition= makes Feature exclude Malawi) |
-| =fix/feature-canonical-index-crop-production= (=75935507=) | =tmp/wt-feature-canonical= | red-team RUNNING at handoff; Feature('crop_production') 8 -> 14 countries; closes #775, part of #569 |
-| =feat/850-food-kg-item-axis= (=2720fdf7=) | =tmp/wt-850-impl= | red-teamed; =baseline_max_spread= built, default None -- @ligon to choose X (recommendation 10); Niger's -56% is NOT a correction without it |
-Merge order: Feature fix -> Malawi (then clear + re-warm Malawi, 26
-hashes) -> #850 with the chosen default (no re-warm; run =make matrix=).
+| =88175a6d= | Feature aligns crop_production to the canonical index (#775 closed; #569 partial) | 0 hashes |
+| =0b142d4d= | Malawi IHS5 shipped factors, condition level, crop_variety (#854 closed) | Malawi cleared + re-warmed 26/26 |
+| =525421e5= | #850 food-side kg inference, dispersion gate default 10 (#850 closed) | 0 hashes; corpus regraded (=7ca5578d=, 0 tier changes) |
+| =a79af45b= | plot_id canonical everywhere (@ligon 2026-09-10) | 274 hashes; 12 countries cleared + re-warmed (274 tables, 0 FAIL) |
+Verified after the re-warms: Country frames serve =plot_id=;
+Feature('crop_production') = 14 countries / 608,570 rows on =plot_id=;
+data-gated suites green on the warm cache.
 
 * Decisions pending with @ligon
-- #850 dispersion gate default X (table in the #850 agent report and
-  =.coder/ledger/850-food-kg-item-axis.md= §8).  Recommendation: 10.
+- (decided 2026-09-10: #850 gate X=10; plot axis = plot_id everywhere.)
 - KG_FACTOR_MAX per-unit cap (ox-cart 800; a floor) -- Malawi ledger §7.
 - Whether to send EPAR the defects found (WORKPLAN Phase 4).
 
