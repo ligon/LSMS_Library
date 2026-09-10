@@ -1012,6 +1012,231 @@ rows* and both the "reported purchase price" and "own-consumption
 valuation" sources are empty for this country.  Wiring =sa3q18= (as, say,
 =Value_if_sold=) would give Nigeria a farmgate valuation on ~2.8x more rows
 than its sales data, and is recorded here as a gap rather than guessed at.
+* crop_production: the per-row Kg/L conversion factor (=KgFactor=, GH #859)
+
+Added 2026-09-09.  The GHS-Panel harvest form asks a *Kg/L conversion factor*
+beside the harvest quantity and its unit, and =crop_production= now carries it
+as the canonical optional column =KgFactor= --- kilograms per ONE unit of the
+row's =u=, REPORTED and never constructed (=lsms_library/data_info.yml=,
+=crop_production.KgFactor=).  =transformations.harvest_kg= already prefers
+such a column as its first (=reported=) layer, so =Harvest_kg= moved with no
+change to =transformations.py=.
+
+** Which =*_conv= column exists, per wave and per section file
+
+Read from the =.dta= metadata (all ten harvest section files, both rounds of
+every wave).  *Only waves 4 and 5 ship one at all.*
+
+| wave    | file                 | rows   | =*_conv= column  | non-null      | pairs with (qty / unit)     | wired? |
+|---------+----------------------+--------+----------------+---------------+-----------------------------+--------|
+| 2010-11 | secta3_harvestw1     | 13 018 | *none*           | ---           | ---                         | n/a    |
+| 2012-13 | secta3_harvestw2     | 12 948 | *none*           | ---           | ---                         | n/a    |
+| 2015-16 | secta3i_harvestw3    | 11 956 | *none*           | ---           | ---                         | n/a    |
+| 2015-16 | secta3ii_harvestw3   |  8 544 | *none*           | ---           | ---                         | n/a    |
+| 2018-19 | secta3i_harvestw4    | 14 197 | =sa3iq6_conv=    | 10 845 (76.4%) | =sa3iq6i= / =sa3iq6ii=        | *yes*    |
+| 2018-19 | secta3i_harvestw4    |        | =sa3iq6d_conv=   |  3 410 (24.0%) | =sa3iq6d1= / =sa3iq6d2=       | no     |
+| 2018-19 | secta3ii_harvestw4   |  8 839 | =sa3iiq1_conv=   |  8 669 (98.1%) | =sa3iiq1a= / =sa3iiq1c=       | no     |
+| 2018-19 | secta3iii_harvestw4  |  1 062 | =sa3iiiq13_conv= |    695 (65.4%) | =sa3iiiq13a= / =sa3iiiq13c=   | *yes*    |
+| 2023-24 | secta3i_harvestw5    | 10 071 | =sa3iq9_conv=    |  8 092 (80.3%) | =sa3iq9a= / =sa3iq9b=         | *yes*    |
+| 2023-24 | secta3i_harvestw5    |        | =sa3iq15_conv=   |  1 169 (11.6%) | =sa3iq15a= / =sa3iq15b=       | no     |
+| 2023-24 | secta3ii_harvestw5   |  7 184 | =sa3iiq1_conv=   |  6 962 (96.9%) | =sa3iiq1a= / =sa3iiq1c=       | no     |
+| 2023-24 | secta3iii_harvestw5  |    483 | =sa3iiiq23_conv= |    295 (61.1%) | =sa3iiiq23a= / =sa3iiiq23b=   | *yes*    |
+
+Every one of them carries the Stata label "Kg/L conversion factor"; the label
+does not distinguish them.  Only the *neighbouring question* does.
+
+** Why three of them are NOT wired --- and must not be
+
+*A factor belongs to the quantity block it was asked beside.*
+
+- =sa3iq6d_conv= (W4) / =sa3iq15_conv= (W5) sit in the *"How much MORE [CROP]
+  does HH expect to harvest from [PLOT]?"* block, which has its own Quantity,
+  Unit, Size and Condition columns (=sa3iq6d1/2/4/2a=, =sa3iq15a/b/c/d=).  That
+  is a *different, not-yet-realised* harvest measured in a *different
+  container*.  =crop_production= stores the q6/q9 harvest, so attaching the
+  q6d/q15 factor to it would multiply one container's rate by another
+  container's quantity.
+- =sa3iiq1_conv= (=secta3ii=, both waves) is the *household*-crop total
+  harvest, with no plot linkage --- the same reason =crop_production.py=
+  already leaves W3--W5 =Quantity_sold= / =Value_sold= NaN (see the
+  [[*crop_production: two reported price fields the build does not carry][price-fields section]] above).  =secta3ii= is not read by this build at all.
+
+GH #859 quoted EPAR's W4 =.do= (:575--592) as evidence of "FOUR columns".  It
+is four columns *for EPAR's purpose*, which is different: EPAR runs a *lockstep
+coalesce* --- =replace unit=... if unit==.=, then =size=, =condition= and
+=conv_fact= for each block in turn --- to BUILD a crop/unit/condition/size
+conversion TABLE that it then merges back on those four keys (:980).  Every
+block's factor is a legitimate input to *that* table because EPAR keeps
+unit+size+condition *bound to* each factor.  We are not building a table --- we
+are carrying the number that sits on the row --- so only the paired column
+qualifies.  Recorded because the two readings look identical until you notice
+what the coalesce is for.  (It is a coalesce, not an =append=: the three
+sections are appended earlier, at :567--569, but the four =*_conv= columns are
+merged column-wise onto the same row.)
+
+** What was actually wired, and what moved
+
+Country script =_/crop_production.py= names one =kg_factor= column per source
+frame; =nigeria.crop_production_for_wave= reads it *positionally off the same
+row* as =qty= / =unit= (no join, no median, no cross-section average) and
+=NaN=s a non-positive value ("0 kg per unit" is not a weight --- measured a
+no-op here: all four wired columns report positive-or-null only).
+
+Rows are *unchanged*, per wave and in total (isolated cold build, before and
+after):
+
+| t      | rows   | KgFactor non-null (after) |
+|--------+--------+---------------------------|
+| 2011Q1 | 12 752 |                         0 |
+| 2013Q1 | 12 777 |                         0 |
+| 2016Q1 | 11 829 |                         0 |
+| 2019Q1 | 15 054 |                    11 393 |
+| 2024Q1 | 10 432 |                     8 285 |
+| total  | 62 844 |                    19 678 |
+
+W1--W3 are all-NaN *because the column does not exist in the source*, which is
+why =data_scheme.yml= declares =KgFactor= =optional: true= --- the Site-B
+all-null guard must not read a survey fact as a wiring gap.
+
+=transformations.harvest_kg= on the built table, before -> after:
+
+| quantity              |     before |        after |
+|-----------------------+------------+--------------|
+| total =Harvest_kg=      |  9 315 175 | *22 111 818*   |
+| plot-crop rows with kg |      6 723 |       19 007 |
+| layer =reported=        |          0 |     *19 667*   |
+| layer =survey_median=   |          0 |          342 |
+| layer =inferred=        |     11 817 |       11 635 |
+| layer =none=            |     51 027 |       31 200 |
+| =reported_implausible=  |          0 |           11 |
+
+=reported= = 19 678 non-null - 11 screened.  The =none= layer fell by 19 827
+rows: Nigeria's kilograms had been resolvable for 19% of rows and are now
+resolvable for 50%.
+
+*This is coverage, not revaluation, and the decomposition says so exactly.*
+All *12 796 643* kg of the increase come from the *19 827 rows that previously
+had no factor at all*.  Rows whose factor changed: *0*.  Rows that lost a
+factor: *0*.  Not one pre-existing number moved.  By unit the delta is
+Sack/Bag 8 846 327 (67%), Tuber 2 422 330, Wheelbarrow 396 706, Bunch 349 345,
+then a long tail --- a 100 kg grain sack, a ~3 kg yam tuber and a 25 kg
+palm-oil bunch are all face-plausible.
+
+** What the plausibility screen rejected: 11 rows, and NOT a sentinel
+
+*Nigeria's own =*_conv= columns contain no 999 / 9999-style sentinel.*  Across
+all six wired-column x wave cells the range is 0.0864 -- 186.13, i.e. entirely
+below =KG_FACTOR_MAX= (250) and outside =_KG_FACTOR_YEAR_BAND=, so screen rules
+2 and 3 cannot fire on this country.  Every rejection is rule 1 --- *the row's
+unit IS the kilogram and the factor is not 1*:
+
+| KgFactor | rows | u  | crop                   | waves          |
+|----------+------+----+------------------------+----------------|
+|     0.36 |    7 | Kg | Maize                  | 2024Q1         |
+|     0.70 |    4 | Kg | Groundnuts (unshelled) | 2019Q1, 2024Q1 |
+
+That is the complete list --- there is no eleventh distinct value.  Both look
+like a *processing ratio* (shelling / drying loss) keyed into a field that
+asks for a container weight: 0.7 kg of shelled groundnut per kg unshelled, 0.36
+of grain per kg of what was weighed.  They are *not* clipped, rescaled or
+stripped here --- the schema stores what the instrument wrote down, and
+=harvest_kg='s screen already refuses them at read time and counts them under
+=reported_implausible=.  (EPAR applies the identical rule --- =replace
+conv_fact=1 if unit==1 //kg=, W4 =.do=:597 --- so the screen matches the
+reference implementation.)
+
+*There is NO independent cross-check on the kilograms this adds, and the
+=reported_vs_inferred= audit must not be read as one.*  It reports "171 both, 0
+disagree", but all 171 of those rows are =u='Kg'= at ratio exactly 1.0: a
+tautology on the kilogram, not a corroboration.  The library's inferred layer
+returns NaN for *every* Nigerian container unit (Sack/Bag, Tuber, Wheelbarrow,
+Bunch, Basket, Basin, Heap, Tiya, Mudu, Congo, Paint rubber, Piece, Bundle,
+Stalk, Bowl), so the overlap the canonical =data_info.yml= note advertises
+("it can be audited against the library's inferred factors for the same =u=")
+does not exist for this country.  The 12.8M kg below rests on the survey's own
+number and on nothing else --- which is what =data_info.yml= demands, and is
+exactly why it should be stated rather than dressed as agreement.
+
+** Caveat: the =survey_median= layer now medians ACROSS the survey's Size axis
+
+342 W4/W5 rows with no reported factor are now served by =survey_median= ---
+the median reported factor of the same =u= *within the same country-wave*.
+Nigeria =crop_production= carries no =condition= column, so that group is =u=
+alone; and =nigeria._canon_unit= is deliberately *size-agnostic* ("Sack/Bag"
+absorbs the survey's small / medium / large / 100kg variants, the same
+collapse documented for =community_prices= above), while the reported factor
+is size-*specific* (the source ships a =Size= column beside every unit ---
+=sa3iq6_4=, =sa3iq9c=, =sa3iiiq13d=, =sa3iiiq23c= --- and this build reads
+none of them).  The audit shows exactly that: =reported_vs_survey_median= has
+19 658 comparable rows and *40.9% disagree* beyond 10%.
+
+The concrete form of it: across the 13 901 rows at =u='Sack/Bag'= the reported
+factor takes *eight distinct container weights*, spanning 9 to 100 kg ---
+
+| kg per sack | 100.0 | 50.0 | 18.0 | 70.0 | 25.0 |  9.0 | 36.0 | 35.0 | 17.5 |
+| rows        |  8786 | 2305 |  780 |  722 |  455 |  387 |  349 |  109 |    8 |
+
+--- because the raw label =130. SACK/BAG= carries a separate Size code
+(=12. 100 KG=, =11. 50 KG=, =10. 25 KG=, ...) that =_canon_unit= discards.  A
+median over that collapsed =u= is a median across four sack sizes.
+
+Two readings, and the file does not adjudicate: either a within-=u= median is
+too coarse for Nigeria, or 40.9% is simply what "a sack" means when sacks come
+in four sizes.  *This is an argument FOR the per-row column, not against it*
+--- the 19 667 =reported= rows are immune to the collapse.  Restoring the size
+axis would change the published =u= vocabulary of a shipped table, which is
+the same maintainer decision already deferred for =community_prices=.
+
+** Litres
+
+The column is labelled "Kg/*L* conversion factor", so on a fluid =u= it is
+litres per unit.  =harvest_kg='s default =volume_as_mass=True= reads 1 l = 1 kg,
+so the two conventions coincide; a caller passing =volume_as_mass=False= should
+know the reported factor does not switch with it.
+
+** Cache --- you MUST =cache clear= to see this change (GH #866)
+
+=nigeria.py= and =data_scheme.yml= are both hashed into *every* Nigeria table's
+=lsms_cache_hash=, so all 24 Nigeria tables' hashes moved.  Only
+=crop_production='s content changes; the other 23 rebuild identically.
+
+*A warm Nigeria cache will NOT pick this up, and will silently re-bless itself
+instead.*  Observed here, then diagnosed by the red team and filed as *GH
+#866*.  The mechanism is a framework defect in the rebuild descent, not the
+read gate:
+
+1. The hash moves, and the gate works --- the read grades =stale= and logs
+   =v0.8.0 cache STALE: crop_production ...; rebuilding from source=.
+2. The rebuild descends to =run_make_target=, which tries =try_make= FIRST:
+   =make -s $(VAR_DIR)/crop_production.parquet= in =Nigeria/_=.
+3. *Nigeria's =_/Makefile= has no rule for that target.*  GNU make, handed a
+   rule-less target that EXISTS as a file, calls it up to date and *exits 0*.
+   (It errors --- =No rule to make target= --- only when the file is absent,
+   which is why deleting the parquet does work.)
+4. =try_make= reads exit 0 as a successful rebuild, finds the stale file, and
+   returns it.  =try_script= --- the only thing that would actually run
+   =_/crop_production.py= --- is never reached.
+5. The stale frame is then written back with the NEW hash, so every later read
+   grades =fresh=.  The bug erases its own evidence.
+
+Consequences, all measured: it fires on *every* hash move, not once;
+=LSMS_NO_CACHE=1= does *not* escape it (it bypasses the read gate and lands in
+the same =try_make= exit-0); and =_evict_hashless_wave_caches= (GH #479) does
+not cover it, because that globs =<wave>/_/{table}.parquet= and the
+country-level =var/{table}.parquet= never matches.  It is distinct from #788 /
+#809, which are about the =legacy= trust-once path --- here the parquet grades
+=stale=, and the bug fires anyway.
+
+The only escape is physically removing the =var/= parquet:
+
+: lsms-library cache clear --country Nigeria
+
+Nigeria has *five* tables with no country-target Makefile rule and therefore
+fully exposed --- =crop_production=, =plot_inputs=, =livestock=, =plot_labor=,
+=people_last7days= --- and the other 19 are exposed to the weaker form of the
+same failure, since no rule lists =_/nigeria.py= or =_/data_scheme.yml= as a
+prerequisite even though both are in the cache hash.
+
 * nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
 
 Item-level household non-food expenditure from the post-planting (=sect8*=) and
