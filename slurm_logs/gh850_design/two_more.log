@@ -1,0 +1,48 @@
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/tmp/gh850_data/Nigeria/var/crop_production.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/tmp/wt-850-design/lsms_library/countries/Nigeria/var/crop_production.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/tmp/wt-850-design/lsms_library/countries/Nigeria/_/crop_production.parquet'.  Stop.
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+GhanaLSS: crop FAILED AttributeError: 'Country' object has no attribute 'crop_production'
+    country  cells_ju_with_3plus_waves  waves  max_over_min_p25  max_over_min_median  max_over_min_p75  share_within_2x  share_within_10x
+     Uganda                        356      8          1.574107             2.204167          3.333333         0.460674          0.929775
+     Malawi                        264      5          1.426569             2.467223          6.069032         0.412879          0.818182
+    Nigeria                        375      8          1.655556             3.106509          9.390045         0.357333          0.754667
+   Ethiopia                        508      5          1.245065             1.600000          2.506313         0.663386          0.960630
+   Tanzania                         68      6          1.000000             1.000000          1.000000         0.941176          0.985294
+      Niger                          0      2               NaN                  NaN               NaN              NaN               NaN
+       Mali                         55      3          1.000000             1.350000          2.191667         0.727273          0.927273
+EthiopiaRHS                        161      5          1.250000             1.671988          2.526316         0.633540          0.975155
+   GhanaLSS                          0      5               NaN                  NaN               NaN              NaN               NaN
+
+    country  crop_rows  labels_seeded_now  labels_seeded_by_c  rows_moved_by_c  share_rows_moved                                                                                                   examples
+     Uganda     130606                 13                  13            62321          0.477168 Cup/Mug(0.5lt); Jerrican (10 lts); Jerrican (2 lts); Jerrican (20 lts); Jerrican (3 lts); Jerrican (5 lts)
+     Malawi     131379                  3                   0                0          0.000000                                                                                                           
+    Nigeria      62844                  4                   0                0          0.000000                                                                                                           
+   Ethiopia      85519                  2                   1                1          0.000012                                                                                                     Litres
+   Tanzania      14126                  1                   0                0          0.000000                                                                                                           
+      Niger      46341                  3                   1                5          0.000108                                                                                                     Gramme
+       Mali      35060                  1                   0                0          0.000000                                                                                                           
+EthiopiaRHS      17523                  1                   0                0          0.000000                                                                                                           
