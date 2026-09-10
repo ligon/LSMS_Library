@@ -59,10 +59,12 @@ Index Info:
     # GH #496: register so Feature() assembles a named MultiIndex instead of
     # collapsing to a single object-tuple Index.  livestock is homogeneous
     # across countries; people_last7days is (t,v,i,pid) for all but Uganda
-    # (reduced to (t,v,i) -- handled as a reduced-index country).  The plot-
-    # level ag features (plot_labor/crop_production/plot_inputs) are NOT here:
+    # (reduced to (t,v,i) -- handled as a reduced-index country).  The other
+    # two plot-level ag features (plot_labor/plot_inputs) are still NOT here:
     # their per-country index NAMES diverge (plot vs plot_id, crop vs j) and
-    # need harmonizing before registration -- tracked separately.
+    # need harmonizing before registration -- GH #569.  crop_production is
+    # registered below; the name divergence is now handled DECLARATIVELY by
+    # `level_aliases`, so the same treatment generalises to the other two.
     livestock: (t, i, animal)
     people_last7days: (t, v, i, pid)
     # GH #817: `nonfood_expenditures` shipped in two shapes -- Togo long
@@ -72,6 +74,62 @@ Index Info:
     # `_join_v_from_sample` (the table is household-grain and must NOT emit v
     # itself); no `skip_extra` entry is therefore needed below.
     nonfood_expenditures: (t, v, i, j)
+    # GH #569/#775.  The canonical crop grain is the one the `KgFactor` note
+    # under `Columns:` already states -- "(t, i, plot, j, u, condition, season)
+    # and are never summed across `u` or `condition`" -- plus `v`, which every
+    # frame carries because `_join_v_from_sample` adds it at API time (the same
+    # reason food_acquired is registered `(t, v, i, j, u, s)` while every
+    # country declares `(t, i, j, u, s)`).  KEEPING `v` HERE IS LOAD-BEARING:
+    # `country._compute_no_v_join` exempts any table whose canonical index omits
+    # `v`, so registering without it would silently strip `v` from every
+    # `Country(...).crop_production()` frame in the corpus.
+    #
+    # Registration alone would have kept nothing extra: only Uganda declares the
+    # full shape.  What makes it work is `level_aliases` (plot_id -> plot, crop
+    # -> j) and `missing_level_sentinels` below -- see `feature.py`'s
+    # `_align_to_canonical_levels`.
+    crop_production: (t, v, i, plot, j, u, condition, season)
+
+  # Per-feature canonical level-name ALIASES: `<the name a country emits>:
+  # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
+  # country's frame BEFORE alignment, so a country that names the same axis
+  # differently stacks instead of being excluded by the kept-shape filter.
+  #
+  # This is the mechanism GH #569 asked for.  It is a RENAME, never a
+  # re-interpretation: only add a pair when the two names denote the SAME axis
+  # with the SAME vocabulary.  crop/j are both the harmonize_crop ->
+  # harmonize_food Preferred Label (the fact `transformations._CROP_LEVELS`
+  # already encodes); plot/plot_id are both the within-household plot key.
+  level_aliases:
+    crop_production:
+      plot_id: plot
+      crop: j
+
+  # Per-feature SENTINEL for a canonical index level a country does not carry.
+  # Distinct from `fabricate_missing_levels` above in the one way that matters:
+  # that fills with `pd.NA`, and a NULL on a declared index level is a DEFERRED
+  # SILENT DELETION (CLAUDE.md "Grain Collapse" 3b -- `groupby(dropna=True)`
+  # deletes the row in whichever aggregation runs first).  A sentinel is a real,
+  # greppable value, so the row survives and the absence is visible.  Prefer
+  # this to `fabricate_missing_levels` for any NEW feature.
+  #
+  # Declaring a level here also licenses PROMOTION: if the country carries that
+  # canonical level as a COLUMN rather than an index level, `feature.py` moves
+  # it into the index (null-filled with this sentinel) instead of fabricating a
+  # sentinel over real values.  That is what keeps Mali / Nigeria / Tanzania --
+  # each of which reports a real `u` in a column -- in the assembly.
+  #
+  # crop_production:
+  #   u        -- `Unknown` is the canonical missing-unit sentinel already in
+  #               force corpus-wide; see the `u:` comment at the top of this file.
+  #   condition-- `unknown_condition` is the value `Columns: crop_production:
+  #               condition` already defines ("a real value, never NA").
+  #   season   -- `unknown_season`, new here, same argument.
+  missing_level_sentinels:
+    crop_production:
+      u: Unknown
+      condition: unknown_condition
+      season: unknown_season
 
   # Features whose reduced-index countries get their MISSING canonical levels
   # FABRICATED as NaN (so all countries share the full canonical shape and are
@@ -542,6 +600,30 @@ Columns:
         dried_grain: []
         other_condition: []
         unknown_condition: []
+    season:
+      type: str
+      note: |
+        Cropping season the harvest was reported for.  Like `condition` this
+        is an INDEX level, declared here for documentation and so
+        `_enforce_canonical_spellings` can reach it if a spellings map is ever
+        added.
+
+        DELIBERATELY NO `spellings:` BLOCK.  The per-country vocabularies are
+        not yet harmonized -- Uganda reports the UNPS `A` / `B` seasons,
+        GhanaSPS reports `major` / `minor` / `annual` -- and
+        `diagnostics._check_declared_spellings` reads a `spellings` block as a
+        CLOSED vocabulary, so declaring one now would grade `fail` on every
+        real season value.  Same reasoning, verbatim, as the `u:` comment at
+        the top of this file.  Harmonizing the two vocabularies is a follow-up
+        to GH #569; the LEVEL assembles across countries today, the VALUES do
+        not yet compare.
+
+        `unknown_season` is the sentinel for a country whose harvest module
+        records no season at all (every crop_production country except Uganda
+        and GhanaSPS).  It is a real value, never NA, for exactly the reason
+        `condition` above gives: a null index key is silently dropped by the
+        first groupby that touches it.  Applied at cross-country assembly by
+        `Index Info > missing_level_sentinels`, not baked into any parquet.
     KgFactor:
       type: float
       optional: true

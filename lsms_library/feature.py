@@ -56,6 +56,15 @@ def _all_known_features() -> set[str]:
     return names
 
 
+def _index_info_section() -> dict[str, Any]:
+    """The global ``Index Info`` block of data_info.yml (``{}`` if absent)."""
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    section = (data or {}).get("Index Info") or {}
+    return section if isinstance(section, dict) else {}
+
+
 def _canonical_index_levels(table_name: str) -> list[str]:
     """Return the canonical index level names for *table_name*.
 
@@ -63,16 +72,221 @@ def _canonical_index_levels(table_name: str) -> list[str]:
     whose values are tuple strings like ``(t, v, i)``.  Returns ``[]`` when
     the table is not listed (no canonical reshaping is then attempted).
     """
-    info_path = files("lsms_library") / "data_info.yml"
-    with open(info_path, "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-    spec = data.get("Index Info", {}).get("index_info", {}).get(table_name)
+    spec = (_index_info_section().get("index_info") or {}).get(table_name)
     if not isinstance(spec, str):
         return []
     cleaned = spec.strip()
     if cleaned.startswith("(") and cleaned.endswith(")"):
         cleaned = cleaned[1:-1]
     return [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+
+
+def _level_aliases(table_name: str) -> dict[str, str]:
+    """``{country's level name: canonical level name}`` for *table_name*.
+
+    Reads ``Index Info: level_aliases`` (GH #569).  A country that names the
+    same axis differently -- Ethiopia's ``plot_id`` for Uganda's ``plot``,
+    Malawi's ``crop`` for Uganda's ``j`` -- would otherwise present a divergent
+    index shape and be excluded from the assembly.  Renaming is declarative on
+    purpose: it is the fact ``transformations._CROP_LEVELS`` / ``_PLOT_LEVELS``
+    already encode for the ``Country()`` path, stated once where the canonical
+    index is stated.
+    """
+    aliases = (_index_info_section().get("level_aliases") or {}).get(table_name)
+    if not isinstance(aliases, dict):
+        return {}
+    return {str(k): str(v) for k, v in aliases.items()}
+
+
+def _missing_level_sentinels(table_name: str) -> dict[str, str]:
+    """``{canonical level: sentinel value}`` for *table_name*.
+
+    Reads ``Index Info: missing_level_sentinels``.  Twin of -- and preferred
+    over -- ``fabricate_missing_levels`` (#506), which fills with ``pd.NA``: a
+    NULL on a declared index level is a DEFERRED SILENT DELETION, because
+    ``groupby(dropna=True)`` removes the row in whichever aggregation runs
+    first (CLAUDE.md "Grain Collapse" 3b; the ``u`` and ``condition`` notes in
+    data_info.yml make the same argument for the same reason).
+
+    Declaring a level here also licenses PROMOTION -- see
+    :func:`_align_to_canonical_levels`.
+    """
+    spec = (_index_info_section().get("missing_level_sentinels") or {}).get(table_name)
+    if not isinstance(spec, dict):
+        return {}
+    return {str(k): v for k, v in spec.items()}
+
+
+def _rename_index_levels(df: pd.DataFrame, aliases: dict[str, str],
+                         country: str, table_name: str) -> pd.DataFrame:
+    """Rename this country's index levels to their canonical names (GH #569).
+
+    A no-op when the frame declares no aliased level.  If BOTH the alias and
+    its canonical target are already present the rename is skipped and warned
+    about -- renaming would produce two levels with one name, and the country
+    means something by the distinction that this table does not know.
+    """
+    if not aliases or df.index.names is None:
+        return df
+    names = list(df.index.names)
+    todo = {src: dst for src, dst in aliases.items() if src in names}
+    if not todo:
+        return df
+    clash = [src for src, dst in todo.items() if dst in names]
+    if clash:
+        warnings.warn(
+            f"{table_name}: {country} carries both an aliased index level and "
+            f"its canonical target {[(c, todo[c]) for c in clash]}; the rename "
+            f"was skipped (it would create duplicate level names). The frame "
+            f"keeps its own index shape."
+        )
+        return df
+    return df.rename_axis(index=todo)
+
+
+def _align_to_canonical_levels(
+    df: pd.DataFrame, canonical_levels: list[str], sentinels: dict[str, Any],
+    country: str, table_name: str, report: dict[str, Any] | None = None,
+) -> pd.DataFrame:
+    """Give *df* every canonical level for which a sentinel is declared.
+
+    Three branches per declared level, in this order:
+
+    1. **already an index level** -- nothing to do;
+    2. **present as a COLUMN** -- promoted into the index, with nulls filled by
+       the sentinel.  Lossless, and strictly better than fabricating a sentinel
+       on top of real values: Mali, Nigeria and Tanzania each report a genuine
+       harvest unit in a ``u`` column rather than in the index, and promoting it
+       is what keeps them in the assembly instead of excluded;
+    3. **absent entirely** -- fabricated as a constant sentinel level.
+
+    Never ``pd.NA``: every value written here is the declared string sentinel,
+    because a null on a declared index level is deleted by the next
+    ``groupby``.  Adding a constant (or promoting a column) can only REFINE an
+    index, so this can never make the index non-unique and can never reach
+    ``_collapse_duplicate_index``.
+
+    Reporting.  With ``report`` supplied, what happened is recorded there and
+    :meth:`Feature.__call__` emits ONE aggregated warning per call and puts the
+    record on ``df.attrs['canonical_alignment']`` -- the same Contract-B shape
+    ``labels=`` degradation uses.  Per-country warnings would fire a dozen
+    times on every ``Feature('crop_production')()`` for behaviour the config
+    explicitly asks for, and a warning nobody reads is how #323 survived its
+    first fix.  With ``report`` omitted (direct callers, tests) it warns
+    per-country instead, so the helper still describes itself.
+    """
+    if not canonical_levels or not sentinels:
+        return df
+    names = list(df.index.names)
+    if any(n is None for n in names):
+        # An unnamed level cannot be round-tripped through reset_index /
+        # set_index, and a frame that reached here unnamed has a bigger problem
+        # than a missing sentinel (the #325 collapse warning covers it).
+        return df
+    todo = [lvl for lvl in canonical_levels
+            if lvl in sentinels and lvl not in names]
+    if not todo:
+        return df
+
+    flat = df.reset_index()
+    promoted, fabricated = [], []
+    for lvl in todo:
+        sentinel = sentinels[lvl]
+        if lvl in flat.columns:
+            col = flat[lvl]
+            if isinstance(col.dtype, pd.CategoricalDtype):
+                col = col.astype(object)
+            filled = col.where(col.notna(), sentinel)
+            n_filled = int(col.isna().sum())
+            flat[lvl] = filled
+            promoted.append((lvl, n_filled))
+        else:
+            flat[lvl] = sentinel
+            fabricated.append(lvl)
+    out = flat.set_index(names + todo)
+    out.attrs = dict(df.attrs)  # single-input ops keep attrs; be explicit anyway
+    if report is not None:
+        if promoted:
+            report.setdefault("promoted", {})[country] = {
+                lvl: n for lvl, n in promoted}
+        if fabricated:
+            report.setdefault("fabricated", {})[country] = {
+                lvl: sentinels[lvl] for lvl in fabricated}
+        return out
+    if promoted:
+        warnings.warn(
+            f"{table_name}: promoted column(s) "
+            f"{[lvl for lvl, _ in promoted]} to index level(s) for {country} "
+            f"(canonical index levels carried as columns); "
+            f"{ {lvl: n for lvl, n in promoted} } null value(s) filled with the "
+            f"declared sentinel."
+        )
+    if fabricated:
+        warnings.warn(
+            f"{table_name}: {country} does not record "
+            f"{fabricated}; added as constant sentinel index level(s) "
+            f"{ {lvl: sentinels[lvl] for lvl in fabricated} } so the frame keeps "
+            f"the canonical shape. No rows were added, removed or collapsed."
+        )
+    return out
+
+
+def _select_kept_shape(
+    frames: list[pd.DataFrame], canonical_levels: list[str],
+) -> tuple[list[pd.DataFrame], list[pd.DataFrame], tuple[Any, ...] | None]:
+    """Choose the single index shape the assembly keeps.
+
+    pandas cannot stack frames whose index DEPTH/NAMES differ into a named
+    MultiIndex -- it falls back to an unnamed object index, collapsing the WHOLE
+    feature (issue #512).  So one shape has to win.  The rule, in order:
+
+    1. the CANONICAL shape (``['country'] + canonical_levels``) if any frame has
+       it -- a country that moves TOWARD the declared index must never be the one
+       excluded, which is exactly the regression this fixes (a Malawi frame that
+       gained the canonical ``condition`` level lost 131,379 rows to the
+       pre-#775 rule);
+    2. otherwise the shape carried by the most frames (the historical "modal"
+       rule, kept for features with no ``index_info`` entry);
+    3. ties broken by total ROWS, then
+    4. by the shape's level names -- the lexicographically smallest tuple.
+
+    Steps 3-4 are what make this independent of the ORDER the caller listed the
+    countries in.  ``Counter.most_common`` breaks a tie by insertion order, so
+    ``Feature(f)(['A','B','C'])`` and ``Feature(f)(['C','B','A'])`` returned
+    different countries for the same data (GH #775).
+
+    Returns ``(kept, dropped, winning_shape)``; ``winning_shape`` is ``None``
+    when every frame already agrees (nothing to choose).
+    """
+    if len(frames) <= 1:
+        return frames, [], None
+    shape_of = lambda f: tuple(f.index.names)
+    shapes = {shape_of(f) for f in frames}
+    if len(shapes) == 1:
+        return frames, [], None
+
+    canonical_shape = tuple(["country"] + list(canonical_levels)) if canonical_levels else None
+    if canonical_shape is not None and canonical_shape in shapes:
+        winner = canonical_shape
+    else:
+        stats: dict[tuple[Any, ...], list[int]] = {}
+        for f in frames:
+            s = shape_of(f)
+            acc = stats.setdefault(s, [0, 0])
+            acc[0] += 1
+            acc[1] += len(f)
+        # Sort key: most frames, then most rows, then the SMALLEST level-name
+        # tuple (negated ranks so a single `min` expresses all three, and so
+        # the third criterion is a genuine lexicographic minimum rather than
+        # whichever way `max` happened to fall).
+        def _rank(s: tuple[Any, ...]) -> tuple[Any, ...]:
+            n_frames, n_rows = stats[s]
+            return (-n_frames, -n_rows,
+                    tuple("" if n is None else str(n) for n in s))
+        winner = min(stats, key=_rank)
+    kept = [f for f in frames if shape_of(f) == winner]
+    dropped = [f for f in frames if shape_of(f) != winner]
+    return kept, dropped, winner
 
 
 def _fabricates_missing_levels(table_name: str) -> bool:
@@ -231,6 +445,9 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
 def _harmonize_country_frame(
     df: pd.DataFrame, canonical_levels: list[str], country: str, table_name: str,
     fabricate_missing: bool = False,
+    aliases: dict[str, str] | None = None,
+    sentinels: dict[str, Any] | None = None,
+    alignment_report: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     """Coerce a single country's frame toward the canonical shape before concat.
 
@@ -246,9 +463,27 @@ def _harmonize_country_frame(
     (a per-feature opt-in, #506), any canonical level absent from this country's
     index is added as a ``pd.NA`` level so reduced-index countries share the
     full canonical shape and are KEPT (rather than modal-excluded in __call__).
+
+    ``aliases`` (``Index Info: level_aliases``, GH #569) renames a country's own
+    level names to the canonical ones FIRST -- ``plot_id`` -> ``plot``, ``crop``
+    -> ``j`` -- so alignment can proceed by name.  ``sentinels``
+    (``Index Info: missing_level_sentinels``) then gives the frame any declared
+    canonical level it still lacks, promoting it from a COLUMN where the country
+    has one and otherwise fabricating a constant sentinel.  Both run before the
+    all-NaN column drop and the #498 reorder, so a promoted column is never
+    dropped as "all NaN" and the reorder sees the finished level set.
     """
     if not isinstance(df, pd.DataFrame) or df.empty:
         return df
+
+    # Canonical NAME harmonization (#569), then canonical LEVEL-SET alignment.
+    # Order matters: aliasing first, or `_align_to_canonical_levels` would see
+    # `plot` as missing on a country that spells it `plot_id` and fabricate a
+    # sentinel on top of a level that is right there.
+    df = _rename_index_levels(df, aliases or {}, country, table_name)
+    df = _align_to_canonical_levels(
+        df, canonical_levels, sentinels or {}, country, table_name,
+        report=alignment_report)
 
     # Drop columns that are entirely missing (e.g. a `date`/`v` column left
     # populated only on other countries).  Concat re-introduces them as NaN
@@ -528,6 +763,11 @@ class Feature:
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
         fabricate_missing = _fabricates_missing_levels(self.table_name)  # #506
+        aliases = _level_aliases(self.table_name)                       # #569
+        sentinels = _missing_level_sentinels(self.table_name)           # #569/#775
+        # Structured record of every canonical level PROMOTED from a column or
+        # FABRICATED as a sentinel, aggregated into one warning after the loop.
+        alignment_report: dict[str, Any] = {}
 
         # numeraire supersedes currency; both are no-ops for non-monetary tables.
         # Either way the output carries a `currency` index level (relabelled to
@@ -613,7 +853,9 @@ class Feature:
                 # column / extra index level can't collapse the whole
                 # concatenated index to object tuples (GH #325).
                 df = _harmonize_country_frame(
-                    df, canonical_levels, name, self.table_name, fabricate_missing
+                    df, canonical_levels, name, self.table_name, fabricate_missing,
+                    aliases=aliases, sentinels=sentinels,
+                    alignment_report=alignment_report,
                 )
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
@@ -652,32 +894,69 @@ class Feature:
         # MultiIndex -- it falls back to an unnamed object index, collapsing the
         # WHOLE feature (issue #512: EthiopiaRHS's documented (t,i) reduced assets
         # stacked with item-level (t,i,j); also surfaces under labels='Aggregate'
-        # when most countries KeyError-drop and a j-less survivor remains).  Keep
-        # the modal index shape and exclude the divergent frame(s) with a loud,
-        # named warning -- the excluded country stays available via
-        # Country(name).<table>().
-        if len(frames) > 1:
-            from collections import Counter
-            shape_of = lambda f: tuple(f.index.names)
-            counts = Counter(shape_of(f) for f in frames)
-            if len(counts) > 1:
-                modal = counts.most_common(1)[0][0]
-                kept = [f for f in frames if shape_of(f) == modal]
-                dropped = [f for f in frames if shape_of(f) != modal]
-                dropped_names = [f.index.get_level_values("country")[0]
-                                 for f in dropped if len(f)]
-                warnings.warn(
-                    f"{self.table_name}: excluded {len(dropped)} country frame(s) "
-                    f"{dropped_names} with a divergent index shape from the "
-                    f"cross-country assembly (kept modal shape {list(modal)}); "
-                    f"stacking heterogeneous index depths would collapse the whole "
-                    f"result to an unnamed index. Access the excluded data via "
-                    f"Country(name).{self.table_name}()."
-                )
-                frames = kept
+        # when most countries KeyError-drop and a j-less survivor remains).  One
+        # shape has to win; the divergent frame(s) are excluded with a loud, named
+        # warning and stay available via Country(name).<table>().
+        #
+        # WHICH shape wins is _select_kept_shape's job: the declared canonical
+        # index when a frame has it, else the historical modal rule with an
+        # order-independent tie-break (GH #775).
+        kept, dropped, winner = _select_kept_shape(frames, canonical_levels)
+        if dropped:
+            dropped_names = [f.index.get_level_values("country")[0]
+                             for f in dropped if len(f)]
+            canonical_shape = (tuple(["country"] + list(canonical_levels))
+                               if canonical_levels else None)
+            why = ("the canonical index declared in data_info.yml"
+                   if winner == canonical_shape else
+                   "the modal index shape among the frames built")
+            warnings.warn(
+                f"{self.table_name}: excluded {len(dropped)} country frame(s) "
+                f"{dropped_names} with a divergent index shape from the "
+                f"cross-country assembly (kept {why}: {list(winner)}); "
+                f"stacking heterogeneous index depths would collapse the whole "
+                f"result to an unnamed index. Access the excluded data via "
+                f"Country(name).{self.table_name}()."
+            )
+        frames = kept
 
         result = pd.concat(frames)
         n_kept = result.index.get_level_values("country").nunique()
+
+        # Canonical-index alignment, reported ONCE (Contract B shape).  Only for
+        # the countries actually KEPT -- a frame excluded above is not in the
+        # answer, so it must not be in the answer's metadata (same rule
+        # `_attach_population` obeys).
+        if alignment_report:
+            try:
+                kept_names = set(result.index.get_level_values("country").unique())
+            except (KeyError, ValueError):
+                kept_names = set(targets)
+            record = {
+                kind: {c: v for c, v in per_country.items() if c in kept_names}
+                for kind, per_country in alignment_report.items()
+            }
+            record = {k: v for k, v in record.items() if v}
+            if record:
+                result.attrs['canonical_alignment'] = record
+                promoted = record.get('promoted', {})
+                fabricated = record.get('fabricated', {})
+                bits = []
+                if promoted:
+                    bits.append(
+                        f"promoted a canonical level carried as a COLUMN into "
+                        f"the index for {sorted(promoted)} "
+                        f"(nulls filled with the declared sentinel: {promoted})")
+                if fabricated:
+                    bits.append(
+                        f"added constant sentinel level(s) for countries whose "
+                        f"instrument does not record them: {fabricated}")
+                warnings.warn(
+                    f"{self.table_name}: aligned country frames to the canonical "
+                    f"index declared in data_info.yml -- " + "; ".join(bits) +
+                    ". No rows were added, removed or collapsed; see "
+                    f"df.attrs['canonical_alignment']."
+                )
 
         # GH #603/#601 -- SURFACE, then WARN.  Never fence: every country that
         # got this far is in `result`, and the population record is metadata
