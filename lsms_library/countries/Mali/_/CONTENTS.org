@@ -794,6 +794,18 @@ factors is wrong by a factor of 2-700.  The fix belongs in
 =lsms_library/transformations.py=, which country-scoped work may not touch.
 Until then: use native units, or =u = 'Kg'= where a per-kg number is needed.
 
+*2026-09-09, GH #850 -- partly fixed, and the advice above still stands.*
+=Gramme= is now EXACT (0.001 kg): the spelling joined =KNOWN_METRIC=, so the
+label is read instead of inferred.  The three sacks moved toward the
+questionnaire and did not arrive -- against a stated 100 / 50 / 25 kg the
+library now serves a median 50.0 / 34.4 / 14.1 kg per row (0.50x / 0.69x /
+0.56x of truth, from 0.33x / 0.52x / 0.21x).  The residual is as likely to be
+Mali's own =u= vocabulary as the inference's arithmetic -- the sacks carry
+only 136 to 240 rows each, GH #838 is open on =Sac moyen=, and a third to a
+half of those rows are still served by the pooled =unit= rung rather than
+their own =(j, u)= cell (visible per row in
+=food_kg_factors(...)['KgFactorSource']=).
+
 ** crop_production HAS a =u= column, but its units are unsized
 
 Contrary to the "no =u= level" shorthand (true only of the *index*),

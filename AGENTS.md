@@ -408,6 +408,34 @@ Before closing a cell, run the four checks (see `docs/guide/coverage.md`). The t
 - The `'kgvalue'` default deliberately departs from the term-of-art "unit value" common in the literature (Deaton 1988, 1997), which usually means `Expenditure / Quantity` standardized to kg. The denominator-explicit naming avoids ambiguity.
 - See `slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org` for full rationale.
 
+**The kilograms behind `units='kgs'` / `'kgvalue'` moved corpus-wide (GH #850, 2026-09-09).** Where a row's unit is not metric and the survey shipped no per-row `Quantity_kg`, its kilograms come from `transformations.conversion_to_kgs`, a price-ratio inference. Three things about it were wrong and all three are fixed, so **every number in the tables below is different from what the same call returned before this landed**:
+
+- **(c) the vocabulary.** `KNOWN_METRIC` had no `Millilitre`, `Grams` or `Litres`, and `_parse_explicit_metric`'s `\b` after `kg`/`l` FORBADE the plural — so `Sack (50 kgs)` and `Tin (Debe) (20 lts)` fell through to the inference. A Malawian millilitre weighed 743 g.
+- **(b) the denominator.** Step 2 medianed `Expenditure`, not `Expenditure / Quantity`, so the factor was kilograms per transaction ROW. Asked what a kilogram weighs, the old chain answered 0.87–2.0 by country; it now answers 1.0 by construction.
+- **(a) the item axis.** There was none, at any step: one factor per unit label for a whole country. Malawi's `Piece` is shared by 133 food items whose separately-estimated weights run from 1 g to 1.8 kg.
+
+Total kg in `food_quantities(units='kgs')`, warm, before → after:
+
+| | Malawi | Ethiopia | Niger | EthiopiaRHS | Uganda | Mali | Nigeria | Tanzania | GhanaLSS |
+|---|---|---|---|---|---|---|---|---|---|
+| before | 8.79e6 | 4.13e6 | 5.02e5 | 3.20e5 | 1.46e6 | 1.60e7 | 1.66e6 | 7.99e5 | 2.04e6 |
+| after | 2.55e6 | 7.25e5 | 2.20e5 | 2.23e5 | 1.25e6 | 1.46e7 | 1.57e6 | 7.79e5 | 2.36e6 |
+| % | **-70.9** | **-82.4** | **-56.1** | **-30.4** | **-14.4** | -9.0 | -5.1 | -2.6 | **+15.6** |
+
+Row counts barely move (the carry rule keeps an unconvertible row with its native unit either way); the kilograms move a great deal, and **not all in one direction** — which is what you would expect if the old number were noise rather than a bias.
+
+**The rungs are now reported per row.** `transformations.food_kg_factors(food_acquired)` returns `kg_per_unit` plus a `KgFactorSource` over `FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit', 'item_unit_tight', 'unit', 'none')` — the food sibling of `harvest_kg_factors`' ladder, which it must never be merged with. The counts partition the frame and ride on the derived tables as `attrs['kg_factor_sources']` (they survive to the API; `Feature()`'s concat drops them, per the `attrs` rule above). **Read the `unit` count before trusting a per-kg number**: it is the old u-pooled factor, and it still serves a fifth to a half of the inferred rows (Niger 141k of 239k, GhanaLSS 495k, Mali 90k).
+
+**Two floors, and one of them is the whole design.** `min_reports=5` gates the `(t, j, u)` estimate and is nearly free (moving it 3→20 costs 1–2% of inference rows). `min_baseline=5` gates the `(t, j)` price-per-kg reference and is what binds — it decides whether one household's single kilogram purchase sets an item's price nationally. A baseline of 3–4 reports is admitted only when they AGREE (max/min ≤ `FOOD_KG_TIGHT_TOLERANCE = 1.25`) and is disclosed as `item_unit_tight`. Not an IQR: at N=3 an IQR is the range wearing a robust name, and measured on the corpus it admits the same cells at tolerance 1.10 as at 2.00.
+
+**The delivered factor carries no `t` axis.** `t` lives INSIDE the estimator — the baseline and the step-2 median are per-wave, then medianed across waves — so a container's weight is one number per `(j, u)`. Safe across redenominations because each wave's estimate is a ratio of same-wave prices (GhanaLSS spans the 2007 cedi redenomination): the currency cancels before the pooling.
+
+**None of this invalidates a cache.** No callable or constant of `transformations.py` appears in any table's build fingerprint — the derived food tables are computed at read time and never written to a parquet — so the change costs a coverage regrade and no re-warm. `tests/test_build_transform_hash.py::test_no_transformations_symbol_reaches_any_fingerprint` is the assertion that keeps it true.
+
+**What it does not fix.** Against the only external answer key the food side has — Mali's own questionnaire — the corrected inference is better and still wrong: a stated 100/50/25 kg sack is served at 0.50x/0.69x/0.56x of truth, up from 0.33x/0.52x/0.21x. `Mali/_/CONTENTS.org`'s advice ("use native units, or `u = 'Kg'`") stands. A price-ratio inference is not a conversion table; where a country ships one, use it.
+
+See `slurm_logs/gh850_design/DESIGN.org` and `.coder/ledger/850-food-kg-item-axis-impl.md`.
+
 **Uganda derivation path now fires** (post-#245 `_/food_acquired.py` Phase-3 fix and the subsequent `food_prices_quantities_and_expenditures.py` removal). Wave-level scripts emit canonical `[t, i, j, u, s]` parquets with columns `[Quantity, Expenditure, Price]` via `uganda.food_acquired_to_canonical()`; the country-level `_/food_acquired.py` concatenates them; `_FOOD_DERIVED` produces `food_expenditures` / `food_prices` / `food_quantities` at runtime from that.  Pre-#245 the country-level concatenator did `df['t'] = t` then `groupby(['i','t','j','u'])`, which raised on pandas 2.x; the bug stayed hidden behind a stale country-level cache.  Surfaced and fixed by the `--rebuild-caches` regression net (PR #243).
 
 `Country._DEPRECATED` maps removed/deprecated table names to deprecation messages. `__getattr__` checks it before `data_scheme`, returning a method that emits `DeprecationWarning` and calls a compatibility shim. Currently contains `locality` only. See `docs/migration/locality.md`.

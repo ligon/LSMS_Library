@@ -807,11 +807,28 @@ The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
 emitted a 2-column projection of the same data) was retired in
 favour of the org-table single source of truth.
 
-The =_/conversion_to_kgs.json= file is a kg-per-unit factor
-lookup consumed by =food_quantities= derivation -- a separate
-concern from =u= label canonicalisation.  Its keys are the same
-=Preferred Label= strings used above; it is built dynamically by
-=_/kg_per_other_units.py=.
+The =_/conversion_to_kgs.json= file is a kg-per-unit factor lookup
+built dynamically by =_/kg_per_other_units.py=, keyed on the same
+=Preferred Label= strings used above.
+
+*It is NOT consumed by the =food_quantities= derivation*, which is
+what this paragraph said until 2026-09-09.  =uganda.food_acquired=
+joins it on =u= alone into a column named =Kgs=, and
+=uganda.food_acquired_to_canonical= then drops it -- its docstring
+lists =Kgs= among the columns that "are ignored", and the canonical
+frame carries =[Quantity, Expenditure, Price]= only.  Confirmed on a
+warm build: =Country('Uganda').food_acquired()= has neither =Kgs= nor
+=Quantity_kg=, so *100% of Uganda's API kilograms come from
+=transformations._get_kg_factors=* / =food_kg_factors=.  The json is
+live for anyone reading a wave parquet directly and dead for the API.
+
+It is still worth having, as an ANSWER KEY rather than as an input:
+it is hand-curated for exactly the container labels
+(=Sack (50 kgs)=, =Tin (Debe) (20 lts)=, =Cup/Mug(0.5lt)=) whose
+kilograms GH #850 taught =_parse_explicit_metric= to read off the
+label.  =tests/test_food_kg_inference.py= asserts the parser agrees
+with it.  The framework must NOT read it at runtime: a stored
+inferred factor is the anti-pattern GH #850 exists to remove.
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 

@@ -539,9 +539,14 @@ files are the R6 slice.
   currency-denominated sentinel -- see the GH #770 entry below).  ALL
   other (local volumetric/container) codes -> their unit NAME
   (=Chinet=, =Kunna=, ...).  The =u= index carries the unit label
-  ALONE; the framework's price-ratio inference
-  (=transformations.conversion_to_kgs=) groups by item within each
-  unit and recovers a per-good kg factor with NO framework change.
+  ALONE.  (Until 2026-09-09 this entry claimed the framework's
+  price-ratio inference "groups by item within each unit and recovers
+  a per-good kg factor with NO framework change".  *That was false*:
+  =conversion_to_kgs= grouped by =['t','i']= -- =i= is the HOUSEHOLD
+  -- and returned one factor per unit label for the whole country.
+  GH #850 added the item axis, so the claim is true now; it was not
+  when the decision it justified was taken.  See
+  =slurm_logs/gh850_design/DESIGN.org=.)
   Code 0 is the source's missing-unit sentinel -> empty label
   (dropped, à la Uganda's =0 | ---=).  1989 unitcode is
   in-data-unlabelled -> 1989 =u= carries the raw unit *code* (a unit

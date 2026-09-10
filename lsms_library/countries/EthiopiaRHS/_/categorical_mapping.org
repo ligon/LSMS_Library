@@ -338,8 +338,11 @@ volumetric/container
 unit NAME (Chinet, Kunna, ...).  The ``u`` index carries this unit
 label ALONE -- NOT a food label (GH #347).  The framework's
 price-ratio kg inference (transformations.conversion_to_kgs) groups
-by item within each unit, so it recovers a per-good kg factor for
-these local units with no food-label tagging.  Code 0 is the
+by ``(j, u)`` and recovers a per-good kg factor for these local units
+with no food-label tagging.  (Corrected 2026-09-09: this said "groups
+by item within each unit", which was FALSE when written -- the
+grouping was ``['t','i']`` and ``i`` is the household, so one factor
+served the whole country.  GH #850 put the item axis in.)  Code 0 is the
 source's missing-unit sentinel -> empty label (dropped downstream,
 à la Uganda's ``0 | ---``).  1989 unitcode is a different,
 in-data-unlabelled scheme not mapped through this table -> 1989
