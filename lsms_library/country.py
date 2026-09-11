@@ -63,6 +63,8 @@ from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 from .recall import attach as attach_recall, recall_records
+from .derivations import (attach as attach_derivations, records_for as _derivation_records_for,
+                          call_inputs as _call_derivation_inputs)
 import importlib.util
 import hashlib
 import logging
@@ -2068,6 +2070,44 @@ class Country:
         """
         return population_records(self.name)
 
+    def derivations(self, table: str | None = None) -> dict:
+        """``{key: DerivationRecord}`` -- served numbers that are NOT survey answers.
+
+        Every entry names a construction the library performs on this
+        country's data (a wave script, or a framework-level rule with an
+        empty country slot): the ``rule``, the ``function`` that implements
+        it, the ``inputs`` callable that returns the raw answers by their
+        original names, and the ``assumptions`` with their ``basis``.  Rows
+        carrying a derivation are labelled in the served table's
+        ``Derivation`` column with the same key.  Read from
+        ``{country}/_/derivations.yml`` and ``lsms_library/derivations.yml``;
+        see :mod:`lsms_library.derivations` and
+        ``SkunkWorks/derived_values.org``.
+
+        Parameters
+        ----------
+        table : str, optional
+            Restrict to entries for this table (an entry with an empty table
+            slot applies to every table).
+        """
+        return _derivation_records_for(self.name, table)
+
+    def derivation_inputs(self, key: str, wave: str | None = None) -> pd.DataFrame:
+        """The exact raw survey answers a derivation was computed from.
+
+        Resolves the entry's ``inputs`` callable and returns its frame: the
+        ORIGINAL variable names, at the input grain, re-read from the source
+        through ``get_dataframe``.  Slow and exact; nothing is cached.  A user
+        who wants the value under a different assumption re-derives it from
+        this -- the derivation function itself takes no options.
+        """
+        records = self.derivations()
+        if key not in records:
+            raise KeyError(
+                f"{self.name} has no derivation {key!r}; registered: "
+                f"{sorted(records)}")
+        return _call_derivation_inputs(records[key], wave=wave)
+
     def provenance(self) -> pd.DataFrame:
         """Tabular survey of source + license per wave.
 
@@ -3129,6 +3169,18 @@ class Country:
             # would turn a metadata annotation into an AttributeError on a data
             # call.  Both measured before this landed.
             attach_recall(df, self.name)
+
+            # Attach the DERIVATIONS summary -- which served rows are
+            # constructions rather than survey answers, per registry key
+            # (SkunkWorks/derived_values.org).  Counted from the frame's own
+            # `Derivation` column, so a wave slice reports what it carries.
+            # Same placement and the same two reasons as the two records
+            # above: `_finalize_result` re-runs on every read, and it is in
+            # `_build_registry._EXCLUDED_CALLABLES`, so this costs no cache
+            # invalidation.  Metadata only -- it adds `attrs`, never a row, a
+            # column or a value.  The row label itself is written by the wave
+            # script that made the derivation, never here.
+            attach_derivations(df, self.name, method_name)
 
             # SITE B of the null-content audit.  Every other guard on this
             # table checks that a required declared column is PRESENT; this one
