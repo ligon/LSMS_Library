@@ -18,6 +18,7 @@ import csv
 import warnings
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from lsms_library.recall import (
@@ -102,12 +103,28 @@ class TestHonesty:
 
     def test_records_are_immutable(self):
         c, w, r = next(_all_records())
-        with pytest.raises(Exception):
-            r.recall_days = 999          # frozen dataclass
+        with pytest.raises(TypeError, match="immutable"):
+            r.recall_days = 999
 
 
 class TestConstructionRefusesContradictions:
     """The record refuses to be built wrong, not merely audited afterwards."""
+
+    def test_defaults_are_validated_and_stored(self):
+        """A record built with no `basis` IS `not-recorded`, in the mapping.
+
+        The two non-None defaults are stored rather than merely returned by
+        attribute lookup: a frame read back from parquet keeps only the
+        mapping, and `is_recorded` must still be answerable from it.
+        """
+        r = RecallRecord(country="X", wave="1")
+        assert r.basis == "not-recorded" == r["basis"]
+        assert r.ask_count_basis == "unknown" == r["ask_count_basis"]
+        assert not r.is_recorded and r.total_exposure_days is None
+
+    def test_missing_country_or_wave_is_a_TypeError(self):
+        with pytest.raises(TypeError, match="missing required"):
+            RecallRecord(wave="1", basis="questionnaire")
 
     def test_rejects_unknown_basis(self):
         with pytest.raises(ValueError, match="not one of"):
@@ -203,6 +220,127 @@ class TestAttach:
         attach(a, "Ethiopia"); attach(b, "GhanaLSS")
         merged = merge_attrs([a, b])
         assert {"Ethiopia", "GhanaLSS"} <= set(merged)
+
+
+def _frame_with_record(country="GhanaLSS"):
+    """A frame carrying one real record on `attrs`, no build required."""
+    recs = recall_records(country)
+    if not recs:
+        pytest.skip(f"{country} has no recall record")
+    wave = sorted(recs)[0]
+    df = pd.DataFrame({"x": [1, 2]},
+                      index=pd.MultiIndex.from_tuples([(wave, "1"), (wave, "2")],
+                                                      names=["t", "i"]))
+    attach(df, country)
+    return df, wave
+
+
+def rec(country="A", wave="1", basis="questionnaire", **kw):
+    return RecallRecord(country=country, wave=wave, basis=basis, **kw)
+
+
+class TestRecordsRideOnAttrs:
+    """`attrs` carries the record itself, and `df.to_parquet()` must still work.
+
+    Mirrors `test_population.py::TestRecordsRideOnAttrs`, test for test,
+    because the record hit the identical wall: a frozen dataclass in `attrs`
+    turned every user's `to_parquet()` on an API frame into
+    `TypeError: Object of type RecallRecord is not JSON serializable` (17
+    countries' `housing()` results, `tests/test_table_structure.py`).  pandas
+    serialises `attrs` with `json.dumps` on the parquet write path and
+    propagates `attrs` by comparing them for EQUALITY; both are pinned below.
+    """
+
+    def test_both_spellings_work_on_the_object_in_attrs(self):
+        df, wave = _frame_with_record()
+        block = df.attrs["recall"]["GhanaLSS"][wave]
+        assert isinstance(block, RecallRecord)
+        assert block.basis == block["basis"]
+        assert block.country == "GhanaLSS" == block["country"]
+
+    def test_an_absent_optional_field_reads_as_None_not_KeyError(self):
+        r = rec()
+        assert r.recall_days is None
+        assert "recall_days" not in r             # mapping drops None fields
+        with pytest.raises(KeyError):
+            r["recall_days"]
+
+    def test_the_record_compares_equal_to_the_plain_dict_it_replaced(self):
+        """The load-bearing property: pandas propagates `attrs` only when every
+        input compares equal, and a parquet round trip hands back a plain dict."""
+        r = rec(recall_days=7, n_asks=6)
+        assert r == dict(r) and dict(r) == r
+        assert r == rec(recall_days=7, n_asks=6) and r is not rec(recall_days=7, n_asks=6)
+
+    def test_merge_preserves_across_a_record_and_an_equivalent_plain_dict(self):
+        new, wave = _frame_with_record()
+        new = new.reset_index()
+        old = pd.DataFrame({"i": ["1", "2"], "y": [3, 4]})
+        old.attrs = {k: ({c: {w: dict(r) for w, r in ws.items()}
+                          for c, ws in v.items()} if k == "recall" else v)
+                     for k, v in new.attrs.items()}
+        assert type(old.attrs["recall"]["GhanaLSS"][wave]) is dict
+        assert "recall" in new.merge(old, on="i").attrs
+
+    def test_records_are_immutable_because_the_loader_is_cached(self):
+        r = recall_records("GhanaLSS")[sorted(recall_records("GhanaLSS"))[0]]
+        for call in (lambda: r.__setitem__("basis", "filename"),
+                     lambda: r.update({"basis": "filename"}),
+                     lambda: r.pop("basis"),
+                     lambda: r.clear(),
+                     lambda: setattr(r, "basis", "filename"),
+                     lambda: delattr(r, "basis")):
+            with pytest.raises(TypeError, match="immutable"):
+                call()
+        assert recall_records("GhanaLSS")[r.wave].basis == r.basis
+
+    def test_records_are_hashable(self):
+        assert len({rec(), rec()}) == 1
+
+    def test_deepcopy_and_pickle_round_trip(self):
+        """pandas deepcopies `attrs` on EVERY propagation, so this is hot."""
+        import copy
+        import pickle
+        r = rec(recall_days=7, n_asks=6, notes="x")
+        for clone in (copy.deepcopy(r), pickle.loads(pickle.dumps(r))):
+            assert type(clone) is RecallRecord and clone == r
+            assert clone.total_exposure_days == 42
+
+    def test_to_parquet_still_works(self, tmp_path):
+        """The regression pinned: 17 `housing()` frames failed `to_parquet()`.
+
+        pandas 3.0.2 `io/parquet.py` does `json.dumps(df.attrs)`; pyarrow's
+        `pandas_compat` does the same and warns.  The round-tripped block is a
+        plain dict and must equal the record, stored defaults included.
+        """
+        df, wave = _frame_with_record()
+        path = tmp_path / "p.parquet"
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")   # pyarrow's attrs-drop warning is fatal
+            df.to_parquet(path)
+        back = pd.read_parquet(path)
+        blk = back.attrs["recall"]["GhanaLSS"][wave]
+        assert blk == dict(df.attrs["recall"]["GhanaLSS"][wave])
+        assert "basis" in blk and "ask_count_basis" in blk
+        assert RecallRecord(**blk) == df.attrs["recall"]["GhanaLSS"][wave]
+
+    def test_an_unknown_field_is_rejected_rather_than_silently_kept(self):
+        with pytest.raises(TypeError, match="unexpected field"):
+            RecallRecord(country="A", wave="1", basis="questionnaire",
+                         recal_days=7)
+
+    def test_country_recall_and_attrs_return_the_SAME_type(self):
+        df, wave = _frame_with_record()
+        from_loader = recall_records("GhanaLSS")[wave]
+        from_attrs = df.attrs["recall"]["GhanaLSS"][wave]
+        assert type(from_loader) is type(from_attrs) is RecallRecord
+
+    def test_the_derived_properties_win_over_getattr(self):
+        """`total_exposure_days` etc. are properties, never mapping keys."""
+        r = rec(recall_days=7, n_asks=6)
+        assert r.total_exposure_days == 42 and r.is_recorded and r.is_strong
+        for name in ("total_exposure_days", "is_recorded", "is_strong"):
+            assert name not in r
 
 
 @pytest.mark.slow
