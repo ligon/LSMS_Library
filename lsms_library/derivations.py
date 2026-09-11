@@ -78,6 +78,7 @@ import importlib
 import importlib.util
 import inspect
 import json
+import sys
 import warnings
 from functools import lru_cache
 from importlib.resources import files
@@ -377,7 +378,14 @@ def _load_module_by_path(path: Path, name: str):
     if spec is None or spec.loader is None:
         raise ImportError(f"cannot load {path}")
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    # Registered BEFORE exec, as importlib's recipe does, so the module is
+    # findable by name afterwards (inspect / pickle / sys.modules lookups).
+    sys.modules[name] = mod
+    try:
+        spec.loader.exec_module(mod)
+    except BaseException:
+        sys.modules.pop(name, None)
+        raise
     return mod
 
 
