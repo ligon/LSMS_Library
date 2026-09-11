@@ -218,16 +218,29 @@ questionnaire.  Slow and exact; nothing is stored.  A cached companion
 parquet is a possible later tier if the call is used enough to want
 one -- the registry key is what such a cache would be named by.
 
-** Propagation through the framework's own derived tables
+** One level up: derived tables and =Feature()= (decided 2026-09-11: follow-on, and a different carrier)
 
 =food_expenditures= / =food_quantities= / =food_prices= are computed
-at read time by summing =food_acquired= over levels.  A groupby-sum
-drops a string column, so the label would die exactly where the
-downstream user meets the number.  Rule: the framework's derived
-tables carry =Derivation= as the set-union of keys within each group
-(=NA= if all =NA=), and =Feature()='s =_collapse_duplicate_index= does
-the same.  This is the one framework change the design needs, and it
-is what makes the label reach =food_expenditures=.
+at read time from =food_acquired=, and =Feature()= concatenates across
+countries.  An earlier draft of this note proposed carrying the row
+label through both by set-union of keys within each group.  @ligon's
+call: that is a follow-on, and at that level the mechanism is NOT a
+per-row column but an ATTRIBUTE -- a summary saying that at the lower
+level there is something to explore.  A derived table did not derive
+those rows; it should point at the table that did, not relabel them.
+
+So: =df.attrs['derivations']= on a derived table (and on a =Feature()=
+result, per country) lists the keys present in its inputs with their
+row counts and the input table's name -- ={'GhanaLSS':
+{'GhanaLSS::food_acquired::12b-fortnight': {'rows': 44149, 'in':
+'food_acquired'}}}=.  The row label stops at the table where the
+derivation was made.  Two known constraints on the follow-on:
+=attrs= die at =Feature()='s concat, so the re-merge must be explicit
+(=recall.merge_attrs= is the intended precedent and has NO caller
+today -- the census found =attrs['recall']= already dies there); and
+the derived tables' groupby must not be asked to reduce the string
+column, which the first instance avoids by leaving it to fall away at
+the sum.
 
 ** Site 1: the declared-index collapse
 
@@ -416,9 +429,8 @@ divides (correctly); =recall.merge_attrs= has no caller, so
    is answered.
 1. Key format -- DECIDED 2026-09-11: =country::table::name=, empties
    mean "all", wave scope in the entry.  See "The registry".
-2. Should the framework's derived tables propagate the label
-   (set-union rule) in the same PR as the first instance, or as a
-   follow-on?  Without it the label stops at =food_acquired=.
+2. Derived tables / =Feature()= -- DECIDED 2026-09-11: follow-on; at
+   that level an =attrs= summary pointing downward, not a row label.
 3. Warning at =Feature()= pooling: yes (once per call, names the
    keys), or column only?
 4. =Derivation= dtype: plain nullable string, or pandas categorical
