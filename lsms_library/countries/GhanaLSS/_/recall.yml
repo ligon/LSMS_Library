@@ -20,20 +20,22 @@
 
 Recall:
   '1987-88':
-    basis: config-comment
+    basis: questionnaire
     ask_count_basis: declared
+    recall_days: 14
     n_asks: 1
-    recall_verbatim: 'since my last visit'
-    evidence: 'lsms_library/countries/GhanaLSS/1987-88/_/food_acquired.py:21,33; _/CONTENTS.org:1242'
-    notes: 'one visit only, so the window has no determinate length'
+    recall_verbatim: 'How much have they spent since my visit?'
+    evidence: '1987-88 questionnaire Section 12A q3 (PDF p.64, printed 41a); Interviewer Manual printed p.70: in theory this period is two weeks; ask the past two weeks if the round-1 -> round-2 gap is <7 or >21 days'
+    notes: 'PURCHASES (12A) only, asked once at round 2 over the round-1 -> round-2 interval (median 14 d). Own production (12B) has NO recall window -- months x times x value each time -- and is served DERIVED on the same nominal fortnight (GhanaLSS::food_acquired::12b-fortnight, 2026-09-11)'
     n_items_delivered: 58
   '1988-89':
-    basis: variable-label
+    basis: questionnaire
     ask_count_basis: declared
+    recall_days: 14
     n_asks: 1
-    recall_verbatim: 'amount spent since last visit'
-    evidence: 'lsms_library/countries/GhanaLSS/1988-89/_/food_acquired.py:26,91 (CFOODBLV label)'
-    notes: 'one visit only, so the window has no determinate length'
+    recall_verbatim: 'How much have they spent since my visit?'
+    evidence: '1988-89 questionnaire Section 12A q3 (PDF p.64, printed 41a); Interviewer Manual printed p.70 (same text as 1987-88); CFOODBLV label: amount spent since last visit'
+    notes: 'PURCHASES (12A) only, asked once at round 2 over the round-1 -> round-2 interval (median 14 d). Own production (12B) has NO recall window and is served DERIVED on the same nominal fortnight (GhanaLSS::food_acquired::12b-fortnight, 2026-09-11)'
     n_items_delivered: 58
   '1991-92':
     basis: questionnaire
