@@ -401,6 +401,19 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: Panama figures reproduced exactly.  The fix itself still moves none of
 #: the unit* counts (before/after delta 0, measured in-process by emptying
 #: ``_CURRENCY_DENOMINATED_UNITS`` on the identical frame).
+#:
+#: RE-DERIVED again 2026-09-11 (private ``LSMS_DATA_DIR``, cold, all seven
+#: wave scripts re-run; 5,338,617 rows) after two source-reading fixes that
+#: this test was not re-run for at the time:
+#:   * 87c1c252d (2026-09-09) reads GLSS3's ``s9bq1`` -- 16.2% of 1991-92's
+#:     purchases, previously dropped: ``unitvalue`` 1,505,752 -> 1,513,772
+#:     and ``units`` +8,020 (purchased rows; the GLSS5 change below
+#:     contributes 0 to ``unitvalue``, produced rows carry no Expenditure);
+#:   * ddfe2726c (2026-09-11) reads GLSS5's ``s8hq3``, the 2nd-visit
+#:     own-production quantity: ``unitprice`` 187,674 -> 189,551 (+1,877)
+#:     and ``units`` +1,877 (measured exactly, by recomputing on the frame
+#:     minus the 21,252 restored rows: 187,674 / 1,691,300).
+#: ``kgvalue`` (407,478, 2016-17 only) unchanged by both.
 GHANALSS_FOOD_PRICES_ROWS = 407_478
 GHANALSS_FOOD_PRICES_WAVES = ['2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
@@ -457,9 +470,9 @@ def test_ghanalss_food_prices_is_one_wave_and_not_constant():
 def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     """Only the kg-denominated modes touch the factor map."""
     c, _ = _country('GhanaLSS')
-    assert len(c.food_prices(units='unitvalue')) == 1_505_752
-    assert len(c.food_prices(units='unitprice')) == 187_674
-    assert len(c.food_quantities(units='units')) == 1_683_280
+    assert len(c.food_prices(units='unitvalue')) == 1_513_772
+    assert len(c.food_prices(units='unitprice')) == 189_551
+    assert len(c.food_quantities(units='units')) == 1_693_177
 
 
 @pytest.mark.slow
