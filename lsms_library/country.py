@@ -2100,13 +2100,29 @@ class Country:
         through ``get_dataframe``.  Slow and exact; nothing is cached.  A user
         who wants the value under a different assumption re-derives it from
         this -- the derivation function itself takes no options.
+
+        The household level ``i`` is re-keyed through ``updated_ids`` exactly
+        as ``_finalize_result`` re-keys every served table, so the frame joins
+        to the served rows by ``(t, i, ...)``.  Without this the raw frame
+        carries the survey's own household id -- GhanaLSS 1988-89 serves
+        ``'101332'`` / ``'101332_1'`` (a panel re-key plus a split-household
+        suffix, GH #548) where ``Y12B.DAT`` says ``'200103'`` -- and "the exact
+        inputs of this row" would not be findable from the row.
         """
         records = self.derivations()
         if key not in records:
             raise KeyError(
                 f"{self.name} has no derivation {key!r}; registered: "
                 f"{sorted(records)}")
-        return _call_derivation_inputs(records[key], wave=wave)
+        frame = _call_derivation_inputs(records[key], wave=wave)
+        if (
+            isinstance(frame.index, pd.MultiIndex)
+            and 'i' in frame.index.names
+            and not frame.attrs.get('id_converted')
+            and self.updated_ids is not None
+        ):
+            frame = id_walk(frame, self.updated_ids)
+        return frame
 
     def provenance(self) -> pd.DataFrame:
         """Tabular survey of source + license per wave.

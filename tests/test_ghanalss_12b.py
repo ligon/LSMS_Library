@@ -182,13 +182,37 @@ class TestDelivered:
         fort = fn(raw['MFOODCLY'], raw['TFOODC'], raw['UTFOODC'], raw['VFOODCPD'])
         per_hh = pd.Series(fort * 26, index=raw.index).groupby(level='i').sum()
         i_of = resolve_callable(f'lsms_library.countries.{COUNTRY}.{wave}._.mapping:i')
-        hp = expend.assign(i=expend['HID'].apply(i_of)).set_index('i')['HPFOOD']
+        # derivation_inputs re-keys `i` through updated_ids as the served table
+        # is; walk EXPEND's HID the same way so the two sides share an id.
+        walk = (country.updated_ids or {}).get(wave, {})
+        hp = expend.assign(i=expend['HID'].apply(i_of).map(lambda x: walk.get(x, x))
+                           ).set_index('i')['HPFOOD']
         hp = pd.to_numeric(hp, errors='coerce')
         both = pd.concat([per_hh.rename('ours'), hp.rename('hpfood')], axis=1, join='inner')
         both = both[both['hpfood'] > 0]
         assert len(both) > 2000
         ratio = (both['ours'] / both['hpfood']).median()
         assert 0.99 <= ratio <= 1.05, ratio
+
+    @pytest.mark.parametrize('wave', WAVES)
+    def test_inputs_join_to_the_served_rows(self, country, delivered, wave):
+        """Every served produced row of the wave has its raw 12B answers under
+        the SAME (t, i): the raw frame is re-keyed through updated_ids as the
+        served table is (GhanaLSS 1988-89 re-keys and splits households)."""
+        try:
+            raw = country.derivation_inputs(KEY, wave=wave)
+        except Exception as e:                # pragma: no cover - no microdata
+            pytest.skip(f'{COUNTRY} {wave} sources not available here: {e}')
+        served = delivered.xs(wave, level='t', drop_level=False)
+        served = served[served['Derivation'].notna()]
+        served_i = set(served.index.get_level_values('i'))
+        raw_i = set(raw.index.get_level_values('i'))
+        missing = served_i - raw_i
+        assert not missing, f'{len(missing)} served households with no raw rows: {sorted(missing)[:5]}'
+        if wave == '1988-89':
+            # The split pair pinned by tests/test_panel_id_collisions.py.
+            n = raw.groupby(level='i').size()
+            assert n.get('101332', 0) == 3 and n.get('101332_1', 0) == 8, n.reindex(['101332', '101332_1'])
 
     def test_label_on_every_produced_row_of_the_two_waves_and_nowhere_else(self, delivered):
         fa = delivered

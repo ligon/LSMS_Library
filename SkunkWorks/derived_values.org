@@ -214,7 +214,13 @@ callable, which re-reads the source through =get_dataframe= and
 returns a frame at the served grain (=t, i, j= for 12B) whose columns
 are the ORIGINAL variable names (=MFOODCLY, TFOODC, UTFOODC,
 VFOODCPD=), so it joins to the served table and reads against the
-questionnaire.  Slow and exact; nothing is stored.  A cached companion
+questionnaire.  "Joins to the served table" is a promise the framework
+has to keep, not the inputs callable: =Country.derivation_inputs=
+re-keys =i= through =updated_ids= exactly as =_finalize_result= does
+for every served table (found 2026-09-11: GhanaLSS 1988-89 serves
+=101332= / =101332_1= -- a panel re-key plus a split-household suffix
+-- where =Y12B.DAT= says =200103=, so an un-walked raw frame had no
+row for the served household).  Slow and exact; nothing is stored.  A cached companion
 parquet is a possible later tier if the call is used enough to want
 one -- the registry key is what such a cache would be named by.
 
