@@ -252,13 +252,13 @@ Site 1 as well, and the wave-script uniqueness assert (Trap 9 in
 GhanaLSS's CONTENTS.org) remains the first guard: a derived row
 should never reach Site 1 non-unique.  Both, not either.
 
-** A warning, once, at pooling time
+** No warning at pooling time (decided 2026-09-11)
 
-Modelled on =PopulationHeterogeneityWarning= (GH #603): when a
-=Feature()= call pools a column that is derived in some frames and
-reported in others, warn once, name the keys and the countries, and
-drop nothing.  =Country(...)= calls stay silent -- the column is the
-signal there.  Rare enough not to be a firehose; the census will say.
+A =PopulationHeterogeneityWarning=-style warning at =Feature()= was
+considered and declined: at that level the mechanism is the =attrs=
+summary (previous section), which says what is below and where to
+look; a warning would repeat it as noise.  =Country(...)= calls have
+the column itself.
 
 * First instance: GhanaLSS 1987-88 / 1988-89 own production
 
@@ -429,7 +429,7 @@ divides (correctly); =recall.merge_attrs= has no caller, so
    mean "all", wave scope in the entry.  See "The registry".
 2. Derived tables / =Feature()= -- DECIDED 2026-09-11: follow-on; at
    that level an =attrs= summary pointing downward, not a row label.
-3. Warning at =Feature()= pooling: yes (once per call, names the
-   keys), or column only?
+3. Warning at =Feature()= pooling -- DECIDED 2026-09-11: none; the
+   =attrs= summary is the signal at that level.
 4. =Derivation= dtype: plain nullable string, or pandas categorical
    (smaller parquet, but categories must be unioned at concat)?
