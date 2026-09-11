@@ -5,9 +5,12 @@
 * Status
 
 Design sketch, not implemented.  Decided with @ligon on 2026-09-11:
-the shape (registry + row label + raw-input retrieval) and the rule
-that a derivation function has ONE construction, no options.  Open
-points are listed at the end.  The census of existing derivations
+the shape (registry + row label + raw-input retrieval); the rule that
+a derivation function has ONE construction, no options; that a key
+names an OPERATION and =derivation_inputs= returns the INPUT grain; and
+the key format =country::table::name= with empty slots meaning "all"
+and the wave scope inside the entry (below).  Open points are listed
+at the end.  The census of existing derivations
 (section "What the corpus already does") is being filled by a sweep
 of every wave script; the design is to be checked against it before
 the first instance lands.
@@ -102,7 +105,7 @@ to the census; the two must not both fire on one row.
 
 A nullable string column on the served table.  =NA= on a reported
 row; on a derived row, the registry key of the derivation
-(=ghanalss:12b-fortnight=).  Where two derivations touch one row the
+(=GhanaLSS::food_acquired::12b-fortnight=).  Where two derivations touch one row the
 keys are joined with =+= in sorted order.
 
 - Why a column and not =attrs= :: =attrs= survive an operation only
@@ -136,8 +139,7 @@ keys are joined with =+= in sorted order.
 =data_scheme.yml= would cold-rebuild the corpus).  One entry per key:
 
 #+begin_example
-ghanalss:12b-fortnight:
-  table: food_acquired
+GhanaLSS::food_acquired::12b-fortnight:
   waves: ['1987-88', '1988-89']
   columns: [Expenditure, Quantity]
   rows: {s: produced}                       # which rows carry the key
@@ -159,6 +161,22 @@ ghanalss:12b-fortnight:
   since: 2026-09-11
 #+end_example
 
+- Key format (decided 2026-09-11) :: =country::table::name=, three
+  slots, an empty slot meaning "all".  The WAVE is not in the key: every
+  served row already carries =t=, so it would repeat the index, and a
+  rule spanning two rounds (12B) would need two identical entries.
+  Scope lives in the entry: =waves:= is a list or =all=.  Where a rule
+  genuinely differs by wave it is a different derivation with a
+  different NAME, each scoped to its waves (Nigeria:
+  =Nigeria::food_acquired::purchase-30d-transaction= for W4 beside
+  =...::consumption-from-purchases= for W1), which is more informative
+  than a wave number and lets =ll.derivations()= filter by wave from
+  the entries.  An empty country slot is a FRAMEWORK-level derivation
+  (=::household_roster::age-dob=), recorded in a =derivations.yml=
+  beside the package's canonical =data_info.yml= rather than under a
+  country; an empty table slot would be a country-wide rule (no case
+  in the census yet).  A row's =Derivation= value is the literal key;
+  empty slots resolve from the row's own country and =t=.
 - The =basis= vocabulary is =derivations.yml='s OWN, defined in its
   own loader: the recall ladder's values (=questionnaire= >
   =variable-label= > =config-comment= > =filename=) plus
@@ -396,8 +414,8 @@ divides (correctly); =recall.merge_attrs= has no caller, so
    (b) in-season fortnight, or (c) GSS's annual on both sides.  See
    "First instance".  Nothing on the 1980s scripts moves until this
    is answered.
-1. Key format: =<country-slug>:<short-name>= as above, or
-   =<country>/<table>/<short-name>=?
+1. Key format -- DECIDED 2026-09-11: =country::table::name=, empties
+   mean "all", wave scope in the entry.  See "The registry".
 2. Should the framework's derived tables propagate the label
    (set-union rule) in the same PR as the first instance, or as a
    follow-on?  Without it the label stops at =food_acquired=.
