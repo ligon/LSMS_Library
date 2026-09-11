@@ -1,0 +1,52 @@
+# Derivations -- served numbers in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's
+# `Derivation` column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# An entry must say what it did (rule, function), to what (inputs,
+# raw_variables) and why (assumptions, each with a basis) -- the loader
+# refuses one that cannot.  `modelling-choice` is a basis that NAMES a choice
+# no document supplies; it is not evidence and is not laundered into one.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+
+GhanaLSS::food_acquired::12b-fortnight:
+  waves: ['1987-88', '1988-89']
+  columns: [Expenditure, Quantity]
+  rows: {s: produced}
+  rule: >-
+    Expenditure = VFOODCPD * TFOODC * (14 / days_per_unit[UTFOODC]) * MFOODCLY / 12
+    with days_per_unit = {3: 1, 4: 7, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365}
+    (12B legend: DAY 3, WEEK 4, MONTH 5, QUARTER 6, HALF YEAR 7, YEAR 8);
+    Quantity = Expenditure (u = 'Value').  The year-average fortnight, i.e.
+    GSS's annual EXPEND.HPFOOD / 26.  Worked example: eaten in 6 of 12 months,
+    12 times a month, 10 cedis each time -> 27.6 (in season 55.3; annual 720).
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_12b_fortnight_value
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_12b
+  raw_variables: [Y12B.MFOODCLY, Y12B.TFOODC, Y12B.UTFOODC, Y12B.VFOODCPD]
+  assumptions:
+    - text: >-
+        the window is the nominal fortnight of the purchase side (12A, "since
+        my last visit"): "in theory this period is two weeks"
+      basis: questionnaire
+      evidence: 1988-89 Interviewer Manual, printed p.70
+    - text: >-
+        the interview fortnight is a random draw from the year, so the
+        in-season fortnight is weighted by MFOODCLY / 12 (the form does not
+        record WHICH months were cited; the in-season figure is right for
+        some households and zero for the rest, unknowably)
+      basis: modelling-choice
+      evidence: SkunkWorks/derived_values.org, "First instance" (@ligon, 2026-09-11)
+    - text: >-
+        days per month / quarter / half-year are 30.4 / 91.3 / 182.6, GSS's
+        own lengths (30 per month reproduces HPFOOD at 1.03-1.04, not 1.02)
+      basis: config-comment
+      evidence: slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org section 2.2
+  validated_against: >-
+    EXPEND.HPFOOD (GSS's annual construction, BID printed p.22 "the value of
+    home produced food consumed in the last year calculated from Section
+    12B"): sum over items of function(...) x 26 per household reproduces it
+    with median ratio 1.018 in both rounds (n = 2,253 / 2,437 households).
+  contents: GhanaLSS/_/CONTENTS.org, "12B is a value per eating occasion"
+  since: '2026-09-11'

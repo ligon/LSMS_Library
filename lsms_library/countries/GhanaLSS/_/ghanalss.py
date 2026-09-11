@@ -479,3 +479,124 @@ def appendix_i_cluster_attributes(year_column, offset):
     bad_ur = tbl.loc[out['Rural'].isna().values, 'UrbRur'].unique()
     assert len(bad_ur) == 0, f'unmapped urb/rur abbreviations: {list(bad_ur)}'
     return out
+
+
+# ---------------------------------------------------------------------------
+# GLSS1 / GLSS2 section 12B -- own-production value, DERIVED (2026-09-11)
+#
+# Registry: _/derivations.yml, key GhanaLSS::food_acquired::12b-fortnight.
+# Design: SkunkWorks/derived_values.org, "First instance".
+# ---------------------------------------------------------------------------
+
+#: Days per 12B time-unit code (question 4's legend: DAY 3, WEEK 4, MONTH 5,
+#: QUARTER 6, HALF YEAR 7, YEAR 8).  30.4 / 91.3 / 182.6 are GSS's own month,
+#: quarter and half-year lengths -- their annual EXPEND.HPFOOD reproduces to
+#: within 2% only with them (30 days per month gives 1.03-1.04).
+DAYS_PER_UNIT = {3: 1.0, 4: 7.0, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365.0}
+
+#: The purchase side's nominal window: section 12A is "since my last visit",
+#: and the 1988-89 Interviewer Manual (printed p.70) says of that interval
+#: "in theory this period is two weeks".  A module constant, NOT an argument:
+#: the cached parquet must be ONE identifiable construction.
+WINDOW_DAYS = 14
+
+
+def _as_float(x):
+    return pd.to_numeric(pd.Series(np.ravel(x)).replace({'.': np.nan}),
+                         errors='coerce').to_numpy(dtype=float)
+
+
+def derive_12b_fortnight_value(months, times, unit_code, value_each_time):
+    """Value of own-produced food eaten in a FORTNIGHT drawn at random from the year.
+
+    Section 12B of GLSS1/GLSS2 never asks a "since my last visit" question.
+    For each home-produced food it asks:
+
+      q2  MFOODCLY  -- in how many of the last 12 months was it eaten;
+      q3  TFOODC    -- how many times per (q4 unit) it was eaten;
+      q4  UTFOODC   -- the unit of q3 (DAY 3 .. YEAR 8, see DAYS_PER_UNIT);
+      q5  VFOODCPD  -- "How much would it cost to buy the amount they ate
+                       each time?" -- the value of ONE EATING OCCASION.
+
+    The served ``Expenditure`` for a produced row is therefore a CONSTRUCTION,
+    not an answer.  This is the one construction the library serves::
+
+        value_each_time * times * (WINDOW_DAYS / DAYS_PER_UNIT[unit_code])
+                        * months / 12
+
+    i.e. the year-average fortnight: GSS's own annual construction
+    ``EXPEND.HPFOOD`` (= value x times x (30.4 / days) x months) divided by
+    26.  Worked example (agreed with @ligon, 2026-09-11): eaten in 6 months
+    of the 12, 12 times a month, 10 cedis each time -> 120 a month in season,
+    720 a year (``HPFOOD``), 55.3 for an in-season fortnight, and **27.6** for
+    a fortnight drawn at random from the year -- the 6/12 being the chance
+    the interview fortnight lands in season.
+
+    Why the year average and not the in-season figure: the purchase side
+    (12A) is a REALISED fortnight, but 12B does not record WHICH months were
+    cited, so the in-season number is right for some households and zero is
+    right for the rest, unknowably.  The year average is unbiased over the
+    sample and defers to the construction the people who collected the data
+    used.  The alternatives are computable from
+    ``Country('GhanaLSS').derivation_inputs(key)``:  the in-season fortnight
+    drops the ``months / 12`` factor; GSS's annual ``HPFOOD`` is this x 26
+    (up to 30.4 x 12 = 364.8 vs 365 days).
+
+    No options, by design: a cached parquet is one identifiable construction.
+    Vectorised; accepts scalars, arrays or Series (elementwise, positional).
+    Returns a float for scalar inputs, else a float ndarray.  An unknown unit
+    code yields NaN.  Where ``months`` is 0 (three 1987-88 rows) the value is
+    0 -- the row is served, labelled, and contributes nothing.
+    """
+    months_f = _as_float(months)
+    times_f = _as_float(times)
+    value_f = _as_float(value_each_time)
+    codes = pd.to_numeric(pd.Series(np.ravel(unit_code)).replace({'.': np.nan}),
+                          errors='coerce').astype('Int64')
+    days = codes.map(DAYS_PER_UNIT).astype(float).to_numpy()
+    out = value_f * times_f * (WINDOW_DAYS / days) * months_f / 12.0
+    scalar = all(np.ndim(x) == 0 for x in (months, times, unit_code, value_each_time))
+    return float(out[0]) if scalar else out
+
+
+def _load_module_by_path(path, name):
+    import importlib.util as _ilu
+    spec = _ilu.spec_from_file_location(name, path)
+    mod = _ilu.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def inputs_12b(wave):
+    """The raw section-12B answers behind the derived produced rows of one wave.
+
+    Re-reads ``Y12B.DAT`` through ``get_dataframe`` and returns a frame indexed
+    ``(t, i, j)`` -- ``i`` via the wave's own ``mapping.i()``, ``j`` via the
+    same ``harmonize_food`` decode the wave script uses -- whose columns are
+    the ORIGINAL variable names: ``FOODCD``, ``MFOODCLY``, ``TFOODC``,
+    ``UTFOODC``, ``VFOODCPD``.  Every source row is returned, unfiltered
+    (the wave script drops zero / missing ``VFOODCPD``), at the INPUT grain:
+    several ``FOODCD`` harmonise to one ``j``, so ``(t, i, j)`` is not unique
+    here and ``FOODCD`` is kept so the row can be read against the
+    questionnaire.  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile, format_id
+    if wave not in ('1987-88', '1988-89'):
+        raise ValueError(f'section 12B exists only in 1987-88 and 1988-89, not {wave!r}')
+    root = countries_root() / 'GhanaLSS' / wave
+    df = get_dataframe(str(root / 'Data' / 'Y12B.DAT'))
+    mapping = _load_module_by_path(root / '_' / 'mapping.py', f'_ghanalss_mapping_{wave}')
+    labels = df_from_orgfile(str(root / '_' / 'categorical_mapping.org'),
+                             name='harmonize_food', encoding='ISO-8859-1')
+    codes = labels['Code_12B'].astype('Int64').astype('string')
+    lab = labels[['Preferred Label']].set_index(codes)['Preferred Label'].to_dict()
+    out = pd.DataFrame({
+        't': wave,
+        'i': df['HID'].apply(mapping.i),
+        'j': df['FOODCD'].apply(format_id).astype('string').replace(lab),
+        'FOODCD': df['FOODCD'],
+        'MFOODCLY': df['MFOODCLY'], 'TFOODC': df['TFOODC'],
+        'UTFOODC': df['UTFOODC'], 'VFOODCPD': df['VFOODCPD'],
+    })
+    return out.set_index(['t', 'i', 'j'])

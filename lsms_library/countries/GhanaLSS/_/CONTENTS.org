@@ -1239,7 +1239,7 @@ First, for waves before 2016--17, the survey instrument elicits the amount spent
 
 Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  The number of visits, their spacing and the recall length each differ by wave -- seven visits five days apart in GLSS4, GLSS6 and GLSS7, eleven in GLSS5 -- so they are tabulated per wave below rather than summarised here.  In =food_acquired= we keep the =visit= level and sum over it in the derived tables (patterns at the visit level are worth examining, and are now sliceable across =s=; see below).
 
-NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for expenditures "since my last visit", but only for one visit, while subsequent rounds elicit this information across several visits.
+NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for purchases (12A) "since my last visit" and only once, and ask for own production (12B) over NO recall window at all -- months eaten in the last twelve, times per unit, and the value of one eating occasion, from which the served value is /derived/ (see "12B is a value per eating occasion" below) -- while subsequent rounds elicit both across several visits.  (Until 2026-09-11 this note said both 1980s modules were "since my last visit"; only 12A is.)
 
 *** The repeated-visit design, wave by wave (2026-09-09)
 
@@ -1255,7 +1255,7 @@ corroborated by the visit dates the survey itself recorded (see below):
 
 | wave             | visits | 9B (purchases)   | 8H (own produce) | consumption occasions |
 |------------------+--------+------------------+------------------+-----------------------|
-| 1987-88, 1988-89 | 1      | single recall    | single recall    | 1                     |
+| 1987-88, 1988-89 | 1      | 12A: 1 recall    | 12B: no recall (derived) | 1               |
 | 1991-92 (GLSS3)  | 8 / 11 | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 7 rural / 10 urban    |
 | 1998-99 (GLSS4)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
 | 2005-06 (GLSS5)  | 11     | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 10                    |
@@ -1291,6 +1291,82 @@ row above now reads 2..11 for both modules.  The calendar-visit convention
 stands on its other grounds (it is what every wave's labels state, it is
 checkable against the source, and it is the clock =interview_date= uses);
 it no longer has a GLSS5 counter-example to lean on.
+
+**** 12B is a value per eating occasion, not a recall value (fixed 2026-09-11)
+
+GLSS1/GLSS2 =food_acquired= served =Y12B.VFOODCPD= as the produced-side
+=Expenditure=, beside =Y12A.CFOODBLV= ("How much have they spent since my
+visit?") on the purchased side, with the same =visit = 1=, the same
+=u = 'Value'= and nothing in the frame to tell them apart.  Both scripts'
+docstrings called =VFOODCPD= "produced_value per day" -- a claim that entered
+in =c404b7fb2= with no source.  It is neither per day nor per recall.
+Section 12B (questionnaire PDF p.68 / printed 43a; Interviewer Manual printed
+p.71; BID printed p.2: "Section 12B asks the amount consumed and market value
+of foods grown or raised by the household in the last twelve months") has NO
+since-my-last-visit question.  It asks, per food:
+
+| q | variable   | question                                                       |
+|---+------------+----------------------------------------------------------------|
+| 2 | =MFOODCLY= | in how many of the last 12 months was it eaten                 |
+| 3 | =TFOODC=   | how many times per (q4 unit)                                   |
+| 4 | =UTFOODC=  | DAY 3, WEEK 4, MONTH 5, QUARTER 6, HALF YEAR 7, YEAR 8         |
+| 5 | =VFOODCPD= | "How much would it cost to buy the amount they ate each time?" |
+
+So the served produced row was ONE MEAL's worth beside ~14 days of purchases:
+the own-production share of food read 17.4% / 18.1% in the two rounds.
+
+*Verified against GSS's own construction, not by elimination.*  The BID
+(printed p.22) defines =EXPEND.HPFOOD= as "the value of home produced food
+consumed in the last year calculated from Section 12B", and summing
+=VFOODCPD x TFOODC x (30.4 / days_per_unit) x MFOODCLY= per household
+reproduces it with median ratio 1.020 (IQR 1.015--1.03) in both rounds
+(n = 2,253 / 2,437 households; =slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org=
+section 2.2).  Treating =VFOODCPD= as a per-DAY value gives 2.1--2.5x.
+
+*The construction served since 2026-09-11* (decided with @ligon; design in
+=SkunkWorks/derived_values.org=, "First instance") is the YEAR-AVERAGE
+FORTNIGHT:
+
+#+begin_example
+Expenditure = VFOODCPD x TFOODC x (14 / days_per_unit[UTFOODC]) x MFOODCLY / 12
+            = HPFOOD / 26
+#+end_example
+
+with =days_per_unit = {3: 1, 4: 7, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365}=.
+Worked example: eaten in 6 months of the 12, 12 times a month, 10 cedis each
+time -> 120 a month in season, 720 a year (=HPFOOD=), 55.3 for an in-season
+fortnight, and *27.6* for a fortnight drawn at random from the year (the 6/12
+is the chance the interview fortnight lands in season).  Year-average rather
+than in-season because the purchase side is a realised fortnight but 12B does
+not record WHICH months were cited, so the in-season figure is right for some
+households and zero for the rest, unknowably; the year average is unbiased
+over the sample and defers to GSS's own construction.  The 14-day window is
+12A's nominal interval: the 1988-89 Interviewer Manual (printed p.70) says of
+it "in theory this period is two weeks".  Check: sum over items of the served
+function x 26 per household reproduces =HPFOOD= at median 1.018 in both
+rounds (=tests/test_ghanalss_12b.py=).
+
+Mechanics: =_/ghanalss.py:derive_12b_fortnight_value= (no options -- one
+construction per parquet), registered as
+=GhanaLSS::food_acquired::12b-fortnight= in =_/derivations.yml=, stamped in
+the =Derivation= column of every produced row of the two waves (NA on
+purchased rows) and summarised on =df.attrs['derivations']=.  The raw four
+answers come back by their original names from
+=Country('GhanaLSS').derivation_inputs('GhanaLSS::food_acquired::12b-fortnight')=
+(=inputs_12b=), from which the in-season or annual alternatives are one
+line.  Effect: row counts unchanged (71,605 / 72,649; the three 1987-88 rows
+with =MFOODCLY = 0= are served as 0 under the key rather than dropped);
+produced-side sum 3,157,354 -> 9,484,484 (x3.00) in 1987-88 and
+3,677,833 -> 8,334,683 (x2.27) in 1988-89; own-production share of food
+17.4% -> 38.8% and 18.1% -> 33.4%.
+
+*12A's two-week fallback rule* (Interviewer Manual, 1988-89, printed p.70),
+recorded here because it is what makes the 14-day window the right nominal
+one: the "since my last visit" interval is in theory two weeks, and where the
+actual gap between the first and second rounds was under 7 or over 21 days
+the interviewer was to ask instead about "the past two weeks" -- about 300
+households (=FINDINGS.org= 2.2).  So 12A is a fortnight by instruction, not
+only on average.
 
 **** =s8hq3= is the 2nd visit, and was dropped for the life of the wave (fixed 2026-09-11)
 
