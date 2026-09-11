@@ -1,0 +1,15 @@
+# Framework-level derivations -- the registry for derivations whose KEY has an
+# EMPTY COUNTRY SLOT (`::table::name`), i.e. a construction the library
+# applies to every country's table rather than one country's wave script
+# (the design's example: `::household_roster::age-dob`, age_handler's
+# DOB-derived fractional Age).  Sibling of the canonical data_info.yml, read by
+# lsms_library.derivations.framework_records().
+#
+# Per-country derivations live in countries/<C>/_/derivations.yml with the
+# country in the first slot.  Entry shape and the loader's refusals are
+# documented in lsms_library/derivations.py; the design is
+# SkunkWorks/derived_values.org.
+#
+# Empty for now: the first instance (GhanaLSS::food_acquired::12b-fortnight)
+# is a country-level entry.  Framework-level instances are a follow-on.
+{}

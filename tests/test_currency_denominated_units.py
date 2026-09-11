@@ -414,6 +414,17 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #:     and ``units`` +1,877 (measured exactly, by recomputing on the frame
 #:     minus the 21,252 restored rows: 187,674 / 1,691,300).
 #: ``kgvalue`` (407,478, 2016-17 only) unchanged by both.
+#:
+#: RE-DERIVED again 2026-09-11 (feat/derived-values, private ``LSMS_DATA_DIR``,
+#: cold) after the 1987-88/1988-89 produced side became the DERIVED 12B
+#: fortnight value (``GhanaLSS::food_acquired::12b-fortnight``; see
+#: tests/test_ghanalss_12b.py).  ``unitvalue`` 1,513,772 -> 1,513,769 and
+#: ``units`` 1,693,177 -> 1,693,174: EXACTLY the three 1987-88 produced rows
+#: whose ``MFOODCLY`` is 0, so the derived value is 0 -- ``food_acquired``
+#: keeps them (71,605 rows, unchanged; served as 0 under the key), and the
+#: derived tables drop them by their own ``replace(0, NaN)`` rule.  Measured
+#: row-for-row: the count on the frame minus those three rows is identical.
+#: ``unitprice`` (189,551) and ``kgvalue`` unchanged.
 GHANALSS_FOOD_PRICES_ROWS = 407_478
 GHANALSS_FOOD_PRICES_WAVES = ['2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
@@ -470,9 +481,9 @@ def test_ghanalss_food_prices_is_one_wave_and_not_constant():
 def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     """Only the kg-denominated modes touch the factor map."""
     c, _ = _country('GhanaLSS')
-    assert len(c.food_prices(units='unitvalue')) == 1_513_772
+    assert len(c.food_prices(units='unitvalue')) == 1_513_769
     assert len(c.food_prices(units='unitprice')) == 189_551
-    assert len(c.food_quantities(units='units')) == 1_693_177
+    assert len(c.food_quantities(units='units')) == 1_693_174
 
 
 @pytest.mark.slow

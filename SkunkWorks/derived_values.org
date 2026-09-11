@@ -4,7 +4,7 @@
 
 * Status
 
-Design sketch, not implemented.  Decided with @ligon on 2026-09-11:
+First instance IMPLEMENTED on =feat/derived-values= (2026-09-11): =lsms_library/derivations.py=, the GhanaLSS 12B entry, =tests/test_derivations.py= and =tests/test_ghanalss_12b.py=.  Decided with @ligon on 2026-09-11:
 the shape (registry + row label + raw-input retrieval); the rule that
 a derivation function has ONE construction, no options; that a key
 names an OPERATION and =derivation_inputs= returns the INPUT grain; and
@@ -146,7 +146,7 @@ GhanaLSS::food_acquired::12b-fortnight:
   rule: >-
     Expenditure = VFOODCPD * TFOODC * (14 / days_per_unit[UTFOODC]) * MFOODCLY / 12;
     Quantity = Expenditure (u = 'Value')
-  function: lsms_library.countries.GhanaLSS._.ghanalss:fortnight_value_from_12b
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_12b_fortnight_value
   inputs:   lsms_library.countries.GhanaLSS._.ghanalss:inputs_12b
   raw_variables: [Y12B.MFOODCLY, Y12B.TFOODC, Y12B.UTFOODC, Y12B.VFOODCPD]
   assumptions:
@@ -214,7 +214,13 @@ callable, which re-reads the source through =get_dataframe= and
 returns a frame at the served grain (=t, i, j= for 12B) whose columns
 are the ORIGINAL variable names (=MFOODCLY, TFOODC, UTFOODC,
 VFOODCPD=), so it joins to the served table and reads against the
-questionnaire.  Slow and exact; nothing is stored.  A cached companion
+questionnaire.  "Joins to the served table" is a promise the framework
+has to keep, not the inputs callable: =Country.derivation_inputs=
+re-keys =i= through =updated_ids= exactly as =_finalize_result= does
+for every served table (found 2026-09-11: GhanaLSS 1988-89 serves
+=101332= / =101332_1= -- a panel re-key plus a split-household suffix
+-- where =Y12B.DAT= says =200103=, so an un-walked raw frame had no
+row for the served household).  Slow and exact; nothing is stored.  A cached companion
 parquet is a possible later tier if the call is used enough to want
 one -- the registry key is what such a cache would be named by.
 
@@ -262,7 +268,7 @@ the column itself.
 
 * First instance: GhanaLSS 1987-88 / 1988-89 own production
 
-- Function :: =ghanalss.fortnight_value_from_12b(months, times, unit_code, value_each_time)=
+- Function :: =ghanalss.derive_12b_fortnight_value(months, times, unit_code, value_each_time)= (the =derive_= prefix is what the drift test keys on)
   with =days_per_unit = {3: 1, 4: 7, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365}=
   (the 12B legend: DAY 3, WEEK 4, MONTH 5, QUARTER 6, HALF YEAR 7,
   YEAR 8) and =window_days = 14= as a module constant, not an argument.
@@ -286,7 +292,7 @@ the column itself.
   the median (measured 1.020 / 1.020 for both rounds); a static test
   that the wave scripts stamp =Derivation= on every produced row and
   on no purchased row.
-- Effect :: 20,808 + 23,374 produced rows relabelled and rescaled.
+- Effect :: 44,112 served produced rows (20,808 + 23,374 source rows before the =j= collapse) relabelled and rescaled; row counts unchanged.
 - CONTENTS.org :: correct l.1242 / l.1258 (12B is not "since my last
   visit"); record the manual's two-week fallback rule for 12A.
 
@@ -412,9 +418,15 @@ divides (correctly); =recall.merge_attrs= has no caller, so
 
 * Costs
 
-- Cache :: hash moves only for the waves whose scripts stamp the
-  column; =_finalize_result= attachment and the =.yml= sibling move
-  nothing (measured pattern: =population.yml=, 524/524 unchanged).
+- Cache :: measured on the first instance (2026-09-11): the mechanism
+  alone (loader, attach in =_finalize_result=, the =.yml= siblings, the
+  =data_info.yml= declaration) moved 0 of 14 probed hashes; the
+  instance moved every GhanaLSS table and nothing else -- 5 of 14 --
+  because the derivation function lives in the country module
+  ={country}.py=, which is in EVERY table's input hash.  So the cost of
+  a new instance is one country re-warm, not one wave; an earlier
+  draft of this line said "only the waves whose scripts stamp the
+  column" and was wrong.
 - Discipline :: once the mechanism exists an unregistered derivation
   is a defect.  =make api-audit= should grow a check that greps wave
   scripts for arithmetic on served columns and asks for a key.

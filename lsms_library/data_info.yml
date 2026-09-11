@@ -909,6 +909,26 @@ Columns:
         in _finalize_result if not stored).  Farmgate price for
         s=produced (survey-reported where available).  Imputed value
         for s=inkind where available.  NaN otherwise.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        The registry key (`country::table::name`) of the derivation that
+        produced this row's served value, where that value is a
+        CONSTRUCTION from raw answers rather than a survey answer; NA on
+        a reported row.  Two derivations on one row are joined with `+`
+        in sorted order.  The key resolves through
+        `Country(c).derivations()` to the rule, the function, the
+        assumptions with their basis, and an `inputs` callable returning
+        the exact raw answers (`Country(c).derivation_inputs(key)`).
+        Optional because a country with no such derivation never emits
+        the column and `Feature()`'s concat fills NA.  First instance:
+        `GhanaLSS::food_acquired::12b-fortnight` (1987-88, 1988-89 own
+        production, whose raw answer is the value of ONE EATING OCCASION).
+        A derivation already visible in the frame -- an index value such as
+        `u = 'Value'`, or a per-row source column of its own such as
+        `KgFactorSource` -- is exempt; the key is for the invisible ones.
+        Design: SkunkWorks/derived_values.org.
   nonfood_expenditures:
     # GH #817.  The canonical shape is Togo's (PR #773): item-level, long, one
     # row per (wave, household, item) actually reported.  It is
