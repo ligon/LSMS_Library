@@ -1,0 +1,535 @@
+#+title: GhanaLSS 2005-06 (GLSS5): where visit dates are recorded, and what shipped
+#+date: 2026-09-11
+#+author: audit agent (wave 2005-06), for the GSS special data request
+
+Scope: Section-0-type files and documents only.  No Country()/Feature() table
+was built.  All data reads via =get_dataframe= / =get_data_file=; all document
+text via pdfplumber over the in-tree PDFs.  No dvc CLI, nothing downloaded from
+outside the library's fetchers.  Nothing tracked was edited.
+
+Documents read (all under =lsms_library/countries/GhanaLSS/2005-06/Documentation/=):
+- =ddi-documentation-english-5.pdf= (753 pp, text layer; DDI-GHA-GSS-GLSS-2005-v2.0)
+- =G5QPartA.pdf= (52 pp, text layer) -- household questionnaire Part A
+- =G5QPartB.pdf= (59 pp, text layer) -- household questionnaire Part B
+Not in the repo: any GLSS5 interviewer / supervisor / data-entry manual.  The
+WB catalog 1064 "related materials" list (read, not downloaded) carries NO
+manual of any kind -- only the Community, Household and Price questionnaires,
+a *Diary* form (=GHA_2006_GLSS_Diary_EN.pdf=, 39.68 KB), the Africa SHIP
+manual and SHIP Stata programs.  So the manual is absent from the catalog as
+well as from here; the Diary form is in the catalog and absent here.
+
+Mandatory reading done: =GhanaLSS/_/CONTENTS.org= 1-32, 1235-1300, 1244-1660,
+2869-2932 (that range is the SU/Rural fold; the text-layer table is at 3283)
+and every =2005-06= / =GLSS5= hit; =2005-06/_/data_info.yml= (=interview_date=
+wires =parta/sec0.dta= =ddate/mdate/ydate= only); the docstring of
+=2005-06/_/food_acquired.py=; =.coder/ledger/ghanalss-visit-offset.md=.
+Idiosyncrasies named from that reading: the q->visit offset (9B q1 -> visit
+2, 8H starts later because of two screeners); =visit= is the calendar visit;
+=sec0= has no urban/rural (=Rural= comes from =parta/sec7.dta:loc2=, DDI
+label "urban/rural-corr"); =pov_gh5.dta= is a decoy with no =hhid=; GLSS5
+spacing is recorded as UNESTABLISHED (CONTENTS 1531-1539,
+=.coder/HANDOFF_recall_research.md:141=).  Two of those are contradicted
+below (spacing: now established; 8H offset: wrong).
+
+* Visit protocol
+
+One line: eleven interviewer visits per household, every third day, a 33-day
+EA cycle, identical in urban and rural areas; paper questionnaire (Part A +
+Part B), manual data entry; purchases (9B) and own-produce consumption (8H)
+both asked at visits 2..11 with "since my last visit" recall (9B's first ask
+says "since my first visit"); a diary form existed (catalog 1064) but no
+local document describes its use.
+
+** Number of visits and spacing -- ESTABLISHED, from the DDI and from the data
+
+=ddi-documentation-english-5.pdf=, PDF p.9, "Interviewer Workload":
+
+#+begin_quote
+A team of three interviewers worked in three EAs during a 33 day cycle. One
+interviewer was assigned to work in one EA during a cycle. In both rural and
+urban areas, each interviewer conducted five interviews per day. Thus, at the
+end of each 33 day period (one cycle) a team will have interviewed 45
+households. The Data Capture staff entered all 45 Part A questionnaires before
+the team left for the next set of EAs.
+
+An interviewer visited each household in the EA assigned to him/her every
+third day. Thus an interviewer's workload of 15 households was divided into
+three batches of five households.
+#+end_quote
+
+Same page, "Team Composition": "For both urban and rural areas, a field team
+consisted of seven members: one supervisor, one senior interviewer, 3
+interviwers, one data cature staff and a driver."  (sic, both.)
+
+The survey's own visit record (=partb/secb2.dta=, below) corroborates it
+exactly: median gap 3.0 days at every one of the ten steps, 94.9% of all
+pooled gaps are exactly 3 days, 6,763 of 8,639 households have all nine
+gaps v2..v11 equal to 3, visits fall flat across the seven weekdays
+(12,211-12,418 per weekday: fieldwork ran through weekends), and the
+v1 -> v11 span has median 30 days (p10 28, p90 30).  Urban and rural are
+indistinguishable (median 3.0 at every step in both; span 30 in both).
+
+So the eleven-visit / 3-day / 33-day-cycle schedule that
+=GLSS7 Final Manual.docx= carries as boilerplate matches what GLSS5
+actually did -- but UNSTRATIFIED.  GLSS3's 8-rural / 11-urban split does
+not apply here.  (Whether the Manual TEXT descended through GLSS5 is a
+separate question this evidence does not touch.)
+
+Coverage: 10 asks x 3 days = 30 days, urban and rural alike.  Fieldwork
+ran September 2005 through August 2006 (=sec0= =mdate= x =ydate=: ~895
+first visits per month Sep-Dec 2005, 309-778 per month Jan-Aug 2006, a
+handful of keying strays in other months).
+
+** Which sections at which visit
+
+=G5QPartA.pdf= PDF p.5 (printed A.04), "SUMMARY OF SURVEY RESULTS":
+
+| visit    | sections           |
+|----------+--------------------|
+| FIRST    | 1, 2, 6, 7         |
+| SECOND   | 3, 8H, 9B          |
+| THIRD    | 4, 8H, 9B          |
+| FOURTH   | 8A-G, 8H, 9B       |
+| FIFTH    | 5, 8H, 9A, 9B, 9C  |
+| SIXTH    | 8H, 9B, 10         |
+| SEVENTH  | 8H, 9B, 10         |
+| EIGHTH   | 8H, 9B, 10         |
+| NINETH   | 8H, 9B, 10         |
+| TENTH    | 8H, 9B, 11         |
+| ELEVENTH | 8H, 9B, 12         |
+
+=G5QPartB.pdf= PDF p.5 (printed B.04) prints the same grid except that the
+SECOND visit reads "3, 5, 8H, 9B" (Section 5 listed at both the 2nd and the
+5th visit).  Part A and Part B disagree on that one cell; recorded, not
+adjudicated.
+
+*Both 8H and 9B are asked at visits 2..11* -- ten asks each -- per this
+grid AND per the module headers (next).
+
+** Recall phrase, per module
+
+Section 9B, =G5QPartB.pdf= PDF p.36 (printed 9.13): ten columns headed
+"2nd 3rd 4th ... 11th VISIT", each with a "dd mm" slot, numbered 1..10:
+"How much was spent on ........ since my first visit?" (column 1) then
+"... since my last visit?" (columns 2..10).  Amount only -- no quantity.
+
+Section 8H, =G5QPartB.pdf= PDF p.17 (printed 8.11): fourteen columns.
+1 "Did the household consume any own produced ........ in the past 12
+months?"; 2 "How many months altogether was own produced ...... consumed
+during the past 12 months?"; 3..12 headed "2nd 3rd ... 11th" with a
+"dd mm" slot each: "How much of own produced ..... was consumed by the
+household since my last visit?  No. OF UNITS"; 13 unit code; 14 "For how
+much would you sell one unit of .... now?".
+
+So on the instrument 8H's per-visit columns are q3..q12 -> visits 2..11,
+exactly parallel to 9B's q1..q10 -> 2..11.  See Contradiction 2.
+
+** Diary or not
+
+No local document mentions a diary (grep over the DDI text and both
+questionnaires: the only hits are "diary products" -- a typo for dairy in
+s8eq5).  The WB catalog 1064 lists =GHA_2006_GLSS_Diary_EN.pdf= under
+questionnaires, so a diary form was part of the GLSS5 instrument set.
+Whether it was urban-only (GLSS3) or universal (GLSS7), and whether its
+entries were transcribed into 9B/8H, is NOT established locally.  Not
+guessed either way.
+
+** Paper or CAPI
+
+Paper.  DDI p.10: "Twenty data entry operators were used to capture the
+data manually in eight regions ... All the datasets were concatenated in
+CSPRO".  Part A pp.3-4 (printed A.02-A.03) carry "DATA ENTRY, END OF CYCLE
+-- OPERATOR / DATE" and "EDITING OF PRINTOUTS, END OF CYCLE -- OPERATOR /
+DATE" boxes.  No CAPI timestamps exist for this wave.
+
+* Where a visit DATE / TIME is recorded on the instrument
+
+| document        | section / form / page                                   | field(s) as printed                                                                                    | records                                                                             |
+|-----------------+---------------------------------------------------------+--------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------|
+| G5QPartA.pdf    | Survey Information, PDF p.2 (printed A.01)              | FIRST VISIT: INTERVIEWER / DATE (DD MM YEAR); DWELLING FOUND; IS THE HEAD THE SAME; LANGUAGE; INTERPRETER | date, interviewer code, result-type codes; no time                                  |
+| G5QPartA.pdf    | same page                                               | VERIFICATION OF THE QUESTIONNAIRE, FIRST VISIT: SUPERVISOR / DATE / REMARKS / REINTERVIEW BY SUPERVISOR; HOUSEHOLD REPLACES HOUSEHOLD NUMBER / REASON | supervisor date, reinterview flag, replacement + reason; no time                    |
+| G5QPartA.pdf    | A.01-A.03 (PDF pp.2-4)                                  | SECOND ... ELEVENTH VISIT: INTERVIEWER / DATE / REMARKS; VERIFICATION OF QUESTIONNAIRE, n-th VISIT: SUPERVISOR / DATE / REMARKS / REINTERVIEW YES 1 NO 2 | one interviewer date + one supervisor date per visit 2..11; free-text remarks; no time |
+| G5QPartA.pdf    | A.03 (PDF p.4)                                          | DATA ENTRY, END OF CYCLE: OPERATOR / DATE / REMARKS; EDITING OF PRINTOUTS, END OF CYCLE: OPERATOR / DATE / REMARKS | two office dates + operator ids                                                     |
+| G5QPartA.pdf    | SUMMARY OF SURVEY RESULTS, A.04 (PDF p.5)               | per VISIT (FIRST..ELEVENTH) x SECTIONS: INTERVIEWER VISITS -- DATE (DD MM YEAR), RESULT (COMPLETE 1 / PARTIAL 2 / DISCONTINUED 3), DURATION (HR MIN); SUPERVISOR CHECK-UP VISITS -- DATE (DD MM YEAR), RESULT (COMPLETE 1 / PARTIAL 2); INTERVIEWER (result by supervisor: SATISFACTORY 1 / TO BE COMPLETED 2 / TO BE REDONE 3); DATA ENTRY OPERATOR (SATISFACTORY 1 / CORRECTION 2) | date, result code, DURATION in hours+minutes, supervisor check-up date+result, QC codes; no time-of-day |
+| G5QPartA.pdf    | OBSERVATION AND COMMENTS, A.05 (PDF p.6)                | REMARKS BY THE INTERVIEWER / SUPERVISOR ON THE n-th VISIT, 1..11                                       | free text only                                                                      |
+| G5QPartB.pdf    | B.01-B.04 (PDF pp.2-5)                                  | identical Survey Information pages and Summary grid, printed again on Part B (2nd-visit sections differ: "3, 5, 8H, 9B") | a SECOND copy of every date above, kept on the Part B booklet                       |
+| G5QPartB.pdf    | Section 8H header, printed 8.11 (PDF p.17)              | "2nd 3rd ... 11th" column heads, each with "dd mm"                                                     | per-visit day+month at the top of the 8H page; no year, no time                     |
+| G5QPartB.pdf    | Section 9B header, printed 9.13 (PDF p.36)              | "2nd 3rd ... 11th VISIT", each with "dd mm"                                                            | per-visit day+month at the top of the 9B page; no year, no time                     |
+| catalog 1064    | Diary form (GHA_2006_GLSS_Diary_EN.pdf) -- NOT in repo  | unknown                                                                                                | presumably daily entries with dates; unread                                         |
+| (none)          | interviewer manual / control sheets / supervisor forms  | --                                                                                                     | no manual exists locally or in catalog 1064; nothing can be cited                   |
+
+*There is no TIME-OF-DAY field anywhere on Part A or Part B.*  Duration
+(HR MIN) is the only clock quantity the instrument records.
+
+* What shipped: instrument field -> distributed variable
+
+** Enumeration of Section-0-like files in =2005-06/Data/=
+
+=parta/sec0.dta= (8,687 rows, 22 vars) -- the Part A Survey Information page (A.01), FIRST visit only.
+=partb/secb0.dta= (8,639 rows, 22 vars) -- the Part B copy of the same page (B.01), first visit only.
+=partb/secb1.dta= (86,252 rows, 16 vars, key hhid x visitno 2..11) -- the per-visit interviewer/supervisor DATE boxes on the PART B booklet (B.01-B.03).
+=partb/secb2.dta= (86,227 rows, 18 vars, key hhid x visitcd 2..11) -- the SUMMARY OF SURVEY RESULTS grid on the PART B booklet (B.04).
+
+Which booklet: the DDI names the three files "Survey Information for
+PartB" / "PartB 2" / "PartB3" (PDF pp.56-58), they live under =partb/=,
+and their 8,639 households are exactly =sec0='s 8,687 minus the 48 with no
+Part B.  So the shipped per-visit record is the Part B transcription; the
+Part A booklet's own copies of the same boxes (A.02-A.04) were NOT
+distributed and would be a third transcription of every visit date.
+=community/community.zip= -- 14 community files (=com-sec0.dta= ... =com-sec52.dta=, =com-list.dta=); community-level, not household; contents listed only, not examined.
+
+None of =secb0/secb1/secb2= is wired anywhere in the library
+(=grep -rn 'secb[012]'= over =lsms_library/ tests/ .coder/ docs/= returns
+nothing but the =.dvc= sidecars).  =interview_date= reads =sec0= only.
+
+#+begin_example
+==== parta/sec0.dta  rows=8687 cols=22
+  clust        int16    'enumeration area'
+  hhid         int32    'household identification number'
+  region       int8     'region'                          vallab=region {1 western .. 10 upper west}
+  ez           int8     'ecological zone'                 vallab=ez {1 coastal, 2 forest, 3 savannah}
+  nh           int8     'household number'
+  intcode      int16    'interviewer code'
+  ddate        int8     'day'
+  mdate        int8     'month'
+  ydate        int16    'year'
+  dwell        int8     'dwelling found?'                 vallab=dwell {1 yes, 2 no}
+  hhhead       int8     'is the head of household same?'  vallab=hhhead {1 yes, 2 no}
+  lang         int8     'language used by respondent'     vallab=lang {1 english .. 8 other}
+  interp       int8     'interpreter used?'               vallab=interp {1 yes, 2 no}
+  supcode      int16    'supervisor code'
+  ddatesup     int8     'day'
+  mdatesup     int8     'month'
+  ydatesup     int16    'year'
+  reint        int8     'reinterview by supervisor'       vallab=reint {1 yes, 2 no}
+  hhno         int8     'household number'                (810 non-null: replacement households)
+  rhhno        int8     'replaced household number'       (810 non-null)
+  reason       int8     'reason for replacement'          vallab=reason {1 dwelling not found/ vacant, 2 occupant not at home, 3 refusal}
+  weight       float    'weight'
+
+==== partb/secb0.dta  rows=8639 cols=22
+  clust        int16    'cluster number'
+  hhid         int32    'household identification number'
+  region       int8     'region'                          vallab=region
+  ez           int8     'ecological zone'                 vallab=ez
+  nh           int8     'household number'
+  intv         int16    'interviewer code'
+  day          int8     'day of interview'
+  month        int8     'month of interview'
+  year         int16    'year of interview'
+  dwell        int8     'dwelling found'                  vallab=dwell {1 yes, 2 no}
+  sameh        int8     'is head of household same'       vallab=sameh {1 yes, 2 no}
+  lang         int8     'language used by respondent'     vallab=lang
+  interp       int8     'interpreter used'                vallab=interp
+  superv       int16    'supervisor code'
+  sday         int8     'day of interview'      (DDI literal question: Day of verification of questionnaire)
+  smon         int8     'month of interview'    (DDI: Month of verification of questionnaire)
+  syear        int16    'year of interview'     (DDI: Year of verification of questionnaire)
+  reinterv     int8     'reinterview by supervisor'       vallab=reinterv {1 yes, 2 no}
+  hno          int8     'household number'                (704 non-null)
+  replace      int8     'replaces household number'       (705 non-null)
+  reason       int8     'reason for replacement'          vallab=reason {1 dwelling not found, 2 occupant not at home, 3 refusal}
+  weight       float    'weight'
+
+==== partb/secb1.dta  rows=86252 cols=16   key: hhid x visitno (2..11)
+  clust        int16    'cluster number'
+  hhid         int32    'household identification number'
+  region       int8     'region'                          vallab=region
+  ez           int8     'ecological zone'                 vallab=ez
+  nh           int8     'household number'
+  visitno      int8     'visit number'
+  intcd        int16    'interviewer code'
+  intday       int8     'interviewer day of visit'        (DDI: Day of visit by interviewer)
+  intmon       int8     'interviewer month of visit'
+  intyr        int16    'interviewer year of visit'
+  supercd      int16    'supervisor code'
+  supday       int8     'supervisor day of visit'         (DDI: Day of verification of questionnaire)
+  supmon       int8     'supervisor month of visit'
+  supyr        int16    'supervisor year of visit'
+  reint        int8     'reinterview by supervisor'       (no value labels; 1 yes 2 no, one stray 0)
+  weight       float    'weight'
+
+==== partb/secb2.dta  rows=86227 cols=18   key: hhid x visitcd (2..11)
+  clust        int16    'cluster number'
+  hhid         int32    'household identification number'
+  region       int8     'region'                          vallab=region
+  ez           int8     'ecological zone'                 vallab=ez
+  nh           int8     'household number'
+  visitcd      int8     'visit number'
+  vday         int8     'day of visit'
+  vmon         int8     'month of visit'
+  vyr          int16    'year of visit'
+  vres         int8     'result of visit'                 (DDI: Result of interview; NO value labels -- grid A.04: 1 complete, 2 partial, 3 discontinued)
+  durhr        int8     'duration in hours'
+  durmin       int8     'duration in minutes'
+  cday         int8     'day of checkup visit'
+  cmon         int8     'month of checkup visit'
+  cyr          int16    'year of checkup visit'
+  cres         int8     'result of checkup visit'         vallab=cres {1 complete, 2 partial}
+  sinu         int8     'interviewer result'              vallab=sinu {1 satisfactory, 2 to be completed, 3 to be redone}  (DDI: Result of interviewer by supervisor)
+  sentry       int8     'data entry operator'             vallab=sentry {1 satisfactory, 2 correction}  (DDI: Result of data entry by supervisor)
+#+end_example
+
+The DDI (PDF pp.14, 56-58) describes each of these four files with ONE
+MORE variable than shipped -- =urbrur= "Urban/rural" (sec0 23 vars,
+secb0 23, secb1 17, secb2 19, vs 22/22/16/18 on disk).  The DDI was
+written against a file layout the distribution does not carry; =urbrur=
+is absent from all four.  (Its counts -- "Cases 300 / 2999 / 2995" -- are
+the DDI's sample extract, not the distributed files.)
+
+** Instrument field -> variable, row by row
+
+| instrument field                                          | shipped?  | file : variable(s)                                                    |
+|-----------------------------------------------------------+-----------+-----------------------------------------------------------------------|
+| A.01 FIRST VISIT interviewer DATE (DD MM YEAR)            | YES       | parta/sec0 : ddate mdate ydate (8,687/8,687 valid); partb/secb0 : day month year (8,638) |
+| A.01 FIRST VISIT interviewer code                         | YES       | sec0 : intcode; secb0 : intv                                          |
+| A.01 dwelling found / head same / language / interpreter  | YES       | sec0 : dwell hhhead lang interp; secb0 : dwell sameh lang interp      |
+| A.01 VERIFICATION FIRST VISIT supervisor DATE / code      | YES       | sec0 : ddatesup mdatesup ydatesup supcode; secb0 : sday smon syear superv |
+| A.01 REINTERVIEW BY SUPERVISOR (1st visit)                | YES       | sec0 : reint; secb0 : reinterv                                        |
+| A.01 HOUSEHOLD REPLACES HOUSEHOLD NUMBER / REASON         | YES       | sec0 : hhno rhhno reason; secb0 : hno replace reason                  |
+| B.01-B.03 SECOND..ELEVENTH VISIT interviewer DATE + code  | YES       | partb/secb1 : visitno intday intmon intyr intcd (86,252 rows, 8,595-8,647 per visit, 100% non-null day/month/year; 8,595-8,645 parse as valid dates) |
+| B.01-B.03 VERIFICATION n-th VISIT supervisor DATE + code  | YES       | secb1 : supday supmon supyr supercd (8,584-8,647 per visit non-null)  |
+| B.01-B.03 REINTERVIEW BY SUPERVISOR (visits 2..11)        | YES       | secb1 : reint (yes 2,823 / no 83,422 / 0: 1 / null 6)                 |
+| A.02-A.03 SECOND..ELEVENTH VISIT boxes (Part A copy)      | NO        | the Part A booklet's transcription of the same dates is not distributed |
+| A.01-A.05 / B.01-B.05 REMARKS (interviewer, supervisor)   | NO        | free text, not distributed                                            |
+| A.03 / B.03 DATA ENTRY, END OF CYCLE: OPERATOR / DATE     | NO (date) | only the QC code secb2 : sentry (77,119 non-null); operator id and date absent |
+| A.03 / B.03 EDITING OF PRINTOUTS, END OF CYCLE: OPERATOR / DATE | NO  | --                                                                    |
+| B.04 grid: INTERVIEWER VISITS DATE (per visit)            | YES       | partb/secb2 : visitcd vday vmon vyr (86,227 rows; 8,602-8,638 per visit; 100% non-null; 8,602-8,635 valid) |
+| B.04 grid: RESULT (complete/partial/discontinued)         | YES       | secb2 : vres (1: 85,356; 2: 822; 3: 49) -- unlabelled in the .dta     |
+| B.04 grid: DURATION HR MIN                                | YES       | secb2 : durhr durmin (86,208 non-null)                                |
+| B.04 grid: SUPERVISOR CHECK-UP VISITS DATE                | YES (sparse) | secb2 : cday cmon cyr (7,230 non-null = the visits actually checked; 652-829 per visit) |
+| B.04 grid: SUPERVISOR CHECK-UP RESULT                     | YES       | secb2 : cres (complete 10,041 / partial 54 / null 76,132)             |
+| B.04 grid: INTERVIEWER (result by supervisor)             | YES       | secb2 : sinu (satisfactory 86,043 / to be completed 121 / to be redone 45) |
+| B.04 grid: DATA ENTRY OPERATOR result                     | YES       | secb2 : sentry (satisfactory 77,085 / correction 34 / null 9,108)     |
+| A.04 grid (Part A copy of the summary grid)               | NO        | second transcription of dates / results / durations, not distributed  |
+| A.04 / B.04 grid: SECTION column (which sections done)    | NO        | pre-printed on the form; nothing to ship                              |
+| 8H header "dd mm" per visit (printed 8.11)                | NO        | partb/sec8h.dta has no date variables                                 |
+| 9B header "dd mm" per visit (printed 9.13)                | NO        | partb/sec9b.dta has no date variables                                 |
+| Diary form entries / dates                                | NO        | no diary file in 2005-06/Data/; form itself not in repo               |
+| Time of day (any visit)                                   | n/a       | not on the instrument                                                 |
+| Visit 1 duration                                          | NO        | the A.04 grid has a FIRST row, but secb2 starts at visitcd 2; sec0/secb0 carry no duration |
+
+Visit 1's date is on =sec0= (Part A) and =secb0= (Part B copy); visits
+2..11 are on =secb1= (Part B interviewer + supervisor date boxes) and
+=secb2= (the Part B summary grid).  The =sec0= date IS the first visit: secb2's visit-2
+date minus the sec0 date is exactly 3 days for 7,488 of 8,639 households
+(0 days for 718 -- see Idiosyncrasies).
+
+** Per-visit measurements (secb2 primary; secb1 agrees)
+
+Number of visit slots: 11 (visit 1 on sec0/secb0; 2..11 on secb1/secb2).
+Households: 8,639 in every Part B file; 8,687 in sec0 (48 households in
+sec0 have NO Part B at all -- not in secb0/1/2, sec8h or sec9b -- 47 of
+them "dwelling found = yes", 17 with a replacement reason; so the visit
+record is complete for every household that has food data).
+
+Non-null visit dates per visit, secb2 (rows / valid dates):
+v2 8,638/8,635; v3 8,626/8,623; v4 8,630/8,629; v5 8,620/8,616;
+v6 8,625/8,618; v7 8,619/8,618; v8 8,620/8,620; v9 8,623/8,623;
+v10 8,624/8,624; v11 8,602/8,602.  8,515 households have exactly 10 rows.
+
+Result-code vocabulary: =vres= 1/2/3 (unlabelled; A.04 says COMPLETE /
+PARTIAL / DISCONTINUED): 85,356 / 822 / 49.  Partials cluster at visits
+2-5 (197, 178, 110, 189) and fall to 10-42 from visit 6 on.  =cres= 1
+complete / 2 partial.  =sinu= 1 satisfactory / 2 to be completed / 3 to be
+redone.  =sentry= 1 satisfactory / 2 correction.
+
+Median gap in days between successive visits, v1 = sec0 date, v2..11 =
+secb2 (n = households with both dates):
+
+| step   | ALL n | ALL median (mean) | URBAN n | URBAN median | RURAL n | RURAL median |
+|--------+-------+-------------------+---------+--------------+---------+--------------|
+| 1->2   | 8,613 | 3.0 (3.93)        | 3,586   | 3.0          | 5,027   | 3.0          |
+| 2->3   | 8,602 | 3.0 (2.89)        | 3,583   | 3.0          | 5,019   | 3.0          |
+| 3->4   | 8,598 | 3.0 (2.94)        | 3,583   | 3.0          | 5,015   | 3.0          |
+| 4->5   | 8,604 | 3.0 (2.96)        | 3,582   | 3.0          | 5,022   | 3.0          |
+| 5->6   | 8,594 | 3.0 (3.22)        | 3,574   | 3.0          | 5,020   | 3.0          |
+| 6->7   | 8,599 | 3.0 (2.25)        | 3,573   | 3.0          | 5,026   | 3.0          |
+| 7->8   | 8,605 | 3.0 (2.63)        | 3,578   | 3.0          | 5,027   | 3.0          |
+| 8->9   | 8,608 | 3.0 (3.29)        | 3,577   | 3.0          | 5,031   | 3.0          |
+| 9->10  | 8,611 | 3.0 (3.07)        | 3,574   | 3.0          | 5,037   | 3.0          |
+| 10->11 | 8,597 | 3.0 (2.59)        | 3,571   | 3.0          | 5,026   | 3.0          |
+
+p25 = p75 = 3 at every step in every stratum.  Span v1->v11: median 30.0
+(mean 29.7; urban 29.5, rural 29.9).  Pooled gap distribution v2..v11:
+exactly 3 days 94.9%; 0 days 1.0%; 2 days 0.5%; 6 days 0.5%; everything
+else < 0.5%.  The means are pulled off 3 by keying errors of +-30/365
+days (month/year slips), not by real deviations.  Using secb1's
+interviewer dates instead gives the same medians and spans.
+Urban/rural via =parta/sec7.dta:loc2= (3,589 urban / 5,050 rural of the
+8,639).
+
+Duration (secb2 durhr*60+durmin, n = 86,208): median 45 min, mean 51.5,
+p10 20, p90 90; by visit, medians 50/53/55/60 min at visits 2-5 (the
+visits carrying Sections 3, 4, 8A-G, 5/9A/9C) then 41/38/35/32/36/37 at
+6-11 (8H + 9B + one section); rural 45, urban 40.  =durhr= has 82 rows at
+10-23 hours -- keying errors.
+
+Supervisor check-up: =cday/cmon/cyr= non-null for 7,230 visit-rows (8.4%);
+=cres= non-null for 10,095; both present 5,718.
+
+* The NSO request for this wave
+
+GLSS5 ALREADY SHIPS the complete per-visit DATE record: eleven dated
+visits per household (sec0 for visit 1; secb1 AND secb2 for visits 2..11,
+two independent transcriptions), plus per-visit RESULT code, per-visit
+DURATION in hours and minutes, supervisor verification dates per visit,
+supervisor check-up dates and results, and the interviewer/data-entry QC
+codes.  Nothing about the visit schedule itself needs to be requested.
+
+The instrument has NO time-of-day field, so a request for "time of visit"
+would be a request for something GSS never recorded on paper.  Duration is
+already distributed.
+
+What exists on the instrument and was NOT distributed (named as printed):
+
+1. Section 8H header, printed 8.11: the "dd mm" date slot above each of
+   the "2nd ... 11th" columns (the date the own-produce consumption ask
+   was made).  Redundant with secb2 if the interviewer copied the same
+   date; independent evidence if not.
+2. Section 9B header, printed 9.13: the "dd mm" slot above each of the
+   "2nd ... 11th VISIT" columns.  Same remark.
+3. Summary of Survey Results, A.04 / B.04: the FIRST-visit row's DURATION
+   (HR MIN) and RESULT -- secb2 starts at visit 2.
+4. "DATA ENTRY, END OF CYCLE -- OPERATOR / DATE" and "EDITING OF PRINTOUTS,
+   END OF CYCLE -- OPERATOR / DATE" (A.03 / B.03): the data-entry and
+   editing dates and operator ids (only the QC verdict =sentry= shipped).
+5. The per-visit REMARKS boxes (A.01-A.03, A.05 / B.05): free text; low
+   value, listed for completeness.
+5a. The PART A booklet's copies of the visit boxes and summary grid
+   (A.02-A.04): a third transcription of every visit date, which would
+   adjudicate the +-365 / +-30-day keying disagreements between =secb1=
+   and =secb2= (9,767 of 85,919 shared cells).
+6. The Diary (=GHA_2006_GLSS_Diary_EN.pdf= in catalog 1064): whether
+   diaries were kept, in which households, and whether the daily entries
+   were retained or only transcribed into 9B/8H.  Ask for the form's role
+   and any diary-level file.
+7. Value labels for =secb2.vres= (1/2/3 -- A.04 says complete / partial /
+   discontinued) and =secb1.reint=; and the =urbrur= variable the DDI
+   documents for sec0/secb0/secb1/secb2 but the files lack (it is
+   recoverable from parta/sec7.dta:loc2, so low priority).
+8. The GLSS5 interviewer's manual and supervisor's manual: absent here AND
+   absent from catalog 1064's related materials.  Ask for it -- it is the
+   only document that would state the diary protocol and the batch
+   schedule in GSS's own words for this round.
+
+Priority for the visit-timing purpose: items 1-3 (per-section dates and
+the visit-1 duration), 5a (the Part A copies, to settle keying
+disagreements) and 6/8 (diary protocol).  Everything else is
+already on disk.
+
+* Idiosyncrasies and contradictions
+
+** Contradiction 1 -- visit spacing is now ESTABLISHED, and the boilerplate does describe GLSS5
+
+CONTENTS.org 1531-1539 (=GLSS7 Final Manual.docx= is stale ...): "GLSS5
+also fields eleven visits ... so it may have passed through that round
+too; what the evidence settles is that the text is NOT GLSS7's, not which
+earlier round it came from."  And =.coder/HANDOFF_recall_research.md:141=:
+"GhanaLSS 2005-06 | 1 | needs GLSS5's own manual for the visit spacing".
+
+Both can be closed without the manual.  GLSS5's DDI (PDF p.9, quoted
+above) states "every third day", "33 day cycle", "in both rural and urban
+areas", and =secb2= measures it: median 3.0 at all ten steps in both
+strata, 94.9% of gaps exactly 3, span 30.  The eleven-visit / 3-day /
+33-day schedule in the GLSS7 Manual's Table 2 MATCHES GLSS5's documented
+and measured practice (and GLSS3's urban schedule).  That is a statement
+about practice, not about the Manual text's lineage -- CONTENTS.org's
+2026-09-09 retraction of the "carried over from GLSS5" attribution
+stands; nothing here shows which round the text passed through.  Unlike
+GLSS3 the GLSS5 schedule is NOT stratified: rural households get 11
+visits at 3 days, not 8 at 2 days.  The recall window
+for =food_expenditures= in 2005-06 is therefore 30 days, urban and rural
+alike, the same figure as GLSS7's 6 x 5.
+
+** Contradiction 2 -- 8H is asked at visit 2, and =s8hq3= is the 2nd-visit quantity, not a total
+
+CONTENTS.org table (line 1261): "2005-06 (GLSS5) | 11 | q1..q10 -> 2..11 |
+q4..q12 -> 3..11 | 10 / 9", and 1284-1288: "GLSS5 is why =visit= is the
+calendar number ... There, purchases run from the 2nd visit but own
+production only from the 3rd (=s8hq3= is 'number of units consumed', a
+total, not a visit)".  =2005-06/_/food_acquired.py:132-135= implements
+that: "s8hq3 is 'number of units consumed', a total, not a visit" and maps
+=s8hq4..s8hq12 -> visits 3..11=, dropping =s8hq3=.
+
+Three independent sources say otherwise, and the data settle it:
+
+- The questionnaire, =G5QPartB.pdf= printed 8.11: columns 3..12 are headed
+  "2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th", each "How much of own
+  produced ..... was consumed by the household since my last visit?".
+  Column 3 is the 2nd visit.
+- The summary grids A.04 and B.04: "SECOND | 3, 8H, 9B" -- 8H is
+  administered at the second visit.
+- The DDI's literal question for =s8hq3= (PDF p.460, "Number of units
+  consumed (s8hq3)"): "How much of own produced ... was consumed by the
+  household since my last visit?"  Only the .dta variable label ("number
+  of units consumed") reads as a total.  The labels on =s8hq4..s8hq12=
+  ("... at 3rd visit" ... "at 11th visit") are consistent with the
+  questionnaire (question 4 = 3rd visit, question 12 = 11th visit); it
+  is =s8hq3='s label alone that fails to say "2nd visit".
+- The data (=partb/sec8h.dta=, rows with =s8hq1= = yes, n = 48,270):
+  =s8hq3= is non-null in 48,228 and positive in 21,440, against 18,266 for
+  =s8hq4= and 17,874 ... 15,653 for q5..q12 -- the same magnitude as a
+  visit column and a 1.17x first-ask excess, exactly the pattern every
+  other wave shows.  It is NOT the sum of q4..q12: it equals that sum in
+  18,578 rows, exceeds it in 2,740, and is SMALLER than it in 26,910.  A
+  total cannot be smaller than the sum of its parts in 56% of rows.
+  Median q3/q4 ratio 1.0; q3 == q4 in 62.8% of rows, the same share as
+  q4 == q5 (66.6%).
+
+Consequences, reported not fixed: (a) the library's 2005-06 produced side
+drops the 2nd-visit ask -- 21,440 positive records -- and serves own
+production from visit 3 only; (b) the "10 / 9" consumption-occasion cell
+should read 10 / 10, and 8H covers the same 30 days as 9B; (c) the
+Scott-Amenuvegbe passage (CONTENTS ~1462-1465: "GLSS5, whose own-production
+module starts at the 3rd visit rather than the 2nd, shows the weakest
+first-ask step (1.02x ...)") is an artefact -- the step it measured was
+visit 3 vs 4, and the real first ask has a 1.17x step on positive counts;
+(d) the ledger's Phase-3 note ("2005-06 -> purchased 2..11, produced 3..11
+(the real asymmetry s5 predicted)") records the label, not the instrument.
+=s8hq2= (months consumed in the past 12) is the only screener with a
+numeric answer; =s8hq1= is the yes/no.
+
+** Idiosyncrasies not in CONTENTS.org
+
+- Two transcriptions of every visit date.  =secb1= (the A.01-A.03 boxes)
+  and =secb2= (the A.04 grid) agree on 76,152 of 85,919 shared (hhid,
+  visit) dates and disagree on 9,767, with +-365 days (year keyed as
+  2005 vs 2006) and +-30/31 (month slips) dominating the differences.
+  Prefer =secb2=: it is the form's single summary grid, it carries the
+  result/duration on the same row, and its per-visit valid-date counts
+  are marginally higher.  Where they disagree, one of the two is usually
+  exactly the +-365 or +-30 shift of the other.
+- Likewise =sec0= vs =secb0= for the first-visit date: 7,953 of 8,639
+  equal; 686 differ, dominated by -1/+1/+3 days and +-30/31/365.
+- Duplicate keys.  =secb1= has 314 rows (149 households) with a repeated
+  (hhid, visitno); =secb2= 156 rows (78 households).  In the pairs
+  inspected the two dates are 3 days apart -- consecutive visits keyed
+  with the same visit number, not repeat visits.  Anyone pivoting on
+  (hhid, visit) must dedupe or re-derive the visit ordinal from the date.
+- 718 households have secb2's visit-2 date EQUAL to the sec0 first-visit
+  date (gap 0 at step 1->2, mostly rural: 561 of 718).  Either the
+  first-visit date on sec0 was written at visit 2, or visits 1 and 2 were
+  same-day.  From step 2->3 on, zero-day gaps fall to ~1%.
+- The DDI documents =urbrur= in all four survey-information files; none of
+  the shipped files has it.  Use =parta/sec7.dta:loc2= as already wired.
+- =secb2.vres= ships WITHOUT value labels although =cres/sinu/sentry= have
+  them; the codes come from the printed grid (A.04).
+- Part A and Part B print the same Survey Information / Summary pages;
+  their SECOND-visit section lists differ ("3, 8H, 9B" vs "3, 5, 8H, 9B").
+- 48 households are in =sec0= only (no Part B files, no 9B/8H rows).
+  Whoever joins =secb*= to =sample= should expect 8,639, not 8,687.
+- The =dd mm= slots on the 8H and 9B page headers mean each module page
+  carries its own visit date on paper; that is the one genuinely
+  per-section date GSS holds and did not distribute.
+- No diary is mentioned in any local GLSS5 document, but the WB catalog
+  lists a GLSS5 Diary form.  The GLSS7 Main Report's diary passage should
+  not be back-projected onto GLSS5 without that form or the manual.
+
+** What was searched, so the negatives are falsifiable
+
+Time-of-day: grep over the text layers of both questionnaires and the DDI
+for "time", "hour", "a.m", "p.m", "duration": only the A.04/B.04 DURATION
+HR MIN cell and =durhr/durmin=.  Manual: none in =2005-06/Documentation/=
+(=ls=: DDI, G5Q10, G5QComm, G5QPartA, G5QPartB, G5QPrice) and none in the
+catalog-1064 related-materials list.  =secb*= wiring: none in the repo.
