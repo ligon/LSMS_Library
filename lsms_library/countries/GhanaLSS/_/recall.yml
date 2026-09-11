@@ -53,11 +53,13 @@ Recall:
     notes: 'spacing asserted in CONTENTS, not cited to GLSS4 own manual'
     n_items_delivered: 112
   '2005-06':
-    basis: not-recorded
-    ask_count_basis: unknown
-    within_wave_variation: by-s
-    evidence: 'lsms_library/countries/GhanaLSS/_/CONTENTS.org:1261 (ask counts only)'
-    notes: 'spacing UNESTABLISHED (design O3); 11 interviewer visits'
+    basis: questionnaire
+    ask_count_basis: measured
+    recall_days: 3
+    n_asks: 10
+    recall_verbatim: 'since my last visit'
+    evidence: '2005-06/Documentation/ddi-documentation-english-5.pdf p.9 (visits every third day, 33-day cycle); G5QPartB.pdf p.17/p.36 (8H and 9B both headed 2nd..11th, since my last visit); spacing measured 3.0 d median at every step from partb/secb2.dta (slurm_logs/2026-09-11_ghanalss_visit_dates/2005-06.org)'
+    notes: '11 interviewer visits, food asked at 2..11 in BOTH modules (s8hq3 is the 2nd-visit quantity, not a total -- corrected 2026-09-11); unstratified, unlike GLSS3'
     n_items_delivered: 114
   '2012-13':
     basis: config-comment

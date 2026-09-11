@@ -117,3 +117,19 @@ record the GLSS visit/recall design in `GhanaLSS/_/CONTENTS.org`.
   (`food_acquired.py:118`) while the other waves leave it integer, so the
   country-level concat gives `visit` an object dtype with mixed types. Real,
   pre-existing, and independent of the offset.
+
+---
+### Correction (2026-09-11)
+
+§5's GLSS5 argument and §4's "8H questions 1 and 2 are screeners" are half
+right: q1/q2 ARE screeners in every wave, 2005-06 included, so 2005-06's
+`s8hq3` is the **2nd-visit** quantity, not "a total, not a visit".  The
+questionnaire (`G5QPartB.pdf` p.17, printed 8.11) heads columns 3..12
+"2nd..11th"; in the data `s8hq3 < sum(s8hq4..s8hq12)` in 27,314 rows.  The
+Stata label ("number of units consumed") was trusted over the instrument --
+the failure the ledger's own §6 warned about for 1991-92.  Phase 3's
+"2005-06 -> purchased 2..11, produced 3..11 (the real asymmetry §5 predicted)"
+was therefore a verification against the same wrong reading.  Fixed in the
+wave script (`range(3, 13)`), the test pins, `food_recall.csv` and
+CONTENTS.org; 21,252 rows restored.  The calendar-visit decision (§5) stands
+on its remaining reasons.

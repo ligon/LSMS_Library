@@ -103,7 +103,7 @@ x['Price'] = np.nan
 x = x.reset_index()
 
 # ================================ PRODUCED (s8h) ==============================
-# Real quantity (s8hq4..s8hq12 = the 3rd..11th visits) in a native unit
+# Real quantity (s8hq3..s8hq12 = the 2nd..11th visits) in a native unit
 # (s8hq13), with a farmgate Price
 # (s8hq14).  Expenditure left NaN -- no produced value is recorded.
 #
@@ -129,10 +129,17 @@ prod = prod[_drop_nonfood(prod['j'])]
 prod['u'] = prod['s8hq13'].astype(str)
 prod['Price'] = prod['s8hq14']
 
-#   s8hq4 'quantity .. consumed at 3rd visit' .. s8hq12 '.. at 11th visit'.
-#   NOTE the asymmetry: purchases start at the 2nd visit, own production at
-#   the 3rd -- s8hq3 is 'number of units consumed', a total, not a visit.
-pro_visit_cols = {f's8hq{v}': f'Quantity_v{v - 1}' for v in range(4, 13)}
+#   s8hq3..s8hq12 -> calendar visits 2..11.  The Stata label on s8hq3 reads
+#   'number of units consumed', which was read as a TOTAL until 2026-09-11
+#   and the column was dropped -- 21,493 positive records, the wave's whole
+#   2nd-visit own-production ask.  It is not a total: the questionnaire
+#   (G5QPartB.pdf p.17, printed 8.11) heads columns 3..12 '2nd 3rd .. 11th',
+#   each asking 'how much of own produced .. was consumed .. since my last
+#   visit?', and in the data s8hq3 < sum(s8hq4..s8hq12) in 27,314 rows, which
+#   no total can be.  Both modules run 2..11 in this wave (the purchases'
+#   s9bq1 label is 'amount spent by second visit'); the 8H stems start at q3
+#   because q1/q2 are screeners, exactly as in 1998-99 / 2012-13 / 2016-17.
+pro_visit_cols = {f's8hq{v}': f'Quantity_v{v - 1}' for v in range(3, 13)}
 keep = ['i', 'j', 'u', 'Price'] + list(pro_visit_cols.values())
 y = prod.rename(columns=pro_visit_cols)[keep]
 y = y.replace({r'': pd.NA, 0: np.nan})

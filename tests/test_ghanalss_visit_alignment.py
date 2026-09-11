@@ -61,8 +61,12 @@ COUNTRY = 'GhanaLSS'
 
 # Per wave: the calendar visits each module is fielded at, read off that wave's
 # own Stata variable labels (see GhanaLSS/_/CONTENTS.org, "The repeated-visit
-# design, wave by wave").  1991-92 is deliberately absent: its source carries no
-# labels").  1991-92 has no variable labels; its mapping comes from the
+# design, wave by wave") -- except 2005-06 produced, whose s8hq3 label
+# ("number of units consumed") is WRONG: it is the 2nd-visit quantity, per the
+# questionnaire (G5QPartB.pdf p.17: columns 3..12 headed "2nd .. 11th") and the
+# data (s8hq3 < sum(s8hq4..q12) in 27,314 rows).  Until 2026-09-11 this table
+# pinned range(3, 12) there and guarded the dropped column.
+# 1991-92 has no variable labels; its mapping comes from the
 # questionnaire (G3QPartB.pdf: eleven date boxes 1st..11th, 9B q1 = "since my
 # FIRST visit") and the interviewer's manual, corroborated by the visit dates
 # the survey recorded in S0B.DTA.  Its 8 rural / 11 urban split shows as
@@ -70,7 +74,7 @@ COUNTRY = 'GhanaLSS'
 EXPECTED = {
     '1991-92': {'purchased': set(range(2, 12)), 'produced': set(range(2, 12))},
     '1998-99': {'purchased': set(range(2, 8)),  'produced': set(range(2, 8))},
-    '2005-06': {'purchased': set(range(2, 12)), 'produced': set(range(3, 12))},
+    '2005-06': {'purchased': set(range(2, 12)), 'produced': set(range(2, 12))},
     '2012-13': {'purchased': set(range(2, 8)),  'produced': set(range(2, 8))},
     '2016-17': {'purchased': set(range(2, 8)),  'produced': set(range(2, 8))},
 }
@@ -135,7 +139,7 @@ class TestScripts:
         evidence = {
             '1991-92': r'first visit|2nd\.\.11th',
             '1998-99': r'2nd visit|2\.\.7',
-            '2005-06': r'second visit|2\.\.11|3rd visit',
+            '2005-06': r'second visit|2\.\.11',
             '2012-13': r'2nd visit|2\.\.7',
             '2016-17': r'2nd visit|2\.\.7',
         }[wave]
@@ -260,14 +264,17 @@ class TestDelivered:
                 f'{sorted(got.get(source, []))} != the {sorted(expected)} the '
                 f'wave\'s Stata labels name.')
 
-    @pytest.mark.parametrize('wave', ['1998-99', '2012-13', '2016-17'])
+    @pytest.mark.parametrize('wave', ['1998-99', '2005-06', '2012-13', '2016-17'])
     def test_both_modules_share_one_visit_axis(self, wave,
                                                visits_by_wave_and_source):
         """The point of the fix: `visit` slices across `s`.
 
-        Only for the waves where both modules ARE fielded at the same visits.
-        2005-06 is excluded on purpose -- there purchases start at the 2nd
-        visit and own production at the 3rd, and that asymmetry is real.
+        Both modules are fielded at the same visits in every one of these
+        waves.  2005-06 was excluded here until 2026-09-11 on the belief that
+        its own production started at the 3rd visit; that belief came from a
+        misleading Stata label (see EXPECTED) and dropped the 2nd-visit ask.
+        1991-92 stays out only because its rural 8-visit schedule thins
+        purchased rows after visit 8 (see EXPECTED's note).
         """
         got = visits_by_wave_and_source.get(wave)
         if not got:

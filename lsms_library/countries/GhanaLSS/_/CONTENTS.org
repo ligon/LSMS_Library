@@ -1258,7 +1258,7 @@ corroborated by the visit dates the survey itself recorded (see below):
 | 1987-88, 1988-89 | 1      | single recall    | single recall    | 1                     |
 | 1991-92 (GLSS3)  | 8 / 11 | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 7 rural / 10 urban    |
 | 1998-99 (GLSS4)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
-| 2005-06 (GLSS5)  | 11     | q1..q10 -> 2..11 | q4..q12 -> 3..11 | 10 / 9                |
+| 2005-06 (GLSS5)  | 11     | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 10                    |
 | 2012-13 (GLSS6)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
 | 2016-17 (GLSS7)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
 
@@ -1281,10 +1281,42 @@ CALENDAR VISIT, which is what the labels state.  Note there is deliberately
 no row at =visit= 1: the first visit collects the roster and trains the
 diary keeper, not consumption.
 
-GLSS5 is why =visit= is the calendar number and not a per-module 1..N
-ordinal.  There, purchases run from the 2nd visit but own production only
-from the 3rd (=s8hq3= is "number of units consumed", a total, not a visit), so
-counting from 1 within each module would leave the two misaligned by one.
+*/Corrected 2026-09-11./*  This passage used to read: "GLSS5 is why =visit=
+is the calendar number and not a per-module 1..N ordinal.  There, purchases
+run from the 2nd visit but own production only from the 3rd (=s8hq3= is
+'number of units consumed', a total, not a visit), so counting from 1 within
+each module would leave the two misaligned by one."  The premise was false
+-- see "=s8hq3= is the 2nd visit, and was dropped" below -- and the table
+row above now reads 2..11 for both modules.  The calendar-visit convention
+stands on its other grounds (it is what every wave's labels state, it is
+checkable against the source, and it is the clock =interview_date= uses);
+it no longer has a GLSS5 counter-example to lean on.
+
+**** =s8hq3= is the 2nd visit, and was dropped for the life of the wave (fixed 2026-09-11)
+
+=2005-06/_/food_acquired.py= read =s8hq4..s8hq12= and skipped =s8hq3=, whose
+Stata label is "number of units consumed".  The label is misleading.  The
+questionnaire (=2005-06/Documentation/G5QPartB.pdf= p.17, printed 8.11)
+heads columns 3..12 "2nd 3rd ... 11th", each asking "How much of own produced
+... was consumed by the household since my last visit?", exactly as 9B's
+columns 1..10 are headed on p.36 -- the 8H stems start at q3 because q1/q2
+are the screeners, as in every other multi-visit round.  The data agree: a
+total cannot be smaller than the sum of its parts, and =s8hq3 <
+sum(s8hq4..s8hq12)= in 27,314 of 423,490 rows; =s8hq3= is positive in 21,493
+rows against 18,336 for =s8hq4=, the same first-ask excess every other wave
+shows at visit 2.
+
+Cost of the drop, measured on a rebuild in a private =LSMS_DATA_DIR=:
+*21,252 rows* added, all at =(s='produced', visit=2)= (21,493 positive
+source records, collapsed by the j-harmonisation), 4,777 households; 1,959
+(household, item) pairs and 57 households had no own-production row at all.
+Every other row of the wave is byte-identical before and after; the index
+stays unique.  =tests/test_ghanalss_visit_alignment.py= had pinned the wrong
+map (=produced: range(3, 12)=) and excluded 2005-06 from the shared-axis
+check "on purpose" -- both corrected.  =_/recall.yml= / =food_recall.csv= no
+longer carry =within_wave_variation: by-s= for this wave, and its spacing is
+now recorded (3 days, unstratified, from the DDI and measured on
+=partb/secb2.dta= -- see =slurm_logs/2026-09-11_ghanalss_visit_dates/2005-06.org=).
 
 **** GLSS3 is stratified: 8 rural visits, 11 urban -- and two recall windows
 
@@ -1357,7 +1389,7 @@ thereafter counts are flat or drift gently down:
 | 1998-99 | purchased | 84,253 (v2)  | 73,701 -> 70,124   |
 | 1998-99 | produced  | 20,098 (v2)  | 17,212 -> 14,733   |
 | 2005-06 | purchased | 125,368 (v2) | 98,996 -> 86,462   |
-| 2005-06 | produced  | 18,166 (v3)  | 17,765 -> 15,590   |
+| 2005-06 | produced  | 21,252 (v2)  | 18,166 -> 15,590   |
 | 2012-13 | purchased | 292,364 (v2) | 246,777 -> 234,035 |
 | 2012-13 | produced  | 39,498 (v2)  | 33,680 -> 30,171   |
 | 2016-17 | purchased | 169,086 (v2) | ~160,000, flat     |
@@ -1459,10 +1491,11 @@ contrast is evidence on precisely that open question: at *identical* interval
 lengths the first ask still carries 24-40% more, and the step is 1.84x for the
 unaided rural stratum against 1.17x for the diary-assisted urban one.
 
-Worth noting that GLSS5, whose own-production module starts at the 3rd visit
-rather than the 2nd, shows the weakest first-ask step (1.02x, against 1.67x
-for GLSS7 produced), which is the kind of contrast that could separate those
-explanations.
+/Corrected 2026-09-11./  This paragraph used to single out GLSS5 as "the
+weakest first-ask step (1.02x)" on the belief that its own-production module
+started at the 3rd visit.  It starts at the 2nd (=s8hq3=, above), and with
+that column restored the produced step is *1.17x* (21,252 vs 18,166) -- in
+line with the other waves, and no longer a contrast that separates anything.
 
 GLSS3 supplies one discriminating measurement.  There the first interval is
 the SAME length as every other -- the =S0B.DTA= visit dates give a median gap
