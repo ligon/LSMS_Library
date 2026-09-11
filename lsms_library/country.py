@@ -2117,7 +2117,7 @@ class Country:
         frame = _call_derivation_inputs(records[key], wave=wave)
         if (
             isinstance(frame.index, pd.MultiIndex)
-            and 'i' in frame.index.names
+            and {'t', 'i'} <= set(frame.index.names)   # id_walk needs both
             and not frame.attrs.get('id_converted')
             and self.updated_ids is not None
         ):
