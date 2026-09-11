@@ -2,7 +2,26 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+from lsms_library.build_transforms import add_visit_level
+from lsms_library.transformations import (
+    food_acquired_to_canonical as _food_acquired_canonical)
+
+
+def food_acquired(df):
+    """``food_acquired`` post-processor: canonical reshape + ``visit = 1``.
+
+    EHCVM fields the consumption module ONCE (its ``vague`` is a sample split
+    — which households are surveyed when — not a repeated measure, and
+    ``food_acquired_to_canonical`` drops it upstream).  The country's 2014 EMC
+    wave DOES repeat it, four times, so ``food_acquired`` carries a ``visit``
+    level; this wave gets the constant ``1`` so all three waves share one index
+    shape and the country-level concat aligns.  That is exactly what
+    ``build_transforms.add_visit_level`` is for.
+
+    No number changes here: one constant level is appended, nothing is summed,
+    reduced or dropped.
+    """
+    return add_visit_level(_food_acquired_canonical(df), visit=1)
 
 FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
               'AteLess', 'RanOut', 'Hungry', 'WholeDay']

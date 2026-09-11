@@ -169,19 +169,19 @@ Burkina_Faso,community_prices,,undeclared,absent,,not declared by this country f
 Burkina_Faso,crop_production,2014,absent,absent,,source not declared for wave
 Burkina_Faso,crop_production,2018-19,sane,declared,15587,"warn: index_levels_match_scheme,no_constant_columns"
 Burkina_Faso,crop_production,2021-22,absent,absent,,source not declared for wave
-Burkina_Faso,food_acquired,2014,sane,declared,97361,all checks pass
+Burkina_Faso,food_acquired,2014,sane,declared,557692,all checks pass
 Burkina_Faso,food_acquired,2018-19,sane,declared,137934,all checks pass
 Burkina_Faso,food_acquired,2021-22,sane,declared,69208,all checks pass
 Burkina_Faso,food_coping,2014,sane,declared,51099,warn: index_levels_match_scheme
 Burkina_Faso,food_coping,2018-19,absent,absent,,source not declared for wave
 Burkina_Faso,food_coping,2021-22,absent,absent,,source not declared for wave
-Burkina_Faso,food_expenditures,2014,sane,declared,96793,all checks pass
+Burkina_Faso,food_expenditures,2014,sane,declared,239916,all checks pass
 Burkina_Faso,food_expenditures,2018-19,sane,declared,97802,all checks pass
 Burkina_Faso,food_expenditures,2021-22,sane,declared,50109,all checks pass
-Burkina_Faso,food_prices,2014,sane,declared,96582,all checks pass
+Burkina_Faso,food_prices,2014,sane,declared,96760,all checks pass
 Burkina_Faso,food_prices,2018-19,sane,declared,97385,all checks pass
 Burkina_Faso,food_prices,2021-22,sane,declared,50000,all checks pass
-Burkina_Faso,food_quantities,2014,sane,declared,97062,all checks pass
+Burkina_Faso,food_quantities,2014,sane,declared,108396,all checks pass
 Burkina_Faso,food_quantities,2018-19,sane,declared,137452,all checks pass
 Burkina_Faso,food_quantities,2021-22,sane,declared,69017,all checks pass
 Burkina_Faso,food_security,2014,absent,absent,,source not declared for wave

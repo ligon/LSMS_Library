@@ -8,7 +8,7 @@ Emits index (t, i, j, u, s, visit) with columns [Quantity, Expenditure, Price].
   skill's LCU convention we emit u='Value', Expenditure=value, Quantity=Expenditure.
   No physical quantity is fabricated (Phase-3 price-imputation is out of scope).
 - s='produced' from sec8h (food label = foodcd, decoded via harmonize_food Label_8h).
-  Produced rows carry a real Quantity (sum of the visit columns s8hq3..s8hq8), a
+  Produced rows carry a real Quantity (s8hq3..s8hq8 = the 2nd..7th visits), a
   real unit u (s8hq9), and a farmgate Price (s8hq10).  Expenditure is NaN.
 
 visit is KEPT as its own index level (decision D1 -- do NOT fold into t).  The
@@ -52,7 +52,7 @@ purch_visits = []
 for i in range(1, 7):
     di = x.loc[:, [f"Expenditure_{i}"]].copy()
     di.columns = ['Expenditure']
-    di['visit'] = i
+    di['visit'] = i + 1   # s9bq1 = '2nd visit', .. s9bq6 = '7th visit'
     di = di.reset_index().replace({r'': pd.NA, 0: np.nan})
     purch_visits.append(di)
 
@@ -81,7 +81,11 @@ prod['j'] = prod['foodcd'].map(produced_food)
 prod = prod[(prod['j'] != '') & prod['j'].notna()]
 
 prod = prod.rename(columns={'hid': 'i', 's8hq9': 'u', 's8hq10': 'Price'})
-qty_cols = {f"s8hq{i}": f"Quantity_{i}" for i in range(3, 9)}
+# Source question numbers are NOT visit numbers.  This wave's own Stata
+# variable labels give the mapping:
+#   s8hq3 "..consumed at 2nd visit" .. s8hq8 "..at 7th visit"; s8hq1/s8hq2
+#   are screeners, which is why the visit columns start at q3.
+qty_cols = {f"s8hq{i}": f"Quantity_{i - 1}" for i in range(3, 9)}
 prod = prod.rename(columns=qty_cols)
 
 keep = ['i', 'j', 'u', 'Price'] + list(qty_cols.values())

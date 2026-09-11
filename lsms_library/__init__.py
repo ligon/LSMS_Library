@@ -145,6 +145,9 @@ from .conversion import convert
 from . import local_tools as tools
 from . import population
 from .population import PopulationRecord, population_records
+from . import recall as _recall_mod
+from .recall import RecallRecord, recall_records
+from .recall_table import recall
 from . import transformations
 from . import visualizations
 from .visualizations import population_pyramid, coordinate_map, lorenz_curve

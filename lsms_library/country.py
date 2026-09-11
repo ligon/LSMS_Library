@@ -62,6 +62,7 @@ from .null_read_audit import check_declared_columns
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
+from .recall import attach as attach_recall, recall_records
 import importlib.util
 import hashlib
 import logging
@@ -3113,6 +3114,21 @@ class Country:
             # and it is in `_build_registry._EXCLUDED_CALLABLES`, so attaching
             # here costs no cache invalidation.  MEASURED, not assumed.
             attach_population(df, self.name)
+
+            # Attach what reference period the food numbers COVER, per wave
+            # (GH #851).  Same placement and the same two reasons as the
+            # population record above: `_finalize_result` re-runs on every read,
+            # and it is in `_build_registry._EXCLUDED_CALLABLES`, so this costs
+            # no cache invalidation.  Metadata only -- it adds `attrs`, never a
+            # row, a column or a value.
+            #
+            # A config read, deliberately NOT a join against `interview_date`:
+            # that table is itself finalized (so the join re-enters this
+            # function unboundedly), and four food countries -- Guatemala,
+            # Panama, GhanaSPS, EthiopiaRHS -- do not have it at all, which
+            # would turn a metadata annotation into an AttributeError on a data
+            # call.  Both measured before this landed.
+            attach_recall(df, self.name)
 
             # SITE B of the null-content audit.  Every other guard on this
             # table checks that a required declared column is PRESENT; this one

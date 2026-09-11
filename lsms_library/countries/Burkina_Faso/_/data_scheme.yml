@@ -53,23 +53,37 @@ Data Scheme:
 
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
-    # source (purchased / produced / inkind / other).  EHCVM 2018-19
-    # and 2021-22 wave mapping.py files import
-    # food_acquired_to_canonical as food_acquired to reshape the
+    # source (purchased / produced / inkind / other).  Every wave's
+    # mapping.py wraps food_acquired_to_canonical to reshape the
     # wide-form (Quantity-total, Produced-subset, Expenditure) into
-    # long-form on s.  `visit` (vague) is dropped: in EHCVM it's a
-    # sample split, not a repeated measure.
+    # long-form on s.  EHCVM's `vague` is dropped there: it is a sample
+    # split, not a repeated measure.
     #
-    # The 2014 wave (which the country module emits as t='2013_Q4' via
-    # the country-level food_acquired.py script) is Phase-2-incomplete:
-    # it follows the legacy script-path build that bypasses mapping.py
-    # post-processors, so the helper isn't invoked.  Pending a Phase 3
-    # rewrite of Burkina_Faso/2014/_/food_acquired.py (or the country-
-    # level food_acquired.py) to emit canonical shape, t='2013_Q4'
-    # continues to emit a legacy non-canonical shape.  Country
-    # ('Burkina_Faso').food_acquired() runtime output mixes shapes
-    # across waves until that lands.
-    index: (t, v, i, j, u, s)
+    # `visit` -- THE RECALL OCCASION, and it is NOT `vague` (GH #851,
+    # charter-recall-windows §2.7).  The 2014 EMC is a CONTINUOUS survey
+    # that revisits the same households in FOUR quarterly passages, each
+    # re-asking the 7-day food module: the wave delivers 4 x 7 = 28 days
+    # of exposure in four independent recalls, and the passage number
+    # exists only in the source FILENAME.  Without this level the four
+    # passages collide on one (t, v, i, j, u, s) tuple and
+    # _ADDITIVE_MEASURE_COLUMNS SUMS them into a single unmarked figure
+    # presented as a 7-day number.  2014 carries visit 1..4; the two
+    # EHCVM waves ask once and carry the constant 1
+    # (build_transforms.add_visit_level).  Cross-country
+    # Feature('food_acquired') still drops the level and sums, exactly as
+    # it does for GhanaLSS's ~12 visits (GH #501) -- the detail is kept
+    # at the Country level, where it can be seen.
+    #
+    # An earlier version of this comment claimed the 2014 wave is built
+    # by the country-level food_acquired.py script and emits t='2013_Q4'
+    # in a legacy non-canonical shape.  That was STALE, and CONTENTS.org
+    # already said so: food_acquired is NOT `materialize: make` for this
+    # country, so 2014 goes through the YAML path (a four-file `file:`
+    # list in 2014/_/data_info.yml) and is served at t='2014' in
+    # canonical shape.  2014/_/food_acquired.py (which reads only passage
+    # 1 and stamps t='2013_Q4') and _/food_acquired.py survive as
+    # unreferenced legacy; nothing on the Country API path calls them.
+    index: (t, v, i, j, u, s, visit)
     Quantity: float
     Expenditure: float
   assets:
