@@ -14,15 +14,15 @@ five of seven waves.  What is missing everywhere is TIME OF DAY: no GLSS
 household instrument, in any round, has a clock-time field (GLSS5/6/7 have a
 per-visit DURATION field; only the community questionnaire records a time).
 
-| wave    | visits | per-visit dates shipped?                                  | file(s)                         | wired in library? |
-|---------+--------+-----------------------------------------------------------+---------------------------------+-------------------|
-| 1987-88 | 2 rounds ~14d apart | yes: both rounds + proposed R2 + supervisor/DEO dates | Y00A (9 date boxes)     | R1 date only      |
-| 1988-89 | 2 rounds ~14d apart | yes: as above, plus per-section first/check-up dates  | Y00A, Y00B              | R1 date only      |
-| 1991-92 | 8 rural / 11 urban  | yes: 11 slots, date+result+check-up (4,230 of 4,522 HH)| S0B (vd/vm/vy/vr k=1..11) | first visit only |
-| 1998-99 | 7                   | yes: visits 1-3 (Part A grid) and 2-7 (Part B grid)   | SEC0C, SEC0B            | first visit only  |
-| 2005-06 | 11                  | yes: visits 2-11 date, result, DURATION, check-up     | secb1, secb2 (+ secb0)  | first visit only  |
-| 2012-13 | 7                   | yes: all 7, date, result, DURATION, check-up          | PARTB/secb2, secb1, SECA01/04 | first visit only |
-| 2016-17 | 7 (CAPI)            | NO: intake date + =hhstatus= only                     | g7sec0                  | first visit only  |
+|    wave | visits              | per-visit dates shipped?                                | file(s)                       | wired in library? |
+|---------+---------------------+---------------------------------------------------------+-------------------------------+-------------------|
+| 1987-88 | 2 rounds ~14d apart | yes: both rounds + proposed R2 + supervisor/DEO dates   | Y00A (9 date boxes)           | R1 date only      |
+| 1988-89 | 2 rounds ~14d apart | yes: as above, plus per-section first/check-up dates    | Y00A, Y00B                    | R1 date only      |
+| 1991-92 | 8 rural / 11 urban  | yes: 11 slots, date+result+check-up (4,230 of 4,522 HH) | S0B (vd/vm/vy/vr k=1..11)     | first visit only  |
+| 1998-99 | 7                   | yes: visits 1-3 (Part A grid) and 2-7 (Part B grid)     | SEC0C, SEC0B                  | first visit only  |
+| 2005-06 | 11                  | yes: visits 2-11 date, result, DURATION, check-up       | secb1, secb2 (+ secb0)        | first visit only  |
+| 2012-13 | 7                   | yes: all 7, date, result, DURATION, check-up            | PARTB/secb2, secb1, SECA01/04 | first visit only  |
+| 2016-17 | 7 (CAPI)            | NO: intake date + =hhstatus= only                       | g7sec0                        | first visit only  |
 
 Median realised spacing, from the shipped dates: GLSS1/2 14 d; GLSS3 3 d
 urban / 2 d rural (11 loc2-urban clusters ran the rural schedule);
