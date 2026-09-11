@@ -266,21 +266,21 @@ signal there.  Rare enough not to be a firehose; the census will say.
   with =days_per_unit = {3: 1, 4: 7, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365}=
   (the 12B legend: DAY 3, WEEK 4, MONTH 5, QUARTER 6, HALF YEAR 7,
   YEAR 8) and =window_days = 14= as a module constant, not an argument.
-- Construction :: NOT YET DECIDED (Open question 0).  The candidates,
-  with the own-production share of food each implies against the
-  17-18% served today: (a) year-average fortnight,
-  =value_each_time * times * (14 / days_per_unit) * months / 12=,
-  i.e. GSS's =HPFOOD / 26= -- 33-38%; (b) in-season fortnight, the
-  same without =months / 12= -- 50-52%; (c) GSS's own annual
-  =HPFOOD= construction on the produced side with 12A's q4-q6
-  annualised on the purchased side (=PFOOD=), abandoning the bounded
-  recall.  The distinction that matters for the precept: the
-  annualisation in (a) and (c) is GSS's documented construction; the
-  =/ 26= in (a) and the dropped month factor in (b) are the library's
-  additions.  Whichever is chosen is the ONE construction; the others
+- Construction (decided 2026-09-11) :: the YEAR-AVERAGE fortnight,
+  =value_each_time * times * (14 / days_per_unit) * months / 12=, i.e.
+  GSS's own annual construction =HPFOOD= divided by 26.  Worked
+  example agreed with @ligon: 6 months of the 12, 12 times a month,
+  10 cedis each time -> 120 a month in season, 720 a year (=HPFOOD=),
+  55.3 for an in-season fortnight, and 27.6 for a fortnight drawn at
+  random from the year (the 6/12 is the chance the fortnight lands in
+  season).  Chosen because it is unbiased over the sample -- the
+  purchase side is a realised fortnight but the form does not record
+  WHICH months were cited, so the in-season figure is right for some
+  households and zero is right for the rest, unknowably -- and because
+  it defers to the construction the people who collected the data
+  used.  The in-season alternative (no =months / 12=) and GSS's annual
   are described in the docstring and computable from
-  =derivation_inputs=.  Which months were cited is not recoverable by
-  construction: the form says "WRITE THE NUMBER OF MONTHS CITED".
+  =derivation_inputs=; the served value is this one.
 - Test :: the annualising core of the function applied to =Y12B= and
   summed per household must reproduce =EXPEND.HPFOOD= to within 3% at
   the median (measured 1.020 / 1.020 for both rounds); a static test
@@ -423,10 +423,8 @@ divides (correctly); =recall.merge_attrs= has no caller, so
 
 * Open questions for @ligon
 
-0. The 12B construction itself -- (a) year-average fortnight,
-   (b) in-season fortnight, or (c) GSS's annual on both sides.  See
-   "First instance".  Nothing on the 1980s scripts moves until this
-   is answered.
+0. The 12B construction -- DECIDED 2026-09-11: year-average
+   fortnight (=HPFOOD / 26=).  See "First instance".
 1. Key format -- DECIDED 2026-09-11: =country::table::name=, empties
    mean "all", wave scope in the entry.  See "The registry".
 2. Derived tables / =Feature()= -- DECIDED 2026-09-11: follow-on; at
